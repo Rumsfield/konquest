@@ -1,11 +1,11 @@
 name: Konquest
 description: A plugin for land claiming and territory control
 author: Rumsfield
-version: 2.5.3
+version: 0.1.0
 api-version: 1.16
 main: konquest.KonquestPlugin
 depend: [Vault]
-softdepend: [QuickShop]
+softdepend: [QuickShop,LuckPerms]
 commands:
   konquest:
     description: Base Konquest command
