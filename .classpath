@@ -7,11 +7,11 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/Vault-1.7.3.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Spigot/BuildTools/Spigot/Spigot-API/target/spigot-api-1.16.5-R0.1-SNAPSHOT-shaded.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Spigot/BuildTools/Spigot/Spigot-Server/target/spigot-1.16.5-R0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/QuickShop-4.0.2.9.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/LuckPerms-Bukkit-5.1.15.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/sqlite-jdbc-3.32.3.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/Vault-1.7.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/spigot-api-1.16.5-R0.1-SNAPSHOT-shaded.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/spigot-1.16.5-R0.1-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/QuickShop-4.0.2.9.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/LuckPerms-Bukkit-5.1.15.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/sqlite-jdbc-3.32.3.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
