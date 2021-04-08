@@ -1,0 +1,78 @@
+package konquest.utility;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Snow;
+import org.bukkit.scheduler.BukkitRunnable;
+//import org.bukkit.scheduler.BukkitTask;
+
+import konquest.Konquest;
+
+public class BlockPaster {
+
+	//private BukkitScheduler scheduler;
+    //private Runnable task;
+    //private BukkitRunnable task;
+    //private BukkitTask task;
+    //private int taskID;
+    Location centerLoc;
+    private int y;
+    private int y_offset;
+    private int bottomBlockY;
+    private int topBlockX;
+    private int topBlockZ;
+    private int bottomBlockX;
+    private int bottomBlockZ;
+    
+    public BlockPaster(Location centerLoc, int y, int y_offset, int bottomBlockY, int topBlockX, int topBlockZ, int bottomBlockX, int bottomBlockZ) {
+    	//this.taskID = 0;
+    	//this.scheduler = Bukkit.getScheduler();
+    	this.centerLoc = centerLoc;
+    	this.y = y;
+    	this.y_offset = y_offset;
+    	this.bottomBlockY = bottomBlockY;
+    	this.topBlockX = topBlockX;
+    	this.topBlockZ = topBlockZ;
+    	this.bottomBlockX = bottomBlockX;
+    	this.bottomBlockZ = bottomBlockZ;
+    }
+    
+    
+    public void setY(int y) {
+    	this.y = y;
+    }
+    
+    public void startPaste() {
+
+    	BukkitRunnable task = new BukkitRunnable() {
+            public void run() {
+            	//ChatUtil.printDebug("Running task at Y "+y+" from template X "+bottomBlockX+" to "+topBlockX+" and Z "+bottomBlockZ+" to "+topBlockZ);
+            	for (int x = bottomBlockX; x <= topBlockX; x++) {
+                    for (int z = bottomBlockZ; z <= topBlockZ; z++) {
+                        Block templateBlock = Bukkit.getServer().getWorld(Konquest.getInstance().getWorldName()).getBlockAt(x, y, z);
+                        Block monumentBlock = Bukkit.getServer().getWorld(Konquest.getInstance().getWorldName()).getChunkAt(centerLoc).getBlock(x-bottomBlockX, y-bottomBlockY+y_offset, z-bottomBlockZ);
+                        // Set local block to monument template block
+                        monumentBlock.setType(templateBlock.getType());
+                        monumentBlock.setBlockData(templateBlock.getBlockData().clone());
+                        //ChatUtil.printDebug("Pasting block at "+monumentBlock.getLocation().toString()+" with template from "+templateBlock.getLocation().toString());
+                        //Remove snow
+                        if(monumentBlock.getBlockData() instanceof Snow) {
+                        	monumentBlock.setType(Material.AIR);
+                        }
+                    }
+                }
+            	//ChatUtil.printDebug("Finished running task at Y "+y+" from template X "+bottomBlockX+" to "+topBlockX+" and Z "+bottomBlockZ+" to "+topBlockZ);
+            	
+            }
+        };
+        //taskID = scheduler.scheduleSyncDelayedTask(Konquest.getInstance().getPlugin(), task, 20);
+        //BukkitTask t = task.runTaskLater(Konquest.getInstance().getPlugin(), 20);
+        task.runTaskLater(Konquest.getInstance().getPlugin(), 20);
+        //this.taskID = t.getTaskId();
+        //ChatUtil.printDebug("Started BlockPaster task with y "+y+" and taskID "+t.getTaskId());
+    }
+
+    
+}

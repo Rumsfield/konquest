@@ -1,0 +1,62 @@
+upgrades:
+  loot:
+    costs:
+    - 100
+    - 300
+    - 500
+    populations:
+    - 2
+    - 5
+    - 8
+  drops:
+    costs:
+    - 250
+    populations:
+    - 5
+  fatigue:
+    costs:
+    - 800
+    populations:
+    - 10
+  counter:
+    costs:
+    - 400
+    - 400
+    populations:
+    - 6
+    - 8
+  health:
+    costs:
+    - 200
+    - 400
+    - 600
+    populations:
+    - 4
+    - 6
+    - 8
+  damage:
+    costs:
+    - 250
+    - 250
+    populations:
+    - 6
+    - 8
+  watch:
+    costs:
+    - 300
+    - 600
+    - 900
+    populations:
+    - 3
+    - 6
+    - 9
+  enchant:
+    costs:
+    - 1000
+    populations:
+    - 10
+  old:
+    costs:
+    - 10000
+    populations:
+    - 20

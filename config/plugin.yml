@@ -1,0 +1,181 @@
+name: Konquest
+description: A plugin for land claiming and territory control
+author: Rumsfield
+version: 2.5.3
+api-version: 1.16
+main: konquest.KonquestPlugin
+depend: [Vault]
+softdepend: [QuickShop]
+commands:
+  konquest:
+    description: Base Konquest command
+    usage: /<command> [options]
+    permission: konquest.command
+  k:
+    description: Display help menu
+    usage: /<command> [options]
+    permission: konquest.command
+permissions:
+  konquest.*:
+    description: Gives access to all Konquest permissions
+    children:
+      konquest.command: true
+    default: op
+
+  konquest.command:
+    description: Gives access to base Konquest command permission
+    default: true
+
+  konquest.command.*:
+    description: Gives access to all Konquest commands
+    default: op
+    children:
+      konquest.command.help: true
+      konquest.command.join: true
+      konquest.command.leave: true
+      konquest.command.exile: true
+      konquest.command.info: true
+      konquest.command.chat: true
+      konquest.command.claim: true
+      konquest.command.list: true
+      konquest.command.map: true
+      konquest.command.settle: true
+      konquest.command.travel: true
+      konquest.command.favor: true
+      konquest.command.quest: true
+      konquest.command.score: true
+      konquest.command.spy: true
+      konquest.command.stats: true
+      konquest.command.prefix: true
+      konquest.command.town: true
+      konquest.command.admin: true
+
+  konquest.command.help:
+    description: Display help in chat
+    default: true
+
+  konquest.command.join:
+    description: Join a kingdom or town
+    default: true
+    
+  konquest.command.leave:
+    description: Leave a town
+    default: true
+
+  konquest.command.exile:
+    description: Exile yourself as a barbarian
+    default: true
+    
+  konquest.command.info:
+    description: Display info on a kingdom, town or player
+    default: true
+
+  konquest.command.claim:
+    description: Claim land for an adjacent town
+    default: true
+    
+  konquest.command.list:
+    description: Display a list of kingdoms or towns
+    default: true
+
+  konquest.command.map:
+    description: Display a map of surrounding land in chat
+    default: true
+
+  konquest.command.settle:
+    description: Settle a new town
+    default: true
+
+  konquest.command.travel:
+    description: Travel to a friendly town
+    default: true
+
+  konquest.command.favor:
+    description: Display your favor and costs
+    default: true
+    
+  konquest.command.quest:
+    description: Display the quest book
+    default: true
+
+  konquest.command.score:
+    description: Display a kingdom's score
+    default: true
+    
+  konquest.command.spy:
+    description: Purchase a map centered on an enemy town
+    default: true
+    
+  konquest.command.stats:
+    description: Display the stats book
+    default: true
+    
+  konquest.command.prefix:
+    description: Choose a prefix for your name in chat
+    default: true
+    
+  konquest.command.town:
+    description: Manage a town
+    default: true
+
+  konquest.command.admin:
+    description: For admins
+    default: op
+    
+  konquest.directive:
+    description: Gives access to base Konquest directive permission
+    default: true
+
+  konquest.directive.*:
+    description: Gives access to all Konquest directives
+    default: true
+    children:
+      konquest.directive.settle: true
+      konquest.directive.claim: true
+      konquest.directive.build: true
+      konquest.directive.golem: true
+      konquest.directive.armor: true
+      konquest.directive.enchant: true
+      konquest.directive.attack: true
+      konquest.directive.capture: true
+      konquest.directive.kill: true
+
+  konquest.directive.settle:
+    description: Receive a reward for settling your first town
+    default: true
+    
+  konquest.directive.claim:
+    description: Receive a reward for claiming your first 5 chunks
+    default: true
+    
+  konquest.directive.build:
+    description: Receive a reward for building structures in a town
+    default: true
+    
+  konquest.directive.golem:
+    description: Receive a reward for creating an iron golem in a town
+    default: true
+    
+  konquest.directive.armor:
+    description: Receive a reward for crafting a set of iron armor
+    default: true
+    
+  konquest.directive.enchant:
+    description: Receive a reward for enchanting tools and weapons
+    default: true
+    
+  konquest.directive.attack:
+    description: Receive a reward for attacking an enemy town
+    default: true
+    
+  konquest.directive.capture:
+    description: Receive a reward for capturing an enemy town
+    default: true
+    
+  konquest.directive.kill:
+    description: Receive a reward for killing an enemy player
+    default: true
+    
+  konquest.compass:
+    description: Compass points to nearest enemy town
+    default: true

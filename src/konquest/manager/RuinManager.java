@@ -1,0 +1,196 @@
+package konquest.manager;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+
+import konquest.Konquest;
+import konquest.KonquestPlugin;
+import konquest.model.KonPlayer;
+import konquest.model.KonRuin;
+import konquest.utility.ChatUtil;
+import net.milkbowl.vault.economy.EconomyResponse;
+
+public class RuinManager {
+
+	private Konquest konquest;
+	private KingdomManager kingdomManager;
+	private HashMap<String, KonRuin> ruinMap; // lower case name maps to ruin object
+	
+	public RuinManager(Konquest konquest) {
+		this.konquest = konquest;
+		this.kingdomManager = konquest.getKingdomManager();
+		this.ruinMap = new HashMap<String, KonRuin>();
+		
+	}
+	//TODO:
+	// On server start and stop, replace critical and spawn blocks in all ruins
+	// Load custom mob lists from config file for spawn tables
+	// Give rewards (favor and exp) to players inside of ruin territory upon capture
+	// Kill all mobs inside a ruin when it is captured
+	
+	public void initialize() {
+		loadRuins();
+		regenAllRuins();
+		ChatUtil.printDebug("Ruin Manager is ready");
+	}
+	
+	public void regenAllRuins() {
+		for(KonRuin ruin : ruinMap.values()) {
+			ruin.regenCriticalBlocks();
+		}
+	}
+	
+	public void removeAllGolems() {
+		for(KonRuin ruin : ruinMap.values()) {
+			ruin.removeAllGolems();
+		}
+	}
+	
+	public void rewardPlayers(KonRuin ruin, KonPlayer capturePlayer) {
+		int rewardFavor = konquest.getConfigManager().getConfig("core").getInt("core.ruins.capture_reward_favor",0);
+		int rewardExp = konquest.getConfigManager().getConfig("core").getInt("core.ruins.capture_reward_exp",0);
+		for(KonPlayer friendly : konquest.getPlayerManager().getPlayersInKingdom(capturePlayer.getKingdom())) {
+			if(isLocInsideRuin(ruin,friendly.getBukkitPlayer().getLocation())) {
+				// Give reward to player
+				if(rewardFavor > 0) {
+					ChatUtil.printDebug("Ruin capture favor rewarded to player "+friendly.getBukkitPlayer().getName());
+					EconomyResponse r = KonquestPlugin.getEconomy().depositPlayer(friendly.getBukkitPlayer(), rewardFavor);
+		            if(r.transactionSuccess()) {
+		            	String balanceF = String.format("%.2f",r.balance);
+		            	String amountF = String.format("%.2f",r.amount);
+		            	ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+"Captured Ruin: "+ruin.getName()+ChatColor.RESET+" "+ChatColor.WHITE+"Favor rewarded: "+ChatColor.DARK_GREEN+amountF+ChatColor.WHITE+", total: "+ChatColor.DARK_GREEN+balanceF);
+		            } else {
+		            	ChatUtil.sendError(friendly.getBukkitPlayer(), String.format("An error occured: %s", r.errorMessage));
+		            }
+				}
+				if(rewardExp > 0) {
+					friendly.getBukkitPlayer().giveExp(rewardExp);
+					ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.WHITE+"EXP rewarded: "+ChatColor.GREEN+rewardExp);
+				}
+			}
+		}
+	}
+	
+	public boolean isRuin(String name) {
+		// Check for lower-case name only
+		return ruinMap.containsKey(name.toLowerCase());
+	}
+	
+	public boolean isLocInsideRuin(KonRuin ruin, Location loc) {
+		boolean result = false;
+		if(kingdomManager.isChunkClaimed(loc.getChunk())) {
+			if(ruin.equals(kingdomManager.getChunkTerritory(loc.getChunk()))) {
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	public boolean addRuin(Location loc, String name) {
+		boolean result = false;
+		if(!name.contains(" ") && !isRuin(name)) {
+			// Verify no overlapping init chunks
+			for(Chunk chunk : konquest.getAreaChunks(loc, 2)) {
+				if(kingdomManager.isChunkClaimed(chunk)) {
+					ChatUtil.printDebug("Found a chunk conflict during ruin init: "+name);
+					return false;
+				}
+			}
+			// Add ruin to map with lower-case key
+			String nameLower = name.toLowerCase();
+			ruinMap.put(nameLower, new KonRuin(loc, name, kingdomManager.getNeutrals(), konquest));
+			ruinMap.get(nameLower).initClaim();
+			kingdomManager.addAllTerritory(loc.getWorld(),ruinMap.get(nameLower).getChunkList());
+			result = true;
+		}
+		return result;
+	}
+	
+	public boolean removeRuin(String name) {
+		boolean result = false;
+		KonRuin oldRuin = ruinMap.remove(name.toLowerCase());
+		if(oldRuin != null) {
+			oldRuin.removeAllBarPlayers();
+			oldRuin.removeAllGolems();
+			kingdomManager.removeAllTerritory(oldRuin.getCenterLoc().getWorld(), oldRuin.getChunkList().keySet());
+			ChatUtil.printDebug("Removed Ruin "+name);
+			oldRuin = null;
+			result = true;
+		}
+		return result;
+	}
+	
+	public KonRuin getRuin(String name) {
+		return ruinMap.get(name.toLowerCase());
+	}
+	
+	public Collection<KonRuin> getRuins() {
+		return ruinMap.values();
+	}
+	
+	public Set<String> getRuinNames() {
+		return ruinMap.keySet();
+	}
+	
+	private void loadRuins() {
+		FileConfiguration ruinsConfig = konquest.getConfigManager().getConfig("ruins");
+        if (ruinsConfig.get("ruins") == null) {
+        	ChatUtil.printDebug("There is no ruins section in ruins.yml");
+            return;
+        }
+        double x,y,z;
+        List<Double> sectionList;
+        String worldName;
+        // Load all Ruins
+        ConfigurationSection ruinsSection = ruinsConfig.getConfigurationSection("ruins");
+        for(String ruinName : ruinsConfig.getConfigurationSection("ruins").getKeys(false)) {
+        	ConfigurationSection ruinSection = ruinsSection.getConfigurationSection(ruinName);
+        	worldName = ruinSection.getString("world","world");
+        	sectionList = ruinSection.getDoubleList("center");
+    		x = sectionList.get(0);
+    		y = sectionList.get(1);
+    		z = sectionList.get(2);
+        	Location ruin_center = new Location(Bukkit.getWorld(worldName),x,y,z);
+        	addRuin(ruin_center,ruinName);
+        	getRuin(ruinName).addPoints(konquest.formatStringToPoints(ruinSection.getString("chunks","")));
+        	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("criticals",""))) {
+        		loc.setWorld(Bukkit.getWorld(worldName));
+        		getRuin(ruinName).addCriticalLocation(loc);
+    		}
+        	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("spawns",""))) {
+        		loc.setWorld(Bukkit.getWorld(worldName));
+        		getRuin(ruinName).addSpawnLocation(loc);
+    		}
+        	kingdomManager.addAllTerritory(Bukkit.getWorld(worldName),getRuin(ruinName).getChunkList());
+        }
+	}
+	
+	public void saveRuins() {
+		if(!ruinMap.isEmpty()) {
+			FileConfiguration ruinsConfig = konquest.getConfigManager().getConfig("ruins");
+			ruinsConfig.set("ruins", null); // reset ruins config
+			ConfigurationSection root = ruinsConfig.createSection("ruins");
+			for(String name : ruinMap.keySet()) {
+				KonRuin ruin = ruinMap.get(name);
+				ConfigurationSection ruinSection = root.createSection(ruin.getName());
+				ruinSection.set("world", ruin.getCenterLoc().getWorld().getName());
+				ruinSection.set("center", new int[] {(int) ruin.getCenterLoc().getX(),
+						 							 (int) ruin.getCenterLoc().getY(),
+						 							 (int) ruin.getCenterLoc().getZ()});
+				ruinSection.set("chunks", konquest.formatPointsToString(ruin.getChunkList().keySet()));
+				ruinSection.set("criticals", konquest.formatLocationsToString(ruin.getCriticalLocations()));
+				ruinSection.set("spawns", konquest.formatLocationsToString(ruin.getSpawnLocations()));
+			}
+		}
+	}
+	
+}

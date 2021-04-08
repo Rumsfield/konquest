@@ -1,0 +1,119 @@
+package konquest.manager;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
+
+import konquest.Konquest;
+import konquest.KonquestPlugin;
+import konquest.model.KonDirective;
+import konquest.model.KonPlayer;
+import konquest.utility.ChatUtil;
+import net.milkbowl.vault.economy.EconomyResponse;
+
+public class DirectiveManager {
+	
+	private Konquest konquest;
+	private HashMap<KonDirective,Double> rewardTable;
+	
+	public DirectiveManager(Konquest konquest) {
+		this.konquest = konquest;
+		this.rewardTable = new HashMap<KonDirective,Double>();
+	}
+	
+	public void initialize() {
+		// Populate reward table, defaults to 10
+		for(KonDirective dir : KonDirective.values()) {
+			String dirName = dir.toString().toLowerCase();
+			double reward = 10;
+			if(konquest.getConfigManager().getConfig("core").contains("core.favor.rewards."+dirName)) {
+				reward = konquest.getConfigManager().getConfig("core").getDouble("core.favor.rewards."+dirName);
+			}
+			rewardTable.put(dir,reward);
+			//ChatUtil.printDebug("Initialized reward "+reward+" for directive "+dirName);
+		}
+		ChatUtil.printDebug("Directive Manager is ready in world "+konquest.getWorldName());
+	}
+	
+	/**
+	 * Primary method for updating progress and giving rewards for completion.
+	 * @param player - KonPlayer assessing progress
+	 * @param directive - KonDirective to asses
+	 */
+	public void updateDirectiveProgress(KonPlayer player, KonDirective directive) {
+		// Check for valid permissions
+		if(!player.getBukkitPlayer().hasPermission(directive.permission())) {
+			ChatUtil.printDebug("Player "+player.getBukkitPlayer().getName()+" does not have permission for directive "+directive.toString());
+			return;
+		}
+		// Check to see if player is already at max progress (complete)
+		int currentProgress = player.getDirectiveProgress(directive);
+		//ChatUtil.printDebug("Updating directive progress for "+player.getBukkitPlayer().getName()+" "+directive.toString()+", currently "+currentProgress);
+		if(currentProgress < directive.stages()) {
+			// Increment directive progress
+			int newProgress = currentProgress + 1;
+			player.setDirectiveProgress(directive, newProgress);
+			// Check to see if directive is now complete
+			if(newProgress >= directive.stages()) {
+				// Give reward
+				ChatUtil.printDebug("Directive rewarded to player "+player.getBukkitPlayer().getName()+" for directive "+directive.title());
+				double reward = rewardTable.get(directive);
+				EconomyResponse r = KonquestPlugin.getEconomy().depositPlayer(player.getBukkitPlayer(), reward);
+	            if(r.transactionSuccess()) {
+	            	String balanceF = String.format("%.2f",r.balance);
+	            	String amountF = String.format("%.2f",r.amount);
+	            	ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+directive.title()+ChatColor.RESET+" "+ChatColor.WHITE+"Favor rewarded: "+ChatColor.DARK_GREEN+amountF+ChatColor.WHITE+", total: "+ChatColor.DARK_GREEN+balanceF);
+	            } else {
+	            	ChatUtil.sendError(player.getBukkitPlayer(), String.format("An error occured: %s", r.errorMessage));
+	            }
+			}
+		} else {
+			//ChatUtil.printDebug("Player "+player.getBukkitPlayer().getName()+" has already completed directive "+directive.toString());
+		}
+	}
+	
+	public void displayBook(KonPlayer player) {
+		ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+		List<String> pages = new ArrayList<String>();
+		BookMeta meta = (BookMeta)Bukkit.getServer().getItemFactory().getItemMeta(Material.WRITTEN_BOOK);
+		// Format book cover
+		meta.setAuthor("Konquest");
+		meta.setGeneration(BookMeta.Generation.ORIGINAL);
+		meta.setTitle("Quest Log");
+		String titlePage = "";
+		titlePage = titlePage+ChatColor.DARK_PURPLE+ChatColor.BOLD+"Tutorial Quests";
+		titlePage = titlePage+ChatColor.RESET+"\n\n";
+		titlePage = titlePage+ChatColor.BLACK+"Use \"/k quest\" or \"/k q\" to open this book again.";
+		titlePage = titlePage+ChatColor.RESET+"\n\n";
+		titlePage = titlePage+ChatColor.BLACK+"Complete these quests to earn "+ChatColor.DARK_GREEN+"Favor"+ChatColor.BLACK+", which is used to claim land and settle new towns!";
+		pages.add(titlePage);
+		// Format pages
+		for(KonDirective dir : KonDirective.values()) {
+			int currentProgress = player.getDirectiveProgress(dir);
+			int stages = dir.stages();
+			ChatColor progressColor = ChatColor.GRAY;
+			if(currentProgress >= stages) {
+				progressColor = ChatColor.DARK_GREEN;
+			}
+			String page = "";
+			page = page+ChatColor.DARK_PURPLE+ChatColor.ITALIC+dir.title();
+			page = page+ChatColor.RESET+"\n\n";
+			page = page+ChatColor.BLACK+dir.description();
+			page = page+ChatColor.RESET+"\n\n";
+			page = page+progressColor+""+currentProgress+"/"+stages;
+			page = page+ChatColor.RESET+"\n\n";
+			page = page+ChatColor.BLACK+"Favor reward: "+ChatColor.DARK_GREEN+rewardTable.get(dir);
+			pages.add(page);
+		}
+		meta.setPages(pages);
+		// Display book
+		book.setItemMeta(meta);
+		player.getBukkitPlayer().openBook(book);
+	}
+}

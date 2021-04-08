@@ -1,0 +1,124 @@
+# core konquest settings
+#core:
+#  debug:                           Enable debug messages (true/false)
+#  world_name:                      Primary world name (string)
+#  save_interval:                   Save interval in minutes, 0 to disable (integer >= 0)
+#  
+#  kingdoms:
+#    capital_suffix:                Suffix to be appended to Kingdom names which will be the name of the Capital city (string)
+#    capital_pvp:                   Allow player damage in capitals (true/false)
+#    protect_containers_use:        Prevent players in other kingdoms using containers in claimed land (true/false)
+#    protect_containers_break:      Prevent players in other kingdoms breaking containers in claimed land (true/false)
+#    no_enemy_enter:                Prevent enemy players from entering Kingdom Capitals (true/false)
+#    no_enemy_travel:               Prevent enemy players from traveling within Kingdom territory (true/false)
+#    no_enemy_edit_offline:         Prevent enemy players from breaking any blocks in a Kingdom with no players online (true/false)
+#    smallest_exp_boost_percent:    Percentage boost EXP gain for the smallest kingdom (0 to disable, 0 - 100)
+#    offline_timeout_seconds:       Time in seconds a player must be offline to be removed from their Kingdom (0 to disable, integer >= 0)
+#    golem_attack_enemies:          Force iron golems to attack enemy players (true/false)
+#    max_player_diff:               Kingdoms with this many players more than other Kingdoms will not accept new players (0 to disable, integer >= 0)
+#
+#  camps:
+#    init_radius:                   Radius of camps for barbarians. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
+#
+#  towns:
+#    min_settle_height:             Minimum height level for new town settlements (0 to disable, 0 - 256)
+#    max_settle_height:             Maximum height level for new town settlements (0 to disable, 0 - 256), Note, if max_settle_height is less than min_settle_height, things might break!
+#    min_distance_town:             Minimum distance in chunks between Towns and other Towns (integer >= 0)
+#    min_distance_capital:          Minimum distance in chunks between Towns and Capitals (integer >= 0)
+#    init_radius:                   Radius of initial settlements. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
+#    capture_cooldown:              Time in seconds before a town can be captured again (integer >= 0)
+#    raid_alert_cooldown:           Time in seconds between raid alerts for Towns (integer >= 0)
+#    travel_cooldown:               Time in seconds for travel cool-down (integer >= 0)
+#    
+#  monuments:
+#    critical_block:                Blocks which must be destroyed to capture a town monument (Material, https://minecraft-ids.grahamedgecombe.com/, e.g. for obsidian, enum is minecraft:obsidian, use OBSIDIAN)
+#    destroy_amount:                Amount of each destroy_blocks that must be destroyed to capture a town monument (integer >= 0)
+#    damage_regen:                  The time in seconds it takes a damaged monument to regenerate after being attacked (integer >= 0)
+#  
+#  favor:
+#    cost_settle:                   Cost to settle a new Town (0 for free, integer >= 0)
+#    cost_claim:                    Cost to claim land (0 for free, integer >= 0)
+#    cost_travel:                   Cost to travel (0 for free, integer >= 0)
+#
+core:
+  debug: true
+  world_name: world
+  save_interval: 60
+  community_link: www.google.com
+  accomplishment_prefix: true
+  travel_wild_random_radius: 1000
+  integration:
+    quickshop: false
+    combatlogx: false
+    essentials: false
+    luckperms: false
+  kingdoms:
+    capital_suffix: Capital
+    capital_pvp: false
+    protect_containers_use: true
+    protect_containers_break: true
+    no_enemy_enter: true
+    no_enemy_travel: true
+    no_enemy_edit_offline: true
+    no_enemy_edit_offline_warmup: 300
+    no_enemy_edit_offline_minimum: 2
+    smallest_exp_boost_percent: 25
+    offline_timeout_days: 0
+    golem_attack_enemies: true
+    attack_friendly_golems: false
+    max_player_diff: 3
+    allow_exile_switch: false
+  towns:
+    min_settle_height: 20
+    max_settle_height: 200
+    min_distance_town: 16
+    min_distance_capital: 16
+    init_radius: 2
+    capture_cooldown: 600
+    raid_alert_cooldown: 30
+    travel_cooldown: 120
+    enable_upgrades: true
+  camps:
+    init_radius: 2
+  monuments:
+    critical_block: OBSIDIAN
+    destroy_amount: 12
+    damage_regen: 300
+    loot_refresh: 1200
+    loot_count: 2
+  ruins:
+    critical_block: OBSIDIAN
+    capture_cooldown: 3600
+    respawn_cooldown: 60
+    capture_reward_favor: 100
+    capture_reward_exp: 1000
+  favor:
+    cost_spy: 200
+    cost_settle: 100
+    cost_settle_increment: 50
+    cost_rename: 50
+    cost_claim: 10
+    cost_travel: 1
+    cost_travel_per_chunk: 0.1
+    allow_travel_always: true
+    rewards:
+      settle_town: 50
+      claim_land: 50
+      build_town: 100
+      create_golem: 25
+      craft_armor: 25
+      enchant_item: 25
+      attack_town: 100
+      capture_town: 100
+      kill_enemy: 50
+      defend_raid: 50
+  combat:
+    prevent_command_on_proximity: true
+    prevent_command_on_damage: true
+    enemy_proximity_chunks: 3
+    enemy_damage_cooldown_seconds: 30
+    prevent_command_list:
+    - k travel
+    - k settle
+    - k exile
+    - k claim
