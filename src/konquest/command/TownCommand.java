@@ -116,6 +116,7 @@ public class TownCommand extends CommandBase {
 			    		ChatUtil.sendError((Player) getSender(), "That player is an enemy!");
 		        		return;
 			    	}
+			    	playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
 			    	/*
 			    	long offlineTimeout = getKonquest().getOfflineTimeoutSeconds();
 			    	long lastPlayedTime = offlinePlayer.getOfflineBukkitPlayer().getLastPlayed();
@@ -182,6 +183,7 @@ public class TownCommand extends CommandBase {
 						ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 		        		return;
 					}
+					playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
 					// Prevent Elites from removing Lord
 					if(town.isPlayerElite(player.getOfflineBukkitPlayer()) && town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
 						ChatUtil.sendError((Player) getSender(), "You cannot kick the Lord!");
