@@ -67,6 +67,7 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 //import org.bukkit.inventory.ItemStack;
 
 //TODO prevent Barbarians from earning money
@@ -505,6 +506,20 @@ public class PlayerListener implements Listener{
             	}
         	}
         }
+    }
+    
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerEnterVehicle(VehicleEnterEvent event) {
+    	Entity ent = event.getEntered();
+    	if(ent instanceof Player && konquest.getKingdomManager().isChunkClaimed(event.getVehicle().getLocation().getChunk())) {
+    		KonPlayer player = konquest.getPlayerManager().getPlayer((Player)ent);
+    		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getVehicle().getLocation().getChunk());
+    		if(player != null && territory != null && !territory.getKingdom().equals(player.getKingdom()) && territory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    			ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+    			event.setCancelled(true);
+				return;
+    		}
+    	}
     }
     
     @EventHandler(priority = EventPriority.NORMAL)
