@@ -25,8 +25,9 @@ public enum KonStatsType {
 	HARVEST				(0,	KonPrefixCategory.FARMING, 		0.25,   "Crops harvested"),
 	FOOD				(0,	KonPrefixCategory.COOKING, 		1, 		"Food items made"),
 	MUSIC				(0,	KonPrefixCategory.JOKING, 		1, 		"Music discs played"),
+	EGG					(0,	KonPrefixCategory.JOKING, 		0.25, 	"Players egged"),
 	FISH				(0,	KonPrefixCategory.FISHING, 		1, 		"Fishing skill"),
-	SPECIAL				(0,	KonPrefixCategory.ROYALTY, 		1, 		"Good boy points");
+	SPECIAL				(0,	KonPrefixCategory.ROYALTY, 		1, 		"Special points");
 
 	private final int defaultValue;
 	private final KonPrefixCategory category;

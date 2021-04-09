@@ -25,6 +25,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Animals;
+import org.bukkit.entity.Egg;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.IronGolem;
@@ -506,6 +507,7 @@ public class EntityListener implements Listener {
     public void onPlayerDamageByPlayer(EntityDamageByEntityEvent event) {
 		Player victimBukkitPlayer;
         Player attackerBukkitPlayer = null;
+        boolean isEggAttack = false;
         if (event.getEntity() instanceof Player) {
         	victimBukkitPlayer = (Player) event.getEntity();
         	//ChatUtil.printDebug("Player was attacked by an entity");
@@ -515,6 +517,14 @@ public class EntityListener implements Listener {
                 if (arrow.getShooter() instanceof Player) {
                 	attackerBukkitPlayer = (Player) arrow.getShooter();
                 	//ChatUtil.printDebug("...Arrow shooter was a Player");
+                } else {
+                	return;
+                }
+            } else if (event.getDamager() instanceof Egg) {
+            	Egg egg = (Egg)event.getDamager();
+            	if (egg.getShooter() instanceof Player) {
+                	attackerBukkitPlayer = (Player) egg.getShooter();
+                	isEggAttack = true;
                 } else {
                 	return;
                 }
@@ -573,6 +583,11 @@ public class EntityListener implements Listener {
             	}
             }
             konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.DAMAGE,(int)event.getFinalDamage());
+            
+            // Update egg stat
+            if(isEggAttack) {
+            	konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.EGG,1);
+            }
         }
     }
 	
