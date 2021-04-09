@@ -7,6 +7,7 @@ import konquest.utility.Timer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.bukkit.ChatColor;
@@ -48,6 +49,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	private Timer priorityTitleDisplayTimer;
 	private Timer borderUpdateLoopTimer;
 	private Timer combatTagTimer;
+	private long recordPlayCooldownTime;
 	private ArrayList<Mob> targetMobList;
 	private HashMap<KonDirective,Integer> directiveProgress;
 	private KonStats playerStats;
@@ -76,6 +78,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		this.priorityTitleDisplayTimer = new Timer(this);
 		this.borderUpdateLoopTimer = new Timer(this);
 		this.combatTagTimer = new Timer(this);
+		this.recordPlayCooldownTime = 0;
 		this.targetMobList = new ArrayList<Mob>();
 		this.directiveProgress = new HashMap<KonDirective,Integer>();
 		this.playerStats = new KonStats();
@@ -289,6 +292,17 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	
 	public void setIsMapAuto(boolean val) {
 		isMapAuto = val;
+	}
+	
+	public void markRecordPlayCooldown() {
+		Date now = new Date();
+		// Set record cooldown time for 60 seconds from now
+		recordPlayCooldownTime = now.getTime() + (60*1000);
+	}
+	
+	public boolean isRecordPlayCooldownOver() {
+		Date now = new Date();
+		return now.after(new Date(recordPlayCooldownTime));
 	}
 
 	@Override

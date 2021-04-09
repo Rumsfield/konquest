@@ -497,11 +497,11 @@ public class PlayerListener implements Listener{
         	if(event.hasItem()) {
             	if(event.getItem().getType().isRecord() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             		if(event.hasBlock() && event.getClickedBlock().getType().equals(Material.JUKEBOX)) {
-            			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.MUSIC,1);
-            		}
-            	} else if(event.getItem().getType().equals(Material.STICK) && event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-            		if(event.hasBlock()) {
-            			player.getBukkitPlayer().spawnParticle(Particle.REDSTONE, event.getClickedBlock().getLocation().add(0.5,1,0.5), 5, 0.25, 0, 0.25, new Particle.DustOptions(Color.GREEN,2));
+            			// Update music stat when not on record cooldown
+            			if(player.isRecordPlayCooldownOver()) {
+            				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.MUSIC,1);
+            				player.markRecordPlayCooldown();
+            			}
             		}
             	}
         	}
