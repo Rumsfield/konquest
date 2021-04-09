@@ -12,6 +12,7 @@ import konquest.Konquest;
 import konquest.model.KonDirective;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
+import konquest.model.KonPrefixType;
 import konquest.model.KonStatsType;
 import konquest.utility.ChatUtil;
 
@@ -182,7 +183,16 @@ public class KonquestDB extends Database{
             }
     		if(kingdomName==null) { kingdomName = getKonquest().getKingdomManager().getBarbarians().getName(); }
     		if(exileKingdomName==null) { exileKingdomName = getKonquest().getKingdomManager().getBarbarians().getName(); }
-        	player = getKonquest().getPlayerManager().importKonPlayer(bukkitPlayer, kingdomName, exileKingdomName, isBarbarian, mainPrefix, enablePrefix);
+        	// Create a player from existing info
+    		player = getKonquest().getPlayerManager().importKonPlayer(bukkitPlayer, kingdomName, exileKingdomName, isBarbarian);
+        	// Add valid prefixes to the player based on stats
+        	getKonquest().getAccomplishmentManager().initPlayerPrefixes(player);
+            // Update player's main prefix
+        	if(mainPrefix != null && mainPrefix != "") {
+        		boolean status = player.getPlayerPrefix().setPrefix(KonPrefixType.getPrefix(mainPrefix)); // Defaults to default prefix defined in KonPrefixType if mainPrefix is not a valid enum
+        		if(!status) {ChatUtil.printDebug("Failed to assign main prefix "+mainPrefix+" to player "+bukkitPlayer.getName());}
+        	}
+        	player.getPlayerPrefix().setEnable(enablePrefix);
         }
         if(player == null) {
         	ChatUtil.printDebug("Bad fetch of null player "+bukkitPlayer.getName());
@@ -214,7 +224,6 @@ public class KonquestDB extends Database{
         }
         //ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" stats = "+allStats);
         //ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" directives = "+allDirectives);
-        getKonquest().getAccomplishmentManager().initPlayerPrefixes(player);
     }
 
     /*public void createPlayerData(KonPlayer player) {

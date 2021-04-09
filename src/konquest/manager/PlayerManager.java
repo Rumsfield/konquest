@@ -1,8 +1,5 @@
 package konquest.manager;
 
-//import java.awt.Point;
-//import java.sql.ResultSet;
-//import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -19,7 +16,6 @@ import konquest.model.KonKingdom;
 import konquest.model.KonMonument;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
-import konquest.model.KonPrefixType;
 import konquest.utility.ChatUtil;
 
 public class PlayerManager {
@@ -122,10 +118,9 @@ public class PlayerManager {
 	 * @param kingdomName
 	 * @param exileKingdomName
 	 * @param isBarbarian
-	 * @param mainPrefix
 	 * @return
 	 */
-	public KonPlayer importKonPlayer(Player bukkitPlayer, String kingdomName, String exileKingdomName, boolean isBarbarian, String mainPrefix, boolean enablePrefix) {
+	public KonPlayer importKonPlayer(Player bukkitPlayer, String kingdomName, String exileKingdomName, boolean isBarbarian) {
 		KonPlayer importedPlayer;
 
     	// Create KonPlayer instance
@@ -173,12 +168,6 @@ public class PlayerManager {
     		// By default, make exile kingdom barbarians
     		importedPlayer.setExileKingdom(konquest.getKingdomManager().getBarbarians());
     	}
-    	
-    	// Update player's main prefix
-    	if(mainPrefix != null) {
-    		importedPlayer.getPlayerPrefix().setPrefix(KonPrefixType.getPrefix(mainPrefix));
-    	}
-    	importedPlayer.getPlayerPrefix().setEnable(enablePrefix);
     	
     	onlinePlayers.put(bukkitPlayer, importedPlayer);
     	linkOnlinePlayerToCache(importedPlayer);

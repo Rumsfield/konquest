@@ -38,8 +38,17 @@ public class KonPrefix {
 		}
 	}
 	
-	public void setPrefix(KonPrefixType prefix) {
-		mainPrefix = prefix;
+	/**
+	 * Set the player's main prefix if it is a valid added prefix
+	 * @param prefix
+	 */
+	public boolean setPrefix(KonPrefixType prefix) {
+		boolean result = false;
+		if(hasPrefix(prefix)) {
+			mainPrefix = prefix;
+			result = true;
+		}
+		return result;
 	}
 	
 	public boolean selectPrefix(KonPrefixType prefix) {
