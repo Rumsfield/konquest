@@ -14,6 +14,7 @@ import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;
+import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessageStatic;
 
@@ -26,8 +27,8 @@ public class ForceTownAdminCommand extends CommandBase {
 	@Override
 	public void execute() {
 		
-		// k admin forcetown <name> open|close|add|kick|knight|lord|rename|upgrade [arg]
-		if (getArgs().length != 4 && getArgs().length != 5) {
+		// k admin forcetown <name> open|close|add|kick|knight|lord|rename|upgrade [arg1] [arg2]
+		if (getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
             ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
             return;
         } else {
@@ -51,6 +52,7 @@ public class ForceTownAdminCommand extends CommandBase {
         	// Action based on sub-command
     		String playerName = "";
         	String newTownName = "";
+        	String upgradeName = "";
         	switch(subCmd.toLowerCase()) {
         	case "open":
             	if(town.isOpen()) {
@@ -184,8 +186,45 @@ public class ForceTownAdminCommand extends CommandBase {
 	        		return;
 	        	}
 	        	break;
+			case "upgrade":
+	        	String upgradeLevelStr = "";
+				if (getArgs().length == 6) {
+					upgradeName = getArgs()[4];
+					upgradeLevelStr = getArgs()[5];
+				}
+	        	if(!upgradeName.equalsIgnoreCase("")) {
+	        		KonUpgrade upgrade = KonUpgrade.getUpgrade(upgradeName);
+	        		if(upgrade == null) {
+	        			ChatUtil.sendError((Player) getSender(), "Invalid upgrade name!");
+		        		return;
+	        		}
+	        		if(!upgradeLevelStr.equalsIgnoreCase("")) {
+	        			int upgradeLevel = 0;
+	        			try {
+	        				upgradeLevel = Integer.parseInt(upgradeLevelStr);
+	        			} 
+	        			catch(NumberFormatException e) {
+	        				ChatUtil.printDebug("Failed to parse string as int: "+e.getMessage());
+	        				ChatUtil.sendError((Player) getSender(), "Invalid upgrade level!");
+			        		return;
+	        			}
+	        			if(upgradeLevel < 0 || upgradeLevel > upgrade.getMaxLevel()) {
+	        				ChatUtil.sendError((Player) getSender(), "Invalid upgrade level!");
+			        		return;
+	        			}
+	        			// Set town upgrade and level
+	        			getKonquest().getUpgradeManager().forceTownUpgrade(town, upgrade, upgradeLevel, (Player)getSender());
+	        		} else {
+	        			ChatUtil.sendError((Player) getSender(), "Must provide an upgrade level!");
+		        		return;
+	        		}
+	        	} else {
+	        		ChatUtil.sendError((Player) getSender(), "Must provide an upgrade name!");
+	        		return;
+	        	}
+	        	break;
         	default:
-        		ChatUtil.sendError((Player) getSender(), "Invalid sub-command, expected open|close|add|kick|knight|lord|rename");
+        		ChatUtil.sendError((Player) getSender(), "Invalid sub-command, expected open|close|add|kick|knight|lord|rename|upgrade");
         		return;
         	}
         	
@@ -195,7 +234,7 @@ public class ForceTownAdminCommand extends CommandBase {
 
 	@Override
 	public List<String> tabComplete() {
-		// k admin forcetown <name> open|close|add|remove|lord|elite [arg]
+		// k admin forcetown <name> open|close|add|remove|lord|elite [arg1] [arg2]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		if(getArgs().length == 3) {
@@ -217,6 +256,7 @@ public class ForceTownAdminCommand extends CommandBase {
 			tabList.add("lord");
 			tabList.add("knight");
 			tabList.add("rename");
+			tabList.add("upgrade");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
@@ -229,10 +269,28 @@ public class ForceTownAdminCommand extends CommandBase {
 					playerList.add(onlinePlayer.getBukkitPlayer().getName());
 				}
 				tabList.addAll(playerList);
-				// Trim down completion options based on current input
-				StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
-				Collections.sort(matchedTabList);
+			} else if(subCommand.equalsIgnoreCase("upgrade")) {
+				for(KonUpgrade upgrade : KonUpgrade.values()) {
+					tabList.add(upgrade.toString().toLowerCase());
+				}
 			}
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
+		} else if(getArgs().length == 6) {
+			// suggest upgrade levels
+			String subCommand = getArgs()[3];
+			if(subCommand.equalsIgnoreCase("upgrade")) {
+				String upgradeName = getArgs()[4];
+				KonUpgrade upgrade = KonUpgrade.getUpgrade(upgradeName);
+				if(upgrade != null) {
+					for(int i=0;i<=upgrade.getMaxLevel();i++) {
+						tabList.add(String.valueOf(i));
+					}
+				}
+			}
+			StringUtil.copyPartialMatches(getArgs()[5], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
 		}
 		return matchedTabList;
 	}

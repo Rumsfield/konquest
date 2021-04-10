@@ -164,6 +164,21 @@ public class UpgradeManager {
 		return true;
 	}
 	
+	public boolean forceTownUpgrade(KonTown town, KonUpgrade upgrade, int level, Player bukkitPlayer) {
+		// Check that upgrades are enabled
+		if(!isEnabled) {
+			ChatUtil.sendError(bukkitPlayer, "Error forcing "+upgrade.getDescription()+" level "+level+": upgrades are currently disabled.");
+			return false;
+		}
+		town.addUpgrade(upgrade, level);
+		if(upgrade.equals(KonUpgrade.HEALTH)) {
+			konquest.getKingdomManager().refreshTownHearts(town);
+		}
+		ChatUtil.sendNotice(bukkitPlayer, "Forced "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
+		ChatUtil.printDebug("Applied forced upgrade "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
+		return true;
+	}
+	
 	public int getTownUpgradeLevel(KonTown town, KonUpgrade upgrade) {
 		int result = 0;
 		if(isEnabled) {
