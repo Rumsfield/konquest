@@ -78,21 +78,30 @@ public class UpgradeManager {
         }
 	}
 	
+	/**
+	 * Provides a list of upgrades available for purchase for the given town.
+	 * Checks for valid cost and level requirements
+	 * Upgrade levels will not be listed if cost is less than 0 (e.g. -1)
+	 * @param town
+	 * @return
+	 */
 	public HashMap<KonUpgrade,Integer> getAvailableUpgrades(KonTown town) {
 		HashMap<KonUpgrade,Integer> result = new HashMap<KonUpgrade,Integer>();
 		//ChatUtil.printDebug("Generating available upgrades for town "+town.getName());
 		for(KonUpgrade upgrade : KonUpgrade.values()) {
 			int currentLevel = town.getRawUpgradeLevel(upgrade);
+			int nextLevel = currentLevel+1;
+			int nextCost = getUpgradeCost(upgrade,nextLevel);
 			//ChatUtil.printDebug("Upgrade "+upgrade.toString()+" is at level "+currentLevel+" out of "+upgrade.getMaxLevel());
-			if(currentLevel < upgrade.getMaxLevel()) {
-				result.put(upgrade, currentLevel+1);
+			if(nextCost >= 0 && nextLevel <= upgrade.getMaxLevel()) {
+				result.put(upgrade, nextLevel);
 			}
 		}
 		return result;
 	}
 	
 	public int getUpgradeCost(KonUpgrade upgrade, int level) {
-		int result = 0;
+		int result = -1;
 		if(level > 0 && level <= upgrade.getMaxLevel()) {
 			if(upgradeCosts.containsKey(upgrade)) {
 				result = upgradeCosts.get(upgrade).get(level-1);
@@ -193,23 +202,31 @@ public class UpgradeManager {
 			int level = town.getRawUpgradeLevel(upgrade);
 			if(level > 0) {
 				if(isEnabled) {
-					// Check every purchased upgrade meets pop requirement
-					int townPop = town.getPlayerResidents().size();
-					if(townPop < upgradePopulations.get(upgrade).get(level-1)) {
-						// Current population is below this upgrade level's requirement
-						// Find new level for disabled upgrade, down to 0 minimum
-						int newLevel = level;
-						while(newLevel > 0 && townPop < upgradePopulations.get(upgrade).get(newLevel-1)) {
-							newLevel--;
+					// Check if the upgrade is disabled (cost < 0)
+					int cost = getUpgradeCost(upgrade,level);
+					if(cost >= 0) {
+						// Check every purchased upgrade meets pop requirement
+						int townPop = town.getPlayerResidents().size();
+						if(townPop < upgradePopulations.get(upgrade).get(level-1)) {
+							// Current population is below this upgrade level's requirement
+							// Find new level for disabled upgrade, down to 0 minimum
+							int newLevel = level;
+							while(newLevel > 0 && townPop < upgradePopulations.get(upgrade).get(newLevel-1)) {
+								newLevel--;
+							}
+							town.disableUpgrade(upgrade,newLevel);
+							ChatUtil.printDebug("Disabled upgrade "+upgrade.getDescription()+" from level "+level+" to "+newLevel+" for town "+town.getName());
+						} else {
+							// Current population is greater than or equal to this upgrade level's requirement
+							boolean status = town.allowUpgrade(upgrade);
+							if(status) {
+								ChatUtil.printDebug("Successfully allowed upgrade "+upgrade.getDescription()+" level "+level+" for town "+town.getName());
+							}
 						}
-						town.disableUpgrade(upgrade,newLevel);
-						ChatUtil.printDebug("Disabled upgrade "+upgrade.getDescription()+" from level "+level+" to "+newLevel+" for town "+town.getName());
 					} else {
-						// Current population is greater than or equal to this upgrade level's requirement
-						boolean status = town.allowUpgrade(upgrade);
-						if(status) {
-							ChatUtil.printDebug("Successfully allowed upgrade "+upgrade.getDescription()+" level "+level+" for town "+town.getName());
-						}
+						// This upgrade level is disabled because either the cost is set to a negative number or is missing from the upgrades.yml
+						town.disableUpgrade(upgrade,0);
+						ChatUtil.printDebug("Disabled invalid upgrade "+upgrade.getDescription()+" to level 0 for town "+town.getName()+", cost is "+cost);
 					}
 				} else {
 					// Upgrades are disabled in config, disable every purchased upgrade

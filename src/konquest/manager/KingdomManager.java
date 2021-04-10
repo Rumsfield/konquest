@@ -1495,6 +1495,8 @@ public class KingdomManager {
 	            			}
 	            		}
 	            	}
+	            	// Update upgrade status
+	            	konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
             	}
         	}
         }

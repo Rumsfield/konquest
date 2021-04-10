@@ -214,6 +214,7 @@ public class ForceTownAdminCommand extends CommandBase {
 	        			}
 	        			// Set town upgrade and level
 	        			getKonquest().getUpgradeManager().forceTownUpgrade(town, upgrade, upgradeLevel, (Player)getSender());
+	        			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(town);
 	        		} else {
 	        			ChatUtil.sendError((Player) getSender(), "Must provide an upgrade level!");
 		        		return;
