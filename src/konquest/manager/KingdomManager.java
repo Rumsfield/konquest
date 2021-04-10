@@ -464,6 +464,98 @@ public class KingdomManager {
 		return claimStatus == 0;
 	}
 	
+	public boolean claimRadiusForPlayer(Player bukkitPlayer, Location claimLoc, int radius) {
+		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		ArrayList<Chunk> claimChunks = new ArrayList<Chunk>();
+		// Verify no surrounding enemy or capital territory
+    	for(Chunk chunk : konquest.getAreaChunks(claimLoc,radius+1)) {
+    		if(konquest.getKingdomManager().isChunkClaimed(chunk)) {
+    			if(!player.getKingdom().equals(konquest.getKingdomManager().getChunkTerritory(chunk).getKingdom())) {
+    				ChatUtil.sendError(bukkitPlayer, "Too close to enemy territory!");
+    				return false;
+    			}
+    			if(konquest.getKingdomManager().getChunkTerritory(chunk).getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    				ChatUtil.sendError(bukkitPlayer, "Too close to the Capital!");
+    				return false;
+    			}
+    		}
+    	}
+    	// Find all unclaimed chunks around center chunk
+    	for(Chunk chunk : konquest.getSurroundingChunks(claimLoc,radius)) {
+    		if(!konquest.getKingdomManager().isChunkClaimed(chunk)) {
+    			claimChunks.add(chunk);
+    		}
+    	}
+    	int unclaimedChunkAmount = claimChunks.size();
+    	boolean isCenterClaimed = true;
+    	if(!konquest.getKingdomManager().isChunkClaimed(claimLoc.getChunk())) {
+    		unclaimedChunkAmount++;
+    		isCenterClaimed = false;
+    	}
+    	// Ensure player can cover the cost
+    	double cost = konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
+    	double totalCost = unclaimedChunkAmount * cost;
+    	if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < totalCost) {
+			ChatUtil.sendError(bukkitPlayer, "Not enough Favor, need "+totalCost);
+            return false;
+		}
+    	// Ensure the center chunk is claimed
+    	int numChunksClaimed = 0;
+    	if(!isCenterClaimed) {
+    		// Claim the center chunk and do some checks to make sure it succeeded
+    		int claimStatus = claimChunk(claimLoc);
+        	switch(claimStatus) {
+        	case 1:
+        		ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: no adjacent territory.");
+        		return false;
+        	case 2:
+        		ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: too far from territory center.");
+        		return false;
+        	case 3:
+        		ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: already claimed.");
+        		return false;
+        	default:
+        		numChunksClaimed++;
+        		break;
+        	}
+    	}
+    	// Use territory of center chunk to claim remaining radius unclaimed chunks
+    	KonTerritory territory = getChunkTerritory(claimLoc.getChunk());
+    	boolean allChunksAdded = true;
+    	if(territory != null) {
+    		for(Chunk newChunk : claimChunks) {
+    			if(territory.addChunk(newChunk)) {
+    				addTerritory(newChunk,territory);
+    				numChunksClaimed++;
+    			} else {
+    				allChunksAdded = false;
+    			}
+    		}
+    		if(!allChunksAdded) {
+    			ChatUtil.sendError(bukkitPlayer, "Failed to claim all land, too far from town center. Claimed "+numChunksClaimed+" chunks.");
+    		} else {
+    			ChatUtil.sendNotice(bukkitPlayer, "Claimed "+numChunksClaimed+" chunks of land.");
+    		}
+    	} else {
+    		ChatUtil.sendError(bukkitPlayer, "Failed to find territory.");
+    		return false;
+    	}
+    	// Reduce the player's favor
+		if(cost > 0 && numChunksClaimed > 0) {
+			double finalCost = numChunksClaimed*cost;
+	    	EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, finalCost);
+	        if(r.transactionSuccess()) {
+	        	String balanceF = String.format("%.2f",r.balance);
+	        	String amountF = String.format("%.2f",r.amount);
+	        	ChatUtil.sendNotice(bukkitPlayer, "Favor reduced by "+amountF+", total: "+balanceF);
+	        	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)finalCost);
+	        } else {
+	        	ChatUtil.sendError(bukkitPlayer, String.format("An error occured: %s", r.errorMessage));
+	        }
+		}
+    	
+		return true;
+	}
 	
 	/**
 	 * unclaimChunk - primary method for unclaiming a chunk for a territory

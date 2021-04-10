@@ -46,9 +46,9 @@ public class ClaimAdminCommand extends CommandBase {
         	            return;
         			}
     				int radius = Integer.parseInt(getArgs()[3]);
-    				if(radius < 1 || radius > 10) {
+    				if(radius < 1 || radius > 16) {
     					ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
-    					ChatUtil.sendError((Player) getSender(), "Radius must be greater than 0 and less than or equal to 10.");
+    					ChatUtil.sendError((Player) getSender(), "Radius must be greater than 0 and less than or equal to 16.");
     					return;
     				}
     				KonTerritory adjacentTerritory = null;
