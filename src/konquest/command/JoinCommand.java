@@ -93,6 +93,7 @@ public class JoinCommand extends CommandBase {
 			    				ChatUtil.sendNotice((Player) resident, bukkitPlayer.getName()+" has joined as a resident of "+joinName);
 			    			}
 			    		}
+			    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
 			    	}
     			} else {
     				if(town.isJoinRequestValid(id)) {

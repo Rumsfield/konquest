@@ -151,6 +151,9 @@ public class TownCommand extends CommandBase {
 					    				ChatUtil.sendNotice((Player) resident, "Added "+playerName+" as a resident of "+townName);
 					    			}
 					    		}
+					    		if(onlinePlayer != null) {
+					    			getKonquest().getKingdomManager().updatePlayerMembershipStats(onlinePlayer);
+					    		}
 					    	}
 			    		} else {
 			    			// Create a new join invite
@@ -192,6 +195,7 @@ public class TownCommand extends CommandBase {
 					// Check for active invite and remove it,
 					// otherwise deny join request
 					UUID id = offlinePlayer.getOfflineBukkitPlayer().getUniqueId();
+					KonPlayer onlinePlayer = getKonquest().getPlayerManager().getPlayerFromName(playerName);
 			    	if(town.isJoinInviteValid(id)) {
 			    		// There is a join invite for this player, revoke it
 			    		ChatUtil.sendNotice((Player) getSender(), "Revoked join invite of "+playerName+" for "+townName);
@@ -210,6 +214,9 @@ public class TownCommand extends CommandBase {
 					    			if(resident.isOnline()) {
 					    				ChatUtil.sendNotice((Player) resident, "Kicked resident "+playerName+" from "+townName);
 					    			}
+					    		}
+					    		if(onlinePlayer != null) {
+					    			getKonquest().getKingdomManager().updatePlayerMembershipStats(onlinePlayer);
 					    		}
 					    	} else {
 					    		ChatUtil.sendError((Player) getSender(), playerName+" is not a resident of "+townName);
@@ -299,6 +306,10 @@ public class TownCommand extends CommandBase {
 				    				ChatUtil.sendNotice((Player) resident, "Gave Lordship of "+townName+" to "+playerName);
 				    			}
 				    		}
+		        			KonPlayer onlinePlayer = getKonquest().getPlayerManager().getPlayerFromName(playerName);
+		        			if(onlinePlayer != null) {
+				    			getKonquest().getKingdomManager().updatePlayerMembershipStats(onlinePlayer);
+				    		}
 		        		}
 					} else {
 						// A non-owner is giving themselves Lord
@@ -317,6 +328,10 @@ public class TownCommand extends CommandBase {
 			    			if(resident.isOnline()) {
 			    				ChatUtil.sendNotice((Player) resident, offlinePlayer.getOfflineBukkitPlayer().getName()+" has claimed Lordship of "+townName+"!");
 			    			}
+			    		}
+	        			KonPlayer onlinePlayer = getKonquest().getPlayerManager().getPlayerFromName(playerName);
+	        			if(onlinePlayer != null) {
+			    			getKonquest().getKingdomManager().updatePlayerMembershipStats(onlinePlayer);
 			    		}
 					}
 			    } else {
@@ -348,6 +363,7 @@ public class TownCommand extends CommandBase {
 		        		return;
         			}
 			    	// Set resident's elite status
+			    	KonPlayer onlinePlayer = getKonquest().getPlayerManager().getPlayerFromName(playerName);
 			    	if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
 			    		if(town.isPlayerElite(offlinePlayer.getOfflineBukkitPlayer())) {
 			    			// Clear elite
@@ -367,6 +383,9 @@ public class TownCommand extends CommandBase {
 				    			}
 				    		}
 			    			ChatUtil.sendNotice((Player) getSender(), "Use this command again to remove Knight status.");
+			    		}
+	        			if(onlinePlayer != null) {
+			    			getKonquest().getKingdomManager().updatePlayerMembershipStats(onlinePlayer);
 			    		}
 			    	} else {
 			    		ChatUtil.sendError((Player) getSender(), "Knights must be added as residents first!");

@@ -123,7 +123,7 @@ public class SettleCommand extends CommandBase {
         		getKonquest().getDirectiveManager().updateDirectiveProgress(player, KonDirective.SETTLE_TOWN);
         		// Update stats
         		getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.SETTLED,1);
-        		//TODO: update player's suffix
+        		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
         	} else {
         		switch(settleStatus) {
         		case 1:
