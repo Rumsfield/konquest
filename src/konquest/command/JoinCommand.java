@@ -100,10 +100,18 @@ public class JoinCommand extends CommandBase {
     					// There is already an existing join request
     					ChatUtil.sendError(bukkitPlayer, "You have already requested to join "+joinName);
     				} else {
-    					// Create a new join request
-    					ChatUtil.sendNotice(bukkitPlayer, "Sending a request to join "+joinName+". Wait for the Lord or Knights to add you.");
-    					town.addJoinRequest(id, false);
-    					town.notifyJoinRequest(id);
+    					if(town.getNumResidents() == 0) {
+    						// The town is empty, make the player into the lord
+    						town.setPlayerLord((OfflinePlayer)bukkitPlayer);
+    						town.removeJoinRequest(id);
+    			    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
+    			    		ChatUtil.sendNotice(bukkitPlayer, "You have joined as the lord of "+joinName+".");
+    					} else {
+    						// Create a new join request
+        					ChatUtil.sendNotice(bukkitPlayer, "Sending a request to join "+joinName+". Wait for the Lord or Knights to add you.");
+        					town.addJoinRequest(id, false);
+        					town.notifyJoinRequest(id);
+    					}
     				}
     			}
     		} else {

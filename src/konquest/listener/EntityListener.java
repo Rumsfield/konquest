@@ -554,6 +554,11 @@ public class EntityListener implements Listener {
             	}
             }
             
+            // Update egg stat
+            if(isEggAttack) {
+            	konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.EGG,1);
+            }
+            
             // Prevent damage between Kingdom members who are not barbarians
             if(victimPlayer != null && attackerPlayer != null && victimPlayer.getKingdom().equals(attackerPlayer.getKingdom()) && !victimPlayer.isBarbarian()) {
             	event.setCancelled(true);
@@ -583,11 +588,6 @@ public class EntityListener implements Listener {
             	}
             }
             konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.DAMAGE,(int)event.getFinalDamage());
-            
-            // Update egg stat
-            if(isEggAttack) {
-            	konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.EGG,1);
-            }
         }
     }
 	
