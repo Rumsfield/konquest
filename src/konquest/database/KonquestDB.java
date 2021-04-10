@@ -192,6 +192,7 @@ public class KonquestDB extends Database{
         		boolean status = player.getPlayerPrefix().setPrefix(KonPrefixType.getPrefix(mainPrefix)); // Defaults to default prefix defined in KonPrefixType if mainPrefix is not a valid enum
         		if(!status) {
         			ChatUtil.printDebug("Failed to assign main prefix "+mainPrefix+" to player "+bukkitPlayer.getName());
+        			enablePrefix = false;
         		}
         	}
         	player.getPlayerPrefix().setEnable(enablePrefix);

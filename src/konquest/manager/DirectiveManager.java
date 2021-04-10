@@ -41,7 +41,11 @@ public class DirectiveManager {
 			//ChatUtil.printDebug("Initialized reward "+reward+" for directive "+dirName);
 		}
 		isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.directive_quests",true);
-		ChatUtil.printDebug("Directive Manager is ready in world "+konquest.getWorldName());
+		ChatUtil.printDebug("Directive Manager is ready in world "+konquest.getWorldName()+", enabled: "+isEnabled);
+	}
+	
+	public boolean isEnabled() {
+		return isEnabled;
 	}
 	
 	/**

@@ -23,8 +23,13 @@ public class QuestCommand extends CommandBase {
             ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
             return;
         } else {
-        	Player bukkitPlayer = (Player) getSender();
+        	// Check for global enable
+        	if(!getKonquest().getDirectiveManager().isEnabled()) {
+        		ChatUtil.sendError((Player) getSender(), "Quests are currently disabled, talk to an admin.");
+        		return;
+        	}
         	
+        	Player bukkitPlayer = (Player) getSender();
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	getKonquest().getDirectiveManager().displayBook(player);
         }

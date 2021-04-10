@@ -26,11 +26,14 @@ public class PrefixCommand extends CommandBase {
             ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
             return;
         } else {
+        	if(!getKonquest().getAccomplishmentManager().isEnabled()) {
+        		ChatUtil.sendError((Player) getSender(), "Prefixes are currently disabled, talk to an admin.");
+        		return;
+        	}
+        	
         	Player bukkitPlayer = (Player) getSender();
-        	
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-        	//getKonquest().getAccomplishmentManager().displayStats(player);
-        	
+
         	if(player.isBarbarian()) {
         		ChatUtil.sendError((Player) getSender(), "Barbarians cannot have a prefix title.");
         		return;
