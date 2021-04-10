@@ -273,7 +273,7 @@ public class BlockListener implements Listener {
 				boolean isDrop = event.isDropItems();
 				ChatUtil.printDebug("Diamond ore block break dropping items: "+isDrop);
 				ItemStack handItem = event.getPlayer().getInventory().getItemInMainHand();
-				if(isDrop && handItem != null && handItem.containsEnchantment(Enchantment.SILK_TOUCH)) {
+				if(isDrop && handItem != null && !handItem.containsEnchantment(Enchantment.SILK_TOUCH)) {
 					KonPlayer player = playerManager.getPlayer(event.getPlayer());
 					konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.DIAMONDS,1);
 				}

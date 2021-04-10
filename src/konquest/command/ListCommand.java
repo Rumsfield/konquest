@@ -2,6 +2,7 @@ package konquest.command;
 
 import konquest.Konquest;
 import konquest.model.KonPlayer;
+import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessageStatic;
 
@@ -34,14 +35,22 @@ public class ListCommand extends CommandBase {
             	for(String kingdomName : getKonquest().getKingdomManager().getKingdomNames()) {
             		kingdomList = kingdomList + " " + ChatColor.AQUA+kingdomName +ChatColor.GRAY+",";
             	}
+            	if(kingdomList.length() > 2) {
+            		kingdomList = kingdomList.substring(0,kingdomList.length()-2);
+    			}
             	//kingdomList = kingdomList.substring(0, kingdomList.length()-2);
             	ChatUtil.sendNotice(bukkitPlayer, "Kingdoms:"+kingdomList);
         	} else if(cmdMode.equalsIgnoreCase("towns")) {
         		if(!player.isBarbarian()) {
         			String townList = "";
-                	for(String townName : player.getKingdom().getTownNames()) {
-                		townList = townList + " " + ChatColor.AQUA+townName +ChatColor.GRAY+",";
+                	for(KonTown town : player.getKingdom().getTowns()) {
+                		String townName = town.getName();
+                		int pop = town.getNumResidents();
+                		townList = townList + " "+ChatColor.AQUA+townName+ChatColor.YELLOW+"("+pop+")"+ChatColor.GRAY+",";
                 	}
+                	if(townList.length() > 2) {
+                		townList = townList.substring(0,townList.length()-2);
+        			}
                 	//townList = townList.substring(0, townList.length()-2);
                 	ChatUtil.sendNotice(bukkitPlayer, "Towns in your Kingdom:"+townList);
         		} else {
