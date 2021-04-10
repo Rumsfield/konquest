@@ -28,6 +28,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.type.Bed;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -41,6 +42,7 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
 public class BlockListener implements Listener {
 
@@ -270,8 +272,11 @@ public class BlockListener implements Listener {
 			if(event.getBlock().getType().equals(Material.DIAMOND_ORE)) {
 				boolean isDrop = event.isDropItems();
 				ChatUtil.printDebug("Diamond ore block break dropping items: "+isDrop);
-				KonPlayer player = playerManager.getPlayer(event.getPlayer());
-				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.DIAMONDS,1);
+				ItemStack handItem = event.getPlayer().getInventory().getItemInMainHand();
+				if(isDrop && handItem != null && handItem.containsEnchantment(Enchantment.SILK_TOUCH)) {
+					KonPlayer player = playerManager.getPlayer(event.getPlayer());
+					konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.DIAMONDS,1);
+				}
 			}
 		}
 	}
