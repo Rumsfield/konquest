@@ -21,10 +21,12 @@ public class DirectiveManager {
 	
 	private Konquest konquest;
 	private HashMap<KonDirective,Double> rewardTable;
+	private boolean isEnabled;
 	
 	public DirectiveManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.rewardTable = new HashMap<KonDirective,Double>();
+		this.isEnabled = false;
 	}
 	
 	public void initialize() {
@@ -33,11 +35,12 @@ public class DirectiveManager {
 			String dirName = dir.toString().toLowerCase();
 			double reward = 10;
 			if(konquest.getConfigManager().getConfig("core").contains("core.favor.rewards."+dirName)) {
-				reward = konquest.getConfigManager().getConfig("core").getDouble("core.favor.rewards."+dirName);
+				reward = konquest.getConfigManager().getConfig("core").getDouble("core.favor.rewards."+dirName,0.0);
 			}
 			rewardTable.put(dir,reward);
 			//ChatUtil.printDebug("Initialized reward "+reward+" for directive "+dirName);
 		}
+		isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.directive_quests",true);
 		ChatUtil.printDebug("Directive Manager is ready in world "+konquest.getWorldName());
 	}
 	
@@ -47,34 +50,36 @@ public class DirectiveManager {
 	 * @param directive - KonDirective to asses
 	 */
 	public void updateDirectiveProgress(KonPlayer player, KonDirective directive) {
-		// Check for valid permissions
-		if(!player.getBukkitPlayer().hasPermission(directive.permission())) {
-			ChatUtil.printDebug("Player "+player.getBukkitPlayer().getName()+" does not have permission for directive "+directive.toString());
-			return;
-		}
-		// Check to see if player is already at max progress (complete)
-		int currentProgress = player.getDirectiveProgress(directive);
-		//ChatUtil.printDebug("Updating directive progress for "+player.getBukkitPlayer().getName()+" "+directive.toString()+", currently "+currentProgress);
-		if(currentProgress < directive.stages()) {
-			// Increment directive progress
-			int newProgress = currentProgress + 1;
-			player.setDirectiveProgress(directive, newProgress);
-			// Check to see if directive is now complete
-			if(newProgress >= directive.stages()) {
-				// Give reward
-				ChatUtil.printDebug("Directive rewarded to player "+player.getBukkitPlayer().getName()+" for directive "+directive.title());
-				double reward = rewardTable.get(directive);
-				EconomyResponse r = KonquestPlugin.getEconomy().depositPlayer(player.getBukkitPlayer(), reward);
-	            if(r.transactionSuccess()) {
-	            	String balanceF = String.format("%.2f",r.balance);
-	            	String amountF = String.format("%.2f",r.amount);
-	            	ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+directive.title()+ChatColor.RESET+" "+ChatColor.WHITE+"Favor rewarded: "+ChatColor.DARK_GREEN+amountF+ChatColor.WHITE+", total: "+ChatColor.DARK_GREEN+balanceF);
-	            } else {
-	            	ChatUtil.sendError(player.getBukkitPlayer(), String.format("An error occured: %s", r.errorMessage));
-	            }
+		if(isEnabled) {
+			// Check for valid permissions
+			if(!player.getBukkitPlayer().hasPermission(directive.permission())) {
+				ChatUtil.printDebug("Player "+player.getBukkitPlayer().getName()+" does not have permission for directive "+directive.toString());
+				return;
 			}
-		} else {
-			//ChatUtil.printDebug("Player "+player.getBukkitPlayer().getName()+" has already completed directive "+directive.toString());
+			// Check to see if player is already at max progress (complete)
+			int currentProgress = player.getDirectiveProgress(directive);
+			//ChatUtil.printDebug("Updating directive progress for "+player.getBukkitPlayer().getName()+" "+directive.toString()+", currently "+currentProgress);
+			if(currentProgress < directive.stages()) {
+				// Increment directive progress
+				int newProgress = currentProgress + 1;
+				player.setDirectiveProgress(directive, newProgress);
+				// Check to see if directive is now complete
+				if(newProgress >= directive.stages()) {
+					// Give reward
+					ChatUtil.printDebug("Directive rewarded to player "+player.getBukkitPlayer().getName()+" for directive "+directive.title());
+					double reward = rewardTable.get(directive);
+					EconomyResponse r = KonquestPlugin.getEconomy().depositPlayer(player.getBukkitPlayer(), reward);
+		            if(r.transactionSuccess()) {
+		            	String balanceF = String.format("%.2f",r.balance);
+		            	String amountF = String.format("%.2f",r.amount);
+		            	ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+directive.title()+ChatColor.RESET+" "+ChatColor.WHITE+"Favor rewarded: "+ChatColor.DARK_GREEN+amountF+ChatColor.WHITE+", total: "+ChatColor.DARK_GREEN+balanceF);
+		            } else {
+		            	ChatUtil.sendError(player.getBukkitPlayer(), String.format("An error occured: %s", r.errorMessage));
+		            }
+				}
+			} else {
+				//ChatUtil.printDebug("Player "+player.getBukkitPlayer().getName()+" has already completed directive "+directive.toString());
+			}
 		}
 	}
 	
