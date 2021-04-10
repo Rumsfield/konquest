@@ -244,71 +244,75 @@ public class PlayerListener implements Listener{
         
         //Check if the event was caused by a player
         if(event.isAsynchronous() && !event.isCancelled()) {
-        	Player bukkitPlayer = event.getPlayer();
-            KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-            KonKingdom kingdom = player.getKingdom();
-            event.setCancelled(true);
-            
-            String title = "";
-            if(player.getPlayerPrefix().isEnabled()) {
-            	title = player.getPlayerPrefix().getMainPrefixName()+" ";
-            }
-            String prefix = konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer);
-            String suffix = konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer);
-            String divider = ChatColor.translateAlternateColorCodes('&', "&7»");
-            
-            if(player.isGlobalChat()) {
-            	//Global chat, all players see this format
-            	ChatUtil.printConsole(ChatColor.GOLD+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
-            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
-            		ChatColor teamColor = ChatColor.WHITE;
-            		ChatColor titleColor = ChatColor.WHITE;
-            		if(player.isBarbarian()) {
-            			teamColor = ChatColor.YELLOW;
-            		} else {
-            			if(globalPlayer.getKingdom().equals(kingdom)) {
-                			// Message sender is in same kingdom as receiver
-                			teamColor = ChatColor.GREEN;
-                			titleColor = ChatColor.DARK_GREEN;
-                		} else {
-                			// Message sender is in different kingdom as receiver
-            				teamColor = ChatColor.RED;
-                			titleColor = ChatColor.DARK_RED;
-                		}
-            		}
-            		globalPlayer.getBukkitPlayer().sendMessage(
-        					ChatColor.translateAlternateColorCodes('&', prefix)+ 
-        					titleColor+ChatColor.translateAlternateColorCodes('&', title)+ 
-        					teamColor+bukkitPlayer.getName()+" "+
-        					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
-        					divider+" "+
-        					ChatColor.WHITE+event.getMessage());
-            	}
-            } else {
-            	//Team chat only (and admins)
-            	ChatUtil.printConsole(ChatColor.GOLD+"[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
-            	for(KonPlayer teamPlayer : playerManager.getPlayersOnline()) {
-            		if(teamPlayer.getKingdom().equals(kingdom)) {
-            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC+ChatColor.GREEN + event.getMessage());
-            			teamPlayer.getBukkitPlayer().sendMessage(
-            					ChatColor.translateAlternateColorCodes('&', prefix)+ 
-            					ChatColor.GREEN+ChatColor.translateAlternateColorCodes('&', title)+
-            					bukkitPlayer.getName()+" "+
-            					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
-            					divider+" "+
-            					ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
-            		} else if(teamPlayer.isAdminBypassActive()) {
-            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K-bypass] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC + event.getMessage());
-            			teamPlayer.getBukkitPlayer().sendMessage(
-            					ChatColor.translateAlternateColorCodes('&', prefix)+ 
-            					ChatColor.GOLD+ChatColor.translateAlternateColorCodes('&', title)+
-            					bukkitPlayer.getName()+" "+
-            					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
-            					divider+" "+
-            					ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
-            		}
-            	}
-            }
+        	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.format_chat_messages",true);
+        	if(enable) {
+	        	// Format chat messages
+	        	Player bukkitPlayer = event.getPlayer();
+	            KonPlayer player = playerManager.getPlayer(bukkitPlayer);
+	            KonKingdom kingdom = player.getKingdom();
+	            event.setCancelled(true);
+	            
+	            String title = "";
+	            if(player.getPlayerPrefix().isEnabled()) {
+	            	title = player.getPlayerPrefix().getMainPrefixName()+" ";
+	            }
+	            String prefix = konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer);
+	            String suffix = konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer);
+	            String divider = ChatColor.translateAlternateColorCodes('&', "&7»");
+	            
+	            if(player.isGlobalChat()) {
+	            	//Global chat, all players see this format
+	            	ChatUtil.printConsole(ChatColor.GOLD+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
+	            		ChatColor teamColor = ChatColor.WHITE;
+	            		ChatColor titleColor = ChatColor.WHITE;
+	            		if(player.isBarbarian()) {
+	            			teamColor = ChatColor.YELLOW;
+	            		} else {
+	            			if(globalPlayer.getKingdom().equals(kingdom)) {
+	                			// Message sender is in same kingdom as receiver
+	                			teamColor = ChatColor.GREEN;
+	                			titleColor = ChatColor.DARK_GREEN;
+	                		} else {
+	                			// Message sender is in different kingdom as receiver
+	            				teamColor = ChatColor.RED;
+	                			titleColor = ChatColor.DARK_RED;
+	                		}
+	            		}
+	            		globalPlayer.getBukkitPlayer().sendMessage(
+	        					ChatColor.translateAlternateColorCodes('&', prefix)+ 
+	        					titleColor+ChatColor.translateAlternateColorCodes('&', title)+ 
+	        					teamColor+bukkitPlayer.getName()+" "+
+	        					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
+	        					divider+" "+
+	        					ChatColor.WHITE+event.getMessage());
+	            	}
+	            } else {
+	            	//Team chat only (and admins)
+	            	ChatUtil.printConsole(ChatColor.GOLD+"[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	            	for(KonPlayer teamPlayer : playerManager.getPlayersOnline()) {
+	            		if(teamPlayer.getKingdom().equals(kingdom)) {
+	            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC+ChatColor.GREEN + event.getMessage());
+	            			teamPlayer.getBukkitPlayer().sendMessage(
+	            					ChatColor.translateAlternateColorCodes('&', prefix)+ 
+	            					ChatColor.GREEN+ChatColor.translateAlternateColorCodes('&', title)+
+	            					bukkitPlayer.getName()+" "+
+	            					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
+	            					divider+" "+
+	            					ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
+	            		} else if(teamPlayer.isAdminBypassActive()) {
+	            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K-bypass] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC + event.getMessage());
+	            			teamPlayer.getBukkitPlayer().sendMessage(
+	            					ChatColor.translateAlternateColorCodes('&', prefix)+ 
+	            					ChatColor.GOLD+ChatColor.translateAlternateColorCodes('&', title)+
+	            					bukkitPlayer.getName()+" "+
+	            					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
+	            					divider+" "+
+	            					ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
+	            		}
+	            	}
+	            }
+        	}
         }
     }
     

@@ -46,6 +46,8 @@ core:
   save_interval: 60
   community_link: www.google.com
   accomplishment_prefix: true
+  directive_quests: true
+  format_chat_messages: true
   travel_wild_random_radius: 1000
   integration:
     quickshop: false
