@@ -117,7 +117,8 @@ public class Konquest implements Timeable {
 	public void initialize() {
 		// Initialize managers
 		configManager.initialize();
-		ChatUtil.printDebug("Init World: "+configManager.getConfig("core").getString("core.world_name"));
+		worldName = configManager.getConfig("core").getString("core.world_name","world");
+		plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Primary world is "+worldName);
 		kingdomManager.initialize();
 		ruinManager.initialize();
 		initManagers();
@@ -157,7 +158,7 @@ public class Konquest implements Timeable {
 			plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED+"offline_timeout_seconds in core.yml is less than 1 day, overriding to 1 day to prevent data loss.");
 		}
 		saveIntervalSeconds = configManager.getConfig("core").getInt("core.save_interval",60)*60;
-        System.out.println("[Konquest] Save interval is "+saveIntervalSeconds+" seconds");
+        plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Save interval is "+saveIntervalSeconds+" seconds");
 		if(saveIntervalSeconds > 0) {
 			saveTimer.stopTimer();
 			saveTimer.setTime(saveIntervalSeconds);
