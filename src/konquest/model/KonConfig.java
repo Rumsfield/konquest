@@ -68,6 +68,19 @@ public class KonConfig {
 	    }
 	}
 	
+	public void saveNewConfig() {
+		if (config == null) {
+			reloadConfig();
+		}
+		try {
+	        config.save(name+".bad");
+	    } catch (IOException exception) {
+	    	exception.printStackTrace();
+	    }
+		file = new File(plugin.getDataFolder(), name);
+		plugin.saveResource(name, true);
+	}
+	
 	public void applyHeader(String header) {
 		config.options().copyHeader(false);
 		config.options().header(header);

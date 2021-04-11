@@ -2,6 +2,7 @@ package konquest.manager;
 
 import java.util.HashMap;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import konquest.Konquest;
@@ -119,6 +120,11 @@ public class ConfigManager{
 		} else {
 			ChatUtil.printDebug("ERROR: Tried to save non-existant config "+name);
 		}
+	}
+	
+	public void overwriteBadConfig(String key) {
+		configCache.get(key).saveNewConfig();
+		Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Error: Bad config file \""+key+"\", saved default version");
 	}
 
 }
