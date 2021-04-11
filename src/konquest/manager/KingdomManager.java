@@ -505,6 +505,25 @@ public class KingdomManager {
     		// Claim the center chunk and do some checks to make sure it succeeded
     		int claimStatus = claimChunk(claimLoc);
         	switch(claimStatus) {
+        	case 0:
+        		numChunksClaimed++;
+        		KonTerritory territory = getChunkTerritory(claimLoc.getChunk());
+        		String territoryName = territory.getName();
+        		// Display town info to players in the newly claimed chunk
+        		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
+        			if(occupant.getBukkitPlayer().getLocation().getChunk().equals(claimLoc.getChunk())) {
+        				if(occupant.getKingdom().equals(territory.getKingdom())) {
+        					ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+territoryName);
+        				} else {
+        					ChatUtil.sendKonTitle(player, "", ChatColor.RED+territoryName);
+        				}
+        				if(territory instanceof KonTown) {
+    	    				KonTown town = (KonTown) territory;
+    	    				town.addBarPlayer(player);
+        				}
+        			}
+        		}
+        		break;
         	case 1:
         		ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: no adjacent territory.");
         		return false;
@@ -515,8 +534,8 @@ public class KingdomManager {
         		ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: already claimed.");
         		return false;
         	default:
-        		numChunksClaimed++;
-        		break;
+        		ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: unknown error.");
+        		return false;
         	}
     	}
     	// Use territory of center chunk to claim remaining radius unclaimed chunks
@@ -534,8 +553,10 @@ public class KingdomManager {
     		if(!allChunksAdded) {
     			ChatUtil.sendError(bukkitPlayer, "Failed to claim all land, too far from town center. Claimed "+numChunksClaimed+" chunks.");
     		} else {
-    			ChatUtil.sendNotice(bukkitPlayer, "Claimed "+numChunksClaimed+" chunks of land.");
+    			ChatUtil.sendNotice(bukkitPlayer, "Successfully claimed "+numChunksClaimed+" chunks of land for Town: "+territory.getName());
     		}
+    		konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CLAIM_LAND);
+    		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,numChunksClaimed);
     	} else {
     		ChatUtil.sendError(bukkitPlayer, "Failed to find territory.");
     		return false;
