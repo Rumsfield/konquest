@@ -86,6 +86,8 @@ public class StatAdminCommand extends CommandBase {
         		if(!isPlayerOnline) {
         			getKonquest().getDatabaseThread().getDatabase().pushPlayerStats(offlinePlayer.getOfflineBukkitPlayer(), stats);
         			stats = null;
+            	} else {
+            		getKonquest().getAccomplishmentManager().initPlayerPrefixes(player);
             	}
         		break;
         	case "add":
@@ -105,6 +107,8 @@ public class StatAdminCommand extends CommandBase {
         		if(!isPlayerOnline) {
         			getKonquest().getDatabaseThread().getDatabase().pushPlayerStats(offlinePlayer.getOfflineBukkitPlayer(), stats);
         			stats = null;
+            	} else {
+            		getKonquest().getAccomplishmentManager().initPlayerPrefixes(player);
             	}
         		break;
         	case "clear":
@@ -113,6 +117,8 @@ public class StatAdminCommand extends CommandBase {
             	// Remove reference to offline player's stats
             	if(!isPlayerOnline) {
             		stats = null;
+            	} else {
+            		getKonquest().getAccomplishmentManager().initPlayerPrefixes(player);
             	}
         		break;
         	default:

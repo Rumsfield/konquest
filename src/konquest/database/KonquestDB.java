@@ -190,12 +190,13 @@ public class KonquestDB extends Database{
         	// Add valid prefixes to the player based on stats
         	getKonquest().getAccomplishmentManager().initPlayerPrefixes(player);
             // Update player's main prefix
-        	if(mainPrefix != null && mainPrefix != "") {
+        	if(mainPrefix != null && mainPrefix != "" && getKonquest().getAccomplishmentManager().isEnabled()) {
         		boolean status = player.getPlayerPrefix().setPrefix(KonPrefixType.getPrefix(mainPrefix)); // Defaults to default prefix defined in KonPrefixType if mainPrefix is not a valid enum
         		if(!status) {
         			ChatUtil.printDebug("Failed to assign main prefix "+mainPrefix+" to player "+bukkitPlayer.getName());
-        			enablePrefix = false;
         		}
+        	} else {
+        		enablePrefix = false;
         	}
         	player.getPlayerPrefix().setEnable(enablePrefix);
         }

@@ -95,6 +95,7 @@ public class AccomplishmentManager {
 				categoryLevels.put(stat.getCategory(), newLevel);
 			}
 			// Add prefixes to player which meet level requirement
+			playerPrefix.clear();
 			for(KonPrefixType pre : KonPrefixType.values()) {
 				if(pre.level() <= categoryLevels.get(pre.category())) {
 					playerPrefix.addPrefix(pre);

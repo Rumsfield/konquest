@@ -510,7 +510,7 @@ public class EntityListener implements Listener {
         boolean isEggAttack = false;
         if (event.getEntity() instanceof Player) {
         	victimBukkitPlayer = (Player) event.getEntity();
-        	//ChatUtil.printDebug("Player was attacked by an entity");
+        	ChatUtil.printDebug("Player was attacked by an entity");
             if (event.getDamager() instanceof AbstractArrow) {
             	AbstractArrow arrow = (AbstractArrow) event.getDamager();
                 //ChatUtil.printDebug("...Attacker was an Arrow");
@@ -521,10 +521,12 @@ public class EntityListener implements Listener {
                 	return;
                 }
             } else if (event.getDamager() instanceof Egg) {
+            	ChatUtil.printDebug("...Attacker was an Egg");
             	Egg egg = (Egg)event.getDamager();
             	if (egg.getShooter() instanceof Player) {
                 	attackerBukkitPlayer = (Player) egg.getShooter();
                 	isEggAttack = true;
+                	ChatUtil.printDebug("...Egg thrower was a Player");
                 } else {
                 	return;
                 }
@@ -556,6 +558,7 @@ public class EntityListener implements Listener {
             
             // Update egg stat
             if(isEggAttack) {
+            	ChatUtil.printDebug("Egg attack!");
             	konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.EGG,1);
             }
             

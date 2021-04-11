@@ -38,6 +38,10 @@ public class KonPrefix {
 		}
 	}
 	
+	public void clear() {
+		prefixList.clear();
+	}
+	
 	/**
 	 * Set the player's main prefix if it is a valid added prefix
 	 * @param prefix
