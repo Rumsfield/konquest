@@ -313,13 +313,6 @@ public class BlockListener implements Listener {
 		// Track last block placed per player
 		konquest.lastPlaced.put(event.getPlayer(),event.getBlock().getLocation());
 		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
-		
-		// Prevent barbarians who already have a camp from placing a bed anywhere
-		if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && konquest.getKingdomManager().isCampSet(player)) {
-			ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot create more than one Camp. Destroy the bed in your current Camp before placing a new bed.", ChatColor.DARK_RED);
-			event.setCancelled(true);
-			return;
-		}
 					
 		// Monitor blocks in claimed territory
 		if(kingdomManager.isChunkClaimed(event.getBlock().getChunk())) {
@@ -435,6 +428,13 @@ public class BlockListener implements Listener {
 			}
 		} else {
 			// When placing blocks in the wilderness...
+			
+			// Prevent barbarians who already have a camp from placing a bed
+			if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && kingdomManager.isCampSet(player)) {
+				ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot create more than one Camp. Destroy the bed in your current Camp before placing a new bed.", ChatColor.DARK_RED);
+				event.setCancelled(true);
+				return;
+			}
 			
 			// Attempt to create a camp for barbarians who place a bed
 			if(!player.isAdminBypassActive() && player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && !kingdomManager.isCampSet(player)) {
