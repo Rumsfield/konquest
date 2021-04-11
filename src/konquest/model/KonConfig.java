@@ -72,8 +72,9 @@ public class KonConfig {
 		if (config == null) {
 			reloadConfig();
 		}
+		File badFile = new File(plugin.getDataFolder(), name+".bad");
 		try {
-	        config.save(name+".bad");
+	        config.save(badFile);
 	    } catch (IOException exception) {
 	    	exception.printStackTrace();
 	    }

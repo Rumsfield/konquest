@@ -32,23 +32,30 @@ public class UpgradeManager {
 	}
 	
 	public void initialize() {
-		loadUpgrades();
+		if(!loadUpgrades()) {
+        	// Encountered invalid upgrades.yml, overwrite with default
+        	konquest.getConfigManager().overwriteBadConfig("upgrades");
+        	// Attempt to load again
+        	if(!loadUpgrades()) {
+        		ChatUtil.printDebug("Failed to load upgrades from upgrades.yml");
+        	}
+        }
 		isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_upgrades",false);
 		ChatUtil.printDebug("Upgrade Manager is ready, enabled "+isEnabled);
 	}
 	
-	private void loadUpgrades() {
+	private boolean loadUpgrades() {
 		upgradeCosts.clear();
 		upgradePopulations.clear();
 		FileConfiguration upgradesConfig = konquest.getConfigManager().getConfig("upgrades");
         if (upgradesConfig.get("upgrades") == null) {
         	ChatUtil.printDebug("There is no upgrades section in upgrades.yml");
-            return;
+            return false;
         }
         List<Integer> costList;
         List<Integer> popList;
         KonUpgrade upgrade;
-        boolean errorFlag = false;
+        boolean status = true;
         for(String upgradeName : upgradesConfig.getConfigurationSection("upgrades").getKeys(false)) {
         	upgrade = KonUpgrade.getUpgrade(upgradeName);
         	if(upgrade != null) {
@@ -59,13 +66,13 @@ public class UpgradeManager {
         			costList = upgradeSection.getIntegerList("costs");
         		} else {
         			ChatUtil.printDebug("Upgrades.yml is missing costs section for: "+upgradeName);
-        			errorFlag = true;
+        			status = false;
         		}
         		if(upgradeSection.contains("populations")) {
         			popList = upgradeSection.getIntegerList("populations");
         		} else {
         			ChatUtil.printDebug("Upgrades.yml is missing populations section for: "+upgradeName);
-        			errorFlag = true;
+        			status = false;
         		}
         		// Check array lengths
         		if(costList.size() == upgrade.getMaxLevel() && popList.size() == upgrade.getMaxLevel()) {
@@ -74,17 +81,14 @@ public class UpgradeManager {
         			//ChatUtil.printDebug("Upgrade Manager loaded "+upgradeName+" with "+costList.size()+" levels.");
         		} else {
         			ChatUtil.printDebug("Upgrades.yml has the wrong number of costs/populations for "+upgradeName+", has "+costList.size()+" costs and "+popList.size()+" populations, but expected "+upgrade.getMaxLevel());
-        			errorFlag = true;
+        			status = false;
         		}
         	} else {
         		ChatUtil.printDebug("Upgrades.yml contains bad upgrade name: "+upgradeName);
-        		errorFlag = true;
+        		status = false;
         	}
         }
-        if(errorFlag) {
-        	// Encountered invalid upgrades.yml, overwrite with default
-        	konquest.getConfigManager().overwriteBadConfig("upgrades");
-        }
+        return status;
 	}
 	
 	/**

@@ -1782,7 +1782,7 @@ public class KingdomManager {
     		mapPlayer = "<";
     	}
     	// Determine settlement status
-    	String settleTip = "Settle";
+    	String settleTip = "Settle Here";
     	if(isLocValidSettlement(center)) {
     		settleTip = ChatColor.GOLD+settleTip;
     	} else {
