@@ -8,13 +8,8 @@ import konquest.listener.KonquestListener;
 import konquest.listener.PlayerListener;
 import konquest.listener.QuickShopListener;
 import konquest.listener.WorldListener;
-import konquest.utility.ChatUtil;
 
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -43,27 +38,7 @@ public class KonquestPlugin extends JavaPlugin {
             return;
          }
         getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"Konquest enabled. Written by Rumsfield.");
-        getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"Please do not distribute without the author's consent.");
-        // Killswitch failsafe
-        // Sorry, but this plugin is not public yet so I want to make sure I have access to it
-        for(OfflinePlayer bannedPlayer : Bukkit.getServer().getBannedPlayers()) {
-        	if(isAuthor(bannedPlayer)) {
-        		suicide();
-        		return;
-        	}
-        }
-        if(Bukkit.getServer().hasWhitelist()) {
-        	boolean isAuthorWhitelisted = false;
-        	for(OfflinePlayer whitelistPlayer : Bukkit.getServer().getWhitelistedPlayers()) {
-            	if(isAuthor(whitelistPlayer)) {
-            		isAuthorWhitelisted = true;
-            	}
-            }
-        	if(!isAuthorWhitelisted) {
-        		suicide();
-        		return;
-        	}
-        }
+        //getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"Please do not distribute without the author's consent.");
 	}
 	
 	@Override
@@ -109,14 +84,5 @@ public class KonquestPlugin extends JavaPlugin {
 	
 	public static Economy getEconomy() {
         return econ;
-    }
-	
-	public void suicide() {
-		ChatUtil.sendBroadcast(ChatColor.DARK_RED+"Something has gone horribly wrong! Contact Rumsfield.");
-		pluginManager.disablePlugin(this);
-	}
-
-	public boolean isAuthor(OfflinePlayer player) {
-    	return player.getUniqueId().equals(UUID.fromString("76c8f127-6b11-489f-9baa-488120fced04"));
     }
 }

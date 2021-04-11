@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
@@ -13,6 +14,7 @@ import konquest.model.KonDirective;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonPrefixType;
+import konquest.model.KonStats;
 import konquest.model.KonStatsType;
 import konquest.utility.ChatUtil;
 
@@ -229,6 +231,36 @@ public class KonquestDB extends Database{
         //ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" directives = "+allDirectives);
     }
 
+    public KonStats pullPlayerStats(OfflinePlayer offlineBukkitPlayer) {
+    	KonStats playerStats = new KonStats();
+    	ResultSet stats = select("stats", "uuid", offlineBukkitPlayer.getUniqueId().toString());
+    	try {
+            while (stats.next()) {
+            	for(KonStatsType statEnum : KonStatsType.values()) {
+            		int statProgress = stats.getInt(statEnum.toString());
+            		playerStats.setStat(statEnum, statProgress);
+            	}
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            ChatUtil.printDebug("Could not pull stats for "+offlineBukkitPlayer.getName());
+        }
+    	return playerStats;
+    }
+    
+    public void pushPlayerStats(OfflinePlayer offlineBukkitPlayer, KonStats stats) {
+        String[] col = new String[KonStatsType.values().length];
+        String[] val = new String[KonStatsType.values().length];
+        int i = 0;
+        for(KonStatsType iter : KonStatsType.values()) {
+        	col[i] = iter.toString();
+        	val[i] = Integer.toString(stats.getStat(iter));
+        	i++;
+    	}
+        set("stats", col, val, "uuid", offlineBukkitPlayer.getUniqueId().toString());
+    }
+    
+    
     /*public void createPlayerData(KonPlayer player) {
         Player bukkitPlayer = player.getBukkitPlayer();
         String uuid = bukkitPlayer.getUniqueId().toString();

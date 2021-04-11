@@ -14,7 +14,7 @@ public enum AdminCommandType {
 	LIST			("kingdoms|towns|all",						   		 	"Display all Kingdoms or Towns of a Kingdom."),
 	FORCEJOIN 		("<player> <kingdom>",									"Forces a player to join a Kingdom and teleports them to the Capital."),
 	FORCEEXILE		("<player> [full]", 									"Forces a player to become a Barbarian and teleports them to the Wild."),
-	FORCETOWN		("<name> open|close|add|kick|lord|elite [name]", 		"Forces a Town to accept the provided management sub-commands."),
+	FORCETOWN		("<name> open|close|add|kick|lord|elite|rename|upgrade [arg1] [arg2]", "Forces a Town to accept the provided management sub-commands."),
 	RENAME	        ("<kingdom> <oldName> <newName>",					    "Renames a Kingdom or Town to newName."),
 	RUIN	        ("create|remove|criticals|spawns",					    "Manage a Ruin territory."),
 	SAVE			("", 													"Saves Kingdoms and Players data files."),
@@ -22,7 +22,7 @@ public enum AdminCommandType {
 	TRAVEL			("<kingdom|town>",                                   	"Teleport to the specified kingdom or town."),
 	RELOAD			("", 													"Reloads configuration files."),
 	FLAG			("<flag> <value>",                                   	"Set kingdom flags. Use the command with no arguments to list available flags."),
-	PREFIX			("<player> <prefix>",									"Set the prefix of a player.");
+	STAT			("<player> <stat> show|set|add|clear [<value>]",		"Manage player stats.");
 	
 	private final String arguments;
 	private final String description;
