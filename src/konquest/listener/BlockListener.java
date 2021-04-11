@@ -400,9 +400,22 @@ public class BlockListener implements Listener {
 					KonCamp camp = (KonCamp)territory;
 					// Prevent additional beds from being placed by anyone
 					if(event.getBlock().getBlockData() instanceof Bed) {
-						ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot place additional beds within this Camp", ChatColor.DARK_RED);
-						event.setCancelled(true);
-						return;
+						if(event.getBlock().getWorld().getBlockAt(camp.getBedLocation()).getBlockData() instanceof Bed) {
+							// The camp has a bed block already
+							ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot place additional beds within this Camp", ChatColor.DARK_RED);
+							event.setCancelled(true);
+							return;
+						} else if(camp.isPlayerOwner(player.getBukkitPlayer())){
+							// The camp does not have a bed and the owner is placing a new one
+							camp.setBedLocation(event.getBlock().getLocation());
+							player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
+							ChatUtil.sendNotice(player.getBukkitPlayer(), "Updated your Camp's bed location");
+						} else {
+							// The camp does not have a bed and this player is not the owner
+							ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot place beds in someone else's Camp", ChatColor.DARK_RED);
+							event.setCancelled(true);
+							return;
+						}
 					}
 					// If the camp owner is not online, prevent block placement
 					boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");

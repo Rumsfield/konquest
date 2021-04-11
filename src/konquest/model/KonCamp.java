@@ -14,6 +14,7 @@ public class KonCamp extends KonTerritory implements Timeable {
 	private OfflinePlayer owner;
 	private Timer raidAlertTimer;
 	private boolean isRaidAlertDisabled;
+	private Location bedLocation;
 	
 	public KonCamp(Location loc, OfflinePlayer owner, KonKingdom kingdom, Konquest konquest) {
 		super(loc, owner.getName()+"'s_Camp", konquest.getKingdomManager().getBarbarians(), KonTerritoryType.CAMP, konquest);
@@ -21,6 +22,7 @@ public class KonCamp extends KonTerritory implements Timeable {
 		this.owner = owner;
 		this.raidAlertTimer = new Timer(this);
 		this.isRaidAlertDisabled = false;
+		this.bedLocation = loc;
 	}
 
 	/**
@@ -63,6 +65,14 @@ public class KonCamp extends KonTerritory implements Timeable {
 	
 	public Timer getRaidAlertTimer() {
 		return raidAlertTimer;
+	}
+	
+	public Location getBedLocation() {
+		return bedLocation;
+	}
+	
+	public void setBedLocation(Location loc) {
+		bedLocation = loc;
 	}
 
 	@Override
