@@ -1,6 +1,5 @@
 package konquest;
 
-
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +16,6 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,14 +40,13 @@ import konquest.model.KonPlayer;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
+import konquest.nms.TeamPacketSender;
+import konquest.nms.TeamPacketSender_1_16_R3;
 import konquest.utility.ChatUtil;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
-import net.minecraft.server.v1_16_R3.PacketPlayOutScoreboardTeam;
-import net.minecraft.server.v1_16_R3.ScoreboardTeam;
 import konquest.command.CommandHandler;
 import konquest.database.DatabaseThread;
-
 
 public class Konquest implements Timeable {
 
@@ -73,6 +70,7 @@ public class Konquest implements Timeable {
     private Team friendlyTeam;
     private Team enemyTeam;
     private Team barbarianTeam;
+    private TeamPacketSender teamPacketSender;
 	
 	private String worldName;
 	public List<String> opStatusMessages;
@@ -132,6 +130,12 @@ public class Konquest implements Timeable {
         enemyTeam.setColor(ChatColor.RED);
         barbarianTeam = scoreboard.registerNewTeam("barbarians");
         barbarianTeam.setColor(ChatColor.YELLOW);
+        
+        if(setupTeamPacketSender()) {
+        	plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Successfully registered name color packets");
+        } else {
+        	plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] ERROR: Failed to register name color packets");
+        }
 		
 		kingdomManager.updateSmallestKingdom();
 		kingdomManager.updateAllTownDisabledUpgrades();
@@ -531,7 +535,7 @@ public class Konquest implements Timeable {
 		ChatUtil.printDebug("Got safe centered location "+randLoc.getX()+","+randLoc.getY()+","+randLoc.getZ());
 		return randLoc;
 	}
-	
+	/*
 	public void setPlayersToFriendlies(Player player, List<String> friendlies) {
         net.minecraft.server.v1_16_R3.Scoreboard nmsScoreboard = new net.minecraft.server.v1_16_R3.Scoreboard();
         ScoreboardTeam nmsTeam = new ScoreboardTeam(nmsScoreboard, friendlyTeam.getName());
@@ -555,62 +559,79 @@ public class Konquest implements Timeable {
         CraftPlayer craftPlayer = (CraftPlayer) player;
         craftPlayer.getHandle().playerConnection.sendPacket(packet);
     }
+    */
+    private boolean setupTeamPacketSender() {
+    	String version;
+    	try {
+    		version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    	} catch (ArrayIndexOutOfBoundsException e) {
+    		ChatUtil.printDebug("Failed to determine server version.");
+    		return false;
+    	}
+    	plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Your server version is "+version);
+    	if(version.equals("v1_16_R3")) {
+    		teamPacketSender = new TeamPacketSender_1_16_R3();
+    	}
+    	return teamPacketSender != null;
+    }
     
     //TODO This could be optimized to reduce loop Order, and only update as needed
     public void updateNamePackets() {
-    	// Update all Kingdom player's nametag color packets
-		for(String kingdomName : kingdomManager.getKingdomNames()) {
-			// For each kingdom, determine friendlies and enemies
-			List<Player> friendlyPlayers = new ArrayList<Player>();
-			List<String> friendlyNames = new ArrayList<String>();
+    	if(teamPacketSender != null) {
+	    	// Update all Kingdom player's nametag color packets
+			for(String kingdomName : kingdomManager.getKingdomNames()) {
+				// For each kingdom, determine friendlies and enemies
+				List<Player> friendlyPlayers = new ArrayList<Player>();
+				List<String> friendlyNames = new ArrayList<String>();
+				List<String> enemyNames = new ArrayList<String>();
+				List<String> barbarianNames = new ArrayList<String>();
+				// Populate friendly and enemy lists
+				for(KonPlayer player : playerManager.getPlayersOnline()) {
+		    		if(player.getKingdom().getName().equalsIgnoreCase(kingdomName)) {
+		    			friendlyNames.add(player.getBukkitPlayer().getName());
+		    			friendlyPlayers.add(player.getBukkitPlayer());
+		    		} else if(!player.isBarbarian()) {
+		    			enemyNames.add(player.getBukkitPlayer().getName());
+		    		} else {
+		    			barbarianNames.add(player.getBukkitPlayer().getName());
+		    		}
+		    	}
+				// For each friendly player in this kingdom, send packet update
+				for(Player kingdomPlayer : friendlyPlayers) {
+					if(!friendlyNames.isEmpty()) {
+						teamPacketSender.setPlayersToFriendlies(kingdomPlayer, friendlyNames, friendlyTeam);
+			    	}
+			    	if(!enemyNames.isEmpty()) {
+			    		teamPacketSender.setPlayersToEnemies(kingdomPlayer, enemyNames, enemyTeam);
+			    	}
+			    	if(!barbarianNames.isEmpty()) {
+			    		teamPacketSender.setPlayersToBarbarians(kingdomPlayer, barbarianNames, barbarianTeam);
+			    	}
+				}
+			}
+			// Update all Barbarian player's nametag color packets
+			List<Player> barbarianPlayers = new ArrayList<Player>();
 			List<String> enemyNames = new ArrayList<String>();
 			List<String> barbarianNames = new ArrayList<String>();
-			// Populate friendly and enemy lists
+			// Populate barbarian and enemy lists
 			for(KonPlayer player : playerManager.getPlayersOnline()) {
-	    		if(player.getKingdom().getName().equalsIgnoreCase(kingdomName)) {
-	    			friendlyNames.add(player.getBukkitPlayer().getName());
-	    			friendlyPlayers.add(player.getBukkitPlayer());
-	    		} else if(!player.isBarbarian()) {
-	    			enemyNames.add(player.getBukkitPlayer().getName());
-	    		} else {
+	    		if(player.isBarbarian()) {
 	    			barbarianNames.add(player.getBukkitPlayer().getName());
+	    			barbarianPlayers.add(player.getBukkitPlayer());
+	    		} else {
+	    			enemyNames.add(player.getBukkitPlayer().getName());
 	    		}
 	    	}
-			// For each friendly player in this kingdom, send packet update
-			for(Player kingdomPlayer : friendlyPlayers) {
-				if(!friendlyNames.isEmpty()) {
-		    		setPlayersToFriendlies(kingdomPlayer, friendlyNames);
-		    	}
+			// For each barbarian player, send packet update
+			for(Player barbarianPlayer : barbarianPlayers) {
 		    	if(!enemyNames.isEmpty()) {
-		    		setPlayersToEnemies(kingdomPlayer, enemyNames);
+		    		teamPacketSender.setPlayersToEnemies(barbarianPlayer, enemyNames, enemyTeam);
 		    	}
 		    	if(!barbarianNames.isEmpty()) {
-		    		setPlayersToBarbarians(kingdomPlayer, barbarianNames);
+		    		teamPacketSender.setPlayersToBarbarians(barbarianPlayer, barbarianNames, barbarianTeam);
 		    	}
 			}
-		}
-		// Update all Barbarian player's nametag color packets
-		List<Player> barbarianPlayers = new ArrayList<Player>();
-		List<String> enemyNames = new ArrayList<String>();
-		List<String> barbarianNames = new ArrayList<String>();
-		// Populate barbarian and enemy lists
-		for(KonPlayer player : playerManager.getPlayersOnline()) {
-    		if(player.isBarbarian()) {
-    			barbarianNames.add(player.getBukkitPlayer().getName());
-    			barbarianPlayers.add(player.getBukkitPlayer());
-    		} else {
-    			enemyNames.add(player.getBukkitPlayer().getName());
-    		}
     	}
-		// For each barbarian player, send packet update
-		for(Player barbarianPlayer : barbarianPlayers) {
-	    	if(!enemyNames.isEmpty()) {
-	    		setPlayersToEnemies(barbarianPlayer, enemyNames);
-	    	}
-	    	if(!barbarianNames.isEmpty()) {
-	    		setPlayersToBarbarians(barbarianPlayer, barbarianNames);
-	    	}
-		}
     }
     
     public static UUID idFromString(String id) {

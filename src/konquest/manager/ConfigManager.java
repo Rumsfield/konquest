@@ -125,7 +125,7 @@ public class ConfigManager{
 	public void overwriteBadConfig(String key) {
 		configCache.get(key).saveNewConfig();
 		configCache.get(key).reloadConfig();
-		Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Error: Bad config file \""+key+"\", saved default version");
+		Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] ERROR: Bad config file \""+key+"\", saved default version");
 	}
 
 }
