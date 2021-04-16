@@ -15,12 +15,14 @@ import konquest.KonquestPlugin;
 public class KonConfig {
 	private File file;
 	private String name;
+	private String fileName;
 	private YamlConfiguration config;
 	
 	private KonquestPlugin plugin;
 	
 	public KonConfig(String name) {
 		this.name = name;
+		this.fileName = name+".yml";
 		plugin = Konquest.getInstance().getPlugin();
 	}
 	
@@ -29,7 +31,7 @@ public class KonConfig {
 		
 		// look for defaults in jar
 		try {
-			Reader defaultConfigStream = new InputStreamReader(plugin.getResource(name), "UTF8");
+			Reader defaultConfigStream = new InputStreamReader(plugin.getResource(fileName), "UTF8");
 			
 			if (defaultConfigStream != null) {
 				YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
@@ -62,11 +64,11 @@ public class KonConfig {
 	// Returns true if the file was missing and has been replaced with the default
 	public boolean saveDefaultConfig() {
 	    if (file == null) {
-	        file = new File(plugin.getDataFolder(), name);
+	        file = new File(plugin.getDataFolder(), fileName);
 	    }
 	    boolean result = false;
 	    if (!file.exists()) {
-	    	plugin.saveResource(name, false);
+	    	plugin.saveResource(fileName, false);
 	    	result = true;
 	    }
 	    return result;
@@ -80,10 +82,38 @@ public class KonConfig {
 		String fileVersion = config.getString("version","0.0.0");
 		String pluginVersion = plugin.getDescription().getVersion();
 		if(!fileVersion.equalsIgnoreCase(pluginVersion)) {
-			config.set("version", pluginVersion);
-			saveConfig();
+			if(fileVersion.equals("0.0.0")) {
+				// Update default config version to current plugin version
+				if(config.contains("version")) {
+					config.set("version", pluginVersion);
+					try {
+				        config.save(file);
+				    } catch (IOException exception) {
+				    	exception.printStackTrace();
+				    }
+				}
+			} else {
+				// Make a copy of config file
+				String oldFileName = name+"-v"+fileVersion+".yml";
+				File oldVersionFile = new File(plugin.getDataFolder(), oldFileName);
+				try {
+			        config.save(oldVersionFile);
+			    } catch (IOException exception) {
+			    	exception.printStackTrace();
+			    }
+				// Save default config & update version
+				file = new File(plugin.getDataFolder(), fileName);
+				plugin.saveResource(fileName, true);
+				reloadConfig();
+				config.set("version", pluginVersion);
+				try {
+			        config.save(file);
+			    } catch (IOException exception) {
+			    	exception.printStackTrace();
+			    }
+			}
 			result = true;
-			Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Invalid or missing config file \""+name+"\" replaced with latest default version. Manually edit new YML file.");
+			Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Invalid or missing config file \""+fileName+"\" replaced with latest default version. Manually edit new YML file.");
 		}
 		return result;
 	}
@@ -92,14 +122,15 @@ public class KonConfig {
 		if (config == null) {
 			reloadConfig();
 		}
-		File badFile = new File(plugin.getDataFolder(), name+".bad");
+		File badFile = new File(plugin.getDataFolder(), fileName+".bad");
 		try {
 	        config.save(badFile);
 	    } catch (IOException exception) {
 	    	exception.printStackTrace();
 	    }
-		file = new File(plugin.getDataFolder(), name);
-		plugin.saveResource(name, true);
+		file = new File(plugin.getDataFolder(), fileName);
+		plugin.saveResource(fileName, true);
+		reloadConfig();
 	}
 	
 }

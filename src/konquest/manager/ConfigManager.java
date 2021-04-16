@@ -20,14 +20,14 @@ public class ConfigManager{
 	}
         
 	public void initialize() {
-		addConfig("core", new KonConfig("core.yml"));
+		addConfig("core", new KonConfig("core"));
 		updateConfigVersion("core");
-		addConfig("upgrades", new KonConfig("upgrades.yml"));
-		addConfig("camps", new KonConfig("camps.yml"));
-		addConfig("kingdoms", new KonConfig("kingdoms.yml"));
-		addConfig("ruins", new KonConfig("ruins.yml"));
+		addConfig("upgrades", new KonConfig("upgrades"));
+		addConfig("camps", new KonConfig("camps"));
+		addConfig("kingdoms", new KonConfig("kingdoms"));
+		addConfig("ruins", new KonConfig("ruins"));
 		
-        System.out.println("[DEBUG]: Debug is "+getConfig("core").getBoolean("core.debug"));
+        //System.out.println("[Konquest]: Debug is "+getConfig("core").getBoolean("core.debug"));
 	}
 	
 	public FileConfiguration getConfig(String key) {
