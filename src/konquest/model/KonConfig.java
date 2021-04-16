@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -14,7 +15,7 @@ import konquest.KonquestPlugin;
 public class KonConfig {
 	private File file;
 	private String name;
-	private FileConfiguration config;
+	private YamlConfiguration config;
 	
 	private KonquestPlugin plugin;
 	
@@ -58,14 +59,33 @@ public class KonConfig {
 	    }
 	}
 	
-	public void saveDefaultConfig() {
+	// Returns true if the file was missing and has been replaced with the default
+	public boolean saveDefaultConfig() {
 	    if (file == null) {
 	        file = new File(plugin.getDataFolder(), name);
 	    }
-	    
+	    boolean result = false;
 	    if (!file.exists()) {
 	    	plugin.saveResource(name, false);
+	    	result = true;
 	    }
+	    return result;
+	}
+	
+	public boolean updateVersion() {
+		if (config == null || file == null) {
+	        return false;
+	    }
+		boolean result = false;
+		String fileVersion = config.getString("version","0.0.0");
+		String pluginVersion = plugin.getDescription().getVersion();
+		if(!fileVersion.equalsIgnoreCase(pluginVersion)) {
+			config.set("version", pluginVersion);
+			saveConfig();
+			result = true;
+			Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Invalid or missing config file \""+name+"\" replaced with latest default version. Manually edit new YML file.");
+		}
+		return result;
 	}
 	
 	public void saveNewConfig() {
@@ -82,8 +102,4 @@ public class KonConfig {
 		plugin.saveResource(name, true);
 	}
 	
-	public void applyHeader(String header) {
-		config.options().copyHeader(false);
-		config.options().header(header);
-	}
 }

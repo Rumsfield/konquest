@@ -6,7 +6,6 @@ import konquest.listener.HangingListener;
 import konquest.listener.InventoryListener;
 import konquest.listener.KonquestListener;
 import konquest.listener.PlayerListener;
-import konquest.listener.QuickShopListener;
 import konquest.listener.WorldListener;
 
 import org.bukkit.ChatColor;
@@ -65,7 +64,7 @@ public class KonquestPlugin extends JavaPlugin {
 		pluginManager.registerEvents(new InventoryListener(this), this);
 		pluginManager.registerEvents(new HangingListener(this), this);
 		pluginManager.registerEvents(new WorldListener(this), this);
-		pluginManager.registerEvents(new QuickShopListener(this), this);
+		//pluginManager.registerEvents(new QuickShopListener(this), this);
 	}
 	
 	private boolean setupEconomy() {
