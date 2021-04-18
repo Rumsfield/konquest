@@ -35,6 +35,13 @@ public class KonPlayerScoreAttributes {
 		attributeMap.put(attribute, value);
 	}
 	
+	public void addAttribute(KonPlayerScoreAttribute attribute, int value) {
+		if(attributeMap.containsKey(attribute)) {
+			int current = attributeMap.get(attribute);
+			attributeMap.put(attribute, current+value);
+		}
+	}
+	
 	public int getAttributeValue(KonPlayerScoreAttribute attribute) {
 		int result = 0;
 		if(attributeMap.containsKey(attribute)) {

@@ -35,6 +35,7 @@ import konquest.model.KonDirective;
 import konquest.model.KonKingdom;
 import konquest.model.KonKingdomScoreAttributes;
 import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
+import konquest.model.KonLeaderboard;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonPlayerScoreAttributes;
@@ -1177,7 +1178,7 @@ public class KingdomManager {
 		player.getPlayerStats().setStat(KonStatsType.KNIGHTS, countElite);
 		player.getPlayerStats().setStat(KonStatsType.RESIDENTS, countResident);
 	}
-	
+	/*
 	public ArrayList<String> getKingdomLeaderboard(KonKingdom kingdom) {
 		ArrayList<String> leaderNames = new ArrayList<String>();
 		if(kingdom.equals(barbarians)) {
@@ -1238,6 +1239,75 @@ public class KingdomManager {
 			}
 		}
 		return leaderNames;
+	}*/
+	
+	public KonLeaderboard getKingdomLeaderboard(KonKingdom kingdom) {
+		KonLeaderboard leaderboard = new KonLeaderboard();
+		if(kingdom.equals(barbarians)) {
+			return leaderboard;
+		}
+		// Determine scores for all players within towns
+		HashMap<OfflinePlayer,KonPlayerScoreAttributes> memberScores = new HashMap<OfflinePlayer,KonPlayerScoreAttributes>();
+		int numTownLords = 0;
+		int numTownKnights = 0;
+		int numTownResidents = 0;
+		int numLordLand = 0;
+		int numKnightLand = 0;
+		int numResidentLand = 0;
+		for(KonTown town : kingdom.getTowns()) {
+			for(OfflinePlayer offlinePlayer : town.getPlayerResidents()) {
+				if(town.isPlayerLord(offlinePlayer)) {
+					numTownLords++;
+					numLordLand += town.getChunkList().size();
+				} else if(town.isPlayerElite(offlinePlayer)) {
+					numTownKnights++;
+					numKnightLand += town.getChunkList().size();
+				} else {
+					numTownResidents++;
+					numResidentLand += town.getChunkList().size();
+				}
+				if(memberScores.containsKey(offlinePlayer)) {
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.TOWN_LORDS, numTownLords);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.TOWN_KNIGHTS, numTownKnights);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.TOWN_RESIDENTS, numTownResidents);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.LAND_LORDS, numLordLand);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.LAND_KNIGHTS, numKnightLand);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.LAND_RESIDENTS, numResidentLand);
+				} else {
+					KonPlayerScoreAttributes newMemberAttributes = new KonPlayerScoreAttributes();
+					newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_LORDS, numTownLords);
+					newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_KNIGHTS, numTownKnights);
+					newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_RESIDENTS, numTownResidents);
+					newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_LORDS, numLordLand);
+					newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_KNIGHTS, numKnightLand);
+					newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_RESIDENTS, numResidentLand);
+					memberScores.put(offlinePlayer, newMemberAttributes);
+				}
+			}
+		}
+		// Find top scoring members
+		final int NUM_TOP_PLAYERS = 9;
+		int topScore = 0;
+		OfflinePlayer topPlayer = null;
+		for(int i = 0;i<NUM_TOP_PLAYERS;i++) {
+			if(!memberScores.isEmpty()) {
+				for(OfflinePlayer offlinePlayer : memberScores.keySet()) {
+					int playerScore = memberScores.get(offlinePlayer).getScore();
+					if(playerScore > topScore) {
+						topScore = playerScore;
+						topPlayer = offlinePlayer;
+					}
+				}
+				if(topPlayer != null) {
+					leaderboard.addEntry(topPlayer,topScore);
+					ChatUtil.printDebug("Found leaderboard member "+topPlayer.getName()+", score: "+topScore);
+					memberScores.remove(topPlayer);
+					topScore = 0;
+					topPlayer = null;
+				}
+			}
+		}
+		return leaderboard;
 	}
 	
 	public KonKingdomScoreAttributes getKingdomScoreAttributes(KonKingdom kingdom) {

@@ -19,8 +19,14 @@ import konquest.display.MenuIcon;
 import konquest.display.PagedMenu;
 import konquest.display.UpgradeIcon;
 import konquest.model.KonKingdomScoreAttributes;
+import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
+import konquest.model.KonLeaderboard;
 import konquest.model.KonOfflinePlayer;
+import konquest.model.KonPlayer;
 import konquest.model.KonPlayerScoreAttributes;
+import konquest.model.KonStats;
+import konquest.model.KonStatsType;
+import konquest.model.KonPlayerScoreAttributes.KonPlayerScoreAttribute;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
@@ -225,21 +231,69 @@ public class DisplayManager {
 		int playerScore = playerScoreAttributes.getScore();
 		int kingdomScore = kingdomScoreAttributes.getScore();
 		String pageLabel = "";
+		int i = 0;
+		InfoIcon info;
 		
 		// Create fresh paged menu
 		PagedMenu newMenu = new PagedMenu();
 		// Page 0
 		pageLabel = ChatColor.BLACK+scorePlayer.getOfflineBukkitPlayer().getName()+" Score: "+playerScore;
 		newMenu.addPage(0, 2, pageLabel);
+		info = new InfoIcon(scorePlayer.getKingdom().getName()+" Kingdom Score", Arrays.asList("Total score:"+ChatColor.DARK_PURPLE+kingdomScore), Material.SPONGE, 0);
+		newMenu.getPage(0).addIcon(info);
+		info = new InfoIcon("Kingdom Towns", Arrays.asList("Total towns: "+ChatColor.AQUA+kingdomScoreAttributes.getAttributeValue(KonKingdomScoreAttribute.TOWNS), "Score contribution: "+ChatColor.DARK_PURPLE+kingdomScoreAttributes.getAttributeScore(KonKingdomScoreAttribute.TOWNS)), Material.DIRT, 1);
+		newMenu.getPage(0).addIcon(info);
+		info = new InfoIcon("Kingdom Land", Arrays.asList("Total land: "+ChatColor.AQUA+kingdomScoreAttributes.getAttributeValue(KonKingdomScoreAttribute.LAND), "Score contribution: "+ChatColor.DARK_PURPLE+kingdomScoreAttributes.getAttributeScore(KonKingdomScoreAttribute.LAND)), Material.DIRT, 2);
+		newMenu.getPage(0).addIcon(info);
+		info = new InfoIcon("Kingdom Favor", Arrays.asList("Total favor: "+ChatColor.AQUA+kingdomScoreAttributes.getAttributeValue(KonKingdomScoreAttribute.FAVOR), "Score contribution: "+ChatColor.DARK_PURPLE+kingdomScoreAttributes.getAttributeScore(KonKingdomScoreAttribute.FAVOR)), Material.DIRT, 3);
+		newMenu.getPage(0).addIcon(info);
+		info = new InfoIcon("Kingdom Population", Arrays.asList("Total population: "+ChatColor.AQUA+kingdomScoreAttributes.getAttributeValue(KonKingdomScoreAttribute.POPULATION), "Score contribution: "+ChatColor.DARK_PURPLE+kingdomScoreAttributes.getAttributeScore(KonKingdomScoreAttribute.POPULATION)), Material.DIRT, 4);
+		newMenu.getPage(0).addIcon(info);
+		info = new InfoIcon(scorePlayer.getOfflineBukkitPlayer().getName()+" Player Score", Arrays.asList("Total score:"+ChatColor.DARK_PURPLE+playerScore), Material.STONE, 9);
+		newMenu.getPage(0).addIcon(info);
+		info = new InfoIcon("Player Lordships", Arrays.asList("Towns: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.TOWN_LORDS), "Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.TOWN_LORDS)), Material.DIRT, 10);
+		newMenu.getPage(0).addIcon(info);
+		info = new InfoIcon("Player Knighthoods", Arrays.asList("Towns: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.TOWN_KNIGHTS), "Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.TOWN_KNIGHTS)), Material.DIRT, 11);
+		newMenu.getPage(0).addIcon(info);
+		info = new InfoIcon("Player Residencies", Arrays.asList("Towns: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.TOWN_RESIDENTS), "Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.TOWN_RESIDENTS)), Material.DIRT, 12);
+		newMenu.getPage(0).addIcon(info);
+		info = new InfoIcon("Lord Town Land", Arrays.asList("Land: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.LAND_LORDS), "Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.LAND_LORDS)), Material.DIRT, 13);
+		newMenu.getPage(0).addIcon(info);
+		info = new InfoIcon("Knight Town Land", Arrays.asList("Land: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.LAND_KNIGHTS), "Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.LAND_KNIGHTS)), Material.DIRT, 14);
+		newMenu.getPage(0).addIcon(info);
+		info = new InfoIcon("Resident Town Land", Arrays.asList("Land: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.LAND_RESIDENTS), "Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.LAND_RESIDENTS)), Material.DIRT, 15);
+		newMenu.getPage(0).addIcon(info);
 		
 		// Page 1
 		pageLabel = ChatColor.BLACK+scorePlayer.getOfflineBukkitPlayer().getName()+" Stats";
 		newMenu.addPage(1, 3, pageLabel);
+		KonPlayer player = konquest.getPlayerManager().getPlayerFromName(scorePlayer.getOfflineBukkitPlayer().getName());
+    	boolean isPlayerOnline = false;
+    	KonStats stats;
+    	if(player == null) {
+    		// Use offline player, pull stats from DB
+    		stats = konquest.getDatabaseThread().getDatabase().pullPlayerStats(scorePlayer.getOfflineBukkitPlayer());
+    	} else {
+    		// Use online player's active stats
+    		stats = player.getPlayerStats();
+    		isPlayerOnline = true;
+    	}
+    	i = 0;
+    	int statValue = 0;
+    	for(KonStatsType stat : KonStatsType.values()) {
+    		statValue = stats.getStat(stat);
+    		info = new InfoIcon(stat.toString(),Arrays.asList(stat.description(),ChatColor.AQUA+""+statValue),Material.GLASS,i);
+    		newMenu.getPage(1).addIcon(info);
+    	}
+    	if(!isPlayerOnline) {
+    		stats = null;
+    	}
 		
 		// Page 2
 		pageLabel = ChatColor.BLACK+scorePlayer.getKingdom().getName()+" Leaderboard";
 		newMenu.addPage(2, 1, pageLabel);
 		
+		KonLeaderboard leaderboard = konquest.getKingdomManager().getKingdomLeaderboard(scorePlayer.getKingdom());
 		
 	}
 	
