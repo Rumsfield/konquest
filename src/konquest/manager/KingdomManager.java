@@ -33,8 +33,12 @@ import konquest.KonquestPlugin;
 import konquest.model.KonCamp;
 import konquest.model.KonDirective;
 import konquest.model.KonKingdom;
+import konquest.model.KonKingdomScoreAttributes;
+import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
+import konquest.model.KonPlayerScoreAttributes;
+import konquest.model.KonPlayerScoreAttributes.KonPlayerScoreAttribute;
 import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
@@ -1236,31 +1240,101 @@ public class KingdomManager {
 		return leaderNames;
 	}
 	
+	public KonKingdomScoreAttributes getKingdomScoreAttributes(KonKingdom kingdom) {
+		KonKingdomScoreAttributes scoreAttributes = new KonKingdomScoreAttributes();
+		if(!kingdom.equals(barbarians) && !kingdom.isPeaceful()) {
+			// Gather Kingdom metrics
+			int numKingdomTowns = kingdom.getTowns().size();
+	    	ArrayList<KonOfflinePlayer> allPlayersInKingdom = konquest.getPlayerManager().getAllPlayersInKingdom(kingdom.getName());
+	    	int numAllKingdomPlayers = allPlayersInKingdom.size();
+	    	int numKingdomLand = 0;
+	    	for(KonTown town : kingdom.getTowns()) {
+	    		numKingdomLand += town.getChunkList().size();
+	    	}
+	    	int numKingdomFavor = 0;
+	    	for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
+	    		numKingdomFavor += (int) KonquestPlugin.getEconomy().getBalance(kingdomPlayer.getOfflineBukkitPlayer());
+	    	}
+	    	// Gather favor costs
+	    	int cost_settle = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_settle");
+	    	int cost_claim = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
+	    	// Set attributes
+	    	scoreAttributes.setAttributeWeight(KonKingdomScoreAttribute.TOWNS, cost_settle+2);
+	    	scoreAttributes.setAttributeWeight(KonKingdomScoreAttribute.LAND, cost_claim+1);
+	    	scoreAttributes.setAttribute(KonKingdomScoreAttribute.TOWNS, numKingdomTowns);
+	    	scoreAttributes.setAttribute(KonKingdomScoreAttribute.LAND, numKingdomLand);
+	    	scoreAttributes.setAttribute(KonKingdomScoreAttribute.FAVOR, numKingdomFavor);
+	    	scoreAttributes.setAttribute(KonKingdomScoreAttribute.POPULATION, numAllKingdomPlayers);
+		}
+		return scoreAttributes;
+	}
+	
+	public int getKingdomScore(KonKingdom kingdom) {
+		int score = getKingdomScoreAttributes(kingdom).getScore();
+		return score;
+	}
+	/*
 	public int getKingdomScore(KonKingdom kingdom) {
 		int score = 0;
-		if(kingdom.equals(barbarians)) {
-			return score;
+		if(!kingdom.equals(barbarians)) {
+			// Gather Kingdom metrics
+			int numKingdomTowns = kingdom.getTowns().size();
+	    	ArrayList<KonOfflinePlayer> allPlayersInKingdom = konquest.getPlayerManager().getAllPlayersInKingdom(kingdom.getName());
+	    	int numAllKingdomPlayers = allPlayersInKingdom.size();
+	    	int numKingdomLand = 0;
+	    	for(KonTown town : kingdom.getTowns()) {
+	    		numKingdomLand += town.getChunkList().size();
+	    	}
+	    	int numKingdomFavor = 0;
+	    	for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
+	    		numKingdomFavor += (int) KonquestPlugin.getEconomy().getBalance(kingdomPlayer.getOfflineBukkitPlayer());
+	    	}
+	    	// Gather favor costs
+	    	int cost_settle = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_settle");
+	    	int cost_claim = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
+	    	// Evaluate score based on weighted metrics, normalized for number of total players
+	    	// Raw score based on territory and favor
+	    	score = ((cost_settle+2)*numKingdomTowns) + ((cost_claim+1)*numKingdomLand) + (numKingdomFavor);
+			// Normalized score for player count
+	    	score = (int)((double)score / (double)(numAllKingdomPlayers+1));
 		}
-		// Gather Kingdom metrics
-		int numKingdomTowns = kingdom.getTowns().size();
-    	ArrayList<KonOfflinePlayer> allPlayersInKingdom = konquest.getPlayerManager().getAllPlayersInKingdom(kingdom.getName());
-    	int numAllKingdomPlayers = allPlayersInKingdom.size();
-    	int numKingdomLand = 0;
-    	for(KonTown town : kingdom.getTowns()) {
-    		numKingdomLand += town.getChunkList().size();
-    	}
-    	int numKingdomFavor = 0;
-    	for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
-    		numKingdomFavor += (int) KonquestPlugin.getEconomy().getBalance(kingdomPlayer.getOfflineBukkitPlayer());
-    	}
-    	// Gather favor costs
-    	int cost_settle = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_settle");
-    	int cost_claim = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
-    	// Evaluate score based on weighted metrics, normalized for number of total players
-    	// Raw score based on territory and favor
-    	score = ((cost_settle+2)*numKingdomTowns) + ((cost_claim+1)*numKingdomLand) + (numKingdomFavor);
-		// Normalized score for player count
-    	score = (int)((double)score / (double)(numAllKingdomPlayers+1));
+		return score;
+	}*/
+	
+	public KonPlayerScoreAttributes getPlayerScoreAttributes(KonOfflinePlayer offlinePlayer) {
+		KonPlayerScoreAttributes scoreAttributes = new KonPlayerScoreAttributes();
+		if(!offlinePlayer.isBarbarian() && !offlinePlayer.getKingdom().isPeaceful()) {
+			// Gather player metrics
+			int numTownLords = 0;
+			int numTownKnights = 0;
+			int numTownResidents = 0;
+			int numLordLand = 0;
+			int numKnightLand = 0;
+			int numResidentLand = 0;
+			for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
+				if(town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
+					numTownLords++;
+					numLordLand += town.getChunkList().size();
+				} else if(town.isPlayerElite(offlinePlayer.getOfflineBukkitPlayer())) {
+					numTownKnights++;
+					numKnightLand += town.getChunkList().size();
+				} else if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
+					numTownResidents++;
+					numResidentLand += town.getChunkList().size();
+				}
+			}
+			scoreAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_LORDS, numTownLords);
+			scoreAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_KNIGHTS, numTownKnights);
+			scoreAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_RESIDENTS, numTownResidents);
+			scoreAttributes.setAttribute(KonPlayerScoreAttribute.LAND_LORDS, numLordLand);
+			scoreAttributes.setAttribute(KonPlayerScoreAttribute.LAND_KNIGHTS, numKnightLand);
+			scoreAttributes.setAttribute(KonPlayerScoreAttribute.LAND_RESIDENTS, numResidentLand);
+		}
+		return scoreAttributes;
+	}
+	
+	public int getPlayerScore(KonOfflinePlayer offlinePlayer) {
+		int score = getPlayerScoreAttributes(offlinePlayer).getScore();
 		return score;
 	}
 	
@@ -1271,6 +1345,7 @@ public class KingdomManager {
 	 * @return
 	 */
 	public HashMap<Location,Color> getBorderLocationMap(ArrayList<Chunk> renderChunks, KonPlayer player) {
+		//TODO: Poor coding style, optimize with a general FOR loop
 		HashMap<Location,Color> locationMap = new HashMap<Location,Color>();
 		// Evaluate every chunk in the provided list. If it's claimed, check each adjacent chunk and determine border locations
 		for(Chunk chunk : renderChunks) {

@@ -16,7 +16,11 @@ import konquest.display.CommandIcon;
 import konquest.display.DisplayMenu;
 import konquest.display.InfoIcon;
 import konquest.display.MenuIcon;
+import konquest.display.PagedMenu;
 import konquest.display.UpgradeIcon;
+import konquest.model.KonKingdomScoreAttributes;
+import konquest.model.KonOfflinePlayer;
+import konquest.model.KonPlayerScoreAttributes;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
@@ -25,18 +29,16 @@ public class DisplayManager {
 
 	private Konquest konquest;
 	private DisplayMenu helpMenu;
-	//private HashMap<Integer, CommandType> helpCommandMap;
-	//private HashMap<Integer, String> helpInfoMap;
 	private HashMap<Inventory, DisplayMenu> townUpgradeMenus;
 	private HashMap<Inventory, KonTown> townMenuCache;
+	private HashMap<Inventory, PagedMenu> scoreMenus;
 	
 	public DisplayManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.helpMenu = new DisplayMenu(3, ChatColor.BLACK+"Konquest Help");
-		//this.helpCommandMap = new HashMap<Integer, CommandType>();
-		//this.helpInfoMap = new HashMap<Integer, String>();
 		this.townUpgradeMenus = new HashMap<Inventory, DisplayMenu>();
 		this.townMenuCache = new HashMap<Inventory, KonTown>();
+		this.scoreMenus = new HashMap<Inventory, PagedMenu>();
 	}
 	
 	public void initialize() {
@@ -96,7 +98,12 @@ public class DisplayManager {
 			if(clickedIcon != null && clickedIcon instanceof UpgradeIcon) {
 				UpgradeIcon icon = (UpgradeIcon)clickedIcon;
 				result = konquest.getUpgradeManager().addTownUpgrade(townMenuCache.get(inv), icon.getUpgrade(), icon.getLevel(), bukkitPlayer);
-				bukkitPlayer.closeInventory();
+				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+		            @Override
+		            public void run() {
+		            	bukkitPlayer.closeInventory();
+		            }
+		        });
 			}
 		}
 		return result;
@@ -130,7 +137,12 @@ public class DisplayManager {
 			}
 		}
 		if(isValidSlot) {
-			bukkitPlayer.closeInventory();
+			Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+	            @Override
+	            public void run() {
+	            	bukkitPlayer.closeInventory();
+	            }
+	        });
 			ChatUtil.sendNotice(bukkitPlayer, message);
 		}
 	}
@@ -193,6 +205,42 @@ public class DisplayManager {
 		i++;
 	}
 	
+	public boolean isScoreMenu(Inventory inv) {
+		boolean result = false;
+		if(scoreMenus.containsKey(inv)) {
+			result = true;
+		}
+		return result;
+	}
 	
+	/**
+	 * Displays a new score menu on the first page
+	 * @param bukkitPlayer	The player to display the menu to
+	 * @param scorePlayer	The player to use for scoring and stats
+	 */
+	public void displayScoreMenu(Player bukkitPlayer, KonOfflinePlayer scorePlayer) {
+		
+		KonPlayerScoreAttributes playerScoreAttributes = konquest.getKingdomManager().getPlayerScoreAttributes(scorePlayer);
+		KonKingdomScoreAttributes kingdomScoreAttributes = konquest.getKingdomManager().getKingdomScoreAttributes(scorePlayer.getKingdom());
+		int playerScore = playerScoreAttributes.getScore();
+		int kingdomScore = kingdomScoreAttributes.getScore();
+		String pageLabel = "";
+		
+		// Create fresh paged menu
+		PagedMenu newMenu = new PagedMenu();
+		// Page 0
+		pageLabel = ChatColor.BLACK+scorePlayer.getOfflineBukkitPlayer().getName()+" Score: "+playerScore;
+		newMenu.addPage(0, 2, pageLabel);
+		
+		// Page 1
+		pageLabel = ChatColor.BLACK+scorePlayer.getOfflineBukkitPlayer().getName()+" Stats";
+		newMenu.addPage(1, 3, pageLabel);
+		
+		// Page 2
+		pageLabel = ChatColor.BLACK+scorePlayer.getKingdom().getName()+" Leaderboard";
+		newMenu.addPage(2, 1, pageLabel);
+		
+		
+	}
 	
 }
