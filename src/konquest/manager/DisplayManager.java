@@ -220,14 +220,88 @@ public class DisplayManager {
 		return result;
 	}
 	
+	public void onScoreMenuClick(Player bukkitPlayer, Inventory inv, int slot) {
+		// Switch pages and handle navigation button clicks
+		// Open new score menus for leaderboard player clicks
+		if(scoreMenus.containsKey(inv)) {
+			ChatUtil.printDebug("Clicked inside of a valid Score Menu");
+			PagedMenu scoreMenu = scoreMenus.get(inv);
+			DisplayMenu currentPage = scoreMenu.getPage(inv);
+			if(currentPage != null) {
+				int nextIndex = currentPage.getInventory().getSize()-1;
+				int closeIndex = currentPage.getInventory().getSize()-5;
+				int backIndex = currentPage.getInventory().getSize()-9;
+				if(slot == nextIndex) {
+					scoreMenu.nextPageIndex();
+					scoreMenus.remove(inv);
+					scoreMenus.put(scoreMenu.getCurrentPage().getInventory(), scoreMenu);
+					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+			            @Override
+			            public void run() {
+			            	bukkitPlayer.closeInventory();
+			            	bukkitPlayer.openInventory(scoreMenu.getCurrentPage().getInventory());
+			            }
+			        });
+					ChatUtil.printDebug("Clicked page next button");
+				} else if(slot == closeIndex) {
+					scoreMenus.remove(inv);
+					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+			            @Override
+			            public void run() {
+			            	bukkitPlayer.closeInventory();
+			            }
+			        });
+					ChatUtil.printDebug("Clicked page close button");
+				} else if(slot == backIndex) {
+					scoreMenu.previousPageIndex();
+					scoreMenus.remove(inv);
+					scoreMenus.put(scoreMenu.getCurrentPage().getInventory(), scoreMenu);
+					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+			            @Override
+			            public void run() {
+			            	bukkitPlayer.closeInventory();
+			            	bukkitPlayer.openInventory(scoreMenu.getCurrentPage().getInventory());
+			            }
+			        });
+					ChatUtil.printDebug("Clicked page previous button");
+				} else {
+					MenuIcon clickedIcon = currentPage.getIcon(slot);
+					if(clickedIcon != null && clickedIcon instanceof PlayerHeadIcon) {
+						PlayerHeadIcon icon = (PlayerHeadIcon)clickedIcon;
+						ChatUtil.printDebug("Clicked on a leaderboard player: "+icon.getOfflinePlayer().getName());
+						KonOfflinePlayer offlinePlayer = konquest.getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
+						if(offlinePlayer != null) {
+							scoreMenus.remove(inv);
+							Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+					            @Override
+					            public void run() {
+					            	bukkitPlayer.closeInventory();
+					            	displayScoreMenu(bukkitPlayer, offlinePlayer);
+					            }
+					        });
+							ChatUtil.printDebug("Opened new score menu");
+						} else {
+							ChatUtil.printDebug("Failed to find valid leaderboard offline player");
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public void onInventoryClose(Inventory inv) {
+		ChatUtil.printDebug("DisplayManager caught a closed display menu inventory");
+		
+	}
+	
 	/**
 	 * Displays a new score menu on the first page
 	 * @param bukkitPlayer	The player to display the menu to
 	 * @param scorePlayer	The player to use for scoring and stats
 	 */
-	public void displayScoreMenu(Player bukkitPlayer, KonOfflinePlayer scorePlayer) {
-		
-		KonPlayerScoreAttributes playerScoreAttributes = konquest.getKingdomManager().getPlayerScoreAttributes(scorePlayer);
+ 	public void displayScoreMenu(Player bukkitPlayer, KonOfflinePlayer scorePlayer) {
+ 		ChatUtil.printDebug("Beginning new score menu display, current size is "+scoreMenus.size());
+ 		KonPlayerScoreAttributes playerScoreAttributes = konquest.getKingdomManager().getPlayerScoreAttributes(scorePlayer);
 		KonKingdomScoreAttributes kingdomScoreAttributes = konquest.getKingdomManager().getKingdomScoreAttributes(scorePlayer.getKingdom());
 		int playerScore = playerScoreAttributes.getScore();
 		int kingdomScore = kingdomScoreAttributes.getScore();
@@ -235,7 +309,6 @@ public class DisplayManager {
 		int i = 0;
 		InfoIcon info;
 		PlayerHeadIcon leader;
-		
 		// Create fresh paged menu
 		PagedMenu newMenu = new PagedMenu();
 		// Page 0
@@ -307,16 +380,16 @@ public class DisplayManager {
 			}
 		}
 		newMenu.refreshNavigationButtons();
-		scoreMenus.put(newMenu.getPage(0).getInventory(), newMenu);
+		newMenu.setPageIndex(0);
+		scoreMenus.put(newMenu.getCurrentPage().getInventory(), newMenu);
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override
             public void run() {
             	bukkitPlayer.closeInventory();
-            	bukkitPlayer.openInventory(newMenu.getPage(0).getInventory());
+            	bukkitPlayer.openInventory(newMenu.getCurrentPage().getInventory());
             }
         });
-		
 	}
 	
 }

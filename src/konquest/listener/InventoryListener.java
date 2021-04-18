@@ -36,6 +36,7 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 //import org.bukkit.inventory.Inventory;
@@ -138,27 +139,39 @@ public class InventoryListener implements Listener {
 		}
 	}
 	
+	@EventHandler(priority = EventPriority.NORMAL)
+    public void onInventoryClose(InventoryCloseEvent event) {
+		// When a player closes a display menu
+		if(konquest.getDisplayManager().isScoreMenu(event.getInventory())) {
+			konquest.getDisplayManager().onInventoryClose(event.getInventory());
+		}
+	}
+	
 	@EventHandler(priority = EventPriority.HIGH)
     public void onDisplayMenuClick(InventoryClickEvent event) {
+		int slot = event.getRawSlot();
+		Player bukkitPlayer = (Player) event.getWhoClicked();
 		// When a player clicks inside of the help menu
 		if(konquest.getDisplayManager().isHelpMenu(event.getClickedInventory())) {
-			int slot = event.getRawSlot();
 			//ChatUtil.printDebug("Inventory click event inside of Help Menu, slot "+slot);
 			if(slot < event.getView().getTopInventory().getSize()) {
 				event.setCancelled(true);
-				Player bukkitPlayer = (Player) event.getWhoClicked();
 				konquest.getDisplayManager().sendHelpContext(bukkitPlayer, slot);
 			}
 		} else if(konquest.getDisplayManager().isTownUpgradeMenu(event.getClickedInventory())) {
-			int slot = event.getRawSlot();
 			//ChatUtil.printDebug("Inventory click event inside of an Upgrade Menu, slot "+slot);
 			if(slot < event.getView().getTopInventory().getSize()) {
 				event.setCancelled(true);
-				Player bukkitPlayer = (Player) event.getWhoClicked();
 				boolean status = konquest.getDisplayManager().onTownUpgradeMenuClick(bukkitPlayer, event.getClickedInventory(), slot);
 				if(status) {
 					Bukkit.getWorld(konquest.getWorldName()).playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, (float)1.0, (float)1.0);
 				}
+			}
+		} else if(konquest.getDisplayManager().isScoreMenu(event.getClickedInventory())) {
+			ChatUtil.printDebug("Inventory click event inside of a Score Menu, slot "+slot);
+			if(slot < event.getView().getTopInventory().getSize()) {
+				event.setCancelled(true);
+				konquest.getDisplayManager().onScoreMenuClick(bukkitPlayer, event.getClickedInventory(), slot);
 			}
 		}
 	}

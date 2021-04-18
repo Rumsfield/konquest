@@ -38,6 +38,10 @@ public class PlayerHeadIcon implements MenuIcon {
 		item.setItemMeta(meta);
 		return item;
 	}
+	
+	public OfflinePlayer getOfflinePlayer() {
+		return player;
+	}
 
 	@Override
 	public int getIndex() {

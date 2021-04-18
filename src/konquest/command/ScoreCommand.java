@@ -2,6 +2,7 @@ package konquest.command;
 
 import konquest.Konquest;
 import konquest.model.KonKingdom;
+import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessageStatic;
@@ -46,8 +47,7 @@ public class ScoreCommand extends CommandBase {
         			playerScore = getKonquest().getKingdomManager().getPlayerScore(player);
         			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"Your score: "+ChatColor.AQUA+playerScore+", Kingdom Score of "+color+kingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+kingdomScore);
         			// Display Score GUI
-        			
-        			
+        			getKonquest().getDisplayManager().displayScoreMenu(bukkitPlayer, player);
         		}
         	} else if(getArgs()[1].equalsIgnoreCase("all")) {
         		// Score all Kingdoms
@@ -65,28 +65,28 @@ public class ScoreCommand extends CommandBase {
         			}
         		}
         	} else {
-        		String kingdomName = getArgs()[1];
-        		if(getKonquest().getKingdomManager().isKingdom(kingdomName)) {
-        			kingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
-        			if(kingdom.isPeaceful()) {
-        				if(!player.getKingdom().equals(kingdom)) {
-	        				color = ""+ChatColor.GRAY;
-	        			}
-            			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"The Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" is peaceful, and cannot be scored!");
-            		} else {
-	        			score = getKonquest().getKingdomManager().getKingdomScore(kingdom);
-	        			if(!player.getKingdom().equals(kingdom)) {
-	        				color = ""+ChatColor.RED;
-	        			}
-	        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"Kingdom Score of "+color+kingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+score);
-	        			int index = 1;
-	            		for(String name : getKonquest().getKingdomManager().getKingdomLeaderboard(kingdom)) {
-	            			ChatUtil.sendMessage((Player) getSender(), ChatColor.GOLD+""+index+". "+color+name);
-	            			index ++;
-	            		}
-            		}
+        		String playerName = getArgs()[1];
+        		// Verify player exists
+            	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+            	if(offlinePlayer == null) {
+            		ChatUtil.sendError((Player) getSender(), "Invalid player name, unknown or bad spelling.");
+                    return;
+            	}
+            	kingdom = offlinePlayer.getKingdom();
+            	if(!player.getKingdom().equals(kingdom)) {
+    				color = ""+ChatColor.RED;
+    			}
+            	String offlinePlayerName = offlinePlayer.getOfflineBukkitPlayer().getName();
+            	if(offlinePlayer.isBarbarian()) {
+        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+offlinePlayerName+" is a Barbarian, and cannot be scored!");
+        		} else if(kingdom.isPeaceful()) {
+        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"The Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" is peaceful, and cannot be scored!");
         		} else {
-        			ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+        			kingdomScore = getKonquest().getKingdomManager().getKingdomScore(kingdom);
+        			playerScore = getKonquest().getKingdomManager().getPlayerScore(offlinePlayer);
+        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"Your score: "+ChatColor.AQUA+playerScore+", Kingdom Score of "+color+kingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+kingdomScore);
+        			// Display Score GUI
+        			getKonquest().getDisplayManager().displayScoreMenu(bukkitPlayer, offlinePlayer);
         		}
         	}
         }

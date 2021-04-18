@@ -3,17 +3,19 @@ package konquest.display;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
 
 import konquest.utility.ChatUtil;
 
 public class PagedMenu {
 
 	private ArrayList<DisplayMenu> pages;
+	private int currentPageIndex;
 	
 	public PagedMenu() {
-		pages = new ArrayList<DisplayMenu>();
+		this.pages = new ArrayList<DisplayMenu>();
+		this.currentPageIndex = 0;
 	}
 	
 	/*
@@ -38,6 +40,52 @@ public class PagedMenu {
 			return null;
 		}
 		return pages.get(index);
+	}
+	
+	public void setPageIndex(int index) {
+		if(index < 0 || index > pages.size()) {
+			ChatUtil.printDebug("Failed to set page beyond list index");
+		} else {
+			currentPageIndex = index;
+		}
+	}
+	
+	public int nextPageIndex() {
+		int newIndex = currentPageIndex+1;
+		if(newIndex < pages.size()) {
+			currentPageIndex = newIndex;
+		}
+		return currentPageIndex;
+	}
+	
+	public int previousPageIndex() {
+		int newIndex = currentPageIndex-1;
+		if(newIndex >= 0) {
+			currentPageIndex = newIndex;
+		}
+		return currentPageIndex;
+	}
+	
+	public int currentPageIndex() {
+		return currentPageIndex;
+	}
+	
+	public DisplayMenu getCurrentPage() {
+		if(currentPageIndex < 0 || currentPageIndex > pages.size()) {
+			ChatUtil.printDebug("Failed to get page beyond list index");
+			return null;
+		}
+		return pages.get(currentPageIndex);
+	}
+	
+	public DisplayMenu getPage(Inventory inv) {
+		DisplayMenu result = null;
+		for(DisplayMenu menu : pages) {
+			if(menu.getInventory().equals(inv)) {
+				result = menu;
+			}
+		}
+		return result;
 	}
 	
 	public void refreshNavigationButtons() {
