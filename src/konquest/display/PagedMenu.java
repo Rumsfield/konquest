@@ -93,24 +93,32 @@ public class PagedMenu {
 		// Place a back button on pages > 0
 		// Place a next button on pages < max
 		// Place a close button on all pages
-		InfoIcon navigationButton;
 		for(int i=0;i<pages.size();i++) {
-			int nextIndex = pages.get(i).getInventory().getSize()-1;
-			int closeIndex = pages.get(i).getInventory().getSize()-5;
-			int backIndex = pages.get(i).getInventory().getSize()-9;
+			int maxSize = pages.get(i).getInventory().getSize();
+			int nextIndex = maxSize-1;
+			int closeIndex = maxSize-5;
+			int backIndex = maxSize-9;
 			if(i > 0) {
 				// Place a back button
-				navigationButton = new InfoIcon(ChatColor.GOLD+"Back",Collections.emptyList(),Material.ENDER_PEARL,backIndex);
-				pages.get(i).addIcon(navigationButton);
+				pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+"Back",Collections.emptyList(),Material.ENDER_PEARL,backIndex));
+			} else {
+				pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex));
 			}
 			if(i < pages.size()-1) {
 				// Place a next button
-				navigationButton = new InfoIcon(ChatColor.GOLD+"Next",Collections.emptyList(),Material.ENDER_PEARL,nextIndex);
-				pages.get(i).addIcon(navigationButton);
+				pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+"Next",Collections.emptyList(),Material.ENDER_PEARL,nextIndex));
+			} else {
+				pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex));
 			}
 			// Place a close button
-			navigationButton = new InfoIcon(ChatColor.GOLD+"Close",Collections.emptyList(),Material.REDSTONE_BLOCK,closeIndex);
-			pages.get(i).addIcon(navigationButton);
+			pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+"Close",Collections.emptyList(),Material.REDSTONE_BLOCK,closeIndex));
+			// Place glass panes
+			pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+1));
+			pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+2));
+			pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+3));
+			pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex-3));
+			pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex-2));
+			pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex-1));
 		}
 	}
 	

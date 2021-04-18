@@ -171,7 +171,8 @@ public class InventoryListener implements Listener {
 			ChatUtil.printDebug("Inventory click event inside of a Score Menu, slot "+slot);
 			if(slot < event.getView().getTopInventory().getSize()) {
 				event.setCancelled(true);
-				konquest.getDisplayManager().onScoreMenuClick(bukkitPlayer, event.getClickedInventory(), slot);
+				KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+				konquest.getDisplayManager().onScoreMenuClick(player, event.getClickedInventory(), slot);
 			}
 		}
 	}

@@ -22,7 +22,7 @@ public enum KonStatsType {
 	CAPTURES			(Material.ENDER_EYE,		KonPrefixCategory.MILITARY, 	10, 	"Enemy towns captured"),
 	CRITICALS			(Material.OBSIDIAN,			KonPrefixCategory.MILITARY, 	1, 		"Enemy town critical hits"),
 	SEEDS				(Material.WHEAT_SEEDS,		KonPrefixCategory.FARMING, 		0.1, 	"Seeds planted"),
-	BREED				(Material.WHEAT,			KonPrefixCategory.FARMING, 		0.5, 	"Mobs romanced"),
+	BREED				(Material.CARROT,			KonPrefixCategory.FARMING, 		0.5, 	"Mobs romanced"),
 	TILL				(Material.IRON_HOE,			KonPrefixCategory.FARMING, 		0.1, 	"Farm land fertalized"),
 	HARVEST				(Material.WHEAT,			KonPrefixCategory.FARMING, 		0.25,   "Crops harvested"),
 	FOOD				(Material.BEEF,				KonPrefixCategory.COOKING, 		1, 		"Food items made"),

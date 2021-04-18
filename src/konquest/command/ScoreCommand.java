@@ -47,7 +47,7 @@ public class ScoreCommand extends CommandBase {
         			playerScore = getKonquest().getKingdomManager().getPlayerScore(player);
         			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"Your score: "+ChatColor.AQUA+playerScore+", Kingdom Score of "+color+kingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+kingdomScore);
         			// Display Score GUI
-        			getKonquest().getDisplayManager().displayScoreMenu(bukkitPlayer, player);
+        			getKonquest().getDisplayManager().displayScoreMenu(player, player);
         		}
         	} else if(getArgs()[1].equalsIgnoreCase("all")) {
         		// Score all Kingdoms
@@ -86,7 +86,7 @@ public class ScoreCommand extends CommandBase {
         			playerScore = getKonquest().getKingdomManager().getPlayerScore(offlinePlayer);
         			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+offlinePlayerName+"'s score: "+ChatColor.AQUA+playerScore+", Kingdom Score of "+color+kingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+kingdomScore);
         			// Display Score GUI
-        			getKonquest().getDisplayManager().displayScoreMenu(bukkitPlayer, offlinePlayer);
+        			getKonquest().getDisplayManager().displayScoreMenu(player, offlinePlayer);
         		}
         	}
         }

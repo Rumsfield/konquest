@@ -1256,6 +1256,12 @@ public class KingdomManager {
 		int numResidentLand = 0;
 		for(KonTown town : kingdom.getTowns()) {
 			for(OfflinePlayer offlinePlayer : town.getPlayerResidents()) {
+				numTownLords = 0;
+				numTownKnights = 0;
+				numTownResidents = 0;
+				numLordLand = 0;
+				numKnightLand = 0;
+				numResidentLand = 0;
 				if(town.isPlayerLord(offlinePlayer)) {
 					numTownLords++;
 					numLordLand += town.getChunkList().size();
@@ -1274,14 +1280,17 @@ public class KingdomManager {
 					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.LAND_KNIGHTS, numKnightLand);
 					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.LAND_RESIDENTS, numResidentLand);
 				} else {
-					KonPlayerScoreAttributes newMemberAttributes = new KonPlayerScoreAttributes();
-					newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_LORDS, numTownLords);
-					newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_KNIGHTS, numTownKnights);
-					newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_RESIDENTS, numTownResidents);
-					newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_LORDS, numLordLand);
-					newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_KNIGHTS, numKnightLand);
-					newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_RESIDENTS, numResidentLand);
-					memberScores.put(offlinePlayer, newMemberAttributes);
+					KonOfflinePlayer validPlayer = konquest.getPlayerManager().getOfflinePlayer(offlinePlayer);
+					if(validPlayer != null && validPlayer.getKingdom().equals(kingdom)) {
+						KonPlayerScoreAttributes newMemberAttributes = new KonPlayerScoreAttributes();
+						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_LORDS, numTownLords);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_KNIGHTS, numTownKnights);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_RESIDENTS, numTownResidents);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_LORDS, numLordLand);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_KNIGHTS, numKnightLand);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_RESIDENTS, numResidentLand);
+						memberScores.put(offlinePlayer, newMemberAttributes);
+					}
 				}
 			}
 		}

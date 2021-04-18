@@ -84,7 +84,7 @@ public class KonquestDB extends Database{
 
             for(KonStatsType stat : KonStatsType.values()) {
     			String name = stat.toString();
-    			String value = String.valueOf(stat.defaultValue());
+    			String value = String.valueOf(0);
     			column = new Column(name);
                 column.setType("INTEGER");
                 column.setDefaultValue(value);
