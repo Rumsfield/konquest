@@ -102,23 +102,23 @@ public class PagedMenu {
 				// Place a back button
 				pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+"Back",Collections.emptyList(),Material.ENDER_PEARL,backIndex));
 			} else {
-				pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex));
+				pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex));
 			}
 			if(i < pages.size()-1) {
 				// Place a next button
 				pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+"Next",Collections.emptyList(),Material.ENDER_PEARL,nextIndex));
 			} else {
-				pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex));
+				pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex));
 			}
 			// Place a close button
 			pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+"Close",Collections.emptyList(),Material.REDSTONE_BLOCK,closeIndex));
 			// Place glass panes
-			pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+1));
-			pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+2));
-			pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+3));
-			pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex-3));
-			pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex-2));
-			pages.get(i).addIcon(new InfoIcon("",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex-1));
+			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+1));
+			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+2));
+			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+3));
+			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex-3));
+			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex-2));
+			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex-1));
 		}
 	}
 	
