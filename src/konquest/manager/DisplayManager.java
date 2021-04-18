@@ -17,6 +17,7 @@ import konquest.display.DisplayMenu;
 import konquest.display.InfoIcon;
 import konquest.display.MenuIcon;
 import konquest.display.PagedMenu;
+import konquest.display.PlayerHeadIcon;
 import konquest.display.UpgradeIcon;
 import konquest.model.KonKingdomScoreAttributes;
 import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
@@ -233,6 +234,7 @@ public class DisplayManager {
 		String pageLabel = "";
 		int i = 0;
 		InfoIcon info;
+		PlayerHeadIcon leader;
 		
 		// Create fresh paged menu
 		PagedMenu newMenu = new PagedMenu();
@@ -263,7 +265,6 @@ public class DisplayManager {
 		newMenu.getPage(0).addIcon(info);
 		info = new InfoIcon("Resident Town Land", Arrays.asList("Land: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.LAND_RESIDENTS), "Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.LAND_RESIDENTS)), Material.DIRT, 15);
 		newMenu.getPage(0).addIcon(info);
-		
 		// Page 1
 		pageLabel = ChatColor.BLACK+scorePlayer.getOfflineBukkitPlayer().getName()+" Stats";
 		newMenu.addPage(1, 3, pageLabel);
@@ -284,16 +285,37 @@ public class DisplayManager {
     		statValue = stats.getStat(stat);
     		info = new InfoIcon(stat.toString(),Arrays.asList(stat.description(),ChatColor.AQUA+""+statValue),Material.GLASS,i);
     		newMenu.getPage(1).addIcon(info);
+    		i++;
     	}
     	if(!isPlayerOnline) {
     		stats = null;
     	}
-		
 		// Page 2
 		pageLabel = ChatColor.BLACK+scorePlayer.getKingdom().getName()+" Leaderboard";
 		newMenu.addPage(2, 1, pageLabel);
-		
 		KonLeaderboard leaderboard = konquest.getKingdomManager().getKingdomLeaderboard(scorePlayer.getKingdom());
+		if(!leaderboard.isEmpty()) {
+			int numEntries = 9;
+			if(leaderboard.getSize() < numEntries) {
+				numEntries = leaderboard.getSize();
+			}
+			i = 0;
+			for(int n = 0;n<numEntries;n++) {
+				leader = new PlayerHeadIcon(leaderboard.getName(n),Arrays.asList("Player Score: "+ChatColor.AQUA+leaderboard.getScore(n),"Click to view stats"),leaderboard.getOfflinePlayer(n),i);
+				newMenu.getPage(2).addIcon(leader);
+				i++;
+			}
+		}
+		newMenu.refreshNavigationButtons();
+		scoreMenus.put(newMenu.getPage(0).getInventory(), newMenu);
+		// Schedule delayed task to display inventory to player
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.closeInventory();
+            	bukkitPlayer.openInventory(newMenu.getPage(0).getInventory());
+            }
+        });
 		
 	}
 	

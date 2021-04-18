@@ -1,6 +1,10 @@
 package konquest.display;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 
 import konquest.utility.ChatUtil;
 
@@ -34,6 +38,31 @@ public class PagedMenu {
 			return null;
 		}
 		return pages.get(index);
+	}
+	
+	public void refreshNavigationButtons() {
+		// Place a back button on pages > 0
+		// Place a next button on pages < max
+		// Place a close button on all pages
+		InfoIcon navigationButton;
+		for(int i=0;i<pages.size();i++) {
+			int nextIndex = pages.get(i).getInventory().getSize()-1;
+			int closeIndex = pages.get(i).getInventory().getSize()-5;
+			int backIndex = pages.get(i).getInventory().getSize()-9;
+			if(i > 0) {
+				// Place a back button
+				navigationButton = new InfoIcon("Back",Arrays.asList(""),Material.REDSTONE_TORCH,backIndex);
+				pages.get(i).addIcon(navigationButton);
+			}
+			if(i < pages.size()-1) {
+				// Place a next button
+				navigationButton = new InfoIcon("Next",Arrays.asList(""),Material.REDSTONE_BLOCK,nextIndex);
+				pages.get(i).addIcon(navigationButton);
+			}
+			// Place a close button
+			navigationButton = new InfoIcon("Close",Arrays.asList(""),Material.REDSTONE_TORCH,closeIndex);
+			pages.get(i).addIcon(navigationButton);
+		}
 	}
 	
 }
