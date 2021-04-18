@@ -1,8 +1,9 @@
 package konquest.display;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
@@ -99,16 +100,16 @@ public class PagedMenu {
 			int backIndex = pages.get(i).getInventory().getSize()-9;
 			if(i > 0) {
 				// Place a back button
-				navigationButton = new InfoIcon("Back",Arrays.asList(""),Material.REDSTONE_TORCH,backIndex);
+				navigationButton = new InfoIcon(ChatColor.GOLD+"Back",Collections.emptyList(),Material.ENDER_PEARL,backIndex);
 				pages.get(i).addIcon(navigationButton);
 			}
 			if(i < pages.size()-1) {
 				// Place a next button
-				navigationButton = new InfoIcon("Next",Arrays.asList(""),Material.REDSTONE_BLOCK,nextIndex);
+				navigationButton = new InfoIcon(ChatColor.GOLD+"Next",Collections.emptyList(),Material.ENDER_PEARL,nextIndex);
 				pages.get(i).addIcon(navigationButton);
 			}
 			// Place a close button
-			navigationButton = new InfoIcon("Close",Arrays.asList(""),Material.REDSTONE_TORCH,closeIndex);
+			navigationButton = new InfoIcon(ChatColor.GOLD+"Close",Collections.emptyList(),Material.REDSTONE_BLOCK,closeIndex);
 			pages.get(i).addIcon(navigationButton);
 		}
 	}

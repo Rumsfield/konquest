@@ -1,48 +1,50 @@
 package konquest.model;
 
+import org.bukkit.Material;
+
 public enum KonStatsType {
 
-	ENCHANTMENTS		(0, KonPrefixCategory.CLERGY, 		2, 		"Enchantments applied to items"),
-	POTIONS				(0, KonPrefixCategory.CLERGY, 		1, 		"Potions used or thrown"),
-	MOBS				(0,	KonPrefixCategory.CLERGY, 		1, 		"Hostile mobs killed"),
-	SETTLED				(0,	KonPrefixCategory.NOBILITY, 	5, 		"Towns settled"),
-	CLAIMED				(0,	KonPrefixCategory.NOBILITY, 	1, 		"Land claimed"),
-	LORDS				(0,	KonPrefixCategory.NOBILITY, 	1, 		"Town lordships"),
-	KNIGHTS				(0,	KonPrefixCategory.NOBILITY, 	0.5, 	"Town knighthoods"),
-	RESIDENTS			(0,	KonPrefixCategory.NOBILITY, 	0.1, 	"Town residencies"),
-	INGOTS				(0,	KonPrefixCategory.TRADESMAN, 	0.5, 	"Ingots smelted"),
-	DIAMONDS			(0,	KonPrefixCategory.TRADESMAN, 	1, 		"Diamond ores mined"),
-	CRAFTED				(0,	KonPrefixCategory.TRADESMAN, 	0.1, 	"Tools, weapons and armor crafting skill"),
-	FAVOR				(0,	KonPrefixCategory.TRADESMAN, 	0.01, 	"Favor spent"),
-	KILLS				(0,	KonPrefixCategory.MILITARY, 	1, 		"Players killed"),
-	DAMAGE				(0,	KonPrefixCategory.MILITARY, 	0.01, 	"Player damage given"),
-	GOLEMS				(0,	KonPrefixCategory.MILITARY, 	0.5, 	"Enemy Iron Golems killed"),
-	CAPTURES			(0,	KonPrefixCategory.MILITARY, 	10, 	"Enemy towns captured"),
-	CRITICALS			(0,	KonPrefixCategory.MILITARY, 	1, 		"Enemy town critical hits"),
-	SEEDS				(0,	KonPrefixCategory.FARMING, 		0.1, 	"Seeds planted"),
-	BREED				(0,	KonPrefixCategory.FARMING, 		0.5, 	"Mobs romanced"),
-	TILL				(0,	KonPrefixCategory.FARMING, 		0.1, 	"Farm land fertalized"),
-	HARVEST				(0,	KonPrefixCategory.FARMING, 		0.25,   "Crops harvested"),
-	FOOD				(0,	KonPrefixCategory.COOKING, 		1, 		"Food items made"),
-	MUSIC				(0,	KonPrefixCategory.JOKING, 		1, 		"Music discs played"),
-	EGG					(0,	KonPrefixCategory.JOKING, 		0.25, 	"Players egged"),
-	FISH				(0,	KonPrefixCategory.FISHING, 		1, 		"Fishing skill"),
-	SPECIAL				(0,	KonPrefixCategory.ROYALTY, 		1, 		"Special points");
+	ENCHANTMENTS		(Material.ENCHANTING_TABLE, KonPrefixCategory.CLERGY, 		2, 		"Enchantments applied to items"),
+	POTIONS				(Material.BREWING_STAND, 	KonPrefixCategory.CLERGY, 		1, 		"Potions used or thrown"),
+	MOBS				(Material.CREEPER_HEAD,		KonPrefixCategory.CLERGY, 		1, 		"Hostile mobs killed"),
+	SETTLED				(Material.OAK_DOOR,			KonPrefixCategory.NOBILITY, 	5, 		"Towns settled"),
+	CLAIMED				(Material.GRASS_BLOCK,		KonPrefixCategory.NOBILITY, 	1, 		"Land claimed"),
+	LORDS				(Material.PURPLE_CONCRETE,	KonPrefixCategory.NOBILITY, 	1, 		"Town lordships"),
+	KNIGHTS				(Material.BLUE_CONCRETE,	KonPrefixCategory.NOBILITY, 	0.5, 	"Town knighthoods"),
+	RESIDENTS			(Material.WHITE_CONCRETE,	KonPrefixCategory.NOBILITY, 	0.1, 	"Town residencies"),
+	INGOTS				(Material.IRON_INGOT,		KonPrefixCategory.TRADESMAN, 	0.5, 	"Ingots smelted"),
+	DIAMONDS			(Material.DIAMOND_ORE,		KonPrefixCategory.TRADESMAN, 	1, 		"Diamond ores mined"),
+	CRAFTED				(Material.IRON_PICKAXE,	 	KonPrefixCategory.TRADESMAN, 	0.1, 	"Tools, weapons and armor crafting skill"),
+	FAVOR				(Material.GOLD_NUGGET,		KonPrefixCategory.TRADESMAN, 	0.01, 	"Favor spent"),
+	KILLS				(Material.DIAMOND_SWORD,	KonPrefixCategory.MILITARY, 	1, 		"Players killed"),
+	DAMAGE				(Material.CACTUS,			KonPrefixCategory.MILITARY, 	0.01, 	"Player damage given"),
+	GOLEMS				(Material.IRON_BLOCK,		KonPrefixCategory.MILITARY, 	0.5, 	"Enemy Iron Golems killed"),
+	CAPTURES			(Material.ENDER_EYE,		KonPrefixCategory.MILITARY, 	10, 	"Enemy towns captured"),
+	CRITICALS			(Material.OBSIDIAN,			KonPrefixCategory.MILITARY, 	1, 		"Enemy town critical hits"),
+	SEEDS				(Material.WHEAT_SEEDS,		KonPrefixCategory.FARMING, 		0.1, 	"Seeds planted"),
+	BREED				(Material.WHEAT,			KonPrefixCategory.FARMING, 		0.5, 	"Mobs romanced"),
+	TILL				(Material.IRON_HOE,			KonPrefixCategory.FARMING, 		0.1, 	"Farm land fertalized"),
+	HARVEST				(Material.WHEAT,			KonPrefixCategory.FARMING, 		0.25,   "Crops harvested"),
+	FOOD				(Material.BEEF,				KonPrefixCategory.COOKING, 		1, 		"Food items made"),
+	MUSIC				(Material.JUKEBOX,			KonPrefixCategory.JOKING, 		1, 		"Music discs played"),
+	EGG					(Material.EGG,				KonPrefixCategory.JOKING, 		0.25, 	"Players egged"),
+	FISH				(Material.SALMON,			KonPrefixCategory.FISHING, 		1, 		"Fishing skill"),
+	SPECIAL				(Material.NETHER_STAR,		KonPrefixCategory.ROYALTY, 		1, 		"Special points");
 
-	private final int defaultValue;
+	private final Material material;
 	private final KonPrefixCategory category;
 	private final double weight;
 	private final String description;
 	
-	KonStatsType(int defaultValue, KonPrefixCategory category, double weight, String description) {
-		this.defaultValue = defaultValue;
+	KonStatsType(Material material, KonPrefixCategory category, double weight, String description) {
+		this.material = material;
 		this.category = category;
 		this.weight = weight;
 		this.description = description;
 	}
 	
-	public int defaultValue() {
-		return defaultValue;
+	public Material getMaterial() {
+		return material;
 	}
 	
 	public KonPrefixCategory getCategory() {
