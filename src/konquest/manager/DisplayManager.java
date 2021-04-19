@@ -1,6 +1,7 @@
 package konquest.manager;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -224,7 +225,7 @@ public class DisplayManager {
 		// Switch pages and handle navigation button clicks
 		// Open new score menus for leaderboard player clicks
 		if(scoreMenus.containsKey(inv)) {
-			ChatUtil.printDebug("Clicked inside of a valid Score Menu");
+			//ChatUtil.printDebug("Clicked inside of a valid Score Menu");
 			Player bukkitPlayer = clickPlayer.getBukkitPlayer();
 			PagedMenu scoreMenu = scoreMenus.get(inv);
 			DisplayMenu currentPage = scoreMenu.getPage(inv);
@@ -243,7 +244,7 @@ public class DisplayManager {
 			            	scoreMenus.put(scoreMenu.getCurrentPage().getInventory(), scoreMenu);
 			            }
 			        },1);
-					ChatUtil.printDebug("Clicked page next button");
+					//ChatUtil.printDebug("Clicked page next button");
 				} else if(slot == closeIndex) {
 					scoreMenus.remove(inv);
 					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
@@ -252,7 +253,7 @@ public class DisplayManager {
 			            	bukkitPlayer.closeInventory();
 			            }
 			        },1);
-					ChatUtil.printDebug("Clicked page close button");
+					//ChatUtil.printDebug("Clicked page close button");
 				} else if(slot == backIndex) {
 					scoreMenu.previousPageIndex();
 					scoreMenus.remove(inv);
@@ -264,7 +265,7 @@ public class DisplayManager {
 			            	scoreMenus.put(scoreMenu.getCurrentPage().getInventory(), scoreMenu);
 			            }
 			        },1);
-					ChatUtil.printDebug("Clicked page previous button");
+					//ChatUtil.printDebug("Clicked page previous button");
 				} else {
 					MenuIcon clickedIcon = currentPage.getIcon(slot);
 					if(clickedIcon != null && clickedIcon instanceof PlayerHeadIcon) {
@@ -274,7 +275,7 @@ public class DisplayManager {
 						if(offlinePlayer != null) {
 							scoreMenus.remove(inv);
 							displayScoreMenu(clickPlayer, offlinePlayer);
-							ChatUtil.printDebug("Opened new score menu");
+							//ChatUtil.printDebug("Opened new score menu");
 						} else {
 							ChatUtil.printDebug("Failed to find valid leaderboard offline player");
 						}
@@ -285,7 +286,7 @@ public class DisplayManager {
 	}
 	
 	public void onInventoryClose(Inventory inv) {
-		ChatUtil.printDebug("DisplayManager caught a closed display menu inventory");
+		//ChatUtil.printDebug("DisplayManager caught a closed display menu inventory");
 		if(scoreMenus.containsKey(inv)) {
 			scoreMenus.remove(inv);
 		}
@@ -297,7 +298,8 @@ public class DisplayManager {
 	 * @param scorePlayer	The player to use for scoring and stats
 	 */
  	public void displayScoreMenu(KonPlayer displayPlayer, KonOfflinePlayer scorePlayer) {
- 		ChatUtil.printDebug("Beginning new score menu display, current size is "+scoreMenus.size());
+ 		ChatUtil.printDebug("Displaying new score menu to "+displayPlayer.getBukkitPlayer().getName()+" of player "+scorePlayer.getOfflineBukkitPlayer().getName()+", current size is "+scoreMenus.size());
+ 		Date begin = new Date();
  		KonPlayerScoreAttributes playerScoreAttributes = konquest.getKingdomManager().getPlayerScoreAttributes(scorePlayer);
 		KonKingdomScoreAttributes kingdomScoreAttributes = konquest.getKingdomManager().getKingdomScoreAttributes(scorePlayer.getKingdom());
 		int playerScore = playerScoreAttributes.getScore();
@@ -313,11 +315,11 @@ public class DisplayManager {
 		if(displayPlayer.getKingdom().equals(scorePlayer.getKingdom())) {
 			kingdomColor = ""+ChatColor.GREEN;
 		}
-		String loreColor = ""+ChatColor.WHITE+""+ChatColor.RESET;
+		String loreColor = ""+ChatColor.WHITE;
 		// Page 0
 		pageLabel = ChatColor.BLACK+scorePlayer.getOfflineBukkitPlayer().getName()+" Score: "+playerScore;
 		newMenu.addPage(0, 2, pageLabel);
-		info = new InfoIcon(kingdomColor+scorePlayer.getKingdom().getName()+" Kingdom Score", Arrays.asList(loreColor+"Total score:"+ChatColor.DARK_PURPLE+kingdomScore), Material.STONE_BRICKS, 0);
+		info = new InfoIcon(kingdomColor+scorePlayer.getKingdom().getName()+" Kingdom Score", Arrays.asList(loreColor+"Total score: "+ChatColor.DARK_PURPLE+kingdomScore), Material.GOLDEN_HELMET, 0);
 		newMenu.getPage(0).addIcon(info);
 		info = new InfoIcon(kingdomColor+"Kingdom Towns", Arrays.asList(loreColor+"Total towns: "+ChatColor.AQUA+kingdomScoreAttributes.getAttributeValue(KonKingdomScoreAttribute.TOWNS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+kingdomScoreAttributes.getAttributeScore(KonKingdomScoreAttribute.TOWNS)), Material.OBSIDIAN, 1);
 		newMenu.getPage(0).addIcon(info);
@@ -327,7 +329,7 @@ public class DisplayManager {
 		newMenu.getPage(0).addIcon(info);
 		info = new InfoIcon(kingdomColor+"Kingdom Population", Arrays.asList(loreColor+"Total population: "+ChatColor.AQUA+kingdomScoreAttributes.getAttributeValue(KonKingdomScoreAttribute.POPULATION), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+kingdomScoreAttributes.getAttributeScore(KonKingdomScoreAttribute.POPULATION)), Material.PLAYER_HEAD, 4);
 		newMenu.getPage(0).addIcon(info);
-		info = new InfoIcon(ChatColor.GOLD+scorePlayer.getOfflineBukkitPlayer().getName()+" Player Score", Arrays.asList(loreColor+"Total score:"+ChatColor.DARK_PURPLE+playerScore), Material.DIAMOND_HELMET, 9);
+		info = new InfoIcon(ChatColor.GOLD+scorePlayer.getOfflineBukkitPlayer().getName()+" Player Score", Arrays.asList(loreColor+"Total score: "+ChatColor.DARK_PURPLE+playerScore), Material.DIAMOND_HELMET, 9);
 		newMenu.getPage(0).addIcon(info);
 		info = new InfoIcon(ChatColor.GOLD+"Player Lordships", Arrays.asList(loreColor+"Towns: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.TOWN_LORDS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.TOWN_LORDS)), Material.PURPLE_CONCRETE, 10);
 		newMenu.getPage(0).addIcon(info);
@@ -359,7 +361,7 @@ public class DisplayManager {
     	int statValue = 0;
     	for(KonStatsType stat : KonStatsType.values()) {
     		statValue = stats.getStat(stat);
-    		info = new InfoIcon(ChatColor.GOLD+stat.toString(),Arrays.asList(ChatColor.RESET+stat.description(),ChatColor.AQUA+""+statValue),stat.getMaterial(),i);
+    		info = new InfoIcon(ChatColor.GOLD+stat.toString(),Arrays.asList(loreColor+stat.description(),ChatColor.AQUA+""+statValue),stat.getMaterial(),i);
     		newMenu.getPage(1).addIcon(info);
     		i++;
     	}
@@ -377,7 +379,7 @@ public class DisplayManager {
 			}
 			i = 0;
 			for(int n = 0;n<numEntries;n++) {
-				leader = new PlayerHeadIcon(kingdomColor+leaderboard.getName(n),Arrays.asList(ChatColor.RESET+"Player Score: "+ChatColor.AQUA+leaderboard.getScore(n),"Click to view stats"),leaderboard.getOfflinePlayer(n),i);
+				leader = new PlayerHeadIcon(ChatColor.GOLD+"#"+(n+1)+" "+kingdomColor+leaderboard.getName(n),Arrays.asList(loreColor+"Player Score: "+ChatColor.AQUA+leaderboard.getScore(n),"Click to view stats"),leaderboard.getOfflinePlayer(n),i);
 				newMenu.getPage(2).addIcon(leader);
 				i++;
 			}
@@ -391,6 +393,9 @@ public class DisplayManager {
             public void run() {
             	bukkitPlayer.closeInventory();
             	bukkitPlayer.openInventory(newMenu.getCurrentPage().getInventory());
+            	Date end = new Date();
+            	int durationMs = (int)((end.getTime()-begin.getTime()));
+            	ChatUtil.printDebug("Score menu display took "+durationMs+" milliseconds");
             }
         },1);
 	}

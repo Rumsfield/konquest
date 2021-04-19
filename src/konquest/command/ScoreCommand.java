@@ -45,7 +45,7 @@ public class ScoreCommand extends CommandBase {
         		} else {
         			kingdomScore = getKonquest().getKingdomManager().getKingdomScore(kingdom);
         			playerScore = getKonquest().getKingdomManager().getPlayerScore(player);
-        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"Your score: "+ChatColor.AQUA+playerScore+", Kingdom Score of "+color+kingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+kingdomScore);
+        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"Your score: "+ChatColor.AQUA+playerScore+ChatColor.GOLD+", Kingdom Score of "+color+kingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+kingdomScore);
         			// Display Score GUI
         			getKonquest().getDisplayManager().displayScoreMenu(player, player);
         		}
@@ -84,7 +84,7 @@ public class ScoreCommand extends CommandBase {
         		} else {
         			kingdomScore = getKonquest().getKingdomManager().getKingdomScore(kingdom);
         			playerScore = getKonquest().getKingdomManager().getPlayerScore(offlinePlayer);
-        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+offlinePlayerName+"'s score: "+ChatColor.AQUA+playerScore+", Kingdom Score of "+color+kingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+kingdomScore);
+        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+offlinePlayerName+"'s score: "+ChatColor.AQUA+playerScore+ChatColor.GOLD+", Kingdom Score of "+color+kingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+kingdomScore);
         			// Display Score GUI
         			getKonquest().getDisplayManager().displayScoreMenu(player, offlinePlayer);
         		}
