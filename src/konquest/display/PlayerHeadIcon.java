@@ -24,6 +24,7 @@ public class PlayerHeadIcon implements MenuIcon {
 		this.item = initItem();
 	}
 
+	//TODO: Render player head asynchronously somehow
 	private ItemStack initItem() {
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta meta = (SkullMeta)item.getItemMeta();

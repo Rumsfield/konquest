@@ -1,7 +1,6 @@
 package konquest.manager;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -239,7 +238,7 @@ public class DisplayManager {
 					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 			            @Override
 			            public void run() {
-			            	bukkitPlayer.closeInventory();
+			            	//bukkitPlayer.closeInventory();
 			            	bukkitPlayer.openInventory(scoreMenu.getCurrentPage().getInventory());
 			            	scoreMenus.put(scoreMenu.getCurrentPage().getInventory(), scoreMenu);
 			            }
@@ -260,7 +259,7 @@ public class DisplayManager {
 					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 			            @Override
 			            public void run() {
-			            	bukkitPlayer.closeInventory();
+			            	//bukkitPlayer.closeInventory();
 			            	bukkitPlayer.openInventory(scoreMenu.getCurrentPage().getInventory());
 			            	scoreMenus.put(scoreMenu.getCurrentPage().getInventory(), scoreMenu);
 			            }
@@ -299,7 +298,6 @@ public class DisplayManager {
 	 */
  	public void displayScoreMenu(KonPlayer displayPlayer, KonOfflinePlayer scorePlayer) {
  		ChatUtil.printDebug("Displaying new score menu to "+displayPlayer.getBukkitPlayer().getName()+" of player "+scorePlayer.getOfflineBukkitPlayer().getName()+", current size is "+scoreMenus.size());
- 		Date begin = new Date();
  		KonPlayerScoreAttributes playerScoreAttributes = konquest.getKingdomManager().getPlayerScoreAttributes(scorePlayer);
 		KonKingdomScoreAttributes kingdomScoreAttributes = konquest.getKingdomManager().getKingdomScoreAttributes(scorePlayer.getKingdom());
 		int playerScore = playerScoreAttributes.getScore();
@@ -308,7 +306,6 @@ public class DisplayManager {
 		String pageLabel = "";
 		int i = 0;
 		InfoIcon info;
-		PlayerHeadIcon leader;
 		// Create fresh paged menu
 		PagedMenu newMenu = new PagedMenu();
 		String kingdomColor = ""+ChatColor.RED;
@@ -373,15 +370,21 @@ public class DisplayManager {
 		newMenu.addPage(2, 1, pageLabel);
 		KonLeaderboard leaderboard = konquest.getKingdomManager().getKingdomLeaderboard(scorePlayer.getKingdom());
 		if(!leaderboard.isEmpty()) {
+			ChatUtil.printDebug("Leaderboard is not empty");
 			int numEntries = 9;
 			if(leaderboard.getSize() < numEntries) {
 				numEntries = leaderboard.getSize();
 			}
-			i = 0;
+			ChatUtil.printDebug("Leaderboard has "+numEntries+" entries");
 			for(int n = 0;n<numEntries;n++) {
-				leader = new PlayerHeadIcon(ChatColor.GOLD+"#"+(n+1)+" "+kingdomColor+leaderboard.getName(n),Arrays.asList(loreColor+"Player Score: "+ChatColor.AQUA+leaderboard.getScore(n),"Click to view stats"),leaderboard.getOfflinePlayer(n),i);
-				newMenu.getPage(2).addIcon(leader);
-				i++;
+				int rank = n + 1;
+				PlayerHeadIcon leader = new PlayerHeadIcon(ChatColor.GOLD+"#"+rank+" "+kingdomColor+leaderboard.getName(n),Arrays.asList(loreColor+"Player Score: "+ChatColor.AQUA+leaderboard.getScore(n),"Click to view stats"),leaderboard.getOfflinePlayer(n),n);
+				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+		            @Override
+		            public void run() {
+		            	newMenu.getPage(2).addIcon(leader);
+		            }
+		        });
 			}
 		}
 		newMenu.refreshNavigationButtons();
@@ -393,9 +396,6 @@ public class DisplayManager {
             public void run() {
             	bukkitPlayer.closeInventory();
             	bukkitPlayer.openInventory(newMenu.getCurrentPage().getInventory());
-            	Date end = new Date();
-            	int durationMs = (int)((end.getTime()-begin.getTime()));
-            	ChatUtil.printDebug("Score menu display took "+durationMs+" milliseconds");
             }
         },1);
 	}
