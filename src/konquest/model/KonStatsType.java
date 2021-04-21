@@ -15,7 +15,7 @@ public enum KonStatsType {
 	INGOTS				(Material.IRON_INGOT,		KonPrefixCategory.TRADESMAN, 	0.5, 	"Ingots smelted"),
 	DIAMONDS			(Material.DIAMOND_ORE,		KonPrefixCategory.TRADESMAN, 	1, 		"Diamond ores mined"),
 	CRAFTED				(Material.IRON_PICKAXE,	 	KonPrefixCategory.TRADESMAN, 	0.1, 	"Tools, weapons and armor crafting skill"),
-	FAVOR				(Material.GOLD_NUGGET,		KonPrefixCategory.TRADESMAN, 	0.01, 	"Favor spent"),
+	FAVOR				(Material.GOLD_INGOT,		KonPrefixCategory.TRADESMAN, 	0.01, 	"Favor spent"),
 	KILLS				(Material.DIAMOND_SWORD,	KonPrefixCategory.MILITARY, 	1, 		"Players killed"),
 	DAMAGE				(Material.CACTUS,			KonPrefixCategory.MILITARY, 	0.01, 	"Player damage given"),
 	GOLEMS				(Material.IRON_BLOCK,		KonPrefixCategory.MILITARY, 	0.5, 	"Enemy Iron Golems killed"),
