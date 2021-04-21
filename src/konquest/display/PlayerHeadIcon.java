@@ -24,7 +24,7 @@ public class PlayerHeadIcon implements MenuIcon {
 		this.item = initItem();
 	}
 
-	//TODO: Render player head asynchronously somehow
+	//TODO: Render player head asynchronously somehow, or load player heads and cache to local file
 	private ItemStack initItem() {
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta meta = (SkullMeta)item.getItemMeta();
@@ -35,7 +35,7 @@ public class PlayerHeadIcon implements MenuIcon {
 		}
 		meta.setDisplayName(getName());
 		meta.setLore(lore);
-		meta.setOwningPlayer(player);
+		//meta.setOwningPlayer(player);
 		item.setItemMeta(meta);
 		return item;
 	}
