@@ -1309,7 +1309,7 @@ public class KingdomManager {
 				}
 				if(topPlayer != null) {
 					leaderboard.addEntry(topPlayer,topScore);
-					ChatUtil.printDebug("Found leaderboard member "+topPlayer.getName()+", score: "+topScore);
+					//ChatUtil.printDebug("Found leaderboard member "+topPlayer.getName()+", score: "+topScore);
 					memberScores.remove(topPlayer);
 					topScore = 0;
 					topPlayer = null;

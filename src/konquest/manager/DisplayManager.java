@@ -314,8 +314,8 @@ public class DisplayManager {
 		}
 		String loreColor = ""+ChatColor.WHITE;
 		// Page 0
-		pageLabel = ChatColor.BLACK+scorePlayer.getOfflineBukkitPlayer().getName()+" Score: "+playerScore;
-		newMenu.addPage(0, 2, pageLabel);
+		pageLabel = ChatColor.BLACK+scorePlayer.getKingdom().getName()+" Score: "+kingdomScore;
+		newMenu.addPage(0, 1, pageLabel);
 		info = new InfoIcon(kingdomColor+scorePlayer.getKingdom().getName()+" Kingdom Score", Arrays.asList(loreColor+"Total score: "+ChatColor.DARK_PURPLE+kingdomScore), Material.GOLDEN_HELMET, 0);
 		newMenu.getPage(0).addIcon(info);
 		info = new InfoIcon(kingdomColor+"Kingdom Towns", Arrays.asList(loreColor+"Total towns: "+ChatColor.AQUA+kingdomScoreAttributes.getAttributeValue(KonKingdomScoreAttribute.TOWNS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+kingdomScoreAttributes.getAttributeScore(KonKingdomScoreAttribute.TOWNS)), Material.OBSIDIAN, 1);
@@ -326,23 +326,26 @@ public class DisplayManager {
 		newMenu.getPage(0).addIcon(info);
 		info = new InfoIcon(kingdomColor+"Kingdom Population", Arrays.asList(loreColor+"Total population: "+ChatColor.AQUA+kingdomScoreAttributes.getAttributeValue(KonKingdomScoreAttribute.POPULATION), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+kingdomScoreAttributes.getAttributeScore(KonKingdomScoreAttribute.POPULATION)), Material.PLAYER_HEAD, 4);
 		newMenu.getPage(0).addIcon(info);
-		info = new InfoIcon(ChatColor.GOLD+scorePlayer.getOfflineBukkitPlayer().getName()+" Player Score", Arrays.asList(loreColor+"Total score: "+ChatColor.DARK_PURPLE+playerScore), Material.DIAMOND_HELMET, 9);
-		newMenu.getPage(0).addIcon(info);
-		info = new InfoIcon(ChatColor.GOLD+"Player Lordships", Arrays.asList(loreColor+"Towns: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.TOWN_LORDS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.TOWN_LORDS)), Material.PURPLE_CONCRETE, 10);
-		newMenu.getPage(0).addIcon(info);
-		info = new InfoIcon(ChatColor.GOLD+"Lord Town Land", Arrays.asList(loreColor+"Land: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.LAND_LORDS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.LAND_LORDS)), Material.PURPLE_CARPET, 11);
-		newMenu.getPage(0).addIcon(info);
-		info = new InfoIcon(ChatColor.GOLD+"Player Knighthoods", Arrays.asList(loreColor+"Towns: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.TOWN_KNIGHTS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.TOWN_KNIGHTS)), Material.BLUE_CONCRETE, 12);
-		newMenu.getPage(0).addIcon(info);
-		info = new InfoIcon(ChatColor.GOLD+"Knight Town Land", Arrays.asList(loreColor+"Land: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.LAND_KNIGHTS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.LAND_KNIGHTS)), Material.BLUE_CARPET, 13);
-		newMenu.getPage(0).addIcon(info);
-		info = new InfoIcon(ChatColor.GOLD+"Player Residencies", Arrays.asList(loreColor+"Towns: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.TOWN_RESIDENTS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.TOWN_RESIDENTS)), Material.WHITE_CONCRETE, 14);
-		newMenu.getPage(0).addIcon(info);
-		info = new InfoIcon(ChatColor.GOLD+"Resident Town Land", Arrays.asList(loreColor+"Land: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.LAND_RESIDENTS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.LAND_RESIDENTS)), Material.WHITE_CARPET, 15);
-		newMenu.getPage(0).addIcon(info);
 		// Page 1
+		pageLabel = ChatColor.BLACK+scorePlayer.getOfflineBukkitPlayer().getName()+" Score: "+playerScore;
+		newMenu.addPage(1, 1, pageLabel);
+		info = new InfoIcon(kingdomColor+scorePlayer.getOfflineBukkitPlayer().getName()+" Player Score", Arrays.asList(loreColor+"Total score: "+ChatColor.DARK_PURPLE+playerScore), Material.DIAMOND_HELMET, 0);
+		newMenu.getPage(1).addIcon(info);
+		info = new InfoIcon(ChatColor.GOLD+"Player Lordships", Arrays.asList(loreColor+"Towns: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.TOWN_LORDS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.TOWN_LORDS)), Material.PURPLE_CONCRETE, 1);
+		newMenu.getPage(1).addIcon(info);
+		info = new InfoIcon(ChatColor.GOLD+"Lord Town Land", Arrays.asList(loreColor+"Land: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.LAND_LORDS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.LAND_LORDS)), Material.PURPLE_CARPET, 2);
+		newMenu.getPage(1).addIcon(info);
+		info = new InfoIcon(ChatColor.GOLD+"Player Knighthoods", Arrays.asList(loreColor+"Towns: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.TOWN_KNIGHTS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.TOWN_KNIGHTS)), Material.BLUE_CONCRETE, 3);
+		newMenu.getPage(1).addIcon(info);
+		info = new InfoIcon(ChatColor.GOLD+"Knight Town Land", Arrays.asList(loreColor+"Land: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.LAND_KNIGHTS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.LAND_KNIGHTS)), Material.BLUE_CARPET, 4);
+		newMenu.getPage(1).addIcon(info);
+		info = new InfoIcon(ChatColor.GOLD+"Player Residencies", Arrays.asList(loreColor+"Towns: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.TOWN_RESIDENTS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.TOWN_RESIDENTS)), Material.WHITE_CONCRETE, 5);
+		newMenu.getPage(1).addIcon(info);
+		info = new InfoIcon(ChatColor.GOLD+"Resident Town Land", Arrays.asList(loreColor+"Land: "+ChatColor.AQUA+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.LAND_RESIDENTS), loreColor+"Score contribution: "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.LAND_RESIDENTS)), Material.WHITE_CARPET, 6);
+		newMenu.getPage(1).addIcon(info);
+		// Page 2
 		pageLabel = ChatColor.BLACK+scorePlayer.getOfflineBukkitPlayer().getName()+" Stats";
-		newMenu.addPage(1, 3, pageLabel);
+		newMenu.addPage(2, 3, pageLabel);
 		KonPlayer player = konquest.getPlayerManager().getPlayerFromName(scorePlayer.getOfflineBukkitPlayer().getName());
     	boolean isPlayerOnline = false;
     	KonStats stats;
@@ -359,32 +362,29 @@ public class DisplayManager {
     	for(KonStatsType stat : KonStatsType.values()) {
     		statValue = stats.getStat(stat);
     		info = new InfoIcon(ChatColor.GOLD+stat.toString(),Arrays.asList(loreColor+stat.description(),ChatColor.AQUA+""+statValue),stat.getMaterial(),i);
-    		newMenu.getPage(1).addIcon(info);
+    		newMenu.getPage(2).addIcon(info);
     		i++;
     	}
     	if(!isPlayerOnline) {
     		stats = null;
     	}
-		// Page 2
+		// Page 3
 		pageLabel = ChatColor.BLACK+scorePlayer.getKingdom().getName()+" Leaderboard";
-		newMenu.addPage(2, 1, pageLabel);
+		newMenu.addPage(3, 1, pageLabel);
 		KonLeaderboard leaderboard = konquest.getKingdomManager().getKingdomLeaderboard(scorePlayer.getKingdom());
 		if(!leaderboard.isEmpty()) {
-			ChatUtil.printDebug("Leaderboard is not empty");
 			int numEntries = 9;
 			if(leaderboard.getSize() < numEntries) {
 				numEntries = leaderboard.getSize();
 			}
-			ChatUtil.printDebug("Leaderboard has "+numEntries+" entries");
+			String playerColor = ""+ChatColor.RED;
+			if(displayPlayer.getKingdom().equals(scorePlayer.getKingdom())) {
+				playerColor = ""+ChatColor.GREEN;
+			}
 			for(int n = 0;n<numEntries;n++) {
 				int rank = n + 1;
-				PlayerHeadIcon leader = new PlayerHeadIcon(ChatColor.GOLD+"#"+rank+" "+kingdomColor+leaderboard.getName(n),Arrays.asList(loreColor+"Player Score: "+ChatColor.AQUA+leaderboard.getScore(n),"Click to view stats"),leaderboard.getOfflinePlayer(n),n);
-				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-		            @Override
-		            public void run() {
-		            	newMenu.getPage(2).addIcon(leader);
-		            }
-		        });
+				PlayerHeadIcon leader = new PlayerHeadIcon(ChatColor.GOLD+"#"+rank+" "+playerColor+leaderboard.getName(n),Arrays.asList(loreColor+"Player Score: "+ChatColor.AQUA+leaderboard.getScore(n),"Click to view stats"),leaderboard.getOfflinePlayer(n),n);
+				newMenu.getPage(3).addIcon(leader);
 			}
 		}
 		newMenu.refreshNavigationButtons();
