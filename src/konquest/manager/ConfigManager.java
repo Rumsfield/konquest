@@ -23,6 +23,7 @@ public class ConfigManager{
 		addConfig("core", new KonConfig("core"));
 		updateConfigVersion("core");
 		addConfig("upgrades", new KonConfig("upgrades"));
+		updateConfigVersion("upgrades");
 		addConfig("camps", new KonConfig("camps"));
 		addConfig("kingdoms", new KonConfig("kingdoms"));
 		addConfig("ruins", new KonConfig("ruins"));

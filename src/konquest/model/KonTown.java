@@ -49,6 +49,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	private ArrayList<UUID> defenders;
 	private HashMap<KonUpgrade,Integer> upgrades;
 	private HashMap<KonUpgrade,Integer> disabledUpgrades;
+	private KonTownRabbit rabbit;
 	
 	public KonTown(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, KonTerritoryType.TOWN, konquest);
@@ -72,6 +73,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.defenders = new ArrayList<UUID>();
 		this.upgrades = new HashMap<KonUpgrade,Integer>();
 		this.disabledUpgrades = new HashMap<KonUpgrade,Integer>();
+		this.rabbit = new KonTownRabbit(getSpawnLoc());
 	}
 
 	/**
@@ -814,6 +816,10 @@ public class KonTown extends KonTerritory implements Timeable{
 				ChatUtil.sendNotice((Player)offlinePlayer, name+" wants to join "+getName()+", use \"/k town "+getName()+" add "+name+"\" to allow, \"/k town "+getName()+" kick "+name+"\" to deny", ChatColor.LIGHT_PURPLE);
 			}
 		}
+	}
+	
+	public void spawnRabbit() {
+		rabbit.spawn();
 	}
 	
 }

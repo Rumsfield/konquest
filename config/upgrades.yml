@@ -1,3 +1,42 @@
+# Town Upgrades
+# Instructions: Change costs and populations values for each upgrade level.
+#   Set a costs line to -1 to disable that upgrade's level. DO NOT add or remove lines.
+#   For example: Loot upgrade level 1 costs 100, level 2 costs 200, level 3 is disabled.
+#      loot:
+#        costs:
+#        - 100
+#        - 200
+#        - -1
+# Upgrades:
+#   loot: Monument Loot
+#     Level 1: Adds 1 more loot item per chest
+#     Level 2: Adds 2 more loot items per chest
+#     Level 3: Adds 3 more loot items per chest
+#   drops: Animal Drops
+#     Level 1: Animal mobs drop 1 more item
+#   fatigue: Enemy Fatigue
+#     Level 1: Enemies get mining fatigue 2
+#   counter: Counter-Intelligence
+#     Level 1: Prevent spy maps from locating this town
+#     Level 2: Prevent compasses from pointing to this town
+#   health: Health Buff
+#     Level 1: Adds 1 heart to friendly health bars
+#     Level 2: Adds 2 hearts to friendly health bars
+#     Level 3: Adds 3 hearts to friendly health bars
+#   damage: Prevent Damage
+#     Level 1: Prevents all fire spread
+#     Level 2: Prevents all explosions
+#   watch: Town Watch
+#     Level 1: Prevents enemy raids unless at least 1 resident is online
+#     Level 2: Prevents enemy raids unless at least 2 residents are online
+#     Level 3: Prevents enemy raids unless at least 3 residents are online
+#   enchant: Better Enchantments
+#     Level 1: Raises enchantment offers by 1 level
+#   old: Old One
+#     Level 1: Summon The Old One
+#
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
 upgrades:
   loot:
     costs:
