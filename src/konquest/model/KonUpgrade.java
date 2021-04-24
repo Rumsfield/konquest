@@ -1,7 +1,7 @@
 package konquest.model;
 
 import org.bukkit.Material;
-import org.bukkit.ChatColor;
+//import org.bukkit.ChatColor;
 
 public enum KonUpgrade {
 
@@ -12,8 +12,8 @@ public enum KonUpgrade {
 	HEALTH		(3, Material.ENCHANTED_GOLDEN_APPLE, "Health Buff", new String[] {"Adds 1 heart to friendly health bars", "Adds 2 hearts to friendly health bars", "Adds 3 hearts to friendly health bars"}),
 	DAMAGE		(2, Material.TNT, "Prevent Damage", new String[] {"Prevents all fire spread", "Prevents all explosions"}),
 	WATCH 		(3, Material.PLAYER_HEAD, "Town Watch", new String[] {"Prevents enemy raids unless at least 1 resident is online", "Prevents enemy raids unless at least 2 residents are online", "Prevents enemy raids unless at least 3 residents are online"}),
-	ENCHANT		(1, Material.ENCHANTED_BOOK, "Better Enchantments", new String[] {"Raises enchantment offers by 1 level"}),
-	OLD			(1, Material.NETHER_STAR, ChatColor.MAGIC+"Old One", new String[] {"Summon The Old One"});
+	ENCHANT		(1, Material.ENCHANTED_BOOK, "Better Enchantments", new String[] {"Raises enchantment offers by 1 level"});
+	//OLD			(1, Material.NETHER_STAR, ChatColor.MAGIC+"Old One", new String[] {"Summon The Old One"});
 	
 	private final int levels;
 	private final Material icon;

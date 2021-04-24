@@ -32,8 +32,6 @@
 #     Level 3: Prevents enemy raids unless at least 3 residents are online
 #   enchant: Better Enchantments
 #     Level 1: Raises enchantment offers by 1 level
-#   old: Old One
-#     Level 1: Summon The Old One
 #
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
@@ -94,8 +92,3 @@ upgrades:
     - 1000
     populations:
     - 10
-  old:
-    costs:
-    - 10000
-    populations:
-    - 20
