@@ -132,9 +132,9 @@ public class Konquest implements Timeable {
         barbarianTeam.setColor(ChatColor.YELLOW);
         
         if(setupTeamPacketSender()) {
-        	plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Successfully registered name color packets");
+        	plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Successfully registered name color packets for this server version");
         } else {
-        	plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] ERROR: Failed to register name color packets");
+        	plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Failed to register name color packets, the server version is unsupported");
         }
 		
 		kingdomManager.updateSmallestKingdom();

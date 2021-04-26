@@ -32,7 +32,7 @@
 #     Level 3: Prevents enemy raids unless at least 3 residents are online
 #   enchant: Better Enchantments
 #     Level 1: Raises enchantment offers by 1 level
-#
+# 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
 upgrades:

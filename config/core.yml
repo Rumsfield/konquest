@@ -77,7 +77,7 @@
 #    enemy_proximity_chunks:        Distance in chunks for proximity combat tag (integer >= 0) (NOT CURRENTLY IMPLEMENTED)
 #    enemy_damage_cooldown_seconds: Time in seconds for combat tag cooldown (integer >= 0)
 #    prevent_command_list:          List of commands to prevent while combat tagged, each command belongs on its own line, e.g. - home (string list)
-#
+# 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
 core:
