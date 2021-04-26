@@ -151,6 +151,9 @@ public class KonMonument{
 	
 	public boolean isLocInside(Location loc) {
 		//ChatUtil.printDebug("Evaluating whether location is inside Monument region: "+loc.toString());
+		if(height == 0) {
+			return false;
+		}
 		Chunk centerChunk = centerLoc.getChunk();
 		Chunk testChunk = loc.getChunk();
 		boolean isChunkMatch = centerChunk.getX() == testChunk.getX() && centerChunk.getZ() == testChunk.getZ();

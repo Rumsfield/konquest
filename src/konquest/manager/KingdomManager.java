@@ -319,7 +319,13 @@ public class KingdomManager {
 	 * @return true if all names exist, else false
 	 */
 	public boolean conquerTown(String name, String oldKingdomName, KonPlayer conquerPlayer) {
-		if(isKingdom(oldKingdomName) && getKingdom(oldKingdomName).hasTown(name) && !conquerPlayer.isBarbarian()) {
+		if(conquerPlayer.isBarbarian()) {
+			return false;
+		}
+		if(!conquerPlayer.getKingdom().getMonumentTemplate().isValid()) {
+			return false;
+		}
+		if(isKingdom(oldKingdomName) && getKingdom(oldKingdomName).hasTown(name)) {
 			getKingdom(oldKingdomName).getTown(name).purgeResidents();
 			getKingdom(oldKingdomName).getTown(name).clearUpgrades();
 			getKingdom(oldKingdomName).getTown(name).setKingdom(conquerPlayer.getKingdom());

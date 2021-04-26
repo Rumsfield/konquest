@@ -50,7 +50,7 @@ public class SettleCommand extends CommandBase {
         	
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	if(player.isBarbarian()) {
-        		ChatUtil.sendError((Player) getSender(), "Barbarians cannot settle.");
+        		ChatUtil.sendError((Player) getSender(), "Barbarians cannot settle, join a Kingdom with \"/k join\"");
                 return;
         	}
         	
@@ -136,7 +136,7 @@ public class SettleCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), "Could not settle: Invalid Town name, already taken or has spaces.");
         			break;
         		case 4:
-        			ChatUtil.sendError((Player) getSender(), "Could not settle: Invalid Monument Template. Contact an Admin!");
+        			ChatUtil.sendError((Player) getSender(), "Could not settle: Invalid Monument Template. Use \"/k admin monument <kingdom> create\"");
         			break;
         		case 5:
         			int distance = getKonquest().getKingdomManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation().getChunk());

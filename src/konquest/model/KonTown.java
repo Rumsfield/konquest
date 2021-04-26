@@ -369,11 +369,13 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 	
 	public void refreshMonument() {
-		removeMonumentBlocks();
-		monument.clearCriticalHits();
-		monument.updateFromTemplate(getKingdom().getMonumentTemplate());
-		pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
-		setSpawn(monument.getTravelPoint());
+		if(monument.isValid()) {
+			removeMonumentBlocks();
+			monument.clearCriticalHits();
+			monument.updateFromTemplate(getKingdom().getMonumentTemplate());
+			pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
+			setSpawn(monument.getTravelPoint());
+		}
 	}
 	
 	public KonMonument getMonument() {

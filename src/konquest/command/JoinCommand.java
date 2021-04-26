@@ -43,6 +43,11 @@ public class JoinCommand extends CommandBase {
         	joinName = getArgs()[1];
         }
     	
+    	if(getKonquest().getKingdomManager().getKingdoms().isEmpty()) {
+    		ChatUtil.sendError((Player) getSender(), "There are no Kingdoms. Create one with \"/k admin makekingdom <name>\"");
+    		return;
+    	}
+    	
     	if(getKonquest().getKingdomManager().isKingdom(joinName)) {
     		// Attempt to join a Kingdom
     		joinName = getKonquest().getKingdomManager().getKingdom(joinName).getName();

@@ -46,7 +46,9 @@ public class MakeKingdomAdminCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), MessageStatic.BAD_NAME.toString());
                 return;
         	} else {
-        		ChatUtil.sendNotice((Player) getSender(), "Successfully created new Kingdom: "+kingdomName);
+        		ChatUtil.sendNotice((Player) getSender(), "Successfully created new Kingdom Capital for "+kingdomName+".");
+        		ChatUtil.sendNotice((Player) getSender(), "Claim additional land with \"/k admin claim\".");
+        		ChatUtil.sendNotice((Player) getSender(), "Next, set up the Kingdom Monument with \"/k admin monument "+kingdomName+" create\".");
         	}
         }
     }
