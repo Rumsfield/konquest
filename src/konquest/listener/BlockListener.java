@@ -37,6 +37,7 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -703,7 +704,6 @@ public class BlockListener implements Listener {
 				KonTown town = (KonTown) territory;
 				// Prevent all spread inside Monument
 				if(town.isLocInsideCenterChunk(event.getBlock().getLocation())) {
-					event.getSource().setType(Material.AIR);
 					event.setCancelled(true);
 					return;
 				}
@@ -734,6 +734,14 @@ public class BlockListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+    public void onBlockIgnite(BlockIgniteEvent event) {
+		if(isBlockInsideMonument(event.getBlock())) {
+			event.setCancelled(true);
+			return;
 		}
 	}
 	

@@ -1658,7 +1658,7 @@ public class KingdomManager {
 	        	// Update territory cache
 	        	addAllTerritory(Bukkit.getWorld(konquest.getWorldName()),kingdomMap.get(kingdomName).getCapital().getChunkList());
         	} else {
-        		ChatUtil.printConsole(ChatColor.RED+"Failed to load capital for Kingdom "+kingdomName);
+        		ChatUtil.printConsoleError("Failed to load capital for Kingdom "+kingdomName);
         		konquest.opStatusMessages.add("Failed to load capital for Kingdom "+kingdomName);
         	}
         	// Create Monument Templates
@@ -1681,18 +1681,18 @@ public class KingdomManager {
 	        	// Create a Monument Template region for current Kingdom
 	        	if(monument_cornerone.getX() == 0 && monument_cornerone.getY() == 0 && monument_cornerone.getZ() == 0 &&
 	        			monument_cornertwo.getX() == 0 && monument_cornertwo.getY() == 0 && monument_cornertwo.getZ() == 0) {
-	        		ChatUtil.printConsole(ChatColor.RED+"Failed to load monument template for Kingdom "+kingdomName+", region corners are zero");
+	        		ChatUtil.printConsoleError("Failed to load monument template for Kingdom "+kingdomName+", region corners are zero");
 	        	} else {
 	        		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel);
 	        		if(status == 0) {
 	        			//ChatUtil.printDebug("Created monument template for Kingdom "+kingdomName);
 	        		} else {
-	        			ChatUtil.printConsole(ChatColor.RED+"Failed to load monument template for Kingdom "+kingdomName+", error code "+status);
+	        			ChatUtil.printConsoleError("Failed to load monument template for Kingdom "+kingdomName+", error code "+status);
 	        			konquest.opStatusMessages.add("Failed to load monument template for Kingdom "+kingdomName+", error code "+status);
 	        		}
 	        	}
         	} else {
-        		ChatUtil.printConsole(ChatColor.RED+"Null monument template for Kingdom "+kingdomName+" in config file!");
+        		ChatUtil.printConsoleError("Null monument template for Kingdom "+kingdomName+" in config file!");
         		konquest.opStatusMessages.add("Missing monument template for Kingdom "+kingdomName+" in kingdoms.yml config file. Use \"/k admin monument\" to define the monument template for this Kingdom.");
         	}
         	// Load all towns
@@ -1719,7 +1719,7 @@ public class KingdomManager {
 	            	// Setup town monument parameters from template
 	            	int status = town.loadMonument(base, kingdomMap.get(kingdomName).getMonumentTemplate());
 	            	if(status != 0) {
-	            		ChatUtil.printConsole(ChatColor.RED+"Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
+	            		ChatUtil.printConsoleError("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            		konquest.opStatusMessages.add("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            	}
 	            	// Add all Town chunk claims
@@ -1848,7 +1848,7 @@ public class KingdomManager {
 							 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getY(),
 							 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getZ()});
 				} else {
-					ChatUtil.printConsole(ChatColor.RED+"Failed to save invalid monument template for Kingdom "+kingdom.getName());
+					ChatUtil.printConsoleError("Failed to save invalid monument template for Kingdom "+kingdom.getName());
 				}
 	            ConfigurationSection townsSection = kingdomSection.createSection("towns");
 	            for(KonTown town : kingdom.getTowns()) {

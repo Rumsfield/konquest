@@ -202,7 +202,7 @@ public class DisplayManager {
 			i++;
 		}
 		// Add info icons
-		List<String> loreList = Arrays.asList("Discord community link");
+		List<String> loreList = Arrays.asList("Community link");
 		InfoIcon info = new InfoIcon("Community", loreList, Material.MINECART, i);
 		if(communityLink == null) {
 			communityLink = "";
