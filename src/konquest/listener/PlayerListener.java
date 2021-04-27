@@ -342,7 +342,7 @@ public class PlayerListener implements Listener{
         // When a player is setting regions...
         if (player.isSettingRegion()) {
         	if (event.getClickedBlock() == null) {
-             	ChatUtil.sendNotice(bukkitPlayer, "Cancelled region creation!");
+             	ChatUtil.sendNotice(bukkitPlayer, "Clicked in Air, cancelled region creation!");
              	player.setRegionCornerOneBuffer(null);
                 player.setRegionCornerTwoBuffer(null);
                 player.settingRegion(RegionType.NONE);
@@ -356,10 +356,11 @@ public class PlayerListener implements Listener{
 	        	case MONUMENT:
 	                if (player.getRegionCornerOneBuffer() == null) {
 	                	player.setRegionCornerOneBuffer(location);
-	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the second corner of the region...");
+	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the second corner block of the region.");
+	                    ChatUtil.sendNotice(bukkitPlayer, "All boundary particles must be green to continue.");
 	                } else if (player.getRegionCornerTwoBuffer() == null) {
 	                	player.setRegionCornerTwoBuffer(location);
-	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the travel point...");
+	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the travel point block.");
 	                } else {
 	                	int createMonumentStatus = kingdomManager.getKingdom(player.getRegionKingdomName()).createMonumentTemplate(player.getRegionCornerOneBuffer(), player.getRegionCornerTwoBuffer(), location);
 	                	switch(createMonumentStatus) {
@@ -375,6 +376,9 @@ public class PlayerListener implements Listener{
 	    					String criticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block");
 	    					int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
 	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, it must contain at least "+maxCriticalhits+" "+criticalBlockTypeName+" blocks");
+	    					break;
+	    				case 3:
+	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, travel point must be inside of the region");
 	    					break;
 	    				default:
 	    					ChatUtil.sendError(bukkitPlayer, "Could not create Monument Template: Unknown cause = "+createMonumentStatus);

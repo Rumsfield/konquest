@@ -146,6 +146,7 @@ public class KonKingdom implements Timeable{
 	 * @return  0 - Success
 	 * 			1 - Region is not 16x16 blocks in base
 	 * 			2 - Region does not contain enough critical blocks
+	 * 			3 - Region does not contain the travel point
 	 */
 	public int createMonumentTemplate(Location corner1, Location corner2, Location travelPoint) {
 		// Check 16x16 base dimensions
@@ -202,6 +203,14 @@ public class KonKingdom implements Timeable{
 		if(criticalBlockCount < maxCriticalhits) {
 			ChatUtil.printDebug("Failed to create Monument Template, not enough critical blocks. Found "+criticalBlockCount+", required "+maxCriticalhits);
 			return 2;
+		}
+		
+		// Check that travel point is inside of the corner bounds
+		if(travelPoint.getBlockX() < bottomBlockX || travelPoint.getBlockX() > topBlockX ||
+				travelPoint.getBlockY() < bottomBlockY || travelPoint.getBlockY() > topBlockY ||
+				travelPoint.getBlockZ() < bottomBlockZ || travelPoint.getBlockZ() > topBlockZ) {
+			ChatUtil.printDebug("Failed to create Monument Template, travel point is outside of corner bounds");
+			return 3;
 		}
 		
 		// Passed all checks, create monument

@@ -53,7 +53,7 @@ public class MonumentAdminCommand extends CommandBase {
         		player.settingRegion(RegionType.MONUMENT);
         		player.setRegionKingdomName(kingdomName);
             	ChatUtil.sendNotice((Player) getSender(), "Now creating new Monument Template. Click on Air to cancel.");
-            	ChatUtil.sendNotice((Player) getSender(), "Click on the first corner of the region...");
+            	ChatUtil.sendNotice((Player) getSender(), "Click on the first corner block of the region.");
         	} else if(cmdMode.equalsIgnoreCase("remove")) {
         		player.settingRegion(RegionType.NONE);
         		getKonquest().getKingdomManager().getKingdom(kingdomName).removeMonumentTemplate();
