@@ -650,11 +650,11 @@ public class Konquest implements Timeable {
     		ChatUtil.printDebug("Teleporting player "+player.getName()+" to loaded chunk");
     		new BukkitRunnable() {
 				public void run() {
-					player.teleport(new Location(loc.getWorld(),loc.getX(),loc.getY()+1.0,loc.getZ()),TeleportCause.PLUGIN);
+					player.teleport(new Location(loc.getWorld(),loc.getX()+0.5,loc.getY()+1.0,loc.getZ()+0.5),TeleportCause.PLUGIN);
 				}
 			}.runTaskLater(getPlugin(), 2L);
     	} else {
-    		teleportQueue.put(new Location(loc.getWorld(),loc.getX(),loc.getY()+1.0,loc.getZ()),player);
+    		teleportQueue.put(new Location(loc.getWorld(),loc.getX()+0.5,loc.getY()+1.0,loc.getZ()+0.5),player);
     		ChatUtil.printDebug("Queueing player "+player.getName()+" for unloaded chunk destination");
     	}
     }

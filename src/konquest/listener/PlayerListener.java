@@ -21,6 +21,7 @@ import konquest.utility.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -832,6 +833,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerMove(PlayerMoveEvent event) {
     	onPlayerEnterLeaveChunk(event);
+    	updateMonumentTemplateBoundary(event);
     }
     
     /**
@@ -1050,6 +1052,74 @@ public class PlayerListener implements Listener{
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
         			kingdomManager.clearTownHearts(player);
+    			}
+    		}
+    	}
+    }
+    
+    private void updateMonumentTemplateBoundary(PlayerMoveEvent event) {
+    	if(!event.getTo().getBlock().equals(event.getFrom().getBlock()) &&
+    			event.getTo().getWorld().equals(event.getFrom().getWorld()) &&
+    			!event.isCancelled()) {
+    		// Check for player creating monument template
+    		KonPlayer player = playerManager.getPlayer(event.getPlayer());
+    		if(player.isSettingRegion() && player.getRegionType().equals(KonPlayer.RegionType.MONUMENT)) {
+    			// Player is currently setting a monument template region
+    			// Draw boundary box between first position and player position
+    			Location loc0 = player.getRegionCornerOneBuffer();
+    			Location loc1 = event.getTo();
+    			if(loc0 != null) {
+    				player.clearMonumentTemplateBoundary();
+    				// Add X lines
+    				int xMax,xMin;
+    				if(loc1.getBlockX() > loc0.getBlockX()) {
+    					xMax = loc1.getBlockX();
+    					xMin = loc0.getBlockX();
+    				} else {
+    					xMax = loc0.getBlockX();
+    					xMin = loc1.getBlockX();
+    				}
+    				for(int i=xMin;i<xMax;i++) {
+    					player.addMonumentTemplateBoundary(new Location(loc0.getWorld(),i+0.5,loc0.getBlockY()+1,loc0.getBlockZ()+0.5));
+    					player.addMonumentTemplateBoundary(new Location(loc0.getWorld(),i+0.5,loc0.getBlockY()+1,loc1.getBlockZ()+0.5));
+    					player.addMonumentTemplateBoundary(new Location(loc0.getWorld(),i+0.5,loc1.getBlockY()+1,loc0.getBlockZ()+0.5));
+    					player.addMonumentTemplateBoundary(new Location(loc0.getWorld(),i+0.5,loc1.getBlockY()+1,loc1.getBlockZ()+0.5));
+    				}
+    				// Add Y lines
+    				int yMax,yMin;
+    				if(loc1.getBlockY() > loc0.getBlockY()) {
+    					yMax = loc1.getBlockY();
+    					yMin = loc0.getBlockY();
+    				} else {
+    					yMax = loc0.getBlockY();
+    					yMin = loc1.getBlockY();
+    				}
+    				for(int i=yMin;i<yMax;i++) {
+    					player.addMonumentTemplateBoundary(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,i+1,loc0.getBlockZ()+0.5));
+    					player.addMonumentTemplateBoundary(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,i+1,loc1.getBlockZ()+0.5));
+    					player.addMonumentTemplateBoundary(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,i+1,loc0.getBlockZ()+0.5));
+    					player.addMonumentTemplateBoundary(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,i+1,loc1.getBlockZ()+0.5));
+    				}
+    				// Add Z lines
+    				int zMax,zMin;
+    				if(loc1.getBlockZ() > loc0.getBlockZ()) {
+    					zMax = loc1.getBlockZ();
+    					zMin = loc0.getBlockZ();
+    				} else {
+    					zMax = loc0.getBlockZ();
+    					zMin = loc1.getBlockZ();
+    				}
+    				for(int i=zMin;i<zMax;i++) {
+    					player.addMonumentTemplateBoundary(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,loc0.getBlockY()+1,i+0.5));
+    					player.addMonumentTemplateBoundary(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,loc1.getBlockY()+1,i+0.5));
+    					player.addMonumentTemplateBoundary(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,loc0.getBlockY()+1,i+0.5));
+    					player.addMonumentTemplateBoundary(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,loc1.getBlockY()+1,i+0.5));
+    				}
+    				if(xMax-xMin == 15 && zMax-zMin == 15) {
+    					player.setMonumentTemplateColor(Color.LIME);
+    				} else {
+    					player.setMonumentTemplateColor(Color.MAROON);
+    				}
     			}
     		}
     	}

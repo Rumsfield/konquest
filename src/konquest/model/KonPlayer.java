@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -48,6 +49,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	private Timer giveLordConfirmTimer;
 	private Timer priorityTitleDisplayTimer;
 	private Timer borderUpdateLoopTimer;
+	private Timer monumentTemplateLoopTimer;
 	private Timer combatTagTimer;
 	private long recordPlayCooldownTime;
 	private ArrayList<Mob> targetMobList;
@@ -55,6 +57,8 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	private KonStats playerStats;
 	private KonPrefix playerPrefix;
 	private HashMap<Location, Color> borderMap;
+	private HashSet<Location> monumentTemplateBoundary;
+	private Color monumentTemplateColor;
 	
 	public KonPlayer(Player bukkitPlayer, KonKingdom kingdom, boolean isBarbarian) {
 		super(bukkitPlayer, kingdom, isBarbarian);
@@ -77,6 +81,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		this.giveLordConfirmTimer = new Timer(this);
 		this.priorityTitleDisplayTimer = new Timer(this);
 		this.borderUpdateLoopTimer = new Timer(this);
+		this.monumentTemplateLoopTimer = new Timer(this);
 		this.combatTagTimer = new Timer(this);
 		this.recordPlayCooldownTime = 0;
 		this.targetMobList = new ArrayList<Mob>();
@@ -84,6 +89,8 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		this.playerStats = new KonStats();
 		this.playerPrefix = new KonPrefix();
 		this.borderMap = new HashMap<Location, Color>();
+		this.monumentTemplateBoundary = new HashSet<Location>();
+		this.monumentTemplateColor = Color.GRAY;
 	}
 	
 	public void addMobAttacker(Mob mob) {
@@ -216,6 +223,10 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		return borderUpdateLoopTimer;
 	}
 	
+	public Timer getMonumentTemplateLoopTimer() {
+		return monumentTemplateLoopTimer;
+	}
+	
 	public Timer getCombatTagTimer() {
 		return combatTagTimer;
 	}
@@ -228,6 +239,18 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	
 	public void settingRegion(RegionType type) {
 		settingRegion = type;
+		// Manage monument template boundary timer
+		if(type.equals(RegionType.MONUMENT)) {
+			monumentTemplateLoopTimer.stopTimer();
+			monumentTemplateLoopTimer.setTime(1);
+			monumentTemplateLoopTimer.startLoopTimer(5);
+			ChatUtil.printDebug("Starting monument template Timer for "+bukkitPlayer.getName());
+		} else if(monumentTemplateLoopTimer.isRunning()){
+			monumentTemplateLoopTimer.stopTimer();
+			ChatUtil.printDebug("Stopped running monument template Timer for "+bukkitPlayer.getName());
+		} else {
+			ChatUtil.printDebug("Doing nothing with monument template Timer for "+bukkitPlayer.getName());
+		}
 	}
 	
 	public void setRegionCornerOneBuffer(Location loc) {
@@ -282,11 +305,24 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		borderMap.putAll(locs);
 	}
 	
+	public void setMonumentTemplateColor(Color color) {
+		monumentTemplateColor = color;
+	}
+	
+	public void clearMonumentTemplateBoundary() {
+		monumentTemplateBoundary.clear();
+	}
+	
+	public void addMonumentTemplateBoundary(Location loc) {
+		monumentTemplateBoundary.add(loc);
+	}
+	
 	public void stopTimers() {
 		exileConfirmTimer.stopTimer();
 		giveLordConfirmTimer.stopTimer();
 		priorityTitleDisplayTimer.stopTimer();
 		borderUpdateLoopTimer.stopTimer();
+		monumentTemplateLoopTimer.stopTimer();
 		combatTagTimer.stopTimer();
 	}
 	
@@ -328,6 +364,10 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 					particleColor = borderMap.get(loc);
 					getBukkitPlayer().spawnParticle(Particle.REDSTONE, loc, 2, 0.25, 0, 0.25, new Particle.DustOptions(particleColor,1));
 				}
+			}
+		} else if(taskID == monumentTemplateLoopTimer.getTaskID()) {
+			for(Location loc : monumentTemplateBoundary) {
+				getBukkitPlayer().spawnParticle(Particle.SPELL_MOB, loc, 1, 0, 0, 0, new Particle.DustOptions(monumentTemplateColor,1));
 			}
 		} else if(taskID == combatTagTimer.getTaskID()) {
 			isCombatTagged = false;
