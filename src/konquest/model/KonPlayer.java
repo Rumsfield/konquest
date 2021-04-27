@@ -15,6 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 
@@ -59,6 +60,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	private HashMap<Location, Color> borderMap;
 	private HashSet<Location> monumentTemplateBoundary;
 	private Color monumentTemplateColor;
+	private Block lastTargetBlock;
 	
 	public KonPlayer(Player bukkitPlayer, KonKingdom kingdom, boolean isBarbarian) {
 		super(bukkitPlayer, kingdom, isBarbarian);
@@ -243,7 +245,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		if(type.equals(RegionType.MONUMENT)) {
 			monumentTemplateLoopTimer.stopTimer();
 			monumentTemplateLoopTimer.setTime(1);
-			monumentTemplateLoopTimer.startLoopTimer(5);
+			monumentTemplateLoopTimer.startLoopTimer(10);
 			ChatUtil.printDebug("Starting monument template Timer for "+bukkitPlayer.getName());
 		} else if(monumentTemplateLoopTimer.isRunning()){
 			monumentTemplateLoopTimer.stopTimer();
@@ -305,18 +307,6 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		borderMap.putAll(locs);
 	}
 	
-	public void setMonumentTemplateColor(Color color) {
-		monumentTemplateColor = color;
-	}
-	
-	public void clearMonumentTemplateBoundary() {
-		monumentTemplateBoundary.clear();
-	}
-	
-	public void addMonumentTemplateBoundary(Location loc) {
-		monumentTemplateBoundary.add(loc);
-	}
-	
 	public void stopTimers() {
 		exileConfirmTimer.stopTimer();
 		giveLordConfirmTimer.stopTimer();
@@ -366,8 +356,9 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 				}
 			}
 		} else if(taskID == monumentTemplateLoopTimer.getTaskID()) {
+			updateMonumentTemplateBoundary();
 			for(Location loc : monumentTemplateBoundary) {
-				getBukkitPlayer().spawnParticle(Particle.SPELL_MOB, loc, 1, 0, 0, 0, new Particle.DustOptions(monumentTemplateColor,1));
+				getBukkitPlayer().spawnParticle(Particle.REDSTONE, loc, 4, 0.25, 0, 0.25, new Particle.DustOptions(monumentTemplateColor,1));
 			}
 		} else if(taskID == combatTagTimer.getTaskID()) {
 			isCombatTagged = false;
@@ -377,5 +368,71 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		}
 	}
 	
+	private void updateMonumentTemplateBoundary() {
+    	Block target = bukkitPlayer.getTargetBlock(null, 4);
+		if(lastTargetBlock != null && !lastTargetBlock.equals(target)) {
+			lastTargetBlock = target;
+			// Check for player creating monument template
+    		if(isSettingRegion() && getRegionType().equals(KonPlayer.RegionType.MONUMENT)) {
+    			// Player is currently setting a monument template region
+    			// Draw boundary box between first position and player position
+    			Location loc0 = getRegionCornerOneBuffer();
+    			Location loc1 = target.getLocation();
+    			if(loc0 != null && getRegionCornerTwoBuffer() == null) {
+    				monumentTemplateBoundary.clear();
+    				// Add X lines
+    				int xMax,xMin;
+    				if(loc1.getBlockX() > loc0.getBlockX()) {
+    					xMax = loc1.getBlockX();
+    					xMin = loc0.getBlockX();
+    				} else {
+    					xMax = loc0.getBlockX();
+    					xMin = loc1.getBlockX();
+    				}
+    				for(int i=xMin;i<xMax;i++) {
+    					monumentTemplateBoundary.add(new Location(loc0.getWorld(),i+0.5,loc0.getBlockY()+1,loc0.getBlockZ()+0.5));
+    					monumentTemplateBoundary.add(new Location(loc0.getWorld(),i+0.5,loc0.getBlockY()+1,loc1.getBlockZ()+0.5));
+    					monumentTemplateBoundary.add(new Location(loc0.getWorld(),i+0.5,loc1.getBlockY()+1,loc0.getBlockZ()+0.5));
+    					monumentTemplateBoundary.add(new Location(loc0.getWorld(),i+0.5,loc1.getBlockY()+1,loc1.getBlockZ()+0.5));
+    				}
+    				// Add Y lines
+    				int yMax,yMin;
+    				if(loc1.getBlockY() > loc0.getBlockY()) {
+    					yMax = loc1.getBlockY();
+    					yMin = loc0.getBlockY();
+    				} else {
+    					yMax = loc0.getBlockY();
+    					yMin = loc1.getBlockY();
+    				}
+    				for(int i=yMin;i<yMax;i++) {
+    					monumentTemplateBoundary.add(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,i+1,loc0.getBlockZ()+0.5));
+    					monumentTemplateBoundary.add(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,i+1,loc1.getBlockZ()+0.5));
+    					monumentTemplateBoundary.add(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,i+1,loc0.getBlockZ()+0.5));
+    					monumentTemplateBoundary.add(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,i+1,loc1.getBlockZ()+0.5));
+    				}
+    				// Add Z lines
+    				int zMax,zMin;
+    				if(loc1.getBlockZ() > loc0.getBlockZ()) {
+    					zMax = loc1.getBlockZ();
+    					zMin = loc0.getBlockZ();
+    				} else {
+    					zMax = loc0.getBlockZ();
+    					zMin = loc1.getBlockZ();
+    				}
+    				for(int i=zMin;i<zMax;i++) {
+    					monumentTemplateBoundary.add(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,loc0.getBlockY()+1,i+0.5));
+    					monumentTemplateBoundary.add(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,loc1.getBlockY()+1,i+0.5));
+    					monumentTemplateBoundary.add(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,loc0.getBlockY()+1,i+0.5));
+    					monumentTemplateBoundary.add(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,loc1.getBlockY()+1,i+0.5));
+    				}
+    				if(xMax-xMin == 15 && zMax-zMin == 15) {
+    					monumentTemplateColor = Color.LIME;
+    				} else {
+    					monumentTemplateColor = Color.MAROON;
+    				}
+    			}
+    		}
+    	}
+    }
 	
 }
