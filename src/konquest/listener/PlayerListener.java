@@ -342,7 +342,7 @@ public class PlayerListener implements Listener{
         // When a player is setting regions...
         if (player.isSettingRegion()) {
         	if (event.getClickedBlock() == null) {
-             	ChatUtil.sendNotice(bukkitPlayer, "Stopping region creation.");
+             	ChatUtil.sendNotice(bukkitPlayer, "Cancelled region creation!");
              	player.setRegionCornerOneBuffer(null);
                 player.setRegionCornerTwoBuffer(null);
                 player.settingRegion(RegionType.NONE);
@@ -359,7 +359,7 @@ public class PlayerListener implements Listener{
 	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the second corner of the region...");
 	                } else if (player.getRegionCornerTwoBuffer() == null) {
 	                	player.setRegionCornerTwoBuffer(location);
-	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the travel point of the region...");
+	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the travel point...");
 	                } else {
 	                	int createMonumentStatus = kingdomManager.getKingdom(player.getRegionKingdomName()).createMonumentTemplate(player.getRegionCornerOneBuffer(), player.getRegionCornerTwoBuffer(), location);
 	                	switch(createMonumentStatus) {
@@ -367,10 +367,14 @@ public class PlayerListener implements Listener{
 	    					ChatUtil.sendNotice(bukkitPlayer, "Successfully created new Monument Template for kingdom "+player.getRegionKingdomName());
 	    					break;
 	    				case 1:
-	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, it must be 16x16 blocks.");
+	    					int diffX = (int)Math.abs(player.getRegionCornerOneBuffer().getX()-player.getRegionCornerTwoBuffer().getX())+1;
+	    					int diffZ = (int)Math.abs(player.getRegionCornerOneBuffer().getZ()-player.getRegionCornerTwoBuffer().getZ())+1;
+	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, base must be 16x16 blocks but got "+diffX+"x"+diffZ);
 	    					break;
 	    				case 2:
-	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, it lacks the minimum number of critical blocks.");
+	    					String criticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block");
+	    					int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
+	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, it must contain at least "+maxCriticalhits+" "+criticalBlockTypeName+" blocks");
 	    					break;
 	    				default:
 	    					ChatUtil.sendError(bukkitPlayer, "Could not create Monument Template: Unknown cause = "+createMonumentStatus);

@@ -151,7 +151,7 @@ public class KonKingdom implements Timeable{
 		// Check 16x16 base dimensions
 		int diffX = (int)Math.abs(corner1.getX()-corner2.getX())+1;
 		int diffZ = (int)Math.abs(corner1.getZ()-corner2.getZ())+1;
-		if(diffX != 16 && diffZ != 16) {
+		if(diffX != 16 || diffZ != 16) {
 			ChatUtil.printDebug("Failed to create Monument Template, not 16x16: "+diffX+"x"+diffZ);
 			return 1;
 		}
