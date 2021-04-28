@@ -62,8 +62,12 @@ public class KonquestListener implements Listener {
 					vehicle.setVelocity(vehicle.getVelocity().multiply(-4));
 					vehicle.eject();
 				}
+				String adminText = "";
+				if(event.getPlayer().getBukkitPlayer().hasPermission("konquest.command.admin")) {
+					adminText = ". Use \"/k admin bypass\" to ignore.";
+				}
 				// Cancel the movement
-				ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "Cannot enter enemy Kingdom Capitals", ChatColor.DARK_RED);
+				ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "Cannot enter enemy Kingdom Capitals"+adminText, ChatColor.DARK_RED);
 				event.setCancelled(true);
 				return;
 			}
