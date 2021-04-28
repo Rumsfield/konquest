@@ -10,7 +10,7 @@ public enum AdminCommandType {
 	UNCLAIM			("",													"Return a chunk to the Wild."),
 	REMOVEKINGDOM	("<kingdom>",											"Removes a Kingdom and all claimed Capital and Town chunks."),
 	REMOVETOWN		("<kingdom> <town>",									"Removes a Town from a Kingdom and all claimed Town chunks."),
-	MONUMENT		("<kingdom> create|remove",								"Defines the Monument for a Kingdom."),
+	MONUMENT		("<kingdom> create|remove|show",						"Creates, removes or shows the Monument Template for a Kingdom."),
 	LIST			("kingdoms|towns|all",						   		 	"Display all Kingdoms or Towns of a Kingdom."),
 	FORCEJOIN 		("<player> <kingdom>",									"Forces a player to join a Kingdom and teleports them to the Capital."),
 	FORCEEXILE		("<player> [full]", 									"Forces a player to become a Barbarian and teleports them to the Wild."),

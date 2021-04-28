@@ -488,7 +488,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 			xMax = loc0.getBlockX();
 			xMin = loc1.getBlockX();
 		}
-		for(int i=xMin;i<xMax;i++) {
+		for(int i=xMin;i<=xMax;i++) {
 			locationSet.add(new Location(loc0.getWorld(),i+0.5,loc0.getBlockY()+1,loc0.getBlockZ()+0.5));
 			locationSet.add(new Location(loc0.getWorld(),i+0.5,loc0.getBlockY()+1,loc1.getBlockZ()+0.5));
 			locationSet.add(new Location(loc0.getWorld(),i+0.5,loc1.getBlockY()+1,loc0.getBlockZ()+0.5));
@@ -503,7 +503,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 			zMax = loc0.getBlockZ();
 			zMin = loc1.getBlockZ();
 		}
-		for(int i=zMin;i<zMax;i++) {
+		for(int i=zMin;i<=zMax;i++) {
 			locationSet.add(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,loc0.getBlockY()+1,i+0.5));
 			locationSet.add(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,loc1.getBlockY()+1,i+0.5));
 			locationSet.add(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,loc0.getBlockY()+1,i+0.5));
@@ -518,7 +518,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 			yMax = loc0.getBlockY();
 			yMin = loc1.getBlockY();
 		}
-		for(int i=yMin;i<yMax;i++) {
+		for(int i=yMin;i<=yMax;i++) {
 			locationSet.add(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,i+1,loc0.getBlockZ()+0.5));
 			locationSet.add(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,i+1,loc1.getBlockZ()+0.5));
 			locationSet.add(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,i+1,loc0.getBlockZ()+0.5));

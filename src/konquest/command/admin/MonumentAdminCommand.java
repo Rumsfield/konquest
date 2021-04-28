@@ -48,7 +48,7 @@ public class MonumentAdminCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), "Bad Kingdom name");
                 return;
         	}
-        	
+        	kingdomName = getKonquest().getKingdomManager().getKingdom(kingdomName).getName();
         	String cmdMode = getArgs()[3];
         	if(cmdMode.equalsIgnoreCase("create")) {
         		player.settingRegion(RegionType.MONUMENT);
@@ -66,7 +66,7 @@ public class MonumentAdminCommand extends CommandBase {
         			Location loc0 = getKonquest().getKingdomManager().getKingdom(kingdomName).getMonumentTemplate().getCornerOne();
         			Location loc1 = getKonquest().getKingdomManager().getKingdom(kingdomName).getMonumentTemplate().getCornerTwo();
         			player.startMonumentShow(loc0, loc1);
-        			ChatUtil.sendNotice((Player) getSender(), "Showing existing Monument Template for kingdom "+kingdomName+" outlined in green particles for 10 seconds.");
+        			ChatUtil.sendNotice((Player) getSender(), "Showing existing Monument Template for kingdom "+kingdomName+", outlined in green particles.");
         		} else {
         			ChatUtil.sendNotice((Player) getSender(), "There is no valid Monument Template for kingdom "+kingdomName);
         		}
