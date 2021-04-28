@@ -434,10 +434,6 @@ public class PlayerListener implements Listener{
         	// When a player is not setting regions...
         	if(!player.isAdminBypassActive() && event.hasBlock() && kingdomManager.isChunkClaimed(event.getClickedBlock().getChunk())) {
         		KonTerritory territory = kingdomManager.getChunkTerritory(event.getClickedBlock().getChunk());
-        		String adminText = "";
-				if(event.getPlayer().hasPermission("konquest.command.admin")) {
-					adminText = ChatColor.RED+"Use \"/k admin bypass\" to ignore";
-				}
         		// Prevent players from interacting with blocks in Capitals
         		if(territory instanceof KonCapital) {
         			//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in the Kingdom Capital", ChatColor.DARK_RED);
@@ -445,7 +441,10 @@ public class PlayerListener implements Listener{
         			// Allow interaction with signs
         			if(!(event.getClickedBlock().getState() instanceof Sign)) {
         				//ChatUtil.printDebug("Interaction was not a sign");
-        				ChatUtil.sendKonPriorityTitle(player, adminText, ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+        				if(event.getPlayer().hasPermission("konquest.command.admin")) {
+        					ChatUtil.sendNotice(bukkitPlayer,"Use \"/k admin bypass\" to ignore capital preventions.");
+        				}
 	        			event.setCancelled(true);
 	        			return;
         			}

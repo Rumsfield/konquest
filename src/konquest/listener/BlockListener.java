@@ -75,14 +75,13 @@ public class BlockListener implements Listener {
 				//ChatUtil.printDebug("Evaluating blockBreak in claimed territory...");
 				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getBlock().getChunk());
 				Location breakLoc = event.getBlock().getLocation();
-				String adminText = "";
-				if(event.getPlayer().hasPermission("konquest.command.admin")) {
-					adminText = ChatColor.RED+"Use \"/k admin bypass\" to ignore";
-				}
 				// Prevent all block breaks inside Capitals
 				if(territory instanceof KonCapital) {
 					//ChatUtil.printDebug("blockBreak occured in a Capital");
-					ChatUtil.sendKonPriorityTitle(player, adminText, ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+					if(event.getPlayer().hasPermission("konquest.command.admin")) {
+    					ChatUtil.sendNotice(event.getPlayer(),"Use \"/k admin bypass\" to ignore capital preventions.");
+    				}
 					event.setCancelled(true);
 					return;
 				}
@@ -324,13 +323,12 @@ public class BlockListener implements Listener {
 			// Bypass event restrictions for player in Admin Bypass Mode
 			if(!player.isAdminBypassActive()) {
 				KonTerritory territory = kingdomManager.getChunkTerritory(event.getBlock().getChunk());
-				String adminText = "";
-				if(event.getPlayer().hasPermission("konquest.command.admin")) {
-					adminText = ChatColor.RED+"Use \"/k admin bypass\" to ignore";
-				}
 				// Prevent all block placements inside Capitals
 				if(territory instanceof KonCapital) {
-					ChatUtil.sendKonPriorityTitle(player, adminText, ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+					if(event.getPlayer().hasPermission("konquest.command.admin")) {
+    					ChatUtil.sendNotice(event.getPlayer(),"Use \"/k admin bypass\" to ignore capital preventions.");
+    				}
 					event.setCancelled(true);
 					return;
 				}
