@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,7 +24,7 @@ public class MonumentAdminCommand extends CommandBase {
     }
 
     public void execute() {
-    	// k admin monument kingdom1 create|remove
+    	// k admin monument kingdom1 create|remove|show
     	if (getArgs().length != 4) {
             ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
             return;
@@ -58,6 +59,17 @@ public class MonumentAdminCommand extends CommandBase {
         		player.settingRegion(RegionType.NONE);
         		getKonquest().getKingdomManager().getKingdom(kingdomName).removeMonumentTemplate();
         		ChatUtil.sendNotice((Player) getSender(), "Removed Monument Template for kingdom "+kingdomName);
+        	} else if(cmdMode.equalsIgnoreCase("show")) {
+        		boolean isValid = getKonquest().getKingdomManager().getKingdom(kingdomName).getMonumentTemplate().isValid();
+        		if(isValid) {
+        			player.settingRegion(RegionType.NONE);
+        			Location loc0 = getKonquest().getKingdomManager().getKingdom(kingdomName).getMonumentTemplate().getCornerOne();
+        			Location loc1 = getKonquest().getKingdomManager().getKingdom(kingdomName).getMonumentTemplate().getCornerTwo();
+        			player.startMonumentShow(loc0, loc1);
+        			ChatUtil.sendNotice((Player) getSender(), "Showing existing Monument Template for kingdom "+kingdomName+" outlined in green particles for 10 seconds.");
+        		} else {
+        			ChatUtil.sendNotice((Player) getSender(), "There is no valid Monument Template for kingdom "+kingdomName);
+        		}
         	} else {
         		ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
         	}
@@ -79,6 +91,7 @@ public class MonumentAdminCommand extends CommandBase {
 		} else if(getArgs().length == 4) {
 			tabList.add("create");
 			tabList.add("remove");
+			tabList.add("show");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
 			Collections.sort(matchedTabList);

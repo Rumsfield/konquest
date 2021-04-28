@@ -49,6 +49,7 @@ public class MakeKingdomAdminCommand extends CommandBase {
         	} else {
         		ChatUtil.sendNotice((Player) getSender(), "Successfully created new Kingdom Capital for "+kingdomName+".");
         		ChatUtil.sendNotice((Player) getSender(), "Claim additional land with \"/k admin claim\".");
+        		ChatUtil.sendNotice((Player) getSender(), "Set the capital spawn point with \"/k admin settravel\".");
         		ChatUtil.sendNotice((Player) getSender(), "Next, set up the Kingdom Monument with \"/k admin monument "+kingdomName+" create\".");
         		// Render border particles
         		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);

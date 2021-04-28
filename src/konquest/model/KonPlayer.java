@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -50,14 +51,17 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	private Timer priorityTitleDisplayTimer;
 	private Timer borderUpdateLoopTimer;
 	private Timer monumentTemplateLoopTimer;
+	private Timer monumentShowLoopTimer;
 	private Timer combatTagTimer;
 	private long recordPlayCooldownTime;
+	private int monumentShowLoopCount;
 	private ArrayList<Mob> targetMobList;
 	private HashMap<KonDirective,Integer> directiveProgress;
 	private KonStats playerStats;
 	private KonPrefix playerPrefix;
 	private HashMap<Location, Color> borderMap;
 	private HashMap<Location,Color> monumentTemplateBoundary;
+	private HashSet<Location> monumentShowBoundary;
 	private Block lastTargetBlock;
 	
 	public KonPlayer(Player bukkitPlayer, KonKingdom kingdom, boolean isBarbarian) {
@@ -82,14 +86,17 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		this.priorityTitleDisplayTimer = new Timer(this);
 		this.borderUpdateLoopTimer = new Timer(this);
 		this.monumentTemplateLoopTimer = new Timer(this);
+		this.monumentShowLoopTimer = new Timer(this);
 		this.combatTagTimer = new Timer(this);
 		this.recordPlayCooldownTime = 0;
+		this.monumentShowLoopCount = 0;
 		this.targetMobList = new ArrayList<Mob>();
 		this.directiveProgress = new HashMap<KonDirective,Integer>();
 		this.playerStats = new KonStats();
 		this.playerPrefix = new KonPrefix();
 		this.borderMap = new HashMap<Location, Color>();
 		this.monumentTemplateBoundary = new HashMap<Location,Color>();
+		this.monumentShowBoundary = new HashSet<Location>();
 	}
 	
 	public void addMobAttacker(Mob mob) {
@@ -222,10 +229,6 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		return borderUpdateLoopTimer;
 	}
 	
-	public Timer getMonumentTemplateLoopTimer() {
-		return monumentTemplateLoopTimer;
-	}
-	
 	public Timer getCombatTagTimer() {
 		return combatTagTimer;
 	}
@@ -311,6 +314,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		priorityTitleDisplayTimer.stopTimer();
 		borderUpdateLoopTimer.stopTimer();
 		monumentTemplateLoopTimer.stopTimer();
+		monumentShowLoopTimer.stopTimer();
 		combatTagTimer.stopTimer();
 	}
 	
@@ -327,6 +331,16 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	public boolean isRecordPlayCooldownOver() {
 		Date now = new Date();
 		return now.after(new Date(recordPlayCooldownTime));
+	}
+	
+	public void startMonumentShow(Location loc0, Location loc1) {
+		monumentShowLoopTimer.stopTimer();
+		monumentShowLoopTimer.setTime(1);
+		monumentShowLoopTimer.startLoopTimer(5);
+		monumentShowLoopCount = 40; // 10 seconds
+		monumentShowBoundary.clear();
+		monumentShowBoundary.addAll(getEdgeLocations(loc0,loc1));
+		ChatUtil.printDebug("Starting monument show Timer for "+bukkitPlayer.getName());
 	}
 
 	@Override
@@ -357,6 +371,16 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 			updateMonumentTemplateBoundary();
 			for(Location loc : monumentTemplateBoundary.keySet()) {
 				getBukkitPlayer().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, new Particle.DustOptions(monumentTemplateBoundary.get(loc),1));
+			}
+		} else if(taskID == monumentShowLoopTimer.getTaskID()) {
+			if(monumentShowLoopCount <= 0) {
+				monumentShowLoopTimer.stopTimer();
+				ChatUtil.printDebug("Ended monument show Timer for "+bukkitPlayer.getName());
+			} else {
+				monumentShowLoopCount--;
+				for(Location loc : monumentShowBoundary) {
+					getBukkitPlayer().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, new Particle.DustOptions(Color.LIME,1));
+				}
 			}
 		} else if(taskID == combatTagTimer.getTaskID()) {
 			isCombatTagged = false;
@@ -451,6 +475,56 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
     			}
     		}
     	}
+    }
+	
+	private HashSet<Location> getEdgeLocations(Location loc0, Location loc1) {
+    	HashSet<Location> locationSet = new HashSet<Location>();
+		// Add X lines
+		int xMax,xMin;
+		if(loc1.getBlockX() > loc0.getBlockX()) {
+			xMax = loc1.getBlockX();
+			xMin = loc0.getBlockX();
+		} else {
+			xMax = loc0.getBlockX();
+			xMin = loc1.getBlockX();
+		}
+		for(int i=xMin;i<xMax;i++) {
+			locationSet.add(new Location(loc0.getWorld(),i+0.5,loc0.getBlockY()+1,loc0.getBlockZ()+0.5));
+			locationSet.add(new Location(loc0.getWorld(),i+0.5,loc0.getBlockY()+1,loc1.getBlockZ()+0.5));
+			locationSet.add(new Location(loc0.getWorld(),i+0.5,loc1.getBlockY()+1,loc0.getBlockZ()+0.5));
+			locationSet.add(new Location(loc0.getWorld(),i+0.5,loc1.getBlockY()+1,loc1.getBlockZ()+0.5));
+		}
+		// Add Z lines
+		int zMax,zMin;
+		if(loc1.getBlockZ() > loc0.getBlockZ()) {
+			zMax = loc1.getBlockZ();
+			zMin = loc0.getBlockZ();
+		} else {
+			zMax = loc0.getBlockZ();
+			zMin = loc1.getBlockZ();
+		}
+		for(int i=zMin;i<zMax;i++) {
+			locationSet.add(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,loc0.getBlockY()+1,i+0.5));
+			locationSet.add(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,loc1.getBlockY()+1,i+0.5));
+			locationSet.add(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,loc0.getBlockY()+1,i+0.5));
+			locationSet.add(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,loc1.getBlockY()+1,i+0.5));
+		}
+		// Add Y lines
+		int yMax,yMin;
+		if(loc1.getBlockY() > loc0.getBlockY()) {
+			yMax = loc1.getBlockY();
+			yMin = loc0.getBlockY();
+		} else {
+			yMax = loc0.getBlockY();
+			yMin = loc1.getBlockY();
+		}
+		for(int i=yMin;i<yMax;i++) {
+			locationSet.add(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,i+1,loc0.getBlockZ()+0.5));
+			locationSet.add(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,i+1,loc1.getBlockZ()+0.5));
+			locationSet.add(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,i+1,loc0.getBlockZ()+0.5));
+			locationSet.add(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,i+1,loc1.getBlockZ()+0.5));
+		}
+		return locationSet;
     }
 	
 }

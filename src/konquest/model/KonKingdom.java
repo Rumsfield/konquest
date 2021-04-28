@@ -147,8 +147,14 @@ public class KonKingdom implements Timeable{
 	 * 			1 - Region is not 16x16 blocks in base
 	 * 			2 - Region does not contain enough critical blocks
 	 * 			3 - Region does not contain the travel point
+	 * 			4 - Region is not within capital territory
 	 */
 	public int createMonumentTemplate(Location corner1, Location corner2, Location travelPoint) {
+		// Check that both corners are within capital territory
+		if(!capital.isLocInside(corner1) || !capital.isLocInside(corner2)) {
+			ChatUtil.printDebug("Failed to create Monument Template, corners are not inside capital territory");
+			return 4;
+		}
 		// Check 16x16 base dimensions
 		int diffX = (int)Math.abs(corner1.getX()-corner2.getX())+1;
 		int diffZ = (int)Math.abs(corner1.getZ()-corner2.getZ())+1;
@@ -156,27 +162,11 @@ public class KonKingdom implements Timeable{
 			ChatUtil.printDebug("Failed to create Monument Template, not 16x16: "+diffX+"x"+diffZ);
 			return 1;
 		}
-		
 		// Check for at least as many critical blocks as required critical hits
 		String criticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block");
 		int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
 		int bottomBlockX, bottomBlockY, bottomBlockZ = 0;
 		int topBlockX, topBlockY, topBlockZ = 0;
-		/*if(corner1.getBlockY() <= corner2.getBlockY()) {
-			bottomBlockX = corner1.getBlockX();
-			bottomBlockY = corner1.getBlockY();
-			bottomBlockZ = corner1.getBlockZ();
-			topBlockX = corner2.getBlockX();
-			topBlockY = corner2.getBlockY();
-			topBlockZ = corner2.getBlockZ();
-		} else {
-			bottomBlockX = corner2.getBlockX();
-			bottomBlockY = corner2.getBlockY();
-			bottomBlockZ = corner2.getBlockZ();
-			topBlockX = corner1.getBlockX();
-			topBlockY = corner1.getBlockY();
-			topBlockZ = corner1.getBlockZ();
-		}*/
 		int c1X = corner1.getBlockX();
 		int c1Y = corner1.getBlockY();
 		int c1Z = corner1.getBlockZ();
@@ -204,7 +194,6 @@ public class KonKingdom implements Timeable{
 			ChatUtil.printDebug("Failed to create Monument Template, not enough critical blocks. Found "+criticalBlockCount+", required "+maxCriticalhits);
 			return 2;
 		}
-		
 		// Check that travel point is inside of the corner bounds
 		if(travelPoint.getBlockX() < bottomBlockX || travelPoint.getBlockX() > topBlockX ||
 				travelPoint.getBlockY() < bottomBlockY || travelPoint.getBlockY() > topBlockY ||
@@ -212,7 +201,6 @@ public class KonKingdom implements Timeable{
 			ChatUtil.printDebug("Failed to create Monument Template, travel point is outside of corner bounds");
 			return 3;
 		}
-		
 		// Passed all checks, create monument
 		monumentTemplate = new KonMonumentTemplate(this, corner1, corner2, travelPoint);
 		return 0;

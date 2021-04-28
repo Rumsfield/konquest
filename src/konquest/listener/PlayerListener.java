@@ -357,7 +357,7 @@ public class PlayerListener implements Listener{
 	                if (player.getRegionCornerOneBuffer() == null) {
 	                	player.setRegionCornerOneBuffer(location);
 	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the second corner block of the region.");
-	                    ChatUtil.sendNotice(bukkitPlayer, "All boundary particles must be green to continue.");
+	                    ChatUtil.sendNotice(bukkitPlayer, "Base area must be 16x16 (green particles).");
 	                } else if (player.getRegionCornerTwoBuffer() == null) {
 	                	player.setRegionCornerTwoBuffer(location);
 	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the travel point block.");
@@ -379,6 +379,9 @@ public class PlayerListener implements Listener{
 	    					break;
 	    				case 3:
 	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, travel point must be inside of the region");
+	    					break;
+	    				case 4:
+	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, region must be within "+player.getRegionKingdomName()+" Capital territory");
 	    					break;
 	    				default:
 	    					ChatUtil.sendError(bukkitPlayer, "Could not create Monument Template: Unknown cause = "+createMonumentStatus);
