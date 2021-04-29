@@ -1661,8 +1661,9 @@ public class KingdomManager {
 	        	// Update territory cache
 	        	addAllTerritory(Bukkit.getWorld(konquest.getWorldName()),kingdomMap.get(kingdomName).getCapital().getChunkList());
         	} else {
-        		ChatUtil.printConsoleError("Failed to load capital for Kingdom "+kingdomName);
-        		konquest.opStatusMessages.add("Failed to load capital for Kingdom "+kingdomName);
+        		String message = "Failed to load capital for Kingdom "+kingdomName+", is one created?";
+        		ChatUtil.printConsoleError(message);
+        		konquest.opStatusMessages.add(message);
         	}
         	// Create Monument Templates
         	if(monumentSection != null) {
@@ -1682,23 +1683,35 @@ public class KingdomManager {
         		z = sectionList.get(2);
 	        	Location monument_cornertwo = new Location(world,x,y,z);
 	        	// Create a Monument Template region for current Kingdom
-	        	if(monument_cornerone.getX() == 0 && monument_cornerone.getY() == 0 && monument_cornerone.getZ() == 0 &&
-	        			monument_cornertwo.getX() == 0 && monument_cornertwo.getY() == 0 && monument_cornertwo.getZ() == 0) {
-	        		ChatUtil.printConsoleError("Failed to load monument template for Kingdom "+kingdomName+", region corners are zero");
-	        	} else {
-	        		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel);
-	        		if(status == 0) {
-	        			//ChatUtil.printDebug("Created monument template for Kingdom "+kingdomName);
-	        		} else {
-	        			ChatUtil.printConsoleError("Failed to load monument template for Kingdom "+kingdomName+", error code "+status);
-	        			konquest.opStatusMessages.add("Failed to load monument template for Kingdom "+kingdomName+", error code "+status);
-	        		}
-	        	}
+        		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel);
+        		if(status != 0) {
+        			String message = "Failed to load Monument Template for Kingdom "+kingdomName+", ";
+        			switch(status) {
+	        			case 1:
+	        				message = message+"base dimensions are not 16x16 blocks.";
+	        				break;
+	        			case 2:
+	        				message = message+"region does not contain enough critical blocks.";
+	        				break;
+	        			case 3:
+	        				message = message+"region does not contain a travel point.";
+	        				break;
+	        			case 4:
+	        				message = message+"region is not within Capital territory.";
+	        				break;
+        				default:
+        					message = message+"unknown reason.";
+        					break;
+        			}
+        			ChatUtil.printConsoleError(message);
+        			konquest.opStatusMessages.add(message);
+        		}
         	} else {
         		ChatUtil.printConsoleError("Null monument template for Kingdom "+kingdomName+" in config file!");
         		konquest.opStatusMessages.add("Missing monument template for Kingdom "+kingdomName+" in kingdoms.yml config file. Use \"/k admin monument\" to define the monument template for this Kingdom.");
         	}
         	// Load all towns
+        	boolean isMissingMonuments = false;
         	for(String townName : kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns").getKeys(false)) {
         		//ChatUtil.printDebug("Loading Town: "+townName);
             	ConfigurationSection townSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns."+townName);
@@ -1722,8 +1735,9 @@ public class KingdomManager {
 	            	// Setup town monument parameters from template
 	            	int status = town.loadMonument(base, kingdomMap.get(kingdomName).getMonumentTemplate());
 	            	if(status != 0) {
+	            		isMissingMonuments = true;
 	            		ChatUtil.printConsoleError("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
-	            		konquest.opStatusMessages.add("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
+	            		//konquest.opStatusMessages.add("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            	}
 	            	// Add all Town chunk claims
 	            	town.addPoints(konquest.formatStringToPoints(townSection.getString("chunks")));
@@ -1774,6 +1788,9 @@ public class KingdomManager {
 	            	// Update upgrade status
 	            	konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
             	}
+        	}
+        	if(isMissingMonuments) {
+        		konquest.opStatusMessages.add("Kingdom "+kingdomName+" has Towns with invalid Monuments. You must create a new Monument Template and restart the server.");
         	}
         }
 		ChatUtil.printDebug("Loaded Kingdoms");

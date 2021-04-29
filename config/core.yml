@@ -106,8 +106,8 @@ core:
     offline_timeout_days: 0
     golem_attack_enemies: true
     attack_friendly_golems: false
-    max_player_diff: 3
-    allow_exile_switch: false
+    max_player_diff: 4
+    allow_exile_switch: true
   towns:
     min_settle_height: 20
     max_settle_height: 200
@@ -125,7 +125,7 @@ core:
     destroy_amount: 12
     damage_regen: 300
     loot_refresh: 1200
-    loot_count: 2
+    loot_count: 1
   ruins:
     critical_block: OBSIDIAN
     capture_cooldown: 3600
@@ -139,7 +139,7 @@ core:
     cost_rename: 50
     cost_claim: 10
     cost_travel: 1
-    cost_travel_per_chunk: 0.1
+    cost_travel_per_chunk: 0.01
     allow_travel_always: true
     rewards:
       settle_town: 50
@@ -153,7 +153,7 @@ core:
       kill_enemy: 50
       defend_raid: 50
   combat:
-    prevent_command_on_proximity: true
+    prevent_command_on_proximity: false
     prevent_command_on_damage: true
     enemy_proximity_chunks: 3
     enemy_damage_cooldown_seconds: 30
