@@ -171,7 +171,7 @@ public class PlayerListener implements Listener{
             		int boostPercent = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.smallest_exp_boost_percent");
             		ChatUtil.sendNotice(bukkitPlayer, "Your Kingdom is currently the smallest, enjoy a "+boostPercent+"% EXP boost!", ChatColor.ITALIC);
             	}
-            	if(bukkitPlayer.isOp()) {
+            	if(bukkitPlayer.hasPermission("konquest.command.admin")) {
             		for(String msg : konquest.opStatusMessages) {
             			ChatUtil.sendError(bukkitPlayer, msg);
             		}

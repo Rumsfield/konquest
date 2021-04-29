@@ -187,13 +187,46 @@ public class KonquestDB extends Database{
     		if(exileKingdomName==null) { exileKingdomName = getKonquest().getKingdomManager().getBarbarians().getName(); }
         	// Create a player from existing info
     		player = getKonquest().getPlayerManager().importKonPlayer(bukkitPlayer, kingdomName, exileKingdomName, isBarbarian);
-        	// Add valid prefixes to the player based on stats
+    		// Get stats and directives for the player
+            ResultSet stats = select("stats", "uuid", bukkitPlayer.getUniqueId().toString());
+            ResultSet directives = select("directives", "uuid", bukkitPlayer.getUniqueId().toString());
+            String allDirectives = "";
+            String allStats = "";
+            try {
+                while (stats.next()) {
+                	for(KonStatsType statEnum : KonStatsType.values()) {
+                		int statProgress = stats.getInt(statEnum.toString());
+                		player.getPlayerStats().setStat(statEnum, statProgress);
+                		allStats = allStats+statEnum.toString()+":"+statProgress+",";
+                	}
+                }
+                while (directives.next()) {
+                	for(KonDirective dirEnum : KonDirective.values()) {
+                		int directiveProgress = directives.getInt(dirEnum.toString());
+                		player.setDirectiveProgress(dirEnum, directiveProgress);
+                		allDirectives = allDirectives+dirEnum.toString()+":"+directiveProgress+",";
+                	}
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                ChatUtil.printDebug("Could not get stats and directives for "+bukkitPlayer.getName());
+            }
+            //ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" stats = "+allStats);
+            //ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" directives = "+allDirectives);
+    		// Add valid prefixes to the player based on stats
         	getKonquest().getAccomplishmentManager().initPlayerPrefixes(player);
             // Update player's main prefix
         	if(mainPrefix != null && mainPrefix != "" && getKonquest().getAccomplishmentManager().isEnabled()) {
         		boolean status = player.getPlayerPrefix().setPrefix(KonPrefixType.getPrefix(mainPrefix)); // Defaults to default prefix defined in KonPrefixType if mainPrefix is not a valid enum
         		if(!status) {
         			ChatUtil.printDebug("Failed to assign main prefix "+mainPrefix+" to player "+bukkitPlayer.getName());
+        			// Schedule messages to display after 20-tick delay (1 second)
+        	    	Bukkit.getScheduler().scheduleSyncDelayedTask(getKonquest().getPlugin(), new Runnable() {
+        	            @Override
+        	            public void run() {
+        	            	ChatUtil.sendError(bukkitPlayer, "Your prefix has been reverted to default.");
+        	            }
+        	        }, 20);
         		}
         	} else {
         		enablePrefix = false;
@@ -204,32 +237,6 @@ public class KonquestDB extends Database{
         	ChatUtil.printDebug("Bad fetch of null player "+bukkitPlayer.getName());
         	return;
         }
-        // Get stats and directives for the player
-        ResultSet stats = select("stats", "uuid", bukkitPlayer.getUniqueId().toString());
-        ResultSet directives = select("directives", "uuid", bukkitPlayer.getUniqueId().toString());
-        String allDirectives = "";
-        String allStats = "";
-        try {
-            while (stats.next()) {
-            	for(KonStatsType statEnum : KonStatsType.values()) {
-            		int statProgress = stats.getInt(statEnum.toString());
-            		player.getPlayerStats().setStat(statEnum, statProgress);
-            		allStats = allStats+statEnum.toString()+":"+statProgress+",";
-            	}
-            }
-            while (directives.next()) {
-            	for(KonDirective dirEnum : KonDirective.values()) {
-            		int directiveProgress = directives.getInt(dirEnum.toString());
-            		player.setDirectiveProgress(dirEnum, directiveProgress);
-            		allDirectives = allDirectives+dirEnum.toString()+":"+directiveProgress+",";
-            	}
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            ChatUtil.printDebug("Could not get stats and directives for "+bukkitPlayer.getName());
-        }
-        //ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" stats = "+allStats);
-        //ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" directives = "+allDirectives);
     }
 
     public KonStats pullPlayerStats(OfflinePlayer offlineBukkitPlayer) {
