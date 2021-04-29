@@ -335,7 +335,7 @@ public class LootManager implements Timeable{
 			markedRefreshTime = new Date().getTime();
 			ChatUtil.printDebug("Loot Refresh timer marked new availability time");
 			for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
-				if(!player.isBarbarian()) {
+				if(!player.isBarbarian() && player.getKingdom().getMonumentTemplate().hasLoot()) {
 					ChatUtil.sendNotice(player.getBukkitPlayer(), "New town monument loot is available.");
 				}
 			}

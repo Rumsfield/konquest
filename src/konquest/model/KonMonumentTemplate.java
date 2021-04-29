@@ -9,10 +9,12 @@ public class KonMonumentTemplate {
 	private Location corner2;
 	private Location travelPoint;
 	private boolean isValid;
+	private boolean hasLoot;
 	
 	public KonMonumentTemplate(KonKingdom kingdom) {
 		this.kingdom = kingdom;
 		this.isValid = false;
+		this.hasLoot = false;
 	}
 	
 	public KonMonumentTemplate(KonKingdom kingdom, Location corner1, Location corner2, Location travelPoint) {
@@ -21,6 +23,7 @@ public class KonMonumentTemplate {
 		this.corner2 = corner2;
 		this.travelPoint = travelPoint;
 		this.isValid = true;
+		this.hasLoot = false;
 	}
 	
 	public int getHeight() {
@@ -64,5 +67,13 @@ public class KonMonumentTemplate {
 	
 	public void setValid(boolean isNewValid) {
 		isValid = isNewValid;
+	}
+	
+	public void setLoot(boolean val) {
+		hasLoot = val;
+	}
+	
+	public boolean hasLoot() {
+		return hasLoot;
 	}
 }

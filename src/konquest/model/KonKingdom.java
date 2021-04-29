@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 
 import konquest.Konquest;
 import konquest.utility.ChatUtil;
@@ -163,6 +164,7 @@ public class KonKingdom implements Timeable{
 			return 1;
 		}
 		// Check for at least as many critical blocks as required critical hits
+		// Also check for any chests for loot flag
 		String criticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block");
 		int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
 		int bottomBlockX, bottomBlockY, bottomBlockZ = 0;
@@ -180,12 +182,15 @@ public class KonKingdom implements Timeable{
 		topBlockY = (c1Y < c2Y) ? c2Y : c1Y;
 		topBlockZ = (c1Z < c2Z) ? c2Z : c1Z;
 		int criticalBlockCount = 0;
+		boolean containsChest = false;
 		for (int x = bottomBlockX; x <= topBlockX; x++) {
             for (int y = bottomBlockY; y <= topBlockY; y++) {
                 for (int z = bottomBlockZ; z <= topBlockZ; z++) {
                 	Block monumentBlock = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getBlockAt(x, y, z);
                 	if(monumentBlock.getType().equals(Material.valueOf(criticalBlockTypeName))) {
                 		criticalBlockCount++;
+                	} else if(monumentBlock.getState() instanceof Chest) {
+                		containsChest = true;
                 	}
                 }
             }
@@ -203,6 +208,13 @@ public class KonKingdom implements Timeable{
 		}
 		// Passed all checks, create monument
 		monumentTemplate = new KonMonumentTemplate(this, corner1, corner2, travelPoint);
+		// Set loot flag
+		monumentTemplate.setLoot(containsChest);
+		if(containsChest) {
+			ChatUtil.printDebug("Created Monument Template with loot chest(s)");
+		} else {
+			ChatUtil.printDebug("Created Monument Template without loot");
+		}
 		return 0;
 	}
 	
