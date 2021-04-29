@@ -658,7 +658,7 @@ public class KingdomManager {
 	}
 	
 	public void addAllTerritory(World world, HashMap<Point,KonTerritory> pointMap) {
-		String territoryName = "null";
+		/*String territoryName = "null";
 		if(!pointMap.isEmpty()) {
 			for(KonTerritory territory : pointMap.values()) {
 				if(territory != null) {
@@ -666,15 +666,15 @@ public class KingdomManager {
 					break;
 				}
 			}
-		}
+		}*/
 		if(territoryWorldCache.containsKey(world)) {
 			territoryWorldCache.get(world).putAll(pointMap);
-			ChatUtil.printDebug("Added points for territory "+territoryName+" into existing world cache: "+world.getName());
+			//ChatUtil.printDebug("Added points for territory "+territoryName+" into existing world cache: "+world.getName());
 		} else {
 			KonTerritoryCache cache = new KonTerritoryCache();
 			cache.putAll(pointMap);
 			territoryWorldCache.put(world, cache);
-			ChatUtil.printDebug("Added points for territory "+territoryName+" into new world cache: "+world.getName());
+			//ChatUtil.printDebug("Added points for territory "+territoryName+" into new world cache: "+world.getName());
 		}
 	}
 	
@@ -685,12 +685,12 @@ public class KingdomManager {
 	public void addTerritory(World world, Point point, KonTerritory territory) {
 		if(territoryWorldCache.containsKey(world)) {
 			territoryWorldCache.get(world).put(point, territory);
-			ChatUtil.printDebug("Added single point for territory "+territory.getName()+" into existing world cache: "+world.getName());
+			//ChatUtil.printDebug("Added single point for territory "+territory.getName()+" into existing world cache: "+world.getName());
 		} else {
 			KonTerritoryCache cache = new KonTerritoryCache();
 			cache.put(point, territory);
 			territoryWorldCache.put(world, cache);
-			ChatUtil.printDebug("Added single point for territory "+territory.getName()+" into new world cache: "+world.getName());
+			//ChatUtil.printDebug("Added single point for territory "+territory.getName()+" into new world cache: "+world.getName());
 		}
 	}
 	
@@ -699,7 +699,7 @@ public class KingdomManager {
 		if(territoryWorldCache.containsKey(world)) {
 			if(territoryWorldCache.get(world).removeAll(points)) {
 				result = true;
-				ChatUtil.printDebug("Removed all points for territory from world cache: "+world.getName());
+				//ChatUtil.printDebug("Removed all points for territory from world cache: "+world.getName());
 			} else {
 				ChatUtil.printDebug("Failed to remove all points for territory from world cache: "+world.getName());
 			}
@@ -719,7 +719,7 @@ public class KingdomManager {
 		if(territoryWorldCache.containsKey(world)) {
 			if(territoryWorldCache.get(world).remove(point)) {
 				result = true;
-				ChatUtil.printDebug("Removed single point for territory from world cache: "+world.getName());
+				//ChatUtil.printDebug("Removed single point for territory from world cache: "+world.getName());
 			} else {
 				ChatUtil.printDebug("Failed to remove single point for territory from world cache: "+world.getName());
 			}
