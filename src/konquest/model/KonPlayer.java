@@ -420,7 +420,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
     				} else {
     					xColor = Color.MAROON;
     				}
-    				for(int i=xMin;i<xMax;i++) {
+    				for(int i=xMin;i<=xMax;i++) {
     					monumentTemplateBoundary.put(new Location(loc0.getWorld(),i+0.5,loc0.getBlockY()+1,loc0.getBlockZ()+0.5),xColor);
     					monumentTemplateBoundary.put(new Location(loc0.getWorld(),i+0.5,loc0.getBlockY()+1,loc1.getBlockZ()+0.5),xColor);
     					monumentTemplateBoundary.put(new Location(loc0.getWorld(),i+0.5,loc1.getBlockY()+1,loc0.getBlockZ()+0.5),xColor);
@@ -443,7 +443,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
     				} else {
     					zColor = Color.MAROON;
     				}
-    				for(int i=zMin;i<zMax;i++) {
+    				for(int i=zMin;i<=zMax;i++) {
     					monumentTemplateBoundary.put(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,loc0.getBlockY()+1,i+0.5),zColor);
     					monumentTemplateBoundary.put(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,loc1.getBlockY()+1,i+0.5),zColor);
     					monumentTemplateBoundary.put(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,loc0.getBlockY()+1,i+0.5),zColor);
@@ -466,7 +466,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
     				} else {
     					yColor = Color.ORANGE;
     				}
-    				for(int i=yMin;i<yMax;i++) {
+    				for(int i=yMin;i<=yMax;i++) {
     					monumentTemplateBoundary.put(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,i+1,loc0.getBlockZ()+0.5),yColor);
     					monumentTemplateBoundary.put(new Location(loc0.getWorld(),loc0.getBlockX()+0.5,i+1,loc1.getBlockZ()+0.5),yColor);
     					monumentTemplateBoundary.put(new Location(loc0.getWorld(),loc1.getBlockX()+0.5,i+1,loc0.getBlockZ()+0.5),yColor);

@@ -39,7 +39,7 @@ public class ClaimCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), "Barbarians cannot claim.");
                 return;
         	}
-        	
+
         	if(getArgs().length > 1) {
         		String claimMode = getArgs()[1];
         		switch(claimMode) {

@@ -385,6 +385,8 @@ public class KingdomManager {
     	int claimStatus = claimChunk(claimLoc);
     	switch(claimStatus) {
     	case 0:
+    		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+    		updatePlayerBorderParticles(player, bukkitPlayer.getLocation());
     		ChatUtil.sendNotice(bukkitPlayer, "Successfully added chunk for territory: "+getChunkTerritory(claimLoc.getChunk()).getName());
     		break;
     	case 1:
@@ -444,6 +446,7 @@ public class KingdomManager {
 	    				KonTown town = (KonTown) territory;
 	    				town.addBarPlayer(player);
     				}
+    				updatePlayerBorderParticles(occupant, occupant.getBukkitPlayer().getLocation());
     			}
     		}
     		break;
@@ -518,22 +521,6 @@ public class KingdomManager {
         	switch(claimStatus) {
         	case 0:
         		numChunksClaimed++;
-        		KonTerritory territory = getChunkTerritory(claimLoc.getChunk());
-        		String territoryName = territory.getName();
-        		// Display town info to players in the newly claimed chunk
-        		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
-        			if(occupant.getBukkitPlayer().getLocation().getChunk().equals(claimLoc.getChunk())) {
-        				if(occupant.getKingdom().equals(territory.getKingdom())) {
-        					ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+territoryName);
-        				} else {
-        					ChatUtil.sendKonTitle(player, "", ChatColor.RED+territoryName);
-        				}
-        				if(territory instanceof KonTown) {
-    	    				KonTown town = (KonTown) territory;
-    	    				town.addBarPlayer(player);
-        				}
-        			}
-        		}
         		break;
         	case 1:
         		ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: no adjacent territory.");
@@ -568,6 +555,22 @@ public class KingdomManager {
     		}
     		konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CLAIM_LAND);
     		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,numChunksClaimed);
+    		String territoryName = territory.getName();
+    		// Display town info to players in the newly claimed chunks
+    		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
+    			if(territory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
+    				if(occupant.getKingdom().equals(territory.getKingdom())) {
+    					ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+territoryName);
+    				} else {
+    					ChatUtil.sendKonTitle(player, "", ChatColor.RED+territoryName);
+    				}
+    				if(territory instanceof KonTown) {
+	    				KonTown town = (KonTown) territory;
+	    				town.addBarPlayer(player);
+    				}
+    				updatePlayerBorderParticles(occupant, occupant.getBukkitPlayer().getLocation());
+    			}
+    		}
     	} else {
     		ChatUtil.sendError(bukkitPlayer, "Failed to find territory.");
     		return false;
