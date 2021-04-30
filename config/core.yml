@@ -9,8 +9,8 @@
 #  format_chat_messages:            Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
 #  travel_wild_random_radius:       Radius in blocks from the center of the primary world for random wild travel (integer > 0)
 #  integration:
-#    quickshop:						Enable plugin integration with QuickShop (true/false)
-#    luckperms:						Enable plugin integration with LuckPerms (true/false)
+#    quickshop:                     Enable plugin integration with QuickShop (true/false)
+#    luckperms:                     Enable plugin integration with LuckPerms (true/false)
 #  kingdoms:
 #    capital_suffix:                Suffix to be appended to Kingdom names which will be the name of the Capital city (string)
 #    capital_pvp:                   Allow player damage in capitals (true/false)
