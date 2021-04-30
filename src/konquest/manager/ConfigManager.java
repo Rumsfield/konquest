@@ -2,7 +2,6 @@ package konquest.manager;
 
 import java.util.HashMap;
 
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import konquest.Konquest;
@@ -80,7 +79,7 @@ public class ConfigManager{
 	public void overwriteBadConfig(String key) {
 		configCache.get(key).saveNewConfig();
 		configCache.get(key).reloadConfig();
-		Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] ERROR: Bad config file \""+key+"\", saved default version");
+		ChatUtil.printConsoleError("Bad config file \""+key+"\", saved default version. Review this file for errors.");
 	}
 
 }

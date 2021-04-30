@@ -35,9 +35,10 @@ public class UpgradeManager {
 		if(!loadUpgrades()) {
         	// Encountered invalid upgrades.yml, overwrite with default
         	konquest.getConfigManager().overwriteBadConfig("upgrades");
+        	konquest.getConfigManager().updateConfigVersion("upgrades");
         	// Attempt to load again
         	if(!loadUpgrades()) {
-        		ChatUtil.printDebug("Failed to load upgrades from upgrades.yml");
+        		ChatUtil.printConsoleError("Failed to load bad upgrades from upgrades.yml. Try deleting all upgrades files and re-starting the server.");
         	}
         }
 		isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_upgrades",false);
