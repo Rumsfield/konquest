@@ -7,6 +7,7 @@ import konquest.listener.InventoryListener;
 import konquest.listener.KonquestListener;
 import konquest.listener.PlayerListener;
 import konquest.listener.WorldListener;
+import konquest.utility.ChatUtil;
 
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
@@ -26,18 +27,17 @@ public class KonquestPlugin extends JavaPlugin {
 	public void onEnable() {
 		pluginManager = getServer().getPluginManager();
 		konquest = new Konquest(this);
-		getCommand("konquest").setExecutor(konquest.getCommandHandler());
+        // Check for Vault & Economy
+ 		if (!setupEconomy()) {
+ 			getLogger().severe(String.format("%s disabled due to bad or missing economy plugin.", getDescription().getName()));
+ 			pluginManager.disablePlugin(this);
+            return;
+        }
+        getCommand("konquest").setExecutor(konquest.getCommandHandler());
         getCommand("k").setExecutor(konquest.getCommandHandler());
         registerListeners();
         konquest.initialize();
-        // Check for Vault & Economy
- 		if (!setupEconomy()) {
- 			getLogger().severe(String.format("[%s] - Disabled due to bad economy.", getDescription().getName()));
- 			pluginManager.disablePlugin(this);
-            return;
-         }
         getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"Konquest enabled. Written by Rumsfield.");
-        //getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"Please do not distribute without the author's consent.");
 	}
 	
 	@Override
@@ -69,12 +69,12 @@ public class KonquestPlugin extends JavaPlugin {
 	
 	private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
-        	getLogger().severe(String.format("[%s] - No Vault dependency found! Include the Vault plugin.", getDescription().getName()));
+        	ChatUtil.printConsoleError("No Vault dependency found! Include the Vault plugin.");
             return false;
         }
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
-        	getLogger().severe(String.format("[%s] - No economy service found! Include an economy plugin, like EssentialsX.", getDescription().getName()));
+        	ChatUtil.printConsoleError("No economy service found! Include an economy plugin, like EssentialsX.");
             return false;
         }
         econ = rsp.getProvider();
