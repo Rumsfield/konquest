@@ -22,6 +22,7 @@ public class KonquestPlugin extends JavaPlugin {
 	private Konquest konquest;
 	private PluginManager pluginManager;
 	private static Economy econ = null;
+	private boolean enableSuccess = false;
 
 	@Override
 	public void onEnable() {
@@ -37,19 +38,20 @@ public class KonquestPlugin extends JavaPlugin {
         getCommand("k").setExecutor(konquest.getCommandHandler());
         registerListeners();
         konquest.initialize();
+        enableSuccess = true;
         getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"Konquest enabled. Written by Rumsfield.");
 	}
 	
 	@Override
 	public void onDisable() {
-		konquest.getKingdomManager().saveKingdoms();
-		konquest.getKingdomManager().saveCamps();
-		konquest.getRuinManager().saveRuins();
-		konquest.getRuinManager().removeAllGolems();
-		//konquest.getPlayerManager().saveAllPlayers();
-		konquest.getConfigManager().saveConfigs();
-		konquest.getDatabaseThread().flushDatabase();
-		//konquest.getDatabaseThread().getDatabase().getDatabaseConnection().disconnect();
+		if(enableSuccess) {
+			konquest.getKingdomManager().saveKingdoms();
+			konquest.getKingdomManager().saveCamps();
+			konquest.getRuinManager().saveRuins();
+			konquest.getRuinManager().removeAllGolems();
+			konquest.getConfigManager().saveConfigs();
+			konquest.getDatabaseThread().flushDatabase();
+		}
 	}
 	
 	public Konquest getKonquestInstance() {
