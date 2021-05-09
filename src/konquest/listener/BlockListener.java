@@ -28,6 +28,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.type.Bed;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -36,11 +37,13 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
 public class BlockListener implements Listener {
 
@@ -76,6 +79,9 @@ public class BlockListener implements Listener {
 				if(territory instanceof KonCapital) {
 					//ChatUtil.printDebug("blockBreak occured in a Capital");
 					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+					if(event.getPlayer().hasPermission("konquest.command.admin")) {
+    					ChatUtil.sendNotice(event.getPlayer(),"Use \"/k admin bypass\" to ignore capital preventions.");
+    				}
 					event.setCancelled(true);
 					return;
 				}
@@ -270,8 +276,11 @@ public class BlockListener implements Listener {
 			if(event.getBlock().getType().equals(Material.DIAMOND_ORE)) {
 				boolean isDrop = event.isDropItems();
 				ChatUtil.printDebug("Diamond ore block break dropping items: "+isDrop);
-				KonPlayer player = playerManager.getPlayer(event.getPlayer());
-				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.DIAMONDS,1);
+				ItemStack handItem = event.getPlayer().getInventory().getItemInMainHand();
+				if(isDrop && handItem != null && !handItem.containsEnchantment(Enchantment.SILK_TOUCH)) {
+					KonPlayer player = playerManager.getPlayer(event.getPlayer());
+					konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.DIAMONDS,1);
+				}
 			}
 		}
 	}
@@ -308,13 +317,6 @@ public class BlockListener implements Listener {
 		// Track last block placed per player
 		konquest.lastPlaced.put(event.getPlayer(),event.getBlock().getLocation());
 		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
-		
-		// Prevent barbarians who already have a camp from placing a bed anywhere
-		if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && konquest.getKingdomManager().isCampSet(player)) {
-			ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot create more than one Camp. Destroy the bed in your current Camp before placing a new bed.", ChatColor.DARK_RED);
-			event.setCancelled(true);
-			return;
-		}
 					
 		// Monitor blocks in claimed territory
 		if(kingdomManager.isChunkClaimed(event.getBlock().getChunk())) {
@@ -324,6 +326,9 @@ public class BlockListener implements Listener {
 				// Prevent all block placements inside Capitals
 				if(territory instanceof KonCapital) {
 					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+					if(event.getPlayer().hasPermission("konquest.command.admin")) {
+    					ChatUtil.sendNotice(event.getPlayer(),"Use \"/k admin bypass\" to ignore capital preventions.");
+    				}
 					event.setCancelled(true);
 					return;
 				}
@@ -395,9 +400,22 @@ public class BlockListener implements Listener {
 					KonCamp camp = (KonCamp)territory;
 					// Prevent additional beds from being placed by anyone
 					if(event.getBlock().getBlockData() instanceof Bed) {
-						ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot place additional beds within this Camp", ChatColor.DARK_RED);
-						event.setCancelled(true);
-						return;
+						if(event.getBlock().getWorld().getBlockAt(camp.getBedLocation()).getBlockData() instanceof Bed) {
+							// The camp has a bed block already
+							ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot place additional beds within this Camp", ChatColor.DARK_RED);
+							event.setCancelled(true);
+							return;
+						} else if(camp.isPlayerOwner(player.getBukkitPlayer())){
+							// The camp does not have a bed and the owner is placing a new one
+							camp.setBedLocation(event.getBlock().getLocation());
+							player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
+							ChatUtil.sendNotice(player.getBukkitPlayer(), "Updated your Camp's bed location");
+						} else {
+							// The camp does not have a bed and this player is not the owner
+							ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot place beds in someone else's Camp", ChatColor.DARK_RED);
+							event.setCancelled(true);
+							return;
+						}
 					}
 					// If the camp owner is not online, prevent block placement
 					boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
@@ -417,6 +435,13 @@ public class BlockListener implements Listener {
 			}
 		} else {
 			// When placing blocks in the wilderness...
+			
+			// Prevent barbarians who already have a camp from placing a bed
+			if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && kingdomManager.isCampSet(player)) {
+				ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot create more than one Camp. Destroy the bed in your current Camp before placing a new bed.", ChatColor.DARK_RED);
+				event.setCancelled(true);
+				return;
+			}
 			
 			// Attempt to create a camp for barbarians who place a bed
 			if(!player.isAdminBypassActive() && player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && !kingdomManager.isCampSet(player)) {
@@ -685,7 +710,6 @@ public class BlockListener implements Listener {
 				KonTown town = (KonTown) territory;
 				// Prevent all spread inside Monument
 				if(town.isLocInsideCenterChunk(event.getBlock().getLocation())) {
-					event.getSource().setType(Material.AIR);
 					event.setCancelled(true);
 					return;
 				}
@@ -716,6 +740,14 @@ public class BlockListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+    public void onBlockIgnite(BlockIgniteEvent event) {
+		if(isBlockInsideMonument(event.getBlock())) {
+			event.setCancelled(true);
+			return;
 		}
 	}
 	

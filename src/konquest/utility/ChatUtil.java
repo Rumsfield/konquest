@@ -32,6 +32,11 @@ public class ChatUtil {
 		//Bukkit.getLogger().info(message);
 		Bukkit.getServer().getConsoleSender().sendMessage(message);
 	}
+	
+	public static void printConsoleError(String message) {
+		String error = errorColor + "[Konquest ERROR] " + message;
+		Bukkit.getServer().getConsoleSender().sendMessage(error);
+	}
 
 	public static void sendNotice(Player player, String message) {
 		String notice = tag + noticeColor + message;

@@ -95,9 +95,14 @@ public class AccomplishmentManager {
 				categoryLevels.put(stat.getCategory(), newLevel);
 			}
 			// Add prefixes to player which meet level requirement
+			playerPrefix.clear();
 			for(KonPrefixType pre : KonPrefixType.values()) {
-				if(pre.level() <= categoryLevels.get(pre.category())) {
+				int prefixLevel = pre.level();
+				double playerLevel = categoryLevels.get(pre.category());
+				//ChatUtil.printDebug("Evaluating prefix "+pre.getName()+" with level "+prefixLevel+" for player "+player.getBukkitPlayer().getName()+" with level "+playerLevel);
+				if(prefixLevel <= playerLevel) {
 					playerPrefix.addPrefix(pre);
+					//ChatUtil.printDebug("    Added prefix!");
 				}
 			}
 		}

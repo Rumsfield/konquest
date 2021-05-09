@@ -15,12 +15,12 @@ public enum CommandType {
 	SPY		    (Material.DIAMOND_SWORD, 	"konquest.command.spy",			"", 		"",													"Reveal the location of an enemy town."),
 	SETTLE		(Material.DIAMOND_PICKAXE, 	"konquest.command.settle",		"",			"<name>",											"Settle a new Town."),
 	CLAIM		(Material.DIAMOND_SHOVEL, 	"konquest.command.claim",		"",			"[radius|auto] [<radius>]",	                		"Claim a chunk of land."),
-	TRAVEL		(Material.COMPASS, 			"konquest.command.travel", 		"t",		"<town>|capital|camp",								"Teleport to a Town, your Camp or to your Capital."),
+	TRAVEL		(Material.COMPASS, 			"konquest.command.travel", 		"t",		"<town>|capital|camp|wild",							"Teleport to a Town, your Camp or to your Capital."),
 	TOWN		(Material.NAME_TAG, 		"konquest.command.town",		"", 		"<town> open|close|add|kick|knight|lord|rename|upgrade [player]", 	"Manage Towns you belong to."),
 	QUEST		(Material.WRITABLE_BOOK, 	"konquest.command.quest",		"q",		"",													"Display your quest log."),
 	STATS		(Material.BOOK, 			"konquest.command.stats",		"s", 		"", 									            "Display your Accomplishment stats."),
 	PREFIX		(Material.CARVED_PUMPKIN, 	"konquest.command.prefix",		"p", 		"<name>|off", 										"Set your prefix title."),
-	SCORE		(Material.DIAMOND, 			"konquest.command.score",		"", 		"[<kingdom>|all]", 									"Display a Kingdom's current score."),
+	SCORE		(Material.DIAMOND, 			"konquest.command.score",		"", 		"[<player>|all]", 									"Display a Player's current score."),
 	ADMIN		(Material.NETHER_STAR, 		"konquest.command.admin",		"",			"",													"For Admins only.");
 	
 	private final String permission;

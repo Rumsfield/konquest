@@ -2,6 +2,7 @@ package konquest.command.admin;
 
 import konquest.Konquest;
 import konquest.command.CommandBase;
+import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessageStatic;
 
@@ -46,7 +47,13 @@ public class MakeKingdomAdminCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), MessageStatic.BAD_NAME.toString());
                 return;
         	} else {
-        		ChatUtil.sendNotice((Player) getSender(), "Successfully created new Kingdom: "+kingdomName);
+        		ChatUtil.sendNotice((Player) getSender(), "Successfully created new Kingdom Capital for "+kingdomName+".");
+        		ChatUtil.sendNotice((Player) getSender(), "Claim additional land with \"/k admin claim\".");
+        		ChatUtil.sendNotice((Player) getSender(), "Set the capital spawn point with \"/k admin settravel\".");
+        		ChatUtil.sendNotice((Player) getSender(), "Next, set up the Kingdom Monument with \"/k admin monument "+kingdomName+" create\".");
+        		// Render border particles
+        		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
+        		getKonquest().getKingdomManager().updatePlayerBorderParticles(player, playerLoc);
         	}
         }
     }

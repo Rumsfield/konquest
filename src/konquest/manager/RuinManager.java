@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -24,12 +25,13 @@ public class RuinManager {
 	private Konquest konquest;
 	private KingdomManager kingdomManager;
 	private HashMap<String, KonRuin> ruinMap; // lower case name maps to ruin object
+	private Material ruinCriticalBlock;
 	
 	public RuinManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.kingdomManager = konquest.getKingdomManager();
 		this.ruinMap = new HashMap<String, KonRuin>();
-		
+		this.ruinCriticalBlock = Material.OBSIDIAN;
 	}
 	//TODO:
 	// On server start and stop, replace critical and spawn blocks in all ruins
@@ -38,6 +40,7 @@ public class RuinManager {
 	// Kill all mobs inside a ruin when it is captured
 	
 	public void initialize() {
+		loadCriticalBlocks();
 		loadRuins();
 		regenAllRuins();
 		ChatUtil.printDebug("Ruin Manager is ready");
@@ -139,6 +142,21 @@ public class RuinManager {
 	
 	public Set<String> getRuinNames() {
 		return ruinMap.keySet();
+	}
+	
+	public Material getRuinCriticalBlock() {
+		return ruinCriticalBlock;
+	}
+	
+	private void loadCriticalBlocks() {
+		String ruinCriticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.ruins.critical_block","");
+		try {
+			ruinCriticalBlock = Material.valueOf(ruinCriticalBlockTypeName);
+		} catch(IllegalArgumentException e) {
+			String message = "Invalid ruin critical block \""+ruinCriticalBlockTypeName+"\" given in core.ruins.critical_block, using default OBSIDIAN";
+    		ChatUtil.printConsoleError(message);
+    		konquest.opStatusMessages.add(message);
+		}
 	}
 	
 	private void loadRuins() {

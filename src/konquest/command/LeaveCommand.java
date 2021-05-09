@@ -48,6 +48,7 @@ public class LeaveCommand extends CommandBase {
 		    			}
 		    		}
 		    		ChatUtil.sendNotice(bukkitPlayer, "You have left the town of "+leaveName);
+		    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
 		    	} else {
 		    		ChatUtil.sendError((Player) getSender(), "Failed to remove you from the town of "+leaveName);
 		    	}

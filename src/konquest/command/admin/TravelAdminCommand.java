@@ -33,17 +33,17 @@ public class TravelAdminCommand  extends CommandBase {
         	Location destination;
         	if(getKonquest().getKingdomManager().isKingdom(travelTo)) {
         		destination = getKonquest().getKingdomManager().getKingdom(travelTo).getCapital().getSpawnLoc();
-        		bukkitPlayer.teleport(destination);
+        		getKonquest().telePlayer(bukkitPlayer, destination);
         		return;
         	} else if(getKonquest().getRuinManager().isRuin(travelTo)) {
         		destination = getKonquest().getRuinManager().getRuin(travelTo).getCenterLoc();
-        		bukkitPlayer.teleport(destination);
+        		getKonquest().telePlayer(bukkitPlayer, destination);
         		return;
         	} else {
         		for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
         			if(kingdom.hasTown(travelTo)) {
         				destination = kingdom.getTown(travelTo).getSpawnLoc();
-        				bukkitPlayer.teleport(destination);
+        				getKonquest().telePlayer(bukkitPlayer, destination);
         				return;
         			}
         		}

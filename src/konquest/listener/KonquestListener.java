@@ -13,7 +13,6 @@ import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTown;
-//import konquest.manager.PlayerManager;
 import konquest.utility.ChatUtil;
 import konquest.utility.Timer;
 
@@ -23,11 +22,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
-//import org.bukkit.Location;
-import org.bukkit.Material;
-//import org.bukkit.entity.Entity;
-//import org.bukkit.entity.EntityType;
-//import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -62,8 +56,12 @@ public class KonquestListener implements Listener {
 					vehicle.setVelocity(vehicle.getVelocity().multiply(-4));
 					vehicle.eject();
 				}
+				String adminText = "";
+				if(event.getPlayer().getBukkitPlayer().hasPermission("konquest.command.admin")) {
+					adminText = ". Use \"/k admin bypass\" to ignore.";
+				}
 				// Cancel the movement
-				ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "Cannot enter enemy Kingdom Capitals", ChatColor.DARK_RED);
+				ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "Cannot enter enemy Kingdom Capitals"+adminText, ChatColor.DARK_RED);
 				event.setCancelled(true);
 				return;
 			}
@@ -194,8 +192,7 @@ public class KonquestListener implements Listener {
 		//kingdomManager.applyTownNerf(event.getPlayer());
 		
 		// Evaluate for critical strikes
-		String criticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block");
-		if(event.getBlockEvent().getBlock().getType().equals(Material.valueOf(criticalBlockTypeName))) {
+		if(event.getBlockEvent().getBlock().getType().equals(konquest.getKingdomManager().getTownCriticalBlock())) {
 			// Critical block has been destroyed
 			ChatUtil.printDebug("Critical strike on Monument in Town "+event.getTerritory().getName());
 			town.getMonument().addCriticalHit();

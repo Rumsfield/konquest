@@ -39,7 +39,7 @@ public class ClaimCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), "Barbarians cannot claim.");
                 return;
         	}
-        	
+
         	if(getArgs().length > 1) {
         		String claimMode = getArgs()[1];
         		switch(claimMode) {
@@ -49,20 +49,12 @@ public class ClaimCommand extends CommandBase {
         	            return;
         			}
     				int radius = Integer.parseInt(getArgs()[2]);
-    				if(radius < 1 || radius > 10) {
+    				if(radius < 1 || radius > 5) {
     					ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
-    					ChatUtil.sendError((Player) getSender(), "Radius must be greater than 0 and less than or equal to 10.");
+    					ChatUtil.sendError((Player) getSender(), "Radius must be greater than 0 and less than or equal to 5.");
     					return;
     				}
-    				//TODO: Implement this
-    				
-    				// Allow player to issue command from within a claimed chunk or adjacent wild chunk
-    				// Find all chunks to be claimed within the radius
-    				// Check candidate chunks for rules: distance from center, adjacency, etc
-    				// Check if player has enough favor to cover the cost of all candidate chunks
-    				// Add all candidate chunks to town
-    				
-    				ChatUtil.sendError((Player) getSender(), "Not yet implemented");
+    				getKonquest().getKingdomManager().claimRadiusForPlayer(bukkitPlayer, bukkitPlayer.getLocation(), radius);
         			break;
         			
         		case "auto" :
@@ -104,6 +96,15 @@ public class ClaimCommand extends CommandBase {
 			tabList.add("auto");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
+		} else if(getArgs().length == 3) {
+			// suggest number
+			String subCommand = getArgs()[1];
+			if(subCommand.equalsIgnoreCase("radius")) {
+				tabList.add("#");
+			}
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
 		}
 		

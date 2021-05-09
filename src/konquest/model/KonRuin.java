@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -39,7 +38,7 @@ public class KonRuin extends KonTerritory implements Timeable {
 	 * + When a target player leaves the ruin, stop targeting
 	 * + Kill all alive when a ruin is captured
 	 * + Remove all when a ruin ends capture cooldown & no players are inside
-	 * - When a golem changes target to a monster due to pathfinding, kill the monster and switch targets back to last player
+	 * + When a golem changes target to a monster due to pathfinding, kill the monster and switch targets back to last player
 	 */
 	
 	public KonRuin(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
@@ -104,10 +103,9 @@ public class KonRuin extends KonTerritory implements Timeable {
 	}
 	
 	public void regenCriticalBlocks() {
-		String criticalBlockTypeName = getKonquest().getConfigManager().getConfig("core").getString("core.ruins.critical_block");
 		for(Location loc : criticalLocations.keySet()) {
 			criticalLocations.put(loc, true);
-			loc.getWorld().getBlockAt(loc).setType(Material.valueOf(criticalBlockTypeName));
+			loc.getWorld().getBlockAt(loc).setType(getKonquest().getRuinManager().getRuinCriticalBlock());
 			loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_PLACE, 1.0F, 0.6F);
 		}
 	}

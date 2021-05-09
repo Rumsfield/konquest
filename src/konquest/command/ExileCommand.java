@@ -72,7 +72,7 @@ public class ExileCommand extends CommandBase {
         	            } else {
         	            	ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
         	            }
-                    	ChatUtil.sendNotice((Player) getSender(), "You have been exiled as a "+ChatColor.DARK_RED+"Barbarian");
+                    	ChatUtil.sendNotice((Player) getSender(), ChatColor.GRAY+"You have been exiled as a "+ChatColor.DARK_RED+"Barbarian"+ChatColor.GRAY+", place a bed to create your Camp.");
             		} else {
             			ChatUtil.sendError((Player) getSender(), "Internal error, could not exile. Contact an Admin!");
             		}

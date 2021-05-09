@@ -76,12 +76,17 @@ public class LootManager implements Timeable{
 	public void initialize() {
 		// Parse config for refresh time
 		refreshTimeSeconds = konquest.getConfigManager().getConfig("core").getLong("core.monuments.loot_refresh",(long)0.0);
-		lootRefreshTimer.stopTimer();
-		lootRefreshTimer.setTime((int)refreshTimeSeconds);
-		lootRefreshTimer.startLoopTimer();
+		if(refreshTimeSeconds > 0) {
+			lootRefreshTimer.stopTimer();
+			lootRefreshTimer.setTime((int)refreshTimeSeconds);
+			lootRefreshTimer.startLoopTimer();
+		}
 		markedRefreshTime = new Date().getTime();
-		lootCount = konquest.getConfigManager().getConfig("core").getInt("core.monuments.loot_count",1);
-		ChatUtil.printDebug("Loot Manager is ready");
+		lootCount = konquest.getConfigManager().getConfig("core").getInt("core.monuments.loot_count",0);
+		if(lootCount < 0) {
+			lootCount = 0;
+		}
+		ChatUtil.printDebug("Loot Manager is ready with loot count: "+lootCount);
 	}
 	
 	/**
@@ -330,7 +335,7 @@ public class LootManager implements Timeable{
 			markedRefreshTime = new Date().getTime();
 			ChatUtil.printDebug("Loot Refresh timer marked new availability time");
 			for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
-				if(!player.isBarbarian()) {
+				if(!player.isBarbarian() && player.getKingdom().getMonumentTemplate().hasLoot()) {
 					ChatUtil.sendNotice(player.getBukkitPlayer(), "New town monument loot is available.");
 				}
 			}

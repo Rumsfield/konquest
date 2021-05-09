@@ -1,8 +1,18 @@
 package konquest.display;
 
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+public interface MenuIcon {
+	
+	public int getIndex();
+	
+	public String getName();
+	
+	public ItemStack getItem();
+	
+}
+
+/*
 public abstract class MenuIcon {
 
 	private ItemStack item;
@@ -34,3 +44,4 @@ public abstract class MenuIcon {
 	public abstract ItemStack initItem();
 	
 }
+*/

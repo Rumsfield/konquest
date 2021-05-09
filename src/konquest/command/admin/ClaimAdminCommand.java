@@ -30,6 +30,7 @@ public class ClaimAdminCommand extends CommandBase {
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
+        	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	//World bukkitWorld = bukkitPlayer.getWorld();
         	/*
         	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
@@ -46,9 +47,9 @@ public class ClaimAdminCommand extends CommandBase {
         	            return;
         			}
     				int radius = Integer.parseInt(getArgs()[3]);
-    				if(radius < 1 || radius > 10) {
+    				if(radius < 1 || radius > 16) {
     					ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
-    					ChatUtil.sendError((Player) getSender(), "Radius must be greater than 0 and less than or equal to 10.");
+    					ChatUtil.sendError((Player) getSender(), "Radius must be greater than 0 and less than or equal to 16.");
     					return;
     				}
     				KonTerritory adjacentTerritory = null;
@@ -77,13 +78,13 @@ public class ClaimAdminCommand extends CommandBase {
     					for(Chunk chunk : chunkList) {
     						getKonquest().getKingdomManager().addTerritory(chunk,adjacentTerritory);
     					}
+    					getKonquest().getKingdomManager().updatePlayerBorderParticles(player, bukkitPlayer.getLocation());
     					ChatUtil.sendNotice((Player) getSender(), "Successfully claimed chunks within radius "+radius+" for territory "+adjacentTerritory.getName());
     				} else {
     					ChatUtil.sendError((Player) getSender(), "There was a problem claiming chunks within radius "+radius+" for territory "+adjacentTerritory.getName());
     				}
         			break;
         		case "auto" :
-        			KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         			if(!player.isAdminClaimingFollow()) {
         				player.setIsAdminClaimingFollow(true);
         				ChatUtil.sendNotice((Player) getSender(), "Enabled admin auto claim. Use this command again to disable.");

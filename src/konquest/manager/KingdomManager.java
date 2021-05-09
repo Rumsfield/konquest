@@ -16,6 +16,7 @@ import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -33,8 +34,13 @@ import konquest.KonquestPlugin;
 import konquest.model.KonCamp;
 import konquest.model.KonDirective;
 import konquest.model.KonKingdom;
+import konquest.model.KonKingdomScoreAttributes;
+import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
+import konquest.model.KonLeaderboard;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
+import konquest.model.KonPlayerScoreAttributes;
+import konquest.model.KonPlayerScoreAttributes.KonPlayerScoreAttribute;
 import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
@@ -54,6 +60,7 @@ public class KingdomManager {
 	private HashMap<World,KonTerritoryCache> territoryWorldCache;
 	private HashMap<String,KonCamp> barbarianCamps;
 	private HashMap<PotionEffectType,Integer> townNerfs;
+	private Material townCriticalBlock;
 	
 	public static int DEFAULT_MAP_SIZE = 9; // 10 lines of chat, minus one for header, odd so player's chunk is centered
 	
@@ -65,9 +72,11 @@ public class KingdomManager {
 		territoryWorldCache = new HashMap<World,KonTerritoryCache>();
 		barbarianCamps = new HashMap<String,KonCamp>();
 		townNerfs = new HashMap<PotionEffectType,Integer>();
+		townCriticalBlock = Material.OBSIDIAN;
 	}
 	
 	public void initialize() {
+		loadCriticalBlocks();
 		loadKingdoms();
 		updateKingdomOfflineProtection();
 		makeTownNerfs();
@@ -314,7 +323,13 @@ public class KingdomManager {
 	 * @return true if all names exist, else false
 	 */
 	public boolean conquerTown(String name, String oldKingdomName, KonPlayer conquerPlayer) {
-		if(isKingdom(oldKingdomName) && getKingdom(oldKingdomName).hasTown(name) && !conquerPlayer.isBarbarian()) {
+		if(conquerPlayer.isBarbarian()) {
+			return false;
+		}
+		if(!conquerPlayer.getKingdom().getMonumentTemplate().isValid()) {
+			return false;
+		}
+		if(isKingdom(oldKingdomName) && getKingdom(oldKingdomName).hasTown(name)) {
 			getKingdom(oldKingdomName).getTown(name).purgeResidents();
 			getKingdom(oldKingdomName).getTown(name).clearUpgrades();
 			getKingdom(oldKingdomName).getTown(name).setKingdom(conquerPlayer.getKingdom());
@@ -374,6 +389,8 @@ public class KingdomManager {
     	int claimStatus = claimChunk(claimLoc);
     	switch(claimStatus) {
     	case 0:
+    		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+    		updatePlayerBorderParticles(player, bukkitPlayer.getLocation());
     		ChatUtil.sendNotice(bukkitPlayer, "Successfully added chunk for territory: "+getChunkTerritory(claimLoc.getChunk()).getName());
     		break;
     	case 1:
@@ -433,6 +450,7 @@ public class KingdomManager {
 	    				KonTown town = (KonTown) territory;
 	    				town.addBarPlayer(player);
     				}
+    				updatePlayerBorderParticles(occupant, occupant.getBukkitPlayer().getLocation());
     			}
     		}
     		break;
@@ -464,6 +482,119 @@ public class KingdomManager {
 		return claimStatus == 0;
 	}
 	
+	public boolean claimRadiusForPlayer(Player bukkitPlayer, Location claimLoc, int radius) {
+		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		ArrayList<Chunk> claimChunks = new ArrayList<Chunk>();
+		// Verify no surrounding enemy or capital territory
+    	for(Chunk chunk : konquest.getAreaChunks(claimLoc,radius+1)) {
+    		if(konquest.getKingdomManager().isChunkClaimed(chunk)) {
+    			if(!player.getKingdom().equals(konquest.getKingdomManager().getChunkTerritory(chunk).getKingdom())) {
+    				ChatUtil.sendError(bukkitPlayer, "Too close to enemy territory!");
+    				return false;
+    			}
+    			if(konquest.getKingdomManager().getChunkTerritory(chunk).getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    				ChatUtil.sendError(bukkitPlayer, "Too close to the Capital!");
+    				return false;
+    			}
+    		}
+    	}
+    	// Find all unclaimed chunks around center chunk
+    	for(Chunk chunk : konquest.getSurroundingChunks(claimLoc,radius)) {
+    		if(!konquest.getKingdomManager().isChunkClaimed(chunk)) {
+    			claimChunks.add(chunk);
+    		}
+    	}
+    	int unclaimedChunkAmount = claimChunks.size();
+    	boolean isCenterClaimed = true;
+    	if(!konquest.getKingdomManager().isChunkClaimed(claimLoc.getChunk())) {
+    		unclaimedChunkAmount++;
+    		isCenterClaimed = false;
+    	}
+    	// Ensure player can cover the cost
+    	double cost = konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
+    	double totalCost = unclaimedChunkAmount * cost;
+    	if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < totalCost) {
+			ChatUtil.sendError(bukkitPlayer, "Not enough Favor, need "+totalCost);
+            return false;
+		}
+    	// Ensure the center chunk is claimed
+    	int numChunksClaimed = 0;
+    	if(!isCenterClaimed) {
+    		// Claim the center chunk and do some checks to make sure it succeeded
+    		int claimStatus = claimChunk(claimLoc);
+        	switch(claimStatus) {
+        	case 0:
+        		numChunksClaimed++;
+        		break;
+        	case 1:
+        		ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: no adjacent territory.");
+        		return false;
+        	case 2:
+        		ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: too far from territory center.");
+        		return false;
+        	case 3:
+        		ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: already claimed.");
+        		return false;
+        	default:
+        		ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: unknown error.");
+        		return false;
+        	}
+    	}
+    	// Use territory of center chunk to claim remaining radius unclaimed chunks
+    	KonTerritory territory = getChunkTerritory(claimLoc.getChunk());
+    	boolean allChunksAdded = true;
+    	if(territory != null) {
+    		for(Chunk newChunk : claimChunks) {
+    			if(territory.addChunk(newChunk)) {
+    				addTerritory(newChunk,territory);
+    				numChunksClaimed++;
+    			} else {
+    				allChunksAdded = false;
+    			}
+    		}
+    		if(!allChunksAdded) {
+    			ChatUtil.sendError(bukkitPlayer, "Failed to claim all land, too far from town center. Claimed "+numChunksClaimed+" chunks.");
+    		} else {
+    			ChatUtil.sendNotice(bukkitPlayer, "Successfully claimed "+numChunksClaimed+" chunks of land for Town: "+territory.getName());
+    		}
+    		konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CLAIM_LAND);
+    		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,numChunksClaimed);
+    		String territoryName = territory.getName();
+    		// Display town info to players in the newly claimed chunks
+    		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
+    			if(territory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
+    				if(occupant.getKingdom().equals(territory.getKingdom())) {
+    					ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+territoryName);
+    				} else {
+    					ChatUtil.sendKonTitle(player, "", ChatColor.RED+territoryName);
+    				}
+    				if(territory instanceof KonTown) {
+	    				KonTown town = (KonTown) territory;
+	    				town.addBarPlayer(player);
+    				}
+    				updatePlayerBorderParticles(occupant, occupant.getBukkitPlayer().getLocation());
+    			}
+    		}
+    	} else {
+    		ChatUtil.sendError(bukkitPlayer, "Failed to find territory.");
+    		return false;
+    	}
+    	// Reduce the player's favor
+		if(cost > 0 && numChunksClaimed > 0) {
+			double finalCost = numChunksClaimed*cost;
+	    	EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, finalCost);
+	        if(r.transactionSuccess()) {
+	        	String balanceF = String.format("%.2f",r.balance);
+	        	String amountF = String.format("%.2f",r.amount);
+	        	ChatUtil.sendNotice(bukkitPlayer, "Favor reduced by "+amountF+", total: "+balanceF);
+	        	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)finalCost);
+	        } else {
+	        	ChatUtil.sendError(bukkitPlayer, String.format("An error occured: %s", r.errorMessage));
+	        }
+		}
+    	
+		return true;
+	}
 	
 	/**
 	 * unclaimChunk - primary method for unclaiming a chunk for a territory
@@ -531,7 +662,7 @@ public class KingdomManager {
 	}
 	
 	public void addAllTerritory(World world, HashMap<Point,KonTerritory> pointMap) {
-		String territoryName = "null";
+		/*String territoryName = "null";
 		if(!pointMap.isEmpty()) {
 			for(KonTerritory territory : pointMap.values()) {
 				if(territory != null) {
@@ -539,15 +670,15 @@ public class KingdomManager {
 					break;
 				}
 			}
-		}
+		}*/
 		if(territoryWorldCache.containsKey(world)) {
 			territoryWorldCache.get(world).putAll(pointMap);
-			ChatUtil.printDebug("Added points for territory "+territoryName+" into existing world cache: "+world.getName());
+			//ChatUtil.printDebug("Added points for territory "+territoryName+" into existing world cache: "+world.getName());
 		} else {
 			KonTerritoryCache cache = new KonTerritoryCache();
 			cache.putAll(pointMap);
 			territoryWorldCache.put(world, cache);
-			ChatUtil.printDebug("Added points for territory "+territoryName+" into new world cache: "+world.getName());
+			//ChatUtil.printDebug("Added points for territory "+territoryName+" into new world cache: "+world.getName());
 		}
 	}
 	
@@ -558,12 +689,12 @@ public class KingdomManager {
 	public void addTerritory(World world, Point point, KonTerritory territory) {
 		if(territoryWorldCache.containsKey(world)) {
 			territoryWorldCache.get(world).put(point, territory);
-			ChatUtil.printDebug("Added single point for territory "+territory.getName()+" into existing world cache: "+world.getName());
+			//ChatUtil.printDebug("Added single point for territory "+territory.getName()+" into existing world cache: "+world.getName());
 		} else {
 			KonTerritoryCache cache = new KonTerritoryCache();
 			cache.put(point, territory);
 			territoryWorldCache.put(world, cache);
-			ChatUtil.printDebug("Added single point for territory "+territory.getName()+" into new world cache: "+world.getName());
+			//ChatUtil.printDebug("Added single point for territory "+territory.getName()+" into new world cache: "+world.getName());
 		}
 	}
 	
@@ -572,7 +703,7 @@ public class KingdomManager {
 		if(territoryWorldCache.containsKey(world)) {
 			if(territoryWorldCache.get(world).removeAll(points)) {
 				result = true;
-				ChatUtil.printDebug("Removed all points for territory from world cache: "+world.getName());
+				//ChatUtil.printDebug("Removed all points for territory from world cache: "+world.getName());
 			} else {
 				ChatUtil.printDebug("Failed to remove all points for territory from world cache: "+world.getName());
 			}
@@ -592,7 +723,7 @@ public class KingdomManager {
 		if(territoryWorldCache.containsKey(world)) {
 			if(territoryWorldCache.get(world).remove(point)) {
 				result = true;
-				ChatUtil.printDebug("Removed single point for territory from world cache: "+world.getName());
+				//ChatUtil.printDebug("Removed single point for territory from world cache: "+world.getName());
 			} else {
 				ChatUtil.printDebug("Failed to remove single point for territory from world cache: "+world.getName());
 			}
@@ -1060,7 +1191,7 @@ public class KingdomManager {
 		player.getPlayerStats().setStat(KonStatsType.KNIGHTS, countElite);
 		player.getPlayerStats().setStat(KonStatsType.RESIDENTS, countResident);
 	}
-	
+	/*
 	public ArrayList<String> getKingdomLeaderboard(KonKingdom kingdom) {
 		ArrayList<String> leaderNames = new ArrayList<String>();
 		if(kingdom.equals(barbarians)) {
@@ -1121,33 +1252,181 @@ public class KingdomManager {
 			}
 		}
 		return leaderNames;
+	}*/
+	
+	public KonLeaderboard getKingdomLeaderboard(KonKingdom kingdom) {
+		KonLeaderboard leaderboard = new KonLeaderboard();
+		if(kingdom.equals(barbarians)) {
+			return leaderboard;
+		}
+		// Determine scores for all players within towns
+		HashMap<OfflinePlayer,KonPlayerScoreAttributes> memberScores = new HashMap<OfflinePlayer,KonPlayerScoreAttributes>();
+		int numTownLords = 0;
+		int numTownKnights = 0;
+		int numTownResidents = 0;
+		int numLordLand = 0;
+		int numKnightLand = 0;
+		int numResidentLand = 0;
+		for(KonTown town : kingdom.getTowns()) {
+			for(OfflinePlayer offlinePlayer : town.getPlayerResidents()) {
+				numTownLords = 0;
+				numTownKnights = 0;
+				numTownResidents = 0;
+				numLordLand = 0;
+				numKnightLand = 0;
+				numResidentLand = 0;
+				if(town.isPlayerLord(offlinePlayer)) {
+					numTownLords++;
+					numLordLand += town.getChunkList().size();
+				} else if(town.isPlayerElite(offlinePlayer)) {
+					numTownKnights++;
+					numKnightLand += town.getChunkList().size();
+				} else {
+					numTownResidents++;
+					numResidentLand += town.getChunkList().size();
+				}
+				if(memberScores.containsKey(offlinePlayer)) {
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.TOWN_LORDS, numTownLords);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.TOWN_KNIGHTS, numTownKnights);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.TOWN_RESIDENTS, numTownResidents);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.LAND_LORDS, numLordLand);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.LAND_KNIGHTS, numKnightLand);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.LAND_RESIDENTS, numResidentLand);
+				} else {
+					KonOfflinePlayer validPlayer = konquest.getPlayerManager().getOfflinePlayer(offlinePlayer);
+					if(validPlayer != null && validPlayer.getKingdom().equals(kingdom)) {
+						KonPlayerScoreAttributes newMemberAttributes = new KonPlayerScoreAttributes();
+						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_LORDS, numTownLords);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_KNIGHTS, numTownKnights);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_RESIDENTS, numTownResidents);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_LORDS, numLordLand);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_KNIGHTS, numKnightLand);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_RESIDENTS, numResidentLand);
+						memberScores.put(offlinePlayer, newMemberAttributes);
+					}
+				}
+			}
+		}
+		// Find top scoring members
+		final int NUM_TOP_PLAYERS = 9;
+		int topScore = 0;
+		OfflinePlayer topPlayer = null;
+		for(int i = 0;i<NUM_TOP_PLAYERS;i++) {
+			if(!memberScores.isEmpty()) {
+				for(OfflinePlayer offlinePlayer : memberScores.keySet()) {
+					int playerScore = memberScores.get(offlinePlayer).getScore();
+					if(playerScore > topScore) {
+						topScore = playerScore;
+						topPlayer = offlinePlayer;
+					}
+				}
+				if(topPlayer != null) {
+					leaderboard.addEntry(topPlayer,topScore);
+					//ChatUtil.printDebug("Found leaderboard member "+topPlayer.getName()+", score: "+topScore);
+					memberScores.remove(topPlayer);
+					topScore = 0;
+					topPlayer = null;
+				}
+			}
+		}
+		return leaderboard;
+	}
+	
+	public KonKingdomScoreAttributes getKingdomScoreAttributes(KonKingdom kingdom) {
+		KonKingdomScoreAttributes scoreAttributes = new KonKingdomScoreAttributes();
+		if(!kingdom.equals(barbarians) && !kingdom.isPeaceful()) {
+			// Gather Kingdom metrics
+			int numKingdomTowns = kingdom.getTowns().size();
+	    	ArrayList<KonOfflinePlayer> allPlayersInKingdom = konquest.getPlayerManager().getAllPlayersInKingdom(kingdom.getName());
+	    	int numAllKingdomPlayers = allPlayersInKingdom.size();
+	    	int numKingdomLand = 0;
+	    	for(KonTown town : kingdom.getTowns()) {
+	    		numKingdomLand += town.getChunkList().size();
+	    	}
+	    	int numKingdomFavor = 0;
+	    	for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
+	    		numKingdomFavor += (int) KonquestPlugin.getEconomy().getBalance(kingdomPlayer.getOfflineBukkitPlayer());
+	    	}
+	    	// Gather favor costs
+	    	int cost_settle = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_settle");
+	    	int cost_claim = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
+	    	// Set attributes
+	    	scoreAttributes.setAttributeWeight(KonKingdomScoreAttribute.TOWNS, cost_settle+2);
+	    	scoreAttributes.setAttributeWeight(KonKingdomScoreAttribute.LAND, cost_claim+1);
+	    	scoreAttributes.setAttribute(KonKingdomScoreAttribute.TOWNS, numKingdomTowns);
+	    	scoreAttributes.setAttribute(KonKingdomScoreAttribute.LAND, numKingdomLand);
+	    	scoreAttributes.setAttribute(KonKingdomScoreAttribute.FAVOR, numKingdomFavor);
+	    	scoreAttributes.setAttribute(KonKingdomScoreAttribute.POPULATION, numAllKingdomPlayers);
+		}
+		return scoreAttributes;
 	}
 	
 	public int getKingdomScore(KonKingdom kingdom) {
+		int score = getKingdomScoreAttributes(kingdom).getScore();
+		return score;
+	}
+	/*
+	public int getKingdomScore(KonKingdom kingdom) {
 		int score = 0;
-		if(kingdom.equals(barbarians)) {
-			return score;
+		if(!kingdom.equals(barbarians)) {
+			// Gather Kingdom metrics
+			int numKingdomTowns = kingdom.getTowns().size();
+	    	ArrayList<KonOfflinePlayer> allPlayersInKingdom = konquest.getPlayerManager().getAllPlayersInKingdom(kingdom.getName());
+	    	int numAllKingdomPlayers = allPlayersInKingdom.size();
+	    	int numKingdomLand = 0;
+	    	for(KonTown town : kingdom.getTowns()) {
+	    		numKingdomLand += town.getChunkList().size();
+	    	}
+	    	int numKingdomFavor = 0;
+	    	for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
+	    		numKingdomFavor += (int) KonquestPlugin.getEconomy().getBalance(kingdomPlayer.getOfflineBukkitPlayer());
+	    	}
+	    	// Gather favor costs
+	    	int cost_settle = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_settle");
+	    	int cost_claim = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
+	    	// Evaluate score based on weighted metrics, normalized for number of total players
+	    	// Raw score based on territory and favor
+	    	score = ((cost_settle+2)*numKingdomTowns) + ((cost_claim+1)*numKingdomLand) + (numKingdomFavor);
+			// Normalized score for player count
+	    	score = (int)((double)score / (double)(numAllKingdomPlayers+1));
 		}
-		// Gather Kingdom metrics
-		int numKingdomTowns = kingdom.getTowns().size();
-    	ArrayList<KonOfflinePlayer> allPlayersInKingdom = konquest.getPlayerManager().getAllPlayersInKingdom(kingdom.getName());
-    	int numAllKingdomPlayers = allPlayersInKingdom.size();
-    	int numKingdomLand = 0;
-    	for(KonTown town : kingdom.getTowns()) {
-    		numKingdomLand += town.getChunkList().size();
-    	}
-    	int numKingdomFavor = 0;
-    	for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
-    		numKingdomFavor += (int) KonquestPlugin.getEconomy().getBalance(kingdomPlayer.getOfflineBukkitPlayer());
-    	}
-    	// Gather favor costs
-    	int cost_settle = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_settle");
-    	int cost_claim = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
-    	// Evaluate score based on weighted metrics, normalized for number of total players
-    	// Raw score based on territory and favor
-    	score = ((cost_settle+2)*numKingdomTowns) + ((cost_claim+1)*numKingdomLand) + (numKingdomFavor);
-		// Normalized score for player count
-    	score = (int)((double)score / (double)(numAllKingdomPlayers+1));
+		return score;
+	}*/
+	
+	public KonPlayerScoreAttributes getPlayerScoreAttributes(KonOfflinePlayer offlinePlayer) {
+		KonPlayerScoreAttributes scoreAttributes = new KonPlayerScoreAttributes();
+		if(!offlinePlayer.isBarbarian() && !offlinePlayer.getKingdom().isPeaceful()) {
+			// Gather player metrics
+			int numTownLords = 0;
+			int numTownKnights = 0;
+			int numTownResidents = 0;
+			int numLordLand = 0;
+			int numKnightLand = 0;
+			int numResidentLand = 0;
+			for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
+				if(town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
+					numTownLords++;
+					numLordLand += town.getChunkList().size();
+				} else if(town.isPlayerElite(offlinePlayer.getOfflineBukkitPlayer())) {
+					numTownKnights++;
+					numKnightLand += town.getChunkList().size();
+				} else if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
+					numTownResidents++;
+					numResidentLand += town.getChunkList().size();
+				}
+			}
+			scoreAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_LORDS, numTownLords);
+			scoreAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_KNIGHTS, numTownKnights);
+			scoreAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_RESIDENTS, numTownResidents);
+			scoreAttributes.setAttribute(KonPlayerScoreAttribute.LAND_LORDS, numLordLand);
+			scoreAttributes.setAttribute(KonPlayerScoreAttribute.LAND_KNIGHTS, numKnightLand);
+			scoreAttributes.setAttribute(KonPlayerScoreAttribute.LAND_RESIDENTS, numResidentLand);
+		}
+		return scoreAttributes;
+	}
+	
+	public int getPlayerScore(KonOfflinePlayer offlinePlayer) {
+		int score = getPlayerScoreAttributes(offlinePlayer).getScore();
 		return score;
 	}
 	
@@ -1158,6 +1437,7 @@ public class KingdomManager {
 	 * @return
 	 */
 	public HashMap<Location,Color> getBorderLocationMap(ArrayList<Chunk> renderChunks, KonPlayer player) {
+		//TODO: Poor coding style, optimize with a general FOR loop
 		HashMap<Location,Color> locationMap = new HashMap<Location,Color>();
 		// Evaluate every chunk in the provided list. If it's claimed, check each adjacent chunk and determine border locations
 		for(Chunk chunk : renderChunks) {
@@ -1346,6 +1626,21 @@ public class KingdomManager {
 		}
 	}
 	
+	public Material getTownCriticalBlock() {
+		return townCriticalBlock;
+	}
+	
+	private void loadCriticalBlocks() {
+		String townCriticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block","");
+		try {
+			townCriticalBlock = Material.valueOf(townCriticalBlockTypeName);
+		} catch(IllegalArgumentException e) {
+			String message = "Invalid monument critical block \""+townCriticalBlockTypeName+"\" given in core.monuments.critical_block, using default OBSIDIAN";
+    		ChatUtil.printConsoleError(message);
+    		konquest.opStatusMessages.add(message);
+		}
+	}
+	
 	private void loadKingdoms() {
 		FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
 		World world = Bukkit.getServer().getWorld(konquest.getWorldName());
@@ -1385,8 +1680,9 @@ public class KingdomManager {
 	        	// Update territory cache
 	        	addAllTerritory(Bukkit.getWorld(konquest.getWorldName()),kingdomMap.get(kingdomName).getCapital().getChunkList());
         	} else {
-        		ChatUtil.printConsole(ChatColor.RED+"Failed to load capital for Kingdom "+kingdomName);
-        		konquest.opStatusMessages.add("Failed to load capital for Kingdom "+kingdomName);
+        		String message = "Failed to load capital for Kingdom "+kingdomName+", is one created?";
+        		ChatUtil.printConsoleError(message);
+        		konquest.opStatusMessages.add(message);
         	}
         	// Create Monument Templates
         	if(monumentSection != null) {
@@ -1406,23 +1702,35 @@ public class KingdomManager {
         		z = sectionList.get(2);
 	        	Location monument_cornertwo = new Location(world,x,y,z);
 	        	// Create a Monument Template region for current Kingdom
-	        	if(monument_cornerone.getX() == 0 && monument_cornerone.getY() == 0 && monument_cornerone.getZ() == 0 &&
-	        			monument_cornertwo.getX() == 0 && monument_cornertwo.getY() == 0 && monument_cornertwo.getZ() == 0) {
-	        		ChatUtil.printConsole(ChatColor.RED+"Failed to load monument template for Kingdom "+kingdomName+", region corners are zero");
-	        	} else {
-	        		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel);
-	        		if(status == 0) {
-	        			//ChatUtil.printDebug("Created monument template for Kingdom "+kingdomName);
-	        		} else {
-	        			ChatUtil.printConsole(ChatColor.RED+"Failed to load monument template for Kingdom "+kingdomName+", error code "+status);
-	        			konquest.opStatusMessages.add("Failed to load monument template for Kingdom "+kingdomName+", error code "+status);
-	        		}
-	        	}
+        		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel);
+        		if(status != 0) {
+        			String message = "Failed to load Monument Template for Kingdom "+kingdomName+", ";
+        			switch(status) {
+	        			case 1:
+	        				message = message+"base dimensions are not 16x16 blocks.";
+	        				break;
+	        			case 2:
+	        				message = message+"region does not contain enough critical blocks.";
+	        				break;
+	        			case 3:
+	        				message = message+"region does not contain a travel point.";
+	        				break;
+	        			case 4:
+	        				message = message+"region is not within Capital territory.";
+	        				break;
+        				default:
+        					message = message+"unknown reason.";
+        					break;
+        			}
+        			ChatUtil.printConsoleError(message);
+        			konquest.opStatusMessages.add(message);
+        		}
         	} else {
-        		ChatUtil.printConsole(ChatColor.RED+"Null monument template for Kingdom "+kingdomName+" in config file!");
+        		ChatUtil.printConsoleError("Null monument template for Kingdom "+kingdomName+" in config file!");
         		konquest.opStatusMessages.add("Missing monument template for Kingdom "+kingdomName+" in kingdoms.yml config file. Use \"/k admin monument\" to define the monument template for this Kingdom.");
         	}
         	// Load all towns
+        	boolean isMissingMonuments = false;
         	for(String townName : kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns").getKeys(false)) {
         		//ChatUtil.printDebug("Loading Town: "+townName);
             	ConfigurationSection townSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns."+townName);
@@ -1446,8 +1754,9 @@ public class KingdomManager {
 	            	// Setup town monument parameters from template
 	            	int status = town.loadMonument(base, kingdomMap.get(kingdomName).getMonumentTemplate());
 	            	if(status != 0) {
-	            		ChatUtil.printConsole(ChatColor.RED+"Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
-	            		konquest.opStatusMessages.add("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
+	            		isMissingMonuments = true;
+	            		ChatUtil.printConsoleError("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
+	            		//konquest.opStatusMessages.add("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            	}
 	            	// Add all Town chunk claims
 	            	town.addPoints(konquest.formatStringToPoints(townSection.getString("chunks")));
@@ -1495,7 +1804,12 @@ public class KingdomManager {
 	            			}
 	            		}
 	            	}
+	            	// Update upgrade status
+	            	konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
             	}
+        	}
+        	if(isMissingMonuments) {
+        		konquest.opStatusMessages.add("Kingdom "+kingdomName+" has Towns with invalid Monuments. You must create a new Monument Template and restart the server.");
         	}
         }
 		ChatUtil.printDebug("Loaded Kingdoms");
@@ -1573,7 +1887,7 @@ public class KingdomManager {
 							 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getY(),
 							 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getZ()});
 				} else {
-					ChatUtil.printConsole(ChatColor.RED+"Failed to save invalid monument template for Kingdom "+kingdom.getName());
+					ChatUtil.printConsoleError("Failed to save invalid monument template for Kingdom "+kingdom.getName());
 				}
 	            ConfigurationSection townsSection = kingdomSection.createSection("towns");
 	            for(KonTown town : kingdom.getTowns()) {
@@ -1667,7 +1981,7 @@ public class KingdomManager {
     		mapPlayer = "<";
     	}
     	// Determine settlement status
-    	String settleTip = "Settle";
+    	String settleTip = "Settle Here";
     	if(isLocValidSettlement(center)) {
     		settleTip = ChatColor.GOLD+settleTip;
     	} else {

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -18,6 +19,7 @@ import org.maxgamer.quickshop.api.QuickShopAPI;
 import org.maxgamer.quickshop.shop.Shop;
 
 import konquest.Konquest;
+import konquest.listener.QuickShopListener;
 //import konquest.model.KonCamp;
 //import konquest.model.KonCapital;
 //import konquest.model.KonPlayer;
@@ -56,8 +58,8 @@ public class IntegrationManager {
 			Plugin quickShop = Bukkit.getPluginManager().getPlugin("QuickShop");
             if (quickShop != null && quickShop.isEnabled()) {
             	isQuickShopEnabled = true;
-            	//integrateQuickShopPlugin();
-            	ChatUtil.printDebug("Successfully integrated QuickShop");
+            	konquest.getPlugin().getServer().getPluginManager().registerEvents(new QuickShopListener(konquest.getPlugin()), konquest.getPlugin());
+            	konquest.getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Successfully integrated QuickShop");
             } else {
             	ChatUtil.printDebug("Failed to integrate QuickShop, plugin not found or disabled");
             }
@@ -71,7 +73,7 @@ public class IntegrationManager {
 			if (provider != null) {
 				lpAPI = provider.getProvider();
 				isLuckPermsEnabled = true;
-				ChatUtil.printDebug("Successfully integrated LuckPerms");
+				konquest.getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Successfully integrated LuckPerms");
 			} else {
 				ChatUtil.printDebug("Failed to integrate LuckPerms, plugin not found or disabled");
 			}

@@ -21,11 +21,9 @@ import konquest.utility.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Particle;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Door;
@@ -67,6 +65,7 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 //import org.bukkit.inventory.ItemStack;
 
 //TODO prevent Barbarians from earning money
@@ -172,7 +171,7 @@ public class PlayerListener implements Listener{
             		int boostPercent = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.smallest_exp_boost_percent");
             		ChatUtil.sendNotice(bukkitPlayer, "Your Kingdom is currently the smallest, enjoy a "+boostPercent+"% EXP boost!", ChatColor.ITALIC);
             	}
-            	if(bukkitPlayer.isOp()) {
+            	if(bukkitPlayer.hasPermission("konquest.command.admin")) {
             		for(String msg : konquest.opStatusMessages) {
             			ChatUtil.sendError(bukkitPlayer, msg);
             		}
@@ -245,71 +244,75 @@ public class PlayerListener implements Listener{
         
         //Check if the event was caused by a player
         if(event.isAsynchronous() && !event.isCancelled()) {
-        	Player bukkitPlayer = event.getPlayer();
-            KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-            KonKingdom kingdom = player.getKingdom();
-            event.setCancelled(true);
-            
-            String title = "";
-            if(player.getPlayerPrefix().isEnabled()) {
-            	title = player.getPlayerPrefix().getMainPrefixName()+" ";
-            }
-            String prefix = konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer);
-            String suffix = konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer);
-            String divider = ChatColor.translateAlternateColorCodes('&', "&7»");
-            
-            if(player.isGlobalChat()) {
-            	//Global chat, all players see this format
-            	ChatUtil.printConsole(ChatColor.GOLD+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
-            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
-            		ChatColor teamColor = ChatColor.WHITE;
-            		ChatColor titleColor = ChatColor.WHITE;
-            		if(player.isBarbarian()) {
-            			teamColor = ChatColor.YELLOW;
-            		} else {
-            			if(globalPlayer.getKingdom().equals(kingdom)) {
-                			// Message sender is in same kingdom as receiver
-                			teamColor = ChatColor.GREEN;
-                			titleColor = ChatColor.DARK_GREEN;
-                		} else {
-                			// Message sender is in different kingdom as receiver
-            				teamColor = ChatColor.RED;
-                			titleColor = ChatColor.DARK_RED;
-                		}
-            		}
-            		globalPlayer.getBukkitPlayer().sendMessage(
-        					ChatColor.translateAlternateColorCodes('&', prefix)+ 
-        					titleColor+ChatColor.translateAlternateColorCodes('&', title)+ 
-        					teamColor+bukkitPlayer.getName()+" "+
-        					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
-        					divider+" "+
-        					ChatColor.WHITE+event.getMessage());
-            	}
-            } else {
-            	//Team chat only (and admins)
-            	ChatUtil.printConsole(ChatColor.GOLD+"[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
-            	for(KonPlayer teamPlayer : playerManager.getPlayersOnline()) {
-            		if(teamPlayer.getKingdom().equals(kingdom)) {
-            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC+ChatColor.GREEN + event.getMessage());
-            			teamPlayer.getBukkitPlayer().sendMessage(
-            					ChatColor.translateAlternateColorCodes('&', prefix)+ 
-            					ChatColor.GREEN+ChatColor.translateAlternateColorCodes('&', title)+
-            					bukkitPlayer.getName()+" "+
-            					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
-            					divider+" "+
-            					ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
-            		} else if(teamPlayer.isAdminBypassActive()) {
-            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K-bypass] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC + event.getMessage());
-            			teamPlayer.getBukkitPlayer().sendMessage(
-            					ChatColor.translateAlternateColorCodes('&', prefix)+ 
-            					ChatColor.GOLD+ChatColor.translateAlternateColorCodes('&', title)+
-            					bukkitPlayer.getName()+" "+
-            					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
-            					divider+" "+
-            					ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
-            		}
-            	}
-            }
+        	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.format_chat_messages",true);
+        	if(enable) {
+	        	// Format chat messages
+	        	Player bukkitPlayer = event.getPlayer();
+	            KonPlayer player = playerManager.getPlayer(bukkitPlayer);
+	            KonKingdom kingdom = player.getKingdom();
+	            event.setCancelled(true);
+	            
+	            String title = "";
+	            if(player.getPlayerPrefix().isEnabled()) {
+	            	title = player.getPlayerPrefix().getMainPrefixName()+" ";
+	            }
+	            String prefix = konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer);
+	            String suffix = konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer);
+	            String divider = ChatColor.translateAlternateColorCodes('&', "&7»");
+	            
+	            if(player.isGlobalChat()) {
+	            	//Global chat, all players see this format
+	            	ChatUtil.printConsole(ChatColor.GOLD+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
+	            		ChatColor teamColor = ChatColor.WHITE;
+	            		ChatColor titleColor = ChatColor.WHITE;
+	            		if(player.isBarbarian()) {
+	            			teamColor = ChatColor.YELLOW;
+	            		} else {
+	            			if(globalPlayer.getKingdom().equals(kingdom)) {
+	                			// Message sender is in same kingdom as receiver
+	                			teamColor = ChatColor.GREEN;
+	                			titleColor = ChatColor.DARK_GREEN;
+	                		} else {
+	                			// Message sender is in different kingdom as receiver
+	            				teamColor = ChatColor.RED;
+	                			titleColor = ChatColor.DARK_RED;
+	                		}
+	            		}
+	            		globalPlayer.getBukkitPlayer().sendMessage(
+	        					ChatColor.translateAlternateColorCodes('&', prefix)+ 
+	        					titleColor+ChatColor.translateAlternateColorCodes('&', title)+ 
+	        					teamColor+bukkitPlayer.getName()+" "+
+	        					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
+	        					divider+" "+
+	        					ChatColor.WHITE+event.getMessage());
+	            	}
+	            } else {
+	            	//Team chat only (and admins)
+	            	ChatUtil.printConsole(ChatColor.GOLD+"[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	            	for(KonPlayer teamPlayer : playerManager.getPlayersOnline()) {
+	            		if(teamPlayer.getKingdom().equals(kingdom)) {
+	            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC+ChatColor.GREEN + event.getMessage());
+	            			teamPlayer.getBukkitPlayer().sendMessage(
+	            					ChatColor.translateAlternateColorCodes('&', prefix)+ 
+	            					ChatColor.GREEN+ChatColor.translateAlternateColorCodes('&', title)+
+	            					bukkitPlayer.getName()+" "+
+	            					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
+	            					divider+" "+
+	            					ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
+	            		} else if(teamPlayer.isAdminBypassActive()) {
+	            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K-bypass] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC + event.getMessage());
+	            			teamPlayer.getBukkitPlayer().sendMessage(
+	            					ChatColor.translateAlternateColorCodes('&', prefix)+ 
+	            					ChatColor.GOLD+ChatColor.translateAlternateColorCodes('&', title)+
+	            					bukkitPlayer.getName()+" "+
+	            					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
+	            					divider+" "+
+	            					ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
+	            		}
+	            	}
+	            }
+        	}
         }
     }
     
@@ -339,7 +342,7 @@ public class PlayerListener implements Listener{
         // When a player is setting regions...
         if (player.isSettingRegion()) {
         	if (event.getClickedBlock() == null) {
-             	ChatUtil.sendNotice(bukkitPlayer, "Stopping region creation.");
+             	ChatUtil.sendNotice(bukkitPlayer, "Clicked in Air, cancelled region creation!");
              	player.setRegionCornerOneBuffer(null);
                 player.setRegionCornerTwoBuffer(null);
                 player.settingRegion(RegionType.NONE);
@@ -353,10 +356,11 @@ public class PlayerListener implements Listener{
 	        	case MONUMENT:
 	                if (player.getRegionCornerOneBuffer() == null) {
 	                	player.setRegionCornerOneBuffer(location);
-	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the second corner of the region...");
+	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the second corner block of the region.");
+	                    ChatUtil.sendNotice(bukkitPlayer, "Base area must be 16x16 (green particles).");
 	                } else if (player.getRegionCornerTwoBuffer() == null) {
 	                	player.setRegionCornerTwoBuffer(location);
-	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the travel point of the region...");
+	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the travel point block.");
 	                } else {
 	                	int createMonumentStatus = kingdomManager.getKingdom(player.getRegionKingdomName()).createMonumentTemplate(player.getRegionCornerOneBuffer(), player.getRegionCornerTwoBuffer(), location);
 	                	switch(createMonumentStatus) {
@@ -364,10 +368,20 @@ public class PlayerListener implements Listener{
 	    					ChatUtil.sendNotice(bukkitPlayer, "Successfully created new Monument Template for kingdom "+player.getRegionKingdomName());
 	    					break;
 	    				case 1:
-	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, it must be 16x16 blocks.");
+	    					int diffX = (int)Math.abs(player.getRegionCornerOneBuffer().getX()-player.getRegionCornerTwoBuffer().getX())+1;
+	    					int diffZ = (int)Math.abs(player.getRegionCornerOneBuffer().getZ()-player.getRegionCornerTwoBuffer().getZ())+1;
+	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, base must be 16x16 blocks but got "+diffX+"x"+diffZ);
 	    					break;
 	    				case 2:
-	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, it lacks the minimum number of critical blocks.");
+	    					String criticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block");
+	    					int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
+	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, it must contain at least "+maxCriticalhits+" "+criticalBlockTypeName+" blocks");
+	    					break;
+	    				case 3:
+	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, travel point must be inside of the region");
+	    					break;
+	    				case 4:
+	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, region must be within "+player.getRegionKingdomName()+" Capital territory");
 	    					break;
 	    				default:
 	    					ChatUtil.sendError(bukkitPlayer, "Could not create Monument Template: Unknown cause = "+createMonumentStatus);
@@ -383,13 +397,13 @@ public class PlayerListener implements Listener{
 	        		if(kingdomManager.isChunkClaimed(location.getChunk())) {
 	        			KonTerritory territory = kingdomManager.getChunkTerritory(location.getChunk());
 	        			if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
-	        				String criticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.ruins.critical_block");
-	        				if(event.getClickedBlock().getType().equals(Material.valueOf(criticalBlockTypeName))) {
+	        				Material criticalType = konquest.getRuinManager().getRuinCriticalBlock();
+	        				if(event.getClickedBlock().getType().equals(criticalType)) {
 	        					((KonRuin)territory).addCriticalLocation(location);
 		        				ruinName = territory.getName();
 		        				validCriticalBlock = true;
 	        				} else {
-	        					ChatUtil.sendError(bukkitPlayer, "Clicked block does not match type: "+criticalBlockTypeName);
+	        					ChatUtil.sendError(bukkitPlayer, "Clicked block does not match type: "+criticalType.toString());
 	        				}
 	        			}
 	        		}
@@ -431,6 +445,9 @@ public class PlayerListener implements Listener{
         			if(!(event.getClickedBlock().getState() instanceof Sign)) {
         				//ChatUtil.printDebug("Interaction was not a sign");
         				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+        				if(event.getPlayer().hasPermission("konquest.command.admin")) {
+        					ChatUtil.sendNotice(bukkitPlayer,"Use \"/k admin bypass\" to ignore capital preventions.");
+        				}
 	        			event.setCancelled(true);
 	        			return;
         			}
@@ -496,15 +513,29 @@ public class PlayerListener implements Listener{
         	if(event.hasItem()) {
             	if(event.getItem().getType().isRecord() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             		if(event.hasBlock() && event.getClickedBlock().getType().equals(Material.JUKEBOX)) {
-            			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.MUSIC,1);
-            		}
-            	} else if(event.getItem().getType().equals(Material.STICK) && event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-            		if(event.hasBlock()) {
-            			player.getBukkitPlayer().spawnParticle(Particle.REDSTONE, event.getClickedBlock().getLocation().add(0.5,1,0.5), 5, 0.25, 0, 0.25, new Particle.DustOptions(Color.GREEN,2));
+            			// Update music stat when not on record cooldown
+            			if(player.isRecordPlayCooldownOver()) {
+            				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.MUSIC,1);
+            				player.markRecordPlayCooldown();
+            			}
             		}
             	}
         	}
         }
+    }
+    
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerEnterVehicle(VehicleEnterEvent event) {
+    	Entity ent = event.getEntered();
+    	if(ent instanceof Player && konquest.getKingdomManager().isChunkClaimed(event.getVehicle().getLocation().getChunk())) {
+    		KonPlayer player = konquest.getPlayerManager().getPlayer((Player)ent);
+    		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getVehicle().getLocation().getChunk());
+    		if(player != null && territory != null && !territory.getKingdom().equals(player.getKingdom()) && territory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    			ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+    			event.setCancelled(true);
+				return;
+    		}
+    	}
     }
     
     @EventHandler(priority = EventPriority.NORMAL)

@@ -32,22 +32,31 @@ public class UpgradeManager {
 	}
 	
 	public void initialize() {
-		loadUpgrades();
+		if(!loadUpgrades()) {
+        	// Encountered invalid upgrades.yml, overwrite with default
+        	konquest.getConfigManager().overwriteBadConfig("upgrades");
+        	konquest.getConfigManager().updateConfigVersion("upgrades");
+        	// Attempt to load again
+        	if(!loadUpgrades()) {
+        		ChatUtil.printConsoleError("Failed to load bad upgrades from upgrades.yml. Try deleting all upgrades files and re-starting the server.");
+        	}
+        }
 		isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_upgrades",false);
 		ChatUtil.printDebug("Upgrade Manager is ready, enabled "+isEnabled);
 	}
 	
-	private void loadUpgrades() {
+	private boolean loadUpgrades() {
 		upgradeCosts.clear();
 		upgradePopulations.clear();
 		FileConfiguration upgradesConfig = konquest.getConfigManager().getConfig("upgrades");
         if (upgradesConfig.get("upgrades") == null) {
         	ChatUtil.printDebug("There is no upgrades section in upgrades.yml");
-            return;
+            return false;
         }
         List<Integer> costList;
         List<Integer> popList;
         KonUpgrade upgrade;
+        boolean status = true;
         for(String upgradeName : upgradesConfig.getConfigurationSection("upgrades").getKeys(false)) {
         	upgrade = KonUpgrade.getUpgrade(upgradeName);
         	if(upgrade != null) {
@@ -58,11 +67,13 @@ public class UpgradeManager {
         			costList = upgradeSection.getIntegerList("costs");
         		} else {
         			ChatUtil.printDebug("Upgrades.yml is missing costs section for: "+upgradeName);
+        			status = false;
         		}
         		if(upgradeSection.contains("populations")) {
         			popList = upgradeSection.getIntegerList("populations");
         		} else {
         			ChatUtil.printDebug("Upgrades.yml is missing populations section for: "+upgradeName);
+        			status = false;
         		}
         		// Check array lengths
         		if(costList.size() == upgrade.getMaxLevel() && popList.size() == upgrade.getMaxLevel()) {
@@ -71,28 +82,40 @@ public class UpgradeManager {
         			//ChatUtil.printDebug("Upgrade Manager loaded "+upgradeName+" with "+costList.size()+" levels.");
         		} else {
         			ChatUtil.printDebug("Upgrades.yml has the wrong number of costs/populations for "+upgradeName+", has "+costList.size()+" costs and "+popList.size()+" populations, but expected "+upgrade.getMaxLevel());
+        			status = false;
         		}
         	} else {
         		ChatUtil.printDebug("Upgrades.yml contains bad upgrade name: "+upgradeName);
+        		status = false;
         	}
         }
+        return status;
 	}
 	
+	/**
+	 * Provides a list of upgrades available for purchase for the given town.
+	 * Checks for valid cost and level requirements
+	 * Upgrade levels will not be listed if cost is less than 0 (e.g. -1)
+	 * @param town
+	 * @return
+	 */
 	public HashMap<KonUpgrade,Integer> getAvailableUpgrades(KonTown town) {
 		HashMap<KonUpgrade,Integer> result = new HashMap<KonUpgrade,Integer>();
 		//ChatUtil.printDebug("Generating available upgrades for town "+town.getName());
 		for(KonUpgrade upgrade : KonUpgrade.values()) {
 			int currentLevel = town.getRawUpgradeLevel(upgrade);
+			int nextLevel = currentLevel+1;
+			int nextCost = getUpgradeCost(upgrade,nextLevel);
 			//ChatUtil.printDebug("Upgrade "+upgrade.toString()+" is at level "+currentLevel+" out of "+upgrade.getMaxLevel());
-			if(currentLevel < upgrade.getMaxLevel()) {
-				result.put(upgrade, currentLevel+1);
+			if(nextCost >= 0 && nextLevel <= upgrade.getMaxLevel()) {
+				result.put(upgrade, nextLevel);
 			}
 		}
 		return result;
 	}
 	
 	public int getUpgradeCost(KonUpgrade upgrade, int level) {
-		int result = 0;
+		int result = -1;
 		if(level > 0 && level <= upgrade.getMaxLevel()) {
 			if(upgradeCosts.containsKey(upgrade)) {
 				result = upgradeCosts.get(upgrade).get(level-1);
@@ -164,6 +187,21 @@ public class UpgradeManager {
 		return true;
 	}
 	
+	public boolean forceTownUpgrade(KonTown town, KonUpgrade upgrade, int level, Player bukkitPlayer) {
+		// Check that upgrades are enabled
+		if(!isEnabled) {
+			ChatUtil.sendError(bukkitPlayer, "Error forcing "+upgrade.getDescription()+" level "+level+": upgrades are currently disabled.");
+			return false;
+		}
+		town.addUpgrade(upgrade, level);
+		if(upgrade.equals(KonUpgrade.HEALTH)) {
+			konquest.getKingdomManager().refreshTownHearts(town);
+		}
+		ChatUtil.sendNotice(bukkitPlayer, "Forced "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
+		ChatUtil.printDebug("Applied forced upgrade "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
+		return true;
+	}
+	
 	public int getTownUpgradeLevel(KonTown town, KonUpgrade upgrade) {
 		int result = 0;
 		if(isEnabled) {
@@ -178,23 +216,31 @@ public class UpgradeManager {
 			int level = town.getRawUpgradeLevel(upgrade);
 			if(level > 0) {
 				if(isEnabled) {
-					// Check every purchased upgrade meets pop requirement
-					int townPop = town.getPlayerResidents().size();
-					if(townPop < upgradePopulations.get(upgrade).get(level-1)) {
-						// Current population is below this upgrade level's requirement
-						// Find new level for disabled upgrade, down to 0 minimum
-						int newLevel = level;
-						while(newLevel > 0 && townPop < upgradePopulations.get(upgrade).get(newLevel-1)) {
-							newLevel--;
+					// Check if the upgrade is disabled (cost < 0)
+					int cost = getUpgradeCost(upgrade,level);
+					if(cost >= 0) {
+						// Check every purchased upgrade meets pop requirement
+						int townPop = town.getPlayerResidents().size();
+						if(townPop < upgradePopulations.get(upgrade).get(level-1)) {
+							// Current population is below this upgrade level's requirement
+							// Find new level for disabled upgrade, down to 0 minimum
+							int newLevel = level;
+							while(newLevel > 0 && townPop < upgradePopulations.get(upgrade).get(newLevel-1)) {
+								newLevel--;
+							}
+							town.disableUpgrade(upgrade,newLevel);
+							ChatUtil.printDebug("Disabled upgrade "+upgrade.getDescription()+" from level "+level+" to "+newLevel+" for town "+town.getName());
+						} else {
+							// Current population is greater than or equal to this upgrade level's requirement
+							boolean status = town.allowUpgrade(upgrade);
+							if(status) {
+								ChatUtil.printDebug("Successfully allowed upgrade "+upgrade.getDescription()+" level "+level+" for town "+town.getName());
+							}
 						}
-						town.disableUpgrade(upgrade,newLevel);
-						ChatUtil.printDebug("Disabled upgrade "+upgrade.getDescription()+" from level "+level+" to "+newLevel+" for town "+town.getName());
 					} else {
-						// Current population is greater than or equal to this upgrade level's requirement
-						boolean status = town.allowUpgrade(upgrade);
-						if(status) {
-							ChatUtil.printDebug("Successfully allowed upgrade "+upgrade.getDescription()+" level "+level+" for town "+town.getName());
-						}
+						// This upgrade level is disabled because either the cost is set to a negative number or is missing from the upgrades.yml
+						town.disableUpgrade(upgrade,0);
+						ChatUtil.printDebug("Disabled invalid upgrade "+upgrade.getDescription()+" to level 0 for town "+town.getName()+", cost is "+cost);
 					}
 				} else {
 					// Upgrades are disabled in config, disable every purchased upgrade

@@ -30,11 +30,11 @@ public class BypassAdminCommand extends CommandBase {
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	if(player.isAdminBypassActive()) {
         		player.setIsAdminBypassActive(false);
-        		ChatUtil.sendNotice((Player) getSender(), "Disabled admin bypass mode");
+        		ChatUtil.sendNotice((Player) getSender(), "Disabled admin bypass.");
         		ChatUtil.resetTitle((Player) getSender());
         	} else {
         		player.setIsAdminBypassActive(true);
-        		ChatUtil.sendNotice((Player) getSender(), "Enabled admin bypass mode");
+        		ChatUtil.sendNotice((Player) getSender(), "Enabled admin bypass, use this command again to disable.");
         		ChatUtil.sendConstantTitle((Player) getSender(), "", ChatColor.GOLD+"BYPASS");
         	}
         }

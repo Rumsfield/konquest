@@ -5,7 +5,9 @@ public enum KonPrefixType {
 	// Royalty - special cases
 	KING		(KonPrefixCategory.ROYALTY, 20, "King"),
 	QUEEN		(KonPrefixCategory.ROYALTY, 20, "Queen"),
-	REGENT		(KonPrefixCategory.ROYALTY, 10, "Regent"),
+	PRINCE		(KonPrefixCategory.ROYALTY, 10, "Prince"),
+	PRINCESS	(KonPrefixCategory.ROYALTY, 10, "Princess"),
+	NOBLE		(KonPrefixCategory.ROYALTY, 5, "Noble"),
 	// Clergy - enchanting and potions accomplishments
 	CARDINAL	(KonPrefixCategory.CLERGY, 1000, "Cardinal"),
 	BISHOP		(KonPrefixCategory.CLERGY, 750, "Bishop"),
@@ -45,6 +47,7 @@ public enum KonPrefixType {
 	SPROUT		(KonPrefixCategory.FARMING, 50, "Sprout"),
 	// Misc - miscellaneous accomplishments
 	JESTER		(KonPrefixCategory.JOKING, 100, "Jester"),
+	FOOL		(KonPrefixCategory.JOKING, 69, "Fool"),
 	DANCER		(KonPrefixCategory.JOKING, 50, "Dancer"),
 	BARD		(KonPrefixCategory.JOKING, 20, "Bard"),
 	FISHERMAN	(KonPrefixCategory.FISHING, 200, "Fisherman"),
