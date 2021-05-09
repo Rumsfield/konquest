@@ -34,7 +34,7 @@ public class ChatUtil {
 	}
 	
 	public static void printConsoleError(String message) {
-		String error = errorColor + "[Konquest] " + message;
+		String error = errorColor + "[Konquest ERROR] " + message;
 		Bukkit.getServer().getConsoleSender().sendMessage(error);
 	}
 
