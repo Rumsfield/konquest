@@ -16,6 +16,7 @@ import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -59,6 +60,7 @@ public class KingdomManager {
 	private HashMap<World,KonTerritoryCache> territoryWorldCache;
 	private HashMap<String,KonCamp> barbarianCamps;
 	private HashMap<PotionEffectType,Integer> townNerfs;
+	private Material townCriticalBlock;
 	
 	public static int DEFAULT_MAP_SIZE = 9; // 10 lines of chat, minus one for header, odd so player's chunk is centered
 	
@@ -70,9 +72,11 @@ public class KingdomManager {
 		territoryWorldCache = new HashMap<World,KonTerritoryCache>();
 		barbarianCamps = new HashMap<String,KonCamp>();
 		townNerfs = new HashMap<PotionEffectType,Integer>();
+		townCriticalBlock = Material.OBSIDIAN;
 	}
 	
 	public void initialize() {
+		loadCriticalBlocks();
 		loadKingdoms();
 		updateKingdomOfflineProtection();
 		makeTownNerfs();
@@ -1619,6 +1623,21 @@ public class KingdomManager {
 			for(KonTown town : kingdom.getTowns()) {
 				konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
 			}
+		}
+	}
+	
+	public Material getTownCriticalBlock() {
+		return townCriticalBlock;
+	}
+	
+	private void loadCriticalBlocks() {
+		String townCriticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block","");
+		try {
+			townCriticalBlock = Material.valueOf(townCriticalBlockTypeName);
+		} catch(IllegalArgumentException e) {
+			String message = "Invalid monument critical block \""+townCriticalBlockTypeName+"\" given in core.monuments.critical_block, using default OBSIDIAN";
+    		ChatUtil.printConsoleError(message);
+    		konquest.opStatusMessages.add(message);
 		}
 	}
 	

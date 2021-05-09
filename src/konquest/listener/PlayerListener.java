@@ -397,13 +397,13 @@ public class PlayerListener implements Listener{
 	        		if(kingdomManager.isChunkClaimed(location.getChunk())) {
 	        			KonTerritory territory = kingdomManager.getChunkTerritory(location.getChunk());
 	        			if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
-	        				String criticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.ruins.critical_block");
-	        				if(event.getClickedBlock().getType().equals(Material.valueOf(criticalBlockTypeName))) {
+	        				Material criticalType = konquest.getRuinManager().getRuinCriticalBlock();
+	        				if(event.getClickedBlock().getType().equals(criticalType)) {
 	        					((KonRuin)territory).addCriticalLocation(location);
 		        				ruinName = territory.getName();
 		        				validCriticalBlock = true;
 	        				} else {
-	        					ChatUtil.sendError(bukkitPlayer, "Clicked block does not match type: "+criticalBlockTypeName);
+	        					ChatUtil.sendError(bukkitPlayer, "Clicked block does not match type: "+criticalType.toString());
 	        				}
 	        			}
 	        		}

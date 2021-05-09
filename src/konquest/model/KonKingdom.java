@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 
@@ -165,7 +164,6 @@ public class KonKingdom implements Timeable{
 		}
 		// Check for at least as many critical blocks as required critical hits
 		// Also check for any chests for loot flag
-		String criticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block");
 		int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
 		int bottomBlockX, bottomBlockY, bottomBlockZ = 0;
 		int topBlockX, topBlockY, topBlockZ = 0;
@@ -187,7 +185,7 @@ public class KonKingdom implements Timeable{
             for (int y = bottomBlockY; y <= topBlockY; y++) {
                 for (int z = bottomBlockZ; z <= topBlockZ; z++) {
                 	Block monumentBlock = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getBlockAt(x, y, z);
-                	if(monumentBlock.getType().equals(Material.valueOf(criticalBlockTypeName))) {
+                	if(monumentBlock.getType().equals(konquest.getKingdomManager().getTownCriticalBlock())) {
                 		criticalBlockCount++;
                 	} else if(monumentBlock.getState() instanceof Chest) {
                 		containsChest = true;
