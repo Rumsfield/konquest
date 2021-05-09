@@ -41,13 +41,13 @@
 #  camps:
 #    init_radius:                   Radius of camps for barbarians. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
 #  monuments:
-#    critical_block*:               Blocks which must be destroyed to capture a town monument (Material, https://minecraft-ids.grahamedgecombe.com/, e.g. for obsidian, enum is minecraft:obsidian, use OBSIDIAN)
+#    critical_block*:               Blocks which must be destroyed to capture a town monument (Material, https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html, e.g. for obsidian, enum is OBSIDIAN)
 #    destroy_amount:                Amount of each destroy_blocks that must be destroyed to capture a town monument (integer >= 0)
 #    damage_regen:                  The time in seconds it takes a damaged monument to regenerate after being attacked (integer >= 0)
 #    loot_refresh:                  Time in seconds between monument loot refresh (integer >= 0)
 #    loot_count:                    Number of loot items to appear in monument loot chests (integer >= 0)
 #  ruins:
-#    critical_block*:               Blocks which must be destroyed to capture a ruin (Material, https://minecraft-ids.grahamedgecombe.com/, e.g. for obsidian, enum is minecraft:obsidian, use OBSIDIAN)
+#    critical_block*:               Blocks which must be destroyed to capture a ruin (Material, https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html, e.g. for obsidian, enum is OBSIDIAN)
 #    capture_cooldown:              Time in seconds between ruin captures (integer >= 0)
 #    respawn_cooldown:              Time in seconds for ruin golems to respawn (integer >= 0)
 #    capture_reward_favor:          Amount of Favor rewarded to players upon ruin capture (integer >= 0)
