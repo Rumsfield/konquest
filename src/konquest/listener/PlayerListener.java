@@ -89,78 +89,7 @@ public class PlayerListener implements Listener{
     public void onPlayerJoin(PlayerJoinEvent event) {
     	//ChatUtil.printDebug("EVENT: Player Joined");
     	Player bukkitPlayer = event.getPlayer();
-    	bukkitPlayer.setScoreboard(konquest.getScoreboard());
-    	// Fetch player from the database
-    	// Also instantiates player object in PlayerManager
-    	konquest.getDatabaseThread().getDatabase().fetchPlayerData(bukkitPlayer);
-    	KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-    	/*
-    	// Add the player as a KonPlayer, either load from players.yml or create new barbarian
-    	if(playerManager.loadPlayer(bukkitPlayer)) {
-    		player = playerManager.getPlayer(bukkitPlayer);
-    		ChatUtil.printDebug("Loaded existing player: "+bukkitPlayer.getDisplayName());
-    	} else {
-    		player = playerManager.createKonPlayer(bukkitPlayer,konquest.getKingdomManager().getBarbarians(),true);
-    		ChatUtil.printDebug("Added new player: "+bukkitPlayer.getDisplayName());
-    		// save player data to config files
-    		playerManager.savePlayer(player);
-        	playerManager.updateAllSavedPlayers();
-    	}
-    	*/
-    	// Update all player's nametag color packets
-    	konquest.updateNamePackets();
-    	// Update offline protections
-    	kingdomManager.updateKingdomOfflineProtection();
-    	// Update player membership stats
-    	kingdomManager.updatePlayerMembershipStats(player);
-    	/*
-    	List<String> friendlyNames = new ArrayList<String>();
-    	List<String> enemyNames = new ArrayList<String>();
-    	KonKingdom myKingdom = playerManager.getPlayer(bukkitPlayer).getKingdom();
-    	for(KonPlayer player : playerManager.getPlayersOnline()) {
-    		if(player.getKingdom().equals(myKingdom)) {
-    			friendlyNames.add(player.getBukkitPlayer().getName());
-    		} else if(!player.getKingdom().isPeaceful() && !player.getKingdom().equals(myKingdom)) {
-    			enemyNames.add(player.getBukkitPlayer().getName());
-    		}
-    	}
-    	if(!friendlyNames.isEmpty()) {
-    		konquest.setPlayersToFriendlies(bukkitPlayer, friendlyNames);
-    	}
-    	if(!enemyNames.isEmpty()) {
-    		konquest.setPlayersToEnemies(bukkitPlayer, enemyNames);
-    	}
-    	*/
-    	// Updates based on login position
-    	Chunk chunkLogin = bukkitPlayer.getLocation().getChunk();
-    	kingdomManager.clearTownHearts(player);
-    	if(kingdomManager.isChunkClaimed(chunkLogin)) {
-			KonTerritory loginTerritory = kingdomManager.getChunkTerritory(chunkLogin);
-    		if(loginTerritory.getTerritoryType().equals(KonTerritoryType.TOWN)) { 
-	    		// Player joined located within a Town
-	    		KonTown town = (KonTown) loginTerritory;
-	    		town.addBarPlayer(playerManager.getPlayer(bukkitPlayer));
-	    		// For enemy players, apply effects
-	    		if(!player.getKingdom().equals(town.getKingdom())) {
-	    			kingdomManager.applyTownNerf(player, town);
-	    			kingdomManager.clearTownHearts(player);
-	    		} else {
-	    			kingdomManager.clearTownNerf(player);
-	    			kingdomManager.applyTownHearts(player, town);
-	    		}
-    		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
-    			// Player joined located within a Ruin
-    			KonRuin ruin = (KonRuin) loginTerritory;
-    			ruin.addBarPlayer(playerManager.getPlayer(bukkitPlayer));
-    			ruin.spawnAllGolems();
-    		}
-		} else {
-			// Player joined located outside of a Town
-			kingdomManager.clearTownNerf(player);
-		}
-    	kingdomManager.updatePlayerBorderParticles(player,bukkitPlayer.getLocation());
-    	ChatUtil.resetTitle(bukkitPlayer);
-    	
+    	KonPlayer player = konquest.initPlayer(bukkitPlayer);
     	// Schedule messages to display after 10-tick delay (0.5 second)
     	Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override

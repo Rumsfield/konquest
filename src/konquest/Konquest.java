@@ -37,7 +37,9 @@ import konquest.manager.UpgradeManager;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
+import konquest.model.KonRuin;
 import konquest.model.KonTerritory;
+import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.nms.TeamPacketSender;
@@ -171,6 +173,60 @@ public class Konquest implements Timeable {
 		compassTimer.stopTimer();
 		compassTimer.setTime(30); // 30 second compass update interval
 		compassTimer.startLoopTimer();
+	}
+	
+	/**
+	 * Fetch any players that happen to be in the server already (typically from /reload)
+	 */
+	public void initAllPlayers() {
+		for(Player bukkitPlayer : Bukkit.getServer().getOnlinePlayers()) {
+			initPlayer(bukkitPlayer);
+		}
+	}
+	
+	public KonPlayer initPlayer(Player bukkitPlayer) {
+		KonPlayer player = null;
+		bukkitPlayer.setScoreboard(getScoreboard());
+    	// Fetch player from the database
+    	// Also instantiates player object in PlayerManager
+		databaseThread.getDatabase().fetchPlayerData(bukkitPlayer);
+    	player = playerManager.getPlayer(bukkitPlayer);
+    	// Update all player's nametag color packets
+    	updateNamePackets();
+    	// Update offline protections
+    	kingdomManager.updateKingdomOfflineProtection();
+    	// Update player membership stats
+    	kingdomManager.updatePlayerMembershipStats(player);
+    	// Updates based on login position
+    	Chunk chunkLogin = bukkitPlayer.getLocation().getChunk();
+    	kingdomManager.clearTownHearts(player);
+    	if(kingdomManager.isChunkClaimed(chunkLogin)) {
+			KonTerritory loginTerritory = kingdomManager.getChunkTerritory(chunkLogin);
+    		if(loginTerritory.getTerritoryType().equals(KonTerritoryType.TOWN)) { 
+	    		// Player joined located within a Town
+	    		KonTown town = (KonTown) loginTerritory;
+	    		town.addBarPlayer(playerManager.getPlayer(bukkitPlayer));
+	    		// For enemy players, apply effects
+	    		if(!player.getKingdom().equals(town.getKingdom())) {
+	    			kingdomManager.applyTownNerf(player, town);
+	    			kingdomManager.clearTownHearts(player);
+	    		} else {
+	    			kingdomManager.clearTownNerf(player);
+	    			kingdomManager.applyTownHearts(player, town);
+	    		}
+    		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+    			// Player joined located within a Ruin
+    			KonRuin ruin = (KonRuin) loginTerritory;
+    			ruin.addBarPlayer(playerManager.getPlayer(bukkitPlayer));
+    			ruin.spawnAllGolems();
+    		}
+		} else {
+			// Player joined located outside of a Town
+			kingdomManager.clearTownNerf(player);
+		}
+    	kingdomManager.updatePlayerBorderParticles(player,bukkitPlayer.getLocation());
+    	ChatUtil.resetTitle(bukkitPlayer);
+		return player;
 	}
 	
 	public static Konquest getInstance() {
