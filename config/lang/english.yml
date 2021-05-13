@@ -1,0 +1,28 @@
+# Language File
+# English
+# 
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
+generic:
+  error:
+    deny-barbarian: Barbarians cannot do this
+    
+  notice:
+    
+commands:
+  chat:   
+    notice:
+      enable: Kingdom chat
+      disable: Global chat
+  claim:
+    notice:
+      enable-auto: Enabled auto claim. Use this command again to disable.
+      disable-auto: Disabled auto claim.
+  exile:
+    notice:
+      prompt-line-1: Are you sure you want to become a Barbarian?
+      prompt-line-2: You will lose all Favor, stats and titles, and be sent to a random location in the wild.
+      prompt-line-3a: Once exiled, you may join any other Kingdom.
+      prompt-line-3b: You can only rejoin your current Kingdom, else you must ask an admin to switch Kingdoms.
+      prompt-line-4: Use this command again to confirm.
+      confirmed: You have been exiled as a Barbarian.
