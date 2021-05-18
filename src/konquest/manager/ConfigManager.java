@@ -12,10 +12,12 @@ public class ConfigManager{
 	
 	private Konquest konquest;
 	private HashMap<String, KonConfig> configCache;
+	private String language;
 	
 	public ConfigManager(Konquest konquest) {
 		this.konquest = konquest;
         this.configCache = new HashMap<String, KonConfig>();
+        this.language = "english";
 	}
         
 	public void initialize() {
@@ -26,18 +28,26 @@ public class ConfigManager{
 		addConfig("camps", new KonConfig("camps"));
 		addConfig("kingdoms", new KonConfig("kingdoms"));
 		addConfig("ruins", new KonConfig("ruins"));
-		
-        //System.out.println("[Konquest]: Debug is "+getConfig("core").getBoolean("core.debug"));
+		language = getConfig("core").getString("language","english");
+		if(!addConfig("language", new KonConfig("lang/"+language))) {
+			addConfig("language", new KonConfig("lang/english"));
+			ChatUtil.printConsoleError("Failed to find language file "+language+".yml in Konquest/lang folder. Using default lang/english.yml.");
+		} else {
+			ChatUtil.printConsole("Using "+language+" language file.");
+		}
 	}
 	
 	public FileConfiguration getConfig(String key) {
 		return configCache.get(key).getConfig();
 	}
 	
-	public void addConfig(String key, KonConfig config) {
-		config.saveDefaultConfig();
-		config.reloadConfig();
-		configCache.put(key, config);
+	public boolean addConfig(String key, KonConfig config) {
+		boolean status = config.saveDefaultConfig();
+		if(status) {
+			config.reloadConfig();
+			configCache.put(key, config);
+		}
+		return status;
 	}
 	
 	public HashMap<String, KonConfig> getConfigCache() {

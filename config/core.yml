@@ -81,6 +81,7 @@
 # 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
+language: english
 core:
   debug: false
   world_name: world

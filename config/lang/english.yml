@@ -1,28 +1,171 @@
 # Language File
 # English
 # 
+# "%" are substitutes for words or numbers by the plugin.
+# %d = number, %s = word
+# If a line has a "%", keep it. You cannot add or remove any "%".
+# 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
+labels:
+  online-players: "Online Players"
+  total-players: "Total Players"
+  players: "Players"
+  kingdoms: "Kingdoms"
+  towns: "Towns"
+  land: "Land"
+  favor: "Favor"
+  open: "Open"
+  health: "Health"
+  upgrades: "Upgrades"
+  residents: "Residents"
+  invites: "Invites"
+  requests: "Requests"
 generic:
   error:
-    deny-barbarian: Barbarians cannot do this
-    
+    deny-barbarian: "Barbarians cannot do this."
+    internal: "Internal error, contact an admin."
+    internal-message: "Internal error: %s"
+    invalid-parameters: "The command did not have valid parameters. Use /k help."
+    invalid-world: "The command cannot be used in this world."
+    no-permission: "You do not have permission to do that."
+    no-allow: "You are not allowed to do that."
+    no-player: "You must be a player to do this!"
+    unknown-name: "Failed to find unknown name, check spelling: %s"
+    bad-name: "Could not find %s in your Kingdom."
+    no-favor: "Not enough Favor, need %s"
+    reduce-favor: "Favor reduced by %s, total: %s"
+    enemy-player: "That player is an enemy."
+    enemy-town: "That is an enemy town."
+    disabled: "This feature is currently disabled, talk to an admin."
   notice:
-    
-commands:
-  chat:   
+    enable-auto: "Enabled. Use this command again to disable."
+    disable-auto: "Disabled."
+command:
+  chat:
     notice:
-      enable: Kingdom chat
-      disable: Global chat
-  claim:
-    notice:
-      enable-auto: Enabled auto claim. Use this command again to disable.
-      disable-auto: Disabled auto claim.
+      enable: "Kingdom chat"
+      disable: "Global chat"
   exile:
     notice:
-      prompt-line-1: Are you sure you want to become a Barbarian?
-      prompt-line-2: You will lose all Favor, stats and titles, and be sent to a random location in the wild.
-      prompt-line-3a: Once exiled, you may join any other Kingdom.
-      prompt-line-3b: You can only rejoin your current Kingdom, else you must ask an admin to switch Kingdoms.
-      prompt-line-4: Use this command again to confirm.
-      confirmed: You have been exiled as a Barbarian.
+      prompt-line-1: "Are you sure you want to become a Barbarian?"
+      prompt-line-2: "You will lose all Favor, stats and titles, and be sent to a random location in the wild."
+      prompt-line-3a: "Once exiled, you may join any other Kingdom."
+      prompt-line-3b: "You can only rejoin your current Kingdom, else you must ask an admin to switch Kingdoms."
+      prompt-line-4: "Use this command again to confirm."
+      confirmed: "You have been exiled as a Barbarian."
+  favor:
+    notice:
+      message: "You have %s Favor, costs are..."
+  help:
+    notice:
+      message: "Help - Command, Arguments, Description, Alias"
+  info:
+    notice:
+      kingdom-header: "Kingdom of %s"
+      town-header: "Town of %s"
+  join:
+    broadcast:
+      player-join: "%s has joined Kingdom %s"
+    notice:
+      kingdom-join: "Joined Kingdom %s"
+      town-resident: "%s has joined as a resident of %s"
+      town-join-lord: "You have joined as the lord of %s"
+      town-request: "Sending a request to join %s. Wait for the Lord or Knight to add you."
+    error:
+      no-kingdoms: "There are no Kingdoms. Create one with \"/k admin makekingdom <name>\"."
+      kingdom-limit: "The Kingdom %s has too many players! Use \"/k join\" to join the smallest Kingdom."
+      kingdom-denied: "You cannot join a rival Kingdom. Ask an admin to move you."
+      kingdom-member: "You are already a member."
+      kingdom-exile: "You cannot switch Kingdoms unless you are exiled. Use \"/k exile\"."
+      town-member: "You are already a resident of %s"
+      town-request: "You have already requested to join %s"
+  leave:
+    notice:
+      town-resident: "%s has left the town of %s"
+      player: "You have left the town of %s"
+      invite-decline: "You declined the invite to join %s"
+    error:
+      no-resident: "You are not a resident of %s"
+  list:
+    notice:
+      towns: "Towns in your Kingdom"
+  prefix:
+    notice:
+      off-success: "Turned off your prefix title"
+      off-fail: "Your prefix title is already off"
+      new-success: "Your prefix is now %s"
+      new-fail: "The prefix %s is not unlocked!"
+  score:
+    notice:
+      all-header: "All Kingdom scores"
+      score: "Your score: %s, Kingdom of %s score: %s"
+      player: "%s's score: %s, Kingdom of %s score: %s"
+    error:
+      peaceful: "The Kingdom of %s is peaceful, and cannot be scored."
+      barbarian: "%s is a Barbarian, and cannot be scored."
+  settle:
+    broadcast:
+      settle: "%s has settled the Town of %s for Kingdom %s"
+    notice:
+      success: "Successfully settled new Town: %s"
+      map-hint: "Use \"/k map\" for helpful info."
+    error:
+      missing-name: "Must specify a town name."
+      space-name: "Bad town name, cannot use spaces."
+      bad-name: "Town name must only contain letters and/or numbers."
+      fail-name: "Invalid Town name, already taken or has spaces."
+      fail-overlap: "Town overlaps with a nearby territory."
+      fail-placement: "Could not find a good Monument placement."
+      fail-template: "Invalid Monument Template. Use \"/k admin monument <kingdom> create\""
+      fail-proximity: "Town is too close to another territory. Currently %s chunks away, must be at least %s."
+      fail-flat: "Your chunk area is not flat enough. Press F3+G to view chunk boundaries. Cut down trees and flatten the ground!"
+      fail-height: "Elevation is too high. Try settling somewhere lower."
+      fail-air: "Too much air or water below. Try settling somewhere else, or remove all air/water below you."
+      fail-init: "Town could not claim initial chunks."
+  spy:
+    notice:
+      nearby: "nearby"
+      regional: "regional"
+      faraway: "faraway"
+      very-distant: "very distant"
+      success: "A spy has recovered this map of a %s enemy town!"
+    error:
+      inventory: "Not enough inventory space, make some room."
+      town: "Could not find an enemy town."
+  town:
+    notice:
+      add-invite-reminder: "You have been invited to join the town of %s."
+      add-success: "Added %s as a resident of %s."
+      add-invite: "Sending an invite to %s to join %s."
+      add-invite-player: "You are invited to join the town of %s. Use \"/k join %s\" to accept or \"/k leave %s\" to decline."
+      kick-remove: "Removed join invite of %s for %s"
+      kick-resident: "Kicked resident %s from %s"
+      lord-prompt-1: "Are you sure you want to give Lordship of %s?"
+      lord-prompt-2: "You will no longer own this town and be made a Knight resident."
+      lord-prompt-3: "Use this command again to confirm."
+      lord-success: "Gave Lordship of %s to %s."
+      lord-claim: "%s has claimed Lordship of %s!"
+      knight-set: "%s has been Knighted in %s."
+      knight-clear: "%s is no longer a Knight in %s."
+      rename: "Lord %s has renamed the Town of %s to %s."
+    error:
+      no-lord: "%s is abandoned! Use \"/k town <name> lord <your name>\" to claim Lordship."
+      open-fail: "%s is already open for access by all players."
+      open-success: "Opened %s for access by all players."
+      close-fail: "Closed %s, only residents may build and access containers."
+      close-success: "%s is already closed for residents only."
+      add-resident: "%s is already a resident of %s."
+      add-invite-resident: "%s has already been invited to join %s."
+      kick-fail: "%s is not a resident of %s."
+      lord-self: "You may only claim Lordship for yourself!"
+  travel:
+    notice:
+      town-travel: "%s has traveled to %s."
+      wild-travel: "Traveled to a random location in the Wild."
+    error:
+      enemy-territory: "You can not travel within enemy territory!"
+      no-home: "You do not have a home!"
+      no-camp: "You do not have a camp!"
+      no-town: "That town does not exist in your Kingdom."
+      cooldown: "You must wait %s before traveling to %s."

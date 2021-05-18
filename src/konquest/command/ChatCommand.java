@@ -35,14 +35,17 @@ public class ChatCommand extends CommandBase {
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	if(!player.isBarbarian()) {
 	        	if(player.isGlobalChat()) {
-	        		ChatUtil.sendNotice(bukkitPlayer, "Chat mode: Kingdom");
+	        		//ChatUtil.sendNotice(bukkitPlayer, "Chat mode: Kingdom");
+	        		ChatUtil.sendNotice(bukkitPlayer, getKonquest().lang().get("commands.chat.notice.enable"));
 	        		player.setIsGlobalChat(false);
 	        	} else {
-	        		ChatUtil.sendNotice(bukkitPlayer, "Chat mode: Global");
+	        		//ChatUtil.sendNotice(bukkitPlayer, "Chat mode: Global");
+	        		ChatUtil.sendNotice(bukkitPlayer, getKonquest().lang().get("commands.chat.notice.disable"));
 	        		player.setIsGlobalChat(true);
 	        	}
         	} else {
-        		ChatUtil.sendError(bukkitPlayer, "Cannot use Kingdom chat as Barbarian");
+        		//ChatUtil.sendError(bukkitPlayer, "Cannot use Kingdom chat as Barbarian");
+        		ChatUtil.sendError(bukkitPlayer, getKonquest().lang().get("generic.error.deny-barbarian"));
         	}
         }
 	}

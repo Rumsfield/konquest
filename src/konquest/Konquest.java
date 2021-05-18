@@ -30,6 +30,7 @@ import konquest.manager.DirectiveManager;
 import konquest.manager.DisplayManager;
 import konquest.manager.IntegrationManager;
 import konquest.manager.KingdomManager;
+import konquest.manager.LanguageManager;
 import konquest.manager.LootManager;
 import konquest.manager.PlayerManager;
 import konquest.manager.RuinManager;
@@ -67,6 +68,7 @@ public class Konquest implements Timeable {
 	private DisplayManager displayManager;
 	private UpgradeManager upgradeManager;
 	private RuinManager ruinManager;
+	private LanguageManager languageManager;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
@@ -103,6 +105,7 @@ public class Konquest implements Timeable {
 		displayManager = new DisplayManager(this);
 		upgradeManager = new UpgradeManager(this);
 		ruinManager = new RuinManager(this);
+		languageManager = new LanguageManager(this);
 		
 		worldName = "world";
 		opStatusMessages = new ArrayList<String>();
@@ -117,6 +120,7 @@ public class Konquest implements Timeable {
 	public void initialize() {
 		// Initialize managers
 		configManager.initialize();
+		languageManager.initialize();
 		worldName = configManager.getConfig("core").getString("core.world_name","world");
 		plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Primary world is "+worldName);
 		kingdomManager.initialize();
@@ -291,6 +295,10 @@ public class Konquest implements Timeable {
 	
 	public RuinManager getRuinManager() {
 		return ruinManager;
+	}
+	
+	public LanguageManager lang() {
+		return languageManager;
 	}
 	
 	public long getOfflineTimeoutSeconds() {

@@ -39,9 +39,9 @@ public class ScoreCommand extends CommandBase {
         	if(getArgs().length == 1) {
         		// Display player's own score GUI
         		if(player.isBarbarian()) {
-        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"You are a Barbarian, and cannot be scored!");
+        			ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+"You are a Barbarian, and cannot be scored!");
         		} else if(kingdom.isPeaceful()) {
-        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"The Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" is peaceful, and cannot be scored!");
+        			ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+"The Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" is peaceful, and cannot be scored!");
         		} else {
         			kingdomScore = getKonquest().getKingdomManager().getKingdomScore(kingdom);
         			playerScore = getKonquest().getKingdomManager().getPlayerScore(player);
@@ -78,9 +78,9 @@ public class ScoreCommand extends CommandBase {
     			}
             	String offlinePlayerName = offlinePlayer.getOfflineBukkitPlayer().getName();
             	if(offlinePlayer.isBarbarian()) {
-        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+offlinePlayerName+" is a Barbarian, and cannot be scored!");
+        			ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+offlinePlayerName+" is a Barbarian, and cannot be scored!");
         		} else if(kingdom.isPeaceful()) {
-        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"The Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" is peaceful, and cannot be scored!");
+        			ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+"The Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" is peaceful, and cannot be scored!");
         		} else {
         			kingdomScore = getKonquest().getKingdomManager().getKingdomScore(kingdom);
         			playerScore = getKonquest().getKingdomManager().getPlayerScore(offlinePlayer);

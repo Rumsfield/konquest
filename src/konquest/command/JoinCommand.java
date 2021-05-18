@@ -64,7 +64,7 @@ public class JoinCommand extends CommandBase {
         				ChatUtil.sendNotice((Player) getSender(), "Joined Kingdom "+ChatColor.AQUA+joinName);
                     	ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+bukkitPlayer.getName()+" has joined Kingdom "+ChatColor.AQUA+joinName);
         			} else if(status == 2) {
-        				ChatUtil.sendNotice((Player) getSender(), ChatColor.RED+"The Kingdom "+ChatColor.AQUA+joinName+ChatColor.RED+" has too many players! Use \"/k join\" to join the smallest Kingdom");
+        				ChatUtil.sendError((Player) getSender(), ChatColor.RED+"The Kingdom "+ChatColor.AQUA+joinName+ChatColor.RED+" has too many players! Use \"/k join\" to join the smallest Kingdom");
         			}
         		} else {
         			ChatUtil.sendError((Player) getSender(), "You cannot join that Kingdom. Ask an admin to move you.");

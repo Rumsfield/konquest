@@ -59,7 +59,7 @@ public class ClaimCommand extends CommandBase {
         			
         		case "auto" :
         			if(player.isAdminClaimingFollow()) {
-        				ChatUtil.sendNotice((Player) getSender(), "Cannot enable auto claim when admin auto claim is enabled.");
+        				ChatUtil.sendError((Player) getSender(), "Cannot enable auto claim when admin auto claim is enabled.");
         				return;
         			}
         			if(!player.isClaimingFollow()) {
