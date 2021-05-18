@@ -1,8 +1,6 @@
 package konquest.manager;
 
-import java.util.Collections;
 import java.util.IllegalFormatException;
-import java.util.List;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -39,11 +37,7 @@ public class LanguageManager {
 		return isValid;
 	}
 	
-	public String get(MessagePath messagePath) {
-		return get(messagePath, Collections.emptyList());
-	}
-	
-	public String get(MessagePath messagePath, List<String> args) {
+	public String get(MessagePath messagePath, Object ...args) {
 		if(!isValid) {
 			return "Bad Language YAML!";
 		}
@@ -51,45 +45,15 @@ public class LanguageManager {
 		String path = messagePath.getPath();
 		if(lang.contains(path)) {
 			int formats = messagePath.getFormats();
-			if(formats != args.size()) {
-				ChatUtil.printConsoleError("Language file message format mismatch. Expected "+formats+", got "+args.size()+" for path "+path);
+			if(formats != args.length) {
+				ChatUtil.printConsoleError("Language file message format mismatch. Expected "+formats+", got "+args.length+" for path "+path);
 			}
-			if(args.size() > 0) {
-				if(args.size() == 1) {
-					try {
-						result = String.format(lang.getString(messagePath.getPath()), args.get(0));
-					} catch(IllegalFormatException e) {
-						ChatUtil.printConsoleError("Language file has bad message format, requires 1 \"%s\": "+path);
-						result = "<BAD FORMAT> "+lang.getString(messagePath.getPath());
-					}
-				} else if(args.size() == 2) {
-					try {
-						result = String.format(lang.getString(messagePath.getPath()), args.get(0), args.get(1));
-					} catch(IllegalFormatException e) {
-						ChatUtil.printConsoleError("Language file has bad message format, requires 2 \"%s\": "+path);
-						result = "<BAD FORMAT> "+lang.getString(messagePath.getPath());
-					}
-				} else if(args.size() == 3) {
-					try {
-						result = String.format(lang.getString(path), args.get(0), args.get(1), args.get(2));
-					} catch(IllegalFormatException e) {
-						ChatUtil.printConsoleError("Language file has bad message format, requires 3 \"%s\": "+path);
-						result = "<BAD FORMAT> "+lang.getString(path);
-					}
-				} else if(args.size() == 4) {
-					try {
-						result = String.format(lang.getString(path), args.get(0), args.get(1), args.get(2), args.get(3));
-					} catch(IllegalFormatException e) {
-						ChatUtil.printConsoleError("Language file has bad message format, requires 4 \"%s\": "+path);
-						result = "<BAD FORMAT> "+lang.getString(path);
-					}
-				} else if(args.size() == 5) {
-					try {
-						result = String.format(lang.getString(path), args.get(0), args.get(1), args.get(2), args.get(3), args.get(4));
-					} catch(IllegalFormatException e) {
-						ChatUtil.printConsoleError("Language file has bad message format, requires 5 \"%s\": "+path);
-						result = "<BAD FORMAT> "+lang.getString(path);
-					}
+			if(args.length > 0) {
+				try {
+					result = String.format(lang.getString(messagePath.getPath()), (Object[])args);
+				} catch(IllegalFormatException e) {
+					ChatUtil.printConsoleError("Language file has bad message format for path "+path+": "+e.getMessage());
+					result = lang.getString(messagePath.getPath());
 				}
 			} else {
 				result = lang.getString(path);

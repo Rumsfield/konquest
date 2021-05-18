@@ -16,6 +16,7 @@ import org.bukkit.util.StringUtil;
 
 import konquest.Konquest;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import konquest.command.admin.AdminCommand;
 
 //public class CommandHandler  implements CommandExecutor {
@@ -102,15 +103,14 @@ public class CommandHandler  implements TabExecutor {
                         new HelpCommand(konquest, sender, args).execute();
                         break;
                     default:
-                    	ChatUtil.sendError((Player) sender, "Command does not exist");
                     	return false;
             		}
             	} else {
-                    ChatUtil.sendError((Player) sender, "Missing permission "+commandArg.permission());
+                    ChatUtil.sendError((Player) sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+commandArg.permission());
             	}
         	}
         } else {
-        	ChatUtil.sendError((Player) sender, "Missing permission konquest.command");
+        	ChatUtil.sendError((Player) sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" konquest.command");
         }
         return true;
     }

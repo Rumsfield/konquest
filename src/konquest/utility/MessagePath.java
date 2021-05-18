@@ -1,5 +1,6 @@
 package konquest.utility;
 
+import konquest.Konquest;
 
 public enum MessagePath {
 
@@ -28,15 +29,16 @@ public enum MessagePath {
 	GENERIC_ERROR_UNKNOWN_NAME                  (1, "generic.error.unknown-name"),
 	GENERIC_ERROR_BAD_NAME                      (1, "generic.error.bad-name"),
 	GENERIC_ERROR_NO_FAVOR                      (1, "generic.error.no-favor"),
-	GENERIC_ERROR_REDUCE_FAVOR                  (2, "generic.error.reduce-favor"),
 	GENERIC_ERROR_ENEMY_PLAYER                  (0, "generic.error.enemy-player"),
 	GENERIC_ERROR_ENEMY_TOWN                    (0, "generic.error.enemy-town"),
 	GENERIC_ERROR_DISABLED                      (0, "generic.error.disabled"),
 	GENERIC_NOTICE_ENABLE_AUTO                  (0, "generic.notice.enable-auto"),
 	GENERIC_NOTICE_DISABLE_AUTO                 (0, "generic.notice.disable-auto"),
+	GENERIC_NOTICE_REDUCE_FAVOR                 (2, "generic.notice.reduce-favor"),
 
 	COMMAND_CHAT_NOTICE_ENABLE                  (0, "command.chat.notice.enable"),
 	COMMAND_CHAT_NOTICE_DISABLE                 (0, "command.chat.notice.disable"),
+	COMMAND_CLAIM_ERROR_RADIUS                  (2, "command.claim.error.radius"),
 	COMMAND_EXILE_NOTICE_PROMPT_1               (0, "command.exile.notice.prompt-line-1"),
 	COMMAND_EXILE_NOTICE_PROMPT_2               (0, "command.exile.notice.prompt-line-2"),
 	COMMAND_EXILE_NOTICE_PROMPT_3A              (0, "command.exile.notice.prompt-line-3a"),
@@ -141,7 +143,11 @@ public enum MessagePath {
 	}
 	
 	public String getPath() {
-        return path;
+		return path;
     }
+	
+	public String getMessage(Object ...args) {
+		return Konquest.getInstance().lang().get(this, args);
+	}
 	
 }

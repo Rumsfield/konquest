@@ -3,7 +3,7 @@ package konquest.command;
 import konquest.Konquest;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +20,7 @@ public class ChatCommand extends CommandBase {
 	public void execute() {
 		// k chat
     	if (getArgs().length != 1) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+            ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
@@ -36,16 +36,16 @@ public class ChatCommand extends CommandBase {
         	if(!player.isBarbarian()) {
 	        	if(player.isGlobalChat()) {
 	        		//ChatUtil.sendNotice(bukkitPlayer, "Chat mode: Kingdom");
-	        		ChatUtil.sendNotice(bukkitPlayer, getKonquest().lang().get("commands.chat.notice.enable"));
+	        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CHAT_NOTICE_ENABLE.getMessage());
 	        		player.setIsGlobalChat(false);
 	        	} else {
 	        		//ChatUtil.sendNotice(bukkitPlayer, "Chat mode: Global");
-	        		ChatUtil.sendNotice(bukkitPlayer, getKonquest().lang().get("commands.chat.notice.disable"));
+	        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CHAT_NOTICE_DISABLE.getMessage());
 	        		player.setIsGlobalChat(true);
 	        	}
         	} else {
         		//ChatUtil.sendError(bukkitPlayer, "Cannot use Kingdom chat as Barbarian");
-        		ChatUtil.sendError(bukkitPlayer, getKonquest().lang().get("generic.error.deny-barbarian"));
+        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
         	}
         }
 	}

@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class HelpCommand extends CommandBase{
 
@@ -18,7 +19,8 @@ public class HelpCommand extends CommandBase{
 
     public void execute() {
         String message = "";
-        ChatUtil.sendNotice((Player) getSender(), "Help: Command, Arguments, Description, Alias");
+        //ChatUtil.sendNotice((Player) getSender(), "Help: Command, Arguments, Description, Alias");
+        ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_HELP_NOTICE_MESSAGE.getMessage());
         for(CommandType cmd : CommandType.values()) {
         	String aliasmsg = "";
         	if(cmd.alias().equals("")==false) {

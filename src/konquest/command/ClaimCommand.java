@@ -3,7 +3,7 @@ package konquest.command;
 import konquest.Konquest;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,20 +23,20 @@ public class ClaimCommand extends CommandBase {
 	public void execute() {
 		// k claim [radius|auto] [<r>]
     	if (getArgs().length > 3) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+            ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
         	// Verify that this command is being used in the default world
         	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
-        		ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_WORLD.toString());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
         	// Verify no Barbarians are using this command
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	if(player.isBarbarian()) {
-        		ChatUtil.sendError((Player) getSender(), "Barbarians cannot claim.");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
                 return;
         	}
 
@@ -45,13 +45,16 @@ public class ClaimCommand extends CommandBase {
         		switch(claimMode) {
         		case "radius" :
         			if(getArgs().length != 3) {
-        				ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
         	            return;
         			}
+        			final int min = 1;
+        			final int max = 5;
     				int radius = Integer.parseInt(getArgs()[2]);
-    				if(radius < 1 || radius > 5) {
-    					ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
-    					ChatUtil.sendError((Player) getSender(), "Radius must be greater than 0 and less than or equal to 5.");
+    				if(radius < min || radius > max) {
+    					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+    					//ChatUtil.sendError((Player) getSender(), "Radius must be greater than 0 and less than or equal to 5.");
+    					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_CLAIM_ERROR_RADIUS.getMessage(min,max));
     					return;
     				}
     				getKonquest().getKingdomManager().claimRadiusForPlayer(bukkitPlayer, bukkitPlayer.getLocation(), radius);
@@ -59,23 +62,26 @@ public class ClaimCommand extends CommandBase {
         			
         		case "auto" :
         			if(player.isAdminClaimingFollow()) {
-        				ChatUtil.sendError((Player) getSender(), "Cannot enable auto claim when admin auto claim is enabled.");
+        				//ChatUtil.sendError((Player) getSender(), "Cannot enable auto claim when admin auto claim is enabled.");
+        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
         				return;
         			}
         			if(!player.isClaimingFollow()) {
         				boolean isClaimSuccess = getKonquest().getKingdomManager().claimForPlayer(bukkitPlayer, bukkitPlayer.getLocation());
         				if(isClaimSuccess) {
-        					ChatUtil.sendNotice((Player) getSender(), "Enabled auto claim. Use this command again to disable.");
-        					player.setIsClaimingFollow(true);
+        					//ChatUtil.sendNotice((Player) getSender(), "Enabled auto claim. Use this command again to disable.");
+        					ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
+            				player.setIsClaimingFollow(true);
         				}
         			} else {
         				player.setIsClaimingFollow(false);
-        				ChatUtil.sendNotice((Player) getSender(), "Disabled auto claim.");
+        				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
+        				//ChatUtil.sendNotice((Player) getSender(), "Disabled auto claim.");
         			}
         			break;
         			
         		default :
-        			ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
                     return;
         		}
         	} else {

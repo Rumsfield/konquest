@@ -12,6 +12,7 @@ import konquest.model.KonPlayer;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import konquest.utility.MessageStatic;
 
 import org.bukkit.ChatColor;
@@ -30,7 +31,7 @@ public class InfoCommand extends CommandBase {
 		// k info <kingdomName>|<townName>|<playerName>
 		//ChatUtil.printDebug("Entering info command execution...");
     	if (getArgs().length != 1 && getArgs().length != 2) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
