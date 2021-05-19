@@ -48,13 +48,6 @@ public class ConfigManager{
 				ChatUtil.printConsoleError("Failed to find language file "+language+".yml in Konquest/lang folder. Using default lang/english.yml.");
 			}
 		}
-		
-		if(!addConfig("language", new KonConfig("lang/"+language))) {
-			addConfig("language", new KonConfig("lang/english"));
-			ChatUtil.printConsoleError("Failed to find language file "+language+".yml in Konquest/lang folder. Using default lang/english.yml.");
-		} else {
-			ChatUtil.printConsoleAlert("Using "+language+" language file.");
-		}
 	}
 	
 	public FileConfiguration getLang() {

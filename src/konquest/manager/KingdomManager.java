@@ -49,6 +49,7 @@ import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
+import konquest.utility.LoadingPrinter;
 import konquest.utility.Timer;
 
 public class KingdomManager {
@@ -1650,6 +1651,12 @@ public class KingdomManager {
         }
         double x,y,z;
         List<Double> sectionList;
+        // Count all towns
+        int numTowns = 0;
+        for(String kingdomName : kingdomsConfig.getConfigurationSection("kingdoms").getKeys(false)) {
+        	numTowns += kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns").getKeys(false).size();
+        }
+        LoadingPrinter loadBar = new LoadingPrinter(numTowns,"Loading "+numTowns+" Towns");
         // Load all Kingdoms
         for(String kingdomName : kingdomsConfig.getConfigurationSection("kingdoms").getKeys(false)) {
         	//ChatUtil.printDebug("Loading Kingdom: "+kingdomName);
@@ -1806,6 +1813,8 @@ public class KingdomManager {
 	            	}
 	            	// Update upgrade status
 	            	konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
+	            	// Update loading bar
+	            	loadBar.addProgress(1);
             	}
         	}
         	if(isMissingMonuments) {
