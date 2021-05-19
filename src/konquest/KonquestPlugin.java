@@ -9,7 +9,6 @@ import konquest.listener.PlayerListener;
 import konquest.listener.WorldListener;
 import konquest.utility.ChatUtil;
 
-import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -40,7 +39,7 @@ public class KonquestPlugin extends JavaPlugin {
         konquest.initialize();
         konquest.initAllPlayers();
         enableSuccess = true;
-        getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"Konquest enabled. Written by Rumsfield.");
+        ChatUtil.printConsoleAlert("Plugin enabled. Written by Rumsfield.");
 	}
 	
 	@Override

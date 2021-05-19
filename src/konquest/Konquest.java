@@ -122,7 +122,7 @@ public class Konquest implements Timeable {
 		configManager.initialize();
 		languageManager.initialize();
 		worldName = configManager.getConfig("core").getString("core.world_name","world");
-		plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Primary world is "+worldName);
+		ChatUtil.printConsoleAlert("Primary world is "+worldName);
 		kingdomManager.initialize();
 		ruinManager.initialize();
 		initManagers();
@@ -138,9 +138,9 @@ public class Konquest implements Timeable {
         barbarianTeam.setColor(ChatColor.YELLOW);
         
         if(setupTeamPacketSender()) {
-        	plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Successfully registered name color packets for this server version");
+        	ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version");
         } else {
-        	plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Failed to register name color packets, the server version is unsupported");
+        	ChatUtil.printConsoleError("Failed to register name color packets, the server version is unsupported");
         }
 		
 		kingdomManager.updateSmallestKingdom();
@@ -165,10 +165,10 @@ public class Konquest implements Timeable {
 		offlineTimeoutSeconds = (long)(configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)*86400);
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;
-			plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED+"offline_timeout_seconds in core.yml is less than 1 day, overriding to 1 day to prevent data loss.");
+			ChatUtil.printConsoleError("offline_timeout_seconds in core.yml is less than 1 day, overriding to 1 day to prevent data loss.");
 		}
 		saveIntervalSeconds = configManager.getConfig("core").getInt("core.save_interval",60)*60;
-        plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Save interval is "+saveIntervalSeconds+" seconds");
+		ChatUtil.printConsoleAlert("Save interval is "+saveIntervalSeconds+" seconds");
 		if(saveIntervalSeconds > 0) {
 			saveTimer.stopTimer();
 			saveTimer.setTime(saveIntervalSeconds);

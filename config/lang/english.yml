@@ -7,7 +7,7 @@
 # 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
-labels:
+label:
   online-players: "Online Players"
   total-players: "Total Players"
   players: "Players"

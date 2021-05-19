@@ -52,7 +52,7 @@ public enum MessagePath {
 	COMMAND_JOIN_BROADCAST_PLAYER_JOIN          (2, "command.join.broadcast.player-join"),
 	COMMAND_JOIN_NOTICE_KINGDOM_JOIN            (1, "command.join.notice.kingdom-join"),
 	COMMAND_JOIN_NOTICE_TOWN_RESIDENT           (2, "command.join.notice.town-resident"),
-	COMMAND_JOIN_NOTICE_TOWN_LORD               (1, "command.join.notice.town-lord"),
+	COMMAND_JOIN_NOTICE_TOWN_JOIN_LORD          (1, "command.join.notice.town-join-lord"),
 	COMMAND_JOIN_NOTICE_TOWN_REQUEST            (1, "command.join.notice.town-request"),
 	COMMAND_JOIN_ERROR_NO_KINGDOMS              (0, "command.join.error.no-kingdoms"),
 	COMMAND_JOIN_ERROR_KINGDOM_LIMIT            (1, "command.join.error.kingdom-limit"),

@@ -38,6 +38,9 @@ public class ConfigManager{
 	}
 	
 	public FileConfiguration getConfig(String key) {
+		if(!configCache.containsKey(key)) {
+			ChatUtil.printConsoleError("Failed to find non-existant config "+key);
+		}
 		return configCache.get(key).getConfig();
 	}
 	
@@ -74,7 +77,7 @@ public class ConfigManager{
 		if(configCache.containsKey(name)) {
 			configCache.get(name).saveConfig();
 		} else {
-			ChatUtil.printDebug("ERROR: Tried to save non-existant config "+name);
+			ChatUtil.printConsoleError("Tried to save non-existant config "+name);
 		}
 	}
 	
@@ -82,7 +85,7 @@ public class ConfigManager{
 		if(configCache.containsKey(name)) {
 			configCache.get(name).updateVersion();
 		} else {
-			ChatUtil.printDebug("ERROR: Tried to update non-existant config "+name);
+			ChatUtil.printConsoleError("Tried to update non-existant config "+name);
 		}
 	}
 	
