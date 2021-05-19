@@ -13,7 +13,6 @@ import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
-import konquest.utility.MessageStatic;
 
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
