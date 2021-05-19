@@ -13,6 +13,7 @@ public class ConfigManager{
 	private Konquest konquest;
 	private HashMap<String, KonConfig> configCache;
 	private String language;
+	private FileConfiguration langConfig;
 	
 	public ConfigManager(Konquest konquest) {
 		this.konquest = konquest;
@@ -28,13 +29,36 @@ public class ConfigManager{
 		addConfig("camps", new KonConfig("camps"));
 		addConfig("kingdoms", new KonConfig("kingdoms"));
 		addConfig("ruins", new KonConfig("ruins"));
+		// Built-in language files
+		addConfig("lang_english", new KonConfig("lang/english"));
+		updateConfigVersion("lang_english");
+		// Language selection
 		language = getConfig("core").getString("language","english");
+		if(configCache.containsKey("lang_"+language)) {
+			// Use a built-in language file
+			langConfig = getConfig("lang_"+language);
+			ChatUtil.printConsoleAlert("Using "+language+" language file.");
+		} else {
+			// Attempt to find a custom local language file
+			if(addConfig("lang_custom", new KonConfig("lang/"+language))) {
+				langConfig = getConfig("lang_custom");
+				ChatUtil.printConsoleAlert("Using custom "+language+" language file.");
+			} else {
+				langConfig = getConfig("lang_english");
+				ChatUtil.printConsoleError("Failed to find language file "+language+".yml in Konquest/lang folder. Using default lang/english.yml.");
+			}
+		}
+		
 		if(!addConfig("language", new KonConfig("lang/"+language))) {
 			addConfig("language", new KonConfig("lang/english"));
 			ChatUtil.printConsoleError("Failed to find language file "+language+".yml in Konquest/lang folder. Using default lang/english.yml.");
 		} else {
-			ChatUtil.printConsole("Using "+language+" language file.");
+			ChatUtil.printConsoleAlert("Using "+language+" language file.");
 		}
+	}
+	
+	public FileConfiguration getLang() {
+		return langConfig;
 	}
 	
 	public FileConfiguration getConfig(String key) {

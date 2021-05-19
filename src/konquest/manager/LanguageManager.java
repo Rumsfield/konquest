@@ -20,7 +20,7 @@ public class LanguageManager {
 	}
 	
 	public void initialize() {
-		lang = konquest.getConfigManager().getConfig("language");
+		lang = konquest.getConfigManager().getLang();
 		if(lang == null) {
 			ChatUtil.printConsoleError("Failed to load any language messages");
 		} else {
@@ -38,9 +38,6 @@ public class LanguageManager {
 	}
 	
 	public String get(MessagePath messagePath, Object ...args) {
-		if(!isValid) {
-			return "Bad Language YAML!";
-		}
 		String result = "";
 		String path = messagePath.getPath();
 		if(lang.contains(path)) {
