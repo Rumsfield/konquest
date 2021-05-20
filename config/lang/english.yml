@@ -24,6 +24,7 @@ label:
   residents: "Residents"
   invites: "Invites"
   requests: "Requests"
+  bypass: "BYPASS"
 generic:
   error:
     deny-barbarian: "Barbarians cannot do this."
@@ -46,13 +47,29 @@ generic:
     reduce-favor: "Favor reduced by %s, total: %s"
     reward-favor: "Favor rewarded: %s, total: %s"
 command:
+  admin:
+    forceexile:
+      notice:
+        player: "Successfully exiled player %s to Barbarians."
+        full: "Successfully reset player %s exile kingdom to Barbarians."
+      error:
+        fail: "Could not exile player, already barbarian or bad random wild location."
   chat:
     notice:
       enable: "Kingdom chat"
       disable: "Global chat"
   claim:
+    notice:
+      radius-success: "Successfully claimed %s chunks of land for %s."
     error:
       radius: "Radius must be greater than or equal to %s and less than or equal to %s."
+      radius-partial: "Failed to claim all land, too far from center. Claimed %s chunks of land for %s."
+      missing: "Must claim near existing territory."
+      overlap: "Cannot claim over another territory."
+      proximity: "Too close to another territory."
+      fail-adjacent: "Failed to claim, no adjacent territory."
+      fail-far: "Failed to claim, too far from territory center."
+      fail-claimed: "Failed to claim, already claimed."
   exile:
     notice:
       prompt-line-1: "Are you sure you want to become a Barbarian?"

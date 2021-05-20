@@ -5,13 +5,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import konquest.Konquest;
 import konquest.command.CommandBase;
 import konquest.command.KonquestCommand;
-import konquest.utility.ChatUtil;
 
 public class AdminCommand extends CommandBase {
 
@@ -21,7 +19,8 @@ public class AdminCommand extends CommandBase {
 
     public void execute() {
         if (getArgs().length == 1) {
-        	ChatUtil.sendNotice((Player) getSender(), "Try \"/k admin help\" for a list of available commands");
+        	//ChatUtil.sendNotice((Player) getSender(), "Try \"/k admin help\" for a list of available commands");
+        	new HelpAdminCommand(getKonquest(), getSender(), getArgs()).execute();
         } else if (getArgs().length >= 2) {
         	AdminCommandType commandArg = AdminCommandType.getCommand(getArgs()[1]);
             switch (commandArg) {
@@ -90,7 +89,7 @@ public class AdminCommand extends CommandBase {
                     break;
                 default:
                 	new KonquestCommand(getKonquest(), getSender()).execute();
-                	ChatUtil.sendError((Player) getSender(), "Command does not exist");
+                	//ChatUtil.sendError((Player) getSender(), "Command does not exist");
                 	break;
             }
         }
