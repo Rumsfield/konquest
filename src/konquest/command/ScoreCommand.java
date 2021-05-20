@@ -5,7 +5,7 @@ import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +27,7 @@ public class ScoreCommand extends CommandBase {
 		// k score [<player>|all]
 		// do not score peaceful kingdoms or barbarians
     	if (getArgs().length != 1 && getArgs().length != 2) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
@@ -39,20 +39,23 @@ public class ScoreCommand extends CommandBase {
         	if(getArgs().length == 1) {
         		// Display player's own score GUI
         		if(player.isBarbarian()) {
-        			ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+"You are a Barbarian, and cannot be scored!");
+        			//ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+"You are a Barbarian, and cannot be scored!");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
         		} else if(kingdom.isPeaceful()) {
-        			ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+"The Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" is peaceful, and cannot be scored!");
+        			//ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+"The Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" is peaceful, and cannot be scored!");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdom.getName()));
         		} else {
         			kingdomScore = getKonquest().getKingdomManager().getKingdomScore(kingdom);
         			playerScore = getKonquest().getKingdomManager().getPlayerScore(player);
-        			ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"Your score: "+ChatColor.AQUA+playerScore+ChatColor.GOLD+", Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" score: "+ChatColor.DARK_PURPLE+kingdomScore);
+        			//ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+"Your score: "+ChatColor.AQUA+playerScore+ChatColor.GOLD+", Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" score: "+ChatColor.DARK_PURPLE+kingdomScore);
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SCORE_NOTICE_SCORE.getMessage(playerScore,kingdom.getName(),kingdomScore));
         			// Display Score GUI
         			getKonquest().getDisplayManager().displayScoreMenu(player, player);
         		}
         	} else if(getArgs()[1].equalsIgnoreCase("all")) {
         		// Score all Kingdoms
-        		String header = ChatColor.GOLD+"All Kingdom Scores:";
-            	ChatUtil.sendNotice((Player) getSender(), header);
+        		//String header = ChatColor.GOLD+"All Kingdom Scores:";
+            	ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+MessagePath.COMMAND_SCORE_NOTICE_ALL_HEADER.getMessage());
         		for(KonKingdom allKingdom : getKonquest().getKingdomManager().getKingdoms()) {
         			if(!kingdom.isPeaceful()) {
 	        			int score = getKonquest().getKingdomManager().getKingdomScore(allKingdom);
@@ -69,7 +72,8 @@ public class ScoreCommand extends CommandBase {
         		// Verify player exists
             	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
             	if(offlinePlayer == null) {
-            		ChatUtil.sendError((Player) getSender(), "Invalid player name, unknown or bad spelling.");
+            		//ChatUtil.sendError((Player) getSender(), "Invalid player name, unknown or bad spelling.");
+            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
                     return;
             	}
             	kingdom = offlinePlayer.getKingdom();
@@ -78,13 +82,16 @@ public class ScoreCommand extends CommandBase {
     			}
             	String offlinePlayerName = offlinePlayer.getOfflineBukkitPlayer().getName();
             	if(offlinePlayer.isBarbarian()) {
-        			ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+offlinePlayerName+" is a Barbarian, and cannot be scored!");
+        			//ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+offlinePlayerName+" is a Barbarian, and cannot be scored!");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage());
         		} else if(kingdom.isPeaceful()) {
-        			ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+"The Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" is peaceful, and cannot be scored!");
+        			//ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+"The Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" is peaceful, and cannot be scored!");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdom.getName()));
         		} else {
         			kingdomScore = getKonquest().getKingdomManager().getKingdomScore(kingdom);
         			playerScore = getKonquest().getKingdomManager().getPlayerScore(offlinePlayer);
-        			ChatUtil.sendNotice((Player) getSender(), color+offlinePlayerName+"'s "+ChatColor.GOLD+" score: "+ChatColor.AQUA+playerScore+ChatColor.GOLD+", Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" score: "+ChatColor.DARK_PURPLE+kingdomScore);
+        			//ChatUtil.sendNotice((Player) getSender(), color+offlinePlayerName+"'s "+ChatColor.GOLD+" score: "+ChatColor.AQUA+playerScore+ChatColor.GOLD+", Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" score: "+ChatColor.DARK_PURPLE+kingdomScore);
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SCORE_NOTICE_PLAYER.getMessage(offlinePlayerName,playerScore,kingdom.getName(),kingdomScore));
         			// Display Score GUI
         			getKonquest().getDisplayManager().displayScoreMenu(player, offlinePlayer);
         		}

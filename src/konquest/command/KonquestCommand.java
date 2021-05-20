@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class KonquestCommand extends CommandBase{
 
@@ -27,7 +28,8 @@ public class KonquestCommand extends CommandBase{
     		Player bukkitPlayer = (Player) getSender();
     		getKonquest().getDisplayManager().displayHelpMenu(bukkitPlayer);
     	} else {
-    		ChatUtil.printConsole("You must be a player do use this command!");
+    		//ChatUtil.printConsole("You must be a player do use this command!");
+    		ChatUtil.printConsoleError(MessagePath.GENERIC_ERROR_NO_PLAYER.getMessage());
     	}
     }
     

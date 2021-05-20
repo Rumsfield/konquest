@@ -15,6 +15,7 @@ import konquest.Konquest;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import konquest.utility.MessageStatic;
 
 public class JoinCommand extends CommandBase {
@@ -44,7 +45,8 @@ public class JoinCommand extends CommandBase {
         }
     	
     	if(getKonquest().getKingdomManager().getKingdoms().isEmpty()) {
-    		ChatUtil.sendError((Player) getSender(), "There are no Kingdoms. Create one with \"/k admin makekingdom <name>\"");
+    		//ChatUtil.sendError((Player) getSender(), "There are no Kingdoms. Create one with \"/k admin makekingdom <name>\"");
+    		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_NO_KINGDOMS.getMessage());
     		return;
     	}
     	
@@ -56,26 +58,34 @@ public class JoinCommand extends CommandBase {
     			if(getKonquest().getKingdomManager().getKingdom(joinName).equals(player.getExileKingdom())) {
         			// Allow barbarians to join their exiled kingdoms
         			getKonquest().getKingdomManager().assignPlayerKingdom(player, joinName);
-                	ChatUtil.sendNotice((Player) getSender(), "Returned from Exile to Kingdom "+ChatColor.AQUA+joinName);
+                	//ChatUtil.sendNotice((Player) getSender(), "Returned from Exile to Kingdom "+ChatColor.AQUA+joinName);
+                	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_JOIN_NOTICE_KINGDOM_JOIN.getMessage(ChatColor.AQUA+joinName));
         		} else if(isAllowSwitch || getKonquest().getKingdomManager().getBarbarians().equals(player.getExileKingdom())) {
         			// Allow barbarians to join any kingdom when they're new (exile kingdom = barbarians) or if switching is allowed in config
         			int status = getKonquest().getKingdomManager().assignPlayerKingdom(player, joinName);
         			if(status == 0) {
-        				ChatUtil.sendNotice((Player) getSender(), "Joined Kingdom "+ChatColor.AQUA+joinName);
-                    	ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+bukkitPlayer.getName()+" has joined Kingdom "+ChatColor.AQUA+joinName);
+        				//ChatUtil.sendNotice((Player) getSender(), "Joined Kingdom "+ChatColor.AQUA+joinName);
+        				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_JOIN_NOTICE_KINGDOM_JOIN.getMessage(ChatColor.AQUA+joinName));
+                    	//ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+bukkitPlayer.getName()+" has joined Kingdom "+ChatColor.AQUA+joinName);
+                    	ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+MessagePath.COMMAND_JOIN_BROADCAST_PLAYER_JOIN.getMessage(bukkitPlayer.getName(),ChatColor.AQUA+joinName));
         			} else if(status == 2) {
-        				ChatUtil.sendError((Player) getSender(), ChatColor.RED+"The Kingdom "+ChatColor.AQUA+joinName+ChatColor.RED+" has too many players! Use \"/k join\" to join the smallest Kingdom");
+        				//ChatUtil.sendError((Player) getSender(), ChatColor.RED+"The Kingdom "+ChatColor.AQUA+joinName+ChatColor.RED+" has too many players! Use \"/k join\" to join the smallest Kingdom");
+        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_LIMIT.getMessage(joinName));
         			}
         		} else {
-        			ChatUtil.sendError((Player) getSender(), "You cannot join that Kingdom. Ask an admin to move you.");
+        			//ChatUtil.sendError((Player) getSender(), "You cannot join that Kingdom. Ask an admin to move you.");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_DENIED.getMessage());
         		}
         	} else if(getKonquest().getKingdomManager().getKingdom(joinName).equals(player.getKingdom())) {
-        		ChatUtil.sendError((Player) getSender(), "You are already a member.");
+        		//ChatUtil.sendError((Player) getSender(), "You are already a member.");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_MEMBER.getMessage());
         	} else {
         		if(isAllowSwitch) {
-        			ChatUtil.sendError((Player) getSender(), "Cannot switch Kingdom unless you are exiled. Type \"/k exile\"");
+        			//ChatUtil.sendError((Player) getSender(), "Cannot switch Kingdom unless you are exiled. Type \"/k exile\"");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_EXILE.getMessage());
         		} else {
-        			ChatUtil.sendError((Player) getSender(), "Cannot join a rival Kingdom. Ask an admin to move you.");
+        			//ChatUtil.sendError((Player) getSender(), "Cannot join a rival Kingdom. Ask an admin to move you.");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_DENIED.getMessage());
         		}
         	}
     	} else if(player.getKingdom().hasTown(joinName)) {
@@ -84,7 +94,8 @@ public class JoinCommand extends CommandBase {
     		if(!player.isBarbarian()) {
     			KonTown town = player.getKingdom().getTown(joinName);
     			if(town.isPlayerResident(bukkitPlayer)) {
-    				ChatUtil.sendError(bukkitPlayer, "You are already a resident of "+joinName);
+    				//ChatUtil.sendError(bukkitPlayer, "You are already a resident of "+joinName);
+    				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_TOWN_MEMBER.getMessage(joinName));
     				return;
     			}
     			UUID id = bukkitPlayer.getUniqueId();
@@ -95,7 +106,8 @@ public class JoinCommand extends CommandBase {
 			    	if(town.addPlayerResident(bukkitPlayer,false)) {
 			    		for(OfflinePlayer resident : town.getPlayerResidents()) {
 			    			if(resident.isOnline()) {
-			    				ChatUtil.sendNotice((Player) resident, bukkitPlayer.getName()+" has joined as a resident of "+joinName);
+			    				//ChatUtil.sendNotice((Player) resident, bukkitPlayer.getName()+" has joined as a resident of "+joinName);
+			    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_JOIN_NOTICE_TOWN_RESIDENT.getMessage(bukkitPlayer.getName(),joinName));
 			    			}
 			    		}
 			    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
@@ -103,28 +115,33 @@ public class JoinCommand extends CommandBase {
     			} else {
     				if(town.isJoinRequestValid(id)) {
     					// There is already an existing join request
-    					ChatUtil.sendError(bukkitPlayer, "You have already requested to join "+joinName);
+    					//ChatUtil.sendError(bukkitPlayer, "You have already requested to join "+joinName);
+    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_JOIN_ERROR_TOWN_REQUEST.getMessage(joinName));
     				} else {
     					if(town.getNumResidents() == 0) {
     						// The town is empty, make the player into the lord
     						town.setPlayerLord((OfflinePlayer)bukkitPlayer);
     						town.removeJoinRequest(id);
     			    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
-    			    		ChatUtil.sendNotice(bukkitPlayer, "You have joined as the lord of "+joinName+".");
+    			    		//ChatUtil.sendNotice(bukkitPlayer, "You have joined as the lord of "+joinName+".");
+    			    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_JOIN_NOTICE_TOWN_JOIN_LORD.getMessage(joinName));
     					} else {
     						// Create a new join request
-        					ChatUtil.sendNotice(bukkitPlayer, "Sending a request to join "+joinName+". Wait for the Lord or Knights to add you.");
+        					//ChatUtil.sendNotice(bukkitPlayer, "Sending a request to join "+joinName+". Wait for the Lord or Knights to add you.");
+        					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_JOIN_NOTICE_TOWN_REQUEST.getMessage(joinName));
         					town.addJoinRequest(id, false);
         					town.notifyJoinRequest(id);
     					}
     				}
     			}
     		} else {
-    			ChatUtil.sendError((Player) getSender(), "You cannot join a town as a barbarian.");
+    			//ChatUtil.sendError((Player) getSender(), "You cannot join a town as a barbarian.");
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
     		}
     	} else {
     		// Could not find what to join
-    		ChatUtil.sendError((Player) getSender(), "Failed to join \""+joinName+"\", maybe bad spelling or enemy.");
+    		//ChatUtil.sendError((Player) getSender(), "Failed to join \""+joinName+"\", maybe bad spelling or enemy.");
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(joinName));
     	}
 	}
 	

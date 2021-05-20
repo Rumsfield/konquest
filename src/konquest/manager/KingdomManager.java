@@ -31,6 +31,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.command.TravelCommand.TravelDestination;
 import konquest.model.KonCamp;
 import konquest.model.KonDirective;
 import konquest.model.KonKingdom;
@@ -259,6 +260,12 @@ public class KingdomManager {
 				if(konquest.distanceInChunks(loc, ruin.getCenterLoc()) < min_distance_town) {
 					ChatUtil.printDebug("Failed to add town, too close to ruin "+ruin.getName());
 					return 5;
+				}
+			}
+			for(TravelDestination keyword : TravelDestination.values()) {
+				if(name.equalsIgnoreCase(keyword.toString())) {
+					ChatUtil.printDebug("Failed to add town, name equals territory keyword: "+name);
+					return 3;
 				}
 			}
 			// Verify no overlapping init chunks

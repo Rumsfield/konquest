@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 public class ChatUtil {
 
+	private static ChatColor broadcastColor = ChatColor.LIGHT_PURPLE;
 	private static ChatColor noticeColor = ChatColor.GRAY;
 	private static ChatColor errorColor = ChatColor.RED;
 	private static ChatColor alertColor = ChatColor.GOLD;
@@ -70,12 +71,12 @@ public class ChatUtil {
 	}
 	
 	public static void sendBroadcast(String message) {
-		String notice = tag + noticeColor + message;
+		String notice = tag + broadcastColor + message;
 		Bukkit.broadcastMessage(notice);
 	}
 	
 	public static void sendAdminBroadcast(String message) {
-		String notice = tag + noticeColor + message;
+		String notice = tag + broadcastColor + message;
 		Bukkit.broadcast(notice,"konquest.command.admin");
 	}
 	

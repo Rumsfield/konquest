@@ -1,9 +1,8 @@
 # Language File
 # English
 # 
-# "%" are substitutes for words or numbers by the plugin.
-# %d = number, %s = word
-# If a line has a "%", keep it. You cannot add or remove any "%".
+# "%s" are substitutes for words or numbers by the plugin.
+# If a line has a "%s", keep it. You cannot add or remove any "%s".
 # 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
@@ -12,6 +11,10 @@ label:
   total-players: "Total Players"
   players: "Players"
   kingdoms: "Kingdoms"
+  player: "Player"
+  kingdom: "Kingdom"
+  barbarian: "Barbarian"
+  residencies: "Residencies"
   towns: "Towns"
   land: "Land"
   favor: "Favor"
@@ -41,6 +44,7 @@ generic:
     enable-auto: "Enabled. Use this command again to disable."
     disable-auto: "Disabled."
     reduce-favor: "Favor reduced by %s, total: %s"
+    reward-favor: "Favor rewarded: %s, total: %s"
 command:
   chat:
     notice:
@@ -95,10 +99,11 @@ command:
       towns: "Towns in your Kingdom"
   prefix:
     notice:
-      off-success: "Turned off your prefix title"
-      off-fail: "Your prefix title is already off"
-      new-success: "Your prefix is now %s"
-      new-fail: "The prefix %s is not unlocked!"
+      off: "Turned off your prefix title"
+      new: "Your prefix is now %s"
+    error:
+      off: "Your prefix title is already off"
+      new: "The prefix %s is not unlocked!"
   score:
     notice:
       all-header: "All Kingdom scores"
@@ -138,6 +143,8 @@ command:
       town: "Could not find an enemy town."
   town:
     notice:
+      open: "Opened %s for access by all players."
+      close: "Closed %s, only residents may build and access containers."
       add-invite-reminder: "You have been invited to join the town of %s."
       add-success: "Added %s as a resident of %s."
       add-invite: "Sending an invite to %s to join %s."
@@ -152,16 +159,15 @@ command:
       knight-set: "%s has been Knighted in %s."
       knight-clear: "%s is no longer a Knight in %s."
       rename: "Lord %s has renamed the Town of %s to %s."
+      no-lord: "%s is abandoned! Use \"/k town %s lord %s\" to claim Lordship."
     error:
-      no-lord: "%s is abandoned! Use \"/k town <name> lord <your name>\" to claim Lordship."
-      open-fail: "%s is already open for access by all players."
-      open-success: "Opened %s for access by all players."
-      close-fail: "Closed %s, only residents may build and access containers."
-      close-success: "%s is already closed for residents only."
+      open: "%s is already open for access by all players."
+      close: "%s is already closed for residents only."
       add-resident: "%s is already a resident of %s."
       add-invite-resident: "%s has already been invited to join %s."
       kick-fail: "%s is not a resident of %s."
       lord-self: "You may only claim Lordship for yourself!"
+      knight-resident: "Knights must be added as residents first."
   travel:
     notice:
       town-travel: "%s has traveled to %s."
