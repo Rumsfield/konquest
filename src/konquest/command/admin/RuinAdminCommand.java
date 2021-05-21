@@ -15,7 +15,7 @@ import konquest.command.CommandBase;
 import konquest.model.KonPlayer;
 import konquest.model.KonPlayer.RegionType;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 public class RuinAdminCommand extends CommandBase {
 
@@ -27,7 +27,7 @@ public class RuinAdminCommand extends CommandBase {
 	public void execute() {
 		// k admin ruin create|remove|criticals|spawns <name>
 		if (getArgs().length != 4) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         }
 		Player bukkitPlayer = (Player) getSender();
@@ -37,62 +37,72 @@ public class RuinAdminCommand extends CommandBase {
 		if(cmdMode.equalsIgnoreCase("create")) {
 			Location playerLoc = bukkitPlayer.getLocation();
         	if(!StringUtils.isAlphanumeric(ruinName)) {
-        		ChatUtil.sendError((Player) getSender(), "Ruin name must only contain letters and/or numbers");
+        		//ChatUtil.sendError((Player) getSender(), "Ruin name must only contain letters and/or numbers");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
                 return;
         	}
         	boolean pass = getKonquest().getRuinManager().addRuin(playerLoc, ruinName);
         	if(!pass) {
-        		ChatUtil.sendError((Player) getSender(), "Failed to create new Ruin: "+ruinName);
+        		//ChatUtil.sendError((Player) getSender(), "Failed to create new Ruin: "+ruinName);
+        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_ERROR_CREATE.getMessage(ruinName));
                 return;
         	} else {
-        		ChatUtil.sendNotice((Player) getSender(), "Successfully created new Ruin: "+ruinName);
+        		//ChatUtil.sendNotice((Player) getSender(), "Successfully created new Ruin: "+ruinName);
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CREATE.getMessage(ruinName));
         	}
 		} else if(cmdMode.equalsIgnoreCase("remove")) {
 			// Check for valid ruin
 			if(!getKonquest().getRuinManager().isRuin(ruinName)) {
-				ChatUtil.sendError((Player) getSender(), MessageStatic.BAD_NAME.toString());
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
                 return;
 			}
 			boolean pass = getKonquest().getRuinManager().removeRuin(ruinName);
         	if(!pass) {
-        		ChatUtil.sendError((Player) getSender(), "Failed to remove Ruin: "+ruinName);
+        		//ChatUtil.sendError((Player) getSender(), "Failed to remove Ruin: "+ruinName);
+        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_ERROR_REMOVE.getMessage(ruinName));
                 return;
         	} else {
-        		ChatUtil.sendNotice((Player) getSender(), "Successfully removed Ruin: "+ruinName);
+        		//ChatUtil.sendNotice((Player) getSender(), "Successfully removed Ruin: "+ruinName);
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_REMOVE.getMessage(ruinName));
         	}
 		} else if(cmdMode.equalsIgnoreCase("criticals")) {
 			KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	if(player.isSettingRegion()) {
-        		ChatUtil.sendError((Player) getSender(), "Cannot do this while setting regions");
+        		//ChatUtil.sendError((Player) getSender(), "Cannot do this while setting regions");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_REGION.getMessage());
                 return;
         	}
         	// Check for valid ruin
 			if(!getKonquest().getRuinManager().isRuin(ruinName)) {
-				ChatUtil.sendError((Player) getSender(), MessageStatic.BAD_NAME.toString());
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
                 return;
 			}
 			getKonquest().getRuinManager().getRuin(ruinName).clearCriticalLocations();
 			player.settingRegion(RegionType.RUIN_CRITICAL);
-        	ChatUtil.sendNotice((Player) getSender(), "Removed all previous critical blocks from "+ruinName+", click on blocks to add.");
-        	ChatUtil.sendNotice((Player) getSender(), "Click on Air to cancel.");
-			
+        	//ChatUtil.sendNotice((Player) getSender(), "Removed all previous critical blocks from "+ruinName+", click on blocks to add.");
+        	//ChatUtil.sendNotice((Player) getSender(), "Click on Air to cancel.");
+        	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CRITICALS.getMessage(ruinName));
+        	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 		} else if(cmdMode.equalsIgnoreCase("spawns")) {
 			KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	if(player.isSettingRegion()) {
-        		ChatUtil.sendError((Player) getSender(), "Cannot do this while setting regions");
+        		//ChatUtil.sendError((Player) getSender(), "Cannot do this while setting regions");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_REGION.getMessage());
                 return;
         	}
         	// Check for valid ruin
 			if(!getKonquest().getRuinManager().isRuin(ruinName)) {
-				ChatUtil.sendError((Player) getSender(), MessageStatic.BAD_NAME.toString());
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
                 return;
 			}
 			getKonquest().getRuinManager().getRuin(ruinName).clearSpawnLocations();
 			player.settingRegion(RegionType.RUIN_SPAWN);
-        	ChatUtil.sendNotice((Player) getSender(), "Removed all previous spawn blocks from "+ruinName+", click on blocks to add.");
-        	ChatUtil.sendNotice((Player) getSender(), "Click on Air to cancel.");
+        	//ChatUtil.sendNotice((Player) getSender(), "Removed all previous spawn blocks from "+ruinName+", click on blocks to add.");
+        	//ChatUtil.sendNotice((Player) getSender(), "Click on Air to cancel.");
+        	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_SPAWNS.getMessage(ruinName));
+        	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 		} else {
-			ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
 		}
 	}

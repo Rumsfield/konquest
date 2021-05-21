@@ -16,6 +16,7 @@ label:
   barbarian: "Barbarian"
   residencies: "Residencies"
   towns: "Towns"
+  towns: "Town"
   land: "Land"
   favor: "Favor"
   open: "Open"
@@ -25,7 +26,16 @@ label:
   invites: "Invites"
   requests: "Requests"
   bypass: "BYPASS"
+  ruins: "Ruins"
+  ruin: "Ruin"
 generic:
+  notice:
+    enable-auto: "Enabled. Use this command again to disable."
+    disable-auto: "Disabled."
+    reduce-favor: "Favor reduced by %s, total: %s"
+    reward-favor: "Favor rewarded: %s, total: %s"
+    click-air: "Click on Air to cancel."
+    success: "Success!"
   error:
     deny-barbarian: "Barbarians cannot do this."
     internal: "Internal error, contact an admin."
@@ -37,15 +47,12 @@ generic:
     no-player: "You must be a player to do this!"
     unknown-name: "Failed to find unknown name, check spelling: %s"
     bad-name: "Could not find %s in your Kingdom."
+    format-name: "Name must only contain letters and/or numbers."
     no-favor: "Not enough Favor, need %s"
     enemy-player: "That player is an enemy."
     enemy-town: "That is an enemy town."
     disabled: "This feature is currently disabled, talk to an admin."
-  notice:
-    enable-auto: "Enabled. Use this command again to disable."
-    disable-auto: "Disabled."
-    reduce-favor: "Favor reduced by %s, total: %s"
-    reward-favor: "Favor rewarded: %s, total: %s"
+    region: "Cannot do this while setting other regions."
 command:
   admin:
     forceexile:
@@ -54,6 +61,66 @@ command:
         full: "Successfully reset player %s exile kingdom to Barbarians."
       error:
         fail: "Could not exile player, already barbarian or bad random wild location."
+    forcejoin:
+      notice:
+        success: "Successfully set player %s to kingdom %s."
+    forcetown:
+      notice:
+        rename: "Successfully changed town name %s to %s."
+      error:
+        no-upgrade: "Invalid upgrade name."
+        no-level: "Invalid upgrade level."
+    help:
+      notice:
+        message: "Admin Help: Command, Arguments, Description"
+    makekingdom:
+      notice:
+        prompt-1: "Successfully created new Kingdom Capital for %s."
+        prompt-2: "Claim additional land with \"/k admin claim\"."
+        prompt-3: "Set the capital spawn point with \"/k admin settravel\"."
+        prompt-4: "Next, set up the Monument Template with \"/k admin monument %s create\"."
+    monument:
+      notice:
+        create: "Now creating new Monument Template, click on the first corner block of the region."
+        remove: "Removed Monument Template for Kingdom %s."
+        show: "Showing existing Monument Template for Kingdom %s."
+      error:
+        none: "There is no valid Monument Template for Kingdom %s."
+    rename:
+      notice:
+        kingdom: "Successfully renamed Kingdom %s to %s."
+        town: "Successfully renamed Town %s to %s."
+    ruin:
+      notice:
+        create: "Successfully created new Ruin: %s"
+        remove: "Successfully removed Ruin: %s"
+        criticals: "Removed all previous critical blocks from %s, click on blocks to add."
+        spawns: "Removed all previous spawn blocks from %s, click on blocks to add."
+      error:
+        create: "Could not create Ruin %s, bad name or territory overlap."
+        remove: "Failed to remove unknown Ruin %s."
+    save:
+      notice:
+        message: "Saved all kingdoms, camps and ruins to files."
+    settravel:
+      notice:
+        success: "Successfully set new travel point in %s."
+      error:
+        fail: "Failed to set travel point in unknown territory."
+    stat:
+      notice:
+        show: "Stat %s for player %s: %s"
+        set: "Set stat %s for player %s to %s."
+        add: "Added %s to stat %s for player %s: %s"
+        clear: "Cleared stat %s to zero for player %s."
+      error:
+        name: "Invalid stat %s, could not match to existing stats."
+        value: "Invalid stat value: %s"
+    unclaim:
+      notice:
+        success: "Successfully removed chunk from territory %s."
+      error:
+        fail: "Failed to unclaim this chunk."
   chat:
     notice:
       enable: "Kingdom chat"
@@ -138,7 +205,6 @@ command:
     error:
       missing-name: "Must specify a town name."
       space-name: "Bad town name, cannot use spaces."
-      bad-name: "Town name must only contain letters and/or numbers."
       fail-name: "Invalid Town name, already taken or has spaces."
       fail-overlap: "Town overlaps with a nearby territory."
       fail-placement: "Could not find a good Monument placement."

@@ -71,7 +71,7 @@ public class SettleCommand extends CommandBase {
         	String townName = getArgs()[1];
         	if(!StringUtils.isAlphanumeric(townName)) {
         		//ChatUtil.sendError((Player) getSender(), "Town name must only contain letters and/or numbers");
-        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_BAD_NAME.getMessage());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
                 return;
         	}
         	if(getKonquest().getPlayerManager().isPlayerNameExist(townName)) {
