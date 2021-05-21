@@ -28,6 +28,13 @@ label:
   bypass: "BYPASS"
   ruins: "Ruins"
   ruin: "Ruin"
+  cost: "Cost"
+  increment-cost: "Increment Cost"
+  level: "Level"
+  population: "Population"
+  back: "Back"
+  next: "Next"
+  close: "Close"
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."
@@ -188,6 +195,7 @@ command:
     error:
       off: "Your prefix title is already off"
       new: "The prefix %s is not unlocked!"
+      default: "Your prefix has been reverted to default."
   score:
     notice:
       all-header: "All Kingdom scores"

@@ -17,6 +17,7 @@ import konquest.model.KonPrefixType;
 import konquest.model.KonStats;
 import konquest.model.KonStatsType;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class KonquestDB extends Database{
 
@@ -224,7 +225,8 @@ public class KonquestDB extends Database{
         	    	Bukkit.getScheduler().scheduleSyncDelayedTask(getKonquest().getPlugin(), new Runnable() {
         	            @Override
         	            public void run() {
-        	            	ChatUtil.sendError(bukkitPlayer, "Your prefix has been reverted to default.");
+        	            	//ChatUtil.sendError(bukkitPlayer, "Your prefix has been reverted to default.");
+        	            	ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_PREFIX_ERROR_DEFAULT.getMessage());
         	            }
         	        }, 20);
         		}
