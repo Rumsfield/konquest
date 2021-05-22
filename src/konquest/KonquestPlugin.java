@@ -43,6 +43,7 @@ public class KonquestPlugin extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
+		ChatUtil.printDebug("Executing onDisable...");
 		if(enableSuccess) {
 			konquest.getKingdomManager().saveKingdoms();
 			konquest.getKingdomManager().saveCamps();
@@ -50,6 +51,8 @@ public class KonquestPlugin extends JavaPlugin {
 			konquest.getRuinManager().removeAllGolems();
 			konquest.getConfigManager().saveConfigs();
 			konquest.getDatabaseThread().flushDatabase();
+			konquest.getDatabaseThread().getDatabase().getDatabaseConnection().disconnect();
+			ChatUtil.printDebug("Finished onDisable");
 		}
 	}
 	

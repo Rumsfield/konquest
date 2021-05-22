@@ -126,7 +126,12 @@ public class Konquest implements Timeable {
 		kingdomManager.initialize();
 		ruinManager.initialize();
 		initManagers();
-		databaseThread.getThread().start();
+		if(!databaseThread.isRunning()) {
+			ChatUtil.printDebug("Starting database thread");
+			databaseThread.getThread().start();
+		} else {
+			ChatUtil.printDebug("Database thread is already running");
+		}
 		
 		// Create global scoreboard and teams
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -145,6 +150,7 @@ public class Konquest implements Timeable {
 		
 		kingdomManager.updateSmallestKingdom();
 		kingdomManager.updateAllTownDisabledUpgrades();
+		
 		ChatUtil.printDebug("Finished Initialization");
 	}
 	
@@ -177,6 +183,14 @@ public class Konquest implements Timeable {
 		compassTimer.stopTimer();
 		compassTimer.setTime(30); // 30 second compass update interval
 		compassTimer.startLoopTimer();
+	}
+	
+	public void initOnlinePlayers() {
+		// Fetch any players that happen to be in the server already (typically from /reload)
+        for(Player bukkitPlayer : Bukkit.getServer().getOnlinePlayers()) {
+			initPlayer(bukkitPlayer);
+			ChatUtil.printStatus("Loaded online player "+bukkitPlayer.getName());
+		}
 	}
 	
 	public KonPlayer initPlayer(Player bukkitPlayer) {

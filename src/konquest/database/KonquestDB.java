@@ -21,8 +21,11 @@ import konquest.utility.MessagePath;
 
 public class KonquestDB extends Database{
 
+	private boolean isReady;
+	
 	public KonquestDB(Konquest konquest) {
         super(konquest);
+        this.isReady = false;
     }
 
     @Override
@@ -35,13 +38,14 @@ public class KonquestDB extends Database{
         spawnTables();
         getKonquest().getPlayerManager().initAllSavedPlayers();
         getKonquest().getKingdomManager().initCamps();
+        isReady = true;
         ChatUtil.printStatus("SQLite database is ready");
         
-        // Fetch any players that happen to be in the server already (typically from /reload)
-        for(Player bukkitPlayer : Bukkit.getServer().getOnlinePlayers()) {
-			getKonquest().initPlayer(bukkitPlayer);
-			ChatUtil.printStatus("Loaded online player "+bukkitPlayer.getName());
-		}
+        getKonquest().initOnlinePlayers();
+    }
+    
+    public boolean isReady() {
+    	return isReady;
     }
 
     public void spawnTables() {

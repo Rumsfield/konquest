@@ -156,9 +156,14 @@ public class PlayerManager {
     		importedPlayer.setExileKingdom(konquest.getKingdomManager().getBarbarians());
     	}
     	
-    	onlinePlayers.put(bukkitPlayer, importedPlayer);
-    	linkOnlinePlayerToCache(importedPlayer);
-    	ChatUtil.printDebug("Imported player "+bukkitPlayer.getName());
+    	if(onlinePlayers.containsKey(bukkitPlayer)) {
+    		ChatUtil.printDebug("Skipped importing existing player "+bukkitPlayer.getName());
+    	} else {
+    		onlinePlayers.put(bukkitPlayer, importedPlayer);
+        	linkOnlinePlayerToCache(importedPlayer);
+        	ChatUtil.printDebug("Imported player "+bukkitPlayer.getName());
+    	}
+    	
     	return importedPlayer;
 	}
 	
