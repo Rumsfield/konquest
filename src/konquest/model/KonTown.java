@@ -9,6 +9,7 @@ import java.util.UUID;
 import konquest.Konquest;
 import konquest.utility.BlockPaster;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
@@ -461,7 +462,8 @@ public class KonTown extends KonTerritory implements Timeable{
 			//ChatUtil.printDebug("Found "+numPlayers+" in Kingdom "+kingdomName+" for message sender");
 			for(KonPlayer player : getKonquest().getPlayerManager().getPlayersInKingdom(getKingdom().getName())) {
 				//ChatUtil.printDebug("Sent monument safe message to player "+player.getBukkitPlayer().getName());
-				ChatUtil.sendNotice(player.getBukkitPlayer(), "The Town of "+getName()+" is safe, for now...", ChatColor.DARK_GREEN);
+				//ChatUtil.sendNotice(player.getBukkitPlayer(), "The Town of "+getName()+" is safe, for now...", ChatColor.DARK_GREEN);
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_SAFE.getMessage(getName()), ChatColor.DARK_GREEN);
 			}
 		} else if(taskID == captureTimer.getTaskID()) {
 			ChatUtil.printDebug("Capture Timer ended with taskID: "+taskID);
@@ -819,7 +821,8 @@ public class KonTown extends KonTerritory implements Timeable{
 		for(OfflinePlayer offlinePlayer : getPlayerElites()) {
 			if(offlinePlayer.isOnline()) {
 				//ChatUtil.sendNotice((Player)offlinePlayer, "Received new request from "+name+" to join "+getName());
-				ChatUtil.sendNotice((Player)offlinePlayer, name+" wants to join "+getName()+", use \"/k town "+getName()+" add "+name+"\" to allow, \"/k town "+getName()+" kick "+name+"\" to deny", ChatColor.LIGHT_PURPLE);
+				//ChatUtil.sendNotice((Player)offlinePlayer, name+" wants to join "+getName()+", use \"/k town "+getName()+" add "+name+"\" to allow, \"/k town "+getName()+" kick "+name+"\" to deny", ChatColor.LIGHT_PURPLE);
+				ChatUtil.sendNotice((Player)offlinePlayer, MessagePath.GENERIC_NOTICE_JOIN_REQUEST.getMessage(name,getName(),getName(),name,getName(),name), ChatColor.LIGHT_PURPLE);
 			}
 		}
 	}

@@ -1,18 +1,19 @@
 package konquest.model;
 
 import org.bukkit.Material;
-//import org.bukkit.ChatColor;
+
+import konquest.utility.MessagePath;
 
 public enum KonUpgrade {
 
-	LOOT 		(3, Material.GOLD_INGOT, "Monument Loot", new String[] {"Adds 1 more loot item per chest", "Adds 2 more loot items per chest", "Adds 3 more loot items per chest"}),
-	DROPS		(1, Material.LEATHER, "Animal Drops", new String[] {"Animal mobs drop 1 more item"}),
-	FATIGUE		(1, Material.DIAMOND_PICKAXE, "Enemy Fatigue", new String[] {"Enemies get mining fatigue 2"}),
-	COUNTER		(2, Material.COMPASS, "Counter-Intelligence", new String[] {"Prevent spy maps from locating this town", "Prevent compasses from pointing to this town"}),
-	HEALTH		(3, Material.ENCHANTED_GOLDEN_APPLE, "Health Buff", new String[] {"Adds 1 heart to friendly health bars", "Adds 2 hearts to friendly health bars", "Adds 3 hearts to friendly health bars"}),
-	DAMAGE		(2, Material.TNT, "Prevent Damage", new String[] {"Prevents all fire spread", "Prevents all explosions"}),
-	WATCH 		(3, Material.PLAYER_HEAD, "Town Watch", new String[] {"Prevents enemy raids unless at least 1 resident is online", "Prevents enemy raids unless at least 2 residents are online", "Prevents enemy raids unless at least 3 residents are online"}),
-	ENCHANT		(1, Material.ENCHANTED_BOOK, "Better Enchantments", new String[] {"Raises enchantment offers by 1 level"});
+	LOOT 		(3, Material.GOLD_INGOT, 				MessagePath.UPGRADE_LOOT_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_LOOT_LEVEL_1.getMessage(), MessagePath.UPGRADE_LOOT_LEVEL_2.getMessage(), MessagePath.UPGRADE_LOOT_LEVEL_3.getMessage()}),
+	DROPS		(1, Material.LEATHER, 					MessagePath.UPGRADE_DROPS_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_DROPS_LEVEL_1.getMessage()}),
+	FATIGUE		(1, Material.DIAMOND_PICKAXE, 			MessagePath.UPGRADE_FATIGUE_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_FATIGUE_LEVEL_1.getMessage()}),
+	COUNTER		(2, Material.COMPASS, 					MessagePath.UPGRADE_COUNTER_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_COUNTER_LEVEL_1.getMessage(), MessagePath.UPGRADE_COUNTER_LEVEL_2.getMessage()}),
+	HEALTH		(3, Material.ENCHANTED_GOLDEN_APPLE, 	MessagePath.UPGRADE_HEALTH_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_HEALTH_LEVEL_1.getMessage(), MessagePath.UPGRADE_HEALTH_LEVEL_2.getMessage(), MessagePath.UPGRADE_HEALTH_LEVEL_3.getMessage()}),
+	DAMAGE		(2, Material.TNT, 						MessagePath.UPGRADE_DAMAGE_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_DAMAGE_LEVEL_1.getMessage(), MessagePath.UPGRADE_DAMAGE_LEVEL_2.getMessage()}),
+	WATCH 		(3, Material.PLAYER_HEAD, 				MessagePath.UPGRADE_WATCH_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_WATCH_LEVEL_1.getMessage(), MessagePath.UPGRADE_WATCH_LEVEL_2.getMessage(), MessagePath.UPGRADE_WATCH_LEVEL_3.getMessage()}),
+	ENCHANT		(1, Material.ENCHANTED_BOOK, 			MessagePath.UPGRADE_ENCHANT_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_ENCHANT_LEVEL_1.getMessage()});
 	//OLD			(1, Material.NETHER_STAR, ChatColor.MAGIC+"Old One", new String[] {"Summon The Old One"});
 	
 	private final int levels;

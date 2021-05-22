@@ -309,7 +309,7 @@ public class KonquestDB extends Database{
         val[0] = "'"+player.getKingdom().getName()+"'";
         val[1] = "'"+player.getExileKingdom().getName()+"'";
         val[2] = player.isBarbarian() ? "1" : "0";
-        val[3] = "'"+player.getPlayerPrefix().getMainPrefixName()+"'";
+        val[3] = "'"+player.getPlayerPrefix().getMainPrefix().toString()+"'";
         val[4] = player.getPlayerPrefix().isEnabled() ? "1" : "0";
         set("players", col, val, "uuid", playerUUIDString);
         

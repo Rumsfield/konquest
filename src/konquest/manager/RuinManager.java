@@ -18,6 +18,7 @@ import konquest.KonquestPlugin;
 import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class RuinManager {
@@ -70,14 +71,18 @@ public class RuinManager {
 		            if(r.transactionSuccess()) {
 		            	String balanceF = String.format("%.2f",r.balance);
 		            	String amountF = String.format("%.2f",r.amount);
-		            	ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+"Captured Ruin: "+ruin.getName()+ChatColor.RESET+" "+ChatColor.WHITE+"Favor rewarded: "+ChatColor.DARK_GREEN+amountF+ChatColor.WHITE+", total: "+ChatColor.DARK_GREEN+balanceF);
+		            	//ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+"Captured Ruin: "+ruin.getName()+ChatColor.RESET+" "+ChatColor.WHITE+"Favor rewarded: "+ChatColor.DARK_GREEN+amountF+ChatColor.WHITE+", total: "+ChatColor.DARK_GREEN+balanceF);
+		            	ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_NOTICE_RUIN.getMessage(ruin.getName()));
+		            	ChatUtil.sendNotice(friendly.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REWARD_FAVOR.getMessage(amountF,balanceF));
 		            } else {
-		            	ChatUtil.sendError(friendly.getBukkitPlayer(), String.format("An error occured: %s", r.errorMessage));
+		            	//ChatUtil.sendError(friendly.getBukkitPlayer(), String.format("An error occured: %s", r.errorMessage));
+		            	ChatUtil.sendError(friendly.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
 		            }
 				}
 				if(rewardExp > 0) {
 					friendly.getBukkitPlayer().giveExp(rewardExp);
-					ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.WHITE+"EXP rewarded: "+ChatColor.GREEN+rewardExp);
+					//ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.WHITE+"EXP rewarded: "+ChatColor.GREEN+rewardExp);
+					ChatUtil.sendNotice(friendly.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REWARD_EXP.getMessage(rewardExp));
 				}
 			}
 		}

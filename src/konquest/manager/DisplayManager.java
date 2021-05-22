@@ -362,7 +362,7 @@ public class DisplayManager {
     	int statValue = 0;
     	for(KonStatsType stat : KonStatsType.values()) {
     		statValue = stats.getStat(stat);
-    		info = new InfoIcon(ChatColor.GOLD+stat.toString(),Arrays.asList(loreColor+stat.description(),ChatColor.AQUA+""+statValue),stat.getMaterial(),i);
+    		info = new InfoIcon(ChatColor.GOLD+stat.displayName(),Arrays.asList(loreColor+stat.description(),ChatColor.AQUA+""+statValue),stat.getMaterial(),i);
     		newMenu.getPage(2).addIcon(info);
     		i++;
     	}

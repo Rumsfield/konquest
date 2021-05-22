@@ -47,10 +47,10 @@ public class PrefixCommand extends CommandBase {
         		if(player.getPlayerPrefix().isEnabled()) {
         			player.getPlayerPrefix().setEnable(false);
         			//ChatUtil.sendNotice((Player) getSender(), "Turned off your prefix title");
-        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_PREFIX_NOTICE_OFF.getMessage());
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_PREFIX_NOTICE_DISABLE.getMessage());
         		} else {
         			//ChatUtil.sendNotice((Player) getSender(), "Your prefix title is already off");
-        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_PREFIX_ERROR_OFF.getMessage());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_PREFIX_ERROR_DISABLE.getMessage());
         		}
         	} else if(KonPrefixType.isPrefixName(prefixReq)) {
         		// Selected an existing prefix

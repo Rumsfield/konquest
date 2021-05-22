@@ -175,7 +175,7 @@ public class AccomplishmentManager {
 					page = "";
 					page = page+ChatColor.DARK_PURPLE+cat.getTitle();
 					page = page+ChatColor.RESET+"\n";
-					page = page+ChatColor.DARK_PURPLE+ChatColor.ITALIC+stat.toString();
+					page = page+ChatColor.DARK_PURPLE+ChatColor.ITALIC+stat.displayName();
 					page = page+ChatColor.RESET+"\n";
 					page = page+ChatColor.BLACK+stat.description();
 					page = page+ChatColor.RESET+"\n\n";

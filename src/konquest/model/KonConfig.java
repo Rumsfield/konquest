@@ -118,7 +118,7 @@ public class KonConfig {
 			    }
 			}
 			result = true;
-			Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Invalid or missing config file \""+fileName+"\" replaced with latest default version. Manually edit new YML file.");
+			Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Invalid or missing config file \""+fileName+"\" replaced with latest default version. Manually edit new YML file if desired.");
 		}
 		return result;
 	}

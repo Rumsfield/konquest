@@ -1,6 +1,7 @@
 package konquest.model;
 
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
@@ -384,8 +385,8 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 			}
 		} else if(taskID == combatTagTimer.getTaskID()) {
 			isCombatTagged = false;
-			ChatUtil.sendKonPriorityTitle(this, "", ChatColor.GOLD+"Tag Expired", 20, 1, 10);
-			ChatUtil.sendNotice(this.getBukkitPlayer(), "You are no longer in combat");
+			ChatUtil.sendKonPriorityTitle(this, "", ChatColor.GOLD+MessagePath.PROTECTION_NOTICE_UNTAGGED.getMessage(), 20, 1, 10);
+			ChatUtil.sendNotice(this.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_UNTAG_MESSAGE.getMessage());
 			ChatUtil.printDebug("Combat tag timer ended with taskID: "+taskID+" for "+bukkitPlayer.getName());
 		}
 	}
