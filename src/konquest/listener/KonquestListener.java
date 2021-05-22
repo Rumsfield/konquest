@@ -14,6 +14,7 @@ import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import konquest.utility.Timer;
 
 import java.util.ArrayList;
@@ -56,12 +57,12 @@ public class KonquestListener implements Listener {
 					vehicle.setVelocity(vehicle.getVelocity().multiply(-4));
 					vehicle.eject();
 				}
-				String adminText = "";
-				if(event.getPlayer().getBukkitPlayer().hasPermission("konquest.command.admin")) {
-					adminText = ". Use \"/k admin bypass\" to ignore.";
-				}
 				// Cancel the movement
-				ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "Cannot enter enemy Kingdom Capitals"+adminText, ChatColor.DARK_RED);
+				//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "Cannot enter enemy Kingdom Capitals"+adminText, ChatColor.DARK_RED);
+				ChatUtil.sendError(event.getPlayer().getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAPITAL_ENTER.getMessage());
+				if(event.getPlayer().getBukkitPlayer().hasPermission("konquest.command.admin")) {
+					ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
+				}
 				event.setCancelled(true);
 				return;
 			}
@@ -79,8 +80,9 @@ public class KonquestListener implements Listener {
 				if(!town.isRaidAlertDisabled()) {
 					// Alert all players of enemy Kingdom
 					for(KonPlayer player : playerManager.getPlayersInKingdom(event.getTerritory().getKingdom().getName())) {
-						ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.DARK_RED+"Enemy spotted in "+event.getTerritory().getName()+", use "+ChatColor.AQUA+"/k travel "+event.getTerritory().getName()+ChatColor.DARK_RED+" to defend!");
-						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+"Raid Alert!", ChatColor.DARK_RED+""+event.getTerritory().getName(), 60, 1, 10);
+						//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.DARK_RED+"Enemy spotted in "+event.getTerritory().getName()+", use "+ChatColor.AQUA+"/k travel "+event.getTerritory().getName()+ChatColor.DARK_RED+" to defend!");
+						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID.getMessage(event.getTerritory().getName(),event.getTerritory().getName()),ChatColor.DARK_RED);
+						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+event.getTerritory().getName(), 60, 1, 10);
 					}
 					// Start Raid Alert disable timer for target town
 					int raidAlertTimeSeconds = konquest.getConfigManager().getConfig("core").getInt("core.towns.raid_alert_cooldown");
@@ -136,8 +138,9 @@ public class KonquestListener implements Listener {
 				// Alert the camp owner if online
 				if(camp.isOwnerOnline() && !event.getPlayer().getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
 					KonPlayer ownerPlayer = playerManager.getPlayer((Player)camp.getOwner());
-					ChatUtil.sendNotice((Player)camp.getOwner(), "Enemy spotted in "+event.getTerritory().getName()+", use \"/k travel camp\" to defend!", ChatColor.DARK_RED);
-					ChatUtil.sendKonTitle(ownerPlayer, ChatColor.DARK_RED+"Raid Alert!", ChatColor.DARK_RED+""+event.getTerritory().getName());
+					//ChatUtil.sendNotice((Player)camp.getOwner(), "Enemy spotted in "+event.getTerritory().getName()+", use \"/k travel camp\" to defend!", ChatColor.DARK_RED);
+					ChatUtil.sendNotice((Player)camp.getOwner(), MessagePath.PROTECTION_NOTICE_RAID.getMessage(event.getTerritory().getName(),"camp"),ChatColor.DARK_RED);
+					ChatUtil.sendKonPriorityTitle(ownerPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+event.getTerritory().getName(), 60, 1, 10);
 					// Start Raid Alert disable timer for target town
 					int raidAlertTimeSeconds = konquest.getConfigManager().getConfig("core").getInt("core.towns.raid_alert_cooldown");
 					ChatUtil.printDebug("Starting raid alert timer for "+raidAlertTimeSeconds+" seconds");
@@ -170,7 +173,8 @@ public class KonquestListener implements Listener {
 		
 		// Verify town can be captured
 		if(town.isCaptureDisabled()) {
-			ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "This Town cannot be conquered again so soon!");
+			//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "This Town cannot be conquered again so soon!");
+			ChatUtil.sendError(event.getPlayer().getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(town.getCaptureCooldownString()));
 			event.setCancelled(true);
 			return;
 		}
@@ -225,7 +229,8 @@ public class KonquestListener implements Listener {
 					Timer townMonumentTimer = town.getMonumentTimer();
 					if(kingdomManager.removeTown(town.getName(), town.getKingdom().getName())) {
 						// Town is removed, no longer exists
-						ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "You have destroyed "+townName+" for the glory of the Barbarian horde!");
+						//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "You have destroyed "+townName+" for the glory of the Barbarian horde!");
+						ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_DESTROY.getMessage(townName));
 						int local_x = 0;
 						if(townSpawnLoc.getBlockX() > 0) {
 							local_x = townSpawnLoc.getBlockX() % 16;
@@ -268,10 +273,12 @@ public class KonquestListener implements Listener {
 					if(kingdomManager.conquerTown(town.getName(), town.getKingdom().getName(), event.getPlayer())) {
 						// Alert all players of original Kingdom
 						for(KonPlayer player : playerManager.getPlayersInKingdom(event.getTerritory().getKingdom().getName())) {
-							ChatUtil.sendNotice(player.getBukkitPlayer(), "The Town "+event.getTerritory().getName()+" has been conquered!", ChatColor.DARK_RED);
+							//ChatUtil.sendNotice(player.getBukkitPlayer(), "The Town "+event.getTerritory().getName()+" has been conquered!", ChatColor.DARK_RED);
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(event.getTerritory().getName()), ChatColor.DARK_RED);
 						}
 						ChatUtil.printDebug("Monument conversion in Town "+event.getTerritory().getName());
-						ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "You have conquered "+town.getName()+" for the conquest of "+event.getPlayer().getKingdom().getName()+"!");
+						//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "You have conquered "+town.getName()+" for the conquest of "+event.getPlayer().getKingdom().getName()+"!");
+						ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAPTURE.getMessage(town.getName(),event.getPlayer().getKingdom().getName()));
 						// Teleport all players inside center chunk to new spawn location
 						/*
 						event.getPlayer().getBukkitPlayer().teleport(town.getSpawnLoc());
@@ -321,30 +328,37 @@ public class KonquestListener implements Listener {
 				// Town has not yet been captured
 				int remainingHits = maxCriticalhits - town.getMonument().getCriticalHits();
 				int defendReward = konquest.getConfigManager().getConfig("core").getInt("core.favor.rewards.defend_raid");
-				ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "Critical Strike! "+remainingHits+" Critical Blocks remain.");
+				//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "Critical Strike! "+remainingHits+" Critical Blocks remain.");
+				ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CRITICAL.getMessage(remainingHits));
 				konquest.getAccomplishmentManager().modifyPlayerStat(event.getPlayer(),KonStatsType.CRITICALS,1);
 				
 				// Alert all players of enemy Kingdom when the first critical block is broken
 				if(town.getMonument().getCriticalHits() == 1) {
 					for(KonPlayer player : playerManager.getPlayersInKingdom(event.getTerritory().getKingdom().getName())) {
-						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+"Raid Alert!", ChatColor.DARK_RED+town.getName()+" is being conquered!", 60, 1, 10 );
-						ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.DARK_RED+"Use "+ChatColor.AQUA+"/k travel "+event.getTerritory().getName()+ChatColor.DARK_RED+" to defend and receive "+ChatColor.DARK_GREEN+defendReward+" Favor!");
+						//ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+"Raid Alert!", ChatColor.DARK_RED+town.getName()+" is being conquered!", 60, 1, 10 );
+						//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.DARK_RED+"Use "+ChatColor.AQUA+"/k travel "+event.getTerritory().getName()+ChatColor.DARK_RED+" to defend and receive "+ChatColor.DARK_GREEN+defendReward+" Favor!");
+						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+event.getTerritory().getName(), 60, 1, 10);
+						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_1.getMessage(event.getTerritory().getName(),event.getTerritory().getName(),defendReward),ChatColor.DARK_RED);
 					}
 				}
 				
 				// Alert all players of enemy Kingdom when half of critical blocks are broken
 				if(town.getMonument().getCriticalHits() == maxCriticalhits/2) {
 					for(KonPlayer player : playerManager.getPlayersInKingdom(event.getTerritory().getKingdom().getName())) {
-						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+"Raid Alert!", ChatColor.DARK_RED+town.getName()+" is at half strength!", 60, 1, 10 );
-						ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.DARK_RED+"Use "+ChatColor.AQUA+"/k travel "+event.getTerritory().getName()+ChatColor.DARK_RED+" to defend and receive "+ChatColor.DARK_GREEN+defendReward+" Favor!");
+						//ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+"Raid Alert!", ChatColor.DARK_RED+town.getName()+" is at half strength!", 60, 1, 10 );
+						//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.DARK_RED+"Use "+ChatColor.AQUA+"/k travel "+event.getTerritory().getName()+ChatColor.DARK_RED+" to defend and receive "+ChatColor.DARK_GREEN+defendReward+" Favor!");
+						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+event.getTerritory().getName(), 60, 1, 10);
+						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_2.getMessage(event.getTerritory().getName(),event.getTerritory().getName(),defendReward),ChatColor.DARK_RED);
 					}
 				}
 				
 				// Alert all players of enemy Kingdom when all but 1 critical blocks are broken
 				if(town.getMonument().getCriticalHits() == maxCriticalhits-1) {
 					for(KonPlayer player : playerManager.getPlayersInKingdom(event.getTerritory().getKingdom().getName())) {
-						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+"Raid Alert!", ChatColor.DARK_RED+town.getName()+" is in critical condition!", 60, 1, 10 );
-						ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.DARK_RED+"Use "+ChatColor.AQUA+"/k travel "+event.getTerritory().getName()+ChatColor.DARK_RED+" to defend and receive "+ChatColor.DARK_GREEN+defendReward+" Favor!");
+						//ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+"Raid Alert!", ChatColor.DARK_RED+town.getName()+" is in critical condition!", 60, 1, 10 );
+						//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.DARK_RED+"Use "+ChatColor.AQUA+"/k travel "+event.getTerritory().getName()+ChatColor.DARK_RED+" to defend and receive "+ChatColor.DARK_GREEN+defendReward+" Favor!");
+						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+event.getTerritory().getName(), 60, 1, 10);
+						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_3.getMessage(event.getTerritory().getName(),event.getTerritory().getName(),defendReward),ChatColor.DARK_RED);
 					}
 				}
 			}

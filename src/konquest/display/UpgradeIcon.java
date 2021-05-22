@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import konquest.Konquest;
 import konquest.model.KonUpgrade;
+import konquest.utility.MessagePath;
 
 public class UpgradeIcon implements MenuIcon{
 
@@ -38,9 +39,9 @@ public class UpgradeIcon implements MenuIcon{
 			}
 		}
 		List<String> loreList = new ArrayList<String>();
-		loreList.add(ChatColor.YELLOW+"Level "+level);
-		loreList.add(ChatColor.YELLOW+"Cost: "+ChatColor.AQUA+cost);
-		loreList.add(ChatColor.YELLOW+"Population: "+ChatColor.AQUA+pop);
+		loreList.add(ChatColor.YELLOW+MessagePath.LABEL_LEVEL.getMessage()+" "+level);
+		loreList.add(ChatColor.YELLOW+MessagePath.LABEL_COST.getMessage()+": "+ChatColor.AQUA+cost);
+		loreList.add(ChatColor.YELLOW+MessagePath.LABEL_POPULATION.getMessage()+": "+ChatColor.AQUA+pop);
 		for(String line : Konquest.stringPaginate(upgrade.getLevelDescription(level))) {
 			loreList.add(ChatColor.RED+line);
 		}

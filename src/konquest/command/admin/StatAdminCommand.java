@@ -15,7 +15,7 @@ import konquest.model.KonPlayer;
 import konquest.model.KonStats;
 import konquest.model.KonStatsType;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 public class StatAdminCommand extends CommandBase {
 
@@ -27,17 +27,17 @@ public class StatAdminCommand extends CommandBase {
 	public void execute() {
 		// k admin stat <player> <stat> show|set|add|clear [<value>]
 		if (getArgs().length != 5 && getArgs().length != 6) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
-        	
         	String playerName = getArgs()[2];
         	String statName = getArgs()[3];
         	String subCmd = getArgs()[4];
         	// Verify player exists
         	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
         	if(offlinePlayer == null) {
-        		ChatUtil.sendError((Player) getSender(), "Invalid player name, unknown or bad spelling.");
+        		//ChatUtil.sendError((Player) getSender(), "Invalid player name, unknown or bad spelling.");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
                 return;
         	}
         	String bukkitPlayerName = offlinePlayer.getOfflineBukkitPlayer().getName();
@@ -55,7 +55,8 @@ public class StatAdminCommand extends CommandBase {
         	// Verify stat exists
         	KonStatsType stat = KonStatsType.getStat(statName);
         	if(stat == null) {
-        		ChatUtil.sendError((Player) getSender(), "Invalid stat, could not match to existing stats.");
+        		//ChatUtil.sendError((Player) getSender(), "Invalid stat, could not match to existing stats.");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_ERROR_NAME.getMessage(statName));
                 return;
         	}
         	// Perform sub-commands
@@ -65,7 +66,8 @@ public class StatAdminCommand extends CommandBase {
         	switch(subCmd.toLowerCase()) {
         	case "show":
         		currentValue = stats.getStat(stat);
-            	ChatUtil.sendNotice((Player) getSender(), "Stat "+stat.toString()+" for player "+bukkitPlayerName+": "+currentValue);
+            	//ChatUtil.sendNotice((Player) getSender(), "Stat "+stat.toString()+" for player "+bukkitPlayerName+": "+currentValue);
+            	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_NOTICE_SHOW.getMessage(stat.toString(),bukkitPlayerName,currentValue));
             	// Remove reference to offline player's stats
             	if(!isPlayerOnline) {
             		stats = null;
@@ -78,11 +80,13 @@ public class StatAdminCommand extends CommandBase {
         		try {
         			valueNum = Integer.parseInt(value);
         		} catch(NumberFormatException e) {
-        			ChatUtil.sendError((Player) getSender(), "Invalid stat value: "+e.getMessage());
+        			//ChatUtil.sendError((Player) getSender(), "Invalid stat value: "+e.getMessage());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_ERROR_VALUE.getMessage(e.getMessage()));
                     return;
         		}
         		stats.setStat(stat, valueNum);
-        		ChatUtil.sendNotice((Player) getSender(), "Set stat "+stat.toString()+" for player "+bukkitPlayerName+": "+valueNum);
+        		//ChatUtil.sendNotice((Player) getSender(), "Set stat "+stat.toString()+" for player "+bukkitPlayerName+": "+valueNum);
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_NOTICE_SET.getMessage(stat.toString(),bukkitPlayerName,valueNum));
         		if(!isPlayerOnline) {
         			getKonquest().getDatabaseThread().getDatabase().pushPlayerStats(offlinePlayer.getOfflineBukkitPlayer(), stats);
         			stats = null;
@@ -97,13 +101,15 @@ public class StatAdminCommand extends CommandBase {
         		try {
         			valueNum = Integer.parseInt(value);
         		} catch(NumberFormatException e) {
-        			ChatUtil.sendError((Player) getSender(), "Invalid stat value: "+e.getMessage());
+        			//ChatUtil.sendError((Player) getSender(), "Invalid stat value: "+e.getMessage());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_ERROR_VALUE.getMessage(e.getMessage()));
                     return;
         		}
         		currentValue = stats.getStat(stat);
         		int newValue = currentValue+valueNum;
         		stats.setStat(stat, newValue);
-        		ChatUtil.sendNotice((Player) getSender(), "Added "+valueNum+" to stat "+stat.toString()+" for player "+bukkitPlayerName+": "+newValue);
+        		//ChatUtil.sendNotice((Player) getSender(), "Added "+valueNum+" to stat "+stat.toString()+" for player "+bukkitPlayerName+": "+newValue);
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_NOTICE_ADD.getMessage(valueNum,stat.toString(),bukkitPlayerName,newValue));
         		if(!isPlayerOnline) {
         			getKonquest().getDatabaseThread().getDatabase().pushPlayerStats(offlinePlayer.getOfflineBukkitPlayer(), stats);
         			stats = null;
@@ -113,7 +119,8 @@ public class StatAdminCommand extends CommandBase {
         		break;
         	case "clear":
         		stats.setStat(stat, 0);
-        		ChatUtil.sendNotice((Player) getSender(), "Cleared stat "+stat.toString()+" for player "+bukkitPlayerName);
+        		//ChatUtil.sendNotice((Player) getSender(), "Cleared stat "+stat.toString()+" for player "+bukkitPlayerName);
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_NOTICE_CLEAR.getMessage(stat.toString(),bukkitPlayerName));
             	// Remove reference to offline player's stats
             	if(!isPlayerOnline) {
             		stats = null;
@@ -122,7 +129,8 @@ public class StatAdminCommand extends CommandBase {
             	}
         		break;
         	default:
-        		ChatUtil.sendError((Player) getSender(), "Invalid sub-command, expected show|set|add|clear");
+        		//ChatUtil.sendError((Player) getSender(), "Invalid sub-command, expected show|set|add|clear");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
         		return;
         	}
         }

@@ -17,11 +17,15 @@ import konquest.model.KonPrefixType;
 import konquest.model.KonStats;
 import konquest.model.KonStatsType;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class KonquestDB extends Database{
 
+	private boolean isReady;
+	
 	public KonquestDB(Konquest konquest) {
         super(konquest);
+        this.isReady = false;
     }
 
     @Override
@@ -34,7 +38,14 @@ public class KonquestDB extends Database{
         spawnTables();
         getKonquest().getPlayerManager().initAllSavedPlayers();
         getKonquest().getKingdomManager().initCamps();
+        isReady = true;
         ChatUtil.printStatus("SQLite database is ready");
+        
+        getKonquest().initOnlinePlayers();
+    }
+    
+    public boolean isReady() {
+    	return isReady;
     }
 
     public void spawnTables() {
@@ -224,7 +235,8 @@ public class KonquestDB extends Database{
         	    	Bukkit.getScheduler().scheduleSyncDelayedTask(getKonquest().getPlugin(), new Runnable() {
         	            @Override
         	            public void run() {
-        	            	ChatUtil.sendError(bukkitPlayer, "Your prefix has been reverted to default.");
+        	            	//ChatUtil.sendError(bukkitPlayer, "Your prefix has been reverted to default.");
+        	            	ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_PREFIX_ERROR_DEFAULT.getMessage());
         	            }
         	        }, 20);
         		}
@@ -307,7 +319,7 @@ public class KonquestDB extends Database{
         val[0] = "'"+player.getKingdom().getName()+"'";
         val[1] = "'"+player.getExileKingdom().getName()+"'";
         val[2] = player.isBarbarian() ? "1" : "0";
-        val[3] = "'"+player.getPlayerPrefix().getMainPrefixName()+"'";
+        val[3] = "'"+player.getPlayerPrefix().getMainPrefix().toString()+"'";
         val[4] = player.getPlayerPrefix().isEnabled() ? "1" : "0";
         set("players", col, val, "uuid", playerUUIDString);
         

@@ -11,6 +11,7 @@ import konquest.Konquest;
 import konquest.command.CommandBase;
 //import konquest.command.admin.AdminCommandType;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class HelpAdminCommand extends CommandBase {
 	
@@ -20,7 +21,8 @@ public class HelpAdminCommand extends CommandBase {
 
     public void execute() {
         String message = "";
-        ChatUtil.sendNotice((Player) getSender(), "Admin Help: Command, Arguments, Description");
+        //ChatUtil.sendNotice((Player) getSender(), "Admin Help: Command, Arguments, Description");
+        ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_HELP_NOTICE_MESSAGE.getMessage());
         for(AdminCommandType cmd : AdminCommandType.values()) {
         	message = ChatColor.GOLD+"/k admin "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmd.arguments()+": "+ChatColor.GRAY+cmd.description();
             ChatUtil.sendMessage((Player) getSender(), message);

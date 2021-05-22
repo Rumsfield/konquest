@@ -72,6 +72,10 @@ public class KonPrefix {
 		return mainPrefix.getName();
 	}
 	
+	public KonPrefixType getMainPrefix() {
+		return mainPrefix;
+	}
+	
 	public Collection<String> getPrefixNames() {
 		Collection<String> result = new ArrayList<String>();
 		for(KonPrefixType pre : prefixList) {

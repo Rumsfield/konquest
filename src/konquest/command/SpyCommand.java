@@ -29,7 +29,7 @@ import konquest.model.KonTerritory;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class SpyCommand extends CommandBase {
@@ -42,14 +42,14 @@ public class SpyCommand extends CommandBase {
 	public void execute() {
 		// k spy
     	if (getArgs().length != 1) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
         	// Verify allowed world
         	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
-        		ChatUtil.sendError(bukkitPlayer, MessageStatic.INVALID_WORLD.toString());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
         	
@@ -58,14 +58,16 @@ public class SpyCommand extends CommandBase {
         	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_spy",0.0);
 			if(cost > 0) {
 				if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < cost) {
-					ChatUtil.sendError(bukkitPlayer, "Not enough Favor, need "+cost);
+					//ChatUtil.sendError(bukkitPlayer, "Not enough Favor, need "+cost);
+					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
                     return;
 				}
 			}
 			
 			// Verify enough inventory space to place map
 			if(bukkitPlayer.getInventory().firstEmpty() == -1) {
-				ChatUtil.sendError(bukkitPlayer, "Not enough inventory space, make some room");
+				//ChatUtil.sendError(bukkitPlayer, "Not enough inventory space, make some room");
+				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SPY_ERROR_INVENTORY.getMessage());
                 return;
 			}
 			
@@ -90,7 +92,8 @@ public class SpyCommand extends CommandBase {
 				}
 			}
 			if(closestTerritory == null) {
-				ChatUtil.sendError(bukkitPlayer, "Could not find an enemy town");
+				//ChatUtil.sendError(bukkitPlayer, "Could not find an enemy town");
+				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SPY_ERROR_TOWN.getMessage());
                 return;
 			}
 			
@@ -126,23 +129,30 @@ public class SpyCommand extends CommandBase {
             if(r.transactionSuccess()) {
             	String balanceF = String.format("%.2f",r.balance);
             	String amountF = String.format("%.2f",r.amount);
-            	ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
+            	//ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
+            	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
             	getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)cost);
             } else {
-            	ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
+            	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
+            	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
             }
             
 			String dist = "";
 			if(minDistance < 32) {
-				dist = "nearby";
+				//dist = "nearby";
+				dist = MessagePath.COMMAND_SPY_NOTICE_NEARBY.getMessage();
 			} else if (minDistance < 64) {
-				dist = "regional";
+				//dist = "regional";
+				dist = MessagePath.COMMAND_SPY_NOTICE_REGIONAL.getMessage();
 			} else if (minDistance < 128) {
-				dist = "faraway";
+				//dist = "faraway";
+				dist = MessagePath.COMMAND_SPY_NOTICE_FARAWAY.getMessage();
 			} else {
-				dist = "very distant";
+				//dist = "very distant";
+				dist = MessagePath.COMMAND_SPY_NOTICE_VERY_DISTANT.getMessage();
 			}
 			ChatUtil.sendNotice(bukkitPlayer, "A spy has recovered this map of a "+dist+" enemy town!");
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SPY_NOTICE_SUCCESS.getMessage(dist));
         }
 		
 	}

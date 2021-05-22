@@ -4,7 +4,7 @@ import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 import konquest.utility.Timer;
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -25,20 +25,21 @@ public class ExileCommand extends CommandBase {
 	public void execute() {
 		// k exile
     	if (getArgs().length != 1) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+            ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
 
         	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
-        		ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_WORLD.toString());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
         	
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	if(player.isBarbarian()) {
-        		ChatUtil.sendError((Player) getSender(), "You are already a disgrace to your Kingdom.");
+        		//ChatUtil.sendError((Player) getSender(), "You are already a disgrace to your Kingdom.");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
         		return;
         	} else {
         		
@@ -46,14 +47,19 @@ public class ExileCommand extends CommandBase {
         		if(!player.isExileConfirmed()) {
         			boolean isAllowSwitch = getKonquest().getConfigManager().getConfig("core").getBoolean("core.kingdoms.allow_exile_switch",false);
         			// Prompt the player to confirm
-        			ChatUtil.sendNotice((Player) getSender(), "Are you sure you want to become a "+ChatColor.DARK_RED+"Barbarian?");
-        			ChatUtil.sendNotice((Player) getSender(), "You will lose all Favor, stats and titles, and be sent to a random location in the Wild.",ChatColor.DARK_RED);
+        			//ChatUtil.sendNotice((Player) getSender(), "Are you sure you want to become a "+ChatColor.DARK_RED+"Barbarian?");
+        			//ChatUtil.sendNotice((Player) getSender(), "You will lose all Favor, stats and titles, and be sent to a random location in the Wild.",ChatColor.DARK_RED);
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_1.getMessage(),ChatColor.DARK_RED);
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_2.getMessage());
         			if(isAllowSwitch) {
-        				ChatUtil.sendNotice((Player) getSender(), "Once exiled, you may join any other Kingdom.",ChatColor.DARK_RED);
+        				//ChatUtil.sendNotice((Player) getSender(), "Once exiled, you may join any other Kingdom.",ChatColor.DARK_RED);
+        				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_3A.getMessage());
         			} else {
-        				ChatUtil.sendNotice((Player) getSender(), "You can only rejoin your current Kingdom, else you must ask an admin to switch Kingdoms.",ChatColor.DARK_RED);
+        				//ChatUtil.sendNotice((Player) getSender(), "You can only rejoin your current Kingdom, else you must ask an admin to switch Kingdoms.",ChatColor.DARK_RED);
+        				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_3B.getMessage());
         			}
-        			ChatUtil.sendNotice((Player) getSender(), "Use this command again to confirm.",ChatColor.DARK_RED);
+        			//ChatUtil.sendNotice((Player) getSender(), "Use this command again to confirm.",ChatColor.DARK_RED);
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_4.getMessage());
         			player.setIsExileConfirmed(true);
         			// Start a timer to cancel the confirmation
         			ChatUtil.printDebug("Starting exile confirmation timer for 60 seconds for player "+bukkitPlayer.getName());
@@ -68,13 +74,18 @@ public class ExileCommand extends CommandBase {
             			double balance = KonquestPlugin.getEconomy().getBalance(bukkitPlayer);
                     	EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, balance);
         	            if(r.transactionSuccess()) {
-        	            	ChatUtil.sendNotice((Player) getSender(), "Favor lost");
+        	            	String balanceF = String.format("%.2f",r.balance);
+    		            	String amountF = String.format("%.2f",r.amount);
+    		            	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
         	            } else {
-        	            	ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
+        	            	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
+        	            	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
         	            }
-                    	ChatUtil.sendNotice((Player) getSender(), ChatColor.GRAY+"You have been exiled as a "+ChatColor.DARK_RED+"Barbarian"+ChatColor.GRAY+", place a bed to create your Camp.");
+                    	//ChatUtil.sendNotice((Player) getSender(), ChatColor.GRAY+"You have been exiled as a "+ChatColor.DARK_RED+"Barbarian"+ChatColor.GRAY+", place a bed to create your Camp.");
+                    	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_CONFIRMED.getMessage());
             		} else {
-            			ChatUtil.sendError((Player) getSender(), "Internal error, could not exile. Contact an Admin!");
+            			//ChatUtil.sendError((Player) getSender(), "Internal error, could not exile. Contact an Admin!");
+            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
             		}
         		}
         	}

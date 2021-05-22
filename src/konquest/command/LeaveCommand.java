@@ -14,7 +14,7 @@ import konquest.Konquest;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 public class LeaveCommand extends CommandBase {
 
@@ -25,7 +25,7 @@ public class LeaveCommand extends CommandBase {
 	public void execute() {
 		// k leave townName
 		if (getArgs().length != 2) {
-			ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
 		}
 		
@@ -44,27 +44,33 @@ public class LeaveCommand extends CommandBase {
 		    	if(town.removePlayerResident(bukkitPlayer)) {
 		    		for(OfflinePlayer resident : town.getPlayerResidents()) {
 		    			if(resident.isOnline()) {
-		    				ChatUtil.sendNotice((Player) resident, bukkitPlayer.getName()+" has left the town of "+leaveName);
+		    				//ChatUtil.sendNotice((Player) resident, bukkitPlayer.getName()+" has left the town of "+leaveName);
+		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_LEAVE_NOTICE_TOWN_RESIDENT.getMessage(bukkitPlayer.getName(),leaveName));
 		    			}
 		    		}
-		    		ChatUtil.sendNotice(bukkitPlayer, "You have left the town of "+leaveName);
+		    		//ChatUtil.sendNotice(bukkitPlayer, "You have left the town of "+leaveName);
+		    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_LEAVE_NOTICE_PLAYER.getMessage(leaveName));
 		    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
 		    	} else {
-		    		ChatUtil.sendError((Player) getSender(), "Failed to remove you from the town of "+leaveName);
+		    		//ChatUtil.sendError((Player) getSender(), "Failed to remove you from the town of "+leaveName);
+		    		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_LEAVE_ERROR_NO_RESIDENT.getMessage(leaveName));
 		    	}
 			} else {
 				// Player is not resident, try to decline join invite
 				if(town.isJoinInviteValid(id)) {
 					// There is an existing invite to join, remove the player from the invites list
 					town.removeJoinRequest(id);
-					ChatUtil.sendNotice(bukkitPlayer, "Invite to join "+leaveName+" declined.");
+					//ChatUtil.sendNotice(bukkitPlayer, "Invite to join "+leaveName+" declined.");
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_LEAVE_NOTICE_INVITE_DECLINE.getMessage(leaveName));
 				} else {
-					ChatUtil.sendError(bukkitPlayer, "You are not a resident of "+leaveName);
+					//ChatUtil.sendError(bukkitPlayer, "You are not a resident of "+leaveName);
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_LEAVE_ERROR_NO_RESIDENT.getMessage(leaveName));
 				}
 			}
 		} else {
     		// Could not find what to leave
-    		ChatUtil.sendError((Player) getSender(), "Failed to leave \""+leaveName+"\", maybe bad spelling or enemy.");
+    		//ChatUtil.sendError((Player) getSender(), "Failed to leave \""+leaveName+"\", maybe bad spelling or enemy.");
+    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(leaveName));
     	}
 	}
 	

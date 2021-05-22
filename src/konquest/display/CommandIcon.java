@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import konquest.Konquest;
 import konquest.command.CommandType;
+import konquest.utility.MessagePath;
 
 public class CommandIcon implements MenuIcon{
 
@@ -37,10 +38,10 @@ public class CommandIcon implements MenuIcon{
 		}
 		List<String> loreList = new ArrayList<String>();
 		if(cost > 0) {
-			loreList.add(ChatColor.GOLD+"Cost: "+ChatColor.AQUA+cost);
+			loreList.add(ChatColor.GOLD+MessagePath.LABEL_COST.getMessage()+": "+ChatColor.AQUA+cost);
 		}
 		if(cost_incr > 0) {
-			loreList.add(ChatColor.RED+"Increment Cost: "+ChatColor.AQUA+cost_incr);
+			loreList.add(ChatColor.RED+MessagePath.LABEL_INCREMENT_COST.getMessage()+": "+ChatColor.AQUA+cost_incr);
 		}
 		for(String line : Konquest.stringPaginate(command.description())) {
 			loreList.add(line);

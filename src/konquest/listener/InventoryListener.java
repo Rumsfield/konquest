@@ -12,6 +12,7 @@ import konquest.model.KonTerritory;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 import java.util.Map;
 
@@ -70,7 +71,7 @@ public class InventoryListener implements Listener {
 				// Prevent all inventory openings inside Capitals
 				if(territory instanceof KonCapital) {
 					//ChatUtil.printDebug("Cancelled inventory open event in "+territory.getName());
-					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 					event.setCancelled(true);
 					return;
 				}
@@ -83,13 +84,14 @@ public class InventoryListener implements Listener {
 					// Prevent all inventory openings by enemies
 					if(isEnemyInvetoryOpenDenied && !player.getKingdom().equals(town.getKingdom())) {
 						//ChatUtil.printDebug("Cancelled inventory open event in "+territory.getName());
-						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
 						return;
 					}
 					// Notify player when there is no lord
 					if(town.canClaimLordship(player)) {
-						ChatUtil.sendNotice(player.getBukkitPlayer(), town.getName()+" has no leader! Use \"/k town <name> lord <your name>\" to claim Lordship.");
+						//ChatUtil.sendNotice(player.getBukkitPlayer(), town.getName()+" has no leader! Use \"/k town <name> lord <your name>\" to claim Lordship.");
+						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),player.getBukkitPlayer().getName()));
 					}
 					// Prevent non-residents in closed towns from opening inventories that can hold items
 					// However this still allows them to open inventories like enchantment tables, crating bench, etc.
@@ -98,7 +100,8 @@ public class InventoryListener implements Listener {
 							 event.getInventory().getHolder() instanceof DoubleChest ||
 							 event.getInventory().getHolder() instanceof StorageMinecart)) {
 						//ChatUtil.printDebug("Cancelled inventory open event for non-resident in closed town "+territory.getName());
-						ChatUtil.sendNotice(player.getBukkitPlayer(), "You must be a resident to access containers in "+territory.getName(), ChatColor.DARK_RED);
+						//ChatUtil.sendNotice(player.getBukkitPlayer(), "You must be a resident to access containers in "+territory.getName(), ChatColor.DARK_RED);
+						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
 						event.setCancelled(true);
 						return;
 					}
@@ -112,13 +115,15 @@ public class InventoryListener implements Listener {
 								if(result) {
 									Bukkit.getWorld(konquest.getWorldName()).playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
 								} else {
-									ChatUtil.sendNotice(player.getBukkitPlayer(), "Come back later!");
+									//ChatUtil.sendNotice(player.getBukkitPlayer(), "Come back later!");
+									ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_LOOT_LATER.getMessage());
 								}
 							//} else {
 							//	ChatUtil.sendNotice(player.getBukkitPlayer(), "Empty the chest to get more loot.");
 							//}
 						} else {
-							ChatUtil.sendNotice(player.getBukkitPlayer(), "You must be a knight or the lord of "+town.getName()+" to open this!");
+							//ChatUtil.sendNotice(player.getBukkitPlayer(), "You must be a knight or the lord of "+town.getName()+" to open this!");
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 							event.setCancelled(true);
 							return;
 						}
@@ -130,7 +135,7 @@ public class InventoryListener implements Listener {
 					KonCamp camp = (KonCamp) territory;
 					if(!player.getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
 						//ChatUtil.printDebug("Cancelled inventory open event in "+territory.getName());
-						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
 						return;
 					}

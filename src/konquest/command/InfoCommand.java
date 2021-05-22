@@ -12,7 +12,7 @@ import konquest.model.KonPlayer;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -30,7 +30,7 @@ public class InfoCommand extends CommandBase {
 		// k info <kingdomName>|<townName>|<playerName>
 		//ChatUtil.printDebug("Entering info command execution...");
     	if (getArgs().length != 1 && getArgs().length != 2) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
@@ -101,11 +101,28 @@ public class InfoCommand extends CommandBase {
         				}
         				player = otherPlayer;
         			} else {
-            			ChatUtil.sendError((Player) getSender(), "Failed to find unknown name, check spelling: "+name);
+            			//ChatUtil.sendError((Player) getSender(), "Failed to find unknown name, check spelling: "+name);
+            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(name));
             	        return;
         			}
         		}
         	}
+        	String labelTotalPlayers = MessagePath.LABEL_TOTAL_PLAYERS.getMessage();
+        	String labelOnlinePlayers = MessagePath.LABEL_ONLINE_PLAYERS.getMessage();
+        	String labelPlayer = MessagePath.LABEL_PLAYER.getMessage();
+        	String labelKingdom = MessagePath.LABEL_KINGDOM.getMessage();
+        	String labelBarbarian = MessagePath.LABEL_BARBARIAN.getMessage();
+        	String labelTowns = MessagePath.LABEL_TOWNS.getMessage();
+        	String labelLand = MessagePath.LABEL_LAND.getMessage();
+        	String labelFavor = MessagePath.LABEL_FAVOR.getMessage();
+        	String labelOpen = MessagePath.LABEL_OPEN.getMessage();
+        	String labelHealth = MessagePath.LABEL_HEALTH.getMessage();
+        	String labelUpgrades = MessagePath.LABEL_UPGRADES.getMessage();
+        	String labelResidents = MessagePath.LABEL_RESIDENTS.getMessage();
+        	String labelInvites = MessagePath.LABEL_INVITES.getMessage();
+        	String labelRequests = MessagePath.LABEL_REQUESTS.getMessage();
+        	String labelResidencies = MessagePath.LABEL_RESIDENCIES.getMessage();
+        	
         	switch(displayState) {
         	case 0: // Display kingdom info
         		//ChatUtil.printDebug("Displaying Kingdom");
@@ -125,18 +142,18 @@ public class InfoCommand extends CommandBase {
 	        	if(kingdom.equals(getKonquest().getKingdomManager().getBarbarians())) {
 		        	String[] message = {
 		        			ChatColor.DARK_RED + "#==~ "+kingdomName+" ~==#",
-		        			ChatColor.DARK_RED + "# Players: "+ChatColor.AQUA+numKingdomPlayers};
+		        			ChatColor.DARK_RED + "# "+labelTotalPlayers+": "+ChatColor.AQUA+numKingdomPlayers};
 		        	for(String line : message) {
 		        		ChatUtil.sendMessage(bukkitPlayer, line);
 		        	}
 	        	} else {
 	        		String[] message = {
-		        			ChatColor.GOLD + "#==~ Kingdom of "+color+kingdomName+ChatColor.GOLD+" ~==#",
-		        			ChatColor.GOLD + "|  Players Online: "+ChatColor.AQUA+numKingdomPlayers,
-		        			ChatColor.GOLD + "|  Total Players: "+ChatColor.AQUA+numAllKingdomPlayers,
-		        			ChatColor.GOLD + "|  Towns: "+ChatColor.AQUA+numKingdomTowns,
-		        			ChatColor.GOLD + "|  Land: "+ChatColor.AQUA+numKingdomLand,
-		        			ChatColor.GOLD + "# Favor: "+ChatColor.AQUA+numKingdomFavor};
+		        			ChatColor.GOLD + "#==~ "+MessagePath.COMMAND_INFO_NOTICE_KINGDOM_HEADER.getMessage(""+color+kingdomName)+ChatColor.GOLD+" ~==#",
+		        			ChatColor.GOLD + "|  "+labelOnlinePlayers+": "+ChatColor.AQUA+numKingdomPlayers,
+		        			ChatColor.GOLD + "|  "+labelTotalPlayers+": "+ChatColor.AQUA+numAllKingdomPlayers,
+		        			ChatColor.GOLD + "|  "+labelTowns+": "+ChatColor.AQUA+numKingdomTowns,
+		        			ChatColor.GOLD + "|  "+labelLand+": "+ChatColor.AQUA+numKingdomLand,
+		        			ChatColor.GOLD + "# "+labelFavor+": "+ChatColor.AQUA+numKingdomFavor};
 		        	for(String line : message) {
 		        		ChatUtil.sendMessage(bukkitPlayer, line);
 		        	}
@@ -209,34 +226,34 @@ public class InfoCommand extends CommandBase {
         					requestingPlayers = requestingPlayers.substring(0,requestingPlayers.length()-2);
             			}
         				String[] message = {
-    		        			ChatColor.GOLD + "#==~ Town of "+color+townName+ChatColor.GOLD+" ~==#",
-    		        			ChatColor.GOLD + "|  Open: "+ChatColor.AQUA+isOpen,
-    		        			ChatColor.GOLD + "|  Land: "+ChatColor.AQUA+townSize,
-    		        			ChatColor.GOLD + "|  Health: "+ChatColor.AQUA+townHealth+"/"+maxCriticalhits,
-    		        			ChatColor.GOLD + "|  Upgrades: "+upgrades,
-    		        			ChatColor.GOLD + "# Residents: "+ChatColor.AQUA+residents,
-    		        			ChatColor.GOLD + "# Invites: "+invitedPlayers,
-    		        			ChatColor.GOLD + "# Requests: "+requestingPlayers
+        						ChatColor.GOLD + "#==~ "+MessagePath.COMMAND_INFO_NOTICE_TOWN_HEADER.getMessage(""+color+townName)+ChatColor.GOLD+" ~==#",
+    		        			ChatColor.GOLD + "|  "+labelOpen+": "+ChatColor.AQUA+isOpen,
+    		        			ChatColor.GOLD + "|  "+labelLand+": "+ChatColor.AQUA+townSize,
+    		        			ChatColor.GOLD + "|  "+labelHealth+": "+ChatColor.AQUA+townHealth+"/"+maxCriticalhits,
+    		        			ChatColor.GOLD + "|  "+labelUpgrades+": "+upgrades,
+    		        			ChatColor.GOLD + "# "+labelResidents+": "+ChatColor.AQUA+residents,
+    		        			ChatColor.GOLD + "# "+labelInvites+": "+invitedPlayers,
+    		        			ChatColor.GOLD + "# "+labelRequests+": "+requestingPlayers
     		        			};
     		        	for(String line : message) {
     		        		ChatUtil.sendMessage(bukkitPlayer, line);
     		        	}
         			} else {
         				String[] message = {
-    		        			ChatColor.GOLD + "#==~ Town of "+color+townName+ChatColor.GOLD+" ~==#",
-    		        			ChatColor.GOLD + "|  Open: "+ChatColor.AQUA+isOpen,
-    		        			ChatColor.GOLD + "|  Land: "+ChatColor.AQUA+townSize,
-    		        			ChatColor.GOLD + "|  Health: "+ChatColor.AQUA+townHealth+"/"+maxCriticalhits,
-    		        			ChatColor.GOLD + "|  Upgrades: "+upgrades,
-    		        			ChatColor.GOLD + "# Residents: "+ChatColor.AQUA+residents
+        						ChatColor.GOLD + "#==~ "+MessagePath.COMMAND_INFO_NOTICE_TOWN_HEADER.getMessage(""+color+townName)+ChatColor.GOLD+" ~==#",
+    		        			ChatColor.GOLD + "|  "+labelOpen+": "+ChatColor.AQUA+isOpen,
+    		        			ChatColor.GOLD + "|  "+labelLand+": "+ChatColor.AQUA+townSize,
+    		        			ChatColor.GOLD + "|  "+labelHealth+": "+ChatColor.AQUA+townHealth+"/"+maxCriticalhits,
+    		        			ChatColor.GOLD + "|  "+labelUpgrades+": "+upgrades,
+    		        			ChatColor.GOLD + "# "+labelResidents+": "+ChatColor.AQUA+residents
     		        			};
     		        	for(String line : message) {
     		        		ChatUtil.sendMessage(bukkitPlayer, line);
     		        	}
         			}
         		} else {
-        			ChatUtil.printDebug("Failed to display null town info");
-        			ChatUtil.sendError(bukkitPlayer, "Internal Error displaying Town "+getArgs()[1]);
+        			ChatUtil.printDebug("Failed to display null town info of town "+getArgs()[1]);
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
         		}
         		break;
         	case 2: // Display player info
@@ -246,8 +263,8 @@ public class InfoCommand extends CommandBase {
         		int numPlayerFavor = (int) KonquestPlugin.getEconomy().getBalance(player.getOfflineBukkitPlayer());
         		if(player.isBarbarian()) {
         			String[] message = {
-    	        			ChatColor.DARK_RED + "#==~ Player "+playerName+ChatColor.DARK_RED+" ~==#",
-    	        			ChatColor.DARK_RED + "# Barbarian Scum"};
+    	        			ChatColor.DARK_RED + "#==~ "+labelPlayer+" "+playerName+ChatColor.DARK_RED+" ~==#",
+    	        			ChatColor.DARK_RED + "# "+labelBarbarian};
         			for(String line : message) {
     	        		ChatUtil.sendMessage(bukkitPlayer, line);
     	        	}
@@ -266,10 +283,10 @@ public class InfoCommand extends CommandBase {
         				townList = townList.substring(0,townList.length()-2);
         			}
         			String[] message = {
-    	        			ChatColor.GOLD + "#==~ Player "+color+playerName+ChatColor.GOLD+" ~==#",
-    	        			ChatColor.GOLD + "|  Kingdom: "+ChatColor.AQUA+playerKingdom,
-    	        			ChatColor.GOLD + "|  Favor: "+ChatColor.AQUA+numPlayerFavor,
-    	        			ChatColor.GOLD + "# Residencies: "+townList};
+    	        			ChatColor.GOLD + "#==~ "+labelPlayer+" "+color+playerName+ChatColor.GOLD+" ~==#",
+    	        			ChatColor.GOLD + "|  "+labelKingdom+": "+ChatColor.AQUA+playerKingdom,
+    	        			ChatColor.GOLD + "|  "+labelFavor+": "+ChatColor.AQUA+numPlayerFavor,
+    	        			ChatColor.GOLD + "# "+labelResidencies+": "+townList};
         			for(String line : message) {
     	        		ChatUtil.sendMessage(bukkitPlayer, line);
     	        	}
@@ -277,7 +294,7 @@ public class InfoCommand extends CommandBase {
         		break;
         	default:
         		ChatUtil.printDebug("Failed to display info, unknown state");
-        		ChatUtil.sendError(bukkitPlayer, "Internal Error displaying unknown "+getArgs()[1]);
+        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
         		break;
         	}
         }

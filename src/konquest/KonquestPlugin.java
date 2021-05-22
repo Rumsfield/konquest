@@ -9,7 +9,6 @@ import konquest.listener.PlayerListener;
 import konquest.listener.WorldListener;
 import konquest.utility.ChatUtil;
 
-import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,13 +37,13 @@ public class KonquestPlugin extends JavaPlugin {
         getCommand("k").setExecutor(konquest.getCommandHandler());
         registerListeners();
         konquest.initialize();
-        konquest.initAllPlayers();
         enableSuccess = true;
-        getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"Konquest enabled. Written by Rumsfield.");
+        ChatUtil.printConsoleAlert("Plugin enabled. Written by Rumsfield.");
 	}
 	
 	@Override
 	public void onDisable() {
+		ChatUtil.printDebug("Executing onDisable...");
 		if(enableSuccess) {
 			konquest.getKingdomManager().saveKingdoms();
 			konquest.getKingdomManager().saveCamps();
@@ -52,6 +51,8 @@ public class KonquestPlugin extends JavaPlugin {
 			konquest.getRuinManager().removeAllGolems();
 			konquest.getConfigManager().saveConfigs();
 			konquest.getDatabaseThread().flushDatabase();
+			konquest.getDatabaseThread().getDatabase().getDatabaseConnection().disconnect();
+			ChatUtil.printDebug("Finished onDisable");
 		}
 	}
 	

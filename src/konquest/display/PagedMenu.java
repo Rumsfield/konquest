@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class PagedMenu {
 
@@ -100,18 +101,18 @@ public class PagedMenu {
 			int backIndex = maxSize-9;
 			if(i > 0) {
 				// Place a back button
-				pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+"Back",Collections.emptyList(),Material.ENDER_PEARL,backIndex));
+				pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_BACK.getMessage(),Collections.emptyList(),Material.ENDER_PEARL,backIndex));
 			} else {
 				pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex));
 			}
 			if(i < pages.size()-1) {
 				// Place a next button
-				pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+"Next",Collections.emptyList(),Material.ENDER_PEARL,nextIndex));
+				pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_NEXT.getMessage(),Collections.emptyList(),Material.ENDER_PEARL,nextIndex));
 			} else {
 				pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex));
 			}
 			// Place a close button
-			pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+"Close",Collections.emptyList(),Material.REDSTONE_BLOCK,closeIndex));
+			pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_CLOSE.getMessage(),Collections.emptyList(),Material.REDSTONE_BLOCK,closeIndex));
 			// Place glass panes
 			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+1));
 			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+2));

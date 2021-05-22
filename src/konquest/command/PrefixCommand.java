@@ -12,7 +12,7 @@ import konquest.Konquest;
 import konquest.model.KonPlayer;
 import konquest.model.KonPrefixType;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 public class PrefixCommand extends CommandBase {
 
@@ -23,11 +23,12 @@ public class PrefixCommand extends CommandBase {
 	public void execute() {
 		// k prefix <name>|off
     	if (getArgs().length != 2) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	if(!getKonquest().getAccomplishmentManager().isEnabled()) {
-        		ChatUtil.sendError((Player) getSender(), "Prefixes are currently disabled, talk to an admin.");
+        		//ChatUtil.sendError((Player) getSender(), "Prefixes are currently disabled, talk to an admin.");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
         		return;
         	}
         	
@@ -35,7 +36,8 @@ public class PrefixCommand extends CommandBase {
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 
         	if(player.isBarbarian()) {
-        		ChatUtil.sendError((Player) getSender(), "Barbarians cannot have a prefix title.");
+        		//ChatUtil.sendError((Player) getSender(), "Barbarians cannot have a prefix title.");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
         		return;
         	}
         	
@@ -44,22 +46,26 @@ public class PrefixCommand extends CommandBase {
         		// Selected off
         		if(player.getPlayerPrefix().isEnabled()) {
         			player.getPlayerPrefix().setEnable(false);
-        			ChatUtil.sendNotice((Player) getSender(), "Turned off your prefix title");
+        			//ChatUtil.sendNotice((Player) getSender(), "Turned off your prefix title");
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_PREFIX_NOTICE_DISABLE.getMessage());
         		} else {
-        			ChatUtil.sendNotice((Player) getSender(), "Your prefix title is already off");
+        			//ChatUtil.sendNotice((Player) getSender(), "Your prefix title is already off");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_PREFIX_ERROR_DISABLE.getMessage());
         		}
         	} else if(KonPrefixType.isPrefixName(prefixReq)) {
         		// Selected an existing prefix
         		KonPrefixType prefixChosen = KonPrefixType.getPrefixByName(prefixReq);
         		if(player.getPlayerPrefix().selectPrefix(prefixChosen)) {
         			player.getPlayerPrefix().setEnable(true);
-        			ChatUtil.sendNotice((Player) getSender(), "Your prefix is now "+prefixChosen.getName());
+        			//ChatUtil.sendNotice((Player) getSender(), "Your prefix is now "+prefixChosen.getName());
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(prefixChosen.getName()));
         		} else {
-        			ChatUtil.sendNotice((Player) getSender(), "The prefix "+prefixChosen.getName()+" is not unlocked!");
+        			//ChatUtil.sendNotice((Player) getSender(), "The prefix "+prefixChosen.getName()+" is not unlocked!");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_PREFIX_ERROR_NEW.getMessage(prefixChosen.getName()));
         		}
         	} else {
         		// Bad selection, not a prefix
-        		ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
         	}
         }
 	}

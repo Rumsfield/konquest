@@ -10,8 +10,10 @@ import org.bukkit.entity.Player;
 
 public class ChatUtil {
 
+	private static ChatColor broadcastColor = ChatColor.LIGHT_PURPLE;
 	private static ChatColor noticeColor = ChatColor.GRAY;
 	private static ChatColor errorColor = ChatColor.RED;
+	private static ChatColor alertColor = ChatColor.GOLD;
 	private static String tag = "§7[§6Konquest§7]§f ";
 	
 	public static void formatArgColors(String args) {
@@ -31,6 +33,11 @@ public class ChatUtil {
 	public static void printConsole(String message) {
 		//Bukkit.getLogger().info(message);
 		Bukkit.getServer().getConsoleSender().sendMessage(message);
+	}
+	
+	public static void printConsoleAlert(String message) {
+		String alert = alertColor + "[Konquest] " + message;
+		Bukkit.getServer().getConsoleSender().sendMessage(alert);
 	}
 	
 	public static void printConsoleError(String message) {
@@ -64,12 +71,12 @@ public class ChatUtil {
 	}
 	
 	public static void sendBroadcast(String message) {
-		String notice = tag + noticeColor + message;
+		String notice = tag + broadcastColor + message;
 		Bukkit.broadcastMessage(notice);
 	}
 	
 	public static void sendAdminBroadcast(String message) {
-		String notice = tag + noticeColor + message;
+		String notice = tag + broadcastColor + message;
 		Bukkit.broadcast(notice,"konquest.command.admin");
 	}
 	

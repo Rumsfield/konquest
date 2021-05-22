@@ -5,7 +5,7 @@ import konquest.command.CommandBase;
 import konquest.model.KonKingdom;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +24,7 @@ public class RenameAdminCommand extends CommandBase {
     public void execute() {
     	// k admin rename kingdomName oldName newName
     	if (getArgs().length != 5) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
 
@@ -33,7 +33,8 @@ public class RenameAdminCommand extends CommandBase {
         	String newName = getArgs()[4];
         	
         	if(!getKonquest().getKingdomManager().isKingdom(kingdomName)) {
-        		ChatUtil.sendError((Player) getSender(), "Invalid Kingdom name.");
+        		//ChatUtil.sendError((Player) getSender(), "Invalid Kingdom name.");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
                 return;
         	}
         	
@@ -41,7 +42,8 @@ public class RenameAdminCommand extends CommandBase {
         	if(kingdom.getName().equals(oldName)) {
     			// Change kingdom name
     			getKonquest().getKingdomManager().renameKingdom(oldName, newName);
-    			ChatUtil.sendNotice((Player) getSender(), "Successfully renamed Kingdom "+oldName+" to "+newName);
+    			//ChatUtil.sendNotice((Player) getSender(), "Successfully renamed Kingdom "+oldName+" to "+newName);
+    			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RENAME_NOTICE_KINGDOM.getMessage(oldName,newName));
     			return;
     		} else {
     			// Search for matching town names
@@ -49,12 +51,14 @@ public class RenameAdminCommand extends CommandBase {
     				if(town.getName().equals(oldName)) {
     					// Change town name
     					kingdom.renameTown(oldName, newName);
-    					ChatUtil.sendNotice((Player) getSender(), "Successfully renamed Town "+oldName+" to "+newName);
+    					//ChatUtil.sendNotice((Player) getSender(), "Successfully renamed Town "+oldName+" to "+newName);
+    					ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RENAME_NOTICE_TOWN.getMessage(oldName,newName));
     					return;
     				}
     			}
     		}
-        	ChatUtil.sendError((Player) getSender(), "Could not find Kingdom or Town with name "+oldName);
+        	//ChatUtil.sendError((Player) getSender(), "Could not find Kingdom or Town with name "+oldName);
+        	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(oldName));
         }
     }
     
