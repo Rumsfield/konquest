@@ -36,6 +36,12 @@ public class KonquestDB extends Database{
         getKonquest().getPlayerManager().initAllSavedPlayers();
         getKonquest().getKingdomManager().initCamps();
         ChatUtil.printStatus("SQLite database is ready");
+        
+        // Fetch any players that happen to be in the server already (typically from /reload)
+        for(Player bukkitPlayer : Bukkit.getServer().getOnlinePlayers()) {
+			getKonquest().initPlayer(bukkitPlayer);
+			ChatUtil.printStatus("Loaded online player "+bukkitPlayer.getName());
+		}
     }
 
     public void spawnTables() {

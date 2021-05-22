@@ -157,6 +157,7 @@ public enum MessagePath {
 	COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_2   (0, "command.admin.makekingdom.notice.prompt-2"),
 	COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_3   (0, "command.admin.makekingdom.notice.prompt-3"),
 	COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_4   (1, "command.admin.makekingdom.notice.prompt-4"),
+	COMMAND_ADMIN_MAKEKINGDOM_ERROR_NAME        (0, "command.admin.makekingdom.error.name"),
 	COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_1      (0, "command.admin.monument.notice.create-1"),
 	COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_2      (0, "command.admin.monument.notice.create-2"),
 	COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_3      (0, "command.admin.monument.notice.create-3"),

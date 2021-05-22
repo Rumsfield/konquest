@@ -9,7 +9,6 @@ import konquest.manager.KingdomManager;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
-import konquest.utility.MessageStatic;
 
 //import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -59,7 +58,7 @@ public class MapCommand extends CommandBase {
         				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
         			}
         		} else {
-        			ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
                     return;
         		}
         	}

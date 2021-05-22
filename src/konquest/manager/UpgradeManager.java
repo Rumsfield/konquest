@@ -161,14 +161,14 @@ public class UpgradeManager {
 		int requiredPopulation = upgradePopulations.get(upgrade).get(level-1);
 		if(currentPopulation < requiredPopulation) {
 			//ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": town population is too low, requires "+requiredPopulation);
-			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_LEVEL.getMessage(upgrade.getDescription(),level,requiredPopulation));
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_POPULATION.getMessage(upgrade.getDescription(),level,requiredPopulation));
 			return false;
 		}
 		// Check that the player has enough favor
 		int requiredCost = upgradeCosts.get(upgrade).get(level-1);
 		if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < requiredCost) {
 			//ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": requires "+requiredCost+" Favor");
-			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_LEVEL.getMessage(upgrade.getDescription(),level,requiredCost));
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_COST.getMessage(upgrade.getDescription(),level,requiredCost));
             return false;
 		}
 		// Passed all checks, add the upgrade

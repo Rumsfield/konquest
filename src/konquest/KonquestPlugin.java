@@ -37,7 +37,6 @@ public class KonquestPlugin extends JavaPlugin {
         getCommand("k").setExecutor(konquest.getCommandHandler());
         registerListeners();
         konquest.initialize();
-        konquest.initAllPlayers();
         enableSuccess = true;
         ChatUtil.printConsoleAlert("Plugin enabled. Written by Rumsfield.");
 	}

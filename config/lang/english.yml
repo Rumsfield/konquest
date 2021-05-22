@@ -182,6 +182,8 @@ command:
         prompt-2: "Claim additional land with \"/k admin claim\"."
         prompt-3: "Set the capital spawn point with \"/k admin settravel\"."
         prompt-4: "Next, set up the Monument Template with \"/k admin monument %s create\"."
+      error:
+        name: "The Kingdom name is already taken or has spaces."
     monument:
       notice:
         create-1: "Now creating new Monument Template, click on the first corner block of the region."

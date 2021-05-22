@@ -37,12 +37,12 @@ public class ConfigManager{
 		if(configCache.containsKey("lang_"+language)) {
 			// Use a built-in language file
 			langConfig = getConfig("lang_"+language);
-			ChatUtil.printConsoleAlert("Using "+language+" language file.");
+			ChatUtil.printConsoleAlert("Using "+language+" language file");
 		} else {
 			// Attempt to find a custom local language file
 			if(addConfig("lang_custom", new KonConfig("lang/"+language))) {
 				langConfig = getConfig("lang_custom");
-				ChatUtil.printConsoleAlert("Using custom "+language+" language file.");
+				ChatUtil.printConsoleAlert("Using custom "+language+" language file");
 			} else {
 				langConfig = getConfig("lang_english");
 				ChatUtil.printConsoleError("Failed to find language file "+language+".yml in Konquest/lang folder. Using default lang/english.yml.");

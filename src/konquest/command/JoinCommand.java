@@ -16,7 +16,6 @@ import konquest.model.KonPlayer;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
-import konquest.utility.MessageStatic;
 
 public class JoinCommand extends CommandBase {
 
@@ -27,7 +26,7 @@ public class JoinCommand extends CommandBase {
 	public void execute() {
 		// k join [kingdomName|townName]
 		if (getArgs().length != 1 && getArgs().length != 2) {
-			ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
 		}
 		

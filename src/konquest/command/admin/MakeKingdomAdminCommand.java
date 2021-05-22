@@ -5,7 +5,6 @@ import konquest.command.CommandBase;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
-import konquest.utility.MessageStatic;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +45,7 @@ public class MakeKingdomAdminCommand extends CommandBase {
         	}
         	boolean pass = getKonquest().getKingdomManager().addKingdom(playerLoc, kingdomName);
         	if(!pass) {
-        		ChatUtil.sendError((Player) getSender(), MessageStatic.BAD_NAME.toString());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_MAKEKINGDOM_ERROR_NAME.getMessage());
                 return;
         	} else {
         		//ChatUtil.sendNotice((Player) getSender(), "Successfully created new Kingdom Capital for "+kingdomName+".");

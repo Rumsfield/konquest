@@ -179,15 +179,6 @@ public class Konquest implements Timeable {
 		compassTimer.startLoopTimer();
 	}
 	
-	/**
-	 * Fetch any players that happen to be in the server already (typically from /reload)
-	 */
-	public void initAllPlayers() {
-		for(Player bukkitPlayer : Bukkit.getServer().getOnlinePlayers()) {
-			initPlayer(bukkitPlayer);
-		}
-	}
-	
 	public KonPlayer initPlayer(Player bukkitPlayer) {
 		KonPlayer player = null;
 		bukkitPlayer.setScoreboard(getScoreboard());
