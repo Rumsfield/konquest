@@ -42,7 +42,12 @@ generic:
     reduce-favor: "Favor reduced by %s, total: %s"
     reward-favor: "Favor rewarded: %s, total: %s"
     click-air: "Click on Air to cancel."
+    clicked-air: "Clicked in Air, cancelled region creation."
     success: "Success!"
+    small-kingdom: "Your Kingdom is currently the smallest, enjoy a %s percent experience boost!"
+    join-invite: "You're invited to join the town of %s, use \"/k join %s\" to accept or \"/k leave %s\" to decline."
+    join-request: "%s wants to join %s, use \"/k town %s add %s\" to allow, \"/k town %s kick %s\" to deny."
+    wild: "The Wild"
   error:
     deny-barbarian: "Barbarians cannot do this."
     internal: "Internal error, contact an admin."
@@ -60,6 +65,43 @@ generic:
     enemy-town: "That is an enemy town."
     disabled: "This feature is currently disabled, talk to an admin."
     region: "Cannot do this while setting other regions."
+protection:
+  notice:
+    ignore: "Use \"/k admin bypass\" to ignore protections."
+    peaceful-town: "The Town of %s is peaceful and cannot be attacked."
+    peaceful-player: "Your Kingdom is peaceful, and you cannot attack towns."
+    camp-destroy: "Destroyed %s!"
+    camp-destroy-owner: "Your camp has been destroyed!"
+    camp-create: "Successfully set up your Camp."
+    critical: "Critical Hit! %s Critical Blocks remain"
+    tagged: "Tagged"
+    tag-message: "You have been tagged in combat."
+    loot-later: "Come back later for more loot!"
+    raid: "Enemy spotted in %s, use \"/k travel %s\" to defend!"
+    raid-alert: "Raid Alert"
+    raid-capture-1: "%s is being conquered! Use \"/k travel %s\" to defend and receive %s Favor!"
+    raid-capture-2: "%s is at half strength! Use \"/k travel %s\" to defend and receive %s Favor!"
+    raid-capture-3: "%s is in critical condition! Use \"/k travel %s\" to defend and receive %s Favor!"
+    destroy: "You have destroyed %s for the glory of the Barbarian horde!"
+    conquer: "The Town of %s has been conquered!"
+    capture: "You have conquered %s for the conquest of %s!"
+  error:
+    blocked: "Blocked"
+    not-resident: "You must be a resident of %s to do this."
+    online: "The Kingdom of %s doesn't have enough online players, cannot attack the Town of %s."
+    upgrade: "%s is upgraded with %s and cannot be attacked without %s residents online."
+    camp: "Cannot attack %s, the camp owner is offline."
+    camp-bed: "Cannot place additional beds within this Camp."
+    camp-update: "Updated your Camp's bed location."
+    camp-create: "Cannot create more than one Camp. Destroy the bed in your current Camp before placing a new bed."
+    camp-fail-overlap: "Camping failed: New claims overlap with existing territory."
+    camp-fail-exists: "Camping failed: Your camp already exists."
+    camp-fail-barbarian: "Camping failed: You are not a Barbarian."
+    capture: "This territory cannot be captured for another %s."
+    golem: "You cannot hurt friendly Iron Golems in the Town of %s."
+    capital-enter: "Cannot enter enemy Kingdom Capitals."
+    tag-blocked: "This command is blocked while in combat."
+    portal-exit: "Your exit portal is inside of protected territory, move your portal!"
 command:
   admin:
     forceexile:
@@ -88,11 +130,18 @@ command:
         prompt-4: "Next, set up the Monument Template with \"/k admin monument %s create\"."
     monument:
       notice:
-        create: "Now creating new Monument Template, click on the first corner block of the region."
+        create-1: "Now creating new Monument Template, click on the first corner block of the region."
+        create-2: "Click on the second corner block of the region, when all particles are green."
+        create-3: "Click on the travel point block."
+        success: "Successfully created new Monument Template for Kingdom %s."
         remove: "Removed Monument Template for Kingdom %s."
         show: "Showing existing Monument Template for Kingdom %s."
       error:
         none: "There is no valid Monument Template for Kingdom %s."
+        fail-base: "Failed to create Monument Template, base must be 16x16 blocks but got %s by %s."
+        fail-critical: "Failed to create Monument Template, it must contain at least %s %s blocks."
+        fail-travel: "Failed to create Monument Template, travel point must be inside of the region."
+        fail-capital: "Failed to create Monument Template, region must be within %s Capital territory."
     rename:
       notice:
         kingdom: "Successfully renamed Kingdom %s to %s."
@@ -103,9 +152,12 @@ command:
         remove: "Successfully removed Ruin: %s"
         criticals: "Removed all previous critical blocks from %s, click on blocks to add."
         spawns: "Removed all previous spawn blocks from %s, click on blocks to add."
+        add: "Block added to Ruin %s."
       error:
         create: "Could not create Ruin %s, bad name or territory overlap."
         remove: "Failed to remove unknown Ruin %s."
+        match: "Clicked block does not match type: %s"
+        invalid: "Could not add this block to a valid Ruin."
     save:
       notice:
         message: "Saved all kingdoms, camps and ruins to files."
@@ -135,6 +187,8 @@ command:
   claim:
     notice:
       radius-success: "Successfully claimed %s chunks of land for %s."
+      fail-auto: "Could not claim, disabled auto claim."
+      pass-auto: "Claimed"
     error:
       radius: "Radius must be greater than or equal to %s and less than or equal to %s."
       radius-partial: "Failed to claim all land, too far from center. Claimed %s chunks of land for %s."
@@ -269,3 +323,12 @@ command:
       no-camp: "You do not have a camp!"
       no-town: "That town does not exist in your Kingdom."
       cooldown: "You must wait %s before traveling to %s."
+quickshop:
+  error:
+    enemy-create: "Cannot create a shop in enemy towns!"
+    enemy-use: "Cannot use enemy shops!"
+    monument: "Cannot create a shop inside monument!"
+    camp: "Can only create shops in your own camp!"
+    fail: "Cannot create a shop here!"
+    wild: "Cannot create shops in the wild!"
+    

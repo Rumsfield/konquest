@@ -433,6 +433,10 @@ public class KonTown extends KonTerritory implements Timeable{
 		}
 		return cooldownTime;
 	}
+	
+	public String getCaptureCooldownString() {
+		return String.format("%02d:%02d", captureTimer.getMinutes(), captureTimer.getSeconds());
+	}
 
 	/**
 	 * Timer is used to regenerate monument on timer end.

@@ -14,6 +14,7 @@ import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -412,7 +413,7 @@ public class EntityListener implements Listener {
 	        	
 	        	if(territory instanceof KonCapital) {
 	        		// Block all entity damage in capitals
-	        		ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+	        		ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 	        		event.setCancelled(true);
 					return;
 	        	}
@@ -434,7 +435,8 @@ public class EntityListener implements Listener {
 	    			if(player.getKingdom().equals(town.getKingdom()) && !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
 	    				// Cannot damage farm animals, ever!
 	    				if(event.getEntity() instanceof Animals || event.getEntity() instanceof Villager) {
-	    					ChatUtil.sendNotice(bukkitPlayer, "Must be a resident of "+town.getName()+" to do this!", ChatColor.DARK_RED);
+	    					//ChatUtil.sendNotice(bukkitPlayer, "Must be a resident of "+town.getName()+" to do this!", ChatColor.DARK_RED);
+	    					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(town.getName()));
 	    					event.setCancelled(true);
 							return;
 	    				}
@@ -445,7 +447,8 @@ public class EntityListener implements Listener {
 	    				if(event.getEntity() instanceof Animals || event.getEntity() instanceof Villager) {
 	    					// Cannot kill mobs within offline kingdom's town
 		    				if(territory.getKingdom().isOfflineProtected()) {
-		    					ChatUtil.sendNotice(bukkitPlayer, "There are not enough "+town.getKingdom().getName()+" players online, cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
+		    					//ChatUtil.sendNotice(bukkitPlayer, "There are not enough "+town.getKingdom().getName()+" players online, cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
+		    					ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_ONLINE.getMessage(town.getKingdom().getName(),town.getName()));
 		    					event.setCancelled(true);
 								return;
 		    				}
@@ -454,7 +457,8 @@ public class EntityListener implements Listener {
 							if(upgradeLevelWatch > 0) {
 								int minimumOnlineResidents = upgradeLevelWatch; // 1, 2, 3
 								if(town.getNumResidentsOnline() < minimumOnlineResidents) {
-									ChatUtil.sendNotice(bukkitPlayer, town.getName()+" is upgraded with "+KonUpgrade.WATCH.getDescription()+" and cannot be attacked without "+minimumOnlineResidents+" residents online", ChatColor.DARK_RED);
+									//ChatUtil.sendNotice(bukkitPlayer, town.getName()+" is upgraded with "+KonUpgrade.WATCH.getDescription()+" and cannot be attacked without "+minimumOnlineResidents+" residents online", ChatColor.DARK_RED);
+									ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(),KonUpgrade.WATCH.getDescription(),minimumOnlineResidents));
 									event.setCancelled(true);
 									return;
 								}
@@ -464,7 +468,8 @@ public class EntityListener implements Listener {
 	    			// Prevent friendlies from hurting iron golems
 	    			boolean isFriendlyGolemAttack = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.attack_friendly_golems");
 	    			if(!isFriendlyGolemAttack && player.getKingdom().equals(town.getKingdom()) && eType.equals(EntityType.IRON_GOLEM)) {
-	    				ChatUtil.sendNotice(bukkitPlayer, "You cannot hurt friendly Iron Golems in Town "+town.getName(), ChatColor.DARK_RED);
+	    				//ChatUtil.sendNotice(bukkitPlayer, "You cannot hurt friendly Iron Golems in Town "+town.getName(), ChatColor.DARK_RED);
+	    				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_GOLEM.getMessage(town.getName()));
     					event.setCancelled(true);
 						return;
 	    			}
@@ -579,8 +584,9 @@ public class EntityListener implements Listener {
             	if(combatTagEnabled && combatTagCooldownSeconds > 0) {
             		// Notify player when tag is new
             		if(!victimPlayer.isCombatTagged()) {
-            			ChatUtil.sendKonPriorityTitle(victimPlayer, "", ChatColor.GOLD+"Tagged", 20, 1, 10);
-                		ChatUtil.sendNotice(victimBukkitPlayer, "You have been tagged in combat");
+            			ChatUtil.sendKonPriorityTitle(victimPlayer, "", ChatColor.GOLD+MessagePath.PROTECTION_NOTICE_TAGGED.getMessage(), 20, 1, 10);
+                		//ChatUtil.sendNotice(victimBukkitPlayer, "You have been tagged in combat");
+                		ChatUtil.sendNotice(victimBukkitPlayer, MessagePath.PROTECTION_NOTICE_TAG_MESSAGE.getMessage());
             		}
             		victimPlayer.getCombatTagTimer().stopTimer();
             		victimPlayer.getCombatTagTimer().setTime(combatTagCooldownSeconds);

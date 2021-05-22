@@ -57,7 +57,7 @@ public class MonumentAdminCommand extends CommandBase {
         		player.setRegionKingdomName(kingdomName);
             	//ChatUtil.sendNotice((Player) getSender(), "Now creating new Monument Template. Click on Air to cancel.");
             	//ChatUtil.sendNotice((Player) getSender(), "Click on the first corner block of the region.");
-            	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE.getMessage());
+            	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_1.getMessage());
             	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
         	} else if(cmdMode.equalsIgnoreCase("remove")) {
         		player.settingRegion(RegionType.NONE);
