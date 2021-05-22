@@ -15,6 +15,7 @@ import konquest.KonquestPlugin;
 import konquest.model.KonDirective;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class DirectiveManager {
@@ -76,9 +77,12 @@ public class DirectiveManager {
 		            if(r.transactionSuccess()) {
 		            	String balanceF = String.format("%.2f",r.balance);
 		            	String amountF = String.format("%.2f",r.amount);
-		            	ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+directive.title()+ChatColor.RESET+" "+ChatColor.WHITE+"Favor rewarded: "+ChatColor.DARK_GREEN+amountF+ChatColor.WHITE+", total: "+ChatColor.DARK_GREEN+balanceF);
+		            	//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+directive.title()+ChatColor.RESET+" "+ChatColor.WHITE+"Favor rewarded: "+ChatColor.DARK_GREEN+amountF+ChatColor.WHITE+", total: "+ChatColor.DARK_GREEN+balanceF);
+		            	ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_QUEST.getMessage()+": "+ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+directive.title());
+		            	ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REWARD_FAVOR.getMessage(amountF,balanceF));
 		            } else {
-		            	ChatUtil.sendError(player.getBukkitPlayer(), String.format("An error occured: %s", r.errorMessage));
+		            	//ChatUtil.sendError(player.getBukkitPlayer(), String.format("An error occured: %s", r.errorMessage));
+		            	ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
 		            }
 				}
 			} else {
@@ -94,13 +98,13 @@ public class DirectiveManager {
 		// Format book cover
 		meta.setAuthor("Konquest");
 		meta.setGeneration(BookMeta.Generation.ORIGINAL);
-		meta.setTitle("Quest Log");
+		meta.setTitle(MessagePath.MENU_QUEST_TITLE.getMessage());
 		String titlePage = "";
-		titlePage = titlePage+ChatColor.DARK_PURPLE+ChatColor.BOLD+"Tutorial Quests";
+		titlePage = titlePage+ChatColor.DARK_PURPLE+ChatColor.BOLD+MessagePath.MENU_QUEST_TITLE.getMessage();
 		titlePage = titlePage+ChatColor.RESET+"\n\n";
-		titlePage = titlePage+ChatColor.BLACK+"Use \"/k quest\" or \"/k q\" to open this book again.";
+		titlePage = titlePage+ChatColor.BLACK+MessagePath.MENU_QUEST_INTRO_1.getMessage();
 		titlePage = titlePage+ChatColor.RESET+"\n\n";
-		titlePage = titlePage+ChatColor.BLACK+"Complete these quests to earn "+ChatColor.DARK_GREEN+"Favor"+ChatColor.BLACK+", which is used to claim land and settle new towns!";
+		titlePage = titlePage+ChatColor.BLACK+MessagePath.MENU_QUEST_INTRO_2.getMessage();
 		pages.add(titlePage);
 		// Format pages
 		for(KonDirective dir : KonDirective.values()) {
@@ -117,7 +121,7 @@ public class DirectiveManager {
 			page = page+ChatColor.RESET+"\n\n";
 			page = page+progressColor+""+currentProgress+"/"+stages;
 			page = page+ChatColor.RESET+"\n\n";
-			page = page+ChatColor.BLACK+"Favor reward: "+ChatColor.DARK_GREEN+rewardTable.get(dir);
+			page = page+ChatColor.BLACK+MessagePath.MENU_QUEST_REWARD.getMessage()+": "+ChatColor.DARK_GREEN+rewardTable.get(dir);
 			pages.add(page);
 		}
 		meta.setPages(pages);

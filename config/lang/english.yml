@@ -35,6 +35,45 @@ label:
   back: "Back"
   next: "Next"
   close: "Close"
+  score: "Score"
+  stats: "Stats"
+  leaderboard: "Leaderboard"
+  total: "Total"
+menu:
+  stats:
+    title: "Accomplishment Stats"
+    intro-1: "Use \"/k stats\" or \"/k s\" to open this book again."
+    intro-2: "View your stats towards Accomplishments, which unlock new prefixes for you to use."
+    max: "Max Level"
+    category: "Accomplishment Category"
+    next: "Next Prefix"
+    unlock: "Unlocked Prefixes"
+    amount: "Stat Amount"
+    points: "Accomplishment Points"
+  quest:
+    title: "Quest Log"
+    intro-1: "Use \"/k quest\" or \"/k q\" to open this book again."
+    intro-2: "Complete these quests to earn Favor, which is used to claim land and settle new towns."
+    reward: "Favor Reward"
+  upgrade:
+    title: "Available Town Upgrades"
+  help:
+    community: "Community"
+    hint: "Click to join"
+  score:
+    kingdom-score: "Kingdom Score"
+    kingdom-towns: "Kingdom Towns"
+    kingdom-land: "Kingdom Land"
+    kingdom-favor: "Kingdom Favor"
+    kingdom-population: "Kingdom Population"
+    town-1: "Player Lordships"
+    land-1: "Lord Town Land"
+    town-2: "Player Knighthoods"
+    land-2: "Knight Town Land"
+    town-3: "Player Residencies"
+    land-3: "Resident Town Land"
+    player-score: "Player Score"
+    hint: "Click to view"
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."
@@ -48,6 +87,11 @@ generic:
     join-invite: "You're invited to join the town of %s, use \"/k join %s\" to accept or \"/k leave %s\" to decline."
     join-request: "%s wants to join %s, use \"/k town %s add %s\" to allow, \"/k town %s kick %s\" to deny."
     wild: "The Wild"
+    accomplishment: "You've made an Accomplishment!"
+    prefix-unlock: "Accomplishment prefix unlocked"
+    quest: "Quest complete"
+    loot: "New town monument loot is available."
+    absent: "You have been absent for too long and have been kicked from all towns."
   error:
     deny-barbarian: "Barbarians cannot do this."
     internal: "Internal error, contact an admin."
@@ -85,6 +129,7 @@ protection:
     destroy: "You have destroyed %s for the glory of the Barbarian horde!"
     conquer: "The Town of %s has been conquered!"
     capture: "You have conquered %s for the conquest of %s!"
+    kingdom-warmup: "The Kingdom of %s will be protected in %s minutes."
   error:
     blocked: "Blocked"
     not-resident: "You must be a resident of %s to do this."
@@ -186,7 +231,7 @@ command:
       disable: "Global chat"
   claim:
     notice:
-      radius-success: "Successfully claimed %s chunks of land for %s."
+      success: "Successfully claimed %s chunks of land for %s."
       fail-auto: "Could not claim, disabled auto claim."
       pass-auto: "Claimed"
     error:
@@ -206,6 +251,7 @@ command:
       prompt-line-3b: "You can only rejoin your current Kingdom, else you must ask an admin to switch Kingdoms."
       prompt-line-4: "Use this command again to confirm."
       confirmed: "You have been exiled as a Barbarian, place a bed to create your Camp."
+      town: "Banished from %s!"
   favor:
     notice:
       message: "You have %s Favor, costs are..."

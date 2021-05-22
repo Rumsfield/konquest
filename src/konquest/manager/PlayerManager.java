@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -17,6 +16,7 @@ import konquest.model.KonMonument;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class PlayerManager {
 
@@ -46,20 +46,6 @@ public class PlayerManager {
 		
 		ChatUtil.printDebug("Player Manager is ready");
 	}
-	/*
-	public KonPlayer addPlayer(Player bukkitPlayer) {
-		FileConfiguration playerConfig = konquest.getConfigManager().getConfig("onlinePlayers");
-		String playerId = bukkitPlayer.getUniqueId().toString();
-		KonPlayer player;
-    	if(playerConfig.contains(playerId)) {
-    		player = createKonPlayer(bukkitPlayer, konquest.getKingdomManager().getKingdom(playerConfig.getString(playerId+".kingdom")), playerConfig.getBoolean(playerId+".isBarbarian"));
-    		ChatUtil.printDebug("Added existing player: "+bukkitPlayer.getName());
-    	} else {
-    		player = createKonPlayer(bukkitPlayer,konquest.getKingdomManager().getBarbarians(),true);
-    		ChatUtil.printDebug("Added new player: "+bukkitPlayer.getName());
-    	}
-    	return player;
-	}*/
 	
 	public ArrayList<String> getBlockedCommands() {
 		return blockedCommands;
@@ -146,7 +132,8 @@ public class PlayerManager {
     	
     	// Inform player of purged residencies
     	if(isOfflineTimeout) {
-    		ChatUtil.sendNotice(bukkitPlayer, ChatColor.RED+"You have been absent for too long and have been kicked from all towns.");
+    		//ChatUtil.sendNotice(bukkitPlayer, ChatColor.RED+"You have been absent for too long and have been kicked from all towns.");
+    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ABSENT.getMessage());
     		ChatUtil.printDebug("Exiled player");
     		/*
     		// Exile the player and set their exile kingdom to barbarian so they can choose a new Kingdom.
@@ -298,78 +285,6 @@ public class PlayerManager {
     	return onlinePlayers.values();
     }
     
-    /*
-    public int getNumKingdomPlayersOnline(String kingdomName) {
-    	if(kingdomOnlinePlayerCount.containsKey(kingdomName)) {
-    		return kingdomOnlinePlayerCount.get(kingdomName);
-    	}
-    	return -1;
-    }
-    
-    public void updateNumKingdomPlayersOnline() {
-    	kingdomOnlinePlayerCount.clear();
-    	for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
-    		kingdomOnlinePlayerCount.put(kingdom.getName(), 0);
-    	}
-    	for(KonPlayer player : onlinePlayers.values()) {
-    		String kingdomName = player.getKingdom().getName();
-			int oldNum = kingdomOnlinePlayerCount.get(kingdomName);
-			kingdomOnlinePlayerCount.put(kingdomName, oldNum+1);
-    	}
-    }*/
-    
-    // Economy-related methods
-    
-    
-    // Loading and Saving methods
-    /*
-    private void loadPlayers() {
-    	FileConfiguration onlinePlayersConfig = konquest.getConfigManager().getConfig("onlinePlayers");
-        if (onlinePlayersConfig.get("onlinePlayers") == null) {
-        	ChatUtil.printDebug("There is no onlinePlayers section in onlinePlayers.yml");
-            return;
-        }
-        // Load all Players
-        for(String uuid : onlinePlayersConfig.getConfigurationSection("onlinePlayers").getKeys(false)) {
-        	Player bukkitPlayer = Bukkit.getPlayer(UUID.fromString(uuid));
-        	ConfigurationSection playerSection = onlinePlayersConfig.getConfigurationSection("onlinePlayers."+uuid);
-        	String kingdomName = playerSection.getString("kingdom");
-        	boolean isBarbarian = playerSection.getBoolean("barbarian");
-        	createKonPlayer(bukkitPlayer, konquest.getKingdomManager().getKingdom(kingdomName), isBarbarian);
-        }
-        ChatUtil.printDebug("Loaded Players");
-    }*/
-    
-    /*
-    public void updateAllSavedPlayers() {
-    	//ChatUtil.printDebug("Updating all players list from players.yml");
-    	allPlayers.clear();
-    	FileConfiguration playersConfig = konquest.getConfigManager().getConfig("players");
-        if (playersConfig.get("players") == null) {
-        	ChatUtil.printDebug("There is no players section in players.yml");
-            return;
-        }
-        ConfigurationSection playersSection = playersConfig.getConfigurationSection("players");
-        Set<String> playerSet = playersSection.getKeys(false);
-        for(String uuid : playerSet) {
-        	String kingdomName = playersSection.getString(uuid+".kingdom");
-        	//ChatUtil.printDebug("... kingdom is "+kingdomName);
-        	//String exileKingdomName = playersConfig.getString("players."+uuid+".exileKingdom");
-        	boolean isBarbarian = playersSection.getBoolean(uuid+".barbarian"); 
-        	//ChatUtil.printDebug("... isBarbarian is "+isBarbarian);
-        	//ChatUtil.printDebug("Loading id "+uuid);
-        	OfflinePlayer offlineBukkitPlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
-        	// Check for null player name
-        	if(offlineBukkitPlayer.getName() == null) {
-        		ChatUtil.printDebug("offlineBukkitPlayer is null! "+uuid);
-        	} else {
-        		KonOfflinePlayer offlinePlayer = new KonOfflinePlayer(offlineBukkitPlayer, konquest.getKingdomManager().getKingdom(kingdomName), isBarbarian);
-            	allPlayers.put(offlineBukkitPlayer, offlinePlayer);
-        	}
-        }
-        ChatUtil.printDebug("Updated all players list from players.yml, size is "+allPlayers.size());
-    }*/
-    
     public void initAllSavedPlayers() {
     	allPlayers.clear();
     	//ChatUtil.printDebug("Initializing PlayerManager allPlayers cache... ");
@@ -378,234 +293,5 @@ public class PlayerManager {
     		allPlayers.put(offlinePlayer.getOfflineBukkitPlayer(), offlinePlayer);
     	}
     }
-    
-    /**
-     * Load a player from the players.yml file if the player has an entry.
-     * @param bukkitPlayer
-     * @return true if the player was found and loaded, else false.
-     */
-    /*public boolean loadPlayer(Player bukkitPlayer) {
-    	FileConfiguration playersConfig = konquest.getConfigManager().getConfig("players");
-        if (playersConfig.get("players") == null) {
-        	ChatUtil.printDebug("There is no players section in players.yml");
-            return false;
-        }
-    	ConfigurationSection playerSection = playersConfig.getConfigurationSection("players."+bukkitPlayer.getUniqueId().toString());
-    	if(playerSection == null) {
-    		return false;
-    	}
-    	String kingdomName = playerSection.getString("kingdom");
-    	String exileKingdomName = playerSection.getString("exileKingdom");
-    	boolean isBarbarian = playerSection.getBoolean("barbarian");
-    	KonPlayer addedPlayer;
-    	// Create KonPlayer instance
-    	if(isBarbarian) {
-    		addedPlayer = createKonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), isBarbarian);
-    	} else {
-    		addedPlayer = createKonPlayer(bukkitPlayer, konquest.getKingdomManager().getKingdom(kingdomName), isBarbarian);
-    	}
-    	// Check if player has exceeded offline timeout
-    	long timeoutSeconds = konquest.getConfigManager().getConfig("core").getLong("core.kingdoms.offline_timeout_seconds");
-    	//long lastSeenTimeMilliseconds = playerSection.getLong("lastSeen");
-    	long lastSeenTimeMilliseconds = bukkitPlayer.getLastPlayed();
-    	boolean isOfflineTimeout = false;
-    	// ignore this check if timeout is 0 or if there is no lastSeen timestamp
-    	if(timeoutSeconds != 0 && lastSeenTimeMilliseconds != 0) {
-    		ChatUtil.printDebug("Testing player for offline timeout");
-    		Date now = new Date();
-    		if(now.after(new Date(lastSeenTimeMilliseconds + (timeoutSeconds*1000)))) {
-    			ChatUtil.printDebug("Player has exceeded offline timeout");
-    			// Exile the player and set their exile kingdom to barbarian so they can choose a new Kingdom.
-    			exileKingdomName = konquest.getKingdomManager().getBarbarians().getName();
-    			isOfflineTimeout = true;
-    		}
-    	}
-    	// Update player's Exile Kingdom
-    	if(konquest.getKingdomManager().isKingdom(exileKingdomName)) {
-    		addedPlayer.setExileKingdom(konquest.getKingdomManager().getKingdom(exileKingdomName));
-		} else if(konquest.getKingdomManager().getBarbarians().getName().equals(exileKingdomName)) {
-			addedPlayer.setExileKingdom(konquest.getKingdomManager().getBarbarians());
-		} else {
-			ChatUtil.printDebug("There was a problem setting player's Exile Kingdom: "+bukkitPlayer.getName());
-		}
-    	// Exile player
-    	if(isOfflineTimeout) {
-	    	if(konquest.getKingdomManager().exilePlayer(addedPlayer)) {
-	    		ChatUtil.sendNotice(addedPlayer.getBukkitPlayer(), "You have been absent for too long and are now exiled as a "+ChatColor.DARK_RED+"Barbarian");
-	    		ChatUtil.printDebug("Exiled player");
-	    	} else {
-	    		ChatUtil.printDebug("Could not properly exile player");
-	    	}
-    	}
-    	// Update player's directive progress
-    	ConfigurationSection playerDirectiveSection = playersConfig.getConfigurationSection("players."+bukkitPlayer.getUniqueId().toString()+".directives");
-    	if(playerDirectiveSection == null) {
-    		ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" has no saved directives");
-    	} else {
-    		String allDirectives = "";
-    		for(String directiveName : playerDirectiveSection.getKeys(false)) {
-    			int directiveProgress = playerDirectiveSection.getInt(directiveName);
-    			addedPlayer.setDirectiveProgress(KonDirective.getDirective(directiveName), directiveProgress);
-    			allDirectives = allDirectives+directiveName+":"+directiveProgress+",";
-    		}
-    		ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" directives = "+allDirectives);
-    	}
-    	return true;
-    }*/
-    
-    /**
-     * Save new player data to players.yml while preserving existing player data.
-     */
-    /*public void saveAllPlayers() {
-    	FileConfiguration playersConfig = konquest.getConfigManager().getConfig("players");
-    	ConfigurationSection root;
-    	// Check for root section
-    	if (playersConfig.get("players") == null) {
-        	// When no root section exists, create on
-    		ChatUtil.printDebug("Could not find root players section while saving, creating new file.");
-    		playersConfig.set("players", null); // reset players config
-    		root = playersConfig.createSection("players");
-        } else {
-        	// When a root section is found, overwrite existing players with up-to-date data
-        	root = playersConfig.getConfigurationSection("players");
-        }
-    	// Iterate over all onlinePlayers in the cache
-		for(KonPlayer player : onlinePlayers.values()) {
-			savePlayerConfig(player, root);
-		}
-		// Iterate over all offline Players in the cache
-		int totalSavedOfflinePlayers = 0;
-		for(KonOfflinePlayer offlinePlayer : allPlayers.values()) {
-			if(!offlinePlayer.getOfflineBukkitPlayer().isOnline()) {
-				saveOfflinePlayerConfig(offlinePlayer, root);
-				totalSavedOfflinePlayers++;
-			}
-		}
-    	ChatUtil.printDebug("Saved "+onlinePlayers.values().size()+" Online Players, "+totalSavedOfflinePlayers+" Offline Players");
-    }*/
-    
-    /*
-    public void savePlayers() {
-    	FileConfiguration playersConfig = konquest.getConfigManager().getConfig("players");
-    	ConfigurationSection root;
-    	// Check for root section
-    	if (playersConfig.get("players") == null) {
-        	// When no root section exists, create on
-    		ChatUtil.printDebug("Could not find root players section while saving, creating new file.");
-    		playersConfig.set("players", null); // reset players config
-    		root = playersConfig.createSection("players");
-        } else {
-        	// When a root section is found, overwrite existing players with up-to-date data
-        	root = playersConfig.getConfigurationSection("players");
-        }
-    	// Iterate over all onlinePlayers in the cache
-		for(KonPlayer player : onlinePlayers.values()) {
-			savePlayerConfig(player, root);
-		}
-    	ChatUtil.printDebug("Saved "+onlinePlayers.values().size()+" Players");
-    }*/
-    
-    /*
-    public void savePlayer(KonPlayer player) {
-    	FileConfiguration playersConfig = konquest.getConfigManager().getConfig("players");
-    	ConfigurationSection root;
-    	// Check for root section
-    	if (playersConfig.get("players") == null) {
-        	// When no root section exists, create on
-    		ChatUtil.printDebug("Could not find root players section while saving, creating new file.");
-    		playersConfig.set("players", null); // reset players config
-    		root = playersConfig.createSection("players");
-        } else {
-        	// When a root section is found, overwrite existing players with up-to-date data
-        	root = playersConfig.getConfigurationSection("players");
-        }
-    	
-    	savePlayerConfig(player, root);
-		
-    	ChatUtil.printDebug("Saved Player "+player.getBukkitPlayer().getName());
-    }*/
-    
-    /*
-    private void savePlayerConfig(KonPlayer player, ConfigurationSection root) {
-    	String uuid = player.getBukkitPlayer().getUniqueId().toString();
-		ConfigurationSection playerSection;
-		if(root.contains(uuid)) {
-			// Overwrite existing player data
-			playerSection = root.getConfigurationSection(uuid);
-		} else {
-			// Create new player entry
-			playerSection = root.createSection(uuid);
-		}
-		playerSection.set("kingdom", player.getKingdom().getName());
-		playerSection.set("exileKingdom", player.getExileKingdom().getName());
-		playerSection.set("barbarian", player.isBarbarian());
-		// Save camp info
-		if(konquest.getKingdomManager().isCampSet((KonOfflinePlayer)player)) {
-			//ChatUtil.printDebug("Saving camp info for online player "+player.getBukkitPlayer().getName());
-			KonCamp camp = konquest.getKingdomManager().getCamp(player);
-			ConfigurationSection playerCampSection = playerSection.createSection("camp");
-			ConfigurationSection playerCampCenterSection = playerCampSection.createSection("center");
-			playerCampCenterSection.set("x", (int) camp.getCenterLoc().getX());
-			playerCampCenterSection.set("y", (int) camp.getCenterLoc().getY());
-			playerCampCenterSection.set("z", (int) camp.getCenterLoc().getZ());
-			String chunk_coords_camp = "";
-	        for(Point point : camp.getChunkList().keySet()) {
-	        	//ChatUtil.printDebug("Saving "+kingdom.getName()+" "+town.getName()+" chunk "+point.getX()+","+point.getY());
-	        	chunk_coords_camp = chunk_coords_camp+(int)point.getX()+","+(int)point.getY()+".";
-	        }
-	        //ChatUtil.printDebug("Saving "+kingdom.getName()+" "+town.getName()+" coord string: "+chunk_coords_town);
-	        playerCampSection.set("chunks", chunk_coords_camp);
-		} else {
-			//ChatUtil.printDebug("Clearing camp info for online player "+player.getBukkitPlayer().getName());
-			playerSection.set("camp",null);
-		}
-		//playerSection.set("lastSeen", new Date().getTime());
-		// Save directive progress
-		if(player.getDirectives().size() > 0) {
-			ChatUtil.printDebug("Saving directive progress of player "+player.getBukkitPlayer().getName());
-			ConfigurationSection directiveSection = playerSection.createSection("directives");
-			for(KonDirective dir : player.getDirectives()) {
-				directiveSection.set(dir.toString().toLowerCase(),player.getDirectiveProgress(dir));
-			}
-		} else {
-			ChatUtil.printDebug("Player "+player.getBukkitPlayer().getName()+" has no directive progress to save");
-		}
-    }*/
-    
-    /*
-    private void saveOfflinePlayerConfig(KonOfflinePlayer player, ConfigurationSection root) {
-    	String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
-		ConfigurationSection playerSection;
-		if(root.contains(uuid)) {
-			// Overwrite existing player data
-			playerSection = root.getConfigurationSection(uuid);
-		} else {
-			// Create new player entry
-			playerSection = root.createSection(uuid);
-		}
-		playerSection.set("kingdom", player.getKingdom().getName());
-		playerSection.set("exileKingdom", player.getExileKingdom().getName());
-		playerSection.set("barbarian", player.isBarbarian());
-		// Save camp info
-		if(konquest.getKingdomManager().isCampSet(player)) {
-			//ChatUtil.printDebug("Saving camp info for offline player "+player.getOfflineBukkitPlayer().getName());
-			KonCamp camp = konquest.getKingdomManager().getCamp(player);
-			ConfigurationSection playerCampSection = playerSection.createSection("camp");
-			ConfigurationSection playerCampCenterSection = playerCampSection.createSection("center");
-			playerCampCenterSection.set("x", (int) camp.getCenterLoc().getX());
-			playerCampCenterSection.set("y", (int) camp.getCenterLoc().getY());
-			playerCampCenterSection.set("z", (int) camp.getCenterLoc().getZ());
-			String chunk_coords_camp = "";
-	        for(Point point : camp.getChunkList().keySet()) {
-	        	//ChatUtil.printDebug("Saving "+kingdom.getName()+" "+town.getName()+" chunk "+point.getX()+","+point.getY());
-	        	chunk_coords_camp = chunk_coords_camp+(int)point.getX()+","+(int)point.getY()+".";
-	        }
-	        //ChatUtil.printDebug("Saving "+kingdom.getName()+" "+town.getName()+" coord string: "+chunk_coords_town);
-	        playerCampSection.set("chunks", chunk_coords_camp);
-		} else {
-			//ChatUtil.printDebug("Clearing camp info for offline player "+player.getOfflineBukkitPlayer().getName());
-			playerSection.set("camp",null);
-		}
-    }*/
-	
+
 }

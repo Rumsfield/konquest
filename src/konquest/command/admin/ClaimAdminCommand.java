@@ -80,7 +80,7 @@ public class ClaimAdminCommand extends CommandBase {
     					}
     					getKonquest().getKingdomManager().updatePlayerBorderParticles(player, bukkitPlayer.getLocation());
     					//ChatUtil.sendNotice((Player) getSender(), "Successfully claimed chunks within radius "+radius+" for territory "+adjacentTerritory.getName());
-    					ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_CLAIM_NOTICE_RADIUS_SUCCESS.getMessage(numChunks,adjacentTerritory.getName()));
+    					ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage(numChunks,adjacentTerritory.getName()));
     				} else {
     					//ChatUtil.sendError((Player) getSender(), "There was a problem claiming chunks within radius "+radius+" for territory "+adjacentTerritory.getName());
     					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
