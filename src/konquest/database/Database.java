@@ -3,16 +3,14 @@ package konquest.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import konquest.Konquest;
-//import konquest.utility.ChatUtil;
 
 public abstract class Database {
     private DatabaseConnection databaseConnection;
-    private Konquest konquest;
+    private DatabaseType type;
 
-    public Database(Konquest konquest) {
-        this.konquest = konquest;
-    	databaseConnection = new DatabaseConnection();
+    public Database(DatabaseType type) {
+        this.type = type;
+    	databaseConnection = new DatabaseConnection(type);
     }
 
     public abstract void initialize();
@@ -21,8 +19,8 @@ public abstract class Database {
         return databaseConnection;
     }
     
-    public Konquest getKonquest() {
-    	return konquest;
+    public DatabaseType getType() {
+    	return type;
     }
 
     public boolean exists(String table) {
