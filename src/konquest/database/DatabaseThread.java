@@ -46,10 +46,9 @@ public class DatabaseThread implements Runnable {
     }
 
     public void createDatabase() {
-        //CoreConfig coreConfig = novsWar.getConfigManager().getCoreConfig();
-        //String prefix = coreConfig.getDatabasePrefix();
-        //database = new NovswarDB(konquest, type, prefix);
-    	database = new KonquestDB(konquest);
+    	String dbType = konquest.getConfigManager().getConfig("core").getString("core.database.connection","sqlite");
+    	DatabaseType type = DatabaseType.getType(dbType);
+    	database = new KonquestDB(type,konquest);
     }
 
     public Thread getThread() {

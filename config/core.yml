@@ -1,5 +1,6 @@
 # Core Konquest Settings
 # (*) means the server must be restarted for a change to take effect, else use the "/k admin reload" command. NEVER USE /reload.
+# language*:                        Language file selection, must match a file name in the /lang folder (e.g. english for lang/english.yml)
 # core:
 #  debug*:                          Enable debug messages for verbose console messages (true/false)
 #  world_name*:                     Primary world name, this world is the only place that players can settle towns (string)
@@ -9,6 +10,15 @@
 #  directive_quests:                Enable the "/k quest" command and built-in quest rewards (true/false)
 #  format_chat_messages:            Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
 #  travel_wild_random_radius:       Radius in blocks from the center of the primary world for random wild travel (integer > 0)
+#  database:
+#      connection:                  Database connection type (sqlite or mysql)
+#      mysql:
+#        hostname:                  MySQL database hostname
+#        port:                      MySQL database port number
+#        database:                  MySQL database name
+#        username:                  MySQL database username
+#        password:                  MySQL database password
+#        properties:                MySQL connection properties as a string list (e.g. ["autoReconnect=true","useSSL=false"])
 #  integration:
 #    quickshop*:                    Enable plugin integration with QuickShop (true/false)
 #    luckperms*:                    Enable plugin integration with LuckPerms (true/false)
@@ -91,6 +101,15 @@ core:
   directive_quests: true
   format_chat_messages: true
   travel_wild_random_radius: 1000
+  database:
+    connection: sqlite
+    mysql:
+      hostname: localhost
+      port: 3306
+      database: example_database
+      username: example_user
+      password: example_password
+      properties: []
   integration:
     quickshop: false
     luckperms: false
