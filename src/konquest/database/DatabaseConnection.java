@@ -38,9 +38,9 @@ public class DatabaseConnection {
         switch(type) {
         	case SQLITE:
         		try {
+        			ChatUtil.printConsoleAlert("Connecting to SQLite database");
                 	String databaseName = "plugins/Konquest/KonquestDatabase";
                     connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName + ".db", properties);
-                    ChatUtil.printConsoleAlert("Connecting to SQLite database");
                     return;
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -48,14 +48,14 @@ public class DatabaseConnection {
         		break;
         	case MYSQL:
         		try {
-                	FileConfiguration coreConfig = Konquest.getInstance().getConfigManager().getConfig("core");
+        			ChatUtil.printConsoleAlert("Connecting to MySQL database");
+        			FileConfiguration coreConfig = Konquest.getInstance().getConfigManager().getConfig("core");
                 	String hostname = coreConfig.getString("core.database.mysql.hostname");
                 	String port = coreConfig.getString("core.database.mysql.port");
                 	String database = coreConfig.getString("core.database.mysql.database");
                 	String username = coreConfig.getString("core.database.mysql.username","");
                 	String password = coreConfig.getString("core.database.mysql.password","");
                     connection = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database, username, password);
-                    ChatUtil.printConsoleAlert("Connecting to MySQL database");
                     return;
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -89,7 +89,7 @@ public class DatabaseConnection {
 
         try {
             statement = connection.createStatement();
-            //ChatUtil.printDebug("Executing SQLite Update: "+query);
+            ChatUtil.printDebug("Executing SQL Update: "+query);
             statement.executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -110,7 +110,7 @@ public class DatabaseConnection {
     	
     	try {
             statement = connection.createStatement();
-            //ChatUtil.printDebug("Executing SQLite Query: "+query);
+            ChatUtil.printDebug("Executing SQL Query: "+query);
             result = statement.executeQuery(query);
         } catch (SQLException e) {
             e.printStackTrace();

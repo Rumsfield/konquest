@@ -41,7 +41,7 @@ public class KonquestDB extends Database{
         konquest.getPlayerManager().initAllSavedPlayers();
         konquest.getKingdomManager().initCamps();
         isReady = true;
-        ChatUtil.printStatus("SQLite database is ready");
+        ChatUtil.printStatus("SQL database is ready");
         
         konquest.initOnlinePlayers();
     }
@@ -63,16 +63,16 @@ public class KonquestDB extends Database{
             
             column = new Column("kingdom");
             column.setType("VARCHAR(255)");
-            column.setDefaultValue(konquest.getKingdomManager().getBarbarians().getName());
+            column.setDefaultValue("'"+konquest.getKingdomManager().getBarbarians().getName()+"'");
             players.add(column);
             
             column = new Column("exileKingdom");
             column.setType("VARCHAR(255)");
-            column.setDefaultValue(konquest.getKingdomManager().getBarbarians().getName());
+            column.setDefaultValue("'"+konquest.getKingdomManager().getBarbarians().getName()+"'");
             players.add(column);
 
             column = new Column("barbarian");
-            column.setType("TINYINT(1)");
+            column.setType("TINYINT");
             column.setDefaultValue("1");
             players.add(column);
             
