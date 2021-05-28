@@ -1215,14 +1215,12 @@ public class KingdomManager {
 		int countElite = 0;
 		int countResident = 0;
 		for(KonTown town : player.getKingdom().getTowns()) {
-			if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
-				countResident = countResident + 1;
-			}
-			if(town.isPlayerElite(player.getOfflineBukkitPlayer())) {
-				countElite = countElite + 1;
-			}
 			if(town.isPlayerLord(player.getOfflineBukkitPlayer())) {
 				countLord = countLord + 1;
+			} else if(town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+				countElite = countElite + 1;
+			} else if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+				countResident = countResident + 1;
 			}
 		}
 		player.getPlayerStats().setStat(KonStatsType.LORDS, countLord);
