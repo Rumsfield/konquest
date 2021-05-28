@@ -18,6 +18,7 @@
 #        database:                  MySQL database name
 #        username:                  MySQL database username
 #        password:                  MySQL database password
+#        properties:                MySQL connection properties as a string list (e.g. ["autoReconnect=true","useSSL=false"])
 #  integration:
 #    quickshop*:                    Enable plugin integration with QuickShop (true/false)
 #    luckperms*:                    Enable plugin integration with LuckPerms (true/false)
@@ -108,6 +109,7 @@ core:
       database: example_database
       username: example_user
       password: example_password
+      properties: []
   integration:
     quickshop: false
     luckperms: false

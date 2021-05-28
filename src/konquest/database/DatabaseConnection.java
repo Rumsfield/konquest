@@ -19,13 +19,11 @@ import konquest.utility.ChatUtil;
 public class DatabaseConnection {
 
     private Connection connection;
-    private Properties properties;
     private ExecutorService queryExecutor;
     private DatabaseType type;
 
     public DatabaseConnection(DatabaseType type) {
         queryExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        properties = new Properties();
         this.type = type;
     }
 
@@ -34,7 +32,7 @@ public class DatabaseConnection {
         	ChatUtil.printConsoleAlert("Could not connect to SQL database of type "+type.toString()+", connection is already open.");
             return;
         }
-        
+        Properties properties = new Properties();
         switch(type) {
         	case SQLITE:
         		try {
@@ -54,8 +52,16 @@ public class DatabaseConnection {
                 	String port = coreConfig.getString("core.database.mysql.port");
                 	String database = coreConfig.getString("core.database.mysql.database");
                 	String username = coreConfig.getString("core.database.mysql.username","");
+                	properties.put("user", username);
                 	String password = coreConfig.getString("core.database.mysql.password","");
-                    connection = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database, username, password);
+                    properties.put("password", password);
+                    for(String nameValuePair : coreConfig.getStringList("core.database.mysql.properties")) {
+                    	String[] propNameValue = nameValuePair.split("=",2);
+                    	if(propNameValue.length == 2) {
+                    		properties.put(propNameValue[0], propNameValue[1]);
+                    	}
+                    }
+                    connection = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database, properties);
                     return;
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -175,12 +181,6 @@ public class DatabaseConnection {
                 }
             }
         }
-    }
-
-    public void setProperties(String autoReconnect, String user, String password) {
-        properties.put("autoReconnect", autoReconnect);
-        properties.put("user", user);
-        properties.put("password", password);
     }
 
     public Connection getConnection() {
