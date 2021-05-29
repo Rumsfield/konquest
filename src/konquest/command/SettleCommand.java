@@ -7,13 +7,12 @@ import konquest.model.KonPlayer;
 import konquest.model.KonStatsType;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -33,24 +32,28 @@ public class SettleCommand extends CommandBase {
 		// k settle town1
 		if (getArgs().length == 1) {
             //ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
-    		ChatUtil.sendError((Player) getSender(), "Must specify a town name");
+    		//ChatUtil.sendError((Player) getSender(), "Must specify a town name");
+    		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_MISSING_NAME.getMessage());
             return;
         } else if (getArgs().length > 2) {
             //ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
-    		ChatUtil.sendError((Player) getSender(), "Bad town name, cannot use spaces!");
+    		//ChatUtil.sendError((Player) getSender(), "Bad town name, cannot use spaces!");
+    		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_SPACE_NAME.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
 
         	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
-        		ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_WORLD.toString());
+        		//ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_WORLD.toString());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
         	
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	if(player.isBarbarian()) {
-        		ChatUtil.sendError((Player) getSender(), "Barbarians cannot settle, join a Kingdom with \"/k join\"");
+        		//ChatUtil.sendError((Player) getSender(), "Barbarians cannot settle, join a Kingdom with \"/k join\"");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
                 return;
         	}
         	
@@ -60,17 +63,20 @@ public class SettleCommand extends CommandBase {
         	double adj_cost = (((double)townCount)*incr) + cost;
         	if(cost > 0) {
 	        	if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < adj_cost) {
-					ChatUtil.sendError((Player) getSender(), "Not enough Favor, need "+adj_cost);
+					//ChatUtil.sendError((Player) getSender(), "Not enough Favor, need "+adj_cost);
+					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(adj_cost));
 	                return;
 				}
         	}
         	String townName = getArgs()[1];
         	if(!StringUtils.isAlphanumeric(townName)) {
-        		ChatUtil.sendError((Player) getSender(), "Town name must only contain letters and/or numbers");
+        		//ChatUtil.sendError((Player) getSender(), "Town name must only contain letters and/or numbers");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
                 return;
         	}
         	if(getKonquest().getPlayerManager().isPlayerNameExist(townName)) {
-        		ChatUtil.sendError((Player) getSender(), "Could not settle: Invalid Town name, already taken or has spaces.");
+        		//ChatUtil.sendError((Player) getSender(), "Could not settle: Invalid Town name, already taken or has spaces.");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_NAME.getMessage());
                 return;
         	}
         	int settleStatus = getKonquest().getKingdomManager().addTown(bukkitPlayer.getLocation(), townName, player.getKingdom().getName());
@@ -113,8 +119,10 @@ public class SettleCommand extends CommandBase {
         		} else {
         			bukkitPlayer.teleport(tpLoc,TeleportCause.PLUGIN);
         		}
-        		ChatUtil.sendNotice((Player) getSender(), "Successfully settled new Town: "+townName);
-        		ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+bukkitPlayer.getName()+" has settled the Town of "+ChatColor.AQUA+townName+ChatColor.LIGHT_PURPLE+" for Kingdom "+ChatColor.AQUA+player.getKingdom().getName());
+        		//ChatUtil.sendNotice((Player) getSender(), "Successfully settled new Town: "+townName);
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SETTLE_NOTICE_SUCCESS.getMessage(townName));
+        		//ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+bukkitPlayer.getName()+" has settled the Town of "+ChatColor.AQUA+townName+ChatColor.LIGHT_PURPLE+" for Kingdom "+ChatColor.AQUA+player.getKingdom().getName());
+        		ChatUtil.sendBroadcast(MessagePath.COMMAND_SETTLE_BROADCAST_SETTLE.getMessage(bukkitPlayer.getName(),townName,player.getKingdom().getName()));
         		// Set player as Lord
         		town.setPlayerLord(player.getOfflineBukkitPlayer());
         		// Add players to town bar
@@ -127,16 +135,20 @@ public class SettleCommand extends CommandBase {
         	} else {
         		switch(settleStatus) {
         		case 1:
-        			ChatUtil.sendError((Player) getSender(), "Could not settle: Overlaps with a nearby territory.");
+        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Overlaps with a nearby territory.");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_OVERLAP.getMessage());
         			break;
         		case 2:
-        			ChatUtil.sendError((Player) getSender(), "Could not settle: Couldn't find good Monument placement.");
+        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Couldn't find good Monument placement.");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PLACEMENT.getMessage());
         			break;
         		case 3:
-        			ChatUtil.sendError((Player) getSender(), "Could not settle: Invalid Town name, already taken or has spaces.");
+        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Invalid Town name, already taken or has spaces.");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_NAME.getMessage());
         			break;
         		case 4:
-        			ChatUtil.sendError((Player) getSender(), "Could not settle: Invalid Monument Template. Use \"/k admin monument <kingdom> create\"");
+        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Invalid Monument Template. Use \"/k admin monument <kingdom> create\"");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_TEMPLATE.getMessage());
         			break;
         		case 5:
         			int distance = getKonquest().getKingdomManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation().getChunk());
@@ -148,26 +160,33 @@ public class SettleCommand extends CommandBase {
         			} else {
         				min_distance = min_distance_town;
         			}
-        			ChatUtil.sendError((Player) getSender(), "Could not settle: Too close to another territory.");
-        			ChatUtil.sendError((Player) getSender(), "Currently "+distance+" chunks away, must be at least "+min_distance+".");
+        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Too close to another territory.");
+        			//ChatUtil.sendError((Player) getSender(), "Currently "+distance+" chunks away, must be at least "+min_distance+".");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
         			break;
         		case 11:
-        			ChatUtil.sendError((Player) getSender(), "Could not settle: The 16x16 area is not flat enough. Press F3+G to view chunk boundaries. Cut down trees and flatten the ground!");
+        			//ChatUtil.sendError((Player) getSender(), "Could not settle: The 16x16 area is not flat enough. Press F3+G to view chunk boundaries. Cut down trees and flatten the ground!");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_FLAT.getMessage());
         			break;
         		case 12:
-        			ChatUtil.sendError((Player) getSender(), "Could not settle: Elevation is too high. Try settling somewhere lower.");
+        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Elevation is too high. Try settling somewhere lower.");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_HEIGHT.getMessage());
         			break;
         		case 13:
-        			ChatUtil.sendError((Player) getSender(), "Could not settle: Too much air or water below. Try settling somewhere else, or remove all air/water below you.");
+        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Too much air or water below. Try settling somewhere else, or remove all air/water below you.");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_AIR.getMessage());
         			break;
         		case 14:
-        			ChatUtil.sendError((Player) getSender(), "Could not settle: Problem claiming intial chunks.");
+        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Problem claiming intial chunks.");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_INIT.getMessage());
         			break;
         		default:
-        			ChatUtil.sendError((Player) getSender(), "Could not settle: Unknown cause. Contact an Admin!");
+        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Unknown cause. Contact an Admin!");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
         			break;
         		}
-        		ChatUtil.sendMessage((Player) getSender(), "Use \"/k map\" for helpful info.", ChatColor.RED);
+        		//ChatUtil.sendMessage((Player) getSender(), "Use \"/k map\" for helpful info.", ChatColor.RED);
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SETTLE_NOTICE_MAP_HINT.getMessage());
         	}
         	
 			if(cost > 0 && settleStatus == 0) {
@@ -175,10 +194,12 @@ public class SettleCommand extends CommandBase {
 	            if(r.transactionSuccess()) {
 	            	String balanceF = String.format("%.2f",r.balance);
 	            	String amountF = String.format("%.2f",r.amount);
-	            	ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
+	            	//ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
+	            	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
 	            	getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)cost);
 	            } else {
-	            	ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
+	            	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
+	            	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
 	            }
 			}
         }

@@ -19,6 +19,7 @@ import konquest.model.KonPrefixType;
 import konquest.model.KonStats;
 import konquest.model.KonStatsType;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 /**
  * 
@@ -67,8 +68,10 @@ public class AccomplishmentManager {
 						ChatUtil.printDebug("Accomplishment unlock for player "+player.getBukkitPlayer().getName()+" with prefix "+pre.getName());
 						playerPrefix.addPrefix(pre);
 						//ChatUtil.sendTitle(player.getBukkitPlayer(), ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+"You've made an Accomplishment!", 60);
-						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+"You've made an Accomplishment!", 60, 5, 10);
-						ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+"Accomplishment prefix unlocked: "+ChatColor.DARK_PURPLE+pre.getName());
+						//ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+"You've made an Accomplishment!", 60, 5, 10);
+						//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+"Accomplishment prefix unlocked: "+ChatColor.DARK_PURPLE+pre.getName());
+						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+MessagePath.GENERIC_NOTICE_ACCOMPLISHMENT.getMessage(), 60, 5, 10);
+						ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+MessagePath.GENERIC_NOTICE_PREFIX_UNLOCK.getMessage()+": "+ChatColor.DARK_PURPLE+pre.getName());
 						Bukkit.getWorld(konquest.getWorldName()).playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)1.0);
 					}
 				}
@@ -116,13 +119,13 @@ public class AccomplishmentManager {
 		// Format book cover
 		meta.setAuthor("Konquest");
 		meta.setGeneration(BookMeta.Generation.ORIGINAL);
-		meta.setTitle("Accomplishment Stats");
+		meta.setTitle(MessagePath.MENU_STATS_TITLE.getMessage());
 		String titlePage = "";
-		titlePage = titlePage+ChatColor.DARK_PURPLE+ChatColor.BOLD+"Accomplishment Stats";
+		titlePage = titlePage+ChatColor.DARK_PURPLE+ChatColor.BOLD+MessagePath.MENU_STATS_TITLE.getMessage();
 		titlePage = titlePage+ChatColor.RESET+"\n\n";
-		titlePage = titlePage+ChatColor.BLACK+"Use \"/k stats\" or \"/k s\" to open this book again.";
+		titlePage = titlePage+ChatColor.BLACK+MessagePath.MENU_STATS_INTRO_1.getMessage();
 		titlePage = titlePage+ChatColor.RESET+"\n\n";
-		titlePage = titlePage+ChatColor.BLACK+"View your stats towards "+ChatColor.DARK_GREEN+"Accomplishments"+ChatColor.BLACK+", which unlock new prefixes for you to use.";
+		titlePage = titlePage+ChatColor.BLACK+MessagePath.MENU_STATS_INTRO_2.getMessage();
 		pages.add(titlePage);
 		// Format category and stat pages
 		for(KonPrefixCategory cat : KonPrefixCategory.values()) {
@@ -149,20 +152,20 @@ public class AccomplishmentManager {
 					}
 				}
 			}
-			String levelProgress = "Max Level";
+			String levelProgress = MessagePath.MENU_STATS_MAX.getMessage();
 			if(nextLevel != Double.MAX_VALUE) {
 				levelProgress = (int)level+"/"+(int)nextLevel;
 			}
 			String page = "";
-			page = page+ChatColor.BLACK+"Accomplishment Category:";
+			page = page+ChatColor.BLACK+MessagePath.MENU_STATS_CATEGORY.getMessage()+":";
 			page = page+ChatColor.RESET+"\n";
 			page = page+ChatColor.DARK_PURPLE+cat.getTitle();
 			page = page+ChatColor.RESET+"\n";
 			page = page+ChatColor.GRAY+levelProgress;
 			page = page+ChatColor.RESET+"\n\n";
-			page = page+ChatColor.BLACK+"Next prefix: "+ChatColor.DARK_GREEN+nextPrefixName;
+			page = page+ChatColor.BLACK+MessagePath.MENU_STATS_NEXT.getMessage()+": "+ChatColor.DARK_GREEN+nextPrefixName;
 			page = page+ChatColor.RESET+"\n\n";
-			page = page+ChatColor.BLACK+"Unlocked prefix: "+ChatColor.GREEN+unlockedPrefixNames;
+			page = page+ChatColor.BLACK+MessagePath.MENU_STATS_UNLOCK.getMessage()+": "+ChatColor.GREEN+unlockedPrefixNames;
 			pages.add(page);
 			// Format individual stats pages for this category
 			for(KonStatsType stat : KonStatsType.values()) {
@@ -172,13 +175,13 @@ public class AccomplishmentManager {
 					page = "";
 					page = page+ChatColor.DARK_PURPLE+cat.getTitle();
 					page = page+ChatColor.RESET+"\n";
-					page = page+ChatColor.DARK_PURPLE+ChatColor.ITALIC+stat.toString();
+					page = page+ChatColor.DARK_PURPLE+ChatColor.ITALIC+stat.displayName();
 					page = page+ChatColor.RESET+"\n";
 					page = page+ChatColor.BLACK+stat.description();
 					page = page+ChatColor.RESET+"\n\n";
-					page = page+ChatColor.BLACK+"Statistic amount:"+ChatColor.GRAY+currentAmount;
+					page = page+ChatColor.BLACK+MessagePath.MENU_STATS_AMOUNT.getMessage()+": "+ChatColor.GRAY+currentAmount;
 					page = page+ChatColor.RESET+"\n";
-					page = page+ChatColor.BLACK+"Accomplishment:"+ChatColor.GRAY+(int)currentLevel;
+					page = page+ChatColor.BLACK+MessagePath.MENU_STATS_POINTS.getMessage()+": "+ChatColor.GRAY+(int)currentLevel;
 					pages.add(page);
 				}
 			}

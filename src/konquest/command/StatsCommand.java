@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import konquest.Konquest;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 public class StatsCommand extends CommandBase {
 
@@ -20,7 +20,8 @@ public class StatsCommand extends CommandBase {
 	public void execute() {
 		// k stats
     	if (getArgs().length != 1) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+            //ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+            ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();

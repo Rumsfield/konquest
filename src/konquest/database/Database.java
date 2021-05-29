@@ -3,16 +3,16 @@ package konquest.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import konquest.Konquest;
-//import konquest.utility.ChatUtil;
+import konquest.utility.ChatUtil;
+
 
 public abstract class Database {
     private DatabaseConnection databaseConnection;
-    private Konquest konquest;
+    private DatabaseType type;
 
-    public Database(Konquest konquest) {
-        this.konquest = konquest;
-    	databaseConnection = new DatabaseConnection();
+    public Database(DatabaseType type) {
+        this.type = type;
+    	databaseConnection = new DatabaseConnection(type);
     }
 
     public abstract void initialize();
@@ -21,14 +21,21 @@ public abstract class Database {
         return databaseConnection;
     }
     
-    public Konquest getKonquest() {
-    	return konquest;
+    public DatabaseType getType() {
+    	return type;
     }
 
     public boolean exists(String table) {
-    	String query = "SELECT name FROM sqlite_master WHERE type='table' AND name='"+table+"';";
+    	String query = "";
+    	if(type.equals(DatabaseType.SQLITE)) {
+    		query = "SELECT name FROM sqlite_master WHERE type='table' AND name='"+table+"';";
+    	} else if(type.equals(DatabaseType.MYSQL)) {
+    		query = "SHOW TABLES LIKE '"+table+"';";
+    	} else {
+    		ChatUtil.printDebug("Failed to check for existing table in unknown database type: "+type.toString());
+    		return false;
+    	}
     	ResultSet result = databaseConnection.scheduleQuery(query);
-    	//ResultSet result = databaseConnection.executeQuery(query);
     	boolean hasRow = false;
         try {
         	hasRow = result.next();
@@ -42,12 +49,23 @@ public abstract class Database {
     }
     
     public boolean exists(String table, String column) {
-    	String query = "PRAGMA table_info('"+table+"');";
+    	String query = "";
+    	int nameIndex = 1;
+    	if(type.equals(DatabaseType.SQLITE)) {
+    		query = "PRAGMA table_info('"+table+"');";
+    		nameIndex = 2;
+    	} else if(type.equals(DatabaseType.MYSQL)) {
+    		query = "DESCRIBE "+table+";";
+    		nameIndex = 1;
+    	} else {
+    		ChatUtil.printDebug("Failed to check for existing table column in unknown database type: "+type.toString());
+    		return false;
+    	}
     	ResultSet result = databaseConnection.scheduleQuery(query);
     	boolean hasColumn = false;
         try {
         	while(result.next()) {
-        		if(column.equalsIgnoreCase(result.getString(2))) {
+        		if(column.equalsIgnoreCase(result.getString(nameIndex))) {
         			hasColumn = true;
         			break;
         		}

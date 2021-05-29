@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Snow;
-import org.bukkit.scheduler.BukkitRunnable;
+//import org.bukkit.scheduler.BukkitRunnable;
 //import org.bukkit.scheduler.BukkitTask;
 
 import konquest.Konquest;
@@ -45,6 +45,23 @@ public class BlockPaster {
     }
     
     public void startPaste() {
+    	for (int x = bottomBlockX; x <= topBlockX; x++) {
+            for (int z = bottomBlockZ; z <= topBlockZ; z++) {
+                Block templateBlock = Bukkit.getServer().getWorld(Konquest.getInstance().getWorldName()).getBlockAt(x, y, z);
+                Block monumentBlock = Bukkit.getServer().getWorld(Konquest.getInstance().getWorldName()).getChunkAt(centerLoc).getBlock(x-bottomBlockX, y-bottomBlockY+y_offset, z-bottomBlockZ);
+                // Set local block to monument template block
+                monumentBlock.setType(templateBlock.getType());
+                monumentBlock.setBlockData(templateBlock.getBlockData().clone());
+                //ChatUtil.printDebug("Pasting block at "+monumentBlock.getLocation().toString()+" with template from "+templateBlock.getLocation().toString());
+                //Remove snow
+                if(monumentBlock.getBlockData() instanceof Snow) {
+                	monumentBlock.setType(Material.AIR);
+                }
+            }
+        }
+    }
+
+    /*public void startPaste() {
 
     	BukkitRunnable task = new BukkitRunnable() {
             public void run() {
@@ -72,7 +89,6 @@ public class BlockPaster {
         task.runTaskLater(Konquest.getInstance().getPlugin(), 20);
         //this.taskID = t.getTaskId();
         //ChatUtil.printDebug("Started BlockPaster task with y "+y+" and taskID "+t.getTaskId());
-    }
-
+    }*/
     
 }

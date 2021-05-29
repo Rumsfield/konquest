@@ -4,7 +4,7 @@ import konquest.Konquest;
 import konquest.command.CommandBase;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +23,7 @@ public class ForceJoinAdminCommand extends CommandBase {
     public void execute() {
     	// k admin forcejoin player1 kingdom1
     	if (getArgs().length != 4) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	String playerName = getArgs()[2];
@@ -31,15 +31,18 @@ public class ForceJoinAdminCommand extends CommandBase {
         	KonPlayer player = getKonquest().getPlayerManager().getPlayerFromName(playerName);
 
         	if(player == null) {
-        		ChatUtil.sendError((Player) getSender(), "No such player");
+        		//ChatUtil.sendError((Player) getSender(), "No such player");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
         		return;
         	}
         	if(!getKonquest().getKingdomManager().isKingdom(kingdomName)) {
-        		ChatUtil.sendError((Player) getSender(), "No such kingdom");
+        		//ChatUtil.sendError((Player) getSender(), "No such kingdom");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
         		return;
         	}
         	getKonquest().getKingdomManager().assignPlayerKingdom(player, kingdomName);
-        	ChatUtil.sendNotice((Player) getSender(), "Successfully set player "+playerName+" to kingdom "+kingdomName);
+        	//ChatUtil.sendNotice((Player) getSender(), "Successfully set player "+playerName+" to kingdom "+kingdomName);
+        	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEJOIN_NOTICE_SUCCESS.getMessage(playerName,kingdomName));
         }
     }
     

@@ -3,7 +3,7 @@ package konquest.command.admin;
 import konquest.Konquest;
 import konquest.command.CommandBase;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,14 +31,15 @@ public class FlagAdminCommand extends CommandBase {
 	            case PEACEFUL:
 	            	// k admin flag peaceful <kingdom> <true|false>
 	            	if (getArgs().length != 5) {
-	            		ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+	            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 	            		return;
 	            	} else {
 	            		String kingdomName = getArgs()[3];
 	            		String flagValue = getArgs()[4];
 	            		// Verify Kingdom exists
 	            		if(!getKonquest().getKingdomManager().isKingdom(kingdomName)) {
-	                		ChatUtil.sendError((Player) getSender(), "No such kingdom");
+	                		//ChatUtil.sendError((Player) getSender(), "No such kingdom");
+	                		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
 	                		return;
 	                	}
 	            		// Assign flag value
@@ -47,7 +48,8 @@ public class FlagAdminCommand extends CommandBase {
 	            	}
 	                break;
                 default:
-                	ChatUtil.sendError((Player) getSender(), "Flag does not exist");
+                	//ChatUtil.sendError((Player) getSender(), "Flag does not exist");
+                	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(getArgs()[2]));
                 	break;
             }
         }

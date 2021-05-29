@@ -15,6 +15,7 @@ import konquest.model.KonStatsType;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class UpgradeManager {
@@ -144,26 +145,30 @@ public class UpgradeManager {
 	public boolean addTownUpgrade(KonTown town, KonUpgrade upgrade, int level, Player bukkitPlayer) {
 		// Check that upgrades are enabled
 		if(!isEnabled) {
-			ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": upgrades are currently disabled. Talk to an admin!");
+			//ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": upgrades are currently disabled. Talk to an admin!");
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return false;
 		}
 		// Check that the town has the previous level, if applicable
 		int currentLevel = town.getUpgradeLevel(upgrade);
 		if(level < 1 || level > upgrade.getMaxLevel() || level != currentLevel+1) {
-			ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": level is greater than maximum or too high from current level ("+currentLevel+")");
+			//ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": level is greater than maximum or too high from current level ("+currentLevel+")");
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_LEVEL.getMessage(upgrade.getDescription(),level,currentLevel));
 			return false;
 		}
 		// Check that the town has enough population
 		int currentPopulation = town.getNumResidents();
 		int requiredPopulation = upgradePopulations.get(upgrade).get(level-1);
 		if(currentPopulation < requiredPopulation) {
-			ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": town population is too low, requires "+requiredPopulation);
+			//ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": town population is too low, requires "+requiredPopulation);
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_POPULATION.getMessage(upgrade.getDescription(),level,requiredPopulation));
 			return false;
 		}
 		// Check that the player has enough favor
 		int requiredCost = upgradeCosts.get(upgrade).get(level-1);
 		if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < requiredCost) {
-			ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": requires "+requiredCost+" Favor");
+			//ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": requires "+requiredCost+" Favor");
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_COST.getMessage(upgrade.getDescription(),level,requiredCost));
             return false;
 		}
 		// Passed all checks, add the upgrade
@@ -171,7 +176,8 @@ public class UpgradeManager {
 		if(upgrade.equals(KonUpgrade.HEALTH)) {
 			konquest.getKingdomManager().refreshTownHearts(town);
 		}
-		ChatUtil.sendNotice(bukkitPlayer, "Added "+upgrade.getDescription()+" level "+level+"!");
+		//ChatUtil.sendNotice(bukkitPlayer, "Added "+upgrade.getDescription()+" level "+level+"!");
+		ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_UPGRADE_ADD.getMessage(upgrade.getDescription(),level,town.getName()));
 		ChatUtil.printDebug("Applied new upgrade "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
 		// Withdraw cost
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
@@ -179,10 +185,12 @@ public class UpgradeManager {
         if(r.transactionSuccess()) {
         	String balanceF = String.format("%.2f",r.balance);
         	String amountF = String.format("%.2f",r.amount);
-        	ChatUtil.sendNotice(bukkitPlayer, "Favor reduced by "+amountF+", total: "+balanceF);
+        	//ChatUtil.sendNotice(bukkitPlayer, "Favor reduced by "+amountF+", total: "+balanceF);
+        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
         	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)requiredCost);
         } else {
-        	ChatUtil.sendError(bukkitPlayer, String.format("An error occured: %s", r.errorMessage));
+        	//ChatUtil.sendError(bukkitPlayer, String.format("An error occured: %s", r.errorMessage));
+        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
         }
 		return true;
 	}
@@ -190,14 +198,16 @@ public class UpgradeManager {
 	public boolean forceTownUpgrade(KonTown town, KonUpgrade upgrade, int level, Player bukkitPlayer) {
 		// Check that upgrades are enabled
 		if(!isEnabled) {
-			ChatUtil.sendError(bukkitPlayer, "Error forcing "+upgrade.getDescription()+" level "+level+": upgrades are currently disabled.");
+			//ChatUtil.sendError(bukkitPlayer, "Error forcing "+upgrade.getDescription()+" level "+level+": upgrades are currently disabled.");
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return false;
 		}
 		town.addUpgrade(upgrade, level);
 		if(upgrade.equals(KonUpgrade.HEALTH)) {
 			konquest.getKingdomManager().refreshTownHearts(town);
 		}
-		ChatUtil.sendNotice(bukkitPlayer, "Forced "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
+		//ChatUtil.sendNotice(bukkitPlayer, "Forced "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
+		ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_UPGRADE_ADD.getMessage(upgrade.getDescription(),level,town.getName()));
 		ChatUtil.printDebug("Applied forced upgrade "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
 		return true;
 	}

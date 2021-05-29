@@ -4,7 +4,7 @@ import konquest.Konquest;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +24,7 @@ public class ListCommand extends CommandBase {
 	public void execute() {
 		// k list kingdoms|towns
     	if (getArgs().length != 2) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
@@ -39,7 +39,7 @@ public class ListCommand extends CommandBase {
             		kingdomList = kingdomList.substring(0,kingdomList.length()-2);
     			}
             	//kingdomList = kingdomList.substring(0, kingdomList.length()-2);
-            	ChatUtil.sendNotice(bukkitPlayer, "Kingdoms:"+kingdomList);
+            	ChatUtil.sendNotice(bukkitPlayer, MessagePath.LABEL_KINGDOMS.getMessage()+":"+kingdomList);
         	} else if(cmdMode.equalsIgnoreCase("towns")) {
         		if(!player.isBarbarian()) {
         			String townList = "";
@@ -52,13 +52,13 @@ public class ListCommand extends CommandBase {
                 		townList = townList.substring(0,townList.length()-2);
         			}
                 	//townList = townList.substring(0, townList.length()-2);
-                	ChatUtil.sendNotice(bukkitPlayer, "Towns in your Kingdom:"+townList);
+                	ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_LIST_NOTICE_TOWNS.getMessage()+":"+townList);
         		} else {
-        			ChatUtil.sendNotice(bukkitPlayer, "Barbarians do not have any Towns");
+        			//ChatUtil.sendNotice(bukkitPlayer, "Barbarians do not have any Towns");
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
         		}
-        		
         	} else {
-        		 ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
                  return;
         	}
         }

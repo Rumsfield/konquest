@@ -30,6 +30,7 @@ import konquest.manager.DirectiveManager;
 import konquest.manager.DisplayManager;
 import konquest.manager.IntegrationManager;
 import konquest.manager.KingdomManager;
+import konquest.manager.LanguageManager;
 import konquest.manager.LootManager;
 import konquest.manager.PlayerManager;
 import konquest.manager.RuinManager;
@@ -37,7 +38,9 @@ import konquest.manager.UpgradeManager;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
+import konquest.model.KonRuin;
 import konquest.model.KonTerritory;
+import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.nms.TeamPacketSender;
@@ -65,6 +68,7 @@ public class Konquest implements Timeable {
 	private DisplayManager displayManager;
 	private UpgradeManager upgradeManager;
 	private RuinManager ruinManager;
+	private LanguageManager languageManager;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
@@ -101,6 +105,7 @@ public class Konquest implements Timeable {
 		displayManager = new DisplayManager(this);
 		upgradeManager = new UpgradeManager(this);
 		ruinManager = new RuinManager(this);
+		languageManager = new LanguageManager(this);
 		
 		worldName = "world";
 		opStatusMessages = new ArrayList<String>();
@@ -115,12 +120,18 @@ public class Konquest implements Timeable {
 	public void initialize() {
 		// Initialize managers
 		configManager.initialize();
+		languageManager.initialize();
 		worldName = configManager.getConfig("core").getString("core.world_name","world");
-		plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Primary world is "+worldName);
+		ChatUtil.printConsoleAlert("Primary world is "+worldName);
 		kingdomManager.initialize();
 		ruinManager.initialize();
 		initManagers();
-		databaseThread.getThread().start();
+		if(!databaseThread.isRunning()) {
+			ChatUtil.printDebug("Starting database thread");
+			databaseThread.getThread().start();
+		} else {
+			ChatUtil.printDebug("Database thread is already running");
+		}
 		
 		// Create global scoreboard and teams
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -132,13 +143,14 @@ public class Konquest implements Timeable {
         barbarianTeam.setColor(ChatColor.YELLOW);
         
         if(setupTeamPacketSender()) {
-        	plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Successfully registered name color packets for this server version");
+        	ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version");
         } else {
-        	plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Failed to register name color packets, the server version is unsupported");
+        	ChatUtil.printConsoleError("Failed to register name color packets, the server version is unsupported");
         }
 		
 		kingdomManager.updateSmallestKingdom();
 		kingdomManager.updateAllTownDisabledUpgrades();
+		
 		ChatUtil.printDebug("Finished Initialization");
 	}
 	
@@ -159,10 +171,10 @@ public class Konquest implements Timeable {
 		offlineTimeoutSeconds = (long)(configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)*86400);
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;
-			plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED+"offline_timeout_seconds in core.yml is less than 1 day, overriding to 1 day to prevent data loss.");
+			ChatUtil.printConsoleError("offline_timeout_seconds in core.yml is less than 1 day, overriding to 1 day to prevent data loss.");
 		}
 		saveIntervalSeconds = configManager.getConfig("core").getInt("core.save_interval",60)*60;
-        plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Save interval is "+saveIntervalSeconds+" seconds");
+		ChatUtil.printConsoleAlert("Save interval is "+saveIntervalSeconds+" seconds");
 		if(saveIntervalSeconds > 0) {
 			saveTimer.stopTimer();
 			saveTimer.setTime(saveIntervalSeconds);
@@ -171,6 +183,59 @@ public class Konquest implements Timeable {
 		compassTimer.stopTimer();
 		compassTimer.setTime(30); // 30 second compass update interval
 		compassTimer.startLoopTimer();
+	}
+	
+	public void initOnlinePlayers() {
+		// Fetch any players that happen to be in the server already (typically from /reload)
+        for(Player bukkitPlayer : Bukkit.getServer().getOnlinePlayers()) {
+			initPlayer(bukkitPlayer);
+			ChatUtil.printStatus("Loaded online player "+bukkitPlayer.getName());
+		}
+	}
+	
+	public KonPlayer initPlayer(Player bukkitPlayer) {
+		KonPlayer player = null;
+		bukkitPlayer.setScoreboard(getScoreboard());
+    	// Fetch player from the database
+    	// Also instantiates player object in PlayerManager
+		databaseThread.getDatabase().fetchPlayerData(bukkitPlayer);
+    	player = playerManager.getPlayer(bukkitPlayer);
+    	// Update all player's nametag color packets
+    	updateNamePackets();
+    	// Update offline protections
+    	kingdomManager.updateKingdomOfflineProtection();
+    	// Update player membership stats
+    	kingdomManager.updatePlayerMembershipStats(player);
+    	// Updates based on login position
+    	Chunk chunkLogin = bukkitPlayer.getLocation().getChunk();
+    	kingdomManager.clearTownHearts(player);
+    	if(kingdomManager.isChunkClaimed(chunkLogin)) {
+			KonTerritory loginTerritory = kingdomManager.getChunkTerritory(chunkLogin);
+    		if(loginTerritory.getTerritoryType().equals(KonTerritoryType.TOWN)) { 
+	    		// Player joined located within a Town
+	    		KonTown town = (KonTown) loginTerritory;
+	    		town.addBarPlayer(playerManager.getPlayer(bukkitPlayer));
+	    		// For enemy players, apply effects
+	    		if(!player.getKingdom().equals(town.getKingdom())) {
+	    			kingdomManager.applyTownNerf(player, town);
+	    			kingdomManager.clearTownHearts(player);
+	    		} else {
+	    			kingdomManager.clearTownNerf(player);
+	    			kingdomManager.applyTownHearts(player, town);
+	    		}
+    		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+    			// Player joined located within a Ruin
+    			KonRuin ruin = (KonRuin) loginTerritory;
+    			ruin.addBarPlayer(playerManager.getPlayer(bukkitPlayer));
+    			ruin.spawnAllGolems();
+    		}
+		} else {
+			// Player joined located outside of a Town
+			kingdomManager.clearTownNerf(player);
+		}
+    	kingdomManager.updatePlayerBorderParticles(player,bukkitPlayer.getLocation());
+    	ChatUtil.resetTitle(bukkitPlayer);
+		return player;
 	}
 	
 	public static Konquest getInstance() {
@@ -235,6 +300,10 @@ public class Konquest implements Timeable {
 	
 	public RuinManager getRuinManager() {
 		return ruinManager;
+	}
+	
+	public LanguageManager lang() {
+		return languageManager;
 	}
 	
 	public long getOfflineTimeoutSeconds() {

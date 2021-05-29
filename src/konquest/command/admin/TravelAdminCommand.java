@@ -4,7 +4,7 @@ import konquest.Konquest;
 import konquest.command.CommandBase;
 import konquest.model.KonKingdom;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +24,7 @@ public class TravelAdminCommand  extends CommandBase {
     public void execute() {
     	// k admin travel kingdom1|town1|ruin1
     	if (getArgs().length != 3 && getArgs().length != 4) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
@@ -48,7 +48,8 @@ public class TravelAdminCommand  extends CommandBase {
         			}
         		}
         	}
-        	ChatUtil.sendError((Player) getSender(), "Travel destination does not exist");
+        	//ChatUtil.sendError((Player) getSender(), "Travel destination does not exist");
+        	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(travelTo));
         }
     }
     

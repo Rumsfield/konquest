@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import konquest.Konquest;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 public class QuestCommand extends CommandBase {
 
@@ -20,12 +20,12 @@ public class QuestCommand extends CommandBase {
 	public void execute() {
 		// k quest
     	if (getArgs().length != 1) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	// Check for global enable
         	if(!getKonquest().getDirectiveManager().isEnabled()) {
-        		ChatUtil.sendError((Player) getSender(), "Quests are currently disabled, talk to an admin.");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
         		return;
         	}
         	

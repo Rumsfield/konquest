@@ -3,7 +3,7 @@ package konquest.command.admin;
 import konquest.Konquest;
 import konquest.command.CommandBase;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,14 +22,14 @@ public class UnclaimAdminCommand extends CommandBase {
     public void execute() {
     	// k admin unclaim
     	if (getArgs().length != 2) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
 
         	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
-        		ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_WORLD.toString());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
         	
@@ -38,12 +38,15 @@ public class UnclaimAdminCommand extends CommandBase {
         		// unclaim the single chunk containing playerLoc from the adjacent territory.
         		String territoryName = getKonquest().getKingdomManager().getChunkTerritory(playerLoc.getChunk()).getName();
         		if(getKonquest().getKingdomManager().unclaimChunk(playerLoc)) {
-        			ChatUtil.sendNotice((Player) getSender(), "Successfully removed chunk from territory: "+territoryName);
+        			//ChatUtil.sendNotice((Player) getSender(), "Successfully removed chunk from territory: "+territoryName);
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_NOTICE_SUCCESS.getMessage(territoryName));
         		} else {
-        			ChatUtil.sendError((Player) getSender(), "There was a problem unclaiming this chunk.");
+        			//ChatUtil.sendError((Player) getSender(), "There was a problem unclaiming this chunk.");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_ERROR_FAIL.getMessage());
         		}
         	} else {
-        		ChatUtil.sendNotice((Player) getSender(), "Chunk is already unclaimed.");
+        		//ChatUtil.sendNotice((Player) getSender(), "Chunk is already unclaimed.");
+        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_ERROR_FAIL.getMessage());
         	}
         }
     }

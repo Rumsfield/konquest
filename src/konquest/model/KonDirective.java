@@ -1,15 +1,17 @@
 package konquest.model;
 
+import konquest.utility.MessagePath;
+
 public enum KonDirective {
-	SETTLE_TOWN		("konquest.directive.settle",	1,		"Fresh Start",			"Settle a Town for your Kingdom."),
-	CLAIM_LAND		("konquest.directive.claim",	5,		"Path to Nobility",		"Claim land for any Town in your Kingdom."),
-	BUILD_TOWN		("konquest.directive.build",	500,	"Masonry",				"Build structures for any Town in your Kingdom."),
-	CRAFT_ARMOR		("konquest.directive.armor",	4,		"Knighthood",			"Craft a set of iron armor to protect yourself."),
-	CREATE_GOLEM	("konquest.directive.golem",	1,		"Stoic Protector",		"Create an Iron Golem to protect any Town in your Kingdom."),
-	ENCHANT_ITEM	("konquest.directive.enchant",	3,		"Divine Tools",			"Apply any enchantment to tools/weapons."),
-	ATTACK_TOWN		("konquest.directive.attack",	1,		"Act of Aggression",	"Attack any Town in an enemy Kingdom by breaking blocks."),
-	CAPTURE_TOWN	("konquest.directive.capture",	1,		"Military Action",		"Capture any Town in an enemy Kingdom by destroying the critical blocks within the Town Monument."),
-	KILL_ENEMY		("konquest.directive.kill",		1,		"Best Enemies",			"Kill a player from an enemy Kingdom.");
+	SETTLE_TOWN		("konquest.directive.settle",	1,		MessagePath.DIRECTIVE_SETTLE_TOWN.getMessage(),		MessagePath.DIRECTIVE_SETTLE_TOWN_INFO.getMessage()),
+	CLAIM_LAND		("konquest.directive.claim",	5,		MessagePath.DIRECTIVE_CLAIM_LAND.getMessage(),		MessagePath.DIRECTIVE_CLAIM_LAND_INFO.getMessage()),
+	BUILD_TOWN		("konquest.directive.build",	500,	MessagePath.DIRECTIVE_BUILD_TOWN.getMessage(),		MessagePath.DIRECTIVE_BUILD_TOWN_INFO.getMessage()),
+	CRAFT_ARMOR		("konquest.directive.armor",	4,		MessagePath.DIRECTIVE_CRAFT_ARMOR.getMessage(),		MessagePath.DIRECTIVE_CRAFT_ARMOR_INFO.getMessage()),
+	CREATE_GOLEM	("konquest.directive.golem",	1,		MessagePath.DIRECTIVE_CREATE_GOLEM.getMessage(),	MessagePath.DIRECTIVE_CREATE_GOLEM_INFO.getMessage()),
+	ENCHANT_ITEM	("konquest.directive.enchant",	3,		MessagePath.DIRECTIVE_ENCHANT_ITEM.getMessage(),	MessagePath.DIRECTIVE_ENCHANT_ITEM_INFO.getMessage()),
+	ATTACK_TOWN		("konquest.directive.attack",	1,		MessagePath.DIRECTIVE_ATTACK_TOWN.getMessage(),		MessagePath.DIRECTIVE_ATTACK_TOWN_INFO.getMessage()),
+	CAPTURE_TOWN	("konquest.directive.capture",	1,		MessagePath.DIRECTIVE_CAPTURE_TOWN.getMessage(),	MessagePath.DIRECTIVE_CAPTURE_TOWN_INFO.getMessage()),
+	KILL_ENEMY		("konquest.directive.kill",		1,		MessagePath.DIRECTIVE_KILL_ENEMY.getMessage(),		MessagePath.DIRECTIVE_KILL_ENEMY_INFO.getMessage());
 	
 	private final String permission;
 	private final int stages;

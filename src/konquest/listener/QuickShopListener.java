@@ -18,6 +18,7 @@ import konquest.model.KonPlayer;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class QuickShopListener implements Listener{
 
@@ -52,32 +53,37 @@ public class QuickShopListener implements Listener{
 					if(territory instanceof KonTown) {
 						if(!player.getKingdom().equals(territory.getKingdom())) {
 							//ChatUtil.printDebug("...chunk is enemy town");
-							ChatUtil.sendError(event.getPlayer(), "Cannot create a shop in enemy towns!");
+							//ChatUtil.sendError(event.getPlayer(), "Cannot create a shop in enemy towns!");
+							ChatUtil.sendError(event.getPlayer(), MessagePath.QUICKSHOP_ERROR_ENEMY_USE.getMessage());
 							event.setCancelled(true);
 							return;
 						}
 						if(((KonTown) territory).isLocInsideCenterChunk(event.getLocation())) {
 							//ChatUtil.printDebug("...chunk is monument");
-							ChatUtil.sendError(event.getPlayer(), "Cannot create a shop inside monument!");
+							//ChatUtil.sendError(event.getPlayer(), "Cannot create a shop inside monument!");
+							ChatUtil.sendError(event.getPlayer(), MessagePath.QUICKSHOP_ERROR_MONUMENT.getMessage());
 							event.setCancelled(true);
 							return;
 						}
 					} 
 					if(territory instanceof KonCamp && !((KonCamp)territory).isPlayerOwner(event.getPlayer())) {
 						//ChatUtil.printDebug("...player is not camp owner");
-						ChatUtil.sendError(event.getPlayer(), "Can only create shops in your own camp!");
+						//ChatUtil.sendError(event.getPlayer(), "Can only create shops in your own camp!");
+						ChatUtil.sendError(event.getPlayer(), MessagePath.QUICKSHOP_ERROR_CAMP.getMessage());
 						event.setCancelled(true);
 						return;
 					}
 					if(territory instanceof KonCapital) {
 						//ChatUtil.printDebug("...chunk is capital");
-						ChatUtil.sendError(event.getPlayer(), "Cannot create a shop here!");
+						//ChatUtil.sendError(event.getPlayer(), "Cannot create a shop here!");
+						ChatUtil.sendError(event.getPlayer(), MessagePath.QUICKSHOP_ERROR_FAIL.getMessage());
 						event.setCancelled(true);
 						return;
 					}
 				} else {
 					//ChatUtil.printDebug("...chunk is not claimed, block");
-					ChatUtil.sendError(event.getPlayer(), "Cannot create shops in the wild!");
+					//ChatUtil.sendError(event.getPlayer(), "Cannot create shops in the wild!");
+					ChatUtil.sendError(event.getPlayer(), MessagePath.QUICKSHOP_ERROR_WILD.getMessage());
 					event.setCancelled(true);
 					return;
 				}
@@ -102,7 +108,8 @@ public class QuickShopListener implements Listener{
 				if(kingdomManager.isChunkClaimed(shopLoc.getChunk())) {
 					KonTerritory territory = kingdomManager.getChunkTerritory(shopLoc.getChunk());
 					if(!player.getKingdom().equals(territory.getKingdom())) {
-						ChatUtil.sendError(event.getPlayer(), "Cannot use enemy shops!");
+						//ChatUtil.sendError(event.getPlayer(), "Cannot use enemy shops!");
+						ChatUtil.sendError(event.getPlayer(), MessagePath.QUICKSHOP_ERROR_ENEMY_USE.getMessage());
 						event.setCancelled(true);
 						return;
 					}

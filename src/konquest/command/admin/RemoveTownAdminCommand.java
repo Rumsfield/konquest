@@ -3,7 +3,7 @@ package konquest.command.admin;
 import konquest.Konquest;
 import konquest.command.CommandBase;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,14 +23,14 @@ public class RemoveTownAdminCommand extends CommandBase {
     public void execute() {
     	// k admin removetown kingdom1 town1
     	if (getArgs().length != 4) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
 
         	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
-        		ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_WORLD.toString());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
         	
@@ -38,10 +38,11 @@ public class RemoveTownAdminCommand extends CommandBase {
         	String townName = getArgs()[3];
         	boolean pass = getKonquest().getKingdomManager().removeTown(townName, kingdomName);
         	if(!pass) {
-        		ChatUtil.sendError((Player) getSender(), MessageStatic.BAD_NAME.toString());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(townName));
                 return;
         	} else {
-        		ChatUtil.sendNotice((Player) getSender(), "Successfully removed Town: "+townName);
+        		//ChatUtil.sendNotice((Player) getSender(), "Successfully removed Town: "+townName);
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
         	}
         }
     }

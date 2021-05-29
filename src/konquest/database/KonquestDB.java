@@ -17,11 +17,17 @@ import konquest.model.KonPrefixType;
 import konquest.model.KonStats;
 import konquest.model.KonStatsType;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class KonquestDB extends Database{
 
-	public KonquestDB(Konquest konquest) {
-        super(konquest);
+	private boolean isReady;
+	private Konquest konquest;
+	
+	public KonquestDB(DatabaseType type, Konquest konquest) {
+        super(type);
+        this.konquest = konquest;
+        this.isReady = false;
     }
 
     @Override
@@ -32,9 +38,16 @@ public class KonquestDB extends Database{
             e.printStackTrace();
         }
         spawnTables();
-        getKonquest().getPlayerManager().initAllSavedPlayers();
-        getKonquest().getKingdomManager().initCamps();
-        ChatUtil.printStatus("SQLite database is ready");
+        konquest.getPlayerManager().initAllSavedPlayers();
+        konquest.getKingdomManager().initCamps();
+        isReady = true;
+        ChatUtil.printStatus("SQL database is ready");
+        
+        konquest.initOnlinePlayers();
+    }
+    
+    public boolean isReady() {
+    	return isReady;
     }
 
     public void spawnTables() {
@@ -50,16 +63,16 @@ public class KonquestDB extends Database{
             
             column = new Column("kingdom");
             column.setType("VARCHAR(255)");
-            column.setDefaultValue(getKonquest().getKingdomManager().getBarbarians().getName());
+            column.setDefaultValue("'"+konquest.getKingdomManager().getBarbarians().getName()+"'");
             players.add(column);
             
             column = new Column("exileKingdom");
             column.setType("VARCHAR(255)");
-            column.setDefaultValue(getKonquest().getKingdomManager().getBarbarians().getName());
+            column.setDefaultValue("'"+konquest.getKingdomManager().getBarbarians().getName()+"'");
             players.add(column);
 
             column = new Column("barbarian");
-            column.setType("TINYINT(1)");
+            column.setType("TINYINT");
             column.setDefaultValue("1");
             players.add(column);
             
@@ -124,8 +137,8 @@ public class KonquestDB extends Database{
             	kingdomName = player.getString("kingdom");
             	isBarbarian = (player.getInt("barbarian") == 1);
             	//ChatUtil.printDebug("Database player row: "+uuid+", "+kingdomName+", "+isBarbarian);
-            	if(kingdomName==null) { kingdomName = getKonquest().getKingdomManager().getBarbarians().getName(); }
-            	players.add(new KonOfflinePlayer(Bukkit.getOfflinePlayer(UUID.fromString(uuid)), getKonquest().getKingdomManager().getKingdom(kingdomName), isBarbarian));
+            	if(kingdomName==null) { kingdomName = konquest.getKingdomManager().getBarbarians().getName(); }
+            	players.add(new KonOfflinePlayer(Bukkit.getOfflinePlayer(UUID.fromString(uuid)), konquest.getKingdomManager().getKingdom(kingdomName), isBarbarian));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -161,7 +174,7 @@ public class KonquestDB extends Database{
     	KonPlayer player;
         if (!exists("players", "uuid", bukkitPlayer.getUniqueId().toString())) {
             createPlayerData(bukkitPlayer);
-            player = getKonquest().getPlayerManager().createKonPlayer(bukkitPlayer);
+            player = konquest.getPlayerManager().createKonPlayer(bukkitPlayer);
         } else {
         	ResultSet playerInfo = select("players", "uuid", bukkitPlayer.getUniqueId().toString());
         	String kingdomName = "";
@@ -183,10 +196,10 @@ public class KonquestDB extends Database{
                 ChatUtil.printDebug("Aborting player import "+bukkitPlayer.getName());
                 return;
             }
-    		if(kingdomName==null) { kingdomName = getKonquest().getKingdomManager().getBarbarians().getName(); }
-    		if(exileKingdomName==null) { exileKingdomName = getKonquest().getKingdomManager().getBarbarians().getName(); }
+    		if(kingdomName==null) { kingdomName = konquest.getKingdomManager().getBarbarians().getName(); }
+    		if(exileKingdomName==null) { exileKingdomName = konquest.getKingdomManager().getBarbarians().getName(); }
         	// Create a player from existing info
-    		player = getKonquest().getPlayerManager().importKonPlayer(bukkitPlayer, kingdomName, exileKingdomName, isBarbarian);
+    		player = konquest.getPlayerManager().importKonPlayer(bukkitPlayer, kingdomName, exileKingdomName, isBarbarian);
     		// Get stats and directives for the player
             ResultSet stats = select("stats", "uuid", bukkitPlayer.getUniqueId().toString());
             ResultSet directives = select("directives", "uuid", bukkitPlayer.getUniqueId().toString());
@@ -214,17 +227,18 @@ public class KonquestDB extends Database{
             //ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" stats = "+allStats);
             //ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" directives = "+allDirectives);
     		// Add valid prefixes to the player based on stats
-        	getKonquest().getAccomplishmentManager().initPlayerPrefixes(player);
+            konquest.getAccomplishmentManager().initPlayerPrefixes(player);
             // Update player's main prefix
-        	if(mainPrefix != null && mainPrefix != "" && getKonquest().getAccomplishmentManager().isEnabled()) {
+        	if(mainPrefix != null && mainPrefix != "" && konquest.getAccomplishmentManager().isEnabled()) {
         		boolean status = player.getPlayerPrefix().setPrefix(KonPrefixType.getPrefix(mainPrefix)); // Defaults to default prefix defined in KonPrefixType if mainPrefix is not a valid enum
         		if(!status) {
         			ChatUtil.printDebug("Failed to assign main prefix "+mainPrefix+" to player "+bukkitPlayer.getName());
         			// Schedule messages to display after 20-tick delay (1 second)
-        	    	Bukkit.getScheduler().scheduleSyncDelayedTask(getKonquest().getPlugin(), new Runnable() {
+        	    	Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
         	            @Override
         	            public void run() {
-        	            	ChatUtil.sendError(bukkitPlayer, "Your prefix has been reverted to default.");
+        	            	//ChatUtil.sendError(bukkitPlayer, "Your prefix has been reverted to default.");
+        	            	ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_PREFIX_ERROR_DEFAULT.getMessage());
         	            }
         	        }, 20);
         		}
@@ -296,7 +310,7 @@ public class KonquestDB extends Database{
     public void flushPlayerData(Player bukkitPlayer) {
     	//ChatUtil.printDebug("Flushing player database for "+bukkitPlayer.getDisplayName());
         String playerUUIDString = bukkitPlayer.getUniqueId().toString();
-        KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
+        KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
         String[] col;
         String[] val;
         int i;
@@ -307,7 +321,7 @@ public class KonquestDB extends Database{
         val[0] = "'"+player.getKingdom().getName()+"'";
         val[1] = "'"+player.getExileKingdom().getName()+"'";
         val[2] = player.isBarbarian() ? "1" : "0";
-        val[3] = "'"+player.getPlayerPrefix().getMainPrefixName()+"'";
+        val[3] = "'"+player.getPlayerPrefix().getMainPrefix().toString()+"'";
         val[4] = player.getPlayerPrefix().isEnabled() ? "1" : "0";
         set("players", col, val, "uuid", playerUUIDString);
         

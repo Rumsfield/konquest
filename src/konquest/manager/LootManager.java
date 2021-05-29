@@ -19,6 +19,7 @@ import konquest.model.KonPlayer;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
@@ -336,7 +337,8 @@ public class LootManager implements Timeable{
 			ChatUtil.printDebug("Loot Refresh timer marked new availability time");
 			for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
 				if(!player.isBarbarian() && player.getKingdom().getMonumentTemplate().hasLoot()) {
-					ChatUtil.sendNotice(player.getBukkitPlayer(), "New town monument loot is available.");
+					//ChatUtil.sendNotice(player.getBukkitPlayer(), "New town monument loot is available.");
+					ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_LOOT.getMessage());
 				}
 			}
 		}

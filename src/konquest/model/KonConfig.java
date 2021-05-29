@@ -11,6 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.utility.ChatUtil;
 
 public class KonConfig {
 	private File file;
@@ -61,15 +62,19 @@ public class KonConfig {
 	    }
 	}
 	
-	// Returns true if the file was missing and has been replaced with the default
+	// Returns false if the file was missing and does not have a default resource
 	public boolean saveDefaultConfig() {
 	    if (file == null) {
 	        file = new File(plugin.getDataFolder(), fileName);
 	    }
-	    boolean result = false;
+	    boolean result = true;
 	    if (!file.exists()) {
-	    	plugin.saveResource(fileName, false);
-	    	result = true;
+	    	try {
+	    		plugin.saveResource(fileName, false);
+	    	} catch(IllegalArgumentException e) {
+	    		result = false;
+	    		ChatUtil.printConsoleError("Failed to save unknown resource "+fileName);
+	    	}
 	    }
 	    return result;
 	}
@@ -113,7 +118,7 @@ public class KonConfig {
 			    }
 			}
 			result = true;
-			Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Invalid or missing config file \""+fileName+"\" replaced with latest default version. Manually edit new YML file.");
+			Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Invalid or missing config file \""+fileName+"\" replaced with latest default version. Manually edit new YML file if desired.");
 		}
 		return result;
 	}

@@ -4,7 +4,7 @@ import konquest.Konquest;
 import konquest.command.CommandBase;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +22,7 @@ public class BypassAdminCommand extends CommandBase {
     public void execute() {
         // k admin bypass
     	if (getArgs().length != 2) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+            ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
@@ -30,12 +30,14 @@ public class BypassAdminCommand extends CommandBase {
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	if(player.isAdminBypassActive()) {
         		player.setIsAdminBypassActive(false);
-        		ChatUtil.sendNotice((Player) getSender(), "Disabled admin bypass.");
+        		//ChatUtil.sendNotice((Player) getSender(), "Disabled admin bypass.");
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
         		ChatUtil.resetTitle((Player) getSender());
         	} else {
         		player.setIsAdminBypassActive(true);
-        		ChatUtil.sendNotice((Player) getSender(), "Enabled admin bypass, use this command again to disable.");
-        		ChatUtil.sendConstantTitle((Player) getSender(), "", ChatColor.GOLD+"BYPASS");
+        		//ChatUtil.sendNotice((Player) getSender(), "Enabled admin bypass, use this command again to disable.");
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
+        		ChatUtil.sendConstantTitle((Player) getSender(), "", ChatColor.GOLD+MessagePath.LABEL_BYPASS.getMessage());
         	}
         }
     }

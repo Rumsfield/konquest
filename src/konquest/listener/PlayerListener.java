@@ -17,6 +17,7 @@ import konquest.model.KonTown;
 import konquest.model.KonPlayer.RegionType;
 //import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -89,78 +90,7 @@ public class PlayerListener implements Listener{
     public void onPlayerJoin(PlayerJoinEvent event) {
     	//ChatUtil.printDebug("EVENT: Player Joined");
     	Player bukkitPlayer = event.getPlayer();
-    	bukkitPlayer.setScoreboard(konquest.getScoreboard());
-    	// Fetch player from the database
-    	// Also instantiates player object in PlayerManager
-    	konquest.getDatabaseThread().getDatabase().fetchPlayerData(bukkitPlayer);
-    	KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-    	/*
-    	// Add the player as a KonPlayer, either load from players.yml or create new barbarian
-    	if(playerManager.loadPlayer(bukkitPlayer)) {
-    		player = playerManager.getPlayer(bukkitPlayer);
-    		ChatUtil.printDebug("Loaded existing player: "+bukkitPlayer.getDisplayName());
-    	} else {
-    		player = playerManager.createKonPlayer(bukkitPlayer,konquest.getKingdomManager().getBarbarians(),true);
-    		ChatUtil.printDebug("Added new player: "+bukkitPlayer.getDisplayName());
-    		// save player data to config files
-    		playerManager.savePlayer(player);
-        	playerManager.updateAllSavedPlayers();
-    	}
-    	*/
-    	// Update all player's nametag color packets
-    	konquest.updateNamePackets();
-    	// Update offline protections
-    	kingdomManager.updateKingdomOfflineProtection();
-    	// Update player membership stats
-    	kingdomManager.updatePlayerMembershipStats(player);
-    	/*
-    	List<String> friendlyNames = new ArrayList<String>();
-    	List<String> enemyNames = new ArrayList<String>();
-    	KonKingdom myKingdom = playerManager.getPlayer(bukkitPlayer).getKingdom();
-    	for(KonPlayer player : playerManager.getPlayersOnline()) {
-    		if(player.getKingdom().equals(myKingdom)) {
-    			friendlyNames.add(player.getBukkitPlayer().getName());
-    		} else if(!player.getKingdom().isPeaceful() && !player.getKingdom().equals(myKingdom)) {
-    			enemyNames.add(player.getBukkitPlayer().getName());
-    		}
-    	}
-    	if(!friendlyNames.isEmpty()) {
-    		konquest.setPlayersToFriendlies(bukkitPlayer, friendlyNames);
-    	}
-    	if(!enemyNames.isEmpty()) {
-    		konquest.setPlayersToEnemies(bukkitPlayer, enemyNames);
-    	}
-    	*/
-    	// Updates based on login position
-    	Chunk chunkLogin = bukkitPlayer.getLocation().getChunk();
-    	kingdomManager.clearTownHearts(player);
-    	if(kingdomManager.isChunkClaimed(chunkLogin)) {
-			KonTerritory loginTerritory = kingdomManager.getChunkTerritory(chunkLogin);
-    		if(loginTerritory.getTerritoryType().equals(KonTerritoryType.TOWN)) { 
-	    		// Player joined located within a Town
-	    		KonTown town = (KonTown) loginTerritory;
-	    		town.addBarPlayer(playerManager.getPlayer(bukkitPlayer));
-	    		// For enemy players, apply effects
-	    		if(!player.getKingdom().equals(town.getKingdom())) {
-	    			kingdomManager.applyTownNerf(player, town);
-	    			kingdomManager.clearTownHearts(player);
-	    		} else {
-	    			kingdomManager.clearTownNerf(player);
-	    			kingdomManager.applyTownHearts(player, town);
-	    		}
-    		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
-    			// Player joined located within a Ruin
-    			KonRuin ruin = (KonRuin) loginTerritory;
-    			ruin.addBarPlayer(playerManager.getPlayer(bukkitPlayer));
-    			ruin.spawnAllGolems();
-    		}
-		} else {
-			// Player joined located outside of a Town
-			kingdomManager.clearTownNerf(player);
-		}
-    	kingdomManager.updatePlayerBorderParticles(player,bukkitPlayer.getLocation());
-    	ChatUtil.resetTitle(bukkitPlayer);
-    	
+    	KonPlayer player = konquest.initPlayer(bukkitPlayer);
     	// Schedule messages to display after 10-tick delay (0.5 second)
     	Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override
@@ -169,7 +99,8 @@ public class PlayerListener implements Listener{
             	// Send helpful messages
             	if(playerManager.getPlayer(bukkitPlayer).getKingdom().isSmallest()) {
             		int boostPercent = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.smallest_exp_boost_percent");
-            		ChatUtil.sendNotice(bukkitPlayer, "Your Kingdom is currently the smallest, enjoy a "+boostPercent+"% EXP boost!", ChatColor.ITALIC);
+            		//ChatUtil.sendNotice(bukkitPlayer, "Your Kingdom is currently the smallest, enjoy a "+boostPercent+"% EXP boost!", ChatColor.ITALIC);
+            		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SMALL_KINGDOM.getMessage(boostPercent), ChatColor.ITALIC);
             	}
             	if(bukkitPlayer.hasPermission("konquest.command.admin")) {
             		for(String msg : konquest.opStatusMessages) {
@@ -179,11 +110,13 @@ public class PlayerListener implements Listener{
             	// Messages for town joining
             	for(KonTown town : player.getKingdom().getTowns()) {
             		if(town.isJoinInviteValid(player.getBukkitPlayer().getUniqueId())) {
-            			ChatUtil.sendNotice(bukkitPlayer, "You're invited to join the town of "+town.getName()+", use \"/k join "+town.getName()+"\" to accept or \"/k leave "+town.getName()+"\" to decline", ChatColor.LIGHT_PURPLE);
+            			//ChatUtil.sendNotice(bukkitPlayer, "You're invited to join the town of "+town.getName()+", use \"/k join "+town.getName()+"\" to accept or \"/k leave "+town.getName()+"\" to decline", ChatColor.LIGHT_PURPLE);
+            			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_JOIN_INVITE.getMessage(town.getName(),town.getName(),town.getName()), ChatColor.LIGHT_PURPLE);
             		}
             		if(town.isPlayerElite(bukkitPlayer)) {
             			for(OfflinePlayer invitee : town.getJoinRequests()) {
-            				ChatUtil.sendNotice(bukkitPlayer, invitee.getName()+" wants to join "+town.getName()+", use \"/k town "+town.getName()+" add "+invitee.getName()+"\" to allow, \"/k town "+town.getName()+" kick "+invitee.getName()+"\" to deny", ChatColor.LIGHT_PURPLE);
+            				//ChatUtil.sendNotice(bukkitPlayer, invitee.getName()+" wants to join "+town.getName()+", use \"/k town "+town.getName()+" add "+invitee.getName()+"\" to allow, \"/k town "+town.getName()+" kick "+invitee.getName()+"\" to deny", ChatColor.LIGHT_PURPLE);
+            				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_JOIN_REQUEST.getMessage(invitee.getName(),town.getName(),town.getName(),invitee.getName(),town.getName(),invitee.getName()), ChatColor.LIGHT_PURPLE);
             			}
             		}
             	}
@@ -322,7 +255,8 @@ public class PlayerListener implements Listener{
     	if(player.isCombatTagged()) {
     		for(String cmd : playerManager.getBlockedCommands()) {
     			if(event.getMessage().toLowerCase().startsWith("/"+cmd.toLowerCase())) {
-    				ChatUtil.sendError(event.getPlayer(), "This command is blocked while in combat");
+    				//ChatUtil.sendError(event.getPlayer(), "This command is blocked while in combat");
+    				ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_TAG_BLOCKED.getMessage());
     				event.setCancelled(true);
     				return;
     			}
@@ -342,7 +276,8 @@ public class PlayerListener implements Listener{
         // When a player is setting regions...
         if (player.isSettingRegion()) {
         	if (event.getClickedBlock() == null) {
-             	ChatUtil.sendNotice(bukkitPlayer, "Clicked in Air, cancelled region creation!");
+             	//ChatUtil.sendNotice(bukkitPlayer, "Clicked in Air, cancelled region creation!");
+             	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_CLICKED_AIR.getMessage());
              	player.setRegionCornerOneBuffer(null);
                 player.setRegionCornerTwoBuffer(null);
                 player.settingRegion(RegionType.NONE);
@@ -356,35 +291,43 @@ public class PlayerListener implements Listener{
 	        	case MONUMENT:
 	                if (player.getRegionCornerOneBuffer() == null) {
 	                	player.setRegionCornerOneBuffer(location);
-	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the second corner block of the region.");
-	                    ChatUtil.sendNotice(bukkitPlayer, "Base area must be 16x16 (green particles).");
+	                    //ChatUtil.sendNotice(bukkitPlayer, "Click on the second corner block of the region.");
+	                    //ChatUtil.sendNotice(bukkitPlayer, "Base area must be 16x16 (green particles).");
+	                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_2.getMessage());
 	                } else if (player.getRegionCornerTwoBuffer() == null) {
 	                	player.setRegionCornerTwoBuffer(location);
-	                    ChatUtil.sendNotice(bukkitPlayer, "Click on the travel point block.");
+	                    //ChatUtil.sendNotice(bukkitPlayer, "Click on the travel point block.");
+	                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_3.getMessage());
 	                } else {
 	                	int createMonumentStatus = kingdomManager.getKingdom(player.getRegionKingdomName()).createMonumentTemplate(player.getRegionCornerOneBuffer(), player.getRegionCornerTwoBuffer(), location);
 	                	switch(createMonumentStatus) {
 	    				case 0:
-	    					ChatUtil.sendNotice(bukkitPlayer, "Successfully created new Monument Template for kingdom "+player.getRegionKingdomName());
+	    					//ChatUtil.sendNotice(bukkitPlayer, "Successfully created new Monument Template for kingdom "+player.getRegionKingdomName());
+	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(player.getRegionKingdomName()));
 	    					break;
 	    				case 1:
 	    					int diffX = (int)Math.abs(player.getRegionCornerOneBuffer().getX()-player.getRegionCornerTwoBuffer().getX())+1;
 	    					int diffZ = (int)Math.abs(player.getRegionCornerOneBuffer().getZ()-player.getRegionCornerTwoBuffer().getZ())+1;
-	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, base must be 16x16 blocks but got "+diffX+"x"+diffZ);
+	    					//ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, base must be 16x16 blocks but got "+diffX+"x"+diffZ);
+	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(diffX,diffZ));
 	    					break;
 	    				case 2:
 	    					String criticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block");
 	    					int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
-	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, it must contain at least "+maxCriticalhits+" "+criticalBlockTypeName+" blocks");
+	    					//ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, it must contain at least "+maxCriticalhits+" "+criticalBlockTypeName+" blocks");
+	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(maxCriticalhits,criticalBlockTypeName));
 	    					break;
 	    				case 3:
-	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, travel point must be inside of the region");
+	    					//ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, travel point must be inside of the region");
+	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_TRAVEL.getMessage());
 	    					break;
 	    				case 4:
-	    					ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, region must be within "+player.getRegionKingdomName()+" Capital territory");
+	    					//ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, region must be within "+player.getRegionKingdomName()+" Capital territory");
+	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CAPITAL.getMessage(player.getRegionKingdomName()));
 	    					break;
 	    				default:
-	    					ChatUtil.sendError(bukkitPlayer, "Could not create Monument Template: Unknown cause = "+createMonumentStatus);
+	    					//ChatUtil.sendError(bukkitPlayer, "Could not create Monument Template: Unknown cause = "+createMonumentStatus);
+	    					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(createMonumentStatus));
 	    					break;
 	    				}
 	                    player.setRegionCornerOneBuffer(null);
@@ -403,14 +346,17 @@ public class PlayerListener implements Listener{
 		        				ruinName = territory.getName();
 		        				validCriticalBlock = true;
 	        				} else {
-	        					ChatUtil.sendError(bukkitPlayer, "Clicked block does not match type: "+criticalType.toString());
+	        					//ChatUtil.sendError(bukkitPlayer, "Clicked block does not match type: "+criticalType.toString());
+	        					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_MATCH.getMessage(criticalType.toString()));
 	        				}
 	        			}
 	        		}
 	        		if(validCriticalBlock) {
-	        			ChatUtil.sendNotice(bukkitPlayer, "Added critical block to Ruin "+ruinName);
+	        			//ChatUtil.sendNotice(bukkitPlayer, "Added critical block to Ruin "+ruinName);
+	        			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_ADD.getMessage(ruinName));
 	        		} else {
-	        			ChatUtil.sendError(bukkitPlayer, "Could not add this block to a valid Ruin");
+	        			//ChatUtil.sendError(bukkitPlayer, "Could not add this block to a valid Ruin");
+	        			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_INVALID.getMessage());
 	        		}
 	        		break;
 	        	case RUIN_SPAWN:
@@ -424,9 +370,11 @@ public class PlayerListener implements Listener{
 	        			}
 	        		}
 	        		if(validSpawnBlock) {
-	        			ChatUtil.sendNotice(bukkitPlayer, "Added spawn block to Ruin "+ruinName);
+	        			//ChatUtil.sendNotice(bukkitPlayer, "Added spawn block to Ruin "+ruinName);
+	        			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_ADD.getMessage(ruinName));
 	        		} else {
-	        			ChatUtil.sendError(bukkitPlayer, "Could not add this block to a valid Ruin");
+	        			//ChatUtil.sendError(bukkitPlayer, "Could not add this block to a valid Ruin");
+	        			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_INVALID.getMessage());
 	        		}
 	        		break;
 	        	default:
@@ -444,9 +392,10 @@ public class PlayerListener implements Listener{
         			// Allow interaction with signs
         			if(!(event.getClickedBlock().getState() instanceof Sign)) {
         				//ChatUtil.printDebug("Interaction was not a sign");
-        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
         				if(event.getPlayer().hasPermission("konquest.command.admin")) {
-        					ChatUtil.sendNotice(bukkitPlayer,"Use \"/k admin bypass\" to ignore capital preventions.");
+        					//ChatUtil.sendNotice(bukkitPlayer,"Use \"/k admin bypass\" to ignore capital preventions.");
+        					ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
         				}
 	        			event.setCancelled(true);
 	        			return;
@@ -482,7 +431,7 @@ public class PlayerListener implements Listener{
         					// Prevent all physical stepping interaction
         					event.setUseInteractedBlock(Event.Result.DENY);
         					//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in enemy Towns", ChatColor.DARK_RED);
-        					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+        					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
         				} else if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 	        				// Prevent use of specific usable blocks
         					BlockData clickedBlockData = event.getClickedBlock().getBlockData();
@@ -492,7 +441,7 @@ public class PlayerListener implements Listener{
 	        						clickedBlockData instanceof TrapDoor) {
 	        					event.setUseInteractedBlock(Event.Result.DENY);
 	        					//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in enemy Towns", ChatColor.DARK_RED);
-		        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+		        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 	        				}
         				}
     				}
@@ -502,7 +451,7 @@ public class PlayerListener implements Listener{
         				//ChatUtil.printDebug("Player identified as enemy or non-resident, clicked block "+clickedMat.toString());
         				if(clickedMat.equals(Material.ITEM_FRAME)) {
         					//ChatUtil.printDebug("EVENT: Enemy or non-resident interacted with item frame");
-        					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+        					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
         					event.setCancelled(true);
     						return;
         				}
@@ -531,7 +480,7 @@ public class PlayerListener implements Listener{
     		KonPlayer player = konquest.getPlayerManager().getPlayer((Player)ent);
     		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getVehicle().getLocation().getChunk());
     		if(player != null && territory != null && !territory.getKingdom().equals(player.getKingdom()) && territory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
-    			ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+    			ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
     			event.setCancelled(true);
 				return;
     		}
@@ -593,7 +542,7 @@ public class PlayerListener implements Listener{
         	if(territory instanceof KonCapital) {
     			//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in the Kingdom Capital", ChatColor.DARK_RED);
     			//ChatUtil.printDebug("EVENT player interaction within capital");
-				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
     			event.setCancelled(true);
     			return;
     		}
@@ -611,7 +560,7 @@ public class PlayerListener implements Listener{
 						return;
     				}
     				*/
-    				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+    				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
     				event.setCancelled(true);
 					return;
     			}
@@ -627,7 +576,7 @@ public class PlayerListener implements Listener{
         	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation().getChunk());
         	// Capital protections...
         	if(territory instanceof KonCapital) {
-				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+"Blocked", 1, 10, 10);
+				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
     			event.setCancelled(true);
     			return;
     		}
@@ -812,7 +761,8 @@ public class PlayerListener implements Listener{
 						ChatUtil.printDebug("EVENT: Portal creation stopped inside of capital "+territory.getName());
 						event.setCanCreatePortal(false);
 						event.setCancelled(true);
-						ChatUtil.sendError(bukkitPlayer, "Your exit portal is inside the Capital of "+territory.getName()+", move your portal!");
+						//ChatUtil.sendError(bukkitPlayer, "Your exit portal is inside the Capital of "+territory.getName()+", move your portal!");
+						ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_PORTAL_EXIT.getMessage());
 						return;
 					}
 					if(territory instanceof KonTown) {
@@ -821,7 +771,8 @@ public class PlayerListener implements Listener{
 							ChatUtil.printDebug("EVENT: Portal creation stopped inside of town monument "+territory.getName());
 							event.setCanCreatePortal(false);
 							event.setCancelled(true);
-							ChatUtil.sendError(bukkitPlayer, "Your exit portal is inside the Monument of "+territory.getName()+", move your portal!");
+							//ChatUtil.sendError(bukkitPlayer, "Your exit portal is inside the Monument of "+territory.getName()+", move your portal!");
+							ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_PORTAL_EXIT.getMessage());
 							return;
 						}
 					}
@@ -899,9 +850,10 @@ public class PlayerListener implements Listener{
         				boolean isClaimSuccess = kingdomManager.claimForPlayer(bukkitPlayer, event.getTo());
             			if(!isClaimSuccess) {
             				player.setIsClaimingFollow(false);
-            				ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
+            				//ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
+            				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
             			} else {
-            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+"Claimed", 15);
+            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_CLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
             			}
             			// Update territory variables for chunk boundary checks below
         				isTerritoryTo = kingdomManager.isChunkClaimed(chunkTo);
@@ -918,7 +870,7 @@ public class PlayerListener implements Listener{
         		if(!isTerritoryTo && isTerritoryFrom) { // When moving into the wild
         			// Display WILD
         			//ChatUtil.sendNotice(bukkitPlayer, "The Wild: "+chunkCoordsTo);
-        			ChatUtil.sendKonTitle(player, "", "The Wild");
+        			ChatUtil.sendKonTitle(player, "", MessagePath.GENERIC_NOTICE_WILD.getMessage());
         			//ChatUtil.printDebug("    Moved from Territory to Wild");
         			KonTerritory territoryFrom = kingdomManager.getChunkTerritory(chunkFrom);
         			if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
@@ -955,7 +907,8 @@ public class PlayerListener implements Listener{
     	    				town.addBarPlayer(player);
     	    				// Notify player if town is abandoned
     	    				if(town.getPlayerResidents().isEmpty() && town.getKingdom().equals(player.getKingdom())) {
-    	    					ChatUtil.sendNotice(bukkitPlayer, "This Town is abandoned! Use \"/k town "+territoryName+" lord "+bukkitPlayer.getName()+"\" to claim Lordship.",ChatColor.RED);
+    	    					//ChatUtil.sendNotice(bukkitPlayer, "This Town is abandoned! Use \"/k town "+territoryName+" lord "+bukkitPlayer.getName()+"\" to claim Lordship.",ChatColor.RED);
+    	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
     	    				}
     	    				// Command all nearby Iron Golems to target enemy player, if no other closer player is present
     						updateGolemTargetsForTerritory(territoryTo,player,true);
@@ -987,7 +940,8 @@ public class PlayerListener implements Listener{
         	            		town.addBarPlayer(player);
         	            		// Notify player if town is abandoned
         	    				if(town.getPlayerResidents().isEmpty() && town.getKingdom().equals(player.getKingdom())) {
-        	    					ChatUtil.sendNotice(bukkitPlayer, "This Town is abandoned! Use \"/k town "+territoryTo.getName()+" lord "+bukkitPlayer.getName()+"\" to claim Lordship.",ChatColor.RED);
+        	    					//ChatUtil.sendNotice(bukkitPlayer, "This Town is abandoned! Use \"/k town "+territoryTo.getName()+" lord "+bukkitPlayer.getName()+"\" to claim Lordship.",ChatColor.RED);
+        	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
         	    				}
         	    				updateGolemTargetsForTerritory(territoryTo,player,true);
         	    			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
@@ -1032,15 +986,16 @@ public class PlayerListener implements Listener{
     			
     			if(player.isAdminClaimingFollow()) {
     				player.setIsAdminClaimingFollow(false);
-    				ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
+    				//ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
+    				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
     			}
     			if(player.isClaimingFollow()) {
     				player.setIsClaimingFollow(false);
-    				ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
+    				//ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
+    				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
     			}
     			if(player.isMapAuto()) {
     				player.setIsMapAuto(false);
-    				ChatUtil.sendNotice(bukkitPlayer, "Disabled auto map");
     			}
     			
     			//kingdomManager.stopPlayerBorderParticles(player);

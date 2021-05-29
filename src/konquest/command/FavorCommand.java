@@ -4,7 +4,7 @@ import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
-import konquest.utility.MessageStatic;
+import konquest.utility.MessagePath;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +22,7 @@ public class FavorCommand extends CommandBase {
 	public void execute() {
 		// k favor
     	if (getArgs().length != 1) {
-            ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
@@ -38,7 +38,7 @@ public class FavorCommand extends CommandBase {
         	double cost_claim = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_claim",0.0);
         	double cost_travel = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel",0.0);
         	String balanceF = String.format("%.2f",balance);
-        	ChatUtil.sendNotice(bukkitPlayer, "You have "+balanceF+" Favor, costs are:");
+        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_MESSAGE.getMessage(balanceF));
         	ChatUtil.sendMessage(bukkitPlayer, "Spy: "+ChatColor.AQUA+cost_spy);
         	ChatUtil.sendMessage(bukkitPlayer, "Settle: "+ChatColor.AQUA+cost_settle_adj);
         	ChatUtil.sendMessage(bukkitPlayer, "Rename: "+ChatColor.AQUA+cost_rename);
