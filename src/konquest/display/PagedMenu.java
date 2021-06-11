@@ -112,7 +112,7 @@ public class PagedMenu {
 				pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex));
 			}
 			// Place a close button
-			pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_CLOSE.getMessage(),Collections.emptyList(),Material.REDSTONE_BLOCK,closeIndex));
+			pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_CLOSE.getMessage(),Collections.emptyList(),Material.STRUCTURE_VOID,closeIndex));
 			// Place glass panes
 			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+1));
 			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,backIndex+2));
