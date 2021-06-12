@@ -39,6 +39,7 @@ label:
   stats: "Stats"
   leaderboard: "Leaderboard"
   total: "Total"
+  camp: "Camp"
 menu:
   stats:
     title: "Accomplishment Stats"
