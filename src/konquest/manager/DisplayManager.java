@@ -37,14 +37,15 @@ import konquest.utility.MessagePath;
 public class DisplayManager {
 
 	private Konquest konquest;
-	private DisplayMenu helpMenu;
+	private PagedMenu helpMenu;
 	private HashMap<Inventory, DisplayMenu> townUpgradeMenus;
 	private HashMap<Inventory, KonTown> townMenuCache;
 	private HashMap<Inventory, PagedMenu> scoreMenus;
 	
 	public DisplayManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.helpMenu = new DisplayMenu(3, ChatColor.BLACK+"Konquest Help");
+		//this.helpMenu = new DisplayMenu(3, ChatColor.BLACK+"Konquest Help");
+		this.helpMenu = new PagedMenu(3, ChatColor.BLACK+"Konquest Help");
 		this.townUpgradeMenus = new HashMap<Inventory, DisplayMenu>();
 		this.townMenuCache = new HashMap<Inventory, KonTown>();
 		this.scoreMenus = new HashMap<Inventory, PagedMenu>();
@@ -62,7 +63,7 @@ public class DisplayManager {
 	public boolean isDisplayMenu(Inventory inv) {
 		boolean result = false;
 		if(inv != null) {
-			if(inv.equals(helpMenu.getInventory()) ||
+			if(inv.equals(helpMenu.getCurrentPage().getInventory()) ||
 					townMenuCache.containsKey(inv) ||
 					scoreMenus.containsKey(inv)
 					) {
@@ -74,7 +75,7 @@ public class DisplayManager {
 	
 	public void onDisplayMenuClick(KonPlayer clickPlayer, Inventory inv, int slot) {
 		if(inv != null) {
-			if(inv.equals(helpMenu.getInventory())) {
+			if(inv.equals(helpMenu.getCurrentPage().getInventory())) {
 				// Help Menu Action
 				sendHelpContext(clickPlayer.getBukkitPlayer(),slot);
 			} else if(townMenuCache.containsKey(inv)) {
@@ -104,14 +105,14 @@ public class DisplayManager {
             @Override
             public void run() {
             	bukkitPlayer.closeInventory();
-            	bukkitPlayer.openInventory(helpMenu.getInventory());
+            	bukkitPlayer.openInventory(helpMenu.getCurrentPage().getInventory());
             }
         });
 	}
 	
 	private void sendHelpContext(Player bukkitPlayer, int slot) {
 		String message = "";
-		MenuIcon clickedIcon = helpMenu.getIcon(slot);
+		MenuIcon clickedIcon = helpMenu.getCurrentPage().getIcon(slot);
 		boolean isValidSlot = false;
 		if(clickedIcon != null) {
 			if(clickedIcon instanceof CommandIcon) {
@@ -173,7 +174,7 @@ public class DisplayManager {
 					break;
 			} 
 			CommandIcon icon = new CommandIcon(cmd, cost, cost_incr, i);
-			helpMenu.addIcon(icon);
+			helpMenu.getCurrentPage().addIcon(icon);
 			i++;
 		}
 		// Add info icons
@@ -183,8 +184,9 @@ public class DisplayManager {
 			communityLink = "";
 		}
 		info.setInfo(ChatColor.GOLD+MessagePath.MENU_HELP_HINT.getMessage()+": "+ChatColor.DARK_PURPLE+ChatColor.UNDERLINE+communityLink);
-		helpMenu.addIcon(info);
+		helpMenu.getCurrentPage().addIcon(info);
 		i++;
+		helpMenu.refreshNavigationButtons();
 	}
 	
 	/*

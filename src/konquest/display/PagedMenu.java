@@ -20,6 +20,12 @@ public class PagedMenu {
 		this.currentPageIndex = 0;
 	}
 	
+	public PagedMenu(int rows, String label) {
+		this.pages = new ArrayList<DisplayMenu>();
+		this.currentPageIndex = 0;
+		addPage(0,rows,label);
+	}
+	
 	/*
 	 * Pages must have a bottom row dedicated to navigation buttons
 	 */
