@@ -146,9 +146,9 @@ public class InventoryListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onInventoryClose(InventoryCloseEvent event) {
-		// When a player closes a display menu
-		if(konquest.getDisplayManager().isScoreMenu(event.getInventory())) {
-			konquest.getDisplayManager().onInventoryClose(event.getInventory());
+		// When a player closes a display menu inventory
+		if(konquest.getDisplayManager().isDisplayMenu(event.getInventory())) {
+			konquest.getDisplayManager().onDisplayMenuClose(event.getInventory());
 		}
 	}
 	
@@ -156,28 +156,12 @@ public class InventoryListener implements Listener {
     public void onDisplayMenuClick(InventoryClickEvent event) {
 		int slot = event.getRawSlot();
 		Player bukkitPlayer = (Player) event.getWhoClicked();
-		// When a player clicks inside of the help menu
-		if(konquest.getDisplayManager().isHelpMenu(event.getClickedInventory())) {
-			//ChatUtil.printDebug("Inventory click event inside of Help Menu, slot "+slot);
+		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		// When a player clicks inside of a display menu inventory
+		if(konquest.getDisplayManager().isDisplayMenu(event.getClickedInventory())) {
 			if(slot < event.getView().getTopInventory().getSize()) {
 				event.setCancelled(true);
-				konquest.getDisplayManager().sendHelpContext(bukkitPlayer, slot);
-			}
-		} else if(konquest.getDisplayManager().isTownUpgradeMenu(event.getClickedInventory())) {
-			//ChatUtil.printDebug("Inventory click event inside of an Upgrade Menu, slot "+slot);
-			if(slot < event.getView().getTopInventory().getSize()) {
-				event.setCancelled(true);
-				boolean status = konquest.getDisplayManager().onTownUpgradeMenuClick(bukkitPlayer, event.getClickedInventory(), slot);
-				if(status) {
-					Bukkit.getWorld(konquest.getWorldName()).playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, (float)1.0, (float)1.0);
-				}
-			}
-		} else if(konquest.getDisplayManager().isScoreMenu(event.getClickedInventory())) {
-			//ChatUtil.printDebug("Inventory click event inside of a Score Menu, slot "+slot);
-			if(slot < event.getView().getTopInventory().getSize()) {
-				event.setCancelled(true);
-				KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-				konquest.getDisplayManager().onScoreMenuClick(player, event.getClickedInventory(), slot);
+				konquest.getDisplayManager().onDisplayMenuClick(player, event.getClickedInventory(), slot);
 			}
 		}
 	}

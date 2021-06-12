@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
@@ -54,68 +55,49 @@ public class DisplayManager {
 		ChatUtil.printDebug("Display Manager is ready");
 	}
 	
-	public void displayTownUpgradeMenu(Player bukkitPlayer, KonTown town) {
-		// Flush any existing menus for this town
-		if(townMenuCache.containsValue(town)) {
-			for(Inventory inv : townMenuCache.keySet()) {
-				if(town.equals(townMenuCache.get(inv))) {
-					townMenuCache.remove(inv);
-					townUpgradeMenus.remove(inv);
-					break;
-				}
-			}
-		}
-		// Create fresh menu
-		DisplayMenu townUpgradeMenu = new DisplayMenu(1,ChatColor.BLACK+MessagePath.MENU_UPGRADE_TITLE.getMessage());
-		HashMap<KonUpgrade,Integer> availableUpgrades = konquest.getUpgradeManager().getAvailableUpgrades(town);
-		int index = 0;
-		for(KonUpgrade upgrade : KonUpgrade.values()) {
-			if(availableUpgrades.containsKey(upgrade)) {
-				int cost = konquest.getUpgradeManager().getUpgradeCost(upgrade, availableUpgrades.get(upgrade));
-				int pop = konquest.getUpgradeManager().getUpgradePopulation(upgrade, availableUpgrades.get(upgrade));
-				UpgradeIcon icon = new UpgradeIcon(upgrade, availableUpgrades.get(upgrade), index, cost, pop);
-				townUpgradeMenu.addIcon(icon);
-				index++;
-			}
-		}
-		townUpgradeMenus.put(townUpgradeMenu.getInventory(), townUpgradeMenu);
-		townMenuCache.put(townUpgradeMenu.getInventory(), town);
-		//ChatUtil.printDebug("townUpgradeMenus is now size "+townUpgradeMenus.size()+", townMenuCache is "+townMenuCache.size());
-		// Schedule delayed task to display inventory to player
-		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	bukkitPlayer.closeInventory();
-            	bukkitPlayer.openInventory(townUpgradeMenu.getInventory());
-            }
-        });
-	}
+	/*
+	 * Common menu methods
+	 */
 	
-	public boolean isTownUpgradeMenu(Inventory inv) {
+	public boolean isDisplayMenu(Inventory inv) {
 		boolean result = false;
-		if(townMenuCache.containsKey(inv)) {
-			result = true;
+		if(inv != null) {
+			if(inv.equals(helpMenu.getInventory()) ||
+					townMenuCache.containsKey(inv) ||
+					scoreMenus.containsKey(inv)
+					) {
+				result = true;
+			}
 		}
 		return result;
 	}
 	
-	public boolean onTownUpgradeMenuClick(Player bukkitPlayer, Inventory inv, int slot) {
-		boolean result = false;
-		if(townMenuCache.containsKey(inv)) {
-			MenuIcon clickedIcon = townUpgradeMenus.get(inv).getIcon(slot);
-			if(clickedIcon != null && clickedIcon instanceof UpgradeIcon) {
-				UpgradeIcon icon = (UpgradeIcon)clickedIcon;
-				result = konquest.getUpgradeManager().addTownUpgrade(townMenuCache.get(inv), icon.getUpgrade(), icon.getLevel(), bukkitPlayer);
-				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-		            @Override
-		            public void run() {
-		            	bukkitPlayer.closeInventory();
-		            }
-		        });
+	public void onDisplayMenuClick(KonPlayer clickPlayer, Inventory inv, int slot) {
+		if(inv != null) {
+			if(inv.equals(helpMenu.getInventory())) {
+				// Help Menu Action
+				sendHelpContext(clickPlayer.getBukkitPlayer(),slot);
+			} else if(townMenuCache.containsKey(inv)) {
+				// Town Upgrade Menu Action
+				onTownUpgradeMenuClick(clickPlayer.getBukkitPlayer(),inv,slot);
+			} else if(scoreMenus.containsKey(inv)) {
+				// Score Paged Menu Action
+				onScoreMenuClick(clickPlayer,inv,slot);
 			}
 		}
-		return result;
 	}
+	
+	public void onDisplayMenuClose(Inventory inv) {
+		if(scoreMenus.containsKey(inv)) {
+			scoreMenus.remove(inv);
+		}
+	}
+	
+	/*
+	 * ===============================================
+	 * Help Menu
+	 * ===============================================
+	 */
 	
 	public void displayHelpMenu(Player bukkitPlayer) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
@@ -127,7 +109,7 @@ public class DisplayManager {
         });
 	}
 	
-	public void sendHelpContext(Player bukkitPlayer, int slot) {
+	private void sendHelpContext(Player bukkitPlayer, int slot) {
 		String message = "";
 		MenuIcon clickedIcon = helpMenu.getIcon(slot);
 		boolean isValidSlot = false;
@@ -153,14 +135,6 @@ public class DisplayManager {
 	        });
 			ChatUtil.sendNotice(bukkitPlayer, message);
 		}
-	}
-	
-	public boolean isHelpMenu(Inventory inv) {
-		boolean result = false;
-		if(inv != null) {
-			result = inv.equals(helpMenu.getInventory());
-		}
-		return result;
 	}
 	
 	private void populateHelpMenu() {
@@ -213,15 +187,76 @@ public class DisplayManager {
 		i++;
 	}
 	
-	public boolean isScoreMenu(Inventory inv) {
-		boolean result = false;
-		if(scoreMenus.containsKey(inv)) {
-			result = true;
+	/*
+	 * ===============================================
+	 * Town Upgrade Menu
+	 * ===============================================
+	 */
+	
+	public void displayTownUpgradeMenu(Player bukkitPlayer, KonTown town) {
+		// Flush any existing menus for this town
+		if(townMenuCache.containsValue(town)) {
+			for(Inventory inv : townMenuCache.keySet()) {
+				if(town.equals(townMenuCache.get(inv))) {
+					townMenuCache.remove(inv);
+					townUpgradeMenus.remove(inv);
+					break;
+				}
+			}
 		}
-		return result;
+		// Create fresh menu
+		DisplayMenu townUpgradeMenu = new DisplayMenu(1,ChatColor.BLACK+MessagePath.MENU_UPGRADE_TITLE.getMessage());
+		HashMap<KonUpgrade,Integer> availableUpgrades = konquest.getUpgradeManager().getAvailableUpgrades(town);
+		int index = 0;
+		for(KonUpgrade upgrade : KonUpgrade.values()) {
+			if(availableUpgrades.containsKey(upgrade)) {
+				int cost = konquest.getUpgradeManager().getUpgradeCost(upgrade, availableUpgrades.get(upgrade));
+				int pop = konquest.getUpgradeManager().getUpgradePopulation(upgrade, availableUpgrades.get(upgrade));
+				UpgradeIcon icon = new UpgradeIcon(upgrade, availableUpgrades.get(upgrade), index, cost, pop);
+				townUpgradeMenu.addIcon(icon);
+				index++;
+			}
+		}
+		townUpgradeMenus.put(townUpgradeMenu.getInventory(), townUpgradeMenu);
+		townMenuCache.put(townUpgradeMenu.getInventory(), town);
+		//ChatUtil.printDebug("townUpgradeMenus is now size "+townUpgradeMenus.size()+", townMenuCache is "+townMenuCache.size());
+		// Schedule delayed task to display inventory to player
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.closeInventory();
+            	bukkitPlayer.openInventory(townUpgradeMenu.getInventory());
+            }
+        });
 	}
 	
-	public void onScoreMenuClick(KonPlayer clickPlayer, Inventory inv, int slot) {
+	private void onTownUpgradeMenuClick(Player bukkitPlayer, Inventory inv, int slot) {
+		boolean result = false;
+		if(townMenuCache.containsKey(inv)) {
+			MenuIcon clickedIcon = townUpgradeMenus.get(inv).getIcon(slot);
+			if(clickedIcon != null && clickedIcon instanceof UpgradeIcon) {
+				UpgradeIcon icon = (UpgradeIcon)clickedIcon;
+				result = konquest.getUpgradeManager().addTownUpgrade(townMenuCache.get(inv), icon.getUpgrade(), icon.getLevel(), bukkitPlayer);
+				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+		            @Override
+		            public void run() {
+		            	bukkitPlayer.closeInventory();
+		            }
+		        });
+			}
+		}
+		if(result) {
+			Bukkit.getWorld(konquest.getWorldName()).playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, (float)1.0, (float)1.0);
+		}
+	}
+	
+	/*
+	 * ===============================================
+	 * Score Paged Menu
+	 * ===============================================
+	 */
+	
+	private void onScoreMenuClick(KonPlayer clickPlayer, Inventory inv, int slot) {
 		// Switch pages and handle navigation button clicks
 		// Open new score menus for leaderboard player clicks
 		if(scoreMenus.containsKey(inv)) {
@@ -282,13 +317,6 @@ public class DisplayManager {
 					}
 				}
 			}
-		}
-	}
-	
-	public void onInventoryClose(Inventory inv) {
-		//ChatUtil.printDebug("DisplayManager caught a closed display menu inventory");
-		if(scoreMenus.containsKey(inv)) {
-			scoreMenus.remove(inv);
 		}
 	}
 	
