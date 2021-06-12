@@ -203,11 +203,11 @@ public class KonTown extends KonTerritory implements Timeable{
                 }
             }
         }
-        //BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),0,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
+        
+        BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
         for (int y = bottomBlockY; y <= topBlockY; y++) {
-        	//monumentPaster.setY(y);
-        	//monumentPaster.startPaste();
-        	BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),y,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
+        	monumentPaster.setY(y);
+        	//BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),y,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
         	monumentPaster.startPaste();
         }
         monument.setIsItemDropsDisabled(false);
