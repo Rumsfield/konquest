@@ -1,8 +1,10 @@
 package konquest.utility;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Snow;
 //import org.bukkit.scheduler.BukkitRunnable;
@@ -45,13 +47,17 @@ public class BlockPaster {
     }
     
     public void startPaste() {
+    	World world = Bukkit.getServer().getWorld(Konquest.getInstance().getWorldName());
+    	Chunk chunk = world.getChunkAt(centerLoc);
     	for (int x = bottomBlockX; x <= topBlockX; x++) {
             for (int z = bottomBlockZ; z <= topBlockZ; z++) {
-                Block templateBlock = Bukkit.getServer().getWorld(Konquest.getInstance().getWorldName()).getBlockAt(x, y, z);
-                Block monumentBlock = Bukkit.getServer().getWorld(Konquest.getInstance().getWorldName()).getChunkAt(centerLoc).getBlock(x-bottomBlockX, y-bottomBlockY+y_offset, z-bottomBlockZ);
-                // Set local block to monument template block
-                monumentBlock.setType(templateBlock.getType());
-                monumentBlock.setBlockData(templateBlock.getBlockData().clone());
+                Block templateBlock = world.getBlockAt(x, y, z);
+                Block monumentBlock = chunk.getBlock(x-bottomBlockX, y-bottomBlockY+y_offset, z-bottomBlockZ);
+                if(!monumentBlock.getBlockData().matches(templateBlock.getBlockData())) {
+                	// Set local block to monument template block
+                    monumentBlock.setType(templateBlock.getType());
+                    monumentBlock.setBlockData(templateBlock.getBlockData().clone());
+                }
                 //ChatUtil.printDebug("Pasting block at "+monumentBlock.getLocation().toString()+" with template from "+templateBlock.getLocation().toString());
                 //Remove snow
                 if(monumentBlock.getBlockData() instanceof Snow) {

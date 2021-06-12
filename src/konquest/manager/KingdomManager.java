@@ -1761,7 +1761,7 @@ public class KingdomManager {
 	            	konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
 	            	// Update loading bar
 	            	loadBar.addProgress(1);
-            	}
+	            }
         	}
         	if(isMissingMonuments) {
         		konquest.opStatusMessages.add("Kingdom "+kingdomName+" has Towns with invalid Monuments. You must create a new Monument Template and restart the server.");
