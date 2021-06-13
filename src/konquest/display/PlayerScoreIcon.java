@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-public class PlayerHeadIcon implements MenuIcon {
+public class PlayerScoreIcon implements MenuIcon {
 
 	private String name;
 	private List<String> lore;
@@ -16,7 +16,7 @@ public class PlayerHeadIcon implements MenuIcon {
 	private int index;
 	private ItemStack item;
 	
-	public PlayerHeadIcon(String name, List<String> lore, OfflinePlayer player, int index) {
+	public PlayerScoreIcon(String name, List<String> lore, OfflinePlayer player, int index) {
 		this.name = name;
 		this.lore = lore;
 		this.player = player;

@@ -18,7 +18,7 @@ import konquest.display.DisplayMenu;
 import konquest.display.InfoIcon;
 import konquest.display.MenuIcon;
 import konquest.display.PagedMenu;
-import konquest.display.PlayerHeadIcon;
+import konquest.display.PlayerScoreIcon;
 import konquest.display.UpgradeIcon;
 import konquest.model.KonKingdomScoreAttributes;
 import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
@@ -145,9 +145,9 @@ public class DisplayManager {
 					            	bukkitPlayer.closeInventory();
 					            }
 					        });
-						} else if(clickedIcon instanceof PlayerHeadIcon) {
+						} else if(clickedIcon instanceof PlayerScoreIcon) {
 							// Player Head Icons open a new score menu for the associated player
-							PlayerHeadIcon icon = (PlayerHeadIcon)clickedIcon;
+							PlayerScoreIcon icon = (PlayerScoreIcon)clickedIcon;
 							KonOfflinePlayer offlinePlayer = konquest.getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
 							if(offlinePlayer != null) {
 								menuCache.remove(inv);
@@ -408,7 +408,7 @@ public class DisplayManager {
 			}
 			for(int n = 0;n<numEntries;n++) {
 				int rank = n + 1;
-				PlayerHeadIcon leader = new PlayerHeadIcon(ChatColor.GOLD+"#"+rank+" "+kingdomColor+leaderboard.getName(n),Arrays.asList(loreColor+MessagePath.MENU_SCORE_PLAYER_SCORE.getMessage()+": "+ChatColor.DARK_PURPLE+leaderboard.getScore(n),ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage()),leaderboard.getOfflinePlayer(n),n);
+				PlayerScoreIcon leader = new PlayerScoreIcon(ChatColor.GOLD+"#"+rank+" "+kingdomColor+leaderboard.getName(n),Arrays.asList(loreColor+MessagePath.MENU_SCORE_PLAYER_SCORE.getMessage()+": "+ChatColor.DARK_PURPLE+leaderboard.getScore(n),ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage()),leaderboard.getOfflinePlayer(n),n);
 				newMenu.getPage(3).addIcon(leader);
 			}
 		}
