@@ -71,6 +71,11 @@ public class CommandIcon implements MenuIcon{
 		return item;
 	}
 
+	@Override
+	public boolean isClickable() {
+		return true;
+	}
+
 }
 
 /*

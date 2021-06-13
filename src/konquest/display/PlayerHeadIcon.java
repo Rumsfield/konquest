@@ -58,4 +58,9 @@ public class PlayerHeadIcon implements MenuIcon {
 	public ItemStack getItem() {
 		return item;
 	}
+	
+	@Override
+	public boolean isClickable() {
+		return true;
+	}
 }
