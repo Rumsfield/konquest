@@ -90,6 +90,10 @@ public class PagedMenu {
 		return result;
 	}
 	
+	public void refreshCurrentPage() {
+		pages.get(currentPageIndex).updateIcons();
+	}
+	
 	public void refreshNavigationButtons() {
 		// Place a back button on pages > 0
 		// Place a next button on pages < max

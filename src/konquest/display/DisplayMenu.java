@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import konquest.utility.ChatUtil;
 
@@ -22,15 +23,22 @@ public class DisplayMenu {
     }
 	
 	public void addIcon(MenuIcon icon) {
-		if(icon.getItem() == null) {
+		ItemStack iconItem = icon.getItem();
+		if(iconItem == null) {
 			ChatUtil.printDebug("Added null item to slot "+icon.getIndex()+" from icon "+icon.getName());
 		}
-		inventory.setItem(icon.getIndex(), icon.getItem());
+		inventory.setItem(icon.getIndex(), iconItem);
 		iconMap.put(icon.getIndex(), icon);
 	}
 	
 	public MenuIcon getIcon(int index) {
 		return iconMap.get(index);
+	}
+	
+	public void updateIcons() {
+		for(MenuIcon icon : iconMap.values()) {
+			inventory.setItem(icon.getIndex(), icon.getItem());
+		}
 	}
 	
 }

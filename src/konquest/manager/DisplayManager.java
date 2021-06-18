@@ -77,6 +77,7 @@ public class DisplayManager {
 				int backIndex = currentPage.getInventory().getSize()-9;
 				if(slot == nextIndex) {
 					clickMenu.nextPageIndex();
+					clickMenu.refreshCurrentPage();
 					menuCache.remove(inv);
 					if(townCache.containsKey(inv)) {
 						KonTown town = townCache.remove(inv);
@@ -105,6 +106,7 @@ public class DisplayManager {
 					//ChatUtil.printDebug("Clicked page close button");
 				} else if(slot == backIndex) {
 					clickMenu.previousPageIndex();
+					clickMenu.refreshCurrentPage();
 					menuCache.remove(inv);
 					if(townCache.containsKey(inv)) {
 						KonTown town = townCache.remove(inv);

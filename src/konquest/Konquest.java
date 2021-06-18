@@ -15,9 +15,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -86,7 +89,7 @@ public class Konquest implements Timeable {
             weakKeys().
             weakValues().
             makeMap();
-	
+	private ConcurrentMap<UUID, ItemStack> headCache = new MapMaker().makeMap();
 	private HashMap<Location,Player> teleportQueue;
 	
 	public Konquest(KonquestPlugin plugin) {
@@ -771,5 +774,49 @@ public class Konquest implements Timeable {
     	}
     	return result;
     }
+    
+    public ItemStack getPlayerHead(OfflinePlayer bukkitOfflinePlayer) {
+    	if(bukkitOfflinePlayer.getUniqueId() != null && !headCache.containsKey(bukkitOfflinePlayer.getUniqueId())) {
+    		ChatUtil.printDebug("Missing "+bukkitOfflinePlayer.getName()+" player head in the cache, creating...");
+    		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+    		
+    		Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), new Runnable() {
+                @Override
+                public void run() {
+                	SkullMeta meta = (SkullMeta)item.getItemMeta();
+                	meta.setOwningPlayer(bukkitOfflinePlayer);
+            		item.setItemMeta(meta);
+            		headCache.put(bukkitOfflinePlayer.getUniqueId(),item);
+                }
+            });
+
+    		return item;
+    	} else {
+    		return headCache.get(bukkitOfflinePlayer.getUniqueId());
+    	}
+    }
+    
+    /*public ItemStack getPlayerHead(OfflinePlayer bukkitOfflinePlayer) {
+    	if(headCache.containsKey(bukkitOfflinePlayer.getUniqueId())) {
+    		ChatUtil.printDebug("Got player head from the cache");
+    		ItemStack head = headCache.get(bukkitOfflinePlayer.getUniqueId());
+    		return head;
+    	} else {
+    		ChatUtil.printDebug("Missing player head in the cache, creating...");
+    		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+    		SkullMeta meta = (SkullMeta)item.getItemMeta();
+    		headCache.put(bukkitOfflinePlayer.getUniqueId(),item);
+    		
+    		Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), new Runnable() {
+                @Override
+                public void run() {
+                	meta.setOwningPlayer(bukkitOfflinePlayer);
+            		item.setItemMeta(meta);
+                }
+            });
+    		
+    		return item;
+    	}
+    }*/
 	
 }
