@@ -40,6 +40,10 @@ label:
   leaderboard: "Leaderboard"
   total: "Total"
   camp: "Camp"
+  protected: "Protected"
+  lord: "Lord"
+  knight: "Knight"
+  resident: "Resident"
 menu:
   stats:
     title: "Accomplishment Stats"

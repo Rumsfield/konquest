@@ -1200,11 +1200,21 @@ public class KingdomManager {
 		return count;
 	}
 	
-	public List<String> getPlayerLordshipTowns(KonOfflinePlayer player) {
-		List<String> townNames = new ArrayList<String>();
+	public List<KonTown> getPlayerLordshipTowns(KonOfflinePlayer player) {
+		List<KonTown> townNames = new ArrayList<KonTown>();
 		for(KonTown town : player.getKingdom().getTowns()) {
 			if(town.isPlayerLord(player.getOfflineBukkitPlayer())) {
-				townNames.add(town.getName());
+				townNames.add(town);
+			}
+		}
+		return townNames;
+	}
+	
+	public List<KonTown> getPlayerResidenceTowns(KonOfflinePlayer player) {
+		List<KonTown> townNames = new ArrayList<KonTown>();
+		for(KonTown town : player.getKingdom().getTowns()) {
+			if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+				townNames.add(town);
 			}
 		}
 		return townNames;
