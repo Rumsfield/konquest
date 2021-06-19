@@ -14,6 +14,7 @@ label:
   player: "Player"
   kingdom: "Kingdom"
   barbarian: "Barbarian"
+  barbarians: "Barbarians"
   residencies: "Residencies"
   towns: "Towns"
   town: "Town"

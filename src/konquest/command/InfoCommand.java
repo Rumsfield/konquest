@@ -262,6 +262,8 @@ public class InfoCommand extends CommandBase {
         		}
         		break;
         	case 2: // Display player info
+        		getKonquest().getDisplayManager().displayPlayerInfoMenu(sender, player);
+        		/*
         		//ChatUtil.printDebug("Displaying Player");
         		String playerName = player.getOfflineBukkitPlayer().getName();
         		String playerKingdom = player.getKingdom().getName();
@@ -296,6 +298,7 @@ public class InfoCommand extends CommandBase {
     	        		ChatUtil.sendMessage(bukkitPlayer, line);
     	        	}
         		}
+        		*/
         		break;
         	default:
         		ChatUtil.printDebug("Failed to display info, unknown state");

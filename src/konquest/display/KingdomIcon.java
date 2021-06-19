@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import konquest.model.KonKingdom;
+import konquest.utility.MessagePath;
 
 public class KingdomIcon implements MenuIcon {
 
@@ -19,13 +20,9 @@ public class KingdomIcon implements MenuIcon {
 	private int index;
 	private ItemStack item;
 	
-	public KingdomIcon(KonKingdom kingdom, boolean isFriendly, Material material, List<String> lore, int index) {
+	public KingdomIcon(KonKingdom kingdom, ChatColor contextColor, Material material, List<String> lore, int index) {
 		this.kingdom = kingdom;
-		if(isFriendly) {
-			contextColor = ChatColor.GREEN;
-		} else {
-			contextColor = ChatColor.RED;
-		}
+		this.contextColor = contextColor;
 		this.material = material;
 		this.lore = lore;
 		this.index = index;
@@ -57,7 +54,11 @@ public class KingdomIcon implements MenuIcon {
 
 	@Override
 	public String getName() {
-		return kingdom.getName();
+		String name = kingdom.getName();
+		if(name.equalsIgnoreCase("barbarians")) {
+			name = MessagePath.LABEL_BARBARIANS.getMessage();
+		}
+		return name;
 	}
 
 	@Override

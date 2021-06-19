@@ -11,6 +11,7 @@ public enum MessagePath {
 	LABEL_PLAYER                                (0, "label.player"),
 	LABEL_KINGDOM                               (0, "label.kingdom"),
 	LABEL_BARBARIAN                             (0, "label.barbarian"),
+	LABEL_BARBARIANS                            (0, "label.barbarians"),
 	LABEL_RESIDENCIES                           (0, "label.residencies"),
 	LABEL_TOWNS                                 (0, "label.towns"),
 	LABEL_TOWN                                  (0, "label.town"),

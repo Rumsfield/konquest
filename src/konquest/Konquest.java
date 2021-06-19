@@ -656,7 +656,7 @@ public class Konquest implements Timeable {
     public void updateNamePackets() {
     	if(teamPacketSender != null) {
 	    	// Update all Kingdom player's nametag color packets
-			for(String kingdomName : kingdomManager.getKingdomNames()) {
+			for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
 				// For each kingdom, determine friendlies and enemies
 				List<Player> friendlyPlayers = new ArrayList<Player>();
 				List<String> friendlyNames = new ArrayList<String>();
@@ -664,7 +664,7 @@ public class Konquest implements Timeable {
 				List<String> barbarianNames = new ArrayList<String>();
 				// Populate friendly and enemy lists
 				for(KonPlayer player : playerManager.getPlayersOnline()) {
-		    		if(player.getKingdom().getName().equalsIgnoreCase(kingdomName)) {
+		    		if(player.getKingdom().equals(kingdom)) {
 		    			friendlyNames.add(player.getBukkitPlayer().getName());
 		    			friendlyPlayers.add(player.getBukkitPlayer());
 		    		} else if(!player.isBarbarian()) {
@@ -801,27 +801,16 @@ public class Konquest implements Timeable {
     	}
     }
     
-    /*public ItemStack getPlayerHead(OfflinePlayer bukkitOfflinePlayer) {
-    	if(headCache.containsKey(bukkitOfflinePlayer.getUniqueId())) {
-    		ChatUtil.printDebug("Got player head from the cache");
-    		ItemStack head = headCache.get(bukkitOfflinePlayer.getUniqueId());
-    		return head;
+    public static ChatColor getContextColor(KonOfflinePlayer observer, KonOfflinePlayer target) {
+    	ChatColor result = ChatColor.RED;
+    	if(target.isBarbarian()) {
+    		result = ChatColor.YELLOW;
     	} else {
-    		ChatUtil.printDebug("Missing player head in the cache, creating...");
-    		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
-    		SkullMeta meta = (SkullMeta)item.getItemMeta();
-    		headCache.put(bukkitOfflinePlayer.getUniqueId(),item);
-    		
-    		Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), new Runnable() {
-                @Override
-                public void run() {
-                	meta.setOwningPlayer(bukkitOfflinePlayer);
-            		item.setItemMeta(meta);
-                }
-            });
-    		
-    		return item;
+    		if(target.getKingdom().equals(observer.getKingdom())) {
+    			result = ChatColor.GREEN;
+    		}
     	}
-    }*/
+    	return result;
+    }
 	
 }
