@@ -503,6 +503,9 @@ public class DisplayManager {
 		ListIterator<KonTown> townIter = playerTowns.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
 			int numPageRows = (int)Math.ceil(((double)((playerTowns.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows == 0) {
+				numPageRows = 1;
+			}
 			pageLabel = ChatColor.BLACK+infoPlayer.getOfflineBukkitPlayer().getName()+" "+MessagePath.LABEL_RESIDENCIES.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
 			int slotIndex = 0;
@@ -620,6 +623,9 @@ public class DisplayManager {
 		ListIterator<KonTown> townIter = kingdomTowns.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
 			int numPageRows = (int)Math.ceil(((double)((kingdomTowns.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows == 0) {
+				numPageRows = 1;
+			}
 			pageLabel = ChatColor.BLACK+infoKingdom.getName()+" "+MessagePath.LABEL_TOWNS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
 			int slotIndex = 0;
@@ -709,6 +715,7 @@ public class DisplayManager {
 		if(infoTown.isLordValid()) {
 			OfflinePlayer lordPlayer = infoTown.getPlayerLord();
 			loreList.add(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage());
+			loreList.add(ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage());
 			PlayerIcon playerInfo = new PlayerIcon(kingdomColor+lordPlayer.getName(),loreList,lordPlayer,1,true,IconAction.DISPLAY_INFO);
 			newMenu.getPage(0).addIcon(playerInfo);
 		} else {
@@ -798,6 +805,9 @@ public class DisplayManager {
 		ListIterator<OfflinePlayer> knightIter = townKnights.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
 			int numPageRows = (int)Math.ceil(((double)((townKnights.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows == 0) {
+				numPageRows = 1;
+			}
 			pageLabel = ChatColor.BLACK+infoTown.getName()+" "+MessagePath.LABEL_KNIGHTS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
 			int slotIndex = 0;
@@ -822,6 +832,9 @@ public class DisplayManager {
 		ListIterator<OfflinePlayer> residentIter = townResidents.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
 			int numPageRows = (int)Math.ceil(((double)((townResidents.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows == 0) {
+				numPageRows = 1;
+			}
 			pageLabel = ChatColor.BLACK+infoTown.getName()+" "+MessagePath.LABEL_RESIDENTS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
 			int slotIndex = 0;
