@@ -129,6 +129,7 @@ public class Konquest implements Timeable {
 		kingdomManager.initialize();
 		ruinManager.initialize();
 		initManagers();
+		databaseThread.setSleepSeconds(saveIntervalSeconds);
 		if(!databaseThread.isRunning()) {
 			ChatUtil.printDebug("Starting database thread");
 			databaseThread.getThread().start();

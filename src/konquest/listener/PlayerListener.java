@@ -827,7 +827,7 @@ public class PlayerListener implements Listener{
     		
     		Player bukkitPlayer = event.getPlayer();
     		if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
-				ChatUtil.printDebug("Failed to handle onPlayerEnterLeaveChunk for non-existent player");
+				//ChatUtil.printDebug("Failed to handle onPlayerEnterLeaveChunk for non-existent player");
 				return;
 			}
         	KonPlayer player = playerManager.getPlayer(bukkitPlayer);
