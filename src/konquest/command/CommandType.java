@@ -2,27 +2,29 @@ package konquest.command;
 
 import org.bukkit.Material;
 
+import konquest.utility.MessagePath;
+
 public enum CommandType {
-	HELP		(Material.LANTERN, 			"konquest.command.help",		"h",		"",													"Display the help message."),
-	JOIN		(Material.GOLDEN_HELMET, 	"konquest.command.join",		"",			"[<kingdom>|<town>]",								"Join a Kingdom or Town."),
-	LEAVE		(Material.FEATHER, 			"konquest.command.leave",		"",			"<town>",											"Leave a Town."),
-	EXILE		(Material.TNT, 				"konquest.command.exile",		"",			"",													"Exile yourself and become a Barbarian."),
-	INFO		(Material.SPRUCE_SIGN, 		"konquest.command.info",		"i",		"[<kingdom>|<town>|<player>]",						"Display info about different things."),
-	LIST		(Material.PAPER, 			"konquest.command.list",       	"l",        "kingdoms|towns",                       			"List the Towns in your Kingdom."),
-	FAVOR		(Material.GOLD_INGOT, 		"konquest.command.favor",		"f",		"",													"Display your current Favor from the King."),
-	MAP			(Material.FILLED_MAP, 		"konquest.command.map",			"m",    	"[far|f|auto|a]",					    			"Display a map of claimed chunks."),
-	CHAT		(Material.EMERALD, 			"konquest.command.chat",		"c",		"",													"Switch between global and kingdom-only chat."),
-	SPY		    (Material.DIAMOND_SWORD, 	"konquest.command.spy",			"", 		"",													"Reveal the location of an enemy town."),
-	SETTLE		(Material.DIAMOND_PICKAXE, 	"konquest.command.settle",		"",			"<name>",											"Settle a new Town."),
-	CLAIM		(Material.DIAMOND_SHOVEL, 	"konquest.command.claim",		"",			"[radius|auto] [<radius>]",	                		"Claim a chunk of land."),
-	TRAVEL		(Material.COMPASS, 			"konquest.command.travel", 		"t",		"<town>|capital|camp|wild",							"Teleport to a Town, your Camp or to your Capital."),
-	TOWN		(Material.NAME_TAG, 		"konquest.command.town",		"", 		"<town> open|close|add|kick|knight|lord|rename|upgrade [player]", 	"Manage Towns you belong to."),
-	QUEST		(Material.WRITABLE_BOOK, 	"konquest.command.quest",		"q",		"",													"Display your quest log."),
-	STATS		(Material.BOOK, 			"konquest.command.stats",		"s", 		"", 									            "Display your Accomplishment stats."),
-	PREFIX		(Material.CARVED_PUMPKIN, 	"konquest.command.prefix",		"p", 		"<name>|off", 										"Set your prefix title."),
-	SCORE		(Material.DIAMOND, 			"konquest.command.score",		"", 		"[<player>|all]", 									"Display a Player's current score."),
-	ADMIN		(Material.NETHER_STAR, 		"konquest.command.admin",		"",			"",													"For Admins only.");
-	
+	HELP    (Material.LANTERN,          "konquest.command.help",    "h",  "",                                                               MessagePath.DESCRIPTION_HELP.getMessage()),
+	JOIN    (Material.GOLDEN_HELMET,    "konquest.command.join",    "",   "[<kingdom>|<town>]",                                             MessagePath.DESCRIPTION_JOIN.getMessage()),
+	LEAVE   (Material.FEATHER,          "konquest.command.leave",   "",   "<town>",                                                         MessagePath.DESCRIPTION_LEAVE.getMessage()),
+	EXILE   (Material.TNT,              "konquest.command.exile",   "",   "",                                                               MessagePath.DESCRIPTION_EXILE.getMessage()),
+	INFO    (Material.SPRUCE_SIGN,      "konquest.command.info",    "i",  "[<kingdom>|<town>|<player>]",                                    MessagePath.DESCRIPTION_INFO.getMessage()),
+	LIST    (Material.PAPER,            "konquest.command.list",    "l",  "kingdoms|towns",                                                 MessagePath.DESCRIPTION_LIST.getMessage()),
+	FAVOR   (Material.GOLD_INGOT,       "konquest.command.favor",   "f",  "",                                                               MessagePath.DESCRIPTION_FAVOR.getMessage()),
+	MAP     (Material.FILLED_MAP,       "konquest.command.map",     "m",  "[far|f|auto|a]",                                                 MessagePath.DESCRIPTION_MAP.getMessage()),
+	CHAT    (Material.EMERALD,          "konquest.command.chat",    "c",  "",                                                               MessagePath.DESCRIPTION_CHAT.getMessage()),
+	SPY     (Material.DIAMOND_SWORD,    "konquest.command.spy",     "",   "",                                                               MessagePath.DESCRIPTION_SPY.getMessage()),
+	SETTLE  (Material.DIAMOND_PICKAXE,  "konquest.command.settle",  "",   "<name>",                                                         MessagePath.DESCRIPTION_SETTLE.getMessage()),
+	CLAIM   (Material.DIAMOND_SHOVEL,   "konquest.command.claim",   "",   "[radius|auto] [<radius>]",                                       MessagePath.DESCRIPTION_CLAIM.getMessage()),
+	TRAVEL  (Material.COMPASS,          "konquest.command.travel",  "t",  "<town>|capital|camp|wild",                                       MessagePath.DESCRIPTION_TRAVEL.getMessage()),
+	TOWN    (Material.NAME_TAG,         "konquest.command.town",    "",   "<town> open|close|add|kick|knight|lord|rename|upgrade [player]", MessagePath.DESCRIPTION_TOWN.getMessage()),
+	QUEST   (Material.WRITABLE_BOOK,    "konquest.command.quest",   "q",  "",                                                               MessagePath.DESCRIPTION_QUEST.getMessage()),
+	STATS   (Material.BOOK,             "konquest.command.stats",   "s",  "",                                                               MessagePath.DESCRIPTION_STATS.getMessage()),
+	PREFIX  (Material.CARVED_PUMPKIN,   "konquest.command.prefix",  "p",  "<name>|off",                                                     MessagePath.DESCRIPTION_PREFIX.getMessage()),
+	SCORE   (Material.DIAMOND,          "konquest.command.score",   "",   "[<player>|all]",                                                 MessagePath.DESCRIPTION_SCORE.getMessage()),
+	ADMIN   (Material.NETHER_STAR,      "konquest.command.admin",   "",   "",                                                               MessagePath.DESCRIPTION_ADMIN.getMessage());
+
 	private final String permission;
 	private final String arguments;
 	private final String description;
