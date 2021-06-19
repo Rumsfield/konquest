@@ -63,6 +63,11 @@ public class InventoryListener implements Listener {
 		Location openLoc = event.getInventory().getLocation();
 		
 		if(openLoc != null && konquest.getKingdomManager().isChunkClaimed(openLoc.getChunk())) {
+			
+			if(!konquest.getPlayerManager().isPlayer((Player)event.getPlayer())) {
+				ChatUtil.printDebug("Failed to handle onInventoryOpen for non-existent player");
+				return;
+			}
 			KonPlayer player = playerManager.getPlayer((Player)event.getPlayer());
 			// Bypass event restrictions for player in Admin Bypass Mode
 			if(!player.isAdminBypassActive()) {
@@ -158,7 +163,7 @@ public class InventoryListener implements Listener {
 		Player bukkitPlayer = (Player) event.getWhoClicked();
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
 		// When a player clicks inside of a display menu inventory
-		if(konquest.getDisplayManager().isDisplayMenu(event.getClickedInventory())) {
+		if(player != null && konquest.getDisplayManager().isDisplayMenu(event.getClickedInventory())) {
 			if(slot < event.getView().getTopInventory().getSize()) {
 				event.setCancelled(true);
 				konquest.getDisplayManager().onDisplayMenuClick(player, event.getClickedInventory(), slot);
@@ -176,7 +181,7 @@ public class InventoryListener implements Listener {
 				//ChatUtil.printDebug("Inventory pickup event in smithing table slot "+slot+" with item "+itemType.toString());
 				HumanEntity human = event.getWhoClicked();
 				KonPlayer player = playerManager.getPlayer((Player)human);
-				if(itemType.equals(Material.NETHERITE_AXE) ||
+				if(player != null && (itemType.equals(Material.NETHERITE_AXE) ||
 						itemType.equals(Material.NETHERITE_HOE) ||
 						itemType.equals(Material.NETHERITE_SHOVEL) ||
 						itemType.equals(Material.NETHERITE_PICKAXE) ||
@@ -184,7 +189,7 @@ public class InventoryListener implements Listener {
 						itemType.equals(Material.NETHERITE_HELMET) ||
 						itemType.equals(Material.NETHERITE_CHESTPLATE) ||
 						itemType.equals(Material.NETHERITE_LEGGINGS) ||
-						itemType.equals(Material.NETHERITE_BOOTS)) {
+						itemType.equals(Material.NETHERITE_BOOTS))) {
 					if(slot == 2) {
 						// Player crafted a netherite item
 						konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,5);
@@ -226,6 +231,10 @@ public class InventoryListener implements Listener {
     public void onCraftItem(CraftItemEvent event) {
 		HumanEntity human = event.getWhoClicked();
 		if(!event.isCancelled() && human instanceof Player) {
+			if(!konquest.getPlayerManager().isPlayer((Player)human)) {
+				ChatUtil.printDebug("Failed to handle onCraftItem for non-existent player");
+				return;
+			}
 			Material recipeMaterial = event.getRecipe().getResult().getType();
 			KonPlayer player = konquest.getPlayerManager().getPlayer((Player)human);
 			if(recipeMaterial.equals(Material.IRON_HELMET) ||
@@ -277,16 +286,19 @@ public class InventoryListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onFurnaceExtract(FurnaceExtractEvent event) {
+		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+			ChatUtil.printDebug("Failed to handle onFurnaceExtract for non-existent player");
+			return;
+		}
+		KonPlayer player = playerManager.getPlayer(event.getPlayer());
 		Material extractMat = event.getItemType();
 		int stackSize = event.getItemAmount();
 		if(extractMat.equals(Material.IRON_INGOT) ||
 				extractMat.equals(Material.GOLD_INGOT) ||
 				extractMat.equals(Material.NETHERITE_SCRAP) ||
 				extractMat.equals(Material.BRICK)) {
-			KonPlayer player = playerManager.getPlayer(event.getPlayer());
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.INGOTS,stackSize);
 		} else if(extractMat.isEdible()) {
-			KonPlayer player = playerManager.getPlayer(event.getPlayer());
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FOOD,stackSize);
 		}
 	}
@@ -294,6 +306,10 @@ public class InventoryListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onEnchantItem(EnchantItemEvent event) {
 		if(!event.isCancelled()) {
+			if(!konquest.getPlayerManager().isPlayer(event.getEnchanter())) {
+				ChatUtil.printDebug("Failed to handle onEnchantItem for non-existent player");
+				return;
+			}
 			KonPlayer player = playerManager.getPlayer(event.getEnchanter());
 			konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.ENCHANT_ITEM);
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.ENCHANTMENTS,1);

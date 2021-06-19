@@ -309,6 +309,10 @@ public class KonquestDB extends Database{
     
     public void flushPlayerData(Player bukkitPlayer) {
     	//ChatUtil.printDebug("Flushing player database for "+bukkitPlayer.getDisplayName());
+    	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+			ChatUtil.printDebug("Failed to flush non-existent player to database");
+			return;
+		}
         String playerUUIDString = bukkitPlayer.getUniqueId().toString();
         KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
         String[] col;

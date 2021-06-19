@@ -91,6 +91,10 @@ public class EntityListener implements Listener {
 		if(!event.isCancelled()) {
 			if(event.getBreeder() instanceof Player) {
 				Player bukkitPlayer = (Player)event.getBreeder();
+				if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+					ChatUtil.printDebug("Failed to handle onEntityBreed for non-existent player");
+					return;
+				}
 				KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
 				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.BREED,1);
 			}
@@ -258,6 +262,10 @@ public class EntityListener implements Listener {
 			        }
 					if(closestPlayer != null) {
 						ChatUtil.printDebug("Iron Golem spawned by "+closestPlayer.getName());
+						if(!konquest.getPlayerManager().isPlayer(closestPlayer)) {
+							ChatUtil.printDebug("Failed to handle onCreatureSpawn for non-existent player");
+							return;
+						}
 						KonPlayer player = konquest.getPlayerManager().getPlayer(closestPlayer);
 						konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CREATE_GOLEM);
 					} else {
@@ -272,6 +280,10 @@ public class EntityListener implements Listener {
     public void onEntityPotionEffect(EntityPotionEffectEvent event) {
 		// prevent milk buckets from removing town nerfs in enemy towns
 		if(!event.isCancelled() && event.getEntity() instanceof Player) {
+			if(!konquest.getPlayerManager().isPlayer((Player)event.getEntity())) {
+				ChatUtil.printDebug("Failed to handle onEntityPotionEffect for non-existent player");
+				return;
+			}
 			Chunk chunk = event.getEntity().getLocation().getChunk();
 			if(event.getCause().equals(EntityPotionEffectEvent.Cause.MILK) && kingdomManager.isChunkClaimed(chunk)) {
 				KonTerritory territory = kingdomManager.getChunkTerritory(chunk);
@@ -307,13 +319,17 @@ public class EntityListener implements Listener {
 			// Protect friendly players in claimed land
 			if(target instanceof Player && kingdomManager.isChunkClaimed(eLoc.getChunk())) {
 				Player bukkitPlayer = (Player)target;
-				KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-				KonTerritory territory = kingdomManager.getChunkTerritory(eLoc.getChunk());
-				if(territory.getKingdom().equals(player.getKingdom())) {
-					ChatUtil.printDebug("Cancelling Iron Golem target of friendly player");
-					golemAttacker.setPlayerCreated(true);
-					golemAttacker.setTarget(null);
-					event.setCancelled(true);
+				if(!konquest.getPlayerManager().isPlayer((Player)bukkitPlayer)) {
+					ChatUtil.printDebug("Failed to handle onEntityTarget for non-existent player");
+				} else {
+					KonPlayer player = playerManager.getPlayer(bukkitPlayer);
+					KonTerritory territory = kingdomManager.getChunkTerritory(eLoc.getChunk());
+					if(territory.getKingdom().equals(player.getKingdom())) {
+						ChatUtil.printDebug("Cancelling Iron Golem target of friendly player");
+						golemAttacker.setPlayerCreated(true);
+						golemAttacker.setTarget(null);
+						event.setCancelled(true);
+					}
 				}
 			}
 			// Cancel Ruin Golems from targeting non-players
@@ -379,6 +395,10 @@ public class EntityListener implements Listener {
         } else { // if neither player nor arrow
             return;
         }
+		if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+			ChatUtil.printDebug("Failed to handle onEntityDamageByPlayer for non-existent player");
+			return;
+		}
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
 		
 		//if(event.getDamager() instanceof Player) {
@@ -482,8 +502,12 @@ public class EntityListener implements Listener {
 		    				LivingEntity currentTarget = golem.getTarget();
 		    				//ChatUtil.printDebug("Golem: Evaluating new targets in territory "+territory.getName());
 		    				if(currentTarget != null && currentTarget instanceof Player) {
-		    					KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
-		    					previousTargetPlayer.removeMobAttacker(golem);
+		    					if(!konquest.getPlayerManager().isPlayer((Player)currentTarget)) {
+		    						ChatUtil.printDebug("Failed to handle onEntityDamageByPlayer golem targeting for non-existent player");
+		    					} else {
+			    					KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
+			    					previousTargetPlayer.removeMobAttacker(golem);
+		    					}
 		    					//ChatUtil.printDebug("Golem: Removed mob attacker from player "+previousTargetPlayer.getBukkitPlayer().getName());
 		    				} else {
 		    					//ChatUtil.printDebug("Golem: Bad current target");
@@ -541,6 +565,11 @@ public class EntityListener implements Listener {
             } else { // if neither player nor arrow
                 return;
             }
+            
+            if(!konquest.getPlayerManager().isPlayer(victimBukkitPlayer) || !konquest.getPlayerManager().isPlayer(attackerBukkitPlayer)) {
+				ChatUtil.printDebug("Failed to handle onPlayerDamageByPlayer for non-existent player(s)");
+				return;
+			}
             KonPlayer victimPlayer = playerManager.getPlayer(victimBukkitPlayer);
             KonPlayer attackerPlayer = playerManager.getPlayer(attackerBukkitPlayer);
             
@@ -629,7 +658,9 @@ public class EntityListener implements Listener {
 		if(event.getEntityType().equals(EntityType.SPLASH_POTION) && source instanceof Player) {
 			Player bukkitPlayer = (Player)source;
 			KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-    		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.POTIONS,1);
+			if(player != null) {
+				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.POTIONS,1);
+			}
     	}
 	}
 	

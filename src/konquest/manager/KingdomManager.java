@@ -428,7 +428,7 @@ public class KingdomManager {
 		// Verify no surrounding enemy or capital territory
     	for(Chunk chunk : konquest.getAreaChunks(claimLoc,2)) {
     		if(konquest.getKingdomManager().isChunkClaimed(chunk)) {
-    			if(!player.getKingdom().equals(konquest.getKingdomManager().getChunkTerritory(chunk).getKingdom())) {
+    			if(player != null && !player.getKingdom().equals(konquest.getKingdomManager().getChunkTerritory(chunk).getKingdom())) {
     				//ChatUtil.sendError(bukkitPlayer, "You are too close to enemy territory!");
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
@@ -513,7 +513,7 @@ public class KingdomManager {
 		// Verify no surrounding enemy or capital territory
     	for(Chunk chunk : konquest.getAreaChunks(claimLoc,radius+1)) {
     		if(konquest.getKingdomManager().isChunkClaimed(chunk)) {
-    			if(!player.getKingdom().equals(konquest.getKingdomManager().getChunkTerritory(chunk).getKingdom())) {
+    			if(player != null && !player.getKingdom().equals(konquest.getKingdomManager().getChunkTerritory(chunk).getKingdom())) {
     				//ChatUtil.sendError(bukkitPlayer, "Too close to enemy territory!");
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
@@ -1532,28 +1532,30 @@ public class KingdomManager {
 	}
 	
 	public void updatePlayerBorderParticles(KonPlayer player, Location loc) {
-    	// Border particle update
-		ArrayList<Chunk> nearbyChunks = konquest.getAreaChunks(loc, 2);
-		boolean isTerritoryNearby = false;
-		for(Chunk chunk : nearbyChunks) {
-			if(isChunkClaimed(chunk)) {
-				isTerritoryNearby = true;
-				break;
+    	if(player != null) {
+			// Border particle update
+			ArrayList<Chunk> nearbyChunks = konquest.getAreaChunks(loc, 2);
+			boolean isTerritoryNearby = false;
+			for(Chunk chunk : nearbyChunks) {
+				if(isChunkClaimed(chunk)) {
+					isTerritoryNearby = true;
+					break;
+				}
 			}
-		}
-		if(isTerritoryNearby) {
-			// Player is nearby a territory, render border particles
-			Timer borderTimer = player.getBorderUpdateLoopTimer();
-			borderTimer.stopTimer();
-    		borderTimer.setTime(1);
-			HashMap<Location,Color> borderTerritoryMap = getBorderLocationMap(nearbyChunks, player);
-    		player.removeAllBorders();
-    		player.addTerritoryBorders(borderTerritoryMap);
-        	borderTimer.startLoopTimer(10);
-		} else {
-			// Player is not nearby a territory, stop rendering
-			stopPlayerBorderParticles(player);
-		}
+			if(isTerritoryNearby) {
+				// Player is nearby a territory, render border particles
+				Timer borderTimer = player.getBorderUpdateLoopTimer();
+				borderTimer.stopTimer();
+	    		borderTimer.setTime(1);
+				HashMap<Location,Color> borderTerritoryMap = getBorderLocationMap(nearbyChunks, player);
+	    		player.removeAllBorders();
+	    		player.addTerritoryBorders(borderTerritoryMap);
+	        	borderTimer.startLoopTimer(10);
+			} else {
+				// Player is not nearby a territory, stop rendering
+				stopPlayerBorderParticles(player);
+			}
+    	}
     }
 	
 	public void stopPlayerBorderParticles(KonPlayer player) {

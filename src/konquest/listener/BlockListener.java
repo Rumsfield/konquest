@@ -70,6 +70,10 @@ public class BlockListener implements Listener {
 		//ChatUtil.printDebug("EVENT: blockBreak");
 		// Monitor blocks in claimed territory
 		if(kingdomManager.isChunkClaimed(event.getBlock().getChunk())) {
+			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+				ChatUtil.printDebug("Failed to handle onBlockBreak for non-existent player");
+				return;
+			}
 			KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 			// Bypass event restrictions for player in Admin Bypass Mode
 			if(!player.isAdminBypassActive()) {
@@ -292,6 +296,10 @@ public class BlockListener implements Listener {
 				ChatUtil.printDebug("Diamond ore block break dropping items: "+isDrop);
 				ItemStack handItem = event.getPlayer().getInventory().getItemInMainHand();
 				if(isDrop && handItem != null && !handItem.containsEnchantment(Enchantment.SILK_TOUCH)) {
+					if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+						ChatUtil.printDebug("Failed to handle onBlockBreakLow for non-existent player");
+						return;
+					}
 					KonPlayer player = playerManager.getPlayer(event.getPlayer());
 					konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.DIAMONDS,1);
 				}
@@ -312,6 +320,10 @@ public class BlockListener implements Listener {
 					Ageable crop = (Ageable)event.getBlock().getBlockData();
 					//ChatUtil.printDebug("Broke crop block with age: "+crop.getAge());
 					if(crop.getAge() == crop.getMaximumAge()) {
+						if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+							ChatUtil.printDebug("Failed to handle onCropHarvest for non-existent player");
+							return;
+						}
 						KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 						konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.HARVEST,1);
 					}
@@ -330,6 +342,10 @@ public class BlockListener implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
 		// Track last block placed per player
 		konquest.lastPlaced.put(event.getPlayer(),event.getBlock().getLocation());
+		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+			ChatUtil.printDebug("Failed to handle onBlockPlace for non-existent player");
+			return;
+		}
 		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 					
 		// Monitor blocks in claimed territory
@@ -507,6 +523,10 @@ public class BlockListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW)
     public void onSeedPlant(BlockPlaceEvent event) {
 		if(!event.isCancelled()) {
+			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+				ChatUtil.printDebug("Failed to handle onSeedPlant for non-existent player");
+				return;
+			}
 			Material placedMat = event.getBlockPlaced().getType();
 			//ChatUtil.printDebug("EVENT: Placed material "+placedMat.toString());
 			if(placedMat.equals(Material.WHEAT) ||
@@ -528,6 +548,10 @@ public class BlockListener implements Listener {
 		if(!event.isCancelled()) {
 			Material placedMat = event.getBlockPlaced().getType();
 			if(placedMat.equals(Material.FARMLAND)) {
+				if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+					ChatUtil.printDebug("Failed to handle onFarmTill for non-existent player");
+					return;
+				}
 				KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.TILL,1);
 			}

@@ -61,6 +61,10 @@ public class PlayerManager {
 		return onlinePlayers.get(bukkitPlayer);
 	}
 	
+	public boolean isPlayer(Player bukkitPlayer) {
+		return onlinePlayers.containsKey(bukkitPlayer);
+	}
+	
 	public KonOfflinePlayer getOfflinePlayer(OfflinePlayer offlineBukkitPlayer) {
 		return allPlayers.get(offlineBukkitPlayer);
 	}
@@ -72,7 +76,7 @@ public class PlayerManager {
 	public boolean isPlayerNameExist(String name) {
 		boolean result = false;
 		for(OfflinePlayer offlineBukkitPlayer : allPlayers.keySet()) {
-			if(name.equalsIgnoreCase(offlineBukkitPlayer.getName())) {
+			if(offlineBukkitPlayer.getName() != null && name.equalsIgnoreCase(offlineBukkitPlayer.getName())) {
 				result = true;
 				break;
 			}
@@ -192,8 +196,9 @@ public class PlayerManager {
     	//ChatUtil.printDebug("Finding player by name: "+displayName);
     	for(KonPlayer player : onlinePlayers.values()) {
     		//ChatUtil.printDebug("Checking player name "+player.getBukkitPlayer().getName());
-    		if(player.getBukkitPlayer().getName().equalsIgnoreCase(displayName)) {
-    		//if(player.getBukkitPlayer().getUniqueId().equals(Bukkit.getPlayer(displayName).getUniqueId())) {
+    		if(player != null &&
+    				player.getBukkitPlayer().getName() != null &&
+    				player.getBukkitPlayer().getName().equalsIgnoreCase(displayName)) {
     			return player;
     		}
     	}
@@ -203,7 +208,9 @@ public class PlayerManager {
     public KonOfflinePlayer getAllPlayerFromName(String displayName) {
     	//ChatUtil.printDebug("Finding all player by name: "+displayName);
     	for(KonOfflinePlayer offlinePlayer : allPlayers.values()) {
-    		if(offlinePlayer != null && offlinePlayer.getOfflineBukkitPlayer().getName().equalsIgnoreCase(displayName)) {
+    		if(offlinePlayer != null && 
+    				offlinePlayer.getOfflineBukkitPlayer().getName() != null &&
+    				offlinePlayer.getOfflineBukkitPlayer().getName().equalsIgnoreCase(displayName)) {
     			return offlinePlayer;
     		}
     	}

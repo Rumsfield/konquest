@@ -31,6 +31,12 @@ public class RuinAdminCommand extends CommandBase {
             return;
         }
 		Player bukkitPlayer = (Player) getSender();
+		if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+			ChatUtil.printDebug("Failed to find non-existent player");
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return;
+		}
+		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 		String cmdMode = getArgs()[2];
 		String ruinName = getArgs()[3];
 		
@@ -66,7 +72,6 @@ public class RuinAdminCommand extends CommandBase {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_REMOVE.getMessage(ruinName));
         	}
 		} else if(cmdMode.equalsIgnoreCase("criticals")) {
-			KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	if(player.isSettingRegion()) {
         		//ChatUtil.sendError((Player) getSender(), "Cannot do this while setting regions");
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_REGION.getMessage());
@@ -84,7 +89,6 @@ public class RuinAdminCommand extends CommandBase {
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CRITICALS.getMessage(ruinName));
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 		} else if(cmdMode.equalsIgnoreCase("spawns")) {
-			KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	if(player.isSettingRegion()) {
         		//ChatUtil.sendError((Player) getSender(), "Cannot do this while setting regions");
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_REGION.getMessage());

@@ -202,6 +202,10 @@ public class Konquest implements Timeable {
     	// Fetch player from the database
     	// Also instantiates player object in PlayerManager
 		databaseThread.getDatabase().fetchPlayerData(bukkitPlayer);
+		if(!playerManager.isPlayer(bukkitPlayer)) {
+			ChatUtil.printDebug("Failed to init a non-existent player!");
+			return null;
+		}
     	player = playerManager.getPlayer(bukkitPlayer);
     	// Update all player's nametag color packets
     	updateNamePackets();
@@ -217,7 +221,7 @@ public class Konquest implements Timeable {
     		if(loginTerritory.getTerritoryType().equals(KonTerritoryType.TOWN)) { 
 	    		// Player joined located within a Town
 	    		KonTown town = (KonTown) loginTerritory;
-	    		town.addBarPlayer(playerManager.getPlayer(bukkitPlayer));
+	    		town.addBarPlayer(player);
 	    		// For enemy players, apply effects
 	    		if(!player.getKingdom().equals(town.getKingdom())) {
 	    			kingdomManager.applyTownNerf(player, town);
@@ -229,7 +233,7 @@ public class Konquest implements Timeable {
     		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
     			// Player joined located within a Ruin
     			KonRuin ruin = (KonRuin) loginTerritory;
-    			ruin.addBarPlayer(playerManager.getPlayer(bukkitPlayer));
+    			ruin.addBarPlayer(player);
     			ruin.spawnAllGolems();
     		}
 		} else {

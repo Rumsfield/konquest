@@ -50,6 +50,11 @@ public class SettleCommand extends CommandBase {
                 return;
         	}
         	
+        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+    			ChatUtil.printDebug("Failed to find non-existent player");
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			return;
+    		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	if(player.isBarbarian()) {
         		//ChatUtil.sendError((Player) getSender(), "Barbarians cannot settle, join a Kingdom with \"/k join\"");

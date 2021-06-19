@@ -33,6 +33,11 @@ public class PrefixCommand extends CommandBase {
         	}
         	
         	Player bukkitPlayer = (Player) getSender();
+        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+    			ChatUtil.printDebug("Failed to find non-existent player");
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			return;
+    		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 
         	if(player.isBarbarian()) {

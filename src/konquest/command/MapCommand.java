@@ -34,6 +34,11 @@ public class MapCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_WORLD.toString());
                 return;
         	}*/
+        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+    			ChatUtil.printDebug("Failed to find non-existent player");
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			return;
+    		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 			// Display formatted text in chat as chunk map
         	// 10 lines of text by default

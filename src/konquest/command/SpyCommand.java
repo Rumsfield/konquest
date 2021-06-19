@@ -53,6 +53,11 @@ public class SpyCommand extends CommandBase {
                 return;
         	}
         	
+        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+    			ChatUtil.printDebug("Failed to find non-existent player");
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			return;
+    		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	// Verify enough favor
         	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_spy",0.0);
