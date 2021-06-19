@@ -38,10 +38,13 @@ public enum MessagePath {
 	LABEL_LEADERBOARD                           (0, "label.leaderboard"),
 	LABEL_TOTAL                                 (0, "label.total"),
 	LABEL_CAMP                                  (0, "label.camp"),
+	LABEL_PEACEFUL                              (0, "label.peaceful"),
 	LABEL_PROTECTED                             (0, "label.protected"),
 	LABEL_LORD                             		(0, "label.lord"),
 	LABEL_KNIGHT                             	(0, "label.knight"),
 	LABEL_RESIDENT                             	(0, "label.resident"),
+	LABEL_PROPERTIES                          	(0, "label.properties"),
+	LABEL_SMALLEST                          	(0, "label.smallest"),
 	
 	MENU_STATS_TITLE                            (0, "menu.stats.title"),
 	MENU_STATS_INTRO_1                          (0, "menu.stats.intro-1"),

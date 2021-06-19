@@ -41,10 +41,13 @@ label:
   leaderboard: "Leaderboard"
   total: "Total"
   camp: "Camp"
+  peaceful: "Peaceful"
   protected: "Protected"
   lord: "Lord"
   knight: "Knight"
   resident: "Resident"
+  properties: "Properties"
+  smallest: "Smallest"
 menu:
   stats:
     title: "Accomplishment Stats"

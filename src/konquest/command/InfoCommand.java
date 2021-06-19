@@ -130,6 +130,8 @@ public class InfoCommand extends CommandBase {
         	
         	switch(displayState) {
         	case 0: // Display kingdom info
+        		getKonquest().getDisplayManager().displayKingdomInfoMenu(sender, kingdom);
+        		/*
         		//ChatUtil.printDebug("Displaying Kingdom");
         		String kingdomName = kingdom.getName();
 	        	int numKingdomTowns = kingdom.getTowns().size();
@@ -163,6 +165,7 @@ public class InfoCommand extends CommandBase {
 		        		ChatUtil.sendMessage(bukkitPlayer, line);
 		        	}
 	        	}
+	        	*/
         		break;
         	case 1: // Display town info
         		if(town != null) {

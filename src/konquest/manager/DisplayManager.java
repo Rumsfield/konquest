@@ -27,6 +27,7 @@ import konquest.display.PagedMenu;
 import konquest.display.PlayerScoreIcon;
 import konquest.display.TownIcon;
 import konquest.display.UpgradeIcon;
+import konquest.model.KonKingdom;
 import konquest.model.KonKingdomScoreAttributes;
 import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
 import konquest.model.KonLeaderboard;
@@ -182,6 +183,11 @@ public class DisplayManager {
 							} else {
 								ChatUtil.printDebug("Failed to find inventory menu in town cache");
 							}
+						} else if(clickedIcon instanceof KingdomIcon) {
+							// Kingdom Icons open a new kingdom info menu for the associated player
+							KingdomIcon icon = (KingdomIcon)clickedIcon;
+							menuCache.remove(inv);
+							displayKingdomInfoMenu(clickPlayer,icon.getKingdom());
 						}
 					}
 				}
@@ -486,7 +492,7 @@ public class DisplayManager {
 		int pageNum = 1;
 		ListIterator<KonTown> townIter = playerTowns.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			pageLabel = ChatColor.BLACK+MessagePath.LABEL_RESIDENCIES.getMessage()+" "+(i+1)+"/"+pageTotal;
+			pageLabel = ChatColor.BLACK+infoPlayer.getOfflineBukkitPlayer().getName()+" "+MessagePath.LABEL_RESIDENCIES.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, 5, pageLabel);
 			int slotIndex = 0;
 			while(slotIndex < MAX_ICONS_PER_PAGE && townIter.hasNext()) {
@@ -527,7 +533,117 @@ public class DisplayManager {
         },1);
  	}
  	
- 	// Sort town list by Lord, Knight, Resident, and then by population
+ 	// Kingdom Info
+  	public void displayKingdomInfoMenu(KonPlayer displayPlayer, KonKingdom infoKingdom) {
+  		
+  		boolean isFriendly = displayPlayer.getKingdom().equals(infoKingdom);
+ 		ChatColor kingdomColor = ChatColor.RED;
+ 		if(isFriendly) {
+ 			kingdomColor = ChatColor.GREEN;
+ 		}
+ 		
+		String loreColor = ""+ChatColor.WHITE;
+		String valueColor = ""+ChatColor.AQUA;
+		String pageLabel = "";
+    	
+ 		// Create fresh paged menu
+ 		PagedMenu newMenu = new PagedMenu();
+ 		List<String> loreList;
+ 		InfoIcon info;
+
+ 		// Page 0
+		pageLabel = ChatColor.BLACK+MessagePath.COMMAND_INFO_NOTICE_KINGDOM_HEADER.getMessage(infoKingdom.getName());
+		newMenu.addPage(0, 1, pageLabel);
+		/* Member Info Icon (2) */
+		int numKingdomPlayers = konquest.getPlayerManager().getPlayersInKingdom(infoKingdom).size();
+    	int numAllKingdomPlayers = konquest.getPlayerManager().getAllPlayersInKingdom(infoKingdom).size();
+    	loreList = new ArrayList<String>();
+    	loreList.add(loreColor+MessagePath.LABEL_ONLINE_PLAYERS.getMessage()+": "+valueColor+numKingdomPlayers);
+    	loreList.add(loreColor+MessagePath.LABEL_TOTAL_PLAYERS.getMessage()+": "+valueColor+numAllKingdomPlayers);
+    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PLAYERS.getMessage(), loreList, Material.PLAYER_HEAD, 2, false);
+    	newMenu.getPage(0).addIcon(info);
+    	/* Properties Info Icon (3) */
+    	String isPeaceful = boolean2Symbol(infoKingdom.isPeaceful());
+    	String isSmallest = boolean2Symbol(infoKingdom.isSmallest());
+    	String isProtected = boolean2Symbol(infoKingdom.isOfflineProtected());
+    	loreList = new ArrayList<String>();
+    	loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
+    	loreList.add(loreColor+MessagePath.LABEL_SMALLEST.getMessage()+": "+isSmallest);
+    	loreList.add(loreColor+MessagePath.LABEL_PROTECTED.getMessage()+": "+isProtected);
+    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, 3, false);
+    	newMenu.getPage(0).addIcon(info);
+    	/* Favor Info Icon (4) */
+    	ArrayList<KonOfflinePlayer> allPlayersInKingdom = konquest.getPlayerManager().getAllPlayersInKingdom(infoKingdom);
+    	int numKingdomFavor = 0;
+    	for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
+    		numKingdomFavor += (int) KonquestPlugin.getEconomy().getBalance(kingdomPlayer.getOfflineBukkitPlayer());
+    	}
+    	loreList = new ArrayList<String>();
+    	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+numKingdomFavor);
+    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_FAVOR.getMessage(), loreList, Material.GOLD_BLOCK, 4, false);
+    	newMenu.getPage(0).addIcon(info);
+    	/* Towns Info Icon (5) */
+    	int numKingdomTowns = infoKingdom.getTowns().size();
+    	loreList = new ArrayList<String>();
+    	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+numKingdomTowns);
+    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_TOWNS.getMessage(), loreList, Material.OBSIDIAN, 5, false);
+    	newMenu.getPage(0).addIcon(info);
+    	/* Towns Info Icon (6) */
+    	int numKingdomLand = 0;
+    	for(KonTown town : infoKingdom.getTowns()) {
+    		numKingdomLand += town.getChunkList().size();
+    	}
+    	loreList = new ArrayList<String>();
+    	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+numKingdomLand);
+    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_LAND.getMessage(), loreList, Material.GRASS_BLOCK, 6, false);
+    	newMenu.getPage(0).addIcon(info);
+    	
+    	// Page 1+
+		List<KonTown> kingdomTowns = sortedTowns(infoKingdom);
+		final int MAX_ICONS_PER_PAGE = 45;
+		int pageTotal = (int)Math.ceil(((double)kingdomTowns.size())/MAX_ICONS_PER_PAGE);
+		if(pageTotal == 0) {
+			pageTotal = 1;
+		}
+		int pageNum = 1;
+		ListIterator<KonTown> townIter = kingdomTowns.listIterator();
+		for(int i = 0; i < pageTotal; i++) {
+			pageLabel = ChatColor.BLACK+infoKingdom.getName()+" "+MessagePath.LABEL_TOWNS.getMessage()+" "+(i+1)+"/"+pageTotal;
+			newMenu.addPage(pageNum, 5, pageLabel);
+			int slotIndex = 0;
+			while(slotIndex < MAX_ICONS_PER_PAGE && townIter.hasNext()) {
+				/* Town Icon (n) */
+				KonTown currentTown = townIter.next();
+				loreList = new ArrayList<String>();
+				Material currentMat = Material.BEDROCK;
+				if(currentTown.isOpen()) {
+					currentMat = Material.LIGHT_GRAY_WOOL;
+					loreList.add(loreColor+ChatColor.ITALIC+MessagePath.LABEL_OPEN.getMessage());
+				}
+		    	loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+currentTown.getNumResidents());
+		    	loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+currentTown.getChunkList().size());
+		    	loreList.add(ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage());
+		    	TownIcon town = new TownIcon(currentTown,isFriendly,currentMat,loreList,slotIndex);
+				newMenu.getPage(pageNum).addIcon(town);
+				slotIndex++;
+			}
+			pageNum++;
+		}
+		
+		newMenu.refreshNavigationButtons();
+		newMenu.setPageIndex(0);
+		menuCache.put(newMenu.getCurrentPage().getInventory(), newMenu);
+		// Schedule delayed task to display inventory to player
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	displayPlayer.getBukkitPlayer().closeInventory();
+            	displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentPage().getInventory());
+            }
+        },1);
+  	}
+ 	
+ 	// Sort player town list by Lord, Knight, Resident, and then by population
  	private List<KonTown> sortedTowns(KonOfflinePlayer player) {
  		List<KonTown> sortedTowns = new ArrayList<KonTown>();
  		// Determine town group lists
@@ -565,5 +681,35 @@ public class DisplayManager {
  		sortedTowns.addAll(residentTowns);
  		
  		return sortedTowns;
+ 	}
+ 	
+ 	// Sort kingdom town list by population
+  	private List<KonTown> sortedTowns(KonKingdom kingdom) {
+  		List<KonTown> sortedTowns = kingdom.getTowns();
+
+  		// Sort each town list by population
+  		Comparator<KonTown> townComparator = new Comparator<KonTown>() {
+  			@Override
+  			public int compare(final KonTown k1, KonTown k2) {
+  				int result = 0;
+  				if(k1.getNumResidents() < k2.getNumResidents()) {
+  					result = 1;
+  				} else if(k1.getNumResidents() > k2.getNumResidents()) {
+  					result = -1;
+  				}
+  				return result;
+  			}
+  		};
+  		Collections.sort(sortedTowns, townComparator);
+  		
+  		return sortedTowns;
+  	}
+ 	
+ 	private String boolean2Symbol(boolean val) {
+ 		String result = ChatColor.DARK_RED+""+ChatColor.BOLD+"\u274C";
+    	if(val) {
+    		result = ChatColor.DARK_GREEN+""+ChatColor.BOLD+"\u2713";
+    	}
+    	return result;
  	}
 }
