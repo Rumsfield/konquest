@@ -23,6 +23,7 @@ label:
   open: "Open"
   health: "Health"
   upgrades: "Upgrades"
+  knights: "Knights"
   residents: "Residents"
   invites: "Invites"
   requests: "Requests"
@@ -148,6 +149,7 @@ protection:
     kingdom-warmup: "The Kingdom of %s will be protected in %s minutes."
     ruin: "You have captured the Ruin %s."
     safe: "The Town of %s is safe, for now..."
+    attacked: "Under Attack"
   error:
     blocked: "Blocked"
     not-resident: "You must be a resident of %s to do this."

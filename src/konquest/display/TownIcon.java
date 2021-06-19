@@ -46,6 +46,10 @@ public class TownIcon implements MenuIcon {
 		return item;
 	}
 	
+	public KonTown getTown() {
+		return town;
+	}
+	
 	@Override
 	public int getIndex() {
 		return index;

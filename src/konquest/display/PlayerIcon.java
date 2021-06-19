@@ -11,20 +11,27 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import konquest.Konquest;
 
-public class PlayerScoreIcon implements MenuIcon {
+public class PlayerIcon implements MenuIcon {
 
+	public enum IconAction {
+		DISPLAY_SCORE,
+		DISPLAY_INFO;
+	}
+	
 	private String name;
 	private List<String> lore;
 	private OfflinePlayer player;
 	private int index;
-	//private ItemStack item;
+	private boolean isClickable;
+	private IconAction action;
 	
-	public PlayerScoreIcon(String name, List<String> lore, OfflinePlayer player, int index) {
+	public PlayerIcon(String name, List<String> lore, OfflinePlayer player, int index, boolean isClickable, IconAction action) {
 		this.name = name;
 		this.lore = lore;
 		this.player = player;
 		this.index = index;
-		//this.item = initItem();
+		this.isClickable = isClickable;
+		this.action = action;
 	}
 
 	/*private ItemStack initItem() {
@@ -43,6 +50,10 @@ public class PlayerScoreIcon implements MenuIcon {
 		item.setItemMeta(meta);
 		return item;
 	}*/
+	
+	public IconAction getAction() {
+		return action;
+	}
 	
 	public OfflinePlayer getOfflinePlayer() {
 		return player;
@@ -75,6 +86,6 @@ public class PlayerScoreIcon implements MenuIcon {
 	
 	@Override
 	public boolean isClickable() {
-		return true;
+		return isClickable;
 	}
 }

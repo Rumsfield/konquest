@@ -47,7 +47,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	private HashMap<UUID,Boolean> residents;
 	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident, false = requesting add from lord/knight)
 	private boolean isOpen;
-	boolean isAttacked;
+	private boolean isAttacked;
 	private ArrayList<UUID> defenders;
 	private HashMap<KonUpgrade,Integer> upgrades;
 	private HashMap<KonUpgrade,Integer> disabledUpgrades;
@@ -680,6 +680,13 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	public boolean isLordValid() {
 		return lord != null ? true : false;
+	}
+	
+	public OfflinePlayer getPlayerLord() {
+		if(lord != null) {
+			return Bukkit.getOfflinePlayer(lord);
+		}
+		return null;
 	}
 	
 	public ArrayList<OfflinePlayer> getPlayerElites() {
