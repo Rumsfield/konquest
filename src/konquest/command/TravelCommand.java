@@ -46,7 +46,7 @@ public class TravelCommand extends CommandBase {
         	Player bukkitPlayer = (Player) getSender();
         	
         	World bukkitWorld = bukkitPlayer.getWorld();
-        	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
+        	if(!getKonquest().isWorldValid(bukkitWorld)) {
         		//ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_WORLD.toString());
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
@@ -116,7 +116,7 @@ public class TravelCommand extends CommandBase {
         	} else if(travelName.equalsIgnoreCase("wild")) {
         		// Travel to random wild location
         		int radius = getKonquest().getConfigManager().getConfig("core").getInt("core.travel_wild_random_radius",200);
-        		travelLoc = getKonquest().getRandomWildLocation(radius*2);
+        		travelLoc = getKonquest().getRandomWildLocation(radius*2,bukkitWorld);
         		destination = TravelDestination.WILD;
         	} else {
         		// Travel to town

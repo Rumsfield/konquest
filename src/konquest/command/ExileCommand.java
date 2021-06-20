@@ -31,7 +31,7 @@ public class ExileCommand extends CommandBase {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
 
-        	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
+        	if(!getKonquest().isWorldValid(bukkitWorld)) {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}

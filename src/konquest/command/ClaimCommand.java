@@ -29,7 +29,7 @@ public class ClaimCommand extends CommandBase {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
         	// Verify that this command is being used in the default world
-        	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
+        	if(!getKonquest().isWorldValid(bukkitWorld)) {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}

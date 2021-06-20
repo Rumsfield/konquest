@@ -37,7 +37,7 @@ public class MakeKingdomAdminCommand extends CommandBase {
     			return;
     		}
         	
-        	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
+        	if(!getKonquest().isWorldValid(bukkitWorld)) {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
