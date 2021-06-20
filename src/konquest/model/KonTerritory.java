@@ -9,6 +9,7 @@ import konquest.utility.ChatUtil;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 public abstract class KonTerritory{
 
@@ -111,6 +112,10 @@ public abstract class KonTerritory{
 	// Getters
 	public Location getCenterLoc() {
 		return centerLoc;
+	}
+	
+	public World getWorld() {
+		return centerLoc.getWorld();
 	}
 	
 	public Location getSpawnLoc() {

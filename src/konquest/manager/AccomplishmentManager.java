@@ -39,7 +39,7 @@ public class AccomplishmentManager {
 	public void initialize() {
 		boolean configEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.accomplishment_prefix");
 		isEnabled = configEnabled;
-		ChatUtil.printDebug("Accomplishment Manager is ready in world "+konquest.getWorldName()+" with prefix "+isEnabled);
+		ChatUtil.printDebug("Accomplishment Manager is ready with prefix "+isEnabled);
 	}
 	
 	public boolean isEnabled() {
@@ -72,7 +72,7 @@ public class AccomplishmentManager {
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+"Accomplishment prefix unlocked: "+ChatColor.DARK_PURPLE+pre.getName());
 						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+MessagePath.GENERIC_NOTICE_ACCOMPLISHMENT.getMessage(), 60, 5, 10);
 						ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+MessagePath.GENERIC_NOTICE_PREFIX_UNLOCK.getMessage()+": "+ChatColor.DARK_PURPLE+pre.getName());
-						Bukkit.getWorld(konquest.getWorldName()).playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)1.0);
+						player.getBukkitPlayer().getWorld().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)1.0);
 					}
 				}
 			}

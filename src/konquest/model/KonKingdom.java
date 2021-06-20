@@ -3,7 +3,6 @@ package konquest.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -184,7 +183,7 @@ public class KonKingdom implements Timeable{
 		for (int x = bottomBlockX; x <= topBlockX; x++) {
             for (int y = bottomBlockY; y <= topBlockY; y++) {
                 for (int z = bottomBlockZ; z <= topBlockZ; z++) {
-                	Block monumentBlock = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getBlockAt(x, y, z);
+                	Block monumentBlock = corner1.getWorld().getBlockAt(x, y, z);
                 	if(monumentBlock.getType().equals(konquest.getKingdomManager().getTownCriticalBlock())) {
                 		criticalBlockCount++;
                 	} else if(monumentBlock.getState() instanceof Chest) {

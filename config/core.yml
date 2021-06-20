@@ -1,9 +1,12 @@
 # Core Konquest Settings
 # (*) means the server must be restarted for a change to take effect, else use the "/k admin reload" command. NEVER USE /reload.
+# [LEGACY] means a setting is not used in the current version, but still exists to support backwards compatability with previous Konquest versions.
 # language*:                        Language file selection, must match a file name in the /lang folder (e.g. english for lang/english.yml)
 # core:
 #  debug*:                          Enable debug messages for verbose console messages (true/false)
-#  world_name*:                     Primary world name, this world is the only place that players can settle towns (string)
+#  world_name*:                     [LEGACY] Primary world name for kingdoms and towns created before v0.3.0 (string)
+#  world_blacklist*:                World names where kingdoms and towns cannot exist (string list)
+#  world_blacklist_reverse*:        Reverse world_blacklist into a whitelist, where listed world names become the only worlds where kingdoms and towns can exist (true/false)
 #  save_interval*:                  Save interval in minutes, 0 to disable (integer >= 0)
 #  community_link:                  URL which will appear in the /k community link icon (string)
 #  accomplishment_prefix:           Enable the usage of accomplishment prefixes applied to player names (true/false)
@@ -95,6 +98,10 @@ language: english
 core:
   debug: false
   world_name: world
+  world_blacklist:
+  - world_nether
+  - world_the_end
+  world_blacklist_reverse: false
   save_interval: 60
   community_link: www.google.com
   accomplishment_prefix: true

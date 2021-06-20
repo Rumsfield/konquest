@@ -1,16 +1,11 @@
 package konquest.utility;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Snow;
-//import org.bukkit.scheduler.BukkitRunnable;
-//import org.bukkit.scheduler.BukkitTask;
-
-import konquest.Konquest;
 
 public class BlockPaster {
 
@@ -47,7 +42,7 @@ public class BlockPaster {
     }
     
     public void startPaste() {
-    	World world = Bukkit.getServer().getWorld(Konquest.getInstance().getWorldName());
+    	World world = centerLoc.getWorld();
     	Chunk chunk = world.getChunkAt(centerLoc);
     	for (int x = bottomBlockX; x <= topBlockX; x++) {
             for (int z = bottomBlockZ; z <= topBlockZ; z++) {
