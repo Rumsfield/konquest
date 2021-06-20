@@ -16,7 +16,6 @@ import konquest.utility.MessagePath;
 
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -118,7 +117,7 @@ public class InventoryListener implements Listener {
 								boolean result = konquest.getLootManager().updateMonumentLoot(event.getInventory(), town);
 								ChatUtil.printDebug("Attempted to update loot in town "+territory.getName()+", got "+result);
 								if(result) {
-									Bukkit.getWorld(konquest.getWorldName()).playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
+									event.getInventory().getLocation().getWorld().playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
 								} else {
 									//ChatUtil.sendNotice(player.getBukkitPlayer(), "Come back later!");
 									ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_LOOT_LATER.getMessage());

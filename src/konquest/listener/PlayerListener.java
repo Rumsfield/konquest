@@ -764,8 +764,8 @@ public class PlayerListener implements Listener{
     	if(portalToLoc != null) {
 	    	ChatUtil.printDebug("EVENT: Player portal to world "+portalToLoc.getWorld().getName()+" because "+event.getCause()+", location: "+portalToLoc.toString());
 	    	Player bukkitPlayer = event.getPlayer();
-	    	// When portal into primary world...
-	    	if(konquest.getWorldName().equalsIgnoreCase(portalToLoc.getWorld().getName())) {
+	    	// When portal into valid world...
+	    	if(konquest.isWorldValid(portalToLoc.getWorld())) {
 				// Protections for territory
 	    		if(konquest.getKingdomManager().isChunkClaimed(portalToLoc.getChunk())) {
 		    		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(portalToLoc.getChunk());

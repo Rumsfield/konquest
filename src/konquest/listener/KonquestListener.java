@@ -19,7 +19,6 @@ import konquest.utility.Timer;
 
 import java.util.ArrayList;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -243,7 +242,7 @@ public class KonquestListener implements Listener {
 						} else {
 							local_z = Math.abs(townSpawnLoc.getBlockZ() % -16);
 						}
-						int new_y = Bukkit.getServer().getWorld(konquest.getWorldName()).getChunkAt(townSpawnLoc).getChunkSnapshot(true,false,false).getHighestBlockYAt(local_x, local_z) + 1;
+						int new_y = townSpawnLoc.getWorld().getChunkAt(townSpawnLoc).getChunkSnapshot(true,false,false).getHighestBlockYAt(local_x, local_z) + 1;
 						townSpawnLoc.setY((double)new_y);
 						// Teleport all players inside monument to a safe location
 						event.getPlayer().getBukkitPlayer().teleport(townSpawnLoc);

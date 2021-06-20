@@ -38,7 +38,7 @@ public class WorldListener  implements Listener {
     public void onPortalCreate(PortalCreateEvent event) {
 		ChatUtil.printDebug("EVENT: Portal is being created in "+event.getWorld().getName());
 		
-		if(event.getWorld().getName().equals(konquest.getWorldName())) {
+		if(konquest.isWorldValid(event.getWorld())) {
 			// Check every block associated with the portal
 			for(BlockState current_blockState : event.getBlocks()) {
 				// Prevent portals from being created inside of Capitals and Monuments in the primary world
