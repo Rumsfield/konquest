@@ -824,10 +824,18 @@ public class Konquest implements Timeable {
     		Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), new Runnable() {
                 @Override
                 public void run() {
+                	
                 	SkullMeta meta = (SkullMeta)item.getItemMeta();
                 	meta.setOwningPlayer(bukkitOfflinePlayer);
             		item.setItemMeta(meta);
-            		headCache.put(bukkitOfflinePlayer.getUniqueId(),item);
+            		
+            		Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
+                        @Override
+                        public void run() {
+                        	headCache.put(bukkitOfflinePlayer.getUniqueId(),item);
+                        }
+            		});
+            		
                 }
             });
 
