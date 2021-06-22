@@ -22,14 +22,16 @@ public class ConfigManager{
 	}
         
 	public void initialize() {
+		// Config Settings
 		addConfig("core", new KonConfig("core"));
 		updateConfigVersion("core");
 		addConfig("upgrades", new KonConfig("upgrades"));
 		updateConfigVersion("upgrades");
-		addConfig("camps", new KonConfig("camps"));
+		// Data Storage
 		addConfig("kingdoms", new KonConfig("kingdoms"));
+		addConfig("camps", new KonConfig("camps"));
 		addConfig("ruins", new KonConfig("ruins"));
-		// Built-in language files
+		// Language files
 		addConfig("lang_english", new KonConfig("lang/english"));
 		updateConfigVersion("lang_english");
 		// Language selection

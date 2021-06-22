@@ -128,9 +128,11 @@ public class Konquest implements Timeable {
 	public void initialize() {
 		// Initialize managers
 		configManager.initialize();
+		boolean debug = configManager.getConfig("core").getBoolean("core.debug");
+		ChatUtil.printDebug("Debug is "+debug);
+		String worldName = configManager.getConfig("core").getString("core.world_name");
+		ChatUtil.printDebug("Primary world is "+worldName);
 		languageManager.initialize();
-		//worldName = configManager.getConfig("core").getString("core.world_name","world");
-		//ChatUtil.printConsoleAlert("Primary world is "+worldName);
 		kingdomManager.initialize();
 		ruinManager.initialize();
 		initManagers();

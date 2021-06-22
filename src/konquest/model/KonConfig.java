@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import org.bukkit.ChatColor;
+//import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -79,6 +79,7 @@ public class KonConfig {
 	    return result;
 	}
 	
+	// Returns true if the config file had its version upgraded
 	public boolean updateVersion() {
 		if (config == null || file == null) {
 	        return false;
@@ -87,8 +88,9 @@ public class KonConfig {
 		String fileVersion = config.getString("version","0.0.0");
 		String pluginVersion = plugin.getDescription().getVersion();
 		if(!fileVersion.equalsIgnoreCase(pluginVersion)) {
+			// Update config version to current plugin version
 			if(fileVersion.equals("0.0.0")) {
-				// Update default config version to current plugin version
+				// The config is a default resource, update 0.0.0 to plugin version
 				if(config.contains("version")) {
 					config.set("version", pluginVersion);
 					try {
@@ -98,6 +100,7 @@ public class KonConfig {
 				    }
 				}
 			} else {
+				// The config is from an older plugin version
 				// Make a copy of config file
 				String oldFileName = name+"-v"+fileVersion+".yml";
 				File oldVersionFile = new File(plugin.getDataFolder(), oldFileName);
@@ -106,10 +109,13 @@ public class KonConfig {
 			    } catch (IOException exception) {
 			    	exception.printStackTrace();
 			    }
+				
 				// Save default config & update version
-				file = new File(plugin.getDataFolder(), fileName);
-				plugin.saveResource(fileName, true);
-				reloadConfig();
+				//file = new File(plugin.getDataFolder(), fileName);
+				//plugin.saveResource(fileName, true);
+				//reloadConfig();
+				
+				// Update version
 				config.set("version", pluginVersion);
 				try {
 			        config.save(file);
@@ -118,7 +124,8 @@ public class KonConfig {
 			    }
 			}
 			result = true;
-			Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Invalid or missing config file \""+fileName+"\" replaced with latest default version. Manually edit new YML file if desired.");
+			ChatUtil.printConsoleAlert("Updated config file \""+fileName+"\" to version "+pluginVersion);
+			//Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Invalid or missing config file \""+fileName+"\" replaced with latest default version. Manually edit new YML file if desired.");
 		}
 		return result;
 	}
