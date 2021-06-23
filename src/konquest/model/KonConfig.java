@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Map;
 
+import org.bukkit.configuration.ConfigurationSection;
 //import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -99,6 +101,7 @@ public class KonConfig {
 				    	exception.printStackTrace();
 				    }
 				}
+				ChatUtil.printConsoleAlert("Created default config file \""+fileName+"\" for version "+pluginVersion);
 			} else {
 				// The config is from an older plugin version
 				// Make a copy of config file
@@ -109,23 +112,34 @@ public class KonConfig {
 			    } catch (IOException exception) {
 			    	exception.printStackTrace();
 			    }
-				
-				// Save default config & update version
-				//file = new File(plugin.getDataFolder(), fileName);
-				//plugin.saveResource(fileName, true);
-				//reloadConfig();
-				
-				// Update version
-				config.set("version", pluginVersion);
 				try {
-			        config.save(file);
-			    } catch (IOException exception) {
-			    	exception.printStackTrace();
-			    }
+					Reader defaultConfigStream = new InputStreamReader(plugin.getResource(fileName), "UTF8");
+					if (defaultConfigStream != null) {
+						YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
+						// Update any valid non-defaults
+						Map<String,Object> allPaths = config.getValues(true);
+						for(String path : allPaths.keySet()) {
+							if(defaultConfig.contains(path,false) && !(allPaths.get(path) instanceof ConfigurationSection)) {
+								defaultConfig.set(path, allPaths.get(path));
+							}
+						}
+						// Update version
+						defaultConfig.set("version", pluginVersion);
+						file = new File(plugin.getDataFolder(), fileName);
+						try {
+							defaultConfig.save(file);
+					    } catch (IOException exception) {
+					    	exception.printStackTrace();
+					    }
+						// Reload from new file
+						reloadConfig();
+						ChatUtil.printConsoleAlert("Updated config file \""+fileName+"\" to version "+pluginVersion);
+					}
+				} catch (IOException exception) {
+					exception.printStackTrace();
+				}
 			}
 			result = true;
-			ChatUtil.printConsoleAlert("Updated config file \""+fileName+"\" to version "+pluginVersion);
-			//Konquest.getInstance().getPlugin().getServer().getConsoleSender().sendMessage(ChatColor.RED+"[Konquest] Invalid or missing config file \""+fileName+"\" replaced with latest default version. Manually edit new YML file if desired.");
 		}
 		return result;
 	}

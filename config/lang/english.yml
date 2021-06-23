@@ -593,7 +593,7 @@ description:
   admin-removetown: "Removes a Town from a Kingdom and all claimed Town chunks."
   admin-monument: "Creates, removes or shows the Monument Template for a Kingdom."
   admin-list: "Display all Kingdoms or Towns of a Kingdom."
-  admin-forcejoin : "Forces a player to join a Kingdom and teleports them to the Capital."
+  admin-forcejoin: "Forces a player to join a Kingdom and teleports them to the Capital."
   admin-forceexile: "Forces a player to become a Barbarian and teleports them to the Wild."
   admin-forcetown: "Forces a Town to accept the provided management sub-commands."
   admin-rename: "Renames a Kingdom or Town to newName."

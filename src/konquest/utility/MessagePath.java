@@ -497,7 +497,7 @@ public enum MessagePath {
 	DESCRIPTION_ADMIN_REMOVETOWN                (0, "description.admin-removetown"),
 	DESCRIPTION_ADMIN_MONUMENT                  (0, "description.admin-monument"),
 	DESCRIPTION_ADMIN_LIST                      (0, "description.admin-list"),
-	DESCRIPTION_ADMIN_FORCEJOIN                 (0, "description.admin-forcejoin "),
+	DESCRIPTION_ADMIN_FORCEJOIN                 (0, "description.admin-forcejoin"),
 	DESCRIPTION_ADMIN_FORCEEXILE                (0, "description.admin-forceexile"),
 	DESCRIPTION_ADMIN_FORCETOWN                 (0, "description.admin-forcetown"),
 	DESCRIPTION_ADMIN_RENAME                    (0, "description.admin-rename"),
