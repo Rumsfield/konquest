@@ -124,6 +124,8 @@ public class PagedMenu {
 			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex-3,false));
 			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex-2,false));
 			pages.get(i).addIcon(new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,nextIndex-1,false));
+			// Set all items
+			pages.get(i).updateIcons();
 		}
 	}
 	

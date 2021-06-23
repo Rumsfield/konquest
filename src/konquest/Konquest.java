@@ -822,7 +822,11 @@ public class Konquest implements Timeable {
     	if(bukkitOfflinePlayer.getUniqueId() != null && !headCache.containsKey(bukkitOfflinePlayer.getUniqueId())) {
     		ChatUtil.printDebug("Missing "+bukkitOfflinePlayer.getName()+" player head in the cache, creating...");
     		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
-    		
+    		SkullMeta meta = (SkullMeta)item.getItemMeta();
+        	meta.setOwningPlayer(bukkitOfflinePlayer);
+    		item.setItemMeta(meta);
+    		headCache.put(bukkitOfflinePlayer.getUniqueId(),item);
+    		/*
     		Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), new Runnable() {
                 @Override
                 public void run() {
@@ -840,7 +844,7 @@ public class Konquest implements Timeable {
             		
                 }
             });
-
+			*/
     		return item;
     	} else {
     		return headCache.get(bukkitOfflinePlayer.getUniqueId());

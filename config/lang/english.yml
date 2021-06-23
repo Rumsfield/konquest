@@ -49,6 +49,7 @@ label:
   resident: "Resident"
   properties: "Properties"
   smallest: "Smallest"
+  information: "Information"
 menu:
   stats:
     title: "Accomplishment Stats"

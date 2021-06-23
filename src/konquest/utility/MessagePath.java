@@ -46,6 +46,7 @@ public enum MessagePath {
 	LABEL_RESIDENT                             	(0, "label.resident"),
 	LABEL_PROPERTIES                          	(0, "label.properties"),
 	LABEL_SMALLEST                          	(0, "label.smallest"),
+	LABEL_INFORMATION                          	(0, "label.information"),
 	
 	MENU_STATS_TITLE                            (0, "menu.stats.title"),
 	MENU_STATS_INTRO_1                          (0, "menu.stats.intro-1"),
