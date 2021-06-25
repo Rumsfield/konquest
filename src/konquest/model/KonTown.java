@@ -92,7 +92,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		int distX = (int)Math.abs(addChunk.getX() - centerChunk.getX());
 		int distY = (int)Math.abs(addChunk.getY() - centerChunk.getY());
 		
-		if(distX > maxChunkRange || distY > maxChunkRange) {
+		if(!chunk.getWorld().equals(getCenterLoc().getWorld()) || distX > maxChunkRange || distY > maxChunkRange) {
 			ChatUtil.printDebug("Failed to add chunk in territory "+getName()+", too far");
 			return false;
 		}

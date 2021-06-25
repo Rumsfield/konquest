@@ -78,7 +78,7 @@ public abstract class KonTerritory{
 	}
 	
 	public boolean isLocInside(Location loc) {
-		return chunkList.containsKey(getKonquest().toPoint(loc));
+		return loc.getWorld().equals(getWorld()) && chunkList.containsKey(getKonquest().toPoint(loc));
 	}
 	
 	public boolean isLocAdjacent(Location loc) {
@@ -89,7 +89,7 @@ public abstract class KonTerritory{
 		int curZ = loc.getChunk().getZ();
 		for(int i = 0;i<4;i++) {
 			Chunk nextChunk = loc.getWorld().getChunkAt(curX+coordLUTX[i], curZ+coordLUTZ[i]);
-			if(chunkList.containsKey(getKonquest().toPoint(nextChunk))) {
+			if(nextChunk.getWorld().equals(getWorld()) && chunkList.containsKey(getKonquest().toPoint(nextChunk))) {
 				result = true;
 				break;
 			}
