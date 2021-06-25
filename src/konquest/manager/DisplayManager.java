@@ -645,10 +645,10 @@ public class DisplayManager {
 				Material currentMat = Material.BEDROCK;
 				if(currentTown.isAttacked()) {
 					currentMat = Material.RED_WOOL;
-					loreList.add(loreColor+ChatColor.ITALIC+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage());
+					loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage());
 				} else if(currentTown.isOpen()) {
-					currentMat = Material.LIGHT_GRAY_WOOL;
-					loreList.add(loreColor+ChatColor.ITALIC+MessagePath.LABEL_OPEN.getMessage());
+					currentMat = Material.GRAY_STAINED_GLASS;
+					loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.LABEL_OPEN.getMessage());
 				}
 		    	loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+currentTown.getNumResidents());
 		    	loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+currentTown.getChunkList().size());
@@ -724,8 +724,8 @@ public class DisplayManager {
 		loreList = new ArrayList<String>();
 		if(infoTown.isLordValid()) {
 			OfflinePlayer lordPlayer = infoTown.getPlayerLord();
-			loreList.add(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage());
 			loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
+			loreList.add(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage());
 			loreList.add(ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage());
 			PlayerIcon playerInfo = new PlayerIcon(kingdomColor+lordPlayer.getName(),loreList,lordPlayer,1,true,IconAction.DISPLAY_INFO);
 			newMenu.getPage(0).addIcon(playerInfo);
@@ -826,8 +826,8 @@ public class DisplayManager {
 				/* Player Icon (n) */
 				OfflinePlayer currentKnight = knightIter.next();
 				loreList = new ArrayList<String>();
-				loreList.add(ChatColor.DARK_BLUE+MessagePath.LABEL_KNIGHT.getMessage());
 				loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
+				loreList.add(ChatColor.DARK_BLUE+MessagePath.LABEL_KNIGHT.getMessage());
 		    	loreList.add(ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage());
 		    	PlayerIcon player = new PlayerIcon(kingdomColor+currentKnight.getName(),loreList,currentKnight,slotIndex,true,IconAction.DISPLAY_INFO);
 				newMenu.getPage(pageNum).addIcon(player);
@@ -854,8 +854,8 @@ public class DisplayManager {
 				/* Player Icon (n) */
 				OfflinePlayer currentResident = residentIter.next();
 				loreList = new ArrayList<String>();
-				loreList.add(ChatColor.WHITE+MessagePath.LABEL_RESIDENT.getMessage());
 				loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
+				loreList.add(ChatColor.WHITE+MessagePath.LABEL_RESIDENT.getMessage());
 		    	loreList.add(ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage());
 		    	PlayerIcon player = new PlayerIcon(kingdomColor+currentResident.getName(),loreList,currentResident,slotIndex,true,IconAction.DISPLAY_INFO);
 				newMenu.getPage(pageNum).addIcon(player);

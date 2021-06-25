@@ -247,12 +247,14 @@ public class KingdomManager {
 					return 3;
 				}
 				// Verify proximity to other territories
-				if(konquest.distanceInChunks(loc, kingdom.getCapital().getCenterLoc()) < min_distance_capital) {
+				if(loc.getWorld().equals(kingdom.getCapital().getCenterLoc().getWorld()) && 
+						konquest.distanceInChunks(loc, kingdom.getCapital().getCenterLoc()) < min_distance_capital) {
 					ChatUtil.printDebug("Failed to add town, too close to capital "+kingdom.getCapital().getName());
 					return 5;
 				}
 				for(KonTown town : kingdom.getTowns()) {
-					if(konquest.distanceInChunks(loc, town.getCenterLoc()) < min_distance_town) {
+					if(loc.getWorld().equals(town.getCenterLoc().getWorld()) && 
+							konquest.distanceInChunks(loc, town.getCenterLoc()) < min_distance_town) {
 						ChatUtil.printDebug("Failed to add town, too close to town "+town.getName());
 						return 5;
 					}
@@ -263,7 +265,8 @@ public class KingdomManager {
 					ChatUtil.printDebug("Failed to add town, name equals existing ruin: "+name);
 					return 3;
 				}
-				if(konquest.distanceInChunks(loc, ruin.getCenterLoc()) < min_distance_town) {
+				if(loc.getWorld().equals(ruin.getCenterLoc().getWorld()) && 
+						konquest.distanceInChunks(loc, ruin.getCenterLoc()) < min_distance_town) {
 					ChatUtil.printDebug("Failed to add town, too close to ruin "+ruin.getName());
 					return 5;
 				}
@@ -383,7 +386,7 @@ public class KingdomManager {
 				} else {
 					int closestDist = konquest.distanceInChunks(loc, closestAdjTerr.getCenterLoc());
 					int currentDist = konquest.distanceInChunks(loc, getChunkTerritory(sideChunk).getCenterLoc());
-					if(currentDist < closestDist) {
+					if(currentDist != -1 && closestDist != -1 && currentDist < closestDist) {
 						closestAdjTerr = getChunkTerritory(sideChunk);
 					}
 				}
@@ -843,7 +846,7 @@ public class KingdomManager {
 			if(!kingdom.equals(friendlyKingdom)) {
 				for(KonTown town : kingdom.getTowns()) {
 					int townDist = konquest.distanceInChunks(chunk, town.getCenterLoc().getChunk());
-					if(townDist < minDistance && chunk.getWorld().equals(town.getCenterLoc().getWorld())) {
+					if(townDist != -1 && townDist < minDistance && chunk.getWorld().equals(town.getCenterLoc().getWorld())) {
 						minDistance = townDist;
 						closestTerritory = town;
 					}
@@ -913,17 +916,20 @@ public class KingdomManager {
 		int min_distance_capital = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
 		int min_distance_town = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
 		for(KonKingdom kingdom : kingdomMap.values()) {
-			if(konquest.distanceInChunks(loc, kingdom.getCapital().getCenterLoc()) < min_distance_capital) {
+			if(loc.getWorld().equals(kingdom.getCapital().getCenterLoc().getWorld()) && 
+					konquest.distanceInChunks(loc, kingdom.getCapital().getCenterLoc()) < min_distance_capital) {
 				return false;
 			}
 			for(KonTown town : kingdom.getTowns()) {
-				if(konquest.distanceInChunks(loc, town.getCenterLoc()) < min_distance_town) {
+				if(loc.getWorld().equals(town.getCenterLoc().getWorld()) && 
+						konquest.distanceInChunks(loc, town.getCenterLoc()) < min_distance_town) {
 					return false;
 				}
 			}
 		}
 		for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			if(konquest.distanceInChunks(loc, ruin.getCenterLoc()) < min_distance_town) {
+			if(loc.getWorld().equals(ruin.getCenterLoc().getWorld()) && 
+					konquest.distanceInChunks(loc, ruin.getCenterLoc()) < min_distance_town) {
 				return false;
 			}
 		}
@@ -1949,24 +1955,24 @@ public class KingdomManager {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Generate Map
     	Point originPoint = konquest.toPoint(center);
-    	String mapWildSymbol = "-";
-    	String mapTownSymbol = "+";
-    	String mapCampSymbol = "=";
-    	String mapRuinSymbol = "%";
-    	String mapCapitalSymbol = "#";
+    	String mapWildSymbol = "\u20DE";// empty square "-";
+    	String mapTownSymbol = "\u229E";// plus in square "+";
+    	String mapCampSymbol = "\u229F";// minus in square "=";
+    	String mapRuinSymbol = "\u22A1";// dot in square "%";
+    	String mapCapitalSymbol = "\u22A0";// cross in square "#";
     	String[][] map = new String[mapSize][mapSize];
     	// Determine player's direction
     	BlockFace playerFace = bukkitPlayer.getFacing();
     	String mapPlayer = "!";
     	ChatColor playerColor = ChatColor.YELLOW;
     	if(playerFace.equals(BlockFace.NORTH)) {
-    		mapPlayer = "^";
+    		mapPlayer = "\u21D1";// "^";
     	} else if(playerFace.equals(BlockFace.EAST)) {
-    		mapPlayer = ">";
+    		mapPlayer = "\u21D2";// ">";
     	} else if(playerFace.equals(BlockFace.SOUTH)) {
-    		mapPlayer = "v";
+    		mapPlayer = "\u21D3";// "v";
     	} else if(playerFace.equals(BlockFace.WEST)) {
-    		mapPlayer = "<";
+    		mapPlayer = "\u21D0";// "<";
     	}
     	// Determine settlement status
     	String settleTip = "Settle Here";

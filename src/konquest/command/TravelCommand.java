@@ -145,9 +145,18 @@ public class TravelCommand extends CommandBase {
 	        	boolean isTravelAlwaysAllowed = getKonquest().getConfigManager().getConfig("core").getBoolean("core.favor.allow_travel_always",true);
 	        	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel",0.0);
 	        	double cost_per_chunk = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel_per_chunk",0.0);
+	        	double cost_world = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel_world",0.0);
 	        	cost = (cost < 0) ? 0 : cost;
 	        	cost_per_chunk = (cost_per_chunk < 0) ? 0 : cost_per_chunk;
-	        	double total_cost = cost + cost_per_chunk*getKonquest().distanceInChunks(travelLoc,bukkitPlayer.getLocation());
+	        	double total_cost = 0;
+	        	int chunkDistance = getKonquest().distanceInChunks(travelLoc,bukkitPlayer.getLocation());
+	        	if(chunkDistance >= 0) {
+	        		// Value is chunk distance within the same world
+	        		total_cost = cost + cost_per_chunk*chunkDistance;
+	        	} else {
+	        		// Value of -1 means travel points are between different worlds
+	        		total_cost = cost + cost_world;
+	        	}
 				if(!isTravelAlwaysAllowed && total_cost > 0) {
 					if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < total_cost) {
 						//ChatUtil.sendError((Player) getSender(), "Not enough Favor, need "+total_cost);

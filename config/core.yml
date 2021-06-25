@@ -1,6 +1,8 @@
 # Core Konquest Settings
-# (*) means the server must be restarted for a change to take effect, else use the "/k admin reload" command. NEVER USE /reload.
-# [LEGACY] means a setting is not used in the current version, but still exists to support backwards compatability with previous Konquest versions.
+#    (*) means the server must be restarted for a change to take effect, else use the "/k admin reload" command. NEVER USE /reload.
+#    [LEGACY] means a setting is not used in the current version, but still exists to support backwards compatability with previous Konquest versions.
+#    Lines that begin with "#" (the entire top-half of this file) are comments and do not control any settings.
+# 
 # language*:                        Language file selection, must match a file name in the /lang folder (e.g. english for lang/english.yml)
 # core:
 #  debug*:                          Enable debug messages for verbose console messages (true/false)
@@ -73,6 +75,7 @@
 #    cost_claim:                    Cost to claim land (decimal >= 0)
 #    cost_travel:                   Cost to travel (decimal >= 0)
 #    cost_travel_per_chunk:         Additional cost to travel per-chunk (decimal >= 0)
+#    cost_travel_world:             Cost to travel between worlds (decimal >= 0)
 #    allow_travel_always:           Allow players to travel even when they can't pay the cost (true/false)
 #    rewards:
 #      settle_town:                 Quest reward for settling a town, requires konquest.directive.settle permission (integer >= 0)
@@ -168,6 +171,7 @@ core:
     cost_claim: 10
     cost_travel: 1
     cost_travel_per_chunk: 0.01
+    cost_travel_world: 5
     allow_travel_always: true
     rewards:
       settle_town: 50

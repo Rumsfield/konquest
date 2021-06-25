@@ -405,7 +405,7 @@ public class Konquest implements Timeable {
 	    					int upgradeLevel = upgradeManager.getTownUpgradeLevel(town, KonUpgrade.COUNTER);
 	    					if(upgradeLevel < 2) {
 	    						int townDist = distanceInChunks(player.getBukkitPlayer().getLocation().getChunk(), town.getCenterLoc().getChunk());
-	    						if(townDist < minDistance) {
+	    						if(townDist != -1 && townDist < minDistance) {
 	    							minDistance = townDist;
 	    							nearestTerritory = town;
 	    						}
@@ -509,15 +509,17 @@ public class Konquest implements Timeable {
 	}
 	
 	public int distanceInChunks(Location loc1, Location loc2) {
-		int diffX = Math.abs(loc1.getChunk().getX() - loc2.getChunk().getX());
-		int diffZ = Math.abs(loc1.getChunk().getZ() - loc2.getChunk().getZ());
-		return Math.max(diffX, diffZ);
+		return distanceInChunks(loc1.getChunk(), loc2.getChunk());
 	}
 	
 	public int distanceInChunks(Chunk chunk1, Chunk chunk2) {
-		int diffX = Math.abs(chunk1.getX() - chunk2.getX());
-		int diffZ = Math.abs(chunk1.getZ() - chunk2.getZ());
-		return Math.max(diffX, diffZ);
+		if(chunk1.getWorld().equals(chunk2.getWorld())) {
+			int diffX = Math.abs(chunk1.getX() - chunk2.getX());
+			int diffZ = Math.abs(chunk1.getZ() - chunk2.getZ());
+			return Math.max(diffX, diffZ);
+		} else {
+			return -1;
+		}
 	}
 	
 	public String formatPointsToString(Collection<Point> points) {

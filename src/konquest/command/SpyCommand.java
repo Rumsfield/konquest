@@ -89,7 +89,7 @@ public class SpyCommand extends CommandBase {
 					int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.COUNTER);
 					if(upgradeLevel < 1) {
 						int townDist = getKonquest().distanceInChunks(bukkitPlayer.getLocation().getChunk(), town.getCenterLoc().getChunk());
-						if(townDist < minDistance) {
+						if(townDist != -1 && townDist < minDistance) {
 							minDistance = townDist;
 							closestTerritory = town;
 						}
