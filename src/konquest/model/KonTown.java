@@ -835,6 +835,18 @@ public class KonTown extends KonTerritory implements Timeable{
 		}
 	}
 	
+	public boolean isTownWatchProtected() {
+		boolean result = false;
+		int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(this, KonUpgrade.WATCH);
+		if(upgradeLevel > 0) {
+			int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
+			if(getNumResidentsOnline() < minimumOnlineResidents) {
+				result = true;
+			}
+		}
+		return result;
+	}
+	
 	public void spawnRabbit() {
 		rabbit.spawn();
 	}

@@ -359,12 +359,13 @@ public class DisplayManager {
 		InfoIcon info;
 		// Create fresh paged menu
 		PagedMenu newMenu = new PagedMenu();
-		String kingdomColor = ""+ChatColor.RED;
+		ChatColor kingdomChatColor = ChatColor.RED;
 		if(displayPlayer.getKingdom().equals(scorePlayer.getKingdom())) {
-			kingdomColor = ""+ChatColor.GREEN;
+			kingdomChatColor = ChatColor.GREEN;
 		}
+		String kingdomColor = ""+kingdomChatColor;
 		String loreColor = ""+ChatColor.WHITE;
-		String pageColor = ""+ChatColor.DARK_PURPLE;
+		String pageColor = ""+ChatColor.BLACK;
 		
 		// Page 0
 		pageLabel = pageColor+scorePlayer.getOfflineBukkitPlayer().getName()+" "+MessagePath.LABEL_SCORE.getMessage()+": "+playerScore;
@@ -388,8 +389,10 @@ public class DisplayManager {
 		// Page 1
 		pageLabel = pageColor+scorePlayer.getKingdom().getName()+" "+MessagePath.LABEL_SCORE.getMessage()+": "+kingdomScore;
 		newMenu.addPage(1, 1, pageLabel);
-		info = new InfoIcon(kingdomColor+scorePlayer.getKingdom().getName()+" "+MessagePath.MENU_SCORE_KINGDOM_SCORE.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_SCORE.getMessage()+": "+ChatColor.DARK_PURPLE+kingdomScore), Material.GOLDEN_HELMET, 2, false);
-		newMenu.getPage(1).addIcon(info);
+		//info = new InfoIcon(kingdomColor+scorePlayer.getKingdom().getName()+" "+MessagePath.MENU_SCORE_KINGDOM_SCORE.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_SCORE.getMessage()+": "+ChatColor.DARK_PURPLE+kingdomScore), Material.GOLDEN_HELMET, 2, false);
+		//newMenu.getPage(1).addIcon(info);
+		KingdomIcon kingdomInfo = new KingdomIcon(scorePlayer.getKingdom(),kingdomChatColor,Material.GOLDEN_HELMET,Arrays.asList(loreColor+MessagePath.LABEL_INFORMATION.getMessage(), ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage()),2);
+		newMenu.getPage(1).addIcon(kingdomInfo);
 		info = new InfoIcon(kingdomColor+MessagePath.MENU_SCORE_KINGDOM_TOWNS.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+ChatColor.AQUA+kingdomScoreAttributes.getAttributeValue(KonKingdomScoreAttribute.TOWNS), loreColor+MessagePath.LABEL_SCORE.getMessage()+": "+ChatColor.DARK_PURPLE+kingdomScoreAttributes.getAttributeScore(KonKingdomScoreAttribute.TOWNS)), Material.OBSIDIAN, 3, false);
 		newMenu.getPage(1).addIcon(info);
 		info = new InfoIcon(kingdomColor+MessagePath.MENU_SCORE_KINGDOM_LAND.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+ChatColor.AQUA+kingdomScoreAttributes.getAttributeValue(KonKingdomScoreAttribute.LAND), loreColor+MessagePath.LABEL_SCORE.getMessage()+": "+ChatColor.DARK_PURPLE+kingdomScoreAttributes.getAttributeScore(KonKingdomScoreAttribute.LAND)), Material.GRASS_BLOCK, 4, false);
@@ -465,7 +468,7 @@ public class DisplayManager {
 		String loreColor = ""+ChatColor.WHITE;
 		String valueColor = ""+ChatColor.AQUA;
 		String pageLabel = "";
-		String pageColor = ""+ChatColor.GOLD;
+		String pageColor = ""+ChatColor.BLACK;
     	
  		// Create fresh paged menu
  		PagedMenu newMenu = new PagedMenu();
@@ -564,7 +567,7 @@ public class DisplayManager {
 		String loreColor = ""+ChatColor.WHITE;
 		String valueColor = ""+ChatColor.AQUA;
 		String pageLabel = "";
-		String pageColor = ""+ChatColor.GOLD;
+		String pageColor = ""+ChatColor.BLACK;
     	
  		// Create fresh paged menu
  		PagedMenu newMenu = new PagedMenu();
@@ -682,7 +685,7 @@ public class DisplayManager {
 		String loreColor = ""+ChatColor.WHITE;
 		String valueColor = ""+ChatColor.AQUA;
 		String pageLabel = "";
-		String pageColor = ""+ChatColor.GOLD;
+		String pageColor = ""+ChatColor.BLACK;
 		
 		List<OfflinePlayer> townKnights = new ArrayList<OfflinePlayer>();
 		List<OfflinePlayer> townResidents = new ArrayList<OfflinePlayer>();
@@ -749,7 +752,7 @@ public class DisplayManager {
 		newMenu.getPage(0).addIcon(info);
 		/* Properties Info Icon (5) */
     	String isOpen = boolean2Symbol(infoTown.isOpen());
-    	String isProtected = boolean2Symbol(infoTown.isCaptureDisabled());
+    	String isProtected = boolean2Symbol((infoTown.isCaptureDisabled() || infoTown.getKingdom().isOfflineProtected() || infoTown.isTownWatchProtected()));
     	String isAttacked = boolean2Symbol(infoTown.isAttacked());
     	loreList = new ArrayList<String>();
     	loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
