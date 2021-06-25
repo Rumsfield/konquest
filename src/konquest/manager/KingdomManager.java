@@ -1955,24 +1955,24 @@ public class KingdomManager {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Generate Map
     	Point originPoint = konquest.toPoint(center);
-    	String mapWildSymbol = "\u20DE";// empty square "-";
-    	String mapTownSymbol = "\u229E";// plus in square "+";
-    	String mapCampSymbol = "\u229F";// minus in square "=";
-    	String mapRuinSymbol = "\u22A1";// dot in square "%";
-    	String mapCapitalSymbol = "\u22A0";// cross in square "#";
+    	String mapWildSymbol = "\u25A2";// empty square "-";
+    	String mapTownSymbol = "\u25A4";// plus in square "+";
+    	String mapCampSymbol = "\u25A7";// minus in square "=";
+    	String mapRuinSymbol = "\u25A9";// dot in square "%";
+    	String mapCapitalSymbol = "\u25A5";// cross in square "#";
     	String[][] map = new String[mapSize][mapSize];
     	// Determine player's direction
     	BlockFace playerFace = bukkitPlayer.getFacing();
     	String mapPlayer = "!";
     	ChatColor playerColor = ChatColor.YELLOW;
     	if(playerFace.equals(BlockFace.NORTH)) {
-    		mapPlayer = "\u21D1";// "^";
+    		mapPlayer = "\u25B3";// "^";
     	} else if(playerFace.equals(BlockFace.EAST)) {
-    		mapPlayer = "\u21D2";// ">";
+    		mapPlayer = "\u25B7";// ">";
     	} else if(playerFace.equals(BlockFace.SOUTH)) {
-    		mapPlayer = "\u21D3";// "v";
+    		mapPlayer = "\u25BD";// "v";
     	} else if(playerFace.equals(BlockFace.WEST)) {
-    		mapPlayer = "\u21D0";// "<";
+    		mapPlayer = "\u25C1";// "<";
     	}
     	// Determine settlement status
     	String settleTip = "Settle Here";

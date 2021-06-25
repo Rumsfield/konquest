@@ -342,7 +342,7 @@ command:
       fail-template: "Invalid Monument Template. Use \"/k admin monument <kingdom> create\""
       fail-proximity: "Town is too close to another territory. Currently %s chunks away, must be at least %s."
       fail-flat: "Your chunk area is not flat enough. Press F3+G to view chunk boundaries. Cut down trees and flatten the ground!"
-      fail-height: "Elevation is too high. Try settling somewhere lower."
+      fail-height: "Bad elevation, try settling somewhere higher or lower."
       fail-air: "Too much air or water below. Try settling somewhere else, or remove all air/water below you."
       fail-init: "Town could not claim initial chunks."
   spy:

@@ -140,7 +140,7 @@ core:
     max_player_diff: 4
     allow_exile_switch: true
   towns:
-    min_settle_height: 20
+    min_settle_height: 2
     max_settle_height: 200
     min_distance_town: 16
     min_distance_capital: 16
