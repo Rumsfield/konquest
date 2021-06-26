@@ -642,6 +642,8 @@ public class DisplayManager {
 				/* Town Icon (n) */
 				KonTown currentTown = townIter.next();
 				loreList = new ArrayList<String>();
+				loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+currentTown.getNumResidents());
+		    	loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+currentTown.getChunkList().size());
 				Material currentMat = Material.BEDROCK;
 				if(currentTown.isAttacked()) {
 					currentMat = Material.RED_WOOL;
@@ -650,8 +652,6 @@ public class DisplayManager {
 					currentMat = Material.GRAY_STAINED_GLASS;
 					loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.LABEL_OPEN.getMessage());
 				}
-		    	loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+currentTown.getNumResidents());
-		    	loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+currentTown.getChunkList().size());
 		    	loreList.add(ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage());
 		    	TownIcon town = new TownIcon(currentTown,isFriendly,currentMat,loreList,slotIndex);
 				newMenu.getPage(pageNum).addIcon(town);

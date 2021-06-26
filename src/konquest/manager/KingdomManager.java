@@ -1966,13 +1966,13 @@ public class KingdomManager {
     	String mapPlayer = "!";
     	ChatColor playerColor = ChatColor.YELLOW;
     	if(playerFace.equals(BlockFace.NORTH)) {
-    		mapPlayer = "\u25B3";// "^";
+    		mapPlayer = "\u25B2";// "\u25B3";// "^";
     	} else if(playerFace.equals(BlockFace.EAST)) {
-    		mapPlayer = "\u25B7";// ">";
+    		mapPlayer = "\u25B6";// "\u25B7";// ">";
     	} else if(playerFace.equals(BlockFace.SOUTH)) {
-    		mapPlayer = "\u25BD";// "v";
+    		mapPlayer = "\u25BC";// "\u25BD";// "v";
     	} else if(playerFace.equals(BlockFace.WEST)) {
-    		mapPlayer = "\u25C1";// "<";
+    		mapPlayer = "\u25C0";// "\u25C1";// "<";
     	}
     	// Determine settlement status
     	String settleTip = MessagePath.MENU_MAP_SETTLE_HINT.getMessage();
