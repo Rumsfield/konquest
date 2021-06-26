@@ -188,13 +188,13 @@ public class KonTown extends KonTerritory implements Timeable{
         int bottomBlockY = Math.min(template.getCornerOne().getBlockY(), template.getCornerTwo().getBlockY());
         int bottomBlockZ = Math.min(template.getCornerOne().getBlockZ(), template.getCornerTwo().getBlockZ());
 
-        ChunkSnapshot chunkSnapshot = getWorld().getChunkAt(getCenterLoc()).getChunkSnapshot(true,false,false);
+        ChunkSnapshot templateChunkSnapshot = template.getCornerOne().getWorld().getChunkAt(template.getCornerOne()).getChunkSnapshot(true,false,false);
         Chunk fillChunk = getWorld().getChunkAt(getCenterLoc());
         int base_y = 0;
         int monument_y = monument.getBaseY();
         for (int x = bottomBlockX; x <= topBlockX; x++) {
             for (int z = bottomBlockZ; z <= topBlockZ; z++) {
-            	base_y = chunkSnapshot.getHighestBlockYAt(x-bottomBlockX, z-bottomBlockZ);
+            	base_y = templateChunkSnapshot.getHighestBlockYAt(x-bottomBlockX, z-bottomBlockZ);
                 // Fill air between world and monument base
                 if(base_y < monument_y) {
                 	for (int k = base_y; k <= monument_y; k++) {
@@ -204,7 +204,7 @@ public class KonTown extends KonTerritory implements Timeable{
             }
         }
         
-        BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
+        BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),template.getCornerOne(),bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
         for (int y = bottomBlockY; y <= topBlockY; y++) {
         	monumentPaster.setY(y);
         	//BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),y,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);

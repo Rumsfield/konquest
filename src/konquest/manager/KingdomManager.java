@@ -1955,11 +1955,11 @@ public class KingdomManager {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Generate Map
     	Point originPoint = konquest.toPoint(center);
-    	String mapWildSymbol = "\u25A2";// empty square "-";
-    	String mapTownSymbol = "\u25A4";// plus in square "+";
-    	String mapCampSymbol = "\u25A7";// minus in square "=";
-    	String mapRuinSymbol = "\u25A9";// dot in square "%";
-    	String mapCapitalSymbol = "\u25A5";// cross in square "#";
+    	String mapWildSymbol = "-"; // "\u25A2";// empty square "-";
+    	String mapTownSymbol = "+"; // "\u25A4";// plus in square "+";
+    	String mapCampSymbol = "="; // "\u25A7";// minus in square "=";
+    	String mapRuinSymbol = "%"; // "\u25A9";// dot in square "%";
+    	String mapCapitalSymbol = "#"; // "\u25A5";// cross in square "#";
     	String[][] map = new String[mapSize][mapSize];
     	// Determine player's direction
     	BlockFace playerFace = bukkitPlayer.getFacing();
@@ -1975,7 +1975,7 @@ public class KingdomManager {
     		mapPlayer = "\u25C1";// "<";
     	}
     	// Determine settlement status
-    	String settleTip = "Settle Here";
+    	String settleTip = MessagePath.MENU_MAP_SETTLE_HINT.getMessage();
     	if(isLocValidSettlement(center)) {
     		settleTip = ChatColor.GOLD+settleTip;
     	} else {
@@ -2067,7 +2067,7 @@ public class KingdomManager {
     		distance = 99;
     	}
     	// Display map
-    	String header = ChatColor.GOLD+"Map Center: "+(int)originPoint.getX()+","+(int)originPoint.getY();
+    	String header = ChatColor.GOLD+MessagePath.MENU_MAP_CENTER.getMessage()+": "+(int)originPoint.getX()+","+(int)originPoint.getY();
     	ChatUtil.sendNotice(bukkitPlayer, header);
     	String[] compassRose = {"   N  ",
     	                        " W * E",
@@ -2084,7 +2084,7 @@ public class KingdomManager {
     			mapLine = mapLine + " " + settleTip;
     		}
     		if(i == mapSize-7) {
-    			mapLine = mapLine + " " + closestTerritoryColor+"Proximity: "+distance;
+    			mapLine = mapLine + " " + closestTerritoryColor+MessagePath.MENU_MAP_PROXIMITY.getMessage()+": "+distance;
     		}
     		ChatUtil.sendMessage(bukkitPlayer, mapLine);
     	}

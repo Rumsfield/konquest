@@ -89,6 +89,10 @@ menu:
     land-3: "Resident Town Land"
     player-score: "Player Score"
     hint: "Click to view"
+  map:
+    center: "Map Center"
+    proximity: "Proximity"
+    settle-hint: "Settle Here"
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."
@@ -108,6 +112,7 @@ generic:
     quest: "Quest complete"
     loot: "New town monument loot is available."
     absent: "You have been absent for too long and have been kicked from all towns."
+    settle-hint: "Settle Here"
   error:
     deny-barbarian: "Barbarians cannot do this."
     internal: "Internal error, contact an admin."

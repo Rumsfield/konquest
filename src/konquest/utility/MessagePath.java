@@ -81,6 +81,9 @@ public enum MessagePath {
 	MENU_SCORE_LAND_3                           (0, "menu.score.land-3"),
 	MENU_SCORE_PLAYER_SCORE                     (0, "menu.score.player-score"),
 	MENU_SCORE_HINT                             (0, "menu.score.hint"),
+	MENU_MAP_CENTER                             (0, "menu.map.center"),
+	MENU_MAP_PROXIMITY                          (0, "menu.map.proximity"),
+	MENU_MAP_SETTLE_HINT                        (0, "menu.map.settle-hint"),
 
 	GENERIC_NOTICE_ENABLE_AUTO                  (0, "generic.notice.enable-auto"),
 	GENERIC_NOTICE_DISABLE_AUTO                 (0, "generic.notice.disable-auto"),

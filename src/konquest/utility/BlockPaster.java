@@ -15,6 +15,7 @@ public class BlockPaster {
     //private BukkitTask task;
     //private int taskID;
     Location centerLoc;
+    Location templateLoc;
     private int y;
     private int y_offset;
     private int bottomBlockY;
@@ -23,10 +24,11 @@ public class BlockPaster {
     private int bottomBlockX;
     private int bottomBlockZ;
     
-    public BlockPaster(Location centerLoc, int y, int y_offset, int bottomBlockY, int topBlockX, int topBlockZ, int bottomBlockX, int bottomBlockZ) {
+    public BlockPaster(Location centerLoc, Location templateLoc, int y, int y_offset, int bottomBlockY, int topBlockX, int topBlockZ, int bottomBlockX, int bottomBlockZ) {
     	//this.taskID = 0;
     	//this.scheduler = Bukkit.getScheduler();
     	this.centerLoc = centerLoc;
+    	this.templateLoc = templateLoc;
     	this.y = y;
     	this.y_offset = y_offset;
     	this.bottomBlockY = bottomBlockY;
@@ -42,12 +44,12 @@ public class BlockPaster {
     }
     
     public void startPaste() {
-    	World world = centerLoc.getWorld();
-    	Chunk chunk = world.getChunkAt(centerLoc);
+    	World templateWorld = templateLoc.getWorld();
+    	Chunk centerChunk = centerLoc.getWorld().getChunkAt(centerLoc);
     	for (int x = bottomBlockX; x <= topBlockX; x++) {
             for (int z = bottomBlockZ; z <= topBlockZ; z++) {
-                Block templateBlock = world.getBlockAt(x, y, z);
-                Block monumentBlock = chunk.getBlock(x-bottomBlockX, y-bottomBlockY+y_offset, z-bottomBlockZ);
+                Block templateBlock = templateWorld.getBlockAt(x, y, z);
+                Block monumentBlock = centerChunk.getBlock(x-bottomBlockX, y-bottomBlockY+y_offset, z-bottomBlockZ);
                 if(!monumentBlock.getBlockData().matches(templateBlock.getBlockData())) {
                 	// Set local block to monument template block
                     monumentBlock.setType(templateBlock.getType());
