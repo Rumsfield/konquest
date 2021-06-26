@@ -1173,32 +1173,35 @@ public class KingdomManager {
 	}
 
 	public void updateKingdomOfflineProtection() {
+		boolean isOfflineProtectedEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline",true);
 		int offlineProtectedWarmupSeconds = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.no_enemy_edit_offline_warmup",0);
 		int offlineProtectedMinimumPlayers = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.no_enemy_edit_offline_minimum",0);
-		// For each kingdom, start protection warmup timer if no players are online, else ensure the timer is stopped
-		for(KonKingdom kingdom : getKingdoms()) {
-			ArrayList<KonPlayer> onlineKingdomPlayers = konquest.getPlayerManager().getPlayersInKingdom(kingdom.getName());
-			int numOnlineKingdomPlayers = onlineKingdomPlayers.size();
-			if((offlineProtectedMinimumPlayers <= 0 && onlineKingdomPlayers.isEmpty()) || (numOnlineKingdomPlayers < offlineProtectedMinimumPlayers)) {
-				Timer protectedWarmupTimer = kingdom.getProtectedWarmupTimer();
-				if(offlineProtectedWarmupSeconds > 0 && protectedWarmupTimer.getTime() == -1 && !kingdom.isOfflineProtected()) {
-					// start timer
-					ChatUtil.printDebug("Starting kingdom protection warmup timer for "+offlineProtectedWarmupSeconds+" seconds: "+kingdom.getName());
+		if(isOfflineProtectedEnabled) {
+			// For each kingdom, start protection warmup timer if no players are online, else ensure the timer is stopped
+			for(KonKingdom kingdom : getKingdoms()) {
+				ArrayList<KonPlayer> onlineKingdomPlayers = konquest.getPlayerManager().getPlayersInKingdom(kingdom.getName());
+				int numOnlineKingdomPlayers = onlineKingdomPlayers.size();
+				if((offlineProtectedMinimumPlayers <= 0 && onlineKingdomPlayers.isEmpty()) || (numOnlineKingdomPlayers < offlineProtectedMinimumPlayers)) {
+					Timer protectedWarmupTimer = kingdom.getProtectedWarmupTimer();
+					if(offlineProtectedWarmupSeconds > 0 && protectedWarmupTimer.getTime() == -1 && !kingdom.isOfflineProtected()) {
+						// start timer
+						ChatUtil.printDebug("Starting kingdom protection warmup timer for "+offlineProtectedWarmupSeconds+" seconds: "+kingdom.getName());
+						protectedWarmupTimer.stopTimer();
+						protectedWarmupTimer.setTime(offlineProtectedWarmupSeconds);
+						protectedWarmupTimer.startTimer();
+						int warmupMinutes = offlineProtectedWarmupSeconds / 60;
+						int warmupSeconds = offlineProtectedWarmupSeconds % 60;
+						String warmupTime = String.format("%d:%02d", warmupMinutes , warmupSeconds);
+						//ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+"The Kingdom of "+ChatColor.RED+kingdom.getName()+ChatColor.LIGHT_PURPLE+" will be protected in "+ChatColor.AQUA+warmupTime+ChatColor.LIGHT_PURPLE+" minutes.");
+						ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_NOTICE_KINGDOM_WARMUP.getMessage(kingdom.getName(),warmupTime));
+					}
+				} else {
+					// stop timer, clear protection
+					//ChatUtil.printDebug("Clearing kingdom protection: "+kingdom.getName());
+					Timer protectedWarmupTimer = kingdom.getProtectedWarmupTimer();
+					kingdom.setOfflineProtected(false);
 					protectedWarmupTimer.stopTimer();
-					protectedWarmupTimer.setTime(offlineProtectedWarmupSeconds);
-					protectedWarmupTimer.startTimer();
-					int warmupMinutes = offlineProtectedWarmupSeconds / 60;
-					int warmupSeconds = offlineProtectedWarmupSeconds % 60;
-					String warmupTime = String.format("%d:%02d", warmupMinutes , warmupSeconds);
-					//ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+"The Kingdom of "+ChatColor.RED+kingdom.getName()+ChatColor.LIGHT_PURPLE+" will be protected in "+ChatColor.AQUA+warmupTime+ChatColor.LIGHT_PURPLE+" minutes.");
-					ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_NOTICE_KINGDOM_WARMUP.getMessage(kingdom.getName(),warmupTime));
 				}
-			} else {
-				// stop timer, clear protection
-				//ChatUtil.printDebug("Clearing kingdom protection: "+kingdom.getName());
-				Timer protectedWarmupTimer = kingdom.getProtectedWarmupTimer();
-				kingdom.setOfflineProtected(false);
-				protectedWarmupTimer.stopTimer();
 			}
 		}
 	}

@@ -650,6 +650,13 @@ public class Konquest implements Timeable {
 			}
 		}
 		ChatUtil.printDebug("Got safe centered location "+randLoc.getX()+","+randLoc.getY()+","+randLoc.getZ());
+		double x0,x1,z0,z1;
+		x0 = randLoc.getX();
+		x1 = center.getX();
+		z0 = randLoc.getZ();
+		z1 = center.getZ();
+		float yaw = (float)(180-(Math.atan2((x0-x1),(z0-z1))*180/Math.PI));
+		randLoc.setYaw(yaw);
 		return randLoc;
 	}
 	/*
