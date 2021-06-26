@@ -45,6 +45,7 @@ public class FlagAdminCommand extends CommandBase {
 	            		// Assign flag value
 	            		boolean bValue = Boolean.valueOf(flagValue);
 	            		getKonquest().getKingdomManager().getKingdom(kingdomName).setPeaceful(bValue);
+	            		ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 	            	}
 	                break;
                 default:
