@@ -84,7 +84,7 @@ public enum MessagePath {
 	MENU_MAP_CENTER                             (0, "menu.map.center"),
 	MENU_MAP_PROXIMITY                          (0, "menu.map.proximity"),
 	MENU_MAP_SETTLE_HINT                        (0, "menu.map.settle-hint"),
-	MENU_PREFIX_OFF                             (0, "menu.prefix.off"),
+	MENU_PREFIX_DISABLE                         (0, "menu.prefix.disable"),
 	MENU_PREFIX_HINT_DISABLE                    (0, "menu.prefix.hint-disable"),
 	MENU_PREFIX_HINT_APPLY                      (0, "menu.prefix.hint-apply"),
 

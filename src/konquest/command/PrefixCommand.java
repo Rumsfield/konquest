@@ -70,6 +70,7 @@ public class PrefixCommand extends CommandBase {
         		}
         	} else {
         		// Bad selection, not a prefix
+        		getKonquest().getDisplayManager().displayPrefixMenu(player);
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
         	}
         }

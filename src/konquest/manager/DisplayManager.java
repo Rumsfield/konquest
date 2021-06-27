@@ -907,7 +907,7 @@ public class DisplayManager {
 		
 		// Top row of page 0 is "Off" and info icons
 		// Start a new row for each category. Categories use as many rows as needed to fit all prefixes
-		
+		//ChatUtil.printDebug("Displaying new prefix menu...");
 		// Determine number of pages and rows per category
 		List<KonPrefixType> allPrefixes = new ArrayList<KonPrefixType>();
 		Map<KonPrefixCategory,Double> categoryLevels = new HashMap<KonPrefixCategory,Double>();
@@ -933,18 +933,21 @@ public class DisplayManager {
 			// count is total number of icons per category
 			// 9 icons per row
 			int rows = (int)Math.ceil(((double)count)/ICONS_PER_ROW);
+			//ChatUtil.printDebug("  Counted "+rows+" rows for category "+category.getTitle());
 			totalRows += rows;
 		}
 		int pageTotal = (int)Math.ceil(((double)totalRows)/MAX_ROWS_PER_PAGE);
+		//ChatUtil.printDebug("  Counted "+totalRows+" total rows");
 		
 		// Page 0+
 		int pageNum = 0;
 		PrefixIcon prefixIcon;
 		ListIterator<KonPrefixType> prefixIter = allPrefixes.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = ((totalRows - i*MAX_ROWS_PER_PAGE) % MAX_ROWS_PER_PAGE);
+			int numPageRows = Math.min((totalRows - i*MAX_ROWS_PER_PAGE),MAX_ROWS_PER_PAGE);
 			pageLabel = ChatColor.BLACK+playerPrefix+" "+displayPlayer.getBukkitPlayer().getName()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
+			//ChatUtil.printDebug("  Created page "+i+" with "+numPageRows+" rows");
 			int slotIndex = 0;
 			// Off and Info Icons on first row of page 0
 			if(pageNum == 0) {
@@ -957,11 +960,14 @@ public class DisplayManager {
 			while(slotIndex < (numPageRows*ICONS_PER_ROW) && prefixIter.hasNext()) {
 				/* Prefix Icon (n) */
 				KonPrefixType prefix = prefixIter.next();
-				double categoryLevel = categoryLevels.get(prefix.category());
+				String categoryLevel = String.format("%.2f",categoryLevels.get(prefix.category()));
+				String categoryFormat = ChatColor.WHITE+prefix.category().getTitle();
+				String levelFormat = ChatColor.DARK_GREEN+categoryLevel+ChatColor.WHITE+"/"+ChatColor.AQUA+prefix.level();
 				if(displayPlayer.getPlayerPrefix().hasPrefix(prefix)) {
-					prefixIcon = new PrefixIcon(prefix,Arrays.asList(prefix.category().getTitle(),categoryLevel+"/"+prefix.level(),ChatColor.GOLD+MessagePath.MENU_PREFIX_HINT_APPLY.getMessage()),slotIndex,true,PrefixIconAction.APPLY_PREFIX);
+					prefixIcon = new PrefixIcon(prefix,Arrays.asList(categoryFormat,levelFormat,ChatColor.GOLD+MessagePath.MENU_PREFIX_HINT_APPLY.getMessage()),slotIndex,true,PrefixIconAction.APPLY_PREFIX);
 				} else {
-					prefixIcon = new PrefixIcon(prefix,Arrays.asList(prefix.category().getTitle(),categoryLevel+"/"+prefix.level()),slotIndex,false,PrefixIconAction.APPLY_PREFIX);
+					levelFormat = ChatColor.DARK_RED+categoryLevel+ChatColor.WHITE+"/"+ChatColor.AQUA+prefix.level();
+					prefixIcon = new PrefixIcon(prefix,Arrays.asList(categoryFormat,levelFormat),slotIndex,false,PrefixIconAction.APPLY_PREFIX);
 				}
 				newMenu.getPage(pageNum).addIcon(prefixIcon);
 				if(prefixIter.hasNext() && !allPrefixes.get(prefixIter.nextIndex()).category().equals(prefix.category())) {

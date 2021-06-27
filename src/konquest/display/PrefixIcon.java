@@ -35,7 +35,7 @@ public class PrefixIcon implements MenuIcon {
 	}
 	
 	private ItemStack initItem() {
-		ItemStack item = new ItemStack(Material.IRON_BARS);
+		ItemStack item = new ItemStack(Material.CHEST);
 		ItemMeta meta = item.getItemMeta();
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
@@ -45,10 +45,11 @@ public class PrefixIcon implements MenuIcon {
 		ChatColor iconColor = ChatColor.GRAY;
 		if(isClickable) {
 			item.setType(prefix.category().getMaterial());
-			iconColor = ChatColor.LIGHT_PURPLE;
+			iconColor = ChatColor.DARK_GREEN;
 		}
 		if(action.equals(PrefixIconAction.DISABLE_PREFIX)) {
-			meta.setDisplayName(ChatColor.DARK_RED+MessagePath.MENU_PREFIX_OFF.getMessage());
+			item.setType(Material.MILK_BUCKET);
+			meta.setDisplayName(ChatColor.DARK_RED+MessagePath.MENU_PREFIX_DISABLE.getMessage());
 		} else {
 			meta.setDisplayName(iconColor+prefix.getName());
 		}
