@@ -93,6 +93,10 @@ menu:
     center: "Map Center"
     proximity: "Proximity"
     settle-hint: "Settle Here"
+  prefix:
+    off: "Off"
+    hint-disable: "Click to disable"
+    hint-apply: "Click to apply"
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."

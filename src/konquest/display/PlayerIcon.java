@@ -13,7 +13,7 @@ import konquest.Konquest;
 
 public class PlayerIcon implements MenuIcon {
 
-	public enum IconAction {
+	public enum PlayerIconAction {
 		DISPLAY_SCORE,
 		DISPLAY_INFO;
 	}
@@ -23,9 +23,9 @@ public class PlayerIcon implements MenuIcon {
 	private OfflinePlayer player;
 	private int index;
 	private boolean isClickable;
-	private IconAction action;
+	private PlayerIconAction action;
 	
-	public PlayerIcon(String name, List<String> lore, OfflinePlayer player, int index, boolean isClickable, IconAction action) {
+	public PlayerIcon(String name, List<String> lore, OfflinePlayer player, int index, boolean isClickable, PlayerIconAction action) {
 		this.name = name;
 		this.lore = lore;
 		this.player = player;
@@ -51,7 +51,7 @@ public class PlayerIcon implements MenuIcon {
 		return item;
 	}*/
 	
-	public IconAction getAction() {
+	public PlayerIconAction getAction() {
 		return action;
 	}
 	
