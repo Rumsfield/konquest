@@ -16,6 +16,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -870,6 +871,21 @@ public class Konquest implements Timeable {
     		}
     	}
     	return result;
+    }
+    
+    public static void playSuccessSound(Player bukkitPlayer) {
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, (float)1.0, (float)1.1);
+            }
+        },1);
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, (float)1.0, (float)1.5);
+            }
+        },6);
     }
 	
 }

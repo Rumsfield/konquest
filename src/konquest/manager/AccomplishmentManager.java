@@ -191,5 +191,28 @@ public class AccomplishmentManager {
 		book.setItemMeta(meta);
 		player.getBukkitPlayer().openBook(book);
 	}
+	
+	public void disablePlayerPrefix(KonPlayer player) {
+		if(player.getPlayerPrefix().isEnabled()) {
+			player.getPlayerPrefix().setEnable(false);
+			//ChatUtil.sendNotice((Player) getSender(), "Turned off your prefix title");
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_DISABLE.getMessage());
+		} else {
+			//ChatUtil.sendNotice((Player) getSender(), "Your prefix title is already off");
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_DISABLE.getMessage());
+		}
+	}
+	
+	public void applyPlayerPrefix(KonPlayer player, KonPrefixType prefix) {
+		if(player.getPlayerPrefix().selectPrefix(prefix)) {
+			player.getPlayerPrefix().setEnable(true);
+			//ChatUtil.sendNotice((Player) getSender(), "Your prefix is now "+prefixChosen.getName());
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(prefix.getName()));
+			Konquest.playSuccessSound(player.getBukkitPlayer());
+		} else {
+			//ChatUtil.sendNotice((Player) getSender(), "The prefix "+prefixChosen.getName()+" is not unlocked!");
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_NEW.getMessage(prefix.getName()));
+		}
+	}
 
 }

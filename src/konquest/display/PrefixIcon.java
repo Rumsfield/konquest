@@ -62,6 +62,10 @@ public class PrefixIcon implements MenuIcon {
 		return action;
 	}
 	
+	public KonPrefixType getPrefix() {
+		return prefix;
+	}
+	
 	@Override
 	public int getIndex() {
 		return index;

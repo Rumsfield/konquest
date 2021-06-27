@@ -208,6 +208,25 @@ public class DisplayManager {
 							TownIcon icon = (TownIcon)clickedIcon;
 							menuCache.remove(inv);
 							displayTownInfoMenu(clickPlayer,icon.getTown());
+						} else if(clickedIcon instanceof PrefixIcon) {
+							PrefixIcon icon = (PrefixIcon)clickedIcon;
+							menuCache.remove(inv);
+							switch(icon.getAction()) {
+								case DISABLE_PREFIX:
+									konquest.getAccomplishmentManager().disablePlayerPrefix(clickPlayer);
+									break;
+								case APPLY_PREFIX:
+									konquest.getAccomplishmentManager().applyPlayerPrefix(clickPlayer,icon.getPrefix());
+									break;
+								default:
+									break;
+							}
+							Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+					            @Override
+					            public void run() {
+					            	bukkitPlayer.closeInventory();
+					            }
+					        });
 						}
 					}
 				}
