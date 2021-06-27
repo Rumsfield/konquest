@@ -9,6 +9,7 @@ import konquest.listener.PlayerListener;
 import konquest.listener.WorldListener;
 import konquest.utility.ChatUtil;
 
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -101,8 +102,11 @@ public class KonquestPlugin extends JavaPlugin {
 		try {
 			result = econ.getBalance(offlineBukkitPlayer);
 		} catch(Exception e) {
-			e.printStackTrace();
-			result = econ.getBalance(offlineBukkitPlayer.getName());
+			try {
+				result = econ.getBalance(offlineBukkitPlayer.getName());
+			} catch(Exception x) {
+				result = econ.getBalance(formatStringForAConomyPlugin(offlineBukkitPlayer));
+			}
 		}
 		return result;
 	}
@@ -113,8 +117,11 @@ public class KonquestPlugin extends JavaPlugin {
 		try {
 			result = econ.withdrawPlayer(offlineBukkitPlayer, amount);
 		} catch(Exception e) {
-			e.printStackTrace();
-			result = econ.withdrawPlayer(offlineBukkitPlayer.getName(), amount);
+			try {
+				result = econ.withdrawPlayer(offlineBukkitPlayer.getName(), amount);
+			} catch(Exception x) {
+				result = econ.withdrawPlayer(formatStringForAConomyPlugin(offlineBukkitPlayer), amount);
+			}
 		}
 		return result;
 	}
@@ -125,9 +132,27 @@ public class KonquestPlugin extends JavaPlugin {
 		try {
 			result = econ.depositPlayer(offlineBukkitPlayer, amount);
 		} catch(Exception e) {
-			e.printStackTrace();
-			result = econ.depositPlayer(offlineBukkitPlayer.getName(), amount);
+			try {
+				result = econ.depositPlayer(offlineBukkitPlayer.getName(), amount);
+			} catch(Exception x) {
+				result = econ.depositPlayer(formatStringForAConomyPlugin(offlineBukkitPlayer), amount);
+			}
 		}
 		return result;
+	}
+	
+	/**
+	 * This method is stupid, and is specific to unique way that AConomy implements its Vault API methods.
+	 * @param offlineBukkitPlayer
+	 * @return String of player's UUID when server is online-mode=true, else player's lowercase name.
+	 */
+	private static String formatStringForAConomyPlugin(OfflinePlayer offlineBukkitPlayer) {
+		String playerString = "";
+		if(Bukkit.getServer().getOnlineMode()) {
+			playerString = offlineBukkitPlayer.getUniqueId().toString();
+		} else {
+			playerString = offlineBukkitPlayer.getName().toLowerCase();
+		}
+		return playerString;
 	}
 }
