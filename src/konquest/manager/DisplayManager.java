@@ -1070,11 +1070,11 @@ public class DisplayManager {
  		return sortedTowns;
  	}
  	
- 	// Sort kingdom town list by population
+ 	// Sort kingdom town list by population then size
   	private List<KonTown> sortedTowns(KonKingdom kingdom) {
   		List<KonTown> sortedTowns = kingdom.getTowns();
 
-  		// Sort each town list by population
+  		// Sort each town list by population then size
   		Comparator<KonTown> townComparator = new Comparator<KonTown>() {
   			@Override
   			public int compare(final KonTown k1, KonTown k2) {
@@ -1083,6 +1083,12 @@ public class DisplayManager {
   					result = 1;
   				} else if(k1.getNumResidents() > k2.getNumResidents()) {
   					result = -1;
+  				} else {
+  					if(k1.getChunkList().size() < k2.getChunkList().size()) {
+  						result = 1;
+  					} else if(k1.getChunkList().size() > k2.getChunkList().size()) {
+  						result = -1;
+  					}
   				}
   				return result;
   			}
