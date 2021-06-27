@@ -68,7 +68,7 @@ public class RuinManager {
 				// Give reward to player
 				if(rewardFavor > 0) {
 					ChatUtil.printDebug("Ruin capture favor rewarded to player "+friendly.getBukkitPlayer().getName());
-					EconomyResponse r = KonquestPlugin.getEconomy().depositPlayer(friendly.getBukkitPlayer(), rewardFavor);
+					EconomyResponse r = KonquestPlugin.depositPlayer(friendly.getBukkitPlayer(), rewardFavor);
 		            if(r.transactionSuccess()) {
 		            	String balanceF = String.format("%.2f",r.balance);
 		            	String amountF = String.format("%.2f",r.amount);

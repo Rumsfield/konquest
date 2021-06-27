@@ -76,8 +76,8 @@ public class ExileCommand extends CommandBase {
         		} else {
         			// Exile the player
             		if(getKonquest().getKingdomManager().exilePlayer(player)) {
-            			double balance = KonquestPlugin.getEconomy().getBalance(bukkitPlayer);
-                    	EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, balance);
+            			double balance = KonquestPlugin.getBalance(bukkitPlayer);
+                    	EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, balance);
         	            if(r.transactionSuccess()) {
         	            	String balanceF = String.format("%.2f",r.balance);
     		            	String amountF = String.format("%.2f",r.amount);

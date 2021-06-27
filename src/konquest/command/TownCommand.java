@@ -464,7 +464,7 @@ public class TownCommand extends CommandBase {
 	        		// Verify enough favor
 	            	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_rename",0.0);
 	    			if(cost > 0) {
-	    				if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < cost) {
+	    				if(KonquestPlugin.getBalance(bukkitPlayer) < cost) {
 	    					//ChatUtil.sendError(bukkitPlayer, "Not enough Favor, need "+cost);
 	    					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
 	                        return;
@@ -481,7 +481,7 @@ public class TownCommand extends CommandBase {
 			    		}
 		        		// Withdraw cost from player
 		        		if(cost > 0) {
-			        		EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, cost);
+			        		EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, cost);
 			                if(r.transactionSuccess()) {
 			                	String balanceF = String.format("%.2f",r.balance);
 				            	String amountF = String.format("%.2f",r.amount);

@@ -3,6 +3,7 @@ package konquest.manager;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -451,7 +452,7 @@ public class KingdomManager {
     	}
     	// Ensure player can cover the cost
     	double cost = konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
-    	if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < cost) {
+    	if(KonquestPlugin.getBalance(bukkitPlayer) < cost) {
 			//ChatUtil.sendError(bukkitPlayer, "Not enough Favor, need "+cost);
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
             return false;
@@ -501,7 +502,7 @@ public class KingdomManager {
     	}
     	// Reduce the player's favor
 		if(cost > 0 && claimStatus == 0) {
-        	EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, cost);
+        	EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, cost);
             if(r.transactionSuccess()) {
             	String balanceF = String.format("%.2f",r.balance);
             	String amountF = String.format("%.2f",r.amount);
@@ -549,7 +550,7 @@ public class KingdomManager {
     	// Ensure player can cover the cost
     	double cost = konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
     	double totalCost = unclaimedChunkAmount * cost;
-    	if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < totalCost) {
+    	if(KonquestPlugin.getBalance(bukkitPlayer) < totalCost) {
 			//ChatUtil.sendError(bukkitPlayer, "Not enough Favor, need "+totalCost);
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(totalCost));
             return false;
@@ -626,7 +627,7 @@ public class KingdomManager {
     	// Reduce the player's favor
 		if(cost > 0 && numChunksClaimed > 0) {
 			double finalCost = numChunksClaimed*cost;
-	    	EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, finalCost);
+	    	EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, finalCost);
 	        if(r.transactionSuccess()) {
 	        	String balanceF = String.format("%.2f",r.balance);
 	        	String amountF = String.format("%.2f",r.amount);
@@ -860,24 +861,26 @@ public class KingdomManager {
 	public KonTerritory getClosestTerritory(Chunk chunk) {
 		KonTerritory closestTerritory = null;
 		int minDistance = Integer.MAX_VALUE;
+		int searchDist = 0;
+		World searchWorld = chunk.getWorld();
 		for(KonKingdom kingdom : kingdomMap.values()) {
-			int capitalDist = konquest.distanceInChunks(chunk, kingdom.getCapital().getCenterLoc().getChunk());
-			if(capitalDist < minDistance && chunk.getWorld().equals(kingdom.getCapital().getCenterLoc().getWorld())) {
-				minDistance = capitalDist;
+			searchDist = konquest.distanceInChunks(chunk, kingdom.getCapital().getCenterLoc().getChunk());
+			if(searchWorld.equals(kingdom.getCapital().getCenterLoc().getWorld()) && searchDist < minDistance) {
+				minDistance = searchDist;
 				closestTerritory = kingdom.getCapital();
 			}
 			for(KonTown town : kingdom.getTowns()) {
-				int townDist = konquest.distanceInChunks(chunk, town.getCenterLoc().getChunk());
-				if(townDist < minDistance && chunk.getWorld().equals(town.getCenterLoc().getWorld())) {
-					minDistance = townDist;
+				searchDist = konquest.distanceInChunks(chunk, town.getCenterLoc().getChunk());
+				if(searchWorld.equals(town.getCenterLoc().getWorld()) && searchDist < minDistance) {
+					minDistance = searchDist;
 					closestTerritory = town;
 				}
 			}
 		}
 		for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			int ruinDist = konquest.distanceInChunks(chunk, ruin.getCenterLoc().getChunk());
-			if(ruinDist < minDistance && chunk.getWorld().equals(ruin.getCenterLoc().getWorld())) {
-				minDistance = ruinDist;
+			searchDist = konquest.distanceInChunks(chunk, ruin.getCenterLoc().getChunk());
+			if(searchWorld.equals(ruin.getCenterLoc().getWorld()) && searchDist < minDistance) {
+				minDistance = searchDist;
 				closestTerritory = ruin;
 			}
 		}
@@ -1345,7 +1348,7 @@ public class KingdomManager {
 	    	}
 	    	int numKingdomFavor = 0;
 	    	for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
-	    		numKingdomFavor += (int) KonquestPlugin.getEconomy().getBalance(kingdomPlayer.getOfflineBukkitPlayer());
+	    		numKingdomFavor += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
 	    	}
 	    	// Gather favor costs
 	    	int cost_settle = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_settle");
@@ -1955,6 +1958,7 @@ public class KingdomManager {
 	}
 	
 	public void printPlayerMap(KonPlayer player, int mapSize, Location center) {
+		Date start = new Date();
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Generate Map
     	Point originPoint = konquest.toPoint(center);
@@ -1985,19 +1989,22 @@ public class KingdomManager {
     		settleTip = ChatColor.STRIKETHROUGH+settleTip;
     		settleTip = ChatColor.GRAY+settleTip;
     	}
+    	Date step1 = new Date();
+    	int evalCount = 0;
     	// Evaluate surrounding chunks
     	for(Chunk chunk: konquest.getAreaChunks(center, ((mapSize-1)/2)+1)) {
+    		evalCount++;
     		Point mapPoint = konquest.toPoint(chunk);
     		int diffOriginX = (int)(mapPoint.getX() - originPoint.getX());
     		int diffOriginY = (int)(mapPoint.getY() - originPoint.getY());
     		int mapY = (mapSize-1)/2 - diffOriginX; // Swap X & Y to translate map to be oriented up as north
     		int mapX = (mapSize-1)/2 - diffOriginY;
     		if(mapX < 0 || mapX >= mapSize) {
-    			ChatUtil.sendError(bukkitPlayer, "Internal Error: Map X was "+mapX);
+    			ChatUtil.printDebug("Internal Error: Map X was "+mapX);
     			return;
     		}
     		if(mapY < 0 || mapY >= mapSize) {
-    			ChatUtil.sendError(bukkitPlayer, "Internal Error: Map Y was "+mapY);
+    			ChatUtil.printDebug("Internal Error: Map Y was "+mapY);
     			return;
     		}
     		if(isChunkClaimed(chunk)) {
@@ -2048,8 +2055,10 @@ public class KingdomManager {
     			map[mapX][mapY] = playerColor+mapPlayer;
     		}
     	}
+    	Date step2 = new Date();
     	// Determine distance to closest territory
     	KonTerritory closestTerritory = getClosestTerritory(center.getChunk());
+    	Date step3 = new Date();
     	ChatColor closestTerritoryColor = ChatColor.GRAY;
     	int distance = 0;
     	int maxDistance = 99;
@@ -2069,6 +2078,7 @@ public class KingdomManager {
     	if(distance > maxDistance) {
     		distance = 99;
     	}
+    	Date step4 = new Date();
     	// Display map
     	String header = ChatColor.GOLD+MessagePath.MENU_MAP_CENTER.getMessage()+": "+(int)originPoint.getX()+","+(int)originPoint.getY();
     	ChatUtil.sendNotice(bukkitPlayer, header);
@@ -2091,5 +2101,14 @@ public class KingdomManager {
     		}
     		ChatUtil.sendMessage(bukkitPlayer, mapLine);
     	}
+    	Date step5 = new Date();
+    	
+    	int s1 = (int)(step1.getTime() - start.getTime());
+    	int s2 = (int)(step2.getTime() - start.getTime());
+    	int s3 = (int)(step3.getTime() - start.getTime());
+    	int s4 = (int)(step4.getTime() - start.getTime());
+    	int s5 = (int)(step5.getTime() - start.getTime());
+    	
+    	ChatUtil.printDebug("Map timings ("+evalCount+" chunks): "+s1+","+s2+","+s3+","+s4+","+s5);
 	}
 }

@@ -67,7 +67,7 @@ public class SettleCommand extends CommandBase {
         	int townCount = getKonquest().getKingdomManager().getPlayerLordships(player);
         	double adj_cost = (((double)townCount)*incr) + cost;
         	if(cost > 0) {
-	        	if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < adj_cost) {
+	        	if(KonquestPlugin.getBalance(bukkitPlayer) < adj_cost) {
 					//ChatUtil.sendError((Player) getSender(), "Not enough Favor, need "+adj_cost);
 					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(adj_cost));
 	                return;
@@ -195,7 +195,7 @@ public class SettleCommand extends CommandBase {
         	}
         	
 			if(cost > 0 && settleStatus == 0) {
-	        	EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, adj_cost);
+	        	EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, adj_cost);
 	            if(r.transactionSuccess()) {
 	            	String balanceF = String.format("%.2f",r.balance);
 	            	String amountF = String.format("%.2f",r.amount);

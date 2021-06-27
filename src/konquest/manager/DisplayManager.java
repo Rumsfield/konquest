@@ -531,7 +531,7 @@ public class DisplayManager {
 		PlayerIcon playerScore = new PlayerIcon(kingdomColor+infoPlayer.getOfflineBukkitPlayer().getName(),loreList,infoPlayer.getOfflineBukkitPlayer(),4,true,PlayerIconAction.DISPLAY_SCORE);
 		newMenu.getPage(0).addIcon(playerScore);
 		/* Favor Info Icon (5) */
-		String balanceF = String.format("%.2f",KonquestPlugin.getEconomy().getBalance(infoPlayer.getOfflineBukkitPlayer()));
+		String balanceF = String.format("%.2f",KonquestPlugin.getBalance(infoPlayer.getOfflineBukkitPlayer()));
 		InfoIcon info = new InfoIcon(kingdomColor+MessagePath.LABEL_FAVOR.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_FAVOR.getMessage()+": "+valueColor+balanceF), Material.GOLD_INGOT, 5, false);
 		newMenu.getPage(0).addIcon(info);
 		
@@ -636,7 +636,7 @@ public class DisplayManager {
     	ArrayList<KonOfflinePlayer> allPlayersInKingdom = konquest.getPlayerManager().getAllPlayersInKingdom(infoKingdom);
     	int numKingdomFavor = 0;
     	for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
-    		numKingdomFavor += (int) KonquestPlugin.getEconomy().getBalance(kingdomPlayer.getOfflineBukkitPlayer());
+    		numKingdomFavor += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
     	}
     	loreList = new ArrayList<String>();
     	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+numKingdomFavor);

@@ -158,16 +158,16 @@ public class TravelCommand extends CommandBase {
 	        		total_cost = cost + cost_world;
 	        	}
 				if(!isTravelAlwaysAllowed && total_cost > 0) {
-					if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < total_cost) {
+					if(KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
 						//ChatUtil.sendError((Player) getSender(), "Not enough Favor, need "+total_cost);
 						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(total_cost));
 	                    return;
 					}
 				}
-				if(isTravelAlwaysAllowed && KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < total_cost) {
+				if(isTravelAlwaysAllowed && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
 	        		//ChatUtil.sendNotice((Player) getSender(), "Not enough Favor, this one's on us.");
 	        	} else {
-	        		EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, total_cost);
+	        		EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, total_cost);
 	                if(r.transactionSuccess()) {
 	                	String balanceF = String.format("%.2f",r.balance);
 		            	String amountF = String.format("%.2f",r.amount);
@@ -189,7 +189,7 @@ public class TravelCommand extends CommandBase {
 	            		if(town.isAttacked() && town.addDefender(bukkitPlayer)) {
 	            			ChatUtil.printDebug("Raid defense rewarded to player "+player.getBukkitPlayer().getName());
 	            			int defendReward = getKonquest().getConfigManager().getConfig("core").getInt("core.favor.rewards.defend_raid");
-	        				EconomyResponse r = KonquestPlugin.getEconomy().depositPlayer(player.getBukkitPlayer(), defendReward);
+	        				EconomyResponse r = KonquestPlugin.depositPlayer(player.getBukkitPlayer(), defendReward);
 	        	            if(r.transactionSuccess()) {
 	        	            	String balanceF = String.format("%.2f",r.balance);
 	        	            	String amountF = String.format("%.2f",r.amount);

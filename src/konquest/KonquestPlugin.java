@@ -9,12 +9,14 @@ import konquest.listener.PlayerListener;
 import konquest.listener.WorldListener;
 import konquest.utility.ChatUtil;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 //import org.maxgamer.quickshop.api.QuickShopAPI;
 
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
 
 public class KonquestPlugin extends JavaPlugin {
 	
@@ -88,4 +90,44 @@ public class KonquestPlugin extends JavaPlugin {
 	public static Economy getEconomy() {
         return econ;
     }
+	
+	/*
+	 * Economy wrapper functions. Attempt to use Vault API methods, and then try depreciated methods if those fail.
+	 */
+	
+	@SuppressWarnings("deprecation")
+	public static double getBalance(OfflinePlayer offlineBukkitPlayer) {
+		double result = 0;
+		try {
+			result = econ.getBalance(offlineBukkitPlayer);
+		} catch(Exception e) {
+			e.printStackTrace();
+			result = econ.getBalance(offlineBukkitPlayer.getName());
+		}
+		return result;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static EconomyResponse withdrawPlayer(OfflinePlayer offlineBukkitPlayer, double amount) {
+		EconomyResponse result;
+		try {
+			result = econ.withdrawPlayer(offlineBukkitPlayer, amount);
+		} catch(Exception e) {
+			e.printStackTrace();
+			result = econ.withdrawPlayer(offlineBukkitPlayer.getName(), amount);
+		}
+		return result;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static EconomyResponse depositPlayer(OfflinePlayer offlineBukkitPlayer, double amount) {
+		EconomyResponse result;
+		try {
+			result = econ.depositPlayer(offlineBukkitPlayer, amount);
+		} catch(Exception e) {
+			e.printStackTrace();
+			result = econ.depositPlayer(offlineBukkitPlayer.getName(), amount);
+		}
+		return result;
+	}
 }

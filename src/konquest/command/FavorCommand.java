@@ -33,7 +33,7 @@ public class FavorCommand extends CommandBase {
     		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 
-        	double balance = KonquestPlugin.getEconomy().getBalance(bukkitPlayer);
+        	double balance = KonquestPlugin.getBalance(bukkitPlayer);
         	double cost_spy = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_spy",0.0);
         	double cost_settle = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_settle",0.0);
         	double cost_settle_incr = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_settle_increment",0.0);

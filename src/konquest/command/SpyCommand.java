@@ -62,7 +62,7 @@ public class SpyCommand extends CommandBase {
         	// Verify enough favor
         	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_spy",0.0);
 			if(cost > 0) {
-				if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < cost) {
+				if(KonquestPlugin.getBalance(bukkitPlayer) < cost) {
 					//ChatUtil.sendError(bukkitPlayer, "Not enough Favor, need "+cost);
 					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
                     return;
@@ -130,7 +130,7 @@ public class SpyCommand extends CommandBase {
 			inv.setItem(inv.firstEmpty(), inv.getItemInMainHand());
 			inv.setItemInMainHand(item);
 			
-			EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, cost);
+			EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, cost);
             if(r.transactionSuccess()) {
             	String balanceF = String.format("%.2f",r.balance);
             	String amountF = String.format("%.2f",r.amount);
