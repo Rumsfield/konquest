@@ -98,6 +98,7 @@ public class DisplayManager {
 						KonTown town = townCache.remove(inv);
 						townCache.put(clickMenu.getCurrentPage().getInventory(), town);
 					}
+					playMenuClickSound(bukkitPlayer);
 					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 			            @Override
 			            public void run() {
@@ -112,6 +113,7 @@ public class DisplayManager {
 					if(townCache.containsKey(inv)) {
 						townCache.remove(inv);
 					}
+					playMenuClickSound(bukkitPlayer);
 					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 			            @Override
 			            public void run() {
@@ -127,6 +129,7 @@ public class DisplayManager {
 						KonTown town = townCache.remove(inv);
 						townCache.put(clickMenu.getCurrentPage().getInventory(), town);
 					}
+					playMenuClickSound(bukkitPlayer);
 					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 			            @Override
 			            public void run() {
@@ -140,6 +143,7 @@ public class DisplayManager {
 					// Clicked non-navigation slot
 					MenuIcon clickedIcon = currentPage.getIcon(slot);
 					if(clickedIcon != null && clickedIcon.isClickable()) {
+						playMenuClickSound(bukkitPlayer);
 						// The clicked slot is a clickable icon
 						if(clickedIcon instanceof CommandIcon) {
 							// Command Icons close the GUI and print a command in chat
@@ -187,7 +191,8 @@ public class DisplayManager {
 								UpgradeIcon icon = (UpgradeIcon)clickedIcon;
 								boolean status = konquest.getUpgradeManager().addTownUpgrade(townCache.get(inv), icon.getUpgrade(), icon.getLevel(), bukkitPlayer);
 								if(status) {
-									bukkitPlayer.getWorld().playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, (float)1.0, (float)1.0);
+									//bukkitPlayer.getWorld().playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, (float)1.0, (float)1.0);
+									Konquest.playSuccessSound(bukkitPlayer);
 								}
 								Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 						            @Override
@@ -209,6 +214,7 @@ public class DisplayManager {
 							menuCache.remove(inv);
 							displayTownInfoMenu(clickPlayer,icon.getTown());
 						} else if(clickedIcon instanceof PrefixIcon) {
+							// Prefix Icons alter the player's prefix
 							PrefixIcon icon = (PrefixIcon)clickedIcon;
 							menuCache.remove(inv);
 							switch(icon.getAction()) {
@@ -250,6 +256,7 @@ public class DisplayManager {
 	 */
 	public void displayHelpMenu(Player bukkitPlayer) {
 		ChatUtil.printDebug("Displaying new help menu to "+bukkitPlayer.getName()+", current menu size is "+menuCache.size());
+		playMenuOpenSound(bukkitPlayer);
 		int i = 0;
 		int cost = 0;
 		int cost_incr = 0;
@@ -333,6 +340,7 @@ public class DisplayManager {
 		}
 		*/
 		ChatUtil.printDebug("Displaying new upgrade menu to "+bukkitPlayer.getName()+", current menu size is "+menuCache.size()+", town size is "+townCache.size());
+		playMenuOpenSound(bukkitPlayer);
 		// Create fresh menu
 		//DisplayMenu townUpgradeMenu = new DisplayMenu(1,ChatColor.BLACK+MessagePath.MENU_UPGRADE_TITLE.getMessage());
 		PagedMenu newMenu = new PagedMenu();
@@ -373,6 +381,7 @@ public class DisplayManager {
 	 */
  	public void displayScoreMenu(KonPlayer displayPlayer, KonOfflinePlayer scorePlayer) {
  		ChatUtil.printDebug("Displaying new score menu to "+displayPlayer.getBukkitPlayer().getName()+" of player "+scorePlayer.getOfflineBukkitPlayer().getName()+", current menu size is "+menuCache.size());
+ 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
  		KonPlayerScoreAttributes playerScoreAttributes = konquest.getKingdomManager().getPlayerScoreAttributes(scorePlayer);
 		KonKingdomScoreAttributes kingdomScoreAttributes = konquest.getKingdomManager().getKingdomScoreAttributes(scorePlayer.getKingdom());
 		int playerScore = playerScoreAttributes.getScore();
@@ -485,6 +494,8 @@ public class DisplayManager {
 	 */
  	// Player Info
  	public void displayPlayerInfoMenu(KonPlayer displayPlayer, KonOfflinePlayer infoPlayer) {
+ 		ChatUtil.printDebug("Displaying new player info menu to "+displayPlayer.getBukkitPlayer().getName()+" of player "+infoPlayer.getOfflineBukkitPlayer().getName()+", current menu size is "+menuCache.size());
+ 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
  		
  		boolean isFriendly = displayPlayer.getKingdom().equals(infoPlayer.getKingdom());
  		ChatColor kingdomColor = Konquest.getContextColor(displayPlayer, infoPlayer);
@@ -581,7 +592,9 @@ public class DisplayManager {
  	
  	// Kingdom Info
   	public void displayKingdomInfoMenu(KonPlayer displayPlayer, KonKingdom infoKingdom) {
-  		
+  		ChatUtil.printDebug("Displaying new kingdom info menu to "+displayPlayer.getBukkitPlayer().getName()+" of kingdom "+infoKingdom.getName()+", current menu size is "+menuCache.size());
+ 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
+ 		
   		boolean isFriendly = displayPlayer.getKingdom().equals(infoKingdom);
  		ChatColor kingdomColor = ChatColor.RED;
  		if(isFriendly) {
@@ -699,7 +712,9 @@ public class DisplayManager {
  	
   	// Town Info
    	public void displayTownInfoMenu(KonPlayer displayPlayer, KonTown infoTown) {
-   		
+   		ChatUtil.printDebug("Displaying new town info menu to "+displayPlayer.getBukkitPlayer().getName()+" of kingdom "+infoTown.getName()+", current menu size is "+menuCache.size());
+ 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
+ 		
    		boolean isFriendly = displayPlayer.getKingdom().equals(infoTown.getKingdom());
  		ChatColor kingdomColor = ChatColor.RED;
  		if(isFriendly) {
@@ -904,16 +919,14 @@ public class DisplayManager {
    	}
    	
    	/*
-	 * Helper methods
-	 */
-  	
-   	/*
 	 * ===============================================
 	 * Prefix Menu
 	 * ===============================================
 	 */
    	public void displayPrefixMenu(KonPlayer displayPlayer) {
-   		
+   		ChatUtil.printDebug("Displaying new prefix menu to "+displayPlayer.getBukkitPlayer().getName()+", current menu size is "+menuCache.size());
+ 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
+ 		
    		// Create fresh paged menu
  		PagedMenu newMenu = new PagedMenu();
 		String pageLabel = "";
@@ -1013,6 +1026,10 @@ public class DisplayManager {
         },1);
    	}
    	
+   	/*
+	 * Helper methods
+	 */
+  	
  	// Sort player town list by Lord, Knight, Resident, and then by population
  	private List<KonTown> sortedTowns(KonOfflinePlayer player) {
  		List<KonTown> sortedTowns = new ArrayList<KonTown>();
@@ -1101,5 +1118,13 @@ public class DisplayManager {
     		result = ChatColor.DARK_GREEN+""+ChatColor.BOLD+"\u2713";
     	}
     	return result;
+ 	}
+ 	
+ 	private void playMenuClickSound(Player bukkitPlayer) {
+ 		bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, (float)1.0, (float)0.8);
+ 	}
+ 	
+ 	private void playMenuOpenSound(Player bukkitPlayer) {
+ 		bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, (float)1.0, (float)1.4);
  	}
 }

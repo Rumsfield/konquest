@@ -35,7 +35,7 @@ public class PrefixIcon implements MenuIcon {
 	}
 	
 	private ItemStack initItem() {
-		ItemStack item = new ItemStack(Material.CHEST);
+		ItemStack item = new ItemStack(Material.IRON_BARS);
 		ItemMeta meta = item.getItemMeta();
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
