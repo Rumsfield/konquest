@@ -509,15 +509,13 @@ public class Konquest implements Timeable {
 		return world.getChunkAt(point.x, point.y);
 	}
 	
-	public int distanceInChunks(Location loc1, Location loc2) {
+	public static int distanceInChunks(Location loc1, Location loc2) {
 		return distanceInChunks(loc1.getChunk(), loc2.getChunk());
 	}
 	
-	public int distanceInChunks(Chunk chunk1, Chunk chunk2) {
-		if(chunk1.getWorld().equals(chunk2.getWorld())) {
-			int diffX = Math.abs(chunk1.getX() - chunk2.getX());
-			int diffZ = Math.abs(chunk1.getZ() - chunk2.getZ());
-			return Math.max(diffX, diffZ);
+	public static int distanceInChunks(Chunk chunk1, Chunk chunk2) {
+		if(chunk1.getWorld().getName().equals(chunk2.getWorld().getName())) {
+			return Math.max(Math.abs(chunk1.getX() - chunk2.getX()), Math.abs(chunk1.getZ() - chunk2.getZ()));
 		} else {
 			return -1;
 		}

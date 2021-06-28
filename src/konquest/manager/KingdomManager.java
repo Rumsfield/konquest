@@ -249,13 +249,13 @@ public class KingdomManager {
 				}
 				// Verify proximity to other territories
 				if(loc.getWorld().equals(kingdom.getCapital().getCenterLoc().getWorld()) && 
-						konquest.distanceInChunks(loc, kingdom.getCapital().getCenterLoc()) < min_distance_capital) {
+						Konquest.distanceInChunks(loc, kingdom.getCapital().getCenterLoc()) < min_distance_capital) {
 					ChatUtil.printDebug("Failed to add town, too close to capital "+kingdom.getCapital().getName());
 					return 5;
 				}
 				for(KonTown town : kingdom.getTowns()) {
 					if(loc.getWorld().equals(town.getCenterLoc().getWorld()) && 
-							konquest.distanceInChunks(loc, town.getCenterLoc()) < min_distance_town) {
+							Konquest.distanceInChunks(loc, town.getCenterLoc()) < min_distance_town) {
 						ChatUtil.printDebug("Failed to add town, too close to town "+town.getName());
 						return 5;
 					}
@@ -267,7 +267,7 @@ public class KingdomManager {
 					return 3;
 				}
 				if(loc.getWorld().equals(ruin.getCenterLoc().getWorld()) && 
-						konquest.distanceInChunks(loc, ruin.getCenterLoc()) < min_distance_town) {
+						Konquest.distanceInChunks(loc, ruin.getCenterLoc()) < min_distance_town) {
 					ChatUtil.printDebug("Failed to add town, too close to ruin "+ruin.getName());
 					return 5;
 				}
@@ -385,8 +385,8 @@ public class KingdomManager {
 					closestAdjTerr = getChunkTerritory(sideChunk);
 					foundAdjTerr = true;
 				} else {
-					int closestDist = konquest.distanceInChunks(loc, closestAdjTerr.getCenterLoc());
-					int currentDist = konquest.distanceInChunks(loc, getChunkTerritory(sideChunk).getCenterLoc());
+					int closestDist = Konquest.distanceInChunks(loc, closestAdjTerr.getCenterLoc());
+					int currentDist = Konquest.distanceInChunks(loc, getChunkTerritory(sideChunk).getCenterLoc());
 					if(currentDist != -1 && closestDist != -1 && currentDist < closestDist) {
 						closestAdjTerr = getChunkTerritory(sideChunk);
 					}
@@ -846,7 +846,7 @@ public class KingdomManager {
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			if(!kingdom.equals(friendlyKingdom)) {
 				for(KonTown town : kingdom.getTowns()) {
-					int townDist = konquest.distanceInChunks(chunk, town.getCenterLoc().getChunk());
+					int townDist = Konquest.distanceInChunks(chunk, town.getCenterLoc().getChunk());
 					if(townDist != -1 && townDist < minDistance && chunk.getWorld().equals(town.getCenterLoc().getWorld())) {
 						minDistance = townDist;
 						closestTerritory = town;
@@ -864,13 +864,13 @@ public class KingdomManager {
 		int searchDist = 0;
 		World searchWorld = chunk.getWorld();
 		for(KonKingdom kingdom : kingdomMap.values()) {
-			searchDist = konquest.distanceInChunks(chunk, kingdom.getCapital().getCenterLoc().getChunk());
+			searchDist = Konquest.distanceInChunks(chunk, kingdom.getCapital().getCenterLoc().getChunk());
 			if(searchWorld.equals(kingdom.getCapital().getCenterLoc().getWorld()) && searchDist < minDistance) {
 				minDistance = searchDist;
 				closestTerritory = kingdom.getCapital();
 			}
 			for(KonTown town : kingdom.getTowns()) {
-				searchDist = konquest.distanceInChunks(chunk, town.getCenterLoc().getChunk());
+				searchDist = Konquest.distanceInChunks(chunk, town.getCenterLoc().getChunk());
 				if(searchWorld.equals(town.getCenterLoc().getWorld()) && searchDist < minDistance) {
 					minDistance = searchDist;
 					closestTerritory = town;
@@ -878,7 +878,7 @@ public class KingdomManager {
 			}
 		}
 		for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			searchDist = konquest.distanceInChunks(chunk, ruin.getCenterLoc().getChunk());
+			searchDist = Konquest.distanceInChunks(chunk, ruin.getCenterLoc().getChunk());
 			if(searchWorld.equals(ruin.getCenterLoc().getWorld()) && searchDist < minDistance) {
 				minDistance = searchDist;
 				closestTerritory = ruin;
@@ -890,19 +890,19 @@ public class KingdomManager {
 	public int getDistanceToClosestTerritory(Chunk chunk) {
 		int minDistance = Integer.MAX_VALUE;
 		for(KonKingdom kingdom : kingdomMap.values()) {
-			int capitalDist = konquest.distanceInChunks(chunk, kingdom.getCapital().getCenterLoc().getChunk());
+			int capitalDist = Konquest.distanceInChunks(chunk, kingdom.getCapital().getCenterLoc().getChunk());
 			if(capitalDist < minDistance && chunk.getWorld().equals(kingdom.getCapital().getCenterLoc().getWorld())) {
 				minDistance = capitalDist;
 			}
 			for(KonTown town : kingdom.getTowns()) {
-				int townDist = konquest.distanceInChunks(chunk, town.getCenterLoc().getChunk());
+				int townDist = Konquest.distanceInChunks(chunk, town.getCenterLoc().getChunk());
 				if(townDist < minDistance && chunk.getWorld().equals(town.getCenterLoc().getWorld())) {
 					minDistance = townDist;
 				}
 			}
 		}
 		for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			int ruinDist = konquest.distanceInChunks(chunk, ruin.getCenterLoc().getChunk());
+			int ruinDist = Konquest.distanceInChunks(chunk, ruin.getCenterLoc().getChunk());
 			if(ruinDist < minDistance && chunk.getWorld().equals(ruin.getCenterLoc().getWorld())) {
 				minDistance = ruinDist;
 			}
@@ -912,27 +912,28 @@ public class KingdomManager {
 	
 	public boolean isLocValidSettlement(Location loc) {
 		// Check for valid world
-		if(!konquest.isWorldValid(loc.getWorld())) {
+		World searchWorld = loc.getWorld();
+		if(!konquest.isWorldValid(searchWorld)) {
 			return false;
 		}
 		// Check for minimum distance
 		int min_distance_capital = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
 		int min_distance_town = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
 		for(KonKingdom kingdom : kingdomMap.values()) {
-			if(loc.getWorld().equals(kingdom.getCapital().getCenterLoc().getWorld()) && 
-					konquest.distanceInChunks(loc, kingdom.getCapital().getCenterLoc()) < min_distance_capital) {
+			if(searchWorld.equals(kingdom.getCapital().getCenterLoc().getWorld()) && 
+					Konquest.distanceInChunks(loc, kingdom.getCapital().getCenterLoc()) < min_distance_capital) {
 				return false;
 			}
 			for(KonTown town : kingdom.getTowns()) {
-				if(loc.getWorld().equals(town.getCenterLoc().getWorld()) && 
-						konquest.distanceInChunks(loc, town.getCenterLoc()) < min_distance_town) {
+				if(searchWorld.equals(town.getCenterLoc().getWorld()) && 
+						Konquest.distanceInChunks(loc, town.getCenterLoc()) < min_distance_town) {
 					return false;
 				}
 			}
 		}
 		for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			if(loc.getWorld().equals(ruin.getCenterLoc().getWorld()) && 
-					konquest.distanceInChunks(loc, ruin.getCenterLoc()) < min_distance_town) {
+			if(searchWorld.equals(ruin.getCenterLoc().getWorld()) && 
+					Konquest.distanceInChunks(loc, ruin.getCenterLoc()) < min_distance_town) {
 				return false;
 			}
 		}
@@ -1981,15 +1982,72 @@ public class KingdomManager {
     	} else if(playerFace.equals(BlockFace.WEST)) {
     		mapPlayer = "\u25C0";// "\u25C1";// "<";
     	}
-    	// Determine settlement status
+    	
+    	// Determine settlement status and proximity
+    	KonTerritory closestTerritory = null;
+    	boolean isLocValidSettle = true;
+		int minDistance = Integer.MAX_VALUE;
+		int searchDist = 0;
+		int min_distance_capital = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
+		int min_distance_town = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
+		Chunk searchChunk = center.getChunk();
+		World searchWorld = searchChunk.getWorld();
+		if(!konquest.isWorldValid(searchWorld)) {
+			isLocValidSettle = false;
+		}
+		Date step1 = new Date();
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			searchDist = Konquest.distanceInChunks(searchChunk, kingdom.getCapital().getCenterLoc().getChunk());
+			if(searchDist != -1) {
+				if(searchDist < minDistance) {
+					minDistance = searchDist;
+					closestTerritory = kingdom.getCapital();
+				}
+				if(searchDist < min_distance_capital) {
+					isLocValidSettle = false;
+				}
+			}
+			for(KonTown town : kingdom.getTowns()) {
+				searchDist = Konquest.distanceInChunks(searchChunk, town.getCenterLoc().getChunk());
+				if(searchDist != -1) {
+					if(searchDist < minDistance) {
+						minDistance = searchDist;
+						closestTerritory = town;
+					}
+					if(searchDist < min_distance_town) {
+						isLocValidSettle = false;
+					}
+				}
+			}
+		}
+		for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
+			searchDist = Konquest.distanceInChunks(searchChunk, ruin.getCenterLoc().getChunk());
+			if(searchDist != -1) {
+				if(searchDist < minDistance) {
+					minDistance = searchDist;
+					closestTerritory = ruin;
+				}
+				if(searchDist < min_distance_town) {
+					isLocValidSettle = false;
+				}
+			}
+		}
+		Date step2 = new Date();
+		// Verify no overlapping init chunks
+		int radius = konquest.getConfigManager().getConfig("core").getInt("core.towns.init_radius");
+		for(Chunk chunk : konquest.getAreaChunks(center, radius)) {
+			if(isChunkClaimed(chunk)) {
+				isLocValidSettle = false;
+			}
+		}
     	String settleTip = MessagePath.MENU_MAP_SETTLE_HINT.getMessage();
-    	if(isLocValidSettlement(center)) {
+    	//if(isLocValidSettlement(center)) {
+    	if(isLocValidSettle) {
     		settleTip = ChatColor.GOLD+settleTip;
     	} else {
     		settleTip = ChatColor.STRIKETHROUGH+settleTip;
     		settleTip = ChatColor.GRAY+settleTip;
     	}
-    	Date step1 = new Date();
     	int evalCount = 0;
     	// Evaluate surrounding chunks
     	for(Chunk chunk: konquest.getAreaChunks(center, ((mapSize-1)/2)+1)) {
@@ -2055,15 +2113,14 @@ public class KingdomManager {
     			map[mapX][mapY] = playerColor+mapPlayer;
     		}
     	}
-    	Date step2 = new Date();
     	// Determine distance to closest territory
-    	KonTerritory closestTerritory = getClosestTerritory(center.getChunk());
+    	//KonTerritory closestTerritory = getClosestTerritory(center.getChunk());
     	Date step3 = new Date();
     	ChatColor closestTerritoryColor = ChatColor.GRAY;
     	int distance = 0;
     	int maxDistance = 99;
     	if(closestTerritory != null) {
-    		distance = konquest.distanceInChunks(center.getChunk(), closestTerritory.getCenterLoc().getChunk());
+    		distance = Konquest.distanceInChunks(center.getChunk(), closestTerritory.getCenterLoc().getChunk());
     		//distance = (int) originPoint.distance(konquest.toPoint(closestTerritory.getCenterLoc().getChunk()));
     		if(closestTerritory.getKingdom().equals(getBarbarians())) {
     			closestTerritoryColor = ChatColor.YELLOW;

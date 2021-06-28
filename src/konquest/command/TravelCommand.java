@@ -149,7 +149,7 @@ public class TravelCommand extends CommandBase {
 	        	cost = (cost < 0) ? 0 : cost;
 	        	cost_per_chunk = (cost_per_chunk < 0) ? 0 : cost_per_chunk;
 	        	double total_cost = 0;
-	        	int chunkDistance = getKonquest().distanceInChunks(travelLoc,bukkitPlayer.getLocation());
+	        	int chunkDistance = Konquest.distanceInChunks(travelLoc,bukkitPlayer.getLocation());
 	        	if(chunkDistance >= 0) {
 	        		// Value is chunk distance within the same world
 	        		total_cost = cost + cost_per_chunk*chunkDistance;

@@ -88,7 +88,7 @@ public class SpyCommand extends CommandBase {
 					// Only find enemy towns which do not have the counter-intelligence upgrade level 1+
 					int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.COUNTER);
 					if(upgradeLevel < 1) {
-						int townDist = getKonquest().distanceInChunks(bukkitPlayer.getLocation().getChunk(), town.getCenterLoc().getChunk());
+						int townDist = Konquest.distanceInChunks(bukkitPlayer.getLocation().getChunk(), town.getCenterLoc().getChunk());
 						if(townDist != -1 && townDist < minDistance) {
 							minDistance = townDist;
 							closestTerritory = town;
