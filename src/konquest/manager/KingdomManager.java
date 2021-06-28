@@ -3,7 +3,6 @@ package konquest.manager;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -1959,7 +1958,6 @@ public class KingdomManager {
 	}
 	
 	public void printPlayerMap(KonPlayer player, int mapSize, Location center) {
-		Date start = new Date();
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Generate Map
     	Point originPoint = konquest.toPoint(center);
@@ -1982,7 +1980,6 @@ public class KingdomManager {
     	} else if(playerFace.equals(BlockFace.WEST)) {
     		mapPlayer = "\u25C0";// "\u25C1";// "<";
     	}
-    	
     	// Determine settlement status and proximity
     	KonTerritory closestTerritory = null;
     	boolean isLocValidSettle = true;
@@ -1990,14 +1987,11 @@ public class KingdomManager {
 		int searchDist = 0;
 		int min_distance_capital = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
 		int min_distance_town = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
-		Chunk searchChunk = center.getChunk();
-		World searchWorld = searchChunk.getWorld();
-		if(!konquest.isWorldValid(searchWorld)) {
+		if(!konquest.isWorldValid(center.getWorld())) {
 			isLocValidSettle = false;
 		}
-		Date step1 = new Date();
 		for(KonKingdom kingdom : kingdomMap.values()) {
-			searchDist = Konquest.distanceInChunks(searchChunk, kingdom.getCapital().getCenterLoc().getChunk());
+			searchDist = Konquest.chunkDistance(center, kingdom.getCapital().getCenterLoc());
 			if(searchDist != -1) {
 				if(searchDist < minDistance) {
 					minDistance = searchDist;
@@ -2008,7 +2002,7 @@ public class KingdomManager {
 				}
 			}
 			for(KonTown town : kingdom.getTowns()) {
-				searchDist = Konquest.distanceInChunks(searchChunk, town.getCenterLoc().getChunk());
+				searchDist = Konquest.chunkDistance(center, town.getCenterLoc());
 				if(searchDist != -1) {
 					if(searchDist < minDistance) {
 						minDistance = searchDist;
@@ -2021,7 +2015,7 @@ public class KingdomManager {
 			}
 		}
 		for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			searchDist = Konquest.distanceInChunks(searchChunk, ruin.getCenterLoc().getChunk());
+			searchDist = Konquest.chunkDistance(center, ruin.getCenterLoc());
 			if(searchDist != -1) {
 				if(searchDist < minDistance) {
 					minDistance = searchDist;
@@ -2032,7 +2026,6 @@ public class KingdomManager {
 				}
 			}
 		}
-		Date step2 = new Date();
 		// Verify no overlapping init chunks
 		int radius = konquest.getConfigManager().getConfig("core").getInt("core.towns.init_radius");
 		for(Chunk chunk : konquest.getAreaChunks(center, radius)) {
@@ -2048,10 +2041,8 @@ public class KingdomManager {
     		settleTip = ChatColor.STRIKETHROUGH+settleTip;
     		settleTip = ChatColor.GRAY+settleTip;
     	}
-    	int evalCount = 0;
     	// Evaluate surrounding chunks
     	for(Chunk chunk: konquest.getAreaChunks(center, ((mapSize-1)/2)+1)) {
-    		evalCount++;
     		Point mapPoint = konquest.toPoint(chunk);
     		int diffOriginX = (int)(mapPoint.getX() - originPoint.getX());
     		int diffOriginY = (int)(mapPoint.getY() - originPoint.getY());
@@ -2115,7 +2106,6 @@ public class KingdomManager {
     	}
     	// Determine distance to closest territory
     	//KonTerritory closestTerritory = getClosestTerritory(center.getChunk());
-    	Date step3 = new Date();
     	ChatColor closestTerritoryColor = ChatColor.GRAY;
     	int distance = 0;
     	int maxDistance = 99;
@@ -2135,7 +2125,6 @@ public class KingdomManager {
     	if(distance > maxDistance) {
     		distance = 99;
     	}
-    	Date step4 = new Date();
     	// Display map
     	String header = ChatColor.GOLD+MessagePath.MENU_MAP_CENTER.getMessage()+": "+(int)originPoint.getX()+","+(int)originPoint.getY();
     	ChatUtil.sendNotice(bukkitPlayer, header);
@@ -2158,14 +2147,5 @@ public class KingdomManager {
     		}
     		ChatUtil.sendMessage(bukkitPlayer, mapLine);
     	}
-    	Date step5 = new Date();
-    	
-    	int s1 = (int)(step1.getTime() - start.getTime());
-    	int s2 = (int)(step2.getTime() - start.getTime());
-    	int s3 = (int)(step3.getTime() - start.getTime());
-    	int s4 = (int)(step4.getTime() - start.getTime());
-    	int s5 = (int)(step5.getTime() - start.getTime());
-    	
-    	ChatUtil.printDebug("Map timings ("+evalCount+" chunks): "+s1+","+s2+","+s3+","+s4+","+s5);
 	}
 }
