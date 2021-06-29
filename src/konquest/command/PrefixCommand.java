@@ -1,16 +1,16 @@
 package konquest.command;
 
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
+//import org.bukkit.util.StringUtil;
 
 import konquest.Konquest;
 import konquest.model.KonPlayer;
-import konquest.model.KonPrefixType;
+//import konquest.model.KonPrefixType;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
@@ -21,8 +21,8 @@ public class PrefixCommand extends CommandBase {
     }
 	
 	public void execute() {
-		// k prefix <name>|off
-    	if (getArgs().length != 2) {
+		// k prefix
+    	if (getArgs().length != 1) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
@@ -33,6 +33,11 @@ public class PrefixCommand extends CommandBase {
         	}
         	
         	Player bukkitPlayer = (Player) getSender();
+        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+    			ChatUtil.printDebug("Failed to find non-existent player");
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			return;
+    		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 
         	if(player.isBarbarian()) {
@@ -41,6 +46,9 @@ public class PrefixCommand extends CommandBase {
         		return;
         	}
         	
+        	getKonquest().getDisplayManager().displayPrefixMenu(player);
+        	
+        	/*
         	String prefixReq = getArgs()[1];
         	if(prefixReq.equalsIgnoreCase("off")) {
         		// Selected off
@@ -65,14 +73,19 @@ public class PrefixCommand extends CommandBase {
         		}
         	} else {
         		// Bad selection, not a prefix
+        		
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
         	}
+        	*/
         }
 	}
 
 	@Override
 	public List<String> tabComplete() {
-		// k prefix <name>|off
+		// k prefix
+		// No arguments to complete
+		return Collections.emptyList();
+		/*
 		if(getKonquest().getAccomplishmentManager().isEnabled()) {
 			List<String> tabList = new ArrayList<>();
 			final List<String> matchedTabList = new ArrayList<>();
@@ -93,5 +106,6 @@ public class PrefixCommand extends CommandBase {
 		} else {
 			return Collections.emptyList();
 		}
+		*/
 	}
 }

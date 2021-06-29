@@ -181,6 +181,10 @@ public class PlayerListener implements Listener{
         	if(enable) {
 	        	// Format chat messages
 	        	Player bukkitPlayer = event.getPlayer();
+	        	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+					ChatUtil.printDebug("Failed to handle onAsyncPlayerChat for non-existent player");
+					return;
+				}
 	            KonPlayer player = playerManager.getPlayer(bukkitPlayer);
 	            KonKingdom kingdom = player.getKingdom();
 	            event.setCancelled(true);
@@ -252,7 +256,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
     	KonPlayer player = playerManager.getPlayer(event.getPlayer());
-    	if(player.isCombatTagged()) {
+    	if(player != null && player.isCombatTagged()) {
     		for(String cmd : playerManager.getBlockedCommands()) {
     			if(event.getMessage().toLowerCase().startsWith("/"+cmd.toLowerCase())) {
     				//ChatUtil.sendError(event.getPlayer(), "This command is blocked while in combat");
@@ -272,6 +276,10 @@ public class PlayerListener implements Listener{
     public void onPlayerInteract(PlayerInteractEvent event) {
     	// TODO Allow players to use boats in capital?
     	Player bukkitPlayer = event.getPlayer();
+    	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+			ChatUtil.printDebug("Failed to handle onPlayerInteract for non-existent player");
+			return;
+		}
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
         // When a player is setting regions...
         if (player.isSettingRegion()) {
@@ -515,7 +523,7 @@ public class PlayerListener implements Listener{
     		}
 	        if(territory instanceof KonTown) {
     			KonTown town = (KonTown) territory;
-    			if(!player.getKingdom().equals(town.getKingdom())) {
+    			if(player != null && !player.getKingdom().equals(town.getKingdom())) {
     				//ChatUtil.printDebug("Cancelling to protect town");
     				event.setCancelled(true);
         			return;
@@ -536,7 +544,7 @@ public class PlayerListener implements Listener{
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
         
-        if(!player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation().getChunk())) {
+        if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation().getChunk())) {
         	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation().getChunk());
         	// Capital protections...
         	if(territory instanceof KonCapital) {
@@ -572,7 +580,7 @@ public class PlayerListener implements Listener{
     public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-        if(!player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation().getChunk())) {
+        if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation().getChunk())) {
         	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation().getChunk());
         	// Capital protections...
         	if(territory instanceof KonCapital) {
@@ -587,7 +595,7 @@ public class PlayerListener implements Listener{
     public void onPlayerFish(PlayerFishEvent event) {
     	if(!event.isCancelled()) {
     		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
-    		if(event.getState().equals(PlayerFishEvent.State.CAUGHT_FISH)) {
+    		if(player != null && event.getState().equals(PlayerFishEvent.State.CAUGHT_FISH)) {
     			Entity caughtEntity = event.getCaught();
     			if(caughtEntity instanceof Item) {
     				Item caughtItem = (Item)caughtEntity;
@@ -615,7 +623,7 @@ public class PlayerListener implements Listener{
     	if(!event.isCancelled()) {
     		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
     		// Check for potion usage and update accomplishment
-    		if(event.getItem().getType().equals(Material.POTION)) {
+    		if(player != null && event.getItem().getType().equals(Material.POTION)) {
     			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.POTIONS,1);
     		}
     	}
@@ -642,6 +650,10 @@ public class PlayerListener implements Listener{
 				return;
 			}
 			// Prevent enemy players from placing or picking up liquids inside of towns
+			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+				ChatUtil.printDebug("Failed to handle onBucketUse for non-existent player");
+				return;
+			}
 			KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 			if(territory instanceof KonTown && !player.getKingdom().equals(territory.getKingdom())) {
 				// The block is located inside an enemy town, cancel
@@ -662,6 +674,10 @@ public class PlayerListener implements Listener{
     	ChatUtil.printDebug("EVENT: Player respawned");
     	Location currentLoc = event.getPlayer().getLocation();
     	Location respawnLoc = event.getRespawnLocation();
+    	if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+			ChatUtil.printDebug("Failed to handle onPlayerRespawn for non-existent player");
+			return;
+		}
     	KonPlayer player = playerManager.getPlayer(event.getPlayer());
     	// Send respawn to capital if no bed exists
     	if(!event.isBedSpawn()) {
@@ -706,7 +722,7 @@ public class PlayerListener implements Listener{
     	Player bukkitPlayer = event.getPlayer();
     	KonPlayer player = playerManager.getPlayer(bukkitPlayer);
     	int boostPercent = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.smallest_exp_boost_percent");
-    	if(boostPercent != 0 && player.getKingdom().isSmallest()) {
+    	if(boostPercent != 0 && player != null && player.getKingdom().isSmallest()) {
     		int baseAmount = event.getAmount();
     		int boostAmount = ((boostPercent*baseAmount)/100)+baseAmount;
     		//ChatUtil.printDebug("Boosting "+baseAmount+" exp for "+bukkitPlayer.getName()+" to "+boostAmount);
@@ -748,8 +764,8 @@ public class PlayerListener implements Listener{
     	if(portalToLoc != null) {
 	    	ChatUtil.printDebug("EVENT: Player portal to world "+portalToLoc.getWorld().getName()+" because "+event.getCause()+", location: "+portalToLoc.toString());
 	    	Player bukkitPlayer = event.getPlayer();
-	    	// When portal into primary world...
-	    	if(konquest.getWorldName().equalsIgnoreCase(portalToLoc.getWorld().getName())) {
+	    	// When portal into valid world...
+	    	if(konquest.isWorldValid(portalToLoc.getWorld())) {
 				// Protections for territory
 	    		if(konquest.getKingdomManager().isChunkClaimed(portalToLoc.getChunk())) {
 		    		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(portalToLoc.getChunk());
@@ -810,6 +826,10 @@ public class PlayerListener implements Listener{
     	if(!event.getTo().getChunk().equals(event.getFrom().getChunk()) || !event.getTo().getWorld().equals(event.getFrom().getWorld())) {
     		
     		Player bukkitPlayer = event.getPlayer();
+    		if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+				//ChatUtil.printDebug("Failed to handle onPlayerEnterLeaveChunk for non-existent player");
+				return;
+			}
         	KonPlayer player = playerManager.getPlayer(bukkitPlayer);
         	
     		if(event.getTo().getWorld().equals(event.getFrom().getWorld())) {
@@ -1035,7 +1055,7 @@ public class PlayerListener implements Listener{
 				for(Entity p : golem.getNearbyEntities(32,32,32)) {
 					if(p instanceof Player) {
 						KonPlayer nearbyPlayer = playerManager.getPlayer((Player)p);
-						if(!nearbyPlayer.isAdminBypassActive() && !nearbyPlayer.getKingdom().equals(territory.getKingdom()) && territory.isLocInside(p.getLocation()) &&
+						if(nearbyPlayer != null && !nearbyPlayer.isAdminBypassActive() && !nearbyPlayer.getKingdom().equals(territory.getKingdom()) && territory.isLocInside(p.getLocation()) &&
 								(useDefault || !nearbyPlayer.equals(triggerPlayer))) {
 							double distance = golem.getLocation().distance(p.getLocation());
 							if(distance < minDistance) {
@@ -1050,8 +1070,10 @@ public class PlayerListener implements Listener{
 				//ChatUtil.printDebug("Golem: Evaluating new targets in territory "+territory.getName());
 				if(currentTarget != null && currentTarget instanceof Player) {
 					KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
-					previousTargetPlayer.removeMobAttacker(golem);
-					//ChatUtil.printDebug("Golem: Removed mob attacker from player "+previousTargetPlayer.getBukkitPlayer().getName());
+					if(previousTargetPlayer != null) {
+						previousTargetPlayer.removeMobAttacker(golem);
+						//ChatUtil.printDebug("Golem: Removed mob attacker from player "+previousTargetPlayer.getBukkitPlayer().getName());
+					}
 				} else {
 					//ChatUtil.printDebug("Golem: Bad current target");
 				}

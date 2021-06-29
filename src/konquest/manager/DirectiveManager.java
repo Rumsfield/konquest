@@ -42,7 +42,7 @@ public class DirectiveManager {
 			//ChatUtil.printDebug("Initialized reward "+reward+" for directive "+dirName);
 		}
 		isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.directive_quests",true);
-		ChatUtil.printDebug("Directive Manager is ready in world "+konquest.getWorldName()+", enabled: "+isEnabled);
+		ChatUtil.printDebug("Directive Manager is ready, enabled: "+isEnabled);
 	}
 	
 	public boolean isEnabled() {
@@ -73,7 +73,7 @@ public class DirectiveManager {
 					// Give reward
 					ChatUtil.printDebug("Directive rewarded to player "+player.getBukkitPlayer().getName()+" for directive "+directive.title());
 					double reward = rewardTable.get(directive);
-					EconomyResponse r = KonquestPlugin.getEconomy().depositPlayer(player.getBukkitPlayer(), reward);
+					EconomyResponse r = KonquestPlugin.depositPlayer(player.getBukkitPlayer(), reward);
 		            if(r.transactionSuccess()) {
 		            	String balanceF = String.format("%.2f",r.balance);
 		            	String amountF = String.format("%.2f",r.amount);

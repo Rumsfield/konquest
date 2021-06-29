@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 //import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -197,15 +198,15 @@ public class IntegrationManager {
 	}
 	*/
 	
-	public void deleteShopsInPoints(Collection<Point> points) {
+	public void deleteShopsInPoints(Collection<Point> points, World world) {
 		if(isQuickShopEnabled && !points.isEmpty()) {
 			for(Point point : points) {
-				Chunk chunk = konquest.toChunk(point);
+				Chunk chunk = konquest.toChunk(point,world);
 				Map<Location, Shop> shopMap = QuickShopAPI.getShopAPI().getShop(chunk);
 				if(shopMap != null) {
 					for(Shop shop : shopMap.values()) {
 						Location shopLoc = shop.getLocation();
-						Bukkit.getWorld(konquest.getWorldName()).playEffect(shopLoc, Effect.IRON_TRAPDOOR_TOGGLE, null);
+						world.playEffect(shopLoc, Effect.IRON_TRAPDOOR_TOGGLE, null);
 						ChatUtil.printDebug("Deleting shop owned by "+Bukkit.getOfflinePlayer(shop.getOwner()).getName());
 						shop.delete();
 					}

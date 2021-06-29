@@ -46,7 +46,7 @@ public class QuickShopListener implements Listener{
 			
 			// Bypass all checks for admins in bypass mode
 			KonPlayer player = playerManager.getPlayer(event.getPlayer());
-			if(!player.isAdminBypassActive()) {
+			if(player != null && !player.isAdminBypassActive()) {
 				if(kingdomManager.isChunkClaimed(event.getLocation().getChunk())) {
 					//ChatUtil.printDebug("...checking claimed chunk");
 					KonTerritory territory = kingdomManager.getChunkTerritory(event.getLocation().getChunk());
@@ -103,7 +103,7 @@ public class QuickShopListener implements Listener{
 		
 			// Bypass all checks for admins in bypass mode
 			KonPlayer player = playerManager.getPlayer(event.getPlayer());
-			if(!player.isAdminBypassActive()) {
+			if(player != null && !player.isAdminBypassActive()) {
 				Location shopLoc = event.getShop().getLocation();
 				if(kingdomManager.isChunkClaimed(shopLoc.getChunk())) {
 					KonTerritory territory = kingdomManager.getChunkTerritory(shopLoc.getChunk());

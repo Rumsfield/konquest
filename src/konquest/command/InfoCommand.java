@@ -5,16 +5,16 @@ import java.util.Collections;
 import java.util.List;
 
 import konquest.Konquest;
-import konquest.KonquestPlugin;
+//import konquest.KonquestPlugin;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
+//import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-import org.bukkit.ChatColor;
+//import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -36,11 +36,16 @@ public class InfoCommand extends CommandBase {
         	Player bukkitPlayer = (Player) getSender();
         	int displayState = 0; // 0 = kingdom, 1 = town, 2 = player
         	// Init info as own player's
+        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+    			ChatUtil.printDebug("Failed to find non-existent player");
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			return;
+    		}
         	KonPlayer sender = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	KonOfflinePlayer player = sender;
         	KonKingdom kingdom = player.getKingdom();
         	KonTown town = null;
-        	String color = ""+ChatColor.GREEN;
+        	//String color = ""+ChatColor.GREEN;
         	if(getArgs().length == 1) {
         		// Display your own Kingdom info
         		displayState = 0;
@@ -71,23 +76,23 @@ public class InfoCommand extends CommandBase {
         			//ChatUtil.printDebug("Parsed kingdom");
         			displayState = 0;
         			kingdom = getKonquest().getKingdomManager().getKingdom(name);
-        			if(!player.getKingdom().equals(kingdom)) {
-        				color = ""+ChatColor.RED;
-        			}
+        			//if(!player.getKingdom().equals(kingdom)) {
+        			//	color = ""+ChatColor.RED;
+        			//}
         		} else if(name.equalsIgnoreCase("barbarians")) {
         			//ChatUtil.printDebug("Parsed Barbarian kingdom");
         			displayState = 0;
         			kingdom = getKonquest().getKingdomManager().getBarbarians();
-        			if(!player.getKingdom().equals(kingdom)) {
-        				color = ""+ChatColor.RED;
-        			}
+        			//if(!player.getKingdom().equals(kingdom)) {
+        			//	color = ""+ChatColor.RED;
+        			//}
         		} else if(foundTown) {
         			//ChatUtil.printDebug("Parsed Town in sender's kingdom");
         			//Check for Town
         			displayState = 1;
-        			if(!player.getKingdom().equals(town.getKingdom())) {
-        				color = ""+ChatColor.RED;
-        			}
+        			//if(!player.getKingdom().equals(town.getKingdom())) {
+        			//	color = ""+ChatColor.RED;
+        			//}
         		} else {
         			// Check for Player
         			//ChatUtil.printDebug("Parsing player");
@@ -96,9 +101,9 @@ public class InfoCommand extends CommandBase {
         			if(otherPlayer != null) {
         				//ChatUtil.printDebug("Player is not null");
         				displayState = 2;
-        				if(!player.getKingdom().equals(otherPlayer.getKingdom())) {
-        					color = ""+ChatColor.RED;
-        				}
+        				//if(!player.getKingdom().equals(otherPlayer.getKingdom())) {
+        				//	color = ""+ChatColor.RED;
+        				//}
         				player = otherPlayer;
         			} else {
             			//ChatUtil.sendError((Player) getSender(), "Failed to find unknown name, check spelling: "+name);
@@ -107,6 +112,7 @@ public class InfoCommand extends CommandBase {
         			}
         		}
         	}
+        	/*
         	String labelTotalPlayers = MessagePath.LABEL_TOTAL_PLAYERS.getMessage();
         	String labelOnlinePlayers = MessagePath.LABEL_ONLINE_PLAYERS.getMessage();
         	String labelPlayer = MessagePath.LABEL_PLAYER.getMessage();
@@ -122,9 +128,11 @@ public class InfoCommand extends CommandBase {
         	String labelInvites = MessagePath.LABEL_INVITES.getMessage();
         	String labelRequests = MessagePath.LABEL_REQUESTS.getMessage();
         	String labelResidencies = MessagePath.LABEL_RESIDENCIES.getMessage();
-        	
+        	*/
         	switch(displayState) {
         	case 0: // Display kingdom info
+        		getKonquest().getDisplayManager().displayKingdomInfoMenu(sender, kingdom);
+        		/*
         		//ChatUtil.printDebug("Displaying Kingdom");
         		String kingdomName = kingdom.getName();
 	        	int numKingdomTowns = kingdom.getTowns().size();
@@ -158,9 +166,12 @@ public class InfoCommand extends CommandBase {
 		        		ChatUtil.sendMessage(bukkitPlayer, line);
 		        	}
 	        	}
+	        	*/
         		break;
         	case 1: // Display town info
         		if(town != null) {
+        			getKonquest().getDisplayManager().displayTownInfoMenu(sender, town);
+        			/*
         			String townName = town.getName();
         			String isOpen = String.valueOf(town.isOpen());
         			int townSize = town.getChunkList().size();
@@ -251,12 +262,15 @@ public class InfoCommand extends CommandBase {
     		        		ChatUtil.sendMessage(bukkitPlayer, line);
     		        	}
         			}
+        			*/
         		} else {
         			ChatUtil.printDebug("Failed to display null town info of town "+getArgs()[1]);
         			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
         		}
         		break;
         	case 2: // Display player info
+        		getKonquest().getDisplayManager().displayPlayerInfoMenu(sender, player);
+        		/*
         		//ChatUtil.printDebug("Displaying Player");
         		String playerName = player.getOfflineBukkitPlayer().getName();
         		String playerKingdom = player.getKingdom().getName();
@@ -291,6 +305,7 @@ public class InfoCommand extends CommandBase {
     	        		ChatUtil.sendMessage(bukkitPlayer, line);
     	        	}
         		}
+        		*/
         		break;
         	default:
         		ChatUtil.printDebug("Failed to display info, unknown state");

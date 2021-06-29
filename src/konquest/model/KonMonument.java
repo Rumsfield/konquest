@@ -156,7 +156,7 @@ public class KonMonument{
 		}
 		Chunk centerChunk = centerLoc.getChunk();
 		Chunk testChunk = loc.getChunk();
-		boolean isChunkMatch = centerChunk.getX() == testChunk.getX() && centerChunk.getZ() == testChunk.getZ();
+		boolean isChunkMatch = centerLoc.getWorld().equals(loc.getWorld()) && centerChunk.getX() == testChunk.getX() && centerChunk.getZ() == testChunk.getZ();
 		//ChatUtil.printDebug("Chunk match: "+isChunkMatch);	
 		//ChatUtil.printDebug("Comparing Y "+loc.getBlockY()+" to baseY "+baseY+" and height "+height);
 		return isChunkMatch && loc.getBlockY() >= baseY && loc.getBlockY() < baseY+height;

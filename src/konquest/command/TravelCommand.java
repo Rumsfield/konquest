@@ -46,12 +46,17 @@ public class TravelCommand extends CommandBase {
         	Player bukkitPlayer = (Player) getSender();
         	
         	World bukkitWorld = bukkitPlayer.getWorld();
-        	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
+        	if(!getKonquest().isWorldValid(bukkitWorld)) {
         		//ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_WORLD.toString());
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
         	
+        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+    			ChatUtil.printDebug("Failed to find non-existent player");
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			return;
+    		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 			// Verify player is not in enemy territory
 			boolean blockEnemyTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_travel");
@@ -111,7 +116,7 @@ public class TravelCommand extends CommandBase {
         	} else if(travelName.equalsIgnoreCase("wild")) {
         		// Travel to random wild location
         		int radius = getKonquest().getConfigManager().getConfig("core").getInt("core.travel_wild_random_radius",200);
-        		travelLoc = getKonquest().getRandomWildLocation(radius*2);
+        		travelLoc = getKonquest().getRandomWildLocation(radius*2,bukkitWorld);
         		destination = TravelDestination.WILD;
         	} else {
         		// Travel to town
@@ -140,20 +145,29 @@ public class TravelCommand extends CommandBase {
 	        	boolean isTravelAlwaysAllowed = getKonquest().getConfigManager().getConfig("core").getBoolean("core.favor.allow_travel_always",true);
 	        	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel",0.0);
 	        	double cost_per_chunk = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel_per_chunk",0.0);
+	        	double cost_world = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel_world",0.0);
 	        	cost = (cost < 0) ? 0 : cost;
 	        	cost_per_chunk = (cost_per_chunk < 0) ? 0 : cost_per_chunk;
-	        	double total_cost = cost + cost_per_chunk*getKonquest().distanceInChunks(travelLoc,bukkitPlayer.getLocation());
+	        	double total_cost = 0;
+	        	int chunkDistance = Konquest.distanceInChunks(travelLoc,bukkitPlayer.getLocation());
+	        	if(chunkDistance >= 0) {
+	        		// Value is chunk distance within the same world
+	        		total_cost = cost + cost_per_chunk*chunkDistance;
+	        	} else {
+	        		// Value of -1 means travel points are between different worlds
+	        		total_cost = cost + cost_world;
+	        	}
 				if(!isTravelAlwaysAllowed && total_cost > 0) {
-					if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < total_cost) {
+					if(KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
 						//ChatUtil.sendError((Player) getSender(), "Not enough Favor, need "+total_cost);
 						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(total_cost));
 	                    return;
 					}
 				}
-				if(isTravelAlwaysAllowed && KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < total_cost) {
+				if(isTravelAlwaysAllowed && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
 	        		//ChatUtil.sendNotice((Player) getSender(), "Not enough Favor, this one's on us.");
 	        	} else {
-	        		EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, total_cost);
+	        		EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, total_cost);
 	                if(r.transactionSuccess()) {
 	                	String balanceF = String.format("%.2f",r.balance);
 		            	String amountF = String.format("%.2f",r.amount);
@@ -175,7 +189,7 @@ public class TravelCommand extends CommandBase {
 	            		if(town.isAttacked() && town.addDefender(bukkitPlayer)) {
 	            			ChatUtil.printDebug("Raid defense rewarded to player "+player.getBukkitPlayer().getName());
 	            			int defendReward = getKonquest().getConfigManager().getConfig("core").getInt("core.favor.rewards.defend_raid");
-	        				EconomyResponse r = KonquestPlugin.getEconomy().depositPlayer(player.getBukkitPlayer(), defendReward);
+	        				EconomyResponse r = KonquestPlugin.depositPlayer(player.getBukkitPlayer(), defendReward);
 	        	            if(r.transactionSuccess()) {
 	        	            	String balanceF = String.format("%.2f",r.balance);
 	        	            	String amountF = String.format("%.2f",r.amount);

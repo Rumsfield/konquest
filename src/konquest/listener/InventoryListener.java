@@ -16,7 +16,6 @@ import konquest.utility.MessagePath;
 
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -63,6 +62,11 @@ public class InventoryListener implements Listener {
 		Location openLoc = event.getInventory().getLocation();
 		
 		if(openLoc != null && konquest.getKingdomManager().isChunkClaimed(openLoc.getChunk())) {
+			
+			if(!konquest.getPlayerManager().isPlayer((Player)event.getPlayer())) {
+				ChatUtil.printDebug("Failed to handle onInventoryOpen for non-existent player");
+				return;
+			}
 			KonPlayer player = playerManager.getPlayer((Player)event.getPlayer());
 			// Bypass event restrictions for player in Admin Bypass Mode
 			if(!player.isAdminBypassActive()) {
@@ -113,7 +117,7 @@ public class InventoryListener implements Listener {
 								boolean result = konquest.getLootManager().updateMonumentLoot(event.getInventory(), town);
 								ChatUtil.printDebug("Attempted to update loot in town "+territory.getName()+", got "+result);
 								if(result) {
-									Bukkit.getWorld(konquest.getWorldName()).playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
+									event.getInventory().getLocation().getWorld().playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
 								} else {
 									//ChatUtil.sendNotice(player.getBukkitPlayer(), "Come back later!");
 									ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_LOOT_LATER.getMessage());
@@ -146,9 +150,9 @@ public class InventoryListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onInventoryClose(InventoryCloseEvent event) {
-		// When a player closes a display menu
-		if(konquest.getDisplayManager().isScoreMenu(event.getInventory())) {
-			konquest.getDisplayManager().onInventoryClose(event.getInventory());
+		// When a player closes a display menu inventory
+		if(konquest.getDisplayManager().isDisplayMenu(event.getInventory())) {
+			konquest.getDisplayManager().onDisplayMenuClose(event.getInventory());
 		}
 	}
 	
@@ -156,28 +160,12 @@ public class InventoryListener implements Listener {
     public void onDisplayMenuClick(InventoryClickEvent event) {
 		int slot = event.getRawSlot();
 		Player bukkitPlayer = (Player) event.getWhoClicked();
-		// When a player clicks inside of the help menu
-		if(konquest.getDisplayManager().isHelpMenu(event.getClickedInventory())) {
-			//ChatUtil.printDebug("Inventory click event inside of Help Menu, slot "+slot);
+		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		// When a player clicks inside of a display menu inventory
+		if(player != null && konquest.getDisplayManager().isDisplayMenu(event.getClickedInventory())) {
 			if(slot < event.getView().getTopInventory().getSize()) {
 				event.setCancelled(true);
-				konquest.getDisplayManager().sendHelpContext(bukkitPlayer, slot);
-			}
-		} else if(konquest.getDisplayManager().isTownUpgradeMenu(event.getClickedInventory())) {
-			//ChatUtil.printDebug("Inventory click event inside of an Upgrade Menu, slot "+slot);
-			if(slot < event.getView().getTopInventory().getSize()) {
-				event.setCancelled(true);
-				boolean status = konquest.getDisplayManager().onTownUpgradeMenuClick(bukkitPlayer, event.getClickedInventory(), slot);
-				if(status) {
-					Bukkit.getWorld(konquest.getWorldName()).playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, (float)1.0, (float)1.0);
-				}
-			}
-		} else if(konquest.getDisplayManager().isScoreMenu(event.getClickedInventory())) {
-			//ChatUtil.printDebug("Inventory click event inside of a Score Menu, slot "+slot);
-			if(slot < event.getView().getTopInventory().getSize()) {
-				event.setCancelled(true);
-				KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-				konquest.getDisplayManager().onScoreMenuClick(player, event.getClickedInventory(), slot);
+				konquest.getDisplayManager().onDisplayMenuClick(player, event.getClickedInventory(), slot);
 			}
 		}
 	}
@@ -192,7 +180,7 @@ public class InventoryListener implements Listener {
 				//ChatUtil.printDebug("Inventory pickup event in smithing table slot "+slot+" with item "+itemType.toString());
 				HumanEntity human = event.getWhoClicked();
 				KonPlayer player = playerManager.getPlayer((Player)human);
-				if(itemType.equals(Material.NETHERITE_AXE) ||
+				if(player != null && (itemType.equals(Material.NETHERITE_AXE) ||
 						itemType.equals(Material.NETHERITE_HOE) ||
 						itemType.equals(Material.NETHERITE_SHOVEL) ||
 						itemType.equals(Material.NETHERITE_PICKAXE) ||
@@ -200,7 +188,7 @@ public class InventoryListener implements Listener {
 						itemType.equals(Material.NETHERITE_HELMET) ||
 						itemType.equals(Material.NETHERITE_CHESTPLATE) ||
 						itemType.equals(Material.NETHERITE_LEGGINGS) ||
-						itemType.equals(Material.NETHERITE_BOOTS)) {
+						itemType.equals(Material.NETHERITE_BOOTS))) {
 					if(slot == 2) {
 						// Player crafted a netherite item
 						konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,5);
@@ -242,6 +230,10 @@ public class InventoryListener implements Listener {
     public void onCraftItem(CraftItemEvent event) {
 		HumanEntity human = event.getWhoClicked();
 		if(!event.isCancelled() && human instanceof Player) {
+			if(!konquest.getPlayerManager().isPlayer((Player)human)) {
+				ChatUtil.printDebug("Failed to handle onCraftItem for non-existent player");
+				return;
+			}
 			Material recipeMaterial = event.getRecipe().getResult().getType();
 			KonPlayer player = konquest.getPlayerManager().getPlayer((Player)human);
 			if(recipeMaterial.equals(Material.IRON_HELMET) ||
@@ -293,16 +285,19 @@ public class InventoryListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onFurnaceExtract(FurnaceExtractEvent event) {
+		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+			ChatUtil.printDebug("Failed to handle onFurnaceExtract for non-existent player");
+			return;
+		}
+		KonPlayer player = playerManager.getPlayer(event.getPlayer());
 		Material extractMat = event.getItemType();
 		int stackSize = event.getItemAmount();
 		if(extractMat.equals(Material.IRON_INGOT) ||
 				extractMat.equals(Material.GOLD_INGOT) ||
 				extractMat.equals(Material.NETHERITE_SCRAP) ||
 				extractMat.equals(Material.BRICK)) {
-			KonPlayer player = playerManager.getPlayer(event.getPlayer());
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.INGOTS,stackSize);
 		} else if(extractMat.isEdible()) {
-			KonPlayer player = playerManager.getPlayer(event.getPlayer());
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FOOD,stackSize);
 		}
 	}
@@ -310,6 +305,10 @@ public class InventoryListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onEnchantItem(EnchantItemEvent event) {
 		if(!event.isCancelled()) {
+			if(!konquest.getPlayerManager().isPlayer(event.getEnchanter())) {
+				ChatUtil.printDebug("Failed to handle onEnchantItem for non-existent player");
+				return;
+			}
 			KonPlayer player = playerManager.getPlayer(event.getEnchanter());
 			konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.ENCHANT_ITEM);
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.ENCHANTMENTS,1);

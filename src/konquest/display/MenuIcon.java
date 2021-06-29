@@ -10,6 +10,8 @@ public interface MenuIcon {
 	
 	public ItemStack getItem();
 	
+	public boolean isClickable();
+	
 }
 
 /*

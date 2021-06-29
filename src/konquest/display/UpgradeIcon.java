@@ -73,6 +73,11 @@ public class UpgradeIcon implements MenuIcon{
 	public ItemStack getItem() {
 		return item;
 	}
+	
+	@Override
+	public boolean isClickable() {
+		return true;
+	}
 
 }
 

@@ -9,12 +9,15 @@ import konquest.listener.PlayerListener;
 import konquest.listener.WorldListener;
 import konquest.utility.ChatUtil;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 //import org.maxgamer.quickshop.api.QuickShopAPI;
 
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
 
 public class KonquestPlugin extends JavaPlugin {
 	
@@ -88,4 +91,68 @@ public class KonquestPlugin extends JavaPlugin {
 	public static Economy getEconomy() {
         return econ;
     }
+	
+	/*
+	 * Economy wrapper functions. Attempt to use Vault API methods, and then try depreciated methods if those fail.
+	 */
+	
+	@SuppressWarnings("deprecation")
+	public static double getBalance(OfflinePlayer offlineBukkitPlayer) {
+		double result = 0;
+		try {
+			result = econ.getBalance(offlineBukkitPlayer);
+		} catch(Exception e) {
+			try {
+				result = econ.getBalance(offlineBukkitPlayer.getName());
+			} catch(Exception x) {
+				result = econ.getBalance(formatStringForAConomyPlugin(offlineBukkitPlayer));
+			}
+		}
+		return result;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static EconomyResponse withdrawPlayer(OfflinePlayer offlineBukkitPlayer, double amount) {
+		EconomyResponse result;
+		try {
+			result = econ.withdrawPlayer(offlineBukkitPlayer, amount);
+		} catch(Exception e) {
+			try {
+				result = econ.withdrawPlayer(offlineBukkitPlayer.getName(), amount);
+			} catch(Exception x) {
+				result = econ.withdrawPlayer(formatStringForAConomyPlugin(offlineBukkitPlayer), amount);
+			}
+		}
+		return result;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static EconomyResponse depositPlayer(OfflinePlayer offlineBukkitPlayer, double amount) {
+		EconomyResponse result;
+		try {
+			result = econ.depositPlayer(offlineBukkitPlayer, amount);
+		} catch(Exception e) {
+			try {
+				result = econ.depositPlayer(offlineBukkitPlayer.getName(), amount);
+			} catch(Exception x) {
+				result = econ.depositPlayer(formatStringForAConomyPlugin(offlineBukkitPlayer), amount);
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * This method is stupid, and is specific to unique way that AConomy implements its Vault API methods.
+	 * @param offlineBukkitPlayer
+	 * @return String of player's UUID when server is online-mode=true, else player's lowercase name.
+	 */
+	private static String formatStringForAConomyPlugin(OfflinePlayer offlineBukkitPlayer) {
+		String playerString = "";
+		if(Bukkit.getServer().getOnlineMode()) {
+			playerString = offlineBukkitPlayer.getUniqueId().toString();
+		} else {
+			playerString = offlineBukkitPlayer.getName().toLowerCase();
+		}
+		return playerString;
+	}
 }

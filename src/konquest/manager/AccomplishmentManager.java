@@ -39,7 +39,7 @@ public class AccomplishmentManager {
 	public void initialize() {
 		boolean configEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.accomplishment_prefix");
 		isEnabled = configEnabled;
-		ChatUtil.printDebug("Accomplishment Manager is ready in world "+konquest.getWorldName()+" with prefix "+isEnabled);
+		ChatUtil.printDebug("Accomplishment Manager is ready with prefix "+isEnabled);
 	}
 	
 	public boolean isEnabled() {
@@ -72,7 +72,7 @@ public class AccomplishmentManager {
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+"Accomplishment prefix unlocked: "+ChatColor.DARK_PURPLE+pre.getName());
 						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+MessagePath.GENERIC_NOTICE_ACCOMPLISHMENT.getMessage(), 60, 5, 10);
 						ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+MessagePath.GENERIC_NOTICE_PREFIX_UNLOCK.getMessage()+": "+ChatColor.DARK_PURPLE+pre.getName());
-						Bukkit.getWorld(konquest.getWorldName()).playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)1.0);
+						player.getBukkitPlayer().getWorld().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)1.0);
 					}
 				}
 			}
@@ -190,6 +190,29 @@ public class AccomplishmentManager {
 		// Display book
 		book.setItemMeta(meta);
 		player.getBukkitPlayer().openBook(book);
+	}
+	
+	public void disablePlayerPrefix(KonPlayer player) {
+		if(player.getPlayerPrefix().isEnabled()) {
+			player.getPlayerPrefix().setEnable(false);
+			//ChatUtil.sendNotice((Player) getSender(), "Turned off your prefix title");
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_DISABLE.getMessage());
+		} else {
+			//ChatUtil.sendNotice((Player) getSender(), "Your prefix title is already off");
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_DISABLE.getMessage());
+		}
+	}
+	
+	public void applyPlayerPrefix(KonPlayer player, KonPrefixType prefix) {
+		if(player.getPlayerPrefix().selectPrefix(prefix)) {
+			player.getPlayerPrefix().setEnable(true);
+			//ChatUtil.sendNotice((Player) getSender(), "Your prefix is now "+prefixChosen.getName());
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(prefix.getName()));
+			Konquest.playSuccessSound(player.getBukkitPlayer());
+		} else {
+			//ChatUtil.sendNotice((Player) getSender(), "The prefix "+prefixChosen.getName()+" is not unlocked!");
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_NEW.getMessage(prefix.getName()));
+		}
 	}
 
 }

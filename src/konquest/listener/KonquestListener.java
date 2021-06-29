@@ -19,7 +19,6 @@ import konquest.utility.Timer;
 
 import java.util.ArrayList;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -136,7 +135,7 @@ public class KonquestListener implements Listener {
 			if(!camp.isRaidAlertDisabled() && !event.getPlayer().isAdminBypassActive() && 
 					!event.getPlayer().getKingdom().isPeaceful()) {
 				// Alert the camp owner if online
-				if(camp.isOwnerOnline() && !event.getPlayer().getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
+				if(camp.isOwnerOnline() && playerManager.isPlayer((Player)camp.getOwner()) && !event.getPlayer().getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
 					KonPlayer ownerPlayer = playerManager.getPlayer((Player)camp.getOwner());
 					//ChatUtil.sendNotice((Player)camp.getOwner(), "Enemy spotted in "+event.getTerritory().getName()+", use \"/k travel camp\" to defend!", ChatColor.DARK_RED);
 					ChatUtil.sendNotice((Player)camp.getOwner(), MessagePath.PROTECTION_NOTICE_RAID.getMessage(event.getTerritory().getName(),"camp"),ChatColor.DARK_RED);
@@ -243,7 +242,7 @@ public class KonquestListener implements Listener {
 						} else {
 							local_z = Math.abs(townSpawnLoc.getBlockZ() % -16);
 						}
-						int new_y = Bukkit.getServer().getWorld(konquest.getWorldName()).getChunkAt(townSpawnLoc).getChunkSnapshot(true,false,false).getHighestBlockYAt(local_x, local_z) + 1;
+						int new_y = townSpawnLoc.getWorld().getChunkAt(townSpawnLoc).getChunkSnapshot(true,false,false).getHighestBlockYAt(local_x, local_z) + 1;
 						townSpawnLoc.setY((double)new_y);
 						// Teleport all players inside monument to a safe location
 						event.getPlayer().getBukkitPlayer().teleport(townSpawnLoc);

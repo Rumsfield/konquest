@@ -9,11 +9,12 @@ public class DatabaseThread implements Runnable {
 
     private KonquestDB database;
     private Thread thread;
-
+    private int sleepSeconds;
     private boolean running = false;
 
     public DatabaseThread(Konquest konquest) {
         this.konquest = konquest;
+        this.sleepSeconds = 3600;
         thread = new Thread(this);
     }
 
@@ -25,12 +26,12 @@ public class DatabaseThread implements Runnable {
 
         Thread databaseFlusher = new Thread(new Runnable() {
             //int sleep = konquest.getConfigManager().getCoreConfig().getDatabaseFlushInterval();
-        	int sleep = 3600; // default 60 minutes
+        	//int sleep = 3600; // default 60 minutes
             @Override
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(sleep*1000);
+                        Thread.sleep(sleepSeconds*1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -57,6 +58,10 @@ public class DatabaseThread implements Runnable {
 
     public KonquestDB getDatabase() {
         return database;
+    }
+    
+    public void setSleepSeconds(int val) {
+    	sleepSeconds = val;
     }
 
     public void flushDatabase() {

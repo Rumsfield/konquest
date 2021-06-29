@@ -15,13 +15,15 @@ public class InfoIcon implements MenuIcon{
 	private String info;
 	private int index;
 	private ItemStack item;
+	private boolean isClickable;
 	
-	public InfoIcon(String name, List<String> lore, Material mat, int index) {
+	public InfoIcon(String name, List<String> lore, Material mat, int index, boolean isClickable) {
 		this.name = name;
 		this.lore = lore;
 		this.mat = mat;
 		this.info = "";
 		this.index = index;
+		this.isClickable = isClickable;
 		this.item = initItem();
 	}
 
@@ -60,6 +62,11 @@ public class InfoIcon implements MenuIcon{
 	@Override
 	public ItemStack getItem() {
 		return item;
+	}
+	
+	@Override
+	public boolean isClickable() {
+		return isClickable;
 	}
 	
 }

@@ -16,6 +16,7 @@ import konquest.utility.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -46,7 +47,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	private HashMap<UUID,Boolean> residents;
 	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident, false = requesting add from lord/knight)
 	private boolean isOpen;
-	boolean isAttacked;
+	private boolean isAttacked;
 	private ArrayList<UUID> defenders;
 	private HashMap<KonUpgrade,Integer> upgrades;
 	private HashMap<KonUpgrade,Integer> disabledUpgrades;
@@ -91,7 +92,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		int distX = (int)Math.abs(addChunk.getX() - centerChunk.getX());
 		int distY = (int)Math.abs(addChunk.getY() - centerChunk.getY());
 		
-		if(distX > maxChunkRange || distY > maxChunkRange) {
+		if(!chunk.getWorld().equals(getCenterLoc().getWorld()) || distX > maxChunkRange || distY > maxChunkRange) {
 			ChatUtil.printDebug("Failed to add chunk in territory "+getName()+", too far");
 			return false;
 		}
@@ -126,8 +127,8 @@ public class KonTown extends KonTerritory implements Timeable{
 			ChatUtil.printDebug("Town init failed: "+monument.getBaseY()+" less than min limit "+config_min_y);
 			return 2;
 		}
-		if(config_max_y > Bukkit.getServer().getWorld(getKonquest().getWorldName()).getMaxHeight()) {
-			config_max_y = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getMaxHeight();
+		if(config_max_y > getWorld().getMaxHeight()) {
+			config_max_y = getWorld().getMaxHeight();
 		}
 		if(config_max_y != 0 && monument.getBaseY() > config_max_y) {
 			ChatUtil.printDebug("Town init failed: "+monument.getBaseY()+" greater than max limit "+config_max_y);
@@ -135,7 +136,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		}
 		
 		// Verify monument template will not pass the height limit
-		if(monument.getBaseY() + getKingdom().getMonumentTemplate().getHeight() + 1 >= Bukkit.getServer().getWorld(getKonquest().getWorldName()).getMaxHeight()) {
+		if(monument.getBaseY() + getKingdom().getMonumentTemplate().getHeight() + 1 >= getWorld().getMaxHeight()) {
 			ChatUtil.printDebug("Town init failed: too high");
 			return 2;
 		}
@@ -174,7 +175,6 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 	
 	public boolean pasteMonumentFromTemplate(KonMonumentTemplate template) {
-		
 		if(!template.isValid()) {
 			return false;
 		}
@@ -187,26 +187,27 @@ public class KonTown extends KonTerritory implements Timeable{
         int bottomBlockX = Math.min(template.getCornerOne().getBlockX(), template.getCornerTwo().getBlockX());
         int bottomBlockY = Math.min(template.getCornerOne().getBlockY(), template.getCornerTwo().getBlockY());
         int bottomBlockZ = Math.min(template.getCornerOne().getBlockZ(), template.getCornerTwo().getBlockZ());
-        
+
+        ChunkSnapshot templateChunkSnapshot = template.getCornerOne().getWorld().getChunkAt(template.getCornerOne()).getChunkSnapshot(true,false,false);
+        Chunk fillChunk = getWorld().getChunkAt(getCenterLoc());
+        int base_y = 0;
+        int monument_y = monument.getBaseY();
         for (int x = bottomBlockX; x <= topBlockX; x++) {
             for (int z = bottomBlockZ; z <= topBlockZ; z++) {
-            	int base_y = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getChunkAt(getCenterLoc()).getChunkSnapshot(true,false,false).getHighestBlockYAt(x-bottomBlockX, z-bottomBlockZ);
-                int monument_y = monument.getBaseY();
+            	base_y = templateChunkSnapshot.getHighestBlockYAt(x-bottomBlockX, z-bottomBlockZ);
                 // Fill air between world and monument base
                 if(base_y < monument_y) {
                 	for (int k = base_y; k <= monument_y; k++) {
-                		Block fillBlock = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getChunkAt(getCenterLoc()).getBlock(x-bottomBlockX, k, z-bottomBlockZ);
-                		fillBlock.setType(Material.STONE);
+                		fillChunk.getBlock(x-bottomBlockX, k, z-bottomBlockZ).setType(Material.STONE);
                 	}
                 }
             }
         }
         
-        //BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),0,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
+        BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),template.getCornerOne(),bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
         for (int y = bottomBlockY; y <= topBlockY; y++) {
-        	//monumentPaster.setY(y);
-        	//monumentPaster.startPaste();
-        	BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),y,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
+        	monumentPaster.setY(y);
+        	//BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),y,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
         	monumentPaster.startPaste();
         }
         monument.setIsItemDropsDisabled(false);
@@ -275,7 +276,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		for (int x = 0; x <= 15; x++) {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = 0; z <= 15; z++) {
-                    Block currentBlock = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getChunkAt(getCenterLoc()).getBlock(x, y, z);
+                    Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
                     if(y == minY) {
                     	currentBlock.setType(Material.DIRT);
                     } else {
@@ -291,9 +292,9 @@ public class KonTown extends KonTerritory implements Timeable{
 	public int countWaterInChunk() {
 		int count = 0;
 		for (int x = 0; x <= 15; x++) {
-            for (int y = 0; y <= Bukkit.getServer().getWorld(getKonquest().getWorldName()).getMaxHeight()-1; y++) {
+            for (int y = 0; y <= getWorld().getMaxHeight()-1; y++) {
                 for (int z = 0; z <= 15; z++) {
-                    Block currentBlock = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getChunkAt(getCenterLoc()).getBlock(x, y, z);
+                    Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
                     if(currentBlock.getType().equals(Material.WATER)) {
                     	count++;
                     }
@@ -308,7 +309,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		for (int x = 0; x <= 15; x++) {
             for (int y = 0; y <= monument.getBaseY(); y++) {
                 for (int z = 0; z <= 15; z++) {
-                    Block currentBlock = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getChunkAt(getCenterLoc()).getBlock(x, y, z);
+                    Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
                     if(currentBlock.getType().equals(Material.AIR)) {
                     	count++;
                     }
@@ -322,7 +323,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		for (int x = 0; x <= 15; x++) {
             for (int y = 0; y <= monument.getBaseY(); y++) {
                 for (int z = 0; z <= 15; z++) {
-                    Block currentBlock = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getChunkAt(getCenterLoc()).getBlock(x, y, z);
+                    Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
                     if(currentBlock.getType().equals(Material.AIR)) {
                     	currentBlock.setType(Material.STONE);
                     }
@@ -335,7 +336,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		for (int x = 0; x <= 15; x++) {
             for (int y = 0; y <= monument.getBaseY(); y++) {
                 for (int z = 0; z <= 15; z++) {
-                    Block currentBlock = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getChunkAt(getCenterLoc()).getBlock(x, y, z);
+                    Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
                     if(!currentBlock.getType().equals(Material.BEDROCK)) {
                     	currentBlock.setType(Material.STONE);
                     }
@@ -681,6 +682,13 @@ public class KonTown extends KonTerritory implements Timeable{
 		return lord != null ? true : false;
 	}
 	
+	public OfflinePlayer getPlayerLord() {
+		if(lord != null) {
+			return Bukkit.getOfflinePlayer(lord);
+		}
+		return null;
+	}
+	
 	public ArrayList<OfflinePlayer> getPlayerElites() {
 		ArrayList<OfflinePlayer> eliteList = new ArrayList<OfflinePlayer>();
 		for(UUID id : residents.keySet()) {
@@ -825,6 +833,18 @@ public class KonTown extends KonTerritory implements Timeable{
 				ChatUtil.sendNotice((Player)offlinePlayer, MessagePath.GENERIC_NOTICE_JOIN_REQUEST.getMessage(name,getName(),getName(),name,getName(),name), ChatColor.LIGHT_PURPLE);
 			}
 		}
+	}
+	
+	public boolean isTownWatchProtected() {
+		boolean result = false;
+		int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(this, KonUpgrade.WATCH);
+		if(upgradeLevel > 0) {
+			int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
+			if(getNumResidentsOnline() < minimumOnlineResidents) {
+				result = true;
+			}
+		}
+		return result;
 	}
 	
 	public void spawnRabbit() {

@@ -166,7 +166,7 @@ public class UpgradeManager {
 		}
 		// Check that the player has enough favor
 		int requiredCost = upgradeCosts.get(upgrade).get(level-1);
-		if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < requiredCost) {
+		if(KonquestPlugin.getBalance(bukkitPlayer) < requiredCost) {
 			//ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": requires "+requiredCost+" Favor");
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_COST.getMessage(upgrade.getDescription(),level,requiredCost));
             return false;
@@ -181,13 +181,15 @@ public class UpgradeManager {
 		ChatUtil.printDebug("Applied new upgrade "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
 		// Withdraw cost
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-		EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, requiredCost);
+		EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost);
         if(r.transactionSuccess()) {
         	String balanceF = String.format("%.2f",r.balance);
         	String amountF = String.format("%.2f",r.amount);
         	//ChatUtil.sendNotice(bukkitPlayer, "Favor reduced by "+amountF+", total: "+balanceF);
         	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
-        	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)requiredCost);
+        	if(player != null) {
+        		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)requiredCost);
+        	}
         } else {
         	//ChatUtil.sendError(bukkitPlayer, String.format("An error occured: %s", r.errorMessage));
         	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));

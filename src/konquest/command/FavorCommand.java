@@ -26,9 +26,14 @@ public class FavorCommand extends CommandBase {
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
+        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+    			ChatUtil.printDebug("Failed to find non-existent player");
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			return;
+    		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 
-        	double balance = KonquestPlugin.getEconomy().getBalance(bukkitPlayer);
+        	double balance = KonquestPlugin.getBalance(bukkitPlayer);
         	double cost_spy = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_spy",0.0);
         	double cost_settle = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_settle",0.0);
         	double cost_settle_incr = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_settle_increment",0.0);

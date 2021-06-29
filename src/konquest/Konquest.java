@@ -15,9 +15,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -76,7 +81,9 @@ public class Konquest implements Timeable {
     private Team barbarianTeam;
     private TeamPacketSender teamPacketSender;
 	
-	private String worldName;
+	//private String worldName;
+    private List<World> worlds;
+    private boolean isWhitelist;
 	public List<String> opStatusMessages;
 	private Timer saveTimer;
 	private Timer compassTimer;
@@ -86,7 +93,7 @@ public class Konquest implements Timeable {
             weakKeys().
             weakValues().
             makeMap();
-	
+	private ConcurrentMap<UUID, ItemStack> headCache = new MapMaker().makeMap();
 	private HashMap<Location,Player> teleportQueue;
 	
 	public Konquest(KonquestPlugin plugin) {
@@ -107,7 +114,9 @@ public class Konquest implements Timeable {
 		ruinManager = new RuinManager(this);
 		languageManager = new LanguageManager(this);
 		
-		worldName = "world";
+		//worldName = "world";
+		worlds = new ArrayList<World>();
+		isWhitelist = false;
 		opStatusMessages = new ArrayList<String>();
 		this.saveTimer = new Timer(this);
 		this.compassTimer = new Timer(this);
@@ -120,12 +129,16 @@ public class Konquest implements Timeable {
 	public void initialize() {
 		// Initialize managers
 		configManager.initialize();
+		boolean debug = configManager.getConfig("core").getBoolean("core.debug");
+		ChatUtil.printDebug("Debug is "+debug);
+		String worldName = configManager.getConfig("core").getString("core.world_name");
+		ChatUtil.printDebug("Primary world is "+worldName);
 		languageManager.initialize();
-		worldName = configManager.getConfig("core").getString("core.world_name","world");
-		ChatUtil.printConsoleAlert("Primary world is "+worldName);
 		kingdomManager.initialize();
 		ruinManager.initialize();
 		initManagers();
+		initWorlds();
+		databaseThread.setSleepSeconds(saveIntervalSeconds);
 		if(!databaseThread.isRunning()) {
 			ChatUtil.printDebug("Starting database thread");
 			databaseThread.getThread().start();
@@ -157,6 +170,7 @@ public class Konquest implements Timeable {
 	public void reload() {
 		configManager.reloadConfigs();
 		initManagers();
+		initWorlds();
 		ChatUtil.printDebug("Finished Reload");
 	}
 	
@@ -185,6 +199,25 @@ public class Konquest implements Timeable {
 		compassTimer.startLoopTimer();
 	}
 	
+	private void initWorlds() {
+		List<String> worldNameList = configManager.getConfig("core").getStringList("core.world_blacklist");
+		isWhitelist = configManager.getConfig("core").getBoolean("core.world_blacklist_reverse",false);
+		// Verify listed worlds exist
+		for(String name : worldNameList) {
+			boolean matches = false;
+			for(World world : Bukkit.getServer().getWorlds()) {
+				if(world.getName().equals(name)) {
+					matches = true;
+					worlds.add(world);
+					break;
+				}
+			}
+			if(!matches) {
+				ChatUtil.printConsoleError("core.world_blacklist name \""+name+"\" does not match any server worlds, check spelling and case.");
+			}
+		}
+	}
+	
 	public void initOnlinePlayers() {
 		// Fetch any players that happen to be in the server already (typically from /reload)
         for(Player bukkitPlayer : Bukkit.getServer().getOnlinePlayers()) {
@@ -199,6 +232,10 @@ public class Konquest implements Timeable {
     	// Fetch player from the database
     	// Also instantiates player object in PlayerManager
 		databaseThread.getDatabase().fetchPlayerData(bukkitPlayer);
+		if(!playerManager.isPlayer(bukkitPlayer)) {
+			ChatUtil.printDebug("Failed to init a non-existent player!");
+			return null;
+		}
     	player = playerManager.getPlayer(bukkitPlayer);
     	// Update all player's nametag color packets
     	updateNamePackets();
@@ -214,7 +251,7 @@ public class Konquest implements Timeable {
     		if(loginTerritory.getTerritoryType().equals(KonTerritoryType.TOWN)) { 
 	    		// Player joined located within a Town
 	    		KonTown town = (KonTown) loginTerritory;
-	    		town.addBarPlayer(playerManager.getPlayer(bukkitPlayer));
+	    		town.addBarPlayer(player);
 	    		// For enemy players, apply effects
 	    		if(!player.getKingdom().equals(town.getKingdom())) {
 	    			kingdomManager.applyTownNerf(player, town);
@@ -226,7 +263,7 @@ public class Konquest implements Timeable {
     		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
     			// Player joined located within a Ruin
     			KonRuin ruin = (KonRuin) loginTerritory;
-    			ruin.addBarPlayer(playerManager.getPlayer(bukkitPlayer));
+    			ruin.addBarPlayer(player);
     			ruin.spawnAllGolems();
     		}
 		} else {
@@ -278,9 +315,9 @@ public class Konquest implements Timeable {
 		return commandHandler;
 	}
 	
-	public String getWorldName() {
+	/*public String getWorldName() {
 		return worldName;
-	}
+	}*/
 	
 	public Scoreboard getScoreboard() {
 		return scoreboard;
@@ -308,6 +345,16 @@ public class Konquest implements Timeable {
 	
 	public long getOfflineTimeoutSeconds() {
 		return offlineTimeoutSeconds;
+	}
+	
+	public boolean isWorldValid(World world) {
+		boolean result = false;
+		if(isWhitelist) {
+			result = worlds.contains(world);
+		} else {
+			result = !worlds.contains(world);
+		}
+		return result;
 	}
 	
 	@Override
@@ -344,7 +391,7 @@ public class Konquest implements Timeable {
 			// Update compass target for all players with permission and compass in inventory
 			for(KonPlayer player : playerManager.getPlayersOnline()) {
 				if(player.getBukkitPlayer().hasPermission("konquest.compass") && 
-						player.getBukkitPlayer().getWorld().equals(Bukkit.getWorld(worldName)) &&
+						isWorldValid(player.getBukkitPlayer().getWorld()) &&
 						player.getBukkitPlayer().getInventory().contains(Material.COMPASS)) {
 					// Find nearest enemy town
 	    			ArrayList<KonKingdom> enemyKingdoms = kingdomManager.getKingdoms();
@@ -359,7 +406,7 @@ public class Konquest implements Timeable {
 	    					int upgradeLevel = upgradeManager.getTownUpgradeLevel(town, KonUpgrade.COUNTER);
 	    					if(upgradeLevel < 2) {
 	    						int townDist = distanceInChunks(player.getBukkitPlayer().getLocation().getChunk(), town.getCenterLoc().getChunk());
-	    						if(townDist < minDistance) {
+	    						if(townDist != -1 && townDist < minDistance) {
 	    							minDistance = townDist;
 	    							nearestTerritory = town;
 	    						}
@@ -458,20 +505,28 @@ public class Konquest implements Timeable {
 		return new Point(chunk.getX(),chunk.getZ());
 	}
 	
-	public Chunk toChunk(Point point) {
-		return Bukkit.getWorld(worldName).getChunkAt(point.x, point.y);
+	public Chunk toChunk(Point point, World world) {
+		return world.getChunkAt(point.x, point.y);
 	}
 	
-	public int distanceInChunks(Location loc1, Location loc2) {
-		int diffX = Math.abs(loc1.getChunk().getX() - loc2.getChunk().getX());
-		int diffZ = Math.abs(loc1.getChunk().getZ() - loc2.getChunk().getZ());
-		return Math.max(diffX, diffZ);
+	public static int distanceInChunks(Location loc1, Location loc2) {
+		return distanceInChunks(loc1.getChunk(), loc2.getChunk());
 	}
 	
-	public int distanceInChunks(Chunk chunk1, Chunk chunk2) {
-		int diffX = Math.abs(chunk1.getX() - chunk2.getX());
-		int diffZ = Math.abs(chunk1.getZ() - chunk2.getZ());
-		return Math.max(diffX, diffZ);
+	public static int distanceInChunks(Chunk chunk1, Chunk chunk2) {
+		if(chunk1.getWorld().getName().equals(chunk2.getWorld().getName())) {
+			return Math.max(Math.abs(chunk1.getX() - chunk2.getX()), Math.abs(chunk1.getZ() - chunk2.getZ()));
+		} else {
+			return -1;
+		}
+	}
+	
+	public static int chunkDistance(Location loc1, Location loc2) {
+		if(loc1.getWorld().getName().equals(loc2.getWorld().getName())) {
+			return Math.max(Math.abs(loc1.getBlockX()/16 - loc2.getBlockX()/16), Math.abs(loc1.getBlockZ()/16 - loc2.getBlockZ()/16));
+		} else {
+			return -1;
+		}
 	}
 	
 	public String formatPointsToString(Collection<Point> points) {
@@ -513,7 +568,7 @@ public class Konquest implements Timeable {
         return result;
 	}
 	
-	public ArrayList<Location> formatStringToLocations(String coords) {
+	public ArrayList<Location> formatStringToLocations(String coords, World world) {
 		ArrayList<Location> locations = new ArrayList<Location>();
 		String[] coord_list = coords.split("\\.");
 		//ChatUtil.printDebug("Split coords: "+Arrays.toString(coord_list));
@@ -526,7 +581,7 @@ public class Konquest implements Timeable {
 				int z = Integer.parseInt(coord_pair[2]);
 				//ChatUtil.printDebug("Got chunk coord: "+x+","+z);
 				// Add location in primary world by default
-				locations.add(new Location(Bukkit.getWorld(worldName),x,y,z));
+				locations.add(new Location(world,x,y,z));
 			}
 		}
 		//ChatUtil.printDebug("Chunk coords: "+Arrays.toString(points.toArray()));
@@ -534,7 +589,7 @@ public class Konquest implements Timeable {
 	}
 	
 	// This can return null!
-	public Location getRandomWildLocation(int worldSize) {
+	public Location getRandomWildLocation(int worldSize, World world) {
 		Location wildLoc = null;
 		ChatUtil.printDebug("Generating random wilderness location for size "+worldSize);
 		
@@ -546,8 +601,8 @@ public class Konquest implements Timeable {
 		while(!foundValidLoc) {
 			randomNumX = ThreadLocalRandom.current().nextInt(-1*(worldSize/2), (worldSize/2) + 1);
 			randomNumZ = ThreadLocalRandom.current().nextInt(-1*(worldSize/2), (worldSize/2) + 1);
-			randomNumY = Bukkit.getServer().getWorld(worldName).getHighestBlockYAt(randomNumX,randomNumZ) + 3;
-			wildLoc = new Location(Bukkit.getServer().getWorld(worldName), randomNumX, randomNumY, randomNumZ);
+			randomNumY = world.getHighestBlockYAt(randomNumX,randomNumZ) + 3;
+			wildLoc = new Location(world, randomNumX, randomNumY, randomNumZ);
 			if(!kingdomManager.isChunkClaimed(wildLoc.getChunk())) {
 				foundValidLoc = true;
 			} else {
@@ -602,6 +657,13 @@ public class Konquest implements Timeable {
 			}
 		}
 		ChatUtil.printDebug("Got safe centered location "+randLoc.getX()+","+randLoc.getY()+","+randLoc.getZ());
+		double x0,x1,z0,z1;
+		x0 = randLoc.getX();
+		x1 = center.getX();
+		z0 = randLoc.getZ();
+		z1 = center.getZ();
+		float yaw = (float)(180-(Math.atan2((x0-x1),(z0-z1))*180/Math.PI));
+		randLoc.setYaw(yaw);
 		return randLoc;
 	}
 	/*
@@ -648,7 +710,7 @@ public class Konquest implements Timeable {
     public void updateNamePackets() {
     	if(teamPacketSender != null) {
 	    	// Update all Kingdom player's nametag color packets
-			for(String kingdomName : kingdomManager.getKingdomNames()) {
+			for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
 				// For each kingdom, determine friendlies and enemies
 				List<Player> friendlyPlayers = new ArrayList<Player>();
 				List<String> friendlyNames = new ArrayList<String>();
@@ -656,7 +718,7 @@ public class Konquest implements Timeable {
 				List<String> barbarianNames = new ArrayList<String>();
 				// Populate friendly and enemy lists
 				for(KonPlayer player : playerManager.getPlayersOnline()) {
-		    		if(player.getKingdom().getName().equalsIgnoreCase(kingdomName)) {
+		    		if(player.getKingdom().equals(kingdom)) {
 		    			friendlyNames.add(player.getBukkitPlayer().getName());
 		    			friendlyPlayers.add(player.getBukkitPlayer());
 		    		} else if(!player.isBarbarian()) {
@@ -770,6 +832,66 @@ public class Konquest implements Timeable {
     		}
     	}
     	return result;
+    }
+    
+    public ItemStack getPlayerHead(OfflinePlayer bukkitOfflinePlayer) {
+    	if(bukkitOfflinePlayer.getUniqueId() != null && !headCache.containsKey(bukkitOfflinePlayer.getUniqueId())) {
+    		ChatUtil.printDebug("Missing "+bukkitOfflinePlayer.getName()+" player head in the cache, creating...");
+    		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+    		SkullMeta meta = (SkullMeta)item.getItemMeta();
+        	meta.setOwningPlayer(bukkitOfflinePlayer);
+    		item.setItemMeta(meta);
+    		headCache.put(bukkitOfflinePlayer.getUniqueId(),item);
+    		/*
+    		Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), new Runnable() {
+                @Override
+                public void run() {
+                	
+                	SkullMeta meta = (SkullMeta)item.getItemMeta();
+                	meta.setOwningPlayer(bukkitOfflinePlayer);
+            		item.setItemMeta(meta);
+            		
+            		Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
+                        @Override
+                        public void run() {
+                        	headCache.put(bukkitOfflinePlayer.getUniqueId(),item);
+                        }
+            		});
+            		
+                }
+            });
+			*/
+    		return item;
+    	} else {
+    		return headCache.get(bukkitOfflinePlayer.getUniqueId());
+    	}
+    }
+    
+    public static ChatColor getContextColor(KonOfflinePlayer observer, KonOfflinePlayer target) {
+    	ChatColor result = ChatColor.RED;
+    	if(target.isBarbarian()) {
+    		result = ChatColor.YELLOW;
+    	} else {
+    		if(target.getKingdom().equals(observer.getKingdom())) {
+    			result = ChatColor.GREEN;
+    		}
+    	}
+    	return result;
+    }
+    
+    public static void playSuccessSound(Player bukkitPlayer) {
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_FLUTE, (float)1.0, (float)1.3);
+            }
+        },1);
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_FLUTE, (float)1.0, (float)1.7);
+            }
+        },4);
     }
 	
 }

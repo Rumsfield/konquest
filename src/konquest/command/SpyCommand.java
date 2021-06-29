@@ -48,16 +48,21 @@ public class SpyCommand extends CommandBase {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
         	// Verify allowed world
-        	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
+        	if(!getKonquest().isWorldValid(bukkitWorld)) {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
         	
+        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+    			ChatUtil.printDebug("Failed to find non-existent player");
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			return;
+    		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	// Verify enough favor
         	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_spy",0.0);
 			if(cost > 0) {
-				if(KonquestPlugin.getEconomy().getBalance(bukkitPlayer) < cost) {
+				if(KonquestPlugin.getBalance(bukkitPlayer) < cost) {
 					//ChatUtil.sendError(bukkitPlayer, "Not enough Favor, need "+cost);
 					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
                     return;
@@ -83,8 +88,8 @@ public class SpyCommand extends CommandBase {
 					// Only find enemy towns which do not have the counter-intelligence upgrade level 1+
 					int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.COUNTER);
 					if(upgradeLevel < 1) {
-						int townDist = getKonquest().distanceInChunks(bukkitPlayer.getLocation().getChunk(), town.getCenterLoc().getChunk());
-						if(townDist < minDistance) {
+						int townDist = Konquest.distanceInChunks(bukkitPlayer.getLocation().getChunk(), town.getCenterLoc().getChunk());
+						if(townDist != -1 && townDist < minDistance) {
 							minDistance = townDist;
 							closestTerritory = town;
 						}
@@ -125,7 +130,7 @@ public class SpyCommand extends CommandBase {
 			inv.setItem(inv.firstEmpty(), inv.getItemInMainHand());
 			inv.setItemInMainHand(item);
 			
-			EconomyResponse r = KonquestPlugin.getEconomy().withdrawPlayer(bukkitPlayer, cost);
+			EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, cost);
             if(r.transactionSuccess()) {
             	String balanceF = String.format("%.2f",r.balance);
             	String amountF = String.format("%.2f",r.amount);
