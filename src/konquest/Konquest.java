@@ -523,7 +523,7 @@ public class Konquest implements Timeable {
 	
 	public static int chunkDistance(Location loc1, Location loc2) {
 		if(loc1.getWorld().getName().equals(loc2.getWorld().getName())) {
-			return Math.max(Math.abs(loc1.getBlockX() - loc2.getBlockX()), Math.abs(loc1.getBlockZ() - loc2.getBlockZ()))/16;
+			return Math.max(Math.abs(loc1.getBlockX()/16 - loc2.getBlockX()/16), Math.abs(loc1.getBlockZ()/16 - loc2.getBlockZ()/16));
 		} else {
 			return -1;
 		}

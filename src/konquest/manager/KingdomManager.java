@@ -2118,7 +2118,8 @@ public class KingdomManager {
     	int distance = 0;
     	int maxDistance = 99;
     	if(closestTerritory != null) {
-    		distance = Konquest.distanceInChunks(center.getChunk(), closestTerritory.getCenterLoc().getChunk());
+    		distance = minDistance;
+    		//distance = Konquest.distanceInChunks(center.getChunk(), closestTerritory.getCenterLoc().getChunk());
     		//distance = (int) originPoint.distance(konquest.toPoint(closestTerritory.getCenterLoc().getChunk()));
     		if(closestTerritory.getKingdom().equals(getBarbarians())) {
     			closestTerritoryColor = ChatColor.YELLOW;
