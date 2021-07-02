@@ -292,8 +292,7 @@ public class InventoryListener implements Listener {
 		KonPlayer player = playerManager.getPlayer(event.getPlayer());
 		Material extractMat = event.getItemType();
 		int stackSize = event.getItemAmount();
-		if(extractMat.equals(Material.IRON_INGOT) ||
-				extractMat.equals(Material.GOLD_INGOT) ||
+		if(extractMat.toString().toLowerCase().contains("ingot") ||
 				extractMat.equals(Material.NETHERITE_SCRAP) ||
 				extractMat.equals(Material.BRICK)) {
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.INGOTS,stackSize);

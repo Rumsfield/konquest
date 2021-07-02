@@ -111,9 +111,11 @@ public class KonquestPlugin extends JavaPlugin {
 		try {
 			result = econ.getBalance(offlineBukkitPlayer);
 		} catch(Exception e) {
+			ChatUtil.printDebug("Failed to get balance using Player: "+e.getMessage());
 			try {
 				result = econ.getBalance(offlineBukkitPlayer.getName());
 			} catch(Exception x) {
+				ChatUtil.printDebug("Failed to get balance using Name: "+x.getMessage());
 				result = econ.getBalance(formatStringForAConomyPlugin(offlineBukkitPlayer));
 			}
 		}
@@ -126,9 +128,11 @@ public class KonquestPlugin extends JavaPlugin {
 		try {
 			result = econ.withdrawPlayer(offlineBukkitPlayer, amount);
 		} catch(Exception e) {
+			ChatUtil.printDebug("Failed to withdraw using Player: "+e.getMessage());
 			try {
 				result = econ.withdrawPlayer(offlineBukkitPlayer.getName(), amount);
 			} catch(Exception x) {
+				ChatUtil.printDebug("Failed to withdraw using Name: "+x.getMessage());
 				result = econ.withdrawPlayer(formatStringForAConomyPlugin(offlineBukkitPlayer), amount);
 			}
 		}
@@ -141,9 +145,11 @@ public class KonquestPlugin extends JavaPlugin {
 		try {
 			result = econ.depositPlayer(offlineBukkitPlayer, amount);
 		} catch(Exception e) {
+			ChatUtil.printDebug("Failed to deposit using Player: "+e.getMessage());
 			try {
 				result = econ.depositPlayer(offlineBukkitPlayer.getName(), amount);
 			} catch(Exception x) {
+				ChatUtil.printDebug("Failed to deposit using Name: "+x.getMessage());
 				result = econ.depositPlayer(formatStringForAConomyPlugin(offlineBukkitPlayer), amount);
 			}
 		}
