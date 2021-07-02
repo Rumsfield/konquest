@@ -158,7 +158,7 @@ public class KingdomManager {
 		    	//konquest.getPlayerManager().saveAllPlayers();
 		    	//konquest.getPlayerManager().updateAllSavedPlayers();
 		    	updateSmallestKingdom();
-		    	konquest.updateNamePackets();
+		    	konquest.updateNamePackets(player);
 		    	konquest.getDirectiveManager().displayBook(player);
 		    	updateKingdomOfflineProtection();
 			} else {
@@ -209,7 +209,7 @@ public class KingdomManager {
     	player.setBarbarian(true);
     	//konquest.getPlayerManager().saveAllPlayers();
     	//konquest.getPlayerManager().updateAllSavedPlayers();
-    	konquest.updateNamePackets();
+    	konquest.updateNamePackets(player);
     	updateSmallestKingdom();
     	updateKingdomOfflineProtection();
     	return true;

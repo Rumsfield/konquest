@@ -2,6 +2,7 @@ package konquest;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -239,7 +240,7 @@ public class Konquest implements Timeable {
 		}
     	player = playerManager.getPlayer(bukkitPlayer);
     	// Update all player's nametag color packets
-    	updateNamePackets();
+    	updateNamePackets(player);
     	// Update offline protections
     	kingdomManager.updateKingdomOfflineProtection();
     	// Update player membership stats
@@ -685,6 +686,51 @@ public class Konquest implements Timeable {
     	return teamPacketSender != null;
     }
     
+    /**
+     * Sends updated team packets for the given player
+     * @param player
+     */
+    public void updateNamePackets(KonPlayer player) {
+    	// Loop over all online players, populate team lists and send each online player a team packet for arg player
+    	// Send arg player packets for each team with lists of online players
+		List<String> friendlyNames = new ArrayList<String>();
+		List<String> enemyNames = new ArrayList<String>();
+		List<String> barbarianNames = new ArrayList<String>();
+    	for(KonPlayer onlinePlayer : playerManager.getPlayersOnline()) {
+    		// Place online player is appropriate list w.r.t. player
+    		if(onlinePlayer.isBarbarian()) {
+    			barbarianNames.add(onlinePlayer.getBukkitPlayer().getName());
+    		} else {
+    			if(onlinePlayer.getKingdom().equals(player.getKingdom())) {
+    				friendlyNames.add(onlinePlayer.getBukkitPlayer().getName());
+    			} else {
+    				enemyNames.add(onlinePlayer.getBukkitPlayer().getName());
+    			}
+    		}
+    		// Send appropriate team packet to online player
+    		if(player.isBarbarian()) {
+    			teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), barbarianTeam);
+    		} else {
+    			if(player.getKingdom().equals(onlinePlayer.getKingdom())) {
+    				teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), friendlyTeam);
+    			} else {
+    				teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), enemyTeam);
+    			}
+    		}
+    	}
+    	// Send packets to player
+    	if(!friendlyNames.isEmpty()) {
+			teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), friendlyNames, friendlyTeam);
+    	}
+    	if(!enemyNames.isEmpty()) {
+    		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), enemyNames, enemyTeam);
+    	}
+    	if(!barbarianNames.isEmpty()) {
+    		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), barbarianNames, barbarianTeam);
+    	}
+    }
+    
+    /*
     //TODO This could be optimized to reduce loop Order, and only update as needed
     public void updateNamePackets() {
     	if(teamPacketSender != null) {
@@ -743,6 +789,7 @@ public class Konquest implements Timeable {
 			}
     	}
     }
+    */
     
     public static UUID idFromString(String id) {
     	UUID result = null;
