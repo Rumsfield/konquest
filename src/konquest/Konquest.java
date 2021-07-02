@@ -49,7 +49,8 @@ import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.nms.TeamPacketSender;
-import konquest.nms.TeamPacketSender_1_16_R3;
+import konquest.nms.TeamPacketSender_p754;
+import konquest.nms.TeamPacketSender_p755;
 import konquest.utility.ChatUtil;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
@@ -666,42 +667,20 @@ public class Konquest implements Timeable {
 		randLoc.setYaw(yaw);
 		return randLoc;
 	}
-	/*
-	public void setPlayersToFriendlies(Player player, List<String> friendlies) {
-        net.minecraft.server.v1_16_R3.Scoreboard nmsScoreboard = new net.minecraft.server.v1_16_R3.Scoreboard();
-        ScoreboardTeam nmsTeam = new ScoreboardTeam(nmsScoreboard, friendlyTeam.getName());
-        PacketPlayOutScoreboardTeam packet = new PacketPlayOutScoreboardTeam(nmsTeam, friendlies, 3);
-        CraftPlayer craftPlayer = (CraftPlayer) player;
-        craftPlayer.getHandle().playerConnection.sendPacket(packet);
-    }
- 
-    public void setPlayersToEnemies(Player player, List<String> enemies) {
-        net.minecraft.server.v1_16_R3.Scoreboard nmsScoreboard = new net.minecraft.server.v1_16_R3.Scoreboard();
-        ScoreboardTeam nmsTeam = new ScoreboardTeam(nmsScoreboard, enemyTeam.getName());
-        PacketPlayOutScoreboardTeam packet = new PacketPlayOutScoreboardTeam(nmsTeam, enemies, 3);
-        CraftPlayer craftPlayer = (CraftPlayer) player;
-        craftPlayer.getHandle().playerConnection.sendPacket(packet);
-    }
-    
-    public void setPlayersToBarbarians(Player player, List<String> barbarians) {
-        net.minecraft.server.v1_16_R3.Scoreboard nmsScoreboard = new net.minecraft.server.v1_16_R3.Scoreboard();
-        ScoreboardTeam nmsTeam = new ScoreboardTeam(nmsScoreboard, barbarianTeam.getName());
-        PacketPlayOutScoreboardTeam packet = new PacketPlayOutScoreboardTeam(nmsTeam, barbarians, 3);
-        CraftPlayer craftPlayer = (CraftPlayer) player;
-        craftPlayer.getHandle().playerConnection.sendPacket(packet);
-    }
-    */
+	
     private boolean setupTeamPacketSender() {
     	String version;
     	try {
     		version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
     	} catch (ArrayIndexOutOfBoundsException e) {
-    		ChatUtil.printDebug("Failed to determine server version.");
+    		ChatUtil.printConsoleError("Failed to determine server version.");
     		return false;
     	}
-    	plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Your server version is "+version);
+    	ChatUtil.printConsoleAlert("Your server version is "+version);
     	if(version.equals("v1_16_R3")) {
-    		teamPacketSender = new TeamPacketSender_1_16_R3();
+    		teamPacketSender = new TeamPacketSender_p754();
+    	} else if(version.equals("v1_17_R1")) {
+    		teamPacketSender = new TeamPacketSender_p755();
     	}
     	return teamPacketSender != null;
     }
@@ -730,13 +709,13 @@ public class Konquest implements Timeable {
 				// For each friendly player in this kingdom, send packet update
 				for(Player kingdomPlayer : friendlyPlayers) {
 					if(!friendlyNames.isEmpty()) {
-						teamPacketSender.setPlayersToFriendlies(kingdomPlayer, friendlyNames, friendlyTeam);
+						teamPacketSender.sendPlayerTeamPacket(kingdomPlayer, friendlyNames, friendlyTeam);
 			    	}
 			    	if(!enemyNames.isEmpty()) {
-			    		teamPacketSender.setPlayersToEnemies(kingdomPlayer, enemyNames, enemyTeam);
+			    		teamPacketSender.sendPlayerTeamPacket(kingdomPlayer, enemyNames, enemyTeam);
 			    	}
 			    	if(!barbarianNames.isEmpty()) {
-			    		teamPacketSender.setPlayersToBarbarians(kingdomPlayer, barbarianNames, barbarianTeam);
+			    		teamPacketSender.sendPlayerTeamPacket(kingdomPlayer, barbarianNames, barbarianTeam);
 			    	}
 				}
 			}
@@ -756,10 +735,10 @@ public class Konquest implements Timeable {
 			// For each barbarian player, send packet update
 			for(Player barbarianPlayer : barbarianPlayers) {
 		    	if(!enemyNames.isEmpty()) {
-		    		teamPacketSender.setPlayersToEnemies(barbarianPlayer, enemyNames, enemyTeam);
+		    		teamPacketSender.sendPlayerTeamPacket(barbarianPlayer, enemyNames, enemyTeam);
 		    	}
 		    	if(!barbarianNames.isEmpty()) {
-		    		teamPacketSender.setPlayersToBarbarians(barbarianPlayer, barbarianNames, barbarianTeam);
+		    		teamPacketSender.sendPlayerTeamPacket(barbarianPlayer, barbarianNames, barbarianTeam);
 		    	}
 			}
     	}

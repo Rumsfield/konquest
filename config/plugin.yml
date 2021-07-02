@@ -4,7 +4,7 @@ author: Rumsfield
 version: 0.4.0
 api-version: 1.17
 main: konquest.KonquestPlugin
-depend: [Vault]
+depend: [Vault,ProtocolLib]
 softdepend: [QuickShop,LuckPerms]
 commands:
   konquest:

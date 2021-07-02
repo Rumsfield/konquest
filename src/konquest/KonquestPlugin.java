@@ -16,6 +16,9 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 //import org.maxgamer.quickshop.api.QuickShopAPI;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -25,6 +28,7 @@ public class KonquestPlugin extends JavaPlugin {
 	private PluginManager pluginManager;
 	private static Economy econ = null;
 	private boolean enableSuccess = false;
+	private static ProtocolManager plib = null;
 
 	@Override
 	public void onEnable() {
@@ -36,6 +40,7 @@ public class KonquestPlugin extends JavaPlugin {
  			pluginManager.disablePlugin(this);
             return;
         }
+ 		plib = ProtocolLibrary.getProtocolManager();
         getCommand("konquest").setExecutor(konquest.getCommandHandler());
         getCommand("k").setExecutor(konquest.getCommandHandler());
         registerListeners();
@@ -61,6 +66,10 @@ public class KonquestPlugin extends JavaPlugin {
 	
 	public Konquest getKonquestInstance() {
 		return konquest;
+	}
+	
+	public static ProtocolManager getProtocolManager() {
+		return plib;
 	}
 	
 	private void registerListeners() {
