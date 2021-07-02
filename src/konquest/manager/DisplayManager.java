@@ -255,7 +255,7 @@ public class DisplayManager {
 	 * ===============================================
 	 */
 	public void displayHelpMenu(Player bukkitPlayer) {
-		ChatUtil.printDebug("Displaying new help menu to "+bukkitPlayer.getName()+", current menu size is "+menuCache.size());
+		//ChatUtil.printDebug("Displaying new help menu to "+bukkitPlayer.getName()+", current menu size is "+menuCache.size());
 		playMenuOpenSound(bukkitPlayer);
 		int i = 0;
 		int cost = 0;
@@ -339,7 +339,7 @@ public class DisplayManager {
 			}
 		}
 		*/
-		ChatUtil.printDebug("Displaying new upgrade menu to "+bukkitPlayer.getName()+", current menu size is "+menuCache.size()+", town size is "+townCache.size());
+		//ChatUtil.printDebug("Displaying new upgrade menu to "+bukkitPlayer.getName()+", current menu size is "+menuCache.size()+", town size is "+townCache.size());
 		playMenuOpenSound(bukkitPlayer);
 		// Create fresh menu
 		//DisplayMenu townUpgradeMenu = new DisplayMenu(1,ChatColor.BLACK+MessagePath.MENU_UPGRADE_TITLE.getMessage());
@@ -380,7 +380,7 @@ public class DisplayManager {
 	 * ===============================================
 	 */
  	public void displayScoreMenu(KonPlayer displayPlayer, KonOfflinePlayer scorePlayer) {
- 		ChatUtil.printDebug("Displaying new score menu to "+displayPlayer.getBukkitPlayer().getName()+" of player "+scorePlayer.getOfflineBukkitPlayer().getName()+", current menu size is "+menuCache.size());
+ 		//ChatUtil.printDebug("Displaying new score menu to "+displayPlayer.getBukkitPlayer().getName()+" of player "+scorePlayer.getOfflineBukkitPlayer().getName()+", current menu size is "+menuCache.size());
  		playMenuOpenSound(displayPlayer.getBukkitPlayer());
  		KonPlayerScoreAttributes playerScoreAttributes = konquest.getKingdomManager().getPlayerScoreAttributes(scorePlayer);
 		KonKingdomScoreAttributes kingdomScoreAttributes = konquest.getKingdomManager().getKingdomScoreAttributes(scorePlayer.getKingdom());
@@ -494,7 +494,7 @@ public class DisplayManager {
 	 */
  	// Player Info
  	public void displayPlayerInfoMenu(KonPlayer displayPlayer, KonOfflinePlayer infoPlayer) {
- 		ChatUtil.printDebug("Displaying new player info menu to "+displayPlayer.getBukkitPlayer().getName()+" of player "+infoPlayer.getOfflineBukkitPlayer().getName()+", current menu size is "+menuCache.size());
+ 		//ChatUtil.printDebug("Displaying new player info menu to "+displayPlayer.getBukkitPlayer().getName()+" of player "+infoPlayer.getOfflineBukkitPlayer().getName()+", current menu size is "+menuCache.size());
  		playMenuOpenSound(displayPlayer.getBukkitPlayer());
  		
  		boolean isFriendly = displayPlayer.getKingdom().equals(infoPlayer.getKingdom());
@@ -592,7 +592,7 @@ public class DisplayManager {
  	
  	// Kingdom Info
   	public void displayKingdomInfoMenu(KonPlayer displayPlayer, KonKingdom infoKingdom) {
-  		ChatUtil.printDebug("Displaying new kingdom info menu to "+displayPlayer.getBukkitPlayer().getName()+" of kingdom "+infoKingdom.getName()+", current menu size is "+menuCache.size());
+  		//ChatUtil.printDebug("Displaying new kingdom info menu to "+displayPlayer.getBukkitPlayer().getName()+" of kingdom "+infoKingdom.getName()+", current menu size is "+menuCache.size());
  		playMenuOpenSound(displayPlayer.getBukkitPlayer());
  		
   		boolean isFriendly = displayPlayer.getKingdom().equals(infoKingdom);
@@ -712,7 +712,7 @@ public class DisplayManager {
  	
   	// Town Info
    	public void displayTownInfoMenu(KonPlayer displayPlayer, KonTown infoTown) {
-   		ChatUtil.printDebug("Displaying new town info menu to "+displayPlayer.getBukkitPlayer().getName()+" of kingdom "+infoTown.getName()+", current menu size is "+menuCache.size());
+   		//ChatUtil.printDebug("Displaying new town info menu to "+displayPlayer.getBukkitPlayer().getName()+" of kingdom "+infoTown.getName()+", current menu size is "+menuCache.size());
  		playMenuOpenSound(displayPlayer.getBukkitPlayer());
  		
    		boolean isFriendly = displayPlayer.getKingdom().equals(infoTown.getKingdom());
@@ -924,7 +924,7 @@ public class DisplayManager {
 	 * ===============================================
 	 */
    	public void displayPrefixMenu(KonPlayer displayPlayer) {
-   		ChatUtil.printDebug("Displaying new prefix menu to "+displayPlayer.getBukkitPlayer().getName()+", current menu size is "+menuCache.size());
+   		//ChatUtil.printDebug("Displaying new prefix menu to "+displayPlayer.getBukkitPlayer().getName()+", current menu size is "+menuCache.size());
  		playMenuOpenSound(displayPlayer.getBukkitPlayer());
  		
    		// Create fresh paged menu
