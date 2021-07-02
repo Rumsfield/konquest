@@ -315,7 +315,7 @@ public class DisplayManager {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override
             public void run() {
-            	bukkitPlayer.closeInventory();
+            	//bukkitPlayer.closeInventory();
             	bukkitPlayer.openInventory(newMenu.getCurrentPage().getInventory());
             }
         });
@@ -368,7 +368,7 @@ public class DisplayManager {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override
             public void run() {
-            	bukkitPlayer.closeInventory();
+            	//bukkitPlayer.closeInventory();
             	bukkitPlayer.openInventory(newMenu.getCurrentPage().getInventory());
             }
         });
@@ -481,7 +481,7 @@ public class DisplayManager {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override
             public void run() {
-            	bukkitPlayer.closeInventory();
+            	//bukkitPlayer.closeInventory();
             	bukkitPlayer.openInventory(newMenu.getCurrentPage().getInventory());
             }
         },1);
@@ -584,7 +584,7 @@ public class DisplayManager {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override
             public void run() {
-            	displayPlayer.getBukkitPlayer().closeInventory();
+            	//displayPlayer.getBukkitPlayer().closeInventory();
             	displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentPage().getInventory());
             }
         },1);
@@ -704,7 +704,7 @@ public class DisplayManager {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override
             public void run() {
-            	displayPlayer.getBukkitPlayer().closeInventory();
+            	//displayPlayer.getBukkitPlayer().closeInventory();
             	displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentPage().getInventory());
             }
         },1);
@@ -912,7 +912,7 @@ public class DisplayManager {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override
             public void run() {
-            	displayPlayer.getBukkitPlayer().closeInventory();
+            	//displayPlayer.getBukkitPlayer().closeInventory();
             	displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentPage().getInventory());
             }
         },1);
@@ -1020,7 +1020,7 @@ public class DisplayManager {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override
             public void run() {
-            	displayPlayer.getBukkitPlayer().closeInventory();
+            	//displayPlayer.getBukkitPlayer().closeInventory();
             	displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentPage().getInventory());
             }
         },1);
