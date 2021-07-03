@@ -38,7 +38,7 @@ public class KonMonument{
 	 * 			2 = bad chunk gradient
 	 * 			3 = bedrock placement
 	 */
-	public int initialize(KonMonumentTemplate template) {
+	public int initialize(KonMonumentTemplate template, Location playerLoc) {
 		// Verify valid template
 		if(!template.isValid()) {
 			ChatUtil.printDebug("Monument init failed: template is not valid");
@@ -94,7 +94,13 @@ public class KonMonument{
 			ChatUtil.printDebug("Monument init failed: town monument attempted to place on bedrock.");
 			return 3;
 		}
-		baseY = maxY-1;
+		
+		int standY = playerLoc.getBlockY()-1;
+		if(standY < minY || standY > maxY) {
+			ChatUtil.printDebug("Monument init failed: player position is outside of gradiant bounds");
+			return 3;
+		}
+		baseY = standY;
 		
 		// Passed all init checks, update the monument with Template parameters
 		boolean updatePass = updateFromTemplate(template);

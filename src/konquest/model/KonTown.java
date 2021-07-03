@@ -115,7 +115,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	public int initClaim() {
 		
 		// Verify monument template and chunk gradient and initialize travelPoint and baseY coordinate
-		int monumentStatus = monument.initialize(getKingdom().getMonumentTemplate());
+		int monumentStatus = monument.initialize(getKingdom().getMonumentTemplate(), getCenterLoc());
 		if(monumentStatus != 0) {
 			ChatUtil.printDebug("Town init failed: monument did not initialize correctly");
 			return 10 + monumentStatus;
