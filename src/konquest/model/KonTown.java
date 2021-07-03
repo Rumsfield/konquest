@@ -134,6 +134,16 @@ public class KonTown extends KonTerritory implements Timeable{
 			ChatUtil.printDebug("Town init failed: "+monument.getBaseY()+" greater than max limit "+config_max_y);
 			return 2;
 		}
+		int world_min_y = getWorld().getMinHeight();
+		int world_max_y = getWorld().getMaxHeight();
+		if(monument.getBaseY() <= world_min_y) {
+			ChatUtil.printDebug("Town init failed: "+monument.getBaseY()+" less than world min limit "+world_min_y);
+			return 2;
+		}
+		if(monument.getBaseY() >= world_max_y) {
+			ChatUtil.printDebug("Town init failed: "+monument.getBaseY()+" greater than world max limit "+world_max_y);
+			return 2;
+		}
 		
 		// Verify monument template will not pass the height limit
 		if(monument.getBaseY() + getKingdom().getMonumentTemplate().getHeight() + 1 >= getWorld().getMaxHeight()) {

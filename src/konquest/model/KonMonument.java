@@ -81,6 +81,10 @@ public class KonMonument{
 			ChatUtil.printDebug("Monument init failed: town center is not flat enough, gradient is "+gradient+" but must be at most 3.");
 			return false;
 		}
+		if(maxMaterial.equals(Material.BEDROCK.toString())) {
+			ChatUtil.printDebug("Monument init failed: town monument attempted to place on bedrock.");
+			return false;
+		}
 		baseY = maxY-1;
 		
 		// Passed all init checks, update the monument with Template parameters
