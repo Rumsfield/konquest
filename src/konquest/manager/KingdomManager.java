@@ -788,7 +788,7 @@ public class KingdomManager {
 	/*
 	 * More methods...
 	 */
-	
+	/*
 	public String getSmallestKingdomName() {
 		KonKingdom smallestKingdom = null;
 		int smallestSize = 9999;
@@ -806,10 +806,21 @@ public class KingdomManager {
 		}
 		return smallestKingdom.getName();
 	}
+	*/
+	
+	public String getSmallestKingdomName() {
+		String smallestName = "";
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			if(kingdom.isSmallest()) {
+				smallestName = kingdom.getName();
+			}
+		}
+		return smallestName;
+	}
 	
 	public void updateSmallestKingdom() {
 		KonKingdom smallestKingdom = null;
-		int smallestSize = 9999;
+		int smallestSize = Integer.MAX_VALUE;
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			kingdom.setSmallest(false);
 			int size = konquest.getPlayerManager().getAllPlayersInKingdom(kingdom.getName()).size();

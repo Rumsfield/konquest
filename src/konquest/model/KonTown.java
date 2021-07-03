@@ -20,6 +20,7 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -201,23 +202,37 @@ public class KonTown extends KonTerritory implements Timeable{
         int bottomBlockY = Math.min(template.getCornerOne().getBlockY(), template.getCornerTwo().getBlockY());
         int bottomBlockZ = Math.min(template.getCornerOne().getBlockZ(), template.getCornerTwo().getBlockZ());
 
-        ChunkSnapshot templateChunkSnapshot = template.getCornerOne().getWorld().getChunkAt(template.getCornerOne()).getChunkSnapshot(true,false,false);
-        Chunk fillChunk = getWorld().getChunkAt(getCenterLoc());
-        int base_y = 0;
-        int monument_y = monument.getBaseY();
-        for (int x = bottomBlockX; x <= topBlockX; x++) {
-            for (int z = bottomBlockZ; z <= topBlockZ; z++) {
-            	base_y = templateChunkSnapshot.getHighestBlockYAt(x-bottomBlockX, z-bottomBlockZ);
-                // Fill air between world and monument base
-                if(base_y < monument_y) {
-                	for (int k = base_y; k <= monument_y; k++) {
-                		fillChunk.getBlock(x-bottomBlockX, k, z-bottomBlockZ).setType(Material.STONE);
-                	}
-                }
+        // Determine minimum Y level of paste chunk below monument Y base
+        int fill_y = 0;
+        int min_fill_y = 0;
+        Chunk fillChunk = getCenterLoc().getChunk();
+        ChunkSnapshot fillChunkSnap = fillChunk.getChunkSnapshot(true,false,false);
+        for (int x = 0; x <= topBlockX-bottomBlockX; x++) {
+            for (int z = 0; z <= topBlockZ-bottomBlockZ; z++) {
+            	fill_y = fillChunkSnap.getHighestBlockYAt(x, z);
+            	while((fillChunk.getBlock(x, fill_y, z).isPassable() || !fillChunk.getBlock(x, fill_y, z).getType().isOccluding()) && fill_y > fillChunk.getWorld().getMinHeight()) {
+            		fill_y--;
+				}
+            	if((x == 0 && z == 0) || fill_y < min_fill_y) {
+            		min_fill_y = fill_y;
+            	}
             }
         }
+        // Fill air between world and monument base
+        int monument_y = monument.getBaseY();
+        if(min_fill_y < monument_y) {
+	        for (int x = 0; x <= topBlockX-bottomBlockX; x++) {
+	            for (int z = 0; z <= topBlockZ-bottomBlockZ; z++) {
+                	for (int y = min_fill_y; y <= monument_y; y++) {
+                		fillChunk.getBlock(x, y, z).setType(Material.STONE);
+                	}
+	            }
+	        }
+        }
         
-        BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),template.getCornerOne(),bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
+        Chunk pasteChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
+        World templateWorld = template.getCornerOne().getWorld();
+        BlockPaster monumentPaster = new BlockPaster(pasteChunk,templateWorld,bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
         for (int y = bottomBlockY; y <= topBlockY; y++) {
         	monumentPaster.setY(y);
         	//BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),y,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);

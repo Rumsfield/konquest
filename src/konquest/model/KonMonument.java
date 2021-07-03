@@ -6,7 +6,6 @@ import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.data.type.Leaves;
 
 public class KonMonument{
 
@@ -53,8 +52,9 @@ public class KonMonument{
 			ChatUtil.printDebug("Monument init failed: template is not 16x16 blocks");
 			return 1;
 		}
-		// Verify center chunk gradient, ignoring leaves
-		ChunkSnapshot chunkSnap = centerLoc.getChunk().getChunkSnapshot(true,false,false);
+		// Verify center chunk gradient, ignoring leaves, grass
+		Chunk chunk = centerLoc.getChunk();
+		ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
 		String minMaterial = "";
 		String maxMaterial = "";
 		int maxY = 0;
@@ -64,7 +64,7 @@ public class KonMonument{
 				int y = chunkSnap.getHighestBlockYAt(x, z);
 				//ChatUtil.printDebug("Checking chunk block "+x+","+z);
 				// Search for next highest block if current block is leaves
-				while(chunkSnap.getBlockData(x, y-1, z) instanceof Leaves || chunkSnap.getBlockType(x, y-1, z).equals(Material.AIR)) {
+				while(chunk.getBlock(x, y-1, z).isPassable() || !chunkSnap.getBlockType(x, y-1, z).isOccluding() || chunkSnap.getBlockType(x, y-1, z).equals(Material.AIR)) {
 					//ChatUtil.printDebug("	Found leaves or air at local position "+x+","+y+","+z);
 					y--;
 					if(y <= 0) {
