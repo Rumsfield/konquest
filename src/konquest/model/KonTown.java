@@ -103,7 +103,9 @@ public class KonTown extends KonTerritory implements Timeable{
 	/**
 	 * initClaim - initializes the Monument, pastes the template and claims chunks.
 	 * @return  0 - success
-	 * 			1 - error, bad monument init
+	 * 			11 - error, monument invalid
+	 * 			12 - error, monument gradient
+	 * 			13 - error, monument bedrock
 	 * 			2 - error, bad town height
 	 * 			3 - error, too much air below town
 	 * 			4 - error, bad chunks
@@ -112,9 +114,10 @@ public class KonTown extends KonTerritory implements Timeable{
 	public int initClaim() {
 		
 		// Verify monument template and chunk gradient and initialize travelPoint and baseY coordinate
-		if(!monument.initialize(getKingdom().getMonumentTemplate())) {
+		int monumentStatus = monument.initialize(getKingdom().getMonumentTemplate());
+		if(monumentStatus != 0) {
 			ChatUtil.printDebug("Town init failed: monument did not initialize correctly");
-			return 1;
+			return 10 + monumentStatus;
 		}
 		
 		// Verify monument paste Y level is within config min/max range

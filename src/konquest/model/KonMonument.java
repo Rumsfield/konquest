@@ -30,11 +30,20 @@ public class KonMonument{
 		this.isDamageDisabled = false;
 	}
 	
-	public boolean initialize(KonMonumentTemplate template) {
+	/**
+	 * Initialize a monument from a kingdom's monument template
+	 * @param template
+	 * @return status code:
+	 * 			0 = success
+	 * 			1 = invalid template
+	 * 			2 = bad chunk gradient
+	 * 			3 = bedrock placement
+	 */
+	public int initialize(KonMonumentTemplate template) {
 		// Verify valid template
 		if(!template.isValid()) {
 			ChatUtil.printDebug("Monument init failed: template is not valid");
-			return false;
+			return 1;
 		}
 		// Verify template is 16x16 blocks
 		int x_diff = (int)Math.abs(template.getCornerOne().getX()-template.getCornerTwo().getX())+1;
@@ -42,7 +51,7 @@ public class KonMonument{
 		
 		if(Math.abs(x_diff) != 16 || Math.abs(z_diff) != 16) {
 			ChatUtil.printDebug("Monument init failed: template is not 16x16 blocks");
-			return false;
+			return 1;
 		}
 		// Verify center chunk gradient, ignoring leaves
 		ChunkSnapshot chunkSnap = centerLoc.getChunk().getChunkSnapshot(true,false,false);
@@ -79,11 +88,11 @@ public class KonMonument{
 		if(maxY - minY > 3) {
 			int gradient = maxY - minY;
 			ChatUtil.printDebug("Monument init failed: town center is not flat enough, gradient is "+gradient+" but must be at most 3.");
-			return false;
+			return 2;
 		}
 		if(maxMaterial.equals(Material.BEDROCK.toString())) {
 			ChatUtil.printDebug("Monument init failed: town monument attempted to place on bedrock.");
-			return false;
+			return 3;
 		}
 		baseY = maxY-1;
 		
@@ -92,7 +101,7 @@ public class KonMonument{
 		if(!updatePass) {
 			ChatUtil.printDebug("Monument init failed: could not update invalid template");
 		}
-		return updatePass;
+		return updatePass ? 0 : 1;
 	}
 	
 	public boolean updateFromTemplate(KonMonumentTemplate template) {

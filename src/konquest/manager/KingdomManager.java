@@ -226,7 +226,9 @@ public class KingdomManager {
 	 * 			3 - error, bad name
 	 * 			4 - error, invalid monument template
 	 * 			5 - error, bad town placement
-	 * 		   11 - error, town init fail, bad monument init
+	 * 		   21 - error, town init fail, invalid monument
+	 * 		   22 - error, town init fail, bad monument gradient
+	 * 		   23 - error, town init fail, monument placed on bedrock
 	 *  	   12 - error, town init fail, bad town height
 	 *  	   13 - error, town init fail, too much air
 	 *  	   14 - error, town init fail, bad chunks
@@ -299,7 +301,7 @@ public class KingdomManager {
 						addAllTerritory(loc.getWorld(),getKingdom(kingdomName).getTown(name).getChunkList());
 						return 0;
 					} else {
-						// Remove town if init fails, exit code 2
+						// Remove town if init fails, exit code 10+
 						getKingdom(kingdomName).removeTown(name);
 						return 10+initStatus;
 					}
