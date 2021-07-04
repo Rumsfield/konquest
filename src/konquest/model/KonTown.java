@@ -208,10 +208,12 @@ public class KonTown extends KonTerritory implements Timeable{
         int fill_y = 0;
         int min_fill_y = 0;
         Date step1 = new Date();
-        if(getCenterLoc().getWorld().isChunkLoaded(getCenterLoc().getBlockX()/16,getCenterLoc().getBlockZ()/16)) {
-        	ChatUtil.printDebug("Paste fill chunk is loaded");
+        int pasteX = (int)Math.floor((double)getCenterLoc().getBlockX()/16);
+        int pasteZ = (int)Math.floor((double)getCenterLoc().getBlockZ()/16);
+        if(getCenterLoc().getWorld().isChunkLoaded(pasteX,pasteZ)) {
+        	ChatUtil.printDebug("Paste fill chunk ("+pasteX+","+pasteZ+") is loaded");
         } else {
-        	ChatUtil.printDebug("Paste fill chunk is NOT loaded!");
+        	ChatUtil.printDebug("Paste fill chunk ("+pasteX+","+pasteZ+") is NOT loaded!");
         }
         Chunk fillChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
         //Chunk fillChunk = getCenterLoc().getChunk();
