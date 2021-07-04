@@ -1,11 +1,11 @@
 package konquest.model;
 
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
@@ -56,13 +56,13 @@ public class KonRuin extends KonTerritory implements Timeable {
 	public int initClaim() {
 		// Upon territory creation...
 		// Add center chunk claim
-		addChunk(getCenterLoc().getChunk());
+		addChunk(getKonquest().toPoint(getCenterLoc()));
 		return 0;
 	}
 
 	@Override
-	public boolean addChunk(Chunk chunk) {
-		addPoint(getKonquest().toPoint(chunk));
+	public boolean addChunk(Point point) {
+		addPoint(point);
 		return true;
 	}
 
@@ -229,9 +229,9 @@ public class KonRuin extends KonTerritory implements Timeable {
 	public boolean isEmpty() {
 		boolean result = true;
 		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
-			Chunk playerChunk = player.getBukkitPlayer().getLocation().getChunk();
-			if(getKonquest().getKingdomManager().isChunkClaimed(playerChunk)) {
-				if(getKonquest().getKingdomManager().getChunkTerritory(playerChunk).equals(this)) {
+			Location playerLoc = player.getBukkitPlayer().getLocation();
+			if(getKonquest().getKingdomManager().isChunkClaimed(playerLoc)) {
+				if(getKonquest().getKingdomManager().getChunkTerritory(playerLoc).equals(this)) {
 					result = false;
 					break;
 				}

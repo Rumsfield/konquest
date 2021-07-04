@@ -86,19 +86,18 @@ public class KonTown extends KonTerritory implements Timeable{
 	 * @return true if chunk is within max distance from town center, else false
 	 */
 	@Override
-	public boolean addChunk(Chunk chunk) {
-		Point addChunk = getKonquest().toPoint(chunk);
+	public boolean addChunk(Point point) {
 		Point centerChunk = getKonquest().toPoint(getCenterLoc());
 		int maxChunkRange = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_town")-1;
 		
-		int distX = (int)Math.abs(addChunk.getX() - centerChunk.getX());
-		int distY = (int)Math.abs(addChunk.getY() - centerChunk.getY());
+		int distX = (int)Math.abs(point.getX() - centerChunk.getX());
+		int distY = (int)Math.abs(point.getY() - centerChunk.getY());
 		
-		if(!chunk.getWorld().equals(getCenterLoc().getWorld()) || distX > maxChunkRange || distY > maxChunkRange) {
+		if(distX > maxChunkRange || distY > maxChunkRange) {
 			ChatUtil.printDebug("Failed to add chunk in territory "+getName()+", too far");
 			return false;
 		}
-		addPoint(getKonquest().toPoint(chunk));
+		addPoint(point);
 		return true;
 	}
 
@@ -169,7 +168,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		}
         
 		// Add chunks around the monument chunk
-		if(!addChunks(getKonquest().getAreaChunks(getCenterLoc(), getKonquest().getConfigManager().getConfig("core").getInt("core.towns.init_radius")))) {
+		if(!addChunks(getKonquest().getAreaPoints(getCenterLoc(), getKonquest().getConfigManager().getConfig("core").getInt("core.towns.init_radius")))) {
 			ChatUtil.printDebug("Town init failed: problem adding some chunks");
 			return 4;
 		}

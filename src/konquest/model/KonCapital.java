@@ -2,7 +2,8 @@ package konquest.model;
 
 import konquest.Konquest;
 
-import org.bukkit.Chunk;
+import java.awt.Point;
+
 import org.bukkit.Location;
 
 public class KonCapital extends KonTerritory{
@@ -17,14 +18,14 @@ public class KonCapital extends KonTerritory{
 
 	
 	@Override
-	public boolean addChunk(Chunk chunk) {
-		addPoint(getKonquest().toPoint(chunk));
+	public boolean addChunk(Point point) {
+		addPoint(point);
 		return true;
 	}
 	
 	@Override
 	public int initClaim() {
-		addChunk(getCenterLoc().getChunk());
+		addChunk(getKonquest().toPoint(getCenterLoc()));
 		return 0;
 	}
 

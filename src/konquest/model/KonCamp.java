@@ -1,6 +1,7 @@
 package konquest.model;
 
-import org.bukkit.Chunk;
+import java.awt.Point;
+
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 
@@ -32,15 +33,16 @@ public class KonCamp extends KonTerritory implements Timeable {
 	 * 			4 - error, bad chunk
 	 */
 	public int initClaim() {
-		if(!addChunks(getKonquest().getAreaChunks(getCenterLoc(), getKonquest().getConfigManager().getConfig("core").getInt("core.camps.init_radius")))) {
+		if(!addChunks(getKonquest().getAreaPoints(getCenterLoc(), getKonquest().getConfigManager().getConfig("core").getInt("core.camps.init_radius")))) {
 			ChatUtil.printDebug("Camp init failed: problem adding some chunks");
 			return 4;
 		}
 		return 0;
 	}
 
-	public boolean addChunk(Chunk chunk) {
-		addPoint(getKonquest().toPoint(chunk));
+	public boolean addChunk(Point point) {
+		//addPoint(getKonquest().toPoint(chunk));
+		addPoint(point);
 		return true;
 	}
 	

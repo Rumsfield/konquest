@@ -14,11 +14,9 @@ import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import net.milkbowl.vault.economy.EconomyResponse;
 
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
-//import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -61,9 +59,9 @@ public class TravelCommand extends CommandBase {
 			// Verify player is not in enemy territory
 			boolean blockEnemyTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_travel");
 			if (blockEnemyTravel) {
-				Chunk playerChunk = bukkitPlayer.getLocation().getChunk();
-				if(getKonquest().getKingdomManager().isChunkClaimed(playerChunk)) {
-					if(!getKonquest().getKingdomManager().getChunkTerritory(playerChunk).getKingdom().equals(player.getKingdom())) {
+				Location playerLoc = bukkitPlayer.getLocation();
+				if(getKonquest().getKingdomManager().isChunkClaimed(playerLoc)) {
+					if(!getKonquest().getKingdomManager().getChunkTerritory(playerLoc).getKingdom().equals(player.getKingdom())) {
 						//ChatUtil.sendError((Player) getSender(), "Cannot travel within enemy territory!");
 						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_ENEMY_TERRITORY.getMessage());
 	                    return;

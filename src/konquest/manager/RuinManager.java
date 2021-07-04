@@ -1,5 +1,6 @@
 package konquest.manager;
 
+import java.awt.Point;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -7,7 +8,6 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -96,8 +96,8 @@ public class RuinManager {
 	
 	public boolean isLocInsideRuin(KonRuin ruin, Location loc) {
 		boolean result = false;
-		if(kingdomManager.isChunkClaimed(loc.getChunk())) {
-			if(ruin.equals(kingdomManager.getChunkTerritory(loc.getChunk()))) {
+		if(kingdomManager.isChunkClaimed(loc)) {
+			if(ruin.equals(kingdomManager.getChunkTerritory(loc))) {
 				result = true;
 			}
 		}
@@ -108,8 +108,8 @@ public class RuinManager {
 		boolean result = false;
 		if(!name.contains(" ") && !isRuin(name)) {
 			// Verify no overlapping init chunks
-			for(Chunk chunk : konquest.getAreaChunks(loc, 2)) {
-				if(kingdomManager.isChunkClaimed(chunk)) {
+			for(Point point : konquest.getAreaPoints(loc, 2)) {
+				if(kingdomManager.isChunkClaimed(point,loc.getWorld())) {
 					ChatUtil.printDebug("Found a chunk conflict during ruin init: "+name);
 					return false;
 				}

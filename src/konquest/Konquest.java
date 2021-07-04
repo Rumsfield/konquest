@@ -246,10 +246,10 @@ public class Konquest implements Timeable {
     	// Update player membership stats
     	kingdomManager.updatePlayerMembershipStats(player);
     	// Updates based on login position
-    	Chunk chunkLogin = bukkitPlayer.getLocation().getChunk();
+    	Location loginLoc = bukkitPlayer.getLocation();
     	kingdomManager.clearTownHearts(player);
-    	if(kingdomManager.isChunkClaimed(chunkLogin)) {
-			KonTerritory loginTerritory = kingdomManager.getChunkTerritory(chunkLogin);
+    	if(kingdomManager.isChunkClaimed(loginLoc)) {
+			KonTerritory loginTerritory = kingdomManager.getChunkTerritory(loginLoc);
     		if(loginTerritory.getTerritoryType().equals(KonTerritoryType.TOWN)) { 
 	    		// Player joined located within a Town
 	    		KonTown town = (KonTown) loginTerritory;
@@ -450,6 +450,24 @@ public class Konquest implements Timeable {
 		//ChatUtil.printDebug("Got chunks: "+Arrays.toString(areaChunks.toArray()));
 		return areaChunks;
 	}
+
+	public ArrayList<Point> getAreaPoints(Location loc, int radius) {
+		ArrayList<Point> areaPoints = new ArrayList<Point>();
+		Point center = toPoint(loc);
+		areaPoints.add(center);
+		if(radius > 0) {
+			int min = (radius-1)*-1;
+			int max = (radius-1);
+			for(int x=min;x<=max;x++) {
+				for(int z=min;z<=max;z++) {
+					if(x != 0 || z != 0) {
+						areaPoints.add(new Point(center.x + x, center.y + z));
+					}
+				}
+			}
+		}
+		return areaPoints;
+	}
 	
 	/**
 	 * Gets chunks surrounding loc, (2r-1)^2-1 chunks squared
@@ -473,6 +491,23 @@ public class Konquest implements Timeable {
 			}
 		}
 		return areaChunks;
+	}
+	
+	public ArrayList<Point> getSurroundingPoints(Location loc, int radius) {
+		ArrayList<Point> areaPoints = new ArrayList<Point>();
+		Point center = toPoint(loc);
+		if(radius > 0) {
+			int min = (radius-1)*-1;
+			int max = (radius-1);
+			for(int x=min;x<=max;x++) {
+				for(int z=min;z<=max;z++) {
+					if(x != 0 || z != 0) {
+						areaPoints.add(new Point(center.x + x, center.y + z));
+					}
+				}
+			}
+		}
+		return areaPoints;
 	}
 	
 	public ArrayList<Chunk> getSideChunks(Chunk chunk) {
@@ -499,8 +534,20 @@ public class Konquest implements Timeable {
 		return sideChunks;
 	}
 	
+	public ArrayList<Point> getSidePoints(Location loc) {
+		ArrayList<Point> sidePoints = new ArrayList<Point>();
+		Point center = toPoint(loc);
+		int[] coordLUTX = {0,1,0,-1};
+		int[] coordLUTZ = {1,0,-1,0};
+		for(int i = 0;i<4;i++) {
+			sidePoints.add(new Point(center.x + coordLUTX[i], center.y + coordLUTZ[i]));
+		}
+		return sidePoints;
+	}
+	
 	public Point toPoint(Location loc) {
-		return new Point(loc.getChunk().getX(),loc.getChunk().getZ());
+		//return new Point(loc.getChunk().getX(),loc.getChunk().getZ());
+		return new Point(loc.getBlockX()/16,loc.getBlockZ()/16);
 	}
 	
 	public Point toPoint(Chunk chunk) {
@@ -605,7 +652,7 @@ public class Konquest implements Timeable {
 			randomNumZ = ThreadLocalRandom.current().nextInt(-1*(worldSize/2), (worldSize/2) + 1);
 			randomNumY = world.getHighestBlockYAt(randomNumX,randomNumZ) + 3;
 			wildLoc = new Location(world, randomNumX, randomNumY, randomNumZ);
-			if(!kingdomManager.isChunkClaimed(wildLoc.getChunk())) {
+			if(!kingdomManager.isChunkClaimed(wildLoc)) {
 				foundValidLoc = true;
 			} else {
 				timeout++;

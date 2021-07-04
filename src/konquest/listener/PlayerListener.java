@@ -3,7 +3,6 @@ package konquest.listener;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.event.KonquestEnterTerritoryEvent;
-//import konquest.event.KonquestPortalTerritoryEvent;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
 import konquest.model.KonCapital;
@@ -15,13 +14,11 @@ import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.model.KonPlayer.RegionType;
-//import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -32,7 +29,6 @@ import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.Switch;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Arrow;
-//import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.IronGolem;
@@ -54,20 +50,16 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-//import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-//import org.bukkit.event.player.PlayerItemConsumeEvent;
-//import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-//import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
-//import org.bukkit.inventory.ItemStack;
+
 
 //TODO prevent Barbarians from earning money
 public class PlayerListener implements Listener{
@@ -345,8 +337,8 @@ public class PlayerListener implements Listener{
 	        		break;
 	        	case RUIN_CRITICAL:
 	        		boolean validCriticalBlock = false;
-	        		if(kingdomManager.isChunkClaimed(location.getChunk())) {
-	        			KonTerritory territory = kingdomManager.getChunkTerritory(location.getChunk());
+	        		if(kingdomManager.isChunkClaimed(location)) {
+	        			KonTerritory territory = kingdomManager.getChunkTerritory(location);
 	        			if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
 	        				Material criticalType = konquest.getRuinManager().getRuinCriticalBlock();
 	        				if(event.getClickedBlock().getType().equals(criticalType)) {
@@ -369,8 +361,8 @@ public class PlayerListener implements Listener{
 	        		break;
 	        	case RUIN_SPAWN:
 	        		boolean validSpawnBlock = false;
-	        		if(kingdomManager.isChunkClaimed(location.getChunk())) {
-	        			KonTerritory territory = kingdomManager.getChunkTerritory(location.getChunk());
+	        		if(kingdomManager.isChunkClaimed(location)) {
+	        			KonTerritory territory = kingdomManager.getChunkTerritory(location);
 	        			if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
 	        				((KonRuin)territory).addSpawnLocation(location);
 	        				ruinName = territory.getName();
@@ -391,8 +383,8 @@ public class PlayerListener implements Listener{
             event.setCancelled(true);
         } else {
         	// When a player is not setting regions...
-        	if(!player.isAdminBypassActive() && event.hasBlock() && kingdomManager.isChunkClaimed(event.getClickedBlock().getChunk())) {
-        		KonTerritory territory = kingdomManager.getChunkTerritory(event.getClickedBlock().getChunk());
+        	if(!player.isAdminBypassActive() && event.hasBlock() && kingdomManager.isChunkClaimed(event.getClickedBlock().getLocation())) {
+        		KonTerritory territory = kingdomManager.getChunkTerritory(event.getClickedBlock().getLocation());
         		// Prevent players from interacting with blocks in Capitals
         		if(territory instanceof KonCapital) {
         			//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in the Kingdom Capital", ChatColor.DARK_RED);
@@ -484,9 +476,9 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerEnterVehicle(VehicleEnterEvent event) {
     	Entity ent = event.getEntered();
-    	if(ent instanceof Player && konquest.getKingdomManager().isChunkClaimed(event.getVehicle().getLocation().getChunk())) {
+    	if(ent instanceof Player && konquest.getKingdomManager().isChunkClaimed(event.getVehicle().getLocation())) {
     		KonPlayer player = konquest.getPlayerManager().getPlayer((Player)ent);
-    		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getVehicle().getLocation().getChunk());
+    		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getVehicle().getLocation());
     		if(player != null && territory != null && !territory.getKingdom().equals(player.getKingdom()) && territory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
     			ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
     			event.setCancelled(true);
@@ -512,9 +504,9 @@ public class PlayerListener implements Listener{
             return;
         }
 		//ChatUtil.printDebug("Caught player arrow interaction...");
-		if(!event.isCancelled() && kingdomManager.isChunkClaimed(event.getBlock().getChunk())) {
+		if(!event.isCancelled() && kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
 			KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-	        KonTerritory territory = kingdomManager.getChunkTerritory(event.getBlock().getChunk());
+	        KonTerritory territory = kingdomManager.getChunkTerritory(event.getBlock().getLocation());
 	        // Protect territory from arrow interaction
 	        if(territory instanceof KonCapital) {
 	        	//ChatUtil.printDebug("Cancelling to protect capital");
@@ -544,8 +536,8 @@ public class PlayerListener implements Listener{
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
         
-        if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation().getChunk())) {
-        	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation().getChunk());
+        if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
+        	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation());
         	// Capital protections...
         	if(territory instanceof KonCapital) {
     			//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in the Kingdom Capital", ChatColor.DARK_RED);
@@ -580,8 +572,8 @@ public class PlayerListener implements Listener{
     public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-        if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation().getChunk())) {
-        	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation().getChunk());
+        if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
+        	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation());
         	// Capital protections...
         	if(territory instanceof KonCapital) {
 				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -640,8 +632,8 @@ public class PlayerListener implements Listener{
     }    
     
     private void onBucketUse(PlayerBucketEvent event) {
-    	if(kingdomManager.isChunkClaimed(event.getBlock().getChunk())) {
-			KonTerritory territory = kingdomManager.getChunkTerritory(event.getBlock().getChunk());
+    	if(kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
+			KonTerritory territory = kingdomManager.getChunkTerritory(event.getBlock().getLocation());
 			// Prevent all players from placing or picking up liquids inside of monuments
 			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideCenterChunk(event.getBlock().getLocation())) {
 				// The block is located inside a monument, cancel
@@ -688,10 +680,8 @@ public class PlayerListener implements Listener{
     	// Update town bars
     	//ChatUtil.printDebug("Player "+event.getPlayer().getName()+" died at "+currentLoc.toString());
     	//ChatUtil.printDebug("Player "+event.getPlayer().getName()+" respawns at "+respawnLoc.toString());
-    	Chunk chunkTo = respawnLoc.getChunk();
-		Chunk chunkFrom = currentLoc.getChunk();
-		if(kingdomManager.isChunkClaimed(chunkFrom)) {
-			KonTerritory territoryFrom = kingdomManager.getChunkTerritory(chunkFrom);
+		if(kingdomManager.isChunkClaimed(currentLoc)) {
+			KonTerritory territoryFrom = kingdomManager.getChunkTerritory(currentLoc);
 			// Update bars
 			if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
 				((KonTown) territoryFrom).removeBarPlayer(player);
@@ -704,8 +694,8 @@ public class PlayerListener implements Listener{
 			// Remove potion effects for all players
 			kingdomManager.clearTownNerf(player);
 		}
-		if(kingdomManager.isChunkClaimed(chunkTo)) {
-			KonTerritory territoryTo = kingdomManager.getChunkTerritory(chunkTo);
+		if(kingdomManager.isChunkClaimed(respawnLoc)) {
+			KonTerritory territoryTo = kingdomManager.getChunkTerritory(respawnLoc);
 			// Update bars
 			if(territoryTo.getTerritoryType().equals(KonTerritoryType.TOWN)) {
 	    		((KonTown) territoryTo).addBarPlayer(player);
@@ -767,8 +757,8 @@ public class PlayerListener implements Listener{
 	    	// When portal into valid world...
 	    	if(konquest.isWorldValid(portalToLoc.getWorld())) {
 				// Protections for territory
-	    		if(konquest.getKingdomManager().isChunkClaimed(portalToLoc.getChunk())) {
-		    		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(portalToLoc.getChunk());
+	    		if(konquest.getKingdomManager().isChunkClaimed(portalToLoc)) {
+		    		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(portalToLoc);
 					/*
 					KonquestPortalTerritoryEvent invokeEvent = new KonquestPortalTerritoryEvent(konquest, kingdomManager.getChunkTerritory(event.getTo().getChunk()), event.getPortalTravelAgent());
 		            Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
@@ -836,8 +826,8 @@ public class PlayerListener implements Listener{
     			// Player moved within the same world
     			//long start = System.currentTimeMillis();
         		
-            	Chunk chunkTo = event.getTo().getChunk();
-        		Chunk chunkFrom = event.getFrom().getChunk();
+            	Location chunkTo = event.getTo();
+        		Location chunkFrom = event.getFrom();
         		//String chunkCoordsTo = chunkTo.getX()+", "+chunkTo.getZ();
         		//String chunkCoordsFrom = chunkFrom.getX()+", "+chunkFrom.getZ();
         		boolean isTerritoryTo = kingdomManager.isChunkClaimed(chunkTo);
@@ -1021,9 +1011,8 @@ public class PlayerListener implements Listener{
     			//kingdomManager.stopPlayerBorderParticles(player);
     			kingdomManager.updatePlayerBorderParticles(player,event.getTo());
     			
-    			Chunk chunkFrom = event.getFrom().getChunk();
-    			if(kingdomManager.isChunkClaimed(chunkFrom)) {
-    				KonTerritory territoryFrom = kingdomManager.getChunkTerritory(chunkFrom);
+    			if(kingdomManager.isChunkClaimed(event.getFrom())) {
+    				KonTerritory territoryFrom = kingdomManager.getChunkTerritory(event.getFrom());
         			if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         				((KonTown) territoryFrom).removeBarPlayer(player);
         				player.clearAllMobAttackers();

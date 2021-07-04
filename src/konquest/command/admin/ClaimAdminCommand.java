@@ -1,5 +1,6 @@
 package konquest.command.admin;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,8 +12,8 @@ import konquest.model.KonTerritory;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-import org.bukkit.Chunk;
-//import org.bukkit.World;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -36,6 +37,8 @@ public class ClaimAdminCommand extends CommandBase {
     			return;
     		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
+        	Location playerLoc = bukkitPlayer.getLocation();
+        	World playerWorld = playerLoc.getWorld();
         	if(getArgs().length > 2) {
         		String claimMode = getArgs()[2];
         		switch(claimMode) {
@@ -54,9 +57,9 @@ public class ClaimAdminCommand extends CommandBase {
     					return;
     				}
     				KonTerritory adjacentTerritory = null;
-					for(Chunk adjChunk : getKonquest().getAreaChunks(bukkitPlayer.getLocation(), 2)) {
-						if(getKonquest().getKingdomManager().isChunkClaimed(adjChunk)) {
-							adjacentTerritory = getKonquest().getKingdomManager().getChunkTerritory(adjChunk);
+					for(Point adjPoint : getKonquest().getAreaPoints(playerLoc, 2)) {
+						if(getKonquest().getKingdomManager().isChunkClaimed(adjPoint,playerLoc.getWorld())) {
+							adjacentTerritory = getKonquest().getKingdomManager().getChunkTerritory(adjPoint,playerLoc.getWorld());
 							break;
 						}
 					}
@@ -65,10 +68,10 @@ public class ClaimAdminCommand extends CommandBase {
 						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_CLAIM_ERROR_MISSING.getMessage());
     					return;
 					}		
-    				ArrayList<Chunk> chunkList = getKonquest().getAreaChunks(bukkitPlayer.getLocation(), radius);
+    				ArrayList<Point> chunkList = getKonquest().getAreaPoints(playerLoc, radius);
     				ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
-    				for(Chunk chunk : chunkList) {
-    					if(getKonquest().getKingdomManager().isChunkClaimed(chunk) && !getKonquest().getKingdomManager().getChunkTerritory(chunk).equals(adjacentTerritory)) {
+    				for(Point point : chunkList) {
+    					if(getKonquest().getKingdomManager().isChunkClaimed(point,playerWorld) && !getKonquest().getKingdomManager().getChunkTerritory(point,playerWorld).equals(adjacentTerritory)) {
     						ChatUtil.printDebug("Found a chunk conflict");
     						//ChatUtil.sendError((Player) getSender(), "Cannot claim over another territory.");
     						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_CLAIM_ERROR_OVERLAP.getMessage());
@@ -79,11 +82,11 @@ public class ClaimAdminCommand extends CommandBase {
     				if(adjacentTerritory.addChunks(chunkList)) {
     					//getKonquest().getKingdomManager().updateTerritoryCache();
     					int numChunks = 0;
-    					for(Chunk chunk : chunkList) {
-    						getKonquest().getKingdomManager().addTerritory(chunk,adjacentTerritory);
+    					for(Point point : chunkList) {
+    						getKonquest().getKingdomManager().addTerritory(playerWorld,point,adjacentTerritory);
     						numChunks++;
     					}
-    					getKonquest().getKingdomManager().updatePlayerBorderParticles(player, bukkitPlayer.getLocation());
+    					getKonquest().getKingdomManager().updatePlayerBorderParticles(player, playerLoc);
     					//ChatUtil.sendNotice((Player) getSender(), "Successfully claimed chunks within radius "+radius+" for territory "+adjacentTerritory.getName());
     					ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage(numChunks,adjacentTerritory.getName()));
     				} else {
@@ -96,7 +99,7 @@ public class ClaimAdminCommand extends CommandBase {
         				player.setIsAdminClaimingFollow(true);
         				//ChatUtil.sendNotice((Player) getSender(), "Enabled admin auto claim. Use this command again to disable.");
         				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
-        				getKonquest().getKingdomManager().claimForAdmin(bukkitPlayer, bukkitPlayer.getLocation());
+        				getKonquest().getKingdomManager().claimForAdmin(bukkitPlayer, playerLoc);
         			} else {
         				player.setIsAdminClaimingFollow(false);
         				//ChatUtil.sendNotice((Player) getSender(), "Disabled admin auto claim.");
@@ -109,7 +112,7 @@ public class ClaimAdminCommand extends CommandBase {
         		}
         	} else {
         		// Claim the single chunk containing playerLoc for the adjacent territory.
-        		getKonquest().getKingdomManager().claimForAdmin(bukkitPlayer, bukkitPlayer.getLocation());
+        		getKonquest().getKingdomManager().claimForAdmin(bukkitPlayer, playerLoc);
         	}
         }
     }

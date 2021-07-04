@@ -34,9 +34,9 @@ public class UnclaimAdminCommand extends CommandBase {
         	}
         	
         	Location playerLoc = bukkitPlayer.getLocation();
-        	if(getKonquest().getKingdomManager().isChunkClaimed(playerLoc.getChunk())) {
+        	if(getKonquest().getKingdomManager().isChunkClaimed(playerLoc)) {
         		// unclaim the single chunk containing playerLoc from the adjacent territory.
-        		String territoryName = getKonquest().getKingdomManager().getChunkTerritory(playerLoc.getChunk()).getName();
+        		String territoryName = getKonquest().getKingdomManager().getChunkTerritory(playerLoc).getName();
         		if(getKonquest().getKingdomManager().unclaimChunk(playerLoc)) {
         			//ChatUtil.sendNotice((Player) getSender(), "Successfully removed chunk from territory: "+territoryName);
         			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_NOTICE_SUCCESS.getMessage(territoryName));

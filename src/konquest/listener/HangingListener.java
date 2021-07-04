@@ -29,8 +29,8 @@ public class HangingListener implements Listener {
     public void onHangingBreak(HangingBreakEvent event) {
 		//ChatUtil.printDebug("EVENT: Hanging Entity Broke");
 		Location brakeLoc = event.getEntity().getLocation();
-		if(kingdomManager.isChunkClaimed(brakeLoc.getChunk())) {
-			KonTerritory territory = kingdomManager.getChunkTerritory(brakeLoc.getChunk());
+		if(kingdomManager.isChunkClaimed(brakeLoc)) {
+			KonTerritory territory = kingdomManager.getChunkTerritory(brakeLoc);
 			// Check for break inside of town
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
