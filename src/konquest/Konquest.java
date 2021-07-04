@@ -546,8 +546,7 @@ public class Konquest implements Timeable {
 	}
 	
 	public Point toPoint(Location loc) {
-		//return new Point(loc.getChunk().getX(),loc.getChunk().getZ());
-		return new Point(loc.getBlockX()/16,loc.getBlockZ()/16);
+		return new Point((int)Math.floor((double)loc.getBlockX()/16),(int)Math.floor((double)loc.getBlockZ()/16));
 	}
 	
 	public Point toPoint(Chunk chunk) {

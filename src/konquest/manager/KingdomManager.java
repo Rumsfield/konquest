@@ -1752,7 +1752,7 @@ public class KingdomManager {
         		z = sectionList.get(2);
 	        	Location monument_cornertwo = new Location(capitalWorld,x,y,z);
 	        	// Load monument template chunk
-	        	capitalWorld.loadChunk(monument_cornerone.getBlockX()/16,monument_cornerone.getBlockZ()/16);
+	        	//capitalWorld.loadChunk(monument_cornerone.getBlockX()/16,monument_cornerone.getBlockZ()/16);
 	        	// Create a Monument Template region for current Kingdom
         		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel);
         		if(status != 0) {
