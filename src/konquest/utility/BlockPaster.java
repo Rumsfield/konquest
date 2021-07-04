@@ -1,5 +1,6 @@
 package konquest.utility;
 
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -12,7 +13,7 @@ public class BlockPaster {
     //private BukkitRunnable task;
     //private BukkitTask task;
     //private int taskID;
-	private World pasteWorld;
+	private Chunk pasteChunk;
 	private World templateWorld;
     private int y;
     private int y_offset;
@@ -21,13 +22,11 @@ public class BlockPaster {
     private int topBlockZ;
     private int bottomBlockX;
     private int bottomBlockZ;
-    private int pasteX;
-    private int pasteZ;
     
-    public BlockPaster(World pasteWorld, World templateWorld, int y, int y_offset, int bottomBlockY, int topBlockX, int topBlockZ, int bottomBlockX, int bottomBlockZ, int pasteX, int pasteZ) {
+    public BlockPaster(Chunk pasteChunk, World templateWorld, int y, int y_offset, int bottomBlockY, int topBlockX, int topBlockZ, int bottomBlockX, int bottomBlockZ) {
     	//this.taskID = 0;
     	//this.scheduler = Bukkit.getScheduler();
-    	this.pasteWorld = pasteWorld;
+    	this.pasteChunk = pasteChunk;
     	this.templateWorld = templateWorld;
     	this.y = y;
     	this.y_offset = y_offset;
@@ -36,8 +35,6 @@ public class BlockPaster {
     	this.topBlockZ = topBlockZ;
     	this.bottomBlockX = bottomBlockX;
     	this.bottomBlockZ = bottomBlockZ;
-    	this.pasteX = pasteX;
-    	this.pasteZ = pasteZ;
     }
     
     
@@ -49,7 +46,7 @@ public class BlockPaster {
     	for (int x = bottomBlockX; x <= topBlockX; x++) {
             for (int z = bottomBlockZ; z <= topBlockZ; z++) {
                 Block templateBlock = templateWorld.getBlockAt(x, y, z);
-                Block monumentBlock = pasteWorld.getBlockAt(pasteX+(x-bottomBlockX), y-bottomBlockY+y_offset, pasteZ+(z-bottomBlockZ));
+                Block monumentBlock = pasteChunk.getBlock(x-bottomBlockX, y-bottomBlockY+y_offset, z-bottomBlockZ);
                 if(!monumentBlock.getBlockData().matches(templateBlock.getBlockData())) {
                 	// Set local block to monument template block
                     monumentBlock.setType(templateBlock.getType());

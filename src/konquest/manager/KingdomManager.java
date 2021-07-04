@@ -1811,7 +1811,7 @@ public class KingdomManager {
 	            	town.setSpawn(town_spawn);
 	            	Date step2 = new Date();
 	            	// Load monument chunk
-	            	//townWorld.loadChunk(town_center.getBlockX()/16,town_center.getBlockZ()/16);
+	            	townWorld.loadChunk(town_center.getBlockX()/16,town_center.getBlockZ()/16);
 	            	// Setup town monument parameters from template
 	            	int status = town.loadMonument(base, kingdomMap.get(kingdomName).getMonumentTemplate());
 	            	if(status != 0) {
@@ -1820,7 +1820,7 @@ public class KingdomManager {
 	            		//konquest.opStatusMessages.add("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            	}
 	            	// Unload monument chunk
-	            	//townWorld.unloadChunk(town_center.getBlockX()/16,town_center.getBlockZ()/16);
+	            	townWorld.unloadChunk(town_center.getBlockX()/16,town_center.getBlockZ()/16);
 	            	Date step3 = new Date();
 	            	// Add all Town chunk claims
 	            	town.addPoints(konquest.formatStringToPoints(townSection.getString("chunks")));
