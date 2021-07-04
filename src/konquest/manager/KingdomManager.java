@@ -3,6 +3,7 @@ package konquest.manager;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -1650,7 +1651,6 @@ public class KingdomManager {
         List<Double> sectionList;
         String worldName;
         String defaultWorldName = konquest.getConfigManager().getConfig("core").getString("core.world_name","world");
-        World world;
         // Count all towns
         int numTowns = 0;
         for(String kingdomName : kingdomsConfig.getConfigurationSection("kingdoms").getKeys(false)) {
@@ -1659,25 +1659,27 @@ public class KingdomManager {
         LoadingPrinter loadBar = new LoadingPrinter(numTowns,"Loading "+numTowns+" Towns");
         // Load all Kingdoms
         for(String kingdomName : kingdomsConfig.getConfigurationSection("kingdoms").getKeys(false)) {
+        	Date kStart = new Date();
         	//ChatUtil.printDebug("Loading Kingdom: "+kingdomName);
         	ConfigurationSection kingdomSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName);
         	boolean isPeaceful = kingdomSection.getBoolean("peaceful", false);
         	ConfigurationSection monumentSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".monument");
         	// Create Kingdoms and Capitals
         	ConfigurationSection capitalSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".capital");
+        	World capitalWorld = null;
         	if(capitalSection != null) {
         		worldName = capitalSection.getString("world",defaultWorldName);
-        		world = Bukkit.getServer().getWorld(worldName);
+        		capitalWorld = Bukkit.getWorld(worldName);
         		sectionList = capitalSection.getDoubleList("spawn");
         		x = sectionList.get(0);
         		y = sectionList.get(1);
         		z = sectionList.get(2);
-	        	Location capital_spawn = new Location(world,x,y,z);
+	        	Location capital_spawn = new Location(capitalWorld,x,y,z);
 	        	sectionList = capitalSection.getDoubleList("center");
         		x = sectionList.get(0);
         		y = sectionList.get(1);
         		z = sectionList.get(2);
-	        	Location capital_center = new Location(world,x,y,z);
+	        	Location capital_center = new Location(capitalWorld,x,y,z);
 	        	// Create Kingdom and capital
 	        	addKingdom(capital_center, kingdomName);
 	        	// Set Peaceful mode
@@ -1687,31 +1689,32 @@ public class KingdomManager {
 	        	// Add all Capital chunk claims
 	        	kingdomMap.get(kingdomName).getCapital().addPoints(konquest.formatStringToPoints(capitalSection.getString("chunks")));
 	        	// Update territory cache
-	        	addAllTerritory(world,kingdomMap.get(kingdomName).getCapital().getChunkList());
+	        	addAllTerritory(capitalWorld,kingdomMap.get(kingdomName).getCapital().getChunkList());
         	} else {
         		String message = "Failed to load capital for Kingdom "+kingdomName+", is one created?";
         		ChatUtil.printConsoleError(message);
         		konquest.opStatusMessages.add(message);
         	}
+        	Date kStep1 = new Date();
         	// Create Monument Templates
-        	if(monumentSection != null) {
-        		worldName = capitalSection.getString("world",defaultWorldName);
-        		world = Bukkit.getServer().getWorld(worldName);
+        	if(monumentSection != null && capitalWorld != null) {
         		sectionList = monumentSection.getDoubleList("travel");
         		x = sectionList.get(0);
         		y = sectionList.get(1);
         		z = sectionList.get(2);
-	        	Location monument_travel = new Location(world,x,y,z);
+	        	Location monument_travel = new Location(capitalWorld,x,y,z);
 	        	sectionList = monumentSection.getDoubleList("cornerone");
         		x = sectionList.get(0);
         		y = sectionList.get(1);
         		z = sectionList.get(2);
-	        	Location monument_cornerone = new Location(world,x,y,z);
+	        	Location monument_cornerone = new Location(capitalWorld,x,y,z);
 	        	sectionList = monumentSection.getDoubleList("cornertwo");
         		x = sectionList.get(0);
         		y = sectionList.get(1);
         		z = sectionList.get(2);
-	        	Location monument_cornertwo = new Location(world,x,y,z);
+	        	Location monument_cornertwo = new Location(capitalWorld,x,y,z);
+	        	// Load monument template chunk
+	        	capitalWorld.loadChunk(monument_cornerone.getBlockX()/16,monument_cornerone.getBlockZ()/16);
 	        	// Create a Monument Template region for current Kingdom
         		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel);
         		if(status != 0) {
@@ -1740,30 +1743,37 @@ public class KingdomManager {
         		ChatUtil.printConsoleError("Null monument template for Kingdom "+kingdomName+" in config file!");
         		konquest.opStatusMessages.add("Missing monument template for Kingdom "+kingdomName+" in kingdoms.yml config file. Use \"/k admin monument\" to define the monument template for this Kingdom.");
         	}
+        	Date kStep2 = new Date();
         	// Load all towns
         	boolean isMissingMonuments = false;
+        	World townWorld = null;
         	for(String townName : kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns").getKeys(false)) {
         		//ChatUtil.printDebug("Loading Town: "+townName);
             	ConfigurationSection townSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns."+townName);
             	if(townSection != null) {
+            		Date start = new Date();
             		worldName = townSection.getString("world",defaultWorldName);
-            		world = Bukkit.getServer().getWorld(worldName);
+            		townWorld = Bukkit.getWorld(worldName);
             		int base = townSection.getInt("base");
             		sectionList = townSection.getDoubleList("spawn");
             		x = sectionList.get(0);
             		y = sectionList.get(1);
             		z = sectionList.get(2);
-	            	Location town_spawn = new Location(world,x,y,z);
+	            	Location town_spawn = new Location(townWorld,x,y,z);
 	            	sectionList = townSection.getDoubleList("center");
             		x = sectionList.get(0);
             		y = sectionList.get(1);
             		z = sectionList.get(2);
-	            	Location town_center = new Location(world,x,y,z);
+	            	Location town_center = new Location(townWorld,x,y,z);
+	            	Date step1 = new Date();
 	            	// Create Town
 	            	kingdomMap.get(kingdomName).addTown(town_center, townName);
 	            	KonTown town = kingdomMap.get(kingdomName).getTown(townName);
 	            	// Set town spawn point
 	            	town.setSpawn(town_spawn);
+	            	Date step2 = new Date();
+	            	// Load monument chunk
+	            	townWorld.loadChunk(town_center.getBlockX()/16,town_center.getBlockZ()/16);
 	            	// Setup town monument parameters from template
 	            	int status = town.loadMonument(base, kingdomMap.get(kingdomName).getMonumentTemplate());
 	            	if(status != 0) {
@@ -1771,10 +1781,14 @@ public class KingdomManager {
 	            		ChatUtil.printConsoleError("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            		//konquest.opStatusMessages.add("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            	}
+	            	// Unload monument chunk
+	            	townWorld.unloadChunk(town_center.getBlockX()/16,town_center.getBlockZ()/16);
+	            	Date step3 = new Date();
 	            	// Add all Town chunk claims
 	            	town.addPoints(konquest.formatStringToPoints(townSection.getString("chunks")));
 	            	// Update territory cache
-		        	addAllTerritory(world,town.getChunkList());
+		        	addAllTerritory(townWorld,town.getChunkList());
+		        	Date step4 = new Date();
 	            	// Set open flag
 	            	boolean isOpen = townSection.getBoolean("open",false);
 	            	town.setIsOpen(isOpen);
@@ -1791,6 +1805,7 @@ public class KingdomManager {
 	            	} else {
 	            		ChatUtil.printDebug("Town "+townName+" in kingdom "+kingdomName+" does not have a stored Lord ID");
 	            	}
+	            	Date step5 = new Date();
 	            	// Populate Residents
 	            	if(townSection.contains("residents")) {
 		            	for(String residentUUID : townSection.getConfigurationSection("residents").getKeys(false)) {
@@ -1800,6 +1815,7 @@ public class KingdomManager {
 	            	} else {
 	            		//ChatUtil.printDebug("Town "+townName+" does not have any stored residents");
 	            	}
+	            	Date step6 = new Date();
 	            	// Add invite requests
 	            	if(townSection.contains("requests")) {
 	            		for(String requestUUID : townSection.getConfigurationSection("requests").getKeys(false)) {
@@ -1807,6 +1823,7 @@ public class KingdomManager {
 	            			town.addJoinRequest(UUID.fromString(requestUUID), type);
 	            		}
 	            	}
+	            	Date step7 = new Date();
 	            	// Add upgrades
 	            	if(townSection.contains("upgrades")) {
 	            		for(String upgradeName : townSection.getConfigurationSection("upgrades").getKeys(false)) {
@@ -1817,15 +1834,32 @@ public class KingdomManager {
 	            			}
 	            		}
 	            	}
+	            	Date step8 = new Date();
 	            	// Update upgrade status
 	            	konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
 	            	// Update loading bar
 	            	loadBar.addProgress(1);
+	            	Date step9 = new Date();
+	            	int s1 = (int)(step1.getTime()-start.getTime());
+	            	int s2 = (int)(step2.getTime()-start.getTime());
+        			int s3 = (int)(step3.getTime()-start.getTime());
+        			int s4 = (int)(step4.getTime()-start.getTime());
+        			int s5 = (int)(step5.getTime()-start.getTime());
+        			int s6 = (int)(step6.getTime()-start.getTime());
+        			int s7 = (int)(step7.getTime()-start.getTime());
+        			int s8 = (int)(step8.getTime()-start.getTime());
+        			int s9 = (int)(step9.getTime()-start.getTime());
+        			ChatUtil.printDebug("Town "+townName+" timings: "+s1+","+s2+","+s3+","+s4+","+s5+","+s6+","+s7+","+s8+","+s9);
 	            }
         	}
         	if(isMissingMonuments) {
         		konquest.opStatusMessages.add("Kingdom "+kingdomName+" has Towns with invalid Monuments. You must create a new Monument Template and restart the server.");
         	}
+        	Date kStep3 = new Date();
+        	int s1 = (int)(kStep1.getTime()-kStart.getTime());
+        	int s2 = (int)(kStep2.getTime()-kStart.getTime());
+			int s3 = (int)(kStep3.getTime()-kStart.getTime());
+			ChatUtil.printDebug("Kingdom "+kingdomName+" timings: "+s1+","+s2+","+s3);
         }
 		ChatUtil.printDebug("Loaded Kingdoms");
 	}

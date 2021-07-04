@@ -13,8 +13,8 @@ public class BlockPaster {
     //private BukkitRunnable task;
     //private BukkitTask task;
     //private int taskID;
-	Chunk pasteChunk;
-	World templateWorld;
+	private Chunk pasteChunk;
+	private World templateWorld;
     private int y;
     private int y_offset;
     private int bottomBlockY;

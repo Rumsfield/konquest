@@ -2,6 +2,7 @@ package konquest.model;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -192,6 +193,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		if(!template.isValid()) {
 			return false;
 		}
+		Date start = new Date();
 		monument.setIsItemDropsDisabled(true);
 		monument.setIsDamageDisabled(true);
 		
@@ -201,16 +203,26 @@ public class KonTown extends KonTerritory implements Timeable{
         int bottomBlockX = Math.min(template.getCornerOne().getBlockX(), template.getCornerTwo().getBlockX());
         int bottomBlockY = Math.min(template.getCornerOne().getBlockY(), template.getCornerTwo().getBlockY());
         int bottomBlockZ = Math.min(template.getCornerOne().getBlockZ(), template.getCornerTwo().getBlockZ());
-
+        
         // Determine minimum Y level of paste chunk below monument Y base
+        int monument_y = monument.getBaseY();
         int fill_y = 0;
         int min_fill_y = 0;
-        Chunk fillChunk = getCenterLoc().getChunk();
+        Date step1 = new Date();
+        if(getCenterLoc().getWorld().isChunkLoaded(getCenterLoc().getBlockX()/16,getCenterLoc().getBlockZ()/16)) {
+        	ChatUtil.printDebug("Paste fill chunk is loaded");
+        } else {
+        	ChatUtil.printDebug("Paste fill chunk is NOT loaded!");
+        }
+        Chunk fillChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
+        //Chunk fillChunk = getCenterLoc().getChunk();
+        Date step2 = new Date();
         ChunkSnapshot fillChunkSnap = fillChunk.getChunkSnapshot(true,false,false);
-        for (int x = 0; x <= topBlockX-bottomBlockX; x++) {
-            for (int z = 0; z <= topBlockZ-bottomBlockZ; z++) {
+        Date step3 = new Date();
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
             	fill_y = fillChunkSnap.getHighestBlockYAt(x, z);
-            	while((fillChunk.getBlock(x, fill_y, z).isPassable() || !fillChunk.getBlock(x, fill_y, z).getType().isOccluding()) && fill_y > fillChunk.getWorld().getMinHeight()) {
+            	while((fillChunk.getBlock(x, fill_y, z).isPassable() || !fillChunkSnap.getBlockType(x, fill_y, z).isOccluding()) && fill_y > fillChunk.getWorld().getMinHeight()) {
             		fill_y--;
 				}
             	if((x == 0 && z == 0) || fill_y < min_fill_y) {
@@ -218,21 +230,22 @@ public class KonTown extends KonTerritory implements Timeable{
             	}
             }
         }
+        Date step4 = new Date();
+        ChatUtil.printDebug("Pasting monument at base "+monument_y+" found minimum Y level: "+min_fill_y);
         // Fill air between world and monument base
-        int monument_y = monument.getBaseY();
         if(min_fill_y < monument_y) {
-	        for (int x = 0; x <= topBlockX-bottomBlockX; x++) {
-	            for (int z = 0; z <= topBlockZ-bottomBlockZ; z++) {
+	        for (int x = 0; x < 16; x++) {
+	            for (int z = 0; z < 16; z++) {
                 	for (int y = min_fill_y; y <= monument_y; y++) {
                 		fillChunk.getBlock(x, y, z).setType(Material.STONE);
                 	}
 	            }
 	        }
         }
-        
-        Chunk pasteChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
+        Date step5 = new Date();
+        //Chunk pasteChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
         World templateWorld = template.getCornerOne().getWorld();
-        BlockPaster monumentPaster = new BlockPaster(pasteChunk,templateWorld,bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
+        BlockPaster monumentPaster = new BlockPaster(fillChunk,templateWorld,bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
         for (int y = bottomBlockY; y <= topBlockY; y++) {
         	monumentPaster.setY(y);
         	//BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),y,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
@@ -240,6 +253,16 @@ public class KonTown extends KonTerritory implements Timeable{
         }
         monument.setIsItemDropsDisabled(false);
         monument.setIsDamageDisabled(false);
+        Date step6 = new Date();
+        
+        int s1 = (int)(step1.getTime()-start.getTime());
+    	int s2 = (int)(step2.getTime()-start.getTime());
+		int s3 = (int)(step3.getTime()-start.getTime());
+		int s4 = (int)(step4.getTime()-start.getTime());
+		int s5 = (int)(step5.getTime()-start.getTime());
+		int s6 = (int)(step6.getTime()-start.getTime());
+		ChatUtil.printDebug("Monument paste timings: "+s1+","+s2+","+s3+","+s4+","+s5+","+s6);
+		
 		return true;
 	}
 
