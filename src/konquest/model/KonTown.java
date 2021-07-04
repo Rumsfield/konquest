@@ -17,7 +17,6 @@ import konquest.utility.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -213,15 +212,20 @@ public class KonTown extends KonTerritory implements Timeable{
         } else {
         	ChatUtil.printDebug("Paste fill chunk is NOT loaded!");
         }
-        Chunk fillChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
+        World fillWorld = getCenterLoc().getWorld();
+        //Chunk fillChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
         //Chunk fillChunk = getCenterLoc().getChunk();
+        // Determine world coords of fill chunk (0,0)
+        int fillBlockX = (int)Math.floor((double)getCenterLoc().getBlockX()/16)*16;
+        int fillBlockZ = (int)Math.floor((double)getCenterLoc().getBlockZ()/16)*16;
         Date step2 = new Date();
-        ChunkSnapshot fillChunkSnap = fillChunk.getChunkSnapshot(true,false,false);
+        //ChunkSnapshot fillChunkSnap = fillChunk.getChunkSnapshot(true,false,false);
         Date step3 = new Date();
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-            	fill_y = fillChunkSnap.getHighestBlockYAt(x, z);
-            	while((fillChunk.getBlock(x, fill_y, z).isPassable() || !fillChunkSnap.getBlockType(x, fill_y, z).isOccluding()) && fill_y > fillChunk.getWorld().getMinHeight()) {
+            	fill_y = fillWorld.getHighestBlockYAt(fillBlockX+x, fillBlockZ+z);
+            	//fill_y = fillChunkSnap.getHighestBlockYAt(x, z);
+            	while((fillWorld.getBlockAt(x, fill_y, z).isPassable() || !fillWorld.getBlockAt(x, fill_y, z).getType().isOccluding()) && fill_y > fillWorld.getMinHeight()) {
             		fill_y--;
 				}
             	if((x == 0 && z == 0) || fill_y < min_fill_y) {
@@ -236,7 +240,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	        for (int x = 0; x < 16; x++) {
 	            for (int z = 0; z < 16; z++) {
                 	for (int y = min_fill_y; y <= monument_y; y++) {
-                		fillChunk.getBlock(x, y, z).setType(Material.STONE);
+                		fillWorld.getBlockAt(x, y, z).setType(Material.STONE);
                 	}
 	            }
 	        }
@@ -244,7 +248,7 @@ public class KonTown extends KonTerritory implements Timeable{
         Date step5 = new Date();
         //Chunk pasteChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
         World templateWorld = template.getCornerOne().getWorld();
-        BlockPaster monumentPaster = new BlockPaster(fillChunk,templateWorld,bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
+        BlockPaster monumentPaster = new BlockPaster(fillWorld,templateWorld,bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ,fillBlockX,fillBlockZ);
         for (int y = bottomBlockY; y <= topBlockY; y++) {
         	monumentPaster.setY(y);
         	//BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),y,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
