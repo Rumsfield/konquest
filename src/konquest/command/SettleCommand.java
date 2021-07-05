@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -128,6 +129,8 @@ public class SettleCommand extends CommandBase {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SETTLE_NOTICE_SUCCESS.getMessage(townName));
         		//ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+bukkitPlayer.getName()+" has settled the Town of "+ChatColor.AQUA+townName+ChatColor.LIGHT_PURPLE+" for Kingdom "+ChatColor.AQUA+player.getKingdom().getName());
         		ChatUtil.sendBroadcast(MessagePath.COMMAND_SETTLE_BROADCAST_SETTLE.getMessage(bukkitPlayer.getName(),townName,player.getKingdom().getName()));
+        		// Play a success sound
+        		bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, (float)1, (float)1.2);
         		// Set player as Lord
         		town.setPlayerLord(player.getOfflineBukkitPlayer());
         		// Add players to town bar
