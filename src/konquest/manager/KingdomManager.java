@@ -1752,7 +1752,11 @@ public class KingdomManager {
         		z = sectionList.get(2);
 	        	Location monument_cornertwo = new Location(capitalWorld,x,y,z);
 	        	// Load monument template chunk
-	        	//capitalWorld.loadChunk(monument_cornerone.getBlockX()/16,monument_cornerone.getBlockZ()/16);
+	        	int tmpX = (int)Math.floor((double)monument_cornerone.getBlockX()/16);
+                int tmpZ = (int)Math.floor((double)monument_cornerone.getBlockZ()/16);
+	        	capitalWorld.loadChunk(tmpX,tmpZ);
+                //capitalWorld.addPluginChunkTicket(tmpX, tmpZ, konquest.getPlugin());
+                //capitalWorld.setChunkForceLoaded(tmpX, tmpZ, true);
 	        	// Create a Monument Template region for current Kingdom
         		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel);
         		if(status != 0) {
@@ -1814,6 +1818,9 @@ public class KingdomManager {
 	            	int monX = (int)Math.floor((double)town_center.getBlockX()/16);
 	                int monZ = (int)Math.floor((double)town_center.getBlockZ()/16);
 	            	townWorld.loadChunk(monX,monZ);
+	            	//townWorld.addPluginChunkTicket(monX, monZ, konquest.getPlugin());
+	            	//townWorld.setChunkForceLoaded(monX, monZ, true);
+	            	Date step3 = new Date();
 	            	// Setup town monument parameters from template
 	            	int status = town.loadMonument(base, kingdomMap.get(kingdomName).getMonumentTemplate());
 	            	if(status != 0) {
@@ -1821,14 +1828,15 @@ public class KingdomManager {
 	            		ChatUtil.printConsoleError("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            		//konquest.opStatusMessages.add("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            	}
+	            	Date step4 = new Date();
 	            	// Unload monument chunk
-	            	townWorld.unloadChunk(monX,monZ);
-	            	Date step3 = new Date();
+	            	//townWorld.unloadChunk(monX,monZ);
+	            	Date step5 = new Date();
 	            	// Add all Town chunk claims
 	            	town.addPoints(konquest.formatStringToPoints(townSection.getString("chunks")));
 	            	// Update territory cache
 		        	addAllTerritory(townWorld,town.getChunkList());
-		        	Date step4 = new Date();
+		        	Date step6 = new Date();
 	            	// Set open flag
 	            	boolean isOpen = townSection.getBoolean("open",false);
 	            	town.setIsOpen(isOpen);
@@ -1845,7 +1853,6 @@ public class KingdomManager {
 	            	} else {
 	            		ChatUtil.printDebug("Town "+townName+" in kingdom "+kingdomName+" does not have a stored Lord ID");
 	            	}
-	            	Date step5 = new Date();
 	            	// Populate Residents
 	            	if(townSection.contains("residents")) {
 		            	for(String residentUUID : townSection.getConfigurationSection("residents").getKeys(false)) {
@@ -1855,7 +1862,6 @@ public class KingdomManager {
 	            	} else {
 	            		//ChatUtil.printDebug("Town "+townName+" does not have any stored residents");
 	            	}
-	            	Date step6 = new Date();
 	            	// Add invite requests
 	            	if(townSection.contains("requests")) {
 	            		for(String requestUUID : townSection.getConfigurationSection("requests").getKeys(false)) {
@@ -1877,8 +1883,7 @@ public class KingdomManager {
 	            	Date step8 = new Date();
 	            	// Update upgrade status
 	            	konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
-	            	// Update loading bar
-	            	loadBar.addProgress(1);
+	            	
 	            	Date step9 = new Date();
 	            	int s1 = (int)(step1.getTime()-start.getTime());
 	            	int s2 = (int)(step2.getTime()-start.getTime());
@@ -1890,6 +1895,9 @@ public class KingdomManager {
         			int s8 = (int)(step8.getTime()-start.getTime());
         			int s9 = (int)(step9.getTime()-start.getTime());
         			ChatUtil.printDebug("Town "+townName+" timings: "+s1+","+s2+","+s3+","+s4+","+s5+","+s6+","+s7+","+s8+","+s9);
+        			
+        			// Update loading bar
+	            	loadBar.addProgress(1);
 	            }
         	}
         	if(isMissingMonuments) {

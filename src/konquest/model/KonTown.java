@@ -232,7 +232,7 @@ public class KonTown extends KonTerritory implements Timeable{
             }
         }
         Date step4 = new Date();
-        ChatUtil.printDebug("Pasting monument at base "+monument_y+" found minimum Y level: "+min_fill_y);
+        ChatUtil.printDebug("Pasting monument ("+fillChunk.getX()+","+fillChunk.getZ()+") at base "+monument_y+" found minimum Y level: "+min_fill_y);
         // Fill air between world and monument base
         if(min_fill_y < monument_y) {
 	        for (int x = 0; x < 16; x++) {
