@@ -407,7 +407,7 @@ public class Konquest implements Timeable {
 	    					// Only find enemy towns which do not have the counter-intelligence upgrade level 2+
 	    					int upgradeLevel = upgradeManager.getTownUpgradeLevel(town, KonUpgrade.COUNTER);
 	    					if(upgradeLevel < 2) {
-	    						int townDist = distanceInChunks(player.getBukkitPlayer().getLocation().getChunk(), town.getCenterLoc().getChunk());
+	    						int townDist = chunkDistance(player.getBukkitPlayer().getLocation(), town.getCenterLoc());
 	    						if(townDist != -1 && townDist < minDistance) {
 	    							minDistance = townDist;
 	    							nearestTerritory = town;
@@ -557,6 +557,7 @@ public class Konquest implements Timeable {
 		return world.getChunkAt(point.x, point.y);
 	}
 	
+	/*
 	public static int distanceInChunks(Location loc1, Location loc2) {
 		return distanceInChunks(loc1.getChunk(), loc2.getChunk());
 	}
@@ -568,10 +569,15 @@ public class Konquest implements Timeable {
 			return -1;
 		}
 	}
+	*/
 	
 	public static int chunkDistance(Location loc1, Location loc2) {
 		if(loc1.getWorld().getName().equals(loc2.getWorld().getName())) {
-			return Math.max(Math.abs(loc1.getBlockX()/16 - loc2.getBlockX()/16), Math.abs(loc1.getBlockZ()/16 - loc2.getBlockZ()/16));
+			int loc1X = (int)Math.floor((double)loc1.getBlockX()/16);
+			int loc1Z = (int)Math.floor((double)loc1.getBlockZ()/16);
+			int loc2X = (int)Math.floor((double)loc2.getBlockX()/16);
+			int loc2Z = (int)Math.floor((double)loc2.getBlockZ()/16);
+			return Math.max(Math.abs(loc1X - loc2X), Math.abs(loc1Z - loc2Z));
 		} else {
 			return -1;
 		}
