@@ -1,5 +1,5 @@
 package konquest.nms;
-
+/*
 import java.util.List;
 
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
@@ -8,7 +8,9 @@ import org.bukkit.scoreboard.Team;
 
 import net.minecraft.server.v1_16_R3.PacketPlayOutScoreboardTeam;
 import net.minecraft.server.v1_16_R3.ScoreboardTeam;
-
+*/
+public class TeamPacketSender_1_16_R3 {}
+/*
 public class TeamPacketSender_1_16_R3 implements TeamPacketSender {
 	
 	@Override
@@ -39,3 +41,4 @@ public class TeamPacketSender_1_16_R3 implements TeamPacketSender {
     }
 
 }
+*/

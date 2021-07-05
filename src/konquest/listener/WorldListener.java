@@ -42,8 +42,8 @@ public class WorldListener  implements Listener {
 			// Check every block associated with the portal
 			for(BlockState current_blockState : event.getBlocks()) {
 				// Prevent portals from being created inside of Capitals and Monuments in the primary world
-				if(konquest.getKingdomManager().isChunkClaimed(current_blockState.getChunk())) {
-					KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(current_blockState.getChunk());
+				if(konquest.getKingdomManager().isChunkClaimed(current_blockState.getLocation())) {
+					KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(current_blockState.getLocation());
 					
 					if(territory instanceof KonCapital) {
 						ChatUtil.printDebug("EVENT: Portal creation stopped inside of capital "+territory.getName());
@@ -83,8 +83,8 @@ public class WorldListener  implements Listener {
 	
 	private boolean isLocInsideMonument(Location loc) {
 		boolean result = false;
-		if(konquest.getKingdomManager().isChunkClaimed(loc.getChunk())) {
-			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(loc.getChunk());
+		if(konquest.getKingdomManager().isChunkClaimed(loc)) {
+			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(loc);
 			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideCenterChunk(loc)) {
 				result = true;
 			}

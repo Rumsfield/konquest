@@ -65,7 +65,7 @@ public class KingdomManager {
 	private HashMap<PotionEffectType,Integer> townNerfs;
 	private Material townCriticalBlock;
 	
-	public static int DEFAULT_MAP_SIZE = 9; // 10 lines of chat, minus one for header, odd so player's chunk is centered
+	public static final int DEFAULT_MAP_SIZE = 9; // 10 lines of chat, minus one for header, odd so player's chunk is centered
 	
 	public KingdomManager(Konquest konquest) {
 		this.konquest = konquest;
@@ -158,7 +158,7 @@ public class KingdomManager {
 		    	//konquest.getPlayerManager().saveAllPlayers();
 		    	//konquest.getPlayerManager().updateAllSavedPlayers();
 		    	updateSmallestKingdom();
-		    	konquest.updateNamePackets();
+		    	konquest.updateNamePackets(player);
 		    	konquest.getDirectiveManager().displayBook(player);
 		    	updateKingdomOfflineProtection();
 			} else {
@@ -209,7 +209,7 @@ public class KingdomManager {
     	player.setBarbarian(true);
     	//konquest.getPlayerManager().saveAllPlayers();
     	//konquest.getPlayerManager().updateAllSavedPlayers();
-    	konquest.updateNamePackets();
+    	konquest.updateNamePackets(player);
     	updateSmallestKingdom();
     	updateKingdomOfflineProtection();
     	return true;
@@ -226,7 +226,9 @@ public class KingdomManager {
 	 * 			3 - error, bad name
 	 * 			4 - error, invalid monument template
 	 * 			5 - error, bad town placement
-	 * 		   11 - error, town init fail, bad monument init
+	 * 		   21 - error, town init fail, invalid monument
+	 * 		   22 - error, town init fail, bad monument gradient
+	 * 		   23 - error, town init fail, monument placed on bedrock
 	 *  	   12 - error, town init fail, bad town height
 	 *  	   13 - error, town init fail, too much air
 	 *  	   14 - error, town init fail, bad chunks
@@ -281,8 +283,8 @@ public class KingdomManager {
 			// Verify no overlapping init chunks
 			int radius = konquest.getConfigManager().getConfig("core").getInt("core.towns.init_radius");
 			ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
-			for(Chunk chunk : konquest.getAreaChunks(loc, radius)) {
-				if(isChunkClaimed(chunk)) {
+			for(Point point : konquest.getAreaPoints(loc, radius)) {
+				if(isChunkClaimed(point,loc.getWorld())) {
 					ChatUtil.printDebug("Found a chunk conflict");
 					return 1;
 				}
@@ -299,7 +301,7 @@ public class KingdomManager {
 						addAllTerritory(loc.getWorld(),getKingdom(kingdomName).getTown(name).getChunkList());
 						return 0;
 					} else {
-						// Remove town if init fails, exit code 2
+						// Remove town if init fails, exit code 10+
 						getKingdom(kingdomName).removeTown(name);
 						return 10+initStatus;
 					}
@@ -374,31 +376,32 @@ public class KingdomManager {
 	 * 			3 - error, already claimed
 	 */
 	public int claimChunk(Location loc) {
-		if(isChunkClaimed(loc.getChunk())) {
+		if(isChunkClaimed(loc)) {
 			return 3;
 		}
 		boolean foundAdjTerr = false;
 		KonTerritory closestAdjTerr = null;
-		for(Chunk sideChunk : konquest.getSideChunks(loc)) {
-			if(isChunkClaimed(sideChunk)) {
+		World claimWorld = loc.getWorld();
+		for(Point sidePoint : konquest.getSidePoints(loc)) {
+			if(isChunkClaimed(sidePoint,claimWorld)) {
 				if(!foundAdjTerr) {
-					closestAdjTerr = getChunkTerritory(sideChunk);
+					closestAdjTerr = getChunkTerritory(sidePoint,claimWorld);
 					foundAdjTerr = true;
 				} else {
 					//int closestDist = Konquest.distanceInChunks(loc, closestAdjTerr.getCenterLoc());
 					int closestDist = Konquest.chunkDistance(loc, closestAdjTerr.getCenterLoc());
 					//int currentDist = Konquest.distanceInChunks(loc, getChunkTerritory(sideChunk).getCenterLoc());
-					int currentDist = Konquest.chunkDistance(loc, getChunkTerritory(sideChunk).getCenterLoc());
+					int currentDist = Konquest.chunkDistance(loc, getChunkTerritory(sidePoint,claimWorld).getCenterLoc());
 					if(currentDist != -1 && closestDist != -1 && currentDist < closestDist) {
-						closestAdjTerr = getChunkTerritory(sideChunk);
+						closestAdjTerr = getChunkTerritory(sidePoint,claimWorld);
 					}
 				}
 			}
 		}
 		if(foundAdjTerr) {
-			if(closestAdjTerr.addChunk(loc.getChunk())) {
-				//updateTerritoryCache();
-				addTerritory(loc.getChunk(),closestAdjTerr);
+			Point addPoint = konquest.toPoint(loc);
+			if(closestAdjTerr.getWorld().equals(loc.getWorld()) && closestAdjTerr.addChunk(addPoint)) {
+				addTerritory(loc.getWorld(),addPoint,closestAdjTerr);
 				return 0;
 			} else {
 				return 2;
@@ -437,15 +440,16 @@ public class KingdomManager {
 	
 	public boolean claimForPlayer(Player bukkitPlayer, Location claimLoc) {
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		World claimWorld = claimLoc.getWorld();
 		// Verify no surrounding enemy or capital territory
-    	for(Chunk chunk : konquest.getAreaChunks(claimLoc,2)) {
-    		if(konquest.getKingdomManager().isChunkClaimed(chunk)) {
-    			if(player != null && !player.getKingdom().equals(konquest.getKingdomManager().getChunkTerritory(chunk).getKingdom())) {
+    	for(Point point : konquest.getAreaPoints(claimLoc,2)) {
+    		if(konquest.getKingdomManager().isChunkClaimed(point,claimWorld)) {
+    			if(player != null && !player.getKingdom().equals(konquest.getKingdomManager().getChunkTerritory(point,claimWorld).getKingdom())) {
     				//ChatUtil.sendError(bukkitPlayer, "You are too close to enemy territory!");
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
     			}
-    			if(konquest.getKingdomManager().getChunkTerritory(chunk).getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    			if(konquest.getKingdomManager().getChunkTerritory(point,claimWorld).getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
     				//ChatUtil.sendError(bukkitPlayer, "You are too close to the Capital!");
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
@@ -463,7 +467,7 @@ public class KingdomManager {
     	int claimStatus = claimChunk(claimLoc);
     	switch(claimStatus) {
     	case 0:
-    		KonTerritory territory = getChunkTerritory(claimLoc.getChunk());
+    		KonTerritory territory = getChunkTerritory(claimLoc);
     		String territoryName = territory.getName();
     		//ChatUtil.sendNotice(bukkitPlayer, "Successfully claimed land for Town: "+territoryName);
     		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage("1",territoryName));
@@ -521,16 +525,17 @@ public class KingdomManager {
 	
 	public boolean claimRadiusForPlayer(Player bukkitPlayer, Location claimLoc, int radius) {
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-		ArrayList<Chunk> claimChunks = new ArrayList<Chunk>();
+		World claimWorld = claimLoc.getWorld();
+		ArrayList<Point> claimChunks = new ArrayList<Point>();
 		// Verify no surrounding enemy or capital territory
-    	for(Chunk chunk : konquest.getAreaChunks(claimLoc,radius+1)) {
-    		if(konquest.getKingdomManager().isChunkClaimed(chunk)) {
-    			if(player != null && !player.getKingdom().equals(konquest.getKingdomManager().getChunkTerritory(chunk).getKingdom())) {
+    	for(Point point : konquest.getAreaPoints(claimLoc,radius+1)) {
+    		if(konquest.getKingdomManager().isChunkClaimed(point,claimWorld)) {
+    			if(player != null && !player.getKingdom().equals(konquest.getKingdomManager().getChunkTerritory(point,claimWorld).getKingdom())) {
     				//ChatUtil.sendError(bukkitPlayer, "Too close to enemy territory!");
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
     			}
-    			if(konquest.getKingdomManager().getChunkTerritory(chunk).getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    			if(konquest.getKingdomManager().getChunkTerritory(point,claimWorld).getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
     				//ChatUtil.sendError(bukkitPlayer, "Too close to the Capital!");
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
@@ -538,14 +543,14 @@ public class KingdomManager {
     		}
     	}
     	// Find all unclaimed chunks around center chunk
-    	for(Chunk chunk : konquest.getSurroundingChunks(claimLoc,radius)) {
-    		if(!konquest.getKingdomManager().isChunkClaimed(chunk)) {
-    			claimChunks.add(chunk);
+    	for(Point point : konquest.getSurroundingPoints(claimLoc,radius)) {
+    		if(!konquest.getKingdomManager().isChunkClaimed(point,claimWorld)) {
+    			claimChunks.add(point);
     		}
     	}
     	int unclaimedChunkAmount = claimChunks.size();
     	boolean isCenterClaimed = true;
-    	if(!konquest.getKingdomManager().isChunkClaimed(claimLoc.getChunk())) {
+    	if(!konquest.getKingdomManager().isChunkClaimed(claimLoc)) {
     		unclaimedChunkAmount++;
     		isCenterClaimed = false;
     	}
@@ -585,12 +590,12 @@ public class KingdomManager {
         	}
     	}
     	// Use territory of center chunk to claim remaining radius unclaimed chunks
-    	KonTerritory territory = getChunkTerritory(claimLoc.getChunk());
+    	KonTerritory territory = getChunkTerritory(claimLoc);
     	boolean allChunksAdded = true;
     	if(territory != null) {
-    		for(Chunk newChunk : claimChunks) {
+    		for(Point newChunk : claimChunks) {
     			if(territory.addChunk(newChunk)) {
-    				addTerritory(newChunk,territory);
+    				addTerritory(claimWorld,newChunk,territory);
     				numChunksClaimed++;
     			} else {
     				allChunksAdded = false;
@@ -651,10 +656,10 @@ public class KingdomManager {
 	 * @return
 	 */
 	public boolean unclaimChunk(Location loc) {
-		if(isChunkClaimed(loc.getChunk())) {
-			if(getChunkTerritory(loc.getChunk()).removeChunk(loc)) {
+		if(isChunkClaimed(loc)) {
+			if(getChunkTerritory(loc).removeChunk(loc)) {
 				//updateTerritoryCache();
-				removeTerritory(loc.getChunk());
+				removeTerritory(loc);
 				return true;
 			}
 		}
@@ -732,9 +737,11 @@ public class KingdomManager {
 		}
 	}
 	
+	/*
 	public void addTerritory(Chunk chunk, KonTerritory territory) {
 		addTerritory(chunk.getWorld(),konquest.toPoint(chunk),territory);
 	}
+	*/
 	
 	public void addTerritory(World world, Point point, KonTerritory territory) {
 		if(territoryWorldCache.containsKey(world)) {
@@ -763,8 +770,8 @@ public class KingdomManager {
 		return result;
 	}
 	
-	public boolean removeTerritory(Chunk chunk) {
-		boolean result = removeTerritory(chunk.getWorld(),konquest.toPoint(chunk));
+	public boolean removeTerritory(Location loc) {
+		boolean result = removeTerritory(loc.getWorld(),konquest.toPoint(loc));
 		return result;
 	}
 	
@@ -786,7 +793,7 @@ public class KingdomManager {
 	/*
 	 * More methods...
 	 */
-	
+	/*
 	public String getSmallestKingdomName() {
 		KonKingdom smallestKingdom = null;
 		int smallestSize = 9999;
@@ -804,10 +811,21 @@ public class KingdomManager {
 		}
 		return smallestKingdom.getName();
 	}
+	*/
+	
+	public String getSmallestKingdomName() {
+		String smallestName = "";
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			if(kingdom.isSmallest()) {
+				smallestName = kingdom.getName();
+			}
+		}
+		return smallestName;
+	}
 	
 	public void updateSmallestKingdom() {
 		KonKingdom smallestKingdom = null;
-		int smallestSize = 9999;
+		int smallestSize = Integer.MAX_VALUE;
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			kingdom.setSmallest(false);
 			int size = konquest.getPlayerManager().getAllPlayersInKingdom(kingdom.getName()).size();
@@ -824,6 +842,7 @@ public class KingdomManager {
 		ChatUtil.printDebug("Updated smallest kingdom: "+smallestKingdom.getName());
 	}
 	
+	/*
 	public boolean isChunkClaimed(Chunk chunk) {
 		boolean result = false;
 		if(territoryWorldCache.containsKey(chunk.getWorld())) {
@@ -831,11 +850,40 @@ public class KingdomManager {
 		}
 		return result;
 	}
+	*/
 	
+	public boolean isChunkClaimed(Location loc) {
+		return isChunkClaimed(konquest.toPoint(loc),loc.getWorld());
+	}
+	
+	public boolean isChunkClaimed(Point point, World world) {
+		boolean result = false;
+		if(territoryWorldCache.containsKey(world)) {
+			result = territoryWorldCache.get(world).has(point);
+		}
+		return result;
+	}
+	
+	/*
 	// This can return null!
 	public KonTerritory getChunkTerritory(Chunk chunk) {
 		if(territoryWorldCache.containsKey(chunk.getWorld())) {
 			return territoryWorldCache.get(chunk.getWorld()).get(konquest.toPoint(chunk));
+		} else {
+			return null;
+		}
+	}
+	*/
+	
+	// This can return null!
+	public KonTerritory getChunkTerritory(Location loc) {
+		return getChunkTerritory(konquest.toPoint(loc),loc.getWorld());
+	}
+	
+	// This can return null!
+	public KonTerritory getChunkTerritory(Point point, World world) {
+		if(territoryWorldCache.containsKey(world)) {
+			return territoryWorldCache.get(world).get(point);
 		} else {
 			return null;
 		}
@@ -1055,8 +1103,9 @@ public class KingdomManager {
 			// Verify no overlapping init chunks
 			int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
 			//ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
-			for(Chunk chunk : konquest.getAreaChunks(loc, radius)) {
-				if(isChunkClaimed(chunk)) {
+			World addWorld = loc.getWorld();
+			for(Point point : konquest.getAreaPoints(loc, radius)) {
+				if(isChunkClaimed(point,addWorld)) {
 					ChatUtil.printDebug("Found a chunk conflict in camp placement for player "+player.getOfflineBukkitPlayer().getName()+" "+uuid);
 					return 1;
 				}
@@ -1425,8 +1474,10 @@ public class KingdomManager {
 		HashMap<Location,Color> locationMap = new HashMap<Location,Color>();
 		// Evaluate every chunk in the provided list. If it's claimed, check each adjacent chunk and determine border locations
 		for(Chunk chunk : renderChunks) {
-			if(isChunkClaimed(chunk)) {
-				KonKingdom chunkKingdom = getChunkTerritory(chunk).getKingdom();
+			Point point = konquest.toPoint(chunk);
+			World renderWorld = chunk.getWorld();
+			if(isChunkClaimed(point,renderWorld)) {
+				KonKingdom chunkKingdom = getChunkTerritory(point,renderWorld).getKingdom();
 				Location renderLoc;
 				Color renderColor;
 				if(chunkKingdom.equals(getBarbarians())) {
@@ -1440,7 +1491,7 @@ public class KingdomManager {
 						renderColor = Color.RED;
 					}
 				}
-				Chunk sideChunk;
+				Point sidePoint;
 				boolean isClaimed = false;
 				int z_fixed, x_fixed;
 				int y_max;
@@ -1452,9 +1503,9 @@ public class KingdomManager {
 				final double Y_MOD_SNOW = 1.1;
 				final double Z_MOD = 0.5;
 				// Side chunk in +Z direction
-				sideChunk = chunk.getWorld().getChunkAt(chunk.getX()+0, chunk.getZ()+1);
-				isClaimed = isChunkClaimed(sideChunk);
-				if(!isClaimed || (isClaimed && !getChunkTerritory(sideChunk).getKingdom().equals(chunkKingdom))) {
+				sidePoint = new Point(point.x + 0, point.y + 1);
+				isClaimed = isChunkClaimed(sidePoint,renderWorld);
+				if(!isClaimed || (isClaimed && !getChunkTerritory(sidePoint,renderWorld).getKingdom().equals(chunkKingdom))) {
 					ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
 					z_fixed = 15;
 					y_max = 0;
@@ -1480,9 +1531,9 @@ public class KingdomManager {
 					}
 				}
 				// Side chunk in -Z direction
-				sideChunk = chunk.getWorld().getChunkAt(chunk.getX()+0, chunk.getZ()-1);
-				isClaimed = isChunkClaimed(sideChunk);
-				if(!isClaimed || (isClaimed && !getChunkTerritory(sideChunk).getKingdom().equals(chunkKingdom))) {
+				sidePoint = new Point(point.x + 0, point.y - 1);
+				isClaimed = isChunkClaimed(sidePoint,renderWorld);
+				if(!isClaimed || (isClaimed && !getChunkTerritory(sidePoint,renderWorld).getKingdom().equals(chunkKingdom))) {
 					ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
 					z_fixed = 0;
 					y_max = 0;
@@ -1508,9 +1559,9 @@ public class KingdomManager {
 					}
 				}
 				// Side chunk in +X direction
-				sideChunk = chunk.getWorld().getChunkAt(chunk.getX()+1, chunk.getZ()+0);
-				isClaimed = isChunkClaimed(sideChunk);
-				if(!isClaimed || (isClaimed && !getChunkTerritory(sideChunk).getKingdom().equals(chunkKingdom))) {
+				sidePoint = new Point(point.x + 1, point.y + 0);
+				isClaimed = isChunkClaimed(sidePoint,renderWorld);
+				if(!isClaimed || (isClaimed && !getChunkTerritory(sidePoint,renderWorld).getKingdom().equals(chunkKingdom))) {
 					ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
 					x_fixed = 15;
 					y_max = 0;
@@ -1536,9 +1587,9 @@ public class KingdomManager {
 					}
 				}
 				// Side chunk in -X direction
-				sideChunk = chunk.getWorld().getChunkAt(chunk.getX()-1, chunk.getZ()+0);
-				isClaimed = isChunkClaimed(sideChunk);
-				if(!isClaimed || (isClaimed && !getChunkTerritory(sideChunk).getKingdom().equals(chunkKingdom))) {
+				sidePoint = new Point(point.x - 1, point.y + 0);
+				isClaimed = isChunkClaimed(sidePoint,renderWorld);
+				if(!isClaimed || (isClaimed && !getChunkTerritory(sidePoint,renderWorld).getKingdom().equals(chunkKingdom))) {
 					ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
 					x_fixed = 0;
 					y_max = 0;
@@ -1574,7 +1625,7 @@ public class KingdomManager {
 			ArrayList<Chunk> nearbyChunks = konquest.getAreaChunks(loc, 2);
 			boolean isTerritoryNearby = false;
 			for(Chunk chunk : nearbyChunks) {
-				if(isChunkClaimed(chunk)) {
+				if(isChunkClaimed(konquest.toPoint(chunk),chunk.getWorld())) {
 					isTerritoryNearby = true;
 					break;
 				}
@@ -1637,7 +1688,6 @@ public class KingdomManager {
         List<Double> sectionList;
         String worldName;
         String defaultWorldName = konquest.getConfigManager().getConfig("core").getString("core.world_name","world");
-        World world;
         // Count all towns
         int numTowns = 0;
         for(String kingdomName : kingdomsConfig.getConfigurationSection("kingdoms").getKeys(false)) {
@@ -1646,25 +1696,27 @@ public class KingdomManager {
         LoadingPrinter loadBar = new LoadingPrinter(numTowns,"Loading "+numTowns+" Towns");
         // Load all Kingdoms
         for(String kingdomName : kingdomsConfig.getConfigurationSection("kingdoms").getKeys(false)) {
+        	//Date kStart = new Date();
         	//ChatUtil.printDebug("Loading Kingdom: "+kingdomName);
         	ConfigurationSection kingdomSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName);
         	boolean isPeaceful = kingdomSection.getBoolean("peaceful", false);
         	ConfigurationSection monumentSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".monument");
         	// Create Kingdoms and Capitals
         	ConfigurationSection capitalSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".capital");
+        	World capitalWorld = null;
         	if(capitalSection != null) {
         		worldName = capitalSection.getString("world",defaultWorldName);
-        		world = Bukkit.getServer().getWorld(worldName);
+        		capitalWorld = Bukkit.getWorld(worldName);
         		sectionList = capitalSection.getDoubleList("spawn");
         		x = sectionList.get(0);
         		y = sectionList.get(1);
         		z = sectionList.get(2);
-	        	Location capital_spawn = new Location(world,x,y,z);
+	        	Location capital_spawn = new Location(capitalWorld,x,y,z);
 	        	sectionList = capitalSection.getDoubleList("center");
         		x = sectionList.get(0);
         		y = sectionList.get(1);
         		z = sectionList.get(2);
-	        	Location capital_center = new Location(world,x,y,z);
+	        	Location capital_center = new Location(capitalWorld,x,y,z);
 	        	// Create Kingdom and capital
 	        	addKingdom(capital_center, kingdomName);
 	        	// Set Peaceful mode
@@ -1674,31 +1726,36 @@ public class KingdomManager {
 	        	// Add all Capital chunk claims
 	        	kingdomMap.get(kingdomName).getCapital().addPoints(konquest.formatStringToPoints(capitalSection.getString("chunks")));
 	        	// Update territory cache
-	        	addAllTerritory(world,kingdomMap.get(kingdomName).getCapital().getChunkList());
+	        	addAllTerritory(capitalWorld,kingdomMap.get(kingdomName).getCapital().getChunkList());
         	} else {
         		String message = "Failed to load capital for Kingdom "+kingdomName+", is one created?";
         		ChatUtil.printConsoleError(message);
         		konquest.opStatusMessages.add(message);
         	}
+        	//Date kStep1 = new Date();
         	// Create Monument Templates
-        	if(monumentSection != null) {
-        		worldName = capitalSection.getString("world",defaultWorldName);
-        		world = Bukkit.getServer().getWorld(worldName);
+        	if(monumentSection != null && capitalWorld != null) {
         		sectionList = monumentSection.getDoubleList("travel");
         		x = sectionList.get(0);
         		y = sectionList.get(1);
         		z = sectionList.get(2);
-	        	Location monument_travel = new Location(world,x,y,z);
+	        	Location monument_travel = new Location(capitalWorld,x,y,z);
 	        	sectionList = monumentSection.getDoubleList("cornerone");
         		x = sectionList.get(0);
         		y = sectionList.get(1);
         		z = sectionList.get(2);
-	        	Location monument_cornerone = new Location(world,x,y,z);
+	        	Location monument_cornerone = new Location(capitalWorld,x,y,z);
 	        	sectionList = monumentSection.getDoubleList("cornertwo");
         		x = sectionList.get(0);
         		y = sectionList.get(1);
         		z = sectionList.get(2);
-	        	Location monument_cornertwo = new Location(world,x,y,z);
+	        	Location monument_cornertwo = new Location(capitalWorld,x,y,z);
+	        	// Load monument template chunk
+	        	int tmpX = (int)Math.floor((double)monument_cornerone.getBlockX()/16);
+                int tmpZ = (int)Math.floor((double)monument_cornerone.getBlockZ()/16);
+	        	capitalWorld.loadChunk(tmpX,tmpZ);
+                //capitalWorld.addPluginChunkTicket(tmpX, tmpZ, konquest.getPlugin());
+                //capitalWorld.setChunkForceLoaded(tmpX, tmpZ, true);
 	        	// Create a Monument Template region for current Kingdom
         		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel);
         		if(status != 0) {
@@ -1727,30 +1784,42 @@ public class KingdomManager {
         		ChatUtil.printConsoleError("Null monument template for Kingdom "+kingdomName+" in config file!");
         		konquest.opStatusMessages.add("Missing monument template for Kingdom "+kingdomName+" in kingdoms.yml config file. Use \"/k admin monument\" to define the monument template for this Kingdom.");
         	}
+        	//Date kStep2 = new Date();
         	// Load all towns
         	boolean isMissingMonuments = false;
+        	World townWorld = null;
         	for(String townName : kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns").getKeys(false)) {
         		//ChatUtil.printDebug("Loading Town: "+townName);
             	ConfigurationSection townSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns."+townName);
             	if(townSection != null) {
+            		//Date start = new Date();
             		worldName = townSection.getString("world",defaultWorldName);
-            		world = Bukkit.getServer().getWorld(worldName);
+            		townWorld = Bukkit.getWorld(worldName);
             		int base = townSection.getInt("base");
             		sectionList = townSection.getDoubleList("spawn");
             		x = sectionList.get(0);
             		y = sectionList.get(1);
             		z = sectionList.get(2);
-	            	Location town_spawn = new Location(world,x,y,z);
+	            	Location town_spawn = new Location(townWorld,x,y,z);
 	            	sectionList = townSection.getDoubleList("center");
             		x = sectionList.get(0);
             		y = sectionList.get(1);
             		z = sectionList.get(2);
-	            	Location town_center = new Location(world,x,y,z);
+	            	Location town_center = new Location(townWorld,x,y,z);
+	            	//Date step1 = new Date();
 	            	// Create Town
 	            	kingdomMap.get(kingdomName).addTown(town_center, townName);
 	            	KonTown town = kingdomMap.get(kingdomName).getTown(townName);
 	            	// Set town spawn point
 	            	town.setSpawn(town_spawn);
+	            	//Date step2 = new Date();
+	            	// Load monument chunk
+	            	int monX = (int)Math.floor((double)town_center.getBlockX()/16);
+	                int monZ = (int)Math.floor((double)town_center.getBlockZ()/16);
+	            	townWorld.loadChunk(monX,monZ);
+	            	//townWorld.addPluginChunkTicket(monX, monZ, konquest.getPlugin());
+	            	//townWorld.setChunkForceLoaded(monX, monZ, true);
+	            	//Date step3 = new Date();
 	            	// Setup town monument parameters from template
 	            	int status = town.loadMonument(base, kingdomMap.get(kingdomName).getMonumentTemplate());
 	            	if(status != 0) {
@@ -1758,10 +1827,15 @@ public class KingdomManager {
 	            		ChatUtil.printConsoleError("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            		//konquest.opStatusMessages.add("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            	}
+	            	//Date step4 = new Date();
+	            	// Unload monument chunk
+	            	//townWorld.unloadChunk(monX,monZ);
+	            	//Date step5 = new Date();
 	            	// Add all Town chunk claims
 	            	town.addPoints(konquest.formatStringToPoints(townSection.getString("chunks")));
 	            	// Update territory cache
-		        	addAllTerritory(world,town.getChunkList());
+		        	addAllTerritory(townWorld,town.getChunkList());
+		        	//Date step6 = new Date();
 	            	// Set open flag
 	            	boolean isOpen = townSection.getBoolean("open",false);
 	            	town.setIsOpen(isOpen);
@@ -1794,6 +1868,7 @@ public class KingdomManager {
 	            			town.addJoinRequest(UUID.fromString(requestUUID), type);
 	            		}
 	            	}
+	            	//Date step7 = new Date();
 	            	// Add upgrades
 	            	if(townSection.contains("upgrades")) {
 	            		for(String upgradeName : townSection.getConfigurationSection("upgrades").getKeys(false)) {
@@ -1804,15 +1879,36 @@ public class KingdomManager {
 	            			}
 	            		}
 	            	}
+	            	//Date step8 = new Date();
 	            	// Update upgrade status
 	            	konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
-	            	// Update loading bar
+	            	/*
+	            	Date step9 = new Date();
+	            	int s1 = (int)(step1.getTime()-start.getTime());
+	            	int s2 = (int)(step2.getTime()-start.getTime());
+        			int s3 = (int)(step3.getTime()-start.getTime());
+        			int s4 = (int)(step4.getTime()-start.getTime());
+        			int s5 = (int)(step5.getTime()-start.getTime());
+        			int s6 = (int)(step6.getTime()-start.getTime());
+        			int s7 = (int)(step7.getTime()-start.getTime());
+        			int s8 = (int)(step8.getTime()-start.getTime());
+        			int s9 = (int)(step9.getTime()-start.getTime());
+        			ChatUtil.printDebug("Town "+townName+" timings: "+s1+","+s2+","+s3+","+s4+","+s5+","+s6+","+s7+","+s8+","+s9);
+        			*/
+        			// Update loading bar
 	            	loadBar.addProgress(1);
 	            }
         	}
         	if(isMissingMonuments) {
         		konquest.opStatusMessages.add("Kingdom "+kingdomName+" has Towns with invalid Monuments. You must create a new Monument Template and restart the server.");
         	}
+        	//Date kStep3 = new Date();
+        	/*
+        	int s1 = (int)(kStep1.getTime()-kStart.getTime());
+        	int s2 = (int)(kStep2.getTime()-kStart.getTime());
+			int s3 = (int)(kStep3.getTime()-kStart.getTime());
+			ChatUtil.printDebug("Kingdom "+kingdomName+" timings: "+s1+","+s2+","+s3);
+			*/
         }
 		ChatUtil.printDebug("Loaded Kingdoms");
 	}
@@ -2036,8 +2132,8 @@ public class KingdomManager {
 		}
 		// Verify no overlapping init chunks
 		int radius = konquest.getConfigManager().getConfig("core").getInt("core.towns.init_radius");
-		for(Chunk chunk : konquest.getAreaChunks(center, radius)) {
-			if(isChunkClaimed(chunk)) {
+		for(Point point : konquest.getAreaPoints(center, radius)) {
+			if(isChunkClaimed(point,center.getWorld())) {
 				isLocValidSettle = false;
 			}
 		}
@@ -2050,8 +2146,7 @@ public class KingdomManager {
     		settleTip = ChatColor.GRAY+settleTip;
     	}
     	// Evaluate surrounding chunks
-    	for(Chunk chunk: konquest.getAreaChunks(center, ((mapSize-1)/2)+1)) {
-    		Point mapPoint = konquest.toPoint(chunk);
+    	for(Point mapPoint: konquest.getAreaPoints(center, ((mapSize-1)/2)+1)) {
     		int diffOriginX = (int)(mapPoint.getX() - originPoint.getX());
     		int diffOriginY = (int)(mapPoint.getY() - originPoint.getY());
     		int mapY = (mapSize-1)/2 - diffOriginX; // Swap X & Y to translate map to be oriented up as north
@@ -2064,8 +2159,8 @@ public class KingdomManager {
     			ChatUtil.printDebug("Internal Error: Map Y was "+mapY);
     			return;
     		}
-    		if(isChunkClaimed(chunk)) {
-    			KonTerritory territory = getChunkTerritory(chunk);
+    		if(isChunkClaimed(mapPoint,center.getWorld())) {
+    			KonTerritory territory = getChunkTerritory(mapPoint,center.getWorld());
     			ChatColor mapSymbolColor = ChatColor.WHITE;
     			if(territory.getKingdom().equals(getBarbarians())) {
     				mapSymbolColor = ChatColor.YELLOW;

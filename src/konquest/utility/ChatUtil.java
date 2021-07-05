@@ -81,19 +81,27 @@ public class ChatUtil {
 	}
 	
 	public static void sendKonTitle(KonPlayer player, String title, String subtitle) {
+		if(title.equals("")) {
+			title = " ";
+		}
 		if(!player.isAdminBypassActive() && !player.isPriorityTitleDisplay()) {
 			player.getBukkitPlayer().sendTitle(title, subtitle, 10, 40, 10);
 		}
 	}
 	
 	public static void sendKonTitle(KonPlayer player, String title, String subtitle, int duration) {
+		if(title.equals("")) {
+			title = " ";
+		}
 		if(!player.isAdminBypassActive() && !player.isPriorityTitleDisplay()) {
 			player.getBukkitPlayer().sendTitle(title, subtitle, 10, duration, 10);
 		}
 	}
 	
 	public static void sendKonPriorityTitle(KonPlayer player, String title, String subtitle, int durationTicks, int fadeInTicks, int fadeOutTicks) {
-		//if(!player.isAdminBypassActive() && !player.isPriorityTitleDisplay()) {
+		if(title.equals("")) {
+			title = " ";
+		}
 		if(!player.isAdminBypassActive()) {
 			int totalDuration = durationTicks/20;
 			if(totalDuration < 1) {
@@ -122,6 +130,9 @@ public class ChatUtil {
 	*/
 	
 	public static void sendConstantTitle(Player player, String title, String subtitle) {
+		if(title.equals("")) {
+			title = " ";
+		}
 		player.sendTitle(title, subtitle, 1, 9999999, 1);
 	}
 	

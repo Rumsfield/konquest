@@ -3,7 +3,7 @@ package konquest.manager;
 
 import java.awt.Point;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -26,6 +26,7 @@ import konquest.listener.QuickShopListener;
 //import konquest.model.KonTerritory;
 //import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
+import konquest.utility.Version;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.User;
@@ -57,9 +58,18 @@ public class IntegrationManager {
 		if(konquest.getConfigManager().getConfig("core").getBoolean("core.integration.quickshop",false)) {
 			Plugin quickShop = Bukkit.getPluginManager().getPlugin("QuickShop");
             if (quickShop != null && quickShop.isEnabled()) {
-            	isQuickShopEnabled = true;
-            	konquest.getPlugin().getServer().getPluginManager().registerEvents(new QuickShopListener(konquest.getPlugin()), konquest.getPlugin());
-            	ChatUtil.printConsoleAlert("Successfully integrated QuickShop");
+            	// Verify version requirement
+            	String ver = quickShop.getDescription().getVersion();
+            	String req = "4.0.9.4";
+            	Version installedVersion = new Version(ver);
+            	Version minimumVersion = new Version(req);
+            	if(installedVersion.compareTo(minimumVersion) >= 0) {
+            		isQuickShopEnabled = true;
+                	konquest.getPlugin().getServer().getPluginManager().registerEvents(new QuickShopListener(konquest.getPlugin()), konquest.getPlugin());
+                	ChatUtil.printConsoleAlert("Successfully integrated QuickShop version "+ver);
+            	} else {
+            		ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too old. You must update it to at least version "+req);
+            	}
             } else {
             	ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin not found or disabled");
             }
@@ -202,9 +212,9 @@ public class IntegrationManager {
 		if(isQuickShopEnabled && !points.isEmpty()) {
 			for(Point point : points) {
 				Chunk chunk = konquest.toChunk(point,world);
-				Map<Location, Shop> shopMap = QuickShopAPI.getShopAPI().getShop(chunk);
-				if(shopMap != null) {
-					for(Shop shop : shopMap.values()) {
+				List<Shop> shopList = QuickShopAPI.getShopAPI().getShops(chunk);
+				if(shopList != null) {
+					for(Shop shop : shopList) {
 						Location shopLoc = shop.getLocation();
 						world.playEffect(shopLoc, Effect.IRON_TRAPDOOR_TOGGLE, null);
 						ChatUtil.printDebug("Deleting shop owned by "+Bukkit.getOfflinePlayer(shop.getOwner()).getName());

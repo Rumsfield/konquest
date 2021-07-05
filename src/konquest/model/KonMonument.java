@@ -6,7 +6,6 @@ import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.data.type.Leaves;
 
 public class KonMonument{
 
@@ -30,11 +29,20 @@ public class KonMonument{
 		this.isDamageDisabled = false;
 	}
 	
-	public boolean initialize(KonMonumentTemplate template) {
+	/**
+	 * Initialize a monument from a kingdom's monument template
+	 * @param template
+	 * @return status code:
+	 * 			0 = success
+	 * 			1 = invalid template
+	 * 			2 = bad chunk gradient
+	 * 			3 = bedrock placement
+	 */
+	public int initialize(KonMonumentTemplate template, Location centerLoc) {
 		// Verify valid template
 		if(!template.isValid()) {
 			ChatUtil.printDebug("Monument init failed: template is not valid");
-			return false;
+			return 1;
 		}
 		// Verify template is 16x16 blocks
 		int x_diff = (int)Math.abs(template.getCornerOne().getX()-template.getCornerTwo().getX())+1;
@@ -42,10 +50,11 @@ public class KonMonument{
 		
 		if(Math.abs(x_diff) != 16 || Math.abs(z_diff) != 16) {
 			ChatUtil.printDebug("Monument init failed: template is not 16x16 blocks");
-			return false;
+			return 1;
 		}
-		// Verify center chunk gradient, ignoring leaves
-		ChunkSnapshot chunkSnap = centerLoc.getChunk().getChunkSnapshot(true,false,false);
+		// Verify center chunk gradient, ignoring leaves, grass
+		Chunk chunk = centerLoc.getChunk();
+		ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
 		String minMaterial = "";
 		String maxMaterial = "";
 		int maxY = 0;
@@ -55,7 +64,7 @@ public class KonMonument{
 				int y = chunkSnap.getHighestBlockYAt(x, z);
 				//ChatUtil.printDebug("Checking chunk block "+x+","+z);
 				// Search for next highest block if current block is leaves
-				while(chunkSnap.getBlockData(x, y-1, z) instanceof Leaves || chunkSnap.getBlockType(x, y-1, z).equals(Material.AIR)) {
+				while(chunk.getBlock(x, y-1, z).isPassable() || !chunkSnap.getBlockType(x, y-1, z).isOccluding() || chunkSnap.getBlockType(x, y-1, z).equals(Material.AIR)) {
 					//ChatUtil.printDebug("	Found leaves or air at local position "+x+","+y+","+z);
 					y--;
 					if(y <= 0) {
@@ -79,16 +88,26 @@ public class KonMonument{
 		if(maxY - minY > 3) {
 			int gradient = maxY - minY;
 			ChatUtil.printDebug("Monument init failed: town center is not flat enough, gradient is "+gradient+" but must be at most 3.");
-			return false;
+			return 2;
 		}
-		baseY = maxY-1;
+		if(maxMaterial.equals(Material.BEDROCK.toString())) {
+			ChatUtil.printDebug("Monument init failed: town monument attempted to place on bedrock.");
+			return 3;
+		}
+		
+		int standY = centerLoc.getBlockY();
+		if(standY < minY || standY > maxY) {
+			ChatUtil.printDebug("Monument init failed: center position "+standY+" is outside of gradiant bounds ("+minY+","+maxY+")");
+			return 3;
+		}
+		baseY = standY-1;
 		
 		// Passed all init checks, update the monument with Template parameters
 		boolean updatePass = updateFromTemplate(template);
 		if(!updatePass) {
 			ChatUtil.printDebug("Monument init failed: could not update invalid template");
 		}
-		return updatePass;
+		return updatePass ? 0 : 1;
 	}
 	
 	public boolean updateFromTemplate(KonMonumentTemplate template) {

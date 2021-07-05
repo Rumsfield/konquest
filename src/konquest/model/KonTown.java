@@ -20,6 +20,7 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -84,26 +85,27 @@ public class KonTown extends KonTerritory implements Timeable{
 	 * @return true if chunk is within max distance from town center, else false
 	 */
 	@Override
-	public boolean addChunk(Chunk chunk) {
-		Point addChunk = getKonquest().toPoint(chunk);
+	public boolean addChunk(Point point) {
 		Point centerChunk = getKonquest().toPoint(getCenterLoc());
 		int maxChunkRange = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_town")-1;
 		
-		int distX = (int)Math.abs(addChunk.getX() - centerChunk.getX());
-		int distY = (int)Math.abs(addChunk.getY() - centerChunk.getY());
+		int distX = (int)Math.abs(point.getX() - centerChunk.getX());
+		int distY = (int)Math.abs(point.getY() - centerChunk.getY());
 		
-		if(!chunk.getWorld().equals(getCenterLoc().getWorld()) || distX > maxChunkRange || distY > maxChunkRange) {
+		if(distX > maxChunkRange || distY > maxChunkRange) {
 			ChatUtil.printDebug("Failed to add chunk in territory "+getName()+", too far");
 			return false;
 		}
-		addPoint(getKonquest().toPoint(chunk));
+		addPoint(point);
 		return true;
 	}
 
 	/**
 	 * initClaim - initializes the Monument, pastes the template and claims chunks.
 	 * @return  0 - success
-	 * 			1 - error, bad monument init
+	 * 			11 - error, monument invalid
+	 * 			12 - error, monument gradient
+	 * 			13 - error, monument bedrock
 	 * 			2 - error, bad town height
 	 * 			3 - error, too much air below town
 	 * 			4 - error, bad chunks
@@ -112,9 +114,10 @@ public class KonTown extends KonTerritory implements Timeable{
 	public int initClaim() {
 		
 		// Verify monument template and chunk gradient and initialize travelPoint and baseY coordinate
-		if(!monument.initialize(getKingdom().getMonumentTemplate())) {
+		int monumentStatus = monument.initialize(getKingdom().getMonumentTemplate(), getCenterLoc());
+		if(monumentStatus != 0) {
 			ChatUtil.printDebug("Town init failed: monument did not initialize correctly");
-			return 1;
+			return 10 + monumentStatus;
 		}
 		
 		// Verify monument paste Y level is within config min/max range
@@ -132,6 +135,16 @@ public class KonTown extends KonTerritory implements Timeable{
 		}
 		if(config_max_y != 0 && monument.getBaseY() > config_max_y) {
 			ChatUtil.printDebug("Town init failed: "+monument.getBaseY()+" greater than max limit "+config_max_y);
+			return 2;
+		}
+		int world_min_y = getWorld().getMinHeight();
+		int world_max_y = getWorld().getMaxHeight();
+		if(monument.getBaseY() <= world_min_y) {
+			ChatUtil.printDebug("Town init failed: "+monument.getBaseY()+" less than world min limit "+world_min_y);
+			return 2;
+		}
+		if(monument.getBaseY() >= world_max_y) {
+			ChatUtil.printDebug("Town init failed: "+monument.getBaseY()+" greater than world max limit "+world_max_y);
 			return 2;
 		}
 		
@@ -154,7 +167,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		}
         
 		// Add chunks around the monument chunk
-		if(!addChunks(getKonquest().getAreaChunks(getCenterLoc(), getKonquest().getConfigManager().getConfig("core").getInt("core.towns.init_radius")))) {
+		if(!addChunks(getKonquest().getAreaPoints(getCenterLoc(), getKonquest().getConfigManager().getConfig("core").getInt("core.towns.init_radius")))) {
 			ChatUtil.printDebug("Town init failed: problem adding some chunks");
 			return 4;
 		}
@@ -178,6 +191,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		if(!template.isValid()) {
 			return false;
 		}
+		//Date start = new Date();
 		monument.setIsItemDropsDisabled(true);
 		monument.setIsDamageDisabled(true);
 		
@@ -187,24 +201,53 @@ public class KonTown extends KonTerritory implements Timeable{
         int bottomBlockX = Math.min(template.getCornerOne().getBlockX(), template.getCornerTwo().getBlockX());
         int bottomBlockY = Math.min(template.getCornerOne().getBlockY(), template.getCornerTwo().getBlockY());
         int bottomBlockZ = Math.min(template.getCornerOne().getBlockZ(), template.getCornerTwo().getBlockZ());
-
-        ChunkSnapshot templateChunkSnapshot = template.getCornerOne().getWorld().getChunkAt(template.getCornerOne()).getChunkSnapshot(true,false,false);
-        Chunk fillChunk = getWorld().getChunkAt(getCenterLoc());
-        int base_y = 0;
+        
+        // Determine minimum Y level of paste chunk below monument Y base
         int monument_y = monument.getBaseY();
-        for (int x = bottomBlockX; x <= topBlockX; x++) {
-            for (int z = bottomBlockZ; z <= topBlockZ; z++) {
-            	base_y = templateChunkSnapshot.getHighestBlockYAt(x-bottomBlockX, z-bottomBlockZ);
-                // Fill air between world and monument base
-                if(base_y < monument_y) {
-                	for (int k = base_y; k <= monument_y; k++) {
-                		fillChunk.getBlock(x-bottomBlockX, k, z-bottomBlockZ).setType(Material.STONE);
-                	}
-                }
+        int fill_y = 0;
+        int min_fill_y = 0;
+        //Date step1 = new Date();
+        /*
+        int pasteX = (int)Math.floor((double)getCenterLoc().getBlockX()/16);
+        int pasteZ = (int)Math.floor((double)getCenterLoc().getBlockZ()/16);
+        if(getCenterLoc().getWorld().isChunkLoaded(pasteX,pasteZ)) {
+        	ChatUtil.printDebug("Paste fill chunk ("+pasteX+","+pasteZ+") is loaded");
+        } else {
+        	ChatUtil.printDebug("Paste fill chunk ("+pasteX+","+pasteZ+") is NOT loaded!");
+        }
+        */
+        Chunk fillChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
+        //Chunk fillChunk = getCenterLoc().getChunk();
+        //Date step2 = new Date();
+        ChunkSnapshot fillChunkSnap = fillChunk.getChunkSnapshot(true,false,false);
+        //Date step3 = new Date();
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+            	fill_y = fillChunkSnap.getHighestBlockYAt(x, z);
+            	while((fillChunk.getBlock(x, fill_y, z).isPassable() || !fillChunkSnap.getBlockType(x, fill_y, z).isOccluding()) && fill_y > fillChunk.getWorld().getMinHeight()) {
+            		fill_y--;
+				}
+            	if((x == 0 && z == 0) || fill_y < min_fill_y) {
+            		min_fill_y = fill_y;
+            	}
             }
         }
-        
-        BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),template.getCornerOne(),bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
+        //Date step4 = new Date();
+        //ChatUtil.printDebug("Pasting monument ("+fillChunk.getX()+","+fillChunk.getZ()+") at base "+monument_y+" found minimum Y level: "+min_fill_y);
+        // Fill air between world and monument base
+        if(min_fill_y < monument_y) {
+	        for (int x = 0; x < 16; x++) {
+	            for (int z = 0; z < 16; z++) {
+                	for (int y = min_fill_y; y <= monument_y; y++) {
+                		fillChunk.getBlock(x, y, z).setType(Material.STONE);
+                	}
+	            }
+	        }
+        }
+        //Date step5 = new Date();
+        //Chunk pasteChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
+        World templateWorld = template.getCornerOne().getWorld();
+        BlockPaster monumentPaster = new BlockPaster(fillChunk,templateWorld,bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
         for (int y = bottomBlockY; y <= topBlockY; y++) {
         	monumentPaster.setY(y);
         	//BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),y,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
@@ -212,6 +255,16 @@ public class KonTown extends KonTerritory implements Timeable{
         }
         monument.setIsItemDropsDisabled(false);
         monument.setIsDamageDisabled(false);
+        //Date step6 = new Date();
+        /*
+        int s1 = (int)(step1.getTime()-start.getTime());
+    	int s2 = (int)(step2.getTime()-start.getTime());
+		int s3 = (int)(step3.getTime()-start.getTime());
+		int s4 = (int)(step4.getTime()-start.getTime());
+		int s5 = (int)(step5.getTime()-start.getTime());
+		int s6 = (int)(step6.getTime()-start.getTime());
+		ChatUtil.printDebug("Monument paste timings: "+s1+","+s2+","+s3+","+s4+","+s5+","+s6);
+		*/
 		return true;
 	}
 

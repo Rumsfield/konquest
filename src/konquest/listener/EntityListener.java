@@ -18,7 +18,6 @@ import konquest.utility.MessagePath;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -72,8 +71,8 @@ public class EntityListener implements Listener {
     public void onItemSpawn(ItemSpawnEvent event) {
 		//ChatUtil.printDebug("EVENT: Item spawned");
 		Location dropLoc = event.getEntity().getLocation();
-		if(kingdomManager.isChunkClaimed(dropLoc.getChunk())) {
-			KonTerritory territory = kingdomManager.getChunkTerritory(dropLoc.getChunk());
+		if(kingdomManager.isChunkClaimed(dropLoc)) {
+			KonTerritory territory = kingdomManager.getChunkTerritory(dropLoc);
 			// Check for break inside of town
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
@@ -118,9 +117,9 @@ public class EntityListener implements Listener {
 		ChatUtil.printDebug("EVENT: entityExplode");
 		//boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
 		for(Block block : event.blockList()) {
-			if(kingdomManager.isChunkClaimed(block.getChunk())) {
+			if(kingdomManager.isChunkClaimed(block.getLocation())) {
 				//ChatUtil.printDebug("EVENT: effected block is inside claimed territory");
-				KonTerritory territory = kingdomManager.getChunkTerritory(block.getChunk());
+				KonTerritory territory = kingdomManager.getChunkTerritory(block.getLocation());
 				
 				// Protect Capitals always
 				if(territory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
@@ -187,8 +186,8 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
 		// Inside of claimed territory...
-		if(konquest.getKingdomManager().isChunkClaimed(event.getLocation().getChunk())) {
-			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getLocation().getChunk());
+		if(konquest.getKingdomManager().isChunkClaimed(event.getLocation())) {
+			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getLocation());
 			// When a spawn event happens in Capital
 			if(territory instanceof KonCapital) {
 				//ChatUtil.printDebug("EVENT: Creature spawned in a Captial, cause: "+event.getSpawnReason().toString());
@@ -284,9 +283,9 @@ public class EntityListener implements Listener {
 				ChatUtil.printDebug("Failed to handle onEntityPotionEffect for non-existent player");
 				return;
 			}
-			Chunk chunk = event.getEntity().getLocation().getChunk();
-			if(event.getCause().equals(EntityPotionEffectEvent.Cause.MILK) && kingdomManager.isChunkClaimed(chunk)) {
-				KonTerritory territory = kingdomManager.getChunkTerritory(chunk);
+			Location eventLoc = event.getEntity().getLocation();
+			if(event.getCause().equals(EntityPotionEffectEvent.Cause.MILK) && kingdomManager.isChunkClaimed(eventLoc)) {
+				KonTerritory territory = kingdomManager.getChunkTerritory(eventLoc);
 				KonPlayer player = konquest.getPlayerManager().getPlayer((Player)event.getEntity());
 				if(!player.getKingdom().equals(territory.getKingdom()) && kingdomManager.isTownNerf(event.getModifiedType())) {
 					ChatUtil.printDebug("Cancelling milk bucket removal of town nerfs for player "+player.getBukkitPlayer().getName()+" in territory "+territory.getName());
@@ -317,13 +316,13 @@ public class EntityListener implements Listener {
 		if(eType.equals(EntityType.IRON_GOLEM) && e instanceof IronGolem) {
 			IronGolem golemAttacker = (IronGolem)e;
 			// Protect friendly players in claimed land
-			if(target instanceof Player && kingdomManager.isChunkClaimed(eLoc.getChunk())) {
+			if(target instanceof Player && kingdomManager.isChunkClaimed(eLoc)) {
 				Player bukkitPlayer = (Player)target;
 				if(!konquest.getPlayerManager().isPlayer((Player)bukkitPlayer)) {
 					ChatUtil.printDebug("Failed to handle onEntityTarget for non-existent player");
 				} else {
 					KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-					KonTerritory territory = kingdomManager.getChunkTerritory(eLoc.getChunk());
+					KonTerritory territory = kingdomManager.getChunkTerritory(eLoc);
 					if(territory.getKingdom().equals(player.getKingdom())) {
 						ChatUtil.printDebug("Cancelling Iron Golem target of friendly player");
 						golemAttacker.setPlayerCreated(true);
@@ -359,8 +358,8 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onEntityDamage(EntityDamageEvent event) {
 		Location damageLoc = event.getEntity().getLocation();
-		if(kingdomManager.isChunkClaimed(damageLoc.getChunk())) {
-			KonTerritory territory = kingdomManager.getChunkTerritory(damageLoc.getChunk());
+		if(kingdomManager.isChunkClaimed(damageLoc)) {
+			KonTerritory territory = kingdomManager.getChunkTerritory(damageLoc);
 			// Check for damage inside of town
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
@@ -409,8 +408,8 @@ public class EntityListener implements Listener {
         	Location attackerLoc = bukkitPlayer.getLocation();
 			//boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
         	// Check for claim protections at attacker location
-        	if(!player.isAdminBypassActive() && kingdomManager.isChunkClaimed(attackerLoc.getChunk())) {
-        		KonTerritory territory = kingdomManager.getChunkTerritory(attackerLoc.getChunk());
+        	if(!player.isAdminBypassActive() && kingdomManager.isChunkClaimed(attackerLoc)) {
+        		KonTerritory territory = kingdomManager.getChunkTerritory(attackerLoc);
         		// Only update golems when player attacks from inside ruin territory
         		if(territory instanceof KonRuin) {
 	        		KonRuin ruin = (KonRuin) territory;
@@ -428,8 +427,8 @@ public class EntityListener implements Listener {
 	        	}
         	}
 			// Check for claim protections at damage location
-			if(!player.isAdminBypassActive() && kingdomManager.isChunkClaimed(damageLoc.getChunk())) {
-	        	KonTerritory territory = kingdomManager.getChunkTerritory(damageLoc.getChunk());
+			if(!player.isAdminBypassActive() && kingdomManager.isChunkClaimed(damageLoc)) {
+	        	KonTerritory territory = kingdomManager.getChunkTerritory(damageLoc);
 	        	
 	        	if(territory instanceof KonCapital) {
 	        		// Block all entity damage in capitals
@@ -575,9 +574,9 @@ public class EntityListener implements Listener {
             
             
             boolean isCapitalDamageEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.captial_pvp");
-            boolean isAttackInTerritory = konquest.getKingdomManager().isChunkClaimed(victimBukkitPlayer.getLocation().getChunk());
+            boolean isAttackInTerritory = konquest.getKingdomManager().isChunkClaimed(victimBukkitPlayer.getLocation());
             if(isAttackInTerritory) {
-            	KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(victimBukkitPlayer.getLocation().getChunk());
+            	KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(victimBukkitPlayer.getLocation());
             	// Optionally prevent damage in Capitals
             	if(!isCapitalDamageEnabled && territory instanceof KonCapital) {
             		event.setCancelled(true);
@@ -667,8 +666,8 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onAnimalDeathItem(EntityDeathEvent event) {
 		// Cause additional items to drop when event is located in town with upgrade
-		if(event.getEntity() instanceof Animals && kingdomManager.isChunkClaimed(event.getEntity().getLocation().getChunk())) {
-			KonTerritory territory = kingdomManager.getChunkTerritory(event.getEntity().getLocation().getChunk());
+		if(event.getEntity() instanceof Animals && kingdomManager.isChunkClaimed(event.getEntity().getLocation())) {
+			KonTerritory territory = kingdomManager.getChunkTerritory(event.getEntity().getLocation());
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown)territory;
 				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DROPS);

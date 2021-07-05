@@ -61,7 +61,7 @@ public class InventoryListener implements Listener {
 		// Monitor blocks in claimed territory
 		Location openLoc = event.getInventory().getLocation();
 		
-		if(openLoc != null && konquest.getKingdomManager().isChunkClaimed(openLoc.getChunk())) {
+		if(openLoc != null && konquest.getKingdomManager().isChunkClaimed(openLoc)) {
 			
 			if(!konquest.getPlayerManager().isPlayer((Player)event.getPlayer())) {
 				ChatUtil.printDebug("Failed to handle onInventoryOpen for non-existent player");
@@ -71,7 +71,7 @@ public class InventoryListener implements Listener {
 			// Bypass event restrictions for player in Admin Bypass Mode
 			if(!player.isAdminBypassActive()) {
 				//ChatUtil.printDebug("inventoryOpen Evaluating territory");
-				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(openLoc.getChunk());
+				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(openLoc);
 				// Prevent all inventory openings inside Capitals
 				if(territory instanceof KonCapital) {
 					//ChatUtil.printDebug("Cancelled inventory open event in "+territory.getName());
@@ -292,8 +292,7 @@ public class InventoryListener implements Listener {
 		KonPlayer player = playerManager.getPlayer(event.getPlayer());
 		Material extractMat = event.getItemType();
 		int stackSize = event.getItemAmount();
-		if(extractMat.equals(Material.IRON_INGOT) ||
-				extractMat.equals(Material.GOLD_INGOT) ||
+		if(extractMat.toString().toLowerCase().contains("ingot") ||
 				extractMat.equals(Material.NETHERITE_SCRAP) ||
 				extractMat.equals(Material.BRICK)) {
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.INGOTS,stackSize);
@@ -313,8 +312,8 @@ public class InventoryListener implements Listener {
 			konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.ENCHANT_ITEM);
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.ENCHANTMENTS,1);
 			Location enchantLoc = event.getEnchantBlock().getLocation();
-			if(enchantLoc != null && konquest.getKingdomManager().isChunkClaimed(enchantLoc.getChunk())) {
-				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(enchantLoc.getChunk());
+			if(enchantLoc != null && konquest.getKingdomManager().isChunkClaimed(enchantLoc)) {
+				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(enchantLoc);
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown)territory;
 					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.ENCHANT);
@@ -337,8 +336,8 @@ public class InventoryListener implements Listener {
     public void onPrepareItemEnchant(PrepareItemEnchantEvent event) {
 		if(!event.isCancelled()) {
 			Location enchantLoc = event.getEnchantBlock().getLocation();
-			if(enchantLoc != null && konquest.getKingdomManager().isChunkClaimed(enchantLoc.getChunk())) {
-				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(enchantLoc.getChunk());
+			if(enchantLoc != null && konquest.getKingdomManager().isChunkClaimed(enchantLoc)) {
+				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(enchantLoc);
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown)territory;
 					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.ENCHANT);

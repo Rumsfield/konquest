@@ -1,6 +1,8 @@
 package konquest.listener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -47,9 +49,9 @@ public class QuickShopListener implements Listener{
 			// Bypass all checks for admins in bypass mode
 			KonPlayer player = playerManager.getPlayer(event.getPlayer());
 			if(player != null && !player.isAdminBypassActive()) {
-				if(kingdomManager.isChunkClaimed(event.getLocation().getChunk())) {
+				if(kingdomManager.isChunkClaimed(event.getLocation())) {
 					//ChatUtil.printDebug("...checking claimed chunk");
-					KonTerritory territory = kingdomManager.getChunkTerritory(event.getLocation().getChunk());
+					KonTerritory territory = kingdomManager.getChunkTerritory(event.getLocation());
 					if(territory instanceof KonTown) {
 						if(!player.getKingdom().equals(territory.getKingdom())) {
 							//ChatUtil.printDebug("...chunk is enemy town");
@@ -102,14 +104,15 @@ public class QuickShopListener implements Listener{
 			//ChatUtil.printDebug("ShopPurchaseEvent: owner "+Bukkit.getOfflinePlayer(event.getShop().getOwner()).getName()+" at "+event.getShop().getLocation());
 		
 			// Bypass all checks for admins in bypass mode
-			KonPlayer player = playerManager.getPlayer(event.getPlayer());
+			Player purchaser = Bukkit.getPlayer(event.getPurchaser());
+			KonPlayer player = playerManager.getPlayer(purchaser);
 			if(player != null && !player.isAdminBypassActive()) {
 				Location shopLoc = event.getShop().getLocation();
-				if(kingdomManager.isChunkClaimed(shopLoc.getChunk())) {
-					KonTerritory territory = kingdomManager.getChunkTerritory(shopLoc.getChunk());
+				if(kingdomManager.isChunkClaimed(shopLoc)) {
+					KonTerritory territory = kingdomManager.getChunkTerritory(shopLoc);
 					if(!player.getKingdom().equals(territory.getKingdom())) {
 						//ChatUtil.sendError(event.getPlayer(), "Cannot use enemy shops!");
-						ChatUtil.sendError(event.getPlayer(), MessagePath.QUICKSHOP_ERROR_ENEMY_USE.getMessage());
+						ChatUtil.sendError(purchaser, MessagePath.QUICKSHOP_ERROR_ENEMY_USE.getMessage());
 						event.setCancelled(true);
 						return;
 					}

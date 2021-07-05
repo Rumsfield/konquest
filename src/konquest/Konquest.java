@@ -2,6 +2,7 @@ package konquest;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,7 +50,8 @@ import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.nms.TeamPacketSender;
-import konquest.nms.TeamPacketSender_1_16_R3;
+import konquest.nms.TeamPacketSender_p754;
+import konquest.nms.TeamPacketSender_p755;
 import konquest.utility.ChatUtil;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
@@ -238,16 +240,16 @@ public class Konquest implements Timeable {
 		}
     	player = playerManager.getPlayer(bukkitPlayer);
     	// Update all player's nametag color packets
-    	updateNamePackets();
+    	updateNamePackets(player);
     	// Update offline protections
     	kingdomManager.updateKingdomOfflineProtection();
     	// Update player membership stats
     	kingdomManager.updatePlayerMembershipStats(player);
     	// Updates based on login position
-    	Chunk chunkLogin = bukkitPlayer.getLocation().getChunk();
+    	Location loginLoc = bukkitPlayer.getLocation();
     	kingdomManager.clearTownHearts(player);
-    	if(kingdomManager.isChunkClaimed(chunkLogin)) {
-			KonTerritory loginTerritory = kingdomManager.getChunkTerritory(chunkLogin);
+    	if(kingdomManager.isChunkClaimed(loginLoc)) {
+			KonTerritory loginTerritory = kingdomManager.getChunkTerritory(loginLoc);
     		if(loginTerritory.getTerritoryType().equals(KonTerritoryType.TOWN)) { 
 	    		// Player joined located within a Town
 	    		KonTown town = (KonTown) loginTerritory;
@@ -405,7 +407,7 @@ public class Konquest implements Timeable {
 	    					// Only find enemy towns which do not have the counter-intelligence upgrade level 2+
 	    					int upgradeLevel = upgradeManager.getTownUpgradeLevel(town, KonUpgrade.COUNTER);
 	    					if(upgradeLevel < 2) {
-	    						int townDist = distanceInChunks(player.getBukkitPlayer().getLocation().getChunk(), town.getCenterLoc().getChunk());
+	    						int townDist = chunkDistance(player.getBukkitPlayer().getLocation(), town.getCenterLoc());
 	    						if(townDist != -1 && townDist < minDistance) {
 	    							minDistance = townDist;
 	    							nearestTerritory = town;
@@ -448,6 +450,24 @@ public class Konquest implements Timeable {
 		//ChatUtil.printDebug("Got chunks: "+Arrays.toString(areaChunks.toArray()));
 		return areaChunks;
 	}
+
+	public ArrayList<Point> getAreaPoints(Location loc, int radius) {
+		ArrayList<Point> areaPoints = new ArrayList<Point>();
+		Point center = toPoint(loc);
+		areaPoints.add(center);
+		if(radius > 0) {
+			int min = (radius-1)*-1;
+			int max = (radius-1);
+			for(int x=min;x<=max;x++) {
+				for(int z=min;z<=max;z++) {
+					if(x != 0 || z != 0) {
+						areaPoints.add(new Point(center.x + x, center.y + z));
+					}
+				}
+			}
+		}
+		return areaPoints;
+	}
 	
 	/**
 	 * Gets chunks surrounding loc, (2r-1)^2-1 chunks squared
@@ -471,6 +491,23 @@ public class Konquest implements Timeable {
 			}
 		}
 		return areaChunks;
+	}
+	
+	public ArrayList<Point> getSurroundingPoints(Location loc, int radius) {
+		ArrayList<Point> areaPoints = new ArrayList<Point>();
+		Point center = toPoint(loc);
+		if(radius > 0) {
+			int min = (radius-1)*-1;
+			int max = (radius-1);
+			for(int x=min;x<=max;x++) {
+				for(int z=min;z<=max;z++) {
+					if(x != 0 || z != 0) {
+						areaPoints.add(new Point(center.x + x, center.y + z));
+					}
+				}
+			}
+		}
+		return areaPoints;
 	}
 	
 	public ArrayList<Chunk> getSideChunks(Chunk chunk) {
@@ -497,8 +534,19 @@ public class Konquest implements Timeable {
 		return sideChunks;
 	}
 	
+	public ArrayList<Point> getSidePoints(Location loc) {
+		ArrayList<Point> sidePoints = new ArrayList<Point>();
+		Point center = toPoint(loc);
+		int[] coordLUTX = {0,1,0,-1};
+		int[] coordLUTZ = {1,0,-1,0};
+		for(int i = 0;i<4;i++) {
+			sidePoints.add(new Point(center.x + coordLUTX[i], center.y + coordLUTZ[i]));
+		}
+		return sidePoints;
+	}
+	
 	public Point toPoint(Location loc) {
-		return new Point(loc.getChunk().getX(),loc.getChunk().getZ());
+		return new Point((int)Math.floor((double)loc.getBlockX()/16),(int)Math.floor((double)loc.getBlockZ()/16));
 	}
 	
 	public Point toPoint(Chunk chunk) {
@@ -509,6 +557,7 @@ public class Konquest implements Timeable {
 		return world.getChunkAt(point.x, point.y);
 	}
 	
+	/*
 	public static int distanceInChunks(Location loc1, Location loc2) {
 		return distanceInChunks(loc1.getChunk(), loc2.getChunk());
 	}
@@ -520,10 +569,15 @@ public class Konquest implements Timeable {
 			return -1;
 		}
 	}
+	*/
 	
 	public static int chunkDistance(Location loc1, Location loc2) {
 		if(loc1.getWorld().getName().equals(loc2.getWorld().getName())) {
-			return Math.max(Math.abs(loc1.getBlockX()/16 - loc2.getBlockX()/16), Math.abs(loc1.getBlockZ()/16 - loc2.getBlockZ()/16));
+			int loc1X = (int)Math.floor((double)loc1.getBlockX()/16);
+			int loc1Z = (int)Math.floor((double)loc1.getBlockZ()/16);
+			int loc2X = (int)Math.floor((double)loc2.getBlockX()/16);
+			int loc2Z = (int)Math.floor((double)loc2.getBlockZ()/16);
+			return Math.max(Math.abs(loc1X - loc2X), Math.abs(loc1Z - loc2Z));
 		} else {
 			return -1;
 		}
@@ -603,7 +657,7 @@ public class Konquest implements Timeable {
 			randomNumZ = ThreadLocalRandom.current().nextInt(-1*(worldSize/2), (worldSize/2) + 1);
 			randomNumY = world.getHighestBlockYAt(randomNumX,randomNumZ) + 3;
 			wildLoc = new Location(world, randomNumX, randomNumY, randomNumZ);
-			if(!kingdomManager.isChunkClaimed(wildLoc.getChunk())) {
+			if(!kingdomManager.isChunkClaimed(wildLoc)) {
 				foundValidLoc = true;
 			} else {
 				timeout++;
@@ -666,46 +720,69 @@ public class Konquest implements Timeable {
 		randLoc.setYaw(yaw);
 		return randLoc;
 	}
-	/*
-	public void setPlayersToFriendlies(Player player, List<String> friendlies) {
-        net.minecraft.server.v1_16_R3.Scoreboard nmsScoreboard = new net.minecraft.server.v1_16_R3.Scoreboard();
-        ScoreboardTeam nmsTeam = new ScoreboardTeam(nmsScoreboard, friendlyTeam.getName());
-        PacketPlayOutScoreboardTeam packet = new PacketPlayOutScoreboardTeam(nmsTeam, friendlies, 3);
-        CraftPlayer craftPlayer = (CraftPlayer) player;
-        craftPlayer.getHandle().playerConnection.sendPacket(packet);
-    }
- 
-    public void setPlayersToEnemies(Player player, List<String> enemies) {
-        net.minecraft.server.v1_16_R3.Scoreboard nmsScoreboard = new net.minecraft.server.v1_16_R3.Scoreboard();
-        ScoreboardTeam nmsTeam = new ScoreboardTeam(nmsScoreboard, enemyTeam.getName());
-        PacketPlayOutScoreboardTeam packet = new PacketPlayOutScoreboardTeam(nmsTeam, enemies, 3);
-        CraftPlayer craftPlayer = (CraftPlayer) player;
-        craftPlayer.getHandle().playerConnection.sendPacket(packet);
-    }
-    
-    public void setPlayersToBarbarians(Player player, List<String> barbarians) {
-        net.minecraft.server.v1_16_R3.Scoreboard nmsScoreboard = new net.minecraft.server.v1_16_R3.Scoreboard();
-        ScoreboardTeam nmsTeam = new ScoreboardTeam(nmsScoreboard, barbarianTeam.getName());
-        PacketPlayOutScoreboardTeam packet = new PacketPlayOutScoreboardTeam(nmsTeam, barbarians, 3);
-        CraftPlayer craftPlayer = (CraftPlayer) player;
-        craftPlayer.getHandle().playerConnection.sendPacket(packet);
-    }
-    */
+	
     private boolean setupTeamPacketSender() {
     	String version;
     	try {
     		version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
     	} catch (ArrayIndexOutOfBoundsException e) {
-    		ChatUtil.printDebug("Failed to determine server version.");
+    		ChatUtil.printConsoleError("Failed to determine server version.");
     		return false;
     	}
-    	plugin.getServer().getConsoleSender().sendMessage(ChatColor.GOLD+"[Konquest] Your server version is "+version);
+    	ChatUtil.printConsoleAlert("Your server version is "+version);
     	if(version.equals("v1_16_R3")) {
-    		teamPacketSender = new TeamPacketSender_1_16_R3();
+    		teamPacketSender = new TeamPacketSender_p754();
+    	} else if(version.equals("v1_17_R1")) {
+    		teamPacketSender = new TeamPacketSender_p755();
     	}
     	return teamPacketSender != null;
     }
     
+    /**
+     * Sends updated team packets for the given player
+     * @param player
+     */
+    public void updateNamePackets(KonPlayer player) {
+    	// Loop over all online players, populate team lists and send each online player a team packet for arg player
+    	// Send arg player packets for each team with lists of online players
+		List<String> friendlyNames = new ArrayList<String>();
+		List<String> enemyNames = new ArrayList<String>();
+		List<String> barbarianNames = new ArrayList<String>();
+    	for(KonPlayer onlinePlayer : playerManager.getPlayersOnline()) {
+    		// Place online player is appropriate list w.r.t. player
+    		if(onlinePlayer.isBarbarian()) {
+    			barbarianNames.add(onlinePlayer.getBukkitPlayer().getName());
+    		} else {
+    			if(onlinePlayer.getKingdom().equals(player.getKingdom())) {
+    				friendlyNames.add(onlinePlayer.getBukkitPlayer().getName());
+    			} else {
+    				enemyNames.add(onlinePlayer.getBukkitPlayer().getName());
+    			}
+    		}
+    		// Send appropriate team packet to online player
+    		if(player.isBarbarian()) {
+    			teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), barbarianTeam);
+    		} else {
+    			if(player.getKingdom().equals(onlinePlayer.getKingdom())) {
+    				teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), friendlyTeam);
+    			} else {
+    				teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), enemyTeam);
+    			}
+    		}
+    	}
+    	// Send packets to player
+    	if(!friendlyNames.isEmpty()) {
+			teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), friendlyNames, friendlyTeam);
+    	}
+    	if(!enemyNames.isEmpty()) {
+    		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), enemyNames, enemyTeam);
+    	}
+    	if(!barbarianNames.isEmpty()) {
+    		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), barbarianNames, barbarianTeam);
+    	}
+    }
+    
+    /*
     //TODO This could be optimized to reduce loop Order, and only update as needed
     public void updateNamePackets() {
     	if(teamPacketSender != null) {
@@ -730,13 +807,13 @@ public class Konquest implements Timeable {
 				// For each friendly player in this kingdom, send packet update
 				for(Player kingdomPlayer : friendlyPlayers) {
 					if(!friendlyNames.isEmpty()) {
-						teamPacketSender.setPlayersToFriendlies(kingdomPlayer, friendlyNames, friendlyTeam);
+						teamPacketSender.sendPlayerTeamPacket(kingdomPlayer, friendlyNames, friendlyTeam);
 			    	}
 			    	if(!enemyNames.isEmpty()) {
-			    		teamPacketSender.setPlayersToEnemies(kingdomPlayer, enemyNames, enemyTeam);
+			    		teamPacketSender.sendPlayerTeamPacket(kingdomPlayer, enemyNames, enemyTeam);
 			    	}
 			    	if(!barbarianNames.isEmpty()) {
-			    		teamPacketSender.setPlayersToBarbarians(kingdomPlayer, barbarianNames, barbarianTeam);
+			    		teamPacketSender.sendPlayerTeamPacket(kingdomPlayer, barbarianNames, barbarianTeam);
 			    	}
 				}
 			}
@@ -756,14 +833,15 @@ public class Konquest implements Timeable {
 			// For each barbarian player, send packet update
 			for(Player barbarianPlayer : barbarianPlayers) {
 		    	if(!enemyNames.isEmpty()) {
-		    		teamPacketSender.setPlayersToEnemies(barbarianPlayer, enemyNames, enemyTeam);
+		    		teamPacketSender.sendPlayerTeamPacket(barbarianPlayer, enemyNames, enemyTeam);
 		    	}
 		    	if(!barbarianNames.isEmpty()) {
-		    		teamPacketSender.setPlayersToBarbarians(barbarianPlayer, barbarianNames, barbarianTeam);
+		    		teamPacketSender.sendPlayerTeamPacket(barbarianPlayer, barbarianNames, barbarianTeam);
 		    	}
 			}
     	}
     }
+    */
     
     public static UUID idFromString(String id) {
     	UUID result = null;

@@ -38,12 +38,12 @@ public abstract class KonTerritory{
 		ChatUtil.printDebug("Added chunk in territory "+name);
 	}*/
 	
-	public boolean addChunks(ArrayList<Chunk> chunks) {
+	public boolean addChunks(ArrayList<Point> points) {
 		boolean pass = true;
-		for(Chunk chunk : chunks) {
-			if(!addChunk(chunk)) {
+		for(Point point : points) {
+			if(!addChunk(point)) {
 				pass = false;
-				ChatUtil.printDebug("Failed to add chunk "+chunk.toString()+" in territory "+name);
+				ChatUtil.printDebug("Failed to add point "+point.toString()+" in territory "+name);
 			}
 		}
 		return pass;
@@ -81,6 +81,7 @@ public abstract class KonTerritory{
 		return loc.getWorld().equals(getWorld()) && chunkList.containsKey(getKonquest().toPoint(loc));
 	}
 	
+	//TODO: Refactor to not use chunks, currently method is unused
 	public boolean isLocAdjacent(Location loc) {
 		boolean result = false;
 		int[] coordLUTX = {0,1,0,-1};
@@ -97,6 +98,7 @@ public abstract class KonTerritory{
 		return result;
 	}
 	
+	//TODO: Refactor to not use chunks, currently method is unused
 	public ArrayList<Chunk> getSurroundChunks(Location loc) {
 		ArrayList<Chunk> sideChunks = new ArrayList<Chunk>();
 		int[] coordLUTX = {0,1,1,1,0,-1,-1,-1};
@@ -165,6 +167,8 @@ public abstract class KonTerritory{
 	 */
 	public abstract int initClaim();
 	
-	public abstract boolean addChunk(Chunk chunk);
+	//public abstract boolean addChunk(Chunk chunk);
+	
+	public abstract boolean addChunk(Point point);
 	
 }
