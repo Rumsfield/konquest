@@ -230,6 +230,7 @@ public class TravelCommand extends CommandBase {
 			KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 			if(player.isBarbarian()) {
 				tabList.add("camp");
+				tabList.add("wild");
 	    	} else {
 	    		List<String> townList = player.getKingdom().getTownNames();
 	    		tabList.add("capital");
