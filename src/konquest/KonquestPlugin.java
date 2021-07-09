@@ -8,6 +8,7 @@ import konquest.listener.KonquestListener;
 import konquest.listener.PlayerListener;
 import konquest.listener.WorldListener;
 import konquest.utility.ChatUtil;
+import konquest.utility.Metrics;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -40,11 +41,17 @@ public class KonquestPlugin extends JavaPlugin {
  			pluginManager.disablePlugin(this);
             return;
         }
+ 		// Enable metrics
+ 		loadMetrics();
+        // Get protocol manager
  		plib = ProtocolLibrary.getProtocolManager();
+ 		// Register command executors & listeners
         getCommand("konquest").setExecutor(konquest.getCommandHandler());
         getCommand("k").setExecutor(konquest.getCommandHandler());
         registerListeners();
+        // Initialize core
         konquest.initialize();
+        // Done!
         enableSuccess = true;
         ChatUtil.printConsoleAlert("Plugin enabled. Written by Rumsfield.");
 	}
@@ -81,6 +88,19 @@ public class KonquestPlugin extends JavaPlugin {
 		pluginManager.registerEvents(new HangingListener(this), this);
 		pluginManager.registerEvents(new WorldListener(this), this);
 		//pluginManager.registerEvents(new QuickShopListener(this), this);
+	}
+	
+	private void loadMetrics() {
+		
+		try {
+			int pluginId = 11980;
+	        new Metrics(this, pluginId);
+	        //Metrics metrics = new Metrics(this, pluginId);
+		} catch(Exception e) {
+			ChatUtil.printConsoleError("Failed to load plugin metrics with bStats:");
+			ChatUtil.printConsoleError(e.getMessage());
+		}
+		
 	}
 	
 	private boolean setupEconomy() {
