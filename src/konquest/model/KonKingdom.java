@@ -366,7 +366,7 @@ public class KonKingdom implements Timeable{
 		Point tPoint;
 		for(KonTown town : getTowns()) {
 			tPoint = konquest.toPoint(town.getCenterLoc());
-			if(town.getWorld().isChunkLoaded(tPoint.x,tPoint.y)) {
+			if(town.getWorld().isChunkLoaded(tPoint.x,tPoint.y) && !town.isAttacked()) {
 				// Teleport players out of the chunk
 				for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
 					if(town.getMonument().isLocInside(player.getBukkitPlayer().getLocation())) {
