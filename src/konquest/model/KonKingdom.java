@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 
@@ -366,6 +367,14 @@ public class KonKingdom implements Timeable{
 		for(KonTown town : getTowns()) {
 			tPoint = konquest.toPoint(town.getCenterLoc());
 			if(town.getWorld().isChunkLoaded(tPoint.x,tPoint.y)) {
+				// Teleport players out of the chunk
+				for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
+					if(town.getMonument().isLocInside(player.getBukkitPlayer().getLocation())) {
+						player.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2));
+						player.getBukkitPlayer().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_ANVIL_USE, (float)1, (float)1.2);
+					}
+				}
+				// Update monument from template
 				town.reloadMonument();
 			}
 		}
