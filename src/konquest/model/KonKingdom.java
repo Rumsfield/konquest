@@ -366,16 +366,20 @@ public class KonKingdom implements Timeable{
 		Point tPoint;
 		for(KonTown town : getTowns()) {
 			tPoint = konquest.toPoint(town.getCenterLoc());
-			if(town.getWorld().isChunkLoaded(tPoint.x,tPoint.y) && !town.isAttacked()) {
-				// Teleport players out of the chunk
-				for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
-					if(town.getMonument().isLocInside(player.getBukkitPlayer().getLocation())) {
-						player.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2));
-						player.getBukkitPlayer().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_ANVIL_USE, (float)1, (float)1.2);
+			if(town.getWorld().isChunkLoaded(tPoint.x,tPoint.y)) {
+				if(town.isAttacked()) {
+					ChatUtil.printDebug("Could not paste monument in town "+town.getName()+" while under attack");
+				} else {
+					// Teleport players out of the chunk
+					for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
+						if(town.getMonument().isLocInside(player.getBukkitPlayer().getLocation())) {
+							player.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2));
+							player.getBukkitPlayer().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_ANVIL_USE, (float)1, (float)1.2);
+						}
 					}
+					// Update monument from template
+					town.reloadMonument();
 				}
-				// Update monument from template
-				town.reloadMonument();
 			}
 		}
 	}

@@ -20,6 +20,7 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
@@ -526,11 +527,12 @@ public class KonTown extends KonTerritory implements Timeable{
 			ChatUtil.printDebug("Monument Timer ended with taskID: "+taskID);
 			// When a monument timer ends
 			monument.clearCriticalHits();
-			pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
+			//pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
+			reloadMonument();
 			setAttacked(false);
 			setBarProgress(1.0);
 			updateBar();
-			
+			getWorld().playSound(getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)1, (float)0.8);
 			//String kingdomName = getKingdom().getName();
 			//int numPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(kingdomName).size();
 			//ChatUtil.printDebug("Found "+numPlayers+" in Kingdom "+kingdomName+" for message sender");
