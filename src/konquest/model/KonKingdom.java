@@ -357,9 +357,9 @@ public class KonKingdom implements Timeable{
 	public void startMonumentBlanking() {
 		isMonumentBlanking = true;
 		monumentBlankingTimer.stopTimer();
-		monumentBlankingTimer.setTime(30);
+		monumentBlankingTimer.setTime(300);
 		monumentBlankingTimer.startTimer();
-		//ChatUtil.printDebug("Starting 30 second monument blanking timer for kingdom "+getName());
+		//ChatUtil.printDebug("Starting 300 second monument blanking timer for kingdom "+getName());
 	}
 	
 	private void reloadLoadedTownMonuments() {
