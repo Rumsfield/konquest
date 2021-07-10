@@ -216,8 +216,8 @@ public class KonTown extends KonTerritory implements Timeable{
         	ChatUtil.printDebug("Paste fill chunk ("+pasteX+","+pasteZ+") is NOT loaded!");
         }
         */
-        Chunk fillChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
-        //Chunk fillChunk = getCenterLoc().getChunk();
+        //Chunk fillChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
+        Chunk fillChunk = getCenterLoc().getChunk();
         //Date step2 = new Date();
         ChunkSnapshot fillChunkSnap = fillChunk.getChunkSnapshot(true,false,false);
         //Date step3 = new Date();
@@ -399,9 +399,15 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 
 	public boolean isLocInsideCenterChunk(Location loc) {
-		Chunk centerChunk = getCenterLoc().getChunk();
-		Chunk testChunk = loc.getChunk();
-		return centerChunk.getX() == testChunk.getX() && centerChunk.getZ() == testChunk.getZ();
+		Point centerPoint = getKonquest().toPoint(getCenterLoc());
+		Point testPoint = getKonquest().toPoint(loc);
+		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
+	}
+	
+	public boolean isChunkCenter(Chunk chunk) {
+		Point centerPoint = getKonquest().toPoint(getCenterLoc());
+		Point testPoint = getKonquest().toPoint(chunk);
+		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
 	}
 	
 	/**
@@ -416,7 +422,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		if(template.isValid()) {
 			monument.setHeight(template.getHeight());
 			monument.setIsValid(true);
-			pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
+			//pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
 		} else {
 			status = 1;
 		}

@@ -66,6 +66,19 @@ public class WorldListener  implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onChunkLoad(ChunkLoadEvent event) {
+		
+		if(konquest.getKingdomManager().isChunkClaimed(konquest.toPoint(event.getChunk()), event.getWorld())) {
+			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(konquest.toPoint(event.getChunk()), event.getWorld());
+			if(territory instanceof KonTown) {
+				KonTown town = (KonTown) territory;
+				if(town.isChunkCenter(event.getChunk())) {
+					ChatUtil.printDebug("EVENT: Loaded monument chunk of town "+town.getName());
+					// Paste current monument template
+					town.pasteMonumentFromTemplate(town.getKingdom().getMonumentTemplate());
+				}
+			}
+		}
+		
 		konquest.applyQueuedTeleports(event.getChunk());
 	}
 	
