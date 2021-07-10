@@ -73,8 +73,15 @@ public class WorldListener  implements Listener {
 				KonTown town = (KonTown) territory;
 				if(town.isChunkCenter(event.getChunk())) {
 					ChatUtil.printDebug("EVENT: Loaded monument chunk of town "+town.getName());
-					// Paste current monument template
-					town.pasteMonumentFromTemplate(town.getKingdom().getMonumentTemplate());
+					if(town.getKingdom().isMonumentBlanking()) {
+						ChatUtil.printDebug("Could not paste monument while monument template is blanked");
+					} else {
+						// Paste current monument template
+						boolean status = town.pasteMonumentFromTemplate(town.getKingdom().getMonumentTemplate());
+						if(!status) {
+							ChatUtil.printDebug("Failed to paste invalid monument template!");
+						}
+					}
 				}
 			}
 		}

@@ -22,7 +22,9 @@ public class KonKingdom implements Timeable{
 	private boolean isSmallest;
 	private boolean isPeaceful;
 	private boolean isOfflineProtected;
+	private boolean isMonumentBlanking;
 	private Timer protectedWarmupTimer;
+	private Timer monumentBlankingTimer;
 	
 	public KonKingdom(Location loc, String name, Konquest konquest) {
 		this.name = name;
@@ -33,7 +35,9 @@ public class KonKingdom implements Timeable{
 		this.isSmallest = false;
 		this.isPeaceful = false;
 		this.isOfflineProtected = true;
+		this.isMonumentBlanking = false;
 		this.protectedWarmupTimer = new Timer(this);
+		this.monumentBlankingTimer = new Timer(this);
 	}
 	
 	// Constructor meant for Barbarians, created on startup
@@ -240,6 +244,16 @@ public class KonKingdom implements Timeable{
 		isOfflineProtected = val;
 	}
 	
+	public boolean isMonumentBlanking() {
+		return isMonumentBlanking;
+	}
+	
+	/*
+	public void setMonumentBlanking(boolean val) {
+		isMonumentBlanking = val;
+	}
+	*/
+	
 	public void removeMonumentTemplate() {
 		monumentTemplate.setValid(false);
 	}
@@ -322,10 +336,26 @@ public class KonKingdom implements Timeable{
 		} else if(taskID == protectedWarmupTimer.getTaskID()) {
 			ChatUtil.printDebug("Kingdom protection warmup Timer ended with taskID: "+taskID);
 			isOfflineProtected = true;
+		} else if(taskID == monumentBlankingTimer.getTaskID()) {
+			ChatUtil.printDebug("Kingdom monument blanking Timer ended with taskID: "+taskID);
+			isMonumentBlanking = false;
 		}
 	}
 	
 	public Timer getProtectedWarmupTimer() {
 		return protectedWarmupTimer;
+	}
+	
+	/*
+	public Timer getMonumentBlankingTimer() {
+		return monumentBlankingTimer;
+	}
+	*/
+	public void startMonumentBlanking() {
+		isMonumentBlanking = true;
+		monumentBlankingTimer.stopTimer();
+		monumentBlankingTimer.setTime(30);
+		monumentBlankingTimer.startTimer();
+		ChatUtil.printDebug("Starting 30 second monument blanking timer for kingdom "+getName());
 	}
 }
