@@ -420,7 +420,8 @@ public class KonTown extends KonTerritory implements Timeable{
 		int status = 0;
 		monument.setBaseY(base);
 		if(template.isValid()) {
-			monument.setHeight(template.getHeight());
+			//monument.setHeight(template.getHeight());
+			monument.updateFromTemplate(template);
 			monument.setIsValid(true);
 			//pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
 		} else {
