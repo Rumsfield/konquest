@@ -1,5 +1,6 @@
 package konquest.model;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -332,13 +333,14 @@ public class KonKingdom implements Timeable{
 	@Override
 	public void onEndTimer(int taskID) {
 		if(taskID == 0) {
-			ChatUtil.printDebug("Kingdom protection warmup Timer ended with null taskID!");
+			ChatUtil.printDebug("Kingdom Timer ended with null taskID!");
 		} else if(taskID == protectedWarmupTimer.getTaskID()) {
 			ChatUtil.printDebug("Kingdom protection warmup Timer ended with taskID: "+taskID);
 			isOfflineProtected = true;
 		} else if(taskID == monumentBlankingTimer.getTaskID()) {
 			ChatUtil.printDebug("Kingdom monument blanking Timer ended with taskID: "+taskID);
 			isMonumentBlanking = false;
+			reloadLoadedTownMonuments();
 		}
 	}
 	
@@ -357,5 +359,15 @@ public class KonKingdom implements Timeable{
 		monumentBlankingTimer.setTime(30);
 		monumentBlankingTimer.startTimer();
 		//ChatUtil.printDebug("Starting 30 second monument blanking timer for kingdom "+getName());
+	}
+	
+	private void reloadLoadedTownMonuments() {
+		Point tPoint;
+		for(KonTown town : getTowns()) {
+			tPoint = konquest.toPoint(town.getCenterLoc());
+			if(town.getWorld().isChunkLoaded(tPoint.x,tPoint.y)) {
+				town.reloadMonument();
+			}
+		}
 	}
 }
