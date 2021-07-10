@@ -112,7 +112,7 @@ public class KonMonument{
 	
 	public boolean updateFromTemplate(KonMonumentTemplate template) {
 		// Verify valid template
-		if(!template.isValid()) {
+		if(template != null && !template.isValid()) {
 			return false;
 		}
 		// Translate travel point location

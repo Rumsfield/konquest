@@ -429,6 +429,19 @@ public class KonTown extends KonTerritory implements Timeable{
 		return status;
 	}
 	
+	/**
+	 * Reloads a monument from template, meant to be used when server loads the chunk
+	 */
+	public boolean reloadMonument() {
+		boolean result = false;
+		if(monument.isValid()) {
+			result = monument.updateFromTemplate(getKingdom().getMonumentTemplate());
+			pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
+			setSpawn(monument.getTravelPoint());
+		}
+		return result;
+	}
+	
 	public void refreshMonument() {
 		if(monument.isValid()) {
 			removeMonumentBlocks();
