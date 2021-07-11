@@ -374,11 +374,12 @@ public class KonKingdom implements Timeable{
 					for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
 						if(town.getMonument().isLocInside(player.getBukkitPlayer().getLocation())) {
 							player.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2));
-							player.getBukkitPlayer().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_ANVIL_USE, (float)1, (float)1.2);
+							//player.getBukkitPlayer().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_ANVIL_USE, (float)1, (float)1.2);
 						}
 					}
 					// Update monument from template
 					town.reloadMonument();
+					town.getWorld().playSound(town.getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)1, (float)0.8);
 				}
 			}
 		}
