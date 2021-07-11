@@ -206,16 +206,17 @@ public class TravelCommand extends CommandBase {
 	    	    			}
 	    	    		}
         			}
+        			getKonquest().telePlayerTerritory(bukkitPlayer, town);
         			break;
         		case WILD:
+        			getKonquest().telePlayerLocation(bukkitPlayer, travelLoc);
         			//ChatUtil.sendNotice((Player) getSender(), "Traveled to a random location in the Wild.");
         			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TRAVEL_NOTICE_WILD_TRAVEL.getMessage());
         			break;
         		default:
+        			getKonquest().telePlayerLocation(bukkitPlayer, travelLoc);
         			break;
         	}
-			//bukkitPlayer.teleport(travelLoc);
-			getKonquest().telePlayer(bukkitPlayer, travelLoc);
         }
 	}
 	
@@ -230,6 +231,7 @@ public class TravelCommand extends CommandBase {
 			KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 			if(player.isBarbarian()) {
 				tabList.add("camp");
+				tabList.add("wild");
 	    	} else {
 	    		List<String> townList = player.getKingdom().getTownNames();
 	    		tabList.add("capital");

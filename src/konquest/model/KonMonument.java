@@ -112,7 +112,7 @@ public class KonMonument{
 	
 	public boolean updateFromTemplate(KonMonumentTemplate template) {
 		// Verify valid template
-		if(!template.isValid()) {
+		if(template != null && !template.isValid()) {
 			return false;
 		}
 		// Translate travel point location
@@ -122,11 +122,19 @@ public class KonMonument{
         
 		//ChatUtil.printDebug("Updating monument travel point");
 		//ChatUtil.printDebug("Using template base point "+minBlockX+","+minBlockY+","+minBlockZ);
+        // Offsets from chunk origin to travel location
 		int offsetX = (int)(template.getTravelPoint().getX() - minBlockX);
 		int offsetY = (int)(template.getTravelPoint().getY() - minBlockY);
 		int offsetZ = (int)(template.getTravelPoint().getZ() - minBlockZ);
 		//ChatUtil.printDebug("Using template offset "+offsetX+","+offsetY+","+offsetZ);
-		travelPoint = centerLoc.getChunk().getBlock(0, baseY+1, 0).getLocation().clone().add(offsetX, offsetY+1, offsetZ);
+		
+		// Calculate monument chunk origin block location
+		int mX = (int)Math.floor((double)centerLoc.getBlockX()/16)*16;
+		int mZ = (int)Math.floor((double)centerLoc.getBlockZ()/16)*16;
+		
+		travelPoint = new Location(centerLoc.getWorld(),mX+offsetX,baseY+offsetY+1,mZ+offsetZ);
+		
+		//travelPoint = centerLoc.getChunk().getBlock(0, baseY+1, 0).getLocation().clone().add(offsetX, offsetY+1, offsetZ);
 		//ChatUtil.printDebug("Updated new travel location "+travelPoint.getX()+","+travelPoint.getY()+","+travelPoint.getZ());
 		height = template.getHeight();
 		//isValid = template.isValid();

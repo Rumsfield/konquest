@@ -162,7 +162,7 @@ public class KonquestListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onKonquestMonumentDamage(KonquestMonumentDamageEvent event) {
-		ChatUtil.printDebug("EVENT: Monument damaged in town: "+event.getTerritory().getName()+", kingdom: "+event.getTerritory().getKingdom().getName());
+		//ChatUtil.printDebug("EVENT: Monument damaged in town: "+event.getTerritory().getName()+", kingdom: "+event.getTerritory().getKingdom().getName());
 		
 		if(!(event.getTerritory() instanceof KonTown)) {
 			ChatUtil.printDebug("Error in onKonquestMonumentDamage Event Handler, event passed territory that is not a Town");
@@ -184,7 +184,7 @@ public class KonquestListener implements Listener {
 		monumentTimer.stopTimer();
 		monumentTimer.setTime(monumentRegenTimeSeconds);
 		monumentTimer.startTimer();
-		ChatUtil.printDebug("Starting monument timer for "+monumentRegenTimeSeconds+" seconds with taskID "+monumentTimer.getTaskID());
+		//ChatUtil.printDebug("Starting monument timer for "+monumentRegenTimeSeconds+" seconds with taskID "+monumentTimer.getTaskID());
 		
 		// Update MonumentBar state
 		town.setAttacked(true);

@@ -134,7 +134,7 @@ public enum MessagePath {
 	PROTECTION_NOTICE_UNTAGGED                  (0, "protection.notice.untagged"),
 	PROTECTION_NOTICE_UNTAG_MESSAGE             (0, "protection.notice.untag-message"),
 	PROTECTION_NOTICE_LOOT_LATER                (0, "protection.notice.loot-later"),
-	PROTECTION_NOTICE_RAID                      (0, "protection.notice.raid"),
+	PROTECTION_NOTICE_RAID                      (2, "protection.notice.raid"),
 	PROTECTION_NOTICE_RAID_ALERT                (0, "protection.notice.raid-alert"),
 	PROTECTION_NOTICE_RAID_CAPTURE_1            (3, "protection.notice.raid-capture-1"),
 	PROTECTION_NOTICE_RAID_CAPTURE_2            (3, "protection.notice.raid-capture-2"),

@@ -20,6 +20,7 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
@@ -216,8 +217,8 @@ public class KonTown extends KonTerritory implements Timeable{
         	ChatUtil.printDebug("Paste fill chunk ("+pasteX+","+pasteZ+") is NOT loaded!");
         }
         */
-        Chunk fillChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
-        //Chunk fillChunk = getCenterLoc().getChunk();
+        //Chunk fillChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
+        Chunk fillChunk = getCenterLoc().getChunk();
         //Date step2 = new Date();
         ChunkSnapshot fillChunkSnap = fillChunk.getChunkSnapshot(true,false,false);
         //Date step3 = new Date();
@@ -399,9 +400,15 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 
 	public boolean isLocInsideCenterChunk(Location loc) {
-		Chunk centerChunk = getCenterLoc().getChunk();
-		Chunk testChunk = loc.getChunk();
-		return centerChunk.getX() == testChunk.getX() && centerChunk.getZ() == testChunk.getZ();
+		Point centerPoint = getKonquest().toPoint(getCenterLoc());
+		Point testPoint = getKonquest().toPoint(loc);
+		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
+	}
+	
+	public boolean isChunkCenter(Chunk chunk) {
+		Point centerPoint = getKonquest().toPoint(getCenterLoc());
+		Point testPoint = getKonquest().toPoint(chunk);
+		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
 	}
 	
 	/**
@@ -414,13 +421,27 @@ public class KonTown extends KonTerritory implements Timeable{
 		int status = 0;
 		monument.setBaseY(base);
 		if(template.isValid()) {
-			monument.setHeight(template.getHeight());
+			//monument.setHeight(template.getHeight());
+			monument.updateFromTemplate(template);
 			monument.setIsValid(true);
-			pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
+			//pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
 		} else {
 			status = 1;
 		}
 		return status;
+	}
+	
+	/**
+	 * Reloads a monument from template, meant to be used when server loads the chunk
+	 */
+	public boolean reloadMonument() {
+		boolean result = false;
+		if(monument.isValid()) {
+			result = monument.updateFromTemplate(getKingdom().getMonumentTemplate());
+			pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
+			setSpawn(monument.getTravelPoint());
+		}
+		return result;
 	}
 	
 	public void refreshMonument() {
@@ -506,11 +527,12 @@ public class KonTown extends KonTerritory implements Timeable{
 			ChatUtil.printDebug("Monument Timer ended with taskID: "+taskID);
 			// When a monument timer ends
 			monument.clearCriticalHits();
-			pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
+			//pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
+			reloadMonument();
 			setAttacked(false);
 			setBarProgress(1.0);
 			updateBar();
-			
+			getWorld().playSound(getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)1, (float)0.8);
 			//String kingdomName = getKingdom().getName();
 			//int numPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(kingdomName).size();
 			//ChatUtil.printDebug("Found "+numPlayers+" in Kingdom "+kingdomName+" for message sender");

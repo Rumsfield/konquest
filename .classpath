@@ -8,7 +8,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/Vault-1.7.3.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/spigot-api-1.17-R0.1-SNAPSHOT-shaded.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/spigot-api-1.17.1-R0.1-SNAPSHOT-shaded.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/QuickShop-4.0.9.4.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/LuckPerms-Bukkit-5.3.47.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/sqlite-jdbc-3.32.3.2.jar"/>
