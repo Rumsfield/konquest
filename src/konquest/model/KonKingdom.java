@@ -1,9 +1,11 @@
 package konquest.model;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 
@@ -22,7 +24,9 @@ public class KonKingdom implements Timeable{
 	private boolean isSmallest;
 	private boolean isPeaceful;
 	private boolean isOfflineProtected;
+	private boolean isMonumentBlanking;
 	private Timer protectedWarmupTimer;
+	private Timer monumentBlankingTimer;
 	
 	public KonKingdom(Location loc, String name, Konquest konquest) {
 		this.name = name;
@@ -33,7 +37,9 @@ public class KonKingdom implements Timeable{
 		this.isSmallest = false;
 		this.isPeaceful = false;
 		this.isOfflineProtected = true;
+		this.isMonumentBlanking = false;
 		this.protectedWarmupTimer = new Timer(this);
+		this.monumentBlankingTimer = new Timer(this);
 	}
 	
 	// Constructor meant for Barbarians, created on startup
@@ -240,6 +246,16 @@ public class KonKingdom implements Timeable{
 		isOfflineProtected = val;
 	}
 	
+	public boolean isMonumentBlanking() {
+		return isMonumentBlanking;
+	}
+	
+	/*
+	public void setMonumentBlanking(boolean val) {
+		isMonumentBlanking = val;
+	}
+	*/
+	
 	public void removeMonumentTemplate() {
 		monumentTemplate.setValid(false);
 	}
@@ -318,14 +334,54 @@ public class KonKingdom implements Timeable{
 	@Override
 	public void onEndTimer(int taskID) {
 		if(taskID == 0) {
-			ChatUtil.printDebug("Kingdom protection warmup Timer ended with null taskID!");
+			ChatUtil.printDebug("Kingdom Timer ended with null taskID!");
 		} else if(taskID == protectedWarmupTimer.getTaskID()) {
 			ChatUtil.printDebug("Kingdom protection warmup Timer ended with taskID: "+taskID);
 			isOfflineProtected = true;
+		} else if(taskID == monumentBlankingTimer.getTaskID()) {
+			ChatUtil.printDebug("Kingdom monument blanking Timer ended with taskID: "+taskID);
+			isMonumentBlanking = false;
+			reloadLoadedTownMonuments();
 		}
 	}
 	
 	public Timer getProtectedWarmupTimer() {
 		return protectedWarmupTimer;
+	}
+	
+	/*
+	public Timer getMonumentBlankingTimer() {
+		return monumentBlankingTimer;
+	}
+	*/
+	public void startMonumentBlanking() {
+		isMonumentBlanking = true;
+		monumentBlankingTimer.stopTimer();
+		monumentBlankingTimer.setTime(300);
+		monumentBlankingTimer.startTimer();
+		//ChatUtil.printDebug("Starting 300 second monument blanking timer for kingdom "+getName());
+	}
+	
+	private void reloadLoadedTownMonuments() {
+		Point tPoint;
+		for(KonTown town : getTowns()) {
+			tPoint = konquest.toPoint(town.getCenterLoc());
+			if(town.getWorld().isChunkLoaded(tPoint.x,tPoint.y)) {
+				if(town.isAttacked()) {
+					ChatUtil.printDebug("Could not paste monument in town "+town.getName()+" while under attack");
+				} else {
+					// Teleport players out of the chunk
+					for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
+						if(town.getMonument().isLocInside(player.getBukkitPlayer().getLocation())) {
+							player.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2));
+							//player.getBukkitPlayer().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_ANVIL_USE, (float)1, (float)1.2);
+						}
+					}
+					// Update monument from template
+					town.reloadMonument();
+					town.getWorld().playSound(town.getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)1, (float)0.8);
+				}
+			}
+		}
 	}
 }

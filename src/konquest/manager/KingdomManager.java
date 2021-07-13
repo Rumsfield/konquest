@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+//import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -1679,6 +1680,7 @@ public class KingdomManager {
 	}
 	
 	private void loadKingdoms() {
+		//ScheduledThreadPoolExecutor service = new ScheduledThreadPoolExecutor(1);
 		FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
         if (kingdomsConfig.get("kingdoms") == null) {
         	ChatUtil.printDebug("There is no kingdoms section in kingdoms.yml");
@@ -1751,9 +1753,9 @@ public class KingdomManager {
         		z = sectionList.get(2);
 	        	Location monument_cornertwo = new Location(capitalWorld,x,y,z);
 	        	// Load monument template chunk
-	        	int tmpX = (int)Math.floor((double)monument_cornerone.getBlockX()/16);
-                int tmpZ = (int)Math.floor((double)monument_cornerone.getBlockZ()/16);
-	        	capitalWorld.loadChunk(tmpX,tmpZ);
+	        	//int tmpX = (int)Math.floor((double)monument_cornerone.getBlockX()/16);
+                //int tmpZ = (int)Math.floor((double)monument_cornerone.getBlockZ()/16);
+	        	//capitalWorld.loadChunk(tmpX,tmpZ);
                 //capitalWorld.addPluginChunkTicket(tmpX, tmpZ, konquest.getPlugin());
                 //capitalWorld.setChunkForceLoaded(tmpX, tmpZ, true);
 	        	// Create a Monument Template region for current Kingdom
@@ -1787,14 +1789,13 @@ public class KingdomManager {
         	//Date kStep2 = new Date();
         	// Load all towns
         	boolean isMissingMonuments = false;
-        	World townWorld = null;
         	for(String townName : kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns").getKeys(false)) {
         		//ChatUtil.printDebug("Loading Town: "+townName);
             	ConfigurationSection townSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns."+townName);
             	if(townSection != null) {
             		//Date start = new Date();
             		worldName = townSection.getString("world",defaultWorldName);
-            		townWorld = Bukkit.getWorld(worldName);
+            		World townWorld = Bukkit.getServer().getWorld(worldName);
             		int base = townSection.getInt("base");
             		sectionList = townSection.getDoubleList("spawn");
             		x = sectionList.get(0);
@@ -1813,20 +1814,38 @@ public class KingdomManager {
 	            	// Set town spawn point
 	            	town.setSpawn(town_spawn);
 	            	//Date step2 = new Date();
+	            	
+	            	
 	            	// Load monument chunk
-	            	int monX = (int)Math.floor((double)town_center.getBlockX()/16);
-	                int monZ = (int)Math.floor((double)town_center.getBlockZ()/16);
-	            	townWorld.loadChunk(monX,monZ);
-	            	//townWorld.addPluginChunkTicket(monX, monZ, konquest.getPlugin());
+	            	//int monX = (int)Math.floor((double)town_center.getBlockX()/16);
+	                //int monZ = (int)Math.floor((double)town_center.getBlockZ()/16);
+	            	//townWorld.loadChunk(monX,monZ);
 	            	//townWorld.setChunkForceLoaded(monX, monZ, true);
-	            	//Date step3 = new Date();
+	            	
 	            	// Setup town monument parameters from template
-	            	int status = town.loadMonument(base, kingdomMap.get(kingdomName).getMonumentTemplate());
-	            	if(status != 0) {
+	            	town.loadMonument(base, kingdomMap.get(kingdomName).getMonumentTemplate());
+	            	
+	            	
+	            	/*
+	            	Bukkit.getScheduler().runTaskAsynchronously(konquest.getPlugin(), new Runnable() {
+	            	//service.submit(new Runnable() {
+	                    @Override
+	                    public void run() {
+	                    	// Load monument chunk
+	    	            	//int monX = (int)Math.floor((double)town_center.getBlockX()/16);
+	    	                //int monZ = (int)Math.floor((double)town_center.getBlockZ()/16);
+	    	            	//townWorld.loadChunk(monX,monZ);
+	    	            	// Setup town monument parameters from template
+	    	            	town.loadMonument(base, kingdomMap.get(kingdomName).getMonumentTemplate());
+	    	            	ChatUtil.printDebug("Finished loading monument for town "+town.getName());
+	                    }
+	            	});
+	            	*/
+	            	if(!kingdomMap.get(kingdomName).getMonumentTemplate().isValid()) {
 	            		isMissingMonuments = true;
 	            		ChatUtil.printConsoleError("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
-	            		//konquest.opStatusMessages.add("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            	}
+	            	
 	            	//Date step4 = new Date();
 	            	// Unload monument chunk
 	            	//townWorld.unloadChunk(monX,monZ);

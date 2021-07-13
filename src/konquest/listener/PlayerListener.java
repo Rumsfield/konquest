@@ -91,8 +91,9 @@ public class PlayerListener implements Listener{
             	// Send helpful messages
             	if(playerManager.getPlayer(bukkitPlayer).getKingdom().isSmallest()) {
             		int boostPercent = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.smallest_exp_boost_percent");
-            		//ChatUtil.sendNotice(bukkitPlayer, "Your Kingdom is currently the smallest, enjoy a "+boostPercent+"% EXP boost!", ChatColor.ITALIC);
-            		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SMALL_KINGDOM.getMessage(boostPercent), ChatColor.ITALIC);
+            		if(boostPercent > 0) {
+            			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SMALL_KINGDOM.getMessage(boostPercent), ChatColor.ITALIC);
+            		}
             	}
             	if(bukkitPlayer.hasPermission("konquest.command.admin")) {
             		for(String msg : konquest.opStatusMessages) {
@@ -299,11 +300,13 @@ public class PlayerListener implements Listener{
 	                    //ChatUtil.sendNotice(bukkitPlayer, "Click on the travel point block.");
 	                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_3.getMessage());
 	                } else {
-	                	int createMonumentStatus = kingdomManager.getKingdom(player.getRegionKingdomName()).createMonumentTemplate(player.getRegionCornerOneBuffer(), player.getRegionCornerTwoBuffer(), location);
+	                	KonKingdom kingdom = kingdomManager.getKingdom(player.getRegionKingdomName());
+	                	int createMonumentStatus = kingdom.createMonumentTemplate(player.getRegionCornerOneBuffer(), player.getRegionCornerTwoBuffer(), location);
 	                	switch(createMonumentStatus) {
 	    				case 0:
 	    					//ChatUtil.sendNotice(bukkitPlayer, "Successfully created new Monument Template for kingdom "+player.getRegionKingdomName());
 	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(player.getRegionKingdomName()));
+	    					kingdom.startMonumentBlanking();
 	    					break;
 	    				case 1:
 	    					int diffX = (int)Math.abs(player.getRegionCornerOneBuffer().getX()-player.getRegionCornerTwoBuffer().getX())+1;
@@ -712,7 +715,7 @@ public class PlayerListener implements Listener{
     	Player bukkitPlayer = event.getPlayer();
     	KonPlayer player = playerManager.getPlayer(bukkitPlayer);
     	int boostPercent = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.smallest_exp_boost_percent");
-    	if(boostPercent != 0 && player != null && player.getKingdom().isSmallest()) {
+    	if(boostPercent > 0 && player != null && player.getKingdom().isSmallest()) {
     		int baseAmount = event.getAmount();
     		int boostAmount = ((boostPercent*baseAmount)/100)+baseAmount;
     		//ChatUtil.printDebug("Boosting "+baseAmount+" exp for "+bukkitPlayer.getName()+" to "+boostAmount);

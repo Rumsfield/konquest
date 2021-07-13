@@ -8,6 +8,7 @@ import konquest.manager.PlayerManager;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
 import konquest.model.KonDirective;
+import konquest.model.KonMonumentTemplate;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
@@ -33,6 +34,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
@@ -284,6 +286,8 @@ public class BlockListener implements Listener {
 						return;
 					}
 				}
+			} else {
+				checkMonumentTemplateBlanking(event);
 			}
 		}
     }
@@ -472,6 +476,8 @@ public class BlockListener implements Listener {
 					event.setCancelled(true);
 					return;
 				}
+			} else {
+				checkMonumentTemplateBlanking(event);
 			}
 		} else {
 			// When placing blocks in the wilderness...
@@ -814,6 +820,18 @@ public class BlockListener implements Listener {
 			}
 		}
 		return result;
+	}
+	
+	private void checkMonumentTemplateBlanking(BlockEvent event) {
+		// Monitor monument templates for blanking by edits from admin bypass players
+		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getBlock().getLocation());
+		if(territory instanceof KonCapital) {
+			KonMonumentTemplate template = territory.getKingdom().getMonumentTemplate();
+			if(template != null && template.isLocInside(event.getBlock().getLocation())) {
+				// Start monument blanking timer to prevent monument pastes
+				territory.getKingdom().startMonumentBlanking();
+			}
+		}
 	}
 	
 }

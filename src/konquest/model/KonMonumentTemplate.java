@@ -76,4 +76,20 @@ public class KonMonumentTemplate {
 	public boolean hasLoot() {
 		return hasLoot;
 	}
+	
+	public boolean isLocInside(Location loc) {
+		if(isValid) {
+			int topBlockX = Math.max(corner1.getBlockX(), corner2.getBlockX());
+	        int topBlockY = Math.max(corner1.getBlockY(), corner2.getBlockY());
+	        int topBlockZ = Math.max(corner1.getBlockZ(), corner2.getBlockZ());
+	        int bottomBlockX = Math.min(corner1.getBlockX(), corner2.getBlockX());
+	        int bottomBlockY = Math.min(corner1.getBlockY(), corner2.getBlockY());
+	        int bottomBlockZ = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
+	        if(loc.getBlockX() <= topBlockX && loc.getBlockY() <= topBlockY && loc.getBlockZ() <= topBlockZ &&
+	        		loc.getBlockX() >= bottomBlockX && loc.getBlockY() >= bottomBlockY && loc.getBlockZ() >= bottomBlockZ) {
+	        	return true;
+	        }
+		}
+		return false;
+	}
 }
