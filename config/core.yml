@@ -30,6 +30,7 @@
 #  kingdoms:
 #    capital_suffix*:               Suffix to be appended to Kingdom names which will be the name of the Capital city (string)
 #    capital_pvp:                   Allow player damage in capitals (true/false)
+#    capital_use:                   Allow players to interact with blocks and containers in capitals (true/false)
 #    protect_containers_use:        Prevent players in other kingdoms using containers in claimed land (true/false)
 #    protect_containers_break:      Prevent players in other kingdoms breaking containers in claimed land (true/false)
 #    no_enemy_enter:                Prevent enemy players from entering Kingdom Capitals (true/false)
@@ -126,6 +127,7 @@ core:
   kingdoms:
     capital_suffix: Capital
     capital_pvp: false
+    capital_use: false
     protect_containers_use: true
     protect_containers_break: true
     no_enemy_enter: true

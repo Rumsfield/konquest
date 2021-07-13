@@ -390,10 +390,9 @@ public class PlayerListener implements Listener{
         		KonTerritory territory = kingdomManager.getChunkTerritory(event.getClickedBlock().getLocation());
         		// Prevent players from interacting with blocks in Capitals
         		if(territory instanceof KonCapital) {
-        			//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in the Kingdom Capital", ChatColor.DARK_RED);
-        			//ChatUtil.printDebug("EVENT player interaction within capital");
-        			// Allow interaction with signs
-        			if(!(event.getClickedBlock().getState() instanceof Sign)) {
+        			boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
+        			// Allow interaction with signs or everything when config allows it
+        			if(!(event.getClickedBlock().getState() instanceof Sign || isCapitalUseEnabled)) {
         				//ChatUtil.printDebug("Interaction was not a sign");
         				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
         				if(event.getPlayer().hasPermission("konquest.command.admin")) {
@@ -482,7 +481,9 @@ public class PlayerListener implements Listener{
     	if(ent instanceof Player && konquest.getKingdomManager().isChunkClaimed(event.getVehicle().getLocation())) {
     		KonPlayer player = konquest.getPlayerManager().getPlayer((Player)ent);
     		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getVehicle().getLocation());
-    		if(player != null && territory != null && !territory.getKingdom().equals(player.getKingdom()) && territory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    		boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
+    		if(player != null && territory != null && !territory.getKingdom().equals(player.getKingdom()) && 
+    				territory.getTerritoryType().equals(KonTerritoryType.CAPITAL) && !isCapitalUseEnabled) {
     			ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
     			event.setCancelled(true);
 				return;
@@ -542,7 +543,8 @@ public class PlayerListener implements Listener{
         if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
         	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation());
         	// Capital protections...
-        	if(territory instanceof KonCapital) {
+        	boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
+        	if(territory instanceof KonCapital && !isCapitalUseEnabled) {
     			//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in the Kingdom Capital", ChatColor.DARK_RED);
     			//ChatUtil.printDebug("EVENT player interaction within capital");
 				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -578,7 +580,8 @@ public class PlayerListener implements Listener{
         if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
         	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation());
         	// Capital protections...
-        	if(territory instanceof KonCapital) {
+        	boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
+        	if(territory instanceof KonCapital && !isCapitalUseEnabled) {
 				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
     			event.setCancelled(true);
     			return;
