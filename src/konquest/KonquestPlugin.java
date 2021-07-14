@@ -16,8 +16,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-//import org.maxgamer.quickshop.api.QuickShopAPI;
-import org.dynmap.DynmapAPI;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -32,7 +30,6 @@ public class KonquestPlugin extends JavaPlugin {
 	private static Economy econ = null;
 	private boolean enableSuccess = false;
 	private static ProtocolManager plib = null;
-	private static DynmapAPI dapi = null;
 
 	@Override
 	public void onEnable() {
@@ -56,9 +53,6 @@ public class KonquestPlugin extends JavaPlugin {
         konquest.initialize();
         // Register placeholders
         registerPlaceholders();
-        // Register Dynmap API
-        registerDynmapAPI();
-        //TODO: Render maps
         // Check for updates
         checkForUpdates();
         // Done!
@@ -87,10 +81,6 @@ public class KonquestPlugin extends JavaPlugin {
 	
 	public static ProtocolManager getProtocolManager() {
 		return plib;
-	}
-	
-	public static DynmapAPI getDynmapAPI() {
-		return dapi;
 	}
 	
 	private void registerListeners() {
@@ -129,13 +119,6 @@ public class KonquestPlugin extends JavaPlugin {
 		if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
 			new KonquestPlaceholderExpansion(this).register();
 			ChatUtil.printConsoleAlert("Successfully registered Placeholders.");
-		}
-	}
-	
-	private void registerDynmapAPI() {
-		if (getServer().getPluginManager().getPlugin("dynmap") != null) {
-			dapi = (DynmapAPI) Bukkit.getServer().getPluginManager().getPlugin("dynmap");
-			ChatUtil.printConsoleAlert("Successfully registered Dynmap.");
 		}
 	}
 	

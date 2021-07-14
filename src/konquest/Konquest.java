@@ -40,6 +40,7 @@ import konquest.manager.LootManager;
 import konquest.manager.PlayerManager;
 import konquest.manager.RuinManager;
 import konquest.manager.UpgradeManager;
+import konquest.map.MapHandler;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
@@ -75,6 +76,7 @@ public class Konquest implements Timeable {
 	private UpgradeManager upgradeManager;
 	private RuinManager ruinManager;
 	private LanguageManager languageManager;
+	private MapHandler mapHandler;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
@@ -115,6 +117,7 @@ public class Konquest implements Timeable {
 		upgradeManager = new UpgradeManager(this);
 		ruinManager = new RuinManager(this);
 		languageManager = new LanguageManager(this);
+		mapHandler = new MapHandler(this);
 		
 		//worldName = "world";
 		worlds = new ArrayList<World>();
@@ -166,6 +169,12 @@ public class Konquest implements Timeable {
 		
 		kingdomManager.updateSmallestKingdom();
 		kingdomManager.updateAllTownDisabledUpgrades();
+		
+		// Render Maps
+		mapHandler.initialize();
+		if(mapHandler.isEnabled()) {
+			mapHandler.drawDynmapArea();
+		}
 		
 		ChatUtil.printDebug("Finished Initialization");
 	}

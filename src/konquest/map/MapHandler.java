@@ -1,19 +1,38 @@
 package konquest.map;
 
+import org.bukkit.Bukkit;
 import org.dynmap.DynmapAPI;
 import org.dynmap.markers.AreaMarker;
 import org.dynmap.markers.MarkerSet;
 
-import konquest.KonquestPlugin;
+import konquest.Konquest;
+import konquest.utility.ChatUtil;
 
 public class MapHandler {
 
+	//private Konquest konquest;
+	private boolean isEnabled;
 	
-	public MapHandler() {
+	private static DynmapAPI dapi = null;
+	
+	public MapHandler(Konquest konquest) {
+		//this.konquest = konquest;
+		this.isEnabled = false;
+	}
+	
+	public void initialize() {
+		if (Bukkit.getPluginManager().getPlugin("dynmap") != null) {
+			dapi = (DynmapAPI) Bukkit.getServer().getPluginManager().getPlugin("dynmap");
+			isEnabled = true;
+			ChatUtil.printConsoleAlert("Successfully registered Dynmap.");
+		}
+	}
+	
+	public boolean isEnabled() {
+		return isEnabled;
 	}
 	
 	public void drawDynmapArea() {
-		DynmapAPI dapi = KonquestPlugin.getDynmapAPI();
 		
 		String setId = "konquest.marker.example";
 		String label = "Example Area";
