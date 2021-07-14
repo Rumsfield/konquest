@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/sqlite-jdbc-3.32.3.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/ProtocolLib.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/PlaceholderAPI-2.10.10.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/Dynmap-3.2-beta-2-spigot.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
