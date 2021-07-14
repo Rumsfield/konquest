@@ -44,6 +44,7 @@
 #    attack_friendly_golems:        Allow players to attack iron golems inside of friendly towns (true/false)
 #    max_player_diff:               Kingdoms with this many players more than other Kingdoms will not accept new players (0 to disable, integer >= 0)
 #    allow_exile_switch:            Allow barbarians to join any kingdom, even when exiled (true) or prevent exiled barbarians from switching kingdoms (false) (true/false)
+#    per_kingdom_join_permissions:  When true, players must have a permission "konquest.join.<kingdom>" to join specific kingdoms, e.g. "konquest.join.rome" to join the kingdom Rome (true/false)
 #  towns:
 #    min_settle_height:             Minimum height level for new town settlements (0 to disable, 0 - 256)
 #    max_settle_height:             Maximum height level for new town settlements (0 to disable, 0 - 256), Note, if max_settle_height is less than min_settle_height, things might break!
@@ -141,6 +142,7 @@ core:
     attack_friendly_golems: false
     max_player_diff: 4
     allow_exile_switch: true
+    per_kingdom_join_permissions: false
   towns:
     min_settle_height: 2
     max_settle_height: 200

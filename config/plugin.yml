@@ -179,3 +179,7 @@ permissions:
   konquest.compass:
     description: Compass points to nearest enemy town
     default: true
+  
+  konquest.join:
+    description: Join a kingdom
+    default: op

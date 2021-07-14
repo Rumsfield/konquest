@@ -134,11 +134,19 @@ public class KingdomManager {
 	 * 				0 = success
 	 *  			1 = kingdom name does not exist
 	 *  			2 = the kingdom is full (config option max_player_diff)
+	 *  			3 = missing permission
 	 */
-	public int assignPlayerKingdom(KonPlayer player, String kingdomName) {
+	public int assignPlayerKingdom(KonPlayer player, String kingdomName, boolean force) {
 		//TODO: Some sort of penalty for changing kingdoms, check if barbarian first
-		int status = 0;
 		if(isKingdom(kingdomName)) {
+			// Check for permission
+			boolean isPerKingdomJoin = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.per_kingdom_join_permissions",false);
+			if (isPerKingdomJoin && !force) {
+				String permission = "konquest.join."+getKingdom(kingdomName).getName().toLowerCase();
+				if(!player.getBukkitPlayer().hasPermission(permission)) {
+					return 3;
+				}
+			}
 			int config_max_player_diff = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.max_player_diff");
 			int smallestKingdomPlayerCount = 0;
 			int targetKingdomPlayerCount = 0;
@@ -149,7 +157,7 @@ public class KingdomManager {
 				targetKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(kingdomName).size();
 			}
 			// Join kingdom is max_player_diff is disabled, or if the desired kingdom is within the max diff
-			if(config_max_player_diff == 0 || 
+			if(config_max_player_diff == 0 || force ||
 					(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
 				removeCamp(player);
 				player.setKingdom(getKingdom(kingdomName));
@@ -163,12 +171,12 @@ public class KingdomManager {
 		    	konquest.getDirectiveManager().displayBook(player);
 		    	updateKingdomOfflineProtection();
 			} else {
-				status = 2;
+				return 2;
 			}
 		} else {
-			status = 1;
+			return 1;
 		}
-		return status;
+		return 0;
 	}
 	
 	/**
