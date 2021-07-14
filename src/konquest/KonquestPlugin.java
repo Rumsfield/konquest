@@ -9,6 +9,7 @@ import konquest.listener.PlayerListener;
 import konquest.listener.WorldListener;
 import konquest.utility.ChatUtil;
 import konquest.utility.Metrics;
+import konquest.utility.Updater;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -51,6 +52,8 @@ public class KonquestPlugin extends JavaPlugin {
         registerListeners();
         // Initialize core
         konquest.initialize();
+        // Check for updates
+        checkForUpdates();
         // Done!
         enableSuccess = true;
         ChatUtil.printConsoleAlert("Plugin enabled. Written by Rumsfield.");
@@ -91,7 +94,6 @@ public class KonquestPlugin extends JavaPlugin {
 	}
 	
 	private void loadMetrics() {
-		
 		try {
 			int pluginId = 11980;
 	        new Metrics(this, pluginId);
@@ -100,7 +102,18 @@ public class KonquestPlugin extends JavaPlugin {
 			ChatUtil.printConsoleError("Failed to load plugin metrics with bStats:");
 			ChatUtil.printConsoleError(e.getMessage());
 		}
-		
+	}
+	
+	private void checkForUpdates() {
+		new Updater(this, 92220).getVersion(version -> {
+            if (this.getDescription().getVersion().equalsIgnoreCase(version)) {
+            	ChatUtil.printConsoleAlert("Konquest version is up to date.");
+            } else {
+            	String message = "Konquest version "+version+" is available to download! --> https://www.spigotmc.org/resources/konquest.92220/";
+                ChatUtil.printConsoleError(message);
+                konquest.opStatusMessages.add(message);
+            }
+        });
 	}
 	
 	private boolean setupEconomy() {
