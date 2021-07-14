@@ -52,6 +52,8 @@ public class KonquestPlugin extends JavaPlugin {
         registerListeners();
         // Initialize core
         konquest.initialize();
+        // Register placeholders
+        registerPlaceholders();
         // Check for updates
         checkForUpdates();
         // Done!
@@ -95,9 +97,7 @@ public class KonquestPlugin extends JavaPlugin {
 	
 	private void loadMetrics() {
 		try {
-			int pluginId = 11980;
-	        new Metrics(this, pluginId);
-	        //Metrics metrics = new Metrics(this, pluginId);
+	        new Metrics(this, 11980);
 		} catch(Exception e) {
 			ChatUtil.printConsoleError("Failed to load plugin metrics with bStats:");
 			ChatUtil.printConsoleError(e.getMessage());
@@ -114,6 +114,13 @@ public class KonquestPlugin extends JavaPlugin {
                 konquest.opStatusMessages.add(message);
             }
         });
+	}
+	
+	private void registerPlaceholders() {
+		if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+			new KonquestPlaceholderExpansion(this).register();
+			ChatUtil.printConsoleAlert("Successfully registered Placeholders.");
+		}
 	}
 	
 	private boolean setupEconomy() {

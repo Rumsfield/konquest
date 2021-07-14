@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/LuckPerms-Bukkit-5.3.47.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/sqlite-jdbc-3.32.3.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/ProtocolLib.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/PlaceholderAPI-2.10.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
