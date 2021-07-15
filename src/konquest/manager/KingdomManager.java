@@ -1094,6 +1094,11 @@ public class KingdomManager {
 		return barbarianCamps.get(uuid);
 	}
 	
+	public ArrayList<KonCamp> getCamps() {
+		ArrayList<KonCamp> camps = new ArrayList<KonCamp>(barbarianCamps.values());
+		return camps;
+	}
+	
 	/**
 	 * addCamp - primary method for adding a camp for a barbarian
 	 * @param loc
