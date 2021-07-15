@@ -57,6 +57,10 @@ public class MapHandler {
 	}
 	
 	public void drawDynmapAllTerritories() {
+		if (!isEnabled) {
+			return;
+		}
+		
 		Date start = new Date();
 		String groupIdBase = "konquest.marker.";
 		
@@ -90,7 +94,7 @@ public class MapHandler {
 					areaCorner2 = new double[] {p.y * 16, p.y * 16 + 16};
 					AreaMarker ruinArea = ruinGroup.createAreaMarker(areaId+"."+pid, areaLabel, true, center.getWorld().getName(), areaCorner1, areaCorner2, false);
 					if (ruinArea != null) {
-						ruinArea.setFillStyle(opacity, 0x575754);
+						ruinArea.setFillStyle(opacity, 0x242424);
 						ruinArea.setLineStyle(0, 1, 0xed1a1a);
 					}
 					pid++;
