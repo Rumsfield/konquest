@@ -173,7 +173,7 @@ public class Konquest implements Timeable {
 		// Render Maps
 		mapHandler.initialize();
 		if(mapHandler.isEnabled()) {
-			mapHandler.drawDynmapArea();
+			mapHandler.drawDynmapAllTerritories();
 		}
 		
 		ChatUtil.printDebug("Finished Initialization");
