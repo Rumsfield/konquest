@@ -162,8 +162,10 @@ public class KingdomManager {
 				removeCamp(player);
 				player.setKingdom(getKingdom(kingdomName));
 		    	player.setBarbarian(false);
-		    	player.getBukkitPlayer().teleport(player.getKingdom().getCapital().getSpawnLoc());
-		    	player.getBukkitPlayer().setBedSpawnLocation(getKingdom(kingdomName).getCapital().getSpawnLoc(), true);
+		    	Location spawn = player.getKingdom().getCapital().getSpawnLoc();
+		    	Location destination = new Location(spawn.getWorld(),spawn.getX()+0.5,spawn.getY()+1.0,spawn.getZ()+0.5);
+		    	player.getBukkitPlayer().teleport(destination);
+		    	player.getBukkitPlayer().setBedSpawnLocation(destination, true);
 		    	//konquest.getPlayerManager().saveAllPlayers();
 		    	//konquest.getPlayerManager().updateAllSavedPlayers();
 		    	updateSmallestKingdom();
