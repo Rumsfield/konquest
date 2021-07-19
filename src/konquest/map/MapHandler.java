@@ -14,15 +14,21 @@ import konquest.Konquest;
 import konquest.model.KonCamp;
 import konquest.model.KonKingdom;
 import konquest.model.KonRuin;
+import konquest.model.KonTerritory;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 
 public class MapHandler {
-
+	
 	private Konquest konquest;
 	private boolean isEnabled;
 	
 	private static DynmapAPI dapi = null;
+	
+	private final int ruinColor = 0x242424;
+	private final int campColor = 0xa3a10a;
+	private final int capitalColor = 0xb942f5;
+	private final int townColor = 0xed921a;
 	
 	public MapHandler(Konquest konquest) {
 		this.konquest = konquest;
@@ -53,6 +59,36 @@ public class MapHandler {
         am.setLabel("test");
         am.setDescription("example test");
         am.setFillStyle(1, 0x42f4f1);
+		
+	}
+	
+	/*
+	 * Dynmap Area ID formats:
+	 * Ruins
+	 * 		MarkerSet Group:  konquest.marker.ruin
+	 * 		AreaMarker Areas: konquest.area.ruin.<name>.<pid>
+	 * Camps
+	 * 		MarkerSet Group:  konquest.marker.camp
+	 * 		AreaMarker Areas: konquest.area.camp.<name>.<pid>
+	 * Kingdoms
+	 * 		MarkerSet Group:  konquest.marker.<kingdom>
+	 * 		AreaMarker Areas: konquest.area.<kingdom>.capital.<pid>
+	 * 			              konquest.area.<kingdom>.<town>.<pid>
+	 */
+	
+	public void drawDynmapCreateTerritory(KonTerritory territory) {
+		
+	}
+	
+	public void drawDynmapRemoveTerritory(KonTerritory territory) {
+		
+	}
+	
+	public void drawDynmapClaimTerritory(KonTerritory territory) {
+		
+	}
+	
+	public void drawDynmapCaptureTerritory(KonTerritory territory, KonKingdom oldKingdom) {
 		
 	}
 	
@@ -94,8 +130,8 @@ public class MapHandler {
 					areaCorner2 = new double[] {p.y * 16, p.y * 16 + 16};
 					AreaMarker ruinArea = ruinGroup.createAreaMarker(areaId+"."+pid, areaLabel, true, center.getWorld().getName(), areaCorner1, areaCorner2, false);
 					if (ruinArea != null) {
-						ruinArea.setFillStyle(opacity, 0x242424);
-						ruinArea.setLineStyle(0, 1, 0xed1a1a);
+						ruinArea.setFillStyle(opacity, ruinColor);
+						ruinArea.setLineStyle(0, 1, ruinColor);
 					}
 					pid++;
 				}
@@ -118,8 +154,8 @@ public class MapHandler {
 					areaCorner2 = new double[] {p.y * 16, p.y * 16 + 16};
 					AreaMarker barbCamp = campGroup.createAreaMarker(areaId+"."+pid, areaLabel, true, center.getWorld().getName(), areaCorner1, areaCorner2, false);
 					if (barbCamp != null) {
-						barbCamp.setFillStyle(opacity, 0xa3a10a);
-						barbCamp.setLineStyle(0, 1, 0xed1a1a);
+						barbCamp.setFillStyle(opacity, campColor);
+						barbCamp.setLineStyle(0, 1, campColor);
 					}
 					pid++;
 				}
@@ -145,8 +181,8 @@ public class MapHandler {
 					areaCorner2 = new double[] {p.y * 16, p.y * 16 + 16};
 					AreaMarker kingdomCapital = kingdomGroup.createAreaMarker(areaId+"."+pid, areaLabel, true, center.getWorld().getName(), areaCorner1, areaCorner2, false);
 					if (kingdomCapital != null) {
-						kingdomCapital.setFillStyle(opacity, 0xb942f5);
-						kingdomCapital.setLineStyle(0, 1, 0xed1a1a);
+						kingdomCapital.setFillStyle(opacity, capitalColor);
+						kingdomCapital.setLineStyle(0, 1, capitalColor);
 					}
 					pid++;
 				}
@@ -163,11 +199,18 @@ public class MapHandler {
 						areaCorner2 = new double[] {p.y * 16, p.y * 16 + 16};
 						AreaMarker kingdomTown = kingdomGroup.createAreaMarker(areaId+"."+pid, areaLabel, true, center.getWorld().getName(), areaCorner1, areaCorner2, false);
 						if (kingdomTown != null) {
-							kingdomTown.setFillStyle(opacity, 0xed921a);
-							kingdomTown.setLineStyle(0, 1, 0xed1a1a);
+							kingdomTown.setFillStyle(opacity, townColor);
+							kingdomTown.setLineStyle(0, 1, townColor);
 						}
 						pid++;
 					}
+					
+					// Test multi-corner area
+					AreaTerritory at = new AreaTerritory(town);
+					AreaMarker kingdomTown2 = kingdomGroup.createAreaMarker(areaId+".alt", areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
+					kingdomTown2.setFillStyle(opacity, 0xF5472C);
+					kingdomTown2.setLineStyle(1, 1, 0x000000);
+					
 				}
 			}
 		}
