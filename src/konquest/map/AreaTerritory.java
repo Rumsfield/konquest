@@ -100,17 +100,19 @@ public class AreaTerritory {
 	 */
 	private List<Coord> sortedCoords(List<Coord> coords) {
 		List<Coord> sortedList = new ArrayList<Coord>();
-		
-		Coord current = coords.get(0);
-		sortedList.add(current);
-		int timeout = 100;
+		List<Coord> remainingCorners = new ArrayList<Coord>();
+		remainingCorners.addAll(coords);
+		Coord current = remainingCorners.get(0);
 		Coord candidate;
-		ChatUtil.printDebug("Beginning corner search for territory with "+coords.size()+" corners...");
+		remainingCorners.remove(0);
+		sortedList.add(current);
+		//ChatUtil.printDebug("Beginning corner search for territory with "+coords.size()+" corners...");
 		// Find consecutive corners
+		int timeout = 100000;
 		while(sortedList.size() < coords.size() && timeout > 0) {
-			ChatUtil.printDebug("Searching for nearest corner adjacent to "+current.toString());
+			//ChatUtil.printDebug("Searching for nearest corner adjacent to "+current.toString());
 			candidate = null;
-			for (Coord c : coords) {
+			for (Coord c : remainingCorners) {
 				if (current.isConvex) {
 					switch (current.face) {
 						case NE:
@@ -180,7 +182,7 @@ public class AreaTerritory {
 				}
 			}
 			if (candidate != null) {
-				ChatUtil.printDebug("  Found corner "+candidate.toString());
+				remainingCorners.remove(candidate);
 				sortedList.add(candidate);
 				current = candidate;
 			} else {

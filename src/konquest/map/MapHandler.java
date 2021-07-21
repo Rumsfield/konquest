@@ -1,11 +1,8 @@
 package konquest.map;
 
-import java.awt.Point;
 import java.util.Date;
-import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.dynmap.DynmapAPI;
 import org.dynmap.markers.AreaMarker;
 import org.dynmap.markers.MarkerSet;
@@ -66,14 +63,14 @@ public class MapHandler {
 	 * Dynmap Area ID formats:
 	 * Ruins
 	 * 		MarkerSet Group:  konquest.marker.ruin
-	 * 		AreaMarker Areas: konquest.area.ruin.<name>.<pid>
+	 * 		AreaMarker Areas: konquest.area.ruin.<name>
 	 * Camps
 	 * 		MarkerSet Group:  konquest.marker.camp
-	 * 		AreaMarker Areas: konquest.area.camp.<name>.<pid>
+	 * 		AreaMarker Areas: konquest.area.camp.<name>
 	 * Kingdoms
 	 * 		MarkerSet Group:  konquest.marker.<kingdom>
-	 * 		AreaMarker Areas: konquest.area.<kingdom>.capital.<pid>
-	 * 			              konquest.area.<kingdom>.<town>.<pid>
+	 * 		AreaMarker Areas: konquest.area.<kingdom>.capital
+	 * 			              konquest.area.<kingdom>.<town>
 	 */
 	
 	public void drawDynmapCreateTerritory(KonTerritory territory) {
@@ -106,11 +103,7 @@ public class MapHandler {
 		String groupLabel;
 		String areaId;
 		String areaLabel;
-		Location center;
-		double[] areaCorner1;
-		double[] areaCorner2;
-		Set<Point> chunks;
-		int pid = 0;
+		AreaTerritory at;
 		
 		final double opacity = 0.5;
 		
@@ -122,18 +115,11 @@ public class MapHandler {
 			for (KonRuin ruin : konquest.getRuinManager().getRuins()) {
 				areaId = areaIdBase + "ruin." + ruin.getName().toLowerCase();
 				areaLabel = "Ruin " + ruin.getName();
-				center = ruin.getCenterLoc();
-				chunks = ruin.getChunkList().keySet();
-				pid = 0;
-				for (Point p : chunks) {
-					areaCorner1 = new double[] {p.x * 16, p.x * 16 + 16};
-					areaCorner2 = new double[] {p.y * 16, p.y * 16 + 16};
-					AreaMarker ruinArea = ruinGroup.createAreaMarker(areaId+"."+pid, areaLabel, true, center.getWorld().getName(), areaCorner1, areaCorner2, false);
-					if (ruinArea != null) {
-						ruinArea.setFillStyle(opacity, ruinColor);
-						ruinArea.setLineStyle(0, 1, ruinColor);
-					}
-					pid++;
+				at = new AreaTerritory(ruin);
+				AreaMarker ruinArea = ruinGroup.createAreaMarker(areaId, areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
+				if (ruinArea != null) {
+					ruinArea.setFillStyle(opacity, ruinColor);
+					ruinArea.setLineStyle(1, 1, 0x000000);
 				}
 			}
 		}
@@ -145,19 +131,12 @@ public class MapHandler {
 		if (campGroup != null) {
 			for (KonCamp camp : konquest.getKingdomManager().getCamps()) {
 				areaId = areaIdBase + "camp." + camp.getName().toLowerCase();
-				areaLabel = "Barbarian Camp " + camp.getName();
-				center = camp.getCenterLoc();
-				chunks = camp.getChunkList().keySet();
-				pid = 0;
-				for (Point p : chunks) {
-					areaCorner1 = new double[] {p.x * 16, p.x * 16 + 16};
-					areaCorner2 = new double[] {p.y * 16, p.y * 16 + 16};
-					AreaMarker barbCamp = campGroup.createAreaMarker(areaId+"."+pid, areaLabel, true, center.getWorld().getName(), areaCorner1, areaCorner2, false);
-					if (barbCamp != null) {
-						barbCamp.setFillStyle(opacity, campColor);
-						barbCamp.setLineStyle(0, 1, campColor);
-					}
-					pid++;
+				areaLabel = "Barbarian " + camp.getName();
+				at = new AreaTerritory(camp);
+				AreaMarker barbCamp = campGroup.createAreaMarker(areaId, areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
+				if (barbCamp != null) {
+					barbCamp.setFillStyle(opacity, campColor);
+					barbCamp.setLineStyle(1, 1, 0x000000);
 				}
 			}
 		}
@@ -173,44 +152,22 @@ public class MapHandler {
 				// Capital
 				areaId = areaIdBase + kingdom.getName().toLowerCase() + ".capital";
 				areaLabel = kingdom.getCapital().getName();
-				center = kingdom.getCapital().getCenterLoc();
-				chunks = kingdom.getCapital().getChunkList().keySet();
-				pid = 0;
-				for (Point p : chunks) {
-					areaCorner1 = new double[] {p.x * 16, p.x * 16 + 16};
-					areaCorner2 = new double[] {p.y * 16, p.y * 16 + 16};
-					AreaMarker kingdomCapital = kingdomGroup.createAreaMarker(areaId+"."+pid, areaLabel, true, center.getWorld().getName(), areaCorner1, areaCorner2, false);
-					if (kingdomCapital != null) {
-						kingdomCapital.setFillStyle(opacity, capitalColor);
-						kingdomCapital.setLineStyle(0, 1, capitalColor);
-					}
-					pid++;
+				at = new AreaTerritory(kingdom.getCapital());
+				AreaMarker kingdomCapital = kingdomGroup.createAreaMarker(areaId, areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
+				if (kingdomCapital != null) {
+					kingdomCapital.setFillStyle(opacity, capitalColor);
+					kingdomCapital.setLineStyle(1, 1, 0x000000);
 				}
-				
 				// Towns
 				for (KonTown town : kingdom.getTowns()) {
 					areaId = areaIdBase + kingdom.getName().toLowerCase() + "." + town.getName().toLowerCase();
 					areaLabel = kingdom.getName() + " " + town.getName();
-					center = town.getCenterLoc();
-					chunks = town.getChunkList().keySet();
-					pid = 0;
-					for (Point p : chunks) {
-						areaCorner1 = new double[] {p.x * 16, p.x * 16 + 16};
-						areaCorner2 = new double[] {p.y * 16, p.y * 16 + 16};
-						AreaMarker kingdomTown = kingdomGroup.createAreaMarker(areaId+"."+pid, areaLabel, true, center.getWorld().getName(), areaCorner1, areaCorner2, false);
-						if (kingdomTown != null) {
-							kingdomTown.setFillStyle(opacity, townColor);
-							kingdomTown.setLineStyle(0, 1, townColor);
-						}
-						pid++;
+					at = new AreaTerritory(town);
+					AreaMarker kingdomTown = kingdomGroup.createAreaMarker(areaId, areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
+					if (kingdomTown != null) {
+						kingdomTown.setFillStyle(opacity, townColor);
+						kingdomTown.setLineStyle(1, 1, 0x000000);
 					}
-					
-					// Test multi-corner area
-					AreaTerritory at = new AreaTerritory(town);
-					AreaMarker kingdomTown2 = kingdomGroup.createAreaMarker(areaId+".alt", areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
-					kingdomTown2.setFillStyle(opacity, 0xF5472C);
-					kingdomTown2.setLineStyle(1, 1, 0x000000);
-					
 				}
 			}
 		}
