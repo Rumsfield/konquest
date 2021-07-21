@@ -106,11 +106,11 @@ public class AreaTerritory {
 		Coord candidate;
 		remainingCorners.remove(0);
 		sortedList.add(current);
-		//ChatUtil.printDebug("Beginning corner search for territory with "+coords.size()+" corners...");
+		ChatUtil.printDebug("Beginning corner search for territory with "+coords.size()+" corners...");
 		// Find consecutive corners
-		int timeout = 100000;
-		while(sortedList.size() < coords.size() && timeout > 0) {
-			//ChatUtil.printDebug("Searching for nearest corner adjacent to "+current.toString());
+		boolean isSearchSuccessful = true;
+		while(sortedList.size() < coords.size() && isSearchSuccessful) {
+			ChatUtil.printDebug("Searching for nearest corner adjacent to "+current.toString());
 			candidate = null;
 			for (Coord c : remainingCorners) {
 				if (current.isConvex) {
@@ -185,13 +185,11 @@ public class AreaTerritory {
 				remainingCorners.remove(candidate);
 				sortedList.add(candidate);
 				current = candidate;
+				ChatUtil.printDebug("  Found next corner: "+candidate.toString());
 			} else {
-				ChatUtil.printDebug("  Could not find corner!");
+				isSearchSuccessful = false;
+				ChatUtil.printDebug("Could not find corner! Stopping search.");
 			}
-			timeout--;
-		}
-		if(timeout <= 0) {
-			ChatUtil.printDebug("Area corner search timed out!");
 		}
 		
 		return sortedList;
