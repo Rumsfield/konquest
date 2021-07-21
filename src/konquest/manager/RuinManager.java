@@ -119,6 +119,7 @@ public class RuinManager {
 			ruinMap.put(nameLower, new KonRuin(loc, name, kingdomManager.getNeutrals(), konquest));
 			ruinMap.get(nameLower).initClaim();
 			kingdomManager.addAllTerritory(loc.getWorld(),ruinMap.get(nameLower).getChunkList());
+			konquest.getMapHandler().drawDynmapUpdateTerritory(ruinMap.get(nameLower));
 			result = true;
 		}
 		return result;
@@ -131,6 +132,7 @@ public class RuinManager {
 			oldRuin.removeAllBarPlayers();
 			oldRuin.removeAllGolems();
 			kingdomManager.removeAllTerritory(oldRuin.getCenterLoc().getWorld(), oldRuin.getChunkList().keySet());
+			konquest.getMapHandler().drawDynmapRemoveTerritory(oldRuin);
 			ChatUtil.printDebug("Removed Ruin "+name);
 			oldRuin = null;
 			result = true;

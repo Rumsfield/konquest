@@ -99,6 +99,7 @@ public class KingdomManager {
 			kingdomMap.get(name).initCapital();
 			//updateTerritoryCache();
 			addAllTerritory(loc.getWorld(),kingdomMap.get(name).getCapital().getChunkList());
+			konquest.getMapHandler().drawDynmapUpdateTerritory(kingdomMap.get(name).getCapital());
 			//ChatUtil.printDebug("Added new Kingdom "+name);
 			return true;
 		}
@@ -110,6 +111,7 @@ public class KingdomManager {
 		if(oldKingdom != null) {
 			//updateTerritoryCache();
 			removeAllTerritory(oldKingdom.getCapital().getWorld(),oldKingdom.getCapital().getChunkList().keySet());
+			konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
 			ChatUtil.printDebug("Removed Kingdom "+name);
 			return true;
 		}
@@ -121,6 +123,10 @@ public class KingdomManager {
 			getKingdom(oldName).setName(newName);
 			KonKingdom kingdom = kingdomMap.remove(oldName);
 			kingdomMap.put(newName, kingdom);
+			konquest.getMapHandler().drawDynmapRefreshTerritory(kingdom.getCapital());
+			for (KonTown town : kingdom.getTowns()) {
+				konquest.getMapHandler().drawDynmapRefreshTerritory(town);
+			}
 			return true;
 		}
 		return false;
@@ -310,6 +316,7 @@ public class KingdomManager {
 						// When a town is added successfully, update the chunk cache
 						//updateTerritoryCache();
 						addAllTerritory(loc.getWorld(),getKingdom(kingdomName).getTown(name).getChunkList());
+						konquest.getMapHandler().drawDynmapUpdateTerritory(getKingdom(kingdomName).getTown(name));
 						return 0;
 					} else {
 						// Remove town if init fails, exit code 10+
@@ -341,7 +348,31 @@ public class KingdomManager {
 				// When a town is removed successfully, update the chunk cache
 				//updateTerritoryCache();
 				removeAllTerritory(town.getWorld(),townPoints);
+				konquest.getMapHandler().drawDynmapRemoveTerritory(town);
 				konquest.getIntegrationManager().deleteShopsInPoints(townPoints,town.getWorld());
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * Primary method for renaming a town
+	 * @param oldName
+	 * @param newName
+	 * @param kingdomName
+	 * @return
+	 */
+	public boolean renameTown(String oldName, String newName, String kingdomName) {
+		if(isKingdom(kingdomName) && getKingdom(kingdomName).hasTown(oldName)) {
+			KonKingdom kingdom = getKingdom(kingdomName);
+			boolean success = kingdom.renameTown(oldName, newName);
+			if (success) {
+				KonTown town = kingdom.getTown(newName);
+				if (town != null) {
+					konquest.getMapHandler().drawDynmapRefreshTerritory(town);
+				}
 				return true;
 			}
 		}
@@ -372,6 +403,7 @@ public class KingdomManager {
 			refreshTownNerfs(conquerPlayer.getKingdom().getTown(name));
 			refreshTownHearts(conquerPlayer.getKingdom().getTown(name));
 			conquerPlayer.getKingdom().getTown(name).updateBarPlayers();
+			konquest.getMapHandler().drawDynmapRefreshTerritory(conquerPlayer.getKingdom().getTown(name));
 			konquest.getIntegrationManager().deleteShopsInPoints(conquerPlayer.getKingdom().getTown(name).getChunkList().keySet(),conquerPlayer.getKingdom().getTown(name).getWorld());
 			return true;
 		}
@@ -413,6 +445,7 @@ public class KingdomManager {
 			Point addPoint = konquest.toPoint(loc);
 			if(closestAdjTerr.getWorld().equals(loc.getWorld()) && closestAdjTerr.addChunk(addPoint)) {
 				addTerritory(loc.getWorld(),addPoint,closestAdjTerr);
+				konquest.getMapHandler().drawDynmapUpdateTerritory(closestAdjTerr);
 				return 0;
 			} else {
 				return 2;
@@ -621,6 +654,7 @@ public class KingdomManager {
     		}
     		konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CLAIM_LAND);
     		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,numChunksClaimed);
+    		konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
     		String territoryName = territory.getName();
     		// Display town info to players in the newly claimed chunks
     		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
@@ -668,9 +702,11 @@ public class KingdomManager {
 	 */
 	public boolean unclaimChunk(Location loc) {
 		if(isChunkClaimed(loc)) {
-			if(getChunkTerritory(loc).removeChunk(loc)) {
+			KonTerritory territory = getChunkTerritory(loc);
+			if(territory.removeChunk(loc)) {
 				//updateTerritoryCache();
 				removeTerritory(loc);
+				konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
 				return true;
 			}
 		}
@@ -1132,7 +1168,7 @@ public class KingdomManager {
 			newCamp.initClaim();
 			//update the chunk cache, add points to primary world cache
 			addAllTerritory(loc.getWorld(),newCamp.getChunkList());
-			//updateTerritoryCache();
+			konquest.getMapHandler().drawDynmapUpdateTerritory(newCamp);
 		} else {
 			return 2;
 		}
@@ -1153,6 +1189,8 @@ public class KingdomManager {
 			//update the chunk cache, remove all points from primary world
 			//updateTerritoryCache();
 			removeAllTerritory(removedCamp.getWorld(),removedCamp.getChunkList().keySet());
+			konquest.getMapHandler().drawDynmapRemoveTerritory(removedCamp);
+			removedCamp = null;
 		} else {
 			ChatUtil.printDebug("Failed to remove camp for missing UUID "+uuid);
 			return false;

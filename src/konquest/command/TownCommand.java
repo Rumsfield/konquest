@@ -471,7 +471,8 @@ public class TownCommand extends CommandBase {
 	    				}
 	    			}
 	        		// Rename the town
-	        		boolean success = player.getKingdom().renameTown(townName, newTownName);
+	        		//boolean success = player.getKingdom().renameTown(townName, newTownName);
+	        		boolean success = getKonquest().getKingdomManager().renameTown(townName, newTownName, town.getKingdom().getName());
 	        		if(success) {
 	        			for(OfflinePlayer resident : town.getPlayerResidents()) {
 			    			if(resident.isOnline()) {

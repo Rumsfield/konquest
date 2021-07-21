@@ -26,6 +26,7 @@ public class MapHandler {
 	private final int campColor = 0xa3a10a;
 	private final int capitalColor = 0xb942f5;
 	private final int townColor = 0xed921a;
+	private final int lineColor = 0x000000; //0xFF2828;
 	
 	public MapHandler(Konquest konquest) {
 		this.konquest = konquest;
@@ -44,21 +45,6 @@ public class MapHandler {
 		return isEnabled;
 	}
 	
-	public void drawDynmapArea() {
-		
-		String setId = "konquest.marker.example";
-		String label = "Example Area";
-		MarkerSet markerset = dapi.getMarkerAPI().createMarkerSet(setId, label, dapi.getMarkerAPI().getMarkerIcons(), false);
-        
-		String areaId = "konquest.area.example";
-        AreaMarker am = markerset.createAreaMarker(areaId, label, true, "world", new double[] {-50, -9}, new double[] {-720, -679}, false);
-
-        am.setLabel("test");
-        am.setDescription("example test");
-        am.setFillStyle(1, 0x42f4f1);
-		
-	}
-	
 	/*
 	 * Dynmap Area ID formats:
 	 * Ruins
@@ -73,20 +59,81 @@ public class MapHandler {
 	 * 			              konquest.area.<kingdom>.<town>
 	 */
 	
-	public void drawDynmapCreateTerritory(KonTerritory territory) {
+	/**
+	 * Draws a territory with Dynmap, when created or updated
+	 * @param territory
+	 */
+	public void drawDynmapUpdateTerritory(KonTerritory territory) {
+		if (!isEnabled) {
+			return;
+		}
+		
+		if (!isTerritoryValid(territory)) {
+			ChatUtil.printDebug("Could not draw territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
+			return;
+		}
+
+		String groupId = getGroupId(territory);
+		String groupLabel = getGroupLabel(territory);
+		String areaId = getAreaId(territory);
+		String areaLabel = getAreaLabel(territory);
+		int areaColor = getAreaColor(territory);
+		
+		MarkerSet territoryGroup = dapi.getMarkerAPI().getMarkerSet(groupId);
+		if (territoryGroup == null) {
+			territoryGroup = dapi.getMarkerAPI().createMarkerSet(groupId, groupLabel, dapi.getMarkerAPI().getMarkerIcons(), false);
+		}
+		AreaMarker territoryArea = territoryGroup.findAreaMarker(areaId);
+		AreaTerritory drawArea = new AreaTerritory(territory);
+		if (territoryArea == null) {
+			// Area does not exist, create new
+			AreaMarker newArea = territoryGroup.createAreaMarker(areaId, areaLabel, true, drawArea.getWorldName(), drawArea.getXCorners(), drawArea.getZCorners(), false);
+			if (newArea != null) {
+				newArea.setFillStyle(0.5, areaColor);
+				newArea.setLineStyle(1, 1, lineColor);
+			}
+		} else {
+			// Area already exists, update corners
+			territoryArea.setCornerLocations(drawArea.getXCorners(), drawArea.getZCorners());
+		}
 		
 	}
 	
+	/**
+	 * Deletes a territory with Dynmap, when destroyed or removed
+	 * @param territory
+	 */
 	public void drawDynmapRemoveTerritory(KonTerritory territory) {
+		if (!isEnabled) {
+			return;
+		}
+		
+		if (!isTerritoryValid(territory)) {
+			ChatUtil.printDebug("Could not delete territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
+			return;
+		}
+		
+		String groupId = getGroupId(territory);
+		String areaId = getAreaId(territory);
+		
+		MarkerSet territoryGroup = dapi.getMarkerAPI().getMarkerSet(groupId);
+		if (territoryGroup != null) {
+			AreaMarker territoryArea = territoryGroup.findAreaMarker(areaId);
+			if (territoryArea != null) {
+				// Delete area from group
+				territoryArea.deleteMarker();
+			}
+			if (territoryGroup.getAreaMarkers().isEmpty()) {
+				// Delete group if no more areas
+				territoryGroup.deleteMarkerSet();
+			}
+		}
 		
 	}
 	
-	public void drawDynmapClaimTerritory(KonTerritory territory) {
-		
-	}
-	
-	public void drawDynmapCaptureTerritory(KonTerritory territory, KonKingdom oldKingdom) {
-		
+	public void drawDynmapRefreshTerritory(KonTerritory territory) {
+		drawDynmapRemoveTerritory(territory);
+		drawDynmapUpdateTerritory(territory);
 	}
 	
 	public void drawDynmapAllTerritories() {
@@ -119,7 +166,7 @@ public class MapHandler {
 				AreaMarker ruinArea = ruinGroup.createAreaMarker(areaId, areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
 				if (ruinArea != null) {
 					ruinArea.setFillStyle(opacity, ruinColor);
-					ruinArea.setLineStyle(1, 1, 0x000000);
+					ruinArea.setLineStyle(1, 1, lineColor);
 				}
 			}
 		}
@@ -136,7 +183,7 @@ public class MapHandler {
 				AreaMarker barbCamp = campGroup.createAreaMarker(areaId, areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
 				if (barbCamp != null) {
 					barbCamp.setFillStyle(opacity, campColor);
-					barbCamp.setLineStyle(1, 1, 0x000000);
+					barbCamp.setLineStyle(1, 1, lineColor);
 				}
 			}
 		}
@@ -145,7 +192,7 @@ public class MapHandler {
 		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
 			
 			groupId = groupIdBase + kingdom.getName().toLowerCase();
-			groupLabel = "Konquest "+kingdom.getName();
+			groupLabel = "Konquest Kingdom "+kingdom.getName();
 			MarkerSet kingdomGroup = dapi.getMarkerAPI().createMarkerSet(groupId, groupLabel, dapi.getMarkerAPI().getMarkerIcons(), false);
 			
 			if (kingdomGroup != null) {
@@ -156,7 +203,7 @@ public class MapHandler {
 				AreaMarker kingdomCapital = kingdomGroup.createAreaMarker(areaId, areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
 				if (kingdomCapital != null) {
 					kingdomCapital.setFillStyle(opacity, capitalColor);
-					kingdomCapital.setLineStyle(1, 1, 0x000000);
+					kingdomCapital.setLineStyle(1, 1, lineColor);
 				}
 				// Towns
 				for (KonTown town : kingdom.getTowns()) {
@@ -166,7 +213,7 @@ public class MapHandler {
 					AreaMarker kingdomTown = kingdomGroup.createAreaMarker(areaId, areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
 					if (kingdomTown != null) {
 						kingdomTown.setFillStyle(opacity, townColor);
-						kingdomTown.setLineStyle(1, 1, 0x000000);
+						kingdomTown.setLineStyle(1, 1, lineColor);
 					}
 				}
 			}
@@ -178,5 +225,129 @@ public class MapHandler {
 		
 	}
 	
+	private String getGroupId(KonTerritory territory) {
+		String result = "konquest";
+		switch (territory.getTerritoryType()) {
+			case RUIN:
+				result = result+".marker.ruin";
+				break;
+			case CAMP:
+				result = result+".marker.camp";
+				break;
+			case CAPITAL:
+				result = result+".marker."+territory.getKingdom().getName().toLowerCase();
+				break;
+			case TOWN:
+				result = result+".marker."+territory.getKingdom().getName().toLowerCase();
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
 	
+	private String getGroupLabel(KonTerritory territory) {
+		String result = "Konquest";
+		switch (territory.getTerritoryType()) {
+			case RUIN:
+				result = "Konquest Ruins";
+				break;
+			case CAMP:
+				result = "Konquest Barbarian Camps";
+				break;
+			case CAPITAL:
+				result = "Konquest Kingdom "+territory.getKingdom().getName();
+				break;
+			case TOWN:
+				result = "Konquest Kingdom "+territory.getKingdom().getName();
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
+	
+	private String getAreaId(KonTerritory territory) {
+		String result = "konquest";
+		switch (territory.getTerritoryType()) {
+			case RUIN:
+				result = result+".area.ruin."+territory.getName().toLowerCase();
+				break;
+			case CAMP:
+				result = result+".area.camp."+territory.getName().toLowerCase();
+				break;
+			case CAPITAL:
+				result = result+".area."+territory.getKingdom().getName().toLowerCase()+".capital";
+				break;
+			case TOWN:
+				result = result+".area."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase();
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
+	
+	private String getAreaLabel(KonTerritory territory) {
+		String result = "Konquest";
+		switch (territory.getTerritoryType()) {
+			case RUIN:
+				result = "Ruin "+territory.getName();
+				break;
+			case CAMP:
+				result = "Barbarian "+territory.getName();
+				break;
+			case CAPITAL:
+				result = territory.getKingdom().getName();
+				break;
+			case TOWN:
+				result = territory.getKingdom().getName()+" "+territory.getName();
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
+	
+	private int getAreaColor(KonTerritory territory) {
+		int result = 0xFFFFFF;
+		switch (territory.getTerritoryType()) {
+			case RUIN:
+				result = ruinColor;
+				break;
+			case CAMP:
+				result = campColor;
+				break;
+			case CAPITAL:
+				result = capitalColor;
+				break;
+			case TOWN:
+				result = townColor;
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
+	
+	private boolean isTerritoryValid(KonTerritory territory) {
+		boolean result = false;
+		switch (territory.getTerritoryType()) {
+			case RUIN:
+				result = true;
+				break;
+			case CAMP:
+				result = true;
+				break;
+			case CAPITAL:
+				result = true;
+				break;
+			case TOWN:
+				result = true;
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
 }
