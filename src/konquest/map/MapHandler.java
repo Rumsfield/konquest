@@ -59,6 +59,8 @@ public class MapHandler {
 	 * 			              konquest.area.<kingdom>.<town>
 	 */
 	
+	//TODO: Make land area (AreaMarkers) descriptions HTML markup
+	
 	/**
 	 * Draws a territory with Dynmap, when created or updated
 	 * @param territory

@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.Set;
 
 import konquest.model.KonTerritory;
-import konquest.utility.ChatUtil;
+//import konquest.utility.ChatUtil;
+
+//TODO: X and Z corner double[]'s are primary boundary contour. Internal unclaimed points yield secondary contours within primary area that will
+// be shaded white. These dead zones will be kept in a collection that can be used to spawn secondary AreaMarkers to mark the unclaimed pockets.
 
 public class AreaTerritory {
 
@@ -93,7 +96,7 @@ public class AreaTerritory {
 	}
 	
 	/**
-	 * Search pattern:
+	 * Search pattern: Start at x-most corner and move clockwise along contour
 	 * 		
 	 * @param coords
 	 * @return
@@ -102,15 +105,21 @@ public class AreaTerritory {
 		List<Coord> sortedList = new ArrayList<Coord>();
 		List<Coord> remainingCorners = new ArrayList<Coord>();
 		remainingCorners.addAll(coords);
+		// Find max x corner
 		Coord current = remainingCorners.get(0);
+		for (Coord c : remainingCorners) {
+			if (c.x > current.x) {
+				current = c;
+			}
+		}
 		Coord candidate;
-		remainingCorners.remove(0);
+		remainingCorners.remove(current);
 		sortedList.add(current);
-		ChatUtil.printDebug("Beginning corner search for territory with "+coords.size()+" corners...");
+		//ChatUtil.printDebug("Beginning corner search for territory with "+coords.size()+" corners...");
 		// Find consecutive corners
 		boolean isSearchSuccessful = true;
 		while(sortedList.size() < coords.size() && isSearchSuccessful) {
-			ChatUtil.printDebug("Searching for nearest corner adjacent to "+current.toString());
+			//ChatUtil.printDebug("Searching for nearest corner adjacent to "+current.toString());
 			candidate = null;
 			for (Coord c : remainingCorners) {
 				if (current.isConvex) {
@@ -185,10 +194,10 @@ public class AreaTerritory {
 				remainingCorners.remove(candidate);
 				sortedList.add(candidate);
 				current = candidate;
-				ChatUtil.printDebug("  Found next corner: "+candidate.toString());
+				//ChatUtil.printDebug("  Found next corner: "+candidate.toString());
 			} else {
 				isSearchSuccessful = false;
-				ChatUtil.printDebug("Could not find corner! Stopping search.");
+				//ChatUtil.printDebug("Could not find corner! Stopping search.");
 			}
 		}
 		
