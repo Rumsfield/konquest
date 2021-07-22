@@ -276,7 +276,7 @@ public class Konquest implements Timeable {
     			KonRuin ruin = (KonRuin) loginTerritory;
     			ruin.addBarPlayer(player);
     			ruin.spawnAllGolems();
-    		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+    		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
     			// Player joined located within a Capital
     			KonCapital capital = (KonCapital) loginTerritory;
     			capital.addBarPlayer(player);

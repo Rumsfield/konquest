@@ -17,7 +17,7 @@ public class KonCapital extends KonTerritory{
 	
 	public KonCapital(Location loc, KonKingdom kingdom, Konquest konquest) {
 		super(loc, kingdom.getName()+" "+konquest.getConfigManager().getConfig("core").getString("core.kingdoms.capital_suffix"), kingdom, KonTerritoryType.CAPITAL, konquest);
-		this.capitalBarAll = Bukkit.getServer().createBossBar(ChatColor.LIGHT_PURPLE+getName(), BarColor.WHITE, BarStyle.SOLID);
+		this.capitalBarAll = Bukkit.getServer().createBossBar(ChatColor.DARK_AQUA+getName(), BarColor.WHITE, BarStyle.SOLID);
 		this.capitalBarAll.setVisible(true);
 	}
 
