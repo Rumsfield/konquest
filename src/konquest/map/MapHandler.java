@@ -141,13 +141,6 @@ public class MapHandler {
 		
 	}
 	
-	/*
-	public void drawDynmapRefreshTerritory(KonTerritory territory) {
-		drawDynmapRemoveTerritory(territory);
-		drawDynmapUpdateTerritory(territory);
-	}
-	*/
-	
 	public void postDynmapBroadcast(String message) {
 		if (!isEnabled) {
 			return;
@@ -155,6 +148,37 @@ public class MapHandler {
 		dapi.sendBroadcastToWeb("Konquest", message);
 	}
 	
+	public void drawDynmapAllTerritories() {
+		if (!isEnabled) {
+			return;
+		}
+		Date start = new Date();
+		
+		// Ruins
+		for (KonRuin ruin : konquest.getRuinManager().getRuins()) {
+			drawDynmapUpdateTerritory(ruin);
+		}
+		
+		// Camps
+		for (KonCamp camp : konquest.getKingdomManager().getCamps()) {
+			drawDynmapUpdateTerritory(camp);
+		}
+		
+		// Kingdoms
+		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+			drawDynmapUpdateTerritory(kingdom.getCapital());
+			// Towns
+			for (KonTown town : kingdom.getTowns()) {
+				drawDynmapUpdateTerritory(town);
+			}
+		}
+		
+		Date end = new Date();
+		int time = (int)(end.getTime() - start.getTime());
+		ChatUtil.printDebug("Drawing all territory in Dynmap took "+time+" ms");
+	}
+	
+	/*
 	public void drawDynmapAllTerritories() {
 		if (!isEnabled) {
 			return;
@@ -243,6 +267,7 @@ public class MapHandler {
 		ChatUtil.printDebug("Drawing all territory in Dynmap took "+time+" ms");
 		
 	}
+	*/
 	
 	private String getGroupId(KonTerritory territory) {
 		String result = "konquest";
