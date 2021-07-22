@@ -1196,8 +1196,8 @@ public class KingdomManager {
 			campPoints.addAll(barbarianCamps.get(uuid).getChunkList().keySet());
 			konquest.getIntegrationManager().deleteShopsInPoints(campPoints,barbarianCamps.get(uuid).getWorld());
 			KonCamp removedCamp = barbarianCamps.remove(uuid);
+			removedCamp.removeAllBarPlayers();
 			//update the chunk cache, remove all points from primary world
-			//updateTerritoryCache();
 			removeAllTerritory(removedCamp.getWorld(),removedCamp.getChunkList().keySet());
 			konquest.getMapHandler().drawDynmapRemoveTerritory(removedCamp);
 			removedCamp = null;

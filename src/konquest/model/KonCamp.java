@@ -2,8 +2,12 @@ package konquest.model;
 
 import java.awt.Point;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 
 import konquest.Konquest;
@@ -27,6 +31,8 @@ public class KonCamp extends KonTerritory implements Timeable {
 		this.raidAlertTimer = new Timer(this);
 		this.isRaidAlertDisabled = false;
 		this.bedLocation = loc;
+		this.campBarAll = Bukkit.getServer().createBossBar(ChatColor.YELLOW+getName(), BarColor.WHITE, BarStyle.SOLID);
+		this.campBarAll.setVisible(true);
 	}
 
 	/**
@@ -91,6 +97,18 @@ public class KonCamp extends KonTerritory implements Timeable {
 		} else {
 			ChatUtil.printDebug("Town Timer ended with unknown taskID: "+taskID);
 		}
+	}
+	
+	public void addBarPlayer(KonPlayer player) {
+		campBarAll.addPlayer(player.getBukkitPlayer());
+	}
+	
+	public void removeBarPlayer(KonPlayer player) {
+		campBarAll.removePlayer(player.getBukkitPlayer());
+	}
+	
+	public void removeAllBarPlayers() {
+		campBarAll.removeAll();
 	}
 
 }

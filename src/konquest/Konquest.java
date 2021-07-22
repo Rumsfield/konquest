@@ -41,6 +41,7 @@ import konquest.manager.PlayerManager;
 import konquest.manager.RuinManager;
 import konquest.manager.UpgradeManager;
 import konquest.map.MapHandler;
+import konquest.model.KonCamp;
 import konquest.model.KonCapital;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
@@ -279,6 +280,10 @@ public class Konquest implements Timeable {
     			// Player joined located within a Capital
     			KonCapital capital = (KonCapital) loginTerritory;
     			capital.addBarPlayer(player);
+    		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+    			// Player joined located within a Camp
+    			KonCamp camp = (KonCamp) loginTerritory;
+    			camp.addBarPlayer(player);
     		}
 		} else {
 			// Player joined located outside of a Town

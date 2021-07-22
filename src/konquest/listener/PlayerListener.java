@@ -5,6 +5,7 @@ import konquest.KonquestPlugin;
 import konquest.event.KonquestEnterTerritoryEvent;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
+import konquest.model.KonCamp;
 import konquest.model.KonCapital;
 import konquest.model.KonKingdom;
 import konquest.model.KonPlayer;
@@ -698,6 +699,8 @@ public class PlayerListener implements Listener{
 				((KonRuin) territoryFrom).removeBarPlayer(player);
 			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
 				((KonCapital) territoryFrom).removeBarPlayer(player);
+			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+				((KonCamp) territoryFrom).removeBarPlayer(player);
 			}
 			// Remove potion effects for all players
 			kingdomManager.clearTownNerf(player);
@@ -712,6 +715,8 @@ public class PlayerListener implements Listener{
 				((KonRuin) territoryTo).addBarPlayer(player);
 			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
 				((KonCapital) territoryTo).addBarPlayer(player);
+			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+				((KonCamp) territoryTo).addBarPlayer(player);
 			}
 		}
     }
@@ -903,6 +908,8 @@ public class PlayerListener implements Listener{
         				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
         			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
         				((KonCapital) territoryFrom).removeBarPlayer(player);
+        			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+        				((KonCamp) territoryFrom).removeBarPlayer(player);
         			}
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
@@ -938,6 +945,8 @@ public class PlayerListener implements Listener{
     	    				((KonRuin) territoryTo).addBarPlayer(player);
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
     	    				((KonCapital) territoryTo).addBarPlayer(player);
+    	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+    	    				((KonCamp) territoryTo).addBarPlayer(player);
     	    			}
                     }
         		} else if(isTerritoryTo && isTerritoryFrom) { // When moving between two claimed territories
