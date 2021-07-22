@@ -696,6 +696,8 @@ public class PlayerListener implements Listener{
 				updateGolemTargetsForTerritory(territoryFrom,player,false);
 			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
 				((KonRuin) territoryFrom).removeBarPlayer(player);
+			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+				((KonCapital) territoryFrom).removeBarPlayer(player);
 			}
 			// Remove potion effects for all players
 			kingdomManager.clearTownNerf(player);
@@ -708,6 +710,8 @@ public class PlayerListener implements Listener{
 				updateGolemTargetsForTerritory(territoryTo,player,true);
 			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
 				((KonRuin) territoryTo).addBarPlayer(player);
+			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+				((KonCapital) territoryTo).addBarPlayer(player);
 			}
 		}
     }
@@ -897,6 +901,8 @@ public class PlayerListener implements Listener{
         			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         				((KonRuin) territoryFrom).removeBarPlayer(player);
         				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
+        			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+        				((KonCapital) territoryFrom).removeBarPlayer(player);
         			}
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
@@ -930,6 +936,8 @@ public class PlayerListener implements Listener{
     						updateGolemTargetsForTerritory(territoryTo,player,true);
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
     	    				((KonRuin) territoryTo).addBarPlayer(player);
+    	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    	    				((KonCapital) territoryTo).addBarPlayer(player);
     	    			}
                     }
         		} else if(isTerritoryTo && isTerritoryFrom) { // When moving between two claimed territories

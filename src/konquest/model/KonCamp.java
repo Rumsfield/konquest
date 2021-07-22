@@ -4,6 +4,7 @@ import java.awt.Point;
 
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.boss.BossBar;
 
 import konquest.Konquest;
 import konquest.utility.ChatUtil;
@@ -17,9 +18,10 @@ public class KonCamp extends KonTerritory implements Timeable {
 	private Timer raidAlertTimer;
 	private boolean isRaidAlertDisabled;
 	private Location bedLocation;
+	private BossBar campBarAll;
 	
 	public KonCamp(Location loc, OfflinePlayer owner, KonKingdom kingdom, Konquest konquest) {
-		super(loc, MessagePath.LABEL_CAMP.getMessage().trim()+"_"+owner.getName(), konquest.getKingdomManager().getBarbarians(), KonTerritoryType.CAMP, konquest);
+		super(loc, MessagePath.LABEL_CAMP.getMessage().trim()+"_"+owner.getName(), kingdom, KonTerritoryType.CAMP, konquest);
 		
 		this.owner = owner;
 		this.raidAlertTimer = new Timer(this);

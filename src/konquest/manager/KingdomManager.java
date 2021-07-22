@@ -109,9 +109,10 @@ public class KingdomManager {
 	public boolean removeKingdom(String name) {
 		KonKingdom oldKingdom = kingdomMap.remove(name);
 		if(oldKingdom != null) {
-			//updateTerritoryCache();
+			oldKingdom.getCapital().removeAllBarPlayers();
 			removeAllTerritory(oldKingdom.getCapital().getWorld(),oldKingdom.getCapital().getChunkList().keySet());
 			konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
+			oldKingdom = null;
 			ChatUtil.printDebug("Removed Kingdom "+name);
 			return true;
 		}
@@ -1545,7 +1546,7 @@ public class KingdomManager {
 				Color renderColor;
 				if(chunkKingdom.equals(getBarbarians())) {
 					renderColor = Color.YELLOW;
-				} if(chunkKingdom.equals(getNeutrals())) {
+				} else if(chunkKingdom.equals(getNeutrals())) {
 					renderColor = Color.GRAY;
 				} else {
 					if(player.getKingdom().equals(chunkKingdom)) {
