@@ -374,11 +374,11 @@ public class KingdomManager {
 	public boolean renameTown(String oldName, String newName, String kingdomName) {
 		if(isKingdom(kingdomName) && getKingdom(kingdomName).hasTown(oldName)) {
 			KonKingdom kingdom = getKingdom(kingdomName);
+			konquest.getMapHandler().drawDynmapRemoveTerritory(kingdom.getTown(oldName));
 			boolean success = kingdom.renameTown(oldName, newName);
 			if (success) {
 				KonTown town = kingdom.getTown(newName);
 				if (town != null) {
-					konquest.getMapHandler().drawDynmapRemoveTerritory(town);
 					konquest.getMapHandler().drawDynmapUpdateTerritory(town);
 				}
 				return true;
