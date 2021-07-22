@@ -2021,10 +2021,14 @@ public class KingdomManager {
             		z = sectionList.get(2);
             		World world = Bukkit.getWorld(worldName);
                 	Location camp_center = new Location(world,x,y,z);
-            		addCamp(camp_center, offlinePlayer);
-            		getCamp(offlinePlayer).addPoints(konquest.formatStringToPoints(playerCampSection.getString("chunks")));
-            		addAllTerritory(world,getCamp(offlinePlayer).getChunkList());
-            		totalCamps++;
+            		int status = addCamp(camp_center, offlinePlayer);
+            		if(status == 0) {
+	            		getCamp(offlinePlayer).addPoints(konquest.formatStringToPoints(playerCampSection.getString("chunks")));
+	            		addAllTerritory(world,getCamp(offlinePlayer).getChunkList());
+	            		totalCamps++;
+            		} else {
+            			ChatUtil.printDebug("Failed to add camp for player "+offlineBukkitPlayer.getName()+", error code: "+status);
+            		}
         		} else {
         			if(offlineBukkitPlayer != null) {
         				ChatUtil.printDebug("Failed to find player "+offlineBukkitPlayer.getName()+" when adding their camp");
@@ -2040,100 +2044,93 @@ public class KingdomManager {
 	
 	//TODO Save and update only items which have changed, do not delete everything and write all from memory
 	public void saveKingdoms() {
-		// This is a lame way to try to ensure that the kingdom map was initialized, and to avoid erasing the YML file when memory is gone
-		if(!kingdomMap.isEmpty()) {
-			FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
-			kingdomsConfig.set("kingdoms", null); // reset kingdoms config
-			ConfigurationSection root = kingdomsConfig.createSection("kingdoms");
-			for(KonKingdom kingdom : kingdomMap.values()) {
-				ConfigurationSection kingdomSection = root.createSection(kingdom.getName());
-				kingdomSection.set("peaceful",kingdom.isPeaceful());
-	            ConfigurationSection capitalSection = kingdomSection.createSection("capital");
-	            capitalSection.set("world", kingdom.getCapital().getWorld().getName());
-	            capitalSection.set("spawn", new int[] {(int) kingdom.getCapital().getSpawnLoc().getX(),
-													   (int) kingdom.getCapital().getSpawnLoc().getY(),
-													   (int) kingdom.getCapital().getSpawnLoc().getZ()});
-	            capitalSection.set("center", new int[] {(int) kingdom.getCapital().getCenterLoc().getX(),
-						 								(int) kingdom.getCapital().getCenterLoc().getY(),
-						 								(int) kingdom.getCapital().getCenterLoc().getZ()});
-	            capitalSection.set("chunks", konquest.formatPointsToString(kingdom.getCapital().getChunkList().keySet()));
-	            if(kingdom.getMonumentTemplate().isValid()) {
-		            ConfigurationSection monumentSection = kingdomSection.createSection("monument");
-		            monumentSection.set("travel", new int[] {(int) kingdom.getMonumentTemplate().getTravelPoint().getX(),
-															 (int) kingdom.getMonumentTemplate().getTravelPoint().getY(),
-															 (int) kingdom.getMonumentTemplate().getTravelPoint().getZ()});
-		            monumentSection.set("cornerone", new int[] {(int) kingdom.getMonumentTemplate().getCornerOne().getX(),
-							 								 	(int) kingdom.getMonumentTemplate().getCornerOne().getY(),
-							 								 	(int) kingdom.getMonumentTemplate().getCornerOne().getZ()});
-		            monumentSection.set("cornertwo", new int[] {(int) kingdom.getMonumentTemplate().getCornerTwo().getX(),
-							 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getY(),
-							 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getZ()});
-				} else {
-					ChatUtil.printConsoleError("Failed to save invalid monument template for Kingdom "+kingdom.getName());
-				}
-	            ConfigurationSection townsSection = kingdomSection.createSection("towns");
-	            for(KonTown town : kingdom.getTowns()) {
-	            	ConfigurationSection townInstanceSection = townsSection.createSection(town.getName());
-	            	townInstanceSection.set("world", town.getWorld().getName());
-	            	townInstanceSection.set("base", town.getMonument().getBaseY());
-	            	townInstanceSection.set("spawn", new int[] {(int) town.getSpawnLoc().getX(),
-							 								 	(int) town.getSpawnLoc().getY(),
-							 								 	(int) town.getSpawnLoc().getZ()});
-	            	townInstanceSection.set("center", new int[] {(int) town.getCenterLoc().getX(),
-							 									 (int) town.getCenterLoc().getY(),
-							 									 (int) town.getCenterLoc().getZ()});
-	                townInstanceSection.set("chunks", konquest.formatPointsToString(town.getChunkList().keySet()));
-	                townInstanceSection.set("open", town.isOpen());
-	                townInstanceSection.set("lord", "");
-	                ConfigurationSection townInstanceResidentSection = townInstanceSection.createSection("residents");
-	                for(OfflinePlayer resident : town.getPlayerResidents()) {
-	                	String uuid = resident.getUniqueId().toString();
-	                	if(town.isPlayerLord(resident)) {
-	                		townInstanceSection.set("lord", uuid);
-	                	} else if(town.isPlayerElite(resident)) {
-	                		townInstanceResidentSection.set(uuid, true);
-	                	} else {
-	                		townInstanceResidentSection.set(uuid, false);
-	                	}
-	                }
-	                ConfigurationSection townInstanceRequestsSection = townInstanceSection.createSection("requests");
-	                for(OfflinePlayer requestee : town.getJoinRequests()) {
-	                	String uuid = requestee.getUniqueId().toString();
-	                	townInstanceRequestsSection.set(uuid, false);
-	                }
-	                for(OfflinePlayer invitee : town.getJoinInvites()) {
-	                	String uuid = invitee.getUniqueId().toString();
-	                	townInstanceRequestsSection.set(uuid, true);
-	                }
-	                ConfigurationSection townInstanceUpgradeSection = townInstanceSection.createSection("upgrades");
-	                for(KonUpgrade upgrade : KonUpgrade.values()) {
-	                	int level = town.getRawUpgradeLevel(upgrade);
-	                	if(level > 0) {
-	                		townInstanceUpgradeSection.set(upgrade.toString(), level);
-	                	}
-	                }
-	            }
+		FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
+		kingdomsConfig.set("kingdoms", null); // reset kingdoms config
+		ConfigurationSection root = kingdomsConfig.createSection("kingdoms");
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			ConfigurationSection kingdomSection = root.createSection(kingdom.getName());
+			kingdomSection.set("peaceful",kingdom.isPeaceful());
+            ConfigurationSection capitalSection = kingdomSection.createSection("capital");
+            capitalSection.set("world", kingdom.getCapital().getWorld().getName());
+            capitalSection.set("spawn", new int[] {(int) kingdom.getCapital().getSpawnLoc().getX(),
+												   (int) kingdom.getCapital().getSpawnLoc().getY(),
+												   (int) kingdom.getCapital().getSpawnLoc().getZ()});
+            capitalSection.set("center", new int[] {(int) kingdom.getCapital().getCenterLoc().getX(),
+					 								(int) kingdom.getCapital().getCenterLoc().getY(),
+					 								(int) kingdom.getCapital().getCenterLoc().getZ()});
+            capitalSection.set("chunks", konquest.formatPointsToString(kingdom.getCapital().getChunkList().keySet()));
+            if(kingdom.getMonumentTemplate().isValid()) {
+	            ConfigurationSection monumentSection = kingdomSection.createSection("monument");
+	            monumentSection.set("travel", new int[] {(int) kingdom.getMonumentTemplate().getTravelPoint().getX(),
+														 (int) kingdom.getMonumentTemplate().getTravelPoint().getY(),
+														 (int) kingdom.getMonumentTemplate().getTravelPoint().getZ()});
+	            monumentSection.set("cornerone", new int[] {(int) kingdom.getMonumentTemplate().getCornerOne().getX(),
+						 								 	(int) kingdom.getMonumentTemplate().getCornerOne().getY(),
+						 								 	(int) kingdom.getMonumentTemplate().getCornerOne().getZ()});
+	            monumentSection.set("cornertwo", new int[] {(int) kingdom.getMonumentTemplate().getCornerTwo().getX(),
+						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getY(),
+						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getZ()});
+			} else {
+				ChatUtil.printConsoleError("Failed to save invalid monument template for Kingdom "+kingdom.getName());
 			}
-			ChatUtil.printDebug("Saved Kingdoms");
-		} else {
-			ChatUtil.printDebug("The kingdom memory cache is invalid, aborted save");
+            ConfigurationSection townsSection = kingdomSection.createSection("towns");
+            for(KonTown town : kingdom.getTowns()) {
+            	ConfigurationSection townInstanceSection = townsSection.createSection(town.getName());
+            	townInstanceSection.set("world", town.getWorld().getName());
+            	townInstanceSection.set("base", town.getMonument().getBaseY());
+            	townInstanceSection.set("spawn", new int[] {(int) town.getSpawnLoc().getX(),
+						 								 	(int) town.getSpawnLoc().getY(),
+						 								 	(int) town.getSpawnLoc().getZ()});
+            	townInstanceSection.set("center", new int[] {(int) town.getCenterLoc().getX(),
+						 									 (int) town.getCenterLoc().getY(),
+						 									 (int) town.getCenterLoc().getZ()});
+                townInstanceSection.set("chunks", konquest.formatPointsToString(town.getChunkList().keySet()));
+                townInstanceSection.set("open", town.isOpen());
+                townInstanceSection.set("lord", "");
+                ConfigurationSection townInstanceResidentSection = townInstanceSection.createSection("residents");
+                for(OfflinePlayer resident : town.getPlayerResidents()) {
+                	String uuid = resident.getUniqueId().toString();
+                	if(town.isPlayerLord(resident)) {
+                		townInstanceSection.set("lord", uuid);
+                	} else if(town.isPlayerElite(resident)) {
+                		townInstanceResidentSection.set(uuid, true);
+                	} else {
+                		townInstanceResidentSection.set(uuid, false);
+                	}
+                }
+                ConfigurationSection townInstanceRequestsSection = townInstanceSection.createSection("requests");
+                for(OfflinePlayer requestee : town.getJoinRequests()) {
+                	String uuid = requestee.getUniqueId().toString();
+                	townInstanceRequestsSection.set(uuid, false);
+                }
+                for(OfflinePlayer invitee : town.getJoinInvites()) {
+                	String uuid = invitee.getUniqueId().toString();
+                	townInstanceRequestsSection.set(uuid, true);
+                }
+                ConfigurationSection townInstanceUpgradeSection = townInstanceSection.createSection("upgrades");
+                for(KonUpgrade upgrade : KonUpgrade.values()) {
+                	int level = town.getRawUpgradeLevel(upgrade);
+                	if(level > 0) {
+                		townInstanceUpgradeSection.set(upgrade.toString(), level);
+                	}
+                }
+            }
 		}
+		ChatUtil.printDebug("Saved Kingdoms");
 	}
 	
 	public void saveCamps() {
-		if(!barbarianCamps.isEmpty()) {
-			FileConfiguration campsConfig = konquest.getConfigManager().getConfig("camps");
-			campsConfig.set("camps", null); // reset camps config
-			ConfigurationSection root = campsConfig.createSection("camps");
-			for(String uuid : barbarianCamps.keySet()) {
-				KonCamp camp = barbarianCamps.get(uuid);
-				ConfigurationSection campSection = root.createSection(uuid);
-				campSection.set("world", camp.getWorld().getName());
-				campSection.set("center", new int[] {(int) camp.getCenterLoc().getX(),
-						 							 (int) camp.getCenterLoc().getY(),
-						 							 (int) camp.getCenterLoc().getZ()});
-		        campSection.set("chunks", konquest.formatPointsToString(camp.getChunkList().keySet()));
-			}
+		FileConfiguration campsConfig = konquest.getConfigManager().getConfig("camps");
+		campsConfig.set("camps", null); // reset camps config
+		ConfigurationSection root = campsConfig.createSection("camps");
+		for(String uuid : barbarianCamps.keySet()) {
+			KonCamp camp = barbarianCamps.get(uuid);
+			ConfigurationSection campSection = root.createSection(uuid);
+			campSection.set("world", camp.getWorld().getName());
+			campSection.set("center", new int[] {(int) camp.getCenterLoc().getX(),
+					 							 (int) camp.getCenterLoc().getY(),
+					 							 (int) camp.getCenterLoc().getZ()});
+	        campSection.set("chunks", konquest.formatPointsToString(camp.getChunkList().keySet()));
 		}
 	}
 	

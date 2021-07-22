@@ -215,21 +215,19 @@ public class RuinManager {
 	}
 	
 	public void saveRuins() {
-		if(!ruinMap.isEmpty()) {
-			FileConfiguration ruinsConfig = konquest.getConfigManager().getConfig("ruins");
-			ruinsConfig.set("ruins", null); // reset ruins config
-			ConfigurationSection root = ruinsConfig.createSection("ruins");
-			for(String name : ruinMap.keySet()) {
-				KonRuin ruin = ruinMap.get(name);
-				ConfigurationSection ruinSection = root.createSection(ruin.getName());
-				ruinSection.set("world", ruin.getWorld().getName());
-				ruinSection.set("center", new int[] {(int) ruin.getCenterLoc().getX(),
-						 							 (int) ruin.getCenterLoc().getY(),
-						 							 (int) ruin.getCenterLoc().getZ()});
-				ruinSection.set("chunks", konquest.formatPointsToString(ruin.getChunkList().keySet()));
-				ruinSection.set("criticals", konquest.formatLocationsToString(ruin.getCriticalLocations()));
-				ruinSection.set("spawns", konquest.formatLocationsToString(ruin.getSpawnLocations()));
-			}
+		FileConfiguration ruinsConfig = konquest.getConfigManager().getConfig("ruins");
+		ruinsConfig.set("ruins", null); // reset ruins config
+		ConfigurationSection root = ruinsConfig.createSection("ruins");
+		for(String name : ruinMap.keySet()) {
+			KonRuin ruin = ruinMap.get(name);
+			ConfigurationSection ruinSection = root.createSection(ruin.getName());
+			ruinSection.set("world", ruin.getWorld().getName());
+			ruinSection.set("center", new int[] {(int) ruin.getCenterLoc().getX(),
+					 							 (int) ruin.getCenterLoc().getY(),
+					 							 (int) ruin.getCenterLoc().getZ()});
+			ruinSection.set("chunks", konquest.formatPointsToString(ruin.getChunkList().keySet()));
+			ruinSection.set("criticals", konquest.formatLocationsToString(ruin.getCriticalLocations()));
+			ruinSection.set("spawns", konquest.formatLocationsToString(ruin.getSpawnLocations()));
 		}
 	}
 	
