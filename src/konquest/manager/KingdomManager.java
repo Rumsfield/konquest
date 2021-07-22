@@ -120,12 +120,18 @@ public class KingdomManager {
 	
 	public boolean renameKingdom(String oldName, String newName) {
 		if(kingdomMap.containsKey(oldName)) {
+			KonKingdom oldKingdom = getKingdom(oldName);
+			for (KonTown town : oldKingdom.getTowns()) {
+				konquest.getMapHandler().drawDynmapRemoveTerritory(town);
+			}
+			konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
+			oldKingdom = null;
 			getKingdom(oldName).setName(newName);
 			KonKingdom kingdom = kingdomMap.remove(oldName);
 			kingdomMap.put(newName, kingdom);
-			konquest.getMapHandler().drawDynmapRefreshTerritory(kingdom.getCapital());
+			konquest.getMapHandler().drawDynmapUpdateTerritory(kingdom.getCapital());
 			for (KonTown town : kingdom.getTowns()) {
-				konquest.getMapHandler().drawDynmapRefreshTerritory(town);
+				konquest.getMapHandler().drawDynmapUpdateTerritory(town);
 			}
 			return true;
 		}
@@ -371,7 +377,8 @@ public class KingdomManager {
 			if (success) {
 				KonTown town = kingdom.getTown(newName);
 				if (town != null) {
-					konquest.getMapHandler().drawDynmapRefreshTerritory(town);
+					konquest.getMapHandler().drawDynmapRemoveTerritory(town);
+					konquest.getMapHandler().drawDynmapUpdateTerritory(town);
 				}
 				return true;
 			}
@@ -394,6 +401,7 @@ public class KingdomManager {
 			return false;
 		}
 		if(isKingdom(oldKingdomName) && getKingdom(oldKingdomName).hasTown(name)) {
+			konquest.getMapHandler().drawDynmapRemoveTerritory(getKingdom(oldKingdomName).getTown(name));
 			getKingdom(oldKingdomName).getTown(name).purgeResidents();
 			getKingdom(oldKingdomName).getTown(name).clearUpgrades();
 			getKingdom(oldKingdomName).getTown(name).setKingdom(conquerPlayer.getKingdom());
@@ -403,7 +411,7 @@ public class KingdomManager {
 			refreshTownNerfs(conquerPlayer.getKingdom().getTown(name));
 			refreshTownHearts(conquerPlayer.getKingdom().getTown(name));
 			conquerPlayer.getKingdom().getTown(name).updateBarPlayers();
-			konquest.getMapHandler().drawDynmapRefreshTerritory(conquerPlayer.getKingdom().getTown(name));
+			konquest.getMapHandler().drawDynmapUpdateTerritory(conquerPlayer.getKingdom().getTown(name));
 			konquest.getIntegrationManager().deleteShopsInPoints(conquerPlayer.getKingdom().getTown(name).getChunkList().keySet(),conquerPlayer.getKingdom().getTown(name).getWorld());
 			return true;
 		}

@@ -63,6 +63,8 @@ public class MapHandler {
 	
 	//TODO: Make this class into a listener, make events for territory updates, deletes, etc
 	
+	//TODO: Figure out way to have created and removed areas update on web page without refresh
+	
 	/**
 	 * Draws a territory with Dynmap, when created or updated
 	 * @param territory
@@ -91,15 +93,16 @@ public class MapHandler {
 		AreaTerritory drawArea = new AreaTerritory(territory);
 		if (territoryArea == null) {
 			// Area does not exist, create new
-			AreaMarker newArea = territoryGroup.createAreaMarker(areaId, areaLabel, true, drawArea.getWorldName(), drawArea.getXCorners(), drawArea.getZCorners(), false);
-			if (newArea != null) {
-				newArea.setFillStyle(0.5, areaColor);
-				newArea.setLineStyle(1, 1, lineColor);
-				newArea.setCornerLocations(drawArea.getXCorners(), drawArea.getZCorners());
+			territoryArea = territoryGroup.createAreaMarker(areaId, areaLabel, true, drawArea.getWorldName(), drawArea.getXCorners(), drawArea.getZCorners(), false);
+			if (territoryArea != null) {
+				territoryArea.setFillStyle(0.5, areaColor);
+				territoryArea.setLineStyle(1, 1, lineColor);
 			}
+			ChatUtil.printDebug("Drawing new Dynmap area of territory "+territory.getName());
 		} else {
 			// Area already exists, update corners
 			territoryArea.setCornerLocations(drawArea.getXCorners(), drawArea.getZCorners());
+			ChatUtil.printDebug("Updating Dynmap area corners of territory "+territory.getName());
 		}
 		
 	}
@@ -127,19 +130,23 @@ public class MapHandler {
 			if (territoryArea != null) {
 				// Delete area from group
 				territoryArea.deleteMarker();
+				ChatUtil.printDebug("Removing Dynmap area of territory "+territory.getName());
 			}
 			if (territoryGroup.getAreaMarkers().isEmpty()) {
 				// Delete group if no more areas
 				territoryGroup.deleteMarkerSet();
+				ChatUtil.printDebug("Removing Dynmap group of territory "+territory.getName());
 			}
 		}
 		
 	}
 	
+	/*
 	public void drawDynmapRefreshTerritory(KonTerritory territory) {
 		drawDynmapRemoveTerritory(territory);
 		drawDynmapUpdateTerritory(territory);
 	}
+	*/
 	
 	public void postDynmapBroadcast(String message) {
 		if (!isEnabled) {
