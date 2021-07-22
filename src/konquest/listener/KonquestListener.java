@@ -225,6 +225,9 @@ public class KonquestListener implements Listener {
 							townLocPlayers.add(player);
 						}
 					}
+					int x = event.getTerritory().getCenterLoc().getBlockX();
+					int y = event.getTerritory().getCenterLoc().getBlockY();
+					int z = event.getTerritory().getCenterLoc().getBlockZ();
 					Timer townMonumentTimer = town.getMonumentTimer();
 					if(kingdomManager.removeTown(town.getName(), town.getKingdom().getName())) {
 						// Town is removed, no longer exists
@@ -261,6 +264,8 @@ public class KonquestListener implements Listener {
 						}
 						// Update directive progress
 						konquest.getDirectiveManager().updateDirectiveProgress(event.getPlayer(), KonDirective.CAPTURE_TOWN);
+						// Broadcast to Dynmap
+						konquest.getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_RAZE.getMessage(townName)+" ("+x+","+y+","+z+")");
 					} else {
 						ChatUtil.printDebug("Problem destroying Town "+event.getTerritory().getName()+" in Kingdom "+event.getTerritory().getKingdom().getName()+" for a barbarian raider "+event.getPlayer().getBukkitPlayer().getName());
 					}
@@ -309,6 +314,11 @@ public class KonquestListener implements Listener {
 						konquest.getDirectiveManager().updateDirectiveProgress(event.getPlayer(), KonDirective.CAPTURE_TOWN);
 						// Update stat
 						konquest.getAccomplishmentManager().modifyPlayerStat(event.getPlayer(),KonStatsType.CAPTURES,1);
+						// Broadcast to Dynmap
+						int x = event.getTerritory().getCenterLoc().getBlockX();
+						int y = event.getTerritory().getCenterLoc().getBlockY();
+						int z = event.getTerritory().getCenterLoc().getBlockZ();
+						konquest.getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(event.getTerritory().getName())+" ("+x+","+y+","+z+")");
 					} else {
 						ChatUtil.printDebug("Problem converting Town "+event.getTerritory().getName()+" from Kingdom "+event.getTerritory().getKingdom().getName()+" to "+event.getPlayer().getKingdom().getName());
 						// If, for example, a player in the Barbarians default kingdom captured the monument

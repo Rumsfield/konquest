@@ -61,6 +61,8 @@ public class MapHandler {
 	
 	//TODO: Make land area (AreaMarkers) descriptions HTML markup
 	
+	//TODO: Make this class into a listener, make events for territory updates, deletes, etc
+	
 	/**
 	 * Draws a territory with Dynmap, when created or updated
 	 * @param territory
@@ -93,6 +95,7 @@ public class MapHandler {
 			if (newArea != null) {
 				newArea.setFillStyle(0.5, areaColor);
 				newArea.setLineStyle(1, 1, lineColor);
+				newArea.setCornerLocations(drawArea.getXCorners(), drawArea.getZCorners());
 			}
 		} else {
 			// Area already exists, update corners
@@ -136,6 +139,13 @@ public class MapHandler {
 	public void drawDynmapRefreshTerritory(KonTerritory territory) {
 		drawDynmapRemoveTerritory(territory);
 		drawDynmapUpdateTerritory(territory);
+	}
+	
+	public void postDynmapBroadcast(String message) {
+		if (!isEnabled) {
+			return;
+		}
+		dapi.sendBroadcastToWeb("Konquest", message);
 	}
 	
 	public void drawDynmapAllTerritories() {

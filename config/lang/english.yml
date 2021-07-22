@@ -153,6 +153,7 @@ protection:
     raid-capture-1: "%s is being conquered! Use \"/k travel %s\" to defend and receive %s Favor!"
     raid-capture-2: "%s is at half strength! Use \"/k travel %s\" to defend and receive %s Favor!"
     raid-capture-3: "%s is in critical condition! Use \"/k travel %s\" to defend and receive %s Favor!"
+    raze: "The Town of %s has been destroyed by the Barbarian horde!"
     destroy: "You have destroyed %s for the glory of the Barbarian horde!"
     conquer: "The Town of %s has been conquered!"
     capture: "You have conquered %s for the conquest of %s!"
