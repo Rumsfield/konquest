@@ -50,7 +50,7 @@ public class RenameAdminCommand extends CommandBase {
     			for(KonTown town : kingdom.getTowns()) {
     				if(town.getName().equals(oldName)) {
     					// Change town name
-    					kingdom.renameTown(oldName, newName);
+    					getKonquest().getKingdomManager().renameTown(oldName, newName, kingdom.getName());
     					//ChatUtil.sendNotice((Player) getSender(), "Successfully renamed Town "+oldName+" to "+newName);
     					ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RENAME_NOTICE_TOWN.getMessage(oldName,newName));
     					return;

@@ -15,7 +15,10 @@ public class KonCapital extends KonTerritory{
 	public KonCapital(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, KonTerritoryType.CAPITAL, konquest);
 	}
-
+	
+	public void updateName() {
+		setName(getKingdom().getName()+" "+getKonquest().getConfigManager().getConfig("core").getString("core.kingdoms.capital_suffix"));
+	}
 	
 	@Override
 	public boolean addChunk(Point point) {

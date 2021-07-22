@@ -129,6 +129,7 @@ public class KingdomManager {
 			getKingdom(oldName).setName(newName);
 			KonKingdom kingdom = kingdomMap.remove(oldName);
 			kingdomMap.put(newName, kingdom);
+			kingdom.getCapital().updateName();
 			konquest.getMapHandler().drawDynmapUpdateTerritory(kingdom.getCapital());
 			for (KonTown town : kingdom.getTowns()) {
 				konquest.getMapHandler().drawDynmapUpdateTerritory(town);

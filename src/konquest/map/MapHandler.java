@@ -317,7 +317,7 @@ public class MapHandler {
 				result = "Barbarian "+territory.getName();
 				break;
 			case CAPITAL:
-				result = territory.getKingdom().getName();
+				result = territory.getKingdom().getCapital().getName();
 				break;
 			case TOWN:
 				result = territory.getKingdom().getName()+" "+territory.getName();
