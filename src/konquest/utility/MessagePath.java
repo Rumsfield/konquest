@@ -47,6 +47,8 @@ public enum MessagePath {
 	LABEL_PROPERTIES                          	(0, "label.properties"),
 	LABEL_SMALLEST                          	(0, "label.smallest"),
 	LABEL_INFORMATION                          	(0, "label.information"),
+	LABEL_SHIELDS                           	(0, "label.shields"),
+	LABEL_SHIELD                            	(0, "label.shield"),
 	
 	MENU_STATS_TITLE                            (0, "menu.stats.title"),
 	MENU_STATS_INTRO_1                          (0, "menu.stats.intro-1"),
@@ -87,6 +89,7 @@ public enum MessagePath {
 	MENU_PREFIX_DISABLE                         (0, "menu.prefix.disable"),
 	MENU_PREFIX_HINT_DISABLE                    (0, "menu.prefix.hint-disable"),
 	MENU_PREFIX_HINT_APPLY                      (0, "menu.prefix.hint-apply"),
+	MENU_SHIELD_HINT                            (0, "menu.shield.hint"),
 
 	GENERIC_NOTICE_ENABLE_AUTO                  (0, "generic.notice.enable-auto"),
 	GENERIC_NOTICE_DISABLE_AUTO                 (0, "generic.notice.disable-auto"),

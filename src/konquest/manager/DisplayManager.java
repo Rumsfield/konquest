@@ -29,6 +29,7 @@ import konquest.display.PagedMenu;
 import konquest.display.PlayerIcon;
 import konquest.display.PlayerIcon.PlayerIconAction;
 import konquest.display.PrefixIcon.PrefixIconAction;
+import konquest.display.ShieldIcon;
 import konquest.display.PrefixIcon;
 import konquest.display.TownIcon;
 import konquest.display.UpgradeIcon;
@@ -44,6 +45,7 @@ import konquest.model.KonStatsType;
 import konquest.model.KonPlayerScoreAttributes.KonPlayerScoreAttribute;
 import konquest.model.KonPrefixCategory;
 import konquest.model.KonPrefixType;
+import konquest.model.KonShield;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
@@ -233,6 +235,25 @@ public class DisplayManager {
 					            	bukkitPlayer.closeInventory();
 					            }
 					        });
+						} else if(clickedIcon instanceof ShieldIcon) {
+							// Shield Icons close the GUI and attempt to activate a town shield
+							if(townCache.containsKey(inv)) {
+								//ShieldIcon icon = (ShieldIcon)clickedIcon;
+								//boolean status = konquest.getUpgradeManager().addTownUpgrade(townCache.get(inv), icon.getUpgrade(), icon.getLevel(), bukkitPlayer);
+								
+								if(true) {
+									//bukkitPlayer.getWorld().playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, (float)1.0, (float)1.0);
+									Konquest.playSuccessSound(bukkitPlayer);
+								}
+								Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+						            @Override
+						            public void run() {
+						            	bukkitPlayer.closeInventory();
+						            }
+						        });
+							} else {
+								ChatUtil.printDebug("Failed to find inventory menu in town cache");
+							}
 						}
 					}
 				}
@@ -372,6 +393,62 @@ public class DisplayManager {
             	bukkitPlayer.openInventory(newMenu.getCurrentPage().getInventory());
             }
         });
+	}
+	
+	/*
+	 * ===============================================
+	 * Town Shield Menu
+	 * ===============================================
+	 */
+	public void displayTownShieldMenu(KonPlayer displayPlayer, KonTown town) {
+		
+		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
+		playMenuOpenSound(bukkitPlayer);
+
+		String pageLabel = "";
+		String pageColor = ""+ChatColor.BLACK;
+    	
+ 		// Create fresh paged menu
+ 		PagedMenu newMenu = new PagedMenu();
+		
+		// Page 0+
+		List<KonShield> allShields = konquest.getShieldManager().getShields();
+		final int MAX_ICONS_PER_PAGE = 45;
+		int pageTotal = (int)Math.ceil(((double)allShields.size())/MAX_ICONS_PER_PAGE);
+		if(pageTotal == 0) {
+			pageTotal = 1;
+		}
+		int pageNum = 1;
+		ListIterator<KonShield> shieldIter = allShields.listIterator();
+		for(int i = 0; i < pageTotal; i++) {
+			int numPageRows = (int)Math.ceil(((double)((allShields.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows == 0) {
+				numPageRows = 1;
+			}
+			pageLabel = pageColor+town.getName()+" "+MessagePath.LABEL_SHIELDS.getMessage()+" "+(i+1)+"/"+pageTotal;
+			newMenu.addPage(pageNum, numPageRows, pageLabel);
+			int slotIndex = 0;
+			while(slotIndex < MAX_ICONS_PER_PAGE && shieldIter.hasNext()) {
+				/* Town Icon (n) */
+				KonShield currentShield = shieldIter.next();
+		    	ShieldIcon shieldIcon = new ShieldIcon(currentShield, true, town.getNumResidents(), slotIndex);
+				newMenu.getPage(pageNum).addIcon(shieldIcon);
+				slotIndex++;
+			}
+			pageNum++;
+		}
+		
+		newMenu.refreshNavigationButtons();
+		newMenu.setPageIndex(0);
+		menuCache.put(newMenu.getCurrentPage().getInventory(), newMenu);
+		// Schedule delayed task to display inventory to player
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	//displayPlayer.getBukkitPlayer().closeInventory();
+            	displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentPage().getInventory());
+            }
+        },1);
 	}
 	
 	/*

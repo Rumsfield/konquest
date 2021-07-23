@@ -50,6 +50,8 @@ label:
   properties: "Properties"
   smallest: "Smallest"
   information: "Information"
+  shields: "Shields"
+  shield: "Shield"
 menu:
   stats:
     title: "Accomplishment Stats"
@@ -97,6 +99,8 @@ menu:
     disable: "Off"
     hint-disable: "Click to disable"
     hint-apply: "Click to apply"
+  shield:
+    hint: "Click to activate"
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."

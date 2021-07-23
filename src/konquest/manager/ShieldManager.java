@@ -1,7 +1,7 @@
 package konquest.manager;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -75,7 +75,7 @@ public class ShieldManager {
 		return result;
 	}
 	
-	public Collection<KonShield> getShields() {
+	public List<KonShield> getShields() {
 		return shields;
 	}
 	
