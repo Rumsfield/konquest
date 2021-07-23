@@ -9,19 +9,19 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import konquest.model.KonShield;
+import konquest.model.KonArmor;
 import konquest.utility.MessagePath;
 
-public class ShieldIcon implements MenuIcon {
+public class ArmorIcon implements MenuIcon {
 
-	private KonShield shield;
+	private KonArmor armor;
 	private boolean isAvailable;
 	private int population;
 	private int index;
 	ItemStack item;
 	
-	public ShieldIcon(KonShield shield, boolean isAvailable, int population, int index) {
-		this.shield = shield;
+	public ArmorIcon(KonArmor armor, boolean isAvailable, int population, int index) {
+		this.armor = armor;
 		this.isAvailable = isAvailable;
 		this.population = population;
 		this.index = index;
@@ -40,21 +40,21 @@ public class ShieldIcon implements MenuIcon {
 				meta.addItemFlags(flag);
 			}
 		}
-		int totalCost = population * shield.getCost();
+		int totalCost = population * armor.getCost();
 		List<String> loreList = new ArrayList<String>();
-		loreList.add(ChatColor.BOLD+""+ChatColor.DARK_AQUA+shield.getDurationFormat());
+		loreList.add(ChatColor.BOLD+""+ChatColor.DARK_AQUA+armor.getBlocks());
     	loreList.add(ChatColor.WHITE+MessagePath.LABEL_COST.getMessage()+": "+ChatColor.AQUA+totalCost);
     	if(isAvailable) {
     		loreList.add(ChatColor.GOLD+MessagePath.MENU_SHIELD_HINT.getMessage());
     	}
-    	meta.setDisplayName(ChatColor.GOLD+shield.getId());
+    	meta.setDisplayName(ChatColor.GOLD+armor.getId());
 		meta.setLore(loreList);
 		item.setItemMeta(meta);
 		return item;
 	}
 	
-	public KonShield getShield() {
-		return shield;
+	public KonArmor getArmor() {
+		return armor;
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class ShieldIcon implements MenuIcon {
 
 	@Override
 	public String getName() {
-		return shield.getId();
+		return armor.getId();
 	}
 
 	@Override

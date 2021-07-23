@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.model.KonArmor;
 import konquest.model.KonPlayer;
 import konquest.model.KonShield;
 import konquest.model.KonStatsType;
@@ -21,20 +22,27 @@ import net.milkbowl.vault.economy.EconomyResponse;
 public class ShieldManager {
 
 	private Konquest konquest;
-	private boolean isEnabled;
+	private boolean isShieldsEnabled;
+	private boolean isArmorsEnabled;
 	private ArrayList<KonShield> shields;
+	private ArrayList<KonArmor> armors;
 	
 	public ShieldManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.isEnabled = false;
+		this.isShieldsEnabled = false;
+		this.isArmorsEnabled = false;
 		this.shields = new ArrayList<KonShield>();
+		this.armors = new ArrayList<KonArmor>();
 	}
 	
 	public void initialize() {
 		if(loadShields()) {
-			isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_shields",false);
+			isShieldsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_shields",false);
 		}
-		ChatUtil.printDebug("Shield Manager is ready, enabled "+isEnabled);
+		if(loadArmors()) {
+			isArmorsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_armor",false);
+		}
+		ChatUtil.printDebug("Shield Manager is ready, shields: "+isShieldsEnabled+", armors: "+isArmorsEnabled);
 	}
 	
 	private boolean loadShields() {
@@ -53,13 +61,13 @@ public class ShieldManager {
         	if(shieldSection.contains("time")) {
         		shieldTime = shieldSection.getInt("time",0);
     		} else {
-    			ChatUtil.printDebug("Shields.yml is missing time section for: "+shieldName);
+    			ChatUtil.printDebug("Shields.yml is missing time section for shield: "+shieldName);
     			status = false;
     		}
         	if(shieldSection.contains("cost")) {
         		shieldCost = shieldSection.getInt("cost",0);
     		} else {
-    			ChatUtil.printDebug("Shields.yml is missing cost section for: "+shieldName);
+    			ChatUtil.printDebug("Shields.yml is missing cost section for shield: "+shieldName);
     			status = false;
     		}
         	if(status || shieldTime == 0 || shieldCost == 0) {
@@ -67,6 +75,41 @@ public class ShieldManager {
         		shields.add(newShield);
         	} else {
         		ChatUtil.printConsoleError("Invalid shield option: "+shieldName+". Must include valid time and cost values.");
+        	}
+        }
+		return true;
+	}
+	
+	private boolean loadArmors() {
+		armors.clear();
+		FileConfiguration shieldsConfig = konquest.getConfigManager().getConfig("shields");
+        if (shieldsConfig.get("armors") == null) {
+        	ChatUtil.printDebug("There is no armors section in shields.yml");
+            return false;
+        }
+        KonArmor newArmor;
+        for(String armorName : shieldsConfig.getConfigurationSection("armors").getKeys(false)) {
+        	boolean status = true;
+        	int armorBlocks = 0;
+        	int armorCost = 0;
+        	ConfigurationSection armorSection = shieldsConfig.getConfigurationSection("armor."+armorName);
+        	if(armorSection.contains("blocks")) {
+        		armorBlocks = armorSection.getInt("blocks",0);
+    		} else {
+    			ChatUtil.printDebug("Shields.yml is missing blocks section for armor: "+armorName);
+    			status = false;
+    		}
+        	if(armorSection.contains("cost")) {
+        		armorCost = armorSection.getInt("cost",0);
+    		} else {
+    			ChatUtil.printDebug("Shields.yml is missing cost section for armor: "+armorName);
+    			status = false;
+    		}
+        	if(status || armorBlocks == 0 || armorCost == 0) {
+        		newArmor = new KonArmor(armorName,armorBlocks,armorCost);
+        		armors.add(newArmor);
+        	} else {
+        		ChatUtil.printConsoleError("Invalid armor option: "+armorName+". Must include valid blocks and cost values.");
         	}
         }
 		return true;
@@ -83,12 +126,24 @@ public class ShieldManager {
 		return result;
 	}
 	
+	public boolean isShieldsEnabled() {
+		return isShieldsEnabled;
+	}
+	
+	public boolean isArmorsEnabled() {
+		return isArmorsEnabled;
+	}
+	
 	public List<KonShield> getShields() {
 		return shields;
 	}
 	
+	public List<KonArmor> getArmors() {
+		return armors;
+	}
+	
 	public boolean activateTownShield(KonShield shield, KonTown town, Player bukkitPlayer) {
-		if(!isEnabled) {
+		if(!isShieldsEnabled) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return false;
 		}

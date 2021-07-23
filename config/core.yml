@@ -55,9 +55,15 @@
 #    raid_alert_cooldown:           Time in seconds between raid alerts for Towns (integer >= 0)
 #    travel_cooldown:               Time in seconds for travel cool-down (integer >= 0)
 #    enable_upgrades:               Enable town upgrades and the upgrade GUI menu (true/false)
-#    enable_shields:                Enable town shields and the shield GUI menu (true/false)
-#    shields_no_enemy_enter:        Prevent enemy players from enterin towns with active shields (true/false)
-#    shields_while_attacked:        Prevent shields from being activated while a town is under attack (true/false)
+#    enable_shields:                Enable town shields, which prevent all enemy attacks, in the shield GUI menu (true/false)
+#    enable_armor:                  Enable town armor, which prevents a limited number of enemy block edits, in the shield GUI menu (true/false)
+#    shields_no_enemy_enter:        Prevent enemy players from entering towns with active shields (true/false)
+#    shields_while_attacked:        Allow shields to be charged charged while a town is under attack (true/false)
+#    armor_while_attacked:          Allow armor to be applied while a town is under attack (true/false)
+#    shields_add:                   Allow new shields to add onto existing shields when true, else require shields to deplete before charging again (true/false)
+#    armor_add:                     Allow new armor to add onto existing armor when true, else require armor to deplete before applying again (true/false)
+#    max_shields:                   Maximum shield duration in seconds that a town can have (integer >= 0)
+#    max_armor:                     Maximum armor amount in blocks that a town can have (integer >= 0)
 #  camps:
 #    init_radius:                   Radius of camps for barbarians. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
 #  monuments:
@@ -156,9 +162,15 @@ core:
     raid_alert_cooldown: 30
     travel_cooldown: 120
     enable_upgrades: true
+    enable_armor: true
     enable_shields: true
     shields_no_enemy_enter: true
     shields_while_attacked: false
+    armor_while_attacked: false
+    shields_add: true
+    armor_add: true
+    max_shields: 432000
+    max_armor: 9999
   camps:
     init_radius: 2
   monuments:

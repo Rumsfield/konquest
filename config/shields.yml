@@ -1,10 +1,16 @@
-# Town Shields
-# Instructions: Set up each town shield option in this file. Each option has a name, time and cost-per-resident. For example,
+# Town Shields & Armor
+# Instructions: Set up each town shield and armor option in this file. Each option has a name, charge and cost-per-resident. For example,
+#
+# shields:
 #   <name>:
 #     time: <shield duration in seconds>
 #     cost: <favor cost per town resident>
+# armors:
+#   <name>:
+#     blocks: <armor amount in blocks>
+#     cost: <favor cost per town resident>
 # 
-# You can change existing names (Level-1, Level-2, etc), times and costs, and add more options.
+# You can change existing names (Level-1, Light, etc), times, blocks and costs, and add more options under shields and armors.
 # Lines that begin with "#" (like this one) are comments, and only convey information.
 # Use a YAML parser to make sure this file is correctly formatted with no errors, like https://yaml-online-parser.appspot.com/
 # 
@@ -20,3 +26,13 @@ shields:
   Level-3:
     time: 14400
     cost: 300
+armors:
+  Light:
+    blocks: 100
+    cost: 50
+  Medium:
+    blocks: 500
+    cost: 150
+  Heavy:
+    blocks: 1000
+    cost: 350
