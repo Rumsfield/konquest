@@ -46,6 +46,10 @@ public class ShieldIcon implements MenuIcon {
 		item.setItemMeta(meta);
 		return item;
 	}
+	
+	public KonShield getShield() {
+		return shield;
+	}
 
 	@Override
 	public int getIndex() {

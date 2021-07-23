@@ -101,6 +101,10 @@ menu:
     hint-apply: "Click to apply"
   shield:
     hint: "Click to activate"
+    fail-attack: "Failed to activate town shield while town is under attack!"
+    fail-cost: "Failed to activate town shield %s, requires %s Favor."
+    activate-new: "Activated town shield %s for duration %s."
+    activate-add: "Increased town shield with %s by duration %s."
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."

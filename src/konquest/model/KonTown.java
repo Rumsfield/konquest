@@ -45,11 +45,14 @@ public class KonTown extends KonTerritory implements Timeable{
 	private boolean isRaidAlertDisabled;
 	private BossBar monumentBarAllies;
 	private BossBar monumentBarEnemies;
+	private BossBar shieldBarAll;
 	private UUID lord;
 	private HashMap<UUID,Boolean> residents;
 	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident, false = requesting add from lord/knight)
 	private boolean isOpen;
 	private boolean isAttacked;
+	private boolean isShielded;
+	private long shieldEndTime;
 	private ArrayList<UUID> defenders;
 	private HashMap<KonUpgrade,Integer> upgrades;
 	private HashMap<KonUpgrade,Integer> disabledUpgrades;
@@ -69,11 +72,15 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.monumentBarAllies.setVisible(true);
 		this.monumentBarEnemies = Bukkit.getServer().createBossBar(ChatColor.RED+name, BarColor.RED, BarStyle.SOLID);
 		this.monumentBarEnemies.setVisible(true);
+		this.shieldBarAll = Bukkit.getServer().createBossBar(ChatColor.DARK_AQUA+"Shield", BarColor.BLUE, BarStyle.SOLID);
+		this.shieldBarAll.setVisible(false);
 		this.lord = null; // init with no lord
 		this.residents = new HashMap<UUID,Boolean>();
 		this.joinRequests = new HashMap<UUID,Boolean>();
 		this.isOpen = false; // init as a closed Town, requires Lord to add players as residents for build/container perms
 		this.isAttacked = false;
+		this.isShielded = false;
+		this.shieldEndTime = 0L;
 		this.defenders = new ArrayList<UUID>();
 		this.upgrades = new HashMap<KonUpgrade,Integer>();
 		this.disabledUpgrades = new HashMap<KonUpgrade,Integer>();
@@ -924,6 +931,25 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	public void spawnRabbit() {
 		rabbit.spawn();
+	}
+	
+	public boolean isShielded() {
+		return isShielded;
+	}
+	
+	public void activateShield() {
+		isShielded = true;
+		shieldBarAll.setVisible(true);
+		
+		
+	}
+	
+	public long getShieldEndTime() {
+		return shieldEndTime;
+	}
+	
+	public void setShieldEndTime(long val) {
+		shieldEndTime = val;
 	}
 	
 }

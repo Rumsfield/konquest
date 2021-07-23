@@ -90,6 +90,10 @@ public enum MessagePath {
 	MENU_PREFIX_HINT_DISABLE                    (0, "menu.prefix.hint-disable"),
 	MENU_PREFIX_HINT_APPLY                      (0, "menu.prefix.hint-apply"),
 	MENU_SHIELD_HINT                            (0, "menu.shield.hint"),
+	MENU_SHIELD_FAIL_ATTACK                     (0, "menu.shield.fail-attack"),
+	MENU_SHIELD_FAIL_COST                       (2, "menu.shield.fail-cost"),
+	MENU_SHIELD_ACTIVATE_NEW                    (2, "menu.shield.activate-new"),
+	MENU_SHIELD_ACTIVATE_ADD                    (2, "menu.shield.activate-add"),
 
 	GENERIC_NOTICE_ENABLE_AUTO                  (0, "generic.notice.enable-auto"),
 	GENERIC_NOTICE_DISABLE_AUTO                 (0, "generic.notice.disable-auto"),

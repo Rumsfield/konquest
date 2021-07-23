@@ -238,11 +238,9 @@ public class DisplayManager {
 						} else if(clickedIcon instanceof ShieldIcon) {
 							// Shield Icons close the GUI and attempt to activate a town shield
 							if(townCache.containsKey(inv)) {
-								//ShieldIcon icon = (ShieldIcon)clickedIcon;
-								//boolean status = konquest.getUpgradeManager().addTownUpgrade(townCache.get(inv), icon.getUpgrade(), icon.getLevel(), bukkitPlayer);
-								
-								if(true) {
-									//bukkitPlayer.getWorld().playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, (float)1.0, (float)1.0);
+								ShieldIcon icon = (ShieldIcon)clickedIcon;
+								boolean status = konquest.getShieldManager().activateTownShield(icon.getShield(), townCache.get(inv), bukkitPlayer);
+								if(status) {
 									Konquest.playSuccessSound(bukkitPlayer);
 								}
 								Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {

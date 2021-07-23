@@ -1,14 +1,22 @@
 package konquest.manager;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.KonquestPlugin;
+import konquest.model.KonPlayer;
 import konquest.model.KonShield;
+import konquest.model.KonStatsType;
+import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
+import net.milkbowl.vault.economy.EconomyResponse;
 
 public class ShieldManager {
 
@@ -77,6 +85,58 @@ public class ShieldManager {
 	
 	public List<KonShield> getShields() {
 		return shields;
+	}
+	
+	public boolean activateTownShield(KonShield shield, KonTown town, Player bukkitPlayer) {
+		if(!isEnabled) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return false;
+		}
+		
+		Date now = new Date();
+		long shieldTime = (shield.getDurationSeconds()*1000);
+		long endTime = now.getTime() + shieldTime;
+		
+		// Check that the player has enough favor
+		int requiredCost = shield.getCost()*town.getNumResidents();
+		if(KonquestPlugin.getBalance(bukkitPlayer) < requiredCost) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_COST.getMessage(shield.getId(),requiredCost));
+            return false;
+		}
+		
+		// Check that town is not under attack optionally
+		boolean isAttackCheckEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.shields_while_attacked",false);
+		if(isAttackCheckEnabled && town.isAttacked()) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_ATTACK.getMessage());
+            return false;
+		}
+		
+		// Passed checks, activate the shield
+		if(town.isShielded()) {
+			endTime = town.getShieldEndTime() + shieldTime;
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_ADD.getMessage(shield.getId(),shield.getDurationFormat()));
+			ChatUtil.printDebug("Activated town shield addition "+shield.getId()+" to town "+town.getName()+" for end time "+endTime);
+		} else {
+			town.activateShield();
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_NEW.getMessage(shield.getId(),shield.getDurationFormat()));
+			ChatUtil.printDebug("Activated new town shield "+shield.getId()+" to town "+town.getName()+" for end time "+endTime);
+		}
+		town.setShieldEndTime(endTime);
+		
+		// Withdraw cost
+		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost);
+        if(r.transactionSuccess()) {
+        	String balanceF = String.format("%.2f",r.balance);
+        	String amountF = String.format("%.2f",r.amount);
+        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+        	if(player != null) {
+        		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)requiredCost);
+        	}
+        } else {
+        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
+        }
+		return true;
 	}
 	
 	
