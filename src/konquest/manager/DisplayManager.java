@@ -400,9 +400,8 @@ public class DisplayManager {
 	 * Town Shield Menu
 	 * ===============================================
 	 */
-	public void displayTownShieldMenu(KonPlayer displayPlayer, KonTown town) {
+	public void displayTownShieldMenu(Player bukkitPlayer, KonTown town) {
 		
-		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
 		playMenuOpenSound(bukkitPlayer);
 
 		String pageLabel = "";
@@ -446,7 +445,7 @@ public class DisplayManager {
             @Override
             public void run() {
             	//displayPlayer.getBukkitPlayer().closeInventory();
-            	displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentPage().getInventory());
+            	bukkitPlayer.openInventory(newMenu.getCurrentPage().getInventory());
             }
         },1);
 	}
