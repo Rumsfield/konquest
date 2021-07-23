@@ -22,8 +22,8 @@ public class KonShield {
 	
 	public String getDurationFormat() {
 		int days = duration / 86400;
-		int hours = duration / 3600;
-		int minutes = duration / 60;
+		int hours = duration % 86400 / 3600;
+		int minutes = duration % 3600 / 60;
 		int seconds = duration % 60;
 		
 		String result = "";

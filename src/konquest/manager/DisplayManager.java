@@ -417,7 +417,7 @@ public class DisplayManager {
 		if(pageTotal == 0) {
 			pageTotal = 1;
 		}
-		int pageNum = 1;
+		int pageNum = 0;
 		ListIterator<KonShield> shieldIter = allShields.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
 			int numPageRows = (int)Math.ceil(((double)((allShields.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
@@ -440,6 +440,7 @@ public class DisplayManager {
 		newMenu.refreshNavigationButtons();
 		newMenu.setPageIndex(0);
 		menuCache.put(newMenu.getCurrentPage().getInventory(), newMenu);
+		townCache.put(newMenu.getCurrentPage().getInventory(), town);
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override

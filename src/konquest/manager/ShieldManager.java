@@ -54,11 +54,11 @@ public class ShieldManager {
     			ChatUtil.printDebug("Shields.yml is missing cost section for: "+shieldName);
     			status = false;
     		}
-        	if(status) {
+        	if(status || shieldTime == 0 || shieldCost == 0) {
         		newShield = new KonShield(shieldName,shieldTime,shieldCost);
         		shields.add(newShield);
         	} else {
-        		ChatUtil.printConsoleError("Invalid shield option: "+shieldName+". Must include time and cost values.");
+        		ChatUtil.printConsoleError("Invalid shield option: "+shieldName+". Must include valid time and cost values.");
         	}
         }
 		return true;
