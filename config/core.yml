@@ -55,6 +55,9 @@
 #    raid_alert_cooldown:           Time in seconds between raid alerts for Towns (integer >= 0)
 #    travel_cooldown:               Time in seconds for travel cool-down (integer >= 0)
 #    enable_upgrades:               Enable town upgrades and the upgrade GUI menu (true/false)
+#    enable_shields:                Enable town shields and the shield GUI menu (true/false)
+#    shields_no_enemy_enter:        Prevent enemy players from enterin towns with active shields (true/false)
+#    shields_while_attacked:        Prevent shields from being activated while a town is under attack (true/false)
 #  camps:
 #    init_radius:                   Radius of camps for barbarians. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
 #  monuments:
@@ -153,6 +156,9 @@ core:
     raid_alert_cooldown: 30
     travel_cooldown: 120
     enable_upgrades: true
+    enable_shields: true
+    shields_no_enemy_enter: true
+    shields_while_attacked: false
   camps:
     init_radius: 2
   monuments:

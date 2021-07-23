@@ -1,0 +1,22 @@
+# Town Shields
+# Instructions: Set up each town shield option in this file. Each option has a name, time and cost-per-resident. For example,
+#   <name>:
+#     time: <shield duration in seconds>
+#     cost: <favor cost per town resident>
+# 
+# You can change existing names (Level-1, Level-2, etc), times and costs, and add more options.
+# Lines that begin with "#" (like this one) are comments, and only convey information.
+# Use a YAML parser to make sure this file is correctly formatted with no errors, like https://yaml-online-parser.appspot.com/
+# 
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
+shields:
+  Level-1:
+    time: 1200
+    cost: 100
+  Level-2:
+    time: 3600
+    cost: 200
+  Level-3:
+    time: 14400
+    cost: 300

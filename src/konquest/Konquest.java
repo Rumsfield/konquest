@@ -39,6 +39,7 @@ import konquest.manager.LanguageManager;
 import konquest.manager.LootManager;
 import konquest.manager.PlayerManager;
 import konquest.manager.RuinManager;
+import konquest.manager.ShieldManager;
 import konquest.manager.UpgradeManager;
 import konquest.map.MapHandler;
 import konquest.model.KonCamp;
@@ -76,6 +77,7 @@ public class Konquest implements Timeable {
 	private CommandHandler commandHandler;
 	private DisplayManager displayManager;
 	private UpgradeManager upgradeManager;
+	private ShieldManager shieldManager;
 	private RuinManager ruinManager;
 	private LanguageManager languageManager;
 	private MapHandler mapHandler;
@@ -117,6 +119,7 @@ public class Konquest implements Timeable {
 		commandHandler = new CommandHandler(this);
 		displayManager = new DisplayManager(this);
 		upgradeManager = new UpgradeManager(this);
+		shieldManager = new ShieldManager(this);
 		ruinManager = new RuinManager(this);
 		languageManager = new LanguageManager(this);
 		mapHandler = new MapHandler(this);
@@ -193,6 +196,7 @@ public class Konquest implements Timeable {
 		accomplishmentManager.initialize();
 		directiveManager.initialize();
 		upgradeManager.initialize();
+		shieldManager.initialize();
 		offlineTimeoutSeconds = (long)(configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)*86400);
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;
@@ -352,6 +356,10 @@ public class Konquest implements Timeable {
 	
 	public UpgradeManager getUpgradeManager() {
 		return upgradeManager;
+	}
+	
+	public ShieldManager getShieldManager() {
+		return shieldManager;
 	}
 	
 	public RuinManager getRuinManager() {
