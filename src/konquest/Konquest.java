@@ -1060,13 +1060,17 @@ public class Konquest implements Timeable {
     	loc.getWorld().playSound(loc, Sound.ENTITY_SHULKER_SHOOT, (float)1.0, (float)2);
     }
     
-    public static String getTimeFormat(int valSeconds, ChatColor numColor) {
+    public static String getTimeFormat(int valSeconds, ChatColor color) {
 		int days = valSeconds / 86400;
 		int hours = valSeconds % 86400 / 3600;
 		int minutes = valSeconds % 3600 / 60;
 		int seconds = valSeconds % 60;
 		
 		ChatColor nColor = ChatColor.GRAY;
+		ChatColor numColor = color;
+		if(valSeconds <= 30) {
+			numColor = ChatColor.DARK_RED;
+		}
 		String result = "";
 		String format = "";
 		

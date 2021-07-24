@@ -160,17 +160,20 @@ public class SettleCommand extends CommandBase {
         			break;
         		case 5:
         			int distance = getKonquest().getKingdomManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
-        			int min_distance_capital = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
-        			int min_distance_town = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
-        			int min_distance = 0;
-        			if(min_distance_capital < min_distance_town) {
-        				min_distance = min_distance_capital;
+        			int max_distance_all = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_distance_all");
+        			if(max_distance_all > 0 && distance > max_distance_all) {
+        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_MAX.getMessage(distance,max_distance_all));
         			} else {
-        				min_distance = min_distance_town;
+        				int min_distance_capital = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
+            			int min_distance_town = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
+            			int min_distance = 0;
+            			if(min_distance_capital < min_distance_town) {
+            				min_distance = min_distance_capital;
+            			} else {
+            				min_distance = min_distance_town;
+            			}
+            			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
         			}
-        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Too close to another territory.");
-        			//ChatUtil.sendError((Player) getSender(), "Currently "+distance+" chunks away, must be at least "+min_distance+".");
-        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
         			break;
         		case 21:
         			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());

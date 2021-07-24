@@ -511,12 +511,12 @@ public class TownCommand extends CommandBase {
             	getKonquest().getDisplayManager().displayTownUpgradeMenu(bukkitPlayer, town);
         		break;
 			case "shield":
-				// Verify player is lord of the Town
-            	if(!town.isPlayerLord(player.getOfflineBukkitPlayer())) {
-            		//ChatUtil.sendError((Player) getSender(), "You must be the Lord of "+townName+" to do this");
-            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-            		return;
-            	}
+            	// Verify player is elite or lord of the Town
+	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+	        		//ChatUtil.sendError((Player) getSender(), "You must be a Knight or the Lord of "+townName+" to do this");
+	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+	        		return;
+	        	}
             	// Verify either shields or armors are enabled
             	boolean isShieldsEnabled = getKonquest().getShieldManager().isShieldsEnabled();
             	boolean isArmorsEnabled = getKonquest().getShieldManager().isArmorsEnabled();

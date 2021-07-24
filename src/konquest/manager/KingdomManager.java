@@ -269,6 +269,7 @@ public class KingdomManager {
 			int min_distance_capital = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
 			int min_distance_town = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
 			int searchDistance = 0;
+			int minDistance = Integer.MAX_VALUE;
 			for(KonKingdom kingdom : kingdomMap.values()) {
 				// Verify name is not taken by existing towns or kingdoms
 				if(name.equalsIgnoreCase(kingdom.getName()) || kingdom.hasTown(name)) {
@@ -281,11 +282,17 @@ public class KingdomManager {
 					ChatUtil.printDebug("Failed to add town, too close to capital "+kingdom.getCapital().getName());
 					return 5;
 				}
+				if(searchDistance != -1 && searchDistance < minDistance) {
+					minDistance = searchDistance;
+				}
 				for(KonTown town : kingdom.getTowns()) {
 					searchDistance = Konquest.chunkDistance(loc, town.getCenterLoc());
 					if(searchDistance != -1 && searchDistance < min_distance_town) {
 						ChatUtil.printDebug("Failed to add town, too close to town "+town.getName());
 						return 5;
+					}
+					if(searchDistance != -1 && searchDistance < minDistance) {
+						minDistance = searchDistance;
 					}
 				}
 			}
@@ -299,6 +306,15 @@ public class KingdomManager {
 					ChatUtil.printDebug("Failed to add town, too close to ruin "+ruin.getName());
 					return 5;
 				}
+				if(searchDistance != -1 && searchDistance < minDistance) {
+					minDistance = searchDistance;
+				}
+			}
+			// Verify max distance
+			int maxLimit = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_distance_all",0);
+			if(minDistance != 0 && maxLimit > 0 && minDistance > maxLimit) {
+				ChatUtil.printDebug("Failed to add town, too far from other towns and capitals");
+				return 5;
 			}
 			for(TravelDestination keyword : TravelDestination.values()) {
 				if(name.equalsIgnoreCase(keyword.toString())) {
