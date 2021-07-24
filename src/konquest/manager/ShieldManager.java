@@ -195,12 +195,13 @@ public class ShieldManager {
 		
 		// Passed checks, activate the shield
 		String timeFormat = Konquest.getTimeFormat(shield.getDurationSeconds(), ChatColor.AQUA);
+		String shieldName = shield.getId()+" "+MessagePath.LABEL_SHIELD.getMessage();
 		if(town.isShielded()) {
 			endTime = town.getShieldEndTime() + shieldTime;
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_ADD.getMessage(shield.getId(),timeFormat));
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_ADD.getMessage(shieldName,timeFormat));
 			ChatUtil.printDebug("Activated town shield addition "+shield.getId()+" to town "+town.getName()+" for end time "+endTime);
 		} else {
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_NEW.getMessage(shield.getId(),timeFormat));
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_NEW.getMessage(shieldName,timeFormat));
 			ChatUtil.printDebug("Activated new town shield "+shield.getId()+" to town "+town.getName()+" for end time "+endTime);
 		}
 		town.activateShield(endTime);
@@ -257,12 +258,13 @@ public class ShieldManager {
 		
 		// Passed checks, activate the armor
 		int newArmor = armor.getBlocks();
+		String armorName = armor.getId()+" "+MessagePath.LABEL_ARMOR.getMessage();
 		if(town.isArmored()) {
 			newArmor = town.getArmorBlocks() + armor.getBlocks();
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_ADD.getMessage(armor.getId(),armor.getBlocks()));
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_ADD.getMessage(armorName,armor.getBlocks()));
 			ChatUtil.printDebug("Activated town armor addition "+armor.getId()+" to town "+town.getName()+" for blocks "+armor.getBlocks());
 		} else {
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_NEW.getMessage(armor.getId(),armor.getBlocks()));
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_NEW.getMessage(armorName,armor.getBlocks()));
 			ChatUtil.printDebug("Activated new town armor "+armor.getId()+" to town "+town.getName()+" for blocks "+armor.getBlocks());
 		}
 		town.activateArmor(newArmor);

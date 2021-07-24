@@ -10,6 +10,7 @@ import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import net.milkbowl.vault.economy.EconomyResponse;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.StringUtil;
 
 public class SettleCommand extends CommandBase {
 
@@ -224,7 +226,16 @@ public class SettleCommand extends CommandBase {
 	
 	@Override
 	public List<String> tabComplete() {
-		// No arguments to complete
-		return Collections.emptyList();
+		// k settle ***
+		List<String> tabList = new ArrayList<>();
+		final List<String> matchedTabList = new ArrayList<>();
+		
+		if(getArgs().length == 2) {
+			tabList.add("***");
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
+		}
+		return matchedTabList;
 	}
 }

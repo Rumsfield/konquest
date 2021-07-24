@@ -606,6 +606,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	public void updateBarPlayers() {
 		monumentBarAllies.removeAll();
 		monumentBarEnemies.removeAll();
+		shieldArmorBarAll.removeAll();
 		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
 			Player bukkitPlayer = player.getBukkitPlayer();
 			if(isLocInside(bukkitPlayer.getLocation())) {
@@ -614,6 +615,7 @@ public class KonTown extends KonTerritory implements Timeable{
 				} else {
 					monumentBarEnemies.addPlayer(bukkitPlayer);
 				}
+				shieldArmorBarAll.addPlayer(bukkitPlayer);
 			}
 		}
 	}
