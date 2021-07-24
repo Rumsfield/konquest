@@ -1,7 +1,7 @@
 # Town Shields & Armor
 # Instructions: Set up each town shield and armor option in this file. Each option has a name, charge and cost-per-resident.
 # You may add more options, or remove the default ones. The format is below. Replace text in <> with your own values.
-#
+# 
 # shields:
 #   <name>:
 #     charge: <shield duration in seconds>
