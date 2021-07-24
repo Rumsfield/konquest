@@ -126,7 +126,9 @@ public class RuinAdminCommand extends CommandBase {
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 4) {
 			String subCmd = getArgs()[2];
-			if(subCmd.equalsIgnoreCase("remove") || subCmd.equalsIgnoreCase("criticals") || subCmd.equalsIgnoreCase("spawns")) {
+			if(subCmd.equalsIgnoreCase("create")) {
+				tabList.add("***");
+			} else if(subCmd.equalsIgnoreCase("remove") || subCmd.equalsIgnoreCase("criticals") || subCmd.equalsIgnoreCase("spawns")) {
 				tabList.addAll(getKonquest().getRuinManager().getRuinNames());
 			}
 			// Trim down completion options based on current input

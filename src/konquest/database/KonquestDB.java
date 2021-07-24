@@ -40,6 +40,7 @@ public class KonquestDB extends Database{
         spawnTables();
         konquest.getPlayerManager().initAllSavedPlayers();
         konquest.getKingdomManager().initCamps();
+        konquest.getMapHandler().drawDynmapAllTerritories();
         isReady = true;
         ChatUtil.printStatus("SQL database is ready");
         

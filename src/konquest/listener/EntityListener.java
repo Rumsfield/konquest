@@ -165,6 +165,19 @@ public class EntityListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
+					// If town is shielded, prevent all explosions
+					if(town.isShielded()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If town is armored, damage the armor while preventing explosions
+					if(town.isArmored()) {
+						int damage = konquest.getConfigManager().getConfig("core").getInt("core.towns.armor_tnt_damage",1);
+						town.damageArmor(damage);
+						Konquest.playTownArmorSound(event.getLocation());
+						event.setCancelled(true);
+						return;
+					}
 				}
 				// Protect chests
 				boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_break");
@@ -481,6 +494,18 @@ public class EntityListener implements Listener {
 									event.setCancelled(true);
 									return;
 								}
+							}
+							// If town is shielded, prevent all enemy entity damage
+							if(town.isShielded()) {
+								ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_AQUA+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+								event.setCancelled(true);
+								return;
+							}
+							// If town is armored, prevent all enemy entity damage
+							if(town.isArmored()) {
+								Konquest.playTownArmorSound(player.getBukkitPlayer());
+								event.setCancelled(true);
+								return;
 							}
 	    				}
 	    			}

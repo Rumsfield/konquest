@@ -40,7 +40,7 @@ public class ForceJoinAdminCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
         		return;
         	}
-        	getKonquest().getKingdomManager().assignPlayerKingdom(player, kingdomName);
+        	getKonquest().getKingdomManager().assignPlayerKingdom(player, kingdomName, true);
         	//ChatUtil.sendNotice((Player) getSender(), "Successfully set player "+playerName+" to kingdom "+kingdomName);
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEJOIN_NOTICE_SUCCESS.getMessage(playerName,kingdomName));
         }

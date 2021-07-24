@@ -50,7 +50,7 @@ public class RenameAdminCommand extends CommandBase {
     			for(KonTown town : kingdom.getTowns()) {
     				if(town.getName().equals(oldName)) {
     					// Change town name
-    					kingdom.renameTown(oldName, newName);
+    					getKonquest().getKingdomManager().renameTown(oldName, newName, kingdom.getName());
     					//ChatUtil.sendNotice((Player) getSender(), "Successfully renamed Town "+oldName+" to "+newName);
     					ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RENAME_NOTICE_TOWN.getMessage(oldName,newName));
     					return;
@@ -87,6 +87,11 @@ public class RenameAdminCommand extends CommandBase {
 			} else {
 				ChatUtil.printDebug("RenameAdminCommand bad kingdom argument "+kingdomName);
 			}
+		} else if(getArgs().length == 5) {
+			tabList.add("***");
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
 		}
 		return matchedTabList;
 	}

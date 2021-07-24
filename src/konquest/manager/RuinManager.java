@@ -119,6 +119,7 @@ public class RuinManager {
 			ruinMap.put(nameLower, new KonRuin(loc, name, kingdomManager.getNeutrals(), konquest));
 			ruinMap.get(nameLower).initClaim();
 			kingdomManager.addAllTerritory(loc.getWorld(),ruinMap.get(nameLower).getChunkList());
+			konquest.getMapHandler().drawDynmapUpdateTerritory(ruinMap.get(nameLower));
 			result = true;
 		}
 		return result;
@@ -131,6 +132,7 @@ public class RuinManager {
 			oldRuin.removeAllBarPlayers();
 			oldRuin.removeAllGolems();
 			kingdomManager.removeAllTerritory(oldRuin.getCenterLoc().getWorld(), oldRuin.getChunkList().keySet());
+			konquest.getMapHandler().drawDynmapRemoveTerritory(oldRuin);
 			ChatUtil.printDebug("Removed Ruin "+name);
 			oldRuin = null;
 			result = true;
@@ -174,6 +176,7 @@ public class RuinManager {
         double x,y,z;
         List<Double> sectionList;
         String worldName;
+        KonRuin ruin;
         // Load all Ruins
         ConfigurationSection ruinsSection = ruinsConfig.getConfigurationSection("ruins");
         for(String ruinName : ruinsConfig.getConfigurationSection("ruins").getKeys(false)) {
@@ -185,36 +188,46 @@ public class RuinManager {
     		z = sectionList.get(2);
     		World world = Bukkit.getWorld(worldName);
         	Location ruin_center = new Location(world,x,y,z);
-        	addRuin(ruin_center,ruinName);
-        	getRuin(ruinName).addPoints(konquest.formatStringToPoints(ruinSection.getString("chunks","")));
-        	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("criticals",""),world)) {
-        		loc.setWorld(world);
-        		getRuin(ruinName).addCriticalLocation(loc);
-    		}
-        	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("spawns",""),world)) {
-        		loc.setWorld(world);
-        		getRuin(ruinName).addSpawnLocation(loc);
-    		}
-        	kingdomManager.addAllTerritory(world,getRuin(ruinName).getChunkList());
+        	if(addRuin(ruin_center,ruinName)) {
+        		ruin = getRuin(ruinName);
+        		if(ruin != null) {
+        			ruin.addPoints(konquest.formatStringToPoints(ruinSection.getString("chunks","")));
+                	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("criticals",""),world)) {
+                		loc.setWorld(world);
+                		ruin.addCriticalLocation(loc);
+            		}
+                	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("spawns",""),world)) {
+                		loc.setWorld(world);
+                		ruin.addSpawnLocation(loc);
+            		}
+                	kingdomManager.addAllTerritory(world,ruin.getChunkList());
+        		} else {
+        			String message = "Could not load ruin "+ruinName+", ruins.yml may be corrupted and needs to be deleted.";
+            		ChatUtil.printConsoleError(message);
+            		konquest.opStatusMessages.add(message);
+        		}
+        	} else {
+        		String message = "Failed to load ruin "+ruinName+", ruins.yml may be corrupted and needs to be deleted.";
+        		ChatUtil.printConsoleError(message);
+        		konquest.opStatusMessages.add(message);
+        	}
         }
 	}
 	
 	public void saveRuins() {
-		if(!ruinMap.isEmpty()) {
-			FileConfiguration ruinsConfig = konquest.getConfigManager().getConfig("ruins");
-			ruinsConfig.set("ruins", null); // reset ruins config
-			ConfigurationSection root = ruinsConfig.createSection("ruins");
-			for(String name : ruinMap.keySet()) {
-				KonRuin ruin = ruinMap.get(name);
-				ConfigurationSection ruinSection = root.createSection(ruin.getName());
-				ruinSection.set("world", ruin.getWorld().getName());
-				ruinSection.set("center", new int[] {(int) ruin.getCenterLoc().getX(),
-						 							 (int) ruin.getCenterLoc().getY(),
-						 							 (int) ruin.getCenterLoc().getZ()});
-				ruinSection.set("chunks", konquest.formatPointsToString(ruin.getChunkList().keySet()));
-				ruinSection.set("criticals", konquest.formatLocationsToString(ruin.getCriticalLocations()));
-				ruinSection.set("spawns", konquest.formatLocationsToString(ruin.getSpawnLocations()));
-			}
+		FileConfiguration ruinsConfig = konquest.getConfigManager().getConfig("ruins");
+		ruinsConfig.set("ruins", null); // reset ruins config
+		ConfigurationSection root = ruinsConfig.createSection("ruins");
+		for(String name : ruinMap.keySet()) {
+			KonRuin ruin = ruinMap.get(name);
+			ConfigurationSection ruinSection = root.createSection(ruin.getName());
+			ruinSection.set("world", ruin.getWorld().getName());
+			ruinSection.set("center", new int[] {(int) ruin.getCenterLoc().getX(),
+					 							 (int) ruin.getCenterLoc().getY(),
+					 							 (int) ruin.getCenterLoc().getZ()});
+			ruinSection.set("chunks", konquest.formatPointsToString(ruin.getChunkList().keySet()));
+			ruinSection.set("criticals", konquest.formatLocationsToString(ruin.getCriticalLocations()));
+			ruinSection.set("spawns", konquest.formatLocationsToString(ruin.getSpawnLocations()));
 		}
 	}
 	

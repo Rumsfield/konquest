@@ -3,6 +3,7 @@ package konquest.manager;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -99,6 +100,7 @@ public class KingdomManager {
 			kingdomMap.get(name).initCapital();
 			//updateTerritoryCache();
 			addAllTerritory(loc.getWorld(),kingdomMap.get(name).getCapital().getChunkList());
+			konquest.getMapHandler().drawDynmapUpdateTerritory(kingdomMap.get(name).getCapital());
 			//ChatUtil.printDebug("Added new Kingdom "+name);
 			return true;
 		}
@@ -108,8 +110,10 @@ public class KingdomManager {
 	public boolean removeKingdom(String name) {
 		KonKingdom oldKingdom = kingdomMap.remove(name);
 		if(oldKingdom != null) {
-			//updateTerritoryCache();
+			oldKingdom.getCapital().removeAllBarPlayers();
 			removeAllTerritory(oldKingdom.getCapital().getWorld(),oldKingdom.getCapital().getChunkList().keySet());
+			konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
+			oldKingdom = null;
 			ChatUtil.printDebug("Removed Kingdom "+name);
 			return true;
 		}
@@ -118,9 +122,20 @@ public class KingdomManager {
 	
 	public boolean renameKingdom(String oldName, String newName) {
 		if(kingdomMap.containsKey(oldName)) {
+			KonKingdom oldKingdom = getKingdom(oldName);
+			for (KonTown town : oldKingdom.getTowns()) {
+				konquest.getMapHandler().drawDynmapRemoveTerritory(town);
+			}
+			konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
+			oldKingdom = null;
 			getKingdom(oldName).setName(newName);
 			KonKingdom kingdom = kingdomMap.remove(oldName);
 			kingdomMap.put(newName, kingdom);
+			kingdom.getCapital().updateName();
+			konquest.getMapHandler().drawDynmapUpdateTerritory(kingdom.getCapital());
+			for (KonTown town : kingdom.getTowns()) {
+				konquest.getMapHandler().drawDynmapUpdateTerritory(town);
+			}
 			return true;
 		}
 		return false;
@@ -134,11 +149,19 @@ public class KingdomManager {
 	 * 				0 = success
 	 *  			1 = kingdom name does not exist
 	 *  			2 = the kingdom is full (config option max_player_diff)
+	 *  			3 = missing permission
 	 */
-	public int assignPlayerKingdom(KonPlayer player, String kingdomName) {
+	public int assignPlayerKingdom(KonPlayer player, String kingdomName, boolean force) {
 		//TODO: Some sort of penalty for changing kingdoms, check if barbarian first
-		int status = 0;
 		if(isKingdom(kingdomName)) {
+			// Check for permission
+			boolean isPerKingdomJoin = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.per_kingdom_join_permissions",false);
+			if (isPerKingdomJoin && !force) {
+				String permission = "konquest.join."+getKingdom(kingdomName).getName().toLowerCase();
+				if(!player.getBukkitPlayer().hasPermission(permission)) {
+					return 3;
+				}
+			}
 			int config_max_player_diff = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.max_player_diff");
 			int smallestKingdomPlayerCount = 0;
 			int targetKingdomPlayerCount = 0;
@@ -149,13 +172,15 @@ public class KingdomManager {
 				targetKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(kingdomName).size();
 			}
 			// Join kingdom is max_player_diff is disabled, or if the desired kingdom is within the max diff
-			if(config_max_player_diff == 0 || 
+			if(config_max_player_diff == 0 || force ||
 					(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
 				removeCamp(player);
 				player.setKingdom(getKingdom(kingdomName));
 		    	player.setBarbarian(false);
-		    	player.getBukkitPlayer().teleport(player.getKingdom().getCapital().getSpawnLoc());
-		    	player.getBukkitPlayer().setBedSpawnLocation(getKingdom(kingdomName).getCapital().getSpawnLoc(), true);
+		    	Location spawn = player.getKingdom().getCapital().getSpawnLoc();
+		    	Location destination = new Location(spawn.getWorld(),spawn.getX()+0.5,spawn.getY()+1.0,spawn.getZ()+0.5);
+		    	player.getBukkitPlayer().teleport(destination);
+		    	player.getBukkitPlayer().setBedSpawnLocation(destination, true);
 		    	//konquest.getPlayerManager().saveAllPlayers();
 		    	//konquest.getPlayerManager().updateAllSavedPlayers();
 		    	updateSmallestKingdom();
@@ -163,12 +188,12 @@ public class KingdomManager {
 		    	konquest.getDirectiveManager().displayBook(player);
 		    	updateKingdomOfflineProtection();
 			} else {
-				status = 2;
+				return 2;
 			}
 		} else {
-			status = 1;
+			return 1;
 		}
-		return status;
+		return 0;
 	}
 	
 	/**
@@ -244,6 +269,7 @@ public class KingdomManager {
 			int min_distance_capital = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
 			int min_distance_town = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
 			int searchDistance = 0;
+			int minDistance = Integer.MAX_VALUE;
 			for(KonKingdom kingdom : kingdomMap.values()) {
 				// Verify name is not taken by existing towns or kingdoms
 				if(name.equalsIgnoreCase(kingdom.getName()) || kingdom.hasTown(name)) {
@@ -256,11 +282,17 @@ public class KingdomManager {
 					ChatUtil.printDebug("Failed to add town, too close to capital "+kingdom.getCapital().getName());
 					return 5;
 				}
+				if(searchDistance != -1 && searchDistance < minDistance) {
+					minDistance = searchDistance;
+				}
 				for(KonTown town : kingdom.getTowns()) {
 					searchDistance = Konquest.chunkDistance(loc, town.getCenterLoc());
 					if(searchDistance != -1 && searchDistance < min_distance_town) {
 						ChatUtil.printDebug("Failed to add town, too close to town "+town.getName());
 						return 5;
+					}
+					if(searchDistance != -1 && searchDistance < minDistance) {
+						minDistance = searchDistance;
 					}
 				}
 			}
@@ -274,6 +306,15 @@ public class KingdomManager {
 					ChatUtil.printDebug("Failed to add town, too close to ruin "+ruin.getName());
 					return 5;
 				}
+				if(searchDistance != -1 && searchDistance < minDistance) {
+					minDistance = searchDistance;
+				}
+			}
+			// Verify max distance
+			int maxLimit = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_distance_all",0);
+			if(minDistance != 0 && maxLimit > 0 && minDistance > maxLimit) {
+				ChatUtil.printDebug("Failed to add town, too far from other towns and capitals");
+				return 5;
 			}
 			for(TravelDestination keyword : TravelDestination.values()) {
 				if(name.equalsIgnoreCase(keyword.toString())) {
@@ -300,6 +341,7 @@ public class KingdomManager {
 						// When a town is added successfully, update the chunk cache
 						//updateTerritoryCache();
 						addAllTerritory(loc.getWorld(),getKingdom(kingdomName).getTown(name).getChunkList());
+						konquest.getMapHandler().drawDynmapUpdateTerritory(getKingdom(kingdomName).getTown(name));
 						return 0;
 					} else {
 						// Remove town if init fails, exit code 10+
@@ -331,7 +373,32 @@ public class KingdomManager {
 				// When a town is removed successfully, update the chunk cache
 				//updateTerritoryCache();
 				removeAllTerritory(town.getWorld(),townPoints);
+				konquest.getMapHandler().drawDynmapRemoveTerritory(town);
 				konquest.getIntegrationManager().deleteShopsInPoints(townPoints,town.getWorld());
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * Primary method for renaming a town
+	 * @param oldName
+	 * @param newName
+	 * @param kingdomName
+	 * @return
+	 */
+	public boolean renameTown(String oldName, String newName, String kingdomName) {
+		if(isKingdom(kingdomName) && getKingdom(kingdomName).hasTown(oldName)) {
+			KonKingdom kingdom = getKingdom(kingdomName);
+			konquest.getMapHandler().drawDynmapRemoveTerritory(kingdom.getTown(oldName));
+			boolean success = kingdom.renameTown(oldName, newName);
+			if (success) {
+				KonTown town = kingdom.getTown(newName);
+				if (town != null) {
+					konquest.getMapHandler().drawDynmapUpdateTerritory(town);
+				}
 				return true;
 			}
 		}
@@ -353,8 +420,10 @@ public class KingdomManager {
 			return false;
 		}
 		if(isKingdom(oldKingdomName) && getKingdom(oldKingdomName).hasTown(name)) {
+			konquest.getMapHandler().drawDynmapRemoveTerritory(getKingdom(oldKingdomName).getTown(name));
 			getKingdom(oldKingdomName).getTown(name).purgeResidents();
 			getKingdom(oldKingdomName).getTown(name).clearUpgrades();
+			getKingdom(oldKingdomName).getTown(name).clearShieldsArmors();
 			getKingdom(oldKingdomName).getTown(name).setKingdom(conquerPlayer.getKingdom());
 			conquerPlayer.getKingdom().addTownConquer(name, getKingdom(oldKingdomName).removeTownConquer(name));
 			conquerPlayer.getKingdom().getTown(name).refreshMonument();
@@ -362,6 +431,7 @@ public class KingdomManager {
 			refreshTownNerfs(conquerPlayer.getKingdom().getTown(name));
 			refreshTownHearts(conquerPlayer.getKingdom().getTown(name));
 			conquerPlayer.getKingdom().getTown(name).updateBarPlayers();
+			konquest.getMapHandler().drawDynmapUpdateTerritory(conquerPlayer.getKingdom().getTown(name));
 			konquest.getIntegrationManager().deleteShopsInPoints(conquerPlayer.getKingdom().getTown(name).getChunkList().keySet(),conquerPlayer.getKingdom().getTown(name).getWorld());
 			return true;
 		}
@@ -403,6 +473,7 @@ public class KingdomManager {
 			Point addPoint = konquest.toPoint(loc);
 			if(closestAdjTerr.getWorld().equals(loc.getWorld()) && closestAdjTerr.addChunk(addPoint)) {
 				addTerritory(loc.getWorld(),addPoint,closestAdjTerr);
+				konquest.getMapHandler().drawDynmapUpdateTerritory(closestAdjTerr);
 				return 0;
 			} else {
 				return 2;
@@ -611,6 +682,7 @@ public class KingdomManager {
     		}
     		konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CLAIM_LAND);
     		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,numChunksClaimed);
+    		konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
     		String territoryName = territory.getName();
     		// Display town info to players in the newly claimed chunks
     		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
@@ -658,9 +730,11 @@ public class KingdomManager {
 	 */
 	public boolean unclaimChunk(Location loc) {
 		if(isChunkClaimed(loc)) {
-			if(getChunkTerritory(loc).removeChunk(loc)) {
+			KonTerritory territory = getChunkTerritory(loc);
+			if(territory.removeChunk(loc)) {
 				//updateTerritoryCache();
 				removeTerritory(loc);
+				konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
 				return true;
 			}
 		}
@@ -1084,6 +1158,11 @@ public class KingdomManager {
 		return barbarianCamps.get(uuid);
 	}
 	
+	public ArrayList<KonCamp> getCamps() {
+		ArrayList<KonCamp> camps = new ArrayList<KonCamp>(barbarianCamps.values());
+		return camps;
+	}
+	
 	/**
 	 * addCamp - primary method for adding a camp for a barbarian
 	 * @param loc
@@ -1115,9 +1194,11 @@ public class KingdomManager {
 			KonCamp newCamp = new KonCamp(loc,player.getOfflineBukkitPlayer(),barbarians,konquest);
 			barbarianCamps.put(uuid,newCamp);
 			newCamp.initClaim();
+			// Update bar players
+			newCamp.updateBarPlayers();
 			//update the chunk cache, add points to primary world cache
 			addAllTerritory(loc.getWorld(),newCamp.getChunkList());
-			//updateTerritoryCache();
+			konquest.getMapHandler().drawDynmapUpdateTerritory(newCamp);
 		} else {
 			return 2;
 		}
@@ -1135,9 +1216,11 @@ public class KingdomManager {
 			campPoints.addAll(barbarianCamps.get(uuid).getChunkList().keySet());
 			konquest.getIntegrationManager().deleteShopsInPoints(campPoints,barbarianCamps.get(uuid).getWorld());
 			KonCamp removedCamp = barbarianCamps.remove(uuid);
+			removedCamp.removeAllBarPlayers();
 			//update the chunk cache, remove all points from primary world
-			//updateTerritoryCache();
 			removeAllTerritory(removedCamp.getWorld(),removedCamp.getChunkList().keySet());
+			konquest.getMapHandler().drawDynmapRemoveTerritory(removedCamp);
+			removedCamp = null;
 		} else {
 			ChatUtil.printDebug("Failed to remove camp for missing UUID "+uuid);
 			return false;
@@ -1483,7 +1566,7 @@ public class KingdomManager {
 				Color renderColor;
 				if(chunkKingdom.equals(getBarbarians())) {
 					renderColor = Color.YELLOW;
-				} if(chunkKingdom.equals(getNeutrals())) {
+				} else if(chunkKingdom.equals(getNeutrals())) {
 					renderColor = Color.GRAY;
 				} else {
 					if(player.getKingdom().equals(chunkKingdom)) {
@@ -1686,6 +1769,8 @@ public class KingdomManager {
         	ChatUtil.printDebug("There is no kingdoms section in kingdoms.yml");
             return;
         }
+        boolean isShieldsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_shields",false);
+        boolean isArmorsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_armor",false);
         double x,y,z;
         List<Double> sectionList;
         String worldName;
@@ -1698,7 +1783,6 @@ public class KingdomManager {
         LoadingPrinter loadBar = new LoadingPrinter(numTowns,"Loading "+numTowns+" Towns");
         // Load all Kingdoms
         for(String kingdomName : kingdomsConfig.getConfigurationSection("kingdoms").getKeys(false)) {
-        	//Date kStart = new Date();
         	//ChatUtil.printDebug("Loading Kingdom: "+kingdomName);
         	ConfigurationSection kingdomSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName);
         	boolean isPeaceful = kingdomSection.getBoolean("peaceful", false);
@@ -1734,7 +1818,6 @@ public class KingdomManager {
         		ChatUtil.printConsoleError(message);
         		konquest.opStatusMessages.add(message);
         	}
-        	//Date kStep1 = new Date();
         	// Create Monument Templates
         	if(monumentSection != null && capitalWorld != null) {
         		sectionList = monumentSection.getDoubleList("travel");
@@ -1752,12 +1835,6 @@ public class KingdomManager {
         		y = sectionList.get(1);
         		z = sectionList.get(2);
 	        	Location monument_cornertwo = new Location(capitalWorld,x,y,z);
-	        	// Load monument template chunk
-	        	//int tmpX = (int)Math.floor((double)monument_cornerone.getBlockX()/16);
-                //int tmpZ = (int)Math.floor((double)monument_cornerone.getBlockZ()/16);
-	        	//capitalWorld.loadChunk(tmpX,tmpZ);
-                //capitalWorld.addPluginChunkTicket(tmpX, tmpZ, konquest.getPlugin());
-                //capitalWorld.setChunkForceLoaded(tmpX, tmpZ, true);
 	        	// Create a Monument Template region for current Kingdom
         		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel);
         		if(status != 0) {
@@ -1786,14 +1863,12 @@ public class KingdomManager {
         		ChatUtil.printConsoleError("Null monument template for Kingdom "+kingdomName+" in config file!");
         		konquest.opStatusMessages.add("Missing monument template for Kingdom "+kingdomName+" in kingdoms.yml config file. Use \"/k admin monument\" to define the monument template for this Kingdom.");
         	}
-        	//Date kStep2 = new Date();
         	// Load all towns
         	boolean isMissingMonuments = false;
         	for(String townName : kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns").getKeys(false)) {
         		//ChatUtil.printDebug("Loading Town: "+townName);
             	ConfigurationSection townSection = kingdomsConfig.getConfigurationSection("kingdoms."+kingdomName+".towns."+townName);
             	if(townSection != null) {
-            		//Date start = new Date();
             		worldName = townSection.getString("world",defaultWorldName);
             		World townWorld = Bukkit.getServer().getWorld(worldName);
             		int base = townSection.getInt("base");
@@ -1807,54 +1882,34 @@ public class KingdomManager {
             		y = sectionList.get(1);
             		z = sectionList.get(2);
 	            	Location town_center = new Location(townWorld,x,y,z);
-	            	//Date step1 = new Date();
 	            	// Create Town
 	            	kingdomMap.get(kingdomName).addTown(town_center, townName);
 	            	KonTown town = kingdomMap.get(kingdomName).getTown(townName);
 	            	// Set town spawn point
 	            	town.setSpawn(town_spawn);
-	            	//Date step2 = new Date();
-	            	
-	            	
-	            	// Load monument chunk
-	            	//int monX = (int)Math.floor((double)town_center.getBlockX()/16);
-	                //int monZ = (int)Math.floor((double)town_center.getBlockZ()/16);
-	            	//townWorld.loadChunk(monX,monZ);
-	            	//townWorld.setChunkForceLoaded(monX, monZ, true);
-	            	
 	            	// Setup town monument parameters from template
 	            	town.loadMonument(base, kingdomMap.get(kingdomName).getMonumentTemplate());
-	            	
-	            	
-	            	/*
-	            	Bukkit.getScheduler().runTaskAsynchronously(konquest.getPlugin(), new Runnable() {
-	            	//service.submit(new Runnable() {
-	                    @Override
-	                    public void run() {
-	                    	// Load monument chunk
-	    	            	//int monX = (int)Math.floor((double)town_center.getBlockX()/16);
-	    	                //int monZ = (int)Math.floor((double)town_center.getBlockZ()/16);
-	    	            	//townWorld.loadChunk(monX,monZ);
-	    	            	// Setup town monument parameters from template
-	    	            	town.loadMonument(base, kingdomMap.get(kingdomName).getMonumentTemplate());
-	    	            	ChatUtil.printDebug("Finished loading monument for town "+town.getName());
-	                    }
-	            	});
-	            	*/
 	            	if(!kingdomMap.get(kingdomName).getMonumentTemplate().isValid()) {
 	            		isMissingMonuments = true;
 	            		ChatUtil.printConsoleError("Failed to load monument for Town "+townName+" in kingdom "+kingdomName+" from invalid template");
 	            	}
-	            	
-	            	//Date step4 = new Date();
-	            	// Unload monument chunk
-	            	//townWorld.unloadChunk(monX,monZ);
-	            	//Date step5 = new Date();
 	            	// Add all Town chunk claims
 	            	town.addPoints(konquest.formatStringToPoints(townSection.getString("chunks")));
 	            	// Update territory cache
 		        	addAllTerritory(townWorld,town.getChunkList());
-		        	//Date step6 = new Date();
+		        	// Set shield
+		        	boolean isShieldActive = townSection.getBoolean("shield",false);
+		        	int shieldTime = townSection.getInt("shield_time",0);
+		        	Date now = new Date();
+		        	if(isShieldsEnabled && isShieldActive && shieldTime > (now.getTime()/1000)) {
+		        		town.activateShield(shieldTime);
+		        	}
+		        	// Set armor
+		        	boolean isArmorActive = townSection.getBoolean("armor",false);
+		        	int armorBlocks = townSection.getInt("armor_blocks",0);
+		        	if(isArmorsEnabled && isArmorActive && armorBlocks > 0) {
+		        		town.activateArmor(armorBlocks);
+		        	}
 	            	// Set open flag
 	            	boolean isOpen = townSection.getBoolean("open",false);
 	            	town.setIsOpen(isOpen);
@@ -1887,7 +1942,6 @@ public class KingdomManager {
 	            			town.addJoinRequest(UUID.fromString(requestUUID), type);
 	            		}
 	            	}
-	            	//Date step7 = new Date();
 	            	// Add upgrades
 	            	if(townSection.contains("upgrades")) {
 	            		for(String upgradeName : townSection.getConfigurationSection("upgrades").getKeys(false)) {
@@ -1898,22 +1952,8 @@ public class KingdomManager {
 	            			}
 	            		}
 	            	}
-	            	//Date step8 = new Date();
 	            	// Update upgrade status
 	            	konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
-	            	/*
-	            	Date step9 = new Date();
-	            	int s1 = (int)(step1.getTime()-start.getTime());
-	            	int s2 = (int)(step2.getTime()-start.getTime());
-        			int s3 = (int)(step3.getTime()-start.getTime());
-        			int s4 = (int)(step4.getTime()-start.getTime());
-        			int s5 = (int)(step5.getTime()-start.getTime());
-        			int s6 = (int)(step6.getTime()-start.getTime());
-        			int s7 = (int)(step7.getTime()-start.getTime());
-        			int s8 = (int)(step8.getTime()-start.getTime());
-        			int s9 = (int)(step9.getTime()-start.getTime());
-        			ChatUtil.printDebug("Town "+townName+" timings: "+s1+","+s2+","+s3+","+s4+","+s5+","+s6+","+s7+","+s8+","+s9);
-        			*/
         			// Update loading bar
 	            	loadBar.addProgress(1);
 	            }
@@ -1921,13 +1961,6 @@ public class KingdomManager {
         	if(isMissingMonuments) {
         		konquest.opStatusMessages.add("Kingdom "+kingdomName+" has Towns with invalid Monuments. You must create a new Monument Template and restart the server.");
         	}
-        	//Date kStep3 = new Date();
-        	/*
-        	int s1 = (int)(kStep1.getTime()-kStart.getTime());
-        	int s2 = (int)(kStep2.getTime()-kStart.getTime());
-			int s3 = (int)(kStep3.getTime()-kStart.getTime());
-			ChatUtil.printDebug("Kingdom "+kingdomName+" timings: "+s1+","+s2+","+s3);
-			*/
         }
 		ChatUtil.printDebug("Loaded Kingdoms");
 	}
@@ -1960,10 +1993,14 @@ public class KingdomManager {
             		z = sectionList.get(2);
             		World world = Bukkit.getWorld(worldName);
                 	Location camp_center = new Location(world,x,y,z);
-            		addCamp(camp_center, offlinePlayer);
-            		getCamp(offlinePlayer).addPoints(konquest.formatStringToPoints(playerCampSection.getString("chunks")));
-            		addAllTerritory(world,getCamp(offlinePlayer).getChunkList());
-            		totalCamps++;
+            		int status = addCamp(camp_center, offlinePlayer);
+            		if(status == 0) {
+	            		getCamp(offlinePlayer).addPoints(konquest.formatStringToPoints(playerCampSection.getString("chunks")));
+	            		addAllTerritory(world,getCamp(offlinePlayer).getChunkList());
+	            		totalCamps++;
+            		} else {
+            			ChatUtil.printDebug("Failed to add camp for player "+offlineBukkitPlayer.getName()+", error code: "+status);
+            		}
         		} else {
         			if(offlineBukkitPlayer != null) {
         				ChatUtil.printDebug("Failed to find player "+offlineBukkitPlayer.getName()+" when adding their camp");
@@ -1979,100 +2016,97 @@ public class KingdomManager {
 	
 	//TODO Save and update only items which have changed, do not delete everything and write all from memory
 	public void saveKingdoms() {
-		// This is a lame way to try to ensure that the kingdom map was initialized, and to avoid erasing the YML file when memory is gone
-		if(!kingdomMap.isEmpty()) {
-			FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
-			kingdomsConfig.set("kingdoms", null); // reset kingdoms config
-			ConfigurationSection root = kingdomsConfig.createSection("kingdoms");
-			for(KonKingdom kingdom : kingdomMap.values()) {
-				ConfigurationSection kingdomSection = root.createSection(kingdom.getName());
-				kingdomSection.set("peaceful",kingdom.isPeaceful());
-	            ConfigurationSection capitalSection = kingdomSection.createSection("capital");
-	            capitalSection.set("world", kingdom.getCapital().getWorld().getName());
-	            capitalSection.set("spawn", new int[] {(int) kingdom.getCapital().getSpawnLoc().getX(),
-													   (int) kingdom.getCapital().getSpawnLoc().getY(),
-													   (int) kingdom.getCapital().getSpawnLoc().getZ()});
-	            capitalSection.set("center", new int[] {(int) kingdom.getCapital().getCenterLoc().getX(),
-						 								(int) kingdom.getCapital().getCenterLoc().getY(),
-						 								(int) kingdom.getCapital().getCenterLoc().getZ()});
-	            capitalSection.set("chunks", konquest.formatPointsToString(kingdom.getCapital().getChunkList().keySet()));
-	            if(kingdom.getMonumentTemplate().isValid()) {
-		            ConfigurationSection monumentSection = kingdomSection.createSection("monument");
-		            monumentSection.set("travel", new int[] {(int) kingdom.getMonumentTemplate().getTravelPoint().getX(),
-															 (int) kingdom.getMonumentTemplate().getTravelPoint().getY(),
-															 (int) kingdom.getMonumentTemplate().getTravelPoint().getZ()});
-		            monumentSection.set("cornerone", new int[] {(int) kingdom.getMonumentTemplate().getCornerOne().getX(),
-							 								 	(int) kingdom.getMonumentTemplate().getCornerOne().getY(),
-							 								 	(int) kingdom.getMonumentTemplate().getCornerOne().getZ()});
-		            monumentSection.set("cornertwo", new int[] {(int) kingdom.getMonumentTemplate().getCornerTwo().getX(),
-							 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getY(),
-							 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getZ()});
-				} else {
-					ChatUtil.printConsoleError("Failed to save invalid monument template for Kingdom "+kingdom.getName());
-				}
-	            ConfigurationSection townsSection = kingdomSection.createSection("towns");
-	            for(KonTown town : kingdom.getTowns()) {
-	            	ConfigurationSection townInstanceSection = townsSection.createSection(town.getName());
-	            	townInstanceSection.set("world", town.getWorld().getName());
-	            	townInstanceSection.set("base", town.getMonument().getBaseY());
-	            	townInstanceSection.set("spawn", new int[] {(int) town.getSpawnLoc().getX(),
-							 								 	(int) town.getSpawnLoc().getY(),
-							 								 	(int) town.getSpawnLoc().getZ()});
-	            	townInstanceSection.set("center", new int[] {(int) town.getCenterLoc().getX(),
-							 									 (int) town.getCenterLoc().getY(),
-							 									 (int) town.getCenterLoc().getZ()});
-	                townInstanceSection.set("chunks", konquest.formatPointsToString(town.getChunkList().keySet()));
-	                townInstanceSection.set("open", town.isOpen());
-	                townInstanceSection.set("lord", "");
-	                ConfigurationSection townInstanceResidentSection = townInstanceSection.createSection("residents");
-	                for(OfflinePlayer resident : town.getPlayerResidents()) {
-	                	String uuid = resident.getUniqueId().toString();
-	                	if(town.isPlayerLord(resident)) {
-	                		townInstanceSection.set("lord", uuid);
-	                	} else if(town.isPlayerElite(resident)) {
-	                		townInstanceResidentSection.set(uuid, true);
-	                	} else {
-	                		townInstanceResidentSection.set(uuid, false);
-	                	}
-	                }
-	                ConfigurationSection townInstanceRequestsSection = townInstanceSection.createSection("requests");
-	                for(OfflinePlayer requestee : town.getJoinRequests()) {
-	                	String uuid = requestee.getUniqueId().toString();
-	                	townInstanceRequestsSection.set(uuid, false);
-	                }
-	                for(OfflinePlayer invitee : town.getJoinInvites()) {
-	                	String uuid = invitee.getUniqueId().toString();
-	                	townInstanceRequestsSection.set(uuid, true);
-	                }
-	                ConfigurationSection townInstanceUpgradeSection = townInstanceSection.createSection("upgrades");
-	                for(KonUpgrade upgrade : KonUpgrade.values()) {
-	                	int level = town.getRawUpgradeLevel(upgrade);
-	                	if(level > 0) {
-	                		townInstanceUpgradeSection.set(upgrade.toString(), level);
-	                	}
-	                }
-	            }
+		FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
+		kingdomsConfig.set("kingdoms", null); // reset kingdoms config
+		ConfigurationSection root = kingdomsConfig.createSection("kingdoms");
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			ConfigurationSection kingdomSection = root.createSection(kingdom.getName());
+			kingdomSection.set("peaceful",kingdom.isPeaceful());
+            ConfigurationSection capitalSection = kingdomSection.createSection("capital");
+            capitalSection.set("world", kingdom.getCapital().getWorld().getName());
+            capitalSection.set("spawn", new int[] {(int) kingdom.getCapital().getSpawnLoc().getX(),
+												   (int) kingdom.getCapital().getSpawnLoc().getY(),
+												   (int) kingdom.getCapital().getSpawnLoc().getZ()});
+            capitalSection.set("center", new int[] {(int) kingdom.getCapital().getCenterLoc().getX(),
+					 								(int) kingdom.getCapital().getCenterLoc().getY(),
+					 								(int) kingdom.getCapital().getCenterLoc().getZ()});
+            capitalSection.set("chunks", konquest.formatPointsToString(kingdom.getCapital().getChunkList().keySet()));
+            if(kingdom.getMonumentTemplate().isValid()) {
+	            ConfigurationSection monumentSection = kingdomSection.createSection("monument");
+	            monumentSection.set("travel", new int[] {(int) kingdom.getMonumentTemplate().getTravelPoint().getX(),
+														 (int) kingdom.getMonumentTemplate().getTravelPoint().getY(),
+														 (int) kingdom.getMonumentTemplate().getTravelPoint().getZ()});
+	            monumentSection.set("cornerone", new int[] {(int) kingdom.getMonumentTemplate().getCornerOne().getX(),
+						 								 	(int) kingdom.getMonumentTemplate().getCornerOne().getY(),
+						 								 	(int) kingdom.getMonumentTemplate().getCornerOne().getZ()});
+	            monumentSection.set("cornertwo", new int[] {(int) kingdom.getMonumentTemplate().getCornerTwo().getX(),
+						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getY(),
+						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getZ()});
+			} else {
+				ChatUtil.printConsoleError("Failed to save invalid monument template for Kingdom "+kingdom.getName());
 			}
-			ChatUtil.printDebug("Saved Kingdoms");
-		} else {
-			ChatUtil.printDebug("The kingdom memory cache is invalid, aborted save");
+            ConfigurationSection townsSection = kingdomSection.createSection("towns");
+            for(KonTown town : kingdom.getTowns()) {
+            	ConfigurationSection townInstanceSection = townsSection.createSection(town.getName());
+            	townInstanceSection.set("world", town.getWorld().getName());
+            	townInstanceSection.set("base", town.getMonument().getBaseY());
+            	townInstanceSection.set("spawn", new int[] {(int) town.getSpawnLoc().getX(),
+						 								 	(int) town.getSpawnLoc().getY(),
+						 								 	(int) town.getSpawnLoc().getZ()});
+            	townInstanceSection.set("center", new int[] {(int) town.getCenterLoc().getX(),
+						 									 (int) town.getCenterLoc().getY(),
+						 									 (int) town.getCenterLoc().getZ()});
+                townInstanceSection.set("chunks", konquest.formatPointsToString(town.getChunkList().keySet()));
+                townInstanceSection.set("open", town.isOpen());
+                townInstanceSection.set("shield", town.isShielded());
+                townInstanceSection.set("shield_time", town.getShieldEndTime());
+                townInstanceSection.set("armor", town.isArmored());
+                townInstanceSection.set("armor_blocks", town.getArmorBlocks());
+                townInstanceSection.set("lord", "");
+                ConfigurationSection townInstanceResidentSection = townInstanceSection.createSection("residents");
+                for(OfflinePlayer resident : town.getPlayerResidents()) {
+                	String uuid = resident.getUniqueId().toString();
+                	if(town.isPlayerLord(resident)) {
+                		townInstanceSection.set("lord", uuid);
+                	} else if(town.isPlayerElite(resident)) {
+                		townInstanceResidentSection.set(uuid, true);
+                	} else {
+                		townInstanceResidentSection.set(uuid, false);
+                	}
+                }
+                ConfigurationSection townInstanceRequestsSection = townInstanceSection.createSection("requests");
+                for(OfflinePlayer requestee : town.getJoinRequests()) {
+                	String uuid = requestee.getUniqueId().toString();
+                	townInstanceRequestsSection.set(uuid, false);
+                }
+                for(OfflinePlayer invitee : town.getJoinInvites()) {
+                	String uuid = invitee.getUniqueId().toString();
+                	townInstanceRequestsSection.set(uuid, true);
+                }
+                ConfigurationSection townInstanceUpgradeSection = townInstanceSection.createSection("upgrades");
+                for(KonUpgrade upgrade : KonUpgrade.values()) {
+                	int level = town.getRawUpgradeLevel(upgrade);
+                	if(level > 0) {
+                		townInstanceUpgradeSection.set(upgrade.toString(), level);
+                	}
+                }
+            }
 		}
+		ChatUtil.printDebug("Saved Kingdoms");
 	}
 	
 	public void saveCamps() {
-		if(!barbarianCamps.isEmpty()) {
-			FileConfiguration campsConfig = konquest.getConfigManager().getConfig("camps");
-			campsConfig.set("camps", null); // reset camps config
-			ConfigurationSection root = campsConfig.createSection("camps");
-			for(String uuid : barbarianCamps.keySet()) {
-				KonCamp camp = barbarianCamps.get(uuid);
-				ConfigurationSection campSection = root.createSection(uuid);
-				campSection.set("world", camp.getWorld().getName());
-				campSection.set("center", new int[] {(int) camp.getCenterLoc().getX(),
-						 							 (int) camp.getCenterLoc().getY(),
-						 							 (int) camp.getCenterLoc().getZ()});
-		        campSection.set("chunks", konquest.formatPointsToString(camp.getChunkList().keySet()));
-			}
+		FileConfiguration campsConfig = konquest.getConfigManager().getConfig("camps");
+		campsConfig.set("camps", null); // reset camps config
+		ConfigurationSection root = campsConfig.createSection("camps");
+		for(String uuid : barbarianCamps.keySet()) {
+			KonCamp camp = barbarianCamps.get(uuid);
+			ConfigurationSection campSection = root.createSection(uuid);
+			campSection.set("world", camp.getWorld().getName());
+			campSection.set("center", new int[] {(int) camp.getCenterLoc().getX(),
+					 							 (int) camp.getCenterLoc().getY(),
+					 							 (int) camp.getCenterLoc().getZ()});
+	        campSection.set("chunks", konquest.formatPointsToString(camp.getChunkList().keySet()));
 		}
 	}
 	
@@ -2148,6 +2182,11 @@ public class KingdomManager {
 					isLocValidSettle = false;
 				}
 			}
+		}
+		// Verify max distance
+		int max_distance_all = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_distance_all");
+		if(max_distance_all > 0 && minDistance > max_distance_all) {
+			isLocValidSettle = false;
 		}
 		// Verify no overlapping init chunks
 		int radius = konquest.getConfigManager().getConfig("core").getInt("core.towns.init_radius");
@@ -2230,7 +2269,6 @@ public class KingdomManager {
     	//KonTerritory closestTerritory = getClosestTerritory(center.getChunk());
     	ChatColor closestTerritoryColor = ChatColor.GRAY;
     	int distance = 0;
-    	int maxDistance = 99;
     	if(closestTerritory != null) {
     		distance = minDistance;
     		//distance = Konquest.distanceInChunks(center.getChunk(), closestTerritory.getCenterLoc().getChunk());
@@ -2245,8 +2283,15 @@ public class KingdomManager {
         		}
     		}
     	}
-    	if(distance > maxDistance) {
-    		distance = 99;
+    	String distStr = "";
+    	int maxDist = 99;
+    	if(max_distance_all > 0) {
+    		maxDist = max_distance_all;
+    	}
+    	if(distance > maxDist) {
+    		distStr = ""+maxDist+"+";
+    	} else {
+    		distStr = ""+distance;
     	}
     	// Display map
     	String header = ChatColor.GOLD+MessagePath.MENU_MAP_CENTER.getMessage()+": "+(int)originPoint.getX()+","+(int)originPoint.getY();
@@ -2266,7 +2311,7 @@ public class KingdomManager {
     			mapLine = mapLine + " " + settleTip;
     		}
     		if(i == mapSize-7) {
-    			mapLine = mapLine + " " + closestTerritoryColor+MessagePath.MENU_MAP_PROXIMITY.getMessage()+": "+distance;
+    			mapLine = mapLine + " " + closestTerritoryColor+MessagePath.MENU_MAP_PROXIMITY.getMessage()+": "+distStr;
     		}
     		ChatUtil.sendMessage(bukkitPlayer, mapLine);
     	}

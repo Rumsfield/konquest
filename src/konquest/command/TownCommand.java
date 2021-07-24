@@ -29,7 +29,7 @@ public class TownCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		// k town <name> open|close|add|kick|knight|lord|rename|upgrade [arg]
+		// k town <name> open|close|add|kick|knight|lord|rename|upgrade|shield [arg]
 		if (getArgs().length != 3 && getArgs().length != 4) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
@@ -471,7 +471,8 @@ public class TownCommand extends CommandBase {
 	    				}
 	    			}
 	        		// Rename the town
-	        		boolean success = player.getKingdom().renameTown(townName, newTownName);
+	        		//boolean success = player.getKingdom().renameTown(townName, newTownName);
+	        		boolean success = getKonquest().getKingdomManager().renameTown(townName, newTownName, town.getKingdom().getName());
 	        		if(success) {
 	        			for(OfflinePlayer resident : town.getPlayerResidents()) {
 			    			if(resident.isOnline()) {
@@ -509,6 +510,22 @@ public class TownCommand extends CommandBase {
             	}
             	getKonquest().getDisplayManager().displayTownUpgradeMenu(bukkitPlayer, town);
         		break;
+			case "shield":
+            	// Verify player is elite or lord of the Town
+	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+	        		//ChatUtil.sendError((Player) getSender(), "You must be a Knight or the Lord of "+townName+" to do this");
+	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+	        		return;
+	        	}
+            	// Verify either shields or armors are enabled
+            	boolean isShieldsEnabled = getKonquest().getShieldManager().isShieldsEnabled();
+            	boolean isArmorsEnabled = getKonquest().getShieldManager().isArmorsEnabled();
+            	if(!isShieldsEnabled && !isArmorsEnabled) {
+            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+            		return;
+            	}
+            	getKonquest().getDisplayManager().displayTownShieldMenu(bukkitPlayer, town);
+				break;
         	default:
         		//ChatUtil.sendError((Player) getSender(), "Invalid sub-command, expected open|close|add|kick|knight|lord|rename|upgrade");
         		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -519,7 +536,7 @@ public class TownCommand extends CommandBase {
 
 	@Override
 	public List<String> tabComplete() {
-		// k town <name> open|close|add|kick|knight|lord|rename|upgrade [arg]
+		// k town <name> open|close|add|kick|knight|lord|rename|upgrade|shield [arg]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		Player bukkitPlayer = (Player) getSender();
@@ -544,6 +561,7 @@ public class TownCommand extends CommandBase {
 			tabList.add("knight");
 			tabList.add("rename");
 			tabList.add("upgrade");
+			tabList.add("shield");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);

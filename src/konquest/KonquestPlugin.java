@@ -9,13 +9,13 @@ import konquest.listener.PlayerListener;
 import konquest.listener.WorldListener;
 import konquest.utility.ChatUtil;
 import konquest.utility.Metrics;
+import konquest.utility.Updater;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-//import org.maxgamer.quickshop.api.QuickShopAPI;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -51,6 +51,10 @@ public class KonquestPlugin extends JavaPlugin {
         registerListeners();
         // Initialize core
         konquest.initialize();
+        // Register placeholders
+        registerPlaceholders();
+        // Check for updates
+        checkForUpdates();
         // Done!
         enableSuccess = true;
         ChatUtil.printConsoleAlert("Plugin enabled. Written by Rumsfield.");
@@ -91,16 +95,31 @@ public class KonquestPlugin extends JavaPlugin {
 	}
 	
 	private void loadMetrics() {
-		
 		try {
-			int pluginId = 11980;
-	        new Metrics(this, pluginId);
-	        //Metrics metrics = new Metrics(this, pluginId);
+	        new Metrics(this, 11980);
 		} catch(Exception e) {
 			ChatUtil.printConsoleError("Failed to load plugin metrics with bStats:");
 			ChatUtil.printConsoleError(e.getMessage());
 		}
-		
+	}
+	
+	private void checkForUpdates() {
+		new Updater(this, 92220).getVersion(version -> {
+            if (this.getDescription().getVersion().equalsIgnoreCase(version)) {
+            	ChatUtil.printConsoleAlert("Konquest version is up to date.");
+            } else {
+            	String message = "Konquest version "+version+" is available to download! --> https://www.spigotmc.org/resources/konquest.92220/";
+                ChatUtil.printConsoleError(message);
+                konquest.opStatusMessages.add(message);
+            }
+        });
+	}
+	
+	private void registerPlaceholders() {
+		if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+			new KonquestPlaceholderExpansion(this).register();
+			ChatUtil.printConsoleAlert("Successfully registered Placeholders.");
+		}
 	}
 	
 	private boolean setupEconomy() {

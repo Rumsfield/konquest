@@ -2,6 +2,7 @@ package konquest.model;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -40,16 +41,24 @@ public class KonTown extends KonTerritory implements Timeable{
 	private Timer monumentTimer;
 	private Timer captureTimer;
 	private Timer raidAlertTimer;
+	private Timer shieldTimer;
 	private HashMap<UUID, Timer> playerTravelTimers;
 	private boolean isCaptureDisabled;
 	private boolean isRaidAlertDisabled;
 	private BossBar monumentBarAllies;
 	private BossBar monumentBarEnemies;
+	private BossBar shieldArmorBarAll;
 	private UUID lord;
 	private HashMap<UUID,Boolean> residents;
 	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident, false = requesting add from lord/knight)
 	private boolean isOpen;
 	private boolean isAttacked;
+	private boolean isShielded;
+	private boolean isArmored;
+	private int shieldEndTimeSeconds;
+	private int shieldNowTimeSeconds;
+	private int armorTotalBlocks;
+	private int armorCurrentBlocks;
 	private ArrayList<UUID> defenders;
 	private HashMap<KonUpgrade,Integer> upgrades;
 	private HashMap<KonUpgrade,Integer> disabledUpgrades;
@@ -62,6 +71,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.monumentTimer = new Timer(this);
 		this.captureTimer = new Timer(this);
 		this.raidAlertTimer = new Timer(this);
+		this.shieldTimer = new Timer(this);
 		this.playerTravelTimers = new HashMap<UUID, Timer>();
 		this.isCaptureDisabled = false;
 		this.isRaidAlertDisabled = false;
@@ -69,11 +79,19 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.monumentBarAllies.setVisible(true);
 		this.monumentBarEnemies = Bukkit.getServer().createBossBar(ChatColor.RED+name, BarColor.RED, BarStyle.SOLID);
 		this.monumentBarEnemies.setVisible(true);
+		this.shieldArmorBarAll = Bukkit.getServer().createBossBar(ChatColor.DARK_AQUA+"Shield", BarColor.BLUE, BarStyle.SOLID);
+		this.shieldArmorBarAll.setVisible(false);
+		this.shieldArmorBarAll.setProgress(0);
 		this.lord = null; // init with no lord
 		this.residents = new HashMap<UUID,Boolean>();
 		this.joinRequests = new HashMap<UUID,Boolean>();
 		this.isOpen = false; // init as a closed Town, requires Lord to add players as residents for build/container perms
 		this.isAttacked = false;
+		this.isShielded = false;
+		this.shieldEndTimeSeconds = 0;
+		this.shieldNowTimeSeconds = 0;
+		this.armorTotalBlocks = 0;
+		this.armorCurrentBlocks = 0;
 		this.defenders = new ArrayList<UUID>();
 		this.upgrades = new HashMap<KonUpgrade,Integer>();
 		this.disabledUpgrades = new HashMap<KonUpgrade,Integer>();
@@ -549,6 +567,16 @@ public class KonTown extends KonTerritory implements Timeable{
 			ChatUtil.printDebug("Raid Alert Timer ended with taskID: "+taskID);
 			// When a raid alert cooldown timer ends
 			isRaidAlertDisabled = false;
+		} else if(taskID == shieldTimer.getTaskID()) {
+			// When shield loop timer ends (1 second loop)
+			//ChatUtil.printDebug("Town "+getName()+" shield tick with taskID: "+taskID);
+			Date now = new Date();
+			shieldNowTimeSeconds = (int)(now.getTime()/1000);
+			if(shieldEndTimeSeconds < shieldNowTimeSeconds) {
+				deactivateShield();
+			} else {
+				refreshShieldBarTitle();
+			}
 		} else {
 			// Check for timer in player travel cooldown map
 			for(UUID uuid : playerTravelTimers.keySet()) {
@@ -578,6 +606,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	public void updateBarPlayers() {
 		monumentBarAllies.removeAll();
 		monumentBarEnemies.removeAll();
+		shieldArmorBarAll.removeAll();
 		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
 			Player bukkitPlayer = player.getBukkitPlayer();
 			if(isLocInside(bukkitPlayer.getLocation())) {
@@ -586,6 +615,7 @@ public class KonTown extends KonTerritory implements Timeable{
 				} else {
 					monumentBarEnemies.addPlayer(bukkitPlayer);
 				}
+				shieldArmorBarAll.addPlayer(bukkitPlayer);
 			}
 		}
 	}
@@ -596,16 +626,19 @@ public class KonTown extends KonTerritory implements Timeable{
 		} else {
 			monumentBarEnemies.addPlayer(player.getBukkitPlayer());
 		}
+		shieldArmorBarAll.addPlayer(player.getBukkitPlayer());
 	}
 	
 	public void removeBarPlayer(KonPlayer player) {
 		monumentBarAllies.removePlayer(player.getBukkitPlayer());
 		monumentBarEnemies.removePlayer(player.getBukkitPlayer());
+		shieldArmorBarAll.removePlayer(player.getBukkitPlayer());
 	}
 	
 	public void removeAllBarPlayers() {
 		monumentBarAllies.removeAll();
 		monumentBarEnemies.removeAll();
+		shieldArmorBarAll.removeAll();
 	}
 	
 	public void setBarProgress(double prog) {
@@ -615,7 +648,13 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	public void setAttacked(boolean val) {
 		this.isAttacked = val;
-		if(val == false) {
+		if(val == true) {
+			// Start Monument regenerate timer for target town
+			int monumentRegenTimeSeconds = getKonquest().getConfigManager().getConfig("core").getInt("core.monuments.damage_regen");
+			monumentTimer.stopTimer();
+			monumentTimer.setTime(monumentRegenTimeSeconds);
+			monumentTimer.startTimer();
+		} else {
 			defenders.clear();
 		}
 	}
@@ -626,9 +665,9 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	public void updateBar() {
 		if(isAttacked) {
-			monumentBarAllies.setTitle(ChatColor.GREEN+getName()+" Critical Hits Remaining");
+			monumentBarAllies.setTitle(ChatColor.GREEN+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
 			monumentBarAllies.setColor(BarColor.PURPLE);
-			monumentBarEnemies.setTitle(ChatColor.RED+getName()+" Critical Hits Remaining");
+			monumentBarEnemies.setTitle(ChatColor.RED+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
 			monumentBarEnemies.setColor(BarColor.PURPLE);
 		} else {
 			monumentBarAllies.setTitle(ChatColor.GREEN+getName());
@@ -744,6 +783,9 @@ public class KonTown extends KonTerritory implements Timeable{
 				lord = null;
 			}
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
+			if(residents.isEmpty()) {
+				clearShieldsArmors();
+			}
 			status = true;
 		}
 		return status;
@@ -924,6 +966,123 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	public void spawnRabbit() {
 		rabbit.spawn();
+	}
+	
+	public boolean isShielded() {
+		return isShielded;
+	}
+	
+	public boolean isArmored() {
+		return isArmored;
+	}
+	
+	public void activateShield(int val) {
+		if(isShielded) {
+			// Already shielded
+			shieldEndTimeSeconds = val;
+		} else {
+			// Activate new shield
+			isShielded = true;
+			shieldEndTimeSeconds = val;
+			Date now = new Date();
+			shieldNowTimeSeconds = (int)(now.getTime()/1000);
+			shieldTimer.stopTimer();
+			shieldTimer.setTime(0);
+			shieldTimer.startLoopTimer();
+		}
+		shieldArmorBarAll.setVisible(true);
+		refreshShieldBarTitle();
+	}
+	
+	public void deactivateShield() {
+		if(isShielded) {
+			playDeactivateSound();
+		}
+		isShielded = false;
+		shieldTimer.stopTimer();
+		refreshShieldBarTitle();
+	}
+	
+	public void activateArmor(int val) {
+		if(!isArmored) {
+			// Activate new armor
+			isArmored = true;
+		}
+		armorCurrentBlocks = val;
+		armorTotalBlocks = armorCurrentBlocks;
+		shieldArmorBarAll.setVisible(true);
+		shieldArmorBarAll.setProgress(1.0);
+		refreshShieldBarTitle();
+	}
+	
+	public void deactivateArmor() {
+		if(isArmored) {
+			playDeactivateSound();
+		}
+		isArmored = false;
+		shieldArmorBarAll.setProgress(0.0);
+		armorCurrentBlocks = 0;
+		armorTotalBlocks = 0;
+		refreshShieldBarTitle();
+	}
+	
+	public void clearShieldsArmors() {
+		deactivateShield();
+		deactivateArmor();
+	}
+	
+	public boolean damageArmor(int damage) {
+		boolean result = false;
+		if(isArmored) {
+			armorCurrentBlocks -= damage;
+			result = true;
+			if(armorCurrentBlocks <= 0) {
+				deactivateArmor();
+			} else {
+				double progress = (double)armorCurrentBlocks/armorTotalBlocks;
+				shieldArmorBarAll.setProgress(progress);
+				refreshShieldBarTitle();
+			}
+		}
+		return result;
+	}
+	
+	private void refreshShieldBarTitle() {
+		ChatColor titleColor = ChatColor.AQUA;
+		int remainingSeconds = getRemainingShieldTimeSeconds();
+		String remainingTime = Konquest.getTimeFormat(remainingSeconds,titleColor);
+		String armor = MessagePath.LABEL_ARMOR.getMessage();
+		String shield = MessagePath.LABEL_SHIELD.getMessage();
+		if(isShielded && isArmored) {
+			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+" "+armor+" | "+shield+" "+remainingTime);
+		} else if(isShielded) {
+			shieldArmorBarAll.setTitle(titleColor+shield+" "+remainingTime);
+		} else if(isArmored) {
+			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+" "+armor);
+		} else {
+			shieldArmorBarAll.setProgress(0.0);
+			shieldArmorBarAll.setVisible(false);
+		}
+	}
+	
+	public int getShieldEndTime() {
+		return shieldEndTimeSeconds;
+	}
+	
+	public int getArmorBlocks() {
+		return armorCurrentBlocks;
+	}
+	
+	public int getRemainingShieldTimeSeconds() {
+		int result = 0;
+		if(isShielded && shieldEndTimeSeconds > shieldNowTimeSeconds) {
+			result = shieldEndTimeSeconds - shieldNowTimeSeconds;
+		}
+		return result;
+	}
+	
+	private void playDeactivateSound() {
+		getWorld().playSound(getCenterLoc(), Sound.BLOCK_GLASS_BREAK, (float)3.0, (float)0.3);
 	}
 	
 }

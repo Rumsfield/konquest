@@ -50,6 +50,11 @@ label:
   properties: "Properties"
   smallest: "Smallest"
   information: "Information"
+  shields: "Shields"
+  shield: "Shield"
+  armors: "Armors"
+  armor: "Armor"
+  critical-hits: "Critical Hits"
 menu:
   stats:
     title: "Accomplishment Stats"
@@ -97,6 +102,14 @@ menu:
     disable: "Off"
     hint-disable: "Click to disable"
     hint-apply: "Click to apply"
+  shield:
+    hint: "Click to charge"
+    fail-max: "Failed to charge, exceeds maximum of %s."
+    fail-add: "Failed to charge, cannot add to existing charge."
+    fail-attack: "Failed to charge while town is under attack!"
+    fail-cost: "Failed to charge, requires %s Favor."
+    activate-new: "Charged %s for %s."
+    activate-add: "Increased charge with %s by %s."
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."
@@ -153,6 +166,7 @@ protection:
     raid-capture-1: "%s is being conquered! Use \"/k travel %s\" to defend and receive %s Favor!"
     raid-capture-2: "%s is at half strength! Use \"/k travel %s\" to defend and receive %s Favor!"
     raid-capture-3: "%s is in critical condition! Use \"/k travel %s\" to defend and receive %s Favor!"
+    raze: "The Town of %s has been destroyed by the Barbarian horde!"
     destroy: "You have destroyed %s for the glory of the Barbarian horde!"
     conquer: "The Town of %s has been conquered!"
     capture: "You have conquered %s for the conquest of %s!"
@@ -194,6 +208,8 @@ command:
       error:
         no-upgrade: "Invalid upgrade name."
         no-level: "Invalid upgrade level."
+        bad-shield: "Shields cannot be negative."
+        bad-armor: "Armor cannot be negative."
     help:
       notice:
         message: "Admin Help: Command, Arguments, Description"
@@ -350,6 +366,7 @@ command:
       fail-placement: "Could not find a good Monument placement."
       fail-template: "Invalid Monument Template. Use \"/k admin monument <kingdom> create\""
       fail-proximity: "Town is too close to another territory. Currently %s chunks away, must be at least %s."
+      fail-max: "Town is too far away from other territories. Currently %s chunks away, must be at most %s."
       fail-flat: "Your chunk area is not flat enough. Press F3+G to view chunk boundaries. Cut down trees and flatten the ground!"
       fail-height: "Bad elevation, try settling somewhere higher or lower."
       fail-air: "Too much air or water below. Try settling somewhere else, or remove all air/water below you."

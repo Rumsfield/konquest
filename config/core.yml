@@ -30,6 +30,7 @@
 #  kingdoms:
 #    capital_suffix*:               Suffix to be appended to Kingdom names which will be the name of the Capital city (string)
 #    capital_pvp:                   Allow player damage in capitals (true/false)
+#    capital_use:                   Allow players to interact with blocks and containers in capitals (true/false)
 #    protect_containers_use:        Prevent players in other kingdoms using containers in claimed land (true/false)
 #    protect_containers_break:      Prevent players in other kingdoms breaking containers in claimed land (true/false)
 #    no_enemy_enter:                Prevent enemy players from entering Kingdom Capitals (true/false)
@@ -43,16 +44,26 @@
 #    attack_friendly_golems:        Allow players to attack iron golems inside of friendly towns (true/false)
 #    max_player_diff:               Kingdoms with this many players more than other Kingdoms will not accept new players (0 to disable, integer >= 0)
 #    allow_exile_switch:            Allow barbarians to join any kingdom, even when exiled (true) or prevent exiled barbarians from switching kingdoms (false) (true/false)
+#    per_kingdom_join_permissions:  When true, players must have a permission "konquest.join.<kingdom>" to join specific kingdoms, e.g. "konquest.join.rome" to join the kingdom Rome (true/false)
 #  towns:
 #    min_settle_height:             Minimum height level for new town settlements (0 to disable, 0 - 256)
 #    max_settle_height:             Maximum height level for new town settlements (0 to disable, 0 - 256), Note, if max_settle_height is less than min_settle_height, things might break!
 #    min_distance_town:             Minimum distance in chunks between Towns and other Towns (integer >= 0)
 #    min_distance_capital:          Minimum distance in chunks between Towns and Capitals (integer >= 0)
+#    max_distance_all:              Maximum distance in chunks between Towns and all other territory (0 to disable, integer >= 0)
 #    init_radius:                   Radius of initial settlements. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
 #    capture_cooldown:              Time in seconds before a town can be captured again (integer >= 0)
 #    raid_alert_cooldown:           Time in seconds between raid alerts for Towns (integer >= 0)
 #    travel_cooldown:               Time in seconds for travel cool-down (integer >= 0)
 #    enable_upgrades:               Enable town upgrades and the upgrade GUI menu (true/false)
+#    enable_shields:                Enable town shields, which prevent all enemy attacks, in the shield GUI menu (true/false)
+#    enable_armor:                  Enable town armor, which prevents a limited number of enemy block edits, in the shield GUI menu (true/false)
+#    shields_while_attacked:        Allow shields to be charged charged while a town is under attack (true/false)
+#    armor_while_attacked:          Allow armor to be applied while a town is under attack (true/false)
+#    shields_add:                   Allow new shields to add onto existing shields when true, else require shields to deplete before charging again (true/false)
+#    armor_add:                     Allow new armor to add onto existing armor when true, else require armor to deplete before applying again (true/false)
+#    max_shields:                   Maximum shield duration in seconds that a town can have (0 to disable, integer >= 0)
+#    max_armor:                     Maximum armor amount in blocks that a town can have (0 to disable, integer >= 0)
 #  camps:
 #    init_radius:                   Radius of camps for barbarians. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
 #  monuments:
@@ -126,6 +137,7 @@ core:
   kingdoms:
     capital_suffix: Capital
     capital_pvp: false
+    capital_use: false
     protect_containers_use: true
     protect_containers_break: true
     no_enemy_enter: true
@@ -139,16 +151,27 @@ core:
     attack_friendly_golems: false
     max_player_diff: 4
     allow_exile_switch: true
+    per_kingdom_join_permissions: false
   towns:
     min_settle_height: 2
     max_settle_height: 200
     min_distance_town: 16
     min_distance_capital: 16
+    max_distance_all: 99
     init_radius: 2
     capture_cooldown: 600
     raid_alert_cooldown: 30
     travel_cooldown: 120
     enable_upgrades: true
+    enable_armor: true
+    enable_shields: true
+    armor_tnt_damage: 10
+    shields_while_attacked: false
+    armor_while_attacked: false
+    shields_add: true
+    armor_add: true
+    max_shields: 432000
+    max_armor: 9999
   camps:
     init_radius: 2
   monuments:

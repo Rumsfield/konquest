@@ -2,8 +2,14 @@ package konquest.model;
 
 import java.awt.Point;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
+import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.utility.ChatUtil;
@@ -17,14 +23,17 @@ public class KonCamp extends KonTerritory implements Timeable {
 	private Timer raidAlertTimer;
 	private boolean isRaidAlertDisabled;
 	private Location bedLocation;
+	private BossBar campBarAll;
 	
 	public KonCamp(Location loc, OfflinePlayer owner, KonKingdom kingdom, Konquest konquest) {
-		super(loc, MessagePath.LABEL_CAMP.getMessage().trim()+"_"+owner.getName(), konquest.getKingdomManager().getBarbarians(), KonTerritoryType.CAMP, konquest);
+		super(loc, MessagePath.LABEL_CAMP.getMessage().trim()+"_"+owner.getName(), kingdom, KonTerritoryType.CAMP, konquest);
 		
 		this.owner = owner;
 		this.raidAlertTimer = new Timer(this);
 		this.isRaidAlertDisabled = false;
 		this.bedLocation = loc;
+		this.campBarAll = Bukkit.getServer().createBossBar(ChatColor.YELLOW+getName(), BarColor.WHITE, BarStyle.SOLID);
+		this.campBarAll.setVisible(true);
 	}
 
 	/**
@@ -88,6 +97,28 @@ public class KonCamp extends KonTerritory implements Timeable {
 			isRaidAlertDisabled = false;
 		} else {
 			ChatUtil.printDebug("Town Timer ended with unknown taskID: "+taskID);
+		}
+	}
+	
+	public void addBarPlayer(KonPlayer player) {
+		campBarAll.addPlayer(player.getBukkitPlayer());
+	}
+	
+	public void removeBarPlayer(KonPlayer player) {
+		campBarAll.removePlayer(player.getBukkitPlayer());
+	}
+	
+	public void removeAllBarPlayers() {
+		campBarAll.removeAll();
+	}
+	
+	public void updateBarPlayers() {
+		campBarAll.removeAll();
+		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
+			Player bukkitPlayer = player.getBukkitPlayer();
+			if(isLocInside(bukkitPlayer.getLocation())) {
+				campBarAll.addPlayer(bukkitPlayer);
+			}
 		}
 	}
 

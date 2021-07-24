@@ -123,7 +123,7 @@ public class BlockListener implements Listener {
 						// Stop all block breaks by non-residents if town is closed
 						if(!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
 							//ChatUtil.sendNotice(player.getBukkitPlayer(), "You must be a resident to break blocks in "+territory.getName(), ChatColor.DARK_RED);
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
+							ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
 							event.setCancelled(true);
 							return;
 						}
@@ -134,7 +134,7 @@ public class BlockListener implements Listener {
 						// If territory is peaceful, prevent all block damage by enemies
 						if(territory.getKingdom().isPeaceful()) {
 							//ChatUtil.sendNotice(player.getBukkitPlayer(), "This Kingdom of "+town.getKingdom().getName()+" is peaceful! You cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_PEACEFUL_TOWN.getMessage(town.getName()));
+							ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_PEACEFUL_TOWN.getMessage(town.getName()));
 							event.setCancelled(true);
 							return;
 						}
@@ -142,7 +142,7 @@ public class BlockListener implements Listener {
 						// If enemy player is peaceful, prevent all block damage
 						if(player.getKingdom().isPeaceful()) {
 							//ChatUtil.sendNotice(player.getBukkitPlayer(), "Your Kingdom of "+town.getKingdom().getName()+" is peaceful! You cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_PEACEFUL_PLAYER.getMessage());
+							ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_PEACEFUL_PLAYER.getMessage());
 							event.setCancelled(true);
 							return;
 						}
@@ -151,7 +151,7 @@ public class BlockListener implements Listener {
 						//boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
 						if(town.getKingdom().isOfflineProtected()) {
 							//ChatUtil.sendNotice(player.getBukkitPlayer(), town.getKingdom().getName()+" doesn't have enough online players, cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_ONLINE.getMessage(town.getKingdom().getName(),town.getName()));
+							ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLINE.getMessage(town.getKingdom().getName(),town.getName()));
 							event.setCancelled(true);
 							return;
 						}
@@ -162,7 +162,7 @@ public class BlockListener implements Listener {
 							int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
 							if(town.getNumResidentsOnline() < minimumOnlineResidents) {
 								//ChatUtil.sendNotice(player.getBukkitPlayer(), town.getName()+" is upgraded with "+KonUpgrade.WATCH.getDescription()+" and cannot be attacked without "+minimumOnlineResidents+" residents online", ChatColor.DARK_RED);
-								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(),KonUpgrade.WATCH.getDescription(),minimumOnlineResidents));
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(),KonUpgrade.WATCH.getDescription(),minimumOnlineResidents));
 								event.setCancelled(true);
 								return;
 							}
@@ -172,6 +172,32 @@ public class BlockListener implements Listener {
 						boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_break");
 						if(isProtectChest && event.getBlock().getState() instanceof BlockInventoryHolder) {
 							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
+						}
+						
+						// Verify town can be captured
+						if(town.isCaptureDisabled()) {
+							//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "This Town cannot be conquered again so soon!");
+							ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(town.getCaptureCooldownString()));
+							event.setCancelled(true);
+							return;
+						}
+						// Update MonumentBar state
+						town.setAttacked(true);
+						town.updateBar();
+						
+						// If town is shielded, prevent all enemy block edits
+						if(town.isShielded()) {
+							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_AQUA+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
+						}
+						
+						// If town is armored, damage the armor while preventing block breaks
+						if(town.isArmored()) {
+							town.damageArmor(1);
+							Konquest.playTownArmorSound(event.getPlayer());
 							event.setCancelled(true);
 							return;
 						}
@@ -232,7 +258,7 @@ public class BlockListener implements Listener {
 						KonPlayer onlineOwner = playerManager.getPlayerFromName(camp.getOwner().getName());
 						if(onlineOwner != null) {
 							//ChatUtil.sendNotice(onlineOwner.getBukkitPlayer(), "Your Camp has been destroyed!");
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY_OWNER.getMessage());
+							ChatUtil.sendError(onlineOwner.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY_OWNER.getMessage());
 						} else {
 							ChatUtil.printDebug("Failed attempt to send camp destruction message to offline owner "+camp.getOwner().getName());
 						}
@@ -409,6 +435,18 @@ public class BlockListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
+						}
+						// If town is shielded, prevent all enemy block edits
+						if(town.isShielded()) {
+							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_AQUA+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
+						}
+						// If town is armored, prevent block places
+						if(town.isArmored()) {
+							Konquest.playTownArmorSound(event.getPlayer());
+							event.setCancelled(true);
+							return;
 						}
 						// Prevent inventory blocks from being placed by enemies
 						boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_break");
@@ -613,6 +651,19 @@ public class BlockListener implements Listener {
 							return;
 						}
 					}
+					// If town is shielded, prevent all enemy block edits
+					if(town.isShielded()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If town is armored, damage the armor while preventing block breaks
+					if(town.isArmored()) {
+						int damage = konquest.getConfigManager().getConfig("core").getInt("core.towns.armor_tnt_damage",1);
+						town.damageArmor(damage);
+						Konquest.playTownArmorSound(event.getBlock().getLocation());
+						event.setCancelled(true);
+						return;
+					}
 				}
 				// Protect chests
 				boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_explode");
@@ -645,14 +696,25 @@ public class BlockListener implements Listener {
 			if(kingdomManager.isChunkClaimed(pushBlock.getLocation())) {
 				KonTerritory territory = kingdomManager.getChunkTerritory(pushBlock.getLocation());
 				if(territory instanceof KonTown) {
+					KonTown town = (KonTown) territory;
 					// Check if this block is within a monument
-					if(((KonTown) territory).isLocInsideCenterChunk(pushBlock.getLocation())) {
+					if(town.isLocInsideCenterChunk(pushBlock.getLocation())) {
 						//ChatUtil.printDebug("EVENT: Monument block pushed by piston, cancelling");
 						event.setCancelled(true);
 						return;
 					}
 					// Check if block is inside of an offline kingdom's town
 					if(playerManager.getPlayersInKingdom(territory.getKingdom()).isEmpty()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If town is shielded
+					if(town.isShielded()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If town is armored
+					if(town.isArmored()) {
 						event.setCancelled(true);
 						return;
 					}
@@ -694,14 +756,25 @@ public class BlockListener implements Listener {
 			if(kingdomManager.isChunkClaimed(pullBlock.getLocation())) {
 				KonTerritory territory = kingdomManager.getChunkTerritory(pullBlock.getLocation());
 				if(territory instanceof KonTown) {
+					KonTown town = (KonTown) territory;
 					// Check if this block is within a monument
-					if(((KonTown) territory).isLocInsideCenterChunk(pullBlock.getLocation())) {
+					if(town.isLocInsideCenterChunk(pullBlock.getLocation())) {
 						//ChatUtil.printDebug("EVENT: Monument block pulled by piston, cancelling");
 						event.setCancelled(true);
 						return;
 					}
 					// Check if block is inside of an offline kingdom's town
 					if(playerManager.getPlayersInKingdom(territory.getKingdom()).isEmpty()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If town is shielded
+					if(town.isShielded()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If town is armored
+					if(town.isArmored()) {
 						event.setCancelled(true);
 						return;
 					}
@@ -791,6 +864,18 @@ public class BlockListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
+				}
+				// If town is shielded
+				if(event.getSource().getType().equals(Material.FIRE) && town.isShielded()) {
+					event.getSource().setType(Material.AIR);
+					event.setCancelled(true);
+					return;
+				}
+				// If town is armored
+				if(event.getSource().getType().equals(Material.FIRE) && town.isArmored()) {
+					event.getSource().setType(Material.AIR);
+					event.setCancelled(true);
+					return;
 				}
 			}
 			if(territory instanceof KonRuin) {

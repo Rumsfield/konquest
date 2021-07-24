@@ -39,7 +39,11 @@ import konquest.manager.LanguageManager;
 import konquest.manager.LootManager;
 import konquest.manager.PlayerManager;
 import konquest.manager.RuinManager;
+import konquest.manager.ShieldManager;
 import konquest.manager.UpgradeManager;
+import konquest.map.MapHandler;
+import konquest.model.KonCamp;
+import konquest.model.KonCapital;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
@@ -73,8 +77,10 @@ public class Konquest implements Timeable {
 	private CommandHandler commandHandler;
 	private DisplayManager displayManager;
 	private UpgradeManager upgradeManager;
+	private ShieldManager shieldManager;
 	private RuinManager ruinManager;
 	private LanguageManager languageManager;
+	private MapHandler mapHandler;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
@@ -113,8 +119,10 @@ public class Konquest implements Timeable {
 		commandHandler = new CommandHandler(this);
 		displayManager = new DisplayManager(this);
 		upgradeManager = new UpgradeManager(this);
+		shieldManager = new ShieldManager(this);
 		ruinManager = new RuinManager(this);
 		languageManager = new LanguageManager(this);
+		mapHandler = new MapHandler(this);
 		
 		//worldName = "world";
 		worlds = new ArrayList<World>();
@@ -167,6 +175,9 @@ public class Konquest implements Timeable {
 		kingdomManager.updateSmallestKingdom();
 		kingdomManager.updateAllTownDisabledUpgrades();
 		
+		// Render Maps
+		mapHandler.initialize();
+		
 		ChatUtil.printDebug("Finished Initialization");
 	}
 	
@@ -185,6 +196,7 @@ public class Konquest implements Timeable {
 		accomplishmentManager.initialize();
 		directiveManager.initialize();
 		upgradeManager.initialize();
+		shieldManager.initialize();
 		offlineTimeoutSeconds = (long)(configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)*86400);
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;
@@ -268,6 +280,14 @@ public class Konquest implements Timeable {
     			KonRuin ruin = (KonRuin) loginTerritory;
     			ruin.addBarPlayer(player);
     			ruin.spawnAllGolems();
+    		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    			// Player joined located within a Capital
+    			KonCapital capital = (KonCapital) loginTerritory;
+    			capital.addBarPlayer(player);
+    		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+    			// Player joined located within a Camp
+    			KonCamp camp = (KonCamp) loginTerritory;
+    			camp.addBarPlayer(player);
     		}
 		} else {
 			// Player joined located outside of a Town
@@ -338,12 +358,20 @@ public class Konquest implements Timeable {
 		return upgradeManager;
 	}
 	
+	public ShieldManager getShieldManager() {
+		return shieldManager;
+	}
+	
 	public RuinManager getRuinManager() {
 		return ruinManager;
 	}
 	
 	public LanguageManager lang() {
 		return languageManager;
+	}
+	
+	public MapHandler getMapHandler() {
+		return mapHandler;
 	}
 	
 	public long getOfflineTimeoutSeconds() {
@@ -1023,5 +1051,44 @@ public class Konquest implements Timeable {
             }
         },4);
     }
+    
+    public static void playTownArmorSound(Player bukkitPlayer) {
+    	playTownArmorSound(bukkitPlayer.getLocation());
+    }
+    
+    public static void playTownArmorSound(Location loc) {
+    	loc.getWorld().playSound(loc, Sound.ENTITY_SHULKER_SHOOT, (float)1.0, (float)2);
+    }
+    
+    public static String getTimeFormat(int valSeconds, ChatColor color) {
+		int days = valSeconds / 86400;
+		int hours = valSeconds % 86400 / 3600;
+		int minutes = valSeconds % 3600 / 60;
+		int seconds = valSeconds % 60;
+		
+		ChatColor nColor = ChatColor.GRAY;
+		ChatColor numColor = color;
+		if(valSeconds <= 30) {
+			numColor = ChatColor.DARK_RED;
+		}
+		String result = "";
+		String format = "";
+		
+		if(days != 0) {
+			format = numColor+"%03d"+nColor+"D:"+numColor+"%02d"+nColor+"H:"+numColor+"%02d"+nColor+"M:"+numColor+"%02d"+nColor+"S";
+			result = String.format(format, days, hours, minutes, seconds);
+		} else if(hours != 0) {
+			format = numColor+"%02d"+nColor+"H:"+numColor+"%02d"+nColor+"M:"+numColor+"%02d"+nColor+"S";
+			result = String.format(format, hours, minutes, seconds);
+		} else if(minutes != 0) {
+			format = numColor+"%02d"+nColor+"M:"+numColor+"%02d"+nColor+"S";
+			result = String.format(format, minutes, seconds);
+		} else {
+			format = numColor+"%02d"+nColor+"S";
+			result = String.format(format, seconds);
+		}
+		
+		return result;		
+	}
 	
 }

@@ -5,6 +5,7 @@ import konquest.KonquestPlugin;
 import konquest.event.KonquestEnterTerritoryEvent;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
+import konquest.model.KonCamp;
 import konquest.model.KonCapital;
 import konquest.model.KonKingdom;
 import konquest.model.KonPlayer;
@@ -88,8 +89,12 @@ public class PlayerListener implements Listener{
             @Override
             public void run() {
             	// Actions to run after delay
+            	if(player == null) {
+            		ChatUtil.printDebug("Failed to use player from null import on player join");
+            		return;
+            	}
             	// Send helpful messages
-            	if(playerManager.getPlayer(bukkitPlayer).getKingdom().isSmallest()) {
+            	if(player.getKingdom().isSmallest()) {
             		int boostPercent = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.smallest_exp_boost_percent");
             		if(boostPercent > 0) {
             			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SMALL_KINGDOM.getMessage(boostPercent), ChatColor.ITALIC);
@@ -390,10 +395,9 @@ public class PlayerListener implements Listener{
         		KonTerritory territory = kingdomManager.getChunkTerritory(event.getClickedBlock().getLocation());
         		// Prevent players from interacting with blocks in Capitals
         		if(territory instanceof KonCapital) {
-        			//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in the Kingdom Capital", ChatColor.DARK_RED);
-        			//ChatUtil.printDebug("EVENT player interaction within capital");
-        			// Allow interaction with signs
-        			if(!(event.getClickedBlock().getState() instanceof Sign)) {
+        			boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
+        			// Allow interaction with signs or everything when config allows it
+        			if(!(event.getClickedBlock().getState() instanceof Sign || isCapitalUseEnabled)) {
         				//ChatUtil.printDebug("Interaction was not a sign");
         				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
         				if(event.getPlayer().hasPermission("konquest.command.admin")) {
@@ -482,7 +486,9 @@ public class PlayerListener implements Listener{
     	if(ent instanceof Player && konquest.getKingdomManager().isChunkClaimed(event.getVehicle().getLocation())) {
     		KonPlayer player = konquest.getPlayerManager().getPlayer((Player)ent);
     		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getVehicle().getLocation());
-    		if(player != null && territory != null && !territory.getKingdom().equals(player.getKingdom()) && territory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    		boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
+    		if(player != null && territory != null && !territory.getKingdom().equals(player.getKingdom()) && 
+    				territory.getTerritoryType().equals(KonTerritoryType.CAPITAL) && !isCapitalUseEnabled) {
     			ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
     			event.setCancelled(true);
 				return;
@@ -542,7 +548,8 @@ public class PlayerListener implements Listener{
         if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
         	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation());
         	// Capital protections...
-        	if(territory instanceof KonCapital) {
+        	boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
+        	if(territory instanceof KonCapital && !isCapitalUseEnabled) {
     			//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in the Kingdom Capital", ChatColor.DARK_RED);
     			//ChatUtil.printDebug("EVENT player interaction within capital");
 				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -578,7 +585,8 @@ public class PlayerListener implements Listener{
         if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
         	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation());
         	// Capital protections...
-        	if(territory instanceof KonCapital) {
+        	boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
+        	if(territory instanceof KonCapital && !isCapitalUseEnabled) {
 				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
     			event.setCancelled(true);
     			return;
@@ -693,6 +701,10 @@ public class PlayerListener implements Listener{
 				updateGolemTargetsForTerritory(territoryFrom,player,false);
 			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
 				((KonRuin) territoryFrom).removeBarPlayer(player);
+			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+				((KonCapital) territoryFrom).removeBarPlayer(player);
+			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+				((KonCamp) territoryFrom).removeBarPlayer(player);
 			}
 			// Remove potion effects for all players
 			kingdomManager.clearTownNerf(player);
@@ -705,6 +717,10 @@ public class PlayerListener implements Listener{
 				updateGolemTargetsForTerritory(territoryTo,player,true);
 			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
 				((KonRuin) territoryTo).addBarPlayer(player);
+			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+				((KonCapital) territoryTo).addBarPlayer(player);
+			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+				((KonCamp) territoryTo).addBarPlayer(player);
 			}
 		}
     }
@@ -894,14 +910,19 @@ public class PlayerListener implements Listener{
         			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         				((KonRuin) territoryFrom).removeBarPlayer(player);
         				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
+        			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+        				((KonCapital) territoryFrom).removeBarPlayer(player);
+        			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+        				((KonCamp) territoryFrom).removeBarPlayer(player);
         			}
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
         			kingdomManager.clearTownHearts(player);
         		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
         			KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
-                    Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
-        			
+                    if(invokeEvent != null) {
+                    	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
+                    }
                     if(!event.isCancelled()) {
                     	KonTerritory territoryTo = kingdomManager.getChunkTerritory(chunkTo);
     	                // Set message color based on enemy territory
@@ -927,6 +948,10 @@ public class PlayerListener implements Listener{
     						updateGolemTargetsForTerritory(territoryTo,player,true);
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
     	    				((KonRuin) territoryTo).addBarPlayer(player);
+    	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    	    				((KonCapital) territoryTo).addBarPlayer(player);
+    	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+    	    				((KonCamp) territoryTo).addBarPlayer(player);
     	    			}
                     }
         		} else if(isTerritoryTo && isTerritoryFrom) { // When moving between two claimed territories
@@ -948,6 +973,7 @@ public class PlayerListener implements Listener{
         	            if(!event.isCancelled()) {
         	            	//ChatUtil.sendNotice(bukkitPlayer, color+territoryTo.getName()+": "+chunkCoordsTo);
         	            	ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
+        	            	// Entry Territory
         	            	if(territoryTo.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         	            		KonTown town = (KonTown) territoryTo;
         	            		town.addBarPlayer(player);
@@ -959,13 +985,22 @@ public class PlayerListener implements Listener{
         	    				updateGolemTargetsForTerritory(territoryTo,player,true);
         	    			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         	    				((KonRuin) territoryTo).addBarPlayer(player);
+        	    			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+        	    				((KonCapital) territoryTo).addBarPlayer(player);
+        	    			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+        	    				((KonCamp) territoryTo).addBarPlayer(player);
         	    			}
+        	            	// Exit Territory
         	            	if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         	    				((KonTown) territoryFrom).removeBarPlayer(player);
         	    				updateGolemTargetsForTerritory(territoryFrom,player,true);
         	    			} else if (territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         	    				((KonRuin) territoryFrom).removeBarPlayer(player);
         	    				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
+        	    			} else if (territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+        	    				((KonCapital) territoryFrom).removeBarPlayer(player);
+        	    			} else if (territoryFrom.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+        	    				((KonCamp) territoryFrom).removeBarPlayer(player);
         	    			}
         	            	//updateGolemTargetsForTerritory(territoryFrom,player,true);
         					//updateGolemTargetsForTerritory(territoryTo,player,true);

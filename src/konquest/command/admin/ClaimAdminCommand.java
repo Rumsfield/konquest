@@ -87,6 +87,7 @@ public class ClaimAdminCommand extends CommandBase {
     						numChunks++;
     					}
     					getKonquest().getKingdomManager().updatePlayerBorderParticles(player, playerLoc);
+    					getKonquest().getMapHandler().drawDynmapUpdateTerritory(adjacentTerritory);
     					//ChatUtil.sendNotice((Player) getSender(), "Successfully claimed chunks within radius "+radius+" for territory "+adjacentTerritory.getName());
     					ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage(numChunks,adjacentTerritory.getName()));
     				} else {
@@ -129,8 +130,16 @@ public class ClaimAdminCommand extends CommandBase {
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
+		} else if(getArgs().length == 4) {
+			// suggest number
+			String subCommand = getArgs()[2];
+			if(subCommand.equalsIgnoreCase("radius")) {
+				tabList.add("#");
+			}
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
 		}
-		
 		return matchedTabList;
 	}
  
