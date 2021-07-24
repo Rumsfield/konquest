@@ -54,6 +54,7 @@ label:
   shield: "Shield"
   armors: "Armors"
   armor: "Armor"
+  critical-hits: "Critical Hits"
 menu:
   stats:
     title: "Accomplishment Stats"

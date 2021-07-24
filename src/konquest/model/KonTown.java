@@ -657,9 +657,9 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	public void updateBar() {
 		if(isAttacked) {
-			monumentBarAllies.setTitle(ChatColor.GREEN+getName()+" Critical Hits Remaining");
+			monumentBarAllies.setTitle(ChatColor.GREEN+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
 			monumentBarAllies.setColor(BarColor.PURPLE);
-			monumentBarEnemies.setTitle(ChatColor.RED+getName()+" Critical Hits Remaining");
+			monumentBarEnemies.setTitle(ChatColor.RED+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
 			monumentBarEnemies.setColor(BarColor.PURPLE);
 		} else {
 			monumentBarAllies.setTitle(ChatColor.GREEN+getName());
@@ -1031,12 +1031,14 @@ public class KonTown extends KonTerritory implements Timeable{
 		ChatColor titleColor = ChatColor.AQUA;
 		int remainingSeconds = getRemainingShieldTimeSeconds();
 		String remainingTime = Konquest.getTimeFormat(remainingSeconds,titleColor);
+		String armor = MessagePath.LABEL_ARMOR.getMessage();
+		String shield = MessagePath.LABEL_SHIELD.getMessage();
 		if(isShielded && isArmored) {
-			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+" Armor | Shield "+remainingTime);
+			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+" "+armor+" | "+shield+" "+remainingTime);
 		} else if(isShielded) {
-			shieldArmorBarAll.setTitle(titleColor+"Shield "+remainingTime);
+			shieldArmorBarAll.setTitle(titleColor+shield+" "+remainingTime);
 		} else if(isArmored) {
-			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+" Armor");
+			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+" "+armor);
 		} else {
 			shieldArmorBarAll.setProgress(0.0);
 			shieldArmorBarAll.setVisible(false);

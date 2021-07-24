@@ -51,6 +51,7 @@ public enum MessagePath {
 	LABEL_SHIELD                            	(0, "label.shield"),
 	LABEL_ARMORS                            	(0, "label.armors"),
 	LABEL_ARMOR                             	(0, "label.armor"),
+	LABEL_CRITICAL_HITS                        	(0, "label.critical-hits"),
 	
 	MENU_STATS_TITLE                            (0, "menu.stats.title"),
 	MENU_STATS_INTRO_1                          (0, "menu.stats.intro-1"),
