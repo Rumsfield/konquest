@@ -102,13 +102,13 @@ menu:
     hint-disable: "Click to disable"
     hint-apply: "Click to apply"
   shield:
-    hint: "Click to activate"
-    fail-max: "Failed to activate, exceeds maximum of %s."
-    fail-add: "Failed to activate while already active."
-    fail-attack: "Failed to activate while town is under attack!"
-    fail-cost: "Failed to activate, requires %s Favor."
-    activate-new: "Activated %s for %s."
-    activate-add: "Increased with %s by %s."
+    hint: "Click to charge"
+    fail-max: "Failed to charge, exceeds maximum of %s."
+    fail-add: "Failed to charge, cannot add to existing charge."
+    fail-attack: "Failed to charge while town is under attack!"
+    fail-cost: "Failed to charge, requires %s Favor."
+    activate-new: "Charged %s for %s."
+    activate-add: "Increased charge with %s by %s."
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."
@@ -207,6 +207,8 @@ command:
       error:
         no-upgrade: "Invalid upgrade name."
         no-level: "Invalid upgrade level."
+        bad-shield: "Shields cannot be negative."
+        bad-armor: "Armor cannot be negative."
     help:
       notice:
         message: "Admin Help: Command, Arguments, Description"

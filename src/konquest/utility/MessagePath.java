@@ -182,6 +182,8 @@ public enum MessagePath {
 	COMMAND_ADMIN_FORCETOWN_NOTICE_RENAME       (2, "command.admin.forcetown.notice.rename"),
 	COMMAND_ADMIN_FORCETOWN_ERROR_NO_UPGRADE    (0, "command.admin.forcetown.error.no-upgrade"),
 	COMMAND_ADMIN_FORCETOWN_ERROR_NO_LEVEL      (0, "command.admin.forcetown.error.no-level"),
+	COMMAND_ADMIN_FORCETOWN_ERROR_BAD_SHIELD    (0, "command.admin.forcetown.error.bad-shield"),
+	COMMAND_ADMIN_FORCETOWN_ERROR_BAD_ARMOR     (0, "command.admin.forcetown.error.bad-armor"),
 	COMMAND_ADMIN_HELP_NOTICE_MESSAGE           (0, "command.admin.help.notice.message"),
 	COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_1   (1, "command.admin.makekingdom.notice.prompt-1"),
 	COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_2   (0, "command.admin.makekingdom.notice.prompt-2"),

@@ -20,6 +20,7 @@ public class KonShield {
 		return duration;
 	}
 	
+	/*
 	public String getDurationFormat() {
 		int days = duration / 86400;
 		int hours = duration % 86400 / 3600;
@@ -40,6 +41,7 @@ public class KonShield {
 		
 		return result;		
 	}
+	*/
 	
 	public int getCost() {
 		return cost;

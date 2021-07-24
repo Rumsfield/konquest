@@ -281,7 +281,7 @@ public class ForceTownAdminCommand extends CommandBase {
 		        			catch(NumberFormatException e) {
 		        				ChatUtil.printDebug("Failed to parse string as int: "+e.getMessage());
 		        				//ChatUtil.sendError((Player) getSender(), "Invalid upgrade level!");
-		        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+		        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(e.getMessage()));
 				        		return;
 		        			}
 							// Parse remaining sub-command options
@@ -289,13 +289,15 @@ public class ForceTownAdminCommand extends CommandBase {
 								if(getKonquest().getShieldManager().shieldSet(town, shieldVal)) {
 									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 								} else {
-									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+									// Shields cannot be negative
+									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_BAD_SHIELD.getMessage());
 								}
 							} else if(shieldSubCmd.equalsIgnoreCase("add")) {
 								if(getKonquest().getShieldManager().shieldAdd(town, shieldVal)) {
 									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 								} else {
-									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+									// Shields cannot be negative
+									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_BAD_SHIELD.getMessage());
 								}
 							} else {
 								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -337,7 +339,7 @@ public class ForceTownAdminCommand extends CommandBase {
 		        			catch(NumberFormatException e) {
 		        				ChatUtil.printDebug("Failed to parse string as int: "+e.getMessage());
 		        				//ChatUtil.sendError((Player) getSender(), "Invalid upgrade level!");
-		        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+		        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(e.getMessage()));
 				        		return;
 		        			}
 							// Parse remaining sub-command options
@@ -345,13 +347,13 @@ public class ForceTownAdminCommand extends CommandBase {
 								if(getKonquest().getShieldManager().armorSet(town, armorVal)) {
 									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 								} else {
-									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_BAD_ARMOR.getMessage());
 								}
 							} else if(armorSubCmd.equalsIgnoreCase("add")) {
 								if(getKonquest().getShieldManager().armorAdd(town, armorVal)) {
 									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 								} else {
-									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_BAD_ARMOR.getMessage());
 								}
 							} else {
 								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());

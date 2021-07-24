@@ -1028,9 +1028,9 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 	
 	private void refreshShieldBarTitle() {
+		ChatColor titleColor = ChatColor.AQUA;
 		int remainingSeconds = getRemainingShieldTimeSeconds();
-		String remainingTime = Konquest.getTimeFormat(remainingSeconds);
-		ChatColor titleColor = ChatColor.BLUE;
+		String remainingTime = Konquest.getTimeFormat(remainingSeconds,titleColor);
 		if(isShielded && isArmored) {
 			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+" Armor | Shield "+remainingTime);
 		} else if(isShielded) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.model.KonArmor;
+import konquest.model.KonKingdom;
 import konquest.model.KonPlayer;
 import konquest.model.KonShield;
 import konquest.model.KonStatsType;
@@ -41,6 +43,17 @@ public class ShieldManager {
 		}
 		if(loadArmors()) {
 			isArmorsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_armor",false);
+		}
+		// Check for shields or armor that must be disabled, due to reload
+		for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+			for(KonTown town : kingdom.getTowns()) {
+				if(!isShieldsEnabled && town.isShielded()) {
+					town.deactivateShield();
+				}
+				if(!isArmorsEnabled && town.isArmored()) {
+					town.deactivateArmor();
+				}
+			}
 		}
 		ChatUtil.printDebug("Shield Manager is ready, shields: "+isShieldsEnabled+", armors: "+isArmorsEnabled);
 	}
@@ -181,12 +194,13 @@ public class ShieldManager {
 		}
 		
 		// Passed checks, activate the shield
+		String timeFormat = Konquest.getTimeFormat(shield.getDurationSeconds(), ChatColor.AQUA);
 		if(town.isShielded()) {
 			endTime = town.getShieldEndTime() + shieldTime;
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_ADD.getMessage(shield.getId(),shield.getDurationFormat()));
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_ADD.getMessage(shield.getId(),timeFormat));
 			ChatUtil.printDebug("Activated town shield addition "+shield.getId()+" to town "+town.getName()+" for end time "+endTime);
 		} else {
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_NEW.getMessage(shield.getId(),shield.getDurationFormat()));
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_NEW.getMessage(shield.getId(),timeFormat));
 			ChatUtil.printDebug("Activated new town shield "+shield.getId()+" to town "+town.getName()+" for end time "+endTime);
 		}
 		town.activateShield(endTime);
@@ -289,8 +303,8 @@ public class ShieldManager {
 				town.deactivateShield();
 			} else {
 				town.activateShield(newEndTime);
-				result = true;
 			}
+			result = true;
 		} else {
 			if(value > 0) {
 				town.activateShield(newEndTime);
@@ -318,6 +332,7 @@ public class ShieldManager {
 			// End time is less than now, deactivate shields and do nothing
 			if(town.isShielded()) {
 				town.deactivateShield();
+				result = true;
 			}
 		} else {
 			// End time is in the future, add to shields
@@ -341,8 +356,8 @@ public class ShieldManager {
 				town.deactivateArmor();
 			} else {
 				town.activateArmor(value);
-				result = true;
 			}
+			result = true;
 		} else {
 			if(value > 0) {
 				town.activateArmor(value);
@@ -368,6 +383,7 @@ public class ShieldManager {
 			// Blocks is 0 or less, deactivate armor and do nothing
 			if(town.isArmored()) {
 				town.deactivateArmor();
+				result = true;
 			}
 		} else {
 			// Blocks are valid, add to armor

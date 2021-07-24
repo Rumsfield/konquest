@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import konquest.Konquest;
 import konquest.model.KonShield;
 import konquest.utility.MessagePath;
 
@@ -44,7 +45,8 @@ public class ShieldIcon implements MenuIcon {
 		}
 		int totalCost = population * shield.getCost();
 		List<String> loreList = new ArrayList<String>();
-		loreList.add(ChatColor.BOLD+""+ChatColor.DARK_AQUA+shield.getDurationFormat());
+		//loreList.add(ChatColor.BOLD+""+ChatColor.DARK_AQUA+shield.getDurationFormat());
+		loreList.add(ChatColor.BOLD+""+Konquest.getTimeFormat(shield.getDurationSeconds(), ChatColor.DARK_AQUA));
     	loreList.add(ChatColor.WHITE+MessagePath.LABEL_COST.getMessage()+": "+ChatColor.AQUA+totalCost);
     	if(isAvailable) {
     		loreList.add(ChatColor.GOLD+MessagePath.MENU_SHIELD_HINT.getMessage());

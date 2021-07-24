@@ -1056,22 +1056,28 @@ public class Konquest implements Timeable {
     	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, (float)1.0, (float)2);
     }
     
-    public static String getTimeFormat(int valSeconds) {
+    public static String getTimeFormat(int valSeconds, ChatColor numColor) {
 		int days = valSeconds / 86400;
 		int hours = valSeconds % 86400 / 3600;
 		int minutes = valSeconds % 3600 / 60;
 		int seconds = valSeconds % 60;
 		
+		ChatColor nColor = ChatColor.GRAY;
 		String result = "";
+		String format = "";
 		
 		if(days != 0) {
-			result = String.format("%03dD:%02dH:%02dM:%02dS", days, hours, minutes, seconds);
+			format = numColor+"%03d"+nColor+"D:"+numColor+"%02d"+nColor+"H:"+numColor+"%02d"+nColor+"M:"+numColor+"%02d"+nColor+"S";
+			result = String.format(format, days, hours, minutes, seconds);
 		} else if(hours != 0) {
-			result = String.format("%02dH:%02dM:%02dS", hours, minutes, seconds);
+			format = numColor+"%02d"+nColor+"H:"+numColor+"%02d"+nColor+"M:"+numColor+"%02d"+nColor+"S";
+			result = String.format(format, hours, minutes, seconds);
 		} else if(minutes != 0) {
-			result = String.format("%02dM:%02dS", minutes, seconds);
+			format = numColor+"%02d"+nColor+"M:"+numColor+"%02d"+nColor+"S";
+			result = String.format(format, minutes, seconds);
 		} else {
-			result = String.format("%02dS", seconds);
+			format = numColor+"%02d"+nColor+"S";
+			result = String.format(format, seconds);
 		}
 		
 		return result;		
