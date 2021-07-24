@@ -92,7 +92,7 @@ public class ShieldManager {
         	boolean status = true;
         	int armorBlocks = 0;
         	int armorCost = 0;
-        	ConfigurationSection armorSection = shieldsConfig.getConfigurationSection("armor."+armorName);
+        	ConfigurationSection armorSection = shieldsConfig.getConfigurationSection("armors."+armorName);
         	if(armorSection.contains("blocks")) {
         		armorBlocks = armorSection.getInt("blocks",0);
     		} else {
@@ -149,8 +149,8 @@ public class ShieldManager {
 		}
 		
 		Date now = new Date();
-		long shieldTime = (shield.getDurationSeconds()*1000);
-		long endTime = now.getTime() + shieldTime;
+		int shieldTime = shield.getDurationSeconds();
+		int endTime = (int)(now.getTime()/1000) + shieldTime;
 		
 		// Check that the player has enough favor
 		int requiredCost = shield.getCost()*town.getNumResidents();
@@ -186,11 +186,10 @@ public class ShieldManager {
 			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_ADD.getMessage(shield.getId(),shield.getDurationFormat()));
 			ChatUtil.printDebug("Activated town shield addition "+shield.getId()+" to town "+town.getName()+" for end time "+endTime);
 		} else {
-			town.activateShield();
 			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_NEW.getMessage(shield.getId(),shield.getDurationFormat()));
 			ChatUtil.printDebug("Activated new town shield "+shield.getId()+" to town "+town.getName()+" for end time "+endTime);
 		}
-		town.setShieldEndTime(endTime);
+		town.activateShield(endTime);
 		
 		// Withdraw cost
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
@@ -244,14 +243,13 @@ public class ShieldManager {
 		
 		// Passed checks, activate the armor
 		if(town.isArmored()) {
-			town.addArmor(armor.getBlocks());
 			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_ADD.getMessage(armor.getId(),armor.getBlocks()));
 			ChatUtil.printDebug("Activated town armor addition "+armor.getId()+" to town "+town.getName()+" for blocks "+armor.getBlocks());
 		} else {
-			town.activateArmor(armor.getBlocks());
 			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_NEW.getMessage(armor.getId(),armor.getBlocks()));
 			ChatUtil.printDebug("Activated new town armor "+armor.getId()+" to town "+town.getName()+" for blocks "+armor.getBlocks());
 		}
+		town.activateArmor(armor.getBlocks());
 		
 		// Withdraw cost
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);

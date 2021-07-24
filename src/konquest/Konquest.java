@@ -1051,5 +1051,26 @@ public class Konquest implements Timeable {
             }
         },4);
     }
+    
+    public static String getTimeFormat(int valSeconds) {
+		int days = valSeconds / 86400;
+		int hours = valSeconds % 86400 / 3600;
+		int minutes = valSeconds % 3600 / 60;
+		int seconds = valSeconds % 60;
+		
+		String result = "";
+		
+		if(days != 0) {
+			result = String.format("%03dD:%02dH:%02dM:%02dS", days, hours, minutes, seconds);
+		} else if(hours != 0) {
+			result = String.format("%02dH:%02dM:%02dS", hours, minutes, seconds);
+		} else if(minutes != 0) {
+			result = String.format("%02dM:%02dS", minutes, seconds);
+		} else {
+			result = String.format("%02dS", seconds);
+		}
+		
+		return result;		
+	}
 	
 }

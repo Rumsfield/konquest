@@ -993,9 +993,9 @@ public class PlayerListener implements Listener{
         	    				((KonRuin) territoryFrom).removeBarPlayer(player);
         	    				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
         	    			} else if (territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
-        	    				((KonCapital) territoryFrom).addBarPlayer(player);
+        	    				((KonCapital) territoryFrom).removeBarPlayer(player);
         	    			} else if (territoryFrom.getTerritoryType().equals(KonTerritoryType.CAMP)) {
-        	    				((KonCamp) territoryFrom).addBarPlayer(player);
+        	    				((KonCamp) territoryFrom).removeBarPlayer(player);
         	    			}
         	            	//updateGolemTargetsForTerritory(territoryFrom,player,true);
         					//updateGolemTargetsForTerritory(territoryTo,player,true);
