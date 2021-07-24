@@ -1763,6 +1763,7 @@ public class KingdomManager {
 	}
 	
 	private void loadKingdoms() {
+		//ScheduledThreadPoolExecutor service = new ScheduledThreadPoolExecutor(1);
 		FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
         if (kingdomsConfig.get("kingdoms") == null) {
         	ChatUtil.printDebug("There is no kingdoms section in kingdoms.yml");
