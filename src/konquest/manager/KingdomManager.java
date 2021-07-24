@@ -1177,6 +1177,8 @@ public class KingdomManager {
 			KonCamp newCamp = new KonCamp(loc,player.getOfflineBukkitPlayer(),barbarians,konquest);
 			barbarianCamps.put(uuid,newCamp);
 			newCamp.initClaim();
+			// Update bar players
+			newCamp.updateBarPlayers();
 			//update the chunk cache, add points to primary world cache
 			addAllTerritory(loc.getWorld(),newCamp.getChunkList());
 			konquest.getMapHandler().drawDynmapUpdateTerritory(newCamp);

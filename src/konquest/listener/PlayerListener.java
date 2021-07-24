@@ -89,8 +89,12 @@ public class PlayerListener implements Listener{
             @Override
             public void run() {
             	// Actions to run after delay
+            	if(player == null) {
+            		ChatUtil.printDebug("Failed to use player from null import on player join");
+            		return;
+            	}
             	// Send helpful messages
-            	if(playerManager.getPlayer(bukkitPlayer).getKingdom().isSmallest()) {
+            	if(player.getKingdom().isSmallest()) {
             		int boostPercent = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.smallest_exp_boost_percent");
             		if(boostPercent > 0) {
             			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SMALL_KINGDOM.getMessage(boostPercent), ChatColor.ITALIC);
@@ -916,8 +920,9 @@ public class PlayerListener implements Listener{
         			kingdomManager.clearTownHearts(player);
         		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
         			KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
-                    Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
-        			
+                    if(invokeEvent != null) {
+                    	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
+                    }
                     if(!event.isCancelled()) {
                     	KonTerritory territoryTo = kingdomManager.getChunkTerritory(chunkTo);
     	                // Set message color based on enemy territory

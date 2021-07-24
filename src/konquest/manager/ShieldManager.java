@@ -174,7 +174,7 @@ public class ShieldManager {
 		
 		// Check that town is not under attack optionally
 		boolean isAttackCheckEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.shields_while_attacked",false);
-		if(isAttackCheckEnabled && town.isAttacked()) {
+		if(!isAttackCheckEnabled && town.isAttacked()) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_ATTACK.getMessage());
             return false;
 		}
@@ -236,7 +236,7 @@ public class ShieldManager {
 		
 		// Check that town is not under attack optionally
 		boolean isAttackCheckEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.armor_while_attacked",false);
-		if(isAttackCheckEnabled && town.isAttacked()) {
+		if(!isAttackCheckEnabled && town.isAttacked()) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_ATTACK.getMessage());
             return false;
 		}

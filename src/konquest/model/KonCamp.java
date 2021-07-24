@@ -9,6 +9,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.utility.ChatUtil;
@@ -109,6 +110,16 @@ public class KonCamp extends KonTerritory implements Timeable {
 	
 	public void removeAllBarPlayers() {
 		campBarAll.removeAll();
+	}
+	
+	public void updateBarPlayers() {
+		campBarAll.removeAll();
+		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
+			Player bukkitPlayer = player.getBukkitPlayer();
+			if(isLocInside(bukkitPlayer.getLocation())) {
+				campBarAll.addPlayer(bukkitPlayer);
+			}
+		}
 	}
 
 }

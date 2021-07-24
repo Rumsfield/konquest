@@ -165,6 +165,7 @@ core:
     enable_armor: true
     enable_shields: true
     shields_no_enemy_enter: true
+    armor_tnt_damage: 10
     shields_while_attacked: false
     armor_while_attacked: false
     shields_add: true

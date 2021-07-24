@@ -247,7 +247,7 @@ public class BlockListener implements Listener {
 						KonPlayer onlineOwner = playerManager.getPlayerFromName(camp.getOwner().getName());
 						if(onlineOwner != null) {
 							//ChatUtil.sendNotice(onlineOwner.getBukkitPlayer(), "Your Camp has been destroyed!");
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY_OWNER.getMessage());
+							ChatUtil.sendError(onlineOwner.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY_OWNER.getMessage());
 						} else {
 							ChatUtil.printDebug("Failed attempt to send camp destruction message to offline owner "+camp.getOwner().getName());
 						}
