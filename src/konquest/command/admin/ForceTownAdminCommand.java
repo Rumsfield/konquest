@@ -328,7 +328,7 @@ public class ForceTownAdminCommand extends CommandBase {
 				if(!armorSubCmd.equals("")) {
 					// Parse the sub-command, clear|set|add
 					if(armorSubCmd.equalsIgnoreCase("clear")) {
-						town.deactivateShield();
+						town.deactivateArmor();
 						ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 					} else {
 						int armorVal = 0;
