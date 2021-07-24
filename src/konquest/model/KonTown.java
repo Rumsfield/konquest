@@ -569,7 +569,7 @@ public class KonTown extends KonTerritory implements Timeable{
 			isRaidAlertDisabled = false;
 		} else if(taskID == shieldTimer.getTaskID()) {
 			// When shield loop timer ends (1 second loop)
-			ChatUtil.printDebug("Town "+getName()+" shield tick with taskID: "+taskID);
+			//ChatUtil.printDebug("Town "+getName()+" shield tick with taskID: "+taskID);
 			Date now = new Date();
 			shieldNowTimeSeconds = (int)(now.getTime()/1000);
 			if(shieldEndTimeSeconds < shieldNowTimeSeconds) {
@@ -968,7 +968,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	public void activateShield(int val) {
 		if(isShielded) {
 			// Already shielded
-			shieldEndTimeSeconds += val;
+			shieldEndTimeSeconds = val;
 		} else {
 			// Activate new shield
 			isShielded = true;
@@ -976,7 +976,7 @@ public class KonTown extends KonTerritory implements Timeable{
 			Date now = new Date();
 			shieldNowTimeSeconds = (int)(now.getTime()/1000);
 			shieldTimer.stopTimer();
-			shieldTimer.setTime(1);
+			shieldTimer.setTime(0);
 			shieldTimer.startLoopTimer();
 		}
 		shieldArmorBarAll.setVisible(true);

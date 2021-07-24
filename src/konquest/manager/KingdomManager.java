@@ -1749,6 +1749,8 @@ public class KingdomManager {
         	ChatUtil.printDebug("There is no kingdoms section in kingdoms.yml");
             return;
         }
+        boolean isShieldsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_shields",false);
+        boolean isArmorsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_armor",false);
         double x,y,z;
         List<Double> sectionList;
         String worldName;
@@ -1879,13 +1881,13 @@ public class KingdomManager {
 		        	boolean isShieldActive = townSection.getBoolean("shield",false);
 		        	int shieldTime = townSection.getInt("shield_time",0);
 		        	Date now = new Date();
-		        	if(isShieldActive && shieldTime > (now.getTime()/1000)) {
+		        	if(isShieldsEnabled && isShieldActive && shieldTime > (now.getTime()/1000)) {
 		        		town.activateShield(shieldTime);
 		        	}
 		        	// Set armor
 		        	boolean isArmorActive = townSection.getBoolean("armor",false);
 		        	int armorBlocks = townSection.getInt("armor_blocks",0);
-		        	if(isArmorActive && armorBlocks > 0) {
+		        	if(isArmorsEnabled && isArmorActive && armorBlocks > 0) {
 		        		town.activateArmor(armorBlocks);
 		        	}
 	            	// Set open flag
