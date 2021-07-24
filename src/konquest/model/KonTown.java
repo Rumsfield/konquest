@@ -46,14 +46,16 @@ public class KonTown extends KonTerritory implements Timeable{
 	private boolean isRaidAlertDisabled;
 	private BossBar monumentBarAllies;
 	private BossBar monumentBarEnemies;
-	private BossBar shieldBarAll;
+	private BossBar shieldArmorBarAll;
 	private UUID lord;
 	private HashMap<UUID,Boolean> residents;
 	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident, false = requesting add from lord/knight)
 	private boolean isOpen;
 	private boolean isAttacked;
 	private boolean isShielded;
+	private boolean isArmored;
 	private long shieldEndTime;
+	private int armorBlocks;
 	private ArrayList<UUID> defenders;
 	private HashMap<KonUpgrade,Integer> upgrades;
 	private HashMap<KonUpgrade,Integer> disabledUpgrades;
@@ -73,8 +75,9 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.monumentBarAllies.setVisible(true);
 		this.monumentBarEnemies = Bukkit.getServer().createBossBar(ChatColor.RED+name, BarColor.RED, BarStyle.SOLID);
 		this.monumentBarEnemies.setVisible(true);
-		this.shieldBarAll = Bukkit.getServer().createBossBar(ChatColor.DARK_AQUA+"Shield", BarColor.BLUE, BarStyle.SOLID);
-		this.shieldBarAll.setVisible(false);
+		this.shieldArmorBarAll = Bukkit.getServer().createBossBar(ChatColor.DARK_AQUA+"Shield", BarColor.BLUE, BarStyle.SOLID);
+		this.shieldArmorBarAll.setVisible(false);
+		this.shieldArmorBarAll.setProgress(0);
 		this.lord = null; // init with no lord
 		this.residents = new HashMap<UUID,Boolean>();
 		this.joinRequests = new HashMap<UUID,Boolean>();
@@ -938,11 +941,31 @@ public class KonTown extends KonTerritory implements Timeable{
 		return isShielded;
 	}
 	
+	public boolean isArmored() {
+		return isArmored;
+	}
+	
 	public void activateShield() {
 		isShielded = true;
-		shieldBarAll.setVisible(true);
+		shieldArmorBarAll.setVisible(true);
+		if(!isArmored) {
+			shieldArmorBarAll.setProgress(0.0);
+		}
+		//TODO: finish
 		
+	}
+	
+	public void activateArmor(int val) {
+		isArmored = true;
+		armorBlocks = val;
+		shieldArmorBarAll.setVisible(true);
+		shieldArmorBarAll.setProgress(1.0);
+		//TODO: finish
 		
+	}
+	
+	public void addArmor(int val) {
+		armorBlocks += val;
 	}
 	
 	public long getShieldEndTime() {
@@ -950,6 +973,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 	
 	public int getRemainingShieldTimeSeconds() {
+		// TODO: Replace this with timer keeping track of remaining time?
 		int result = 0;
 		if(isShielded) {
 			Date now = new Date();
@@ -960,6 +984,10 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	public void setShieldEndTime(long val) {
 		shieldEndTime = val;
+	}
+	
+	public int getArmorBlocks() {
+		return armorBlocks;
 	}
 	
 }

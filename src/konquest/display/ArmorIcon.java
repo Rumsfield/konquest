@@ -29,7 +29,7 @@ public class ArmorIcon implements MenuIcon {
 	}
 	
 	private ItemStack initItem() {
-		Material mat = Material.SHIELD;
+		Material mat = Material.DIAMOND_CHESTPLATE;
 		if(!isAvailable) {
 			mat = Material.IRON_BARS;
 		}

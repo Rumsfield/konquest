@@ -262,9 +262,9 @@ public class DisplayManager {
 				} else if(clickedIcon instanceof ArmorIcon) {
 					// Armor Icons close the GUI and attempt to activate a town armor
 					if(townCache.containsKey(inv)) {
-						//ArmorIcon icon = (ArmorIcon)clickedIcon;
-						//boolean status = konquest.getShieldManager().activateTownShield(icon.getShield(), townCache.get(inv), bukkitPlayer);
-						if(true) {
+						ArmorIcon icon = (ArmorIcon)clickedIcon;
+						boolean status = konquest.getShieldManager().activateTownArmor(icon.getArmor(), townCache.get(inv), bukkitPlayer);
+						if(status) {
 							Konquest.playSuccessSound(bukkitPlayer);
 						}
 						menuCache.remove(inv);

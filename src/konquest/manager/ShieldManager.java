@@ -173,7 +173,7 @@ public class ShieldManager {
             return false;
 		}
 		
-		// Check that town does not exceed maximum
+		// Check that town does not exceed maximum optionally
 		int maxShields = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_shields",0);
 		if(maxShields > 0 && shield.getDurationSeconds()+town.getRemainingShieldTimeSeconds() > maxShields) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_MAX.getMessage(maxShields));
@@ -191,6 +191,67 @@ public class ShieldManager {
 			ChatUtil.printDebug("Activated new town shield "+shield.getId()+" to town "+town.getName()+" for end time "+endTime);
 		}
 		town.setShieldEndTime(endTime);
+		
+		// Withdraw cost
+		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost);
+        if(r.transactionSuccess()) {
+        	String balanceF = String.format("%.2f",r.balance);
+        	String amountF = String.format("%.2f",r.amount);
+        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+        	if(player != null) {
+        		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)requiredCost);
+        	}
+        } else {
+        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
+        }
+		return true;
+	}
+	
+	public boolean activateTownArmor(KonArmor armor, KonTown town, Player bukkitPlayer) {
+		if(!isArmorsEnabled) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return false;
+		}
+		
+		// Check that the player has enough favor
+		int requiredCost = armor.getCost()*town.getNumResidents();
+		if(KonquestPlugin.getBalance(bukkitPlayer) < requiredCost) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_COST.getMessage(requiredCost));
+            return false;
+		}
+		
+		// Check that town is not under attack optionally
+		boolean isAttackCheckEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.armor_while_attacked",false);
+		if(isAttackCheckEnabled && town.isAttacked()) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_ATTACK.getMessage());
+            return false;
+		}
+		
+		// Check that town does not have an active armor optionally
+		boolean isArmorAddEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.armor_add",false);
+		if(!isArmorAddEnabled && town.isArmored()) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_ADD.getMessage());
+            return false;
+		}
+		
+		// Check that town does not exceed maximum optionally
+		int maxArmor = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_armor",0);
+		if(maxArmor > 0 && armor.getBlocks()+town.getArmorBlocks() > maxArmor) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_MAX.getMessage(maxArmor));
+            return false;
+		}
+		
+		// Passed checks, activate the armor
+		if(town.isArmored()) {
+			town.addArmor(armor.getBlocks());
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_ADD.getMessage(armor.getId(),armor.getBlocks()));
+			ChatUtil.printDebug("Activated town armor addition "+armor.getId()+" to town "+town.getName()+" for blocks "+armor.getBlocks());
+		} else {
+			town.activateArmor(armor.getBlocks());
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_NEW.getMessage(armor.getId(),armor.getBlocks()));
+			ChatUtil.printDebug("Activated new town armor "+armor.getId()+" to town "+town.getName()+" for blocks "+armor.getBlocks());
+		}
 		
 		// Withdraw cost
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
