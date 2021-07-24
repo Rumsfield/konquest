@@ -71,10 +71,10 @@ public class ShieldManager {
         	int shieldTime = 0;
         	int shieldCost = 0;
         	ConfigurationSection shieldSection = shieldsConfig.getConfigurationSection("shields."+shieldName);
-        	if(shieldSection.contains("time")) {
-        		shieldTime = shieldSection.getInt("time",0);
+        	if(shieldSection.contains("charge")) {
+        		shieldTime = shieldSection.getInt("charge",0);
     		} else {
-    			ChatUtil.printDebug("Shields.yml is missing time section for shield: "+shieldName);
+    			ChatUtil.printDebug("Shields.yml is missing charge section for shield: "+shieldName);
     			status = false;
     		}
         	if(shieldSection.contains("cost")) {
@@ -106,10 +106,10 @@ public class ShieldManager {
         	int armorBlocks = 0;
         	int armorCost = 0;
         	ConfigurationSection armorSection = shieldsConfig.getConfigurationSection("armors."+armorName);
-        	if(armorSection.contains("blocks")) {
-        		armorBlocks = armorSection.getInt("blocks",0);
+        	if(armorSection.contains("charge")) {
+        		armorBlocks = armorSection.getInt("charge",0);
     		} else {
-    			ChatUtil.printDebug("Shields.yml is missing blocks section for armor: "+armorName);
+    			ChatUtil.printDebug("Shields.yml is missing charge section for armor: "+armorName);
     			status = false;
     		}
         	if(armorSection.contains("cost")) {
