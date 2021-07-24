@@ -569,6 +569,7 @@ public class KonTown extends KonTerritory implements Timeable{
 			isRaidAlertDisabled = false;
 		} else if(taskID == shieldTimer.getTaskID()) {
 			// When shield loop timer ends (1 second loop)
+			ChatUtil.printDebug("Town "+getName()+" shield tick with taskID: "+taskID);
 			Date now = new Date();
 			shieldNowTimeSeconds = (int)(now.getTime()/1000);
 			if(shieldEndTimeSeconds < shieldNowTimeSeconds) {
@@ -986,6 +987,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		isShielded = false;
 		shieldTimer.stopTimer();
 		refreshShieldBarTitle();
+		playDeactivateSound();
 	}
 	
 	public void activateArmor(int val) {
@@ -1007,6 +1009,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		isArmored = false;
 		shieldArmorBarAll.setProgress(0.0);
 		refreshShieldBarTitle();
+		playDeactivateSound();
 	}
 	
 	public boolean damageArmor(int damage) {
@@ -1032,11 +1035,11 @@ public class KonTown extends KonTerritory implements Timeable{
 		String remainingTime = Konquest.getTimeFormat(remainingSeconds);
 		ChatColor titleColor = ChatColor.DARK_AQUA;
 		if(isShielded && isArmored) {
-			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+ChatColor.BOLD+" Armor | Shield "+ChatColor.RESET+titleColor+remainingTime);
+			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+" Armor | Shield "+remainingTime);
 		} else if(isShielded) {
-			shieldArmorBarAll.setTitle(titleColor+""+ChatColor.BOLD+"Shield "+ChatColor.RESET+titleColor+remainingTime);
+			shieldArmorBarAll.setTitle(titleColor+"Shield "+remainingTime);
 		} else if(isArmored) {
-			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+ChatColor.BOLD+" Armor");
+			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+" Armor");
 		} else {
 			shieldArmorBarAll.setProgress(0.0);
 			shieldArmorBarAll.setVisible(false);
@@ -1059,6 +1062,8 @@ public class KonTown extends KonTerritory implements Timeable{
 		return result;
 	}
 	
-	
+	private void playDeactivateSound() {
+		getWorld().playSound(getCenterLoc(), Sound.BLOCK_GLASS_BREAK, (float)3.0, (float)0.3);
+	}
 	
 }

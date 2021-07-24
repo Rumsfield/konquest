@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,6 +36,7 @@ public class ArmorIcon implements MenuIcon {
 		}
 		ItemStack item = new ItemStack(mat,1);
 		ItemMeta meta = item.getItemMeta();
+		meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
 				meta.addItemFlags(flag);

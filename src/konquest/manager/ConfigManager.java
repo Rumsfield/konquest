@@ -28,7 +28,7 @@ public class ConfigManager{
 		addConfig("upgrades", new KonConfig("upgrades"));
 		updateConfigVersion("upgrades");
 		addConfig("shields", new KonConfig("shields"));
-		updateConfigVersion("shields");
+		//updateConfigVersion("shields");
 		// Data Storage
 		addConfig("kingdoms", new KonConfig("kingdoms"));
 		addConfig("camps", new KonConfig("camps"));

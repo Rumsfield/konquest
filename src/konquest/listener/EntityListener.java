@@ -172,7 +172,7 @@ public class EntityListener implements Listener {
 					}
 					// If town is armored, damage the armor while preventing explosions
 					if(town.isArmored()) {
-						town.damageArmor(event.blockList().size());
+						town.damageArmor(10);
 						event.setCancelled(true);
 						return;
 					}

@@ -647,7 +647,7 @@ public class BlockListener implements Listener {
 					}
 					// If town is armored, damage the armor while preventing block breaks
 					if(town.isArmored()) {
-						town.damageArmor(event.blockList().size());
+						town.damageArmor(10);
 						event.setCancelled(true);
 						return;
 					}
