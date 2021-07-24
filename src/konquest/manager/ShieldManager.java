@@ -242,14 +242,16 @@ public class ShieldManager {
 		}
 		
 		// Passed checks, activate the armor
+		int newArmor = armor.getBlocks();
 		if(town.isArmored()) {
+			newArmor = town.getArmorBlocks() + armor.getBlocks();
 			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_ADD.getMessage(armor.getId(),armor.getBlocks()));
 			ChatUtil.printDebug("Activated town armor addition "+armor.getId()+" to town "+town.getName()+" for blocks "+armor.getBlocks());
 		} else {
 			ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_SHIELD_ACTIVATE_NEW.getMessage(armor.getId(),armor.getBlocks()));
 			ChatUtil.printDebug("Activated new town armor "+armor.getId()+" to town "+town.getName()+" for blocks "+armor.getBlocks());
 		}
-		town.activateArmor(armor.getBlocks());
+		town.activateArmor(newArmor);
 		
 		// Withdraw cost
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
@@ -311,7 +313,7 @@ public class ShieldManager {
 		if(town.isShielded()) {
 			newEndTime = town.getShieldEndTime() + value;
 		}
-		Date end = new Date((long)newEndTime);
+		Date end = new Date((long)newEndTime*1000);
 		if(now.after(end)) {
 			// End time is less than now, deactivate shields and do nothing
 			if(town.isShielded()) {

@@ -991,14 +991,11 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 	
 	public void activateArmor(int val) {
-		if(isArmored) {
-			// Already armored
-			armorCurrentBlocks += val;
-		} else {
+		if(!isArmored) {
 			// Activate new armor
 			isArmored = true;
-			armorCurrentBlocks = val;
 		}
+		armorCurrentBlocks = val;
 		armorTotalBlocks = armorCurrentBlocks;
 		shieldArmorBarAll.setVisible(true);
 		shieldArmorBarAll.setProgress(1.0);
@@ -1033,7 +1030,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	private void refreshShieldBarTitle() {
 		int remainingSeconds = getRemainingShieldTimeSeconds();
 		String remainingTime = Konquest.getTimeFormat(remainingSeconds);
-		ChatColor titleColor = ChatColor.DARK_AQUA;
+		ChatColor titleColor = ChatColor.BLUE;
 		if(isShielded && isArmored) {
 			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+" Armor | Shield "+remainingTime);
 		} else if(isShielded) {
