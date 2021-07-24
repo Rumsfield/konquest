@@ -47,7 +47,7 @@ public class ArmorIcon implements MenuIcon {
     	if(isAvailable) {
     		loreList.add(ChatColor.GOLD+MessagePath.MENU_SHIELD_HINT.getMessage());
     	}
-    	meta.setDisplayName(ChatColor.GOLD+armor.getId());
+    	meta.setDisplayName(ChatColor.GOLD+armor.getId()+" "+MessagePath.LABEL_ARMOR.getMessage());
 		meta.setLore(loreList);
 		item.setItemMeta(meta);
 		return item;

@@ -52,6 +52,8 @@ label:
   information: "Information"
   shields: "Shields"
   shield: "Shield"
+  armors: "Armors"
+  armor: "Armor"
 menu:
   stats:
     title: "Accomplishment Stats"
@@ -101,10 +103,12 @@ menu:
     hint-apply: "Click to apply"
   shield:
     hint: "Click to activate"
-    fail-attack: "Failed to activate town shield while town is under attack!"
-    fail-cost: "Failed to activate town shield %s, requires %s Favor."
-    activate-new: "Activated town shield %s for duration %s."
-    activate-add: "Increased town shield with %s by duration %s."
+    fail-max: "Failed to activate, exceeds maximum of %s."
+    fail-add: "Failed to activate while already active."
+    fail-attack: "Failed to activate while town is under attack!"
+    fail-cost: "Failed to activate, requires %s Favor."
+    activate-new: "Activated %s for %s."
+    activate-add: "Increased with %s by %s."
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."

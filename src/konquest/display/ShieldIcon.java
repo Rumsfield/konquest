@@ -47,7 +47,7 @@ public class ShieldIcon implements MenuIcon {
     	if(isAvailable) {
     		loreList.add(ChatColor.GOLD+MessagePath.MENU_SHIELD_HINT.getMessage());
     	}
-    	meta.setDisplayName(ChatColor.GOLD+shield.getId());
+    	meta.setDisplayName(ChatColor.GOLD+shield.getId()+" "+MessagePath.LABEL_SHIELD.getMessage());
 		meta.setLore(loreList);
 		item.setItemMeta(meta);
 		return item;

@@ -155,7 +155,7 @@ public class ShieldManager {
 		// Check that the player has enough favor
 		int requiredCost = shield.getCost()*town.getNumResidents();
 		if(KonquestPlugin.getBalance(bukkitPlayer) < requiredCost) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_COST.getMessage(shield.getId(),requiredCost));
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_COST.getMessage(requiredCost));
             return false;
 		}
 		
@@ -163,6 +163,20 @@ public class ShieldManager {
 		boolean isAttackCheckEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.shields_while_attacked",false);
 		if(isAttackCheckEnabled && town.isAttacked()) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_ATTACK.getMessage());
+            return false;
+		}
+		
+		// Check that town does not have an active shield optionally
+		boolean isShieldAddEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.shields_add",false);
+		if(!isShieldAddEnabled && town.isShielded()) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_ADD.getMessage());
+            return false;
+		}
+		
+		// Check that town does not exceed maximum
+		int maxShields = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_shields",0);
+		if(maxShields > 0 && shield.getDurationSeconds()+town.getRemainingShieldTimeSeconds() > maxShields) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_MAX.getMessage(maxShields));
             return false;
 		}
 		

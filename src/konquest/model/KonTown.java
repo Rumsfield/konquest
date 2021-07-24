@@ -2,6 +2,7 @@ package konquest.model;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -946,6 +947,15 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	public long getShieldEndTime() {
 		return shieldEndTime;
+	}
+	
+	public int getRemainingShieldTimeSeconds() {
+		int result = 0;
+		if(isShielded) {
+			Date now = new Date();
+			result = (int)((shieldEndTime - now.getTime())/1000);
+		}
+		return result;
 	}
 	
 	public void setShieldEndTime(long val) {

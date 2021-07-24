@@ -20,6 +20,7 @@ import org.bukkit.inventory.Inventory;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.command.CommandType;
+import konquest.display.ArmorIcon;
 import konquest.display.CommandIcon;
 import konquest.display.DisplayMenu;
 import konquest.display.InfoIcon;
@@ -33,6 +34,7 @@ import konquest.display.ShieldIcon;
 import konquest.display.PrefixIcon;
 import konquest.display.TownIcon;
 import konquest.display.UpgradeIcon;
+import konquest.model.KonArmor;
 import konquest.model.KonKingdom;
 import konquest.model.KonKingdomScoreAttributes;
 import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
@@ -88,171 +90,193 @@ public class DisplayManager {
 			Player bukkitPlayer = clickPlayer.getBukkitPlayer();
 			PagedMenu clickMenu = menuCache.get(inv);
 			DisplayMenu currentPage = clickMenu.getPage(inv);
-			if(currentPage != null) {
-				int nextIndex = currentPage.getInventory().getSize()-1;
-				int closeIndex = currentPage.getInventory().getSize()-5;
-				int backIndex = currentPage.getInventory().getSize()-9;
-				if(slot == nextIndex) {
-					clickMenu.nextPageIndex();
-					clickMenu.refreshCurrentPage();
+			if(currentPage == null) {
+				return;
+			}
+			MenuIcon clickedIcon = currentPage.getIcon(slot);
+			if(clickedIcon == null || !clickedIcon.isClickable()) {
+				return;
+			}
+			playMenuClickSound(bukkitPlayer);
+			int nextIndex = currentPage.getInventory().getSize()-1;
+			int closeIndex = currentPage.getInventory().getSize()-5;
+			int backIndex = currentPage.getInventory().getSize()-9;
+			if(slot == nextIndex) {
+				clickMenu.nextPageIndex();
+				clickMenu.refreshCurrentPage();
+				menuCache.remove(inv);
+				if(townCache.containsKey(inv)) {
+					KonTown town = townCache.remove(inv);
+					townCache.put(clickMenu.getCurrentPage().getInventory(), town);
+				}
+				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+		            @Override
+		            public void run() {
+		            	//bukkitPlayer.closeInventory();
+		            	bukkitPlayer.openInventory(clickMenu.getCurrentPage().getInventory());
+		            	menuCache.put(clickMenu.getCurrentPage().getInventory(), clickMenu);
+		            }
+		        },1);
+				//ChatUtil.printDebug("Clicked page next button");
+			} else if(slot == closeIndex) {
+				menuCache.remove(inv);
+				if(townCache.containsKey(inv)) {
+					townCache.remove(inv);
+				}
+				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+		            @Override
+		            public void run() {
+		            	bukkitPlayer.closeInventory();
+		            }
+		        },1);
+				//ChatUtil.printDebug("Clicked page close button");
+			} else if(slot == backIndex) {
+				clickMenu.previousPageIndex();
+				clickMenu.refreshCurrentPage();
+				menuCache.remove(inv);
+				if(townCache.containsKey(inv)) {
+					KonTown town = townCache.remove(inv);
+					townCache.put(clickMenu.getCurrentPage().getInventory(), town);
+				}
+				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+		            @Override
+		            public void run() {
+		            	//bukkitPlayer.closeInventory();
+		            	bukkitPlayer.openInventory(clickMenu.getCurrentPage().getInventory());
+		            	menuCache.put(clickMenu.getCurrentPage().getInventory(), clickMenu);
+		            }
+		        },1);
+				//ChatUtil.printDebug("Clicked page previous button");
+			} else {
+				// Clicked non-navigation slot
+				if(clickedIcon instanceof CommandIcon) {
+					// Command Icons close the GUI and print a command in chat
+					CommandIcon icon = (CommandIcon)clickedIcon;
+					CommandType cmd = icon.getCommand();
+					ChatUtil.sendNotice(bukkitPlayer, ChatColor.GOLD+"/k "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmd.arguments());
 					menuCache.remove(inv);
-					if(townCache.containsKey(inv)) {
-						KonTown town = townCache.remove(inv);
-						townCache.put(clickMenu.getCurrentPage().getInventory(), town);
-					}
-					playMenuClickSound(bukkitPlayer);
-					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-			            @Override
-			            public void run() {
-			            	//bukkitPlayer.closeInventory();
-			            	bukkitPlayer.openInventory(clickMenu.getCurrentPage().getInventory());
-			            	menuCache.put(clickMenu.getCurrentPage().getInventory(), clickMenu);
-			            }
-			        },1);
-					//ChatUtil.printDebug("Clicked page next button");
-				} else if(slot == closeIndex) {
-					menuCache.remove(inv);
-					if(townCache.containsKey(inv)) {
-						townCache.remove(inv);
-					}
-					playMenuClickSound(bukkitPlayer);
 					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 			            @Override
 			            public void run() {
 			            	bukkitPlayer.closeInventory();
 			            }
-			        },1);
-					//ChatUtil.printDebug("Clicked page close button");
-				} else if(slot == backIndex) {
-					clickMenu.previousPageIndex();
-					clickMenu.refreshCurrentPage();
+			        });
+				} else if(clickedIcon instanceof InfoIcon) {
+					// Info Icons close the GUI and print their info in chat
+					InfoIcon icon = (InfoIcon)clickedIcon;
+					ChatUtil.sendNotice(bukkitPlayer, icon.getInfo());
 					menuCache.remove(inv);
-					if(townCache.containsKey(inv)) {
-						KonTown town = townCache.remove(inv);
-						townCache.put(clickMenu.getCurrentPage().getInventory(), town);
-					}
-					playMenuClickSound(bukkitPlayer);
 					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 			            @Override
 			            public void run() {
-			            	//bukkitPlayer.closeInventory();
-			            	bukkitPlayer.openInventory(clickMenu.getCurrentPage().getInventory());
-			            	menuCache.put(clickMenu.getCurrentPage().getInventory(), clickMenu);
+			            	bukkitPlayer.closeInventory();
 			            }
-			        },1);
-					//ChatUtil.printDebug("Clicked page previous button");
-				} else {
-					// Clicked non-navigation slot
-					MenuIcon clickedIcon = currentPage.getIcon(slot);
-					if(clickedIcon != null && clickedIcon.isClickable()) {
-						playMenuClickSound(bukkitPlayer);
-						// The clicked slot is a clickable icon
-						if(clickedIcon instanceof CommandIcon) {
-							// Command Icons close the GUI and print a command in chat
-							CommandIcon icon = (CommandIcon)clickedIcon;
-							CommandType cmd = icon.getCommand();
-							ChatUtil.sendNotice(bukkitPlayer, ChatColor.GOLD+"/k "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmd.arguments());
-							Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-					            @Override
-					            public void run() {
-					            	bukkitPlayer.closeInventory();
-					            }
-					        });
-						} else if(clickedIcon instanceof InfoIcon) {
-							// Info Icons close the GUI and print their info in chat
-							InfoIcon icon = (InfoIcon)clickedIcon;
-							ChatUtil.sendNotice(bukkitPlayer, icon.getInfo());
-							Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-					            @Override
-					            public void run() {
-					            	bukkitPlayer.closeInventory();
-					            }
-					        });
-						} else if(clickedIcon instanceof PlayerIcon) {
-							// Player Head Icons open a new score menu for the associated player
-							PlayerIcon icon = (PlayerIcon)clickedIcon;
-							KonOfflinePlayer offlinePlayer = konquest.getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
-							if(offlinePlayer != null) {
-								menuCache.remove(inv);
-								switch(icon.getAction()) {
-									case DISPLAY_SCORE:
-										displayScoreMenu(clickPlayer, offlinePlayer);
-										break;
-									case DISPLAY_INFO:
-										displayPlayerInfoMenu(clickPlayer,offlinePlayer);
-										break;
-									default:
-										break;
-								}
-							} else {
-								ChatUtil.printDebug("Failed to find valid leaderboard offline player");
-							}
-						} else if(clickedIcon instanceof UpgradeIcon) {
-							// Upgrade Icons close the GUI and attempt to apply an upgrade
-							if(townCache.containsKey(inv)) {
-								UpgradeIcon icon = (UpgradeIcon)clickedIcon;
-								boolean status = konquest.getUpgradeManager().addTownUpgrade(townCache.get(inv), icon.getUpgrade(), icon.getLevel(), bukkitPlayer);
-								if(status) {
-									//bukkitPlayer.getWorld().playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, (float)1.0, (float)1.0);
-									Konquest.playSuccessSound(bukkitPlayer);
-								}
-								Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-						            @Override
-						            public void run() {
-						            	bukkitPlayer.closeInventory();
-						            }
-						        });
-							} else {
-								ChatUtil.printDebug("Failed to find inventory menu in town cache");
-							}
-						} else if(clickedIcon instanceof KingdomIcon) {
-							// Kingdom Icons open a new kingdom info menu for the associated player
-							KingdomIcon icon = (KingdomIcon)clickedIcon;
-							menuCache.remove(inv);
-							displayKingdomInfoMenu(clickPlayer,icon.getKingdom());
-						} else if(clickedIcon instanceof TownIcon) {
-							// Town Icons open a new town info menu for the associated player
-							TownIcon icon = (TownIcon)clickedIcon;
-							menuCache.remove(inv);
-							displayTownInfoMenu(clickPlayer,icon.getTown());
-						} else if(clickedIcon instanceof PrefixIcon) {
-							// Prefix Icons alter the player's prefix
-							PrefixIcon icon = (PrefixIcon)clickedIcon;
-							menuCache.remove(inv);
-							switch(icon.getAction()) {
-								case DISABLE_PREFIX:
-									konquest.getAccomplishmentManager().disablePlayerPrefix(clickPlayer);
-									break;
-								case APPLY_PREFIX:
-									konquest.getAccomplishmentManager().applyPlayerPrefix(clickPlayer,icon.getPrefix());
-									break;
-								default:
-									break;
-							}
-							Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-					            @Override
-					            public void run() {
-					            	bukkitPlayer.closeInventory();
-					            }
-					        });
-						} else if(clickedIcon instanceof ShieldIcon) {
-							// Shield Icons close the GUI and attempt to activate a town shield
-							if(townCache.containsKey(inv)) {
-								ShieldIcon icon = (ShieldIcon)clickedIcon;
-								boolean status = konquest.getShieldManager().activateTownShield(icon.getShield(), townCache.get(inv), bukkitPlayer);
-								if(status) {
-									Konquest.playSuccessSound(bukkitPlayer);
-								}
-								Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-						            @Override
-						            public void run() {
-						            	bukkitPlayer.closeInventory();
-						            }
-						        });
-							} else {
-								ChatUtil.printDebug("Failed to find inventory menu in town cache");
-							}
+			        });
+				} else if(clickedIcon instanceof PlayerIcon) {
+					// Player Head Icons open a new score menu for the associated player
+					PlayerIcon icon = (PlayerIcon)clickedIcon;
+					KonOfflinePlayer offlinePlayer = konquest.getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
+					menuCache.remove(inv);
+					if(offlinePlayer != null) {
+						switch(icon.getAction()) {
+							case DISPLAY_SCORE:
+								displayScoreMenu(clickPlayer, offlinePlayer);
+								break;
+							case DISPLAY_INFO:
+								displayPlayerInfoMenu(clickPlayer,offlinePlayer);
+								break;
+							default:
+								break;
 						}
+					} else {
+						ChatUtil.printDebug("Failed to find valid leaderboard offline player");
+					}
+				} else if(clickedIcon instanceof UpgradeIcon) {
+					// Upgrade Icons close the GUI and attempt to apply an upgrade
+					if(townCache.containsKey(inv)) {
+						UpgradeIcon icon = (UpgradeIcon)clickedIcon;
+						boolean status = konquest.getUpgradeManager().addTownUpgrade(townCache.get(inv), icon.getUpgrade(), icon.getLevel(), bukkitPlayer);
+						if(status) {
+							//bukkitPlayer.getWorld().playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, (float)1.0, (float)1.0);
+							Konquest.playSuccessSound(bukkitPlayer);
+						}
+						menuCache.remove(inv);
+						townCache.remove(inv);
+						Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+				            @Override
+				            public void run() {
+				            	bukkitPlayer.closeInventory();
+				            }
+				        });
+					} else {
+						ChatUtil.printDebug("Failed to find inventory menu in town cache");
+					}
+				} else if(clickedIcon instanceof KingdomIcon) {
+					// Kingdom Icons open a new kingdom info menu for the associated player
+					KingdomIcon icon = (KingdomIcon)clickedIcon;
+					menuCache.remove(inv);
+					displayKingdomInfoMenu(clickPlayer,icon.getKingdom());
+				} else if(clickedIcon instanceof TownIcon) {
+					// Town Icons open a new town info menu for the associated player
+					TownIcon icon = (TownIcon)clickedIcon;
+					menuCache.remove(inv);
+					displayTownInfoMenu(clickPlayer,icon.getTown());
+				} else if(clickedIcon instanceof PrefixIcon) {
+					// Prefix Icons alter the player's prefix
+					PrefixIcon icon = (PrefixIcon)clickedIcon;
+					switch(icon.getAction()) {
+						case DISABLE_PREFIX:
+							konquest.getAccomplishmentManager().disablePlayerPrefix(clickPlayer);
+							break;
+						case APPLY_PREFIX:
+							konquest.getAccomplishmentManager().applyPlayerPrefix(clickPlayer,icon.getPrefix());
+							break;
+						default:
+							break;
+					}
+					menuCache.remove(inv);
+					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+			            @Override
+			            public void run() {
+			            	bukkitPlayer.closeInventory();
+			            }
+			        });
+				} else if(clickedIcon instanceof ShieldIcon) {
+					// Shield Icons close the GUI and attempt to activate a town shield
+					if(townCache.containsKey(inv)) {
+						ShieldIcon icon = (ShieldIcon)clickedIcon;
+						boolean status = konquest.getShieldManager().activateTownShield(icon.getShield(), townCache.get(inv), bukkitPlayer);
+						if(status) {
+							Konquest.playSuccessSound(bukkitPlayer);
+						}
+						menuCache.remove(inv);
+						Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+				            @Override
+				            public void run() {
+				            	bukkitPlayer.closeInventory();
+				            }
+				        });
+					} else {
+						ChatUtil.printDebug("Failed to find inventory menu in town cache");
+					}
+				} else if(clickedIcon instanceof ArmorIcon) {
+					// Armor Icons close the GUI and attempt to activate a town armor
+					if(townCache.containsKey(inv)) {
+						//ArmorIcon icon = (ArmorIcon)clickedIcon;
+						//boolean status = konquest.getShieldManager().activateTownShield(icon.getShield(), townCache.get(inv), bukkitPlayer);
+						if(true) {
+							Konquest.playSuccessSound(bukkitPlayer);
+						}
+						menuCache.remove(inv);
+						townCache.remove(inv);
+						Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+				            @Override
+				            public void run() {
+				            	bukkitPlayer.closeInventory();
+				            }
+				        });
+					} else {
+						ChatUtil.printDebug("Failed to find inventory menu in town cache");
 					}
 				}
 			}
@@ -404,35 +428,68 @@ public class DisplayManager {
 
 		String pageLabel = "";
 		String pageColor = ""+ChatColor.BLACK;
+		int pageTotal = 0;
+		final int MAX_ICONS_PER_PAGE = 45;
     	
  		// Create fresh paged menu
  		PagedMenu newMenu = new PagedMenu();
 		
 		// Page 0+
 		List<KonShield> allShields = konquest.getShieldManager().getShields();
-		final int MAX_ICONS_PER_PAGE = 45;
-		int pageTotal = (int)Math.ceil(((double)allShields.size())/MAX_ICONS_PER_PAGE);
+		boolean isShieldsEnabled = konquest.getShieldManager().isShieldsEnabled();
+		pageTotal = (int)Math.ceil(((double)allShields.size())/MAX_ICONS_PER_PAGE);
 		if(pageTotal == 0) {
 			pageTotal = 1;
 		}
 		int pageNum = 0;
-		ListIterator<KonShield> shieldIter = allShields.listIterator();
-		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)((allShields.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows == 0) {
-				numPageRows = 1;
+		if(isShieldsEnabled) {
+			ListIterator<KonShield> shieldIter = allShields.listIterator();
+			for(int i = 0; i < pageTotal; i++) {
+				int numPageRows = (int)Math.ceil(((double)((allShields.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
+				if(numPageRows == 0) {
+					numPageRows = 1;
+				}
+				pageLabel = pageColor+town.getName()+" "+MessagePath.LABEL_SHIELDS.getMessage()+" "+(i+1)+"/"+pageTotal;
+				newMenu.addPage(pageNum, numPageRows, pageLabel);
+				int slotIndex = 0;
+				while(slotIndex < MAX_ICONS_PER_PAGE && shieldIter.hasNext()) {
+					/* Shield Icon (n) */
+					KonShield currentShield = shieldIter.next();
+					
+			    	ShieldIcon shieldIcon = new ShieldIcon(currentShield, true, town.getNumResidents(), slotIndex);
+					newMenu.getPage(pageNum).addIcon(shieldIcon);
+					slotIndex++;
+				}
+				pageNum++;
 			}
-			pageLabel = pageColor+town.getName()+" "+MessagePath.LABEL_SHIELDS.getMessage()+" "+(i+1)+"/"+pageTotal;
-			newMenu.addPage(pageNum, numPageRows, pageLabel);
-			int slotIndex = 0;
-			while(slotIndex < MAX_ICONS_PER_PAGE && shieldIter.hasNext()) {
-				/* Town Icon (n) */
-				KonShield currentShield = shieldIter.next();
-		    	ShieldIcon shieldIcon = new ShieldIcon(currentShield, true, town.getNumResidents(), slotIndex);
-				newMenu.getPage(pageNum).addIcon(shieldIcon);
-				slotIndex++;
+		}
+		
+		// Page N+
+		List<KonArmor> allArmors = konquest.getShieldManager().getArmors();
+		boolean isArmorsEnabled = konquest.getShieldManager().isArmorsEnabled();
+		pageTotal = (int)Math.ceil(((double)allArmors.size())/MAX_ICONS_PER_PAGE);
+		if(pageTotal == 0) {
+			pageTotal = 1;
+		}
+		if(isArmorsEnabled) {
+			ListIterator<KonArmor> armorIter = allArmors.listIterator();
+			for(int i = 0; i < pageTotal; i++) {
+				int numPageRows = (int)Math.ceil(((double)((allArmors.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
+				if(numPageRows == 0) {
+					numPageRows = 1;
+				}
+				pageLabel = pageColor+town.getName()+" "+MessagePath.LABEL_ARMORS.getMessage()+" "+(i+1)+"/"+pageTotal;
+				newMenu.addPage(pageNum, numPageRows, pageLabel);
+				int slotIndex = 0;
+				while(slotIndex < MAX_ICONS_PER_PAGE && armorIter.hasNext()) {
+					/* Armor Icon (n) */
+					KonArmor currentArmor = armorIter.next();
+			    	ArmorIcon armorIcon = new ArmorIcon(currentArmor, true, town.getNumResidents(), slotIndex);
+					newMenu.getPage(pageNum).addIcon(armorIcon);
+					slotIndex++;
+				}
+				pageNum++;
 			}
-			pageNum++;
 		}
 		
 		newMenu.refreshNavigationButtons();
