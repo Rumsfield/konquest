@@ -455,7 +455,6 @@ public class DisplayManager {
 				while(slotIndex < MAX_ICONS_PER_PAGE && shieldIter.hasNext()) {
 					/* Shield Icon (n) */
 					KonShield currentShield = shieldIter.next();
-					
 			    	ShieldIcon shieldIcon = new ShieldIcon(currentShield, true, town.getNumResidents(), slotIndex);
 					newMenu.getPage(pageNum).addIcon(shieldIcon);
 					slotIndex++;
@@ -1166,7 +1165,7 @@ public class DisplayManager {
 	 * Helper methods
 	 */
   	
- 	// Sort player town list by Lord, Knight, Resident, and then by population
+ 	// Sort player town list by Lord, Knight, Resident, and then by population, and then by size
  	private List<KonTown> sortedTowns(KonOfflinePlayer player) {
  		List<KonTown> sortedTowns = new ArrayList<KonTown>();
  		// Determine town group lists
@@ -1182,19 +1181,25 @@ public class DisplayManager {
  				residentTowns.add(town);
  			}
  		}
- 		// Sort each town list by population
- 		Comparator<KonTown> townComparator = new Comparator<KonTown>() {
- 			@Override
- 			public int compare(final KonTown k1, KonTown k2) {
- 				int result = 0;
- 				if(k1.getNumResidents() < k2.getNumResidents()) {
- 					result = 1;
- 				} else if(k1.getNumResidents() > k2.getNumResidents()) {
- 					result = -1;
- 				}
- 				return result;
- 			}
- 		};
+ 		// Sort each town list by population then size
+  		Comparator<KonTown> townComparator = new Comparator<KonTown>() {
+  			@Override
+  			public int compare(final KonTown k1, KonTown k2) {
+  				int result = 0;
+  				if(k1.getNumResidents() < k2.getNumResidents()) {
+  					result = 1;
+  				} else if(k1.getNumResidents() > k2.getNumResidents()) {
+  					result = -1;
+  				} else {
+  					if(k1.getChunkList().size() < k2.getChunkList().size()) {
+  						result = 1;
+  					} else if(k1.getChunkList().size() > k2.getChunkList().size()) {
+  						result = -1;
+  					}
+  				}
+  				return result;
+  			}
+  		};
  		Collections.sort(lordTowns, townComparator);
  		Collections.sort(knightTowns, townComparator);
  		Collections.sort(residentTowns, townComparator);

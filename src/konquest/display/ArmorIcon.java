@@ -44,8 +44,8 @@ public class ArmorIcon implements MenuIcon {
 		}
 		int totalCost = population * armor.getCost();
 		List<String> loreList = new ArrayList<String>();
-		loreList.add(ChatColor.BOLD+""+ChatColor.DARK_AQUA+armor.getBlocks());
-    	loreList.add(ChatColor.WHITE+MessagePath.LABEL_COST.getMessage()+": "+ChatColor.AQUA+totalCost);
+		loreList.add(ChatColor.DARK_AQUA+""+armor.getBlocks());
+    	loreList.add(ChatColor.YELLOW+MessagePath.LABEL_COST.getMessage()+": "+ChatColor.AQUA+totalCost);
     	if(isAvailable) {
     		loreList.add(ChatColor.GOLD+MessagePath.MENU_SHIELD_HINT.getMessage());
     	}
