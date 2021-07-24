@@ -517,6 +517,13 @@ public class TownCommand extends CommandBase {
             		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
             		return;
             	}
+            	// Verify either shields or armors are enabled
+            	boolean isShieldsEnabled = getKonquest().getShieldManager().isShieldsEnabled();
+            	boolean isArmorsEnabled = getKonquest().getShieldManager().isArmorsEnabled();
+            	if(!isShieldsEnabled && !isArmorsEnabled) {
+            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+            		return;
+            	}
             	getKonquest().getDisplayManager().displayTownShieldMenu(bukkitPlayer, town);
 				break;
         	default:

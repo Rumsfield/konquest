@@ -168,6 +168,21 @@ public class BlockListener implements Listener {
 							}
 						}
 						
+						// If town is shielded, prevent all enemy block edits
+						if(town.isShielded()) {
+							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_AQUA+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
+						}
+						
+						// If town is armored, damage the armor while preventing block breaks
+						if(town.isArmored()) {
+							town.damageArmor(1);
+							Konquest.playTownArmorSound(event.getPlayer());
+							event.setCancelled(true);
+							return;
+						}
+						
 						// If block is a container, protect (optionally)
 						boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_break");
 						if(isProtectChest && event.getBlock().getState() instanceof BlockInventoryHolder) {
@@ -410,6 +425,18 @@ public class BlockListener implements Listener {
 								return;
 							}
 						}
+						// If town is shielded, prevent all enemy block edits
+						if(town.isShielded()) {
+							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_AQUA+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
+						}
+						// If town is armored, prevent block places
+						if(town.isArmored()) {
+							Konquest.playTownArmorSound(event.getPlayer());
+							event.setCancelled(true);
+							return;
+						}
 						// Prevent inventory blocks from being placed by enemies
 						boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_break");
 						if(isProtectChest && event.getBlock().getState() instanceof BlockInventoryHolder) {
@@ -613,6 +640,17 @@ public class BlockListener implements Listener {
 							return;
 						}
 					}
+					// If town is shielded, prevent all enemy block edits
+					if(town.isShielded()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If town is armored, damage the armor while preventing block breaks
+					if(town.isArmored()) {
+						town.damageArmor(event.blockList().size());
+						event.setCancelled(true);
+						return;
+					}
 				}
 				// Protect chests
 				boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_explode");
@@ -645,14 +683,25 @@ public class BlockListener implements Listener {
 			if(kingdomManager.isChunkClaimed(pushBlock.getLocation())) {
 				KonTerritory territory = kingdomManager.getChunkTerritory(pushBlock.getLocation());
 				if(territory instanceof KonTown) {
+					KonTown town = (KonTown) territory;
 					// Check if this block is within a monument
-					if(((KonTown) territory).isLocInsideCenterChunk(pushBlock.getLocation())) {
+					if(town.isLocInsideCenterChunk(pushBlock.getLocation())) {
 						//ChatUtil.printDebug("EVENT: Monument block pushed by piston, cancelling");
 						event.setCancelled(true);
 						return;
 					}
 					// Check if block is inside of an offline kingdom's town
 					if(playerManager.getPlayersInKingdom(territory.getKingdom()).isEmpty()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If town is shielded
+					if(town.isShielded()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If town is armored
+					if(town.isArmored()) {
 						event.setCancelled(true);
 						return;
 					}
@@ -694,14 +743,25 @@ public class BlockListener implements Listener {
 			if(kingdomManager.isChunkClaimed(pullBlock.getLocation())) {
 				KonTerritory territory = kingdomManager.getChunkTerritory(pullBlock.getLocation());
 				if(territory instanceof KonTown) {
+					KonTown town = (KonTown) territory;
 					// Check if this block is within a monument
-					if(((KonTown) territory).isLocInsideCenterChunk(pullBlock.getLocation())) {
+					if(town.isLocInsideCenterChunk(pullBlock.getLocation())) {
 						//ChatUtil.printDebug("EVENT: Monument block pulled by piston, cancelling");
 						event.setCancelled(true);
 						return;
 					}
 					// Check if block is inside of an offline kingdom's town
 					if(playerManager.getPlayersInKingdom(territory.getKingdom()).isEmpty()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If town is shielded
+					if(town.isShielded()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If town is armored
+					if(town.isArmored()) {
 						event.setCancelled(true);
 						return;
 					}
@@ -791,6 +851,18 @@ public class BlockListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
+				}
+				// If town is shielded
+				if(event.getSource().getType().equals(Material.FIRE) && town.isShielded()) {
+					event.getSource().setType(Material.AIR);
+					event.setCancelled(true);
+					return;
+				}
+				// If town is armored
+				if(event.getSource().getType().equals(Material.FIRE) && town.isArmored()) {
+					event.getSource().setType(Material.AIR);
+					event.setCancelled(true);
+					return;
 				}
 			}
 			if(territory instanceof KonRuin) {

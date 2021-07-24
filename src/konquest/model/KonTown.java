@@ -57,7 +57,8 @@ public class KonTown extends KonTerritory implements Timeable{
 	private boolean isArmored;
 	private int shieldEndTimeSeconds;
 	private int shieldNowTimeSeconds;
-	private int armorBlocks;
+	private int armorTotalBlocks;
+	private int armorCurrentBlocks;
 	private ArrayList<UUID> defenders;
 	private HashMap<KonUpgrade,Integer> upgrades;
 	private HashMap<KonUpgrade,Integer> disabledUpgrades;
@@ -89,6 +90,8 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.isShielded = false;
 		this.shieldEndTimeSeconds = 0;
 		this.shieldNowTimeSeconds = 0;
+		this.armorTotalBlocks = 0;
+		this.armorCurrentBlocks = 0;
 		this.defenders = new ArrayList<UUID>();
 		this.upgrades = new HashMap<KonUpgrade,Integer>();
 		this.disabledUpgrades = new HashMap<KonUpgrade,Integer>();
@@ -988,12 +991,13 @@ public class KonTown extends KonTerritory implements Timeable{
 	public void activateArmor(int val) {
 		if(isArmored) {
 			// Already armored
-			armorBlocks += val;
+			armorCurrentBlocks += val;
 		} else {
 			// Activate new armor
 			isArmored = true;
-			armorBlocks = val;
+			armorCurrentBlocks = val;
 		}
+		armorTotalBlocks = armorCurrentBlocks;
 		shieldArmorBarAll.setVisible(true);
 		shieldArmorBarAll.setProgress(1.0);
 		refreshShieldBarTitle();
@@ -1008,12 +1012,15 @@ public class KonTown extends KonTerritory implements Timeable{
 	public boolean damageArmor(int damage) {
 		boolean result = false;
 		if(isArmored) {
-			armorBlocks -= damage;
+			armorCurrentBlocks -= damage;
 			result = true;
-			if(armorBlocks <= 0) {
-				armorBlocks = 0;
+			if(armorCurrentBlocks <= 0) {
+				armorCurrentBlocks = 0;
+				armorTotalBlocks = 0;
 				deactivateArmor();
 			} else {
+				double progress = (double)armorCurrentBlocks/armorTotalBlocks;
+				shieldArmorBarAll.setProgress(progress);
 				refreshShieldBarTitle();
 			}
 		}
@@ -1025,11 +1032,11 @@ public class KonTown extends KonTerritory implements Timeable{
 		String remainingTime = Konquest.getTimeFormat(remainingSeconds);
 		ChatColor titleColor = ChatColor.DARK_AQUA;
 		if(isShielded && isArmored) {
-			shieldArmorBarAll.setTitle(titleColor+""+armorBlocks+ChatColor.BOLD+" Armor | Shield "+ChatColor.RESET+titleColor+remainingTime);
+			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+ChatColor.BOLD+" Armor | Shield "+ChatColor.RESET+titleColor+remainingTime);
 		} else if(isShielded) {
 			shieldArmorBarAll.setTitle(titleColor+""+ChatColor.BOLD+"Shield "+ChatColor.RESET+titleColor+remainingTime);
 		} else if(isArmored) {
-			shieldArmorBarAll.setTitle(titleColor+""+armorBlocks+ChatColor.BOLD+" Armor");
+			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+ChatColor.BOLD+" Armor");
 		} else {
 			shieldArmorBarAll.setProgress(0.0);
 			shieldArmorBarAll.setVisible(false);
@@ -1041,7 +1048,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 	
 	public int getArmorBlocks() {
-		return armorBlocks;
+		return armorCurrentBlocks;
 	}
 	
 	public int getRemainingShieldTimeSeconds() {

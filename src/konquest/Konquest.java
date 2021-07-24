@@ -1052,6 +1052,10 @@ public class Konquest implements Timeable {
         },4);
     }
     
+    public static void playTownArmorSound(Player bukkitPlayer) {
+    	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, (float)1.0, (float)2);
+    }
+    
     public static String getTimeFormat(int valSeconds) {
 		int days = valSeconds / 86400;
 		int hours = valSeconds % 86400 / 3600;

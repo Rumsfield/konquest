@@ -925,11 +925,15 @@ public class DisplayManager {
     	String isOpen = boolean2Symbol(infoTown.isOpen());
     	String isProtected = boolean2Symbol((infoTown.isCaptureDisabled() || infoTown.getKingdom().isOfflineProtected() || infoTown.isTownWatchProtected()));
     	String isAttacked = boolean2Symbol(infoTown.isAttacked());
+    	String isShielded = boolean2Symbol(infoTown.isShielded());
+    	String isArmored = boolean2Symbol(infoTown.isArmored());
     	String isPeaceful = boolean2Symbol(infoTown.getKingdom().isPeaceful());
     	loreList = new ArrayList<String>();
     	loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
     	loreList.add(loreColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage()+": "+isAttacked);
     	loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
+    	loreList.add(loreColor+MessagePath.LABEL_SHIELD.getMessage()+": "+isShielded);
+    	loreList.add(loreColor+MessagePath.LABEL_ARMOR.getMessage()+": "+isArmored);
     	loreList.add(loreColor+MessagePath.LABEL_PROTECTED.getMessage()+": "+isProtected);
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, 5, false);
     	newMenu.getPage(0).addIcon(info);
