@@ -2181,6 +2181,11 @@ public class KingdomManager {
 				}
 			}
 		}
+		// Verify max distance
+		int max_distance_all = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_distance_all");
+		if(max_distance_all > 0 && minDistance > max_distance_all) {
+			isLocValidSettle = false;
+		}
 		// Verify no overlapping init chunks
 		int radius = konquest.getConfigManager().getConfig("core").getInt("core.towns.init_radius");
 		for(Point point : konquest.getAreaPoints(center, radius)) {
@@ -2262,7 +2267,6 @@ public class KingdomManager {
     	//KonTerritory closestTerritory = getClosestTerritory(center.getChunk());
     	ChatColor closestTerritoryColor = ChatColor.GRAY;
     	int distance = 0;
-    	int maxDistance = 99;
     	if(closestTerritory != null) {
     		distance = minDistance;
     		//distance = Konquest.distanceInChunks(center.getChunk(), closestTerritory.getCenterLoc().getChunk());
@@ -2277,8 +2281,15 @@ public class KingdomManager {
         		}
     		}
     	}
-    	if(distance > maxDistance) {
-    		distance = 99;
+    	String distStr = "";
+    	int maxDist = 99;
+    	if(max_distance_all > 0) {
+    		maxDist = max_distance_all;
+    	}
+    	if(distance > maxDist) {
+    		distStr = ""+maxDist+"+";
+    	} else {
+    		distStr = ""+distance;
     	}
     	// Display map
     	String header = ChatColor.GOLD+MessagePath.MENU_MAP_CENTER.getMessage()+": "+(int)originPoint.getX()+","+(int)originPoint.getY();
@@ -2298,7 +2309,7 @@ public class KingdomManager {
     			mapLine = mapLine + " " + settleTip;
     		}
     		if(i == mapSize-7) {
-    			mapLine = mapLine + " " + closestTerritoryColor+MessagePath.MENU_MAP_PROXIMITY.getMessage()+": "+distance;
+    			mapLine = mapLine + " " + closestTerritoryColor+MessagePath.MENU_MAP_PROXIMITY.getMessage()+": "+distStr;
     		}
     		ChatUtil.sendMessage(bukkitPlayer, mapLine);
     	}

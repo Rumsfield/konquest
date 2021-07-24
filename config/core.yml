@@ -157,7 +157,7 @@ core:
     max_settle_height: 200
     min_distance_town: 16
     min_distance_capital: 16
-    max_distance_all: 625
+    max_distance_all: 99
     init_radius: 2
     capture_cooldown: 600
     raid_alert_cooldown: 30
