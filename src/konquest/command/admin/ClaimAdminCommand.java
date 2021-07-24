@@ -130,8 +130,16 @@ public class ClaimAdminCommand extends CommandBase {
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
+		} else if(getArgs().length == 4) {
+			// suggest number
+			String subCommand = getArgs()[2];
+			if(subCommand.equalsIgnoreCase("radius")) {
+				tabList.add("#");
+			}
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
 		}
-		
 		return matchedTabList;
 	}
  

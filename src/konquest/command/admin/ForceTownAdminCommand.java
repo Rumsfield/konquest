@@ -27,7 +27,7 @@ public class ForceTownAdminCommand extends CommandBase {
 	@Override
 	public void execute() {
 		
-		// k admin forcetown <name> open|close|add|kick|knight|lord|rename|upgrade [arg1] [arg2]
+		// k admin forcetown <name> open|close|add|kick|knight|lord|rename|upgrade|shield [arg1] [arg2]
 		if (getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
@@ -255,6 +255,118 @@ public class ForceTownAdminCommand extends CommandBase {
 	        		return;
 	        	}
 	        	break;
+			case "shield":
+				// /k admin forcetown shield clear|set|add|sub [#]
+				String shieldSubCmd = "";
+				String shieldValStr = "";
+				if (getArgs().length >= 5) {
+					shieldSubCmd = getArgs()[4];
+				}
+				if (getArgs().length == 6) {
+					shieldValStr = getArgs()[5];
+					
+					
+				}
+				if(!shieldSubCmd.equals("")) {
+					// Parse the sub-command, clear|set|add
+					if(shieldSubCmd.equalsIgnoreCase("clear")) {
+						town.deactivateShield();
+						ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+					} else {
+						int shieldVal = 0;
+						if(!shieldValStr.equals("")) {
+							try {
+								shieldVal = Integer.parseInt(shieldValStr);
+		        			} 
+		        			catch(NumberFormatException e) {
+		        				ChatUtil.printDebug("Failed to parse string as int: "+e.getMessage());
+		        				//ChatUtil.sendError((Player) getSender(), "Invalid upgrade level!");
+		        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				        		return;
+		        			}
+							// Parse remaining sub-command options
+							if(shieldSubCmd.equalsIgnoreCase("set")) {
+								if(getKonquest().getShieldManager().shieldSet(town, shieldVal)) {
+									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+								} else {
+									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+								}
+							} else if(shieldSubCmd.equalsIgnoreCase("add")) {
+								if(getKonquest().getShieldManager().shieldAdd(town, shieldVal)) {
+									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+								} else {
+									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+								}
+							} else {
+								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				        		return;
+							}
+						} else {
+							ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			        		return;
+						}
+					}
+				} else {
+					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+				}
+				break;
+			case "armor":
+				// /k admin forcetown armor clear|set|add [#]
+				String armorSubCmd = "";
+				String armorValStr = "";
+				if (getArgs().length >= 5) {
+					armorSubCmd = getArgs()[4];
+				}
+				if (getArgs().length == 6) {
+					armorValStr = getArgs()[5];
+					
+					
+				}
+				if(!armorSubCmd.equals("")) {
+					// Parse the sub-command, clear|set|add
+					if(armorSubCmd.equalsIgnoreCase("clear")) {
+						town.deactivateShield();
+						ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+					} else {
+						int armorVal = 0;
+						if(!armorValStr.equals("")) {
+							try {
+								armorVal = Integer.parseInt(armorValStr);
+		        			} 
+		        			catch(NumberFormatException e) {
+		        				ChatUtil.printDebug("Failed to parse string as int: "+e.getMessage());
+		        				//ChatUtil.sendError((Player) getSender(), "Invalid upgrade level!");
+		        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				        		return;
+		        			}
+							// Parse remaining sub-command options
+							if(armorSubCmd.equalsIgnoreCase("set")) {
+								if(getKonquest().getShieldManager().armorSet(town, armorVal)) {
+									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+								} else {
+									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+								}
+							} else if(armorSubCmd.equalsIgnoreCase("add")) {
+								if(getKonquest().getShieldManager().armorAdd(town, armorVal)) {
+									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+								} else {
+									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+								}
+							} else {
+								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				        		return;
+							}
+						} else {
+							ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			        		return;
+						}
+					}
+				} else {
+					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+				}
+				break;
         	default:
         		//ChatUtil.sendError((Player) getSender(), "Invalid sub-command, expected open|close|add|kick|knight|lord|rename|upgrade");
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -290,28 +402,36 @@ public class ForceTownAdminCommand extends CommandBase {
 			tabList.add("knight");
 			tabList.add("rename");
 			tabList.add("upgrade");
+			tabList.add("shield");
+			tabList.add("armor");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 5) {
 			// suggest appropriate arguments
 			String subCommand = getArgs()[3];
-			if(subCommand.equalsIgnoreCase("add") || subCommand.equalsIgnoreCase("kick") || subCommand.equalsIgnoreCase("lord") || subCommand.equalsIgnoreCase("elite")) {
+			if(subCommand.equalsIgnoreCase("add") || subCommand.equalsIgnoreCase("kick") || subCommand.equalsIgnoreCase("lord") || subCommand.equalsIgnoreCase("knight")) {
 				List<String> playerList = new ArrayList<>();
 				for(KonPlayer onlinePlayer : getKonquest().getPlayerManager().getPlayersOnline()) {
 					playerList.add(onlinePlayer.getBukkitPlayer().getName());
 				}
 				tabList.addAll(playerList);
+			} else if(subCommand.equalsIgnoreCase("rename")) {
+				tabList.add("***");
 			} else if(subCommand.equalsIgnoreCase("upgrade")) {
 				for(KonUpgrade upgrade : KonUpgrade.values()) {
 					tabList.add(upgrade.toString().toLowerCase());
 				}
+			} else if(subCommand.equalsIgnoreCase("shield") || subCommand.equalsIgnoreCase("armor")) {
+				tabList.add("clear");
+				tabList.add("set");
+				tabList.add("add");
 			}
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 6) {
-			// suggest upgrade levels
+			// suggest appropriate arguments
 			String subCommand = getArgs()[3];
 			if(subCommand.equalsIgnoreCase("upgrade")) {
 				String upgradeName = getArgs()[4];
@@ -320,6 +440,11 @@ public class ForceTownAdminCommand extends CommandBase {
 					for(int i=0;i<=upgrade.getMaxLevel();i++) {
 						tabList.add(String.valueOf(i));
 					}
+				}
+			} else if(subCommand.equalsIgnoreCase("shield") || subCommand.equalsIgnoreCase("armor")) {
+				String modifier = getArgs()[4];
+				if(modifier.equalsIgnoreCase("set") || modifier.equalsIgnoreCase("add")) {
+					tabList.add("#");
 				}
 			}
 			StringUtil.copyPartialMatches(getArgs()[5], tabList, matchedTabList);

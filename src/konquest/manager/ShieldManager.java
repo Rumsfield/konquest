@@ -267,5 +267,112 @@ public class ShieldManager {
 		return true;
 	}
 	
+	/*
+	 * Override methods, used for admin commands
+	 */
+	
+	/**
+	 * Sets a town's shields for (value) seconds from now
+	 * @param town
+	 * 		The town to modify shields
+	 * @param value
+	 * 		Time in seconds from now to end shields. If 0, deactivate shields.
+	 */
+	public boolean shieldSet(KonTown town, int value) {
+		boolean result = false;
+		Date now = new Date();
+		int newEndTime = (int)(now.getTime()/1000) + value;
+		if(town.isShielded()) {
+			if(value <= 0) {
+				town.deactivateShield();
+			} else {
+				town.activateShield(newEndTime);
+				result = true;
+			}
+		} else {
+			if(value > 0) {
+				town.activateShield(newEndTime);
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Adds to a town's shields in seconds, positive or negative
+	 * @param town
+	 * @param value
+	 * 		Time in seconds to add to current shields. If result is <= 0, deactivate shields.
+	 */
+	public boolean shieldAdd(KonTown town, int value) {
+		boolean result = false;
+		Date now = new Date();
+		int newEndTime = (int)(now.getTime()/1000) + value;
+		if(town.isShielded()) {
+			newEndTime = town.getShieldEndTime() + value;
+		}
+		Date end = new Date((long)newEndTime);
+		if(now.after(end)) {
+			// End time is less than now, deactivate shields and do nothing
+			if(town.isShielded()) {
+				town.deactivateShield();
+			}
+		} else {
+			// End time is in the future, add to shields
+			town.activateShield(newEndTime);
+			result = true;
+		}
+		return result;
+	}
+
+	/**
+	 * Sets a town's armor for (value) blocks
+	 * @param town
+	 * 		The town to modify armor
+	 * @param value
+	 * 		Amount of blocks to set the town's armor to. If 0, deactivate armor.
+	 */
+	public boolean armorSet(KonTown town, int value) {
+		boolean result = false;
+		if(town.isArmored()) {
+			if(value <= 0) {
+				town.deactivateArmor();
+			} else {
+				town.activateArmor(value);
+				result = true;
+			}
+		} else {
+			if(value > 0) {
+				town.activateArmor(value);
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Adds to a town's armor in blocks, positive or negative
+	 * @param town
+	 * @param value
+	 * 		Blocks to add to current armor. If result is <= 0, deactivate armor.
+	 */
+	public boolean armorAdd(KonTown town, int value) {
+		boolean result = false;
+		int newBlocks = value;
+		if(town.isArmored()) {
+			newBlocks = town.getArmorBlocks() + value;
+		}
+		if(newBlocks <= 0) {
+			// Blocks is 0 or less, deactivate armor and do nothing
+			if(town.isArmored()) {
+				town.deactivateArmor();
+			}
+		} else {
+			// Blocks are valid, add to armor
+			town.activateArmor(newBlocks);
+			result = true;
+		}
+		return result;
+	}
 	
 }

@@ -113,7 +113,7 @@ public class MakeTownAdminCommand extends CommandBase {
 		final List<String> matchedTabList = new ArrayList<>();
 		
 		if(getArgs().length == 3) {
-			tabList.addAll(Collections.emptyList());
+			tabList.add("***");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);

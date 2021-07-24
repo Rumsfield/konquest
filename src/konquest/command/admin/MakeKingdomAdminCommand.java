@@ -6,6 +6,7 @@ import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
 
 public class MakeKingdomAdminCommand extends CommandBase {
@@ -71,7 +73,16 @@ public class MakeKingdomAdminCommand extends CommandBase {
     
     @Override
 	public List<String> tabComplete() {
-		// No arguments to complete
-		return Collections.emptyList();
+    	// k admin makekingdom ***
+		List<String> tabList = new ArrayList<>();
+		final List<String> matchedTabList = new ArrayList<>();
+		
+		if(getArgs().length == 3) {
+			tabList.add("***");
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
+		}
+		return matchedTabList;
 	}
 }

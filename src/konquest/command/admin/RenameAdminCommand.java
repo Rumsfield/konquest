@@ -87,6 +87,11 @@ public class RenameAdminCommand extends CommandBase {
 			} else {
 				ChatUtil.printDebug("RenameAdminCommand bad kingdom argument "+kingdomName);
 			}
+		} else if(getArgs().length == 5) {
+			tabList.add("***");
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
 		}
 		return matchedTabList;
 	}

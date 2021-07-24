@@ -983,7 +983,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		refreshShieldBarTitle();
 	}
 	
-	private void deactivateShield() {
+	public void deactivateShield() {
 		isShielded = false;
 		shieldTimer.stopTimer();
 		refreshShieldBarTitle();
@@ -1005,9 +1005,11 @@ public class KonTown extends KonTerritory implements Timeable{
 		refreshShieldBarTitle();
 	}
 	
-	private void deactivateArmor() {
+	public void deactivateArmor() {
 		isArmored = false;
 		shieldArmorBarAll.setProgress(0.0);
+		armorCurrentBlocks = 0;
+		armorTotalBlocks = 0;
 		refreshShieldBarTitle();
 		playDeactivateSound();
 	}
@@ -1018,8 +1020,6 @@ public class KonTown extends KonTerritory implements Timeable{
 			armorCurrentBlocks -= damage;
 			result = true;
 			if(armorCurrentBlocks <= 0) {
-				armorCurrentBlocks = 0;
-				armorTotalBlocks = 0;
 				deactivateArmor();
 			} else {
 				double progress = (double)armorCurrentBlocks/armorTotalBlocks;

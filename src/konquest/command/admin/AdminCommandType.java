@@ -15,7 +15,7 @@ public enum AdminCommandType {
 	LIST			("kingdoms|towns|all",						   		 					MessagePath.DESCRIPTION_ADMIN_LIST.getMessage()),
 	FORCEJOIN 		("<player> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_FORCEJOIN.getMessage()),
 	FORCEEXILE		("<player> [full]", 													MessagePath.DESCRIPTION_ADMIN_FORCEEXILE.getMessage()),
-	FORCETOWN		("<name> open|close|add|kick|lord|knight|rename|upgrade [arg1] [arg2]", MessagePath.DESCRIPTION_ADMIN_FORCETOWN.getMessage()),
+	FORCETOWN		("<name> open|close|add|kick|lord|knight|rename|upgrade|shield [arg1] [arg2]", MessagePath.DESCRIPTION_ADMIN_FORCETOWN.getMessage()),
 	RENAME	        ("<kingdom> <oldName> <newName>",					    				MessagePath.DESCRIPTION_ADMIN_RENAME.getMessage()),
 	RUIN	        ("create|remove|criticals|spawns [<name>]",								MessagePath.DESCRIPTION_ADMIN_RUIN.getMessage()),
 	SAVE			("", 																	MessagePath.DESCRIPTION_ADMIN_SAVE.getMessage()),
