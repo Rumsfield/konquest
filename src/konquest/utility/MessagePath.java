@@ -244,7 +244,7 @@ public enum MessagePath {
 	COMMAND_EXILE_NOTICE_PROMPT_3B              (0, "command.exile.notice.prompt-line-3b"),
 	COMMAND_EXILE_NOTICE_PROMPT_4               (0, "command.exile.notice.prompt-line-4"),
 	COMMAND_EXILE_NOTICE_CONFIRMED              (0, "command.exile.notice.confirmed"),
-	COMMAND_EXILE_NOTICE_TOWN                   (0, "command.exile.notice.town"),
+	COMMAND_EXILE_NOTICE_TOWN                   (1, "command.exile.notice.town"),
 	COMMAND_FAVOR_NOTICE_MESSAGE                (1, "command.favor.notice.message"),
 	COMMAND_HELP_NOTICE_MESSAGE                 (0, "command.help.notice.message"),
 	COMMAND_INFO_NOTICE_KINGDOM_HEADER          (1, "command.info.notice.kingdom-header"),

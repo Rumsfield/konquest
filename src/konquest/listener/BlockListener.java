@@ -168,6 +168,25 @@ public class BlockListener implements Listener {
 							}
 						}
 						
+						// If block is a container, protect (optionally)
+						boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_break");
+						if(isProtectChest && event.getBlock().getState() instanceof BlockInventoryHolder) {
+							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
+						}
+						
+						// Verify town can be captured
+						if(town.isCaptureDisabled()) {
+							//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "This Town cannot be conquered again so soon!");
+							ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(town.getCaptureCooldownString()));
+							event.setCancelled(true);
+							return;
+						}
+						// Update MonumentBar state
+						town.setAttacked(true);
+						town.updateBar();
+						
 						// If town is shielded, prevent all enemy block edits
 						if(town.isShielded()) {
 							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_AQUA+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -182,29 +201,6 @@ public class BlockListener implements Listener {
 							event.setCancelled(true);
 							return;
 						}
-						
-						// If block is a container, protect (optionally)
-						boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_break");
-						if(isProtectChest && event.getBlock().getState() instanceof BlockInventoryHolder) {
-							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-							event.setCancelled(true);
-							return;
-						}
-						
-						/*
-						 * End of block break protections
-						 */
-						// Verify town can be captured
-						if(town.isCaptureDisabled()) {
-							//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "This Town cannot be conquered again so soon!");
-							ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(town.getCaptureCooldownString()));
-							event.setCancelled(true);
-							return;
-						}
-
-						// Update MonumentBar state
-						town.setAttacked(true);
-						town.updateBar();
 						
 						// If block is inside a monument, throw KonquestMonumentDamageEvent
 						if(town.isLocInsideCenterChunk(breakLoc)) {
