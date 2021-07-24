@@ -968,6 +968,7 @@ public class PlayerListener implements Listener{
         	            if(!event.isCancelled()) {
         	            	//ChatUtil.sendNotice(bukkitPlayer, color+territoryTo.getName()+": "+chunkCoordsTo);
         	            	ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
+        	            	// Entry Territory
         	            	if(territoryTo.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         	            		KonTown town = (KonTown) territoryTo;
         	            		town.addBarPlayer(player);
@@ -979,13 +980,22 @@ public class PlayerListener implements Listener{
         	    				updateGolemTargetsForTerritory(territoryTo,player,true);
         	    			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         	    				((KonRuin) territoryTo).addBarPlayer(player);
+        	    			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+        	    				((KonCapital) territoryTo).addBarPlayer(player);
+        	    			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+        	    				((KonCamp) territoryTo).addBarPlayer(player);
         	    			}
+        	            	// Exit Territory
         	            	if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         	    				((KonTown) territoryFrom).removeBarPlayer(player);
         	    				updateGolemTargetsForTerritory(territoryFrom,player,true);
         	    			} else if (territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         	    				((KonRuin) territoryFrom).removeBarPlayer(player);
         	    				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
+        	    			} else if (territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+        	    				((KonCapital) territoryFrom).addBarPlayer(player);
+        	    			} else if (territoryFrom.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+        	    				((KonCamp) territoryFrom).addBarPlayer(player);
         	    			}
         	            	//updateGolemTargetsForTerritory(territoryFrom,player,true);
         					//updateGolemTargetsForTerritory(territoryTo,player,true);
