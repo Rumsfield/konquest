@@ -783,6 +783,9 @@ public class KonTown extends KonTerritory implements Timeable{
 				lord = null;
 			}
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
+			if(residents.isEmpty()) {
+				clearShieldsArmors();
+			}
 			status = true;
 		}
 		return status;
@@ -992,10 +995,12 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 	
 	public void deactivateShield() {
+		if(isShielded) {
+			playDeactivateSound();
+		}
 		isShielded = false;
 		shieldTimer.stopTimer();
 		refreshShieldBarTitle();
-		playDeactivateSound();
 	}
 	
 	public void activateArmor(int val) {
@@ -1011,12 +1016,19 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 	
 	public void deactivateArmor() {
+		if(isArmored) {
+			playDeactivateSound();
+		}
 		isArmored = false;
 		shieldArmorBarAll.setProgress(0.0);
 		armorCurrentBlocks = 0;
 		armorTotalBlocks = 0;
 		refreshShieldBarTitle();
-		playDeactivateSound();
+	}
+	
+	public void clearShieldsArmors() {
+		deactivateShield();
+		deactivateArmor();
 	}
 	
 	public boolean damageArmor(int damage) {

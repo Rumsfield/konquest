@@ -423,6 +423,7 @@ public class KingdomManager {
 			konquest.getMapHandler().drawDynmapRemoveTerritory(getKingdom(oldKingdomName).getTown(name));
 			getKingdom(oldKingdomName).getTown(name).purgeResidents();
 			getKingdom(oldKingdomName).getTown(name).clearUpgrades();
+			getKingdom(oldKingdomName).getTown(name).clearShieldsArmors();
 			getKingdom(oldKingdomName).getTown(name).setKingdom(conquerPlayer.getKingdom());
 			conquerPlayer.getKingdom().addTownConquer(name, getKingdom(oldKingdomName).removeTownConquer(name));
 			conquerPlayer.getKingdom().getTown(name).refreshMonument();
