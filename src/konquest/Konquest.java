@@ -1053,7 +1053,11 @@ public class Konquest implements Timeable {
     }
     
     public static void playTownArmorSound(Player bukkitPlayer) {
-    	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, (float)1.0, (float)2);
+    	playTownArmorSound(bukkitPlayer.getLocation());
+    }
+    
+    public static void playTownArmorSound(Location loc) {
+    	loc.getWorld().playSound(loc, Sound.ENTITY_SHULKER_SHOOT, (float)1.0, (float)2);
     }
     
     public static String getTimeFormat(int valSeconds, ChatColor numColor) {

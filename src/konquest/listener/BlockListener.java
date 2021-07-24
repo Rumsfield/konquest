@@ -647,7 +647,9 @@ public class BlockListener implements Listener {
 					}
 					// If town is armored, damage the armor while preventing block breaks
 					if(town.isArmored()) {
-						town.damageArmor(10);
+						int damage = konquest.getConfigManager().getConfig("core").getInt("core.towns.armor_tnt_damage",1);
+						town.damageArmor(damage);
+						Konquest.playTownArmorSound(event.getBlock().getLocation());
 						event.setCancelled(true);
 						return;
 					}
