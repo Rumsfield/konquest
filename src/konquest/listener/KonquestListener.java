@@ -170,6 +170,7 @@ public class KonquestListener implements Listener {
 		}
 		KonTown town = (KonTown) event.getTerritory();
 		
+		/* Moved to BlockListener onBlockBreak()
 		// Verify town can be captured
 		if(town.isCaptureDisabled()) {
 			//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "This Town cannot be conquered again so soon!");
@@ -190,6 +191,7 @@ public class KonquestListener implements Listener {
 		town.setAttacked(true);
 		town.updateBar();
 		//town.updateBarPlayers();
+		*/
 		
 		// Re-apply town nerfs to attacker
 		//kingdomManager.applyTownNerf(event.getPlayer());

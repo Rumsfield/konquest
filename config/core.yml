@@ -62,8 +62,8 @@
 #    armor_while_attacked:          Allow armor to be applied while a town is under attack (true/false)
 #    shields_add:                   Allow new shields to add onto existing shields when true, else require shields to deplete before charging again (true/false)
 #    armor_add:                     Allow new armor to add onto existing armor when true, else require armor to deplete before applying again (true/false)
-#    max_shields:                   Maximum shield duration in seconds that a town can have (integer >= 0)
-#    max_armor:                     Maximum armor amount in blocks that a town can have (integer >= 0)
+#    max_shields:                   Maximum shield duration in seconds that a town can have (0 to disable, integer >= 0)
+#    max_armor:                     Maximum armor amount in blocks that a town can have (0 to disable, integer >= 0)
 #  camps:
 #    init_radius:                   Radius of camps for barbarians. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
 #  monuments:

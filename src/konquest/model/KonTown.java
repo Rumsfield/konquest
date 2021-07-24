@@ -648,7 +648,13 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	public void setAttacked(boolean val) {
 		this.isAttacked = val;
-		if(val == false) {
+		if(val == true) {
+			// Start Monument regenerate timer for target town
+			int monumentRegenTimeSeconds = getKonquest().getConfigManager().getConfig("core").getInt("core.monuments.damage_regen");
+			monumentTimer.stopTimer();
+			monumentTimer.setTime(monumentRegenTimeSeconds);
+			monumentTimer.startTimer();
+		} else {
 			defenders.clear();
 		}
 	}
