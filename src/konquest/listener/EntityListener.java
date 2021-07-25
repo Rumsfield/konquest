@@ -201,7 +201,7 @@ public class EntityListener implements Listener {
 		// Inside of claimed territory...
 		if(konquest.getKingdomManager().isChunkClaimed(event.getLocation())) {
 			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getLocation());
-			ChatUtil.printDebug("EVENT: Creature spawned in territory "+territory.getTerritoryType().toString()+", cause: "+event.getSpawnReason().toString());
+			//ChatUtil.printDebug("EVENT: Creature spawned in territory "+territory.getTerritoryType().toString()+", cause: "+event.getSpawnReason().toString());
 			// When a spawn event happens in Capital or ruin
 			if(territory instanceof KonCapital || territory instanceof KonRuin) {
 				// Conditions to block spawning...

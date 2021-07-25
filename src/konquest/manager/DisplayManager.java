@@ -687,21 +687,16 @@ public class DisplayManager {
 				/* Town Icon (n) */
 				KonTown currentTown = townIter.next();
 				loreList = new ArrayList<String>();
-				Material currentMat = Material.DIRT;
 				if(currentTown.isPlayerLord(infoPlayer.getOfflineBukkitPlayer())) {
-					currentMat = Material.PURPLE_CONCRETE;
 					loreList.add(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage());
 				} else if(currentTown.isPlayerElite(infoPlayer.getOfflineBukkitPlayer())) {
-					currentMat = Material.BLUE_CONCRETE;
 					loreList.add(ChatColor.DARK_BLUE+MessagePath.LABEL_KNIGHT.getMessage());
 				} else {
-					currentMat = Material.WHITE_CONCRETE;
 					loreList.add(loreColor+MessagePath.LABEL_RESIDENT.getMessage());
 				}
 		    	loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+currentTown.getNumResidents());
 		    	loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+currentTown.getChunkList().size());
-		    	loreList.add(ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage());
-		    	TownIcon town = new TownIcon(currentTown,isFriendly,currentMat,loreList,slotIndex);
+		    	TownIcon town = new TownIcon(currentTown,isFriendly,konquest.getKingdomManager().getTownCriticalBlock(),loreList,slotIndex);
 				newMenu.getPage(pageNum).addIcon(town);
 				slotIndex++;
 			}
@@ -777,7 +772,7 @@ public class DisplayManager {
     	int numKingdomTowns = infoKingdom.getTowns().size();
     	loreList = new ArrayList<String>();
     	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+numKingdomTowns);
-    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_TOWNS.getMessage(), loreList, Material.OBSIDIAN, 5, false);
+    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_TOWNS.getMessage(), loreList, konquest.getKingdomManager().getTownCriticalBlock(), 5, false);
     	newMenu.getPage(0).addIcon(info);
     	/* Towns Info Icon (6) */
     	int numKingdomLand = 0;
@@ -812,16 +807,7 @@ public class DisplayManager {
 				loreList = new ArrayList<String>();
 				loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+currentTown.getNumResidents());
 		    	loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+currentTown.getChunkList().size());
-				Material currentMat = Material.BEDROCK;
-				if(currentTown.isAttacked()) {
-					currentMat = Material.RED_WOOL;
-					loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage());
-				} else if(currentTown.isOpen()) {
-					currentMat = Material.GRAY_STAINED_GLASS;
-					loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.LABEL_OPEN.getMessage());
-				}
-		    	loreList.add(ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage());
-		    	TownIcon town = new TownIcon(currentTown,isFriendly,currentMat,loreList,slotIndex);
+		    	TownIcon town = new TownIcon(currentTown,isFriendly,konquest.getKingdomManager().getTownCriticalBlock(),loreList,slotIndex);
 				newMenu.getPage(pageNum).addIcon(town);
 				slotIndex++;
 			}
