@@ -145,6 +145,16 @@ public class KonRuin extends KonTerritory implements Timeable {
 		ruinBarAll.removeAll();
 	}
 	
+	public void updateBarPlayers() {
+		ruinBarAll.removeAll();
+		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
+			Player bukkitPlayer = player.getBukkitPlayer();
+			if(isLocInside(bukkitPlayer.getLocation())) {
+				ruinBarAll.addPlayer(bukkitPlayer);
+			}
+		}
+	}
+	
 	public void setBarProgress(double prog) {
 		ruinBarAll.setProgress(prog);
 	}

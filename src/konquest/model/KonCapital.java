@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.entity.Player;
 
 public class KonCapital extends KonTerritory{
 	
@@ -51,6 +52,16 @@ public class KonCapital extends KonTerritory{
 	
 	public void removeAllBarPlayers() {
 		capitalBarAll.removeAll();
+	}
+	
+	public void updateBarPlayers() {
+		capitalBarAll.removeAll();
+		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
+			Player bukkitPlayer = player.getBukkitPlayer();
+			if(isLocInside(bukkitPlayer.getLocation())) {
+				capitalBarAll.addPlayer(bukkitPlayer);
+			}
+		}
 	}
 
 }

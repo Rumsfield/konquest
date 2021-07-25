@@ -118,6 +118,7 @@ public class RuinManager {
 			String nameLower = name.toLowerCase();
 			ruinMap.put(nameLower, new KonRuin(loc, name, kingdomManager.getNeutrals(), konquest));
 			ruinMap.get(nameLower).initClaim();
+			ruinMap.get(nameLower).updateBarPlayers();
 			kingdomManager.addAllTerritory(loc.getWorld(),ruinMap.get(nameLower).getChunkList());
 			konquest.getMapHandler().drawDynmapUpdateTerritory(ruinMap.get(nameLower));
 			result = true;
