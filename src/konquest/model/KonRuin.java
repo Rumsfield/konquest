@@ -259,6 +259,7 @@ public class KonRuin extends KonTerritory implements Timeable {
 					}
 					if(!foundMatches) {
 						foundGolem.remove();
+						foundGolem = null;
 						ChatUtil.printDebug("Pruned Iron Golem in ruin "+getName());
 					}
 				}
