@@ -172,9 +172,6 @@ public class Konquest implements Timeable {
         	ChatUtil.printConsoleError("Failed to register name color packets, the server version is unsupported");
         }
 		
-		kingdomManager.updateSmallestKingdom();
-		kingdomManager.updateAllTownDisabledUpgrades();
-		
 		// Render Maps
 		mapHandler.initialize();
 		
@@ -212,6 +209,11 @@ public class Konquest implements Timeable {
 		compassTimer.stopTimer();
 		compassTimer.setTime(30); // 30 second compass update interval
 		compassTimer.startLoopTimer();
+		// Update kingdom stuff
+		kingdomManager.updateSmallestKingdom();
+		kingdomManager.updateAllTownDisabledUpgrades();
+		kingdomManager.updateKingdomOfflineProtection();
+		
 	}
 	
 	private void initWorlds() {

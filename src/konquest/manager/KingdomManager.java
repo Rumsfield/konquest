@@ -98,6 +98,7 @@ public class KingdomManager {
 		if(!name.contains(" ") && !isKingdom(name)) {
 			kingdomMap.put(name, new KonKingdom(loc, name, konquest));
 			kingdomMap.get(name).initCapital();
+			kingdomMap.get(name).getCapital().updateBarPlayers();
 			//updateTerritoryCache();
 			addAllTerritory(loc.getWorld(),kingdomMap.get(name).getCapital().getChunkList());
 			konquest.getMapHandler().drawDynmapUpdateTerritory(kingdomMap.get(name).getCapital());

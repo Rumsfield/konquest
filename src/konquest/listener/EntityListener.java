@@ -201,45 +201,21 @@ public class EntityListener implements Listener {
 		// Inside of claimed territory...
 		if(konquest.getKingdomManager().isChunkClaimed(event.getLocation())) {
 			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getLocation());
-			// When a spawn event happens in Capital
-			if(territory instanceof KonCapital) {
-				//ChatUtil.printDebug("EVENT: Creature spawned in a Captial, cause: "+event.getSpawnReason().toString());
-				// Exceptions to block spawning...
-				if(!event.getEntityType().equals(EntityType.ARMOR_STAND)) {
-					event.setCancelled(true);
-				}
-			}
-			if(territory instanceof KonRuin) {
-				if(!event.getEntityType().equals(EntityType.IRON_GOLEM)) {
+			//ChatUtil.printDebug("EVENT: Creature spawned in territory "+territory.getTerritoryType().toString()+", cause: "+event.getSpawnReason().toString());
+			// When a spawn event happens in Capital or ruin
+			if(territory instanceof KonCapital || territory instanceof KonRuin) {
+				// Conditions to block spawning...
+				EntityType eType = event.getEntityType();
+				SpawnReason eReason = event.getSpawnReason();
+				boolean stopOnType = !(eType.equals(EntityType.ARMOR_STAND) || eType.equals(EntityType.IRON_GOLEM));
+				boolean stopOnReason = !(eReason.equals(SpawnReason.COMMAND) || eReason.equals(SpawnReason.CUSTOM) || eReason.equals(SpawnReason.DEFAULT));
+				if(stopOnType || stopOnReason) {
 					event.setCancelled(true);
 				}
 			}
 			// When spawn event happens in town
 			if(territory instanceof KonTown) {
 				//ChatUtil.printDebug("EVENT: Creature spawned in a Town, cause: "+event.getSpawnReason().toString());
-				/*
-				// Exceptions to block spawning...
-				if(!event.getSpawnReason().equals(SpawnReason.BREEDING) && 
-						!event.getSpawnReason().equals(SpawnReason.DISPENSE_EGG) && 
-						!event.getSpawnReason().equals(SpawnReason.CUSTOM) &&
-						!event.getSpawnReason().equals(SpawnReason.SPAWNER_EGG) &&
-						!event.getSpawnReason().equals(SpawnReason.SPAWNER) &&
-						
-						!event.getSpawnReason().equals(SpawnReason.BUILD_IRONGOLEM) &&
-						!event.getSpawnReason().equals(SpawnReason.CURED) &&
-						!event.getSpawnReason().equals(SpawnReason.INFECTION) &&
-						!event.getSpawnReason().equals(SpawnReason.PATROL) &&
-						!event.getSpawnReason().equals(SpawnReason.RAID) &&
-						
-						!event.getSpawnReason().equals(SpawnReason.SHEARED) &&
-						!event.getSpawnReason().equals(SpawnReason.SHOULDER_ENTITY) &&
-						!event.getSpawnReason().equals(SpawnReason.VILLAGE_DEFENSE) &&
-
-						!event.getSpawnReason().equals(SpawnReason.EGG)) {
-					
-					event.setCancelled(true);
-				}
-				*/
 				// Conditions to block spawning...
 				if(event.getSpawnReason().equals(SpawnReason.DROWNED) || 
 						event.getSpawnReason().equals(SpawnReason.JOCKEY) ||
