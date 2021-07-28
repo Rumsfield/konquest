@@ -5,6 +5,8 @@ import java.util.Date;
 import org.bukkit.Bukkit;
 import org.dynmap.DynmapAPI;
 import org.dynmap.markers.AreaMarker;
+import org.dynmap.markers.Marker;
+import org.dynmap.markers.MarkerIcon;
 import org.dynmap.markers.MarkerSet;
 
 import konquest.Konquest;
@@ -84,6 +86,9 @@ public class MapHandler {
 		String areaId = getAreaId(territory);
 		String areaLabel = getAreaLabel(territory);
 		int areaColor = getAreaColor(territory);
+		String iconId = getIconId(territory);
+		String iconLabel = getIconLabel(territory);
+		MarkerIcon icon = getIconMarker(territory);
 		
 		MarkerSet territoryGroup = dapi.getMarkerAPI().getMarkerSet(groupId);
 		if (territoryGroup == null) {
@@ -103,6 +108,14 @@ public class MapHandler {
 			// Area already exists, update corners
 			territoryArea.setCornerLocations(drawArea.getXCorners(), drawArea.getZCorners());
 			ChatUtil.printDebug("Updating Dynmap area corners of territory "+territory.getName());
+		}
+		Marker territoryIcon = territoryGroup.findMarker(iconId);
+		if (territoryIcon == null) {
+			// Icon does not exist, create ne
+			territoryIcon = territoryGroup.createMarker(iconId, iconLabel, true, drawArea.getWorldName(), drawArea.getCenterX(), drawArea.getCenterY(), drawArea.getCenterZ(), icon, false);
+		} else {
+			// Icon already exists, update label
+			territoryIcon.setLabel(iconLabel);
 		}
 		
 	}
@@ -388,6 +401,69 @@ public class MapHandler {
 				break;
 			case TOWN:
 				result = true;
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
+	
+	private String getIconId(KonTerritory territory) {
+		String result = "konquest";
+		switch (territory.getTerritoryType()) {
+			case RUIN:
+				result = result+".icon.ruin."+territory.getName().toLowerCase();
+				break;
+			case CAMP:
+				result = result+".icon.camp."+territory.getName().toLowerCase();
+				break;
+			case CAPITAL:
+				result = result+".icon."+territory.getKingdom().getName().toLowerCase()+".capital";
+				break;
+			case TOWN:
+				result = result+".icon."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase();
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
+	
+	private String getIconLabel(KonTerritory territory) {
+		String result = "Konquest";
+		switch (territory.getTerritoryType()) {
+			case RUIN:
+				result = "Ruin "+territory.getName();
+				break;
+			case CAMP:
+				result = "Barbarian "+territory.getName();
+				break;
+			case CAPITAL:
+				result = territory.getKingdom().getCapital().getName();
+				break;
+			case TOWN:
+				result = territory.getKingdom().getName()+" "+territory.getName();
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
+	
+	private MarkerIcon getIconMarker(KonTerritory territory) {
+		MarkerIcon result = null;
+		switch (territory.getTerritoryType()) {
+			case RUIN:
+				result = dapi.getMarkerAPI().getMarkerIcon("tower");
+				break;
+			case CAMP:
+				result = dapi.getMarkerAPI().getMarkerIcon("pirateflag");
+				break;
+			case CAPITAL:
+				result = dapi.getMarkerAPI().getMarkerIcon("star");
+				break;
+			case TOWN:
+				result = dapi.getMarkerAPI().getMarkerIcon("orangeflag");
 				break;
 			default:
 				break;

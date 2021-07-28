@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.bukkit.Location;
+
 import konquest.model.KonTerritory;
 //import konquest.utility.ChatUtil;
 
@@ -20,6 +22,7 @@ public class AreaTerritory {
 	private double[] xCorners;
 	private double[] zCorners;
 	private String worldName;
+	private Location center;
 	
 	private static enum FaceDirection {
 		NE,
@@ -46,6 +49,7 @@ public class AreaTerritory {
 	public AreaTerritory(KonTerritory territory) {
 		this.worldName = territory.getWorld().getName();
 		this.areaPoints = territory.getChunkList().keySet();
+		this.center = territory.getCenterLoc();
 		calculateCorners();
 	}
 	
@@ -93,6 +97,18 @@ public class AreaTerritory {
 	
 	public String getWorldName() {
 		return worldName;
+	}
+	
+	public double getCenterX() {
+		return center.getX();
+	}
+	
+	public double getCenterY() {
+		return center.getY();
+	}
+	
+	public double getCenterZ() {
+		return center.getZ();
 	}
 	
 	/**
