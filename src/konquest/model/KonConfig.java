@@ -92,7 +92,7 @@ public class KonConfig {
 	    		plugin.saveResource(fileName, false);
 	    	} catch(IllegalArgumentException e) {
 	    		result = false;
-	    		ChatUtil.printConsoleError("Failed to save unknown resource "+fileName);
+	    		ChatUtil.printConsoleError("Unknown resource "+fileName+", check spelling.");
 	    	}
 	    }
 	    return result;
