@@ -39,7 +39,8 @@ public class KonConfig {
 			config = new YamlConfiguration();
 		}
 		
-		if (config.getKeys(false).isEmpty()) {
+		String configStr = config.saveToString();
+		if (configStr.isEmpty()) {
 			result = false;
 			ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check for file syntax errors.");
 		}
