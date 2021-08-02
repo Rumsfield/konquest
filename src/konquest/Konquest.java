@@ -87,6 +87,7 @@ public class Konquest implements Timeable {
     private Team enemyTeam;
     private Team barbarianTeam;
     private TeamPacketSender teamPacketSender;
+    private boolean isPacketSendEnabled;
 	
 	//private String worldName;
     private List<World> worlds;
@@ -132,6 +133,7 @@ public class Konquest implements Timeable {
 		this.compassTimer = new Timer(this);
 		this.saveIntervalSeconds = 0;
 		this.offlineTimeoutSeconds = 0;
+		this.isPacketSendEnabled = false;
 		
 		teleportTerritoryQueue = new HashMap<Player,KonTerritory>();
 		teleportLocationQueue = new HashMap<Player,Location>();
@@ -167,7 +169,12 @@ public class Konquest implements Timeable {
         barbarianTeam.setColor(ChatColor.YELLOW);
         
         if(setupTeamPacketSender()) {
-        	ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version");
+        	if(plugin.isProtocolEnabled()) {
+        		ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version");
+        		isPacketSendEnabled = true;
+        	} else {
+        		ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is disabled! Check version.");
+        	}
         } else {
         	ChatUtil.printConsoleError("Failed to register name color packets, the server version is unsupported");
         }
@@ -774,6 +781,9 @@ public class Konquest implements Timeable {
      * @param player
      */
     public void updateNamePackets(KonPlayer player) {
+    	if(!isPacketSendEnabled) {
+    		return;
+    	}
     	// Loop over all online players, populate team lists and send each online player a team packet for arg player
     	// Send arg player packets for each team with lists of online players
 		List<String> friendlyNames = new ArrayList<String>();

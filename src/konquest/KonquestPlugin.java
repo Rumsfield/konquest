@@ -27,6 +27,7 @@ public class KonquestPlugin extends JavaPlugin {
 	
 	private Konquest konquest;
 	private PluginManager pluginManager;
+	private boolean isProtocolEnabled = false;
 	private static Economy econ = null;
 	private boolean enableSuccess = false;
 	private static ProtocolManager plib = null;
@@ -43,8 +44,8 @@ public class KonquestPlugin extends JavaPlugin {
         }
  		// Enable metrics
  		loadMetrics();
-        // Get protocol manager
- 		plib = ProtocolLibrary.getProtocolManager();
+        // Enable protocol
+ 		setupProtocol();
  		// Register command executors & listeners
         getCommand("konquest").setExecutor(konquest.getCommandHandler());
         getCommand("k").setExecutor(konquest.getCommandHandler());
@@ -83,6 +84,10 @@ public class KonquestPlugin extends JavaPlugin {
 		return plib;
 	}
 	
+	public boolean isProtocolEnabled() {
+		return isProtocolEnabled;
+	}
+	
 	private void registerListeners() {
 		pluginManager.registerEvents(new PlayerListener(this), this);
 		pluginManager.registerEvents(new KonquestListener(this), this);
@@ -99,6 +104,17 @@ public class KonquestPlugin extends JavaPlugin {
 	        new Metrics(this, 11980);
 		} catch(Exception e) {
 			ChatUtil.printConsoleError("Failed to load plugin metrics with bStats:");
+			ChatUtil.printConsoleError(e.getMessage());
+		}
+	}
+	
+	private void setupProtocol() {
+		plib = null;
+		try {
+			plib = ProtocolLibrary.getProtocolManager();
+			isProtocolEnabled = true;
+		} catch(Exception e) {
+			ChatUtil.printConsoleError("Failed to load ProtocolLib, is it the latest version?");
 			ChatUtil.printConsoleError(e.getMessage());
 		}
 	}
