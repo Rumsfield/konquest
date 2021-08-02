@@ -2,6 +2,7 @@ package konquest.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
@@ -29,20 +30,36 @@ public class KonConfig {
 		plugin = Konquest.getInstance().getPlugin();
 	}
 	
-	public void reloadConfig() {
-		config = YamlConfiguration.loadConfiguration(file);
+	// returns false if the configuration could not be loaded, else true
+	public boolean reloadConfig() {
+		boolean result = true;
+		if (file != null) {
+			config = YamlConfiguration.loadConfiguration(file);
+		} else {
+			config = new YamlConfiguration();
+		}
 		
-		// look for defaults in jar
+		String configStr = config.saveToString();
+		if (configStr.isEmpty()) {
+			result = false;
+			ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check for file syntax errors.");
+		}
+		
+		// look for defaults in jar, if any
 		try {
-			Reader defaultConfigStream = new InputStreamReader(plugin.getResource(fileName), "UTF8");
-			
-			if (defaultConfigStream != null) {
-				YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
-				config.setDefaults(defaultConfig);
+			InputStream defaultFile = plugin.getResource(fileName);
+			if (defaultFile != null) {
+				Reader defaultConfigStream = new InputStreamReader(defaultFile, "UTF8");
+				if (defaultConfigStream != null) {
+					YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
+					config.setDefaults(defaultConfig);
+				}
 			}
 		} catch (IOException exception) {
 			exception.printStackTrace();
+			result = false;
 		}
+		return result;
 	}
 	
 	public FileConfiguration getConfig() {
@@ -54,7 +71,7 @@ public class KonConfig {
 	}
 	
 	public void saveConfig() {
-		if (config == null || file == null) {
+		if (config == null || file == null || config.getKeys(false).isEmpty()) {
 	        return;
 	    }
 	    try {
@@ -75,7 +92,7 @@ public class KonConfig {
 	    		plugin.saveResource(fileName, false);
 	    	} catch(IllegalArgumentException e) {
 	    		result = false;
-	    		ChatUtil.printConsoleError("Failed to save unknown resource "+fileName);
+	    		ChatUtil.printConsoleError("Unknown resource "+fileName+", check spelling.");
 	    	}
 	    }
 	    return result;

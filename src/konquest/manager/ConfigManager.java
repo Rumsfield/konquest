@@ -49,7 +49,7 @@ public class ConfigManager{
 				ChatUtil.printConsoleAlert("Using custom "+language+" language file");
 			} else {
 				langConfig = getConfig("lang_english");
-				ChatUtil.printConsoleError("Failed to find language file "+language+".yml in Konquest/lang folder. Using default lang/english.yml.");
+				ChatUtil.printConsoleError("Failed to load invalid language file "+language+".yml in Konquest/lang folder. Using default lang/english.yml.");
 			}
 		}
 	}
@@ -66,10 +66,12 @@ public class ConfigManager{
 	}
 	
 	public boolean addConfig(String key, KonConfig config) {
-		boolean status = config.saveDefaultConfig();
-		if(status) {
-			config.reloadConfig();
-			configCache.put(key, config);
+		boolean status = false;
+		if(config.saveDefaultConfig()) {
+			if(config.reloadConfig()) {
+				configCache.put(key, config);
+				status = true;
+			}
 		}
 		return status;
 	}

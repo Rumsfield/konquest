@@ -708,13 +708,8 @@ public class BlockListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
-					// If town is shielded
-					if(town.isShielded()) {
-						event.setCancelled(true);
-						return;
-					}
-					// If town is armored
-					if(town.isArmored()) {
+					// If town is shielded or armored, and piston is outside of territory
+					if((town.isShielded() || town.isArmored()) && !town.isLocInside(event.getBlock().getLocation())) {
 						event.setCancelled(true);
 						return;
 					}
@@ -768,13 +763,8 @@ public class BlockListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
-					// If town is shielded
-					if(town.isShielded()) {
-						event.setCancelled(true);
-						return;
-					}
-					// If town is armored
-					if(town.isArmored()) {
+					// If town is shielded or armored, and piston is outside of territory
+					if((town.isShielded() || town.isArmored()) && !town.isLocInside(event.getBlock().getLocation())) {
 						event.setCancelled(true);
 						return;
 					}
