@@ -13,6 +13,7 @@ public enum AdminCommandType {
 	REMOVETOWN		("<kingdom> <town>",													MessagePath.DESCRIPTION_ADMIN_REMOVETOWN.getMessage()),
 	MONUMENT		("<kingdom> create|remove|show",										MessagePath.DESCRIPTION_ADMIN_MONUMENT.getMessage()),
 	LIST			("kingdoms|towns|all",						   		 					MessagePath.DESCRIPTION_ADMIN_LIST.getMessage()),
+	FORCECAPTURE	("<town> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_FORCECAPTURE.getMessage()),
 	FORCEJOIN 		("<player> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_FORCEJOIN.getMessage()),
 	FORCEEXILE		("<player> [full]", 													MessagePath.DESCRIPTION_ADMIN_FORCEEXILE.getMessage()),
 	FORCETOWN		("<name> open|close|add|kick|lord|knight|rename|upgrade|shield [arg1] [arg2]", MessagePath.DESCRIPTION_ADMIN_FORCETOWN.getMessage()),

@@ -276,7 +276,7 @@ public class KonquestListener implements Listener {
 					townMonumentTimer.stopTimer();
 				} else {
 					// Conquer the town for the enemy player's kingdom
-					if(kingdomManager.conquerTown(town.getName(), town.getKingdom().getName(), event.getPlayer())) {
+					if(kingdomManager.captureTownForPlayer(town.getName(), town.getKingdom().getName(), event.getPlayer())) {
 						// Alert all players of original Kingdom
 						for(KonPlayer player : playerManager.getPlayersInKingdom(event.getTerritory().getKingdom().getName())) {
 							//ChatUtil.sendNotice(player.getBukkitPlayer(), "The Town "+event.getTerritory().getName()+" has been conquered!", ChatColor.DARK_RED);

@@ -413,10 +413,18 @@ public class KingdomManager {
 	 * @param conquerPlayer - Player who initiated the conquering
 	 * @return true if all names exist, else false
 	 */
-	public boolean conquerTown(String name, String oldKingdomName, KonPlayer conquerPlayer) {
+	public boolean captureTownForPlayer(String name, String oldKingdomName, KonPlayer conquerPlayer) {
+		if(conquerPlayer == null) {
+			return false;
+		}
 		if(conquerPlayer.isBarbarian()) {
 			return false;
 		}
+		if(captureTown(name, oldKingdomName, conquerPlayer.getKingdom())) {
+			conquerPlayer.getKingdom().getTown(name).setPlayerLord(conquerPlayer.getOfflineBukkitPlayer());
+			return true;
+		}
+		/*
 		if(!conquerPlayer.getKingdom().getMonumentTemplate().isValid()) {
 			return false;
 		}
@@ -434,6 +442,29 @@ public class KingdomManager {
 			conquerPlayer.getKingdom().getTown(name).updateBarPlayers();
 			konquest.getMapHandler().drawDynmapUpdateTerritory(conquerPlayer.getKingdom().getTown(name));
 			konquest.getIntegrationManager().deleteShopsInPoints(conquerPlayer.getKingdom().getTown(name).getChunkList().keySet(),conquerPlayer.getKingdom().getTown(name).getWorld());
+			return true;
+		}
+		*/
+		return false;
+	}
+	
+	public boolean captureTown(String name, String oldKingdomName, KonKingdom conquerKingdom) {
+		if(!conquerKingdom.getMonumentTemplate().isValid()) {
+			return false;
+		}
+		if(isKingdom(oldKingdomName) && getKingdom(oldKingdomName).hasTown(name)) {
+			konquest.getMapHandler().drawDynmapRemoveTerritory(getKingdom(oldKingdomName).getTown(name));
+			getKingdom(oldKingdomName).getTown(name).purgeResidents();
+			getKingdom(oldKingdomName).getTown(name).clearUpgrades();
+			getKingdom(oldKingdomName).getTown(name).clearShieldsArmors();
+			getKingdom(oldKingdomName).getTown(name).setKingdom(conquerKingdom);
+			conquerKingdom.addTownConquer(name, getKingdom(oldKingdomName).removeTownConquer(name));
+			conquerKingdom.getTown(name).refreshMonument();
+			refreshTownNerfs(conquerKingdom.getTown(name));
+			refreshTownHearts(conquerKingdom.getTown(name));
+			conquerKingdom.getTown(name).updateBarPlayers();
+			konquest.getMapHandler().drawDynmapUpdateTerritory(conquerKingdom.getTown(name));
+			konquest.getIntegrationManager().deleteShopsInPoints(conquerKingdom.getTown(name).getChunkList().keySet(),conquerKingdom.getTown(name).getWorld());
 			return true;
 		}
 		return false;

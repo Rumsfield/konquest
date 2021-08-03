@@ -133,6 +133,7 @@ public enum MessagePath {
 	GENERIC_ERROR_ENEMY_TOWN                    (0, "generic.error.enemy-town"),
 	GENERIC_ERROR_DISABLED                      (0, "generic.error.disabled"),
 	GENERIC_ERROR_REGION                        (0, "generic.error.region"),
+	GENERIC_ERROR_FAILED                        (0, "generic.error.failed"),
 	
 	PROTECTION_NOTICE_IGNORE                    (0, "protection.notice.ignore"),
 	PROTECTION_NOTICE_PEACEFUL_TOWN             (1, "protection.notice.peaceful-town"),
@@ -520,6 +521,7 @@ public enum MessagePath {
 	DESCRIPTION_ADMIN_REMOVETOWN                (0, "description.admin-removetown"),
 	DESCRIPTION_ADMIN_MONUMENT                  (0, "description.admin-monument"),
 	DESCRIPTION_ADMIN_LIST                      (0, "description.admin-list"),
+	DESCRIPTION_ADMIN_FORCECAPTURE              (0, "description.admin-forcecapture"),
 	DESCRIPTION_ADMIN_FORCEJOIN                 (0, "description.admin-forcejoin"),
 	DESCRIPTION_ADMIN_FORCEEXILE                (0, "description.admin-forceexile"),
 	DESCRIPTION_ADMIN_FORCETOWN                 (0, "description.admin-forcetown"),

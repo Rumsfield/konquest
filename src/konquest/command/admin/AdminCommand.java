@@ -33,6 +33,9 @@ public class AdminCommand extends CommandBase {
             	case FLAG:
                     new FlagAdminCommand(getKonquest(), getSender(), getArgs()).execute();
                     break;
+            	case FORCECAPTURE:
+                    new ForceCaptureAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+                    break;
                 case FORCEEXILE:
                     new ForceExileAdminCommand(getKonquest(), getSender(), getArgs()).execute();
                     break;
@@ -116,6 +119,9 @@ public class AdminCommand extends CommandBase {
                     break;
             	case FLAG:
             		tabList.addAll(new FlagAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+                    break;
+            	case FORCECAPTURE:
+                	tabList.addAll(new ForceCaptureAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
                     break;
                 case FORCEEXILE:
                 	tabList.addAll(new ForceExileAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
