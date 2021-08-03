@@ -13,8 +13,11 @@
 #  community_link:                  URL which will appear in the /k community link icon (string)
 #  accomplishment_prefix:           Enable the usage of accomplishment prefixes applied to player names (true/false)
 #  directive_quests:                Enable the "/k quest" command and built-in quest rewards (true/false)
-#  format_chat_messages:            Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
 #  travel_wild_random_radius:       Radius in blocks from the center of the primary world for random wild travel (integer > 0)
+# chat:
+#     enable_format:                Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
+#     use_kingdom:                  Use a player's kingdom name as a part of their chat message (true/false)
+#     priority:                     Set the priority of Konquest's chat message formatting. Set to low to allow other plugins to modify chat first (lowest, low, normal, high, highest)
 #  database:
 #      connection:                  Database connection type (sqlite or mysql)
 #      mysql:
@@ -120,8 +123,11 @@ core:
   community_link: www.google.com
   accomplishment_prefix: true
   directive_quests: true
-  format_chat_messages: true
   travel_wild_random_radius: 1000
+  chat:
+    enable_format: true
+    use_kingdom: true
+    priority: low
   database:
     connection: sqlite
     mysql:

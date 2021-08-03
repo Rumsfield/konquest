@@ -21,6 +21,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -89,7 +90,7 @@ public class Konquest implements Timeable {
     private TeamPacketSender teamPacketSender;
     private boolean isPacketSendEnabled;
 	
-	//private String worldName;
+	private EventPriority chatPriority;
     private List<World> worlds;
     private boolean isWhitelist;
 	public List<String> opStatusMessages;
@@ -125,7 +126,7 @@ public class Konquest implements Timeable {
 		languageManager = new LanguageManager(this);
 		mapHandler = new MapHandler(this);
 		
-		//worldName = "world";
+		chatPriority = EventPriority.LOW;
 		worlds = new ArrayList<World>();
 		isWhitelist = false;
 		opStatusMessages = new ArrayList<String>();
@@ -216,6 +217,8 @@ public class Konquest implements Timeable {
 		compassTimer.stopTimer();
 		compassTimer.setTime(30); // 30 second compass update interval
 		compassTimer.startLoopTimer();
+		// Set chat even priority
+		chatPriority = getEventPriority(configManager.getConfig("core").getString("core.chat.priority","low"));
 		// Update kingdom stuff
 		kingdomManager.updateSmallestKingdom();
 		kingdomManager.updateAllTownDisabledUpgrades();
@@ -385,6 +388,10 @@ public class Konquest implements Timeable {
 	
 	public long getOfflineTimeoutSeconds() {
 		return offlineTimeoutSeconds;
+	}
+	
+	public EventPriority getChatPriority() {
+		return chatPriority;
 	}
 	
 	public boolean isWorldValid(World world) {
@@ -1102,5 +1109,17 @@ public class Konquest implements Timeable {
 		
 		return result;		
 	}
+    
+    public static EventPriority getEventPriority(String priority) {
+    	EventPriority result = EventPriority.LOW;
+    	if(priority != null) {
+    		try {
+    			result = EventPriority.valueOf(priority);
+    		} catch(IllegalArgumentException e) {
+    			// do nothing
+    		}
+    	}
+    	return result;
+    }
 	
 }

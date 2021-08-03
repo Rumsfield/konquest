@@ -148,36 +148,53 @@ public class PlayerListener implements Listener{
     	//playerManager.updateAllSavedPlayers();
     }
     
-    /**
-     * Fires when a player is kicked from the server
-     * @param event
-     */
-    /*
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onAsyncPlayerChatLowest(AsyncPlayerChatEvent event) {
+    	if(konquest.getChatPriority().equals(EventPriority.LOWEST)) {
+    		onAsyncPlayerChat(event);
+    	}
+    }
+    
+    @EventHandler(priority = EventPriority.LOW)
+    public void onAsyncPlayerChatLow(AsyncPlayerChatEvent event) {
+    	if(konquest.getChatPriority().equals(EventPriority.LOW)) {
+    		onAsyncPlayerChat(event);
+    	}
+    }
+    
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onPlayerKick(PlayerKickEvent event) {
-    	ChatUtil.printDebug("EVENT: Player got kicked");
-    	// save player data to config files
-    	playerManager.savePlayers();
-    	// remove player from cache
-    	Player bukkitPlayer = event.getPlayer();
-    	playerManager.removePlayer(bukkitPlayer);
-    	//playerManager.updateNumKingdomPlayersOnline();
-    	playerManager.updateAllSavedPlayers();
-    }*/
+    public void onAsyncPlayerChatNormal(AsyncPlayerChatEvent event) {
+    	if(konquest.getChatPriority().equals(EventPriority.NORMAL)) {
+    		onAsyncPlayerChat(event);
+    	}
+    }
+    
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onAsyncPlayerChatHigh(AsyncPlayerChatEvent event) {
+    	if(konquest.getChatPriority().equals(EventPriority.HIGH)) {
+    		onAsyncPlayerChat(event);
+    	}
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onAsyncPlayerChatHighest(AsyncPlayerChatEvent event) {
+    	if(konquest.getChatPriority().equals(EventPriority.HIGHEST)) {
+    		onAsyncPlayerChat(event);
+    	}
+    }
     
     /**
      * Fires on chat events
      * All players always see global chat messages and team chat messages
      * @param event
      */
-    @EventHandler(priority = EventPriority.LOW)
-    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        
+    private void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
         //Check if the event was caused by a player
         if(event.isAsynchronous() && !event.isCancelled()) {
-        	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.format_chat_messages",true);
+        	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.enable_format",true);
         	if(enable) {
 	        	// Format chat messages
+        		boolean useKingdom = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.use_kingdom",true);
 	        	Player bukkitPlayer = event.getPlayer();
 	        	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
 					ChatUtil.printDebug("Failed to handle onAsyncPlayerChat for non-existent player");
@@ -194,6 +211,10 @@ public class PlayerListener implements Listener{
 	            String prefix = konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer);
 	            String suffix = konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer);
 	            String divider = ChatColor.translateAlternateColorCodes('&', "&7»");
+	            String kingdomName = "";
+	            if(useKingdom) {
+	            	kingdomName = kingdom.getName() + ChatColor.translateAlternateColorCodes('&', " &7| ");;
+	            }
 	            
 	            if(player.isGlobalChat()) {
 	            	//Global chat, all players see this format
@@ -216,6 +237,7 @@ public class PlayerListener implements Listener{
 	            		}
 	            		globalPlayer.getBukkitPlayer().sendMessage(
 	        					ChatColor.translateAlternateColorCodes('&', prefix)+ 
+	        					teamColor+kingdomName+
 	        					titleColor+ChatColor.translateAlternateColorCodes('&', title)+ 
 	        					teamColor+bukkitPlayer.getName()+" "+
 	        					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
@@ -239,6 +261,7 @@ public class PlayerListener implements Listener{
 	            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K-bypass] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC + event.getMessage());
 	            			teamPlayer.getBukkitPlayer().sendMessage(
 	            					ChatColor.translateAlternateColorCodes('&', prefix)+ 
+	            					ChatColor.GOLD+kingdomName+
 	            					ChatColor.GOLD+ChatColor.translateAlternateColorCodes('&', title)+
 	            					bukkitPlayer.getName()+" "+
 	            					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
