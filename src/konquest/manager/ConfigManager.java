@@ -1,5 +1,6 @@
 package konquest.manager;
 
+import java.io.File;
 import java.util.HashMap;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -28,11 +29,14 @@ public class ConfigManager{
 		addConfig("upgrades", new KonConfig("upgrades"));
 		updateConfigVersion("upgrades");
 		addConfig("shields", new KonConfig("shields"));
-		//updateConfigVersion("shields");
+		addConfig("loot", new KonConfig("loot"));
 		// Data Storage
-		addConfig("kingdoms", new KonConfig("kingdoms"));
-		addConfig("camps", new KonConfig("camps"));
-		addConfig("ruins", new KonConfig("ruins"));
+		migrateConfigFile("kingdoms","data");
+		migrateConfigFile("camps","data");
+		migrateConfigFile("ruins","data");
+		addConfig("kingdoms", new KonConfig("data/kingdoms"));
+		addConfig("camps", new KonConfig("data/camps"));
+		addConfig("ruins", new KonConfig("data/ruins"));
 		// Language files
 		addConfig("lang_english", new KonConfig("lang/english"));
 		updateConfigVersion("lang_english");
@@ -116,6 +120,18 @@ public class ConfigManager{
 		configCache.get(key).saveNewConfig();
 		configCache.get(key).reloadConfig();
 		ChatUtil.printConsoleError("Bad config file \""+key+"\", saved default version. Review this file for errors.");
+	}
+	
+	public void migrateConfigFile(String name, String path) {
+		String newName = path+"/"+name;
+		File oldFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), name);
+		File newFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), newName);
+		if(oldFile.exists() && !newFile.exists()) {
+			if(oldFile.renameTo(newFile)) {
+				oldFile.delete();
+				ChatUtil.printConsoleAlert("Migrated file "+name+" to "+newName);
+			}
+		}
 	}
 
 }
