@@ -14,7 +14,7 @@ public class ChatUtil {
 	private static ChatColor noticeColor = ChatColor.GRAY;
 	private static ChatColor errorColor = ChatColor.RED;
 	private static ChatColor alertColor = ChatColor.GOLD;
-	private static String tag = "§7[§6Konquest§7]§f ";
+	//private static String tag = "§7[§6Konquest§7]§f "; /*Replaced with Konquest.getChatTag()*/
 	
 	public static void formatArgColors(String args) {
 		
@@ -41,12 +41,12 @@ public class ChatUtil {
 	}
 
 	public static void sendNotice(Player player, String message) {
-		String notice = tag + noticeColor + message;
+		String notice = Konquest.getChatTag() + noticeColor + message;
 		player.sendMessage(notice);
 	}
 	
 	public static void sendNotice(Player player, String message, ChatColor color) {
-		String notice = tag + color + message;
+		String notice = Konquest.getChatTag() + color + message;
 		player.sendMessage(notice);
 	}
 	
@@ -61,17 +61,17 @@ public class ChatUtil {
 	}
 
 	public static void sendError(Player player, String message) {
-		String error = tag + errorColor + message;
+		String error = Konquest.getChatTag() + errorColor + message;
 		player.sendMessage(error);
 	}
 	
 	public static void sendBroadcast(String message) {
-		String notice = tag + broadcastColor + message;
+		String notice = Konquest.getChatTag() + broadcastColor + message;
 		Bukkit.broadcastMessage(notice);
 	}
 	
 	public static void sendAdminBroadcast(String message) {
-		String notice = tag + broadcastColor + message;
+		String notice = Konquest.getChatTag() + broadcastColor + message;
 		Bukkit.broadcast(notice,"konquest.command.admin");
 	}
 	

@@ -66,6 +66,7 @@ public class Konquest implements Timeable {
 
 	private KonquestPlugin plugin;
 	private static Konquest instance;
+	private static String chatTag;
 	
 	private DatabaseThread databaseThread;
 	private AccomplishmentManager accomplishmentManager;
@@ -109,6 +110,7 @@ public class Konquest implements Timeable {
 	public Konquest(KonquestPlugin plugin) {
 		this.plugin = plugin;
 		instance = this;
+		chatTag = "§7[§6Konquest§7]§f ";
 		
 		databaseThread = new DatabaseThread(this);
 		accomplishmentManager = new AccomplishmentManager(this);
@@ -147,6 +149,8 @@ public class Konquest implements Timeable {
 		ChatUtil.printDebug("Debug is "+debug);
 		String worldName = configManager.getConfig("core").getString("core.world_name");
 		ChatUtil.printDebug("Primary world is "+worldName);
+		String configTag = configManager.getConfig("core").getString("core.chat.tag");
+		chatTag = ChatColor.translateAlternateColorCodes('&', configTag);
 		languageManager.initialize();
 		kingdomManager.initialize();
 		ruinManager.initialize();
@@ -1120,6 +1124,10 @@ public class Konquest implements Timeable {
     		}
     	}
     	return result;
+    }
+    
+    public static String getChatTag() {
+    	return chatTag;
     }
 	
 }
