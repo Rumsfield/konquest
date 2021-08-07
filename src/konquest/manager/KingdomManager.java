@@ -182,6 +182,7 @@ public class KingdomManager {
 		    	Location destination = new Location(spawn.getWorld(),spawn.getX()+0.5,spawn.getY()+1.0,spawn.getZ()+0.5);
 		    	player.getBukkitPlayer().teleport(destination);
 		    	player.getBukkitPlayer().setBedSpawnLocation(destination, true);
+		    	getKingdom(kingdomName).getCapital().addBarPlayer(player);
 		    	//konquest.getPlayerManager().saveAllPlayers();
 		    	//konquest.getPlayerManager().updateAllSavedPlayers();
 		    	updateSmallestKingdom();
