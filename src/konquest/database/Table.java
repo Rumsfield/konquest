@@ -33,7 +33,7 @@ public class Table {
     				//ChatUtil.printDebug("Found existing column "+col.getName());
     			} else {
     				//ChatUtil.printDebug("Missing column "+col.getName()+", adding now");
-    				ChatUtil.printStatus("SQL database is missing column '"+col.getName()+"' in table '"+name+"', adding it now.");
+    				ChatUtil.printConsole("SQL database is missing column '"+col.getName()+"' in table '"+name+"', adding it now.");
     				StringBuilder addBuffer = new StringBuilder("ALTER TABLE ");
     	        	addBuffer.append(name).append(" ADD COLUMN ");
     	        	addBuffer.append(col.getName()).append(" ");
@@ -47,7 +47,7 @@ public class Table {
     		}
     	} else {
     		//ChatUtil.printDebug("Missing table "+name);
-    		ChatUtil.printStatus("SQL database is missing table '"+name+"', creating it now.");
+    		ChatUtil.printConsole("SQL database is missing table '"+name+"', creating it now.");
     		// Creates a new table with all current columns.
             StringBuilder buffer = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
             buffer.append(name);

@@ -22,17 +22,12 @@ public class ChatUtil {
 	
 	public static void printDebug(String message) {
 		if(Konquest.getInstance().getConfigManager().getConfig("core").getBoolean("core.debug")) {
-        	System.out.println("[Konquest DEBUG]: "+message);
+        	Bukkit.getServer().getConsoleSender().sendMessage("[Konquest DEBUG] " + message);
         }
 	}
 	
-	public static void printStatus(String message) {
-        System.out.println("[Konquest]: " + message);
-	}
-	
 	public static void printConsole(String message) {
-		//Bukkit.getLogger().info(message);
-		Bukkit.getServer().getConsoleSender().sendMessage(message);
+		Bukkit.getServer().getConsoleSender().sendMessage("[Konquest] " + message);
 	}
 	
 	public static void printConsoleAlert(String message) {

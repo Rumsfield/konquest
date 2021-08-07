@@ -249,7 +249,7 @@ public class Konquest implements Timeable {
 		// Fetch any players that happen to be in the server already (typically from /reload)
         for(Player bukkitPlayer : Bukkit.getServer().getOnlinePlayers()) {
 			initPlayer(bukkitPlayer);
-			ChatUtil.printStatus("Loaded online player "+bukkitPlayer.getName());
+			ChatUtil.printConsole("Loaded online player "+bukkitPlayer.getName());
 		}
 	}
 	
