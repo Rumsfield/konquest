@@ -6,6 +6,8 @@ import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -32,6 +34,7 @@ public class LootManager implements Timeable{
 	private int lootCount;
 	private Random randomness;
 	private Timer lootRefreshTimer;
+	private HashMap<ItemStack,Integer> lootTable;
 	
 	/*
 	 * Monument loot is divided into different categories:
@@ -42,6 +45,7 @@ public class LootManager implements Timeable{
 	 * Food - cooked meat, etc
 	 * Others - Saddle, End Pearl, Blaze Rod, Music Disc
 	 */
+	/*
 	public enum LootType {
 		VALUABLE (4),
 		POTIONS (9),
@@ -63,6 +67,7 @@ public class LootManager implements Timeable{
 			return totalP;
 		}
 	}
+	*/
 	
 	public LootManager(Konquest konquest) {
 		this.konquest = konquest;
@@ -72,6 +77,7 @@ public class LootManager implements Timeable{
 		this.lootCount = 0;
 		this.randomness = new Random();
 		this.lootRefreshTimer = new Timer(this);
+		this.lootTable = new HashMap<ItemStack,Integer>();
 	}
 	
 	public void initialize() {
@@ -87,7 +93,168 @@ public class LootManager implements Timeable{
 		if(lootCount < 0) {
 			lootCount = 0;
 		}
+		if(loadLoot()) {
+			ChatUtil.printConsoleAlert("Finished loading loot table.");
+		} else {
+			ChatUtil.printConsoleError("Failed to load loot table, check for syntax errors.");
+		}
 		ChatUtil.printDebug("Loot Manager is ready with loot count: "+lootCount);
+	}
+	
+	// Loads loot table from file
+	private boolean loadLoot() {
+		lootTable.clear();
+		
+		FileConfiguration lootConfig = konquest.getConfigManager().getConfig("loot");
+        if (lootConfig.get("loot") == null) {
+        	ChatUtil.printDebug("There is no loot section in loot.yml");
+            return false;
+        }
+        ConfigurationSection lootEntry = null;
+        boolean status = true;
+        
+        // Load items
+        Material itemType = null;
+        ConfigurationSection itemsSection = lootConfig.getConfigurationSection("loot.items");
+        if(itemsSection != null) {
+        	for(String itemName : itemsSection.getKeys(false)) {
+        		status = true;
+        		int itemAmount = 0;
+            	int itemWeight = 0;
+        		try {
+        			itemType = Material.valueOf(itemName);
+        		} catch(IllegalArgumentException e) {
+            		ChatUtil.printConsoleError("Invalid loot item \""+itemName+"\" given in loot.yml, skipping this item.");
+            		status = false;
+        		}
+            	lootEntry = itemsSection.getConfigurationSection(itemName);
+            	if(lootEntry.contains("amount")) {
+            		itemAmount = lootEntry.getInt("amount",1);
+            		itemAmount = itemAmount < 1 ? 1 : itemAmount;
+        		} else {
+        			ChatUtil.printConsoleError("loot.yml is missing amount for item: "+itemName);
+        			status = false;
+        		}
+            	if(lootEntry.contains("weight")) {
+            		itemWeight = lootEntry.getInt("weight",0);
+            		itemWeight = itemWeight < 0 ? 0 : itemWeight;
+        		} else {
+        			ChatUtil.printConsoleError("loot.yml is missing weight for item: "+itemName);
+        			status = false;
+        		}
+            	if(status && itemWeight > 0) {
+            		// Add loot table entry
+            		lootTable.put(new ItemStack(itemType, itemAmount), itemWeight);
+            	}
+            }
+        }
+        
+        // Load potions
+        PotionType potionType = null;
+        ConfigurationSection potionsSection = lootConfig.getConfigurationSection("loot.potions");
+        if(potionsSection != null) {
+        	for(String potionName : potionsSection.getKeys(false)) {
+        		status = true;
+        		boolean itemUpgraded = false;
+        		boolean itemExtended = false;
+            	int itemWeight = 0;
+        		try {
+        			potionType = PotionType.valueOf(potionName);
+        		} catch(IllegalArgumentException e) {
+            		ChatUtil.printConsoleError("Invalid loot potion \""+potionName+"\" given in loot.yml, skipping this potion.");
+            		status = false;
+        		}
+            	lootEntry = itemsSection.getConfigurationSection(potionName);
+            	if(lootEntry.contains("upgraded")) {
+            		itemUpgraded = lootEntry.getBoolean("upgraded",false);
+        		} else {
+        			ChatUtil.printConsoleError("loot.yml is missing upgraded for potion: "+potionName);
+        			status = false;
+        		}
+            	if(lootEntry.contains("extended")) {
+            		itemExtended = lootEntry.getBoolean("extended",false);
+        		} else {
+        			ChatUtil.printConsoleError("loot.yml is missing extended for potion: "+potionName);
+        			status = false;
+        		}
+            	if(lootEntry.contains("weight")) {
+            		itemWeight = lootEntry.getInt("weight",0);
+            		itemWeight = itemWeight < 0 ? 0 : itemWeight;
+        		} else {
+        			ChatUtil.printConsoleError("loot.yml is missing weight for potion: "+potionName);
+        			status = false;
+        		}
+            	if(status && itemWeight > 0) {
+            		// Add loot table entry
+            		ItemStack potion = new ItemStack(Material.POTION, 1);
+    				PotionMeta meta;
+    				meta = (PotionMeta) potion.getItemMeta();
+    				meta.setBasePotionData(new PotionData(potionType, itemExtended, itemUpgraded));
+    				potion.setItemMeta(meta);
+            		lootTable.put(potion, itemWeight);
+            	}
+            }
+        }
+        
+        // Load enchanted books
+        Enchantment bookType = null;
+        ConfigurationSection ebookSection = lootConfig.getConfigurationSection("loot.enchanted_books");
+        if(ebookSection != null) {
+        	for(String enchantName : ebookSection.getKeys(false)) {
+        		status = true;
+        		int itemLevel = 0;
+            	int itemWeight = 0;
+        		bookType = getEnchantment(enchantName);
+            	if(bookType == null) {
+            		ChatUtil.printConsoleError("Invalid loot enchantment \""+enchantName+"\" given in loot.yml, skipping this enchantment.");
+            		status = false;
+        		}
+            	lootEntry = itemsSection.getConfigurationSection(enchantName);
+            	if(lootEntry.contains("level")) {
+            		itemLevel = lootEntry.getInt("level",0);
+            		itemLevel = itemLevel < 0 ? 0 : itemLevel;
+        		} else {
+        			ChatUtil.printConsoleError("loot.yml is missing level for enchantment: "+enchantName);
+        			status = false;
+        		}
+            	if(lootEntry.contains("weight")) {
+            		itemWeight = lootEntry.getInt("weight",0);
+            		itemWeight = itemWeight < 0 ? 0 : itemWeight;
+        		} else {
+        			ChatUtil.printConsoleError("loot.yml is missing weight for enchantment: "+enchantName);
+        			status = false;
+        		}
+            	if(status && itemWeight > 0) {
+            		// Add loot table entry
+            		if(itemLevel == 0) {
+            			// Choose random level
+            			itemLevel = randomness.nextInt(bookType.getMaxLevel()+1);
+        				if(itemLevel < bookType.getStartLevel()) {
+        					itemLevel = bookType.getStartLevel();
+        				}
+            		}
+    				ItemStack enchantBook = new ItemStack(Material.ENCHANTED_BOOK, 1);
+    				EnchantmentStorageMeta enchantMeta = (EnchantmentStorageMeta)enchantBook.getItemMeta();
+    				enchantMeta.addStoredEnchant(bookType, itemLevel, true);
+    				enchantBook.setItemMeta(enchantMeta);
+            		lootTable.put(enchantBook, itemWeight);
+            	}
+            }
+        }
+        
+        return true;
+	}
+	
+	private Enchantment getEnchantment(String name) {
+		Enchantment result = null;
+		Enchantment[] allValues = Enchantment.values();
+		for(int i = 0; i < allValues.length; i++) {
+			if(name.equalsIgnoreCase(allValues[i].toString())) {
+				result = allValues[i];
+				break;
+			}
+		}
+		return result;
 	}
 	
 	/**
@@ -143,12 +310,13 @@ public class LootManager implements Timeable{
 			if(availableSlot == -1) {
 				ChatUtil.printDebug("Failed to find empty slot for generated loot in inventory "+inventory.toString());
 			} else {
-				inventory.setItem(availableSlot,generateRandomLoot());
+				inventory.setItem(availableSlot,chooseRandomItem(lootTable));
 				//ChatUtil.printDebug("...Setting item in slot "+availableSlot);
 			}
 		}
 	}
 	
+	/*
 	private ItemStack generateRandomLoot() {
 		// Randomly choose LootType
 		int typeChoice = randomness.nextInt(LootType.total());
@@ -278,51 +446,31 @@ public class LootManager implements Timeable{
 				enchantMeta.addStoredEnchant(enchant, enchantLevel, true);
 				item.setItemMeta(enchantMeta);
 				break;
-			/*
-			case EGG:
-				itemOptions.put(Material.BLAZE_SPAWN_EGG, 1);
-				itemOptions.put(Material.CAT_SPAWN_EGG, 1);
-				itemOptions.put(Material.CAVE_SPIDER_SPAWN_EGG, 1);
-				itemOptions.put(Material.CREEPER_SPAWN_EGG, 1);
-				itemOptions.put(Material.DROWNED_SPAWN_EGG, 1);
-				itemOptions.put(Material.ENDERMAN_SPAWN_EGG, 1);
-				itemOptions.put(Material.MOOSHROOM_SPAWN_EGG, 1);
-				itemOptions.put(Material.PARROT_SPAWN_EGG, 1);
-				itemOptions.put(Material.SKELETON_SPAWN_EGG, 1);
-				itemOptions.put(Material.SLIME_SPAWN_EGG, 1);
-				itemOptions.put(Material.SPIDER_SPAWN_EGG, 1);
-				itemOptions.put(Material.VILLAGER_SPAWN_EGG, 1);
-				itemOptions.put(Material.ZOMBIE_SPAWN_EGG, 1);
-				itemOptions.put(Material.ZOMBIE_PIGMAN_SPAWN_EGG, 1);
-				materialList = new ArrayList<Material>(itemOptions.keySet());
-				itemIndex = randomness.nextInt(materialList.size());
-				itemMaterial = materialList.get(itemIndex);
-				itemCount = randomness.nextInt(itemOptions.get(itemMaterial))+1;
-				item = new ItemStack(itemMaterial, itemCount);
-				break;
-			*/
 			default:
 				break;
 		}
 		//ChatUtil.printDebug("Generated item is "+item.getType().toString());
 		return item;
 	}
+	*/
 	
 	private ItemStack chooseRandomItem(HashMap<ItemStack,Integer> itemOptions) {
-		// Find total item range
-		int total = 0;
-		for(int p : itemOptions.values()) {
-			total = total + p;
-		}
-		int typeChoice = randomness.nextInt(total);
-		int typeWindow = 0;
-		ItemStack item = null;
-		for(ItemStack i : itemOptions.keySet()) {
-			if(typeChoice < typeWindow + itemOptions.get(i)) {
-				item = i;
-				break;
+		ItemStack item = new ItemStack(Material.DIRT,1);
+		if(!itemOptions.isEmpty()) {
+			// Find total item range
+			int total = 0;
+			for(int p : itemOptions.values()) {
+				total = total + p;
 			}
-			typeWindow = typeWindow + itemOptions.get(i);
+			int typeChoice = randomness.nextInt(total);
+			int typeWindow = 0;
+			for(ItemStack i : itemOptions.keySet()) {
+				if(typeChoice < typeWindow + itemOptions.get(i)) {
+					item = i.clone();
+					break;
+				}
+				typeWindow = typeWindow + itemOptions.get(i);
+			}
 		}
 		//ChatUtil.printDebug("Choosing random item out of "+total+", chose "+typeChoice+", got "+item.getType().toString());
 		return item;
