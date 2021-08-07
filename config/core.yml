@@ -31,6 +31,7 @@
 #  integration:
 #    quickshop*:                    Enable plugin integration with QuickShop (true/false)
 #    luckperms*:                    Enable plugin integration with LuckPerms (true/false)
+#    dynmap*:                       Enable plugin integration with Dynmap (true/false)
 #  kingdoms:
 #    capital_suffix*:               Suffix to be appended to Kingdom names which will be the name of the Capital city (string)
 #    capital_pvp:                   Allow player damage in capitals (true/false)
@@ -145,6 +146,7 @@ core:
   integration:
     quickshop: false
     luckperms: false
+    dynmap: false
   kingdoms:
     capital_suffix: Capital
     capital_pvp: false

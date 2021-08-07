@@ -38,8 +38,12 @@ public class MapHandler {
 	public void initialize() {
 		if (Bukkit.getPluginManager().getPlugin("dynmap") != null) {
 			dapi = (DynmapAPI) Bukkit.getServer().getPluginManager().getPlugin("dynmap");
-			isEnabled = true;
-			ChatUtil.printConsoleAlert("Successfully registered Dynmap.");
+			isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.dynmap",false);
+			if(isEnabled) {
+				ChatUtil.printConsoleAlert("Successfully registered Dynmap.");
+			} else {
+				ChatUtil.printDebug("Skipping Dynmap integration from config settings");
+			}
 		}
 	}
 	
