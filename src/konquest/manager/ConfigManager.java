@@ -31,9 +31,9 @@ public class ConfigManager{
 		addConfig("shields", new KonConfig("shields"));
 		addConfig("loot", new KonConfig("loot"));
 		// Data Storage
-		migrateConfigFile("kingdoms","data");
-		migrateConfigFile("camps","data");
-		migrateConfigFile("ruins","data");
+		migrateConfigFile("kingdoms.yml","data");
+		migrateConfigFile("camps.yml","data");
+		migrateConfigFile("ruins.yml","data");
 		addConfig("kingdoms", new KonConfig("data/kingdoms"));
 		addConfig("camps", new KonConfig("data/camps"));
 		addConfig("ruins", new KonConfig("data/ruins"));

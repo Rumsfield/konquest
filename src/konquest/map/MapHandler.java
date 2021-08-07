@@ -42,7 +42,7 @@ public class MapHandler {
 			if(isEnabled) {
 				ChatUtil.printConsoleAlert("Successfully registered Dynmap.");
 			} else {
-				ChatUtil.printDebug("Skipping Dynmap integration from config settings");
+				ChatUtil.printConsoleAlert("Disabled Dynmap integration from core config settings.");
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 package konquest.database;
 
+import java.io.File;
 import java.sql.*;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -37,7 +38,8 @@ public class DatabaseConnection {
         	case SQLITE:
         		try {
         			ChatUtil.printConsoleAlert("Connecting to SQLite database");
-                	String databaseName = "plugins/Konquest/KonquestDatabase";
+        			migrateDatabaseFile("KonquestDatabase.db","data/KonquestDatabase.db");
+                	String databaseName = "plugins/Konquest/data/KonquestDatabase";
                     connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName + ".db", properties);
                     return;
                 } catch (SQLException e) {
@@ -186,4 +188,15 @@ public class DatabaseConnection {
     public Connection getConnection() {
         return connection;
     }
+    
+    private void migrateDatabaseFile(String oldPath, String newpath) {
+		File oldFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), oldPath);
+		File newFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), newpath);
+		if(oldFile.exists() && !newFile.exists()) {
+			if(oldFile.renameTo(newFile)) {
+				oldFile.delete();
+				ChatUtil.printConsoleAlert("Migrated database file "+oldPath+" to "+newpath);
+			}
+		}
+	}
 }
