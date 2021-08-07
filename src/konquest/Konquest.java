@@ -151,6 +151,7 @@ public class Konquest implements Timeable {
 		ChatUtil.printDebug("Primary world is "+worldName);
 		String configTag = configManager.getConfig("core").getString("core.chat.tag");
 		chatTag = ChatColor.translateAlternateColorCodes('&', configTag);
+		ChatUtil.printDebug("Chat tag is "+chatTag);
 		languageManager.initialize();
 		kingdomManager.initialize();
 		ruinManager.initialize();

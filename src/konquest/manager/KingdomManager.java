@@ -226,10 +226,13 @@ public class KingdomManager {
     			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_TOWN.getMessage(town.getName()));
     		}
     	}
-    	// Clear all stats
-    	player.getPlayerStats().clearStats();
-    	// Disable prefix
-    	player.getPlayerPrefix().setEnable(false);
+    	boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
+    	if(doRemoveStats) {
+	    	// Clear all stats
+	    	player.getPlayerStats().clearStats();
+	    	// Disable prefix
+	    	player.getPlayerPrefix().setEnable(false);
+    	}
     	// Force into global chat mode
     	player.setIsGlobalChat(true);
     	// Make into barbarian
