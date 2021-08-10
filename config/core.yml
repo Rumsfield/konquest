@@ -57,6 +57,7 @@
 #    min_distance_capital:          Minimum distance in chunks between Towns and Capitals (integer >= 0)
 #    max_distance_all:              Maximum distance in chunks between Towns and all other territory (0 to disable, integer >= 0)
 #    init_radius:                   Radius of initial settlements. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
+#    capture_upgrades:              Allow town upgrades to remain when the town is captured (true/false)
 #    capture_cooldown:              Time in seconds before a town can be captured again (integer >= 0)
 #    raid_alert_cooldown:           Time in seconds between raid alerts for Towns (integer >= 0)
 #    travel_cooldown:               Time in seconds for travel cool-down (integer >= 0)
@@ -172,6 +173,7 @@ core:
     min_distance_capital: 16
     max_distance_all: 99
     init_radius: 2
+    capture_upgrades: true
     capture_cooldown: 600
     raid_alert_cooldown: 30
     travel_cooldown: 120

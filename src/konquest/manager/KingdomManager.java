@@ -456,10 +456,10 @@ public class KingdomManager {
 		if(!conquerKingdom.getMonumentTemplate().isValid()) {
 			return false;
 		}
+		boolean captureUpgrades = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.capture_upgrades",true);
 		if(isKingdom(oldKingdomName) && getKingdom(oldKingdomName).hasTown(name)) {
 			konquest.getMapHandler().drawDynmapRemoveTerritory(getKingdom(oldKingdomName).getTown(name));
 			getKingdom(oldKingdomName).getTown(name).purgeResidents();
-			getKingdom(oldKingdomName).getTown(name).clearUpgrades();
 			getKingdom(oldKingdomName).getTown(name).clearShieldsArmors();
 			getKingdom(oldKingdomName).getTown(name).setKingdom(conquerKingdom);
 			conquerKingdom.addTownConquer(name, getKingdom(oldKingdomName).removeTownConquer(name));
@@ -467,6 +467,11 @@ public class KingdomManager {
 			refreshTownNerfs(conquerKingdom.getTown(name));
 			refreshTownHearts(conquerKingdom.getTown(name));
 			conquerKingdom.getTown(name).updateBarPlayers();
+			if(captureUpgrades) {
+				konquest.getUpgradeManager().updateTownDisabledUpgrades(conquerKingdom.getTown(name));
+			} else {
+				conquerKingdom.getTown(name).clearUpgrades();
+			}
 			konquest.getMapHandler().drawDynmapUpdateTerritory(conquerKingdom.getTown(name));
 			konquest.getIntegrationManager().deleteShopsInPoints(conquerKingdom.getTown(name).getChunkList().keySet(),conquerKingdom.getTown(name).getWorld());
 			return true;
