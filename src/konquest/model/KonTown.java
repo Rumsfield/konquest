@@ -52,6 +52,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	private HashMap<UUID,Boolean> residents;
 	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident, false = requesting add from lord/knight)
 	private boolean isOpen;
+	private boolean isEnemyRedstoneAllowed;
 	private boolean isAttacked;
 	private boolean isShielded;
 	private boolean isArmored;
@@ -86,6 +87,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.residents = new HashMap<UUID,Boolean>();
 		this.joinRequests = new HashMap<UUID,Boolean>();
 		this.isOpen = false; // init as a closed Town, requires Lord to add players as residents for build/container perms
+		this.isEnemyRedstoneAllowed = false;
 		this.isAttacked = false;
 		this.isShielded = false;
 		this.shieldEndTimeSeconds = 0;
@@ -692,6 +694,14 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	public boolean isOpen() {
 		return isOpen ? true : false;
+	}
+	
+	public void setIsEnemyRedstoneAllowed(boolean val) {
+		isEnemyRedstoneAllowed = val;
+	}
+	
+	public boolean isEnemyRedstoneAllowed() {
+		return isEnemyRedstoneAllowed ? true : false;
 	}
 	
 	public boolean canClaimLordship(KonPlayer player) {

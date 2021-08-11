@@ -1954,6 +1954,9 @@ public class KingdomManager {
 	            	// Set open flag
 	            	boolean isOpen = townSection.getBoolean("open",false);
 	            	town.setIsOpen(isOpen);
+	            	// Set redstone flag
+	            	boolean isRedstone = townSection.getBoolean("redstone",false);
+	            	town.setIsEnemyRedstoneAllowed(isRedstone);
 	            	// Assign Lord
 	            	String lordUUID = townSection.getString("lord","");
 	            	if(!lordUUID.equalsIgnoreCase("")) {
@@ -2099,6 +2102,7 @@ public class KingdomManager {
 						 									 (int) town.getCenterLoc().getZ()});
                 townInstanceSection.set("chunks", konquest.formatPointsToString(town.getChunkList().keySet()));
                 townInstanceSection.set("open", town.isOpen());
+                townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());
                 townInstanceSection.set("shield", town.isShielded());
                 townInstanceSection.set("shield_time", town.getShieldEndTime());
                 townInstanceSection.set("armor", town.isArmored());
