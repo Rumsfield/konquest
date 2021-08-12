@@ -3,6 +3,7 @@ package konquest.manager;
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.Location;
@@ -230,6 +231,7 @@ public class LootManager implements Timeable{
         		}
             	if(status && itemWeight > 0) {
             		// Add loot table entry
+            		/*
             		if(itemLevel == 0) {
             			// Choose random level
             			itemLevel = randomness.nextInt(bookType.getMaxLevel()+1);
@@ -237,6 +239,7 @@ public class LootManager implements Timeable{
         					itemLevel = bookType.getStartLevel();
         				}
             		}
+            		*/
     				ItemStack enchantBook = new ItemStack(Material.ENCHANTED_BOOK, 1);
     				EnchantmentStorageMeta enchantMeta = (EnchantmentStorageMeta)enchantBook.getItemMeta();
     				enchantMeta.addStoredEnchant(bookType, itemLevel, true);
@@ -475,6 +478,22 @@ public class LootManager implements Timeable{
 					break;
 				}
 				typeWindow = typeWindow + itemOptions.get(i);
+			}
+		}
+		// Check for enchanted item with level 0
+		Map<Enchantment,Integer> enchants = item.getEnchantments();
+		if(!enchants.isEmpty()) {
+			for(Enchantment e : enchants.keySet()) {
+				if(enchants.get(e) == 0) {
+					// Choose random level
+					int newLevel = randomness.nextInt(e.getMaxLevel()+1);
+					if(newLevel < e.getStartLevel()) {
+						newLevel = e.getStartLevel();
+					}
+					item.removeEnchantment(e);
+					item.addEnchantment(e, newLevel);
+					ChatUtil.printDebug("Enchanted loot item "+item.getType().toString()+" updated "+e.getKey().getKey()+" from level 0 to "+newLevel);
+				}
 			}
 		}
 		//ChatUtil.printDebug("Choosing random item out of "+total+", chose "+typeChoice+", got "+item.getType().toString());

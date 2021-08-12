@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import konquest.Konquest;
 import konquest.model.KonConfig;
@@ -67,10 +68,13 @@ public class ConfigManager{
 	}
 	
 	public FileConfiguration getConfig(String key) {
+		FileConfiguration result = new YamlConfiguration();
 		if(!configCache.containsKey(key)) {
 			ChatUtil.printConsoleError("Failed to find non-existant config "+key);
+		} else {
+			result =  configCache.get(key).getConfig();
 		}
-		return configCache.get(key).getConfig();
+		return result;
 	}
 	
 	public boolean addConfig(String key, KonConfig config) {
