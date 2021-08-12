@@ -1,6 +1,10 @@
 package konquest.manager;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -31,9 +35,9 @@ public class ConfigManager{
 		addConfig("shields", new KonConfig("shields"));
 		addConfig("loot", new KonConfig("loot"));
 		// Data Storage
-		migrateConfigFile("kingdoms.yml","data");
-		migrateConfigFile("camps.yml","data");
-		migrateConfigFile("ruins.yml","data");
+		migrateConfigFile("kingdoms.yml","data/kingdoms.yml");
+		migrateConfigFile("camps.yml","data/camps.yml");
+		migrateConfigFile("ruins.yml","data/ruins.yml");
 		addConfig("kingdoms", new KonConfig("data/kingdoms"));
 		addConfig("camps", new KonConfig("data/camps"));
 		addConfig("ruins", new KonConfig("data/ruins"));
@@ -122,15 +126,28 @@ public class ConfigManager{
 		ChatUtil.printConsoleError("Bad config file \""+key+"\", saved default version. Review this file for errors.");
 	}
 	
-	public void migrateConfigFile(String name, String path) {
-		String newName = path+"/"+name;
-		File oldFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), name);
-		File newFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), newName);
-		if(oldFile.exists() && !newFile.exists()) {
+	private void migrateConfigFile(String oldPath, String newpath) {
+		File oldFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), oldPath);
+		File newFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), newpath);
+		if(oldFile.exists()) {
+			Path source = oldFile.toPath();
+			Path destination = newFile.toPath();
+			try {
+				Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
+				oldFile.delete();
+				ChatUtil.printConsoleAlert("Migrated data file "+oldPath+" to "+newpath);
+			} catch (IOException e) {
+				e.printStackTrace();
+				ChatUtil.printDebug("Failed to move file "+oldPath+" to "+newpath);
+			}
+			/*
 			if(oldFile.renameTo(newFile)) {
 				oldFile.delete();
-				ChatUtil.printConsoleAlert("Migrated file "+name+" to "+newName);
+				ChatUtil.printConsoleAlert("Migrated data file "+oldPath+" to "+newpath);
+			} else {
+				ChatUtil.printDebug("Failed to rename file "+oldPath+" to "+newpath);
 			}
+			*/
 		}
 	}
 

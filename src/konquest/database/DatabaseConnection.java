@@ -1,6 +1,10 @@
 package konquest.database;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -192,10 +196,16 @@ public class DatabaseConnection {
     private void migrateDatabaseFile(String oldPath, String newpath) {
 		File oldFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), oldPath);
 		File newFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), newpath);
-		if(oldFile.exists() && !newFile.exists()) {
-			if(oldFile.renameTo(newFile)) {
+		if(oldFile.exists()) {
+			Path source = oldFile.toPath();
+			Path destination = newFile.toPath();
+			try {
+				Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
 				oldFile.delete();
 				ChatUtil.printConsoleAlert("Migrated database file "+oldPath+" to "+newpath);
+			} catch (IOException e) {
+				e.printStackTrace();
+				ChatUtil.printDebug("Failed to move database file "+oldPath+" to "+newpath);
 			}
 		}
 	}

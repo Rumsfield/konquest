@@ -1,5 +1,6 @@
 package konquest.manager;
 
+import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
@@ -94,7 +95,7 @@ public class LootManager implements Timeable{
 			lootCount = 0;
 		}
 		if(loadLoot()) {
-			ChatUtil.printConsoleAlert("Finished loading loot table.");
+			ChatUtil.printConsoleAlert("Loaded loot table from loot.yml");
 		} else {
 			ChatUtil.printConsoleError("Failed to load loot table, check for syntax errors.");
 		}
@@ -112,6 +113,7 @@ public class LootManager implements Timeable{
         }
         ConfigurationSection lootEntry = null;
         boolean status = true;
+        ChatUtil.printDebug("Loading loot...");
         
         // Load items
         Material itemType = null;
@@ -145,6 +147,7 @@ public class LootManager implements Timeable{
             	if(status && itemWeight > 0) {
             		// Add loot table entry
             		lootTable.put(new ItemStack(itemType, itemAmount), itemWeight);
+            		ChatUtil.printDebug("  Added loot item "+itemName+" with amount "+itemAmount+", weight "+itemWeight);
             	}
             }
         }
@@ -164,7 +167,7 @@ public class LootManager implements Timeable{
             		ChatUtil.printConsoleError("Invalid loot potion \""+potionName+"\" given in loot.yml, skipping this potion.");
             		status = false;
         		}
-            	lootEntry = itemsSection.getConfigurationSection(potionName);
+            	lootEntry = potionsSection.getConfigurationSection(potionName);
             	if(lootEntry.contains("upgraded")) {
             		itemUpgraded = lootEntry.getBoolean("upgraded",false);
         		} else {
@@ -192,6 +195,7 @@ public class LootManager implements Timeable{
     				meta.setBasePotionData(new PotionData(potionType, itemExtended, itemUpgraded));
     				potion.setItemMeta(meta);
             		lootTable.put(potion, itemWeight);
+            		ChatUtil.printDebug("  Added loot potion "+potionName+" with extended "+itemExtended+", upgraded "+itemUpgraded+", weight "+itemWeight);
             	}
             }
         }
@@ -209,7 +213,7 @@ public class LootManager implements Timeable{
             		ChatUtil.printConsoleError("Invalid loot enchantment \""+enchantName+"\" given in loot.yml, skipping this enchantment.");
             		status = false;
         		}
-            	lootEntry = itemsSection.getConfigurationSection(enchantName);
+            	lootEntry = ebookSection.getConfigurationSection(enchantName);
             	if(lootEntry.contains("level")) {
             		itemLevel = lootEntry.getInt("level",0);
             		itemLevel = itemLevel < 0 ? 0 : itemLevel;
@@ -238,6 +242,7 @@ public class LootManager implements Timeable{
     				enchantMeta.addStoredEnchant(bookType, itemLevel, true);
     				enchantBook.setItemMeta(enchantMeta);
             		lootTable.put(enchantBook, itemWeight);
+            		ChatUtil.printDebug("  Added loot enchant "+enchantName+" with level "+itemLevel+", weight "+itemWeight);
             	}
             }
         }
@@ -245,14 +250,14 @@ public class LootManager implements Timeable{
         return true;
 	}
 	
-	private Enchantment getEnchantment(String name) {
+	private Enchantment getEnchantment(String fieldName) {
 		Enchantment result = null;
-		Enchantment[] allValues = Enchantment.values();
-		for(int i = 0; i < allValues.length; i++) {
-			if(name.equalsIgnoreCase(allValues[i].toString())) {
-				result = allValues[i];
-				break;
-			}
+		try {
+			Class<?> c = Enchantment.class;
+			Field field = c.getDeclaredField(fieldName);
+			result = (Enchantment)field.get(null);
+		} catch(NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			//ChatUtil.printConsoleError("Enchantment field "+fieldName+" does not match any known enchantments!");
 		}
 		return result;
 	}
