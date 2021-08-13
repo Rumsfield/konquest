@@ -537,7 +537,6 @@ public class DisplayManager {
 		OptionIcon option;
 		ArrayList<String> loreList;
 		String currentValue;
-		ChatColor nameColor = ChatColor.GREEN;
 		ChatColor loreColor = ChatColor.YELLOW;
 		ChatColor valueColor = ChatColor.AQUA;
 		ChatColor hintColor = ChatColor.GOLD;
@@ -555,7 +554,7 @@ public class DisplayManager {
     	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_OPEN.getMessage()));
     	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
     	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-		option = new OptionIcon(optionAction.TOWN_OPEN, nameColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.DARK_OAK_DOOR, 3);
+		option = new OptionIcon(optionAction.TOWN_OPEN, loreColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.DARK_OAK_DOOR, 3);
 		newMenu.getPage(0).addIcon(option);
 		
 		// Redstone Info Icon
@@ -564,7 +563,7 @@ public class DisplayManager {
     	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_REDSTONE.getMessage()));
     	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
     	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-		option = new OptionIcon(optionAction.TOWN_REDSTONE, nameColor+MessagePath.LABEL_REDSTONE.getMessage(), loreList, Material.LEVER, 5);
+		option = new OptionIcon(optionAction.TOWN_REDSTONE, loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage(), loreList, Material.LEVER, 5);
 		newMenu.getPage(0).addIcon(option);
 		
 		newMenu.refreshNavigationButtons();
@@ -984,6 +983,7 @@ public class DisplayManager {
 		newMenu.getPage(0).addIcon(info);
 		/* Properties Info Icon (5) */
     	String isOpen = boolean2Symbol(infoTown.isOpen());
+    	String isRedstone = boolean2Symbol(infoTown.isEnemyRedstoneAllowed());
     	String isProtected = boolean2Symbol((infoTown.isCaptureDisabled() || infoTown.getKingdom().isOfflineProtected() || infoTown.isTownWatchProtected()));
     	String isAttacked = boolean2Symbol(infoTown.isAttacked());
     	String isShielded = boolean2Symbol(infoTown.isShielded());
@@ -991,6 +991,7 @@ public class DisplayManager {
     	String isPeaceful = boolean2Symbol(infoTown.getKingdom().isPeaceful());
     	loreList = new ArrayList<String>();
     	loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
+    	loreList.add(loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage()+": "+isRedstone);
     	loreList.add(loreColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage()+": "+isAttacked);
     	loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
     	loreList.add(loreColor+MessagePath.LABEL_SHIELD.getMessage()+": "+isShielded);

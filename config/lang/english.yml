@@ -56,7 +56,7 @@ label:
   armor: "Armor"
   critical-hits: "Critical Hits"
   options: "Options"
-  redstone: "Redstone"
+  enemy-redstone: "Enemy Redstone"
   true: "True"
   false: "False"
 menu:
@@ -393,8 +393,10 @@ command:
       town: "Could not find an enemy town."
   town:
     notice:
-      open: "Opened %s for access by all players."
+      open: "Opened %s for access by all kingdom members."
       close: "Closed %s, only residents may build and access containers."
+      redstone-enable: "%s now allows enemies to use redstone switches and doors."
+      redstone-disable: "%s now prevents enemies from using redstone switches and doors."
       add-invite-reminder: "You have been invited to join the town of %s."
       add-success: "Added %s as a resident of %s."
       add-invite: "Sending an invite to %s to join %s."

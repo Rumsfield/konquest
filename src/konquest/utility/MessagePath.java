@@ -53,7 +53,7 @@ public enum MessagePath {
 	LABEL_ARMOR                             	(0, "label.armor"),
 	LABEL_CRITICAL_HITS                        	(0, "label.critical-hits"),
 	LABEL_OPTIONS                             	(0, "label.options"),
-	LABEL_REDSTONE                             	(0, "label.redstone"),
+	LABEL_ENEMY_REDSTONE                        (0, "label.enemy-redstone"),
 	LABEL_TRUE                               	(0, "label.true"),
 	LABEL_FALSE                             	(0, "label.false"),
 	
@@ -309,6 +309,8 @@ public enum MessagePath {
 	COMMAND_SPY_ERROR_TOWN                      (0, "command.spy.error.town"),
 	COMMAND_TOWN_NOTICE_OPEN                    (1, "command.town.notice.open"),
 	COMMAND_TOWN_NOTICE_CLOSE                   (1, "command.town.notice.close"),
+	COMMAND_TOWN_NOTICE_REDSTONE_ENABLE         (1, "command.town.notice.redstone-enable"),
+	COMMAND_TOWN_NOTICE_REDSTONE_DISABLE        (1, "command.town.notice.redstone-disable"),
 	COMMAND_TOWN_NOTICE_ADD_INVITE_REMINDER     (1, "command.town.notice.add-invite-reminder"),
 	COMMAND_TOWN_NOTICE_ADD_SUCCESS             (2, "command.town.notice.add-success"),
 	COMMAND_TOWN_NOTICE_ADD_INVITE              (2, "command.town.notice.add-invite"),

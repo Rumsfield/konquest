@@ -30,11 +30,11 @@ public class HelpCommand extends CommandBase{
         	String cmdArgsFormatted = cmd.arguments();
         	cmdArgsFormatted = cmdArgsFormatted.replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA);
         	cmdArgsFormatted = cmdArgsFormatted.replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA);
-        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("|", ChatColor.GRAY+"|"+ChatColor.AQUA);
+        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA);
         	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\]", ChatColor.GRAY+"]"+ChatColor.AQUA);
         	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
         	
-        	message = ChatColor.GOLD+"/k "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted+ChatColor.GRAY+": "+cmd.description()+ChatColor.LIGHT_PURPLE+aliasmsg;
+        	message = ChatColor.GOLD+"/k "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted+ChatColor.WHITE+": "+cmd.description()+ChatColor.LIGHT_PURPLE+aliasmsg;
         	ChatUtil.sendMessage((Player) getSender(), message);
         }
     }

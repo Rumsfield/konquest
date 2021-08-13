@@ -1314,12 +1314,13 @@ public class KingdomManager {
 					if(town.isEnemyRedstoneAllowed()) {
 						// Disable enemy redstone
 	            		town.setIsEnemyRedstoneAllowed(false);
+	            		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_DISABLE.getMessage(town.getName()));
 					} else {
 						// Enable enemy redstone
 						town.setIsEnemyRedstoneAllowed(true);
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_ENABLE.getMessage(town.getName()));
 					}
 					result = true;
-					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
             	} else {
             		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
             	}
