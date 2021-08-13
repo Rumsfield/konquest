@@ -191,6 +191,7 @@ public class KingdomManager {
 		    	updateSmallestKingdom();
 		    	konquest.updateNamePackets(player);
 		    	konquest.getDirectiveManager().displayBook(player);
+		    	konquest.getMapHandler().drawDynmapLabel(getKingdom(kingdomName).getCapital());
 		    	updateKingdomOfflineProtection();
 			} else {
 				return 2;
@@ -219,9 +220,10 @@ public class KingdomManager {
     	if(randomWildLoc == null) {
     		return false;
     	}
+    	KonKingdom oldKingdom = player.getKingdom();
     	player.getBukkitPlayer().teleport(randomWildLoc);
     	player.getBukkitPlayer().setBedSpawnLocation(randomWildLoc, true);
-    	player.setExileKingdom(player.getKingdom());
+    	player.setExileKingdom(oldKingdom);
     	// Remove residency
     	for(KonTown town : player.getKingdom().getTowns()) {
     		if(town.removePlayerResident(player.getOfflineBukkitPlayer())) {
@@ -244,6 +246,7 @@ public class KingdomManager {
     	//konquest.getPlayerManager().saveAllPlayers();
     	//konquest.getPlayerManager().updateAllSavedPlayers();
     	konquest.updateNamePackets(player);
+    	konquest.getMapHandler().drawDynmapLabel(oldKingdom.getCapital());
     	updateSmallestKingdom();
     	updateKingdomOfflineProtection();
     	return true;
@@ -382,6 +385,7 @@ public class KingdomManager {
 				//updateTerritoryCache();
 				removeAllTerritory(town.getWorld(),townPoints);
 				konquest.getMapHandler().drawDynmapRemoveTerritory(town);
+				konquest.getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
 				konquest.getIntegrationManager().deleteShopsInPoints(townPoints,town.getWorld());
 				return true;
 			}
@@ -476,6 +480,8 @@ public class KingdomManager {
 				conquerKingdom.getTown(name).clearUpgrades();
 			}
 			konquest.getMapHandler().drawDynmapUpdateTerritory(conquerKingdom.getTown(name));
+			konquest.getMapHandler().drawDynmapLabel(getKingdom(oldKingdomName).getCapital());
+			konquest.getMapHandler().drawDynmapLabel(conquerKingdom.getCapital());
 			konquest.getIntegrationManager().deleteShopsInPoints(conquerKingdom.getTown(name).getChunkList().keySet(),conquerKingdom.getTown(name).getWorld());
 			return true;
 		}
@@ -518,6 +524,7 @@ public class KingdomManager {
 			if(closestAdjTerr.getWorld().equals(loc.getWorld()) && closestAdjTerr.addChunk(addPoint)) {
 				addTerritory(loc.getWorld(),addPoint,closestAdjTerr);
 				konquest.getMapHandler().drawDynmapUpdateTerritory(closestAdjTerr);
+				konquest.getMapHandler().drawDynmapLabel(closestAdjTerr.getKingdom().getCapital());
 				return 0;
 			} else {
 				return 2;
@@ -727,6 +734,7 @@ public class KingdomManager {
     		konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CLAIM_LAND);
     		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,numChunksClaimed);
     		konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
+    		konquest.getMapHandler().drawDynmapLabel(territory.getKingdom().getCapital());
     		String territoryName = territory.getName();
     		// Display town info to players in the newly claimed chunks
     		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
@@ -779,6 +787,7 @@ public class KingdomManager {
 				//updateTerritoryCache();
 				removeTerritory(loc);
 				konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
+				konquest.getMapHandler().drawDynmapLabel(territory.getKingdom().getCapital());
 				return true;
 			}
 		}

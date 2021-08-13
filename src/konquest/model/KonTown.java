@@ -727,11 +727,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 	
 	public void setPlayerLord(OfflinePlayer player) {
-		lord = player.getUniqueId();
-		if(!residents.containsKey(player.getUniqueId())) {
-			residents.put(player.getUniqueId(),true);
-			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-		}
+		setLord(player.getUniqueId());
 	}
 	
 	public void setLord(UUID id) {
@@ -739,6 +735,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		if(!residents.containsKey(id)) {
 			residents.put(id,true);
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
+			getKonquest().getMapHandler().drawDynmapLabel(this);
 		}
 	}
 	
@@ -779,6 +776,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		if(!residents.containsKey(playerUUID)) {
 			residents.put(playerUUID,isElite);
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
+			getKonquest().getMapHandler().drawDynmapLabel(this);
 			status = true;
 		}
 		return status;
@@ -793,6 +791,7 @@ public class KonTown extends KonTerritory implements Timeable{
 				lord = null;
 			}
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
+			getKonquest().getMapHandler().drawDynmapLabel(this);
 			if(residents.isEmpty()) {
 				clearShieldsArmors();
 			}

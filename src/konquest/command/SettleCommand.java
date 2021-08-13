@@ -142,6 +142,9 @@ public class SettleCommand extends CommandBase {
         		// Update stats
         		getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.SETTLED,1);
         		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
+        		// Update labels
+        		getKonquest().getMapHandler().drawDynmapLabel(town);
+        		getKonquest().getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
         	} else {
         		switch(settleStatus) {
         		case 1:
