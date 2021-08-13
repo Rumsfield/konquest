@@ -2256,6 +2256,7 @@ public class KingdomManager {
     	KonTerritory closestTerritory = null;
     	boolean isLocValidSettle = true;
 		int minDistance = Integer.MAX_VALUE;
+		int proximity = Integer.MAX_VALUE;
 		int searchDist = 0;
 		int min_distance_capital = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
 		int min_distance_town = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
@@ -2267,6 +2268,7 @@ public class KingdomManager {
 			if(searchDist != -1) {
 				if(searchDist < minDistance) {
 					minDistance = searchDist;
+					proximity = searchDist;
 					closestTerritory = kingdom.getCapital();
 				}
 				if(searchDist < min_distance_capital) {
@@ -2278,6 +2280,7 @@ public class KingdomManager {
 				if(searchDist != -1) {
 					if(searchDist < minDistance) {
 						minDistance = searchDist;
+						proximity = searchDist;
 						closestTerritory = town;
 					}
 					if(searchDist < min_distance_town) {
@@ -2291,12 +2294,23 @@ public class KingdomManager {
 			if(searchDist != -1) {
 				if(searchDist < minDistance) {
 					minDistance = searchDist;
+					proximity = searchDist;
 					closestTerritory = ruin;
 				}
 				if(searchDist < min_distance_town) {
 					isLocValidSettle = false;
 				}
 			}
+		}
+		for(KonCamp camp : getCamps()) {
+			searchDist = Konquest.chunkDistance(center, camp.getCenterLoc());
+			if(searchDist != -1) {
+				if(searchDist < minDistance) {
+					proximity = searchDist;
+					closestTerritory = camp;
+				}
+			}
+			
 		}
 		// Verify max distance
 		int max_distance_all = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_distance_all");
@@ -2385,11 +2399,13 @@ public class KingdomManager {
     	ChatColor closestTerritoryColor = ChatColor.GRAY;
     	int distance = 0;
     	if(closestTerritory != null) {
-    		distance = minDistance;
+    		distance = proximity;
     		//distance = Konquest.distanceInChunks(center.getChunk(), closestTerritory.getCenterLoc().getChunk());
     		//distance = (int) originPoint.distance(konquest.toPoint(closestTerritory.getCenterLoc().getChunk()));
     		if(closestTerritory.getKingdom().equals(getBarbarians())) {
     			closestTerritoryColor = ChatColor.YELLOW;
+    		}  else if(closestTerritory.getKingdom().equals(getNeutrals())) {
+    			closestTerritoryColor = ChatColor.DARK_GRAY;
     		} else {
     			if(player.getKingdom().equals(closestTerritory.getKingdom())) {
         			closestTerritoryColor = ChatColor.GREEN;
@@ -2405,6 +2421,7 @@ public class KingdomManager {
     	}
     	if(distance > maxDist) {
     		distStr = ""+maxDist+"+";
+    		closestTerritoryColor = ChatColor.GRAY;
     	} else {
     		distStr = ""+distance;
     	}
