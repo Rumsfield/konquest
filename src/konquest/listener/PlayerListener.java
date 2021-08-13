@@ -456,7 +456,7 @@ public class PlayerListener implements Listener{
 					}
 					*/
         			// Prevent enemies from interacting with things like buttons, levers, pressure plates...
-        			if(!player.getKingdom().equals(town.getKingdom())) {
+        			if(!player.getKingdom().equals(town.getKingdom()) && !town.isEnemyRedstoneAllowed()) {
         				if(event.getAction().equals(Action.PHYSICAL)) {
         					// Prevent all physical stepping interaction
         					event.setUseInteractedBlock(Event.Result.DENY);
