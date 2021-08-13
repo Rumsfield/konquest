@@ -73,8 +73,8 @@ public class KingdomManager {
 	public KingdomManager(Konquest konquest) {
 		this.konquest = konquest;
 		kingdomMap = new HashMap<String, KonKingdom>();
-		barbarians = new KonKingdom("Barbarians",konquest);
-		neutrals = new KonKingdom("Neutrals",konquest);
+		barbarians = null;
+		neutrals = null;
 		territoryWorldCache = new HashMap<World,KonTerritoryCache>();
 		barbarianCamps = new HashMap<String,KonCamp>();
 		townNerfs = new HashMap<PotionEffectType,Integer>();
@@ -82,6 +82,8 @@ public class KingdomManager {
 	}
 	
 	public void initialize() {
+		barbarians = new KonKingdom("Barbarians",konquest);
+		neutrals = new KonKingdom("Neutrals",konquest);
 		loadCriticalBlocks();
 		loadKingdoms();
 		updateKingdomOfflineProtection();

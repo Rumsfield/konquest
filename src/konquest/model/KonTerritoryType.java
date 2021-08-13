@@ -11,7 +11,7 @@ public enum KonTerritoryType {
     NEUTRAL		(MessagePath.TERRITORY_NEUTRAL.getMessage()),
     OTHER		(MessagePath.TERRITORY_OTHER.getMessage());
 
-	private final String label;
+	private String label;
 	
 	KonTerritoryType(String label) {
 		this.label = label;
@@ -21,6 +21,7 @@ public enum KonTerritoryType {
 		return label;
 	}
 	
+	/*
     public static KonTerritoryType parseString(String territoryType) {
         switch (territoryType.toLowerCase()) {
             case "wild": return KonTerritoryType.WILD;
@@ -33,4 +34,5 @@ public enum KonTerritoryType {
         }
         return null;
     }
+    */
 }
