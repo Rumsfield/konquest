@@ -52,6 +52,10 @@ public enum MessagePath {
 	LABEL_ARMORS                            	(0, "label.armors"),
 	LABEL_ARMOR                             	(0, "label.armor"),
 	LABEL_CRITICAL_HITS                        	(0, "label.critical-hits"),
+	LABEL_OPTIONS                             	(0, "label.options"),
+	LABEL_REDSTONE                             	(0, "label.redstone"),
+	LABEL_TRUE                               	(0, "label.true"),
+	LABEL_FALSE                             	(0, "label.false"),
 	
 	MENU_STATS_TITLE                            (0, "menu.stats.title"),
 	MENU_STATS_INTRO_1                          (0, "menu.stats.intro-1"),
@@ -99,6 +103,10 @@ public enum MessagePath {
 	MENU_SHIELD_FAIL_COST                       (1, "menu.shield.fail-cost"),
 	MENU_SHIELD_ACTIVATE_NEW                    (2, "menu.shield.activate-new"),
 	MENU_SHIELD_ACTIVATE_ADD                    (2, "menu.shield.activate-add"),
+	MENU_OPTIONS_HINT                           (0, "menu.options.hint"),
+	MENU_OPTIONS_CURRENT                        (1, "menu.options.current"),
+	MENU_OPTIONS_OPEN                           (0, "menu.options.open"),
+	MENU_OPTIONS_REDSTONE                       (0, "menu.options.redstone"),
 
 	GENERIC_NOTICE_ENABLE_AUTO                  (0, "generic.notice.enable-auto"),
 	GENERIC_NOTICE_DISABLE_AUTO                 (0, "generic.notice.disable-auto"),
@@ -533,6 +541,14 @@ public enum MessagePath {
 	DESCRIPTION_ADMIN_RELOAD                    (0, "description.admin-reload"),
 	DESCRIPTION_ADMIN_FLAG                      (0, "description.admin-flag"),
 	DESCRIPTION_ADMIN_STAT                      (0, "description.admin-stat"),
+	
+	TERRITORY_WILD                              (0, "territory.wild"),
+	TERRITORY_CAPITAL                           (0, "territory.capital"),
+	TERRITORY_TOWN                              (0, "territory.town"),
+	TERRITORY_CAMP                              (0, "territory.camp"),
+	TERRITORY_RUIN                              (0, "territory.ruin"),
+	TERRITORY_NEUTRAL                           (0, "territory.neutral"),
+	TERRITORY_OTHER                             (0, "territory.other"),
 	
 	NULL_MESSAGE	(0,"");
 	

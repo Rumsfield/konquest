@@ -55,6 +55,10 @@ label:
   armors: "Armors"
   armor: "Armor"
   critical-hits: "Critical Hits"
+  options: "Options"
+  redstone: "Redstone"
+  true: "True"
+  false: "False"
 menu:
   stats:
     title: "Accomplishment Stats"
@@ -110,6 +114,11 @@ menu:
     fail-cost: "Failed to charge, requires %s Favor."
     activate-new: "Charged %s for %s."
     activate-add: "Increased charge with %s by %s."
+  options:
+    hint: "Click to change"
+    current: "Current: %s"
+    open: "All members can build and use chests"
+    redstone: "Enemies can use redstone switches and doors"
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."
@@ -633,4 +642,12 @@ description:
   admin-reload: "Reloads configuration files."
   admin-flag: "Set kingdom flags. Use the command with no arguments to list available flags."
   admin-stat: "Manage player stats."
+territory:
+  wild: "Wild"
+  capital: "Capital"
+  town: "Town"
+  camp: "Camp"
+  ruin: "Ruin"
+  neutral: "Neutral"
+  other: "Other"
   

@@ -34,6 +34,7 @@ import org.bukkit.potion.PotionEffectType;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.command.TravelCommand.TravelDestination;
+import konquest.display.OptionIcon.optionAction;
 import konquest.model.KonCamp;
 import konquest.model.KonDirective;
 import konquest.model.KonKingdom;
@@ -1268,6 +1269,63 @@ public class KingdomManager {
 		}
 		ChatUtil.printDebug("Successfully removed camp for UUID "+uuid);
 		return true;
+	}
+	
+	/**
+	 * Updates a town option based on action
+	 * @param action
+	 * @param town
+	 * @param bukkitPlayer
+	 * @return true if action was successful
+	 */
+	public boolean changeTownOption(optionAction action, KonTown town, Player bukkitPlayer) {
+		boolean result = false;
+		switch(action) {
+			case TOWN_OPEN:
+				// Verify town lord
+				if(town.isPlayerLord(bukkitPlayer)) {
+					if(town.isOpen()) {
+						// Close the town
+	            		town.setIsOpen(false);
+	            		for(OfflinePlayer resident : town.getPlayerResidents()) {
+			    			if(resident.isOnline()) {
+			    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_CLOSE.getMessage(town.getName()));
+			    			}
+			    		}
+					} else {
+						// Open the town
+						town.setIsOpen(true);
+	            		for(OfflinePlayer resident : town.getPlayerResidents()) {
+			    			if(resident.isOnline()) {
+			    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_OPEN.getMessage(town.getName()));
+			    			}
+			    		}
+					}
+					result = true;
+            	} else {
+            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+            	}
+				break;
+			case TOWN_REDSTONE:
+				// Verify town lord
+				if(town.isPlayerLord(bukkitPlayer)) {
+					if(town.isEnemyRedstoneAllowed()) {
+						// Disable enemy redstone
+	            		town.setIsEnemyRedstoneAllowed(false);
+					} else {
+						// Enable enemy redstone
+						town.setIsEnemyRedstoneAllowed(true);
+					}
+					result = true;
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+            	} else {
+            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+            	}
+				break;
+			default:
+				break;
+		}
+		return result;
 	}
 	
 	private void makeTownNerfs() {

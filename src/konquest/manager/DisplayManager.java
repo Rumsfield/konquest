@@ -26,6 +26,8 @@ import konquest.display.DisplayMenu;
 import konquest.display.InfoIcon;
 import konquest.display.KingdomIcon;
 import konquest.display.MenuIcon;
+import konquest.display.OptionIcon;
+import konquest.display.OptionIcon.optionAction;
 import konquest.display.PagedMenu;
 import konquest.display.PlayerIcon;
 import konquest.display.PlayerIcon.PlayerIconAction;
@@ -278,6 +280,24 @@ public class DisplayManager {
 					} else {
 						ChatUtil.printDebug("Failed to find inventory menu in town cache");
 					}
+				} else if(clickedIcon instanceof OptionIcon) {
+					// Option Icons close the GUI and attempt to change a town setting
+					if(townCache.containsKey(inv)) {
+						OptionIcon icon = (OptionIcon)clickedIcon;
+						boolean status = konquest.getKingdomManager().changeTownOption(icon.getAction(), townCache.get(inv), bukkitPlayer);
+						if(status) {
+							Konquest.playSuccessSound(bukkitPlayer);
+						}
+						menuCache.remove(inv);
+						Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+				            @Override
+				            public void run() {
+				            	bukkitPlayer.closeInventory();
+				            }
+				        });
+					} else {
+						ChatUtil.printDebug("Failed to find inventory menu in town cache");
+					}
 				}
 			}
 		}	
@@ -490,6 +510,62 @@ public class DisplayManager {
 				pageNum++;
 			}
 		}
+		
+		newMenu.refreshNavigationButtons();
+		newMenu.setPageIndex(0);
+		menuCache.put(newMenu.getCurrentPage().getInventory(), newMenu);
+		townCache.put(newMenu.getCurrentPage().getInventory(), town);
+		// Schedule delayed task to display inventory to player
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	//displayPlayer.getBukkitPlayer().closeInventory();
+            	bukkitPlayer.openInventory(newMenu.getCurrentPage().getInventory());
+            }
+        },1);
+	}
+	
+	/*
+	 * ===============================================
+	 * Town Options Menu
+	 * ===============================================
+	 */
+	public void displayTownOptionsMenu(Player bukkitPlayer, KonTown town) {
+		
+		playMenuOpenSound(bukkitPlayer);
+    	
+		OptionIcon option;
+		ArrayList<String> loreList;
+		String currentValue;
+		ChatColor nameColor = ChatColor.GREEN;
+		ChatColor loreColor = ChatColor.YELLOW;
+		ChatColor valueColor = ChatColor.AQUA;
+		ChatColor hintColor = ChatColor.GOLD;
+		
+ 		// Create fresh paged menu
+ 		PagedMenu newMenu = new PagedMenu();
+		
+		// Page 0
+		String pageLabel = ChatColor.BLACK+town.getName()+" "+MessagePath.LABEL_OPTIONS.getMessage();
+		newMenu.addPage(0, 1, pageLabel);
+		
+		// Open Info Icon
+		currentValue = boolean2Lang(town.isOpen())+" "+boolean2Symbol(town.isOpen());
+		loreList = new ArrayList<String>();
+    	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_OPEN.getMessage()));
+    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
+    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+		option = new OptionIcon(optionAction.TOWN_OPEN, nameColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.DARK_OAK_DOOR, 3);
+		newMenu.getPage(0).addIcon(option);
+		
+		// Redstone Info Icon
+		currentValue = boolean2Lang(town.isEnemyRedstoneAllowed())+" "+boolean2Symbol(town.isEnemyRedstoneAllowed());
+		loreList = new ArrayList<String>();
+    	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_REDSTONE.getMessage()));
+    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
+    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+		option = new OptionIcon(optionAction.TOWN_REDSTONE, nameColor+MessagePath.LABEL_REDSTONE.getMessage(), loreList, Material.LEVER, 5);
+		newMenu.getPage(0).addIcon(option);
 		
 		newMenu.refreshNavigationButtons();
 		newMenu.setPageIndex(0);
@@ -1251,6 +1327,14 @@ public class DisplayManager {
     		result = ChatColor.DARK_GREEN+""+ChatColor.BOLD+"\u2713";
     	}
     	return result;
+ 	}
+ 	
+ 	private String boolean2Lang(boolean val) {
+ 		String result = MessagePath.LABEL_FALSE.getMessage();
+ 		if(val) {
+ 			result = MessagePath.LABEL_TRUE.getMessage();
+ 		}
+ 		return result;
  	}
  	
  	private void playMenuClickSound(Player bukkitPlayer) {
