@@ -111,8 +111,9 @@ public class MapHandler {
 			}
 			ChatUtil.printDebug("Drawing new Dynmap area of territory "+territory.getName());
 		} else {
-			// Area already exists, update corners
+			// Area already exists, update corners and label
 			territoryArea.setCornerLocations(drawArea.getXCorners(), drawArea.getZCorners());
+			territoryArea.setLabel(areaLabel,true);
 			ChatUtil.printDebug("Updating Dynmap area corners of territory "+territory.getName());
 		}
 		Marker territoryIcon = territoryGroup.findMarker(iconId);
