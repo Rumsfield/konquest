@@ -8,6 +8,7 @@ import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
+import konquest.utility.MessagePath;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 
 /**
@@ -129,7 +130,7 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion {
 	        /* %konquest_barbarian% - true if player is barbarian, else false */
 	        case "barbarian":
 	        	offlinePlayer = playerManager.getOfflinePlayer(player);
-	        	result = offlinePlayer == null ? "" : String.valueOf(offlinePlayer.isBarbarian());
+	        	result = offlinePlayer == null ? "" : boolean2Lang(offlinePlayer.isBarbarian());
 	        	break;
 	        /* %konquest_towns_lord% - comma-separated list of player's lord only towns */
 	        case "towns_lord":
@@ -203,9 +204,9 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion {
 	        	onlinePlayer = playerManager.getPlayer(player);
 	        	if(onlinePlayer != null && player.isOnline()) {
 		        	if(kingdomManager.isChunkClaimed(player.getLocation())) {
-		        		result = kingdomManager.getChunkTerritory(player.getLocation()).getTerritoryType().name();
+		        		result = kingdomManager.getChunkTerritory(player.getLocation()).getTerritoryType().getLabel();
 		        	} else {
-		        		result = KonTerritoryType.WILD.name();
+		        		result = KonTerritoryType.WILD.getLabel();
 		        	}
 	        	}
 	        	break;
@@ -217,7 +218,7 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion {
 		        	if(kingdomManager.isChunkClaimed(player.getLocation())) {
 		        		result = kingdomManager.getChunkTerritory(player.getLocation()).getName();
 		        	} else {
-		        		result = KonTerritoryType.WILD.name();
+		        		result = KonTerritoryType.WILD.getLabel();
 		        	}
 	        	}
 	        	break;
@@ -226,7 +227,7 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion {
 	        	result = "";
 	        	onlinePlayer = playerManager.getPlayer(player);
 	        	if(onlinePlayer != null && player.isOnline()) {
-	        		result = String.valueOf(kingdomManager.isChunkClaimed(player.getLocation()));
+	        		result = boolean2Lang(kingdomManager.isChunkClaimed(player.getLocation()));
 	        	}
 	        	break;
 	        /* %konquest_score% - player's score value */
@@ -267,12 +268,12 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion {
 	        /* %konquest_chat% - true if player is using global chat, else false */
 	        case "chat":
 	        	onlinePlayer = playerManager.getPlayer(player);
-	        	result = onlinePlayer == null ? "" : String.valueOf(onlinePlayer.isGlobalChat());
+	        	result = onlinePlayer == null ? "" : boolean2Lang(onlinePlayer.isGlobalChat());
 	        	break;
 	        /* %konquest_combat% - true if player is combat tagged, else false */
 	        case "combat":
 	        	onlinePlayer = playerManager.getPlayer(player);
-	        	result = onlinePlayer == null ? "" : String.valueOf(onlinePlayer.isCombatTagged());
+	        	result = onlinePlayer == null ? "" : boolean2Lang(onlinePlayer.isCombatTagged());
 	        	break;
 	        default: 
 	        	break;
@@ -280,5 +281,13 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion {
 
         return result;
     }
+    
+    private String boolean2Lang(boolean val) {
+ 		String result = MessagePath.LABEL_FALSE.getMessage();
+ 		if(val) {
+ 			result = MessagePath.LABEL_TRUE.getMessage();
+ 		}
+ 		return result;
+ 	}
 
 }
