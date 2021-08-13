@@ -849,7 +849,7 @@ public class DisplayManager {
     	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+numKingdomTowns);
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_TOWNS.getMessage(), loreList, konquest.getKingdomManager().getTownCriticalBlock(), 5, false);
     	newMenu.getPage(0).addIcon(info);
-    	/* Towns Info Icon (6) */
+    	/* Land Info Icon (6) */
     	int numKingdomLand = 0;
     	for(KonTown town : infoKingdom.getTowns()) {
     		numKingdomLand += town.getChunkList().size();

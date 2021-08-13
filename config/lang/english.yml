@@ -55,6 +55,7 @@ label:
   armors: "Armors"
   armor: "Armor"
   critical-hits: "Critical Hits"
+  golem-spawns: "Golem Spawns"
   options: "Options"
   enemy-redstone: "Enemy Redstone"
   true: "True"

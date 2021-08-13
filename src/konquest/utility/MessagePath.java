@@ -52,6 +52,7 @@ public enum MessagePath {
 	LABEL_ARMORS                            	(0, "label.armors"),
 	LABEL_ARMOR                             	(0, "label.armor"),
 	LABEL_CRITICAL_HITS                        	(0, "label.critical-hits"),
+	LABEL_GOLEM_SPAWNS                        	(0, "label.golem-spawns"),
 	LABEL_OPTIONS                             	(0, "label.options"),
 	LABEL_ENEMY_REDSTONE                        (0, "label.enemy-redstone"),
 	LABEL_TRUE                               	(0, "label.true"),

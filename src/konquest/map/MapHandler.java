@@ -11,11 +11,13 @@ import org.dynmap.markers.MarkerSet;
 
 import konquest.Konquest;
 import konquest.model.KonCamp;
+import konquest.model.KonCapital;
 import konquest.model.KonKingdom;
 import konquest.model.KonRuin;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class MapHandler {
 	
@@ -195,96 +197,26 @@ public class MapHandler {
 		ChatUtil.printDebug("Drawing all territory in Dynmap took "+time+" ms");
 	}
 	
-	/*
-	public void drawDynmapAllTerritories() {
+	public void drawDynmapLabel(KonTerritory territory) {
 		if (!isEnabled) {
 			return;
 		}
-		
-		Date start = new Date();
-		String groupIdBase = "konquest.marker.";
-		
-		String areaIdBase = "konquest.area.";
-		
-		String groupId;
-		String groupLabel;
-		String areaId;
-		String areaLabel;
-		AreaTerritory at;
-		
-		final double opacity = 0.5;
-		
-		// Ruins
-		groupId = groupIdBase + "ruin";
-		groupLabel = "Konquest Ruins";
-		MarkerSet ruinGroup = dapi.getMarkerAPI().createMarkerSet(groupId, groupLabel, dapi.getMarkerAPI().getMarkerIcons(), false);
-		if (ruinGroup != null) {
-			for (KonRuin ruin : konquest.getRuinManager().getRuins()) {
-				areaId = areaIdBase + "ruin." + ruin.getName().toLowerCase();
-				areaLabel = "Ruin " + ruin.getName();
-				at = new AreaTerritory(ruin);
-				AreaMarker ruinArea = ruinGroup.createAreaMarker(areaId, areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
-				if (ruinArea != null) {
-					ruinArea.setFillStyle(opacity, ruinColor);
-					ruinArea.setLineStyle(1, 1, lineColor);
-				}
+		if (!isTerritoryValid(territory)) {
+			ChatUtil.printDebug("Could not update label for territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
+			return;
+		}
+		String groupId = getGroupId(territory);
+		String areaId = getAreaId(territory);
+		String areaLabel = getAreaLabel(territory);
+		MarkerSet territoryGroup = dapi.getMarkerAPI().getMarkerSet(groupId);
+		if (territoryGroup != null) {
+			AreaMarker territoryArea = territoryGroup.findAreaMarker(areaId);
+			if (territoryArea != null) {
+				// Area already exists, update label
+				territoryArea.setLabel(areaLabel,true);
 			}
 		}
-				
-		// Camps
-		groupId = groupIdBase + "camp";
-		groupLabel = "Konquest Barbarian Camps";
-		MarkerSet campGroup = dapi.getMarkerAPI().createMarkerSet(groupId, groupLabel, dapi.getMarkerAPI().getMarkerIcons(), false);
-		if (campGroup != null) {
-			for (KonCamp camp : konquest.getKingdomManager().getCamps()) {
-				areaId = areaIdBase + "camp." + camp.getName().toLowerCase();
-				areaLabel = "Barbarian " + camp.getName();
-				at = new AreaTerritory(camp);
-				AreaMarker barbCamp = campGroup.createAreaMarker(areaId, areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
-				if (barbCamp != null) {
-					barbCamp.setFillStyle(opacity, campColor);
-					barbCamp.setLineStyle(1, 1, lineColor);
-				}
-			}
-		}
-		
-		// Kingdoms
-		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
-			
-			groupId = groupIdBase + kingdom.getName().toLowerCase();
-			groupLabel = "Konquest Kingdom "+kingdom.getName();
-			MarkerSet kingdomGroup = dapi.getMarkerAPI().createMarkerSet(groupId, groupLabel, dapi.getMarkerAPI().getMarkerIcons(), false);
-			
-			if (kingdomGroup != null) {
-				// Capital
-				areaId = areaIdBase + kingdom.getName().toLowerCase() + ".capital";
-				areaLabel = kingdom.getCapital().getName();
-				at = new AreaTerritory(kingdom.getCapital());
-				AreaMarker kingdomCapital = kingdomGroup.createAreaMarker(areaId, areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
-				if (kingdomCapital != null) {
-					kingdomCapital.setFillStyle(opacity, capitalColor);
-					kingdomCapital.setLineStyle(1, 1, lineColor);
-				}
-				// Towns
-				for (KonTown town : kingdom.getTowns()) {
-					areaId = areaIdBase + kingdom.getName().toLowerCase() + "." + town.getName().toLowerCase();
-					areaLabel = kingdom.getName() + " " + town.getName();
-					at = new AreaTerritory(town);
-					AreaMarker kingdomTown = kingdomGroup.createAreaMarker(areaId, areaLabel, true, at.getWorldName(), at.getXCorners(), at.getZCorners(), false);
-					if (kingdomTown != null) {
-						kingdomTown.setFillStyle(opacity, townColor);
-						kingdomTown.setLineStyle(1, 1, lineColor);
-					}
-				}
-			}
-		}
-		
-		Date end = new Date();
-		int time = (int)(end.getTime() - start.getTime());
-		ChatUtil.printDebug("Drawing all territory in Dynmap took "+time+" ms");
-		
 	}
-	*/
 	
 	private String getGroupId(KonTerritory territory) {
 		String result = "konquest";
@@ -353,16 +285,51 @@ public class MapHandler {
 		String result = "Konquest";
 		switch (territory.getTerritoryType()) {
 			case RUIN:
-				result = "Ruin "+territory.getName();
+				KonRuin ruin = (KonRuin)territory;
+				int numCriticals = ruin.getMaxCriticalHits();
+				int numSpawns = ruin.getSpawnLocations().size();
+				result = "<p>"+
+						"<b>"+MessagePath.LABEL_RUIN.getMessage() + ruin.getName() + "</b><br>" +
+						MessagePath.LABEL_CRITICAL_HITS.getMessage() + ": " + numCriticals + "<br>" +
+						MessagePath.LABEL_GOLEM_SPAWNS.getMessage() + ": " + numSpawns + "<br>" +
+						"</p>";
 				break;
 			case CAMP:
-				result = "Barbarian "+territory.getName();
+				KonCamp camp = (KonCamp)territory;
+				result = "<p>"+
+						"<b>"+camp.getName() + "</b><br>" +
+						MessagePath.LABEL_BARBARIANS.getMessage() + "<br>" +
+						"</p>";
 				break;
 			case CAPITAL:
-				result = territory.getKingdom().getCapital().getName();
+				KonCapital capital = (KonCapital)territory;
+				int numKingdomTowns = territory.getKingdom().getTowns().size();
+				int numKingdomLand = 0;
+		    	for(KonTown town : territory.getKingdom().getTowns()) {
+		    		numKingdomLand += town.getChunkList().size();
+		    	}
+				int numAllKingdomPlayers = konquest.getPlayerManager().getAllPlayersInKingdom(territory.getKingdom()).size();
+				result = "<p>"+
+						"<b>"+capital.getName() + "</b><br>" +
+						MessagePath.LABEL_KINGDOM.getMessage() + ": " + capital.getKingdom().getName() + "<br>" +
+						MessagePath.LABEL_TOWNS.getMessage() + ": " + numKingdomTowns + "<br>" +
+						MessagePath.LABEL_LAND.getMessage() + ": " + numKingdomLand + "<br>" +
+						MessagePath.LABEL_PLAYERS.getMessage() + ": " + numAllKingdomPlayers + "<br>" +
+						"</p>";
 				break;
 			case TOWN:
-				result = territory.getKingdom().getName()+" "+territory.getName();
+				KonTown town = (KonTown)territory;
+				String lordName = "-";
+				if(town.getPlayerLord() != null) {
+					lordName = town.getPlayerLord().getName();
+				}
+				result = "<p>"+
+						"<b>"+town.getName() + "</b><br>" +
+						MessagePath.LABEL_KINGDOM.getMessage() + ": " + town.getKingdom().getName() + "<br>" +
+						MessagePath.LABEL_LORD.getMessage() + ": " + lordName + "<br>" +
+						MessagePath.LABEL_LAND.getMessage() + ": " + town.getChunkList().size() + "<br>" +
+						MessagePath.LABEL_POPULATION.getMessage() + ": " + town.getNumResidents() + "<br>" +
+						"</p>";
 				break;
 			default:
 				break;
@@ -437,10 +404,10 @@ public class MapHandler {
 		String result = "Konquest";
 		switch (territory.getTerritoryType()) {
 			case RUIN:
-				result = "Ruin "+territory.getName();
+				result = MessagePath.LABEL_RUIN.getMessage()+" "+territory.getName();
 				break;
 			case CAMP:
-				result = "Barbarian "+territory.getName();
+				result = MessagePath.LABEL_BARBARIAN.getMessage()+" "+territory.getName();
 				break;
 			case CAPITAL:
 				result = territory.getKingdom().getCapital().getName();
