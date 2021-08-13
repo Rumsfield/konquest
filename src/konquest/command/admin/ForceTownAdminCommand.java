@@ -27,7 +27,7 @@ public class ForceTownAdminCommand extends CommandBase {
 	@Override
 	public void execute() {
 		
-		// k admin forcetown <name> open|close|add|kick|knight|lord|rename|upgrade|shield [arg1] [arg2]
+		// k admin forcetown <name> open|redstone|add|kick|knight|lord|rename|upgrade|shield [arg1] [arg2]
 		if (getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
@@ -54,26 +54,63 @@ public class ForceTownAdminCommand extends CommandBase {
     		String playerName = "";
         	String newTownName = "";
         	String upgradeName = "";
+        	String optionSetting = "";
         	switch(subCmd.toLowerCase()) {
         	case "open":
-            	if(town.isOpen()) {
-            		//ChatUtil.sendNotice((Player) getSender(), townName+" is already open for access by all players");
-            		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TOWN_ERROR_OPEN.getMessage(townName));
-            	} else {
-            		town.setIsOpen(true);
-            		//ChatUtil.sendNotice((Player) getSender(), "Opened "+townName+" for access by all players");
-            		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_OPEN.getMessage(townName));
-            	}
+            	// get "true" or "false"
+        		if (getArgs().length == 5) {
+        			optionSetting = getArgs()[4];
+				}
+    			if(optionSetting.equalsIgnoreCase("true")) {
+    				// Attempt to open the town
+    				if(town.isOpen()) {
+    					// Already enabled
+                		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+                	} else {
+                		town.setIsOpen(true);
+                		ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+                	}
+    			} else if(optionSetting.equalsIgnoreCase("false")) {
+    				// Attempt to close the town
+    				if(town.isOpen()) {
+                		town.setIsOpen(false);
+                		ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+                	} else {
+                		// Already disabled
+                		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+                	}
+    			} else {
+    				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+    			}
         		break;
-        	case "close":
-            	if(town.isOpen()) {
-            		town.setIsOpen(false);
-            		//ChatUtil.sendNotice((Player) getSender(), "Closed "+townName+", only residents may build and access containers");
-            		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_CLOSE.getMessage(townName));
-            	} else {
-            		//ChatUtil.sendNotice((Player) getSender(), townName+" is already closed for residents only");
-            		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TOWN_ERROR_CLOSE.getMessage(townName));
-            	}
+        	case "redstone":
+        		// get "true" or "false"
+        		if (getArgs().length == 5) {
+        			optionSetting = getArgs()[4];
+				}
+    			if(optionSetting.equalsIgnoreCase("true")) {
+    				// Attempt to enable enemy redstone use
+    				if(town.isEnemyRedstoneAllowed()) {
+    					// Already enabled
+                		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+                	} else {
+                		town.setIsEnemyRedstoneAllowed(true);
+                		ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+                	}
+    			} else if(optionSetting.equalsIgnoreCase("false")) {
+    				// Attempt to disable enemy redstone use
+    				if(town.isEnemyRedstoneAllowed()) {
+    					town.setIsEnemyRedstoneAllowed(false);
+                		ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+                	} else {
+                		// Already disabled
+                		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+                	}
+    			} else {
+    				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+    			}
         		break;
 			case "add":
 				if (getArgs().length == 5) {
@@ -397,7 +434,7 @@ public class ForceTownAdminCommand extends CommandBase {
 		} else if(getArgs().length == 4) {
 			// suggest sub-commands
 			tabList.add("open");
-			tabList.add("close");
+			tabList.add("redstone");
 			tabList.add("add");
 			tabList.add("kick");
 			tabList.add("lord");
@@ -428,6 +465,9 @@ public class ForceTownAdminCommand extends CommandBase {
 				tabList.add("clear");
 				tabList.add("set");
 				tabList.add("add");
+			} else if(subCommand.equalsIgnoreCase("open") || subCommand.equalsIgnoreCase("redstone")) {
+				tabList.add("true");
+				tabList.add("false");
 			}
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
