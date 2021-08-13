@@ -522,8 +522,8 @@ public class BlockListener implements Listener {
 			if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && kingdomManager.isCampSet(player)) {
 				//ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot create more than one Camp. Destroy the bed in your current Camp before placing a new bed.", ChatColor.DARK_RED);
 				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
-				event.setCancelled(true);
-				return;
+				//event.setCancelled(true);
+				//return;
 			}
 			
 			// Attempt to create a camp for barbarians who place a bed
