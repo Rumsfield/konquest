@@ -88,7 +88,7 @@ public class ScoreCommand extends CommandBase {
             	String offlinePlayerName = offlinePlayer.getOfflineBukkitPlayer().getName();
             	if(offlinePlayer.isBarbarian()) {
         			//ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+offlinePlayerName+" is a Barbarian, and cannot be scored!");
-        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(offlinePlayerName));
         		} else if(kingdom.isPeaceful()) {
         			//ChatUtil.sendError((Player) getSender(), ChatColor.GOLD+"The Kingdom of "+color+kingdom.getName()+ChatColor.GOLD+" is peaceful, and cannot be scored!");
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdom.getName()));

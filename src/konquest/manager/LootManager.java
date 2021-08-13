@@ -14,6 +14,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
@@ -193,7 +194,12 @@ public class LootManager implements Timeable{
             		ItemStack potion = new ItemStack(Material.POTION, 1);
     				PotionMeta meta;
     				meta = (PotionMeta) potion.getItemMeta();
-    				meta.setBasePotionData(new PotionData(potionType, itemExtended, itemUpgraded));
+    				try {
+    					meta.setBasePotionData(new PotionData(potionType, itemExtended, itemUpgraded));
+    				} catch(IllegalArgumentException e) {
+    					meta.setBasePotionData(new PotionData(potionType, false, false));
+    					ChatUtil.printConsoleError("Invalid options extended="+itemExtended+", upgraded="+itemUpgraded+" for potion "+potionName+" in loot.yml");
+    				}
     				potion.setItemMeta(meta);
             		lootTable.put(potion, itemWeight);
             		ChatUtil.printDebug("  Added loot potion "+potionName+" with extended "+itemExtended+", upgraded "+itemUpgraded+", weight "+itemWeight);
@@ -231,15 +237,12 @@ public class LootManager implements Timeable{
         		}
             	if(status && itemWeight > 0) {
             		// Add loot table entry
-            		/*
-            		if(itemLevel == 0) {
-            			// Choose random level
-            			itemLevel = randomness.nextInt(bookType.getMaxLevel()+1);
-        				if(itemLevel < bookType.getStartLevel()) {
-        					itemLevel = bookType.getStartLevel();
-        				}
-            		}
-            		*/
+        			// Limit level
+    				if(itemLevel < bookType.getStartLevel()) {
+    					itemLevel = bookType.getStartLevel();
+    				} else if(itemLevel > bookType.getMaxLevel()) {
+    					itemLevel = bookType.getMaxLevel();
+    				}
     				ItemStack enchantBook = new ItemStack(Material.ENCHANTED_BOOK, 1);
     				EnchantmentStorageMeta enchantMeta = (EnchantmentStorageMeta)enchantBook.getItemMeta();
     				enchantMeta.addStoredEnchant(bookType, itemLevel, true);
@@ -480,19 +483,26 @@ public class LootManager implements Timeable{
 				typeWindow = typeWindow + itemOptions.get(i);
 			}
 		}
-		// Check for enchanted item with level 0
-		Map<Enchantment,Integer> enchants = item.getEnchantments();
-		if(!enchants.isEmpty()) {
-			for(Enchantment e : enchants.keySet()) {
-				if(enchants.get(e) == 0) {
-					// Choose random level
-					int newLevel = randomness.nextInt(e.getMaxLevel()+1);
-					if(newLevel < e.getStartLevel()) {
-						newLevel = e.getStartLevel();
+		// Check for stored enchantment with level 0
+		ItemMeta meta = item.getItemMeta();
+		if(meta instanceof EnchantmentStorageMeta) {
+			EnchantmentStorageMeta enchantMeta = (EnchantmentStorageMeta)meta;
+			if(enchantMeta.hasStoredEnchants()) {
+				Map<Enchantment,Integer> enchants = enchantMeta.getStoredEnchants();
+				if(!enchants.isEmpty()) {
+					for(Enchantment e : enchants.keySet()) {
+						if(enchants.get(e) == 0) {
+							// Choose random level
+							int newLevel = randomness.nextInt(e.getMaxLevel()+1);
+							if(newLevel < e.getStartLevel()) {
+								newLevel = e.getStartLevel();
+							}
+							enchantMeta.removeStoredEnchant(e);
+							enchantMeta.addStoredEnchant(e, newLevel, true);
+							item.setItemMeta(enchantMeta);
+							ChatUtil.printDebug("Enchanted loot item "+item.getType().toString()+" updated "+e.getKey().getKey()+" from level 0 to "+newLevel);
+						}
 					}
-					item.removeEnchantment(e);
-					item.addEnchantment(e, newLevel);
-					ChatUtil.printDebug("Enchanted loot item "+item.getType().toString()+" updated "+e.getKey().getKey()+" from level 0 to "+newLevel);
 				}
 			}
 		}
