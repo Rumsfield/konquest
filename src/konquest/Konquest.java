@@ -273,6 +273,12 @@ public class Konquest implements Timeable {
     	updateNamePackets(player);
     	// Update offline protections
     	kingdomManager.updateKingdomOfflineProtection();
+    	if(player.isBarbarian()) {
+    		KonCamp camp = kingdomManager.getCamp(player);
+    		if(camp != null) {
+    			camp.setProtected(false);
+    		}
+    	}
     	// Update player membership stats
     	kingdomManager.updatePlayerMembershipStats(player);
     	// Updates based on login position

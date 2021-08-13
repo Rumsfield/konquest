@@ -234,8 +234,7 @@ public class BlockListener implements Listener {
 					KonCamp camp = (KonCamp)territory;
 
 					// If the camp owner is not online, prevent block breaking
-					boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
-					if(isBreakDisabledOffline && !camp.isOwnerOnline()) {
+					if(camp.isProtected()) {
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot attack "+camp.getName()+", owner is offline", ChatColor.DARK_RED);
 						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP.getMessage(camp.getName()));
 						event.setCancelled(true);
@@ -499,8 +498,7 @@ public class BlockListener implements Listener {
 						}
 					}
 					// If the camp owner is not online, prevent block placement
-					boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
-					if(isBreakDisabledOffline && !camp.isOwnerOnline()) {
+					if(camp.isProtected()) {
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot attack "+camp.getName()+", owner is offline", ChatColor.DARK_RED);
 						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP.getMessage(camp.getName()));
 						event.setCancelled(true);
@@ -665,6 +663,17 @@ public class BlockListener implements Listener {
 						return;
 					}
 				}
+				// Camp protections
+				if(territory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+					KonCamp camp = (KonCamp)territory;
+					// Protect offline owner camps
+					if(camp.isProtected()) {
+						ChatUtil.printDebug("EVENT: protecting offline camp from explosion");
+						event.setCancelled(true);
+						return;
+					}
+				}
+				
 				// Protect chests
 				boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_explode");
 				if(isProtectChest && event.getBlock().getState() instanceof BlockInventoryHolder) {
@@ -717,6 +726,14 @@ public class BlockListener implements Listener {
 				if(territory instanceof KonRuin) {
 					event.setCancelled(true);
 					return;
+				}
+				if(territory instanceof KonCamp) {
+					KonCamp camp = (KonCamp) territory;
+					// Check if owner is offline
+					if(camp.isProtected()) {
+						event.setCancelled(true);
+						return;
+					}
 				}
 			}
 			// Check if this block will move into a monument
@@ -772,6 +789,14 @@ public class BlockListener implements Listener {
 				if(territory instanceof KonRuin) {
 					event.setCancelled(true);
 					return;
+				}
+				if(territory instanceof KonCamp) {
+					KonCamp camp = (KonCamp) territory;
+					// Check if owner is offline
+					if(camp.isProtected()) {
+						event.setCancelled(true);
+						return;
+					}
 				}
 			}
 		}

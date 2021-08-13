@@ -146,6 +146,12 @@ public class PlayerListener implements Listener{
     	kingdomManager.updateKingdomOfflineProtection();
     	//playerManager.updateNumKingdomPlayersOnline();
     	//playerManager.updateAllSavedPlayers();
+    	if(player.isBarbarian()) {
+    		KonCamp camp = kingdomManager.getCamp(player);
+    		if(camp != null) {
+    			camp.setProtected(true);
+    		}
+    	}
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
@@ -691,6 +697,14 @@ public class PlayerListener implements Listener{
 			if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
 				event.setCancelled(true);
 				return;
+			}
+			// Prevent non-owners from using buckets in camps
+			if(territory instanceof KonCamp) {
+				KonCamp camp = (KonCamp)territory;
+				if(!camp.isPlayerOwner(event.getPlayer())) {
+					event.setCancelled(true);
+					return;
+				}
 			}
 		}
     }
