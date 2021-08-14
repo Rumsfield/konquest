@@ -70,6 +70,7 @@
 #    armor_add:                     Allow new armor to add onto existing armor when true, else require armor to deplete before applying again (true/false)
 #    max_shields:                   Maximum shield duration in seconds that a town can have (0 to disable, integer >= 0)
 #    max_armor:                     Maximum armor amount in blocks that a town can have (0 to disable, integer >= 0)
+#    barbarians_destroy:            Allow barbarian players to destroy towns when true, else prevent barbarians from attacking town monuments (true/false)
 #  exile:
 #    remove_favor:                  Set a player's currency balance to 0 when exiled (true/flase)
 #    remove_stats:                  Remove all stats and accomplishment prefixes from a player when exiled (true/false)
@@ -189,6 +190,7 @@ core:
     armor_add: true
     max_shields: 432000
     max_armor: 9999
+    barbarians_destroy: true
   exile:
     remove_favor: true
     remove_stats: true

@@ -205,13 +205,14 @@ public class BlockListener implements Listener {
 						// If block is inside a monument, throw KonquestMonumentDamageEvent
 						if(town.isLocInsideCenterChunk(breakLoc)) {
 							if(town.getMonument().isLocInside(breakLoc)) {
-								// Prevent Barbarians from damaging monuments
-								/*
-								if(player.isBarbarian()) {
-									ChatUtil.sendNotice(player.getBukkitPlayer(), "Barbarians cannot damage Town Monuments.", ChatColor.DARK_RED);
+								// Prevent Barbarians from damaging monuments optionally
+								boolean isBarbAttackAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.barbarians_destroy",true);
+								if(player.isBarbarian() && !isBarbAttackAllowed) {
+									//ChatUtil.sendNotice(player.getBukkitPlayer(), "Barbarians cannot damage Town Monuments.", ChatColor.DARK_RED);
+									ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 									event.setCancelled(true);
 									return;
-								}*/
+								}
 								// Cancel item drops on the broken blocks
 								event.setDropItems(false);
 								// Throw Konquest event
