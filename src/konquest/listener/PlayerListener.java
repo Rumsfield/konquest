@@ -3,6 +3,7 @@ package konquest.listener;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.event.KonquestEnterTerritoryEvent;
+import konquest.manager.CampManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
 import konquest.model.KonCamp;
@@ -68,11 +69,13 @@ public class PlayerListener implements Listener{
 	private Konquest konquest;
 	private PlayerManager playerManager;
 	private KingdomManager kingdomManager;
+	private CampManager campManager;
 	
 	public PlayerListener(KonquestPlugin plugin) {
 		this.konquest = plugin.getKonquestInstance();
 		this.playerManager = konquest.getPlayerManager();
 		this.kingdomManager = konquest.getKingdomManager();
+		this.campManager = konquest.getCampManager();
 	}
 	
 	/**
@@ -147,7 +150,7 @@ public class PlayerListener implements Listener{
     	//playerManager.updateNumKingdomPlayersOnline();
     	//playerManager.updateAllSavedPlayers();
     	if(player.isBarbarian()) {
-    		KonCamp camp = kingdomManager.getCamp(player);
+    		KonCamp camp = campManager.getCamp(player);
     		if(camp != null) {
     			camp.setProtected(true);
     		}

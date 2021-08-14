@@ -89,12 +89,12 @@ public class TravelCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
                     return;
         		}
-        		if(!getKonquest().getKingdomManager().isCampSet((KonOfflinePlayer)player)) {
+        		if(!getKonquest().getCampManager().isCampSet((KonOfflinePlayer)player)) {
         			//ChatUtil.sendError((Player) getSender(), "You do not have a Camp!");
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_NO_CAMP.getMessage());
                     return;
         		}
-        		travelLoc = getKonquest().getKingdomManager().getCamp((KonOfflinePlayer)player).getSpawnLoc();
+        		travelLoc = getKonquest().getCampManager().getCamp((KonOfflinePlayer)player).getSpawnLoc();
         		destination = TravelDestination.CAMP;
         	} else if(travelName.equalsIgnoreCase("home")) {
         		// Travel to bed home

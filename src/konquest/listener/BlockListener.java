@@ -3,6 +3,7 @@ package konquest.listener;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.event.KonquestMonumentDamageEvent;
+import konquest.manager.CampManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
 import konquest.model.KonCamp;
@@ -52,6 +53,7 @@ public class BlockListener implements Listener {
 	private KonquestPlugin konquestPlugin;
 	private Konquest konquest;
 	private KingdomManager kingdomManager;
+	private CampManager campManager;
 	private PlayerManager playerManager;
 	
 	public BlockListener(KonquestPlugin plugin) {
@@ -59,6 +61,7 @@ public class BlockListener implements Listener {
 		this.konquest = konquestPlugin.getKonquestInstance();
 		this.playerManager = konquest.getPlayerManager();
 		this.kingdomManager = konquest.getKingdomManager();
+		this.campManager = konquest.getCampManager();
 	}
 	
 	/**
@@ -252,7 +255,7 @@ public class BlockListener implements Listener {
 					
 					// Remove the camp if a bed is broken within it
 					if(event.getBlock().getBlockData() instanceof Bed) {
-						kingdomManager.removeCamp(camp.getOwner().getUniqueId().toString());
+						campManager.removeCamp(camp.getOwner().getUniqueId().toString());
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), "Destroyed "+camp.getName()+"!");
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY.getMessage(camp.getName()));
 						KonPlayer onlineOwner = playerManager.getPlayerFromName(camp.getOwner().getName());
@@ -520,7 +523,7 @@ public class BlockListener implements Listener {
 			// When placing blocks in the wilderness...
 			
 			// Prevent barbarians who already have a camp from placing a bed
-			if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && kingdomManager.isCampSet(player)) {
+			if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && campManager.isCampSet(player)) {
 				//ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot create more than one Camp. Destroy the bed in your current Camp before placing a new bed.", ChatColor.DARK_RED);
 				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
 				//event.setCancelled(true);
@@ -528,13 +531,13 @@ public class BlockListener implements Listener {
 			}
 			
 			// Attempt to create a camp for barbarians who place a bed
-			if(!player.isAdminBypassActive() && player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && !kingdomManager.isCampSet(player)) {
-				int status = kingdomManager.addCamp(event.getBlock().getLocation(), (KonOfflinePlayer)player);
+			if(!player.isAdminBypassActive() && player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && !campManager.isCampSet(player)) {
+				int status = campManager.addCamp(event.getBlock().getLocation(), (KonOfflinePlayer)player);
 				if(status == 0) { // on successful camp setup...
 					player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
 					//ChatUtil.sendNotice(event.getPlayer(), "Successfully set up camp");
 					ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
-					String territoryName = kingdomManager.getCamp((KonOfflinePlayer)player).getName();
+					String territoryName = campManager.getCamp((KonOfflinePlayer)player).getName();
 					ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+territoryName);
 				} else {
 					switch(status) {

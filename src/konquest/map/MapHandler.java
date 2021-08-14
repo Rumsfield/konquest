@@ -180,7 +180,7 @@ public class MapHandler {
 		}
 		
 		// Camps
-		for (KonCamp camp : konquest.getKingdomManager().getCamps()) {
+		for (KonCamp camp : konquest.getCampManager().getCamps()) {
 			drawDynmapUpdateTerritory(camp);
 		}
 		

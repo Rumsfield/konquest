@@ -25,7 +25,7 @@ public class SaveAdminCommand extends CommandBase {
         } else {
 
         	getKonquest().getKingdomManager().saveKingdoms();
-        	getKonquest().getKingdomManager().saveCamps();
+        	getKonquest().getCampManager().saveCamps();
         	getKonquest().getRuinManager().saveRuins();
         	//getKonquest().getPlayerManager().saveAllPlayers();
         	getKonquest().getConfigManager().saveConfigs();

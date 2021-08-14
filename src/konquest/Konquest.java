@@ -31,6 +31,7 @@ import org.bukkit.scoreboard.Team;
 import com.google.common.collect.MapMaker;
 
 import konquest.manager.AccomplishmentManager;
+import konquest.manager.CampManager;
 import konquest.manager.ConfigManager;
 import konquest.manager.DirectiveManager;
 import konquest.manager.DisplayManager;
@@ -73,6 +74,7 @@ public class Konquest implements Timeable {
 	private DirectiveManager directiveManager;
 	private PlayerManager playerManager;
 	private KingdomManager kingdomManager;
+	private CampManager campManager;
 	private ConfigManager configManager;
 	private IntegrationManager integrationManager;
 	private LootManager lootManager;
@@ -117,6 +119,7 @@ public class Konquest implements Timeable {
 		directiveManager = new DirectiveManager(this);
 		playerManager = new PlayerManager(this);
 		kingdomManager = new KingdomManager(this);
+		campManager = new CampManager(this);
 		configManager = new ConfigManager(this);
 		integrationManager = new IntegrationManager(this);
 		lootManager = new LootManager(this);
@@ -274,7 +277,7 @@ public class Konquest implements Timeable {
     	// Update offline protections
     	kingdomManager.updateKingdomOfflineProtection();
     	if(player.isBarbarian()) {
-    		KonCamp camp = kingdomManager.getCamp(player);
+    		KonCamp camp = campManager.getCamp(player);
     		if(camp != null) {
     			camp.setProtected(false);
     		}
@@ -343,6 +346,10 @@ public class Konquest implements Timeable {
 	
 	public KingdomManager getKingdomManager() {
 		return kingdomManager;
+	}
+	
+	public CampManager getCampManager() {
+		return campManager;
 	}
 	
 	public ConfigManager getConfigManager() {
@@ -439,7 +446,7 @@ public class Konquest implements Timeable {
 			}
 			// Save config files
 			kingdomManager.saveKingdoms();
-			kingdomManager.saveCamps();
+			campManager.saveCamps();
 			ruinManager.saveRuins();
 			//playerManager.saveAllPlayers();
 			configManager.saveConfigs();
