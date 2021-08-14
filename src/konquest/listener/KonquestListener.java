@@ -134,20 +134,26 @@ public class KonquestListener implements Listener {
 			// Attempt to start a raid alert
 			if(!camp.isRaidAlertDisabled() && !event.getPlayer().isAdminBypassActive() && 
 					!event.getPlayer().getKingdom().isPeaceful()) {
-				// Alert the camp owner if online
-				if(camp.isOwnerOnline() && playerManager.isPlayer((Player)camp.getOwner()) && !event.getPlayer().getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
-					KonPlayer ownerPlayer = playerManager.getPlayer((Player)camp.getOwner());
-					//ChatUtil.sendNotice((Player)camp.getOwner(), "Enemy spotted in "+event.getTerritory().getName()+", use \"/k travel camp\" to defend!", ChatColor.DARK_RED);
-					ChatUtil.sendNotice((Player)camp.getOwner(), MessagePath.PROTECTION_NOTICE_RAID.getMessage(event.getTerritory().getName(),"camp"),ChatColor.DARK_RED);
-					ChatUtil.sendKonPriorityTitle(ownerPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+event.getTerritory().getName(), 60, 1, 10);
-					// Start Raid Alert disable timer for target town
-					int raidAlertTimeSeconds = konquest.getConfigManager().getConfig("core").getInt("core.towns.raid_alert_cooldown");
-					ChatUtil.printDebug("Starting raid alert timer for "+raidAlertTimeSeconds+" seconds");
-					Timer raidAlertTimer = camp.getRaidAlertTimer();
-					camp.setIsRaidAlertDisabled(true);
-					raidAlertTimer.stopTimer();
-					raidAlertTimer.setTime(raidAlertTimeSeconds);
-					raidAlertTimer.startTimer();
+				// Verify online player
+				if(camp.isOwnerOnline() && camp.getOwner() instanceof Player) {
+					Player bukkitPlayer = (Player)camp.getOwner();
+					// Alert the camp owner if online
+					if(playerManager.isPlayer(bukkitPlayer) && !event.getPlayer().getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
+						KonPlayer ownerPlayer = playerManager.getPlayer(bukkitPlayer);
+						//ChatUtil.sendNotice((Player)camp.getOwner(), "Enemy spotted in "+event.getTerritory().getName()+", use \"/k travel camp\" to defend!", ChatColor.DARK_RED);
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_RAID.getMessage(event.getTerritory().getName(),"camp"),ChatColor.DARK_RED);
+						ChatUtil.sendKonPriorityTitle(ownerPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+event.getTerritory().getName(), 60, 1, 10);
+						// Start Raid Alert disable timer for target town
+						int raidAlertTimeSeconds = konquest.getConfigManager().getConfig("core").getInt("core.towns.raid_alert_cooldown");
+						ChatUtil.printDebug("Starting raid alert timer for "+raidAlertTimeSeconds+" seconds");
+						Timer raidAlertTimer = camp.getRaidAlertTimer();
+						camp.setIsRaidAlertDisabled(true);
+						raidAlertTimer.stopTimer();
+						raidAlertTimer.setTime(raidAlertTimeSeconds);
+						raidAlertTimer.startTimer();
+					}
+				} else {
+					ChatUtil.printDebug("Failed to alert non-player owner of camp "+event.getTerritory().getName());
 				}
 			}
 		}
