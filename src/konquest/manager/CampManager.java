@@ -2,7 +2,10 @@ package konquest.manager;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -13,28 +16,36 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.model.KonCamp;
+import konquest.model.KonCampGroup;
 import konquest.model.KonOfflinePlayer;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class CampManager {
 
 	private Konquest konquest;
 	private KingdomManager kingdomManager;
-	private HashMap<String,KonCamp> barbarianCamps;
+	private HashMap<String,KonCamp> barbarianCamps; // player uuids to camps
+	//private HashSet<KonCampGroup> barbarianGroups; // all camp groups
+	private HashMap<KonCamp,KonCampGroup> groupMap; // camps to groups
 	
 	public CampManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.kingdomManager = konquest.getKingdomManager();
 		this.barbarianCamps = new HashMap<String, KonCamp>();
+		//this.barbarianGroups = new HashSet<KonCampGroup>();
+		this.groupMap = new HashMap<KonCamp,KonCampGroup>();
 	}
 	
+	// intended to be called after database has connected and loaded player tables
 	public void initCamps() {
 		loadCamps();
-		//updateTerritoryCache(); // function moved into loadCamps()
-		ChatUtil.printDebug("Loaded camps");
+		refreshGroups();
+		ChatUtil.printDebug("Loaded camps and groups");
 	}
 	
 	public boolean isCampSet(KonOfflinePlayer player) {
@@ -87,6 +98,18 @@ public class CampManager {
 			newCamp.updateBarPlayers();
 			//update the chunk cache, add points to primary world cache
 			kingdomManager.addAllTerritory(loc.getWorld(),newCamp.getChunkList());
+			// Refresh groups
+			refreshGroups();
+			if(groupMap.containsKey(newCamp)) {
+				Konquest.playCampGroupSound(loc);
+				// Notify group
+				for(KonCamp groupCamp : groupMap.get(newCamp).getCamps()) {
+					if(groupCamp.isOwnerOnline() && groupCamp.getOwner() instanceof Player) {
+						Player bukkitPlayer = (Player)groupCamp.getOwner();
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_CAMP_GROUP_ADD.getMessage(newCamp.getName()));
+					}
+				}
+			}
 			konquest.getMapHandler().drawDynmapUpdateTerritory(newCamp);
 		} else {
 			return 2;
@@ -108,6 +131,19 @@ public class CampManager {
 			removedCamp.removeAllBarPlayers();
 			//update the chunk cache, remove all points from primary world
 			kingdomManager.removeAllTerritory(removedCamp.getWorld(),removedCamp.getChunkList().keySet());
+			// Refresh groups
+			Collection<KonCamp> groupSet = new ArrayList<KonCamp>();
+			if(groupMap.containsKey(removedCamp)) {
+				groupSet = groupMap.get(removedCamp).getCamps();
+			}
+			refreshGroups();
+			// Notify group
+			for(KonCamp groupCamp : groupSet) {
+				if(groupCamp.isOwnerOnline() && groupCamp.getOwner() instanceof Player) {
+					Player bukkitPlayer = (Player)groupCamp.getOwner();
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_CAMP_GROUP_REMOVE.getMessage(removedCamp.getName()));
+				}
+			}
 			konquest.getMapHandler().drawDynmapRemoveTerritory(removedCamp);
 			removedCamp = null;
 		} else {
@@ -116,6 +152,208 @@ public class CampManager {
 		}
 		ChatUtil.printDebug("Successfully removed camp for UUID "+uuid);
 		return true;
+	}
+	
+	/**
+	 * Attempts to remove a camp from a group
+	 * @param camp - a removed camp
+	 * @return true when camp has been removed from a group
+	 */
+	/*
+	private boolean removeUpdateGroup(KonCamp camp) {
+		boolean result = false;
+		// check for existing group
+		if(!groupMap.containsKey(camp)) {
+			result = true;
+		} else {
+			// Camp belongs to a group
+			KonCampGroup mainGroup = groupMap.get(camp);
+			// Search surroundings for all adjacent camps
+			HashSet<KonCamp> adjCamps = new HashSet<KonCamp>();
+			Location center = camp.getCenterLoc();
+			int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
+			for(Point point : konquest.getBorderPoints(center, radius+1)) {
+				if(kingdomManager.isChunkClaimed(point,center.getWorld()) && kingdomManager.getChunkTerritory(point,center.getWorld()) instanceof KonCamp) {
+					KonCamp adjCamp = (KonCamp)kingdomManager.getChunkTerritory(point,center.getWorld());
+					adjCamps.add(adjCamp);
+				}
+			}
+			// Remove camp from main group
+			mainGroup.removeCamp(camp);
+			groupMap.remove(camp);
+			// Update groups of remaining adjacent camps
+			
+			
+		}
+		return result;
+	}
+	*/
+	/**
+	 * Attempts to add camp to a group
+	 * @param camp - a new camp
+	 * @return true when camp has been added to a group
+	 */
+	/*
+	private boolean addUpdateGroup(KonCamp camp) {
+		boolean result = false;
+		// check for existing group
+		if(groupMap.containsKey(camp)) {
+			result = true;
+		} else {
+			// Camp has no group
+			// Search surroundings for all adjacent camps
+			HashSet<KonCamp> adjCamps = new HashSet<KonCamp>();
+			Location center = camp.getCenterLoc();
+			int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
+			for(Point point : konquest.getBorderPoints(center, radius+1)) {
+				if(kingdomManager.isChunkClaimed(point,center.getWorld()) && kingdomManager.getChunkTerritory(point,center.getWorld()) instanceof KonCamp) {
+					KonCamp adjCamp = (KonCamp)kingdomManager.getChunkTerritory(point,center.getWorld());
+					adjCamps.add(adjCamp);
+				}
+			}
+			// Find any existing groups
+			HashSet<KonCampGroup> adjGroups = new HashSet<KonCampGroup>();
+			for(KonCamp adjCamp : adjCamps) {
+				if(groupMap.containsKey(adjCamp)) {
+					adjGroups.add(groupMap.get(adjCamp));
+				}
+			}
+			// Attempt to form groups
+			if(adjGroups.isEmpty()) {
+				// There are no adjacent groups, try to make one
+				if(!adjCamps.isEmpty()) {
+					// Make a new group with the adjacent camp(s)
+					KonCampGroup campGroup = new KonCampGroup();
+					campGroup.addCamp(camp);
+					groupMap.put(camp, campGroup);
+					for(KonCamp adjCamp : adjCamps) {
+						campGroup.addCamp(adjCamp);
+						groupMap.put(adjCamp, campGroup);
+					}
+					barbarianGroups.add(campGroup);
+					result = true;
+				}
+			} else {
+				// There are other adjacent group(s)
+				Iterator<KonCampGroup> groupIter = adjGroups.iterator();
+				if(groupIter.hasNext()) {
+					KonCampGroup mainGroup = groupIter.next(); // choose arbitrary group as main
+					// Add camp and all adjacent camps to main group
+					mainGroup.addCamp(camp);
+					groupMap.put(camp, mainGroup);
+					for(KonCamp adjCamp : adjCamps) {
+						mainGroup.addCamp(adjCamp);
+						groupMap.put(adjCamp, mainGroup);
+					}
+					// Merge other group(s) into main and prune
+					while(groupIter.hasNext()) {
+						KonCampGroup mergeGroup = groupIter.next();
+						mainGroup.mergeGroup(mergeGroup);
+						mergeGroup.clearCamps();
+						barbarianGroups.remove(mergeGroup);
+					}
+					result = true;
+				}
+			}
+		}
+		return result;
+	}
+	*/
+	private void refreshGroups() {
+		groupMap.clear();
+		int totalGroups = 0;
+		int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
+		Location center = null;
+		// Evaluate each camp for adjacent camps, creating groups as necessary
+		for(KonCamp currCamp : barbarianCamps.values()) {
+			// Verify camp is not already in a group
+			if(!groupMap.containsKey(currCamp)) {
+				center = currCamp.getCenterLoc();
+				// Search surroundings for all adjacent camps
+				HashSet<KonCamp> adjCamps = new HashSet<KonCamp>();
+				for(Point point : konquest.getBorderPoints(center, radius+1)) {
+					if(kingdomManager.isChunkClaimed(point,center.getWorld()) && kingdomManager.getChunkTerritory(point,center.getWorld()) instanceof KonCamp) {
+						KonCamp adjCamp = (KonCamp)kingdomManager.getChunkTerritory(point,center.getWorld());
+						adjCamps.add(adjCamp);
+					}
+				}
+				// Find any existing groups
+				HashSet<KonCampGroup> adjGroups = new HashSet<KonCampGroup>();
+				for(KonCamp adjCamp : adjCamps) {
+					if(groupMap.containsKey(adjCamp)) {
+						adjGroups.add(groupMap.get(adjCamp));
+					}
+				}
+				// Attempt to form groups
+				if(adjGroups.isEmpty()) {
+					// There are no adjacent groups, try to make one
+					if(!adjCamps.isEmpty()) {
+						// Make a new group with the adjacent camp(s)
+						KonCampGroup campGroup = new KonCampGroup();
+						campGroup.addCamp(currCamp);
+						groupMap.put(currCamp, campGroup);
+						for(KonCamp adjCamp : adjCamps) {
+							campGroup.addCamp(adjCamp);
+							groupMap.put(adjCamp, campGroup);
+						}
+						//barbarianGroups.add(campGroup);
+						totalGroups++;
+					}
+				} else {
+					// There are other adjacent group(s)
+					Iterator<KonCampGroup> groupIter = adjGroups.iterator();
+					if(groupIter.hasNext()) {
+						KonCampGroup mainGroup = groupIter.next(); // choose arbitrary group as main
+						// Add camp and all adjacent camps to main group
+						mainGroup.addCamp(currCamp);
+						groupMap.put(currCamp, mainGroup);
+						for(KonCamp adjCamp : adjCamps) {
+							mainGroup.addCamp(adjCamp);
+							groupMap.put(adjCamp, mainGroup);
+						}
+						// Merge other group(s) into main and prune
+						while(groupIter.hasNext()) {
+							KonCampGroup mergeGroup = groupIter.next();
+							mainGroup.mergeGroup(mergeGroup);
+							mergeGroup.clearCamps();
+							//barbarianGroups.remove(mergeGroup);
+							totalGroups--;
+						}
+					}
+				}
+			}
+			/*
+			// Search surrounding chunks
+			KonCampGroup campGroup = null;
+			int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
+			for(Point point : konquest.getBorderPoints(currCenter, radius+1)) {
+				if(kingdomManager.isChunkClaimed(point,currCenter.getWorld()) && kingdomManager.getChunkTerritory(point,currCenter.getWorld()) instanceof KonCamp) {
+					KonCamp adjCamp = (KonCamp)kingdomManager.getChunkTerritory(point,currCenter.getWorld());
+					// Found adjacent camp, decide to make new group or add
+					if(groupMap.containsKey(currCamp)) {
+						// current camp is already in a group
+						campGroup = groupMap.get(currCamp);
+						campGroup.addCamp(adjCamp);
+						groupMap.put(adjCamp, campGroup);
+					} else if(groupMap.containsKey(adjCamp)) {
+						// adjacent camp is already in a group
+						campGroup = groupMap.get(adjCamp);
+						campGroup.addCamp(currCamp);
+						groupMap.put(currCamp, campGroup);
+					} else {
+						// neither camps are in a group, create new one
+						campGroup = new KonCampGroup();
+						campGroup.addCamp(adjCamp);
+						groupMap.put(adjCamp, campGroup);
+						campGroup.addCamp(currCamp);
+						groupMap.put(currCamp, campGroup);
+						totalGroups++;
+					}
+				}
+			}
+			*/
+		}
+		ChatUtil.printDebug("Refreshed "+totalGroups+" camp groups");
 	}
 	
 	private void loadCamps() {

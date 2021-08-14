@@ -166,6 +166,8 @@ protection:
     camp-destroy: "Destroyed %s!"
     camp-destroy-owner: "Your camp has been destroyed!"
     camp-create: "Successfully set up your Camp."
+    camp-group-add: "%s has been added to your camp group."
+    camp-group-remove: "%s has been removed from your camp group."
     critical: "Critical Hit! %s Critical Blocks remain"
     tagged: "Tagged"
     tag-message: "You have been tagged in combat."

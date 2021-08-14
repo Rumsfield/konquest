@@ -573,6 +573,23 @@ public class Konquest implements Timeable {
 		return areaPoints;
 	}
 	
+	public ArrayList<Point> getBorderPoints(Location loc, int radius) {
+		ArrayList<Point> areaPoints = new ArrayList<Point>();
+		Point center = toPoint(loc);
+		if(radius > 0) {
+			int min = (radius-1)*-1;
+			int max = (radius-1);
+			for(int x=min;x<=max;x++) {
+				for(int z=min;z<=max;z++) {
+					if(x == min || z == min || x == max || z == max) {
+						areaPoints.add(new Point(center.x + x, center.y + z));
+					}
+				}
+			}
+		}
+		return areaPoints;
+	}
+	
 	public ArrayList<Chunk> getSideChunks(Chunk chunk) {
 		ArrayList<Chunk> sideChunks = new ArrayList<Chunk>();
 		int[] coordLUTX = {0,1,0,-1};
@@ -1095,6 +1112,10 @@ public class Konquest implements Timeable {
     
     public static void playTownArmorSound(Location loc) {
     	loc.getWorld().playSound(loc, Sound.ENTITY_SHULKER_SHOOT, (float)1.0, (float)2);
+    }
+    
+    public static void playCampGroupSound(Location loc) {
+    	loc.getWorld().playSound(loc, Sound.BLOCK_FENCE_GATE_OPEN, (float)1.0, (float)0.7);
     }
     
     public static String getTimeFormat(int valSeconds, ChatColor color) {

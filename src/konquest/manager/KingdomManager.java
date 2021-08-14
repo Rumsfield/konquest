@@ -64,7 +64,6 @@ public class KingdomManager {
 	private KonKingdom barbarians;
 	private KonKingdom neutrals;
 	private HashMap<World,KonTerritoryCache> territoryWorldCache;
-	//private HashMap<String,KonCamp> barbarianCamps;
 	private HashMap<PotionEffectType,Integer> townNerfs;
 	private Material townCriticalBlock;
 	
@@ -76,7 +75,6 @@ public class KingdomManager {
 		barbarians = null;
 		neutrals = null;
 		territoryWorldCache = new HashMap<World,KonTerritoryCache>();
-		//barbarianCamps = new HashMap<String,KonCamp>();
 		townNerfs = new HashMap<PotionEffectType,Integer>();
 		townCriticalBlock = Material.OBSIDIAN;
 	}
@@ -429,27 +427,6 @@ public class KingdomManager {
 			conquerPlayer.getKingdom().getTown(name).setPlayerLord(conquerPlayer.getOfflineBukkitPlayer());
 			return true;
 		}
-		/*
-		if(!conquerPlayer.getKingdom().getMonumentTemplate().isValid()) {
-			return false;
-		}
-		if(isKingdom(oldKingdomName) && getKingdom(oldKingdomName).hasTown(name)) {
-			konquest.getMapHandler().drawDynmapRemoveTerritory(getKingdom(oldKingdomName).getTown(name));
-			getKingdom(oldKingdomName).getTown(name).purgeResidents();
-			getKingdom(oldKingdomName).getTown(name).clearUpgrades();
-			getKingdom(oldKingdomName).getTown(name).clearShieldsArmors();
-			getKingdom(oldKingdomName).getTown(name).setKingdom(conquerPlayer.getKingdom());
-			conquerPlayer.getKingdom().addTownConquer(name, getKingdom(oldKingdomName).removeTownConquer(name));
-			conquerPlayer.getKingdom().getTown(name).refreshMonument();
-			conquerPlayer.getKingdom().getTown(name).setPlayerLord(conquerPlayer.getOfflineBukkitPlayer());
-			refreshTownNerfs(conquerPlayer.getKingdom().getTown(name));
-			refreshTownHearts(conquerPlayer.getKingdom().getTown(name));
-			conquerPlayer.getKingdom().getTown(name).updateBarPlayers();
-			konquest.getMapHandler().drawDynmapUpdateTerritory(conquerPlayer.getKingdom().getTown(name));
-			konquest.getIntegrationManager().deleteShopsInPoints(conquerPlayer.getKingdom().getTown(name).getChunkList().keySet(),conquerPlayer.getKingdom().getTown(name).getWorld());
-			return true;
-		}
-		*/
 		return false;
 	}
 	
