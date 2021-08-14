@@ -268,11 +268,11 @@ public class CampManager {
 	}
 	*/
 	private void refreshGroups() {
+		groupMap.clear();
 		boolean isClanEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_enable",false);
 		if(!isClanEnabled) {
 			return;
 		}
-		groupMap.clear();
 		int totalGroups = 0;
 		int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
 		Location center = null;

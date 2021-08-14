@@ -259,8 +259,15 @@ public class BlockListener implements Listener {
 						return;
 					}
 					
+					// Prevent group members from breaking beds they don't own
+					if(isMember && !camp.isPlayerOwner(event.getPlayer()) && event.getBlock().getBlockData() instanceof Bed) {
+						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						event.setCancelled(true);
+						return;
+					}
+					
 					// Remove the camp if a bed is broken within it
-					if(!camp.isProtected() && event.getBlock().getBlockData() instanceof Bed) {
+					if(event.getBlock().getBlockData() instanceof Bed) {
 						campManager.removeCamp(camp.getOwner().getUniqueId().toString());
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), "Destroyed "+camp.getName()+"!");
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY.getMessage(camp.getName()));

@@ -280,6 +280,7 @@ public class Konquest implements Timeable {
     		KonCamp camp = campManager.getCamp(player);
     		if(camp != null) {
     			camp.setProtected(false);
+    			camp.setOnlineOwner(bukkitPlayer);
     		}
     	}
     	// Update player membership stats

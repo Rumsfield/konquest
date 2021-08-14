@@ -154,8 +154,6 @@ public class KonquestListener implements Listener {
 						raidAlertTimer.setTime(raidAlertTimeSeconds);
 						raidAlertTimer.startTimer();
 					}
-				} else {
-					ChatUtil.printDebug("Failed to alert non-player owner of camp "+event.getTerritory().getName());
 				}
 			}
 		}

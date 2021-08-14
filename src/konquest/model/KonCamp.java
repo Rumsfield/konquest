@@ -45,7 +45,7 @@ public class KonCamp extends KonTerritory implements Timeable {
 	
 	private void initProtection() {
 		boolean isOfflineProtectedEnabled = getKonquest().getConfigManager().getConfig("core").getBoolean("core.camps.no_enemy_edit_offline",true);
-		if(isOfflineProtectedEnabled) {
+		if(isOfflineProtectedEnabled && !isOwnerOnline()) {
 			// Immediately enable protection
 			isOfflineProtected = true;
 			campBarAll.setTitle(ChatColor.YELLOW+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
@@ -77,6 +77,10 @@ public class KonCamp extends KonTerritory implements Timeable {
 	
 	public OfflinePlayer getOwner() {
 		return owner;
+	}
+	
+	public void setOnlineOwner(Player player) {
+		owner = player;
 	}
 	
 	public boolean isPlayerOwner(OfflinePlayer player) {
