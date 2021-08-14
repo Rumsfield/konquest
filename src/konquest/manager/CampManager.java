@@ -106,7 +106,7 @@ public class CampManager {
 				for(KonCamp groupCamp : groupMap.get(newCamp).getCamps()) {
 					if(groupCamp.isOwnerOnline() && groupCamp.getOwner() instanceof Player) {
 						Player bukkitPlayer = (Player)groupCamp.getOwner();
-						ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_CAMP_GROUP_ADD.getMessage(newCamp.getName()));
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_CAMP_CLAN_ADD.getMessage(newCamp.getName()));
 					}
 				}
 			}
@@ -141,7 +141,7 @@ public class CampManager {
 			for(KonCamp groupCamp : groupSet) {
 				if(groupCamp.isOwnerOnline() && groupCamp.getOwner() instanceof Player) {
 					Player bukkitPlayer = (Player)groupCamp.getOwner();
-					ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_CAMP_GROUP_REMOVE.getMessage(removedCamp.getName()));
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_CAMP_CLAN_REMOVE.getMessage(removedCamp.getName()));
 				}
 			}
 			konquest.getMapHandler().drawDynmapRemoveTerritory(removedCamp);
@@ -260,6 +260,10 @@ public class CampManager {
 	}
 	*/
 	private void refreshGroups() {
+		boolean isClanEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_enable",false);
+		if(!isClanEnabled) {
+			return;
+		}
 		groupMap.clear();
 		int totalGroups = 0;
 		int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");

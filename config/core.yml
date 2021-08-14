@@ -78,6 +78,9 @@
 #    init_radius:                   Radius of camps for barbarians. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
 #    no_enemy_edit_offline:         Prevent enemy players from breaking any blocks in camps when owners are offline (true/false)
 #    no_enemy_edit_offline_warmup:  Time in seconds when a camp is protected from when the owner disconnects (integer >= 0)
+#    clan_enable:                   Enable camp clans when barbarian camps are placed next to each other (true/false)
+#    clan_allow_containers:         Allow barbarians to access containers in camps from the same clan, CAN BE ABUSED! (true/false)
+#    clan_allow_edit_offline:       Allow barbarians to edit blocks in offline-protected camps from the same clan, CAN BE ABUSED! (true/false)
 #  monuments:
 #    critical_block*:               Blocks which must be destroyed to capture a town monument (Material, https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html, e.g. for obsidian, enum is OBSIDIAN)
 #    destroy_amount:                Amount of each destroy_blocks that must be destroyed to capture a town monument (integer >= 0)
@@ -198,6 +201,9 @@ core:
     init_radius: 2
     no_enemy_edit_offline: true
     no_enemy_edit_offline_warmup: 120
+    clan_enable: true
+    clan_allow_containers: false
+    clan_allow_edit_offline: false
   monuments:
     critical_block: OBSIDIAN
     destroy_amount: 12
