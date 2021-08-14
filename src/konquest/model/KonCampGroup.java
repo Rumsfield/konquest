@@ -3,6 +3,8 @@ package konquest.model;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.bukkit.OfflinePlayer;
+
 /**
  * Represents a group of adjacent camps
  *
@@ -37,6 +39,17 @@ public class KonCampGroup {
 	
 	public void mergeGroup(KonCampGroup otherGroup) {
 		camps.addAll(otherGroup.getCamps());
+	}
+	
+	public boolean isPlayerMember(OfflinePlayer bukkitOfflinePlayer) {
+		boolean result = false;
+		for(KonCamp camp : camps) {
+			if(camp.isPlayerOwner(bukkitOfflinePlayer)) {
+				result = true;
+				break;
+			}
+		}
+		return result;
 	}
 	
 }

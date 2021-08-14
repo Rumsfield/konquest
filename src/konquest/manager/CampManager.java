@@ -154,6 +154,14 @@ public class CampManager {
 		return true;
 	}
 	
+	public boolean isCampGrouped(KonCamp camp) {
+		return groupMap.containsKey(camp);
+	}
+	
+	public KonCampGroup getCampGroup(KonCamp camp) {
+		return groupMap.get(camp);
+	}
+	
 	/**
 	 * Attempts to remove a camp from a group
 	 * @param camp - a removed camp

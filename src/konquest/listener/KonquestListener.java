@@ -127,18 +127,20 @@ public class KonquestListener implements Listener {
 		}
 		
 		// When territory is a camp
-		// TODO check for allowable players, because some barbarians may be hostile and others may be friendly
 		if(event.getTerritory() instanceof KonCamp) {
 			KonCamp camp = (KonCamp)event.getTerritory();
-			
 			// Attempt to start a raid alert
 			if(!camp.isRaidAlertDisabled() && !event.getPlayer().isAdminBypassActive() && 
 					!event.getPlayer().getKingdom().isPeaceful()) {
 				// Verify online player
 				if(camp.isOwnerOnline() && camp.getOwner() instanceof Player) {
 					Player bukkitPlayer = (Player)camp.getOwner();
-					// Alert the camp owner if online
-					if(playerManager.isPlayer(bukkitPlayer) && !event.getPlayer().getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
+					boolean isMember = false;
+					if(konquest.getCampManager().isCampGrouped(camp)) {
+						isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(event.getPlayer().getBukkitPlayer());
+					}
+					// Alert the camp owner if player is not a group member and online
+					if(playerManager.isPlayer(bukkitPlayer) && !isMember && !event.getPlayer().getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
 						KonPlayer ownerPlayer = playerManager.getPlayer(bukkitPlayer);
 						//ChatUtil.sendNotice((Player)camp.getOwner(), "Enemy spotted in "+event.getTerritory().getName()+", use \"/k travel camp\" to defend!", ChatColor.DARK_RED);
 						ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_RAID.getMessage(event.getTerritory().getName(),"camp"),ChatColor.DARK_RED);

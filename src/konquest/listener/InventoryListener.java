@@ -135,10 +135,16 @@ public class InventoryListener implements Listener {
 					}
 				}
 				
-				// Prevent all inventory openings except for camp owner
-				if(territory instanceof KonCamp && isEnemyInvetoryOpenDenied) {
+				// Prevent all inventory openings except for camp owner and clan members when allowed
+				boolean isCampContainersProtected = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.protect_containers", true);
+				if(territory instanceof KonCamp && isCampContainersProtected) {
 					KonCamp camp = (KonCamp) territory;
-					if(!player.getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
+					boolean isMemberAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_allow_containers", false);
+					boolean isMember = false;
+					if(konquest.getCampManager().isCampGrouped(camp)) {
+						isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
+					}
+					if(!(isMember && isMemberAllowed) && !player.getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
 						//ChatUtil.printDebug("Cancelled inventory open event in "+territory.getName());
 						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);

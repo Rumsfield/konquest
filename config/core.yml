@@ -76,6 +76,7 @@
 #    remove_stats:                  Remove all stats and accomplishment prefixes from a player when exiled (true/false)
 #  camps:
 #    init_radius:                   Radius of camps for barbarians. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
+#    protect_containers:            Prevent players, except for camp owner, from using or breaking containers in camp land (true/false)
 #    no_enemy_edit_offline:         Prevent enemy players from breaking any blocks in camps when owners are offline (true/false)
 #    no_enemy_edit_offline_warmup:  Time in seconds when a camp is protected from when the owner disconnects (integer >= 0)
 #    clan_enable:                   Enable camp clans when barbarian camps are placed next to each other (true/false)
@@ -199,6 +200,7 @@ core:
     remove_stats: true
   camps:
     init_radius: 2
+    protect_containers: true
     no_enemy_edit_offline: true
     no_enemy_edit_offline_warmup: 120
     clan_enable: true

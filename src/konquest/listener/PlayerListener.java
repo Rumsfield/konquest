@@ -967,10 +967,14 @@ public class PlayerListener implements Listener{
                     	KonTerritory territoryTo = kingdomManager.getChunkTerritory(chunkTo);
     	                // Set message color based on enemy territory
     	                String color = ""+ChatColor.RED;
-    	                if(player.getKingdom().equals(territoryTo.getKingdom())) {
-    	                	color = ""+ChatColor.GREEN;
-    	                } else if(territoryTo.getKingdom().equals(kingdomManager.getNeutrals())) {
-    	                	color = ""+ChatColor.GRAY;
+    	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
+    	                	color = ""+ChatColor.YELLOW;
+    	                } else {
+    	                	if(player.getKingdom().equals(territoryTo.getKingdom())) {
+	    	                	color = ""+ChatColor.GREEN;
+	    	                } else if(territoryTo.getKingdom().equals(kingdomManager.getNeutrals())) {
+	    	                	color = ""+ChatColor.GRAY;
+	    	                }
     	                }
     	                // Display Territory Name
     	    			String territoryName = territoryTo.getName();
@@ -1002,10 +1006,14 @@ public class PlayerListener implements Listener{
         				
         				// Set message color based on enemy territory
                         String color = ""+ChatColor.RED;
-                        if(player.getKingdom().equals(territoryTo.getKingdom())) {
-                        	color = ""+ChatColor.GREEN;
-                        } else if(territoryTo.getKingdom().equals(kingdomManager.getNeutrals())) {
-    	                	color = ""+ChatColor.GRAY;
+    	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
+    	                	color = ""+ChatColor.YELLOW;
+    	                } else {
+    	                	if(player.getKingdom().equals(territoryTo.getKingdom())) {
+	    	                	color = ""+ChatColor.GREEN;
+	    	                } else if(territoryTo.getKingdom().equals(kingdomManager.getNeutrals())) {
+	    	                	color = ""+ChatColor.GRAY;
+	    	                }
     	                }
                         
         				KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
