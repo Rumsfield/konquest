@@ -427,19 +427,23 @@ public class Konquest implements Timeable {
 		if(taskID == 0) {
 			ChatUtil.printDebug("Save Timer ended with null taskID!");
 		} else if(taskID == saveTimer.getTaskID()) {
-			// Prune residents for being offline too long
+			// Prune residents and camp owners for being offline too long
 			if(offlineTimeoutSeconds != 0) {
 				// Search all stored players and prune
 				Date now = new Date();
 				for(KonOfflinePlayer player : playerManager.getAllKonOfflinePlayers()) {
 					long lastPlayedTime = player.getOfflineBukkitPlayer().getLastPlayed();
 					if(lastPlayedTime > 0 && now.after(new Date(lastPlayedTime + (offlineTimeoutSeconds*1000)))) {
-						// Offline player has exceeded timeout period, prune from residencies
+						// Offline player has exceeded timeout period, prune from residencies and camp
 						for(KonTown town : player.getKingdom().getTowns()) {
 							if(town.getPlayerResidents().contains(player.getOfflineBukkitPlayer())) {
 								boolean status = town.removePlayerResident(player.getOfflineBukkitPlayer());
 								ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from town "+town.getName()+" in kingdom "+player.getKingdom().getName()+", got "+status);
 							}
+						}
+						if(campManager.isCampSet(player)) {
+							campManager.removeCamp(player);
+							ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from camp");
 						}
 					}
 				}
