@@ -118,7 +118,7 @@ public class MapHandler {
 		}
 		Marker territoryIcon = territoryGroup.findMarker(iconId);
 		if (territoryIcon == null) {
-			// Icon does not exist, create ne
+			// Icon does not exist, create new
 			territoryIcon = territoryGroup.createMarker(iconId, iconLabel, true, drawArea.getWorldName(), drawArea.getCenterX(), drawArea.getCenterY(), drawArea.getCenterZ(), icon, false);
 		} else {
 			// Icon already exists, update label
@@ -143,6 +143,7 @@ public class MapHandler {
 		
 		String groupId = getGroupId(territory);
 		String areaId = getAreaId(territory);
+		String iconId = getIconId(territory);
 		
 		MarkerSet territoryGroup = dapi.getMarkerAPI().getMarkerSet(groupId);
 		if (territoryGroup != null) {
@@ -151,6 +152,12 @@ public class MapHandler {
 				// Delete area from group
 				territoryArea.deleteMarker();
 				ChatUtil.printDebug("Removing Dynmap area of territory "+territory.getName());
+			}
+			Marker territoryIcon = territoryGroup.findMarker(iconId);
+			if (territoryIcon != null) {
+				// Delete icon
+				territoryIcon.deleteMarker();
+				ChatUtil.printDebug("Removing Dynmap icon of territory "+territory.getName());
 			}
 			if (territoryGroup.getAreaMarkers().isEmpty()) {
 				// Delete group if no more areas
