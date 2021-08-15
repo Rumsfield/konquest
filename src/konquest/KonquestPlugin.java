@@ -189,7 +189,7 @@ public class KonquestPlugin extends JavaPlugin {
 			String perm = p.getPermission();
 			if(perm.contains("konquest.discount")) {
 				String valStr = perm.split("\\.",3)[2];
-				ChatUtil.printDebug("Withdraw discount found: "+valStr);
+				//ChatUtil.printDebug("Withdraw discount found: "+valStr);
 				int valNum = 0;
 				try {
         			valNum = Integer.parseInt(valStr);
@@ -204,7 +204,7 @@ public class KonquestPlugin extends JavaPlugin {
 		// Apply discount
 		double amountMod = amount;
 		if(discount > 0 && discount <= 100) {
-			ChatUtil.printDebug("Applying discount of "+discount+"%");
+			//ChatUtil.printDebug("Applying discount of "+discount+"%");
 			double amountOff = amount * ((double)discount / 100);
 			amountMod = amount - amountOff;
 			String amountF = String.format("%.2f",amountOff);
