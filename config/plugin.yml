@@ -49,6 +49,7 @@ permissions:
       konquest.command.prefix: true
       konquest.command.town: true
       konquest.command.admin: true
+      konquest.command.fly: false
 
   konquest.command.help:
     description: Display help in chat
@@ -122,6 +123,10 @@ permissions:
     description: For admins
     default: op
     
+  konquest.command.fly:
+    description: Fly in friendly territory
+    default: false
+    
   konquest.directive:
     description: Gives access to base Konquest directive permission
     default: true
@@ -183,3 +188,11 @@ permissions:
   konquest.join:
     description: Join a kingdom
     default: op
+    
+  konquest.discount:
+    description: Applies a percent discount on all Favor withdraws
+    default: false
+    
+  konquest.prefix:
+    description: Grants access to a custom prefix
+    default: false

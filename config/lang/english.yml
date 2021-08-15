@@ -127,6 +127,7 @@ generic:
     reduce-favor: "Favor reduced by %s, total: %s"
     reward-favor: "Favor rewarded: %s, total: %s"
     reward-exp: "EXP rewarded: %s"
+    discount-favor: "%s percent discount, you saved %s Favor."
     click-air: "Click on Air to cancel."
     clicked-air: "Clicked in Air, cancelled region creation."
     success: "Success!"

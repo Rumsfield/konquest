@@ -114,6 +114,7 @@ public enum MessagePath {
 	GENERIC_NOTICE_REDUCE_FAVOR                 (2, "generic.notice.reduce-favor"),
 	GENERIC_NOTICE_REWARD_FAVOR                 (2, "generic.notice.reward-favor"),
 	GENERIC_NOTICE_REWARD_EXP                   (1, "generic.notice.reward-exp"),
+	GENERIC_NOTICE_DISCOUNT_FAVOR               (2, "generic.notice.discount-favor"),
 	GENERIC_NOTICE_CLICK_AIR                    (0, "generic.notice.click-air"),
 	GENERIC_NOTICE_CLICKED_AIR                  (0, "generic.notice.clicked-air"),
 	GENERIC_NOTICE_SUCCESS                      (0, "generic.notice.success"),

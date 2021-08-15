@@ -8,11 +8,14 @@ import konquest.listener.KonquestListener;
 import konquest.listener.PlayerListener;
 import konquest.listener.WorldListener;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import konquest.utility.Metrics;
 import konquest.utility.Updater;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -178,17 +181,47 @@ public class KonquestPlugin extends JavaPlugin {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public static EconomyResponse withdrawPlayer(OfflinePlayer offlineBukkitPlayer, double amount) {
+	public static EconomyResponse withdrawPlayer(Player bukkitPlayer, double amount) {
+		// Check for discounts
+		// Look for discount permissions, for biggest discount
+		int discount = 0;
+		for(PermissionAttachmentInfo p : bukkitPlayer.getEffectivePermissions()) {
+			String perm = p.getPermission();
+			if(perm.contains("konquest.discount")) {
+				String valStr = perm.split("\\.",3)[2];
+				ChatUtil.printDebug("Withdraw discount found: "+valStr);
+				int valNum = 0;
+				try {
+        			valNum = Integer.parseInt(valStr);
+        		} catch(NumberFormatException e) {
+        			ChatUtil.printDebug("Failed to parse discount value");
+        		}
+				if(valNum > discount) {
+					discount = valNum;
+				}
+			}
+		}
+		// Apply discount
+		double amountMod = amount;
+		if(discount > 0 && discount <= 100) {
+			ChatUtil.printDebug("Applying discount of "+discount+"%");
+			double amountOff = amount * (discount / 100);
+			amountMod = amount - amountOff;
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(discount,amountOff));
+		} else {
+			ChatUtil.printDebug("Failed to apply invalid discount of "+discount+"%");
+		}
+		// Perform transaction
 		EconomyResponse result;
 		try {
-			result = econ.withdrawPlayer(offlineBukkitPlayer, amount);
+			result = econ.withdrawPlayer(bukkitPlayer, amountMod);
 		} catch(Exception e) {
 			ChatUtil.printDebug("Failed to withdraw using Player: "+e.getMessage());
 			try {
-				result = econ.withdrawPlayer(offlineBukkitPlayer.getName(), amount);
+				result = econ.withdrawPlayer(bukkitPlayer.getName(), amountMod);
 			} catch(Exception x) {
 				ChatUtil.printDebug("Failed to withdraw using Name: "+x.getMessage());
-				result = econ.withdrawPlayer(formatStringForAConomyPlugin(offlineBukkitPlayer), amount);
+				result = econ.withdrawPlayer(formatStringForAConomyPlugin(bukkitPlayer), amountMod);
 			}
 		}
 		return result;
