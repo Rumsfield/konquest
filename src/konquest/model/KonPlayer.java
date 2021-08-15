@@ -322,9 +322,9 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	    		if(bukkitPlayer.isFlying()) {
 	    			Location playerLoc = bukkitPlayer.getLocation();
 	    			ChunkSnapshot snap = playerLoc.getChunk().getChunkSnapshot();
-	    			int x = playerLoc.getBlockX();
+	    			int x = playerLoc.getBlockX() - snap.getX()*16;
 	    			int y = playerLoc.getBlockY();
-	    			int z = playerLoc.getBlockZ();
+	    			int z = playerLoc.getBlockZ() - snap.getZ()*16;
 	    			while(snap.getBlockType(x, y, z).isAir()) {
 	    				y--;
 	    				if(y < playerLoc.getWorld().getMinHeight()) {
@@ -332,7 +332,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	    					break;
 	    				}
 	    			}
-	    			bukkitPlayer.teleport(new Location(playerLoc.getWorld(),x,y,z),TeleportCause.PLUGIN);
+	    			bukkitPlayer.teleport(new Location(playerLoc.getWorld(),playerLoc.getBlockX()+0.5,y+1,playerLoc.getBlockZ()+0.5),TeleportCause.PLUGIN);
 	    		}
 	    		bukkitPlayer.setFlying(false);
 	    		bukkitPlayer.setAllowFlight(false);
@@ -345,7 +345,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	
 	public void setFlyDisableWarmup(boolean enable) {
 		// Begin or cancel the fly disable warmup (5 seconds)
-		if(enable) {
+		if(enable && isFlying) {
 			Date now = new Date();
 			flyDisableTime = now.getTime() + (5 * 1000);
 			flyDisableWarmupTimer.stopTimer();
@@ -452,7 +452,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 				flyDisableWarmupTimer.stopTimer();
 			} else {
 				int timeLeft = (int)(flyDisableTime - now.getTime()) / 1000;
-				ChatUtil.sendKonPriorityTitle(this, "", ChatColor.GOLD+""+timeLeft, 16, 2, 2);
+				ChatUtil.sendKonPriorityTitle(this, "", ChatColor.GOLD+""+(timeLeft+1), 16, 2, 2);
 			}
 			
 		}

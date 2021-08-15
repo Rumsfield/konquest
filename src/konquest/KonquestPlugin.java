@@ -205,9 +205,10 @@ public class KonquestPlugin extends JavaPlugin {
 		double amountMod = amount;
 		if(discount > 0 && discount <= 100) {
 			ChatUtil.printDebug("Applying discount of "+discount+"%");
-			double amountOff = amount * (discount / 100);
+			double amountOff = amount * ((double)discount / 100);
 			amountMod = amount - amountOff;
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(discount,amountOff));
+			String amountF = String.format("%.2f",amountOff);
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(discount,amountF));
 		} else {
 			ChatUtil.printDebug("Failed to apply invalid discount of "+discount+"%");
 		}

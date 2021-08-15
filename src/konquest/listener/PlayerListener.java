@@ -999,9 +999,11 @@ public class PlayerListener implements Listener{
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAMP)) {
     	    				((KonCamp) territoryTo).addBarPlayer(player);
     	    			}
-    	    			// Try to stop fly disable warmup
+    	    			// Try to stop fly disable warmup, or disable immediately
     	    			if(territoryTo.getKingdom().equals(player.getKingdom())) {
     	    				player.setFlyDisableWarmup(false);
+    	    			} else {
+    	    				player.setIsFlyEnabled(false);
     	    			}
                     }
         		} else if(isTerritoryTo && isTerritoryFrom) { // When moving between two claimed territories
@@ -1062,7 +1064,7 @@ public class PlayerListener implements Listener{
         	    			if(territoryTo.getKingdom().equals(player.getKingdom())) {
         	    				player.setFlyDisableWarmup(false);
         	    			} else {
-        	    				player.setFlyDisableWarmup(true);
+        	    				player.setIsFlyEnabled(false);
         	    			}
         	            }
         			} else { // moving between the same territory
