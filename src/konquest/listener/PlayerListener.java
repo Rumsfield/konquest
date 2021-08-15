@@ -958,6 +958,8 @@ public class PlayerListener implements Listener{
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
         			kingdomManager.clearTownHearts(player);
+        			// Begin fly disable warmup
+        			player.setFlyDisableWarmup(true);
         		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
         			KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
                     if(invokeEvent != null) {
@@ -996,6 +998,10 @@ public class PlayerListener implements Listener{
     	    				((KonCapital) territoryTo).addBarPlayer(player);
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAMP)) {
     	    				((KonCamp) territoryTo).addBarPlayer(player);
+    	    			}
+    	    			// Try to stop fly disable warmup
+    	    			if(territoryTo.getKingdom().equals(player.getKingdom())) {
+    	    				player.setFlyDisableWarmup(false);
     	    			}
                     }
         		} else if(isTerritoryTo && isTerritoryFrom) { // When moving between two claimed territories
@@ -1052,6 +1058,12 @@ public class PlayerListener implements Listener{
         	    			}
         	            	//updateGolemTargetsForTerritory(territoryFrom,player,true);
         					//updateGolemTargetsForTerritory(territoryTo,player,true);
+        	            	// Try to stop or start fly disable warmup
+        	    			if(territoryTo.getKingdom().equals(player.getKingdom())) {
+        	    				player.setFlyDisableWarmup(false);
+        	    			} else {
+        	    				player.setFlyDisableWarmup(true);
+        	    			}
         	            }
         			} else { // moving between the same territory
         				//ChatUtil.sendNotice(bukkitPlayer, "(Debug) "+territoryTo.getName()+": "+chunkCoordsTo);
@@ -1093,6 +1105,8 @@ public class PlayerListener implements Listener{
     			if(player.isMapAuto()) {
     				player.setIsMapAuto(false);
     			}
+    			// Disable flying
+    			player.setIsFlyEnabled(false);
     			
     			//kingdomManager.stopPlayerBorderParticles(player);
     			kingdomManager.updatePlayerBorderParticles(player,event.getTo());

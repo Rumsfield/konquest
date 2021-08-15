@@ -13,12 +13,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.bukkit.ChatColor;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 public class KonPlayer extends KonOfflinePlayer implements Timeable{
 
@@ -46,6 +48,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	private boolean isGiveLordConfirmed;
 	private boolean isPriorityTitleDisplay;
 	private boolean isCombatTagged;
+	private boolean isFlying;
 	
 	private Timer exileConfirmTimer;
 	private Timer giveLordConfirmTimer;
@@ -54,8 +57,10 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	private Timer monumentTemplateLoopTimer;
 	private Timer monumentShowLoopTimer;
 	private Timer combatTagTimer;
+	private Timer flyDisableWarmupTimer;
 	private long recordPlayCooldownTime;
 	private int monumentShowLoopCount;
+	private long flyDisableTime;
 	private ArrayList<Mob> targetMobList;
 	private HashMap<KonDirective,Integer> directiveProgress;
 	private KonStats playerStats;
@@ -82,6 +87,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		this.isGiveLordConfirmed = false;
 		this.isPriorityTitleDisplay = false;
 		this.isCombatTagged = false;
+		this.isFlying = false;
 		this.exileConfirmTimer = new Timer(this);
 		this.giveLordConfirmTimer = new Timer(this);
 		this.priorityTitleDisplayTimer = new Timer(this);
@@ -89,8 +95,10 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		this.monumentTemplateLoopTimer = new Timer(this);
 		this.monumentShowLoopTimer = new Timer(this);
 		this.combatTagTimer = new Timer(this);
+		this.flyDisableWarmupTimer = new Timer(this);
 		this.recordPlayCooldownTime = 0;
 		this.monumentShowLoopCount = 0;
+		this.flyDisableTime = 0;
 		this.targetMobList = new ArrayList<Mob>();
 		this.directiveProgress = new HashMap<KonDirective,Integer>();
 		this.playerStats = new KonStats();
@@ -210,6 +218,10 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		return isCombatTagged;
 	}
 	
+	public boolean isFlyEnabled() {
+		return isFlying;
+	}
+	
 	public Timer getGiveLordConfirmTimer() {
 		return giveLordConfirmTimer;
 	}
@@ -301,6 +313,49 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		isCombatTagged = val;
 	}
 	
+	public void setIsFlyEnabled(boolean val) {
+		try {
+			if(val) {
+				bukkitPlayer.setAllowFlight(true);
+	    	} else {
+	    		// Attempt to tp the player to the ground beneath their feet
+	    		if(bukkitPlayer.isFlying()) {
+	    			Location playerLoc = bukkitPlayer.getLocation();
+	    			ChunkSnapshot snap = playerLoc.getChunk().getChunkSnapshot();
+	    			int x = playerLoc.getBlockX();
+	    			int y = playerLoc.getBlockY();
+	    			int z = playerLoc.getBlockZ();
+	    			while(snap.getBlockType(x, y, z).isAir()) {
+	    				y--;
+	    				if(y < playerLoc.getWorld().getMinHeight()) {
+	    					y = playerLoc.getWorld().getMinHeight();
+	    					break;
+	    				}
+	    			}
+	    			bukkitPlayer.teleport(new Location(playerLoc.getWorld(),x,y,z),TeleportCause.PLUGIN);
+	    		}
+	    		bukkitPlayer.setFlying(false);
+	    		bukkitPlayer.setAllowFlight(false);
+	    	}
+			isFlying = val;
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void setFlyDisableWarmup(boolean enable) {
+		// Begin or cancel the fly disable warmup (5 seconds)
+		if(enable) {
+			Date now = new Date();
+			flyDisableTime = now.getTime() + (5 * 1000);
+			flyDisableWarmupTimer.stopTimer();
+			flyDisableWarmupTimer.setTime(0);
+			flyDisableWarmupTimer.startLoopTimer();
+		} else {
+			flyDisableWarmupTimer.stopTimer();
+		}
+	}
+	
 	public void removeAllBorders() {
 		borderMap.clear();
 	}
@@ -317,6 +372,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		monumentTemplateLoopTimer.stopTimer();
 		monumentShowLoopTimer.stopTimer();
 		combatTagTimer.stopTimer();
+		flyDisableWarmupTimer.stopTimer();
 	}
 	
 	public void setIsMapAuto(boolean val) {
@@ -388,6 +444,17 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 			ChatUtil.sendKonPriorityTitle(this, "", ChatColor.GOLD+MessagePath.PROTECTION_NOTICE_UNTAGGED.getMessage(), 20, 1, 10);
 			ChatUtil.sendNotice(this.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_UNTAG_MESSAGE.getMessage());
 			ChatUtil.printDebug("Combat tag timer ended with taskID: "+taskID+" for "+bukkitPlayer.getName());
+		} else if(taskID == flyDisableWarmupTimer.getTaskID()) {
+			// Display fly disable countdown, then disable flying
+			Date now = new Date();
+			if(flyDisableTime <= now.getTime()) {
+				setIsFlyEnabled(false);
+				flyDisableWarmupTimer.stopTimer();
+			} else {
+				int timeLeft = (int)(flyDisableTime - now.getTime()) / 1000;
+				ChatUtil.sendKonPriorityTitle(this, "", ChatColor.GOLD+""+timeLeft, 16, 2, 2);
+			}
+			
 		}
 	}
 	
