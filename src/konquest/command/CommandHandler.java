@@ -60,6 +60,9 @@ public class CommandHandler  implements TabExecutor {
                     case FAVOR:
                         new FavorCommand(konquest, sender, args).execute();
                         break;
+                    case FLY:
+                        new FlyCommand(konquest, sender, args).execute();
+                        break;
                     case INFO:
                         new InfoCommand(konquest, sender, args).execute();
                         break;
@@ -157,6 +160,9 @@ public class CommandHandler  implements TabExecutor {
                     case FAVOR:
                     	tabList.addAll(new FavorCommand(konquest, sender, args).tabComplete());
                     	//ChatUtil.printDebug("Tab Complete for FavorCommand: "+args.length);
+                        break;
+                    case FLY:
+                    	tabList.addAll(new FlyCommand(konquest, sender, args).tabComplete());
                         break;
                     case INFO:
                     	tabList.addAll(new InfoCommand(konquest, sender, args).tabComplete());

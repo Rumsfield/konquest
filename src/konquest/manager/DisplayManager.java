@@ -333,7 +333,7 @@ public class DisplayManager {
     	// Create new menu
     	PagedMenu newMenu = new PagedMenu();
 		// Page 0
-    	newMenu.addPage(0, (int)Math.ceil((CommandType.values().length+1)/9), ChatColor.BLACK+"Konquest Help");
+    	newMenu.addPage(0, (int)Math.ceil(((double)(CommandType.values().length+1))/9), ChatColor.BLACK+MessagePath.MENU_HELP_TITLE.getMessage());
     	// Add command icons
 		for(CommandType cmd : CommandType.values()) {
 			switch (cmd) {
@@ -371,6 +371,7 @@ public class DisplayManager {
 		info.setInfo(ChatColor.GOLD+MessagePath.MENU_HELP_HINT.getMessage()+": "+ChatColor.DARK_PURPLE+ChatColor.UNDERLINE+communityLink);
 		newMenu.getPage(0).addIcon(info);
 		i++;
+		
 		newMenu.refreshNavigationButtons();
 		newMenu.setPageIndex(0);
 		menuCache.put(newMenu.getCurrentPage().getInventory(), newMenu);

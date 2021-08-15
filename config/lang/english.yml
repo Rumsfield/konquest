@@ -83,6 +83,7 @@ menu:
     fail-cost: "Failed to add %s level %s, requires %s Favor."
     add: "Added %s level %s to the Town of %s!"
   help:
+    title: "Konquest Help"
     community: "Community"
     hint: "Click to join"
   score:
@@ -625,6 +626,7 @@ description:
   stats: "Display your Accomplishment stats."
   prefix: "Set your prefix title."
   score: "Display a Player's current score."
+  fly: "Fly within friendly land."
   admin: "For Admins only."
   admin-help: "Display the admin help message."
   admin-bypass: "Toggle Admin bypass mode."
