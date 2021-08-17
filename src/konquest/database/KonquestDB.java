@@ -176,6 +176,10 @@ public class KonquestDB extends Database{
             createPlayerData(bukkitPlayer);
             player = konquest.getPlayerManager().createKonPlayer(bukkitPlayer);
         } else {
+        	assertPlayerData(bukkitPlayer);
+        	//TODO: Insert player into tables if they're not already in them,
+        	// i.e. the customs table is new and existing players must be inserted.
+        	
         	ResultSet playerInfo = select("players", "uuid", bukkitPlayer.getUniqueId().toString());
         	String kingdomName = "";
     		String exileKingdomName = "";
@@ -252,19 +256,19 @@ public class KonquestDB extends Database{
             if(customPrefix == null) {
             	ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" custom is NULL!");
             } else {
-            	ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" custom is "+customPrefix);
+            	ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" custom is \""+customPrefix+"\"");
             }
             if(mainPrefix == null) {
             	ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" prefix is NULL!");
             } else {
-            	ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" prefix is "+mainPrefix);
+            	ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" prefix is \""+mainPrefix+"\"");
             }
             
             // END DEBUG
-            if(customPrefix != null && customPrefix != "" && konquest.getAccomplishmentManager().isEnabled()) {
+            if(customPrefix != null && !customPrefix.equals("") && konquest.getAccomplishmentManager().isEnabled()) {
             	// Update player's custom prefix first
             	prefixStatus = konquest.getAccomplishmentManager().setPlayerCustomPrefix(player, customPrefix);
-            } else if(mainPrefix != null && mainPrefix != "" && konquest.getAccomplishmentManager().isEnabled()) {
+            } else if(mainPrefix != null && !mainPrefix.equals("") && konquest.getAccomplishmentManager().isEnabled()) {
             	// Update player's main prefix
             	prefixStatus = player.getPlayerPrefix().setPrefix(KonPrefixType.getPrefix(mainPrefix)); // Defaults to default prefix defined in KonPrefixType if mainPrefix is not a valid enum
         	} else {
@@ -324,6 +328,22 @@ public class KonquestDB extends Database{
         insert("stats", new String[] {"uuid"}, new String[] {uuid});
         insert("directives", new String[] {"uuid"}, new String[] {uuid});
         insert("customs", new String[] {"uuid"}, new String[] {uuid});
+    }
+    
+    public void assertPlayerData(Player bukkitPlayer) {
+        String uuid = bukkitPlayer.getUniqueId().toString();
+        if (!exists("players", "uuid", uuid)) {
+        	insert("players", new String[] {"uuid"}, new String[] {uuid});
+        }
+        if (!exists("stats", "uuid", uuid)) {
+        	insert("stats", new String[] {"uuid"}, new String[] {uuid});
+        }
+        if (!exists("directives", "uuid", uuid)) {
+        	insert("directives", new String[] {"uuid"}, new String[] {uuid});
+        }
+        if (!exists("customs", "uuid", uuid)) {
+        	insert("customs", new String[] {"uuid"}, new String[] {uuid});
+        }
     }
     
     public void flushPlayerData(Player bukkitPlayer) {

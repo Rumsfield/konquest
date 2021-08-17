@@ -14,5 +14,5 @@ prefix:
     name: '&bDonor'
     cost: 0
   gamer:
-    name: '&o&3Gamer'
+    name: '&d&oGamer'
     cost: 1000
