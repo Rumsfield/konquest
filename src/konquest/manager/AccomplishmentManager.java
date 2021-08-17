@@ -3,6 +3,7 @@ package konquest.manager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -44,7 +45,7 @@ public class AccomplishmentManager {
 	public void initialize() {
 		boolean configEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.accomplishment_prefix");
 		isEnabled = configEnabled;
-		loadCustomPrefixes();
+		//loadCustomPrefixes();
 		ChatUtil.printDebug("Accomplishment Manager is ready with prefix "+isEnabled);
 	}
 	
@@ -222,7 +223,7 @@ public class AccomplishmentManager {
 	}
 	
 	// Load custom prefixes from file
-	private void loadCustomPrefixes() {
+	public void loadCustomPrefixes() {
 		customPrefixes.clear();
 		// Get all custom prefixes from file
 		FileConfiguration prefixConfig = konquest.getConfigManager().getConfig("prefix");
@@ -262,6 +263,21 @@ public class AccomplishmentManager {
         		}
         	}
         }
+	}
+	
+	public Set<String> getCustomPrefixLabels() {
+		return customPrefixes.keySet();
+	}
+	
+	public boolean setPlayerCustomPrefix(KonPlayer player, String label) {
+		boolean result = false;
+		if(customPrefixes.containsKey(label)) {
+			String prefix = customPrefixes.get(label).getName();
+			if(player.getPlayerPrefix().setCustomPrefix(label, prefix)) {
+				result = true;
+			}
+		}
+		return result;
 	}
 
 }

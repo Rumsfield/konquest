@@ -2,20 +2,25 @@ package konquest.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 public class KonPrefix {
 
 	private ArrayList<KonPrefixType> prefixList;
 	private KonPrefixType mainPrefix;
 	private boolean enabled;
+	private String customLabel;
 	private String customPrefix;
+	private HashSet<String> availableCustoms;
 	
 	public KonPrefix() {
 		this.prefixList = new ArrayList<KonPrefixType>();
 		this.prefixList.add(KonPrefixType.getDefault());
 		this.mainPrefix = KonPrefixType.getDefault();
 		this.enabled = false;
+		this.customLabel = "";
 		this.customPrefix = "";
+		this.availableCustoms = new HashSet<String>();
 	}
 	
 	public void setEnable(boolean en) {
@@ -61,6 +66,7 @@ public class KonPrefix {
 		boolean result = false;
 		if(prefixList.contains(prefix)) {
 			mainPrefix = prefix;
+			customLabel = "";
 			result = true;
 		}
 		return result;
@@ -71,7 +77,7 @@ public class KonPrefix {
 	}
 	
 	public String getMainPrefixName() {
-		if(customPrefix == null || customPrefix.equals("")) {
+		if(customLabel == null || customLabel.equals("")) {
 			return mainPrefix.getName();
 		} else {
 			return customPrefix;
@@ -90,11 +96,24 @@ public class KonPrefix {
 		return result;
 	}
 	
-	public void setCustomPrefix(String prefix) {
-		customPrefix = prefix;
+	public boolean setCustomPrefix(String label, String prefix) {
+		if(isCustomAvailable(label)) {
+			customLabel = label;
+			customPrefix = prefix;
+			return true;
+		}
+		return false;
 	}
 	
-	public String getCustomPrefix() {
-		return customPrefix;
+	public String getCustom() {
+		return customLabel;
+	}
+	
+	public void addAvailableCustom(String label) {
+		availableCustoms.add(label);
+	}
+	
+	public boolean isCustomAvailable(String label) {
+		return availableCustoms.contains(label);
 	}
 }
