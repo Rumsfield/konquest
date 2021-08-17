@@ -45,7 +45,7 @@ public class AccomplishmentManager {
 	public void initialize() {
 		boolean configEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.accomplishment_prefix");
 		isEnabled = configEnabled;
-		//loadCustomPrefixes();
+		//loadCustomPrefixes(); // moved to database init
 		ChatUtil.printDebug("Accomplishment Manager is ready with prefix "+isEnabled);
 	}
 	
@@ -258,7 +258,7 @@ public class AccomplishmentManager {
         			status = false;
         		}
         		if(status) {
-        			customPrefixes.put(prefixName.toLowerCase(), new KonCustomPrefix(prefixLabel,prefixName,prefixCost));
+        			customPrefixes.put(prefixLabel.toLowerCase(), new KonCustomPrefix(prefixLabel.toLowerCase(),prefixName,prefixCost));
         			ChatUtil.printDebug("Loaded custom prefix: "+prefixLabel);
         		}
         	}
@@ -269,14 +269,40 @@ public class AccomplishmentManager {
 		return customPrefixes.keySet();
 	}
 	
+	public List<KonCustomPrefix> getCustomPrefixes() {
+		List<KonCustomPrefix> result = new ArrayList<KonCustomPrefix>();
+		for(KonCustomPrefix c : customPrefixes.values()) {
+			result.add(c);
+		}
+		return result;
+	}
+	
+	/**
+	 * Sets a player prefix without checks
+	 * @param player
+	 * @param label
+	 * @return
+	 */
 	public boolean setPlayerCustomPrefix(KonPlayer player, String label) {
 		boolean result = false;
 		if(customPrefixes.containsKey(label)) {
-			String prefix = customPrefixes.get(label).getName();
-			if(player.getPlayerPrefix().setCustomPrefix(label, prefix)) {
+			KonCustomPrefix prefix = customPrefixes.get(label);
+			if(player.getPlayerPrefix().setCustomPrefix(prefix)) {
 				result = true;
 			}
 		}
+		return result;
+	}
+	
+	/**
+	 * Sets a player prefix with checks
+	 * @param player
+	 * @param label
+	 * @return
+	 */
+	public boolean applyPlayerCustomPrefix(KonPlayer player, String label) {
+		boolean result = false;
+		
 		return result;
 	}
 

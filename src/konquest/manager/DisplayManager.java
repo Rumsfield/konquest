@@ -31,12 +31,14 @@ import konquest.display.OptionIcon.optionAction;
 import konquest.display.PagedMenu;
 import konquest.display.PlayerIcon;
 import konquest.display.PlayerIcon.PlayerIconAction;
+import konquest.display.PrefixCustomIcon;
 import konquest.display.PrefixIcon.PrefixIconAction;
 import konquest.display.ShieldIcon;
 import konquest.display.PrefixIcon;
 import konquest.display.TownIcon;
 import konquest.display.UpgradeIcon;
 import konquest.model.KonArmor;
+import konquest.model.KonCustomPrefix;
 import konquest.model.KonKingdom;
 import konquest.model.KonKingdomScoreAttributes;
 import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
@@ -1128,11 +1130,15 @@ public class DisplayManager {
  		
    		// Create fresh paged menu
  		PagedMenu newMenu = new PagedMenu();
+ 		String loreColor = ""+ChatColor.YELLOW;
+		String valueColor = ""+ChatColor.AQUA;
+		String pageColor = ""+ChatColor.BLACK;
 		String pageLabel = "";
 		String playerPrefix = "";
 		if(displayPlayer.getPlayerPrefix().isEnabled()) {
 			playerPrefix = displayPlayer.getPlayerPrefix().getMainPrefixName();
 		}
+		final int MAX_ICONS_PER_PAGE = 45;
 		final int MAX_ROWS_PER_PAGE = 5;
 		final int ICONS_PER_ROW = 9;
 		
@@ -1211,7 +1217,44 @@ public class DisplayManager {
 			}
 			pageNum++;
 		}
-		
+		// Page N+
+		List<String> loreList;
+		boolean isAllowed = false;
+		List<KonCustomPrefix> allCustoms = konquest.getAccomplishmentManager().getCustomPrefixes();
+		pageTotal = (int)Math.ceil(((double)allCustoms.size())/MAX_ICONS_PER_PAGE);
+		if(pageTotal == 0) {
+			pageTotal = 1;
+		}
+		if(!allCustoms.isEmpty()) {
+			ListIterator<KonCustomPrefix> customIter = allCustoms.listIterator();
+			for(int i = 0; i < pageTotal; i++) {
+				int numPageRows = (int)Math.ceil(((double)((allCustoms.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
+				if(numPageRows == 0) {
+					numPageRows = 1;
+				}
+				pageLabel = pageColor+MessagePath.MENU_PREFIX_CUSTOM_PAGES.getMessage()+" "+(i+1)+"/"+pageTotal;
+				newMenu.addPage(pageNum, numPageRows, pageLabel);
+				int slotIndex = 0;
+				while(slotIndex < MAX_ICONS_PER_PAGE && customIter.hasNext()) {
+					/* Custom Prefix Icon (n) */
+					loreList = new ArrayList<String>();
+					KonCustomPrefix currentCustom = customIter.next();
+					loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+currentCustom.getCost());
+					if(displayPlayer.getBukkitPlayer().hasPermission("konquest.prefix."+currentCustom.getLabel())) {
+						isAllowed = true;
+						loreList.add(ChatColor.GOLD+MessagePath.MENU_PREFIX_HINT_APPLY.getMessage());
+					} else {
+						isAllowed = false;
+						loreList.add(ChatColor.DARK_RED+MessagePath.MENU_PREFIX_NO_ALLOW.getMessage());
+					}
+			    	PrefixCustomIcon customIcon = new PrefixCustomIcon(currentCustom, loreList, slotIndex, isAllowed);
+					newMenu.getPage(pageNum).addIcon(customIcon);
+					slotIndex++;
+				}
+				pageNum++;
+			}
+		}
+				
 		newMenu.refreshNavigationButtons();
 		newMenu.setPageIndex(0);
 		menuCache.put(newMenu.getCurrentPage().getInventory(), newMenu);

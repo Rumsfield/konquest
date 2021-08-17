@@ -98,6 +98,8 @@ public enum MessagePath {
 	MENU_PREFIX_DISABLE                         (0, "menu.prefix.disable"),
 	MENU_PREFIX_HINT_DISABLE                    (0, "menu.prefix.hint-disable"),
 	MENU_PREFIX_HINT_APPLY                      (0, "menu.prefix.hint-apply"),
+	MENU_PREFIX_CUSTOM_PAGES                    (0, "menu.prefix.custom-pages"),
+	MENU_PREFIX_NO_ALLOW                        (0, "menu.prefix.no-allow"),
 	MENU_SHIELD_HINT                            (0, "menu.shield.hint"),
 	MENU_SHIELD_FAIL_MAX                        (1, "menu.shield.fail-max"),
 	MENU_SHIELD_FAIL_ADD                        (0, "menu.shield.fail-add"),

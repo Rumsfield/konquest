@@ -108,6 +108,8 @@ menu:
     disable: "Off"
     hint-disable: "Click to disable"
     hint-apply: "Click to apply"
+    custom-pages: "Custom Prefixes"
+    no-allow: "Missing permission"
   shield:
     hint: "Click to charge"
     fail-max: "Failed to charge, exceeds maximum of %s."

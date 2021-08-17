@@ -9,8 +9,7 @@ public class KonPrefix {
 	private ArrayList<KonPrefixType> prefixList;
 	private KonPrefixType mainPrefix;
 	private boolean enabled;
-	private String customLabel;
-	private String customPrefix;
+	private KonCustomPrefix customPrefix;
 	private HashSet<String> availableCustoms;
 	
 	public KonPrefix() {
@@ -18,8 +17,7 @@ public class KonPrefix {
 		this.prefixList.add(KonPrefixType.getDefault());
 		this.mainPrefix = KonPrefixType.getDefault();
 		this.enabled = false;
-		this.customLabel = "";
-		this.customPrefix = "";
+		this.customPrefix = null;
 		this.availableCustoms = new HashSet<String>();
 	}
 	
@@ -66,7 +64,7 @@ public class KonPrefix {
 		boolean result = false;
 		if(prefixList.contains(prefix)) {
 			mainPrefix = prefix;
-			customLabel = "";
+			customPrefix = null;
 			result = true;
 		}
 		return result;
@@ -77,10 +75,10 @@ public class KonPrefix {
 	}
 	
 	public String getMainPrefixName() {
-		if(customLabel == null || customLabel.equals("")) {
+		if(customPrefix == null) {
 			return mainPrefix.getName();
 		} else {
-			return customPrefix;
+			return customPrefix.getName();
 		}
 	}
 	
@@ -96,9 +94,8 @@ public class KonPrefix {
 		return result;
 	}
 	
-	public boolean setCustomPrefix(String label, String prefix) {
-		if(isCustomAvailable(label)) {
-			customLabel = label;
+	public boolean setCustomPrefix(KonCustomPrefix prefix) {
+		if(isCustomAvailable(prefix.getLabel())) {
 			customPrefix = prefix;
 			return true;
 		}
@@ -106,7 +103,7 @@ public class KonPrefix {
 	}
 	
 	public String getCustom() {
-		return customLabel;
+		return customPrefix.getLabel();
 	}
 	
 	public void addAvailableCustom(String label) {
