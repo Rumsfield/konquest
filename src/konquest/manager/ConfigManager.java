@@ -35,6 +35,7 @@ public class ConfigManager{
 		updateConfigVersion("upgrades");
 		addConfig("shields", new KonConfig("shields"));
 		addConfig("loot", new KonConfig("loot"));
+		addConfig("prefix", new KonConfig("prefix"));
 		// Data Storage
 		migrateConfigFile("kingdoms.yml","data/kingdoms.yml");
 		migrateConfigFile("camps.yml","data/camps.yml");

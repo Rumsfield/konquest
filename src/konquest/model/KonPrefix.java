@@ -8,12 +8,14 @@ public class KonPrefix {
 	private ArrayList<KonPrefixType> prefixList;
 	private KonPrefixType mainPrefix;
 	private boolean enabled;
+	private String customPrefix;
 	
 	public KonPrefix() {
 		this.prefixList = new ArrayList<KonPrefixType>();
 		this.prefixList.add(KonPrefixType.getDefault());
 		this.mainPrefix = KonPrefixType.getDefault();
 		this.enabled = false;
+		this.customPrefix = "";
 	}
 	
 	public void setEnable(boolean en) {
@@ -69,7 +71,11 @@ public class KonPrefix {
 	}
 	
 	public String getMainPrefixName() {
-		return mainPrefix.getName();
+		if(customPrefix == null || customPrefix.equals("")) {
+			return mainPrefix.getName();
+		} else {
+			return customPrefix;
+		}
 	}
 	
 	public KonPrefixType getMainPrefix() {
@@ -84,6 +90,11 @@ public class KonPrefix {
 		return result;
 	}
 	
+	public void setCustomPrefix(String prefix) {
+		customPrefix = prefix;
+	}
 	
-	
+	public String getCustomPrefix() {
+		return customPrefix;
+	}
 }

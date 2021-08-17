@@ -8,10 +8,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import konquest.Konquest;
+import konquest.model.KonCustomPrefix;
 import konquest.model.KonPlayer;
 import konquest.model.KonPrefix;
 import konquest.model.KonPrefixCategory;
@@ -30,15 +33,18 @@ public class AccomplishmentManager {
 
 	private Konquest konquest;
 	private boolean isEnabled;
+	private HashMap<String,KonCustomPrefix> customPrefixes;
 	
 	public AccomplishmentManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.isEnabled = false;
+		this.customPrefixes = new HashMap<String,KonCustomPrefix>();
 	}
 	
 	public void initialize() {
 		boolean configEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.accomplishment_prefix");
 		isEnabled = configEnabled;
+		loadCustomPrefixes();
 		ChatUtil.printDebug("Accomplishment Manager is ready with prefix "+isEnabled);
 	}
 	
@@ -213,6 +219,49 @@ public class AccomplishmentManager {
 			//ChatUtil.sendNotice((Player) getSender(), "The prefix "+prefixChosen.getName()+" is not unlocked!");
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_NEW.getMessage(prefix.getName()));
 		}
+	}
+	
+	// Load custom prefixes from file
+	private void loadCustomPrefixes() {
+		customPrefixes.clear();
+		// Get all custom prefixes from file
+		FileConfiguration prefixConfig = konquest.getConfigManager().getConfig("prefix");
+        if (prefixConfig.get("prefix") == null) {
+        	ChatUtil.printDebug("There is no prefix section in prefix.yml");
+            return;
+        }
+        boolean status = true;
+        String prefixName = "";
+        int prefixCost = 0;
+        ConfigurationSection prefixEntry = null;
+        ConfigurationSection prefixSection = prefixConfig.getConfigurationSection("prefix");
+        if(prefixSection != null) {
+        	for(String prefixLabel : prefixSection.getKeys(false)) {
+        		status = true;
+        		prefixEntry = prefixSection.getConfigurationSection("prefix."+prefixLabel);
+        		if(prefixEntry.contains("name")) {
+        			prefixName = prefixEntry.getString("name","");
+        			if(prefixName.equals("") || prefixName.isEmpty()) {
+        				ChatUtil.printConsoleError("prefix.yml has an invalid name for prefix: "+prefixLabel);
+            			status = false;
+        			}
+        		} else {
+        			ChatUtil.printConsoleError("prefix.yml is missing name for prefix: "+prefixLabel);
+        			status = false;
+        		}
+        		if(prefixEntry.contains("cost")) {
+        			prefixCost = prefixEntry.getInt("cost",0);
+        			prefixCost = prefixCost < 0 ? 0 : prefixCost;
+        		} else {
+        			ChatUtil.printConsoleError("prefix.yml is missing cost for prefix: "+prefixLabel);
+        			status = false;
+        		}
+        		if(status) {
+        			customPrefixes.put(prefixName.toLowerCase(), new KonCustomPrefix(prefixLabel,prefixName,prefixCost));
+        			ChatUtil.printDebug("Loaded custom prefix: "+prefixLabel);
+        		}
+        	}
+        }
 	}
 
 }

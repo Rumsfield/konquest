@@ -452,7 +452,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 				flyDisableWarmupTimer.stopTimer();
 			} else {
 				int timeLeft = (int)(flyDisableTime - now.getTime()) / 1000;
-				if(timeLeft <= 4) {
+				if(timeLeft <= 3) {
 					ChatUtil.sendKonPriorityTitle(this, "", ChatColor.GOLD+""+(timeLeft+1), 16, 2, 2);
 				}
 			}
