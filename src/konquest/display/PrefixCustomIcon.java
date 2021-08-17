@@ -2,6 +2,7 @@ package konquest.display;
 
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -40,7 +41,8 @@ public class PrefixCustomIcon implements MenuIcon {
 		if(isClickable) {
 			item.setType(Material.GOLD_BLOCK);
 		}
-		meta.setDisplayName(prefix.getName());
+		String displayName = ChatColor.translateAlternateColorCodes('&', prefix.getName());
+		meta.setDisplayName(displayName);
 		meta.setLore(lore);
 		item.setItemMeta(meta);
 		return item;

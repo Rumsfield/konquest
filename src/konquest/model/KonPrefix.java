@@ -103,7 +103,11 @@ public class KonPrefix {
 	}
 	
 	public String getCustom() {
-		return customPrefix.getLabel();
+		if(customPrefix == null) {
+			return "";
+		} else {
+			return customPrefix.getLabel();
+		}
 	}
 	
 	public void addAvailableCustom(String label) {

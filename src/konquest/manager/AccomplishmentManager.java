@@ -242,11 +242,10 @@ public class AccomplishmentManager {
         String prefixName = "";
         int prefixCost = 0;
         ConfigurationSection prefixEntry = null;
-        ConfigurationSection prefixSection = prefixConfig.getConfigurationSection("prefix");
-        if(prefixSection != null) {
-        	for(String prefixLabel : prefixSection.getKeys(false)) {
-        		status = true;
-        		prefixEntry = prefixSection.getConfigurationSection("prefix."+prefixLabel);
+    	for(String prefixLabel : prefixConfig.getConfigurationSection("prefix").getKeys(false)) {
+    		status = true;
+    		prefixEntry = prefixConfig.getConfigurationSection("prefix."+prefixLabel);
+    		if(prefixEntry != null) {
         		if(prefixEntry.contains("name")) {
         			prefixName = prefixEntry.getString("name","");
         			if(prefixName.equals("") || prefixName.isEmpty()) {
@@ -268,8 +267,10 @@ public class AccomplishmentManager {
         			customPrefixes.put(prefixLabel.toLowerCase(), new KonCustomPrefix(prefixLabel.toLowerCase(),prefixName,prefixCost));
         			ChatUtil.printDebug("Loaded custom prefix: "+prefixLabel);
         		}
-        	}
-        }
+    		} else {
+    			ChatUtil.printDebug("Failed to load null prefix entry: "+prefixLabel);
+    		}
+    	}
 	}
 	
 	public Set<String> getCustomPrefixLabels() {
@@ -319,18 +320,23 @@ public class AccomplishmentManager {
 				// Attempt to purchase this prefix
 				int cost = prefix.getCost();
 				if(cost > 0) {
-					EconomyResponse r = KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), cost);
-		            if(r.transactionSuccess()) {
-		            	String balanceF = String.format("%.2f",r.balance);
-		            	String amountF = String.format("%.2f",r.amount);
-		            	//ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
-		            	ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
-		            	checkPassed = true;
-		            } else {
-		            	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
-		            	ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
-		            }
-				} else {
+		        	if(KonquestPlugin.getBalance(player.getBukkitPlayer()) < cost) {
+						// player is too poor
+		        		ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
+					} else {
+						EconomyResponse r = KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), cost);
+			            if(r.transactionSuccess()) {
+			            	String balanceF = String.format("%.2f",r.balance);
+			            	String amountF = String.format("%.2f",r.amount);
+			            	//ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
+			            	ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+			            	checkPassed = true;
+			            } else {
+			            	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
+			            	ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
+			            }
+					}
+	        	} else {
 					// it's free!
 					checkPassed = true;
 				}
@@ -339,10 +345,15 @@ public class AccomplishmentManager {
 			// no permission
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 		}
-		if(checkPassed && player.getPlayerPrefix().setCustomPrefix(prefix)) {
-			player.getPlayerPrefix().setEnable(true);
-			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(prefix.getName()));
-			result = true;
+		if(checkPassed) {
+			player.getPlayerPrefix().addAvailableCustom(prefix.getLabel());
+			if(player.getPlayerPrefix().setCustomPrefix(prefix)) {
+				player.getPlayerPrefix().setEnable(true);
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(ChatColor.translateAlternateColorCodes('&', prefix.getName())));
+				result = true;
+			} else {
+				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			}
 		}
 		return result;
 	}

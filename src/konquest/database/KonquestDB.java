@@ -234,7 +234,9 @@ public class KonquestDB extends Database{
                 while (customs.next()) {
                 	for(String label : konquest.getAccomplishmentManager().getCustomPrefixLabels()) {
                 		boolean isAvailable = customs.getBoolean(label);
+                		ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" custom "+label+" is "+String.valueOf(isAvailable));
                 		if(isAvailable) {
+                			ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" added custom "+label);
                 			player.getPlayerPrefix().addAvailableCustom(label);
                 		}
                 	}
@@ -246,6 +248,19 @@ public class KonquestDB extends Database{
     		// Add valid prefixes to the player based on stats
             konquest.getAccomplishmentManager().initPlayerPrefixes(player);
             boolean prefixStatus = false;
+            // DEBUG
+            if(customPrefix == null) {
+            	ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" custom is NULL!");
+            } else {
+            	ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" custom is "+customPrefix);
+            }
+            if(mainPrefix == null) {
+            	ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" prefix is NULL!");
+            } else {
+            	ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" prefix is "+mainPrefix);
+            }
+            
+            // END DEBUG
             if(customPrefix != null && customPrefix != "" && konquest.getAccomplishmentManager().isEnabled()) {
             	// Update player's custom prefix first
             	prefixStatus = konquest.getAccomplishmentManager().setPlayerCustomPrefix(player, customPrefix);
