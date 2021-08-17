@@ -228,15 +228,33 @@ public class DisplayManager {
 				} else if(clickedIcon instanceof PrefixIcon) {
 					// Prefix Icons alter the player's prefix
 					PrefixIcon icon = (PrefixIcon)clickedIcon;
+					boolean status = false;
 					switch(icon.getAction()) {
 						case DISABLE_PREFIX:
-							konquest.getAccomplishmentManager().disablePlayerPrefix(clickPlayer);
+							status = konquest.getAccomplishmentManager().disablePlayerPrefix(clickPlayer);
 							break;
 						case APPLY_PREFIX:
-							konquest.getAccomplishmentManager().applyPlayerPrefix(clickPlayer,icon.getPrefix());
+							status = konquest.getAccomplishmentManager().applyPlayerPrefix(clickPlayer,icon.getPrefix());
 							break;
 						default:
 							break;
+					}
+					if(status) {
+						Konquest.playSuccessSound(bukkitPlayer);
+					}
+					menuCache.remove(inv);
+					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+			            @Override
+			            public void run() {
+			            	bukkitPlayer.closeInventory();
+			            }
+			        });
+				} else if(clickedIcon instanceof PrefixCustomIcon) {
+					// Prefix Custom Icons alter the player's prefix
+					PrefixCustomIcon icon = (PrefixCustomIcon)clickedIcon;
+					boolean status = konquest.getAccomplishmentManager().applyPlayerCustomPrefix(clickPlayer,icon.getPrefix());
+					if(status) {
+						Konquest.playSuccessSound(bukkitPlayer);
 					}
 					menuCache.remove(inv);
 					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
@@ -1239,7 +1257,9 @@ public class DisplayManager {
 					/* Custom Prefix Icon (n) */
 					loreList = new ArrayList<String>();
 					KonCustomPrefix currentCustom = customIter.next();
-					loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+currentCustom.getCost());
+					if(!displayPlayer.getPlayerPrefix().isCustomAvailable(currentCustom.getLabel())) {
+						loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+currentCustom.getCost());
+					}
 					if(displayPlayer.getBukkitPlayer().hasPermission("konquest.prefix."+currentCustom.getLabel())) {
 						isAllowed = true;
 						loreList.add(ChatColor.GOLD+MessagePath.MENU_PREFIX_HINT_APPLY.getMessage());

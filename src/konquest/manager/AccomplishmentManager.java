@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import konquest.Konquest;
+import konquest.KonquestPlugin;
 import konquest.model.KonCustomPrefix;
 import konquest.model.KonPlayer;
 import konquest.model.KonPrefix;
@@ -24,6 +25,7 @@ import konquest.model.KonStats;
 import konquest.model.KonStatsType;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
+import net.milkbowl.vault.economy.EconomyResponse;
 
 /**
  * 
@@ -199,27 +201,32 @@ public class AccomplishmentManager {
 		player.getBukkitPlayer().openBook(book);
 	}
 	
-	public void disablePlayerPrefix(KonPlayer player) {
+	public boolean disablePlayerPrefix(KonPlayer player) {
+		boolean result = false;
 		if(player.getPlayerPrefix().isEnabled()) {
 			player.getPlayerPrefix().setEnable(false);
 			//ChatUtil.sendNotice((Player) getSender(), "Turned off your prefix title");
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_DISABLE.getMessage());
+			result = true;
 		} else {
 			//ChatUtil.sendNotice((Player) getSender(), "Your prefix title is already off");
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_DISABLE.getMessage());
 		}
+		return result;
 	}
 	
-	public void applyPlayerPrefix(KonPlayer player, KonPrefixType prefix) {
+	public boolean applyPlayerPrefix(KonPlayer player, KonPrefixType prefix) {
+		boolean result = false;
 		if(player.getPlayerPrefix().selectPrefix(prefix)) {
 			player.getPlayerPrefix().setEnable(true);
 			//ChatUtil.sendNotice((Player) getSender(), "Your prefix is now "+prefixChosen.getName());
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(prefix.getName()));
-			Konquest.playSuccessSound(player.getBukkitPlayer());
+			result = true;
 		} else {
 			//ChatUtil.sendNotice((Player) getSender(), "The prefix "+prefixChosen.getName()+" is not unlocked!");
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_NEW.getMessage(prefix.getName()));
 		}
+		return result;
 	}
 	
 	// Load custom prefixes from file
@@ -300,9 +307,43 @@ public class AccomplishmentManager {
 	 * @param label
 	 * @return
 	 */
-	public boolean applyPlayerCustomPrefix(KonPlayer player, String label) {
+	public boolean applyPlayerCustomPrefix(KonPlayer player, KonCustomPrefix prefix) {
 		boolean result = false;
-		
+		boolean checkPassed = false;
+		// check for permission, available and cost
+		if(player.getBukkitPlayer().hasPermission("konquest.prefix."+prefix.getLabel())) {
+			if(player.getPlayerPrefix().isCustomAvailable(prefix.getLabel())) {
+				// Player already owns this prefix
+				checkPassed = true;
+			} else {
+				// Attempt to purchase this prefix
+				int cost = prefix.getCost();
+				if(cost > 0) {
+					EconomyResponse r = KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), cost);
+		            if(r.transactionSuccess()) {
+		            	String balanceF = String.format("%.2f",r.balance);
+		            	String amountF = String.format("%.2f",r.amount);
+		            	//ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
+		            	ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+		            	checkPassed = true;
+		            } else {
+		            	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
+		            	ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
+		            }
+				} else {
+					// it's free!
+					checkPassed = true;
+				}
+			}
+		} else {
+			// no permission
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+		}
+		if(checkPassed && player.getPlayerPrefix().setCustomPrefix(prefix)) {
+			player.getPlayerPrefix().setEnable(true);
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(prefix.getName()));
+			result = true;
+		}
 		return result;
 	}
 
