@@ -3,6 +3,7 @@ package konquest.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -378,15 +379,18 @@ public class KonquestDB extends Database{
         set("directives", col, val, "uuid", playerUUIDString);
         
         // Flush player data into customs table
-        col = new String[konquest.getAccomplishmentManager().getCustomPrefixLabels().size()];
-        val = new String[konquest.getAccomplishmentManager().getCustomPrefixLabels().size()];
-        i = 0;
-        for(String iter : konquest.getAccomplishmentManager().getCustomPrefixLabels()) {
-        	col[i] = iter;
-        	val[i] = player.getPlayerPrefix().isCustomAvailable(iter) ? "1" : "0";
-        	i++;
-    	}
-        set("customs", col, val, "uuid", playerUUIDString);
+        Set<String> labels = konquest.getAccomplishmentManager().getCustomPrefixLabels();
+        if(!labels.isEmpty()) {
+	        col = new String[labels.size()];
+	        val = new String[labels.size()];
+	        i = 0;
+	        for(String iter : labels) {
+	        	col[i] = iter;
+	        	val[i] = player.getPlayerPrefix().isCustomAvailable(iter) ? "1" : "0";
+	        	i++;
+	    	}
+	        set("customs", col, val, "uuid", playerUUIDString);
+        }
     }
     
 }
