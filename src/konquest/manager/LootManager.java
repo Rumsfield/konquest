@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -467,6 +468,9 @@ public class LootManager implements Timeable{
 	
 	private ItemStack chooseRandomItem(HashMap<ItemStack,Integer> itemOptions) {
 		ItemStack item = new ItemStack(Material.DIRT,1);
+		ItemMeta defaultMeta = item.getItemMeta();
+		defaultMeta.setDisplayName(ChatColor.DARK_RED+"Invalid Loot");
+		item.setItemMeta(defaultMeta);
 		if(!itemOptions.isEmpty()) {
 			// Find total item range
 			int total = 0;
