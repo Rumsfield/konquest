@@ -28,14 +28,14 @@ public class ConfigManager{
 	}
         
 	public void initialize() {
-		// Config Settings
-		addConfig("core", new KonConfig("core"));
+		// Config Settings - unsaved
+		addConfig("core", new KonConfig("core",false));
 		updateConfigVersion("core");
-		addConfig("upgrades", new KonConfig("upgrades"));
+		addConfig("upgrades", new KonConfig("upgrades",false));
 		updateConfigVersion("upgrades");
-		addConfig("shields", new KonConfig("shields"));
-		addConfig("loot", new KonConfig("loot"));
-		addConfig("prefix", new KonConfig("prefix"));
+		addConfig("shields", new KonConfig("shields",false));
+		addConfig("loot", new KonConfig("loot",false));
+		addConfig("prefix", new KonConfig("prefix",false));
 		// Data Storage
 		migrateConfigFile("kingdoms.yml","data/kingdoms.yml");
 		migrateConfigFile("camps.yml","data/camps.yml");
@@ -44,7 +44,7 @@ public class ConfigManager{
 		addConfig("camps", new KonConfig("data/camps"));
 		addConfig("ruins", new KonConfig("data/ruins"));
 		// Language files
-		addConfig("lang_english", new KonConfig("lang/english"));
+		addConfig("lang_english", new KonConfig("lang/english",false));
 		updateConfigVersion("lang_english");
 		// Language selection
 		language = getConfig("core").getString("language","english");
