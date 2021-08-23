@@ -133,20 +133,25 @@ public class LootManager implements Timeable{
             		status = false;
         		}
             	lootEntry = itemsSection.getConfigurationSection(itemName);
-            	if(lootEntry.contains("amount")) {
-            		itemAmount = lootEntry.getInt("amount",1);
-            		itemAmount = itemAmount < 1 ? 1 : itemAmount;
-        		} else {
-        			ChatUtil.printConsoleError("loot.yml is missing amount for item: "+itemName);
-        			status = false;
-        		}
-            	if(lootEntry.contains("weight")) {
-            		itemWeight = lootEntry.getInt("weight",0);
-            		itemWeight = itemWeight < 0 ? 0 : itemWeight;
-        		} else {
-        			ChatUtil.printConsoleError("loot.yml is missing weight for item: "+itemName);
-        			status = false;
-        		}
+            	if(lootEntry != null) {
+	            	if(lootEntry.contains("amount")) {
+	            		itemAmount = lootEntry.getInt("amount",1);
+	            		itemAmount = itemAmount < 1 ? 1 : itemAmount;
+	        		} else {
+	        			ChatUtil.printConsoleError("loot.yml is missing amount for item: "+itemName);
+	        			status = false;
+	        		}
+	            	if(lootEntry.contains("weight")) {
+	            		itemWeight = lootEntry.getInt("weight",0);
+	            		itemWeight = itemWeight < 0 ? 0 : itemWeight;
+	        		} else {
+	        			ChatUtil.printConsoleError("loot.yml is missing weight for item: "+itemName);
+	        			status = false;
+	        		}
+            	} else {
+            		status = false;
+            		ChatUtil.printConsoleError("loot.yml contains invalid item: "+itemName);
+            	}
             	if(status && itemWeight > 0) {
             		// Add loot table entry
             		lootTable.put(new ItemStack(itemType, itemAmount), itemWeight);
@@ -171,25 +176,30 @@ public class LootManager implements Timeable{
             		status = false;
         		}
             	lootEntry = potionsSection.getConfigurationSection(potionName);
-            	if(lootEntry.contains("upgraded")) {
-            		itemUpgraded = lootEntry.getBoolean("upgraded",false);
-        		} else {
-        			ChatUtil.printConsoleError("loot.yml is missing upgraded for potion: "+potionName);
-        			status = false;
-        		}
-            	if(lootEntry.contains("extended")) {
-            		itemExtended = lootEntry.getBoolean("extended",false);
-        		} else {
-        			ChatUtil.printConsoleError("loot.yml is missing extended for potion: "+potionName);
-        			status = false;
-        		}
-            	if(lootEntry.contains("weight")) {
-            		itemWeight = lootEntry.getInt("weight",0);
-            		itemWeight = itemWeight < 0 ? 0 : itemWeight;
-        		} else {
-        			ChatUtil.printConsoleError("loot.yml is missing weight for potion: "+potionName);
-        			status = false;
-        		}
+            	if(lootEntry != null) {
+	            	if(lootEntry.contains("upgraded")) {
+	            		itemUpgraded = lootEntry.getBoolean("upgraded",false);
+	        		} else {
+	        			ChatUtil.printConsoleError("loot.yml is missing upgraded for potion: "+potionName);
+	        			status = false;
+	        		}
+	            	if(lootEntry.contains("extended")) {
+	            		itemExtended = lootEntry.getBoolean("extended",false);
+	        		} else {
+	        			ChatUtil.printConsoleError("loot.yml is missing extended for potion: "+potionName);
+	        			status = false;
+	        		}
+	            	if(lootEntry.contains("weight")) {
+	            		itemWeight = lootEntry.getInt("weight",0);
+	            		itemWeight = itemWeight < 0 ? 0 : itemWeight;
+	        		} else {
+	        			ChatUtil.printConsoleError("loot.yml is missing weight for potion: "+potionName);
+	        			status = false;
+	        		}
+            	} else {
+            		status = false;
+            		ChatUtil.printConsoleError("loot.yml contains invalid potion: "+potionName);
+            	}
             	if(status && itemWeight > 0) {
             		// Add loot table entry
             		ItemStack potion = new ItemStack(Material.POTION, 1);
@@ -222,20 +232,25 @@ public class LootManager implements Timeable{
             		status = false;
         		}
             	lootEntry = ebookSection.getConfigurationSection(enchantName);
-            	if(lootEntry.contains("level")) {
-            		itemLevel = lootEntry.getInt("level",0);
-            		itemLevel = itemLevel < 0 ? 0 : itemLevel;
-        		} else {
-        			ChatUtil.printConsoleError("loot.yml is missing level for enchantment: "+enchantName);
-        			status = false;
-        		}
-            	if(lootEntry.contains("weight")) {
-            		itemWeight = lootEntry.getInt("weight",0);
-            		itemWeight = itemWeight < 0 ? 0 : itemWeight;
-        		} else {
-        			ChatUtil.printConsoleError("loot.yml is missing weight for enchantment: "+enchantName);
-        			status = false;
-        		}
+            	if(lootEntry != null) {
+	            	if(lootEntry.contains("level")) {
+	            		itemLevel = lootEntry.getInt("level",0);
+	            		itemLevel = itemLevel < 0 ? 0 : itemLevel;
+	        		} else {
+	        			ChatUtil.printConsoleError("loot.yml is missing level for enchantment: "+enchantName);
+	        			status = false;
+	        		}
+	            	if(lootEntry.contains("weight")) {
+	            		itemWeight = lootEntry.getInt("weight",0);
+	            		itemWeight = itemWeight < 0 ? 0 : itemWeight;
+	        		} else {
+	        			ChatUtil.printConsoleError("loot.yml is missing weight for enchantment: "+enchantName);
+	        			status = false;
+	        		}
+            	} else {
+            		status = false;
+            		ChatUtil.printConsoleError("loot.yml contains invalid enchanted book: "+enchantName);
+            	}
             	if(status && itemWeight > 0) {
             		// Add loot table entry
         			// Limit level

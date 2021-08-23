@@ -254,7 +254,9 @@ public class KingdomManager {
 	 * 			2 - error, bad monument placement
 	 * 			3 - error, bad name
 	 * 			4 - error, invalid monument template
-	 * 			5 - error, bad town placement
+	 * 			5 - error, bad town placement, invalid world
+	 * 			6 - error, bad town placement, too close
+	 * 			7 - error, bad town placement, too far
 	 * 		   21 - error, town init fail, invalid monument
 	 * 		   22 - error, town init fail, bad monument gradient
 	 * 		   23 - error, town init fail, monument placed on bedrock
@@ -283,7 +285,7 @@ public class KingdomManager {
 				searchDistance = Konquest.chunkDistance(loc, kingdom.getCapital().getCenterLoc());
 				if(searchDistance != -1 && searchDistance < min_distance_capital) {
 					ChatUtil.printDebug("Failed to add town, too close to capital "+kingdom.getCapital().getName());
-					return 5;
+					return 6;
 				}
 				if(searchDistance != -1 && searchDistance < minDistance) {
 					minDistance = searchDistance;
@@ -292,7 +294,7 @@ public class KingdomManager {
 					searchDistance = Konquest.chunkDistance(loc, town.getCenterLoc());
 					if(searchDistance != -1 && searchDistance < min_distance_town) {
 						ChatUtil.printDebug("Failed to add town, too close to town "+town.getName());
-						return 5;
+						return 6;
 					}
 					if(searchDistance != -1 && searchDistance < minDistance) {
 						minDistance = searchDistance;
@@ -307,7 +309,7 @@ public class KingdomManager {
 				searchDistance = Konquest.chunkDistance(loc, ruin.getCenterLoc());
 				if(searchDistance != -1 && searchDistance < min_distance_town) {
 					ChatUtil.printDebug("Failed to add town, too close to ruin "+ruin.getName());
-					return 5;
+					return 6;
 				}
 				if(searchDistance != -1 && searchDistance < minDistance) {
 					minDistance = searchDistance;
@@ -317,7 +319,7 @@ public class KingdomManager {
 			int maxLimit = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_distance_all",0);
 			if(minDistance != 0 && maxLimit > 0 && minDistance > maxLimit) {
 				ChatUtil.printDebug("Failed to add town, too far from other towns and capitals");
-				return 5;
+				return 7;
 			}
 			for(TravelDestination keyword : TravelDestination.values()) {
 				if(name.equalsIgnoreCase(keyword.toString())) {

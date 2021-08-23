@@ -54,7 +54,7 @@ public class ConfigManager{
 			ChatUtil.printConsoleAlert("Using "+language+" language file");
 		} else {
 			// Attempt to find a custom local language file
-			if(addConfig("lang_custom", new KonConfig("lang/"+language))) {
+			if(addConfig("lang_custom", new KonConfig("lang/"+language,false))) {
 				langConfig = getConfig("lang_custom");
 				ChatUtil.printConsoleAlert("Using custom "+language+" language file");
 			} else {
