@@ -50,6 +50,7 @@ public class MakeTownAdminCommand extends CommandBase {
         		//ChatUtil.sendNotice((Player) getSender(), "Successfully created new Town: "+townName);
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SETTLE_NOTICE_SUCCESS.getMessage(townName));
         	} else {
+        		int distance = 0;
         		switch(exitCode) {
         		case 1:
         			//ChatUtil.sendError((Player) getSender(), "Could not settle: Overlaps with a nearby territory.");
@@ -68,7 +69,10 @@ public class MakeTownAdminCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_TEMPLATE.getMessage());
         			break;
         		case 5:
-        			int distance = getKonquest().getKingdomManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+        			break;
+        		case 6:
+        			distance = getKonquest().getKingdomManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
         			int min_distance_capital = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
         			int min_distance_town = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
         			int min_distance = 0;
@@ -77,13 +81,22 @@ public class MakeTownAdminCommand extends CommandBase {
         			} else {
         				min_distance = min_distance_town;
         			}
-        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Too close to another territory.");
-        			//ChatUtil.sendError((Player) getSender(), "Currently "+distance+" chunks away, must be at least "+min_distance+".");
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
         			break;
-        		case 11:
+        		case 7:
+        			distance = getKonquest().getKingdomManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
+        			int max_distance_all = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_distance_all");
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_MAX.getMessage(distance,max_distance_all));
+        			break;
+        		case 21:
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+        			break;
+        		case 22:
         			//ChatUtil.sendError((Player) getSender(), "Could not settle: The 16x16 area is not flat enough. Press F3+G to view chunk boundaries. Cut down trees and flatten the ground!");
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_FLAT.getMessage());
+        			break;
+        		case 23:
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_HEIGHT.getMessage());
         			break;
         		case 12:
         			//ChatUtil.sendError((Player) getSender(), "Could not settle: Elevation is too high. Try settling somewhere lower.");
