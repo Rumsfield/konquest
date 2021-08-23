@@ -283,7 +283,7 @@ public class KingdomManager {
 				}
 				// Verify proximity to other territories
 				searchDistance = Konquest.chunkDistance(loc, kingdom.getCapital().getCenterLoc());
-				if(searchDistance != -1 && searchDistance < min_distance_capital) {
+				if(searchDistance != -1 && min_distance_capital > 0 && searchDistance < min_distance_capital) {
 					ChatUtil.printDebug("Failed to add town, too close to capital "+kingdom.getCapital().getName());
 					return 6;
 				}
@@ -292,7 +292,7 @@ public class KingdomManager {
 				}
 				for(KonTown town : kingdom.getTowns()) {
 					searchDistance = Konquest.chunkDistance(loc, town.getCenterLoc());
-					if(searchDistance != -1 && searchDistance < min_distance_town) {
+					if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
 						ChatUtil.printDebug("Failed to add town, too close to town "+town.getName());
 						return 6;
 					}
@@ -307,7 +307,7 @@ public class KingdomManager {
 					return 3;
 				}
 				searchDistance = Konquest.chunkDistance(loc, ruin.getCenterLoc());
-				if(searchDistance != -1 && searchDistance < min_distance_town) {
+				if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
 					ChatUtil.printDebug("Failed to add town, too close to ruin "+ruin.getName());
 					return 6;
 				}
@@ -329,6 +329,9 @@ public class KingdomManager {
 			}
 			// Verify no overlapping init chunks
 			int radius = konquest.getConfigManager().getConfig("core").getInt("core.towns.init_radius");
+			if(radius < 1) {
+				radius = 1;
+			}
 			ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
 			for(Point point : konquest.getAreaPoints(loc, radius)) {
 				if(isChunkClaimed(point,loc.getWorld())) {

@@ -1,13 +1,14 @@
 # Core Konquest Settings
 #    (*) means the server must be restarted for a change to take effect, else use the "/k admin reload" command. NEVER USE /reload.
 #    [LEGACY] means a setting is not used in the current version, but still exists to support backwards compatability with previous Konquest versions.
+#    [EXPERIMENTAL] means a setting is new and has had limited testing, use with caution.
 #    Lines that begin with "#" (the entire top-half of this file) are comments and do not control any settings.
 # 
 # language*:                        Language file selection, must match a file name in the /lang folder (e.g. english for lang/english.yml)
 # core:
 #  debug*:                          Enable debug messages for verbose console messages (true/false)
 #  world_name*:                     [LEGACY] Primary world name for kingdoms and towns created before v0.3.0 (string)
-#  world_blacklist*:                World names where kingdoms and towns cannot exist (string list)
+#  world_blacklist*:                World names where kingdoms and towns cannot exist (string list, use [] to disable)
 #  world_blacklist_reverse*:        Reverse world_blacklist into a whitelist, where listed world names become the only worlds where kingdoms and towns can exist (true/false)
 #  save_interval*:                  Save interval in minutes, 0 to disable (integer >= 0)
 #  community_link:                  URL which will appear in the /k community link icon (string)
@@ -53,10 +54,11 @@
 #  towns:
 #    min_settle_height:             Minimum height level for new town settlements (0 to disable, 0 - 256)
 #    max_settle_height:             Maximum height level for new town settlements (0 to disable, 0 - 256), Note, if max_settle_height is less than min_settle_height, things might break!
-#    min_distance_town:             Minimum distance in chunks between Towns and other Towns (integer >= 0)
-#    min_distance_capital:          Minimum distance in chunks between Towns and Capitals (integer >= 0)
+#    min_distance_town:             Minimum distance in chunks between Towns and other Towns (0 to disable, integer >= 0)
+#    min_distance_capital:          Minimum distance in chunks between Towns and Capitals (0 to disable, integer >= 0)
 #    max_distance_all:              Maximum distance in chunks between Towns and all other territory (0 to disable, integer >= 0)
-#    init_radius:                   Radius of initial settlements. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
+#    max_size:                      Maximum distance in chunks between land claims and the town center monument (0 to disable, integer >= 0)
+#    init_radius:                   Radius of initial settlements. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 1)
 #    capture_upgrades:              Allow town upgrades to remain when the town is captured (true/false)
 #    capture_cooldown:              Time in seconds before a town can be captured again (integer >= 0)
 #    raid_alert_cooldown:           Time in seconds between raid alerts for Towns (integer >= 0)
@@ -79,7 +81,7 @@
 #    protect_containers:            Prevent players, except for camp owner, from using or breaking containers in camp land (true/false)
 #    no_enemy_edit_offline:         Prevent enemy players from breaking any blocks in camps when owners are offline (true/false)
 #    no_enemy_edit_offline_warmup:  Time in seconds when a camp is protected from when the owner disconnects (integer >= 0)
-#    clan_enable:                   Enable camp clans when barbarian camps are placed next to each other (true/false)
+#    clan_enable:                   [EXPERIMENTAL] Enable camp clans when barbarian camps are placed next to each other (true/false)
 #    clan_allow_containers:         Allow barbarians to access containers in camps from the same clan, CAN BE ABUSED! (true/false)
 #    clan_allow_edit_offline:       Allow barbarians to edit blocks in offline-protected camps from the same clan, CAN BE ABUSED! (true/false)
 #  monuments:
@@ -179,6 +181,7 @@ core:
     min_distance_town: 16
     min_distance_capital: 16
     max_distance_all: 99
+    max_size: 16
     init_radius: 2
     capture_upgrades: true
     capture_cooldown: 600
@@ -203,7 +206,7 @@ core:
     protect_containers: true
     no_enemy_edit_offline: true
     no_enemy_edit_offline_warmup: 120
-    clan_enable: true
+    clan_enable: false
     clan_allow_containers: false
     clan_allow_edit_offline: false
   monuments:
