@@ -1,6 +1,7 @@
 package konquest.map;
 
 import java.util.Date;
+import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.dynmap.DynmapAPI;
@@ -23,6 +24,7 @@ public class MapHandler {
 	
 	private Konquest konquest;
 	private boolean isEnabled;
+	private HashMap<KonTerritory,AreaTerritory> areaCache;
 	
 	private static DynmapAPI dapi = null;
 	
@@ -30,11 +32,12 @@ public class MapHandler {
 	private final int campColor = 0xa3a10a;
 	private final int capitalColor = 0xb942f5;
 	private final int townColor = 0xed921a;
-	private final int lineColor = 0x000000; //0xFF2828;
+	private final int lineColor = 0x000000;
 	
 	public MapHandler(Konquest konquest) {
 		this.konquest = konquest;
 		this.isEnabled = false;
+		this.areaCache = new HashMap<KonTerritory,AreaTerritory>();
 	}
 	
 	public void initialize() {
@@ -56,18 +59,22 @@ public class MapHandler {
 	/*
 	 * Dynmap Area ID formats:
 	 * Ruins
-	 * 		MarkerSet Group:  konquest.marker.ruin
-	 * 		AreaMarker Areas: konquest.area.ruin.<name>
+	 * 		MarkerSet Group:  		konquest.marker.ruin
+	 * 		AreaMarker Points: 		konquest.area.ruin.<name>.point.<n>
+	 * 		AreaMarker Contours: 	konquest.area.ruin.<name>.contour.<n>
 	 * Camps
-	 * 		MarkerSet Group:  konquest.marker.camp
-	 * 		AreaMarker Areas: konquest.area.camp.<name>
+	 * 		MarkerSet Group:  		konquest.marker.camp
+	 * 		AreaMarker Points: 		konquest.area.camp.<name>.point.<n>
+	 * 		AreaMarker Contours: 	konquest.area.camp.<name>.contour.<n>
 	 * Kingdoms
-	 * 		MarkerSet Group:  konquest.marker.<kingdom>
-	 * 		AreaMarker Areas: konquest.area.<kingdom>.capital
-	 * 			              konquest.area.<kingdom>.<town>
+	 * 		MarkerSet Group:  		konquest.marker.<kingdom>
+	 * 		Capital
+	 * 		AreaMarker Points: 		konquest.area.<kingdom>.capital.point.<n>
+	 * 		AreaMarker Contours: 	konquest.area.<kingdom>.capital.contour.<n>
+	 * 		Towns
+	 * 		AreaMarker Points: 		konquest.area.<kingdom>.<town>.point.<n>
+	 * 		AreaMarker Contours: 	konquest.area.<kingdom>.<town>.contour.<n>
 	 */
-	
-	//TODO: Make land area (AreaMarkers) descriptions HTML markup
 	
 	//TODO: Make this class into a listener, make events for territory updates, deletes, etc
 	
@@ -86,7 +93,7 @@ public class MapHandler {
 			ChatUtil.printDebug("Could not draw territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
 			return;
 		}
-
+		ChatUtil.printDebug("Drawing Dynmap area of territory "+territory.getName());
 		String groupId = getGroupId(territory);
 		String groupLabel = getGroupLabel(territory);
 		String areaId = getAreaId(territory);
@@ -95,26 +102,69 @@ public class MapHandler {
 		String iconId = getIconId(territory);
 		String iconLabel = getIconLabel(territory);
 		MarkerIcon icon = getIconMarker(territory);
-		
+		// Get territory group
 		MarkerSet territoryGroup = dapi.getMarkerAPI().getMarkerSet(groupId);
 		if (territoryGroup == null) {
 			territoryGroup = dapi.getMarkerAPI().createMarkerSet(groupId, groupLabel, dapi.getMarkerAPI().getMarkerIcons(), false);
 		}
-		AreaMarker territoryArea = territoryGroup.findAreaMarker(areaId);
+		String pointId = "";
+		String contourId = "";
+		AreaMarker areaPoint;
+		AreaMarker areaContour;
+		// Prune any points and contours
 		AreaTerritory drawArea = new AreaTerritory(territory);
-		if (territoryArea == null) {
-			// Area does not exist, create new
-			territoryArea = territoryGroup.createAreaMarker(areaId, areaLabel, true, drawArea.getWorldName(), drawArea.getXCorners(), drawArea.getZCorners(), false);
-			if (territoryArea != null) {
-				territoryArea.setFillStyle(0.5, areaColor);
-				territoryArea.setLineStyle(1, 1, lineColor);
+		if(areaCache.containsKey(territory)) {
+			// Territory is already rendered
+			AreaTerritory oldArea = areaCache.get(territory);
+			for(int i = (oldArea.getNumContours()-1); i >= drawArea.getNumContours(); i--) {
+				contourId = areaId + ".contour." + i;
+				areaContour = territoryGroup.findAreaMarker(contourId);
+				if (areaContour != null) {
+					// Delete area from group
+					areaContour.deleteMarker();
+				}
 			}
-			ChatUtil.printDebug("Drawing new Dynmap area of territory "+territory.getName());
-		} else {
-			// Area already exists, update corners and label
-			territoryArea.setCornerLocations(drawArea.getXCorners(), drawArea.getZCorners());
-			territoryArea.setLabel(areaLabel,true);
-			ChatUtil.printDebug("Updating Dynmap area corners of territory "+territory.getName());
+			for(int i = (oldArea.getNumPoints()-1); i >= drawArea.getNumPoints(); i--) {
+				pointId = areaId + ".point." +i ;
+				areaPoint = territoryGroup.findAreaMarker(pointId);
+				if (areaPoint != null) {
+					// Delete area from group
+					areaPoint.deleteMarker();
+				}
+			}
+		}
+		areaCache.put(territory, drawArea);
+		// Update or create all points and contours
+		for(int i = 0; i < drawArea.getNumContours(); i++) {
+			contourId = areaId + ".contour." + i;
+			areaContour = territoryGroup.findAreaMarker(contourId);
+			if (areaContour == null) {
+				// Area does not exist, create new
+				areaContour = territoryGroup.createAreaMarker(contourId, "", false, drawArea.getWorldName(), drawArea.getXContour(i), drawArea.getZContour(i), false);
+				if (areaContour != null) {
+					areaContour.setFillStyle(0, areaColor);
+					areaContour.setLineStyle(1, 1, lineColor);
+				}
+			} else {
+				// Area already exists, update corners
+				areaContour.setCornerLocations(drawArea.getXContour(i), drawArea.getZContour(i));
+			}
+		}
+		for(int i = 0; i < drawArea.getNumPoints(); i++) {
+			pointId = areaId + ".point." + i;
+			areaPoint = territoryGroup.findAreaMarker(pointId);
+			if (areaPoint == null) {
+				// Area does not exist, create new
+				areaPoint = territoryGroup.createAreaMarker(pointId, areaLabel, true, drawArea.getWorldName(), drawArea.getXPoint(i), drawArea.getZPoint(i), false);
+				if (areaPoint != null) {
+					areaPoint.setFillStyle(0.5, areaColor);
+					areaPoint.setLineStyle(0, 0, lineColor);
+				}
+			} else {
+				// Area already exists, update corners and label
+				areaPoint.setCornerLocations(drawArea.getXPoint(i), drawArea.getZPoint(i));
+				areaPoint.setLabel(areaLabel,true);
+			}
 		}
 		Marker territoryIcon = territoryGroup.findMarker(iconId);
 		if (territoryIcon == null) {
@@ -124,7 +174,6 @@ public class MapHandler {
 			// Icon already exists, update label
 			territoryIcon.setLabel(iconLabel);
 		}
-		
 	}
 	
 	/**
@@ -140,18 +189,38 @@ public class MapHandler {
 			ChatUtil.printDebug("Could not delete territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
 			return;
 		}
-		
+		ChatUtil.printDebug("Erasing Dynmap area of territory "+territory.getName());
 		String groupId = getGroupId(territory);
 		String areaId = getAreaId(territory);
 		String iconId = getIconId(territory);
 		
 		MarkerSet territoryGroup = dapi.getMarkerAPI().getMarkerSet(groupId);
 		if (territoryGroup != null) {
-			AreaMarker territoryArea = territoryGroup.findAreaMarker(areaId);
-			if (territoryArea != null) {
-				// Delete area from group
-				territoryArea.deleteMarker();
-				ChatUtil.printDebug("Removing Dynmap area of territory "+territory.getName());
+			if(areaCache.containsKey(territory)) {
+				// Territory is already rendered, remove all points and contours
+				String pointId = "";
+				String contourId = "";
+				AreaMarker areaPoint;
+				AreaMarker areaContour;
+				AreaTerritory oldArea = areaCache.get(territory);
+				for(int i = 0; i < oldArea.getNumContours(); i++) {
+					contourId = areaId + ".contour." + i;
+					areaContour = territoryGroup.findAreaMarker(contourId);
+					if (areaContour != null) {
+						// Delete area from group
+						areaContour.deleteMarker();
+					}
+				}
+				for(int i = 0; i < oldArea.getNumPoints(); i++) {
+					pointId = areaId + ".point." +i ;
+					areaPoint = territoryGroup.findAreaMarker(pointId);
+					if (areaPoint != null) {
+						// Delete area from group
+						areaPoint.deleteMarker();
+					}
+				}
+			} else {
+				ChatUtil.printDebug("Failed to erase un-rendered territory "+territory.getName());
 			}
 			Marker territoryIcon = territoryGroup.findMarker(iconId);
 			if (territoryIcon != null) {
@@ -165,7 +234,39 @@ public class MapHandler {
 				ChatUtil.printDebug("Removing Dynmap group of territory "+territory.getName());
 			}
 		}
-		
+	}
+	
+	public void drawDynmapLabel(KonTerritory territory) {
+		if (!isEnabled) {
+			return;
+		}
+		if (!isTerritoryValid(territory)) {
+			ChatUtil.printDebug("Could not update label for territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
+			return;
+		}
+		String groupId = getGroupId(territory);
+		String areaId = getAreaId(territory);
+		String areaLabel = getAreaLabel(territory);
+		MarkerSet territoryGroup = dapi.getMarkerAPI().getMarkerSet(groupId);
+		if (territoryGroup != null) {
+			// Update all area point labels
+			if(areaCache.containsKey(territory)) {
+				// Territory is already rendered, remove all points and contours
+				String pointId = "";
+				AreaMarker areaPoint;
+				AreaTerritory oldArea = areaCache.get(territory);
+				for(int i = 0; i < oldArea.getNumPoints(); i++) {
+					pointId = areaId + ".point." +i ;
+					areaPoint = territoryGroup.findAreaMarker(pointId);
+					if (areaPoint != null) {
+						// Area already exists, update label
+						areaPoint.setLabel(areaLabel,true);
+					}
+				}
+			} else {
+				ChatUtil.printDebug("Failed to label un-rendered territory "+territory.getName());
+			}
+		}
 	}
 	
 	public void postDynmapBroadcast(String message) {
@@ -203,27 +304,6 @@ public class MapHandler {
 		Date end = new Date();
 		int time = (int)(end.getTime() - start.getTime());
 		ChatUtil.printDebug("Drawing all territory in Dynmap took "+time+" ms");
-	}
-	
-	public void drawDynmapLabel(KonTerritory territory) {
-		if (!isEnabled) {
-			return;
-		}
-		if (!isTerritoryValid(territory)) {
-			ChatUtil.printDebug("Could not update label for territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
-			return;
-		}
-		String groupId = getGroupId(territory);
-		String areaId = getAreaId(territory);
-		String areaLabel = getAreaLabel(territory);
-		MarkerSet territoryGroup = dapi.getMarkerAPI().getMarkerSet(groupId);
-		if (territoryGroup != null) {
-			AreaMarker territoryArea = territoryGroup.findAreaMarker(areaId);
-			if (territoryArea != null) {
-				// Area already exists, update label
-				territoryArea.setLabel(areaLabel,true);
-			}
-		}
 	}
 	
 	private String getGroupId(KonTerritory territory) {
