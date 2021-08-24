@@ -118,7 +118,7 @@ public class AreaTerritory {
 	}
 	
 	public int getNumPoints() {
-		return areaPoints.size();
+		return xPoints.size();
 	}
 	
 	public double[] getXPoint(int n) {
@@ -145,10 +145,6 @@ public class AreaTerritory {
 		return center.getZ();
 	}
 	
-	public Set<Point> getPoints() {
-		return areaPoints;
-	}
-	
 	/**
 	 * Search pattern: Start at x-most corner and move clockwise along contour. If there
 	 * 	are corners left over, begin a new search for a new contour, etc.
@@ -161,7 +157,7 @@ public class AreaTerritory {
 		List<Coord> remainingCorners = new ArrayList<Coord>();
 		remainingCorners.addAll(coords);
 		//
-		int timeout = 100;
+		int timeout = 9001;
 		while(!remainingCorners.isEmpty() && timeout > 0) {
 
 			List<Coord> contour = new ArrayList<Coord>();

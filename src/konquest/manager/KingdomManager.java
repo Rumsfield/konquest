@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -36,6 +37,7 @@ import konquest.KonquestPlugin;
 import konquest.command.TravelCommand.TravelDestination;
 import konquest.display.OptionIcon.optionAction;
 import konquest.model.KonCamp;
+import konquest.model.KonCapital;
 import konquest.model.KonDirective;
 import konquest.model.KonKingdom;
 import konquest.model.KonKingdomScoreAttributes;
@@ -758,9 +760,31 @@ public class KingdomManager {
 	public boolean unclaimChunk(Location loc) {
 		if(isChunkClaimed(loc)) {
 			KonTerritory territory = getChunkTerritory(loc);
+			Set<KonPlayer> occupants = new HashSet<KonPlayer>();
+			for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
+				if(territory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
+					occupants.add(occupant);
+				}
+			}
 			if(territory.removeChunk(loc)) {
 				//updateTerritoryCache();
 				removeTerritory(loc);
+	    		for(KonPlayer occupant : occupants) {
+    				if(territory instanceof KonTown) {
+	    				KonTown town = (KonTown) territory;
+	    				town.removeBarPlayer(occupant);
+    				} else if(territory instanceof KonCapital) {
+    					KonCapital capital = (KonCapital) territory;
+    					capital.removeBarPlayer(occupant);
+    				} else if(territory instanceof KonRuin) {
+    					KonRuin ruin = (KonRuin) territory;
+    					ruin.removeBarPlayer(occupant);
+    				} else if(territory instanceof KonCamp) {
+    					KonCamp camp = (KonCamp) territory;
+    					camp.removeBarPlayer(occupant);
+    				}
+    				updatePlayerBorderParticles(occupant, occupant.getBukkitPlayer().getLocation());
+	    		}
 				konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
 				konquest.getMapHandler().drawDynmapLabel(territory.getKingdom().getCapital());
 				return true;

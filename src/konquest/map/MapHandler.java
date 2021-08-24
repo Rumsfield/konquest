@@ -116,19 +116,22 @@ public class MapHandler {
 		if(areaCache.containsKey(territory)) {
 			// Territory is already rendered
 			AreaTerritory oldArea = areaCache.get(territory);
+			//ChatUtil.printDebug("Updating existing territory from "+oldArea.getNumContours()+" to "+drawArea.getNumContours()+" contours, "+oldArea.getNumPoints()+" to "+drawArea.getNumPoints()+" points.");
 			for(int i = (oldArea.getNumContours()-1); i >= drawArea.getNumContours(); i--) {
 				contourId = areaId + ".contour." + i;
 				areaContour = territoryGroup.findAreaMarker(contourId);
 				if (areaContour != null) {
 					// Delete area from group
+					//ChatUtil.printDebug("Pruned contour ID "+contourId);
 					areaContour.deleteMarker();
 				}
 			}
 			for(int i = (oldArea.getNumPoints()-1); i >= drawArea.getNumPoints(); i--) {
-				pointId = areaId + ".point." +i ;
+				pointId = areaId + ".point." + i;
 				areaPoint = territoryGroup.findAreaMarker(pointId);
 				if (areaPoint != null) {
 					// Delete area from group
+					//ChatUtil.printDebug("Pruned point ID "+pointId);
 					areaPoint.deleteMarker();
 				}
 			}
