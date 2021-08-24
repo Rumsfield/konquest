@@ -3,9 +3,10 @@ description: A plugin for land claiming and territory control
 author: Rumsfield
 version: 0.6.0
 api-version: 1.16
+load: POSTWORLD
 main: konquest.KonquestPlugin
 depend: [Vault,ProtocolLib]
-softdepend: [QuickShop,LuckPerms,PlaceholderAPI,dynmap]
+softdepend: [QuickShop,LuckPerms,PlaceholderAPI,dynmap,'Multiverse-Core','Multiverse-Inventories','Multiverse-Portals','Multiverse-NetherPortals']
 commands:
   konquest:
     description: Base Konquest command

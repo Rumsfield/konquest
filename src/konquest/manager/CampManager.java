@@ -395,15 +395,22 @@ public class CampManager {
             		y = sectionList.get(1);
             		z = sectionList.get(2);
             		World world = Bukkit.getWorld(worldName);
-                	Location camp_center = new Location(world,x,y,z);
-            		int status = addCamp(camp_center, offlinePlayer);
-            		if(status == 0) {
-	            		getCamp(offlinePlayer).addPoints(konquest.formatStringToPoints(playerCampSection.getString("chunks")));
-	            		kingdomManager.addAllTerritory(world,getCamp(offlinePlayer).getChunkList());
-	            		totalCamps++;
-            		} else {
-            			ChatUtil.printDebug("Failed to add camp for player "+offlineBukkitPlayer.getName()+", error code: "+status);
-            		}
+                	if(world != null) {
+                		// Create the camp
+	            		Location camp_center = new Location(world,x,y,z);
+	            		int status = addCamp(camp_center, offlinePlayer);
+	            		if(status == 0) {
+		            		getCamp(offlinePlayer).addPoints(konquest.formatStringToPoints(playerCampSection.getString("chunks")));
+		            		kingdomManager.addAllTerritory(world,getCamp(offlinePlayer).getChunkList());
+		            		totalCamps++;
+	            		} else {
+	            			ChatUtil.printDebug("Failed to add camp for player "+offlineBukkitPlayer.getName()+", error code: "+status);
+	            		}
+                	} else {
+                		String message = "Failed to load camp for player "+offlineBukkitPlayer.getName()+" in an unloaded world, "+worldName+". Check plugin load order.";
+            			ChatUtil.printConsoleError(message);
+            			konquest.opStatusMessages.add(message);
+                	}
         		} else {
         			if(offlineBukkitPlayer != null) {
         				ChatUtil.printDebug("Failed to find player "+offlineBukkitPlayer.getName()+" when adding their camp");
