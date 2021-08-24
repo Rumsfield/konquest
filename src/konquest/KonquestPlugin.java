@@ -209,7 +209,7 @@ public class KonquestPlugin extends JavaPlugin {
 			amountMod = amount - amountOff;
 			String amountF = String.format("%.2f",amountOff);
 			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(discount,amountF));
-		} else {
+		} else if(discount != 0) {
 			ChatUtil.printDebug("Failed to apply invalid discount of "+discount+"%");
 		}
 		// Perform transaction
