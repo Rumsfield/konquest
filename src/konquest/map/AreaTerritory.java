@@ -175,7 +175,7 @@ public class AreaTerritory {
 			Coord candidate;
 			remainingCorners.remove(current);
 			contour.add(current);
-			ChatUtil.printDebug("Beginning contour search for territory with "+coords.size()+" corners...");
+			//ChatUtil.printDebug("Beginning contour search for territory with "+remainingCorners.size()+" corners...");
 			// Find consecutive corners
 			boolean isSearchSuccessful = true;
 			while(contour.size() < coords.size() && isSearchSuccessful) {
@@ -257,7 +257,7 @@ public class AreaTerritory {
 					//ChatUtil.printDebug("  Found next corner: "+candidate.toString());
 				} else {
 					isSearchSuccessful = false;
-					ChatUtil.printDebug("Could not find corner contiguous corner, stopping contour search.");
+					//ChatUtil.printDebug("Could not find corner contiguous corner, stopping contour search.");
 				}
 			}
 			if(!contour.isEmpty()) {
