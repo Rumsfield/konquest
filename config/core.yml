@@ -76,6 +76,7 @@
 #  exile:
 #    remove_favor:                  Set a player's currency balance to 0 when exiled (true/flase)
 #    remove_stats:                  Remove all stats and accomplishment prefixes from a player when exiled (true/false)
+#    random_wild:                   Teleport a player to a random location in the wild of their current world upon exile (true/false)
 #  camps:
 #    init_radius:                   Radius of camps for barbarians. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
 #    protect_containers:            Prevent players, except for camp owner, from using or breaking containers in camp land (true/false)
@@ -201,6 +202,7 @@ core:
   exile:
     remove_favor: true
     remove_stats: true
+    random_wild: true
   camps:
     init_radius: 2
     protect_containers: true

@@ -210,13 +210,16 @@ public class KingdomManager {
     	if(!konquest.isWorldValid(player.getBukkitPlayer().getLocation().getWorld())) {
     		return false;
     	}
-		Location randomWildLoc = konquest.getRandomWildLocation(1000,player.getBukkitPlayer().getLocation().getWorld());
-    	if(randomWildLoc == null) {
-    		return false;
-    	}
     	KonKingdom oldKingdom = player.getKingdom();
-    	player.getBukkitPlayer().teleport(randomWildLoc);
-    	player.getBukkitPlayer().setBedSpawnLocation(randomWildLoc, true);
+    	boolean doWildTeleport = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.random_wild", true);
+    	if(doWildTeleport) {
+			Location randomWildLoc = konquest.getRandomWildLocation(1000,player.getBukkitPlayer().getLocation().getWorld());
+	    	if(randomWildLoc == null) {
+	    		return false;
+	    	}
+	    	player.getBukkitPlayer().teleport(randomWildLoc);
+	    	player.getBukkitPlayer().setBedSpawnLocation(randomWildLoc, true);
+    	}
     	player.setExileKingdom(oldKingdom);
     	// Remove residency
     	for(KonTown town : player.getKingdom().getTowns()) {

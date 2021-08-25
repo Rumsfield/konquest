@@ -380,7 +380,7 @@ public class MapHandler {
 				int numCriticals = ruin.getMaxCriticalHits();
 				int numSpawns = ruin.getSpawnLocations().size();
 				result = "<p>"+
-						"<b>"+MessagePath.LABEL_RUIN.getMessage() + ruin.getName() + "</b><br>" +
+						"<b>"+MessagePath.LABEL_RUIN.getMessage() + " " + ruin.getName() + "</b><br>" +
 						MessagePath.LABEL_CRITICAL_HITS.getMessage() + ": " + numCriticals + "<br>" +
 						MessagePath.LABEL_GOLEM_SPAWNS.getMessage() + ": " + numSpawns + "<br>" +
 						"</p>";
