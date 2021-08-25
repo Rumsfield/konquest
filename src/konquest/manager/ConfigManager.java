@@ -138,12 +138,13 @@ public class ConfigManager{
 			Path source = oldFile.toPath();
 			Path destination = newFile.toPath();
 			try {
+				Files.createDirectories(destination);
 				Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
 				oldFile.delete();
 				ChatUtil.printConsoleAlert("Migrated data file "+oldPath+" to "+newpath);
 			} catch (IOException e) {
 				e.printStackTrace();
-				ChatUtil.printDebug("Failed to move file "+oldPath+" to "+newpath);
+				ChatUtil.printConsoleError("Failed to move file "+oldPath+" to "+newpath);
 			}
 			/*
 			if(oldFile.renameTo(newFile)) {
