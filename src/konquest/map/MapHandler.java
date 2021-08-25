@@ -93,7 +93,7 @@ public class MapHandler {
 			ChatUtil.printDebug("Could not draw territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
 			return;
 		}
-		ChatUtil.printDebug("Drawing Dynmap area of territory "+territory.getName());
+		//ChatUtil.printDebug("Drawing Dynmap area of territory "+territory.getName());
 		String groupId = getGroupId(territory);
 		String groupLabel = getGroupLabel(territory);
 		String areaId = getAreaId(territory);
@@ -380,7 +380,8 @@ public class MapHandler {
 				int numCriticals = ruin.getMaxCriticalHits();
 				int numSpawns = ruin.getSpawnLocations().size();
 				result = "<p>"+
-						"<b>"+MessagePath.LABEL_RUIN.getMessage() + " " + ruin.getName() + "</b><br>" +
+						"<b>"+ruin.getName() + "</b><br>" +
+						MessagePath.LABEL_RUIN.getMessage() + "<br>" +
 						MessagePath.LABEL_CRITICAL_HITS.getMessage() + ": " + numCriticals + "<br>" +
 						MessagePath.LABEL_GOLEM_SPAWNS.getMessage() + ": " + numSpawns + "<br>" +
 						"</p>";

@@ -226,6 +226,7 @@ public class KingdomManager {
     		if(town.removePlayerResident(player.getOfflineBukkitPlayer())) {
     			//ChatUtil.sendNotice(player.getBukkitPlayer(), "Banished from "+town.getName()+"!");
     			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_TOWN.getMessage(town.getName()));
+    			konquest.getMapHandler().drawDynmapLabel(town);
     		}
     	}
     	boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
