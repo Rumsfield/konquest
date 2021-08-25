@@ -315,9 +315,10 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	
 	public void setIsFlyEnabled(boolean val) {
 		try {
-			if(val) {
+			if(val && !isFlying) {
 				bukkitPlayer.setAllowFlight(true);
-	    	} else {
+				isFlying = true;
+	    	} else if(!val && isFlying) {
 	    		// Attempt to tp the player to the ground beneath their feet
 	    		if(bukkitPlayer.isFlying()) {
 	    			Location playerLoc = bukkitPlayer.getLocation();
@@ -336,8 +337,8 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	    		}
 	    		bukkitPlayer.setFlying(false);
 	    		bukkitPlayer.setAllowFlight(false);
+	    		isFlying = false;
 	    	}
-			isFlying = val;
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
