@@ -1119,17 +1119,13 @@ public class PlayerListener implements Listener{
         				player.clearAllMobAttackers();
         				// Command all nearby Iron Golems to target nearby enemy players, ignore triggering player
     					updateGolemTargetsForTerritory(territoryFrom,player,false);
-    					ChatUtil.printDebug("Player left a world town");
         			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         				((KonRuin) territoryFrom).removeBarPlayer(player);
         				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
-        				ChatUtil.printDebug("Player left a world ruin");
         			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
         				((KonCapital) territoryFrom).removeBarPlayer(player);
-        				ChatUtil.printDebug("Player left a world capital");
         			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAMP)) {
         				((KonCamp) territoryFrom).removeBarPlayer(player);
-        				ChatUtil.printDebug("Player left a world camp");
         			}
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
