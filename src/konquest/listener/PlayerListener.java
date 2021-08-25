@@ -880,17 +880,16 @@ public class PlayerListener implements Listener{
 				return;
 			}
         	KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-        	
+        	Location chunkTo = event.getTo();
+    		Location chunkFrom = event.getFrom();
+    		boolean isTerritoryTo = kingdomManager.isChunkClaimed(chunkTo);
+    		boolean isTerritoryFrom = kingdomManager.isChunkClaimed(chunkFrom);
+    		
     		if(event.getTo().getWorld().equals(event.getFrom().getWorld())) {
     			// Player moved within the same world
     			//long start = System.currentTimeMillis();
-        		
-            	Location chunkTo = event.getTo();
-        		Location chunkFrom = event.getFrom();
         		//String chunkCoordsTo = chunkTo.getX()+", "+chunkTo.getZ();
         		//String chunkCoordsFrom = chunkFrom.getX()+", "+chunkFrom.getZ();
-        		boolean isTerritoryTo = kingdomManager.isChunkClaimed(chunkTo);
-        		boolean isTerritoryFrom = kingdomManager.isChunkClaimed(chunkFrom);
         		
         		// Auto map
         		if(player.isMapAuto()) {
@@ -1111,21 +1110,72 @@ public class PlayerListener implements Listener{
     			player.setIsFlyEnabled(false);
     			
     			//kingdomManager.stopPlayerBorderParticles(player);
-    			kingdomManager.updatePlayerBorderParticles(player,event.getTo());
+    			kingdomManager.updatePlayerBorderParticles(player,chunkTo);
     			
-    			if(kingdomManager.isChunkClaimed(event.getFrom())) {
-    				KonTerritory territoryFrom = kingdomManager.getChunkTerritory(event.getFrom());
-        			if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+    			if(isTerritoryFrom) {
+    				KonTerritory territoryFrom = kingdomManager.getChunkTerritory(chunkFrom);
+    				if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         				((KonTown) territoryFrom).removeBarPlayer(player);
         				player.clearAllMobAttackers();
         				// Command all nearby Iron Golems to target nearby enemy players, ignore triggering player
     					updateGolemTargetsForTerritory(territoryFrom,player,false);
-        			} else if (territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
-	    				((KonRuin) territoryFrom).removeBarPlayer(player);
-	    			}
+    					ChatUtil.printDebug("Player left a world town");
+        			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+        				((KonRuin) territoryFrom).removeBarPlayer(player);
+        				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
+        				ChatUtil.printDebug("Player left a world ruin");
+        			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+        				((KonCapital) territoryFrom).removeBarPlayer(player);
+        				ChatUtil.printDebug("Player left a world capital");
+        			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+        				((KonCamp) territoryFrom).removeBarPlayer(player);
+        				ChatUtil.printDebug("Player left a world camp");
+        			}
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
         			kingdomManager.clearTownHearts(player);
+    			}
+    			
+    			if(isTerritoryTo) {
+    				KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
+                    if(invokeEvent != null) {
+                    	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
+                    }
+                    if(!event.isCancelled()) {
+                    	KonTerritory territoryTo = kingdomManager.getChunkTerritory(chunkTo);
+    	                // Set message color based on enemy territory
+    	                String color = ""+ChatColor.RED;
+    	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
+    	                	color = ""+ChatColor.YELLOW;
+    	                } else {
+    	                	if(player.getKingdom().equals(territoryTo.getKingdom())) {
+	    	                	color = ""+ChatColor.GREEN;
+	    	                } else if(territoryTo.getKingdom().equals(kingdomManager.getNeutrals())) {
+	    	                	color = ""+ChatColor.GRAY;
+	    	                }
+    	                }
+    	                // Display Territory Name
+    	    			String territoryName = territoryTo.getName();
+    	    			//ChatUtil.sendNotice(bukkitPlayer, color+territoryName+": "+chunkCoordsTo);
+    	    			ChatUtil.sendKonTitle(player, "", color+territoryName);
+    	    			if(territoryTo.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+    	    				KonTown town = (KonTown) territoryTo;
+    	    				town.addBarPlayer(player);
+    	    				// Notify player if town is abandoned
+    	    				if(town.getPlayerResidents().isEmpty() && town.getKingdom().equals(player.getKingdom())) {
+    	    					//ChatUtil.sendNotice(bukkitPlayer, "This Town is abandoned! Use \"/k town "+territoryName+" lord "+bukkitPlayer.getName()+"\" to claim Lordship.",ChatColor.RED);
+    	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
+    	    				}
+    	    				// Command all nearby Iron Golems to target enemy player, if no other closer player is present
+    						updateGolemTargetsForTerritory(territoryTo,player,true);
+    	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+    	    				((KonRuin) territoryTo).addBarPlayer(player);
+    	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    	    				((KonCapital) territoryTo).addBarPlayer(player);
+    	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+    	    				((KonCamp) territoryTo).addBarPlayer(player);
+    	    			}
+                    }
     			}
     		}
     	}

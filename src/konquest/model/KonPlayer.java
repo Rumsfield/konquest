@@ -338,6 +338,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	    		bukkitPlayer.setFlying(false);
 	    		bukkitPlayer.setAllowFlight(false);
 	    		isFlying = false;
+	    		flyDisableWarmupTimer.stopTimer();
 	    	}
 		} catch(Exception e) {
 			e.printStackTrace();
