@@ -52,6 +52,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	private HashMap<UUID,Boolean> residents;
 	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident, false = requesting add from lord/knight)
 	private boolean isOpen;
+	private boolean isEnemyRedstoneAllowed;
 	private boolean isAttacked;
 	private boolean isShielded;
 	private boolean isArmored;
@@ -86,6 +87,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.residents = new HashMap<UUID,Boolean>();
 		this.joinRequests = new HashMap<UUID,Boolean>();
 		this.isOpen = false; // init as a closed Town, requires Lord to add players as residents for build/container perms
+		this.isEnemyRedstoneAllowed = false;
 		this.isAttacked = false;
 		this.isShielded = false;
 		this.shieldEndTimeSeconds = 0;
@@ -106,14 +108,17 @@ public class KonTown extends KonTerritory implements Timeable{
 	@Override
 	public boolean addChunk(Point point) {
 		Point centerChunk = getKonquest().toPoint(getCenterLoc());
-		int maxChunkRange = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_town")-1;
-		
-		int distX = (int)Math.abs(point.getX() - centerChunk.getX());
-		int distY = (int)Math.abs(point.getY() - centerChunk.getY());
-		
-		if(distX > maxChunkRange || distY > maxChunkRange) {
-			ChatUtil.printDebug("Failed to add chunk in territory "+getName()+", too far");
-			return false;
+		int maxChunkRange = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_size");
+		if(maxChunkRange < 0) {
+			maxChunkRange = 0;
+		}
+		if(maxChunkRange >= 1) {
+			int distX = (int)Math.abs(point.getX() - centerChunk.getX());
+			int distY = (int)Math.abs(point.getY() - centerChunk.getY());
+			if(distX > (maxChunkRange-1) || distY > (maxChunkRange-1)) {
+				ChatUtil.printDebug("Failed to add chunk in territory "+getName()+", too far");
+				return false;
+			}
 		}
 		addPoint(point);
 		return true;
@@ -186,7 +191,11 @@ public class KonTown extends KonTerritory implements Timeable{
 		}
         
 		// Add chunks around the monument chunk
-		if(!addChunks(getKonquest().getAreaPoints(getCenterLoc(), getKonquest().getConfigManager().getConfig("core").getInt("core.towns.init_radius")))) {
+		int radius = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.init_radius");
+		if(radius < 1) {
+			radius = 1;
+		}
+		if(!addChunks(getKonquest().getAreaPoints(getCenterLoc(), radius))) {
 			ChatUtil.printDebug("Town init failed: problem adding some chunks");
 			return 4;
 		}
@@ -694,6 +703,14 @@ public class KonTown extends KonTerritory implements Timeable{
 		return isOpen ? true : false;
 	}
 	
+	public void setIsEnemyRedstoneAllowed(boolean val) {
+		isEnemyRedstoneAllowed = val;
+	}
+	
+	public boolean isEnemyRedstoneAllowed() {
+		return isEnemyRedstoneAllowed ? true : false;
+	}
+	
 	public boolean canClaimLordship(KonPlayer player) {
 		boolean result = false;
 		if(!isLordValid()) {
@@ -717,11 +734,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 	
 	public void setPlayerLord(OfflinePlayer player) {
-		lord = player.getUniqueId();
-		if(!residents.containsKey(player.getUniqueId())) {
-			residents.put(player.getUniqueId(),true);
-			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-		}
+		setLord(player.getUniqueId());
 	}
 	
 	public void setLord(UUID id) {
@@ -729,6 +742,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		if(!residents.containsKey(id)) {
 			residents.put(id,true);
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
+			getKonquest().getMapHandler().drawDynmapLabel(this);
 		}
 	}
 	
@@ -769,6 +783,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		if(!residents.containsKey(playerUUID)) {
 			residents.put(playerUUID,isElite);
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
+			getKonquest().getMapHandler().drawDynmapLabel(this);
 			status = true;
 		}
 		return status;
@@ -783,6 +798,7 @@ public class KonTown extends KonTerritory implements Timeable{
 				lord = null;
 			}
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
+			getKonquest().getMapHandler().drawDynmapLabel(this);
 			if(residents.isEmpty()) {
 				clearShieldsArmors();
 			}

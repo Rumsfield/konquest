@@ -188,30 +188,36 @@ public class RuinManager {
     		y = sectionList.get(1);
     		z = sectionList.get(2);
     		World world = Bukkit.getWorld(worldName);
-        	Location ruin_center = new Location(world,x,y,z);
-        	if(addRuin(ruin_center,ruinName)) {
-        		ruin = getRuin(ruinName);
-        		if(ruin != null) {
-        			ruin.addPoints(konquest.formatStringToPoints(ruinSection.getString("chunks","")));
-                	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("criticals",""),world)) {
-                		loc.setWorld(world);
-                		ruin.addCriticalLocation(loc);
-            		}
-                	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("spawns",""),world)) {
-                		loc.setWorld(world);
-                		ruin.addSpawnLocation(loc);
-            		}
-                	kingdomManager.addAllTerritory(world,ruin.getChunkList());
-        		} else {
-        			String message = "Could not load ruin "+ruinName+", ruins.yml may be corrupted and needs to be deleted.";
-            		ChatUtil.printConsoleError(message);
-            		konquest.opStatusMessages.add(message);
-        		}
-        	} else {
-        		String message = "Failed to load ruin "+ruinName+", ruins.yml may be corrupted and needs to be deleted.";
-        		ChatUtil.printConsoleError(message);
-        		konquest.opStatusMessages.add(message);
-        	}
+    		if(world != null) {
+	        	Location ruin_center = new Location(world,x,y,z);
+	        	if(addRuin(ruin_center,ruinName)) {
+	        		ruin = getRuin(ruinName);
+	        		if(ruin != null) {
+	        			ruin.addPoints(konquest.formatStringToPoints(ruinSection.getString("chunks","")));
+	                	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("criticals",""),world)) {
+	                		loc.setWorld(world);
+	                		ruin.addCriticalLocation(loc);
+	            		}
+	                	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("spawns",""),world)) {
+	                		loc.setWorld(world);
+	                		ruin.addSpawnLocation(loc);
+	            		}
+	                	kingdomManager.addAllTerritory(world,ruin.getChunkList());
+	        		} else {
+	        			String message = "Could not load ruin "+ruinName+", ruins.yml may be corrupted and needs to be deleted.";
+	            		ChatUtil.printConsoleError(message);
+	            		konquest.opStatusMessages.add(message);
+	        		}
+	        	} else {
+	        		String message = "Failed to load ruin "+ruinName+", ruins.yml may be corrupted and needs to be deleted.";
+	        		ChatUtil.printConsoleError(message);
+	        		konquest.opStatusMessages.add(message);
+	        	}
+    		} else {
+    			String message = "Failed to load ruin "+ruinName+" in an unloaded world, "+worldName+". Check plugin load order.";
+    			ChatUtil.printConsoleError(message);
+    			konquest.opStatusMessages.add(message);
+    		}
         }
 	}
 	

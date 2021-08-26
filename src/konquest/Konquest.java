@@ -21,6 +21,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -30,6 +31,7 @@ import org.bukkit.scoreboard.Team;
 import com.google.common.collect.MapMaker;
 
 import konquest.manager.AccomplishmentManager;
+import konquest.manager.CampManager;
 import konquest.manager.ConfigManager;
 import konquest.manager.DirectiveManager;
 import konquest.manager.DisplayManager;
@@ -65,12 +67,14 @@ public class Konquest implements Timeable {
 
 	private KonquestPlugin plugin;
 	private static Konquest instance;
+	private static String chatTag;
 	
 	private DatabaseThread databaseThread;
 	private AccomplishmentManager accomplishmentManager;
 	private DirectiveManager directiveManager;
 	private PlayerManager playerManager;
 	private KingdomManager kingdomManager;
+	private CampManager campManager;
 	private ConfigManager configManager;
 	private IntegrationManager integrationManager;
 	private LootManager lootManager;
@@ -87,8 +91,9 @@ public class Konquest implements Timeable {
     private Team enemyTeam;
     private Team barbarianTeam;
     private TeamPacketSender teamPacketSender;
+    private boolean isPacketSendEnabled;
 	
-	//private String worldName;
+	private EventPriority chatPriority;
     private List<World> worlds;
     private boolean isWhitelist;
 	public List<String> opStatusMessages;
@@ -107,12 +112,14 @@ public class Konquest implements Timeable {
 	public Konquest(KonquestPlugin plugin) {
 		this.plugin = plugin;
 		instance = this;
+		chatTag = "§7[§6Konquest§7]§f ";
 		
 		databaseThread = new DatabaseThread(this);
 		accomplishmentManager = new AccomplishmentManager(this);
 		directiveManager = new DirectiveManager(this);
 		playerManager = new PlayerManager(this);
 		kingdomManager = new KingdomManager(this);
+		campManager = new CampManager(this);
 		configManager = new ConfigManager(this);
 		integrationManager = new IntegrationManager(this);
 		lootManager = new LootManager(this);
@@ -124,7 +131,7 @@ public class Konquest implements Timeable {
 		languageManager = new LanguageManager(this);
 		mapHandler = new MapHandler(this);
 		
-		//worldName = "world";
+		chatPriority = EventPriority.LOW;
 		worlds = new ArrayList<World>();
 		isWhitelist = false;
 		opStatusMessages = new ArrayList<String>();
@@ -132,6 +139,7 @@ public class Konquest implements Timeable {
 		this.compassTimer = new Timer(this);
 		this.saveIntervalSeconds = 0;
 		this.offlineTimeoutSeconds = 0;
+		this.isPacketSendEnabled = false;
 		
 		teleportTerritoryQueue = new HashMap<Player,KonTerritory>();
 		teleportLocationQueue = new HashMap<Player,Location>();
@@ -144,6 +152,9 @@ public class Konquest implements Timeable {
 		ChatUtil.printDebug("Debug is "+debug);
 		String worldName = configManager.getConfig("core").getString("core.world_name");
 		ChatUtil.printDebug("Primary world is "+worldName);
+		String configTag = configManager.getConfig("core").getString("core.chat.tag");
+		chatTag = ChatColor.translateAlternateColorCodes('&', configTag);
+		ChatUtil.printDebug("Chat tag is "+chatTag);
 		languageManager.initialize();
 		kingdomManager.initialize();
 		ruinManager.initialize();
@@ -167,7 +178,12 @@ public class Konquest implements Timeable {
         barbarianTeam.setColor(ChatColor.YELLOW);
         
         if(setupTeamPacketSender()) {
-        	ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version");
+        	if(plugin.isProtocolEnabled()) {
+        		ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version");
+        		isPacketSendEnabled = true;
+        	} else {
+        		ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is disabled! Check version.");
+        	}
         } else {
         	ChatUtil.printConsoleError("Failed to register name color packets, the server version is unsupported");
         }
@@ -209,6 +225,8 @@ public class Konquest implements Timeable {
 		compassTimer.stopTimer();
 		compassTimer.setTime(30); // 30 second compass update interval
 		compassTimer.startLoopTimer();
+		// Set chat even priority
+		chatPriority = getEventPriority(configManager.getConfig("core").getString("core.chat.priority","low"));
 		// Update kingdom stuff
 		kingdomManager.updateSmallestKingdom();
 		kingdomManager.updateAllTownDisabledUpgrades();
@@ -239,7 +257,7 @@ public class Konquest implements Timeable {
 		// Fetch any players that happen to be in the server already (typically from /reload)
         for(Player bukkitPlayer : Bukkit.getServer().getOnlinePlayers()) {
 			initPlayer(bukkitPlayer);
-			ChatUtil.printStatus("Loaded online player "+bukkitPlayer.getName());
+			ChatUtil.printConsole("Loaded online player "+bukkitPlayer.getName());
 		}
 	}
 	
@@ -258,6 +276,13 @@ public class Konquest implements Timeable {
     	updateNamePackets(player);
     	// Update offline protections
     	kingdomManager.updateKingdomOfflineProtection();
+    	if(player.isBarbarian()) {
+    		KonCamp camp = campManager.getCamp(player);
+    		if(camp != null) {
+    			camp.setProtected(false);
+    			camp.setOnlineOwner(bukkitPlayer);
+    		}
+    	}
     	// Update player membership stats
     	kingdomManager.updatePlayerMembershipStats(player);
     	// Updates based on login position
@@ -324,6 +349,10 @@ public class Konquest implements Timeable {
 		return kingdomManager;
 	}
 	
+	public CampManager getCampManager() {
+		return campManager;
+	}
+	
 	public ConfigManager getConfigManager() {
 		return configManager;
 	}
@@ -380,6 +409,10 @@ public class Konquest implements Timeable {
 		return offlineTimeoutSeconds;
 	}
 	
+	public EventPriority getChatPriority() {
+		return chatPriority;
+	}
+	
 	public boolean isWorldValid(World world) {
 		boolean result = false;
 		if(isWhitelist) {
@@ -395,26 +428,30 @@ public class Konquest implements Timeable {
 		if(taskID == 0) {
 			ChatUtil.printDebug("Save Timer ended with null taskID!");
 		} else if(taskID == saveTimer.getTaskID()) {
-			// Prune residents for being offline too long
+			// Prune residents and camp owners for being offline too long
 			if(offlineTimeoutSeconds != 0) {
 				// Search all stored players and prune
 				Date now = new Date();
 				for(KonOfflinePlayer player : playerManager.getAllKonOfflinePlayers()) {
 					long lastPlayedTime = player.getOfflineBukkitPlayer().getLastPlayed();
 					if(lastPlayedTime > 0 && now.after(new Date(lastPlayedTime + (offlineTimeoutSeconds*1000)))) {
-						// Offline player has exceeded timeout period, prune from residencies
+						// Offline player has exceeded timeout period, prune from residencies and camp
 						for(KonTown town : player.getKingdom().getTowns()) {
 							if(town.getPlayerResidents().contains(player.getOfflineBukkitPlayer())) {
 								boolean status = town.removePlayerResident(player.getOfflineBukkitPlayer());
 								ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from town "+town.getName()+" in kingdom "+player.getKingdom().getName()+", got "+status);
 							}
 						}
+						if(campManager.isCampSet(player)) {
+							campManager.removeCamp(player);
+							ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from camp");
+						}
 					}
 				}
 			}
 			// Save config files
 			kingdomManager.saveKingdoms();
-			kingdomManager.saveCamps();
+			campManager.saveCamps();
 			ruinManager.saveRuins();
 			//playerManager.saveAllPlayers();
 			configManager.saveConfigs();
@@ -533,6 +570,23 @@ public class Konquest implements Timeable {
 			for(int x=min;x<=max;x++) {
 				for(int z=min;z<=max;z++) {
 					if(x != 0 || z != 0) {
+						areaPoints.add(new Point(center.x + x, center.y + z));
+					}
+				}
+			}
+		}
+		return areaPoints;
+	}
+	
+	public ArrayList<Point> getBorderPoints(Location loc, int radius) {
+		ArrayList<Point> areaPoints = new ArrayList<Point>();
+		Point center = toPoint(loc);
+		if(radius > 0) {
+			int min = (radius-1)*-1;
+			int max = (radius-1);
+			for(int x=min;x<=max;x++) {
+				for(int z=min;z<=max;z++) {
+					if(x == min || z == min || x == max || z == max) {
 						areaPoints.add(new Point(center.x + x, center.y + z));
 					}
 				}
@@ -774,6 +828,9 @@ public class Konquest implements Timeable {
      * @param player
      */
     public void updateNamePackets(KonPlayer player) {
+    	if(!isPacketSendEnabled) {
+    		return;
+    	}
     	// Loop over all online players, populate team lists and send each online player a team packet for arg player
     	// Send arg player packets for each team with lists of online players
 		List<String> friendlyNames = new ArrayList<String>();
@@ -1062,6 +1119,10 @@ public class Konquest implements Timeable {
     	loc.getWorld().playSound(loc, Sound.ENTITY_SHULKER_SHOOT, (float)1.0, (float)2);
     }
     
+    public static void playCampGroupSound(Location loc) {
+    	loc.getWorld().playSound(loc, Sound.BLOCK_FENCE_GATE_OPEN, (float)1.0, (float)0.7);
+    }
+    
     public static String getTimeFormat(int valSeconds, ChatColor color) {
 		int days = valSeconds / 86400;
 		int hours = valSeconds % 86400 / 3600;
@@ -1092,5 +1153,21 @@ public class Konquest implements Timeable {
 		
 		return result;		
 	}
+    
+    public static EventPriority getEventPriority(String priority) {
+    	EventPriority result = EventPriority.LOW;
+    	if(priority != null) {
+    		try {
+    			result = EventPriority.valueOf(priority);
+    		} catch(IllegalArgumentException e) {
+    			// do nothing
+    		}
+    	}
+    	return result;
+    }
+    
+    public static String getChatTag() {
+    	return chatTag;
+    }
 	
 }

@@ -1,11 +1,12 @@
 name: Konquest
 description: A plugin for land claiming and territory control
 author: Rumsfield
-version: 0.5.2
+version: 0.6.0
 api-version: 1.16
+load: POSTWORLD
 main: konquest.KonquestPlugin
 depend: [Vault,ProtocolLib]
-softdepend: [QuickShop,LuckPerms,PlaceholderAPI,dynmap]
+softdepend: [QuickShop,LuckPerms,PlaceholderAPI,dynmap,'Multiverse-Core','Multiverse-Inventories','Multiverse-Portals','Multiverse-NetherPortals']
 commands:
   konquest:
     description: Base Konquest command
@@ -49,6 +50,7 @@ permissions:
       konquest.command.prefix: true
       konquest.command.town: true
       konquest.command.admin: true
+      konquest.command.fly: false
 
   konquest.command.help:
     description: Display help in chat
@@ -122,6 +124,10 @@ permissions:
     description: For admins
     default: op
     
+  konquest.command.fly:
+    description: Fly in friendly territory
+    default: false
+    
   konquest.directive:
     description: Gives access to base Konquest directive permission
     default: true
@@ -183,3 +189,11 @@ permissions:
   konquest.join:
     description: Join a kingdom
     default: op
+    
+  konquest.discount:
+    description: Applies a percent discount on all Favor withdraws
+    default: false
+    
+  konquest.prefix:
+    description: Grants access to a custom prefix
+    default: false

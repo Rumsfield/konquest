@@ -29,7 +29,7 @@ public class TownCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		// k town <name> open|close|add|kick|knight|lord|rename|upgrade|shield [arg]
+		// k town <name> options|add|kick|knight|lord|rename|upgrade|shield [arg]
 		if (getArgs().length != 3 && getArgs().length != 4) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
@@ -71,6 +71,14 @@ public class TownCommand extends CommandBase {
         	String playerName = "";
         	String newTownName = "";
         	switch(subCmd.toLowerCase()) {
+        	case "options":
+        		if(!town.isPlayerLord(player.getOfflineBukkitPlayer())) {
+            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+            		return;
+            	}
+        		getKonquest().getDisplayManager().displayTownOptionsMenu(bukkitPlayer, town);
+        		break;
+        	/*
         	case "open":
         		// Verify player is lord of the Town
             	if(!town.isPlayerLord(player.getOfflineBukkitPlayer())) {
@@ -111,6 +119,7 @@ public class TownCommand extends CommandBase {
             		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_CLOSE.getMessage(townName));
             	}
         		break;
+        	*/
 			case "add":
 				// Verify player is elite or lord of the Town
 	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerElite(player.getOfflineBukkitPlayer())) {
@@ -536,7 +545,7 @@ public class TownCommand extends CommandBase {
 
 	@Override
 	public List<String> tabComplete() {
-		// k town <name> open|close|add|kick|knight|lord|rename|upgrade|shield [arg]
+		// k town <name> options|add|kick|knight|lord|rename|upgrade|shield [arg]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		Player bukkitPlayer = (Player) getSender();
@@ -553,8 +562,7 @@ public class TownCommand extends CommandBase {
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 3) {
 			// suggest sub-commands
-			tabList.add("open");
-			tabList.add("close");
+			tabList.add("options");
 			tabList.add("add");
 			tabList.add("kick");
 			tabList.add("lord");

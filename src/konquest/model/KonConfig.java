@@ -21,12 +21,21 @@ public class KonConfig {
 	private String name;
 	private String fileName;
 	private YamlConfiguration config;
+	private boolean doSave;
 	
 	private KonquestPlugin plugin;
 	
 	public KonConfig(String name) {
 		this.name = name;
 		this.fileName = name+".yml";
+		this.doSave = true;
+		plugin = Konquest.getInstance().getPlugin();
+	}
+	
+	public KonConfig(String name, boolean doSave) {
+		this.name = name;
+		this.fileName = name+".yml";
+		this.doSave = doSave;
 		plugin = Konquest.getInstance().getPlugin();
 	}
 	
@@ -71,7 +80,7 @@ public class KonConfig {
 	}
 	
 	public void saveConfig() {
-		if (config == null || file == null || config.getKeys(false).isEmpty()) {
+		if (config == null || file == null || config.getKeys(false).isEmpty() || !doSave) {
 	        return;
 	    }
 	    try {

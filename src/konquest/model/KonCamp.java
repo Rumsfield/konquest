@@ -21,7 +21,10 @@ public class KonCamp extends KonTerritory implements Timeable {
 	
 	private OfflinePlayer owner;
 	private Timer raidAlertTimer;
+	private Timer protectedWarmupTimer;
+	private Timer protectedCountdownTimer;
 	private boolean isRaidAlertDisabled;
+	private boolean isOfflineProtected;
 	private Location bedLocation;
 	private BossBar campBarAll;
 	
@@ -30,10 +33,23 @@ public class KonCamp extends KonTerritory implements Timeable {
 		
 		this.owner = owner;
 		this.raidAlertTimer = new Timer(this);
+		this.protectedWarmupTimer = new Timer(this);
+		this.protectedCountdownTimer = new Timer(this);
 		this.isRaidAlertDisabled = false;
+		this.isOfflineProtected = false;
 		this.bedLocation = loc;
 		this.campBarAll = Bukkit.getServer().createBossBar(ChatColor.YELLOW+getName(), BarColor.WHITE, BarStyle.SOLID);
 		this.campBarAll.setVisible(true);
+		initProtection();
+	}
+	
+	private void initProtection() {
+		boolean isOfflineProtectedEnabled = getKonquest().getConfigManager().getConfig("core").getBoolean("core.camps.no_enemy_edit_offline",true);
+		if(isOfflineProtectedEnabled && !isOwnerOnline()) {
+			// Immediately enable protection
+			isOfflineProtected = true;
+			campBarAll.setTitle(ChatColor.YELLOW+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
+		}
 	}
 
 	/**
@@ -63,6 +79,10 @@ public class KonCamp extends KonTerritory implements Timeable {
 		return owner;
 	}
 	
+	public void setOnlineOwner(Player player) {
+		owner = player;
+	}
+	
 	public boolean isPlayerOwner(OfflinePlayer player) {
 		return player.getUniqueId().equals(owner.getUniqueId());
 	}
@@ -90,13 +110,24 @@ public class KonCamp extends KonTerritory implements Timeable {
 	@Override
 	public void onEndTimer(int taskID) {
 		if(taskID == 0) {
-			ChatUtil.printDebug("Town Timer ended with null taskID!");
+			ChatUtil.printDebug("Camp Timer ended with null taskID!");
 		} else if(taskID == raidAlertTimer.getTaskID()) {
 			ChatUtil.printDebug("Raid Alert Timer ended with taskID: "+taskID);
 			// When a raid alert cooldown timer ends
 			isRaidAlertDisabled = false;
+		} else if(taskID == protectedWarmupTimer.getTaskID()) {
+			ChatUtil.printDebug("Offline protection warmup Timer ended with taskID: "+taskID);
+			// When a protection warmup timer ends
+			isOfflineProtected = true;
+			protectedCountdownTimer.stopTimer();
+			campBarAll.setTitle(ChatColor.YELLOW+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
+		} else if(taskID == protectedCountdownTimer.getTaskID()) {
+			// Update protection countdown title
+			String remainingTime = Konquest.getTimeFormat(protectedWarmupTimer.getTime(),ChatColor.RED);
+			campBarAll.setTitle(ChatColor.YELLOW+getName()+" "+remainingTime);
+			//ChatUtil.printDebug("Camp protection countdown tick with taskID: "+taskID);
 		} else {
-			ChatUtil.printDebug("Town Timer ended with unknown taskID: "+taskID);
+			ChatUtil.printDebug("Camp Timer ended with unknown taskID: "+taskID);
 		}
 	}
 	
@@ -120,6 +151,39 @@ public class KonCamp extends KonTerritory implements Timeable {
 				campBarAll.addPlayer(bukkitPlayer);
 			}
 		}
+	}
+	
+	public void setProtected(boolean val) {
+		if(val) {
+			// Optionally start warmup timer to protect this camp
+			boolean isOfflineProtectedEnabled = getKonquest().getConfigManager().getConfig("core").getBoolean("core.camps.no_enemy_edit_offline",true);
+			int offlineProtectedWarmupSeconds = getKonquest().getConfigManager().getConfig("core").getInt("core.camps.no_enemy_edit_offline_warmup",0);
+			if(isOfflineProtectedEnabled) {
+				if(offlineProtectedWarmupSeconds > 0 && protectedWarmupTimer.getTime() == -1 && !isOfflineProtected) {
+					// Start warmup timer
+					protectedWarmupTimer.stopTimer();
+					protectedWarmupTimer.setTime(offlineProtectedWarmupSeconds);
+					protectedWarmupTimer.startTimer();
+					// Start countdown timer
+					protectedCountdownTimer.stopTimer();
+					protectedCountdownTimer.setTime(0);
+					protectedCountdownTimer.startLoopTimer();
+				} else if(offlineProtectedWarmupSeconds <= 0) {
+					// Immediately enable protection
+					isOfflineProtected = true;
+					campBarAll.setTitle(ChatColor.YELLOW+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
+				}
+			}
+		} else {
+			// Remove protection
+			isOfflineProtected = false;
+			protectedCountdownTimer.stopTimer();
+			campBarAll.setTitle(ChatColor.YELLOW+getName());
+		}
+	}
+	
+	public boolean isProtected() {
+		return isOfflineProtected;
 	}
 
 }

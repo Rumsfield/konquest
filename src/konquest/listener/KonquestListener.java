@@ -127,27 +127,33 @@ public class KonquestListener implements Listener {
 		}
 		
 		// When territory is a camp
-		// TODO check for allowable players, because some barbarians may be hostile and others may be friendly
 		if(event.getTerritory() instanceof KonCamp) {
 			KonCamp camp = (KonCamp)event.getTerritory();
-			
 			// Attempt to start a raid alert
 			if(!camp.isRaidAlertDisabled() && !event.getPlayer().isAdminBypassActive() && 
 					!event.getPlayer().getKingdom().isPeaceful()) {
-				// Alert the camp owner if online
-				if(camp.isOwnerOnline() && playerManager.isPlayer((Player)camp.getOwner()) && !event.getPlayer().getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
-					KonPlayer ownerPlayer = playerManager.getPlayer((Player)camp.getOwner());
-					//ChatUtil.sendNotice((Player)camp.getOwner(), "Enemy spotted in "+event.getTerritory().getName()+", use \"/k travel camp\" to defend!", ChatColor.DARK_RED);
-					ChatUtil.sendNotice((Player)camp.getOwner(), MessagePath.PROTECTION_NOTICE_RAID.getMessage(event.getTerritory().getName(),"camp"),ChatColor.DARK_RED);
-					ChatUtil.sendKonPriorityTitle(ownerPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+event.getTerritory().getName(), 60, 1, 10);
-					// Start Raid Alert disable timer for target town
-					int raidAlertTimeSeconds = konquest.getConfigManager().getConfig("core").getInt("core.towns.raid_alert_cooldown");
-					ChatUtil.printDebug("Starting raid alert timer for "+raidAlertTimeSeconds+" seconds");
-					Timer raidAlertTimer = camp.getRaidAlertTimer();
-					camp.setIsRaidAlertDisabled(true);
-					raidAlertTimer.stopTimer();
-					raidAlertTimer.setTime(raidAlertTimeSeconds);
-					raidAlertTimer.startTimer();
+				// Verify online player
+				if(camp.isOwnerOnline() && camp.getOwner() instanceof Player) {
+					Player bukkitPlayer = (Player)camp.getOwner();
+					boolean isMember = false;
+					if(konquest.getCampManager().isCampGrouped(camp)) {
+						isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(event.getPlayer().getBukkitPlayer());
+					}
+					// Alert the camp owner if player is not a group member and online
+					if(playerManager.isPlayer(bukkitPlayer) && !isMember && !event.getPlayer().getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
+						KonPlayer ownerPlayer = playerManager.getPlayer(bukkitPlayer);
+						//ChatUtil.sendNotice((Player)camp.getOwner(), "Enemy spotted in "+event.getTerritory().getName()+", use \"/k travel camp\" to defend!", ChatColor.DARK_RED);
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_RAID.getMessage(event.getTerritory().getName(),"camp"),ChatColor.DARK_RED);
+						ChatUtil.sendKonPriorityTitle(ownerPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+event.getTerritory().getName(), 60, 1, 10);
+						// Start Raid Alert disable timer for target town
+						int raidAlertTimeSeconds = konquest.getConfigManager().getConfig("core").getInt("core.towns.raid_alert_cooldown");
+						ChatUtil.printDebug("Starting raid alert timer for "+raidAlertTimeSeconds+" seconds");
+						Timer raidAlertTimer = camp.getRaidAlertTimer();
+						camp.setIsRaidAlertDisabled(true);
+						raidAlertTimer.stopTimer();
+						raidAlertTimer.setTime(raidAlertTimeSeconds);
+						raidAlertTimer.startTimer();
+					}
 				}
 			}
 		}
@@ -276,7 +282,7 @@ public class KonquestListener implements Listener {
 					townMonumentTimer.stopTimer();
 				} else {
 					// Conquer the town for the enemy player's kingdom
-					if(kingdomManager.conquerTown(town.getName(), town.getKingdom().getName(), event.getPlayer())) {
+					if(kingdomManager.captureTownForPlayer(town.getName(), town.getKingdom().getName(), event.getPlayer())) {
 						// Alert all players of original Kingdom
 						for(KonPlayer player : playerManager.getPlayersInKingdom(event.getTerritory().getKingdom().getName())) {
 							//ChatUtil.sendNotice(player.getBukkitPlayer(), "The Town "+event.getTerritory().getName()+" has been conquered!", ChatColor.DARK_RED);

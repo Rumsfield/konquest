@@ -3,6 +3,7 @@ package konquest.listener;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.event.KonquestMonumentDamageEvent;
+import konquest.manager.CampManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
 import konquest.model.KonCamp;
@@ -52,6 +53,7 @@ public class BlockListener implements Listener {
 	private KonquestPlugin konquestPlugin;
 	private Konquest konquest;
 	private KingdomManager kingdomManager;
+	private CampManager campManager;
 	private PlayerManager playerManager;
 	
 	public BlockListener(KonquestPlugin plugin) {
@@ -59,6 +61,7 @@ public class BlockListener implements Listener {
 		this.konquest = konquestPlugin.getKonquestInstance();
 		this.playerManager = konquest.getPlayerManager();
 		this.kingdomManager = konquest.getKingdomManager();
+		this.campManager = konquest.getCampManager();
 	}
 	
 	/**
@@ -205,13 +208,14 @@ public class BlockListener implements Listener {
 						// If block is inside a monument, throw KonquestMonumentDamageEvent
 						if(town.isLocInsideCenterChunk(breakLoc)) {
 							if(town.getMonument().isLocInside(breakLoc)) {
-								// Prevent Barbarians from damaging monuments
-								/*
-								if(player.isBarbarian()) {
-									ChatUtil.sendNotice(player.getBukkitPlayer(), "Barbarians cannot damage Town Monuments.", ChatColor.DARK_RED);
+								// Prevent Barbarians from damaging monuments optionally
+								boolean isBarbAttackAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.barbarians_destroy",true);
+								if(player.isBarbarian() && !isBarbAttackAllowed) {
+									//ChatUtil.sendNotice(player.getBukkitPlayer(), "Barbarians cannot damage Town Monuments.", ChatColor.DARK_RED);
+									ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 									event.setCancelled(true);
 									return;
-								}*/
+								}
 								// Cancel item drops on the broken blocks
 								event.setDropItems(false);
 								// Throw Konquest event
@@ -232,10 +236,15 @@ public class BlockListener implements Listener {
 				// Camp considerations...
 				if(territory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
 					KonCamp camp = (KonCamp)territory;
-
-					// If the camp owner is not online, prevent block breaking
-					boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
-					if(isBreakDisabledOffline && !camp.isOwnerOnline()) {
+					boolean isMemberAllowedContainers = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_allow_containers", false);
+					boolean isMemberAllowedEdit = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_allow_edit_offline", false);
+					boolean isMember = false;
+					if(konquest.getCampManager().isCampGrouped(camp)) {
+						isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
+					}
+					
+					// If the camp owner is not online, prevent block breaking optionally
+					if(camp.isProtected() && !(isMember && isMemberAllowedEdit)) {
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot attack "+camp.getName()+", owner is offline", ChatColor.DARK_RED);
 						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP.getMessage(camp.getName()));
 						event.setCancelled(true);
@@ -243,8 +252,15 @@ public class BlockListener implements Listener {
 					}
 					
 					// If block is a container, protect (optionally) from players other than the owner
-					boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_break");
-					if(isProtectChest && !camp.isPlayerOwner(event.getPlayer()) && event.getBlock().getState() instanceof BlockInventoryHolder) {
+					boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.protect_containers");
+					if(isProtectChest && !(isMember && isMemberAllowedContainers) && !camp.isPlayerOwner(event.getPlayer()) && event.getBlock().getState() instanceof BlockInventoryHolder) {
+						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						event.setCancelled(true);
+						return;
+					}
+					
+					// Prevent group members from breaking beds they don't own
+					if(isMember && !camp.isPlayerOwner(event.getPlayer()) && event.getBlock().getBlockData() instanceof Bed) {
 						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
 						return;
@@ -252,7 +268,7 @@ public class BlockListener implements Listener {
 					
 					// Remove the camp if a bed is broken within it
 					if(event.getBlock().getBlockData() instanceof Bed) {
-						kingdomManager.removeCamp(camp.getOwner().getUniqueId().toString());
+						campManager.removeCamp(camp.getOwner().getUniqueId().toString());
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), "Destroyed "+camp.getName()+"!");
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY.getMessage(camp.getName()));
 						KonPlayer onlineOwner = playerManager.getPlayerFromName(camp.getOwner().getName());
@@ -476,6 +492,11 @@ public class BlockListener implements Listener {
 				// Preventions for Camps
 				if(territory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
 					KonCamp camp = (KonCamp)territory;
+					boolean isMemberAllowedEdit = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_allow_edit_offline", false);
+					boolean isMember = false;
+					if(konquest.getCampManager().isCampGrouped(camp)) {
+						isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
+					}
 					// Prevent additional beds from being placed by anyone
 					if(event.getBlock().getBlockData() instanceof Bed) {
 						if(event.getBlock().getWorld().getBlockAt(camp.getBedLocation()).getBlockData() instanceof Bed) {
@@ -498,9 +519,8 @@ public class BlockListener implements Listener {
 							return;
 						}
 					}
-					// If the camp owner is not online, prevent block placement
-					boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
-					if(isBreakDisabledOffline && !camp.isOwnerOnline()) {
+					// If the camp owner is not online, prevent block placement optionally for clan members
+					if(camp.isProtected() && !(isMember && isMemberAllowedEdit)) {
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot attack "+camp.getName()+", owner is offline", ChatColor.DARK_RED);
 						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP.getMessage(camp.getName()));
 						event.setCancelled(true);
@@ -521,21 +541,21 @@ public class BlockListener implements Listener {
 			// When placing blocks in the wilderness...
 			
 			// Prevent barbarians who already have a camp from placing a bed
-			if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && kingdomManager.isCampSet(player)) {
+			if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && campManager.isCampSet(player)) {
 				//ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot create more than one Camp. Destroy the bed in your current Camp before placing a new bed.", ChatColor.DARK_RED);
 				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
-				event.setCancelled(true);
-				return;
+				//event.setCancelled(true);
+				//return;
 			}
 			
 			// Attempt to create a camp for barbarians who place a bed
-			if(!player.isAdminBypassActive() && player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && !kingdomManager.isCampSet(player)) {
-				int status = kingdomManager.addCamp(event.getBlock().getLocation(), (KonOfflinePlayer)player);
+			if(!player.isAdminBypassActive() && player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && !campManager.isCampSet(player)) {
+				int status = campManager.addCamp(event.getBlock().getLocation(), (KonOfflinePlayer)player);
 				if(status == 0) { // on successful camp setup...
 					player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
 					//ChatUtil.sendNotice(event.getPlayer(), "Successfully set up camp");
 					ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
-					String territoryName = kingdomManager.getCamp((KonOfflinePlayer)player).getName();
+					String territoryName = campManager.getCamp((KonOfflinePlayer)player).getName();
 					ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+territoryName);
 				} else {
 					switch(status) {
@@ -665,6 +685,17 @@ public class BlockListener implements Listener {
 						return;
 					}
 				}
+				// Camp protections
+				if(territory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+					KonCamp camp = (KonCamp)territory;
+					// Protect offline owner camps
+					if(camp.isProtected()) {
+						ChatUtil.printDebug("EVENT: protecting offline camp from explosion");
+						event.setCancelled(true);
+						return;
+					}
+				}
+				
 				// Protect chests
 				boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_explode");
 				if(isProtectChest && event.getBlock().getState() instanceof BlockInventoryHolder) {
@@ -717,6 +748,14 @@ public class BlockListener implements Listener {
 				if(territory instanceof KonRuin) {
 					event.setCancelled(true);
 					return;
+				}
+				if(territory instanceof KonCamp) {
+					KonCamp camp = (KonCamp) territory;
+					// Check if owner is offline
+					if(camp.isProtected()) {
+						event.setCancelled(true);
+						return;
+					}
 				}
 			}
 			// Check if this block will move into a monument
@@ -772,6 +811,14 @@ public class BlockListener implements Listener {
 				if(territory instanceof KonRuin) {
 					event.setCancelled(true);
 					return;
+				}
+				if(territory instanceof KonCamp) {
+					KonCamp camp = (KonCamp) territory;
+					// Check if owner is offline
+					if(camp.isProtected()) {
+						event.setCancelled(true);
+						return;
+					}
 				}
 			}
 		}

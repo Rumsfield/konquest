@@ -1,8 +1,14 @@
 package konquest.manager;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import konquest.Konquest;
 import konquest.model.KonConfig;
@@ -22,19 +28,23 @@ public class ConfigManager{
 	}
         
 	public void initialize() {
-		// Config Settings
-		addConfig("core", new KonConfig("core"));
+		// Config Settings - unsaved
+		addConfig("core", new KonConfig("core",false));
 		updateConfigVersion("core");
-		addConfig("upgrades", new KonConfig("upgrades"));
+		addConfig("upgrades", new KonConfig("upgrades",false));
 		updateConfigVersion("upgrades");
-		addConfig("shields", new KonConfig("shields"));
-		//updateConfigVersion("shields");
+		addConfig("shields", new KonConfig("shields",false));
+		addConfig("loot", new KonConfig("loot",false));
+		addConfig("prefix", new KonConfig("prefix",false));
 		// Data Storage
-		addConfig("kingdoms", new KonConfig("kingdoms"));
-		addConfig("camps", new KonConfig("camps"));
-		addConfig("ruins", new KonConfig("ruins"));
+		migrateConfigFile("kingdoms.yml","data/kingdoms.yml");
+		migrateConfigFile("camps.yml","data/camps.yml");
+		migrateConfigFile("ruins.yml","data/ruins.yml");
+		addConfig("kingdoms", new KonConfig("data/kingdoms"));
+		addConfig("camps", new KonConfig("data/camps"));
+		addConfig("ruins", new KonConfig("data/ruins"));
 		// Language files
-		addConfig("lang_english", new KonConfig("lang/english"));
+		addConfig("lang_english", new KonConfig("lang/english",false));
 		updateConfigVersion("lang_english");
 		// Language selection
 		language = getConfig("core").getString("language","english");
@@ -44,7 +54,7 @@ public class ConfigManager{
 			ChatUtil.printConsoleAlert("Using "+language+" language file");
 		} else {
 			// Attempt to find a custom local language file
-			if(addConfig("lang_custom", new KonConfig("lang/"+language))) {
+			if(addConfig("lang_custom", new KonConfig("lang/"+language,false))) {
 				langConfig = getConfig("lang_custom");
 				ChatUtil.printConsoleAlert("Using custom "+language+" language file");
 			} else {
@@ -59,10 +69,13 @@ public class ConfigManager{
 	}
 	
 	public FileConfiguration getConfig(String key) {
+		FileConfiguration result = new YamlConfiguration();
 		if(!configCache.containsKey(key)) {
 			ChatUtil.printConsoleError("Failed to find non-existant config "+key);
+		} else {
+			result =  configCache.get(key).getConfig();
 		}
-		return configCache.get(key).getConfig();
+		return result;
 	}
 	
 	public boolean addConfig(String key, KonConfig config) {
@@ -116,6 +129,32 @@ public class ConfigManager{
 		configCache.get(key).saveNewConfig();
 		configCache.get(key).reloadConfig();
 		ChatUtil.printConsoleError("Bad config file \""+key+"\", saved default version. Review this file for errors.");
+	}
+	
+	private void migrateConfigFile(String oldPath, String newpath) {
+		File oldFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), oldPath);
+		File newFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), newpath);
+		if(oldFile.exists()) {
+			Path source = oldFile.toPath();
+			Path destination = newFile.toPath();
+			try {
+				Files.createDirectories(destination);
+				Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
+				oldFile.delete();
+				ChatUtil.printConsoleAlert("Migrated data file "+oldPath+" to "+newpath);
+			} catch (IOException e) {
+				e.printStackTrace();
+				ChatUtil.printConsoleError("Failed to move file "+oldPath+" to "+newpath);
+			}
+			/*
+			if(oldFile.renameTo(newFile)) {
+				oldFile.delete();
+				ChatUtil.printConsoleAlert("Migrated data file "+oldPath+" to "+newpath);
+			} else {
+				ChatUtil.printDebug("Failed to rename file "+oldPath+" to "+newpath);
+			}
+			*/
+		}
 	}
 
 }

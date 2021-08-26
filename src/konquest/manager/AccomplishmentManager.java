@@ -3,15 +3,20 @@ package konquest.manager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import konquest.Konquest;
+import konquest.KonquestPlugin;
+import konquest.model.KonCustomPrefix;
 import konquest.model.KonPlayer;
 import konquest.model.KonPrefix;
 import konquest.model.KonPrefixCategory;
@@ -20,6 +25,7 @@ import konquest.model.KonStats;
 import konquest.model.KonStatsType;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
+import net.milkbowl.vault.economy.EconomyResponse;
 
 /**
  * 
@@ -30,15 +36,18 @@ public class AccomplishmentManager {
 
 	private Konquest konquest;
 	private boolean isEnabled;
+	private HashMap<String,KonCustomPrefix> customPrefixes;
 	
 	public AccomplishmentManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.isEnabled = false;
+		this.customPrefixes = new HashMap<String,KonCustomPrefix>();
 	}
 	
 	public void initialize() {
 		boolean configEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.accomplishment_prefix");
 		isEnabled = configEnabled;
+		//loadCustomPrefixes(); // moved to database init
 		ChatUtil.printDebug("Accomplishment Manager is ready with prefix "+isEnabled);
 	}
 	
@@ -192,27 +201,161 @@ public class AccomplishmentManager {
 		player.getBukkitPlayer().openBook(book);
 	}
 	
-	public void disablePlayerPrefix(KonPlayer player) {
+	public boolean disablePlayerPrefix(KonPlayer player) {
+		boolean result = false;
 		if(player.getPlayerPrefix().isEnabled()) {
 			player.getPlayerPrefix().setEnable(false);
 			//ChatUtil.sendNotice((Player) getSender(), "Turned off your prefix title");
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_DISABLE.getMessage());
+			result = true;
 		} else {
 			//ChatUtil.sendNotice((Player) getSender(), "Your prefix title is already off");
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_DISABLE.getMessage());
 		}
+		return result;
 	}
 	
-	public void applyPlayerPrefix(KonPlayer player, KonPrefixType prefix) {
+	public boolean applyPlayerPrefix(KonPlayer player, KonPrefixType prefix) {
+		boolean result = false;
 		if(player.getPlayerPrefix().selectPrefix(prefix)) {
 			player.getPlayerPrefix().setEnable(true);
 			//ChatUtil.sendNotice((Player) getSender(), "Your prefix is now "+prefixChosen.getName());
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(prefix.getName()));
-			Konquest.playSuccessSound(player.getBukkitPlayer());
+			result = true;
 		} else {
 			//ChatUtil.sendNotice((Player) getSender(), "The prefix "+prefixChosen.getName()+" is not unlocked!");
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_NEW.getMessage(prefix.getName()));
 		}
+		return result;
+	}
+	
+	// Load custom prefixes from file
+	public void loadCustomPrefixes() {
+		customPrefixes.clear();
+		// Get all custom prefixes from file
+		FileConfiguration prefixConfig = konquest.getConfigManager().getConfig("prefix");
+        if (prefixConfig.get("prefix") == null) {
+        	ChatUtil.printDebug("There is no prefix section in prefix.yml");
+            return;
+        }
+        boolean status = true;
+        String prefixName = "";
+        int prefixCost = 0;
+        ConfigurationSection prefixEntry = null;
+    	for(String prefixLabel : prefixConfig.getConfigurationSection("prefix").getKeys(false)) {
+    		status = true;
+    		prefixEntry = prefixConfig.getConfigurationSection("prefix."+prefixLabel);
+    		if(prefixEntry != null) {
+        		if(prefixEntry.contains("name")) {
+        			prefixName = prefixEntry.getString("name","");
+        			if(prefixName.equals("") || prefixName.isEmpty()) {
+        				ChatUtil.printConsoleError("prefix.yml has an invalid name for prefix: "+prefixLabel);
+            			status = false;
+        			}
+        		} else {
+        			ChatUtil.printConsoleError("prefix.yml is missing name for prefix: "+prefixLabel);
+        			status = false;
+        		}
+        		if(prefixEntry.contains("cost")) {
+        			prefixCost = prefixEntry.getInt("cost",0);
+        			prefixCost = prefixCost < 0 ? 0 : prefixCost;
+        		} else {
+        			ChatUtil.printConsoleError("prefix.yml is missing cost for prefix: "+prefixLabel);
+        			status = false;
+        		}
+        		if(status) {
+        			customPrefixes.put(prefixLabel.toLowerCase(), new KonCustomPrefix(prefixLabel.toLowerCase(),prefixName,prefixCost));
+        			ChatUtil.printDebug("Loaded custom prefix: "+prefixLabel);
+        		}
+    		} else {
+    			ChatUtil.printDebug("Failed to load null prefix entry: "+prefixLabel);
+    		}
+    	}
+	}
+	
+	public Set<String> getCustomPrefixLabels() {
+		return customPrefixes.keySet();
+	}
+	
+	public List<KonCustomPrefix> getCustomPrefixes() {
+		List<KonCustomPrefix> result = new ArrayList<KonCustomPrefix>();
+		for(KonCustomPrefix c : customPrefixes.values()) {
+			result.add(c);
+		}
+		return result;
+	}
+	
+	/**
+	 * Sets a player prefix without checks
+	 * @param player
+	 * @param label
+	 * @return
+	 */
+	public boolean setPlayerCustomPrefix(KonPlayer player, String label) {
+		boolean result = false;
+		if(customPrefixes.containsKey(label)) {
+			KonCustomPrefix prefix = customPrefixes.get(label);
+			if(player.getPlayerPrefix().setCustomPrefix(prefix)) {
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Sets a player prefix with checks
+	 * @param player
+	 * @param label
+	 * @return
+	 */
+	public boolean applyPlayerCustomPrefix(KonPlayer player, KonCustomPrefix prefix) {
+		boolean result = false;
+		boolean checkPassed = false;
+		// check for permission, available and cost
+		if(player.getBukkitPlayer().hasPermission("konquest.prefix."+prefix.getLabel())) {
+			if(player.getPlayerPrefix().isCustomAvailable(prefix.getLabel())) {
+				// Player already owns this prefix
+				checkPassed = true;
+			} else {
+				// Attempt to purchase this prefix
+				int cost = prefix.getCost();
+				if(cost > 0) {
+		        	if(KonquestPlugin.getBalance(player.getBukkitPlayer()) < cost) {
+						// player is too poor
+		        		ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
+					} else {
+						EconomyResponse r = KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), cost);
+			            if(r.transactionSuccess()) {
+			            	String balanceF = String.format("%.2f",r.balance);
+			            	String amountF = String.format("%.2f",r.amount);
+			            	//ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
+			            	ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+			            	checkPassed = true;
+			            } else {
+			            	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
+			            	ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
+			            }
+					}
+	        	} else {
+					// it's free!
+					checkPassed = true;
+				}
+			}
+		} else {
+			// no permission
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+		}
+		if(checkPassed) {
+			player.getPlayerPrefix().addAvailableCustom(prefix.getLabel());
+			if(player.getPlayerPrefix().setCustomPrefix(prefix)) {
+				player.getPlayerPrefix().setEnable(true);
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(ChatColor.translateAlternateColorCodes('&', prefix.getName())));
+				result = true;
+			} else {
+				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			}
+		}
+		return result;
 	}
 
 }

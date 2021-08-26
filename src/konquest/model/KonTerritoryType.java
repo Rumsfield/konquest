@@ -1,14 +1,27 @@
 package konquest.model;
 
-public enum KonTerritoryType {
-	WILD,
-    CAPITAL,
-    TOWN,
-    CAMP,
-    RUIN,
-    NEUTRAL,
-    OTHER;
+import konquest.utility.MessagePath;
 
+public enum KonTerritoryType {
+	WILD		(MessagePath.TERRITORY_WILD.getMessage()),
+    CAPITAL		(MessagePath.TERRITORY_CAPITAL.getMessage()),
+    TOWN		(MessagePath.TERRITORY_TOWN.getMessage()),
+    CAMP		(MessagePath.TERRITORY_CAMP.getMessage()),
+    RUIN		(MessagePath.TERRITORY_RUIN.getMessage()),
+    NEUTRAL		(MessagePath.TERRITORY_NEUTRAL.getMessage()),
+    OTHER		(MessagePath.TERRITORY_OTHER.getMessage());
+
+	private String label;
+	
+	KonTerritoryType(String label) {
+		this.label = label;
+	}
+	
+	public String getLabel() {
+		return label;
+	}
+	
+	/*
     public static KonTerritoryType parseString(String territoryType) {
         switch (territoryType.toLowerCase()) {
             case "wild": return KonTerritoryType.WILD;
@@ -21,4 +34,5 @@ public enum KonTerritoryType {
         }
         return null;
     }
+    */
 }

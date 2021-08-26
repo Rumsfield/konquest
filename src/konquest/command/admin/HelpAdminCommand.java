@@ -24,7 +24,15 @@ public class HelpAdminCommand extends CommandBase {
         //ChatUtil.sendNotice((Player) getSender(), "Admin Help: Command, Arguments, Description");
         ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_HELP_NOTICE_MESSAGE.getMessage());
         for(AdminCommandType cmd : AdminCommandType.values()) {
-        	message = ChatColor.GOLD+"/k admin "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmd.arguments()+": "+ChatColor.GRAY+cmd.description();
+        	
+        	String cmdArgsFormatted = cmd.arguments();
+        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA);
+        	cmdArgsFormatted = cmdArgsFormatted.replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA);
+        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA);
+        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\]", ChatColor.GRAY+"]"+ChatColor.AQUA);
+        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
+        	
+        	message = ChatColor.GOLD+"/k admin "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted+": "+ChatColor.WHITE+cmd.description();
             ChatUtil.sendMessage((Player) getSender(), message);
         }
     }

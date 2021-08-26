@@ -26,15 +26,19 @@ import konquest.display.DisplayMenu;
 import konquest.display.InfoIcon;
 import konquest.display.KingdomIcon;
 import konquest.display.MenuIcon;
+import konquest.display.OptionIcon;
+import konquest.display.OptionIcon.optionAction;
 import konquest.display.PagedMenu;
 import konquest.display.PlayerIcon;
 import konquest.display.PlayerIcon.PlayerIconAction;
+import konquest.display.PrefixCustomIcon;
 import konquest.display.PrefixIcon.PrefixIconAction;
 import konquest.display.ShieldIcon;
 import konquest.display.PrefixIcon;
 import konquest.display.TownIcon;
 import konquest.display.UpgradeIcon;
 import konquest.model.KonArmor;
+import konquest.model.KonCustomPrefix;
 import konquest.model.KonKingdom;
 import konquest.model.KonKingdomScoreAttributes;
 import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
@@ -224,15 +228,33 @@ public class DisplayManager {
 				} else if(clickedIcon instanceof PrefixIcon) {
 					// Prefix Icons alter the player's prefix
 					PrefixIcon icon = (PrefixIcon)clickedIcon;
+					boolean status = false;
 					switch(icon.getAction()) {
 						case DISABLE_PREFIX:
-							konquest.getAccomplishmentManager().disablePlayerPrefix(clickPlayer);
+							status = konquest.getAccomplishmentManager().disablePlayerPrefix(clickPlayer);
 							break;
 						case APPLY_PREFIX:
-							konquest.getAccomplishmentManager().applyPlayerPrefix(clickPlayer,icon.getPrefix());
+							status = konquest.getAccomplishmentManager().applyPlayerPrefix(clickPlayer,icon.getPrefix());
 							break;
 						default:
 							break;
+					}
+					if(status) {
+						Konquest.playSuccessSound(bukkitPlayer);
+					}
+					menuCache.remove(inv);
+					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+			            @Override
+			            public void run() {
+			            	bukkitPlayer.closeInventory();
+			            }
+			        });
+				} else if(clickedIcon instanceof PrefixCustomIcon) {
+					// Prefix Custom Icons alter the player's prefix
+					PrefixCustomIcon icon = (PrefixCustomIcon)clickedIcon;
+					boolean status = konquest.getAccomplishmentManager().applyPlayerCustomPrefix(clickPlayer,icon.getPrefix());
+					if(status) {
+						Konquest.playSuccessSound(bukkitPlayer);
 					}
 					menuCache.remove(inv);
 					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
@@ -278,6 +300,24 @@ public class DisplayManager {
 					} else {
 						ChatUtil.printDebug("Failed to find inventory menu in town cache");
 					}
+				} else if(clickedIcon instanceof OptionIcon) {
+					// Option Icons close the GUI and attempt to change a town setting
+					if(townCache.containsKey(inv)) {
+						OptionIcon icon = (OptionIcon)clickedIcon;
+						boolean status = konquest.getKingdomManager().changeTownOption(icon.getAction(), townCache.get(inv), bukkitPlayer);
+						if(status) {
+							Konquest.playSuccessSound(bukkitPlayer);
+						}
+						menuCache.remove(inv);
+						Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+				            @Override
+				            public void run() {
+				            	bukkitPlayer.closeInventory();
+				            }
+				        });
+					} else {
+						ChatUtil.printDebug("Failed to find inventory menu in town cache");
+					}
 				}
 			}
 		}	
@@ -313,7 +353,7 @@ public class DisplayManager {
     	// Create new menu
     	PagedMenu newMenu = new PagedMenu();
 		// Page 0
-    	newMenu.addPage(0, (int)Math.ceil((CommandType.values().length+1)/9), ChatColor.BLACK+"Konquest Help");
+    	newMenu.addPage(0, (int)Math.ceil(((double)(CommandType.values().length+1))/9), ChatColor.BLACK+MessagePath.MENU_HELP_TITLE.getMessage());
     	// Add command icons
 		for(CommandType cmd : CommandType.values()) {
 			switch (cmd) {
@@ -351,6 +391,7 @@ public class DisplayManager {
 		info.setInfo(ChatColor.GOLD+MessagePath.MENU_HELP_HINT.getMessage()+": "+ChatColor.DARK_PURPLE+ChatColor.UNDERLINE+communityLink);
 		newMenu.getPage(0).addIcon(info);
 		i++;
+		
 		newMenu.refreshNavigationButtons();
 		newMenu.setPageIndex(0);
 		menuCache.put(newMenu.getCurrentPage().getInventory(), newMenu);
@@ -490,6 +531,61 @@ public class DisplayManager {
 				pageNum++;
 			}
 		}
+		
+		newMenu.refreshNavigationButtons();
+		newMenu.setPageIndex(0);
+		menuCache.put(newMenu.getCurrentPage().getInventory(), newMenu);
+		townCache.put(newMenu.getCurrentPage().getInventory(), town);
+		// Schedule delayed task to display inventory to player
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	//displayPlayer.getBukkitPlayer().closeInventory();
+            	bukkitPlayer.openInventory(newMenu.getCurrentPage().getInventory());
+            }
+        },1);
+	}
+	
+	/*
+	 * ===============================================
+	 * Town Options Menu
+	 * ===============================================
+	 */
+	public void displayTownOptionsMenu(Player bukkitPlayer, KonTown town) {
+		
+		playMenuOpenSound(bukkitPlayer);
+    	
+		OptionIcon option;
+		ArrayList<String> loreList;
+		String currentValue;
+		ChatColor loreColor = ChatColor.YELLOW;
+		ChatColor valueColor = ChatColor.AQUA;
+		ChatColor hintColor = ChatColor.GOLD;
+		
+ 		// Create fresh paged menu
+ 		PagedMenu newMenu = new PagedMenu();
+		
+		// Page 0
+		String pageLabel = ChatColor.BLACK+town.getName()+" "+MessagePath.LABEL_OPTIONS.getMessage();
+		newMenu.addPage(0, 1, pageLabel);
+		
+		// Open Info Icon
+		currentValue = boolean2Lang(town.isOpen())+" "+boolean2Symbol(town.isOpen());
+		loreList = new ArrayList<String>();
+    	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_OPEN.getMessage()));
+    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
+    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+		option = new OptionIcon(optionAction.TOWN_OPEN, loreColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.DARK_OAK_DOOR, 3);
+		newMenu.getPage(0).addIcon(option);
+		
+		// Redstone Info Icon
+		currentValue = boolean2Lang(town.isEnemyRedstoneAllowed())+" "+boolean2Symbol(town.isEnemyRedstoneAllowed());
+		loreList = new ArrayList<String>();
+    	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_REDSTONE.getMessage()));
+    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
+    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+		option = new OptionIcon(optionAction.TOWN_REDSTONE, loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage(), loreList, Material.LEVER, 5);
+		newMenu.getPage(0).addIcon(option);
 		
 		newMenu.refreshNavigationButtons();
 		newMenu.setPageIndex(0);
@@ -774,7 +870,7 @@ public class DisplayManager {
     	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+numKingdomTowns);
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_TOWNS.getMessage(), loreList, konquest.getKingdomManager().getTownCriticalBlock(), 5, false);
     	newMenu.getPage(0).addIcon(info);
-    	/* Towns Info Icon (6) */
+    	/* Land Info Icon (6) */
     	int numKingdomLand = 0;
     	for(KonTown town : infoKingdom.getTowns()) {
     		numKingdomLand += town.getChunkList().size();
@@ -908,6 +1004,7 @@ public class DisplayManager {
 		newMenu.getPage(0).addIcon(info);
 		/* Properties Info Icon (5) */
     	String isOpen = boolean2Symbol(infoTown.isOpen());
+    	String isRedstone = boolean2Symbol(infoTown.isEnemyRedstoneAllowed());
     	String isProtected = boolean2Symbol((infoTown.isCaptureDisabled() || infoTown.getKingdom().isOfflineProtected() || infoTown.isTownWatchProtected()));
     	String isAttacked = boolean2Symbol(infoTown.isAttacked());
     	String isShielded = boolean2Symbol(infoTown.isShielded());
@@ -915,6 +1012,7 @@ public class DisplayManager {
     	String isPeaceful = boolean2Symbol(infoTown.getKingdom().isPeaceful());
     	loreList = new ArrayList<String>();
     	loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
+    	loreList.add(loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage()+": "+isRedstone);
     	loreList.add(loreColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage()+": "+isAttacked);
     	loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
     	loreList.add(loreColor+MessagePath.LABEL_SHIELD.getMessage()+": "+isShielded);
@@ -1050,11 +1148,15 @@ public class DisplayManager {
  		
    		// Create fresh paged menu
  		PagedMenu newMenu = new PagedMenu();
+ 		String loreColor = ""+ChatColor.YELLOW;
+		String valueColor = ""+ChatColor.AQUA;
+		String pageColor = ""+ChatColor.BLACK;
 		String pageLabel = "";
 		String playerPrefix = "";
 		if(displayPlayer.getPlayerPrefix().isEnabled()) {
 			playerPrefix = displayPlayer.getPlayerPrefix().getMainPrefixName();
 		}
+		final int MAX_ICONS_PER_PAGE = 45;
 		final int MAX_ROWS_PER_PAGE = 5;
 		final int ICONS_PER_ROW = 9;
 		
@@ -1133,7 +1235,46 @@ public class DisplayManager {
 			}
 			pageNum++;
 		}
-		
+		// Page N+
+		List<String> loreList;
+		boolean isAllowed = false;
+		List<KonCustomPrefix> allCustoms = konquest.getAccomplishmentManager().getCustomPrefixes();
+		pageTotal = (int)Math.ceil(((double)allCustoms.size())/MAX_ICONS_PER_PAGE);
+		if(pageTotal == 0) {
+			pageTotal = 1;
+		}
+		if(!allCustoms.isEmpty()) {
+			ListIterator<KonCustomPrefix> customIter = allCustoms.listIterator();
+			for(int i = 0; i < pageTotal; i++) {
+				int numPageRows = (int)Math.ceil(((double)((allCustoms.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
+				if(numPageRows == 0) {
+					numPageRows = 1;
+				}
+				pageLabel = pageColor+MessagePath.MENU_PREFIX_CUSTOM_PAGES.getMessage()+" "+(i+1)+"/"+pageTotal;
+				newMenu.addPage(pageNum, numPageRows, pageLabel);
+				int slotIndex = 0;
+				while(slotIndex < MAX_ICONS_PER_PAGE && customIter.hasNext()) {
+					/* Custom Prefix Icon (n) */
+					loreList = new ArrayList<String>();
+					KonCustomPrefix currentCustom = customIter.next();
+					if(!displayPlayer.getPlayerPrefix().isCustomAvailable(currentCustom.getLabel())) {
+						loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+currentCustom.getCost());
+					}
+					if(displayPlayer.getBukkitPlayer().hasPermission("konquest.prefix."+currentCustom.getLabel())) {
+						isAllowed = true;
+						loreList.add(ChatColor.GOLD+MessagePath.MENU_PREFIX_HINT_APPLY.getMessage());
+					} else {
+						isAllowed = false;
+						loreList.add(ChatColor.DARK_RED+MessagePath.MENU_PREFIX_NO_ALLOW.getMessage());
+					}
+			    	PrefixCustomIcon customIcon = new PrefixCustomIcon(currentCustom, loreList, slotIndex, isAllowed);
+					newMenu.getPage(pageNum).addIcon(customIcon);
+					slotIndex++;
+				}
+				pageNum++;
+			}
+		}
+				
 		newMenu.refreshNavigationButtons();
 		newMenu.setPageIndex(0);
 		menuCache.put(newMenu.getCurrentPage().getInventory(), newMenu);
@@ -1251,6 +1392,14 @@ public class DisplayManager {
     		result = ChatColor.DARK_GREEN+""+ChatColor.BOLD+"\u2713";
     	}
     	return result;
+ 	}
+ 	
+ 	private String boolean2Lang(boolean val) {
+ 		String result = MessagePath.LABEL_FALSE.getMessage();
+ 		if(val) {
+ 			result = MessagePath.LABEL_TRUE.getMessage();
+ 		}
+ 		return result;
  	}
  	
  	private void playMenuClickSound(Player bukkitPlayer) {

@@ -26,15 +26,15 @@ public class HelpCommand extends CommandBase{
         	if(cmd.alias().equals("")==false) {
         		aliasmsg = (" Alias: "+cmd.alias());
         	}
-        	/*
+        	
         	String cmdArgsFormatted = cmd.arguments();
-        	cmdArgsFormatted.replaceAll("<", ChatColor.GRAY+"*"+ChatColor.AQUA);
-        	cmdArgsFormatted.replaceAll(">", ChatColor.GRAY+"*"+ChatColor.AQUA);
-        	cmdArgsFormatted.replaceAll("|", ChatColor.GRAY+"*"+ChatColor.AQUA);
-        	cmdArgsFormatted.replaceAll("//]", ChatColor.GRAY+"*"+ChatColor.AQUA);
-        	cmdArgsFormatted.replaceAll("//[", ChatColor.GRAY+"*"+ChatColor.AQUA);
-        	*/
-        	message = ChatColor.GOLD+"/k "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmd.arguments()+ChatColor.GRAY+": "+cmd.description()+ChatColor.LIGHT_PURPLE+aliasmsg;
+        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA);
+        	cmdArgsFormatted = cmdArgsFormatted.replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA);
+        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA);
+        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\]", ChatColor.GRAY+"]"+ChatColor.AQUA);
+        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
+        	
+        	message = ChatColor.GOLD+"/k "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted+ChatColor.WHITE+": "+cmd.description()+ChatColor.LIGHT_PURPLE+aliasmsg;
         	ChatUtil.sendMessage((Player) getSender(), message);
         }
     }

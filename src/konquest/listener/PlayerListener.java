@@ -3,6 +3,7 @@ package konquest.listener;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.event.KonquestEnterTerritoryEvent;
+import konquest.manager.CampManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
 import konquest.model.KonCamp;
@@ -68,11 +69,13 @@ public class PlayerListener implements Listener{
 	private Konquest konquest;
 	private PlayerManager playerManager;
 	private KingdomManager kingdomManager;
+	private CampManager campManager;
 	
 	public PlayerListener(KonquestPlugin plugin) {
 		this.konquest = plugin.getKonquestInstance();
 		this.playerManager = konquest.getPlayerManager();
 		this.kingdomManager = konquest.getKingdomManager();
+		this.campManager = konquest.getCampManager();
 	}
 	
 	/**
@@ -146,38 +149,61 @@ public class PlayerListener implements Listener{
     	kingdomManager.updateKingdomOfflineProtection();
     	//playerManager.updateNumKingdomPlayersOnline();
     	//playerManager.updateAllSavedPlayers();
+    	if(player.isBarbarian()) {
+    		KonCamp camp = campManager.getCamp(player);
+    		if(camp != null) {
+    			camp.setProtected(true);
+    		}
+    	}
     }
     
-    /**
-     * Fires when a player is kicked from the server
-     * @param event
-     */
-    /*
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onAsyncPlayerChatLowest(AsyncPlayerChatEvent event) {
+    	if(konquest.getChatPriority().equals(EventPriority.LOWEST)) {
+    		onAsyncPlayerChat(event);
+    	}
+    }
+    
+    @EventHandler(priority = EventPriority.LOW)
+    public void onAsyncPlayerChatLow(AsyncPlayerChatEvent event) {
+    	if(konquest.getChatPriority().equals(EventPriority.LOW)) {
+    		onAsyncPlayerChat(event);
+    	}
+    }
+    
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onPlayerKick(PlayerKickEvent event) {
-    	ChatUtil.printDebug("EVENT: Player got kicked");
-    	// save player data to config files
-    	playerManager.savePlayers();
-    	// remove player from cache
-    	Player bukkitPlayer = event.getPlayer();
-    	playerManager.removePlayer(bukkitPlayer);
-    	//playerManager.updateNumKingdomPlayersOnline();
-    	playerManager.updateAllSavedPlayers();
-    }*/
+    public void onAsyncPlayerChatNormal(AsyncPlayerChatEvent event) {
+    	if(konquest.getChatPriority().equals(EventPriority.NORMAL)) {
+    		onAsyncPlayerChat(event);
+    	}
+    }
+    
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onAsyncPlayerChatHigh(AsyncPlayerChatEvent event) {
+    	if(konquest.getChatPriority().equals(EventPriority.HIGH)) {
+    		onAsyncPlayerChat(event);
+    	}
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onAsyncPlayerChatHighest(AsyncPlayerChatEvent event) {
+    	if(konquest.getChatPriority().equals(EventPriority.HIGHEST)) {
+    		onAsyncPlayerChat(event);
+    	}
+    }
     
     /**
      * Fires on chat events
      * All players always see global chat messages and team chat messages
      * @param event
      */
-    @EventHandler(priority = EventPriority.LOW)
-    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        
+    private void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
         //Check if the event was caused by a player
         if(event.isAsynchronous() && !event.isCancelled()) {
-        	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.format_chat_messages",true);
+        	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.enable_format",true);
         	if(enable) {
 	        	// Format chat messages
+        		boolean useKingdom = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.use_kingdom",true);
 	        	Player bukkitPlayer = event.getPlayer();
 	        	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
 					ChatUtil.printDebug("Failed to handle onAsyncPlayerChat for non-existent player");
@@ -194,6 +220,10 @@ public class PlayerListener implements Listener{
 	            String prefix = konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer);
 	            String suffix = konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer);
 	            String divider = ChatColor.translateAlternateColorCodes('&', "&7»");
+	            String kingdomName = "";
+	            if(useKingdom) {
+	            	kingdomName = kingdom.getName() + ChatColor.translateAlternateColorCodes('&', " &7| ");;
+	            }
 	            
 	            if(player.isGlobalChat()) {
 	            	//Global chat, all players see this format
@@ -216,6 +246,7 @@ public class PlayerListener implements Listener{
 	            		}
 	            		globalPlayer.getBukkitPlayer().sendMessage(
 	        					ChatColor.translateAlternateColorCodes('&', prefix)+ 
+	        					teamColor+kingdomName+
 	        					titleColor+ChatColor.translateAlternateColorCodes('&', title)+ 
 	        					teamColor+bukkitPlayer.getName()+" "+
 	        					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
@@ -239,6 +270,7 @@ public class PlayerListener implements Listener{
 	            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K-bypass] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC + event.getMessage());
 	            			teamPlayer.getBukkitPlayer().sendMessage(
 	            					ChatColor.translateAlternateColorCodes('&', prefix)+ 
+	            					ChatColor.GOLD+kingdomName+
 	            					ChatColor.GOLD+ChatColor.translateAlternateColorCodes('&', title)+
 	            					bukkitPlayer.getName()+" "+
 	            					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
@@ -433,7 +465,7 @@ public class PlayerListener implements Listener{
 					}
 					*/
         			// Prevent enemies from interacting with things like buttons, levers, pressure plates...
-        			if(!player.getKingdom().equals(town.getKingdom())) {
+        			if(!player.getKingdom().equals(town.getKingdom()) && !town.isEnemyRedstoneAllowed()) {
         				if(event.getAction().equals(Action.PHYSICAL)) {
         					// Prevent all physical stepping interaction
         					event.setUseInteractedBlock(Event.Result.DENY);
@@ -669,6 +701,14 @@ public class PlayerListener implements Listener{
 				event.setCancelled(true);
 				return;
 			}
+			// Prevent non-owners from using buckets in camps
+			if(territory instanceof KonCamp) {
+				KonCamp camp = (KonCamp)territory;
+				if(!camp.isPlayerOwner(event.getPlayer())) {
+					event.setCancelled(true);
+					return;
+				}
+			}
 		}
     }
     
@@ -840,17 +880,16 @@ public class PlayerListener implements Listener{
 				return;
 			}
         	KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-        	
+        	Location chunkTo = event.getTo();
+    		Location chunkFrom = event.getFrom();
+    		boolean isTerritoryTo = kingdomManager.isChunkClaimed(chunkTo);
+    		boolean isTerritoryFrom = kingdomManager.isChunkClaimed(chunkFrom);
+    		
     		if(event.getTo().getWorld().equals(event.getFrom().getWorld())) {
     			// Player moved within the same world
     			//long start = System.currentTimeMillis();
-        		
-            	Location chunkTo = event.getTo();
-        		Location chunkFrom = event.getFrom();
         		//String chunkCoordsTo = chunkTo.getX()+", "+chunkTo.getZ();
         		//String chunkCoordsFrom = chunkFrom.getX()+", "+chunkFrom.getZ();
-        		boolean isTerritoryTo = kingdomManager.isChunkClaimed(chunkTo);
-        		boolean isTerritoryFrom = kingdomManager.isChunkClaimed(chunkFrom);
         		
         		// Auto map
         		if(player.isMapAuto()) {
@@ -918,6 +957,8 @@ public class PlayerListener implements Listener{
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
         			kingdomManager.clearTownHearts(player);
+        			// Begin fly disable warmup
+        			player.setFlyDisableWarmup(true);
         		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
         			KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
                     if(invokeEvent != null) {
@@ -927,10 +968,14 @@ public class PlayerListener implements Listener{
                     	KonTerritory territoryTo = kingdomManager.getChunkTerritory(chunkTo);
     	                // Set message color based on enemy territory
     	                String color = ""+ChatColor.RED;
-    	                if(player.getKingdom().equals(territoryTo.getKingdom())) {
-    	                	color = ""+ChatColor.GREEN;
-    	                } else if(territoryTo.getKingdom().equals(kingdomManager.getNeutrals())) {
-    	                	color = ""+ChatColor.GRAY;
+    	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
+    	                	color = ""+ChatColor.YELLOW;
+    	                } else {
+    	                	if(player.getKingdom().equals(territoryTo.getKingdom())) {
+	    	                	color = ""+ChatColor.GREEN;
+	    	                } else if(territoryTo.getKingdom().equals(kingdomManager.getNeutrals())) {
+	    	                	color = ""+ChatColor.GRAY;
+	    	                }
     	                }
     	                // Display Territory Name
     	    			String territoryName = territoryTo.getName();
@@ -953,6 +998,12 @@ public class PlayerListener implements Listener{
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAMP)) {
     	    				((KonCamp) territoryTo).addBarPlayer(player);
     	    			}
+    	    			// Try to stop fly disable warmup, or disable immediately
+    	    			if(territoryTo.getKingdom().equals(player.getKingdom())) {
+    	    				player.setFlyDisableWarmup(false);
+    	    			} else {
+    	    				player.setIsFlyEnabled(false);
+    	    			}
                     }
         		} else if(isTerritoryTo && isTerritoryFrom) { // When moving between two claimed territories
         			// Check for differing territories, if true then display new Territory Name and send message to enemies
@@ -962,10 +1013,14 @@ public class PlayerListener implements Listener{
         				
         				// Set message color based on enemy territory
                         String color = ""+ChatColor.RED;
-                        if(player.getKingdom().equals(territoryTo.getKingdom())) {
-                        	color = ""+ChatColor.GREEN;
-                        } else if(territoryTo.getKingdom().equals(kingdomManager.getNeutrals())) {
-    	                	color = ""+ChatColor.GRAY;
+    	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
+    	                	color = ""+ChatColor.YELLOW;
+    	                } else {
+    	                	if(player.getKingdom().equals(territoryTo.getKingdom())) {
+	    	                	color = ""+ChatColor.GREEN;
+	    	                } else if(territoryTo.getKingdom().equals(kingdomManager.getNeutrals())) {
+	    	                	color = ""+ChatColor.GRAY;
+	    	                }
     	                }
                         
         				KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
@@ -1004,6 +1059,12 @@ public class PlayerListener implements Listener{
         	    			}
         	            	//updateGolemTargetsForTerritory(territoryFrom,player,true);
         					//updateGolemTargetsForTerritory(territoryTo,player,true);
+        	            	// Try to stop or start fly disable warmup
+        	    			if(territoryTo.getKingdom().equals(player.getKingdom())) {
+        	    				player.setFlyDisableWarmup(false);
+        	    			} else {
+        	    				player.setIsFlyEnabled(false);
+        	    			}
         	            }
         			} else { // moving between the same territory
         				//ChatUtil.sendNotice(bukkitPlayer, "(Debug) "+territoryTo.getName()+": "+chunkCoordsTo);
@@ -1045,23 +1106,72 @@ public class PlayerListener implements Listener{
     			if(player.isMapAuto()) {
     				player.setIsMapAuto(false);
     			}
+    			// Disable flying
+    			player.setIsFlyEnabled(false);
     			
     			//kingdomManager.stopPlayerBorderParticles(player);
-    			kingdomManager.updatePlayerBorderParticles(player,event.getTo());
+    			kingdomManager.updatePlayerBorderParticles(player,chunkTo);
     			
-    			if(kingdomManager.isChunkClaimed(event.getFrom())) {
-    				KonTerritory territoryFrom = kingdomManager.getChunkTerritory(event.getFrom());
-        			if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+    			if(isTerritoryFrom) {
+    				KonTerritory territoryFrom = kingdomManager.getChunkTerritory(chunkFrom);
+    				if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         				((KonTown) territoryFrom).removeBarPlayer(player);
         				player.clearAllMobAttackers();
         				// Command all nearby Iron Golems to target nearby enemy players, ignore triggering player
     					updateGolemTargetsForTerritory(territoryFrom,player,false);
-        			} else if (territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
-	    				((KonRuin) territoryFrom).removeBarPlayer(player);
-	    			}
+        			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+        				((KonRuin) territoryFrom).removeBarPlayer(player);
+        				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
+        			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+        				((KonCapital) territoryFrom).removeBarPlayer(player);
+        			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+        				((KonCamp) territoryFrom).removeBarPlayer(player);
+        			}
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
         			kingdomManager.clearTownHearts(player);
+    			}
+    			
+    			if(isTerritoryTo) {
+    				KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
+                    if(invokeEvent != null) {
+                    	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
+                    }
+                    if(!event.isCancelled()) {
+                    	KonTerritory territoryTo = kingdomManager.getChunkTerritory(chunkTo);
+    	                // Set message color based on enemy territory
+    	                String color = ""+ChatColor.RED;
+    	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
+    	                	color = ""+ChatColor.YELLOW;
+    	                } else {
+    	                	if(player.getKingdom().equals(territoryTo.getKingdom())) {
+	    	                	color = ""+ChatColor.GREEN;
+	    	                } else if(territoryTo.getKingdom().equals(kingdomManager.getNeutrals())) {
+	    	                	color = ""+ChatColor.GRAY;
+	    	                }
+    	                }
+    	                // Display Territory Name
+    	    			String territoryName = territoryTo.getName();
+    	    			//ChatUtil.sendNotice(bukkitPlayer, color+territoryName+": "+chunkCoordsTo);
+    	    			ChatUtil.sendKonTitle(player, "", color+territoryName);
+    	    			if(territoryTo.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+    	    				KonTown town = (KonTown) territoryTo;
+    	    				town.addBarPlayer(player);
+    	    				// Notify player if town is abandoned
+    	    				if(town.getPlayerResidents().isEmpty() && town.getKingdom().equals(player.getKingdom())) {
+    	    					//ChatUtil.sendNotice(bukkitPlayer, "This Town is abandoned! Use \"/k town "+territoryName+" lord "+bukkitPlayer.getName()+"\" to claim Lordship.",ChatColor.RED);
+    	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
+    	    				}
+    	    				// Command all nearby Iron Golems to target enemy player, if no other closer player is present
+    						updateGolemTargetsForTerritory(territoryTo,player,true);
+    	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+    	    				((KonRuin) territoryTo).addBarPlayer(player);
+    	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    	    				((KonCapital) territoryTo).addBarPlayer(player);
+    	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+    	    				((KonCamp) territoryTo).addBarPlayer(player);
+    	    			}
+                    }
     			}
     		}
     	}

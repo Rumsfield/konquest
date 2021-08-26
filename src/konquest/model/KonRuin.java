@@ -161,6 +161,7 @@ public class KonRuin extends KonTerritory implements Timeable {
 
 	public void addCriticalLocation(Location loc) {
 		criticalLocations.put(loc, true);
+		getKonquest().getMapHandler().drawDynmapLabel(this);
 	}
 	
 	public void addCriticalLocation(Set<Location> locs) {
@@ -171,6 +172,7 @@ public class KonRuin extends KonTerritory implements Timeable {
 	
 	public void addSpawnLocation(Location loc) {
 		spawnLocations.put(loc, new KonRuinGolem(loc, this));
+		getKonquest().getMapHandler().drawDynmapLabel(this);
 	}
 	
 	public void addSpawnLocation(Set<Location> locs) {

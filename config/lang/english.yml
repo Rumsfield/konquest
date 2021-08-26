@@ -55,6 +55,11 @@ label:
   armors: "Armors"
   armor: "Armor"
   critical-hits: "Critical Hits"
+  golem-spawns: "Golem Spawns"
+  options: "Options"
+  enemy-redstone: "Enemy Redstone"
+  true: "True"
+  false: "False"
 menu:
   stats:
     title: "Accomplishment Stats"
@@ -78,6 +83,7 @@ menu:
     fail-cost: "Failed to add %s level %s, requires %s Favor."
     add: "Added %s level %s to the Town of %s!"
   help:
+    title: "Konquest Help"
     community: "Community"
     hint: "Click to join"
   score:
@@ -102,6 +108,8 @@ menu:
     disable: "Off"
     hint-disable: "Click to disable"
     hint-apply: "Click to apply"
+    custom-pages: "Custom Prefixes"
+    no-allow: "Missing permission"
   shield:
     hint: "Click to charge"
     fail-max: "Failed to charge, exceeds maximum of %s."
@@ -110,6 +118,11 @@ menu:
     fail-cost: "Failed to charge, requires %s Favor."
     activate-new: "Charged %s for %s."
     activate-add: "Increased charge with %s by %s."
+  options:
+    hint: "Click to change"
+    current: "Current: %s"
+    open: "All members can build and use chests"
+    redstone: "Enemies can use redstone switches and doors"
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."
@@ -117,6 +130,7 @@ generic:
     reduce-favor: "Favor reduced by %s, total: %s"
     reward-favor: "Favor rewarded: %s, total: %s"
     reward-exp: "EXP rewarded: %s"
+    discount-favor: "%s percent discount, you saved %s Favor."
     click-air: "Click on Air to cancel."
     clicked-air: "Clicked in Air, cancelled region creation."
     success: "Success!"
@@ -147,6 +161,7 @@ generic:
     enemy-town: "That is an enemy town."
     disabled: "This feature is currently disabled, talk to an admin."
     region: "Cannot do this while setting other regions."
+    failed: "Failed :("
 protection:
   notice:
     ignore: "Use \"/k admin bypass\" to ignore protections."
@@ -155,6 +170,8 @@ protection:
     camp-destroy: "Destroyed %s!"
     camp-destroy-owner: "Your camp has been destroyed!"
     camp-create: "Successfully set up your Camp."
+    camp-clan-add: "%s has been added to your camp clan."
+    camp-clan-remove: "%s has been removed from your camp clan."
     critical: "Critical Hit! %s Critical Blocks remain"
     tagged: "Tagged"
     tag-message: "You have been tagged in combat."
@@ -383,8 +400,10 @@ command:
       town: "Could not find an enemy town."
   town:
     notice:
-      open: "Opened %s for access by all players."
+      open: "Opened %s for access by all kingdom members."
       close: "Closed %s, only residents may build and access containers."
+      redstone-enable: "%s now allows enemies to use redstone switches and doors."
+      redstone-disable: "%s now prevents enemies from using redstone switches and doors."
       add-invite-reminder: "You have been invited to join the town of %s."
       add-success: "Added %s as a resident of %s."
       add-invite: "Sending an invite to %s to join %s."
@@ -609,6 +628,7 @@ description:
   stats: "Display your Accomplishment stats."
   prefix: "Set your prefix title."
   score: "Display a Player's current score."
+  fly: "Fly within friendly land."
   admin: "For Admins only."
   admin-help: "Display the admin help message."
   admin-bypass: "Toggle Admin bypass mode."
@@ -620,6 +640,7 @@ description:
   admin-removetown: "Removes a Town from a Kingdom and all claimed Town chunks."
   admin-monument: "Creates, removes or shows the Monument Template for a Kingdom."
   admin-list: "Display all Kingdoms or Towns of a Kingdom."
+  admin-forcecapture: "Forces a town to be captured by the given Kingdom."
   admin-forcejoin: "Forces a player to join a Kingdom and teleports them to the Capital."
   admin-forceexile: "Forces a player to become a Barbarian and teleports them to the Wild."
   admin-forcetown: "Forces a Town to accept the provided management sub-commands."
@@ -631,4 +652,12 @@ description:
   admin-reload: "Reloads configuration files."
   admin-flag: "Set kingdom flags. Use the command with no arguments to list available flags."
   admin-stat: "Manage player stats."
+territory:
+  wild: "Wild"
+  capital: "Capital"
+  town: "Town"
+  camp: "Camp"
+  ruin: "Ruin"
+  neutral: "Neutral"
+  other: "Other"
   
