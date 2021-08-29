@@ -1179,49 +1179,65 @@ public class PlayerListener implements Listener{
     
     private void updateGolemTargetsForTerritory(KonTerritory territory, KonPlayer triggerPlayer, boolean useDefault) {
     	// Command all nearby Iron Golems to target closest player, if enemy exists nearby, else don't change target
+    	// Find iron golems within the town max radius
     	boolean isGolemAttackEnemies = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.golem_attack_enemies");
 		if(isGolemAttackEnemies && !triggerPlayer.isAdminBypassActive() && !triggerPlayer.getKingdom().equals(territory.getKingdom())) {
 			Location centerLoc = territory.getCenterLoc();
-			for(Entity e : centerLoc.getWorld().getNearbyEntities(centerLoc,128,128,128,(e) -> e.getType() == EntityType.IRON_GOLEM)) {
+			int golumSearchRange = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_size",1); // chunks
+			int radius = 16*16;
+			if(golumSearchRange > 1) {
+				radius = golumSearchRange*16;
+			}
+			for(Entity e : centerLoc.getWorld().getNearbyEntities(centerLoc,radius,256,radius,(e) -> e.getType() == EntityType.IRON_GOLEM)) {
 				IronGolem golem = (IronGolem)e;
-				//golem.setTarget(event.getPlayer().getBukkitPlayer());
-				// Check for closest enemy player
-				boolean isNearbyPlayer = false;
-				double minDistance = 99;
-				KonPlayer nearestPlayer = null;
-				for(Entity p : golem.getNearbyEntities(32,32,32)) {
-					if(p instanceof Player) {
-						KonPlayer nearbyPlayer = playerManager.getPlayer((Player)p);
-						if(nearbyPlayer != null && !nearbyPlayer.isAdminBypassActive() && !nearbyPlayer.getKingdom().equals(territory.getKingdom()) && territory.isLocInside(p.getLocation()) &&
-								(useDefault || !nearbyPlayer.equals(triggerPlayer))) {
-							double distance = golem.getLocation().distance(p.getLocation());
-							if(distance < minDistance) {
-								minDistance = distance;
-								isNearbyPlayer = true;
-								nearestPlayer = nearbyPlayer;
+				// Check for golem inside given territory or in wild
+				if(territory.isLocInside(golem.getLocation()) || !kingdomManager.isChunkClaimed(golem.getLocation())) {
+					
+					// Check for closest enemy player
+					boolean isNearbyPlayer = false;
+					double minDistance = 99;
+					KonPlayer nearestPlayer = null;
+					for(Entity p : golem.getNearbyEntities(32,32,32)) {
+						if(p instanceof Player) {
+							KonPlayer nearbyPlayer = playerManager.getPlayer((Player)p);
+							if(nearbyPlayer != null && !nearbyPlayer.isAdminBypassActive() && !nearbyPlayer.getKingdom().equals(territory.getKingdom()) && territory.isLocInside(p.getLocation()) &&
+									(useDefault || !nearbyPlayer.equals(triggerPlayer))) {
+								double distance = golem.getLocation().distance(p.getLocation());
+								if(distance < minDistance) {
+									minDistance = distance;
+									isNearbyPlayer = true;
+									nearestPlayer = nearbyPlayer;
+								}
 							}
 						}
 					}
-				}
-				LivingEntity currentTarget = golem.getTarget();
-				//ChatUtil.printDebug("Golem: Evaluating new targets in territory "+territory.getName());
-				if(currentTarget != null && currentTarget instanceof Player) {
-					KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
-					if(previousTargetPlayer != null) {
-						previousTargetPlayer.removeMobAttacker(golem);
-						//ChatUtil.printDebug("Golem: Removed mob attacker from player "+previousTargetPlayer.getBukkitPlayer().getName());
+					
+					// Attempt to remove current target
+					LivingEntity currentTarget = golem.getTarget();
+					//ChatUtil.printDebug("Golem: Evaluating new targets in territory "+territory.getName());
+					if(currentTarget != null && currentTarget instanceof Player) {
+						KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
+						if(previousTargetPlayer != null) {
+							previousTargetPlayer.removeMobAttacker(golem);
+							//ChatUtil.printDebug("Golem: Removed mob attacker from player "+previousTargetPlayer.getBukkitPlayer().getName());
+						}
+					} else {
+						//ChatUtil.printDebug("Golem: Bad current target");
 					}
+					
+					// Attempt to apply new target, either closest player or default trigger player
+					if(isNearbyPlayer) {
+						//ChatUtil.printDebug("Golem: Found nearby player "+nearestPlayer.getBukkitPlayer().getName());
+						golem.setTarget(nearestPlayer.getBukkitPlayer());
+						nearestPlayer.addMobAttacker(golem);
+					} else if(useDefault){
+						//ChatUtil.printDebug("Golem: Targeting default player "+triggerPlayer.getBukkitPlayer().getName());
+						golem.setTarget(triggerPlayer.getBukkitPlayer());
+						triggerPlayer.addMobAttacker(golem);
+					}
+					
 				} else {
-					//ChatUtil.printDebug("Golem: Bad current target");
-				}
-				if(isNearbyPlayer) {
-					//ChatUtil.printDebug("Golem: Found nearby player "+nearestPlayer.getBukkitPlayer().getName());
-					golem.setTarget(nearestPlayer.getBukkitPlayer());
-					nearestPlayer.addMobAttacker(golem);
-				} else if(useDefault){
-					//ChatUtil.printDebug("Golem: Targeting default player "+triggerPlayer.getBukkitPlayer().getName());
-					golem.setTarget(triggerPlayer.getBukkitPlayer());
-					triggerPlayer.addMobAttacker(golem);
+					ChatUtil.printDebug("Golem: Not in this territory or wild");
 				}
 			}
 		}
