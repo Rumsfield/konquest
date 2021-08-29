@@ -82,8 +82,8 @@ public class KingdomManager {
 	}
 	
 	public void initialize() {
-		barbarians = new KonKingdom("Barbarians",konquest);
-		neutrals = new KonKingdom("Neutrals",konquest);
+		barbarians = new KonKingdom(MessagePath.LABEL_BARBARIANS.getMessage(),konquest);
+		neutrals = new KonKingdom(MessagePath.LABEL_NEUTRALS.getMessage(),konquest);
 		loadCriticalBlocks();
 		loadKingdoms();
 		updateKingdomOfflineProtection();
