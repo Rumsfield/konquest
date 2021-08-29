@@ -283,7 +283,7 @@ public class PlayerListener implements Listener{
         }
     }
     
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
     	KonPlayer player = playerManager.getPlayer(event.getPlayer());
     	if(player != null && player.isCombatTagged()) {

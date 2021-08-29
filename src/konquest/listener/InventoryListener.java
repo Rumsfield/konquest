@@ -163,7 +163,7 @@ public class InventoryListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.LOW)
     public void onDisplayMenuClick(InventoryClickEvent event) {
 		int slot = event.getRawSlot();
 		Player bukkitPlayer = (Player) event.getWhoClicked();

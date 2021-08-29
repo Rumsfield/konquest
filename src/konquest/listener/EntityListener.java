@@ -85,7 +85,7 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onEntityBreed(EntityBreedEvent event) {
 		if(!event.isCancelled()) {
 			if(event.getBreeder() instanceof Player) {
@@ -295,7 +295,7 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.LOW)
     public void onEntityTarget(EntityTargetEvent event) {
 		// Prevent Iron Golems from targeting friendly players
 		Entity target = event.getTarget();
