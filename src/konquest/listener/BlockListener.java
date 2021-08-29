@@ -547,6 +547,20 @@ public class BlockListener implements Listener {
 				//event.setCancelled(true);
 				//return;
 			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOW)
+    public void onBedPlace(BlockPlaceEvent event) {
+		
+		// Monitor blocks in unclaimed territory
+		if(!event.isCancelled() && !kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
+			
+			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+				ChatUtil.printDebug("Failed to handle onBedPlace for non-existent player");
+				return;
+			}
+			KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 			
 			// Attempt to create a camp for barbarians who place a bed
 			if(!player.isAdminBypassActive() && player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && !campManager.isCampSet(player)) {
