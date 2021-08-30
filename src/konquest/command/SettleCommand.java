@@ -91,48 +91,45 @@ public class SettleCommand extends CommandBase {
         	if(settleStatus == 0) { // on successful settle..
         		KonTown town = player.getKingdom().getTown(townName);
         		// Teleport player to safe place around monument, facing monument
-        		Location tpLoc = getKonquest().getSafeRandomCenteredLocation(town.getSpawnLoc(), 2);
-        		//
-        		double x0,x1,z0,z1;
-        		x0 = tpLoc.getX();
-        		x1 = town.getCenterLoc().getX();
-        		z0 = tpLoc.getZ();
-        		z1 = town.getCenterLoc().getZ();
-        		float yaw = (float)(180-(Math.atan2((x0-x1),(z0-z1))*180/Math.PI));
-        		ChatUtil.printDebug("Settle teleport used x0,z0;x1,z1: "+x0+","+z0+";"+x1+","+z1+" and calculated yaw degrees: "+yaw);
-        		tpLoc.setYaw(yaw);
-        		if(bukkitPlayer.isInsideVehicle()) {
-        			ChatUtil.printDebug("Settling player is in a vehicle, type "+bukkitPlayer.getVehicle().getType().toString());
-        			Entity vehicle = bukkitPlayer.getVehicle();
-        			List<Entity> passengers = vehicle.getPassengers();
-        			bukkitPlayer.leaveVehicle();
-        			bukkitPlayer.teleport(tpLoc,TeleportCause.PLUGIN);
-        			//vehicle.setVelocity(tpLoc.toVector().subtract(vehicle.getLocation().toVector()).normalize());
-        			//vehicle.teleport(tpLoc,TeleportCause.PLUGIN);
-        			//vehicle.teleport(bukkitPlayer,TeleportCause.PLUGIN);
-        			//vehicle.addPassenger(bukkitPlayer);
-        			
-        			new BukkitRunnable() {
-        				public void run() {
-        					vehicle.teleport(tpLoc,TeleportCause.PLUGIN);
-        					//vehicle.addPassenger(bukkitPlayer);
-        					for (Entity e : passengers) {
-        						//if (!(e instanceof Player)) {
-        							vehicle.addPassenger(e);
-        						//}
-        					}
-        				}
-        			}.runTaskLater(getKonquest().getPlugin(), 10L);
-        			
-        		} else {
-        			bukkitPlayer.teleport(tpLoc,TeleportCause.PLUGIN);
-        		}
+				for(KonPlayer occupant : getKonquest().getPlayerManager().getPlayersOnline()) {
+					if(town.isLocInsideCenterChunk(occupant.getBukkitPlayer().getLocation())) {
+						Location tpLoc = getKonquest().getSafeRandomCenteredLocation(town.getCenterLoc(), 2);
+		        		//
+		        		double x0,x1,z0,z1;
+		        		x0 = tpLoc.getX();
+		        		x1 = town.getCenterLoc().getX();
+		        		z0 = tpLoc.getZ();
+		        		z1 = town.getCenterLoc().getZ();
+		        		float yaw = (float)(180-(Math.atan2((x0-x1),(z0-z1))*180/Math.PI));
+		        		//ChatUtil.printDebug("Settle teleport used x0,z0;x1,z1: "+x0+","+z0+";"+x1+","+z1+" and calculated yaw degrees: "+yaw);
+		        		tpLoc.setYaw(yaw);
+		        		if(occupant.getBukkitPlayer().isInsideVehicle()) {
+		        			ChatUtil.printDebug("Settling occupant player is in a vehicle, type "+occupant.getBukkitPlayer().getVehicle().getType().toString());
+		        			Entity vehicle = occupant.getBukkitPlayer().getVehicle();
+		        			List<Entity> passengers = vehicle.getPassengers();
+		        			occupant.getBukkitPlayer().leaveVehicle();
+		        			occupant.getBukkitPlayer().teleport(tpLoc,TeleportCause.PLUGIN);
+		        			new BukkitRunnable() {
+		        				public void run() {
+		        					vehicle.teleport(tpLoc,TeleportCause.PLUGIN);
+		        					for (Entity e : passengers) {
+		        						vehicle.addPassenger(e);
+		        					}
+		        				}
+		        			}.runTaskLater(getKonquest().getPlugin(), 10L);
+		        			
+		        		} else {
+		        			occupant.getBukkitPlayer().teleport(tpLoc,TeleportCause.PLUGIN);
+		        		}
+					}
+				}
+
         		//ChatUtil.sendNotice((Player) getSender(), "Successfully settled new Town: "+townName);
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SETTLE_NOTICE_SUCCESS.getMessage(townName));
         		//ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+bukkitPlayer.getName()+" has settled the Town of "+ChatColor.AQUA+townName+ChatColor.LIGHT_PURPLE+" for Kingdom "+ChatColor.AQUA+player.getKingdom().getName());
         		ChatUtil.sendBroadcast(MessagePath.COMMAND_SETTLE_BROADCAST_SETTLE.getMessage(bukkitPlayer.getName(),townName,player.getKingdom().getName()));
         		// Play a success sound
-        		bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, (float)1, (float)1.2);
+        		town.getWorld().playSound(town.getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)1, (float)1.2);
         		// Set player as Lord
         		town.setPlayerLord(player.getOfflineBukkitPlayer());
         		// Add players to town bar

@@ -72,6 +72,10 @@ public class BlockListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onBlockBreak(BlockBreakEvent event) {
 		//ChatUtil.printDebug("EVENT: blockBreak");
+		if(event.isCancelled()) {
+			return;
+		}
+		
 		// Monitor blocks in claimed territory
 		if(kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
 			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
@@ -333,7 +337,7 @@ public class BlockListener implements Listener {
 			}
 		}
     }
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockBreakLow(BlockBreakEvent event) {
 		if(!event.isCancelled()) {
 			if(event.getBlock().getType().equals(Material.DIAMOND_ORE)) {
@@ -352,7 +356,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onCropHarvest(BlockBreakEvent event) {
 		if(!event.isCancelled()) {
 			Material brokenMat = event.getBlock().getType();
@@ -383,8 +387,13 @@ public class BlockListener implements Listener {
 	 * Check for barbarian bed placement
 	 * @param event
 	 */
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockPlace(BlockPlaceEvent event) {
+		
+		if(event.isCancelled()) {
+			return;
+		}
+		
 		// Track last block placed per player
 		konquest.lastPlaced.put(event.getPlayer(),event.getBlock().getLocation());
 		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
@@ -541,12 +550,57 @@ public class BlockListener implements Listener {
 			// When placing blocks in the wilderness...
 			
 			// Prevent barbarians who already have a camp from placing a bed
-			if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && campManager.isCampSet(player)) {
-				//ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot create more than one Camp. Destroy the bed in your current Camp before placing a new bed.", ChatColor.DARK_RED);
-				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
-				//event.setCancelled(true);
-				//return;
+			// Attempt to create a camp for barbarians who place a bed
+			if(!player.isAdminBypassActive() && player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed) {
+				if(campManager.isCampSet(player)) {
+					ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
+				} else {
+					int status = campManager.addCamp(event.getBlock().getLocation(), (KonOfflinePlayer)player);
+					if(status == 0) { // on successful camp setup...
+						player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
+						//ChatUtil.sendNotice(event.getPlayer(), "Successfully set up camp");
+						ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
+						String territoryName = campManager.getCamp((KonOfflinePlayer)player).getName();
+						ChatUtil.sendKonTitle(player, "", ChatColor.YELLOW+territoryName);
+					} else {
+						switch(status) {
+				    	case 1:
+				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: New claims overlap with existing territory.");
+				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
+				    		break;
+				    	case 2:
+				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Your camp already exists.");
+				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_EXISTS.getMessage());
+				    		break;
+				    	case 3:
+				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: You are not a Barbarian.");
+				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
+				    		break;
+				    	default:
+				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Unknown cause. Contact an Admin!");
+				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+				    		break;
+						}
+						event.setCancelled(true);
+						return;
+					}
+				}
 			}
+		}
+	}
+	
+	/*
+	@EventHandler(priority = EventPriority.LOW)
+    public void onBedPlace(BlockPlaceEvent event) {
+		
+		// Monitor blocks in unclaimed territory
+		if(!event.isCancelled() && !kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
+			
+			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+				ChatUtil.printDebug("Failed to handle onBedPlace for non-existent player");
+				return;
+			}
+			KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 			
 			// Attempt to create a camp for barbarians who place a bed
 			if(!player.isAdminBypassActive() && player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && !campManager.isCampSet(player)) {
@@ -556,7 +610,7 @@ public class BlockListener implements Listener {
 					//ChatUtil.sendNotice(event.getPlayer(), "Successfully set up camp");
 					ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
 					String territoryName = campManager.getCamp((KonOfflinePlayer)player).getName();
-					ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+territoryName);
+					ChatUtil.sendKonTitle(player, "", ChatColor.YELLOW+territoryName);
 				} else {
 					switch(status) {
 			    	case 1:
@@ -565,11 +619,11 @@ public class BlockListener implements Listener {
 			    		break;
 			    	case 2:
 			    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Your camp already exists.");
-			    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
+			    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_EXISTS.getMessage());
 			    		break;
 			    	case 3:
 			    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: You are not a Barbarian.");
-			    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
+			    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
 			    		break;
 			    	default:
 			    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Unknown cause. Contact an Admin!");
@@ -582,8 +636,9 @@ public class BlockListener implements Listener {
 			}
 		}
 	}
+	*/
 	
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onSeedPlant(BlockPlaceEvent event) {
 		if(!event.isCancelled()) {
 			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
@@ -606,7 +661,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onFarmTill(BlockPlaceEvent event) {
 		if(!event.isCancelled()) {
 			Material placedMat = event.getBlockPlaced().getType();
