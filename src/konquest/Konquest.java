@@ -949,7 +949,7 @@ public class Konquest implements Timeable {
     		//player.teleport(new Location(loc.getWorld(),loc.getX(),loc.getY()+1.0,loc.getZ()));
     		ChatUtil.printDebug("Teleporting player "+player.getName()+" to loaded territory");
     		Location qLoc = travelTerritory.getSpawnLoc();
-    		Location destination = new Location(qLoc.getWorld(),qLoc.getX()+0.5,qLoc.getY()+1.0,qLoc.getZ()+0.5);
+    		Location destination = new Location(qLoc.getWorld(),qLoc.getX()+0.5,qLoc.getY()+1.0,qLoc.getZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
     		player.teleport(destination,TeleportCause.PLUGIN);
     		/*new BukkitRunnable() {
 				public void run() {
@@ -971,7 +971,7 @@ public class Konquest implements Timeable {
     		//player.teleport(new Location(loc.getWorld(),loc.getX(),loc.getY()+1.0,loc.getZ()));
     		ChatUtil.printDebug("Teleporting player "+player.getName()+" to loaded chunk");
     		Location qLoc = travelLocation;
-    		Location destination = new Location(qLoc.getWorld(),qLoc.getX()+0.5,qLoc.getY()+1.0,qLoc.getZ()+0.5);
+    		Location destination = new Location(qLoc.getWorld(),qLoc.getX()+0.5,qLoc.getY()+1.0,qLoc.getZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
     		player.teleport(destination,TeleportCause.PLUGIN);
     		/*new BukkitRunnable() {
 				public void run() {
@@ -994,7 +994,7 @@ public class Konquest implements Timeable {
 	    		qLoc = teleportTerritoryQueue.get(qPlayer).getSpawnLoc();
 	    		qPoint = toPoint(qLoc);
 	    		if(qPoint.equals(cPoint) && chunk.getWorld().equals(qLoc.getWorld())) {
-	    			Location destination = new Location(qLoc.getWorld(),qLoc.getX()+0.5,qLoc.getY()+1.0,qLoc.getZ()+0.5);
+	    			Location destination = new Location(qLoc.getWorld(),qLoc.getX()+0.5,qLoc.getY()+1.0,qLoc.getZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
 	    			qPlayer.teleport(destination,TeleportCause.PLUGIN);
 	    			/*new BukkitRunnable() {
 	    				public void run() {
@@ -1011,7 +1011,7 @@ public class Konquest implements Timeable {
 	    		qLoc = teleportLocationQueue.get(qPlayer);
 	    		qPoint = toPoint(qLoc);
 	    		if(qPoint.equals(cPoint) && chunk.getWorld().equals(qLoc.getWorld())) {
-	    			Location destination = new Location(qLoc.getWorld(),qLoc.getX()+0.5,qLoc.getY()+1.0,qLoc.getZ()+0.5);
+	    			Location destination = new Location(qLoc.getWorld(),qLoc.getX()+0.5,qLoc.getY()+1.0,qLoc.getZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
 	    			qPlayer.teleport(destination,TeleportCause.PLUGIN);
 	    			/*new BukkitRunnable() {
 	    				public void run() {
