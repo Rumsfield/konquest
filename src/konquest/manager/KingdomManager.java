@@ -1612,6 +1612,7 @@ public class KingdomManager {
         boolean isShieldsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_shields",false);
         boolean isArmorsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_armor",false);
         double x,y,z;
+        float pitch,yaw;
         List<Double> sectionList;
         String worldName;
         String defaultWorldName = konquest.getConfigManager().getConfig("core").getString("core.world_name","world");
@@ -1639,7 +1640,19 @@ public class KingdomManager {
 	        		x = sectionList.get(0);
 	        		y = sectionList.get(1);
 	        		z = sectionList.get(2);
-		        	Location capital_spawn = new Location(capitalWorld,x,y,z);
+	        		if(sectionList.size() > 3) {
+	        			double val = sectionList.get(3);
+	        			pitch = (float)val;
+	        		} else {
+	        			pitch = 0;	
+	        		}
+	        		if(sectionList.size() > 4) {
+	        			double val = sectionList.get(4);
+	        			yaw = (float)val;
+	        		} else {
+	        			yaw = 0;	
+	        		}
+		        	Location capital_spawn = new Location(capitalWorld,x,y,z,yaw,pitch);
 		        	sectionList = capitalSection.getDoubleList("center");
 	        		x = sectionList.get(0);
 	        		y = sectionList.get(1);
@@ -1835,7 +1848,9 @@ public class KingdomManager {
             capitalSection.set("world", kingdom.getCapital().getWorld().getName());
             capitalSection.set("spawn", new int[] {(int) kingdom.getCapital().getSpawnLoc().getX(),
 												   (int) kingdom.getCapital().getSpawnLoc().getY(),
-												   (int) kingdom.getCapital().getSpawnLoc().getZ()});
+												   (int) kingdom.getCapital().getSpawnLoc().getZ(),
+												   (int) kingdom.getCapital().getSpawnLoc().getPitch(),
+												   (int) kingdom.getCapital().getSpawnLoc().getYaw()});
             capitalSection.set("center", new int[] {(int) kingdom.getCapital().getCenterLoc().getX(),
 					 								(int) kingdom.getCapital().getCenterLoc().getY(),
 					 								(int) kingdom.getCapital().getCenterLoc().getZ()});
