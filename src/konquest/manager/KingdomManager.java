@@ -357,6 +357,15 @@ public class KingdomManager {
 			}
 			// Verify valid monument template
 			if(getKingdom(kingdomName).getMonumentTemplate().isValid()) {
+				// Modify location to max Y at given X,Z
+				int xChunk = (loc.getBlockX() % 16);
+				int zChunk = (loc.getBlockZ() % 16);
+				Chunk chunk = loc.getChunk();
+				int yFloor = chunk.getChunkSnapshot(true, false, false).getHighestBlockYAt(xChunk, zChunk);
+				while((chunk.getBlock(xChunk, yFloor, zChunk).isPassable() || !chunk.getBlock(xChunk, yFloor, zChunk).getType().isOccluding()) && yFloor > 1) {
+					yFloor--;
+				}
+				loc.setY(yFloor);
 				// Attempt to add the town
 				if(getKingdom(kingdomName).addTown(loc, name)) {
 					// Attempt to initialize the town
