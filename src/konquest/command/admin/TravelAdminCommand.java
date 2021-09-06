@@ -42,7 +42,7 @@ public class TravelAdminCommand  extends CommandBase {
         	} else {
         		for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
         			if(kingdom.hasTown(travelTo)) {
-        				getKonquest().telePlayerTerritory(bukkitPlayer, kingdom.getTown(travelTo));
+        				getKonquest().telePlayerLocation(bukkitPlayer, kingdom.getTown(travelTo).getSpawnLoc());
         				return;
         			}
         		}

@@ -106,7 +106,7 @@ public class Konquest implements Timeable {
             weakValues().
             makeMap();
 	private ConcurrentMap<UUID, ItemStack> headCache = new MapMaker().makeMap();
-	private HashMap<Player,KonTerritory> teleportTerritoryQueue;
+	//private HashMap<Player,KonTerritory> teleportTerritoryQueue;
 	private HashMap<Player,Location> teleportLocationQueue;
 	
 	public Konquest(KonquestPlugin plugin) {
@@ -141,7 +141,7 @@ public class Konquest implements Timeable {
 		this.offlineTimeoutSeconds = 0;
 		this.isPacketSendEnabled = false;
 		
-		teleportTerritoryQueue = new HashMap<Player,KonTerritory>();
+		//teleportTerritoryQueue = new HashMap<Player,KonTerritory>();
 		teleportLocationQueue = new HashMap<Player,Location>();
 	}
 	
@@ -941,43 +941,31 @@ public class Konquest implements Timeable {
     	return result;
     }
     
+    /*
     public void telePlayerTerritory(Player player, KonTerritory travelTerritory) {
     	Point locPoint = toPoint(travelTerritory.getCenterLoc());
-    	//Location destination = new Location(loc.getWorld(),loc.getX()+0.5,loc.getY()+1.0,loc.getZ()+0.5);
+    	Location qLoc = travelTerritory.getSpawnLoc();
+		Location pLoc = player.getLocation();
+		Location destination = new Location(qLoc.getWorld(),qLoc.getBlockX()+0.5,qLoc.getBlockY()+1.0,qLoc.getBlockZ()+0.5,pLoc.getYaw(),pLoc.getPitch());
     	if(travelTerritory.getWorld().isChunkLoaded(locPoint.x,locPoint.y)) {
-    	//if(loc.getChunk().isLoaded()) {
-    		//player.teleport(new Location(loc.getWorld(),loc.getX(),loc.getY()+1.0,loc.getZ()));
     		ChatUtil.printDebug("Teleporting player "+player.getName()+" to loaded territory");
-    		Location qLoc = travelTerritory.getSpawnLoc();
-    		Location destination = new Location(qLoc.getWorld(),qLoc.getX()+0.5,qLoc.getY()+1.0,qLoc.getZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
     		player.teleport(destination,TeleportCause.PLUGIN);
-    		/*new BukkitRunnable() {
-				public void run() {
-					player.teleport(destination,TeleportCause.PLUGIN);
-				}
-			}.runTaskLater(getPlugin(), 2L);*/
     	} else {
-    		teleportTerritoryQueue.put(player,travelTerritory);
+    		//teleportTerritoryQueue.put(player,travelTerritory);
+    		teleportLocationQueue.put(player,destination);
     		ChatUtil.printDebug("Queueing player "+player.getName()+" for unloaded territory destination");
     		travelTerritory.getWorld().loadChunk(locPoint.x,locPoint.y);
     	}
     }
+    */
     
     public void telePlayerLocation(Player player, Location travelLocation) {
     	Point locPoint = toPoint(travelLocation);
-    	//Location destination = new Location(loc.getWorld(),loc.getX()+0.5,loc.getY()+1.0,loc.getZ()+0.5);
     	if(travelLocation.getWorld().isChunkLoaded(locPoint.x,locPoint.y)) {
-    	//if(loc.getChunk().isLoaded()) {
-    		//player.teleport(new Location(loc.getWorld(),loc.getX(),loc.getY()+1.0,loc.getZ()));
     		ChatUtil.printDebug("Teleporting player "+player.getName()+" to loaded chunk");
     		Location qLoc = travelLocation;
-    		Location destination = new Location(qLoc.getWorld(),qLoc.getX()+0.5,qLoc.getY()+1.0,qLoc.getZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
+    		Location destination = new Location(qLoc.getWorld(),qLoc.getBlockX()+0.5,qLoc.getBlockY()+1.0,qLoc.getBlockZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
     		player.teleport(destination,TeleportCause.PLUGIN);
-    		/*new BukkitRunnable() {
-				public void run() {
-					player.teleport(destination,TeleportCause.PLUGIN);
-				}
-			}.runTaskLater(getPlugin(), 2L);*/
     	} else {
     		teleportLocationQueue.put(player,travelLocation);
     		ChatUtil.printDebug("Queueing player "+player.getName()+" for unloaded chunk destination");
@@ -989,35 +977,27 @@ public class Konquest implements Timeable {
     	Point cPoint = toPoint(chunk);
     	Point qPoint;
 		Location qLoc;
+		/*
     	if(!teleportTerritoryQueue.isEmpty()) {
 	    	for(Player qPlayer : teleportTerritoryQueue.keySet()) {
 	    		qLoc = teleportTerritoryQueue.get(qPlayer).getSpawnLoc();
 	    		qPoint = toPoint(qLoc);
 	    		if(qPoint.equals(cPoint) && chunk.getWorld().equals(qLoc.getWorld())) {
-	    			Location destination = new Location(qLoc.getWorld(),qLoc.getX()+0.5,qLoc.getY()+1.0,qLoc.getZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
+	    			Location destination = new Location(qLoc.getWorld(),qLoc.getBlockX()+0.5,qLoc.getBlockY()+1.0,qLoc.getBlockZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
 	    			qPlayer.teleport(destination,TeleportCause.PLUGIN);
-	    			/*new BukkitRunnable() {
-	    				public void run() {
-	    					qPlayer.teleport(qLoc,TeleportCause.PLUGIN);
-	    				}
-	    			}.runTaskLater(getPlugin(), 2L);*/
 	    			ChatUtil.printDebug("Teleporting territory queued player "+qPlayer.getName());
 	    			teleportTerritoryQueue.remove(qPlayer);
 	    		}
 	    	}
     	}
+    	*/
     	if(!teleportLocationQueue.isEmpty()) {
 	    	for(Player qPlayer : teleportLocationQueue.keySet()) {
 	    		qLoc = teleportLocationQueue.get(qPlayer);
 	    		qPoint = toPoint(qLoc);
 	    		if(qPoint.equals(cPoint) && chunk.getWorld().equals(qLoc.getWorld())) {
-	    			Location destination = new Location(qLoc.getWorld(),qLoc.getX()+0.5,qLoc.getY()+1.0,qLoc.getZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
-	    			qPlayer.teleport(destination,TeleportCause.PLUGIN);
-	    			/*new BukkitRunnable() {
-	    				public void run() {
-	    					qPlayer.teleport(qLoc,TeleportCause.PLUGIN);
-	    				}
-	    			}.runTaskLater(getPlugin(), 2L);*/
+	    			//Location destination = new Location(qLoc.getWorld(),qLoc.getBlockX()+0.5,qLoc.getBlockY()+1.0,qLoc.getBlockZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
+	    			qPlayer.teleport(qLoc,TeleportCause.PLUGIN);
 	    			ChatUtil.printDebug("Teleporting chunk queued player "+qPlayer.getName());
 	    			teleportLocationQueue.remove(qPlayer);
 	    		}

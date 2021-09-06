@@ -205,8 +205,13 @@ public class TravelCommand extends CommandBase {
 	    	    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TRAVEL_NOTICE_TOWN_TRAVEL.getMessage(bukkitPlayer.getName(),town.getName()));
 	    	    			}
 	    	    		}
+	            		Location pLoc = bukkitPlayer.getLocation();
+	            		Location tLoc = town.getSpawnLoc();
+	            		Location dest = new Location(tLoc.getWorld(),tLoc.getX(),tLoc.getY(),tLoc.getZ(),pLoc.getYaw(),pLoc.getPitch());
+	            		getKonquest().telePlayerLocation(bukkitPlayer, dest);
+        			} else {
+        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
         			}
-        			getKonquest().telePlayerTerritory(bukkitPlayer, town);
         			break;
         		case WILD:
         			getKonquest().telePlayerLocation(bukkitPlayer, travelLoc);
