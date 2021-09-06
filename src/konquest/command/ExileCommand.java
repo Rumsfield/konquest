@@ -75,7 +75,9 @@ public class ExileCommand extends CommandBase {
         			
         		} else {
         			// Exile the player
-            		if(getKonquest().getKingdomManager().exilePlayer(player)) {
+        			boolean doWildTeleport = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.random_wild", true);
+        			boolean doRemoveStats = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
+            		if(getKonquest().getKingdomManager().exilePlayer(player,doWildTeleport,doRemoveStats)) {
             			boolean doRemoveFavor = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.remove_favor", true);
             			if(doRemoveFavor) {
 	            			double balance = KonquestPlugin.getBalance(bukkitPlayer);

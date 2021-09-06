@@ -1,10 +1,12 @@
 package konquest.command.admin;
 
 import konquest.Konquest;
+import konquest.KonquestPlugin;
 import konquest.command.CommandBase;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
+import net.milkbowl.vault.economy.EconomyResponse;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,8 +36,22 @@ public class ForceExileAdminCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
         		return;
         	}
-        	
-        	if(getKonquest().getKingdomManager().exilePlayer(player)) {
+        	boolean doWildTeleport = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.random_wild", true);
+			boolean doRemoveStats = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
+        	if(getKonquest().getKingdomManager().exilePlayer(player,doWildTeleport,doRemoveStats)) {
+        		boolean doRemoveFavor = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.remove_favor", true);
+    			if(doRemoveFavor) {
+        			double balance = KonquestPlugin.getBalance(player.getBukkitPlayer());
+                	EconomyResponse r = KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), balance);
+    	            if(r.transactionSuccess()) {
+    	            	String balanceF = String.format("%.2f",r.balance);
+		            	String amountF = String.format("%.2f",r.amount);
+		            	ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+    	            } else {
+    	            	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
+    	            	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
+    	            }
+    			}
         		//ChatUtil.sendNotice(player.getBukkitPlayer(), "You have been exiled as a "+ChatColor.DARK_RED+"Barbarian");
         		ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_CONFIRMED.getMessage());
         		//ChatUtil.sendNotice((Player) getSender(), "Successfully exiled player "+playerName+" to Barbarians");

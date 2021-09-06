@@ -108,6 +108,15 @@ public class KingdomManager {
 	public boolean removeKingdom(String name) {
 		KonKingdom oldKingdom = kingdomMap.remove(name);
 		if(oldKingdom != null) {
+			// Exile all members
+			for(KonPlayer member : konquest.getPlayerManager().getPlayersInKingdom(oldKingdom)) {
+				exilePlayer(member,false,false);
+			}
+			// Remove all towns
+			for(KonTown town : oldKingdom.getTowns()) {
+				removeTown(town.getName(),oldKingdom.getName());
+			}
+			// Remove capital
 			oldKingdom.getCapital().removeAllBarPlayers();
 			removeAllTerritory(oldKingdom.getCapital().getWorld(),oldKingdom.getCapital().getChunkList().keySet());
 			konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
@@ -203,17 +212,18 @@ public class KingdomManager {
 	 * @param player
 	 * @return true if not already barbarian and the teleport was successful, else false.
 	 */
-	public boolean exilePlayer(KonPlayer player) {
+	public boolean exilePlayer(KonPlayer player, boolean teleport, boolean stats) {
     	if(player.isBarbarian()) {
     		return false;
     	}
-    	if(!konquest.isWorldValid(player.getBukkitPlayer().getLocation().getWorld())) {
-    		return false;
-    	}
     	KonKingdom oldKingdom = player.getKingdom();
-    	boolean doWildTeleport = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.random_wild", true);
-    	if(doWildTeleport) {
-			Location randomWildLoc = konquest.getRandomWildLocation(1000,player.getBukkitPlayer().getLocation().getWorld());
+    	//boolean doWildTeleport = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.random_wild", true);
+    	if(teleport) {
+    		if(!konquest.isWorldValid(player.getBukkitPlayer().getLocation().getWorld())) {
+        		return false;
+        	}
+    		int radius = konquest.getConfigManager().getConfig("core").getInt("core.travel_wild_random_radius",200);
+			Location randomWildLoc = konquest.getRandomWildLocation(radius*2,player.getBukkitPlayer().getLocation().getWorld());
 	    	if(randomWildLoc == null) {
 	    		return false;
 	    	}
@@ -229,8 +239,8 @@ public class KingdomManager {
     			konquest.getMapHandler().drawDynmapLabel(town);
     		}
     	}
-    	boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
-    	if(doRemoveStats) {
+    	//boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
+    	if(stats) {
 	    	// Clear all stats
 	    	player.getPlayerStats().clearStats();
 	    	// Disable prefix
