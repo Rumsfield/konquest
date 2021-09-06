@@ -574,14 +574,19 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
     	
+    	Entity clicked = event.getRightClicked();
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
         
         if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
         	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation());
+        	
+        	ChatUtil.printDebug("Player interacted at entity of type: "+clicked.getType().toString());
+        	boolean isEntityAllowed = (clicked.getType().equals(EntityType.PLAYER));
+        	
         	// Capital protections...
         	boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
-        	if(territory instanceof KonCapital && !isCapitalUseEnabled) {
+        	if(territory instanceof KonCapital && !isCapitalUseEnabled && !isEntityAllowed) {
     			//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in the Kingdom Capital", ChatColor.DARK_RED);
     			//ChatUtil.printDebug("EVENT player interaction within capital");
 				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -589,7 +594,7 @@ public class PlayerListener implements Listener{
     			return;
     		}
         	// Town protections...
-    		if(territory instanceof KonTown) {
+    		if(territory instanceof KonTown && !isEntityAllowed) {
     			KonTown town = (KonTown) territory;
     			//ChatUtil.printDebug("EVENT player entity interaction within town "+town.getName());
     			// Prevent enemies and non-residents from interacting with entities
