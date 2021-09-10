@@ -153,7 +153,7 @@ core:
       database: example_database
       username: example_user
       password: example_password
-      properties: []
+      properties: ["autoReconnect=true","useSSL=false"]
   integration:
     quickshop: false
     luckperms: false
