@@ -1865,26 +1865,26 @@ public class KingdomManager {
 			kingdomSection.set("peaceful",kingdom.isPeaceful());
             ConfigurationSection capitalSection = kingdomSection.createSection("capital");
             capitalSection.set("world", kingdom.getCapital().getWorld().getName());
-            capitalSection.set("spawn", new int[] {(int) kingdom.getCapital().getSpawnLoc().getX(),
-												   (int) kingdom.getCapital().getSpawnLoc().getY(),
-												   (int) kingdom.getCapital().getSpawnLoc().getZ(),
+            capitalSection.set("spawn", new int[] {(int) kingdom.getCapital().getSpawnLoc().getBlockX(),
+												   (int) kingdom.getCapital().getSpawnLoc().getBlockY(),
+												   (int) kingdom.getCapital().getSpawnLoc().getBlockZ(),
 												   (int) kingdom.getCapital().getSpawnLoc().getPitch(),
 												   (int) kingdom.getCapital().getSpawnLoc().getYaw()});
-            capitalSection.set("center", new int[] {(int) kingdom.getCapital().getCenterLoc().getX(),
-					 								(int) kingdom.getCapital().getCenterLoc().getY(),
-					 								(int) kingdom.getCapital().getCenterLoc().getZ()});
+            capitalSection.set("center", new int[] {(int) kingdom.getCapital().getCenterLoc().getBlockX(),
+					 								(int) kingdom.getCapital().getCenterLoc().getBlockY(),
+					 								(int) kingdom.getCapital().getCenterLoc().getBlockZ()});
             capitalSection.set("chunks", konquest.formatPointsToString(kingdom.getCapital().getChunkList().keySet()));
             if(kingdom.getMonumentTemplate().isValid()) {
 	            ConfigurationSection monumentSection = kingdomSection.createSection("monument");
-	            monumentSection.set("travel", new int[] {(int) kingdom.getMonumentTemplate().getTravelPoint().getX(),
-														 (int) kingdom.getMonumentTemplate().getTravelPoint().getY(),
-														 (int) kingdom.getMonumentTemplate().getTravelPoint().getZ()});
-	            monumentSection.set("cornerone", new int[] {(int) kingdom.getMonumentTemplate().getCornerOne().getX(),
-						 								 	(int) kingdom.getMonumentTemplate().getCornerOne().getY(),
-						 								 	(int) kingdom.getMonumentTemplate().getCornerOne().getZ()});
-	            monumentSection.set("cornertwo", new int[] {(int) kingdom.getMonumentTemplate().getCornerTwo().getX(),
-						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getY(),
-						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getZ()});
+	            monumentSection.set("travel", new int[] {(int) kingdom.getMonumentTemplate().getTravelPoint().getBlockX(),
+														 (int) kingdom.getMonumentTemplate().getTravelPoint().getBlockY(),
+														 (int) kingdom.getMonumentTemplate().getTravelPoint().getBlockZ()});
+	            monumentSection.set("cornerone", new int[] {(int) kingdom.getMonumentTemplate().getCornerOne().getBlockX(),
+						 								 	(int) kingdom.getMonumentTemplate().getCornerOne().getBlockY(),
+						 								 	(int) kingdom.getMonumentTemplate().getCornerOne().getBlockZ()});
+	            monumentSection.set("cornertwo", new int[] {(int) kingdom.getMonumentTemplate().getCornerTwo().getBlockX(),
+						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getBlockY(),
+						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getBlockZ()});
 			} else {
 				ChatUtil.printConsoleError("Failed to save invalid monument template for Kingdom "+kingdom.getName());
 			}
@@ -1893,12 +1893,12 @@ public class KingdomManager {
             	ConfigurationSection townInstanceSection = townsSection.createSection(town.getName());
             	townInstanceSection.set("world", town.getWorld().getName());
             	townInstanceSection.set("base", town.getMonument().getBaseY());
-            	townInstanceSection.set("spawn", new int[] {(int) town.getSpawnLoc().getX(),
-						 								 	(int) town.getSpawnLoc().getY(),
-						 								 	(int) town.getSpawnLoc().getZ()});
-            	townInstanceSection.set("center", new int[] {(int) town.getCenterLoc().getX(),
-						 									 (int) town.getCenterLoc().getY(),
-						 									 (int) town.getCenterLoc().getZ()});
+            	townInstanceSection.set("spawn", new int[] {(int) town.getSpawnLoc().getBlockX(),
+						 								 	(int) town.getSpawnLoc().getBlockY(),
+						 								 	(int) town.getSpawnLoc().getBlockZ()});
+            	townInstanceSection.set("center", new int[] {(int) town.getCenterLoc().getBlockX(),
+						 									 (int) town.getCenterLoc().getBlockY(),
+						 									 (int) town.getCenterLoc().getBlockZ()});
                 townInstanceSection.set("chunks", konquest.formatPointsToString(town.getChunkList().keySet()));
                 townInstanceSection.set("open", town.isOpen());
                 townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());

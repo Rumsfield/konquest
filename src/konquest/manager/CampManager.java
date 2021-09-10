@@ -432,9 +432,9 @@ public class CampManager {
 			KonCamp camp = barbarianCamps.get(uuid);
 			ConfigurationSection campSection = root.createSection(uuid);
 			campSection.set("world", camp.getWorld().getName());
-			campSection.set("center", new int[] {(int) camp.getCenterLoc().getX(),
-					 							 (int) camp.getCenterLoc().getY(),
-					 							 (int) camp.getCenterLoc().getZ()});
+			campSection.set("center", new int[] {(int) camp.getCenterLoc().getBlockX(),
+					 							 (int) camp.getCenterLoc().getBlockY(),
+					 							 (int) camp.getCenterLoc().getBlockZ()});
 	        campSection.set("chunks", konquest.formatPointsToString(camp.getChunkList().keySet()));
 		}
 	}

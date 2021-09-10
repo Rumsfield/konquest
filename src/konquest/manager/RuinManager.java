@@ -229,9 +229,9 @@ public class RuinManager {
 			KonRuin ruin = ruinMap.get(name);
 			ConfigurationSection ruinSection = root.createSection(ruin.getName());
 			ruinSection.set("world", ruin.getWorld().getName());
-			ruinSection.set("center", new int[] {(int) ruin.getCenterLoc().getX(),
-					 							 (int) ruin.getCenterLoc().getY(),
-					 							 (int) ruin.getCenterLoc().getZ()});
+			ruinSection.set("center", new int[] {(int) ruin.getCenterLoc().getBlockX(),
+					 							 (int) ruin.getCenterLoc().getBlockY(),
+					 							 (int) ruin.getCenterLoc().getBlockZ()});
 			ruinSection.set("chunks", konquest.formatPointsToString(ruin.getChunkList().keySet()));
 			ruinSection.set("criticals", konquest.formatLocationsToString(ruin.getCriticalLocations()));
 			ruinSection.set("spawns", konquest.formatLocationsToString(ruin.getSpawnLocations()));
