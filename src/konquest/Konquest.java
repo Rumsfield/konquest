@@ -961,13 +961,13 @@ public class Konquest implements Timeable {
     
     public void telePlayerLocation(Player player, Location travelLocation) {
     	Point locPoint = toPoint(travelLocation);
+    	Location qLoc = travelLocation;
+		Location destination = new Location(qLoc.getWorld(),qLoc.getBlockX()+0.5,qLoc.getBlockY()+1.0,qLoc.getBlockZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
     	if(travelLocation.getWorld().isChunkLoaded(locPoint.x,locPoint.y)) {
     		ChatUtil.printDebug("Teleporting player "+player.getName()+" to loaded chunk");
-    		Location qLoc = travelLocation;
-    		Location destination = new Location(qLoc.getWorld(),qLoc.getBlockX()+0.5,qLoc.getBlockY()+1.0,qLoc.getBlockZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
     		player.teleport(destination,TeleportCause.PLUGIN);
     	} else {
-    		teleportLocationQueue.put(player,travelLocation);
+    		teleportLocationQueue.put(player,destination);
     		ChatUtil.printDebug("Queueing player "+player.getName()+" for unloaded chunk destination");
     		travelLocation.getWorld().loadChunk(locPoint.x,locPoint.y);
     	}

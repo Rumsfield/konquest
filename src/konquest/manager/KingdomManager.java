@@ -365,10 +365,10 @@ public class KingdomManager {
 				int zLocal = loc.getBlockZ() - (point.y*16);
 				Chunk chunk = loc.getChunk();
 				int yFloor = chunk.getChunkSnapshot(true, false, false).getHighestBlockYAt(xLocal, zLocal);
-				while((chunk.getBlock(xLocal, yFloor, zLocal).isPassable() || !chunk.getBlock(xLocal, yFloor, zLocal).getType().isOccluding()) && yFloor > 1) {
+				while((chunk.getBlock(xLocal, yFloor, zLocal).isPassable() || !chunk.getBlock(xLocal, yFloor, zLocal).getType().isOccluding()) && yFloor > 0) {
 					yFloor--;
 				}
-				loc.setY(yFloor);
+				loc.setY(yFloor+1);
 				// Attempt to add the town
 				if(getKingdom(kingdomName).addTown(loc, name)) {
 					// Attempt to initialize the town
