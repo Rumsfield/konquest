@@ -187,15 +187,15 @@ public class KingdomManager {
 					(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
 				// Remove player from any enemy towns
 				KonKingdom assignedKingdom = getKingdom(kingdomName);
-				Collection<KonKingdom> enemyKingdoms = kingdomMap.values();
-				enemyKingdoms.remove(assignedKingdom);
-				for(KonKingdom enemy : enemyKingdoms) {
-					for(KonTown town : enemy.getTowns()) {
-			    		if(town.removePlayerResident(player.getOfflineBukkitPlayer())) {
-			    			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_TOWN.getMessage(town.getName()));
-			    			konquest.getMapHandler().drawDynmapLabel(town);
-			    		}
-			    	}
+				for(KonKingdom kingdom : kingdomMap.values()) {
+					if(!kingdom.equals(assignedKingdom)) {
+						for(KonTown town : kingdom.getTowns()) {
+				    		if(town.removePlayerResident(player.getOfflineBukkitPlayer())) {
+				    			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_TOWN.getMessage(town.getName()));
+				    			konquest.getMapHandler().drawDynmapLabel(town);
+				    		}
+				    	}
+					}
 				}
 				// Remove any barbarian camps
 				konquest.getCampManager().removeCamp(player);

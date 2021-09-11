@@ -21,6 +21,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
 import konquest.Konquest;
+import konquest.model.KonMonumentTemplate;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
@@ -537,7 +538,8 @@ public class LootManager implements Timeable{
 			markedRefreshTime = new Date().getTime();
 			ChatUtil.printDebug("Loot Refresh timer marked new availability time");
 			for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
-				if(!player.isBarbarian() && player.getKingdom().getMonumentTemplate().hasLoot()) {
+				KonMonumentTemplate template = player.getKingdom().getMonumentTemplate();
+				if(!player.isBarbarian() && template != null && template.hasLoot()) {
 					//ChatUtil.sendNotice(player.getBukkitPlayer(), "New town monument loot is available.");
 					ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_LOOT.getMessage());
 				}
