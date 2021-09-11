@@ -36,6 +36,7 @@ import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.command.TravelCommand.TravelDestination;
 import konquest.display.OptionIcon.optionAction;
+import konquest.event.KonKingdomChangeEvent;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
 import konquest.model.KonDirective;
@@ -161,6 +162,7 @@ public class KingdomManager {
 	 *  			1 = kingdom name does not exist
 	 *  			2 = the kingdom is full (config option max_player_diff)
 	 *  			3 = missing permission
+	 *  			4 = cancelled
 	 */
 	public int assignPlayerKingdom(KonPlayer player, String kingdomName, boolean force) {
 		//TODO: Some sort of penalty for changing kingdoms, check if barbarian first
@@ -185,8 +187,16 @@ public class KingdomManager {
 			// Join kingdom is max_player_diff is disabled, or if the desired kingdom is within the max diff
 			if(config_max_player_diff == 0 || force ||
 					(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
-				// Remove player from any enemy towns
 				KonKingdom assignedKingdom = getKingdom(kingdomName);
+				// Fire event
+				KonKingdomChangeEvent invokeEvent = new KonKingdomChangeEvent(konquest, player, assignedKingdom, player.getExileKingdom(), false);
+                if(invokeEvent != null) {
+                	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
+                }
+				if(invokeEvent.isCancelled()) {
+					return 4;
+				}
+				// Remove player from any enemy towns
 				for(KonKingdom kingdom : kingdomMap.values()) {
 					if(!kingdom.equals(assignedKingdom)) {
 						for(KonTown town : kingdom.getTowns()) {
@@ -234,6 +244,14 @@ public class KingdomManager {
     		return false;
     	}
     	KonKingdom oldKingdom = player.getKingdom();
+    	// Fire event
+		KonKingdomChangeEvent invokeEvent = new KonKingdomChangeEvent(konquest, player, getBarbarians(), oldKingdom, true);
+        if(invokeEvent != null) {
+        	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
+        }
+		if(invokeEvent.isCancelled()) {
+			return false;
+		}
     	//boolean doWildTeleport = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.random_wild", true);
     	if(teleport) {
     		if(!konquest.isWorldValid(player.getBukkitPlayer().getLocation().getWorld())) {

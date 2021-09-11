@@ -2,6 +2,7 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.event.KonKingdomChangeEvent;
 import konquest.event.KonquestEnterTerritoryEvent;
 import konquest.event.KonquestMonumentDamageEvent;
 import konquest.manager.KingdomManager;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -225,7 +225,7 @@ public class KonquestListener implements Listener {
 							monumentPlayers.add(player);
 						}
 					}
-					Location townSpawnLoc = town.getSpawnLoc();
+					//Location townSpawnLoc = town.getSpawnLoc();
 					String townName = town.getName();
 					ArrayList<KonPlayer> townLocPlayers = new ArrayList<KonPlayer>();
 					for(KonPlayer player : playerManager.getPlayersOnline()) {
@@ -241,6 +241,7 @@ public class KonquestListener implements Listener {
 						// Town is removed, no longer exists
 						//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "You have destroyed "+townName+" for the glory of the Barbarian horde!");
 						ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_DESTROY.getMessage(townName));
+						/*
 						int local_x = 0;
 						if(townSpawnLoc.getBlockX() > 0) {
 							local_x = townSpawnLoc.getBlockX() % 16;
@@ -260,7 +261,7 @@ public class KonquestListener implements Listener {
 						for(KonPlayer player : monumentPlayers) {
 							player.getBukkitPlayer().teleport(townSpawnLoc);
 						}
-						
+						*/
 						for(KonPlayer player : monumentPlayers) {
 							player.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2));
 							//ChatUtil.printDebug("Effect data is: "+Effect.ANVIL_LAND.getData().getName()+", "+Effect.ANVIL_LAND.getData().toString());
@@ -381,4 +382,18 @@ public class KonquestListener implements Listener {
 			}
 		}
 	}
+	
+	/*
+	 * General Konquest Events
+	 */
+	
+	/**
+	 * Handles when a player is assigned to a kingdom or becomes a barbarian
+	 * @param event
+	 */
+	@EventHandler(priority = EventPriority.NORMAL)
+    public void onKingdomChange(KonKingdomChangeEvent event) {
+		//TODO: something
+	}
+	
 }

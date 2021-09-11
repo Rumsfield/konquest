@@ -40,9 +40,18 @@ public class ForceJoinAdminCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
         		return;
         	}
-        	getKonquest().getKingdomManager().assignPlayerKingdom(player, kingdomName, true);
-        	//ChatUtil.sendNotice((Player) getSender(), "Successfully set player "+playerName+" to kingdom "+kingdomName);
-        	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEJOIN_NOTICE_SUCCESS.getMessage(playerName,kingdomName));
+        	int status = getKonquest().getKingdomManager().assignPlayerKingdom(player, kingdomName, true);
+        	if(status == 0) {
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEJOIN_NOTICE_SUCCESS.getMessage(playerName,kingdomName));
+			} else if(status == 2) {
+				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_LIMIT.getMessage(kingdomName));
+			} else if(status == 3) {
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage());
+			} else if(status == 4) {
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+			} else {
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			}
         }
     }
     
