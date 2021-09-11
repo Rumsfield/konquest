@@ -106,23 +106,27 @@ public class KingdomManager {
 	}
 	
 	public boolean removeKingdom(String name) {
-		KonKingdom oldKingdom = kingdomMap.remove(name);
-		if(oldKingdom != null) {
+		if(kingdomMap.containsKey(name)) {
+			KonKingdom kingdom = kingdomMap.get(name);
 			// Exile all members
-			for(KonPlayer member : konquest.getPlayerManager().getPlayersInKingdom(oldKingdom)) {
+			for(KonPlayer member : konquest.getPlayerManager().getPlayersInKingdom(kingdom)) {
 				exilePlayer(member,false,false);
 			}
 			// Remove all towns
-			for(KonTown town : oldKingdom.getTowns()) {
-				removeTown(town.getName(),oldKingdom.getName());
+			for(KonTown town : kingdom.getTowns()) {
+				removeTown(town.getName(),kingdom.getName());
 			}
-			// Remove capital
-			oldKingdom.getCapital().removeAllBarPlayers();
-			removeAllTerritory(oldKingdom.getCapital().getWorld(),oldKingdom.getCapital().getChunkList().keySet());
-			konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
-			oldKingdom = null;
-			ChatUtil.printDebug("Removed Kingdom "+name);
-			return true;
+			kingdom = null;
+			KonKingdom oldKingdom = kingdomMap.remove(name);
+			if(oldKingdom != null) {
+				// Remove capital
+				oldKingdom.getCapital().removeAllBarPlayers();
+				removeAllTerritory(oldKingdom.getCapital().getWorld(),oldKingdom.getCapital().getChunkList().keySet());
+				konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
+				oldKingdom = null;
+				ChatUtil.printDebug("Removed Kingdom "+name);
+				return true;
+			}
 		}
 		return false;
 	}
@@ -181,18 +185,29 @@ public class KingdomManager {
 			// Join kingdom is max_player_diff is disabled, or if the desired kingdom is within the max diff
 			if(config_max_player_diff == 0 || force ||
 					(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
-				//TODO: Remove player from any enemy town residencies
-				
+				// Remove player from any enemy towns
+				KonKingdom assignedKingdom = getKingdom(kingdomName);
+				Collection<KonKingdom> enemyKingdoms = kingdomMap.values();
+				enemyKingdoms.remove(assignedKingdom);
+				for(KonKingdom enemy : enemyKingdoms) {
+					for(KonTown town : enemy.getTowns()) {
+			    		if(town.removePlayerResident(player.getOfflineBukkitPlayer())) {
+			    			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_TOWN.getMessage(town.getName()));
+			    			konquest.getMapHandler().drawDynmapLabel(town);
+			    		}
+			    	}
+				}
+				// Remove any barbarian camps
 				konquest.getCampManager().removeCamp(player);
+				// Set kingdom
 				player.setKingdom(getKingdom(kingdomName));
 		    	player.setBarbarian(false);
+		    	// Teleport to capital
 		    	Location spawn = player.getKingdom().getCapital().getSpawnLoc();
-		    	Location destination = new Location(spawn.getWorld(),spawn.getX()+0.5,spawn.getY()+1.0,spawn.getZ()+0.5);
-		    	player.getBukkitPlayer().teleport(destination);
-		    	player.getBukkitPlayer().setBedSpawnLocation(destination, true);
+		    	konquest.telePlayerLocation(player.getBukkitPlayer(), spawn);
+		    	player.getBukkitPlayer().setBedSpawnLocation(spawn, true);
+		    	// Updates
 		    	getKingdom(kingdomName).getCapital().addBarPlayer(player);
-		    	//konquest.getPlayerManager().saveAllPlayers();
-		    	//konquest.getPlayerManager().updateAllSavedPlayers();
 		    	updateSmallestKingdom();
 		    	konquest.updateNamePackets(player);
 		    	konquest.getDirectiveManager().displayBook(player);
