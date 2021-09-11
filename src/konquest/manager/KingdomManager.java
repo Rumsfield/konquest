@@ -181,6 +181,8 @@ public class KingdomManager {
 			// Join kingdom is max_player_diff is disabled, or if the desired kingdom is within the max diff
 			if(config_max_player_diff == 0 || force ||
 					(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
+				//TODO: Remove player from any enemy town residencies
+				
 				konquest.getCampManager().removeCamp(player);
 				player.setKingdom(getKingdom(kingdomName));
 		    	player.setBarbarian(false);
@@ -358,11 +360,12 @@ public class KingdomManager {
 			// Verify valid monument template
 			if(getKingdom(kingdomName).getMonumentTemplate().isValid()) {
 				// Modify location to max Y at given X,Z
-				int xChunk = (loc.getBlockX() % 16);
-				int zChunk = (loc.getBlockZ() % 16);
+				Point point = konquest.toPoint(loc);
+				int xLocal = loc.getBlockX() - (point.x*16);
+				int zLocal = loc.getBlockZ() - (point.y*16);
 				Chunk chunk = loc.getChunk();
-				int yFloor = chunk.getChunkSnapshot(true, false, false).getHighestBlockYAt(xChunk, zChunk);
-				while((chunk.getBlock(xChunk, yFloor, zChunk).isPassable() || !chunk.getBlock(xChunk, yFloor, zChunk).getType().isOccluding()) && yFloor > 1) {
+				int yFloor = chunk.getChunkSnapshot(true, false, false).getHighestBlockYAt(xLocal, zLocal);
+				while((chunk.getBlock(xLocal, yFloor, zLocal).isPassable() || !chunk.getBlock(xLocal, yFloor, zLocal).getType().isOccluding()) && yFloor > 1) {
 					yFloor--;
 				}
 				loc.setY(yFloor);
