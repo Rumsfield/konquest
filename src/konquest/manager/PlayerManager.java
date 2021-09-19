@@ -115,9 +115,22 @@ public class PlayerManager {
 
     	// Create KonPlayer instance
     	if(isBarbarian) {
+    		// Player data has barbarian flag set true, create barbarian player
     		importedPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), true);
     	} else {
-    		importedPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getKingdom(kingdomName), false);
+    		// Player's barbarian flag is false, should belong to a kingdom
+    		KonKingdom playerKingdom = konquest.getKingdomManager().getKingdom(kingdomName);
+    		if(playerKingdom.equals(konquest.getKingdomManager().getBarbarians())) {
+    			// The player's kingdom is barbarians but barbarian flag is false
+    			// The player's kingdom was probably removed or changed names while offline
+    			// Override the barbarian flag to force the player into barbarians
+    			importedPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), true);
+    			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_FORCE_BARBARIAN.getMessage());
+    			ChatUtil.printDebug("Forced non-barbarian player with no kingdom to become a barbarian");
+    		} else {
+    			// The player has a valid kingdom and barbarian flag is false
+    			importedPlayer = new KonPlayer(bukkitPlayer, playerKingdom, false);
+    		}
     	}
     	
     	// Check if player has exceeded offline timeout

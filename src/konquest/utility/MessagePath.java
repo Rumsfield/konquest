@@ -132,6 +132,7 @@ public enum MessagePath {
 	GENERIC_NOTICE_QUEST                        (0, "generic.notice.quest"),
 	GENERIC_NOTICE_LOOT                         (0, "generic.notice.loot"),
 	GENERIC_NOTICE_ABSENT                       (0, "generic.notice.absent"),
+	GENERIC_NOTICE_FORCE_BARBARIAN              (0, "generic.notice.force-barbarian"),
 	GENERIC_ERROR_DENY_BARBARIAN                (0, "generic.error.deny-barbarian"),
 	GENERIC_ERROR_INTERNAL                      (0, "generic.error.internal"),
 	GENERIC_ERROR_INTERNAL_MESSAGE              (1, "generic.error.internal-message"),

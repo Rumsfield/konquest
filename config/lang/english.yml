@@ -145,7 +145,7 @@ generic:
     quest: "Quest complete"
     loot: "New town monument loot is available."
     absent: "You have been absent for too long and have been kicked from all towns."
-    settle-hint: "Settle Here"
+    force-barbarian: "You are now a barbarian!"
   error:
     deny-barbarian: "Barbarians cannot do this."
     internal: "Internal error, contact an admin."
