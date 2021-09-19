@@ -39,6 +39,7 @@ import konquest.manager.IntegrationManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.LanguageManager;
 import konquest.manager.LootManager;
+import konquest.manager.PlaceholderManager;
 import konquest.manager.PlayerManager;
 import konquest.manager.RuinManager;
 import konquest.manager.ShieldManager;
@@ -85,6 +86,7 @@ public class Konquest implements Timeable {
 	private RuinManager ruinManager;
 	private LanguageManager languageManager;
 	private MapHandler mapHandler;
+	private PlaceholderManager placeholderManager;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
@@ -130,6 +132,7 @@ public class Konquest implements Timeable {
 		ruinManager = new RuinManager(this);
 		languageManager = new LanguageManager(this);
 		mapHandler = new MapHandler(this);
+		placeholderManager = new PlaceholderManager(this);
 		
 		chatPriority = EventPriority.LOW;
 		worlds = new ArrayList<World>();
@@ -403,6 +406,10 @@ public class Konquest implements Timeable {
 	
 	public MapHandler getMapHandler() {
 		return mapHandler;
+	}
+	
+	public PlaceholderManager getPlaceholderManager() {
+		return placeholderManager;
 	}
 	
 	public long getOfflineTimeoutSeconds() {
