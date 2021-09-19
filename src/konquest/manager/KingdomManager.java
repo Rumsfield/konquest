@@ -148,6 +148,7 @@ public class KingdomManager {
 			for (KonTown town : kingdom.getTowns()) {
 				konquest.getMapHandler().drawDynmapUpdateTerritory(town);
 			}
+			konquest.getDatabaseThread().getDatabase().setOfflinePlayers(konquest.getPlayerManager().getAllPlayersInKingdom(kingdom));
 			return true;
 		}
 		return false;
