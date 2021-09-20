@@ -15,6 +15,7 @@
 #  accomplishment_prefix:           Enable the usage of accomplishment prefixes applied to player names (true/false)
 #  directive_quests:                Enable the "/k quest" command and built-in quest rewards (true/false)
 #  travel_wild_random_radius:       Radius in blocks from the center of the primary world for random wild travel (integer > 0)
+#  placeholder_request_limit:       Minimum time in seconds between placeholder requests, use lower values for faster update rates but more lag (0 to disable, integer >= 0)
 # chat:
 #     tag*:                         Text tag for all Konquest plugin messages. Use '' to disable. Use & for color codes. ('string')
 #     enable_format:                Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
@@ -140,6 +141,7 @@ core:
   accomplishment_prefix: true
   directive_quests: true
   travel_wild_random_radius: 1000
+  placeholder_request_limit: 30
   chat:
     tag: '&7[&6Konquest&7]&f '
     enable_format: true

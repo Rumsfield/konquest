@@ -7,16 +7,30 @@ import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
+import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
+//TODO: Add enums for each placeholder, implement list of players per-enum with request cooldown times.
+// A placeholder cannot be requested until after the cooldown time, configurable duration.
+// Cooldown time applies to every placeholder.
+// Previous placeholder result is cached and returned for requests made before cooldown time ends.
 public class PlaceholderManager {
 
+	private Konquest konquest;
 	private PlayerManager playerManager;
 	private KingdomManager kingdomManager;
+	private int cooldownSeconds;
 	
 	public PlaceholderManager(Konquest konquest) {
-		playerManager = konquest.getPlayerManager();
-		kingdomManager = konquest.getKingdomManager();
+		this.konquest = konquest;
+		this.playerManager = konquest.getPlayerManager();
+		this.kingdomManager = konquest.getKingdomManager();
+		this.cooldownSeconds = 0;
+	}
+	
+	public void initialize() {
+		cooldownSeconds = konquest.getConfigManager().getConfig("core").getInt("core.placeholder_request_limit",0);
+		ChatUtil.printDebug("Placeholder Manager is ready with cooldown seconds: "+cooldownSeconds);
 	}
 	
 	private String boolean2Lang(boolean val) {
@@ -26,6 +40,10 @@ public class PlaceholderManager {
  		}
  		return result;
  	}
+	
+	/*
+	 * Placeholder Requesters
+	 */
 	
 	public String getKingdom(Player player) {
 		String result = "";

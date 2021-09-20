@@ -213,6 +213,7 @@ public class Konquest implements Timeable {
 		directiveManager.initialize();
 		upgradeManager.initialize();
 		shieldManager.initialize();
+		placeholderManager.initialize();
 		offlineTimeoutSeconds = (long)(configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)*86400);
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;
