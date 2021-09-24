@@ -283,7 +283,7 @@ public class KonquestDB extends Database{
         	} else {
         		enablePrefix = false;
         	}
-            if(!prefixStatus) {
+            if(!prefixStatus && konquest.getAccomplishmentManager().isEnabled()) {
             	ChatUtil.printDebug("Failed to assign main prefix or custom prefix to player "+bukkitPlayer.getName());
     			// Schedule messages to display after 20-tick delay (1 second)
     	    	Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
