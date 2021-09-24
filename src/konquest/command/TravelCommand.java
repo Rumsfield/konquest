@@ -114,8 +114,13 @@ public class TravelCommand extends CommandBase {
         	} else if(travelName.equalsIgnoreCase("wild")) {
         		// Travel to random wild location
         		int radius = getKonquest().getConfigManager().getConfig("core").getInt("core.travel_wild_random_radius",200);
-        		travelLoc = getKonquest().getRandomWildLocation(radius*2,bukkitWorld);
-        		destination = TravelDestination.WILD;
+        		if(radius <= 0) {
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+                    return;
+        		} else {
+        			travelLoc = getKonquest().getRandomWildLocation(radius*2,bukkitWorld);
+            		destination = TravelDestination.WILD;
+        		}
         	} else {
         		// Travel to town
         		if(player.isBarbarian()) {
