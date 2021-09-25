@@ -66,6 +66,9 @@ public class AdminCommand extends CommandBase {
                 case REMOVETOWN:
                     new RemoveTownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
                     break;
+                case REMOVECAMP:
+                    new RemoveCampAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+                    break;
                 case RENAME:
                     new RenameAdminCommand(getKonquest(), getSender(), getArgs()).execute();
                     break;
@@ -152,6 +155,9 @@ public class AdminCommand extends CommandBase {
                     break;
                 case REMOVETOWN:
                 	tabList.addAll(new RemoveTownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+                    break;
+                case REMOVECAMP:
+                	tabList.addAll(new RemoveCampAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
                     break;
                 case RENAME:
                 	tabList.addAll(new RenameAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
