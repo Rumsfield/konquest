@@ -232,7 +232,7 @@ public class PlayerListener implements Listener{
 	            
 	            if(player.isGlobalChat()) {
 	            	//Global chat, all players see this format
-	            	ChatUtil.printConsole(ChatColor.GOLD+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
 	            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
 	            		ChatColor teamColor = ChatColor.WHITE;
 	            		ChatColor titleColor = ChatColor.WHITE;
@@ -260,7 +260,7 @@ public class PlayerListener implements Listener{
 	            	}
 	            } else {
 	            	//Team chat only (and admins)
-	            	ChatUtil.printConsole(ChatColor.GOLD+"[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + "[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
 	            	for(KonPlayer teamPlayer : playerManager.getPlayersOnline()) {
 	            		if(teamPlayer.getKingdom().equals(kingdom)) {
 	            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC+ChatColor.GREEN + event.getMessage());
