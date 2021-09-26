@@ -96,6 +96,7 @@ public class Konquest implements Timeable {
     private boolean isPacketSendEnabled;
 	
 	private EventPriority chatPriority;
+	private static final EventPriority defaultChatPriority = EventPriority.HIGH;
     private List<World> worlds;
     private boolean isWhitelist;
 	public List<String> opStatusMessages;
@@ -134,7 +135,7 @@ public class Konquest implements Timeable {
 		mapHandler = new MapHandler(this);
 		placeholderManager = new PlaceholderManager(this);
 		
-		chatPriority = EventPriority.LOW;
+		chatPriority = defaultChatPriority;
 		worlds = new ArrayList<World>();
 		isWhitelist = false;
 		opStatusMessages = new ArrayList<String>();
@@ -230,7 +231,7 @@ public class Konquest implements Timeable {
 		compassTimer.setTime(30); // 30 second compass update interval
 		compassTimer.startLoopTimer();
 		// Set chat even priority
-		chatPriority = getEventPriority(configManager.getConfig("core").getString("core.chat.priority","low"));
+		chatPriority = getEventPriority(configManager.getConfig("core").getString("core.chat.priority","HIGH"));
 		// Update kingdom stuff
 		kingdomManager.updateSmallestKingdom();
 		kingdomManager.updateAllTownDisabledUpgrades();
@@ -1143,10 +1144,10 @@ public class Konquest implements Timeable {
 	}
     
     public static EventPriority getEventPriority(String priority) {
-    	EventPriority result = EventPriority.LOW;
+    	EventPriority result = defaultChatPriority;
     	if(priority != null) {
     		try {
-    			result = EventPriority.valueOf(priority);
+    			result = EventPriority.valueOf(priority.toUpperCase());
     		} catch(IllegalArgumentException e) {
     			// do nothing
     		}

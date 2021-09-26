@@ -160,6 +160,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.LOWEST)
     public void onAsyncPlayerChatLowest(AsyncPlayerChatEvent event) {
     	if(konquest.getChatPriority().equals(EventPriority.LOWEST)) {
+    		ChatUtil.printDebug("Using chat event priority LOWEST");
     		onAsyncPlayerChat(event);
     	}
     }
@@ -167,6 +168,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.LOW)
     public void onAsyncPlayerChatLow(AsyncPlayerChatEvent event) {
     	if(konquest.getChatPriority().equals(EventPriority.LOW)) {
+    		ChatUtil.printDebug("Using chat event priority LOW");
     		onAsyncPlayerChat(event);
     	}
     }
@@ -174,6 +176,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onAsyncPlayerChatNormal(AsyncPlayerChatEvent event) {
     	if(konquest.getChatPriority().equals(EventPriority.NORMAL)) {
+    		ChatUtil.printDebug("Using chat event priority NORMAL");
     		onAsyncPlayerChat(event);
     	}
     }
@@ -181,6 +184,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.HIGH)
     public void onAsyncPlayerChatHigh(AsyncPlayerChatEvent event) {
     	if(konquest.getChatPriority().equals(EventPriority.HIGH)) {
+    		ChatUtil.printDebug("Using chat event priority HIGH");
     		onAsyncPlayerChat(event);
     	}
     }
@@ -188,6 +192,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onAsyncPlayerChatHighest(AsyncPlayerChatEvent event) {
     	if(konquest.getChatPriority().equals(EventPriority.HIGHEST)) {
+    		ChatUtil.printDebug("Using chat event priority HIGHEST");
     		onAsyncPlayerChat(event);
     	}
     }
