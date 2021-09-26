@@ -420,10 +420,13 @@ public class EntityListener implements Listener {
 	        	KonTerritory territory = kingdomManager.getChunkTerritory(damageLoc);
 	        	
 	        	if(territory instanceof KonCapital) {
-	        		// Block all entity damage in capitals
-	        		ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-	        		event.setCancelled(true);
-					return;
+	        		boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
+	        		// Block all entity damage in capitals optionally
+	        		if(!isCapitalUseEnabled) {
+		        		ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+		        		event.setCancelled(true);
+						return;
+	        		}
 	        	}
 	        	
 	        	if(territory instanceof KonTown) {
