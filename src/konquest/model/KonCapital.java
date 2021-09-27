@@ -28,6 +28,7 @@ public class KonCapital extends KonTerritory{
 	
 	public void updateName() {
 		setName(getKingdom().getName()+" "+getKonquest().getConfigManager().getConfig("core").getString("core.kingdoms.capital_suffix"));
+		capitalBarAll.setTitle(ChatColor.GOLD+getName());
 	}
 	
 	@Override
