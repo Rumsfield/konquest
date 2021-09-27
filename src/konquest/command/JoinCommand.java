@@ -69,6 +69,10 @@ public class JoinCommand extends CommandBase {
         				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_LIMIT.getMessage(joinName));
         			} else if(status == 3) {
         				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage());
+        			} else if(status == 4) {
+        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+        			} else {
+        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
         			}
         		} else if(isAllowSwitch || getKonquest().getKingdomManager().getBarbarians().equals(player.getExileKingdom())) {
         			// Allow barbarians to join any kingdom when they're new (exile kingdom = barbarians) or if switching is allowed in config
@@ -83,6 +87,10 @@ public class JoinCommand extends CommandBase {
         				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_LIMIT.getMessage(joinName));
         			} else if(status == 3) {
         				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage());
+        			} else if(status == 4) {
+        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+        			} else {
+        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
         			}
         		} else {
         			//ChatUtil.sendError((Player) getSender(), "You cannot join that Kingdom. Ask an admin to move you.");

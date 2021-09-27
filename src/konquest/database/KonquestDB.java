@@ -171,6 +171,28 @@ public class KonquestDB extends Database{
     	return players;
     }
     
+    public void setOfflinePlayers(ArrayList<KonOfflinePlayer> offlinePlayers) {
+    	for(KonOfflinePlayer offlinePlayer : offlinePlayers) {
+    		setOfflinePlayer(offlinePlayer);
+    	}
+    }
+    
+    public void setOfflinePlayer(KonOfflinePlayer offlinePlayer) {
+		if(konquest.getPlayerManager().isPlayerExist(offlinePlayer.getOfflineBukkitPlayer())) {
+			String playerUUIDString = offlinePlayer.getOfflineBukkitPlayer().getUniqueId().toString();
+	        String[] col;
+	        String[] val;
+	        // Flush player data into players table
+	        col  = new String[] {"kingdom","barbarian"};
+	        val  = new String[col.length];
+	        val[0] = "'"+offlinePlayer.getKingdom().getName()+"'";
+	        val[1] = offlinePlayer.isBarbarian() ? "1" : "0";
+	        set("players", col, val, "uuid", playerUUIDString);
+		} else {
+			ChatUtil.printDebug("Failed to flush non-existent offlinePlayer to database");
+		}
+    }
+    
     public void fetchPlayerData(Player bukkitPlayer) {
     	KonPlayer player;
         if (!exists("players", "uuid", bukkitPlayer.getUniqueId().toString())) {
@@ -261,7 +283,7 @@ public class KonquestDB extends Database{
         	} else {
         		enablePrefix = false;
         	}
-            if(!prefixStatus) {
+            if(!prefixStatus && konquest.getAccomplishmentManager().isEnabled()) {
             	ChatUtil.printDebug("Failed to assign main prefix or custom prefix to player "+bukkitPlayer.getName());
     			// Schedule messages to display after 20-tick delay (1 second)
     	    	Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {

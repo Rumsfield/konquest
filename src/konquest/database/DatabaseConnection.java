@@ -89,7 +89,6 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -105,6 +104,7 @@ public class DatabaseConnection {
             statement.executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace();
+            ChatUtil.printConsoleError("Failed to execute SQL update, is the connection closed?");
         } finally {
             try {
                 if (statement != null) {
@@ -112,6 +112,7 @@ public class DatabaseConnection {
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
+                ChatUtil.printConsoleError("Failed to execute SQL update, is the connection closed?");
             }
         }
     }
@@ -126,6 +127,7 @@ public class DatabaseConnection {
             result = statement.executeQuery(query);
         } catch (SQLException e) {
             e.printStackTrace();
+            ChatUtil.printConsoleError("Failed to execute SQL query, is the connection closed?");
         } finally {
             try {
                 if (statement != null) {
@@ -133,6 +135,7 @@ public class DatabaseConnection {
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
+                ChatUtil.printConsoleError("Failed to execute SQL query, is the connection closed?");
             }
         }
     	return result;
@@ -147,6 +150,7 @@ public class DatabaseConnection {
             return connection.prepareStatement(sql);
         } catch (SQLException e) {
             e.printStackTrace();
+            ChatUtil.printConsoleError("Failed to prepare SQL statement, is the connection closed?");
         }
 
         return null;
@@ -159,8 +163,10 @@ public class DatabaseConnection {
             return futureResult.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            ChatUtil.printConsoleError("Failed to schedule SQL query, is the connection closed?");
         } catch (ExecutionException e) {
             e.printStackTrace();
+            ChatUtil.printConsoleError("Failed to schedule SQL query, is the connection closed?");
         }
 
         return null;
@@ -178,12 +184,14 @@ public class DatabaseConnection {
             statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
+            ChatUtil.printConsoleError("Failed to ping SQL database, is the connection closed?");
         } finally {
             if (statement != null) {
                 try {
                     statement.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
+                    ChatUtil.printConsoleError("Failed to ping SQL database, is the connection closed?");
                 }
             }
         }

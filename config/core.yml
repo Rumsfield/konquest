@@ -14,12 +14,13 @@
 #  community_link:                  URL which will appear in the /k community link icon (string)
 #  accomplishment_prefix:           Enable the usage of accomplishment prefixes applied to player names (true/false)
 #  directive_quests:                Enable the "/k quest" command and built-in quest rewards (true/false)
-#  travel_wild_random_radius:       Radius in blocks from the center of the primary world for random wild travel (integer > 0)
-# chat:
+#  travel_wild_random_radius:       Radius in blocks from the center of the primary world for random wild travel (0 to disable, integer >= 0)
+#  placeholder_request_limit:       Minimum time in seconds between placeholder requests, use lower values for faster update rates but more lag (0 to disable, integer >= 0)
+#  chat:
 #     tag*:                         Text tag for all Konquest plugin messages. Use '' to disable. Use & for color codes. ('string')
 #     enable_format:                Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
 #     use_kingdom:                  Use a player's kingdom name as a part of their chat message (true/false)
-#     priority:                     Set the priority of Konquest's chat message formatting. Set to low to allow other plugins to modify chat first (lowest, low, normal, high, highest)
+#     priority:                     Set the priority of Konquest's chat message formatting. Set to low to allow other plugins to modify chat first (LOWEST, LOW, NORMAL, HIGH, HIGHEST)
 #  database:
 #      connection:                  Database connection type (sqlite or mysql)
 #      mysql:
@@ -37,6 +38,7 @@
 #    capital_suffix*:               Suffix to be appended to Kingdom names which will be the name of the Capital city (string)
 #    capital_pvp:                   Allow player damage in capitals (true/false)
 #    capital_use:                   Allow players to interact with blocks and containers in capitals (true/false)
+#    capital_build:                 Allow players to build inside of capitals (true/false)
 #    protect_containers_use:        Prevent players in other kingdoms using containers in claimed land (true/false)
 #    protect_containers_break:      Prevent players in other kingdoms breaking containers in claimed land (true/false)
 #    no_enemy_enter:                Prevent enemy players from entering Kingdom Capitals (true/false)
@@ -140,11 +142,12 @@ core:
   accomplishment_prefix: true
   directive_quests: true
   travel_wild_random_radius: 1000
+  placeholder_request_limit: 30
   chat:
     tag: '&7[&6Konquest&7]&f '
     enable_format: true
     use_kingdom: true
-    priority: low
+    priority: HIGH
   database:
     connection: sqlite
     mysql:
@@ -153,7 +156,7 @@ core:
       database: example_database
       username: example_user
       password: example_password
-      properties: []
+      properties: ["autoReconnect=true","useSSL=false"]
   integration:
     quickshop: false
     luckperms: false
@@ -162,6 +165,7 @@ core:
     capital_suffix: Capital
     capital_pvp: false
     capital_use: false
+    capital_build: false
     protect_containers_use: true
     protect_containers_break: true
     no_enemy_enter: true

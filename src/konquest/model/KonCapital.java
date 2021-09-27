@@ -28,6 +28,7 @@ public class KonCapital extends KonTerritory{
 	
 	public void updateName() {
 		setName(getKingdom().getName()+" "+getKonquest().getConfigManager().getConfig("core").getString("core.kingdoms.capital_suffix"));
+		capitalBarAll.setTitle(ChatColor.GOLD+getName());
 	}
 	
 	@Override
@@ -43,18 +44,30 @@ public class KonCapital extends KonTerritory{
 	}
 	
 	public void addBarPlayer(KonPlayer player) {
+		if(capitalBarAll == null) {
+			return;
+		}
 		capitalBarAll.addPlayer(player.getBukkitPlayer());
 	}
 	
 	public void removeBarPlayer(KonPlayer player) {
+		if(capitalBarAll == null) {
+			return;
+		}
 		capitalBarAll.removePlayer(player.getBukkitPlayer());
 	}
 	
 	public void removeAllBarPlayers() {
+		if(capitalBarAll == null) {
+			return;
+		}
 		capitalBarAll.removeAll();
 	}
 	
 	public void updateBarPlayers() {
+		if(capitalBarAll == null) {
+			return;
+		}
 		capitalBarAll.removeAll();
 		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
 			Player bukkitPlayer = player.getBukkitPlayer();

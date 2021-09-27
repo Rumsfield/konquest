@@ -11,6 +11,7 @@ public enum AdminCommandType {
 	UNCLAIM			("",																	MessagePath.DESCRIPTION_ADMIN_UNCLAIM.getMessage()),
 	REMOVEKINGDOM	("<kingdom>",															MessagePath.DESCRIPTION_ADMIN_REMOVEKINGDOM.getMessage()),
 	REMOVETOWN		("<kingdom> <town>",													MessagePath.DESCRIPTION_ADMIN_REMOVETOWN.getMessage()),
+	REMOVECAMP		("<player>",															MessagePath.DESCRIPTION_ADMIN_REMOVECAMP.getMessage()),
 	MONUMENT		("<kingdom> create|remove|show",										MessagePath.DESCRIPTION_ADMIN_MONUMENT.getMessage()),
 	LIST			("kingdoms|towns|all",						   		 					MessagePath.DESCRIPTION_ADMIN_LIST.getMessage()),
 	FORCECAPTURE	("<town> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_FORCECAPTURE.getMessage()),

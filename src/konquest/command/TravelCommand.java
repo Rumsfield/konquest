@@ -114,8 +114,13 @@ public class TravelCommand extends CommandBase {
         	} else if(travelName.equalsIgnoreCase("wild")) {
         		// Travel to random wild location
         		int radius = getKonquest().getConfigManager().getConfig("core").getInt("core.travel_wild_random_radius",200);
-        		travelLoc = getKonquest().getRandomWildLocation(radius*2,bukkitWorld);
-        		destination = TravelDestination.WILD;
+        		if(radius <= 0) {
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+                    return;
+        		} else {
+        			travelLoc = getKonquest().getRandomWildLocation(radius*2,bukkitWorld);
+            		destination = TravelDestination.WILD;
+        		}
         	} else {
         		// Travel to town
         		if(player.isBarbarian()) {
@@ -205,8 +210,13 @@ public class TravelCommand extends CommandBase {
 	    	    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TRAVEL_NOTICE_TOWN_TRAVEL.getMessage(bukkitPlayer.getName(),town.getName()));
 	    	    			}
 	    	    		}
+	            		Location pLoc = bukkitPlayer.getLocation();
+	            		Location tLoc = town.getSpawnLoc();
+	            		Location dest = new Location(tLoc.getWorld(),tLoc.getX(),tLoc.getY(),tLoc.getZ(),pLoc.getYaw(),pLoc.getPitch());
+	            		getKonquest().telePlayerLocation(bukkitPlayer, dest);
+        			} else {
+        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
         			}
-        			getKonquest().telePlayerTerritory(bukkitPlayer, town);
         			break;
         		case WILD:
         			getKonquest().telePlayerLocation(bukkitPlayer, travelLoc);

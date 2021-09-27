@@ -160,6 +160,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.LOWEST)
     public void onAsyncPlayerChatLowest(AsyncPlayerChatEvent event) {
     	if(konquest.getChatPriority().equals(EventPriority.LOWEST)) {
+    		//ChatUtil.printDebug("Using chat event priority LOWEST");
     		onAsyncPlayerChat(event);
     	}
     }
@@ -167,6 +168,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.LOW)
     public void onAsyncPlayerChatLow(AsyncPlayerChatEvent event) {
     	if(konquest.getChatPriority().equals(EventPriority.LOW)) {
+    		//ChatUtil.printDebug("Using chat event priority LOW");
     		onAsyncPlayerChat(event);
     	}
     }
@@ -174,6 +176,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onAsyncPlayerChatNormal(AsyncPlayerChatEvent event) {
     	if(konquest.getChatPriority().equals(EventPriority.NORMAL)) {
+    		//ChatUtil.printDebug("Using chat event priority NORMAL");
     		onAsyncPlayerChat(event);
     	}
     }
@@ -181,6 +184,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.HIGH)
     public void onAsyncPlayerChatHigh(AsyncPlayerChatEvent event) {
     	if(konquest.getChatPriority().equals(EventPriority.HIGH)) {
+    		//ChatUtil.printDebug("Using chat event priority HIGH");
     		onAsyncPlayerChat(event);
     	}
     }
@@ -188,6 +192,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onAsyncPlayerChatHighest(AsyncPlayerChatEvent event) {
     	if(konquest.getChatPriority().equals(EventPriority.HIGHEST)) {
+    		//ChatUtil.printDebug("Using chat event priority HIGHEST");
     		onAsyncPlayerChat(event);
     	}
     }
@@ -227,7 +232,7 @@ public class PlayerListener implements Listener{
 	            
 	            if(player.isGlobalChat()) {
 	            	//Global chat, all players see this format
-	            	ChatUtil.printConsole(ChatColor.GOLD+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
 	            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
 	            		ChatColor teamColor = ChatColor.WHITE;
 	            		ChatColor titleColor = ChatColor.WHITE;
@@ -255,7 +260,7 @@ public class PlayerListener implements Listener{
 	            	}
 	            } else {
 	            	//Team chat only (and admins)
-	            	ChatUtil.printConsole(ChatColor.GOLD+"[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + "[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
 	            	for(KonPlayer teamPlayer : playerManager.getPlayersOnline()) {
 	            		if(teamPlayer.getKingdom().equals(kingdom)) {
 	            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC+ChatColor.GREEN + event.getMessage());
@@ -574,14 +579,19 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
     	
+    	Entity clicked = event.getRightClicked();
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
         
         if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
         	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation());
+        	
+        	ChatUtil.printDebug("Player interacted at entity of type: "+clicked.getType().toString());
+        	boolean isEntityAllowed = (clicked.getType().equals(EntityType.PLAYER));
+        	
         	// Capital protections...
         	boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
-        	if(territory instanceof KonCapital && !isCapitalUseEnabled) {
+        	if(territory instanceof KonCapital && !isCapitalUseEnabled && !isEntityAllowed) {
     			//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in the Kingdom Capital", ChatColor.DARK_RED);
     			//ChatUtil.printDebug("EVENT player interaction within capital");
 				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -589,7 +599,7 @@ public class PlayerListener implements Listener{
     			return;
     		}
         	// Town protections...
-    		if(territory instanceof KonTown) {
+    		if(territory instanceof KonTown && !isEntityAllowed) {
     			KonTown town = (KonTown) territory;
     			//ChatUtil.printDebug("EVENT player entity interaction within town "+town.getName());
     			// Prevent enemies and non-residents from interacting with entities
