@@ -142,7 +142,7 @@ core:
   accomplishment_prefix: true
   directive_quests: true
   travel_wild_random_radius: 1000
-  placeholder_request_limit: 30
+  placeholder_request_limit: 60
   chat:
     tag: '&7[&6Konquest&7]&f '
     enable_format: true
