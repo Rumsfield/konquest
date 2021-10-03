@@ -1477,7 +1477,7 @@ public class KingdomManager {
 				int y_max;
 				double y_mod;
 				final int Y_MIN_LIMIT = 1;
-				final int Y_MAX_LIMIT = 256;
+				final int Y_MAX_LIMIT = 255;
 				final double X_MOD = 0.5;
 				final double Y_MOD = 1;
 				final double Y_MOD_SNOW = 1.1;
@@ -1491,6 +1491,8 @@ public class KingdomManager {
 					y_max = 0;
 					for(int x = 0;x<16;x++) {
 						y_max = chunkSnap.getHighestBlockYAt(x, z_fixed);
+						y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
+						y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
 						while((chunk.getBlock(x, y_max, z_fixed).isPassable() || !chunk.getBlock(x, y_max, z_fixed).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
 							y_max--;
 						}
@@ -1519,6 +1521,8 @@ public class KingdomManager {
 					y_max = 0;
 					for(int x = 0;x<16;x++) {
 						y_max = chunkSnap.getHighestBlockYAt(x, z_fixed);
+						y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
+						y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
 						while((chunk.getBlock(x, y_max, z_fixed).isPassable() || !chunk.getBlock(x, y_max, z_fixed).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
 							y_max--;
 						}
@@ -1547,6 +1551,8 @@ public class KingdomManager {
 					y_max = 0;
 					for(int z = 0;z<16;z++) {
 						y_max = chunkSnap.getHighestBlockYAt(x_fixed, z);
+						y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
+						y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
 						while((chunk.getBlock(x_fixed, y_max, z).isPassable() || !chunk.getBlock(x_fixed, y_max, z).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
 							y_max--;
 						}
@@ -1575,6 +1581,8 @@ public class KingdomManager {
 					y_max = 0;
 					for(int z = 0;z<16;z++) {
 						y_max = chunkSnap.getHighestBlockYAt(x_fixed, z);
+						y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
+						y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
 						while((chunk.getBlock(x_fixed, y_max, z).isPassable() || !chunk.getBlock(x_fixed, y_max, z).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
 							y_max--;
 						}
