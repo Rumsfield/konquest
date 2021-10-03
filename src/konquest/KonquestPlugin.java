@@ -246,18 +246,35 @@ public class KonquestPlugin extends JavaPlugin {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public static EconomyResponse depositPlayer(OfflinePlayer offlineBukkitPlayer, double amount) {
-		EconomyResponse result;
+	public static boolean depositPlayer(Player bukkitPlayer, double amount) {
+		boolean result = false;
+		// Perform transaction
+		EconomyResponse resp = null;
 		try {
-			result = econ.depositPlayer(offlineBukkitPlayer, amount);
+			resp = econ.depositPlayer(bukkitPlayer, amount);
 		} catch(Exception e) {
 			ChatUtil.printDebug("Failed to deposit using Player: "+e.getMessage());
 			try {
-				result = econ.depositPlayer(offlineBukkitPlayer.getName(), amount);
+				resp = econ.depositPlayer(bukkitPlayer.getName(), amount);
 			} catch(Exception x) {
 				ChatUtil.printDebug("Failed to deposit using Name: "+x.getMessage());
-				result = econ.depositPlayer(formatStringForAConomyPlugin(offlineBukkitPlayer), amount);
+				resp = econ.depositPlayer(formatStringForAConomyPlugin(bukkitPlayer), amount);
 			}
+		}
+		// Send message
+		if(resp != null) {
+			if(resp.transactionSuccess()) {
+	        	//String balanceF = String.format("%.2f",resp.balance);
+	        	//String amountF = String.format("%.2f",resp.amount);
+	        	String balanceF = econ.format(resp.balance);
+				String amountF = econ.format(resp.amount);
+	        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REWARD_FAVOR.getMessage(amountF,balanceF));
+	        	result = true;
+	        } else {
+	        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(resp.errorMessage));
+	        }
+		} else {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 		}
 		return result;
 	}
