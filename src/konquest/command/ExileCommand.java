@@ -6,7 +6,7 @@ import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timer;
-import net.milkbowl.vault.economy.EconomyResponse;
+//import net.milkbowl.vault.economy.EconomyResponse;
 
 import java.util.Collections;
 import java.util.List;
@@ -81,15 +81,7 @@ public class ExileCommand extends CommandBase {
             			boolean doRemoveFavor = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.remove_favor", true);
             			if(doRemoveFavor) {
 	            			double balance = KonquestPlugin.getBalance(bukkitPlayer);
-	                    	EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, balance);
-	        	            if(r.transactionSuccess()) {
-	        	            	String balanceF = String.format("%.2f",r.balance);
-	    		            	String amountF = String.format("%.2f",r.amount);
-	    		            	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
-	        	            } else {
-	        	            	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
-	        	            	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
-	        	            }
+	            			KonquestPlugin.withdrawPlayer(bukkitPlayer, balance);
             			}
                     	//ChatUtil.sendNotice((Player) getSender(), ChatColor.GRAY+"You have been exiled as a "+ChatColor.DARK_RED+"Barbarian"+ChatColor.GRAY+", place a bed to create your Camp.");
                     	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_CONFIRMED.getMessage());

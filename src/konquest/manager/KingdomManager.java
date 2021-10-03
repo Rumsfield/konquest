@@ -9,9 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-//import java.util.concurrent.ScheduledThreadPoolExecutor;
-
-import net.milkbowl.vault.economy.EconomyResponse;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -690,16 +687,8 @@ public class KingdomManager {
     	}
     	// Reduce the player's favor
 		if(cost > 0 && claimStatus == 0) {
-        	EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, cost);
-            if(r.transactionSuccess()) {
-            	String balanceF = String.format("%.2f",r.balance);
-            	String amountF = String.format("%.2f",r.amount);
-            	//ChatUtil.sendNotice(bukkitPlayer, "Favor reduced by "+amountF+", total: "+balanceF);
-            	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+            if(KonquestPlugin.withdrawPlayer(bukkitPlayer, cost)) {
             	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)cost);
-            } else {
-            	//ChatUtil.sendError(bukkitPlayer, String.format("An error occured: %s", r.errorMessage));
-            	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
             }
 		}
 		return claimStatus == 0;
@@ -818,16 +807,8 @@ public class KingdomManager {
     	// Reduce the player's favor
 		if(cost > 0 && numChunksClaimed > 0) {
 			double finalCost = numChunksClaimed*cost;
-	    	EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, finalCost);
-	        if(r.transactionSuccess()) {
-	        	String balanceF = String.format("%.2f",r.balance);
-	        	String amountF = String.format("%.2f",r.amount);
-	        	//ChatUtil.sendNotice(bukkitPlayer, "Favor reduced by "+amountF+", total: "+balanceF);
-	        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+	        if(KonquestPlugin.withdrawPlayer(bukkitPlayer, finalCost)) {
 	        	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)finalCost);
-	        } else {
-	        	//ChatUtil.sendError(bukkitPlayer, String.format("An error occured: %s", r.errorMessage));
-	        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
 	        }
 		}
 		return true;

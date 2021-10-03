@@ -25,7 +25,6 @@ import konquest.model.KonStats;
 import konquest.model.KonStatsType;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 /**
  * 
@@ -323,18 +322,8 @@ public class AccomplishmentManager {
 		        	if(KonquestPlugin.getBalance(player.getBukkitPlayer()) < cost) {
 						// player is too poor
 		        		ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
-					} else {
-						EconomyResponse r = KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), cost);
-			            if(r.transactionSuccess()) {
-			            	String balanceF = String.format("%.2f",r.balance);
-			            	String amountF = String.format("%.2f",r.amount);
-			            	//ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
-			            	ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
-			            	checkPassed = true;
-			            } else {
-			            	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
-			            	ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
-			            }
+					} else if(KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), cost)) {
+			            checkPassed = true;
 					}
 	        	} else {
 					// it's free!

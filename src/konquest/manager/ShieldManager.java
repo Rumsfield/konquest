@@ -19,7 +19,6 @@ import konquest.model.KonStatsType;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 public class ShieldManager {
 
@@ -208,16 +207,10 @@ public class ShieldManager {
 		
 		// Withdraw cost
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-		EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost);
-        if(r.transactionSuccess()) {
-        	String balanceF = String.format("%.2f",r.balance);
-        	String amountF = String.format("%.2f",r.amount);
-        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+        if(KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost)) {
         	if(player != null) {
         		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)requiredCost);
         	}
-        } else {
-        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
         }
 		return true;
 	}
@@ -271,16 +264,10 @@ public class ShieldManager {
 		
 		// Withdraw cost
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-		EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost);
-        if(r.transactionSuccess()) {
-        	String balanceF = String.format("%.2f",r.balance);
-        	String amountF = String.format("%.2f",r.amount);
-        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+        if(KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost)) {
         	if(player != null) {
         		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)requiredCost);
         	}
-        } else {
-        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
         }
 		return true;
 	}
