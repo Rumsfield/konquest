@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 
-import org.bukkit.ChatColor;
+//import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
@@ -282,13 +282,13 @@ public class PlaceholderManager {
 		if(now.after(new Date(topScoreCooldownTime))) {
 			// The cooldown time is over
 			// Create ranked list of kingdoms
-			KonPlayer onlinePlayer = playerManager.getPlayer(player);
+			//KonPlayer onlinePlayer = playerManager.getPlayer(player);
 			topScoreList = new ArrayList<Ranked>();
 			for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
 				String kingdomName = kingdom.getName();
-				if(onlinePlayer != null && onlinePlayer.getKingdom().equals(kingdom)) {
-					kingdomName = ChatColor.GREEN+kingdomName;
-				}
+				//if(onlinePlayer != null && onlinePlayer.getKingdom().equals(kingdom)) {
+				//	kingdomName = ChatColor.GREEN+kingdomName;
+				//}
 				topScoreList.add(new Ranked(kingdomName, kingdomManager.getKingdomScore(kingdom)));
 			}
 			// Sort the list by value
@@ -309,13 +309,13 @@ public class PlaceholderManager {
 		if(now.after(new Date(topTownCooldownTime))) {
 			// The cooldown time is over
 			// Create ranked list of kingdoms
-			KonPlayer onlinePlayer = playerManager.getPlayer(player);
+			//KonPlayer onlinePlayer = playerManager.getPlayer(player);
 			topTownList = new ArrayList<Ranked>();
 			for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
 				String kingdomName = kingdom.getName();
-				if(onlinePlayer != null && onlinePlayer.getKingdom().equals(kingdom)) {
-					kingdomName = ChatColor.GREEN+kingdomName;
-				}
+				//if(onlinePlayer != null && onlinePlayer.getKingdom().equals(kingdom)) {
+				//	kingdomName = ChatColor.GREEN+kingdomName;
+				//}
 				topTownList.add(new Ranked(kingdomName, kingdom.getTowns().size()));
 			}
 			// Sort the list by value
@@ -336,14 +336,14 @@ public class PlaceholderManager {
 		if(now.after(new Date(topLandCooldownTime))) {
 			// The cooldown time is over
 			// Create ranked list of kingdoms
-			KonPlayer onlinePlayer = playerManager.getPlayer(player);
+			//KonPlayer onlinePlayer = playerManager.getPlayer(player);
 			topLandList = new ArrayList<Ranked>();
 			for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
 				String kingdomName = kingdom.getName();
 				int kingdomLand = 0;
-				if(onlinePlayer != null && onlinePlayer.getKingdom().equals(kingdom)) {
-					kingdomName = ChatColor.GREEN+kingdomName;
-				}
+				//if(onlinePlayer != null && onlinePlayer.getKingdom().equals(kingdom)) {
+				//	kingdomName = ChatColor.GREEN+kingdomName;
+				//}
 				for(KonTown town : kingdom.getTowns()) {
 					kingdomLand += town.getChunkList().size();
 				}
