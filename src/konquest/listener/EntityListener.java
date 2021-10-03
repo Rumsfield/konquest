@@ -576,8 +576,8 @@ public class EntityListener implements Listener {
             KonPlayer victimPlayer = playerManager.getPlayer(victimBukkitPlayer);
             KonPlayer attackerPlayer = playerManager.getPlayer(attackerBukkitPlayer);
             
-            
-            boolean isCapitalDamageEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.captial_pvp");
+            // Check for protections for attacks within claimed territory
+            boolean isCapitalDamageEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_pvp", false);
             boolean isAttackInTerritory = konquest.getKingdomManager().isChunkClaimed(victimBukkitPlayer.getLocation());
             if(isAttackInTerritory) {
             	KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(victimBukkitPlayer.getLocation());
