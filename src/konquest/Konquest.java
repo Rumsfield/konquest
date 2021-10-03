@@ -445,15 +445,23 @@ public class Konquest implements Timeable {
 					long lastPlayedTime = player.getOfflineBukkitPlayer().getLastPlayed();
 					if(lastPlayedTime > 0 && now.after(new Date(lastPlayedTime + (offlineTimeoutSeconds*1000)))) {
 						// Offline player has exceeded timeout period, prune from residencies and camp
-						for(KonTown town : player.getKingdom().getTowns()) {
-							if(town.getPlayerResidents().contains(player.getOfflineBukkitPlayer())) {
-								boolean status = town.removePlayerResident(player.getOfflineBukkitPlayer());
-								ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from town "+town.getName()+" in kingdom "+player.getKingdom().getName()+", got "+status);
+						boolean doExile = configManager.getConfig("core").getBoolean("core.kingdoms.offline_timeout_exile",false);
+						if(!player.isBarbarian()) {
+							if(doExile) {
+								getKingdomManager().exileOfflinePlayer(player);
+							} else {
+								for(KonTown town : player.getKingdom().getTowns()) {
+									if(town.getPlayerResidents().contains(player.getOfflineBukkitPlayer())) {
+										boolean status = town.removePlayerResident(player.getOfflineBukkitPlayer());
+										ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from town "+town.getName()+" in kingdom "+player.getKingdom().getName()+", got "+status);
+									}
+								}
 							}
-						}
-						if(campManager.isCampSet(player)) {
-							campManager.removeCamp(player);
-							ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from camp");
+						} else {
+							if(campManager.isCampSet(player)) {
+								campManager.removeCamp(player);
+								ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from camp");
+							}
 						}
 					}
 				}

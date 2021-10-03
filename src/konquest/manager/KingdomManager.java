@@ -296,6 +296,27 @@ public class KingdomManager {
     	return true;
 	}
 	
+	public void exileOfflinePlayer(KonOfflinePlayer offlinePlayer) {
+		if(offlinePlayer.isBarbarian()) {
+    		return;
+    	}
+    	KonKingdom oldKingdom = offlinePlayer.getKingdom();
+    	offlinePlayer.setExileKingdom(oldKingdom);
+    	// Remove residency
+    	for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
+    		if(town.removePlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
+    			konquest.getMapHandler().drawDynmapLabel(town);
+    		}
+    	}
+    	// Make into barbarian
+    	offlinePlayer.setKingdom(getBarbarians());
+    	offlinePlayer.setBarbarian(true);
+    	// Update stuff
+    	konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
+    	updateSmallestKingdom();
+    	return;
+	}
+	
 	/**
 	 * addTown - Primary method for adding a town
 	 * @param loc - location of town center

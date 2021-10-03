@@ -47,7 +47,8 @@
 #    no_enemy_edit_offline_warmup:  Time in seconds when a Kingdom is protected from when the minimum player disconnects (integer >= 0)
 #    no_enemy_edit_offline_minimum: Number of players required for a Kingdom to be protected (integer >= 0)
 #    smallest_exp_boost_percent:    Percentage boost EXP gain for the smallest kingdom (0 to disable, 0 - 100)
-#    offline_timeout_days:          Time in days a player must be offline to be removed from their Kingdom (0 to disable, integer >= 0)
+#    offline_timeout_days:          Time in days a player must be offline to be inactive, and removed from towns and camps (0 to disable, integer >= 0)
+#    offline_timeout_exile:         Remove inactive players from their kingdoms and exile them as barbarians (true/false)
 #    golem_attack_enemies:          Force iron golems to attack enemy players (true/false)
 #    attack_friendly_golems:        Allow players to attack iron golems inside of friendly towns (true/false)
 #    max_player_diff:               Kingdoms with this many players more than other Kingdoms will not accept new players (0 to disable, integer >= 0)
@@ -175,6 +176,7 @@ core:
     no_enemy_edit_offline_minimum: 2
     smallest_exp_boost_percent: 25
     offline_timeout_days: 0
+    offline_timeout_exile: false
     golem_attack_enemies: true
     attack_friendly_golems: false
     max_player_diff: 4
