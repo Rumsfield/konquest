@@ -69,6 +69,7 @@ public class Konquest implements Timeable {
 	private KonquestPlugin plugin;
 	private static Konquest instance;
 	private static String chatTag;
+	private static String chatMessage;
 	
 	private DatabaseThread databaseThread;
 	private AccomplishmentManager accomplishmentManager;
@@ -116,6 +117,7 @@ public class Konquest implements Timeable {
 		this.plugin = plugin;
 		instance = this;
 		chatTag = "§7[§6Konquest§7]§f ";
+		chatMessage = "%KINGDOM% §7| %TITLE% %NAME% §7» ";
 		
 		databaseThread = new DatabaseThread(this);
 		accomplishmentManager = new AccomplishmentManager(this);
@@ -156,9 +158,6 @@ public class Konquest implements Timeable {
 		ChatUtil.printDebug("Debug is "+debug);
 		String worldName = configManager.getConfig("core").getString("core.world_name");
 		ChatUtil.printDebug("Primary world is "+worldName);
-		String configTag = configManager.getConfig("core").getString("core.chat.tag");
-		chatTag = ChatColor.translateAlternateColorCodes('&', configTag);
-		ChatUtil.printDebug("Chat tag is "+chatTag);
 		languageManager.initialize();
 		kingdomManager.initialize();
 		ruinManager.initialize();
@@ -206,6 +205,12 @@ public class Konquest implements Timeable {
 	}
 	
 	private void initManagers() {
+		String configTag = configManager.getConfig("core").getString("core.chat.tag");
+		chatTag = ChatUtil.parseHex(configTag);
+		ChatUtil.printDebug("Chat tag is "+chatTag);
+		String configMessage = configManager.getConfig("core").getString("core.chat.message");
+		chatMessage = ChatUtil.parseHex(configMessage);
+		ChatUtil.printDebug("Chat message is "+chatMessage);
 		integrationManager.initialize();
 		lootManager.initialize();
 		displayManager.initialize();
@@ -1165,6 +1170,10 @@ public class Konquest implements Timeable {
     
     public static String getChatTag() {
     	return chatTag;
+    }
+    
+    public static String getChatMessage() {
+    	return chatMessage;
     }
 	
 }

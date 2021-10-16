@@ -17,10 +17,10 @@
 #  travel_wild_random_radius:       Radius in blocks from the center of the primary world for random wild travel (0 to disable, integer >= 0)
 #  placeholder_request_limit:       Minimum time in seconds between placeholder requests, use lower values for faster update rates but more lag (0 to disable, integer >= 0)
 #  chat:
-#     tag*:                         Text tag for all Konquest plugin messages. Use '' to disable. Use & for color codes. ('string')
+#     tag*:                         Text tag for all Konquest plugin messages. Use '' to disable. Use & for color codes, or hex #000000. ('string')
+#     message*:                     Chat message format used for all players. Use %PREFIX%, %SUFFIX%, %KINGDOM%, %TITLE% and %NAME% as placeholders. Use & for color codes, or hex #000000. ('string')
 #     enable_format:                Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
-#     use_kingdom:                  Use a player's kingdom name as a part of their chat message (true/false)
-#     priority:                     Set the priority of Konquest's chat message formatting. Set to low to allow other plugins to modify chat first (LOWEST, LOW, NORMAL, HIGH, HIGHEST)
+#     priority:                     Set the priority of Konquest's chat message formatting. Set to high to allow other plugins to modify chat first (LOWEST, LOW, NORMAL, HIGH, HIGHEST)
 #  database:
 #      connection:                  Database connection type (sqlite or mysql)
 #      mysql:
@@ -81,13 +81,14 @@
 #    remove_stats:                  Remove all stats and accomplishment prefixes from a player when exiled (true/false)
 #    random_wild:                   Teleport a player to a random location in the wild of their current world upon exile (true/false)
 #  camps:
+#    enable:                        Allow barbarian players to create a camp from placed beds (true/false)
 #    init_radius:                   Radius of camps for barbarians. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
 #    protect_containers:            Prevent players, except for camp owner, from using or breaking containers in camp land (true/false)
 #    no_enemy_edit_offline:         Prevent enemy players from breaking any blocks in camps when owners are offline (true/false)
 #    no_enemy_edit_offline_warmup:  Time in seconds when a camp is protected from when the owner disconnects (integer >= 0)
 #    clan_enable:                   [EXPERIMENTAL] Enable camp clans when barbarian camps are placed next to each other (true/false)
-#    clan_allow_containers:         Allow barbarians to access containers in camps from the same clan, CAN BE ABUSED! (true/false)
-#    clan_allow_edit_offline:       Allow barbarians to edit blocks in offline-protected camps from the same clan, CAN BE ABUSED! (true/false)
+#    clan_allow_containers:         [EXPERIMENTAL] Allow barbarians to access containers in camps from the same clan, CAN BE ABUSED! (true/false)
+#    clan_allow_edit_offline:       [EXPERIMENTAL] Allow barbarians to edit blocks in offline-protected camps from the same clan, CAN BE ABUSED! (true/false)
 #  monuments:
 #    critical_block*:               Blocks which must be destroyed to capture a town monument (Material, https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html, e.g. for obsidian, enum is OBSIDIAN)
 #    destroy_amount:                Amount of each destroy_blocks that must be destroyed to capture a town monument (integer >= 0)
@@ -146,8 +147,8 @@ core:
   placeholder_request_limit: 60
   chat:
     tag: '&7[&6Konquest&7]&f '
+    message: '%PREFIX% %KINGDOM% &7| %TITLE% %NAME% %SUFFIX% &7» '
     enable_format: true
-    use_kingdom: true
     priority: HIGH
   database:
     connection: sqlite
@@ -210,6 +211,7 @@ core:
     remove_stats: true
     random_wild: true
   camps:
+    enable: true
     init_radius: 2
     protect_containers: true
     no_enemy_edit_offline: true

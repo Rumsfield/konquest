@@ -208,6 +208,88 @@ public class PlayerListener implements Listener{
         	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.enable_format",true);
         	if(enable) {
 	        	// Format chat messages
+        		Player bukkitPlayer = event.getPlayer();
+	        	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+					ChatUtil.printDebug("Failed to handle onAsyncPlayerChat for non-existent player");
+					return;
+				}
+	            KonPlayer player = playerManager.getPlayer(bukkitPlayer);
+	            KonKingdom kingdom = player.getKingdom();
+	            event.setCancelled(true);
+	            
+	            String title = "";
+	            if(player.getPlayerPrefix().isEnabled()) {
+	            	title = ChatUtil.parseHex(player.getPlayerPrefix().getMainPrefixName());
+	            }
+	            String prefix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer));
+	            String suffix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer));
+	            String kingdomName = kingdom.getName();
+	            String name = bukkitPlayer.getName();
+	            
+	            if(player.isGlobalChat()) {
+	            	//Global chat, all players see this format
+	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
+	            		ChatColor teamColor = ChatColor.WHITE;
+	            		ChatColor titleColor = ChatColor.WHITE;
+	            		if(player.isBarbarian()) {
+	            			teamColor = ChatColor.YELLOW;
+	            		} else {
+	            			if(globalPlayer.getKingdom().equals(kingdom)) {
+	                			// Message sender is in same kingdom as receiver
+	                			teamColor = ChatColor.GREEN;
+	                			titleColor = ChatColor.DARK_GREEN;
+	                		} else {
+	                			// Message sender is in different kingdom as receiver
+	            				teamColor = ChatColor.RED;
+	                			titleColor = ChatColor.DARK_RED;
+	                		}
+	            		}
+	            		globalPlayer.getBukkitPlayer().sendMessage(
+	            				ChatUtil.parseFormat(Konquest.getChatMessage(),
+	            						prefix,
+	            						suffix,
+	            						teamColor+kingdomName,
+	            						titleColor+title,
+	            						teamColor+name) +
+	        					event.getMessage());
+	            	}
+	            } else {
+	            	//Team chat only (and admins)
+	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + "[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	            	for(KonPlayer teamPlayer : playerManager.getPlayersOnline()) {
+	            		if(teamPlayer.getKingdom().equals(kingdom)) {
+	            			teamPlayer.getBukkitPlayer().sendMessage(
+		            				ChatUtil.parseFormat(Konquest.getChatMessage(),
+		            						prefix,
+		            						suffix,
+		            						ChatColor.GREEN+kingdomName,
+		            						ChatColor.GREEN+title,
+		            						ChatColor.GREEN+name) +
+		            				ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
+	            		} else if(teamPlayer.isAdminBypassActive()) {
+	            			teamPlayer.getBukkitPlayer().sendMessage(
+		            				ChatUtil.parseFormat(Konquest.getChatMessage(),
+		            						prefix,
+		            						suffix,
+		            						ChatColor.GOLD+kingdomName,
+		            						ChatColor.GOLD+title,
+		            						ChatColor.GOLD+name) +
+		            				ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
+	            		}
+	            	}
+	            }
+        	}
+        }
+    }
+    
+    /*
+    private void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+        //Check if the event was caused by a player
+        if(event.isAsynchronous() && !event.isCancelled()) {
+        	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.enable_format",true);
+        	if(enable) {
+	        	// Format chat messages
         		boolean useKingdom = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.use_kingdom",true);
 	        	Player bukkitPlayer = event.getPlayer();
 	        	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
@@ -222,8 +304,8 @@ public class PlayerListener implements Listener{
 	            if(player.getPlayerPrefix().isEnabled()) {
 	            	title = player.getPlayerPrefix().getMainPrefixName()+" ";
 	            }
-	            String prefix = konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer);
-	            String suffix = konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer);
+	            String prefix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer));
+	            String suffix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer));
 	            String divider = ChatColor.translateAlternateColorCodes('&', "&7»");
 	            String kingdomName = "";
 	            if(useKingdom) {
@@ -250,11 +332,11 @@ public class PlayerListener implements Listener{
 	                		}
 	            		}
 	            		globalPlayer.getBukkitPlayer().sendMessage(
-	        					ChatColor.translateAlternateColorCodes('&', prefix)+ 
+	        					prefix+ 
 	        					teamColor+kingdomName+
 	        					titleColor+ChatColor.translateAlternateColorCodes('&', title)+ 
 	        					teamColor+bukkitPlayer.getName()+" "+
-	        					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
+	        					ChatColor.RESET+suffix+
 	        					divider+" "+
 	        					ChatColor.WHITE+event.getMessage());
 	            	}
@@ -287,6 +369,7 @@ public class PlayerListener implements Listener{
         	}
         }
     }
+    */
     
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {

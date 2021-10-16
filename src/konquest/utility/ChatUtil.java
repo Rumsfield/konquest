@@ -3,6 +3,9 @@ package konquest.utility;
 import konquest.Konquest;
 import konquest.model.KonPlayer;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -16,8 +19,52 @@ public class ChatUtil {
 	private static ChatColor alertColor = ChatColor.GOLD;
 	//private static String tag = "§7[§6Konquest§7]§f "; /*Replaced with Konquest.getChatTag()*/
 	
-	public static void formatArgColors(String args) {
-		
+	/**
+	 * Formats hex color codes, written by user zwrumpy
+	 * https://www.spigotmc.org/threads/hex-color-code-translate.449748/#post-4270781
+	 * @param message
+	 * @return
+	 */
+	public static String parseHex(String message) {
+		Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
+        Matcher matcher = pattern.matcher(message);
+        while (matcher.find()) {
+            String hexCode = message.substring(matcher.start(), matcher.end());
+            String replaceSharp = hexCode.replace('#', 'x');
+           
+            char[] ch = replaceSharp.toCharArray();
+            StringBuilder builder = new StringBuilder("");
+            for (char c : ch) {
+                builder.append("&" + c);
+            }
+           
+            message = message.replace(hexCode, builder.toString());
+            matcher = pattern.matcher(message);
+        }
+        return ChatColor.translateAlternateColorCodes('&', message);
+	}
+	
+	/**
+	 * Search base string and replace
+	 * 		%PREFIX% with prefix arg
+	 * 		%SUFFIX% with suffix arg
+	 * 		%KINGDOM% with kingdom arg
+	 * 		%TITLE% with title arg
+	 * 		%NAME% with name arg
+	 * @param base - Base format that may or may not contain %PREFIX%, %SUFFIX%, %KINGDOM%, %TITLE% or %NAME%.
+	 * @param kingdom
+	 * @param title
+	 * @param name
+	 * @return
+	 */
+	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name) {
+		String message = base.toLowerCase();
+		message.replace("%prefix%", prefix);
+		message.replace("%suffix%", suffix);
+		message.replace("%kingdom%", kingdom);
+		message.replace("%title%", title);
+		message.replace("%name%", name);
+		return message;
 	}
 	
 	public static void printDebug(String message) {
