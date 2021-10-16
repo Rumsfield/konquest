@@ -30,9 +30,10 @@ public class MapHandler {
 	
 	private final int ruinColor = 0x242424;
 	private final int campColor = 0xa3a10a;
-	private final int capitalColor = 0xb942f5;
-	private final int townColor = 0xed921a;
-	private final int lineColor = 0x000000;
+	//private final int capitalColor = 0xb942f5;
+	//private final int townColor = 0xed921a;
+	private final int lineDefaultColor = 0x000000;
+	private final int lineCapitalColor = 0x8010d0;
 	
 	public MapHandler(Konquest konquest) {
 		this.konquest = konquest;
@@ -99,6 +100,7 @@ public class MapHandler {
 		String areaId = getAreaId(territory);
 		String areaLabel = getAreaLabel(territory);
 		int areaColor = getAreaColor(territory);
+		int lineColor = getLineColor(territory);
 		String iconId = getIconId(territory);
 		String iconLabel = getIconLabel(territory);
 		MarkerIcon icon = getIconMarker(territory);
@@ -439,10 +441,33 @@ public class MapHandler {
 				result = campColor;
 				break;
 			case CAPITAL:
-				result = capitalColor;
+				//result = capitalColor;
+				result = stringToRGB(territory.getKingdom().getName());
 				break;
 			case TOWN:
-				result = townColor;
+				//result = townColor;
+				result = stringToRGB(territory.getKingdom().getName());
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
+	
+	private int getLineColor(KonTerritory territory) {
+		int result = lineDefaultColor;
+		switch (territory.getTerritoryType()) {
+			case RUIN:
+				result = lineDefaultColor;
+				break;
+			case CAMP:
+				result = lineDefaultColor;
+				break;
+			case CAPITAL:
+				result = lineCapitalColor;
+				break;
+			case TOWN:
+				result = lineDefaultColor;
 				break;
 			default:
 				break;
@@ -532,5 +557,13 @@ public class MapHandler {
 				break;
 		}
 		return result;
+	}
+	
+	private int stringToRGB(String input) {
+		int hash = input.hashCode();
+		int hexColor =  ((hash >> 16) & 0xFF) +
+						((hash >> 8)  & 0xFF) +
+						((hash >> 0)  & 0xFF);
+		return hexColor;
 	}
 }
