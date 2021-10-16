@@ -676,6 +676,9 @@ public class BlockListener implements Listener {
 				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: You are not a Barbarian.");
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
 				    		break;
+				    	case 4:
+				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+				    		break;
 				    	default:
 				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Unknown cause. Contact an Admin!");
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());

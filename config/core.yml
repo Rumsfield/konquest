@@ -17,8 +17,8 @@
 #  travel_wild_random_radius:       Radius in blocks from the center of the primary world for random wild travel (0 to disable, integer >= 0)
 #  placeholder_request_limit:       Minimum time in seconds between placeholder requests, use lower values for faster update rates but more lag (0 to disable, integer >= 0)
 #  chat:
-#     tag*:                         Text tag for all Konquest plugin messages. Use '' to disable. Use & for color codes, or hex #000000. ('string')
-#     message*:                     Chat message format used for all players. Use %PREFIX%, %SUFFIX%, %KINGDOM%, %TITLE% and %NAME% as placeholders. Use & for color codes, or hex #000000. ('string')
+#     tag:                          Text tag for all Konquest plugin messages. Use '' to disable. Use & for color codes, or hex #000000. ('string')
+#     message:                      Chat message format used for all players. Use %PREFIX%, %SUFFIX%, %KINGDOM%, %TITLE% and %NAME% as placeholders. Use & for color codes, or hex #000000. ('string')
 #     enable_format:                Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
 #     priority:                     Set the priority of Konquest's chat message formatting. Set to high to allow other plugins to modify chat first (LOWEST, LOW, NORMAL, HIGH, HIGHEST)
 #  database:
