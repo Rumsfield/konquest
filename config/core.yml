@@ -76,6 +76,11 @@
 #    max_shields:                   Maximum shield duration in seconds that a town can have (0 to disable, integer >= 0)
 #    max_armor:                     Maximum armor amount in blocks that a town can have (0 to disable, integer >= 0)
 #    barbarians_destroy:            Allow barbarian players to destroy towns when true, else prevent barbarians from attacking town monuments (true/false)
+#  plots:
+#    enable:                        Enable town plots (true/false)
+#    max_size:                      Maximum plot size in chunks (0 to disable, integer >= 0)
+#    allow_build:                   Allow all town residents to build in any town plot (true/false)
+#    allow_containers:              Allow all town residents to access containers in any town plot (true/false)
 #  exile:
 #    remove_favor:                  Set a player's currency balance to 0 when exiled (true/flase)
 #    remove_stats:                  Remove all stats and accomplishment prefixes from a player when exiled (true/false)
@@ -206,6 +211,11 @@ core:
     max_shields: 432000
     max_armor: 9999
     barbarians_destroy: true
+  plots:
+    enable: true
+    max_size: 16
+    allow_build: false
+    allow_containers: false
   exile:
     remove_favor: true
     remove_stats: true

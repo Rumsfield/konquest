@@ -1,5 +1,6 @@
 package konquest.manager;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,6 +31,7 @@ import konquest.display.OptionIcon;
 import konquest.display.OptionIcon.optionAction;
 import konquest.display.PagedMenu;
 import konquest.display.PlayerIcon;
+import konquest.display.PlotMenu;
 import konquest.display.PlayerIcon.PlayerIconAction;
 import konquest.display.PrefixCustomIcon;
 import konquest.display.PrefixIcon.PrefixIconAction;
@@ -62,11 +64,13 @@ public class DisplayManager {
 	private Konquest konquest;
 	private HashMap<Inventory, KonTown> townCache;
 	private HashMap<Inventory, PagedMenu> menuCache;
+	private HashMap<Inventory, PlotMenu> plotMenus;
 	
 	public DisplayManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.townCache = new HashMap<Inventory, KonTown>();
 		this.menuCache = new HashMap<Inventory, PagedMenu>();
+		this.plotMenus = new HashMap<Inventory, PlotMenu>();
 	}
 	
 	public void initialize() {
@@ -82,16 +86,20 @@ public class DisplayManager {
 		if(inv != null) {
 			if(menuCache.containsKey(inv)) {
 				result = true;
+			} else if(plotMenus.containsKey(inv)) {
+				result = true;
 			}
 		}
 		return result;
 	}
 	
 	public void onDisplayMenuClick(KonPlayer clickPlayer, Inventory inv, int slot) {
+		if(inv == null) {
+			return;
+		}
+		Player bukkitPlayer = clickPlayer.getBukkitPlayer();
 		// Switch pages and handle navigation button clicks
-		// Open new score menus for leaderboard player clicks
-		if(inv != null && menuCache.containsKey(inv)) {
-			Player bukkitPlayer = clickPlayer.getBukkitPlayer();
+		if(menuCache.containsKey(inv)) {
 			PagedMenu clickMenu = menuCache.get(inv);
 			DisplayMenu currentPage = clickMenu.getPage(inv);
 			if(currentPage == null) {
@@ -320,7 +328,43 @@ public class DisplayManager {
 					}
 				}
 			}
-		}	
+		} else if(plotMenus.containsKey(inv)) {
+			// Handle plot menu navigation and states
+			// Every clickable icon in a plot menu view will update the state and refresh the open inventory
+			PlotMenu clickMenu = plotMenus.get(inv);
+			DisplayMenu currentView = clickMenu.getCurrentView();
+			if(currentView == null || !currentView.getInventory().equals(inv)) {
+				ChatUtil.printDebug("Plot menu view is not current!");
+				return;
+			}
+			MenuIcon clickedIcon = currentView.getIcon(slot);
+			if(clickedIcon == null || !clickedIcon.isClickable()) {
+				return;
+			}
+			playMenuClickSound(bukkitPlayer);
+			// Update plot menu state
+			DisplayMenu updateView = clickMenu.updateState(slot);
+			// Update inventory view
+			plotMenus.remove(inv);
+			if(updateView != null) {
+				// Refresh displayed inventory view
+				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+		            @Override
+		            public void run() {
+		            	bukkitPlayer.openInventory(updateView.getInventory());
+		            	plotMenus.put(updateView.getInventory(), clickMenu);
+		            }
+		        },1);
+			} else {
+				// Close inventory view
+				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+		            @Override
+		            public void run() {
+		            	bukkitPlayer.closeInventory();
+		            }
+		        },1);
+			}
+		}
 	}
 	
 	public void onDisplayMenuClose(Inventory inv) {
@@ -329,6 +373,9 @@ public class DisplayManager {
 		}
 		if(townCache.containsKey(inv)) {
 			townCache.remove(inv);
+		}
+		if(plotMenus.containsKey(inv)) {
+			plotMenus.remove(inv);
 		}
 	}
 	
@@ -1289,6 +1336,37 @@ public class DisplayManager {
    	}
    	
    	/*
+	 * ===============================================
+	 * Plot Menu
+	 * ===============================================
+	 */
+   	public void displayPlotMenu(Player bukkitPlayer, KonTown town) {
+		
+		playMenuOpenSound(bukkitPlayer);
+		
+		Point center = konquest.toPoint(bukkitPlayer.getLocation());
+		if(!town.isLocInside(bukkitPlayer.getLocation())) {
+			center = konquest.toPoint(town.getCenterLoc());
+		}
+		
+		PlotMenu newMenu = new PlotMenu(town, center);
+		
+		//TODO: stuff
+		
+		
+		newMenu.refreshNavigationButtons();
+		plotMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
+		// Schedule delayed task to display inventory to player
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.openInventory(newMenu.getCurrentView().getInventory());
+            }
+        },1);
+		
+	}
+   	
+   	/*
 	 * Helper methods
 	 */
   	
@@ -1386,7 +1464,7 @@ public class DisplayManager {
    		return inputList;
    	}
  	
- 	private String boolean2Symbol(boolean val) {
+   	private String boolean2Symbol(boolean val) {
  		String result = ChatColor.DARK_RED+""+ChatColor.BOLD+"\u274C";
     	if(val) {
     		result = ChatColor.DARK_GREEN+""+ChatColor.BOLD+"\u2713";
@@ -1394,7 +1472,7 @@ public class DisplayManager {
     	return result;
  	}
  	
- 	private String boolean2Lang(boolean val) {
+   	private String boolean2Lang(boolean val) {
  		String result = MessagePath.LABEL_FALSE.getMessage();
  		if(val) {
  			result = MessagePath.LABEL_TRUE.getMessage();
@@ -1402,11 +1480,11 @@ public class DisplayManager {
  		return result;
  	}
  	
- 	private void playMenuClickSound(Player bukkitPlayer) {
+   	private void playMenuClickSound(Player bukkitPlayer) {
  		bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, (float)1.0, (float)0.8);
  	}
  	
- 	private void playMenuOpenSound(Player bukkitPlayer) {
+   	private void playMenuOpenSound(Player bukkitPlayer) {
  		bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, (float)1.0, (float)1.4);
  	}
 }

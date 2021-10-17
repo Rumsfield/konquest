@@ -64,6 +64,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	private HashMap<KonUpgrade,Integer> upgrades;
 	private HashMap<KonUpgrade,Integer> disabledUpgrades;
 	private KonTownRabbit rabbit;
+	private HashMap<Point,KonPlot> plots;
 	
 	public KonTown(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, KonTerritoryType.TOWN, konquest);
@@ -98,6 +99,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.upgrades = new HashMap<KonUpgrade,Integer>();
 		this.disabledUpgrades = new HashMap<KonUpgrade,Integer>();
 		this.rabbit = new KonTownRabbit(getSpawnLoc());
+		this.plots = new HashMap<Point,KonPlot>();
 	}
 
 	/**
@@ -1099,6 +1101,48 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	private void playDeactivateSound() {
 		getWorld().playSound(getCenterLoc(), Sound.BLOCK_GLASS_BREAK, (float)3.0, (float)0.3);
+	}
+	
+	public boolean addPlot(Location loc) {
+		boolean result = false;
+		if(this.isLocInside(loc)) {
+			Point p = getKonquest().toPoint(loc);
+			plots.put(p,new KonPlot(p));
+			result = true;
+		}
+		return result;
+	}
+	
+	public void removePlot(KonPlot plot) {
+		for(Point p : plots.keySet()) {
+			if(plots.get(p).equals(plot)) {
+				plots.remove(p);
+			}
+		}
+	}
+	
+	public boolean hasPlot(Location loc) {
+		boolean result = false;
+		if(this.isLocInside(loc)) {
+			Point p = getKonquest().toPoint(loc);
+			result = plots.containsKey(p);
+		}
+		return result;
+	}
+	
+	// This can return null!
+	public KonPlot getPlot(Location loc) {
+		KonPlot result = null;
+		if(this.isLocInside(loc)) {
+			Point p = getKonquest().toPoint(loc);
+			result = plots.get(p);
+		}
+		return result;
+	}
+	
+	public void addPlotPoint(KonPlot plot, Point p) {
+		plot.addPoint(p);
+		plots.put(p, plot);
 	}
 	
 }
