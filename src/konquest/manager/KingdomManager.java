@@ -412,7 +412,7 @@ public class KingdomManager {
 			// Verify valid monument template
 			if(getKingdom(kingdomName).getMonumentTemplate().isValid()) {
 				// Modify location to max Y at given X,Z
-				Point point = konquest.toPoint(loc);
+				Point point = Konquest.toPoint(loc);
 				int xLocal = loc.getBlockX() - (point.x*16);
 				int zLocal = loc.getBlockZ() - (point.y*16);
 				Chunk chunk = loc.getChunk();
@@ -576,7 +576,7 @@ public class KingdomManager {
 			}
 		}
 		if(foundAdjTerr) {
-			Point addPoint = konquest.toPoint(loc);
+			Point addPoint = Konquest.toPoint(loc);
 			if(closestAdjTerr.getWorld().equals(loc.getWorld()) && closestAdjTerr.addChunk(addPoint)) {
 				addTerritory(loc.getWorld(),addPoint,closestAdjTerr);
 				konquest.getMapHandler().drawDynmapUpdateTerritory(closestAdjTerr);
@@ -895,7 +895,7 @@ public class KingdomManager {
 	}
 	
 	public boolean removeTerritory(Location loc) {
-		boolean result = removeTerritory(loc.getWorld(),konquest.toPoint(loc));
+		boolean result = removeTerritory(loc.getWorld(),Konquest.toPoint(loc));
 		return result;
 	}
 	
@@ -948,7 +948,7 @@ public class KingdomManager {
 	}
 	
 	public boolean isChunkClaimed(Location loc) {
-		return isChunkClaimed(konquest.toPoint(loc),loc.getWorld());
+		return isChunkClaimed(Konquest.toPoint(loc),loc.getWorld());
 	}
 	
 	public boolean isChunkClaimed(Point point, World world) {
@@ -961,7 +961,7 @@ public class KingdomManager {
 	
 	// This can return null!
 	public KonTerritory getChunkTerritory(Location loc) {
-		return getChunkTerritory(konquest.toPoint(loc),loc.getWorld());
+		return getChunkTerritory(Konquest.toPoint(loc),loc.getWorld());
 	}
 	
 	// This can return null!
@@ -1639,7 +1639,7 @@ public class KingdomManager {
 		double y_mod;
 		// Evaluate every chunk in the provided list. If it's claimed, check each adjacent chunk and determine border locations
 		for(Chunk chunk : renderChunks) {
-			Point point = konquest.toPoint(chunk);
+			Point point = Konquest.toPoint(chunk);
 			World renderWorld = chunk.getWorld();
 			if(isChunkClaimed(point,renderWorld)) {
 				KonKingdom chunkKingdom = getChunkTerritory(point,renderWorld).getKingdom();
@@ -1710,7 +1710,7 @@ public class KingdomManager {
 			ArrayList<Chunk> nearbyChunks = konquest.getAreaChunks(loc, 2);
 			boolean isTerritoryNearby = false;
 			for(Chunk chunk : nearbyChunks) {
-				if(isChunkClaimed(konquest.toPoint(chunk),chunk.getWorld())) {
+				if(isChunkClaimed(Konquest.toPoint(chunk),chunk.getWorld())) {
 					isTerritoryNearby = true;
 					break;
 				}
@@ -2088,7 +2088,7 @@ public class KingdomManager {
 	public void printPlayerMap(KonPlayer player, int mapSize, Location center) {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Generate Map
-    	Point originPoint = konquest.toPoint(center);
+    	Point originPoint = Konquest.toPoint(center);
     	String mapWildSymbol = "-"; // "\u25A2";// empty square "-";
     	String mapTownSymbol = "+"; // "\u25A4";// plus in square "+";
     	String mapCampSymbol = "="; // "\u25A7";// minus in square "=";

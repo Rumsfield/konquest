@@ -660,15 +660,15 @@ public class Konquest implements Timeable {
 		return sidePoints;
 	}
 	
-	public Point toPoint(Location loc) {
+	public static Point toPoint(Location loc) {
 		return new Point((int)Math.floor((double)loc.getBlockX()/16),(int)Math.floor((double)loc.getBlockZ()/16));
 	}
 	
-	public Point toPoint(Chunk chunk) {
+	public static Point toPoint(Chunk chunk) {
 		return new Point(chunk.getX(),chunk.getZ());
 	}
 	
-	public Chunk toChunk(Point point, World world) {
+	public static Chunk toChunk(Point point, World world) {
 		return world.getChunkAt(point.x, point.y);
 	}
 	

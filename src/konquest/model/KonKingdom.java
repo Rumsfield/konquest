@@ -365,7 +365,7 @@ public class KonKingdom implements Timeable{
 	private void reloadLoadedTownMonuments() {
 		Point tPoint;
 		for(KonTown town : getTowns()) {
-			tPoint = konquest.toPoint(town.getCenterLoc());
+			tPoint = Konquest.toPoint(town.getCenterLoc());
 			if(town.getWorld().isChunkLoaded(tPoint.x,tPoint.y)) {
 				if(town.isAttacked()) {
 					ChatUtil.printDebug("Could not paste monument in town "+town.getName()+" while under attack");

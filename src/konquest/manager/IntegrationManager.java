@@ -211,7 +211,7 @@ public class IntegrationManager {
 	public void deleteShopsInPoints(Collection<Point> points, World world) {
 		if(isQuickShopEnabled && !points.isEmpty()) {
 			for(Point point : points) {
-				Chunk chunk = konquest.toChunk(point,world);
+				Chunk chunk = Konquest.toChunk(point,world);
 				List<Shop> shopList = QuickShopAPI.getShopAPI().getShops(chunk);
 				if(shopList != null) {
 					for(Shop shop : shopList) {

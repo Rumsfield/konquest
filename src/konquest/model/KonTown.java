@@ -109,7 +109,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	 */
 	@Override
 	public boolean addChunk(Point point) {
-		Point centerChunk = getKonquest().toPoint(getCenterLoc());
+		Point centerChunk = Konquest.toPoint(getCenterLoc());
 		int maxChunkRange = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_size");
 		if(maxChunkRange < 0) {
 			maxChunkRange = 0;
@@ -429,14 +429,14 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 
 	public boolean isLocInsideCenterChunk(Location loc) {
-		Point centerPoint = getKonquest().toPoint(getCenterLoc());
-		Point testPoint = getKonquest().toPoint(loc);
+		Point centerPoint = Konquest.toPoint(getCenterLoc());
+		Point testPoint = Konquest.toPoint(loc);
 		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
 	}
 	
 	public boolean isChunkCenter(Chunk chunk) {
-		Point centerPoint = getKonquest().toPoint(getCenterLoc());
-		Point testPoint = getKonquest().toPoint(chunk);
+		Point centerPoint = Konquest.toPoint(getCenterLoc());
+		Point testPoint = Konquest.toPoint(chunk);
 		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
 	}
 	
@@ -1106,7 +1106,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	public boolean addPlot(Location loc) {
 		boolean result = false;
 		if(this.isLocInside(loc)) {
-			Point p = getKonquest().toPoint(loc);
+			Point p = Konquest.toPoint(loc);
 			plots.put(p,new KonPlot(p));
 			result = true;
 		}
@@ -1124,7 +1124,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	public boolean hasPlot(Location loc) {
 		boolean result = false;
 		if(this.isLocInside(loc)) {
-			Point p = getKonquest().toPoint(loc);
+			Point p = Konquest.toPoint(loc);
 			result = plots.containsKey(p);
 		}
 		return result;
@@ -1134,7 +1134,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	public KonPlot getPlot(Location loc) {
 		KonPlot result = null;
 		if(this.isLocInside(loc)) {
-			Point p = getKonquest().toPoint(loc);
+			Point p = Konquest.toPoint(loc);
 			result = plots.get(p);
 		}
 		return result;

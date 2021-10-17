@@ -1,6 +1,5 @@
 package konquest.manager;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1343,18 +1342,9 @@ public class DisplayManager {
    	public void displayPlotMenu(Player bukkitPlayer, KonTown town) {
 		
 		playMenuOpenSound(bukkitPlayer);
-		
-		Point center = konquest.toPoint(bukkitPlayer.getLocation());
-		if(!town.isLocInside(bukkitPlayer.getLocation())) {
-			center = konquest.toPoint(town.getCenterLoc());
-		}
-		
-		PlotMenu newMenu = new PlotMenu(town, center);
-		
-		//TODO: stuff
-		
-		
-		newMenu.refreshNavigationButtons();
+
+		PlotMenu newMenu = new PlotMenu(town, bukkitPlayer.getLocation());
+
 		plotMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {

@@ -70,7 +70,7 @@ public abstract class KonTerritory{
 	}
 	
 	public boolean removeChunk(Location loc) {
-		return chunkList.remove(konquest.toPoint(loc)) != null;
+		return chunkList.remove(Konquest.toPoint(loc)) != null;
 	}
 	
 	public void clearChunks() {
@@ -78,7 +78,7 @@ public abstract class KonTerritory{
 	}
 	
 	public boolean isLocInside(Location loc) {
-		return loc.getWorld().equals(getWorld()) && chunkList.containsKey(getKonquest().toPoint(loc));
+		return loc.getWorld().equals(getWorld()) && chunkList.containsKey(Konquest.toPoint(loc));
 	}
 	
 	//TODO: Refactor to not use chunks, currently method is unused
@@ -90,7 +90,7 @@ public abstract class KonTerritory{
 		int curZ = loc.getChunk().getZ();
 		for(int i = 0;i<4;i++) {
 			Chunk nextChunk = loc.getWorld().getChunkAt(curX+coordLUTX[i], curZ+coordLUTZ[i]);
-			if(nextChunk.getWorld().equals(getWorld()) && chunkList.containsKey(getKonquest().toPoint(nextChunk))) {
+			if(nextChunk.getWorld().equals(getWorld()) && chunkList.containsKey(Konquest.toPoint(nextChunk))) {
 				result = true;
 				break;
 			}

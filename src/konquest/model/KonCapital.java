@@ -39,7 +39,7 @@ public class KonCapital extends KonTerritory{
 	
 	@Override
 	public int initClaim() {
-		addChunk(getKonquest().toPoint(getCenterLoc()));
+		addChunk(Konquest.toPoint(getCenterLoc()));
 		return 0;
 	}
 	

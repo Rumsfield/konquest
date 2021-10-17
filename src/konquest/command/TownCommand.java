@@ -83,7 +83,7 @@ public class TownCommand extends CommandBase {
             		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
             		return;
             	}
-	        	getKonquest().getPlotManager().displayPlotMenu(bukkitPlayer, town);
+	        	getKonquest().getDisplayManager().displayPlotMenu(bukkitPlayer, town);
         		break;
         	case "options":
         		if(!town.isPlayerLord(player.getOfflineBukkitPlayer())) {
