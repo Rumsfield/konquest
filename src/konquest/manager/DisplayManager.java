@@ -1200,7 +1200,7 @@ public class DisplayManager {
 		String pageLabel = "";
 		String playerPrefix = "";
 		if(displayPlayer.getPlayerPrefix().isEnabled()) {
-			playerPrefix = displayPlayer.getPlayerPrefix().getMainPrefixName();
+			playerPrefix = ChatUtil.parseHex(displayPlayer.getPlayerPrefix().getMainPrefixName());
 		}
 		final int MAX_ICONS_PER_PAGE = 45;
 		final int MAX_ROWS_PER_PAGE = 5;
@@ -1246,7 +1246,7 @@ public class DisplayManager {
 		ListIterator<KonPrefixType> prefixIter = allPrefixes.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
 			int numPageRows = Math.min((totalRows - i*MAX_ROWS_PER_PAGE),MAX_ROWS_PER_PAGE);
-			pageLabel = ChatColor.BLACK+playerPrefix+" "+displayPlayer.getBukkitPlayer().getName()+" "+(i+1)+"/"+pageTotal;
+			pageLabel = ChatColor.BLACK+playerPrefix+" "+ChatColor.BLACK+displayPlayer.getBukkitPlayer().getName()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
 			//ChatUtil.printDebug("  Created page "+i+" with "+numPageRows+" rows");
 			int slotIndex = 0;
@@ -1340,7 +1340,7 @@ public class DisplayManager {
 	 * ===============================================
 	 */
    	public void displayPlotMenu(Player bukkitPlayer, KonTown town) {
-		
+   		ChatUtil.printDebug("Displaying new plots menu to "+bukkitPlayer.getName()+", current menu size is "+plotMenus.size());
 		playMenuOpenSound(bukkitPlayer);
 
 		PlotMenu newMenu = new PlotMenu(town, bukkitPlayer.getLocation());

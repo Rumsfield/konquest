@@ -60,9 +60,9 @@ public class PlaceholderManager {
    			public int compare(final Ranked k1, Ranked k2) {
    				int result = 0;
    				if(k1.value < k2.value) {
-   					result = -1;
-   				} else if(k1.value > k2.value) {
    					result = 1;
+   				} else if(k1.value > k2.value) {
+   					result = -1;
    				}
    				return result;
    			}
@@ -280,6 +280,7 @@ public class PlaceholderManager {
 		String result = "---";
 		Date now = new Date();
 		if(now.after(new Date(topScoreCooldownTime))) {
+			ChatUtil.printDebug("Fetching new placeholder top score");
 			// The cooldown time is over
 			// Create ranked list of kingdoms
 			//KonPlayer onlinePlayer = playerManager.getPlayer(player);
@@ -295,6 +296,8 @@ public class PlaceholderManager {
 	   		Collections.sort(topScoreList, rankedComparator);
 	   		// Update cooldown time
 	   		topScoreCooldownTime = now.getTime() + (cooldownSeconds*1000);
+		} else {
+			ChatUtil.printDebug("Fetching cached placeholder top score");
 		}
 		// Get requested rank
 		if(rank > 0 && rank <= topScoreList.size()) {

@@ -561,9 +561,7 @@ public class MapHandler {
 	
 	private int stringToRGB(String input) {
 		int hash = input.hashCode();
-		int hexColor =  ((hash >> 16) & 0xFF) +
-						((hash >> 8)  & 0xFF) +
-						((hash >> 0)  & 0xFF);
+		int hexColor = hash & 0xFFFFFF;
 		return hexColor;
 	}
 }

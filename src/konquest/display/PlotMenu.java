@@ -34,7 +34,6 @@ public class PlotMenu {
 	private Point origin;
 	private Location playerLoc;
 	private HashMap<PlotState,DisplayMenu> views;
-	//private DisplayMenu[] scrollViews;
 	private ArrayList<DisplayMenu> playerPages;
 	private PlotState currentPlotState;
 	
@@ -44,7 +43,6 @@ public class PlotMenu {
 		this.center = Konquest.toPoint(playerLoc);
 		this.origin = center;
 		this.views = new HashMap<PlotState,DisplayMenu>();
-		//this.scrollViews = new DisplayMenu[4];
 		this.playerPages = new ArrayList<DisplayMenu>();
 		this.currentPlotState = PlotState.ROOT;
 		initializeMenu();
@@ -52,10 +50,6 @@ public class PlotMenu {
 	}
 	
 	private void initializeMenu() {
-		//scrollViews[0] = new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Plots"); // North
-		//scrollViews[1] = new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Plots"); // East
-		//scrollViews[2] = new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Plots"); // South
-		//scrollViews[3] = new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Plots"); // West
 		
 		playerPages.add(new DisplayMenu(2, ChatColor.BLACK+town.getName()+" Player"));
 		
@@ -74,35 +68,42 @@ public class PlotMenu {
 		}
 	}
 	
+	/*
+	 * Render default views
+	 */
 	private void renderMenuViews() {
 		DisplayMenu renderView;
+		InfoIcon icon;
 		
 		/* Root View */
-		String viewTitle = ChatColor.BLACK+town.getName()+" Plots";
-		renderView = createLandView(center,viewTitle,PlotState.ROOT);
+		renderView = createLandView(center,PlotState.ROOT);
 		views.put(PlotState.ROOT, renderView);
 		origin = center;
-		/*
-		Point northCenter = new Point(center.x + 0, center.y + 1);
-		Point eastCenter = new Point(center.x + 1, center.y + 0);
-		Point southCenter = new Point(center.x + 0, center.y - 1);
-		Point westCenter = new Point(center.x - 1, center.y + 0);
-		scrollViews[0] = createLandView(northCenter,viewTitle,PlotState.ROOT); // North
-		scrollViews[1] = createLandView(eastCenter,viewTitle,PlotState.ROOT); // East
-		scrollViews[2] = createLandView(southCenter,viewTitle,PlotState.ROOT); // South
-		scrollViews[3] = createLandView(westCenter,viewTitle,PlotState.ROOT); // West
-		*/
+		refreshNavigationButtons(PlotState.ROOT);
 		
+		/* Edit View */
+		renderView = new DisplayMenu(2, getTitle(PlotState.EDIT));
+		icon = new InfoIcon(ChatColor.GREEN+"Add Land", Collections.emptyList(), Material.GRASS_BLOCK, 1, true);
+		renderView.addIcon(icon);
+		icon = new InfoIcon(ChatColor.RED+"Remove Land", Collections.emptyList(), Material.STONE, 3, true);
+		renderView.addIcon(icon);
+		icon = new InfoIcon(ChatColor.GREEN+"Add Players", Collections.emptyList(), Material.PLAYER_HEAD, 5, true);
+		renderView.addIcon(icon);
+		icon = new InfoIcon(ChatColor.RED+"Remove Players", Collections.emptyList(), Material.CREEPER_HEAD, 7, true);
+		renderView.addIcon(icon);
+		views.put(PlotState.EDIT, renderView);
+		refreshNavigationButtons(PlotState.EDIT);
 	}
 	
-	private DisplayMenu createLandView(Point origin, String title, PlotState context) {
-		DisplayMenu result = new DisplayMenu(6, title);
+	private DisplayMenu createLandView(Point origin, PlotState context) {
+		DisplayMenu result = new DisplayMenu(6, getTitle(context));
 		List<String> loreList;
 		InfoIcon icon;
 		Point drawPoint;
 		int index = 0;
-		for(int r = 2; r >= -2; r--) {
-			for(int c = -3; c <= 3; c++) {
+		for(int r = -2; r <= 2; r++) {
+			for(int c = -4; c <= 4; c++) {
+				//ChatUtil.printDebug("Land View index "+index+", row "+r+", column "+c);
 				// Iterate over all land tiles
 				drawPoint = new Point(origin.x + c, origin.y + r);
 				if(town.getChunkList().containsKey(drawPoint)) {
@@ -112,10 +113,12 @@ public class PlotMenu {
 					if(Konquest.toPoint(playerLoc).equals(drawPoint)) {
 						landMat = Material.PLAYER_HEAD;
 						loreList.add("You Are Here");
+						//ChatUtil.printDebug("  This is player");
 					}
 					if(Konquest.toPoint(town.getCenterLoc()).equals(drawPoint)) {
 						landMat = Material.IRON_BARS;
 						loreList.add("Town Monument");
+						//ChatUtil.printDebug("  This is monument");
 					}
 					icon = new InfoIcon(ChatColor.GOLD+"Town Land",loreList,landMat,index,false);
 					result.addIcon(icon);
@@ -138,63 +141,122 @@ public class PlotMenu {
 	public DisplayMenu updateState(int slot) {
 		DisplayMenu result = null;
 		
-		
 		int navMaxIndex = getCurrentView().getInventory().getSize()-1;
 		int navMinIndex = getCurrentView().getInventory().getSize()-9;
 		if(slot <= navMaxIndex && slot >= navMinIndex) {
 			// Clicked in navigation bar, do something based on current state
+			int index = slot-navMinIndex;
 			switch(currentPlotState) {
 			case ROOT:
 				// Scroll arrows [0,1,2,3], close [4], create [5], delete [6], edit [7]
-				String viewTitle = ChatColor.BLACK+town.getName()+" Plots";
-				if(slot == navMinIndex+0) {
-					// Scroll left
-					origin = new Point(origin.x - 1, origin.y + 0);
-					result = createLandView(origin,viewTitle,PlotState.ROOT);
-					views.put(PlotState.ROOT, result);
-				} else if(slot == navMinIndex+1) {
-					// Scroll up
-					origin = new Point(origin.x + 0, origin.y + 1);
-					result = createLandView(origin,viewTitle,PlotState.ROOT);
-					views.put(PlotState.ROOT, result);
-				} else if(slot == navMinIndex+2) {
-					// Scroll down
-					origin = new Point(origin.x + 0, origin.y - 1);
-					result = createLandView(origin,viewTitle,PlotState.ROOT);
-					views.put(PlotState.ROOT, result);
-				} else if(slot == navMinIndex+3) {
-					// Scroll right
-					origin = new Point(origin.x + 1, origin.y + 0);
-					result = createLandView(origin,viewTitle,PlotState.ROOT);
-					views.put(PlotState.ROOT, result);
-				} else if(slot == navMinIndex+4) {
+				if(index >= 0 && index <= 3) {
+					result = scrollView(index,PlotState.ROOT);
+				} else if(index == 4) {
 					// Close
 					result = null;
+				} else if(index == 5) {
+					// Create
+					currentPlotState = PlotState.ROOT_CREATE;
+					result = createLandView(origin,currentPlotState);
+					views.put(currentPlotState, result);
+				} else if(index == 6) {
+					// Delete
+					currentPlotState = PlotState.ROOT_DELETE;
+					result = createLandView(origin,currentPlotState);
+					views.put(currentPlotState, result);
+				} else if(index == 7) {
+					// Edit
+					currentPlotState = PlotState.ROOT_EDIT;
+					result = createLandView(origin,currentPlotState);
+					views.put(currentPlotState, result);
 				}
 				break;
 			case ROOT_CREATE:
 				// Scroll arrows [0,1,2,3], close [4], return [5]
-				
+				if(index >= 0 && index <= 3) {
+					result = scrollView(index,PlotState.ROOT_CREATE);
+				} else if(index == 4) {
+					// Close
+					result = null;
+				} else if(index == 5) {
+					// Return
+					currentPlotState = PlotState.ROOT;
+					result = createLandView(origin,currentPlotState);
+					views.put(currentPlotState, result);
+				}
 				break;
 			case ROOT_DELETE:
 				// Scroll arrows [0,1,2,3], close [4], return [5]
-				
+				if(index >= 0 && index <= 3) {
+					result = scrollView(index,PlotState.ROOT_DELETE);
+				} else if(index == 4) {
+					// Close
+					result = null;
+				} else if(index == 5) {
+					// Return
+					currentPlotState = PlotState.ROOT;
+					result = createLandView(origin,currentPlotState);
+					views.put(currentPlotState, result);
+				}
 				break;
 			case ROOT_EDIT:
 				// Scroll arrows [0,1,2,3], close [4], return [5]
-				
+				if(index >= 0 && index <= 3) {
+					result = scrollView(index,PlotState.ROOT_EDIT);
+				} else if(index == 4) {
+					// Close
+					result = null;
+				} else if(index == 5) {
+					// Return
+					currentPlotState = PlotState.ROOT;
+					result = createLandView(origin,currentPlotState);
+					views.put(currentPlotState, result);
+				}
 				break;
 			case EDIT:
 				// Close [4], return [5]
-				
+				if(index == 4) {
+					// Close
+					result = null;
+				} else if(index == 5) {
+					// Return
+					currentPlotState = PlotState.ROOT_EDIT;
+					result = views.get(currentPlotState);
+				}
 				break;
 			case EDIT_LAND_ADD:
 				// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
-				
+				if(index >= 0 && index <= 3) {
+					result = scrollView(index,PlotState.EDIT_LAND_ADD);
+				} else if(index == 4) {
+					// Close
+					result = null;
+				} else if(index == 5) {
+					// Return
+					currentPlotState = PlotState.EDIT;
+					result = views.get(currentPlotState);
+				} else if(index == 6) {
+					// Finish
+					result = null;
+					//TODO
+				}
 				break;
 			case EDIT_LAND_REMOVE:
 				// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
-				
+				if(index >= 0 && index <= 3) {
+					result = scrollView(index,PlotState.EDIT_LAND_REMOVE);
+				} else if(index == 4) {
+					// Close
+					result = null;
+				} else if(index == 5) {
+					// Return
+					currentPlotState = PlotState.EDIT;
+					result = views.get(currentPlotState);
+				} else if(index == 6) {
+					// Finish
+					result = null;
+					//TODO
+				}
 				break;
 			case EDIT_PLAYER_ADD:
 				// (back [0]) close [4], return [5], finish [6], (next [8])
@@ -208,11 +270,37 @@ public class PlotMenu {
 				break;
 		}
 			
-		} else {
+		} else if(slot < navMinIndex) {
 			// Click in non-navigation slot
 			
 		}
-		
+		refreshNavigationButtons(currentPlotState);
+		return result;
+	}
+	
+	private DisplayMenu scrollView(int index, PlotState context) {
+		DisplayMenu result = null;
+		if(index == 0) {
+			// Scroll left
+			origin = new Point(origin.x - 1, origin.y + 0);
+			result = createLandView(origin,context);
+			views.put(context, result);
+		} else if(index == 1) {
+			// Scroll right
+			origin = new Point(origin.x + 1, origin.y + 0);
+			result = createLandView(origin,context);
+			views.put(context, result);
+		}  else if(index == 2) {
+			// Scroll up
+			origin = new Point(origin.x + 0, origin.y - 1);
+			result = createLandView(origin,context);
+			views.put(context, result);
+		} else if(index == 3) {
+			// Scroll down
+			origin = new Point(origin.x + 0, origin.y + 1);
+			result = createLandView(origin,context);
+			views.put(context, result);
+		}
 		return result;
 	}
 	
@@ -231,9 +319,9 @@ public class PlotMenu {
 			case ROOT:
 				// Scroll arrows [0,1,2,3], close [4], create [5], delete [6], edit [7]
 				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollUp(navStart+1));
-				view.addIcon(navIconScrollDown(navStart+2));
-				view.addIcon(navIconScrollRight(navStart+3));
+				view.addIcon(navIconScrollRight(navStart+1));
+				view.addIcon(navIconScrollUp(navStart+2));
+				view.addIcon(navIconScrollDown(navStart+3));
 				view.addIcon(navIconClose(navStart+4));
 				view.addIcon(navIconCreate(navStart+5));
 				view.addIcon(navIconDelete(navStart+6));
@@ -243,9 +331,9 @@ public class PlotMenu {
 			case ROOT_CREATE:
 				// Scroll arrows [0,1,2,3], close [4], return [5]
 				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollUp(navStart+1));
-				view.addIcon(navIconScrollDown(navStart+2));
-				view.addIcon(navIconScrollRight(navStart+3));
+				view.addIcon(navIconScrollRight(navStart+1));
+				view.addIcon(navIconScrollUp(navStart+2));
+				view.addIcon(navIconScrollDown(navStart+3));
 				view.addIcon(navIconClose(navStart+4));
 				view.addIcon(navIconReturn(navStart+5));
 				view.addIcon(navIconEmpty(navStart+6));
@@ -255,9 +343,9 @@ public class PlotMenu {
 			case ROOT_DELETE:
 				// Scroll arrows [0,1,2,3], close [4], return [5]
 				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollUp(navStart+1));
-				view.addIcon(navIconScrollDown(navStart+2));
-				view.addIcon(navIconScrollRight(navStart+3));
+				view.addIcon(navIconScrollRight(navStart+1));
+				view.addIcon(navIconScrollUp(navStart+2));
+				view.addIcon(navIconScrollDown(navStart+3));
 				view.addIcon(navIconClose(navStart+4));
 				view.addIcon(navIconReturn(navStart+5));
 				view.addIcon(navIconEmpty(navStart+6));
@@ -267,9 +355,9 @@ public class PlotMenu {
 			case ROOT_EDIT:
 				// Scroll arrows [0,1,2,3], close [4], return [5]
 				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollUp(navStart+1));
-				view.addIcon(navIconScrollDown(navStart+2));
-				view.addIcon(navIconScrollRight(navStart+3));
+				view.addIcon(navIconScrollRight(navStart+1));
+				view.addIcon(navIconScrollUp(navStart+2));
+				view.addIcon(navIconScrollDown(navStart+3));
 				view.addIcon(navIconClose(navStart+4));
 				view.addIcon(navIconReturn(navStart+5));
 				view.addIcon(navIconEmpty(navStart+6));
@@ -291,9 +379,9 @@ public class PlotMenu {
 			case EDIT_LAND_ADD:
 				// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
 				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollUp(navStart+1));
-				view.addIcon(navIconScrollDown(navStart+2));
-				view.addIcon(navIconScrollRight(navStart+3));
+				view.addIcon(navIconScrollRight(navStart+1));
+				view.addIcon(navIconScrollUp(navStart+2));
+				view.addIcon(navIconScrollDown(navStart+3));
 				view.addIcon(navIconClose(navStart+4));
 				view.addIcon(navIconReturn(navStart+5));
 				view.addIcon(navIconFinish(navStart+6));
@@ -303,9 +391,9 @@ public class PlotMenu {
 			case EDIT_LAND_REMOVE:
 				// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
 				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollUp(navStart+1));
-				view.addIcon(navIconScrollDown(navStart+2));
-				view.addIcon(navIconScrollRight(navStart+3));
+				view.addIcon(navIconScrollRight(navStart+1));
+				view.addIcon(navIconScrollUp(navStart+2));
+				view.addIcon(navIconScrollDown(navStart+3));
 				view.addIcon(navIconClose(navStart+4));
 				view.addIcon(navIconReturn(navStart+5));
 				view.addIcon(navIconFinish(navStart+6));
@@ -346,40 +434,76 @@ public class PlotMenu {
 		
 	}
 	
+	private String getTitle(PlotState context) {
+		String result = "";
+		switch(context) {
+			case ROOT:
+				result = ChatColor.BLACK+town.getName()+" Plots";
+				break;
+			case ROOT_CREATE:
+				result = ChatColor.BLACK+town.getName()+" Create Plot";
+				break;
+			case ROOT_DELETE:
+				result = ChatColor.BLACK+town.getName()+" Delete Plot";
+				break;
+			case ROOT_EDIT:
+				result = ChatColor.BLACK+town.getName()+" Edit Plot";
+				break;
+			case EDIT:
+				result = ChatColor.BLACK+town.getName()+" Edit Options";
+				break;
+			case EDIT_LAND_ADD:
+				result = ChatColor.BLACK+town.getName()+" Add Land";
+				break;
+			case EDIT_LAND_REMOVE:
+				result = ChatColor.BLACK+town.getName()+" Remove Land";
+				break;
+			case EDIT_PLAYER_ADD:
+				result = ChatColor.BLACK+town.getName()+" Add Players";
+				break;
+			case EDIT_PLAYER_REMOVE:
+				result = ChatColor.BLACK+town.getName()+" Remove Players";
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
+	
 	private InfoIcon navIconScrollLeft(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Scroll Left",Collections.emptyList(),Material.DIRT,index,true);
+		return new InfoIcon(ChatColor.GOLD+"\u25C0",Collections.emptyList(),Material.STONE_BUTTON,index,true);
 	}
 	
 	private InfoIcon navIconScrollRight(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Scroll Right",Collections.emptyList(),Material.DIRT,index,true);
+		return new InfoIcon(ChatColor.GOLD+"\u25B6",Collections.emptyList(),Material.STONE_BUTTON,index,true);
 	}
 	
 	private InfoIcon navIconScrollUp(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Scroll Up",Collections.emptyList(),Material.DIRT,index,true);
+		return new InfoIcon(ChatColor.GOLD+"\u25B2",Collections.emptyList(),Material.STONE_BUTTON,index,true);
 	}
 	
 	private InfoIcon navIconScrollDown(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Scroll Down",Collections.emptyList(),Material.DIRT,index,true);
+		return new InfoIcon(ChatColor.GOLD+"\u25BC",Collections.emptyList(),Material.STONE_BUTTON,index,true);
 	}
 	
 	private InfoIcon navIconCreate(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Create",Collections.emptyList(),Material.DIRT,index,true);
+		return new InfoIcon(ChatColor.GOLD+"Create",Collections.emptyList(),Material.OAK_SAPLING,index,true);
 	}
 	
 	private InfoIcon navIconDelete(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Delete",Collections.emptyList(),Material.DIRT,index,true);
+		return new InfoIcon(ChatColor.GOLD+"Delete",Collections.emptyList(),Material.BARRIER,index,true);
 	}
 	
 	private InfoIcon navIconEdit(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Edit",Collections.emptyList(),Material.DIRT,index,true);
+		return new InfoIcon(ChatColor.GOLD+"Edit",Collections.emptyList(),Material.WRITABLE_BOOK,index,true);
 	}
 	
 	private InfoIcon navIconReturn(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Return",Collections.emptyList(),Material.DIRT,index,true);
+		return new InfoIcon(ChatColor.GOLD+"Return",Collections.emptyList(),Material.FIREWORK_ROCKET,index,true);
 	}
 	
 	private InfoIcon navIconFinish(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Finish",Collections.emptyList(),Material.DIRT,index,true);
+		return new InfoIcon(ChatColor.GOLD+"Finish",Collections.emptyList(),Material.WRITTEN_BOOK,index,true);
 	}
 	
 	private InfoIcon navIconClose(int index) {

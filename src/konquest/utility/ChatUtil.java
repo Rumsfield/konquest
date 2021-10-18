@@ -59,11 +59,11 @@ public class ChatUtil {
 	 */
 	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name) {
 		String message = base.toLowerCase();
-		message.replace("%prefix%", prefix);
-		message.replace("%suffix%", suffix);
-		message.replace("%kingdom%", kingdom);
-		message.replace("%title%", title);
-		message.replace("%name%", name);
+		message = message.replace("%prefix%", prefix);
+		message = message.replace("%suffix%", suffix);
+		message = message.replace("%kingdom%", kingdom);
+		message = message.replace("%title%", title);
+		message = message.replace("%name%", name);
 		return message;
 	}
 	
