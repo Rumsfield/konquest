@@ -1,10 +1,12 @@
 package konquest.model;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 public class KonPlot {
@@ -34,6 +36,14 @@ public class KonPlot {
 		return points.contains(p);
 	}
 	
+	public List<Point> getPoints() {
+		ArrayList<Point> result = new ArrayList<Point>();
+		for(Point p : points) {
+			result.add(p);
+		}
+		return result;
+	}
+	
 	public void addUsers(List<UUID> u) {
 		users.addAll(u);
 	}
@@ -51,10 +61,18 @@ public class KonPlot {
 	}
 	
 	public boolean removeUser(OfflinePlayer u) {
-		return removeUser(u);
+		return removeUser(u.getUniqueId());
 	}
 	
 	public boolean hasUser(OfflinePlayer u) {
 		return users.contains(u.getUniqueId());
+	}
+	
+	public List<OfflinePlayer> getUsers() {
+		ArrayList<OfflinePlayer> result = new ArrayList<OfflinePlayer>();
+		for(UUID id : users) {
+			result.add(Bukkit.getOfflinePlayer(id));
+		}
+		return result;
 	}
 }

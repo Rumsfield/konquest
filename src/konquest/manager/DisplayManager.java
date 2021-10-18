@@ -1342,9 +1342,7 @@ public class DisplayManager {
    	public void displayPlotMenu(Player bukkitPlayer, KonTown town) {
    		ChatUtil.printDebug("Displaying new plots menu to "+bukkitPlayer.getName()+", current menu size is "+plotMenus.size());
 		playMenuOpenSound(bukkitPlayer);
-
-		PlotMenu newMenu = new PlotMenu(town, bukkitPlayer.getLocation());
-
+		PlotMenu newMenu = new PlotMenu(town, bukkitPlayer);
 		plotMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {

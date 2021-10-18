@@ -1103,7 +1103,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		getWorld().playSound(getCenterLoc(), Sound.BLOCK_GLASS_BREAK, (float)3.0, (float)0.3);
 	}
 	
-	public boolean addPlot(Location loc) {
+	/*public boolean addPlot(Location loc) {
 		boolean result = false;
 		if(this.isLocInside(loc)) {
 			Point p = Konquest.toPoint(loc);
@@ -1111,9 +1111,26 @@ public class KonTown extends KonTerritory implements Timeable{
 			result = true;
 		}
 		return result;
+	}*/
+	
+	public void setPlot(KonPlot plot) {
+		if(plot == null) {
+			ChatUtil.printDebug("Failed to set null plot!");
+			return;
+		}
+		// Remove from map if already present
+		removePlot(plot);
+		// Add to map
+		for(Point p : plot.getPoints()) {
+			plots.put(p, plot);
+		}
 	}
 	
 	public void removePlot(KonPlot plot) {
+		if(plot == null) {
+			ChatUtil.printDebug("Failed to remove null plot!");
+			return;
+		}
 		for(Point p : plots.keySet()) {
 			if(plots.get(p).equals(plot)) {
 				plots.remove(p);
@@ -1122,9 +1139,12 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 	
 	public boolean hasPlot(Location loc) {
+		return hasPlot(Konquest.toPoint(loc), loc.getWorld());
+	}
+	
+	public boolean hasPlot(Point p, World w) {
 		boolean result = false;
-		if(this.isLocInside(loc)) {
-			Point p = Konquest.toPoint(loc);
+		if(this.getChunkList().containsKey(p) && w.equals(getWorld())) {
 			result = plots.containsKey(p);
 		}
 		return result;
@@ -1132,17 +1152,16 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	// This can return null!
 	public KonPlot getPlot(Location loc) {
+		return getPlot(Konquest.toPoint(loc), loc.getWorld());
+	}
+	
+	// This can return null!
+	public KonPlot getPlot(Point p, World w) {
 		KonPlot result = null;
-		if(this.isLocInside(loc)) {
-			Point p = Konquest.toPoint(loc);
+		if(this.getChunkList().containsKey(p) && w.equals(getWorld())) {
 			result = plots.get(p);
 		}
 		return result;
-	}
-	
-	public void addPlotPoint(KonPlot plot, Point p) {
-		plot.addPoint(p);
-		plots.put(p, plot);
 	}
 	
 }
