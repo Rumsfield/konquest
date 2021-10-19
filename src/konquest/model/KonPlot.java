@@ -20,6 +20,11 @@ public class KonPlot {
 		this.points.add(origin);
 	}
 	
+	public KonPlot(HashSet<Point> points, HashSet<UUID> users) {
+		this.points = points;
+		this.users = users;
+	}
+	
 	public void addPoints(List<Point> p) {
 		points.addAll(p);
 	}
@@ -74,5 +79,9 @@ public class KonPlot {
 			result.add(Bukkit.getOfflinePlayer(id));
 		}
 		return result;
+	}
+	
+	public KonPlot clone() {
+		return new KonPlot(this.points,this.users);
 	}
 }

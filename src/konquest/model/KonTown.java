@@ -1113,14 +1113,11 @@ public class KonTown extends KonTerritory implements Timeable{
 		return result;
 	}*/
 	
-	public void setPlot(KonPlot plot) {
+	public void putPlot(KonPlot plot) {
 		if(plot == null) {
 			ChatUtil.printDebug("Failed to set null plot!");
 			return;
 		}
-		// Remove from map if already present
-		removePlot(plot);
-		// Add to map
 		for(Point p : plot.getPoints()) {
 			plots.put(p, plot);
 		}
@@ -1131,8 +1128,8 @@ public class KonTown extends KonTerritory implements Timeable{
 			ChatUtil.printDebug("Failed to remove null plot!");
 			return;
 		}
-		for(Point p : plots.keySet()) {
-			if(plots.get(p).equals(plot)) {
+		for(Point p : plot.getPoints()) {
+			if(plots.containsKey(p)) {
 				plots.remove(p);
 			}
 		}

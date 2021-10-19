@@ -26,6 +26,8 @@ public class PlotMenu {
 		ROOT_CREATE,
 		ROOT_DELETE,
 		ROOT_EDIT,
+		CREATE_LAND_ADD,
+		CREATE_PLAYER_ADD,
 		EDIT,
 		EDIT_LAND_ADD,
 		EDIT_LAND_REMOVE,
@@ -53,7 +55,18 @@ public class PlotMenu {
 	private ArrayList<DisplayMenu> playerPages;
 	private int currentPlayerPage;
 	private PlotState currentPlotState;
-	private KonPlot tempPlot = null;
+	private KonPlot editPlot = null;
+	private KonPlot oldPlot = null;
+	private final Material[] plotColors = {
+			Material.MAGENTA_STAINED_GLASS_PANE,
+			Material.CYAN_STAINED_GLASS_PANE,
+			Material.BLUE_STAINED_GLASS_PANE,
+			Material.ORANGE_STAINED_GLASS_PANE,
+			Material.PINK_STAINED_GLASS_PANE,
+			Material.YELLOW_STAINED_GLASS_PANE,
+			Material.PURPLE_STAINED_GLASS_PANE,
+			Material.LIGHT_BLUE_STAINED_GLASS_PANE
+	};
 	
 	public PlotMenu(KonTown town, Player bukkitPlayer) {
 		this.town = town;
@@ -76,6 +89,8 @@ public class PlotMenu {
 		views.put(PlotState.ROOT_CREATE, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Create Plot"));
 		views.put(PlotState.ROOT_DELETE, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Delete Plot"));
 		views.put(PlotState.ROOT_EDIT, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Edit Plot"));
+		views.put(PlotState.CREATE_LAND_ADD, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Add Land"));
+		views.put(PlotState.CREATE_PLAYER_ADD, new DisplayMenu(2, ChatColor.BLACK+town.getName()+" Add Player"));
 		views.put(PlotState.EDIT, new DisplayMenu(2, ChatColor.BLACK+town.getName()+" Edit"));
 		views.put(PlotState.EDIT_LAND_ADD, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Add Land"));
 		views.put(PlotState.EDIT_LAND_REMOVE, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Remove Land"));
@@ -118,27 +133,40 @@ public class PlotMenu {
 		List<String> loreList;
 		InfoIcon icon;
 		Point drawPoint;
+		KonPlot drawPlot;
+		int colorSelect = 0;
+		HashMap<KonPlot,Material> plotColorMap = new HashMap<KonPlot,Material>();
 		int index = 0;
 		for(int r = -2; r <= 2; r++) {
 			for(int c = -4; c <= 4; c++) {
 				// Iterate over all land tiles
 				drawPoint = new Point(origin.x + c, origin.y + r);
+				drawPlot = null;
 				if(town.getChunkList().containsKey(drawPoint)) {
+					// This tile is claimed by the town
 					loreList = new ArrayList<String>();
 			    	boolean isClickable = false;
 					Material landMat = Material.GREEN_STAINED_GLASS_PANE;
 					String landTitle = ChatColor.GREEN+"Town Land";
-					// Render plots
-					if(town.hasPlot(drawPoint, town.getWorld()) || (tempPlot != null && tempPlot.hasPoint(drawPoint))) {
-						// This tile is part of a plot. Change display attributes...
-						KonPlot drawPlot = town.getPlot(drawPoint, town.getWorld());
-						landMat = Material.MAGENTA_STAINED_GLASS_PANE;
-						landTitle = ChatColor.LIGHT_PURPLE+"Plot";
-						if(tempPlot.hasPoint(drawPoint)) {
-							landMat = Material.GLASS_PANE;
-							landTitle = ChatColor.WHITE+"Editing Plot";
-							drawPlot = tempPlot;
+					boolean isPlot = false;
+					// Render all town land, then plots, then remove oldPlot if exist, then render editPlot if exist.
+					// Draw different plots in a sequence of stained glass pane colors.
+					if(town.hasPlot(drawPoint, town.getWorld())) {
+						drawPlot = town.getPlot(drawPoint, town.getWorld());
+						// Determine plot color
+						if(plotColorMap.containsKey(drawPlot)) {
+							// Use chosen color
+							landMat = plotColorMap.get(drawPlot);
+						} else {
+							// Choose new color in sequence
+							landMat = plotColors[colorSelect];
+							plotColorMap.put(drawPlot, plotColors[colorSelect]);
+							colorSelect++;
+							if(colorSelect >= plotColors.length) {
+								colorSelect = 0;
+							}
 						}
+						landTitle = ChatColor.LIGHT_PURPLE+"Plot";
 						// Display plot player list in lore
 						if(drawPlot != null) {
 							List<OfflinePlayer> users = drawPlot.getUsers();
@@ -155,27 +183,53 @@ public class PlotMenu {
 						} else {
 							loreList.add(ChatColor.DARK_RED+"Invalid Plot");
 						}
-						if(context.equals(PlotState.ROOT_CREATE) ||
-								context.equals(PlotState.ROOT_DELETE) || 
-								context.equals(PlotState.ROOT_EDIT) ||
-								context.equals(PlotState.EDIT_LAND_REMOVE)) {
+						isPlot = true;
+					}
+					// Remove plot render if tile belongs to oldPlot
+					if(oldPlot != null && oldPlot.hasPoint(drawPoint)) {
+						landMat = Material.GREEN_STAINED_GLASS_PANE;
+						landTitle = ChatColor.GREEN+"Town Land";
+						loreList.clear();
+						isPlot = false;
+					}
+					// Add render for editPloy
+					if(editPlot != null && editPlot.hasPoint(drawPoint)) {
+						landMat = Material.GLASS_PANE;
+						landTitle = ChatColor.WHITE+"Editing Plot";
+						isPlot = true;
+					}
+					// Add context tips to lore
+					if(isPlot) {
+						if(context.equals(PlotState.ROOT_DELETE)) {
 							isClickable = true;
-							loreList.add(ChatColor.GOLD+"Click");
+							loreList.add(ChatColor.GOLD+"Click to Delete Plot");
+						} else if(context.equals(PlotState.ROOT_EDIT)) {
+							isClickable = true;
+							loreList.add(ChatColor.GOLD+"Click to Edit Plot");
+						} else if(context.equals(PlotState.EDIT_LAND_REMOVE)) {
+							isClickable = true;
+							loreList.add(ChatColor.GOLD+"Click to Remove Chunk");
 						}
 					} else {
-						if(context.equals(PlotState.EDIT_LAND_ADD)) {
+						if(context.equals(PlotState.ROOT_CREATE)) {
 							isClickable = true;
-							loreList.add(ChatColor.GOLD+"Click");
+							loreList.add(ChatColor.GOLD+"Click to Create Plot");
+						} else if(context.equals(PlotState.EDIT_LAND_ADD) || context.equals(PlotState.CREATE_LAND_ADD)) {
+							isClickable = true;
+							loreList.add(ChatColor.GOLD+"Click to Add Chunk");
 						}
 					}
+					// Add other info to lore
 					if(Konquest.toPoint(playerLoc).equals(drawPoint)) {
-						landMat = Material.PLAYER_HEAD;
+						//landMat = Material.PLAYER_HEAD;
 						loreList.add("You Are Here");
 					}
 					if(Konquest.toPoint(town.getCenterLoc()).equals(drawPoint)) {
 						landMat = Material.OBSIDIAN;
 						loreList.add("Town Monument");
+						isClickable = false;
 					}
+					// Build icon and add to menu view
 					icon = new InfoIcon(landTitle,loreList,landMat,index,isClickable);
 					result.addIcon(icon);
 				}
@@ -197,7 +251,7 @@ public class PlotMenu {
 		boolean isClickable = false;
 		// Determine list of players for this paged view
 		List<OfflinePlayer> players = new ArrayList<OfflinePlayer>();
-		if(context.equals(PlotState.EDIT_PLAYER_ADD)) {
+		if(context.equals(PlotState.EDIT_PLAYER_ADD) || context.equals(PlotState.CREATE_PLAYER_ADD)) {
 			players.addAll(town.getPlayerResidents());
 			players.removeAll(plot.getUsers());
 			loreStr = "Click to add player";
@@ -286,7 +340,8 @@ public class PlotMenu {
 						result = null;
 					} else if(index == 5) {
 						// Return
-						tempPlot = null;
+						editPlot = null;
+						oldPlot = null;
 						result = goToState(PlotState.ROOT);
 					}
 					break;
@@ -299,7 +354,8 @@ public class PlotMenu {
 						result = null;
 					} else if(index == 5) {
 						// Return
-						tempPlot = null;
+						editPlot = null;
+						oldPlot = null;
 						result = goToState(PlotState.ROOT);
 					}
 					break;
@@ -312,8 +368,42 @@ public class PlotMenu {
 						result = null;
 					} else if(index == 5) {
 						// Return
-						tempPlot = null;
+						editPlot = null;
+						oldPlot = null;
 						result = goToState(PlotState.ROOT);
+					}
+					break;
+				case CREATE_LAND_ADD:
+					// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
+					if(index >= 0 && index <= 3) {
+						result = scrollView(index);
+					} else if(index == 4) {
+						// Close
+						result = null;
+					} else if(index == 5) {
+						// Return
+						result = goToState(PlotState.ROOT_CREATE);
+					} else if(index == 6) {
+						// Finish
+						result = goToState(PlotState.CREATE_PLAYER_ADD);
+					}
+					break;
+				case CREATE_PLAYER_ADD:
+					// (back [0]) close [4], return [5], finish [6], (next [8])
+					if(index == 0) {
+						result = goPageBack();
+					} else if(index == 4) {
+						// Close
+						result = null;
+					} else if(index == 5) {
+						// Return
+						result = goToState(PlotState.CREATE_LAND_ADD);
+					} else if(index == 6) {
+						// Finish
+						result = null;
+						commitPlot();
+					} else if(index == 8) {
+						result = goPageNext();
 					}
 					break;
 				case EDIT:
@@ -323,7 +413,8 @@ public class PlotMenu {
 						result = null;
 					} else if(index == 5) {
 						// Return
-						tempPlot = null;
+						editPlot = null;
+						oldPlot = null;
 						result = goToState(PlotState.ROOT_EDIT);
 					}
 					break;
@@ -340,8 +431,7 @@ public class PlotMenu {
 					} else if(index == 6) {
 						// Finish
 						result = null;
-						town.setPlot(tempPlot);
-						Konquest.playSuccessSound(bukkitPlayer);
+						commitPlot();
 					}
 					break;
 				case EDIT_LAND_REMOVE:
@@ -357,8 +447,7 @@ public class PlotMenu {
 					} else if(index == 6) {
 						// Finish
 						result = null;
-						town.setPlot(tempPlot);
-						Konquest.playSuccessSound(bukkitPlayer);
+						commitPlot();
 					}
 					break;
 				case EDIT_PLAYER_ADD:
@@ -374,8 +463,7 @@ public class PlotMenu {
 					} else if(index == 6) {
 						// Finish
 						result = null;
-						town.setPlot(tempPlot);
-						Konquest.playSuccessSound(bukkitPlayer);
+						commitPlot();
 					} else if(index == 8) {
 						result = goPageNext();
 					}
@@ -393,8 +481,7 @@ public class PlotMenu {
 					} else if(index == 6) {
 						// Finish
 						result = null;
-						town.setPlot(tempPlot);
-						Konquest.playSuccessSound(bukkitPlayer);
+						commitPlot();
 					} else if(index == 8) {
 						result = goPageNext();
 					}
@@ -412,26 +499,44 @@ public class PlotMenu {
 					// Check for non-plot town land click, create new plot
 					if(!town.hasPlot(clickPoint, town.getWorld())) {
 						// Make a new plot with this point
-						tempPlot = new KonPlot(clickPoint);
-						result = goToState(PlotState.EDIT_LAND_ADD);
+						oldPlot = null;
+						editPlot = new KonPlot(clickPoint);
+						result = goToState(PlotState.CREATE_LAND_ADD);
 					}
 					break;
 				case ROOT_DELETE:
 					// Check for plot town land click, delete existing plot
 					if(town.hasPlot(clickPoint, town.getWorld())) {
 						// Choose plot to remove
-						tempPlot = town.getPlot(clickPoint,town.getWorld());
+						oldPlot = town.getPlot(clickPoint,town.getWorld());
+						editPlot = null;
 						result = null;
-						town.removePlot(tempPlot);
-						Konquest.playSuccessSound(bukkitPlayer);
+						commitPlot();
 					}
 					break;
 				case ROOT_EDIT:
 					// Check for plot town land click, edit existing plot
 					if(town.hasPlot(clickPoint, town.getWorld())) {
 						// Choose plot to edit
-						tempPlot = town.getPlot(clickPoint,town.getWorld());
+						oldPlot = town.getPlot(clickPoint,town.getWorld());
+						editPlot = oldPlot.clone();
 						result = goToState(PlotState.EDIT);
+					}
+					break;
+				case CREATE_LAND_ADD:
+					// Check for non-plot town land click, add to chosen plot
+					if(!town.hasPlot(clickPoint, town.getWorld()) && editPlot != null && !editPlot.hasPoint(clickPoint)) {
+						// Add this point to the temp plot
+						editPlot.addPoint(clickPoint);
+						result = goToState(PlotState.CREATE_LAND_ADD);
+					}
+					break;
+				case CREATE_PLAYER_ADD:
+					// Check for player icon click, add to chosen plot
+					if(clickedIcon != null && clickedIcon instanceof PlayerIcon && editPlot != null) {
+						PlayerIcon icon = (PlayerIcon)clickedIcon;
+						editPlot.addUser(icon.getOfflinePlayer());
+						result = goToState(PlotState.CREATE_PLAYER_ADD);
 					}
 					break;
 				case EDIT:
@@ -453,33 +558,33 @@ public class PlotMenu {
 					break;
 				case EDIT_LAND_ADD:
 					// Check for non-plot town land click, add to chosen plot
-					if(!town.hasPlot(clickPoint, town.getWorld()) && !tempPlot.hasPoint(clickPoint)) {
+					if(!town.hasPlot(clickPoint, town.getWorld()) && editPlot != null && !editPlot.hasPoint(clickPoint)) {
 						// Add this point to the temp plot
-						tempPlot.addPoint(clickPoint);
+						editPlot.addPoint(clickPoint);
 						result = goToState(PlotState.EDIT_LAND_ADD);
 					}
 					break;
 				case EDIT_LAND_REMOVE:
 					// Check for plot town land click, remove from chosen plot
-					if(tempPlot.hasPoint(clickPoint)) {
+					if(editPlot != null && editPlot.hasPoint(clickPoint)) {
 						// Remove this point from the temp plot
-						tempPlot.removePoint(clickPoint);
+						editPlot.removePoint(clickPoint);
 						result = goToState(PlotState.EDIT_LAND_REMOVE);
 					}
 					break;
 				case EDIT_PLAYER_ADD:
 					// Check for player icon click, add to chosen plot
-					if(clickedIcon != null && clickedIcon instanceof PlayerIcon) {
+					if(clickedIcon != null && clickedIcon instanceof PlayerIcon && editPlot != null) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
-						tempPlot.addUser(icon.getOfflinePlayer());
+						editPlot.addUser(icon.getOfflinePlayer());
 						result = goToState(PlotState.EDIT_PLAYER_ADD);
 					}
 					break;
 				case EDIT_PLAYER_REMOVE:
 					// Check for player icon click, remove from chosen plot
-					if(clickedIcon != null && clickedIcon instanceof PlayerIcon) {
+					if(clickedIcon != null && clickedIcon instanceof PlayerIcon && editPlot != null) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
-						tempPlot.removeUser(icon.getOfflinePlayer());
+						editPlot.removeUser(icon.getOfflinePlayer());
 						result = goToState(PlotState.EDIT_PLAYER_REMOVE);
 					}
 					break;
@@ -537,6 +642,14 @@ public class PlotMenu {
 				result = createLandView(origin,currentPlotState);
 				views.put(currentPlotState, result);
 				break;
+			case CREATE_LAND_ADD:
+				result = createLandView(origin,currentPlotState);
+				views.put(currentPlotState, result);
+				break;
+			case CREATE_PLAYER_ADD:
+				result = createPlayerView(editPlot,currentPlotState);
+				views.put(currentPlotState, result);
+				break;
 			case EDIT:
 				result = views.get(currentPlotState);
 				break;
@@ -549,11 +662,11 @@ public class PlotMenu {
 				views.put(currentPlotState, result);
 				break;
 			case EDIT_PLAYER_ADD:
-				result = createPlayerView(tempPlot,currentPlotState);
+				result = createPlayerView(editPlot,currentPlotState);
 				views.put(currentPlotState, result);
 				break;
 			case EDIT_PLAYER_REMOVE:
-				result = createPlayerView(tempPlot,currentPlotState);
+				result = createPlayerView(editPlot,currentPlotState);
 				views.put(currentPlotState, result);
 				break;
 			default:
@@ -582,6 +695,18 @@ public class PlotMenu {
 		result = playerPages.get(currentPlayerPage);
 		views.put(currentPlotState, result);
 		return result;
+	}
+	
+	private void commitPlot() {
+		// Attempt to remove old plot
+		if(oldPlot != null) {
+			town.removePlot(oldPlot);
+		}
+		// Attempt to put new plot
+		if(editPlot != null) {
+			town.putPlot(editPlot);
+		}
+		Konquest.playSuccessSound(bukkitPlayer);
 	}
 	
 	/**
@@ -643,6 +768,40 @@ public class PlotMenu {
 				view.addIcon(navIconEmpty(navStart+6));
 				view.addIcon(navIconEmpty(navStart+7));
 				view.addIcon(navIconEmpty(navStart+8));
+				break;
+			case CREATE_LAND_ADD:
+				// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
+				view.addIcon(navIconScrollLeft(navStart+0));
+				view.addIcon(navIconScrollRight(navStart+1));
+				view.addIcon(navIconScrollUp(navStart+2));
+				view.addIcon(navIconScrollDown(navStart+3));
+				view.addIcon(navIconClose(navStart+4));
+				view.addIcon(navIconReturn(navStart+5));
+				view.addIcon(navIconFinish(navStart+6));
+				view.addIcon(navIconEmpty(navStart+7));
+				view.addIcon(navIconEmpty(navStart+8));
+				break;
+			case CREATE_PLAYER_ADD:
+				// (back [0]) close [4], return [5], finish [6], (next [8])
+				if(currentPlayerPage > 0) {
+					// Place a back button
+					view.addIcon(navIconBack(navStart+0));
+				} else {
+					view.addIcon(navIconEmpty(navStart+0));
+				}
+				if(currentPlayerPage < playerPages.size()-1) {
+					// Place a next button
+					view.addIcon(navIconNext(navStart+8));
+				} else {
+					view.addIcon(navIconEmpty(navStart+8));
+				}
+				view.addIcon(navIconEmpty(navStart+1));
+				view.addIcon(navIconEmpty(navStart+2));
+				view.addIcon(navIconEmpty(navStart+3));
+				view.addIcon(navIconClose(navStart+4));
+				view.addIcon(navIconReturn(navStart+5));
+				view.addIcon(navIconFinish(navStart+6));
+				view.addIcon(navIconEmpty(navStart+7));
 				break;
 			case EDIT:
 				// Close [4], return [5]
@@ -744,6 +903,12 @@ public class PlotMenu {
 				break;
 			case ROOT_EDIT:
 				result = ChatColor.BLACK+town.getName()+" Edit Plot";
+				break;
+			case CREATE_LAND_ADD:
+				result = ChatColor.BLACK+town.getName()+" Add Land";
+				break;
+			case CREATE_PLAYER_ADD:
+				result = ChatColor.BLACK+town.getName()+" Add Players";
 				break;
 			case EDIT:
 				result = ChatColor.BLACK+town.getName()+" Edit Options";
