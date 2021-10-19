@@ -145,9 +145,10 @@ public class PlotMenu {
 				if(town.getChunkList().containsKey(drawPoint)) {
 					// This tile is claimed by the town
 					loreList = new ArrayList<String>();
+					//loreList.add(ChatColor.GOLD+""+drawPoint.x+","+drawPoint.y);
 			    	boolean isClickable = false;
 					Material landMat = Material.GREEN_STAINED_GLASS_PANE;
-					String landTitle = ChatColor.GREEN+"Town Land";
+					String landTitle = ChatColor.GREEN+"Town Land: "+drawPoint.x+","+drawPoint.y;
 					boolean isPlot = false;
 					// Render all town land, then plots, then remove oldPlot if exist, then render editPlot if exist.
 					// Draw different plots in a sequence of stained glass pane colors.
@@ -166,7 +167,7 @@ public class PlotMenu {
 								colorSelect = 0;
 							}
 						}
-						landTitle = ChatColor.LIGHT_PURPLE+"Plot";
+						landTitle = ChatColor.LIGHT_PURPLE+"Plot: "+drawPoint.x+","+drawPoint.y;
 						// Display plot player list in lore
 						if(drawPlot != null) {
 							List<OfflinePlayer> users = drawPlot.getUsers();
@@ -188,27 +189,33 @@ public class PlotMenu {
 					// Remove plot render if tile belongs to oldPlot
 					if(oldPlot != null && oldPlot.hasPoint(drawPoint)) {
 						landMat = Material.GREEN_STAINED_GLASS_PANE;
-						landTitle = ChatColor.GREEN+"Town Land";
+						landTitle = ChatColor.GREEN+"Town Land: "+drawPoint.x+","+drawPoint.y;
 						loreList.clear();
 						isPlot = false;
 					}
 					// Add render for editPloy
 					if(editPlot != null && editPlot.hasPoint(drawPoint)) {
 						landMat = Material.GLASS_PANE;
-						landTitle = ChatColor.WHITE+"Editing Plot";
+						landTitle = ChatColor.WHITE+"Editing Plot: "+drawPoint.x+","+drawPoint.y;
 						isPlot = true;
 					}
 					// Add context tips to lore
 					if(isPlot) {
-						if(context.equals(PlotState.ROOT_DELETE)) {
-							isClickable = true;
-							loreList.add(ChatColor.GOLD+"Click to Delete Plot");
-						} else if(context.equals(PlotState.ROOT_EDIT)) {
-							isClickable = true;
-							loreList.add(ChatColor.GOLD+"Click to Edit Plot");
-						} else if(context.equals(PlotState.EDIT_LAND_REMOVE)) {
-							isClickable = true;
-							loreList.add(ChatColor.GOLD+"Click to Remove Chunk");
+						if(Konquest.toPoint(town.getCenterLoc()).equals(drawPoint)) {
+							isClickable = false;
+							loreList.add("Town Monument");
+							landMat = Material.OBSIDIAN;
+						} else {
+							if(context.equals(PlotState.ROOT_DELETE)) {
+								isClickable = true;
+								loreList.add(ChatColor.GOLD+"Click to Delete Plot");
+							} else if(context.equals(PlotState.ROOT_EDIT)) {
+								isClickable = true;
+								loreList.add(ChatColor.GOLD+"Click to Edit Plot");
+							} else if(context.equals(PlotState.EDIT_LAND_REMOVE)) {
+								isClickable = true;
+								loreList.add(ChatColor.GOLD+"Click to Remove Chunk");
+							}
 						}
 					} else {
 						if(context.equals(PlotState.ROOT_CREATE)) {
@@ -223,11 +230,6 @@ public class PlotMenu {
 					if(Konquest.toPoint(playerLoc).equals(drawPoint)) {
 						//landMat = Material.PLAYER_HEAD;
 						loreList.add("You Are Here");
-					}
-					if(Konquest.toPoint(town.getCenterLoc()).equals(drawPoint)) {
-						landMat = Material.OBSIDIAN;
-						loreList.add("Town Monument");
-						isClickable = false;
 					}
 					// Build icon and add to menu view
 					icon = new InfoIcon(landTitle,loreList,landMat,index,isClickable);
@@ -311,7 +313,7 @@ public class PlotMenu {
 		if(slot <= navMaxIndex && slot >= navMinIndex) {
 			// Clicked in navigation bar, do something based on current state
 			int index = slot-navMinIndex;
-			ChatUtil.printDebug("Plot Menu navigation update: State "+currentPlotState.toString()+", Index "+index);
+			//ChatUtil.printDebug("Plot Menu navigation update: State "+currentPlotState.toString()+", Index "+index);
 			switch(currentPlotState) {
 				case ROOT:
 					// Scroll arrows [0,1,2,3], close [4], create [5], delete [6], edit [7]
@@ -493,7 +495,7 @@ public class PlotMenu {
 			// Click in non-navigation slot
 			Point clickPoint = slotToPoint(slot);
 			MenuIcon clickedIcon = views.get(currentPlotState).getIcon(slot);
-			ChatUtil.printDebug("Plot Menu view update: State "+currentPlotState.toString()+", Slot "+slot+", Point "+clickPoint.x+","+clickPoint.y);
+			//ChatUtil.printDebug("Plot Menu view update: State "+currentPlotState.toString()+", Slot "+slot+", Point "+clickPoint.x+","+clickPoint.y);
 			switch(currentPlotState) {
 				case ROOT_CREATE:
 					// Check for non-plot town land click, create new plot

@@ -82,6 +82,10 @@ public class KonPlot {
 	}
 	
 	public KonPlot clone() {
-		return new KonPlot(this.points,this.users);
+		HashSet<Point> clonePoints = new HashSet<Point>();
+		HashSet<UUID> cloneUsers = new HashSet<UUID>();
+		clonePoints.addAll(points);
+		cloneUsers.addAll(users);
+		return new KonPlot(clonePoints,cloneUsers);
 	}
 }
