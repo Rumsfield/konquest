@@ -1121,6 +1121,15 @@ public class Konquest implements Timeable {
         },4);
     }
     
+    public static void playFailSound(Player bukkitPlayer) {
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, (float)0.5, (float)1.4);
+            }
+        },1);
+    }
+    
     public static void playTownArmorSound(Player bukkitPlayer) {
     	playTownArmorSound(bukkitPlayer.getLocation());
     }

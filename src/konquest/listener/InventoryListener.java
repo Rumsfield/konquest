@@ -100,15 +100,36 @@ public class InventoryListener implements Listener {
 					}
 					// Prevent non-residents in closed towns from opening inventories that can hold items
 					// However this still allows them to open inventories like enchantment tables, crating bench, etc.
-					if(!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()) && 
-							(event.getInventory().getHolder() instanceof BlockInventoryHolder ||
+					// Protect land and plots
+					if(event.getInventory().getHolder() instanceof BlockInventoryHolder ||
 							 event.getInventory().getHolder() instanceof DoubleChest ||
-							 event.getInventory().getHolder() instanceof StorageMinecart)) {
-						//ChatUtil.printDebug("Cancelled inventory open event for non-resident in closed town "+territory.getName());
-						//ChatUtil.sendNotice(player.getBukkitPlayer(), "You must be a resident to access containers in "+territory.getName(), ChatColor.DARK_RED);
-						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
-						event.setCancelled(true);
-						return;
+							 event.getInventory().getHolder() instanceof StorageMinecart) {
+						// Inventory can hold items
+						if(town.isOpen()) {
+							// Town is open
+							if(!konquest.getPlotManager().isContainerAllowed() && town.hasPlot(openLoc) && !town.getPlot(openLoc).hasUser(player.getOfflineBukkitPlayer())) {
+								// Stop when player edits plot that isn't theirs
+								ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage(territory.getName()));
+								event.setCancelled(true);
+								return;
+							}
+						} else {
+							// Town is closed
+							if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+								// Player is a resident
+								if(!konquest.getPlotManager().isContainerAllowed() && town.hasPlot(openLoc) && !town.getPlot(openLoc).hasUser(player.getOfflineBukkitPlayer())) {
+									// Stop when player edits plot that isn't theirs
+									ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage(territory.getName()));
+									event.setCancelled(true);
+									return;
+								}
+							} else {
+								// Stop all edits by non-resident
+								ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
+								event.setCancelled(true);
+								return;
+							}
+						}
 					}
 					// Attempt to put loot into empty chests within the monument
 					if(town.isLocInsideCenterChunk(openLoc) && event.getInventory().getHolder() instanceof Chest) {
@@ -165,12 +186,12 @@ public class InventoryListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.LOW)
     public void onDisplayMenuClick(InventoryClickEvent event) {
-		int slot = event.getRawSlot();
-		Player bukkitPlayer = (Player) event.getWhoClicked();
-		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
 		// When a player clicks inside of a display menu inventory
-		if(player != null && konquest.getDisplayManager().isDisplayMenu(event.getClickedInventory())) {
-			if(slot < event.getView().getTopInventory().getSize()) {
+		if(konquest.getDisplayManager().isDisplayMenu(event.getClickedInventory())) {
+			int slot = event.getRawSlot();
+			Player bukkitPlayer = (Player) event.getWhoClicked();
+			KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+			if(player != null && slot < event.getView().getTopInventory().getSize()) {
 				event.setCancelled(true);
 				konquest.getDisplayManager().onDisplayMenuClick(player, event.getClickedInventory(), slot);
 			}

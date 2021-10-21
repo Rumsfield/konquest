@@ -50,6 +50,7 @@ public class PlotMenu {
 	private Point center;
 	private Point origin;
 	private Player bukkitPlayer;
+	private int maxSize;
 	private Location playerLoc;
 	private HashMap<PlotState,DisplayMenu> views;
 	private ArrayList<DisplayMenu> playerPages;
@@ -68,9 +69,10 @@ public class PlotMenu {
 			Material.LIGHT_BLUE_STAINED_GLASS_PANE
 	};
 	
-	public PlotMenu(KonTown town, Player bukkitPlayer) {
+	public PlotMenu(KonTown town, Player bukkitPlayer, int maxSize) {
 		this.town = town;
 		this.bukkitPlayer = bukkitPlayer;
+		this.maxSize = maxSize;
 		this.playerLoc = bukkitPlayer.getLocation();;
 		this.center = Konquest.toPoint(playerLoc);
 		this.origin = center;
@@ -118,11 +120,11 @@ public class PlotMenu {
 		renderView = new DisplayMenu(2, getTitle(PlotState.EDIT));
 		icon = new InfoIcon(ChatColor.GREEN+"Add Land", Collections.emptyList(), Material.GRASS_BLOCK, 1, true);
 		renderView.addIcon(icon);
-		icon = new InfoIcon(ChatColor.RED+"Remove Land", Collections.emptyList(), Material.STONE, 3, true);
+		icon = new InfoIcon(ChatColor.RED+"Remove Land", Collections.emptyList(), Material.COARSE_DIRT, 3, true);
 		renderView.addIcon(icon);
 		icon = new InfoIcon(ChatColor.GREEN+"Add Players", Collections.emptyList(), Material.PLAYER_HEAD, 5, true);
 		renderView.addIcon(icon);
-		icon = new InfoIcon(ChatColor.RED+"Remove Players", Collections.emptyList(), Material.CREEPER_HEAD, 7, true);
+		icon = new InfoIcon(ChatColor.RED+"Remove Players", Collections.emptyList(), Material.ZOMBIE_HEAD, 7, true);
 		renderView.addIcon(icon);
 		views.put(PlotState.EDIT, renderView);
 		refreshNavigationButtons(PlotState.EDIT);
@@ -528,8 +530,12 @@ public class PlotMenu {
 				case CREATE_LAND_ADD:
 					// Check for non-plot town land click, add to chosen plot
 					if(!town.hasPlot(clickPoint, town.getWorld()) && editPlot != null && !editPlot.hasPoint(clickPoint)) {
-						// Add this point to the temp plot
-						editPlot.addPoint(clickPoint);
+						if(editPlot.getPoints().size() < maxSize) {
+							// Add this point to the temp plot
+							editPlot.addPoint(clickPoint);
+						} else {
+							Konquest.playFailSound(bukkitPlayer);
+						}
 						result = goToState(PlotState.CREATE_LAND_ADD);
 					}
 					break;
@@ -561,8 +567,12 @@ public class PlotMenu {
 				case EDIT_LAND_ADD:
 					// Check for non-plot town land click, add to chosen plot
 					if(!town.hasPlot(clickPoint, town.getWorld()) && editPlot != null && !editPlot.hasPoint(clickPoint)) {
-						// Add this point to the temp plot
-						editPlot.addPoint(clickPoint);
+						if(editPlot.getPoints().size() < maxSize) {
+							// Add this point to the temp plot
+							editPlot.addPoint(clickPoint);
+						} else {
+							Konquest.playFailSound(bukkitPlayer);
+						}
 						result = goToState(PlotState.EDIT_LAND_ADD);
 					}
 					break;

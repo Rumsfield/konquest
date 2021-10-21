@@ -181,6 +181,7 @@ public enum MessagePath {
 	PROTECTION_NOTICE_ATTACKED                  (0, "protection.notice.attacked"),
 	PROTECTION_ERROR_BLOCKED                    (0, "protection.error.blocked"),
 	PROTECTION_ERROR_NOT_RESIDENT               (1, "protection.error.not-resident"),
+	PROTECTION_ERROR_NOT_PLOT                   (0, "protection.error.not-plot"),
 	PROTECTION_ERROR_ONLINE                     (2, "protection.error.online"),
 	PROTECTION_ERROR_UPGRADE                    (3, "protection.error.upgrade"),
 	PROTECTION_ERROR_CAMP                       (1, "protection.error.camp"),

@@ -197,6 +197,7 @@ protection:
   error:
     blocked: "Blocked"
     not-resident: "You must be a resident of %s to do this."
+    not-plot: "You must be a plot member to do this."
     online: "The Kingdom of %s doesn't have enough online players, cannot attack the Town of %s."
     upgrade: "%s is upgraded with %s and cannot be attacked without %s residents online."
     camp: "Cannot attack %s, the camp owner is offline."

@@ -1,56 +1,55 @@
 package konquest.manager;
 
-import java.awt.Point;
-
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
-
 import konquest.Konquest;
+import konquest.utility.ChatUtil;
 
 public class PlotManager {
 
 	private Konquest konquest;
 	private boolean isPlotsEnabled;
+	private boolean isAllowBuild;
+	private boolean isAllowContainers;
+	private boolean isIgnoreKnights;
+	private int maxSize;
 	
 	public PlotManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.isPlotsEnabled = false;
+		this.isAllowBuild = false;
+		this.isAllowContainers = false;
+		this.isIgnoreKnights = false;
+		this.maxSize = 16;
 	}
 	
-	//TODO: Ensure there is error checking/validation on editor finish, to prevent issues when multiple players are editing the same plot.
-	
 	public void initialize() {
-		
 		isPlotsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.enable",true);
-		
+		isAllowBuild = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.allow_build",false);
+		isAllowContainers = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.allow_containers",false);
+		isIgnoreKnights = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.ignore_knights",true);
+		maxSize = konquest.getConfigManager().getConfig("core").getInt("core.plots.max_size",16);
+		ChatUtil.printDebug("Plot Manager is ready");
 	}
 	
 	public boolean isEnabled() {
 		return isPlotsEnabled;
 	}
 	
-	public void createPlot(Point p, World w) {
-		
+	public boolean isBuildAllowed() {
+		return isAllowBuild;
 	}
 	
-	public void deletePlot(Point p, World w) {
-		
+	public boolean isContainerAllowed() {
+		return isAllowContainers;
 	}
 	
-	public void addPlotPoint(Point p, World w) {
-		
+	public boolean isKnightIgnored() {
+		return isIgnoreKnights;
 	}
 	
-	public void removePlotPoint(Point p, World w) {
-		
+	public int getMaxSize() {
+		return maxSize;
 	}
 	
-	public void addPlotUser(OfflinePlayer player) {
-		
-	}
 	
-	public void removePlotUser(OfflinePlayer player) {
-		
-	}
 	
 }

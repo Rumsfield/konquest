@@ -81,6 +81,7 @@
 #    max_size:                      Maximum plot size in chunks (0 to disable, integer >= 0)
 #    allow_build:                   Allow all town residents to build in any town plot (true/false)
 #    allow_containers:              Allow all town residents to access containers in any town plot (true/false)
+#    ignore_knights:                Allow town knights to ignore plot protections (true/false)
 #  exile:
 #    remove_favor:                  Set a player's currency balance to 0 when exiled (true/flase)
 #    remove_stats:                  Remove all stats and accomplishment prefixes from a player when exiled (true/false)
@@ -216,6 +217,7 @@ core:
     max_size: 16
     allow_build: false
     allow_containers: false
+    ignore_knights: true
   exile:
     remove_favor: true
     remove_stats: true
