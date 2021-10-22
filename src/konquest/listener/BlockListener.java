@@ -180,7 +180,7 @@ public class BlockListener implements Listener {
 						// Protect land and plots
 						if(town.isOpen()) {
 							// Town is open
-							if(!konquest.getPlotManager().isBuildAllowed() && town.hasPlot(breakLoc) && !town.getPlot(breakLoc).hasUser(player.getOfflineBukkitPlayer())) {
+							if(konquest.getPlotManager().isPlayerPlotProtectBuild(town, breakLoc, player.getBukkitPlayer())) {
 								// Stop when player edits plot that isn't theirs
 								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage(territory.getName()));
 								event.setCancelled(true);
@@ -190,7 +190,7 @@ public class BlockListener implements Listener {
 							// Town is closed
 							if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
 								// Player is a resident
-								if(!konquest.getPlotManager().isBuildAllowed() && town.hasPlot(breakLoc) && !town.getPlot(breakLoc).hasUser(player.getOfflineBukkitPlayer())) {
+								if(konquest.getPlotManager().isPlayerPlotProtectBuild(town, breakLoc, player.getBukkitPlayer())) {
 									// Stop when player edits plot that isn't theirs
 									ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage(territory.getName()));
 									event.setCancelled(true);
@@ -612,7 +612,7 @@ public class BlockListener implements Listener {
 						// Protect land and plots
 						if(town.isOpen()) {
 							// Town is open
-							if(!konquest.getPlotManager().isBuildAllowed() && town.hasPlot(placeLoc) && !town.getPlot(placeLoc).hasUser(player.getOfflineBukkitPlayer())) {
+							if(konquest.getPlotManager().isPlayerPlotProtectBuild(town, placeLoc, player.getBukkitPlayer())) {
 								// Stop when player edits plot that isn't theirs
 								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage(territory.getName()));
 								event.setCancelled(true);
@@ -622,7 +622,7 @@ public class BlockListener implements Listener {
 							// Town is closed
 							if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
 								// Player is a resident
-								if(!konquest.getPlotManager().isBuildAllowed() && town.hasPlot(placeLoc) && !town.getPlot(placeLoc).hasUser(player.getOfflineBukkitPlayer())) {
+								if(konquest.getPlotManager().isPlayerPlotProtectBuild(town, placeLoc, player.getBukkitPlayer())) {
 									// Stop when player edits plot that isn't theirs
 									ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage(territory.getName()));
 									event.setCancelled(true);

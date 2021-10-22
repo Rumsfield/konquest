@@ -1,6 +1,10 @@
 package konquest.manager;
 
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+
 import konquest.Konquest;
+import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 
 public class PlotManager {
@@ -50,6 +54,74 @@ public class PlotManager {
 		return maxSize;
 	}
 	
+	/**
+	 * Check if the plot at the given location for the given town is protected from the given player.
+	 * Town lords can always build in all plots.
+	 * @param town
+	 * @param loc
+	 * @param player
+	 * @return True when the player is not allowed to edit the plot at loc in town.
+	 */
+	public boolean isPlayerPlotProtectBuild(KonTown town, Location loc, Player player) {
+		boolean result = false;
+		if(town.hasPlot(loc)) {
+			// Town has a plot at the given location
+			if(!isBuildAllowed()) {
+				// Only plot members may build
+				if(!town.getPlot(loc).hasUser(player)) {
+					// The player is not a plot member
+					if(isKnightIgnored()) {
+						// Knights ignore plot protection
+						if(!town.isPlayerElite(player)) {
+							// The player is not a knight or lord, and cannot edit this plot
+							result = true;
+						}
+					} else {
+						// Knights are included in protections
+						if(!town.isPlayerLord(player)) {
+							// The player is not the lord, and cannot edit this plot
+							result = true;
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
 	
+	/**
+	 * Check if the plot at the given location for the given town is protected from the given player.
+	 * Town lords can always access containers in all plots.
+	 * @param town
+	 * @param loc
+	 * @param player
+	 * @return True when the player is not allowed to access containers in the plot at loc in town.
+	 */
+	public boolean isPlayerPlotProtectContainer(KonTown town, Location loc, Player player) {
+		boolean result = false;
+		if(town.hasPlot(loc)) {
+			// Town has a plot at the given location
+			if(!isContainerAllowed()) {
+				// Only plot members may build
+				if(!town.getPlot(loc).hasUser(player)) {
+					// The player is not a plot member
+					if(isKnightIgnored()) {
+						// Knights ignore plot protection
+						if(!town.isPlayerElite(player)) {
+							// The player is not a knight or lord, and cannot edit this plot
+							result = true;
+						}
+					} else {
+						// Knights are included in protections
+						if(!town.isPlayerLord(player)) {
+							// The player is not the lord, and cannot edit this plot
+							result = true;
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
 	
 }
