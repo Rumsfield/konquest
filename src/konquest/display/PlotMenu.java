@@ -18,6 +18,7 @@ import konquest.display.PlayerIcon.PlayerIconAction;
 import konquest.model.KonPlot;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class PlotMenu {
 
@@ -118,13 +119,13 @@ public class PlotMenu {
 		
 		/* Edit View */
 		renderView = new DisplayMenu(2, getTitle(PlotState.EDIT));
-		icon = new InfoIcon(ChatColor.GREEN+"Add Land", Collections.emptyList(), Material.GRASS_BLOCK, 1, true);
+		icon = new InfoIcon(ChatColor.GREEN+MessagePath.MENU_PLOTS_EDIT_ADD_LAND.getMessage(), Collections.emptyList(), Material.GRASS_BLOCK, 1, true);
 		renderView.addIcon(icon);
-		icon = new InfoIcon(ChatColor.RED+"Remove Land", Collections.emptyList(), Material.COARSE_DIRT, 3, true);
+		icon = new InfoIcon(ChatColor.RED+MessagePath.MENU_PLOTS_EDIT_REMOVE_LAND.getMessage(), Collections.emptyList(), Material.COARSE_DIRT, 3, true);
 		renderView.addIcon(icon);
-		icon = new InfoIcon(ChatColor.GREEN+"Add Players", Collections.emptyList(), Material.PLAYER_HEAD, 5, true);
+		icon = new InfoIcon(ChatColor.GREEN+MessagePath.MENU_PLOTS_EDIT_ADD_PLAYERS.getMessage(), Collections.emptyList(), Material.PLAYER_HEAD, 5, true);
 		renderView.addIcon(icon);
-		icon = new InfoIcon(ChatColor.RED+"Remove Players", Collections.emptyList(), Material.ZOMBIE_HEAD, 7, true);
+		icon = new InfoIcon(ChatColor.RED+MessagePath.MENU_PLOTS_EDIT_REMOVE_PLAYERS.getMessage(), Collections.emptyList(), Material.ZOMBIE_HEAD, 7, true);
 		renderView.addIcon(icon);
 		views.put(PlotState.EDIT, renderView);
 		refreshNavigationButtons(PlotState.EDIT);
@@ -150,7 +151,7 @@ public class PlotMenu {
 					//loreList.add(ChatColor.GOLD+""+drawPoint.x+","+drawPoint.y);
 			    	boolean isClickable = false;
 					Material landMat = Material.GREEN_STAINED_GLASS_PANE;
-					String landTitle = ChatColor.GREEN+"Town Land: "+drawPoint.x+","+drawPoint.y;
+					String landTitle = ChatColor.GREEN+MessagePath.MENU_PLOTS_TOWN_LAND.getMessage()+" - "+drawPoint.x+","+drawPoint.y;
 					boolean isPlot = false;
 					// Render all town land, then plots, then remove oldPlot if exist, then render editPlot if exist.
 					// Draw different plots in a sequence of stained glass pane colors.
@@ -169,7 +170,7 @@ public class PlotMenu {
 								colorSelect = 0;
 							}
 						}
-						landTitle = ChatColor.LIGHT_PURPLE+"Plot: "+drawPoint.x+","+drawPoint.y;
+						landTitle = ChatColor.LIGHT_PURPLE+MessagePath.MENU_PLOTS_PLOT.getMessage()+" - "+drawPoint.x+","+drawPoint.y;
 						// Display plot player list in lore
 						if(drawPlot != null) {
 							List<OfflinePlayer> users = drawPlot.getUsers();
@@ -180,7 +181,7 @@ public class PlotMenu {
 									loreList.add(users.get(n).getName());
 								} else if(n == 3 && n < users.size()) {
 									int remaining = users.size() - 3;
-									loreList.add("and "+remaining+" more...");
+									loreList.add(remaining+"+");
 								}
 							}
 						} else {
@@ -191,47 +192,48 @@ public class PlotMenu {
 					// Remove plot render if tile belongs to oldPlot
 					if(oldPlot != null && oldPlot.hasPoint(drawPoint)) {
 						landMat = Material.GREEN_STAINED_GLASS_PANE;
-						landTitle = ChatColor.GREEN+"Town Land: "+drawPoint.x+","+drawPoint.y;
+						landTitle = ChatColor.GREEN+MessagePath.MENU_PLOTS_TOWN_LAND.getMessage()+" - "+drawPoint.x+","+drawPoint.y;
 						loreList.clear();
 						isPlot = false;
 					}
 					// Add render for editPloy
 					if(editPlot != null && editPlot.hasPoint(drawPoint)) {
 						landMat = Material.GLASS_PANE;
-						landTitle = ChatColor.WHITE+"Editing Plot: "+drawPoint.x+","+drawPoint.y;
+						landTitle = ChatColor.WHITE+MessagePath.MENU_PLOTS_EDITING_PLOT.getMessage()+" - "+drawPoint.x+","+drawPoint.y;
 						isPlot = true;
 					}
 					// Add context tips to lore
 					if(isPlot) {
-						if(Konquest.toPoint(town.getCenterLoc()).equals(drawPoint)) {
-							isClickable = false;
-							loreList.add("Town Monument");
-							landMat = Material.OBSIDIAN;
-						} else {
-							if(context.equals(PlotState.ROOT_DELETE)) {
-								isClickable = true;
-								loreList.add(ChatColor.GOLD+"Click to Delete Plot");
-							} else if(context.equals(PlotState.ROOT_EDIT)) {
-								isClickable = true;
-								loreList.add(ChatColor.GOLD+"Click to Edit Plot");
-							} else if(context.equals(PlotState.EDIT_LAND_REMOVE)) {
-								isClickable = true;
-								loreList.add(ChatColor.GOLD+"Click to Remove Chunk");
-							}
+						if(context.equals(PlotState.ROOT_DELETE)) {
+							isClickable = true;
+							loreList.add(ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_DELETE.getMessage());
+						} else if(context.equals(PlotState.ROOT_EDIT)) {
+							isClickable = true;
+							loreList.add(ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_EDIT.getMessage());
+						} else if(context.equals(PlotState.EDIT_LAND_REMOVE)) {
+							isClickable = true;
+							loreList.add(ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_REMOVE_CHUNK.getMessage());
 						}
 					} else {
 						if(context.equals(PlotState.ROOT_CREATE)) {
 							isClickable = true;
-							loreList.add(ChatColor.GOLD+"Click to Create Plot");
+							loreList.add(ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_CREATE.getMessage());
 						} else if(context.equals(PlotState.EDIT_LAND_ADD) || context.equals(PlotState.CREATE_LAND_ADD)) {
 							isClickable = true;
-							loreList.add(ChatColor.GOLD+"Click to Add Chunk");
+							loreList.add(ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_ADD_CHUNK.getMessage());
 						}
+					}
+					// Check for monument chunk
+					if(Konquest.toPoint(town.getCenterLoc()).equals(drawPoint)) {
+						isClickable = false;
+						loreList.clear();
+						loreList.add(MessagePath.MENU_PLOTS_TOWN_MONUMENT.getMessage());
+						landMat = Material.OBSIDIAN;
 					}
 					// Add other info to lore
 					if(Konquest.toPoint(playerLoc).equals(drawPoint)) {
 						//landMat = Material.PLAYER_HEAD;
-						loreList.add("You Are Here");
+						loreList.add(MessagePath.MENU_PLOTS_HERE.getMessage());
 					}
 					// Build icon and add to menu view
 					icon = new InfoIcon(landTitle,loreList,landMat,index,isClickable);
@@ -258,11 +260,11 @@ public class PlotMenu {
 		if(context.equals(PlotState.EDIT_PLAYER_ADD) || context.equals(PlotState.CREATE_PLAYER_ADD)) {
 			players.addAll(town.getPlayerResidents());
 			players.removeAll(plot.getUsers());
-			loreStr = "Click to add player";
+			loreStr = MessagePath.MENU_PLOTS_CLICK_ADD_PLAYER.getMessage();
 			isClickable = true;
 		} else if(context.equals(PlotState.EDIT_PLAYER_REMOVE)) {
 			players.addAll(plot.getUsers());
-			loreStr = "Click to remove player";
+			loreStr = MessagePath.MENU_PLOTS_CLICK_REMOVE_PLAYER.getMessage();
 			isClickable = true;
 		} else {
 			return null;
@@ -905,37 +907,37 @@ public class PlotMenu {
 		String result = "";
 		switch(context) {
 			case ROOT:
-				result = ChatColor.BLACK+town.getName()+" Plots";
+				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_PLOTS.getMessage();
 				break;
 			case ROOT_CREATE:
-				result = ChatColor.BLACK+town.getName()+" Create Plot";
+				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_CREATE.getMessage();
 				break;
 			case ROOT_DELETE:
-				result = ChatColor.BLACK+town.getName()+" Delete Plot";
+				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_DELETE.getMessage();
 				break;
 			case ROOT_EDIT:
-				result = ChatColor.BLACK+town.getName()+" Edit Plot";
+				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_EDIT.getMessage();
 				break;
 			case CREATE_LAND_ADD:
-				result = ChatColor.BLACK+town.getName()+" Add Land";
+				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_ADD_LAND.getMessage();
 				break;
 			case CREATE_PLAYER_ADD:
-				result = ChatColor.BLACK+town.getName()+" Add Players";
+				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_ADD_PLAYERS.getMessage();
 				break;
 			case EDIT:
-				result = ChatColor.BLACK+town.getName()+" Edit Options";
+				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_EDIT_OPTIONS.getMessage();
 				break;
 			case EDIT_LAND_ADD:
-				result = ChatColor.BLACK+town.getName()+" Add Land";
+				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_ADD_LAND.getMessage();
 				break;
 			case EDIT_LAND_REMOVE:
-				result = ChatColor.BLACK+town.getName()+" Remove Land";
+				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_REMOVE_LAND.getMessage();
 				break;
 			case EDIT_PLAYER_ADD:
-				result = ChatColor.BLACK+town.getName()+" Add Players";
+				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_ADD_PLAYERS.getMessage();
 				break;
 			case EDIT_PLAYER_REMOVE:
-				result = ChatColor.BLACK+town.getName()+" Remove Players";
+				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_REMOVE_PLAYERS.getMessage();
 				break;
 			default:
 				break;
@@ -982,35 +984,35 @@ public class PlotMenu {
 	}
 	
 	private InfoIcon navIconCreate(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Create",Collections.emptyList(),Material.OAK_SAPLING,index,true);
+		return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_CREATE.getMessage(),Collections.emptyList(),Material.OAK_SAPLING,index,true);
 	}
 	
 	private InfoIcon navIconDelete(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Delete",Collections.emptyList(),Material.BARRIER,index,true);
+		return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_DELETE.getMessage(),Collections.emptyList(),Material.BARRIER,index,true);
 	}
 	
 	private InfoIcon navIconEdit(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Edit",Collections.emptyList(),Material.WRITABLE_BOOK,index,true);
+		return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_EDIT.getMessage(),Collections.emptyList(),Material.WRITABLE_BOOK,index,true);
 	}
 	
 	private InfoIcon navIconReturn(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Return",Collections.emptyList(),Material.FIREWORK_ROCKET,index,true);
+		return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_RETURN.getMessage(),Collections.emptyList(),Material.FIREWORK_ROCKET,index,true);
 	}
 	
 	private InfoIcon navIconFinish(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Finish",Collections.emptyList(),Material.WRITTEN_BOOK,index,true);
+		return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_FINISH.getMessage(),Collections.emptyList(),Material.WRITTEN_BOOK,index,true);
 	}
 	
 	private InfoIcon navIconClose(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Close",Collections.emptyList(),Material.STRUCTURE_VOID,index,true);
+		return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_CLOSE.getMessage(),Collections.emptyList(),Material.STRUCTURE_VOID,index,true);
 	}
 	
 	private InfoIcon navIconBack(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Back",Collections.emptyList(),Material.ENDER_PEARL,index,true);
+		return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_BACK.getMessage(),Collections.emptyList(),Material.ENDER_PEARL,index,true);
 	}
 	
 	private InfoIcon navIconNext(int index) {
-		return new InfoIcon(ChatColor.GOLD+"Next",Collections.emptyList(),Material.ENDER_PEARL,index,true);
+		return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_NEXT.getMessage(),Collections.emptyList(),Material.ENDER_PEARL,index,true);
 	}
 	
 	private InfoIcon navIconEmpty(int index) {

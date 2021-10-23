@@ -9,18 +9,20 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import konquest.utility.MessagePath;
+
 public class KonPlot {
 
 	private HashSet<Point> points;
-	private HashSet<UUID> users;
+	private ArrayList<UUID> users;
 	
 	public KonPlot(Point origin) {
 		this.points = new HashSet<Point>();
-		this.users = new HashSet<UUID>();
+		this.users = new ArrayList<UUID>();
 		this.points.add(origin);
 	}
 	
-	public KonPlot(HashSet<Point> points, HashSet<UUID> users) {
+	public KonPlot(HashSet<Point> points, ArrayList<UUID> users) {
 		this.points = points;
 		this.users = users;
 	}
@@ -50,11 +52,15 @@ public class KonPlot {
 	}
 	
 	public void addUsers(List<UUID> u) {
-		users.addAll(u);
+		for(UUID id : u) {
+			addUser(id);
+		}
 	}
 	
 	public void addUser(UUID u) {
-		users.add(u);
+		if(!users.contains(u)) {
+			users.add(u);
+		}
 	}
 	
 	public void addUser(OfflinePlayer u) {
@@ -81,9 +87,22 @@ public class KonPlot {
 		return result;
 	}
 	
+	public String getDisplayText() {
+		String result = MessagePath.MENU_PLOTS_PLOT.getMessage();
+		if(!users.isEmpty()) {
+			String firstName = Bukkit.getOfflinePlayer(users.get(0)).getName();
+			result = result + " " + firstName;
+			if(users.size() > 1) {
+				result = result + " + " + (users.size() - 1);
+			}
+		}
+		return result;
+	}
+	
+	@Override
 	public KonPlot clone() {
 		HashSet<Point> clonePoints = new HashSet<Point>();
-		HashSet<UUID> cloneUsers = new HashSet<UUID>();
+		ArrayList<UUID> cloneUsers = new ArrayList<UUID>();
 		clonePoints.addAll(points);
 		cloneUsers.addAll(users);
 		return new KonPlot(clonePoints,cloneUsers);

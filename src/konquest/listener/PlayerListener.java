@@ -16,8 +16,11 @@ import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.model.KonPlayer.RegionType;
+import konquest.model.KonPlot;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -1053,6 +1056,9 @@ public class PlayerListener implements Listener{
         			// Begin fly disable warmup
         			player.setFlyDisableWarmup(true);
         		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
+        			// TEST
+        			//bukkitPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD+"Hello!"));
+        			// END TEST
         			KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
                     if(invokeEvent != null) {
                     	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
@@ -1081,6 +1087,16 @@ public class PlayerListener implements Listener{
     	    				if(town.getPlayerResidents().isEmpty() && town.getKingdom().equals(player.getKingdom())) {
     	    					//ChatUtil.sendNotice(bukkitPlayer, "This Town is abandoned! Use \"/k town "+territoryName+" lord "+bukkitPlayer.getName()+"\" to claim Lordship.",ChatColor.RED);
     	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
+    	    				}
+    	    				// Display plot message to friendly players
+    	    				if(town.hasPlot(chunkTo) && town.getKingdom().equals(player.getKingdom())) {
+    	    					KonPlot plot = town.getPlot(chunkTo);
+    	    					String plotMessage = ChatColor.GOLD+plot.getDisplayText();
+    	    					ChatColor plotMessageColor = ChatColor.GOLD;
+    	    					if(plot.hasUser(bukkitPlayer)) {
+    	    						plotMessageColor = ChatColor.DARK_GREEN;
+    	    					}
+    	    					bukkitPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plotMessageColor+plotMessage));
     	    				}
     	    				// Command all nearby Iron Golems to target enemy player, if no other closer player is present
     						updateGolemTargetsForTerritory(territoryTo,player,true);
@@ -1130,6 +1146,16 @@ public class PlayerListener implements Listener{
         	    					//ChatUtil.sendNotice(bukkitPlayer, "This Town is abandoned! Use \"/k town "+territoryTo.getName()+" lord "+bukkitPlayer.getName()+"\" to claim Lordship.",ChatColor.RED);
         	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
         	    				}
+        	    				// Display plot message to friendly players
+        	    				if(town.hasPlot(chunkTo) && town.getKingdom().equals(player.getKingdom())) {
+        	    					KonPlot plot = town.getPlot(chunkTo);
+        	    					String plotMessage = ChatColor.GOLD+plot.getDisplayText();
+        	    					ChatColor plotMessageColor = ChatColor.GOLD;
+        	    					if(plot.hasUser(bukkitPlayer)) {
+        	    						plotMessageColor = ChatColor.DARK_GREEN;
+        	    					}
+        	    					bukkitPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plotMessageColor+plotMessage));
+        	    				}
         	    				updateGolemTargetsForTerritory(territoryTo,player,true);
         	    			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         	    				((KonRuin) territoryTo).addBarPlayer(player);
@@ -1165,6 +1191,16 @@ public class PlayerListener implements Listener{
         					if(!territoryTo.getKingdom().equals(player.getKingdom()) && territoryTo.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         						KonTown town = (KonTown) territoryTo;
         						kingdomManager.applyTownNerf(player, town);
+        						// Display plot message to friendly players
+        	    				if(town.hasPlot(chunkTo) && town.getKingdom().equals(player.getKingdom())) {
+        	    					KonPlot plot = town.getPlot(chunkTo);
+        	    					String plotMessage = ChatColor.GOLD+plot.getDisplayText();
+        	    					ChatColor plotMessageColor = ChatColor.GOLD;
+        	    					if(plot.hasUser(bukkitPlayer)) {
+        	    						plotMessageColor = ChatColor.DARK_GREEN;
+        	    					}
+        	    					bukkitPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plotMessageColor+plotMessage));
+        	    				}
         						updateGolemTargetsForTerritory(territoryTo,player,true);
         					}
         					//updateGolemTargetsForTerritory(territoryTo,player,true);
@@ -1254,6 +1290,16 @@ public class PlayerListener implements Listener{
     	    				if(town.getPlayerResidents().isEmpty() && town.getKingdom().equals(player.getKingdom())) {
     	    					//ChatUtil.sendNotice(bukkitPlayer, "This Town is abandoned! Use \"/k town "+territoryName+" lord "+bukkitPlayer.getName()+"\" to claim Lordship.",ChatColor.RED);
     	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
+    	    				}
+    	    				// Display plot message to friendly players
+    	    				if(town.hasPlot(chunkTo) && town.getKingdom().equals(player.getKingdom())) {
+    	    					KonPlot plot = town.getPlot(chunkTo);
+    	    					String plotMessage = ChatColor.GOLD+plot.getDisplayText();
+    	    					ChatColor plotMessageColor = ChatColor.GOLD;
+    	    					if(plot.hasUser(bukkitPlayer)) {
+    	    						plotMessageColor = ChatColor.DARK_GREEN;
+    	    					}
+    	    					bukkitPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plotMessageColor+plotMessage));
     	    				}
     	    				// Command all nearby Iron Golems to target enemy player, if no other closer player is present
     						updateGolemTargetsForTerritory(territoryTo,player,true);
