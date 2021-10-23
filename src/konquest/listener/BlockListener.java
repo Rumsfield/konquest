@@ -182,7 +182,7 @@ public class BlockListener implements Listener {
 							// Town is open
 							if(konquest.getPlotManager().isPlayerPlotProtectBuild(town, breakLoc, player.getBukkitPlayer())) {
 								// Stop when player edits plot that isn't theirs
-								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage(territory.getName()));
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage());
 								event.setCancelled(true);
 								return;
 							}
@@ -192,7 +192,7 @@ public class BlockListener implements Listener {
 								// Player is a resident
 								if(konquest.getPlotManager().isPlayerPlotProtectBuild(town, breakLoc, player.getBukkitPlayer())) {
 									// Stop when player edits plot that isn't theirs
-									ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage(territory.getName()));
+									ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage());
 									event.setCancelled(true);
 									return;
 								}
@@ -614,7 +614,7 @@ public class BlockListener implements Listener {
 							// Town is open
 							if(konquest.getPlotManager().isPlayerPlotProtectBuild(town, placeLoc, player.getBukkitPlayer())) {
 								// Stop when player edits plot that isn't theirs
-								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage(territory.getName()));
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage());
 								event.setCancelled(true);
 								return;
 							}
@@ -624,7 +624,7 @@ public class BlockListener implements Listener {
 								// Player is a resident
 								if(konquest.getPlotManager().isPlayerPlotProtectBuild(town, placeLoc, player.getBukkitPlayer())) {
 									// Stop when player edits plot that isn't theirs
-									ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage(territory.getName()));
+									ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage());
 									event.setCancelled(true);
 									return;
 								}

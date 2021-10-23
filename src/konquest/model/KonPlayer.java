@@ -442,7 +442,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 					double red = particleColor.getRed() / 255D;
 					double green = particleColor.getGreen() / 255D;
 					double blue = particleColor.getBlue() / 255D;
-					getBukkitPlayer().spawnParticle(Particle.SPELL_MOB, loc, 0, red, green, blue, 1);
+					getBukkitPlayer().spawnParticle(Particle.SPELL_MOB_AMBIENT, loc, 0, red, green, blue, 1);
 				}
 			}
 		} else if(taskID == monumentTemplateLoopTimer.getTaskID()) {

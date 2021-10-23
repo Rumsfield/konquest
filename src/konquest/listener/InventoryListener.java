@@ -109,7 +109,7 @@ public class InventoryListener implements Listener {
 							// Town is open
 							if(konquest.getPlotManager().isPlayerPlotProtectContainer(town, openLoc, player.getBukkitPlayer())) {
 								// Stop when player edits plot that isn't theirs
-								ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage(territory.getName()));
+								ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage());
 								event.setCancelled(true);
 								return;
 							}
@@ -119,7 +119,7 @@ public class InventoryListener implements Listener {
 								// Player is a resident
 								if(konquest.getPlotManager().isPlayerPlotProtectContainer(town, openLoc, player.getBukkitPlayer())) {
 									// Stop when player edits plot that isn't theirs
-									ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage(territory.getName()));
+									ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage());
 									event.setCancelled(true);
 									return;
 								}

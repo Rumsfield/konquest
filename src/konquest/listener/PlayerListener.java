@@ -1089,15 +1089,7 @@ public class PlayerListener implements Listener{
     	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
     	    				}
     	    				// Display plot message to friendly players
-    	    				if(town.hasPlot(chunkTo) && town.getKingdom().equals(player.getKingdom())) {
-    	    					KonPlot plot = town.getPlot(chunkTo);
-    	    					String plotMessage = ChatColor.GOLD+plot.getDisplayText();
-    	    					ChatColor plotMessageColor = ChatColor.GOLD;
-    	    					if(plot.hasUser(bukkitPlayer)) {
-    	    						plotMessageColor = ChatColor.DARK_GREEN;
-    	    					}
-    	    					bukkitPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plotMessageColor+plotMessage));
-    	    				}
+    	    				displayPlotMessage(town, chunkTo, chunkFrom, player);
     	    				// Command all nearby Iron Golems to target enemy player, if no other closer player is present
     						updateGolemTargetsForTerritory(territoryTo,player,true);
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
@@ -1147,15 +1139,7 @@ public class PlayerListener implements Listener{
         	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
         	    				}
         	    				// Display plot message to friendly players
-        	    				if(town.hasPlot(chunkTo) && town.getKingdom().equals(player.getKingdom())) {
-        	    					KonPlot plot = town.getPlot(chunkTo);
-        	    					String plotMessage = ChatColor.GOLD+plot.getDisplayText();
-        	    					ChatColor plotMessageColor = ChatColor.GOLD;
-        	    					if(plot.hasUser(bukkitPlayer)) {
-        	    						plotMessageColor = ChatColor.DARK_GREEN;
-        	    					}
-        	    					bukkitPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plotMessageColor+plotMessage));
-        	    				}
+        	    				displayPlotMessage(town, chunkTo, chunkFrom, player);
         	    				updateGolemTargetsForTerritory(territoryTo,player,true);
         	    			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         	    				((KonRuin) territoryTo).addBarPlayer(player);
@@ -1188,20 +1172,17 @@ public class PlayerListener implements Listener{
         			} else { // moving between the same territory
         				//ChatUtil.sendNotice(bukkitPlayer, "(Debug) "+territoryTo.getName()+": "+chunkCoordsTo);
         				if(!event.isCancelled()) {
-        					if(!territoryTo.getKingdom().equals(player.getKingdom()) && territoryTo.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+        					if(territoryTo.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         						KonTown town = (KonTown) territoryTo;
-        						kingdomManager.applyTownNerf(player, town);
-        						// Display plot message to friendly players
-        	    				if(town.hasPlot(chunkTo) && town.getKingdom().equals(player.getKingdom())) {
-        	    					KonPlot plot = town.getPlot(chunkTo);
-        	    					String plotMessage = ChatColor.GOLD+plot.getDisplayText();
-        	    					ChatColor plotMessageColor = ChatColor.GOLD;
-        	    					if(plot.hasUser(bukkitPlayer)) {
-        	    						plotMessageColor = ChatColor.DARK_GREEN;
-        	    					}
-        	    					bukkitPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plotMessageColor+plotMessage));
-        	    				}
-        						updateGolemTargetsForTerritory(territoryTo,player,true);
+        						if(!territoryTo.getKingdom().equals(player.getKingdom())) {
+            						// Enemy player
+        							kingdomManager.applyTownNerf(player, town);
+            						updateGolemTargetsForTerritory(territoryTo,player,true);
+            					} else {
+            						// Friendly player
+            						// Display plot message to friendly players
+            						displayPlotMessage(town, chunkTo, chunkFrom, player);
+            					}
         					}
         					//updateGolemTargetsForTerritory(territoryTo,player,true);
         				}
@@ -1292,15 +1273,7 @@ public class PlayerListener implements Listener{
     	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
     	    				}
     	    				// Display plot message to friendly players
-    	    				if(town.hasPlot(chunkTo) && town.getKingdom().equals(player.getKingdom())) {
-    	    					KonPlot plot = town.getPlot(chunkTo);
-    	    					String plotMessage = ChatColor.GOLD+plot.getDisplayText();
-    	    					ChatColor plotMessageColor = ChatColor.GOLD;
-    	    					if(plot.hasUser(bukkitPlayer)) {
-    	    						plotMessageColor = ChatColor.DARK_GREEN;
-    	    					}
-    	    					bukkitPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plotMessageColor+plotMessage));
-    	    				}
+    	    				displayPlotMessage(town, chunkTo, chunkFrom, player);
     	    				// Command all nearby Iron Golems to target enemy player, if no other closer player is present
     						updateGolemTargetsForTerritory(territoryTo,player,true);
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
@@ -1380,6 +1353,46 @@ public class PlayerListener implements Listener{
 				}
 			}
 		}
+    }
+    
+    private void displayPlotMessage(KonTown town, Location toLoc, Location fromLoc, KonPlayer player) {
+    	if(town.getKingdom().equals(player.getKingdom())) {
+    		// Player is friendly
+    		boolean isPlotTo = town.hasPlot(toLoc);
+    		boolean isPlotFrom = town.hasPlot(fromLoc);
+    		/*
+    		 * Display messages:
+    		 * 		into plot from non-plot (territory or wild)
+    		 * 		into plot from other plot
+    		 * 		out of plot, to town
+    		 */
+    		String plotMessage = "";
+    		ChatColor plotMessageColor = ChatColor.GOLD;
+    		boolean doDisplay = false;
+    		// Display conditions
+    		if(isPlotTo) {
+    			KonPlot plotTo = town.getPlot(toLoc);
+    			if(!isPlotFrom || (isPlotFrom && !plotTo.equals(town.getPlot(fromLoc)))) {
+    				plotMessage = plotTo.getDisplayText();
+    				plotMessageColor = ChatColor.GOLD;
+    				if(plotTo.hasUser(player.getBukkitPlayer())) {
+    					plotMessageColor = ChatColor.DARK_GREEN;
+    				}
+    				doDisplay = true;
+    			}
+    		} else {
+    			if(isPlotFrom && town.isLocInside(toLoc)) {
+    				// Moved out of plot into town land
+    				plotMessage = MessagePath.MENU_PLOTS_TOWN_LAND.getMessage();
+    				plotMessageColor = ChatColor.DARK_GREEN;
+    				doDisplay = true;
+    			}
+    		}
+    		// Display message
+    		if(doDisplay) {
+    			player.getBukkitPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plotMessageColor+plotMessage));
+    		}
+    	}
     }
     
 }
