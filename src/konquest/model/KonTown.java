@@ -804,6 +804,9 @@ public class KonTown extends KonTerritory implements Timeable{
 			if(residents.isEmpty()) {
 				clearShieldsArmors();
 			}
+			for(KonPlot plot : getPlots()) {
+				plot.removeUser(player);
+			}
 			status = true;
 		}
 		return status;

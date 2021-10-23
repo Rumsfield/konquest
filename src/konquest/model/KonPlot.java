@@ -97,6 +97,14 @@ public class KonPlot {
 		return result;
 	}
 	
+	public List<String> getUserStrings() {
+		ArrayList<String> result = new ArrayList<String>();
+		for(UUID id : users) {
+			result.add(id.toString());
+		}
+		return result;
+	}
+	
 	public String getDisplayText() {
 		String result = MessagePath.MENU_PLOTS_PLOT.getMessage();
 		if(!users.isEmpty()) {

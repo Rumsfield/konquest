@@ -2075,6 +2075,19 @@ public class KingdomManager {
 		            	}
 		            	// Update upgrade status
 		            	konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
+		            	// Create plots
+		            	if(townSection.contains("plots")) {
+		            		for(String plotIndex : townSection.getConfigurationSection("plots").getKeys(false)) {
+		            			HashSet<Point> points = new HashSet<Point>();
+		            			points.addAll(konquest.formatStringToPoints(townSection.getString("plots."+plotIndex+".chunks")));
+		            			ArrayList<UUID> users = new ArrayList<UUID>();
+		            			for(String user : townSection.getStringList("plots."+plotIndex+".members")) {
+		            				users.add(UUID.fromString(user));
+		            			}
+		            			KonPlot plot = new KonPlot(points,users);
+		            			town.putPlot(plot);
+		            		}
+		            	}
 	        			// Update loading bar
 		            	loadBar.addProgress(1);
             		} else {
@@ -2169,6 +2182,14 @@ public class KingdomManager {
                 	if(level > 0) {
                 		townInstanceUpgradeSection.set(upgrade.toString(), level);
                 	}
+                }
+                ConfigurationSection townInstancePlotSection = townInstanceSection.createSection("plots");
+                int plotIndex = 0;
+                for(KonPlot plot : town.getPlots()) {
+                	ConfigurationSection plotInstanceSection = townInstancePlotSection.createSection("plot_"+plotIndex);
+                	plotInstanceSection.set("chunks", konquest.formatPointsToString(plot.getPoints()));
+                	plotInstanceSection.set("members",plot.getUserStrings());
+                	plotIndex++;
                 }
             }
 		}
