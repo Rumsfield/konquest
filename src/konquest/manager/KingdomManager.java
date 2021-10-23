@@ -45,6 +45,7 @@ import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonPlayerScoreAttributes;
 import konquest.model.KonPlayerScoreAttributes.KonPlayerScoreAttribute;
+import konquest.model.KonPlot;
 import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
@@ -1704,6 +1705,96 @@ public class KingdomManager {
 		return locationMap;
 	}
 	
+	public HashMap<Location,Color> getPlotBorderLocationMap(ArrayList<Chunk> renderChunks, KonPlayer player) {
+		HashMap<Location,Color> locationMap = new HashMap<Location,Color>();
+		final int Y_MIN_LIMIT = 1;
+		final int Y_MAX_LIMIT = 255;
+		final double X_MOD = 0.5;
+		final double Y_MOD = 2;
+		final double Y_MOD_SNOW = 2.1;
+		final double Z_MOD = 0.5;
+		// Search pattern look-up tables
+		final int[] sideLUTX     = {0,  0,  1, -1};
+		final int[] sideLUTZ     = {1, -1,  0,  0};
+		final int[] blockLUTXmin = {0,  0,  15, 0};
+		final int[] blockLUTXmax = {15, 15, 15, 0};
+		final int[] blockLUTZmin = {15, 0,  0,  0};
+		final int[] blockLUTZmax = {15, 0,  15, 15};
+		// Iterative variables
+		Point sidePoint;
+		boolean isClaimed;
+		boolean isPlot;
+		int y_max;
+		double y_mod;
+		KonTerritory territory;
+		KonTown town;
+		KonPlot chunkPlot;
+		Location renderLoc;
+		Color renderColor;
+		// Evaluate every chunk in the provided list. If it's claimed and a town plot, check each adjacent chunk and determine border locations
+		for(Chunk chunk : renderChunks) {
+			Point point = Konquest.toPoint(chunk);
+			World renderWorld = chunk.getWorld();
+			if(isChunkClaimed(point,renderWorld)) {
+				territory = getChunkTerritory(point,renderWorld);
+				if(territory.getKingdom().equals(player.getKingdom()) && territory instanceof KonTown && ((KonTown)territory).hasPlot(point,renderWorld)) {
+					// This render chunk is a friendly town plot
+					town = ((KonTown)territory);
+					chunkPlot = town.getPlot(point,renderWorld);
+					renderColor = Color.ORANGE;
+					if(chunkPlot != null && chunkPlot.hasUser(player.getOfflineBukkitPlayer())) {
+						renderColor = Color.LIME;
+					}
+					// Iterate all 4 sides of the chunk
+					// x+0,z+1 side: traverse x 0 -> 15 when z is 15
+					// x+0,z-1 side: traverse x 0 -> 15 when z is 0
+					// x+1,z+0 side: traverse z 0 -> 15 when x is 15
+					// x-1,z+0 side: traverse z 0 -> 15 when x is 0
+					for(int i = 0; i < 4; i++) {
+						sidePoint = new Point(point.x + sideLUTX[i], point.y + sideLUTZ[i]);
+						isClaimed = isChunkClaimed(sidePoint,renderWorld);
+						isPlot = town.hasPlot(sidePoint,renderWorld);
+						if(!isClaimed || (isClaimed && !isPlot) || (isClaimed && isPlot && !chunkPlot.equals(town.getPlot(sidePoint,renderWorld)))) {
+							// This side of the render chunk is a border
+							ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
+							y_max = 0;
+							for(int x = blockLUTXmin[i]; x <= blockLUTXmax[i]; x++) {
+								for(int z = blockLUTZmin[i]; z <= blockLUTZmax[i]; z++) {
+									// Determine Y level of border
+									y_max = chunkSnap.getHighestBlockYAt(x, z);
+									y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
+									y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
+									// Descend through passable blocks like grass, non-occluding blocks like leaves
+									while((chunk.getBlock(x, y_max, z).isPassable() || !chunk.getBlock(x, y_max, z).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
+										y_max--;
+									}
+									// Ascend through liquids
+									while(chunk.getBlock(x, y_max+1, z).isLiquid() && y_max < Y_MAX_LIMIT) {
+										y_max++;
+									}
+									// Increase Y a little when there's snow on the border
+									Block renderBlock = chunk.getBlock(x, y_max, z);
+									Block aboveBlock = chunk.getBlock(x, y_max+1, z);
+									y_mod = Y_MOD;
+									if(aboveBlock.getBlockData() instanceof Snow) {
+										Snow snowBlock = (Snow)aboveBlock.getBlockData();
+										if(snowBlock.getLayers() >= snowBlock.getMinimumLayers()) {
+											y_mod = Y_MOD_SNOW;
+										}
+									}
+									// Add border location
+									renderLoc = new Location(renderBlock.getWorld(),renderBlock.getLocation().getX()+X_MOD,renderBlock.getLocation().getY()+y_mod,renderBlock.getLocation().getZ()+Z_MOD);
+									locationMap.put(renderLoc, renderColor);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return locationMap;
+	}
+	
 	public void updatePlayerBorderParticles(KonPlayer player, Location loc) {
     	if(player != null) {
 			// Border particle update
@@ -1723,6 +1814,9 @@ public class KingdomManager {
 				HashMap<Location,Color> borderTerritoryMap = getBorderLocationMap(nearbyChunks, player);
 	    		player.removeAllBorders();
 	    		player.addTerritoryBorders(borderTerritoryMap);
+	    		HashMap<Location,Color> plotBorderTerritoryMap = getPlotBorderLocationMap(nearbyChunks, player);
+	    		player.removeAllPlotBorders();
+	    		player.addTerritoryPlotBorders(plotBorderTerritoryMap);
 	        	borderTimer.startLoopTimer(10);
 			} else {
 				// Player is not nearby a territory, stop rendering

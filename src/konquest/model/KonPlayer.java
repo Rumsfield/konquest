@@ -66,6 +66,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	private KonStats playerStats;
 	private KonPrefix playerPrefix;
 	private HashMap<Location, Color> borderMap;
+	private HashMap<Location, Color> borderPlotMap;
 	private HashMap<Location,Color> monumentTemplateBoundary;
 	private HashSet<Location> monumentShowBoundary;
 	private Block lastTargetBlock;
@@ -104,6 +105,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		this.playerStats = new KonStats();
 		this.playerPrefix = new KonPrefix();
 		this.borderMap = new HashMap<Location, Color>();
+		this.borderPlotMap = new HashMap<Location, Color>();
 		this.monumentTemplateBoundary = new HashMap<Location,Color>();
 		this.monumentShowBoundary = new HashSet<Location>();
 	}
@@ -366,6 +368,14 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		borderMap.putAll(locs);
 	}
 	
+	public void removeAllPlotBorders() {
+		borderPlotMap.clear();
+	}
+	
+	public void addTerritoryPlotBorders(HashMap<Location, Color> locs) {
+		borderPlotMap.putAll(locs);
+	}
+	
 	public void stopTimers() {
 		exileConfirmTimer.stopTimer();
 		giveLordConfirmTimer.stopTimer();
@@ -424,6 +434,15 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 				if(loc.getWorld().equals(getBukkitPlayer().getWorld()) && loc.distance(getBukkitPlayer().getLocation()) < 12) {
 					particleColor = borderMap.get(loc);
 					getBukkitPlayer().spawnParticle(Particle.REDSTONE, loc, 2, 0.25, 0, 0.25, new Particle.DustOptions(particleColor,1));
+				}
+			}
+			for(Location loc : borderPlotMap.keySet()) {
+				if(loc.getWorld().equals(getBukkitPlayer().getWorld()) && loc.distance(getBukkitPlayer().getLocation()) < 12) {
+					particleColor = borderPlotMap.get(loc);
+					double red = particleColor.getRed() / 255D;
+					double green = particleColor.getGreen() / 255D;
+					double blue = particleColor.getBlue() / 255D;
+					getBukkitPlayer().spawnParticle(Particle.SPELL_MOB, loc, 0, red, green, blue, 1);
 				}
 			}
 		} else if(taskID == monumentTemplateLoopTimer.getTaskID()) {
