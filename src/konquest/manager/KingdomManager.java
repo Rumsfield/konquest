@@ -1710,8 +1710,8 @@ public class KingdomManager {
 		final int Y_MIN_LIMIT = 1;
 		final int Y_MAX_LIMIT = 255;
 		final double X_MOD = 0.5;
-		final double Y_MOD = 2;
-		final double Y_MOD_SNOW = 2.1;
+		final double Y_MOD = 1;
+		final double Y_MOD_SNOW = 1.1;
 		final double Z_MOD = 0.5;
 		// Search pattern look-up tables
 		final int[] sideLUTX     = {0,  0,  1, -1};
@@ -2085,7 +2085,9 @@ public class KingdomManager {
 		            				users.add(UUID.fromString(user));
 		            			}
 		            			KonPlot plot = new KonPlot(points,users);
-		            			town.putPlot(plot);
+		            			if(!konquest.getPlotManager().addPlot(town, plot)) {
+		            				ChatUtil.printConsoleError("Failed to add incompatible plot to town "+town.getName());
+		            			}
 		            		}
 		            	}
 	        			// Update loading bar

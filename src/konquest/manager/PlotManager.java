@@ -1,9 +1,13 @@
 package konquest.manager;
 
+import java.awt.Point;
+
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.model.KonPlot;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 
@@ -52,6 +56,26 @@ public class PlotManager {
 	
 	public int getMaxSize() {
 		return maxSize;
+	}
+	
+	public boolean addPlot(KonTown town, KonPlot plot) {
+		if(isPlotsEnabled) {
+			// Verify plot points exist within town
+			for(Point p : plot.getPoints()) {
+				if(!town.getChunkList().containsKey(p)) {
+					return false;
+				}
+			}
+			// Verify plot users are town residents
+			for(OfflinePlayer p : plot.getUserOfflinePlayers()) {
+				if(!town.isPlayerResident(p)) {
+					return false;
+				}
+			}
+			// Add the plot to the town
+			town.putPlot(plot);
+		}
+		return true;
 	}
 	
 	/**
