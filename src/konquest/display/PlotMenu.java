@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -32,6 +33,7 @@ public class PlotMenu {
 		EDIT,
 		EDIT_LAND_ADD,
 		EDIT_LAND_REMOVE,
+		EDIT_PLAYER_SHOW,
 		EDIT_PLAYER_ADD,
 		EDIT_PLAYER_REMOVE;
 	}
@@ -87,6 +89,7 @@ public class PlotMenu {
 	
 	private void initializeMenu() {
 		// Create empty display views by default
+		/*
 		playerPages.add(new DisplayMenu(2, ChatColor.BLACK+town.getName()+" Player"));
 		views.put(PlotState.ROOT, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Plots"));
 		views.put(PlotState.ROOT_CREATE, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Create Plot"));
@@ -99,6 +102,7 @@ public class PlotMenu {
 		views.put(PlotState.EDIT_LAND_REMOVE, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Remove Land"));
 		views.put(PlotState.EDIT_PLAYER_ADD, new DisplayMenu(2, ChatColor.BLACK+town.getName()+" Add Player"));
 		views.put(PlotState.EDIT_PLAYER_REMOVE, new DisplayMenu(2, ChatColor.BLACK+town.getName()+" Remove Player"));
+		*/
 		if(!town.isLocInside(playerLoc)) {
 			center = Konquest.toPoint(town.getCenterLoc());
 		}
@@ -125,7 +129,9 @@ public class PlotMenu {
 		renderView.addIcon(icon);
 		icon = new InfoIcon(ChatColor.GREEN+MessagePath.MENU_PLOTS_EDIT_ADD_PLAYERS.getMessage(), Collections.emptyList(), Material.PLAYER_HEAD, 5, true);
 		renderView.addIcon(icon);
-		icon = new InfoIcon(ChatColor.RED+MessagePath.MENU_PLOTS_EDIT_REMOVE_PLAYERS.getMessage(), Collections.emptyList(), Material.ZOMBIE_HEAD, 7, true);
+		icon = new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_EDIT_SHOW_PLAYERS.getMessage(), Collections.emptyList(), Material.PAINTING, 6, true);
+		renderView.addIcon(icon);
+		icon = new InfoIcon(ChatColor.RED+MessagePath.MENU_PLOTS_EDIT_REMOVE_PLAYERS.getMessage(), Collections.emptyList(), Material.SKELETON_SKULL, 7, true);
 		renderView.addIcon(icon);
 		views.put(PlotState.EDIT, renderView);
 		refreshNavigationButtons(PlotState.EDIT);
@@ -173,7 +179,7 @@ public class PlotMenu {
 						landTitle = ChatColor.LIGHT_PURPLE+MessagePath.MENU_PLOTS_PLOT.getMessage()+" - "+drawPoint.x+","+drawPoint.y;
 						// Display plot player list in lore
 						if(drawPlot != null) {
-							List<OfflinePlayer> users = drawPlot.getUsers();
+							List<OfflinePlayer> users = drawPlot.getUserOfflinePlayers();
 							for(int n = 0; n < 4; n++) {
 								if(n < 3 && n < users.size()) {
 									loreList.add(users.get(n).getName());
@@ -227,13 +233,13 @@ public class PlotMenu {
 					if(Konquest.toPoint(town.getCenterLoc()).equals(drawPoint)) {
 						isClickable = false;
 						loreList.clear();
-						loreList.add(MessagePath.MENU_PLOTS_TOWN_MONUMENT.getMessage());
+						loreList.add(ChatColor.GREEN+MessagePath.MENU_PLOTS_TOWN_MONUMENT.getMessage());
 						landMat = Material.OBSIDIAN;
 					}
 					// Add other info to lore
 					if(Konquest.toPoint(playerLoc).equals(drawPoint)) {
 						//landMat = Material.PLAYER_HEAD;
-						loreList.add(MessagePath.MENU_PLOTS_HERE.getMessage());
+						loreList.add(ChatColor.GREEN+MessagePath.MENU_PLOTS_HERE.getMessage());
 					}
 					// Build icon and add to menu view
 					icon = new InfoIcon(landTitle,loreList,landMat,index,isClickable);
@@ -259,12 +265,16 @@ public class PlotMenu {
 		List<OfflinePlayer> players = new ArrayList<OfflinePlayer>();
 		if(context.equals(PlotState.EDIT_PLAYER_ADD) || context.equals(PlotState.CREATE_PLAYER_ADD)) {
 			players.addAll(town.getPlayerResidents());
-			players.removeAll(plot.getUsers());
-			loreStr = MessagePath.MENU_PLOTS_CLICK_ADD_PLAYER.getMessage();
+			players.removeAll(plot.getUserOfflinePlayers());
+			loreStr = ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_ADD_PLAYER.getMessage();
 			isClickable = true;
 		} else if(context.equals(PlotState.EDIT_PLAYER_REMOVE)) {
-			players.addAll(plot.getUsers());
-			loreStr = MessagePath.MENU_PLOTS_CLICK_REMOVE_PLAYER.getMessage();
+			players.addAll(plot.getUserOfflinePlayers());
+			loreStr = ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_REMOVE_PLAYER.getMessage();
+			isClickable = true;
+		} else if(context.equals(PlotState.EDIT_PLAYER_SHOW)) {
+			players.addAll(plot.getUserOfflinePlayers());
+			loreStr = ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_MOVE_PLAYER.getMessage();
 			isClickable = true;
 		} else {
 			return null;
@@ -388,6 +398,8 @@ public class PlotMenu {
 						result = null;
 					} else if(index == 5) {
 						// Return
+						editPlot = null;
+						oldPlot = null;
 						result = goToState(PlotState.ROOT_CREATE);
 					} else if(index == 6) {
 						// Finish
@@ -403,6 +415,9 @@ public class PlotMenu {
 						result = null;
 					} else if(index == 5) {
 						// Return
+						if(editPlot != null) {
+							editPlot.clearUsers();
+						}
 						result = goToState(PlotState.CREATE_LAND_ADD);
 					} else if(index == 6) {
 						// Finish
@@ -454,6 +469,24 @@ public class PlotMenu {
 						// Finish
 						result = null;
 						commitPlot();
+					}
+					break;
+				case EDIT_PLAYER_SHOW:
+					// (back [0]) close [4], return [5], finish [6], (next [8])
+					if(index == 0) {
+						result = goPageBack();
+					} else if(index == 4) {
+						// Close
+						result = null;
+					} else if(index == 5) {
+						// Return
+						result = goToState(PlotState.EDIT);
+					} else if(index == 6) {
+						// Finish
+						result = null;
+						commitPlot();
+					} else if(index == 8) {
+						result = goPageNext();
 					}
 					break;
 				case EDIT_PLAYER_ADD:
@@ -561,6 +594,9 @@ public class PlotMenu {
 					} else if(slot == 5) {
 						// Add Players
 						result = goToState(PlotState.EDIT_PLAYER_ADD);
+					} else if(slot == 6) {
+						// Add Players
+						result = goToState(PlotState.EDIT_PLAYER_SHOW);
 					} else if(slot == 7) {
 						// Remove Players
 						result = goToState(PlotState.EDIT_PLAYER_REMOVE);
@@ -592,6 +628,19 @@ public class PlotMenu {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
 						editPlot.addUser(icon.getOfflinePlayer());
 						result = goToState(PlotState.EDIT_PLAYER_ADD);
+					}
+					break;
+				case EDIT_PLAYER_SHOW:
+					// Check for player icon click, move player to first index in user list
+					if(clickedIcon != null && clickedIcon instanceof PlayerIcon && editPlot != null) {
+						PlayerIcon icon = (PlayerIcon)clickedIcon;
+						List<UUID> members = editPlot.getUsers();
+						if(members.remove(icon.getOfflinePlayer().getUniqueId())) {
+							editPlot.clearUsers();
+							editPlot.addUser(icon.getOfflinePlayer());
+							editPlot.addUsers(members);
+						}
+						result = goToState(PlotState.EDIT_PLAYER_SHOW);
 					}
 					break;
 				case EDIT_PLAYER_REMOVE:
@@ -675,6 +724,10 @@ public class PlotMenu {
 				result = createLandView(origin,currentPlotState);
 				views.put(currentPlotState, result);
 				break;
+			case EDIT_PLAYER_SHOW:
+				result = createPlayerView(editPlot,currentPlotState);
+				views.put(currentPlotState, result);
+				break;
 			case EDIT_PLAYER_ADD:
 				result = createPlayerView(editPlot,currentPlotState);
 				views.put(currentPlotState, result);
@@ -727,178 +780,77 @@ public class PlotMenu {
 	 * Place all navigation button icons on view given context and update icons
 	 */
 	public void refreshNavigationButtons(PlotState context) {
-		
 		DisplayMenu view = views.get(context);
 		int navStart = view.getInventory().getSize()-9;
 		if(navStart < 0) {
 			ChatUtil.printDebug("Plot menu nav buttons failed to refresh in context "+context.toString());
 			return;
 		}
-		switch(context) {
-			case ROOT:
-				// Scroll arrows [0,1,2,3], close [4], create [5], delete [6], edit [7]
-				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollRight(navStart+1));
-				view.addIcon(navIconScrollUp(navStart+2));
-				view.addIcon(navIconScrollDown(navStart+3));
-				view.addIcon(navIconClose(navStart+4));
-				view.addIcon(navIconCreate(navStart+5));
-				view.addIcon(navIconDelete(navStart+6));
-				view.addIcon(navIconEdit(navStart+7));
-				view.addIcon(navIconEmpty(navStart+8));
-				break;
-			case ROOT_CREATE:
-				// Scroll arrows [0,1,2,3], close [4], return [5]
-				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollRight(navStart+1));
-				view.addIcon(navIconScrollUp(navStart+2));
-				view.addIcon(navIconScrollDown(navStart+3));
-				view.addIcon(navIconClose(navStart+4));
-				view.addIcon(navIconReturn(navStart+5));
-				view.addIcon(navIconEmpty(navStart+6));
-				view.addIcon(navIconEmpty(navStart+7));
-				view.addIcon(navIconEmpty(navStart+8));
-				break;
-			case ROOT_DELETE:
-				// Scroll arrows [0,1,2,3], close [4], return [5]
-				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollRight(navStart+1));
-				view.addIcon(navIconScrollUp(navStart+2));
-				view.addIcon(navIconScrollDown(navStart+3));
-				view.addIcon(navIconClose(navStart+4));
-				view.addIcon(navIconReturn(navStart+5));
-				view.addIcon(navIconEmpty(navStart+6));
-				view.addIcon(navIconEmpty(navStart+7));
-				view.addIcon(navIconEmpty(navStart+8));
-				break;
-			case ROOT_EDIT:
-				// Scroll arrows [0,1,2,3], close [4], return [5]
-				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollRight(navStart+1));
-				view.addIcon(navIconScrollUp(navStart+2));
-				view.addIcon(navIconScrollDown(navStart+3));
-				view.addIcon(navIconClose(navStart+4));
-				view.addIcon(navIconReturn(navStart+5));
-				view.addIcon(navIconEmpty(navStart+6));
-				view.addIcon(navIconEmpty(navStart+7));
-				view.addIcon(navIconEmpty(navStart+8));
-				break;
-			case CREATE_LAND_ADD:
-				// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
-				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollRight(navStart+1));
-				view.addIcon(navIconScrollUp(navStart+2));
-				view.addIcon(navIconScrollDown(navStart+3));
-				view.addIcon(navIconClose(navStart+4));
-				view.addIcon(navIconReturn(navStart+5));
-				view.addIcon(navIconFinish(navStart+6));
-				view.addIcon(navIconEmpty(navStart+7));
-				view.addIcon(navIconEmpty(navStart+8));
-				break;
-			case CREATE_PLAYER_ADD:
-				// (back [0]) close [4], return [5], finish [6], (next [8])
-				if(currentPlayerPage > 0) {
-					// Place a back button
-					view.addIcon(navIconBack(navStart+0));
-				} else {
-					view.addIcon(navIconEmpty(navStart+0));
-				}
-				if(currentPlayerPage < playerPages.size()-1) {
-					// Place a next button
-					view.addIcon(navIconNext(navStart+8));
-				} else {
-					view.addIcon(navIconEmpty(navStart+8));
-				}
-				view.addIcon(navIconEmpty(navStart+1));
-				view.addIcon(navIconEmpty(navStart+2));
-				view.addIcon(navIconEmpty(navStart+3));
-				view.addIcon(navIconClose(navStart+4));
-				view.addIcon(navIconReturn(navStart+5));
-				view.addIcon(navIconFinish(navStart+6));
-				view.addIcon(navIconEmpty(navStart+7));
-				break;
-			case EDIT:
-				// Close [4], return [5]
+		if(context.equals(PlotState.ROOT)) {
+			// Scroll arrows [0,1,2,3], close [4], create [5], delete [6], edit [7]
+			view.addIcon(navIconScrollLeft(navStart+0));
+			view.addIcon(navIconScrollRight(navStart+1));
+			view.addIcon(navIconScrollUp(navStart+2));
+			view.addIcon(navIconScrollDown(navStart+3));
+			view.addIcon(navIconClose(navStart+4));
+			view.addIcon(navIconCreate(navStart+5));
+			view.addIcon(navIconDelete(navStart+6));
+			view.addIcon(navIconEdit(navStart+7));
+			view.addIcon(navIconEmpty(navStart+8));
+		} else if(context.equals(PlotState.ROOT_CREATE) || context.equals(PlotState.ROOT_DELETE) || context.equals(PlotState.ROOT_EDIT)) {
+			// Scroll arrows [0,1,2,3], close [4], return [5]
+			view.addIcon(navIconScrollLeft(navStart+0));
+			view.addIcon(navIconScrollRight(navStart+1));
+			view.addIcon(navIconScrollUp(navStart+2));
+			view.addIcon(navIconScrollDown(navStart+3));
+			view.addIcon(navIconClose(navStart+4));
+			view.addIcon(navIconReturn(navStart+5));
+			view.addIcon(navIconEmpty(navStart+6));
+			view.addIcon(navIconEmpty(navStart+7));
+			view.addIcon(navIconEmpty(navStart+8));
+		} else if(context.equals(PlotState.CREATE_LAND_ADD) || context.equals(PlotState.EDIT_LAND_ADD) || context.equals(PlotState.EDIT_LAND_REMOVE)) {
+			// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
+			view.addIcon(navIconScrollLeft(navStart+0));
+			view.addIcon(navIconScrollRight(navStart+1));
+			view.addIcon(navIconScrollUp(navStart+2));
+			view.addIcon(navIconScrollDown(navStart+3));
+			view.addIcon(navIconClose(navStart+4));
+			view.addIcon(navIconReturn(navStart+5));
+			view.addIcon(navIconFinish(navStart+6));
+			view.addIcon(navIconEmpty(navStart+7));
+			view.addIcon(navIconEmpty(navStart+8));
+		} else if(context.equals(PlotState.CREATE_PLAYER_ADD) || context.equals(PlotState.EDIT_PLAYER_SHOW) || context.equals(PlotState.EDIT_PLAYER_ADD) || context.equals(PlotState.EDIT_PLAYER_REMOVE)) {
+			// (back [0]) close [4], return [5], finish [6], (next [8])
+			if(currentPlayerPage > 0) {
+				// Place a back button
+				view.addIcon(navIconBack(navStart+0));
+			} else {
 				view.addIcon(navIconEmpty(navStart+0));
-				view.addIcon(navIconEmpty(navStart+1));
-				view.addIcon(navIconEmpty(navStart+2));
-				view.addIcon(navIconEmpty(navStart+3));
-				view.addIcon(navIconClose(navStart+4));
-				view.addIcon(navIconReturn(navStart+5));
-				view.addIcon(navIconEmpty(navStart+6));
-				view.addIcon(navIconEmpty(navStart+7));
+			}
+			if(currentPlayerPage < playerPages.size()-1) {
+				// Place a next button
+				view.addIcon(navIconNext(navStart+8));
+			} else {
 				view.addIcon(navIconEmpty(navStart+8));
-				break;
-			case EDIT_LAND_ADD:
-				// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
-				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollRight(navStart+1));
-				view.addIcon(navIconScrollUp(navStart+2));
-				view.addIcon(navIconScrollDown(navStart+3));
-				view.addIcon(navIconClose(navStart+4));
-				view.addIcon(navIconReturn(navStart+5));
-				view.addIcon(navIconFinish(navStart+6));
-				view.addIcon(navIconEmpty(navStart+7));
-				view.addIcon(navIconEmpty(navStart+8));
-				break;
-			case EDIT_LAND_REMOVE:
-				// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
-				view.addIcon(navIconScrollLeft(navStart+0));
-				view.addIcon(navIconScrollRight(navStart+1));
-				view.addIcon(navIconScrollUp(navStart+2));
-				view.addIcon(navIconScrollDown(navStart+3));
-				view.addIcon(navIconClose(navStart+4));
-				view.addIcon(navIconReturn(navStart+5));
-				view.addIcon(navIconFinish(navStart+6));
-				view.addIcon(navIconEmpty(navStart+7));
-				view.addIcon(navIconEmpty(navStart+8));
-				break;
-			case EDIT_PLAYER_ADD:
-				// (back [0]) close [4], return [5], finish [6], (next [8])
-				if(currentPlayerPage > 0) {
-					// Place a back button
-					view.addIcon(navIconBack(navStart+0));
-				} else {
-					view.addIcon(navIconEmpty(navStart+0));
-				}
-				if(currentPlayerPage < playerPages.size()-1) {
-					// Place a next button
-					view.addIcon(navIconNext(navStart+8));
-				} else {
-					view.addIcon(navIconEmpty(navStart+8));
-				}
-				view.addIcon(navIconEmpty(navStart+1));
-				view.addIcon(navIconEmpty(navStart+2));
-				view.addIcon(navIconEmpty(navStart+3));
-				view.addIcon(navIconClose(navStart+4));
-				view.addIcon(navIconReturn(navStart+5));
-				view.addIcon(navIconFinish(navStart+6));
-				view.addIcon(navIconEmpty(navStart+7));
-				break;
-			case EDIT_PLAYER_REMOVE:
-				// (back [0]) close [4], return [5], finish [6], (next [8])
-				if(currentPlayerPage > 0) {
-					// Place a back button
-					view.addIcon(navIconBack(navStart+0));
-				} else {
-					view.addIcon(navIconEmpty(navStart+0));
-				}
-				if(currentPlayerPage < playerPages.size()-1) {
-					// Place a next button
-					view.addIcon(navIconNext(navStart+8));
-				} else {
-					view.addIcon(navIconEmpty(navStart+8));
-				}
-				view.addIcon(navIconEmpty(navStart+1));
-				view.addIcon(navIconEmpty(navStart+2));
-				view.addIcon(navIconEmpty(navStart+3));
-				view.addIcon(navIconClose(navStart+4));
-				view.addIcon(navIconReturn(navStart+5));
-				view.addIcon(navIconFinish(navStart+6));
-				view.addIcon(navIconEmpty(navStart+7));
-				break;
-			default:
-				break;
+			}
+			view.addIcon(navIconEmpty(navStart+1));
+			view.addIcon(navIconEmpty(navStart+2));
+			view.addIcon(navIconEmpty(navStart+3));
+			view.addIcon(navIconClose(navStart+4));
+			view.addIcon(navIconReturn(navStart+5));
+			view.addIcon(navIconFinish(navStart+6));
+			view.addIcon(navIconEmpty(navStart+7));
+		} else if(context.equals(PlotState.EDIT)) {
+			// Close [4], return [5]
+			view.addIcon(navIconEmpty(navStart+0));
+			view.addIcon(navIconEmpty(navStart+1));
+			view.addIcon(navIconEmpty(navStart+2));
+			view.addIcon(navIconEmpty(navStart+3));
+			view.addIcon(navIconClose(navStart+4));
+			view.addIcon(navIconReturn(navStart+5));
+			view.addIcon(navIconEmpty(navStart+6));
+			view.addIcon(navIconEmpty(navStart+7));
+			view.addIcon(navIconEmpty(navStart+8));
 		}
 		view.updateIcons();
 	}
@@ -932,6 +884,9 @@ public class PlotMenu {
 				break;
 			case EDIT_LAND_REMOVE:
 				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_REMOVE_LAND.getMessage();
+				break;
+			case EDIT_PLAYER_SHOW:
+				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_SHOW_PLAYERS.getMessage();
 				break;
 			case EDIT_PLAYER_ADD:
 				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_ADD_PLAYERS.getMessage();

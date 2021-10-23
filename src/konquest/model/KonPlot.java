@@ -75,15 +75,25 @@ public class KonPlot {
 		return removeUser(u.getUniqueId());
 	}
 	
+	public void clearUsers() {
+		users.clear();
+	}
+	
 	public boolean hasUser(OfflinePlayer u) {
 		return users.contains(u.getUniqueId());
 	}
 	
-	public List<OfflinePlayer> getUsers() {
+	public List<OfflinePlayer> getUserOfflinePlayers() {
 		ArrayList<OfflinePlayer> result = new ArrayList<OfflinePlayer>();
 		for(UUID id : users) {
 			result.add(Bukkit.getOfflinePlayer(id));
 		}
+		return result;
+	}
+	
+	public List<UUID> getUsers() {
+		ArrayList<UUID> result = new ArrayList<UUID>();
+		result.addAll(users);
 		return result;
 	}
 	
