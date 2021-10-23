@@ -1165,4 +1165,14 @@ public class KonTown extends KonTerritory implements Timeable{
 		return result;
 	}
 	
+	public List<KonPlot> getPlots() {
+		ArrayList<KonPlot> result = new ArrayList<KonPlot>();
+		for(KonPlot plot : plots.values()) {
+			if(!result.contains(plot)) {
+				result.add(plot);
+			}
+		}
+		return result;
+	}
+	
 }

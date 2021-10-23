@@ -77,7 +77,7 @@
 #    max_armor:                     Maximum armor amount in blocks that a town can have (0 to disable, integer >= 0)
 #    barbarians_destroy:            Allow barbarian players to destroy towns when true, else prevent barbarians from attacking town monuments (true/false)
 #  plots:
-#    enable:                        Enable town plots (true/false)
+#    enable*:                       Enable town plots (true/false)
 #    max_size:                      Maximum plot size in chunks (0 to disable, integer >= 0)
 #    allow_build:                   Allow all town residents to build in any town plot (true/false)
 #    allow_containers:              Allow all town residents to access containers in any town plot (true/false)

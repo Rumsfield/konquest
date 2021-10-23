@@ -301,7 +301,7 @@ public class PlotMenu {
 				OfflinePlayer currentPlayer = playerIter.next();
 				loreList = new ArrayList<String>();
 				loreList.add(loreStr);
-		    	PlayerIcon player = new PlayerIcon(currentPlayer.getName(),loreList,currentPlayer,slotIndex,isClickable,PlayerIconAction.DISPLAY_INFO);
+		    	PlayerIcon player = new PlayerIcon(ChatColor.GREEN+currentPlayer.getName(),loreList,currentPlayer,slotIndex,isClickable,PlayerIconAction.DISPLAY_INFO);
 				playerPages.get(pageNum).addIcon(player);
 				slotIndex++;
 			}
@@ -565,7 +565,7 @@ public class PlotMenu {
 				case CREATE_LAND_ADD:
 					// Check for non-plot town land click, add to chosen plot
 					if(!town.hasPlot(clickPoint, town.getWorld()) && editPlot != null && !editPlot.hasPoint(clickPoint)) {
-						if(editPlot.getPoints().size() < maxSize) {
+						if(maxSize < 1 || editPlot.getPoints().size() < maxSize) {
 							// Add this point to the temp plot
 							editPlot.addPoint(clickPoint);
 						} else {
@@ -605,7 +605,7 @@ public class PlotMenu {
 				case EDIT_LAND_ADD:
 					// Check for non-plot town land click, add to chosen plot
 					if(!town.hasPlot(clickPoint, town.getWorld()) && editPlot != null && !editPlot.hasPoint(clickPoint)) {
-						if(editPlot.getPoints().size() < maxSize) {
+						if(maxSize < 1 || editPlot.getPoints().size() < maxSize) {
 							// Add this point to the temp plot
 							editPlot.addPoint(clickPoint);
 						} else {
