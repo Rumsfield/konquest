@@ -105,27 +105,24 @@ public class InventoryListener implements Listener {
 							 event.getInventory().getHolder() instanceof DoubleChest ||
 							 event.getInventory().getHolder() instanceof StorageMinecart) {
 						// Inventory can hold items
-						if(town.isOpen()) {
-							// Town is open
+						// Protect land and plots
+						if(!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+							// Stop all edits by non-resident in closed towns
+							ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
+							event.setCancelled(true);
+							return;
+						}
+						if(town.isOpen() || (!town.isOpen() && town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+							// Check for protections in open towns and closed town residents
 							if(konquest.getPlotManager().isPlayerPlotProtectContainer(town, openLoc, player.getBukkitPlayer())) {
 								// Stop when player edits plot that isn't theirs
 								ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage());
 								event.setCancelled(true);
 								return;
 							}
-						} else {
-							// Town is closed
-							if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
-								// Player is a resident
-								if(konquest.getPlotManager().isPlayerPlotProtectContainer(town, openLoc, player.getBukkitPlayer())) {
-									// Stop when player edits plot that isn't theirs
-									ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage());
-									event.setCancelled(true);
-									return;
-								}
-							} else {
-								// Stop all edits by non-resident
-								ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
+							if(town.isPlotOnly() && !town.isPlayerElite(player.getOfflineBukkitPlayer()) && !town.hasPlot(openLoc)) {
+								// Stop when non-elite player edits non-plot land
+								ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLY_PLOT.getMessage());
 								event.setCancelled(true);
 								return;
 							}

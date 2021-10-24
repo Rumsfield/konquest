@@ -106,7 +106,7 @@ public class KonPlot {
 	}
 	
 	public String getDisplayText() {
-		String result = MessagePath.MENU_PLOTS_PLOT.getMessage();
+		String result = MessagePath.LABEL_PLOT.getMessage();
 		if(!users.isEmpty()) {
 			String firstName = Bukkit.getOfflinePlayer(users.get(0)).getName();
 			result = result + " " + firstName;

@@ -176,7 +176,7 @@ public class PlotMenu {
 								colorSelect = 0;
 							}
 						}
-						landTitle = ChatColor.LIGHT_PURPLE+MessagePath.MENU_PLOTS_PLOT.getMessage()+" - "+drawPoint.x+","+drawPoint.y;
+						landTitle = ChatColor.LIGHT_PURPLE+MessagePath.LABEL_PLOT.getMessage()+" - "+drawPoint.x+","+drawPoint.y;
 						// Display plot player list in lore
 						if(drawPlot != null) {
 							List<OfflinePlayer> users = drawPlot.getUserOfflinePlayers();

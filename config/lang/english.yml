@@ -62,6 +62,7 @@ label:
   enemy-redstone: "Enemy Redstone"
   true: "True"
   false: "False"
+  plot: "Plot"
 menu:
   stats:
     title: "Accomplishment Stats"
@@ -123,7 +124,8 @@ menu:
   options:
     hint: "Click to change"
     current: "Current: %s"
-    open: "All members can build and use chests"
+    open: "All kingdom members can build and use chests"
+    plot: "Residents can only build and use chests in plots"
     redstone: "Enemies can use redstone switches and doors"
   plots:
     edit-add-land: "Add Land"
@@ -133,7 +135,6 @@ menu:
     edit-show-players: "Show Players"
     town-land: "Town Land"
     town-monument: "Town Monument"
-    plot: "Plot"
     editing-plot: "Editing Plot"
     click-delete: "Click to Delete Plot"
     click-edit: "Click to Edit Plot"
@@ -232,6 +233,7 @@ protection:
     blocked: "Blocked"
     not-resident: "You must be a resident of %s to do this."
     not-plot: "You must be a plot member to do this."
+    only-plot: "You cannot do this outside of a town plot."
     online: "The Kingdom of %s doesn't have enough online players, cannot attack the Town of %s."
     upgrade: "%s is upgraded with %s and cannot be attacked without %s residents online."
     camp: "Cannot attack %s, the camp owner is offline."
@@ -440,6 +442,8 @@ command:
     notice:
       open: "Opened %s for access by all kingdom members."
       close: "Closed %s, only residents may build and access containers."
+      plot-enable: "%s now allows residents to only build within plots."
+      plot-disable: "%s now allows residents to build in town land and within plots."
       redstone-enable: "%s now allows enemies to use redstone switches and doors."
       redstone-disable: "%s now prevents enemies from using redstone switches and doors."
       add-invite-reminder: "You have been invited to join the town of %s."

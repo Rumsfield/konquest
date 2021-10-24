@@ -26,8 +26,7 @@ public class ForceTownAdminCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		
-		// k admin forcetown <name> open|redstone|add|kick|knight|lord|rename|upgrade|shield [arg1] [arg2]
+		// k admin forcetown <name> options|add|kick|knight|lord|rename|upgrade|shield|plots [arg1] [arg2]
 		if (getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
@@ -54,8 +53,12 @@ public class ForceTownAdminCommand extends CommandBase {
     		String playerName = "";
         	String newTownName = "";
         	String upgradeName = "";
-        	String optionSetting = "";
+        	//String optionSetting = "";
         	switch(subCmd.toLowerCase()) {
+        	case "options":
+        		getKonquest().getDisplayManager().displayTownOptionsMenu((Player) getSender(), town);
+        		break;
+        	/*
         	case "open":
             	// get "true" or "false"
         		if (getArgs().length == 5) {
@@ -112,6 +115,7 @@ public class ForceTownAdminCommand extends CommandBase {
 	        		return;
     			}
         		break;
+        	*/
 			case "add":
 				if (getArgs().length == 5) {
 					playerName = getArgs()[4];
@@ -424,7 +428,7 @@ public class ForceTownAdminCommand extends CommandBase {
 
 	@Override
 	public List<String> tabComplete() {
-		// k admin forcetown <name> open|close|add|remove|lord|elite [arg1] [arg2]
+		// k admin forcetown <name> options|add|kick|knight|lord|rename|upgrade|shield|plots [arg1] [arg2]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		if(getArgs().length == 3) {
@@ -439,8 +443,7 @@ public class ForceTownAdminCommand extends CommandBase {
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 4) {
 			// suggest sub-commands
-			tabList.add("open");
-			tabList.add("redstone");
+			tabList.add("options");
 			tabList.add("add");
 			tabList.add("kick");
 			tabList.add("lord");
@@ -472,9 +475,6 @@ public class ForceTownAdminCommand extends CommandBase {
 				tabList.add("clear");
 				tabList.add("set");
 				tabList.add("add");
-			} else if(subCommand.equalsIgnoreCase("open") || subCommand.equalsIgnoreCase("redstone")) {
-				tabList.add("true");
-				tabList.add("false");
 			}
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);

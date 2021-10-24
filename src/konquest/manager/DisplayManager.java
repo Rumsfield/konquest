@@ -624,6 +624,15 @@ public class DisplayManager {
 		option = new OptionIcon(optionAction.TOWN_OPEN, loreColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.DARK_OAK_DOOR, 3);
 		newMenu.getPage(0).addIcon(option);
 		
+		// Open Info Icon
+		currentValue = boolean2Lang(town.isPlotOnly())+" "+boolean2Symbol(town.isPlotOnly());
+		loreList = new ArrayList<String>();
+    	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_PLOT.getMessage()));
+    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
+    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+		option = new OptionIcon(optionAction.TOWN_PLOT_ONLY, loreColor+MessagePath.LABEL_PLOT.getMessage(), loreList, Material.DIAMOND_SHOVEL, 4);
+		newMenu.getPage(0).addIcon(option);
+		
 		// Redstone Info Icon
 		currentValue = boolean2Lang(town.isEnemyRedstoneAllowed())+" "+boolean2Symbol(town.isEnemyRedstoneAllowed());
 		loreList = new ArrayList<String>();

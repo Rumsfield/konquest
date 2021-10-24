@@ -1081,46 +1081,56 @@ public class KingdomManager {
 		boolean result = false;
 		switch(action) {
 			case TOWN_OPEN:
-				// Verify town lord
-				if(town.isPlayerLord(bukkitPlayer)) {
-					if(town.isOpen()) {
-						// Close the town
-	            		town.setIsOpen(false);
-	            		for(OfflinePlayer resident : town.getPlayerResidents()) {
-			    			if(resident.isOnline()) {
-			    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_CLOSE.getMessage(town.getName()));
-			    			}
-			    		}
-					} else {
-						// Open the town
-						town.setIsOpen(true);
-	            		for(OfflinePlayer resident : town.getPlayerResidents()) {
-			    			if(resident.isOnline()) {
-			    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_OPEN.getMessage(town.getName()));
-			    			}
-			    		}
-					}
-					result = true;
-            	} else {
-            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-            	}
+				if(town.isOpen()) {
+					// Close the town
+            		town.setIsOpen(false);
+            		for(OfflinePlayer resident : town.getPlayerResidents()) {
+		    			if(resident.isOnline()) {
+		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_CLOSE.getMessage(town.getName()));
+		    			}
+		    		}
+				} else {
+					// Open the town
+					town.setIsOpen(true);
+            		for(OfflinePlayer resident : town.getPlayerResidents()) {
+		    			if(resident.isOnline()) {
+		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_OPEN.getMessage(town.getName()));
+		    			}
+		    		}
+				}
+				result = true;
+				break;
+			case TOWN_PLOT_ONLY:
+				if(town.isPlotOnly()) {
+					// Disable plot only mode
+					town.setIsPlotOnly(false);
+					for(OfflinePlayer resident : town.getPlayerResidents()) {
+		    			if(resident.isOnline()) {
+		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_PLOT_DISABLE.getMessage(town.getName()));
+		    			}
+		    		}
+				} else {
+					// Enable plot only mode
+					town.setIsPlotOnly(true);
+					for(OfflinePlayer resident : town.getPlayerResidents()) {
+		    			if(resident.isOnline()) {
+		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_PLOT_ENABLE.getMessage(town.getName()));
+		    			}
+		    		}
+				}
+				result = true;
 				break;
 			case TOWN_REDSTONE:
-				// Verify town lord
-				if(town.isPlayerLord(bukkitPlayer)) {
-					if(town.isEnemyRedstoneAllowed()) {
-						// Disable enemy redstone
-	            		town.setIsEnemyRedstoneAllowed(false);
-	            		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_DISABLE.getMessage(town.getName()));
-					} else {
-						// Enable enemy redstone
-						town.setIsEnemyRedstoneAllowed(true);
-						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_ENABLE.getMessage(town.getName()));
-					}
-					result = true;
-            	} else {
-            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-            	}
+				if(town.isEnemyRedstoneAllowed()) {
+					// Disable enemy redstone
+            		town.setIsEnemyRedstoneAllowed(false);
+            		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_DISABLE.getMessage(town.getName()));
+				} else {
+					// Enable enemy redstone
+					town.setIsEnemyRedstoneAllowed(true);
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_ENABLE.getMessage(town.getName()));
+				}
+				result = true;
 				break;
 			default:
 				break;
@@ -2031,6 +2041,9 @@ public class KingdomManager {
 		            	// Set open flag
 		            	boolean isOpen = townSection.getBoolean("open",false);
 		            	town.setIsOpen(isOpen);
+		            	// Set plot flag
+		            	boolean isPlotOnly = townSection.getBoolean("plot",false);
+		            	town.setIsPlotOnly(isPlotOnly);
 		            	// Set redstone flag
 		            	boolean isRedstone = townSection.getBoolean("redstone",false);
 		            	town.setIsEnemyRedstoneAllowed(isRedstone);
@@ -2152,6 +2165,7 @@ public class KingdomManager {
 						 									 (int) town.getCenterLoc().getBlockZ()});
                 townInstanceSection.set("chunks", konquest.formatPointsToString(town.getChunkList().keySet()));
                 townInstanceSection.set("open", town.isOpen());
+                townInstanceSection.set("plot", town.isPlotOnly());
                 townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());
                 townInstanceSection.set("shield", town.isShielded());
                 townInstanceSection.set("shield_time", town.getShieldEndTime());
