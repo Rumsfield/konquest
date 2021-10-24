@@ -536,6 +536,7 @@ public class KingdomManager {
 			} else {
 				conquerKingdom.getTown(name).clearUpgrades();
 			}
+			conquerKingdom.getTown(name).clearPlots();
 			konquest.getMapHandler().drawDynmapUpdateTerritory(conquerKingdom.getTown(name));
 			konquest.getMapHandler().drawDynmapLabel(getKingdom(oldKingdomName).getCapital());
 			konquest.getMapHandler().drawDynmapLabel(conquerKingdom.getCapital());

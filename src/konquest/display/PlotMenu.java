@@ -671,18 +671,18 @@ public class PlotMenu {
 			result = createLandView(origin,currentPlotState);
 			views.put(currentPlotState, result);
 		} else if(index == 1) {
-			// Scroll right
-			origin = new Point(origin.x + 1, origin.y + 0);
-			result = createLandView(origin,currentPlotState);
-			views.put(currentPlotState, result);
-		}  else if(index == 2) {
 			// Scroll up
 			origin = new Point(origin.x + 0, origin.y - 1);
 			result = createLandView(origin,currentPlotState);
 			views.put(currentPlotState, result);
-		} else if(index == 3) {
+		} else if(index == 2) {
 			// Scroll down
 			origin = new Point(origin.x + 0, origin.y + 1);
+			result = createLandView(origin,currentPlotState);
+			views.put(currentPlotState, result);
+		} else if(index == 3) {
+			// Scroll right
+			origin = new Point(origin.x + 1, origin.y + 0);
 			result = createLandView(origin,currentPlotState);
 			views.put(currentPlotState, result);
 		}
@@ -793,9 +793,9 @@ public class PlotMenu {
 		if(context.equals(PlotState.ROOT)) {
 			// Scroll arrows [0,1,2,3], close [4], create [5], delete [6], edit [7]
 			view.addIcon(navIconScrollLeft(navStart+0));
-			view.addIcon(navIconScrollRight(navStart+1));
-			view.addIcon(navIconScrollUp(navStart+2));
-			view.addIcon(navIconScrollDown(navStart+3));
+			view.addIcon(navIconScrollUp(navStart+1));
+			view.addIcon(navIconScrollDown(navStart+2));
+			view.addIcon(navIconScrollRight(navStart+3));
 			view.addIcon(navIconClose(navStart+4));
 			view.addIcon(navIconCreate(navStart+5));
 			view.addIcon(navIconDelete(navStart+6));
@@ -804,9 +804,9 @@ public class PlotMenu {
 		} else if(context.equals(PlotState.ROOT_CREATE) || context.equals(PlotState.ROOT_DELETE) || context.equals(PlotState.ROOT_EDIT)) {
 			// Scroll arrows [0,1,2,3], close [4], return [5]
 			view.addIcon(navIconScrollLeft(navStart+0));
-			view.addIcon(navIconScrollRight(navStart+1));
-			view.addIcon(navIconScrollUp(navStart+2));
-			view.addIcon(navIconScrollDown(navStart+3));
+			view.addIcon(navIconScrollUp(navStart+1));
+			view.addIcon(navIconScrollDown(navStart+2));
+			view.addIcon(navIconScrollRight(navStart+3));
 			view.addIcon(navIconClose(navStart+4));
 			view.addIcon(navIconReturn(navStart+5));
 			view.addIcon(navIconEmpty(navStart+6));
@@ -815,9 +815,9 @@ public class PlotMenu {
 		} else if(context.equals(PlotState.CREATE_LAND_ADD) || context.equals(PlotState.EDIT_LAND_ADD) || context.equals(PlotState.EDIT_LAND_REMOVE)) {
 			// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
 			view.addIcon(navIconScrollLeft(navStart+0));
-			view.addIcon(navIconScrollRight(navStart+1));
-			view.addIcon(navIconScrollUp(navStart+2));
-			view.addIcon(navIconScrollDown(navStart+3));
+			view.addIcon(navIconScrollUp(navStart+1));
+			view.addIcon(navIconScrollDown(navStart+2));
+			view.addIcon(navIconScrollRight(navStart+3));
 			view.addIcon(navIconClose(navStart+4));
 			view.addIcon(navIconReturn(navStart+5));
 			view.addIcon(navIconFinish(navStart+6));

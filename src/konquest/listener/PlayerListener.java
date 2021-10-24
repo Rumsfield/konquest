@@ -1371,6 +1371,7 @@ public class PlayerListener implements Listener{
     		 * 		into plot from non-plot (territory or wild)
     		 * 		into plot from other plot
     		 * 		out of plot, to town
+    		 * 	    out of wild, to town
     		 */
     		String plotMessage = "";
     		ChatColor plotMessageColor = ChatColor.GOLD;
@@ -1387,8 +1388,8 @@ public class PlayerListener implements Listener{
     				doDisplay = true;
     			}
     		} else {
-    			if(isPlotFrom && town.isLocInside(toLoc)) {
-    				// Moved out of plot into town land
+    			if((isPlotFrom || !town.isLocInside(fromLoc)) && town.isLocInside(toLoc)) {
+    				// Moved out of plot or other territory or wild into town land
     				plotMessage = MessagePath.MENU_PLOTS_TOWN_LAND.getMessage();
     				plotMessageColor = ChatColor.DARK_GREEN;
     				doDisplay = true;

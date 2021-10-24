@@ -1189,4 +1189,8 @@ public class KonTown extends KonTerritory implements Timeable{
 		return result;
 	}
 	
+	public void clearPlots() {
+		plots.clear();
+	}
+	
 }
