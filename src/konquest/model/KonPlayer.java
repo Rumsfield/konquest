@@ -49,6 +49,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	private boolean isPriorityTitleDisplay;
 	private boolean isCombatTagged;
 	private boolean isFlying;
+	private boolean isBorderDisplay;
 	
 	private Timer exileConfirmTimer;
 	private Timer giveLordConfirmTimer;
@@ -89,6 +90,7 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		this.isPriorityTitleDisplay = false;
 		this.isCombatTagged = false;
 		this.isFlying = false;
+		this.isBorderDisplay = true;
 		this.exileConfirmTimer = new Timer(this);
 		this.giveLordConfirmTimer = new Timer(this);
 		this.priorityTitleDisplayTimer = new Timer(this);
@@ -224,6 +226,10 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 		return isFlying;
 	}
 	
+	public boolean isBorderDisplay() {
+		return isBorderDisplay;
+	}
+	
 	public Timer getGiveLordConfirmTimer() {
 		return giveLordConfirmTimer;
 	}
@@ -313,6 +319,10 @@ public class KonPlayer extends KonOfflinePlayer implements Timeable{
 	
 	public void setIsCombatTagged(boolean val) {
 		isCombatTagged = val;
+	}
+	
+	public void setIsBorderDisplay(boolean val) {
+		isBorderDisplay = val;
 	}
 	
 	public void setIsFlyEnabled(boolean val) {

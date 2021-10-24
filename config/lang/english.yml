@@ -330,6 +330,10 @@ command:
         success: "Successfully removed chunk from territory %s."
       error:
         fail: "Failed to unclaim this chunk."
+  border:
+    notice:
+      enable: "Displaying particle borders"
+      disable: "Hiding particle borders"
   chat:
     notice:
       enable: "Kingdom chat"
@@ -671,6 +675,7 @@ description:
   prefix: "Set your prefix title."
   score: "Display a Player's current score."
   fly: "Fly within friendly land."
+  border: "Toggle particle borders of territories and plots."
   admin: "For Admins only."
   admin-help: "Display the admin help message."
   admin-bypass: "Toggle Admin bypass mode."

@@ -281,6 +281,8 @@ public enum MessagePath {
 	COMMAND_ADMIN_STAT_NOTICE_SUCCESS           (1, "command.admin.unclaim.notice.success"),
 	COMMAND_ADMIN_STAT_ERROR_FAIL               (0, "command.admin.unclaim.error.fail"),
 	
+	COMMAND_BORDER_NOTICE_ENABLE                (0, "command.border.notice.enable"),
+	COMMAND_BORDER_NOTICE_DISABLE               (0, "command.border.notice.disable"),
 	COMMAND_CHAT_NOTICE_ENABLE                  (0, "command.chat.notice.enable"),
 	COMMAND_CHAT_NOTICE_DISABLE                 (0, "command.chat.notice.disable"),
 	COMMAND_CLAIM_NOTICE_SUCCESS                (2, "command.claim.notice.success"),
@@ -570,6 +572,7 @@ public enum MessagePath {
 	DESCRIPTION_PREFIX                          (0, "description.prefix"),
 	DESCRIPTION_SCORE                           (0, "description.score"),
 	DESCRIPTION_FLY                             (0, "description.fly"),
+	DESCRIPTION_BORDER                          (0, "description.border"),
 	DESCRIPTION_ADMIN                           (0, "description.admin"),
 	DESCRIPTION_ADMIN_HELP                      (0, "description.admin-help"),
 	DESCRIPTION_ADMIN_BYPASS                    (0, "description.admin-bypass"),

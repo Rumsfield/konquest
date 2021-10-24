@@ -1806,7 +1806,7 @@ public class KingdomManager {
 	}
 	
 	public void updatePlayerBorderParticles(KonPlayer player, Location loc) {
-    	if(player != null) {
+    	if(player != null && player.isBorderDisplay()) {
 			// Border particle update
 			ArrayList<Chunk> nearbyChunks = konquest.getAreaChunks(loc, 2);
 			boolean isTerritoryNearby = false;

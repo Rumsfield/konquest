@@ -48,6 +48,9 @@ public class CommandHandler  implements TabExecutor {
                     case ADMIN:
                         new AdminCommand(konquest, sender, args).execute();
                         break;
+                    case BORDER:
+                        new BorderCommand(konquest, sender, args).execute();
+                        break;
                     case CHAT:
                         new ChatCommand(konquest, sender, args).execute();
                         break;
@@ -144,6 +147,9 @@ public class CommandHandler  implements TabExecutor {
                     case ADMIN:
                     	tabList.addAll(new AdminCommand(konquest, sender, args).tabComplete());
                     	//ChatUtil.printDebug("Tab Complete for AdminCommand: "+args.length);
+                        break;
+                    case BORDER:
+                    	tabList.addAll(new BorderCommand(konquest, sender, args).tabComplete());
                         break;
                     case CHAT:
                     	tabList.addAll(new ChatCommand(konquest, sender, args).tabComplete());
