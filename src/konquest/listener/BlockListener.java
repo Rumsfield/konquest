@@ -707,24 +707,26 @@ public class BlockListener implements Listener {
 				    	case 1:
 				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: New claims overlap with existing territory.");
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
+				    		event.setCancelled(true);
 				    		break;
 				    	case 2:
 				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Your camp already exists.");
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_EXISTS.getMessage());
+				    		event.setCancelled(true);
 				    		break;
 				    	case 3:
 				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: You are not a Barbarian.");
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
+				    		event.setCancelled(true);
 				    		break;
 				    	case 4:
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+				    		//ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 				    		break;
 				    	default:
 				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Unknown cause. Contact an Admin!");
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 				    		break;
 						}
-						event.setCancelled(true);
 						return;
 					}
 				}
