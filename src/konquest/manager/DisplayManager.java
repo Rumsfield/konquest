@@ -1059,6 +1059,7 @@ public class DisplayManager {
 		newMenu.getPage(0).addIcon(info);
 		/* Properties Info Icon (5) */
     	String isOpen = boolean2Symbol(infoTown.isOpen());
+    	String isPlotOnly = boolean2Symbol(infoTown.isPlotOnly());
     	String isRedstone = boolean2Symbol(infoTown.isEnemyRedstoneAllowed());
     	String isProtected = boolean2Symbol((infoTown.isCaptureDisabled() || infoTown.getKingdom().isOfflineProtected() || infoTown.isTownWatchProtected()));
     	String isAttacked = boolean2Symbol(infoTown.isAttacked());
@@ -1067,6 +1068,7 @@ public class DisplayManager {
     	String isPeaceful = boolean2Symbol(infoTown.getKingdom().isPeaceful());
     	loreList = new ArrayList<String>();
     	loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
+    	loreList.add(loreColor+MessagePath.LABEL_PLOT.getMessage()+": "+isPlotOnly);
     	loreList.add(loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage()+": "+isRedstone);
     	loreList.add(loreColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage()+": "+isAttacked);
     	loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);

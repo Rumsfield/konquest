@@ -836,6 +836,7 @@ public class KingdomManager {
     				if(territory instanceof KonTown) {
 	    				KonTown town = (KonTown) territory;
 	    				town.removeBarPlayer(occupant);
+	    				konquest.getPlotManager().removePlotPoint(town, loc);
     				} else if(territory instanceof KonCapital) {
     					KonCapital capital = (KonCapital) territory;
     					capital.removeBarPlayer(occupant);
@@ -2091,6 +2092,7 @@ public class KingdomManager {
 		            	// Create plots
 		            	if(townSection.contains("plots")) {
 		            		for(String plotIndex : townSection.getConfigurationSection("plots").getKeys(false)) {
+		            			//ChatUtil.printDebug("Creating plot "+plotIndex+" for town "+town.getName());
 		            			HashSet<Point> points = new HashSet<Point>();
 		            			points.addAll(konquest.formatStringToPoints(townSection.getString("plots."+plotIndex+".chunks")));
 		            			ArrayList<UUID> users = new ArrayList<UUID>();

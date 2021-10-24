@@ -617,8 +617,12 @@ public class PlotMenu {
 				case EDIT_LAND_REMOVE:
 					// Check for plot town land click, remove from chosen plot
 					if(editPlot != null && editPlot.hasPoint(clickPoint)) {
-						// Remove this point from the temp plot
-						editPlot.removePoint(clickPoint);
+						if(editPlot.getPoints().size() > 1) {
+							// Remove this point from the temp plot
+							editPlot.removePoint(clickPoint);
+						} else {
+							Konquest.playFailSound(bukkitPlayer);
+						}
 						result = goToState(PlotState.EDIT_LAND_REMOVE);
 					}
 					break;

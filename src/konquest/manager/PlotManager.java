@@ -30,12 +30,12 @@ public class PlotManager {
 	}
 	
 	public void initialize() {
-		isPlotsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.enable",true);
+		isPlotsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.enable",false);
 		isAllowBuild = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.allow_build",false);
 		isAllowContainers = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.allow_containers",false);
-		isIgnoreKnights = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.ignore_knights",true);
+		isIgnoreKnights = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.ignore_knights",false);
 		maxSize = konquest.getConfigManager().getConfig("core").getInt("core.plots.max_size",16);
-		ChatUtil.printDebug("Plot Manager is ready");
+		ChatUtil.printDebug("Plot Manager is ready, enabled: "+isPlotsEnabled);
 	}
 	
 	public boolean isEnabled() {
@@ -58,8 +58,21 @@ public class PlotManager {
 		return maxSize;
 	}
 	
+	public void removePlotPoint(KonTown town, Location loc) {
+		if(town.hasPlot(loc)) {
+			KonPlot plot = town.getPlot(loc);
+			if(plot != null) {
+				plot.removePoint(Konquest.toPoint(loc));
+				if(plot.getPoints().isEmpty()) {
+					town.removePlot(plot);
+				}
+			}
+		}
+	}
+	
 	public boolean addPlot(KonTown town, KonPlot plot) {
-		if(isPlotsEnabled) {
+		boolean enabled = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.enable",false);
+		if(enabled) {
 			// Verify plot points exist within town
 			for(Point p : plot.getPoints()) {
 				if(!town.getChunkList().containsKey(p)) {
@@ -72,6 +85,7 @@ public class PlotManager {
 					return false;
 				}
 			}
+			//ChatUtil.printDebug("Adding plot to town "+town.getName());
 			// Add the plot to the town
 			town.putPlot(plot);
 		}

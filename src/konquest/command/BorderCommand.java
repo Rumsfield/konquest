@@ -37,6 +37,7 @@ public class BorderCommand extends CommandBase {
         	} else {
         		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_BORDER_NOTICE_ENABLE.getMessage());
         		player.setIsBorderDisplay(true);
+        		getKonquest().getKingdomManager().updatePlayerBorderParticles(player, bukkitPlayer.getLocation());
         	}
         }
 	}

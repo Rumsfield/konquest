@@ -1136,6 +1136,7 @@ public class KonTown extends KonTerritory implements Timeable{
 			plots.put(p, plot);
 			//ChatUtil.printDebug("  Put point "+p.x+","+p.y);
 		}
+		//ChatUtil.printDebug("Finished putting plot, plot size: "+plots.size());
 	}
 	
 	public void removePlot(KonPlot plot) {
