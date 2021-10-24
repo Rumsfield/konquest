@@ -406,14 +406,20 @@ public class ForceTownAdminCommand extends CommandBase {
 	        		return;
 				}
 				break;
+			case "plots":
+	        	// Verify plots are enabled
+            	boolean isPlotsEnabled = getKonquest().getPlotManager().isEnabled();
+            	if(!isPlotsEnabled) {
+            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+            		return;
+            	}
+	        	getKonquest().getDisplayManager().displayPlotMenu((Player) getSender(), town);
+        		break;
         	default:
-        		//ChatUtil.sendError((Player) getSender(), "Invalid sub-command, expected open|close|add|kick|knight|lord|rename|upgrade");
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
         		return;
         	}
-        	
         }
-		
 	}
 
 	@Override
@@ -443,6 +449,7 @@ public class ForceTownAdminCommand extends CommandBase {
 			tabList.add("upgrade");
 			tabList.add("shield");
 			tabList.add("armor");
+			tabList.add("plots");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
