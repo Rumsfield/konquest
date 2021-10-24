@@ -57,13 +57,33 @@ public class ChatUtil {
 	 * @param name
 	 * @return
 	 */
-	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name) {
-		String message = base.toLowerCase();
-		message = message.replace("%prefix%", prefix);
-		message = message.replace("%suffix%", suffix);
-		message = message.replace("%kingdom%", kingdom);
-		message = message.replace("%title%", title);
-		message = message.replace("%name%", name);
+	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, ChatColor teamColor, ChatColor titleColor) {
+		String message = base;
+		if(prefix.equals("")) {
+			message = message.replace("%PREFIX% ", "");
+		} else {
+			message = message.replace("%PREFIX%", prefix);
+		}
+		if(suffix.equals("")) {
+			message = message.replace("%SUFFIX% ", "");
+		} else {
+			message = message.replace("%SUFFIX%", suffix);
+		}
+		if(kingdom.equals("")) {
+			message = message.replace("%KINGDOM% ", "");
+		} else {
+			message = message.replace("%KINGDOM%", teamColor+kingdom);
+		}
+		if(title.equals("")) {
+			message = message.replace("%TITLE% ", "");
+		} else {
+			message = message.replace("%TITLE%", titleColor+title);
+		}
+		if(name.equals("")) {
+			message = message.replace("%NAME% ", "");
+		} else {
+			message = message.replace("%NAME%", teamColor+name);
+		}
 		return message;
 	}
 	

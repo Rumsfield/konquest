@@ -338,7 +338,7 @@ public class AccomplishmentManager {
 			player.getPlayerPrefix().addAvailableCustom(prefix.getLabel());
 			if(player.getPlayerPrefix().setCustomPrefix(prefix)) {
 				player.getPlayerPrefix().setEnable(true);
-				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(ChatColor.translateAlternateColorCodes('&', prefix.getName())));
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(ChatUtil.parseHex(prefix.getName())));
 				result = true;
 			} else {
 				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());

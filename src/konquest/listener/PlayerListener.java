@@ -252,10 +252,12 @@ public class PlayerListener implements Listener{
 	            				ChatUtil.parseFormat(Konquest.getChatMessage(),
 	            						prefix,
 	            						suffix,
-	            						teamColor+kingdomName,
-	            						titleColor+title,
-	            						teamColor+name) +
-	        					event.getMessage());
+	            						kingdomName,
+	            						title,
+	            						name,
+	            						teamColor,
+	            						titleColor) +
+	        					Konquest.chatDivider + ChatColor.RESET + " " + event.getMessage());
 	            	}
 	            } else {
 	            	//Team chat only (and admins)
@@ -266,19 +268,23 @@ public class PlayerListener implements Listener{
 		            				ChatUtil.parseFormat(Konquest.getChatMessage(),
 		            						prefix,
 		            						suffix,
-		            						ChatColor.GREEN+kingdomName,
-		            						ChatColor.GREEN+title,
-		            						ChatColor.GREEN+name) +
-		            				ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
+		            						kingdomName,
+		            						title,
+		            						name,
+		            						ChatColor.GREEN,
+		            						ChatColor.GREEN) +
+		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
 	            		} else if(teamPlayer.isAdminBypassActive()) {
 	            			teamPlayer.getBukkitPlayer().sendMessage(
 		            				ChatUtil.parseFormat(Konquest.getChatMessage(),
 		            						prefix,
 		            						suffix,
-		            						ChatColor.GOLD+kingdomName,
-		            						ChatColor.GOLD+title,
-		            						ChatColor.GOLD+name) +
-		            				ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
+		            						kingdomName,
+		            						title,
+		            						name,
+		            						ChatColor.GOLD,
+		            						ChatColor.GOLD) +
+		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
 	            		}
 	            	}
 	            }

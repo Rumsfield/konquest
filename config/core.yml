@@ -153,7 +153,7 @@ core:
   placeholder_request_limit: 60
   chat:
     tag: '&7[&6Konquest&7]&f '
-    message: '%PREFIX% %KINGDOM% &7| %TITLE% %NAME% %SUFFIX% &7» '
+    message: '%PREFIX% %KINGDOM% &7| %TITLE% %NAME% %SUFFIX% '
     enable_format: true
     priority: HIGH
   database:

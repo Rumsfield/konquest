@@ -71,6 +71,8 @@ public class Konquest implements Timeable {
 	private static Konquest instance;
 	private static String chatTag;
 	private static String chatMessage;
+	public static final String chatDivider = "§7»";
+	
 	
 	private DatabaseThread databaseThread;
 	private AccomplishmentManager accomplishmentManager;
@@ -119,7 +121,7 @@ public class Konquest implements Timeable {
 		this.plugin = plugin;
 		instance = this;
 		chatTag = "§7[§6Konquest§7]§f ";
-		chatMessage = "%KINGDOM% §7| %TITLE% %NAME% §7» ";
+		chatMessage = "%PREFIX% %KINGDOM% §7| %TITLE% %NAME% %SUFFIX% ";
 		
 		databaseThread = new DatabaseThread(this);
 		accomplishmentManager = new AccomplishmentManager(this);
@@ -211,8 +213,10 @@ public class Konquest implements Timeable {
 		String configTag = configManager.getConfig("core").getString("core.chat.tag");
 		chatTag = ChatUtil.parseHex(configTag);
 		ChatUtil.printDebug("Chat tag is "+chatTag);
-		String configMessage = configManager.getConfig("core").getString("core.chat.message");
-		chatMessage = ChatUtil.parseHex(configMessage);
+		String configMessage = configManager.getConfig("core").getString("core.chat.message","");
+		if(!configMessage.equals("")) {
+			chatMessage = ChatUtil.parseHex(configMessage);
+		}
 		ChatUtil.printDebug("Chat message is "+chatMessage);
 		integrationManager.initialize();
 		lootManager.initialize();
