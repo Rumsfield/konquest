@@ -278,8 +278,8 @@ public enum MessagePath {
 	COMMAND_ADMIN_STAT_NOTICE_CLEAR             (2, "command.admin.stat.notice.clear"),
 	COMMAND_ADMIN_STAT_ERROR_NAME               (1, "command.admin.stat.error.name"),
 	COMMAND_ADMIN_STAT_ERROR_VALUE              (1, "command.admin.stat.error.value"),
-	COMMAND_ADMIN_STAT_NOTICE_SUCCESS           (1, "command.admin.unclaim.notice.success"),
-	COMMAND_ADMIN_STAT_ERROR_FAIL               (0, "command.admin.unclaim.error.fail"),
+	COMMAND_ADMIN_UNCLAIM_NOTICE_SUCCESS        (1, "command.admin.unclaim.notice.success"),
+	COMMAND_ADMIN_UNCLAIM_ERROR_FAIL            (0, "command.admin.unclaim.error.fail"),
 	
 	COMMAND_BORDER_NOTICE_ENABLE                (0, "command.border.notice.enable"),
 	COMMAND_BORDER_NOTICE_DISABLE               (0, "command.border.notice.disable"),

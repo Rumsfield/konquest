@@ -1146,10 +1146,11 @@ public class KonTown extends KonTerritory implements Timeable{
 		}
 		//ChatUtil.printDebug("Removing plot with "+plot.getPoints().size()+" points...");
 		for(Point p : plot.getPoints()) {
-			if(plots.containsKey(p)) {
+			plots.remove(p);
+			/*if(plots.containsKey(p)) {
 				plots.remove(p);
 				//ChatUtil.printDebug("  Removed point "+p.x+","+p.y);
-			}
+			}*/
 		}
 	}
 	

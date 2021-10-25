@@ -61,26 +61,31 @@ public class ChatUtil {
 		String message = base;
 		if(prefix.equals("")) {
 			message = message.replace("%PREFIX% ", "");
+			message = message.replace("%PREFIX%", "");
 		} else {
 			message = message.replace("%PREFIX%", prefix);
 		}
 		if(suffix.equals("")) {
 			message = message.replace("%SUFFIX% ", "");
+			message = message.replace("%SUFFIX%", "");
 		} else {
 			message = message.replace("%SUFFIX%", suffix);
 		}
 		if(kingdom.equals("")) {
 			message = message.replace("%KINGDOM% ", "");
+			message = message.replace("%KINGDOM%", "");
 		} else {
 			message = message.replace("%KINGDOM%", teamColor+kingdom);
 		}
 		if(title.equals("")) {
 			message = message.replace("%TITLE% ", "");
+			message = message.replace("%TITLE%", "");
 		} else {
 			message = message.replace("%TITLE%", titleColor+title);
 		}
 		if(name.equals("")) {
 			message = message.replace("%NAME% ", "");
+			message = message.replace("%NAME%", "");
 		} else {
 			message = message.replace("%NAME%", teamColor+name);
 		}

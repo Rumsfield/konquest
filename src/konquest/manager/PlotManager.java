@@ -60,11 +60,12 @@ public class PlotManager {
 	
 	public void removePlotPoint(KonTown town, Location loc) {
 		if(town.hasPlot(loc)) {
-			KonPlot plot = town.getPlot(loc);
+			KonPlot plot = town.getPlot(loc).clone();
 			if(plot != null) {
 				plot.removePoint(Konquest.toPoint(loc));
-				if(plot.getPoints().isEmpty()) {
-					town.removePlot(plot);
+				town.removePlot(plot);
+				if(!plot.getPoints().isEmpty()) {
+					town.putPlot(plot);
 				}
 			}
 		}

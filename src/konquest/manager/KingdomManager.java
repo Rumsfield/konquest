@@ -824,11 +824,17 @@ public class KingdomManager {
 	public boolean unclaimChunk(Location loc) {
 		if(isChunkClaimed(loc)) {
 			KonTerritory territory = getChunkTerritory(loc);
+			// Pre-removal saves
+			// Player occupants
 			Set<KonPlayer> occupants = new HashSet<KonPlayer>();
 			for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 				if(territory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
 					occupants.add(occupant);
 				}
+			}
+			// Do removal
+			if(territory instanceof KonTown) {
+				konquest.getPlotManager().removePlotPoint((KonTown)territory, loc);
 			}
 			if(territory.removeChunk(loc)) {
 				//updateTerritoryCache();
@@ -837,7 +843,6 @@ public class KingdomManager {
     				if(territory instanceof KonTown) {
 	    				KonTown town = (KonTown) territory;
 	    				town.removeBarPlayer(occupant);
-	    				konquest.getPlotManager().removePlotPoint(town, loc);
     				} else if(territory instanceof KonCapital) {
     					KonCapital capital = (KonCapital) territory;
     					capital.removeBarPlayer(occupant);
