@@ -60,10 +60,11 @@ public class PlotManager {
 	
 	public void removePlotPoint(KonTown town, Location loc) {
 		if(town.hasPlot(loc)) {
+			//ChatUtil.printDebug("Removing plot point in town "+town.getName());
 			KonPlot plot = town.getPlot(loc).clone();
 			if(plot != null) {
-				plot.removePoint(Konquest.toPoint(loc));
 				town.removePlot(plot);
+				plot.removePoint(Konquest.toPoint(loc));
 				if(!plot.getPoints().isEmpty()) {
 					town.putPlot(plot);
 				}

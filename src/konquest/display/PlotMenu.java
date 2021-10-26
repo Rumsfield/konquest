@@ -266,6 +266,13 @@ public class PlotMenu {
 		if(context.equals(PlotState.EDIT_PLAYER_ADD) || context.equals(PlotState.CREATE_PLAYER_ADD)) {
 			players.addAll(town.getPlayerResidents());
 			players.removeAll(plot.getUserOfflinePlayers());
+			// DEBUG
+			if(!players.isEmpty()) {
+				for(int i=0;i<70;i++) {
+					players.add(players.get(0));
+				}
+			}
+			// END DEBUG
 			loreStr = ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_ADD_PLAYER.getMessage();
 			isClickable = true;
 		} else if(context.equals(PlotState.EDIT_PLAYER_REMOVE)) {
@@ -289,9 +296,11 @@ public class PlotMenu {
 		int pageNum = 0;
 		ListIterator<OfflinePlayer> playerIter = players.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)((players.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows == 0) {
+			int numPageRows = (int)Math.ceil(((double)(players.size() - i*MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows < 1) {
 				numPageRows = 1;
+			} else if(numPageRows > 5) {
+				numPageRows = 5;
 			}
 			pageLabel = getTitle(context)+" "+(i+1)+"/"+pageTotal;
 			playerPages.add(pageNum, new DisplayMenu(numPageRows+1, pageLabel));

@@ -532,9 +532,11 @@ public class DisplayManager {
 		if(isShieldsEnabled) {
 			ListIterator<KonShield> shieldIter = allShields.listIterator();
 			for(int i = 0; i < pageTotal; i++) {
-				int numPageRows = (int)Math.ceil(((double)((allShields.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-				if(numPageRows == 0) {
+				int numPageRows = (int)Math.ceil(((double)(allShields.size() - i*MAX_ICONS_PER_PAGE))/9);
+				if(numPageRows < 1) {
 					numPageRows = 1;
+				} else if(numPageRows > 5) {
+					numPageRows = 5;
 				}
 				pageLabel = pageColor+town.getName()+" "+MessagePath.LABEL_SHIELDS.getMessage()+" "+(i+1)+"/"+pageTotal;
 				newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -560,9 +562,11 @@ public class DisplayManager {
 		if(isArmorsEnabled) {
 			ListIterator<KonArmor> armorIter = allArmors.listIterator();
 			for(int i = 0; i < pageTotal; i++) {
-				int numPageRows = (int)Math.ceil(((double)((allArmors.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-				if(numPageRows == 0) {
+				int numPageRows = (int)Math.ceil(((double)(allArmors.size() - i*MAX_ICONS_PER_PAGE))/9);
+				if(numPageRows < 1) {
 					numPageRows = 1;
+				} else if(numPageRows > 5) {
+					numPageRows = 5;
 				}
 				pageLabel = pageColor+town.getName()+" "+MessagePath.LABEL_ARMORS.getMessage()+" "+(i+1)+"/"+pageTotal;
 				newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -827,9 +831,11 @@ public class DisplayManager {
 		int pageNum = 1;
 		ListIterator<KonTown> townIter = playerTowns.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)((playerTowns.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows == 0) {
+			int numPageRows = (int)Math.ceil(((double)(playerTowns.size() - i*MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows < 1) {
 				numPageRows = 1;
+			} else if(numPageRows > 5) {
+				numPageRows = 5;
 			}
 			pageLabel = pageColor+infoPlayer.getOfflineBukkitPlayer().getName()+" "+MessagePath.LABEL_RESIDENCIES.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -945,9 +951,11 @@ public class DisplayManager {
 		int pageNum = 1;
 		ListIterator<KonTown> townIter = kingdomTowns.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)((kingdomTowns.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows == 0) {
+			int numPageRows = (int)Math.ceil(((double)(kingdomTowns.size() - i*MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows < 1) {
 				numPageRows = 1;
+			} else if(numPageRows > 5) {
+				numPageRows = 5;
 			}
 			pageLabel = pageColor+infoKingdom.getName()+" "+MessagePath.LABEL_TOWNS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -1132,9 +1140,11 @@ public class DisplayManager {
 		}
 		ListIterator<OfflinePlayer> knightIter = townKnights.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)((townKnights.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows == 0) {
+			int numPageRows = (int)Math.ceil(((double)(townKnights.size() - i*MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows < 1) {
 				numPageRows = 1;
+			} else if(numPageRows > 5) {
+				numPageRows = 5;
 			}
 			pageLabel = pageColor+infoTown.getName()+" "+MessagePath.LABEL_KNIGHTS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -1160,9 +1170,11 @@ public class DisplayManager {
 		}
 		ListIterator<OfflinePlayer> residentIter = townResidents.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)((townResidents.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows == 0) {
+			int numPageRows = (int)Math.ceil(((double)(townResidents.size() - i*MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows < 1) {
 				numPageRows = 1;
+			} else if(numPageRows > 5) {
+				numPageRows = 5;
 			}
 			pageLabel = pageColor+infoTown.getName()+" "+MessagePath.LABEL_RESIDENTS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -1303,9 +1315,11 @@ public class DisplayManager {
 		if(!allCustoms.isEmpty()) {
 			ListIterator<KonCustomPrefix> customIter = allCustoms.listIterator();
 			for(int i = 0; i < pageTotal; i++) {
-				int numPageRows = (int)Math.ceil(((double)((allCustoms.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-				if(numPageRows == 0) {
+				int numPageRows = (int)Math.ceil(((double)(allCustoms.size() - i*MAX_ICONS_PER_PAGE))/9);
+				if(numPageRows < 1) {
 					numPageRows = 1;
+				} else if(numPageRows > 5) {
+					numPageRows = 5;
 				}
 				pageLabel = pageColor+MessagePath.MENU_PREFIX_CUSTOM_PAGES.getMessage()+" "+(i+1)+"/"+pageTotal;
 				newMenu.addPage(pageNum, numPageRows, pageLabel);

@@ -833,7 +833,7 @@ public class KingdomManager {
 				}
 			}
 			// Do removal
-			if(territory instanceof KonTown) {
+			if(territory.getChunkList().containsKey(Konquest.toPoint(loc)) && territory instanceof KonTown) {
 				konquest.getPlotManager().removePlotPoint((KonTown)territory, loc);
 			}
 			if(territory.removeChunk(loc)) {
