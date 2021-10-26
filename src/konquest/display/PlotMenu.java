@@ -266,13 +266,6 @@ public class PlotMenu {
 		if(context.equals(PlotState.EDIT_PLAYER_ADD) || context.equals(PlotState.CREATE_PLAYER_ADD)) {
 			players.addAll(town.getPlayerResidents());
 			players.removeAll(plot.getUserOfflinePlayers());
-			// DEBUG
-			if(!players.isEmpty()) {
-				for(int i=0;i<70;i++) {
-					players.add(players.get(0));
-				}
-			}
-			// END DEBUG
 			loreStr = ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_ADD_PLAYER.getMessage();
 			isClickable = true;
 		} else if(context.equals(PlotState.EDIT_PLAYER_REMOVE)) {
