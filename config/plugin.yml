@@ -1,7 +1,7 @@
 name: Konquest
 description: A plugin for land claiming and territory control
 author: Rumsfield
-version: 0.6.2
+version: 0.7.0
 api-version: 1.16
 load: POSTWORLD
 main: konquest.KonquestPlugin
@@ -63,6 +63,7 @@ permissions:
       konquest.command.town: true
       konquest.command.admin: true
       konquest.command.fly: false
+      konquest.command.border: true
 
   konquest.command.help:
     description: Display help in chat
@@ -139,6 +140,10 @@ permissions:
   konquest.command.fly:
     description: Fly in friendly territory
     default: false
+    
+  konquest.command.border:
+    description: Toggle particle borders of territories and plots
+    default: true
     
   konquest.directive:
     description: Gives access to base Konquest directive permission

@@ -17,10 +17,10 @@
 #  travel_wild_random_radius:       Radius in blocks from the center of the primary world for random wild travel (0 to disable, integer >= 0)
 #  placeholder_request_limit:       Minimum time in seconds between placeholder requests, use lower values for faster update rates but more lag (0 to disable, integer >= 0)
 #  chat:
-#     tag*:                         Text tag for all Konquest plugin messages. Use '' to disable. Use & for color codes. ('string')
+#     tag:                          Text tag for all Konquest plugin messages. Use '' to disable. Use & for color codes, or hex #000000. ('string')
+#     message:                      Chat message format used for all players. Use %PREFIX%, %SUFFIX%, %KINGDOM%, %TITLE% and %NAME% as placeholders. Use & for color codes, or hex #000000. ('string')
 #     enable_format:                Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
-#     use_kingdom:                  Use a player's kingdom name as a part of their chat message (true/false)
-#     priority:                     Set the priority of Konquest's chat message formatting. Set to low to allow other plugins to modify chat first (LOWEST, LOW, NORMAL, HIGH, HIGHEST)
+#     priority:                     Set the priority of Konquest's chat message formatting. Set to high to allow other plugins to modify chat first (LOWEST, LOW, NORMAL, HIGH, HIGHEST)
 #  database:
 #      connection:                  Database connection type (sqlite or mysql)
 #      mysql:
@@ -47,7 +47,8 @@
 #    no_enemy_edit_offline_warmup:  Time in seconds when a Kingdom is protected from when the minimum player disconnects (integer >= 0)
 #    no_enemy_edit_offline_minimum: Number of players required for a Kingdom to be protected (integer >= 0)
 #    smallest_exp_boost_percent:    Percentage boost EXP gain for the smallest kingdom (0 to disable, 0 - 100)
-#    offline_timeout_days:          Time in days a player must be offline to be removed from their Kingdom (0 to disable, integer >= 0)
+#    offline_timeout_days:          Time in days a player must be offline to be inactive, and removed from towns and camps (0 to disable, integer >= 0)
+#    offline_timeout_exile:         Remove inactive players from their kingdoms and exile them as barbarians (true/false)
 #    golem_attack_enemies:          Force iron golems to attack enemy players (true/false)
 #    attack_friendly_golems:        Allow players to attack iron golems inside of friendly towns (true/false)
 #    max_player_diff:               Kingdoms with this many players more than other Kingdoms will not accept new players (0 to disable, integer >= 0)
@@ -75,18 +76,25 @@
 #    max_shields:                   Maximum shield duration in seconds that a town can have (0 to disable, integer >= 0)
 #    max_armor:                     Maximum armor amount in blocks that a town can have (0 to disable, integer >= 0)
 #    barbarians_destroy:            Allow barbarian players to destroy towns when true, else prevent barbarians from attacking town monuments (true/false)
+#  plots:
+#    enable*:                       Enable town plots (true/false)
+#    max_size:                      Maximum plot size in chunks (0 to disable, integer >= 0)
+#    allow_build:                   Allow all town residents to build in any town plot (true/false)
+#    allow_containers:              Allow all town residents to access containers in any town plot (true/false)
+#    ignore_knights:                Allow town knights to ignore plot protections (true/false)
 #  exile:
 #    remove_favor:                  Set a player's currency balance to 0 when exiled (true/flase)
 #    remove_stats:                  Remove all stats and accomplishment prefixes from a player when exiled (true/false)
 #    random_wild:                   Teleport a player to a random location in the wild of their current world upon exile (true/false)
 #  camps:
+#    enable:                        Allow barbarian players to create a camp from placed beds (true/false)
 #    init_radius:                   Radius of camps for barbarians. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 0)
 #    protect_containers:            Prevent players, except for camp owner, from using or breaking containers in camp land (true/false)
 #    no_enemy_edit_offline:         Prevent enemy players from breaking any blocks in camps when owners are offline (true/false)
 #    no_enemy_edit_offline_warmup:  Time in seconds when a camp is protected from when the owner disconnects (integer >= 0)
 #    clan_enable:                   [EXPERIMENTAL] Enable camp clans when barbarian camps are placed next to each other (true/false)
-#    clan_allow_containers:         Allow barbarians to access containers in camps from the same clan, CAN BE ABUSED! (true/false)
-#    clan_allow_edit_offline:       Allow barbarians to edit blocks in offline-protected camps from the same clan, CAN BE ABUSED! (true/false)
+#    clan_allow_containers:         [EXPERIMENTAL] Allow barbarians to access containers in camps from the same clan, CAN BE ABUSED! (true/false)
+#    clan_allow_edit_offline:       [EXPERIMENTAL] Allow barbarians to edit blocks in offline-protected camps from the same clan, CAN BE ABUSED! (true/false)
 #  monuments:
 #    critical_block*:               Blocks which must be destroyed to capture a town monument (Material, https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html, e.g. for obsidian, enum is OBSIDIAN)
 #    destroy_amount:                Amount of each destroy_blocks that must be destroyed to capture a town monument (integer >= 0)
@@ -142,11 +150,11 @@ core:
   accomplishment_prefix: true
   directive_quests: true
   travel_wild_random_radius: 1000
-  placeholder_request_limit: 30
+  placeholder_request_limit: 60
   chat:
     tag: '&7[&6Konquest&7]&f '
+    message: '%PREFIX% %KINGDOM% &7| %TITLE% %NAME% %SUFFIX% '
     enable_format: true
-    use_kingdom: true
     priority: HIGH
   database:
     connection: sqlite
@@ -175,6 +183,7 @@ core:
     no_enemy_edit_offline_minimum: 2
     smallest_exp_boost_percent: 25
     offline_timeout_days: 0
+    offline_timeout_exile: false
     golem_attack_enemies: true
     attack_friendly_golems: false
     max_player_diff: 4
@@ -203,11 +212,18 @@ core:
     max_shields: 432000
     max_armor: 9999
     barbarians_destroy: true
+  plots:
+    enable: true
+    max_size: 16
+    allow_build: false
+    allow_containers: false
+    ignore_knights: true
   exile:
     remove_favor: true
     remove_stats: true
     random_wild: true
   camps:
+    enable: true
     init_radius: 2
     protect_containers: true
     no_enemy_edit_offline: true

@@ -8,7 +8,6 @@ import konquest.model.KonStatsType;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -213,16 +212,8 @@ public class SettleCommand extends CommandBase {
         	}
         	
 			if(cost > 0 && settleStatus == 0) {
-	        	EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, adj_cost);
-	            if(r.transactionSuccess()) {
-	            	String balanceF = String.format("%.2f",r.balance);
-	            	String amountF = String.format("%.2f",r.amount);
-	            	//ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
-	            	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+	            if(KonquestPlugin.withdrawPlayer(bukkitPlayer, adj_cost)) {
 	            	getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)cost);
-	            } else {
-	            	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
-	            	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
 	            }
 			}
         }

@@ -56,7 +56,7 @@ public class KonRuin extends KonTerritory implements Timeable {
 	public int initClaim() {
 		// Upon territory creation...
 		// Add center chunk claim
-		addChunk(getKonquest().toPoint(getCenterLoc()));
+		addChunk(Konquest.toPoint(getCenterLoc()));
 		return 0;
 	}
 

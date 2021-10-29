@@ -66,8 +66,8 @@ public class WorldListener  implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onChunkLoad(ChunkLoadEvent event) {
-		if(konquest.getKingdomManager().isChunkClaimed(konquest.toPoint(event.getChunk()), event.getWorld())) {
-			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(konquest.toPoint(event.getChunk()), event.getWorld());
+		if(konquest.getKingdomManager().isChunkClaimed(Konquest.toPoint(event.getChunk()), event.getWorld())) {
+			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(Konquest.toPoint(event.getChunk()), event.getWorld());
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
 				if(town.isChunkCenter(event.getChunk())) {

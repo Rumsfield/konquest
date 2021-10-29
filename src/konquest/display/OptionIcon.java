@@ -11,6 +11,7 @@ public class OptionIcon implements MenuIcon {
 
 	public enum optionAction {
 		TOWN_OPEN,
+		TOWN_PLOT_ONLY,
 		TOWN_REDSTONE;
 	}
 	

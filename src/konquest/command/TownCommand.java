@@ -19,7 +19,6 @@ import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timer;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 public class TownCommand extends CommandBase {
 
@@ -29,7 +28,7 @@ public class TownCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		// k town <name> options|add|kick|knight|lord|rename|upgrade|shield [arg]
+		// k town <name> add|kick|knight|lord|rename|upgrade|shield|options|plots [arg]
 		if (getArgs().length != 3 && getArgs().length != 4) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
@@ -71,6 +70,21 @@ public class TownCommand extends CommandBase {
         	String playerName = "";
         	String newTownName = "";
         	switch(subCmd.toLowerCase()) {
+        	case "plots":
+        		// Verify player is elite or lord of the Town
+	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+	        		//ChatUtil.sendError((Player) getSender(), "You must be a Knight or the Lord of "+townName+" to do this");
+	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+	        		return;
+	        	}
+	        	// Verify plots are enabled
+            	boolean isPlotsEnabled = getKonquest().getPlotManager().isEnabled();
+            	if(!isPlotsEnabled) {
+            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+            		return;
+            	}
+	        	getKonquest().getDisplayManager().displayPlotMenu(bukkitPlayer, town);
+        		break;
         	case "options":
         		if(!town.isPlayerLord(player.getOfflineBukkitPlayer())) {
             		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
@@ -491,16 +505,8 @@ public class TownCommand extends CommandBase {
 			    		}
 		        		// Withdraw cost from player
 		        		if(cost > 0) {
-			        		EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, cost);
-			                if(r.transactionSuccess()) {
-			                	String balanceF = String.format("%.2f",r.balance);
-				            	String amountF = String.format("%.2f",r.amount);
-				            	//ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
-				            	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+			                if(KonquestPlugin.withdrawPlayer(bukkitPlayer, cost)) {
 			                	getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)cost);
-			                } else {
-			                	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
-			                	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
 			                }
 		        		}
 	        		}
@@ -545,7 +551,7 @@ public class TownCommand extends CommandBase {
 
 	@Override
 	public List<String> tabComplete() {
-		// k town <name> options|add|kick|knight|lord|rename|upgrade|shield [arg]
+		// k town <name> add|kick|knight|lord|rename|upgrade|shield|options|plots [arg]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		Player bukkitPlayer = (Player) getSender();
@@ -562,7 +568,6 @@ public class TownCommand extends CommandBase {
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 3) {
 			// suggest sub-commands
-			tabList.add("options");
 			tabList.add("add");
 			tabList.add("kick");
 			tabList.add("lord");
@@ -570,6 +575,8 @@ public class TownCommand extends CommandBase {
 			tabList.add("rename");
 			tabList.add("upgrade");
 			tabList.add("shield");
+			tabList.add("options");
+			tabList.add("plots");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);

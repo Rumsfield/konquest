@@ -30,7 +30,6 @@ import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 public class SpyCommand extends CommandBase {
 
@@ -130,16 +129,8 @@ public class SpyCommand extends CommandBase {
 			inv.setItem(inv.firstEmpty(), inv.getItemInMainHand());
 			inv.setItemInMainHand(item);
 			
-			EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, cost);
-            if(r.transactionSuccess()) {
-            	String balanceF = String.format("%.2f",r.balance);
-            	String amountF = String.format("%.2f",r.amount);
-            	//ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
-            	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+            if(KonquestPlugin.withdrawPlayer(bukkitPlayer, cost)) {
             	getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)cost);
-            } else {
-            	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
-            	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
             }
             
 			String dist = "";

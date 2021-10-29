@@ -147,10 +147,6 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion {
 	        case "score":
 	        	result = placeholderManager.getScore(player);
 	        	break;
-	        /* %konquest_prefix% - player's prefix title */
-	        case "prefix":
-	        	result = placeholderManager.getPrefix(player);
-	        	break;
 	        /* %konquest_lordships% - number of player's lordships */
 	        case "lordships":
 	        	result = placeholderManager.getLordships(player);
@@ -166,6 +162,126 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion {
 	        /* %konquest_combat% - true if player is combat tagged, else false */
 	        case "combat":
 	        	result = placeholderManager.getCombat(player);
+	        	break;
+	        /* %konquest_top_score_1% - kingdom name and score in rank 1 */
+	        case "top_score_1":
+	        	result = placeholderManager.getTopScore(player, 1);
+	        	break;
+	        /* %konquest_top_score_2% - kingdom name and score in rank 2 */
+	        case "top_score_2":
+	        	result = placeholderManager.getTopScore(player, 2);
+	        	break;
+	        /* %konquest_top_score_3% - kingdom name and score in rank 3 */
+	        case "top_score_3":
+	        	result = placeholderManager.getTopScore(player, 3);
+	        	break;
+	        /* %konquest_top_score_4% - kingdom name and score in rank 4 */
+	        case "top_score_4":
+	        	result = placeholderManager.getTopScore(player, 4);
+	        	break;
+	        /* %konquest_top_score_5% - kingdom name and score in rank 5 */
+	        case "top_score_5":
+	        	result = placeholderManager.getTopScore(player, 5);
+	        	break;
+	        /* %konquest_top_score_6% - kingdom name and score in rank 6 */
+	        case "top_score_6":
+	        	result = placeholderManager.getTopScore(player, 6);
+	        	break;
+	        /* %konquest_top_score_7% - kingdom name and score in rank 7 */
+	        case "top_score_7":
+	        	result = placeholderManager.getTopScore(player, 7);
+	        	break;
+	        /* %konquest_top_score_8% - kingdom name and score in rank 8 */
+	        case "top_score_8":
+	        	result = placeholderManager.getTopScore(player, 8);
+	        	break;
+	        /* %konquest_top_score_9% - kingdom name and score in rank 9 */
+	        case "top_score_9":
+	        	result = placeholderManager.getTopScore(player, 9);
+	        	break;
+	        /* %konquest_top_score_10% - kingdom name and score in rank 10 */
+	        case "top_score_10":
+	        	result = placeholderManager.getTopScore(player, 10);
+	        	break;
+	        /* %konquest_top_town_1% - kingdom name and towns in rank 1 */
+	        case "top_town_1":
+	        	result = placeholderManager.getTopTown(player, 1);
+	        	break;
+	        /* %konquest_top_town_2% - kingdom name and towns in rank 2 */
+	        case "top_town_2":
+	        	result = placeholderManager.getTopTown(player, 2);
+	        	break;
+	        /* %konquest_top_town_3% - kingdom name and towns in rank 3 */
+	        case "top_town_3":
+	        	result = placeholderManager.getTopTown(player, 3);
+	        	break;
+	        /* %konquest_top_town_4% - kingdom name and towns in rank 4 */
+	        case "top_town_4":
+	        	result = placeholderManager.getTopTown(player, 4);
+	        	break;
+	        /* %konquest_top_town_5% - kingdom name and towns in rank 5 */
+	        case "top_town_5":
+	        	result = placeholderManager.getTopTown(player, 5);
+	        	break;
+	        /* %konquest_top_town_6% - kingdom name and towns in rank 6 */
+	        case "top_town_6":
+	        	result = placeholderManager.getTopTown(player, 6);
+	        	break;
+	        /* %konquest_top_town_7% - kingdom name and towns in rank 7 */
+	        case "top_town_7":
+	        	result = placeholderManager.getTopTown(player, 7);
+	        	break;
+	        /* %konquest_top_town_8% - kingdom name and towns in rank 8 */
+	        case "top_town_8":
+	        	result = placeholderManager.getTopTown(player, 8);
+	        	break;
+	        /* %konquest_top_town_9% - kingdom name and towns in rank 9 */
+	        case "top_town_9":
+	        	result = placeholderManager.getTopTown(player, 9);
+	        	break;
+	        /* %konquest_top_town_10% - kingdom name and towns in rank 10 */
+	        case "top_town_10":
+	        	result = placeholderManager.getTopTown(player, 10);
+	        	break;
+	        /* %konquest_top_land_1% - kingdom name and land in rank 1 */
+	        case "top_land_1":
+	        	result = placeholderManager.getTopLand(player, 1);
+	        	break;
+	        /* %konquest_top_land_2% - kingdom name and land in rank 2 */
+	        case "top_land_2":
+	        	result = placeholderManager.getTopLand(player, 2);
+	        	break;
+	        /* %konquest_top_land_3% - kingdom name and land in rank 3 */
+	        case "top_land_3":
+	        	result = placeholderManager.getTopLand(player, 3);
+	        	break;
+	        /* %konquest_top_land_4% - kingdom name and land in rank 4 */
+	        case "top_land_4":
+	        	result = placeholderManager.getTopLand(player, 4);
+	        	break;
+	        /* %konquest_top_land_5% - kingdom name and land in rank 5 */
+	        case "top_land_5":
+	        	result = placeholderManager.getTopLand(player, 5);
+	        	break;
+	        /* %konquest_top_land_6% - kingdom name and land in rank 6 */
+	        case "top_land_6":
+	        	result = placeholderManager.getTopLand(player, 6);
+	        	break;
+	        /* %konquest_top_land_7% - kingdom name and land in rank 7 */
+	        case "top_land_7":
+	        	result = placeholderManager.getTopLand(player, 7);
+	        	break;
+	        /* %konquest_top_land_8% - kingdom name and land in rank 8 */
+	        case "top_land_8":
+	        	result = placeholderManager.getTopLand(player, 8);
+	        	break;
+	        /* %konquest_top_land_9% - kingdom name and land in rank 9 */
+	        case "top_land_9":
+	        	result = placeholderManager.getTopLand(player, 9);
+	        	break;
+	        /* %konquest_top_land_10% - kingdom name and land in rank 10 */
+	        case "top_land_10":
+	        	result = placeholderManager.getTopLand(player, 10);
 	        	break;
 	        default: 
 	        	break;

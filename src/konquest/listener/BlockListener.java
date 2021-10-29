@@ -162,10 +162,11 @@ public class BlockListener implements Listener {
 						}
 						/*
 						Open:
-							all players can edit blocks
+							all players can edit blocks outside of plots
+							only resident plot users can edit blocks in respective plots
 							any player can claim lordship
 						else:
-							Only residents can edit blocks
+							Only residents can edit blocks outside of plots and within their own plot
 							No Residents:
 								Anyone can claim lordship
 							else:
@@ -176,12 +177,27 @@ public class BlockListener implements Listener {
 							//ChatUtil.sendNotice(player.getBukkitPlayer(), town.getName()+" has no leader! Use \"/k town <name> lord <your name>\" to claim Lordship.");
 							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),player.getBukkitPlayer().getName()));
 						}
-						// Stop all block breaks by non-residents if town is closed
+						// Protect land and plots
 						if(!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
-							//ChatUtil.sendNotice(player.getBukkitPlayer(), "You must be a resident to break blocks in "+territory.getName(), ChatColor.DARK_RED);
+							// Stop all edits by non-resident in closed towns
 							ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
 							event.setCancelled(true);
 							return;
+						}
+						if(town.isOpen() || (!town.isOpen() && town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+							// Check for protections in open towns and closed town residents
+							if(konquest.getPlotManager().isPlayerPlotProtectBuild(town, breakLoc, player.getBukkitPlayer())) {
+								// Stop when player edits plot that isn't theirs
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage());
+								event.setCancelled(true);
+								return;
+							}
+							if(town.isPlotOnly() && !town.isPlayerElite(player.getOfflineBukkitPlayer()) && !town.hasPlot(breakLoc)) {
+								// Stop when non-elite player edits non-plot land
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLY_PLOT.getMessage());
+								event.setCancelled(true);
+								return;
+							}
 						}
 					} else {
 						// If player is enemy, protect containers and allow block breaks inside monument region
@@ -451,12 +467,12 @@ public class BlockListener implements Listener {
 			return;
 		}
 		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
-					
+		Location placeLoc = event.getBlock().getLocation();
 		// Monitor blocks in claimed territory
-		if(kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
+		if(kingdomManager.isChunkClaimed(placeLoc)) {
 			// Bypass event restrictions for player in Admin Bypass Mode
 			if(!player.isAdminBypassActive()) {
-				KonTerritory territory = kingdomManager.getChunkTerritory(event.getBlock().getLocation());
+				KonTerritory territory = kingdomManager.getChunkTerritory(placeLoc);
 				// Capital considerations...
 				if(territory instanceof KonCapital) {
 					boolean isCapitalBuild = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_build",false);
@@ -464,7 +480,7 @@ public class BlockListener implements Listener {
 						// Players can build in capital
 						// Always prevent monument template edits
 						KonMonumentTemplate template = territory.getKingdom().getMonumentTemplate();
-						if(template != null && template.isLocInside(event.getBlock().getLocation())) {
+						if(template != null && template.isLocInside(placeLoc)) {
 							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 							if(event.getPlayer().hasPermission("konquest.command.admin")) {
 		    					ChatUtil.sendNotice(event.getPlayer(),MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
@@ -588,12 +604,27 @@ public class BlockListener implements Listener {
 							//ChatUtil.sendNotice(player.getBukkitPlayer(), town.getName()+" has no leader! Use \"/k town <name> lord <your name>\" to claim Lordship.");
 							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),player.getBukkitPlayer().getName()));
 						}
-						// Stop all block placement by non-residents if town is closed
+						// Protect land and plots
 						if(!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
-							//ChatUtil.sendNotice(player.getBukkitPlayer(), "You must be a resident to place blocks in "+territory.getName(), ChatColor.DARK_RED);
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
+							// Stop all edits by non-resident in closed towns
+							ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
 							event.setCancelled(true);
 							return;
+						}
+						if(town.isOpen() || (!town.isOpen() && town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+							// Check for protections in open towns and closed town residents
+							if(konquest.getPlotManager().isPlayerPlotProtectBuild(town, placeLoc, player.getBukkitPlayer())) {
+								// Stop when player edits plot that isn't theirs
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_NOT_PLOT.getMessage());
+								event.setCancelled(true);
+								return;
+							}
+							if(town.isPlotOnly() && !town.isPlayerElite(player.getOfflineBukkitPlayer()) && !town.hasPlot(placeLoc)) {
+								// Stop when non-elite player edits non-plot land
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLY_PLOT.getMessage());
+								event.setCancelled(true);
+								return;
+							}
 						}
 						konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.BUILD_TOWN);
 					}
@@ -667,21 +698,26 @@ public class BlockListener implements Listener {
 				    	case 1:
 				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: New claims overlap with existing territory.");
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
+				    		event.setCancelled(true);
 				    		break;
 				    	case 2:
 				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Your camp already exists.");
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_EXISTS.getMessage());
+				    		event.setCancelled(true);
 				    		break;
 				    	case 3:
 				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: You are not a Barbarian.");
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
+				    		event.setCancelled(true);
+				    		break;
+				    	case 4:
+				    		//ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 				    		break;
 				    	default:
 				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Unknown cause. Contact an Admin!");
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 				    		break;
 						}
-						event.setCancelled(true);
 						return;
 					}
 				}

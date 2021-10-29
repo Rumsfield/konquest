@@ -53,6 +53,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident, false = requesting add from lord/knight)
 	private boolean isOpen;
 	private boolean isEnemyRedstoneAllowed;
+	private boolean isResidentPlotOnly;
 	private boolean isAttacked;
 	private boolean isShielded;
 	private boolean isArmored;
@@ -64,6 +65,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	private HashMap<KonUpgrade,Integer> upgrades;
 	private HashMap<KonUpgrade,Integer> disabledUpgrades;
 	private KonTownRabbit rabbit;
+	private HashMap<Point,KonPlot> plots;
 	
 	public KonTown(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, KonTerritoryType.TOWN, konquest);
@@ -88,6 +90,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.joinRequests = new HashMap<UUID,Boolean>();
 		this.isOpen = false; // init as a closed Town, requires Lord to add players as residents for build/container perms
 		this.isEnemyRedstoneAllowed = false;
+		this.isResidentPlotOnly = false;
 		this.isAttacked = false;
 		this.isShielded = false;
 		this.shieldEndTimeSeconds = 0;
@@ -98,6 +101,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.upgrades = new HashMap<KonUpgrade,Integer>();
 		this.disabledUpgrades = new HashMap<KonUpgrade,Integer>();
 		this.rabbit = new KonTownRabbit(getSpawnLoc());
+		this.plots = new HashMap<Point,KonPlot>();
 	}
 
 	/**
@@ -107,7 +111,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	 */
 	@Override
 	public boolean addChunk(Point point) {
-		Point centerChunk = getKonquest().toPoint(getCenterLoc());
+		Point centerChunk = Konquest.toPoint(getCenterLoc());
 		int maxChunkRange = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_size");
 		if(maxChunkRange < 0) {
 			maxChunkRange = 0;
@@ -427,14 +431,14 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 
 	public boolean isLocInsideCenterChunk(Location loc) {
-		Point centerPoint = getKonquest().toPoint(getCenterLoc());
-		Point testPoint = getKonquest().toPoint(loc);
+		Point centerPoint = Konquest.toPoint(getCenterLoc());
+		Point testPoint = Konquest.toPoint(loc);
 		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
 	}
 	
 	public boolean isChunkCenter(Chunk chunk) {
-		Point centerPoint = getKonquest().toPoint(getCenterLoc());
-		Point testPoint = getKonquest().toPoint(chunk);
+		Point centerPoint = Konquest.toPoint(getCenterLoc());
+		Point testPoint = Konquest.toPoint(chunk);
 		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
 	}
 	
@@ -711,6 +715,14 @@ public class KonTown extends KonTerritory implements Timeable{
 		return isEnemyRedstoneAllowed ? true : false;
 	}
 	
+	public void setIsPlotOnly(boolean val) {
+		isResidentPlotOnly = val;
+	}
+	
+	public boolean isPlotOnly() {
+		return isResidentPlotOnly ? true : false;
+	}
+	
 	public boolean canClaimLordship(KonPlayer player) {
 		boolean result = false;
 		if(!isLordValid()) {
@@ -801,6 +813,9 @@ public class KonTown extends KonTerritory implements Timeable{
 			getKonquest().getMapHandler().drawDynmapLabel(this);
 			if(residents.isEmpty()) {
 				clearShieldsArmors();
+			}
+			for(KonPlot plot : getPlots()) {
+				plot.removeUser(player);
 			}
 			status = true;
 		}
@@ -1099,6 +1114,84 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	private void playDeactivateSound() {
 		getWorld().playSound(getCenterLoc(), Sound.BLOCK_GLASS_BREAK, (float)3.0, (float)0.3);
+	}
+	
+	/*public boolean addPlot(Location loc) {
+		boolean result = false;
+		if(this.isLocInside(loc)) {
+			Point p = Konquest.toPoint(loc);
+			plots.put(p,new KonPlot(p));
+			result = true;
+		}
+		return result;
+	}*/
+	
+	public void putPlot(KonPlot plot) {
+		if(plot == null) {
+			ChatUtil.printDebug("Failed to set null plot!");
+			return;
+		}
+		//ChatUtil.printDebug("Putting plot with "+plot.getPoints().size()+" points...");
+		for(Point p : plot.getPoints()) {
+			plots.put(p, plot);
+			//ChatUtil.printDebug("  Put point "+p.x+","+p.y);
+		}
+		//ChatUtil.printDebug("Finished putting plot, plot size: "+plots.size());
+	}
+	
+	public void removePlot(KonPlot plot) {
+		if(plot == null) {
+			ChatUtil.printDebug("Failed to remove null plot!");
+			return;
+		}
+		//ChatUtil.printDebug("Removing plot with "+plot.getPoints().size()+" points...");
+		for(Point p : plot.getPoints()) {
+			plots.remove(p);
+			/*if(plots.containsKey(p)) {
+				plots.remove(p);
+				//ChatUtil.printDebug("  Removed point "+p.x+","+p.y);
+			}*/
+		}
+	}
+	
+	public boolean hasPlot(Location loc) {
+		return hasPlot(Konquest.toPoint(loc), loc.getWorld());
+	}
+	
+	public boolean hasPlot(Point p, World w) {
+		boolean result = false;
+		if(this.getChunkList().containsKey(p) && w.equals(getWorld())) {
+			result = plots.containsKey(p);
+		}
+		return result;
+	}
+	
+	// This can return null!
+	public KonPlot getPlot(Location loc) {
+		return getPlot(Konquest.toPoint(loc), loc.getWorld());
+	}
+	
+	// This can return null!
+	public KonPlot getPlot(Point p, World w) {
+		KonPlot result = null;
+		if(this.getChunkList().containsKey(p) && w.equals(getWorld())) {
+			result = plots.get(p);
+		}
+		return result;
+	}
+	
+	public List<KonPlot> getPlots() {
+		ArrayList<KonPlot> result = new ArrayList<KonPlot>();
+		for(KonPlot plot : plots.values()) {
+			if(!result.contains(plot)) {
+				result.add(plot);
+			}
+		}
+		return result;
+	}
+	
+	public void clearPlots() {
+		plots.clear();
 	}
 	
 }

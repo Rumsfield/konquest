@@ -41,6 +41,7 @@ import konquest.manager.LanguageManager;
 import konquest.manager.LootManager;
 import konquest.manager.PlaceholderManager;
 import konquest.manager.PlayerManager;
+import konquest.manager.PlotManager;
 import konquest.manager.RuinManager;
 import konquest.manager.ShieldManager;
 import konquest.manager.UpgradeManager;
@@ -69,6 +70,9 @@ public class Konquest implements Timeable {
 	private KonquestPlugin plugin;
 	private static Konquest instance;
 	private static String chatTag;
+	private static String chatMessage;
+	public static final String chatDivider = "§7»";
+	
 	
 	private DatabaseThread databaseThread;
 	private AccomplishmentManager accomplishmentManager;
@@ -87,6 +91,7 @@ public class Konquest implements Timeable {
 	private LanguageManager languageManager;
 	private MapHandler mapHandler;
 	private PlaceholderManager placeholderManager;
+	private PlotManager plotManager;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
@@ -116,6 +121,7 @@ public class Konquest implements Timeable {
 		this.plugin = plugin;
 		instance = this;
 		chatTag = "§7[§6Konquest§7]§f ";
+		chatMessage = "%PREFIX% %KINGDOM% §7| %TITLE% %NAME% %SUFFIX% ";
 		
 		databaseThread = new DatabaseThread(this);
 		accomplishmentManager = new AccomplishmentManager(this);
@@ -134,6 +140,7 @@ public class Konquest implements Timeable {
 		languageManager = new LanguageManager(this);
 		mapHandler = new MapHandler(this);
 		placeholderManager = new PlaceholderManager(this);
+		plotManager = new PlotManager(this);
 		
 		chatPriority = defaultChatPriority;
 		worlds = new ArrayList<World>();
@@ -156,9 +163,6 @@ public class Konquest implements Timeable {
 		ChatUtil.printDebug("Debug is "+debug);
 		String worldName = configManager.getConfig("core").getString("core.world_name");
 		ChatUtil.printDebug("Primary world is "+worldName);
-		String configTag = configManager.getConfig("core").getString("core.chat.tag");
-		chatTag = ChatColor.translateAlternateColorCodes('&', configTag);
-		ChatUtil.printDebug("Chat tag is "+chatTag);
 		languageManager.initialize();
 		kingdomManager.initialize();
 		ruinManager.initialize();
@@ -206,6 +210,14 @@ public class Konquest implements Timeable {
 	}
 	
 	private void initManagers() {
+		String configTag = configManager.getConfig("core").getString("core.chat.tag");
+		chatTag = ChatUtil.parseHex(configTag);
+		ChatUtil.printDebug("Chat tag is "+chatTag);
+		String configMessage = configManager.getConfig("core").getString("core.chat.message","");
+		if(!configMessage.equals("")) {
+			chatMessage = ChatUtil.parseHex(configMessage);
+		}
+		ChatUtil.printDebug("Chat message is "+chatMessage);
 		integrationManager.initialize();
 		lootManager.initialize();
 		displayManager.initialize();
@@ -215,6 +227,7 @@ public class Konquest implements Timeable {
 		upgradeManager.initialize();
 		shieldManager.initialize();
 		placeholderManager.initialize();
+		plotManager.initialize();
 		offlineTimeoutSeconds = (long)(configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)*86400);
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;
@@ -414,6 +427,10 @@ public class Konquest implements Timeable {
 		return placeholderManager;
 	}
 	
+	public PlotManager getPlotManager() {
+		return plotManager;
+	}
+	
 	public long getOfflineTimeoutSeconds() {
 		return offlineTimeoutSeconds;
 	}
@@ -445,15 +462,23 @@ public class Konquest implements Timeable {
 					long lastPlayedTime = player.getOfflineBukkitPlayer().getLastPlayed();
 					if(lastPlayedTime > 0 && now.after(new Date(lastPlayedTime + (offlineTimeoutSeconds*1000)))) {
 						// Offline player has exceeded timeout period, prune from residencies and camp
-						for(KonTown town : player.getKingdom().getTowns()) {
-							if(town.getPlayerResidents().contains(player.getOfflineBukkitPlayer())) {
-								boolean status = town.removePlayerResident(player.getOfflineBukkitPlayer());
-								ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from town "+town.getName()+" in kingdom "+player.getKingdom().getName()+", got "+status);
+						boolean doExile = configManager.getConfig("core").getBoolean("core.kingdoms.offline_timeout_exile",false);
+						if(!player.isBarbarian()) {
+							if(doExile) {
+								getKingdomManager().exileOfflinePlayer(player);
+							} else {
+								for(KonTown town : player.getKingdom().getTowns()) {
+									if(town.getPlayerResidents().contains(player.getOfflineBukkitPlayer())) {
+										boolean status = town.removePlayerResident(player.getOfflineBukkitPlayer());
+										ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from town "+town.getName()+" in kingdom "+player.getKingdom().getName()+", got "+status);
+									}
+								}
 							}
-						}
-						if(campManager.isCampSet(player)) {
-							campManager.removeCamp(player);
-							ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from camp");
+						} else {
+							if(campManager.isCampSet(player)) {
+								campManager.removeCamp(player);
+								ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from camp");
+							}
 						}
 					}
 				}
@@ -639,15 +664,15 @@ public class Konquest implements Timeable {
 		return sidePoints;
 	}
 	
-	public Point toPoint(Location loc) {
+	public static Point toPoint(Location loc) {
 		return new Point((int)Math.floor((double)loc.getBlockX()/16),(int)Math.floor((double)loc.getBlockZ()/16));
 	}
 	
-	public Point toPoint(Chunk chunk) {
+	public static Point toPoint(Chunk chunk) {
 		return new Point(chunk.getX(),chunk.getZ());
 	}
 	
-	public Chunk toChunk(Point point, World world) {
+	public static Chunk toChunk(Point point, World world) {
 		return world.getChunkAt(point.x, point.y);
 	}
 	
@@ -1100,6 +1125,15 @@ public class Konquest implements Timeable {
         },4);
     }
     
+    public static void playFailSound(Player bukkitPlayer) {
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, (float)0.5, (float)1.4);
+            }
+        },1);
+    }
+    
     public static void playTownArmorSound(Player bukkitPlayer) {
     	playTownArmorSound(bukkitPlayer.getLocation());
     }
@@ -1157,6 +1191,10 @@ public class Konquest implements Timeable {
     
     public static String getChatTag() {
     	return chatTag;
+    }
+    
+    public static String getChatMessage() {
+    	return chatMessage;
     }
 	
 }

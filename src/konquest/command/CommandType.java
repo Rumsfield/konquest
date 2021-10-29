@@ -18,12 +18,13 @@ public enum CommandType {
 	SETTLE  (Material.DIAMOND_PICKAXE,  "konquest.command.settle",  "",   "<name>",                                                         MessagePath.DESCRIPTION_SETTLE.getMessage()),
 	CLAIM   (Material.DIAMOND_SHOVEL,   "konquest.command.claim",   "",   "[radius|auto] [<radius>]",                                       MessagePath.DESCRIPTION_CLAIM.getMessage()),
 	TRAVEL  (Material.COMPASS,          "konquest.command.travel",  "t",  "<town>|capital|camp|wild",                                       MessagePath.DESCRIPTION_TRAVEL.getMessage()),
-	TOWN    (Material.IRON_DOOR,        "konquest.command.town",    "",   "<town> options|add|kick|knight|lord|rename|upgrade|shield [player]", MessagePath.DESCRIPTION_TOWN.getMessage()),
+	TOWN    (Material.IRON_DOOR,        "konquest.command.town",    "",   "<town> add|kick|knight|lord|rename|upgrade|shield|options|plots [player]", MessagePath.DESCRIPTION_TOWN.getMessage()),
 	QUEST   (Material.WRITABLE_BOOK,    "konquest.command.quest",   "q",  "",                                                               MessagePath.DESCRIPTION_QUEST.getMessage()),
 	STATS   (Material.BOOK,             "konquest.command.stats",   "s",  "",                                                               MessagePath.DESCRIPTION_STATS.getMessage()),
 	PREFIX  (Material.NAME_TAG,         "konquest.command.prefix",  "p",  "",                                                               MessagePath.DESCRIPTION_PREFIX.getMessage()),
 	SCORE   (Material.DIAMOND,          "konquest.command.score",   "",   "[<player>|all]",                                                 MessagePath.DESCRIPTION_SCORE.getMessage()),
 	FLY     (Material.ELYTRA,           "konquest.command.fly",     "",   "",                                                               MessagePath.DESCRIPTION_FLY.getMessage()),
+	BORDER  (Material.GREEN_CARPET,     "konquest.command.border",  "b",  "",                                                               MessagePath.DESCRIPTION_BORDER.getMessage()),
 	ADMIN   (Material.NETHER_STAR,      "konquest.command.admin",   "",   "",                                                               MessagePath.DESCRIPTION_ADMIN.getMessage());
 
 	private final String permission;

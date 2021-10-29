@@ -16,8 +16,11 @@ import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.model.KonPlayer.RegionType;
+import konquest.model.KonPlot;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -208,6 +211,94 @@ public class PlayerListener implements Listener{
         	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.enable_format",true);
         	if(enable) {
 	        	// Format chat messages
+        		Player bukkitPlayer = event.getPlayer();
+	        	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+					ChatUtil.printDebug("Failed to handle onAsyncPlayerChat for non-existent player");
+					return;
+				}
+	            KonPlayer player = playerManager.getPlayer(bukkitPlayer);
+	            KonKingdom kingdom = player.getKingdom();
+	            event.setCancelled(true);
+	            
+	            String title = "";
+	            if(player.getPlayerPrefix().isEnabled()) {
+	            	title = ChatUtil.parseHex(player.getPlayerPrefix().getMainPrefixName());
+	            }
+	            String prefix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer));
+	            String suffix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer));
+	            String kingdomName = kingdom.getName();
+	            String name = bukkitPlayer.getName();
+	            
+	            if(player.isGlobalChat()) {
+	            	//Global chat, all players see this format
+	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
+	            		ChatColor teamColor = ChatColor.WHITE;
+	            		ChatColor titleColor = ChatColor.WHITE;
+	            		if(player.isBarbarian()) {
+	            			teamColor = ChatColor.YELLOW;
+	            		} else {
+	            			if(globalPlayer.getKingdom().equals(kingdom)) {
+	                			// Message sender is in same kingdom as receiver
+	                			teamColor = ChatColor.GREEN;
+	                			titleColor = ChatColor.DARK_GREEN;
+	                		} else {
+	                			// Message sender is in different kingdom as receiver
+	            				teamColor = ChatColor.RED;
+	                			titleColor = ChatColor.DARK_RED;
+	                		}
+	            		}
+	            		globalPlayer.getBukkitPlayer().sendMessage(
+	            				ChatUtil.parseFormat(Konquest.getChatMessage(),
+	            						prefix,
+	            						suffix,
+	            						kingdomName,
+	            						title,
+	            						name,
+	            						teamColor,
+	            						titleColor) +
+	        					Konquest.chatDivider + ChatColor.RESET + " " + event.getMessage());
+	            	}
+	            } else {
+	            	//Team chat only (and admins)
+	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + "[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	            	for(KonPlayer teamPlayer : playerManager.getPlayersOnline()) {
+	            		if(teamPlayer.getKingdom().equals(kingdom)) {
+	            			teamPlayer.getBukkitPlayer().sendMessage(
+		            				ChatUtil.parseFormat(Konquest.getChatMessage(),
+		            						prefix,
+		            						suffix,
+		            						kingdomName,
+		            						title,
+		            						name,
+		            						ChatColor.GREEN,
+		            						ChatColor.GREEN) +
+		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
+	            		} else if(teamPlayer.isAdminBypassActive()) {
+	            			teamPlayer.getBukkitPlayer().sendMessage(
+		            				ChatUtil.parseFormat(Konquest.getChatMessage(),
+		            						prefix,
+		            						suffix,
+		            						kingdomName,
+		            						title,
+		            						name,
+		            						ChatColor.GOLD,
+		            						ChatColor.GOLD) +
+		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
+	            		}
+	            	}
+	            }
+        	}
+        }
+    }
+    
+    /*
+    private void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+        //Check if the event was caused by a player
+        if(event.isAsynchronous() && !event.isCancelled()) {
+        	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.enable_format",true);
+        	if(enable) {
+	        	// Format chat messages
         		boolean useKingdom = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.use_kingdom",true);
 	        	Player bukkitPlayer = event.getPlayer();
 	        	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
@@ -222,8 +313,8 @@ public class PlayerListener implements Listener{
 	            if(player.getPlayerPrefix().isEnabled()) {
 	            	title = player.getPlayerPrefix().getMainPrefixName()+" ";
 	            }
-	            String prefix = konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer);
-	            String suffix = konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer);
+	            String prefix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer));
+	            String suffix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer));
 	            String divider = ChatColor.translateAlternateColorCodes('&', "&7»");
 	            String kingdomName = "";
 	            if(useKingdom) {
@@ -250,11 +341,11 @@ public class PlayerListener implements Listener{
 	                		}
 	            		}
 	            		globalPlayer.getBukkitPlayer().sendMessage(
-	        					ChatColor.translateAlternateColorCodes('&', prefix)+ 
+	        					prefix+ 
 	        					teamColor+kingdomName+
 	        					titleColor+ChatColor.translateAlternateColorCodes('&', title)+ 
 	        					teamColor+bukkitPlayer.getName()+" "+
-	        					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
+	        					ChatColor.RESET+suffix+
 	        					divider+" "+
 	        					ChatColor.WHITE+event.getMessage());
 	            	}
@@ -287,6 +378,7 @@ public class PlayerListener implements Listener{
         	}
         }
     }
+    */
     
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
@@ -970,6 +1062,9 @@ public class PlayerListener implements Listener{
         			// Begin fly disable warmup
         			player.setFlyDisableWarmup(true);
         		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
+        			// TEST
+        			//bukkitPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD+"Hello!"));
+        			// END TEST
         			KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
                     if(invokeEvent != null) {
                     	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
@@ -999,6 +1094,8 @@ public class PlayerListener implements Listener{
     	    					//ChatUtil.sendNotice(bukkitPlayer, "This Town is abandoned! Use \"/k town "+territoryName+" lord "+bukkitPlayer.getName()+"\" to claim Lordship.",ChatColor.RED);
     	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
     	    				}
+    	    				// Display plot message to friendly players
+    	    				displayPlotMessage(town, chunkTo, chunkFrom, player);
     	    				// Command all nearby Iron Golems to target enemy player, if no other closer player is present
     						updateGolemTargetsForTerritory(territoryTo,player,true);
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
@@ -1047,6 +1144,8 @@ public class PlayerListener implements Listener{
         	    					//ChatUtil.sendNotice(bukkitPlayer, "This Town is abandoned! Use \"/k town "+territoryTo.getName()+" lord "+bukkitPlayer.getName()+"\" to claim Lordship.",ChatColor.RED);
         	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
         	    				}
+        	    				// Display plot message to friendly players
+        	    				displayPlotMessage(town, chunkTo, chunkFrom, player);
         	    				updateGolemTargetsForTerritory(territoryTo,player,true);
         	    			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         	    				((KonRuin) territoryTo).addBarPlayer(player);
@@ -1079,10 +1178,17 @@ public class PlayerListener implements Listener{
         			} else { // moving between the same territory
         				//ChatUtil.sendNotice(bukkitPlayer, "(Debug) "+territoryTo.getName()+": "+chunkCoordsTo);
         				if(!event.isCancelled()) {
-        					if(!territoryTo.getKingdom().equals(player.getKingdom()) && territoryTo.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+        					if(territoryTo.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         						KonTown town = (KonTown) territoryTo;
-        						kingdomManager.applyTownNerf(player, town);
-        						updateGolemTargetsForTerritory(territoryTo,player,true);
+        						if(!territoryTo.getKingdom().equals(player.getKingdom())) {
+            						// Enemy player
+        							kingdomManager.applyTownNerf(player, town);
+            						updateGolemTargetsForTerritory(territoryTo,player,true);
+            					} else {
+            						// Friendly player
+            						// Display plot message to friendly players
+            						displayPlotMessage(town, chunkTo, chunkFrom, player);
+            					}
         					}
         					//updateGolemTargetsForTerritory(territoryTo,player,true);
         				}
@@ -1172,6 +1278,8 @@ public class PlayerListener implements Listener{
     	    					//ChatUtil.sendNotice(bukkitPlayer, "This Town is abandoned! Use \"/k town "+territoryName+" lord "+bukkitPlayer.getName()+"\" to claim Lordship.",ChatColor.RED);
     	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
     	    				}
+    	    				// Display plot message to friendly players
+    	    				displayPlotMessage(town, chunkTo, chunkFrom, player);
     	    				// Command all nearby Iron Golems to target enemy player, if no other closer player is present
     						updateGolemTargetsForTerritory(territoryTo,player,true);
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
@@ -1251,6 +1359,47 @@ public class PlayerListener implements Listener{
 				}
 			}
 		}
+    }
+    
+    private void displayPlotMessage(KonTown town, Location toLoc, Location fromLoc, KonPlayer player) {
+    	if(town.getKingdom().equals(player.getKingdom())) {
+    		// Player is friendly
+    		boolean isPlotTo = town.hasPlot(toLoc);
+    		boolean isPlotFrom = town.hasPlot(fromLoc);
+    		/*
+    		 * Display messages:
+    		 * 		into plot from non-plot (territory or wild)
+    		 * 		into plot from other plot
+    		 * 		out of plot, to town
+    		 * 	    out of wild, to town
+    		 */
+    		String plotMessage = "";
+    		ChatColor plotMessageColor = ChatColor.GOLD;
+    		boolean doDisplay = false;
+    		// Display conditions
+    		if(isPlotTo) {
+    			KonPlot plotTo = town.getPlot(toLoc);
+    			if(!isPlotFrom || (isPlotFrom && !plotTo.equals(town.getPlot(fromLoc)))) {
+    				plotMessage = plotTo.getDisplayText();
+    				plotMessageColor = ChatColor.GOLD;
+    				if(plotTo.hasUser(player.getBukkitPlayer())) {
+    					plotMessageColor = ChatColor.DARK_GREEN;
+    				}
+    				doDisplay = true;
+    			}
+    		} else {
+    			if((isPlotFrom || !town.isLocInside(fromLoc)) && town.isLocInside(toLoc)) {
+    				// Moved out of plot or other territory or wild into town land
+    				plotMessage = MessagePath.MENU_PLOTS_TOWN_LAND.getMessage();
+    				plotMessageColor = ChatColor.DARK_GREEN;
+    				doDisplay = true;
+    			}
+    		}
+    		// Display message
+    		if(doDisplay) {
+    			player.getBukkitPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plotMessageColor+plotMessage));
+    		}
+    	}
     }
     
 }

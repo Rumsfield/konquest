@@ -113,7 +113,7 @@ public class IntegrationManager {
 			QueryOptions queryOptions = lpAPI.getContextManager().getQueryOptions(player);
 	        CachedMetaData metaData = user.getCachedData().getMetaData(queryOptions);
 	        if (metaData.getPrefix() != null) {
-	        	prefix = metaData.getPrefix().equalsIgnoreCase("null") ? "" : metaData.getPrefix()+" ";
+	        	prefix = metaData.getPrefix().equalsIgnoreCase("null") ? "" : metaData.getPrefix();
 	        }
 		}
 		return prefix;
@@ -126,7 +126,7 @@ public class IntegrationManager {
 			QueryOptions queryOptions = lpAPI.getContextManager().getQueryOptions(player);
 	        CachedMetaData metaData = user.getCachedData().getMetaData(queryOptions);
 	        if (metaData.getSuffix() != null) {
-	        	suffix = metaData.getSuffix().equalsIgnoreCase("null") ? "" : metaData.getSuffix()+" ";
+	        	suffix = metaData.getSuffix().equalsIgnoreCase("null") ? "" : metaData.getSuffix();
 	        }
 		}
 		return suffix;
@@ -211,7 +211,7 @@ public class IntegrationManager {
 	public void deleteShopsInPoints(Collection<Point> points, World world) {
 		if(isQuickShopEnabled && !points.isEmpty()) {
 			for(Point point : points) {
-				Chunk chunk = konquest.toChunk(point,world);
+				Chunk chunk = Konquest.toChunk(point,world);
 				List<Shop> shopList = QuickShopAPI.getShopAPI().getShops(chunk);
 				if(shopList != null) {
 					for(Shop shop : shopList) {

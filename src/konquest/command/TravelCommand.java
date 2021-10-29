@@ -12,7 +12,6 @@ import konquest.model.KonStatsType;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -170,16 +169,8 @@ public class TravelCommand extends CommandBase {
 				if(isTravelAlwaysAllowed && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
 	        		//ChatUtil.sendNotice((Player) getSender(), "Not enough Favor, this one's on us.");
 	        	} else {
-	        		EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, total_cost);
-	                if(r.transactionSuccess()) {
-	                	String balanceF = String.format("%.2f",r.balance);
-		            	String amountF = String.format("%.2f",r.amount);
-		            	//ChatUtil.sendNotice((Player) getSender(), "Favor reduced by "+amountF+", total: "+balanceF);
-		            	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+	                if(KonquestPlugin.withdrawPlayer(bukkitPlayer, total_cost)) {
 	                	getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)total_cost);
-	                } else {
-	                	//ChatUtil.sendError((Player) getSender(), String.format("An error occured: %s", r.errorMessage));
-	                	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
 	                }
 	        	}
         	}
@@ -192,16 +183,7 @@ public class TravelCommand extends CommandBase {
 	            		if(town.isAttacked() && town.addDefender(bukkitPlayer)) {
 	            			ChatUtil.printDebug("Raid defense rewarded to player "+player.getBukkitPlayer().getName());
 	            			int defendReward = getKonquest().getConfigManager().getConfig("core").getInt("core.favor.rewards.defend_raid");
-	        				EconomyResponse r = KonquestPlugin.depositPlayer(player.getBukkitPlayer(), defendReward);
-	        	            if(r.transactionSuccess()) {
-	        	            	String balanceF = String.format("%.2f",r.balance);
-	        	            	String amountF = String.format("%.2f",r.amount);
-	        	            	//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+"Favor rewarded: "+ChatColor.DARK_GREEN+amountF+ChatColor.WHITE+", total: "+ChatColor.DARK_GREEN+balanceF);
-	        	            	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_REWARD_FAVOR.getMessage(amountF,balanceF));
-	        	            } else {
-	        	            	//ChatUtil.sendError(player.getBukkitPlayer(), String.format("An error occured: %s", r.errorMessage));
-	        	            	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
-	        	            }
+	        	            KonquestPlugin.depositPlayer(player.getBukkitPlayer(), defendReward);
 	            		}
 	            		//TODO this might get spammy
 	            		for(OfflinePlayer resident : town.getPlayerResidents()) {

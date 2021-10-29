@@ -39,14 +39,14 @@ public class UnclaimAdminCommand extends CommandBase {
         		String territoryName = getKonquest().getKingdomManager().getChunkTerritory(playerLoc).getName();
         		if(getKonquest().getKingdomManager().unclaimChunk(playerLoc)) {
         			//ChatUtil.sendNotice((Player) getSender(), "Successfully removed chunk from territory: "+territoryName);
-        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_NOTICE_SUCCESS.getMessage(territoryName));
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_UNCLAIM_NOTICE_SUCCESS.getMessage(territoryName));
         		} else {
         			//ChatUtil.sendError((Player) getSender(), "There was a problem unclaiming this chunk.");
-        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_ERROR_FAIL.getMessage());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_UNCLAIM_ERROR_FAIL.getMessage());
         		}
         	} else {
         		//ChatUtil.sendNotice((Player) getSender(), "Chunk is already unclaimed.");
-        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_ERROR_FAIL.getMessage());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_UNCLAIM_ERROR_FAIL.getMessage());
         	}
         }
     }

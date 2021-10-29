@@ -62,6 +62,7 @@ label:
   enemy-redstone: "Enemy Redstone"
   true: "True"
   false: "False"
+  plot: "Plot"
 menu:
   stats:
     title: "Accomplishment Stats"
@@ -123,8 +124,42 @@ menu:
   options:
     hint: "Click to change"
     current: "Current: %s"
-    open: "All members can build and use chests"
+    open: "All kingdom members can build and use chests"
+    plot: "Residents can only build and use chests in plots"
     redstone: "Enemies can use redstone switches and doors"
+  plots:
+    edit-add-land: "Add Land"
+    edit-remove-land: "Remove Land"
+    edit-add-players: "Add Players"
+    edit-remove-players: "Remove Players"
+    edit-show-players: "Show Players"
+    town-land: "Town Land"
+    town-monument: "Town Monument"
+    editing-plot: "Editing Plot"
+    click-delete: "Click to Delete Plot"
+    click-edit: "Click to Edit Plot"
+    click-remove-chunk: "Click to Remove Chunk"
+    click-remove-player: "Click to Remove Player"
+    click-create: "Click to Create Plot"
+    click-add-chunk: "Click to Add Chunk"
+    click-add-player: "Click to Add Player"
+    click-move-player: "Click to Move Player"
+    here: "You Are Here"
+    title-plots: "Plots"
+    title-create: "Create Plot"
+    title-delete: "Delete Plot"
+    title-edit: "Edit Plot"
+    title-edit-options: "Edit Options"
+    title-add-land: "Add Land"
+    title-add-players: "Add Players"
+    title-remove-land: "Remove Land"
+    title-remove-players: "Remove Players"
+    title-show-players: "Show Players"
+    button-create: "Create"
+    button-delete: "Delete"
+    button-edit: "Edit"
+    button-return: "Return"
+    button-finish: "Finish"
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."
@@ -197,6 +232,8 @@ protection:
   error:
     blocked: "Blocked"
     not-resident: "You must be a resident of %s to do this."
+    not-plot: "You must be a plot member to do this."
+    only-plot: "You cannot do this outside of a town plot."
     online: "The Kingdom of %s doesn't have enough online players, cannot attack the Town of %s."
     upgrade: "%s is upgraded with %s and cannot be attacked without %s residents online."
     camp: "Cannot attack %s, the camp owner is offline."
@@ -293,6 +330,10 @@ command:
         success: "Successfully removed chunk from territory %s."
       error:
         fail: "Failed to unclaim this chunk."
+  border:
+    notice:
+      enable: "Displaying particle borders"
+      disable: "Hiding particle borders"
   chat:
     notice:
       enable: "Kingdom chat"
@@ -405,6 +446,8 @@ command:
     notice:
       open: "Opened %s for access by all kingdom members."
       close: "Closed %s, only residents may build and access containers."
+      plot-enable: "%s now allows residents to only build within plots."
+      plot-disable: "%s now allows residents to build in town land and within plots."
       redstone-enable: "%s now allows enemies to use redstone switches and doors."
       redstone-disable: "%s now prevents enemies from using redstone switches and doors."
       add-invite-reminder: "You have been invited to join the town of %s."
@@ -632,6 +675,7 @@ description:
   prefix: "Set your prefix title."
   score: "Display a Player's current score."
   fly: "Fly within friendly land."
+  border: "Toggle particle borders of territories and plots."
   admin: "For Admins only."
   admin-help: "Display the admin help message."
   admin-bypass: "Toggle Admin bypass mode."

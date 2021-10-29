@@ -30,6 +30,7 @@ import konquest.display.OptionIcon;
 import konquest.display.OptionIcon.optionAction;
 import konquest.display.PagedMenu;
 import konquest.display.PlayerIcon;
+import konquest.display.PlotMenu;
 import konquest.display.PlayerIcon.PlayerIconAction;
 import konquest.display.PrefixCustomIcon;
 import konquest.display.PrefixIcon.PrefixIconAction;
@@ -62,11 +63,13 @@ public class DisplayManager {
 	private Konquest konquest;
 	private HashMap<Inventory, KonTown> townCache;
 	private HashMap<Inventory, PagedMenu> menuCache;
+	private HashMap<Inventory, PlotMenu> plotMenus;
 	
 	public DisplayManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.townCache = new HashMap<Inventory, KonTown>();
 		this.menuCache = new HashMap<Inventory, PagedMenu>();
+		this.plotMenus = new HashMap<Inventory, PlotMenu>();
 	}
 	
 	public void initialize() {
@@ -82,16 +85,20 @@ public class DisplayManager {
 		if(inv != null) {
 			if(menuCache.containsKey(inv)) {
 				result = true;
+			} else if(plotMenus.containsKey(inv)) {
+				result = true;
 			}
 		}
 		return result;
 	}
 	
 	public void onDisplayMenuClick(KonPlayer clickPlayer, Inventory inv, int slot) {
+		if(inv == null) {
+			return;
+		}
+		Player bukkitPlayer = clickPlayer.getBukkitPlayer();
 		// Switch pages and handle navigation button clicks
-		// Open new score menus for leaderboard player clicks
-		if(inv != null && menuCache.containsKey(inv)) {
-			Player bukkitPlayer = clickPlayer.getBukkitPlayer();
+		if(menuCache.containsKey(inv)) {
 			PagedMenu clickMenu = menuCache.get(inv);
 			DisplayMenu currentPage = clickMenu.getPage(inv);
 			if(currentPage == null) {
@@ -320,7 +327,43 @@ public class DisplayManager {
 					}
 				}
 			}
-		}	
+		} else if(plotMenus.containsKey(inv)) {
+			// Handle plot menu navigation and states
+			// Every clickable icon in a plot menu view will update the state and refresh the open inventory
+			PlotMenu clickMenu = plotMenus.get(inv);
+			DisplayMenu currentView = clickMenu.getCurrentView();
+			if(currentView == null || !currentView.getInventory().equals(inv)) {
+				ChatUtil.printDebug("Plot menu view is not current!");
+				return;
+			}
+			MenuIcon clickedIcon = currentView.getIcon(slot);
+			if(clickedIcon == null || !clickedIcon.isClickable()) {
+				return;
+			}
+			playMenuClickSound(bukkitPlayer);
+			// Update plot menu state
+			DisplayMenu updateView = clickMenu.updateState(slot);
+			// Update inventory view
+			plotMenus.remove(inv);
+			if(updateView != null) {
+				// Refresh displayed inventory view
+				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+		            @Override
+		            public void run() {
+		            	bukkitPlayer.openInventory(updateView.getInventory());
+		            	plotMenus.put(updateView.getInventory(), clickMenu);
+		            }
+		        },1);
+			} else {
+				// Close inventory view
+				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+		            @Override
+		            public void run() {
+		            	bukkitPlayer.closeInventory();
+		            }
+		        },1);
+			}
+		}
 	}
 	
 	public void onDisplayMenuClose(Inventory inv) {
@@ -329,6 +372,9 @@ public class DisplayManager {
 		}
 		if(townCache.containsKey(inv)) {
 			townCache.remove(inv);
+		}
+		if(plotMenus.containsKey(inv)) {
+			plotMenus.remove(inv);
 		}
 	}
 	
@@ -486,9 +532,11 @@ public class DisplayManager {
 		if(isShieldsEnabled) {
 			ListIterator<KonShield> shieldIter = allShields.listIterator();
 			for(int i = 0; i < pageTotal; i++) {
-				int numPageRows = (int)Math.ceil(((double)((allShields.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-				if(numPageRows == 0) {
+				int numPageRows = (int)Math.ceil(((double)(allShields.size() - i*MAX_ICONS_PER_PAGE))/9);
+				if(numPageRows < 1) {
 					numPageRows = 1;
+				} else if(numPageRows > 5) {
+					numPageRows = 5;
 				}
 				pageLabel = pageColor+town.getName()+" "+MessagePath.LABEL_SHIELDS.getMessage()+" "+(i+1)+"/"+pageTotal;
 				newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -514,9 +562,11 @@ public class DisplayManager {
 		if(isArmorsEnabled) {
 			ListIterator<KonArmor> armorIter = allArmors.listIterator();
 			for(int i = 0; i < pageTotal; i++) {
-				int numPageRows = (int)Math.ceil(((double)((allArmors.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-				if(numPageRows == 0) {
+				int numPageRows = (int)Math.ceil(((double)(allArmors.size() - i*MAX_ICONS_PER_PAGE))/9);
+				if(numPageRows < 1) {
 					numPageRows = 1;
+				} else if(numPageRows > 5) {
+					numPageRows = 5;
 				}
 				pageLabel = pageColor+town.getName()+" "+MessagePath.LABEL_ARMORS.getMessage()+" "+(i+1)+"/"+pageTotal;
 				newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -576,6 +626,15 @@ public class DisplayManager {
     	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
     	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
 		option = new OptionIcon(optionAction.TOWN_OPEN, loreColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.DARK_OAK_DOOR, 3);
+		newMenu.getPage(0).addIcon(option);
+		
+		// Open Info Icon
+		currentValue = boolean2Lang(town.isPlotOnly())+" "+boolean2Symbol(town.isPlotOnly());
+		loreList = new ArrayList<String>();
+    	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_PLOT.getMessage()));
+    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
+    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+		option = new OptionIcon(optionAction.TOWN_PLOT_ONLY, loreColor+MessagePath.LABEL_PLOT.getMessage(), loreList, Material.DIAMOND_SHOVEL, 4);
 		newMenu.getPage(0).addIcon(option);
 		
 		// Redstone Info Icon
@@ -772,9 +831,11 @@ public class DisplayManager {
 		int pageNum = 1;
 		ListIterator<KonTown> townIter = playerTowns.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)((playerTowns.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows == 0) {
+			int numPageRows = (int)Math.ceil(((double)(playerTowns.size() - i*MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows < 1) {
 				numPageRows = 1;
+			} else if(numPageRows > 5) {
+				numPageRows = 5;
 			}
 			pageLabel = pageColor+infoPlayer.getOfflineBukkitPlayer().getName()+" "+MessagePath.LABEL_RESIDENCIES.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -890,9 +951,11 @@ public class DisplayManager {
 		int pageNum = 1;
 		ListIterator<KonTown> townIter = kingdomTowns.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)((kingdomTowns.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows == 0) {
+			int numPageRows = (int)Math.ceil(((double)(kingdomTowns.size() - i*MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows < 1) {
 				numPageRows = 1;
+			} else if(numPageRows > 5) {
+				numPageRows = 5;
 			}
 			pageLabel = pageColor+infoKingdom.getName()+" "+MessagePath.LABEL_TOWNS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -1004,6 +1067,7 @@ public class DisplayManager {
 		newMenu.getPage(0).addIcon(info);
 		/* Properties Info Icon (5) */
     	String isOpen = boolean2Symbol(infoTown.isOpen());
+    	String isPlotOnly = boolean2Symbol(infoTown.isPlotOnly());
     	String isRedstone = boolean2Symbol(infoTown.isEnemyRedstoneAllowed());
     	String isProtected = boolean2Symbol((infoTown.isCaptureDisabled() || infoTown.getKingdom().isOfflineProtected() || infoTown.isTownWatchProtected()));
     	String isAttacked = boolean2Symbol(infoTown.isAttacked());
@@ -1012,6 +1076,7 @@ public class DisplayManager {
     	String isPeaceful = boolean2Symbol(infoTown.getKingdom().isPeaceful());
     	loreList = new ArrayList<String>();
     	loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
+    	loreList.add(loreColor+MessagePath.LABEL_PLOT.getMessage()+": "+isPlotOnly);
     	loreList.add(loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage()+": "+isRedstone);
     	loreList.add(loreColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage()+": "+isAttacked);
     	loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
@@ -1075,9 +1140,11 @@ public class DisplayManager {
 		}
 		ListIterator<OfflinePlayer> knightIter = townKnights.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)((townKnights.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows == 0) {
+			int numPageRows = (int)Math.ceil(((double)(townKnights.size() - i*MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows < 1) {
 				numPageRows = 1;
+			} else if(numPageRows > 5) {
+				numPageRows = 5;
 			}
 			pageLabel = pageColor+infoTown.getName()+" "+MessagePath.LABEL_KNIGHTS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -1103,9 +1170,11 @@ public class DisplayManager {
 		}
 		ListIterator<OfflinePlayer> residentIter = townResidents.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)((townResidents.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows == 0) {
+			int numPageRows = (int)Math.ceil(((double)(townResidents.size() - i*MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows < 1) {
 				numPageRows = 1;
+			} else if(numPageRows > 5) {
+				numPageRows = 5;
 			}
 			pageLabel = pageColor+infoTown.getName()+" "+MessagePath.LABEL_RESIDENTS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -1154,7 +1223,7 @@ public class DisplayManager {
 		String pageLabel = "";
 		String playerPrefix = "";
 		if(displayPlayer.getPlayerPrefix().isEnabled()) {
-			playerPrefix = displayPlayer.getPlayerPrefix().getMainPrefixName();
+			playerPrefix = ChatUtil.parseHex(displayPlayer.getPlayerPrefix().getMainPrefixName());
 		}
 		final int MAX_ICONS_PER_PAGE = 45;
 		final int MAX_ROWS_PER_PAGE = 5;
@@ -1200,7 +1269,7 @@ public class DisplayManager {
 		ListIterator<KonPrefixType> prefixIter = allPrefixes.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
 			int numPageRows = Math.min((totalRows - i*MAX_ROWS_PER_PAGE),MAX_ROWS_PER_PAGE);
-			pageLabel = ChatColor.BLACK+playerPrefix+" "+displayPlayer.getBukkitPlayer().getName()+" "+(i+1)+"/"+pageTotal;
+			pageLabel = ChatColor.BLACK+playerPrefix+" "+ChatColor.BLACK+displayPlayer.getBukkitPlayer().getName()+" "+(i+1)+"/"+pageTotal;
 			newMenu.addPage(pageNum, numPageRows, pageLabel);
 			//ChatUtil.printDebug("  Created page "+i+" with "+numPageRows+" rows");
 			int slotIndex = 0;
@@ -1246,9 +1315,11 @@ public class DisplayManager {
 		if(!allCustoms.isEmpty()) {
 			ListIterator<KonCustomPrefix> customIter = allCustoms.listIterator();
 			for(int i = 0; i < pageTotal; i++) {
-				int numPageRows = (int)Math.ceil(((double)((allCustoms.size() - i*MAX_ICONS_PER_PAGE) % MAX_ICONS_PER_PAGE))/9);
-				if(numPageRows == 0) {
+				int numPageRows = (int)Math.ceil(((double)(allCustoms.size() - i*MAX_ICONS_PER_PAGE))/9);
+				if(numPageRows < 1) {
 					numPageRows = 1;
+				} else if(numPageRows > 5) {
+					numPageRows = 5;
 				}
 				pageLabel = pageColor+MessagePath.MENU_PREFIX_CUSTOM_PAGES.getMessage()+" "+(i+1)+"/"+pageTotal;
 				newMenu.addPage(pageNum, numPageRows, pageLabel);
@@ -1287,6 +1358,27 @@ public class DisplayManager {
             }
         },1);
    	}
+   	
+   	/*
+	 * ===============================================
+	 * Plot Menu
+	 * ===============================================
+	 */
+   	public void displayPlotMenu(Player bukkitPlayer, KonTown town) {
+   		//ChatUtil.printDebug("Displaying new plots menu to "+bukkitPlayer.getName()+", current menu size is "+plotMenus.size());
+		playMenuOpenSound(bukkitPlayer);
+		int maxSize = konquest.getPlotManager().getMaxSize();
+		PlotMenu newMenu = new PlotMenu(town, bukkitPlayer, maxSize);
+		plotMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
+		// Schedule delayed task to display inventory to player
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.openInventory(newMenu.getCurrentView().getInventory());
+            }
+        },1);
+		
+	}
    	
    	/*
 	 * Helper methods
@@ -1386,7 +1478,7 @@ public class DisplayManager {
    		return inputList;
    	}
  	
- 	private String boolean2Symbol(boolean val) {
+   	private String boolean2Symbol(boolean val) {
  		String result = ChatColor.DARK_RED+""+ChatColor.BOLD+"\u274C";
     	if(val) {
     		result = ChatColor.DARK_GREEN+""+ChatColor.BOLD+"\u2713";
@@ -1394,7 +1486,7 @@ public class DisplayManager {
     	return result;
  	}
  	
- 	private String boolean2Lang(boolean val) {
+   	private String boolean2Lang(boolean val) {
  		String result = MessagePath.LABEL_FALSE.getMessage();
  		if(val) {
  			result = MessagePath.LABEL_TRUE.getMessage();
@@ -1402,11 +1494,11 @@ public class DisplayManager {
  		return result;
  	}
  	
- 	private void playMenuClickSound(Player bukkitPlayer) {
+   	private void playMenuClickSound(Player bukkitPlayer) {
  		bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, (float)1.0, (float)0.8);
  	}
  	
- 	private void playMenuOpenSound(Player bukkitPlayer) {
+   	private void playMenuOpenSound(Player bukkitPlayer) {
  		bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, (float)1.0, (float)1.4);
  	}
 }

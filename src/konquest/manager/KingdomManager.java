@@ -9,9 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-//import java.util.concurrent.ScheduledThreadPoolExecutor;
-
-import net.milkbowl.vault.economy.EconomyResponse;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -48,6 +45,7 @@ import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonPlayerScoreAttributes;
 import konquest.model.KonPlayerScoreAttributes.KonPlayerScoreAttribute;
+import konquest.model.KonPlot;
 import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
@@ -296,6 +294,27 @@ public class KingdomManager {
     	return true;
 	}
 	
+	public void exileOfflinePlayer(KonOfflinePlayer offlinePlayer) {
+		if(offlinePlayer.isBarbarian()) {
+    		return;
+    	}
+    	KonKingdom oldKingdom = offlinePlayer.getKingdom();
+    	offlinePlayer.setExileKingdom(oldKingdom);
+    	// Remove residency
+    	for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
+    		if(town.removePlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
+    			konquest.getMapHandler().drawDynmapLabel(town);
+    		}
+    	}
+    	// Make into barbarian
+    	offlinePlayer.setKingdom(getBarbarians());
+    	offlinePlayer.setBarbarian(true);
+    	// Update stuff
+    	konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
+    	updateSmallestKingdom();
+    	return;
+	}
+	
 	/**
 	 * addTown - Primary method for adding a town
 	 * @param loc - location of town center
@@ -394,7 +413,7 @@ public class KingdomManager {
 			// Verify valid monument template
 			if(getKingdom(kingdomName).getMonumentTemplate().isValid()) {
 				// Modify location to max Y at given X,Z
-				Point point = konquest.toPoint(loc);
+				Point point = Konquest.toPoint(loc);
 				int xLocal = loc.getBlockX() - (point.x*16);
 				int zLocal = loc.getBlockZ() - (point.y*16);
 				Chunk chunk = loc.getChunk();
@@ -517,6 +536,7 @@ public class KingdomManager {
 			} else {
 				conquerKingdom.getTown(name).clearUpgrades();
 			}
+			conquerKingdom.getTown(name).clearPlots();
 			konquest.getMapHandler().drawDynmapUpdateTerritory(conquerKingdom.getTown(name));
 			konquest.getMapHandler().drawDynmapLabel(getKingdom(oldKingdomName).getCapital());
 			konquest.getMapHandler().drawDynmapLabel(conquerKingdom.getCapital());
@@ -558,7 +578,7 @@ public class KingdomManager {
 			}
 		}
 		if(foundAdjTerr) {
-			Point addPoint = konquest.toPoint(loc);
+			Point addPoint = Konquest.toPoint(loc);
 			if(closestAdjTerr.getWorld().equals(loc.getWorld()) && closestAdjTerr.addChunk(addPoint)) {
 				addTerritory(loc.getWorld(),addPoint,closestAdjTerr);
 				konquest.getMapHandler().drawDynmapUpdateTerritory(closestAdjTerr);
@@ -669,16 +689,8 @@ public class KingdomManager {
     	}
     	// Reduce the player's favor
 		if(cost > 0 && claimStatus == 0) {
-        	EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, cost);
-            if(r.transactionSuccess()) {
-            	String balanceF = String.format("%.2f",r.balance);
-            	String amountF = String.format("%.2f",r.amount);
-            	//ChatUtil.sendNotice(bukkitPlayer, "Favor reduced by "+amountF+", total: "+balanceF);
-            	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+            if(KonquestPlugin.withdrawPlayer(bukkitPlayer, cost)) {
             	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)cost);
-            } else {
-            	//ChatUtil.sendError(bukkitPlayer, String.format("An error occured: %s", r.errorMessage));
-            	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
             }
 		}
 		return claimStatus == 0;
@@ -797,16 +809,8 @@ public class KingdomManager {
     	// Reduce the player's favor
 		if(cost > 0 && numChunksClaimed > 0) {
 			double finalCost = numChunksClaimed*cost;
-	    	EconomyResponse r = KonquestPlugin.withdrawPlayer(bukkitPlayer, finalCost);
-	        if(r.transactionSuccess()) {
-	        	String balanceF = String.format("%.2f",r.balance);
-	        	String amountF = String.format("%.2f",r.amount);
-	        	//ChatUtil.sendNotice(bukkitPlayer, "Favor reduced by "+amountF+", total: "+balanceF);
-	        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+	        if(KonquestPlugin.withdrawPlayer(bukkitPlayer, finalCost)) {
 	        	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)finalCost);
-	        } else {
-	        	//ChatUtil.sendError(bukkitPlayer, String.format("An error occured: %s", r.errorMessage));
-	        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
 	        }
 		}
 		return true;
@@ -820,11 +824,17 @@ public class KingdomManager {
 	public boolean unclaimChunk(Location loc) {
 		if(isChunkClaimed(loc)) {
 			KonTerritory territory = getChunkTerritory(loc);
+			// Pre-removal saves
+			// Player occupants
 			Set<KonPlayer> occupants = new HashSet<KonPlayer>();
 			for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 				if(territory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
 					occupants.add(occupant);
 				}
+			}
+			// Do removal
+			if(territory.getChunkList().containsKey(Konquest.toPoint(loc)) && territory instanceof KonTown) {
+				konquest.getPlotManager().removePlotPoint((KonTown)territory, loc);
 			}
 			if(territory.removeChunk(loc)) {
 				//updateTerritoryCache();
@@ -893,7 +903,7 @@ public class KingdomManager {
 	}
 	
 	public boolean removeTerritory(Location loc) {
-		boolean result = removeTerritory(loc.getWorld(),konquest.toPoint(loc));
+		boolean result = removeTerritory(loc.getWorld(),Konquest.toPoint(loc));
 		return result;
 	}
 	
@@ -946,7 +956,7 @@ public class KingdomManager {
 	}
 	
 	public boolean isChunkClaimed(Location loc) {
-		return isChunkClaimed(konquest.toPoint(loc),loc.getWorld());
+		return isChunkClaimed(Konquest.toPoint(loc),loc.getWorld());
 	}
 	
 	public boolean isChunkClaimed(Point point, World world) {
@@ -959,7 +969,7 @@ public class KingdomManager {
 	
 	// This can return null!
 	public KonTerritory getChunkTerritory(Location loc) {
-		return getChunkTerritory(konquest.toPoint(loc),loc.getWorld());
+		return getChunkTerritory(Konquest.toPoint(loc),loc.getWorld());
 	}
 	
 	// This can return null!
@@ -1078,46 +1088,56 @@ public class KingdomManager {
 		boolean result = false;
 		switch(action) {
 			case TOWN_OPEN:
-				// Verify town lord
-				if(town.isPlayerLord(bukkitPlayer)) {
-					if(town.isOpen()) {
-						// Close the town
-	            		town.setIsOpen(false);
-	            		for(OfflinePlayer resident : town.getPlayerResidents()) {
-			    			if(resident.isOnline()) {
-			    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_CLOSE.getMessage(town.getName()));
-			    			}
-			    		}
-					} else {
-						// Open the town
-						town.setIsOpen(true);
-	            		for(OfflinePlayer resident : town.getPlayerResidents()) {
-			    			if(resident.isOnline()) {
-			    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_OPEN.getMessage(town.getName()));
-			    			}
-			    		}
-					}
-					result = true;
-            	} else {
-            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-            	}
+				if(town.isOpen()) {
+					// Close the town
+            		town.setIsOpen(false);
+            		for(OfflinePlayer resident : town.getPlayerResidents()) {
+		    			if(resident.isOnline()) {
+		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_CLOSE.getMessage(town.getName()));
+		    			}
+		    		}
+				} else {
+					// Open the town
+					town.setIsOpen(true);
+            		for(OfflinePlayer resident : town.getPlayerResidents()) {
+		    			if(resident.isOnline()) {
+		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_OPEN.getMessage(town.getName()));
+		    			}
+		    		}
+				}
+				result = true;
+				break;
+			case TOWN_PLOT_ONLY:
+				if(town.isPlotOnly()) {
+					// Disable plot only mode
+					town.setIsPlotOnly(false);
+					for(OfflinePlayer resident : town.getPlayerResidents()) {
+		    			if(resident.isOnline()) {
+		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_PLOT_DISABLE.getMessage(town.getName()));
+		    			}
+		    		}
+				} else {
+					// Enable plot only mode
+					town.setIsPlotOnly(true);
+					for(OfflinePlayer resident : town.getPlayerResidents()) {
+		    			if(resident.isOnline()) {
+		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_PLOT_ENABLE.getMessage(town.getName()));
+		    			}
+		    		}
+				}
+				result = true;
 				break;
 			case TOWN_REDSTONE:
-				// Verify town lord
-				if(town.isPlayerLord(bukkitPlayer)) {
-					if(town.isEnemyRedstoneAllowed()) {
-						// Disable enemy redstone
-	            		town.setIsEnemyRedstoneAllowed(false);
-	            		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_DISABLE.getMessage(town.getName()));
-					} else {
-						// Enable enemy redstone
-						town.setIsEnemyRedstoneAllowed(true);
-						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_ENABLE.getMessage(town.getName()));
-					}
-					result = true;
-            	} else {
-            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-            	}
+				if(town.isEnemyRedstoneAllowed()) {
+					// Disable enemy redstone
+            		town.setIsEnemyRedstoneAllowed(false);
+            		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_DISABLE.getMessage(town.getName()));
+				} else {
+					// Enable enemy redstone
+					town.setIsEnemyRedstoneAllowed(true);
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_ENABLE.getMessage(town.getName()));
+				}
+				result = true;
 				break;
 			default:
 				break;
@@ -1449,7 +1469,7 @@ public class KingdomManager {
 	 * @param player
 	 * @return
 	 */
-	public HashMap<Location,Color> getBorderLocationMap(ArrayList<Chunk> renderChunks, KonPlayer player) {
+	/*public HashMap<Location,Color> getBorderLocationMap(ArrayList<Chunk> renderChunks, KonPlayer player) {
 		//TODO: Poor coding style, optimize with a general FOR loop
 		HashMap<Location,Color> locationMap = new HashMap<Location,Color>();
 		// Evaluate every chunk in the provided list. If it's claimed, check each adjacent chunk and determine border locations
@@ -1477,7 +1497,7 @@ public class KingdomManager {
 				int y_max;
 				double y_mod;
 				final int Y_MIN_LIMIT = 1;
-				final int Y_MAX_LIMIT = 256;
+				final int Y_MAX_LIMIT = 255;
 				final double X_MOD = 0.5;
 				final double Y_MOD = 1;
 				final double Y_MOD_SNOW = 1.1;
@@ -1491,6 +1511,8 @@ public class KingdomManager {
 					y_max = 0;
 					for(int x = 0;x<16;x++) {
 						y_max = chunkSnap.getHighestBlockYAt(x, z_fixed);
+						y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
+						y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
 						while((chunk.getBlock(x, y_max, z_fixed).isPassable() || !chunk.getBlock(x, y_max, z_fixed).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
 							y_max--;
 						}
@@ -1519,6 +1541,8 @@ public class KingdomManager {
 					y_max = 0;
 					for(int x = 0;x<16;x++) {
 						y_max = chunkSnap.getHighestBlockYAt(x, z_fixed);
+						y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
+						y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
 						while((chunk.getBlock(x, y_max, z_fixed).isPassable() || !chunk.getBlock(x, y_max, z_fixed).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
 							y_max--;
 						}
@@ -1547,6 +1571,8 @@ public class KingdomManager {
 					y_max = 0;
 					for(int z = 0;z<16;z++) {
 						y_max = chunkSnap.getHighestBlockYAt(x_fixed, z);
+						y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
+						y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
 						while((chunk.getBlock(x_fixed, y_max, z).isPassable() || !chunk.getBlock(x_fixed, y_max, z).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
 							y_max--;
 						}
@@ -1575,6 +1601,8 @@ public class KingdomManager {
 					y_max = 0;
 					for(int z = 0;z<16;z++) {
 						y_max = chunkSnap.getHighestBlockYAt(x_fixed, z);
+						y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
+						y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
 						while((chunk.getBlock(x_fixed, y_max, z).isPassable() || !chunk.getBlock(x_fixed, y_max, z).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
 							y_max--;
 						}
@@ -1598,14 +1626,199 @@ public class KingdomManager {
 		}
 		return locationMap;
 	}
+	*/
+	
+	/**
+	 * 
+	 * @param renderChunks - List of chunks to check for borders
+	 * @param player - Player to render borders for
+	 * @return A map of border particle locations with colors
+	 */
+	public HashMap<Location,Color> getBorderLocationMap(ArrayList<Chunk> renderChunks, KonPlayer player) {
+		HashMap<Location,Color> locationMap = new HashMap<Location,Color>();
+		//Location playerLoc = player.getBukkitPlayer().getLocation();
+		final int Y_MIN_LIMIT = 1;
+		final int Y_MAX_LIMIT = 255;
+		final double X_MOD = 0.5;
+		final double Y_MOD = 1;
+		final double Y_MOD_SNOW = 1.1;
+		final double Z_MOD = 0.5;
+		// Search pattern look-up tables
+		final int[] sideLUTX     = {0,  0,  1, -1};
+		final int[] sideLUTZ     = {1, -1,  0,  0};
+		final int[] blockLUTXmin = {0,  0,  15, 0};
+		final int[] blockLUTXmax = {15, 15, 15, 0};
+		final int[] blockLUTZmin = {15, 0,  0,  0};
+		final int[] blockLUTZmax = {15, 0,  15, 15};
+		// Iterative variables
+		Point sidePoint;
+		boolean isClaimed;
+		int y_max;
+		double y_mod;
+		// Evaluate every chunk in the provided list. If it's claimed, check each adjacent chunk and determine border locations
+		for(Chunk chunk : renderChunks) {
+			Point point = Konquest.toPoint(chunk);
+			World renderWorld = chunk.getWorld();
+			if(isChunkClaimed(point,renderWorld)) {
+				KonKingdom chunkKingdom = getChunkTerritory(point,renderWorld).getKingdom();
+				Location renderLoc;
+				Color renderColor;
+				if(chunkKingdom.equals(getBarbarians())) {
+					renderColor = Color.YELLOW;
+				} else if(chunkKingdom.equals(getNeutrals())) {
+					renderColor = Color.GRAY;
+				} else {
+					if(player.getKingdom().equals(chunkKingdom)) {
+						renderColor = Color.GREEN;
+					} else {
+						renderColor = Color.RED;
+					}
+				}
+				// Iterate all 4 sides of the chunk
+				// x+0,z+1 side: traverse x 0 -> 15 when z is 15
+				// x+0,z-1 side: traverse x 0 -> 15 when z is 0
+				// x+1,z+0 side: traverse z 0 -> 15 when x is 15
+				// x-1,z+0 side: traverse z 0 -> 15 when x is 0
+				for(int i = 0; i < 4; i++) {
+					sidePoint = new Point(point.x + sideLUTX[i], point.y + sideLUTZ[i]);
+					isClaimed = isChunkClaimed(sidePoint,renderWorld);
+					if(!isClaimed || (isClaimed && !getChunkTerritory(sidePoint,renderWorld).getKingdom().equals(chunkKingdom))) {
+						// This side of the render chunk is a border
+						ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
+						y_max = 0;
+						for(int x = blockLUTXmin[i]; x <= blockLUTXmax[i]; x++) {
+							for(int z = blockLUTZmin[i]; z <= blockLUTZmax[i]; z++) {
+								// Determine Y level of border
+								y_max = chunkSnap.getHighestBlockYAt(x, z);
+								y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
+								y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
+								// Descend through passable blocks like grass, non-occluding blocks like leaves
+								while((chunk.getBlock(x, y_max, z).isPassable() || !chunk.getBlock(x, y_max, z).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
+									y_max--;
+								}
+								// Ascend through liquids
+								while(chunk.getBlock(x, y_max+1, z).isLiquid() && y_max < Y_MAX_LIMIT) {
+									y_max++;
+								}
+								// Increase Y a little when there's snow on the border
+								Block renderBlock = chunk.getBlock(x, y_max, z);
+								Block aboveBlock = chunk.getBlock(x, y_max+1, z);
+								y_mod = Y_MOD;
+								if(aboveBlock.getBlockData() instanceof Snow) {
+									Snow snowBlock = (Snow)aboveBlock.getBlockData();
+									if(snowBlock.getLayers() >= snowBlock.getMinimumLayers()) {
+										y_mod = Y_MOD_SNOW;
+									}
+								}
+								// Add border location
+								renderLoc = new Location(renderBlock.getWorld(),renderBlock.getLocation().getX()+X_MOD,renderBlock.getLocation().getY()+y_mod,renderBlock.getLocation().getZ()+Z_MOD);
+								locationMap.put(renderLoc, renderColor);
+							}
+						}
+					}
+				}
+			}
+		}
+		return locationMap;
+	}
+	
+	public HashMap<Location,Color> getPlotBorderLocationMap(ArrayList<Chunk> renderChunks, KonPlayer player) {
+		HashMap<Location,Color> locationMap = new HashMap<Location,Color>();
+		final int Y_MIN_LIMIT = 1;
+		final int Y_MAX_LIMIT = 255;
+		final double X_MOD = 0.5;
+		final double Y_MOD = 1;
+		final double Y_MOD_SNOW = 1.1;
+		final double Z_MOD = 0.5;
+		// Search pattern look-up tables
+		final int[] sideLUTX     = {0,  0,  1, -1};
+		final int[] sideLUTZ     = {1, -1,  0,  0};
+		final int[] blockLUTXmin = {0,  0,  15, 0};
+		final int[] blockLUTXmax = {15, 15, 15, 0};
+		final int[] blockLUTZmin = {15, 0,  0,  0};
+		final int[] blockLUTZmax = {15, 0,  15, 15};
+		// Iterative variables
+		Point sidePoint;
+		boolean isClaimed;
+		boolean isPlot;
+		int y_max;
+		double y_mod;
+		KonTerritory territory;
+		KonTown town;
+		KonPlot chunkPlot;
+		Location renderLoc;
+		Color renderColor;
+		// Evaluate every chunk in the provided list. If it's claimed and a town plot, check each adjacent chunk and determine border locations
+		for(Chunk chunk : renderChunks) {
+			Point point = Konquest.toPoint(chunk);
+			World renderWorld = chunk.getWorld();
+			if(isChunkClaimed(point,renderWorld)) {
+				territory = getChunkTerritory(point,renderWorld);
+				if(territory.getKingdom().equals(player.getKingdom()) && territory instanceof KonTown && ((KonTown)territory).hasPlot(point,renderWorld)) {
+					// This render chunk is a friendly town plot
+					town = ((KonTown)territory);
+					chunkPlot = town.getPlot(point,renderWorld);
+					renderColor = Color.ORANGE;
+					if(chunkPlot != null && chunkPlot.hasUser(player.getOfflineBukkitPlayer())) {
+						renderColor = Color.LIME;
+					}
+					// Iterate all 4 sides of the chunk
+					// x+0,z+1 side: traverse x 0 -> 15 when z is 15
+					// x+0,z-1 side: traverse x 0 -> 15 when z is 0
+					// x+1,z+0 side: traverse z 0 -> 15 when x is 15
+					// x-1,z+0 side: traverse z 0 -> 15 when x is 0
+					for(int i = 0; i < 4; i++) {
+						sidePoint = new Point(point.x + sideLUTX[i], point.y + sideLUTZ[i]);
+						isClaimed = isChunkClaimed(sidePoint,renderWorld);
+						isPlot = town.hasPlot(sidePoint,renderWorld);
+						if(!isClaimed || (isClaimed && !isPlot) || (isClaimed && isPlot && !chunkPlot.equals(town.getPlot(sidePoint,renderWorld)))) {
+							// This side of the render chunk is a border
+							ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
+							y_max = 0;
+							for(int x = blockLUTXmin[i]; x <= blockLUTXmax[i]; x++) {
+								for(int z = blockLUTZmin[i]; z <= blockLUTZmax[i]; z++) {
+									// Determine Y level of border
+									y_max = chunkSnap.getHighestBlockYAt(x, z);
+									y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
+									y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
+									// Descend through passable blocks like grass, non-occluding blocks like leaves
+									while((chunk.getBlock(x, y_max, z).isPassable() || !chunk.getBlock(x, y_max, z).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
+										y_max--;
+									}
+									// Ascend through liquids
+									while(chunk.getBlock(x, y_max+1, z).isLiquid() && y_max < Y_MAX_LIMIT) {
+										y_max++;
+									}
+									// Increase Y a little when there's snow on the border
+									Block renderBlock = chunk.getBlock(x, y_max, z);
+									Block aboveBlock = chunk.getBlock(x, y_max+1, z);
+									y_mod = Y_MOD;
+									if(aboveBlock.getBlockData() instanceof Snow) {
+										Snow snowBlock = (Snow)aboveBlock.getBlockData();
+										if(snowBlock.getLayers() >= snowBlock.getMinimumLayers()) {
+											y_mod = Y_MOD_SNOW;
+										}
+									}
+									// Add border location
+									renderLoc = new Location(renderBlock.getWorld(),renderBlock.getLocation().getX()+X_MOD,renderBlock.getLocation().getY()+y_mod,renderBlock.getLocation().getZ()+Z_MOD);
+									locationMap.put(renderLoc, renderColor);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return locationMap;
+	}
 	
 	public void updatePlayerBorderParticles(KonPlayer player, Location loc) {
-    	if(player != null) {
+    	if(player != null && player.isBorderDisplay()) {
 			// Border particle update
 			ArrayList<Chunk> nearbyChunks = konquest.getAreaChunks(loc, 2);
 			boolean isTerritoryNearby = false;
 			for(Chunk chunk : nearbyChunks) {
-				if(isChunkClaimed(konquest.toPoint(chunk),chunk.getWorld())) {
+				if(isChunkClaimed(Konquest.toPoint(chunk),chunk.getWorld())) {
 					isTerritoryNearby = true;
 					break;
 				}
@@ -1618,6 +1831,9 @@ public class KingdomManager {
 				HashMap<Location,Color> borderTerritoryMap = getBorderLocationMap(nearbyChunks, player);
 	    		player.removeAllBorders();
 	    		player.addTerritoryBorders(borderTerritoryMap);
+	    		HashMap<Location,Color> plotBorderTerritoryMap = getPlotBorderLocationMap(nearbyChunks, player);
+	    		player.removeAllPlotBorders();
+	    		player.addTerritoryPlotBorders(plotBorderTerritoryMap);
 	        	borderTimer.startLoopTimer(10);
 			} else {
 				// Player is not nearby a territory, stop rendering
@@ -1832,6 +2048,9 @@ public class KingdomManager {
 		            	// Set open flag
 		            	boolean isOpen = townSection.getBoolean("open",false);
 		            	town.setIsOpen(isOpen);
+		            	// Set plot flag
+		            	boolean isPlotOnly = townSection.getBoolean("plot",false);
+		            	town.setIsPlotOnly(isPlotOnly);
 		            	// Set redstone flag
 		            	boolean isRedstone = townSection.getBoolean("redstone",false);
 		            	town.setIsEnemyRedstoneAllowed(isRedstone);
@@ -1876,6 +2095,22 @@ public class KingdomManager {
 		            	}
 		            	// Update upgrade status
 		            	konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
+		            	// Create plots
+		            	if(townSection.contains("plots")) {
+		            		for(String plotIndex : townSection.getConfigurationSection("plots").getKeys(false)) {
+		            			//ChatUtil.printDebug("Creating plot "+plotIndex+" for town "+town.getName());
+		            			HashSet<Point> points = new HashSet<Point>();
+		            			points.addAll(konquest.formatStringToPoints(townSection.getString("plots."+plotIndex+".chunks")));
+		            			ArrayList<UUID> users = new ArrayList<UUID>();
+		            			for(String user : townSection.getStringList("plots."+plotIndex+".members")) {
+		            				users.add(UUID.fromString(user));
+		            			}
+		            			KonPlot plot = new KonPlot(points,users);
+		            			if(!konquest.getPlotManager().addPlot(town, plot)) {
+		            				ChatUtil.printConsoleError("Failed to add incompatible plot to town "+town.getName());
+		            			}
+		            		}
+		            	}
 	        			// Update loading bar
 		            	loadBar.addProgress(1);
             		} else {
@@ -1938,6 +2173,7 @@ public class KingdomManager {
 						 									 (int) town.getCenterLoc().getBlockZ()});
                 townInstanceSection.set("chunks", konquest.formatPointsToString(town.getChunkList().keySet()));
                 townInstanceSection.set("open", town.isOpen());
+                townInstanceSection.set("plot", town.isPlotOnly());
                 townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());
                 townInstanceSection.set("shield", town.isShielded());
                 townInstanceSection.set("shield_time", town.getShieldEndTime());
@@ -1971,6 +2207,14 @@ public class KingdomManager {
                 		townInstanceUpgradeSection.set(upgrade.toString(), level);
                 	}
                 }
+                ConfigurationSection townInstancePlotSection = townInstanceSection.createSection("plots");
+                int plotIndex = 0;
+                for(KonPlot plot : town.getPlots()) {
+                	ConfigurationSection plotInstanceSection = townInstancePlotSection.createSection("plot_"+plotIndex);
+                	plotInstanceSection.set("chunks", konquest.formatPointsToString(plot.getPoints()));
+                	plotInstanceSection.set("members",plot.getUserStrings());
+                	plotIndex++;
+                }
             }
 		}
 		ChatUtil.printDebug("Saved Kingdoms");
@@ -1983,7 +2227,7 @@ public class KingdomManager {
 	public void printPlayerMap(KonPlayer player, int mapSize, Location center) {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Generate Map
-    	Point originPoint = konquest.toPoint(center);
+    	Point originPoint = Konquest.toPoint(center);
     	String mapWildSymbol = "-"; // "\u25A2";// empty square "-";
     	String mapTownSymbol = "+"; // "\u25A4";// plus in square "+";
     	String mapCampSymbol = "="; // "\u25A7";// minus in square "=";

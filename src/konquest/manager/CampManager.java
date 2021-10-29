@@ -71,8 +71,14 @@ public class CampManager {
 	 * 					1 = camp init claims overlap with existing territory
 	 * 					2 = camp already exists for player
 	 * 					3 = player is not a barbarian
+	 * 					4 = camps are disabled
 	 */
 	public int addCamp(Location loc, KonOfflinePlayer player) {
+		boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.enable",true);
+		if(!enable) {
+			ChatUtil.printDebug("Failed to add camp, feature disabled!");
+			return 4;
+		}
 		String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
 		//ChatUtil.printDebug("Attempting to add new Camp for player "+player.getOfflineBukkitPlayer().getName()+" "+uuid);
 		if(!player.isBarbarian()) {
@@ -369,7 +375,12 @@ public class CampManager {
 	}
 	
 	private void loadCamps() {
-    	FileConfiguration campsConfig = konquest.getConfigManager().getConfig("camps");
+		boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.enable",true);
+		if(!enable) {
+			ChatUtil.printConsoleAlert("Disabled barbarian camps");
+			return;
+		}
+		FileConfiguration campsConfig = konquest.getConfigManager().getConfig("camps");
         if (campsConfig.get("camps") == null) {
         	ChatUtil.printDebug("There is no camps section in camps.yml");
             return;

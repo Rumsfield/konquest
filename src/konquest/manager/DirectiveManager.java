@@ -16,7 +16,6 @@ import konquest.model.KonDirective;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 public class DirectiveManager {
 	
@@ -73,16 +72,8 @@ public class DirectiveManager {
 					// Give reward
 					ChatUtil.printDebug("Directive rewarded to player "+player.getBukkitPlayer().getName()+" for directive "+directive.title());
 					double reward = rewardTable.get(directive);
-					EconomyResponse r = KonquestPlugin.depositPlayer(player.getBukkitPlayer(), reward);
-		            if(r.transactionSuccess()) {
-		            	String balanceF = String.format("%.2f",r.balance);
-		            	String amountF = String.format("%.2f",r.amount);
-		            	//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+directive.title()+ChatColor.RESET+" "+ChatColor.WHITE+"Favor rewarded: "+ChatColor.DARK_GREEN+amountF+ChatColor.WHITE+", total: "+ChatColor.DARK_GREEN+balanceF);
+		            if(KonquestPlugin.depositPlayer(player.getBukkitPlayer(), reward)) {
 		            	ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_QUEST.getMessage()+": "+ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+directive.title());
-		            	ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REWARD_FAVOR.getMessage(amountF,balanceF));
-		            } else {
-		            	//ChatUtil.sendError(player.getBukkitPlayer(), String.format("An error occured: %s", r.errorMessage));
-		            	ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(r.errorMessage));
 		            }
 				}
 			} else {

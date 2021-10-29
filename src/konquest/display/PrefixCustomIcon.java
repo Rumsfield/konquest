@@ -2,7 +2,7 @@ package konquest.display;
 
 import java.util.List;
 
-import org.bukkit.ChatColor;
+//import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import konquest.model.KonCustomPrefix;
+import konquest.utility.ChatUtil;
 
 public class PrefixCustomIcon implements MenuIcon {
 
@@ -41,7 +42,8 @@ public class PrefixCustomIcon implements MenuIcon {
 		if(isClickable) {
 			item.setType(Material.GOLD_BLOCK);
 		}
-		String displayName = ChatColor.translateAlternateColorCodes('&', prefix.getName());
+		//String displayName = ChatColor.translateAlternateColorCodes('&', prefix.getName());
+		String displayName = ChatUtil.parseHex(prefix.getName());
 		meta.setDisplayName(displayName);
 		meta.setLore(lore);
 		item.setItemMeta(meta);
