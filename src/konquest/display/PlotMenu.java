@@ -157,7 +157,7 @@ public class PlotMenu {
 					//loreList.add(ChatColor.GOLD+""+drawPoint.x+","+drawPoint.y);
 			    	boolean isClickable = false;
 					Material landMat = Material.GREEN_STAINED_GLASS_PANE;
-					String landTitle = ChatColor.GREEN+MessagePath.MENU_PLOTS_TOWN_LAND.getMessage()+" - "+drawPoint.x+","+drawPoint.y;
+					String landTitle = ChatColor.GREEN+MessagePath.MENU_PLOTS_TOWN_LAND.getMessage()+" | "+drawPoint.x+","+drawPoint.y;
 					boolean isPlot = false;
 					// Render all town land, then plots, then remove oldPlot if exist, then render editPlot if exist.
 					// Draw different plots in a sequence of stained glass pane colors.
@@ -176,7 +176,7 @@ public class PlotMenu {
 								colorSelect = 0;
 							}
 						}
-						landTitle = ChatColor.LIGHT_PURPLE+MessagePath.LABEL_PLOT.getMessage()+" - "+drawPoint.x+","+drawPoint.y;
+						landTitle = ChatColor.LIGHT_PURPLE+MessagePath.LABEL_PLOT.getMessage()+" | "+drawPoint.x+","+drawPoint.y;
 						// Display plot player list in lore
 						if(drawPlot != null) {
 							List<OfflinePlayer> users = drawPlot.getUserOfflinePlayers();
@@ -198,14 +198,14 @@ public class PlotMenu {
 					// Remove plot render if tile belongs to oldPlot
 					if(oldPlot != null && oldPlot.hasPoint(drawPoint)) {
 						landMat = Material.GREEN_STAINED_GLASS_PANE;
-						landTitle = ChatColor.GREEN+MessagePath.MENU_PLOTS_TOWN_LAND.getMessage()+" - "+drawPoint.x+","+drawPoint.y;
+						landTitle = ChatColor.GREEN+MessagePath.MENU_PLOTS_TOWN_LAND.getMessage()+" | "+drawPoint.x+","+drawPoint.y;
 						loreList.clear();
 						isPlot = false;
 					}
 					// Add render for editPloy
 					if(editPlot != null && editPlot.hasPoint(drawPoint)) {
 						landMat = Material.GLASS_PANE;
-						landTitle = ChatColor.WHITE+MessagePath.MENU_PLOTS_EDITING_PLOT.getMessage()+" - "+drawPoint.x+","+drawPoint.y;
+						landTitle = ChatColor.WHITE+MessagePath.MENU_PLOTS_EDITING_PLOT.getMessage()+" | "+drawPoint.x+","+drawPoint.y;
 						isPlot = true;
 					}
 					// Add context tips to lore
@@ -233,13 +233,13 @@ public class PlotMenu {
 					if(Konquest.toPoint(town.getCenterLoc()).equals(drawPoint)) {
 						isClickable = false;
 						loreList.clear();
-						loreList.add(ChatColor.GREEN+MessagePath.MENU_PLOTS_TOWN_MONUMENT.getMessage());
+						loreList.add(ChatColor.YELLOW+MessagePath.MENU_PLOTS_TOWN_MONUMENT.getMessage());
 						landMat = Material.OBSIDIAN;
 					}
 					// Add other info to lore
 					if(Konquest.toPoint(playerLoc).equals(drawPoint)) {
 						//landMat = Material.PLAYER_HEAD;
-						loreList.add(ChatColor.GREEN+MessagePath.MENU_PLOTS_HERE.getMessage());
+						loreList.add(ChatColor.YELLOW+MessagePath.MENU_PLOTS_HERE.getMessage());
 					}
 					// Build icon and add to menu view
 					icon = new InfoIcon(landTitle,loreList,landMat,index,isClickable);
