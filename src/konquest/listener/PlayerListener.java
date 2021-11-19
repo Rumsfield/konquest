@@ -211,6 +211,7 @@ public class PlayerListener implements Listener{
         //Check if the event was caused by a player
         if(event.isAsynchronous() && !event.isCancelled()) {
         	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.enable_format",true);
+        	boolean formatName = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.name_team_color",true);
         	if(enable) {
 	        	// Format chat messages
         		Player bukkitPlayer = event.getPlayer();
@@ -258,7 +259,8 @@ public class PlayerListener implements Listener{
 	            						title,
 	            						name,
 	            						teamColor,
-	            						titleColor) +
+	            						titleColor,
+	            						formatName) +
 	        					Konquest.chatDivider + ChatColor.RESET + " " + event.getMessage());
 	            	}
 	            } else {
@@ -274,7 +276,8 @@ public class PlayerListener implements Listener{
 		            						title,
 		            						name,
 		            						ChatColor.GREEN,
-		            						ChatColor.GREEN) +
+		            						ChatColor.GREEN,
+		            						true) +
 		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
 	            		} else if(teamPlayer.isAdminBypassActive()) {
 	            			teamPlayer.getBukkitPlayer().sendMessage(
@@ -285,7 +288,8 @@ public class PlayerListener implements Listener{
 		            						title,
 		            						name,
 		            						ChatColor.GOLD,
-		            						ChatColor.GOLD) +
+		            						ChatColor.GOLD,
+		            						true) +
 		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
 	            		}
 	            	}
