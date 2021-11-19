@@ -522,78 +522,90 @@ public class PlayerListener implements Listener{
             event.setCancelled(true);
         } else {
         	// When a player is not setting regions...
-        	if(!player.isAdminBypassActive() && event.hasBlock() && kingdomManager.isChunkClaimed(event.getClickedBlock().getLocation())) {
-        		KonTerritory territory = kingdomManager.getChunkTerritory(event.getClickedBlock().getLocation());
-        		// Prevent players from interacting with blocks in Capitals
-        		if(territory instanceof KonCapital) {
-        			boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
-        			BlockState clickedState = event.getClickedBlock().getState();
-        			// Allow interaction with signs or everything when config allows it
-        			if(!(clickedState instanceof Sign || clickedState.getType().isInteractable() || isCapitalUseEnabled)) {
-        				//ChatUtil.printDebug("Interaction was not a sign");
-        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-        				if(event.getPlayer().hasPermission("konquest.command.admin")) {
-        					//ChatUtil.sendNotice(bukkitPlayer,"Use \"/k admin bypass\" to ignore capital preventions.");
-        					ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
-        				}
-	        			event.setCancelled(true);
-	        			return;
-        			}
-        		}
-        		// Ruin actions...
-        		if(territory instanceof KonRuin) {
-        			KonRuin ruin = (KonRuin)territory;
-        			// Target player who interacts with critical blocks
-        			if(ruin.isCriticalLocation(event.getClickedBlock().getLocation())) {
-        				ruin.targetAllGolemsToPlayer(bukkitPlayer);
-        				//ChatUtil.printDebug("EVENT player interaction with ruin critical block");
-        			}
-        		}
-        		// Town protections...
-        		if(territory instanceof KonTown) {
-        			KonTown town = (KonTown) territory;
-        			//ChatUtil.printDebug("EVENT player interaction within town "+town.getName());
-        			/*
-        			// Prevent players from interacting by right clicking blocks (like placing buckets) in town monuments
-        			if(event.hasItem() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && 
-        					(event.getItem().getType().equals(Material.LAVA_BUCKET) || event.getItem().getType().equals(Material.WATER_BUCKET)) &&
-        					town.isLocInsideCenterChunk(event.getClickedBlock().getLocation())) {
-        				//ChatUtil.printDebug("EVENT: player interacted with a hand item inside town monument");
-        				//event.setCancelled(true);
-        				event.setUseItemInHand(Result.DENY);
-						return;
-					}
-					*/
-        			// Prevent enemies from interacting with things like buttons, levers, pressure plates...
-        			if(!player.getKingdom().equals(town.getKingdom()) && !town.isEnemyRedstoneAllowed()) {
-        				if(event.getAction().equals(Action.PHYSICAL)) {
-        					// Prevent all physical stepping interaction
-        					event.setUseInteractedBlock(Event.Result.DENY);
-        					//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in enemy Towns", ChatColor.DARK_RED);
-        					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-        				} else if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-	        				// Prevent use of specific usable blocks
-        					BlockData clickedBlockData = event.getClickedBlock().getBlockData();
-	        				if(clickedBlockData instanceof Door ||
-	        						clickedBlockData instanceof Gate ||
-	        						clickedBlockData instanceof Switch ||
-	        						clickedBlockData instanceof TrapDoor) {
+        	if(!player.isAdminBypassActive() && event.hasBlock()) {
+        		// Check for territory
+        		if(kingdomManager.isChunkClaimed(event.getClickedBlock().getLocation())) {
+        			// Interaction occurred within claimed territory
+	        		KonTerritory territory = kingdomManager.getChunkTerritory(event.getClickedBlock().getLocation());
+	        		// Prevent players from interacting with blocks in Capitals
+	        		if(territory instanceof KonCapital) {
+	        			boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
+	        			BlockState clickedState = event.getClickedBlock().getState();
+	        			// Allow interaction with signs or everything when config allows it
+	        			if(!(clickedState instanceof Sign || clickedState.getType().isInteractable() || isCapitalUseEnabled)) {
+	        				//ChatUtil.printDebug("Interaction was not a sign");
+	        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+	        				if(event.getPlayer().hasPermission("konquest.command.admin")) {
+	        					//ChatUtil.sendNotice(bukkitPlayer,"Use \"/k admin bypass\" to ignore capital preventions.");
+	        					ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
+	        				}
+		        			event.setCancelled(true);
+		        			return;
+	        			}
+	        		}
+	        		// Ruin actions...
+	        		if(territory instanceof KonRuin) {
+	        			KonRuin ruin = (KonRuin)territory;
+	        			// Target player who interacts with critical blocks
+	        			if(ruin.isCriticalLocation(event.getClickedBlock().getLocation())) {
+	        				ruin.targetAllGolemsToPlayer(bukkitPlayer);
+	        				//ChatUtil.printDebug("EVENT player interaction with ruin critical block");
+	        			}
+	        		}
+	        		// Town protections...
+	        		if(territory instanceof KonTown) {
+	        			KonTown town = (KonTown) territory;
+	        			//ChatUtil.printDebug("EVENT player interaction within town "+town.getName());
+	        			/*
+	        			// Prevent players from interacting by right clicking blocks (like placing buckets) in town monuments
+	        			if(event.hasItem() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && 
+	        					(event.getItem().getType().equals(Material.LAVA_BUCKET) || event.getItem().getType().equals(Material.WATER_BUCKET)) &&
+	        					town.isLocInsideCenterChunk(event.getClickedBlock().getLocation())) {
+	        				//ChatUtil.printDebug("EVENT: player interacted with a hand item inside town monument");
+	        				//event.setCancelled(true);
+	        				event.setUseItemInHand(Result.DENY);
+							return;
+						}
+						*/
+	        			// Prevent enemies from interacting with things like buttons, levers, pressure plates...
+	        			if(!player.getKingdom().equals(town.getKingdom()) && !town.isEnemyRedstoneAllowed()) {
+	        				if(event.getAction().equals(Action.PHYSICAL)) {
+	        					// Prevent all physical stepping interaction
 	        					event.setUseInteractedBlock(Event.Result.DENY);
 	        					//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in enemy Towns", ChatColor.DARK_RED);
-		        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+	        					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+	        				} else if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+		        				// Prevent use of specific usable blocks
+	        					BlockData clickedBlockData = event.getClickedBlock().getBlockData();
+		        				if(clickedBlockData instanceof Door ||
+		        						clickedBlockData instanceof Gate ||
+		        						clickedBlockData instanceof Switch ||
+		        						clickedBlockData instanceof TrapDoor) {
+		        					event.setUseInteractedBlock(Event.Result.DENY);
+		        					//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in enemy Towns", ChatColor.DARK_RED);
+			        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+		        				}
 	        				}
-        				}
-    				}
-        			// Prevent enemies and non-residents from interacting with item frames
-        			if(!player.getKingdom().equals(town.getKingdom()) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
-        				Material clickedMat = event.getClickedBlock().getType();
-        				//ChatUtil.printDebug("Player identified as enemy or non-resident, clicked block "+clickedMat.toString());
-        				if(clickedMat.equals(Material.ITEM_FRAME)) {
-        					//ChatUtil.printDebug("EVENT: Enemy or non-resident interacted with item frame");
-        					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-        					event.setCancelled(true);
-    						return;
-        				}
+	    				}
+	        			// Prevent enemies and non-residents from interacting with item frames
+	        			if(!player.getKingdom().equals(town.getKingdom()) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+	        				Material clickedMat = event.getClickedBlock().getType();
+	        				//ChatUtil.printDebug("Player identified as enemy or non-resident, clicked block "+clickedMat.toString());
+	        				if(clickedMat.equals(Material.ITEM_FRAME)) {
+	        					//ChatUtil.printDebug("EVENT: Enemy or non-resident interacted with item frame");
+	        					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+	        					event.setCancelled(true);
+	    						return;
+	        				}
+	        			}
+	        		}
+        		} else {
+        			// Interaction occurred in the wild
+        			boolean isWildUse = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.wild_use", true);
+        			if(!isWildUse && event.getClickedBlock().getState().getType().isInteractable()) {
+        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+    					event.setCancelled(true);
+						return;
         			}
         		}
         	}

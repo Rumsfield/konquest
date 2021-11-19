@@ -578,6 +578,7 @@ public class EntityListener implements Listener {
             
             // Check for protections for attacks within claimed territory
             boolean isCapitalDamageEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_pvp", false);
+            boolean isWildDamageEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.wild_pvp", true);
             boolean isAttackInTerritory = konquest.getKingdomManager().isChunkClaimed(victimBukkitPlayer.getLocation());
             if(isAttackInTerritory) {
             	KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(victimBukkitPlayer.getLocation());
@@ -591,6 +592,9 @@ public class EntityListener implements Listener {
             		event.setCancelled(true);
                 	return;
             	}
+            } else if(!isWildDamageEnabled) {
+            	event.setCancelled(true);
+            	return;
             }
             
             // Update egg stat
