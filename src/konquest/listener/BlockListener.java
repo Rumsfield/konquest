@@ -105,6 +105,14 @@ public class BlockListener implements Listener {
 						}
 						// Restrict enemies
 						if(!player.getKingdom().equals(territory.getKingdom())) {
+							// Enemies cannot build in capital
+							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							if(event.getPlayer().hasPermission("konquest.command.admin")) {
+		    					ChatUtil.sendNotice(event.getPlayer(),MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
+		    				}
+							event.setCancelled(true);
+							return;
+							/*
 							// If territory is peaceful, prevent all block damage by enemies
 							if(territory.getKingdom().isPeaceful()) {
 								//ChatUtil.sendNotice(player.getBukkitPlayer(), "This Kingdom of "+town.getKingdom().getName()+" is peaceful! You cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
@@ -137,6 +145,7 @@ public class BlockListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
+							*/
 						}
 					} else {
 						// No building is allowed in capital
@@ -268,8 +277,14 @@ public class BlockListener implements Listener {
 						
 						// If town is armored, damage the armor while preventing block breaks
 						if(town.isArmored()) {
-							town.damageArmor(1);
-							Konquest.playTownArmorSound(event.getPlayer());
+							// Ignore instant-break blocks
+							Material blockMat = event.getBlock().getState().getType();
+							int hardness = (int)blockMat.getHardness();
+							ChatUtil.printDebug("Armor block broke of hardness "+hardness);
+							if(hardness > 0) {
+								town.damageArmor(1);
+								Konquest.playTownArmorSound(event.getPlayer());
+							}
 							event.setCancelled(true);
 							return;
 						}
@@ -490,6 +505,14 @@ public class BlockListener implements Listener {
 						}
 						// Restrict enemies
 						if(!player.getKingdom().equals(territory.getKingdom())) {
+							// Enemies cannot place blocks in capital
+							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							if(event.getPlayer().hasPermission("konquest.command.admin")) {
+		    					ChatUtil.sendNotice(event.getPlayer(),MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
+		    				}
+							event.setCancelled(true);
+							return;
+							/*
 							// If territory is peaceful, prevent all block damage by enemies
 							if(territory.getKingdom().isPeaceful()) {
 								//ChatUtil.sendNotice(player.getBukkitPlayer(), "This Kingdom of "+town.getKingdom().getName()+" is peaceful! You cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
@@ -522,6 +545,7 @@ public class BlockListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
+							*/
 						}
 					} else {
 						// No building is allowed in capital
@@ -930,6 +954,11 @@ public class BlockListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
+					// If piston is outside of territory
+					if(!capital.isLocInside(event.getBlock().getLocation())) {
+						event.setCancelled(true);
+						return;
+					}
 				}
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
@@ -1016,6 +1045,11 @@ public class BlockListener implements Listener {
 					}
 					// Check if block is inside of an offline kingdom's capital
 					if(playerManager.getPlayersInKingdom(capital.getKingdom()).isEmpty()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If piston is outside of territory
+					if(!capital.isLocInside(event.getBlock().getLocation())) {
 						event.setCancelled(true);
 						return;
 					}
