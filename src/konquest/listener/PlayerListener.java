@@ -110,6 +110,7 @@ public class PlayerListener implements Listener{
             		for(String msg : konquest.opStatusMessages) {
             			ChatUtil.sendError(bukkitPlayer, msg);
             		}
+            		konquest.opStatusMessages.clear();
             	}
             	// Messages for town joining
             	for(KonTown town : player.getKingdom().getTowns()) {
