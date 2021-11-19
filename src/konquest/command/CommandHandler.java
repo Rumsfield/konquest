@@ -18,6 +18,7 @@ import konquest.Konquest;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.command.admin.AdminCommand;
+import konquest.command.admin.AdminCommandType;
 
 //public class CommandHandler  implements CommandExecutor {
 public class CommandHandler  implements TabExecutor {
@@ -43,76 +44,90 @@ public class CommandHandler  implements TabExecutor {
             	//Get command type. If args[0] is not a command, defaults to HELP
             	CommandType commandArg = CommandType.getCommand(args[0]);
             	//ChatUtil.printDebug("Command type is "+commandArg.toString());
-            	if (sender.hasPermission(commandArg.permission())) {
-            		switch (commandArg) {
-                    case ADMIN:
-                        new AdminCommand(konquest, sender, args).execute();
-                        break;
-                    case BORDER:
-                        new BorderCommand(konquest, sender, args).execute();
-                        break;
-                    case CHAT:
-                        new ChatCommand(konquest, sender, args).execute();
-                        break;
-                    case CLAIM:
-                        new ClaimCommand(konquest, sender, args).execute();
-                        break;
-                    case EXILE:
-                        new ExileCommand(konquest, sender, args).execute();
-                        break;
-                    case FAVOR:
-                        new FavorCommand(konquest, sender, args).execute();
-                        break;
-                    case FLY:
-                        new FlyCommand(konquest, sender, args).execute();
-                        break;
-                    case INFO:
-                        new InfoCommand(konquest, sender, args).execute();
-                        break;
-                    case JOIN:
-                        new JoinCommand(konquest, sender, args).execute();
-                        break;
-                    case LEAVE:
-                        new LeaveCommand(konquest, sender, args).execute();
-                        break;
-                    case LIST:
-                        new ListCommand(konquest, sender, args).execute();
-                        break;
-                    case MAP:
-                        new MapCommand(konquest, sender, args).execute();
-                        break;
-                    case PREFIX:
-                        new PrefixCommand(konquest, sender, args).execute();
-                        break;
-                    case QUEST:
-                        new QuestCommand(konquest, sender, args).execute();
-                        break;
-                    case SCORE:
-                    	new ScoreCommand(konquest, sender, args).execute();
-                    	break;
-                    case SETTLE:
-                    	new SettleCommand(konquest, sender, args).execute();
-                    	break;
-                    case SPY:
-                    	new SpyCommand(konquest, sender, args).execute();
-                    	break;
-                    case STATS:
-                    	new StatsCommand(konquest, sender, args).execute();
-                    	break;
-                    case TOWN:
-                        new TownCommand(konquest, sender, args).execute();
-                        break;
-                    case TRAVEL:
-                        new TravelCommand(konquest, sender, args).execute();
-                        break;
-                    case HELP:
-                        new HelpCommand(konquest, sender, args).execute();
-                        break;
-                    default:
-                    	return false;
-            		}
+            	// Handle admin commands differently from normal commands
+            	if (commandArg.equals(CommandType.ADMIN)) {
+            		// Command is an admin command
+            		AdminCommandType adminArg = AdminCommandType.getCommand(args[1]);
+            		if (sender.hasPermission(commandArg.permission()) || sender.hasPermission(adminArg.permission())) {
+            			// Sender has permission for this admin command
+            			new AdminCommand(konquest, sender, args).execute();
+            		} else {
+            			// Sender does not have permission for this admin command
+            			ChatUtil.sendError((Player) sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+commandArg.permission());
+            			ChatUtil.sendError((Player) sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+adminArg.permission());
+            		} 
             	} else {
-                    ChatUtil.sendError((Player) sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+commandArg.permission());
+            		// Command is a normal command
+	            	if (sender.hasPermission(commandArg.permission())) {
+	            		// Sender has permission for this command
+	            		switch (commandArg) {
+	                    case BORDER:
+	                        new BorderCommand(konquest, sender, args).execute();
+	                        break;
+	                    case CHAT:
+	                        new ChatCommand(konquest, sender, args).execute();
+	                        break;
+	                    case CLAIM:
+	                        new ClaimCommand(konquest, sender, args).execute();
+	                        break;
+	                    case EXILE:
+	                        new ExileCommand(konquest, sender, args).execute();
+	                        break;
+	                    case FAVOR:
+	                        new FavorCommand(konquest, sender, args).execute();
+	                        break;
+	                    case FLY:
+	                        new FlyCommand(konquest, sender, args).execute();
+	                        break;
+	                    case INFO:
+	                        new InfoCommand(konquest, sender, args).execute();
+	                        break;
+	                    case JOIN:
+	                        new JoinCommand(konquest, sender, args).execute();
+	                        break;
+	                    case LEAVE:
+	                        new LeaveCommand(konquest, sender, args).execute();
+	                        break;
+	                    case LIST:
+	                        new ListCommand(konquest, sender, args).execute();
+	                        break;
+	                    case MAP:
+	                        new MapCommand(konquest, sender, args).execute();
+	                        break;
+	                    case PREFIX:
+	                        new PrefixCommand(konquest, sender, args).execute();
+	                        break;
+	                    case QUEST:
+	                        new QuestCommand(konquest, sender, args).execute();
+	                        break;
+	                    case SCORE:
+	                    	new ScoreCommand(konquest, sender, args).execute();
+	                    	break;
+	                    case SETTLE:
+	                    	new SettleCommand(konquest, sender, args).execute();
+	                    	break;
+	                    case SPY:
+	                    	new SpyCommand(konquest, sender, args).execute();
+	                    	break;
+	                    case STATS:
+	                    	new StatsCommand(konquest, sender, args).execute();
+	                    	break;
+	                    case TOWN:
+	                        new TownCommand(konquest, sender, args).execute();
+	                        break;
+	                    case TRAVEL:
+	                        new TravelCommand(konquest, sender, args).execute();
+	                        break;
+	                    case HELP:
+	                        new HelpCommand(konquest, sender, args).execute();
+	                        break;
+	                    default:
+	                    	return false;
+	            		}
+	            	} else {
+	            		// Sender does not have permission for this command
+	                    ChatUtil.sendError((Player) sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+commandArg.permission());
+	            	}
             	}
         	}
         } else {
@@ -146,7 +161,6 @@ public class CommandHandler  implements TabExecutor {
             		switch (commandArg) {
                     case ADMIN:
                     	tabList.addAll(new AdminCommand(konquest, sender, args).tabComplete());
-                    	//ChatUtil.printDebug("Tab Complete for AdminCommand: "+args.length);
                         break;
                     case BORDER:
                     	tabList.addAll(new BorderCommand(konquest, sender, args).tabComplete());
