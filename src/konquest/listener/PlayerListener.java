@@ -27,6 +27,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Door;
@@ -526,8 +527,9 @@ public class PlayerListener implements Listener{
         		// Prevent players from interacting with blocks in Capitals
         		if(territory instanceof KonCapital) {
         			boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
+        			BlockState clickedState = event.getClickedBlock().getState();
         			// Allow interaction with signs or everything when config allows it
-        			if(!(event.getClickedBlock().getState() instanceof Sign || isCapitalUseEnabled)) {
+        			if(!(clickedState instanceof Sign || clickedState.getType().isInteractable() || isCapitalUseEnabled)) {
         				//ChatUtil.printDebug("Interaction was not a sign");
         				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
         				if(event.getPlayer().hasPermission("konquest.command.admin")) {
