@@ -234,6 +234,7 @@ public class BlockListener implements Listener {
 						// Update MonumentBar state
 						town.setAttacked(true);
 						town.updateBar();
+						town.applyGlow(event.getPlayer());
 						
 						// If town is shielded, prevent all enemy block edits
 						if(town.isShielded()) {

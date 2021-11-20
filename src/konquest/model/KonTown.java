@@ -28,6 +28,8 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 
 /**
@@ -697,6 +699,11 @@ public class KonTown extends KonTerritory implements Timeable{
 			result = true;
 		}
 		return result;
+	}
+	
+	public void applyGlow(Player bukkitPlayer) {
+		bukkitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*3, 1));
+		ChatUtil.printDebug("Applied glowing to "+bukkitPlayer.getName()+",: "+bukkitPlayer.isGlowing());
 	}
 	
 	public void setIsOpen(boolean val) {
