@@ -235,6 +235,8 @@ public class BlockListener implements Listener {
 						town.setAttacked(true);
 						town.updateBar();
 						town.applyGlow(event.getPlayer());
+						// Attempt to start a raid alert
+						town.sendRaidAlert();
 						
 						// If town is shielded, prevent all enemy block edits
 						if(town.isShielded()) {
@@ -248,7 +250,7 @@ public class BlockListener implements Listener {
 							// Ignore instant-break blocks
 							Material blockMat = event.getBlock().getState().getType();
 							int hardness = (int)blockMat.getHardness();
-							ChatUtil.printDebug("Armor block broke of hardness "+hardness);
+							ChatUtil.printDebug("Armor block broke of hardness "+blockMat.getHardness());
 							if(hardness > 0) {
 								town.damageArmor(1);
 								Konquest.playTownArmorSound(event.getPlayer());
