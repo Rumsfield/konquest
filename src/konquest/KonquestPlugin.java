@@ -189,16 +189,21 @@ public class KonquestPlugin extends JavaPlugin {
 		for(PermissionAttachmentInfo p : bukkitPlayer.getEffectivePermissions()) {
 			String perm = p.getPermission();
 			if(perm.contains("konquest.discount")) {
-				String valStr = perm.split("\\.",3)[2];
-				//ChatUtil.printDebug("Withdraw discount found: "+valStr);
-				int valNum = 0;
-				try {
-        			valNum = Integer.parseInt(valStr);
-        		} catch(NumberFormatException e) {
-        			ChatUtil.printDebug("Failed to parse discount value");
-        		}
-				if(valNum > discount) {
-					discount = valNum;
+				String[] permArr = perm.split("\\.",3);
+				if(permArr.length == 3) {
+					String valStr = permArr[2];
+					//ChatUtil.printDebug("Withdraw discount found: "+valStr);
+					int valNum = 0;
+					try {
+	        			valNum = Integer.parseInt(valStr);
+	        		} catch(NumberFormatException e) {
+	        			ChatUtil.printDebug("Failed to parse discount value");
+	        		}
+					if(valNum > discount) {
+						discount = valNum;
+					}
+				} else {
+					ChatUtil.printDebug("Failed to parse malformed discount permission: "+perm);
 				}
 			}
 		}
