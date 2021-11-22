@@ -154,15 +154,22 @@ public class CommandHandler  implements TabExecutor {
 		if (sender.hasPermission("konquest.command")) {
 			//ChatUtil.printDebug("Entering onTabComplete, length: "+args.length+", args: "+String.join(",",args));
         	if (args.length == 1) {
+        		List<String> baseList = new ArrayList<>();
         		for(CommandType cmd : CommandType.values()) {
-        			if(sender.hasPermission(cmd.permission())) {
-        				List<String> baseList = new ArrayList<>();
-            			baseList.add(cmd.toString().toLowerCase());
-            			// Trim down completion options based on current input
-            			StringUtil.copyPartialMatches(args[0], baseList, tabList);
-            			Collections.sort(tabList);
+        			String suggestion = cmd.toString().toLowerCase();
+        			if(cmd.equals(CommandType.ADMIN)) {
+        				for(AdminCommandType subcmd : AdminCommandType.values()) {
+        					if((sender.hasPermission(cmd.permission()) || sender.hasPermission(subcmd.permission())) && !baseList.contains(suggestion)) {
+        						baseList.add(suggestion);
+        					}
+        				}
+        			} else if(sender.hasPermission(cmd.permission())) {
+        				baseList.add(suggestion);
         			}
         		}
+    			// Trim down completion options based on current input
+    			StringUtil.copyPartialMatches(args[0], baseList, tabList);
+    			Collections.sort(tabList);
         		//ChatUtil.printDebug("Tab Complete for 0 args: "+args.length);
         	} else if(args.length >= 1){
             	//Get command type. If args[0] is not a command, defaults to HELP

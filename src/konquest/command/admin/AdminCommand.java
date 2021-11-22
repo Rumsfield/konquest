@@ -106,7 +106,9 @@ public class AdminCommand extends CommandBase {
         if (getArgs().length == 2) {
         	List<String> baseList = new ArrayList<>();
         	for(AdminCommandType cmd : AdminCommandType.values()) {
-        		baseList.add(cmd.toString().toLowerCase());
+        		if(getSender().hasPermission(cmd.permission())) {
+        			baseList.add(cmd.toString().toLowerCase());
+        		}
     		}
         	// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[1], baseList, tabList);
