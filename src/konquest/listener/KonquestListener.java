@@ -27,6 +27,8 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 
 public class KonquestListener implements Listener {
@@ -44,6 +46,17 @@ public class KonquestListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onKonquestEnterTerritory(KonquestEnterTerritoryEvent event) {
 		//ChatUtil.printDebug("EVENT: Player "+event.getPlayer().getBukkitPlayer().getDisplayName()+" entered new territory");
+		// Check for ender pearl from enemy
+		boolean isEnemyPearlAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_ender_pearl", false);
+		if(event.getMoveEvent() instanceof PlayerTeleportEvent) {
+			PlayerTeleportEvent tpEvent = (PlayerTeleportEvent)event.getMoveEvent();
+			if(!isEnemyPearlAllowed && tpEvent.getCause().equals(TeleportCause.ENDER_PEARL) && !event.getPlayer().getKingdom().equals(event.getTerritory().getKingdom())) {
+				ChatUtil.sendKonPriorityTitle(event.getPlayer(), "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				event.setCancelled(true);
+				return;
+			}
+		}
+		
 		// When territory is a capital
 		if(event.getTerritory() instanceof KonCapital) {
 			// Optionally prevent players from entering

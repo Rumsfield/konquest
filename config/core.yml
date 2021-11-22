@@ -47,6 +47,7 @@
 #    no_enemy_edit_offline:         Prevent enemy players from breaking any blocks in a Kingdom with no players online (true/false)
 #    no_enemy_edit_offline_warmup:  Time in seconds when a Kingdom is protected from when the minimum player disconnects (integer >= 0)
 #    no_enemy_edit_offline_minimum: Number of players required for a Kingdom to be protected (integer >= 0)
+#    no_enemy_ender_pearl:          Prevent enemy players from throwing ender pearls into kingdom territory (true/false)
 #    smallest_exp_boost_percent:    Percentage boost EXP gain for the smallest kingdom (0 to disable, 0 - 100)
 #    offline_timeout_days:          Time in days a player must be offline to be inactive, and removed from towns and camps (0 to disable, integer >= 0)
 #    offline_timeout_exile:         Remove inactive players from their kingdoms and exile them as barbarians (true/false)
@@ -186,6 +187,7 @@ core:
     no_enemy_edit_offline: true
     no_enemy_edit_offline_warmup: 300
     no_enemy_edit_offline_minimum: 2
+    no_enemy_ender_pearl: false
     smallest_exp_boost_percent: 25
     offline_timeout_days: 0
     offline_timeout_exile: false
