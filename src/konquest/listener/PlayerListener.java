@@ -88,7 +88,7 @@ public class PlayerListener implements Listener{
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerJoin(PlayerJoinEvent event) {
-    	ChatUtil.printDebug("EVENT: Player Joined");
+    	//ChatUtil.printDebug("EVENT: Player Joined");
     	Player bukkitPlayer = event.getPlayer();
     	KonPlayer player = konquest.initPlayer(bukkitPlayer);
     	// Schedule messages to display after 10-tick delay (0.5 second)
@@ -536,15 +536,8 @@ public class PlayerListener implements Listener{
 	        			boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
 	        			BlockState clickedState = event.getClickedBlock().getState();
 	        			// Allow interaction with signs or everything when config allows it
-	        			if(!(clickedState instanceof Sign || clickedState.getType().isInteractable() || isCapitalUseEnabled)) {
-	        				//ChatUtil.printDebug("Interaction was not a sign");
-	        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-	        				if(event.getPlayer().hasPermission("konquest.command.admin")) {
-	        					//ChatUtil.sendNotice(bukkitPlayer,"Use \"/k admin bypass\" to ignore capital preventions.");
-	        					ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
-	        				}
-		        			event.setCancelled(true);
-		        			return;
+	        			if(!(clickedState instanceof Sign || isCapitalUseEnabled)) {
+	        				preventUse(event,player);
 	        			}
 	        		}
 	        		// Ruin actions...
@@ -560,36 +553,9 @@ public class PlayerListener implements Listener{
 	        		if(territory instanceof KonTown) {
 	        			KonTown town = (KonTown) territory;
 	        			//ChatUtil.printDebug("EVENT player interaction within town "+town.getName());
-	        			/*
-	        			// Prevent players from interacting by right clicking blocks (like placing buckets) in town monuments
-	        			if(event.hasItem() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && 
-	        					(event.getItem().getType().equals(Material.LAVA_BUCKET) || event.getItem().getType().equals(Material.WATER_BUCKET)) &&
-	        					town.isLocInsideCenterChunk(event.getClickedBlock().getLocation())) {
-	        				//ChatUtil.printDebug("EVENT: player interacted with a hand item inside town monument");
-	        				//event.setCancelled(true);
-	        				event.setUseItemInHand(Result.DENY);
-							return;
-						}
-						*/
 	        			// Prevent enemies from interacting with things like buttons, levers, pressure plates...
 	        			if(!player.getKingdom().equals(town.getKingdom()) && !town.isEnemyRedstoneAllowed()) {
-	        				if(event.getAction().equals(Action.PHYSICAL)) {
-	        					// Prevent all physical stepping interaction
-	        					event.setUseInteractedBlock(Event.Result.DENY);
-	        					//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in enemy Towns", ChatColor.DARK_RED);
-	        					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-	        				} else if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-		        				// Prevent use of specific usable blocks
-	        					BlockData clickedBlockData = event.getClickedBlock().getBlockData();
-		        				if(clickedBlockData instanceof Door ||
-		        						clickedBlockData instanceof Gate ||
-		        						clickedBlockData instanceof Switch ||
-		        						clickedBlockData instanceof TrapDoor) {
-		        					event.setUseInteractedBlock(Event.Result.DENY);
-		        					//ChatUtil.sendNotice(player.getBukkitPlayer(), "You cannot do that in enemy Towns", ChatColor.DARK_RED);
-			        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-		        				}
-	        				}
+	        				preventUse(event,player);
 	    				}
 	        			// Prevent enemies and non-residents from interacting with item frames
 	        			if(!player.getKingdom().equals(town.getKingdom()) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
@@ -606,10 +572,8 @@ public class PlayerListener implements Listener{
         		} else {
         			// Interaction occurred in the wild
         			boolean isWildUse = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.wild_use", true);
-        			if(!isWildUse && event.getClickedBlock().getState().getType().isInteractable()) {
-        				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-    					event.setCancelled(true);
-						return;
+        			if(!isWildUse) {
+        				preventUse(event,player);
         			}
         		}
         	}
@@ -1419,6 +1383,30 @@ public class PlayerListener implements Listener{
     			player.getBukkitPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plotMessageColor+plotMessage));
     		}
     	}
+    }
+    
+    private void preventUse(PlayerInteractEvent event, KonPlayer player) {
+    	if(event.getAction().equals(Action.PHYSICAL)) {
+			// Prevent all physical stepping interaction
+			event.setUseInteractedBlock(Event.Result.DENY);
+			ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+		} else if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+			// Prevent use of specific usable blocks
+			BlockData clickedBlockData = event.getClickedBlock().getBlockData();
+			if(clickedBlockData instanceof Door ||
+					clickedBlockData instanceof Gate ||
+					clickedBlockData instanceof Switch ||
+					clickedBlockData instanceof TrapDoor) {
+				event.setUseInteractedBlock(Event.Result.DENY);
+				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+			} else if(event.getMaterial().isInteractable()) {
+				event.setUseInteractedBlock(Event.Result.DENY);
+				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+			}
+			if(event.getPlayer().hasPermission("konquest.command.admin")) {
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
+			}
+		}
     }
     
 }

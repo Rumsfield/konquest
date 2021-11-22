@@ -249,9 +249,8 @@ public class BlockListener implements Listener {
 						if(town.isArmored()) {
 							// Ignore instant-break blocks
 							Material blockMat = event.getBlock().getState().getType();
-							int hardness = (int)blockMat.getHardness();
-							ChatUtil.printDebug("Armor block broke of hardness "+blockMat.getHardness());
-							if(hardness > 0) {
+							//ChatUtil.printDebug("Armor block broke of hardness "+blockMat.getHardness());
+							if(blockMat.getHardness() > 0) {
 								town.damageArmor(1);
 								Konquest.playTownArmorSound(event.getPlayer());
 							}
