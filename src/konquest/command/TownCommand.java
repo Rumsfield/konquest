@@ -583,10 +583,14 @@ public class TownCommand extends CommandBase {
 		} else if(getArgs().length == 4) {
 			// suggest appropriate arguments
 			String subCommand = getArgs()[2];
+			String name;
 			if(subCommand.equalsIgnoreCase("add") || subCommand.equalsIgnoreCase("kick") || subCommand.equalsIgnoreCase("lord") || subCommand.equalsIgnoreCase("knight")) {
 				List<String> playerList = new ArrayList<>();
 				for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllPlayersInKingdom(player.getKingdom())) {
-					playerList.add(offlinePlayer.getOfflineBukkitPlayer().getName());
+					name = offlinePlayer.getOfflineBukkitPlayer().getName();
+					if(name != null) {
+						playerList.add(name);
+					}
 				}
 				tabList.addAll(playerList);
 				// Trim down completion options based on current input

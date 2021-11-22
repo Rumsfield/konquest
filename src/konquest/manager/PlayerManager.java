@@ -65,6 +65,7 @@ public class PlayerManager {
 		return onlinePlayers.containsKey(bukkitPlayer);
 	}
 	
+	
 	public KonOfflinePlayer getOfflinePlayer(OfflinePlayer offlineBukkitPlayer) {
 		return allPlayers.get(offlineBukkitPlayer);
 	}
@@ -202,7 +203,9 @@ public class PlayerManager {
 			allPlayers.remove(offline);
 		}
 		// Put online player into cache
-		allPlayers.put(bukkitOfflinePlayer, (KonOfflinePlayer)player);
+		if(bukkitOfflinePlayer.getName() != null) {
+			allPlayers.put(bukkitOfflinePlayer, (KonOfflinePlayer)player);
+		}
 	}
 
     public KonPlayer getPlayerFromName(String displayName) {

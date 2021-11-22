@@ -162,7 +162,11 @@ public class KonquestDB extends Database{
             	isBarbarian = (player.getInt("barbarian") == 1);
             	//ChatUtil.printDebug("Database player row: "+uuid+", "+kingdomName+", "+isBarbarian);
             	if(kingdomName==null) { kingdomName = konquest.getKingdomManager().getBarbarians().getName(); }
-            	players.add(new KonOfflinePlayer(Bukkit.getOfflinePlayer(UUID.fromString(uuid)), konquest.getKingdomManager().getKingdom(kingdomName), isBarbarian));
+            	OfflinePlayer offlineBukkitPlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+            	// Check that a valid offlinePlayer was fetched by checking for not null name
+            	if(offlineBukkitPlayer.getName() != null) {
+            		players.add(new KonOfflinePlayer(offlineBukkitPlayer, konquest.getKingdomManager().getKingdom(kingdomName), isBarbarian));
+            	}
             }
         } catch (SQLException e) {
             e.printStackTrace();
