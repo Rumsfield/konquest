@@ -71,7 +71,7 @@ public class BlockListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onBlockBreak(BlockBreakEvent event) {
-		ChatUtil.printDebug("EVENT: blockBreak");
+		//ChatUtil.printDebug("EVENT: blockBreak");
 		if(event.isCancelled()) {
 			return;
 		}
@@ -451,7 +451,7 @@ public class BlockListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockPlace(BlockPlaceEvent event) {
-		ChatUtil.printDebug("EVENT: blockPlace");
+		//ChatUtil.printDebug("EVENT: blockPlace");
 		if(event.isCancelled()) {
 			return;
 		}

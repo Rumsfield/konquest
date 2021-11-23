@@ -530,7 +530,7 @@ public class PlayerListener implements Listener{
         	if(!player.isAdminBypassActive() && event.hasBlock()) {
         		BlockState clickedState = event.getClickedBlock().getState();
         		
-        		ChatUtil.printDebug("EVENT player interaction with block "+clickedState.getType().toString()+" using action "+event.getAction().toString());
+        		//ChatUtil.printDebug("EVENT player interaction with block "+clickedState.getType().toString()+" using action "+event.getAction().toString());
         		// Check for territory
         		if(kingdomManager.isChunkClaimed(clickedState.getLocation())) {
         			// Interaction occurred within claimed territory
@@ -540,7 +540,7 @@ public class PlayerListener implements Listener{
 	        			boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
 	        			// Allow interaction with signs or everything when config allows it
 	        			if(!(clickedState instanceof Sign || isCapitalUseEnabled)) {
-	        				ChatUtil.printDebug("  running preventUse: capital");
+	        				//ChatUtil.printDebug("  running preventUse: capital");
 	        				preventUse(event,player);
 	        			}
 	        		}
@@ -559,7 +559,7 @@ public class PlayerListener implements Listener{
 	        			//ChatUtil.printDebug("EVENT player interaction within town "+town.getName());
 	        			// Prevent enemies from interacting with things like buttons, levers, pressure plates...
 	        			if(!player.getKingdom().equals(town.getKingdom()) && !town.isEnemyRedstoneAllowed()) {
-	        				ChatUtil.printDebug("  running preventUse: town");
+	        				//ChatUtil.printDebug("  running preventUse: town");
 	        				preventUse(event,player);
 	    				}
 	        			// Prevent enemies and non-residents from interacting with item frames
@@ -578,7 +578,7 @@ public class PlayerListener implements Listener{
         			// Interaction occurred in the wild
         			boolean isWildUse = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.wild_use", true);
         			if(!isWildUse) {
-        				ChatUtil.printDebug("  running preventUse: wild");
+        				//ChatUtil.printDebug("  running preventUse: wild");
         				preventUse(event,player);
         			}
         		}
@@ -957,6 +957,25 @@ public class PlayerListener implements Listener{
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
+    	// Check for inter-chunk ender pearl
+    	boolean isEnemyPearlBlocked = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_ender_pearl", false);
+    	boolean isTerritoryTo = kingdomManager.isChunkClaimed(event.getTo());
+    	Player bukkitPlayer = event.getPlayer();
+		if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+			//ChatUtil.printDebug("Failed to handle onPlayerEnterLeaveChunk for non-existent player");
+			return;
+		}
+		KonPlayer player = playerManager.getPlayer(bukkitPlayer);
+		// Inter-chunk checks
+		if(isEnemyPearlBlocked && isTerritoryTo) {
+			KonTerritory territoryTo = kingdomManager.getChunkTerritory(event.getTo());
+			if(event.getCause().equals(TeleportCause.ENDER_PEARL) && !player.getKingdom().equals(territoryTo.getKingdom())) {
+				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				event.setCancelled(true);
+				return;
+			}
+		}
+		// General chunk transition handler
     	onPlayerEnterLeaveChunk(event);
     }
     
@@ -975,6 +994,14 @@ public class PlayerListener implements Listener{
     		Location chunkFrom = event.getFrom();
     		boolean isTerritoryTo = kingdomManager.isChunkClaimed(chunkTo);
     		boolean isTerritoryFrom = kingdomManager.isChunkClaimed(chunkFrom);
+    		KonTerritory territoryTo = null;
+			KonTerritory territoryFrom = null;
+			if(isTerritoryTo) {
+				territoryTo = kingdomManager.getChunkTerritory(chunkTo);
+			}
+			if(isTerritoryFrom) {
+				territoryFrom = kingdomManager.getChunkTerritory(chunkFrom);
+			}
     		
     		if(event.getTo().getWorld().equals(event.getFrom().getWorld())) {
     			// Player moved within the same world
@@ -1029,7 +1056,6 @@ public class PlayerListener implements Listener{
         		
         		// Chunk transition checks
         		if(!isTerritoryTo && isTerritoryFrom) { // When moving into the wild
-        			KonTerritory territoryFrom = kingdomManager.getChunkTerritory(chunkFrom);
         			// Prevent enemy ender pearl out of territory into wild (optional)
         			if(isEnemyPearlBlocked && event instanceof PlayerTeleportEvent) {
         				PlayerTeleportEvent tpEvent = (PlayerTeleportEvent)event;
@@ -1070,7 +1096,6 @@ public class PlayerListener implements Listener{
                     	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
                     }
                     if(!event.isCancelled()) {
-                    	KonTerritory territoryTo = kingdomManager.getChunkTerritory(chunkTo);
                     	// Prevent enemy ender pearl into territory from wild (optional)
             			if(isEnemyPearlBlocked && event instanceof PlayerTeleportEvent) {
             				PlayerTeleportEvent tpEvent = (PlayerTeleportEvent)event;
@@ -1123,8 +1148,6 @@ public class PlayerListener implements Listener{
                     }
         		} else if(isTerritoryTo && isTerritoryFrom) { // When moving between two claimed territories
         			// Check for differing territories, if true then display new Territory Name and send message to enemies
-        			KonTerritory territoryTo = kingdomManager.getChunkTerritory(chunkTo);
-        			KonTerritory territoryFrom = kingdomManager.getChunkTerritory(chunkFrom);
         			if(!territoryTo.equals(territoryFrom)) { // moving between different territories
         				
         				// Prevent enemy ender pearl into territory from other territory (optional)
@@ -1259,7 +1282,6 @@ public class PlayerListener implements Listener{
     			kingdomManager.updatePlayerBorderParticles(player,chunkTo);
     			
     			if(isTerritoryFrom) {
-    				KonTerritory territoryFrom = kingdomManager.getChunkTerritory(chunkFrom);
     				if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         				((KonTown) territoryFrom).removeBarPlayer(player);
         				player.clearAllMobAttackers();
@@ -1284,7 +1306,6 @@ public class PlayerListener implements Listener{
                     	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
                     }
                     if(!event.isCancelled()) {
-                    	KonTerritory territoryTo = kingdomManager.getChunkTerritory(chunkTo);
     	                // Set message color based on enemy territory
     	                String color = ""+ChatColor.RED;
     	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
@@ -1441,7 +1462,7 @@ public class PlayerListener implements Listener{
 			// Prevent use of specific usable blocks
 			BlockState clickedState = event.getClickedBlock().getState();
 			BlockData clickedBlockData = clickedState.getBlockData();
-			ChatUtil.printDebug("  checking block data of type "+clickedBlockData.getMaterial());
+			//ChatUtil.printDebug("  checking block data of type "+clickedBlockData.getMaterial());
 			boolean sendAdminHint = false;
 			if(clickedBlockData instanceof Door ||
 					clickedBlockData instanceof Gate ||
