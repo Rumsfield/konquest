@@ -76,13 +76,14 @@ public class BlockListener implements Listener {
 			return;
 		}
 		
+		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+			ChatUtil.printDebug("Failed to handle onBlockBreak for non-existent player");
+			return;
+		}
+		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
+		
 		// Monitor blocks in claimed territory
 		if(kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
-			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
-				ChatUtil.printDebug("Failed to handle onBlockBreak for non-existent player");
-				return;
-			}
-			KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 			// Bypass event restrictions for player in Admin Bypass Mode
 			if(!player.isAdminBypassActive()) {
 				//ChatUtil.printDebug("Evaluating blockBreak in claimed territory...");
@@ -105,38 +106,13 @@ public class BlockListener implements Listener {
 						}
 						// Restrict enemies
 						if(!player.getKingdom().equals(territory.getKingdom())) {
-							// If territory is peaceful, prevent all block damage by enemies
-							if(territory.getKingdom().isPeaceful()) {
-								//ChatUtil.sendNotice(player.getBukkitPlayer(), "This Kingdom of "+town.getKingdom().getName()+" is peaceful! You cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
-								ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_PEACEFUL_TOWN.getMessage(territory.getName()));
-								event.setCancelled(true);
-								return;
-							}
-							
-							// If enemy player is peaceful, prevent all block damage
-							if(player.getKingdom().isPeaceful()) {
-								//ChatUtil.sendNotice(player.getBukkitPlayer(), "Your Kingdom of "+town.getKingdom().getName()+" is peaceful! You cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
-								ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_PEACEFUL_PLAYER.getMessage());
-								event.setCancelled(true);
-								return;
-							}
-							
-							// If no players are online from this Kingdom, prevent block damage
-							//boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
-							if(territory.getKingdom().isOfflineProtected()) {
-								//ChatUtil.sendNotice(player.getBukkitPlayer(), town.getKingdom().getName()+" doesn't have enough online players, cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
-								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLINE.getMessage(territory.getKingdom().getName(),territory.getName()));
-								event.setCancelled(true);
-								return;
-							}
-							
-							// If block is a container, protect (optionally)
-							boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_break");
-							if(isProtectChest && event.getBlock().getState() instanceof BlockInventoryHolder) {
-								ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-								event.setCancelled(true);
-								return;
-							}
+							// Enemies cannot build in capital
+							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							if(event.getPlayer().hasPermission("konquest.command.admin")) {
+		    					ChatUtil.sendNotice(event.getPlayer(),MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
+		    				}
+							event.setCancelled(true);
+							return;
 						}
 					} else {
 						// No building is allowed in capital
@@ -258,6 +234,9 @@ public class BlockListener implements Listener {
 						// Update MonumentBar state
 						town.setAttacked(true);
 						town.updateBar();
+						town.applyGlow(event.getPlayer());
+						// Attempt to start a raid alert
+						town.sendRaidAlert();
 						
 						// If town is shielded, prevent all enemy block edits
 						if(town.isShielded()) {
@@ -268,8 +247,13 @@ public class BlockListener implements Listener {
 						
 						// If town is armored, damage the armor while preventing block breaks
 						if(town.isArmored()) {
-							town.damageArmor(1);
-							Konquest.playTownArmorSound(event.getPlayer());
+							// Ignore instant-break blocks
+							Material blockMat = event.getBlock().getState().getType();
+							//ChatUtil.printDebug("Armor block broke of hardness "+blockMat.getHardness());
+							if(blockMat.getHardness() > 0) {
+								town.damageArmor(1);
+								Konquest.playTownArmorSound(event.getPlayer());
+							}
 							event.setCancelled(true);
 							return;
 						}
@@ -401,6 +385,18 @@ public class BlockListener implements Listener {
 				// When player is in admin bypass and breaks a block
 				checkMonumentTemplateBlanking(event);
 			}
+		} else {
+			// Break occurred in the wild
+			boolean isWildBuild = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.wild_build", true);
+			if(!player.isAdminBypassActive() && !isWildBuild) {
+				// No building is allowed in the wild
+				ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				if(event.getPlayer().hasPermission("konquest.command.admin")) {
+					ChatUtil.sendNotice(event.getPlayer(),MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
+				}
+				event.setCancelled(true);
+				return;
+			}
 		}
     }
 	@EventHandler(priority = EventPriority.HIGH)
@@ -455,7 +451,7 @@ public class BlockListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockPlace(BlockPlaceEvent event) {
-		
+		//ChatUtil.printDebug("EVENT: blockPlace");
 		if(event.isCancelled()) {
 			return;
 		}
@@ -490,38 +486,13 @@ public class BlockListener implements Listener {
 						}
 						// Restrict enemies
 						if(!player.getKingdom().equals(territory.getKingdom())) {
-							// If territory is peaceful, prevent all block damage by enemies
-							if(territory.getKingdom().isPeaceful()) {
-								//ChatUtil.sendNotice(player.getBukkitPlayer(), "This Kingdom of "+town.getKingdom().getName()+" is peaceful! You cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
-								ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_PEACEFUL_TOWN.getMessage(territory.getName()));
-								event.setCancelled(true);
-								return;
-							}
-							
-							// If enemy player is peaceful, prevent all block damage
-							if(player.getKingdom().isPeaceful()) {
-								//ChatUtil.sendNotice(player.getBukkitPlayer(), "Your Kingdom of "+town.getKingdom().getName()+" is peaceful! You cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
-								ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_PEACEFUL_PLAYER.getMessage());
-								event.setCancelled(true);
-								return;
-							}
-							
-							// If no players are online from this Kingdom, prevent block damage
-							//boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
-							if(territory.getKingdom().isOfflineProtected()) {
-								//ChatUtil.sendNotice(player.getBukkitPlayer(), town.getKingdom().getName()+" doesn't have enough online players, cannot attack the Town "+town.getName(), ChatColor.DARK_RED);
-								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLINE.getMessage(territory.getKingdom().getName(),territory.getName()));
-								event.setCancelled(true);
-								return;
-							}
-							
-							// If block is a container, protect (optionally)
-							boolean isProtectChest = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_break");
-							if(isProtectChest && event.getBlock().getState() instanceof BlockInventoryHolder) {
-								ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-								event.setCancelled(true);
-								return;
-							}
+							// Enemies cannot place blocks in capital
+							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							if(event.getPlayer().hasPermission("konquest.command.admin")) {
+		    					ChatUtil.sendNotice(event.getPlayer(),MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
+		    				}
+							event.setCancelled(true);
+							return;
 						}
 					} else {
 						// No building is allowed in capital
@@ -679,100 +650,66 @@ public class BlockListener implements Listener {
 			}
 		} else {
 			// When placing blocks in the wilderness...
-			
+
 			// Prevent barbarians who already have a camp from placing a bed
 			// Attempt to create a camp for barbarians who place a bed
-			if(!player.isAdminBypassActive() && player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed) {
-				if(campManager.isCampSet(player)) {
-					ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
-				} else {
-					int status = campManager.addCamp(event.getBlock().getLocation(), (KonOfflinePlayer)player);
-					if(status == 0) { // on successful camp setup...
-						player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
-						//ChatUtil.sendNotice(event.getPlayer(), "Successfully set up camp");
-						ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
-						String territoryName = campManager.getCamp((KonOfflinePlayer)player).getName();
-						ChatUtil.sendKonTitle(player, "", ChatColor.YELLOW+territoryName);
+			if(!player.isAdminBypassActive()) {
+				// Check if the player is a barbarian placing a bed
+				if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed) {
+					if(campManager.isCampSet(player)) {
+						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
 					} else {
-						switch(status) {
-				    	case 1:
-				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: New claims overlap with existing territory.");
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
-				    		event.setCancelled(true);
-				    		break;
-				    	case 2:
-				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Your camp already exists.");
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_EXISTS.getMessage());
-				    		event.setCancelled(true);
-				    		break;
-				    	case 3:
-				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: You are not a Barbarian.");
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
-				    		event.setCancelled(true);
-				    		break;
-				    	case 4:
-				    		//ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
-				    		break;
-				    	default:
-				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Unknown cause. Contact an Admin!");
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-				    		break;
+						int status = campManager.addCamp(event.getBlock().getLocation(), (KonOfflinePlayer)player);
+						if(status == 0) { // on successful camp setup...
+							player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
+							//ChatUtil.sendNotice(event.getPlayer(), "Successfully set up camp");
+							ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
+							String territoryName = campManager.getCamp((KonOfflinePlayer)player).getName();
+							ChatUtil.sendKonTitle(player, "", ChatColor.YELLOW+territoryName);
+						} else {
+							switch(status) {
+					    	case 1:
+					    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: New claims overlap with existing territory.");
+					    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
+					    		event.setCancelled(true);
+					    		break;
+					    	case 2:
+					    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Your camp already exists.");
+					    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_EXISTS.getMessage());
+					    		event.setCancelled(true);
+					    		break;
+					    	case 3:
+					    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: You are not a Barbarian.");
+					    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
+					    		event.setCancelled(true);
+					    		break;
+					    	case 4:
+					    		//ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+					    		break;
+					    	default:
+					    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Unknown cause. Contact an Admin!");
+					    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+					    		break;
+							}
+							return;
 						}
+					}
+				} else {
+					// Place occurred in the wild
+					boolean isWildBuild = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.wild_build", true);
+					if(!isWildBuild) {
+						// No building is allowed in the wild
+						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						if(event.getPlayer().hasPermission("konquest.command.admin")) {
+							ChatUtil.sendNotice(event.getPlayer(),MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
+						}
+						event.setCancelled(true);
 						return;
 					}
 				}
 			}
 		}
 	}
-	
-	/*
-	@EventHandler(priority = EventPriority.LOW)
-    public void onBedPlace(BlockPlaceEvent event) {
-		
-		// Monitor blocks in unclaimed territory
-		if(!event.isCancelled() && !kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
-			
-			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
-				ChatUtil.printDebug("Failed to handle onBedPlace for non-existent player");
-				return;
-			}
-			KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
-			
-			// Attempt to create a camp for barbarians who place a bed
-			if(!player.isAdminBypassActive() && player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && !campManager.isCampSet(player)) {
-				int status = campManager.addCamp(event.getBlock().getLocation(), (KonOfflinePlayer)player);
-				if(status == 0) { // on successful camp setup...
-					player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
-					//ChatUtil.sendNotice(event.getPlayer(), "Successfully set up camp");
-					ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
-					String territoryName = campManager.getCamp((KonOfflinePlayer)player).getName();
-					ChatUtil.sendKonTitle(player, "", ChatColor.YELLOW+territoryName);
-				} else {
-					switch(status) {
-			    	case 1:
-			    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: New claims overlap with existing territory.");
-			    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
-			    		break;
-			    	case 2:
-			    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Your camp already exists.");
-			    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_EXISTS.getMessage());
-			    		break;
-			    	case 3:
-			    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: You are not a Barbarian.");
-			    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
-			    		break;
-			    	default:
-			    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Unknown cause. Contact an Admin!");
-			    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-			    		break;
-					}
-					event.setCancelled(true);
-					return;
-				}
-			}
-		}
-	}
-	*/
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
     public void onSeedPlant(BlockPlaceEvent event) {
@@ -930,6 +867,11 @@ public class BlockListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
+					// If piston is outside of territory
+					if(!capital.isLocInside(event.getBlock().getLocation())) {
+						event.setCancelled(true);
+						return;
+					}
 				}
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
@@ -1016,6 +958,11 @@ public class BlockListener implements Listener {
 					}
 					// Check if block is inside of an offline kingdom's capital
 					if(playerManager.getPlayersInKingdom(capital.getKingdom()).isEmpty()) {
+						event.setCancelled(true);
+						return;
+					}
+					// If piston is outside of territory
+					if(!capital.isLocInside(event.getBlock().getLocation())) {
 						event.setCancelled(true);
 						return;
 					}

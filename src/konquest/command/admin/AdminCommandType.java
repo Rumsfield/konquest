@@ -3,35 +3,41 @@ package konquest.command.admin;
 import konquest.utility.MessagePath;
 
 public enum AdminCommandType {
-	HELP			("",																	MessagePath.DESCRIPTION_ADMIN_HELP.getMessage()),
-	BYPASS			("",																	MessagePath.DESCRIPTION_ADMIN_BYPASS.getMessage()),
-	MAKEKINGDOM		("<kingdom>",															MessagePath.DESCRIPTION_ADMIN_MAKEKINGDOM.getMessage()),
-	MAKETOWN		("<town> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_MAKETOWN.getMessage()),
-	CLAIM			("[radius|auto] [<radius>]",											MessagePath.DESCRIPTION_ADMIN_CLAIM.getMessage()),
-	UNCLAIM			("",																	MessagePath.DESCRIPTION_ADMIN_UNCLAIM.getMessage()),
-	REMOVEKINGDOM	("<kingdom>",															MessagePath.DESCRIPTION_ADMIN_REMOVEKINGDOM.getMessage()),
-	REMOVETOWN		("<kingdom> <town>",													MessagePath.DESCRIPTION_ADMIN_REMOVETOWN.getMessage()),
-	REMOVECAMP		("<player>",															MessagePath.DESCRIPTION_ADMIN_REMOVECAMP.getMessage()),
-	MONUMENT		("<kingdom> create|remove|show",										MessagePath.DESCRIPTION_ADMIN_MONUMENT.getMessage()),
-	LIST			("kingdoms|towns|all",						   		 					MessagePath.DESCRIPTION_ADMIN_LIST.getMessage()),
-	FORCECAPTURE	("<town> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_FORCECAPTURE.getMessage()),
-	FORCEJOIN 		("<player> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_FORCEJOIN.getMessage()),
-	FORCEEXILE		("<player> [full]", 													MessagePath.DESCRIPTION_ADMIN_FORCEEXILE.getMessage()),
-	FORCETOWN		("<name> options|add|kick|lord|knight|rename|upgrade|shield|armor|plots [arg1] [arg2]", MessagePath.DESCRIPTION_ADMIN_FORCETOWN.getMessage()),
-	RENAME	        ("<kingdom> <oldName> <newName>",					    				MessagePath.DESCRIPTION_ADMIN_RENAME.getMessage()),
-	RUIN	        ("create|remove|criticals|spawns [<name>]",								MessagePath.DESCRIPTION_ADMIN_RUIN.getMessage()),
-	SAVE			("", 																	MessagePath.DESCRIPTION_ADMIN_SAVE.getMessage()),
-	SETTRAVEL		("",																	MessagePath.DESCRIPTION_ADMIN_SETTRAVEL.getMessage()),												
-	TRAVEL			("<kingdom|town>",                                   					MessagePath.DESCRIPTION_ADMIN_TRAVEL.getMessage()),
-	RELOAD			("", 																	MessagePath.DESCRIPTION_ADMIN_RELOAD.getMessage()),
-	FLAG			("<flag> <value>",                                   					MessagePath.DESCRIPTION_ADMIN_FLAG.getMessage()),
-	STAT			("<player> <stat> show|set|add|clear [<value>]",						MessagePath.DESCRIPTION_ADMIN_STAT.getMessage());
+	HELP			("konquest.command.admin.help",				"",																	MessagePath.DESCRIPTION_ADMIN_HELP.getMessage()),
+	BYPASS			("konquest.command.admin.bypass",			"",																	MessagePath.DESCRIPTION_ADMIN_BYPASS.getMessage()),
+	MAKEKINGDOM		("konquest.command.admin.makekingdom",		"<kingdom>",														MessagePath.DESCRIPTION_ADMIN_MAKEKINGDOM.getMessage()),
+	MAKETOWN		("konquest.command.admin.maketown",			"<town> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_MAKETOWN.getMessage()),
+	CLAIM			("konquest.command.admin.claim",			"[radius|auto] [<radius>]",											MessagePath.DESCRIPTION_ADMIN_CLAIM.getMessage()),
+	UNCLAIM			("konquest.command.admin.unclaim",			"",																	MessagePath.DESCRIPTION_ADMIN_UNCLAIM.getMessage()),
+	REMOVEKINGDOM	("konquest.command.admin.removekingdom",	"<kingdom>",														MessagePath.DESCRIPTION_ADMIN_REMOVEKINGDOM.getMessage()),
+	REMOVETOWN		("konquest.command.admin.removetown",		"<kingdom> <town>",													MessagePath.DESCRIPTION_ADMIN_REMOVETOWN.getMessage()),
+	REMOVECAMP		("konquest.command.admin.removecamp",		"<player>",															MessagePath.DESCRIPTION_ADMIN_REMOVECAMP.getMessage()),
+	MONUMENT		("konquest.command.admin.monument",			"<kingdom> create|remove|show",										MessagePath.DESCRIPTION_ADMIN_MONUMENT.getMessage()),
+	LIST			("konquest.command.admin.list",				"kingdoms|towns|all",						   		 				MessagePath.DESCRIPTION_ADMIN_LIST.getMessage()),
+	FORCECAPTURE	("konquest.command.admin.forcecapture",		"<town> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_FORCECAPTURE.getMessage()),
+	FORCEJOIN 		("konquest.command.admin.forcejoin",		"<player> <kingdom>",												MessagePath.DESCRIPTION_ADMIN_FORCEJOIN.getMessage()),
+	FORCEEXILE		("konquest.command.admin.forceexile",		"<player> [full]", 													MessagePath.DESCRIPTION_ADMIN_FORCEEXILE.getMessage()),
+	FORCETOWN		("konquest.command.admin.forcetown",		"<name> options|add|kick|lord|knight|rename|upgrade|shield|armor|plots [arg1] [arg2]", MessagePath.DESCRIPTION_ADMIN_FORCETOWN.getMessage()),
+	RENAME	        ("konquest.command.admin.rename",			"<kingdom> <oldName> <newName>",					    			MessagePath.DESCRIPTION_ADMIN_RENAME.getMessage()),
+	RUIN	        ("konquest.command.admin.ruin",				"create|remove|criticals|spawns [<name>]",							MessagePath.DESCRIPTION_ADMIN_RUIN.getMessage()),
+	SAVE			("konquest.command.admin.save",				"", 																MessagePath.DESCRIPTION_ADMIN_SAVE.getMessage()),
+	SETTRAVEL		("konquest.command.admin.settravel",		"",																	MessagePath.DESCRIPTION_ADMIN_SETTRAVEL.getMessage()),												
+	TRAVEL			("konquest.command.admin.travel",			"<kingdom|town>",                                   				MessagePath.DESCRIPTION_ADMIN_TRAVEL.getMessage()),
+	RELOAD			("konquest.command.admin.reload",			"", 																MessagePath.DESCRIPTION_ADMIN_RELOAD.getMessage()),
+	FLAG			("konquest.command.admin.flag",				"<flag> <value>",                                   				MessagePath.DESCRIPTION_ADMIN_FLAG.getMessage()),
+	STAT			("konquest.command.admin.stat",				"<player> <stat> show|set|add|clear [<value>]",						MessagePath.DESCRIPTION_ADMIN_STAT.getMessage());
 	
+	private final String permission;
 	private final String arguments;
 	private final String description;
-	AdminCommandType(String arguments, String description) {
+	AdminCommandType(String permission, String arguments, String description) {
+		this.permission = permission;
 		this.arguments = arguments;
 		this.description = description;
+	}
+	
+	public String permission() {
+		return permission;
 	}
 	
 	public String arguments() {

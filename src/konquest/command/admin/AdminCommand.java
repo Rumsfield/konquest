@@ -106,87 +106,91 @@ public class AdminCommand extends CommandBase {
         if (getArgs().length == 2) {
         	List<String> baseList = new ArrayList<>();
         	for(AdminCommandType cmd : AdminCommandType.values()) {
-        		baseList.add(cmd.toString().toLowerCase());
+        		if(getSender().hasPermission(cmd.permission())) {
+        			baseList.add(cmd.toString().toLowerCase());
+        		}
     		}
         	// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[1], baseList, tabList);
 			Collections.sort(tabList);
         } else if (getArgs().length >= 3) {
         	AdminCommandType commandArg = AdminCommandType.getCommand(getArgs()[1]);
-            switch (commandArg) {
-	            case BYPASS:
-	                tabList.addAll(new BypassAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                break;
-            	case CLAIM:
-            		tabList.addAll(new ClaimAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-            	case FLAG:
-            		tabList.addAll(new FlagAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-            	case FORCECAPTURE:
-                	tabList.addAll(new ForceCaptureAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case FORCEEXILE:
-                	tabList.addAll(new ForceExileAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case FORCEJOIN:
-                	tabList.addAll(new ForceJoinAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case FORCETOWN:
-                	tabList.addAll(new ForceTownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case HELP:
-                	tabList.addAll(new HelpAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case LIST:
-                	tabList.addAll(new ListAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case MAKEKINGDOM:
-                	tabList.addAll(new MakeKingdomAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case MAKETOWN:
-                	tabList.addAll(new MakeTownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case MONUMENT:
-                	tabList.addAll(new MonumentAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case REMOVEKINGDOM:
-                	tabList.addAll(new RemoveKingdomAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case REMOVETOWN:
-                	tabList.addAll(new RemoveTownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case REMOVECAMP:
-                	tabList.addAll(new RemoveCampAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case RENAME:
-                	tabList.addAll(new RenameAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case RUIN:
-                	tabList.addAll(new RuinAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case SAVE:
-                	tabList.addAll(new SaveAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case SETTRAVEL:
-                	tabList.addAll(new SetTravelAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case STAT:
-                	tabList.addAll(new StatAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case TRAVEL:
-                	tabList.addAll(new TravelAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case UNCLAIM:
-                	tabList.addAll(new UnclaimAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                case RELOAD:
-                	tabList.addAll(new ReloadAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-                    break;
-                default:
-                	tabList.addAll(Collections.emptyList());
-                	break;
-            }
+        	if (getSender().hasPermission(commandArg.permission())) {
+	            switch (commandArg) {
+		            case BYPASS:
+		                tabList.addAll(new BypassAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+		                break;
+	            	case CLAIM:
+	            		tabList.addAll(new ClaimAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	            	case FLAG:
+	            		tabList.addAll(new FlagAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	            	case FORCECAPTURE:
+	                	tabList.addAll(new ForceCaptureAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case FORCEEXILE:
+	                	tabList.addAll(new ForceExileAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case FORCEJOIN:
+	                	tabList.addAll(new ForceJoinAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case FORCETOWN:
+	                	tabList.addAll(new ForceTownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case HELP:
+	                	tabList.addAll(new HelpAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case LIST:
+	                	tabList.addAll(new ListAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case MAKEKINGDOM:
+	                	tabList.addAll(new MakeKingdomAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case MAKETOWN:
+	                	tabList.addAll(new MakeTownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case MONUMENT:
+	                	tabList.addAll(new MonumentAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case REMOVEKINGDOM:
+	                	tabList.addAll(new RemoveKingdomAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case REMOVETOWN:
+	                	tabList.addAll(new RemoveTownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case REMOVECAMP:
+	                	tabList.addAll(new RemoveCampAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case RENAME:
+	                	tabList.addAll(new RenameAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case RUIN:
+	                	tabList.addAll(new RuinAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case SAVE:
+	                	tabList.addAll(new SaveAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case SETTRAVEL:
+	                	tabList.addAll(new SetTravelAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case STAT:
+	                	tabList.addAll(new StatAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case TRAVEL:
+	                	tabList.addAll(new TravelAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case UNCLAIM:
+	                	tabList.addAll(new UnclaimAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case RELOAD:
+	                	tabList.addAll(new ReloadAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                default:
+	                	tabList.addAll(Collections.emptyList());
+	                	break;
+	            }
+        	}
         }
         return tabList;
     }

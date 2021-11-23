@@ -28,6 +28,8 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 
 /**
@@ -695,6 +697,35 @@ public class KonTown extends KonTerritory implements Timeable{
 		if(!defenders.contains(bukkitPlayer.getUniqueId())) {
 			defenders.add(bukkitPlayer.getUniqueId());
 			result = true;
+		}
+		return result;
+	}
+	
+	public void applyGlow(Player bukkitPlayer) {
+		boolean isGlowEnabled = getKonquest().getConfigManager().getConfig("core").getBoolean("core.towns.enemy_glow", true);
+		if(isGlowEnabled) {
+			bukkitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*5, 1));
+			//ChatUtil.printDebug("Applied glowing to "+bukkitPlayer.getName()+": "+bukkitPlayer.isGlowing());
+		}
+	}
+	
+	public boolean sendRaidAlert() {
+		boolean result = false;
+		// Attempt to start a raid alert
+		if(!isRaidAlertDisabled()) {
+			// Alert all players of enemy Kingdom
+			for(KonPlayer player : getKonquest().getPlayerManager().getPlayersInKingdom(getKingdom().getName())) {
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID.getMessage(getName(),getName()),ChatColor.DARK_RED);
+				ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+getName(), 60, 1, 10);
+			}
+			// Start Raid Alert disable timer for target town
+			int raidAlertTimeSeconds = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.raid_alert_cooldown");
+			ChatUtil.printDebug("Starting raid alert timer for "+raidAlertTimeSeconds+" seconds in town "+getName());
+			Timer raidAlertTimer = getRaidAlertTimer();
+			setIsRaidAlertDisabled(true);
+			raidAlertTimer.stopTimer();
+			raidAlertTimer.setTime(raidAlertTimeSeconds);
+			raidAlertTimer.startTimer();
 		}
 		return result;
 	}

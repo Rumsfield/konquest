@@ -147,6 +147,10 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion {
 	        case "score":
 	        	result = placeholderManager.getScore(player);
 	        	break;
+	        /* %konquest_prefix% - player's prefix title */
+	        case "prefix":
+	        	result = placeholderManager.getPrefix(player);
+	        	break;
 	        /* %konquest_lordships% - number of player's lordships */
 	        case "lordships":
 	        	result = placeholderManager.getLordships(player);

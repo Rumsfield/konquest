@@ -44,6 +44,7 @@ public class KonquestListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onKonquestEnterTerritory(KonquestEnterTerritoryEvent event) {
 		//ChatUtil.printDebug("EVENT: Player "+event.getPlayer().getBukkitPlayer().getDisplayName()+" entered new territory");
+		
 		// When territory is a capital
 		if(event.getTerritory() instanceof KonCapital) {
 			// Optionally prevent players from entering
@@ -76,23 +77,7 @@ public class KonquestListener implements Listener {
 					!event.getPlayer().getKingdom().equals(event.getTerritory().getKingdom()) &&
 					!event.getPlayer().getKingdom().isPeaceful() ) {
 				// Attempt to start a raid alert
-				if(!town.isRaidAlertDisabled()) {
-					// Alert all players of enemy Kingdom
-					for(KonPlayer player : playerManager.getPlayersInKingdom(event.getTerritory().getKingdom().getName())) {
-						//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.DARK_RED+"Enemy spotted in "+event.getTerritory().getName()+", use "+ChatColor.AQUA+"/k travel "+event.getTerritory().getName()+ChatColor.DARK_RED+" to defend!");
-						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID.getMessage(event.getTerritory().getName(),event.getTerritory().getName()),ChatColor.DARK_RED);
-						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+event.getTerritory().getName(), 60, 1, 10);
-					}
-					// Start Raid Alert disable timer for target town
-					int raidAlertTimeSeconds = konquest.getConfigManager().getConfig("core").getInt("core.towns.raid_alert_cooldown");
-					ChatUtil.printDebug("Starting raid alert timer for "+raidAlertTimeSeconds+" seconds");
-					Timer raidAlertTimer = town.getRaidAlertTimer();
-					town.setIsRaidAlertDisabled(true);
-					raidAlertTimer.stopTimer();
-					raidAlertTimer.setTime(raidAlertTimeSeconds);
-					raidAlertTimer.startTimer();
-				}
-				
+				town.sendRaidAlert();
 				// Apply town nerfs
 				kingdomManager.applyTownNerf(event.getPlayer(), town);
 			} else {

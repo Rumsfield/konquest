@@ -12,6 +12,7 @@ import konquest.Konquest;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
+import konquest.model.KonPrefix;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
@@ -362,6 +363,20 @@ public class PlaceholderManager {
    			result = topLandList.get(rank-1).name + " " + topLandList.get(rank-1).value;
    		}
 		return result;
+	}
+	
+	public String getPrefix(Player player) {
+		String result = "";
+    	KonPlayer onlinePlayer = playerManager.getPlayer(player);
+    	if(onlinePlayer != null) {
+    		KonPrefix playerPrefix = onlinePlayer.getPlayerPrefix();
+    		if(playerPrefix.isEnabled()) {
+    			result = playerPrefix.getMainPrefixName();
+    		} else {
+    			result = "-";
+    		}
+    	}
+    	return result;
 	}
 	
 }

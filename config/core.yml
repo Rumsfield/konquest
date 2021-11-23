@@ -19,6 +19,7 @@
 #  chat:
 #     tag:                          Text tag for all Konquest plugin messages. Use '' to disable. Use & for color codes, or hex #000000. ('string')
 #     message:                      Chat message format used for all players. Use %PREFIX%, %SUFFIX%, %KINGDOM%, %TITLE% and %NAME% as placeholders. Use & for color codes, or hex #000000. ('string')
+#     name_team_color:              Use team colors (red, green, yellow) for %NAME% format, else use colors from message string (true/false)
 #     enable_format:                Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
 #     priority:                     Set the priority of Konquest's chat message formatting. Set to high to allow other plugins to modify chat first (LOWEST, LOW, NORMAL, HIGH, HIGHEST)
 #  database:
@@ -46,6 +47,7 @@
 #    no_enemy_edit_offline:         Prevent enemy players from breaking any blocks in a Kingdom with no players online (true/false)
 #    no_enemy_edit_offline_warmup:  Time in seconds when a Kingdom is protected from when the minimum player disconnects (integer >= 0)
 #    no_enemy_edit_offline_minimum: Number of players required for a Kingdom to be protected (integer >= 0)
+#    no_enemy_ender_pearl:          Prevent enemy players from throwing ender pearls into kingdom territory (true/false)
 #    smallest_exp_boost_percent:    Percentage boost EXP gain for the smallest kingdom (0 to disable, 0 - 100)
 #    offline_timeout_days:          Time in days a player must be offline to be inactive, and removed from towns and camps (0 to disable, integer >= 0)
 #    offline_timeout_exile:         Remove inactive players from their kingdoms and exile them as barbarians (true/false)
@@ -54,6 +56,9 @@
 #    max_player_diff:               Kingdoms with this many players more than other Kingdoms will not accept new players (0 to disable, integer >= 0)
 #    allow_exile_switch:            Allow barbarians to join any kingdom, even when exiled (true) or prevent exiled barbarians from switching kingdoms (false) (true/false)
 #    per_kingdom_join_permissions:  When true, players must have a permission "konquest.join.<kingdom>" to join specific kingdoms, e.g. "konquest.join.rome" to join the kingdom Rome (true/false)
+#    wild_pvp:                      Allow player damage in the wild (true/false)
+#    wild_use:                      Allow players to interact with blocks and containers in the wild (true/false)
+#    wild_build:                    Allow players to build in the wild (true/false)
 #  towns:
 #    min_settle_height:             Minimum height level for new town settlements (0 to disable, 0 - 256)
 #    max_settle_height:             Maximum height level for new town settlements (0 to disable, 0 - 256), Note, if max_settle_height is less than min_settle_height, things might break!
@@ -76,6 +81,7 @@
 #    max_shields:                   Maximum shield duration in seconds that a town can have (0 to disable, integer >= 0)
 #    max_armor:                     Maximum armor amount in blocks that a town can have (0 to disable, integer >= 0)
 #    barbarians_destroy:            Allow barbarian players to destroy towns when true, else prevent barbarians from attacking town monuments (true/false)
+#    enemy_glow:                    Apply the Glowing effect to enemies that break blocks within a town (true/false)
 #  plots:
 #    enable*:                       Enable town plots (true/false)
 #    max_size:                      Maximum plot size in chunks (0 to disable, integer >= 0)
@@ -154,6 +160,7 @@ core:
   chat:
     tag: '&7[&6Konquest&7]&f '
     message: '%PREFIX% %KINGDOM% &7| %TITLE% %NAME% %SUFFIX% '
+    name_team_color: true
     enable_format: true
     priority: HIGH
   database:
@@ -181,6 +188,7 @@ core:
     no_enemy_edit_offline: true
     no_enemy_edit_offline_warmup: 300
     no_enemy_edit_offline_minimum: 2
+    no_enemy_ender_pearl: false
     smallest_exp_boost_percent: 25
     offline_timeout_days: 0
     offline_timeout_exile: false
@@ -189,6 +197,9 @@ core:
     max_player_diff: 4
     allow_exile_switch: true
     per_kingdom_join_permissions: false
+    wild_pvp: true
+    wild_use: true
+    wild_build: true
   towns:
     min_settle_height: 2
     max_settle_height: 200
@@ -212,6 +223,7 @@ core:
     max_shields: 432000
     max_armor: 9999
     barbarians_destroy: true
+    enemy_glow: true
   plots:
     enable: true
     max_size: 16
