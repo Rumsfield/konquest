@@ -702,8 +702,11 @@ public class KonTown extends KonTerritory implements Timeable{
 	}
 	
 	public void applyGlow(Player bukkitPlayer) {
-		bukkitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*5, 1));
-		//ChatUtil.printDebug("Applied glowing to "+bukkitPlayer.getName()+": "+bukkitPlayer.isGlowing());
+		boolean isGlowEnabled = getKonquest().getConfigManager().getConfig("core").getBoolean("core.towns.enemy_glow", true);
+		if(isGlowEnabled) {
+			bukkitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*5, 1));
+			//ChatUtil.printDebug("Applied glowing to "+bukkitPlayer.getName()+": "+bukkitPlayer.isGlowing());
+		}
 	}
 	
 	public boolean sendRaidAlert() {

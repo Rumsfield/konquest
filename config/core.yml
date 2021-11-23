@@ -81,6 +81,7 @@
 #    max_shields:                   Maximum shield duration in seconds that a town can have (0 to disable, integer >= 0)
 #    max_armor:                     Maximum armor amount in blocks that a town can have (0 to disable, integer >= 0)
 #    barbarians_destroy:            Allow barbarian players to destroy towns when true, else prevent barbarians from attacking town monuments (true/false)
+#    enemy_glow:                    Apply the Glowing effect to enemies that break blocks within a town (true/false)
 #  plots:
 #    enable*:                       Enable town plots (true/false)
 #    max_size:                      Maximum plot size in chunks (0 to disable, integer >= 0)
@@ -222,6 +223,7 @@ core:
     max_shields: 432000
     max_armor: 9999
     barbarians_destroy: true
+    enemy_glow: true
   plots:
     enable: true
     max_size: 16
