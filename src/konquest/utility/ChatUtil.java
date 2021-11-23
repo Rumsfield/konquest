@@ -173,8 +173,8 @@ public class ChatUtil {
 		if(title.equals("")) {
 			title = " ";
 		}
-		if(!player.isAdminBypassActive()) {
-			int totalDuration = durationTicks/20;
+		if(!player.isAdminBypassActive() && !player.isPriorityTitleDisplay()) {
+			int totalDuration = (durationTicks+fadeInTicks+fadeOutTicks)/20;
 			if(totalDuration < 1) {
 				totalDuration = 1;
 			}
