@@ -803,9 +803,9 @@ public class PlayerListener implements Listener{
 		}
     }
     
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-    	ChatUtil.printDebug("EVENT: Player respawned");
+    	//ChatUtil.printDebug("EVENT: Player respawned");
     	Location currentLoc = event.getPlayer().getLocation();
     	Location respawnLoc = event.getRespawnLocation();
     	if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
