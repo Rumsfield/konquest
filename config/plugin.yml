@@ -84,6 +84,10 @@ permissions:
   konquest.command.info:
     description: Display info on a kingdom, town or player
     default: true
+    
+  konquest.command.chat:
+    description: Toggle between global and kingdom-only chat
+    default: true
 
   konquest.command.claim:
     description: Claim land for an adjacent town
@@ -142,10 +146,6 @@ permissions:
     default: true
     
   konquest.command.admin:
-    description: All admin commands
-    default: op
-    
-  konquest.command.admin.*:
     description: All admin commands
     default: op
     children:
