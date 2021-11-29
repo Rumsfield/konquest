@@ -57,8 +57,8 @@ public class KonMonument{
 		ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
 		String minMaterial = "";
 		String maxMaterial = "";
-		int maxY = 0;
-		int minY = 256;
+		int maxY = centerLoc.getWorld().getMinHeight();
+		int minY = centerLoc.getWorld().getMaxHeight();
 		for(int x=0;x<16;x++) {
 			for(int z=0;z<16;z++) {
 				int y = chunkSnap.getHighestBlockYAt(x, z);

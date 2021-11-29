@@ -238,8 +238,8 @@ public class KonTown extends KonTerritory implements Timeable{
         
         // Determine minimum Y level of paste chunk below monument Y base
         int monument_y = monument.getBaseY();
-        int fill_y = 0;
-        int min_fill_y = 0;
+        int fill_y = getCenterLoc().getWorld().getMinHeight();
+        int min_fill_y = getCenterLoc().getWorld().getMinHeight();
         //Date step1 = new Date();
         /*
         int pasteX = (int)Math.floor((double)getCenterLoc().getBlockX()/16);
@@ -379,7 +379,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	public int countWaterInChunk() {
 		int count = 0;
 		for (int x = 0; x <= 15; x++) {
-            for (int y = 0; y <= getWorld().getMaxHeight()-1; y++) {
+            for (int y = getWorld().getMinHeight(); y <= getWorld().getMaxHeight()-1; y++) {
                 for (int z = 0; z <= 15; z++) {
                     Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
                     if(currentBlock.getType().equals(Material.WATER)) {
@@ -406,6 +406,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		return count;
 	}
 	
+	/*
 	public void fillAirBelowMonument() {
 		for (int x = 0; x <= 15; x++) {
             for (int y = 0; y <= monument.getBaseY(); y++) {
@@ -431,7 +432,8 @@ public class KonTown extends KonTerritory implements Timeable{
             }
         }
 	}
-
+	*/
+	
 	public boolean isLocInsideCenterChunk(Location loc) {
 		Point centerPoint = Konquest.toPoint(getCenterLoc());
 		Point testPoint = Konquest.toPoint(loc);
