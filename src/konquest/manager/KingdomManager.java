@@ -95,7 +95,7 @@ public class KingdomManager {
 			kingdomMap.put(name, new KonKingdom(loc, name, konquest));
 			kingdomMap.get(name).initCapital();
 			kingdomMap.get(name).getCapital().updateBarPlayers();
-			//updateTerritoryCache();
+			updateSmallestKingdom();
 			addAllTerritory(loc.getWorld(),kingdomMap.get(name).getCapital().getChunkList());
 			konquest.getMapHandler().drawDynmapUpdateTerritory(kingdomMap.get(name).getCapital());
 			//ChatUtil.printDebug("Added new Kingdom "+name);
