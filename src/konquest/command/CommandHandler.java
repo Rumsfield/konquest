@@ -48,8 +48,13 @@ public class CommandHandler  implements TabExecutor {
             	// Handle admin commands differently from normal commands
             	if (commandArg.equals(CommandType.ADMIN)) {
             		// Command is an admin command
+            		new AdminCommand(konquest, sender, args).execute();
+            		/*
             		if (args.length >= 2) {
             			AdminCommandType adminArg = AdminCommandType.getCommand(args[1]);
+            			boolean hasBasePerm = sender.hasPermission(commandArg.permission());
+            			boolean hasSubPerm = sender.hasPermission(adminArg.permission());
+            			ChatUtil.printDebug("Command sender has permission base: "+hasBasePerm+" and sub: "+hasSubPerm);
             			if (sender.hasPermission(commandArg.permission()) || sender.hasPermission(adminArg.permission())) {
                 			// Sender has permission for this admin command
                 			new AdminCommand(konquest, sender, args).execute();
@@ -67,6 +72,7 @@ public class CommandHandler  implements TabExecutor {
                 			ChatUtil.sendError((Player) sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+commandArg.permission());
                 		}
             		}
+            		*/
             	} else {
             		// Command is a normal command
 	            	if (sender.hasPermission(commandArg.permission())) {
@@ -158,12 +164,14 @@ public class CommandHandler  implements TabExecutor {
         		for(CommandType cmd : CommandType.values()) {
         			String suggestion = cmd.toString().toLowerCase();
         			if(cmd.equals(CommandType.ADMIN)) {
+        				// Suggest admin command if any sub-command permissions are valid
         				for(AdminCommandType subcmd : AdminCommandType.values()) {
-        					if((sender.hasPermission(cmd.permission()) || sender.hasPermission(subcmd.permission())) && !baseList.contains(suggestion)) {
+        					if(sender.hasPermission(subcmd.permission()) && !baseList.contains(suggestion)) {
         						baseList.add(suggestion);
         					}
         				}
         			} else if(sender.hasPermission(cmd.permission())) {
+        				// Suggest command if permission is valid
         				baseList.add(suggestion);
         			}
         		}
@@ -178,6 +186,8 @@ public class CommandHandler  implements TabExecutor {
             	// Handle admin commands differently from normal commands
             	if (commandArg.equals(CommandType.ADMIN)) {
             		// Command is an admin command
+            		tabList.addAll(new AdminCommand(konquest, sender, args).tabComplete());
+            		/*
             		if (args.length >= 2) {
             			AdminCommandType adminArg = AdminCommandType.getCommand(args[1]);
             			if (sender.hasPermission(commandArg.permission()) || sender.hasPermission(adminArg.permission())) {
@@ -189,7 +199,7 @@ public class CommandHandler  implements TabExecutor {
                 			// Sender has permission for this admin command
             				tabList.addAll(new AdminCommand(konquest, sender, args).tabComplete());
                 		}
-            		}
+            		}*/
             	} else {
             		// Command is a normal command
 	            	if (sender.hasPermission(commandArg.permission())) {
@@ -280,8 +290,8 @@ public class CommandHandler  implements TabExecutor {
             	}
         	}
         } /*else {
-        	ChatUtil.sendError((Player) sender, "Missing permission konquest.command");
-        }*/
+        //	ChatUtil.sendError((Player) sender, "Missing permission konquest.command");
+        //}*/
 		//ChatUtil.printDebug("Exiting onTabComplete");
         return tabList;
 	}

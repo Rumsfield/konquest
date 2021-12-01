@@ -299,94 +299,6 @@ public class PlayerListener implements Listener{
         }
     }
     
-    /*
-    private void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        //Check if the event was caused by a player
-        if(event.isAsynchronous() && !event.isCancelled()) {
-        	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.enable_format",true);
-        	if(enable) {
-	        	// Format chat messages
-        		boolean useKingdom = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.use_kingdom",true);
-	        	Player bukkitPlayer = event.getPlayer();
-	        	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
-					ChatUtil.printDebug("Failed to handle onAsyncPlayerChat for non-existent player");
-					return;
-				}
-	            KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-	            KonKingdom kingdom = player.getKingdom();
-	            event.setCancelled(true);
-	            
-	            String title = "";
-	            if(player.getPlayerPrefix().isEnabled()) {
-	            	title = player.getPlayerPrefix().getMainPrefixName()+" ";
-	            }
-	            String prefix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer));
-	            String suffix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer));
-	            String divider = ChatColor.translateAlternateColorCodes('&', "&7»");
-	            String kingdomName = "";
-	            if(useKingdom) {
-	            	kingdomName = kingdom.getName() + ChatColor.translateAlternateColorCodes('&', " &7| ");;
-	            }
-	            
-	            if(player.isGlobalChat()) {
-	            	//Global chat, all players see this format
-	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
-	            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
-	            		ChatColor teamColor = ChatColor.WHITE;
-	            		ChatColor titleColor = ChatColor.WHITE;
-	            		if(player.isBarbarian()) {
-	            			teamColor = ChatColor.YELLOW;
-	            		} else {
-	            			if(globalPlayer.getKingdom().equals(kingdom)) {
-	                			// Message sender is in same kingdom as receiver
-	                			teamColor = ChatColor.GREEN;
-	                			titleColor = ChatColor.DARK_GREEN;
-	                		} else {
-	                			// Message sender is in different kingdom as receiver
-	            				teamColor = ChatColor.RED;
-	                			titleColor = ChatColor.DARK_RED;
-	                		}
-	            		}
-	            		globalPlayer.getBukkitPlayer().sendMessage(
-	        					prefix+ 
-	        					teamColor+kingdomName+
-	        					titleColor+ChatColor.translateAlternateColorCodes('&', title)+ 
-	        					teamColor+bukkitPlayer.getName()+" "+
-	        					ChatColor.RESET+suffix+
-	        					divider+" "+
-	        					ChatColor.WHITE+event.getMessage());
-	            	}
-	            } else {
-	            	//Team chat only (and admins)
-	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + "[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
-	            	for(KonPlayer teamPlayer : playerManager.getPlayersOnline()) {
-	            		if(teamPlayer.getKingdom().equals(kingdom)) {
-	            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC+ChatColor.GREEN + event.getMessage());
-	            			teamPlayer.getBukkitPlayer().sendMessage(
-	            					ChatColor.translateAlternateColorCodes('&', prefix)+ 
-	            					ChatColor.GREEN+ChatColor.translateAlternateColorCodes('&', title)+
-	            					bukkitPlayer.getName()+" "+
-	            					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
-	            					divider+" "+
-	            					ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
-	            		} else if(teamPlayer.isAdminBypassActive()) {
-	            			//teamPlayer.getBukkitPlayer().sendMessage(ChatColor.GREEN + "[K-bypass] "+bukkitPlayer.getDisplayName() +": "+ ChatColor.ITALIC + event.getMessage());
-	            			teamPlayer.getBukkitPlayer().sendMessage(
-	            					ChatColor.translateAlternateColorCodes('&', prefix)+ 
-	            					ChatColor.GOLD+kingdomName+
-	            					ChatColor.GOLD+ChatColor.translateAlternateColorCodes('&', title)+
-	            					bukkitPlayer.getName()+" "+
-	            					ChatColor.translateAlternateColorCodes('&', "&r"+suffix)+ 
-	            					divider+" "+
-	            					ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
-	            		}
-	            	}
-	            }
-        	}
-        }
-    }
-    */
-    
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
     	KonPlayer player = playerManager.getPlayer(event.getPlayer());
@@ -409,6 +321,9 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteract(PlayerInteractEvent event) {
     	// TODO Allow players to use boats in capital?
+    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
+			return;
+		}
     	Player bukkitPlayer = event.getPlayer();
     	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to handle onPlayerInteract for non-existent player");
@@ -616,7 +531,10 @@ public class PlayerListener implements Listener{
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerArrowInteract(EntityInteractEvent event) {
-		// prevent player-shot arrows from interacting with things
+    	if(konquest.isWorldIgnored(event.getEntity().getLocation().getWorld())) {
+			return;
+		}
+    	// prevent player-shot arrows from interacting with things
     	Player bukkitPlayer = null;
 		if (event.getEntity() instanceof Arrow) {
             Arrow arrow = (Arrow) event.getEntity();
@@ -659,7 +577,9 @@ public class PlayerListener implements Listener{
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-    	
+    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
+			return;
+		}
     	Entity clicked = event.getRightClicked();
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
@@ -703,6 +623,9 @@ public class PlayerListener implements Listener{
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
+			return;
+		}
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
         if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
@@ -720,6 +643,9 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerFish(PlayerFishEvent event) {
     	if(!event.isCancelled()) {
+    		if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
+    			return;
+    		}
     		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
     		if(player != null && event.getState().equals(PlayerFishEvent.State.CAUGHT_FISH)) {
     			Entity caughtEntity = event.getCaught();
@@ -747,6 +673,9 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
     	if(!event.isCancelled()) {
+    		if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
+    			return;
+    		}
     		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
     		// Check for potion usage and update accomplishment
     		if(player != null && event.getItem().getType().equals(Material.POTION)) {
@@ -858,6 +787,9 @@ public class PlayerListener implements Listener{
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerExpChange(PlayerExpChangeEvent event) {
+    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
+			return;
+		}
     	//ChatUtil.printDebug("EVENT: Player exp changed");
     	Player bukkitPlayer = event.getPlayer();
     	KonPlayer player = playerManager.getPlayer(bukkitPlayer);

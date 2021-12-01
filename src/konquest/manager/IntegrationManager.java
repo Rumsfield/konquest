@@ -60,15 +60,25 @@ public class IntegrationManager {
             if (quickShop != null && quickShop.isEnabled()) {
             	// Verify version requirement
             	String ver = quickShop.getDescription().getVersion();
-            	String req = "4.0.9.4";
+            	String reqMin = "4.0.9.4";
+            	String reqMax = "4.0.9.10";
             	Version installedVersion = new Version(ver);
-            	Version minimumVersion = new Version(req);
-            	if(installedVersion.compareTo(minimumVersion) >= 0) {
+            	Version minimumVersion = new Version(reqMin);
+            	Version maximumVersion = new Version(reqMax);
+            	boolean isMinVersion = (installedVersion.compareTo(minimumVersion) >= 0);
+            	boolean isMaxVersion = (installedVersion.compareTo(maximumVersion) <= 0);
+            	if(isMinVersion && isMaxVersion) {
             		isQuickShopEnabled = true;
                 	konquest.getPlugin().getServer().getPluginManager().registerEvents(new QuickShopListener(konquest.getPlugin()), konquest.getPlugin());
                 	ChatUtil.printConsoleAlert("Successfully integrated QuickShop version "+ver);
             	} else {
-            		ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too old. You must update it to at least version "+req);
+            		if(isMinVersion) {
+            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too old. You must update it to at least version "+reqMin);
+            		} else if(isMaxVersion) {
+            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too new. You must update it to at most version "+reqMax);
+            		} else {
+            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is unknown. You must use a version between "+reqMin+" and "+reqMax);
+            		}
             	}
             } else {
             	ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin not found or disabled");

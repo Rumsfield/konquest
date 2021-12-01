@@ -95,7 +95,7 @@ public class KingdomManager {
 			kingdomMap.put(name, new KonKingdom(loc, name, konquest));
 			kingdomMap.get(name).initCapital();
 			kingdomMap.get(name).getCapital().updateBarPlayers();
-			//updateTerritoryCache();
+			updateSmallestKingdom();
 			addAllTerritory(loc.getWorld(),kingdomMap.get(name).getCapital().getChunkList());
 			konquest.getMapHandler().drawDynmapUpdateTerritory(kingdomMap.get(name).getCapital());
 			//ChatUtil.printDebug("Added new Kingdom "+name);
@@ -1464,171 +1464,6 @@ public class KingdomManager {
 	}
 	
 	/**
-	 * Determines all block locations at the top of a chunk which lie on the border of the chunk's territory.
-	 * @param nearbyChunks
-	 * @param player
-	 * @return
-	 */
-	/*public HashMap<Location,Color> getBorderLocationMap(ArrayList<Chunk> renderChunks, KonPlayer player) {
-		//TODO: Poor coding style, optimize with a general FOR loop
-		HashMap<Location,Color> locationMap = new HashMap<Location,Color>();
-		// Evaluate every chunk in the provided list. If it's claimed, check each adjacent chunk and determine border locations
-		for(Chunk chunk : renderChunks) {
-			Point point = konquest.toPoint(chunk);
-			World renderWorld = chunk.getWorld();
-			if(isChunkClaimed(point,renderWorld)) {
-				KonKingdom chunkKingdom = getChunkTerritory(point,renderWorld).getKingdom();
-				Location renderLoc;
-				Color renderColor;
-				if(chunkKingdom.equals(getBarbarians())) {
-					renderColor = Color.YELLOW;
-				} else if(chunkKingdom.equals(getNeutrals())) {
-					renderColor = Color.GRAY;
-				} else {
-					if(player.getKingdom().equals(chunkKingdom)) {
-						renderColor = Color.GREEN;
-					} else {
-						renderColor = Color.RED;
-					}
-				}
-				Point sidePoint;
-				boolean isClaimed = false;
-				int z_fixed, x_fixed;
-				int y_max;
-				double y_mod;
-				final int Y_MIN_LIMIT = 1;
-				final int Y_MAX_LIMIT = 255;
-				final double X_MOD = 0.5;
-				final double Y_MOD = 1;
-				final double Y_MOD_SNOW = 1.1;
-				final double Z_MOD = 0.5;
-				// Side chunk in +Z direction
-				sidePoint = new Point(point.x + 0, point.y + 1);
-				isClaimed = isChunkClaimed(sidePoint,renderWorld);
-				if(!isClaimed || (isClaimed && !getChunkTerritory(sidePoint,renderWorld).getKingdom().equals(chunkKingdom))) {
-					ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
-					z_fixed = 15;
-					y_max = 0;
-					for(int x = 0;x<16;x++) {
-						y_max = chunkSnap.getHighestBlockYAt(x, z_fixed);
-						y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
-						y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
-						while((chunk.getBlock(x, y_max, z_fixed).isPassable() || !chunk.getBlock(x, y_max, z_fixed).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
-							y_max--;
-						}
-						while(chunk.getBlock(x, y_max+1, z_fixed).isLiquid() && y_max < Y_MAX_LIMIT) {
-							y_max++;
-						}
-						Block renderBlock = chunk.getBlock(x, y_max, z_fixed);
-						Block aboveBlock = chunk.getBlock(x, y_max+1, z_fixed);
-						y_mod = Y_MOD;
-						if(aboveBlock.getBlockData() instanceof Snow) {
-							Snow snowBlock = (Snow)aboveBlock.getBlockData();
-							if(snowBlock.getLayers() >= snowBlock.getMinimumLayers()) {
-								y_mod = Y_MOD_SNOW;
-							}
-						}
-						renderLoc = new Location(renderBlock.getWorld(),renderBlock.getLocation().getX()+X_MOD,renderBlock.getLocation().getY()+y_mod,renderBlock.getLocation().getZ()+Z_MOD);
-						locationMap.put(renderLoc, renderColor);
-					}
-				}
-				// Side chunk in -Z direction
-				sidePoint = new Point(point.x + 0, point.y - 1);
-				isClaimed = isChunkClaimed(sidePoint,renderWorld);
-				if(!isClaimed || (isClaimed && !getChunkTerritory(sidePoint,renderWorld).getKingdom().equals(chunkKingdom))) {
-					ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
-					z_fixed = 0;
-					y_max = 0;
-					for(int x = 0;x<16;x++) {
-						y_max = chunkSnap.getHighestBlockYAt(x, z_fixed);
-						y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
-						y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
-						while((chunk.getBlock(x, y_max, z_fixed).isPassable() || !chunk.getBlock(x, y_max, z_fixed).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
-							y_max--;
-						}
-						while(chunk.getBlock(x, y_max+1, z_fixed).isLiquid() && y_max < Y_MAX_LIMIT) {
-							y_max++;
-						}
-						Block renderBlock = chunk.getBlock(x, y_max, z_fixed);
-						Block aboveBlock = chunk.getBlock(x, y_max+1, z_fixed);
-						y_mod = Y_MOD;
-						if(aboveBlock.getBlockData() instanceof Snow) {
-							Snow snowBlock = (Snow)aboveBlock.getBlockData();
-							if(snowBlock.getLayers() >= snowBlock.getMinimumLayers()) {
-								y_mod = Y_MOD_SNOW;
-							}
-						}
-						renderLoc = new Location(renderBlock.getWorld(),renderBlock.getLocation().getX()+X_MOD,renderBlock.getLocation().getY()+y_mod,renderBlock.getLocation().getZ()+Z_MOD);
-						locationMap.put(renderLoc, renderColor);
-					}
-				}
-				// Side chunk in +X direction
-				sidePoint = new Point(point.x + 1, point.y + 0);
-				isClaimed = isChunkClaimed(sidePoint,renderWorld);
-				if(!isClaimed || (isClaimed && !getChunkTerritory(sidePoint,renderWorld).getKingdom().equals(chunkKingdom))) {
-					ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
-					x_fixed = 15;
-					y_max = 0;
-					for(int z = 0;z<16;z++) {
-						y_max = chunkSnap.getHighestBlockYAt(x_fixed, z);
-						y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
-						y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
-						while((chunk.getBlock(x_fixed, y_max, z).isPassable() || !chunk.getBlock(x_fixed, y_max, z).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
-							y_max--;
-						}
-						while(chunk.getBlock(x_fixed, y_max+1, z).isLiquid() && y_max < Y_MAX_LIMIT) {
-							y_max++;
-						}
-						Block renderBlock = chunk.getBlock(x_fixed, y_max, z);
-						Block aboveBlock = chunk.getBlock(x_fixed, y_max+1, z);
-						y_mod = Y_MOD;
-						if(aboveBlock.getBlockData() instanceof Snow) {
-							Snow snowBlock = (Snow)aboveBlock.getBlockData();
-							if(snowBlock.getLayers() >= snowBlock.getMinimumLayers()) {
-								y_mod = Y_MOD_SNOW;
-							}
-						}
-						renderLoc = new Location(renderBlock.getWorld(),renderBlock.getLocation().getX()+X_MOD,renderBlock.getLocation().getY()+y_mod,renderBlock.getLocation().getZ()+Z_MOD);
-						locationMap.put(renderLoc, renderColor);
-					}
-				}
-				// Side chunk in -X direction
-				sidePoint = new Point(point.x - 1, point.y + 0);
-				isClaimed = isChunkClaimed(sidePoint,renderWorld);
-				if(!isClaimed || (isClaimed && !getChunkTerritory(sidePoint,renderWorld).getKingdom().equals(chunkKingdom))) {
-					ChunkSnapshot chunkSnap = chunk.getChunkSnapshot(true,false,false);
-					x_fixed = 0;
-					y_max = 0;
-					for(int z = 0;z<16;z++) {
-						y_max = chunkSnap.getHighestBlockYAt(x_fixed, z);
-						y_max = (y_max > Y_MAX_LIMIT) ? Y_MAX_LIMIT : y_max;
-						y_max = (y_max < Y_MIN_LIMIT) ? Y_MIN_LIMIT : y_max;
-						while((chunk.getBlock(x_fixed, y_max, z).isPassable() || !chunk.getBlock(x_fixed, y_max, z).getType().isOccluding()) && y_max > Y_MIN_LIMIT) {
-							y_max--;
-						}
-						while(chunk.getBlock(x_fixed, y_max+1, z).isLiquid() && y_max < Y_MAX_LIMIT) {
-							y_max++;
-						}
-						Block renderBlock = chunk.getBlock(x_fixed, y_max, z);
-						Block aboveBlock = chunk.getBlock(x_fixed, y_max+1, z);
-						y_mod = Y_MOD;
-						if(aboveBlock.getBlockData() instanceof Snow) {
-							Snow snowBlock = (Snow)aboveBlock.getBlockData();
-							if(snowBlock.getLayers() >= snowBlock.getMinimumLayers()) {
-								y_mod = Y_MOD_SNOW;
-							}
-						}
-						renderLoc = new Location(renderBlock.getWorld(),renderBlock.getLocation().getX()+X_MOD,renderBlock.getLocation().getY()+y_mod,renderBlock.getLocation().getZ()+Z_MOD);
-						locationMap.put(renderLoc, renderColor);
-					}
-				}
-			}
-		}
-		return locationMap;
-	}
-	*/
-	
-	/**
 	 * 
 	 * @param renderChunks - List of chunks to check for borders
 	 * @param player - Player to render borders for
@@ -1637,8 +1472,8 @@ public class KingdomManager {
 	public HashMap<Location,Color> getBorderLocationMap(ArrayList<Chunk> renderChunks, KonPlayer player) {
 		HashMap<Location,Color> locationMap = new HashMap<Location,Color>();
 		//Location playerLoc = player.getBukkitPlayer().getLocation();
-		final int Y_MIN_LIMIT = 1;
-		final int Y_MAX_LIMIT = 255;
+		final int Y_MIN_LIMIT = player.getBukkitPlayer().getWorld().getMinHeight()+1;
+		final int Y_MAX_LIMIT = player.getBukkitPlayer().getWorld().getMaxHeight()-1;
 		final double X_MOD = 0.5;
 		final double Y_MOD = 1;
 		final double Y_MOD_SNOW = 1.1;
@@ -1724,8 +1559,8 @@ public class KingdomManager {
 	
 	public HashMap<Location,Color> getPlotBorderLocationMap(ArrayList<Chunk> renderChunks, KonPlayer player) {
 		HashMap<Location,Color> locationMap = new HashMap<Location,Color>();
-		final int Y_MIN_LIMIT = 1;
-		final int Y_MAX_LIMIT = 255;
+		final int Y_MIN_LIMIT = player.getBukkitPlayer().getWorld().getMinHeight()+1;
+		final int Y_MAX_LIMIT = player.getBukkitPlayer().getWorld().getMaxHeight()-1;
 		final double X_MOD = 0.5;
 		final double Y_MOD = 1;
 		final double Y_MOD_SNOW = 1.1;
