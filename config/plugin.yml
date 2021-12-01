@@ -22,23 +22,26 @@ softdepend:
 commands:
   konquest:
     description: Base Konquest command
-    usage: /<command> [options]
+    usage: /<command> [sub-command] [arguments]
     permission: konquest.command
   k:
     description: Display help menu
-    usage: /<command> [options]
+    usage: /<command> [sub-command] [arguments]
     permission: konquest.command
 permissions:
   konquest.*:
     description: Gives access to all Konquest permissions
-    children:
-      konquest.command: true
     default: op
+    children:
+      konquest.command.*: true
+      konquest.directive.*: true
+      konquest.compass: true
+      konquest.join: true
 
   konquest.command:
-    description: Gives access to base Konquest command permission
+    description: Base command permission
     default: true
-
+    
   konquest.command.*:
     description: Gives access to all Konquest commands
     default: op
@@ -63,7 +66,7 @@ permissions:
       konquest.command.town: true
       konquest.command.fly: true
       konquest.command.border: true
-      konquest.command.admin: true
+      konquest.command.admin.*: true
 
   konquest.command.help:
     description: Display help in chat
@@ -145,7 +148,7 @@ permissions:
     description: Toggle particle borders of territories and plots
     default: true
     
-  konquest.command.admin:
+  konquest.command.admin.*:
     description: All admin commands
     default: op
     children:
@@ -264,10 +267,6 @@ permissions:
   konquest.command.admin.unclaim:
     description: Return a chunk to the Wild
     default: op
-  
-  konquest.directive:
-    description: Gives access to base Konquest directive permission
-    default: true
 
   konquest.directive.*:
     description: Gives access to all Konquest directives

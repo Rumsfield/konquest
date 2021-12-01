@@ -5,11 +5,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import konquest.Konquest;
 import konquest.command.CommandBase;
 import konquest.command.KonquestCommand;
+import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 
 public class AdminCommand extends CommandBase {
 
@@ -20,84 +23,92 @@ public class AdminCommand extends CommandBase {
     public void execute() {
         if (getArgs().length == 1) {
         	//ChatUtil.sendNotice((Player) getSender(), "Try \"/k admin help\" for a list of available commands");
-        	new HelpAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+        	if (getSender().hasPermission(AdminCommandType.HELP.permission())) {
+        		new HelpAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+        	} else {
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+AdminCommandType.HELP.permission());
+        	}
         } else if (getArgs().length >= 2) {
         	AdminCommandType commandArg = AdminCommandType.getCommand(getArgs()[1]);
-            switch (commandArg) {
-	            case BYPASS:
-	                new BypassAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                break;
-            	case CLAIM:
-                    new ClaimAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-            	case FLAG:
-                    new FlagAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-            	case FORCECAPTURE:
-                    new ForceCaptureAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case FORCEEXILE:
-                    new ForceExileAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case FORCEJOIN:
-                    new ForceJoinAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case FORCETOWN:
-                    new ForceTownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case HELP:
-                    new HelpAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case LIST:
-                    new ListAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case MAKEKINGDOM:
-                    new MakeKingdomAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case MAKETOWN:
-                    new MakeTownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case MONUMENT:
-                    new MonumentAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case REMOVEKINGDOM:
-                    new RemoveKingdomAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case REMOVETOWN:
-                    new RemoveTownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case REMOVECAMP:
-                    new RemoveCampAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case RENAME:
-                    new RenameAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case RUIN:
-                    new RuinAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case SAVE:
-                    new SaveAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case SETTRAVEL:
-                    new SetTravelAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case STAT:
-                    new StatAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case TRAVEL:
-                    new TravelAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case UNCLAIM:
-                    new UnclaimAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                case RELOAD:
-                    new ReloadAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-                    break;
-                default:
-                	new KonquestCommand(getKonquest(), getSender()).execute();
-                	//ChatUtil.sendError((Player) getSender(), "Command does not exist");
-                	break;
-            }
+        	if (getSender().hasPermission(commandArg.permission())) {
+	            switch (commandArg) {
+		            case BYPASS:
+		                new BypassAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+		                break;
+	            	case CLAIM:
+	                    new ClaimAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	            	case FLAG:
+	                    new FlagAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	            	case FORCECAPTURE:
+	                    new ForceCaptureAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case FORCEEXILE:
+	                    new ForceExileAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case FORCEJOIN:
+	                    new ForceJoinAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case FORCETOWN:
+	                    new ForceTownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case HELP:
+	                    new HelpAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case LIST:
+	                    new ListAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case MAKEKINGDOM:
+	                    new MakeKingdomAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case MAKETOWN:
+	                    new MakeTownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case MONUMENT:
+	                    new MonumentAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case REMOVEKINGDOM:
+	                    new RemoveKingdomAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case REMOVETOWN:
+	                    new RemoveTownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case REMOVECAMP:
+	                    new RemoveCampAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case RENAME:
+	                    new RenameAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case RUIN:
+	                    new RuinAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case SAVE:
+	                    new SaveAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case SETTRAVEL:
+	                    new SetTravelAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case STAT:
+	                    new StatAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case TRAVEL:
+	                    new TravelAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case UNCLAIM:
+	                    new UnclaimAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case RELOAD:
+	                    new ReloadAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                default:
+	                	new KonquestCommand(getKonquest(), getSender()).execute();
+	                	//ChatUtil.sendError((Player) getSender(), "Command does not exist");
+	                	break;
+	            }
+        	} else {
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+commandArg.permission());
+        	}
         }
     }
     
