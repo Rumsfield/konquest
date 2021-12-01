@@ -10,7 +10,7 @@
 #  world_name*:                     [LEGACY] Primary world name for kingdoms and towns created before v0.3.0 (string)
 #  world_blacklist*:                World names where kingdoms and towns cannot exist (string list, use [] to disable)
 #  world_blacklist_reverse*:        Reverse world_blacklist into a whitelist, where listed world names become the only worlds where kingdoms and towns can exist (true/false)
-#  world_blacklist_ignore*:         Ignore all Konquest protections in blacklist worlds, basically making the worlds into vanilla (true/false)
+#  world_blacklist_ignore*:         [EXPERIMENTAL] Ignore all Konquest protections in blacklist worlds, basically making the worlds into vanilla (true/false)
 #  save_interval*:                  Save interval in minutes, 0 to disable (integer >= 0)
 #  community_link:                  URL which will appear in the /k community link icon (string)
 #  accomplishment_prefix:           Enable the usage of accomplishment prefixes applied to player names (true/false)
