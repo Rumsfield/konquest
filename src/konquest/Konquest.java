@@ -59,6 +59,7 @@ import konquest.model.KonUpgrade;
 import konquest.nms.TeamPacketSender;
 import konquest.nms.TeamPacketSender_p754;
 import konquest.nms.TeamPacketSender_p755;
+import konquest.nms.TeamPacketSender_p756;
 import konquest.utility.ChatUtil;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
@@ -860,6 +861,8 @@ public class Konquest implements Timeable {
     		teamPacketSender = new TeamPacketSender_p754();
     	} else if(version.equals("v1_17_R1")) {
     		teamPacketSender = new TeamPacketSender_p755();
+    	} else if(version.equals("v1_18_R1")) {
+    		teamPacketSender = new TeamPacketSender_p756();
     	}
     	return teamPacketSender != null;
     }
