@@ -104,6 +104,7 @@ public class Konquest implements Timeable {
 	private static final EventPriority defaultChatPriority = EventPriority.HIGH;
     private List<World> worlds;
     private boolean isWhitelist;
+    private boolean isBlacklistIgnored;
 	public List<String> opStatusMessages;
 	private Timer saveTimer;
 	private Timer compassTimer;
@@ -145,6 +146,7 @@ public class Konquest implements Timeable {
 		chatPriority = defaultChatPriority;
 		worlds = new ArrayList<World>();
 		isWhitelist = false;
+		isBlacklistIgnored = false;
 		opStatusMessages = new ArrayList<String>();
 		this.saveTimer = new Timer(this);
 		this.compassTimer = new Timer(this);
@@ -255,6 +257,7 @@ public class Konquest implements Timeable {
 	private void initWorlds() {
 		List<String> worldNameList = configManager.getConfig("core").getStringList("core.world_blacklist");
 		isWhitelist = configManager.getConfig("core").getBoolean("core.world_blacklist_reverse",false);
+		isBlacklistIgnored = configManager.getConfig("core").getBoolean("core.world_blacklist_ignore",false);
 		// Verify listed worlds exist
 		for(String name : worldNameList) {
 			boolean matches = false;
@@ -447,6 +450,10 @@ public class Konquest implements Timeable {
 			result = !worlds.contains(world);
 		}
 		return result;
+	}
+	
+	public boolean isWorldIgnored(World world) {
+		return isBlacklistIgnored && !isWorldValid(world);
 	}
 	
 	@Override
