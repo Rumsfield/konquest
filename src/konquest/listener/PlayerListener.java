@@ -321,9 +321,9 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteract(PlayerInteractEvent event) {
     	// TODO Allow players to use boats in capital?
-    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
-			return;
-		}
+//    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
+//			return;
+//		}
     	Player bukkitPlayer = event.getPlayer();
     	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to handle onPlayerInteract for non-existent player");
@@ -531,9 +531,9 @@ public class PlayerListener implements Listener{
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerArrowInteract(EntityInteractEvent event) {
-    	if(konquest.isWorldIgnored(event.getEntity().getLocation().getWorld())) {
-			return;
-		}
+//    	if(konquest.isWorldIgnored(event.getEntity().getLocation().getWorld())) {
+//			return;
+//		}
     	// prevent player-shot arrows from interacting with things
     	Player bukkitPlayer = null;
 		if (event.getEntity() instanceof Arrow) {
@@ -577,9 +577,9 @@ public class PlayerListener implements Listener{
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
-			return;
-		}
+//    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
+//			return;
+//		}
     	Entity clicked = event.getRightClicked();
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
@@ -623,9 +623,9 @@ public class PlayerListener implements Listener{
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
-    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
-			return;
-		}
+//    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
+//			return;
+//		}
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
         if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
@@ -643,9 +643,9 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerFish(PlayerFishEvent event) {
     	if(!event.isCancelled()) {
-    		if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
-    			return;
-    		}
+//    		if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
+//    			return;
+//    		}
     		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
     		if(player != null && event.getState().equals(PlayerFishEvent.State.CAUGHT_FISH)) {
     			Entity caughtEntity = event.getCaught();
@@ -673,9 +673,9 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
     	if(!event.isCancelled()) {
-    		if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
-    			return;
-    		}
+//    		if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
+//    			return;
+//    		}
     		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
     		// Check for potion usage and update accomplishment
     		if(player != null && event.getItem().getType().equals(Material.POTION)) {
@@ -787,9 +787,9 @@ public class PlayerListener implements Listener{
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerExpChange(PlayerExpChangeEvent event) {
-    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
-			return;
-		}
+//    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
+//			return;
+//		}
     	//ChatUtil.printDebug("EVENT: Player exp changed");
     	Player bukkitPlayer = event.getPlayer();
     	KonPlayer player = playerManager.getPlayer(bukkitPlayer);

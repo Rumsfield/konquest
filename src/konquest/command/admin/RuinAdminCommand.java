@@ -31,10 +31,10 @@ public class RuinAdminCommand extends CommandBase {
             return;
         }
 		Player bukkitPlayer = (Player) getSender();
-		if(getKonquest().isWorldIgnored(bukkitPlayer.getWorld())) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
-			return;
-		}
+//		if(getKonquest().isWorldIgnored(bukkitPlayer.getWorld())) {
+//			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+//			return;
+//		}
 		if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to find non-existent player");
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());

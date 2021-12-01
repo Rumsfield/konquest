@@ -76,9 +76,9 @@ public class BlockListener implements Listener {
 			return;
 		}
 		
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+//		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//			return;
+//		}
 		
 		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onBlockBreak for non-existent player");
@@ -406,9 +406,9 @@ public class BlockListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockBreakLow(BlockBreakEvent event) {
 		if(!event.isCancelled()) {
-			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-				return;
-			}
+//			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//				return;
+//			}
 			if(event.getBlock().getType().equals(Material.DIAMOND_ORE)) {
 				boolean isDrop = event.isDropItems();
 				ChatUtil.printDebug("Diamond ore block break dropping items: "+isDrop);
@@ -428,9 +428,9 @@ public class BlockListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
     public void onCropHarvest(BlockBreakEvent event) {
 		if(!event.isCancelled()) {
-			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-				return;
-			}
+//			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//				return;
+//			}
 			Material brokenMat = event.getBlock().getType();
 			//ChatUtil.printDebug("EVENT: Broke material "+brokenMat.toString());
 			if(brokenMat.equals(Material.WHEAT) ||
@@ -466,9 +466,9 @@ public class BlockListener implements Listener {
 			return;
 		}
 		
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+//		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//			return;
+//		}
 		
 		// Track last block placed per player
 		konquest.lastPlaced.put(event.getPlayer(),event.getBlock().getLocation());
@@ -728,9 +728,9 @@ public class BlockListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
     public void onSeedPlant(BlockPlaceEvent event) {
 		if(!event.isCancelled()) {
-			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-				return;
-			}
+//			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//				return;
+//			}
 			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
 				ChatUtil.printDebug("Failed to handle onSeedPlant for non-existent player");
 				return;
@@ -754,9 +754,9 @@ public class BlockListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
     public void onFarmTill(BlockPlaceEvent event) {
 		if(!event.isCancelled()) {
-			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-				return;
-			}
+//			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//				return;
+//			}
 			Material placedMat = event.getBlockPlaced().getType();
 			if(placedMat.equals(Material.FARMLAND)) {
 				if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
@@ -778,9 +778,9 @@ public class BlockListener implements Listener {
     public void onBlockExplode(BlockExplodeEvent event) {
 		// Protect blocks inside of territory
 		//ChatUtil.printDebug("EVENT: blockExplode");
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+//		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//			return;
+//		}
 		for(Block block : event.blockList()) {
 			if(kingdomManager.isChunkClaimed(block.getLocation())) {
 				ChatUtil.printDebug("effected block is inside claimed territory");
@@ -872,9 +872,9 @@ public class BlockListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onPistonExtend(BlockPistonExtendEvent event) {
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+//		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//			return;
+//		}
 		//boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
 		// review the list of affected blocks, prevent any movement of monument blocks
 		for(Block pushBlock : event.getBlocks()) {
@@ -969,9 +969,9 @@ public class BlockListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onPistonRetract(BlockPistonRetractEvent event) {
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+//		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//			return;
+//		}
 		//boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
 		// review the list of affected blocks, prevent any movement of monument blocks
 		for(Block pullBlock : event.getBlocks()) {
@@ -1033,9 +1033,9 @@ public class BlockListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onFluidFlow(BlockFromToEvent event) {
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+//		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//			return;
+//		}
 		// Prevent all flow into monument
 		if(isBlockInsideMonument(event.getToBlock())) {
 			event.setCancelled(true);
@@ -1068,9 +1068,9 @@ public class BlockListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onBlockForm(BlockFormEvent event) {
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+//		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//			return;
+//		}
 		if(isBlockInsideMonument(event.getBlock())) {
 			event.setCancelled(true);
 			return;
@@ -1079,9 +1079,9 @@ public class BlockListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onBlockGrow(BlockGrowEvent event) {
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+//		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//			return;
+//		}
 		if(isBlockInsideMonument(event.getBlock())) {
 			event.setCancelled(true);
 			return;
@@ -1090,9 +1090,9 @@ public class BlockListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onBlockSpread(BlockSpreadEvent event) {
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+//		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//			return;
+//		}
 		if(kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
 			KonTerritory territory = kingdomManager.getChunkTerritory(event.getBlock().getLocation());
 			if(territory instanceof KonTown) {
@@ -1146,9 +1146,9 @@ public class BlockListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onBlockIgnite(BlockIgniteEvent event) {
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+//		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+//			return;
+//		}
 		if(isBlockInsideMonument(event.getBlock())) {
 			event.setCancelled(true);
 			return;

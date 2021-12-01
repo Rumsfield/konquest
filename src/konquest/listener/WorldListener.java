@@ -91,9 +91,9 @@ public class WorldListener  implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onStructureGrow(StructureGrowEvent event) {
-		if(konquest.isWorldIgnored(event.getWorld())) {
-			return;
-		}
+//		if(konquest.isWorldIgnored(event.getWorld())) {
+//			return;
+//		}
 		// Prevent growth if any blocks are within monument
 		for(BlockState bState : event.getBlocks()) {
 			if(isLocInsideMonument(bState.getLocation())) {
