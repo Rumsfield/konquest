@@ -847,12 +847,15 @@ public class PlayerListener implements Listener{
 		            Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
 					*/
 					if(territory instanceof KonCapital) {
-						ChatUtil.printDebug("EVENT: Portal creation stopped inside of capital "+territory.getName());
-						event.setCanCreatePortal(false);
-						event.setCancelled(true);
-						//ChatUtil.sendError(bukkitPlayer, "Your exit portal is inside the Capital of "+territory.getName()+", move your portal!");
-						ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_PORTAL_EXIT.getMessage());
-						return;
+						boolean isPortalAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_portal",false);
+						if(!isPortalAllowed) {
+							ChatUtil.printDebug("EVENT: Portal creation stopped inside of capital "+territory.getName());
+							event.setCanCreatePortal(false);
+							event.setCancelled(true);
+							//ChatUtil.sendError(bukkitPlayer, "Your exit portal is inside the Capital of "+territory.getName()+", move your portal!");
+							ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_PORTAL_EXIT.getMessage());
+							return;
+						}
 					}
 					if(territory instanceof KonTown) {
 						KonTown town = (KonTown) territory;

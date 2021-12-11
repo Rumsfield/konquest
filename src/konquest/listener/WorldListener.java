@@ -46,9 +46,12 @@ public class WorldListener  implements Listener {
 					KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(current_blockState.getLocation());
 					
 					if(territory instanceof KonCapital) {
-						ChatUtil.printDebug("EVENT: Portal creation stopped inside of capital "+territory.getName());
-						event.setCancelled(true);
-						return;
+						boolean isPortalAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_portal",false);
+						if(!isPortalAllowed) {
+							ChatUtil.printDebug("EVENT: Portal creation stopped inside of capital "+territory.getName());
+							event.setCancelled(true);
+							return;
+						}
 					}
 					
 					if(territory instanceof KonTown) {

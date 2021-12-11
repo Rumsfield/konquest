@@ -41,6 +41,7 @@
 #    capital_pvp:                   Allow player damage in capitals (true/false)
 #    capital_use:                   Allow players to interact with blocks and containers in capitals (true/false)
 #    capital_build:                 Allow players to build inside of capitals (true/false)
+#    capital_portal:                Allow Nether portals within kingdom capital land (true/false)
 #    protect_containers_use:        Prevent players in other kingdoms using containers in claimed land (true/false)
 #    protect_containers_break:      Prevent players in other kingdoms breaking containers in claimed land (true/false)
 #    no_enemy_enter:                Prevent enemy players from entering Kingdom Capitals (true/false)
@@ -183,6 +184,7 @@ core:
     capital_pvp: false
     capital_use: false
     capital_build: false
+    capital_portal: false
     protect_containers_use: true
     protect_containers_break: true
     no_enemy_enter: true
