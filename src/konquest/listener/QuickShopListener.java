@@ -48,7 +48,9 @@ public class QuickShopListener implements Listener{
 //		}
 		if(integrationManager.isQuickShopEnabled()) {
 			//ChatUtil.printDebug("ShopPreCreateEvent: player "+event.getPlayer().getName()+" at "+event.getLocation().toString());
-			
+			if(konquest.isWorldIgnored(event.getLocation())) {
+				return;
+			}
 			// Bypass all checks for admins in bypass mode
 			KonPlayer player = playerManager.getPlayer(event.getPlayer());
 			if(player != null && !player.isAdminBypassActive()) {
@@ -103,9 +105,9 @@ public class QuickShopListener implements Listener{
 	 */
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onShopPurchase(ShopPurchaseEvent event) {
-//		if(konquest.isWorldIgnored(event.getShop().getLocation().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getShop().getLocation())) {
+			return;
+		}
 		if(integrationManager.isQuickShopEnabled()) {
 			//ChatUtil.printDebug("ShopPurchaseEvent: owner "+Bukkit.getOfflinePlayer(event.getShop().getOwner()).getName()+" at "+event.getShop().getLocation());
 		

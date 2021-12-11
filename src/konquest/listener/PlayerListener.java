@@ -492,7 +492,7 @@ public class PlayerListener implements Listener{
         		} else {
         			// Interaction occurred in the wild
         			boolean isWildUse = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.wild_use", true);
-        			if(!isWildUse) {
+        			if(!isWildUse && !konquest.isWorldIgnored(clickedState.getLocation())) {
         				//ChatUtil.printDebug("  running preventUse: wild");
         				preventUse(event,player);
         			}
@@ -501,7 +501,8 @@ public class PlayerListener implements Listener{
         	// Check for item...
         	if(event.hasItem()) {
             	if(event.getItem().getType().isRecord() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-            		if(event.hasBlock() && event.getClickedBlock().getType().equals(Material.JUKEBOX)) {
+            		if(event.hasBlock() && event.getClickedBlock().getType().equals(Material.JUKEBOX) &&
+            				!konquest.isWorldIgnored(event.getClickedBlock().getLocation())) {
             			// Update music stat when not on record cooldown
             			if(player.isRecordPlayCooldownOver()) {
             				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.MUSIC,1);
@@ -531,9 +532,9 @@ public class PlayerListener implements Listener{
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerArrowInteract(EntityInteractEvent event) {
-//    	if(konquest.isWorldIgnored(event.getEntity().getLocation().getWorld())) {
-//			return;
-//		}
+    	if(konquest.isWorldIgnored(event.getEntity().getLocation())) {
+			return;
+		}
     	// prevent player-shot arrows from interacting with things
     	Player bukkitPlayer = null;
 		if (event.getEntity() instanceof Arrow) {
@@ -577,9 +578,9 @@ public class PlayerListener implements Listener{
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-//    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
-//			return;
-//		}
+    	if(konquest.isWorldIgnored(event.getPlayer().getLocation())) {
+			return;
+		}
     	Entity clicked = event.getRightClicked();
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
@@ -623,9 +624,9 @@ public class PlayerListener implements Listener{
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
-//    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
-//			return;
-//		}
+    	if(konquest.isWorldIgnored(event.getPlayer().getLocation())) {
+			return;
+		}
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
         if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
@@ -643,9 +644,9 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerFish(PlayerFishEvent event) {
     	if(!event.isCancelled()) {
-//    		if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
-//    			return;
-//    		}
+    		if(konquest.isWorldIgnored(event.getPlayer().getLocation())) {
+    			return;
+    		}
     		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
     		if(player != null && event.getState().equals(PlayerFishEvent.State.CAUGHT_FISH)) {
     			Entity caughtEntity = event.getCaught();
@@ -673,9 +674,9 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
     	if(!event.isCancelled()) {
-//    		if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
-//    			return;
-//    		}
+    		if(konquest.isWorldIgnored(event.getPlayer().getLocation())) {
+    			return;
+    		}
     		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
     		// Check for potion usage and update accomplishment
     		if(player != null && event.getItem().getType().equals(Material.POTION)) {
@@ -787,9 +788,9 @@ public class PlayerListener implements Listener{
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerExpChange(PlayerExpChangeEvent event) {
-//    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
-//			return;
-//		}
+    	if(konquest.isWorldIgnored(event.getPlayer().getLocation())) {
+			return;
+		}
     	//ChatUtil.printDebug("EVENT: Player exp changed");
     	Player bukkitPlayer = event.getPlayer();
     	KonPlayer player = playerManager.getPlayer(bukkitPlayer);
@@ -868,11 +869,6 @@ public class PlayerListener implements Listener{
 			}
     	}
     }
-    /*
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
-    	//onPlayerEnterLeaveChunk(event);
-    }*/
     
     /**
      * Checks for players moving into chunks

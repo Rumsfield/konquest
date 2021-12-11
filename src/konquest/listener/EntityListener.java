@@ -88,9 +88,9 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
     public void onEntityBreed(EntityBreedEvent event) {
 		if(!event.isCancelled()) {
-//			if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-//				return;
-//			}
+			if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
+				return;
+			}
 			if(event.getBreeder() instanceof Player) {
 				Player bukkitPlayer = (Player)event.getBreeder();
 				if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
@@ -118,9 +118,9 @@ public class EntityListener implements Listener {
     public void onEntityExplode(EntityExplodeEvent event) {
 		// Protect blocks inside of territory
 		//ChatUtil.printDebug("EVENT: entityExplode");
-//		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
+			return;
+		}
 		//boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
 		for(Block block : event.blockList()) {
 			if(kingdomManager.isChunkClaimed(block.getLocation())) {
@@ -272,9 +272,9 @@ public class EntityListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onEntityPotionEffect(EntityPotionEffectEvent event) {
-//		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
+			return;
+		}
 		// prevent milk buckets from removing town nerfs in enemy towns
 		if(!event.isCancelled() && event.getEntity() instanceof Player) {
 			if(!konquest.getPlayerManager().isPlayer((Player)event.getEntity())) {
@@ -296,9 +296,9 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onEntityInteract(EntityInteractEvent event) {
 		// prevent items from interacting with pressure plates
-//		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
+			return;
+		}
 		//String entity = event.getEntity().getType().toString();
 		//String block = event.getBlock().getType().toString();
 		//ChatUtil.printDebug("Entity "+entity+" interacted with block "+block);
@@ -309,9 +309,9 @@ public class EntityListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.LOW)
     public void onEntityTarget(EntityTargetEvent event) {
-//		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
+			return;
+		}
 		// Prevent Iron Golems from targeting friendly players
 		Entity target = event.getTarget();
 		Entity e = event.getEntity();
@@ -361,9 +361,9 @@ public class EntityListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onEntityDamage(EntityDamageEvent event) {
-//		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
+			return;
+		}
 		Location damageLoc = event.getEntity().getLocation();
 		if(kingdomManager.isChunkClaimed(damageLoc)) {
 			KonTerritory territory = kingdomManager.getChunkTerritory(damageLoc);
@@ -381,9 +381,9 @@ public class EntityListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onEntityDamageByPlayer(EntityDamageByEntityEvent event) {
-//		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
+			return;
+		}
 		Entity entityVictim = event.getEntity();
 		EntityType eType = event.getEntity().getType();
 		//EntityType dType = event.getDamager().getType();
@@ -558,9 +558,9 @@ public class EntityListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerDamageByPlayer(EntityDamageByEntityEvent event) {
-//		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
+			return;
+		}
 		Player victimBukkitPlayer;
         Player attackerBukkitPlayer = null;
         boolean isEggAttack = false;
@@ -684,9 +684,9 @@ public class EntityListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
-//		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
+			return;
+		}
 		//ChatUtil.printDebug("EVENT: Player interacted with item "+event.getItem().getType().toString());
 		ProjectileSource source = event.getEntity().getShooter();
 		if(event.getEntityType().equals(EntityType.SPLASH_POTION) && source instanceof Player) {
@@ -700,9 +700,9 @@ public class EntityListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onAnimalDeathItem(EntityDeathEvent event) {
-//		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
+			return;
+		}
 		// Cause additional items to drop when event is located in town with upgrade
 		if(event.getEntity() instanceof Animals && kingdomManager.isChunkClaimed(event.getEntity().getLocation())) {
 			KonTerritory territory = kingdomManager.getChunkTerritory(event.getEntity().getLocation());
