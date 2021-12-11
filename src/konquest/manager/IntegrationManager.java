@@ -56,46 +56,54 @@ public class IntegrationManager {
 	public void initialize() {
 		// Attempt to integrate QuickShop
 		if(konquest.getConfigManager().getConfig("core").getBoolean("core.integration.quickshop",false)) {
-			Plugin quickShop = Bukkit.getPluginManager().getPlugin("QuickShop");
-            if (quickShop != null && quickShop.isEnabled()) {
-            	// Verify version requirement
-            	String ver = quickShop.getDescription().getVersion();
-            	String reqMin = "4.0.9.4";
-            	String reqMax = "4.0.9.10";
-            	Version installedVersion = new Version(ver);
-            	Version minimumVersion = new Version(reqMin);
-            	Version maximumVersion = new Version(reqMax);
-            	boolean isMinVersion = (installedVersion.compareTo(minimumVersion) >= 0);
-            	boolean isMaxVersion = (installedVersion.compareTo(maximumVersion) <= 0);
-            	if(isMinVersion && isMaxVersion) {
-            		isQuickShopEnabled = true;
-                	konquest.getPlugin().getServer().getPluginManager().registerEvents(new QuickShopListener(konquest.getPlugin()), konquest.getPlugin());
-                	ChatUtil.printConsoleAlert("Successfully integrated QuickShop version "+ver);
-            	} else {
-            		if(isMinVersion) {
-            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too old. You must update it to at least version "+reqMin);
-            		} else if(isMaxVersion) {
-            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too new. You must update it to at most version "+reqMax);
-            		} else {
-            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is unknown. You must use a version between "+reqMin+" and "+reqMax);
-            		}
-            	}
-            } else {
-            	ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin not found or disabled");
-            }
+			try {
+				Plugin quickShop = Bukkit.getPluginManager().getPlugin("QuickShop");
+	            if (quickShop != null && quickShop.isEnabled()) {
+	            	// Verify version requirement
+	            	String ver = quickShop.getDescription().getVersion();
+	            	String reqMin = "4.0.9.4";
+	            	String reqMax = "4.0.9.10";
+	            	Version installedVersion = new Version(ver);
+	            	Version minimumVersion = new Version(reqMin);
+	            	Version maximumVersion = new Version(reqMax);
+	            	boolean isMinVersion = (installedVersion.compareTo(minimumVersion) >= 0);
+	            	boolean isMaxVersion = (installedVersion.compareTo(maximumVersion) <= 0);
+	            	if(isMinVersion && isMaxVersion) {
+	            		isQuickShopEnabled = true;
+	                	konquest.getPlugin().getServer().getPluginManager().registerEvents(new QuickShopListener(konquest.getPlugin()), konquest.getPlugin());
+	                	ChatUtil.printConsoleAlert("Successfully integrated QuickShop version "+ver);
+	            	} else {
+	            		if(isMinVersion) {
+	            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too old. You must update it to at least version "+reqMin);
+	            		} else if(isMaxVersion) {
+	            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too new. You must update it to at most version "+reqMax);
+	            		} else {
+	            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is unknown. You must use a version between "+reqMin+" and "+reqMax);
+	            		}
+	            	}
+	            } else {
+	            	ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin not found or disabled");
+	            }
+			} catch (Exception e) {
+				ChatUtil.printConsoleError("Failed to integrate QuickShop, missing JAR!");
+			}
 		} else {
 			ChatUtil.printDebug("Skipping QuickShop integration from config settings");
 		}
 		
 		// Attempt to integrate Luckperms
 		if(konquest.getConfigManager().getConfig("core").getBoolean("core.integration.luckperms",false)) {
-			RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-			if (provider != null) {
-				lpAPI = provider.getProvider();
-				isLuckPermsEnabled = true;
-				ChatUtil.printConsoleAlert("Successfully integrated LuckPerms");
-			} else {
-				ChatUtil.printConsoleError("Failed to integrate LuckPerms, plugin not found or disabled");
+			try {
+				RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+				if (provider != null) {
+					lpAPI = provider.getProvider();
+					isLuckPermsEnabled = true;
+					ChatUtil.printConsoleAlert("Successfully integrated LuckPerms");
+				} else {
+					ChatUtil.printConsoleError("Failed to integrate LuckPerms, plugin not found or disabled");
+				}
+			} catch (Exception e) {
+				ChatUtil.printConsoleError("Failed to integrate LuckPerms, missing JAR!");
 			}
 		} else {
 			ChatUtil.printDebug("Skipping LuckPerms integration from config settings");
