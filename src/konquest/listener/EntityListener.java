@@ -216,6 +216,8 @@ public class EntityListener implements Listener {
 				boolean stopOnType = !(eType.equals(EntityType.ARMOR_STAND) || eType.equals(EntityType.IRON_GOLEM));
 				boolean stopOnReason = !(eReason.equals(SpawnReason.COMMAND) || eReason.equals(SpawnReason.CUSTOM) || eReason.equals(SpawnReason.DEFAULT));
 				if(stopOnType || stopOnReason) {
+					boolean isAllMobSpawnAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_mobs",false);
+					if((territory.getTerritoryType().equals(KonTerritoryType.CAPITAL) && !isAllMobSpawnAllowed) || territory.getTerritoryType().equals(KonTerritoryType.RUIN))
 					event.setCancelled(true);
 				}
 			}
@@ -231,8 +233,10 @@ public class EntityListener implements Listener {
 						event.getSpawnReason().equals(SpawnReason.PATROL) ||
 						event.getSpawnReason().equals(SpawnReason.RAID) ||
 						event.getSpawnReason().equals(SpawnReason.VILLAGE_INVASION)) {
-					
-					event.setCancelled(true);
+					boolean isAllMobSpawnAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.town_mobs",false);
+					if(!isAllMobSpawnAllowed) {
+						event.setCancelled(true);
+					}
 				}
 				// Check to see if player created an Iron Golem
 				if(event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM)) {
