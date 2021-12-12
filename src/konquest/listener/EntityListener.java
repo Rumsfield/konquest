@@ -215,7 +215,7 @@ public class EntityListener implements Listener {
 				SpawnReason eReason = event.getSpawnReason();
 				boolean stopOnType = !(eType.equals(EntityType.ARMOR_STAND) || eType.equals(EntityType.IRON_GOLEM));
 				boolean stopOnReason = !(eReason.equals(SpawnReason.COMMAND) || eReason.equals(SpawnReason.CUSTOM) || eReason.equals(SpawnReason.DEFAULT) || eReason.equals(SpawnReason.SPAWNER));
-				if(stopOnType || stopOnReason) {
+				if(stopOnType && stopOnReason) {
 					boolean isAllMobSpawnAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_mobs",false);
 					if((territory.getTerritoryType().equals(KonTerritoryType.CAPITAL) && !isAllMobSpawnAllowed) || territory.getTerritoryType().equals(KonTerritoryType.RUIN))
 					event.setCancelled(true);
