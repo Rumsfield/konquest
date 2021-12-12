@@ -41,6 +41,8 @@
 #    capital_pvp:                   Allow player damage in capitals (true/false)
 #    capital_use:                   Allow players to interact with blocks and containers in capitals (true/false)
 #    capital_build:                 Allow players to build inside of capitals (true/false)
+#    capital_portal:                Allow Nether portals within kingdom capital land (true/false)
+#    capital_mobs:                  Allow all mob types to spawn within kingdom capital land (true/false)
 #    protect_containers_use:        Prevent players in other kingdoms using containers in claimed land (true/false)
 #    protect_containers_break:      Prevent players in other kingdoms breaking containers in claimed land (true/false)
 #    no_enemy_enter:                Prevent enemy players from entering Kingdom Capitals (true/false)
@@ -83,6 +85,7 @@
 #    max_armor:                     Maximum armor amount in blocks that a town can have (0 to disable, integer >= 0)
 #    barbarians_destroy:            Allow barbarian players to destroy towns when true, else prevent barbarians from attacking town monuments (true/false)
 #    enemy_glow:                    Apply the Glowing effect to enemies that break blocks within a town (true/false)
+#    town_mobs:                     Allow all mob types to spawn within town land (true/false)
 #  plots:
 #    enable*:                       Enable town plots (true/false)
 #    max_size:                      Maximum plot size in chunks (0 to disable, integer >= 0)
@@ -183,6 +186,8 @@ core:
     capital_pvp: false
     capital_use: false
     capital_build: false
+    capital_portal: false
+    capital_mobs: false
     protect_containers_use: true
     protect_containers_break: true
     no_enemy_enter: true
@@ -226,6 +231,7 @@ core:
     max_armor: 9999
     barbarians_destroy: true
     enemy_glow: true
+    town_mobs: false
   plots:
     enable: true
     max_size: 16

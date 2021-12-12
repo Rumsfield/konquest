@@ -58,9 +58,9 @@ public class InventoryListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onInventoryOpen(InventoryOpenEvent event) {
 		//ChatUtil.printDebug("EVENT: inventoryOpen");
-//		if(konquest.isWorldIgnored(event.getInventory().getLocation().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getInventory().getLocation())) {
+			return;
+		}
 		// Monitor blocks in claimed territory
 		Location openLoc = event.getInventory().getLocation();
 		
@@ -179,9 +179,6 @@ public class InventoryListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onInventoryClose(InventoryCloseEvent event) {
 		// When a player closes a display menu inventory
-//		if(konquest.isWorldIgnored(event.getInventory().getLocation().getWorld())) {
-//			return;
-//		}
 		if(konquest.getDisplayManager().isDisplayMenu(event.getInventory())) {
 			konquest.getDisplayManager().onDisplayMenuClose(event.getInventory());
 		}
@@ -189,9 +186,6 @@ public class InventoryListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.LOW)
     public void onDisplayMenuClick(InventoryClickEvent event) {
-//		if(konquest.isWorldIgnored(event.getInventory().getLocation().getWorld())) {
-//			return;
-//		}
 		// When a player clicks inside of a display menu inventory
 		if(konquest.getDisplayManager().isDisplayMenu(event.getClickedInventory())) {
 			int slot = event.getRawSlot();
@@ -207,11 +201,9 @@ public class InventoryListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onInventoryClick(InventoryClickEvent event) {
 		if(!event.isCancelled()) {
-//			if(konquest.isWorldIgnored(event.getInventory().getLocation().getWorld())) {
-//				return;
-//			}
 			// Check for picking up netherite items for stats
-			if(event.getAction().equals(InventoryAction.PICKUP_ALL) && event.getClickedInventory() instanceof SmithingInventory) {
+			if(event.getAction().equals(InventoryAction.PICKUP_ALL) && event.getClickedInventory() instanceof SmithingInventory &&
+					!konquest.isWorldIgnored(event.getInventory().getLocation())) {
 				Material itemType = event.getCurrentItem().getType();
 				int slot = event.getRawSlot();
 				//ChatUtil.printDebug("Inventory pickup event in smithing table slot "+slot+" with item "+itemType.toString());
@@ -265,9 +257,9 @@ public class InventoryListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onCraftItem(CraftItemEvent event) {
-//		if(konquest.isWorldIgnored(event.getInventory().getLocation().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getInventory().getLocation())) {
+			return;
+		}
 		HumanEntity human = event.getWhoClicked();
 		if(!event.isCancelled() && human instanceof Player) {
 			if(!konquest.getPlayerManager().isPlayer((Player)human)) {
@@ -325,9 +317,9 @@ public class InventoryListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onFurnaceExtract(FurnaceExtractEvent event) {
-//		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-//			return;
-//		}
+		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+			return;
+		}
 		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onFurnaceExtract for non-existent player");
 			return;
@@ -347,9 +339,9 @@ public class InventoryListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onEnchantItem(EnchantItemEvent event) {
 		if(!event.isCancelled()) {
-//			if(konquest.isWorldIgnored(event.getInventory().getLocation().getWorld())) {
-//				return;
-//			}
+			if(konquest.isWorldIgnored(event.getInventory().getLocation())) {
+				return;
+			}
 			if(!konquest.getPlayerManager().isPlayer(event.getEnchanter())) {
 				ChatUtil.printDebug("Failed to handle onEnchantItem for non-existent player");
 				return;
@@ -381,9 +373,9 @@ public class InventoryListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onPrepareItemEnchant(PrepareItemEnchantEvent event) {
 		if(!event.isCancelled()) {
-//			if(konquest.isWorldIgnored(event.getInventory().getLocation().getWorld())) {
-//				return;
-//			}
+			if(konquest.isWorldIgnored(event.getInventory().getLocation())) {
+				return;
+			}
 			Location enchantLoc = event.getEnchantBlock().getLocation();
 			if(enchantLoc != null && konquest.getKingdomManager().isChunkClaimed(enchantLoc)) {
 				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(enchantLoc);

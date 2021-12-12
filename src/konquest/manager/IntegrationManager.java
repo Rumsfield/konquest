@@ -89,11 +89,16 @@ public class IntegrationManager {
 		
 		// Attempt to integrate Luckperms
 		if(konquest.getConfigManager().getConfig("core").getBoolean("core.integration.luckperms",false)) {
-			RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-			if (provider != null) {
-				lpAPI = provider.getProvider();
-				isLuckPermsEnabled = true;
-				ChatUtil.printConsoleAlert("Successfully integrated LuckPerms");
+			Plugin luckPerms = Bukkit.getPluginManager().getPlugin("LuckPerms");
+			if (luckPerms != null && luckPerms.isEnabled()) {
+				RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+				if (provider != null) {
+					lpAPI = provider.getProvider();
+					isLuckPermsEnabled = true;
+					ChatUtil.printConsoleAlert("Successfully integrated LuckPerms");
+				} else {
+					ChatUtil.printConsoleError("Failed to integrate LuckPerms, plugin not found or disabled");
+				}
 			} else {
 				ChatUtil.printConsoleError("Failed to integrate LuckPerms, plugin not found or disabled");
 			}

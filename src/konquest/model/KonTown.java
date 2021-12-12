@@ -479,13 +479,22 @@ public class KonTown extends KonTerritory implements Timeable{
 		return result;
 	}
 	
+	/**
+	 * Updates a monument from template, meant to be used for town capture
+	 */
 	public void refreshMonument() {
 		if(monument.isValid()) {
 			removeMonumentBlocks();
 			monument.clearCriticalHits();
 			monument.updateFromTemplate(getKingdom().getMonumentTemplate());
-			pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
 			setSpawn(monument.getTravelPoint());
+			// Delay paste by 1 tick
+			Bukkit.getScheduler().scheduleSyncDelayedTask(getKonquest().getPlugin(), new Runnable() {
+	            @Override
+	            public void run() {
+	            	pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
+	            }
+	        },1);
 		}
 	}
 	
