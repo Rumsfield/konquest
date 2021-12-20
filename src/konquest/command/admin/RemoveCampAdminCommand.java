@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.World;
+//import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -27,13 +27,15 @@ public class RemoveCampAdminCommand extends CommandBase {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
-        	Player bukkitPlayer = (Player) getSender();
-        	World bukkitWorld = bukkitPlayer.getWorld();
+        	//Player bukkitPlayer = (Player) getSender();
+        	//World bukkitWorld = bukkitPlayer.getWorld();
 
+        	/*
         	if(!getKonquest().isWorldValid(bukkitWorld)) {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
+        	*/
         	
         	String playerName = getArgs()[2];
         	
