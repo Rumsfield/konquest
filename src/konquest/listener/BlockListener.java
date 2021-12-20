@@ -698,7 +698,12 @@ public class BlockListener implements Listener {
 					    		event.setCancelled(true);
 					    		break;
 					    	case 4:
+					    		// This error message is removed because it could be annoying to see it every time a bed is placed when camps are disabled.
 					    		//ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+					    		break;
+					    	case 5:
+					    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+					    		event.setCancelled(true);
 					    		break;
 					    	default:
 					    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Unknown cause. Contact an Admin!");

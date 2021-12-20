@@ -444,6 +444,14 @@ public class Konquest implements Timeable {
 		return chatPriority;
 	}
 	
+	public boolean isWorldValid(Location loc) {
+		if(loc != null && loc.getWorld() != null) {
+			return isWorldValid(loc.getWorld());
+		} else {
+			return false;
+		}
+	}
+	
 	public boolean isWorldValid(World world) {
 		boolean result = false;
 		if(isWhitelist) {
@@ -456,7 +464,7 @@ public class Konquest implements Timeable {
 	
 	public boolean isWorldIgnored(Location loc) {
 		if(loc != null) {
-			return isBlacklistIgnored && !isWorldValid(loc.getWorld());
+			return isBlacklistIgnored && !isWorldValid(loc);
 		}
 		return true;
 	}
