@@ -670,6 +670,7 @@ description:
   claim: "Claim a chunk of land."
   travel: "Teleport to a Town, your Camp or to your Capital."
   town: "Manage Towns you belong to."
+  guild: "Manage kingdom guilds."
   quest: "Display your quest log."
   stats: "Display your Accomplishment stats."
   prefix: "Set your prefix title."

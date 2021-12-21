@@ -35,6 +35,7 @@ import konquest.manager.CampManager;
 import konquest.manager.ConfigManager;
 import konquest.manager.DirectiveManager;
 import konquest.manager.DisplayManager;
+import konquest.manager.GuildManager;
 import konquest.manager.IntegrationManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.LanguageManager;
@@ -94,6 +95,7 @@ public class Konquest implements Timeable {
 	private MapHandler mapHandler;
 	private PlaceholderManager placeholderManager;
 	private PlotManager plotManager;
+	private GuildManager guildManager;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
@@ -144,6 +146,7 @@ public class Konquest implements Timeable {
 		mapHandler = new MapHandler(this);
 		placeholderManager = new PlaceholderManager(this);
 		plotManager = new PlotManager(this);
+		guildManager = new GuildManager(this);
 		
 		chatPriority = defaultChatPriority;
 		worlds = new ArrayList<World>();
@@ -232,6 +235,7 @@ public class Konquest implements Timeable {
 		shieldManager.initialize();
 		placeholderManager.initialize();
 		plotManager.initialize();
+		guildManager.initialize();
 		offlineTimeoutSeconds = (long)(configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)*86400);
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;

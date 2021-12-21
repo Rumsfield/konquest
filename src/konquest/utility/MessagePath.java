@@ -567,6 +567,7 @@ public enum MessagePath {
 	DESCRIPTION_CLAIM                           (0, "description.claim"),
 	DESCRIPTION_TRAVEL                          (0, "description.travel"),
 	DESCRIPTION_TOWN                            (0, "description.town"),
+	DESCRIPTION_GUILD                           (0, "description.guild"),
 	DESCRIPTION_QUEST                           (0, "description.quest"),
 	DESCRIPTION_STATS                           (0, "description.stats"),
 	DESCRIPTION_PREFIX                          (0, "description.prefix"),

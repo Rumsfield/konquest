@@ -92,6 +92,13 @@
 #    allow_build:                   Allow all town residents to build in any town plot (true/false)
 #    allow_containers:              Allow all town residents to access containers in any town plot (true/false)
 #    ignore_knights:                Allow town knights to ignore plot protections (true/false)
+#  guilds:
+#    enable*:                       Enable kingdom guilds (true/false)
+#    special_change_cost:           Cost in favor to change a guild's specialization (integer >= 0)
+#    pay_interval_seconds:          Time in seconds between guild payments to all members (0 to disable, integer >= 0)
+#    pay_per_chunk:                 Value in favor to pay all guild members per chunk of land in all guild towns (number >= 0.0)
+#    pay_per_resident:              Value in favor to pay all guild members per resident in all guild towns (number >= 0.0)
+#    pay_limit:                     Maximum value in favor for guild payments to members (0 to disable, number >= 0.0)
 #  exile:
 #    remove_favor:                  Set a player's currency balance to 0 when exiled (true/flase)
 #    remove_stats:                  Remove all stats and accomplishment prefixes from a player when exiled (true/false)
@@ -238,6 +245,13 @@ core:
     allow_build: false
     allow_containers: false
     ignore_knights: true
+  guilds:
+    enable: true
+    special_change_cost: 200
+    pay_interval_seconds: 600
+    pay_per_chunk: 0.25
+    pay_per_resident: 0.10
+    pay_limit: 100
   exile:
     remove_favor: true
     remove_stats: true
