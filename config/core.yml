@@ -248,7 +248,7 @@ core:
   guilds:
     enable: true
     special_change_cost: 200
-    pay_interval_seconds: 600
+    pay_interval_seconds: 1800
     pay_per_chunk: 0.25
     pay_per_resident: 0.10
     pay_limit: 100

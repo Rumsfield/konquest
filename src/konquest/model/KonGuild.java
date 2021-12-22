@@ -2,6 +2,7 @@ package konquest.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,8 +22,11 @@ public class KonGuild {
 	private UUID master; // Master should not be null
 	private HashMap<UUID,Boolean> members; // True = officer, False = regular
 	private Villager.Profession specialization;
+	private KonKingdom kingdom;
+	private HashSet<KonGuild> friendlySanction;
+	private HashSet<KonGuild> enemyArmistice;
 	
-	public KonGuild(String name, UUID id) {
+	public KonGuild(String name, UUID id, KonKingdom kingdom) {
 		this.isOpen = false;
 		this.name = name;
 		this.joinRequestKeeper = new RequestKeeper();
@@ -30,6 +34,9 @@ public class KonGuild {
 		this.members = new HashMap<UUID,Boolean>();
 		this.members.put(master, true);
 		this.specialization = Villager.Profession.NONE;
+		this.kingdom = kingdom;
+		this.friendlySanction = new HashSet<KonGuild>();
+		this.enemyArmistice = new HashSet<KonGuild>();
 	}
 	
 	/*
@@ -60,6 +67,10 @@ public class KonGuild {
 	
 	public Villager.Profession getSpecialization() {
 		return specialization;
+	}
+	
+	public KonKingdom getKingdom() {
+		return kingdom;
 	}
 	
 	/*
@@ -233,6 +244,72 @@ public class KonGuild {
 				//ChatUtil.sendNotice((Player)offlinePlayer, MessagePath.GENERIC_NOTICE_JOIN_REQUEST.getMessage(name,getName(),getName(),name,getName(),name), ChatColor.LIGHT_PURPLE);
 			}
 		}
+	}
+	
+	/*
+	 * =================================================
+	 * Relationship Methods
+	 * =================================================
+	 */
+	
+	public boolean addSanction(KonGuild guild) {
+		boolean result = false;
+		if(!friendlySanction.contains(guild) && guild.getKingdom().equals(this.getKingdom())) {
+			friendlySanction.add(guild);
+			result = true;
+		}
+		return result;
+	}
+	
+	public boolean removeSanction(KonGuild guild) {
+		boolean result = false;
+		if(friendlySanction.contains(guild) && guild.getKingdom().equals(this.getKingdom())) {
+			friendlySanction.remove(guild);
+			result = true;
+		}
+		return result;
+	}
+	
+	public boolean isSanction(KonGuild guild) {
+		return friendlySanction.contains(guild);
+	}
+	
+	public boolean addArmistice(KonGuild guild) {
+		boolean result = false;
+		if(!enemyArmistice.contains(guild) && !guild.getKingdom().equals(this.getKingdom())) {
+			enemyArmistice.add(guild);
+		}
+		return result;
+	}
+	
+	public boolean removeArmistice(KonGuild guild) {
+		boolean result = false;
+		if(enemyArmistice.contains(guild) && !guild.getKingdom().equals(this.getKingdom())) {
+			enemyArmistice.remove(guild);
+			result = true;
+		}
+		return result;
+	}
+	
+	public boolean isArmistice(KonGuild guild) {
+		return enemyArmistice.contains(guild);
+	}
+	
+	/*
+	 * =================================================
+	 * Query Methods
+	 * =================================================
+	 */
+	
+	public boolean isTownMember(KonTown town) {
+		if(town.getKingdom().equals(this.getKingdom())) {
+			for(UUID id : members.keySet()) {
+				if(town.isLord(id)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 }

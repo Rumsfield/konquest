@@ -23,6 +23,7 @@ import konquest.command.CommandType;
 import konquest.display.ArmorIcon;
 import konquest.display.CommandIcon;
 import konquest.display.DisplayMenu;
+import konquest.display.GuildMenu;
 import konquest.display.InfoIcon;
 import konquest.display.KingdomIcon;
 import konquest.display.MenuIcon;
@@ -35,6 +36,7 @@ import konquest.display.PlayerIcon.PlayerIconAction;
 import konquest.display.PrefixCustomIcon;
 import konquest.display.PrefixIcon.PrefixIconAction;
 import konquest.display.ShieldIcon;
+import konquest.display.StateMenu;
 import konquest.display.PrefixIcon;
 import konquest.display.TownIcon;
 import konquest.display.UpgradeIcon;
@@ -63,13 +65,13 @@ public class DisplayManager {
 	private Konquest konquest;
 	private HashMap<Inventory, KonTown> townCache;
 	private HashMap<Inventory, PagedMenu> menuCache;
-	private HashMap<Inventory, PlotMenu> plotMenus;
+	private HashMap<Inventory, StateMenu> stateMenus;
 	
 	public DisplayManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.townCache = new HashMap<Inventory, KonTown>();
 		this.menuCache = new HashMap<Inventory, PagedMenu>();
-		this.plotMenus = new HashMap<Inventory, PlotMenu>();
+		this.stateMenus = new HashMap<Inventory, StateMenu>();
 	}
 	
 	public void initialize() {
@@ -85,7 +87,7 @@ public class DisplayManager {
 		if(inv != null) {
 			if(menuCache.containsKey(inv)) {
 				result = true;
-			} else if(plotMenus.containsKey(inv)) {
+			} else if(stateMenus.containsKey(inv)) {
 				result = true;
 			}
 		}
@@ -327,13 +329,13 @@ public class DisplayManager {
 					}
 				}
 			}
-		} else if(plotMenus.containsKey(inv)) {
-			// Handle plot menu navigation and states
-			// Every clickable icon in a plot menu view will update the state and refresh the open inventory
-			PlotMenu clickMenu = plotMenus.get(inv);
+		} else if(stateMenus.containsKey(inv)) {
+			// Handle menu navigation and states
+			// Every clickable icon in a menu view will update the state and refresh the open inventory
+			StateMenu clickMenu = stateMenus.get(inv);
 			DisplayMenu currentView = clickMenu.getCurrentView();
 			if(currentView == null || !currentView.getInventory().equals(inv)) {
-				ChatUtil.printDebug("Plot menu view is not current!");
+				ChatUtil.printDebug("State menu view is not current!");
 				return;
 			}
 			MenuIcon clickedIcon = currentView.getIcon(slot);
@@ -344,14 +346,14 @@ public class DisplayManager {
 			// Update plot menu state
 			DisplayMenu updateView = clickMenu.updateState(slot);
 			// Update inventory view
-			plotMenus.remove(inv);
+			stateMenus.remove(inv);
 			if(updateView != null) {
 				// Refresh displayed inventory view
 				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 		            @Override
 		            public void run() {
 		            	bukkitPlayer.openInventory(updateView.getInventory());
-		            	plotMenus.put(updateView.getInventory(), clickMenu);
+		            	stateMenus.put(updateView.getInventory(), clickMenu);
 		            }
 		        },1);
 			} else {
@@ -373,8 +375,8 @@ public class DisplayManager {
 		if(townCache.containsKey(inv)) {
 			townCache.remove(inv);
 		}
-		if(plotMenus.containsKey(inv)) {
-			plotMenus.remove(inv);
+		if(stateMenus.containsKey(inv)) {
+			stateMenus.remove(inv);
 		}
 	}
 	
@@ -1369,7 +1371,7 @@ public class DisplayManager {
 		playMenuOpenSound(bukkitPlayer);
 		int maxSize = konquest.getPlotManager().getMaxSize();
 		PlotMenu newMenu = new PlotMenu(town, bukkitPlayer, maxSize);
-		plotMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
+		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override
@@ -1377,7 +1379,25 @@ public class DisplayManager {
             	bukkitPlayer.openInventory(newMenu.getCurrentView().getInventory());
             }
         },1);
-		
+	}
+   	
+   	/*
+	 * ===============================================
+	 * Guild Menu
+	 * ===============================================
+	 */
+   	public void displayGuildMenu(KonPlayer displayPlayer) {
+   		//ChatUtil.printDebug("Displaying new guild menu to "+bukkitPlayer.getName()+", current menu size is "+plotMenus.size());
+		playMenuOpenSound(displayPlayer.getBukkitPlayer());
+		GuildMenu newMenu = new GuildMenu(displayPlayer);
+		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
+		// Schedule delayed task to display inventory to player
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentView().getInventory());
+            }
+        },1);
 	}
    	
    	/*

@@ -801,12 +801,16 @@ public class KonTown extends KonTerritory implements Timeable {
 		}
 	}
 	
-	public boolean isPlayerLord(OfflinePlayer player) {
+	public boolean isLord(UUID id) {
 		boolean status = false;
 		if(lord != null) {
-			status = player.getUniqueId().equals(lord);
+			status =id.equals(lord);
 		}
 		return status;
+	}
+	
+	public boolean isPlayerLord(OfflinePlayer player) {
+		return isLord(player.getUniqueId());
 	}
 	
 	public boolean setPlayerElite(OfflinePlayer player, boolean val) {
