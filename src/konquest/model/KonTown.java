@@ -11,6 +11,7 @@ import konquest.Konquest;
 import konquest.utility.BlockPaster;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
+import konquest.utility.RequestKeeper;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
@@ -37,7 +38,7 @@ import org.bukkit.potion.PotionEffectType;
  * @author Rumsfield
  * @prerequisites	The Town's Kingdom must have a valid Monument Template
  */
-public class KonTown extends KonTerritory implements Timeable{
+public class KonTown extends KonTerritory implements Timeable {
 	
 	private KonMonument monument;
 	private Timer monumentTimer;
@@ -52,7 +53,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	private BossBar shieldArmorBarAll;
 	private UUID lord;
 	private HashMap<UUID,Boolean> residents;
-	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident, false = requesting add from lord/knight)
+	private RequestKeeper joinRequestKeeper;
 	private boolean isOpen;
 	private boolean isEnemyRedstoneAllowed;
 	private boolean isResidentPlotOnly;
@@ -89,7 +90,7 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.shieldArmorBarAll.setProgress(0);
 		this.lord = null; // init with no lord
 		this.residents = new HashMap<UUID,Boolean>();
-		this.joinRequests = new HashMap<UUID,Boolean>();
+		this.joinRequestKeeper = new RequestKeeper();
 		this.isOpen = false; // init as a closed Town, requires Lord to add players as residents for build/container perms
 		this.isEnemyRedstoneAllowed = false;
 		this.isResidentPlotOnly = false;
@@ -784,7 +785,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	public void purgeResidents() {
 		lord = null;
 		residents.clear();
-		joinRequests.clear();
+		joinRequestKeeper.clearRequests();
 	}
 	
 	public void setPlayerLord(OfflinePlayer player) {
@@ -963,55 +964,30 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	// Players who have tried joining but need to be added
 	public List<OfflinePlayer> getJoinRequests() {
-		ArrayList<OfflinePlayer> result = new ArrayList<OfflinePlayer>();
-		for(UUID id : joinRequests.keySet()) {
-			if(joinRequests.get(id) == false) {
-				result.add(Bukkit.getOfflinePlayer(id));
-			}
-		}
-		return result;
+		return joinRequestKeeper.getJoinRequests();
 	}
 	
 	// Players who have been added but need to join
 	public List<OfflinePlayer> getJoinInvites() {
-		ArrayList<OfflinePlayer> result = new ArrayList<OfflinePlayer>();
-		for(UUID id : joinRequests.keySet()) {
-			if(joinRequests.get(id) == true) {
-				result.add(Bukkit.getOfflinePlayer(id));
-			}
-		}
-		return result;
+		return joinRequestKeeper.getJoinInvites();
 	}
 	
 	public boolean addJoinRequest(UUID id, Boolean type) {
-		boolean result = false;
-		if(!joinRequests.containsKey(id)) {
-			joinRequests.put(id, type);
-			result = true;
-		}
-		return result;
+		return joinRequestKeeper.addJoinRequest(id, type);
 	}
 	
 	// Does the player have an existing request to be added?
 	public boolean isJoinRequestValid(UUID id) {
-		boolean result = false;
-		if(joinRequests.containsKey(id)) {
-			result = (joinRequests.get(id) == false);
-		}
-		return result;
+		return joinRequestKeeper.isJoinRequestValid(id);
 	}
 	
 	// Does the player have an existing invite to join?
 	public boolean isJoinInviteValid(UUID id) {
-		boolean result = false;
-		if(joinRequests.containsKey(id)) {
-			result = (joinRequests.get(id) == true);
-		}
-		return result;
+		return joinRequestKeeper.isJoinInviteValid(id);
 	}
 	
 	public void removeJoinRequest(UUID id) {
-		joinRequests.remove(id);
+		joinRequestKeeper.removeJoinRequest(id);
 	}
 	
 	public void notifyJoinRequest(UUID id) {
