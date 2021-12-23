@@ -32,6 +32,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.InventoryAction;
@@ -193,7 +194,8 @@ public class InventoryListener implements Listener {
 			KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
 			if(player != null && slot < event.getView().getTopInventory().getSize()) {
 				event.setCancelled(true);
-				konquest.getDisplayManager().onDisplayMenuClick(player, event.getClickedInventory(), slot);
+				boolean clickType = (event.getClick().equals(ClickType.RIGHT)) ? false : true;
+				konquest.getDisplayManager().onDisplayMenuClick(player, event.getClickedInventory(), slot, clickType);
 			}
 		}
 	}

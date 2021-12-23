@@ -95,7 +95,7 @@ public class DisplayManager {
 		return result;
 	}
 	
-	public void onDisplayMenuClick(KonPlayer clickPlayer, Inventory inv, int slot) {
+	public void onDisplayMenuClick(KonPlayer clickPlayer, Inventory inv, int slot, boolean clickType) {
 		if(inv == null) {
 			return;
 		}
@@ -345,7 +345,7 @@ public class DisplayManager {
 			}
 			playMenuClickSound(bukkitPlayer);
 			// Update plot menu state
-			DisplayMenu updateView = clickMenu.updateState(slot);
+			DisplayMenu updateView = clickMenu.updateState(slot, clickType);
 			// Update inventory view
 			stateMenus.remove(inv);
 			if(updateView != null) {

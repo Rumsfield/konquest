@@ -322,7 +322,7 @@ public class PlotMenu implements StateMenu {
 	 * @param slot - Clicked icon index
 	 * @return The new DisplayMenu view.
 	 */
-	public DisplayMenu updateState(int slot) {
+	public DisplayMenu updateState(int slot, boolean clickType) {
 		DisplayMenu result = null;
 		int navMaxIndex = getCurrentView().getInventory().getSize()-1;
 		int navMinIndex = getCurrentView().getInventory().getSize()-9;

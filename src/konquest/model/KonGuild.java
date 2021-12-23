@@ -102,12 +102,12 @@ public class KonGuild {
 	 * Set a member's officer status
 	 * @param id - Member UUID
 	 * @param val - True to make officer, false to make regular
-	 * @return True when member is updated, false if id is not a member
+	 * @return True when member is updated, false if id is not a member or is master
 	 */
 	public boolean setOfficer(UUID id, boolean val) {
 		// Target ID must be a member to modify officer flag
 		boolean status = false;
-		if(members.containsKey(id)) {
+		if(members.containsKey(id) && !master.equals(id)) {
 			members.put(id,val);
 			status = true;
 		}

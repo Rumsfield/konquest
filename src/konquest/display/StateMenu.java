@@ -4,5 +4,5 @@ public interface StateMenu {
 
 	public DisplayMenu getCurrentView();
 	
-	public DisplayMenu updateState(int slot);
+	public DisplayMenu updateState(int slot, boolean clickType);
 }

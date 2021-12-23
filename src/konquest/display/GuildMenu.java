@@ -379,7 +379,7 @@ public class GuildMenu implements StateMenu {
 
 
 	@Override
-	public DisplayMenu updateState(int slot) {
+	public DisplayMenu updateState(int slot, boolean clickType) {
 		// Assume a clickable icon was clicked
 		// Do something based on current state and clicked slot
 		DisplayMenu result = null;
@@ -401,7 +401,6 @@ public class GuildMenu implements StateMenu {
 			} else if(index == 8) {
 				result = goPageNext();
 			}
-			
 		} else if(slot < navMinIndex) {
 			// Click in non-navigation slot
 			MenuIcon clickedIcon = views.get(currentState).getIcon(slot);
@@ -453,8 +452,8 @@ public class GuildMenu implements StateMenu {
 						GuildIcon icon = (GuildIcon)clickedIcon;
 						KonGuild clickGuild = icon.getGuild();
 						manager.joinGuildRequest(player, clickGuild);
+						result = null; // Close menu
 					}
-					result = null; // Close menu
 					break;
 				case A_LEAVE:
 					if(slot == LEAVE_SLOT_YES) {
@@ -468,7 +467,8 @@ public class GuildMenu implements StateMenu {
 					if(clickedIcon != null && clickedIcon instanceof GuildIcon) {
 						GuildIcon icon = (GuildIcon)clickedIcon;
 						KonGuild clickGuild = icon.getGuild();
-						manager.joinGuildInvite(player, clickGuild);
+						manager.respondGuildInvite(player, clickGuild, clickType);
+						result = null; // Close menu
 					}
 					break;
 				case A_LIST:
@@ -485,10 +485,9 @@ public class GuildMenu implements StateMenu {
 					break;
 				case B_REQUESTS:
 					if(clickedIcon != null && clickedIcon instanceof PlayerIcon) {
-						//PlayerIcon icon = (PlayerIcon)clickedIcon;
-						//OfflinePlayer clickPlayer = icon.getOfflinePlayer();
-						//manager.joinGuildInvite(clickPlayer, guild);
-						//TODO: Make method for accepting/rejecting join requests
+						PlayerIcon icon = (PlayerIcon)clickedIcon;
+						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
+						manager.respondGuildRequest(clickPlayer, guild, clickType);
 						result = goToPlayerView(currentState);
 					}
 					break;
@@ -513,6 +512,7 @@ public class GuildMenu implements StateMenu {
 						ProfessionIcon icon = (ProfessionIcon)clickedIcon;
 						Villager.Profession clickProfession = icon.getProfession();
 						manager.changeSpecialization(clickProfession, guild);
+						result = null; // Close menu
 					}
 					break;
 				default:
@@ -590,15 +590,13 @@ public class GuildMenu implements StateMenu {
 	}
 	
 	private DisplayMenu goToGuildView(MenuState context) {
-		DisplayMenu result = null;
-		result = createGuildView(context);
+		DisplayMenu result = createGuildView(context);
 		views.put(context, result);
 		return result;
 	}
 	
 	private DisplayMenu goToPlayerView(MenuState context) {
-		DisplayMenu result = null;
-		result = createPlayerView(context);
+		DisplayMenu result = createPlayerView(context);
 		views.put(context, result);
 		return result;
 	}
