@@ -42,6 +42,7 @@ import konquest.display.TownIcon;
 import konquest.display.UpgradeIcon;
 import konquest.model.KonArmor;
 import konquest.model.KonCustomPrefix;
+import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
 import konquest.model.KonKingdomScoreAttributes;
 import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
@@ -1386,10 +1387,10 @@ public class DisplayManager {
 	 * Guild Menu
 	 * ===============================================
 	 */
-   	public void displayGuildMenu(KonPlayer displayPlayer) {
+   	public void displayGuildMenu(KonPlayer displayPlayer, KonGuild guild) {
    		//ChatUtil.printDebug("Displaying new guild menu to "+bukkitPlayer.getName()+", current menu size is "+plotMenus.size());
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		GuildMenu newMenu = new GuildMenu(displayPlayer);
+		GuildMenu newMenu = new GuildMenu(konquest.getGuildManager(), displayPlayer, guild);
 		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {

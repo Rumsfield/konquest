@@ -785,7 +785,7 @@ public class PlotMenu implements StateMenu {
 	/**
 	 * Place all navigation button icons on view given context and update icons
 	 */
-	public void refreshNavigationButtons(PlotState context) {
+	private void refreshNavigationButtons(PlotState context) {
 		DisplayMenu view = views.get(context);
 		int navStart = view.getInventory().getSize()-9;
 		if(navStart < 0) {

@@ -186,20 +186,6 @@ public class KonGuild {
 		return memberList;
 	}
 	
-	public int getNumResidents() {
-		return members.size();
-	}
-	
-	public int getNumResidentsOnline() {
-		int result = 0;
-		for(UUID id : members.keySet()) {
-			if(Bukkit.getOfflinePlayer(id).isOnline()) {
-				result++;
-			}
-		}
-		return result;
-	}
-	
 	/*
 	 * =================================================
 	 * Join Request Methods
@@ -301,6 +287,20 @@ public class KonGuild {
 	 * =================================================
 	 */
 	
+	public int getNumMembers() {
+		return members.size();
+	}
+	
+	public int getNumMembersOnline() {
+		int result = 0;
+		for(UUID id : members.keySet()) {
+			if(Bukkit.getOfflinePlayer(id).isOnline()) {
+				result++;
+			}
+		}
+		return result;
+	}
+	
 	public boolean isTownMember(KonTown town) {
 		if(town.getKingdom().equals(this.getKingdom())) {
 			for(UUID id : members.keySet()) {
@@ -310,6 +310,16 @@ public class KonGuild {
 			}
 		}
 		return false;
+	}
+	
+	public int getNumTowns() {
+		int result = 0;
+		for(KonTown town : this.getKingdom().getTowns()) {
+			if(members.containsKey(town.getPlayerLord().getUniqueId())) {
+				result++;
+			}
+		}
+		return result;
 	}
 	
 }

@@ -85,6 +85,16 @@ public class GuildManager {
 		return result;
 	}
 	
+	public List<KonGuild> getInviteGuilds(KonPlayer player) {
+		List<KonGuild> result = new ArrayList<KonGuild>();
+		for(KonGuild guild : guilds) {
+			if(player.getKingdom().equals(guild.getKingdom()) && guild.isJoinInviteValid(player.getBukkitPlayer().getUniqueId())) {
+				result.add(guild);
+			}
+		}
+		return result;
+	}
+	
 	public KonGuild getTownGuild(KonTown town) {
 		KonGuild result = null;
 		for(KonGuild guild : guilds) {
@@ -95,6 +105,7 @@ public class GuildManager {
 		}
 		return result;
 	}
+	
 	
 	
 }

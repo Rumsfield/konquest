@@ -440,6 +440,10 @@ public class Konquest implements Timeable {
 		return plotManager;
 	}
 	
+	public GuildManager getGuildManager() {
+		return guildManager;
+	}
+	
 	public long getOfflineTimeoutSeconds() {
 		return offlineTimeoutSeconds;
 	}
