@@ -10,7 +10,7 @@ import org.bukkit.OfflinePlayer;
 
 public class RequestKeeper {
 
-	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident, false = requesting add from lord/knight)
+	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident (invite), false = requesting add from lord/knight)
 	
 	public RequestKeeper() {
 		this.joinRequests = new HashMap<UUID,Boolean>();

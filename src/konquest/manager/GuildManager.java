@@ -3,6 +3,10 @@ package konquest.manager;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
+
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Villager;
 
 import konquest.Konquest;
 import konquest.model.KonGuild;
@@ -54,18 +58,65 @@ public class GuildManager {
 		return 0;
 	}
 	
-	public void editGuildOpen(boolean val) {
-		
+	public void toggleGuildOpen(KonGuild guild) {
+		if(guild != null) {
+			if(guild.isOpen()) {
+				guild.setIsOpen(false);
+			} else {
+				guild.setIsOpen(true);
+			}
+		}
 	}
 	
-	public void joinGuild(KonPlayer player, KonGuild guild) {
+	public void toggleGuildStatus(KonGuild guild, KonGuild otherGuild) {
+		//TODO
+	}
+	
+	// Player requests to join the guild to the officers
+	public void joinGuildRequest(KonPlayer player, KonGuild guild) {
+		/*
+		if(clickGuild != null) {
+			UUID id = player.getBukkitPlayer().getUniqueId();
+			if(clickGuild.isJoinInviteValid(id)) {
+				// There is already a valid invite, add the player to the guild
+				clickGuild.addMember(id, false);
+			} else if(!clickGuild.isJoinRequestValid(id)){
+				// Request to join if not already requested
+				clickGuild.addJoinRequest(id, false);
+			}
+		}
+		*/
+	}
+	
+	// Player is invited to join the guild by officers
+	public void joinGuildInvite(KonPlayer player, KonGuild guild) {
 		
 	}
 	
 	public void leaveGuild(KonPlayer player, KonGuild guild) {
+		if(guild != null) {
+			UUID id = player.getBukkitPlayer().getUniqueId();
+			boolean status = guild.removeMember(id);
+			if(status) {
+				ChatUtil.sendNotice(player.getBukkitPlayer(), "Success");
+			} else {
+				ChatUtil.sendNotice(player.getBukkitPlayer(), "Failed");
+			}
+		}
+	}
+	
+	public void promoteOfficer(OfflinePlayer player, KonGuild guild) {
 		
 	}
 	
+	public void demoteOfficer(OfflinePlayer player, KonGuild guild) {
+		
+	}
+	
+	public void changeSpecialization(Villager.Profession profession, KonGuild guild) {
+		
+	}
+
 	
 	public List<KonGuild> getAllGuilds() {
 		List<KonGuild> result = new ArrayList<KonGuild>();

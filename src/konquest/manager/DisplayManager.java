@@ -1499,7 +1499,7 @@ public class DisplayManager {
    		return inputList;
    	}
  	
-   	private String boolean2Symbol(boolean val) {
+   	public static String boolean2Symbol(boolean val) {
  		String result = ChatColor.DARK_RED+""+ChatColor.BOLD+"\u274C";
     	if(val) {
     		result = ChatColor.DARK_GREEN+""+ChatColor.BOLD+"\u2713";
@@ -1507,7 +1507,7 @@ public class DisplayManager {
     	return result;
  	}
  	
-   	private String boolean2Lang(boolean val) {
+   	public static String boolean2Lang(boolean val) {
  		String result = MessagePath.LABEL_FALSE.getMessage();
  		if(val) {
  			result = MessagePath.LABEL_TRUE.getMessage();

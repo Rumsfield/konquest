@@ -178,10 +178,30 @@ public class KonGuild {
 		return officerList;
 	}
 	
+	public ArrayList<OfflinePlayer> getPlayerOfficersOnly() {
+		ArrayList<OfflinePlayer> officerList = new ArrayList<OfflinePlayer>();
+		for(UUID id : members.keySet()) {
+			if(members.get(id) && !master.equals(id)) {
+				officerList.add(Bukkit.getOfflinePlayer(id));
+			}
+		}
+		return officerList;
+	}
+	
 	public ArrayList<OfflinePlayer> getPlayerMembers() {
 		ArrayList<OfflinePlayer> memberList = new ArrayList<OfflinePlayer>();
 		for(UUID id : members.keySet()) {
 			memberList.add(Bukkit.getOfflinePlayer(id));
+		}
+		return memberList;
+	}
+	
+	public ArrayList<OfflinePlayer> getPlayerMembersOnly() {
+		ArrayList<OfflinePlayer> memberList = new ArrayList<OfflinePlayer>();
+		for(UUID id : members.keySet()) {
+			if(!members.get(id)) {
+				memberList.add(Bukkit.getOfflinePlayer(id));
+			}
 		}
 		return memberList;
 	}
