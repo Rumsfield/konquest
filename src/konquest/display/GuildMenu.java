@@ -38,7 +38,9 @@ public class GuildMenu implements StateMenu {
 		B_REQUESTS,
 		C_PROMOTE,
 		C_DEMOTE,
-		C_SPECIALIZE;
+		C_TRANSFER,
+		C_SPECIALIZE,
+		C_DISBAND;
 	}
 	
 	enum AccessType {
@@ -54,13 +56,19 @@ public class GuildMenu implements StateMenu {
 	private final int ROOT_SLOT_GUILD 			= 8;
 	private final int ROOT_SLOT_RELATIONSHIPS 	= 12;
 	private final int ROOT_SLOT_REQUESTS 		= 14;
-	private final int ROOT_SLOT_PROMOTE 		= 18;
+	private final int ROOT_SLOT_PROMOTE 		= 19;
 	private final int ROOT_SLOT_DEMOTE 			= 20;
+	private final int ROOT_SLOT_TRANSFER		= 21;
+	private final int ROOT_SLOT_SPECIALIZE 		= 23;
 	private final int ROOT_SLOT_OPEN 			= 24;
-	private final int ROOT_SLOT_SPECIALIZE 		= 26;
+	private final int ROOT_SLOT_DISBAND			= 25;
 	
-	private final int LEAVE_SLOT_YES 			= 3;
-	private final int LEAVE_SLOT_NO 			= 5;
+	private final int SLOT_YES 					= 3;
+	private final int SLOT_NO 					= 5;
+	
+	private final ChatColor loreColor = ChatColor.YELLOW;
+	private final ChatColor valueColor = ChatColor.AQUA;
+	private final ChatColor hintColor = ChatColor.GOLD;
 	
 	private HashMap<MenuState,DisplayMenu> views;
 	private ArrayList<DisplayMenu> pages;
@@ -112,6 +120,11 @@ public class GuildMenu implements StateMenu {
 		views.put(MenuState.A_LEAVE, renderView);
 		refreshNavigationButtons(MenuState.A_LEAVE);
 		
+		/* Disband View */
+		renderView = createDisbandView();
+		views.put(MenuState.C_DISBAND, renderView);
+		refreshNavigationButtons(MenuState.C_DISBAND);
+		
 		/* Specialize View */
 		renderView = createSpecializeView();
 		views.put(MenuState.C_SPECIALIZE, renderView);
@@ -120,65 +133,102 @@ public class GuildMenu implements StateMenu {
 	
 	private DisplayMenu createRootView() {
 		DisplayMenu result;
-		InfoIcon icon;
-		List<String> loreList;
-		
-		ChatColor loreColor = ChatColor.YELLOW;
-		ChatColor valueColor = ChatColor.AQUA;
-		ChatColor hintColor = ChatColor.GOLD;
+		MenuIcon icon;
+		List<String> loreList = new ArrayList<String>();
+		ChatColor regularColor = ChatColor.GREEN;
+		ChatColor officerColor = ChatColor.BLUE;
+		ChatColor masterColor = ChatColor.LIGHT_PURPLE;
 		
 		int rows = 2;
 		switch(menuAccess) {
-		case REGULAR:
-			rows = 2;
-		case OFFICER:
-			rows = 3;
-		case MASTER:
-			rows = 4;
+			case REGULAR:
+				rows = 2;
+				break;
+			case OFFICER:
+				rows = 3;
+				break;
+			case MASTER:
+				rows = 4;
+				break;
+			default:
+				break;
 		}
 		
 		result = new DisplayMenu(rows, getTitle(MenuState.ROOT));
 		
-		icon = new InfoIcon(ChatColor.GREEN+"Join", Collections.emptyList(), Material.GRASS_BLOCK, ROOT_SLOT_JOIN, true);
+		loreList.clear();
+		loreList.add(loreColor+"Request to join a guild");
+		icon = new InfoIcon(regularColor+"Join", loreList, Material.SADDLE, ROOT_SLOT_JOIN, true);
 		result.addIcon(icon);
 		
-		icon = new InfoIcon(ChatColor.GREEN+"Leave", Collections.emptyList(), Material.GRASS_BLOCK, ROOT_SLOT_LEAVE, true);
+		loreList.clear();
+		loreList.add(loreColor+"Leave your current guild");
+		icon = new InfoIcon(regularColor+"Leave", loreList, Material.ARROW, ROOT_SLOT_LEAVE, true);
 		result.addIcon(icon);
 
-		icon = new InfoIcon(ChatColor.GREEN+"Invites", Collections.emptyList(), Material.GRASS_BLOCK, ROOT_SLOT_INVITE, true);
+		loreList.clear();
+		loreList.add(loreColor+"View your guild invites");
+		icon = new InfoIcon(regularColor+"Invites", Collections.emptyList(), Material.WRITABLE_BOOK, ROOT_SLOT_INVITE, true);
 		result.addIcon(icon);
 		
-		icon = new InfoIcon(ChatColor.GREEN+"List", Collections.emptyList(), Material.GRASS_BLOCK, ROOT_SLOT_LIST, true);
+		loreList.clear();
+		loreList.add(loreColor+"View all guilds");
+		icon = new InfoIcon(regularColor+"List", Collections.emptyList(), Material.LECTERN, ROOT_SLOT_LIST, true);
 		result.addIcon(icon);
 		
 		if(guild != null) {
-			icon = new InfoIcon(ChatColor.GREEN+"Guild", Collections.emptyList(), Material.GRASS_BLOCK, ROOT_SLOT_GUILD, false);
+			loreList.clear();
+			loreList.add(loreColor+"Towns: "+valueColor+guild.getNumTowns());
+			loreList.add(loreColor+"Land: "+valueColor+guild.getNumLand());
+			loreList.add(loreColor+"Members: "+valueColor+guild.getNumMembers());
+			loreList.add(loreColor+"Specialization: "+valueColor+guild.getSpecialization().name());
+			icon = new GuildIcon(regularColor+guild.getName()+" Guild",loreList,guild,ROOT_SLOT_GUILD,false);
 			result.addIcon(icon);
 
 			if(menuAccess.equals(AccessType.OFFICER) || menuAccess.equals(AccessType.MASTER)) {
-				icon = new InfoIcon(ChatColor.GREEN+"Relationships", Collections.emptyList(), Material.GRASS_BLOCK, ROOT_SLOT_RELATIONSHIPS, true);
+				loreList.clear();
+				loreList.add(loreColor+"Modify guild status");
+				icon = new InfoIcon(officerColor+"Relationships", loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, true);
 				result.addIcon(icon);
 				
-				icon = new InfoIcon(ChatColor.GREEN+"Requests", Collections.emptyList(), Material.GRASS_BLOCK, ROOT_SLOT_REQUESTS, true);
+				loreList.clear();
+				loreList.add(loreColor+"View guild membership requests");
+				icon = new InfoIcon(officerColor+"Requests", loreList, Material.JUKEBOX, ROOT_SLOT_REQUESTS, true);
 				result.addIcon(icon);
 			}
 			
 			if(menuAccess.equals(AccessType.MASTER)) {
-				icon = new InfoIcon(ChatColor.GREEN+"Promote", Collections.emptyList(), Material.GRASS_BLOCK, ROOT_SLOT_PROMOTE, true);
+				loreList.clear();
+				loreList.add(loreColor+"Promote members to officers");
+				icon = new InfoIcon(masterColor+"Promote", loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, true);
 				result.addIcon(icon);
 				
-				icon = new InfoIcon(ChatColor.GREEN+"Demote", Collections.emptyList(), Material.GRASS_BLOCK, ROOT_SLOT_DEMOTE, true);
+				loreList.clear();
+				loreList.add(loreColor+"Demote officers to members");
+				icon = new InfoIcon(masterColor+"Demote", loreList, Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, true);
+				result.addIcon(icon);
+				
+				loreList.clear();
+				loreList.add(loreColor+"Transfer master to another member");
+				icon = new InfoIcon(masterColor+"Transfer", loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, true);
+				result.addIcon(icon);
+				
+				loreList.clear();
+				loreList.add(loreColor+"Change guild specialization");
+				icon = new InfoIcon(masterColor+"Specialization", loreList, Material.SMITHING_TABLE, ROOT_SLOT_SPECIALIZE, true);
 				result.addIcon(icon);
 				
 				/* Open/Close Button */
 				String currentValue = DisplayManager.boolean2Lang(guild.isOpen())+" "+DisplayManager.boolean2Symbol(guild.isOpen());
-				loreList = new ArrayList<String>();
+				loreList.clear();
 		    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
 		    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-				icon = new InfoIcon(ChatColor.GREEN+"Open/Close", loreList, Material.GRASS_BLOCK, ROOT_SLOT_OPEN, true);
+				icon = new InfoIcon(masterColor+"Open/Close", loreList, Material.IRON_DOOR, ROOT_SLOT_OPEN, true);
 				result.addIcon(icon);
 				
-				icon = new InfoIcon(ChatColor.GREEN+"Specialization", Collections.emptyList(), Material.GRASS_BLOCK, ROOT_SLOT_SPECIALIZE, true);
+				loreList.clear();
+				loreList.add(loreColor+"Disband and delete your guild");
+				icon = new InfoIcon(masterColor+"Disband", loreList, Material.ELYTRA, ROOT_SLOT_DISBAND, true);
 				result.addIcon(icon);
 			}
 		}
@@ -189,10 +239,35 @@ public class GuildMenu implements StateMenu {
 	private DisplayMenu createLeaveView() {
 		DisplayMenu result;
 		InfoIcon icon;
+		List<String> loreList = new ArrayList<String>();
 		result = new DisplayMenu(2, getTitle(MenuState.A_LEAVE));
-		icon = new InfoIcon(ChatColor.GOLD+"Yes", Collections.emptyList(), Material.GRASS_BLOCK, LEAVE_SLOT_YES, true);
+		
+		loreList.clear();
+		loreList.add(loreColor+"Click to leave your guild");
+		icon = new InfoIcon(ChatColor.GOLD+"Yes", loreList, Material.GLOWSTONE_DUST, SLOT_YES, true);
 		result.addIcon(icon);
-		icon = new InfoIcon(ChatColor.GOLD+"No", Collections.emptyList(), Material.GRASS_BLOCK, LEAVE_SLOT_NO, true);
+		
+		loreList.clear();
+		loreList.add(loreColor+"Exit the menu");
+		icon = new InfoIcon(ChatColor.GOLD+"No", loreList, Material.REDSTONE, SLOT_NO, true);
+		result.addIcon(icon);
+		return result;
+	}
+	
+	private DisplayMenu createDisbandView() {
+		DisplayMenu result;
+		InfoIcon icon;
+		List<String> loreList = new ArrayList<String>();
+		result = new DisplayMenu(2, getTitle(MenuState.C_DISBAND));
+		
+		loreList.clear();
+		loreList.add(loreColor+"Click to delete your guild");
+		icon = new InfoIcon(ChatColor.GOLD+"Yes", loreList, Material.GLOWSTONE_DUST, SLOT_YES, true);
+		result.addIcon(icon);
+		
+		loreList.clear();
+		loreList.add(loreColor+"Exit the menu");
+		icon = new InfoIcon(ChatColor.GOLD+"No", loreList, Material.REDSTONE, SLOT_NO, true);
 		result.addIcon(icon);
 		return result;
 	}
@@ -249,6 +324,9 @@ public class GuildMenu implements StateMenu {
 		} else if(context.equals(MenuState.B_RELATIONSHIP)) {
 			// List of all guilds, friendly and enemy, with relationship status and click hints
 			guilds.addAll(manager.getAllGuilds());
+			if(guild != null) {
+				guilds.remove(guild);
+			}
 			loreHintStr = "Click to change status";
 			isClickable = true;
 		} else {
@@ -332,6 +410,11 @@ public class GuildMenu implements StateMenu {
 			players.addAll(guild.getPlayerOfficersOnly());
 			loreHintStr = "Click to demote to Guild Member";
 			isClickable = true;
+		} else if(context.equals(MenuState.C_TRANSFER)) {
+			players.addAll(guild.getPlayerOfficersOnly());
+			players.addAll(guild.getPlayerMembersOnly());
+			loreHintStr = "Click to make Guild Master";
+			isClickable = true;
 		} else {
 			return null;
 		}
@@ -407,13 +490,19 @@ public class GuildMenu implements StateMenu {
 			switch(currentState) {
 				case ROOT:
 					if(slot == ROOT_SLOT_JOIN) {
-						currentState = MenuState.A_JOIN;
-						result = goToGuildView(currentState);
-						
+						if(guild == null) {
+							currentState = MenuState.A_JOIN;
+							result = goToGuildView(currentState);
+						} else {
+							ChatUtil.sendNotice(player.getBukkitPlayer(), "You are already a member of a guild");
+						}
 					} else if(slot == ROOT_SLOT_LEAVE) {
-						currentState = MenuState.A_LEAVE;
-						result = views.get(currentState);
-						
+						if(guild != null) {
+							currentState = MenuState.A_LEAVE;
+							result = views.get(currentState);
+						} else {
+							ChatUtil.sendNotice(player.getBukkitPlayer(), "You are not a member of any guild");
+						}
 					} else if(slot == ROOT_SLOT_INVITE) {
 						currentState = MenuState.A_INVITE;
 						result = goToGuildView(currentState);
@@ -438,7 +527,15 @@ public class GuildMenu implements StateMenu {
 						currentState = MenuState.C_DEMOTE;
 						result = goToPlayerView(currentState);
 						
-					} else if(slot == ROOT_SLOT_OPEN) {
+					} else if(slot == ROOT_SLOT_TRANSFER) {
+						currentState = MenuState.C_TRANSFER;
+						result = goToPlayerView(currentState);
+						
+					} else if(slot == ROOT_SLOT_DISBAND) {
+						currentState = MenuState.C_DISBAND;
+						result = views.get(currentState);
+						
+					}  else if(slot == ROOT_SLOT_OPEN) {
 						result = null; // Close menu
 						manager.toggleGuildOpen(guild);
 						
@@ -456,9 +553,9 @@ public class GuildMenu implements StateMenu {
 					}
 					break;
 				case A_LEAVE:
-					if(slot == LEAVE_SLOT_YES) {
+					if(slot == SLOT_YES) {
 						manager.leaveGuild(player, guild);
-					} else if(slot == LEAVE_SLOT_NO) {
+					} else if(slot == SLOT_NO) {
 						// Do nothing, just close the menu
 					}
 					result = null; // Close menu
@@ -507,6 +604,14 @@ public class GuildMenu implements StateMenu {
 						result = goToPlayerView(currentState);
 					}
 					break;
+				case C_TRANSFER:
+					if(clickedIcon != null && clickedIcon instanceof PlayerIcon) {
+						PlayerIcon icon = (PlayerIcon)clickedIcon;
+						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
+						manager.transferMaster(clickPlayer, guild);
+						result = null; // Close menu
+					}
+					break;
 				case C_SPECIALIZE:
 					if(clickedIcon != null && clickedIcon instanceof ProfessionIcon) {
 						ProfessionIcon icon = (ProfessionIcon)clickedIcon;
@@ -514,6 +619,14 @@ public class GuildMenu implements StateMenu {
 						manager.changeSpecialization(clickProfession, guild);
 						result = null; // Close menu
 					}
+					break;
+				case C_DISBAND:
+					if(slot == SLOT_YES) {
+						manager.removeGuild(guild);
+					} else if(slot == SLOT_NO) {
+						// Do nothing, just close the menu
+					}
+					result = null; // Close menu
 					break;
 				default:
 					break;
@@ -538,7 +651,7 @@ public class GuildMenu implements StateMenu {
 				result = color+"Join a Guild";
 				break;
 			case A_LEAVE:
-				result = color+"Leave your Guild";
+				result = color+"Are you sure?";
 				break;
 			case A_INVITE:
 				result = color+"Guild Invites";
@@ -550,13 +663,16 @@ public class GuildMenu implements StateMenu {
 				result = color+"Guild Relationships";
 				break;
 			case B_REQUESTS:
-				result = color+"Guild Member Requests";
+				result = color+"Member Requests";
 				break;
 			case C_PROMOTE:
-				result = color+"Promote Guild Officers";
+				result = color+"Promote Officers";
 				break;
 			case C_DEMOTE:
-				result = color+"Demote Guild Officers";
+				result = color+"Demote Officers";
+				break;
+			case C_TRANSFER:
+				result = color+"Transfer Guild Master";
 				break;
 			case C_SPECIALIZE:
 				result = color+"Guild Specialization";
@@ -622,7 +738,7 @@ public class GuildMenu implements StateMenu {
 			view.addIcon(navIconEmpty(navStart+6));
 			view.addIcon(navIconEmpty(navStart+7));
 			view.addIcon(navIconEmpty(navStart+8));
-		} else if(context.equals(MenuState.A_LEAVE) || context.equals(MenuState.C_SPECIALIZE)) {
+		} else if(context.equals(MenuState.A_LEAVE) || context.equals(MenuState.C_SPECIALIZE) || context.equals(MenuState.C_DISBAND)) {
 			// Close [4], Return [5]
 			view.addIcon(navIconEmpty(navStart+0));
 			view.addIcon(navIconEmpty(navStart+1));
@@ -634,7 +750,8 @@ public class GuildMenu implements StateMenu {
 			view.addIcon(navIconEmpty(navStart+7));
 			view.addIcon(navIconEmpty(navStart+8));
 		} else if(context.equals(MenuState.A_JOIN) || context.equals(MenuState.A_INVITE) || context.equals(MenuState.A_LIST) ||
-				context.equals(MenuState.B_RELATIONSHIP) || context.equals(MenuState.B_REQUESTS) || context.equals(MenuState.C_PROMOTE) || context.equals(MenuState.C_DEMOTE)) {
+				context.equals(MenuState.B_RELATIONSHIP) || context.equals(MenuState.B_REQUESTS) || 
+				context.equals(MenuState.C_PROMOTE) || context.equals(MenuState.C_DEMOTE) || context.equals(MenuState.C_TRANSFER)) {
 			// (back [0]) close [4], return [5] (next [8])
 			if(currentPage > 0) {
 				// Place a back button

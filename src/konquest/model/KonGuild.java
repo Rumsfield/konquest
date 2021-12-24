@@ -342,4 +342,14 @@ public class KonGuild {
 		return result;
 	}
 	
+	public int getNumLand() {
+		int result = 0;
+		for(KonTown town : this.getKingdom().getTowns()) {
+			if(members.containsKey(town.getPlayerLord().getUniqueId())) {
+				result += town.getChunkList().size();
+			}
+		}
+		return result;
+	}
+	
 }

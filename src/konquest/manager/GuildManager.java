@@ -31,6 +31,8 @@ public class GuildManager {
 	
 	private HashSet<KonGuild> guilds;
 	
+	//TODO: Implement player and town guild cache, for fast lookup
+	
 	public GuildManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.isEnabled = false;
@@ -107,7 +109,7 @@ public class GuildManager {
 	}
 	
 	public void toggleGuildStatus(KonGuild guild, KonGuild otherGuild) {
-		if(guild != null && otherGuild != null) {
+		if(guild != null && otherGuild != null && !guild.equals(otherGuild)) {
 			if(guild.getKingdom().equals(otherGuild.getKingdom())) {
 				if(guild.isSanction(otherGuild)) {
 					guild.removeSanction(otherGuild);
@@ -269,6 +271,13 @@ public class GuildManager {
 		UUID id = player.getUniqueId();
 		if(guild.isOfficer(id)) {
 			guild.setOfficer(id, false);
+		}
+	}
+	
+	public void transferMaster(OfflinePlayer player, KonGuild guild) {
+		UUID id = player.getUniqueId();
+		if(guild.isMember(id)) {
+			guild.setMaster(id);
 		}
 	}
 	

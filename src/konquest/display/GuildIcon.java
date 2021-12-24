@@ -41,7 +41,7 @@ public class GuildIcon implements MenuIcon {
 
 	@Override
 	public ItemStack getItem() {
-		ItemStack item = new ItemStack(Material.QUARTZ_PILLAR,1);
+		ItemStack item = new ItemStack(Material.BELL,1);
 		ItemMeta meta = item.getItemMeta();
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {

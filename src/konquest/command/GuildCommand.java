@@ -228,7 +228,7 @@ public class GuildCommand extends CommandBase {
 				List<String> playerList = new ArrayList<>();
 				for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllPlayersInKingdom(player.getKingdom())) {
 					name = offlinePlayer.getOfflineBukkitPlayer().getName();
-					if(name != null && !guild.isMember(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
+					if(name != null && guild != null && !guild.isMember(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
 						playerList.add(name);
 					}
 				}
@@ -237,7 +237,7 @@ public class GuildCommand extends CommandBase {
 				List<String> playerList = new ArrayList<>();
 				for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllPlayersInKingdom(player.getKingdom())) {
 					name = offlinePlayer.getOfflineBukkitPlayer().getName();
-					if(name != null && guild.isMember(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
+					if(name != null && guild != null && guild.isMember(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
 						playerList.add(name);
 					}
 				}
