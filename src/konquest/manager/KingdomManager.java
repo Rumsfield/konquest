@@ -1069,6 +1069,15 @@ public class KingdomManager {
 		return false;
 	}
 	
+	public boolean isTown(String name) {
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			if(kingdom.hasTown(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public KonKingdom getBarbarians() {
 		return barbarians;
 	}

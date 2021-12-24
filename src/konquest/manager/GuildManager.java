@@ -60,11 +60,36 @@ public class GuildManager {
 		return isEnabled;
 	}
 	
+	/**
+	 * Creates a new guild
+	 * @param name - Guild name
+	 * @param master - Player who is the guild master
+	 * @return 0	- Success
+	 * 	       1	- Bad name
+	 * 		   2	- Master already is a guild member
+	 */
 	public int createGuild(String name, KonPlayer master) {
-		KonGuild newGuild = new KonGuild(name, master.getBukkitPlayer().getUniqueId(), master.getKingdom());
-		guilds.add(newGuild);
-		
+		if(!name.contains(" ") && !konquest.getKingdomManager().isKingdom(name) && !konquest.getKingdomManager().isTown(name)) {
+			KonGuild currentGuild = getPlayerGuild(master.getOfflineBukkitPlayer());
+			if(currentGuild == null) {
+				KonGuild newGuild = new KonGuild(name, master.getBukkitPlayer().getUniqueId(), master.getKingdom());
+				guilds.add(newGuild);
+			} else {
+				return 2;
+			}
+		} else {
+			return 1;
+		}
 		return 0;
+	}
+	
+	public boolean renameGuild(KonGuild guild, String name) {
+		boolean result = false;
+		if(!name.contains(" ") && !konquest.getKingdomManager().isKingdom(name) && !konquest.getKingdomManager().isTown(name)) {
+			guild.setName(name);
+			result = true;
+		}
+		return result;
 	}
 	
 	public void removeGuild(KonGuild guild) {
@@ -108,16 +133,18 @@ public class GuildManager {
 		if(guild != null) {
 			UUID id = player.getBukkitPlayer().getUniqueId();
 			if(player.getKingdom().equals(guild.getKingdom())) {
-				if(guild.isJoinInviteValid(id)) {
-					// There is already a valid invite, add the player to the guild
-					guild.addMember(id, false);
-					guild.removeJoinRequest(id);
-					ChatUtil.sendNotice(player.getBukkitPlayer(), "Successfully joined guild");
-				} else if(!guild.isJoinRequestValid(id)){
-					// Request to join if not already requested
-					guild.addJoinRequest(id, false);
-				} else {
-					ChatUtil.sendError(player.getBukkitPlayer(), "You have already requested to join");
+				if(!guild.isMember(id)) {
+					if(guild.isJoinInviteValid(id)) {
+						// There is already a valid invite, add the player to the guild
+						guild.addMember(id, false);
+						guild.removeJoinRequest(id);
+						ChatUtil.sendNotice(player.getBukkitPlayer(), "Successfully joined guild");
+					} else if(!guild.isJoinRequestValid(id)){
+						// Request to join if not already requested
+						guild.addJoinRequest(id, false);
+					} else {
+						ChatUtil.sendError(player.getBukkitPlayer(), "You have already requested to join");
+					}
 				}
 			} else {
 				ChatUtil.sendError(player.getBukkitPlayer(), "Cannot request to join enemy guild");
@@ -161,23 +188,29 @@ public class GuildManager {
 	 * @param player - The offline player that the officer invites to join their guild
 	 * @param guild - The target guild for the join invite
 	 */
-	public void joinGuildInvite(KonOfflinePlayer player, KonGuild guild) {
+	public boolean joinGuildInvite(KonOfflinePlayer player, KonGuild guild) {
+		boolean result = false;
 		if(guild != null) {
 			UUID id = player.getOfflineBukkitPlayer().getUniqueId();
 			if(player.getKingdom().equals(guild.getKingdom())) {
-				if(guild.isJoinRequestValid(id)) {
-					// There is already a valid request, add the player to the guild
-					guild.addMember(id, false);
-					guild.removeJoinRequest(id);
-					if(player.getOfflineBukkitPlayer().isOnline()) {
-						ChatUtil.sendNotice((Player)player.getOfflineBukkitPlayer(), "Guild join request accepted");
+				if(!guild.isMember(id)) {
+					if(guild.isJoinRequestValid(id)) {
+						// There is already a valid request, add the player to the guild
+						guild.addMember(id, false);
+						guild.removeJoinRequest(id);
+						if(player.getOfflineBukkitPlayer().isOnline()) {
+							ChatUtil.sendNotice((Player)player.getOfflineBukkitPlayer(), "Guild join request accepted");
+						}
+						result = true;
+					} else if(!guild.isJoinInviteValid(id)) {
+						// Invite to join if not already invited
+						guild.addJoinRequest(id, true);
+						result = true;
 					}
-				} else if(!guild.isJoinInviteValid(id)) {
-					// Invite to join if not already invited
-					guild.addJoinRequest(id, true);
 				}
 			}
 		}
+		return result;
 	}
 	
 	/**
@@ -216,6 +249,13 @@ public class GuildManager {
 				ChatUtil.sendNotice(player.getBukkitPlayer(), "Failed to leave - you are either the guild master or not a member");
 			}
 		}
+	}
+	
+	public boolean kickGuildMember(OfflinePlayer player, KonGuild guild) {
+		boolean result = false;
+		UUID id = player.getUniqueId();
+		result = guild.removeMember(id);
+		return result;
 	}
 	
 	public void promoteOfficer(OfflinePlayer player, KonGuild guild) {
@@ -274,6 +314,17 @@ public class GuildManager {
 		KonGuild result = null;
 		for(KonGuild guild : guilds) {
 			if(guild.isTownMember(town)) {
+				result = guild;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	public KonGuild getPlayerGuild(OfflinePlayer player) {
+		KonGuild result = null;
+		for(KonGuild guild : guilds) {
+			if(guild.isMember(player.getUniqueId())) {
 				result = guild;
 				break;
 			}
