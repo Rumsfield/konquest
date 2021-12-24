@@ -51,9 +51,9 @@ public class GuildMenu implements StateMenu {
 	
 	private final int ROOT_SLOT_JOIN 			= 0;
 	private final int ROOT_SLOT_LEAVE 			= 2;
-	private final int ROOT_SLOT_INVITE 			= 4;
-	private final int ROOT_SLOT_LIST 			= 6;
-	private final int ROOT_SLOT_GUILD 			= 8;
+	private final int ROOT_SLOT_GUILD 			= 4;
+	private final int ROOT_SLOT_INVITE 			= 6;
+	private final int ROOT_SLOT_LIST 			= 8;
 	private final int ROOT_SLOT_RELATIONSHIPS 	= 12;
 	private final int ROOT_SLOT_REQUESTS 		= 14;
 	private final int ROOT_SLOT_PROMOTE 		= 19;
@@ -177,7 +177,7 @@ public class GuildMenu implements StateMenu {
 		result.addIcon(icon);
 		
 		if(guild != null) {
-			loreList.clear();
+			loreList = new ArrayList<String>();
 			loreList.add(loreColor+"Towns: "+valueColor+guild.getNumTowns());
 			loreList.add(loreColor+"Land: "+valueColor+guild.getNumLand());
 			loreList.add(loreColor+"Members: "+valueColor+guild.getNumMembers());
@@ -186,7 +186,7 @@ public class GuildMenu implements StateMenu {
 			result.addIcon(icon);
 
 			if(menuAccess.equals(AccessType.OFFICER) || menuAccess.equals(AccessType.MASTER)) {
-				loreList.clear();
+				loreList = new ArrayList<String>();
 				loreList.add(loreColor+"Modify guild status");
 				icon = new InfoIcon(officerColor+"Relationships", loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, true);
 				result.addIcon(icon);
@@ -198,7 +198,7 @@ public class GuildMenu implements StateMenu {
 			}
 			
 			if(menuAccess.equals(AccessType.MASTER)) {
-				loreList.clear();
+				loreList = new ArrayList<String>();
 				loreList.add(loreColor+"Promote members to officers");
 				icon = new InfoIcon(masterColor+"Promote", loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, true);
 				result.addIcon(icon);
@@ -228,7 +228,7 @@ public class GuildMenu implements StateMenu {
 				
 				loreList.clear();
 				loreList.add(loreColor+"Disband and delete your guild");
-				icon = new InfoIcon(masterColor+"Disband", loreList, Material.ELYTRA, ROOT_SLOT_DISBAND, true);
+				icon = new InfoIcon(masterColor+"Disband", loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
 				result.addIcon(icon);
 			}
 		}
@@ -676,6 +676,9 @@ public class GuildMenu implements StateMenu {
 				break;
 			case C_SPECIALIZE:
 				result = color+"Guild Specialization";
+				break;
+			case C_DISBAND:
+				result = color+"Disband your Guild";
 				break;
 			default:
 				break;
