@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Villager;
 
+import konquest.Konquest;
 import konquest.display.PlayerIcon.PlayerIconAction;
 import konquest.manager.DisplayManager;
 import konquest.manager.GuildManager;
@@ -363,6 +364,7 @@ public class GuildMenu implements StateMenu {
 				loreList = new ArrayList<String>();
 				loreList.add(loreColor+"Towns: "+valueColor+currentGuild.getNumTowns());
 				loreList.add(loreColor+"Members: "+valueColor+currentGuild.getNumMembers());
+				loreList.add(loreColor+"Specialization: "+valueColor+currentGuild.getSpecialization().name());
 				if(guild != null) {
 					if(!player.getKingdom().equals(currentGuild.getKingdom())) {
 						guildColor = ChatColor.RED;
@@ -504,6 +506,7 @@ public class GuildMenu implements StateMenu {
 							result = goToGuildView(currentState);
 						} else {
 							ChatUtil.sendNotice(player.getBukkitPlayer(), "You are already a member of a guild");
+							Konquest.playFailSound(player.getBukkitPlayer());
 						}
 					} else if(slot == ROOT_SLOT_LEAVE) {
 						if(guild != null) {
@@ -511,6 +514,7 @@ public class GuildMenu implements StateMenu {
 							result = views.get(currentState);
 						} else {
 							ChatUtil.sendNotice(player.getBukkitPlayer(), "You are not a member of any guild");
+							Konquest.playFailSound(player.getBukkitPlayer());
 						}
 					} else if(slot == ROOT_SLOT_INVITE) {
 						currentState = MenuState.A_INVITE;
@@ -547,6 +551,7 @@ public class GuildMenu implements StateMenu {
 					}  else if(slot == ROOT_SLOT_OPEN) {
 						result = null; // Close menu
 						manager.toggleGuildOpen(guild);
+						Konquest.playSuccessSound(player.getBukkitPlayer());
 						
 					} else if(slot == ROOT_SLOT_SPECIALIZE) {
 						currentState = MenuState.C_SPECIALIZE;
@@ -559,11 +564,13 @@ public class GuildMenu implements StateMenu {
 						KonGuild clickGuild = icon.getGuild();
 						manager.joinGuildRequest(player, clickGuild);
 						result = null; // Close menu
+						Konquest.playSuccessSound(player.getBukkitPlayer());
 					}
 					break;
 				case A_LEAVE:
 					if(slot == SLOT_YES) {
 						manager.leaveGuild(player, guild);
+						Konquest.playSuccessSound(player.getBukkitPlayer());
 					} else if(slot == SLOT_NO) {
 						// Do nothing, just close the menu
 					}
@@ -573,8 +580,14 @@ public class GuildMenu implements StateMenu {
 					if(clickedIcon != null && clickedIcon instanceof GuildIcon) {
 						GuildIcon icon = (GuildIcon)clickedIcon;
 						KonGuild clickGuild = icon.getGuild();
-						manager.respondGuildInvite(player, clickGuild, clickType);
-						result = null; // Close menu
+						boolean status = manager.respondGuildInvite(player, clickGuild, clickType);
+						if(status) {
+							// Invite accepted
+							result = null;
+						} else {
+							// Invite declined
+							result = goToGuildView(currentState);
+						}
 					}
 					break;
 				case A_LIST:
@@ -585,8 +598,14 @@ public class GuildMenu implements StateMenu {
 					if(clickedIcon != null && clickedIcon instanceof GuildIcon) {
 						GuildIcon icon = (GuildIcon)clickedIcon;
 						KonGuild clickGuild = icon.getGuild();
-						manager.toggleGuildStatus(guild, clickGuild, player);
-						result = goToGuildView(currentState);
+						boolean status = manager.toggleGuildStatus(guild, clickGuild, player);
+						if(status) {
+							result = goToGuildView(currentState);
+							Konquest.playSuccessSound(player.getBukkitPlayer());
+						} else {
+							result = null;
+							Konquest.playFailSound(player.getBukkitPlayer());
+						}
 					}
 					break;
 				case B_REQUESTS:
@@ -619,19 +638,27 @@ public class GuildMenu implements StateMenu {
 						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
 						manager.transferMaster(clickPlayer, guild);
 						result = null; // Close menu
+						Konquest.playSuccessSound(player.getBukkitPlayer());
 					}
 					break;
 				case C_SPECIALIZE:
 					if(clickedIcon != null && clickedIcon instanceof ProfessionIcon) {
 						ProfessionIcon icon = (ProfessionIcon)clickedIcon;
 						Villager.Profession clickProfession = icon.getProfession();
-						manager.changeSpecialization(clickProfession, guild, player);
+						boolean status = manager.changeSpecialization(clickProfession, guild, player);
+						if(status) {
+							ChatUtil.sendNotice(player.getBukkitPlayer(), "Changed "+guild.getName()+" Guild specialization to "+clickProfession.name());
+							Konquest.playSuccessSound(player.getBukkitPlayer());
+						} else {
+							Konquest.playFailSound(player.getBukkitPlayer());
+						}
 						result = null; // Close menu
 					}
 					break;
 				case C_DISBAND:
 					if(slot == SLOT_YES) {
 						manager.removeGuild(guild);
+						Konquest.playSuccessSound(player.getBukkitPlayer());
 					} else if(slot == SLOT_NO) {
 						// Do nothing, just close the menu
 					}

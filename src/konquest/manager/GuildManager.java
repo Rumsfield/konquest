@@ -281,13 +281,13 @@ public class GuildManager implements Timeable {
 		}
 	}
 	
-	public void toggleGuildStatus(KonGuild guild, KonGuild otherGuild, KonPlayer player) {
+	public boolean toggleGuildStatus(KonGuild guild, KonGuild otherGuild, KonPlayer player) {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Check cost
 		if(costRelation > 0) {
 			if(KonquestPlugin.getBalance(bukkitPlayer) < costRelation) {
 				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costRelation));
-                return;
+                return false;
 			}
     	}
 		// Attempt to change relationship
@@ -322,15 +322,16 @@ public class GuildManager implements Timeable {
 	            }
 			}
 		}
+		return true;
 	}
 	
-	public void changeSpecialization(Villager.Profession profession, KonGuild guild, KonPlayer player) {
+	public boolean changeSpecialization(Villager.Profession profession, KonGuild guild, KonPlayer player) {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Check cost
 		if(costSpecial > 0) {
 			if(KonquestPlugin.getBalance(bukkitPlayer) < costSpecial) {
 				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costSpecial));
-                return;
+                return false;
 			}
     	}
 		guild.setSpecialization(profession);
@@ -340,6 +341,7 @@ public class GuildManager implements Timeable {
             	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costSpecial);
             }
 		}
+		return true;
 	}
 	
 	/**
@@ -387,12 +389,12 @@ public class GuildManager implements Timeable {
 					guild.addMember(id, false);
 					result = true;
 					if(player.isOnline()) {
-						ChatUtil.sendNotice((Player)player, "Guild join request accepted");
+						ChatUtil.sendNotice((Player)player, guild.getName()+" Guild join request accepted");
 					}
 				} else {
 					// Denied join request
 					if(player.isOnline()) {
-						ChatUtil.sendNotice((Player)player, "Guild join request denied");
+						ChatUtil.sendError((Player)player, guild.getName()+" Guild join request denied");
 					}
 				}
 				guild.removeJoinRequest(id);
@@ -447,9 +449,11 @@ public class GuildManager implements Timeable {
 					guild.addMember(id, false);
 					result = true;
 					ChatUtil.sendNotice(player.getBukkitPlayer(), "Guild join invite accepted");
+					Konquest.playSuccessSound(player.getBukkitPlayer());
 				} else {
 					// Denied join request
 					ChatUtil.sendNotice(player.getBukkitPlayer(), "Guild join invite declined");
+					Konquest.playFailSound(player.getBukkitPlayer());
 				}
 				guild.removeJoinRequest(id);
 			}
