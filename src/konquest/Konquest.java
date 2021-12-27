@@ -527,14 +527,7 @@ public class Konquest implements Timeable {
 					}
 				}
 			}
-			/*
 			// Save config files
-			kingdomManager.saveKingdoms();
-			campManager.saveCamps();
-			ruinManager.saveRuins();
-			//playerManager.saveAllPlayers();
-			configManager.saveConfigs();
-			*/
 			save();
 			saveTimer.setTime(saveIntervalSeconds);
 			ChatUtil.sendAdminBroadcast("Saved all config files");

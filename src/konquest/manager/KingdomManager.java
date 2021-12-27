@@ -265,6 +265,8 @@ public class KingdomManager {
 	    	player.getBukkitPlayer().setBedSpawnLocation(randomWildLoc, true);
     	}
     	player.setExileKingdom(oldKingdom);
+    	// Remove guild
+    	konquest.getGuildManager().removePlayerGuild(player.getOfflineBukkitPlayer());
     	// Remove residency
     	for(KonTown town : player.getKingdom().getTowns()) {
     		if(town.removePlayerResident(player.getOfflineBukkitPlayer())) {
@@ -300,6 +302,8 @@ public class KingdomManager {
     	}
     	KonKingdom oldKingdom = offlinePlayer.getKingdom();
     	offlinePlayer.setExileKingdom(oldKingdom);
+    	// Remove guild
+    	konquest.getGuildManager().removePlayerGuild(offlinePlayer.getOfflineBukkitPlayer());
     	// Remove residency
     	for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
     		if(town.removePlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {

@@ -261,12 +261,12 @@ public class GuildMenu implements StateMenu {
 		result = new DisplayMenu(2, getTitle(MenuState.C_DISBAND));
 		
 		loreList.clear();
-		loreList.add(loreColor+"Click to delete your guild");
+		loreList.add(hintColor+"Click to delete your guild");
 		icon = new InfoIcon(ChatColor.GOLD+"Yes", loreList, Material.GLOWSTONE_DUST, SLOT_YES, true);
 		result.addIcon(icon);
 		
 		loreList.clear();
-		loreList.add(loreColor+"Exit the menu");
+		loreList.add(hintColor+"Exit the menu");
 		icon = new InfoIcon(ChatColor.GOLD+"No", loreList, Material.REDSTONE, SLOT_NO, true);
 		result.addIcon(icon);
 		return result;
@@ -275,13 +275,17 @@ public class GuildMenu implements StateMenu {
 	private DisplayMenu createSpecializeView() {
 		DisplayMenu result;
 		ProfessionIcon icon;
+		String cost = String.format("%.2f",manager.getCostSpecial());
 		int numEntries = Villager.Profession.values().length - 1; // Subtract one to omit current specialization choice
 		int numRows = (int)Math.ceil((double)numEntries / 9);
 		result = new DisplayMenu(numRows+1, getTitle(MenuState.C_SPECIALIZE));
 		int index = 0;
+		List<String> loreList = new ArrayList<String>();
+		loreList.add(loreColor+"Cost: "+valueColor+cost);
+		loreList.add(hintColor+"Click to choose");
 		for(Villager.Profession profession : Villager.Profession.values()) {
 			if(guild == null || (guild != null && !profession.equals(guild.getSpecialization()))) {
-				icon = new ProfessionIcon(ChatColor.GOLD+profession.name(),Collections.emptyList(),profession,index,true);
+				icon = new ProfessionIcon(ChatColor.GOLD+profession.name(),loreList,profession,index,true);
 				result.addIcon(icon);
 				index++;
 			}
@@ -327,7 +331,7 @@ public class GuildMenu implements StateMenu {
 			if(guild != null) {
 				guilds.remove(guild);
 			}
-			loreHintStr = "Click to change status";
+			loreHintStr = "Click to change our status";
 			isClickable = true;
 		} else {
 			return null;
@@ -362,17 +366,22 @@ public class GuildMenu implements StateMenu {
 				if(guild != null) {
 					if(!player.getKingdom().equals(currentGuild.getKingdom())) {
 						guildColor = ChatColor.RED;
-						String guildEnemyStatus = "Hostile";
-						if(guild.isArmistice(currentGuild)) {
-							guildEnemyStatus = "Armistice";
-						}
-						loreList.add(loreColor+"Status: "+valueColor+guildEnemyStatus);
+						String theirEnemyStatus = currentGuild.isArmistice(guild) ? "Armistice" : "Hostile";
+						loreList.add(loreColor+"Their Status: "+valueColor+theirEnemyStatus);
+						String guildEnemyStatus = guild.isArmistice(currentGuild) ? "Armistice" : "Hostile";
+						loreList.add(loreColor+"Our Status: "+valueColor+guildEnemyStatus);
 					} else {
-						String guildFriendlyStatus = "Treaty";
-						if(guild.isSanction(currentGuild)) {
-							guildFriendlyStatus = "Sanction";
-						}
-						loreList.add(loreColor+"Status: "+valueColor+guildFriendlyStatus);
+						String theirFriendlyStatus = currentGuild.isSanction(guild) ? "Sanction" : "Treaty";
+						loreList.add(loreColor+"Their Status: "+valueColor+theirFriendlyStatus);
+						String guildFriendlyStatus = guild.isSanction(currentGuild) ? "Sanction" : "Treaty";
+						loreList.add(loreColor+"Our Status: "+valueColor+guildFriendlyStatus);
+					}
+					if(manager.isArmistice(guild, currentGuild)) {
+						guildColor = ChatColor.LIGHT_PURPLE;
+					}
+					if(context.equals(MenuState.B_RELATIONSHIP)) {
+						String cost = String.format("%.2f",manager.getCostRelation());
+						loreList.add(loreColor+"Cost: "+valueColor+cost);
 					}
 				}
 				loreList.add(hintColor+loreHintStr);
@@ -576,7 +585,7 @@ public class GuildMenu implements StateMenu {
 					if(clickedIcon != null && clickedIcon instanceof GuildIcon) {
 						GuildIcon icon = (GuildIcon)clickedIcon;
 						KonGuild clickGuild = icon.getGuild();
-						manager.toggleGuildStatus(guild, clickGuild);
+						manager.toggleGuildStatus(guild, clickGuild, player);
 						result = goToGuildView(currentState);
 					}
 					break;
@@ -616,7 +625,7 @@ public class GuildMenu implements StateMenu {
 					if(clickedIcon != null && clickedIcon instanceof ProfessionIcon) {
 						ProfessionIcon icon = (ProfessionIcon)clickedIcon;
 						Villager.Profession clickProfession = icon.getProfession();
-						manager.changeSpecialization(clickProfession, guild);
+						manager.changeSpecialization(clickProfession, guild, player);
 						result = null; // Close menu
 					}
 					break;

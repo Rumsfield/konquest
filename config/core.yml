@@ -94,11 +94,12 @@
 #    ignore_knights:                Allow town knights to ignore plot protections (true/false)
 #  guilds:
 #    enable*:                       Enable kingdom guilds (true/false)
-#    special_change_cost:           Cost in favor to change a guild's specialization (integer >= 0)
-#    pay_interval_seconds:          Time in seconds between guild payments to all members (0 to disable, integer >= 0)
+#    pay_interval_seconds:          Time in seconds between guild payments to all members, set to 0 to disable guild pay (0 to disable, integer >= 0)
 #    pay_per_chunk:                 Value in favor to pay all guild members per chunk of land in all guild towns (number >= 0.0)
 #    pay_per_resident:              Value in favor to pay all guild members per resident in all guild towns (number >= 0.0)
-#    pay_limit:                     Maximum value in favor for guild payments to members (0 to disable, number >= 0.0)
+#    pay_limit:                     Maximum value in favor for guild payments to members, set to 0 for no limit (0 to disable, number >= 0.0)
+#    pay_officer_percent:           Guild Officer bonus pay percentage of all guild town land and population (0 <= integer <= 100)
+#    pay_master_percent:            Guild Master bonus pay percentage of all guild town land and population (0 <= integer <= 100)
 #  exile:
 #    remove_favor:                  Set a player's currency balance to 0 when exiled (true/flase)
 #    remove_stats:                  Remove all stats and accomplishment prefixes from a player when exiled (true/false)
@@ -145,6 +146,11 @@
 #      capture_town:                Quest reward for capturing an enemy town, requires konquest.directive.capture permission (integer >= 0)
 #      kill_enemy:                  Quest reward for killing an enemy, requires konquest.directive.kill permission (integer >= 0)
 #      defend_raid:                 Reward for defending a town from attack, does not require any permission (integer >= 0)
+#    guilds:
+#      cost_create:                 Cost to create a guild (integer >= 0)
+#      cost_rename:                 Cost to rename a guild (integer >= 0)
+#      cost_specialize:             Cost to change a guild specialization profession (integer >= 0)
+#      cost_relationship:           Cost to change a guild relationship with another guild (integer >= 0)
 #  combat:
 #    prevent_command_on_proximity:  Enable combat tagging when enemies are in close priximity (true/false) (NOT CURRENTLY IMPLEMENTED)
 #    prevent_command_on_damage:     Enable combat tagging when damaged by an enemy (true/false)
@@ -247,11 +253,12 @@ core:
     ignore_knights: true
   guilds:
     enable: true
-    special_change_cost: 200
-    pay_interval_seconds: 1800
+    pay_interval_seconds: 900
     pay_per_chunk: 0.25
     pay_per_resident: 0.10
     pay_limit: 100
+    pay_officer_percent: 20
+    pay_master_percent: 80
   exile:
     remove_favor: true
     remove_stats: true
@@ -298,6 +305,11 @@ core:
       capture_town: 100
       kill_enemy: 50
       defend_raid: 50
+    guilds:
+      cost_create: 100
+      cost_rename: 50
+      cost_specialize: 200
+      cost_relationship: 50
   combat:
     prevent_command_on_proximity: false
     prevent_command_on_damage: true

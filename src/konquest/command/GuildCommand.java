@@ -87,6 +87,9 @@ public class GuildCommand extends CommandBase {
 		                    		case 2:
 		                    			ChatUtil.sendError((Player) getSender(), "Failed to create, leave your current guild first!");
 		                    			break;
+		                    		case 3:
+		                    			ChatUtil.sendError((Player) getSender(), "Failed to create, not enough favor");
+		                    			break;
 	                    			default:
 	                    				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 	                    				break;
@@ -180,7 +183,7 @@ public class GuildCommand extends CommandBase {
 	                    		ChatUtil.sendError((Player) getSender(), "Failed to rename, that name is already taken");
 	                            return;
 	                    	}
-	                    	boolean status = getKonquest().getGuildManager().renameGuild(guild, guildName);
+	                    	boolean status = getKonquest().getGuildManager().renameGuild(guild, guildName, player);
 	                    	if(status) {
 	            				ChatUtil.sendNotice((Player) getSender(), "Successfully renamed guild to: "+guildName);
 	            			} else {
