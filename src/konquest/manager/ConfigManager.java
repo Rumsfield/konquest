@@ -40,9 +40,11 @@ public class ConfigManager{
 		migrateConfigFile("kingdoms.yml","data/kingdoms.yml");
 		migrateConfigFile("camps.yml","data/camps.yml");
 		migrateConfigFile("ruins.yml","data/ruins.yml");
+		migrateConfigFile("guilds.yml","data/guilds.yml");
 		addConfig("kingdoms", new KonConfig("data/kingdoms"));
 		addConfig("camps", new KonConfig("data/camps"));
 		addConfig("ruins", new KonConfig("data/ruins"));
+		addConfig("guilds", new KonConfig("data/guilds"));
 		// Language files
 		addConfig("lang_english", new KonConfig("lang/english",false));
 		updateConfigVersion("lang_english");

@@ -3,9 +3,12 @@ package konquest.manager;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 
@@ -55,6 +58,7 @@ public class GuildManager {
 		payLimit 			= konquest.getConfigManager().getConfig("core").getDouble("core.guilds.pay_limit",0);
 		specialChangeCost 	= konquest.getConfigManager().getConfig("core").getDouble("core.guilds.special_change_cost",0);
 		*/
+		loadGuilds();
 		ChatUtil.printDebug("Guild Manager is ready, enabled: "+isEnabled);
 	}
 	
@@ -341,6 +345,161 @@ public class GuildManager {
 		return result;
 	}
 	
+	public KonGuild getGuild(String name) {
+		KonGuild result = null;
+		for(KonGuild guild : guilds) {
+			if(guild.getName().equals(name)) {
+				result = guild;
+				break;
+			}
+		}
+		return result;
+	}
 	
+	/*
+	 * ===================================
+	 * Saving Methods
+	 * ===================================
+	 */
+
+	private void loadGuilds() {
+		if(!isEnabled) {
+			ChatUtil.printConsoleAlert("Disabled guilds");
+			return;
+		}
+		FileConfiguration guildsConfig = konquest.getConfigManager().getConfig("guilds");
+        if (guildsConfig.get("guilds") == null) {
+        	ChatUtil.printDebug("There is no guilds section in guilds.yml");
+            return;
+        }
+        ConfigurationSection guildsSection = guildsConfig.getConfigurationSection("guilds");
+        Set<String> guildSet = guildsSection.getKeys(false);
+        
+        boolean isOpen;
+        String specializationName;
+        String kingdomName;
+        String masterUUIDStr;
+        KonKingdom kingdom;
+        UUID playerUUID;
+        
+        // Load initial guild set
+        for(String guildName : guildSet) {
+        	if(guildsSection.contains(guildName)) {
+        		ConfigurationSection guildInstanceSection = guildsSection.getConfigurationSection("guilds."+guildName);
+        		// Parse property fields
+        		isOpen = guildInstanceSection.getBoolean("open",false);
+        		specializationName = guildInstanceSection.getString("specialization","NONE");
+        		kingdomName = guildInstanceSection.getString("kingdom");
+        		masterUUIDStr = guildInstanceSection.getString("master");
+        		kingdom = konquest.getKingdomManager().getKingdom(kingdomName);
+        		playerUUID = Konquest.idFromString(masterUUIDStr);
+        		// Check valid fields
+        		if(!kingdom.equals(konquest.getKingdomManager().getBarbarians()) && playerUUID != null) {
+        			// Create guild
+        			KonGuild newGuild = new KonGuild(guildName, playerUUID, kingdom);
+    				// Set open flag
+        			newGuild.setIsOpen(isOpen);
+        			// Set profession
+        			Villager.Profession profession = Villager.Profession.NONE;
+        			try {
+        				profession = Villager.Profession.valueOf(specializationName);
+        			} catch(Exception e) {
+        				ChatUtil.printConsoleAlert("Failed to parse profession "+specializationName+" for guild "+guildName);
+        			}
+        			newGuild.setSpecialization(profession);
+        			// Add members
+        			if(guildInstanceSection.contains("members")) {
+		            	for(String memberUUIDStr : guildInstanceSection.getConfigurationSection("members").getKeys(false)) {
+		            		boolean isOfficer = guildInstanceSection.getBoolean("members."+memberUUIDStr);
+		            		playerUUID = Konquest.idFromString(memberUUIDStr);
+		            		if(playerUUID != null) {
+		            			newGuild.addMember(playerUUID,isOfficer);
+		            		}
+		            	}
+	            	}
+        			// Add membership requests
+        			if(guildInstanceSection.contains("requests")) {
+	            		for(String requestUUIDStr : guildInstanceSection.getConfigurationSection("requests").getKeys(false)) {
+	            			boolean type = guildInstanceSection.getBoolean("requests."+requestUUIDStr);
+	            			playerUUID = Konquest.idFromString(requestUUIDStr);
+		            		if(playerUUID != null) {
+		            			newGuild.addJoinRequest(playerUUID, type);
+		            		}
+	            		}
+	            	}
+        			guilds.add(newGuild);
+        		}
+        	}
+        }
+        // Load subsequent guild relationships
+        for(String guildName : guildSet) {
+        	if(guildsSection.contains(guildName)) {
+        		ConfigurationSection guildInstanceSection = guildsSection.getConfigurationSection("guilds."+guildName);
+        		KonGuild currentGuild = getGuild(guildName);
+        		if(currentGuild != null) {
+	        		// Add sanction and armistice lists
+	    			if(guildInstanceSection.contains("sanction")) {
+	    				List<String> sanctionList = guildInstanceSection.getStringList("sanction");
+	    				for(String sanctionName : sanctionList) {
+	    					KonGuild otherGuild = getGuild(sanctionName);
+	    					if(otherGuild != null) {
+	    						currentGuild.addSanction(otherGuild);
+	    					} else {
+	    						ChatUtil.printDebug("Failed to add sanction guild by name: "+sanctionName);
+	    					}
+	    				}
+	    			}
+	    			if(guildInstanceSection.contains("armistice")) {
+	    				List<String> armisticeList = guildInstanceSection.getStringList("armistice");
+	    				for(String armisticeName : armisticeList) {
+	    					KonGuild otherGuild = getGuild(armisticeName);
+	    					if(otherGuild != null) {
+	    						currentGuild.addArmistice(otherGuild);
+	    					} else {
+	    						ChatUtil.printDebug("Failed to add armistice guild by name: "+armisticeName);
+	    					}
+	    				}
+	    			}
+        		} else {
+        			ChatUtil.printDebug("Failed to find guild by name: "+guildName);
+        		}
+        	}
+        }
+        // Finished loading guilds
+        ChatUtil.printDebug("Finished loading all guilds");
+	}
 	
+	public void saveGuilds() {
+		FileConfiguration guildsConfig = konquest.getConfigManager().getConfig("guilds");
+		guildsConfig.set("guilds", null); // reset guilds config
+		ConfigurationSection root = guildsConfig.createSection("guilds");
+		for(KonGuild guild : guilds) {
+			ConfigurationSection guildSection = root.createSection(guild.getName());
+			guildSection.set("open", guild.isOpen());
+			guildSection.set("specialization", guild.getSpecialization().toString());
+			guildSection.set("kingdom", guild.getKingdom().getName());
+			ConfigurationSection guildMemberSection = guildSection.createSection("members");
+            for(OfflinePlayer member : guild.getPlayerMembers()) {
+            	String uuid = member.getUniqueId().toString();
+            	if(guild.isMaster(member.getUniqueId())) {
+            		guildSection.set("master", uuid);
+            	} else if(guild.isOfficer(member.getUniqueId())) {
+            		guildMemberSection.set(uuid, true);
+            	} else {
+            		guildMemberSection.set(uuid, false);
+            	}
+            }
+            ConfigurationSection guildRequestsSection = guildSection.createSection("requests");
+            for(OfflinePlayer requestee : guild.getJoinRequests()) {
+            	String uuid = requestee.getUniqueId().toString();
+            	guildRequestsSection.set(uuid, false);
+            }
+            for(OfflinePlayer invitee : guild.getJoinInvites()) {
+            	String uuid = invitee.getUniqueId().toString();
+            	guildRequestsSection.set(uuid, true);
+            }
+            guildSection.set("sanction", guild.getSanctionNames());
+            guildSection.set("armistice", guild.getArmisticeNames());
+		}
+	}
 }

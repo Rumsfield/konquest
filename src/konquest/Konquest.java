@@ -352,6 +352,15 @@ public class Konquest implements Timeable {
 		return player;
 	}
 	
+	public void save() {
+		// Save config files
+		kingdomManager.saveKingdoms();
+		campManager.saveCamps();
+		ruinManager.saveRuins();
+		guildManager.saveGuilds();
+		configManager.saveConfigs();
+	}
+	
 	public static Konquest getInstance() {
 		return instance;
 	}
@@ -518,12 +527,15 @@ public class Konquest implements Timeable {
 					}
 				}
 			}
+			/*
 			// Save config files
 			kingdomManager.saveKingdoms();
 			campManager.saveCamps();
 			ruinManager.saveRuins();
 			//playerManager.saveAllPlayers();
 			configManager.saveConfigs();
+			*/
+			save();
 			saveTimer.setTime(saveIntervalSeconds);
 			ChatUtil.sendAdminBroadcast("Saved all config files");
 		} else if(taskID == compassTimer.getTaskID()) {

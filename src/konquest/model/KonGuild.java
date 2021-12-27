@@ -161,6 +161,10 @@ public class KonGuild {
 		return master != null ? true : false;
 	}
 	
+	public UUID getMaster() {
+		return master;
+	}
+	
 	public OfflinePlayer getPlayerMaster() {
 		if(master != null) {
 			return Bukkit.getOfflinePlayer(master);
@@ -280,6 +284,14 @@ public class KonGuild {
 		return friendlySanction.contains(guild);
 	}
 	
+	public List<String> getSanctionNames() {
+		List<String> result = new ArrayList<String>();
+		for(KonGuild guild : friendlySanction) {
+			result.add(guild.getName());
+		}
+		return result;
+	}
+	
 	public boolean addArmistice(KonGuild guild) {
 		boolean result = false;
 		if(!enemyArmistice.contains(guild) && !guild.getKingdom().equals(this.getKingdom())) {
@@ -299,6 +311,14 @@ public class KonGuild {
 	
 	public boolean isArmistice(KonGuild guild) {
 		return enemyArmistice.contains(guild);
+	}
+	
+	public List<String> getArmisticeNames() {
+		List<String> result = new ArrayList<String>();
+		for(KonGuild guild : enemyArmistice) {
+			result.add(guild.getName());
+		}
+		return result;
 	}
 	
 	/*

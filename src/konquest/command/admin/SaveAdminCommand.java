@@ -24,12 +24,8 @@ public class SaveAdminCommand extends CommandBase {
             return;
         } else {
 
-        	getKonquest().getKingdomManager().saveKingdoms();
-        	getKonquest().getCampManager().saveCamps();
-        	getKonquest().getRuinManager().saveRuins();
-        	//getKonquest().getPlayerManager().saveAllPlayers();
-        	getKonquest().getConfigManager().saveConfigs();
-        	
+        	getKonquest().save();
+
         	//ChatUtil.sendNotice(bukkitPlayer, "Saved all kingdoms, camps and ruins.");
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SAVE_NOTICE_MESSAGE.getMessage());
         }
