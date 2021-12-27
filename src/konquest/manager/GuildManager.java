@@ -1,6 +1,7 @@
 package konquest.manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +34,7 @@ public class GuildManager {
 	*/
 	
 	private HashSet<KonGuild> guilds;
+	private HashMap<OfflinePlayer,KonGuild> playerGuildCache;
 	
 	//TODO: Implement player and town guild cache, for fast lookup
 	
@@ -47,6 +49,7 @@ public class GuildManager {
 		this.specialChangeCost = 200;
 		*/
 		this.guilds = new HashSet<KonGuild>();
+		this.playerGuildCache = new HashMap<OfflinePlayer,KonGuild>();
 	}
 	
 	public void initialize() {
@@ -117,14 +120,22 @@ public class GuildManager {
 			if(guild.getKingdom().equals(otherGuild.getKingdom())) {
 				if(guild.isSanction(otherGuild)) {
 					guild.removeSanction(otherGuild);
+					broadcastGuild(guild, "Removed sanction for "+otherGuild.getName()+" Guild");
+					broadcastGuild(otherGuild, guild.getName()+" Guild has removed the sanction on your guild!");
 				} else {
 					guild.addSanction(otherGuild);
+					broadcastGuild(guild, "Added sanction for "+otherGuild.getName()+" Guild");
+					broadcastGuild(otherGuild, guild.getName()+" Guild has added a sanction on your guild!");
 				}
 			} else {
 				if(guild.isArmistice(otherGuild)) {
 					guild.removeArmistice(otherGuild);
+					broadcastGuild(guild, "Broke the armistice with "+otherGuild.getName()+" Guild");
+					broadcastGuild(otherGuild, guild.getName()+" Guild has broken the armistice with your guild!");
 				} else {
 					guild.addArmistice(otherGuild);
+					broadcastGuild(guild, "Made an armistice with "+otherGuild.getName()+" Guild");
+					broadcastGuild(otherGuild, guild.getName()+" Guild has offered an armistice with your guild!");
 				}
 			}
 		}
@@ -251,6 +262,8 @@ public class GuildManager {
 			boolean status = guild.removeMember(id);
 			if(status) {
 				ChatUtil.sendNotice(player.getBukkitPlayer(), "Successfully left the guild");
+				// Remove cached entry
+				playerGuildCache.remove(player.getOfflineBukkitPlayer());
 			} else {
 				ChatUtil.sendNotice(player.getBukkitPlayer(), "Failed to leave - you are either the guild master or not a member");
 			}
@@ -287,6 +300,17 @@ public class GuildManager {
 	
 	public void changeSpecialization(Villager.Profession profession, KonGuild guild) {
 		guild.setSpecialization(profession);
+	}
+	
+	private void broadcastGuild(KonGuild guild, String message) {
+		if(guild != null) {
+			for(OfflinePlayer offlinePlayer : guild.getPlayerMembers()) {
+				if(offlinePlayer.isOnline()) {
+					Player player = (Player)offlinePlayer;
+					ChatUtil.sendNotice(player, message);
+				}
+			}
+		}
 	}
 
 	/*
@@ -336,12 +360,28 @@ public class GuildManager {
 	
 	public KonGuild getPlayerGuild(OfflinePlayer player) {
 		KonGuild result = null;
+		// Search for result
 		for(KonGuild guild : guilds) {
 			if(guild.isMember(player.getUniqueId())) {
 				result = guild;
 				break;
 			}
 		}
+		/*
+		if(playerGuildCache.containsKey(player)) {
+			// Use cached result
+			result = playerGuildCache.get(player);
+		} else {
+			// Search for result, and cache it
+			for(KonGuild guild : guilds) {
+				if(guild.isMember(player.getUniqueId())) {
+					result = guild;
+					break;
+				}
+			}
+			playerGuildCache.put(player, result); // can be null!
+		}
+		*/
 		return result;
 	}
 	
@@ -385,7 +425,7 @@ public class GuildManager {
         // Load initial guild set
         for(String guildName : guildSet) {
         	if(guildsSection.contains(guildName)) {
-        		ConfigurationSection guildInstanceSection = guildsSection.getConfigurationSection("guilds."+guildName);
+        		ConfigurationSection guildInstanceSection = guildsSection.getConfigurationSection(guildName);
         		// Parse property fields
         		isOpen = guildInstanceSection.getBoolean("open",false);
         		specializationName = guildInstanceSection.getString("specialization","NONE");
@@ -434,7 +474,7 @@ public class GuildManager {
         // Load subsequent guild relationships
         for(String guildName : guildSet) {
         	if(guildsSection.contains(guildName)) {
-        		ConfigurationSection guildInstanceSection = guildsSection.getConfigurationSection("guilds."+guildName);
+        		ConfigurationSection guildInstanceSection = guildsSection.getConfigurationSection(guildName);
         		KonGuild currentGuild = getGuild(guildName);
         		if(currentGuild != null) {
 	        		// Add sanction and armistice lists

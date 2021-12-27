@@ -319,7 +319,7 @@ public class GuildMenu implements StateMenu {
 		} else if(context.equals(MenuState.A_LIST)) {
 			// List of all guilds, friendly and enemy, with normal info
 			guilds.addAll(manager.getAllGuilds());
-			loreHintStr = "No click";
+			loreHintStr = "";
 			isClickable = false;
 		} else if(context.equals(MenuState.B_RELATIONSHIP)) {
 			// List of all guilds, friendly and enemy, with relationship status and click hints
@@ -357,25 +357,25 @@ public class GuildMenu implements StateMenu {
 				KonGuild currentGuild = listIter.next();
 				ChatColor guildColor = ChatColor.GREEN;
 				loreList = new ArrayList<String>();
-				loreList.add("Towns: "+currentGuild.getNumTowns());
-				loreList.add("Members: "+currentGuild.getNumMembers());
+				loreList.add(loreColor+"Towns: "+valueColor+currentGuild.getNumTowns());
+				loreList.add(loreColor+"Members: "+valueColor+currentGuild.getNumMembers());
 				if(guild != null) {
-					if(!player.getKingdom().equals(guild.getKingdom())) {
+					if(!player.getKingdom().equals(currentGuild.getKingdom())) {
 						guildColor = ChatColor.RED;
 						String guildEnemyStatus = "Hostile";
 						if(guild.isArmistice(currentGuild)) {
 							guildEnemyStatus = "Armistice";
 						}
-						loreList.add("Status: "+guildEnemyStatus);
+						loreList.add(loreColor+"Status: "+valueColor+guildEnemyStatus);
 					} else {
 						String guildFriendlyStatus = "Treaty";
 						if(guild.isSanction(currentGuild)) {
 							guildFriendlyStatus = "Sanction";
 						}
-						loreList.add("Status: "+guildFriendlyStatus);
+						loreList.add(loreColor+"Status: "+valueColor+guildFriendlyStatus);
 					}
 				}
-				loreList.add(loreHintStr);
+				loreList.add(hintColor+loreHintStr);
 		    	GuildIcon guildIcon = new GuildIcon(guildColor+currentGuild.getName(),loreList,currentGuild,slotIndex,isClickable);
 		    	pages.get(pageNum).addIcon(guildIcon);
 				slotIndex++;
