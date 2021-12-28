@@ -73,8 +73,8 @@ public class GuildManager implements Timeable {
 		payPerChunk 		= konquest.getConfigManager().getConfig("core").getDouble("core.guilds.pay_per_chunk");
 		payPerResident 		= konquest.getConfigManager().getConfig("core").getDouble("core.guilds.pay_per_resident");
 		payLimit 			= konquest.getConfigManager().getConfig("core").getDouble("core.guilds.pay_limit");
-		payPercentOfficer   = konquest.getConfigManager().getConfig("core").getInt("core.guilds.pay_officer_percent");
-		payPercentMaster    = konquest.getConfigManager().getConfig("core").getInt("core.guilds.pay_master_percent");
+		payPercentOfficer   = konquest.getConfigManager().getConfig("core").getInt("core.guilds.bonus_officer_percent");
+		payPercentMaster    = konquest.getConfigManager().getConfig("core").getInt("core.guilds.bonus_master_percent");
 		costCreate 	        = konquest.getConfigManager().getConfig("core").getDouble("core.favor.guilds.cost_create");
 		costRename 	        = konquest.getConfigManager().getConfig("core").getDouble("core.favor.guilds.cost_rename");
 		costSpecial 	    = konquest.getConfigManager().getConfig("core").getDouble("core.favor.guilds.cost_specialize");
@@ -271,12 +271,14 @@ public class GuildManager implements Timeable {
 		guilds.remove(guild);
 	}
 	
-	public void toggleGuildOpen(KonGuild guild) {
+	public void toggleGuildOpen(KonGuild guild, KonPlayer player) {
 		if(guild != null) {
 			if(guild.isOpen()) {
 				guild.setIsOpen(false);
+				ChatUtil.sendNotice(player.getBukkitPlayer(), guild.getName()+" Guild changed to closed");
 			} else {
 				guild.setIsOpen(true);
+				ChatUtil.sendNotice(player.getBukkitPlayer(), guild.getName()+" Guild changed to open");
 			}
 		}
 	}
@@ -655,6 +657,8 @@ public class GuildManager implements Timeable {
         	ChatUtil.printDebug("There is no guilds section in guilds.yml");
             return;
         }
+        guilds.clear();
+        ChatUtil.printDebug("  Beginning guild load, size "+guilds.size());
         ConfigurationSection guildsSection = guildsConfig.getConfigurationSection("guilds");
         Set<String> guildSet = guildsSection.getKeys(false);
         
@@ -711,6 +715,7 @@ public class GuildManager implements Timeable {
 	            		}
 	            	}
         			guilds.add(newGuild);
+        			//ChatUtil.printDebug("  Added guild "+newGuild.getName()+", size "+guilds.size());
         		}
         	}
         }
@@ -749,7 +754,7 @@ public class GuildManager implements Timeable {
         	}
         }
         // Finished loading guilds
-        ChatUtil.printDebug("Finished loading all guilds");
+        ChatUtil.printDebug("  Finished guild load, size "+guilds.size());
 	}
 	
 	public void saveGuilds() {

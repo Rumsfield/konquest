@@ -98,8 +98,8 @@
 #    pay_per_chunk:                 Value in favor to pay all guild members per chunk of land in all guild towns (number >= 0.0)
 #    pay_per_resident:              Value in favor to pay all guild members per resident in all guild towns (number >= 0.0)
 #    pay_limit:                     Maximum value in favor for guild payments to members, set to 0 for no limit (0 to disable, number >= 0.0)
-#    pay_officer_percent:           Guild Officer bonus pay percentage of all guild town land and population (0 <= integer <= 100)
-#    pay_master_percent:            Guild Master bonus pay percentage of all guild town land and population (0 <= integer <= 100)
+#    bonus_officer_percent:         Guild Officer bonus pay percentage of all guild town land and population (0 <= integer <= 100)
+#    bonus_master_percent:          Guild Master bonus pay percentage of all guild town land and population (0 <= integer <= 100)
 #  exile:
 #    remove_favor:                  Set a player's currency balance to 0 when exiled (true/flase)
 #    remove_stats:                  Remove all stats and accomplishment prefixes from a player when exiled (true/false)
@@ -257,8 +257,8 @@ core:
     pay_per_chunk: 0.25
     pay_per_resident: 0.10
     pay_limit: 100
-    pay_officer_percent: 20
-    pay_master_percent: 80
+    bonus_officer_percent: 20
+    bonus_master_percent: 50
   exile:
     remove_favor: true
     remove_stats: true

@@ -550,7 +550,7 @@ public class GuildMenu implements StateMenu {
 						
 					}  else if(slot == ROOT_SLOT_OPEN) {
 						result = null; // Close menu
-						manager.toggleGuildOpen(guild);
+						manager.toggleGuildOpen(guild, player);
 						Konquest.playSuccessSound(player.getBukkitPlayer());
 						
 					} else if(slot == ROOT_SLOT_SPECIALIZE) {
