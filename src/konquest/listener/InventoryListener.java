@@ -63,6 +63,7 @@ public class InventoryListener implements Listener {
 			return;
 		}
 		// Monitor blocks in claimed territory
+		// Check for merchant trades in claimed territory of guilds
 		Location openLoc = event.getInventory().getLocation();
 		
 		if(openLoc != null && konquest.getKingdomManager().isChunkClaimed(openLoc)) {
@@ -154,6 +155,12 @@ public class InventoryListener implements Listener {
 							event.setCancelled(true);
 							return;
 						}
+					}
+					// Attempt to modify merchant trades based on guild specialization and relationships with player
+					boolean status = konquest.getGuildManager().applyTradeDiscounts(player, town, event.getInventory());
+					if(!status) {
+						// TODO: use MessagePath
+						ChatUtil.sendError(player.getBukkitPlayer(), "Your guild is blocked from trade discounts with this merchant!");
 					}
 				}
 				

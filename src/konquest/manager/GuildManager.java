@@ -12,6 +12,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Merchant;
+import org.bukkit.inventory.MerchantInventory;
+import org.bukkit.inventory.MerchantRecipe;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
@@ -204,6 +210,59 @@ public class GuildManager implements Timeable {
 	            }
 			}
 		}
+	}
+	
+	public boolean applyTradeDiscounts(KonPlayer player, KonTown town, Inventory inv) {
+		/*
+		 * Ensure inventory is from a not-null merchant
+		 * Check that the player is either member or treaty with town guild, or has no guild
+		 * Get all merchant trades in the inventory and apply special price
+		 */
+		
+		if(inv != null && inv.getType().equals(InventoryType.MERCHANT) && inv instanceof MerchantInventory) {
+			MerchantInventory merch = (MerchantInventory)inv;
+			if(merch.getHolder() != null && merch.getMerchant() != null && merch.getHolder() instanceof Villager) {
+				// The inventory belongs to a valid merchant villager entity
+				// Check that the player can receive guild discounts
+				boolean doDiscounts = false;
+				KonGuild playerGuild = getPlayerGuild(player.getOfflineBukkitPlayer());
+				KonGuild townGuild = getTownGuild(town);
+				if(playerGuild != null) {
+					// Player belongs to a guild, make sure it is the same or treaty with town's guild
+					if(townGuild.equals(playerGuild) || !townGuild.isSanction(playerGuild)) {
+						doDiscounts = true;
+					}
+				} else {
+					doDiscounts = true;
+				}
+				// Check that the merchant is of the correct specialized profession
+				Villager host = (Villager)merch.getHolder();
+				if(host.getProfession().equals(townGuild.getSpecialization())) {
+					if(!doDiscounts) {
+						return false;
+					}
+					// Proceed with discounts for the valid villager's profession
+					Merchant tradeHost = merch.getMerchant();
+					List<MerchantRecipe> tradeList = tradeHost.getRecipes();
+					List<MerchantRecipe> tradeListDiscounted = new ArrayList<MerchantRecipe>();
+					
+					for(MerchantRecipe trade : tradeList) {
+						ChatUtil.printDebug("Found trade for "+trade.getResult().getType().toString()+" with price mult "+trade.getPriceMultiplier()+
+								", uses "+trade.getUses()+", max "+trade.getMaxUses());
+						for(ItemStack ingredient : trade.getIngredients()) {
+							ChatUtil.printDebug("  Has ingredient "+ingredient.getType().toString()+", amount: "+ingredient.getAmount());
+						}
+						//
+						tradeListDiscounted.add(trade);
+					}
+					
+					tradeHost.setRecipes(tradeListDiscounted);
+					
+				}
+				
+			}
+		}
+		return true;
 	}
 	
 	/**
