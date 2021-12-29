@@ -268,17 +268,18 @@ public class GuildManager implements Timeable {
 							ChatUtil.printDebug("  Has ingredient "+ingredient.getType().toString()+", amount: "+ingredient.getAmount());
 						}
 						if(!ingredientList.isEmpty()) {
-							if(isDiscountStack) {
-								amount = trade.getAdjustedIngredient1().getAmount();
-							} else {
-								amount = ingredientList.get(0).getAmount();
-							}
+							amount = ingredientList.get(0).getAmount();
 							discount = (int)(amount*priceAdj*-1);
+							if(isDiscountStack) {
+								discount += trade.getSpecialPrice();
+							}
 							trade.setSpecialPrice(discount);
+							ChatUtil.printDebug("  Applied special price "+discount);
 						}
 						tradeListDiscounted.add(trade);
 					}
 					tradeHost.setRecipes(tradeListDiscounted);
+					Konquest.playDiscountSound(player.getBukkitPlayer());
 				}
 			}
 		}

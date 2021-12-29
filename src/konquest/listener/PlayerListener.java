@@ -588,7 +588,7 @@ public class PlayerListener implements Listener{
         if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
         	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation());
         	
-        	ChatUtil.printDebug("Player interacted at entity of type: "+clicked.getType().toString());
+        	ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" interacted at entity of type: "+clicked.getType().toString());
         	boolean isEntityAllowed = (clicked.getType().equals(EntityType.PLAYER));
         	
         	// Capital protections...
