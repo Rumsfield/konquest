@@ -300,7 +300,8 @@ public class GuildMenu implements StateMenu {
 		final int MAX_ICONS_PER_PAGE = 45;
 		pages.clear();
 		currentPage = 0;
-		String loreHintStr = "";
+		String loreHintStr1 = "";
+		String loreHintStr2 = "";
 		boolean isClickable = false;
 		List<KonGuild> guilds = new ArrayList<KonGuild>();
 		
@@ -311,7 +312,7 @@ public class GuildMenu implements StateMenu {
 			if(guild != null) {
 				guilds.remove(guild);
 			}
-			loreHintStr = "Click send a join request";
+			loreHintStr1 = "Click send a join request";
 			isClickable = true;
 		} else if(context.equals(MenuState.A_INVITE)) {
 			// List of friendly guilds with valid join invite for player
@@ -319,12 +320,12 @@ public class GuildMenu implements StateMenu {
 			if(guild != null) {
 				guilds.remove(guild);
 			}
-			loreHintStr = "Left-click to accept, Right-click to decline";
+			loreHintStr1 = "Left-click to accept";
+			loreHintStr2 = "Right-click to decline";
 			isClickable = true;
 		} else if(context.equals(MenuState.A_LIST)) {
 			// List of all guilds, friendly and enemy, with normal info
 			guilds.addAll(manager.getAllGuilds());
-			loreHintStr = "";
 			isClickable = false;
 		} else if(context.equals(MenuState.B_RELATIONSHIP)) {
 			// List of all guilds, friendly and enemy, with relationship status and click hints
@@ -332,7 +333,7 @@ public class GuildMenu implements StateMenu {
 			if(guild != null) {
 				guilds.remove(guild);
 			}
-			loreHintStr = "Click to change our status";
+			loreHintStr1 = "Click to change our status";
 			isClickable = true;
 		} else {
 			return null;
@@ -363,6 +364,7 @@ public class GuildMenu implements StateMenu {
 				ChatColor guildColor = ChatColor.GREEN;
 				loreList = new ArrayList<String>();
 				loreList.add(loreColor+"Towns: "+valueColor+currentGuild.getNumTowns());
+				loreList.add(loreColor+"Land: "+valueColor+currentGuild.getNumLand());
 				loreList.add(loreColor+"Members: "+valueColor+currentGuild.getNumMembers());
 				loreList.add(loreColor+"Specialization: "+valueColor+currentGuild.getSpecialization().name());
 				if(guild != null) {
@@ -386,7 +388,12 @@ public class GuildMenu implements StateMenu {
 						loreList.add(loreColor+"Cost: "+valueColor+cost);
 					}
 				}
-				loreList.add(hintColor+loreHintStr);
+				if(!loreHintStr1.equals("")) {
+					loreList.add(hintColor+loreHintStr1);
+				}
+				if(!loreHintStr2.equals("")) {
+					loreList.add(hintColor+loreHintStr2);
+				}
 		    	GuildIcon guildIcon = new GuildIcon(guildColor+currentGuild.getName(),loreList,currentGuild,slotIndex,isClickable);
 		    	pages.get(pageNum).addIcon(guildIcon);
 				slotIndex++;
@@ -403,7 +410,8 @@ public class GuildMenu implements StateMenu {
 		final int MAX_ICONS_PER_PAGE = 45;
 		pages.clear();
 		currentPage = 0;
-		String loreHintStr = "";
+		String loreHintStr1 = "";
+		String loreHintStr2 = "";
 		PlayerIconAction iconAction = PlayerIconAction.GUILD;
 		boolean isClickable = false;
 		List<OfflinePlayer> players = new ArrayList<OfflinePlayer>();
@@ -411,20 +419,21 @@ public class GuildMenu implements StateMenu {
 		// Determine list of players given context
 		if(context.equals(MenuState.B_REQUESTS)) {
 			players.addAll(guild.getJoinRequests());
-			loreHintStr = "Left-click to accept, Right-click to decline";
+			loreHintStr1 = "Left-click to accept";
+			loreHintStr2 = "Right-click to decline";
 			isClickable = true;
 		} else if(context.equals(MenuState.C_PROMOTE)) {
 			players.addAll(guild.getPlayerMembersOnly());
-			loreHintStr = "Click to promote to Guild Officer";
+			loreHintStr1 = "Click to promote to Guild Officer";
 			isClickable = true;
 		} else if(context.equals(MenuState.C_DEMOTE)) {
 			players.addAll(guild.getPlayerOfficersOnly());
-			loreHintStr = "Click to demote to Guild Member";
+			loreHintStr1 = "Click to demote to Guild Member";
 			isClickable = true;
 		} else if(context.equals(MenuState.C_TRANSFER)) {
 			players.addAll(guild.getPlayerOfficersOnly());
 			players.addAll(guild.getPlayerMembersOnly());
-			loreHintStr = "Click to make Guild Master";
+			loreHintStr1 = "Click to make Guild Master";
 			isClickable = true;
 		} else {
 			return null;
@@ -455,7 +464,12 @@ public class GuildMenu implements StateMenu {
 				ChatColor guildColor = ChatColor.GREEN;
 				loreList = new ArrayList<String>();
 				loreList.add("Last Online: ?");
-				loreList.add(loreHintStr);
+				if(!loreHintStr1.equals("")) {
+					loreList.add(loreHintStr1);
+				}
+				if(!loreHintStr2.equals("")) {
+					loreList.add(loreHintStr2);
+				}
 		    	PlayerIcon playerIcon = new PlayerIcon(guildColor+currentPlayer.getName(),loreList,currentPlayer,slotIndex,isClickable,iconAction);
 		    	pages.get(pageNum).addIcon(playerIcon);
 				slotIndex++;
@@ -570,7 +584,6 @@ public class GuildMenu implements StateMenu {
 				case A_LEAVE:
 					if(slot == SLOT_YES) {
 						manager.leaveGuild(player, guild);
-						Konquest.playSuccessSound(player.getBukkitPlayer());
 					} else if(slot == SLOT_NO) {
 						// Do nothing, just close the menu
 					}
@@ -583,7 +596,7 @@ public class GuildMenu implements StateMenu {
 						boolean status = manager.respondGuildInvite(player, clickGuild, clickType);
 						if(status) {
 							// Invite accepted
-							result = null;
+							result = null; // Close menu
 						} else {
 							// Invite declined
 							result = goToGuildView(currentState);
@@ -612,7 +625,14 @@ public class GuildMenu implements StateMenu {
 					if(clickedIcon != null && clickedIcon instanceof PlayerIcon) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
 						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
-						manager.respondGuildRequest(clickPlayer, guild, clickType);
+						boolean status = manager.respondGuildRequest(clickPlayer, guild, clickType);
+						if(status) {
+							Konquest.playSuccessSound(player.getBukkitPlayer());
+						} else {
+							//TODO: Change to MessagePath
+							ChatUtil.sendError(player.getBukkitPlayer(), clickPlayer.getName()+" is already in another guild.");
+							Konquest.playFailSound(player.getBukkitPlayer());
+						}
 						result = goToPlayerView(currentState);
 					}
 					break;

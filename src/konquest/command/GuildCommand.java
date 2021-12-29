@@ -30,6 +30,11 @@ public class GuildCommand extends CommandBase {
             return;
         } else {
         	
+        	if(!getKonquest().getGuildManager().isEnabled()) {
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+        		return;
+    		}
+        	
         	// Check for player
         	Player bukkitPlayer = (Player) getSender();
         	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {

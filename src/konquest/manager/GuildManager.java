@@ -95,18 +95,18 @@ public class GuildManager implements Timeable {
 		costSpecial 	    = konquest.getConfigManager().getConfig("core").getDouble("core.favor.guilds.cost_specialize");
 		costRelation 	    = konquest.getConfigManager().getConfig("core").getDouble("core.favor.guilds.cost_relationship");
 		
-		if(payIntervalSeconds > 0) {
-			payTimer.stopTimer();
-			payTimer.setTime((int)payIntervalSeconds);
-			payTimer.startLoopTimer();
-		}
-		
 		payPercentOfficer = payPercentOfficer < 0 ? 0 : payPercentOfficer;
 		payPercentOfficer = payPercentOfficer > 100 ? 100 : payPercentOfficer;
 		payPercentMaster = payPercentMaster < 0 ? 0 : payPercentMaster;
 		payPercentMaster = payPercentMaster > 100 ? 100 : payPercentMaster;
 		discountPercent = discountPercent < 0 ? 0 : discountPercent;
 		discountPercent = discountPercent > 100 ? 100 : discountPercent;
+		
+		if(isEnabled && payIntervalSeconds > 0) {
+			payTimer.stopTimer();
+			payTimer.setTime((int)payIntervalSeconds);
+			payTimer.startLoopTimer();
+		}
 		
 		loadGuilds();
 		ChatUtil.printDebug("Guild Manager is ready, enabled: "+isEnabled+" with "+guilds.size()+" guilds");
@@ -214,7 +214,7 @@ public class GuildManager implements Timeable {
 			if(payLimit > 0 && payAmount > payLimit) {
 				payAmount = payLimit;
 			}
-			if(offlinePlayer.isOnline()) {
+			if(offlinePlayer.isOnline() && payAmount > 0) {
 				Player player = (Player)offlinePlayer;
 				if(KonquestPlugin.depositPlayer(player, payAmount)) {
 	            	ChatUtil.sendNotice(player, "Received guild payment");
@@ -253,7 +253,7 @@ public class GuildManager implements Timeable {
 				if(host.getProfession().equals(townGuild.getSpecialization())) {
 					if(!doDiscounts) {
 						// TODO: use MessagePath
-						ChatUtil.sendError(player.getBukkitPlayer(), "Your guild is blocked from trade discounts with this merchant!");
+						ChatUtil.sendError(player.getBukkitPlayer(), townGuild.getName()+" Guild is blocking your guild from trade discounts with this merchant!");
 						return;
 					}
 					// Proceed with discounts for the valid villager's profession
@@ -450,34 +450,41 @@ public class GuildManager implements Timeable {
 					} else if(!guild.isJoinRequestValid(id)){
 						// Request to join if not already requested
 						guild.addJoinRequest(id, false);
+						ChatUtil.sendNotice(player.getBukkitPlayer(), "Sent request to join the guild");
+						broadcastOfficersGuild(guild,"New guild join request, type \"/k guild\" to review");
 					} else {
 						ChatUtil.sendError(player.getBukkitPlayer(), "You have already requested to join");
 					}
 				}
-			} else {
-				ChatUtil.sendError(player.getBukkitPlayer(), "Cannot request to join enemy guild");
 			}
 		}
 		
 	}
 	
 	/**
-	 * Officer approves or denies join request of (offline) player
+	 * Officer approves or denies join request of (offline) player.
+	 * Check to ensure target player is not currently in a guild.
 	 * @param player - The offline player target of the response
 	 * @param guild - The target guild that player wants to join
 	 * @param resp - True to approve, false to reject request
+	 * @return True when request response was successful, else false when target is already in a guild.
 	 */
 	public boolean respondGuildRequest(OfflinePlayer player, KonGuild guild, boolean resp) {
-		boolean result = false;
+		boolean result = true;
 		if(guild != null) {
 			UUID id = player.getUniqueId();
 			if(guild.isJoinRequestValid(id)) {
 				if(resp) {
-					// Approved join request, add player as member
-					guild.addMember(id, false);
-					result = true;
-					if(player.isOnline()) {
-						ChatUtil.sendNotice((Player)player, guild.getName()+" Guild join request accepted");
+					KonGuild playerGuild = getPlayerGuild(player);
+					// Ensure the player is not already a guild member
+					if(playerGuild == null) {
+						// Approved join request, add player as member
+						guild.addMember(id, false);
+						if(player.isOnline()) {
+							ChatUtil.sendNotice((Player)player, guild.getName()+" Guild join request accepted");
+						}
+					} else {
+						result = false;
 					}
 				} else {
 					// Denied join request
@@ -492,27 +499,32 @@ public class GuildManager implements Timeable {
 	}
 	
 	/**
-	 * Officer invites (offline) player to join (with /guild add command)
+	 * Officer invites (offline) player to join (with /guild add command).
+	 * Allow invites to players already in a guild.
 	 * @param player - The offline player that the officer invites to join their guild
 	 * @param guild - The target guild for the join invite
 	 */
 	public boolean joinGuildInvite(KonOfflinePlayer player, KonGuild guild) {
 		boolean result = false;
 		if(guild != null) {
-			UUID id = player.getOfflineBukkitPlayer().getUniqueId();
+			OfflinePlayer offlineBukkitPlayer = player.getOfflineBukkitPlayer();
+			UUID id = offlineBukkitPlayer.getUniqueId();
 			if(player.getKingdom().equals(guild.getKingdom())) {
 				if(!guild.isMember(id)) {
 					if(guild.isJoinRequestValid(id)) {
 						// There is already a valid request, add the player to the guild
 						guild.addMember(id, false);
 						guild.removeJoinRequest(id);
-						if(player.getOfflineBukkitPlayer().isOnline()) {
-							ChatUtil.sendNotice((Player)player.getOfflineBukkitPlayer(), "Guild join request accepted");
+						if(offlineBukkitPlayer.isOnline()) {
+							ChatUtil.sendNotice((Player)offlineBukkitPlayer, "Guild join request accepted");
 						}
 						result = true;
 					} else if(!guild.isJoinInviteValid(id)) {
 						// Invite to join if not already invited
 						guild.addJoinRequest(id, true);
+						if(offlineBukkitPlayer.isOnline()) {
+							ChatUtil.sendNotice((Player)offlineBukkitPlayer, "Received new guild invite. Type \"/k guild\" to respond to invites.");
+						}
 						result = true;
 					}
 				}
@@ -533,17 +545,25 @@ public class GuildManager implements Timeable {
 			UUID id = player.getBukkitPlayer().getUniqueId();
 			if(guild.isJoinInviteValid(id)) {
 				if(resp) {
-					// Accept join invite, add as member
-					guild.addMember(id, false);
+					KonGuild playerGuild = getPlayerGuild(player.getOfflineBukkitPlayer());
+					// Ensure the player is not already a guild member
+					if(playerGuild == null) {
+						// Accept join invite, add as member
+						guild.addMember(id, false);
+						guild.removeJoinRequest(id);
+						ChatUtil.sendNotice(player.getBukkitPlayer(), "Guild join invite accepted");
+						Konquest.playSuccessSound(player.getBukkitPlayer());
+					} else {
+						ChatUtil.sendError(player.getBukkitPlayer(), "Leave your current guild first!");
+						Konquest.playFailSound(player.getBukkitPlayer());
+					}
 					result = true;
-					ChatUtil.sendNotice(player.getBukkitPlayer(), "Guild join invite accepted");
-					Konquest.playSuccessSound(player.getBukkitPlayer());
 				} else {
 					// Denied join request
+					guild.removeJoinRequest(id);
 					ChatUtil.sendNotice(player.getBukkitPlayer(), "Guild join invite declined");
 					Konquest.playFailSound(player.getBukkitPlayer());
 				}
-				guild.removeJoinRequest(id);
 			}
 		}
 		return result;
@@ -554,11 +574,13 @@ public class GuildManager implements Timeable {
 			UUID id = player.getBukkitPlayer().getUniqueId();
 			boolean status = guild.removeMember(id);
 			if(status) {
-				ChatUtil.sendNotice(player.getBukkitPlayer(), "Successfully left the guild");
 				// Remove cached entry
 				playerGuildCache.remove(player.getOfflineBukkitPlayer());
+				ChatUtil.sendNotice(player.getBukkitPlayer(), "Successfully left the guild");
+				Konquest.playSuccessSound(player.getBukkitPlayer());
 			} else {
-				ChatUtil.sendNotice(player.getBukkitPlayer(), "Failed to leave - you are either the guild master or not a member");
+				ChatUtil.sendNotice(player.getBukkitPlayer(), "Failed to leave, try disbanding instead");
+				Konquest.playFailSound(player.getBukkitPlayer());
 			}
 		}
 	}
@@ -627,6 +649,17 @@ public class GuildManager implements Timeable {
 	private void broadcastGuild(KonGuild guild, String message) {
 		if(guild != null) {
 			for(OfflinePlayer offlinePlayer : guild.getPlayerMembers()) {
+				if(offlinePlayer.isOnline()) {
+					Player player = (Player)offlinePlayer;
+					ChatUtil.sendNotice(player, message);
+				}
+			}
+		}
+	}
+	
+	private void broadcastOfficersGuild(KonGuild guild, String message) {
+		if(guild != null) {
+			for(OfflinePlayer offlinePlayer : guild.getPlayerOfficers()) {
 				if(offlinePlayer.isOnline()) {
 					Player player = (Player)offlinePlayer;
 					ChatUtil.sendNotice(player, message);
