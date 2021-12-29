@@ -157,11 +157,7 @@ public class InventoryListener implements Listener {
 						}
 					}
 					// Attempt to modify merchant trades based on guild specialization and relationships with player
-					boolean status = konquest.getGuildManager().applyTradeDiscounts(player, town, event.getInventory());
-					if(!status) {
-						// TODO: use MessagePath
-						ChatUtil.sendError(player.getBukkitPlayer(), "Your guild is blocked from trade discounts with this merchant!");
-					}
+					konquest.getGuildManager().applyTradeDiscounts(player, town, event.getInventory());
 				}
 				
 				// Prevent all inventory openings except for camp owner and clan members when allowed

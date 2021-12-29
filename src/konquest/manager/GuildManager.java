@@ -223,14 +223,14 @@ public class GuildManager implements Timeable {
 		}
 	}
 	
-	public boolean applyTradeDiscounts(KonPlayer player, KonTown town, Inventory inv) {
+	public void applyTradeDiscounts(KonPlayer player, KonTown town, Inventory inv) {
 		/*
 		 * Ensure inventory is from a not-null merchant
 		 * Check that the player is either member or treaty with town guild, or has no guild
 		 * Get all merchant trades in the inventory and apply special price
 		 */
 		if(!isDiscountEnable) {
-			return true;
+			return;
 		}
 		if(inv != null && inv.getType().equals(InventoryType.MERCHANT) && inv instanceof MerchantInventory) {
 			MerchantInventory merch = (MerchantInventory)inv;
@@ -252,7 +252,9 @@ public class GuildManager implements Timeable {
 				Villager host = (Villager)merch.getHolder();
 				if(host.getProfession().equals(townGuild.getSpecialization())) {
 					if(!doDiscounts) {
-						return false;
+						// TODO: use MessagePath
+						ChatUtil.sendError(player.getBukkitPlayer(), "Your guild is blocked from trade discounts with this merchant!");
+						return;
 					}
 					// Proceed with discounts for the valid villager's profession
 					double priceAdj = (double)discountPercent/100;
@@ -279,11 +281,15 @@ public class GuildManager implements Timeable {
 						tradeListDiscounted.add(trade);
 					}
 					tradeHost.setRecipes(tradeListDiscounted);
-					Konquest.playDiscountSound(player.getBukkitPlayer());
+					if(discountPercent > 0) {
+						Konquest.playDiscountSound(player.getBukkitPlayer());
+						// TODO: use MessagePath
+						ChatUtil.sendNotice(player.getBukkitPlayer(), townGuild.getName()+" Guild gives you a "+discountPercent+" percent discount with this merchant");
+					}
 				}
 			}
 		}
-		return true;
+		return;
 	}
 	
 	/**
@@ -566,34 +572,33 @@ public class GuildManager implements Timeable {
 	
 	public void removePlayerGuild(OfflinePlayer player) {
 		UUID id = player.getUniqueId();
-		for(KonGuild guild : guilds) {
-			if(guild.isMember(player.getUniqueId())) {
-				// Found guild where target player is a member
-				if(guild.isMaster(id)) {
-					// Player is master, transfer if possible
-					List<OfflinePlayer> officers = guild.getPlayerOfficersOnly();
-					if(!officers.isEmpty()) {
-						// Make the first officer into the master
-						transferMaster(officers.get(0),guild);
+		KonGuild guild = getPlayerGuild(player);
+		if(guild != null) {
+			// Found guild where target player is a member
+			if(guild.isMaster(id)) {
+				// Player is master, transfer if possible
+				List<OfflinePlayer> officers = guild.getPlayerOfficersOnly();
+				if(!officers.isEmpty()) {
+					// Make the first officer into the master
+					transferMaster(officers.get(0),guild);
+					// Now remove the player
+					guild.removeMember(id);
+				} else {
+					// There are no officers
+					List<OfflinePlayer> members = guild.getPlayerMembersOnly();
+					if(!members.isEmpty()) {
+						// Make the first member into the master
+						transferMaster(members.get(0),guild);
 						// Now remove the player
 						guild.removeMember(id);
 					} else {
-						// There are no officers
-						List<OfflinePlayer> members = guild.getPlayerMembersOnly();
-						if(!members.isEmpty()) {
-							// Make the first member into the master
-							transferMaster(members.get(0),guild);
-							// Now remove the player
-							guild.removeMember(id);
-						} else {
-							// There are no members to transfer master to, delete the guild
-							removeGuild(guild);
-						}
+						// There are no members to transfer master to, delete the guild
+						removeGuild(guild);
 					}
-				} else {
-					// Player is not the master, remove
-					guild.removeMember(id);
 				}
+			} else {
+				// Player is not the master, remove
+				guild.removeMember(id);
 			}
 		}
 	}
