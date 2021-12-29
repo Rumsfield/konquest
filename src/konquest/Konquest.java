@@ -888,7 +888,7 @@ public class Konquest implements Timeable {
     		ChatUtil.printConsoleError("Failed to determine server version.");
     		return false;
     	}
-    	ChatUtil.printConsoleAlert("Your server version is "+version);
+    	ChatUtil.printConsoleAlert("Your server version is "+version+", "+Bukkit.getServer().getBukkitVersion());
     	if(version.equals("v1_16_R3")) {
     		teamPacketSender = new TeamPacketSender_p754();
     	} else if(version.equals("v1_17_R1")) {

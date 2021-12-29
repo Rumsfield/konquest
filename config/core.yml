@@ -100,6 +100,9 @@
 #    pay_limit:                     Maximum value in favor for guild payments to members, set to 0 for no limit (0 to disable, number >= 0.0)
 #    bonus_officer_percent:         Guild Officer bonus pay percentage of all guild town land and population (0 <= integer <= 100)
 #    bonus_master_percent:          Guild Master bonus pay percentage of all guild town land and population (0 <= integer <= 100)
+#    discount_enable:               Enable guild specialization discounts for villager trades (true/false)
+#    discount_percent:              Villager trade discount percentage for professions that match a guild's specialization (0 <= integer <= 100)
+#    discount_stack:                Allow guild discounts to add with normal villager trade modifiers, good or bad (true/false)
 #  exile:
 #    remove_favor:                  Set a player's currency balance to 0 when exiled (true/flase)
 #    remove_stats:                  Remove all stats and accomplishment prefixes from a player when exiled (true/false)
@@ -259,6 +262,9 @@ core:
     pay_limit: 100
     bonus_officer_percent: 20
     bonus_master_percent: 50
+    discount_enable: true
+    discount_percent: 50
+    discount_stack: true
   exile:
     remove_favor: true
     remove_stats: true

@@ -42,6 +42,9 @@ public class GuildManager implements Timeable {
 	private double payLimit;
 	private int payPercentOfficer;
 	private int payPercentMaster;
+	private boolean isDiscountEnable;
+	private int discountPercent;
+    private boolean isDiscountStack;
 	private double costSpecial;
 	private double costRelation;
 	private double costCreate;
@@ -51,7 +54,7 @@ public class GuildManager implements Timeable {
 	private HashMap<OfflinePlayer,KonGuild> playerGuildCache;
 	
 	//TODO: Specialization trade discounts
-	/* - ?
+	/* - Check version to handle exceptions in MerchantRecipe special price methods
 	 * 
 	 */
 	
@@ -64,6 +67,9 @@ public class GuildManager implements Timeable {
 		this.payLimit = 100;
 		this.payPercentOfficer = 20;
 		this.payPercentMaster = 80;
+		this.isDiscountEnable = false;
+		this.discountPercent = 0;
+		this.isDiscountStack = false;
 		this.costSpecial = 200;
 		this.costRelation = 50;
 		this.costCreate = 100;
@@ -81,6 +87,9 @@ public class GuildManager implements Timeable {
 		payLimit 			= konquest.getConfigManager().getConfig("core").getDouble("core.guilds.pay_limit");
 		payPercentOfficer   = konquest.getConfigManager().getConfig("core").getInt("core.guilds.bonus_officer_percent");
 		payPercentMaster    = konquest.getConfigManager().getConfig("core").getInt("core.guilds.bonus_master_percent");
+		isDiscountEnable    = konquest.getConfigManager().getConfig("core").getBoolean("core.guilds.discount_enable",false);
+		discountPercent 	= konquest.getConfigManager().getConfig("core").getInt("core.guilds.discount_percent");
+		isDiscountStack 	= konquest.getConfigManager().getConfig("core").getBoolean("core.guilds.discount_stack");
 		costCreate 	        = konquest.getConfigManager().getConfig("core").getDouble("core.favor.guilds.cost_create");
 		costRename 	        = konquest.getConfigManager().getConfig("core").getDouble("core.favor.guilds.cost_rename");
 		costSpecial 	    = konquest.getConfigManager().getConfig("core").getDouble("core.favor.guilds.cost_specialize");
@@ -96,6 +105,8 @@ public class GuildManager implements Timeable {
 		payPercentOfficer = payPercentOfficer > 100 ? 100 : payPercentOfficer;
 		payPercentMaster = payPercentMaster < 0 ? 0 : payPercentMaster;
 		payPercentMaster = payPercentMaster > 100 ? 100 : payPercentMaster;
+		discountPercent = discountPercent < 0 ? 0 : discountPercent;
+		discountPercent = discountPercent > 100 ? 100 : discountPercent;
 		
 		loadGuilds();
 		ChatUtil.printDebug("Guild Manager is ready, enabled: "+isEnabled+" with "+guilds.size()+" guilds");
@@ -218,7 +229,9 @@ public class GuildManager implements Timeable {
 		 * Check that the player is either member or treaty with town guild, or has no guild
 		 * Get all merchant trades in the inventory and apply special price
 		 */
-		
+		if(!isDiscountEnable) {
+			return true;
+		}
 		if(inv != null && inv.getType().equals(InventoryType.MERCHANT) && inv instanceof MerchantInventory) {
 			MerchantInventory merch = (MerchantInventory)inv;
 			if(merch.getHolder() != null && merch.getMerchant() != null && merch.getHolder() instanceof Villager) {
@@ -242,24 +255,31 @@ public class GuildManager implements Timeable {
 						return false;
 					}
 					// Proceed with discounts for the valid villager's profession
+					double priceAdj = (double)discountPercent/100;
+					int amount = 0;
+					int discount = 0;
 					Merchant tradeHost = merch.getMerchant();
-					List<MerchantRecipe> tradeList = tradeHost.getRecipes();
 					List<MerchantRecipe> tradeListDiscounted = new ArrayList<MerchantRecipe>();
-					
-					for(MerchantRecipe trade : tradeList) {
+					for(MerchantRecipe trade : tradeHost.getRecipes()) {
 						ChatUtil.printDebug("Found trade for "+trade.getResult().getType().toString()+" with price mult "+trade.getPriceMultiplier()+
-								", uses "+trade.getUses()+", max "+trade.getMaxUses());
-						for(ItemStack ingredient : trade.getIngredients()) {
+								", special "+trade.getSpecialPrice()+", uses "+trade.getUses()+", max "+trade.getMaxUses());
+						List<ItemStack> ingredientList = trade.getIngredients();
+						for(ItemStack ingredient : ingredientList) {
 							ChatUtil.printDebug("  Has ingredient "+ingredient.getType().toString()+", amount: "+ingredient.getAmount());
 						}
-						//
+						if(!ingredientList.isEmpty()) {
+							if(isDiscountStack) {
+								amount = trade.getAdjustedIngredient1().getAmount();
+							} else {
+								amount = ingredientList.get(0).getAmount();
+							}
+							discount = (int)(amount*priceAdj*-1);
+							trade.setSpecialPrice(discount);
+						}
 						tradeListDiscounted.add(trade);
 					}
-					
 					tradeHost.setRecipes(tradeListDiscounted);
-					
 				}
-				
 			}
 		}
 		return true;
