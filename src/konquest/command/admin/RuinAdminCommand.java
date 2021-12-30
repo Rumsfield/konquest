@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -46,10 +45,8 @@ public class RuinAdminCommand extends CommandBase {
 		
 		if(cmdMode.equalsIgnoreCase("create")) {
 			Location playerLoc = bukkitPlayer.getLocation();
-        	if(!StringUtils.isAlphanumeric(ruinName)) {
-        		//ChatUtil.sendError((Player) getSender(), "Ruin name must only contain letters and/or numbers");
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
-                return;
+			if(getKonquest().validateName(ruinName,bukkitPlayer) != 0) {
+        		return;
         	}
         	boolean pass = getKonquest().getRuinManager().addRuin(playerLoc, ruinName);
         	if(!pass) {

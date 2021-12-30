@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -64,6 +65,7 @@ import konquest.nms.TeamPacketSender_p755;
 //import konquest.nms.TeamPacketSender_p756;
 import konquest.nms.TeamPacketSender_p757;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 import konquest.command.CommandHandler;
@@ -492,6 +494,68 @@ public class Konquest implements Timeable {
 			return isBlacklistIgnored && !isWorldValid(world);
 		}
 		return true;
+	}
+	
+	/**
+	 * Checks for name conflicts and constraints for all namable objects
+	 * @param name - The name of an object (town, ruin, etc)
+	 * @param player - The player requesting the name, to be sent status messages
+	 * @return Status code
+	 * 			0 - Success, no issue found
+	 * 			1 - Error, name is not strictly alpha-numeric
+	 * 			2 - Error, name has more than 20 characters
+	 * 			3 - Error, name is an existing player
+	 * 			4 - Error, name is a kingdom
+	 * 			5 - Error, name is a town
+	 * 			6 - Error, name is a ruin
+	 * 			7 - Error, name is a guild
+	 */
+	public int validateName(String name, Player player) {
+		if(name == null || name.equals("") || !StringUtils.isAlphanumeric(name)) {
+    		if(player != null) {
+    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
+    		}
+			return 1;
+    	}
+    	if(name.length() > 20) {
+    		if(player != null) {
+    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_LENGTH_NAME.getMessage());
+    		}
+    		return 2;
+    	}
+    	if(playerManager.isPlayerNameExist(name)) {
+    		if(player != null) {
+    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+    		}
+    		return 3;
+    	}
+		if(kingdomManager.isKingdom(name)) {
+			if(player != null) {
+    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+    		}
+			return 4;
+		}
+		for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
+			if(kingdom.hasTown(name)) {
+				if(player != null) {
+	    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+	    		}
+				return 5;
+			}
+		}
+		if(ruinManager.isRuin(name)) {
+			if(player != null) {
+    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+    		}
+			return 6;
+		}
+		if(guildManager.isGuild(name)) {
+			if(player != null) {
+    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+    		}
+			return 7;
+		}
+		return 0;
 	}
 	
 	@Override

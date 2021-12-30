@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -76,15 +75,9 @@ public class SettleCommand extends CommandBase {
 				}
         	}
         	String townName = getArgs()[1];
-        	if(!StringUtils.isAlphanumeric(townName)) {
-        		//ChatUtil.sendError((Player) getSender(), "Town name must only contain letters and/or numbers");
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
-                return;
-        	}
-        	if(getKonquest().getPlayerManager().isPlayerNameExist(townName)) {
-        		//ChatUtil.sendError((Player) getSender(), "Could not settle: Invalid Town name, already taken or has spaces.");
-        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_NAME.getMessage());
-                return;
+        	
+        	if(getKonquest().validateName(townName,bukkitPlayer) != 0) {
+        		return;
         	}
         	int settleStatus = getKonquest().getKingdomManager().addTown(bukkitPlayer.getLocation(), townName, player.getKingdom().getName());
         	if(settleStatus == 0) { // on successful settle..

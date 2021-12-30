@@ -178,6 +178,8 @@ public enum MessagePath {
 	GENERIC_ERROR_UNKNOWN_NAME                  (1, "generic.error.unknown-name"),
 	GENERIC_ERROR_BAD_NAME                      (1, "generic.error.bad-name"),
 	GENERIC_ERROR_FORMAT_NAME                   (0, "generic.error.format-name"),
+	GENERIC_ERROR_LENGTH_NAME                   (0, "generic.error.length-name"),
+	GENERIC_ERROR_TAKEN_NAME                    (0, "generic.error.taken-name"),
 	GENERIC_ERROR_NO_FAVOR                      (1, "generic.error.no-favor"),
 	GENERIC_ERROR_INVALID_PLAYER                (0, "generic.error.invalid-player"),
 	GENERIC_ERROR_ENEMY_PLAYER                  (0, "generic.error.enemy-player"),

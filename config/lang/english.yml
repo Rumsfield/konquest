@@ -193,6 +193,8 @@ generic:
     unknown-name: "Failed to find unknown name, check spelling: %s"
     bad-name: "Could not find %s in your Kingdom."
     format-name: "Name must only contain letters and/or numbers."
+    length-name: "Name can not be greater than 20 characters."
+    taken-name: "That name is already taken."
     no-favor: "Not enough Favor, need %s"
     invalid-player: "That player is not valid."
     enemy-player: "That player is an enemy."

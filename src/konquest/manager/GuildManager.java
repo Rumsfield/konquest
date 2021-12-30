@@ -804,6 +804,17 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
+	public boolean isGuild(String name) {
+		boolean result = false;
+		for(KonGuild guild : guilds) {
+			if(guild.getName().equalsIgnoreCase(name)) {
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
+	
 	public boolean isArmistice(KonGuild guild1, KonGuild guild2) {
 		boolean result = false;
 		if(guild1 != null && guild2 != null && guild1.isArmistice(guild2) && guild2.isArmistice(guild1)) {

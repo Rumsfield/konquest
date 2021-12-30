@@ -38,6 +38,10 @@ public class RenameAdminCommand extends CommandBase {
                 return;
         	}
         	
+        	if(getKonquest().validateName(newName,(Player) getSender()) != 0) {
+        		return;
+        	}
+        	
         	KonKingdom kingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
         	if(kingdom.getName().equals(oldName)) {
     			// Change kingdom name

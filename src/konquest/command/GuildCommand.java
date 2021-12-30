@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -68,15 +67,9 @@ public class GuildCommand extends CommandBase {
 	            		// Create a new guild
 	            		if(getArgs().length == 3) {
 	            			String guildName = getArgs()[2];
-	            			
-	            			if(!StringUtils.isAlphanumeric(guildName)) {
-	                    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
-	                            return;
-	                    	}
-	                    	if(getKonquest().getPlayerManager().isPlayerNameExist(guildName)) {
-	                    		ChatUtil.sendError((Player) getSender(), "Failed to create, that name is already taken");
-	                            return;
-	                    	}
+	            			if(getKonquest().validateName(guildName,bukkitPlayer) != 0) {
+	    	            		return;
+	    	            	}
 	                    	int status = getKonquest().getGuildManager().createGuild(guildName, player);
 	                    	if(status == 0) {
 	                    		// Successful guild creation
@@ -180,14 +173,9 @@ public class GuildCommand extends CommandBase {
 	            		}
 	            		if(getArgs().length == 3) {
 	            			String guildName = getArgs()[2];
-	            			if(!StringUtils.isAlphanumeric(guildName)) {
-	                    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
-	                            return;
-	                    	}
-	                    	if(getKonquest().getPlayerManager().isPlayerNameExist(guildName)) {
-	                    		ChatUtil.sendError((Player) getSender(), "Failed to rename, that name is already taken");
-	                            return;
-	                    	}
+	            			if(getKonquest().validateName(guildName,bukkitPlayer) != 0) {
+	    	            		return;
+	    	            	}
 	                    	boolean status = getKonquest().getGuildManager().renameGuild(guild, guildName, player);
 	                    	if(status) {
 	            				ChatUtil.sendNotice((Player) getSender(), "Successfully renamed guild to: "+guildName);

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -46,10 +45,8 @@ public class MakeKingdomAdminCommand extends CommandBase {
         	
         	Location playerLoc = bukkitPlayer.getLocation();
         	String kingdomName = getArgs()[2];
-        	if(!StringUtils.isAlphanumeric(kingdomName)) {
-        		//ChatUtil.sendError((Player) getSender(), "Kingdom name must only contain letters and/or numbers");
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
-                return;
+        	if(getKonquest().validateName(kingdomName,bukkitPlayer) != 0) {
+        		return;
         	}
         	boolean pass = getKonquest().getKingdomManager().addKingdom(playerLoc, kingdomName);
         	if(!pass) {
