@@ -109,6 +109,7 @@ public class GuildManager implements Timeable {
 		}
 		
 		loadGuilds();
+		validateGuilds();
 		ChatUtil.printDebug("Guild Manager is ready, enabled: "+isEnabled+" with "+guilds.size()+" guilds");
 	}
 	
@@ -444,16 +445,26 @@ public class GuildManager implements Timeable {
 				if(!guild.isMember(id)) {
 					if(guild.isJoinInviteValid(id)) {
 						// There is already a valid invite, add the player to the guild
-						guild.addMember(id, false);
-						guild.removeJoinRequest(id);
-						ChatUtil.sendNotice(player.getBukkitPlayer(), "Successfully joined guild");
+						KonGuild playerGuild = getPlayerGuild(player.getOfflineBukkitPlayer());
+						// Ensure the player is not already a guild member
+						if(playerGuild == null) {
+							guild.addMember(id, false);
+							guild.removeJoinRequest(id);
+							ChatUtil.sendNotice(player.getBukkitPlayer(), "Successfully joined guild");
+							Konquest.playSuccessSound(player.getBukkitPlayer());
+						} else {
+							ChatUtil.sendError(player.getBukkitPlayer(), "Leave your current guild first!");
+							Konquest.playFailSound(player.getBukkitPlayer());
+						}
 					} else if(!guild.isJoinRequestValid(id)){
 						// Request to join if not already requested
 						guild.addJoinRequest(id, false);
 						ChatUtil.sendNotice(player.getBukkitPlayer(), "Sent request to join the guild");
+						Konquest.playSuccessSound(player.getBukkitPlayer());
 						broadcastOfficersGuild(guild,"New guild join request, type \"/k guild\" to review");
 					} else {
 						ChatUtil.sendError(player.getBukkitPlayer(), "You have already requested to join");
+						Konquest.playFailSound(player.getBukkitPlayer());
 					}
 				}
 			}
@@ -513,12 +524,16 @@ public class GuildManager implements Timeable {
 				if(!guild.isMember(id)) {
 					if(guild.isJoinRequestValid(id)) {
 						// There is already a valid request, add the player to the guild
-						guild.addMember(id, false);
-						guild.removeJoinRequest(id);
-						if(offlineBukkitPlayer.isOnline()) {
-							ChatUtil.sendNotice((Player)offlineBukkitPlayer, "Guild join request accepted");
+						KonGuild playerGuild = getPlayerGuild(player.getOfflineBukkitPlayer());
+						// Ensure the player is not already a guild member
+						if(playerGuild == null) {
+							guild.addMember(id, false);
+							guild.removeJoinRequest(id);
+							if(offlineBukkitPlayer.isOnline()) {
+								ChatUtil.sendNotice((Player)offlineBukkitPlayer, guild.getName()+" Guild join request accepted");
+							}
+							result = true;
 						}
-						result = true;
 					} else if(!guild.isJoinInviteValid(id)) {
 						// Invite to join if not already invited
 						guild.addJoinRequest(id, true);
@@ -551,7 +566,7 @@ public class GuildManager implements Timeable {
 						// Accept join invite, add as member
 						guild.addMember(id, false);
 						guild.removeJoinRequest(id);
-						ChatUtil.sendNotice(player.getBukkitPlayer(), "Guild join invite accepted");
+						ChatUtil.sendNotice(player.getBukkitPlayer(), guild.getName()+" Guild join invite accepted");
 						Konquest.playSuccessSound(player.getBukkitPlayer());
 					} else {
 						ChatUtil.sendError(player.getBukkitPlayer(), "Leave your current guild first!");
@@ -561,7 +576,7 @@ public class GuildManager implements Timeable {
 				} else {
 					// Denied join request
 					guild.removeJoinRequest(id);
-					ChatUtil.sendNotice(player.getBukkitPlayer(), "Guild join invite declined");
+					ChatUtil.sendNotice(player.getBukkitPlayer(), guild.getName()+" Guild join invite declined");
 				}
 			}
 		}
@@ -592,8 +607,11 @@ public class GuildManager implements Timeable {
 	}
 	
 	public void removePlayerGuild(OfflinePlayer player) {
+		removePlayerGuild(player,getPlayerGuild(player));
+	}
+	
+	public void removePlayerGuild(OfflinePlayer player, KonGuild guild) {
 		UUID id = player.getUniqueId();
-		KonGuild guild = getPlayerGuild(player);
 		if(guild != null) {
 			// Found guild where target player is a member
 			if(guild.isMaster(id)) {
@@ -764,6 +782,30 @@ public class GuildManager implements Timeable {
 	 * ===================================
 	 */
 
+	private void validateGuilds() {
+		// Ensure that players are not members of multiple guilds
+		// Iterate over all guilds, cache members, check for multiple memberships and remove as necessary
+		HashSet<OfflinePlayer> playerCache = new HashSet<OfflinePlayer>();
+		HashMap<OfflinePlayer,KonGuild> removalList = new HashMap<OfflinePlayer,KonGuild>();
+		// Determine players to be removed from duplicate guilds
+		for(KonGuild guild : guilds) {
+			for(OfflinePlayer p : guild.getPlayerMembers()) {
+				// Is this guild member already accounted for?
+				if(playerCache.contains(p)) {
+					// This guild member has already been seen in another guild. Put them in the removal list.
+					removalList.put(p,guild);
+				} else {
+					// This guild member is unaccounted for, cache them
+					playerCache.add(p);
+				}
+			}
+		}
+		// Perform excess guild removal
+		for(OfflinePlayer p : removalList.keySet()) {
+			removePlayerGuild(p,removalList.get(p));
+		}
+	}
+	
 	private void loadGuilds() {
 		if(!isEnabled) {
 			ChatUtil.printConsoleAlert("Disabled guilds");

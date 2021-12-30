@@ -592,7 +592,6 @@ public class GuildMenu implements StateMenu {
 						KonGuild clickGuild = icon.getGuild();
 						manager.joinGuildRequest(player, clickGuild);
 						result = null; // Close menu
-						Konquest.playSuccessSound(player.getBukkitPlayer());
 					}
 					break;
 				case A_LEAVE:
