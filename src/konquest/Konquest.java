@@ -176,6 +176,7 @@ public class Konquest implements Timeable {
 		languageManager.initialize();
 		kingdomManager.initialize();
 		ruinManager.initialize();
+		guildManager.initialize();
 		initManagers();
 		initWorlds();
 		databaseThread.setSleepSeconds(saveIntervalSeconds);
@@ -238,7 +239,7 @@ public class Konquest implements Timeable {
 		shieldManager.initialize();
 		placeholderManager.initialize();
 		plotManager.initialize();
-		guildManager.initialize();
+		guildManager.loadOptions();
 		offlineTimeoutSeconds = (long)(configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)*86400);
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;

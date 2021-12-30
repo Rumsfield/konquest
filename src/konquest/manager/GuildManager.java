@@ -81,6 +81,13 @@ public class GuildManager implements Timeable {
 	
 	public void initialize() {
 		isEnabled 			= konquest.getConfigManager().getConfig("core").getBoolean("core.guilds.enable",false);
+		
+		loadGuilds();
+		validateGuilds();
+		ChatUtil.printDebug("Guild Manager is ready, enabled: "+isEnabled+" with "+guilds.size()+" guilds");
+	}
+	
+	public void loadOptions() {
 		payIntervalSeconds 	= konquest.getConfigManager().getConfig("core").getLong("core.guilds.pay_interval_seconds");
 		payPerChunk 		= konquest.getConfigManager().getConfig("core").getDouble("core.guilds.pay_per_chunk");
 		payPerResident 		= konquest.getConfigManager().getConfig("core").getDouble("core.guilds.pay_per_resident");
@@ -107,10 +114,6 @@ public class GuildManager implements Timeable {
 			payTimer.setTime((int)payIntervalSeconds);
 			payTimer.startLoopTimer();
 		}
-		
-		loadGuilds();
-		validateGuilds();
-		ChatUtil.printDebug("Guild Manager is ready, enabled: "+isEnabled+" with "+guilds.size()+" guilds");
 	}
 	
 	/*
