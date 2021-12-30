@@ -169,12 +169,16 @@ public class GuildMenu implements StateMenu {
 
 		loreList.clear();
 		loreList.add(loreColor+"View your guild invites");
-		icon = new InfoIcon(regularColor+"Invites", Collections.emptyList(), Material.WRITABLE_BOOK, ROOT_SLOT_INVITE, true);
+		int numInvites = manager.getInviteGuilds(player).size();
+		if(numInvites > 0) {
+			loreList.add(valueColor+""+numInvites);
+		}
+		icon = new InfoIcon(regularColor+"Invites", loreList, Material.WRITABLE_BOOK, ROOT_SLOT_INVITE, true);
 		result.addIcon(icon);
 		
 		loreList.clear();
 		loreList.add(loreColor+"View all guilds");
-		icon = new InfoIcon(regularColor+"List", Collections.emptyList(), Material.LECTERN, ROOT_SLOT_LIST, true);
+		icon = new InfoIcon(regularColor+"List", loreList, Material.LECTERN, ROOT_SLOT_LIST, true);
 		result.addIcon(icon);
 		
 		if(guild != null) {
@@ -194,6 +198,10 @@ public class GuildMenu implements StateMenu {
 				
 				loreList.clear();
 				loreList.add(loreColor+"View guild membership requests");
+				int numRequests = guild.getJoinRequests().size();
+				if(numRequests > 0) {
+					loreList.add(valueColor+""+numRequests);
+				}
 				icon = new InfoIcon(officerColor+"Requests", loreList, Material.JUKEBOX, ROOT_SLOT_REQUESTS, true);
 				result.addIcon(icon);
 			}
@@ -463,12 +471,17 @@ public class GuildMenu implements StateMenu {
 				OfflinePlayer currentPlayer = listIter.next();
 				ChatColor guildColor = ChatColor.GREEN;
 				loreList = new ArrayList<String>();
-				loreList.add("Last Online: ?");
+				if(currentPlayer.isOnline()) {
+					loreList.add(loreColor+"Online");
+				} else {
+					String lastOnlineFormat = Konquest.getDateFormat(currentPlayer.getLastPlayed());
+					loreList.add(loreColor+"Seen: "+valueColor+lastOnlineFormat);
+				}
 				if(!loreHintStr1.equals("")) {
-					loreList.add(loreHintStr1);
+					loreList.add(hintColor+loreHintStr1);
 				}
 				if(!loreHintStr2.equals("")) {
-					loreList.add(loreHintStr2);
+					loreList.add(hintColor+loreHintStr2);
 				}
 		    	PlayerIcon playerIcon = new PlayerIcon(guildColor+currentPlayer.getName(),loreList,currentPlayer,slotIndex,isClickable,iconAction);
 		    	pages.get(pageNum).addIcon(playerIcon);
@@ -504,7 +517,8 @@ public class GuildMenu implements StateMenu {
 				result = null;
 			} else if(index == 5) {
 				// Return to previous root
-				result = views.get(MenuState.ROOT);
+				//result = views.get(MenuState.ROOT);
+				result = goToRootView();
 				currentState = MenuState.ROOT;
 			} else if(index == 8) {
 				result = goPageNext();
@@ -773,6 +787,12 @@ public class GuildMenu implements StateMenu {
 	private DisplayMenu goToPlayerView(MenuState context) {
 		DisplayMenu result = createPlayerView(context);
 		views.put(context, result);
+		return result;
+	}
+	
+	private DisplayMenu goToRootView() {
+		DisplayMenu result = createRootView();
+		views.put(MenuState.ROOT, result);
 		return result;
 	}
 	

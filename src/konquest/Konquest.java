@@ -1,6 +1,7 @@
 package konquest;
 
 import java.awt.Point;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1227,6 +1228,12 @@ public class Konquest implements Timeable {
 		
 		return result;		
 	}
+    
+    public static String getDateFormat(long time) {
+    	Date date = new Date(time);
+        SimpleDateFormat formater = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+        return formater.format(date);
+    }
     
     public static EventPriority getEventPriority(String priority) {
     	EventPriority result = defaultChatPriority;

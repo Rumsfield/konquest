@@ -562,7 +562,6 @@ public class GuildManager implements Timeable {
 					// Denied join request
 					guild.removeJoinRequest(id);
 					ChatUtil.sendNotice(player.getBukkitPlayer(), "Guild join invite declined");
-					Konquest.playFailSound(player.getBukkitPlayer());
 				}
 			}
 		}
