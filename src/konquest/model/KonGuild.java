@@ -321,6 +321,11 @@ public class KonGuild {
 		return result;
 	}
 	
+	public void removeGuildRelationship(KonGuild guild) {
+		enemyArmistice.remove(guild);
+		friendlySanction.remove(guild);
+	}
+	
 	/*
 	 * =================================================
 	 * Query Methods

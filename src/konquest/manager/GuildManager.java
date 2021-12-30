@@ -356,6 +356,10 @@ public class GuildManager implements Timeable {
 	
 	public void removeGuild(KonGuild guild) {
 		guilds.remove(guild);
+		// Remove the guild from all other relationships
+		for(KonGuild currentGuild : guilds) {
+			currentGuild.removeGuildRelationship(guild);
+		}
 	}
 	
 	public void toggleGuildOpen(KonGuild guild, KonPlayer player) {
