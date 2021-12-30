@@ -1,7 +1,9 @@
 package konquest.display;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -14,15 +16,25 @@ public class GuildIcon implements MenuIcon {
 	private String name;
 	private List<String> lore;
 	private KonGuild guild;
+	private ChatColor contextColor;
 	private int index;
 	private boolean isClickable;
 	
-	public GuildIcon(String name, List<String> lore, KonGuild guild, int index, boolean isClickable) {
-		this.name = name;
+	public GuildIcon(KonGuild guild, boolean isFriendly, boolean isArmistice, List<String> lore, int index, boolean isClickable) {
+		this.name = guild.getName()+" Guild";
 		this.lore = lore;
 		this.guild = guild;
 		this.index = index;
 		this.isClickable = isClickable;
+		if(isFriendly) {
+			contextColor = ChatColor.GREEN;
+		} else {
+			if(isArmistice) {
+				contextColor = ChatColor.LIGHT_PURPLE;
+			} else {
+				contextColor = ChatColor.RED;
+			}
+		}
 	}
 	
 	public KonGuild getGuild() {
@@ -48,8 +60,18 @@ public class GuildIcon implements MenuIcon {
 				meta.addItemFlags(flag);
 			}
 		}
-		meta.setDisplayName(getName());
-		meta.setLore(lore);
+		meta.setDisplayName(contextColor+getName());
+		ChatColor loreColor = ChatColor.YELLOW;
+		ChatColor valueColor = ChatColor.AQUA;
+		List<String> loreList = new ArrayList<String>();
+		if(guild != null) {
+			loreList.add(loreColor+"Towns: "+valueColor+guild.getNumTowns());
+			loreList.add(loreColor+"Land: "+valueColor+guild.getNumLand());
+			loreList.add(loreColor+"Members: "+valueColor+guild.getNumMembers());
+			loreList.add(loreColor+"Specialization: "+valueColor+guild.getSpecialization().name());
+		}
+		loreList.addAll(lore);
+		meta.setLore(loreList);
 		item.setItemMeta(meta);
 		return item;
 	}

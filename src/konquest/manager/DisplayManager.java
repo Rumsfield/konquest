@@ -23,6 +23,7 @@ import konquest.command.CommandType;
 import konquest.display.ArmorIcon;
 import konquest.display.CommandIcon;
 import konquest.display.DisplayMenu;
+import konquest.display.GuildIcon;
 import konquest.display.GuildMenu;
 import konquest.display.InfoIcon;
 import konquest.display.KingdomIcon;
@@ -824,6 +825,12 @@ public class DisplayManager {
 		String balanceF = String.format("%.2f",KonquestPlugin.getBalance(infoPlayer.getOfflineBukkitPlayer()));
 		InfoIcon info = new InfoIcon(kingdomColor+MessagePath.LABEL_FAVOR.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_FAVOR.getMessage()+": "+valueColor+balanceF), Material.GOLD_INGOT, 5, false);
 		newMenu.getPage(0).addIcon(info);
+		/* Guild Icon (6) */
+		KonGuild guild = konquest.getGuildManager().getPlayerGuild(infoPlayer.getOfflineBukkitPlayer());
+		if(guild != null) {
+			GuildIcon guildIcon = new GuildIcon(guild, isFriendly, isArmistice, Collections.emptyList(), 6, false);
+			newMenu.getPage(0).addIcon(guildIcon);
+		}
 		
 		// Page 1+
 		List<KonTown> playerTowns = sortedTowns(infoPlayer);

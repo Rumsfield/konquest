@@ -183,11 +183,7 @@ public class GuildMenu implements StateMenu {
 		
 		if(guild != null) {
 			loreList = new ArrayList<String>();
-			loreList.add(loreColor+"Towns: "+valueColor+guild.getNumTowns());
-			loreList.add(loreColor+"Land: "+valueColor+guild.getNumLand());
-			loreList.add(loreColor+"Members: "+valueColor+guild.getNumMembers());
-			loreList.add(loreColor+"Specialization: "+valueColor+guild.getSpecialization().name());
-			icon = new GuildIcon(regularColor+guild.getName()+" Guild",loreList,guild,ROOT_SLOT_GUILD,false);
+			icon = new GuildIcon(guild,true,false,loreList,ROOT_SLOT_GUILD,false);
 			result.addIcon(icon);
 
 			if(menuAccess.equals(AccessType.OFFICER) || menuAccess.equals(AccessType.MASTER)) {
@@ -373,15 +369,11 @@ public class GuildMenu implements StateMenu {
 			while(slotIndex < MAX_ICONS_PER_PAGE && listIter.hasNext()) {
 				/* Guild Icon (n) */
 				KonGuild currentGuild = listIter.next();
-				ChatColor guildColor = ChatColor.GREEN;
 				loreList = new ArrayList<String>();
-				loreList.add(loreColor+"Towns: "+valueColor+currentGuild.getNumTowns());
-				loreList.add(loreColor+"Land: "+valueColor+currentGuild.getNumLand());
-				loreList.add(loreColor+"Members: "+valueColor+currentGuild.getNumMembers());
-				loreList.add(loreColor+"Specialization: "+valueColor+currentGuild.getSpecialization().name());
+				boolean isFriendly = false;
+				boolean isArmistice = false;
 				if(guild != null) {
 					if(!player.getKingdom().equals(currentGuild.getKingdom())) {
-						guildColor = ChatColor.RED;
 						String theirEnemyStatus = currentGuild.isArmistice(guild) ? "Armistice" : "Hostile";
 						loreList.add(loreColor+"Their Status: "+valueColor+theirEnemyStatus);
 						String guildEnemyStatus = guild.isArmistice(currentGuild) ? "Armistice" : "Hostile";
@@ -391,10 +383,9 @@ public class GuildMenu implements StateMenu {
 						loreList.add(loreColor+"Their Status: "+valueColor+theirFriendlyStatus);
 						String guildFriendlyStatus = guild.isSanction(currentGuild) ? "Sanction" : "Treaty";
 						loreList.add(loreColor+"Our Status: "+valueColor+guildFriendlyStatus);
+						isFriendly = true;
 					}
-					if(manager.isArmistice(guild, currentGuild)) {
-						guildColor = ChatColor.LIGHT_PURPLE;
-					}
+					isArmistice = manager.isArmistice(guild, currentGuild);
 					if(context.equals(MenuState.B_RELATIONSHIP)) {
 						String cost = String.format("%.2f",manager.getCostRelation());
 						loreList.add(loreColor+"Cost: "+valueColor+cost);
@@ -406,7 +397,7 @@ public class GuildMenu implements StateMenu {
 				if(!loreHintStr2.equals("")) {
 					loreList.add(hintColor+loreHintStr2);
 				}
-		    	GuildIcon guildIcon = new GuildIcon(guildColor+currentGuild.getName(),loreList,currentGuild,slotIndex,isClickable);
+		    	GuildIcon guildIcon = new GuildIcon(currentGuild,isFriendly,isArmistice,loreList,slotIndex,isClickable);
 		    	pages.get(pageNum).addIcon(guildIcon);
 				slotIndex++;
 			}
