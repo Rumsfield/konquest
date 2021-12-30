@@ -884,6 +884,10 @@ public class KonTown extends KonTerritory implements Timeable {
 		return null;
 	}
 	
+	public UUID getLord() {
+		return lord;
+	}
+	
 	public ArrayList<OfflinePlayer> getPlayerElites() {
 		ArrayList<OfflinePlayer> eliteList = new ArrayList<OfflinePlayer>();
 		for(UUID id : residents.keySet()) {

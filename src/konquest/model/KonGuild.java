@@ -343,10 +343,9 @@ public class KonGuild {
 	
 	public boolean isTownMember(KonTown town) {
 		if(town.getKingdom().equals(this.getKingdom())) {
-			for(UUID id : members.keySet()) {
-				if(town.isLord(id)) {
-					return true;
-				}
+			UUID lordID = town.getLord();
+			if(members.containsKey(lordID)) {
+				return true;
 			}
 		}
 		return false;

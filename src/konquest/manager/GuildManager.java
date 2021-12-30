@@ -51,7 +51,7 @@ public class GuildManager implements Timeable {
 	private double costRename;
 	private Timer payTimer;
 	private HashSet<KonGuild> guilds;
-	private HashMap<OfflinePlayer,KonGuild> playerGuildCache;
+	private HashMap<UUID,KonGuild> playerGuildCache;
 	
 	//TODO: Specialization trade discounts
 	/* - Check version to handle exceptions in MerchantRecipe special price methods
@@ -76,7 +76,7 @@ public class GuildManager implements Timeable {
 		this.costRename = 50;
 		this.payTimer = new Timer(this);
 		this.guilds = new HashSet<KonGuild>();
-		this.playerGuildCache = new HashMap<OfflinePlayer,KonGuild>();
+		this.playerGuildCache = new HashMap<UUID,KonGuild>();
 	}
 	
 	public void initialize() {
@@ -433,6 +433,12 @@ public class GuildManager implements Timeable {
 		return true;
 	}
 	
+	/*
+	 * ===================================
+	 * Membership Methods
+	 * ===================================
+	 */
+	
 	/**
 	 * Online Player requests to join the guild to the officers
 	 * @param player - The online player requesting to join the guild
@@ -448,7 +454,7 @@ public class GuildManager implements Timeable {
 						KonGuild playerGuild = getPlayerGuild(player.getOfflineBukkitPlayer());
 						// Ensure the player is not already a guild member
 						if(playerGuild == null) {
-							guild.addMember(id, false);
+							addMember(guild, id, false);
 							guild.removeJoinRequest(id);
 							ChatUtil.sendNotice(player.getBukkitPlayer(), "Successfully joined guild");
 							Konquest.playSuccessSound(player.getBukkitPlayer());
@@ -490,7 +496,7 @@ public class GuildManager implements Timeable {
 					// Ensure the player is not already a guild member
 					if(playerGuild == null) {
 						// Approved join request, add player as member
-						guild.addMember(id, false);
+						addMember(guild, id, false);
 						if(player.isOnline()) {
 							ChatUtil.sendNotice((Player)player, guild.getName()+" Guild join request accepted");
 						}
@@ -527,7 +533,7 @@ public class GuildManager implements Timeable {
 						KonGuild playerGuild = getPlayerGuild(player.getOfflineBukkitPlayer());
 						// Ensure the player is not already a guild member
 						if(playerGuild == null) {
-							guild.addMember(id, false);
+							addMember(guild, id, false);
 							guild.removeJoinRequest(id);
 							if(offlineBukkitPlayer.isOnline()) {
 								ChatUtil.sendNotice((Player)offlineBukkitPlayer, guild.getName()+" Guild join request accepted");
@@ -564,7 +570,7 @@ public class GuildManager implements Timeable {
 					// Ensure the player is not already a guild member
 					if(playerGuild == null) {
 						// Accept join invite, add as member
-						guild.addMember(id, false);
+						addMember(guild, id, false);
 						guild.removeJoinRequest(id);
 						ChatUtil.sendNotice(player.getBukkitPlayer(), guild.getName()+" Guild join invite accepted");
 						Konquest.playSuccessSound(player.getBukkitPlayer());
@@ -586,10 +592,8 @@ public class GuildManager implements Timeable {
 	public void leaveGuild(KonPlayer player, KonGuild guild) {
 		if(guild != null) {
 			UUID id = player.getBukkitPlayer().getUniqueId();
-			boolean status = guild.removeMember(id);
+			boolean status = removeMember(guild, id);
 			if(status) {
-				// Remove cached entry
-				playerGuildCache.remove(player.getOfflineBukkitPlayer());
 				ChatUtil.sendNotice(player.getBukkitPlayer(), "Successfully left the guild");
 				Konquest.playSuccessSound(player.getBukkitPlayer());
 			} else {
@@ -602,7 +606,7 @@ public class GuildManager implements Timeable {
 	public boolean kickGuildMember(OfflinePlayer player, KonGuild guild) {
 		boolean result = false;
 		UUID id = player.getUniqueId();
-		result = guild.removeMember(id);
+		result = removeMember(guild, id);
 		return result;
 	}
 	
@@ -621,7 +625,7 @@ public class GuildManager implements Timeable {
 					// Make the first officer into the master
 					transferMaster(officers.get(0),guild);
 					// Now remove the player
-					guild.removeMember(id);
+					removeMember(guild, id);
 				} else {
 					// There are no officers
 					List<OfflinePlayer> members = guild.getPlayerMembersOnly();
@@ -629,7 +633,7 @@ public class GuildManager implements Timeable {
 						// Make the first member into the master
 						transferMaster(members.get(0),guild);
 						// Now remove the player
-						guild.removeMember(id);
+						removeMember(guild, id);
 					} else {
 						// There are no members to transfer master to, delete the guild
 						removeGuild(guild);
@@ -637,7 +641,7 @@ public class GuildManager implements Timeable {
 				}
 			} else {
 				// Player is not the master, remove
-				guild.removeMember(id);
+				removeMember(guild, id);
 			}
 		}
 	}
@@ -684,6 +688,22 @@ public class GuildManager implements Timeable {
 			}
 		}
 	}
+	
+	private boolean removeMember(KonGuild guild, UUID id) {
+		boolean result = guild.removeMember(id);
+		if(result) {
+			playerGuildCache.remove(id);
+		}
+		return result;
+	}
+	
+	private boolean addMember(KonGuild guild, UUID id, boolean isOfficer) {
+		boolean result = guild.addMember(id, isOfficer);
+		if(result) {
+			playerGuildCache.remove(id);
+		}
+		return result;
+	}
 
 	/*
 	 * ===================================
@@ -721,39 +741,34 @@ public class GuildManager implements Timeable {
 	
 	public KonGuild getTownGuild(KonTown town) {
 		KonGuild result = null;
-		for(KonGuild guild : guilds) {
-			if(guild.isTownMember(town)) {
-				result = guild;
-				break;
-			}
+		UUID lordID = town.getLord();
+		if(lordID != null) {
+			result = getPlayerGuild(lordID);
 		}
 		return result;
 	}
 	
 	public KonGuild getPlayerGuild(OfflinePlayer player) {
+		return getPlayerGuild(player.getUniqueId());
+	}
+	
+	public KonGuild getPlayerGuild(UUID id) {
 		KonGuild result = null;
-		// Search for result
-		for(KonGuild guild : guilds) {
-			if(guild.isMember(player.getUniqueId())) {
-				result = guild;
-				break;
-			}
-		}
-		/*
-		if(playerGuildCache.containsKey(player)) {
-			// Use cached result
-			result = playerGuildCache.get(player);
-		} else {
-			// Search for result, and cache it
-			for(KonGuild guild : guilds) {
-				if(guild.isMember(player.getUniqueId())) {
-					result = guild;
-					break;
+		if(id != null) {
+			if(playerGuildCache.containsKey(id)) {
+				// Use cached result
+				result = playerGuildCache.get(id);
+			} else {
+				// Search for result, and cache it
+				for(KonGuild guild : guilds) {
+					if(guild.isMember(id)) {
+						result = guild;
+						break;
+					}
 				}
+				playerGuildCache.put(id, result); // can be null!
 			}
-			playerGuildCache.put(player, result); // can be null!
 		}
-		*/
 		return result;
 	}
 	
@@ -773,6 +788,22 @@ public class GuildManager implements Timeable {
 		if(guild1 != null && guild2 != null && guild1.isArmistice(guild2) && guild2.isArmistice(guild1)) {
 			result = true;
 		}
+		return result;
+	}
+	
+	public boolean isArmistice(KonPlayer player1, KonPlayer player2) {
+		boolean result = false;
+		KonGuild guild1 = getPlayerGuild(player1.getOfflineBukkitPlayer());
+		KonGuild guild2 = getPlayerGuild(player2.getOfflineBukkitPlayer());
+		result = isArmistice(guild1, guild2);
+		return result;
+	}
+	
+	public boolean isArmistice(KonPlayer player1, KonTown town2) {
+		boolean result = false;
+		KonGuild guild1 = getPlayerGuild(player1.getOfflineBukkitPlayer());
+		KonGuild guild2 = getTownGuild(town2);
+		result = isArmistice(guild1, guild2);
 		return result;
 	}
 	
