@@ -103,6 +103,7 @@ public class Konquest implements Timeable {
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
     private Team enemyTeam;
+    private Team armisticeTeam;
     private Team barbarianTeam;
     private TeamPacketSender teamPacketSender;
     private boolean isPacketSendEnabled;
@@ -193,6 +194,8 @@ public class Konquest implements Timeable {
         friendlyTeam.setColor(ChatColor.GREEN);
         enemyTeam = scoreboard.registerNewTeam("enemies");
         enemyTeam.setColor(ChatColor.RED);
+        armisticeTeam = scoreboard.registerNewTeam("armistice");
+        armisticeTeam.setColor(ChatColor.LIGHT_PURPLE);
         barbarianTeam = scoreboard.registerNewTeam("barbarians");
         barbarianTeam.setColor(ChatColor.YELLOW);
         
@@ -977,16 +980,22 @@ public class Konquest implements Timeable {
     	// Send arg player packets for each team with lists of online players
 		List<String> friendlyNames = new ArrayList<String>();
 		List<String> enemyNames = new ArrayList<String>();
+		List<String> armisticeNames = new ArrayList<String>();
 		List<String> barbarianNames = new ArrayList<String>();
     	for(KonPlayer onlinePlayer : playerManager.getPlayersOnline()) {
-    		// Place online player is appropriate list w.r.t. player
+    		boolean isArmistice = guildManager.isArmistice(onlinePlayer, player);
+    		// Place online player in appropriate list w.r.t. player
     		if(onlinePlayer.isBarbarian()) {
     			barbarianNames.add(onlinePlayer.getBukkitPlayer().getName());
     		} else {
     			if(onlinePlayer.getKingdom().equals(player.getKingdom())) {
     				friendlyNames.add(onlinePlayer.getBukkitPlayer().getName());
     			} else {
-    				enemyNames.add(onlinePlayer.getBukkitPlayer().getName());
+    				if(isArmistice) {
+    					armisticeNames.add(onlinePlayer.getBukkitPlayer().getName());
+    				} else {
+    					enemyNames.add(onlinePlayer.getBukkitPlayer().getName());
+    				}
     			}
     		}
     		// Send appropriate team packet to online player
@@ -996,7 +1005,11 @@ public class Konquest implements Timeable {
     			if(player.getKingdom().equals(onlinePlayer.getKingdom())) {
     				teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), friendlyTeam);
     			} else {
-    				teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), enemyTeam);
+    				if(isArmistice) {
+    					teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), armisticeTeam);
+    				} else {
+    					teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), enemyTeam);
+    				}
     			}
     		}
     	}
@@ -1007,71 +1020,27 @@ public class Konquest implements Timeable {
     	if(!enemyNames.isEmpty()) {
     		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), enemyNames, enemyTeam);
     	}
+    	if(!armisticeNames.isEmpty()) {
+    		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), enemyNames, armisticeTeam);
+    	}
     	if(!barbarianNames.isEmpty()) {
     		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), barbarianNames, barbarianTeam);
     	}
     }
     
-    /*
-    //TODO This could be optimized to reduce loop Order, and only update as needed
-    public void updateNamePackets() {
-    	if(teamPacketSender != null) {
-	    	// Update all Kingdom player's nametag color packets
-			for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
-				// For each kingdom, determine friendlies and enemies
-				List<Player> friendlyPlayers = new ArrayList<Player>();
-				List<String> friendlyNames = new ArrayList<String>();
-				List<String> enemyNames = new ArrayList<String>();
-				List<String> barbarianNames = new ArrayList<String>();
-				// Populate friendly and enemy lists
-				for(KonPlayer player : playerManager.getPlayersOnline()) {
-		    		if(player.getKingdom().equals(kingdom)) {
-		    			friendlyNames.add(player.getBukkitPlayer().getName());
-		    			friendlyPlayers.add(player.getBukkitPlayer());
-		    		} else if(!player.isBarbarian()) {
-		    			enemyNames.add(player.getBukkitPlayer().getName());
-		    		} else {
-		    			barbarianNames.add(player.getBukkitPlayer().getName());
-		    		}
-		    	}
-				// For each friendly player in this kingdom, send packet update
-				for(Player kingdomPlayer : friendlyPlayers) {
-					if(!friendlyNames.isEmpty()) {
-						teamPacketSender.sendPlayerTeamPacket(kingdomPlayer, friendlyNames, friendlyTeam);
-			    	}
-			    	if(!enemyNames.isEmpty()) {
-			    		teamPacketSender.sendPlayerTeamPacket(kingdomPlayer, enemyNames, enemyTeam);
-			    	}
-			    	if(!barbarianNames.isEmpty()) {
-			    		teamPacketSender.sendPlayerTeamPacket(kingdomPlayer, barbarianNames, barbarianTeam);
-			    	}
-				}
-			}
-			// Update all Barbarian player's nametag color packets
-			List<Player> barbarianPlayers = new ArrayList<Player>();
-			List<String> enemyNames = new ArrayList<String>();
-			List<String> barbarianNames = new ArrayList<String>();
-			// Populate barbarian and enemy lists
-			for(KonPlayer player : playerManager.getPlayersOnline()) {
-	    		if(player.isBarbarian()) {
-	    			barbarianNames.add(player.getBukkitPlayer().getName());
-	    			barbarianPlayers.add(player.getBukkitPlayer());
-	    		} else {
-	    			enemyNames.add(player.getBukkitPlayer().getName());
-	    		}
-	    	}
-			// For each barbarian player, send packet update
-			for(Player barbarianPlayer : barbarianPlayers) {
-		    	if(!enemyNames.isEmpty()) {
-		    		teamPacketSender.sendPlayerTeamPacket(barbarianPlayer, enemyNames, enemyTeam);
-		    	}
-		    	if(!barbarianNames.isEmpty()) {
-		    		teamPacketSender.sendPlayerTeamPacket(barbarianPlayer, barbarianNames, barbarianTeam);
-		    	}
-			}
+    public void updateNamePackets(OfflinePlayer offlineBukkitPlayer) {
+    	if(offlineBukkitPlayer != null && offlineBukkitPlayer.getName() != null && offlineBukkitPlayer.isOnline()) {
+    		KonPlayer player = playerManager.getPlayer((Player)offlineBukkitPlayer);
+    		if(player != null) {
+    			updateNamePackets(player);
+    		}
     	}
     }
-    */
+    
+    public void updateNamePackets(UUID id) {
+    	OfflinePlayer offlineBukkitPlayer = Bukkit.getOfflinePlayer(id);
+    	updateNamePackets(offlineBukkitPlayer);
+    }
     
     public static UUID idFromString(String id) {
     	UUID result = null;
@@ -1082,24 +1051,6 @@ public class Konquest implements Timeable {
     	}
     	return result;
     }
-    
-    /*
-    public void telePlayerTerritory(Player player, KonTerritory travelTerritory) {
-    	Point locPoint = toPoint(travelTerritory.getCenterLoc());
-    	Location qLoc = travelTerritory.getSpawnLoc();
-		Location pLoc = player.getLocation();
-		Location destination = new Location(qLoc.getWorld(),qLoc.getBlockX()+0.5,qLoc.getBlockY()+1.0,qLoc.getBlockZ()+0.5,pLoc.getYaw(),pLoc.getPitch());
-    	if(travelTerritory.getWorld().isChunkLoaded(locPoint.x,locPoint.y)) {
-    		ChatUtil.printDebug("Teleporting player "+player.getName()+" to loaded territory");
-    		player.teleport(destination,TeleportCause.PLUGIN);
-    	} else {
-    		//teleportTerritoryQueue.put(player,travelTerritory);
-    		teleportLocationQueue.put(player,destination);
-    		ChatUtil.printDebug("Queueing player "+player.getName()+" for unloaded territory destination");
-    		travelTerritory.getWorld().loadChunk(locPoint.x,locPoint.y);
-    	}
-    }
-    */
     
     public void telePlayerLocation(Player player, Location travelLocation) {
     	Point locPoint = toPoint(travelLocation);
@@ -1206,15 +1157,67 @@ public class Konquest implements Timeable {
     	}
     }
     
-    public static ChatColor getContextColor(KonOfflinePlayer observer, KonOfflinePlayer target) {
+    /**
+     * Determines primary color based on player relationships
+     * @param displayPlayer - The target player to show the color to
+     * @param contextPlayer - The player to base the color from
+     * @param isArmistice - Are the two players in an armistice?
+     * @return Color
+     */
+    public static ChatColor getDisplayPrimaryColor(KonOfflinePlayer displayPlayer, KonOfflinePlayer contextPlayer, boolean isArmistice) {
     	ChatColor result = ChatColor.RED;
-    	if(target.isBarbarian()) {
+    	if(contextPlayer.isBarbarian()) {
     		result = ChatColor.YELLOW;
-    	} else {
-    		if(target.getKingdom().equals(observer.getKingdom())) {
-    			result = ChatColor.GREEN;
+		} else {
+			if(contextPlayer.getKingdom().equals(displayPlayer.getKingdom())) {
+				result = ChatColor.GREEN;
+    		} else {
+    			if(isArmistice) {
+    				result = ChatColor.LIGHT_PURPLE;
+    			} else {
+    				result = ChatColor.RED;
+    			}
     		}
-    	}
+		}
+    	return result;
+    }
+    
+    public static ChatColor getDisplayPrimaryColor(KonOfflinePlayer displayPlayer, KonTown contextTown, boolean isArmistice) {
+    	ChatColor result = ChatColor.RED;
+		if(contextTown.getKingdom().equals(displayPlayer.getKingdom())) {
+			result = ChatColor.GREEN;
+		} else {
+			if(isArmistice) {
+				result = ChatColor.LIGHT_PURPLE;
+			} else {
+				result = ChatColor.RED;
+			}
+		}
+    	return result;
+    }
+    
+    /**
+     * Determines secondary color based on player relationships
+     * @param displayPlayer - The target player to show the color to
+     * @param contextPlayer - The player to base the color from
+     * @param isArmistice - Are the two players in an armistice?
+     * @return Color
+     */
+    public static ChatColor getDisplaySecondaryColor(KonOfflinePlayer displayPlayer, KonOfflinePlayer contextPlayer, boolean isArmistice) {
+    	ChatColor result = ChatColor.RED;
+    	if(contextPlayer.isBarbarian()) {
+    		result = ChatColor.YELLOW;
+		} else {
+			if(contextPlayer.getKingdom().equals(displayPlayer.getKingdom())) {
+				result = ChatColor.DARK_GREEN;
+    		} else {
+    			if(isArmistice) {
+    				result = ChatColor.DARK_PURPLE;
+    			} else {
+    				result = ChatColor.DARK_RED;
+    			}
+    		}
+		}
     	return result;
     }
     

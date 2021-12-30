@@ -787,8 +787,9 @@ public class DisplayManager {
  		playMenuOpenSound(displayPlayer.getBukkitPlayer());
  		
  		boolean isFriendly = displayPlayer.getKingdom().equals(infoPlayer.getKingdom());
- 		ChatColor kingdomColor = Konquest.getContextColor(displayPlayer, infoPlayer);
- 		
+ 		boolean isArmistice = konquest.getGuildManager().isArmistice(displayPlayer, infoPlayer);
+ 		ChatColor kingdomColor = Konquest.getDisplayPrimaryColor(displayPlayer, infoPlayer, isArmistice);
+ 				
 		String loreColor = ""+ChatColor.WHITE;
 		String valueColor = ""+ChatColor.AQUA;
 		String pageLabel = "";
@@ -856,7 +857,7 @@ public class DisplayManager {
 				}
 		    	loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+currentTown.getNumResidents());
 		    	loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+currentTown.getChunkList().size());
-		    	TownIcon town = new TownIcon(currentTown,isFriendly,konquest.getKingdomManager().getTownCriticalBlock(),loreList,slotIndex);
+		    	TownIcon town = new TownIcon(currentTown,isFriendly,isArmistice,konquest.getKingdomManager().getTownCriticalBlock(),loreList,slotIndex);
 				newMenu.getPage(pageNum).addIcon(town);
 				slotIndex++;
 			}
@@ -966,10 +967,11 @@ public class DisplayManager {
 			while(slotIndex < MAX_ICONS_PER_PAGE && townIter.hasNext()) {
 				/* Town Icon (n) */
 				KonTown currentTown = townIter.next();
+				boolean isArmistice = konquest.getGuildManager().isArmistice(displayPlayer, currentTown);
 				loreList = new ArrayList<String>();
 				loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+currentTown.getNumResidents());
 		    	loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+currentTown.getChunkList().size());
-		    	TownIcon town = new TownIcon(currentTown,isFriendly,konquest.getKingdomManager().getTownCriticalBlock(),loreList,slotIndex);
+		    	TownIcon town = new TownIcon(currentTown,isFriendly,isArmistice,konquest.getKingdomManager().getTownCriticalBlock(),loreList,slotIndex);
 				newMenu.getPage(pageNum).addIcon(town);
 				slotIndex++;
 			}
@@ -994,11 +996,8 @@ public class DisplayManager {
    		//ChatUtil.printDebug("Displaying new town info menu to "+displayPlayer.getBukkitPlayer().getName()+" of kingdom "+infoTown.getName()+", current menu size is "+menuCache.size());
  		playMenuOpenSound(displayPlayer.getBukkitPlayer());
  		
-   		boolean isFriendly = displayPlayer.getKingdom().equals(infoTown.getKingdom());
- 		ChatColor kingdomColor = ChatColor.RED;
- 		if(isFriendly) {
- 			kingdomColor = ChatColor.GREEN;
- 		}
+ 		boolean isArmistice = konquest.getGuildManager().isArmistice(displayPlayer, infoTown);
+ 		ChatColor kingdomColor = Konquest.getDisplayPrimaryColor(displayPlayer, infoTown, isArmistice);
  		
 		String loreColor = ""+ChatColor.WHITE;
 		String valueColor = ""+ChatColor.AQUA;
@@ -1280,7 +1279,6 @@ public class DisplayManager {
 			if(pageNum == 0) {
 				PrefixIcon offIcon = new PrefixIcon(KonPrefixType.getDefault(),Arrays.asList(ChatColor.GOLD+MessagePath.MENU_PREFIX_HINT_DISABLE.getMessage()),4,true,PrefixIconAction.DISABLE_PREFIX);
 				newMenu.getPage(pageNum).addIcon(offIcon);
-				// TODO: Info icon?
 				slotIndex = 9;
 			}
 			// All other prefix icons

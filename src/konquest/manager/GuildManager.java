@@ -410,12 +410,26 @@ public class GuildManager implements Timeable {
 					// If either side breaks the armistice, make both hostile toward each other
 					guild.removeArmistice(otherGuild);
 					otherGuild.removeArmistice(guild);
+					updateAllMemberColors(guild);
+					updateAllMemberColors(otherGuild);
+					guild.getKingdom().updateAllTownBars();
+					otherGuild.getKingdom().updateAllTownBars();
 					broadcastGuild(guild, "Broke the armistice with "+otherGuild.getName()+" Guild");
 					broadcastGuild(otherGuild, guild.getName()+" Guild has broken the armistice with your guild!");
 				} else {
+					// When both sides offer an armistice, set up protections
 					guild.addArmistice(otherGuild);
-					broadcastGuild(guild, "Made an armistice with "+otherGuild.getName()+" Guild");
-					broadcastGuild(otherGuild, guild.getName()+" Guild has offered an armistice with your guild!");
+					if(isArmistice(guild,otherGuild)) {
+						updateAllMemberColors(guild);
+						updateAllMemberColors(otherGuild);
+						guild.getKingdom().updateAllTownBars();
+						otherGuild.getKingdom().updateAllTownBars();
+						broadcastGuild(guild, "Your guild agreed to an armistice with "+otherGuild.getName()+" Guild");
+						broadcastGuild(otherGuild, guild.getName()+" Guild has accepted an armistice with your guild!");
+					} else {
+						broadcastGuild(guild, "Offered an armistice with "+otherGuild.getName()+" Guild");
+						broadcastGuild(otherGuild, guild.getName()+" Guild has offered an armistice with your guild!");
+					}
 				}
 			}
 			// Withdraw cost
@@ -426,6 +440,14 @@ public class GuildManager implements Timeable {
 			}
 		}
 		return true;
+	}
+	
+	private void updateAllMemberColors(KonGuild guild) {
+		if(guild != null) {
+			for(OfflinePlayer offlinePlayer : guild.getPlayerMembers()) {
+				konquest.updateNamePackets(offlinePlayer);
+			}
+		}
 	}
 	
 	public boolean changeSpecialization(Villager.Profession profession, KonGuild guild, KonPlayer player) {
@@ -707,6 +729,7 @@ public class GuildManager implements Timeable {
 		boolean result = guild.removeMember(id);
 		if(result) {
 			playerGuildCache.remove(id);
+			konquest.updateNamePackets(id);
 		}
 		return result;
 	}
@@ -715,6 +738,7 @@ public class GuildManager implements Timeable {
 		boolean result = guild.addMember(id, isOfficer);
 		if(result) {
 			playerGuildCache.remove(id);
+			konquest.updateNamePackets(id);
 		}
 		return result;
 	}
@@ -820,13 +844,13 @@ public class GuildManager implements Timeable {
 	
 	public boolean isArmistice(KonGuild guild1, KonGuild guild2) {
 		boolean result = false;
-		if(guild1 != null && guild2 != null && guild1.isArmistice(guild2) && guild2.isArmistice(guild1)) {
+		if(guild1 != null && guild2 != null && !guild1.getKingdom().equals(guild2.getKingdom()) && guild1.isArmistice(guild2) && guild2.isArmistice(guild1)) {
 			result = true;
 		}
 		return result;
 	}
 	
-	public boolean isArmistice(KonPlayer player1, KonPlayer player2) {
+	public boolean isArmistice(KonOfflinePlayer player1, KonOfflinePlayer player2) {
 		boolean result = false;
 		KonGuild guild1 = getPlayerGuild(player1.getOfflineBukkitPlayer());
 		KonGuild guild2 = getPlayerGuild(player2.getOfflineBukkitPlayer());
@@ -834,7 +858,7 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
-	public boolean isArmistice(KonPlayer player1, KonTown town2) {
+	public boolean isArmistice(KonOfflinePlayer player1, KonTown town2) {
 		boolean result = false;
 		KonGuild guild1 = getPlayerGuild(player1.getOfflineBukkitPlayer());
 		KonGuild guild2 = getTownGuild(town2);

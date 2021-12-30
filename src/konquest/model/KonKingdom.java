@@ -362,6 +362,12 @@ public class KonKingdom implements Timeable{
 		//ChatUtil.printDebug("Starting 300 second monument blanking timer for kingdom "+getName());
 	}
 	
+	public void updateAllTownBars() {
+		for(KonTown town : townMap.values()) {
+			town.updateBarPlayers();
+		}
+	}
+	
 	private void reloadLoadedTownMonuments() {
 		Point tPoint;
 		for(KonTown town : getTowns()) {

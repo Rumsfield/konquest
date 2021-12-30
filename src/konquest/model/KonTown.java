@@ -50,6 +50,7 @@ public class KonTown extends KonTerritory implements Timeable {
 	private boolean isRaidAlertDisabled;
 	private BossBar monumentBarAllies;
 	private BossBar monumentBarEnemies;
+	private BossBar monumentBarArmistice;
 	private BossBar shieldArmorBarAll;
 	private UUID lord;
 	private HashMap<UUID,Boolean> residents;
@@ -85,6 +86,8 @@ public class KonTown extends KonTerritory implements Timeable {
 		this.monumentBarAllies.setVisible(true);
 		this.monumentBarEnemies = Bukkit.getServer().createBossBar(ChatColor.RED+name, BarColor.RED, BarStyle.SOLID);
 		this.monumentBarEnemies.setVisible(true);
+		this.monumentBarArmistice = Bukkit.getServer().createBossBar(ChatColor.LIGHT_PURPLE+name, BarColor.PINK, BarStyle.SOLID);
+		this.monumentBarArmistice.setVisible(true);
 		this.shieldArmorBarAll = Bukkit.getServer().createBossBar(ChatColor.DARK_AQUA+"Shield", BarColor.BLUE, BarStyle.SOLID);
 		this.shieldArmorBarAll.setVisible(false);
 		this.shieldArmorBarAll.setProgress(0);
@@ -633,6 +636,7 @@ public class KonTown extends KonTerritory implements Timeable {
 	public void updateBarPlayers() {
 		monumentBarAllies.removeAll();
 		monumentBarEnemies.removeAll();
+		monumentBarArmistice.removeAll();
 		shieldArmorBarAll.removeAll();
 		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
 			Player bukkitPlayer = player.getBukkitPlayer();
@@ -640,7 +644,11 @@ public class KonTown extends KonTerritory implements Timeable {
 				if(player.getKingdom().equals(getKingdom())) {
 					monumentBarAllies.addPlayer(bukkitPlayer);
 				} else {
-					monumentBarEnemies.addPlayer(bukkitPlayer);
+					if(getKonquest().getGuildManager().isArmistice(player, this)) {
+						monumentBarEnemies.addPlayer(bukkitPlayer);
+					} else {
+						monumentBarArmistice.addPlayer(bukkitPlayer);
+					}
 				}
 				shieldArmorBarAll.addPlayer(bukkitPlayer);
 			}
@@ -651,7 +659,11 @@ public class KonTown extends KonTerritory implements Timeable {
 		if(player.getKingdom().equals(getKingdom())) {
 			monumentBarAllies.addPlayer(player.getBukkitPlayer());
 		} else {
-			monumentBarEnemies.addPlayer(player.getBukkitPlayer());
+			if(getKonquest().getGuildManager().isArmistice(player, this)) {
+				monumentBarEnemies.addPlayer(player.getBukkitPlayer());
+			} else {
+				monumentBarArmistice.addPlayer(player.getBukkitPlayer());
+			}
 		}
 		shieldArmorBarAll.addPlayer(player.getBukkitPlayer());
 	}
@@ -659,18 +671,21 @@ public class KonTown extends KonTerritory implements Timeable {
 	public void removeBarPlayer(KonPlayer player) {
 		monumentBarAllies.removePlayer(player.getBukkitPlayer());
 		monumentBarEnemies.removePlayer(player.getBukkitPlayer());
+		monumentBarArmistice.removePlayer(player.getBukkitPlayer());
 		shieldArmorBarAll.removePlayer(player.getBukkitPlayer());
 	}
 	
 	public void removeAllBarPlayers() {
 		monumentBarAllies.removeAll();
 		monumentBarEnemies.removeAll();
+		monumentBarArmistice.removeAll();
 		shieldArmorBarAll.removeAll();
 	}
 	
 	public void setBarProgress(double prog) {
 		monumentBarAllies.setProgress(prog);
 		monumentBarEnemies.setProgress(prog);
+		monumentBarArmistice.setProgress(prog);
 	}
 	
 	public void setAttacked(boolean val) {
@@ -696,11 +711,15 @@ public class KonTown extends KonTerritory implements Timeable {
 			monumentBarAllies.setColor(BarColor.PURPLE);
 			monumentBarEnemies.setTitle(ChatColor.RED+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
 			monumentBarEnemies.setColor(BarColor.PURPLE);
+			monumentBarArmistice.setTitle(ChatColor.LIGHT_PURPLE+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
+			monumentBarArmistice.setColor(BarColor.PURPLE);
 		} else {
 			monumentBarAllies.setTitle(ChatColor.GREEN+getName());
 			monumentBarAllies.setColor(BarColor.GREEN);
 			monumentBarEnemies.setTitle(ChatColor.RED+getName());
 			monumentBarEnemies.setColor(BarColor.RED);
+			monumentBarArmistice.setTitle(ChatColor.LIGHT_PURPLE+getName());
+			monumentBarArmistice.setColor(BarColor.PINK);
 		}
 	}
 	

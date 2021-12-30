@@ -21,12 +21,16 @@ public class TownIcon implements MenuIcon {
 	private int index;
 	private ItemStack item;
 	
-	public TownIcon(KonTown town, boolean isFriendly, Material material, List<String> lore, int index) {
+	public TownIcon(KonTown town, boolean isFriendly, boolean isArmistice, Material material, List<String> lore, int index) {
 		this.town = town;
 		if(isFriendly) {
 			contextColor = ChatColor.GREEN;
 		} else {
-			contextColor = ChatColor.RED;
+			if(isArmistice) {
+				contextColor = ChatColor.LIGHT_PURPLE;
+			} else {
+				contextColor = ChatColor.RED;
+			}
 		}
 		this.material = material;
 		this.lore = lore;
