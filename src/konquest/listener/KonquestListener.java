@@ -76,10 +76,15 @@ public class KonquestListener implements Listener {
 			if(!event.getPlayer().isAdminBypassActive() &&
 					!event.getPlayer().getKingdom().equals(event.getTerritory().getKingdom()) &&
 					!event.getPlayer().getKingdom().isPeaceful() ) {
-				// Attempt to start a raid alert
-				town.sendRaidAlert();
-				// Apply town nerfs
-				kingdomManager.applyTownNerf(event.getPlayer(), town);
+				
+				// If the town and enemy guilds share an armistice
+				if(!konquest.getGuildManager().isArmistice(event.getPlayer(), town)) {
+					// Attempt to start a raid alert
+					town.sendRaidAlert();
+					// Apply town nerfs
+					kingdomManager.applyTownNerf(event.getPlayer(), town);
+				}
+				
 			} else {
 				// Players entering friendly towns...
 				kingdomManager.clearTownNerf(event.getPlayer());

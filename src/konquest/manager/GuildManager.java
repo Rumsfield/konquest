@@ -139,6 +139,10 @@ public class GuildManager implements Timeable {
 		return costRename;
 	}
 	
+	public boolean isDiscountEnable() {
+		return isDiscountEnable;
+	}
+	
 	/*
 	 * ===================================
 	 * Management Methods
@@ -386,6 +390,9 @@ public class GuildManager implements Timeable {
 		// Attempt to change relationship
 		if(guild != null && otherGuild != null && !guild.equals(otherGuild)) {
 			if(guild.getKingdom().equals(otherGuild.getKingdom())) {
+				if(!isDiscountEnable) {
+					return true;
+				}
 				if(guild.isSanction(otherGuild)) {
 					guild.removeSanction(otherGuild);
 					broadcastGuild(guild, "Removed sanction for "+otherGuild.getName()+" Guild");
@@ -719,6 +726,16 @@ public class GuildManager implements Timeable {
 		List<KonGuild> result = new ArrayList<KonGuild>();
 		for(KonGuild guild : guilds) {
 			result.add(guild);
+		}
+		return result;
+	}
+	
+	public List<KonGuild> getEnemyGuilds(KonKingdom kingdom) {
+		List<KonGuild> result = new ArrayList<KonGuild>();
+		for(KonGuild otherGuild : guilds) {
+			if(!otherGuild.getKingdom().equals(kingdom)) {
+				result.add(otherGuild);
+			}
 		}
 		return result;
 	}

@@ -320,7 +320,6 @@ public class PlayerListener implements Listener{
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteract(PlayerInteractEvent event) {
-    	// TODO Allow players to use boats in capital?
 //    	if(konquest.isWorldIgnored(event.getPlayer().getLocation().getWorld())) {
 //			return;
 //		}
@@ -802,33 +801,6 @@ public class PlayerListener implements Listener{
     		event.setAmount(boostAmount);
     	}
     }
-    /*
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
-    	// Prevent enemies from consuming milk buckets in Towns
-    	if(event.getItem().getType().equals(Material.MILK_BUCKET) && konquest.getKingdomManager().isChunkClaimed(event.getPlayer().getLocation().getChunk())) {
-    		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getPlayer().getLocation().getChunk());
-    		if(territory instanceof KonTown) {
-    			KonPlayer player = playerManager.getPlayer(event.getPlayer());
-    			if(!player.getKingdom().equals(territory.getKingdom())) {
-    				ChatUtil.sendError(event.getPlayer(), "That milk cannot save you here!");
-    				event.setCancelled(true);
-    			}
-    		}
-    	}
-    }*/
-    /*
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerItemHeld(PlayerItemHeldEvent event) {
-    	// Set a player's compass target to nearest enemy town
-    	ItemStack heldItem = event.getPlayer().getInventory().getItemInMainHand();
-    	if(heldItem.getType().equals(Material.COMPASS) && event.getPlayer().hasPermission("konquest.compass")) {
-    		KonPlayer player = playerManager.getPlayer(event.getPlayer());
-    		Location nearestEnemyTownLoc = kingdomManager.getClosestEnemyTown(event.getPlayer().getLocation().getChunk(),player.getKingdom()).getCenterLoc();
-    		event.getPlayer().setCompassTarget(nearestEnemyTownLoc);
-    	}
-    }*/
-    
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerPortal(PlayerPortalEvent event) {

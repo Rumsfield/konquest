@@ -337,7 +337,11 @@ public class GuildMenu implements StateMenu {
 			isClickable = false;
 		} else if(context.equals(MenuState.B_RELATIONSHIP)) {
 			// List of all guilds, friendly and enemy, with relationship status and click hints
-			guilds.addAll(manager.getAllGuilds());
+			if(manager.isDiscountEnable()) {
+				guilds.addAll(manager.getAllGuilds());
+			} else {
+				guilds.addAll(manager.getEnemyGuilds(player.getKingdom()));
+			}
 			if(guild != null) {
 				guilds.remove(guild);
 			}
