@@ -381,10 +381,10 @@ public class GuildManager implements Timeable {
 		}
 	}
 	
-	public boolean toggleGuildStatus(KonGuild guild, KonGuild otherGuild, KonPlayer player) {
+	public boolean toggleGuildStatus(KonGuild guild, KonGuild otherGuild, KonPlayer player, boolean isAdmin) {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Check cost
-		if(costRelation > 0) {
+		if(costRelation > 0 && !isAdmin) {
 			if(KonquestPlugin.getBalance(bukkitPlayer) < costRelation) {
 				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costRelation));
                 return false;
@@ -433,7 +433,7 @@ public class GuildManager implements Timeable {
 				}
 			}
 			// Withdraw cost
-			if(costRelation > 0) {
+			if(costRelation > 0 && !isAdmin) {
 	            if(KonquestPlugin.withdrawPlayer(bukkitPlayer, costRelation)) {
 	            	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costRelation);
 	            }
@@ -450,10 +450,10 @@ public class GuildManager implements Timeable {
 		}
 	}
 	
-	public boolean changeSpecialization(Villager.Profession profession, KonGuild guild, KonPlayer player) {
+	public boolean changeSpecialization(Villager.Profession profession, KonGuild guild, KonPlayer player, boolean isAdmin) {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Check cost
-		if(costSpecial > 0) {
+		if(costSpecial > 0 && !isAdmin) {
 			if(KonquestPlugin.getBalance(bukkitPlayer) < costSpecial) {
 				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costSpecial));
                 return false;
@@ -461,7 +461,7 @@ public class GuildManager implements Timeable {
     	}
 		guild.setSpecialization(profession);
 		// Withdraw cost
-		if(costSpecial > 0) {
+		if(costSpecial > 0 && !isAdmin) {
             if(KonquestPlugin.withdrawPlayer(bukkitPlayer, costSpecial)) {
             	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costSpecial);
             }
@@ -757,6 +757,14 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
+	public List<String> getAllGuildNames() {
+		List<String> result = new ArrayList<String>();
+		for(KonGuild guild : guilds) {
+			result.add(guild.getName());
+		}
+		return result;
+	}
+	
 	public List<KonGuild> getEnemyGuilds(KonKingdom kingdom) {
 		List<KonGuild> result = new ArrayList<KonGuild>();
 		for(KonGuild otherGuild : guilds) {
@@ -823,7 +831,7 @@ public class GuildManager implements Timeable {
 	public KonGuild getGuild(String name) {
 		KonGuild result = null;
 		for(KonGuild guild : guilds) {
-			if(guild.getName().equals(name)) {
+			if(guild.getName().equalsIgnoreCase(name)) {
 				result = guild;
 				break;
 			}

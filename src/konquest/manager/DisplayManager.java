@@ -1392,10 +1392,10 @@ public class DisplayManager {
 	 * Guild Menu
 	 * ===============================================
 	 */
-   	public void displayGuildMenu(KonPlayer displayPlayer, KonGuild guild) {
+   	public void displayGuildMenu(KonPlayer displayPlayer, KonGuild guild, boolean isAdmin) {
    		//ChatUtil.printDebug("Displaying new guild menu to "+bukkitPlayer.getName()+", current menu size is "+plotMenus.size());
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		GuildMenu newMenu = new GuildMenu(konquest.getGuildManager(), displayPlayer, guild);
+		GuildMenu newMenu = new GuildMenu(konquest.getGuildManager(), displayPlayer, guild, isAdmin);
 		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {

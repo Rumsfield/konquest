@@ -53,7 +53,7 @@ public class GuildCommand extends CommandBase {
     		
         	if(getArgs().length == 1) {
         		// No sub-command, open guild menu
-        		getKonquest().getDisplayManager().displayGuildMenu(player, guild);
+        		getKonquest().getDisplayManager().displayGuildMenu(player, guild, false);
         	} else if(getArgs().length >= 2) {
         		// Has sub-commands
         		String subCmd = getArgs()[1];
@@ -61,7 +61,7 @@ public class GuildCommand extends CommandBase {
         		switch(subCmd.toLowerCase()) {
 	            	case "menu":
 	            		// Open the guild menu
-	            		getKonquest().getDisplayManager().displayGuildMenu(player, guild);
+	            		getKonquest().getDisplayManager().displayGuildMenu(player, guild, false);
 	            		break;
 	            	case "create":
 	            		// Create a new guild
@@ -76,7 +76,7 @@ public class GuildCommand extends CommandBase {
 	                    		ChatUtil.sendNotice((Player) getSender(), "Successfully created new guild, "+guildName);
 	                    		// Open guild menu for newly created guild
 	                    		KonGuild newGuild = getKonquest().getGuildManager().getPlayerGuild(bukkitPlayer);
-	                    		getKonquest().getDisplayManager().displayGuildMenu(player, newGuild);
+	                    		getKonquest().getDisplayManager().displayGuildMenu(player, newGuild, false);
 	                    	} else {
 	                    		switch(status) {
 		                    		case 1:

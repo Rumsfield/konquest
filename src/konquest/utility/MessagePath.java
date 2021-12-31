@@ -592,6 +592,7 @@ public enum MessagePath {
 	DESCRIPTION_ADMIN_FORCEJOIN                 (0, "description.admin-forcejoin"),
 	DESCRIPTION_ADMIN_FORCEEXILE                (0, "description.admin-forceexile"),
 	DESCRIPTION_ADMIN_FORCETOWN                 (0, "description.admin-forcetown"),
+	DESCRIPTION_ADMIN_FORCEGUILD                (0, "description.admin-forceguild"),
 	DESCRIPTION_ADMIN_RENAME                    (0, "description.admin-rename"),
 	DESCRIPTION_ADMIN_RUIN                      (0, "description.admin-ruin"),
 	DESCRIPTION_ADMIN_SAVE                      (0, "description.admin-save"),

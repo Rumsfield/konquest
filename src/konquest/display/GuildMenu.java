@@ -78,9 +78,10 @@ public class GuildMenu implements StateMenu {
 	private GuildManager manager;
 	private KonPlayer player;
 	private KonGuild guild;
+	private boolean isAdmin;
 	private AccessType menuAccess;
 	
-	public GuildMenu(GuildManager manager, KonPlayer player, KonGuild guild) {
+	public GuildMenu(GuildManager manager, KonPlayer player, KonGuild guild, boolean isAdmin) {
 		this.views = new HashMap<MenuState,DisplayMenu>();
 		this.pages = new ArrayList<DisplayMenu>();
 		this.currentPage = 0;
@@ -88,6 +89,7 @@ public class GuildMenu implements StateMenu {
 		this.manager = manager;
 		this.player = player;
 		this.guild = guild;
+		this.isAdmin = isAdmin;
 		this.menuAccess = AccessType.REGULAR;
 		
 		initializeMenu();
@@ -98,13 +100,18 @@ public class GuildMenu implements StateMenu {
 	private void initializeMenu() {
 		if(guild != null) {
 			UUID id = player.getBukkitPlayer().getUniqueId();
-			if(guild.isMaster(id)) {
+			if(isAdmin) {
 				menuAccess = AccessType.MASTER;
-			} else if(guild.isOfficer(id)) {
-				menuAccess = AccessType.OFFICER;
-			} else if(guild.isMember(id)) {
-				menuAccess = AccessType.REGULAR;
+			} else {
+				if(guild.isMaster(id)) {
+					menuAccess = AccessType.MASTER;
+				} else if(guild.isOfficer(id)) {
+					menuAccess = AccessType.OFFICER;
+				} else if(guild.isMember(id)) {
+					menuAccess = AccessType.REGULAR;
+				}
 			}
+			
 		}
 	}
 	
@@ -280,13 +287,15 @@ public class GuildMenu implements StateMenu {
 	private DisplayMenu createSpecializeView() {
 		DisplayMenu result;
 		ProfessionIcon icon;
-		String cost = String.format("%.2f",manager.getCostSpecial());
 		int numEntries = Villager.Profession.values().length - 1; // Subtract one to omit current specialization choice
 		int numRows = (int)Math.ceil((double)numEntries / 9);
 		result = new DisplayMenu(numRows+1, getTitle(MenuState.C_SPECIALIZE));
 		int index = 0;
 		List<String> loreList = new ArrayList<String>();
-		loreList.add(loreColor+"Cost: "+valueColor+cost);
+		if(!isAdmin) {
+			String cost = String.format("%.2f",manager.getCostSpecial());
+			loreList.add(loreColor+"Cost: "+valueColor+cost);
+		}
 		loreList.add(hintColor+"Click to choose");
 		for(Villager.Profession profession : Villager.Profession.values()) {
 			if(guild == null || (guild != null && !profession.equals(guild.getSpecialization()))) {
@@ -386,7 +395,7 @@ public class GuildMenu implements StateMenu {
 						isFriendly = true;
 					}
 					isArmistice = manager.isArmistice(guild, currentGuild);
-					if(context.equals(MenuState.B_RELATIONSHIP)) {
+					if(context.equals(MenuState.B_RELATIONSHIP) && !isAdmin) {
 						String cost = String.format("%.2f",manager.getCostRelation());
 						loreList.add(loreColor+"Cost: "+valueColor+cost);
 					}
@@ -619,7 +628,7 @@ public class GuildMenu implements StateMenu {
 					if(clickedIcon != null && clickedIcon instanceof GuildIcon) {
 						GuildIcon icon = (GuildIcon)clickedIcon;
 						KonGuild clickGuild = icon.getGuild();
-						boolean status = manager.toggleGuildStatus(guild, clickGuild, player);
+						boolean status = manager.toggleGuildStatus(guild, clickGuild, player, isAdmin);
 						if(status) {
 							result = goToGuildView(currentState);
 							Konquest.playSuccessSound(player.getBukkitPlayer());
@@ -673,7 +682,7 @@ public class GuildMenu implements StateMenu {
 					if(clickedIcon != null && clickedIcon instanceof ProfessionIcon) {
 						ProfessionIcon icon = (ProfessionIcon)clickedIcon;
 						Villager.Profession clickProfession = icon.getProfession();
-						boolean status = manager.changeSpecialization(clickProfession, guild, player);
+						boolean status = manager.changeSpecialization(clickProfession, guild, player, isAdmin);
 						if(status) {
 							ChatUtil.sendNotice(player.getBukkitPlayer(), "Changed "+guild.getName()+" Guild specialization to "+clickProfession.name());
 							Konquest.playSuccessSound(player.getBukkitPlayer());
@@ -703,6 +712,9 @@ public class GuildMenu implements StateMenu {
 	private String getTitle(MenuState context) {
 		String result = "";
 		ChatColor color = ChatColor.BLACK;
+		if(isAdmin) {
+			color = ChatColor.GOLD;
+		}
 		switch(context) {
 			case ROOT:
 				if(guild != null) {
@@ -724,25 +736,25 @@ public class GuildMenu implements StateMenu {
 				result = color+"Guild List";
 				break;
 			case B_RELATIONSHIP:
-				result = color+"Guild Relationships";
+				result = color+guild.getName()+" Guild Relations";
 				break;
 			case B_REQUESTS:
-				result = color+"Member Requests";
+				result = color+guild.getName()+" Guild Requests";
 				break;
 			case C_PROMOTE:
-				result = color+"Promote Officers";
+				result = color+guild.getName()+" Guild Promotion";
 				break;
 			case C_DEMOTE:
-				result = color+"Demote Officers";
+				result = color+guild.getName()+" Guild Demotion";
 				break;
 			case C_TRANSFER:
-				result = color+"Transfer Guild Master";
+				result = color+guild.getName()+" Guild Master Transfer";
 				break;
 			case C_SPECIALIZE:
-				result = color+"Guild Specialization";
+				result = color+guild.getName()+" Guild Specialization";
 				break;
 			case C_DISBAND:
-				result = color+"Disband your Guild";
+				result = color+"Disband "+guild.getName()+" Guild";
 				break;
 			default:
 				break;

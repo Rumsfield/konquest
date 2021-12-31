@@ -695,6 +695,7 @@ description:
   admin-forcejoin: "Forces a player to join a Kingdom and teleports them to the Capital."
   admin-forceexile: "Forces a player to become a Barbarian and teleports them to the Wild."
   admin-forcetown: "Forces a Town to accept the provided management sub-commands."
+  admin-forceguild: "Forces a Guild to accept the provided management sub-commands."
   admin-rename: "Renames a Kingdom or Town to newName."
   admin-ruin: "Manage a Ruin territory."
   admin-save: "Saves Kingdoms and Players data files."
