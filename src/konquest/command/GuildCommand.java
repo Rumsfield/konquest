@@ -73,20 +73,21 @@ public class GuildCommand extends CommandBase {
 	                    	int status = getKonquest().getGuildManager().createGuild(guildName, player);
 	                    	if(status == 0) {
 	                    		// Successful guild creation
-	                    		ChatUtil.sendNotice((Player) getSender(), "Successfully created new guild, "+guildName);
+	                    		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_GUILD_NOTICE_CREATE.getMessage(guildName));
 	                    		// Open guild menu for newly created guild
 	                    		KonGuild newGuild = getKonquest().getGuildManager().getPlayerGuild(bukkitPlayer);
 	                    		getKonquest().getDisplayManager().displayGuildMenu(player, newGuild, false);
 	                    	} else {
 	                    		switch(status) {
 		                    		case 1:
-		                    			ChatUtil.sendError((Player) getSender(), "Failed to create, bad name");
+		                    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
 		                    			break;
 		                    		case 2:
-		                    			ChatUtil.sendError((Player) getSender(), "Failed to create, leave your current guild first!");
+		                    			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_GUILD_ERROR_OTHER_GUILD.getMessage());
 		                    			break;
 		                    		case 3:
-		                    			ChatUtil.sendError((Player) getSender(), "Failed to create, not enough favor");
+		                    			String cost = String.format("%.2f",getKonquest().getGuildManager().getCostCreate());
+		                    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
 		                    			break;
 	                    			default:
 	                    				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
@@ -100,7 +101,7 @@ public class GuildCommand extends CommandBase {
 	            	case "add":
 	            		// Invite a new guild member (officers only)
 	            		if(guild == null) {
-	            			ChatUtil.sendError((Player) getSender(), "Guild not found!");
+	            			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_GUILD_ERROR_NO_GUILD.getMessage());
 	            			return;
 	            		}
 	            		if(!guild.isOfficer(bukkitPlayer.getUniqueId())) {
@@ -121,9 +122,9 @@ public class GuildCommand extends CommandBase {
 	            			playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
 	            			boolean status = getKonquest().getGuildManager().joinGuildInvite(offlinePlayer, guild);
 	            			if(status) {
-	            				ChatUtil.sendNotice((Player) getSender(), "Invited player to guild");
+	            				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_GUILD_NOTICE_INVITE.getMessage(playerName));
 	            			} else {
-	            				ChatUtil.sendError((Player) getSender(), "Failed to invite to guild");
+	            				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 	            			}
 	            		} else {
 	            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -132,7 +133,7 @@ public class GuildCommand extends CommandBase {
 	            	case "kick":
 	            		// Remove a guild member (officers only)
 	            		if(guild == null) {
-	            			ChatUtil.sendError((Player) getSender(), "Guild not found!");
+	            			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_GUILD_ERROR_NO_GUILD.getMessage());
 	            			return;
 	            		}
 	            		if(!guild.isOfficer(bukkitPlayer.getUniqueId())) {
@@ -153,9 +154,9 @@ public class GuildCommand extends CommandBase {
 	            			playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
 	            			boolean status = getKonquest().getGuildManager().kickGuildMember(offlinePlayer.getOfflineBukkitPlayer(), guild);
 	            			if(status) {
-	            				ChatUtil.sendNotice((Player) getSender(), "Kicked player from guild");
+	            				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_GUILD_NOTICE_KICK.getMessage(playerName));
 	            			} else {
-	            				ChatUtil.sendError((Player) getSender(), "Failed to kick player");
+	            				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 	            			}
 	            		} else {
 	            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -164,7 +165,7 @@ public class GuildCommand extends CommandBase {
 	            	case "rename":
 	            		// Rename your guild (master only)
 	            		if(guild == null) {
-	            			ChatUtil.sendError((Player) getSender(), "Guild not found!");
+	            			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_GUILD_ERROR_NO_GUILD.getMessage());
 	            			return;
 	            		}
 	            		if(!guild.isMaster(bukkitPlayer.getUniqueId())) {
@@ -178,9 +179,9 @@ public class GuildCommand extends CommandBase {
 	    	            	}
 	                    	boolean status = getKonquest().getGuildManager().renameGuild(guild, guildName, player);
 	                    	if(status) {
-	            				ChatUtil.sendNotice((Player) getSender(), "Successfully renamed guild to: "+guildName);
+	            				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_GUILD_NOTICE_RENAME.getMessage(guildName));
 	            			} else {
-	            				ChatUtil.sendError((Player) getSender(), "Failed to rename guild");
+	            				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 	            			}
 	            		} else {
 	            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());

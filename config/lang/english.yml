@@ -366,6 +366,15 @@ command:
   favor:
     notice:
       message: "You have %s Favor, costs are..."
+  guild:
+    notice:
+      create: "Successfully created new guild, %s"
+      invite: "Invited player %s to the guild."
+      kick: "Kicked player %s from the guild."
+      rename: "Successfully changed name to %s Guild."
+    error:
+      other-guild: "You are already in another guild."
+      no-guild: "You are not in a guild."
   help:
     notice:
       message: "Help - Command, Arguments, Description, Alias"
