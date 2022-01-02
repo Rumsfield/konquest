@@ -4,6 +4,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.type.Snow;
 
 public class BlockPaster {
@@ -49,7 +50,11 @@ public class BlockPaster {
                 Block monumentBlock = pasteChunk.getBlock(x-bottomBlockX, y-bottomBlockY+y_offset, z-bottomBlockZ);
                 if(!monumentBlock.getBlockData().matches(templateBlock.getBlockData())) {
                 	// Set local block to monument template block
-                    monumentBlock.setType(templateBlock.getType());
+                	if(templateBlock.getBlockData() instanceof Bisected) {
+                		monumentBlock.setType(templateBlock.getType(),false);
+                	} else {
+                		monumentBlock.setType(templateBlock.getType());
+                	}
                     monumentBlock.setBlockData(templateBlock.getBlockData().clone());
                 }
                 //ChatUtil.printDebug("Pasting block at "+monumentBlock.getLocation().toString()+" with template from "+templateBlock.getLocation().toString());
