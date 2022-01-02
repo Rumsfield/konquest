@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 //import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -42,18 +43,16 @@ public class KonConfig {
 	// returns false if the configuration could not be loaded, else true
 	public boolean reloadConfig() {
 		boolean result = true;
+		config = new YamlConfiguration();
 		if (file != null) {
-			config = YamlConfiguration.loadConfiguration(file);
-		} else {
-			config = new YamlConfiguration();
+			try {
+				config.load(file);
+			} catch (IOException | InvalidConfigurationException e) {
+				e.printStackTrace();
+				ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check for file syntax errors.");
+				result = false;
+			}
 		}
-		
-		String configStr = config.saveToString();
-		if (configStr.isEmpty()) {
-			result = false;
-			ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check for file syntax errors.");
-		}
-		
 		// look for defaults in jar, if any
 		try {
 			InputStream defaultFile = plugin.getResource(fileName);
@@ -135,8 +134,9 @@ public class KonConfig {
 				File oldVersionFile = new File(plugin.getDataFolder(), oldFileName);
 				try {
 			        config.save(oldVersionFile);
-			    } catch (IOException exception) {
+			    } catch (Exception exception) {
 			    	exception.printStackTrace();
+			    	ChatUtil.printConsoleError("Failed to save old config "+oldFileName+".");
 			    }
 				try {
 					Reader defaultConfigStream = new InputStreamReader(plugin.getResource(fileName), "UTF8");
