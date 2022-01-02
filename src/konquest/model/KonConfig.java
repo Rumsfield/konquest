@@ -8,8 +8,6 @@ import java.io.Reader;
 import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
-//import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -47,7 +45,7 @@ public class KonConfig {
 		if (file != null) {
 			try {
 				config.load(file);
-			} catch (IOException | InvalidConfigurationException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check for file syntax errors.");
 				result = false;
