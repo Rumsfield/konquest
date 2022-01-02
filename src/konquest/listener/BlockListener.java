@@ -670,51 +670,48 @@ public class BlockListener implements Listener {
 			if(!player.isAdminBypassActive()) {
 				// Check if the player is a barbarian placing a bed
 				if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed) {
-					if(campManager.isCampSet(player)) {
-						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
+					int status = campManager.addCamp(event.getBlock().getLocation(), (KonOfflinePlayer)player);
+					if(status == 0) { // on successful camp setup...
+						player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
+						//ChatUtil.sendNotice(event.getPlayer(), "Successfully set up camp");
+						ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
+						String territoryName = campManager.getCamp((KonOfflinePlayer)player).getName();
+						ChatUtil.sendKonTitle(player, "", ChatColor.YELLOW+territoryName);
 					} else {
-						int status = campManager.addCamp(event.getBlock().getLocation(), (KonOfflinePlayer)player);
-						if(status == 0) { // on successful camp setup...
-							player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
-							//ChatUtil.sendNotice(event.getPlayer(), "Successfully set up camp");
-							ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
-							String territoryName = campManager.getCamp((KonOfflinePlayer)player).getName();
-							ChatUtil.sendKonTitle(player, "", ChatColor.YELLOW+territoryName);
-						} else {
-							switch(status) {
-					    	case 1:
-					    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: New claims overlap with existing territory.");
-					    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
-					    		event.setCancelled(true);
-					    		break;
-					    	case 2:
-					    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Your camp already exists.");
-					    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_EXISTS.getMessage());
-					    		event.setCancelled(true);
-					    		break;
-					    	case 3:
-					    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: You are not a Barbarian.");
-					    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
-					    		event.setCancelled(true);
-					    		break;
-					    	case 4:
-					    		// This error message is removed because it could be annoying to see it every time a bed is placed when camps are disabled.
-					    		//ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
-					    		break;
-					    	case 5:
-					    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
-					    		event.setCancelled(true);
-					    		break;
-					    	default:
-					    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Unknown cause. Contact an Admin!");
-					    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-					    		break;
-							}
-							return;
+						switch(status) {
+				    	case 1:
+				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: New claims overlap with existing territory.");
+				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
+				    		event.setCancelled(true);
+				    		break;
+				    	case 2:
+				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Your camp already exists.");
+				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
+				    		event.setCancelled(true);
+				    		break;
+				    	case 3:
+				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: You are not a Barbarian.");
+				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
+				    		event.setCancelled(true);
+				    		break;
+				    	case 4:
+				    		// This error message is removed because it could be annoying to see it every time a bed is placed when camps are disabled.
+				    		//ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+				    		break;
+				    	case 5:
+				    		// This error message is removed because it could be annoying to see it every time a bed is placed in an invalid world.
+				    		//ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+				    		//event.setCancelled(true);
+				    		break;
+				    	default:
+				    		//ChatUtil.sendError(event.getPlayer(), "Camping failed: Unknown cause. Contact an Admin!");
+				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+				    		break;
 						}
+						return;
 					}
 				} else {
-					// Place occurred in the wild
+					// Wild placement by non-barbarian
 					boolean isWildBuild = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.wild_build", true);
 					if(!isWildBuild) {
 						// No building is allowed in the wild

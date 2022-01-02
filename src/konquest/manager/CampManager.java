@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -140,6 +141,10 @@ public class CampManager {
 			konquest.getIntegrationManager().deleteShopsInPoints(campPoints,barbarianCamps.get(uuid).getWorld());
 			KonCamp removedCamp = barbarianCamps.remove(uuid);
 			removedCamp.removeAllBarPlayers();
+			// Ensure bed is broken
+			if(removedCamp.getBedLocation().getBlock().getBlockData() instanceof Bed) {
+				removedCamp.getBedLocation().getBlock().breakNaturally();
+			}
 			//update the chunk cache, remove all points from primary world
 			kingdomManager.removeAllTerritory(removedCamp.getWorld(),removedCamp.getChunkList().keySet());
 			// Refresh groups
