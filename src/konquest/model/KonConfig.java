@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -38,17 +41,29 @@ public class KonConfig {
 		plugin = Konquest.getInstance().getPlugin();
 	}
 	
-	// returns false if the configuration could not be loaded, else true
+	// returns false if the configuration could not be loaded from a default resource or file
 	public boolean reloadConfig() {
 		boolean result = true;
+		boolean isFileValid = true;
 		config = new YamlConfiguration();
 		if (file != null) {
 			try {
 				config.load(file);
 			} catch (Exception e) {
 				e.printStackTrace();
-				ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check for file syntax errors.");
-				result = false;
+				ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check bad file for syntax errors.");
+				File badFile = new File(plugin.getDataFolder(), fileName+".bad");
+				Path source = file.toPath();
+				Path destination = badFile.toPath();
+				try {
+					Files.createDirectories(destination);
+					Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
+					saveDefaultConfig();
+				} catch (IOException io) {
+					io.printStackTrace();
+					ChatUtil.printConsoleError("Failed to save bad config file "+fileName);
+				}
+				isFileValid = false;
 			}
 		}
 		// look for defaults in jar, if any
@@ -58,7 +73,11 @@ public class KonConfig {
 				Reader defaultConfigStream = new InputStreamReader(defaultFile, "UTF8");
 				if (defaultConfigStream != null) {
 					YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
-					config.setDefaults(defaultConfig);
+					if(isFileValid) {
+						config.setDefaults(defaultConfig);
+					} else {
+						config = defaultConfig;
+					}
 				}
 			}
 		} catch (IOException exception) {
@@ -72,7 +91,6 @@ public class KonConfig {
 		if (config == null) {
 			reloadConfig();
 		}
-		
 		return config;
 	}
 	
