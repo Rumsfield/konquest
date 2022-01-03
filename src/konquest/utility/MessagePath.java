@@ -226,7 +226,6 @@ public enum MessagePath {
 	PROTECTION_ERROR_CAMP_UPDATE                (0, "protection.error.camp-update"),
 	PROTECTION_ERROR_CAMP_CREATE                (0, "protection.error.camp-create"),
 	PROTECTION_ERROR_CAMP_FAIL_OVERLAP          (0, "protection.error.camp-fail-overlap"),
-	PROTECTION_ERROR_CAMP_FAIL_EXISTS           (0, "protection.error.camp-fail-exists"),
 	PROTECTION_ERROR_CAMP_FAIL_BARBARIAN        (0, "protection.error.camp-fail-barbarian"),
 	PROTECTION_ERROR_CAPTURE                    (1, "protection.error.capture"),
 	PROTECTION_ERROR_GOLEM                      (1, "protection.error.golem"),

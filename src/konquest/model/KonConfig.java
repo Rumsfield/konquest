@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
-//import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -39,21 +41,31 @@ public class KonConfig {
 		plugin = Konquest.getInstance().getPlugin();
 	}
 	
-	// returns false if the configuration could not be loaded, else true
+	// returns false if the configuration could not be loaded from a default resource or file
 	public boolean reloadConfig() {
 		boolean result = true;
+		boolean isFileValid = true;
+		config = new YamlConfiguration();
 		if (file != null) {
-			config = YamlConfiguration.loadConfiguration(file);
-		} else {
-			config = new YamlConfiguration();
+			try {
+				config.load(file);
+			} catch (Exception e) {
+				e.printStackTrace();
+				ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check bad file for syntax errors.");
+				File badFile = new File(plugin.getDataFolder(), fileName+".bad");
+				Path source = file.toPath();
+				Path destination = badFile.toPath();
+				try {
+					Files.createDirectories(destination);
+					Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
+					saveDefaultConfig();
+				} catch (IOException io) {
+					io.printStackTrace();
+					ChatUtil.printConsoleError("Failed to save bad config file "+fileName);
+				}
+				isFileValid = false;
+			}
 		}
-		
-		String configStr = config.saveToString();
-		if (configStr.isEmpty()) {
-			result = false;
-			ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check for file syntax errors.");
-		}
-		
 		// look for defaults in jar, if any
 		try {
 			InputStream defaultFile = plugin.getResource(fileName);
@@ -61,7 +73,11 @@ public class KonConfig {
 				Reader defaultConfigStream = new InputStreamReader(defaultFile, "UTF8");
 				if (defaultConfigStream != null) {
 					YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
-					config.setDefaults(defaultConfig);
+					if(isFileValid) {
+						config.setDefaults(defaultConfig);
+					} else {
+						config = defaultConfig;
+					}
 				}
 			}
 		} catch (IOException exception) {
@@ -75,7 +91,6 @@ public class KonConfig {
 		if (config == null) {
 			reloadConfig();
 		}
-		
 		return config;
 	}
 	
@@ -135,8 +150,17 @@ public class KonConfig {
 				File oldVersionFile = new File(plugin.getDataFolder(), oldFileName);
 				try {
 			        config.save(oldVersionFile);
-			    } catch (IOException exception) {
+			    } catch (Exception exception) {
 			    	exception.printStackTrace();
+					Path source = file.toPath();
+					Path destination = oldVersionFile.toPath();
+					try {
+						Files.createDirectories(destination);
+						Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+					} catch (IOException io) {
+						io.printStackTrace();
+						ChatUtil.printConsoleError("Failed to save old config "+oldFileName+".");
+					}
 			    }
 				try {
 					Reader defaultConfigStream = new InputStreamReader(plugin.getResource(fileName), "UTF8");

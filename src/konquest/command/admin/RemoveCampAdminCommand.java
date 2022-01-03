@@ -29,14 +29,12 @@ public class RemoveCampAdminCommand extends CommandBase {
         } else {
         	//Player bukkitPlayer = (Player) getSender();
         	//World bukkitWorld = bukkitPlayer.getWorld();
-
         	/*
         	if(!getKonquest().isWorldValid(bukkitWorld)) {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
         	*/
-        	
         	String playerName = getArgs()[2];
         	
         	if(getKonquest().getPlayerManager().isPlayerNameExist(playerName)) {

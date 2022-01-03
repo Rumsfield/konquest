@@ -36,6 +36,7 @@ public class ConfigManager{
 		addConfig("shields", new KonConfig("shields",false));
 		addConfig("loot", new KonConfig("loot",false));
 		addConfig("prefix", new KonConfig("prefix",false));
+		
 		// Data Storage
 		migrateConfigFile("kingdoms.yml","data/kingdoms.yml");
 		migrateConfigFile("camps.yml","data/camps.yml");
@@ -45,9 +46,11 @@ public class ConfigManager{
 		addConfig("camps", new KonConfig("data/camps"));
 		addConfig("ruins", new KonConfig("data/ruins"));
 		addConfig("guilds", new KonConfig("data/guilds"));
+
 		// Language files
 		addConfig("lang_english", new KonConfig("lang/english",false));
 		updateConfigVersion("lang_english");
+		
 		// Language selection
 		language = getConfig("core").getString("language","english");
 		if(configCache.containsKey("lang_"+language)) {
@@ -60,6 +63,7 @@ public class ConfigManager{
 				langConfig = getConfig("lang_custom");
 				ChatUtil.printConsoleAlert("Using custom "+language+" language file");
 			} else {
+				// Failed to get any useful config, try to use english
 				langConfig = getConfig("lang_english");
 				ChatUtil.printConsoleError("Failed to load invalid language file "+language+".yml in Konquest/lang folder. Using default lang/english.yml.");
 			}
