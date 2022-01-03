@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -72,12 +73,17 @@ public class CampManager {
 	 * 					2 = camp already exists for player
 	 * 					3 = player is not a barbarian
 	 * 					4 = camps are disabled
+	 *                  5 = world is invalid
 	 */
 	public int addCamp(Location loc, KonOfflinePlayer player) {
 		boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.enable",true);
 		if(!enable) {
 			ChatUtil.printDebug("Failed to add camp, feature disabled!");
 			return 4;
+		}
+		if(!konquest.isWorldValid(loc)) {
+			ChatUtil.printDebug("Failed to add camp, location is in invalid world");
+			return 5;
 		}
 		String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
 		//ChatUtil.printDebug("Attempting to add new Camp for player "+player.getOfflineBukkitPlayer().getName()+" "+uuid);
@@ -135,6 +141,10 @@ public class CampManager {
 			konquest.getIntegrationManager().deleteShopsInPoints(campPoints,barbarianCamps.get(uuid).getWorld());
 			KonCamp removedCamp = barbarianCamps.remove(uuid);
 			removedCamp.removeAllBarPlayers();
+			// Ensure bed is broken
+			if(removedCamp.getBedLocation().getBlock().getBlockData() instanceof Bed) {
+				removedCamp.getBedLocation().getBlock().breakNaturally();
+			}
 			//update the chunk cache, remove all points from primary world
 			kingdomManager.removeAllTerritory(removedCamp.getWorld(),removedCamp.getChunkList().keySet());
 			// Refresh groups
