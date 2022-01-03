@@ -152,7 +152,15 @@ public class KonConfig {
 			        config.save(oldVersionFile);
 			    } catch (Exception exception) {
 			    	exception.printStackTrace();
-			    	ChatUtil.printConsoleError("Failed to save old config "+oldFileName+".");
+					Path source = file.toPath();
+					Path destination = oldVersionFile.toPath();
+					try {
+						Files.createDirectories(destination);
+						Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+					} catch (IOException io) {
+						io.printStackTrace();
+						ChatUtil.printConsoleError("Failed to save old config "+oldFileName+".");
+					}
 			    }
 				try {
 					Reader defaultConfigStream = new InputStreamReader(plugin.getResource(fileName), "UTF8");
