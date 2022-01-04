@@ -8,10 +8,8 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 
-import konquest.utility.ChatUtil;
 import konquest.utility.RequestKeeper;
 
 public class KonGuild {
@@ -242,18 +240,6 @@ public class KonGuild {
 	
 	public void removeJoinRequest(UUID id) {
 		joinRequestKeeper.removeJoinRequest(id);
-	}
-	
-	public void notifyJoinRequest(UUID id) {
-		String name = Bukkit.getOfflinePlayer(id).getName();
-		for(OfflinePlayer offlinePlayer : getPlayerOfficers()) {
-			if(offlinePlayer.isOnline()) {
-				//TODO: Add message for guild join request for officers
-				ChatUtil.sendNotice((Player)offlinePlayer, "Received new request from "+name+" to join guild");
-				//ChatUtil.sendNotice((Player)offlinePlayer, name+" wants to join "+getName()+", use \"/k town "+getName()+" add "+name+"\" to allow, \"/k town "+getName()+" kick "+name+"\" to deny", ChatColor.LIGHT_PURPLE);
-				//ChatUtil.sendNotice((Player)offlinePlayer, MessagePath.GENERIC_NOTICE_JOIN_REQUEST.getMessage(name,getName(),getName(),name,getName(),name), ChatColor.LIGHT_PURPLE);
-			}
-		}
 	}
 	
 	/*

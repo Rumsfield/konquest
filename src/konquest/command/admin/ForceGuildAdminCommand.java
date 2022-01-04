@@ -81,9 +81,9 @@ public class ForceGuildAdminCommand extends CommandBase {
 	            			playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
 	            			boolean status = getKonquest().getGuildManager().joinGuildInvite(offlinePlayer, guild);
 	            			if(status) {
-	            				ChatUtil.sendNotice((Player) getSender(), "Invited player to guild");
+	            				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_GUILD_NOTICE_INVITE.getMessage(playerName));
 	            			} else {
-	            				ChatUtil.sendError((Player) getSender(), "Failed to invite to guild");
+	            				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 	            			}
 	            		} else {
 	            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -105,9 +105,9 @@ public class ForceGuildAdminCommand extends CommandBase {
 	            			playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
 	            			boolean status = getKonquest().getGuildManager().kickGuildMember(offlinePlayer.getOfflineBukkitPlayer(), guild);
 	            			if(status) {
-	            				ChatUtil.sendNotice((Player) getSender(), "Kicked player from guild");
+	            				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_GUILD_NOTICE_KICK.getMessage(playerName));
 	            			} else {
-	            				ChatUtil.sendError((Player) getSender(), "Failed to kick player");
+	            				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 	            			}
 	            		} else {
 	            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -122,9 +122,9 @@ public class ForceGuildAdminCommand extends CommandBase {
 	    	            	}
 	                    	boolean status = getKonquest().getGuildManager().renameGuild(guild, guildNewName, player);
 	                    	if(status) {
-	            				ChatUtil.sendNotice((Player) getSender(), "Successfully renamed guild to: "+guildNewName);
+	            				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_GUILD_NOTICE_RENAME.getMessage(guildName));
 	            			} else {
-	            				ChatUtil.sendError((Player) getSender(), "Failed to rename guild");
+	            				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 	            			}
 	            		} else {
 	            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());

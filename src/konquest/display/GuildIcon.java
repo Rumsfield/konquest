@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import konquest.model.KonGuild;
+import konquest.utility.MessagePath;
 
 public class GuildIcon implements MenuIcon {
 	
@@ -21,7 +22,7 @@ public class GuildIcon implements MenuIcon {
 	private boolean isClickable;
 	
 	public GuildIcon(KonGuild guild, boolean isFriendly, boolean isArmistice, List<String> lore, int index, boolean isClickable) {
-		this.name = guild.getName()+" Guild";
+		this.name = guild.getName()+" "+MessagePath.LABEL_GUILD.getMessage();
 		this.lore = lore;
 		this.guild = guild;
 		this.index = index;
@@ -65,10 +66,10 @@ public class GuildIcon implements MenuIcon {
 		ChatColor valueColor = ChatColor.AQUA;
 		List<String> loreList = new ArrayList<String>();
 		if(guild != null) {
-			loreList.add(loreColor+"Towns: "+valueColor+guild.getNumTowns());
-			loreList.add(loreColor+"Land: "+valueColor+guild.getNumLand());
-			loreList.add(loreColor+"Members: "+valueColor+guild.getNumMembers());
-			loreList.add(loreColor+"Specialization: "+valueColor+guild.getSpecialization().name());
+			loreList.add(loreColor+MessagePath.LABEL_TOWNS.getMessage()+": "+valueColor+guild.getNumTowns());
+			loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+guild.getNumLand());
+			loreList.add(loreColor+MessagePath.LABEL_PLAYERS.getMessage()+": "+valueColor+guild.getNumMembers());
+			loreList.add(loreColor+MessagePath.LABEL_SPECIALIZATION.getMessage()+": "+valueColor+guild.getSpecialization().name());
 		}
 		loreList.addAll(lore);
 		meta.setLore(loreList);

@@ -225,7 +225,7 @@ public class GuildManager implements Timeable {
 			if(offlinePlayer.isOnline() && payAmount > 0) {
 				Player player = (Player)offlinePlayer;
 				if(KonquestPlugin.depositPlayer(player, payAmount)) {
-	            	ChatUtil.sendNotice(player, "Received guild payment");
+	            	ChatUtil.sendNotice(player, MessagePath.COMMAND_GUILD_NOTICE_PAY.getMessage());
 	            }
 			}
 		}
@@ -260,8 +260,7 @@ public class GuildManager implements Timeable {
 				Villager host = (Villager)merch.getHolder();
 				if(host.getProfession().equals(townGuild.getSpecialization())) {
 					if(!doDiscounts) {
-						// TODO: use MessagePath
-						ChatUtil.sendError(player.getBukkitPlayer(), townGuild.getName()+" Guild is blocking your guild from trade discounts with this merchant!");
+						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_SANCTION.getMessage(townGuild.getName()));
 						return;
 					}
 					// Proceed with discounts for the valid villager's profession
@@ -291,8 +290,8 @@ public class GuildManager implements Timeable {
 					tradeHost.setRecipes(tradeListDiscounted);
 					if(discountPercent > 0) {
 						Konquest.playDiscountSound(player.getBukkitPlayer());
-						// TODO: use MessagePath
-						ChatUtil.sendNotice(player.getBukkitPlayer(), townGuild.getName()+" Guild gives you a "+discountPercent+" percent discount with this merchant");
+						String discountStr = ""+discountPercent;
+						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_DISCOUNT.getMessage(townGuild.getName(),discountStr));
 					}
 				}
 			}
@@ -343,7 +342,8 @@ public class GuildManager implements Timeable {
 		// Check cost
 		if(costRename > 0) {
 			if(KonquestPlugin.getBalance(bukkitPlayer) < costRename) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costRename));
+				String costStr = ""+costRename;
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costStr));
                 return false;
 			}
     	}
@@ -373,10 +373,10 @@ public class GuildManager implements Timeable {
 		if(guild != null) {
 			if(guild.isOpen()) {
 				guild.setIsOpen(false);
-				ChatUtil.sendNotice(player.getBukkitPlayer(), guild.getName()+" Guild changed to closed");
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_CLOSED.getMessage(guild.getName()));
 			} else {
 				guild.setIsOpen(true);
-				ChatUtil.sendNotice(player.getBukkitPlayer(), guild.getName()+" Guild changed to open");
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_OPEN.getMessage(guild.getName()));
 			}
 		}
 	}
@@ -398,12 +398,12 @@ public class GuildManager implements Timeable {
 				}
 				if(guild.isSanction(otherGuild)) {
 					guild.removeSanction(otherGuild);
-					broadcastGuild(guild, "Removed sanction for "+otherGuild.getName()+" Guild");
-					broadcastGuild(otherGuild, guild.getName()+" Guild has removed the sanction on your guild!");
+					broadcastGuild(guild, MessagePath.COMMAND_GUILD_BROADCAST_SANCTION_REMOVE_1.getMessage(otherGuild.getName()));
+					broadcastGuild(otherGuild, MessagePath.COMMAND_GUILD_BROADCAST_SANCTION_REMOVE_2.getMessage(guild.getName()));
 				} else {
 					guild.addSanction(otherGuild);
-					broadcastGuild(guild, "Added sanction for "+otherGuild.getName()+" Guild");
-					broadcastGuild(otherGuild, guild.getName()+" Guild has added a sanction on your guild!");
+					broadcastGuild(guild, MessagePath.COMMAND_GUILD_BROADCAST_SANCTION_ADD_1.getMessage(otherGuild.getName()));
+					broadcastGuild(otherGuild, MessagePath.COMMAND_GUILD_BROADCAST_SANCTION_ADD_2.getMessage(guild.getName()));
 				}
 			} else {
 				if(guild.isArmistice(otherGuild)) {
@@ -414,8 +414,8 @@ public class GuildManager implements Timeable {
 					updateAllMemberColors(otherGuild);
 					guild.getKingdom().updateAllTownBars();
 					otherGuild.getKingdom().updateAllTownBars();
-					broadcastGuild(guild, "Broke the armistice with "+otherGuild.getName()+" Guild");
-					broadcastGuild(otherGuild, guild.getName()+" Guild has broken the armistice with your guild!");
+					broadcastGuild(guild, MessagePath.COMMAND_GUILD_BROADCAST_ARMISTICE_REMOVE_1.getMessage(otherGuild.getName()));
+					broadcastGuild(otherGuild, MessagePath.COMMAND_GUILD_BROADCAST_ARMISTICE_REMOVE_2.getMessage(guild.getName()));
 				} else {
 					// When both sides offer an armistice, set up protections
 					guild.addArmistice(otherGuild);
@@ -424,11 +424,11 @@ public class GuildManager implements Timeable {
 						updateAllMemberColors(otherGuild);
 						guild.getKingdom().updateAllTownBars();
 						otherGuild.getKingdom().updateAllTownBars();
-						broadcastGuild(guild, "Your guild agreed to an armistice with "+otherGuild.getName()+" Guild");
-						broadcastGuild(otherGuild, guild.getName()+" Guild has accepted an armistice with your guild!");
+						broadcastGuild(guild, MessagePath.COMMAND_GUILD_BROADCAST_ARMISTICE_ACCEPT_1.getMessage(otherGuild.getName()));
+						broadcastGuild(otherGuild, MessagePath.COMMAND_GUILD_BROADCAST_ARMISTICE_ACCEPT_2.getMessage(guild.getName()));
 					} else {
-						broadcastGuild(guild, "Offered an armistice with "+otherGuild.getName()+" Guild");
-						broadcastGuild(otherGuild, guild.getName()+" Guild has offered an armistice with your guild!");
+						broadcastGuild(guild, MessagePath.COMMAND_GUILD_BROADCAST_ARMISTICE_OFFER_1.getMessage(otherGuild.getName()));
+						broadcastGuild(otherGuild, MessagePath.COMMAND_GUILD_BROADCAST_ARMISTICE_OFFER_2.getMessage(guild.getName()));
 					}
 				}
 			}
@@ -492,20 +492,20 @@ public class GuildManager implements Timeable {
 						if(playerGuild == null) {
 							addMember(guild, id, false);
 							guild.removeJoinRequest(id);
-							ChatUtil.sendNotice(player.getBukkitPlayer(), "Successfully joined guild");
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(guild.getName()));
 							Konquest.playSuccessSound(player.getBukkitPlayer());
 						} else {
-							ChatUtil.sendError(player.getBukkitPlayer(), "Leave your current guild first!");
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_LEAVE_FIRST.getMessage());
 							Konquest.playFailSound(player.getBukkitPlayer());
 						}
 					} else if(!guild.isJoinRequestValid(id)){
 						// Request to join if not already requested
 						guild.addJoinRequest(id, false);
-						ChatUtil.sendNotice(player.getBukkitPlayer(), "Sent request to join the guild");
+						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_REQUEST_JOIN.getMessage(guild.getName()));
 						Konquest.playSuccessSound(player.getBukkitPlayer());
-						broadcastOfficersGuild(guild,"New guild join request, type \"/k guild\" to review");
+						broadcastOfficersGuild(guild, MessagePath.COMMAND_GUILD_NOTICE_REQUEST_NEW.getMessage());
 					} else {
-						ChatUtil.sendError(player.getBukkitPlayer(), "You have already requested to join");
+						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_REQUEST_SENT.getMessage(guild.getName()));
 						Konquest.playFailSound(player.getBukkitPlayer());
 					}
 				}
@@ -534,7 +534,7 @@ public class GuildManager implements Timeable {
 						// Approved join request, add player as member
 						addMember(guild, id, false);
 						if(player.isOnline()) {
-							ChatUtil.sendNotice((Player)player, guild.getName()+" Guild join request accepted");
+							ChatUtil.sendNotice((Player)player, MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(guild.getName()));
 						}
 					} else {
 						result = false;
@@ -542,7 +542,7 @@ public class GuildManager implements Timeable {
 				} else {
 					// Denied join request
 					if(player.isOnline()) {
-						ChatUtil.sendError((Player)player, guild.getName()+" Guild join request denied");
+						ChatUtil.sendError((Player)player, MessagePath.COMMAND_GUILD_ERROR_JOIN_DENY.getMessage(guild.getName()));
 					}
 				}
 				guild.removeJoinRequest(id);
@@ -572,7 +572,7 @@ public class GuildManager implements Timeable {
 							addMember(guild, id, false);
 							guild.removeJoinRequest(id);
 							if(offlineBukkitPlayer.isOnline()) {
-								ChatUtil.sendNotice((Player)offlineBukkitPlayer, guild.getName()+" Guild join request accepted");
+								ChatUtil.sendNotice((Player)offlineBukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(guild.getName()));
 							}
 							result = true;
 						}
@@ -580,7 +580,7 @@ public class GuildManager implements Timeable {
 						// Invite to join if not already invited
 						guild.addJoinRequest(id, true);
 						if(offlineBukkitPlayer.isOnline()) {
-							ChatUtil.sendNotice((Player)offlineBukkitPlayer, "Received new guild invite. Type \"/k guild\" to respond to invites.");
+							ChatUtil.sendNotice((Player)offlineBukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_INVITE_NEW.getMessage());
 						}
 						result = true;
 					}
@@ -608,17 +608,17 @@ public class GuildManager implements Timeable {
 						// Accept join invite, add as member
 						addMember(guild, id, false);
 						guild.removeJoinRequest(id);
-						ChatUtil.sendNotice(player.getBukkitPlayer(), guild.getName()+" Guild join invite accepted");
+						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(guild.getName()));
 						Konquest.playSuccessSound(player.getBukkitPlayer());
 					} else {
-						ChatUtil.sendError(player.getBukkitPlayer(), "Leave your current guild first!");
+						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_LEAVE_FIRST.getMessage());
 						Konquest.playFailSound(player.getBukkitPlayer());
 					}
 					result = true;
 				} else {
 					// Denied join request
 					guild.removeJoinRequest(id);
-					ChatUtil.sendNotice(player.getBukkitPlayer(), guild.getName()+" Guild join invite declined");
+					ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_INVITE_DECLINE.getMessage(guild.getName()));
 				}
 			}
 		}
@@ -630,10 +630,10 @@ public class GuildManager implements Timeable {
 			UUID id = player.getBukkitPlayer().getUniqueId();
 			boolean status = removeMember(guild, id);
 			if(status) {
-				ChatUtil.sendNotice(player.getBukkitPlayer(), "Successfully left the guild");
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_LEAVE.getMessage(guild.getName()));
 				Konquest.playSuccessSound(player.getBukkitPlayer());
 			} else {
-				ChatUtil.sendNotice(player.getBukkitPlayer(), "Failed to leave, try disbanding instead");
+				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_LEAVE_FAIL.getMessage());
 				Konquest.playFailSound(player.getBukkitPlayer());
 			}
 		}
