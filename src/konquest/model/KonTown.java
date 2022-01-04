@@ -189,13 +189,14 @@ public class KonTown extends KonTerritory implements Timeable {
 		}
 		
 		// Verify there is not too much air below the base Y location, no more than 10 layers of 16x16 blocks.
-		if(countAirBelowMonument() > 2560) {
+		int baseDepth = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.settle_checks_depth",0);
+		if(baseDepth > 0 && countAirBelowMonument(baseDepth) > 2560) {
 			ChatUtil.printDebug("Town init failed: too much air below monument");
 			return 3;
 		}
 		
-		// Verify there is not too much water in this chunk, no more than 3 layers of 16x16 blocks.
-		if(countWaterInChunk() > 768) {
+		// Verify there is not too much water in this chunk, no more than 5 layers of 16x16 blocks.
+		if(countWaterInChunk() > 1280) {
 			ChatUtil.printDebug("Town init failed: too much water in the chunk");
 			return 3;
 		}
@@ -380,6 +381,10 @@ public class KonTown extends KonTerritory implements Timeable {
 		return true;
 	}
 	
+	/**
+	 * Counts all water blocks in the entire chunk
+	 * @return
+	 */
 	public int countWaterInChunk() {
 		int count = 0;
 		for (int x = 0; x <= 15; x++) {
@@ -395,10 +400,20 @@ public class KonTown extends KonTerritory implements Timeable {
 		return count;
 	}
 	
-	public int countAirBelowMonument() {
+	/**
+	 * Count the number of air blocks below the monument base, for height specified by limit
+	 * @param limit - The height below the monument base to check for air
+	 * @return
+	 */
+	public int countAirBelowMonument(int limit) {
 		int count = 0;
+		int yMin = 0;
+		int yMax = monument.getBaseY();
+		if(limit > 0) {
+			yMin = monument.getBaseY() - limit;
+		}
 		for (int x = 0; x <= 15; x++) {
-            for (int y = 0; y <= monument.getBaseY(); y++) {
+            for (int y = yMin; y <= yMax; y++) {
                 for (int z = 0; z <= 15; z++) {
                     Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
                     if(currentBlock.getType().equals(Material.AIR)) {

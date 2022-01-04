@@ -71,6 +71,7 @@ core:
     min_distance_capital: 16
     max_distance_all: 99
     max_size: 16
+    settle_checks_depth: 32
     init_radius: 2
     capture_upgrades: true
     capture_cooldown: 600
