@@ -120,6 +120,7 @@ core:
     remove_favor: true
     remove_stats: true
     random_wild: true
+    world_spawn: false
   camps:
     enable: true
     init_radius: 2

@@ -238,7 +238,7 @@ public class KingdomManager {
 	 * @param player
 	 * @return true if not already barbarian and the teleport was successful, else false.
 	 */
-	public boolean exilePlayer(KonPlayer player, boolean teleport, boolean stats) {
+	public boolean exilePlayer(KonPlayer player, boolean teleport, boolean clearStats) {
     	if(player.isBarbarian()) {
     		return false;
     	}
@@ -251,17 +251,31 @@ public class KingdomManager {
 		if(invokeEvent.isCancelled()) {
 			return false;
 		}
-    	//boolean doWildTeleport = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.random_wild", true);
+		boolean doWildTeleport = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.random_wild", true);
+		boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
+		boolean doWorldSpawn = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.world_spawn", false);
     	if(teleport) {
-    		if(!konquest.isWorldValid(player.getBukkitPlayer().getLocation().getWorld())) {
+    		World playerWorld = player.getBukkitPlayer().getLocation().getWorld();
+    		if(!konquest.isWorldValid(playerWorld)) {
         		return false;
         	}
-			Location randomWildLoc = konquest.getRandomWildLocation(player.getBukkitPlayer().getLocation().getWorld());
-	    	if(randomWildLoc == null) {
-	    		return false;
+    		Location exileLoc = null;
+    		if(doWorldSpawn) {
+    			exileLoc = playerWorld.getSpawnLocation();
+    		} else if(doWildTeleport) {
+    			exileLoc = konquest.getRandomWildLocation(playerWorld);
+    			if(exileLoc == null) {
+    	    		return false;
+    	    	}
+    		} else {
+    			ChatUtil.printDebug("Teleport for player "+player.getBukkitPlayer().getName()+" on exile is disabled.");
+    		}
+	    	if(exileLoc != null) {
+	    		player.getBukkitPlayer().teleport(exileLoc);
+		    	player.getBukkitPlayer().setBedSpawnLocation(exileLoc, true);
+	    	} else {
+	    		ChatUtil.printDebug("Could not teleport player "+player.getBukkitPlayer().getName()+" on exile, disabled or null location.");
 	    	}
-	    	player.getBukkitPlayer().teleport(randomWildLoc);
-	    	player.getBukkitPlayer().setBedSpawnLocation(randomWildLoc, true);
     	}
     	player.setExileKingdom(oldKingdom);
     	// Remove guild
@@ -275,7 +289,7 @@ public class KingdomManager {
     		}
     	}
     	//boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
-    	if(stats) {
+    	if(doRemoveStats && clearStats) {
 	    	// Clear all stats
 	    	player.getPlayerStats().clearStats();
 	    	// Disable prefix
