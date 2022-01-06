@@ -256,8 +256,7 @@ public class KingdomManager {
     		if(!konquest.isWorldValid(player.getBukkitPlayer().getLocation().getWorld())) {
         		return false;
         	}
-    		int radius = konquest.getConfigManager().getConfig("core").getInt("core.travel_wild_random_radius",200);
-			Location randomWildLoc = konquest.getRandomWildLocation(radius*2,player.getBukkitPlayer().getLocation().getWorld());
+			Location randomWildLoc = konquest.getRandomWildLocation(player.getBukkitPlayer().getLocation().getWorld());
 	    	if(randomWildLoc == null) {
 	    		return false;
 	    	}

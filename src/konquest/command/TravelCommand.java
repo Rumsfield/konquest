@@ -79,8 +79,14 @@ public class TravelCommand extends CommandBase {
             		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
                     return;
             	}
-        		travelLoc = player.getKingdom().getCapital().getSpawnLoc();
-        		destination = TravelDestination.CAPITAL;
+        		boolean isCapitalTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.capital",false);
+        		if(isCapitalTravel) {
+        			travelLoc = player.getKingdom().getCapital().getSpawnLoc();
+            		destination = TravelDestination.CAPITAL;
+        		} else {
+            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+                    return;
+        		}
         	} else if(travelName.equalsIgnoreCase("camp")) {
         		// Travel to camp
         		if(!player.isBarbarian()) {
@@ -93,8 +99,14 @@ public class TravelCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_NO_CAMP.getMessage());
                     return;
         		}
-        		travelLoc = getKonquest().getCampManager().getCamp((KonOfflinePlayer)player).getSpawnLoc();
-        		destination = TravelDestination.CAMP;
+        		boolean isCampTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.camp",false);
+        		if(isCampTravel) {
+        			travelLoc = getKonquest().getCampManager().getCamp((KonOfflinePlayer)player).getSpawnLoc();
+            		destination = TravelDestination.CAMP;
+        		} else {
+            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+                    return;
+        		}
         	} else if(travelName.equalsIgnoreCase("home")) {
         		// Travel to bed home
         		if(player.isBarbarian()) {
@@ -108,17 +120,23 @@ public class TravelCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_NO_HOME.getMessage());
                     return;
         		}
-        		travelLoc = bedLoc;
-        		destination = TravelDestination.HOME;
+        		boolean isHomeTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.home",false);
+        		if(isHomeTravel) {
+        			travelLoc = bedLoc;
+            		destination = TravelDestination.HOME;
+        		} else {
+            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+                    return;
+        		}
         	} else if(travelName.equalsIgnoreCase("wild")) {
         		// Travel to random wild location
-        		int radius = getKonquest().getConfigManager().getConfig("core").getInt("core.travel_wild_random_radius",200);
-        		if(radius <= 0) {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
-                    return;
-        		} else {
-        			travelLoc = getKonquest().getRandomWildLocation(radius*2,bukkitWorld);
+        		boolean isWildTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.wild",false);
+        		if(isWildTravel) {
+        			travelLoc = getKonquest().getRandomWildLocation(bukkitWorld);
             		destination = TravelDestination.WILD;
+        		} else {
+            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+                    return;
         		}
         	} else {
         		// Travel to town
@@ -139,8 +157,14 @@ public class TravelCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_COOLDOWN.getMessage(cooldown,town.getName()));
                     return;
         		}
-        		travelLoc = town.getSpawnLoc();
-        		destination = TravelDestination.TOWN;
+        		boolean isTownTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.towns",false);
+        		if(isTownTravel) {
+        			travelLoc = town.getSpawnLoc();
+            		destination = TravelDestination.TOWN;
+        		} else {
+            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+                    return;
+        		}
         	}
         	// Second, determine whether player can cover cost
         	if(!destination.equals(TravelDestination.CAMP)) {
@@ -214,22 +238,26 @@ public class TravelCommand extends CommandBase {
 	
 	@Override
 	public List<String> tabComplete() {
-		// k travel town1|capital|home|wild
+		// k travel town1|capital|home|wild|camp
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
-		
 		if(getArgs().length == 2) {
+			boolean isCapitalTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.capital",false);
+			boolean isTownTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.towns",false);
+			boolean isHomeTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.home",false);
+			boolean isCampTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.camp",false);
+			boolean isWildTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.wild",false);
 			Player bukkitPlayer = (Player) getSender();
 			KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 			if(player.isBarbarian()) {
-				tabList.add("camp");
-				tabList.add("wild");
+				if(isCampTravel) {tabList.add("camp");}
+				if(isWildTravel) {tabList.add("wild");}
 	    	} else {
 	    		List<String> townList = player.getKingdom().getTownNames();
-	    		tabList.add("capital");
-	    		tabList.add("home");
-	    		tabList.add("wild");
-	    		tabList.addAll(townList);
+	    		if(isCapitalTravel) {tabList.add("capital");}
+	    		if(isHomeTravel) {tabList.add("home");}
+	    		if(isWildTravel) {tabList.add("wild");}
+	    		if(isTownTravel) {tabList.addAll(townList);}
 	    	}
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);

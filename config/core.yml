@@ -17,7 +17,6 @@ core:
   community_link: www.google.com
   accomplishment_prefix: true
   directive_quests: true
-  travel_wild_random_radius: 1000
   placeholder_request_limit: 60
   chat:
     tag: '&7[&6Konquest&7]&f '
@@ -38,6 +37,16 @@ core:
     quickshop: false
     luckperms: false
     dynmap: false
+  travel:
+    enable:
+      towns: true
+      capital: true
+      home: true
+      camp: true
+      wild: true
+    wild_radius: 1000
+    wild_center_x: 0
+    wild_center_z: 0
   kingdoms:
     capital_suffix: Capital
     capital_pvp: false

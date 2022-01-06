@@ -871,18 +871,21 @@ public class Konquest implements Timeable {
 	}
 	
 	// This can return null!
-	public Location getRandomWildLocation(int worldSize, World world) {
+	public Location getRandomWildLocation(World world) {
 		Location wildLoc = null;
-		ChatUtil.printDebug("Generating random wilderness location for size "+worldSize);
-		
+		int radius = configManager.getConfig("core").getInt("core.travel.wild_radius",500);
+		int offsetX = configManager.getConfig("core").getInt("core.travel.wild_center_x",0);
+		int offsetZ = configManager.getConfig("core").getInt("core.travel.wild_center_z",0);
+		radius = radius > 0 ? radius : 2;
+		ChatUtil.printDebug("Generating random wilderness location at center "+offsetX+","+offsetZ+" in radius "+radius);
 		int randomNumX = 0;
 		int randomNumZ = 0;
 		int randomNumY = 0;
 		boolean foundValidLoc = false;
 		int timeout = 0;
 		while(!foundValidLoc) {
-			randomNumX = ThreadLocalRandom.current().nextInt(-1*(worldSize/2), (worldSize/2) + 1);
-			randomNumZ = ThreadLocalRandom.current().nextInt(-1*(worldSize/2), (worldSize/2) + 1);
+			randomNumX = ThreadLocalRandom.current().nextInt(-1*(radius), (radius) + 1) + offsetX;
+			randomNumZ = ThreadLocalRandom.current().nextInt(-1*(radius), (radius) + 1) + offsetZ;
 			randomNumY = world.getHighestBlockYAt(randomNumX,randomNumZ) + 3;
 			wildLoc = new Location(world, randomNumX, randomNumY, randomNumZ);
 			if(!kingdomManager.isChunkClaimed(wildLoc)) {
