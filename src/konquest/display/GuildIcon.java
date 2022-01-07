@@ -66,7 +66,7 @@ public class GuildIcon implements MenuIcon {
 		ChatColor valueColor = ChatColor.AQUA;
 		List<String> loreList = new ArrayList<String>();
 		if(guild != null) {
-			loreList.add(loreColor+MessagePath.LABEL_TOWNS.getMessage()+": "+valueColor+guild.getNumTowns());
+			loreList.add(loreColor+MessagePath.LABEL_KINGDOM.getMessage()+": "+valueColor+guild.getKingdom().getName());
 			loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+guild.getNumLand());
 			loreList.add(loreColor+MessagePath.LABEL_PLAYERS.getMessage()+": "+valueColor+guild.getNumMembers());
 			loreList.add(loreColor+MessagePath.LABEL_SPECIALIZATION.getMessage()+": "+valueColor+guild.getSpecialization().name());

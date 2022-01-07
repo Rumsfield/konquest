@@ -321,6 +321,7 @@ public class GuildManager implements Timeable {
 			if(currentGuild == null) {
 				KonGuild newGuild = new KonGuild(name, master.getBukkitPlayer().getUniqueId(), master.getKingdom());
 				guilds.add(newGuild);
+				clearGuildCacheEntry(bukkitPlayer.getUniqueId());
 				// Withdraw cost
 				if(costCreate > 0 && newGuild != null) {
 		            if(KonquestPlugin.withdrawPlayer(bukkitPlayer, costCreate)) {
@@ -362,11 +363,22 @@ public class GuildManager implements Timeable {
 	}
 	
 	public void removeGuild(KonGuild guild) {
-		guilds.remove(guild);
+		KonGuild tmpGuild = guild;
+		// Remove guild from memory
+		guilds.remove(tmpGuild);
+		// Remove all guild members from cache
+		UUID id = null;
+		for(OfflinePlayer member : tmpGuild.getPlayerMembers()) {
+			id = member.getUniqueId();
+			if(id != null) {
+				clearGuildCacheEntry(id);
+			}
+		}
 		// Remove the guild from all other relationships
 		for(KonGuild currentGuild : guilds) {
-			currentGuild.removeGuildRelationship(guild);
+			currentGuild.removeGuildRelationship(tmpGuild);
 		}
+		tmpGuild = null;
 	}
 	
 	public void toggleGuildOpen(KonGuild guild, KonPlayer player) {
@@ -469,6 +481,17 @@ public class GuildManager implements Timeable {
 		return true;
 	}
 	
+	private void clearGuildCacheEntry(UUID id) {
+		KonGuild oldGuild = playerGuildCache.remove(id);
+		konquest.updateNamePackets(id);
+		
+		if(oldGuild == null) {
+			ChatUtil.printDebug("Cleared player cache of null guild");
+		} else {
+			ChatUtil.printDebug("Cleared player cache of real guild");
+		}
+	}
+	
 	/*
 	 * ===================================
 	 * Membership Methods
@@ -508,10 +531,13 @@ public class GuildManager implements Timeable {
 						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_REQUEST_SENT.getMessage(guild.getName()));
 						Konquest.playFailSound(player.getBukkitPlayer());
 					}
+				} else {
+					Konquest.playFailSound(player.getBukkitPlayer());
 				}
+			} else {
+				Konquest.playFailSound(player.getBukkitPlayer());
 			}
 		}
-		
 	}
 	
 	/**
@@ -641,8 +667,10 @@ public class GuildManager implements Timeable {
 	
 	public boolean kickGuildMember(OfflinePlayer player, KonGuild guild) {
 		boolean result = false;
-		UUID id = player.getUniqueId();
-		result = removeMember(guild, id);
+		if(guild != null) {
+			UUID id = player.getUniqueId();
+			result = removeMember(guild, id);
+		}
 		return result;
 	}
 	
@@ -728,8 +756,7 @@ public class GuildManager implements Timeable {
 	private boolean removeMember(KonGuild guild, UUID id) {
 		boolean result = guild.removeMember(id);
 		if(result) {
-			playerGuildCache.remove(id);
-			konquest.updateNamePackets(id);
+			clearGuildCacheEntry(id);
 		}
 		return result;
 	}
@@ -737,8 +764,7 @@ public class GuildManager implements Timeable {
 	private boolean addMember(KonGuild guild, UUID id, boolean isOfficer) {
 		boolean result = guild.addMember(id, isOfficer);
 		if(result) {
-			playerGuildCache.remove(id);
-			konquest.updateNamePackets(id);
+			clearGuildCacheEntry(id);
 		}
 		return result;
 	}
@@ -823,6 +849,11 @@ public class GuildManager implements Timeable {
 					}
 				}
 				playerGuildCache.put(id, result); // can be null!
+				if(result == null) {
+					ChatUtil.printDebug("Put null guild into player cache");
+				} else {
+					ChatUtil.printDebug("Put real guild into player cache");
+				}
 			}
 		}
 		return result;

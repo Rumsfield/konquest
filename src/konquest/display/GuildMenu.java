@@ -2,6 +2,7 @@ package konquest.display;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -80,6 +81,7 @@ public class GuildMenu implements StateMenu {
 	private KonGuild guild;
 	private boolean isAdmin;
 	private AccessType menuAccess;
+	private Comparator<KonGuild> guildComparator;
 	
 	public GuildMenu(GuildManager manager, KonPlayer player, KonGuild guild, boolean isAdmin) {
 		this.views = new HashMap<MenuState,DisplayMenu>();
@@ -91,6 +93,29 @@ public class GuildMenu implements StateMenu {
 		this.guild = guild;
 		this.isAdmin = isAdmin;
 		this.menuAccess = AccessType.REGULAR;
+		this.guildComparator = new Comparator<KonGuild>() {
+   			@Override
+   			public int compare(final KonGuild g1, KonGuild g2) {
+   				// sort by land, then population
+   				int result = 0;
+   				int g1Land = g1.getNumLand();
+   				int g2Land = g2.getNumLand();
+   				if(g1Land < g2Land) {
+   					result = 1;
+   				} else if(g1Land > g2Land) {
+   					result = -1;
+   				} else {
+   					int g1Pop = g1.getNumMembers();
+   					int g2Pop = g2.getNumMembers();
+   					if(g1Pop < g2Pop) {
+   						result = 1;
+   					} else if(g1Pop > g2Pop) {
+   						result = -1;
+   					}
+   				}
+   				return result;
+   			}
+   		};
 		
 		initializeMenu();
 		renderDefaultViews();
@@ -127,16 +152,6 @@ public class GuildMenu implements StateMenu {
 		renderView = createLeaveView();
 		views.put(MenuState.A_LEAVE, renderView);
 		refreshNavigationButtons(MenuState.A_LEAVE);
-		
-		/* Disband View */
-		renderView = createDisbandView();
-		views.put(MenuState.C_DISBAND, renderView);
-		refreshNavigationButtons(MenuState.C_DISBAND);
-		
-		/* Specialize View */
-		renderView = createSpecializeView();
-		views.put(MenuState.C_SPECIALIZE, renderView);
-		refreshNavigationButtons(MenuState.C_SPECIALIZE);
 	}
 	
 	private DisplayMenu createRootView() {
@@ -355,6 +370,8 @@ public class GuildMenu implements StateMenu {
 		} else {
 			return null;
 		}
+		// Sort guild list by land then population
+		Collections.sort(guilds, guildComparator);
 		
 		// Create page(s)
 		String pageLabel = "";
@@ -381,6 +398,9 @@ public class GuildMenu implements StateMenu {
 				loreList = new ArrayList<String>();
 				boolean isFriendly = false;
 				boolean isArmistice = false;
+				if(player.getKingdom().equals(currentGuild.getKingdom())) {
+					isFriendly = true;
+				}
 				if(guild != null) {
 					if(!player.getKingdom().equals(currentGuild.getKingdom())) {
 						String theirEnemyStatus = currentGuild.isArmistice(guild) ? MessagePath.LABEL_ARMISTICE.getMessage() : MessagePath.LABEL_HOSTILE.getMessage();
@@ -392,7 +412,6 @@ public class GuildMenu implements StateMenu {
 						loreList.add(loreColor+MessagePath.MENU_GUILD_THEIR_STATUS.getMessage()+": "+valueColor+theirFriendlyStatus);
 						String guildFriendlyStatus = guild.isSanction(currentGuild) ? MessagePath.LABEL_SANCTION.getMessage() : MessagePath.LABEL_TREATY.getMessage();
 						loreList.add(loreColor+MessagePath.MENU_GUILD_OUR_STATUS.getMessage()+": "+valueColor+guildFriendlyStatus);
-						isFriendly = true;
 					}
 					isArmistice = manager.isArmistice(guild, currentGuild);
 					if(context.equals(MenuState.B_RELATIONSHIP) && !isAdmin) {
@@ -574,7 +593,7 @@ public class GuildMenu implements StateMenu {
 						
 					} else if(slot == ROOT_SLOT_DISBAND) {
 						currentState = MenuState.C_DISBAND;
-						result = views.get(currentState);
+						result = goToDisbandView();
 						
 					}  else if(slot == ROOT_SLOT_OPEN) {
 						result = null; // Close menu
@@ -583,7 +602,8 @@ public class GuildMenu implements StateMenu {
 						
 					} else if(slot == ROOT_SLOT_SPECIALIZE) {
 						currentState = MenuState.C_SPECIALIZE;
-						result = views.get(currentState);
+						result = goToSpecializeView();
+						
 					}
 					break;
 				case A_JOIN:
@@ -710,10 +730,14 @@ public class GuildMenu implements StateMenu {
 		if(isAdmin) {
 			color = ChatColor.GOLD;
 		}
+		String name = "";
+		if(guild != null) {
+			name = guild.getName();
+		}
 		switch(context) {
 			case ROOT:
 				if(guild != null) {
-					result = color+MessagePath.MENU_GUILD_TITLE_ROOT_NAME.getMessage(guild.getName());
+					result = color+MessagePath.MENU_GUILD_TITLE_ROOT_NAME.getMessage(name);
 				} else {
 					result = color+MessagePath.MENU_GUILD_TITLE_ROOT.getMessage();
 				}
@@ -731,25 +755,25 @@ public class GuildMenu implements StateMenu {
 				result = color+MessagePath.MENU_GUILD_TITLE_LIST.getMessage();
 				break;
 			case B_RELATIONSHIP:
-				result = color+MessagePath.MENU_GUILD_TITLE_RELATIONS.getMessage(guild.getName());
+				result = color+MessagePath.MENU_GUILD_TITLE_RELATIONS.getMessage();
 				break;
 			case B_REQUESTS:
-				result = color+MessagePath.MENU_GUILD_TITLE_REQUESTS.getMessage(guild.getName());
+				result = color+MessagePath.MENU_GUILD_TITLE_REQUESTS.getMessage();
 				break;
 			case C_PROMOTE:
-				result = color+MessagePath.MENU_GUILD_TITLE_PROMOTION.getMessage(guild.getName());
+				result = color+MessagePath.MENU_GUILD_TITLE_PROMOTION.getMessage();
 				break;
 			case C_DEMOTE:
-				result = color+MessagePath.MENU_GUILD_TITLE_DEMOTION.getMessage(guild.getName());
+				result = color+MessagePath.MENU_GUILD_TITLE_DEMOTION.getMessage();
 				break;
 			case C_TRANSFER:
-				result = color+MessagePath.MENU_GUILD_TITLE_TRANSFER.getMessage(guild.getName());
+				result = color+MessagePath.MENU_GUILD_TITLE_TRANSFER.getMessage();
 				break;
 			case C_SPECIALIZE:
-				result = color+MessagePath.MENU_GUILD_TITLE_SPECIALIZE.getMessage(guild.getName());
+				result = color+MessagePath.MENU_GUILD_TITLE_SPECIALIZE.getMessage();
 				break;
 			case C_DISBAND:
-				result = color+MessagePath.MENU_GUILD_TITLE_DISBAND.getMessage(guild.getName());
+				result = color+MessagePath.MENU_GUILD_TITLE_DISBAND.getMessage(name);
 				break;
 			default:
 				break;
@@ -794,6 +818,18 @@ public class GuildMenu implements StateMenu {
 	private DisplayMenu goToRootView() {
 		DisplayMenu result = createRootView();
 		views.put(MenuState.ROOT, result);
+		return result;
+	}
+	
+	private DisplayMenu goToDisbandView() {
+		DisplayMenu result = createDisbandView();
+		views.put(MenuState.C_DISBAND, result);
+		return result;
+	}
+	
+	private DisplayMenu goToSpecializeView() {
+		DisplayMenu result = createSpecializeView();
+		views.put(MenuState.C_SPECIALIZE, result);
 		return result;
 	}
 	
