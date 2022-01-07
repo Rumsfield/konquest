@@ -412,6 +412,12 @@ public class KonTown extends KonTerritory implements Timeable {
 		if(limit > 0) {
 			yMin = monument.getBaseY() - limit;
 		}
+		if(yMin < getWorld().getMinHeight()) {
+			yMin = getWorld().getMinHeight();
+		}
+		if(yMax > getWorld().getMaxHeight()-1) {
+			yMax = getWorld().getMaxHeight()-1;
+		}
 		for (int x = 0; x <= 15; x++) {
             for (int y = yMin; y <= yMax; y++) {
                 for (int z = 0; z <= 15; z++) {
