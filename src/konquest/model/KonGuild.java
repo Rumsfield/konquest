@@ -334,8 +334,8 @@ public class KonGuild {
 	
 	public boolean isTownMember(KonTown town) {
 		if(town.getKingdom().equals(this.getKingdom())) {
-			UUID lordID = town.getLord();
-			if(members.containsKey(lordID)) {
+			UUID lord = town.getLord();
+			if(lord != null && members.containsKey(lord)) {
 				return true;
 			}
 		}
@@ -344,8 +344,10 @@ public class KonGuild {
 	
 	public int getNumTowns() {
 		int result = 0;
+		UUID lord = null;
 		for(KonTown town : this.getKingdom().getTowns()) {
-			if(members.containsKey(town.getPlayerLord().getUniqueId())) {
+			lord = town.getLord();
+			if(lord != null && members.containsKey(lord)) {
 				result++;
 			}
 		}
@@ -354,8 +356,10 @@ public class KonGuild {
 	
 	public int getNumLand() {
 		int result = 0;
+		UUID lord = null;
 		for(KonTown town : this.getKingdom().getTowns()) {
-			if(members.containsKey(town.getPlayerLord().getUniqueId())) {
+			lord = town.getLord();
+			if(lord != null && members.containsKey(lord)) {
 				result += town.getChunkList().size();
 			}
 		}

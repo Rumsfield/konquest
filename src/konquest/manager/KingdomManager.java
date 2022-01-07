@@ -251,9 +251,9 @@ public class KingdomManager {
 		if(invokeEvent.isCancelled()) {
 			return false;
 		}
-		boolean doWildTeleport = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.random_wild", true);
+		boolean doWorldSpawn = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.teleport_world_spawn", false);
+		boolean doWildTeleport = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.teleport_wild", true);
 		boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
-		boolean doWorldSpawn = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.world_spawn", false);
     	if(teleport) {
     		World playerWorld = player.getBukkitPlayer().getLocation().getWorld();
     		if(!konquest.isWorldValid(playerWorld)) {
