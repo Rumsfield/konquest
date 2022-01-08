@@ -74,16 +74,25 @@ public class ForceGuildAdminCommand extends CommandBase {
 	    						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
 	    		        		return;
 	    					}
-	            			if(!guild.getKingdom().equals(offlinePlayer.getKingdom())) {
-	            				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
-	    		        		return;
-	            			}
 	            			playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
-	            			boolean status = getKonquest().getGuildManager().joinGuildInvite(offlinePlayer, guild);
-	            			if(status) {
+	            			int status = getKonquest().getGuildManager().joinGuildInvite(offlinePlayer, guild);
+	            			if(status == 0) {
 	            				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_GUILD_NOTICE_INVITE.getMessage(playerName));
 	            			} else {
-	            				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+	            				switch(status) {
+		            				case 1:
+		            					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
+		            					break;
+		            				case 2:
+		            					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_GUILD_ERROR_ADD_MEMBER.getMessage(playerName));
+		            					break;
+		            				case 3:
+		            					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_GUILD_ERROR_ADD_INVITE_MEMBER.getMessage(playerName));
+		            					break;
+	            					default:
+	            						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+	            						break;
+	            				}
 	            			}
 	            		} else {
 	            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());

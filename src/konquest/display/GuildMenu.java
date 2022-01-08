@@ -672,7 +672,10 @@ public class GuildMenu implements StateMenu {
 					if(clickedIcon != null && clickedIcon instanceof PlayerIcon) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
 						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
-						manager.promoteOfficer(clickPlayer, guild);
+						boolean status = manager.promoteOfficer(clickPlayer, guild);
+						if(status) {
+							Konquest.playSuccessSound(player.getBukkitPlayer());
+						}
 						result = goToPlayerView(currentState);
 					}
 					break;
@@ -680,7 +683,10 @@ public class GuildMenu implements StateMenu {
 					if(clickedIcon != null && clickedIcon instanceof PlayerIcon) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
 						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
-						manager.demoteOfficer(clickPlayer, guild);
+						boolean status = manager.demoteOfficer(clickPlayer, guild);
+						if(status) {
+							Konquest.playSuccessSound(player.getBukkitPlayer());
+						}
 						result = goToPlayerView(currentState);
 					}
 					break;

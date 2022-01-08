@@ -244,10 +244,13 @@ public class GuildManager implements Timeable {
 			MerchantInventory merch = (MerchantInventory)inv;
 			if(merch.getHolder() != null && merch.getMerchant() != null && merch.getHolder() instanceof Villager) {
 				// The inventory belongs to a valid merchant villager entity
+				KonGuild townGuild = getTownGuild(town);
+				if(townGuild == null) {
+					return;
+				}
 				// Check that the player can receive guild discounts
 				boolean doDiscounts = false;
 				KonGuild playerGuild = getPlayerGuild(player.getOfflineBukkitPlayer());
-				KonGuild townGuild = getTownGuild(town);
 				if(playerGuild != null) {
 					// Player belongs to a guild, make sure it is the same or treaty with town's guild
 					if(townGuild.equals(playerGuild) || !townGuild.isSanction(playerGuild)) {
@@ -263,32 +266,33 @@ public class GuildManager implements Timeable {
 						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_SANCTION.getMessage(townGuild.getName()));
 						return;
 					}
-					// Proceed with discounts for the valid villager's profession
-					double priceAdj = (double)discountPercent/100;
-					int amount = 0;
-					int discount = 0;
-					Merchant tradeHost = merch.getMerchant();
-					List<MerchantRecipe> tradeListDiscounted = new ArrayList<MerchantRecipe>();
-					for(MerchantRecipe trade : tradeHost.getRecipes()) {
-						ChatUtil.printDebug("Found trade for "+trade.getResult().getType().toString()+" with price mult "+trade.getPriceMultiplier()+
-								", special "+trade.getSpecialPrice()+", uses "+trade.getUses()+", max "+trade.getMaxUses());
-						List<ItemStack> ingredientList = trade.getIngredients();
-						for(ItemStack ingredient : ingredientList) {
-							ChatUtil.printDebug("  Has ingredient "+ingredient.getType().toString()+", amount: "+ingredient.getAmount());
-						}
-						if(!ingredientList.isEmpty()) {
-							amount = ingredientList.get(0).getAmount();
-							discount = (int)(amount*priceAdj*-1);
-							if(isDiscountStack) {
-								discount += trade.getSpecialPrice();
-							}
-							trade.setSpecialPrice(discount);
-							ChatUtil.printDebug("  Applied special price "+discount);
-						}
-						tradeListDiscounted.add(trade);
-					}
-					tradeHost.setRecipes(tradeListDiscounted);
 					if(discountPercent > 0) {
+						// Proceed with discounts for the valid villager's profession
+						double priceAdj = (double)discountPercent/100;
+						int amount = 0;
+						int discount = 0;
+						Merchant tradeHost = merch.getMerchant();
+						List<MerchantRecipe> tradeListDiscounted = new ArrayList<MerchantRecipe>();
+						for(MerchantRecipe trade : tradeHost.getRecipes()) {
+							ChatUtil.printDebug("Found trade for "+trade.getResult().getType().toString()+" with price mult "+trade.getPriceMultiplier()+
+									", special "+trade.getSpecialPrice()+", uses "+trade.getUses()+", max "+trade.getMaxUses());
+							List<ItemStack> ingredientList = trade.getIngredients();
+							for(ItemStack ingredient : ingredientList) {
+								ChatUtil.printDebug("  Has ingredient "+ingredient.getType().toString()+", amount: "+ingredient.getAmount());
+							}
+							if(!ingredientList.isEmpty()) {
+								amount = ingredientList.get(0).getAmount();
+								discount = (int)(amount*priceAdj*-1);
+								if(isDiscountStack) {
+									discount += trade.getSpecialPrice();
+								}
+								trade.setSpecialPrice(discount);
+								ChatUtil.printDebug("  Applied special price "+discount);
+							}
+							tradeListDiscounted.add(trade);
+						}
+						tradeHost.setRecipes(tradeListDiscounted);
+						// Notify player
 						Konquest.playDiscountSound(player.getBukkitPlayer());
 						String discountStr = ""+discountPercent;
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_DISCOUNT.getMessage(townGuild.getName(),discountStr));
@@ -582,9 +586,12 @@ public class GuildManager implements Timeable {
 	 * Allow invites to players already in a guild.
 	 * @param player - The offline player that the officer invites to join their guild
 	 * @param guild - The target guild for the join invite
+	 * @return Error code:  0 - Success
+	 * 						1 - Player is enemy
+	 * 						2 - Player is already a member
+	 * 						3 - Player has already been invited
 	 */
-	public boolean joinGuildInvite(KonOfflinePlayer player, KonGuild guild) {
-		boolean result = false;
+	public int joinGuildInvite(KonOfflinePlayer player, KonGuild guild) {
 		if(guild != null) {
 			OfflinePlayer offlineBukkitPlayer = player.getOfflineBukkitPlayer();
 			UUID id = offlineBukkitPlayer.getUniqueId();
@@ -600,7 +607,6 @@ public class GuildManager implements Timeable {
 							if(offlineBukkitPlayer.isOnline()) {
 								ChatUtil.sendNotice((Player)offlineBukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(guild.getName()));
 							}
-							result = true;
 						}
 					} else if(!guild.isJoinInviteValid(id)) {
 						// Invite to join if not already invited
@@ -608,12 +614,17 @@ public class GuildManager implements Timeable {
 						if(offlineBukkitPlayer.isOnline()) {
 							ChatUtil.sendNotice((Player)offlineBukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_INVITE_NEW.getMessage());
 						}
-						result = true;
+					} else {
+						return 3;
 					}
+				} else {
+					return 2;
 				}
+			} else {
+				return 1;
 			}
 		}
-		return result;
+		return 0;
 	}
 	
 	/**
@@ -710,18 +721,24 @@ public class GuildManager implements Timeable {
 		}
 	}
 	
-	public void promoteOfficer(OfflinePlayer player, KonGuild guild) {
+	public boolean promoteOfficer(OfflinePlayer player, KonGuild guild) {
+		boolean result = false;
 		UUID id = player.getUniqueId();
 		if(!guild.isOfficer(id)) {
 			guild.setOfficer(id, true);
+			result = true;
 		}
+		return result;
 	}
 	
-	public void demoteOfficer(OfflinePlayer player, KonGuild guild) {
+	public boolean demoteOfficer(OfflinePlayer player, KonGuild guild) {
+		boolean result = false;
 		UUID id = player.getUniqueId();
 		if(guild.isOfficer(id)) {
 			guild.setOfficer(id, false);
+			result = true;
 		}
+		return result;
 	}
 	
 	public void transferMaster(OfflinePlayer player, KonGuild guild) {
@@ -821,6 +838,7 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
+	// This can return null!
 	public KonGuild getTownGuild(KonTown town) {
 		KonGuild result = null;
 		UUID lordID = town.getLord();
@@ -830,10 +848,12 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
+	// This can return null!
 	public KonGuild getPlayerGuild(OfflinePlayer player) {
 		return getPlayerGuild(player.getUniqueId());
 	}
 	
+	// This can return null!
 	public KonGuild getPlayerGuild(UUID id) {
 		KonGuild result = null;
 		if(id != null) {

@@ -395,6 +395,8 @@ public enum MessagePath {
 	COMMAND_GUILD_ERROR_REQUEST_SENT            (1, "command.guild.error.request-sent"),
 	COMMAND_GUILD_ERROR_JOIN_DENY               (1, "command.guild.error.join-deny"),
 	COMMAND_GUILD_ERROR_LEAVE_FAIL              (0, "command.guild.error.leave-fail"),
+	COMMAND_GUILD_ERROR_ADD_MEMBER              (1, "command.guild.error.add-member"),
+	COMMAND_GUILD_ERROR_ADD_INVITE_MEMBER       (1, "command.guild.error.add-invite-member"),
 	COMMAND_HELP_NOTICE_MESSAGE                 (0, "command.help.notice.message"),
 	COMMAND_INFO_NOTICE_KINGDOM_HEADER          (1, "command.info.notice.kingdom-header"),
 	COMMAND_INFO_NOTICE_TOWN_HEADER             (1, "command.info.notice.town-header"),

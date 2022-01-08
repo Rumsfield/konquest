@@ -460,6 +460,8 @@ command:
       request-sent: "You have already requested to join %s Guild."
       join-deny: "%s Guild join request denied."
       leave-fail: "Failed to leave. Disband or transfer guild master first."
+      add-member: "%s is already a guild member."
+      add-invite-member: "%s has already been invited to join the guild."
   help:
     notice:
       message: "Help - Command, Arguments, Description, Alias"
