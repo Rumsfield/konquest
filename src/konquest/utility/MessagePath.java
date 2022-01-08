@@ -66,6 +66,9 @@ public enum MessagePath {
 	LABEL_SANCTION                              (0, "label.sanction"),
 	LABEL_HOSTILE                               (0, "label.hostile"),
 	LABEL_TREATY                                (0, "label.treaty"),
+	LABEL_MEMBER                                (0, "label.member"),
+	LABEL_OFFICER                               (0, "label.officer"),
+	LABEL_MASTER                                (0, "label.master"),
 	
 	MENU_STATS_TITLE                            (0, "menu.stats.title"),
 	MENU_STATS_INTRO_1                          (0, "menu.stats.intro-1"),
@@ -192,7 +195,6 @@ public enum MessagePath {
 	MENU_GUILD_THEIR_STATUS                     (0, "menu.guild.their-status"),
 	MENU_GUILD_OUR_STATUS                       (0, "menu.guild.our-status"),
 	MENU_GUILD_TITLE_ROOT                       (0, "menu.guild.title-root"),
-	MENU_GUILD_TITLE_ROOT_NAME                  (1, "menu.guild.title-root-name"),
 	MENU_GUILD_TITLE_JOIN                       (0, "menu.guild.title-join"),
 	MENU_GUILD_TITLE_CONFIRM                    (0, "menu.guild.title-confirm"),
 	MENU_GUILD_TITLE_INVITES                    (0, "menu.guild.title-invites"),

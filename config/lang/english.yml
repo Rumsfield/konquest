@@ -69,6 +69,9 @@ label:
   sanction: "Sanction"
   hostile: "Hostile"
   treaty: "Treaty"
+  member: "Member"
+  officer: "Officer"
+  master: "Master"
 menu:
   stats:
     title: "Accomplishment Stats"
@@ -206,7 +209,6 @@ menu:
     their-status: "Their Status"
     our-status: "Our Status"
     title-root: "Guild Menu"
-    title-root-name: "%s Guild Menu"
     title-join: "Join a Guild"
     title-confirm: "Are you sure?"
     title-invites: "Guild Invites"

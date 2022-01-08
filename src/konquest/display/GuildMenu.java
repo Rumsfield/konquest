@@ -743,7 +743,21 @@ public class GuildMenu implements StateMenu {
 		switch(context) {
 			case ROOT:
 				if(guild != null) {
-					result = color+MessagePath.MENU_GUILD_TITLE_ROOT_NAME.getMessage(name);
+					String titleAccess = "";
+					switch(menuAccess) {
+						case REGULAR:
+							titleAccess = MessagePath.LABEL_MEMBER.getMessage();
+							break;
+						case OFFICER:
+							titleAccess = MessagePath.LABEL_OFFICER.getMessage();
+							break;
+						case MASTER:
+							titleAccess = MessagePath.LABEL_MASTER.getMessage();
+							break;
+						default:
+							break;
+					}
+					result = color+name+" "+MessagePath.LABEL_GUILD.getMessage()+" "+titleAccess;
 				} else {
 					result = color+MessagePath.MENU_GUILD_TITLE_ROOT.getMessage();
 				}
