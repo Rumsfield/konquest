@@ -1199,6 +1199,14 @@ public class Konquest implements Timeable {
     	return result;
     }
     
+    public static ChatColor getDisplayPrimaryColor(KonKingdom displayKingdom, KonKingdom contextKingdom) {
+    	ChatColor result = ChatColor.RED;
+    	if(contextKingdom.equals(displayKingdom)) {
+			result = ChatColor.GREEN;
+		}
+    	return result;
+    }
+    
     /**
      * Determines secondary color based on player relationships
      * @param displayPlayer - The target player to show the color to
