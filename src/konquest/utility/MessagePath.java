@@ -67,7 +67,9 @@ public enum MessagePath {
 	LABEL_HOSTILE                               (0, "label.hostile"),
 	LABEL_TREATY                                (0, "label.treaty"),
 	LABEL_MEMBER                                (0, "label.member"),
+	LABEL_MEMBERS                               (0, "label.members"),
 	LABEL_OFFICER                               (0, "label.officer"),
+	LABEL_OFFICERS                              (0, "label.officers"),
 	LABEL_MASTER                                (0, "label.master"),
 	
 	MENU_STATS_TITLE                            (0, "menu.stats.title"),

@@ -1,6 +1,7 @@
 package konquest.display.wrapper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -10,12 +11,14 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.display.GuildIcon;
 import konquest.display.InfoIcon;
 import konquest.display.KingdomIcon;
 import konquest.display.MenuIcon;
 import konquest.display.PlayerIcon;
 import konquest.display.PlayerIcon.PlayerIconAction;
 import konquest.manager.DisplayManager;
+import konquest.model.KonGuild;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;
@@ -42,6 +45,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
  		InfoIcon info;
  		final int MAX_ICONS_PER_PAGE = 45;
 		int pageTotal = 1;
+		boolean isFriendly = observer.getKingdom().equals(infoTown.getKingdom());
 		boolean isArmistice = getKonquest().getGuildManager().isArmistice(observer, infoTown);
 		
 		ChatColor kingdomColor = Konquest.getDisplayPrimaryColor(observer, infoTown, isArmistice);
@@ -75,7 +79,13 @@ public class TownInfoMenuWrapper extends MenuWrapper {
     	loreList.add(ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage());
     	KingdomIcon kingdom = new KingdomIcon(infoTown.getKingdom(),kingdomColor,Material.GOLDEN_HELMET,loreList,0);
     	getMenu().getPage(0).addIcon(kingdom);
-		/* Lord Player Info Icon (1) */
+    	/* Guild Icon (1) */
+		KonGuild guild = getKonquest().getGuildManager().getTownGuild(infoTown);
+		if(guild != null) {
+			GuildIcon guildIcon = new GuildIcon(guild, isFriendly, isArmistice, Collections.emptyList(), 1, true);
+			getMenu().getPage(0).addIcon(guildIcon);
+		}
+		/* Lord Player Info Icon (2) */
 		loreList = new ArrayList<String>();
 		if(infoTown.isLordValid()) {
 			OfflinePlayer lordPlayer = infoTown.getPlayerLord();
@@ -88,22 +98,22 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			for(String line : Konquest.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getName(), observer.getBukkitPlayer().getName()))) {
 				loreList.add(ChatColor.RED+line);
 			}
-			info = new InfoIcon(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage(),loreList,Material.BARRIER,1,false);
+			info = new InfoIcon(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage(),loreList,Material.BARRIER,2,false);
 			getMenu().getPage(0).addIcon(info);
 		}
-		/* Invites Info Icon (2) */
+		/* Invites Info Icon (3) */
 		loreList = new ArrayList<String>();
 		for(OfflinePlayer invitee : infoTown.getJoinInvites()) {
 			loreList.add(loreColor+invitee.getName());
 		}
-		info = new InfoIcon(kingdomColor+MessagePath.LABEL_INVITES.getMessage(),loreList,Material.DIAMOND,2,false);
+		info = new InfoIcon(kingdomColor+MessagePath.LABEL_INVITES.getMessage(),loreList,Material.DIAMOND,3,false);
 		getMenu().getPage(0).addIcon(info);
-		/* Requests Info Icon (3) */
+		/* Requests Info Icon (4) */
 		loreList = new ArrayList<String>();
 		for(OfflinePlayer requestee : infoTown.getJoinRequests()) {
 			loreList.add(loreColor+requestee.getName());
 		}
-		info = new InfoIcon(kingdomColor+MessagePath.LABEL_REQUESTS.getMessage(),loreList,Material.EMERALD,3,false);
+		info = new InfoIcon(kingdomColor+MessagePath.LABEL_REQUESTS.getMessage(),loreList,Material.EMERALD,4,false);
 		getMenu().getPage(0).addIcon(info);
 		/* Properties Info Icon (5) */
     	String isOpen = DisplayManager.boolean2Symbol(infoTown.isOpen());
@@ -258,6 +268,11 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			if(clickPlayer != null && offlinePlayer != null && icon.getAction().equals(PlayerIconAction.DISPLAY_INFO)) {
 				getKonquest().getDisplayManager().displayPlayerInfoMenu(clickPlayer, offlinePlayer);
 			}
+			result = false;
+		} else if(clickedIcon instanceof GuildIcon) {
+			// Guild Icons open a new guild info menu for the associated player
+			GuildIcon icon = (GuildIcon)clickedIcon;
+			getKonquest().getDisplayManager().displayGuildInfoMenu(clickPlayer,icon.getGuild());
 			result = false;
 		}
 		return result;

@@ -15,6 +15,7 @@ import konquest.display.MenuIcon;
 import konquest.display.PagedMenu;
 import konquest.display.PlotMenu;
 import konquest.display.StateMenu;
+import konquest.display.wrapper.GuildInfoMenuWrapper;
 import konquest.display.wrapper.HelpMenuWrapper;
 import konquest.display.wrapper.KingdomInfoMenuWrapper;
 import konquest.display.wrapper.MenuWrapper;
@@ -298,6 +299,18 @@ public class DisplayManager {
    		playMenuOpenSound(displayPlayer.getBukkitPlayer());
    		// Create menu
 		TownInfoMenuWrapper wrapper = new TownInfoMenuWrapper(konquest, infoTown, displayPlayer);
+		wrapper.constructMenu();
+		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
+		// Display menu
+		showDisplayMenu(bukkitPlayer,wrapper.getCurrentInventory());
+   	}
+   	
+   	// Guild Info
+   	public void displayGuildInfoMenu(KonPlayer displayPlayer, KonGuild infoGuild) {
+   		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
+   		playMenuOpenSound(displayPlayer.getBukkitPlayer());
+   		// Create menu
+		GuildInfoMenuWrapper wrapper = new GuildInfoMenuWrapper(konquest, infoGuild, displayPlayer);
 		wrapper.constructMenu();
 		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		// Display menu

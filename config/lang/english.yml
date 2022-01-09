@@ -70,7 +70,9 @@ label:
   hostile: "Hostile"
   treaty: "Treaty"
   member: "Member"
+  members: "Members"
   officer: "Officer"
+  officers: "Officers"
   master: "Master"
 menu:
   stats:

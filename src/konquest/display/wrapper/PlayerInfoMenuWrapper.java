@@ -56,7 +56,8 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
  		// Page 0
 		pageLabel = titleColor+MessagePath.LABEL_PLAYER.getMessage()+" "+infoPlayer.getOfflineBukkitPlayer().getName();
 		getMenu().addPage(0, 1, pageLabel);
-		/* Kingdom Icon (3) */
+		
+		/* Kingdom Icon (2) */
 		int numKingdomPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(infoPlayer.getKingdom()).size();
     	int numAllKingdomPlayers = getKonquest().getPlayerManager().getAllPlayersInKingdom(infoPlayer.getKingdom()).size();
     	loreList = new ArrayList<String>();
@@ -65,8 +66,14 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
     		loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.LABEL_PROTECTED.getMessage());
     	}
     	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
-    	KingdomIcon kingdom = new KingdomIcon(infoPlayer.getKingdom(),kingdomColor,Material.GOLDEN_HELMET,loreList,3);
+    	KingdomIcon kingdom = new KingdomIcon(infoPlayer.getKingdom(),kingdomColor,Material.GOLDEN_HELMET,loreList,2);
     	getMenu().getPage(0).addIcon(kingdom);
+    	/* Guild Icon (3) */
+		KonGuild guild = getKonquest().getGuildManager().getPlayerGuild(infoPlayer.getOfflineBukkitPlayer());
+		if(guild != null) {
+			GuildIcon guildIcon = new GuildIcon(guild, isFriendly, isArmistice, Collections.emptyList(), 3, true);
+			getMenu().getPage(0).addIcon(guildIcon);
+		}
 		/* Player Score Icon (4) */
 		int score = getKonquest().getKingdomManager().getPlayerScore(infoPlayer);
 		loreList = new ArrayList<String>();
@@ -78,13 +85,6 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		String balanceF = String.format("%.2f",KonquestPlugin.getBalance(infoPlayer.getOfflineBukkitPlayer()));
 		InfoIcon info = new InfoIcon(kingdomColor+MessagePath.LABEL_FAVOR.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_FAVOR.getMessage()+": "+valueColor+balanceF), Material.GOLD_INGOT, 5, false);
 		getMenu().getPage(0).addIcon(info);
-		/* Guild Icon (6) */
-		KonGuild guild = getKonquest().getGuildManager().getPlayerGuild(infoPlayer.getOfflineBukkitPlayer());
-		if(guild != null) {
-			GuildIcon guildIcon = new GuildIcon(guild, isFriendly, isArmistice, Collections.emptyList(), 6, false);
-			getMenu().getPage(0).addIcon(guildIcon);
-		}
-		
 		// Page 1+
 		List<KonTown> playerTowns = sortedTowns(infoPlayer);
 		final int MAX_ICONS_PER_PAGE = 45;
@@ -154,6 +154,11 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 			// Town Icons open a new town info menu for the associated player
 			TownIcon icon = (TownIcon)clickedIcon;
 			getKonquest().getDisplayManager().displayTownInfoMenu(clickPlayer,icon.getTown());
+			result = false;
+		} else if(clickedIcon instanceof GuildIcon) {
+			// Guild Icons open a new guild info menu for the associated player
+			GuildIcon icon = (GuildIcon)clickedIcon;
+			getKonquest().getDisplayManager().displayGuildInfoMenu(clickPlayer,icon.getGuild());
 			result = false;
 		}
 		return result;

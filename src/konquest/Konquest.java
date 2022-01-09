@@ -1199,10 +1199,16 @@ public class Konquest implements Timeable {
     	return result;
     }
     
-    public static ChatColor getDisplayPrimaryColor(KonKingdom displayKingdom, KonKingdom contextKingdom) {
+    public static ChatColor getDisplayPrimaryColor(KonKingdom displayKingdom, KonKingdom contextKingdom, boolean isArmistice) {
     	ChatColor result = ChatColor.RED;
     	if(contextKingdom.equals(displayKingdom)) {
 			result = ChatColor.GREEN;
+		} else {
+			if(isArmistice) {
+				result = ChatColor.LIGHT_PURPLE;
+			} else {
+				result = ChatColor.RED;
+			}
 		}
     	return result;
     }
