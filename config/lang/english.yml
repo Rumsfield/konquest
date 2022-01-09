@@ -439,6 +439,9 @@ command:
       armistice-accept-2: "%s Guild has accepted an armistice with your guild!"
       armistice-offer-1: "Offered an armistice with %s Guild."
       armistice-offer-2: "%s Guild has offered an armistice with your guild!"
+      transfer: "%s is now the guild master of %s Guild."
+      promote: "%s has been promoted to guild officer of %s Guild."
+      demote: "%s has been demoted to guild member of %s Guild."
     notice:
       create: "Successfully created new guild, %s"
       invite: "Invited player %s to the guild."

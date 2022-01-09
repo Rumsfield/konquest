@@ -725,8 +725,10 @@ public class GuildManager implements Timeable {
 		boolean result = false;
 		UUID id = player.getUniqueId();
 		if(!guild.isOfficer(id)) {
-			guild.setOfficer(id, true);
-			result = true;
+			if(guild.setOfficer(id, true)) {
+				broadcastGuild(guild,MessagePath.COMMAND_GUILD_BROADCAST_PROMOTE.getMessage(player.getName(),guild.getName()));
+				result = true;
+			}
 		}
 		return result;
 	}
@@ -735,8 +737,10 @@ public class GuildManager implements Timeable {
 		boolean result = false;
 		UUID id = player.getUniqueId();
 		if(guild.isOfficer(id)) {
-			guild.setOfficer(id, false);
-			result = true;
+			if(guild.setOfficer(id, false)) {
+				broadcastGuild(guild,MessagePath.COMMAND_GUILD_BROADCAST_DEMOTE.getMessage(player.getName(),guild.getName()));
+				result = true;
+			}
 		}
 		return result;
 	}
@@ -744,7 +748,9 @@ public class GuildManager implements Timeable {
 	public void transferMaster(OfflinePlayer player, KonGuild guild) {
 		UUID id = player.getUniqueId();
 		if(guild.isMember(id)) {
-			guild.setMaster(id);
+			if(guild.setMaster(id)) {
+				broadcastGuild(guild,MessagePath.COMMAND_GUILD_BROADCAST_TRANSFER.getMessage(player.getName(),guild.getName()));
+			}
 		}
 	}
 	
