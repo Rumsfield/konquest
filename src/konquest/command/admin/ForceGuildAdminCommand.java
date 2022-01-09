@@ -129,12 +129,22 @@ public class ForceGuildAdminCommand extends CommandBase {
 	            			if(getKonquest().validateName(guildNewName,bukkitPlayer) != 0) {
 	    	            		return;
 	    	            	}
-	                    	boolean status = getKonquest().getGuildManager().renameGuild(guild, guildNewName, player);
-	                    	if(status) {
-	            				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_GUILD_NOTICE_RENAME.getMessage(guildName));
-	            			} else {
-	            				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
-	            			}
+	                    	int status = getKonquest().getGuildManager().renameGuild(guild, guildNewName, player, true);
+	                    	switch(status) {
+	            				case 0:
+	            					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_RENAME.getMessage(guildName));
+	            					break;
+	            				case 1:
+	            					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+	            					break;
+	            				case 2:
+	            					String cost = String.format("%.2f",getKonquest().getGuildManager().getCostRename());
+	            					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
+	            					break;
+	        					default:
+	        						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+	        						break;
+	        				}
 	            		} else {
 	            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 	            		}

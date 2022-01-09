@@ -316,7 +316,7 @@ public class GuildManager implements Timeable {
 		Player bukkitPlayer = master.getBukkitPlayer();
 		if(costCreate > 0) {
 			if(KonquestPlugin.getBalance(bukkitPlayer) < costCreate) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costCreate));
+				//ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costCreate));
                 return 3;
 			}
     	}
@@ -341,29 +341,37 @@ public class GuildManager implements Timeable {
 		return 0;
 	}
 	
-	public boolean renameGuild(KonGuild guild, String name, KonPlayer player) {
-		boolean result = false;
+	/**
+	 * Renames a guild
+	 * @param guild - Target guild to be renamed
+	 * @param name - New name for the guild
+	 * @param player - The player attempting to perform the action
+	 * @param force - True to bypass cost, false to check cost
+	 * @return Error code:  0 - Success
+	 * 						1 - Bad name
+	 * 						2 - Not enough favor
+	 */
+	public int renameGuild(KonGuild guild, String name, KonPlayer player, boolean force) {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Check cost
-		if(costRename > 0) {
+		if(costRename > 0 && !force) {
 			if(KonquestPlugin.getBalance(bukkitPlayer) < costRename) {
-				String costStr = ""+costRename;
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costStr));
-                return false;
+                return 2;
 			}
     	}
 		// Attempt to rename
 		if(!name.contains(" ") && !konquest.getKingdomManager().isKingdom(name) && !konquest.getKingdomManager().isTown(name)) {
 			guild.setName(name);
-			result = true;
 			// Withdraw cost
-			if(costRename > 0) {
+			if(costRename > 0 && !force) {
 	            if(KonquestPlugin.withdrawPlayer(bukkitPlayer, costRename)) {
 	            	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costRename);
 	            }
 			}
+		} else {
+			return 1;
 		}
-		return result;
+		return 0;
 	}
 	
 	public void removeGuild(KonGuild guild) {

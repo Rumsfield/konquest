@@ -68,7 +68,8 @@ public class GuildCommand extends CommandBase {
 	            		if(getArgs().length == 3) {
 	            			String guildName = getArgs()[2];
 	            			if(getKonquest().validateName(guildName,bukkitPlayer) != 0) {
-	    	            		return;
+	            				// Player receives error message within validateName method
+	            				return;
 	    	            	}
 	                    	int status = getKonquest().getGuildManager().createGuild(guildName, player);
 	                    	if(status == 0) {
@@ -184,14 +185,25 @@ public class GuildCommand extends CommandBase {
 	            		if(getArgs().length == 3) {
 	            			String guildName = getArgs()[2];
 	            			if(getKonquest().validateName(guildName,bukkitPlayer) != 0) {
-	    	            		return;
+	            				// Player receives error message within validateName method
+	            				return;
 	    	            	}
-	                    	boolean status = getKonquest().getGuildManager().renameGuild(guild, guildName, player);
-	                    	if(status) {
-	            				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_RENAME.getMessage(guildName));
-	            			} else {
-	            				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
-	            			}
+	                    	int status = getKonquest().getGuildManager().renameGuild(guild, guildName, player, false);
+	                    	switch(status) {
+	            				case 0:
+	            					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_RENAME.getMessage(guildName));
+	            					break;
+	            				case 1:
+	            					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+	            					break;
+	            				case 2:
+	            					String cost = String.format("%.2f",getKonquest().getGuildManager().getCostRename());
+	            					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
+	            					break;
+	        					default:
+	        						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+	        						break;
+	        				}
 	            		} else {
 	            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 	            		}
