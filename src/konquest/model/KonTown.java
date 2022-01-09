@@ -666,9 +666,9 @@ public class KonTown extends KonTerritory implements Timeable {
 					monumentBarAllies.addPlayer(bukkitPlayer);
 				} else {
 					if(getKonquest().getGuildManager().isArmistice(player, this)) {
-						monumentBarEnemies.addPlayer(bukkitPlayer);
-					} else {
 						monumentBarArmistice.addPlayer(bukkitPlayer);
+					} else {
+						monumentBarEnemies.addPlayer(bukkitPlayer);
 					}
 				}
 				shieldArmorBarAll.addPlayer(bukkitPlayer);
@@ -681,9 +681,9 @@ public class KonTown extends KonTerritory implements Timeable {
 			monumentBarAllies.addPlayer(player.getBukkitPlayer());
 		} else {
 			if(getKonquest().getGuildManager().isArmistice(player, this)) {
-				monumentBarEnemies.addPlayer(player.getBukkitPlayer());
-			} else {
 				monumentBarArmistice.addPlayer(player.getBukkitPlayer());
+			} else {
+				monumentBarEnemies.addPlayer(player.getBukkitPlayer());
 			}
 		}
 		shieldArmorBarAll.addPlayer(player.getBukkitPlayer());
