@@ -13,6 +13,7 @@ import konquest.utility.Metrics;
 import konquest.utility.Updater;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -216,7 +217,7 @@ public class KonquestPlugin extends JavaPlugin {
 			amountMod = amount - amountOff;
 			//String amountF = String.format("%.2f",amountOff);
 			String amountF = econ.format(amountOff);
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(discount,amountF));
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(discount,amountF), ChatColor.DARK_AQUA);
 		} else if(discount != 0) {
 			ChatUtil.printDebug("Failed to apply invalid discount of "+discount+"%");
 		}
@@ -240,7 +241,7 @@ public class KonquestPlugin extends JavaPlugin {
 	        	//String amountF = String.format("%.2f",r.amount);
 				String balanceF = econ.format(resp.balance);
 				String amountF = econ.format(resp.amount);
-	        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF));
+	        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF), ChatColor.DARK_AQUA);
 	        	result = true;
 	        } else {
 	        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(resp.errorMessage));
@@ -274,7 +275,7 @@ public class KonquestPlugin extends JavaPlugin {
 	        	//String amountF = String.format("%.2f",resp.amount);
 	        	String balanceF = econ.format(resp.balance);
 				String amountF = econ.format(resp.amount);
-	        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REWARD_FAVOR.getMessage(amountF,balanceF));
+	        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REWARD_FAVOR.getMessage(amountF,balanceF), ChatColor.DARK_GREEN);
 	        	result = true;
 	        } else {
 	        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(resp.errorMessage));

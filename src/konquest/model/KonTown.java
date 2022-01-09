@@ -608,7 +608,7 @@ public class KonTown extends KonTerritory implements Timeable {
 			for(KonPlayer player : getKonquest().getPlayerManager().getPlayersInKingdom(getKingdom().getName())) {
 				//ChatUtil.printDebug("Sent monument safe message to player "+player.getBukkitPlayer().getName());
 				//ChatUtil.sendNotice(player.getBukkitPlayer(), "The Town of "+getName()+" is safe, for now...", ChatColor.DARK_GREEN);
-				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_SAFE.getMessage(getName()), ChatColor.DARK_GREEN);
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_SAFE.getMessage(getName()), ChatColor.GREEN);
 			}
 		} else if(taskID == captureTimer.getTaskID()) {
 			ChatUtil.printDebug("Capture Timer ended with taskID: "+taskID);

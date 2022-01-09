@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -62,7 +63,7 @@ public class MonumentAdminCommand extends CommandBase {
         		player.setRegionKingdomName(kingdomName);
             	//ChatUtil.sendNotice((Player) getSender(), "Now creating new Monument Template. Click on Air to cancel.");
             	//ChatUtil.sendNotice((Player) getSender(), "Click on the first corner block of the region.");
-            	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_1.getMessage());
+            	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_1.getMessage(), ChatColor.LIGHT_PURPLE);
             	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
         	} else if(cmdMode.equalsIgnoreCase("remove")) {
         		player.settingRegion(RegionType.NONE);

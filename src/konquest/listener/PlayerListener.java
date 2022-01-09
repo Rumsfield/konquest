@@ -338,11 +338,11 @@ public class PlayerListener implements Listener{
 	                	player.setRegionCornerOneBuffer(location);
 	                    //ChatUtil.sendNotice(bukkitPlayer, "Click on the second corner block of the region.");
 	                    //ChatUtil.sendNotice(bukkitPlayer, "Base area must be 16x16 (green particles).");
-	                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_2.getMessage());
+	                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_2.getMessage(), ChatColor.LIGHT_PURPLE);
 	                } else if (player.getRegionCornerTwoBuffer() == null) {
 	                	player.setRegionCornerTwoBuffer(location);
 	                    //ChatUtil.sendNotice(bukkitPlayer, "Click on the travel point block.");
-	                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_3.getMessage());
+	                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_3.getMessage(), ChatColor.LIGHT_PURPLE);
 	                } else {
 	                	KonKingdom kingdom = kingdomManager.getKingdom(player.getRegionKingdomName());
 	                	int createMonumentStatus = kingdom.createMonumentTemplate(player.getRegionCornerOneBuffer(), player.getRegionCornerTwoBuffer(), location);

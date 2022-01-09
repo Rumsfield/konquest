@@ -55,16 +55,16 @@ public class ExileCommand extends CommandBase {
         			//ChatUtil.sendNotice((Player) getSender(), "Are you sure you want to become a "+ChatColor.DARK_RED+"Barbarian?");
         			//ChatUtil.sendNotice((Player) getSender(), "You will lose all Favor, stats and titles, and be sent to a random location in the Wild.",ChatColor.DARK_RED);
         			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_1.getMessage(),ChatColor.DARK_RED);
-        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_2.getMessage());
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_2.getMessage(),ChatColor.DARK_RED);
         			if(isAllowSwitch) {
         				//ChatUtil.sendNotice((Player) getSender(), "Once exiled, you may join any other Kingdom.",ChatColor.DARK_RED);
-        				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_3A.getMessage());
+        				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_3A.getMessage(),ChatColor.DARK_RED);
         			} else {
         				//ChatUtil.sendNotice((Player) getSender(), "You can only rejoin your current Kingdom, else you must ask an admin to switch Kingdoms.",ChatColor.DARK_RED);
-        				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_3B.getMessage());
+        				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_3B.getMessage(),ChatColor.DARK_RED);
         			}
         			//ChatUtil.sendNotice((Player) getSender(), "Use this command again to confirm.",ChatColor.DARK_RED);
-        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_4.getMessage());
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_PROMPT_4.getMessage(),ChatColor.DARK_RED);
         			player.setIsExileConfirmed(true);
         			// Start a timer to cancel the confirmation
         			ChatUtil.printDebug("Starting exile confirmation timer for 60 seconds for player "+bukkitPlayer.getName());
