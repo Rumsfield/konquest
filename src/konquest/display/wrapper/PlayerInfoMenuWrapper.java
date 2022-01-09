@@ -71,7 +71,16 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
     	/* Guild Icon (3) */
 		KonGuild guild = getKonquest().getGuildManager().getPlayerGuild(infoPlayer.getOfflineBukkitPlayer());
 		if(guild != null) {
-			GuildIcon guildIcon = new GuildIcon(guild, isFriendly, isArmistice, Collections.emptyList(), 3, true);
+			loreList = new ArrayList<String>();
+			if(guild.isMaster(infoPlayer.getOfflineBukkitPlayer().getUniqueId())) {
+				loreList.add(ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage());
+			} else if(guild.isOfficer(infoPlayer.getOfflineBukkitPlayer().getUniqueId())) {
+				loreList.add(ChatColor.BLUE+MessagePath.LABEL_OFFICER.getMessage());
+			} else if(guild.isMember(infoPlayer.getOfflineBukkitPlayer().getUniqueId())) {
+				loreList.add(ChatColor.WHITE+MessagePath.LABEL_MEMBER.getMessage());
+			}
+			loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
+			GuildIcon guildIcon = new GuildIcon(guild, isFriendly, isArmistice, loreList, 3, true);
 			getMenu().getPage(0).addIcon(guildIcon);
 		}
 		/* Player Score Icon (4) */

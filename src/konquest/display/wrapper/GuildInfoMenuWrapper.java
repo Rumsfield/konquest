@@ -75,7 +75,6 @@ public class GuildInfoMenuWrapper extends MenuWrapper {
 		/* Master Player Info Icon (2) */
 		loreList = new ArrayList<String>();
 		OfflinePlayer masterPlayer = infoGuild.getPlayerMaster();
-		loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
 		loreList.add(ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage());
 		loreList.add(ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage());
 		PlayerIcon playerInfo = new PlayerIcon(kingdomColor+masterPlayer.getName(),loreList,masterPlayer,2,true,PlayerIconAction.DISPLAY_INFO);
@@ -140,7 +139,6 @@ public class GuildInfoMenuWrapper extends MenuWrapper {
 				/* Player Icon (n) */
 				OfflinePlayer currentOfficer = playerIter.next();
 				loreList = new ArrayList<String>();
-				loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
 				loreList.add(ChatColor.BLUE+MessagePath.LABEL_OFFICER.getMessage());
 		    	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
 		    	PlayerIcon player = new PlayerIcon(kingdomColor+currentOfficer.getName(),loreList,currentOfficer,slotIndex,true,PlayerIconAction.DISPLAY_INFO);
@@ -170,7 +168,6 @@ public class GuildInfoMenuWrapper extends MenuWrapper {
 				/* Player Icon (n) */
 				OfflinePlayer currentMember = playerIter.next();
 				loreList = new ArrayList<String>();
-				loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
 				loreList.add(ChatColor.WHITE+MessagePath.LABEL_MEMBER.getMessage());
 		    	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
 		    	PlayerIcon player = new PlayerIcon(kingdomColor+currentMember.getName(),loreList,currentMember,slotIndex,true,PlayerIconAction.DISPLAY_INFO);

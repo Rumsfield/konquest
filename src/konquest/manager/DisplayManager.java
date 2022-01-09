@@ -188,11 +188,24 @@ public class DisplayManager {
 		}
 	}
 	
+	/*
 	private void showDisplayMenu(Player bukkitPlayer, Inventory inv) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
             @Override
             public void run() {
             	bukkitPlayer.openInventory(inv);
+            }
+        });
+	}
+	*/
+	
+	private void showMenuWrapper(Player bukkitPlayer, MenuWrapper wrapper) {
+		//ChatUtil.printDebug("Put and opened menu wrapper, size: "+pagedMenus.size());
+		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.openInventory(wrapper.getCurrentInventory());
             }
         });
 	}
@@ -208,9 +221,8 @@ public class DisplayManager {
 		// Create menu
 		HelpMenuWrapper wrapper = new HelpMenuWrapper(konquest);
 		wrapper.constructMenu();
-		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		// Display menu
-		showDisplayMenu(bukkitPlayer,wrapper.getCurrentInventory());
+		showMenuWrapper(bukkitPlayer,wrapper);
 	}
 	
 	/*
@@ -223,9 +235,8 @@ public class DisplayManager {
 		// Create menu
 		TownUpgradeMenuWrapper wrapper = new TownUpgradeMenuWrapper(konquest, town);
 		wrapper.constructMenu();
-		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		// Display menu
-		showDisplayMenu(bukkitPlayer,wrapper.getCurrentInventory());
+		showMenuWrapper(bukkitPlayer,wrapper);
 	}
 	
 	public void displayTownShieldMenu(Player bukkitPlayer, KonTown town) {
@@ -233,9 +244,8 @@ public class DisplayManager {
 		// Create menu
 		TownShieldMenuWrapper wrapper = new TownShieldMenuWrapper(konquest, town);
 		wrapper.constructMenu();
-		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		// Display menu
-		showDisplayMenu(bukkitPlayer,wrapper.getCurrentInventory());
+		showMenuWrapper(bukkitPlayer,wrapper);
 	}
 
 	public void displayTownOptionsMenu(Player bukkitPlayer, KonTown town) {
@@ -243,9 +253,8 @@ public class DisplayManager {
 		// Create menu
 		TownOptionsMenuWrapper wrapper = new TownOptionsMenuWrapper(konquest, town);
 		wrapper.constructMenu();
-		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		// Display menu
-		showDisplayMenu(bukkitPlayer,wrapper.getCurrentInventory());
+		showMenuWrapper(bukkitPlayer,wrapper);
 	}
 	
 	/*
@@ -259,9 +268,8 @@ public class DisplayManager {
  		// Create menu
 		ScoreMenuWrapper wrapper = new ScoreMenuWrapper(konquest, scorePlayer, displayPlayer);
 		wrapper.constructMenu();
-		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		// Display menu
-		showDisplayMenu(bukkitPlayer,wrapper.getCurrentInventory());
+		showMenuWrapper(bukkitPlayer,wrapper);
 	}
 	
  	/*
@@ -276,9 +284,8 @@ public class DisplayManager {
  		// Create menu
 		PlayerInfoMenuWrapper wrapper = new PlayerInfoMenuWrapper(konquest, infoPlayer, displayPlayer);
 		wrapper.constructMenu();
-		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		// Display menu
-		showDisplayMenu(bukkitPlayer,wrapper.getCurrentInventory());
+		showMenuWrapper(bukkitPlayer,wrapper);
  	}
  	
  	// Kingdom Info
@@ -288,9 +295,8 @@ public class DisplayManager {
  		// Create menu
 		KingdomInfoMenuWrapper wrapper = new KingdomInfoMenuWrapper(konquest, infoKingdom, displayPlayer);
 		wrapper.constructMenu();
-		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		// Display menu
-		showDisplayMenu(bukkitPlayer,wrapper.getCurrentInventory());
+		showMenuWrapper(bukkitPlayer,wrapper);
   	}
  	
   	// Town Info
@@ -300,9 +306,8 @@ public class DisplayManager {
    		// Create menu
 		TownInfoMenuWrapper wrapper = new TownInfoMenuWrapper(konquest, infoTown, displayPlayer);
 		wrapper.constructMenu();
-		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		// Display menu
-		showDisplayMenu(bukkitPlayer,wrapper.getCurrentInventory());
+		showMenuWrapper(bukkitPlayer,wrapper);
    	}
    	
    	// Guild Info
@@ -312,9 +317,8 @@ public class DisplayManager {
    		// Create menu
 		GuildInfoMenuWrapper wrapper = new GuildInfoMenuWrapper(konquest, infoGuild, displayPlayer);
 		wrapper.constructMenu();
-		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		// Display menu
-		showDisplayMenu(bukkitPlayer,wrapper.getCurrentInventory());
+		showMenuWrapper(bukkitPlayer,wrapper);
    	}
    	
    	/*
@@ -328,9 +332,8 @@ public class DisplayManager {
  		// Create menu
 		PrefixMenuWrapper wrapper = new PrefixMenuWrapper(konquest, displayPlayer);
 		wrapper.constructMenu();
-		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		// Display menu
-		showDisplayMenu(bukkitPlayer,wrapper.getCurrentInventory());
+		showMenuWrapper(bukkitPlayer,wrapper);
    	}
    	
    	/*
