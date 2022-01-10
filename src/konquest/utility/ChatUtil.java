@@ -45,6 +45,19 @@ public class ChatUtil {
 	}
 	
 	/**
+	 * Parse a string color code into usable color
+	 * @param input - The code to be parsed
+	 * @return String code, empty string if invalid code
+	 */
+	public static String parseColorCode(String input) {
+		String result = "";
+		if(input.matches("#[a-fA-F0-9]{6}") || input.matches("&[a-fA-F0-9]")) {
+			result = parseHex(input);
+		}
+		return result;
+	}
+	
+	/**
 	 * Search base string and replace
 	 * 		%PREFIX% with prefix arg
 	 * 		%SUFFIX% with suffix arg
@@ -57,7 +70,7 @@ public class ChatUtil {
 	 * @param name
 	 * @return
 	 */
-	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, ChatColor teamColor, ChatColor titleColor, boolean formatName) {
+	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, String teamColor, String titleColor, boolean formatName) {
 		String message = base;
 		if(prefix.equals("")) {
 			message = message.replace("%PREFIX% ", "");
