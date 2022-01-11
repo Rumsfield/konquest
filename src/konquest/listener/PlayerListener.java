@@ -998,6 +998,12 @@ public class PlayerListener implements Listener{
             				}
             			}
                     	// Set message color based on enemy territory
+            			boolean isArmistice = false;
+            			if(territoryTo instanceof KonTown) {
+            				isArmistice = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
+            			}
+            			String color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmistice);
+            			/*
     	                String color = ""+ChatColor.RED;
     	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
     	                	color = ""+ChatColor.YELLOW;
@@ -1008,6 +1014,7 @@ public class PlayerListener implements Listener{
 	    	                	color = ""+ChatColor.GRAY;
 	    	                }
     	                }
+    	                */
     	                // Display Territory Name
     	    			String territoryName = territoryTo.getName();
     	    			//ChatUtil.sendNotice(bukkitPlayer, color+territoryName+": "+chunkCoordsTo);
@@ -1053,6 +1060,12 @@ public class PlayerListener implements Listener{
             			}
             			
         				// Set message color based on enemy territory
+            			boolean isArmistice = false;
+            			if(territoryTo instanceof KonTown) {
+            				isArmistice = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
+            			}
+            			String color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmistice);
+            			/*
                         String color = ""+ChatColor.RED;
     	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
     	                	color = ""+ChatColor.YELLOW;
@@ -1063,7 +1076,7 @@ public class PlayerListener implements Listener{
 	    	                	color = ""+ChatColor.GRAY;
 	    	                }
     	                }
-                        
+                        */
         				KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
         	            Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
         	            if(!event.isCancelled()) {
@@ -1199,6 +1212,12 @@ public class PlayerListener implements Listener{
                     }
                     if(!event.isCancelled()) {
     	                // Set message color based on enemy territory
+                    	boolean isArmistice = false;
+            			if(territoryTo instanceof KonTown) {
+            				isArmistice = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
+            			}
+            			String color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmistice);
+            			/*
     	                String color = ""+ChatColor.RED;
     	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
     	                	color = ""+ChatColor.YELLOW;
@@ -1209,6 +1228,7 @@ public class PlayerListener implements Listener{
 	    	                	color = ""+ChatColor.GRAY;
 	    	                }
     	                }
+    	                */
     	                // Display Territory Name
     	    			String territoryName = territoryTo.getName();
     	    			//ChatUtil.sendNotice(bukkitPlayer, color+territoryName+": "+chunkCoordsTo);

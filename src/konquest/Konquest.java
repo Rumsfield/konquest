@@ -85,6 +85,7 @@ public class Konquest implements Timeable {
 	public static String armisticeColor1 = ""+ChatColor.LIGHT_PURPLE;
 	public static String armisticeColor2 = ""+ChatColor.DARK_PURPLE;
 	public static String barbarianColor = ""+ChatColor.YELLOW;
+	public static String neutralColor = ""+ChatColor.GRAY;
 	
 	private DatabaseThread databaseThread;
 	private AccomplishmentManager accomplishmentManager;
@@ -1283,6 +1284,24 @@ public class Konquest implements Timeable {
     				result = enemyColor2;
     			}
     		}
+		}
+    	return result;
+    }
+    
+    public String getDisplayKingdomColor(KonKingdom displayKingdom, KonKingdom contextKingdom, boolean isArmistice) {
+    	String result = ""+ChatColor.RED;
+    	if(contextKingdom.equals(kingdomManager.getBarbarians())) {
+    		result = barbarianColor;
+    	} else if(contextKingdom.equals(kingdomManager.getNeutrals())) {
+    		result = neutralColor;
+    	} else if(contextKingdom.equals(displayKingdom)) {
+			result = friendColor1;
+		} else {
+			if(isArmistice) {
+				result = armisticeColor1;
+			} else {
+				result = enemyColor1;
+			}
 		}
     	return result;
     }
