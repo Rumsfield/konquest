@@ -265,8 +265,8 @@ public class PlayerListener implements Listener{
 		            						kingdomName,
 		            						title,
 		            						name,
-		            						Konquest.friendColor1,
-		            						Konquest.friendColor1,
+		            						""+Konquest.friendColor1,
+		            						""+Konquest.friendColor1,
 		            						true) +
 		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
 	            		} else if(teamPlayer.isAdminBypassActive()) {

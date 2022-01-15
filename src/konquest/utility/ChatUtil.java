@@ -47,13 +47,13 @@ public class ChatUtil {
 	/**
 	 * Parse a string color code into usable color
 	 * @param input - The code to be parsed
-	 * @return String code, empty string if invalid code
+	 * @return ChatColor enum code, null if invalid code
 	 */
-	public static String parseColorCode(String input) {
-		String result = "";
-		if(input.matches("#[a-fA-F0-9]{6}") || input.matches("&[a-fA-F0-9]")) {
-			result = parseHex(input);
-		}
+	public static ChatColor parseColorCode(String input) {
+		ChatColor result = null;
+		try {
+			result = ChatColor.valueOf(input);
+		} catch (Exception ignored) {}
 		return result;
 	}
 	

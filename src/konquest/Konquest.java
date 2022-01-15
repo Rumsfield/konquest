@@ -82,14 +82,14 @@ public class Konquest implements Timeable {
 	private static String chatTag;
 	private static String chatMessage;
 	public static final String chatDivider = "§7»";
-	public static String friendColor1 = ""+ChatColor.GREEN;
-	public static String friendColor2 = ""+ChatColor.DARK_GREEN;
-	public static String enemyColor1 = ""+ChatColor.RED;
-	public static String enemyColor2 = ""+ChatColor.DARK_RED;
-	public static String armisticeColor1 = ""+ChatColor.LIGHT_PURPLE;
-	public static String armisticeColor2 = ""+ChatColor.DARK_PURPLE;
-	public static String barbarianColor = ""+ChatColor.YELLOW;
-	public static String neutralColor = ""+ChatColor.GRAY;
+	public static ChatColor friendColor1 = ChatColor.GREEN;
+	public static ChatColor friendColor2 = ChatColor.DARK_GREEN;
+	public static ChatColor enemyColor1 = ChatColor.RED;
+	public static ChatColor enemyColor2 = ChatColor.DARK_RED;
+	public static ChatColor armisticeColor1 = ChatColor.LIGHT_PURPLE;
+	public static ChatColor armisticeColor2 = ChatColor.DARK_PURPLE;
+	public static ChatColor barbarianColor = ChatColor.YELLOW;
+	public static ChatColor neutralColor = ChatColor.GRAY;
 	
 	private DatabaseThread databaseThread;
 	private AccomplishmentManager accomplishmentManager;
@@ -208,13 +208,13 @@ public class Konquest implements Timeable {
 		// Create global scoreboard and teams
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         friendlyTeam = scoreboard.registerNewTeam("friendlies");
-        friendlyTeam.setColor(ChatColor.GREEN);
+        friendlyTeam.setColor(friendColor1);
         enemyTeam = scoreboard.registerNewTeam("enemies");
-        enemyTeam.setColor(ChatColor.RED);
+        enemyTeam.setColor(enemyColor1);
         armisticeTeam = scoreboard.registerNewTeam("armistice");
-        armisticeTeam.setColor(ChatColor.LIGHT_PURPLE);
+        armisticeTeam.setColor(armisticeColor1);
         barbarianTeam = scoreboard.registerNewTeam("barbarians");
-        barbarianTeam.setColor(ChatColor.YELLOW);
+        barbarianTeam.setColor(barbarianColor);
         
         // Set up version-specific classes
         initVersionHandlers();
@@ -348,55 +348,63 @@ public class Konquest implements Timeable {
 	}
 	
 	private void initColors() {
-		String colorStr = "";
+		ChatColor color;
+		String configColor = "";
 		/* Friendly Primary Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.friendly_primary",""));
-		if(colorStr.equals("")) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.friendly_primary: "+colorStr);
+		configColor = configManager.getConfig("core").getString("core.colors.friendly_primary","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.friendly_primary: "+configColor);
 		} else {
-			friendColor1 = colorStr;
+			friendColor1 = color;
 		}
 		/* Friendly Secondary Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.friendly_secondary",""));
-		if(colorStr.equals("")) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.friendly_secondary: "+colorStr);
+		configColor = configManager.getConfig("core").getString("core.colors.friendly_secondary","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.friendly_secondary: "+configColor);
 		} else {
-			friendColor2 = colorStr;
+			friendColor2 = color;
 		}
 		/* Enemy Primary Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.enemy_primary",""));
-		if(colorStr.equals("")) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_primary: "+colorStr);
+		configColor = configManager.getConfig("core").getString("core.colors.enemy_primary","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_primary: "+configColor);
 		} else {
-			enemyColor1 = colorStr;
+			enemyColor1 = color;
 		}
 		/* Enemy Secondary Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.enemy_secondary",""));
-		if(colorStr.equals("")) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_secondary: "+colorStr);
+		configColor = configManager.getConfig("core").getString("core.colors.enemy_secondary","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_secondary: "+configColor);
 		} else {
-			enemyColor2 = colorStr;
+			enemyColor2 = color;
 		}
 		/* Armistice Primary Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.armistice_primary",""));
-		if(colorStr.equals("")) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_primary: "+colorStr);
+		configColor = configManager.getConfig("core").getString("core.colors.armistice_primary","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_primary: "+configColor);
 		} else {
-			armisticeColor1 = colorStr;
+			armisticeColor1 = color;
 		}
 		/* Armistice Secondary Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.armistice_secondary",""));
-		if(colorStr.equals("")) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_secondary: "+colorStr);
+		configColor = configManager.getConfig("core").getString("core.colors.armistice_secondary","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_secondary: "+configColor);
 		} else {
-			armisticeColor2 = colorStr;
+			armisticeColor2 = color;
 		}
 		/* Barbarian Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.barbarian",""));
-		if(colorStr.equals("")) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.barbarian: "+colorStr);
+		configColor = configManager.getConfig("core").getString("core.colors.barbarian","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.barbarian: "+configColor);
 		} else {
-			barbarianColor = colorStr;
+			barbarianColor = color;
 		}
 	}
 	
@@ -1273,15 +1281,15 @@ public class Konquest implements Timeable {
     public static String getDisplayPrimaryColor(KonOfflinePlayer displayPlayer, KonOfflinePlayer contextPlayer, boolean isArmistice) {
     	String result = ""+ChatColor.RED;
     	if(contextPlayer.isBarbarian()) {
-    		result = barbarianColor;
+    		result = ""+barbarianColor;
 		} else {
 			if(contextPlayer.getKingdom().equals(displayPlayer.getKingdom())) {
-				result = friendColor1;
+				result = ""+friendColor1;
     		} else {
     			if(isArmistice) {
-    				result = armisticeColor1;
+    				result = ""+armisticeColor1;
     			} else {
-    				result = enemyColor1;
+    				result = ""+enemyColor1;
     			}
     		}
 		}
@@ -1291,12 +1299,12 @@ public class Konquest implements Timeable {
     public static String getDisplayPrimaryColor(KonKingdom displayKingdom, KonKingdom contextKingdom, boolean isArmistice) {
     	String result = ""+ChatColor.RED;
     	if(contextKingdom.equals(displayKingdom)) {
-			result = friendColor1;
+			result = ""+friendColor1;
 		} else {
 			if(isArmistice) {
-				result = armisticeColor1;
+				result = ""+armisticeColor1;
 			} else {
-				result = enemyColor1;
+				result = ""+enemyColor1;
 			}
 		}
     	return result;
@@ -1316,15 +1324,15 @@ public class Konquest implements Timeable {
     public static String getDisplaySecondaryColor(KonOfflinePlayer displayPlayer, KonOfflinePlayer contextPlayer, boolean isArmistice) {
     	String result = ""+ChatColor.RED;
     	if(contextPlayer.isBarbarian()) {
-    		result = barbarianColor;
+    		result = ""+barbarianColor;
 		} else {
 			if(contextPlayer.getKingdom().equals(displayPlayer.getKingdom())) {
-				result = friendColor2;
+				result = ""+friendColor2;
     		} else {
     			if(isArmistice) {
-    				result = armisticeColor2;
+    				result = ""+armisticeColor2;
     			} else {
-    				result = enemyColor2;
+    				result = ""+enemyColor2;
     			}
     		}
 		}
@@ -1334,16 +1342,16 @@ public class Konquest implements Timeable {
     public String getDisplayKingdomColor(KonKingdom displayKingdom, KonKingdom contextKingdom, boolean isArmistice) {
     	String result = ""+ChatColor.RED;
     	if(contextKingdom.equals(kingdomManager.getBarbarians())) {
-    		result = barbarianColor;
+    		result = ""+barbarianColor;
     	} else if(contextKingdom.equals(kingdomManager.getNeutrals())) {
-    		result = neutralColor;
+    		result = ""+neutralColor;
     	} else if(contextKingdom.equals(displayKingdom)) {
-			result = friendColor1;
+			result = ""+friendColor1;
 		} else {
 			if(isArmistice) {
-				result = armisticeColor1;
+				result = ""+armisticeColor1;
 			} else {
-				result = enemyColor1;
+				result = ""+enemyColor1;
 			}
 		}
     	return result;
