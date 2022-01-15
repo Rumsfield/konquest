@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import konquest.Konquest;
 import konquest.model.KonGuild;
 import konquest.utility.MessagePath;
 
@@ -28,12 +29,12 @@ public class GuildIcon implements MenuIcon {
 		this.index = index;
 		this.isClickable = isClickable;
 		if(isFriendly) {
-			contextColor = ChatColor.GREEN;
+			contextColor = Konquest.friendColor1;
 		} else {
 			if(isArmistice) {
-				contextColor = ChatColor.LIGHT_PURPLE;
+				contextColor = Konquest.armisticeColor1;
 			} else {
-				contextColor = ChatColor.RED;
+				contextColor = Konquest.enemyColor1;
 			}
 		}
 	}

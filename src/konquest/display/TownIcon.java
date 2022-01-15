@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import konquest.Konquest;
 import konquest.model.KonTown;
 import konquest.utility.MessagePath;
 
@@ -24,12 +25,12 @@ public class TownIcon implements MenuIcon {
 	public TownIcon(KonTown town, boolean isFriendly, boolean isArmistice, Material material, List<String> lore, int index) {
 		this.town = town;
 		if(isFriendly) {
-			contextColor = ChatColor.GREEN;
+			contextColor = Konquest.friendColor1;
 		} else {
 			if(isArmistice) {
-				contextColor = ChatColor.LIGHT_PURPLE;
+				contextColor = Konquest.armisticeColor1;
 			} else {
-				contextColor = ChatColor.RED;
+				contextColor = Konquest.enemyColor1;
 			}
 		}
 		this.material = material;

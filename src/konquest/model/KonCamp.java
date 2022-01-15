@@ -38,7 +38,7 @@ public class KonCamp extends KonTerritory implements Timeable {
 		this.isRaidAlertDisabled = false;
 		this.isOfflineProtected = false;
 		this.bedLocation = loc;
-		this.campBarAll = Bukkit.getServer().createBossBar(ChatColor.YELLOW+getName(), BarColor.WHITE, BarStyle.SOLID);
+		this.campBarAll = Bukkit.getServer().createBossBar(ChatColor.YELLOW+getName(), BarColor.YELLOW, BarStyle.SOLID);
 		this.campBarAll.setVisible(true);
 		initProtection();
 	}
