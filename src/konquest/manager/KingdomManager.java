@@ -297,6 +297,8 @@ public class KingdomManager {
     	}
     	// Force into global chat mode
     	player.setIsGlobalChat(true);
+    	// Force disabled prefix
+    	player.getPlayerPrefix().setEnable(false);
     	// Make into barbarian
     	player.setKingdom(getBarbarians());
     	player.setBarbarian(true);
