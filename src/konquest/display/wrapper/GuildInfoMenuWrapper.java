@@ -48,7 +48,7 @@ public class GuildInfoMenuWrapper extends MenuWrapper {
 		int pageTotal = 1;
 		boolean isArmistice = getKonquest().getGuildManager().isArmistice(observerGuild, infoGuild);
 		
-		String kingdomColor = Konquest.getDisplayPrimaryColor(observer.getKingdom(), infoGuild.getKingdom(), isArmistice);
+		ChatColor kingdomColor = Konquest.getDisplayPrimaryColor(observer.getKingdom(), infoGuild.getKingdom(), isArmistice);
  		ChatColor titleColor = DisplayManager.titleColor;
 		ChatColor loreColor = DisplayManager.loreColor;
 		ChatColor valueColor = DisplayManager.valueColor;

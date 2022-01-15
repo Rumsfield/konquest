@@ -1523,20 +1523,15 @@ public class KingdomManager {
 			Point point = Konquest.toPoint(chunk);
 			World renderWorld = chunk.getWorld();
 			if(isChunkClaimed(point,renderWorld)) {
-				KonKingdom chunkKingdom = getChunkTerritory(point,renderWorld).getKingdom();
+				KonTerritory territory = getChunkTerritory(point,renderWorld);
+				KonKingdom chunkKingdom = territory.getKingdom();
 				Location renderLoc;
-				Color renderColor;
-				if(chunkKingdom.equals(getBarbarians())) {
-					renderColor = Color.YELLOW;
-				} else if(chunkKingdom.equals(getNeutrals())) {
-					renderColor = Color.GRAY;
-				} else {
-					if(player.getKingdom().equals(chunkKingdom)) {
-						renderColor = Color.GREEN;
-					} else {
-						renderColor = Color.RED;
-					}
+				boolean isArmistice = false;
+				if(territory instanceof KonTown) {
+					isArmistice = konquest.getGuildManager().isArmistice(player, (KonTown)territory);
 				}
+				Color renderColor = ChatUtil.lookupColor(konquest.getDisplayKingdomColor(player.getKingdom(), chunkKingdom, isArmistice));
+
 				// Iterate all 4 sides of the chunk
 				// x+0,z+1 side: traverse x 0 -> 15 when z is 15
 				// x+0,z-1 side: traverse x 0 -> 15 when z is 0

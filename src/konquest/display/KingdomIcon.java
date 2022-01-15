@@ -2,6 +2,7 @@ package konquest.display;
 
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -13,13 +14,13 @@ import konquest.utility.MessagePath;
 public class KingdomIcon implements MenuIcon {
 
 	private KonKingdom kingdom;
-	private String contextColor;
+	private ChatColor contextColor;
 	private Material material;
 	private List<String> lore;
 	private int index;
 	private ItemStack item;
 	
-	public KingdomIcon(KonKingdom kingdom, String contextColor, Material material, List<String> lore, int index) {
+	public KingdomIcon(KonKingdom kingdom, ChatColor contextColor, Material material, List<String> lore, int index) {
 		this.kingdom = kingdom;
 		this.contextColor = contextColor;
 		this.material = material;

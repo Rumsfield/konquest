@@ -239,8 +239,8 @@ public class PlayerListener implements Listener{
 	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
 	            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
 	            		isArmistice = konquest.getGuildManager().isArmistice(globalPlayer, player);
-	            		String teamColor = Konquest.getDisplayPrimaryColor(globalPlayer, player, isArmistice);
-	            		String titleColor = Konquest.getDisplaySecondaryColor(globalPlayer, player, isArmistice);
+	            		ChatColor teamColor = Konquest.getDisplayPrimaryColor(globalPlayer, player, isArmistice);
+	            		ChatColor titleColor = Konquest.getDisplaySecondaryColor(globalPlayer, player, isArmistice);
 	            		globalPlayer.getBukkitPlayer().sendMessage(
 	            				ChatUtil.parseFormat(Konquest.getChatMessage(),
 	            						prefix,
@@ -265,8 +265,8 @@ public class PlayerListener implements Listener{
 		            						kingdomName,
 		            						title,
 		            						name,
-		            						""+Konquest.friendColor1,
-		            						""+Konquest.friendColor1,
+		            						Konquest.friendColor1,
+		            						Konquest.friendColor1,
 		            						true) +
 		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
 	            		} else if(teamPlayer.isAdminBypassActive()) {
@@ -277,8 +277,8 @@ public class PlayerListener implements Listener{
 		            						kingdomName,
 		            						title,
 		            						name,
-		            						""+ChatColor.GOLD,
-		            						""+ChatColor.GOLD,
+		            						ChatColor.GOLD,
+		            						ChatColor.GOLD,
 		            						true) +
 		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
 	            		}
@@ -1002,7 +1002,7 @@ public class PlayerListener implements Listener{
             			if(territoryTo instanceof KonTown) {
             				isArmistice = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
             			}
-            			String color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmistice);
+            			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmistice);
             			/*
     	                String color = ""+ChatColor.RED;
     	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
@@ -1064,7 +1064,7 @@ public class PlayerListener implements Listener{
             			if(territoryTo instanceof KonTown) {
             				isArmistice = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
             			}
-            			String color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmistice);
+            			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmistice);
             			/*
                         String color = ""+ChatColor.RED;
     	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
@@ -1216,7 +1216,7 @@ public class PlayerListener implements Listener{
             			if(territoryTo instanceof KonTown) {
             				isArmistice = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
             			}
-            			String color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmistice);
+            			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmistice);
             			/*
     	                String color = ""+ChatColor.RED;
     	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {

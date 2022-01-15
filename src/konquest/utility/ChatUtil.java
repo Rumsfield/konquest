@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.entity.Player;
 
 
@@ -70,7 +71,7 @@ public class ChatUtil {
 	 * @param name
 	 * @return
 	 */
-	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, String teamColor, String titleColor, boolean formatName) {
+	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, ChatColor teamColor, ChatColor titleColor, boolean formatName) {
 		String message = base;
 		if(prefix.equals("")) {
 			message = message.replace("%PREFIX% ", "");
@@ -107,6 +108,63 @@ public class ChatUtil {
 			}
 		}
 		return message;
+	}
+	
+	public static Color lookupColor(ChatColor reference) {
+		Color result = Color.WHITE;
+		switch(reference) {
+			case BLACK:
+				result = Color.fromRGB(0x000000);
+				break;
+			case DARK_BLUE:
+				result = Color.fromRGB(0x0000AA);
+				break;
+			case DARK_GREEN:
+				result = Color.fromRGB(0x00AA00);
+				break;
+			case DARK_AQUA:
+				result = Color.fromRGB(0x00AAAA);
+				break;
+			case DARK_RED:
+				result = Color.fromRGB(0xAA0000);
+				break;
+			case DARK_PURPLE:
+				result = Color.fromRGB(0xAA00AA);
+				break;
+			case GOLD:
+				result = Color.fromRGB(0xFFAA00);
+				break;
+			case GRAY:
+				result = Color.fromRGB(0xAAAAAA);
+				break;
+			case DARK_GRAY:
+				result = Color.fromRGB(0x555555);
+				break;
+			case BLUE:
+				result = Color.fromRGB(0x5555FF);
+				break;
+			case GREEN:
+				result = Color.fromRGB(0x55FF55);
+				break;
+			case AQUA:
+				result = Color.fromRGB(0x55FFFF);
+				break;
+			case RED:
+				result = Color.fromRGB(0xFF5555);
+				break;
+			case LIGHT_PURPLE:
+				result = Color.fromRGB(0xFF55FF);
+				break;
+			case YELLOW:
+				result = Color.fromRGB(0xFFFF55);
+				break;
+			case WHITE:
+				result = Color.fromRGB(0xFFFFFF);
+				break;
+			default:
+				break;
+		}
+		return result;
 	}
 	
 	public static void printDebug(String message) {
