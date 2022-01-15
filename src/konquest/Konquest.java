@@ -297,49 +297,49 @@ public class Konquest implements Timeable {
 	private void initColors() {
 		String colorStr = "";
 		/* Friendly Primary Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.friendly_primary"));
+		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.friendly_primary",""));
 		if(colorStr.equals("")) {
 			ChatUtil.printConsoleError("Invalid color code core.colors.friendly_primary: "+colorStr);
 		} else {
 			friendColor1 = colorStr;
 		}
 		/* Friendly Secondary Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.friendly_secondary"));
+		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.friendly_secondary",""));
 		if(colorStr.equals("")) {
 			ChatUtil.printConsoleError("Invalid color code core.colors.friendly_secondary: "+colorStr);
 		} else {
 			friendColor2 = colorStr;
 		}
 		/* Enemy Primary Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.enemy_primary"));
+		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.enemy_primary",""));
 		if(colorStr.equals("")) {
 			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_primary: "+colorStr);
 		} else {
 			enemyColor1 = colorStr;
 		}
 		/* Enemy Secondary Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.enemy_secondary"));
+		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.enemy_secondary",""));
 		if(colorStr.equals("")) {
 			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_secondary: "+colorStr);
 		} else {
 			enemyColor2 = colorStr;
 		}
 		/* Armistice Primary Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.armistice_primary"));
+		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.armistice_primary",""));
 		if(colorStr.equals("")) {
 			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_primary: "+colorStr);
 		} else {
 			armisticeColor1 = colorStr;
 		}
 		/* Armistice Secondary Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.armistice_secondary"));
+		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.armistice_secondary",""));
 		if(colorStr.equals("")) {
 			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_secondary: "+colorStr);
 		} else {
 			armisticeColor2 = colorStr;
 		}
 		/* Barbarian Color */
-		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.barbarian"));
+		colorStr = ChatUtil.parseColorCode(configManager.getConfig("core").getString("core.colors.barbarian",""));
 		if(colorStr.equals("")) {
 			ChatUtil.printConsoleError("Invalid color code core.colors.barbarian: "+colorStr);
 		} else {

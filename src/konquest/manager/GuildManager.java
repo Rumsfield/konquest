@@ -267,6 +267,13 @@ public class GuildManager implements Timeable {
 						return;
 					}
 					if(discountPercent > 0) {
+						/*
+						 try {
+						    // Get and set special price with API methods
+						} catch (NoSuchMethodError compatability) {
+							// Use NMS packets/tags to modify attributes?
+						}
+						 */
 						// Proceed with discounts for the valid villager's profession
 						double priceAdj = (double)discountPercent/100;
 						int amount = 0;

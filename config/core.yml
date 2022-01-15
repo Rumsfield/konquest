@@ -25,13 +25,13 @@ core:
     enable_format: true
     priority: HIGH
   colors:
-    friendly_primary: &a
-    friendly_secondary: &2
-    enemy_primary: &c
-    enemy_secondary: &4
-    armistice_primary: &d
-    armistice_secondary: &5
-    barbarian: &e
+    friendly_primary: '&a'
+    friendly_secondary: '&2'
+    enemy_primary: '&c'
+    enemy_secondary: '&4'
+    armistice_primary: '&d'
+    armistice_secondary: '&5'
+    barbarian: '&e'
   database:
     connection: sqlite
     mysql:
