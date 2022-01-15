@@ -2,6 +2,7 @@ package konquest.nms;
 
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
 import org.bukkit.entity.Villager;
+import org.bukkit.inventory.MerchantInventory;
 
 import konquest.utility.ChatUtil;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,8 +14,9 @@ public class Handler_1_17_R1 implements VersionHandler {
 	public Handler_1_17_R1() {}
 	
 	@Override
-	public void applyTradeDiscount(double discountPercent, boolean isStack, Villager villager) {
+	public void applyTradeDiscount(double discountPercent, boolean isStack, MerchantInventory merchantInventory) {
 		
+		Villager villager = (Villager)merchantInventory.getHolder();
 		Entity targetVillager = ((CraftEntity) villager).getHandle();
 		NBTTagCompound tag = targetVillager.save(new NBTTagCompound());
 		NBTTagList recipeData = (NBTTagList) tag.getCompound("Offers").get("Recipes");

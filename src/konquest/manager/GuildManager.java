@@ -300,7 +300,7 @@ public class GuildManager implements Timeable {
 						} catch (NoSuchMethodError compatability) {
 							ChatUtil.printDebug("Attempting to use version handler to apply trade discounts...");
 							if(konquest.isVersionHandlerEnabled()) {
-								konquest.getVersionHandler().applyTradeDiscount(priceAdj, isDiscountStack, host);
+								konquest.getVersionHandler().applyTradeDiscount(priceAdj, isDiscountStack, merch);
 								doNotification = true;
 							} else {
 								ChatUtil.printDebug("Version handler is not available.");

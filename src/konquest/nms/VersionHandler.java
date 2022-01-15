@@ -1,9 +1,9 @@
 package konquest.nms;
 
-import org.bukkit.entity.Villager;
+import org.bukkit.inventory.MerchantInventory;
 
 public interface VersionHandler {
 
-	public void applyTradeDiscount(double discountPercent, boolean isStack, Villager villager);
+	public void applyTradeDiscount(double discountPercent, boolean isStack, MerchantInventory merchantInventory);
 	
 }
