@@ -28,9 +28,9 @@ public class Handler_1_17_R1 implements VersionHandler {
             	applyDiscount += currentDiscount;
             }
             recipeTag.setInt("specialPrice", applyDiscount);
-            targetVillager.load(recipeTag);
-            ChatUtil.printDebug("  Applied 1.17.1 special price "+applyDiscount);
+            ChatUtil.printDebug("  Applied 1.17.x special price "+applyDiscount);
         }
+		targetVillager.load(tag);
 	}
 
 }

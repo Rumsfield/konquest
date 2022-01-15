@@ -59,6 +59,7 @@ import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
+import konquest.nms.Handler_1_16_R3;
 import konquest.nms.Handler_1_17_R1;
 import konquest.nms.TeamPacketSender;
 import konquest.nms.TeamPacketSender_p754;
@@ -239,6 +240,7 @@ public class Konquest implements Timeable {
     	switch(version) {
     		case "v1_16_R3":
     			teamPacketSender = new TeamPacketSender_p754();
+    			versionHandler = new Handler_1_16_R3();
     			break;
     		case "v1_17_R1":
     			teamPacketSender = new TeamPacketSender_p755();
