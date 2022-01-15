@@ -59,11 +59,13 @@ import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
+import konquest.nms.Handler_1_17_R1;
 import konquest.nms.TeamPacketSender;
 import konquest.nms.TeamPacketSender_p754;
 import konquest.nms.TeamPacketSender_p755;
 //import konquest.nms.TeamPacketSender_p756;
 import konquest.nms.TeamPacketSender_p757;
+import konquest.nms.VersionHandler;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
@@ -114,6 +116,8 @@ public class Konquest implements Timeable {
     private Team barbarianTeam;
     private TeamPacketSender teamPacketSender;
     private boolean isPacketSendEnabled;
+    private VersionHandler versionHandler;
+    private boolean isVersionHandlerEnabled;
 	
 	private EventPriority chatPriority;
 	private static final EventPriority defaultChatPriority = EventPriority.HIGH;
@@ -158,6 +162,9 @@ public class Konquest implements Timeable {
 		plotManager = new PlotManager(this);
 		guildManager = new GuildManager(this);
 		
+		teamPacketSender = null;
+		versionHandler = null;
+		
 		chatPriority = defaultChatPriority;
 		worlds = new ArrayList<World>();
 		isWhitelist = false;
@@ -168,6 +175,7 @@ public class Konquest implements Timeable {
 		this.saveIntervalSeconds = 0;
 		this.offlineTimeoutSeconds = 0;
 		this.isPacketSendEnabled = false;
+		this.isVersionHandlerEnabled = false;
 		
 		//teleportTerritoryQueue = new HashMap<Player,KonTerritory>();
 		teleportLocationQueue = new HashMap<Player,Location>();
@@ -206,21 +214,62 @@ public class Konquest implements Timeable {
         barbarianTeam = scoreboard.registerNewTeam("barbarians");
         barbarianTeam.setColor(ChatColor.YELLOW);
         
-        if(setupTeamPacketSender()) {
-        	if(plugin.isProtocolEnabled()) {
-        		ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version");
-        		isPacketSendEnabled = true;
-        	} else {
-        		ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is disabled! Check version.");
-        	}
-        } else {
-        	ChatUtil.printConsoleError("Failed to register name color packets, the server version is unsupported");
-        }
+        // Set up version-specific classes
+        initVersionHandlers();
 		
 		// Render Maps
 		mapHandler.initialize();
 		
 		ChatUtil.printDebug("Finished Initialization");
+	}
+	
+	private void initVersionHandlers() {
+		String version;
+    	try {
+    		version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    	} catch (ArrayIndexOutOfBoundsException e) {
+    		ChatUtil.printConsoleError("Failed to determine server version.");
+    		return;
+    	}
+    	ChatUtil.printConsoleAlert("Your server version is "+version+", "+Bukkit.getServer().getBukkitVersion());
+    	boolean isTeamPacketSenderReady = false;
+    	boolean isVersionHandlerReady = false;
+    	
+    	// Version-specific cases
+    	switch(version) {
+    		case "v1_16_R3":
+    			teamPacketSender = new TeamPacketSender_p754();
+    			break;
+    		case "v1_17_R1":
+    			teamPacketSender = new TeamPacketSender_p755();
+    			versionHandler = new Handler_1_17_R1();
+    			break;
+    		case "v1_18_R1":
+    			teamPacketSender = new TeamPacketSender_p757();
+    			break;
+    		default:
+    			break;
+    	}
+    	isTeamPacketSenderReady = teamPacketSender != null;
+    	isVersionHandlerReady = versionHandler != null;
+		
+    	if(isTeamPacketSenderReady) {
+        	if(plugin.isProtocolEnabled()) {
+        		ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version.");
+        		isPacketSendEnabled = true;
+        	} else {
+        		ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is disabled! Check version.");
+        	}
+        } else {
+        	ChatUtil.printConsoleError("Failed to register name color packets, the server version is unsupported.");
+        }
+    	
+    	if(isVersionHandlerReady) {
+    		isVersionHandlerEnabled = true;
+    	} else {
+    		ChatUtil.printConsoleError("Some Konquest features may not work for this server version.");
+    	}
+    	
 	}
 	
 	public void reload() {
@@ -434,6 +483,15 @@ public class Konquest implements Timeable {
 	
 	public KonquestPlugin getPlugin() {
 		return plugin;
+	}
+	
+	public VersionHandler getVersionHandler() {
+		// This can be null!
+		return versionHandler;
+	}
+	
+	public boolean isVersionHandlerEnabled() {
+		return isVersionHandlerEnabled;
 	}
 	
 	public AccomplishmentManager getAccomplishmentManager() {
@@ -1011,25 +1069,6 @@ public class Konquest implements Timeable {
 		randLoc.setYaw(yaw);
 		return randLoc;
 	}
-	
-    private boolean setupTeamPacketSender() {
-    	String version;
-    	try {
-    		version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-    	} catch (ArrayIndexOutOfBoundsException e) {
-    		ChatUtil.printConsoleError("Failed to determine server version.");
-    		return false;
-    	}
-    	ChatUtil.printConsoleAlert("Your server version is "+version+", "+Bukkit.getServer().getBukkitVersion());
-    	if(version.equals("v1_16_R3")) {
-    		teamPacketSender = new TeamPacketSender_p754();
-    	} else if(version.equals("v1_17_R1")) {
-    		teamPacketSender = new TeamPacketSender_p755();
-    	} else if(version.equals("v1_18_R1")) {
-    		teamPacketSender = new TeamPacketSender_p757();
-    	}
-    	return teamPacketSender != null;
-    }
     
     /**
      * Sends updated team packets for the given player

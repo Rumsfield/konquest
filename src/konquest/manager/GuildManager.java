@@ -267,42 +267,51 @@ public class GuildManager implements Timeable {
 						return;
 					}
 					if(discountPercent > 0) {
-						/*
-						 try {
-						    // Get and set special price with API methods
-						} catch (NoSuchMethodError compatability) {
-							// Use NMS packets/tags to modify attributes?
-						}
-						 */
+						// Try to use 1.18 API first, catch missing method error and then try to use version handler
 						// Proceed with discounts for the valid villager's profession
 						double priceAdj = (double)discountPercent/100;
-						int amount = 0;
-						int discount = 0;
-						Merchant tradeHost = merch.getMerchant();
-						List<MerchantRecipe> tradeListDiscounted = new ArrayList<MerchantRecipe>();
-						for(MerchantRecipe trade : tradeHost.getRecipes()) {
-							ChatUtil.printDebug("Found trade for "+trade.getResult().getType().toString()+" with price mult "+trade.getPriceMultiplier()+
-									", special "+trade.getSpecialPrice()+", uses "+trade.getUses()+", max "+trade.getMaxUses());
-							List<ItemStack> ingredientList = trade.getIngredients();
-							for(ItemStack ingredient : ingredientList) {
-								ChatUtil.printDebug("  Has ingredient "+ingredient.getType().toString()+", amount: "+ingredient.getAmount());
-							}
-							if(!ingredientList.isEmpty()) {
-								amount = ingredientList.get(0).getAmount();
-								discount = (int)(amount*priceAdj*-1);
-								if(isDiscountStack) {
-									discount += trade.getSpecialPrice();
+						boolean doNotification = false;
+						try {
+						    // Get and set special price with API methods
+							int amount = 0;
+							int discount = 0;
+							Merchant tradeHost = merch.getMerchant();
+							List<MerchantRecipe> tradeListDiscounted = new ArrayList<MerchantRecipe>();
+							for(MerchantRecipe trade : tradeHost.getRecipes()) {
+								ChatUtil.printDebug("Found trade for "+trade.getResult().getType().toString()+" with price mult "+trade.getPriceMultiplier()+
+										", special "+trade.getSpecialPrice()+", uses "+trade.getUses()+", max "+trade.getMaxUses());
+								List<ItemStack> ingredientList = trade.getIngredients();
+								for(ItemStack ingredient : ingredientList) {
+									ChatUtil.printDebug("  Has ingredient "+ingredient.getType().toString()+", amount: "+ingredient.getAmount());
 								}
-								trade.setSpecialPrice(discount);
-								ChatUtil.printDebug("  Applied special price "+discount);
+								if(!ingredientList.isEmpty()) {
+									amount = ingredientList.get(0).getAmount();
+									discount = (int)(amount*priceAdj*-1);
+									if(isDiscountStack) {
+										discount += trade.getSpecialPrice();
+									}
+									trade.setSpecialPrice(discount);
+									ChatUtil.printDebug("  Applied special price "+discount);
+								}
+								tradeListDiscounted.add(trade);
 							}
-							tradeListDiscounted.add(trade);
+							tradeHost.setRecipes(tradeListDiscounted);
+							doNotification = true;
+						} catch (NoSuchMethodError compatability) {
+							ChatUtil.printDebug("Attempting to use version handler to apply trade discounts...");
+							if(konquest.isVersionHandlerEnabled()) {
+								konquest.getVersionHandler().applyTradeDiscount(priceAdj, isDiscountStack, host);
+								doNotification = true;
+							} else {
+								ChatUtil.printDebug("Version handler is not available.");
+							}
 						}
-						tradeHost.setRecipes(tradeListDiscounted);
 						// Notify player
-						Konquest.playDiscountSound(player.getBukkitPlayer());
-						String discountStr = ""+discountPercent;
-						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_DISCOUNT.getMessage(townGuild.getName(),discountStr));
+						if(doNotification) {
+							Konquest.playDiscountSound(player.getBukkitPlayer());
+							String discountStr = ""+discountPercent;
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_DISCOUNT.getMessage(townGuild.getName(),discountStr));
+						}
 					}
 				}
 			}
