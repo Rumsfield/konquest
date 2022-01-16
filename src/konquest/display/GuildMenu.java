@@ -494,8 +494,15 @@ public class GuildMenu implements StateMenu {
 				OfflinePlayer currentPlayer = listIter.next();
 				ChatColor guildColor = ChatColor.GREEN;
 				loreList = new ArrayList<String>();
-				String lastOnlineFormat = Konquest.getDateFormat(currentPlayer.getLastPlayed());
+				String lastOnlineFormat = Konquest.getLastSeenFormat(currentPlayer);
 				loreList.add(valueColor+lastOnlineFormat);
+				if(guild.isMaster(currentPlayer.getUniqueId())) {
+					loreList.add(ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage());
+				} else if(guild.isOfficer(currentPlayer.getUniqueId())) {
+					loreList.add(ChatColor.BLUE+MessagePath.LABEL_OFFICER.getMessage());
+				} else if(guild.isMember(currentPlayer.getUniqueId())) {
+					loreList.add(ChatColor.WHITE+MessagePath.LABEL_MEMBER.getMessage());
+				}
 				if(!loreHintStr1.equals("")) {
 					loreList.add(hintColor+loreHintStr1);
 				}

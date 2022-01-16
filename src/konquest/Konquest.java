@@ -1435,9 +1435,13 @@ public class Konquest implements Timeable {
 		return result;		
 	}
     
-    public static String getDateFormat(long time) {
-    	Date date = new Date(time);
-        SimpleDateFormat formater = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+    public static String getLastSeenFormat(OfflinePlayer offlineBukkitPlayer) {
+    	Date date = new Date(); // Now
+    	if(!offlineBukkitPlayer.isOnline()) {
+    		date = new Date(offlineBukkitPlayer.getLastPlayed()); // Last joined
+    	}
+    	//SimpleDateFormat formater = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+    	SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
         return formater.format(date);
     }
     
