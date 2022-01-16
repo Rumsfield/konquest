@@ -82,11 +82,11 @@ public class KonTown extends KonTerritory implements Timeable {
 		this.playerTravelTimers = new HashMap<UUID, Timer>();
 		this.isCaptureDisabled = false;
 		this.isRaidAlertDisabled = false;
-		this.monumentBarAllies = Bukkit.getServer().createBossBar(ChatColor.GREEN+name, BarColor.GREEN, BarStyle.SOLID);
+		this.monumentBarAllies = Bukkit.getServer().createBossBar(Konquest.friendColor1+name, ChatUtil.mapBarColor(Konquest.friendColor1), BarStyle.SOLID);
 		this.monumentBarAllies.setVisible(true);
-		this.monumentBarEnemies = Bukkit.getServer().createBossBar(ChatColor.RED+name, BarColor.RED, BarStyle.SOLID);
+		this.monumentBarEnemies = Bukkit.getServer().createBossBar(Konquest.enemyColor1+name, ChatUtil.mapBarColor(Konquest.enemyColor1), BarStyle.SOLID);
 		this.monumentBarEnemies.setVisible(true);
-		this.monumentBarArmistice = Bukkit.getServer().createBossBar(ChatColor.LIGHT_PURPLE+name, BarColor.PINK, BarStyle.SOLID);
+		this.monumentBarArmistice = Bukkit.getServer().createBossBar(Konquest.armisticeColor1+name, ChatUtil.mapBarColor(Konquest.armisticeColor1), BarStyle.SOLID);
 		this.monumentBarArmistice.setVisible(true);
 		this.shieldArmorBarAll = Bukkit.getServer().createBossBar(ChatColor.DARK_AQUA+"Shield", BarColor.BLUE, BarStyle.SOLID);
 		this.shieldArmorBarAll.setVisible(false);
@@ -728,19 +728,19 @@ public class KonTown extends KonTerritory implements Timeable {
 	
 	public void updateBar() {
 		if(isAttacked) {
-			monumentBarAllies.setTitle(ChatColor.GREEN+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
-			monumentBarAllies.setColor(BarColor.PURPLE);
-			monumentBarEnemies.setTitle(ChatColor.RED+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
-			monumentBarEnemies.setColor(BarColor.PURPLE);
-			monumentBarArmistice.setTitle(ChatColor.LIGHT_PURPLE+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
-			monumentBarArmistice.setColor(BarColor.PURPLE);
+			monumentBarAllies.setTitle(Konquest.friendColor1+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
+			//monumentBarAllies.setColor(BarColor.PURPLE);
+			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
+			//monumentBarEnemies.setColor(BarColor.PURPLE);
+			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
+			//monumentBarArmistice.setColor(BarColor.PURPLE);
 		} else {
-			monumentBarAllies.setTitle(ChatColor.GREEN+getName());
-			monumentBarAllies.setColor(BarColor.GREEN);
-			monumentBarEnemies.setTitle(ChatColor.RED+getName());
-			monumentBarEnemies.setColor(BarColor.RED);
-			monumentBarArmistice.setTitle(ChatColor.LIGHT_PURPLE+getName());
-			monumentBarArmistice.setColor(BarColor.PINK);
+			monumentBarAllies.setTitle(Konquest.friendColor1+getName());
+			//monumentBarAllies.setColor(BarColor.GREEN);
+			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName());
+			//monumentBarEnemies.setColor(BarColor.RED);
+			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName());
+			//monumentBarArmistice.setColor(BarColor.PINK);
 		}
 	}
 	

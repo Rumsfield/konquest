@@ -190,13 +190,15 @@ public class Konquest implements Timeable {
 		ChatUtil.printDebug("Debug is "+debug);
 		String worldName = configManager.getConfig("core").getString("core.world_name");
 		ChatUtil.printDebug("Primary world is "+worldName);
+		
+		initColors();
 		languageManager.initialize();
 		kingdomManager.initialize();
 		ruinManager.initialize();
 		guildManager.initialize();
 		initManagers();
 		initWorlds();
-		initColors();
+		
 		databaseThread.setSleepSeconds(saveIntervalSeconds);
 		if(!databaseThread.isRunning()) {
 			ChatUtil.printDebug("Starting database thread");

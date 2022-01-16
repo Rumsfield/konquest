@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 
 
@@ -160,6 +161,63 @@ public class ChatUtil {
 				break;
 			case WHITE:
 				result = Color.fromRGB(0xFFFFFF);
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
+	
+	public static BarColor mapBarColor(ChatColor reference) {
+		BarColor result = BarColor.WHITE;
+		switch(reference) {
+			case BLACK:
+				result = BarColor.PURPLE;
+				break;
+			case DARK_BLUE:
+				result = BarColor.BLUE;
+				break;
+			case DARK_GREEN:
+				result = BarColor.GREEN;
+				break;
+			case DARK_AQUA:
+				result = BarColor.BLUE;
+				break;
+			case DARK_RED:
+				result = BarColor.RED;
+				break;
+			case DARK_PURPLE:
+				result = BarColor.PURPLE;
+				break;
+			case GOLD:
+				result = BarColor.YELLOW;
+				break;
+			case GRAY:
+				result = BarColor.WHITE;
+				break;
+			case DARK_GRAY:
+				result = BarColor.WHITE;
+				break;
+			case BLUE:
+				result = BarColor.BLUE;
+				break;
+			case GREEN:
+				result = BarColor.GREEN;
+				break;
+			case AQUA:
+				result = BarColor.BLUE;
+				break;
+			case RED:
+				result = BarColor.RED;
+				break;
+			case LIGHT_PURPLE:
+				result = BarColor.PINK;
+				break;
+			case YELLOW:
+				result = BarColor.YELLOW;
+				break;
+			case WHITE:
+				result = BarColor.WHITE;
 				break;
 			default:
 				break;
