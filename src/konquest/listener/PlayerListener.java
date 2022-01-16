@@ -745,9 +745,10 @@ public class PlayerListener implements Listener{
 			// Update bars
 			if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
 				((KonTown) territoryFrom).removeBarPlayer(player);
+				boolean isArmisticeFrom = konquest.getGuildManager().isArmistice(player, (KonTown)territoryFrom);
 				player.clearAllMobAttackers();
 				// Command all nearby Iron Golems to target nearby enemy players, ignore triggering player
-				updateGolemTargetsForTerritory(territoryFrom,player,false);
+				updateGolemTargetsForTerritory(territoryFrom,player,false,isArmisticeFrom);
 			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
 				((KonRuin) territoryFrom).removeBarPlayer(player);
 			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
@@ -762,8 +763,9 @@ public class PlayerListener implements Listener{
 			KonTerritory territoryTo = kingdomManager.getChunkTerritory(respawnLoc);
 			// Update bars
 			if(territoryTo.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+				boolean isArmisticeTo = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
 	    		((KonTown) territoryTo).addBarPlayer(player);
-				updateGolemTargetsForTerritory(territoryTo,player,true);
+				updateGolemTargetsForTerritory(territoryTo,player,true,isArmisticeTo);
 			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
 				((KonRuin) territoryTo).addBarPlayer(player);
 			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
@@ -894,6 +896,10 @@ public class PlayerListener implements Listener{
 			if(isTerritoryFrom) {
 				territoryFrom = kingdomManager.getChunkTerritory(chunkFrom);
 			}
+			
+			boolean isArmisticeTo = false; // Is the player in an armistice with the to-territory?
+			boolean isArmisticeFrom = false; // Is the player in an armistice with the from-territory?
+			
     		
     		if(event.getTo().getWorld().equals(event.getFrom().getWorld())) {
     			// Player moved within the same world
@@ -944,6 +950,14 @@ public class PlayerListener implements Listener{
         		kingdomManager.updatePlayerBorderParticles(player,event.getTo());
         		//long step4 = System.currentTimeMillis();
         		
+        		// Check for armistice conditions
+        		if(isTerritoryTo && territoryTo instanceof KonTown) {
+    				isArmisticeTo = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
+    			}
+    			if(isTerritoryFrom && territoryFrom instanceof KonTown) {
+    				isArmisticeFrom = konquest.getGuildManager().isArmistice(player, (KonTown)territoryFrom);
+    			}
+    			
         		boolean isEnemyPearlBlocked = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_ender_pearl", false);
         		
         		// Chunk transition checks
@@ -965,7 +979,7 @@ public class PlayerListener implements Listener{
         				((KonTown) territoryFrom).removeBarPlayer(player);
         				player.clearAllMobAttackers();
         				// Command all nearby Iron Golems to target nearby enemy players, ignore triggering player
-    					updateGolemTargetsForTerritory(territoryFrom,player,false);
+    					updateGolemTargetsForTerritory(territoryFrom,player,false,isArmisticeFrom);
         			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         				((KonRuin) territoryFrom).removeBarPlayer(player);
         				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
@@ -998,11 +1012,7 @@ public class PlayerListener implements Listener{
             				}
             			}
                     	// Set message color based on enemy territory
-            			boolean isArmistice = false;
-            			if(territoryTo instanceof KonTown) {
-            				isArmistice = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
-            			}
-            			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmistice);
+            			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmisticeTo);
             			/*
     	                String color = ""+ChatColor.RED;
     	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
@@ -1030,7 +1040,7 @@ public class PlayerListener implements Listener{
     	    				// Display plot message to friendly players
     	    				displayPlotMessage(town, chunkTo, chunkFrom, player);
     	    				// Command all nearby Iron Golems to target enemy player, if no other closer player is present
-    						updateGolemTargetsForTerritory(territoryTo,player,true);
+    						updateGolemTargetsForTerritory(territoryTo,player,true,isArmisticeTo);
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
     	    				((KonRuin) territoryTo).addBarPlayer(player);
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
@@ -1060,11 +1070,7 @@ public class PlayerListener implements Listener{
             			}
             			
         				// Set message color based on enemy territory
-            			boolean isArmistice = false;
-            			if(territoryTo instanceof KonTown) {
-            				isArmistice = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
-            			}
-            			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmistice);
+            			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmisticeTo);
             			/*
                         String color = ""+ChatColor.RED;
     	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
@@ -1093,7 +1099,7 @@ public class PlayerListener implements Listener{
         	    				}
         	    				// Display plot message to friendly players
         	    				displayPlotMessage(town, chunkTo, chunkFrom, player);
-        	    				updateGolemTargetsForTerritory(territoryTo,player,true);
+        	    				updateGolemTargetsForTerritory(territoryTo,player,true,isArmisticeTo);
         	    			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         	    				((KonRuin) territoryTo).addBarPlayer(player);
         	    			} else if (territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
@@ -1104,7 +1110,7 @@ public class PlayerListener implements Listener{
         	            	// Exit Territory
         	            	if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         	    				((KonTown) territoryFrom).removeBarPlayer(player);
-        	    				updateGolemTargetsForTerritory(territoryFrom,player,true);
+        	    				updateGolemTargetsForTerritory(territoryFrom,player,true,isArmisticeFrom);
         	    			} else if (territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         	    				((KonRuin) territoryFrom).removeBarPlayer(player);
         	    				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
@@ -1139,9 +1145,12 @@ public class PlayerListener implements Listener{
         					if(territoryTo.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         						KonTown town = (KonTown) territoryTo;
         						if(!territoryTo.getKingdom().equals(player.getKingdom())) {
-            						// Enemy player
-        							kingdomManager.applyTownNerf(player, town);
-            						updateGolemTargetsForTerritory(territoryTo,player,true);
+        							// If the town and enemy guilds share an armistice
+        							if(!isArmisticeTo) {
+        								// Enemy player
+            							kingdomManager.applyTownNerf(player, town);
+        							}
+        							updateGolemTargetsForTerritory(territoryTo,player,true,isArmisticeTo);
             					} else {
             						// Friendly player
             						// Display plot message to friendly players
@@ -1186,12 +1195,20 @@ public class PlayerListener implements Listener{
     			//kingdomManager.stopPlayerBorderParticles(player);
     			kingdomManager.updatePlayerBorderParticles(player,chunkTo);
     			
+    			// Check for armistice conditions
+        		if(isTerritoryTo && territoryTo instanceof KonTown) {
+    				isArmisticeTo = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
+    			}
+    			if(isTerritoryFrom && territoryFrom instanceof KonTown) {
+    				isArmisticeFrom = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
+    			}
+    			
     			if(isTerritoryFrom) {
     				if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
         				((KonTown) territoryFrom).removeBarPlayer(player);
         				player.clearAllMobAttackers();
         				// Command all nearby Iron Golems to target nearby enemy players, ignore triggering player
-    					updateGolemTargetsForTerritory(territoryFrom,player,false);
+    					updateGolemTargetsForTerritory(territoryFrom,player,false,isArmisticeFrom);
         			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         				((KonRuin) territoryFrom).removeBarPlayer(player);
         				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
@@ -1212,11 +1229,7 @@ public class PlayerListener implements Listener{
                     }
                     if(!event.isCancelled()) {
     	                // Set message color based on enemy territory
-                    	boolean isArmistice = false;
-            			if(territoryTo instanceof KonTown) {
-            				isArmistice = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
-            			}
-            			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmistice);
+            			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmisticeTo);
             			/*
     	                String color = ""+ChatColor.RED;
     	                if(territoryTo.getKingdom().equals(kingdomManager.getBarbarians())) {
@@ -1244,7 +1257,7 @@ public class PlayerListener implements Listener{
     	    				// Display plot message to friendly players
     	    				displayPlotMessage(town, chunkTo, chunkFrom, player);
     	    				// Command all nearby Iron Golems to target enemy player, if no other closer player is present
-    						updateGolemTargetsForTerritory(territoryTo,player,true);
+    						updateGolemTargetsForTerritory(territoryTo,player,true,isArmisticeTo);
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
     	    				((KonRuin) territoryTo).addBarPlayer(player);
     	    			} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
@@ -1258,11 +1271,11 @@ public class PlayerListener implements Listener{
     	}
     }
     
-    private void updateGolemTargetsForTerritory(KonTerritory territory, KonPlayer triggerPlayer, boolean useDefault) {
+    private void updateGolemTargetsForTerritory(KonTerritory territory, KonPlayer triggerPlayer, boolean useDefault, boolean isArmistice) {
     	// Command all nearby Iron Golems to target closest player, if enemy exists nearby, else don't change target
     	// Find iron golems within the town max radius
     	boolean isGolemAttackEnemies = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.golem_attack_enemies");
-		if(isGolemAttackEnemies && !triggerPlayer.isAdminBypassActive() && !triggerPlayer.getKingdom().equals(territory.getKingdom())) {
+		if(isGolemAttackEnemies && !triggerPlayer.isAdminBypassActive() && !triggerPlayer.getKingdom().equals(territory.getKingdom()) && !isArmistice) {
 			Location centerLoc = territory.getCenterLoc();
 			int golumSearchRange = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_size",1); // chunks
 			int radius = 16*16;
