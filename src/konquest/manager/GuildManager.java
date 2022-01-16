@@ -102,6 +102,13 @@ public class GuildManager implements Timeable {
 		costSpecial 	    = konquest.getConfigManager().getConfig("core").getDouble("core.favor.guilds.cost_specialize");
 		costRelation 	    = konquest.getConfigManager().getConfig("core").getDouble("core.favor.guilds.cost_relationship");
 		
+		payPerChunk = payPerChunk < 0 ? 0 : payPerChunk;
+		payPerResident = payPerResident < 0 ? 0 : payPerResident;
+		payLimit = payLimit < 0 ? 0 : payLimit;
+		costCreate = costCreate < 0 ? 0 : costCreate;
+		costRename = costRename < 0 ? 0 : costRename;
+		costSpecial = costSpecial < 0 ? 0 : costSpecial;
+		costRelation = costRelation < 0 ? 0 : costRelation;
 		payPercentOfficer = payPercentOfficer < 0 ? 0 : payPercentOfficer;
 		payPercentOfficer = payPercentOfficer > 100 ? 100 : payPercentOfficer;
 		payPercentMaster = payPercentMaster < 0 ? 0 : payPercentMaster;
