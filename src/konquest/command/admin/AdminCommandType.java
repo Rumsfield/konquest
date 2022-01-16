@@ -18,6 +18,7 @@ public enum AdminCommandType {
 	FORCEJOIN 		("konquest.command.admin.forcejoin",		"<player> <kingdom>",												MessagePath.DESCRIPTION_ADMIN_FORCEJOIN.getMessage()),
 	FORCEEXILE		("konquest.command.admin.forceexile",		"<player> [full]", 													MessagePath.DESCRIPTION_ADMIN_FORCEEXILE.getMessage()),
 	FORCETOWN		("konquest.command.admin.forcetown",		"<name> options|add|kick|lord|knight|rename|upgrade|shield|armor|plots [arg1] [arg2]", MessagePath.DESCRIPTION_ADMIN_FORCETOWN.getMessage()),
+	FORCEGUILD		("konquest.command.admin.forceguild",		"<name> [menu|add|kick|rename] [name]", 							MessagePath.DESCRIPTION_ADMIN_FORCEGUILD.getMessage()),
 	RENAME	        ("konquest.command.admin.rename",			"<kingdom> <oldName> <newName>",					    			MessagePath.DESCRIPTION_ADMIN_RENAME.getMessage()),
 	RUIN	        ("konquest.command.admin.ruin",				"create|remove|criticals|spawns [<name>]",							MessagePath.DESCRIPTION_ADMIN_RUIN.getMessage()),
 	SAVE			("konquest.command.admin.save",				"", 																MessagePath.DESCRIPTION_ADMIN_SAVE.getMessage()),

@@ -228,6 +228,13 @@ public class BlockListener implements Listener {
 							return;
 						}
 						
+						// If the town and enemy guilds share an armistice, prevent event
+						if(konquest.getGuildManager().isArmistice(player, town)) {
+							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
+						}
+						
 						// Verify town can be captured
 						if(town.isCaptureDisabled()) {
 							//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "This Town cannot be conquered again so soon!");
@@ -561,6 +568,12 @@ public class BlockListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
+						}
+						// If the town and enemy guilds share an armistice, prevent event
+						if(konquest.getGuildManager().isArmistice(player, town)) {
+							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
 						}
 						// If town is shielded, prevent all enemy block edits
 						if(town.isShielded()) {

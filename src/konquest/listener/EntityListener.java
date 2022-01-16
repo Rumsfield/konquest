@@ -499,6 +499,12 @@ public class EntityListener implements Listener {
 									return;
 								}
 							}
+							// If the town and enemy guilds share an armistice, prevent event
+							if(konquest.getGuildManager().isArmistice(player, town)) {
+								ChatUtil.sendKonPriorityTitle(player, "", ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+								event.setCancelled(true);
+								return;
+							}
 							// If town is shielded, prevent all enemy entity damage
 							if(town.isShielded()) {
 								ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_AQUA+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -635,6 +641,13 @@ public class EntityListener implements Listener {
             	event.setCancelled(true);
             	return;
             }
+            
+            // Prevent damage between guild members with shared armistice
+			if(konquest.getGuildManager().isArmistice(attackerPlayer, victimPlayer)) {
+				ChatUtil.sendKonPriorityTitle(attackerPlayer, "", ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				event.setCancelled(true);
+				return;
+			}
             
             // Check for death, update directive progress & stat
             //ChatUtil.printDebug("Player Damage: "+attackerBukkitPlayer.getName()+" attacked "+victimBukkitPlayer.getName()+", current health: "+victimBukkitPlayer.getHealth()+", damage dealt: "+event.getFinalDamage());

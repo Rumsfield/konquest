@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
@@ -38,7 +37,7 @@ public class KonCamp extends KonTerritory implements Timeable {
 		this.isRaidAlertDisabled = false;
 		this.isOfflineProtected = false;
 		this.bedLocation = loc;
-		this.campBarAll = Bukkit.getServer().createBossBar(ChatColor.YELLOW+getName(), BarColor.WHITE, BarStyle.SOLID);
+		this.campBarAll = Bukkit.getServer().createBossBar(Konquest.barbarianColor+getName(), ChatUtil.mapBarColor(Konquest.barbarianColor), BarStyle.SOLID);
 		this.campBarAll.setVisible(true);
 		initProtection();
 	}
@@ -48,7 +47,7 @@ public class KonCamp extends KonTerritory implements Timeable {
 		if(isOfflineProtectedEnabled && !isOwnerOnline()) {
 			// Immediately enable protection
 			isOfflineProtected = true;
-			campBarAll.setTitle(ChatColor.YELLOW+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
+			campBarAll.setTitle(Konquest.barbarianColor+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
 		}
 	}
 
@@ -120,11 +119,11 @@ public class KonCamp extends KonTerritory implements Timeable {
 			// When a protection warmup timer ends
 			isOfflineProtected = true;
 			protectedCountdownTimer.stopTimer();
-			campBarAll.setTitle(ChatColor.YELLOW+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
+			campBarAll.setTitle(Konquest.barbarianColor+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
 		} else if(taskID == protectedCountdownTimer.getTaskID()) {
 			// Update protection countdown title
 			String remainingTime = Konquest.getTimeFormat(protectedWarmupTimer.getTime(),ChatColor.RED);
-			campBarAll.setTitle(ChatColor.YELLOW+getName()+" "+remainingTime);
+			campBarAll.setTitle(Konquest.barbarianColor+getName()+" "+remainingTime);
 			//ChatUtil.printDebug("Camp protection countdown tick with taskID: "+taskID);
 		} else {
 			ChatUtil.printDebug("Camp Timer ended with unknown taskID: "+taskID);
@@ -171,14 +170,14 @@ public class KonCamp extends KonTerritory implements Timeable {
 				} else if(offlineProtectedWarmupSeconds <= 0) {
 					// Immediately enable protection
 					isOfflineProtected = true;
-					campBarAll.setTitle(ChatColor.YELLOW+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
+					campBarAll.setTitle(Konquest.barbarianColor+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
 				}
 			}
 		} else {
 			// Remove protection
 			isOfflineProtected = false;
 			protectedCountdownTimer.stopTimer();
-			campBarAll.setTitle(ChatColor.YELLOW+getName());
+			campBarAll.setTitle(Konquest.barbarianColor+getName());
 		}
 	}
 	

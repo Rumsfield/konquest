@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -46,10 +46,8 @@ public class RuinAdminCommand extends CommandBase {
 		
 		if(cmdMode.equalsIgnoreCase("create")) {
 			Location playerLoc = bukkitPlayer.getLocation();
-        	if(!StringUtils.isAlphanumeric(ruinName)) {
-        		//ChatUtil.sendError((Player) getSender(), "Ruin name must only contain letters and/or numbers");
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
-                return;
+			if(getKonquest().validateName(ruinName,bukkitPlayer) != 0) {
+        		return;
         	}
         	boolean pass = getKonquest().getRuinManager().addRuin(playerLoc, ruinName);
         	if(!pass) {
@@ -90,7 +88,7 @@ public class RuinAdminCommand extends CommandBase {
 			player.settingRegion(RegionType.RUIN_CRITICAL);
         	//ChatUtil.sendNotice((Player) getSender(), "Removed all previous critical blocks from "+ruinName+", click on blocks to add.");
         	//ChatUtil.sendNotice((Player) getSender(), "Click on Air to cancel.");
-        	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CRITICALS.getMessage(ruinName));
+        	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CRITICALS.getMessage(ruinName), ChatColor.LIGHT_PURPLE);
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 		} else if(cmdMode.equalsIgnoreCase("spawns")) {
         	if(player.isSettingRegion()) {
@@ -107,7 +105,7 @@ public class RuinAdminCommand extends CommandBase {
 			player.settingRegion(RegionType.RUIN_SPAWN);
         	//ChatUtil.sendNotice((Player) getSender(), "Removed all previous spawn blocks from "+ruinName+", click on blocks to add.");
         	//ChatUtil.sendNotice((Player) getSender(), "Click on Air to cancel.");
-        	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_SPAWNS.getMessage(ruinName));
+        	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_SPAWNS.getMessage(ruinName), ChatColor.LIGHT_PURPLE);
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 		} else {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());

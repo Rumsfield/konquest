@@ -53,6 +53,9 @@ public class AdminCommand extends CommandBase {
 	                case FORCETOWN:
 	                    new ForceTownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 	                    break;
+	                case FORCEGUILD:
+	                    new ForceGuildAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
 	                case HELP:
 	                    new HelpAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 	                    break;
@@ -148,6 +151,9 @@ public class AdminCommand extends CommandBase {
 	                    break;
 	                case FORCETOWN:
 	                	tabList.addAll(new ForceTownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case FORCEGUILD:
+	                	tabList.addAll(new ForceGuildAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
 	                    break;
 	                case HELP:
 	                	tabList.addAll(new HelpAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());

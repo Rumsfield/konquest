@@ -1,7 +1,7 @@
 # Core Konquest Settings
 # Go to the wiki for details on all options:
 # https://github.com/Rumsfield/konquest-doc/wiki/Configuration
-#  
+# 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
 language: english
@@ -17,7 +17,6 @@ core:
   community_link: www.google.com
   accomplishment_prefix: true
   directive_quests: true
-  travel_wild_random_radius: 1000
   placeholder_request_limit: 60
   chat:
     tag: '&7[&6Konquest&7]&f '
@@ -25,6 +24,14 @@ core:
     name_team_color: true
     enable_format: true
     priority: HIGH
+  colors:
+    friendly_primary: GREEN
+    friendly_secondary: DARK_GREEN
+    enemy_primary: RED
+    enemy_secondary: DARK_RED
+    armistice_primary: LIGHT_PURPLE
+    armistice_secondary: DARK_PURPLE
+    barbarian: YELLOW
   database:
     connection: sqlite
     mysql:
@@ -38,6 +45,16 @@ core:
     quickshop: false
     luckperms: false
     dynmap: false
+  travel:
+    enable:
+      towns: true
+      capital: true
+      home: true
+      camp: true
+      wild: true
+    wild_radius: 1000
+    wild_center_x: 0
+    wild_center_z: 0
   kingdoms:
     capital_suffix: Capital
     capital_pvp: false
@@ -71,6 +88,7 @@ core:
     min_distance_capital: 16
     max_distance_all: 99
     max_size: 16
+    settle_checks_depth: 32
     init_radius: 2
     capture_upgrades: true
     capture_cooldown: 600
@@ -95,10 +113,22 @@ core:
     allow_build: false
     allow_containers: false
     ignore_knights: true
+  guilds:
+    enable: true
+    pay_interval_seconds: 900
+    pay_per_chunk: 0.25
+    pay_per_resident: 0.10
+    pay_limit: 100
+    bonus_officer_percent: 20
+    bonus_master_percent: 50
+    discount_enable: true
+    discount_percent: 50
+    discount_stack: true
   exile:
     remove_favor: true
     remove_stats: true
-    random_wild: true
+    teleport_wild: true
+    teleport_world_spawn: false
   camps:
     enable: true
     init_radius: 2
@@ -141,6 +171,11 @@ core:
       capture_town: 100
       kill_enemy: 50
       defend_raid: 50
+    guilds:
+      cost_create: 100
+      cost_rename: 50
+      cost_specialize: 200
+      cost_relationship: 50
   combat:
     prevent_command_on_proximity: false
     prevent_command_on_damage: true

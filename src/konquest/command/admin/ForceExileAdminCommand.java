@@ -35,9 +35,7 @@ public class ForceExileAdminCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
         		return;
         	}
-        	boolean doWildTeleport = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.random_wild", true);
-			boolean doRemoveStats = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
-        	if(getKonquest().getKingdomManager().exilePlayer(player,doWildTeleport,doRemoveStats)) {
+        	if(getKonquest().getKingdomManager().exilePlayer(player,true,true)) {
         		boolean doRemoveFavor = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.remove_favor", true);
     			if(doRemoveFavor) {
         			double balance = KonquestPlugin.getBalance(player.getBukkitPlayer());

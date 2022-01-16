@@ -1,7 +1,7 @@
 name: Konquest
 description: A plugin for land claiming and territory control
 author: Rumsfield
-version: 0.7.4
+version: 0.8.0
 api-version: 1.16
 load: POSTWORLD
 main: konquest.KonquestPlugin
@@ -64,6 +64,7 @@ permissions:
       konquest.command.stats: true
       konquest.command.prefix: true
       konquest.command.town: true
+      konquest.command.guild: true
       konquest.command.fly: true
       konquest.command.border: true
       konquest.command.admin.*: true
@@ -139,7 +140,11 @@ permissions:
   konquest.command.town:
     description: Manage a town
     default: true
-    
+
+  konquest.command.guild:
+    description: Manage a kingdom guild
+    default: true
+
   konquest.command.fly:
     description: Fly in friendly territory
     default: op
@@ -157,6 +162,7 @@ permissions:
       konquest.command.admin.flag: true
       konquest.command.admin.forcecapture: true
       konquest.command.admin.forceexile: true
+      konquest.command.admin.forceguild: true
       konquest.command.admin.forcejoin: true
       konquest.command.admin.forcetown: true
       konquest.command.admin.help: true
@@ -196,6 +202,10 @@ permissions:
     description: Forces a player to become a Barbarian
     default: op
   
+  konquest.command.admin.forceguild:
+    description: Forces a Guild to accept the provided management sub-commands
+    default: op
+    
   konquest.command.admin.forcejoin:
     description: Forces a player to join a Kingdom
     default: op

@@ -15,7 +15,8 @@ public class PlayerIcon implements MenuIcon {
 
 	public enum PlayerIconAction {
 		DISPLAY_SCORE,
-		DISPLAY_INFO;
+		DISPLAY_INFO,
+		GUILD;
 	}
 	
 	private String name;

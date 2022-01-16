@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -46,10 +46,8 @@ public class MakeKingdomAdminCommand extends CommandBase {
         	
         	Location playerLoc = bukkitPlayer.getLocation();
         	String kingdomName = getArgs()[2];
-        	if(!StringUtils.isAlphanumeric(kingdomName)) {
-        		//ChatUtil.sendError((Player) getSender(), "Kingdom name must only contain letters and/or numbers");
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
-                return;
+        	if(getKonquest().validateName(kingdomName,bukkitPlayer) != 0) {
+        		return;
         	}
         	boolean pass = getKonquest().getKingdomManager().addKingdom(playerLoc, kingdomName);
         	if(!pass) {
@@ -60,10 +58,10 @@ public class MakeKingdomAdminCommand extends CommandBase {
         		//ChatUtil.sendNotice((Player) getSender(), "Claim additional land with \"/k admin claim\".");
         		//ChatUtil.sendNotice((Player) getSender(), "Set the capital spawn point with \"/k admin settravel\".");
         		//ChatUtil.sendNotice((Player) getSender(), "Next, set up the Kingdom Monument with \"/k admin monument "+kingdomName+" create\".");
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_1.getMessage(kingdomName));
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_2.getMessage());
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_3.getMessage());
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_4.getMessage(kingdomName));
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_1.getMessage(kingdomName), ChatColor.LIGHT_PURPLE);
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_2.getMessage(), ChatColor.LIGHT_PURPLE);
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_3.getMessage(), ChatColor.LIGHT_PURPLE);
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_4.getMessage(kingdomName), ChatColor.LIGHT_PURPLE);
         		// Render border particles
         		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         		getKonquest().getKingdomManager().updatePlayerBorderParticles(player, playerLoc);

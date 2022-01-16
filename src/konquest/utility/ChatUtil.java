@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 
 
@@ -42,6 +44,19 @@ public class ChatUtil {
             matcher = pattern.matcher(message);
         }
         return ChatColor.translateAlternateColorCodes('&', message);
+	}
+	
+	/**
+	 * Parse a string color code into usable color
+	 * @param input - The code to be parsed
+	 * @return ChatColor enum code, null if invalid code
+	 */
+	public static ChatColor parseColorCode(String input) {
+		ChatColor result = null;
+		try {
+			result = ChatColor.valueOf(input);
+		} catch (Exception ignored) {}
+		return result;
 	}
 	
 	/**
@@ -94,6 +109,120 @@ public class ChatUtil {
 			}
 		}
 		return message;
+	}
+	
+	public static Color lookupColor(ChatColor reference) {
+		Color result = Color.WHITE;
+		switch(reference) {
+			case BLACK:
+				result = Color.fromRGB(0x000000);
+				break;
+			case DARK_BLUE:
+				result = Color.fromRGB(0x0000AA);
+				break;
+			case DARK_GREEN:
+				result = Color.fromRGB(0x00AA00);
+				break;
+			case DARK_AQUA:
+				result = Color.fromRGB(0x00AAAA);
+				break;
+			case DARK_RED:
+				result = Color.fromRGB(0xAA0000);
+				break;
+			case DARK_PURPLE:
+				result = Color.fromRGB(0xAA00AA);
+				break;
+			case GOLD:
+				result = Color.fromRGB(0xFFAA00);
+				break;
+			case GRAY:
+				result = Color.fromRGB(0xAAAAAA);
+				break;
+			case DARK_GRAY:
+				result = Color.fromRGB(0x555555);
+				break;
+			case BLUE:
+				result = Color.fromRGB(0x5555FF);
+				break;
+			case GREEN:
+				result = Color.fromRGB(0x55FF55);
+				break;
+			case AQUA:
+				result = Color.fromRGB(0x55FFFF);
+				break;
+			case RED:
+				result = Color.fromRGB(0xFF5555);
+				break;
+			case LIGHT_PURPLE:
+				result = Color.fromRGB(0xFF55FF);
+				break;
+			case YELLOW:
+				result = Color.fromRGB(0xFFFF55);
+				break;
+			case WHITE:
+				result = Color.fromRGB(0xFFFFFF);
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
+	
+	public static BarColor mapBarColor(ChatColor reference) {
+		BarColor result = BarColor.WHITE;
+		switch(reference) {
+			case BLACK:
+				result = BarColor.PURPLE;
+				break;
+			case DARK_BLUE:
+				result = BarColor.BLUE;
+				break;
+			case DARK_GREEN:
+				result = BarColor.GREEN;
+				break;
+			case DARK_AQUA:
+				result = BarColor.BLUE;
+				break;
+			case DARK_RED:
+				result = BarColor.RED;
+				break;
+			case DARK_PURPLE:
+				result = BarColor.PURPLE;
+				break;
+			case GOLD:
+				result = BarColor.YELLOW;
+				break;
+			case GRAY:
+				result = BarColor.WHITE;
+				break;
+			case DARK_GRAY:
+				result = BarColor.WHITE;
+				break;
+			case BLUE:
+				result = BarColor.BLUE;
+				break;
+			case GREEN:
+				result = BarColor.GREEN;
+				break;
+			case AQUA:
+				result = BarColor.BLUE;
+				break;
+			case RED:
+				result = BarColor.RED;
+				break;
+			case LIGHT_PURPLE:
+				result = BarColor.PINK;
+				break;
+			case YELLOW:
+				result = BarColor.YELLOW;
+				break;
+			case WHITE:
+				result = BarColor.WHITE;
+				break;
+			default:
+				break;
+		}
+		return result;
 	}
 	
 	public static void printDebug(String message) {

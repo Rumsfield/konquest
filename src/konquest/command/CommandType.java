@@ -19,6 +19,7 @@ public enum CommandType {
 	CLAIM   (Material.DIAMOND_SHOVEL,   "konquest.command.claim",   "",   "[radius|auto] [<radius>]",                                       MessagePath.DESCRIPTION_CLAIM.getMessage()),
 	TRAVEL  (Material.COMPASS,          "konquest.command.travel",  "t",  "<town>|capital|camp|wild",                                       MessagePath.DESCRIPTION_TRAVEL.getMessage()),
 	TOWN    (Material.IRON_DOOR,        "konquest.command.town",    "",   "<town> add|kick|knight|lord|rename|upgrade|shield|options|plots [player]", MessagePath.DESCRIPTION_TOWN.getMessage()),
+	GUILD   (Material.GOLDEN_AXE,       "konquest.command.guild",   "g",  "[menu|create|add|kick|rename] [name]",                           MessagePath.DESCRIPTION_GUILD.getMessage()),
 	QUEST   (Material.WRITABLE_BOOK,    "konquest.command.quest",   "q",  "",                                                               MessagePath.DESCRIPTION_QUEST.getMessage()),
 	STATS   (Material.BOOK,             "konquest.command.stats",   "s",  "",                                                               MessagePath.DESCRIPTION_STATS.getMessage()),
 	PREFIX  (Material.NAME_TAG,         "konquest.command.prefix",  "p",  "",                                                               MessagePath.DESCRIPTION_PREFIX.getMessage()),

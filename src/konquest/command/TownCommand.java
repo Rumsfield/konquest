@@ -493,6 +493,10 @@ public class TownCommand extends CommandBase {
 	                        return;
 	    				}
 	    			}
+	    			// Check new name constraints
+	    			if(getKonquest().validateName(newTownName,bukkitPlayer) != 0) {
+	            		return;
+	            	}
 	        		// Rename the town
 	        		//boolean success = player.getKingdom().renameTown(townName, newTownName);
 	        		boolean success = getKonquest().getKingdomManager().renameTown(townName, newTownName, town.getKingdom().getName());
@@ -509,6 +513,8 @@ public class TownCommand extends CommandBase {
 			                	getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)cost);
 			                }
 		        		}
+	        		} else {
+	        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 	        		}
 	        	} else {
 	        		//ChatUtil.sendError((Player) getSender(), "Must provide a new Town name!");

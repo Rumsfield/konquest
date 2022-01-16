@@ -1,6 +1,7 @@
 package konquest;
 
 import java.awt.Point;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,6 +12,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -35,6 +37,7 @@ import konquest.manager.CampManager;
 import konquest.manager.ConfigManager;
 import konquest.manager.DirectiveManager;
 import konquest.manager.DisplayManager;
+import konquest.manager.GuildManager;
 import konquest.manager.IntegrationManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.LanguageManager;
@@ -56,12 +59,17 @@ import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.model.KonUpgrade;
+import konquest.nms.Handler_1_16_R3;
+import konquest.nms.Handler_1_17_R1;
+import konquest.nms.Handler_1_18_R1;
 import konquest.nms.TeamPacketSender;
 import konquest.nms.TeamPacketSender_p754;
 import konquest.nms.TeamPacketSender_p755;
 //import konquest.nms.TeamPacketSender_p756;
 import konquest.nms.TeamPacketSender_p757;
+import konquest.nms.VersionHandler;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 import konquest.command.CommandHandler;
@@ -74,7 +82,14 @@ public class Konquest implements Timeable {
 	private static String chatTag;
 	private static String chatMessage;
 	public static final String chatDivider = "§7»";
-	
+	public static ChatColor friendColor1 = ChatColor.GREEN;
+	public static ChatColor friendColor2 = ChatColor.DARK_GREEN;
+	public static ChatColor enemyColor1 = ChatColor.RED;
+	public static ChatColor enemyColor2 = ChatColor.DARK_RED;
+	public static ChatColor armisticeColor1 = ChatColor.LIGHT_PURPLE;
+	public static ChatColor armisticeColor2 = ChatColor.DARK_PURPLE;
+	public static ChatColor barbarianColor = ChatColor.YELLOW;
+	public static ChatColor neutralColor = ChatColor.GRAY;
 	
 	private DatabaseThread databaseThread;
 	private AccomplishmentManager accomplishmentManager;
@@ -94,13 +109,17 @@ public class Konquest implements Timeable {
 	private MapHandler mapHandler;
 	private PlaceholderManager placeholderManager;
 	private PlotManager plotManager;
+	private GuildManager guildManager;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
     private Team enemyTeam;
+    private Team armisticeTeam;
     private Team barbarianTeam;
     private TeamPacketSender teamPacketSender;
     private boolean isPacketSendEnabled;
+    private VersionHandler versionHandler;
+    private boolean isVersionHandlerEnabled;
 	
 	private EventPriority chatPriority;
 	private static final EventPriority defaultChatPriority = EventPriority.HIGH;
@@ -117,7 +136,6 @@ public class Konquest implements Timeable {
             weakValues().
             makeMap();
 	private ConcurrentMap<UUID, ItemStack> headCache = new MapMaker().makeMap();
-	//private HashMap<Player,KonTerritory> teleportTerritoryQueue;
 	private HashMap<Player,Location> teleportLocationQueue;
 	
 	public Konquest(KonquestPlugin plugin) {
@@ -144,6 +162,10 @@ public class Konquest implements Timeable {
 		mapHandler = new MapHandler(this);
 		placeholderManager = new PlaceholderManager(this);
 		plotManager = new PlotManager(this);
+		guildManager = new GuildManager(this);
+		
+		teamPacketSender = null;
+		versionHandler = null;
 		
 		chatPriority = defaultChatPriority;
 		worlds = new ArrayList<World>();
@@ -155,6 +177,7 @@ public class Konquest implements Timeable {
 		this.saveIntervalSeconds = 0;
 		this.offlineTimeoutSeconds = 0;
 		this.isPacketSendEnabled = false;
+		this.isVersionHandlerEnabled = false;
 		
 		//teleportTerritoryQueue = new HashMap<Player,KonTerritory>();
 		teleportLocationQueue = new HashMap<Player,Location>();
@@ -167,11 +190,15 @@ public class Konquest implements Timeable {
 		ChatUtil.printDebug("Debug is "+debug);
 		String worldName = configManager.getConfig("core").getString("core.world_name");
 		ChatUtil.printDebug("Primary world is "+worldName);
+		
+		initColors();
 		languageManager.initialize();
 		kingdomManager.initialize();
 		ruinManager.initialize();
+		guildManager.initialize();
 		initManagers();
 		initWorlds();
+		
 		databaseThread.setSleepSeconds(saveIntervalSeconds);
 		if(!databaseThread.isRunning()) {
 			ChatUtil.printDebug("Starting database thread");
@@ -183,27 +210,72 @@ public class Konquest implements Timeable {
 		// Create global scoreboard and teams
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         friendlyTeam = scoreboard.registerNewTeam("friendlies");
-        friendlyTeam.setColor(ChatColor.GREEN);
+        friendlyTeam.setColor(friendColor1);
         enemyTeam = scoreboard.registerNewTeam("enemies");
-        enemyTeam.setColor(ChatColor.RED);
+        enemyTeam.setColor(enemyColor1);
+        armisticeTeam = scoreboard.registerNewTeam("armistice");
+        armisticeTeam.setColor(armisticeColor1);
         barbarianTeam = scoreboard.registerNewTeam("barbarians");
-        barbarianTeam.setColor(ChatColor.YELLOW);
+        barbarianTeam.setColor(barbarianColor);
         
-        if(setupTeamPacketSender()) {
-        	if(plugin.isProtocolEnabled()) {
-        		ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version");
-        		isPacketSendEnabled = true;
-        	} else {
-        		ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is disabled! Check version.");
-        	}
-        } else {
-        	ChatUtil.printConsoleError("Failed to register name color packets, the server version is unsupported");
-        }
+        // Set up version-specific classes
+        initVersionHandlers();
 		
 		// Render Maps
 		mapHandler.initialize();
 		
 		ChatUtil.printDebug("Finished Initialization");
+	}
+	
+	private void initVersionHandlers() {
+		String version;
+    	try {
+    		version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    	} catch (ArrayIndexOutOfBoundsException e) {
+    		ChatUtil.printConsoleError("Failed to determine server version.");
+    		return;
+    	}
+    	ChatUtil.printConsoleAlert("Your server version is "+version+", "+Bukkit.getServer().getBukkitVersion());
+    	boolean isTeamPacketSenderReady = false;
+    	boolean isVersionHandlerReady = false;
+    	
+    	// Version-specific cases
+    	switch(version) {
+    		case "v1_16_R3":
+    			teamPacketSender = new TeamPacketSender_p754();
+    			versionHandler = new Handler_1_16_R3();
+    			break;
+    		case "v1_17_R1":
+    			teamPacketSender = new TeamPacketSender_p755();
+    			versionHandler = new Handler_1_17_R1();
+    			break;
+    		case "v1_18_R1":
+    			teamPacketSender = new TeamPacketSender_p757();
+    			versionHandler = new Handler_1_18_R1();
+    			break;
+    		default:
+    			break;
+    	}
+    	isTeamPacketSenderReady = teamPacketSender != null;
+    	isVersionHandlerReady = versionHandler != null;
+		
+    	if(isTeamPacketSenderReady) {
+        	if(plugin.isProtocolEnabled()) {
+        		ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version.");
+        		isPacketSendEnabled = true;
+        	} else {
+        		ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is disabled! Check version.");
+        	}
+        } else {
+        	ChatUtil.printConsoleError("Failed to register name color packets, the server version is unsupported.");
+        }
+    	
+    	if(isVersionHandlerReady) {
+    		isVersionHandlerEnabled = true;
+    	} else {
+    		ChatUtil.printConsoleError("Some Konquest features may not work for this server version.");
+    	}
+    	
 	}
 	
 	public void reload() {
@@ -232,6 +304,7 @@ public class Konquest implements Timeable {
 		shieldManager.initialize();
 		placeholderManager.initialize();
 		plotManager.initialize();
+		guildManager.loadOptions();
 		offlineTimeoutSeconds = (long)(configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)*86400);
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;
@@ -273,6 +346,67 @@ public class Konquest implements Timeable {
 			if(!matches) {
 				ChatUtil.printConsoleError("core.world_blacklist name \""+name+"\" does not match any server worlds, check spelling and case.");
 			}
+		}
+	}
+	
+	private void initColors() {
+		ChatColor color;
+		String configColor = "";
+		/* Friendly Primary Color */
+		configColor = configManager.getConfig("core").getString("core.colors.friendly_primary","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.friendly_primary: "+configColor);
+		} else {
+			friendColor1 = color;
+		}
+		/* Friendly Secondary Color */
+		configColor = configManager.getConfig("core").getString("core.colors.friendly_secondary","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.friendly_secondary: "+configColor);
+		} else {
+			friendColor2 = color;
+		}
+		/* Enemy Primary Color */
+		configColor = configManager.getConfig("core").getString("core.colors.enemy_primary","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_primary: "+configColor);
+		} else {
+			enemyColor1 = color;
+		}
+		/* Enemy Secondary Color */
+		configColor = configManager.getConfig("core").getString("core.colors.enemy_secondary","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_secondary: "+configColor);
+		} else {
+			enemyColor2 = color;
+		}
+		/* Armistice Primary Color */
+		configColor = configManager.getConfig("core").getString("core.colors.armistice_primary","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_primary: "+configColor);
+		} else {
+			armisticeColor1 = color;
+		}
+		/* Armistice Secondary Color */
+		configColor = configManager.getConfig("core").getString("core.colors.armistice_secondary","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_secondary: "+configColor);
+		} else {
+			armisticeColor2 = color;
+		}
+		/* Barbarian Color */
+		configColor = configManager.getConfig("core").getString("core.colors.barbarian","");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			ChatUtil.printConsoleError("Invalid color code core.colors.barbarian: "+configColor);
+		} else {
+			barbarianColor = color;
 		}
 	}
 	
@@ -348,12 +482,30 @@ public class Konquest implements Timeable {
 		return player;
 	}
 	
+	public void save() {
+		// Save config files
+		kingdomManager.saveKingdoms();
+		campManager.saveCamps();
+		ruinManager.saveRuins();
+		guildManager.saveGuilds();
+		configManager.saveConfigs();
+	}
+	
 	public static Konquest getInstance() {
 		return instance;
 	}
 	
 	public KonquestPlugin getPlugin() {
 		return plugin;
+	}
+	
+	public VersionHandler getVersionHandler() {
+		// This can be null!
+		return versionHandler;
+	}
+	
+	public boolean isVersionHandlerEnabled() {
+		return isVersionHandlerEnabled;
 	}
 	
 	public AccomplishmentManager getAccomplishmentManager() {
@@ -436,6 +588,10 @@ public class Konquest implements Timeable {
 		return plotManager;
 	}
 	
+	public GuildManager getGuildManager() {
+		return guildManager;
+	}
+	
 	public long getOfflineTimeoutSeconds() {
 		return offlineTimeoutSeconds;
 	}
@@ -476,6 +632,68 @@ public class Konquest implements Timeable {
 		return true;
 	}
 	
+	/**
+	 * Checks for name conflicts and constraints for all namable objects
+	 * @param name - The name of an object (town, ruin, etc)
+	 * @param player - The player requesting the name, to be sent status messages
+	 * @return Status code
+	 * 			0 - Success, no issue found
+	 * 			1 - Error, name is not strictly alpha-numeric
+	 * 			2 - Error, name has more than 20 characters
+	 * 			3 - Error, name is an existing player
+	 * 			4 - Error, name is a kingdom
+	 * 			5 - Error, name is a town
+	 * 			6 - Error, name is a ruin
+	 * 			7 - Error, name is a guild
+	 */
+	public int validateName(String name, Player player) {
+		if(name == null || name.equals("") || !StringUtils.isAlphanumeric(name)) {
+    		if(player != null) {
+    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
+    		}
+			return 1;
+    	}
+    	if(name.length() > 20) {
+    		if(player != null) {
+    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_LENGTH_NAME.getMessage());
+    		}
+    		return 2;
+    	}
+    	if(playerManager.isPlayerNameExist(name)) {
+    		if(player != null) {
+    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+    		}
+    		return 3;
+    	}
+		if(kingdomManager.isKingdom(name)) {
+			if(player != null) {
+    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+    		}
+			return 4;
+		}
+		for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
+			if(kingdom.hasTown(name)) {
+				if(player != null) {
+	    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+	    		}
+				return 5;
+			}
+		}
+		if(ruinManager.isRuin(name)) {
+			if(player != null) {
+    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+    		}
+			return 6;
+		}
+		if(guildManager.isGuild(name)) {
+			if(player != null) {
+    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+    		}
+			return 7;
+		}
+		return 0;
+	}
+	
 	@Override
 	public void onEndTimer(int taskID) {
 		if(taskID == 0) {
@@ -511,11 +729,7 @@ public class Konquest implements Timeable {
 				}
 			}
 			// Save config files
-			kingdomManager.saveKingdoms();
-			campManager.saveCamps();
-			ruinManager.saveRuins();
-			//playerManager.saveAllPlayers();
-			configManager.saveConfigs();
+			save();
 			saveTimer.setTime(saveIntervalSeconds);
 			ChatUtil.sendAdminBroadcast("Saved all config files");
 		} else if(taskID == compassTimer.getTaskID()) {
@@ -789,18 +1003,21 @@ public class Konquest implements Timeable {
 	}
 	
 	// This can return null!
-	public Location getRandomWildLocation(int worldSize, World world) {
+	public Location getRandomWildLocation(World world) {
 		Location wildLoc = null;
-		ChatUtil.printDebug("Generating random wilderness location for size "+worldSize);
-		
+		int radius = configManager.getConfig("core").getInt("core.travel.wild_radius",500);
+		int offsetX = configManager.getConfig("core").getInt("core.travel.wild_center_x",0);
+		int offsetZ = configManager.getConfig("core").getInt("core.travel.wild_center_z",0);
+		radius = radius > 0 ? radius : 2;
+		ChatUtil.printDebug("Generating random wilderness location at center "+offsetX+","+offsetZ+" in radius "+radius);
 		int randomNumX = 0;
 		int randomNumZ = 0;
 		int randomNumY = 0;
 		boolean foundValidLoc = false;
 		int timeout = 0;
 		while(!foundValidLoc) {
-			randomNumX = ThreadLocalRandom.current().nextInt(-1*(worldSize/2), (worldSize/2) + 1);
-			randomNumZ = ThreadLocalRandom.current().nextInt(-1*(worldSize/2), (worldSize/2) + 1);
+			randomNumX = ThreadLocalRandom.current().nextInt(-1*(radius), (radius) + 1) + offsetX;
+			randomNumZ = ThreadLocalRandom.current().nextInt(-1*(radius), (radius) + 1) + offsetZ;
 			randomNumY = world.getHighestBlockYAt(randomNumX,randomNumZ) + 3;
 			wildLoc = new Location(world, randomNumX, randomNumY, randomNumZ);
 			if(!kingdomManager.isChunkClaimed(wildLoc)) {
@@ -866,25 +1083,6 @@ public class Konquest implements Timeable {
 		randLoc.setYaw(yaw);
 		return randLoc;
 	}
-	
-    private boolean setupTeamPacketSender() {
-    	String version;
-    	try {
-    		version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-    	} catch (ArrayIndexOutOfBoundsException e) {
-    		ChatUtil.printConsoleError("Failed to determine server version.");
-    		return false;
-    	}
-    	ChatUtil.printConsoleAlert("Your server version is "+version);
-    	if(version.equals("v1_16_R3")) {
-    		teamPacketSender = new TeamPacketSender_p754();
-    	} else if(version.equals("v1_17_R1")) {
-    		teamPacketSender = new TeamPacketSender_p755();
-    	} else if(version.equals("v1_18_R1")) {
-    		teamPacketSender = new TeamPacketSender_p757();
-    	}
-    	return teamPacketSender != null;
-    }
     
     /**
      * Sends updated team packets for the given player
@@ -898,16 +1096,22 @@ public class Konquest implements Timeable {
     	// Send arg player packets for each team with lists of online players
 		List<String> friendlyNames = new ArrayList<String>();
 		List<String> enemyNames = new ArrayList<String>();
+		List<String> armisticeNames = new ArrayList<String>();
 		List<String> barbarianNames = new ArrayList<String>();
     	for(KonPlayer onlinePlayer : playerManager.getPlayersOnline()) {
-    		// Place online player is appropriate list w.r.t. player
+    		boolean isArmistice = guildManager.isArmistice(onlinePlayer, player);
+    		// Place online player in appropriate list w.r.t. player
     		if(onlinePlayer.isBarbarian()) {
     			barbarianNames.add(onlinePlayer.getBukkitPlayer().getName());
     		} else {
     			if(onlinePlayer.getKingdom().equals(player.getKingdom())) {
     				friendlyNames.add(onlinePlayer.getBukkitPlayer().getName());
     			} else {
-    				enemyNames.add(onlinePlayer.getBukkitPlayer().getName());
+    				if(isArmistice) {
+    					armisticeNames.add(onlinePlayer.getBukkitPlayer().getName());
+    				} else {
+    					enemyNames.add(onlinePlayer.getBukkitPlayer().getName());
+    				}
     			}
     		}
     		// Send appropriate team packet to online player
@@ -917,7 +1121,11 @@ public class Konquest implements Timeable {
     			if(player.getKingdom().equals(onlinePlayer.getKingdom())) {
     				teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), friendlyTeam);
     			} else {
-    				teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), enemyTeam);
+    				if(isArmistice) {
+    					teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), armisticeTeam);
+    				} else {
+    					teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), enemyTeam);
+    				}
     			}
     		}
     	}
@@ -928,71 +1136,27 @@ public class Konquest implements Timeable {
     	if(!enemyNames.isEmpty()) {
     		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), enemyNames, enemyTeam);
     	}
+    	if(!armisticeNames.isEmpty()) {
+    		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), armisticeNames, armisticeTeam);
+    	}
     	if(!barbarianNames.isEmpty()) {
     		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), barbarianNames, barbarianTeam);
     	}
     }
     
-    /*
-    //TODO This could be optimized to reduce loop Order, and only update as needed
-    public void updateNamePackets() {
-    	if(teamPacketSender != null) {
-	    	// Update all Kingdom player's nametag color packets
-			for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
-				// For each kingdom, determine friendlies and enemies
-				List<Player> friendlyPlayers = new ArrayList<Player>();
-				List<String> friendlyNames = new ArrayList<String>();
-				List<String> enemyNames = new ArrayList<String>();
-				List<String> barbarianNames = new ArrayList<String>();
-				// Populate friendly and enemy lists
-				for(KonPlayer player : playerManager.getPlayersOnline()) {
-		    		if(player.getKingdom().equals(kingdom)) {
-		    			friendlyNames.add(player.getBukkitPlayer().getName());
-		    			friendlyPlayers.add(player.getBukkitPlayer());
-		    		} else if(!player.isBarbarian()) {
-		    			enemyNames.add(player.getBukkitPlayer().getName());
-		    		} else {
-		    			barbarianNames.add(player.getBukkitPlayer().getName());
-		    		}
-		    	}
-				// For each friendly player in this kingdom, send packet update
-				for(Player kingdomPlayer : friendlyPlayers) {
-					if(!friendlyNames.isEmpty()) {
-						teamPacketSender.sendPlayerTeamPacket(kingdomPlayer, friendlyNames, friendlyTeam);
-			    	}
-			    	if(!enemyNames.isEmpty()) {
-			    		teamPacketSender.sendPlayerTeamPacket(kingdomPlayer, enemyNames, enemyTeam);
-			    	}
-			    	if(!barbarianNames.isEmpty()) {
-			    		teamPacketSender.sendPlayerTeamPacket(kingdomPlayer, barbarianNames, barbarianTeam);
-			    	}
-				}
-			}
-			// Update all Barbarian player's nametag color packets
-			List<Player> barbarianPlayers = new ArrayList<Player>();
-			List<String> enemyNames = new ArrayList<String>();
-			List<String> barbarianNames = new ArrayList<String>();
-			// Populate barbarian and enemy lists
-			for(KonPlayer player : playerManager.getPlayersOnline()) {
-	    		if(player.isBarbarian()) {
-	    			barbarianNames.add(player.getBukkitPlayer().getName());
-	    			barbarianPlayers.add(player.getBukkitPlayer());
-	    		} else {
-	    			enemyNames.add(player.getBukkitPlayer().getName());
-	    		}
-	    	}
-			// For each barbarian player, send packet update
-			for(Player barbarianPlayer : barbarianPlayers) {
-		    	if(!enemyNames.isEmpty()) {
-		    		teamPacketSender.sendPlayerTeamPacket(barbarianPlayer, enemyNames, enemyTeam);
-		    	}
-		    	if(!barbarianNames.isEmpty()) {
-		    		teamPacketSender.sendPlayerTeamPacket(barbarianPlayer, barbarianNames, barbarianTeam);
-		    	}
-			}
+    public void updateNamePackets(OfflinePlayer offlineBukkitPlayer) {
+    	if(offlineBukkitPlayer != null && offlineBukkitPlayer.getName() != null && offlineBukkitPlayer.isOnline()) {
+    		KonPlayer player = playerManager.getPlayer((Player)offlineBukkitPlayer);
+    		if(player != null) {
+    			updateNamePackets(player);
+    		}
     	}
     }
-    */
+    
+    public void updateNamePackets(UUID id) {
+    	OfflinePlayer offlineBukkitPlayer = Bukkit.getOfflinePlayer(id);
+    	updateNamePackets(offlineBukkitPlayer);
+    }
     
     public static UUID idFromString(String id) {
     	UUID result = null;
@@ -1003,24 +1167,6 @@ public class Konquest implements Timeable {
     	}
     	return result;
     }
-    
-    /*
-    public void telePlayerTerritory(Player player, KonTerritory travelTerritory) {
-    	Point locPoint = toPoint(travelTerritory.getCenterLoc());
-    	Location qLoc = travelTerritory.getSpawnLoc();
-		Location pLoc = player.getLocation();
-		Location destination = new Location(qLoc.getWorld(),qLoc.getBlockX()+0.5,qLoc.getBlockY()+1.0,qLoc.getBlockZ()+0.5,pLoc.getYaw(),pLoc.getPitch());
-    	if(travelTerritory.getWorld().isChunkLoaded(locPoint.x,locPoint.y)) {
-    		ChatUtil.printDebug("Teleporting player "+player.getName()+" to loaded territory");
-    		player.teleport(destination,TeleportCause.PLUGIN);
-    	} else {
-    		//teleportTerritoryQueue.put(player,travelTerritory);
-    		teleportLocationQueue.put(player,destination);
-    		ChatUtil.printDebug("Queueing player "+player.getName()+" for unloaded territory destination");
-    		travelTerritory.getWorld().loadChunk(locPoint.x,locPoint.y);
-    	}
-    }
-    */
     
     public void telePlayerLocation(Player player, Location travelLocation) {
     	Point locPoint = toPoint(travelLocation);
@@ -1127,15 +1273,89 @@ public class Konquest implements Timeable {
     	}
     }
     
-    public static ChatColor getContextColor(KonOfflinePlayer observer, KonOfflinePlayer target) {
+    /**
+     * Determines primary color based on player relationships
+     * @param displayPlayer - The target player to show the color to
+     * @param contextPlayer - The player to base the color from
+     * @param isArmistice - Are the two players in an armistice?
+     * @return Color
+     */
+    public static ChatColor getDisplayPrimaryColor(KonOfflinePlayer displayPlayer, KonOfflinePlayer contextPlayer, boolean isArmistice) {
     	ChatColor result = ChatColor.RED;
-    	if(target.isBarbarian()) {
-    		result = ChatColor.YELLOW;
-    	} else {
-    		if(target.getKingdom().equals(observer.getKingdom())) {
-    			result = ChatColor.GREEN;
+    	if(contextPlayer.isBarbarian()) {
+    		result = barbarianColor;
+		} else {
+			if(contextPlayer.getKingdom().equals(displayPlayer.getKingdom())) {
+				result = friendColor1;
+    		} else {
+    			if(isArmistice) {
+    				result = armisticeColor1;
+    			} else {
+    				result = enemyColor1;
+    			}
     		}
-    	}
+		}
+    	return result;
+    }
+    
+    public static ChatColor getDisplayPrimaryColor(KonKingdom displayKingdom, KonKingdom contextKingdom, boolean isArmistice) {
+    	ChatColor result = ChatColor.RED;
+    	if(contextKingdom.equals(displayKingdom)) {
+			result = friendColor1;
+		} else {
+			if(isArmistice) {
+				result = armisticeColor1;
+			} else {
+				result = enemyColor1;
+			}
+		}
+    	return result;
+    }
+    
+    public static ChatColor getDisplayPrimaryColor(KonOfflinePlayer displayPlayer, KonTown contextTown, boolean isArmistice) {
+    	return getDisplayPrimaryColor(displayPlayer.getKingdom(), contextTown.getKingdom(), isArmistice);
+    }
+    
+    /**
+     * Determines secondary color based on player relationships
+     * @param displayPlayer - The target player to show the color to
+     * @param contextPlayer - The player to base the color from
+     * @param isArmistice - Are the two players in an armistice?
+     * @return Color
+     */
+    public static ChatColor getDisplaySecondaryColor(KonOfflinePlayer displayPlayer, KonOfflinePlayer contextPlayer, boolean isArmistice) {
+    	ChatColor result = ChatColor.RED;
+    	if(contextPlayer.isBarbarian()) {
+    		result = barbarianColor;
+		} else {
+			if(contextPlayer.getKingdom().equals(displayPlayer.getKingdom())) {
+				result = friendColor2;
+    		} else {
+    			if(isArmistice) {
+    				result = armisticeColor2;
+    			} else {
+    				result = enemyColor2;
+    			}
+    		}
+		}
+    	return result;
+    }
+    
+    public ChatColor getDisplayKingdomColor(KonKingdom displayKingdom, KonKingdom contextKingdom, boolean isArmistice) {
+    	ChatColor result = ChatColor.RED;
+    	if(contextKingdom.equals(kingdomManager.getBarbarians())) {
+    		result = barbarianColor;
+    	} else if(contextKingdom.equals(kingdomManager.getNeutrals())) {
+    		result = neutralColor;
+    	} else if(contextKingdom.equals(displayKingdom)) {
+			result = friendColor1;
+		} else {
+			if(isArmistice) {
+				result = armisticeColor1;
+			} else {
+				result = enemyColor1;
+			}
+		}
     	return result;
     }
     
@@ -1159,6 +1379,15 @@ public class Konquest implements Timeable {
             @Override
             public void run() {
             	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, (float)0.5, (float)1.4);
+            }
+        },1);
+    }
+    
+    public static void playDiscountSound(Player bukkitPlayer) {
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_VILLAGER_CELEBRATE, (float)1.0, (float)1.0);
             }
         },1);
     }
@@ -1205,6 +1434,16 @@ public class Konquest implements Timeable {
 		
 		return result;		
 	}
+    
+    public static String getLastSeenFormat(OfflinePlayer offlineBukkitPlayer) {
+    	Date date = new Date(); // Now
+    	if(!offlineBukkitPlayer.isOnline()) {
+    		date = new Date(offlineBukkitPlayer.getLastPlayed()); // Last joined
+    	}
+    	//SimpleDateFormat formater = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+    	SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+        return formater.format(date);
+    }
     
     public static EventPriority getEventPriority(String priority) {
     	EventPriority result = defaultChatPriority;

@@ -94,15 +94,44 @@ public class PagedMenu {
 		pages.get(currentPageIndex).updateIcons();
 	}
 	
+	public int getNextSlot(int page) {
+		int maxSize = pages.get(page).getInventory().getSize();
+		return maxSize-1;
+	}
+	
+	public int getCurrentNextSlot() {
+		int maxSize = pages.get(currentPageIndex).getInventory().getSize();
+		return maxSize-1;
+	}
+	
+	public int getCloseSlot(int page) {
+		int maxSize = pages.get(page).getInventory().getSize();
+		return maxSize-5;
+	}
+	
+	public int getCurrentCloseSlot() {
+		int maxSize = pages.get(currentPageIndex).getInventory().getSize();
+		return maxSize-5;
+	}
+	
+	public int getBackSlot(int page) {
+		int maxSize = pages.get(page).getInventory().getSize();
+		return maxSize-9;
+	}
+	
+	public int getCurrentBackSlot() {
+		int maxSize = pages.get(currentPageIndex).getInventory().getSize();
+		return maxSize-9;
+	}
+	
 	public void refreshNavigationButtons() {
 		// Place a back button on pages > 0
 		// Place a next button on pages < max
 		// Place a close button on all pages
 		for(int i=0;i<pages.size();i++) {
-			int maxSize = pages.get(i).getInventory().getSize();
-			int nextIndex = maxSize-1;
-			int closeIndex = maxSize-5;
-			int backIndex = maxSize-9;
+			int nextIndex = getNextSlot(i);
+			int closeIndex = getCloseSlot(i);
+			int backIndex = getBackSlot(i);
 			if(i > 0) {
 				// Place a back button
 				pages.get(i).addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_BACK.getMessage(),Collections.emptyList(),Material.ENDER_PEARL,backIndex,true));

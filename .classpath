@@ -15,5 +15,7 @@
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/ProtocolLib.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/PlaceholderAPI-2.10.10.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/Dynmap-3.2-beta-2-spigot.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/spigot-1.17.1-R0.1-SNAPSHOT-remapped.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/spigot-1.16.5-R0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

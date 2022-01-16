@@ -32,6 +32,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.InventoryAction;
@@ -62,6 +63,7 @@ public class InventoryListener implements Listener {
 			return;
 		}
 		// Monitor blocks in claimed territory
+		// Check for merchant trades in claimed territory of guilds
 		Location openLoc = event.getInventory().getLocation();
 		
 		if(openLoc != null && konquest.getKingdomManager().isChunkClaimed(openLoc)) {
@@ -154,6 +156,8 @@ public class InventoryListener implements Listener {
 							return;
 						}
 					}
+					// Attempt to modify merchant trades based on guild specialization and relationships with player
+					konquest.getGuildManager().applyTradeDiscounts(player, town, event.getInventory());
 				}
 				
 				// Prevent all inventory openings except for camp owner and clan members when allowed
@@ -193,7 +197,8 @@ public class InventoryListener implements Listener {
 			KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
 			if(player != null && slot < event.getView().getTopInventory().getSize()) {
 				event.setCancelled(true);
-				konquest.getDisplayManager().onDisplayMenuClick(player, event.getClickedInventory(), slot);
+				boolean clickType = (event.getClick().equals(ClickType.RIGHT)) ? false : true;
+				konquest.getDisplayManager().onDisplayMenuClick(player, event.getClickedInventory(), slot, clickType);
 			}
 		}
 	}

@@ -238,7 +238,7 @@ public class KingdomManager {
 	 * @param player
 	 * @return true if not already barbarian and the teleport was successful, else false.
 	 */
-	public boolean exilePlayer(KonPlayer player, boolean teleport, boolean stats) {
+	public boolean exilePlayer(KonPlayer player, boolean teleport, boolean clearStats) {
     	if(player.isBarbarian()) {
     		return false;
     	}
@@ -251,20 +251,35 @@ public class KingdomManager {
 		if(invokeEvent.isCancelled()) {
 			return false;
 		}
-    	//boolean doWildTeleport = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.random_wild", true);
+		boolean doWorldSpawn = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.teleport_world_spawn", false);
+		boolean doWildTeleport = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.teleport_wild", true);
+		boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
     	if(teleport) {
-    		if(!konquest.isWorldValid(player.getBukkitPlayer().getLocation().getWorld())) {
+    		World playerWorld = player.getBukkitPlayer().getLocation().getWorld();
+    		if(!konquest.isWorldValid(playerWorld)) {
         		return false;
         	}
-    		int radius = konquest.getConfigManager().getConfig("core").getInt("core.travel_wild_random_radius",200);
-			Location randomWildLoc = konquest.getRandomWildLocation(radius*2,player.getBukkitPlayer().getLocation().getWorld());
-	    	if(randomWildLoc == null) {
-	    		return false;
+    		Location exileLoc = null;
+    		if(doWorldSpawn) {
+    			exileLoc = playerWorld.getSpawnLocation();
+    		} else if(doWildTeleport) {
+    			exileLoc = konquest.getRandomWildLocation(playerWorld);
+    			if(exileLoc == null) {
+    	    		return false;
+    	    	}
+    		} else {
+    			ChatUtil.printDebug("Teleport for player "+player.getBukkitPlayer().getName()+" on exile is disabled.");
+    		}
+	    	if(exileLoc != null) {
+	    		player.getBukkitPlayer().teleport(exileLoc);
+		    	player.getBukkitPlayer().setBedSpawnLocation(exileLoc, true);
+	    	} else {
+	    		ChatUtil.printDebug("Could not teleport player "+player.getBukkitPlayer().getName()+" on exile, disabled or null location.");
 	    	}
-	    	player.getBukkitPlayer().teleport(randomWildLoc);
-	    	player.getBukkitPlayer().setBedSpawnLocation(randomWildLoc, true);
     	}
     	player.setExileKingdom(oldKingdom);
+    	// Remove guild
+    	konquest.getGuildManager().removePlayerGuild(player.getOfflineBukkitPlayer());
     	// Remove residency
     	for(KonTown town : player.getKingdom().getTowns()) {
     		if(town.removePlayerResident(player.getOfflineBukkitPlayer())) {
@@ -274,7 +289,7 @@ public class KingdomManager {
     		}
     	}
     	//boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
-    	if(stats) {
+    	if(doRemoveStats && clearStats) {
 	    	// Clear all stats
 	    	player.getPlayerStats().clearStats();
 	    	// Disable prefix
@@ -282,6 +297,8 @@ public class KingdomManager {
     	}
     	// Force into global chat mode
     	player.setIsGlobalChat(true);
+    	// Force disabled prefix
+    	player.getPlayerPrefix().setEnable(false);
     	// Make into barbarian
     	player.setKingdom(getBarbarians());
     	player.setBarbarian(true);
@@ -300,6 +317,8 @@ public class KingdomManager {
     	}
     	KonKingdom oldKingdom = offlinePlayer.getKingdom();
     	offlinePlayer.setExileKingdom(oldKingdom);
+    	// Remove guild
+    	konquest.getGuildManager().removePlayerGuild(offlinePlayer.getOfflineBukkitPlayer());
     	// Remove residency
     	for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
     		if(town.removePlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
@@ -1069,6 +1088,15 @@ public class KingdomManager {
 		return false;
 	}
 	
+	public boolean isTown(String name) {
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			if(kingdom.hasTown(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public KonKingdom getBarbarians() {
 		return barbarians;
 	}
@@ -1495,20 +1523,15 @@ public class KingdomManager {
 			Point point = Konquest.toPoint(chunk);
 			World renderWorld = chunk.getWorld();
 			if(isChunkClaimed(point,renderWorld)) {
-				KonKingdom chunkKingdom = getChunkTerritory(point,renderWorld).getKingdom();
+				KonTerritory territory = getChunkTerritory(point,renderWorld);
+				KonKingdom chunkKingdom = territory.getKingdom();
 				Location renderLoc;
-				Color renderColor;
-				if(chunkKingdom.equals(getBarbarians())) {
-					renderColor = Color.YELLOW;
-				} else if(chunkKingdom.equals(getNeutrals())) {
-					renderColor = Color.GRAY;
-				} else {
-					if(player.getKingdom().equals(chunkKingdom)) {
-						renderColor = Color.GREEN;
-					} else {
-						renderColor = Color.RED;
-					}
+				boolean isArmistice = false;
+				if(territory instanceof KonTown) {
+					isArmistice = konquest.getGuildManager().isArmistice(player, (KonTown)territory);
 				}
+				Color renderColor = ChatUtil.lookupColor(konquest.getDisplayKingdomColor(player.getKingdom(), chunkKingdom, isArmistice));
+
 				// Iterate all 4 sides of the chunk
 				// x+0,z+1 side: traverse x 0 -> 15 when z is 15
 				// x+0,z-1 side: traverse x 0 -> 15 when z is 0

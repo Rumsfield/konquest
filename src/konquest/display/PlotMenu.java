@@ -21,7 +21,7 @@ import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-public class PlotMenu {
+public class PlotMenu implements StateMenu {
 
 	enum PlotState {
 		ROOT,
@@ -322,7 +322,7 @@ public class PlotMenu {
 	 * @param slot - Clicked icon index
 	 * @return The new DisplayMenu view.
 	 */
-	public DisplayMenu updateState(int slot) {
+	public DisplayMenu updateState(int slot, boolean clickType) {
 		DisplayMenu result = null;
 		int navMaxIndex = getCurrentView().getInventory().getSize()-1;
 		int navMinIndex = getCurrentView().getInventory().getSize()-9;
@@ -785,7 +785,7 @@ public class PlotMenu {
 	/**
 	 * Place all navigation button icons on view given context and update icons
 	 */
-	public void refreshNavigationButtons(PlotState context) {
+	private void refreshNavigationButtons(PlotState context) {
 		DisplayMenu view = views.get(context);
 		int navStart = view.getInventory().getSize()-9;
 		if(navStart < 0) {

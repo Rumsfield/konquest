@@ -11,6 +11,7 @@ import konquest.Konquest;
 import konquest.utility.BlockPaster;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
+import konquest.utility.RequestKeeper;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
@@ -37,7 +38,7 @@ import org.bukkit.potion.PotionEffectType;
  * @author Rumsfield
  * @prerequisites	The Town's Kingdom must have a valid Monument Template
  */
-public class KonTown extends KonTerritory implements Timeable{
+public class KonTown extends KonTerritory implements Timeable {
 	
 	private KonMonument monument;
 	private Timer monumentTimer;
@@ -49,10 +50,11 @@ public class KonTown extends KonTerritory implements Timeable{
 	private boolean isRaidAlertDisabled;
 	private BossBar monumentBarAllies;
 	private BossBar monumentBarEnemies;
+	private BossBar monumentBarArmistice;
 	private BossBar shieldArmorBarAll;
 	private UUID lord;
 	private HashMap<UUID,Boolean> residents;
-	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident, false = requesting add from lord/knight)
+	private RequestKeeper joinRequestKeeper;
 	private boolean isOpen;
 	private boolean isEnemyRedstoneAllowed;
 	private boolean isResidentPlotOnly;
@@ -80,16 +82,18 @@ public class KonTown extends KonTerritory implements Timeable{
 		this.playerTravelTimers = new HashMap<UUID, Timer>();
 		this.isCaptureDisabled = false;
 		this.isRaidAlertDisabled = false;
-		this.monumentBarAllies = Bukkit.getServer().createBossBar(ChatColor.GREEN+name, BarColor.GREEN, BarStyle.SOLID);
+		this.monumentBarAllies = Bukkit.getServer().createBossBar(Konquest.friendColor1+name, ChatUtil.mapBarColor(Konquest.friendColor1), BarStyle.SOLID);
 		this.monumentBarAllies.setVisible(true);
-		this.monumentBarEnemies = Bukkit.getServer().createBossBar(ChatColor.RED+name, BarColor.RED, BarStyle.SOLID);
+		this.monumentBarEnemies = Bukkit.getServer().createBossBar(Konquest.enemyColor1+name, ChatUtil.mapBarColor(Konquest.enemyColor1), BarStyle.SOLID);
 		this.monumentBarEnemies.setVisible(true);
+		this.monumentBarArmistice = Bukkit.getServer().createBossBar(Konquest.armisticeColor1+name, ChatUtil.mapBarColor(Konquest.armisticeColor1), BarStyle.SOLID);
+		this.monumentBarArmistice.setVisible(true);
 		this.shieldArmorBarAll = Bukkit.getServer().createBossBar(ChatColor.DARK_AQUA+"Shield", BarColor.BLUE, BarStyle.SOLID);
 		this.shieldArmorBarAll.setVisible(false);
 		this.shieldArmorBarAll.setProgress(0);
 		this.lord = null; // init with no lord
 		this.residents = new HashMap<UUID,Boolean>();
-		this.joinRequests = new HashMap<UUID,Boolean>();
+		this.joinRequestKeeper = new RequestKeeper();
 		this.isOpen = false; // init as a closed Town, requires Lord to add players as residents for build/container perms
 		this.isEnemyRedstoneAllowed = false;
 		this.isResidentPlotOnly = false;
@@ -185,13 +189,14 @@ public class KonTown extends KonTerritory implements Timeable{
 		}
 		
 		// Verify there is not too much air below the base Y location, no more than 10 layers of 16x16 blocks.
-		if(countAirBelowMonument() > 2560) {
+		int baseDepth = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.settle_checks_depth",0);
+		if(baseDepth > 0 && countAirBelowMonument(baseDepth) > 2560) {
 			ChatUtil.printDebug("Town init failed: too much air below monument");
 			return 3;
 		}
 		
-		// Verify there is not too much water in this chunk, no more than 3 layers of 16x16 blocks.
-		if(countWaterInChunk() > 768) {
+		// Verify there is not too much water in this chunk, no more than 5 layers of 16x16 blocks.
+		if(countWaterInChunk() > 1280) {
 			ChatUtil.printDebug("Town init failed: too much water in the chunk");
 			return 3;
 		}
@@ -376,6 +381,10 @@ public class KonTown extends KonTerritory implements Timeable{
 		return true;
 	}
 	
+	/**
+	 * Counts all water blocks in the entire chunk
+	 * @return
+	 */
 	public int countWaterInChunk() {
 		int count = 0;
 		for (int x = 0; x <= 15; x++) {
@@ -391,10 +400,26 @@ public class KonTown extends KonTerritory implements Timeable{
 		return count;
 	}
 	
-	public int countAirBelowMonument() {
+	/**
+	 * Count the number of air blocks below the monument base, for height specified by limit
+	 * @param limit - The height below the monument base to check for air
+	 * @return
+	 */
+	public int countAirBelowMonument(int limit) {
 		int count = 0;
+		int yMin = 0;
+		int yMax = monument.getBaseY();
+		if(limit > 0) {
+			yMin = monument.getBaseY() - limit;
+		}
+		if(yMin < getWorld().getMinHeight()) {
+			yMin = getWorld().getMinHeight();
+		}
+		if(yMax > getWorld().getMaxHeight()-1) {
+			yMax = getWorld().getMaxHeight()-1;
+		}
 		for (int x = 0; x <= 15; x++) {
-            for (int y = 0; y <= monument.getBaseY(); y++) {
+            for (int y = yMin; y <= yMax; y++) {
                 for (int z = 0; z <= 15; z++) {
                     Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
                     if(currentBlock.getType().equals(Material.AIR)) {
@@ -583,7 +608,7 @@ public class KonTown extends KonTerritory implements Timeable{
 			for(KonPlayer player : getKonquest().getPlayerManager().getPlayersInKingdom(getKingdom().getName())) {
 				//ChatUtil.printDebug("Sent monument safe message to player "+player.getBukkitPlayer().getName());
 				//ChatUtil.sendNotice(player.getBukkitPlayer(), "The Town of "+getName()+" is safe, for now...", ChatColor.DARK_GREEN);
-				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_SAFE.getMessage(getName()), ChatColor.DARK_GREEN);
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_SAFE.getMessage(getName()), ChatColor.GREEN);
 			}
 		} else if(taskID == captureTimer.getTaskID()) {
 			ChatUtil.printDebug("Capture Timer ended with taskID: "+taskID);
@@ -632,6 +657,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	public void updateBarPlayers() {
 		monumentBarAllies.removeAll();
 		monumentBarEnemies.removeAll();
+		monumentBarArmistice.removeAll();
 		shieldArmorBarAll.removeAll();
 		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
 			Player bukkitPlayer = player.getBukkitPlayer();
@@ -639,7 +665,11 @@ public class KonTown extends KonTerritory implements Timeable{
 				if(player.getKingdom().equals(getKingdom())) {
 					monumentBarAllies.addPlayer(bukkitPlayer);
 				} else {
-					monumentBarEnemies.addPlayer(bukkitPlayer);
+					if(getKonquest().getGuildManager().isArmistice(player, this)) {
+						monumentBarArmistice.addPlayer(bukkitPlayer);
+					} else {
+						monumentBarEnemies.addPlayer(bukkitPlayer);
+					}
 				}
 				shieldArmorBarAll.addPlayer(bukkitPlayer);
 			}
@@ -650,7 +680,11 @@ public class KonTown extends KonTerritory implements Timeable{
 		if(player.getKingdom().equals(getKingdom())) {
 			monumentBarAllies.addPlayer(player.getBukkitPlayer());
 		} else {
-			monumentBarEnemies.addPlayer(player.getBukkitPlayer());
+			if(getKonquest().getGuildManager().isArmistice(player, this)) {
+				monumentBarArmistice.addPlayer(player.getBukkitPlayer());
+			} else {
+				monumentBarEnemies.addPlayer(player.getBukkitPlayer());
+			}
 		}
 		shieldArmorBarAll.addPlayer(player.getBukkitPlayer());
 	}
@@ -658,18 +692,21 @@ public class KonTown extends KonTerritory implements Timeable{
 	public void removeBarPlayer(KonPlayer player) {
 		monumentBarAllies.removePlayer(player.getBukkitPlayer());
 		monumentBarEnemies.removePlayer(player.getBukkitPlayer());
+		monumentBarArmistice.removePlayer(player.getBukkitPlayer());
 		shieldArmorBarAll.removePlayer(player.getBukkitPlayer());
 	}
 	
 	public void removeAllBarPlayers() {
 		monumentBarAllies.removeAll();
 		monumentBarEnemies.removeAll();
+		monumentBarArmistice.removeAll();
 		shieldArmorBarAll.removeAll();
 	}
 	
 	public void setBarProgress(double prog) {
 		monumentBarAllies.setProgress(prog);
 		monumentBarEnemies.setProgress(prog);
+		monumentBarArmistice.setProgress(prog);
 	}
 	
 	public void setAttacked(boolean val) {
@@ -691,15 +728,19 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	public void updateBar() {
 		if(isAttacked) {
-			monumentBarAllies.setTitle(ChatColor.GREEN+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
-			monumentBarAllies.setColor(BarColor.PURPLE);
-			monumentBarEnemies.setTitle(ChatColor.RED+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
-			monumentBarEnemies.setColor(BarColor.PURPLE);
+			monumentBarAllies.setTitle(Konquest.friendColor1+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
+			//monumentBarAllies.setColor(BarColor.PURPLE);
+			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
+			//monumentBarEnemies.setColor(BarColor.PURPLE);
+			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+" "+MessagePath.LABEL_CRITICAL_HITS.getMessage());
+			//monumentBarArmistice.setColor(BarColor.PURPLE);
 		} else {
-			monumentBarAllies.setTitle(ChatColor.GREEN+getName());
-			monumentBarAllies.setColor(BarColor.GREEN);
-			monumentBarEnemies.setTitle(ChatColor.RED+getName());
-			monumentBarEnemies.setColor(BarColor.RED);
+			monumentBarAllies.setTitle(Konquest.friendColor1+getName());
+			//monumentBarAllies.setColor(BarColor.GREEN);
+			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName());
+			//monumentBarEnemies.setColor(BarColor.RED);
+			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName());
+			//monumentBarArmistice.setColor(BarColor.PINK);
 		}
 	}
 	
@@ -784,7 +825,7 @@ public class KonTown extends KonTerritory implements Timeable{
 	public void purgeResidents() {
 		lord = null;
 		residents.clear();
-		joinRequests.clear();
+		joinRequestKeeper.clearRequests();
 	}
 	
 	public void setPlayerLord(OfflinePlayer player) {
@@ -800,12 +841,16 @@ public class KonTown extends KonTerritory implements Timeable{
 		}
 	}
 	
-	public boolean isPlayerLord(OfflinePlayer player) {
+	public boolean isLord(UUID id) {
 		boolean status = false;
 		if(lord != null) {
-			status = player.getUniqueId().equals(lord);
+			status =id.equals(lord);
 		}
 		return status;
+	}
+	
+	public boolean isPlayerLord(OfflinePlayer player) {
+		return isLord(player.getUniqueId());
 	}
 	
 	public boolean setPlayerElite(OfflinePlayer player, boolean val) {
@@ -877,6 +922,10 @@ public class KonTown extends KonTerritory implements Timeable{
 			return Bukkit.getOfflinePlayer(lord);
 		}
 		return null;
+	}
+	
+	public UUID getLord() {
+		return lord;
 	}
 	
 	public ArrayList<OfflinePlayer> getPlayerElites() {
@@ -963,55 +1012,30 @@ public class KonTown extends KonTerritory implements Timeable{
 	
 	// Players who have tried joining but need to be added
 	public List<OfflinePlayer> getJoinRequests() {
-		ArrayList<OfflinePlayer> result = new ArrayList<OfflinePlayer>();
-		for(UUID id : joinRequests.keySet()) {
-			if(joinRequests.get(id) == false) {
-				result.add(Bukkit.getOfflinePlayer(id));
-			}
-		}
-		return result;
+		return joinRequestKeeper.getJoinRequests();
 	}
 	
 	// Players who have been added but need to join
 	public List<OfflinePlayer> getJoinInvites() {
-		ArrayList<OfflinePlayer> result = new ArrayList<OfflinePlayer>();
-		for(UUID id : joinRequests.keySet()) {
-			if(joinRequests.get(id) == true) {
-				result.add(Bukkit.getOfflinePlayer(id));
-			}
-		}
-		return result;
+		return joinRequestKeeper.getJoinInvites();
 	}
 	
 	public boolean addJoinRequest(UUID id, Boolean type) {
-		boolean result = false;
-		if(!joinRequests.containsKey(id)) {
-			joinRequests.put(id, type);
-			result = true;
-		}
-		return result;
+		return joinRequestKeeper.addJoinRequest(id, type);
 	}
 	
 	// Does the player have an existing request to be added?
 	public boolean isJoinRequestValid(UUID id) {
-		boolean result = false;
-		if(joinRequests.containsKey(id)) {
-			result = (joinRequests.get(id) == false);
-		}
-		return result;
+		return joinRequestKeeper.isJoinRequestValid(id);
 	}
 	
 	// Does the player have an existing invite to join?
 	public boolean isJoinInviteValid(UUID id) {
-		boolean result = false;
-		if(joinRequests.containsKey(id)) {
-			result = (joinRequests.get(id) == true);
-		}
-		return result;
+		return joinRequestKeeper.isJoinInviteValid(id);
 	}
 	
 	public void removeJoinRequest(UUID id) {
-		joinRequests.remove(id);
+		joinRequestKeeper.removeJoinRequest(id);
 	}
 	
 	public void notifyJoinRequest(UUID id) {

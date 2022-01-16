@@ -96,6 +96,9 @@ public class CommandHandler  implements TabExecutor {
 	                    case FLY:
 	                        new FlyCommand(konquest, sender, args).execute();
 	                        break;
+	                    case GUILD:
+	                        new GuildCommand(konquest, sender, args).execute();
+	                        break;
 	                    case INFO:
 	                        new InfoCommand(konquest, sender, args).execute();
 	                        break;
@@ -225,6 +228,9 @@ public class CommandHandler  implements TabExecutor {
 	                        break;
 	                    case FLY:
 	                    	tabList.addAll(new FlyCommand(konquest, sender, args).tabComplete());
+	                        break;
+	                    case GUILD:
+	                    	tabList.addAll(new GuildCommand(konquest, sender, args).tabComplete());
 	                        break;
 	                    case INFO:
 	                    	tabList.addAll(new InfoCommand(konquest, sender, args).tabComplete());
