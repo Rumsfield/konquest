@@ -1137,7 +1137,7 @@ public class Konquest implements Timeable {
     		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), enemyNames, enemyTeam);
     	}
     	if(!armisticeNames.isEmpty()) {
-    		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), enemyNames, armisticeTeam);
+    		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), armisticeNames, armisticeTeam);
     	}
     	if(!barbarianNames.isEmpty()) {
     		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), barbarianNames, barbarianTeam);
