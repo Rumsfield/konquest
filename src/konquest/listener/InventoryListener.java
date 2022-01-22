@@ -16,6 +16,7 @@ import konquest.utility.MessagePath;
 
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,6 +28,7 @@ import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.minecart.StorageMinecart;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -40,8 +42,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
-//import org.bukkit.inventory.Inventory;
-//import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.SmithingInventory;
 
 public class InventoryListener implements Listener {
@@ -184,7 +184,7 @@ public class InventoryListener implements Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
 		// When a player closes a display menu inventory
 		if(konquest.getDisplayManager().isDisplayMenu(event.getInventory())) {
-			konquest.getDisplayManager().onDisplayMenuClose(event.getInventory());
+			konquest.getDisplayManager().onDisplayMenuClose(event.getInventory(), event.getPlayer());
 		}
 	}
 	
@@ -196,9 +196,25 @@ public class InventoryListener implements Listener {
 			Player bukkitPlayer = (Player) event.getWhoClicked();
 			KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
 			if(player != null && slot < event.getView().getTopInventory().getSize()) {
+				event.setResult(Event.Result.DENY);
+				/*
+				// DEBUG
+				String action = event.getAction().name();
+				String type = event.getClick().name();
+				String result = event.getResult().name();
+				ChatUtil.printDebug("Display click type "+type+", action "+action+", result "+result);
+				// END DEBUG
+				*/
 				event.setCancelled(true);
-				boolean clickType = (event.getClick().equals(ClickType.RIGHT)) ? false : true;
-				konquest.getDisplayManager().onDisplayMenuClick(player, event.getClickedInventory(), slot, clickType);
+				if(event.getClick().equals(ClickType.LEFT) || event.getClick().equals(ClickType.RIGHT)) {
+					boolean clickType = (event.getClick().equals(ClickType.RIGHT)) ? false : true;
+					Bukkit.getScheduler().runTask(konquest.getPlugin(), new Runnable() {
+			            @Override
+			            public void run() {
+			            	konquest.getDisplayManager().onDisplayMenuClick(player, event.getClickedInventory(), slot, clickType);
+			            }
+			        });
+				}
 			}
 		}
 	}

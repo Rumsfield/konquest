@@ -1,10 +1,12 @@
 package konquest.manager;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
@@ -39,6 +41,7 @@ public class DisplayManager {
 	private Konquest konquest;
 	private HashMap<Inventory, MenuWrapper> pagedMenus;
 	private HashMap<Inventory, StateMenu> stateMenus;
+	private HashSet<Player> playerViewerCache;
 	
 	public static ChatColor titleColor = ChatColor.BLACK;
 	public static ChatColor loreColor = ChatColor.YELLOW;
@@ -49,6 +52,7 @@ public class DisplayManager {
 		this.konquest = konquest;
 		this.pagedMenus = new HashMap<Inventory, MenuWrapper>();
 		this.stateMenus = new HashMap<Inventory, StateMenu>();
+		this.playerViewerCache = new HashSet<Player>();
 	}
 	
 	public void initialize() {
@@ -58,6 +62,14 @@ public class DisplayManager {
 	/*
 	 * Common menu methods
 	 */
+	
+	public boolean isPlayerViewingMenu(Player player) {
+		boolean result = false;
+		if(player != null) {
+			result = playerViewerCache.contains(player);
+		}
+		return result;
+	}
 	
 	public boolean isDisplayMenu(Inventory inv) {
 		boolean result = false;
@@ -99,11 +111,13 @@ public class DisplayManager {
 			int closeIndex = clickMenu.getCurrentCloseSlot();
 			int backIndex = clickMenu.getCurrentBackSlot();
 			pagedMenus.remove(inv);
+			playerViewerCache.add(bukkitPlayer);
 			
 			// Handle click context
 			if(slot == nextIndex) {
 				clickMenu.nextPageIndex();
 				clickMenu.refreshCurrentPage();
+				/*
 				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 		            @Override
 		            public void run() {
@@ -111,16 +125,25 @@ public class DisplayManager {
 		            	pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		            }
 		        },1);
+		        */
+				bukkitPlayer.openInventory(wrapper.getCurrentInventory());
+            	pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 			} else if(slot == closeIndex) {
+				/*
 				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 		            @Override
 		            public void run() {
 		            	bukkitPlayer.closeInventory();
+		            	playerViewerCache.remove(bukkitPlayer);
 		            }
 		        },1);
+		        */
+				bukkitPlayer.closeInventory();
+            	playerViewerCache.remove(bukkitPlayer);
 			} else if(slot == backIndex) {
 				clickMenu.previousPageIndex();
 				clickMenu.refreshCurrentPage();
+				/*
 				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 		            @Override
 		            public void run() {
@@ -128,16 +151,24 @@ public class DisplayManager {
 		            	pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 		            }
 		        },1);
+		        */
+				bukkitPlayer.openInventory(clickMenu.getCurrentPage().getInventory());
+            	pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 			} else {
 				// Clicked non-navigation slot
 				boolean status = wrapper.onIconClick(clickPlayer, clickedIcon);
 				if(status) {
+					/*
 					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 			            @Override
 			            public void run() {
 			            	bukkitPlayer.closeInventory();
+			            	playerViewerCache.remove(bukkitPlayer);
 			            }
-			        });
+			        },1);
+			        */
+					bukkitPlayer.closeInventory();
+	            	playerViewerCache.remove(bukkitPlayer);
 				}
 			}
 		} else if(stateMenus.containsKey(inv)) {
@@ -158,8 +189,10 @@ public class DisplayManager {
 			DisplayMenu updateView = clickMenu.updateState(slot, clickType);
 			// Update inventory view
 			stateMenus.remove(inv);
+			playerViewerCache.add(bukkitPlayer);
 			if(updateView != null) {
 				// Refresh displayed inventory view
+				/*
 				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 		            @Override
 		            public void run() {
@@ -167,24 +200,35 @@ public class DisplayManager {
 		            	stateMenus.put(updateView.getInventory(), clickMenu);
 		            }
 		        },1);
+		        */
+				bukkitPlayer.openInventory(updateView.getInventory());
+            	stateMenus.put(updateView.getInventory(), clickMenu);
 			} else {
 				// Close inventory view
+				/*
 				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
 		            @Override
 		            public void run() {
 		            	bukkitPlayer.closeInventory();
+		            	playerViewerCache.remove(bukkitPlayer);
 		            }
 		        },1);
+		        */
+				bukkitPlayer.closeInventory();
+            	playerViewerCache.remove(bukkitPlayer);
 			}
 		}
 	}
 	
-	public void onDisplayMenuClose(Inventory inv) {
+	public void onDisplayMenuClose(Inventory inv, HumanEntity owner) {
 		if(pagedMenus.containsKey(inv)) {
 			pagedMenus.remove(inv);
 		}
 		if(stateMenus.containsKey(inv)) {
 			stateMenus.remove(inv);
+		}
+		if(owner instanceof Player) {
+			playerViewerCache.remove((Player)owner);
 		}
 	}
 	

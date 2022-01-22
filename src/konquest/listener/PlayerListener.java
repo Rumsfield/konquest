@@ -53,6 +53,7 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -790,6 +791,17 @@ public class PlayerListener implements Listener{
     		int boostAmount = ((boostPercent*baseAmount)/100)+baseAmount;
     		//ChatUtil.printDebug("Boosting "+baseAmount+" exp for "+bukkitPlayer.getName()+" to "+boostAmount);
     		event.setAmount(boostAmount);
+    	}
+    }
+    
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
+    	if(konquest.getDisplayManager().isPlayerViewingMenu(event.getPlayer())) {
+    		ChatUtil.printDebug("Player "+event.getPlayer().getName()+" tried to drop an item from an inventory menu!");
+    		//event.setCancelled(true);
+    		//event.getItemDrop().getItemStack().setType(Material.AIR);
+    		//event.getItemDrop().remove();
+    		//TODO: Destroy the item dropped from the menu GUI
     	}
     }
     
