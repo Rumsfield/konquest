@@ -168,7 +168,8 @@ public class MapHandler {
 			} else {
 				// Area already exists, update corners and label
 				areaPoint.setCornerLocations(drawArea.getXPoint(i), drawArea.getZPoint(i));
-				areaPoint.setLabel(areaLabel,true);
+				//areaPoint.setLabel(areaLabel,true);
+				areaPoint.setDescription(areaLabel);
 			}
 		}
 		Marker territoryIcon = territoryGroup.findMarker(iconId);
@@ -265,7 +266,8 @@ public class MapHandler {
 					areaPoint = territoryGroup.findAreaMarker(pointId);
 					if (areaPoint != null) {
 						// Area already exists, update label
-						areaPoint.setLabel(areaLabel,true);
+						//areaPoint.setLabel(areaLabel,true);
+						areaPoint.setDescription(areaLabel);
 					}
 				}
 			} else {
