@@ -164,12 +164,12 @@ public class MapHandler {
 				if (areaPoint != null) {
 					areaPoint.setFillStyle(0.5, areaColor);
 					areaPoint.setLineStyle(0, 0, lineColor);
+					areaPoint.setLabel(areaLabel,true);
 				}
 			} else {
 				// Area already exists, update corners and label
 				areaPoint.setCornerLocations(drawArea.getXPoint(i), drawArea.getZPoint(i));
-				//areaPoint.setLabel(areaLabel,true);
-				areaPoint.setDescription(areaLabel);
+				areaPoint.setLabel(areaLabel,true);
 			}
 		}
 		Marker territoryIcon = territoryGroup.findMarker(iconId);
@@ -266,8 +266,7 @@ public class MapHandler {
 					areaPoint = territoryGroup.findAreaMarker(pointId);
 					if (areaPoint != null) {
 						// Area already exists, update label
-						//areaPoint.setLabel(areaLabel,true);
-						areaPoint.setDescription(areaLabel);
+						areaPoint.setLabel(areaLabel,true);
 					}
 				}
 			} else {
