@@ -720,7 +720,6 @@ public class EntityListener implements Listener {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
 			return;
 		}
-		/*
 		// Check for ruin golem
 		boolean cancelGolemDrops = konquest.getConfigManager().getConfig("core").getBoolean("core.ruins.no_golem_drops", true);
 		EntityType eType = event.getEntity().getType();
@@ -729,10 +728,13 @@ public class EntityListener implements Listener {
 			for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
 				if(ruin.isGolem(deadGolem)) {
 					// cancel the drop
+					ChatUtil.printDebug("Found dead ruin golem, blocking loot drops");
+					for(ItemStack item : event.getDrops()) {
+						item.setAmount(0);
+					}
 				}
 			}
 		}
-		*/
 		// Cause additional items to drop when event is located in town with upgrade
 		if(event.getEntity() instanceof Animals && kingdomManager.isChunkClaimed(event.getEntity().getLocation())) {
 			KonTerritory territory = kingdomManager.getChunkTerritory(event.getEntity().getLocation());
