@@ -150,6 +150,7 @@ core:
     respawn_cooldown: 60
     capture_reward_favor: 100
     capture_reward_exp: 1000
+    no_golem_drops: true
   favor:
     cost_spy: 200
     cost_settle: 100

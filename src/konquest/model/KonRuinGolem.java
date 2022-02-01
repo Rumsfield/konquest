@@ -19,9 +19,11 @@ public class KonRuinGolem {
 	private Timer respawnTimer;
 	private boolean isRespawnCooldown;
 	private LivingEntity lastTarget;
+	private KonRuin ruin;
 	
 	public KonRuinGolem(Location spawnLoc, KonRuin ruin) {
 		this.spawnLoc = spawnLoc;
+		this.ruin = ruin;
 		this.golem = null;
 		this.respawnTimer = new Timer(ruin);
 		this.isRespawnCooldown = false;
@@ -44,6 +46,11 @@ public class KonRuinGolem {
 				// Modify movement speed
 				defaultValue = golem.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getDefaultValue();
 				golem.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(defaultValue*0.5);
+				// Modify loot table optionally
+				boolean cancelGolemDrops = ruin.getKonquest().getConfigManager().getConfig("core").getBoolean("core.ruins.no_golem_drops", true);
+				if(cancelGolemDrops) {
+					golem.setLootTable(null);
+				}
 				// Modify follow range
 				//golem.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(10);
 				// Play spawn noise
