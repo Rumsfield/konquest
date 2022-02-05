@@ -90,13 +90,18 @@ public class KonquestListener implements Listener {
 				kingdomManager.clearTownNerf(event.getPlayer());
 			}
 			
-			// For a friendly player...
+			// Attempt to modify town hearts
+			if(!event.getPlayer().isAdminBypassActive()) {
+				kingdomManager.applyTownHearts(event.getPlayer(), town);
+			}
+			/*
 			if(!event.getPlayer().isAdminBypassActive() && event.getPlayer().getKingdom().equals(event.getTerritory().getKingdom())) {
 				// Apply town hearts
 				kingdomManager.applyTownHearts(event.getPlayer(), town);
 			} else {
 				kingdomManager.clearTownHearts(event.getPlayer());
 			}
+			*/
 			
 			/*
 			// Force all nearby (within 4 chunks of town center) Iron Golems to attack the enemy
@@ -113,7 +118,7 @@ public class KonquestListener implements Listener {
 		} else {
 			// Territory other than Town
 			kingdomManager.clearTownNerf(event.getPlayer());
-			kingdomManager.clearTownHearts(event.getPlayer());
+			//kingdomManager.clearTownHearts(event.getPlayer());
 		}
 		
 		// When territory is a camp

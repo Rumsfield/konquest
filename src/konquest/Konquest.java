@@ -90,6 +90,7 @@ public class Konquest implements Timeable {
 	public static ChatColor armisticeColor2 = ChatColor.DARK_PURPLE;
 	public static ChatColor barbarianColor = ChatColor.YELLOW;
 	public static ChatColor neutralColor = ChatColor.GRAY;
+	public static String healthModName = "konquest.health_buff";
 	
 	private DatabaseThread databaseThread;
 	private AccomplishmentManager accomplishmentManager;

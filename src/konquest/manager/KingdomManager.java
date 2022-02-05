@@ -20,6 +20,8 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Snow;
@@ -1225,9 +1227,26 @@ public class KingdomManager {
 		if(player.getKingdom().equals(town.getKingdom())) {
 			int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.HEALTH);
 			if(upgradeLevel >= 1) {
-				double upgradedBaseHealth = 20 + (upgradeLevel*2);
-				player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(upgradedBaseHealth);
-				//ChatUtil.printDebug("Applied max health attribute "+upgradedBaseHealth+" to player "+player.getBukkitPlayer().getName());
+				//double upgradedBaseHealth = 20 + (upgradeLevel*2);
+				//player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(upgradedBaseHealth);
+				double modifier = (upgradeLevel*2);
+				String modName = Konquest.healthModName;
+				// Check for existing modifier
+				boolean isModActive = false;
+				AttributeInstance playerHealthAtt = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH);
+				for(AttributeModifier mod : playerHealthAtt.getModifiers()) {
+					if(mod.getName().equals(modName)) {
+						isModActive = true;
+						break;
+					}
+				}
+				// Apply modifier
+				if(!isModActive) {
+					playerHealthAtt.addModifier(new AttributeModifier(modName,modifier,AttributeModifier.Operation.ADD_NUMBER));
+					ChatUtil.printDebug("Applied max health attribute modifier "+modifier+" to player "+player.getBukkitPlayer().getName());
+				} else {
+					ChatUtil.printDebug("Could not apply max health attribute modifier to player "+player.getBukkitPlayer().getName());
+				}
 			} else {
 				clearTownHearts(player);
 			}
@@ -1235,9 +1254,17 @@ public class KingdomManager {
 	}
 	
 	public void clearTownHearts(KonPlayer player) {
-		double defaultValue = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
-		player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(defaultValue);
-		//ChatUtil.printDebug("Cleared max health attribute "+defaultValue+" for player "+player.getBukkitPlayer().getName());
+		//double defaultValue = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
+		//player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(defaultValue);
+		String modName = Konquest.healthModName;
+		// Search for modifier and remove
+		AttributeInstance playerHealthAtt = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH);
+		for(AttributeModifier mod : playerHealthAtt.getModifiers()) {
+			if(mod.getName().equals(modName)) {
+				playerHealthAtt.removeModifier(mod);
+				ChatUtil.printDebug("Removed max health attribute modifier for player "+player.getBukkitPlayer().getName());
+			}
+		}
 	}
 	
 	public void clearAllTownHearts(KonTown town) {

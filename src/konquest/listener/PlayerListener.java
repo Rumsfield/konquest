@@ -15,6 +15,7 @@ import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
+import konquest.model.KonUpgrade;
 import konquest.model.KonPlayer.RegionType;
 import konquest.model.KonPlot;
 import konquest.utility.ChatUtil;
@@ -988,10 +989,15 @@ public class PlayerListener implements Listener{
         			ChatUtil.sendKonTitle(player, "", MessagePath.GENERIC_NOTICE_WILD.getMessage());
         			//ChatUtil.printDebug("    Moved from Territory to Wild");
         			if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
-        				((KonTown) territoryFrom).removeBarPlayer(player);
+        				KonTown town = (KonTown) territoryFrom;
+        				town.removeBarPlayer(player);
         				player.clearAllMobAttackers();
         				// Command all nearby Iron Golems to target nearby enemy players, ignore triggering player
     					updateGolemTargetsForTerritory(territoryFrom,player,false,isArmisticeFrom);
+    					// Try to clear heart adjustments
+    					if(town.hasUpgrade(KonUpgrade.HEALTH)) {
+    						kingdomManager.clearTownHearts(player);
+    					}
         			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         				((KonRuin) territoryFrom).removeBarPlayer(player);
         				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
@@ -1002,7 +1008,6 @@ public class PlayerListener implements Listener{
         			}
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
-        			kingdomManager.clearTownHearts(player);
         			// Begin fly disable warmup
         			player.setFlyDisableWarmup(true);
         		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
@@ -1217,10 +1222,15 @@ public class PlayerListener implements Listener{
     			
     			if(isTerritoryFrom) {
     				if(territoryFrom.getTerritoryType().equals(KonTerritoryType.TOWN)) {
-        				((KonTown) territoryFrom).removeBarPlayer(player);
+        				KonTown town = (KonTown) territoryFrom;
+        				town.removeBarPlayer(player);
         				player.clearAllMobAttackers();
         				// Command all nearby Iron Golems to target nearby enemy players, ignore triggering player
     					updateGolemTargetsForTerritory(territoryFrom,player,false,isArmisticeFrom);
+    					// Try to clear heart adjustments
+    					if(town.hasUpgrade(KonUpgrade.HEALTH)) {
+    						kingdomManager.clearTownHearts(player);
+    					}
         			} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
         				((KonRuin) territoryFrom).removeBarPlayer(player);
         				((KonRuin) territoryFrom).stopTargetingPlayer(bukkitPlayer);
@@ -1231,7 +1241,6 @@ public class PlayerListener implements Listener{
         			}
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
-        			kingdomManager.clearTownHearts(player);
     			}
     			
     			if(isTerritoryTo) {
