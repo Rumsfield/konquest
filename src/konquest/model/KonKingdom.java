@@ -3,6 +3,7 @@ package konquest.model;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -21,6 +22,7 @@ public class KonKingdom implements Timeable{
 	private Konquest konquest;
 	private KonCapital capital;
 	private KonMonumentTemplate monumentTemplate;
+	private ArrayList<Location> criticalBlockLocs;
 	private HashMap<String, KonTown> townMap;
 	private boolean isSmallest;
 	private boolean isPeaceful;
@@ -35,6 +37,7 @@ public class KonKingdom implements Timeable{
 		this.capital = new KonCapital(loc, this, konquest);
 		this.townMap = new HashMap<String, KonTown>();
 		this.monumentTemplate = new KonMonumentTemplate(this);
+		this.criticalBlockLocs = new ArrayList<Location>();
 		this.isSmallest = false;
 		this.isPeaceful = false;
 		this.isOfflineProtected = true;
@@ -61,6 +64,15 @@ public class KonKingdom implements Timeable{
 	
 	public void initCapital() {
 		capital.initClaim();
+	}
+	
+	public void updateCriticals(ArrayList<Location> locs) {
+		criticalBlockLocs.clear();
+		criticalBlockLocs.addAll(locs);
+	}
+	
+	public List<Location> getCriticals() {
+		return criticalBlockLocs;
 	}
 	
 	/**
@@ -155,7 +167,7 @@ public class KonKingdom implements Timeable{
 	 * 			3 - Region does not contain the travel point
 	 * 			4 - Region is not within capital territory
 	 */
-	public int createMonumentTemplate(Location corner1, Location corner2, Location travelPoint) {
+	public int createMonumentTemplate(Location corner1, Location corner2, Location travelPoint, boolean save) {
 		if(corner1 == null || corner2 == null || travelPoint == null) {
 			return 4;
 		}
@@ -173,6 +185,7 @@ public class KonKingdom implements Timeable{
 		}
 		// Check for at least as many critical blocks as required critical hits
 		// Also check for any chests for loot flag
+		ArrayList<Location> criticalBlockLocs = new ArrayList<Location>();
 		int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
 		int bottomBlockX, bottomBlockY, bottomBlockZ = 0;
 		int topBlockX, topBlockY, topBlockZ = 0;
@@ -196,6 +209,7 @@ public class KonKingdom implements Timeable{
                 	Block monumentBlock = corner1.getWorld().getBlockAt(x, y, z);
                 	if(monumentBlock.getType().equals(konquest.getKingdomManager().getTownCriticalBlock())) {
                 		criticalBlockCount++;
+                		criticalBlockLocs.add(monumentBlock.getLocation());
                 	} else if(monumentBlock.getState() instanceof Chest) {
                 		containsChest = true;
                 	}
@@ -222,7 +236,17 @@ public class KonKingdom implements Timeable{
 		} else {
 			ChatUtil.printDebug("Created Monument Template without loot");
 		}
+		// Before exit, save to file
+		updateCriticals(criticalBlockLocs);
+		if(save) {
+			konquest.getKingdomManager().saveKingdoms();
+			konquest.getConfigManager().saveConfigs();
+		}
 		return 0;
+	}
+	
+	public int createMonumentTemplate(Location corner1, Location corner2, Location travelPoint) {
+		return createMonumentTemplate(corner1, corner2, travelPoint, true);
 	}
 	
 	public boolean isSmallest() {

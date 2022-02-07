@@ -1842,8 +1842,13 @@ public class KingdomManager {
 		        		y = sectionList.get(1);
 		        		z = sectionList.get(2);
 			        	Location monument_cornertwo = new Location(capitalWorld,x,y,z);
-			        	// Create a Monument Template region for current Kingdom
-		        		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel);
+			        	// Apply missing criticals, if any
+			        	for(Location loc : konquest.formatStringToLocations(monumentSection.getString("criticals",""),capitalWorld)) {
+			        		capitalWorld.getBlockAt(loc).setType(townCriticalBlock);
+	            		}
+			        	// Create a Monument Template region for current Kingdom, avoid saving
+			        	// Creation of template will update critical locations within kingdom object
+		        		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel, false);
 		        		if(status != 0) {
 		        			String message = "Failed to load Monument Template for Kingdom "+kingdomName+", ";
 		        			switch(status) {
@@ -2042,6 +2047,7 @@ public class KingdomManager {
 	            monumentSection.set("cornertwo", new int[] {(int) kingdom.getMonumentTemplate().getCornerTwo().getBlockX(),
 						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getBlockY(),
 						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getBlockZ()});
+	            monumentSection.set("criticals", konquest.formatLocationsToString(kingdom.getCriticals()));
 			} else {
 				ChatUtil.printConsoleError("Failed to save invalid monument template for Kingdom "+kingdom.getName());
 			}
