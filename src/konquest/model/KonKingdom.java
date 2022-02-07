@@ -388,7 +388,6 @@ public class KonKingdom implements Timeable{
 	}
 	*/
 	public void startMonumentBlanking() {
-		monumentTemplate.setValid(false); // invalidate monument template after it's been edited.
 		isMonumentBlanking = true;
 		monumentBlankingTimer.stopTimer();
 		monumentBlankingTimer.setTime(120);
