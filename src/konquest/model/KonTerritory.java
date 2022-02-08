@@ -81,6 +81,10 @@ public abstract class KonTerritory{
 		return loc.getWorld().equals(getWorld()) && chunkList.containsKey(Konquest.toPoint(loc));
 	}
 	
+	public boolean hasChunk(Chunk chunk) {
+		return chunk.getWorld().equals(getWorld()) && chunkList.containsKey(Konquest.toPoint(chunk));
+	}
+	
 	//TODO: Refactor to not use chunks, currently method is unused
 	public boolean isLocAdjacent(Location loc) {
 		boolean result = false;

@@ -952,7 +952,7 @@ public class PlayerListener implements Listener{
         			}
         		}
         		// Border particle update
-        		kingdomManager.updatePlayerBorderParticles(player,event.getTo());
+        		kingdomManager.updatePlayerBorderParticles(player);
         		//long step4 = System.currentTimeMillis();
         		
         		// Check for armistice conditions
@@ -1110,7 +1110,7 @@ public class PlayerListener implements Listener{
     			player.setIsFlyEnabled(false);
     			
     			//kingdomManager.stopPlayerBorderParticles(player);
-    			kingdomManager.updatePlayerBorderParticles(player,chunkTo);
+    			kingdomManager.updatePlayerBorderParticles(player);
     			
     			// Check for armistice conditions
         		if(isTerritoryTo && territoryTo instanceof KonTown) {

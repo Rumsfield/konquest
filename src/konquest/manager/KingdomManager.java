@@ -617,7 +617,7 @@ public class KingdomManager {
     	switch(claimStatus) {
     	case 0:
     		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-    		updatePlayerBorderParticles(player, bukkitPlayer.getLocation());
+    		updatePlayerBorderParticles(player);
     		//ChatUtil.sendNotice(bukkitPlayer, "Successfully added chunk for territory: "+getChunkTerritory(claimLoc.getChunk()).getName());
     		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
     		break;
@@ -687,7 +687,7 @@ public class KingdomManager {
 	    				KonTown town = (KonTown) territory;
 	    				town.addBarPlayer(player);
     				}
-    				updatePlayerBorderParticles(occupant, occupant.getBukkitPlayer().getLocation());
+    				updatePlayerBorderParticles(occupant);
     			}
     		}
     		break;
@@ -819,7 +819,7 @@ public class KingdomManager {
 	    				KonTown town = (KonTown) territory;
 	    				town.addBarPlayer(player);
     				}
-    				updatePlayerBorderParticles(occupant, occupant.getBukkitPlayer().getLocation());
+    				updatePlayerBorderParticles(occupant);
     			}
     		}
     	} else {
@@ -874,7 +874,7 @@ public class KingdomManager {
     					KonCamp camp = (KonCamp) territory;
     					camp.removeBarPlayer(occupant);
     				}
-    				updatePlayerBorderParticles(occupant, occupant.getBukkitPlayer().getLocation());
+    				updatePlayerBorderParticles(occupant);
 	    		}
 				konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
 				konquest.getMapHandler().drawDynmapLabel(territory.getKingdom().getCapital());
@@ -1697,10 +1697,10 @@ public class KingdomManager {
 		return locationMap;
 	}
 	
-	public void updatePlayerBorderParticles(KonPlayer player, Location loc) {
+	public void updatePlayerBorderParticles(KonPlayer player) {
     	if(player != null && player.isBorderDisplay()) {
 			// Border particle update
-			ArrayList<Chunk> nearbyChunks = konquest.getAreaChunks(loc, 2);
+			ArrayList<Chunk> nearbyChunks = konquest.getAreaChunks(player.getBukkitPlayer().getLocation(), 2);
 			boolean isTerritoryNearby = false;
 			for(Chunk chunk : nearbyChunks) {
 				if(isChunkClaimed(Konquest.toPoint(chunk),chunk.getWorld())) {

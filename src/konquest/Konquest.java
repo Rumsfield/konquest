@@ -478,7 +478,7 @@ public class Konquest implements Timeable {
 			// Player joined located outside of a Town
 			kingdomManager.clearTownNerf(player);
 		}
-    	kingdomManager.updatePlayerBorderParticles(player,bukkitPlayer.getLocation());
+    	kingdomManager.updatePlayerBorderParticles(player);
     	ChatUtil.resetTitle(bukkitPlayer);
 		return player;
 	}
