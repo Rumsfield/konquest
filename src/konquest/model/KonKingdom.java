@@ -286,7 +286,7 @@ public class KonKingdom implements Timeable{
 	
 	public void removeMonumentTemplate() {
 		monumentTemplate.setValid(false);
-		isMonumentBlanking = false;
+		stopMonumentBlanking();
 	}
 	
 	public KonMonumentTemplate getMonumentTemplate() {
@@ -416,7 +416,13 @@ public class KonKingdom implements Timeable{
 		monumentBlankingTimer.stopTimer();
 		monumentBlankingTimer.setTime(120);
 		monumentBlankingTimer.startTimer();
-		//ChatUtil.printDebug("Starting 300 second monument blanking timer for kingdom "+getName());
+		ChatUtil.printDebug("Starting 120 second monument blanking timer for kingdom "+getName());
+	}
+	
+	public void stopMonumentBlanking() {
+		isMonumentBlanking = false;
+		monumentBlankingTimer.stopTimer();
+		ChatUtil.printDebug("Stopping monument blanking timer for kingdom "+getName());
 	}
 	
 	public void updateAllTownBars() {

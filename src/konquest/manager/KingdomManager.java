@@ -459,7 +459,10 @@ public class KingdomManager {
 						return 10+initStatus;
 					}
 				} else { return 3; }
-			} else { return 4; }
+			} else { 
+				ChatUtil.printDebug("Failed to create town with invalid or blanked monument template.");
+				return 4;
+			}
 		}
 		return 3;
 	}
