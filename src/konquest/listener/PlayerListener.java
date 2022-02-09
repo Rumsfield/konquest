@@ -15,7 +15,6 @@ import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
 import konquest.model.KonPlayer.RegionType;
 import konquest.model.KonPlot;
 import konquest.utility.ChatUtil;
@@ -1043,10 +1042,10 @@ public class PlayerListener implements Listener{
         	            if(!event.isCancelled()) {
         	            	ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
         	            	// Do things appropriate to the type of territory
-        	            	// Entry Territory
-        	    			onEnterTerritory(territoryTo,chunkTo,chunkFrom,player,isArmisticeTo);
         	    			// Exit Territory
                 			onExitTerritory(territoryFrom,player,isArmisticeFrom);
+                			// Entry Territory
+        	    			onEnterTerritory(territoryTo,chunkTo,chunkFrom,player,isArmisticeTo);
 
         	            	// Try to stop or start fly disable warmup
         	    			if(territoryTo.getKingdom().equals(player.getKingdom())) {
@@ -1161,6 +1160,8 @@ public class PlayerListener implements Listener{
 			displayPlotMessage(town, locTo, locFrom, player);
 			// Command all nearby Iron Golems to target enemy player, if no other closer player is present
 			updateGolemTargetsForTerritory(territoryTo,player,true,isArmisticeTo);
+			// Try to apply heart adjustments
+			kingdomManager.applyTownHearts(player,town);
 		} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.RUIN)) {
 			((KonRuin) territoryTo).addBarPlayer(player);
 		} else if(territoryTo.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
@@ -1181,9 +1182,7 @@ public class PlayerListener implements Listener{
 			// Command all nearby Iron Golems to target nearby enemy players, ignore triggering player
 			updateGolemTargetsForTerritory(territoryFrom,player,false,isArmisticeFrom);
 			// Try to clear heart adjustments
-			if(town.hasUpgrade(KonUpgrade.HEALTH)) {
-				kingdomManager.clearTownHearts(player);
-			}
+			kingdomManager.clearTownHearts(player);
 		} else if(territoryFrom.getTerritoryType().equals(KonTerritoryType.RUIN)) {
 			((KonRuin) territoryFrom).removeBarPlayer(player);
 			((KonRuin) territoryFrom).stopTargetingPlayer(player.getBukkitPlayer());

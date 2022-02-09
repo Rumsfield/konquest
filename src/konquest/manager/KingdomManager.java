@@ -1241,11 +1241,12 @@ public class KingdomManager {
 					}
 				}
 				// Apply modifier
+				double baseHealth = playerHealthAtt.getBaseValue();
 				if(!isModActive) {
 					playerHealthAtt.addModifier(new AttributeModifier(modName,modifier,AttributeModifier.Operation.ADD_NUMBER));
-					ChatUtil.printDebug("Applied max health attribute modifier "+modifier+" to player "+player.getBukkitPlayer().getName());
+					ChatUtil.printDebug("Applied max health attribute modifier "+modifier+" to player "+player.getBukkitPlayer().getName()+" with base health "+baseHealth);
 				} else {
-					ChatUtil.printDebug("Could not apply max health attribute modifier to player "+player.getBukkitPlayer().getName());
+					ChatUtil.printDebug("Could not apply max health attribute modifier to player "+player.getBukkitPlayer().getName()+" with base health "+baseHealth);
 				}
 			} else {
 				clearTownHearts(player);
@@ -1278,10 +1279,9 @@ public class KingdomManager {
 	public void refreshTownHearts(KonTown town) {
 		for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
 			if(town.isLocInside(player.getBukkitPlayer().getLocation())) {
+				clearTownHearts(player);
 				if(player.getKingdom().equals(town.getKingdom())) {
 					applyTownHearts(player, town);
-				} else {
-					clearTownHearts(player);
 				}
 			}
 		}

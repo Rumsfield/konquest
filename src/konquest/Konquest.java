@@ -21,6 +21,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -443,9 +444,17 @@ public class Konquest implements Timeable {
     	//}
     	// Update player membership stats
     	kingdomManager.updatePlayerMembershipStats(player);
+    	// Try to reset base health from legacy health upgrades
+    	kingdomManager.clearTownHearts(player);
+    	boolean doReset = configManager.getConfig("core").getBoolean("core.reset_legacy_health",false);
+    	if(doReset) {
+    		double baseHealth = bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
+    		if(baseHealth > 20) {
+    			bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
+    		}
+    	}
     	// Updates based on login position
     	Location loginLoc = bukkitPlayer.getLocation();
-    	kingdomManager.clearTownHearts(player);
     	if(kingdomManager.isChunkClaimed(loginLoc)) {
 			KonTerritory loginTerritory = kingdomManager.getChunkTerritory(loginLoc);
     		if(loginTerritory.getTerritoryType().equals(KonTerritoryType.TOWN)) { 

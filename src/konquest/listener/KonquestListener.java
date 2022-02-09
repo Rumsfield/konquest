@@ -90,11 +90,13 @@ public class KonquestListener implements Listener {
 				// Players entering friendly towns...
 				kingdomManager.clearTownNerf(event.getPlayer());
 			}
-			
+			/*
 			// Attempt to modify town hearts
 			if(!event.getPlayer().isAdminBypassActive()) {
+				kingdomManager.clearTownHearts(event.getPlayer());
 				kingdomManager.applyTownHearts(event.getPlayer(), town);
 			}
+			*/
 			/*
 			if(!event.getPlayer().isAdminBypassActive() && event.getPlayer().getKingdom().equals(event.getTerritory().getKingdom())) {
 				// Apply town hearts

@@ -17,6 +17,7 @@ core:
   community_link: www.google.com
   accomplishment_prefix: true
   directive_quests: true
+  reset_legacy_health: true
   placeholder_request_limit: 60
   chat:
     tag: '&7[&6Konquest&7]&f '
