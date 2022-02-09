@@ -351,7 +351,7 @@ public class PlayerListener implements Listener{
 	    				case 0:
 	    					//ChatUtil.sendNotice(bukkitPlayer, "Successfully created new Monument Template for kingdom "+player.getRegionKingdomName());
 	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(player.getRegionKingdomName()));
-	    					kingdom.startMonumentBlanking();
+	    					kingdom.reloadLoadedTownMonuments();
 	    					break;
 	    				case 1:
 	    					int diffX = (int)Math.abs(player.getRegionCornerOneBuffer().getX()-player.getRegionCornerTwoBuffer().getX())+1;
@@ -381,6 +381,7 @@ public class PlayerListener implements Listener{
 	                    player.setRegionCornerOneBuffer(null);
 	                    player.setRegionCornerTwoBuffer(null);
 	                    player.settingRegion(RegionType.NONE);
+	                    ChatUtil.printDebug("Finished setting monument region");
 	                }
 	        		break;
 	        	case RUIN_CRITICAL:

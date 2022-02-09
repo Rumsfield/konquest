@@ -431,7 +431,7 @@ public class KonKingdom implements Timeable{
 		}
 	}
 	
-	private void reloadLoadedTownMonuments() {
+	public void reloadLoadedTownMonuments() {
 		Point tPoint;
 		for(KonTown town : getTowns()) {
 			tPoint = Konquest.toPoint(town.getCenterLoc());
