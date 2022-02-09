@@ -1701,9 +1701,13 @@ public class KingdomManager {
 	}
 	
 	public void updatePlayerBorderParticles(KonPlayer player) {
+		updatePlayerBorderParticles(player, player.getBukkitPlayer().getLocation());
+	}
+	
+	public void updatePlayerBorderParticles(KonPlayer player, Location loc) {
     	if(player != null && player.isBorderDisplay()) {
-			// Border particle update
-			ArrayList<Chunk> nearbyChunks = konquest.getAreaChunks(player.getBukkitPlayer().getLocation(), 2);
+    		// Border particle update
+			ArrayList<Chunk> nearbyChunks = konquest.getAreaChunks(loc, 2);
 			boolean isTerritoryNearby = false;
 			for(Chunk chunk : nearbyChunks) {
 				if(isChunkClaimed(Konquest.toPoint(chunk),chunk.getWorld())) {
@@ -1711,6 +1715,7 @@ public class KingdomManager {
 					break;
 				}
 			}
+			//ChatUtil.printDebug("Updating border particles for "+player.getBukkitPlayer().getName()+", nearby is "+isTerritoryNearby);
 			if(isTerritoryNearby) {
 				// Player is nearby a territory, render border particles
 				Timer borderTimer = player.getBorderUpdateLoopTimer();
@@ -1737,6 +1742,7 @@ public class KingdomManager {
 			borderTimer.stopTimer();
 		}
 		player.removeAllBorders();
+		player.removeAllPlotBorders();
 	}
 	
 	public void updateAllTownDisabledUpgrades() {

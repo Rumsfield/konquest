@@ -952,7 +952,7 @@ public class PlayerListener implements Listener{
         			}
         		}
         		// Border particle update
-        		kingdomManager.updatePlayerBorderParticles(player);
+        		kingdomManager.updatePlayerBorderParticles(player,event.getTo());
         		//long step4 = System.currentTimeMillis();
         		
         		// Check for armistice conditions
