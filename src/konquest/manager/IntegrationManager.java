@@ -62,11 +62,17 @@ public class IntegrationManager {
             	String ver = quickShop.getDescription().getVersion();
             	String reqMin = "4.0.9.4";
             	String reqMax = "4.0.9.10";
-            	Version installedVersion = new Version(ver);
-            	Version minimumVersion = new Version(reqMin);
-            	Version maximumVersion = new Version(reqMax);
-            	boolean isMinVersion = (installedVersion.compareTo(minimumVersion) >= 0);
-            	boolean isMaxVersion = (installedVersion.compareTo(maximumVersion) <= 0);
+            	boolean isMinVersion = false;
+            	boolean isMaxVersion = false;
+            	try {
+            		Version installedVersion = new Version(ver);
+            		Version minimumVersion = new Version(reqMin);
+                	Version maximumVersion = new Version(reqMax);
+                	isMinVersion = (installedVersion.compareTo(minimumVersion) >= 0);
+                	isMaxVersion = (installedVersion.compareTo(maximumVersion) <= 0);
+            	} catch(IllegalArgumentException e) {
+            		e.printStackTrace();
+            	}
             	if(isMinVersion && isMaxVersion) {
             		isQuickShopEnabled = true;
                 	konquest.getPlugin().getServer().getPluginManager().registerEvents(new QuickShopListener(konquest.getPlugin()), konquest.getPlugin());
