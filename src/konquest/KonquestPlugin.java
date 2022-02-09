@@ -236,7 +236,7 @@ public class KonquestPlugin extends JavaPlugin {
 		}
 		// Send message
 		if(resp != null) {
-			if(resp.transactionSuccess()) {
+			if(resp.transactionSuccess() && resp.amount > 0) {
 	        	//String balanceF = String.format("%.2f",r.balance);
 	        	//String amountF = String.format("%.2f",r.amount);
 				String balanceF = econ.format(resp.balance);
@@ -270,7 +270,7 @@ public class KonquestPlugin extends JavaPlugin {
 		}
 		// Send message
 		if(resp != null) {
-			if(resp.transactionSuccess()) {
+			if(resp.transactionSuccess() && resp.amount > 0) {
 	        	//String balanceF = String.format("%.2f",resp.balance);
 	        	//String amountF = String.format("%.2f",resp.amount);
 	        	String balanceF = econ.format(resp.balance);
