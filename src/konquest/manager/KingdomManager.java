@@ -20,6 +20,8 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Snow;
@@ -430,7 +432,7 @@ public class KingdomManager {
 				}
 			}
 			// Verify valid monument template
-			if(getKingdom(kingdomName).getMonumentTemplate().isValid()) {
+			if(getKingdom(kingdomName).getMonumentTemplate().isValid() && !getKingdom(kingdomName).isMonumentBlanking()) {
 				// Modify location to max Y at given X,Z
 				Point point = Konquest.toPoint(loc);
 				int xLocal = loc.getBlockX() - (point.x*16);
@@ -457,7 +459,10 @@ public class KingdomManager {
 						return 10+initStatus;
 					}
 				} else { return 3; }
-			} else { return 4; }
+			} else { 
+				ChatUtil.printDebug("Failed to create town with invalid or blanked monument template.");
+				return 4;
+			}
 		}
 		return 3;
 	}
@@ -615,7 +620,7 @@ public class KingdomManager {
     	switch(claimStatus) {
     	case 0:
     		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-    		updatePlayerBorderParticles(player, bukkitPlayer.getLocation());
+    		updatePlayerBorderParticles(player);
     		//ChatUtil.sendNotice(bukkitPlayer, "Successfully added chunk for territory: "+getChunkTerritory(claimLoc.getChunk()).getName());
     		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
     		break;
@@ -685,7 +690,7 @@ public class KingdomManager {
 	    				KonTown town = (KonTown) territory;
 	    				town.addBarPlayer(player);
     				}
-    				updatePlayerBorderParticles(occupant, occupant.getBukkitPlayer().getLocation());
+    				updatePlayerBorderParticles(occupant);
     			}
     		}
     		break;
@@ -817,7 +822,7 @@ public class KingdomManager {
 	    				KonTown town = (KonTown) territory;
 	    				town.addBarPlayer(player);
     				}
-    				updatePlayerBorderParticles(occupant, occupant.getBukkitPlayer().getLocation());
+    				updatePlayerBorderParticles(occupant);
     			}
     		}
     	} else {
@@ -872,7 +877,7 @@ public class KingdomManager {
     					KonCamp camp = (KonCamp) territory;
     					camp.removeBarPlayer(occupant);
     				}
-    				updatePlayerBorderParticles(occupant, occupant.getBukkitPlayer().getLocation());
+    				updatePlayerBorderParticles(occupant);
 	    		}
 				konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
 				konquest.getMapHandler().drawDynmapLabel(territory.getKingdom().getCapital());
@@ -1225,9 +1230,27 @@ public class KingdomManager {
 		if(player.getKingdom().equals(town.getKingdom())) {
 			int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.HEALTH);
 			if(upgradeLevel >= 1) {
-				double upgradedBaseHealth = 20 + (upgradeLevel*2);
-				player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(upgradedBaseHealth);
-				//ChatUtil.printDebug("Applied max health attribute "+upgradedBaseHealth+" to player "+player.getBukkitPlayer().getName());
+				//double upgradedBaseHealth = 20 + (upgradeLevel*2);
+				//player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(upgradedBaseHealth);
+				double modifier = (upgradeLevel*2);
+				String modName = Konquest.healthModName;
+				// Check for existing modifier
+				boolean isModActive = false;
+				AttributeInstance playerHealthAtt = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH);
+				for(AttributeModifier mod : playerHealthAtt.getModifiers()) {
+					if(mod.getName().equals(modName)) {
+						isModActive = true;
+						break;
+					}
+				}
+				// Apply modifier
+				double baseHealth = playerHealthAtt.getBaseValue();
+				if(!isModActive) {
+					playerHealthAtt.addModifier(new AttributeModifier(modName,modifier,AttributeModifier.Operation.ADD_NUMBER));
+					ChatUtil.printDebug("Applied max health attribute modifier "+modifier+" to player "+player.getBukkitPlayer().getName()+" with base health "+baseHealth);
+				} else {
+					ChatUtil.printDebug("Could not apply max health attribute modifier to player "+player.getBukkitPlayer().getName()+" with base health "+baseHealth);
+				}
 			} else {
 				clearTownHearts(player);
 			}
@@ -1235,9 +1258,17 @@ public class KingdomManager {
 	}
 	
 	public void clearTownHearts(KonPlayer player) {
-		double defaultValue = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
-		player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(defaultValue);
-		//ChatUtil.printDebug("Cleared max health attribute "+defaultValue+" for player "+player.getBukkitPlayer().getName());
+		//double defaultValue = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
+		//player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(defaultValue);
+		String modName = Konquest.healthModName;
+		// Search for modifier and remove
+		AttributeInstance playerHealthAtt = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH);
+		for(AttributeModifier mod : playerHealthAtt.getModifiers()) {
+			if(mod.getName().equals(modName)) {
+				playerHealthAtt.removeModifier(mod);
+				ChatUtil.printDebug("Removed max health attribute modifier for player "+player.getBukkitPlayer().getName());
+			}
+		}
 	}
 	
 	public void clearAllTownHearts(KonTown town) {
@@ -1251,10 +1282,9 @@ public class KingdomManager {
 	public void refreshTownHearts(KonTown town) {
 		for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
 			if(town.isLocInside(player.getBukkitPlayer().getLocation())) {
+				clearTownHearts(player);
 				if(player.getKingdom().equals(town.getKingdom())) {
 					applyTownHearts(player, town);
-				} else {
-					clearTownHearts(player);
 				}
 			}
 		}
@@ -1670,9 +1700,13 @@ public class KingdomManager {
 		return locationMap;
 	}
 	
+	public void updatePlayerBorderParticles(KonPlayer player) {
+		updatePlayerBorderParticles(player, player.getBukkitPlayer().getLocation());
+	}
+	
 	public void updatePlayerBorderParticles(KonPlayer player, Location loc) {
     	if(player != null && player.isBorderDisplay()) {
-			// Border particle update
+    		// Border particle update
 			ArrayList<Chunk> nearbyChunks = konquest.getAreaChunks(loc, 2);
 			boolean isTerritoryNearby = false;
 			for(Chunk chunk : nearbyChunks) {
@@ -1681,6 +1715,7 @@ public class KingdomManager {
 					break;
 				}
 			}
+			//ChatUtil.printDebug("Updating border particles for "+player.getBukkitPlayer().getName()+", nearby is "+isTerritoryNearby);
 			if(isTerritoryNearby) {
 				// Player is nearby a territory, render border particles
 				Timer borderTimer = player.getBorderUpdateLoopTimer();
@@ -1707,6 +1742,7 @@ public class KingdomManager {
 			borderTimer.stopTimer();
 		}
 		player.removeAllBorders();
+		player.removeAllPlotBorders();
 	}
 	
 	public void updateAllTownDisabledUpgrades() {
@@ -1815,8 +1851,13 @@ public class KingdomManager {
 		        		y = sectionList.get(1);
 		        		z = sectionList.get(2);
 			        	Location monument_cornertwo = new Location(capitalWorld,x,y,z);
-			        	// Create a Monument Template region for current Kingdom
-		        		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel);
+			        	// Apply missing criticals, if any
+			        	for(Location loc : konquest.formatStringToLocations(monumentSection.getString("criticals",""),capitalWorld)) {
+			        		capitalWorld.getBlockAt(loc).setType(townCriticalBlock);
+	            		}
+			        	// Create a Monument Template region for current Kingdom, avoid saving
+			        	// Creation of template will update critical locations within kingdom object
+		        		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel, false);
 		        		if(status != 0) {
 		        			String message = "Failed to load Monument Template for Kingdom "+kingdomName+", ";
 		        			switch(status) {
@@ -2015,6 +2056,7 @@ public class KingdomManager {
 	            monumentSection.set("cornertwo", new int[] {(int) kingdom.getMonumentTemplate().getCornerTwo().getBlockX(),
 						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getBlockY(),
 						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getBlockZ()});
+	            monumentSection.set("criticals", konquest.formatLocationsToString(kingdom.getCriticals()));
 			} else {
 				ChatUtil.printConsoleError("Failed to save invalid monument template for Kingdom "+kingdom.getName());
 			}

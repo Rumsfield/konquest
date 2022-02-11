@@ -64,7 +64,7 @@ public class MakeKingdomAdminCommand extends CommandBase {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MAKEKINGDOM_NOTICE_PROMPT_4.getMessage(kingdomName), ChatColor.LIGHT_PURPLE);
         		// Render border particles
         		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-        		getKonquest().getKingdomManager().updatePlayerBorderParticles(player, playerLoc);
+        		getKonquest().getKingdomManager().updatePlayerBorderParticles(player);
         	}
         }
     }

@@ -3,6 +3,7 @@ package konquest.model;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -11,6 +12,7 @@ import org.bukkit.block.Chest;
 
 import konquest.Konquest;
 import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
@@ -20,6 +22,7 @@ public class KonKingdom implements Timeable{
 	private Konquest konquest;
 	private KonCapital capital;
 	private KonMonumentTemplate monumentTemplate;
+	private ArrayList<Location> criticalBlockLocs;
 	private HashMap<String, KonTown> townMap;
 	private boolean isSmallest;
 	private boolean isPeaceful;
@@ -34,6 +37,7 @@ public class KonKingdom implements Timeable{
 		this.capital = new KonCapital(loc, this, konquest);
 		this.townMap = new HashMap<String, KonTown>();
 		this.monumentTemplate = new KonMonumentTemplate(this);
+		this.criticalBlockLocs = new ArrayList<Location>();
 		this.isSmallest = false;
 		this.isPeaceful = false;
 		this.isOfflineProtected = true;
@@ -60,6 +64,15 @@ public class KonKingdom implements Timeable{
 	
 	public void initCapital() {
 		capital.initClaim();
+	}
+	
+	public void updateCriticals(ArrayList<Location> locs) {
+		criticalBlockLocs.clear();
+		criticalBlockLocs.addAll(locs);
+	}
+	
+	public List<Location> getCriticals() {
+		return criticalBlockLocs;
 	}
 	
 	/**
@@ -154,7 +167,10 @@ public class KonKingdom implements Timeable{
 	 * 			3 - Region does not contain the travel point
 	 * 			4 - Region is not within capital territory
 	 */
-	public int createMonumentTemplate(Location corner1, Location corner2, Location travelPoint) {
+	public int createMonumentTemplate(Location corner1, Location corner2, Location travelPoint, boolean save) {
+		if(corner1 == null || corner2 == null || travelPoint == null) {
+			return 4;
+		}
 		// Check that both corners are within capital territory
 		if(!capital.isLocInside(corner1) || !capital.isLocInside(corner2)) {
 			ChatUtil.printDebug("Failed to create Monument Template, corners are not inside capital territory");
@@ -169,6 +185,7 @@ public class KonKingdom implements Timeable{
 		}
 		// Check for at least as many critical blocks as required critical hits
 		// Also check for any chests for loot flag
+		ArrayList<Location> criticalBlockLocs = new ArrayList<Location>();
 		int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
 		int bottomBlockX, bottomBlockY, bottomBlockZ = 0;
 		int topBlockX, topBlockY, topBlockZ = 0;
@@ -192,6 +209,7 @@ public class KonKingdom implements Timeable{
                 	Block monumentBlock = corner1.getWorld().getBlockAt(x, y, z);
                 	if(monumentBlock.getType().equals(konquest.getKingdomManager().getTownCriticalBlock())) {
                 		criticalBlockCount++;
+                		criticalBlockLocs.add(monumentBlock.getLocation());
                 	} else if(monumentBlock.getState() instanceof Chest) {
                 		containsChest = true;
                 	}
@@ -218,7 +236,17 @@ public class KonKingdom implements Timeable{
 		} else {
 			ChatUtil.printDebug("Created Monument Template without loot");
 		}
+		// Before exit, save to file
+		updateCriticals(criticalBlockLocs);
+		if(save) {
+			konquest.getKingdomManager().saveKingdoms();
+			konquest.getConfigManager().saveConfigs();
+		}
 		return 0;
+	}
+	
+	public int createMonumentTemplate(Location corner1, Location corner2, Location travelPoint) {
+		return createMonumentTemplate(corner1, corner2, travelPoint, true);
 	}
 	
 	public boolean isSmallest() {
@@ -258,6 +286,7 @@ public class KonKingdom implements Timeable{
 	
 	public void removeMonumentTemplate() {
 		monumentTemplate.setValid(false);
+		stopMonumentBlanking();
 	}
 	
 	public KonMonumentTemplate getMonumentTemplate() {
@@ -340,8 +369,36 @@ public class KonKingdom implements Timeable{
 			isOfflineProtected = true;
 		} else if(taskID == monumentBlankingTimer.getTaskID()) {
 			ChatUtil.printDebug("Kingdom monument blanking Timer ended with taskID: "+taskID);
-			isMonumentBlanking = false;
-			reloadLoadedTownMonuments();
+			// Re-create monument template after edits
+			Location c1 = monumentTemplate.getCornerOne();
+			Location c2 = monumentTemplate.getCornerTwo();
+			Location tp = monumentTemplate.getTravelPoint();
+			int status = createMonumentTemplate(c1,c2,tp);
+			switch(status) {
+				case 0:
+					ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(name));
+					isMonumentBlanking = false;
+					reloadLoadedTownMonuments();
+					break;
+				case 1:
+					int diffX = (int)Math.abs(c1.getX()-c2.getX())+1;
+					int diffZ = (int)Math.abs(c1.getZ()-c2.getZ())+1;
+					ChatUtil.sendAdminBroadcast(name+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(diffX,diffZ));
+					break;
+				case 2:
+					String criticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block");
+					int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
+					ChatUtil.sendAdminBroadcast(name+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(maxCriticalhits,criticalBlockTypeName));
+					break;
+				case 3:
+					ChatUtil.sendAdminBroadcast(name+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_TRAVEL.getMessage());
+					break;
+				case 4:
+					ChatUtil.sendAdminBroadcast(name+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CAPITAL.getMessage(name));
+					break;
+				default:
+					break;
+			}
 		}
 	}
 	
@@ -357,9 +414,15 @@ public class KonKingdom implements Timeable{
 	public void startMonumentBlanking() {
 		isMonumentBlanking = true;
 		monumentBlankingTimer.stopTimer();
-		monumentBlankingTimer.setTime(300);
+		monumentBlankingTimer.setTime(120);
 		monumentBlankingTimer.startTimer();
-		//ChatUtil.printDebug("Starting 300 second monument blanking timer for kingdom "+getName());
+		ChatUtil.printDebug("Starting 120 second monument blanking timer for kingdom "+getName());
+	}
+	
+	public void stopMonumentBlanking() {
+		isMonumentBlanking = false;
+		monumentBlankingTimer.stopTimer();
+		ChatUtil.printDebug("Stopping monument blanking timer for kingdom "+getName());
 	}
 	
 	public void updateAllTownBars() {
@@ -368,7 +431,7 @@ public class KonKingdom implements Timeable{
 		}
 	}
 	
-	private void reloadLoadedTownMonuments() {
+	public void reloadLoadedTownMonuments() {
 		Point tPoint;
 		for(KonTown town : getTowns()) {
 			tPoint = Konquest.toPoint(town.getCenterLoc());

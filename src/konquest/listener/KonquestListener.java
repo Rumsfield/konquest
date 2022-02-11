@@ -21,6 +21,7 @@ import konquest.utility.Timer;
 import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Effect;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -89,14 +90,21 @@ public class KonquestListener implements Listener {
 				// Players entering friendly towns...
 				kingdomManager.clearTownNerf(event.getPlayer());
 			}
-			
-			// For a friendly player...
+			/*
+			// Attempt to modify town hearts
+			if(!event.getPlayer().isAdminBypassActive()) {
+				kingdomManager.clearTownHearts(event.getPlayer());
+				kingdomManager.applyTownHearts(event.getPlayer(), town);
+			}
+			*/
+			/*
 			if(!event.getPlayer().isAdminBypassActive() && event.getPlayer().getKingdom().equals(event.getTerritory().getKingdom())) {
 				// Apply town hearts
 				kingdomManager.applyTownHearts(event.getPlayer(), town);
 			} else {
 				kingdomManager.clearTownHearts(event.getPlayer());
 			}
+			*/
 			
 			/*
 			// Force all nearby (within 4 chunks of town center) Iron Golems to attack the enemy
@@ -113,7 +121,7 @@ public class KonquestListener implements Listener {
 		} else {
 			// Territory other than Town
 			kingdomManager.clearTownNerf(event.getPlayer());
-			kingdomManager.clearTownHearts(event.getPlayer());
+			//kingdomManager.clearTownHearts(event.getPlayer());
 		}
 		
 		// When territory is a camp
@@ -166,32 +174,6 @@ public class KonquestListener implements Listener {
 		}
 		KonTown town = (KonTown) event.getTerritory();
 		
-		/* Moved to BlockListener onBlockBreak()
-		// Verify town can be captured
-		if(town.isCaptureDisabled()) {
-			//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "This Town cannot be conquered again so soon!");
-			ChatUtil.sendError(event.getPlayer().getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(town.getCaptureCooldownString()));
-			event.setCancelled(true);
-			return;
-		}
-		
-		// Start Monument regenerate timer for target town
-		int monumentRegenTimeSeconds = konquest.getConfigManager().getConfig("core").getInt("core.monuments.damage_regen");
-		Timer monumentTimer = town.getMonumentTimer();
-		monumentTimer.stopTimer();
-		monumentTimer.setTime(monumentRegenTimeSeconds);
-		monumentTimer.startTimer();
-		//ChatUtil.printDebug("Starting monument timer for "+monumentRegenTimeSeconds+" seconds with taskID "+monumentTimer.getTaskID());
-		
-		// Update MonumentBar state
-		town.setAttacked(true);
-		town.updateBar();
-		//town.updateBarPlayers();
-		*/
-		
-		// Re-apply town nerfs to attacker
-		//kingdomManager.applyTownNerf(event.getPlayer());
-		
 		// Evaluate for critical strikes
 		if(event.getBlockEvent().getBlock().getType().equals(konquest.getKingdomManager().getTownCriticalBlock())) {
 			// Critical block has been destroyed
@@ -208,17 +190,13 @@ public class KonquestListener implements Listener {
 				// The Town is at critical max, conquer or destroy
 				if(event.getPlayer().isBarbarian()) {
 					// Destroy the town when the enemy is a barbarian
-					//ArrayList<KonPlayer> monumentPlayers = playerManager.getPlayersInMonument(town.getMonument());
+					String townName = town.getName();
 					ArrayList<KonPlayer> monumentPlayers = new ArrayList<KonPlayer>();
+					ArrayList<KonPlayer> townLocPlayers = new ArrayList<KonPlayer>();
 					for(KonPlayer player : playerManager.getPlayersOnline()) {
 						if(town.isLocInsideCenterChunk(player.getBukkitPlayer().getLocation())) {
 							monumentPlayers.add(player);
 						}
-					}
-					//Location townSpawnLoc = town.getSpawnLoc();
-					String townName = town.getName();
-					ArrayList<KonPlayer> townLocPlayers = new ArrayList<KonPlayer>();
-					for(KonPlayer player : playerManager.getPlayersOnline()) {
 						if(town.isLocInside(player.getBukkitPlayer().getLocation())) {
 							townLocPlayers.add(player);
 						}
@@ -231,35 +209,16 @@ public class KonquestListener implements Listener {
 						// Town is removed, no longer exists
 						//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "You have destroyed "+townName+" for the glory of the Barbarian horde!");
 						ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_DESTROY.getMessage(townName));
-						/*
-						int local_x = 0;
-						if(townSpawnLoc.getBlockX() > 0) {
-							local_x = townSpawnLoc.getBlockX() % 16;
-						} else {
-							local_x = Math.abs(townSpawnLoc.getBlockX() % -16);
-						}
-						int local_z = 0;
-						if(townSpawnLoc.getBlockZ() > 0) {
-							local_z = townSpawnLoc.getBlockZ() % 16;
-						} else {
-							local_z = Math.abs(townSpawnLoc.getBlockZ() % -16);
-						}
-						int new_y = townSpawnLoc.getWorld().getChunkAt(townSpawnLoc).getChunkSnapshot(true,false,false).getHighestBlockYAt(local_x, local_z) + 1;
-						townSpawnLoc.setY((double)new_y);
-						// Teleport all players inside monument to a safe location
-						event.getPlayer().getBukkitPlayer().teleport(townSpawnLoc);
-						for(KonPlayer player : monumentPlayers) {
-							player.getBukkitPlayer().teleport(townSpawnLoc);
-						}
-						*/
 						for(KonPlayer player : monumentPlayers) {
 							player.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2));
 							//ChatUtil.printDebug("Effect data is: "+Effect.ANVIL_LAND.getData().getName()+", "+Effect.ANVIL_LAND.getData().toString());
 							player.getBukkitPlayer().playEffect(player.getBukkitPlayer().getLocation(), Effect.ANVIL_LAND, null);
 						}
-						// Clear mob targets for all players within the old town
 						for(KonPlayer player : townLocPlayers) {
+							// Clear mob targets for all players within the old town
 							player.clearAllMobAttackers();
+							// Update particle border renders for nearby players
+							kingdomManager.updatePlayerBorderParticles(player);
 						}
 						// Update directive progress
 						konquest.getDirectiveManager().updateDirectiveProgress(event.getPlayer(), KonDirective.CAPTURE_TOWN);
@@ -282,19 +241,6 @@ public class KonquestListener implements Listener {
 						ChatUtil.printDebug("Monument conversion in Town "+event.getTerritory().getName());
 						//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "You have conquered "+town.getName()+" for the conquest of "+event.getPlayer().getKingdom().getName()+"!");
 						ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAPTURE.getMessage(town.getName(),event.getPlayer().getKingdom().getName()));
-						// Teleport all players inside center chunk to new spawn location
-						/*
-						event.getPlayer().getBukkitPlayer().teleport(town.getSpawnLoc());
-						for(KonPlayer player : playerManager.getPlayersInMonument(town.getMonument())) {
-							player.getBukkitPlayer().teleport(town.getSpawnLoc());
-						}
-						*/
-						for(KonPlayer player : playerManager.getPlayersOnline()) {
-							if(town.isLocInsideCenterChunk(player.getBukkitPlayer().getLocation())) {
-								player.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2));
-								player.getBukkitPlayer().playEffect(player.getBukkitPlayer().getLocation(), Effect.ANVIL_LAND, null);
-							}
-						}
 						// Start Capture disable timer for target town
 						int townCaptureTimeSeconds = konquest.getConfigManager().getConfig("core").getInt("core.towns.capture_cooldown");
 						Timer captureTimer = town.getCaptureTimer();
@@ -303,11 +249,25 @@ public class KonquestListener implements Listener {
 						captureTimer.setTime(townCaptureTimeSeconds);
 						captureTimer.startTimer();
 						ChatUtil.printDebug("Starting capture timer for "+townCaptureTimeSeconds+" seconds with taskID "+captureTimer.getTaskID());
-						// Remove mob targets
+						// For all online players...
 						for(KonPlayer player : playerManager.getPlayersOnline()) {
+							// Teleport all players inside center chunk to new spawn location
+							if(town.isLocInsideCenterChunk(player.getBukkitPlayer().getLocation())) {
+								player.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2));
+								player.getBukkitPlayer().playEffect(player.getBukkitPlayer().getLocation(), Effect.ANVIL_LAND, null);
+							}
+							// Remove mob targets
 							if(town.isLocInside(player.getBukkitPlayer().getLocation())) {
 								player.clearAllMobAttackers();
 							}
+							// Update particle border renders for nearby players
+							for(Chunk chunk : konquest.getAreaChunks(player.getBukkitPlayer().getLocation(), 2)) {
+								if(town.hasChunk(chunk)) {
+									kingdomManager.updatePlayerBorderParticles(player);
+									break;
+								}
+							}
+							
 						}
 						// Update directive progress
 						konquest.getDirectiveManager().updateDirectiveProgress(event.getPlayer(), KonDirective.CAPTURE_TOWN);

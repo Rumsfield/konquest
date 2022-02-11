@@ -244,7 +244,7 @@ public class AccomplishmentManager {
     	for(String prefixLabel : prefixConfig.getConfigurationSection("prefix").getKeys(false)) {
     		status = true;
     		prefixEntry = prefixConfig.getConfigurationSection("prefix."+prefixLabel);
-    		if(prefixEntry != null) {
+    		if(prefixEntry != null && prefixLabel.matches("[A-Za-z0-9_]+")) {
         		if(prefixEntry.contains("name")) {
         			prefixName = prefixEntry.getString("name","");
         			if(prefixName.equals("") || prefixName.isEmpty()) {
@@ -267,7 +267,7 @@ public class AccomplishmentManager {
         			ChatUtil.printDebug("Loaded custom prefix: "+prefixLabel);
         		}
     		} else {
-    			ChatUtil.printDebug("Failed to load null prefix entry: "+prefixLabel);
+    			ChatUtil.printConsoleError("Failed to load invalid custom prefix, must only contain letters, numbers and underscores: "+prefixLabel);
     		}
     	}
 	}

@@ -164,6 +164,7 @@ public class MapHandler {
 				if (areaPoint != null) {
 					areaPoint.setFillStyle(0.5, areaColor);
 					areaPoint.setLineStyle(0, 0, lineColor);
+					areaPoint.setLabel(areaLabel,true);
 				}
 			} else {
 				// Area already exists, update corners and label

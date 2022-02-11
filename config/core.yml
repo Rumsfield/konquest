@@ -17,6 +17,7 @@ core:
   community_link: www.google.com
   accomplishment_prefix: true
   directive_quests: true
+  reset_legacy_health: true
   placeholder_request_limit: 60
   chat:
     tag: '&7[&6Konquest&7]&f '
@@ -150,6 +151,7 @@ core:
     respawn_cooldown: 60
     capture_reward_favor: 100
     capture_reward_exp: 1000
+    no_golem_drops: true
   favor:
     cost_spy: 200
     cost_settle: 100
