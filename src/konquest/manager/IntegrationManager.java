@@ -79,9 +79,9 @@ public class IntegrationManager {
                 	ChatUtil.printConsoleAlert("Successfully integrated QuickShop version "+ver);
             	} else {
             		if(isMinVersion) {
-            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too old. You must update it to at least version "+reqMin);
+            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too new. You must revert it to at most version "+reqMax);
             		} else if(isMaxVersion) {
-            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too new. You must update it to at most version "+reqMax);
+            			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too old. You must update it to at least version "+reqMin);
             		} else {
             			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is unknown. You must use a version between "+reqMin+" and "+reqMax);
             		}
