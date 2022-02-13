@@ -32,7 +32,7 @@ public class DatabaseConnection {
         this.type = type;
     }
 
-    public void connect() throws Exception {
+    public void connect() throws SQLException {
         if (connection != null && !connection.isClosed()) {
         	ChatUtil.printConsoleAlert("Could not connect to SQL database of type "+type.toString()+", connection is already open.");
             return;
@@ -47,6 +47,7 @@ public class DatabaseConnection {
                     connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName + ".db", properties);
                     return;
                 } catch (SQLException e) {
+                	ChatUtil.printConsoleAlert("Failed to connect to SQLite database!");
                     e.printStackTrace();
                 }
         		break;
@@ -67,9 +68,17 @@ public class DatabaseConnection {
                     		properties.put(propNameValue[0], propNameValue[1]);
                     	}
                     }
+                    // DEBUG
+                    ChatUtil.printDebug("Applying connection properties...");
+                    for(String key : properties.stringPropertyNames()) {
+                    	String value = properties.getProperty(key);
+                    	ChatUtil.printDebug("  "+key+" = "+value);
+                    }
+                    // END DEBUG
                     connection = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database, properties);
                     return;
                 } catch (SQLException e) {
+                	ChatUtil.printConsoleAlert("Failed to connect to MySQL database!");
                     e.printStackTrace();
                 }
         		break;
@@ -95,12 +104,13 @@ public class DatabaseConnection {
         connection = null;
     }
 
+    /*
     public void executeUpdate(String query) {
         Statement statement = null;
 
         try {
+        	ChatUtil.printDebug("Executing SQL Update: "+query);
             statement = connection.createStatement();
-            ChatUtil.printDebug("Executing SQL Update: "+query);
             statement.executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -112,7 +122,7 @@ public class DatabaseConnection {
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                ChatUtil.printConsoleError("Failed to execute SQL update, is the connection closed?");
+                ChatUtil.printConsoleError("Failed to close SQL update statement, is the connection closed?");
             }
         }
     }
@@ -135,12 +145,13 @@ public class DatabaseConnection {
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                ChatUtil.printConsoleError("Failed to execute SQL query, is the connection closed?");
+                ChatUtil.printConsoleError("Failed to close SQL query statement, is the connection closed?");
             }
         }
     	return result;
     }
-
+	*/
+    
     public PreparedStatement prepare(String sql) {
         if (connection == null) {
             return null;
@@ -157,48 +168,76 @@ public class DatabaseConnection {
     }
 
     public ResultSet scheduleQuery(String query) {
+    	// Verify good connection, try to reconnect
+    	if(testConnection(true)) {
+    		ChatUtil.printConsoleAlert("Successfully reconnected to database");
+    	}
+    	
         Future<ResultSet> futureResult = queryExecutor.submit(new AsyncQuerySQL(this, query));
-
         try {
             return futureResult.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            ChatUtil.printConsoleError("Failed to schedule SQL query, is the connection closed?");
+            ChatUtil.printConsoleError("Failed to schedule SQL query, InterruptedException");
         } catch (ExecutionException e) {
             e.printStackTrace();
-            ChatUtil.printConsoleError("Failed to schedule SQL query, is the connection closed?");
+            ChatUtil.printConsoleError("Failed to schedule SQL query, ExecutionException");
         }
 
         return null;
     }
 
     public void scheduleUpdate(String query) {
+    	// Verify good connection, try to reconnect
+    	if(testConnection(true)) {
+    		ChatUtil.printConsoleAlert("Successfully reconnected to database");
+    	}
+    	
         queryExecutor.execute(new AsyncUpdateSQL(this, query));
     }
 
-    public void pingDatabase() {
+    public boolean pingDatabase() {
+    	boolean result = false;
         Statement statement = null;
         try {
             statement = connection.createStatement();
             statement.executeQuery("SELECT 1;");
             statement.close();
+            result = true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            ChatUtil.printConsoleError("Failed to ping SQL database, is the connection closed?");
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    ChatUtil.printConsoleError("Failed to ping SQL database, is the connection closed?");
-                }
-            }
+        	ChatUtil.printDebug("Failed to ping SQL database, caught exception:");
+        	ChatUtil.printDebug(e.getMessage());
         }
+        return result;
     }
 
     public Connection getConnection() {
         return connection;
+    }
+    
+    private boolean testConnection(boolean reconnect) {
+    	boolean result = false;
+    	Statement statement = null;
+        try {
+            statement = connection.createStatement();
+            statement.executeQuery("SELECT 1;");
+            statement.close();
+        } catch (SQLException e) {
+        	if(reconnect) {
+        		ChatUtil.printConsoleError("Failed to connect to database, trying to reconnect");
+        		try {
+        			connect();
+        			result = true;
+        		} catch(SQLException r) {
+        			e.printStackTrace();
+        			r.printStackTrace();
+        		}
+        	} else {
+        		ChatUtil.printConsoleError("Failed to connect to database :(");
+        		e.printStackTrace();
+        	}
+        }
+    	return result;
     }
     
     private void migrateDatabaseFile(String oldPath, String newpath) {

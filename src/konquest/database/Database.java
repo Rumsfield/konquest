@@ -1,7 +1,6 @@
 package konquest.database;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import konquest.utility.ChatUtil;
 
@@ -40,8 +39,9 @@ public abstract class Database {
         try {
         	hasRow = result.next();
         	//ChatUtil.printDebug("SQL table "+table+" exists? "+hasRow);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+        	//e.printStackTrace();
+            ChatUtil.printDebug("Got null SQL result: "+e.getMessage());
             hasRow = false;
             //ChatUtil.printDebug("SQL table "+table+" exists encountered an exception! "+hasRow);
         }
@@ -72,8 +72,9 @@ public abstract class Database {
         		//ChatUtil.printDebug("SQL table "+table+" column info: "+result.getString(1)+", "+result.getString(2));
         	}
         	//ChatUtil.printDebug("SQL table "+table+" column "+column+" exists? "+hasColumn);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+        	//e.printStackTrace();
+            ChatUtil.printDebug("Got null SQL result: "+e.getMessage());
             //ChatUtil.printDebug("SQL table "+table+" column "+column+" exist encountered an exception! "+hasColumn);
         }
         return hasColumn;
@@ -121,8 +122,9 @@ public abstract class Database {
             if(result.next()){
                 count = result.getInt(1);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            //e.printStackTrace();
+            ChatUtil.printDebug("Got null SQL result: "+e.getMessage());
             return false;
         }
 
