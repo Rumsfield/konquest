@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"konquest.api","l":"KonquestAPI"},{"p":"konquest.api.model","l":"KonquestPlayer"},{"p":"konquest.api.manager","l":"KonquestPlayerManager"}];updateSearchResults();

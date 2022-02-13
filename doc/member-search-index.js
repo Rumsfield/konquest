@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"konquest.api","c":"KonquestAPI","l":"getFriendlyPrimaryColor()"},{"p":"konquest.api.manager","c":"KonquestPlayerManager","l":"getPlayer(Player)","u":"getPlayer(org.bukkit.entity.Player)"},{"p":"konquest.api","c":"KonquestAPI","l":"getPlayerManager()"}];updateSearchResults();

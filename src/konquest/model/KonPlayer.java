@@ -1,5 +1,6 @@
 package konquest.model;
 
+import konquest.api.model.KonquestPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
@@ -22,7 +23,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
-public class KonPlayer extends KonOfflinePlayer implements Timeable{
+public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timeable {
 
 	public enum RegionType {
 		NONE,

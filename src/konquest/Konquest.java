@@ -73,10 +73,11 @@ import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
+import konquest.api.KonquestAPI;
 import konquest.command.CommandHandler;
 import konquest.database.DatabaseThread;
 
-public class Konquest implements Timeable {
+public class Konquest implements KonquestAPI, Timeable {
 
 	private KonquestPlugin plugin;
 	private static Konquest instance;
@@ -500,6 +501,13 @@ public class Konquest implements Timeable {
 		guildManager.saveGuilds();
 		configManager.saveConfigs();
 	}
+	
+	/* API Methods */
+	public ChatColor getFriendlyPrimaryColor() {
+		return friendColor1;
+	}
+	
+	/* Regular Methods */
 	
 	public static Konquest getInstance() {
 		return instance;

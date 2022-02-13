@@ -1,5 +1,6 @@
 package konquest;
 
+import konquest.api.KonquestAPI;
 import konquest.listener.BlockListener;
 import konquest.listener.EntityListener;
 import konquest.listener.HangingListener;
@@ -19,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.comphenix.protocol.ProtocolLibrary;
@@ -56,6 +58,8 @@ public class KonquestPlugin extends JavaPlugin {
         registerListeners();
         // Initialize core
         konquest.initialize();
+        // Register API
+        registerApi(konquest);
         // Register placeholders
         registerPlaceholders();
         // Check for updates
@@ -102,6 +106,10 @@ public class KonquestPlugin extends JavaPlugin {
 		pluginManager.registerEvents(new HangingListener(this), this);
 		pluginManager.registerEvents(new WorldListener(this), this);
 		//pluginManager.registerEvents(new QuickShopListener(this), this);
+	}
+	
+	private void registerApi(KonquestAPI api) {
+		this.getServer().getServicesManager().register(KonquestAPI.class, api, this, ServicePriority.Normal);
 	}
 	
 	private void loadMetrics() {

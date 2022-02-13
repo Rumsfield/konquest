@@ -11,6 +11,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.manager.KonquestPlayerManager;
 import konquest.model.KonKingdom;
 import konquest.model.KonMonument;
 import konquest.model.KonOfflinePlayer;
@@ -18,7 +19,7 @@ import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-public class PlayerManager {
+public class PlayerManager implements KonquestPlayerManager {
 
 	private Konquest konquest;
 	private HashMap<Player, KonPlayer> onlinePlayers;
