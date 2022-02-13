@@ -20,12 +20,23 @@ public class AsyncQuerySQL implements Callable<ResultSet> {
     	PreparedStatement statement = null;
     	try {
         	ChatUtil.printDebug("Executing SQL Query: "+query);
+        	// First attempt
             statement = connection.prepare(query);
             ResultSet result = statement.executeQuery();
             return result;
         } catch (SQLException e) {
-        	ChatUtil.printConsoleError("Failed to execute SQL query, is the connection closed?");
-            e.printStackTrace();
+        	ChatUtil.printConsoleError("Failed to execute SQL query, attempting to reconnect");
+        	ChatUtil.printDebug(e.getMessage());
+        	try {
+        		// Second attempt
+        		connection.connect();
+        		statement = connection.prepare(query);
+                ResultSet result = statement.executeQuery();
+                return result;
+        	} catch(SQLException r) {
+        		ChatUtil.printConsoleError("Failed to execute SQL query after reconnect. Check your database settings.");
+        		r.printStackTrace();
+        	}
         }
         return null;
     }

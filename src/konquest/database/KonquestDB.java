@@ -1,6 +1,7 @@
 package konquest.database;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -34,7 +35,7 @@ public class KonquestDB extends Database{
     public void initialize() {
         try {
             getDatabaseConnection().connect();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         konquest.getAccomplishmentManager().loadCustomPrefixes();

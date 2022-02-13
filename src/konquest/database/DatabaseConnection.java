@@ -32,7 +32,7 @@ public class DatabaseConnection {
         this.type = type;
     }
 
-    public void connect() throws Exception {
+    public void connect() throws SQLException {
         if (connection != null && !connection.isClosed()) {
         	ChatUtil.printConsoleAlert("Could not connect to SQL database of type "+type.toString()+", connection is already open.");
             return;
@@ -168,8 +168,12 @@ public class DatabaseConnection {
     }
 
     public ResultSet scheduleQuery(String query) {
+    	// Verify good connection, try to reconnect
+    	if(testConnection(true)) {
+    		ChatUtil.printConsoleAlert("Successfully reconnected to database");
+    	}
+    	
         Future<ResultSet> futureResult = queryExecutor.submit(new AsyncQuerySQL(this, query));
-
         try {
             return futureResult.get();
         } catch (InterruptedException e) {
@@ -184,6 +188,11 @@ public class DatabaseConnection {
     }
 
     public void scheduleUpdate(String query) {
+    	// Verify good connection, try to reconnect
+    	if(testConnection(true)) {
+    		ChatUtil.printConsoleAlert("Successfully reconnected to database");
+    	}
+    	
         queryExecutor.execute(new AsyncUpdateSQL(this, query));
     }
 
@@ -210,6 +219,31 @@ public class DatabaseConnection {
 
     public Connection getConnection() {
         return connection;
+    }
+    
+    private boolean testConnection(boolean reconnect) {
+    	boolean result = false;
+    	Statement statement = null;
+        try {
+            statement = connection.createStatement();
+            statement.executeQuery("SELECT 1;");
+            statement.close();
+        } catch (SQLException e) {
+        	if(reconnect) {
+        		ChatUtil.printConsoleError("Failed to connect to database, trying to reconnect");
+        		try {
+        			connect();
+        			result = true;
+        		} catch(SQLException r) {
+        			e.printStackTrace();
+        			r.printStackTrace();
+        		}
+        	} else {
+        		ChatUtil.printConsoleError("Failed to connect to database :(");
+        		e.printStackTrace();
+        	}
+        }
+    	return result;
     }
     
     private void migrateDatabaseFile(String oldPath, String newpath) {
