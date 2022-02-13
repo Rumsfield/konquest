@@ -1,7 +1,6 @@
 package konquest.database;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -168,9 +167,9 @@ public class KonquestDB extends Database{
             		players.add(new KonOfflinePlayer(offlineBukkitPlayer, konquest.getKingdomManager().getKingdom(kingdomName), isBarbarian));
             	}
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            ChatUtil.printDebug("A problem occured while getting all saved players from the database");
+            ChatUtil.printConsoleError("A problem occured while getting all saved players from the database");
         }
     	return players;
     }
@@ -224,7 +223,7 @@ public class KonquestDB extends Database{
                 	customPrefix = playerInfo.getString("custom");
                 }
                 //ChatUtil.printDebug("SQL Imported player info: "+kingdomName+","+exileKingdomName+","+isBarbarian+","+mainPrefix+","+enablePrefix);
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 ChatUtil.printDebug("Aborting player import "+bukkitPlayer.getName());
                 return;
@@ -253,7 +252,7 @@ public class KonquestDB extends Database{
                 		allDirectives = allDirectives+dirEnum.toString()+":"+directiveProgress+",";
                 	}
                 }
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 ChatUtil.printDebug("Could not get stats and directives for "+bukkitPlayer.getName());
             }
@@ -271,7 +270,7 @@ public class KonquestDB extends Database{
                 		}
                 	}
                 }
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 ChatUtil.printDebug("Could not get custom prefixes for "+bukkitPlayer.getName());
             }
@@ -316,7 +315,7 @@ public class KonquestDB extends Database{
             		playerStats.setStat(statEnum, statProgress);
             	}
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             ChatUtil.printDebug("Could not pull stats for "+offlineBukkitPlayer.getName());
         }

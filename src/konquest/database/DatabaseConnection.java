@@ -47,6 +47,7 @@ public class DatabaseConnection {
                     connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName + ".db", properties);
                     return;
                 } catch (SQLException e) {
+                	ChatUtil.printConsoleAlert("Failed to connect to SQLite database!");
                     e.printStackTrace();
                 }
         		break;
@@ -67,9 +68,17 @@ public class DatabaseConnection {
                     		properties.put(propNameValue[0], propNameValue[1]);
                     	}
                     }
+                    // DEBUG
+                    ChatUtil.printDebug("Applying connection properties...");
+                    for(String key : properties.stringPropertyNames()) {
+                    	String value = properties.getProperty(key);
+                    	ChatUtil.printDebug("  "+key+" = "+value);
+                    }
+                    // END DEBUG
                     connection = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database, properties);
                     return;
                 } catch (SQLException e) {
+                	ChatUtil.printConsoleAlert("Failed to connect to MySQL database!");
                     e.printStackTrace();
                 }
         		break;
@@ -95,12 +104,13 @@ public class DatabaseConnection {
         connection = null;
     }
 
+    /*
     public void executeUpdate(String query) {
         Statement statement = null;
 
         try {
+        	ChatUtil.printDebug("Executing SQL Update: "+query);
             statement = connection.createStatement();
-            ChatUtil.printDebug("Executing SQL Update: "+query);
             statement.executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -112,7 +122,7 @@ public class DatabaseConnection {
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                ChatUtil.printConsoleError("Failed to execute SQL update, is the connection closed?");
+                ChatUtil.printConsoleError("Failed to close SQL update statement, is the connection closed?");
             }
         }
     }
@@ -135,12 +145,13 @@ public class DatabaseConnection {
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                ChatUtil.printConsoleError("Failed to execute SQL query, is the connection closed?");
+                ChatUtil.printConsoleError("Failed to close SQL query statement, is the connection closed?");
             }
         }
     	return result;
     }
-
+	*/
+    
     public PreparedStatement prepare(String sql) {
         if (connection == null) {
             return null;
@@ -163,10 +174,10 @@ public class DatabaseConnection {
             return futureResult.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            ChatUtil.printConsoleError("Failed to schedule SQL query, is the connection closed?");
+            ChatUtil.printConsoleError("Failed to schedule SQL query, InterruptedException");
         } catch (ExecutionException e) {
             e.printStackTrace();
-            ChatUtil.printConsoleError("Failed to schedule SQL query, is the connection closed?");
+            ChatUtil.printConsoleError("Failed to schedule SQL query, ExecutionException");
         }
 
         return null;
@@ -191,7 +202,7 @@ public class DatabaseConnection {
                     statement.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    ChatUtil.printConsoleError("Failed to ping SQL database, is the connection closed?");
+                    ChatUtil.printConsoleError("Failed to close SQL ping statement, is the connection closed?");
                 }
             }
         }
