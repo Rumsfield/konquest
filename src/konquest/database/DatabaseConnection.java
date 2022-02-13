@@ -196,25 +196,19 @@ public class DatabaseConnection {
         queryExecutor.execute(new AsyncUpdateSQL(this, query));
     }
 
-    public void pingDatabase() {
+    public boolean pingDatabase() {
+    	boolean result = false;
         Statement statement = null;
         try {
             statement = connection.createStatement();
             statement.executeQuery("SELECT 1;");
             statement.close();
+            result = true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            ChatUtil.printConsoleError("Failed to ping SQL database, is the connection closed?");
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    ChatUtil.printConsoleError("Failed to close SQL ping statement, is the connection closed?");
-                }
-            }
+        	ChatUtil.printDebug("Failed to ping SQL database, caught exception:");
+        	ChatUtil.printDebug(e.getMessage());
         }
+        return result;
     }
 
     public Connection getConnection() {
