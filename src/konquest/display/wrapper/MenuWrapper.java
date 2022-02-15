@@ -38,7 +38,6 @@ public abstract class MenuWrapper {
 	
 	public abstract void constructMenu();
 	
-	// Return true to close the menu, false to do nothing
-	public abstract boolean onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon);
+	public abstract void onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon);
 	
 }

@@ -172,8 +172,7 @@ public class PrefixMenuWrapper extends MenuWrapper {
 	}
 
 	@Override
-	public boolean onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
-		boolean result = false;
+	public void onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
 		Player bukkitPlayer = clickPlayer.getBukkitPlayer();
 		if(clickedIcon instanceof PrefixIcon) {
 			// Prefix Icons alter the player's prefix
@@ -194,7 +193,6 @@ public class PrefixMenuWrapper extends MenuWrapper {
 			} else {
 				Konquest.playFailSound(bukkitPlayer);
 			}
-			result = true;
 		} else if(clickedIcon instanceof PrefixCustomIcon) {
 			// Prefix Custom Icons alter the player's prefix
 			PrefixCustomIcon icon = (PrefixCustomIcon)clickedIcon;
@@ -204,9 +202,7 @@ public class PrefixMenuWrapper extends MenuWrapper {
 			} else {
 				Konquest.playFailSound(bukkitPlayer);
 			}
-			result = true;
 		}
-		return result;
 	}
 
 	// Sort prefix by level low-to-high

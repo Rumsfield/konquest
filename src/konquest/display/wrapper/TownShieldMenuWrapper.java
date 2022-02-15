@@ -99,8 +99,7 @@ public class TownShieldMenuWrapper extends MenuWrapper {
 	}
 
 	@Override
-	public boolean onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
-		boolean result = false;
+	public void onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
 		Player bukkitPlayer = clickPlayer.getBukkitPlayer();
 		if(clickedIcon instanceof ShieldIcon) {
 			// Shield Icons close the GUI and attempt to activate a town shield
@@ -111,7 +110,6 @@ public class TownShieldMenuWrapper extends MenuWrapper {
 			} else {
 				Konquest.playFailSound(bukkitPlayer);
 			}
-			result = true;
 		} else if(clickedIcon instanceof ArmorIcon) {
 			// Armor Icons close the GUI and attempt to activate a town armor
 			ArmorIcon icon = (ArmorIcon)clickedIcon;
@@ -121,9 +119,7 @@ public class TownShieldMenuWrapper extends MenuWrapper {
 			} else {
 				Konquest.playFailSound(bukkitPlayer);
 			}
-			result = true;
 		}
-		return result;
 	}
 
 }

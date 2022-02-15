@@ -131,21 +131,17 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 	}
 
 	@Override
-	public boolean onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
-		boolean result = false;
+	public void onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
 		Player bukkitPlayer = clickPlayer.getBukkitPlayer();
 		if(clickedIcon instanceof InfoIcon) {
 			// Info Icons close the GUI and print their info in chat
 			InfoIcon icon = (InfoIcon)clickedIcon;
 			ChatUtil.sendNotice(bukkitPlayer, icon.getInfo());
-			result = true;
 		} else if(clickedIcon instanceof TownIcon) {
 			// Town Icons open a new town info menu for the associated player
 			TownIcon icon = (TownIcon)clickedIcon;
 			getKonquest().getDisplayManager().displayTownInfoMenu(clickPlayer,icon.getTown());
-			result = false;
 		}
-		return result;
 	}
 
 	// Sort kingdom town list by population then size
