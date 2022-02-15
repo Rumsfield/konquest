@@ -80,22 +80,18 @@ public class HelpMenuWrapper extends MenuWrapper {
 	}
 
 	@Override
-	public boolean onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
-		boolean result = false;
+	public void onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
 		Player bukkitPlayer = clickPlayer.getBukkitPlayer();
 		if(clickedIcon instanceof CommandIcon) {
 			// Command Icons close the GUI and print a command in chat
 			CommandIcon icon = (CommandIcon)clickedIcon;
 			CommandType cmd = icon.getCommand();
 			ChatUtil.sendNotice(bukkitPlayer, ChatColor.GOLD+"/k "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmd.arguments());
-			result = true;
 		} else if(clickedIcon instanceof InfoIcon) {
 			// Info Icons close the GUI and print their info in chat
 			InfoIcon icon = (InfoIcon)clickedIcon;
 			ChatUtil.sendNotice(bukkitPlayer, icon.getInfo());
-			result = true;
 		}
-		return result;
 	}
 
 }

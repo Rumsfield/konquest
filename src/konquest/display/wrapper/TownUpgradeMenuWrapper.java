@@ -45,8 +45,7 @@ public class TownUpgradeMenuWrapper extends MenuWrapper {
 	}
 
 	@Override
-	public boolean onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
-		boolean result = false;
+	public void onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
 		Player bukkitPlayer = clickPlayer.getBukkitPlayer();
 		if(clickedIcon instanceof UpgradeIcon) {
 			// Upgrade Icons close the GUI and attempt to apply an upgrade
@@ -57,9 +56,7 @@ public class TownUpgradeMenuWrapper extends MenuWrapper {
 			} else {
 				Konquest.playFailSound(bukkitPlayer);
 			}
-			result = true;
 		}
-		return result;
 	}
 
 }

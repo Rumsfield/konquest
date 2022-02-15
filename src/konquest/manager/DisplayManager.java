@@ -110,66 +110,31 @@ public class DisplayManager {
 			int nextIndex = clickMenu.getCurrentNextSlot();
 			int closeIndex = clickMenu.getCurrentCloseSlot();
 			int backIndex = clickMenu.getCurrentBackSlot();
-			pagedMenus.remove(inv);
 			playerViewerCache.add(bukkitPlayer);
-			
+			pagedMenus.remove(inv);
 			// Handle click context
 			if(slot == nextIndex) {
+				// Change paged view to next
 				clickMenu.nextPageIndex();
 				clickMenu.refreshCurrentPage();
-				/*
-				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-		            @Override
-		            public void run() {
-		            	bukkitPlayer.openInventory(wrapper.getCurrentInventory());
-		            	pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
-		            }
-		        },1);
-		        */
 				bukkitPlayer.openInventory(wrapper.getCurrentInventory());
             	pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 			} else if(slot == closeIndex) {
-				/*
-				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-		            @Override
-		            public void run() {
-		            	bukkitPlayer.closeInventory();
-		            	playerViewerCache.remove(bukkitPlayer);
-		            }
-		        },1);
-		        */
+				// Close paged view
 				bukkitPlayer.closeInventory();
             	playerViewerCache.remove(bukkitPlayer);
 			} else if(slot == backIndex) {
+				// Change paged view to previous
 				clickMenu.previousPageIndex();
 				clickMenu.refreshCurrentPage();
-				/*
-				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-		            @Override
-		            public void run() {
-		            	bukkitPlayer.openInventory(clickMenu.getCurrentPage().getInventory());
-		            	pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
-		            }
-		        },1);
-		        */
 				bukkitPlayer.openInventory(clickMenu.getCurrentPage().getInventory());
             	pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
 			} else {
-				// Clicked non-navigation slot
-				boolean status = wrapper.onIconClick(clickPlayer, clickedIcon);
-				if(status) {
-					/*
-					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-			            @Override
-			            public void run() {
-			            	bukkitPlayer.closeInventory();
-			            	playerViewerCache.remove(bukkitPlayer);
-			            }
-			        },1);
-			        */
-					bukkitPlayer.closeInventory();
-	            	playerViewerCache.remove(bukkitPlayer);
-				}
+				// Clicked non-navigation slot, clickable icon
+				// An icon will either open another menu or do nothing
+				wrapper.onIconClick(clickPlayer, clickedIcon);
+				bukkitPlayer.closeInventory();
+            	playerViewerCache.remove(bukkitPlayer);
 			}
 		} else if(stateMenus.containsKey(inv)) {
 			// Handle menu navigation and states
@@ -192,28 +157,10 @@ public class DisplayManager {
 			playerViewerCache.add(bukkitPlayer);
 			if(updateView != null) {
 				// Refresh displayed inventory view
-				/*
-				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-		            @Override
-		            public void run() {
-		            	bukkitPlayer.openInventory(updateView.getInventory());
-		            	stateMenus.put(updateView.getInventory(), clickMenu);
-		            }
-		        },1);
-		        */
 				bukkitPlayer.openInventory(updateView.getInventory());
             	stateMenus.put(updateView.getInventory(), clickMenu);
 			} else {
 				// Close inventory view
-				/*
-				Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-		            @Override
-		            public void run() {
-		            	bukkitPlayer.closeInventory();
-		            	playerViewerCache.remove(bukkitPlayer);
-		            }
-		        },1);
-		        */
 				bukkitPlayer.closeInventory();
             	playerViewerCache.remove(bukkitPlayer);
 			}
@@ -250,6 +197,7 @@ public class DisplayManager {
             @Override
             public void run() {
             	bukkitPlayer.openInventory(wrapper.getCurrentInventory());
+            	playerViewerCache.add(bukkitPlayer);
             }
         });
 	}
