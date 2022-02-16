@@ -7,14 +7,14 @@ import konquest.model.KonTerritory;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public class KonEnterTerritoryEvent extends KonEvent implements Cancellable {
+public class KonquestEnterTerritoryEvent extends KonquestEvent implements Cancellable {
 	
 	private KonPlayer player;
 	private KonTerritory territory;
 	private PlayerMoveEvent moveEvent;
 	private boolean isCancelled;
 	
-	public KonEnterTerritoryEvent(Konquest konquest, KonPlayer player, KonTerritory territory, PlayerMoveEvent moveEvent) {
+	public KonquestEnterTerritoryEvent(Konquest konquest, KonPlayer player, KonTerritory territory, PlayerMoveEvent moveEvent) {
 		super(konquest);
 		this.player = player;
 		this.territory = territory;

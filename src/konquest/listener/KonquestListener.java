@@ -2,9 +2,9 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.api.event.KonEnterTerritoryEvent;
-import konquest.api.event.KonKingdomChangeEvent;
-import konquest.api.event.KonMonumentDamageEvent;
+import konquest.api.event.KonquestEnterTerritoryEvent;
+import konquest.api.event.KonquestKingdomChangeEvent;
+import konquest.api.event.KonquestMonumentDamageEvent;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
 import konquest.model.KonCamp;
@@ -43,7 +43,7 @@ public class KonquestListener implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.NORMAL)
-    public void onKonquestEnterTerritory(KonEnterTerritoryEvent event) {
+    public void onKonquestEnterTerritory(KonquestEnterTerritoryEvent event) {
 		//ChatUtil.printDebug("EVENT: Player "+event.getPlayer().getBukkitPlayer().getDisplayName()+" entered new territory");
 		
 		// When territory is a capital
@@ -165,7 +165,7 @@ public class KonquestListener implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.NORMAL)
-    public void onKonquestMonumentDamage(KonMonumentDamageEvent event) {
+    public void onKonquestMonumentDamage(KonquestMonumentDamageEvent event) {
 		//ChatUtil.printDebug("EVENT: Monument damaged in town: "+event.getTerritory().getName()+", kingdom: "+event.getTerritory().getKingdom().getName());
 		
 		if(!(event.getTerritory() instanceof KonTown)) {
@@ -342,7 +342,7 @@ public class KonquestListener implements Listener {
 	 * @param event
 	 */
 	@EventHandler(priority = EventPriority.NORMAL)
-    public void onKingdomChange(KonKingdomChangeEvent event) {
+    public void onKingdomChange(KonquestKingdomChangeEvent event) {
 		//TODO: something
 	}
 	

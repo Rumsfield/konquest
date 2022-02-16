@@ -7,14 +7,14 @@ import konquest.model.KonTerritory;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.BlockBreakEvent;
 
-public class KonMonumentDamageEvent extends KonEvent implements Cancellable {
+public class KonquestMonumentDamageEvent extends KonquestEvent implements Cancellable {
 	
 	private KonPlayer player;
 	private KonTerritory territory;
 	private BlockBreakEvent blockEvent;
 	private boolean isCancelled;
 	
-	public KonMonumentDamageEvent(Konquest konquest, KonPlayer player, KonTerritory territory, BlockBreakEvent blockEvent) {
+	public KonquestMonumentDamageEvent(Konquest konquest, KonPlayer player, KonTerritory territory, BlockBreakEvent blockEvent) {
 		super(konquest);
 		this.blockEvent = blockEvent;
 		this.territory = territory;

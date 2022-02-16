@@ -10,7 +10,7 @@ import konquest.model.KonPlayer;
  * Called before the given player has been assigned to the given kingdom (or exiled as barbarian)
  * @return
  */
-public class KonKingdomChangeEvent extends KonEvent implements Cancellable {
+public class KonquestKingdomChangeEvent extends KonquestEvent implements Cancellable {
 
 	private KonPlayer player;
 	private KonKingdom newKingdom;
@@ -18,7 +18,7 @@ public class KonKingdomChangeEvent extends KonEvent implements Cancellable {
 	private boolean barbarian;
 	private boolean isCancelled;
 	
-	public KonKingdomChangeEvent(Konquest konquest, KonPlayer player, KonKingdom newKingdom, KonKingdom exileKingdom, boolean barbarian) {
+	public KonquestKingdomChangeEvent(Konquest konquest, KonPlayer player, KonKingdom newKingdom, KonKingdom exileKingdom, boolean barbarian) {
 		super(konquest);
 		this.player = player;
 		this.newKingdom = newKingdom;
