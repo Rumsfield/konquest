@@ -1,5 +1,13 @@
 package konquest.api.model;
 
-public interface KonquestPlayer {
+/**
+ * Represents an online player in Konquest.
+ * This interface wraps around Bukkit's Player interface.
+ * 
+ * @author Rumsfield
+ *
+ */
+public interface KonquestPlayer extends KonquestOfflinePlayer {
 
+	
 }

@@ -11,12 +11,13 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestKingdom;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
-public class KonKingdom implements Timeable{
+public class KonKingdom implements Timeable, KonquestKingdom {
 
 	private String name;
 	private Konquest konquest;

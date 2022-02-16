@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestTerritory;
 import konquest.utility.ChatUtil;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-public abstract class KonTerritory{
+public abstract class KonTerritory implements KonquestTerritory {
 
 	private HashMap<Point,KonTerritory> chunkList;
 	private Location centerLoc;

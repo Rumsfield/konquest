@@ -1,13 +1,13 @@
 package konquest.event;
 
 import konquest.Konquest;
+import konquest.api.event.KonquestEnterTerritoryEvent;
 import konquest.model.KonPlayer;
 import konquest.model.KonTerritory;
 
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public class KonEnterTerritoryEvent extends KonEvent implements Cancellable {
+public class KonEnterTerritoryEvent extends KonEvent implements KonquestEnterTerritoryEvent {
 	
 	private KonPlayer player;
 	private KonTerritory territory;

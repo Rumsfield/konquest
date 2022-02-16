@@ -2,7 +2,9 @@ package konquest.model;
 
 import org.bukkit.OfflinePlayer;
 
-public class KonOfflinePlayer {
+import konquest.api.model.KonquestOfflinePlayer;
+
+public class KonOfflinePlayer implements KonquestOfflinePlayer {
 
 	private OfflinePlayer offlineBukkitPlayer;
 	private KonKingdom kingdom;
