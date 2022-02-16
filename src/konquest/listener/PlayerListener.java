@@ -2,7 +2,7 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.event.KonquestEnterTerritoryEvent;
+import konquest.event.KonEnterTerritoryEvent;
 import konquest.manager.CampManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
@@ -990,7 +990,7 @@ public class PlayerListener implements Listener{
         			player.setFlyDisableWarmup(true);
         		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
 
-        			KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
+        			KonEnterTerritoryEvent invokeEvent = new KonEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
                     if(invokeEvent != null) {
                     	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
                     }
@@ -1038,7 +1038,7 @@ public class PlayerListener implements Listener{
         				// Set message color based on enemy territory
             			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmisticeTo);
 
-        				KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
+        				KonEnterTerritoryEvent invokeEvent = new KonEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
         	            Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
         	            if(!event.isCancelled()) {
         	            	ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
@@ -1127,7 +1127,7 @@ public class PlayerListener implements Listener{
     			}
     			
     			if(isTerritoryTo) {
-    				KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
+    				KonEnterTerritoryEvent invokeEvent = new KonEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
                     if(invokeEvent != null) {
                     	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
                     }

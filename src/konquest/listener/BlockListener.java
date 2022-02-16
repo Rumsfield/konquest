@@ -2,7 +2,7 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.event.KonquestMonumentDamageEvent;
+import konquest.event.KonMonumentDamageEvent;
 import konquest.manager.CampManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
@@ -283,7 +283,7 @@ public class BlockListener implements Listener {
 								// Cancel item drops on the broken blocks
 								event.setDropItems(false);
 								// Throw Konquest event
-								KonquestMonumentDamageEvent invokeEvent = new KonquestMonumentDamageEvent(konquest, player, kingdomManager.getChunkTerritory(breakLoc), event);
+								KonMonumentDamageEvent invokeEvent = new KonMonumentDamageEvent(konquest, player, kingdomManager.getChunkTerritory(breakLoc), event);
 			    	            Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
 							} else {
 								// Prevent block breaks in the rest of the chunk
