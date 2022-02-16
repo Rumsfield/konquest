@@ -132,6 +132,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	public List<String> opStatusMessages;
 	private Timer saveTimer;
 	private Timer compassTimer;
+	private Timer pingTimer;
 	private int saveIntervalSeconds;
 	private long offlineTimeoutSeconds;
 	public ConcurrentMap<Player, Location> lastPlaced = new MapMaker().
@@ -177,6 +178,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		opStatusMessages = new ArrayList<String>();
 		this.saveTimer = new Timer(this);
 		this.compassTimer = new Timer(this);
+		this.pingTimer = new Timer(this);
 		this.saveIntervalSeconds = 0;
 		this.offlineTimeoutSeconds = 0;
 		this.isPacketSendEnabled = false;
@@ -323,6 +325,9 @@ public class Konquest implements KonquestAPI, Timeable {
 		compassTimer.stopTimer();
 		compassTimer.setTime(30); // 30 second compass update interval
 		compassTimer.startLoopTimer();
+		pingTimer.stopTimer();
+		pingTimer.setTime(60*60); // 1 hour database ping interval
+		pingTimer.startLoopTimer();
 		// Set chat even priority
 		chatPriority = getEventPriority(configManager.getConfig("core").getString("core.chat.priority","HIGH"));
 		// Update kingdom stuff
@@ -781,6 +786,11 @@ public class Konquest implements KonquestAPI, Timeable {
 	    				player.getBukkitPlayer().setCompassTarget(nearestEnemyTownLoc);
 	    			}
 	        	}
+			}
+		} else if(taskID == pingTimer.getTaskID()) {
+			boolean status = databaseThread.getDatabase().getDatabaseConnection().pingDatabase();
+			if(status) {
+				ChatUtil.printDebug("Database ping success!");
 			}
 		}
 	}

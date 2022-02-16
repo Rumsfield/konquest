@@ -70,8 +70,7 @@ public class TownOptionsMenuWrapper extends MenuWrapper {
 	}
 
 	@Override
-	public boolean onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
-		boolean result = false;
+	public void onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
 		Player bukkitPlayer = clickPlayer.getBukkitPlayer();
 		if(clickedIcon instanceof OptionIcon) {
 			// Option Icons close the GUI and attempt to change a town setting
@@ -82,9 +81,7 @@ public class TownOptionsMenuWrapper extends MenuWrapper {
 			} else {
 				Konquest.playFailSound(bukkitPlayer);
 			}
-			result = true;
 		}
-		return result;
 	}
 
 }

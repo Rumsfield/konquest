@@ -132,24 +132,33 @@ public class ScoreMenuWrapper extends MenuWrapper {
 	}
 
 	@Override
-	public boolean onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
-		boolean result = false;
+	public void onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
 		Player bukkitPlayer = clickPlayer.getBukkitPlayer();
 		if(clickedIcon instanceof InfoIcon) {
 			// Info Icons close the GUI and print their info in chat
 			InfoIcon icon = (InfoIcon)clickedIcon;
 			ChatUtil.sendNotice(bukkitPlayer, icon.getInfo());
-			result = true;
 		} else if(clickedIcon instanceof PlayerIcon) {
 			// Player Head Icons open a new info menu for the associated player
 			PlayerIcon icon = (PlayerIcon)clickedIcon;
 			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
-			if(clickPlayer != null && offlinePlayer != null && icon.getAction().equals(PlayerIconAction.DISPLAY_INFO)) {
-				getKonquest().getDisplayManager().displayPlayerInfoMenu(clickPlayer, offlinePlayer);
+			if(clickPlayer != null && offlinePlayer != null) {
+				switch(icon.getAction()) {
+					case DISPLAY_INFO:
+						getKonquest().getDisplayManager().displayPlayerInfoMenu(clickPlayer, offlinePlayer);
+						break;
+					case DISPLAY_SCORE:
+						getKonquest().getDisplayManager().displayScoreMenu(clickPlayer, offlinePlayer);
+						break;
+					default:
+						break;
+				}
 			}
-			result = false;
+		} else if(clickedIcon instanceof KingdomIcon) {
+			// Kingdom Icons open a new kingdom info menu for the associated player
+			KingdomIcon icon = (KingdomIcon)clickedIcon;
+			getKonquest().getDisplayManager().displayKingdomInfoMenu(clickPlayer,icon.getKingdom());
 		}
-		return result;
 	}
 
 }
