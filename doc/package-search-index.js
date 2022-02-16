@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"konquest.api"},{"l":"konquest.api.manager"},{"l":"konquest.api.model"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"konquest.api"},{"l":"konquest.api.event"},{"l":"konquest.api.manager"},{"l":"konquest.api.model"}];updateSearchResults();
