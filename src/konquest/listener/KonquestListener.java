@@ -2,9 +2,9 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.event.KonKingdomChangeEvent;
-import konquest.event.KonEnterTerritoryEvent;
-import konquest.event.KonMonumentDamageEvent;
+import konquest.api.event.KonEnterTerritoryEvent;
+import konquest.api.event.KonKingdomChangeEvent;
+import konquest.api.event.KonMonumentDamageEvent;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
 import konquest.model.KonCamp;

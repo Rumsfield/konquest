@@ -33,9 +33,9 @@ import org.bukkit.potion.PotionEffectType;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.event.KonKingdomChangeEvent;
 import konquest.command.TravelCommand.TravelDestination;
 import konquest.display.OptionIcon.optionAction;
-import konquest.event.KonKingdomChangeEvent;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
 import konquest.model.KonDirective;

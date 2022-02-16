@@ -2,7 +2,7 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.event.KonMonumentDamageEvent;
+import konquest.api.event.KonMonumentDamageEvent;
 import konquest.manager.CampManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;

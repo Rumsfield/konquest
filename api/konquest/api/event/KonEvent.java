@@ -1,12 +1,11 @@
-package konquest.event;
+package konquest.api.event;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import konquest.Konquest;
-import konquest.api.event.KonquestEvent;
 
-public class KonEvent extends Event implements KonquestEvent {
+public class KonEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
 	

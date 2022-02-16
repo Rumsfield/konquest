@@ -1,4 +1,4 @@
-package konquest.event;
+package konquest.api.event;
 
 import konquest.Konquest;
 
