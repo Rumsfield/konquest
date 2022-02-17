@@ -13,6 +13,13 @@ public interface KonquestAPI {
 	 */
 	public ChatColor getFriendlyPrimaryColor();
 	
+	/**
+	 * Get the enemy primary color, from core.yml.
+	 * 
+	 * @return The enemy primary color
+	 */
+	public ChatColor getEnemyPrimaryColor();
+	
 	public KonquestPlayerManager getPlayerManager();
 	
 	

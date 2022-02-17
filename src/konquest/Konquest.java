@@ -512,6 +512,10 @@ public class Konquest implements KonquestAPI, Timeable {
 		return friendColor1;
 	}
 	
+	public ChatColor getEnemyPrimaryColor() {
+		return enemyColor1;
+	}
+	
 	/* Regular Methods */
 	
 	public static Konquest getInstance() {
