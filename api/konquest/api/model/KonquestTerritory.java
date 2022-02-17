@@ -14,4 +14,12 @@ public interface KonquestTerritory {
 	 * @return The kingdom object
 	 */
 	public KonquestKingdom getKingdom();
+	
+	/**
+	 * Get the name of this territory.
+	 * 
+	 * @return The name
+	 */
+	public String getName();
+	
 }

@@ -33,7 +33,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	}
 	
 	private Player bukkitPlayer;
-	private KonKingdom exileKingdom;
+	//private KonKingdom exileKingdom;
 	
 	private RegionType settingRegion;
 	private String regionKingdomName;
@@ -78,7 +78,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		//super((OfflinePlayer) bukkitPlayer, kingdom, isBarbarian);
 		
 		this.bukkitPlayer = bukkitPlayer;
-		this.exileKingdom = kingdom;
+		//this.exileKingdom = kingdom;
 		this.settingRegion = RegionType.NONE;
 		this.regionKingdomName = "";
 		this.isAdminBypassActive = false;
@@ -159,9 +159,11 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		return bukkitPlayer;
 	}
 	
+	/*
 	public KonKingdom getExileKingdom() {
 		return exileKingdom;
 	}
+	*/
 	
 	public boolean isSettingRegion() {
 		return (!settingRegion.equals(RegionType.NONE));
@@ -257,9 +259,11 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	
 	// Setters
 	
+	/*
 	public void setExileKingdom(KonKingdom newKingdom) {
 		exileKingdom = newKingdom;
 	}
+	*/
 	
 	public void settingRegion(RegionType type) {
 		settingRegion = type;
