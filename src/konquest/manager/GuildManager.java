@@ -23,6 +23,7 @@ import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.manager.KonquestGuildManager;
 import konquest.api.model.KonquestGuild;
+import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestTown;
 import konquest.model.KonGuild;
@@ -56,11 +57,6 @@ public class GuildManager implements KonquestGuildManager, Timeable {
 	private Timer payTimer;
 	private HashSet<KonGuild> guilds;
 	private HashMap<UUID,KonGuild> playerGuildCache;
-	
-	//TODO: Specialization trade discounts
-	/* - Check version to handle exceptions in MerchantRecipe special price methods
-	 * 
-	 */
 	
 	public GuildManager(Konquest konquest) {
 		this.konquest = konquest;
@@ -849,7 +845,7 @@ public class GuildManager implements KonquestGuildManager, Timeable {
 		return result;
 	}
 	
-	public List<KonGuild> getEnemyGuilds(KonKingdom kingdom) {
+	public List<KonGuild> getEnemyGuilds(KonquestKingdom kingdom) {
 		List<KonGuild> result = new ArrayList<KonGuild>();
 		for(KonGuild otherGuild : guilds) {
 			if(!otherGuild.getKingdom().equals(kingdom)) {
@@ -859,7 +855,7 @@ public class GuildManager implements KonquestGuildManager, Timeable {
 		return result;
 	}
 	
-	public List<KonGuild> getKingdomGuilds(KonKingdom kingdom) {
+	public List<KonGuild> getKingdomGuilds(KonquestKingdom kingdom) {
 		List<KonGuild> result = new ArrayList<KonGuild>();
 		for(KonGuild guild : guilds) {
 			if(kingdom.equals(guild.getKingdom())) {
