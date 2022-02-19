@@ -17,6 +17,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.manager.KonquestRuinManager;
+import konquest.api.model.KonquestRuin;
 import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
 import konquest.utility.ChatUtil;
@@ -81,11 +82,14 @@ public class RuinManager implements KonquestRuinManager {
 		return ruinMap.containsKey(name.toLowerCase());
 	}
 	
-	public boolean isLocInsideRuin(KonRuin ruin, Location loc) {
+	public boolean isLocInsideRuin(KonquestRuin ruinArg, Location loc) {
 		boolean result = false;
-		if(kingdomManager.isChunkClaimed(loc)) {
-			if(ruin.equals(kingdomManager.getChunkTerritory(loc))) {
-				result = true;
+		if(ruinArg instanceof KonRuin) {
+			KonRuin ruin = (KonRuin) ruinArg;
+			if(kingdomManager.isChunkClaimed(loc)) {
+				if(ruin.equals(kingdomManager.getChunkTerritory(loc))) {
+					result = true;
+				}
 			}
 		}
 		return result;
@@ -93,7 +97,7 @@ public class RuinManager implements KonquestRuinManager {
 	
 	public boolean addRuin(Location loc, String name) {
 		boolean result = false;
-		if(!name.contains(" ") && !isRuin(name)) {
+		if(!name.contains(" ") && konquest.validateNameConstraints(name) == 0) {
 			// Verify no overlapping init chunks
 			for(Point point : konquest.getAreaPoints(loc, 2)) {
 				if(kingdomManager.isChunkClaimed(point,loc.getWorld())) {

@@ -18,11 +18,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestRuin;
 import konquest.utility.ChatUtil;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
-public class KonRuin extends KonTerritory implements Timeable {
+public class KonRuin extends KonTerritory implements KonquestRuin, Timeable {
 
 	private Timer spawnTimer;
 	private Timer captureTimer;

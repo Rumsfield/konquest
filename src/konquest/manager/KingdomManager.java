@@ -377,7 +377,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	 */
 	public int addTown(Location loc, String name, String kingdomName) {
 		ChatUtil.printDebug("Attempting to add new town "+name+" for kingdom "+kingdomName);
-		if(!name.contains(" ") && isKingdom(kingdomName)) {
+		if(!name.contains(" ") && isKingdom(kingdomName) && konquest.validateNameConstraints(name) == 0) {
 			if(!konquest.isWorldValid(loc.getWorld())) {
 				ChatUtil.printDebug("Failed to add town, invalid world: "+loc.getWorld().getName());
 				return 5;

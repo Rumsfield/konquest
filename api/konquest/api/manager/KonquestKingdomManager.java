@@ -274,7 +274,7 @@ public interface KonquestKingdomManager {
 	
 	/**
 	 * Gets the monument critical block material.
-	 * This is block type that must be destroyed within town monuments in order to capture the town.
+	 * This is the block type that must be destroyed within town monuments in order to capture the town.
 	 * 
 	 * @return The critical material
 	 */

@@ -347,7 +347,7 @@ public class GuildManager implements KonquestGuildManager, Timeable {
                 return 3;
 			}
     	}
-		if(!name.contains(" ") && !konquest.getKingdomManager().isKingdom(name) && !konquest.getKingdomManager().isTown(name)) {
+		if(!name.contains(" ") && konquest.validateNameConstraints(name) == 0) {
 			KonGuild currentGuild = getPlayerGuild(master.getOfflineBukkitPlayer());
 			if(currentGuild == null) {
 				KonGuild newGuild = new KonGuild(name, master.getBukkitPlayer().getUniqueId(), master.getKingdom());
