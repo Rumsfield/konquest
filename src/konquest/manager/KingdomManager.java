@@ -35,6 +35,7 @@ import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.event.KonquestKingdomChangeEvent;
 import konquest.api.manager.KonquestKingdomManager;
+import konquest.api.model.KonquestUpgrade;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestPlayer;
 import konquest.command.TravelCommand.TravelDestination;
@@ -57,7 +58,6 @@ import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryCache;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.LoadingPrinter;
 import konquest.utility.MessagePath;
@@ -1209,7 +1209,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	public void applyTownNerf(KonPlayer player, KonTown town) {
 		if(!player.isAdminBypassActive()) {
 			for(PotionEffectType pot : townNerfs.keySet()) {
-				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.FATIGUE);
+				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.FATIGUE);
 				int upgradedPotLevel = townNerfs.get(pot) + upgradeLevel;
 				player.getBukkitPlayer().addPotionEffect(new PotionEffect(pot, 9999999, upgradedPotLevel));
 			}
@@ -1252,7 +1252,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	
 	public void applyTownHearts(KonPlayer player, KonTown town) {
 		if(player.getKingdom().equals(town.getKingdom())) {
-			int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.HEALTH);
+			int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.HEALTH);
 			if(upgradeLevel >= 1) {
 				//double upgradedBaseHealth = 20 + (upgradeLevel*2);
 				//player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(upgradedBaseHealth);
@@ -2025,7 +2025,7 @@ public class KingdomManager implements KonquestKingdomManager {
 		            	if(townSection.contains("upgrades")) {
 		            		for(String upgradeName : townSection.getConfigurationSection("upgrades").getKeys(false)) {
 		            			int level = townSection.getInt("upgrades."+upgradeName);
-		            			KonUpgrade upgrade = KonUpgrade.getUpgrade(upgradeName);
+		            			KonquestUpgrade upgrade = KonquestUpgrade.getUpgrade(upgradeName);
 		            			if(upgrade != null) {
 		            				town.addUpgrade(upgrade, level);
 		            			}
@@ -2140,7 +2140,7 @@ public class KingdomManager implements KonquestKingdomManager {
                 	townInstanceRequestsSection.set(uuid, true);
                 }
                 ConfigurationSection townInstanceUpgradeSection = townInstanceSection.createSection("upgrades");
-                for(KonUpgrade upgrade : KonUpgrade.values()) {
+                for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
                 	int level = town.getRawUpgradeLevel(upgrade);
                 	if(level > 0) {
                 		townInstanceUpgradeSection.set(upgrade.toString(), level);

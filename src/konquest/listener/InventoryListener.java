@@ -2,6 +2,7 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.model.KonquestUpgrade;
 import konquest.manager.PlayerManager;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
@@ -10,7 +11,6 @@ import konquest.model.KonPlayer;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
@@ -375,7 +375,7 @@ public class InventoryListener implements Listener {
 				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(enchantLoc);
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown)territory;
-					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.ENCHANT);
+					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.ENCHANT);
 					if(upgradeLevel >= 1) {
 						// Add 1 (if possible) to all applied enchantment levels
 						Map<Enchantment,Integer> enchantsToAdd = event.getEnchantsToAdd();
@@ -402,7 +402,7 @@ public class InventoryListener implements Listener {
 				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(enchantLoc);
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown)territory;
-					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.ENCHANT);
+					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.ENCHANT);
 					if(upgradeLevel >= 1) {
 						// Add 1 (if possible) to all enchantment offers
 						EnchantmentOffer[] offers = event.getOffers();

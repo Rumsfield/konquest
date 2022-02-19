@@ -60,7 +60,6 @@ import konquest.model.KonRuin;
 import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
 import konquest.nms.Handler_1_16_R3;
 import konquest.nms.Handler_1_17_R1;
 import konquest.nms.Handler_1_18_R1;
@@ -75,6 +74,7 @@ import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 import konquest.api.KonquestAPI;
+import konquest.api.model.KonquestUpgrade;
 import konquest.api.model.KonquestGuild;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestTerritory;
@@ -790,7 +790,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	    			for(KonKingdom kingdom : enemyKingdoms) {
 	    				for(KonTown town : kingdom.getTowns()) {
 	    					// Only find enemy towns which do not have the counter-intelligence upgrade level 2+
-	    					int upgradeLevel = upgradeManager.getTownUpgradeLevel(town, KonUpgrade.COUNTER);
+	    					int upgradeLevel = upgradeManager.getTownUpgradeLevel(town, KonquestUpgrade.COUNTER);
 	    					if(upgradeLevel < 2) {
 	    						int townDist = chunkDistance(player.getBukkitPlayer().getLocation(), town.getCenterLoc());
 	    						if(townDist != -1 && townDist < minDistance) {

@@ -9,12 +9,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestUpgrade;
 import konquest.command.CommandBase;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
@@ -260,7 +260,7 @@ public class ForceTownAdminCommand extends CommandBase {
 					upgradeLevelStr = getArgs()[5];
 				}
 	        	if(!upgradeName.equalsIgnoreCase("")) {
-	        		KonUpgrade upgrade = KonUpgrade.getUpgrade(upgradeName);
+	        		KonquestUpgrade upgrade = KonquestUpgrade.getUpgrade(upgradeName);
 	        		if(upgrade == null) {
 	        			//ChatUtil.sendError((Player) getSender(), "Invalid upgrade name!");
 	        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_UPGRADE.getMessage());
@@ -277,14 +277,20 @@ public class ForceTownAdminCommand extends CommandBase {
 	        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_LEVEL.getMessage());
 			        		return;
 	        			}
+	        			if(!getKonquest().getUpgradeManager().isEnabled()) {
+	        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+	        				return;
+	        			}
 	        			if(upgradeLevel < 0 || upgradeLevel > upgrade.getMaxLevel()) {
-	        				//ChatUtil.sendError((Player) getSender(), "Invalid upgrade level!");
 	        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_LEVEL.getMessage());
 			        		return;
 	        			}
 	        			// Set town upgrade and level
-	        			getKonquest().getUpgradeManager().forceTownUpgrade(town, upgrade, upgradeLevel, (Player)getSender());
-	        			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(town);
+	        			boolean status = getKonquest().getUpgradeManager().applyTownUpgrade(town, upgrade, upgradeLevel);
+	        			if(status) {
+	        				ChatUtil.sendNotice((Player) getSender(), MessagePath.MENU_UPGRADE_ADD.getMessage(upgrade.getDescription(),upgradeLevel,town.getName()));
+	        			}
+	        			
 	        		} else {
 	        			//ChatUtil.sendError((Player) getSender(), "Must provide an upgrade level!");
 	        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_LEVEL.getMessage());
@@ -468,7 +474,7 @@ public class ForceTownAdminCommand extends CommandBase {
 			} else if(subCommand.equalsIgnoreCase("rename")) {
 				tabList.add("***");
 			} else if(subCommand.equalsIgnoreCase("upgrade")) {
-				for(KonUpgrade upgrade : KonUpgrade.values()) {
+				for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
 					tabList.add(upgrade.toString().toLowerCase());
 				}
 			} else if(subCommand.equalsIgnoreCase("shield") || subCommand.equalsIgnoreCase("armor")) {
@@ -484,7 +490,7 @@ public class ForceTownAdminCommand extends CommandBase {
 			String subCommand = getArgs()[3];
 			if(subCommand.equalsIgnoreCase("upgrade")) {
 				String upgradeName = getArgs()[4];
-				KonUpgrade upgrade = KonUpgrade.getUpgrade(upgradeName);
+				KonquestUpgrade upgrade = KonquestUpgrade.getUpgrade(upgradeName);
 				if(upgrade != null) {
 					for(int i=0;i<=upgrade.getMaxLevel();i++) {
 						tabList.add(String.valueOf(i));

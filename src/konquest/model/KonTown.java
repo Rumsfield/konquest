@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestUpgrade;
 import konquest.api.model.KonquestTown;
 import konquest.utility.BlockPaster;
 import konquest.utility.ChatUtil;
@@ -67,8 +68,8 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 	private int armorCurrentBlocks;
 	private double armorProgress;
 	private ArrayList<UUID> defenders;
-	private HashMap<KonUpgrade,Integer> upgrades;
-	private HashMap<KonUpgrade,Integer> disabledUpgrades;
+	private HashMap<KonquestUpgrade,Integer> upgrades;
+	private HashMap<KonquestUpgrade,Integer> disabledUpgrades;
 	private KonTownRabbit rabbit;
 	private HashMap<Point,KonPlot> plots;
 	
@@ -109,8 +110,8 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 		this.armorCurrentBlocks = 0;
 		this.armorProgress = 0.0;
 		this.defenders = new ArrayList<UUID>();
-		this.upgrades = new HashMap<KonUpgrade,Integer>();
-		this.disabledUpgrades = new HashMap<KonUpgrade,Integer>();
+		this.upgrades = new HashMap<KonquestUpgrade,Integer>();
+		this.disabledUpgrades = new HashMap<KonquestUpgrade,Integer>();
 		this.rabbit = new KonTownRabbit(getSpawnLoc());
 		this.plots = new HashMap<Point,KonPlot>();
 	}
@@ -1002,11 +1003,11 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 		return result;
 	}
 	
-	public void addUpgrade(KonUpgrade upgrade, int level) {
+	public void addUpgrade(KonquestUpgrade upgrade, int level) {
 		upgrades.put(upgrade, level);
 	}
 	
-	public boolean hasUpgrade(KonUpgrade upgrade) {
+	public boolean hasUpgrade(KonquestUpgrade upgrade) {
 		return upgrades.containsKey(upgrade);
 	}
 	
@@ -1015,7 +1016,7 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 	}
 	
 	// Returns current upgrade level, modified when disabled
-	public int getUpgradeLevel(KonUpgrade upgrade) {
+	public int getUpgradeLevel(KonquestUpgrade upgrade) {
 		int result = 0;
 		if(upgrades.containsKey(upgrade)) {
 			if(disabledUpgrades.containsKey(upgrade)) {
@@ -1027,7 +1028,7 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 		return result;
 	}
 	
-	public int getRawUpgradeLevel(KonUpgrade upgrade) {
+	public int getRawUpgradeLevel(KonquestUpgrade upgrade) {
 		int result = 0;
 		if(upgrades.containsKey(upgrade)) {
 			result = upgrades.get(upgrade);
@@ -1035,11 +1036,11 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 		return result;
 	}
 	
-	public void disableUpgrade(KonUpgrade upgrade, int newLevel) {
+	public void disableUpgrade(KonquestUpgrade upgrade, int newLevel) {
 		disabledUpgrades.put(upgrade,newLevel);
 	}
 	
-	public boolean allowUpgrade(KonUpgrade upgrade) {
+	public boolean allowUpgrade(KonquestUpgrade upgrade) {
 		boolean result = false;
 		if(disabledUpgrades.containsKey(upgrade)) {
 			disabledUpgrades.remove(upgrade);
@@ -1048,7 +1049,7 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 		return result;
 	}
 	
-	public boolean isUpgradeDisabled(KonUpgrade upgrade) {
+	public boolean isUpgradeDisabled(KonquestUpgrade upgrade) {
 		return disabledUpgrades.containsKey(upgrade);
 	}
 	
@@ -1093,7 +1094,7 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 	
 	public boolean isTownWatchProtected() {
 		boolean result = false;
-		int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(this, KonUpgrade.WATCH);
+		int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(this, KonquestUpgrade.WATCH);
 		if(upgradeLevel > 0) {
 			int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
 			if(getNumResidentsOnline() < minimumOnlineResidents) {

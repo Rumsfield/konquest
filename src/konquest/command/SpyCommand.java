@@ -21,13 +21,13 @@ import org.bukkit.map.MapView.Scale;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.model.KonquestUpgrade;
 import konquest.model.KonKingdom;
 //import konquest.model.KonMapRenderer;
 import konquest.model.KonPlayer;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
@@ -85,7 +85,7 @@ public class SpyCommand extends CommandBase {
 			for(KonKingdom kingdom : enemyKingdoms) {
 				for(KonTown town : kingdom.getTowns()) {
 					// Only find enemy towns which do not have the counter-intelligence upgrade level 1+
-					int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.COUNTER);
+					int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.COUNTER);
 					if(upgradeLevel < 1) {
 						int townDist = Konquest.chunkDistance(bukkitPlayer.getLocation(), town.getCenterLoc());
 						if(townDist != -1 && townDist < minDistance) {

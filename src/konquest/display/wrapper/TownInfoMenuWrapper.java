@@ -10,6 +10,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestUpgrade;
 import konquest.display.GuildIcon;
 import konquest.display.InfoIcon;
 import konquest.display.KingdomIcon;
@@ -21,7 +22,6 @@ import konquest.model.KonGuild;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
@@ -159,7 +159,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		pageLabel = titleColor+infoTown.getName()+" "+MessagePath.LABEL_UPGRADES.getMessage();
 		getMenu().addPage(1, 1, pageLabel);
 		int index = 0;
-		for(KonUpgrade upgrade : KonUpgrade.values()) {
+		for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
 			int currentLevel = infoTown.getRawUpgradeLevel(upgrade);
 			if(currentLevel > 0) {
 				String formattedUpgrade = ChatColor.LIGHT_PURPLE+upgrade.getDescription()+" "+currentLevel;
