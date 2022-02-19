@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.manager.KonquestShieldManager;
 import konquest.model.KonArmor;
 import konquest.model.KonKingdom;
 import konquest.model.KonPlayer;
@@ -20,7 +21,7 @@ import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-public class ShieldManager {
+public class ShieldManager implements KonquestShieldManager {
 
 	private Konquest konquest;
 	private boolean isShieldsEnabled;

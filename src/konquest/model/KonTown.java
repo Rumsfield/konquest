@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestTown;
 import konquest.utility.BlockPaster;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
@@ -37,7 +38,7 @@ import org.bukkit.potion.PotionEffectType;
  * @author Rumsfield
  * @prerequisites	The Town's Kingdom must have a valid Monument Template
  */
-public class KonTown extends KonTerritory implements Timeable {
+public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 	
 	private KonMonument monument;
 	private Timer monumentTimer;

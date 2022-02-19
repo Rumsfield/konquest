@@ -46,9 +46,8 @@ public class GuildInfoMenuWrapper extends MenuWrapper {
  		InfoIcon info;
  		final int MAX_ICONS_PER_PAGE = 45;
 		int pageTotal = 1;
-		boolean isArmistice = getKonquest().getGuildManager().isArmistice(observerGuild, infoGuild);
-		
-		ChatColor kingdomColor = Konquest.getDisplayPrimaryColor(observer.getKingdom(), infoGuild.getKingdom(), isArmistice);
+
+		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observerGuild, infoGuild);
  		ChatColor titleColor = DisplayManager.titleColor;
 		ChatColor loreColor = DisplayManager.loreColor;
 		ChatColor valueColor = DisplayManager.valueColor;

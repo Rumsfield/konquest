@@ -20,13 +20,14 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.manager.KonquestCampManager;
 import konquest.model.KonCamp;
 import konquest.model.KonCampGroup;
 import konquest.model.KonOfflinePlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-public class CampManager {
+public class CampManager implements KonquestCampManager {
 
 	private Konquest konquest;
 	private KingdomManager kingdomManager;

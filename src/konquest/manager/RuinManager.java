@@ -16,12 +16,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.manager.KonquestRuinManager;
 import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-public class RuinManager {
+public class RuinManager implements KonquestRuinManager {
 
 	private Konquest konquest;
 	private KingdomManager kingdomManager;
@@ -34,11 +35,6 @@ public class RuinManager {
 		this.ruinMap = new HashMap<String, KonRuin>();
 		this.ruinCriticalBlock = Material.OBSIDIAN;
 	}
-	//TODO:
-	// On server start and stop, replace critical and spawn blocks in all ruins
-	// Load custom mob lists from config file for spawn tables
-	// Give rewards (favor and exp) to players inside of ruin territory upon capture
-	// Kill all mobs inside a ruin when it is captured
 	
 	public void initialize() {
 		loadCriticalBlocks();

@@ -233,15 +233,13 @@ public class PlayerListener implements Listener{
 	            String suffix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer));
 	            String kingdomName = kingdom.getName();
 	            String name = bukkitPlayer.getName();
-	            boolean isArmistice = false;
 	            
 	            if(player.isGlobalChat()) {
 	            	//Global chat, all players see this format
 	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
 	            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
-	            		isArmistice = konquest.getGuildManager().isArmistice(globalPlayer, player);
-	            		ChatColor teamColor = Konquest.getDisplayPrimaryColor(globalPlayer, player, isArmistice);
-	            		ChatColor titleColor = Konquest.getDisplaySecondaryColor(globalPlayer, player, isArmistice);
+	            		ChatColor teamColor = konquest.getDisplayPrimaryColor(globalPlayer, player);
+	            		ChatColor titleColor = konquest.getDisplaySecondaryColor(globalPlayer, player);
 	            		globalPlayer.getBukkitPlayer().sendMessage(
 	            				ChatUtil.parseFormat(Konquest.getChatMessage(),
 	            						prefix,
@@ -1005,7 +1003,7 @@ public class PlayerListener implements Listener{
             				}
             			}
                     	// Set message color based on enemy territory
-            			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmisticeTo);
+            			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
 
     	                // Display Territory Name
     	    			String territoryName = territoryTo.getName();
@@ -1036,7 +1034,7 @@ public class PlayerListener implements Listener{
             			}
             			
         				// Set message color based on enemy territory
-            			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmisticeTo);
+            			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
 
         				KonquestEnterTerritoryEvent invokeEvent = new KonquestEnterTerritoryEvent(konquest, player, kingdomManager.getChunkTerritory(chunkTo), event);
         	            Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
@@ -1133,7 +1131,7 @@ public class PlayerListener implements Listener{
                     }
                     if(!event.isCancelled()) {
     	                // Set message color based on enemy territory
-            			ChatColor color = konquest.getDisplayKingdomColor(player.getKingdom(), territoryTo.getKingdom(), isArmisticeTo);
+            			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
     	                // Display Territory Name
     	    			String territoryName = territoryTo.getName();
     	    			//ChatUtil.sendNotice(bukkitPlayer, color+territoryName+": "+chunkCoordsTo);

@@ -52,6 +52,7 @@ import konquest.manager.UpgradeManager;
 import konquest.map.MapHandler;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
+import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
@@ -74,6 +75,9 @@ import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 import konquest.api.KonquestAPI;
+import konquest.api.model.KonquestGuild;
+import konquest.api.model.KonquestOfflinePlayer;
+import konquest.api.model.KonquestTerritory;
 import konquest.command.CommandHandler;
 import konquest.database.DatabaseThread;
 
@@ -1312,12 +1316,13 @@ public class Konquest implements KonquestAPI, Timeable {
      * @param isArmistice - Are the two players in an armistice?
      * @return Color
      */
-    public static ChatColor getDisplayPrimaryColor(KonOfflinePlayer displayPlayer, KonOfflinePlayer contextPlayer, boolean isArmistice) {
+    public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer) {
     	ChatColor result = ChatColor.RED;
+    	boolean isArmistice = guildManager.isArmistice(displayPlayer, contextPlayer);
     	if(contextPlayer.isBarbarian()) {
     		result = barbarianColor;
 		} else {
-			if(contextPlayer.getKingdom().equals(displayPlayer.getKingdom())) {
+			if(displayPlayer.getKingdom().equals(contextPlayer.getKingdom())) {
 				result = friendColor1;
     		} else {
     			if(isArmistice) {
@@ -1330,9 +1335,10 @@ public class Konquest implements KonquestAPI, Timeable {
     	return result;
     }
     
-    public static ChatColor getDisplayPrimaryColor(KonKingdom displayKingdom, KonKingdom contextKingdom, boolean isArmistice) {
+    public ChatColor getDisplayPrimaryColor(KonquestGuild displayGuild, KonquestGuild contextGuild) {
     	ChatColor result = ChatColor.RED;
-    	if(contextKingdom.equals(displayKingdom)) {
+    	boolean isArmistice = guildManager.isArmistice(displayGuild, contextGuild);
+    	if(displayGuild.getKingdom().equals(contextGuild.getKingdom())) {
 			result = friendColor1;
 		} else {
 			if(isArmistice) {
@@ -1344,8 +1350,22 @@ public class Konquest implements KonquestAPI, Timeable {
     	return result;
     }
     
-    public static ChatColor getDisplayPrimaryColor(KonOfflinePlayer displayPlayer, KonTown contextTown, boolean isArmistice) {
-    	return getDisplayPrimaryColor(displayPlayer.getKingdom(), contextTown.getKingdom(), isArmistice);
+    public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory) {
+    	ChatColor result = ChatColor.RED;
+    	boolean isArmistice = false;
+    	if(contextTerritory instanceof KonTown) {
+    		isArmistice = guildManager.isArmistice(displayPlayer, (KonTown)contextTerritory);
+    	}
+    	if(displayPlayer.getKingdom().equals(contextTerritory.getKingdom())) {
+			result = friendColor1;
+		} else {
+			if(isArmistice) {
+				result = armisticeColor1;
+			} else {
+				result = enemyColor1;
+			}
+		}
+    	return result;
     }
     
     /**
@@ -1355,8 +1375,9 @@ public class Konquest implements KonquestAPI, Timeable {
      * @param isArmistice - Are the two players in an armistice?
      * @return Color
      */
-    public static ChatColor getDisplaySecondaryColor(KonOfflinePlayer displayPlayer, KonOfflinePlayer contextPlayer, boolean isArmistice) {
+    public ChatColor getDisplaySecondaryColor(KonOfflinePlayer displayPlayer, KonOfflinePlayer contextPlayer) {
     	ChatColor result = ChatColor.RED;
+    	boolean isArmistice = guildManager.isArmistice(displayPlayer, contextPlayer);
     	if(contextPlayer.isBarbarian()) {
     		result = barbarianColor;
 		} else {
@@ -1373,7 +1394,40 @@ public class Konquest implements KonquestAPI, Timeable {
     	return result;
     }
     
-    public ChatColor getDisplayKingdomColor(KonKingdom displayKingdom, KonKingdom contextKingdom, boolean isArmistice) {
+    public ChatColor getDisplaySecondaryColor(KonGuild displayGuild, KonGuild contextGuild) {
+    	ChatColor result = ChatColor.RED;
+    	boolean isArmistice = guildManager.isArmistice(displayGuild, contextGuild);
+    	if(displayGuild.getKingdom().equals(contextGuild.getKingdom())) {
+			result = friendColor2;
+		} else {
+			if(isArmistice) {
+				result = armisticeColor2;
+			} else {
+				result = enemyColor2;
+			}
+		}
+    	return result;
+    }
+    
+    public ChatColor getDisplaySecondaryColor(KonOfflinePlayer displayPlayer, KonTerritory contextTerritory) {
+    	ChatColor result = ChatColor.RED;
+    	boolean isArmistice = false;
+    	if(contextTerritory instanceof KonTown) {
+    		isArmistice = guildManager.isArmistice(displayPlayer, (KonTown)contextTerritory);
+    	}
+    	if(displayPlayer.getKingdom().equals(contextTerritory.getKingdom())) {
+			result = friendColor2;
+		} else {
+			if(isArmistice) {
+				result = armisticeColor2;
+			} else {
+				result = enemyColor2;
+			}
+		}
+    	return result;
+    }
+    
+    public ChatColor getDisplayKingdomColor(KonKingdom displayKingdom, KonKingdom contextKingdom) {
     	ChatColor result = ChatColor.RED;
     	if(contextKingdom.equals(kingdomManager.getBarbarians())) {
     		result = barbarianColor;
@@ -1382,11 +1436,7 @@ public class Konquest implements KonquestAPI, Timeable {
     	} else if(contextKingdom.equals(displayKingdom)) {
 			result = friendColor1;
 		} else {
-			if(isArmistice) {
-				result = armisticeColor1;
-			} else {
-				result = enemyColor1;
-			}
+			result = enemyColor1;
 		}
     	return result;
     }

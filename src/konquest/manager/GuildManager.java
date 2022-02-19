@@ -21,6 +21,10 @@ import org.bukkit.inventory.MerchantRecipe;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.manager.KonquestGuildManager;
+import konquest.api.model.KonquestGuild;
+import konquest.api.model.KonquestOfflinePlayer;
+import konquest.api.model.KonquestTown;
 import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
@@ -32,7 +36,7 @@ import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
-public class GuildManager implements Timeable {
+public class GuildManager implements KonquestGuildManager, Timeable {
 
 	private Konquest konquest;
 	private boolean isEnabled;
@@ -876,7 +880,7 @@ public class GuildManager implements Timeable {
 	}
 	
 	// This can return null!
-	public KonGuild getTownGuild(KonTown town) {
+	public KonGuild getTownGuild(KonquestTown town) {
 		KonGuild result = null;
 		UUID lordID = town.getLord();
 		if(lordID != null) {
@@ -938,7 +942,7 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
-	public boolean isArmistice(KonGuild guild1, KonGuild guild2) {
+	public boolean isArmistice(KonquestGuild guild1, KonquestGuild guild2) {
 		boolean result = false;
 		if(guild1 != null && guild2 != null && !guild1.getKingdom().equals(guild2.getKingdom()) && guild1.isArmistice(guild2) && guild2.isArmistice(guild1)) {
 			result = true;
@@ -946,7 +950,7 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
-	public boolean isArmistice(KonOfflinePlayer player1, KonOfflinePlayer player2) {
+	public boolean isArmistice(KonquestOfflinePlayer player1, KonquestOfflinePlayer player2) {
 		boolean result = false;
 		KonGuild guild1 = getPlayerGuild(player1.getOfflineBukkitPlayer());
 		KonGuild guild2 = getPlayerGuild(player2.getOfflineBukkitPlayer());
@@ -954,7 +958,7 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
-	public boolean isArmistice(KonOfflinePlayer player1, KonTown town2) {
+	public boolean isArmistice(KonquestOfflinePlayer player1, KonquestTown town2) {
 		boolean result = false;
 		KonGuild guild1 = getPlayerGuild(player1.getOfflineBukkitPlayer());
 		KonGuild guild2 = getTownGuild(town2);

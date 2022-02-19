@@ -47,7 +47,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		boolean isFriendly = observer.getKingdom().equals(infoTown.getKingdom());
 		boolean isArmistice = getKonquest().getGuildManager().isArmistice(observer, infoTown);
 		
-		ChatColor kingdomColor = Konquest.getDisplayPrimaryColor(observer, infoTown, isArmistice);
+		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer, infoTown);
  		ChatColor titleColor = DisplayManager.titleColor;
 		ChatColor loreColor = DisplayManager.loreColor;
 		ChatColor valueColor = DisplayManager.valueColor;

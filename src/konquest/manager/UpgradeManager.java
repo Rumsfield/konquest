@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.manager.KonquestUpgradeManager;
 import konquest.model.KonPlayer;
 import konquest.model.KonStatsType;
 import konquest.model.KonTown;
@@ -17,7 +18,7 @@ import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-public class UpgradeManager {
+public class UpgradeManager implements KonquestUpgradeManager {
 	
 	private Konquest konquest;
 	private HashMap<KonUpgrade,List<Integer>> upgradeCosts;

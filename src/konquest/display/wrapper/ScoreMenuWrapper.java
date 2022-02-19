@@ -45,9 +45,8 @@ public class ScoreMenuWrapper extends MenuWrapper {
 		String pageLabel = "";
 		int i = 0;
 		InfoIcon info;
-		boolean isArmistice = getKonquest().getGuildManager().isArmistice(observer, scorePlayer);
-		
-		ChatColor kingdomColor = Konquest.getDisplayPrimaryColor(observer, scorePlayer, isArmistice);
+
+		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer, scorePlayer);
 		ChatColor titleColor = DisplayManager.titleColor;
 		ChatColor loreColor = DisplayManager.loreColor;
 		ChatColor valueColor = DisplayManager.valueColor;

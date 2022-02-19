@@ -34,6 +34,7 @@ import org.bukkit.potion.PotionEffectType;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.event.KonquestKingdomChangeEvent;
+import konquest.api.manager.KonquestKingdomManager;
 import konquest.command.TravelCommand.TravelDestination;
 import konquest.display.OptionIcon.optionAction;
 import konquest.model.KonCamp;
@@ -60,7 +61,7 @@ import konquest.utility.LoadingPrinter;
 import konquest.utility.MessagePath;
 import konquest.utility.Timer;
 
-public class KingdomManager {
+public class KingdomManager implements KonquestKingdomManager {
 
 	private Konquest konquest;
 	private HashMap<String, KonKingdom> kingdomMap;
@@ -1556,11 +1557,7 @@ public class KingdomManager {
 				KonTerritory territory = getChunkTerritory(point,renderWorld);
 				KonKingdom chunkKingdom = territory.getKingdom();
 				Location renderLoc;
-				boolean isArmistice = false;
-				if(territory instanceof KonTown) {
-					isArmistice = konquest.getGuildManager().isArmistice(player, (KonTown)territory);
-				}
-				Color renderColor = ChatUtil.lookupColor(konquest.getDisplayKingdomColor(player.getKingdom(), chunkKingdom, isArmistice));
+				Color renderColor = ChatUtil.lookupColor(konquest.getDisplayPrimaryColor(player, territory));
 
 				// Iterate all 4 sides of the chunk
 				// x+0,z+1 side: traverse x 0 -> 15 when z is 15

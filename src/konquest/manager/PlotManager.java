@@ -7,11 +7,12 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.manager.KonquestPlotManager;
 import konquest.model.KonPlot;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 
-public class PlotManager {
+public class PlotManager implements KonquestPlotManager {
 
 	private Konquest konquest;
 	private boolean isPlotsEnabled;

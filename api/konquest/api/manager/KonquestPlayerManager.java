@@ -4,6 +4,12 @@ import org.bukkit.entity.Player;
 
 import konquest.api.model.KonquestPlayer;
 
+/**
+ * A manager for players in Konquest.
+ * 
+ * @author Rumsfield
+ *
+ */
 public interface KonquestPlayerManager {
 
 	/**
