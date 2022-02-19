@@ -37,7 +37,7 @@ public class TownCommand extends CommandBase {
         	String subCmd = getArgs()[2];
         	
         	Player bukkitPlayer = (Player) getSender();
-        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
@@ -145,7 +145,7 @@ public class TownCommand extends CommandBase {
 					playerName = getArgs()[3];
 				}
 			    if(!playerName.equalsIgnoreCase("")) {
-			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 			    	if(offlinePlayer == null) {
 						//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -229,7 +229,7 @@ public class TownCommand extends CommandBase {
 					playerName = getArgs()[3];
 				}
 				if(!playerName.equalsIgnoreCase("")) {
-					KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+					KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 					if(offlinePlayer == null) {
 						//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -331,7 +331,7 @@ public class TownCommand extends CommandBase {
 				if(!playerName.equalsIgnoreCase("")) {
 					if(isSenderOwner) {
 						// The current Town owner is giving away Lordship
-						KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+						KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 	        			if(offlinePlayer == null) {
 							//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -379,7 +379,7 @@ public class TownCommand extends CommandBase {
 		        		}
 					} else {
 						// A non-owner is giving themselves Lord
-						KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+						KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 	        			if(offlinePlayer == null) {
 							//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -420,7 +420,7 @@ public class TownCommand extends CommandBase {
 					playerName = getArgs()[3];
 				}
 			    if(!playerName.equalsIgnoreCase("")) {
-			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 			    	if(offlinePlayer == null) {
 						//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));

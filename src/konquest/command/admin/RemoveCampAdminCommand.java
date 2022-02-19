@@ -38,7 +38,7 @@ public class RemoveCampAdminCommand extends CommandBase {
         	String playerName = getArgs()[2];
         	
         	if(getKonquest().getPlayerManager().isPlayerNameExist(playerName)) {
-        		KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+        		KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
         		if(offlinePlayer != null && offlinePlayer.isBarbarian()) {
         			boolean status = getKonquest().getCampManager().removeCamp(offlinePlayer);
         			if(status) {
@@ -65,7 +65,7 @@ public class RemoveCampAdminCommand extends CommandBase {
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		// Suggest player names
-		for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllKonOfflinePlayers()) {
+		for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllKonquestOfflinePlayers()) {
 			if(offlinePlayer.isBarbarian()) {
 				tabList.add(offlinePlayer.getOfflineBukkitPlayer().getName());
 			}

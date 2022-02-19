@@ -153,7 +153,7 @@ public class KonquestListener implements Listener {
 						isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
 					}
 					// Alert the camp owner if player is not a group member and online
-					if(playerManager.isPlayer(bukkitPlayer) && !isMember && !player.getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
+					if(playerManager.isOnlinePlayer(bukkitPlayer) && !isMember && !player.getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
 						KonPlayer ownerPlayer = playerManager.getPlayer(bukkitPlayer);
 						//ChatUtil.sendNotice((Player)camp.getOwner(), "Enemy spotted in "+event.getTerritory().getName()+", use \"/k travel camp\" to defend!", ChatColor.DARK_RED);
 						ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_RAID.getMessage(territory.getName(),"camp"),ChatColor.DARK_RED);

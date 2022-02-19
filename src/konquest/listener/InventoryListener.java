@@ -68,7 +68,7 @@ public class InventoryListener implements Listener {
 		
 		if(openLoc != null && konquest.getKingdomManager().isChunkClaimed(openLoc)) {
 			
-			if(!konquest.getPlayerManager().isPlayer((Player)event.getPlayer())) {
+			if(!konquest.getPlayerManager().isOnlinePlayer((Player)event.getPlayer())) {
 				ChatUtil.printDebug("Failed to handle onInventoryOpen for non-existent player");
 				return;
 			}
@@ -283,7 +283,7 @@ public class InventoryListener implements Listener {
 		}
 		HumanEntity human = event.getWhoClicked();
 		if(!event.isCancelled() && human instanceof Player) {
-			if(!konquest.getPlayerManager().isPlayer((Player)human)) {
+			if(!konquest.getPlayerManager().isOnlinePlayer((Player)human)) {
 				ChatUtil.printDebug("Failed to handle onCraftItem for non-existent player");
 				return;
 			}
@@ -341,7 +341,7 @@ public class InventoryListener implements Listener {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
 		}
-		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onFurnaceExtract for non-existent player");
 			return;
 		}
@@ -363,7 +363,7 @@ public class InventoryListener implements Listener {
 			if(konquest.isWorldIgnored(event.getInventory().getLocation())) {
 				return;
 			}
-			if(!konquest.getPlayerManager().isPlayer(event.getEnchanter())) {
+			if(!konquest.getPlayerManager().isOnlinePlayer(event.getEnchanter())) {
 				ChatUtil.printDebug("Failed to handle onEnchantItem for non-existent player");
 				return;
 			}

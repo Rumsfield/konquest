@@ -217,7 +217,7 @@ public class PlayerListener implements Listener{
         	if(enable) {
 	        	// Format chat messages
         		Player bukkitPlayer = event.getPlayer();
-	        	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+	        	if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 					ChatUtil.printDebug("Failed to handle onAsyncPlayerChat for non-existent player");
 					return;
 				}
@@ -312,7 +312,7 @@ public class PlayerListener implements Listener{
 //			return;
 //		}
     	Player bukkitPlayer = event.getPlayer();
-    	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+    	if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to handle onPlayerInteract for non-existent player");
 			return;
 		}
@@ -694,7 +694,7 @@ public class PlayerListener implements Listener{
 				return;
 			}
 			// Prevent enemy players from placing or picking up liquids inside of towns
-			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+			if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 				ChatUtil.printDebug("Failed to handle onBucketUse for non-existent player");
 				return;
 			}
@@ -726,7 +726,7 @@ public class PlayerListener implements Listener{
     	//ChatUtil.printDebug("EVENT: Player respawned");
     	Location currentLoc = event.getPlayer().getLocation();
     	Location respawnLoc = event.getRespawnLocation();
-    	if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+    	if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onPlayerRespawn for non-existent player");
 			return;
 		}
@@ -866,7 +866,7 @@ public class PlayerListener implements Listener{
     	boolean isEnemyPearlBlocked = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_ender_pearl", false);
     	boolean isTerritoryTo = kingdomManager.isChunkClaimed(event.getTo());
     	Player bukkitPlayer = event.getPlayer();
-		if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+		if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			//ChatUtil.printDebug("Failed to handle onPlayerEnterLeaveChunk for non-existent player");
 			return;
 		}
@@ -890,7 +890,7 @@ public class PlayerListener implements Listener{
     	if(!event.getTo().getChunk().equals(event.getFrom().getChunk()) || !event.getTo().getWorld().equals(event.getFrom().getWorld())) {
     		
     		Player bukkitPlayer = event.getPlayer();
-    		if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+    		if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 				//ChatUtil.printDebug("Failed to handle onPlayerEnterLeaveChunk for non-existent player");
 				return;
 			}

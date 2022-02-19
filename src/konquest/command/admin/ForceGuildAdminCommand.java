@@ -38,7 +38,7 @@ public class ForceGuildAdminCommand extends CommandBase {
         	
         	// Check for player
         	Player bukkitPlayer = (Player) getSender();
-        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
@@ -69,7 +69,7 @@ public class ForceGuildAdminCommand extends CommandBase {
 	            		// Invite a new guild member
 	            		if(getArgs().length == 5) {
 	            			String playerName = getArgs()[4];
-	            			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+	            			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 	    			    	if(offlinePlayer == null) {
 	    						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
 	    		        		return;
@@ -102,7 +102,7 @@ public class ForceGuildAdminCommand extends CommandBase {
 	            		// Remove a guild member
 	            		if(getArgs().length == 5) {
 	            			String playerName = getArgs()[4];
-	            			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+	            			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 	    			    	if(offlinePlayer == null) {
 	    						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
 	    		        		return;

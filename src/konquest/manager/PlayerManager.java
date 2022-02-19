@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Chunk;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.api.manager.KonquestPlayerManager;
+import konquest.api.model.KonquestKingdom;
 import konquest.model.KonKingdom;
 import konquest.model.KonMonument;
 import konquest.model.KonOfflinePlayer;
@@ -62,7 +64,7 @@ public class PlayerManager implements KonquestPlayerManager {
 		return onlinePlayers.get(bukkitPlayer);
 	}
 	
-	public boolean isPlayer(Player bukkitPlayer) {
+	public boolean isOnlinePlayer(Player bukkitPlayer) {
 		return onlinePlayers.containsKey(bukkitPlayer);
 	}
 	
@@ -71,7 +73,7 @@ public class PlayerManager implements KonquestPlayerManager {
 		return allPlayers.get(offlineBukkitPlayer);
 	}
 	
-	public boolean isPlayerExist(OfflinePlayer offlineBukkitPlayer) {
+	public boolean isOfflinePlayer(OfflinePlayer offlineBukkitPlayer) {
 		return allPlayers.containsKey(offlineBukkitPlayer);
 	}
 	
@@ -222,7 +224,7 @@ public class PlayerManager implements KonquestPlayerManager {
         return null;
     }
     
-    public KonOfflinePlayer getAllPlayerFromName(String displayName) {
+    public KonOfflinePlayer getOfflinePlayerFromName(String displayName) {
     	//ChatUtil.printDebug("Finding all player by name: "+displayName);
     	for(KonOfflinePlayer offlinePlayer : allPlayers.values()) {
     		if(offlinePlayer != null && 
@@ -235,11 +237,15 @@ public class PlayerManager implements KonquestPlayerManager {
     }
     
     public Collection<OfflinePlayer> getAllOfflinePlayers() {
-    	return allPlayers.keySet();
+    	Collection<OfflinePlayer> result = new HashSet<OfflinePlayer>();
+    	result.addAll(allPlayers.keySet());
+    	return result;
     }
     
-    public Collection<KonOfflinePlayer> getAllKonOfflinePlayers() {
-    	return allPlayers.values();
+    public Collection<KonOfflinePlayer> getAllKonquestOfflinePlayers() {
+    	Collection<KonOfflinePlayer> result = new HashSet<KonOfflinePlayer>();
+    	result.addAll(allPlayers.values());
+    	return result;
     }
     
     public ArrayList<KonPlayer> getPlayersInKingdom(String kingdomName) {
@@ -252,7 +258,7 @@ public class PlayerManager implements KonquestPlayerManager {
     	return playerList;
     }
     
-    public ArrayList<KonPlayer> getPlayersInKingdom(KonKingdom kingdom) {
+    public ArrayList<KonPlayer> getPlayersInKingdom(KonquestKingdom kingdom) {
     	ArrayList<KonPlayer> playerList = new ArrayList<KonPlayer>();
     	for(KonPlayer player : onlinePlayers.values()) {
     		if(player.getKingdom().equals(kingdom)) {
@@ -283,7 +289,7 @@ public class PlayerManager implements KonquestPlayerManager {
     	return playerList;
     }
     
-    public ArrayList<KonOfflinePlayer> getAllPlayersInKingdom(KonKingdom kingdom) {
+    public ArrayList<KonOfflinePlayer> getAllPlayersInKingdom(KonquestKingdom kingdom) {
     	//ChatUtil.printDebug("Gathering all players in Kingdom "+kingdomName);
     	ArrayList<KonOfflinePlayer> playerList = new ArrayList<KonOfflinePlayer>();
     	for(KonOfflinePlayer player : allPlayers.values()) {
@@ -311,7 +317,9 @@ public class PlayerManager implements KonquestPlayerManager {
     }
     
     public Collection<KonPlayer> getPlayersOnline() {
-    	return onlinePlayers.values();
+    	Collection<KonPlayer> result = new HashSet<KonPlayer>();
+    	result.addAll(onlinePlayers.values());
+    	return result;
     }
     
     public void initAllSavedPlayers() {
@@ -322,5 +330,7 @@ public class PlayerManager implements KonquestPlayerManager {
     		allPlayers.put(offlinePlayer.getOfflineBukkitPlayer(), offlinePlayer);
     	}
     }
+    
+    
 
 }

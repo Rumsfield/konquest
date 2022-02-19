@@ -44,7 +44,7 @@ public class InfoCommand extends CommandBase {
         	Player bukkitPlayer = (Player) getSender();
         	infoType displayState = infoType.KINGDOM;
         	// Init info as own player's
-        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
@@ -83,7 +83,7 @@ public class InfoCommand extends CommandBase {
         		} else {
         			// Check for Player
         			//ChatUtil.printDebug("Parsing player");
-        			KonOfflinePlayer otherPlayer = getKonquest().getPlayerManager().getAllPlayerFromName(name);
+        			KonOfflinePlayer otherPlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(name);
         			//ChatUtil.printDebug("Fetched KonOfflinePlayer");
         			if(otherPlayer != null) {
         				//ChatUtil.printDebug("Player is not null");

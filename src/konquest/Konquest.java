@@ -436,7 +436,7 @@ public class Konquest implements KonquestAPI, Timeable {
     	// Fetch player from the database
     	// Also instantiates player object in PlayerManager
 		databaseThread.getDatabase().fetchPlayerData(bukkitPlayer);
-		if(!playerManager.isPlayer(bukkitPlayer)) {
+		if(!playerManager.isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to init a non-existent player!");
 			return null;
 		}
@@ -734,7 +734,7 @@ public class Konquest implements KonquestAPI, Timeable {
 			if(offlineTimeoutSeconds != 0) {
 				// Search all stored players and prune
 				Date now = new Date();
-				for(KonOfflinePlayer player : playerManager.getAllKonOfflinePlayers()) {
+				for(KonOfflinePlayer player : playerManager.getAllKonquestOfflinePlayers()) {
 					long lastPlayedTime = player.getOfflineBukkitPlayer().getLastPlayed();
 					if(lastPlayedTime > 0 && now.after(new Date(lastPlayedTime + (offlineTimeoutSeconds*1000)))) {
 						// Offline player has exceeded timeout period, prune from residencies and camp

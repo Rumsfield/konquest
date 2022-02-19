@@ -34,7 +34,7 @@ public class StatAdminCommand extends CommandBase {
         	String statName = getArgs()[3];
         	String subCmd = getArgs()[4];
         	// Verify player exists
-        	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+        	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
         	if(offlinePlayer == null) {
         		//ChatUtil.sendError((Player) getSender(), "Invalid player name, unknown or bad spelling.");
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -143,7 +143,7 @@ public class StatAdminCommand extends CommandBase {
 		final List<String> matchedTabList = new ArrayList<>();
 		if(getArgs().length == 3) {
 			// Suggest player names
-			for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllKonOfflinePlayers()) {
+			for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllKonquestOfflinePlayers()) {
 				tabList.add(offlinePlayer.getOfflineBukkitPlayer().getName());
 			}
 			// Trim down completion options based on current input

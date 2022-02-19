@@ -121,7 +121,7 @@ public class ForceTownAdminCommand extends CommandBase {
 					playerName = getArgs()[4];
 				}
 			    if(!playerName.equalsIgnoreCase("")) {
-			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 			    	if(offlinePlayer == null) {
 						//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -151,7 +151,7 @@ public class ForceTownAdminCommand extends CommandBase {
 					playerName = getArgs()[4];
 				}
 				if(!playerName.equalsIgnoreCase("")) {
-					KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+					KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 					if(offlinePlayer == null) {
 						//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -177,7 +177,7 @@ public class ForceTownAdminCommand extends CommandBase {
 				}
 				if(!playerName.equalsIgnoreCase("")) {
         			// Give lordship
-        			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+        			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
         			if(offlinePlayer == null) {
 						//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -202,7 +202,7 @@ public class ForceTownAdminCommand extends CommandBase {
 					playerName = getArgs()[4];
 				}
 			    if(!playerName.equalsIgnoreCase("")) {
-			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 			    	if(offlinePlayer == null) {
 						//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));

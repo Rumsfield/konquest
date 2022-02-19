@@ -31,7 +31,7 @@ public class ScoreCommand extends CommandBase {
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
-        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
@@ -75,7 +75,7 @@ public class ScoreCommand extends CommandBase {
         	} else {
         		String playerName = getArgs()[1];
         		// Verify player exists
-            	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+            	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
             	if(offlinePlayer == null) {
             		//ChatUtil.sendError((Player) getSender(), "Invalid player name, unknown or bad spelling.");
             		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));

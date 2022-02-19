@@ -93,7 +93,7 @@ public class EntityListener implements Listener {
 			}
 			if(event.getBreeder() instanceof Player) {
 				Player bukkitPlayer = (Player)event.getBreeder();
-				if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+				if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 					ChatUtil.printDebug("Failed to handle onEntityBreed for non-existent player");
 					return;
 				}
@@ -260,7 +260,7 @@ public class EntityListener implements Listener {
 			        }
 					if(closestPlayer != null) {
 						ChatUtil.printDebug("Iron Golem spawned by "+closestPlayer.getName());
-						if(!konquest.getPlayerManager().isPlayer(closestPlayer)) {
+						if(!konquest.getPlayerManager().isOnlinePlayer(closestPlayer)) {
 							ChatUtil.printDebug("Failed to handle onCreatureSpawn for non-existent player");
 							return;
 						}
@@ -281,7 +281,7 @@ public class EntityListener implements Listener {
 		}
 		// prevent milk buckets from removing town nerfs in enemy towns
 		if(!event.isCancelled() && event.getEntity() instanceof Player) {
-			if(!konquest.getPlayerManager().isPlayer((Player)event.getEntity())) {
+			if(!konquest.getPlayerManager().isOnlinePlayer((Player)event.getEntity())) {
 				ChatUtil.printDebug("Failed to handle onEntityPotionEffect for non-existent player");
 				return;
 			}
@@ -326,7 +326,7 @@ public class EntityListener implements Listener {
 			// Protect friendly players in claimed land
 			if(target instanceof Player && kingdomManager.isChunkClaimed(eLoc)) {
 				Player bukkitPlayer = (Player)target;
-				if(!konquest.getPlayerManager().isPlayer((Player)bukkitPlayer)) {
+				if(!konquest.getPlayerManager().isOnlinePlayer((Player)bukkitPlayer)) {
 					ChatUtil.printDebug("Failed to handle onEntityTarget for non-existent player");
 				} else {
 					KonPlayer player = playerManager.getPlayer(bukkitPlayer);
@@ -408,7 +408,7 @@ public class EntityListener implements Listener {
         } else { // if neither player nor arrow
             return;
         }
-		if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+		if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to handle onEntityDamageByPlayer for non-existent player");
 			return;
 		}
@@ -536,7 +536,7 @@ public class EntityListener implements Listener {
 		    				LivingEntity currentTarget = golem.getTarget();
 		    				//ChatUtil.printDebug("Golem: Evaluating new targets in territory "+territory.getName());
 		    				if(currentTarget != null && currentTarget instanceof Player) {
-		    					if(!konquest.getPlayerManager().isPlayer((Player)currentTarget)) {
+		    					if(!konquest.getPlayerManager().isOnlinePlayer((Player)currentTarget)) {
 		    						ChatUtil.printDebug("Failed to handle onEntityDamageByPlayer golem targeting for non-existent player");
 		    					} else {
 			    					KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
@@ -603,7 +603,7 @@ public class EntityListener implements Listener {
                 return;
             }
             
-            if(!konquest.getPlayerManager().isPlayer(victimBukkitPlayer) || !konquest.getPlayerManager().isPlayer(attackerBukkitPlayer)) {
+            if(!konquest.getPlayerManager().isOnlinePlayer(victimBukkitPlayer) || !konquest.getPlayerManager().isOnlinePlayer(attackerBukkitPlayer)) {
 				ChatUtil.printDebug("Failed to handle onPlayerDamageByPlayer for non-existent player(s)");
 				return;
 			}

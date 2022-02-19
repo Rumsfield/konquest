@@ -407,7 +407,7 @@ public class CampManager implements KonquestCampManager {
         	if(campsSection.contains(uuid)) {
         		OfflinePlayer offlineBukkitPlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
         		//ChatUtil.printDebug("Adding camp for player "+offlineBukkitPlayer.getName());
-        		if(konquest.getPlayerManager().isPlayerExist(offlineBukkitPlayer)) {
+        		if(konquest.getPlayerManager().isOfflinePlayer(offlineBukkitPlayer)) {
         			KonOfflinePlayer offlinePlayer = konquest.getPlayerManager().getOfflinePlayer(offlineBukkitPlayer);
         			// Add stored camp
             		ConfigurationSection playerCampSection = campsSection.getConfigurationSection(uuid);

@@ -80,7 +80,7 @@ public class BlockListener implements Listener {
 			return;
 		}
 		
-		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onBlockBreak for non-existent player");
 			return;
 		}
@@ -421,7 +421,7 @@ public class BlockListener implements Listener {
 				ChatUtil.printDebug("Diamond ore block break dropping items: "+isDrop);
 				ItemStack handItem = event.getPlayer().getInventory().getItemInMainHand();
 				if(isDrop && handItem != null && !handItem.containsEnchantment(Enchantment.SILK_TOUCH)) {
-					if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+					if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 						ChatUtil.printDebug("Failed to handle onBlockBreakLow for non-existent player");
 						return;
 					}
@@ -448,7 +448,7 @@ public class BlockListener implements Listener {
 					Ageable crop = (Ageable)event.getBlock().getBlockData();
 					//ChatUtil.printDebug("Broke crop block with age: "+crop.getAge());
 					if(crop.getAge() == crop.getMaximumAge()) {
-						if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+						if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 							ChatUtil.printDebug("Failed to handle onCropHarvest for non-existent player");
 							return;
 						}
@@ -479,7 +479,7 @@ public class BlockListener implements Listener {
 		
 		// Track last block placed per player
 		konquest.lastPlaced.put(event.getPlayer(),event.getBlock().getLocation());
-		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onBlockPlace for non-existent player");
 			return;
 		}
@@ -746,7 +746,7 @@ public class BlockListener implements Listener {
 			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 				return;
 			}
-			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+			if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 				ChatUtil.printDebug("Failed to handle onSeedPlant for non-existent player");
 				return;
 			}
@@ -774,7 +774,7 @@ public class BlockListener implements Listener {
 			}
 			Material placedMat = event.getBlockPlaced().getType();
 			if(placedMat.equals(Material.FARMLAND)) {
-				if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+				if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 					ChatUtil.printDebug("Failed to handle onFarmTill for non-existent player");
 					return;
 				}
