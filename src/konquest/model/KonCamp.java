@@ -11,12 +11,13 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestCamp;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
-public class KonCamp extends KonTerritory implements Timeable {
+public class KonCamp extends KonTerritory implements KonquestCamp, Timeable {
 	
 	private OfflinePlayer owner;
 	private Timer raidAlertTimer;

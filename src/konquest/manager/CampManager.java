@@ -21,6 +21,8 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.api.manager.KonquestCampManager;
+import konquest.api.model.KonquestCamp;
+import konquest.api.model.KonquestOfflinePlayer;
 import konquest.model.KonCamp;
 import konquest.model.KonCampGroup;
 import konquest.model.KonOfflinePlayer;
@@ -50,12 +52,12 @@ public class CampManager implements KonquestCampManager {
 		ChatUtil.printDebug("Loaded camps and groups");
 	}
 	
-	public boolean isCampSet(KonOfflinePlayer player) {
+	public boolean isCampSet(KonquestOfflinePlayer player) {
 		String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
 		return player.isBarbarian() && barbarianCamps.containsKey(uuid);
 	}
 	
-	public KonCamp getCamp(KonOfflinePlayer player) {
+	public KonCamp getCamp(KonquestOfflinePlayer player) {
 		String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
 		return barbarianCamps.get(uuid);
 	}
@@ -130,7 +132,7 @@ public class CampManager implements KonquestCampManager {
 		return 0;
 	}
 	
-	public boolean removeCamp(KonOfflinePlayer player) {
+	public boolean removeCamp(KonquestOfflinePlayer player) {
 		String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
 		return removeCamp(uuid);
 	}
@@ -171,11 +173,11 @@ public class CampManager implements KonquestCampManager {
 		return true;
 	}
 	
-	public boolean isCampGrouped(KonCamp camp) {
+	public boolean isCampGrouped(KonquestCamp camp) {
 		return groupMap.containsKey(camp);
 	}
 	
-	public KonCampGroup getCampGroup(KonCamp camp) {
+	public KonCampGroup getCampGroup(KonquestCamp camp) {
 		return groupMap.get(camp);
 	}
 	
