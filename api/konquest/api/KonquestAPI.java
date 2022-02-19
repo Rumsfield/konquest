@@ -197,8 +197,8 @@ public interface KonquestAPI {
 	 * Get the primary display color based on relationships. This color is set in the Konquest configuration.
 	 * There is a color for each relationship: friendly, enemy, armistice
 	 * 
-	 * @param displayGuild The observing player who should see the color
-	 * @param contextGuild The target town who's relationship to the observer determines the color
+	 * @param displayPlayer The observing player who should see the color
+	 * @param contextTerritory The target town who's relationship to the observer determines the color
 	 * @return The primary display color
 	 */
 	public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);

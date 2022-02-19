@@ -14,13 +14,37 @@ import konquest.utility.MessagePath;
  */
 public enum KonquestUpgrade {
 
+	/**
+	 * Monument Loot upgrade
+	 */
 	LOOT 		(3, Material.GOLD_INGOT, 				MessagePath.UPGRADE_LOOT_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_LOOT_LEVEL_1.getMessage(), MessagePath.UPGRADE_LOOT_LEVEL_2.getMessage(), MessagePath.UPGRADE_LOOT_LEVEL_3.getMessage()}),
+	/**
+	 * Animal Drops upgrade
+	 */
 	DROPS		(1, Material.LEATHER, 					MessagePath.UPGRADE_DROPS_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_DROPS_LEVEL_1.getMessage()}),
+	/**
+	 * Enemy Fatigue upgrade
+	 */
 	FATIGUE		(1, Material.DIAMOND_PICKAXE, 			MessagePath.UPGRADE_FATIGUE_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_FATIGUE_LEVEL_1.getMessage()}),
+	/**
+	 * Counter-Intelligence upgrade
+	 */
 	COUNTER		(2, Material.COMPASS, 					MessagePath.UPGRADE_COUNTER_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_COUNTER_LEVEL_1.getMessage(), MessagePath.UPGRADE_COUNTER_LEVEL_2.getMessage()}),
+	/**
+	 * Health Buff upgrade
+	 */
 	HEALTH		(3, Material.ENCHANTED_GOLDEN_APPLE, 	MessagePath.UPGRADE_HEALTH_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_HEALTH_LEVEL_1.getMessage(), MessagePath.UPGRADE_HEALTH_LEVEL_2.getMessage(), MessagePath.UPGRADE_HEALTH_LEVEL_3.getMessage()}),
+	/**
+	 * Prevent Damage upgrade
+	 */
 	DAMAGE		(2, Material.TNT, 						MessagePath.UPGRADE_DAMAGE_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_DAMAGE_LEVEL_1.getMessage(), MessagePath.UPGRADE_DAMAGE_LEVEL_2.getMessage()}),
+	/**
+	 * Town Watch upgrade
+	 */
 	WATCH 		(3, Material.PLAYER_HEAD, 				MessagePath.UPGRADE_WATCH_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_WATCH_LEVEL_1.getMessage(), MessagePath.UPGRADE_WATCH_LEVEL_2.getMessage(), MessagePath.UPGRADE_WATCH_LEVEL_3.getMessage()}),
+	/**
+	 * Better Enchantments upgrade
+	 */
 	ENCHANT		(1, Material.ENCHANTED_BOOK, 			MessagePath.UPGRADE_ENCHANT_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_ENCHANT_LEVEL_1.getMessage()});
 
 	private final int levels;

@@ -39,6 +39,11 @@ public abstract class KonquestEvent extends Event {
 		return handlers;
 	}
 	
+	/**
+	 * Get the handler list
+	 * 
+	 * @return handlers
+	 */
 	public static HandlerList getHandlerList() {
         return handlers;
     }
