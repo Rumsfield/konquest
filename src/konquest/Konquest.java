@@ -677,52 +677,63 @@ public class Konquest implements KonquestAPI, Timeable {
 	 * 			6 - Error, name is a ruin
 	 * 			7 - Error, name is a guild
 	 */
-	public int validateName(String name, Player player) {
+	public int validateNameConstraints(String name) {
 		if(name == null || name.equals("") || !StringUtils.isAlphanumeric(name)) {
-    		if(player != null) {
-    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
-    		}
 			return 1;
     	}
     	if(name.length() > 20) {
-    		if(player != null) {
-    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_LENGTH_NAME.getMessage());
-    		}
     		return 2;
     	}
     	if(playerManager.isPlayerNameExist(name)) {
-    		if(player != null) {
-    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
-    		}
     		return 3;
     	}
 		if(kingdomManager.isKingdom(name)) {
-			if(player != null) {
-    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
-    		}
 			return 4;
 		}
 		for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
 			if(kingdom.hasTown(name)) {
-				if(player != null) {
-	    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
-	    		}
 				return 5;
 			}
 		}
 		if(ruinManager.isRuin(name)) {
-			if(player != null) {
-    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
-    		}
 			return 6;
 		}
 		if(guildManager.isGuild(name)) {
-			if(player != null) {
-    			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
-    		}
 			return 7;
 		}
 		return 0;
+	}
+	
+	public int validateName(String name, Player player) {
+		int result = validateNameConstraints(name);
+		if(player != null) {
+			switch(result) {
+				case 1:
+					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
+					break;
+				case 2:
+					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_LENGTH_NAME.getMessage());
+					break;
+				case 3:
+					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+					break;
+				case 4:
+					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+					break;
+				case 5:
+					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+					break;
+				case 6:
+					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+					break;
+				case 7:
+					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+					break;
+				default:
+					break;
+			}
+		}
+		return result;
 	}
 	
 	@Override

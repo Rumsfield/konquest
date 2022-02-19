@@ -47,6 +47,22 @@ public interface KonquestAPI {
 	public Scoreboard getScoreboard();
 	
 	/**
+	 * Checks for name conflicts and constraints against all Konquest names.
+	 * 
+	 * @param name The name of an object (town, ruin, etc)
+	 * @return Status code
+	 * 			0 - Success, no issue found
+	 * 			1 - Error, name is not strictly alpha-numeric
+	 * 			2 - Error, name has more than 20 characters
+	 * 			3 - Error, name is an existing player
+	 * 			4 - Error, name is a kingdom
+	 * 			5 - Error, name is a town
+	 * 			6 - Error, name is a ruin
+	 * 			7 - Error, name is a guild
+	 */
+	public int validateNameConstraints(String name);
+	
+	/**
 	 * Get the player manager, for all things player related.
 	 * 
 	 * @return The player manager

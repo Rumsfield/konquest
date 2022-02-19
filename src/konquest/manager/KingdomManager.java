@@ -35,6 +35,8 @@ import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.event.KonquestKingdomChangeEvent;
 import konquest.api.manager.KonquestKingdomManager;
+import konquest.api.model.KonquestOfflinePlayer;
+import konquest.api.model.KonquestPlayer;
 import konquest.command.TravelCommand.TravelDestination;
 import konquest.display.OptionIcon.optionAction;
 import konquest.model.KonCamp;
@@ -94,7 +96,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	}
 	
 	public boolean addKingdom(Location loc, String name) {
-		if(!name.contains(" ") && !isKingdom(name)) {
+		if(!name.contains(" ") && konquest.validateNameConstraints(name) == 0) {
 			kingdomMap.put(name, new KonKingdom(loc, name, konquest));
 			kingdomMap.get(name).initCapital();
 			kingdomMap.get(name).getCapital().updateBarPlayers();
@@ -134,7 +136,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	}
 	
 	public boolean renameKingdom(String oldName, String newName) {
-		if(kingdomMap.containsKey(oldName)) {
+		if(kingdomMap.containsKey(oldName) && konquest.validateNameConstraints(newName) == 0) {
 			KonKingdom oldKingdom = getKingdom(oldName);
 			for (KonTown town : oldKingdom.getTowns()) {
 				konquest.getMapHandler().drawDynmapRemoveTerritory(town);
@@ -165,10 +167,17 @@ public class KingdomManager implements KonquestKingdomManager {
 	 *  			2 = the kingdom is full (config option max_player_diff)
 	 *  			3 = missing permission
 	 *  			4 = cancelled
+	 *             -1 = internal error
 	 */
-	public int assignPlayerKingdom(KonPlayer player, String kingdomName, boolean force) {
+	public int assignPlayerKingdom(KonquestPlayer playerArg, String kingdomName, boolean force) {
 		//TODO: Some sort of penalty for changing kingdoms, check if barbarian first
 		if(isKingdom(kingdomName)) {
+			// Qualify interface
+			if(!(playerArg instanceof KonPlayer)) {
+				return -1;
+			}
+			KonPlayer player = (KonPlayer)playerArg;
+			
 			// Check for permission
 			boolean isPerKingdomJoin = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.per_kingdom_join_permissions",false);
 			if (isPerKingdomJoin && !force) {
@@ -241,8 +250,13 @@ public class KingdomManager implements KonquestKingdomManager {
 	 * @param player
 	 * @return true if not already barbarian and the teleport was successful, else false.
 	 */
-	public boolean exilePlayer(KonPlayer player, boolean teleport, boolean clearStats) {
-    	if(player.isBarbarian()) {
+	public boolean exilePlayer(KonquestPlayer playerArg, boolean teleport, boolean clearStats) {
+		if(!(playerArg instanceof KonPlayer)) {
+			return false;
+		}
+		KonPlayer player = (KonPlayer)playerArg;
+		
+		if(player.isBarbarian()) {
     		return false;
     	}
     	KonKingdom oldKingdom = player.getKingdom();
@@ -314,7 +328,11 @@ public class KingdomManager implements KonquestKingdomManager {
     	return true;
 	}
 	
-	public void exileOfflinePlayer(KonOfflinePlayer offlinePlayer) {
+	public void exileOfflinePlayer(KonquestOfflinePlayer offlinePlayerArg) {
+		if(!(offlinePlayerArg instanceof KonOfflinePlayer)) {
+			return;
+		}
+		KonOfflinePlayer offlinePlayer = (KonOfflinePlayer)offlinePlayerArg;
 		if(offlinePlayer.isBarbarian()) {
     		return;
     	}
@@ -527,10 +545,15 @@ public class KingdomManager implements KonquestKingdomManager {
 	 * @param conquerPlayer - Player who initiated the conquering
 	 * @return true if all names exist, else false
 	 */
-	public boolean captureTownForPlayer(String name, String oldKingdomName, KonPlayer conquerPlayer) {
-		if(conquerPlayer == null) {
+	public boolean captureTownForPlayer(String name, String oldKingdomName, KonquestPlayer conquerPlayerArg) {
+		if(conquerPlayerArg == null) {
 			return false;
 		}
+		if(!(conquerPlayerArg instanceof KonPlayer)) {
+			return false;
+		}
+		KonPlayer conquerPlayer = (KonPlayer)conquerPlayerArg;
+		
 		if(conquerPlayer.isBarbarian()) {
 			return false;
 		}
@@ -1335,21 +1358,40 @@ public class KingdomManager implements KonquestKingdomManager {
 		return count;
 	}
 	
-	public List<KonTown> getPlayerLordshipTowns(KonOfflinePlayer player) {
+	public List<KonTown> getPlayerLordshipTowns(KonquestOfflinePlayer player) {
 		List<KonTown> townNames = new ArrayList<KonTown>();
-		for(KonTown town : player.getKingdom().getTowns()) {
-			if(town.isPlayerLord(player.getOfflineBukkitPlayer())) {
-				townNames.add(town);
+		if(player.getKingdom() instanceof KonKingdom) {
+			KonKingdom kingdom = (KonKingdom)player.getKingdom();
+			for(KonTown town : kingdom.getTowns()) {
+				if(town.isPlayerLord(player.getOfflineBukkitPlayer())) {
+					townNames.add(town);
+				}
 			}
 		}
 		return townNames;
 	}
 	
-	public List<KonTown> getPlayerResidenceTowns(KonOfflinePlayer player) {
+	public List<KonTown> getPlayerKnightTowns(KonquestOfflinePlayer player) {
 		List<KonTown> townNames = new ArrayList<KonTown>();
-		for(KonTown town : player.getKingdom().getTowns()) {
-			if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
-				townNames.add(town);
+		if(player.getKingdom() instanceof KonKingdom) {
+			KonKingdom kingdom = (KonKingdom)player.getKingdom();
+			for(KonTown town : kingdom.getTowns()) {
+				if(town.isPlayerElite(player.getOfflineBukkitPlayer()) && !town.isPlayerLord(player.getOfflineBukkitPlayer())) {
+					townNames.add(town);
+				}
+			}
+		}
+		return townNames;
+	}
+	
+	public List<KonTown> getPlayerResidenceTowns(KonquestOfflinePlayer player) {
+		List<KonTown> townNames = new ArrayList<KonTown>();
+		if(player.getKingdom() instanceof KonKingdom) {
+			KonKingdom kingdom = (KonKingdom)player.getKingdom();
+			for(KonTown town : kingdom.getTowns()) {
+				if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+					townNames.add(town);
+				}
 			}
 		}
 		return townNames;

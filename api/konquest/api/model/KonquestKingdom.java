@@ -1,5 +1,7 @@
 package konquest.api.model;
 
+import java.util.ArrayList;
+
 /**
  * My kingdom for a horse!
  * A kingdom is a collection of towns and a monument template.
@@ -22,5 +24,12 @@ public interface KonquestKingdom {
 	 * @return The name
 	 */
 	public String getName();
+	
+	/**
+	 * Get a list of all towns in this kingdom.
+	 * 
+	 * @return The list of towns
+	 */
+	public ArrayList<? extends KonquestTown> getTowns();
 	
 }
