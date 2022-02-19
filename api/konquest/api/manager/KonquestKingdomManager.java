@@ -60,12 +60,12 @@ public interface KonquestKingdomManager {
 	 * @param kingdomName The kingdom name, case-sensitive
 	 * @param force Ignore permission and max membership limits when true
 	 * @return status
-	 * 				0 = success
-	 *  			1 = kingdom name does not exist
-	 *  			2 = the kingdom is full (config option max_player_diff)
-	 *  			3 = missing permission
-	 *  			4 = cancelled
-	 *             -1 = internal error
+	 * 				<br>0 - success
+	 *  			<br>1 - kingdom name does not exist
+	 *  			<br>2 - the kingdom is full (config option max_player_diff)
+	 *  			<br>3 - missing permission
+	 *  			<br>4 - cancelled
+	 *             <br>-1 - internal error
 	 */
 	public int assignPlayerKingdom(KonquestPlayer player, String kingdomName, boolean force);
 	
@@ -97,19 +97,20 @@ public interface KonquestKingdomManager {
 	 * @param loc The center location of the town
 	 * @param name The name of the town
 	 * @param kingdomName The name of the kingdom that the town belongs to, case-sensitive
-	 * @return  0 - success
-	 * 			1 - error, initial territory chunks conflict with another territory
-	 * 			3 - error, bad name
-	 * 			4 - error, invalid monument template
-	 * 			5 - error, bad town placement, invalid world
-	 * 			6 - error, bad town placement, too close to another territory
-	 * 			7 - error, bad town placement, too far from other territories
-	 *  	   12 - error, town init fail, bad town height
-	 *  	   13 - error, town init fail, too much air
-	 *  	   14 - error, town init fail, bad chunks
-     * 		   21 - error, town init fail, invalid monument
-	 * 		   22 - error, town init fail, bad monument gradient
-	 * 		   23 - error, town init fail, monument placed on bedrock
+	 * @return  Status code
+	 * 			<br>0 - success
+	 * 			<br>1 - error, initial territory chunks conflict with another territory
+	 * 			<br>3 - error, bad name
+	 * 			<br>4 - error, invalid monument template
+	 * 			<br>5 - error, bad town placement, invalid world
+	 * 			<br>6 - error, bad town placement, too close to another territory
+	 * 			<br>7 - error, bad town placement, too far from other territories
+	 *  	   <br>12 - error, town init fail, bad town height
+	 *  	   <br>13 - error, town init fail, too much air
+	 *  	   <br>14 - error, town init fail, bad chunks
+     * 		   <br>21 - error, town init fail, invalid monument
+	 * 		   <br>22 - error, town init fail, bad monument gradient
+	 * 		   <br>23 - error, town init fail, monument placed on bedrock
 	 */
 	public int addTown(Location loc, String name, String kingdomName);
 	
@@ -151,10 +152,11 @@ public interface KonquestKingdomManager {
 	 * The territory is chosen by finding the closest territory center location to the given location.
 	 * 
 	 * @param loc The location to claim
-	 * @return  0 - success
-	 * 			1 - error, no adjacent territory
-	 * 			2 - error, exceeds max distance
-	 * 			3 - error, already claimed
+	 * @return  Status code
+	 * 			<br>0 - success
+	 * 			<br>1 - error, no adjacent territory
+	 * 			<br>2 - error, exceeds max distance
+	 * 			<br>3 - error, already claimed
 	 */
 	public int claimChunk(Location loc);
 	

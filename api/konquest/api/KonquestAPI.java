@@ -26,21 +26,21 @@ import konquest.api.model.KonquestTerritory;
 public interface KonquestAPI {
 
 	/**
-	 * Get the friendly primary color, from core.yml.
+	 * Gets the friendly primary color, from core.yml.
 	 * 
 	 * @return The friendly primary color
 	 */
 	public ChatColor getFriendlyPrimaryColor();
 	
 	/**
-	 * Get the enemy primary color, from core.yml.
+	 * Gets the enemy primary color, from core.yml.
 	 * 
 	 * @return The enemy primary color
 	 */
 	public ChatColor getEnemyPrimaryColor();
 	
 	/**
-	 * Get the primary Konquest scoreboard with teams.
+	 * Gets the primary Konquest scoreboard with teams.
 	 * 
 	 * @return The primary scoreboard
 	 */
@@ -51,75 +51,75 @@ public interface KonquestAPI {
 	 * 
 	 * @param name The name of an object (town, ruin, etc)
 	 * @return Status code
-	 * 			0 - Success, no issue found
-	 * 			1 - Error, name is not strictly alpha-numeric
-	 * 			2 - Error, name has more than 20 characters
-	 * 			3 - Error, name is an existing player
-	 * 			4 - Error, name is a kingdom
-	 * 			5 - Error, name is a town
-	 * 			6 - Error, name is a ruin
-	 * 			7 - Error, name is a guild
+	 * 			<br>0 - Success, no issue found
+	 * 			<br>1 - Error, name is not strictly alpha-numeric
+	 * 			<br>2 - Error, name has more than 20 characters
+	 * 			<br>3 - Error, name is an existing player
+	 * 			<br>4 - Error, name is a kingdom
+	 * 			<br>5 - Error, name is a town
+	 * 			<br>6 - Error, name is a ruin
+	 * 			<br>7 - Error, name is a guild
 	 */
 	public int validateNameConstraints(String name);
 	
 	/**
-	 * Get the player manager, for all things player related.
+	 * Gets the player manager, for all things player related.
 	 * 
 	 * @return The player manager
 	 */
 	public KonquestPlayerManager getPlayerManager();
 	
 	/**
-	 * Get the kingdom manager, for all things kingdom/town related.
+	 * Gets the kingdom manager, for all things kingdom/town related.
 	 * 
 	 * @return The kingdom manager
 	 */
 	public KonquestKingdomManager getKingdomManager();
 	
 	/**
-	 * Get the camp manager, for all things camp related.
+	 * Gets the camp manager, for all things camp related.
 	 * 
 	 * @return The camp manager
 	 */
 	public KonquestCampManager getCampManager();
 	
 	/**
-	 * Get the upgrade manager, for all things town upgrade related.
+	 * Gets the upgrade manager, for all things town upgrade related.
 	 * 
 	 * @return The upgrade manager
 	 */
 	public KonquestUpgradeManager getUpgradeManager();
 	
 	/**
-	 * Get the shield manager, for all things town shield and armor related.
+	 * Gets the shield manager, for all things town shield and armor related.
 	 * 
 	 * @return The shield manager
 	 */
 	public KonquestShieldManager getShieldManager();
 	
 	/**
-	 * Get the ruin manager, for all things ruin related.
+	 * Gets the ruin manager, for all things ruin related.
 	 * 
 	 * @return The ruin manager
 	 */
 	public KonquestRuinManager getRuinManager();
 	
 	/**
-	 * Get the plot manager, for all things town plot related.
+	 * Gets the plot manager, for all things town plot related.
 	 * 
 	 * @return The ruin manager
 	 */
 	public KonquestPlotManager getPlotManager();
 	
 	/**
-	 * Get the guild manager, for all things guild related.
+	 * Gets the guild manager, for all things guild related.
 	 * 
 	 * @return The guild manager
 	 */
 	public KonquestGuildManager getGuildManager();
 	
 	/**
-	 * Check if a location is in a valid world.
+	 * Checks if a location is in a valid world.
 	 * Invalid worlds prevent some Konquest commands.
 	 * 
 	 * @param loc A location
@@ -128,7 +128,7 @@ public interface KonquestAPI {
 	public boolean isWorldValid(Location loc);
 	
 	/**
-	 * Check if a world is valid.
+	 * Checks if a world is valid.
 	 * Invalid worlds prevent some Konquest commands.
 	 * 
 	 * @param world A world
@@ -137,7 +137,7 @@ public interface KonquestAPI {
 	public boolean isWorldValid(World world);
 	
 	/**
-	 * Check if a location is in an ignored world.
+	 * Checks if a location is in an ignored world.
 	 * Ignored worlds prevent most Konquest commands and features.
 	 * 
 	 * @param loc A location
@@ -146,7 +146,7 @@ public interface KonquestAPI {
 	public boolean isWorldIgnored(Location loc);
 	
 	/**
-	 * Check if a world is ignored.
+	 * Checks if a world is ignored.
 	 * Ignored worlds prevent most Konquest commands and features.
 	 * 
 	 * @param world A world
@@ -155,7 +155,7 @@ public interface KonquestAPI {
 	public boolean isWorldIgnored(World world);
 	
 	/**
-	 * Get a random location in the wild, constrained by radius and offset in Konquest's configuration.
+	 * Gets a random location in the wild, constrained by radius and offset in Konquest's configuration.
 	 * 
 	 * @param world The world to generate the random location
 	 * @return A random location in the wild
@@ -163,7 +163,7 @@ public interface KonquestAPI {
 	public Location getRandomWildLocation(World world);
 	
 	/**
-	 * Get a random safe location in a surrounding chunk to the given center location.
+	 * Gets a random safe location in a surrounding chunk to the given center location.
 	 * A safe location is one that should not kill the player.
 	 * The resulting location will not be in the same chunk as the center location.
 	 * 
@@ -174,7 +174,7 @@ public interface KonquestAPI {
 	public Location getSafeRandomCenteredLocation(Location center, int radius);
 	
 	/**
-	 * Get the primary display color based on relationships. This color is set in the Konquest configuration.
+	 * Gets the primary display color based on relationships. This color is set in the Konquest configuration.
 	 * There is a color for each relationship: friendly, enemy, armistice, barbarian
 	 * 
 	 * @param displayPlayer The observing player who should see the color
@@ -184,7 +184,7 @@ public interface KonquestAPI {
 	public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer);
 	
 	/**
-	 * Get the primary display color based on relationships. This color is set in the Konquest configuration.
+	 * Gets the primary display color based on relationships. This color is set in the Konquest configuration.
 	 * There is a color for each relationship: friendly, enemy, armistice
 	 * 
 	 * @param displayGuild The observing guild who should see the color
@@ -194,7 +194,7 @@ public interface KonquestAPI {
 	public ChatColor getDisplayPrimaryColor(KonquestGuild displayGuild, KonquestGuild contextGuild);
 	
 	/**
-	 * Get the primary display color based on relationships. This color is set in the Konquest configuration.
+	 * Gets the primary display color based on relationships. This color is set in the Konquest configuration.
 	 * There is a color for each relationship: friendly, enemy, armistice
 	 * 
 	 * @param displayPlayer The observing player who should see the color
