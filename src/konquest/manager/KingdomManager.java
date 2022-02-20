@@ -33,7 +33,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.api.event.player.KonquestKingdomChangeEvent;
+import konquest.api.event.player.KonquestPlayerKingdomEvent;
 import konquest.api.manager.KonquestKingdomManager;
 import konquest.api.model.KonquestUpgrade;
 import konquest.api.model.KonquestTerritoryType;
@@ -202,7 +202,7 @@ public class KingdomManager implements KonquestKingdomManager {
 					(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
 				KonKingdom assignedKingdom = getKingdom(kingdomName);
 				// Fire event
-				KonquestKingdomChangeEvent invokeEvent = new KonquestKingdomChangeEvent(konquest, player, assignedKingdom, player.getExileKingdom(), false);
+				KonquestPlayerKingdomEvent invokeEvent = new KonquestPlayerKingdomEvent(konquest, player, assignedKingdom, player.getExileKingdom(), false);
                 if(invokeEvent != null) {
                 	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
                 }
@@ -263,7 +263,7 @@ public class KingdomManager implements KonquestKingdomManager {
     	}
     	KonKingdom oldKingdom = player.getKingdom();
     	// Fire event
-		KonquestKingdomChangeEvent invokeEvent = new KonquestKingdomChangeEvent(konquest, player, getBarbarians(), oldKingdom, true);
+		KonquestPlayerKingdomEvent invokeEvent = new KonquestPlayerKingdomEvent(konquest, player, getBarbarians(), oldKingdom, true);
         if(invokeEvent != null) {
         	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
         }

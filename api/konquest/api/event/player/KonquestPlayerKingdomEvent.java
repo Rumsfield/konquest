@@ -3,7 +3,6 @@ package konquest.api.event.player;
 import org.bukkit.event.Cancellable;
 
 import konquest.api.KonquestAPI;
-import konquest.api.event.KonquestEvent;
 import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestPlayer;
 
@@ -12,9 +11,8 @@ import konquest.api.model.KonquestPlayer;
  * 
  * @author Rumsfield
  */
-public class KonquestKingdomChangeEvent extends KonquestEvent implements Cancellable {
+public class KonquestPlayerKingdomEvent extends KonquestPlayerEvent implements Cancellable {
 
-	private KonquestPlayer player;
 	private KonquestKingdom newKingdom;
 	private KonquestKingdom exileKingdom;
 	private boolean barbarian;
@@ -24,27 +22,16 @@ public class KonquestKingdomChangeEvent extends KonquestEvent implements Cancell
 	 * Constructor for a new event
 	 * 
 	 * @param konquest The KonquestAPI instance
-	 * @param player The player that is changing kingdoms
 	 * @param newKingdom The kingdom that the player is changing to
 	 * @param exileKingdom The kingdom that the player is leaving
 	 * @param barbarian Is the player becoming a barbarian?
 	 */
-	public KonquestKingdomChangeEvent(KonquestAPI konquest, KonquestPlayer player, KonquestKingdom newKingdom, KonquestKingdom exileKingdom, boolean barbarian) {
-		super(konquest);
-		this.player = player;
+	public KonquestPlayerKingdomEvent(KonquestAPI konquest, KonquestPlayer player, KonquestKingdom newKingdom, KonquestKingdom exileKingdom, boolean barbarian) {
+		super(konquest, player);
 		this.newKingdom = newKingdom;
 		this.exileKingdom = exileKingdom;
 		this.barbarian = barbarian;
 		this.isCancelled = false;
-	}
-	
-	/**
-	 * Get the player that is changing kingdoms
-	 * 
-	 * @return The player
-	 */
-	public KonquestPlayer getPlayer() {
-		return player;
 	}
 	
 	/**

@@ -3,7 +3,7 @@ package konquest.listener;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.event.player.KonquestEnterTerritoryEvent;
-import konquest.api.event.player.KonquestKingdomChangeEvent;
+import konquest.api.event.player.KonquestPlayerKingdomEvent;
 import konquest.api.event.town.KonquestMonumentDamageEvent;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
@@ -366,7 +366,7 @@ public class KonquestListener implements Listener {
 	 * @param event
 	 */
 	@EventHandler(priority = EventPriority.NORMAL)
-    public void onKingdomChange(KonquestKingdomChangeEvent event) {
+    public void onKingdomChange(KonquestPlayerKingdomEvent event) {
 		//TODO: something
 	}
 	
