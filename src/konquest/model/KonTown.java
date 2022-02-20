@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import konquest.Konquest;
 import konquest.api.model.KonquestUpgrade;
+import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestTown;
 import konquest.utility.BlockPaster;
 import konquest.utility.ChatUtil;
@@ -74,7 +75,7 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 	private HashMap<Point,KonPlot> plots;
 	
 	public KonTown(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
-		super(loc, name, kingdom, KonTerritoryType.TOWN, konquest);
+		super(loc, name, kingdom, KonquestTerritoryType.TOWN, konquest);
 		// Assume there is a valid Monument Template
 		this.monument = new KonMonument(loc);
 		this.monumentTimer = new Timer(this);
@@ -896,7 +897,7 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 		return isLord(player.getUniqueId());
 	}
 	
-	public boolean setPlayerElite(OfflinePlayer player, boolean val) {
+	public boolean setPlayerKnight(OfflinePlayer player, boolean val) {
 		boolean status = true;
 		UUID playerUUID = player.getUniqueId();
 		if(residents.containsKey(playerUUID)) {
@@ -908,7 +909,7 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 	}
 	
 	// Returns true when player is Lord or Knight
-	public boolean isPlayerElite(OfflinePlayer player) {
+	public boolean isPlayerKnight(OfflinePlayer player) {
 		boolean status = true;
 		UUID playerUUID = player.getUniqueId();
 		if(residents.containsKey(playerUUID)) {
@@ -971,7 +972,7 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 		return lord;
 	}
 	
-	public ArrayList<OfflinePlayer> getPlayerElites() {
+	public ArrayList<OfflinePlayer> getPlayerKnights() {
 		ArrayList<OfflinePlayer> eliteList = new ArrayList<OfflinePlayer>();
 		for(UUID id : residents.keySet()) {
 			if(residents.get(id)) {
@@ -1083,7 +1084,7 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 	
 	public void notifyJoinRequest(UUID id) {
 		String name = Bukkit.getOfflinePlayer(id).getName();
-		for(OfflinePlayer offlinePlayer : getPlayerElites()) {
+		for(OfflinePlayer offlinePlayer : getPlayerKnights()) {
 			if(offlinePlayer.isOnline()) {
 				//ChatUtil.sendNotice((Player)offlinePlayer, "Received new request from "+name+" to join "+getName());
 				//ChatUtil.sendNotice((Player)offlinePlayer, name+" wants to join "+getName()+", use \"/k town "+getName()+" add "+name+"\" to allow, \"/k town "+getName()+" kick "+name+"\" to deny", ChatColor.LIGHT_PURPLE);

@@ -125,7 +125,7 @@ public class InventoryListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
-							if(town.isPlotOnly() && !town.isPlayerElite(player.getOfflineBukkitPlayer()) && !town.hasPlot(openLoc)) {
+							if(town.isPlotOnly() && !town.isPlayerKnight(player.getOfflineBukkitPlayer()) && !town.hasPlot(openLoc)) {
 								// Stop when non-elite player edits non-plot land
 								ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLY_PLOT.getMessage());
 								event.setCancelled(true);
@@ -135,7 +135,7 @@ public class InventoryListener implements Listener {
 					}
 					// Attempt to put loot into empty chests within the monument
 					if(town.isLocInsideCenterChunk(openLoc) && event.getInventory().getHolder() instanceof Chest) {
-						if(town.isPlayerLord(player.getOfflineBukkitPlayer()) || town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+						if(town.isPlayerLord(player.getOfflineBukkitPlayer()) || town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 							//if(isInventoryEmpty(event.getInventory())) {
 								// Update loot with default count as defined in core YML
 								boolean result = konquest.getLootManager().updateMonumentLoot(event.getInventory(), town);

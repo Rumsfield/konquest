@@ -1,5 +1,6 @@
 package konquest.model;
 
+import konquest.api.model.KonquestMonument;
 import konquest.utility.ChatUtil;
 
 import org.bukkit.Chunk;
@@ -7,7 +8,7 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-public class KonMonument{
+public class KonMonument implements KonquestMonument {
 
 	private Location centerLoc;
 	private int baseY;

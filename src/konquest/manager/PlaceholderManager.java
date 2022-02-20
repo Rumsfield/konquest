@@ -9,11 +9,11 @@ import java.util.Date;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestTerritoryType;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonPrefix;
-import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
@@ -132,7 +132,7 @@ public class PlaceholderManager {
 		String list = "";
     	if(offlinePlayer != null) {
     		for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
-    			if(town.isPlayerElite(offlinePlayer.getOfflineBukkitPlayer()) &&
+    			if(town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer()) &&
     					!town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
     				list = list + town.getName() + ",";
     			}
@@ -150,7 +150,7 @@ public class PlaceholderManager {
     	if(offlinePlayer != null) {
     		for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
     			if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer()) &&
-    					!town.isPlayerElite(offlinePlayer.getOfflineBukkitPlayer())) {
+    					!town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer())) {
     				list = list + town.getName() + ",";
     			}
     		}
@@ -184,7 +184,7 @@ public class PlaceholderManager {
         	if(kingdomManager.isChunkClaimed(player.getLocation())) {
         		result = kingdomManager.getChunkTerritory(player.getLocation()).getTerritoryType().getLabel();
         	} else {
-        		result = KonTerritoryType.WILD.getLabel();
+        		result = KonquestTerritoryType.WILD.getLabel();
         	}
     	}
     	return result;
@@ -197,7 +197,7 @@ public class PlaceholderManager {
         	if(kingdomManager.isChunkClaimed(player.getLocation())) {
         		result = kingdomManager.getChunkTerritory(player.getLocation()).getName();
         	} else {
-        		result = KonTerritoryType.WILD.getLabel();
+        		result = KonquestTerritoryType.WILD.getLabel();
         	}
     	}
     	return result;

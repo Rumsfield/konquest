@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 import org.bukkit.OfflinePlayer;
 
+import konquest.api.model.KonquestCamp;
 import konquest.api.model.KonquestCampGroup;
 
 /**
@@ -19,7 +20,7 @@ public class KonCampGroup implements KonquestCampGroup {
 		this.camps = new HashSet<KonCamp>();
 	}
 	
-	public boolean containsCamp(KonCamp camp) {
+	public boolean containsCamp(KonquestCamp camp) {
 		return camps.contains(camp);
 	}
 	

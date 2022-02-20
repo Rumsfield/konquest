@@ -36,6 +36,7 @@ public class CampManager implements KonquestCampManager {
 	private HashMap<String,KonCamp> barbarianCamps; // player uuids to camps
 	//private HashSet<KonCampGroup> barbarianGroups; // all camp groups
 	private HashMap<KonCamp,KonCampGroup> groupMap; // camps to groups
+	private boolean isClanEnabled;
 	
 	public CampManager(Konquest konquest) {
 		this.konquest = konquest;
@@ -43,10 +44,12 @@ public class CampManager implements KonquestCampManager {
 		this.barbarianCamps = new HashMap<String, KonCamp>();
 		//this.barbarianGroups = new HashSet<KonCampGroup>();
 		this.groupMap = new HashMap<KonCamp,KonCampGroup>();
+		this.isClanEnabled = false;
 	}
 	
 	// intended to be called after database has connected and loaded player tables
 	public void initCamps() {
+		isClanEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_enable",false);
 		loadCamps();
 		refreshGroups();
 		ChatUtil.printDebug("Loaded camps and groups");
@@ -181,6 +184,10 @@ public class CampManager implements KonquestCampManager {
 		return groupMap.get(camp);
 	}
 	
+	public boolean isCampGroupsEnabled() {
+		return isClanEnabled;
+	}
+	
 	/**
 	 * Attempts to remove a camp from a group
 	 * @param camp - a removed camp
@@ -288,7 +295,6 @@ public class CampManager implements KonquestCampManager {
 	*/
 	private void refreshGroups() {
 		groupMap.clear();
-		boolean isClanEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_enable",false);
 		if(!isClanEnabled) {
 			return;
 		}

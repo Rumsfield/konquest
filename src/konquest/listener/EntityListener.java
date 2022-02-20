@@ -2,6 +2,7 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestUpgrade;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
@@ -11,7 +12,6 @@ import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
-import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
@@ -128,19 +128,19 @@ public class EntityListener implements Listener {
 				KonTerritory territory = kingdomManager.getChunkTerritory(block.getLocation());
 				
 				// Protect Capitals always
-				if(territory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
 					ChatUtil.printDebug("protecting Capital");
 					event.setCancelled(true);
 					return;
 				}
 				// Protect Ruins always
-				if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
 					ChatUtil.printDebug("protecting Ruin");
 					event.setCancelled(true);
 					return;
 				}
 				// Town protections
-				if(territory.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 					KonTown town = (KonTown)territory;
 					// Protect Town Monuments
 					if(town.isLocInsideCenterChunk(block.getLocation())) {
@@ -217,7 +217,7 @@ public class EntityListener implements Listener {
 				boolean stopOnReason = !(eReason.equals(SpawnReason.COMMAND) || eReason.equals(SpawnReason.CUSTOM) || eReason.equals(SpawnReason.DEFAULT) || eReason.equals(SpawnReason.SPAWNER));
 				if(stopOnType && stopOnReason) {
 					boolean isAllMobSpawnAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_mobs",false);
-					if((territory.getTerritoryType().equals(KonTerritoryType.CAPITAL) && !isAllMobSpawnAllowed) || territory.getTerritoryType().equals(KonTerritoryType.RUIN))
+					if((territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && !isAllMobSpawnAllowed) || territory.getTerritoryType().equals(KonquestTerritoryType.RUIN))
 					event.setCancelled(true);
 				}
 			}

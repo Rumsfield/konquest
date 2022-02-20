@@ -36,6 +36,7 @@ import konquest.KonquestPlugin;
 import konquest.api.event.KonquestKingdomChangeEvent;
 import konquest.api.manager.KonquestKingdomManager;
 import konquest.api.model.KonquestUpgrade;
+import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestPlayer;
 import konquest.command.TravelCommand.TravelDestination;
@@ -56,7 +57,6 @@ import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryCache;
-import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.LoadingPrinter;
@@ -72,6 +72,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	private HashMap<World,KonTerritoryCache> territoryWorldCache;
 	private HashMap<PotionEffectType,Integer> townNerfs;
 	private Material townCriticalBlock;
+	private int maxCriticalHits;
 	
 	public static final int DEFAULT_MAP_SIZE = 9; // 10 lines of chat, minus one for header, odd so player's chunk is centered
 	
@@ -83,6 +84,7 @@ public class KingdomManager implements KonquestKingdomManager {
 		territoryWorldCache = new HashMap<World,KonTerritoryCache>();
 		townNerfs = new HashMap<PotionEffectType,Integer>();
 		townCriticalBlock = Material.OBSIDIAN;
+		this.maxCriticalHits = 12;
 	}
 	
 	public void initialize() {
@@ -678,7 +680,7 @@ public class KingdomManager implements KonquestKingdomManager {
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
     			}
-    			if(konquest.getKingdomManager().getChunkTerritory(point,claimWorld).getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    			if(konquest.getKingdomManager().getChunkTerritory(point,claimWorld).getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
     				//ChatUtil.sendError(bukkitPlayer, "You are too close to the Capital!");
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
@@ -756,7 +758,7 @@ public class KingdomManager implements KonquestKingdomManager {
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
     			}
-    			if(konquest.getKingdomManager().getChunkTerritory(point,claimWorld).getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    			if(konquest.getKingdomManager().getChunkTerritory(point,claimWorld).getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
     				//ChatUtil.sendError(bukkitPlayer, "Too close to the Capital!");
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
@@ -1376,7 +1378,7 @@ public class KingdomManager implements KonquestKingdomManager {
 		if(player.getKingdom() instanceof KonKingdom) {
 			KonKingdom kingdom = (KonKingdom)player.getKingdom();
 			for(KonTown town : kingdom.getTowns()) {
-				if(town.isPlayerElite(player.getOfflineBukkitPlayer()) && !town.isPlayerLord(player.getOfflineBukkitPlayer())) {
+				if(town.isPlayerKnight(player.getOfflineBukkitPlayer()) && !town.isPlayerLord(player.getOfflineBukkitPlayer())) {
 					townNames.add(town);
 				}
 			}
@@ -1404,7 +1406,7 @@ public class KingdomManager implements KonquestKingdomManager {
 		for(KonTown town : player.getKingdom().getTowns()) {
 			if(town.isPlayerLord(player.getOfflineBukkitPlayer())) {
 				countLord = countLord + 1;
-			} else if(town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+			} else if(town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 				countElite = countElite + 1;
 			} else if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
 				countResident = countResident + 1;
@@ -1439,7 +1441,7 @@ public class KingdomManager implements KonquestKingdomManager {
 				if(town.isPlayerLord(offlinePlayer)) {
 					numTownLords++;
 					numLordLand += town.getChunkList().size();
-				} else if(town.isPlayerElite(offlinePlayer)) {
+				} else if(town.isPlayerKnight(offlinePlayer)) {
 					numTownKnights++;
 					numKnightLand += town.getChunkList().size();
 				} else {
@@ -1541,7 +1543,7 @@ public class KingdomManager implements KonquestKingdomManager {
 				if(town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
 					numTownLords++;
 					numLordLand += town.getChunkList().size();
-				} else if(town.isPlayerElite(offlinePlayer.getOfflineBukkitPlayer())) {
+				} else if(town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer())) {
 					numTownKnights++;
 					numKnightLand += town.getChunkList().size();
 				} else if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
@@ -1796,7 +1798,12 @@ public class KingdomManager implements KonquestKingdomManager {
 		return townCriticalBlock;
 	}
 	
+	public int getMaxCriticalHits() {
+		return maxCriticalHits;
+	}
+	
 	private void loadCriticalBlocks() {
+		maxCriticalHits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount",12);
 		String townCriticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block","");
 		try {
 			townCriticalBlock = Material.valueOf(townCriticalBlockTypeName);
@@ -2124,7 +2131,7 @@ public class KingdomManager implements KonquestKingdomManager {
                 	String uuid = resident.getUniqueId().toString();
                 	if(town.isPlayerLord(resident)) {
                 		townInstanceSection.set("lord", uuid);
-                	} else if(town.isPlayerElite(resident)) {
+                	} else if(town.isPlayerKnight(resident)) {
                 		townInstanceResidentSection.set(uuid, true);
                 	} else {
                 		townInstanceResidentSection.set(uuid, false);

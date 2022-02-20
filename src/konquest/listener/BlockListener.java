@@ -3,6 +3,7 @@ package konquest.listener;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.event.KonquestMonumentDamageEvent;
+import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestUpgrade;
 import konquest.manager.CampManager;
 import konquest.manager.KingdomManager;
@@ -16,7 +17,6 @@ import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
-import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
@@ -172,7 +172,7 @@ public class BlockListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
-							if(town.isPlotOnly() && !town.isPlayerElite(player.getOfflineBukkitPlayer()) && !town.hasPlot(breakLoc)) {
+							if(town.isPlotOnly() && !town.isPlayerKnight(player.getOfflineBukkitPlayer()) && !town.hasPlot(breakLoc)) {
 								// Stop when non-elite player edits non-plot land
 								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLY_PLOT.getMessage());
 								event.setCancelled(true);
@@ -272,6 +272,12 @@ public class BlockListener implements Listener {
 						// If block is inside a monument, throw KonquestMonumentDamageEvent
 						if(town.isLocInsideCenterChunk(breakLoc)) {
 							if(town.getMonument().isLocInside(breakLoc)) {
+								// Prevent monument attack when template is blanking or invalid
+								if(!town.getKingdom().getMonumentTemplate().isValid() || town.getKingdom().isMonumentBlanking()) {
+									ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+									event.setCancelled(true);
+									return;
+								}
 								// Prevent Barbarians from damaging monuments optionally
 								boolean isBarbAttackAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.barbarians_destroy",true);
 								if(player.isBarbarian() && !isBarbAttackAllowed) {
@@ -298,7 +304,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				// Camp considerations...
-				if(territory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAMP)) {
 					KonCamp camp = (KonCamp)territory;
 					boolean isMemberAllowedContainers = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_allow_containers", false);
 					boolean isMemberAllowedEdit = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_allow_edit_offline", false);
@@ -345,7 +351,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				// Ruin considerations...
-				if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
 					KonRuin ruin = (KonRuin)territory;
 					// Check for expired cooldown
 					if(ruin.isCaptureDisabled()) {
@@ -526,7 +532,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				// Preventions for Towns
-				if(territory.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 					KonTown town = (KonTown) territory;
 					// Prevent all block placements in center chunk
 					if(town.isLocInsideCenterChunk(event.getBlock().getLocation())) {
@@ -617,7 +623,7 @@ public class BlockListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
-							if(town.isPlotOnly() && !town.isPlayerElite(player.getOfflineBukkitPlayer()) && !town.hasPlot(placeLoc)) {
+							if(town.isPlotOnly() && !town.isPlayerKnight(player.getOfflineBukkitPlayer()) && !town.hasPlot(placeLoc)) {
 								// Stop when non-elite player edits non-plot land
 								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLY_PLOT.getMessage());
 								event.setCancelled(true);
@@ -628,7 +634,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				// Preventions for Camps
-				if(territory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAMP)) {
 					KonCamp camp = (KonCamp)territory;
 					boolean isMemberAllowedEdit = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_allow_edit_offline", false);
 					boolean isMember = false;
@@ -666,7 +672,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				// Ruin considerations...
-				if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
 					// Prevent all placement within ruins
 					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 					event.setCancelled(true);
@@ -801,7 +807,7 @@ public class BlockListener implements Listener {
 				ChatUtil.printDebug("effected block is inside claimed territory");
 				KonTerritory territory = kingdomManager.getChunkTerritory(block.getLocation());
 				// Protect Capitals
-				if(territory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
 					ChatUtil.printDebug("protecting Capital");
 					event.setCancelled(true);
 					return;
@@ -813,7 +819,7 @@ public class BlockListener implements Listener {
 					return;
 				}
 				// Town protections
-				if(territory.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 					KonTown town = (KonTown)territory;
 					// Protect Town Monuments
 					if(town.isLocInsideCenterChunk(block.getLocation())) {
@@ -852,7 +858,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				// Camp protections
-				if(territory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAMP)) {
 					KonCamp camp = (KonCamp)territory;
 					// Protect offline owner camps
 					if(camp.isProtected()) {
@@ -876,7 +882,7 @@ public class BlockListener implements Listener {
 					return;
 				}
 				// Protect Ruins
-				if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
 					ChatUtil.printDebug("protecting Ruin");
 					event.setCancelled(true);
 					return;

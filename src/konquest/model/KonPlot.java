@@ -9,9 +9,10 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import konquest.api.model.KonquestPlot;
 import konquest.utility.MessagePath;
 
-public class KonPlot {
+public class KonPlot implements KonquestPlot {
 
 	private HashSet<Point> points;
 	private ArrayList<UUID> users;

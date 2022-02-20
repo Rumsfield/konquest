@@ -11,6 +11,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestCamp;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
@@ -29,7 +30,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, Timeable {
 	private BossBar campBarAll;
 	
 	public KonCamp(Location loc, OfflinePlayer owner, KonKingdom kingdom, Konquest konquest) {
-		super(loc, MessagePath.LABEL_CAMP.getMessage().trim()+"_"+owner.getName(), kingdom, KonTerritoryType.CAMP, konquest);
+		super(loc, MessagePath.LABEL_CAMP.getMessage().trim()+"_"+owner.getName(), kingdom, KonquestTerritoryType.CAMP, konquest);
 		
 		this.owner = owner;
 		this.raidAlertTimer = new Timer(this);

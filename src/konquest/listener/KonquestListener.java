@@ -208,7 +208,8 @@ public class KonquestListener implements Listener {
 			// Critical block has been destroyed
 			ChatUtil.printDebug("Critical strike on Monument in Town "+territory.getName());
 			town.getMonument().addCriticalHit();
-			int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
+			//int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
+			int maxCriticalhits = konquest.getKingdomManager().getMaxCriticalHits();
 			
 			// Update bar progress
 			double progress = (double)(maxCriticalhits - town.getMonument().getCriticalHits()) / (double)maxCriticalhits;

@@ -1,5 +1,7 @@
 package konquest.api;
 
+import java.awt.Point;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -202,4 +204,16 @@ public interface KonquestAPI {
 	 * @return The primary display color
 	 */
 	public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);
+	
+	/**
+	 * Utility method to convert a location to a point representation of the chunk that contains the location.
+	 * The point's "x" field is the chunk's X coordinate, and the point's "y" field is the chunk's Z coordinate.
+	 * Note that the point does not preserve the World of the location, so keep track of that separately.
+	 * 
+	 * @param loc The location to convert into a point
+	 * @return A point representing the chunk containing the location
+	 */
+	public static Point toPoint(Location loc) {
+		return new Point((int)Math.floor((double)loc.getBlockX()/16),(int)Math.floor((double)loc.getBlockZ()/16));
+	}
 }

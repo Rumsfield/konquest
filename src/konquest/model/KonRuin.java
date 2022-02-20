@@ -18,6 +18,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestRuin;
 import konquest.utility.ChatUtil;
 import konquest.utility.Timeable;
@@ -43,7 +44,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, Timeable {
 	 */
 	
 	public KonRuin(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
-		super(loc, name, kingdom, KonTerritoryType.RUIN, konquest);
+		super(loc, name, kingdom, KonquestTerritoryType.RUIN, konquest);
 		this.spawnTimer = new Timer(this);
 		this.captureTimer = new Timer(this);
 		this.isCaptureDisabled = false;

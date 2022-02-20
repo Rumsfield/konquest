@@ -57,7 +57,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		List<OfflinePlayer> townResidents = new ArrayList<OfflinePlayer>();
 		for(OfflinePlayer resident : infoTown.getPlayerResidents()) {
 			if(!infoTown.isPlayerLord(resident)) {
-				if(infoTown.isPlayerElite(resident)) {
+				if(infoTown.isPlayerKnight(resident)) {
 					townKnights.add(resident);
 				} else {
 					townResidents.add(resident);

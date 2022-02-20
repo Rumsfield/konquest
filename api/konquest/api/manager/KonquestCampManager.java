@@ -46,6 +46,13 @@ public interface KonquestCampManager {
 	public boolean removeCamp(KonquestOfflinePlayer player);
 	
 	/**
+	 * Checks whether camp groups (clans) are enabled in the Konquest configuration.
+	 * 
+	 * @return True when camp groups are enabled, else false
+	 */
+	public boolean isCampGroupsEnabled();
+	
+	/**
 	 * Checks whether the given camp is part of a camp group (clan).
 	 * A camp group is a collection of adjacent camps.
 	 * 

@@ -57,11 +57,13 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 		this.townMap = new HashMap<String, KonTown>();
 	}
 	
+	/*
 	public void overrideCapital(Location loc) {
 		capital.clearChunks();
 		capital = new KonCapital(loc, this, konquest);
 		capital.initClaim();
 	}
+	*/
 	
 	public void initCapital() {
 		capital.initClaim();
@@ -298,9 +300,11 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 		return name;
 	}
 	
+	/*
 	public Konquest getKonquest() {
 		return konquest;
 	}
+	*/
 	
 	// Careful! This can return null
 	public KonCapital getCapital() {

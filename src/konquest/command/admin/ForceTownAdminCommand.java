@@ -215,14 +215,14 @@ public class ForceTownAdminCommand extends CommandBase {
 			    	}
 			    	// Set resident's elite status
 			    	if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
-			    		if(town.isPlayerElite(offlinePlayer.getOfflineBukkitPlayer())) {
+			    		if(town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer())) {
 			    			// Clear elite
-			    			town.setPlayerElite(offlinePlayer.getOfflineBukkitPlayer(), false);
+			    			town.setPlayerKnight(offlinePlayer.getOfflineBukkitPlayer(), false);
 			    			//ChatUtil.sendNotice((Player) getSender(), playerName+" is no longer a Knight in "+townName+". Use this command again to set Knight status.");
 			    			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_CLEAR.getMessage(playerName,townName));
 			    		} else {
 			    			// Set elite
-			    			town.setPlayerElite(offlinePlayer.getOfflineBukkitPlayer(), true);
+			    			town.setPlayerKnight(offlinePlayer.getOfflineBukkitPlayer(), true);
 			    			//ChatUtil.sendNotice((Player) getSender(), playerName+" is now a Knight resident in "+townName+". Use this command again to remove Knight status.");
 			    			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_SET.getMessage(playerName,townName));
 			    		}

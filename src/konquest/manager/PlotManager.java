@@ -116,7 +116,7 @@ public class PlotManager implements KonquestPlotManager {
 						// The player is not a plot member
 						if(isKnightIgnored()) {
 							// Knights ignore plot protection
-							if(!town.isPlayerElite(player)) {
+							if(!town.isPlayerKnight(player)) {
 								// The player is not a knight or lord, and cannot edit this plot
 								result = true;
 							}
@@ -154,7 +154,7 @@ public class PlotManager implements KonquestPlotManager {
 						// The player is not a plot member
 						if(isKnightIgnored()) {
 							// Knights ignore plot protection
-							if(!town.isPlayerElite(player)) {
+							if(!town.isPlayerKnight(player)) {
 								// The player is not a knight or lord, and cannot edit this plot
 								result = true;
 							}

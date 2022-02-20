@@ -282,4 +282,12 @@ public interface KonquestKingdomManager {
 	 */
 	public Material getTownCriticalBlock();
 	
+	/**
+	 * Gets the maximum number of critical hits for each town monument.
+	 * When this number of critical blocks are destroyed, the town will be captured.
+	 * 
+	 * @return The number of maximum critical hits
+	 */
+	public int getMaxCriticalHits();
+	
 }

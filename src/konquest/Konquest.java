@@ -58,7 +58,6 @@ import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
 import konquest.model.KonTerritory;
-import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.nms.Handler_1_16_R3;
 import konquest.nms.Handler_1_17_R1;
@@ -75,6 +74,7 @@ import konquest.utility.Timeable;
 import konquest.utility.Timer;
 import konquest.api.KonquestAPI;
 import konquest.api.model.KonquestUpgrade;
+import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestGuild;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestTerritory;
@@ -467,7 +467,7 @@ public class Konquest implements KonquestAPI, Timeable {
     	Location loginLoc = bukkitPlayer.getLocation();
     	if(kingdomManager.isChunkClaimed(loginLoc)) {
 			KonTerritory loginTerritory = kingdomManager.getChunkTerritory(loginLoc);
-    		if(loginTerritory.getTerritoryType().equals(KonTerritoryType.TOWN)) { 
+    		if(loginTerritory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) { 
 	    		// Player joined located within a Town
 	    		KonTown town = (KonTown) loginTerritory;
 	    		town.addBarPlayer(player);
@@ -479,16 +479,16 @@ public class Konquest implements KonquestAPI, Timeable {
 	    			kingdomManager.clearTownNerf(player);
 	    			kingdomManager.applyTownHearts(player, town);
 	    		}
-    		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+    		} else if(loginTerritory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
     			// Player joined located within a Ruin
     			KonRuin ruin = (KonRuin) loginTerritory;
     			ruin.addBarPlayer(player);
     			ruin.spawnAllGolems();
-    		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+    		} else if(loginTerritory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
     			// Player joined located within a Capital
     			KonCapital capital = (KonCapital) loginTerritory;
     			capital.addBarPlayer(player);
-    		} else if(loginTerritory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+    		} else if(loginTerritory.getTerritoryType().equals(KonquestTerritoryType.CAMP)) {
     			// Player joined located within a Camp
     			KonCamp camp = (KonCamp) loginTerritory;
     			camp.addBarPlayer(player);
