@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList;
 import konquest.api.KonquestAPI;
 
 /**
- * A base event from Konquest
+ * A base event from Konquest, with a reference to the API instance.
  * 
  * @author Rumsfield
  *

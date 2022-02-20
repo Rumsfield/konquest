@@ -2,7 +2,7 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.api.event.KonquestMonumentDamageEvent;
+import konquest.api.event.town.KonquestMonumentDamageEvent;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestUpgrade;
 import konquest.manager.CampManager;

@@ -1,8 +1,9 @@
-package konquest.api.event;
+package konquest.api.event.player;
 
 import org.bukkit.event.Cancellable;
 
 import konquest.api.KonquestAPI;
+import konquest.api.event.KonquestEvent;
 import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestPlayer;
 

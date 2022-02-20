@@ -1,6 +1,7 @@
-package konquest.api.event;
+package konquest.api.event.town;
 
 import konquest.api.KonquestAPI;
+import konquest.api.event.KonquestEvent;
 import konquest.api.model.KonquestPlayer;
 import konquest.api.model.KonquestTerritory;
 

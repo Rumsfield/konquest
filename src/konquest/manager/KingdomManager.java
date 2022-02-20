@@ -33,7 +33,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.api.event.KonquestKingdomChangeEvent;
+import konquest.api.event.player.KonquestKingdomChangeEvent;
 import konquest.api.manager.KonquestKingdomManager;
 import konquest.api.model.KonquestUpgrade;
 import konquest.api.model.KonquestTerritoryType;
