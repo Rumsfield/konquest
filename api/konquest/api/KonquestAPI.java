@@ -16,11 +16,13 @@ import konquest.api.manager.KonquestRuinManager;
 import konquest.api.manager.KonquestShieldManager;
 import konquest.api.manager.KonquestUpgradeManager;
 import konquest.api.model.KonquestGuild;
+import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestTerritory;
 
 /**
- * The Konquest API. This is the primary means of accessing Konquest objects and methods.
+ * The Konquest API. This is the primary means of accessing Konquest objects and methods. Most of the methods are helpers.
+ * Use the manager classes to interact with specific portions of Konquest.
  * 
  * @author Rumsfield
  *
@@ -40,6 +42,48 @@ public interface KonquestAPI {
 	 * @return The enemy primary color
 	 */
 	public ChatColor getEnemyPrimaryColor();
+
+	/**
+	 * Gets the armistice primary color, from core.yml.
+	 * 
+	 * @return The armistice primary color
+	 */
+	public ChatColor getArmisticePrimaryColor();
+	
+	/**
+	 * Gets the friendly secondary color, from core.yml.
+	 * 
+	 * @return The friendly secondary color
+	 */
+	public ChatColor getFriendlySecondaryColor();
+	
+	/**
+	 * Gets the enemy secondary color, from core.yml.
+	 * 
+	 * @return The enemy secondary color
+	 */
+	public ChatColor getEnemySecondaryColor();
+	
+	/**
+	 * Gets the armistice secondary color, from core.yml.
+	 * 
+	 * @return The armistice secondary color
+	 */
+	public ChatColor getArmisticeSecondaryColor();
+	
+	/**
+	 * Gets the barbarian color, from core.yml.
+	 * 
+	 * @return The barbarian color
+	 */
+	public ChatColor getBarbarianColor();
+	
+	/**
+	 * Gets the neutral color, from core.yml.
+	 * 
+	 * @return The neutral color
+	 */
+	public ChatColor getNeutralColor();
 	
 	/**
 	 * Gets the primary Konquest scoreboard with teams.
@@ -204,6 +248,46 @@ public interface KonquestAPI {
 	 * @return The primary display color
 	 */
 	public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);
+	
+	/**
+	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
+	 * There is a color for each relationship: friendly, enemy, armistice, barbarian
+	 * 
+	 * @param displayPlayer The observing player who should see the color
+	 * @param contextPlayer The target player who's relationship to the observer determines the color
+	 * @return The secondary display color
+	 */
+	public ChatColor getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer);
+	
+	/**
+	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
+	 * There is a color for each relationship: friendly, enemy, armistice
+	 * 
+	 * @param displayGuild The observing guild who should see the color
+	 * @param contextGuild The target guild who's relationship to the observer determines the color
+	 * @return The secondary display color
+	 */
+	public ChatColor getDisplaySecondaryColor(KonquestGuild displayGuild, KonquestGuild contextGuild);
+	
+	/**
+	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
+	 * There is a color for each relationship: friendly, enemy, armistice
+	 * 
+	 * @param displayPlayer The observing player who should see the color
+	 * @param contextTerritory The target town who's relationship to the observer determines the color
+	 * @return The secondary display color
+	 */
+	public ChatColor getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);
+	
+	/**
+	 * Gets the kingdom display color based on relationships. This color is set in the Konquest configuration.
+	 * There is a color for each relationship: friendly, enemy, barbarian, neutral
+	 * 
+	 * @param displayKingdom The observing kingdom that should see the color
+	 * @param contextKingdom The target kingdom who's relationship to the observer determines the color
+	 * @return The kingdom display color
+	 */
+	public ChatColor getDisplayKingdomColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom);
 	
 	/**
 	 * Utility method to convert a location to a point representation of the chunk that contains the location.
