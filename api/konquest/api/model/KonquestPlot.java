@@ -3,6 +3,7 @@ package konquest.api.model;
 import java.awt.Point;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 
 /**
@@ -15,7 +16,7 @@ public interface KonquestPlot {
 
 	/**
 	 * Checks whether the given point is a part of this plot.
-	 * Use the {@link KonquestAPI#toPoint} method to convert from location to point easily.
+	 * Use the {@link konquest.api.KonquestAPI#toPoint(Location loc) toPoint} method to convert from location to point easily.
 	 * Make sure to check that the world matches also.
 	 * 
 	 * @param point The point to check

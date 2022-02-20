@@ -11,7 +11,6 @@ import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestPlayer;
 import konquest.api.model.KonquestTerritory;
 import konquest.api.model.KonquestTown;
-import konquest.model.KonKingdom;
 
 /**
  * A manager for kingdoms and towns in Konquest.
@@ -240,7 +239,7 @@ public interface KonquestKingdomManager {
 	 * 
 	 * @return The barbarians kingdom
 	 */
-	public KonKingdom getBarbarians();
+	public KonquestKingdom getBarbarians();
 	
 	/**
 	 * Gets the neutrals kingdom.
@@ -248,7 +247,7 @@ public interface KonquestKingdomManager {
 	 * 
 	 * @return The neutrals kingdom
 	 */
-	public KonKingdom getNeutrals();
+	public KonquestKingdom getNeutrals();
 	
 	/**
 	 * Gets the towns which the given player is the lord of.
