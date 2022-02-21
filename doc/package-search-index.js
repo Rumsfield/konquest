@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"konquest.api"},{"l":"konquest.api.event"},{"l":"konquest.api.manager"},{"l":"konquest.api.model"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"konquest.api"},{"l":"konquest.api.event"},{"l":"konquest.api.event.camp"},{"l":"konquest.api.event.player"},{"l":"konquest.api.event.ruin"},{"l":"konquest.api.event.territory"},{"l":"konquest.api.event.town"},{"l":"konquest.api.manager"},{"l":"konquest.api.model"}];updateSearchResults();

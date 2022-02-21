@@ -14,6 +14,13 @@ public class KonquestPlayerPrefixEvent extends KonquestPlayerEvent {
 	private String prefix;
 	private boolean isDisabled;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param player The player
+	 * @param prefix The prefix
+	 * @param isDisabled Is the prefix disabled
+	 */
 	public KonquestPlayerPrefixEvent(KonquestAPI konquest, KonquestPlayer player, String prefix, boolean isDisabled) {
 		super(konquest, player);
 		this.prefix = prefix;

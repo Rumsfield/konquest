@@ -22,6 +22,12 @@ public class KonquestTownDestroyEvent extends KonquestTownEvent implements Cance
 	
 	private KonquestPlayer player;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param town The town
+	 * @param player The player
+	 */
 	public KonquestTownDestroyEvent(KonquestAPI konquest, KonquestTown town, KonquestPlayer player) {
 		super(konquest, town);
 		this.isCancelled = false;

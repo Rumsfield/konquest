@@ -24,6 +24,13 @@ public class KonquestTownCaptureEvent extends KonquestTownEvent implements Cance
 	private KonquestPlayer player;
 	private KonquestKingdom newKingdom;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param town The town
+	 * @param player The player
+	 * @param newKingdom The town's new kingdom
+	 */
 	public KonquestTownCaptureEvent(KonquestAPI konquest, KonquestTown town, KonquestPlayer player, KonquestKingdom newKingdom) {
 		super(konquest, town);
 		this.isCancelled = false;

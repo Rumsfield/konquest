@@ -28,6 +28,14 @@ public class KonquestTerritoryChunkEvent extends KonquestEvent implements Cancel
 	private Chunk chunk;
 	private boolean isClaimed;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param territory The territory
+	 * @param player The player
+	 * @param chunk The chunk
+	 * @param isClaimed Is the chunk claimed or unclaimed
+	 */
 	public KonquestTerritoryChunkEvent(KonquestAPI konquest, KonquestTerritory territory, KonquestPlayer player, Chunk chunk, boolean isClaimed) {
 		super(konquest);
 		this.isCancelled = false;

@@ -17,6 +17,11 @@ public class KonquestRuinEvent extends KonquestEvent {
 
 	private KonquestRuin ruin;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param ruin The ruin
+	 */
 	public KonquestRuinEvent(KonquestAPI konquest, KonquestRuin ruin) {
 		super(konquest);
 		this.ruin = ruin;

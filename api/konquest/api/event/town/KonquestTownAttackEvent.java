@@ -26,6 +26,15 @@ public class KonquestTownAttackEvent extends KonquestTownEvent implements Cancel
 	private boolean isMonument;
 	private boolean isCritical;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param town The town
+	 * @param attacker The attacking player
+	 * @param block The block
+	 * @param isMonument Is the block inside the monument
+	 * @param isCritical Is the block a critical monument block
+	 */
 	public KonquestTownAttackEvent(KonquestAPI konquest, KonquestTown town, KonquestPlayer attacker, Block block, boolean isMonument, boolean isCritical) {
 		super(konquest, town);
 		this.isCancelled = false;

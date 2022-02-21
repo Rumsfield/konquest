@@ -21,6 +21,12 @@ public class KonquestPlayerCampEvent extends KonquestPlayerEvent implements Canc
 	
 	private Location location;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param player The player
+	 * @param location The location
+	 */
 	public KonquestPlayerCampEvent(KonquestAPI konquest, KonquestPlayer player, Location location) {
 		super(konquest, player);
 		this.isCancelled = false;

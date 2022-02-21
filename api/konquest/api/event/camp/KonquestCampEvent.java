@@ -17,6 +17,11 @@ public class KonquestCampEvent extends KonquestEvent {
 
 	private KonquestCamp camp;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param camp The camp
+	 */
 	public KonquestCampEvent(KonquestAPI konquest, KonquestCamp camp) {
 		super(konquest);
 		this.camp = camp;

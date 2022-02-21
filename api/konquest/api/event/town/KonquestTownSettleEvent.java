@@ -20,6 +20,13 @@ public class KonquestTownSettleEvent extends KonquestTownEvent {
 	private KonquestPlayer player;
 	private KonquestKingdom kingdom;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param town The town
+	 * @param player The player
+	 * @param kingdom The kingdom
+	 */
 	public KonquestTownSettleEvent(KonquestAPI konquest, KonquestTown town, KonquestPlayer player, KonquestKingdom kingdom) {
 		super(konquest, town);
 		this.player = player;

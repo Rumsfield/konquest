@@ -24,6 +24,13 @@ public class KonquestPlayerCombatTagEvent extends KonquestPlayerEvent implements
 	private KonquestPlayer attacker;
 	private Location location;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param player The player
+	 * @param attacker The attacking player
+	 * @param location The location
+	 */
 	public KonquestPlayerCombatTagEvent(KonquestAPI konquest, KonquestPlayer player, KonquestPlayer attacker, Location location) {
 		super(konquest, player);
 		this.isCancelled = false;

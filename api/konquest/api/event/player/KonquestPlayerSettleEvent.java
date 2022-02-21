@@ -25,6 +25,14 @@ public class KonquestPlayerSettleEvent extends KonquestPlayerEvent implements Ca
 	private Location location;
 	private String name;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param player The player
+	 * @param kingdom The kingdom
+	 * @param location The location
+	 * @param name The name of the town
+	 */
 	public KonquestPlayerSettleEvent(KonquestAPI konquest, KonquestPlayer player, KonquestKingdom kingdom, Location location, String name) {
 		super(konquest, player);
 		this.isCancelled = false;

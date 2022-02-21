@@ -26,6 +26,13 @@ public class KonquestRuinCaptureEvent extends KonquestRuinEvent implements Cance
 	private KonquestPlayer player;
 	private List<? extends KonquestPlayer> rewardPlayers;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param ruin The ruin
+	 * @param player The player
+	 * @param rewardPlayers The players receiving reward
+	 */
 	public KonquestRuinCaptureEvent(KonquestAPI konquest, KonquestRuin ruin, KonquestPlayer player, List<? extends KonquestPlayer> rewardPlayers) {
 		super(konquest, ruin);
 		this.isCancelled = false;

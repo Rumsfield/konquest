@@ -24,6 +24,13 @@ public class KonquestRuinAttackEvent extends KonquestRuinEvent implements Cancel
 	private KonquestPlayer attacker;
 	private Block block;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param ruin The ruin
+	 * @param attacker The attacking player
+	 * @param block The block
+	 */
 	public KonquestRuinAttackEvent(KonquestAPI konquest, KonquestRuin ruin, KonquestPlayer attacker, Block block) {
 		super(konquest, ruin);
 		this.isCancelled = false;

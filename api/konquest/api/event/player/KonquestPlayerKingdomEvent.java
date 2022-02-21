@@ -19,12 +19,12 @@ public class KonquestPlayerKingdomEvent extends KonquestPlayerEvent implements C
 	private boolean isCancelled;
 	
 	/**
-	 * Constructor for a new event
-	 * 
-	 * @param konquest The KonquestAPI instance
-	 * @param newKingdom The kingdom that the player is changing to
-	 * @param exileKingdom The kingdom that the player is leaving
-	 * @param barbarian Is the player becoming a barbarian?
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param player The player
+	 * @param newKingdom The new kingdom
+	 * @param exileKingdom The old kingdom
+	 * @param barbarian Is the player becoming a barbarian
 	 */
 	public KonquestPlayerKingdomEvent(KonquestAPI konquest, KonquestPlayer player, KonquestKingdom newKingdom, KonquestKingdom exileKingdom, boolean barbarian) {
 		super(konquest, player);

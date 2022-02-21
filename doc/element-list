@@ -1,4 +1,9 @@
 konquest.api
 konquest.api.event
+konquest.api.event.camp
+konquest.api.event.player
+konquest.api.event.ruin
+konquest.api.event.territory
+konquest.api.event.town
 konquest.api.manager
 konquest.api.model

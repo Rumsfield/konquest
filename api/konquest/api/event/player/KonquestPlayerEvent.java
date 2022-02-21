@@ -17,6 +17,11 @@ public class KonquestPlayerEvent extends KonquestEvent {
 
 	private KonquestPlayer player;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param player The player
+	 */
 	public KonquestPlayerEvent(KonquestAPI konquest, KonquestPlayer player) {
 		super(konquest);
 		this.player = player;

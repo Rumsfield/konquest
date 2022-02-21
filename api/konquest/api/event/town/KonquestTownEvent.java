@@ -17,6 +17,11 @@ public class KonquestTownEvent extends KonquestEvent {
 
 	private KonquestTown town;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param town The town
+	 */
 	public KonquestTownEvent(KonquestAPI konquest, KonquestTown town) {
 		super(konquest);
 		this.town = town;

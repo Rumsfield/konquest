@@ -26,6 +26,13 @@ public class KonquestTerritoryMoveEvent extends KonquestEvent implements Cancell
 	private KonquestTerritory territoryFrom;
 	private KonquestPlayer player;
 	
+	/**
+	 * Default constructor
+	 * @param konquest The API instance
+	 * @param territoryTo The territory moving to
+	 * @param territoryFrom The territory moving from
+	 * @param player The player
+	 */
 	public KonquestTerritoryMoveEvent(KonquestAPI konquest, KonquestTerritory territoryTo, KonquestTerritory territoryFrom, KonquestPlayer player) {
 		super(konquest);
 		this.isCancelled = false;
