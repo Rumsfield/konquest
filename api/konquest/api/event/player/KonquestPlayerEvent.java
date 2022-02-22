@@ -6,9 +6,6 @@ import konquest.api.model.KonquestPlayer;
 
 /**
  * The base player event.
- * <p>
- * This event is not called by Konquest. Do not listen for it.
- * </p>
  * 
  * @author Rumsfield
  *
