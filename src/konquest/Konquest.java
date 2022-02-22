@@ -72,6 +72,7 @@ import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 import konquest.api.KonquestAPI;
+import konquest.api.event.KonquestEvent;
 import konquest.api.model.KonquestUpgrade;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestGuild;
@@ -1580,6 +1581,19 @@ public class Konquest implements KonquestAPI, Timeable {
     
     public static String getChatMessage() {
     	return chatMessage;
+    }
+    
+    public static void callKonquestEvent(KonquestEvent event) {
+    	if(event != null) {
+	    	try {
+	            Bukkit.getServer().getPluginManager().callEvent(event);
+			} catch(IllegalStateException e) {
+				ChatUtil.printConsoleError("Failed to call Konquest event!");
+				e.printStackTrace();
+			}
+    	} else {
+    		ChatUtil.printDebug("Could not call null Konquest event");
+    	}
     }
 	
 }

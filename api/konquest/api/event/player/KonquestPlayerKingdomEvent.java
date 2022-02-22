@@ -7,7 +7,10 @@ import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestPlayer;
 
 /**
- * Called before the given player has been assigned to the given kingdom (or exiled as barbarian)
+ * Called before the given player has been assigned to the given kingdom (or exiled as barbarian).
+ * <p>
+ * Canceling this event will prevent the player from changing kingdoms.
+ * </p>
  * 
  * @author Rumsfield
  */

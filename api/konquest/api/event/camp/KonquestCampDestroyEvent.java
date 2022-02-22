@@ -11,7 +11,7 @@ import konquest.api.model.KonquestPlayer;
  * Called before a player breaks a camp's bed to destroy it.
  * <p>
  * This event is called when any player breaks the camp's bed, even the camp owner.
- * Cancelling this event will prevent the bed from breaking, and the camp will not be destroyed.
+ * Canceling this event will prevent the bed from breaking, and the camp will not be destroyed.
  * </p>
  * 
  * @author Rumsfield

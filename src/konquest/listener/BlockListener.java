@@ -2,6 +2,7 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.event.camp.KonquestCampDestroyEvent;
 import konquest.api.event.town.KonquestMonumentDamageEvent;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestUpgrade;
@@ -338,6 +339,14 @@ public class BlockListener implements Listener {
 					
 					// Remove the camp if a bed is broken within it
 					if(event.getBlock().getBlockData() instanceof Bed) {
+						// Fire event
+						KonquestCampDestroyEvent invokeEvent = new KonquestCampDestroyEvent(konquest, camp, player, event.getBlock().getLocation());
+						Konquest.callKonquestEvent(invokeEvent);
+						// Check for cancelled
+						if(invokeEvent.isCancelled()) {
+							event.setCancelled(true);
+							return;
+						}
 						campManager.removeCamp(camp.getOwner().getUniqueId().toString());
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), "Destroyed "+camp.getName()+"!");
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY.getMessage(camp.getName()));
@@ -689,7 +698,7 @@ public class BlockListener implements Listener {
 			if(!player.isAdminBypassActive()) {
 				// Check if the player is a barbarian placing a bed
 				if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed) {
-					int status = campManager.addCamp(event.getBlock().getLocation(), (KonOfflinePlayer)player);
+					int status = campManager.addCampForPlayer(event.getBlock().getLocation(), player);
 					if(status == 0) { // on successful camp setup...
 						player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
 						//ChatUtil.sendNotice(event.getPlayer(), "Successfully set up camp");

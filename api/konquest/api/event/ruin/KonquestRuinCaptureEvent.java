@@ -13,7 +13,7 @@ import konquest.api.model.KonquestRuin;
  * <p>
  * Players capture ruins by breaking all critical blocks inside.
  * When the final critical block is broken, all players located inside of the ruin receive a reward.
- * Cancelling this event will stop the final critical block break and prevent the ruin from being captured.
+ * Canceling this event will stop the final critical block break and prevent the ruin from being captured.
  * </p>
  * 
  * @author Rumsfield

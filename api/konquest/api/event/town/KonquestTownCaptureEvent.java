@@ -11,7 +11,7 @@ import konquest.api.model.KonquestTown;
  * Called before an enemy player captures a town for their own kingdom.
  * <p>
  * Players capture towns for their kingdoms when they destroy the final critical block in the town monument.
- * Cancelling this event will stop the final critical block break and prevent the town from being captured.
+ * Canceling this event will stop the final critical block break and prevent the town from being captured.
  * </p>
  * 
  * @author Rumsfield

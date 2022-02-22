@@ -9,7 +9,7 @@ import konquest.api.model.KonquestPlayer;
 /**
  * Called before a barbarian player places a bed in the wild to create their camp.
  * <p>
- * Cancelling this event will prevent the camp creation and bed block placement.
+ * Canceling this event will prevent the camp creation and bed block placement.
  * </p>
  * 
  * @author Rumsfield

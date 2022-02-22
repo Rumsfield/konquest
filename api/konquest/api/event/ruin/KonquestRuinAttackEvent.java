@@ -11,7 +11,7 @@ import konquest.api.model.KonquestRuin;
  * Called when a player breaks a critical block within a ruin.
  * <p>
  * Players can only break critical blocks inside of ruins.
- * Cancelling this event prevents the block from braking.
+ * Canceling this event prevents the block from braking.
  * </p>
  * 
  * @author Rumsfield

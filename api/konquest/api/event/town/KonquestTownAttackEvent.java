@@ -11,7 +11,7 @@ import konquest.api.model.KonquestTown;
  * Called when an enemy player breaks a block within a town.
  * <p>
  * This event occurs for all blocks broken inside town land, including inside of the monument and for critical blocks.
- * Cancelling this event prevents the block from braking.
+ * Canceling this event prevents the block from braking.
  * </p>
  * 
  * @author Rumsfield

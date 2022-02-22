@@ -11,7 +11,7 @@ import konquest.api.model.KonquestPlayer;
  * <p>
  * Attacking another player causes the victim to become combat tagged.
  * A player that is combat tagged is restricted from using a list of commands from the Konquest configuration.
- * Cancelling this event will prevent the victim from becoming combat tagged.
+ * Canceling this event will prevent the victim from becoming combat tagged.
  * </p>
  * 
  * @author Rumsfield

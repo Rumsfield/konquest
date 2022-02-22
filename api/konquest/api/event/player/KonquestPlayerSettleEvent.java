@@ -11,7 +11,7 @@ import konquest.api.model.KonquestPlayer;
  * Called before a player settles a new town using the "/k settle" command.
  * <p>
  * This event is called before the town is created.
- * Cancelling this event will prevent the town from being settled.
+ * Canceling this event will prevent the town from being settled.
  * </p>
  * 
  * @author Rumsfield

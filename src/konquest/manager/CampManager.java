@@ -20,12 +20,14 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.event.camp.KonquestCampCreateEvent;
 import konquest.api.manager.KonquestCampManager;
 import konquest.api.model.KonquestCamp;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.model.KonCamp;
 import konquest.model.KonCampGroup;
 import konquest.model.KonOfflinePlayer;
+import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
@@ -133,6 +135,19 @@ public class CampManager implements KonquestCampManager {
 			return 2;
 		}
 		return 0;
+	}
+	
+	public int addCampForPlayer(Location loc, KonPlayer player) {
+		int result = addCamp(loc, player);
+		if(result == 0) {
+			KonCamp newCamp = getCamp(player);
+			if(newCamp != null && player != null) {
+				// Fire event
+				KonquestCampCreateEvent invokeEvent = new KonquestCampCreateEvent(konquest, newCamp, player);
+				Konquest.callKonquestEvent(invokeEvent);
+			}
+		}
+		return result;
 	}
 	
 	public boolean removeCamp(KonquestOfflinePlayer player) {
