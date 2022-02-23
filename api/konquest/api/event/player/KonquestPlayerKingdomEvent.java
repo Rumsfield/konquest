@@ -7,7 +7,7 @@ import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestPlayer;
 
 /**
- * Called before the given player has been assigned to the given kingdom (or exiled as barbarian).
+ * Called before the given player has been assigned to the given kingdom.
  * <p>
  * Canceling this event will prevent the player from changing kingdoms.
  * </p>
@@ -17,8 +17,7 @@ import konquest.api.model.KonquestPlayer;
 public class KonquestPlayerKingdomEvent extends KonquestPlayerEvent implements Cancellable {
 
 	private KonquestKingdom newKingdom;
-	private KonquestKingdom exileKingdom;
-	private boolean barbarian;
+	private KonquestKingdom oldKingdom;
 	private boolean isCancelled;
 	
 	/**
@@ -29,39 +28,29 @@ public class KonquestPlayerKingdomEvent extends KonquestPlayerEvent implements C
 	 * @param exileKingdom The old kingdom
 	 * @param barbarian Is the player becoming a barbarian
 	 */
-	public KonquestPlayerKingdomEvent(KonquestAPI konquest, KonquestPlayer player, KonquestKingdom newKingdom, KonquestKingdom exileKingdom, boolean barbarian) {
+	public KonquestPlayerKingdomEvent(KonquestAPI konquest, KonquestPlayer player, KonquestKingdom newKingdom, KonquestKingdom oldKingdom) {
 		super(konquest, player);
 		this.newKingdom = newKingdom;
-		this.exileKingdom = exileKingdom;
-		this.barbarian = barbarian;
+		this.oldKingdom = oldKingdom;
 		this.isCancelled = false;
 	}
 	
 	/**
-	 * Get the kingdom that the player is changing to
+	 * Gets the kingdom that the player is changing to
 	 * 
 	 * @return The new kingdom
 	 */
-	public KonquestKingdom getKingdom() {
+	public KonquestKingdom getNewKingdom() {
 		return newKingdom;
 	}
 	
 	/**
-	 * Get the kingdom that the player is leaving
+	 * Gets the kingdom that the player is leaving
 	 * 
 	 * @return The old kingdom
 	 */
-	public KonquestKingdom getExile() {
-		return exileKingdom;
-	}
-	
-	/**
-	 * Get whether the player is becoming a barbarian or not
-	 * 
-	 * @return True when the player is becoming a barbarian, else false
-	 */
-	public boolean isBarbarian() {
-		return barbarian;
+	public KonquestKingdom getOldKingdom() {
+		return oldKingdom;
 	}
 
 	@Override

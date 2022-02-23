@@ -33,6 +33,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.event.player.KonquestPlayerExileEvent;
 import konquest.api.event.player.KonquestPlayerKingdomEvent;
 import konquest.api.manager.KonquestKingdomManager;
 import konquest.api.model.KonquestUpgrade;
@@ -202,10 +203,8 @@ public class KingdomManager implements KonquestKingdomManager {
 					(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
 				KonKingdom assignedKingdom = getKingdom(kingdomName);
 				// Fire event
-				KonquestPlayerKingdomEvent invokeEvent = new KonquestPlayerKingdomEvent(konquest, player, assignedKingdom, player.getExileKingdom(), false);
-                if(invokeEvent != null) {
-                	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
-                }
+				KonquestPlayerKingdomEvent invokeEvent = new KonquestPlayerKingdomEvent(konquest, player, assignedKingdom, player.getExileKingdom());
+				Konquest.callKonquestEvent(invokeEvent);
 				if(invokeEvent.isCancelled()) {
 					return 4;
 				}
@@ -263,10 +262,8 @@ public class KingdomManager implements KonquestKingdomManager {
     	}
     	KonKingdom oldKingdom = player.getKingdom();
     	// Fire event
-		KonquestPlayerKingdomEvent invokeEvent = new KonquestPlayerKingdomEvent(konquest, player, getBarbarians(), oldKingdom, true);
-        if(invokeEvent != null) {
-        	Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
-        }
+		KonquestPlayerExileEvent invokeEvent = new KonquestPlayerExileEvent(konquest, player, oldKingdom);
+		Konquest.callKonquestEvent(invokeEvent);
 		if(invokeEvent.isCancelled()) {
 			return false;
 		}
@@ -339,6 +336,12 @@ public class KingdomManager implements KonquestKingdomManager {
     		return;
     	}
     	KonKingdom oldKingdom = offlinePlayer.getKingdom();
+    	// Fire event
+    	KonquestPlayerExileEvent invokeEvent = new KonquestPlayerExileEvent(konquest, offlinePlayer, oldKingdom);
+		Konquest.callKonquestEvent(invokeEvent);
+		if(invokeEvent.isCancelled()) {
+			return;
+		}
     	offlinePlayer.setExileKingdom(oldKingdom);
     	// Remove guild
     	konquest.getGuildManager().removePlayerGuild(offlinePlayer.getOfflineBukkitPlayer());

@@ -2,6 +2,7 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.event.player.KonquestPlayerCombatTagEvent;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestUpgrade;
 import konquest.manager.KingdomManager;
@@ -659,17 +660,23 @@ public class EntityListener implements Listener {
             	int combatTagCooldownSeconds = konquest.getConfigManager().getConfig("core").getInt("core.combat.enemy_damage_cooldown_seconds",0);
             	boolean combatTagEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.combat.prevent_command_on_damage",false);
             	if(combatTagEnabled && combatTagCooldownSeconds > 0) {
-            		// Notify player when tag is new
-            		if(!victimPlayer.isCombatTagged()) {
-            			ChatUtil.sendKonPriorityTitle(victimPlayer, "", ChatColor.GOLD+MessagePath.PROTECTION_NOTICE_TAGGED.getMessage(), 20, 1, 10);
-                		//ChatUtil.sendNotice(victimBukkitPlayer, "You have been tagged in combat");
-                		ChatUtil.sendNotice(victimBukkitPlayer, MessagePath.PROTECTION_NOTICE_TAG_MESSAGE.getMessage());
-            		}
-            		victimPlayer.getCombatTagTimer().stopTimer();
-            		victimPlayer.getCombatTagTimer().setTime(combatTagCooldownSeconds);
-            		victimPlayer.getCombatTagTimer().startTimer();
-            		victimPlayer.setIsCombatTagged(true);
-            		//ChatUtil.printDebug("Refreshed combat tag timer for player "+victimBukkitPlayer.getName());
+            		// Fire event
+            		KonquestPlayerCombatTagEvent invokePreEvent = new KonquestPlayerCombatTagEvent(konquest, victimPlayer, attackerPlayer, victimBukkitPlayer.getLocation());
+					Konquest.callKonquestEvent(invokePreEvent);
+					// Check for cancelled
+					if(!invokePreEvent.isCancelled()) {
+						// Notify player when tag is new
+	            		if(!victimPlayer.isCombatTagged()) {
+	            			ChatUtil.sendKonPriorityTitle(victimPlayer, "", ChatColor.GOLD+MessagePath.PROTECTION_NOTICE_TAGGED.getMessage(), 20, 1, 10);
+	                		//ChatUtil.sendNotice(victimBukkitPlayer, "You have been tagged in combat");
+	                		ChatUtil.sendNotice(victimBukkitPlayer, MessagePath.PROTECTION_NOTICE_TAG_MESSAGE.getMessage());
+	            		}
+	            		victimPlayer.getCombatTagTimer().stopTimer();
+	            		victimPlayer.getCombatTagTimer().setTime(combatTagCooldownSeconds);
+	            		victimPlayer.getCombatTagTimer().startTimer();
+	            		victimPlayer.setIsCombatTagged(true);
+	            		//ChatUtil.printDebug("Refreshed combat tag timer for player "+victimBukkitPlayer.getName());
+					}
             	}
             }
             konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.DAMAGE,(int)event.getFinalDamage());

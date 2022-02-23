@@ -29,9 +29,9 @@ public class KonquestPlayerPrefixEvent extends KonquestPlayerEvent {
 	
 	/**
 	 * Gets the current prefix of the player, as shown in chat.
-	 * When isDisabled returns true, no prefix will show in chat, however the prefix will still return a result.
+	 * When isDisabled returns true, no prefix will show in chat, and the prefix will be an empty string.
 	 * 
-	 * @return The prefix
+	 * @return The prefix, or an empty string when disabled
 	 */
 	public String getPrefix() {
 		return prefix;

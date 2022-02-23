@@ -3,6 +3,7 @@ package konquest.listener;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.event.camp.KonquestCampDestroyEvent;
+import konquest.api.event.player.KonquestPlayerCampEvent;
 import konquest.api.event.town.KonquestMonumentDamageEvent;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestUpgrade;
@@ -698,6 +699,14 @@ public class BlockListener implements Listener {
 			if(!player.isAdminBypassActive()) {
 				// Check if the player is a barbarian placing a bed
 				if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed) {
+					// Fire event
+					KonquestPlayerCampEvent invokePreEvent = new KonquestPlayerCampEvent(konquest, player, event.getBlock().getLocation());
+					Konquest.callKonquestEvent(invokePreEvent);
+					// Check for cancelled
+					if(invokePreEvent.isCancelled()) {
+						event.setCancelled(true);
+						return;
+					}
 					int status = campManager.addCampForPlayer(event.getBlock().getLocation(), player);
 					if(status == 0) { // on successful camp setup...
 						player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);

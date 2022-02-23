@@ -2,6 +2,7 @@ package konquest.command;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.event.player.KonquestPlayerSettleEvent;
 import konquest.model.KonDirective;
 import konquest.model.KonPlayer;
 import konquest.model.KonStatsType;
@@ -77,8 +78,16 @@ public class SettleCommand extends CommandBase {
         	String townName = getArgs()[1];
         	
         	if(getKonquest().validateName(townName,bukkitPlayer) != 0) {
+        		// sends player message within the method
         		return;
         	}
+        	// Fire event
+        	KonquestPlayerSettleEvent invokeEvent = new KonquestPlayerSettleEvent(getKonquest(), player, player.getKingdom(), bukkitPlayer.getLocation(), townName);
+			Konquest.callKonquestEvent(invokeEvent);
+			if(invokeEvent.isCancelled()) {
+				return;
+			}
+        	// Add town
         	int settleStatus = getKonquest().getKingdomManager().addTown(bukkitPlayer.getLocation(), townName, player.getKingdom().getName());
         	if(settleStatus == 0) { // on successful settle..
         		KonTown town = player.getKingdom().getTown(townName);
