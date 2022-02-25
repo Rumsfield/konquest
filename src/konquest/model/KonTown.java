@@ -40,7 +40,7 @@ import org.bukkit.potion.PotionEffectType;
  * @author Rumsfield
  * @prerequisites	The Town's Kingdom must have a valid Monument Template
  */
-public class KonTown extends KonTerritory implements KonquestTown, Timeable {
+public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplayer, Timeable {
 	
 	private KonMonument monument;
 	private Timer monumentTimer;
@@ -124,6 +124,15 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 	 */
 	@Override
 	public boolean addChunk(Point point) {
+		boolean testResult = testChunk(point);
+		if(testResult) {
+			addPoint(point);
+		}
+		return testResult;
+	}
+	
+	@Override
+	public boolean testChunk(Point point) {
 		Point centerChunk = Konquest.toPoint(getCenterLoc());
 		int maxChunkRange = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_size");
 		if(maxChunkRange < 0) {
@@ -133,11 +142,10 @@ public class KonTown extends KonTerritory implements KonquestTown, Timeable {
 			int distX = (int)Math.abs(point.getX() - centerChunk.getX());
 			int distY = (int)Math.abs(point.getY() - centerChunk.getY());
 			if(distX > (maxChunkRange-1) || distY > (maxChunkRange-1)) {
-				ChatUtil.printDebug("Failed to add chunk in territory "+getName()+", too far");
+				ChatUtil.printDebug("Failed to test chunk in territory "+getName()+", too far");
 				return false;
 			}
 		}
-		addPoint(point);
 		return true;
 	}
 

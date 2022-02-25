@@ -2,18 +2,12 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.api.event.player.KonquestEnterTerritoryEvent;
-import konquest.api.event.player.KonquestPlayerKingdomEvent;
-import konquest.api.event.town.KonquestMonumentDamageEvent;
+import konquest.api.event.town.KonquestTownMonumentDamageEvent;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
-import konquest.model.KonCamp;
-import konquest.model.KonCapital;
 import konquest.model.KonDirective;
 import konquest.model.KonPlayer;
-import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
-import konquest.model.KonTerritory;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
@@ -24,8 +18,6 @@ import java.util.ArrayList;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Effect;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -43,30 +35,37 @@ public class KonquestListener implements Listener {
 		this.kingdomManager = konquest.getKingdomManager();
 	}
 	
+	// This event handler was removed and is now handled directly from the player move listener.
+	/*
 	@EventHandler(priority = EventPriority.NORMAL)
-    public void onKonquestEnterTerritory(KonquestEnterTerritoryEvent event) {
+    public void onKonquestMoveTerritory(KonquestTerritoryMoveEvent event) {
 		//ChatUtil.printDebug("EVENT: Player "+event.getPlayer().getBukkitPlayer().getDisplayName()+" entered new territory");
 		
 		// Qualify event fields
-		KonPlayer player = null;
-		if(event.getPlayer() instanceof KonPlayer) {
-			player = (KonPlayer)event.getPlayer();
-		} else {
+		if(!(event.getPlayer() instanceof KonPlayer)) {
 			return;
 		}
-		KonTerritory territory = null;
-		if(event.getTerritory() instanceof KonTerritory) {
-			territory = (KonTerritory)event.getTerritory();
-		} else {
+		KonPlayer player = (KonPlayer)event.getPlayer();
+		
+		if(!(event.getTerritoryTo() instanceof KonTerritory)) {
 			return;
 		}
+		KonTerritory territoryTo = (KonTerritory)event.getTerritoryTo();
+		
+		if(!(event.getTerritoryFrom() instanceof KonTerritory)) {
+			return;
+		}
+		KonTerritory territoryFrom = (KonTerritory)event.getTerritoryFrom();
+		
+		// When entering territory
 		
 		// When territory is a capital
-		if(territory instanceof KonCapital) {
+		if(territoryTo != null && territoryTo instanceof KonCapital) {
+			KonCapital capital = (KonCapital) territoryTo;
 			// Optionally prevent players from entering
 			boolean isEnemyAllowedDenied = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_enter");
 			boolean isAdminBypassMode = player.isAdminBypassActive();
-			if(!isAdminBypassMode && isEnemyAllowedDenied && !player.getKingdom().equals(territory.getKingdom())) {
+			if(!isAdminBypassMode && isEnemyAllowedDenied && !player.getKingdom().equals(capital.getKingdom())) {
 				// When Player is in a vehicle, reverse the velocity and eject
 				if(player.getBukkitPlayer().isInsideVehicle()) {
 					Vehicle vehicle = (Vehicle) player.getBukkitPlayer().getVehicle();
@@ -85,12 +84,12 @@ public class KonquestListener implements Listener {
 		}
 		
 		// When territory is a town
-		if(territory instanceof KonTown) {
-			KonTown town = (KonTown)territory;
+		if(territoryTo != null && territoryTo instanceof KonTown) {
+			KonTown town = (KonTown)territoryTo;
 
 			// For an enemy player...
 			if(!player.isAdminBypassActive() &&
-					!player.getKingdom().equals(territory.getKingdom()) &&
+					!player.getKingdom().equals(town.getKingdom()) &&
 					!player.getKingdom().isPeaceful() ) {
 				
 				// If the town and enemy guilds share an armistice
@@ -105,34 +104,6 @@ public class KonquestListener implements Listener {
 				// Players entering friendly towns...
 				kingdomManager.clearTownNerf(player);
 			}
-			/*
-			// Attempt to modify town hearts
-			if(!event.getPlayer().isAdminBypassActive()) {
-				kingdomManager.clearTownHearts(event.getPlayer());
-				kingdomManager.applyTownHearts(event.getPlayer(), town);
-			}
-			*/
-			/*
-			if(!event.getPlayer().isAdminBypassActive() && event.getPlayer().getKingdom().equals(event.getTerritory().getKingdom())) {
-				// Apply town hearts
-				kingdomManager.applyTownHearts(event.getPlayer(), town);
-			} else {
-				kingdomManager.clearTownHearts(event.getPlayer());
-			}
-			*/
-			
-			/*
-			// Force all nearby (within 4 chunks of town center) Iron Golems to attack the enemy
-			//TODO Make golems attack nearest enemy?
-			//TODO Add conditions to stop golems from targeting enemies
-			boolean isGolemAttackEnemies = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.golem_attack_enemies");
-			if(isGolemAttackEnemies && !event.getPlayer().getKingdom().equals(event.getTerritory().getKingdom())) {
-				Location centerLoc = event.getTerritory().getCenterLoc();
-				for(Entity e : centerLoc.getWorld().getNearbyEntities(centerLoc,64,64,64,(e) -> e.getType() == EntityType.IRON_GOLEM)) {
-					IronGolem golem = (IronGolem)e;
-					golem.setTarget(event.getPlayer().getBukkitPlayer());
-				}
-			}*/
 		} else {
 			// Territory other than Town
 			kingdomManager.clearTownNerf(player);
@@ -140,8 +111,8 @@ public class KonquestListener implements Listener {
 		}
 		
 		// When territory is a camp
-		if(territory instanceof KonCamp) {
-			KonCamp camp = (KonCamp)territory;
+		if(territoryTo != null && territoryTo instanceof KonCamp) {
+			KonCamp camp = (KonCamp)territoryTo;
 			// Attempt to start a raid alert
 			if(!camp.isRaidAlertDisabled() && !player.isAdminBypassActive() && 
 					!player.getKingdom().isPeaceful()) {
@@ -156,8 +127,8 @@ public class KonquestListener implements Listener {
 					if(playerManager.isOnlinePlayer(bukkitPlayer) && !isMember && !player.getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
 						KonPlayer ownerPlayer = playerManager.getPlayer(bukkitPlayer);
 						//ChatUtil.sendNotice((Player)camp.getOwner(), "Enemy spotted in "+event.getTerritory().getName()+", use \"/k travel camp\" to defend!", ChatColor.DARK_RED);
-						ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_RAID.getMessage(territory.getName(),"camp"),ChatColor.DARK_RED);
-						ChatUtil.sendKonPriorityTitle(ownerPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+territory.getName(), 60, 1, 10);
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_RAID.getMessage(camp.getName(),"camp"),ChatColor.DARK_RED);
+						ChatUtil.sendKonPriorityTitle(ownerPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+camp.getName(), 60, 1, 10);
 						// Start Raid Alert disable timer for target town
 						int raidAlertTimeSeconds = konquest.getConfigManager().getConfig("core").getInt("core.towns.raid_alert_cooldown");
 						ChatUtil.printDebug("Starting raid alert timer for "+raidAlertTimeSeconds+" seconds");
@@ -172,41 +143,33 @@ public class KonquestListener implements Listener {
 		}
 		
 		// When territory is a ruin
-		if(territory instanceof KonRuin) {
-			KonRuin ruin = (KonRuin)territory;
+		if(territoryTo != null && territoryTo instanceof KonRuin) {
+			KonRuin ruin = (KonRuin)territoryTo;
 			// Spawn all ruin golems
 			ruin.spawnAllGolems();
 		}
 	}
+	*/
 	
 	@EventHandler(priority = EventPriority.NORMAL)
-    public void onKonquestMonumentDamage(KonquestMonumentDamageEvent event) {
+    public void onKonquestMonumentDamage(KonquestTownMonumentDamageEvent event) {
 		//ChatUtil.printDebug("EVENT: Monument damaged in town: "+event.getTerritory().getName()+", kingdom: "+event.getTerritory().getKingdom().getName());
 		
 		// Qualify event fields
-		KonPlayer player = null;
-		if(event.getPlayer() instanceof KonPlayer) {
-			player = (KonPlayer)event.getPlayer();
-		} else {
+		if(!(event.getAttacker() instanceof KonPlayer)) {
 			return;
 		}
-		KonTerritory territory = null;
-		if(event.getTerritory() instanceof KonTerritory) {
-			territory = (KonTerritory)event.getTerritory();
-		} else {
+		KonPlayer player = (KonPlayer)event.getAttacker();
+		
+		if(!(event.getTown() instanceof KonTown)) {
 			return;
 		}
-				
-		if(!(territory instanceof KonTown)) {
-			ChatUtil.printDebug("Error in onKonquestMonumentDamage Event Handler, event passed territory that is not a Town");
-			return;
-		}
-		KonTown town = (KonTown) territory;
+		KonTown town = (KonTown)event.getTown();
 		
 		// Evaluate for critical strikes
-		if(event.getBlockEvent().getBlock().getType().equals(konquest.getKingdomManager().getTownCriticalBlock())) {
+		if(event.getBlock().getType().equals(konquest.getKingdomManager().getTownCriticalBlock())) {
 			// Critical block has been destroyed
-			ChatUtil.printDebug("Critical strike on Monument in Town "+territory.getName());
+			ChatUtil.printDebug("Critical strike on Monument in Town "+town.getName());
 			town.getMonument().addCriticalHit();
 			//int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
 			int maxCriticalhits = konquest.getKingdomManager().getMaxCriticalHits();
@@ -218,7 +181,7 @@ public class KonquestListener implements Listener {
 			// Evaluate town capture conditions
 			if(town.getMonument().getCriticalHits() >= maxCriticalhits) {
 				// The Town is at critical max, conquer or destroy
-				if(event.getPlayer().isBarbarian()) {
+				if(player.isBarbarian()) {
 					// Destroy the town when the enemy is a barbarian
 					String townName = town.getName();
 					ArrayList<KonPlayer> monumentPlayers = new ArrayList<KonPlayer>();
@@ -231,9 +194,9 @@ public class KonquestListener implements Listener {
 							townLocPlayers.add(onlinePlayer);
 						}
 					}
-					int x = territory.getCenterLoc().getBlockX();
-					int y = territory.getCenterLoc().getBlockY();
-					int z = territory.getCenterLoc().getBlockZ();
+					int x = town.getCenterLoc().getBlockX();
+					int y = town.getCenterLoc().getBlockY();
+					int z = town.getCenterLoc().getBlockZ();
 					Timer townMonumentTimer = town.getMonumentTimer();
 					if(kingdomManager.removeTown(town.getName(), town.getKingdom().getName())) {
 						// Town is removed, no longer exists
@@ -255,7 +218,7 @@ public class KonquestListener implements Listener {
 						// Broadcast to Dynmap
 						konquest.getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_RAZE.getMessage(townName)+" ("+x+","+y+","+z+")");
 					} else {
-						ChatUtil.printDebug("Problem destroying Town "+territory.getName()+" in Kingdom "+territory.getKingdom().getName()+" for a barbarian raider "+player.getBukkitPlayer().getName());
+						ChatUtil.printDebug("Problem destroying Town "+town.getName()+" in Kingdom "+town.getKingdom().getName()+" for a barbarian raider "+player.getBukkitPlayer().getName());
 					}
 					// Stop the town monument timer
 					ChatUtil.printDebug("Stopping monument timer with taskID "+townMonumentTimer.getTaskID());
@@ -264,11 +227,11 @@ public class KonquestListener implements Listener {
 					// Conquer the town for the enemy player's kingdom
 					if(kingdomManager.captureTownForPlayer(town.getName(), town.getKingdom().getName(), player)) {
 						// Alert all players of original Kingdom
-						for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(territory.getKingdom().getName())) {
+						for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
 							//ChatUtil.sendNotice(player.getBukkitPlayer(), "The Town "+event.getTerritory().getName()+" has been conquered!", ChatColor.DARK_RED);
-							ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(territory.getName()), ChatColor.DARK_RED);
+							ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(town.getName()), ChatColor.DARK_RED);
 						}
-						ChatUtil.printDebug("Monument conversion in Town "+territory.getName());
+						ChatUtil.printDebug("Monument conversion in Town "+town.getName());
 						//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "You have conquered "+town.getName()+" for the conquest of "+event.getPlayer().getKingdom().getName()+"!");
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAPTURE.getMessage(town.getName(),player.getKingdom().getName()));
 						// Start Capture disable timer for target town
@@ -304,12 +267,12 @@ public class KonquestListener implements Listener {
 						// Update stat
 						konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CAPTURES,1);
 						// Broadcast to Dynmap
-						int x = territory.getCenterLoc().getBlockX();
-						int y = territory.getCenterLoc().getBlockY();
-						int z = territory.getCenterLoc().getBlockZ();
-						konquest.getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(territory.getName())+" ("+x+","+y+","+z+")");
+						int x = town.getCenterLoc().getBlockX();
+						int y = town.getCenterLoc().getBlockY();
+						int z = town.getCenterLoc().getBlockZ();
+						konquest.getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(town.getName())+" ("+x+","+y+","+z+")");
 					} else {
-						ChatUtil.printDebug("Problem converting Town "+territory.getName()+" from Kingdom "+territory.getKingdom().getName()+" to "+player.getKingdom().getName());
+						ChatUtil.printDebug("Problem converting Town "+town.getName()+" from Kingdom "+town.getKingdom().getName()+" to "+player.getKingdom().getName());
 						// If, for example, a player in the Barbarians default kingdom captured the monument
 						town.refreshMonument();
 					}
@@ -332,42 +295,29 @@ public class KonquestListener implements Listener {
 				
 				// Alert all players of enemy Kingdom when the first critical block is broken
 				if(town.getMonument().getCriticalHits() == 1) {
-					for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(territory.getKingdom().getName())) {
-						ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+territory.getName(), 60, 1, 10);
-						ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_1.getMessage(territory.getName(),territory.getName(),defendReward),ChatColor.DARK_RED);
+					for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+						ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
+						ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_1.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
 					}
 				}
 				
 				// Alert all players of enemy Kingdom when half of critical blocks are broken
 				if(town.getMonument().getCriticalHits() == maxCriticalhits/2) {
-					for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(territory.getKingdom().getName())) {
-						ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+territory.getName(), 60, 1, 10);
-						ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_2.getMessage(territory.getName(),territory.getName(),defendReward),ChatColor.DARK_RED);
+					for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+						ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
+						ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_2.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
 					}
 				}
 				
 				// Alert all players of enemy Kingdom when all but 1 critical blocks are broken
 				if(town.getMonument().getCriticalHits() == maxCriticalhits-1) {
-					for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(territory.getKingdom().getName())) {
-						ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+territory.getName(), 60, 1, 10);
-						ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_3.getMessage(territory.getName(),territory.getName(),defendReward),ChatColor.DARK_RED);
+					for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+						ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
+						ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_3.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
 					}
 				}
 			}
 		}
-	}
-	
-	/*
-	 * General Konquest Events
-	 */
-	
-	/**
-	 * Handles when a player is assigned to a kingdom or becomes a barbarian
-	 * @param event
-	 */
-	@EventHandler(priority = EventPriority.NORMAL)
-    public void onKingdomChange(KonquestPlayerKingdomEvent event) {
-		//TODO: something
 	}
 	
 }

@@ -4,7 +4,8 @@ import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.event.camp.KonquestCampDestroyEvent;
 import konquest.api.event.player.KonquestPlayerCampEvent;
-import konquest.api.event.town.KonquestMonumentDamageEvent;
+import konquest.api.event.town.KonquestTownAttackEvent;
+import konquest.api.event.town.KonquestTownMonumentDamageEvent;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestUpgrade;
 import konquest.manager.CampManager;
@@ -24,7 +25,6 @@ import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timer;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -244,6 +244,19 @@ public class BlockListener implements Listener {
 							event.setCancelled(true);
 							return;
 						}
+						/* This town can be attacked... */
+						
+						// Event pre-checks
+						boolean isMonument = town.getMonument().isLocInside(breakLoc);
+						boolean isCritical = isMonument && event.getBlock().getType().equals(konquest.getKingdomManager().getTownCriticalBlock());
+						// Fire event
+						KonquestTownAttackEvent invokeEvent = new KonquestTownAttackEvent(konquest, town, player, event.getBlock(), isMonument, isCritical);
+						Konquest.callKonquestEvent(invokeEvent);
+						if(invokeEvent.isCancelled()) {
+							event.setCancelled(true);
+							return;
+						}
+						
 						// Update MonumentBar state
 						town.setAttacked(true);
 						town.updateBar();
@@ -271,9 +284,9 @@ public class BlockListener implements Listener {
 							return;
 						}
 						
-						// If block is inside a monument, throw KonquestMonumentDamageEvent
+						// If block is inside a monument, handle it
 						if(town.isLocInsideCenterChunk(breakLoc)) {
-							if(town.getMonument().isLocInside(breakLoc)) {
+							if(isMonument) {
 								// Prevent monument attack when template is blanking or invalid
 								if(!town.getKingdom().getMonumentTemplate().isValid() || town.getKingdom().isMonumentBlanking()) {
 									ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -290,9 +303,9 @@ public class BlockListener implements Listener {
 								}
 								// Cancel item drops on the broken blocks
 								event.setDropItems(false);
-								// Throw Konquest event
-								KonquestMonumentDamageEvent invokeEvent = new KonquestMonumentDamageEvent(konquest, player, kingdomManager.getChunkTerritory(breakLoc), event);
-			    	            Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
+								// Throw Konquest event to handle capture behavior
+								KonquestTownMonumentDamageEvent damageEvent = new KonquestTownMonumentDamageEvent(konquest, town, player, event.getBlock());
+			    	            Konquest.callKonquestEvent(damageEvent);
 							} else {
 								// Prevent block breaks in the rest of the chunk
 								//ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot break blocks outside the Monument structure", ChatColor.DARK_RED);

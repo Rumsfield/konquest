@@ -18,7 +18,7 @@ import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
-public class KonCamp extends KonTerritory implements KonquestCamp, Timeable {
+public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplayer, Timeable {
 	
 	private OfflinePlayer owner;
 	private Timer raidAlertTimer;
@@ -66,9 +66,15 @@ public class KonCamp extends KonTerritory implements KonquestCamp, Timeable {
 		return 0;
 	}
 
+	@Override
 	public boolean addChunk(Point point) {
 		//addPoint(getKonquest().toPoint(chunk));
 		addPoint(point);
+		return true;
+	}
+	
+	@Override
+	public boolean testChunk(Point point) {
 		return true;
 	}
 	

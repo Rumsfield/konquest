@@ -24,7 +24,7 @@ import konquest.utility.ChatUtil;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
-public class KonRuin extends KonTerritory implements KonquestRuin, Timeable {
+public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplayer, Timeable {
 
 	private Timer spawnTimer;
 	private Timer captureTimer;
@@ -65,6 +65,11 @@ public class KonRuin extends KonTerritory implements KonquestRuin, Timeable {
 	@Override
 	public boolean addChunk(Point point) {
 		addPoint(point);
+		return true;
+	}
+	
+	@Override
+	public boolean testChunk(Point point) {
 		return true;
 	}
 

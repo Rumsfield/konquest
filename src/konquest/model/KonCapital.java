@@ -14,7 +14,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
-public class KonCapital extends KonTerritory implements KonquestCapital {
+public class KonCapital extends KonTerritory implements KonquestCapital, KonBarDisplayer {
 	
 	private BossBar capitalBarAll;
 	
@@ -36,6 +36,11 @@ public class KonCapital extends KonTerritory implements KonquestCapital {
 	@Override
 	public boolean addChunk(Point point) {
 		addPoint(point);
+		return true;
+	}
+	
+	@Override
+	public boolean testChunk(Point point) {
 		return true;
 	}
 	

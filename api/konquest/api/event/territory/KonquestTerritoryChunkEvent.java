@@ -1,11 +1,14 @@
 package konquest.api.event.territory;
 
-import org.bukkit.Chunk;
+import java.awt.Point;
+import java.util.Set;
+
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.event.Cancellable;
 
 import konquest.api.KonquestAPI;
 import konquest.api.event.KonquestEvent;
-import konquest.api.model.KonquestPlayer;
 import konquest.api.model.KonquestTerritory;
 
 /**
@@ -24,38 +27,29 @@ public class KonquestTerritoryChunkEvent extends KonquestEvent implements Cancel
 	private boolean isCancelled;
 	
 	private KonquestTerritory territory;
-	private KonquestPlayer player;
-	private Chunk chunk;
+	private Location location;
+	private Set<Point> points;
 	private boolean isClaimed;
 	
 	/**
 	 * Default constructor
 	 * @param konquest The API instance
 	 * @param territory The territory
-	 * @param player The player
-	 * @param chunk The chunk
-	 * @param isClaimed Is the chunk claimed or unclaimed
+	 * @param location The location
+	 * @param points The point(s) of land
+	 * @param isClaimed Are the point(s) claimed or unclaimed
 	 */
-	public KonquestTerritoryChunkEvent(KonquestAPI konquest, KonquestTerritory territory, KonquestPlayer player, Chunk chunk, boolean isClaimed) {
+	public KonquestTerritoryChunkEvent(KonquestAPI konquest, KonquestTerritory territory, Location location, Set<Point> points, boolean isClaimed) {
 		super(konquest);
 		this.isCancelled = false;
 		this.territory = territory;
-		this.player = player;
-		this.chunk = chunk;
+		this.location = location;
+		this.points = points;
 		this.isClaimed = isClaimed;
 	}
 	
 	/**
-	 * Get the player that is modifying the territory.
-	 * 
-	 * @return The player
-	 */
-	public KonquestPlayer getPlayer() {
-		return player;
-	}
-	
-	/**
-	 * Get the territory that is being modified.
+	 * Gets the territory that is being modified.
 	 * 
 	 * @return The territory
 	 */
@@ -64,12 +58,32 @@ public class KonquestTerritoryChunkEvent extends KonquestEvent implements Cancel
 	}
 	
 	/**
-	 * Get the chunk of land that is being modified.
+	 * Gets the location in the chunk of land being modified.
 	 * 
-	 * @return The chunk
+	 * @return The location
 	 */
-	public Chunk getLand() {
-		return chunk;
+	public Location getLocation() {
+		return location;
+	}
+	
+	/**
+	 * Gets the world of the chunk(s) of land being modified.
+	 * This is a convenience method, getting the world from the location.
+	 * 
+	 * @return The world
+	 */
+	public World getWorld() {
+		return location.getWorld();
+	}
+	
+	/**
+	 * Gets the set of points representing land chunks which were modified.
+	 * Each point represents a chunk, in the same world as the location.
+	 * 
+	 * @return The points of land
+	 */
+	public Set<Point> getPoints() {
+		return points;
 	}
 	
 	/**

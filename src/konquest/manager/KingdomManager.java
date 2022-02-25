@@ -35,6 +35,7 @@ import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.event.player.KonquestPlayerExileEvent;
 import konquest.api.event.player.KonquestPlayerKingdomEvent;
+import konquest.api.event.territory.KonquestTerritoryChunkEvent;
 import konquest.api.manager.KonquestKingdomManager;
 import konquest.api.model.KonquestUpgrade;
 import konquest.api.model.KonquestTerritoryType;
@@ -42,6 +43,7 @@ import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestPlayer;
 import konquest.command.TravelCommand.TravelDestination;
 import konquest.display.OptionIcon.optionAction;
+import konquest.model.KonBarDisplayer;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
 import konquest.model.KonDirective;
@@ -606,6 +608,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	 * 			1 - error, no adjacent territory
 	 * 			2 - error, exceeds max distance
 	 * 			3 - error, already claimed
+	 * 			4 - error, cancelled by event
 	 */
 	public int claimChunk(Location loc) {
 		if(isChunkClaimed(loc)) {
@@ -613,29 +616,62 @@ public class KingdomManager implements KonquestKingdomManager {
 		}
 		boolean foundAdjTerr = false;
 		KonTerritory closestAdjTerr = null;
+		KonTerritory currentTerr = null;
 		World claimWorld = loc.getWorld();
+		int searchDist = 0;
+		int minDistance = Integer.MAX_VALUE;
 		for(Point sidePoint : konquest.getSidePoints(loc)) {
 			if(isChunkClaimed(sidePoint,claimWorld)) {
-				if(!foundAdjTerr) {
-					closestAdjTerr = getChunkTerritory(sidePoint,claimWorld);
-					foundAdjTerr = true;
-				} else {
-					//int closestDist = Konquest.distanceInChunks(loc, closestAdjTerr.getCenterLoc());
-					int closestDist = Konquest.chunkDistance(loc, closestAdjTerr.getCenterLoc());
-					//int currentDist = Konquest.distanceInChunks(loc, getChunkTerritory(sideChunk).getCenterLoc());
-					int currentDist = Konquest.chunkDistance(loc, getChunkTerritory(sidePoint,claimWorld).getCenterLoc());
-					if(currentDist != -1 && closestDist != -1 && currentDist < closestDist) {
-						closestAdjTerr = getChunkTerritory(sidePoint,claimWorld);
+				currentTerr = getChunkTerritory(sidePoint,claimWorld);
+				searchDist = Konquest.chunkDistance(loc, currentTerr.getCenterLoc());
+				if(searchDist != -1) {
+					if(searchDist < minDistance) {
+						minDistance = searchDist;
+						closestAdjTerr = currentTerr;
+						foundAdjTerr = true;
 					}
 				}
+				/*
+				if(!foundAdjTerr) {
+					closestAdjTerr = currentTerr;
+					foundAdjTerr = true;
+				} else {
+					int closestDist = Konquest.chunkDistance(loc, closestAdjTerr.getCenterLoc());
+					int currentDist = Konquest.chunkDistance(loc, currentTerr.getCenterLoc());
+					if(currentDist != -1 && closestDist != -1 && currentDist < closestDist) {
+						closestAdjTerr = currentTerr;
+					}
+				}
+				*/
 			}
 		}
 		if(foundAdjTerr) {
 			Point addPoint = Konquest.toPoint(loc);
-			if(closestAdjTerr.getWorld().equals(loc.getWorld()) && closestAdjTerr.addChunk(addPoint)) {
+			if(closestAdjTerr.getWorld().equals(loc.getWorld()) && closestAdjTerr.testChunk(addPoint)) {
+				// Fire event
+				Set<Point> points = new HashSet<Point>();
+				points.add(addPoint);
+				KonquestTerritoryChunkEvent invokeEvent = new KonquestTerritoryChunkEvent(konquest, closestAdjTerr, loc, points, true);
+				Konquest.callKonquestEvent(invokeEvent);
+				if(invokeEvent.isCancelled()) {
+					return 4;
+				}
+				// Add territory
+				closestAdjTerr.addChunk(addPoint);
 				addTerritory(loc.getWorld(),addPoint,closestAdjTerr);
 				konquest.getMapHandler().drawDynmapUpdateTerritory(closestAdjTerr);
 				konquest.getMapHandler().drawDynmapLabel(closestAdjTerr.getKingdom().getCapital());
+				// Display town info to players in the newly claimed chunk
+	    		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
+	    			if(occupant.getBukkitPlayer().getLocation().getChunk().equals(loc.getChunk())) {
+	    				ChatColor color = konquest.getDisplayKingdomColor(occupant.getKingdom(), closestAdjTerr.getKingdom());
+	    				ChatUtil.sendKonTitle(occupant, "", color+closestAdjTerr.getName());
+	    				if(closestAdjTerr instanceof KonBarDisplayer) {
+	    					((KonBarDisplayer)closestAdjTerr).addBarPlayer(occupant);
+	    				}
+	    				updatePlayerBorderParticles(occupant);
+	    			}
+	    		}
 				return 0;
 			} else {
 				return 2;
@@ -644,6 +680,8 @@ public class KingdomManager implements KonquestKingdomManager {
 		return 1;
 	}
 	
+	// Main method for admins to claim an individual chunk.
+	// Calls event.
 	public void claimForAdmin(Player bukkitPlayer, Location claimLoc) {
     	int claimStatus = claimChunk(claimLoc);
     	switch(claimStatus) {
@@ -665,6 +703,8 @@ public class KingdomManager implements KonquestKingdomManager {
     		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: already claimed.");
     		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_CLAIMED.getMessage());
     		break;
+    	case 4:
+    		break;
     	default:
     		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: unknown.");
     		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(claimStatus));
@@ -672,6 +712,8 @@ public class KingdomManager implements KonquestKingdomManager {
     	}
     }
 	
+	// Main method for players to claim an individual chunk.
+		// Calls event.
 	public boolean claimForPlayer(Player bukkitPlayer, Location claimLoc) {
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
 		World claimWorld = claimLoc.getWorld();
@@ -707,21 +749,6 @@ public class KingdomManager implements KonquestKingdomManager {
     		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage("1",territoryName));
     		konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CLAIM_LAND);
     		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,1);
-    		// Display town info to players in the newly claimed chunk
-    		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
-    			if(occupant.getBukkitPlayer().getLocation().getChunk().equals(claimLoc.getChunk())) {
-    				if(occupant.getKingdom().equals(territory.getKingdom())) {
-    					ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+territoryName);
-    				} else {
-    					ChatUtil.sendKonTitle(player, "", ChatColor.RED+territoryName);
-    				}
-    				if(territory instanceof KonTown) {
-	    				KonTown town = (KonTown) territory;
-	    				town.addBarPlayer(player);
-    				}
-    				updatePlayerBorderParticles(occupant);
-    			}
-    		}
     		break;
     	case 1:
     		//ChatUtil.sendError(bukkitPlayer, "Failed to claim land: No adjacent Town.");
@@ -734,6 +761,8 @@ public class KingdomManager implements KonquestKingdomManager {
     	case 3:
     		//ChatUtil.sendError(bukkitPlayer, "Failed to claim land: Already claimed.");
     		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_CLAIMED.getMessage());
+    		break;
+    	case 4:
     		break;
     	default:
     		//ChatUtil.sendError(bukkitPlayer, "Failed to claim land: Unknown. Contact an Admin!");
@@ -749,38 +778,154 @@ public class KingdomManager implements KonquestKingdomManager {
 		return claimStatus == 0;
 	}
 	
-	public boolean claimRadiusForPlayer(Player bukkitPlayer, Location claimLoc, int radius) {
-		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+	/**
+	 * claimChunkRadius - Primary method for claiming area of chunks for closest adjacent territories
+	 * @return  0 - success
+	 * 			1 - error, no adjacent territory
+	 * 			2 - error, no chunks claimed
+	 * 			4 - error, event cancelled
+	 */
+	public int claimChunkRadius(Location loc, int radius) {
+		World claimWorld = loc.getWorld();
+		
+		// Find adjacent or current territory
+		KonTerritory closestTerritory = getAdjacentTerritory(loc);
+		if(closestTerritory == null || (closestTerritory != null && !closestTerritory.getWorld().equals(claimWorld))) {
+			return 1;
+		}
+		
+    	// Find all unclaimed chunks to claim
+		HashSet<Point> unclaimedChunks = new HashSet<Point>();
+    	for(Point point : konquest.getAreaPoints(loc,radius)) {
+    		if(!isChunkClaimed(point,claimWorld)) {
+    			unclaimedChunks.add(point);
+    		}
+    	}
+    	
+    	// Test chunks
+    	HashSet<Point> claimedChunks = new HashSet<Point>();
+    	for(Point newChunk : unclaimedChunks) {
+			if(closestTerritory.testChunk(newChunk)) {
+				claimedChunks.add(newChunk);
+			}
+		}
+    	
+    	if(claimedChunks.isEmpty()) {
+    		return 2;
+    	} else {
+    		// Fire event
+			Set<Point> points = new HashSet<Point>(claimedChunks);
+			KonquestTerritoryChunkEvent invokeEvent = new KonquestTerritoryChunkEvent(konquest, closestTerritory, loc, points, true);
+			Konquest.callKonquestEvent(invokeEvent);
+			if(invokeEvent.isCancelled()) {
+				return 4;
+			}
+			// Add territory
+			for(Point claimChunk : claimedChunks) {
+				closestTerritory.addChunk(claimChunk);
+				addTerritory(claimWorld,claimChunk,closestTerritory);
+			}
+	    	// Update map render
+			konquest.getMapHandler().drawDynmapUpdateTerritory(closestTerritory);
+			konquest.getMapHandler().drawDynmapLabel(closestTerritory.getKingdom().getCapital());
+			// Display territory info to players in the newly claimed chunks
+			for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
+				if(occupant.getBukkitPlayer().getWorld().equals(claimWorld) && claimedChunks.contains(Konquest.toPoint(occupant.getBukkitPlayer().getLocation()))) {
+					ChatColor color = konquest.getDisplayKingdomColor(occupant.getKingdom(), closestTerritory.getKingdom());
+					ChatUtil.sendKonTitle(occupant, "", color+closestTerritory.getName());
+					if(closestTerritory instanceof KonBarDisplayer) {
+						((KonBarDisplayer)closestTerritory).addBarPlayer(occupant);
+					}
+					updatePlayerBorderParticles(occupant);
+				}
+			}
+    	}
+
+		return 0;
+	}
+	
+	public boolean claimRadiusForAdmin(Player bukkitPlayer, Location claimLoc, int radius) {
 		World claimWorld = claimLoc.getWorld();
-		ArrayList<Point> claimChunks = new ArrayList<Point>();
-		// Verify no surrounding enemy or capital territory
-    	for(Point point : konquest.getAreaPoints(claimLoc,radius+1)) {
+		
+		// Find adjacent or current territory
+		KonTerritory claimTerritory = getAdjacentTerritory(claimLoc);
+		if(claimTerritory == null) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_MISSING.getMessage());
+    		return false;
+		}
+		
+		// Verify no overlapping territories
+		for(Point point : konquest.getAreaPoints(claimLoc,radius+1)) {
     		if(konquest.getKingdomManager().isChunkClaimed(point,claimWorld)) {
-    			if(player != null && !player.getKingdom().equals(konquest.getKingdomManager().getChunkTerritory(point,claimWorld).getKingdom())) {
+    			if(!claimTerritory.getKingdom().equals(getChunkTerritory(point,claimWorld).getKingdom())) {
     				//ChatUtil.sendError(bukkitPlayer, "Too close to enemy territory!");
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
     			}
-    			if(konquest.getKingdomManager().getChunkTerritory(point,claimWorld).getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+    		}
+    	}
+		
+		// Attempt to claim
+    	int preClaimLand = claimTerritory.getChunkPoints().size();
+    	int postClaimLand = preClaimLand;
+    	int claimStatus = claimChunkRadius(claimLoc, radius);
+    	switch(claimStatus) {
+	    	case 0:
+	    		postClaimLand = claimTerritory.getChunkPoints().size();
+	    		int numChunksClaimed = postClaimLand - preClaimLand;
+	    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage(numChunksClaimed,claimTerritory.getName()));
+	    		break;
+	    	case 1:
+	    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: no adjacent territory.");
+	    		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_ADJACENT.getMessage());
+	    		return false;
+	    	case 2:
+	    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: too far from territory center.");
+	    		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_FAR.getMessage());
+	    		return false;
+	    	case 4:
+	    		return false;
+	    	default:
+	    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: unknown error.");
+	    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(claimStatus));
+	    		return false;
+    	}
+		return true;
+	}
+	
+	public boolean claimRadiusForPlayer(Player bukkitPlayer, Location claimLoc, int radius) {
+		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		World claimWorld = claimLoc.getWorld();
+		// Verify no surrounding enemy or capital territory
+    	for(Point point : konquest.getAreaPoints(claimLoc,radius+1)) {
+    		if(konquest.getKingdomManager().isChunkClaimed(point,claimWorld)) {
+    			if(player != null && !player.getKingdom().equals(getChunkTerritory(point,claimWorld).getKingdom())) {
+    				//ChatUtil.sendError(bukkitPlayer, "Too close to enemy territory!");
+    				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
+    				return false;
+    			}
+    			if(getChunkTerritory(point,claimWorld).getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
     				//ChatUtil.sendError(bukkitPlayer, "Too close to the Capital!");
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
     			}
     		}
     	}
-    	// Find all unclaimed chunks around center chunk
-    	for(Point point : konquest.getSurroundingPoints(claimLoc,radius)) {
-    		if(!konquest.getKingdomManager().isChunkClaimed(point,claimWorld)) {
-    			claimChunks.add(point);
+    	// Find adjacent or current territory
+		KonTerritory claimTerritory = getAdjacentTerritory(claimLoc);
+		if(claimTerritory == null) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_MISSING.getMessage());
+    		return false;
+		}
+    	// Find all unclaimed chunks to claim
+		HashSet<Point> toClaimChunks = new HashSet<Point>();
+    	for(Point point : konquest.getAreaPoints(claimLoc,radius)) {
+    		if(!isChunkClaimed(point,claimWorld)) {
+    			toClaimChunks.add(point);
     		}
     	}
-    	int unclaimedChunkAmount = claimChunks.size();
-    	boolean isCenterClaimed = true;
-    	if(!konquest.getKingdomManager().isChunkClaimed(claimLoc)) {
-    		unclaimedChunkAmount++;
-    		isCenterClaimed = false;
-    	}
     	// Ensure player can cover the cost
+    	int unclaimedChunkAmount = toClaimChunks.size();
     	double cost = konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
     	double totalCost = unclaimedChunkAmount * cost;
     	if(KonquestPlugin.getBalance(bukkitPlayer) < totalCost) {
@@ -788,84 +933,40 @@ public class KingdomManager implements KonquestKingdomManager {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(totalCost));
             return false;
 		}
-    	// Ensure the center chunk is claimed
-    	int numChunksClaimed = 0;
-    	if(!isCenterClaimed) {
-    		// Claim the center chunk and do some checks to make sure it succeeded
-    		int claimStatus = claimChunk(claimLoc);
-        	switch(claimStatus) {
-        	case 0:
-        		numChunksClaimed++;
-        		break;
-        	case 1:
-        		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: no adjacent territory.");
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_ADJACENT.getMessage());
-        		return false;
-        	case 2:
-        		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: too far from territory center.");
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_FAR.getMessage());
-        		return false;
-        	case 3:
-        		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: already claimed.");
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_CLAIMED.getMessage());
-        		return false;
-        	default:
-        		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: unknown error.");
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(claimStatus));
-        		return false;
-        	}
+    	// Attempt to claim
+    	int preClaimLand = claimTerritory.getChunkPoints().size();
+    	int postClaimLand = preClaimLand;
+    	int claimStatus = claimChunkRadius(claimLoc, radius);
+    	switch(claimStatus) {
+	    	case 0:
+	    		postClaimLand = claimTerritory.getChunkPoints().size();
+	    		int numChunksClaimed = postClaimLand - preClaimLand;
+	    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage(numChunksClaimed,claimTerritory.getName()));
+	    		konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CLAIM_LAND);
+	    		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,numChunksClaimed);
+	    		// Reduce the player's favor
+	    		if(cost > 0 && numChunksClaimed > 0) {
+	    			double finalCost = numChunksClaimed*cost;
+	    	        if(KonquestPlugin.withdrawPlayer(bukkitPlayer, finalCost)) {
+	    	        	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)finalCost);
+	    	        }
+	    		}
+	    		break;
+	    	case 1:
+	    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: no adjacent territory.");
+	    		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_ADJACENT.getMessage());
+	    		return false;
+	    	case 2:
+	    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: too far from territory center.");
+	    		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_FAR.getMessage());
+	    		return false;
+	    	case 4:
+	    		return false;
+	    	default:
+	    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: unknown error.");
+	    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(claimStatus));
+	    		return false;
     	}
-    	// Use territory of center chunk to claim remaining radius unclaimed chunks
-    	KonTerritory territory = getChunkTerritory(claimLoc);
-    	boolean allChunksAdded = true;
-    	if(territory != null) {
-    		for(Point newChunk : claimChunks) {
-    			if(territory.addChunk(newChunk)) {
-    				addTerritory(claimWorld,newChunk,territory);
-    				numChunksClaimed++;
-    			} else {
-    				allChunksAdded = false;
-    			}
-    		}
-    		if(!allChunksAdded) {
-    			//ChatUtil.sendError(bukkitPlayer, "Failed to claim all land, too far from town center. Claimed "+numChunksClaimed+" chunks.");
-    			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_RADIUS_PARTIAL.getMessage(numChunksClaimed,territory.getName()));
-    		} else {
-    			//ChatUtil.sendNotice(bukkitPlayer, "Successfully claimed "+numChunksClaimed+" chunks of land for Town: "+territory.getName());
-    			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage(numChunksClaimed,territory.getName()));
-    		}
-    		konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CLAIM_LAND);
-    		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,numChunksClaimed);
-    		konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
-    		konquest.getMapHandler().drawDynmapLabel(territory.getKingdom().getCapital());
-    		String territoryName = territory.getName();
-    		// Display town info to players in the newly claimed chunks
-    		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
-    			if(territory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
-    				if(occupant.getKingdom().equals(territory.getKingdom())) {
-    					ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+territoryName);
-    				} else {
-    					ChatUtil.sendKonTitle(player, "", ChatColor.RED+territoryName);
-    				}
-    				if(territory instanceof KonTown) {
-	    				KonTown town = (KonTown) territory;
-	    				town.addBarPlayer(player);
-    				}
-    				updatePlayerBorderParticles(occupant);
-    			}
-    		}
-    	} else {
-    		//ChatUtil.sendError(bukkitPlayer, "Failed to find territory.");
-    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_MISSING.getMessage());
-    		return false;
-    	}
-    	// Reduce the player's favor
-		if(cost > 0 && numChunksClaimed > 0) {
-			double finalCost = numChunksClaimed*cost;
-	        if(KonquestPlugin.withdrawPlayer(bukkitPlayer, finalCost)) {
-	        	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)finalCost);
-	        }
-		}
 		return true;
 	}
 	
@@ -877,6 +978,19 @@ public class KingdomManager implements KonquestKingdomManager {
 	public boolean unclaimChunk(Location loc) {
 		if(isChunkClaimed(loc)) {
 			KonTerritory territory = getChunkTerritory(loc);
+			if(territory.isLocInside(loc)) {
+				// Fire event
+				Set<Point> points = new HashSet<Point>();
+				points.add(Konquest.toPoint(loc));
+				KonquestTerritoryChunkEvent invokeEvent = new KonquestTerritoryChunkEvent(konquest, territory, loc, points, false);
+				Konquest.callKonquestEvent(invokeEvent);
+				if(invokeEvent.isCancelled()) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+			
 			// Pre-removal saves
 			// Player occupants
 			Set<KonPlayer> occupants = new HashSet<KonPlayer>();
@@ -1045,6 +1159,31 @@ public class KingdomManager implements KonquestKingdomManager {
 					if(townDist != -1 && townDist < minDistance) {
 						minDistance = townDist;
 						closestTerritory = town;
+					}
+				}
+			}
+		}
+		return closestTerritory;
+	}
+	
+	public KonTerritory getAdjacentTerritory(Location loc) {
+		// Find adjacent or current territory
+		KonTerritory closestTerritory = null;
+		if(isChunkClaimed(loc)) {
+			closestTerritory = getChunkTerritory(loc);
+		} else {
+			KonTerritory currentTerritory = null;
+			int searchDist = 0;
+			int minDistance = Integer.MAX_VALUE;
+			for(Point areaPoint : konquest.getSidePoints(loc)) {
+				if(isChunkClaimed(areaPoint,loc.getWorld())) {
+					currentTerritory = getChunkTerritory(areaPoint,loc.getWorld());
+					searchDist = Konquest.chunkDistance(loc, currentTerritory.getCenterLoc());
+					if(searchDist != -1) {
+						if(searchDist < minDistance) {
+							minDistance = searchDist;
+							closestTerritory = currentTerritory;
+						}
 					}
 				}
 			}

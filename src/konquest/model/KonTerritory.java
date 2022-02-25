@@ -166,4 +166,6 @@ public abstract class KonTerritory implements KonquestTerritory {
 	
 	public abstract boolean addChunk(Point point);
 	
+	public abstract boolean testChunk(Point point);
+	
 }
