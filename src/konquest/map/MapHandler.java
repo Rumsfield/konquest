@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 import org.dynmap.DynmapAPI;
 import org.dynmap.markers.AreaMarker;
 import org.dynmap.markers.Marker;
@@ -42,14 +43,22 @@ public class MapHandler {
 	}
 	
 	public void initialize() {
-		if (Bukkit.getPluginManager().getPlugin("dynmap") != null) {
-			dapi = (DynmapAPI) Bukkit.getServer().getPluginManager().getPlugin("dynmap");
-			isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.dynmap",false);
-			if(isEnabled) {
-				ChatUtil.printConsoleAlert("Successfully registered Dynmap.");
+		boolean doRegistration = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.dynmap",false);
+		if(doRegistration) {
+			Plugin dynmap = Bukkit.getPluginManager().getPlugin("dynmap");
+			if (dynmap != null && dynmap.isEnabled()) {
+				dapi = (DynmapAPI) Bukkit.getServer().getPluginManager().getPlugin("dynmap");
+				if(dapi != null) {
+					isEnabled = true;
+					ChatUtil.printConsoleAlert("Successfully registered Dynmap.");
+				} else {
+					ChatUtil.printConsoleError("Failed to register Dynmap. Is it disabled?");
+				}
 			} else {
-				ChatUtil.printConsoleAlert("Disabled Dynmap integration from core config settings.");
+				ChatUtil.printConsoleError("Failed to register Dynmap. Is it disabled?");
 			}
+		} else {
+			ChatUtil.printConsoleAlert("Disabled Dynmap integration from core config settings.");
 		}
 	}
 	
