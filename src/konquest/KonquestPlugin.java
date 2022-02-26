@@ -5,7 +5,6 @@ import konquest.listener.BlockListener;
 import konquest.listener.EntityListener;
 import konquest.listener.HangingListener;
 import konquest.listener.InventoryListener;
-import konquest.listener.KonquestListener;
 import konquest.listener.PlayerListener;
 import konquest.listener.WorldListener;
 import konquest.utility.ChatUtil;
@@ -99,7 +98,6 @@ public class KonquestPlugin extends JavaPlugin {
 	
 	private void registerListeners() {
 		pluginManager.registerEvents(new PlayerListener(this), this);
-		pluginManager.registerEvents(new KonquestListener(this), this);
 		pluginManager.registerEvents(new EntityListener(this), this);
 		pluginManager.registerEvents(new BlockListener(this), this);
 		pluginManager.registerEvents(new InventoryListener(this), this);

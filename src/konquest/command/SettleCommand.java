@@ -3,6 +3,7 @@ package konquest.command;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.event.player.KonquestPlayerSettleEvent;
+import konquest.api.event.town.KonquestTownSettleEvent;
 import konquest.model.KonDirective;
 import konquest.model.KonPlayer;
 import konquest.model.KonStatsType;
@@ -81,7 +82,7 @@ public class SettleCommand extends CommandBase {
         		// sends player message within the method
         		return;
         	}
-        	// Fire event
+        	// Fire pre event
         	KonquestPlayerSettleEvent invokeEvent = new KonquestPlayerSettleEvent(getKonquest(), player, player.getKingdom(), bukkitPlayer.getLocation(), townName);
 			Konquest.callKonquestEvent(invokeEvent);
 			if(invokeEvent.isCancelled()) {
@@ -143,6 +144,10 @@ public class SettleCommand extends CommandBase {
         		// Update labels
         		getKonquest().getMapHandler().drawDynmapLabel(town);
         		getKonquest().getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
+        		
+        		// Fire post event
+        		KonquestTownSettleEvent invokePostEvent = new KonquestTownSettleEvent(getKonquest(), town, player, town.getKingdom());
+    			Konquest.callKonquestEvent(invokePostEvent);
         	} else {
         		int distance = 0;
         		switch(settleStatus) {
