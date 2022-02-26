@@ -25,8 +25,7 @@ public class KonquestPlayerKingdomEvent extends KonquestPlayerEvent implements C
 	 * @param konquest The API instance
 	 * @param player The player
 	 * @param newKingdom The new kingdom
-	 * @param exileKingdom The old kingdom
-	 * @param barbarian Is the player becoming a barbarian
+	 * @param oldKingdom The old kingdom
 	 */
 	public KonquestPlayerKingdomEvent(KonquestAPI konquest, KonquestPlayer player, KonquestKingdom newKingdom, KonquestKingdom oldKingdom) {
 		super(konquest, player);

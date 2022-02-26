@@ -10,7 +10,12 @@ import konquest.api.model.KonquestTown;
  * Called before a barbarian player destroys a town by breaking its final critical block.
  * <p>
  * Barbarians can only destroy towns when allowed by the Konquest configuration.
- * Canceling this event will stop the final critical block break and prevent the town from being destroyed.
+ * Canceling this event will prevent the town from being destroyed, but the final critical block will still be broken.
+ * </p>
+ * 
+ * <p>
+ * After this event is cancelled, the town will remain un-destroyed, but all critical blocks will be broken.
+ * The monument will regenerate as normal after enemy players break the most recent monument block.
  * </p>
  * 
  * @author Rumsfield
