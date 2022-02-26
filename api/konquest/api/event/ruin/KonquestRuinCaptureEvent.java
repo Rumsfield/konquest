@@ -9,7 +9,7 @@ import konquest.api.model.KonquestPlayer;
 import konquest.api.model.KonquestRuin;
 
 /**
- * Called before a player captures a ruin.
+ * Called before a player captures a ruin, but after {@link KonquestRuinAttackEvent KonquestRuinAttackEvent}
  * <p>
  * Players capture ruins by breaking all critical blocks inside.
  * When the final critical block is broken, all players located inside of the ruin receive a reward.

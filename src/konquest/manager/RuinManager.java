@@ -1,6 +1,7 @@
 package konquest.manager;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.manager.KonquestRuinManager;
 import konquest.api.model.KonquestRuin;
+import konquest.model.KonKingdom;
 import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
 import konquest.utility.ChatUtil;
@@ -56,25 +58,34 @@ public class RuinManager implements KonquestRuinManager {
 		}
 	}
 	
-	public void rewardPlayers(KonRuin ruin, KonPlayer capturePlayer) {
+	public void rewardPlayers(KonRuin ruin, KonKingdom kingdom) {
 		int rewardFavor = konquest.getConfigManager().getConfig("core").getInt("core.ruins.capture_reward_favor",0);
 		int rewardExp = konquest.getConfigManager().getConfig("core").getInt("core.ruins.capture_reward_exp",0);
-		for(KonPlayer friendly : konquest.getPlayerManager().getPlayersInKingdom(capturePlayer.getKingdom())) {
-			if(isLocInsideRuin(ruin,friendly.getBukkitPlayer().getLocation())) {
-				// Give reward to player
-				if(rewardFavor > 0) {
-					ChatUtil.printDebug("Ruin capture favor rewarded to player "+friendly.getBukkitPlayer().getName());
-		            if(KonquestPlugin.depositPlayer(friendly.getBukkitPlayer(), rewardFavor)) {
-		            	ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_NOTICE_RUIN.getMessage(ruin.getName()));
-		            }
-				}
-				if(rewardExp > 0) {
-					friendly.getBukkitPlayer().giveExp(rewardExp);
-					//ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.WHITE+"EXP rewarded: "+ChatColor.GREEN+rewardExp);
-					ChatUtil.sendNotice(friendly.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REWARD_EXP.getMessage(rewardExp));
-				}
+		for(KonPlayer friendly : getRuinPlayers(ruin,kingdom)) {
+			// Give reward to player
+			if(rewardFavor > 0) {
+				ChatUtil.printDebug("Ruin capture favor rewarded to player "+friendly.getBukkitPlayer().getName());
+	            if(KonquestPlugin.depositPlayer(friendly.getBukkitPlayer(), rewardFavor)) {
+	            	ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_NOTICE_RUIN.getMessage(ruin.getName()));
+	            }
+			}
+			if(rewardExp > 0) {
+				friendly.getBukkitPlayer().giveExp(rewardExp);
+				//ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.WHITE+"EXP rewarded: "+ChatColor.GREEN+rewardExp);
+				ChatUtil.sendNotice(friendly.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REWARD_EXP.getMessage(rewardExp));
 			}
 		}
+	}
+	
+	// returns list of players in kingdom inside ruin
+	public List<KonPlayer> getRuinPlayers(KonRuin ruin, KonKingdom kingdom) {
+		List<KonPlayer> players = new ArrayList<KonPlayer>();
+		for(KonPlayer friendly : konquest.getPlayerManager().getPlayersInKingdom(kingdom)) {
+			if(isLocInsideRuin(ruin,friendly.getBukkitPlayer().getLocation())) {
+				players.add(friendly);
+			}
+		}
+		return players;
 	}
 	
 	public boolean isRuin(String name) {

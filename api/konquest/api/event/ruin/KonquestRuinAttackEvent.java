@@ -8,7 +8,7 @@ import konquest.api.model.KonquestPlayer;
 import konquest.api.model.KonquestRuin;
 
 /**
- * Called when a player breaks a critical block within a ruin.
+ * Called when a player breaks a critical block within a ruin, but before {@link KonquestRuinCaptureEvent KonquestRuinCaptureEvent}
  * <p>
  * Players can only break critical blocks inside of ruins.
  * Canceling this event prevents the block from braking.

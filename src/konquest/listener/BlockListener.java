@@ -4,6 +4,8 @@ import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.event.camp.KonquestCampDestroyEvent;
 import konquest.api.event.player.KonquestPlayerCampEvent;
+import konquest.api.event.ruin.KonquestRuinAttackEvent;
+import konquest.api.event.ruin.KonquestRuinCaptureEvent;
 import konquest.api.event.town.KonquestTownAttackEvent;
 import konquest.api.event.town.KonquestTownMonumentDamageEvent;
 import konquest.api.model.KonquestTerritoryType;
@@ -24,6 +26,8 @@ import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timer;
+
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -386,6 +390,23 @@ public class BlockListener implements Listener {
 					}
 					// Check for broken critical block within this Ruin
 					if(ruin.isCriticalLocation(breakLoc)) {
+						// Fire event for every attack
+						KonquestRuinAttackEvent invokeEvent = new KonquestRuinAttackEvent(konquest, ruin, player, event.getBlock());
+						Konquest.callKonquestEvent(invokeEvent);
+						if(invokeEvent.isCancelled()) {
+							event.setCancelled(true);
+							return;
+						}
+						// Fire event for pre-capture
+						if(ruin.getRemainingCriticalHits() == 0) {
+							List<KonPlayer> rewardPlayers = konquest.getRuinManager().getRuinPlayers(ruin,player.getKingdom());
+							KonquestRuinCaptureEvent invokeEventCapture = new KonquestRuinCaptureEvent(konquest, ruin, player, rewardPlayers);
+							Konquest.callKonquestEvent(invokeEventCapture);
+							if(invokeEventCapture.isCancelled()) {
+								event.setCancelled(true);
+								return;
+							}
+						}
 						// Prevent critical block drop
 						event.setDropItems(false);
 						// Restart capture cooldown timer
@@ -406,7 +427,7 @@ public class BlockListener implements Listener {
 						// Evaluate critical blocks
 						if(ruin.getRemainingCriticalHits() == 0) {
 							ruin.setIsCaptureDisabled(true);
-							konquest.getRuinManager().rewardPlayers(ruin,player);
+							konquest.getRuinManager().rewardPlayers(ruin,player.getKingdom());
 							//ChatUtil.sendNotice(player.getBukkitPlayer(), "Captured Ruin "+ruin.getName());
 						} else {
 							// Force all alive golems to respawn
