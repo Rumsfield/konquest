@@ -447,8 +447,8 @@ public class EntityListener implements Listener {
 	        	
 	        	if(territory instanceof KonCapital) {
 	        		boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
-	        		// Block all entity damage in capitals optionally
-	        		if(!isCapitalUseEnabled) {
+	        		// Block all non-monster entity damage in capitals optionally
+	        		if(!(isCapitalUseEnabled || event.getEntity() instanceof Monster)) {
 		        		ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 		        		event.setCancelled(true);
 						return;
