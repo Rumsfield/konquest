@@ -506,17 +506,32 @@ public class PlayerListener implements Listener{
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerEnterVehicle(VehicleEnterEvent event) {
-    	Entity ent = event.getEntered();
-    	if(ent instanceof Player && konquest.getKingdomManager().isChunkClaimed(event.getVehicle().getLocation())) {
-    		KonPlayer player = konquest.getPlayerManager().getPlayer((Player)ent);
-    		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getVehicle().getLocation());
-    		boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
-    		if(player != null && territory != null && !territory.getKingdom().equals(player.getKingdom()) && 
-    				territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && !isCapitalUseEnabled) {
-    			ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-    			event.setCancelled(true);
-				return;
+    	if(event.isCancelled()) {
+    		// Do nothing if another plugin cancels this event
+    		return;
+    	}
+    	Entity passenger = event.getEntered();
+    	if(passenger instanceof Player) {
+    		Player bukkitPlayer = (Player) passenger;
+    		// Prevent entering vehicles in capitals
+    		if(konquest.getKingdomManager().isChunkClaimed(event.getVehicle().getLocation())) {
+    			KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+        		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getVehicle().getLocation());
+        		if(player != null && territory != null && territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+        			boolean isEnemy = !territory.getKingdom().equals(player.getKingdom());
+        			boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
+        			if(isEnemy || (!isEnemy && !isCapitalUseEnabled)) {
+    	    			ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+    	    			event.setCancelled(true);
+    					return;
+        			}
+        		}
     		}
+    		// General chunk transition handler
+        	boolean status = onPlayerEnterLeaveChunk(event.getVehicle().getLocation(), bukkitPlayer.getLocation(), bukkitPlayer);
+        	if(!status) {
+        		event.setCancelled(true);
+        	}
     	}
     }
     
@@ -808,6 +823,10 @@ public class PlayerListener implements Listener{
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerPortal(PlayerPortalEvent event) {
+    	if(event.isCancelled()) {
+    		// Do nothing if another plugin cancels this event
+    		return;
+    	}
     	Location portalToLoc = event.getTo();
     	// Ensure the portal event is not sending the player to a null location, like if the end is disabled
     	if(portalToLoc != null) {
@@ -846,6 +865,11 @@ public class PlayerListener implements Listener{
 					}
 	    		}
 			}
+	    	// General chunk transition handler
+	    	boolean status = onPlayerEnterLeaveChunk(event.getTo(), event.getFrom(), event.getPlayer());
+	    	if(!status) {
+	    		event.setCancelled(true);
+	    	}
     	}
     }
     
@@ -855,7 +879,15 @@ public class PlayerListener implements Listener{
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerMove(PlayerMoveEvent event) {
-    	onPlayerEnterLeaveChunk(event);
+    	if(event.isCancelled()) {
+    		// Do nothing if another plugin cancels this event
+    		return;
+    	}
+    	// General chunk transition handler
+    	boolean status = onPlayerEnterLeaveChunk(event.getTo(), event.getFrom(), event.getPlayer());
+    	if(!status) {
+    		event.setCancelled(true);
+    	}
     }
     
     /**
@@ -864,6 +896,10 @@ public class PlayerListener implements Listener{
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
+    	if(event.isCancelled()) {
+    		// Do nothing if another plugin cancels this event
+    		return;
+    	}
     	// Check for inter-chunk ender pearl
     	boolean isEnemyPearlBlocked = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_ender_pearl", false);
     	boolean isTerritoryTo = kingdomManager.isChunkClaimed(event.getTo());
@@ -897,35 +933,33 @@ public class PlayerListener implements Listener{
 			}
 		}
 		// General chunk transition handler
-    	onPlayerEnterLeaveChunk(event);
+    	boolean status = onPlayerEnterLeaveChunk(event.getTo(), event.getFrom(), event.getPlayer());
+    	if(!status) {
+    		event.setCancelled(true);
+    	}
     }
     
-    private void onPlayerEnterLeaveChunk(PlayerMoveEvent event) {
+    // Returns false when parent event should be cancelled
+    private boolean onPlayerEnterLeaveChunk(Location moveTo, Location moveFrom, Player movePlayer) {
     	// Evaluate chunk territory transitions only when players move between chunks
-    	if(event.isCancelled()) {
-    		// Do nothing if another plugin cancels this event
-    		return;
-    	}
+    	
     	// Check if player moved between chunks or worlds
-    	if(!event.getTo().getChunk().equals(event.getFrom().getChunk()) || !event.getTo().getWorld().equals(event.getFrom().getWorld())) {
+    	if(!moveTo.getChunk().equals(moveFrom.getChunk()) || !moveTo.getWorld().equals(moveFrom.getWorld())) {
     		
-    		Player bukkitPlayer = event.getPlayer();
-    		if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
+    		if(!konquest.getPlayerManager().isOnlinePlayer(movePlayer)) {
 				//ChatUtil.printDebug("Failed to handle onPlayerEnterLeaveChunk for non-existent player");
-				return;
+				return true;
 			}
-        	KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-        	Location chunkTo = event.getTo();
-    		Location chunkFrom = event.getFrom();
-    		boolean isTerritoryTo = kingdomManager.isChunkClaimed(chunkTo);
-    		boolean isTerritoryFrom = kingdomManager.isChunkClaimed(chunkFrom);
+        	KonPlayer player = playerManager.getPlayer(movePlayer);
+    		boolean isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
+    		boolean isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
     		KonTerritory territoryTo = null;
 			KonTerritory territoryFrom = null;
 			if(isTerritoryTo) {
-				territoryTo = kingdomManager.getChunkTerritory(chunkTo);
+				territoryTo = kingdomManager.getChunkTerritory(moveTo);
 			}
 			if(isTerritoryFrom) {
-				territoryFrom = kingdomManager.getChunkTerritory(chunkFrom);
+				territoryFrom = kingdomManager.getChunkTerritory(moveFrom);
 			}
 			
 			boolean isArmisticeTo = false; // Is the player in an armistice with the to-territory?
@@ -936,8 +970,7 @@ public class PlayerListener implements Listener{
 	    		KonquestTerritoryMoveEvent invokeEvent = new KonquestTerritoryMoveEvent(konquest, territoryTo, territoryFrom, player);
 	    		Konquest.callKonquestEvent(invokeEvent);
 	    		if(invokeEvent.isCancelled()) {
-	    			event.setCancelled(true);
-	    			return;
+	    			return false;
 	    		}
 			}
 			
@@ -950,7 +983,7 @@ public class PlayerListener implements Listener{
 			}
     		
 			// Check world transition
-    		if(event.getTo().getWorld().equals(event.getFrom().getWorld())) {
+    		if(moveTo.getWorld().equals(moveFrom.getWorld())) {
     			// Player moved within the same world
 
         		// Auto map
@@ -959,7 +992,7 @@ public class PlayerListener implements Listener{
         			Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
         	            @Override
         	            public void run() {
-        	            	kingdomManager.printPlayerMap(player, KingdomManager.DEFAULT_MAP_SIZE, event.getTo());
+        	            	kingdomManager.printPlayerMap(player, KingdomManager.DEFAULT_MAP_SIZE, moveTo);
         	            }
         	        },1);
         		}
@@ -968,28 +1001,28 @@ public class PlayerListener implements Listener{
         		if(!isTerritoryTo) {
         			if(player.isAdminClaimingFollow()) {
         				// Admin claiming takes priority
-        				kingdomManager.claimForAdmin(bukkitPlayer, event.getTo());
+        				kingdomManager.claimForAdmin(movePlayer, moveTo);
         				// Update territory variables for chunk boundary checks below
-        				isTerritoryTo = kingdomManager.isChunkClaimed(chunkTo);
-        				isTerritoryFrom = kingdomManager.isChunkClaimed(chunkFrom);
+        				isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
+        				isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
         			} else if(player.isClaimingFollow()) {
         				// Player is claim following
-        				boolean isClaimSuccess = kingdomManager.claimForPlayer(bukkitPlayer, event.getTo());
+        				boolean isClaimSuccess = kingdomManager.claimForPlayer(movePlayer, moveTo);
             			if(!isClaimSuccess) {
             				player.setIsClaimingFollow(false);
             				//ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
-            				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
+            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
             			} else {
             				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_CLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
             			}
             			// Update territory variables for chunk boundary checks below
-        				isTerritoryTo = kingdomManager.isChunkClaimed(chunkTo);
-        				isTerritoryFrom = kingdomManager.isChunkClaimed(chunkFrom);
+        				isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
+        				isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
         			}
         		}
         		
         		// Border particle update
-        		kingdomManager.updatePlayerBorderParticles(player,event.getTo());
+        		kingdomManager.updatePlayerBorderParticles(player,moveTo);
         		
         		// Chunk transition checks
         		if(!isTerritoryTo && isTerritoryFrom) { // When moving into the wild
@@ -1013,10 +1046,9 @@ public class PlayerListener implements Listener{
 	    			ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
 	    			
 	    			// Do things appropriate to the type of territory
-	    			boolean allowEntry = onEnterTerritory(territoryTo,chunkTo,chunkFrom,player,isArmisticeTo);
+	    			boolean allowEntry = onEnterTerritory(territoryTo,moveTo,moveFrom,player,isArmisticeTo);
 	    			if(!allowEntry) {
-	    				event.setCancelled(true);
-	    				return;
+	    				return false;
 	    			}
 	    			
 	    			// Try to stop fly disable warmup, or disable immediately
@@ -1037,10 +1069,9 @@ public class PlayerListener implements Listener{
     	    			// Exit Territory
             			onExitTerritory(territoryFrom,player,isArmisticeFrom);
             			// Entry Territory
-    	    			boolean allowEntry = onEnterTerritory(territoryTo,chunkTo,chunkFrom,player,isArmisticeTo);
+    	    			boolean allowEntry = onEnterTerritory(territoryTo,moveTo,moveFrom,player,isArmisticeTo);
     	    			if(!allowEntry) {
-    	    				event.setCancelled(true);
-    	    				return;
+    	    				return false;
     	    			}
     	    			
     	            	// Try to stop or start fly disable warmup
@@ -1063,7 +1094,7 @@ public class PlayerListener implements Listener{
         					} else {
         						// Friendly player
         						// Display plot message to friendly players
-        						displayPlotMessage(town, chunkTo, chunkFrom, player);
+        						displayPlotMessage(town, moveTo, moveFrom, player);
         					}
     					}
         			}
@@ -1078,12 +1109,12 @@ public class PlayerListener implements Listener{
     			if(player.isAdminClaimingFollow()) {
     				player.setIsAdminClaimingFollow(false);
     				//ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
-    				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
+    				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
     			}
     			if(player.isClaimingFollow()) {
     				player.setIsClaimingFollow(false);
     				//ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
-    				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
+    				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
     			}
     			if(player.isMapAuto()) {
     				player.setIsMapAuto(false);
@@ -1093,7 +1124,7 @@ public class PlayerListener implements Listener{
     			player.setIsFlyEnabled(false);
     			
     			// Border particle update
-        		kingdomManager.updatePlayerBorderParticles(player,event.getTo());
+        		kingdomManager.updatePlayerBorderParticles(player,moveTo);
         		
     			if(isTerritoryFrom) {
     				onExitTerritory(territoryFrom,player,isArmisticeFrom);
@@ -1108,14 +1139,14 @@ public class PlayerListener implements Listener{
 	    			String territoryName = territoryTo.getName();
 	    			ChatUtil.sendKonTitle(player, "", color+territoryName);
 	    			// Do things appropriate to the type of territory
-	    			boolean allowEntry = onEnterTerritory(territoryTo,chunkTo,chunkFrom,player,isArmisticeTo);
+	    			boolean allowEntry = onEnterTerritory(territoryTo,moveTo,moveFrom,player,isArmisticeTo);
 	    			if(!allowEntry) {
-	    				event.setCancelled(true);
-	    				return;
+	    				return false;
 	    			}
     			}
     		}
     	}
+    	return true;
     }
     
     // Return true to allow entry, else false to deny entry
