@@ -393,16 +393,16 @@ public class MapHandler {
 				int numSpawns = ruin.getSpawnLocations().size();
 				result = "<p>"+
 						"<b>"+ruin.getName() + "</b><br>" +
-						MessagePath.LABEL_RUIN.getMessage() + "<br>" +
-						MessagePath.LABEL_CRITICAL_HITS.getMessage() + ": " + numCriticals + "<br>" +
-						MessagePath.LABEL_GOLEM_SPAWNS.getMessage() + ": " + numSpawns + "<br>" +
+						MessagePath.MAP_RUIN.getMessage() + "<br>" +
+						MessagePath.MAP_CRITICAL_HITS.getMessage() + ": " + numCriticals + "<br>" +
+						MessagePath.MAP_GOLEM_SPAWNS.getMessage() + ": " + numSpawns + "<br>" +
 						"</p>";
 				break;
 			case CAMP:
 				KonCamp camp = (KonCamp)territory;
 				result = "<p>"+
 						"<b>"+camp.getName() + "</b><br>" +
-						MessagePath.LABEL_BARBARIANS.getMessage() + "<br>" +
+						MessagePath.MAP_BARBARIANS.getMessage() + "<br>" +
 						"</p>";
 				break;
 			case CAPITAL:
@@ -415,10 +415,10 @@ public class MapHandler {
 				int numAllKingdomPlayers = konquest.getPlayerManager().getAllPlayersInKingdom(territory.getKingdom()).size();
 				result = "<p>"+
 						"<b>"+capital.getName() + "</b><br>" +
-						MessagePath.LABEL_KINGDOM.getMessage() + ": " + capital.getKingdom().getName() + "<br>" +
-						MessagePath.LABEL_TOWNS.getMessage() + ": " + numKingdomTowns + "<br>" +
-						MessagePath.LABEL_LAND.getMessage() + ": " + numKingdomLand + "<br>" +
-						MessagePath.LABEL_PLAYERS.getMessage() + ": " + numAllKingdomPlayers + "<br>" +
+						MessagePath.MAP_KINGDOM.getMessage() + ": " + capital.getKingdom().getName() + "<br>" +
+						MessagePath.MAP_TOWNS.getMessage() + ": " + numKingdomTowns + "<br>" +
+						MessagePath.MAP_LAND.getMessage() + ": " + numKingdomLand + "<br>" +
+						MessagePath.MAP_PLAYERS.getMessage() + ": " + numAllKingdomPlayers + "<br>" +
 						"</p>";
 				break;
 			case TOWN:
@@ -429,10 +429,10 @@ public class MapHandler {
 				}
 				result = "<p>"+
 						"<b>"+town.getName() + "</b><br>" +
-						MessagePath.LABEL_KINGDOM.getMessage() + ": " + town.getKingdom().getName() + "<br>" +
-						MessagePath.LABEL_LORD.getMessage() + ": " + lordName + "<br>" +
-						MessagePath.LABEL_LAND.getMessage() + ": " + town.getChunkList().size() + "<br>" +
-						MessagePath.LABEL_POPULATION.getMessage() + ": " + town.getNumResidents() + "<br>" +
+						MessagePath.MAP_KINGDOM.getMessage() + ": " + town.getKingdom().getName() + "<br>" +
+						MessagePath.MAP_LORD.getMessage() + ": " + lordName + "<br>" +
+						MessagePath.MAP_LAND.getMessage() + ": " + town.getChunkList().size() + "<br>" +
+						MessagePath.MAP_POPULATION.getMessage() + ": " + town.getNumResidents() + "<br>" +
 						"</p>";
 				break;
 			default:
@@ -531,10 +531,10 @@ public class MapHandler {
 		String result = "Konquest";
 		switch (territory.getTerritoryType()) {
 			case RUIN:
-				result = MessagePath.LABEL_RUIN.getMessage()+" "+territory.getName();
+				result = MessagePath.MAP_RUIN.getMessage()+" "+territory.getName();
 				break;
 			case CAMP:
-				result = MessagePath.LABEL_BARBARIAN.getMessage()+" "+territory.getName();
+				result = MessagePath.MAP_BARBARIAN.getMessage()+" "+territory.getName();
 				break;
 			case CAPITAL:
 				result = territory.getKingdom().getCapital().getName();

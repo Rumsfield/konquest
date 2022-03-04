@@ -54,7 +54,6 @@ public enum MessagePath {
 	LABEL_ARMORS                            	(0, "label.armors"),
 	LABEL_ARMOR                             	(0, "label.armor"),
 	LABEL_CRITICAL_HITS                        	(0, "label.critical-hits"),
-	LABEL_GOLEM_SPAWNS                        	(0, "label.golem-spawns"),
 	LABEL_OPTIONS                             	(0, "label.options"),
 	LABEL_ENEMY_REDSTONE                        (0, "label.enemy-redstone"),
 	LABEL_TRUE                               	(0, "label.true"),
@@ -71,7 +70,19 @@ public enum MessagePath {
 	LABEL_OFFICER                               (0, "label.officer"),
 	LABEL_OFFICERS                              (0, "label.officers"),
 	LABEL_MASTER                                (0, "label.master"),
-	
+			  
+    MAP_BARBARIAN                               (0, "map.barbarian"),
+    MAP_BARBARIANS                              (0, "map.barbarians"),
+    MAP_KINGDOM                                 (0, "map.kingdom"),
+    MAP_TOWNS                                   (0, "map.towns"),
+    MAP_LAND                                    (0, "map.land"),
+    MAP_PLAYERS                                 (0, "map.players"),
+    MAP_LORD                             		(0, "map.lord"),
+    MAP_POPULATION                              (0, "map.population"),
+    MAP_RUIN                                    (0, "map.ruin"),
+    MAP_CRITICAL_HITS                        	(0, "map.critical-hits"),
+    MAP_GOLEM_SPAWNS                        	(0, "map.golem-spawns"),
+    
 	MENU_STATS_TITLE                            (0, "menu.stats.title"),
 	MENU_STATS_INTRO_1                          (0, "menu.stats.intro-1"),
 	MENU_STATS_INTRO_2                          (0, "menu.stats.intro-2"),

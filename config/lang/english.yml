@@ -57,7 +57,6 @@ label:
   armors: "Armors"
   armor: "Armor"
   critical-hits: "Critical Hits"
-  golem-spawns: "Golem Spawns"
   options: "Options"
   enemy-redstone: "Enemy Redstone"
   true: "True"
@@ -74,6 +73,18 @@ label:
   officer: "Officer"
   officers: "Officers"
   master: "Master"
+map:
+  barbarian: "Barbarian"
+  barbarians: "Barbarians"
+  kingdom: "Kingdom"
+  towns: "Towns"
+  land: "Land"
+  players: "Players"
+  lord: "Lord"
+  population: "Population"
+  ruin: "Ruin"
+  critical_hits: "Critical Hits"
+  golem-spawns: "Golem Spawns"
 menu:
   stats:
     title: "Accomplishment Stats"
