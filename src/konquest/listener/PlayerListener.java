@@ -25,6 +25,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -1170,7 +1171,8 @@ public class PlayerListener implements Listener{
 				// Try to apply heart adjustments
 				kingdomManager.applyTownHearts(player,town);
 				// For an enemy player...
-				if(!player.isAdminBypassActive() && !player.getKingdom().equals(town.getKingdom()) && !player.getKingdom().isPeaceful() ) {
+				if(!player.isAdminBypassActive() && !player.getBukkitPlayer().getGameMode().equals(GameMode.SPECTATOR) &&
+						!player.getKingdom().equals(town.getKingdom()) && !player.getKingdom().isPeaceful() ) {
 					// When there is no armistice...
 					if(!isArmisticeTo) {
 						// Attempt to start a raid alert
