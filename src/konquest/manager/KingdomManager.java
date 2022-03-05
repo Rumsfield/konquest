@@ -78,6 +78,10 @@ public class KingdomManager implements KonquestKingdomManager {
 	private int maxCriticalHits;
 	private HashSet<Material> armorBlocks;
 	private boolean isArmorBlockWhitelist;
+	private int joinCooldownSeconds;
+	private int exileCooldownSeconds;
+	private HashMap<Player,Integer> joinPlayerCooldowns;
+	private HashMap<Player,Integer> exilePlayerCooldowns;
 	
 	public static final int DEFAULT_MAP_SIZE = 9; // 10 lines of chat, minus one for header, odd so player's chunk is centered
 	
@@ -92,6 +96,10 @@ public class KingdomManager implements KonquestKingdomManager {
 		this.maxCriticalHits = 12;
 		this.armorBlocks = new HashSet<Material>();
 		this.isArmorBlockWhitelist = false;
+		this.joinCooldownSeconds = 0;
+		this.exileCooldownSeconds = 0;
+		this.joinPlayerCooldowns = new HashMap<Player,Integer>();
+		this.exilePlayerCooldowns = new HashMap<Player,Integer>();
 	}
 	
 	public void initialize() {
@@ -99,6 +107,7 @@ public class KingdomManager implements KonquestKingdomManager {
 		neutrals = new KonKingdom(MessagePath.LABEL_NEUTRALS.getMessage(),konquest);
 		loadCriticalBlocks();
 		loadArmorBlacklist();
+		loadJoinExileCooldowns();
 		loadKingdoms();
 		updateKingdomOfflineProtection();
 		makeTownNerfs();
@@ -167,18 +176,7 @@ public class KingdomManager implements KonquestKingdomManager {
 		return false;
 	}
 	
-	/**
-	 * Assign a player to a Kingdom and teleport them there.
-	 * @param player
-	 * @param kingdomName
-	 * @return int status
-	 * 				0 = success
-	 *  			1 = kingdom name does not exist
-	 *  			2 = the kingdom is full (config option max_player_diff)
-	 *  			3 = missing permission
-	 *  			4 = cancelled
-	 *             -1 = internal error
-	 */
+	// See interface for method description
 	public int assignPlayerKingdom(KonquestPlayer playerArg, String kingdomName, boolean force) {
 		//TODO: Some sort of penalty for changing kingdoms, check if barbarian first
 		if(isKingdom(kingdomName)) {
@@ -196,6 +194,7 @@ public class KingdomManager implements KonquestKingdomManager {
 					return 3;
 				}
 			}
+			
 			int config_max_player_diff = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.max_player_diff");
 			int smallestKingdomPlayerCount = 0;
 			int targetKingdomPlayerCount = 0;
@@ -1938,6 +1937,128 @@ public class KingdomManager implements KonquestKingdomManager {
 			for(KonTown town : kingdom.getTowns()) {
 				konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
 			}
+		}
+	}
+	
+	// Returns true when the player is still in cooldown, else false
+	public boolean isPlayerJoinCooldown(Player player) {
+		boolean result = false;
+		// Check if player is currently in cooldown.
+		// If cooldown has expired, remove it.
+		if(joinPlayerCooldowns.containsKey(player)) {
+			long endSeconds = joinPlayerCooldowns.get(player);
+			Date now = new Date();
+			if(now.after(new Date(endSeconds*1000))) {
+				// The cooldown has expired
+				joinPlayerCooldowns.remove(player);
+			} else {
+				// The player is still in cooldown
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	public void applyPlayerJoinCooldown(Player player) {
+		if(joinCooldownSeconds > 0) {
+			int endTimeSeconds = (int)((new Date()).getTime()/1000) + joinCooldownSeconds;
+			joinPlayerCooldowns.put(player, endTimeSeconds);
+		}
+	}
+	
+	public int getJoinCooldownRemainingSeconds(Player player) {
+		int result = 0;
+		if(joinPlayerCooldowns.containsKey(player)) {
+			int endSeconds = joinPlayerCooldowns.get(player);
+			Date now = new Date();
+			if(now.before(new Date((long)endSeconds*1000))) {
+				result = endSeconds - (int)(now.getTime()/1000);
+			}
+		}
+		return result;
+	}
+	
+	// Returns true when the player is still in cooldown, else false
+	public boolean isPlayerExileCooldown(Player player) {
+		boolean result = false;
+		// Check if player is currently in cooldown.
+		// If cooldown has expired, remove it.
+		if(exilePlayerCooldowns.containsKey(player)) {
+			long endSeconds = exilePlayerCooldowns.get(player);
+			Date now = new Date();
+			if(now.after(new Date(endSeconds*1000))) {
+				// The cooldown has expired
+				exilePlayerCooldowns.remove(player);
+			} else {
+				// The player is still in cooldown
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	public void applyPlayerExileCooldown(Player player) {
+		if(exileCooldownSeconds > 0) {
+			int endTimeSeconds = (int)((new Date()).getTime()/1000) + exileCooldownSeconds;
+			exilePlayerCooldowns.put(player, endTimeSeconds);
+		}
+	}
+	
+	public int getExileCooldownRemainingSeconds(Player player) {
+		int result = 0;
+		if(exilePlayerCooldowns.containsKey(player)) {
+			int endSeconds = exilePlayerCooldowns.get(player);
+			Date now = new Date();
+			if(now.before(new Date((long)endSeconds*1000))) {
+				result = endSeconds - (int)(now.getTime()/1000);
+			}
+		}
+		return result;
+	}
+	
+	public void loadJoinExileCooldowns() {
+		joinCooldownSeconds = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.join_cooldown",0);
+		exileCooldownSeconds = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.exile_cooldown",0);
+		// Check any existing cooldowns, ensure less than config values.
+		// Join cooldown map
+		if(!joinPlayerCooldowns.isEmpty()) {
+			HashMap<Player,Integer> updateJoinMap = new HashMap<Player,Integer>();
+			if(joinCooldownSeconds > 0) {
+				int nowSeconds = (int)((new Date()).getTime()/1000);
+				int maxEndSeconds = nowSeconds + joinCooldownSeconds;
+				for(Player p : joinPlayerCooldowns.keySet()) {
+					int endSeconds = joinPlayerCooldowns.get(p);
+					if(endSeconds > maxEndSeconds) {
+						// Existing cooldown is longer than new config setting, shorten it.
+						updateJoinMap.put(p, maxEndSeconds);
+					} else {
+						// Existing cooldown is under config, preserve it.
+						updateJoinMap.put(p, endSeconds);
+					}
+				}
+			}
+			joinPlayerCooldowns.clear();
+			joinPlayerCooldowns.putAll(updateJoinMap);
+		}
+		// Exile cooldown map
+		if(!exilePlayerCooldowns.isEmpty()) {
+			HashMap<Player,Integer> updateExileMap = new HashMap<Player,Integer>();
+			if(exileCooldownSeconds > 0) {
+				int nowSeconds = (int)((new Date()).getTime()/1000);
+				int maxEndSeconds = nowSeconds + exileCooldownSeconds;
+				for(Player p : exilePlayerCooldowns.keySet()) {
+					int endSeconds = exilePlayerCooldowns.get(p);
+					if(endSeconds > maxEndSeconds) {
+						// Existing cooldown is longer than new config setting, shorten it.
+						updateExileMap.put(p, maxEndSeconds);
+					} else {
+						// Existing cooldown is under config, preserve it.
+						updateExileMap.put(p, endSeconds);
+					}
+				}
+			}
+			exilePlayerCooldowns.clear();
+			exilePlayerCooldowns.putAll(updateExileMap);
 		}
 	}
 	

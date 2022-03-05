@@ -435,6 +435,8 @@ command:
       prompt-line-4: "Use this command again to confirm."
       confirmed: "You have been exiled as a Barbarian, place a bed to create your Camp."
       town: "Banished from %s!"
+    error:
+      cooldown: "You must wait before becoming a barbarian: %s"
   favor:
     notice:
       message: "You have %s Favor, costs are..."
@@ -501,6 +503,7 @@ command:
       kingdom-denied: "You cannot join a rival Kingdom. Ask an admin to move you."
       kingdom-member: "You are already a member."
       kingdom-exile: "You cannot switch Kingdoms unless you are exiled. Use \"/k exile\"."
+      kingdom-cooldown: "You must wait before joining another kingdom: %s"
       town-member: "You are already a resident of %s"
       town-request: "You have already requested to join %s"
   leave:

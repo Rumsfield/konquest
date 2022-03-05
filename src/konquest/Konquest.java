@@ -336,6 +336,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		// Set chat even priority
 		chatPriority = getEventPriority(configManager.getConfig("core").getString("core.chat.priority","HIGH"));
 		// Update kingdom stuff
+		kingdomManager.loadJoinExileCooldowns();
 		kingdomManager.updateSmallestKingdom();
 		kingdomManager.updateAllTownDisabledUpgrades();
 		kingdomManager.updateKingdomOfflineProtection();

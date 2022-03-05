@@ -79,6 +79,8 @@ core:
     attack_friendly_golems: false
     max_player_diff: 4
     allow_exile_switch: true
+    exile_cooldown: 300
+    join_cooldown: 300
     per_kingdom_join_permissions: false
     wild_pvp: true
     wild_use: true

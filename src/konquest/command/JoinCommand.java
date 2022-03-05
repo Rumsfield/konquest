@@ -55,42 +55,47 @@ public class JoinCommand extends CommandBase {
     	}
     	
     	if(getKonquest().getKingdomManager().isKingdom(joinName)) {
+    		// Check for cooldown
+    		if(getKonquest().getKingdomManager().isPlayerJoinCooldown(bukkitPlayer)) {
+    			int remainingCooldown = getKonquest().getKingdomManager().getJoinCooldownRemainingSeconds(bukkitPlayer);
+				String cooldownTimeStr = Konquest.getTimeFormat(remainingCooldown, ChatColor.AQUA);
+    			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_COOLDOWN.getMessage(cooldownTimeStr));
+    			return;
+    		}
+    		
     		// Attempt to join a Kingdom
     		joinName = getKonquest().getKingdomManager().getKingdom(joinName).getName();
     		boolean isAllowSwitch = getKonquest().getConfigManager().getConfig("core").getBoolean("core.kingdoms.allow_exile_switch",false);
-    		
+    		// Must be a barbarian to join a kingdom
     		if(player.isBarbarian()) {
-    			if(getKonquest().getKingdomManager().getKingdom(joinName).equals(player.getExileKingdom())) {
-        			// Allow barbarians to join their exiled kingdoms
+    			if(getKonquest().getKingdomManager().getKingdom(joinName).equals(player.getExileKingdom()) ||
+    					getKonquest().getKingdomManager().getBarbarians().equals(player.getExileKingdom()) ||
+    					isAllowSwitch) {
+    				// Allow barbarians to join any kingdom when they're new (exile kingdom = barbarians) or if switching is allowed in config
+    				// Allow barbarians to join their exiled kingdoms
         			int status = getKonquest().getKingdomManager().assignPlayerKingdom(player, joinName, false);
-        			if(status == 0) {
-        				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_JOIN_NOTICE_KINGDOM_JOIN.getMessage(ChatColor.AQUA+joinName));
-        			} else if(status == 2) {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_LIMIT.getMessage(joinName));
-        			} else if(status == 3) {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage());
-        			} else if(status == 4) {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
-        			} else {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-        			}
-        		} else if(isAllowSwitch || getKonquest().getKingdomManager().getBarbarians().equals(player.getExileKingdom())) {
-        			// Allow barbarians to join any kingdom when they're new (exile kingdom = barbarians) or if switching is allowed in config
-        			int status = getKonquest().getKingdomManager().assignPlayerKingdom(player, joinName, false);
-        			if(status == 0) {
-        				//ChatUtil.sendNotice((Player) getSender(), "Joined Kingdom "+ChatColor.AQUA+joinName);
-        				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_JOIN_NOTICE_KINGDOM_JOIN.getMessage(ChatColor.AQUA+joinName));
-                    	//ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+bukkitPlayer.getName()+" has joined Kingdom "+ChatColor.AQUA+joinName);
-                    	ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+MessagePath.COMMAND_JOIN_BROADCAST_PLAYER_JOIN.getMessage(bukkitPlayer.getName(),ChatColor.AQUA+joinName));
-        			} else if(status == 2) {
-        				//ChatUtil.sendError((Player) getSender(), ChatColor.RED+"The Kingdom "+ChatColor.AQUA+joinName+ChatColor.RED+" has too many players! Use \"/k join\" to join the smallest Kingdom");
-        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_LIMIT.getMessage(joinName));
-        			} else if(status == 3) {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage());
-        			} else if(status == 4) {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
-        			} else {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+        			switch(status) {
+	        			case 0:
+	        				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_JOIN_NOTICE_KINGDOM_JOIN.getMessage(ChatColor.AQUA+joinName));
+	        				ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+MessagePath.COMMAND_JOIN_BROADCAST_PLAYER_JOIN.getMessage(bukkitPlayer.getName(),ChatColor.AQUA+joinName));
+	        				// Apply cooldown
+	        				getKonquest().getKingdomManager().applyPlayerJoinCooldown(bukkitPlayer);
+	        				break;
+	        			case 1:
+	        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(joinName));
+	        				break;
+	        			case 2:
+	        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_LIMIT.getMessage(joinName));
+	        				break;
+	        			case 3:
+	        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage());
+	        				break;
+	        			case 4:
+	        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+	        				break;
+        				default:
+        					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+        					break;
         			}
         		} else {
         			//ChatUtil.sendError((Player) getSender(), "You cannot join that Kingdom. Ask an admin to move you.");

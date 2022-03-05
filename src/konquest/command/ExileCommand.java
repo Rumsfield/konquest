@@ -47,7 +47,13 @@ public class ExileCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
         		return;
         	} else {
-        		
+        		// Check for cooldown
+        		if(getKonquest().getKingdomManager().isPlayerExileCooldown(bukkitPlayer)) {
+        			int remainingCooldown = getKonquest().getKingdomManager().getExileCooldownRemainingSeconds(bukkitPlayer);
+    				String cooldownTimeStr = Konquest.getTimeFormat(remainingCooldown, ChatColor.AQUA);
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_EXILE_ERROR_COOLDOWN.getMessage(cooldownTimeStr));
+        			return;
+        		}
         		// Confirm with the player
         		if(!player.isExileConfirmed()) {
         			boolean isAllowSwitch = getKonquest().getConfigManager().getConfig("core").getBoolean("core.kingdoms.allow_exile_switch",false);
@@ -85,6 +91,8 @@ public class ExileCommand extends CommandBase {
                     	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_CONFIRMED.getMessage());
                     	player.setIsExileConfirmed(false);
                     	player.getExileConfirmTimer().stopTimer();
+                    	// Apply cooldown
+                    	getKonquest().getKingdomManager().applyPlayerExileCooldown(bukkitPlayer);
             		} else {
             			//ChatUtil.sendError((Player) getSender(), "Internal error, could not exile. Contact an Admin!");
             			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
