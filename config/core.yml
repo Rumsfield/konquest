@@ -22,6 +22,7 @@ core:
   chat:
     tag: '&7[&6Konquest&7]&f '
     message: '%PREFIX% %KINGDOM% &7| %TITLE% %NAME% %SUFFIX% '
+    kingdom_team_color: true
     name_team_color: true
     enable_format: true
     priority: HIGH

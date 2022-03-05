@@ -216,7 +216,6 @@ public class PlayerListener implements Listener{
         //Check if the event was caused by a player
         if(event.isAsynchronous() && !event.isCancelled()) {
         	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.enable_format",true);
-        	boolean formatName = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.name_team_color",true);
         	if(enable) {
 	        	// Format chat messages
         		Player bukkitPlayer = event.getPlayer();
@@ -237,6 +236,9 @@ public class PlayerListener implements Listener{
 	            String kingdomName = kingdom.getName();
 	            String name = bukkitPlayer.getName();
 	            
+	            boolean formatName = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.name_team_color",true);
+	        	boolean formatKingdom = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.kingdom_team_color",true);
+	            
 	            if(player.isGlobalChat()) {
 	            	//Global chat, all players see this format
 	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
@@ -252,7 +254,8 @@ public class PlayerListener implements Listener{
 	            						name,
 	            						teamColor,
 	            						titleColor,
-	            						formatName) +
+	            						formatName,
+	            						formatKingdom) +
 	        					Konquest.chatDivider + ChatColor.RESET + " " + event.getMessage());
 	            	}
 	            } else {
@@ -269,6 +272,7 @@ public class PlayerListener implements Listener{
 		            						name,
 		            						Konquest.friendColor1,
 		            						Konquest.friendColor1,
+		            						true,
 		            						true) +
 		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
 	            		} else if(teamPlayer.isAdminBypassActive()) {
@@ -281,6 +285,7 @@ public class PlayerListener implements Listener{
 		            						name,
 		            						ChatColor.GOLD,
 		            						ChatColor.GOLD,
+		            						true,
 		            						true) +
 		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
 	            		}
