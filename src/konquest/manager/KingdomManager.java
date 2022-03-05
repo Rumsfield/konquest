@@ -76,24 +76,29 @@ public class KingdomManager implements KonquestKingdomManager {
 	private HashMap<PotionEffectType,Integer> townNerfs;
 	private Material townCriticalBlock;
 	private int maxCriticalHits;
+	private HashSet<Material> armorBlocks;
+	private boolean isArmorBlockWhitelist;
 	
 	public static final int DEFAULT_MAP_SIZE = 9; // 10 lines of chat, minus one for header, odd so player's chunk is centered
 	
 	public KingdomManager(Konquest konquest) {
 		this.konquest = konquest;
-		kingdomMap = new HashMap<String, KonKingdom>();
-		barbarians = null;
-		neutrals = null;
-		territoryWorldCache = new HashMap<World,KonTerritoryCache>();
-		townNerfs = new HashMap<PotionEffectType,Integer>();
-		townCriticalBlock = Material.OBSIDIAN;
+		this.kingdomMap = new HashMap<String, KonKingdom>();
+		this.barbarians = null;
+		this.neutrals = null;
+		this.territoryWorldCache = new HashMap<World,KonTerritoryCache>();
+		this.townNerfs = new HashMap<PotionEffectType,Integer>();
+		this.townCriticalBlock = Material.OBSIDIAN;
 		this.maxCriticalHits = 12;
+		this.armorBlocks = new HashSet<Material>();
+		this.isArmorBlockWhitelist = false;
 	}
 	
 	public void initialize() {
 		barbarians = new KonKingdom(MessagePath.LABEL_BARBARIANS.getMessage(),konquest);
 		neutrals = new KonKingdom(MessagePath.LABEL_NEUTRALS.getMessage(),konquest);
 		loadCriticalBlocks();
+		loadArmorBlacklist();
 		loadKingdoms();
 		updateKingdomOfflineProtection();
 		makeTownNerfs();
@@ -1953,6 +1958,36 @@ public class KingdomManager implements KonquestKingdomManager {
 			String message = "Invalid monument critical block \""+townCriticalBlockTypeName+"\" given in core.monuments.critical_block, using default OBSIDIAN";
     		ChatUtil.printConsoleError(message);
     		konquest.opStatusMessages.add(message);
+		}
+	}
+	
+	public boolean isArmorValid(Material mat) {
+		boolean result = false;
+		if(isArmorBlockWhitelist) {
+			result = armorBlocks.contains(mat);
+		} else {
+			result = !armorBlocks.contains(mat);
+		}
+		return result;
+	}
+	
+	private void loadArmorBlacklist() {
+		// True = list is a whitelist, False = list is a blacklist (Default false)
+		isArmorBlockWhitelist = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.armor_blacklist_reverse",false);
+		boolean isListEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.armor_blacklist_enable",false);
+		if(isListEnabled) {
+			List<String> armorList = konquest.getConfigManager().getConfig("core").getStringList("core.towns.armor_blacklist");
+			Material mat = null;
+			for(String entry : armorList) {
+				try {
+					mat = Material.valueOf(entry);
+					if(mat != null && !armorBlocks.contains(mat)) {
+						armorBlocks.add(mat);
+					}
+				} catch(IllegalArgumentException e) {
+					ChatUtil.printConsoleError("Invalid armor list entry, "+entry+", ignoring.");
+				}
+			}
 		}
 	}
 	

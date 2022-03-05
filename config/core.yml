@@ -108,6 +108,11 @@ core:
     barbarians_destroy: true
     enemy_glow: true
     town_mobs: false
+    armor_blacklist_enable: true
+    armor_blacklist_reverse: false
+    armor_blacklist:
+    - STONE
+    - END_STONE
   plots:
     enable: true
     max_size: 16
