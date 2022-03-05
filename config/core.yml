@@ -43,9 +43,9 @@ core:
       password: example_password
       properties: ["autoReconnect=true","useSSL=false"]
   integration:
-    quickshop: false
-    luckperms: false
-    dynmap: false
+    quickshop: true
+    luckperms: true
+    dynmap: true
   travel:
     enable:
       towns: true
