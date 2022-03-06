@@ -299,44 +299,43 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
 	        	break;
 	        default: 
 	        	// Check for kingdom-specific placeholders
-	        	/*
-	        	 * total player count 	- konquest_players_<kingdom>
-	        	 * online player count 	- konquest_online_<kingdom>
-	        	 * total towns 			- konquest_towns_<kingdom>
-	        	 * total land 			- konquest_land_<kingdom>
-	        	 * total favor 			- konquest_favor_<kingdom>
-	        	 * total score 			- konquest_score_<kingdom>
-	        	 */
+	        	
+	        	/* %konquest_players_<kingdom>% */
 	        	if(identifierLower.matches("players_[a-zA-Z0-9]+")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(8);
 	        			result = placeholderManager.getKingdomPlayers(kingdomName);
 	        		} catch(IndexOutOfBoundsException e) {}
 	        		
+        		/* %konquest_online_<kingdom>% */
 	        	} else if(identifierLower.matches("online_[a-zA-Z0-9]+")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(7);
 	        			result = placeholderManager.getKingdomOnline(kingdomName);
 	        		} catch(IndexOutOfBoundsException e) {}
 	        		
+        		/* %konquest_towns_<kingdom>% */
 	        	} else if(identifierLower.matches("towns_[a-zA-Z0-9]+")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(6);
 	        			result = placeholderManager.getKingdomTowns(kingdomName);
 	        		} catch(IndexOutOfBoundsException e) {}
 	        		
+        		/* %konquest_land_<kingdom>% */
 	        	} else if(identifierLower.matches("land_[a-zA-Z0-9]+")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(5);
 	        			result = placeholderManager.getKingdomLand(kingdomName);
 	        		} catch(IndexOutOfBoundsException e) {}
 	        		
+        		/* %konquest_favor_<kingdom>% */
 	        	} else if(identifierLower.matches("favor_[a-zA-Z0-9]+")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(6);
 	        			result = placeholderManager.getKingdomFavor(kingdomName);
 	        		} catch(IndexOutOfBoundsException e) {}
 	        		
+        		/* %konquest_score_<kingdom>% */
 	        	} else if(identifierLower.matches("score_[a-zA-Z0-9]+")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(6);
