@@ -264,6 +264,43 @@ public class PlaceholderManager {
 	}
 	
 	/*
+	 * Placeholder Relational Requesters
+	 */
+	
+	public String getRelation(Player playerOne, Player playerTwo) {
+		String result = "";
+		KonPlayer onlinePlayerOne = playerManager.getPlayer(playerOne);
+		KonPlayer onlinePlayerTwo = playerManager.getPlayer(playerTwo);
+		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
+			boolean isArmistice = konquest.getGuildManager().isArmistice(onlinePlayerOne, onlinePlayerTwo);
+	    	if(onlinePlayerTwo.isBarbarian()) {
+	    		result = MessagePath.LABEL_BARBARIAN.getMessage();
+			} else {
+				if(onlinePlayerOne.getKingdom().equals(onlinePlayerTwo.getKingdom())) {
+					result = MessagePath.LABEL_FRIENDLY.getMessage();
+	    		} else {
+	    			if(isArmistice) {
+	    				result = MessagePath.LABEL_ARMISTICE.getMessage();
+	    			} else {
+	    				result = MessagePath.LABEL_ENEMY.getMessage();
+	    			}
+	    		}
+			}
+		}
+		return result;
+	}
+	
+	public String getRelationColor(Player playerOne, Player playerTwo) {
+		String result = "";
+		KonPlayer onlinePlayerOne = playerManager.getPlayer(playerOne);
+		KonPlayer onlinePlayerTwo = playerManager.getPlayer(playerTwo);
+		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
+			result = ""+konquest.getDisplayPrimaryColor(onlinePlayerOne, onlinePlayerTwo);
+		}
+		return result;
+	}
+	
+	/*
 	 * Top rankings
 	 * These methods may be called repeatedly for multiple players.
 	 * Any time a top method is called, check for past cooldown time.

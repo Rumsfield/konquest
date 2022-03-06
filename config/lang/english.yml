@@ -17,6 +17,8 @@ label:
   barbarians: "Barbarians"
   neutral: "Neutral"
   neutrals: "Neutrals"
+  friendly: "Friendly"
+  enemy: "Enemy"
   residencies: "Residencies"
   towns: "Towns"
   town: "Town"

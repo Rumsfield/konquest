@@ -4,12 +4,13 @@ import org.bukkit.entity.Player;
 
 import konquest.manager.PlaceholderManager;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import me.clip.placeholderapi.expansion.Relational;
 
 /**
  * This class will be registered through the register-method in the 
  * plugins onEnable-method.
  */
-public class KonquestPlaceholderExpansion extends PlaceholderExpansion {
+public class KonquestPlaceholderExpansion extends PlaceholderExpansion implements Relational {
 
 	private KonquestPlugin plugin;
 	private PlaceholderManager placeholderManager;
@@ -293,5 +294,29 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion {
 
         return result;
     }
+
+	@Override
+	public String onPlaceholderRequest(Player playerOne, Player playerTwo, String identifier) {
+		if(playerOne == null || playerTwo == null) {
+			return "";
+		}
+		
+		// Provide placeholder value info
+        String result = null;
+        switch(identifier.toLowerCase()) {
+	        /* %rel_konquest_relation% - playerOne's relationship to playerTwo */
+        	case "relation":
+        		result = placeholderManager.getRelation(playerOne, playerTwo);
+	        	break;
+	        /* %rel_konquest_relation_color% - playerOne's relationship color to playerTwo */
+        	case "relation_color":
+        		result = placeholderManager.getRelationColor(playerOne, playerTwo);
+	        	break;
+        	default: 
+	        	break;
+        }
+        
+		return result;
+	}
 
 }
