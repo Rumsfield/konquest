@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.api.model.KonquestTerritoryType;
+import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
@@ -281,6 +282,13 @@ public class PlaceholderManager {
 		String result = "";
 		KonPlayer onlinePlayer = playerManager.getPlayer(player);
     	result = (onlinePlayer != null && onlinePlayer.isCombatTagged()) ? ChatUtil.parseHex(konquest.getConfigManager().getConfig("core").getString("core.combat.placeholder_tag","")) : "";
+    	return result;
+	}
+	
+	public String getGuild(Player player) {
+		String result = "";
+		KonGuild guild = konquest.getGuildManager().getPlayerGuild(player);
+    	result = guild == null ? "" : guild.getName();
     	return result;
 	}
 	
