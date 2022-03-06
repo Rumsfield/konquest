@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 
 //import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -26,6 +27,15 @@ import konquest.utility.MessagePath;
 // Previous placeholder result is cached and returned for requests made before cooldown time ends.
 public class PlaceholderManager {
 
+	private enum KingdomValue {
+		PLAYERS,
+		ONLINE,
+		TOWNS,
+		LAND,
+		FAVOR,
+		SCORE;
+	}
+	
 	private class Ranked {
 		String name;
 		int value;
@@ -46,18 +56,26 @@ public class PlaceholderManager {
 	private ArrayList<Ranked> topScoreList;
 	private ArrayList<Ranked> topTownList;
 	private ArrayList<Ranked> topLandList;
+	private HashMap<KingdomValue,HashMap<String,Integer>> kingdomCache;
+	private HashMap<KingdomValue,Long> kingdomCooldownTimes;
 	
 	public PlaceholderManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.playerManager = konquest.getPlayerManager();
 		this.kingdomManager = konquest.getKingdomManager();
 		this.cooldownSeconds = 0;
-		this.topScoreCooldownTime = 0;
-		this.topTownCooldownTime = 0;
-		this.topLandCooldownTime = 0;
+		this.topScoreCooldownTime = 0L;
+		this.topTownCooldownTime = 0L;
+		this.topLandCooldownTime = 0L;
 		this.topScoreList = new ArrayList<Ranked>();
 		this.topTownList = new ArrayList<Ranked>();
 		this.topLandList = new ArrayList<Ranked>();
+		this.kingdomCache = new HashMap<KingdomValue,HashMap<String,Integer>>();
+		this.kingdomCooldownTimes = new HashMap<KingdomValue,Long>();
+		for(KingdomValue val : KingdomValue.values()) {
+			kingdomCache.put(val, new HashMap<String,Integer>());
+			kingdomCooldownTimes.put(val, 0L);
+		}
 		this.rankedComparator = new Comparator<Ranked>() {
    			@Override
    			public int compare(final Ranked k1, Ranked k2) {
@@ -76,6 +94,12 @@ public class PlaceholderManager {
 		topScoreList = new ArrayList<Ranked>();
 		topTownList = new ArrayList<Ranked>();
 		topLandList = new ArrayList<Ranked>();
+		kingdomCache = new HashMap<KingdomValue,HashMap<String,Integer>>();
+		kingdomCooldownTimes = new HashMap<KingdomValue,Long>();
+		for(KingdomValue val : KingdomValue.values()) {
+			kingdomCache.put(val, new HashMap<String,Integer>());
+			kingdomCooldownTimes.put(val, 0L);
+		}
 		cooldownSeconds = konquest.getConfigManager().getConfig("core").getInt("core.placeholder_request_limit",0);
 		ChatUtil.printDebug("Placeholder Manager is ready with cooldown seconds: "+cooldownSeconds);
 	}
@@ -435,60 +459,135 @@ public class PlaceholderManager {
 	/*
 	 * Placeholder Kingdom Requesters
 	 */
-	// TODO: implement caching for these
 	
 	public String getKingdomPlayers(String name) {
 		String result = "";
-		if(kingdomManager.isKingdom(name)) {
-			result = ""+playerManager.getAllPlayersInKingdom(kingdomManager.getKingdom(name)).size();
+		// Check cooldown time, update cache if expired
+		KingdomValue type = KingdomValue.PLAYERS;
+		if(kingdomManager.isKingdom(name) && 
+				kingdomCooldownTimes.containsKey(type) &&
+				kingdomCache.containsKey(type)) {
+			Date now = new Date();
+			if(now.after(new Date(kingdomCooldownTimes.get(type)))) {
+				// Cooldown is expired, update value
+				int value = playerManager.getAllPlayersInKingdom(kingdomManager.getKingdom(name)).size();
+				kingdomCache.get(type).put(name, value);
+				// Update new cooldown time
+				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds*1000));
+			}
+			// Get value
+			result = ""+kingdomCache.get(type).get(name);
 		}
 		return result;
 	}
 	
 	public String getKingdomOnline(String name) {
 		String result = "";
-		if(kingdomManager.isKingdom(name)) {
-			result = ""+playerManager.getPlayersInKingdom(kingdomManager.getKingdom(name)).size();
+		// Check cooldown time, update cache if expired
+		KingdomValue type = KingdomValue.ONLINE;
+		if(kingdomManager.isKingdom(name) && 
+				kingdomCooldownTimes.containsKey(type) &&
+				kingdomCache.containsKey(type)) {
+			Date now = new Date();
+			if(now.after(new Date(kingdomCooldownTimes.get(type)))) {
+				// Cooldown is expired, update value
+				int value = playerManager.getPlayersInKingdom(kingdomManager.getKingdom(name)).size();
+				kingdomCache.get(type).put(name, value);
+				// Update new cooldown time
+				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds*1000));
+			}
+			// Get value
+			result = ""+kingdomCache.get(type).get(name);
 		}
 		return result;
 	}
 	
 	public String getKingdomTowns(String name) {
 		String result = "";
-		if(kingdomManager.isKingdom(name)) {
-			result = ""+kingdomManager.getKingdom(name).getTowns().size();
+		// Check cooldown time, update cache if expired
+		KingdomValue type = KingdomValue.TOWNS;
+		if(kingdomManager.isKingdom(name) && 
+				kingdomCooldownTimes.containsKey(type) &&
+				kingdomCache.containsKey(type)) {
+			Date now = new Date();
+			if(now.after(new Date(kingdomCooldownTimes.get(type)))) {
+				// Cooldown is expired, update value
+				int value = kingdomManager.getKingdom(name).getTowns().size();
+				kingdomCache.get(type).put(name, value);
+				// Update new cooldown time
+				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds*1000));
+			}
+			// Get value
+			result = ""+kingdomCache.get(type).get(name);
 		}
 		return result;
 	}
 	
 	public String getKingdomLand(String name) {
 		String result = "";
-		if(kingdomManager.isKingdom(name)) {
-			int numKingdomLand = 0;
-	    	for(KonTown town : kingdomManager.getKingdom(name).getTowns()) {
-	    		numKingdomLand += town.getChunkList().size();
-	    	}
-			result = ""+numKingdomLand;
+		// Check cooldown time, update cache if expired
+		KingdomValue type = KingdomValue.LAND;
+		if(kingdomManager.isKingdom(name) && 
+				kingdomCooldownTimes.containsKey(type) &&
+				kingdomCache.containsKey(type)) {
+			Date now = new Date();
+			if(now.after(new Date(kingdomCooldownTimes.get(type)))) {
+				// Cooldown is expired, update value
+				int value = 0;
+		    	for(KonTown town : kingdomManager.getKingdom(name).getTowns()) {
+		    		value += town.getChunkList().size();
+		    	}
+				kingdomCache.get(type).put(name, value);
+				// Update new cooldown time
+				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds*1000));
+			}
+			// Get value
+			result = ""+kingdomCache.get(type).get(name);
 		}
 		return result;
 	}
 	
 	public String getKingdomFavor(String name) {
 		String result = "";
-		if(kingdomManager.isKingdom(name)) {
-			int numKingdomFavor = 0;
-	    	for(KonOfflinePlayer kingdomPlayer : playerManager.getAllPlayersInKingdom(kingdomManager.getKingdom(name))) {
-	    		numKingdomFavor += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
-	    	}
-			result = ""+numKingdomFavor;
+		// Check cooldown time, update cache if expired
+		KingdomValue type = KingdomValue.FAVOR;
+		if(kingdomManager.isKingdom(name) && 
+				kingdomCooldownTimes.containsKey(type) &&
+				kingdomCache.containsKey(type)) {
+			Date now = new Date();
+			if(now.after(new Date(kingdomCooldownTimes.get(type)))) {
+				// Cooldown is expired, update value
+				int value = 0;
+		    	for(KonOfflinePlayer kingdomPlayer : playerManager.getAllPlayersInKingdom(kingdomManager.getKingdom(name))) {
+		    		value += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
+		    	}
+				kingdomCache.get(type).put(name, value);
+				// Update new cooldown time
+				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds*1000));
+			}
+			// Get value
+			result = ""+kingdomCache.get(type).get(name);
 		}
 		return result;
 	}
 	
 	public String getKingdomScore(String name) {
 		String result = "";
-		if(kingdomManager.isKingdom(name)) {
-			result = ""+kingdomManager.getKingdomScore(kingdomManager.getKingdom(name));
+		// Check cooldown time, update cache if expired
+		KingdomValue type = KingdomValue.SCORE;
+		if(kingdomManager.isKingdom(name) && 
+				kingdomCooldownTimes.containsKey(type) &&
+				kingdomCache.containsKey(type)) {
+			Date now = new Date();
+			if(now.after(new Date(kingdomCooldownTimes.get(type)))) {
+				// Cooldown is expired, update value
+				int value = kingdomManager.getKingdomScore(kingdomManager.getKingdom(name));
+				kingdomCache.get(type).put(name, value);
+				// Update new cooldown time
+				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds*1000));
+			}
+			// Get value
+			result = ""+kingdomCache.get(type).get(name);
 		}
 		return result;
 	}
