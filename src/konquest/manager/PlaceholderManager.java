@@ -9,6 +9,7 @@ import java.util.Date;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.KonquestPlugin;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
@@ -428,6 +429,67 @@ public class PlaceholderManager {
 		if(rank > 0 && rank <= topLandList.size()) {
    			result = topLandList.get(rank-1).name + " " + topLandList.get(rank-1).value;
    		}
+		return result;
+	}
+	
+	/*
+	 * Placeholder Kingdom Requesters
+	 */
+	// TODO: implement caching for these
+	
+	public String getKingdomPlayers(String name) {
+		String result = "";
+		if(kingdomManager.isKingdom(name)) {
+			result = ""+playerManager.getAllPlayersInKingdom(kingdomManager.getKingdom(name)).size();
+		}
+		return result;
+	}
+	
+	public String getKingdomOnline(String name) {
+		String result = "";
+		if(kingdomManager.isKingdom(name)) {
+			result = ""+playerManager.getPlayersInKingdom(kingdomManager.getKingdom(name)).size();
+		}
+		return result;
+	}
+	
+	public String getKingdomTowns(String name) {
+		String result = "";
+		if(kingdomManager.isKingdom(name)) {
+			result = ""+kingdomManager.getKingdom(name).getTowns().size();
+		}
+		return result;
+	}
+	
+	public String getKingdomLand(String name) {
+		String result = "";
+		if(kingdomManager.isKingdom(name)) {
+			int numKingdomLand = 0;
+	    	for(KonTown town : kingdomManager.getKingdom(name).getTowns()) {
+	    		numKingdomLand += town.getChunkList().size();
+	    	}
+			result = ""+numKingdomLand;
+		}
+		return result;
+	}
+	
+	public String getKingdomFavor(String name) {
+		String result = "";
+		if(kingdomManager.isKingdom(name)) {
+			int numKingdomFavor = 0;
+	    	for(KonOfflinePlayer kingdomPlayer : playerManager.getAllPlayersInKingdom(kingdomManager.getKingdom(name))) {
+	    		numKingdomFavor += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
+	    	}
+			result = ""+numKingdomFavor;
+		}
+		return result;
+	}
+	
+	public String getKingdomScore(String name) {
+		String result = "";
+		if(kingdomManager.isKingdom(name)) {
+			result = ""+kingdomManager.getKingdomScore(kingdomManager.getKingdom(name));
+		}
 		return result;
 	}
 	
