@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.manager.KonquestPlaceholderManager;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
@@ -25,7 +26,7 @@ import konquest.utility.MessagePath;
 // A placeholder cannot be requested until after the cooldown time, configurable duration.
 // Cooldown time applies to every placeholder.
 // Previous placeholder result is cached and returned for requests made before cooldown time ends.
-public class PlaceholderManager {
+public class PlaceholderManager implements KonquestPlaceholderManager {
 
 	private enum KingdomValue {
 		PLAYERS,
@@ -364,11 +365,10 @@ public class PlaceholderManager {
 	
 	/**
 	 * 
-	 * @param player
 	 * @param rank - List index starting at 1
 	 * @return
 	 */
-	public String getTopScore(Player player, int rank) {
+	public String getTopScore(int rank) {
 		String result = "---";
 		Date now = new Date();
 		if(now.after(new Date(topScoreCooldownTime))) {
@@ -398,7 +398,7 @@ public class PlaceholderManager {
 		return result;
 	}
 	
-	public String getTopTown(Player player, int rank) {
+	public String getTopTown(int rank) {
 		String result = "---";
 		Date now = new Date();
 		if(now.after(new Date(topTownCooldownTime))) {
@@ -425,7 +425,7 @@ public class PlaceholderManager {
 		return result;
 	}
 	
-	public String getTopLand(Player player, int rank) {
+	public String getTopLand(int rank) {
 		String result = "---";
 		Date now = new Date();
 		if(now.after(new Date(topLandCooldownTime))) {
