@@ -219,6 +219,20 @@ public class PlaceholderManager {
     	return result;
 	}
 	
+	public String getPrefix(Player player) {
+		String result = "";
+    	KonPlayer onlinePlayer = playerManager.getPlayer(player);
+    	if(onlinePlayer != null) {
+    		KonPrefix playerPrefix = onlinePlayer.getPlayerPrefix();
+    		if(playerPrefix.isEnabled()) {
+    			result = playerPrefix.getMainPrefixName();
+    		} else {
+    			result = "";
+    		}
+    	}
+    	return result;
+	}
+	
 	public String getLordships(Player player) {
 		String result = "";
     	KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
@@ -263,6 +277,13 @@ public class PlaceholderManager {
     	return result;
 	}
 	
+	public String getCombatTag(Player player) {
+		String result = "";
+		KonPlayer onlinePlayer = playerManager.getPlayer(player);
+    	result = (onlinePlayer != null && onlinePlayer.isCombatTagged()) ? ChatUtil.parseHex(konquest.getConfigManager().getConfig("core").getString("core.combat.placeholder_tag","")) : "";
+    	return result;
+	}
+	
 	/*
 	 * Placeholder Relational Requesters
 	 */
@@ -274,15 +295,15 @@ public class PlaceholderManager {
 		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
 			boolean isArmistice = konquest.getGuildManager().isArmistice(onlinePlayerOne, onlinePlayerTwo);
 	    	if(onlinePlayerTwo.isBarbarian()) {
-	    		result = MessagePath.LABEL_BARBARIAN.getMessage();
+	    		result = MessagePath.PLACEHOLDER_BARBARIAN.getMessage();
 			} else {
 				if(onlinePlayerOne.getKingdom().equals(onlinePlayerTwo.getKingdom())) {
-					result = MessagePath.LABEL_FRIENDLY.getMessage();
+					result = MessagePath.PLACEHOLDER_FRIENDLY.getMessage();
 	    		} else {
 	    			if(isArmistice) {
-	    				result = MessagePath.LABEL_ARMISTICE.getMessage();
+	    				result = MessagePath.PLACEHOLDER_ARMISTICE.getMessage();
 	    			} else {
-	    				result = MessagePath.LABEL_ENEMY.getMessage();
+	    				result = MessagePath.PLACEHOLDER_ENEMY.getMessage();
 	    			}
 	    		}
 			}
@@ -400,20 +421,6 @@ public class PlaceholderManager {
    			result = topLandList.get(rank-1).name + " " + topLandList.get(rank-1).value;
    		}
 		return result;
-	}
-	
-	public String getPrefix(Player player) {
-		String result = "";
-    	KonPlayer onlinePlayer = playerManager.getPlayer(player);
-    	if(onlinePlayer != null) {
-    		KonPrefix playerPrefix = onlinePlayer.getPlayerPrefix();
-    		if(playerPrefix.isEnabled()) {
-    			result = playerPrefix.getMainPrefixName();
-    		} else {
-    			result = "-";
-    		}
-    	}
-    	return result;
 	}
 	
 }

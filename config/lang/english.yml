@@ -17,8 +17,6 @@ label:
   barbarians: "Barbarians"
   neutral: "Neutral"
   neutrals: "Neutrals"
-  friendly: "Friendly"
-  enemy: "Enemy"
   residencies: "Residencies"
   towns: "Towns"
   town: "Town"
@@ -75,6 +73,11 @@ label:
   officer: "Officer"
   officers: "Officers"
   master: "Master"
+placeholder:
+  friendly: "Friendly"
+  enemy: "Enemy"
+  barbarian: "Barbarian"
+  armistice: "Armistice"
 map:
   barbarian: "Barbarian"
   barbarians: "Barbarians"

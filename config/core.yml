@@ -187,6 +187,7 @@ core:
       cost_specialize: 200
       cost_relationship: 50
   combat:
+    placeholder_tag: '&6[In Combat] '
     prevent_command_on_proximity: false
     prevent_command_on_damage: true
     enemy_proximity_chunks: 3

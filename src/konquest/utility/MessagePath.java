@@ -14,8 +14,6 @@ public enum MessagePath {
 	LABEL_BARBARIANS                            (0, "label.barbarians"),
 	LABEL_NEUTRAL                               (0, "label.neutral"),
 	LABEL_NEUTRALS                              (0, "label.neutrals"),
-	LABEL_FRIENDLY                              (0, "label.friendly"),
-	LABEL_ENEMY                                 (0, "label.enemy"),
 	LABEL_RESIDENCIES                           (0, "label.residencies"),
 	LABEL_TOWNS                                 (0, "label.towns"),
 	LABEL_TOWN                                  (0, "label.town"),
@@ -72,7 +70,12 @@ public enum MessagePath {
 	LABEL_OFFICER                               (0, "label.officer"),
 	LABEL_OFFICERS                              (0, "label.officers"),
 	LABEL_MASTER                                (0, "label.master"),
-			  
+			
+	PLACEHOLDER_FRIENDLY                        (0, "placeholder.friendly"),
+	PLACEHOLDER_ENEMY                           (0, "placeholder.enemy"),
+	PLACEHOLDER_BARBARIAN                       (0, "placeholder.barbarian"),
+	PLACEHOLDER_ARMISTICE                       (0, "placeholder.armistice"),
+
     MAP_BARBARIAN                               (0, "map.barbarian"),
     MAP_BARBARIANS                              (0, "map.barbarians"),
     MAP_KINGDOM                                 (0, "map.kingdom"),
