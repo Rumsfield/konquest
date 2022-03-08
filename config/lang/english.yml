@@ -88,7 +88,7 @@ map:
   lord: "Lord"
   population: "Population"
   ruin: "Ruin"
-  critical_hits: "Critical Hits"
+  critical-hits: "Critical Hits"
   golem-spawns: "Golem Spawns"
 menu:
   stats:

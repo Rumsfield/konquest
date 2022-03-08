@@ -242,13 +242,13 @@ public class KonquestPlugin extends JavaPlugin {
 		}
 		// Send message
 		if(resp != null) {
-			if(resp.transactionSuccess() && resp.amount > 0) {
-	        	//String balanceF = String.format("%.2f",r.balance);
-	        	//String amountF = String.format("%.2f",r.amount);
-				String balanceF = econ.format(resp.balance);
-				String amountF = econ.format(resp.amount);
-	        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF), ChatColor.DARK_AQUA);
-	        	result = true;
+			if(resp.transactionSuccess()) {
+	        	if(resp.amount > 0) {
+					String balanceF = econ.format(resp.balance);
+					String amountF = econ.format(resp.amount);
+		        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF), ChatColor.DARK_AQUA);
+		        	result = true;
+	        	}
 	        } else {
 	        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(resp.errorMessage));
 	        }
@@ -276,13 +276,13 @@ public class KonquestPlugin extends JavaPlugin {
 		}
 		// Send message
 		if(resp != null) {
-			if(resp.transactionSuccess() && resp.amount > 0) {
-	        	//String balanceF = String.format("%.2f",resp.balance);
-	        	//String amountF = String.format("%.2f",resp.amount);
-	        	String balanceF = econ.format(resp.balance);
-				String amountF = econ.format(resp.amount);
-	        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REWARD_FAVOR.getMessage(amountF,balanceF), ChatColor.DARK_GREEN);
-	        	result = true;
+			if(resp.transactionSuccess()) {
+				if(resp.amount > 0) {
+		        	String balanceF = econ.format(resp.balance);
+					String amountF = econ.format(resp.amount);
+		        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REWARD_FAVOR.getMessage(amountF,balanceF), ChatColor.DARK_GREEN);
+		        	result = true;
+				}
 	        } else {
 	        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(resp.errorMessage));
 	        }
