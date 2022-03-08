@@ -991,7 +991,90 @@ public class PlayerListener implements Listener{
 			// Check world transition
     		if(moveTo.getWorld().equals(moveFrom.getWorld())) {
     			// Player moved within the same world
+        		
+        		// Chunk transition checks
+        		if(!isTerritoryTo && isTerritoryFrom) { // When moving into the wild
+        			// Display WILD
+        			ChatUtil.sendKonTitle(player, "", MessagePath.GENERIC_NOTICE_WILD.getMessage());
+        			
+        			// Do things appropriate to the type of territory
+        			onExitTerritory(territoryFrom,player,isArmisticeFrom);
 
+        			// Remove potion effects for all players
+        			kingdomManager.clearTownNerf(player);
+        			
+        			// Begin fly disable warmup
+        			player.setFlyDisableWarmup(true);
+        			
+        		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
+        			// Check if entry is allowed
+        			if(!isAllowedEnterTerritory(territoryTo,player)) {
+        				return false;
+        			}
+        			
+        			// Set message color based on enemy territory
+        			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
+
+	                // Display Territory Name
+	    			ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
+	    			
+	    			// Do things appropriate to the type of territory
+	    			onEnterTerritory(territoryTo,moveTo,moveFrom,player,isArmisticeTo);
+	    			
+	    			// Try to stop fly disable warmup, or disable immediately
+	    			if(territoryTo.getKingdom().equals(player.getKingdom())) {
+	    				player.setFlyDisableWarmup(false);
+	    			} else {
+	    				player.setIsFlyEnabled(false);
+	    			}
+	    			
+        		} else if(isTerritoryTo && isTerritoryFrom) { // When moving between two claimed territories
+        			// Check for differing territories, if true then display new Territory Name and send message to enemies
+        			if(!territoryTo.equals(territoryFrom)) { // moving between different territories
+        				// Check if entry is allowed
+            			if(!isAllowedEnterTerritory(territoryTo,player)) {
+            				return false;
+            			}
+        				
+        				// Set message color based on enemy territory
+            			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
+    	            	ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
+    	            	
+    	            	// Do things appropriate to the type of territory
+    	    			// Exit Territory
+            			onExitTerritory(territoryFrom,player,isArmisticeFrom);
+            			// Entry Territory
+    	    			onEnterTerritory(territoryTo,moveTo,moveFrom,player,isArmisticeTo);
+    	    			
+    	            	// Try to stop or start fly disable warmup
+    	    			if(territoryTo.getKingdom().equals(player.getKingdom())) {
+    	    				player.setFlyDisableWarmup(false);
+    	    			} else {
+    	    				player.setIsFlyEnabled(false);
+    	    			}
+    	    			
+        			} else { // moving between the same territory
+        				if(territoryTo.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
+    						KonTown town = (KonTown) territoryTo;
+    						if(!territoryTo.getKingdom().equals(player.getKingdom())) {
+    							// If the town and enemy guilds share an armistice
+    							if(!isArmisticeTo) {
+    								// Enemy player
+        							kingdomManager.applyTownNerf(player, town);
+    							}
+    							updateGolemTargetsForTerritory(territoryTo,player,true,isArmisticeTo);
+        					} else {
+        						// Friendly player
+        						// Display plot message to friendly players
+        						displayPlotMessage(town, moveTo, moveFrom, player);
+        					}
+    					}
+        			}
+        		} else { // Otherwise, moving between Wild chunks
+        			//ChatUtil.sendNotice(bukkitPlayer, "(Debug) The Wild: "+chunkCoordsTo);
+        			//ChatUtil.printDebug("    Moved from Wild to Wild");
+        		}
+        		
         		// Auto map
         		if(player.isMapAuto()) {
         			// Schedule delayed task to print map
@@ -1027,89 +1110,13 @@ public class PlayerListener implements Listener{
         			}
         		}
         		
-        		// Border particle update
-        		kingdomManager.updatePlayerBorderParticles(player,moveTo);
-        		
-        		// Chunk transition checks
-        		if(!isTerritoryTo && isTerritoryFrom) { // When moving into the wild
-        			// Display WILD
-        			ChatUtil.sendKonTitle(player, "", MessagePath.GENERIC_NOTICE_WILD.getMessage());
-        			
-        			// Do things appropriate to the type of territory
-        			onExitTerritory(territoryFrom,player,isArmisticeFrom);
-
-        			// Remove potion effects for all players
-        			kingdomManager.clearTownNerf(player);
-        			
-        			// Begin fly disable warmup
-        			player.setFlyDisableWarmup(true);
-        			
-        		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
-                	// Set message color based on enemy territory
-        			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
-
-	                // Display Territory Name
-	    			ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
-	    			
-	    			// Do things appropriate to the type of territory
-	    			boolean allowEntry = onEnterTerritory(territoryTo,moveTo,moveFrom,player,isArmisticeTo);
-	    			if(!allowEntry) {
-	    				return false;
-	    			}
-	    			
-	    			// Try to stop fly disable warmup, or disable immediately
-	    			if(territoryTo.getKingdom().equals(player.getKingdom())) {
-	    				player.setFlyDisableWarmup(false);
-	    			} else {
-	    				player.setIsFlyEnabled(false);
-	    			}
-	    			
-        		} else if(isTerritoryTo && isTerritoryFrom) { // When moving between two claimed territories
-        			// Check for differing territories, if true then display new Territory Name and send message to enemies
-        			if(!territoryTo.equals(territoryFrom)) { // moving between different territories
-        				// Set message color based on enemy territory
-            			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
-    	            	ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
-    	            	
-    	            	// Do things appropriate to the type of territory
-    	    			// Exit Territory
-            			onExitTerritory(territoryFrom,player,isArmisticeFrom);
-            			// Entry Territory
-    	    			boolean allowEntry = onEnterTerritory(territoryTo,moveTo,moveFrom,player,isArmisticeTo);
-    	    			if(!allowEntry) {
-    	    				return false;
-    	    			}
-    	    			
-    	            	// Try to stop or start fly disable warmup
-    	    			if(territoryTo.getKingdom().equals(player.getKingdom())) {
-    	    				player.setFlyDisableWarmup(false);
-    	    			} else {
-    	    				player.setIsFlyEnabled(false);
-    	    			}
-    	    			
-        			} else { // moving between the same territory
-        				if(territoryTo.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
-    						KonTown town = (KonTown) territoryTo;
-    						if(!territoryTo.getKingdom().equals(player.getKingdom())) {
-    							// If the town and enemy guilds share an armistice
-    							if(!isArmisticeTo) {
-    								// Enemy player
-        							kingdomManager.applyTownNerf(player, town);
-    							}
-    							updateGolemTargetsForTerritory(territoryTo,player,true,isArmisticeTo);
-        					} else {
-        						// Friendly player
-        						// Display plot message to friendly players
-        						displayPlotMessage(town, moveTo, moveFrom, player);
-        					}
-    					}
-        			}
-        		} else { // Otherwise, moving between Wild chunks
-        			//ChatUtil.sendNotice(bukkitPlayer, "(Debug) The Wild: "+chunkCoordsTo);
-        			//ChatUtil.printDebug("    Moved from Wild to Wild");
-        		}
     		} else {
     			// Player moved between worlds
+    			
+    			// Check if entry is allowed
+    			if(isTerritoryTo && !isAllowedEnterTerritory(territoryTo,player)) {
+    				return false;
+    			}
     			
     			// Disable movement-based flags
     			if(player.isAdminClaimingFollow()) {
@@ -1128,9 +1135,6 @@ public class PlayerListener implements Listener{
     			
     			// Disable flying
     			player.setIsFlyEnabled(false);
-    			
-    			// Border particle update
-        		kingdomManager.updatePlayerBorderParticles(player,moveTo);
         		
     			if(isTerritoryFrom) {
     				onExitTerritory(territoryFrom,player,isArmisticeFrom);
@@ -1145,20 +1149,69 @@ public class PlayerListener implements Listener{
 	    			String territoryName = territoryTo.getName();
 	    			ChatUtil.sendKonTitle(player, "", color+territoryName);
 	    			// Do things appropriate to the type of territory
-	    			boolean allowEntry = onEnterTerritory(territoryTo,moveTo,moveFrom,player,isArmisticeTo);
-	    			if(!allowEntry) {
-	    				return false;
-	    			}
+	    			onEnterTerritory(territoryTo,moveTo,moveFrom,player,isArmisticeTo);
     			}
     		}
+    		
+    		// Border particle update
+    		kingdomManager.updatePlayerBorderParticles(player,moveTo);
     	}
     	return true;
     }
     
-    // Return true to allow entry, else false to deny entry
-    private boolean onEnterTerritory(KonTerritory territoryTo, Location locTo, Location locFrom, KonPlayer player, boolean isArmisticeTo) {
+ // Return true to allow entry, else false to deny entry
+    private boolean isAllowedEnterTerritory(KonTerritory territoryTo, KonPlayer player) {
     	if(territoryTo == null) {
-    		return false;
+    		// Unknown territory, just allow it
+    		return true;
+    	}
+		// Decide what to do for specific territories
+		switch(territoryTo.getTerritoryType()) {
+			case TOWN:
+				// Always allow entry
+				break;
+				
+			case RUIN:
+				// Always allow entry
+				break;
+				
+			case CAPITAL:
+				KonCapital capital = (KonCapital) territoryTo;
+				// Optionally prevent players from entering
+				boolean isEnemyAllowedDenied = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_enter");
+				boolean isAdminBypassMode = player.isAdminBypassActive();
+				if(!isAdminBypassMode && isEnemyAllowedDenied && !player.getKingdom().equals(capital.getKingdom())) {
+					// When Player is in a vehicle, reverse the velocity and eject
+					if(player.getBukkitPlayer().isInsideVehicle()) {
+						Vehicle vehicle = (Vehicle) player.getBukkitPlayer().getVehicle();
+						vehicle.setVelocity(vehicle.getVelocity().multiply(-4));
+						vehicle.eject();
+					}
+					// Cancel the movement
+					//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "Cannot enter enemy Kingdom Capitals"+adminText, ChatColor.DARK_RED);
+					ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAPITAL_ENTER.getMessage());
+					if(player.getBukkitPlayer().hasPermission("konquest.command.admin")) {
+						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
+					}
+					return false;
+				}
+				break;
+				
+			case CAMP:
+				// Always allow entry
+				break;
+				
+			default:
+				break;
+		}
+		return true;
+    }
+    
+    
+    // Return true to allow entry, else false to deny entry
+    private void onEnterTerritory(KonTerritory territoryTo, Location locTo, Location locFrom, KonPlayer player, boolean isArmisticeTo) {
+    	if(territoryTo == null) {
+    		return;
     	}
 		// Decide what to do for specific territories
 		switch(territoryTo.getTerritoryType()) {
@@ -1203,24 +1256,6 @@ public class PlayerListener implements Listener{
 				KonCapital capital = (KonCapital) territoryTo;
 				// Add player to territory bar
 				capital.addBarPlayer(player);
-				// Optionally prevent players from entering
-				boolean isEnemyAllowedDenied = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_enter");
-				boolean isAdminBypassMode = player.isAdminBypassActive();
-				if(!isAdminBypassMode && isEnemyAllowedDenied && !player.getKingdom().equals(capital.getKingdom())) {
-					// When Player is in a vehicle, reverse the velocity and eject
-					if(player.getBukkitPlayer().isInsideVehicle()) {
-						Vehicle vehicle = (Vehicle) player.getBukkitPlayer().getVehicle();
-						vehicle.setVelocity(vehicle.getVelocity().multiply(-4));
-						vehicle.eject();
-					}
-					// Cancel the movement
-					//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "Cannot enter enemy Kingdom Capitals"+adminText, ChatColor.DARK_RED);
-					ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAPITAL_ENTER.getMessage());
-					if(player.getBukkitPlayer().hasPermission("konquest.command.admin")) {
-						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
-					}
-					return false;
-				}
 				break;
 				
 			case CAMP:
@@ -1258,7 +1293,7 @@ public class PlayerListener implements Listener{
 			default:
 				break;
 		}
-		return true;
+		return;
     }
     
     private void onExitTerritory(KonTerritory territoryFrom, KonPlayer player, boolean isArmisticeFrom) {
