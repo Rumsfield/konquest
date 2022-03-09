@@ -690,8 +690,8 @@ public class KingdomManager implements KonquestKingdomManager {
     	int claimStatus = claimChunk(claimLoc);
     	switch(claimStatus) {
     	case 0:
-    		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-    		updatePlayerBorderParticles(player);
+    		//KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+    		//updatePlayerBorderParticles(player);
     		//ChatUtil.sendNotice(bukkitPlayer, "Successfully added chunk for territory: "+getChunkTerritory(claimLoc.getChunk()).getName());
     		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
     		break;
@@ -834,7 +834,8 @@ public class KingdomManager implements KonquestKingdomManager {
 			konquest.getMapHandler().drawDynmapLabel(closestTerritory.getKingdom().getCapital());
 			// Display territory info to players in the newly claimed chunks
 			for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
-				if(occupant.getBukkitPlayer().getWorld().equals(claimWorld) && claimedChunks.contains(Konquest.toPoint(occupant.getBukkitPlayer().getLocation()))) {
+				//if(occupant.getBukkitPlayer().getWorld().equals(claimWorld) && claimedChunks.contains(Konquest.toPoint(occupant.getBukkitPlayer().getLocation()))) {
+				if(closestTerritory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
 					ChatColor color = konquest.getDisplayKingdomColor(occupant.getKingdom(), closestTerritory.getKingdom());
 					ChatUtil.sendKonTitle(occupant, "", color+closestTerritory.getName());
 					if(closestTerritory instanceof KonBarDisplayer) {
