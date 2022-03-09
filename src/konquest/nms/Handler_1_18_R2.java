@@ -19,9 +19,9 @@ import com.comphenix.protocol.reflect.FieldAccessException;
 import konquest.KonquestPlugin;
 import konquest.utility.ChatUtil;
 
-public class Handler_1_18_R1 implements VersionHandler {
+public class Handler_1_18_R2 implements VersionHandler {
 
-	public Handler_1_18_R1() {}
+	public Handler_1_18_R2() {}
 	
 	@Override
 	public void applyTradeDiscount(double discountPercent, boolean isStack, MerchantInventory merchantInventory) {

@@ -61,11 +61,7 @@ import konquest.model.KonTown;
 import konquest.nms.Handler_1_16_R3;
 import konquest.nms.Handler_1_17_R1;
 import konquest.nms.Handler_1_18_R1;
-import konquest.nms.TeamPacketSender;
-import konquest.nms.TeamPacketSender_p754;
-import konquest.nms.TeamPacketSender_p755;
-//import konquest.nms.TeamPacketSender_p756;
-import konquest.nms.TeamPacketSender_p757;
+import konquest.nms.Handler_1_18_R2;
 import konquest.nms.VersionHandler;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
@@ -124,10 +120,9 @@ public class Konquest implements KonquestAPI, Timeable {
     private Team enemyTeam;
     private Team armisticeTeam;
     private Team barbarianTeam;
-    private TeamPacketSender teamPacketSender;
-    private boolean isPacketSendEnabled;
     private VersionHandler versionHandler;
     private boolean isVersionHandlerEnabled;
+    private boolean isPacketSendEnabled;
 	
 	private EventPriority chatPriority;
 	private static final EventPriority defaultChatPriority = EventPriority.HIGH;
@@ -173,7 +168,6 @@ public class Konquest implements KonquestAPI, Timeable {
 		plotManager = new PlotManager(this);
 		guildManager = new GuildManager(this);
 		
-		teamPacketSender = null;
 		versionHandler = null;
 		
 		chatPriority = defaultChatPriority;
@@ -186,8 +180,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		this.pingTimer = new Timer(this);
 		this.saveIntervalSeconds = 0;
 		this.offlineTimeoutSeconds = 0;
-		this.isPacketSendEnabled = false;
 		this.isVersionHandlerEnabled = false;
+		this.isPacketSendEnabled = false;
 		
 		//teleportTerritoryQueue = new HashMap<Player,KonTerritory>();
 		teleportLocationQueue = new HashMap<Player,Location>();
@@ -246,44 +240,37 @@ public class Konquest implements KonquestAPI, Timeable {
     		return;
     	}
     	ChatUtil.printConsoleAlert("Your server version is "+version+", "+Bukkit.getServer().getBukkitVersion());
-    	boolean isTeamPacketSenderReady = false;
     	boolean isVersionHandlerReady = false;
     	
     	// Version-specific cases
     	switch(version) {
     		case "v1_16_R3":
-    			teamPacketSender = new TeamPacketSender_p754();
     			versionHandler = new Handler_1_16_R3();
     			break;
     		case "v1_17_R1":
-    			teamPacketSender = new TeamPacketSender_p755();
     			versionHandler = new Handler_1_17_R1();
     			break;
     		case "v1_18_R1":
-    			teamPacketSender = new TeamPacketSender_p757();
     			versionHandler = new Handler_1_18_R1();
+    			break;
+    		case "v1_18_R2":
+    			versionHandler = new Handler_1_18_R2();
     			break;
     		default:
     			break;
     	}
-    	isTeamPacketSenderReady = teamPacketSender != null;
     	isVersionHandlerReady = versionHandler != null;
-		
-    	if(isTeamPacketSenderReady) {
-        	if(plugin.isProtocolEnabled()) {
+    	
+    	if(isVersionHandlerReady) {
+    		isVersionHandlerEnabled = true;
+    		if(plugin.isProtocolEnabled()) {
         		ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version.");
         		isPacketSendEnabled = true;
         	} else {
         		ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is disabled! Check version.");
         	}
-        } else {
-        	ChatUtil.printConsoleError("Failed to register name color packets, the server version is unsupported.");
-        }
-    	
-    	if(isVersionHandlerReady) {
-    		isVersionHandlerEnabled = true;
     	} else {
-    		ChatUtil.printConsoleError("Some Konquest features may not work for this server version.");
+    		ChatUtil.printConsoleError("Some Konquest features may not work for this unsupported server version.");
     	}
     	
 	}
@@ -1189,31 +1176,31 @@ public class Konquest implements KonquestAPI, Timeable {
     		}
     		// Send appropriate team packet to online player
     		if(player.isBarbarian()) {
-    			teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), barbarianTeam);
+    			versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), barbarianTeam);
     		} else {
     			if(player.getKingdom().equals(onlinePlayer.getKingdom())) {
-    				teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), friendlyTeam);
+    				versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), friendlyTeam);
     			} else {
     				if(isArmistice) {
-    					teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), armisticeTeam);
+    					versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), armisticeTeam);
     				} else {
-    					teamPacketSender.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), enemyTeam);
+    					versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), enemyTeam);
     				}
     			}
     		}
     	}
     	// Send packets to player
     	if(!friendlyNames.isEmpty()) {
-			teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), friendlyNames, friendlyTeam);
+    		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), friendlyNames, friendlyTeam);
     	}
     	if(!enemyNames.isEmpty()) {
-    		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), enemyNames, enemyTeam);
+    		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), enemyNames, enemyTeam);
     	}
     	if(!armisticeNames.isEmpty()) {
-    		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), armisticeNames, armisticeTeam);
+    		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), armisticeNames, armisticeTeam);
     	}
     	if(!barbarianNames.isEmpty()) {
-    		teamPacketSender.sendPlayerTeamPacket(player.getBukkitPlayer(), barbarianNames, barbarianTeam);
+    		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), barbarianNames, barbarianTeam);
     	}
     }
     

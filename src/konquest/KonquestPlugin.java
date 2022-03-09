@@ -126,7 +126,7 @@ public class KonquestPlugin extends JavaPlugin {
 			isProtocolEnabled = true;
 		} catch(Exception e) {
 			ChatUtil.printConsoleError("Failed to load ProtocolLib, is it the latest version?");
-			ChatUtil.printConsoleError(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 	
