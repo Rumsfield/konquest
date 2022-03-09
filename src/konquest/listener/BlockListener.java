@@ -312,8 +312,10 @@ public class BlockListener implements Listener {
 								// Cancel item drops on the broken blocks
 								event.setDropItems(false);
 
-								// Handle town capture/destroy
-								onTownCriticalHit(town, player);
+								if(isCritical) {
+									// Handle town capture/destroy
+									onTownCriticalHit(town, player);
+								}
 								
 							} else {
 								// Prevent block breaks in the rest of the chunk
@@ -1264,8 +1266,9 @@ public class BlockListener implements Listener {
 		int maxCriticalhits = konquest.getKingdomManager().getMaxCriticalHits();
 		
 		// Update bar progress
-		double progress = (double)(maxCriticalhits - town.getMonument().getCriticalHits()) / (double)maxCriticalhits;
-		town.setBarProgress(progress);
+		//double progress = (double)(maxCriticalhits - town.getMonument().getCriticalHits()) / (double)maxCriticalhits;
+		//town.setBarProgress(progress);
+		town.updateBar();
 		
 		// Evaluate town capture conditions
 		if(town.getMonument().getCriticalHits() >= maxCriticalhits) {

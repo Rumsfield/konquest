@@ -746,6 +746,14 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public void updateBar() {
+		//TODO: Fix bar display logic
+		/*
+		 * When town block is broken without shield or armor, attacked=true & show critical hit progress.
+		 * If shields or armor are added while attacked, preserve attacked state and critical progress in background,
+		 * but display armor/shield progress. Do not refresh regen timer while armor/shield is active.
+		 * When shields/armor are depleted, and regen timer has not expired, restore attacked title & critical bar progress.
+		 * Otherwise, when regen timer has expired, restore to normal non-attacked title & 1.0 progress.
+		 */
 		String separator = " - ";
 		if(isAttacked) {
 			monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+MessagePath.LABEL_CRITICAL_HITS.getMessage());
@@ -754,6 +762,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			monumentBarAllies.setStyle(BarStyle.SOLID);
 			monumentBarEnemies.setStyle(BarStyle.SOLID);
 			monumentBarArmistice.setStyle(BarStyle.SOLID);
+			// Set bar with critical hits
+			int maxCriticalhits = getKonquest().getKingdomManager().getMaxCriticalHits();
+			double progress = (double)(maxCriticalhits - getMonument().getCriticalHits()) / (double)maxCriticalhits;
+			setBarProgress(progress);
 		} else {
 			int remainingSeconds = getRemainingShieldTimeSeconds();
 			String remainingTime = "";
@@ -1141,6 +1153,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			shieldTimer.stopTimer();
 			shieldTimer.setTime(0);
 			shieldTimer.startLoopTimer();
+			// No longer attacked when shielded
+			setAttacked(false);
 		}
 		//shieldArmorBarAll.setVisible(true);
 		//refreshShieldBarTitle();
@@ -1161,6 +1175,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		if(!isArmored) {
 			// Activate new armor
 			isArmored = true;
+			// No longer attacked when armored
+			setAttacked(false);
 		}
 		armorCurrentBlocks = val;
 		armorTotalBlocks = armorCurrentBlocks;
