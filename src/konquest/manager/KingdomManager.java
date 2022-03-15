@@ -2100,6 +2100,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	}
 	
 	public void loadArmorBlacklist() {
+		armorBlocks.clear();
 		// True = list is a whitelist, False = list is a blacklist (Default false)
 		isArmorBlockWhitelist = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.armor_blacklist_reverse",false);
 		boolean isListEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.armor_blacklist_enable",false);
