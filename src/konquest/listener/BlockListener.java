@@ -1330,11 +1330,15 @@ public class BlockListener implements Listener {
 				}
 				// Conquer the town for the enemy player's kingdom
 				if(kingdomManager.captureTownForPlayer(town.getName(), town.getKingdom().getName(), player)) {
+					/*
 					// Alert all players of original Kingdom
 					for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), "The Town "+event.getTerritory().getName()+" has been conquered!", ChatColor.DARK_RED);
 						ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(town.getName()), ChatColor.DARK_RED);
 					}
+					*/
+					ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(town.getName()));
+	        		
 					ChatUtil.printDebug("Monument conversion in Town "+town.getName());
 					//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "You have conquered "+town.getName()+" for the conquest of "+event.getPlayer().getKingdom().getName()+"!");
 					ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAPTURE.getMessage(town.getName(),player.getKingdom().getName()));

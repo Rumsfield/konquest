@@ -96,12 +96,12 @@ public class KonMonument implements KonquestMonument {
 			return 3;
 		}
 		
-		int standY = centerLoc.getBlockY();
+		int standY = centerLoc.getBlockY()-1;
 		if(standY < minY || standY > maxY) {
 			ChatUtil.printDebug("Monument init failed: center position "+standY+" is outside of gradiant bounds ("+minY+","+maxY+")");
 			return 3;
 		}
-		baseY = standY-1;
+		baseY = standY;
 		
 		// Passed all init checks, update the monument with Template parameters
 		boolean updatePass = updateFromTemplate(template);
