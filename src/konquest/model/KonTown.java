@@ -615,7 +615,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			//pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
 			reloadMonument();
 			setAttacked(false);
-			setBarProgress(1.0);
+			//setBarProgress(1.0);
 			updateBar();
 			getWorld().playSound(getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)1, (float)0.8);
 			//String kingdomName = getKingdom().getName();
@@ -727,14 +727,18 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public void setAttacked(boolean val) {
-		// Cannot attack while shielded or armored
-		if(val == true && !(isShielded || isArmored)) {
+		if(val == true) {
 			this.isAttacked = true;
-			// Start Monument regenerate timer for target town
+			// Start Monument regenerate timer for target town when no armor nor shield
 			int monumentRegenTimeSeconds = getKonquest().getConfigManager().getConfig("core").getInt("core.monuments.damage_regen");
 			monumentTimer.stopTimer();
 			monumentTimer.setTime(monumentRegenTimeSeconds);
 			monumentTimer.startTimer();
+			/*
+			if(!(isShielded || isArmored)) {
+				
+			}
+			*/
 		} else {
 			this.isAttacked = false;
 			defenders.clear();
@@ -755,10 +759,50 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		 * Otherwise, when regen timer has expired, restore to normal non-attacked title & 1.0 progress.
 		 */
 		String separator = " - ";
-		if(isAttacked) {
-			monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+MessagePath.LABEL_CRITICAL_HITS.getMessage());
-			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+MessagePath.LABEL_CRITICAL_HITS.getMessage());
-			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+separator+MessagePath.LABEL_CRITICAL_HITS.getMessage());
+		int remainingSeconds = 0;
+		String remainingTime = "";
+		String armor = MessagePath.LABEL_ARMOR.getMessage();
+		String shield = MessagePath.LABEL_SHIELD.getMessage();
+		String critical = MessagePath.LABEL_CRITICAL_HITS.getMessage();
+		
+		// Set title conditions
+		if(isShielded && isArmored) {
+			remainingSeconds = getRemainingShieldTimeSeconds();
+			remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor1);
+			monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+remainingTime);
+			remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor1);
+			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+remainingTime);
+			remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.armisticeColor1);
+			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+remainingTime);
+		} else if(isShielded) {
+			remainingSeconds = getRemainingShieldTimeSeconds();
+			remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor1);
+			monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+shield+" "+remainingTime);
+			remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor1);
+			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+shield+" "+remainingTime);
+			remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.armisticeColor1);
+			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+separator+shield+" "+remainingTime);
+		} else if(isArmored) {
+			monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+separator+armorCurrentBlocks+" "+armor);
+		} else if(isAttacked) {
+			monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+critical);
+			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+critical);
+			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+separator+critical);
+		} else {
+			monumentBarAllies.setTitle(Konquest.friendColor1+getName());
+			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName());
+			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName());
+		}
+		
+		// Set progress conditions
+		if(isShielded || isArmored) {
+			monumentBarAllies.setStyle(BarStyle.SEGMENTED_10);
+			monumentBarEnemies.setStyle(BarStyle.SEGMENTED_10);
+			monumentBarArmistice.setStyle(BarStyle.SEGMENTED_10);
+			setBarProgress(armorProgress);
+		} else if(isAttacked) {
 			monumentBarAllies.setStyle(BarStyle.SOLID);
 			monumentBarEnemies.setStyle(BarStyle.SOLID);
 			monumentBarArmistice.setStyle(BarStyle.SOLID);
@@ -767,45 +811,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			double progress = (double)(maxCriticalhits - getMonument().getCriticalHits()) / (double)maxCriticalhits;
 			setBarProgress(progress);
 		} else {
-			int remainingSeconds = getRemainingShieldTimeSeconds();
-			String remainingTime = "";
-			String armor = MessagePath.LABEL_ARMOR.getMessage();
-			String shield = MessagePath.LABEL_SHIELD.getMessage();
-			
-			if(isShielded && isArmored) {
-				remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor1);
-				monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+remainingTime);
-				remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor1);
-				monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+remainingTime);
-				remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.armisticeColor1);
-				monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+remainingTime);
-			} else if(isShielded) {
-				remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor1);
-				monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+shield+" "+remainingTime);
-				remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor1);
-				monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+shield+" "+remainingTime);
-				remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.armisticeColor1);
-				monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+separator+shield+" "+remainingTime);
-			} else if(isArmored) {
-				monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+armorCurrentBlocks+" "+armor);
-				monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+armorCurrentBlocks+" "+armor);
-				monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+separator+armorCurrentBlocks+" "+armor);
-			} else {
-				monumentBarAllies.setTitle(Konquest.friendColor1+getName());
-				monumentBarEnemies.setTitle(Konquest.enemyColor1+getName());
-				monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName());
-			}
-			if(isShielded || isArmored) {
-				monumentBarAllies.setStyle(BarStyle.SEGMENTED_10);
-				monumentBarEnemies.setStyle(BarStyle.SEGMENTED_10);
-				monumentBarArmistice.setStyle(BarStyle.SEGMENTED_10);
-				setBarProgress(armorProgress);
-			} else {
-				monumentBarAllies.setStyle(BarStyle.SOLID);
-				monumentBarEnemies.setStyle(BarStyle.SOLID);
-				monumentBarArmistice.setStyle(BarStyle.SOLID);
-				setBarProgress(1.0);
-			}
+			monumentBarAllies.setStyle(BarStyle.SOLID);
+			monumentBarEnemies.setStyle(BarStyle.SOLID);
+			monumentBarArmistice.setStyle(BarStyle.SOLID);
+			setBarProgress(1.0);
 		}
 	}
 	
