@@ -354,11 +354,13 @@ public class Konquest implements KonquestAPI, Timeable {
 	private void initColors() {
 		ChatColor color;
 		String configColor = "";
+		String defaultColor = "";
 		/* Friendly Primary Color */
 		configColor = configManager.getConfig("core").getString("core.colors.friendly_primary","");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.friendly_primary: "+configColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.friendly_primary");
+			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.friendly_primary: "+configColor+", using "+defaultColor);
 		} else {
 			friendColor1 = color;
 		}
@@ -366,7 +368,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		configColor = configManager.getConfig("core").getString("core.colors.friendly_secondary","");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.friendly_secondary: "+configColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.friendly_secondary");
+			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.friendly_secondary: "+configColor+", using "+defaultColor);
 		} else {
 			friendColor2 = color;
 		}
@@ -374,7 +377,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		configColor = configManager.getConfig("core").getString("core.colors.enemy_primary","");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_primary: "+configColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.enemy_primary");
+			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_primary: "+configColor+", using "+defaultColor);
 		} else {
 			enemyColor1 = color;
 		}
@@ -382,7 +386,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		configColor = configManager.getConfig("core").getString("core.colors.enemy_secondary","");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_secondary: "+configColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.enemy_secondary");
+			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_secondary: "+configColor+", using "+defaultColor);
 		} else {
 			enemyColor2 = color;
 		}
@@ -390,7 +395,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		configColor = configManager.getConfig("core").getString("core.colors.armistice_primary","");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_primary: "+configColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.armistice_primary");
+			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_primary: "+configColor+", using "+defaultColor);
 		} else {
 			armisticeColor1 = color;
 		}
@@ -398,7 +404,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		configColor = configManager.getConfig("core").getString("core.colors.armistice_secondary","");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_secondary: "+configColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.armistice_secondary");
+			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_secondary: "+configColor+", using "+defaultColor);
 		} else {
 			armisticeColor2 = color;
 		}
@@ -406,7 +413,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		configColor = configManager.getConfig("core").getString("core.colors.barbarian","");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			ChatUtil.printConsoleError("Invalid color code core.colors.barbarian: "+configColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.barbarian");
+			ChatUtil.printConsoleError("Invalid color code core.colors.barbarian: "+configColor+", using "+defaultColor);
 		} else {
 			barbarianColor = color;
 		}
