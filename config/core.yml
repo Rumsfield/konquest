@@ -114,8 +114,19 @@ core:
     armor_blacklist_enable: true
     armor_blacklist_reverse: false
     armor_blacklist:
-    - STONE
-    - END_STONE
+    - ACACIA_LEAVES
+    - AZALEA_LEAVES
+    - BIRCH_LEAVES
+    - DARK_OAK_LEAVES
+    - FLOWERING_AZALEA_LEAVES
+    - JUNGLE_LEAVES
+    - OAK_LEAVES
+    - SPRUCE_LEAVES
+    - GRASS_BLOCK
+    - DIRT
+    - SAND
+    - GRAVEL
+    - SNOW
   plots:
     enable: true
     max_size: 16
