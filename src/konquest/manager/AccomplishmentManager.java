@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.event.player.KonquestPlayerPrefixEvent;
 import konquest.model.KonCustomPrefix;
 import konquest.model.KonPlayer;
 import konquest.model.KonPrefix;
@@ -204,6 +205,9 @@ public class AccomplishmentManager {
 		boolean result = false;
 		if(player.getPlayerPrefix().isEnabled()) {
 			player.getPlayerPrefix().setEnable(false);
+			// Fire event
+			KonquestPlayerPrefixEvent invokeEvent = new KonquestPlayerPrefixEvent(konquest, player, "", true);
+			Konquest.callKonquestEvent(invokeEvent);
 			//ChatUtil.sendNotice((Player) getSender(), "Turned off your prefix title");
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_DISABLE.getMessage());
 			result = true;
@@ -218,6 +222,9 @@ public class AccomplishmentManager {
 		boolean result = false;
 		if(player.getPlayerPrefix().selectPrefix(prefix)) {
 			player.getPlayerPrefix().setEnable(true);
+			// Fire event
+			KonquestPlayerPrefixEvent invokeEvent = new KonquestPlayerPrefixEvent(konquest, player, prefix.getName(), false);
+			Konquest.callKonquestEvent(invokeEvent);
 			//ChatUtil.sendNotice((Player) getSender(), "Your prefix is now "+prefixChosen.getName());
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(prefix.getName()));
 			result = true;

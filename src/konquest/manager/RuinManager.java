@@ -1,6 +1,7 @@
 package konquest.manager;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -16,12 +17,15 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.manager.KonquestRuinManager;
+import konquest.api.model.KonquestRuin;
+import konquest.model.KonKingdom;
 import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-public class RuinManager {
+public class RuinManager implements KonquestRuinManager {
 
 	private Konquest konquest;
 	private KingdomManager kingdomManager;
@@ -34,11 +38,6 @@ public class RuinManager {
 		this.ruinMap = new HashMap<String, KonRuin>();
 		this.ruinCriticalBlock = Material.OBSIDIAN;
 	}
-	//TODO:
-	// On server start and stop, replace critical and spawn blocks in all ruins
-	// Load custom mob lists from config file for spawn tables
-	// Give rewards (favor and exp) to players inside of ruin territory upon capture
-	// Kill all mobs inside a ruin when it is captured
 	
 	public void initialize() {
 		loadCriticalBlocks();
@@ -59,25 +58,34 @@ public class RuinManager {
 		}
 	}
 	
-	public void rewardPlayers(KonRuin ruin, KonPlayer capturePlayer) {
+	public void rewardPlayers(KonRuin ruin, KonKingdom kingdom) {
 		int rewardFavor = konquest.getConfigManager().getConfig("core").getInt("core.ruins.capture_reward_favor",0);
 		int rewardExp = konquest.getConfigManager().getConfig("core").getInt("core.ruins.capture_reward_exp",0);
-		for(KonPlayer friendly : konquest.getPlayerManager().getPlayersInKingdom(capturePlayer.getKingdom())) {
-			if(isLocInsideRuin(ruin,friendly.getBukkitPlayer().getLocation())) {
-				// Give reward to player
-				if(rewardFavor > 0) {
-					ChatUtil.printDebug("Ruin capture favor rewarded to player "+friendly.getBukkitPlayer().getName());
-		            if(KonquestPlugin.depositPlayer(friendly.getBukkitPlayer(), rewardFavor)) {
-		            	ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_NOTICE_RUIN.getMessage(ruin.getName()));
-		            }
-				}
-				if(rewardExp > 0) {
-					friendly.getBukkitPlayer().giveExp(rewardExp);
-					//ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.WHITE+"EXP rewarded: "+ChatColor.GREEN+rewardExp);
-					ChatUtil.sendNotice(friendly.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REWARD_EXP.getMessage(rewardExp));
-				}
+		for(KonPlayer friendly : getRuinPlayers(ruin,kingdom)) {
+			// Give reward to player
+			if(rewardFavor > 0) {
+				ChatUtil.printDebug("Ruin capture favor rewarded to player "+friendly.getBukkitPlayer().getName());
+	            if(KonquestPlugin.depositPlayer(friendly.getBukkitPlayer(), rewardFavor)) {
+	            	ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_NOTICE_RUIN.getMessage(ruin.getName()));
+	            }
+			}
+			if(rewardExp > 0) {
+				friendly.getBukkitPlayer().giveExp(rewardExp);
+				//ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.WHITE+"EXP rewarded: "+ChatColor.GREEN+rewardExp);
+				ChatUtil.sendNotice(friendly.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REWARD_EXP.getMessage(rewardExp));
 			}
 		}
+	}
+	
+	// returns list of players in kingdom inside ruin
+	public List<KonPlayer> getRuinPlayers(KonRuin ruin, KonKingdom kingdom) {
+		List<KonPlayer> players = new ArrayList<KonPlayer>();
+		for(KonPlayer friendly : konquest.getPlayerManager().getPlayersInKingdom(kingdom)) {
+			if(isLocInsideRuin(ruin,friendly.getBukkitPlayer().getLocation())) {
+				players.add(friendly);
+			}
+		}
+		return players;
 	}
 	
 	public boolean isRuin(String name) {
@@ -85,11 +93,14 @@ public class RuinManager {
 		return ruinMap.containsKey(name.toLowerCase());
 	}
 	
-	public boolean isLocInsideRuin(KonRuin ruin, Location loc) {
+	public boolean isLocInsideRuin(KonquestRuin ruinArg, Location loc) {
 		boolean result = false;
-		if(kingdomManager.isChunkClaimed(loc)) {
-			if(ruin.equals(kingdomManager.getChunkTerritory(loc))) {
-				result = true;
+		if(ruinArg instanceof KonRuin) {
+			KonRuin ruin = (KonRuin) ruinArg;
+			if(kingdomManager.isChunkClaimed(loc)) {
+				if(ruin.equals(kingdomManager.getChunkTerritory(loc))) {
+					result = true;
+				}
 			}
 		}
 		return result;
@@ -97,7 +108,7 @@ public class RuinManager {
 	
 	public boolean addRuin(Location loc, String name) {
 		boolean result = false;
-		if(!name.contains(" ") && !isRuin(name)) {
+		if(!name.contains(" ") && konquest.validateNameConstraints(name) == 0) {
 			// Verify no overlapping init chunks
 			for(Point point : konquest.getAreaPoints(loc, 2)) {
 				if(kingdomManager.isChunkClaimed(point,loc.getWorld())) {

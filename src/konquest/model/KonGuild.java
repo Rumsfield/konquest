@@ -10,9 +10,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Villager;
 
+import konquest.api.model.KonquestGuild;
+import konquest.api.model.KonquestTown;
 import konquest.utility.RequestKeeper;
 
-public class KonGuild {
+public class KonGuild implements KonquestGuild {
 
 	private boolean isOpen;
 	private String name;
@@ -266,7 +268,7 @@ public class KonGuild {
 		return result;
 	}
 	
-	public boolean isSanction(KonGuild guild) {
+	public boolean isSanction(KonquestGuild guild) {
 		return friendlySanction.contains(guild);
 	}
 	
@@ -295,7 +297,7 @@ public class KonGuild {
 		return result;
 	}
 	
-	public boolean isArmistice(KonGuild guild) {
+	public boolean isArmistice(KonquestGuild guild) {
 		return enemyArmistice.contains(guild);
 	}
 	
@@ -332,7 +334,7 @@ public class KonGuild {
 		return result;
 	}
 	
-	public boolean isTownMember(KonTown town) {
+	public boolean isTownMember(KonquestTown town) {
 		if(town.getKingdom().equals(this.getKingdom())) {
 			UUID lord = town.getLord();
 			if(lord != null && members.containsKey(lord)) {

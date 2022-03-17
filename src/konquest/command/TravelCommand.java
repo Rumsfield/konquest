@@ -49,7 +49,7 @@ public class TravelCommand extends CommandBase {
                 return;
         	}
         	
-        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
@@ -211,7 +211,7 @@ public class TravelCommand extends CommandBase {
 	            		}
 	            		//TODO this might get spammy
 	            		for(OfflinePlayer resident : town.getPlayerResidents()) {
-	    	    			if(resident.isOnline() && (town.isPlayerLord(resident) || town.isPlayerElite(resident))) {
+	    	    			if(resident.isOnline() && (town.isPlayerLord(resident) || town.isPlayerKnight(resident))) {
 	    	    				//ChatUtil.sendNotice((Player) resident, bukkitPlayer.getName()+" has traveled to "+town.getName());
 	    	    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TRAVEL_NOTICE_TOWN_TRAVEL.getMessage(bukkitPlayer.getName(),town.getName()));
 	    	    			}

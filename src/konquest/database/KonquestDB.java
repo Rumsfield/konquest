@@ -182,7 +182,7 @@ public class KonquestDB extends Database{
     }
     
     public void setOfflinePlayer(KonOfflinePlayer offlinePlayer) {
-		if(konquest.getPlayerManager().isPlayerExist(offlinePlayer.getOfflineBukkitPlayer())) {
+		if(konquest.getPlayerManager().isOfflinePlayer(offlinePlayer.getOfflineBukkitPlayer())) {
 			String playerUUIDString = offlinePlayer.getOfflineBukkitPlayer().getUniqueId().toString();
 	        String[] col;
 	        String[] val;
@@ -361,7 +361,7 @@ public class KonquestDB extends Database{
     
     public void flushPlayerData(Player bukkitPlayer) {
     	//ChatUtil.printDebug("Flushing player database for "+bukkitPlayer.getDisplayName());
-    	if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+    	if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to flush non-existent player to database");
 			return;
 		}

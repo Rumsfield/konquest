@@ -11,12 +11,14 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestTerritoryType;
+import konquest.api.model.KonquestCamp;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
-public class KonCamp extends KonTerritory implements Timeable {
+public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplayer, Timeable {
 	
 	private OfflinePlayer owner;
 	private Timer raidAlertTimer;
@@ -28,7 +30,7 @@ public class KonCamp extends KonTerritory implements Timeable {
 	private BossBar campBarAll;
 	
 	public KonCamp(Location loc, OfflinePlayer owner, KonKingdom kingdom, Konquest konquest) {
-		super(loc, MessagePath.LABEL_CAMP.getMessage().trim()+"_"+owner.getName(), kingdom, KonTerritoryType.CAMP, konquest);
+		super(loc, MessagePath.LABEL_CAMP.getMessage().trim()+"_"+owner.getName(), kingdom, KonquestTerritoryType.CAMP, konquest);
 		
 		this.owner = owner;
 		this.raidAlertTimer = new Timer(this);
@@ -64,9 +66,15 @@ public class KonCamp extends KonTerritory implements Timeable {
 		return 0;
 	}
 
+	@Override
 	public boolean addChunk(Point point) {
 		//addPoint(getKonquest().toPoint(chunk));
 		addPoint(point);
+		return true;
+	}
+	
+	@Override
+	public boolean testChunk(Point point) {
 		return true;
 	}
 	

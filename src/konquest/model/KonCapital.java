@@ -1,6 +1,8 @@
 package konquest.model;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestTerritoryType;
+import konquest.api.model.KonquestCapital;
 
 import java.awt.Point;
 
@@ -12,18 +14,18 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
-public class KonCapital extends KonTerritory{
+public class KonCapital extends KonTerritory implements KonquestCapital, KonBarDisplayer {
 	
 	private BossBar capitalBarAll;
 	
 	public KonCapital(Location loc, KonKingdom kingdom, Konquest konquest) {
-		super(loc, kingdom.getName()+" "+konquest.getConfigManager().getConfig("core").getString("core.kingdoms.capital_suffix"), kingdom, KonTerritoryType.CAPITAL, konquest);
+		super(loc, kingdom.getName()+" "+konquest.getConfigManager().getConfig("core").getString("core.kingdoms.capital_suffix"), kingdom, KonquestTerritoryType.CAPITAL, konquest);
 		this.capitalBarAll = Bukkit.getServer().createBossBar(ChatColor.GOLD+getName(), BarColor.WHITE, BarStyle.SOLID);
 		this.capitalBarAll.setVisible(true);
 	}
 
 	public KonCapital(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
-		super(loc, name, kingdom, KonTerritoryType.CAPITAL, konquest);
+		super(loc, name, kingdom, KonquestTerritoryType.CAPITAL, konquest);
 	}
 	
 	public void updateName() {
@@ -34,6 +36,11 @@ public class KonCapital extends KonTerritory{
 	@Override
 	public boolean addChunk(Point point) {
 		addPoint(point);
+		return true;
+	}
+	
+	@Override
+	public boolean testChunk(Point point) {
 		return true;
 	}
 	

@@ -9,19 +9,19 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import konquest.Konquest;
-import konquest.model.KonUpgrade;
+import konquest.api.model.KonquestUpgrade;
 import konquest.utility.MessagePath;
 
 public class UpgradeIcon implements MenuIcon{
 
-	KonUpgrade upgrade;
+	KonquestUpgrade upgrade;
 	int level;
 	int cost;
 	int pop;
 	int index;
 	ItemStack item;
 	
-	public UpgradeIcon(KonUpgrade upgrade, int level, int index, int cost, int pop) {
+	public UpgradeIcon(KonquestUpgrade upgrade, int level, int index, int cost, int pop) {
 		this.upgrade = upgrade;
 		this.level = level;
 		this.index = index;
@@ -51,7 +51,7 @@ public class UpgradeIcon implements MenuIcon{
 		return item;
 	}
 	
-	public KonUpgrade getUpgrade() {
+	public KonquestUpgrade getUpgrade() {
 		return upgrade;
 	}
 	

@@ -20,19 +20,25 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.event.camp.KonquestCampCreateEvent;
+import konquest.api.manager.KonquestCampManager;
+import konquest.api.model.KonquestCamp;
+import konquest.api.model.KonquestOfflinePlayer;
 import konquest.model.KonCamp;
 import konquest.model.KonCampGroup;
 import konquest.model.KonOfflinePlayer;
+import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-public class CampManager {
+public class CampManager implements KonquestCampManager {
 
 	private Konquest konquest;
 	private KingdomManager kingdomManager;
 	private HashMap<String,KonCamp> barbarianCamps; // player uuids to camps
 	//private HashSet<KonCampGroup> barbarianGroups; // all camp groups
 	private HashMap<KonCamp,KonCampGroup> groupMap; // camps to groups
+	private boolean isClanEnabled;
 	
 	public CampManager(Konquest konquest) {
 		this.konquest = konquest;
@@ -40,21 +46,23 @@ public class CampManager {
 		this.barbarianCamps = new HashMap<String, KonCamp>();
 		//this.barbarianGroups = new HashSet<KonCampGroup>();
 		this.groupMap = new HashMap<KonCamp,KonCampGroup>();
+		this.isClanEnabled = false;
 	}
 	
 	// intended to be called after database has connected and loaded player tables
 	public void initCamps() {
+		isClanEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_enable",false);
 		loadCamps();
 		refreshGroups();
 		ChatUtil.printDebug("Loaded camps and groups");
 	}
 	
-	public boolean isCampSet(KonOfflinePlayer player) {
+	public boolean isCampSet(KonquestOfflinePlayer player) {
 		String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
 		return player.isBarbarian() && barbarianCamps.containsKey(uuid);
 	}
 	
-	public KonCamp getCamp(KonOfflinePlayer player) {
+	public KonCamp getCamp(KonquestOfflinePlayer player) {
 		String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
 		return barbarianCamps.get(uuid);
 	}
@@ -129,7 +137,20 @@ public class CampManager {
 		return 0;
 	}
 	
-	public boolean removeCamp(KonOfflinePlayer player) {
+	public int addCampForPlayer(Location loc, KonPlayer player) {
+		int result = addCamp(loc, player);
+		if(result == 0) {
+			KonCamp newCamp = getCamp(player);
+			if(newCamp != null && player != null) {
+				// Fire event
+				KonquestCampCreateEvent invokeEvent = new KonquestCampCreateEvent(konquest, newCamp, player);
+				Konquest.callKonquestEvent(invokeEvent);
+			}
+		}
+		return result;
+	}
+	
+	public boolean removeCamp(KonquestOfflinePlayer player) {
 		String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
 		return removeCamp(uuid);
 	}
@@ -170,12 +191,16 @@ public class CampManager {
 		return true;
 	}
 	
-	public boolean isCampGrouped(KonCamp camp) {
+	public boolean isCampGrouped(KonquestCamp camp) {
 		return groupMap.containsKey(camp);
 	}
 	
-	public KonCampGroup getCampGroup(KonCamp camp) {
+	public KonCampGroup getCampGroup(KonquestCamp camp) {
 		return groupMap.get(camp);
+	}
+	
+	public boolean isCampGroupsEnabled() {
+		return isClanEnabled;
 	}
 	
 	/**
@@ -285,7 +310,6 @@ public class CampManager {
 	*/
 	private void refreshGroups() {
 		groupMap.clear();
-		boolean isClanEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_enable",false);
 		if(!isClanEnabled) {
 			return;
 		}
@@ -406,7 +430,7 @@ public class CampManager {
         	if(campsSection.contains(uuid)) {
         		OfflinePlayer offlineBukkitPlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
         		//ChatUtil.printDebug("Adding camp for player "+offlineBukkitPlayer.getName());
-        		if(konquest.getPlayerManager().isPlayerExist(offlineBukkitPlayer)) {
+        		if(konquest.getPlayerManager().isOfflinePlayer(offlineBukkitPlayer)) {
         			KonOfflinePlayer offlinePlayer = konquest.getPlayerManager().getOfflinePlayer(offlineBukkitPlayer);
         			// Add stored camp
             		ConfigurationSection playerCampSection = campsSection.getConfigurationSection(uuid);

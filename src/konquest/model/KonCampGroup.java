@@ -5,11 +5,14 @@ import java.util.HashSet;
 
 import org.bukkit.OfflinePlayer;
 
+import konquest.api.model.KonquestCamp;
+import konquest.api.model.KonquestCampGroup;
+
 /**
  * Represents a group of adjacent camps
  *
  */
-public class KonCampGroup {
+public class KonCampGroup implements KonquestCampGroup {
 
 	private HashSet<KonCamp> camps;
 	
@@ -17,7 +20,7 @@ public class KonCampGroup {
 		this.camps = new HashSet<KonCamp>();
 	}
 	
-	public boolean containsCamp(KonCamp camp) {
+	public boolean containsCamp(KonquestCamp camp) {
 		return camps.contains(camp);
 	}
 	

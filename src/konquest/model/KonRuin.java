@@ -18,11 +18,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestTerritoryType;
+import konquest.api.model.KonquestRuin;
 import konquest.utility.ChatUtil;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
-public class KonRuin extends KonTerritory implements Timeable {
+public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplayer, Timeable {
 
 	private Timer spawnTimer;
 	private Timer captureTimer;
@@ -42,7 +44,7 @@ public class KonRuin extends KonTerritory implements Timeable {
 	 */
 	
 	public KonRuin(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
-		super(loc, name, kingdom, KonTerritoryType.RUIN, konquest);
+		super(loc, name, kingdom, KonquestTerritoryType.RUIN, konquest);
 		this.spawnTimer = new Timer(this);
 		this.captureTimer = new Timer(this);
 		this.isCaptureDisabled = false;
@@ -63,6 +65,11 @@ public class KonRuin extends KonTerritory implements Timeable {
 	@Override
 	public boolean addChunk(Point point) {
 		addPoint(point);
+		return true;
+	}
+	
+	@Override
+	public boolean testChunk(Point point) {
 		return true;
 	}
 

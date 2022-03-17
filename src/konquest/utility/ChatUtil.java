@@ -72,7 +72,7 @@ public class ChatUtil {
 	 * @param name
 	 * @return
 	 */
-	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, ChatColor teamColor, ChatColor titleColor, boolean formatName) {
+	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, ChatColor teamColor, ChatColor titleColor, boolean formatName, boolean formatKingdom) {
 		String message = base;
 		if(prefix.equals("")) {
 			message = message.replace("%PREFIX% ", "");
@@ -90,7 +90,11 @@ public class ChatUtil {
 			message = message.replace("%KINGDOM% ", "");
 			message = message.replace("%KINGDOM%", "");
 		} else {
-			message = message.replace("%KINGDOM%", teamColor+kingdom);
+			if(formatKingdom) {
+				message = message.replace("%KINGDOM%", teamColor+kingdom);
+			} else {
+				message = message.replace("%KINGDOM%", kingdom);
+			}
 		}
 		if(title.equals("")) {
 			message = message.replace("%TITLE% ", "");

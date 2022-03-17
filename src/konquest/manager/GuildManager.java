@@ -21,6 +21,11 @@ import org.bukkit.inventory.MerchantRecipe;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.manager.KonquestGuildManager;
+import konquest.api.model.KonquestGuild;
+import konquest.api.model.KonquestKingdom;
+import konquest.api.model.KonquestOfflinePlayer;
+import konquest.api.model.KonquestTown;
 import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
@@ -32,7 +37,7 @@ import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
-public class GuildManager implements Timeable {
+public class GuildManager implements KonquestGuildManager, Timeable {
 
 	private Konquest konquest;
 	private boolean isEnabled;
@@ -52,11 +57,6 @@ public class GuildManager implements Timeable {
 	private Timer payTimer;
 	private HashSet<KonGuild> guilds;
 	private HashMap<UUID,KonGuild> playerGuildCache;
-	
-	//TODO: Specialization trade discounts
-	/* - Check version to handle exceptions in MerchantRecipe special price methods
-	 * 
-	 */
 	
 	public GuildManager(Konquest konquest) {
 		this.konquest = konquest;
@@ -343,7 +343,7 @@ public class GuildManager implements Timeable {
                 return 3;
 			}
     	}
-		if(!name.contains(" ") && !konquest.getKingdomManager().isKingdom(name) && !konquest.getKingdomManager().isTown(name)) {
+		if(!name.contains(" ") && konquest.validateNameConstraints(name) == 0) {
 			KonGuild currentGuild = getPlayerGuild(master.getOfflineBukkitPlayer());
 			if(currentGuild == null) {
 				KonGuild newGuild = new KonGuild(name, master.getBukkitPlayer().getUniqueId(), master.getKingdom());
@@ -845,7 +845,7 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
-	public List<KonGuild> getEnemyGuilds(KonKingdom kingdom) {
+	public List<KonGuild> getEnemyGuilds(KonquestKingdom kingdom) {
 		List<KonGuild> result = new ArrayList<KonGuild>();
 		for(KonGuild otherGuild : guilds) {
 			if(!otherGuild.getKingdom().equals(kingdom)) {
@@ -855,7 +855,7 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
-	public List<KonGuild> getKingdomGuilds(KonKingdom kingdom) {
+	public List<KonGuild> getKingdomGuilds(KonquestKingdom kingdom) {
 		List<KonGuild> result = new ArrayList<KonGuild>();
 		for(KonGuild guild : guilds) {
 			if(kingdom.equals(guild.getKingdom())) {
@@ -876,7 +876,7 @@ public class GuildManager implements Timeable {
 	}
 	
 	// This can return null!
-	public KonGuild getTownGuild(KonTown town) {
+	public KonGuild getTownGuild(KonquestTown town) {
 		KonGuild result = null;
 		UUID lordID = town.getLord();
 		if(lordID != null) {
@@ -938,7 +938,7 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
-	public boolean isArmistice(KonGuild guild1, KonGuild guild2) {
+	public boolean isArmistice(KonquestGuild guild1, KonquestGuild guild2) {
 		boolean result = false;
 		if(guild1 != null && guild2 != null && !guild1.getKingdom().equals(guild2.getKingdom()) && guild1.isArmistice(guild2) && guild2.isArmistice(guild1)) {
 			result = true;
@@ -946,7 +946,7 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
-	public boolean isArmistice(KonOfflinePlayer player1, KonOfflinePlayer player2) {
+	public boolean isArmistice(KonquestOfflinePlayer player1, KonquestOfflinePlayer player2) {
 		boolean result = false;
 		KonGuild guild1 = getPlayerGuild(player1.getOfflineBukkitPlayer());
 		KonGuild guild2 = getPlayerGuild(player2.getOfflineBukkitPlayer());
@@ -954,7 +954,7 @@ public class GuildManager implements Timeable {
 		return result;
 	}
 	
-	public boolean isArmistice(KonOfflinePlayer player1, KonTown town2) {
+	public boolean isArmistice(KonquestOfflinePlayer player1, KonquestTown town2) {
 		boolean result = false;
 		KonGuild guild1 = getPlayerGuild(player1.getOfflineBukkitPlayer());
 		KonGuild guild2 = getTownGuild(town2);

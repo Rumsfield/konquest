@@ -6,12 +6,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestUpgrade;
 import konquest.display.MenuIcon;
 import konquest.display.UpgradeIcon;
 import konquest.manager.DisplayManager;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
 import konquest.utility.MessagePath;
 
 public class TownUpgradeMenuWrapper extends MenuWrapper {
@@ -29,9 +29,9 @@ public class TownUpgradeMenuWrapper extends MenuWrapper {
 		// Page 0
 		String pageLabel = titleColor+MessagePath.MENU_UPGRADE_TITLE.getMessage();
 		getMenu().addPage(0, 1, pageLabel);
-		HashMap<KonUpgrade,Integer> availableUpgrades = getKonquest().getUpgradeManager().getAvailableUpgrades(town);
+		HashMap<KonquestUpgrade,Integer> availableUpgrades = getKonquest().getUpgradeManager().getAvailableUpgrades(town);
 		int index = 0;
-		for(KonUpgrade upgrade : KonUpgrade.values()) {
+		for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
 			if(availableUpgrades.containsKey(upgrade)) {
 				int cost = getKonquest().getUpgradeManager().getUpgradeCost(upgrade, availableUpgrades.get(upgrade));
 				int pop = getKonquest().getUpgradeManager().getUpgradePopulation(upgrade, availableUpgrades.get(upgrade));

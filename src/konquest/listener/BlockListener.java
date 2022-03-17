@@ -2,7 +2,15 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.event.KonquestMonumentDamageEvent;
+import konquest.api.event.camp.KonquestCampDestroyEvent;
+import konquest.api.event.player.KonquestPlayerCampEvent;
+import konquest.api.event.ruin.KonquestRuinAttackEvent;
+import konquest.api.event.ruin.KonquestRuinCaptureEvent;
+import konquest.api.event.town.KonquestTownAttackEvent;
+import konquest.api.event.town.KonquestTownCaptureEvent;
+import konquest.api.event.town.KonquestTownDestroyEvent;
+import konquest.api.model.KonquestTerritoryType;
+import konquest.api.model.KonquestUpgrade;
 import konquest.manager.CampManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
@@ -15,15 +23,18 @@ import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
-import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timer;
 
-import org.bukkit.Bukkit;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.Effect;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -80,7 +91,7 @@ public class BlockListener implements Listener {
 			return;
 		}
 		
-		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onBlockBreak for non-existent player");
 			return;
 		}
@@ -89,7 +100,7 @@ public class BlockListener implements Listener {
 		// Monitor blocks in claimed territory
 		if(kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
 			// Bypass event restrictions for player in Admin Bypass Mode
-			if(!player.isAdminBypassActive()) {
+			if(!player.isAdminBypassActive() && !player.getBukkitPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
 				//ChatUtil.printDebug("Evaluating blockBreak in claimed territory...");
 				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getBlock().getLocation());
 				Location breakLoc = event.getBlock().getLocation();
@@ -172,7 +183,7 @@ public class BlockListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
-							if(town.isPlotOnly() && !town.isPlayerElite(player.getOfflineBukkitPlayer()) && !town.hasPlot(breakLoc)) {
+							if(town.isPlotOnly() && !town.isPlayerKnight(player.getOfflineBukkitPlayer()) && !town.hasPlot(breakLoc)) {
 								// Stop when non-elite player edits non-plot land
 								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLY_PLOT.getMessage());
 								event.setCancelled(true);
@@ -209,12 +220,12 @@ public class BlockListener implements Listener {
 						}
 						
 						// If town is upgraded to require a minimum online resident amount, prevent block damage
-						int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
+						int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.WATCH);
 						if(upgradeLevel > 0) {
 							int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
 							if(town.getNumResidentsOnline() < minimumOnlineResidents) {
 								//ChatUtil.sendNotice(player.getBukkitPlayer(), town.getName()+" is upgraded with "+KonUpgrade.WATCH.getDescription()+" and cannot be attacked without "+minimumOnlineResidents+" residents online", ChatColor.DARK_RED);
-								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(),KonUpgrade.WATCH.getDescription(),minimumOnlineResidents));
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(),KonquestUpgrade.WATCH.getDescription(),minimumOnlineResidents));
 								event.setCancelled(true);
 								return;
 							}
@@ -242,6 +253,19 @@ public class BlockListener implements Listener {
 							event.setCancelled(true);
 							return;
 						}
+						/* This town can be attacked... */
+						
+						// Event pre-checks
+						boolean isMonument = town.getMonument().isLocInside(breakLoc);
+						boolean isCritical = isMonument && event.getBlock().getType().equals(konquest.getKingdomManager().getTownCriticalBlock());
+						// Fire event for general attack
+						KonquestTownAttackEvent invokeEvent = new KonquestTownAttackEvent(konquest, town, player, event.getBlock(), isMonument, isCritical);
+						Konquest.callKonquestEvent(invokeEvent);
+						if(invokeEvent.isCancelled()) {
+							event.setCancelled(true);
+							return;
+						}
+						
 						// Update MonumentBar state
 						town.setAttacked(true);
 						town.updateBar();
@@ -260,18 +284,26 @@ public class BlockListener implements Listener {
 						if(town.isArmored()) {
 							// Ignore instant-break blocks
 							Material blockMat = event.getBlock().getState().getType();
-							//ChatUtil.printDebug("Armor block broke of hardness "+blockMat.getHardness());
-							if(blockMat.getHardness() > 0) {
+							//ChatUtil.printDebug("Armor block "+blockMat.toString()+" broke of hardness "+blockMat.getHardness()+", max durability "+blockMat.getMaxDurability()+", solid "+blockMat.isSolid());
+							if(blockMat.getHardness() > 0.0 && blockMat.isSolid() && konquest.getKingdomManager().isArmorValid(blockMat)) {
 								town.damageArmor(1);
 								Konquest.playTownArmorSound(event.getPlayer());
+							} else {
+								ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_AQUA+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 							}
 							event.setCancelled(true);
 							return;
 						}
 						
-						// If block is inside a monument, throw KonquestMonumentDamageEvent
+						// If block is inside a monument, handle it
 						if(town.isLocInsideCenterChunk(breakLoc)) {
-							if(town.getMonument().isLocInside(breakLoc)) {
+							if(isMonument) {
+								// Prevent monument attack when template is blanking or invalid
+								if(!town.getKingdom().getMonumentTemplate().isValid() || town.getKingdom().isMonumentBlanking()) {
+									ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+									event.setCancelled(true);
+									return;
+								}
 								// Prevent Barbarians from damaging monuments optionally
 								boolean isBarbAttackAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.barbarians_destroy",true);
 								if(player.isBarbarian() && !isBarbAttackAllowed) {
@@ -282,9 +314,12 @@ public class BlockListener implements Listener {
 								}
 								// Cancel item drops on the broken blocks
 								event.setDropItems(false);
-								// Throw Konquest event
-								KonquestMonumentDamageEvent invokeEvent = new KonquestMonumentDamageEvent(konquest, player, kingdomManager.getChunkTerritory(breakLoc), event);
-			    	            Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
+
+								if(isCritical) {
+									// Handle town capture/destroy
+									onTownCriticalHit(town, player);
+								}
+								
 							} else {
 								// Prevent block breaks in the rest of the chunk
 								//ChatUtil.sendNotice(player.getBukkitPlayer(), "Cannot break blocks outside the Monument structure", ChatColor.DARK_RED);
@@ -298,7 +333,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				// Camp considerations...
-				if(territory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAMP)) {
 					KonCamp camp = (KonCamp)territory;
 					boolean isMemberAllowedContainers = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_allow_containers", false);
 					boolean isMemberAllowedEdit = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_allow_edit_offline", false);
@@ -332,6 +367,14 @@ public class BlockListener implements Listener {
 					
 					// Remove the camp if a bed is broken within it
 					if(event.getBlock().getBlockData() instanceof Bed) {
+						// Fire event
+						KonquestCampDestroyEvent invokeEvent = new KonquestCampDestroyEvent(konquest, camp, player, event.getBlock().getLocation());
+						Konquest.callKonquestEvent(invokeEvent);
+						// Check for cancelled
+						if(invokeEvent.isCancelled()) {
+							event.setCancelled(true);
+							return;
+						}
 						campManager.removeCamp(camp.getOwner().getUniqueId().toString());
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), "Destroyed "+camp.getName()+"!");
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY.getMessage(camp.getName()));
@@ -345,7 +388,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				// Ruin considerations...
-				if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
 					KonRuin ruin = (KonRuin)territory;
 					// Check for expired cooldown
 					if(ruin.isCaptureDisabled()) {
@@ -357,6 +400,23 @@ public class BlockListener implements Listener {
 					}
 					// Check for broken critical block within this Ruin
 					if(ruin.isCriticalLocation(breakLoc)) {
+						// Fire event for every attack
+						KonquestRuinAttackEvent invokeEvent = new KonquestRuinAttackEvent(konquest, ruin, player, event.getBlock());
+						Konquest.callKonquestEvent(invokeEvent);
+						if(invokeEvent.isCancelled()) {
+							event.setCancelled(true);
+							return;
+						}
+						// Fire event for pre-capture
+						if(ruin.getRemainingCriticalHits() == 0) {
+							List<KonPlayer> rewardPlayers = konquest.getRuinManager().getRuinPlayers(ruin,player.getKingdom());
+							KonquestRuinCaptureEvent invokeEventCapture = new KonquestRuinCaptureEvent(konquest, ruin, player, rewardPlayers);
+							Konquest.callKonquestEvent(invokeEventCapture);
+							if(invokeEventCapture.isCancelled()) {
+								event.setCancelled(true);
+								return;
+							}
+						}
 						// Prevent critical block drop
 						event.setDropItems(false);
 						// Restart capture cooldown timer
@@ -377,7 +437,7 @@ public class BlockListener implements Listener {
 						// Evaluate critical blocks
 						if(ruin.getRemainingCriticalHits() == 0) {
 							ruin.setIsCaptureDisabled(true);
-							konquest.getRuinManager().rewardPlayers(ruin,player);
+							konquest.getRuinManager().rewardPlayers(ruin,player.getKingdom());
 							//ChatUtil.sendNotice(player.getBukkitPlayer(), "Captured Ruin "+ruin.getName());
 						} else {
 							// Force all alive golems to respawn
@@ -421,7 +481,7 @@ public class BlockListener implements Listener {
 				ChatUtil.printDebug("Diamond ore block break dropping items: "+isDrop);
 				ItemStack handItem = event.getPlayer().getInventory().getItemInMainHand();
 				if(isDrop && handItem != null && !handItem.containsEnchantment(Enchantment.SILK_TOUCH)) {
-					if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+					if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 						ChatUtil.printDebug("Failed to handle onBlockBreakLow for non-existent player");
 						return;
 					}
@@ -448,7 +508,7 @@ public class BlockListener implements Listener {
 					Ageable crop = (Ageable)event.getBlock().getBlockData();
 					//ChatUtil.printDebug("Broke crop block with age: "+crop.getAge());
 					if(crop.getAge() == crop.getMaximumAge()) {
-						if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+						if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 							ChatUtil.printDebug("Failed to handle onCropHarvest for non-existent player");
 							return;
 						}
@@ -479,7 +539,7 @@ public class BlockListener implements Listener {
 		
 		// Track last block placed per player
 		konquest.lastPlaced.put(event.getPlayer(),event.getBlock().getLocation());
-		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onBlockPlace for non-existent player");
 			return;
 		}
@@ -526,7 +586,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				// Preventions for Towns
-				if(territory.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 					KonTown town = (KonTown) territory;
 					// Prevent all block placements in center chunk
 					if(town.isLocInsideCenterChunk(event.getBlock().getLocation())) {
@@ -559,12 +619,12 @@ public class BlockListener implements Listener {
 							return;
 						}
 						// If town is upgraded to require a minimum online resident amount, prevent block damage
-						int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
+						int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.WATCH);
 						if(upgradeLevel > 0) {
 							int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
 							if(town.getNumResidentsOnline() < minimumOnlineResidents) {
 								//ChatUtil.sendNotice(player.getBukkitPlayer(), town.getName()+" is upgraded with "+KonUpgrade.WATCH.getDescription()+" and cannot be attacked without "+minimumOnlineResidents+" residents online", ChatColor.DARK_RED);
-								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(),KonUpgrade.WATCH.getDescription(),minimumOnlineResidents));
+								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(),KonquestUpgrade.WATCH.getDescription(),minimumOnlineResidents));
 								event.setCancelled(true);
 								return;
 							}
@@ -617,7 +677,7 @@ public class BlockListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
-							if(town.isPlotOnly() && !town.isPlayerElite(player.getOfflineBukkitPlayer()) && !town.hasPlot(placeLoc)) {
+							if(town.isPlotOnly() && !town.isPlayerKnight(player.getOfflineBukkitPlayer()) && !town.hasPlot(placeLoc)) {
 								// Stop when non-elite player edits non-plot land
 								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLY_PLOT.getMessage());
 								event.setCancelled(true);
@@ -628,7 +688,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				// Preventions for Camps
-				if(territory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAMP)) {
 					KonCamp camp = (KonCamp)territory;
 					boolean isMemberAllowedEdit = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_allow_edit_offline", false);
 					boolean isMember = false;
@@ -666,7 +726,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				// Ruin considerations...
-				if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
 					// Prevent all placement within ruins
 					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 					event.setCancelled(true);
@@ -683,7 +743,15 @@ public class BlockListener implements Listener {
 			if(!player.isAdminBypassActive()) {
 				// Check if the player is a barbarian placing a bed
 				if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed) {
-					int status = campManager.addCamp(event.getBlock().getLocation(), (KonOfflinePlayer)player);
+					// Fire event
+					KonquestPlayerCampEvent invokePreEvent = new KonquestPlayerCampEvent(konquest, player, event.getBlock().getLocation());
+					Konquest.callKonquestEvent(invokePreEvent);
+					// Check for cancelled
+					if(invokePreEvent.isCancelled()) {
+						event.setCancelled(true);
+						return;
+					}
+					int status = campManager.addCampForPlayer(event.getBlock().getLocation(), player);
 					if(status == 0) { // on successful camp setup...
 						player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
 						//ChatUtil.sendNotice(event.getPlayer(), "Successfully set up camp");
@@ -746,7 +814,7 @@ public class BlockListener implements Listener {
 			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 				return;
 			}
-			if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+			if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 				ChatUtil.printDebug("Failed to handle onSeedPlant for non-existent player");
 				return;
 			}
@@ -774,7 +842,7 @@ public class BlockListener implements Listener {
 			}
 			Material placedMat = event.getBlockPlaced().getType();
 			if(placedMat.equals(Material.FARMLAND)) {
-				if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+				if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 					ChatUtil.printDebug("Failed to handle onFarmTill for non-existent player");
 					return;
 				}
@@ -800,8 +868,10 @@ public class BlockListener implements Listener {
 			if(kingdomManager.isChunkClaimed(block.getLocation())) {
 				ChatUtil.printDebug("effected block is inside claimed territory");
 				KonTerritory territory = kingdomManager.getChunkTerritory(block.getLocation());
+				Material blockMat = block.getType();
+				
 				// Protect Capitals
-				if(territory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
 					ChatUtil.printDebug("protecting Capital");
 					event.setCancelled(true);
 					return;
@@ -813,7 +883,7 @@ public class BlockListener implements Listener {
 					return;
 				}
 				// Town protections
-				if(territory.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 					KonTown town = (KonTown)territory;
 					// Protect Town Monuments
 					if(town.isLocInsideCenterChunk(block.getLocation())) {
@@ -828,7 +898,7 @@ public class BlockListener implements Listener {
 						return;
 					}
 					// If town is upgraded to require a minimum online resident amount, prevent block damage
-					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
+					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.WATCH);
 					if(upgradeLevel > 0) {
 						int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
 						if(town.getNumResidentsOnline() < minimumOnlineResidents) {
@@ -843,7 +913,7 @@ public class BlockListener implements Listener {
 						return;
 					}
 					// If town is armored, damage the armor while preventing block breaks
-					if(town.isArmored()) {
+					if(town.isArmored() && blockMat.getHardness() > 0.0 && blockMat.isSolid() && konquest.getKingdomManager().isArmorValid(blockMat)) {
 						int damage = konquest.getConfigManager().getConfig("core").getInt("core.towns.armor_tnt_damage",1);
 						town.damageArmor(damage);
 						Konquest.playTownArmorSound(event.getBlock().getLocation());
@@ -852,7 +922,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				// Camp protections
-				if(territory.getTerritoryType().equals(KonTerritoryType.CAMP)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAMP)) {
 					KonCamp camp = (KonCamp)territory;
 					// Protect offline owner camps
 					if(camp.isProtected()) {
@@ -876,7 +946,7 @@ public class BlockListener implements Listener {
 					return;
 				}
 				// Protect Ruins
-				if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
 					ChatUtil.printDebug("protecting Ruin");
 					event.setCancelled(true);
 					return;
@@ -1118,7 +1188,7 @@ public class BlockListener implements Listener {
 					return;
 				}
 				// Prevent fire spread inside upgraded Towns
-				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DAMAGE);
+				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.DAMAGE);
 				if(event.getSource().getType().equals(Material.FIRE) && upgradeLevel >= 1) {
 					ChatUtil.printDebug("EVENT: Stopped fire spread in upgraded town, DAMAGE");
 					event.getSource().setType(Material.AIR);
@@ -1126,7 +1196,7 @@ public class BlockListener implements Listener {
 					return;
 				}
 				// If town is upgraded to require a minimum online resident amount, prevent block damage
-				int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
+				int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.WATCH);
 				if(event.getSource().getType().equals(Material.FIRE) && upgradeLevelWatch > 0) {
 					int minimumOnlineResidents = upgradeLevelWatch; // 1, 2, 3
 					if(town.getNumResidentsOnline() < minimumOnlineResidents) {
@@ -1189,6 +1259,175 @@ public class BlockListener implements Listener {
 			if(template != null && template.isLocInside(event.getBlock().getLocation())) {
 				// Start monument blanking timer to prevent monument pastes
 				territory.getKingdom().startMonumentBlanking();
+			}
+		}
+	}
+	
+	private void onTownCriticalHit(KonTown town, KonPlayer player) {
+		// Critical block has been destroyed
+		ChatUtil.printDebug("Critical strike on Monument in Town "+town.getName());
+		town.getMonument().addCriticalHit();
+		//int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
+		int maxCriticalhits = konquest.getKingdomManager().getMaxCriticalHits();
+		
+		// Update bar progress
+		//double progress = (double)(maxCriticalhits - town.getMonument().getCriticalHits()) / (double)maxCriticalhits;
+		//town.setBarProgress(progress);
+		town.updateBar();
+		
+		// Evaluate town capture conditions
+		if(town.getMonument().getCriticalHits() >= maxCriticalhits) {
+			// The Town is at critical max, conquer or destroy
+			if(player.isBarbarian()) {
+				// Fire event
+				KonquestTownDestroyEvent invokeEvent = new KonquestTownDestroyEvent(konquest, town, player);
+				Konquest.callKonquestEvent(invokeEvent);
+				if(invokeEvent.isCancelled()) {
+					return;
+				}
+				// Destroy the town when the enemy is a barbarian
+				String townName = town.getName();
+				ArrayList<KonPlayer> monumentPlayers = new ArrayList<KonPlayer>();
+				ArrayList<KonPlayer> townLocPlayers = new ArrayList<KonPlayer>();
+				for(KonPlayer onlinePlayer : playerManager.getPlayersOnline()) {
+					if(town.isLocInsideCenterChunk(onlinePlayer.getBukkitPlayer().getLocation())) {
+						monumentPlayers.add(onlinePlayer);
+					}
+					if(town.isLocInside(onlinePlayer.getBukkitPlayer().getLocation())) {
+						townLocPlayers.add(onlinePlayer);
+					}
+				}
+				int x = town.getCenterLoc().getBlockX();
+				int y = town.getCenterLoc().getBlockY();
+				int z = town.getCenterLoc().getBlockZ();
+				Timer townMonumentTimer = town.getMonumentTimer();
+				if(kingdomManager.removeTown(town.getName(), town.getKingdom().getName())) {
+					// Town is removed, no longer exists
+					//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "You have destroyed "+townName+" for the glory of the Barbarian horde!");
+					ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_DESTROY.getMessage(townName));
+					for(KonPlayer monPlayer : monumentPlayers) {
+						monPlayer.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2));
+						//ChatUtil.printDebug("Effect data is: "+Effect.ANVIL_LAND.getData().getName()+", "+Effect.ANVIL_LAND.getData().toString());
+						monPlayer.getBukkitPlayer().playEffect(monPlayer.getBukkitPlayer().getLocation(), Effect.ANVIL_LAND, null);
+					}
+					for(KonPlayer locPlayer : townLocPlayers) {
+						// Clear mob targets for all players within the old town
+						locPlayer.clearAllMobAttackers();
+						// Update particle border renders for nearby players
+						kingdomManager.updatePlayerBorderParticles(locPlayer);
+					}
+					// Update directive progress
+					konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CAPTURE_TOWN);
+					// Broadcast to Dynmap
+					konquest.getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_RAZE.getMessage(townName)+" ("+x+","+y+","+z+")");
+				} else {
+					ChatUtil.printDebug("Problem destroying Town "+town.getName()+" in Kingdom "+town.getKingdom().getName()+" for a barbarian raider "+player.getBukkitPlayer().getName());
+				}
+				// Stop the town monument timer
+				ChatUtil.printDebug("Stopping monument timer with taskID "+townMonumentTimer.getTaskID());
+				townMonumentTimer.stopTimer();
+			} else {
+				// Fire event
+				KonquestTownCaptureEvent invokeEvent = new KonquestTownCaptureEvent(konquest, town, player, player.getKingdom());
+				Konquest.callKonquestEvent(invokeEvent);
+				if(invokeEvent.isCancelled()) {
+					return;
+				}
+				// Conquer the town for the enemy player's kingdom
+				if(kingdomManager.captureTownForPlayer(town.getName(), town.getKingdom().getName(), player)) {
+					/*
+					// Alert all players of original Kingdom
+					for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+						//ChatUtil.sendNotice(player.getBukkitPlayer(), "The Town "+event.getTerritory().getName()+" has been conquered!", ChatColor.DARK_RED);
+						ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(town.getName()), ChatColor.DARK_RED);
+					}
+					*/
+					ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(town.getName()));
+	        		
+					ChatUtil.printDebug("Monument conversion in Town "+town.getName());
+					//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "You have conquered "+town.getName()+" for the conquest of "+event.getPlayer().getKingdom().getName()+"!");
+					ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAPTURE.getMessage(town.getName(),player.getKingdom().getName()));
+					// Start Capture disable timer for target town
+					int townCaptureTimeSeconds = konquest.getConfigManager().getConfig("core").getInt("core.towns.capture_cooldown");
+					Timer captureTimer = town.getCaptureTimer();
+					town.setIsCaptureDisabled(true);
+					captureTimer.stopTimer();
+					captureTimer.setTime(townCaptureTimeSeconds);
+					captureTimer.startTimer();
+					ChatUtil.printDebug("Starting capture timer for "+townCaptureTimeSeconds+" seconds with taskID "+captureTimer.getTaskID());
+					// For all online players...
+					for(KonPlayer onlinePlayer : playerManager.getPlayersOnline()) {
+						// Teleport all players inside center chunk to new spawn location
+						if(town.isLocInsideCenterChunk(onlinePlayer.getBukkitPlayer().getLocation())) {
+							onlinePlayer.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2));
+							onlinePlayer.getBukkitPlayer().playEffect(onlinePlayer.getBukkitPlayer().getLocation(), Effect.ANVIL_LAND, null);
+						}
+						// Remove mob targets
+						if(town.isLocInside(onlinePlayer.getBukkitPlayer().getLocation())) {
+							onlinePlayer.clearAllMobAttackers();
+						}
+						// Update particle border renders for nearby players
+						for(Chunk chunk : konquest.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
+							if(town.hasChunk(chunk)) {
+								kingdomManager.updatePlayerBorderParticles(onlinePlayer);
+								break;
+							}
+						}
+						
+					}
+					// Update directive progress
+					konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CAPTURE_TOWN);
+					// Update stat
+					konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CAPTURES,1);
+					// Broadcast to Dynmap
+					int x = town.getCenterLoc().getBlockX();
+					int y = town.getCenterLoc().getBlockY();
+					int z = town.getCenterLoc().getBlockZ();
+					konquest.getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(town.getName())+" ("+x+","+y+","+z+")");
+				} else {
+					ChatUtil.printDebug("Problem converting Town "+town.getName()+" from Kingdom "+town.getKingdom().getName()+" to "+player.getKingdom().getName());
+					// If, for example, a player in the Barbarians default kingdom captured the monument
+					town.refreshMonument();
+				}
+				// Stop the town monument timer
+				ChatUtil.printDebug("Stopping monument timer with taskID "+town.getMonumentTimer().getTaskID());
+				town.getMonumentTimer().stopTimer();
+				// Reset the town MonumentBar
+				//town.resetBar();
+				town.setAttacked(false);
+				town.setBarProgress(1.0);
+				town.updateBar();
+			}
+		} else {
+			// Town has not yet been captured
+			int remainingHits = maxCriticalhits - town.getMonument().getCriticalHits();
+			int defendReward = konquest.getConfigManager().getConfig("core").getInt("core.favor.rewards.defend_raid");
+			//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "Critical Strike! "+remainingHits+" Critical Blocks remain.");
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CRITICAL.getMessage(remainingHits));
+			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRITICALS,1);
+			
+			// Alert all players of enemy Kingdom when the first critical block is broken
+			if(town.getMonument().getCriticalHits() == 1) {
+				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
+					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_1.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
+				}
+			}
+			
+			// Alert all players of enemy Kingdom when half of critical blocks are broken
+			if(town.getMonument().getCriticalHits() == maxCriticalhits/2) {
+				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
+					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_2.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
+				}
+			}
+			
+			// Alert all players of enemy Kingdom when all but 1 critical blocks are broken
+			if(town.getMonument().getCriticalHits() == maxCriticalhits-1) {
+				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
+					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_3.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
+				}
 			}
 		}
 	}

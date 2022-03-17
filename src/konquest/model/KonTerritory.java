@@ -3,26 +3,29 @@ package konquest.model;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestTerritoryType;
+import konquest.api.model.KonquestTerritory;
 import konquest.utility.ChatUtil;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-public abstract class KonTerritory{
+public abstract class KonTerritory implements KonquestTerritory {
 
 	private HashMap<Point,KonTerritory> chunkList;
 	private Location centerLoc;
 	private Location spawnLoc;
 	private KonKingdom kingdom;
 	private String name;
-	private KonTerritoryType territoryType;
+	private KonquestTerritoryType territoryType;
 	private Konquest konquest;
 	
 	
-	public KonTerritory(Location loc, String name, KonKingdom kingdom, KonTerritoryType territoryType, Konquest konquest) {
+	public KonTerritory(Location loc, String name, KonKingdom kingdom, KonquestTerritoryType territoryType, Konquest konquest) {
 		this.centerLoc = loc;
 		this.spawnLoc = loc;
 		this.name = name;
@@ -85,34 +88,18 @@ public abstract class KonTerritory{
 		return chunk.getWorld().equals(getWorld()) && chunkList.containsKey(Konquest.toPoint(chunk));
 	}
 	
-	//TODO: Refactor to not use chunks, currently method is unused
 	public boolean isLocAdjacent(Location loc) {
 		boolean result = false;
 		int[] coordLUTX = {0,1,0,-1};
 		int[] coordLUTZ = {1,0,-1,0};
-		int curX = loc.getChunk().getX();
-		int curZ = loc.getChunk().getZ();
+		Point center = Konquest.toPoint(loc);
 		for(int i = 0;i<4;i++) {
-			Chunk nextChunk = loc.getWorld().getChunkAt(curX+coordLUTX[i], curZ+coordLUTZ[i]);
-			if(nextChunk.getWorld().equals(getWorld()) && chunkList.containsKey(Konquest.toPoint(nextChunk))) {
+			if(loc.getWorld().equals(getWorld()) && chunkList.containsKey(new Point(center.x + coordLUTX[i], center.y + coordLUTZ[i]))) {
 				result = true;
 				break;
 			}
 		}
 		return result;
-	}
-	
-	//TODO: Refactor to not use chunks, currently method is unused
-	public ArrayList<Chunk> getSurroundChunks(Location loc) {
-		ArrayList<Chunk> sideChunks = new ArrayList<Chunk>();
-		int[] coordLUTX = {0,1,1,1,0,-1,-1,-1};
-		int[] coordLUTZ = {1,1,0,-1,-1,-1,0,1};
-		int curX = loc.getChunk().getX();
-		int curZ = loc.getChunk().getZ();
-		for(int i = 0;i<8;i++) {
-			sideChunks.add(loc.getWorld().getChunkAt(curX+coordLUTX[i], curZ+coordLUTZ[i]));
-		}
-		return sideChunks;
 	}
 	
 	// Getters
@@ -136,12 +123,16 @@ public abstract class KonTerritory{
 		return kingdom;
 	}
 	
-	public KonTerritoryType getTerritoryType() {
+	public KonquestTerritoryType getTerritoryType() {
 		return territoryType;
 	}
 	
 	public HashMap<Point,KonTerritory> getChunkList() {
 		return chunkList;
+	}
+	
+	public HashSet<Point> getChunkPoints() {
+		return new HashSet<Point>(chunkList.keySet());
 	}
 	
 	public Konquest getKonquest() {
@@ -174,5 +165,7 @@ public abstract class KonTerritory{
 	//public abstract boolean addChunk(Chunk chunk);
 	
 	public abstract boolean addChunk(Point point);
+	
+	public abstract boolean testChunk(Point point);
 	
 }

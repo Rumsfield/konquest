@@ -22,6 +22,7 @@ core:
   chat:
     tag: '&7[&6Konquest&7]&f '
     message: '%PREFIX% %KINGDOM% &7| %TITLE% %NAME% %SUFFIX% '
+    kingdom_team_color: true
     name_team_color: true
     enable_format: true
     priority: HIGH
@@ -43,9 +44,9 @@ core:
       password: example_password
       properties: ["autoReconnect=true","useSSL=false"]
   integration:
-    quickshop: false
-    luckperms: false
-    dynmap: false
+    quickshop: true
+    luckperms: true
+    dynmap: true
   travel:
     enable:
       towns: true
@@ -78,6 +79,8 @@ core:
     attack_friendly_golems: false
     max_player_diff: 4
     allow_exile_switch: true
+    exile_cooldown: 300
+    join_cooldown: 300
     per_kingdom_join_permissions: false
     wild_pvp: true
     wild_use: true
@@ -108,6 +111,22 @@ core:
     barbarians_destroy: true
     enemy_glow: true
     town_mobs: false
+    armor_blacklist_enable: true
+    armor_blacklist_reverse: false
+    armor_blacklist:
+    - ACACIA_LEAVES
+    - AZALEA_LEAVES
+    - BIRCH_LEAVES
+    - DARK_OAK_LEAVES
+    - FLOWERING_AZALEA_LEAVES
+    - JUNGLE_LEAVES
+    - OAK_LEAVES
+    - SPRUCE_LEAVES
+    - GRASS_BLOCK
+    - DIRT
+    - SAND
+    - GRAVEL
+    - SNOW
   plots:
     enable: true
     max_size: 16
@@ -179,6 +198,7 @@ core:
       cost_specialize: 200
       cost_relationship: 50
   combat:
+    placeholder_tag: '&6[In Combat] '
     prevent_command_on_proximity: false
     prevent_command_on_damage: true
     enemy_proximity_chunks: 3

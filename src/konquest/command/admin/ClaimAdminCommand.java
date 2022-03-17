@@ -1,6 +1,5 @@
 package konquest.command.admin;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,12 +7,10 @@ import java.util.List;
 import konquest.Konquest;
 import konquest.command.CommandBase;
 import konquest.model.KonPlayer;
-import konquest.model.KonTerritory;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -31,14 +28,14 @@ public class ClaimAdminCommand extends CommandBase {
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
-        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
     		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	Location playerLoc = bukkitPlayer.getLocation();
-        	World playerWorld = playerLoc.getWorld();
+        	//World playerWorld = playerLoc.getWorld();
         	if(getArgs().length > 2) {
         		String claimMode = getArgs()[2];
         		switch(claimMode) {
@@ -56,6 +53,8 @@ public class ClaimAdminCommand extends CommandBase {
     					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_CLAIM_ERROR_RADIUS.getMessage(min,max));
     					return;
     				}
+    				getKonquest().getKingdomManager().claimRadiusForAdmin(bukkitPlayer, bukkitPlayer.getLocation(), radius);
+    				/*
     				KonTerritory adjacentTerritory = null;
 					for(Point adjPoint : getKonquest().getAreaPoints(playerLoc, 2)) {
 						if(getKonquest().getKingdomManager().isChunkClaimed(adjPoint,playerLoc.getWorld())) {
@@ -94,6 +93,7 @@ public class ClaimAdminCommand extends CommandBase {
     					//ChatUtil.sendError((Player) getSender(), "There was a problem claiming chunks within radius "+radius+" for territory "+adjacentTerritory.getName());
     					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     				}
+    				*/
         			break;
         		case "auto" :
         			if(!player.isAdminClaimingFollow()) {

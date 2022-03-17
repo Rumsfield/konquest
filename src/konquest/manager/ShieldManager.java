@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.manager.KonquestShieldManager;
+import konquest.api.model.KonquestTown;
 import konquest.model.KonArmor;
 import konquest.model.KonKingdom;
 import konquest.model.KonPlayer;
@@ -20,7 +22,7 @@ import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-public class ShieldManager {
+public class ShieldManager implements KonquestShieldManager {
 
 	private Konquest konquest;
 	private boolean isShieldsEnabled;
@@ -272,6 +274,24 @@ public class ShieldManager {
 		return true;
 	}
 	
+	public int getTownShieldTime(KonquestTown townArg) {
+		int result = -1;
+		if(townArg instanceof KonTown) {
+			KonTown town = (KonTown) townArg;
+			result = town.getShieldEndTime();
+		}
+		return result;
+	}
+	
+	public int getTownArmorBlocks(KonquestTown townArg) {
+		int result = -1;
+		if(townArg instanceof KonTown) {
+			KonTown town = (KonTown) townArg;
+			result = town.getArmorBlocks();
+		}
+		return result;
+	}
+	
 	/*
 	 * Override methods, used for admin commands
 	 */
@@ -283,21 +303,24 @@ public class ShieldManager {
 	 * @param value
 	 * 		Time in seconds from now to end shields. If 0, deactivate shields.
 	 */
-	public boolean shieldSet(KonTown town, int value) {
+	public boolean shieldSet(KonquestTown townArg, int value) {
 		boolean result = false;
-		Date now = new Date();
-		int newEndTime = (int)(now.getTime()/1000) + value;
-		if(town.isShielded()) {
-			if(value <= 0) {
-				town.deactivateShield();
-			} else {
-				town.activateShield(newEndTime);
-			}
-			result = true;
-		} else {
-			if(value > 0) {
-				town.activateShield(newEndTime);
+		if(townArg instanceof KonTown) {
+			KonTown town = (KonTown) townArg;
+			Date now = new Date();
+			int newEndTime = (int)(now.getTime()/1000) + value;
+			if(town.isShielded()) {
+				if(value <= 0) {
+					town.deactivateShield();
+				} else {
+					town.activateShield(newEndTime);
+				}
 				result = true;
+			} else {
+				if(value > 0) {
+					town.activateShield(newEndTime);
+					result = true;
+				}
 			}
 		}
 		return result;
@@ -309,24 +332,27 @@ public class ShieldManager {
 	 * @param value
 	 * 		Time in seconds to add to current shields. If result is <= 0, deactivate shields.
 	 */
-	public boolean shieldAdd(KonTown town, int value) {
+	public boolean shieldAdd(KonquestTown townArg, int value) {
 		boolean result = false;
-		Date now = new Date();
-		int newEndTime = (int)(now.getTime()/1000) + value;
-		if(town.isShielded()) {
-			newEndTime = town.getShieldEndTime() + value;
-		}
-		Date end = new Date((long)newEndTime*1000);
-		if(now.after(end)) {
-			// End time is less than now, deactivate shields and do nothing
+		if(townArg instanceof KonTown) {
+			KonTown town = (KonTown) townArg;
+			Date now = new Date();
+			int newEndTime = (int)(now.getTime()/1000) + value;
 			if(town.isShielded()) {
-				town.deactivateShield();
+				newEndTime = town.getShieldEndTime() + value;
+			}
+			Date end = new Date((long)newEndTime*1000);
+			if(now.after(end)) {
+				// End time is less than now, deactivate shields and do nothing
+				if(town.isShielded()) {
+					town.deactivateShield();
+					result = true;
+				}
+			} else {
+				// End time is in the future, add to shields
+				town.activateShield(newEndTime);
 				result = true;
 			}
-		} else {
-			// End time is in the future, add to shields
-			town.activateShield(newEndTime);
-			result = true;
 		}
 		return result;
 	}
@@ -338,19 +364,22 @@ public class ShieldManager {
 	 * @param value
 	 * 		Amount of blocks to set the town's armor to. If 0, deactivate armor.
 	 */
-	public boolean armorSet(KonTown town, int value) {
+	public boolean armorSet(KonquestTown townArg, int value) {
 		boolean result = false;
-		if(town.isArmored()) {
-			if(value <= 0) {
-				town.deactivateArmor();
-			} else {
-				town.activateArmor(value);
-			}
-			result = true;
-		} else {
-			if(value > 0) {
-				town.activateArmor(value);
+		if(townArg instanceof KonTown) {
+			KonTown town = (KonTown) townArg;
+			if(town.isArmored()) {
+				if(value <= 0) {
+					town.deactivateArmor();
+				} else {
+					town.activateArmor(value);
+				}
 				result = true;
+			} else {
+				if(value > 0) {
+					town.activateArmor(value);
+					result = true;
+				}
 			}
 		}
 		return result;
@@ -362,22 +391,25 @@ public class ShieldManager {
 	 * @param value
 	 * 		Blocks to add to current armor. If result is <= 0, deactivate armor.
 	 */
-	public boolean armorAdd(KonTown town, int value) {
+	public boolean armorAdd(KonquestTown townArg, int value) {
 		boolean result = false;
-		int newBlocks = value;
-		if(town.isArmored()) {
-			newBlocks = town.getArmorBlocks() + value;
-		}
-		if(newBlocks <= 0) {
-			// Blocks is 0 or less, deactivate armor and do nothing
+		if(townArg instanceof KonTown) {
+			KonTown town = (KonTown) townArg;
+			int newBlocks = value;
 			if(town.isArmored()) {
-				town.deactivateArmor();
+				newBlocks = town.getArmorBlocks() + value;
+			}
+			if(newBlocks <= 0) {
+				// Blocks is 0 or less, deactivate armor and do nothing
+				if(town.isArmored()) {
+					town.deactivateArmor();
+					result = true;
+				}
+			} else {
+				// Blocks are valid, add to armor
+				town.activateArmor(newBlocks);
 				result = true;
 			}
-		} else {
-			// Blocks are valid, add to armor
-			town.activateArmor(newBlocks);
-			result = true;
 		}
 		return result;
 	}

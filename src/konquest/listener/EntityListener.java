@@ -2,6 +2,9 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.event.player.KonquestPlayerCombatTagEvent;
+import konquest.api.model.KonquestTerritoryType;
+import konquest.api.model.KonquestUpgrade;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
 import konquest.model.KonCapital;
@@ -10,15 +13,14 @@ import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
-import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -93,7 +95,7 @@ public class EntityListener implements Listener {
 			}
 			if(event.getBreeder() instanceof Player) {
 				Player bukkitPlayer = (Player)event.getBreeder();
-				if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+				if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 					ChatUtil.printDebug("Failed to handle onEntityBreed for non-existent player");
 					return;
 				}
@@ -126,21 +128,22 @@ public class EntityListener implements Listener {
 			if(kingdomManager.isChunkClaimed(block.getLocation())) {
 				//ChatUtil.printDebug("EVENT: effected block is inside claimed territory");
 				KonTerritory territory = kingdomManager.getChunkTerritory(block.getLocation());
+				Material blockMat = block.getType();
 				
 				// Protect Capitals always
-				if(territory.getTerritoryType().equals(KonTerritoryType.CAPITAL)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
 					ChatUtil.printDebug("protecting Capital");
 					event.setCancelled(true);
 					return;
 				}
 				// Protect Ruins always
-				if(territory.getTerritoryType().equals(KonTerritoryType.RUIN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
 					ChatUtil.printDebug("protecting Ruin");
 					event.setCancelled(true);
 					return;
 				}
 				// Town protections
-				if(territory.getTerritoryType().equals(KonTerritoryType.TOWN)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 					KonTown town = (KonTown)territory;
 					// Protect Town Monuments
 					if(town.isLocInsideCenterChunk(block.getLocation())) {
@@ -155,7 +158,7 @@ public class EntityListener implements Listener {
 						return;
 					}
 					// If town is upgraded to require a minimum online resident amount, prevent block damage
-					int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
+					int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.WATCH);
 					if(upgradeLevelWatch > 0) {
 						int minimumOnlineResidents = upgradeLevelWatch; // 1, 2, 3
 						if(town.getNumResidentsOnline() < minimumOnlineResidents) {
@@ -165,7 +168,7 @@ public class EntityListener implements Listener {
 						}
 					}
 					// Protect when town has upgrade
-					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DAMAGE);
+					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.DAMAGE);
 					if(upgradeLevel >= 2) {
 						ChatUtil.printDebug("protecting upgraded Town DAMAGE");
 						event.setCancelled(true);
@@ -177,7 +180,7 @@ public class EntityListener implements Listener {
 						return;
 					}
 					// If town is armored, damage the armor while preventing explosions
-					if(town.isArmored()) {
+					if(town.isArmored() && blockMat.getHardness() > 0.0 && blockMat.isSolid() && konquest.getKingdomManager().isArmorValid(blockMat)) {
 						int damage = konquest.getConfigManager().getConfig("core").getInt("core.towns.armor_tnt_damage",1);
 						town.damageArmor(damage);
 						Konquest.playTownArmorSound(event.getLocation());
@@ -217,7 +220,7 @@ public class EntityListener implements Listener {
 				boolean stopOnReason = !(eReason.equals(SpawnReason.COMMAND) || eReason.equals(SpawnReason.CUSTOM) || eReason.equals(SpawnReason.DEFAULT) || eReason.equals(SpawnReason.SPAWNER));
 				if(stopOnType && stopOnReason) {
 					boolean isAllMobSpawnAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_mobs",false);
-					if((territory.getTerritoryType().equals(KonTerritoryType.CAPITAL) && !isAllMobSpawnAllowed) || territory.getTerritoryType().equals(KonTerritoryType.RUIN))
+					if((territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && !isAllMobSpawnAllowed) || territory.getTerritoryType().equals(KonquestTerritoryType.RUIN))
 					event.setCancelled(true);
 				}
 			}
@@ -260,7 +263,7 @@ public class EntityListener implements Listener {
 			        }
 					if(closestPlayer != null) {
 						ChatUtil.printDebug("Iron Golem spawned by "+closestPlayer.getName());
-						if(!konquest.getPlayerManager().isPlayer(closestPlayer)) {
+						if(!konquest.getPlayerManager().isOnlinePlayer(closestPlayer)) {
 							ChatUtil.printDebug("Failed to handle onCreatureSpawn for non-existent player");
 							return;
 						}
@@ -281,7 +284,7 @@ public class EntityListener implements Listener {
 		}
 		// prevent milk buckets from removing town nerfs in enemy towns
 		if(!event.isCancelled() && event.getEntity() instanceof Player) {
-			if(!konquest.getPlayerManager().isPlayer((Player)event.getEntity())) {
+			if(!konquest.getPlayerManager().isOnlinePlayer((Player)event.getEntity())) {
 				ChatUtil.printDebug("Failed to handle onEntityPotionEffect for non-existent player");
 				return;
 			}
@@ -326,7 +329,7 @@ public class EntityListener implements Listener {
 			// Protect friendly players in claimed land
 			if(target instanceof Player && kingdomManager.isChunkClaimed(eLoc)) {
 				Player bukkitPlayer = (Player)target;
-				if(!konquest.getPlayerManager().isPlayer((Player)bukkitPlayer)) {
+				if(!konquest.getPlayerManager().isOnlinePlayer((Player)bukkitPlayer)) {
 					ChatUtil.printDebug("Failed to handle onEntityTarget for non-existent player");
 				} else {
 					KonPlayer player = playerManager.getPlayer(bukkitPlayer);
@@ -408,7 +411,7 @@ public class EntityListener implements Listener {
         } else { // if neither player nor arrow
             return;
         }
-		if(!konquest.getPlayerManager().isPlayer(bukkitPlayer)) {
+		if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to handle onEntityDamageByPlayer for non-existent player");
 			return;
 		}
@@ -446,8 +449,8 @@ public class EntityListener implements Listener {
 	        	
 	        	if(territory instanceof KonCapital) {
 	        		boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
-	        		// Block all entity damage in capitals optionally
-	        		if(!isCapitalUseEnabled) {
+	        		// Block all non-monster entity damage in capitals optionally
+	        		if(!(isCapitalUseEnabled || event.getEntity() instanceof Monster)) {
 		        		ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 		        		event.setCancelled(true);
 						return;
@@ -489,12 +492,12 @@ public class EntityListener implements Listener {
 								return;
 		    				}
 		    				// If town is upgraded to require a minimum online resident amount, prevent block damage
-							int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
+							int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.WATCH);
 							if(upgradeLevelWatch > 0) {
 								int minimumOnlineResidents = upgradeLevelWatch; // 1, 2, 3
 								if(town.getNumResidentsOnline() < minimumOnlineResidents) {
 									//ChatUtil.sendNotice(bukkitPlayer, town.getName()+" is upgraded with "+KonUpgrade.WATCH.getDescription()+" and cannot be attacked without "+minimumOnlineResidents+" residents online", ChatColor.DARK_RED);
-									ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(),KonUpgrade.WATCH.getDescription(),minimumOnlineResidents));
+									ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(),KonquestUpgrade.WATCH.getDescription(),minimumOnlineResidents));
 									event.setCancelled(true);
 									return;
 								}
@@ -536,7 +539,7 @@ public class EntityListener implements Listener {
 		    				LivingEntity currentTarget = golem.getTarget();
 		    				//ChatUtil.printDebug("Golem: Evaluating new targets in territory "+territory.getName());
 		    				if(currentTarget != null && currentTarget instanceof Player) {
-		    					if(!konquest.getPlayerManager().isPlayer((Player)currentTarget)) {
+		    					if(!konquest.getPlayerManager().isOnlinePlayer((Player)currentTarget)) {
 		    						ChatUtil.printDebug("Failed to handle onEntityDamageByPlayer golem targeting for non-existent player");
 		    					} else {
 			    					KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
@@ -603,7 +606,7 @@ public class EntityListener implements Listener {
                 return;
             }
             
-            if(!konquest.getPlayerManager().isPlayer(victimBukkitPlayer) || !konquest.getPlayerManager().isPlayer(attackerBukkitPlayer)) {
+            if(!konquest.getPlayerManager().isOnlinePlayer(victimBukkitPlayer) || !konquest.getPlayerManager().isOnlinePlayer(attackerBukkitPlayer)) {
 				ChatUtil.printDebug("Failed to handle onPlayerDamageByPlayer for non-existent player(s)");
 				return;
 			}
@@ -659,17 +662,23 @@ public class EntityListener implements Listener {
             	int combatTagCooldownSeconds = konquest.getConfigManager().getConfig("core").getInt("core.combat.enemy_damage_cooldown_seconds",0);
             	boolean combatTagEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.combat.prevent_command_on_damage",false);
             	if(combatTagEnabled && combatTagCooldownSeconds > 0) {
-            		// Notify player when tag is new
-            		if(!victimPlayer.isCombatTagged()) {
-            			ChatUtil.sendKonPriorityTitle(victimPlayer, "", ChatColor.GOLD+MessagePath.PROTECTION_NOTICE_TAGGED.getMessage(), 20, 1, 10);
-                		//ChatUtil.sendNotice(victimBukkitPlayer, "You have been tagged in combat");
-                		ChatUtil.sendNotice(victimBukkitPlayer, MessagePath.PROTECTION_NOTICE_TAG_MESSAGE.getMessage());
-            		}
-            		victimPlayer.getCombatTagTimer().stopTimer();
-            		victimPlayer.getCombatTagTimer().setTime(combatTagCooldownSeconds);
-            		victimPlayer.getCombatTagTimer().startTimer();
-            		victimPlayer.setIsCombatTagged(true);
-            		//ChatUtil.printDebug("Refreshed combat tag timer for player "+victimBukkitPlayer.getName());
+            		// Fire event
+            		KonquestPlayerCombatTagEvent invokePreEvent = new KonquestPlayerCombatTagEvent(konquest, victimPlayer, attackerPlayer, victimBukkitPlayer.getLocation());
+					Konquest.callKonquestEvent(invokePreEvent);
+					// Check for cancelled
+					if(!invokePreEvent.isCancelled()) {
+						// Notify player when tag is new
+	            		if(!victimPlayer.isCombatTagged()) {
+	            			ChatUtil.sendKonPriorityTitle(victimPlayer, "", ChatColor.GOLD+MessagePath.PROTECTION_NOTICE_TAGGED.getMessage(), 20, 1, 10);
+	                		//ChatUtil.sendNotice(victimBukkitPlayer, "You have been tagged in combat");
+	                		ChatUtil.sendNotice(victimBukkitPlayer, MessagePath.PROTECTION_NOTICE_TAG_MESSAGE.getMessage());
+	            		}
+	            		victimPlayer.getCombatTagTimer().stopTimer();
+	            		victimPlayer.getCombatTagTimer().setTime(combatTagCooldownSeconds);
+	            		victimPlayer.getCombatTagTimer().startTimer();
+	            		victimPlayer.setIsCombatTagged(true);
+	            		//ChatUtil.printDebug("Refreshed combat tag timer for player "+victimBukkitPlayer.getName());
+					}
             	}
             }
             konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.DAMAGE,(int)event.getFinalDamage());
@@ -740,7 +749,7 @@ public class EntityListener implements Listener {
 			KonTerritory territory = kingdomManager.getChunkTerritory(event.getEntity().getLocation());
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown)territory;
-				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DROPS);
+				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.DROPS);
 				if(upgradeLevel >= 1) {
 					// Add 1 to all drops
 					for(ItemStack item : event.getDrops()) {

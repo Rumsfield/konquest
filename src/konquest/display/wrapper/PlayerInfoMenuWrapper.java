@@ -44,7 +44,7 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		boolean isFriendly = observer.getKingdom().equals(infoPlayer.getKingdom());
  		boolean isArmistice = getKonquest().getGuildManager().isArmistice(observer, infoPlayer);
  		
- 		ChatColor kingdomColor = Konquest.getDisplayPrimaryColor(observer, infoPlayer, isArmistice);
+ 		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer, infoPlayer);
 		ChatColor titleColor = DisplayManager.titleColor;
 		ChatColor loreColor = DisplayManager.loreColor;
 		ChatColor valueColor = DisplayManager.valueColor;
@@ -119,7 +119,7 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 				loreList = new ArrayList<String>();
 				if(currentTown.isPlayerLord(infoPlayer.getOfflineBukkitPlayer())) {
 					loreList.add(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage());
-				} else if(currentTown.isPlayerElite(infoPlayer.getOfflineBukkitPlayer())) {
+				} else if(currentTown.isPlayerKnight(infoPlayer.getOfflineBukkitPlayer())) {
 					loreList.add(ChatColor.DARK_BLUE+MessagePath.LABEL_KNIGHT.getMessage());
 				} else {
 					loreList.add(loreColor+MessagePath.LABEL_RESIDENT.getMessage());
@@ -176,7 +176,7 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
  		for(KonTown town : getKonquest().getKingdomManager().getPlayerResidenceTowns(player)) {
  			if(town.isPlayerLord(player.getOfflineBukkitPlayer())) {
  				lordTowns.add(town);
- 			} else if(town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+ 			} else if(town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
  				knightTowns.add(town);
  			} else {
  				residentTowns.add(town);

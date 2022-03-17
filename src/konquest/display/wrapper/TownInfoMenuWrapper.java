@@ -10,6 +10,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.api.model.KonquestUpgrade;
 import konquest.display.GuildIcon;
 import konquest.display.InfoIcon;
 import konquest.display.KingdomIcon;
@@ -21,7 +22,6 @@ import konquest.model.KonGuild;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
@@ -47,7 +47,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		boolean isFriendly = observer.getKingdom().equals(infoTown.getKingdom());
 		boolean isArmistice = getKonquest().getGuildManager().isArmistice(observer, infoTown);
 		
-		ChatColor kingdomColor = Konquest.getDisplayPrimaryColor(observer, infoTown, isArmistice);
+		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer, infoTown);
  		ChatColor titleColor = DisplayManager.titleColor;
 		ChatColor loreColor = DisplayManager.loreColor;
 		ChatColor valueColor = DisplayManager.valueColor;
@@ -57,7 +57,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		List<OfflinePlayer> townResidents = new ArrayList<OfflinePlayer>();
 		for(OfflinePlayer resident : infoTown.getPlayerResidents()) {
 			if(!infoTown.isPlayerLord(resident)) {
-				if(infoTown.isPlayerElite(resident)) {
+				if(infoTown.isPlayerKnight(resident)) {
 					townKnights.add(resident);
 				} else {
 					townResidents.add(resident);
@@ -159,7 +159,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		pageLabel = titleColor+infoTown.getName()+" "+MessagePath.LABEL_UPGRADES.getMessage();
 		getMenu().addPage(1, 1, pageLabel);
 		int index = 0;
-		for(KonUpgrade upgrade : KonUpgrade.values()) {
+		for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
 			int currentLevel = infoTown.getRawUpgradeLevel(upgrade);
 			if(currentLevel > 0) {
 				String formattedUpgrade = ChatColor.LIGHT_PURPLE+upgrade.getDescription()+" "+currentLevel;

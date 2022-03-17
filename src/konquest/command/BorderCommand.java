@@ -24,7 +24,7 @@ public class BorderCommand extends CommandBase {
             return;
         } else {
         	Player bukkitPlayer = (Player) getSender();
-        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;

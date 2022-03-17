@@ -2,6 +2,7 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.api.model.KonquestUpgrade;
 import konquest.manager.PlayerManager;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
@@ -10,7 +11,6 @@ import konquest.model.KonPlayer;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
-import konquest.model.KonUpgrade;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
@@ -68,7 +68,7 @@ public class InventoryListener implements Listener {
 		
 		if(openLoc != null && konquest.getKingdomManager().isChunkClaimed(openLoc)) {
 			
-			if(!konquest.getPlayerManager().isPlayer((Player)event.getPlayer())) {
+			if(!konquest.getPlayerManager().isOnlinePlayer((Player)event.getPlayer())) {
 				ChatUtil.printDebug("Failed to handle onInventoryOpen for non-existent player");
 				return;
 			}
@@ -125,7 +125,7 @@ public class InventoryListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
-							if(town.isPlotOnly() && !town.isPlayerElite(player.getOfflineBukkitPlayer()) && !town.hasPlot(openLoc)) {
+							if(town.isPlotOnly() && !town.isPlayerKnight(player.getOfflineBukkitPlayer()) && !town.hasPlot(openLoc)) {
 								// Stop when non-elite player edits non-plot land
 								ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLY_PLOT.getMessage());
 								event.setCancelled(true);
@@ -135,7 +135,7 @@ public class InventoryListener implements Listener {
 					}
 					// Attempt to put loot into empty chests within the monument
 					if(town.isLocInsideCenterChunk(openLoc) && event.getInventory().getHolder() instanceof Chest) {
-						if(town.isPlayerLord(player.getOfflineBukkitPlayer()) || town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+						if(town.isPlayerLord(player.getOfflineBukkitPlayer()) || town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 							//if(isInventoryEmpty(event.getInventory())) {
 								// Update loot with default count as defined in core YML
 								boolean result = konquest.getLootManager().updateMonumentLoot(event.getInventory(), town);
@@ -283,7 +283,7 @@ public class InventoryListener implements Listener {
 		}
 		HumanEntity human = event.getWhoClicked();
 		if(!event.isCancelled() && human instanceof Player) {
-			if(!konquest.getPlayerManager().isPlayer((Player)human)) {
+			if(!konquest.getPlayerManager().isOnlinePlayer((Player)human)) {
 				ChatUtil.printDebug("Failed to handle onCraftItem for non-existent player");
 				return;
 			}
@@ -341,7 +341,7 @@ public class InventoryListener implements Listener {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
 		}
-		if(!konquest.getPlayerManager().isPlayer(event.getPlayer())) {
+		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onFurnaceExtract for non-existent player");
 			return;
 		}
@@ -363,7 +363,7 @@ public class InventoryListener implements Listener {
 			if(konquest.isWorldIgnored(event.getInventory().getLocation())) {
 				return;
 			}
-			if(!konquest.getPlayerManager().isPlayer(event.getEnchanter())) {
+			if(!konquest.getPlayerManager().isOnlinePlayer(event.getEnchanter())) {
 				ChatUtil.printDebug("Failed to handle onEnchantItem for non-existent player");
 				return;
 			}
@@ -375,7 +375,7 @@ public class InventoryListener implements Listener {
 				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(enchantLoc);
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown)territory;
-					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.ENCHANT);
+					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.ENCHANT);
 					if(upgradeLevel >= 1) {
 						// Add 1 (if possible) to all applied enchantment levels
 						Map<Enchantment,Integer> enchantsToAdd = event.getEnchantsToAdd();
@@ -402,7 +402,7 @@ public class InventoryListener implements Listener {
 				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(enchantLoc);
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown)territory;
-					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.ENCHANT);
+					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.ENCHANT);
 					if(upgradeLevel >= 1) {
 						// Add 1 (if possible) to all enchantment offers
 						EnchantmentOffer[] offers = event.getOffers();

@@ -4,16 +4,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 
 //import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.KonquestPlugin;
+import konquest.api.manager.KonquestPlaceholderManager;
+import konquest.api.model.KonquestTerritoryType;
+import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonPrefix;
-import konquest.model.KonTerritoryType;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
@@ -22,8 +26,17 @@ import konquest.utility.MessagePath;
 // A placeholder cannot be requested until after the cooldown time, configurable duration.
 // Cooldown time applies to every placeholder.
 // Previous placeholder result is cached and returned for requests made before cooldown time ends.
-public class PlaceholderManager {
+public class PlaceholderManager implements KonquestPlaceholderManager {
 
+	private enum KingdomValue {
+		PLAYERS,
+		ONLINE,
+		TOWNS,
+		LAND,
+		FAVOR,
+		SCORE;
+	}
+	
 	private class Ranked {
 		String name;
 		int value;
@@ -44,18 +57,26 @@ public class PlaceholderManager {
 	private ArrayList<Ranked> topScoreList;
 	private ArrayList<Ranked> topTownList;
 	private ArrayList<Ranked> topLandList;
+	private HashMap<KingdomValue,HashMap<String,Integer>> kingdomCache;
+	private HashMap<KingdomValue,Long> kingdomCooldownTimes;
 	
 	public PlaceholderManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.playerManager = konquest.getPlayerManager();
 		this.kingdomManager = konquest.getKingdomManager();
 		this.cooldownSeconds = 0;
-		this.topScoreCooldownTime = 0;
-		this.topTownCooldownTime = 0;
-		this.topLandCooldownTime = 0;
+		this.topScoreCooldownTime = 0L;
+		this.topTownCooldownTime = 0L;
+		this.topLandCooldownTime = 0L;
 		this.topScoreList = new ArrayList<Ranked>();
 		this.topTownList = new ArrayList<Ranked>();
 		this.topLandList = new ArrayList<Ranked>();
+		this.kingdomCache = new HashMap<KingdomValue,HashMap<String,Integer>>();
+		this.kingdomCooldownTimes = new HashMap<KingdomValue,Long>();
+		for(KingdomValue val : KingdomValue.values()) {
+			kingdomCache.put(val, new HashMap<String,Integer>());
+			kingdomCooldownTimes.put(val, 0L);
+		}
 		this.rankedComparator = new Comparator<Ranked>() {
    			@Override
    			public int compare(final Ranked k1, Ranked k2) {
@@ -74,6 +95,12 @@ public class PlaceholderManager {
 		topScoreList = new ArrayList<Ranked>();
 		topTownList = new ArrayList<Ranked>();
 		topLandList = new ArrayList<Ranked>();
+		kingdomCache = new HashMap<KingdomValue,HashMap<String,Integer>>();
+		kingdomCooldownTimes = new HashMap<KingdomValue,Long>();
+		for(KingdomValue val : KingdomValue.values()) {
+			kingdomCache.put(val, new HashMap<String,Integer>());
+			kingdomCooldownTimes.put(val, 0L);
+		}
 		cooldownSeconds = konquest.getConfigManager().getConfig("core").getInt("core.placeholder_request_limit",0);
 		ChatUtil.printDebug("Placeholder Manager is ready with cooldown seconds: "+cooldownSeconds);
 	}
@@ -132,7 +159,7 @@ public class PlaceholderManager {
 		String list = "";
     	if(offlinePlayer != null) {
     		for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
-    			if(town.isPlayerElite(offlinePlayer.getOfflineBukkitPlayer()) &&
+    			if(town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer()) &&
     					!town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
     				list = list + town.getName() + ",";
     			}
@@ -150,7 +177,7 @@ public class PlaceholderManager {
     	if(offlinePlayer != null) {
     		for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
     			if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer()) &&
-    					!town.isPlayerElite(offlinePlayer.getOfflineBukkitPlayer())) {
+    					!town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer())) {
     				list = list + town.getName() + ",";
     			}
     		}
@@ -184,7 +211,7 @@ public class PlaceholderManager {
         	if(kingdomManager.isChunkClaimed(player.getLocation())) {
         		result = kingdomManager.getChunkTerritory(player.getLocation()).getTerritoryType().getLabel();
         	} else {
-        		result = KonTerritoryType.WILD.getLabel();
+        		result = KonquestTerritoryType.WILD.getLabel();
         	}
     	}
     	return result;
@@ -197,7 +224,7 @@ public class PlaceholderManager {
         	if(kingdomManager.isChunkClaimed(player.getLocation())) {
         		result = kingdomManager.getChunkTerritory(player.getLocation()).getName();
         	} else {
-        		result = KonTerritoryType.WILD.getLabel();
+        		result = KonquestTerritoryType.WILD.getLabel();
         	}
     	}
     	return result;
@@ -216,6 +243,20 @@ public class PlaceholderManager {
 		String result = "";
     	KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
     	result = offlinePlayer == null ? "" : String.valueOf(kingdomManager.getPlayerScore(offlinePlayer));
+    	return result;
+	}
+	
+	public String getPrefix(Player player) {
+		String result = "";
+    	KonPlayer onlinePlayer = playerManager.getPlayer(player);
+    	if(onlinePlayer != null) {
+    		KonPrefix playerPrefix = onlinePlayer.getPlayerPrefix();
+    		if(playerPrefix.isEnabled()) {
+    			result = playerPrefix.getMainPrefixName();
+    		} else {
+    			result = "";
+    		}
+    	}
     	return result;
 	}
 	
@@ -263,6 +304,57 @@ public class PlaceholderManager {
     	return result;
 	}
 	
+	public String getCombatTag(Player player) {
+		String result = "";
+		KonPlayer onlinePlayer = playerManager.getPlayer(player);
+    	result = (onlinePlayer != null && onlinePlayer.isCombatTagged()) ? ChatUtil.parseHex(konquest.getConfigManager().getConfig("core").getString("core.combat.placeholder_tag","")) : "";
+    	return result;
+	}
+	
+	public String getGuild(Player player) {
+		String result = "";
+		KonGuild guild = konquest.getGuildManager().getPlayerGuild(player);
+    	result = guild == null ? "" : guild.getName();
+    	return result;
+	}
+	
+	/*
+	 * Placeholder Relational Requesters
+	 */
+	
+	public String getRelation(Player playerOne, Player playerTwo) {
+		String result = "";
+		KonPlayer onlinePlayerOne = playerManager.getPlayer(playerOne);
+		KonPlayer onlinePlayerTwo = playerManager.getPlayer(playerTwo);
+		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
+			boolean isArmistice = konquest.getGuildManager().isArmistice(onlinePlayerOne, onlinePlayerTwo);
+	    	if(onlinePlayerTwo.isBarbarian()) {
+	    		result = MessagePath.PLACEHOLDER_BARBARIAN.getMessage();
+			} else {
+				if(onlinePlayerOne.getKingdom().equals(onlinePlayerTwo.getKingdom())) {
+					result = MessagePath.PLACEHOLDER_FRIENDLY.getMessage();
+	    		} else {
+	    			if(isArmistice) {
+	    				result = MessagePath.PLACEHOLDER_ARMISTICE.getMessage();
+	    			} else {
+	    				result = MessagePath.PLACEHOLDER_ENEMY.getMessage();
+	    			}
+	    		}
+			}
+		}
+		return result;
+	}
+	
+	public String getRelationColor(Player playerOne, Player playerTwo) {
+		String result = "";
+		KonPlayer onlinePlayerOne = playerManager.getPlayer(playerOne);
+		KonPlayer onlinePlayerTwo = playerManager.getPlayer(playerTwo);
+		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
+			result = ""+konquest.getDisplayPrimaryColor(onlinePlayerOne, onlinePlayerTwo);
+		}
+		return result;
+	}
+	
 	/*
 	 * Top rankings
 	 * These methods may be called repeatedly for multiple players.
@@ -273,11 +365,10 @@ public class PlaceholderManager {
 	
 	/**
 	 * 
-	 * @param player
 	 * @param rank - List index starting at 1
 	 * @return
 	 */
-	public String getTopScore(Player player, int rank) {
+	public String getTopScore(int rank) {
 		String result = "---";
 		Date now = new Date();
 		if(now.after(new Date(topScoreCooldownTime))) {
@@ -307,7 +398,7 @@ public class PlaceholderManager {
 		return result;
 	}
 	
-	public String getTopTown(Player player, int rank) {
+	public String getTopTown(int rank) {
 		String result = "---";
 		Date now = new Date();
 		if(now.after(new Date(topTownCooldownTime))) {
@@ -334,7 +425,7 @@ public class PlaceholderManager {
 		return result;
 	}
 	
-	public String getTopLand(Player player, int rank) {
+	public String getTopLand(int rank) {
 		String result = "---";
 		Date now = new Date();
 		if(now.after(new Date(topLandCooldownTime))) {
@@ -365,18 +456,140 @@ public class PlaceholderManager {
 		return result;
 	}
 	
-	public String getPrefix(Player player) {
+	/*
+	 * Placeholder Kingdom Requesters
+	 */
+	
+	public String getKingdomPlayers(String name) {
 		String result = "";
-    	KonPlayer onlinePlayer = playerManager.getPlayer(player);
-    	if(onlinePlayer != null) {
-    		KonPrefix playerPrefix = onlinePlayer.getPlayerPrefix();
-    		if(playerPrefix.isEnabled()) {
-    			result = playerPrefix.getMainPrefixName();
-    		} else {
-    			result = "-";
-    		}
-    	}
-    	return result;
+		// Check cooldown time, update cache if expired
+		KingdomValue type = KingdomValue.PLAYERS;
+		if(kingdomManager.isKingdom(name) && 
+				kingdomCooldownTimes.containsKey(type) &&
+				kingdomCache.containsKey(type)) {
+			Date now = new Date();
+			if(now.after(new Date(kingdomCooldownTimes.get(type)))) {
+				// Cooldown is expired, update value
+				int value = playerManager.getAllPlayersInKingdom(kingdomManager.getKingdom(name)).size();
+				kingdomCache.get(type).put(name, value);
+				// Update new cooldown time
+				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds*1000));
+			}
+			// Get value
+			result = ""+kingdomCache.get(type).get(name);
+		}
+		return result;
+	}
+	
+	public String getKingdomOnline(String name) {
+		String result = "";
+		// Check cooldown time, update cache if expired
+		KingdomValue type = KingdomValue.ONLINE;
+		if(kingdomManager.isKingdom(name) && 
+				kingdomCooldownTimes.containsKey(type) &&
+				kingdomCache.containsKey(type)) {
+			Date now = new Date();
+			if(now.after(new Date(kingdomCooldownTimes.get(type)))) {
+				// Cooldown is expired, update value
+				int value = playerManager.getPlayersInKingdom(kingdomManager.getKingdom(name)).size();
+				kingdomCache.get(type).put(name, value);
+				// Update new cooldown time
+				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds*1000));
+			}
+			// Get value
+			result = ""+kingdomCache.get(type).get(name);
+		}
+		return result;
+	}
+	
+	public String getKingdomTowns(String name) {
+		String result = "";
+		// Check cooldown time, update cache if expired
+		KingdomValue type = KingdomValue.TOWNS;
+		if(kingdomManager.isKingdom(name) && 
+				kingdomCooldownTimes.containsKey(type) &&
+				kingdomCache.containsKey(type)) {
+			Date now = new Date();
+			if(now.after(new Date(kingdomCooldownTimes.get(type)))) {
+				// Cooldown is expired, update value
+				int value = kingdomManager.getKingdom(name).getTowns().size();
+				kingdomCache.get(type).put(name, value);
+				// Update new cooldown time
+				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds*1000));
+			}
+			// Get value
+			result = ""+kingdomCache.get(type).get(name);
+		}
+		return result;
+	}
+	
+	public String getKingdomLand(String name) {
+		String result = "";
+		// Check cooldown time, update cache if expired
+		KingdomValue type = KingdomValue.LAND;
+		if(kingdomManager.isKingdom(name) && 
+				kingdomCooldownTimes.containsKey(type) &&
+				kingdomCache.containsKey(type)) {
+			Date now = new Date();
+			if(now.after(new Date(kingdomCooldownTimes.get(type)))) {
+				// Cooldown is expired, update value
+				int value = 0;
+		    	for(KonTown town : kingdomManager.getKingdom(name).getTowns()) {
+		    		value += town.getChunkList().size();
+		    	}
+				kingdomCache.get(type).put(name, value);
+				// Update new cooldown time
+				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds*1000));
+			}
+			// Get value
+			result = ""+kingdomCache.get(type).get(name);
+		}
+		return result;
+	}
+	
+	public String getKingdomFavor(String name) {
+		String result = "";
+		// Check cooldown time, update cache if expired
+		KingdomValue type = KingdomValue.FAVOR;
+		if(kingdomManager.isKingdom(name) && 
+				kingdomCooldownTimes.containsKey(type) &&
+				kingdomCache.containsKey(type)) {
+			Date now = new Date();
+			if(now.after(new Date(kingdomCooldownTimes.get(type)))) {
+				// Cooldown is expired, update value
+				int value = 0;
+		    	for(KonOfflinePlayer kingdomPlayer : playerManager.getAllPlayersInKingdom(kingdomManager.getKingdom(name))) {
+		    		value += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
+		    	}
+				kingdomCache.get(type).put(name, value);
+				// Update new cooldown time
+				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds*1000));
+			}
+			// Get value
+			result = ""+kingdomCache.get(type).get(name);
+		}
+		return result;
+	}
+	
+	public String getKingdomScore(String name) {
+		String result = "";
+		// Check cooldown time, update cache if expired
+		KingdomValue type = KingdomValue.SCORE;
+		if(kingdomManager.isKingdom(name) && 
+				kingdomCooldownTimes.containsKey(type) &&
+				kingdomCache.containsKey(type)) {
+			Date now = new Date();
+			if(now.after(new Date(kingdomCooldownTimes.get(type)))) {
+				// Cooldown is expired, update value
+				int value = kingdomManager.getKingdomScore(kingdomManager.getKingdom(name));
+				kingdomCache.get(type).put(name, value);
+				// Update new cooldown time
+				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds*1000));
+			}
+			// Get value
+			result = ""+kingdomCache.get(type).get(name);
+		}
+		return result;
 	}
 	
 }

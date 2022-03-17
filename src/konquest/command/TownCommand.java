@@ -37,7 +37,7 @@ public class TownCommand extends CommandBase {
         	String subCmd = getArgs()[2];
         	
         	Player bukkitPlayer = (Player) getSender();
-        	if(!getKonquest().getPlayerManager().isPlayer(bukkitPlayer)) {
+        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
@@ -54,10 +54,10 @@ public class TownCommand extends CommandBase {
         	
         	// Check if town has a lord
         	if(!town.isLordValid() && !subCmd.equalsIgnoreCase("lord")) {
-        		if(town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+        		if(town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
         			//ChatUtil.sendNotice((Player) getSender(), townName+" is lordless! Use \"/k town <name> lord <your name>\" to claim Lordship.");
         			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(townName,townName,bukkitPlayer.getName()));
-        		} else if(town.isPlayerResident(player.getOfflineBukkitPlayer()) && town.getPlayerElites().isEmpty()) {
+        		} else if(town.isPlayerResident(player.getOfflineBukkitPlayer()) && town.getPlayerKnights().isEmpty()) {
         			//ChatUtil.sendNotice((Player) getSender(), townName+" is leaderless! Use \"/k town <name> lord <your name>\" to claim Lordship.");
         			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(townName,townName,bukkitPlayer.getName()));
         		} else if(town.getPlayerResidents().isEmpty()){
@@ -72,7 +72,7 @@ public class TownCommand extends CommandBase {
         	switch(subCmd.toLowerCase()) {
         	case "plots":
         		// Verify player is elite or lord of the Town
-	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 	        		//ChatUtil.sendError((Player) getSender(), "You must be a Knight or the Lord of "+townName+" to do this");
 	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 	        		return;
@@ -136,7 +136,7 @@ public class TownCommand extends CommandBase {
         	*/
 			case "add":
 				// Verify player is elite or lord of the Town
-	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 	        		//ChatUtil.sendError((Player) getSender(), "You must be a Knight or the Lord of "+townName+" to do this");
 	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 	        		return;
@@ -145,7 +145,7 @@ public class TownCommand extends CommandBase {
 					playerName = getArgs()[3];
 				}
 			    if(!playerName.equalsIgnoreCase("")) {
-			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 			    	if(offlinePlayer == null) {
 						//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -220,7 +220,7 @@ public class TownCommand extends CommandBase {
 			    break;
 			case "kick":
 				// Verify player is elite or lord of the Town
-	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 	        		//ChatUtil.sendError((Player) getSender(), "You must be a Knight or the Lord of "+townName+" to do this");
 	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 	        		return;
@@ -229,7 +229,7 @@ public class TownCommand extends CommandBase {
 					playerName = getArgs()[3];
 				}
 				if(!playerName.equalsIgnoreCase("")) {
-					KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+					KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 					if(offlinePlayer == null) {
 						//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -237,7 +237,7 @@ public class TownCommand extends CommandBase {
 					}
 					playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
 					// Prevent Elites from removing Lord
-					if(town.isPlayerElite(player.getOfflineBukkitPlayer()) && town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
+					if(town.isPlayerKnight(player.getOfflineBukkitPlayer()) && town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
 						//ChatUtil.sendError((Player) getSender(), "You cannot kick the Lord!");
 						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 		        		return;
@@ -298,9 +298,9 @@ public class TownCommand extends CommandBase {
 	        		// Lord does not exist
 	        		if(!town.isOpen() && town.getKingdom().equals(player.getKingdom())) {
 	        			// Check player roles in closed towns only, allow any member to claim lordship in open towns
-		        		if(!town.getPlayerElites().isEmpty()) {
+		        		if(!town.getPlayerKnights().isEmpty()) {
 		        			// Elite residents exist, permit access to them
-		        			if(!town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+		        			if(!town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 		    	        		//ChatUtil.sendError((Player) getSender(), "You must be a Knight in "+townName+" to do this");
 		    	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 		    	        		return;
@@ -331,7 +331,7 @@ public class TownCommand extends CommandBase {
 				if(!playerName.equalsIgnoreCase("")) {
 					if(isSenderOwner) {
 						// The current Town owner is giving away Lordship
-						KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+						KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 	        			if(offlinePlayer == null) {
 							//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -379,7 +379,7 @@ public class TownCommand extends CommandBase {
 		        		}
 					} else {
 						// A non-owner is giving themselves Lord
-						KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+						KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 	        			if(offlinePlayer == null) {
 							//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -420,7 +420,7 @@ public class TownCommand extends CommandBase {
 					playerName = getArgs()[3];
 				}
 			    if(!playerName.equalsIgnoreCase("")) {
-			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getAllPlayerFromName(playerName);
+			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 			    	if(offlinePlayer == null) {
 						//ChatUtil.sendError((Player) getSender(), "Invalid player name!");
 						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
@@ -439,9 +439,9 @@ public class TownCommand extends CommandBase {
 			    	// Set resident's elite status
 			    	KonPlayer onlinePlayer = getKonquest().getPlayerManager().getPlayerFromName(playerName);
 			    	if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
-			    		if(town.isPlayerElite(offlinePlayer.getOfflineBukkitPlayer())) {
+			    		if(town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer())) {
 			    			// Clear elite
-			    			town.setPlayerElite(offlinePlayer.getOfflineBukkitPlayer(), false);
+			    			town.setPlayerKnight(offlinePlayer.getOfflineBukkitPlayer(), false);
 			    			for(OfflinePlayer resident : town.getPlayerResidents()) {
 				    			if(resident.isOnline()) {
 				    				//ChatUtil.sendNotice((Player) resident, playerName+" is no longer a Knight in "+townName);
@@ -451,7 +451,7 @@ public class TownCommand extends CommandBase {
 			    			//ChatUtil.sendNotice((Player) getSender(), "Use this command again to set Knight status.");
 			    		} else {
 			    			// Set elite
-			    			town.setPlayerElite(offlinePlayer.getOfflineBukkitPlayer(), true);
+			    			town.setPlayerKnight(offlinePlayer.getOfflineBukkitPlayer(), true);
 			    			for(OfflinePlayer resident : town.getPlayerResidents()) {
 				    			if(resident.isOnline()) {
 				    				//ChatUtil.sendNotice((Player) resident, playerName+" has been Knighted in "+townName);
@@ -533,7 +533,7 @@ public class TownCommand extends CommandBase {
         		break;
 			case "shield":
             	// Verify player is elite or lord of the Town
-	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerElite(player.getOfflineBukkitPlayer())) {
+	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 	        		//ChatUtil.sendError((Player) getSender(), "You must be a Knight or the Lord of "+townName+" to do this");
 	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 	        		return;
@@ -565,7 +565,7 @@ public class TownCommand extends CommandBase {
 		if(getArgs().length == 2) {
 			// Suggest town names where the player is elite or if lord is not set
 			for(KonTown town : player.getKingdom().getTowns()) {
-				if(town.isPlayerElite(bukkitPlayer) || !town.isLordValid()) {
+				if(town.isPlayerKnight(bukkitPlayer) || !town.isLordValid()) {
 					tabList.add(town.getName());
 				}
 			}

@@ -1,10 +1,10 @@
 package konquest;
 
+import konquest.api.KonquestAPI;
 import konquest.listener.BlockListener;
 import konquest.listener.EntityListener;
 import konquest.listener.HangingListener;
 import konquest.listener.InventoryListener;
-import konquest.listener.KonquestListener;
 import konquest.listener.PlayerListener;
 import konquest.listener.WorldListener;
 import konquest.utility.ChatUtil;
@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.comphenix.protocol.ProtocolLibrary;
@@ -56,6 +57,8 @@ public class KonquestPlugin extends JavaPlugin {
         registerListeners();
         // Initialize core
         konquest.initialize();
+        // Register API
+        registerApi(konquest);
         // Register placeholders
         registerPlaceholders();
         // Check for updates
@@ -95,13 +98,16 @@ public class KonquestPlugin extends JavaPlugin {
 	
 	private void registerListeners() {
 		pluginManager.registerEvents(new PlayerListener(this), this);
-		pluginManager.registerEvents(new KonquestListener(this), this);
 		pluginManager.registerEvents(new EntityListener(this), this);
 		pluginManager.registerEvents(new BlockListener(this), this);
 		pluginManager.registerEvents(new InventoryListener(this), this);
 		pluginManager.registerEvents(new HangingListener(this), this);
 		pluginManager.registerEvents(new WorldListener(this), this);
 		//pluginManager.registerEvents(new QuickShopListener(this), this);
+	}
+	
+	private void registerApi(KonquestAPI api) {
+		this.getServer().getServicesManager().register(KonquestAPI.class, api, this, ServicePriority.Normal);
 	}
 	
 	private void loadMetrics() {
@@ -120,7 +126,7 @@ public class KonquestPlugin extends JavaPlugin {
 			isProtocolEnabled = true;
 		} catch(Exception e) {
 			ChatUtil.printConsoleError("Failed to load ProtocolLib, is it the latest version?");
-			ChatUtil.printConsoleError(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 	
@@ -236,13 +242,13 @@ public class KonquestPlugin extends JavaPlugin {
 		}
 		// Send message
 		if(resp != null) {
-			if(resp.transactionSuccess() && resp.amount > 0) {
-	        	//String balanceF = String.format("%.2f",r.balance);
-	        	//String amountF = String.format("%.2f",r.amount);
-				String balanceF = econ.format(resp.balance);
-				String amountF = econ.format(resp.amount);
-	        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF), ChatColor.DARK_AQUA);
-	        	result = true;
+			if(resp.transactionSuccess()) {
+	        	if(resp.amount > 0) {
+					String balanceF = econ.format(resp.balance);
+					String amountF = econ.format(resp.amount);
+		        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REDUCE_FAVOR.getMessage(amountF,balanceF), ChatColor.DARK_AQUA);
+		        	result = true;
+	        	}
 	        } else {
 	        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(resp.errorMessage));
 	        }
@@ -270,13 +276,13 @@ public class KonquestPlugin extends JavaPlugin {
 		}
 		// Send message
 		if(resp != null) {
-			if(resp.transactionSuccess() && resp.amount > 0) {
-	        	//String balanceF = String.format("%.2f",resp.balance);
-	        	//String amountF = String.format("%.2f",resp.amount);
-	        	String balanceF = econ.format(resp.balance);
-				String amountF = econ.format(resp.amount);
-	        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REWARD_FAVOR.getMessage(amountF,balanceF), ChatColor.DARK_GREEN);
-	        	result = true;
+			if(resp.transactionSuccess()) {
+				if(resp.amount > 0) {
+		        	String balanceF = econ.format(resp.balance);
+					String amountF = econ.format(resp.amount);
+		        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_REWARD_FAVOR.getMessage(amountF,balanceF), ChatColor.DARK_GREEN);
+		        	result = true;
+				}
 	        } else {
 	        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(resp.errorMessage));
 	        }
