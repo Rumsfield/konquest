@@ -241,6 +241,7 @@ public class KingdomManager implements KonquestKingdomManager {
 		    	konquest.getDirectiveManager().displayBook(player);
 		    	konquest.getMapHandler().drawDynmapLabel(getKingdom(kingdomName).getCapital());
 		    	updateKingdomOfflineProtection();
+		    	updatePlayerBorderParticles(player);
 			} else {
 				return 2;
 			}
@@ -330,6 +331,7 @@ public class KingdomManager implements KonquestKingdomManager {
     	konquest.getMapHandler().drawDynmapLabel(oldKingdom.getCapital());
     	updateSmallestKingdom();
     	updateKingdomOfflineProtection();
+    	updatePlayerBorderParticles(player);
     	return true;
 	}
 	
