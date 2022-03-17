@@ -34,6 +34,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Effect;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -99,7 +100,7 @@ public class BlockListener implements Listener {
 		// Monitor blocks in claimed territory
 		if(kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
 			// Bypass event restrictions for player in Admin Bypass Mode
-			if(!player.isAdminBypassActive()) {
+			if(!player.isAdminBypassActive() && !player.getBukkitPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
 				//ChatUtil.printDebug("Evaluating blockBreak in claimed territory...");
 				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getBlock().getLocation());
 				Location breakLoc = event.getBlock().getLocation();

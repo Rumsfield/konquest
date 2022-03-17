@@ -839,7 +839,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		boolean result = false;
 		// Attempt to start a raid alert
 		if(!isRaidAlertDisabled()) {
-			// Alert all players of enemy Kingdom
+			// Alert all players of this town's kingdom
 			for(KonPlayer player : getKonquest().getPlayerManager().getPlayersInKingdom(getKingdom().getName())) {
 				if(!player.isAdminBypassActive() && !player.getBukkitPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
 					ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID.getMessage(getName(),getName()),ChatColor.DARK_RED);
