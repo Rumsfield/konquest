@@ -284,10 +284,12 @@ public class BlockListener implements Listener {
 						if(town.isArmored()) {
 							// Ignore instant-break blocks
 							Material blockMat = event.getBlock().getState().getType();
-							ChatUtil.printDebug("Armor block broke of hardness "+blockMat.getHardness()+", "+blockMat.isBlock());
-							if(blockMat.getHardness() > 0.5 && konquest.getKingdomManager().isArmorValid(blockMat)) {
+							//ChatUtil.printDebug("Armor block "+blockMat.toString()+" broke of hardness "+blockMat.getHardness()+", max durability "+blockMat.getMaxDurability()+", solid "+blockMat.isSolid());
+							if(blockMat.getHardness() > 0.0 && blockMat.isSolid() && konquest.getKingdomManager().isArmorValid(blockMat)) {
 								town.damageArmor(1);
 								Konquest.playTownArmorSound(event.getPlayer());
+							} else {
+								ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_AQUA+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 							}
 							event.setCancelled(true);
 							return;
@@ -866,6 +868,8 @@ public class BlockListener implements Listener {
 			if(kingdomManager.isChunkClaimed(block.getLocation())) {
 				ChatUtil.printDebug("effected block is inside claimed territory");
 				KonTerritory territory = kingdomManager.getChunkTerritory(block.getLocation());
+				Material blockMat = block.getType();
+				
 				// Protect Capitals
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
 					ChatUtil.printDebug("protecting Capital");
@@ -909,7 +913,7 @@ public class BlockListener implements Listener {
 						return;
 					}
 					// If town is armored, damage the armor while preventing block breaks
-					if(town.isArmored()) {
+					if(town.isArmored() && blockMat.getHardness() > 0.0 && blockMat.isSolid() && konquest.getKingdomManager().isArmorValid(blockMat)) {
 						int damage = konquest.getConfigManager().getConfig("core").getInt("core.towns.armor_tnt_damage",1);
 						town.damageArmor(damage);
 						Konquest.playTownArmorSound(event.getBlock().getLocation());

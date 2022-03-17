@@ -20,6 +20,7 @@ import konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -127,6 +128,7 @@ public class EntityListener implements Listener {
 			if(kingdomManager.isChunkClaimed(block.getLocation())) {
 				//ChatUtil.printDebug("EVENT: effected block is inside claimed territory");
 				KonTerritory territory = kingdomManager.getChunkTerritory(block.getLocation());
+				Material blockMat = block.getType();
 				
 				// Protect Capitals always
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
@@ -178,7 +180,7 @@ public class EntityListener implements Listener {
 						return;
 					}
 					// If town is armored, damage the armor while preventing explosions
-					if(town.isArmored()) {
+					if(town.isArmored() && blockMat.getHardness() > 0.0 && blockMat.isSolid() && konquest.getKingdomManager().isArmorValid(blockMat)) {
 						int damage = konquest.getConfigManager().getConfig("core").getInt("core.towns.armor_tnt_damage",1);
 						town.damageArmor(damage);
 						Konquest.playTownArmorSound(event.getLocation());
