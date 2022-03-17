@@ -1163,7 +1163,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			shieldTimer.setTime(0);
 			shieldTimer.startLoopTimer();
 			// No longer attacked when shielded
-			setAttacked(false);
+			//setAttacked(false);
 		}
 		//shieldArmorBarAll.setVisible(true);
 		//refreshShieldBarTitle();
@@ -1185,7 +1185,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			// Activate new armor
 			isArmored = true;
 			// No longer attacked when armored
-			setAttacked(false);
+			//setAttacked(false);
 		}
 		armorCurrentBlocks = val;
 		armorTotalBlocks = armorCurrentBlocks;
