@@ -378,7 +378,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
 			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.enemy_primary");
-			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_primary: "+configColor+", using "+defaultColor);
+			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.enemy_primary: "+configColor+", using "+defaultColor);
 		} else {
 			enemyColor1 = color;
 		}
@@ -387,7 +387,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
 			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.enemy_secondary");
-			ChatUtil.printConsoleError("Invalid color code core.colors.enemy_secondary: "+configColor+", using "+defaultColor);
+			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.enemy_secondary: "+configColor+", using "+defaultColor);
 		} else {
 			enemyColor2 = color;
 		}
@@ -396,7 +396,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
 			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.armistice_primary");
-			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_primary: "+configColor+", using "+defaultColor);
+			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.armistice_primary: "+configColor+", using "+defaultColor);
 		} else {
 			armisticeColor1 = color;
 		}
@@ -405,7 +405,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
 			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.armistice_secondary");
-			ChatUtil.printConsoleError("Invalid color code core.colors.armistice_secondary: "+configColor+", using "+defaultColor);
+			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.armistice_secondary: "+configColor+", using "+defaultColor);
 		} else {
 			armisticeColor2 = color;
 		}
@@ -414,7 +414,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
 			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.barbarian");
-			ChatUtil.printConsoleError("Invalid color code core.colors.barbarian: "+configColor+", using "+defaultColor);
+			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.barbarian: "+configColor+", using "+defaultColor);
 		} else {
 			barbarianColor = color;
 		}
