@@ -88,82 +88,91 @@ public class DisplayManager {
 			return;
 		}
 		Player bukkitPlayer = clickPlayer.getBukkitPlayer();
-		// Switch pages and handle navigation button clicks
-		if(pagedMenus.containsKey(inv)) {
-			MenuWrapper wrapper = pagedMenus.get(inv);
-			if(wrapper == null) {
-				return;
+		try {
+			// Switch pages and handle navigation button clicks
+			if(pagedMenus.containsKey(inv)) {
+				MenuWrapper wrapper = pagedMenus.get(inv);
+				if(wrapper == null) {
+					return;
+				}
+				PagedMenu clickMenu = wrapper.getMenu();
+				if(clickMenu == null) {
+					return;
+				}
+				DisplayMenu currentPage = clickMenu.getCurrentPage();
+				if(currentPage == null) {
+					return;
+				}
+				MenuIcon clickedIcon = currentPage.getIcon(slot);
+				if(clickedIcon == null || !clickedIcon.isClickable()) {
+					return;
+				}
+				playMenuClickSound(bukkitPlayer);
+				int nextIndex = clickMenu.getCurrentNextSlot();
+				int closeIndex = clickMenu.getCurrentCloseSlot();
+				int backIndex = clickMenu.getCurrentBackSlot();
+				playerViewerCache.add(bukkitPlayer);
+				pagedMenus.remove(inv);
+				// Handle click context
+				if(slot == nextIndex) {
+					// Change paged view to next
+					clickMenu.nextPageIndex();
+					clickMenu.refreshCurrentPage();
+					bukkitPlayer.openInventory(wrapper.getCurrentInventory());
+	            	pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
+				} else if(slot == closeIndex) {
+					// Close paged view
+					bukkitPlayer.closeInventory();
+	            	playerViewerCache.remove(bukkitPlayer);
+				} else if(slot == backIndex) {
+					// Change paged view to previous
+					clickMenu.previousPageIndex();
+					clickMenu.refreshCurrentPage();
+					bukkitPlayer.openInventory(clickMenu.getCurrentPage().getInventory());
+	            	pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
+				} else {
+					// Clicked non-navigation slot, clickable icon
+					// An icon will either open another menu or do nothing
+					wrapper.onIconClick(clickPlayer, clickedIcon);
+					bukkitPlayer.closeInventory();
+	            	playerViewerCache.remove(bukkitPlayer);
+				}
+			} else if(stateMenus.containsKey(inv)) {
+				// Handle menu navigation and states
+				// Every clickable icon in a menu view will update the state and refresh the open inventory
+				StateMenu clickMenu = stateMenus.get(inv);
+				DisplayMenu currentView = clickMenu.getCurrentView();
+				if(currentView == null || !currentView.getInventory().equals(inv)) {
+					ChatUtil.printDebug("State menu view is not current!");
+					return;
+				}
+				MenuIcon clickedIcon = currentView.getIcon(slot);
+				if(clickedIcon == null || !clickedIcon.isClickable()) {
+					return;
+				}
+				playMenuClickSound(bukkitPlayer);
+				// Update plot menu state
+				DisplayMenu updateView = clickMenu.updateState(slot, clickType);
+				// Update inventory view
+				stateMenus.remove(inv);
+				playerViewerCache.add(bukkitPlayer);
+				if(updateView != null) {
+					// Refresh displayed inventory view
+					bukkitPlayer.openInventory(updateView.getInventory());
+	            	stateMenus.put(updateView.getInventory(), clickMenu);
+				} else {
+					// Close inventory view
+					bukkitPlayer.closeInventory();
+	            	playerViewerCache.remove(bukkitPlayer);
+				}
 			}
-			PagedMenu clickMenu = wrapper.getMenu();
-			if(clickMenu == null) {
-				return;
-			}
-			DisplayMenu currentPage = clickMenu.getCurrentPage();
-			if(currentPage == null) {
-				return;
-			}
-			MenuIcon clickedIcon = currentPage.getIcon(slot);
-			if(clickedIcon == null || !clickedIcon.isClickable()) {
-				return;
-			}
-			playMenuClickSound(bukkitPlayer);
-			int nextIndex = clickMenu.getCurrentNextSlot();
-			int closeIndex = clickMenu.getCurrentCloseSlot();
-			int backIndex = clickMenu.getCurrentBackSlot();
-			playerViewerCache.add(bukkitPlayer);
-			pagedMenus.remove(inv);
-			// Handle click context
-			if(slot == nextIndex) {
-				// Change paged view to next
-				clickMenu.nextPageIndex();
-				clickMenu.refreshCurrentPage();
-				bukkitPlayer.openInventory(wrapper.getCurrentInventory());
-            	pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
-			} else if(slot == closeIndex) {
-				// Close paged view
-				bukkitPlayer.closeInventory();
-            	playerViewerCache.remove(bukkitPlayer);
-			} else if(slot == backIndex) {
-				// Change paged view to previous
-				clickMenu.previousPageIndex();
-				clickMenu.refreshCurrentPage();
-				bukkitPlayer.openInventory(clickMenu.getCurrentPage().getInventory());
-            	pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
-			} else {
-				// Clicked non-navigation slot, clickable icon
-				// An icon will either open another menu or do nothing
-				wrapper.onIconClick(clickPlayer, clickedIcon);
-				bukkitPlayer.closeInventory();
-            	playerViewerCache.remove(bukkitPlayer);
-			}
-		} else if(stateMenus.containsKey(inv)) {
-			// Handle menu navigation and states
-			// Every clickable icon in a menu view will update the state and refresh the open inventory
-			StateMenu clickMenu = stateMenus.get(inv);
-			DisplayMenu currentView = clickMenu.getCurrentView();
-			if(currentView == null || !currentView.getInventory().equals(inv)) {
-				ChatUtil.printDebug("State menu view is not current!");
-				return;
-			}
-			MenuIcon clickedIcon = currentView.getIcon(slot);
-			if(clickedIcon == null || !clickedIcon.isClickable()) {
-				return;
-			}
-			playMenuClickSound(bukkitPlayer);
-			// Update plot menu state
-			DisplayMenu updateView = clickMenu.updateState(slot, clickType);
-			// Update inventory view
-			stateMenus.remove(inv);
-			playerViewerCache.add(bukkitPlayer);
-			if(updateView != null) {
-				// Refresh displayed inventory view
-				bukkitPlayer.openInventory(updateView.getInventory());
-            	stateMenus.put(updateView.getInventory(), clickMenu);
-			} else {
-				// Close inventory view
-				bukkitPlayer.closeInventory();
-            	playerViewerCache.remove(bukkitPlayer);
-			}
+		} catch(Exception e) {
+			// Close inventory view
+			bukkitPlayer.closeInventory();
+        	playerViewerCache.remove(bukkitPlayer);
+        	// Display exception
+        	ChatUtil.printConsoleError("Failed to handle menu click, report this as a bug to the plugin author!");
+        	e.printStackTrace();
 		}
 	}
 	
