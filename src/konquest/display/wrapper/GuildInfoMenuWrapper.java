@@ -47,7 +47,12 @@ public class GuildInfoMenuWrapper extends MenuWrapper {
  		final int MAX_ICONS_PER_PAGE = 45;
 		int pageTotal = 1;
 
-		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observerGuild, infoGuild);
+		ChatColor kingdomColor = ChatColor.YELLOW;
+		if(observerGuild == null) {
+			kingdomColor = getKonquest().getDisplayKingdomColor(observer.getKingdom(), infoGuild.getKingdom());
+		} else {
+			kingdomColor = getKonquest().getDisplayPrimaryColor(observerGuild, infoGuild);
+		}
  		ChatColor titleColor = DisplayManager.titleColor;
 		ChatColor loreColor = DisplayManager.loreColor;
 		ChatColor valueColor = DisplayManager.valueColor;
