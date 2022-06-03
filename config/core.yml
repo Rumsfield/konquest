@@ -47,6 +47,7 @@ core:
     quickshop: true
     luckperms: true
     dynmap: true
+    discordsrv: true
   travel:
     enable:
       towns: true

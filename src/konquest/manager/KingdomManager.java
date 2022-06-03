@@ -520,7 +520,7 @@ public class KingdomManager implements KonquestKingdomManager {
 				removeAllTerritory(town.getWorld(),townPoints);
 				konquest.getMapHandler().drawDynmapRemoveTerritory(town);
 				konquest.getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
-				konquest.getIntegrationManager().deleteShopsInPoints(townPoints,town.getWorld());
+				konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(townPoints,town.getWorld());
 				return true;
 			}
 		}
@@ -601,7 +601,7 @@ public class KingdomManager implements KonquestKingdomManager {
 			konquest.getMapHandler().drawDynmapUpdateTerritory(conquerKingdom.getTown(name));
 			konquest.getMapHandler().drawDynmapLabel(getKingdom(oldKingdomName).getCapital());
 			konquest.getMapHandler().drawDynmapLabel(conquerKingdom.getCapital());
-			konquest.getIntegrationManager().deleteShopsInPoints(conquerKingdom.getTown(name).getChunkList().keySet(),conquerKingdom.getTown(name).getWorld());
+			konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(conquerKingdom.getTown(name).getChunkList().keySet(),conquerKingdom.getTown(name).getWorld());
 			return true;
 		}
 		return false;

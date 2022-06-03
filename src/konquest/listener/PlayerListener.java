@@ -131,6 +131,11 @@ public class PlayerListener implements Listener{
             			}
             		}
             	}
+            	// DiscordSRV
+            	if(konquest.getIntegrationManager().getDiscordSrv().isEnabled()) {
+            		String message = konquest.getIntegrationManager().getDiscordSrv().getLinkMessage(bukkitPlayer);
+            		ChatUtil.sendNotice(bukkitPlayer, message);
+            	}
             }
         }, 10);
     }
@@ -231,8 +236,8 @@ public class PlayerListener implements Listener{
 	            if(player.getPlayerPrefix().isEnabled()) {
 	            	title = ChatUtil.parseHex(player.getPlayerPrefix().getMainPrefixName());
 	            }
-	            String prefix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer));
-	            String suffix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer));
+	            String prefix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPerms().getPrefix(bukkitPlayer));
+	            String suffix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPerms().getSuffix(bukkitPlayer));
 	            String kingdomName = kingdom.getName();
 	            String name = bukkitPlayer.getName();
 	            

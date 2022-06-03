@@ -231,6 +231,10 @@ public class Konquest implements KonquestAPI, Timeable {
 		ChatUtil.printDebug("Finished Initialization");
 	}
 	
+	public void disable() {
+		integrationManager.disable();
+	}
+	
 	private void initVersionHandlers() {
 		String version;
     	try {

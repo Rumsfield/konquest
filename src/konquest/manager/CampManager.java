@@ -159,7 +159,7 @@ public class CampManager implements KonquestCampManager {
 		if(barbarianCamps.containsKey(uuid)) {
 			ArrayList<Point> campPoints = new ArrayList<Point>();
 			campPoints.addAll(barbarianCamps.get(uuid).getChunkList().keySet());
-			konquest.getIntegrationManager().deleteShopsInPoints(campPoints,barbarianCamps.get(uuid).getWorld());
+			konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(campPoints,barbarianCamps.get(uuid).getWorld());
 			KonCamp removedCamp = barbarianCamps.remove(uuid);
 			removedCamp.removeAllBarPlayers();
 			// Ensure bed is broken
