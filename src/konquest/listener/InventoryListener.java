@@ -27,7 +27,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.minecart.StorageMinecart;
+import org.bukkit.entity.Vehicle;
+//import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -109,8 +110,8 @@ public class InventoryListener implements Listener {
 					// Protect land and plots
 					if(event.getInventory().getHolder() instanceof BlockInventoryHolder ||
 							 event.getInventory().getHolder() instanceof DoubleChest ||
-							 event.getInventory().getHolder() instanceof StorageMinecart) {
-						// Inventory can hold items
+							 event.getInventory().getHolder() instanceof Vehicle) {
+						// Inventory can hold items, or is a vehicle with storage
 						// Protect land and plots
 						if(!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
 							// Stop all edits by non-resident in closed towns
