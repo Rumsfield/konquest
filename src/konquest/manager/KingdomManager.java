@@ -303,14 +303,6 @@ public class KingdomManager implements KonquestKingdomManager {
     	player.setExileKingdom(oldKingdom);
     	// Remove guild
     	konquest.getGuildManager().removePlayerGuild(player.getOfflineBukkitPlayer());
-    	// Remove residency
-    	for(KonTown town : player.getKingdom().getTowns()) {
-    		if(town.removePlayerResident(player.getOfflineBukkitPlayer())) {
-    			//ChatUtil.sendNotice(player.getBukkitPlayer(), "Banished from "+town.getName()+"!");
-    			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_TOWN.getMessage(town.getName()));
-    			konquest.getMapHandler().drawDynmapLabel(town);
-    		}
-    	}
     	//boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
     	if(doRemoveStats && clearStats) {
 	    	// Clear all stats
@@ -325,8 +317,17 @@ public class KingdomManager implements KonquestKingdomManager {
     	// Make into barbarian
     	player.setKingdom(getBarbarians());
     	player.setBarbarian(true);
-    	//konquest.getPlayerManager().saveAllPlayers();
-    	//konquest.getPlayerManager().updateAllSavedPlayers();
+    	// Remove residencies and refresh title bars
+    	for(KonTown town : oldKingdom.getTowns()) {
+    		if(town.removePlayerResident(player.getOfflineBukkitPlayer())) {
+    			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_TOWN.getMessage(town.getName()));
+    			konquest.getMapHandler().drawDynmapLabel(town);
+    		}
+    		if(town.isLocInside(player.getBukkitPlayer().getLocation())) {
+    			town.removeBarPlayer(player);
+    			town.addBarPlayer(player);
+    		}
+    	}
     	konquest.updateNamePackets(player);
     	konquest.getMapHandler().drawDynmapLabel(oldKingdom.getCapital());
     	updateSmallestKingdom();
