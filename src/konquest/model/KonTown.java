@@ -164,7 +164,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public int initClaim() {
 		
 		// Verify monument template and chunk gradient and initialize travelPoint and baseY coordinate
-		int monumentStatus = monument.initialize(getKingdom().getMonumentTemplate(), getCenterLoc());
+		int flatness = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.settle_check_flatness",3);
+		int monumentStatus = monument.initialize(getKingdom().getMonumentTemplate(), getCenterLoc(), flatness);
 		if(monumentStatus != 0) {
 			ChatUtil.printDebug("Town init failed: monument did not initialize correctly");
 			return 10 + monumentStatus;

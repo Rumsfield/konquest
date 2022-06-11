@@ -21,13 +21,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.Chest;
+//import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.minecart.StorageMinecart;
+import org.bukkit.entity.Vehicle;
+//import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -41,6 +42,7 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.SmithingInventory;
 
@@ -108,8 +110,8 @@ public class InventoryListener implements Listener {
 					// Protect land and plots
 					if(event.getInventory().getHolder() instanceof BlockInventoryHolder ||
 							 event.getInventory().getHolder() instanceof DoubleChest ||
-							 event.getInventory().getHolder() instanceof StorageMinecart) {
-						// Inventory can hold items
+							 event.getInventory().getHolder() instanceof Vehicle) {
+						// Inventory can hold items, or is a vehicle with storage
 						// Protect land and plots
 						if(!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
 							// Stop all edits by non-resident in closed towns
@@ -134,7 +136,8 @@ public class InventoryListener implements Listener {
 						}
 					}
 					// Attempt to put loot into empty chests within the monument
-					if(town.isLocInsideCenterChunk(openLoc) && event.getInventory().getHolder() instanceof Chest) {
+					//if(town.isLocInsideCenterChunk(openLoc) && event.getInventory().getHolder() instanceof Chest) {
+					if(town.isLocInsideCenterChunk(openLoc) && event.getInventory().getType().equals(InventoryType.CHEST)) {
 						if(town.isPlayerLord(player.getOfflineBukkitPlayer()) || town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 							//if(isInventoryEmpty(event.getInventory())) {
 								// Update loot with default count as defined in core YML
