@@ -83,41 +83,43 @@ public class DirectiveManager {
 	}
 	
 	public void displayBook(KonPlayer player) {
-		ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-		List<String> pages = new ArrayList<String>();
-		BookMeta meta = (BookMeta)Bukkit.getServer().getItemFactory().getItemMeta(Material.WRITTEN_BOOK);
-		// Format book cover
-		meta.setAuthor("Konquest");
-		meta.setGeneration(BookMeta.Generation.ORIGINAL);
-		meta.setTitle(MessagePath.MENU_QUEST_TITLE.getMessage());
-		String titlePage = "";
-		titlePage = titlePage+ChatColor.DARK_PURPLE+ChatColor.BOLD+MessagePath.MENU_QUEST_TITLE.getMessage();
-		titlePage = titlePage+ChatColor.RESET+"\n\n";
-		titlePage = titlePage+ChatColor.BLACK+MessagePath.MENU_QUEST_INTRO_1.getMessage();
-		titlePage = titlePage+ChatColor.RESET+"\n\n";
-		titlePage = titlePage+ChatColor.BLACK+MessagePath.MENU_QUEST_INTRO_2.getMessage();
-		pages.add(titlePage);
-		// Format pages
-		for(KonDirective dir : KonDirective.values()) {
-			int currentProgress = player.getDirectiveProgress(dir);
-			int stages = dir.stages();
-			ChatColor progressColor = ChatColor.GRAY;
-			if(currentProgress >= stages) {
-				progressColor = ChatColor.DARK_GREEN;
+		if(isEnabled) {
+			ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+			List<String> pages = new ArrayList<String>();
+			BookMeta meta = (BookMeta)Bukkit.getServer().getItemFactory().getItemMeta(Material.WRITTEN_BOOK);
+			// Format book cover
+			meta.setAuthor("Konquest");
+			meta.setGeneration(BookMeta.Generation.ORIGINAL);
+			meta.setTitle(MessagePath.MENU_QUEST_TITLE.getMessage());
+			String titlePage = "";
+			titlePage = titlePage+ChatColor.DARK_PURPLE+ChatColor.BOLD+MessagePath.MENU_QUEST_TITLE.getMessage();
+			titlePage = titlePage+ChatColor.RESET+"\n\n";
+			titlePage = titlePage+ChatColor.BLACK+MessagePath.MENU_QUEST_INTRO_1.getMessage();
+			titlePage = titlePage+ChatColor.RESET+"\n\n";
+			titlePage = titlePage+ChatColor.BLACK+MessagePath.MENU_QUEST_INTRO_2.getMessage();
+			pages.add(titlePage);
+			// Format pages
+			for(KonDirective dir : KonDirective.values()) {
+				int currentProgress = player.getDirectiveProgress(dir);
+				int stages = dir.stages();
+				ChatColor progressColor = ChatColor.GRAY;
+				if(currentProgress >= stages) {
+					progressColor = ChatColor.DARK_GREEN;
+				}
+				String page = "";
+				page = page+ChatColor.DARK_PURPLE+ChatColor.ITALIC+dir.title();
+				page = page+ChatColor.RESET+"\n\n";
+				page = page+ChatColor.BLACK+dir.description();
+				page = page+ChatColor.RESET+"\n\n";
+				page = page+progressColor+""+currentProgress+"/"+stages;
+				page = page+ChatColor.RESET+"\n\n";
+				page = page+ChatColor.BLACK+MessagePath.MENU_QUEST_REWARD.getMessage()+": "+ChatColor.DARK_GREEN+rewardTable.get(dir);
+				pages.add(page);
 			}
-			String page = "";
-			page = page+ChatColor.DARK_PURPLE+ChatColor.ITALIC+dir.title();
-			page = page+ChatColor.RESET+"\n\n";
-			page = page+ChatColor.BLACK+dir.description();
-			page = page+ChatColor.RESET+"\n\n";
-			page = page+progressColor+""+currentProgress+"/"+stages;
-			page = page+ChatColor.RESET+"\n\n";
-			page = page+ChatColor.BLACK+MessagePath.MENU_QUEST_REWARD.getMessage()+": "+ChatColor.DARK_GREEN+rewardTable.get(dir);
-			pages.add(page);
+			meta.setPages(pages);
+			// Display book
+			book.setItemMeta(meta);
+			player.getBukkitPlayer().openBook(book);
 		}
-		meta.setPages(pages);
-		// Display book
-		book.setItemMeta(meta);
-		player.getBukkitPlayer().openBook(book);
 	}
 }
