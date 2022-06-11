@@ -62,6 +62,7 @@ import konquest.nms.Handler_1_16_R3;
 import konquest.nms.Handler_1_17_R1;
 import konquest.nms.Handler_1_18_R1;
 import konquest.nms.Handler_1_18_R2;
+import konquest.nms.Handler_1_19_R1;
 import konquest.nms.VersionHandler;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
@@ -255,6 +256,9 @@ public class Konquest implements KonquestAPI, Timeable {
     			break;
     		case "v1_18_R2":
     			versionHandler = new Handler_1_18_R2();
+    			break;
+    		case "v1_19_R1":
+    			versionHandler = new Handler_1_19_R1();
     			break;
     		default:
     			break;
