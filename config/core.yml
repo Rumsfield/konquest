@@ -94,6 +94,7 @@ core:
     max_distance_all: 99
     max_size: 16
     settle_checks_depth: 32
+    settle_check_flatness: 3
     init_radius: 2
     capture_upgrades: true
     capture_cooldown: 600

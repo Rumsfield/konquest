@@ -39,7 +39,7 @@ public class KonMonument implements KonquestMonument {
 	 * 			2 = bad chunk gradient
 	 * 			3 = bedrock placement
 	 */
-	public int initialize(KonMonumentTemplate template, Location centerLoc) {
+	public int initialize(KonMonumentTemplate template, Location centerLoc, int flatness) {
 		// Verify valid template
 		if(!template.isValid()) {
 			ChatUtil.printDebug("Monument init failed: template is not valid");
@@ -86,11 +86,20 @@ public class KonMonument implements KonquestMonument {
 		}
 		ChatUtil.printDebug("Total Highest block: "+maxMaterial);
 		ChatUtil.printDebug("Total Lowest block: "+minMaterial);
-		if(maxY - minY > 3) {
+		
+		// Disable gradient check if flatness is -1
+		if (flatness != -1) {
+			// Clamp flatness to 0
+			if (flatness < 0) {
+				flatness = 0;
+			}
 			int gradient = maxY - minY;
-			ChatUtil.printDebug("Monument init failed: town center is not flat enough, gradient is "+gradient+" but must be at most 3.");
-			return 2;
+			if(gradient > flatness) {
+				ChatUtil.printDebug("Monument init failed: town center is not flat enough, gradient is "+gradient+" but must be at most "+flatness);
+				return 2;
+			}
 		}
+		
 		if(maxMaterial.equals(Material.BEDROCK.toString())) {
 			ChatUtil.printDebug("Monument init failed: town monument attempted to place on bedrock.");
 			return 3;
