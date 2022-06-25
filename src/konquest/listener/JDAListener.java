@@ -4,6 +4,9 @@ import github.scarsz.discordsrv.dependencies.jda.api.events.guild.GuildUnavailab
 import github.scarsz.discordsrv.dependencies.jda.api.hooks.ListenerAdapter;
 import konquest.utility.ChatUtil;
 
+// see https://ci.dv8tion.net/job/JDA/javadoc/ for JDA's javadoc
+// see https://github.com/DV8FromTheWorld/JDA/wiki for JDA's wiki
+
 public class JDAListener extends ListenerAdapter {
 
     public JDAListener() {

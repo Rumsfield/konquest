@@ -26,11 +26,17 @@ public class IntegrationManager {
 	
 	
 	public void initialize() {
-		// Define hooks
+		// Shutdown any existing hooks
+		for (PluginHook hook : hooks) {
+			hook.shutdown();
+		}
+		
+		// Define new hooks
 		luckpermsHook = new LuckPermsHook(konquest);
 		quickshopHook = new QuickShopHook(konquest);
 		discordsrvHook = new DiscordSrvHook(konquest);
 		
+		hooks.clear();
 		hooks.add(luckpermsHook);
 		hooks.add(quickshopHook);
 		hooks.add(discordsrvHook);

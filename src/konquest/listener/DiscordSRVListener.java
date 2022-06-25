@@ -41,7 +41,7 @@ public class DiscordSRVListener {
     @Subscribe(priority = ListenerPriority.MONITOR)
     public void aMessageWasSentInADiscordGuildByTheBot(DiscordGuildMessageSentEvent event) {
         // Example of logging a message sent in Minecraft (being sent to Discord)
-
+    	
     	ChatUtil.printConsole("A message was sent to Discord: " + event.getMessage());
     }
 
