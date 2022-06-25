@@ -19,6 +19,7 @@ softdepend:
 - Multiverse-Inventories
 - Multiverse-Portals
 - Multiverse-NetherPortals
+- DiscordSRV
 commands:
   konquest:
     description: Base Konquest command

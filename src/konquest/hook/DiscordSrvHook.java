@@ -35,7 +35,8 @@ public class DiscordSrvHook implements PluginHook {
 					isEnabled = true;
 					ChatUtil.printConsoleAlert("Successfully integrated DiscordSRV");
 				} catch (Exception e) {
-					ChatUtil.printConsoleError("Failed to integrate DiscordSRV, plugin not found or disabled");
+					ChatUtil.printConsoleError("Failed to integrate DiscordSRV, see exception message:");
+					e.printStackTrace();
 				}
 			} else {
 				ChatUtil.printConsoleAlert("Disabled DiscordSRV integration from core config settings.");
