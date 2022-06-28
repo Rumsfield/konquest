@@ -31,8 +31,6 @@ public class DiscordSrvHook implements PluginHook {
 		if (discordSrv != null && discordSrv.isEnabled()) {
 			if(konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv",false)) {
 				try {
-					// Attempt to re-subscribe
-					DiscordSRV.api.unsubscribe(discordSrvListener);
 					DiscordSRV.api.subscribe(discordSrvListener);
 					isEnabled = true;
 					ChatUtil.printConsoleAlert("Successfully integrated DiscordSRV");

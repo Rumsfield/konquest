@@ -13,41 +13,32 @@ import konquest.utility.ChatUtil;
 
 public class IntegrationManager {
 
-	private Konquest konquest;
 	private HashSet<PluginHook> hooks;
 	private LuckPermsHook luckpermsHook;
 	private QuickShopHook quickshopHook;
 	private DiscordSrvHook discordsrvHook;
 	
 	public IntegrationManager(Konquest konquest) {
-		this.konquest = konquest;
 		this.hooks = new HashSet<PluginHook>();
-	}
-	
-	
-	public void initialize() {
-		// Shutdown any existing hooks
-		for (PluginHook hook : hooks) {
-			hook.shutdown();
-		}
-		
 		// Define new hooks
 		luckpermsHook = new LuckPermsHook(konquest);
 		quickshopHook = new QuickShopHook(konquest);
 		discordsrvHook = new DiscordSrvHook(konquest);
 		
-		hooks.clear();
 		hooks.add(luckpermsHook);
 		hooks.add(quickshopHook);
 		hooks.add(discordsrvHook);
-		
-		// Reload all hooks
+	}
+	
+	
+	public void initialize() {
+		// Reload any disabled hooks
 		for (PluginHook hook : hooks) {
-			hook.reload();
+			if (!hook.isEnabled()) {
+				hook.reload();
+			}
 		}
-		
 		ChatUtil.printDebug("Integration Manager is ready");
-
 	}
 	
 	public void disable() {

@@ -20,8 +20,11 @@ import konquest.model.KonPlot;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timer;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+
+import java.util.HashSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -214,12 +217,20 @@ public class PlayerListener implements Listener{
     
     /**
      * Fires on chat events
-     * All players always see global chat messages and team chat messages
+     * Cancel and re-throw chat events for global and kingdom modes.
      * @param event
      */
     private void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
         //Check if the event was caused by a player
         if(event.isAsynchronous() && !event.isCancelled()) {
+        	
+        	// DEBUG
+        	String format = event.getFormat();
+        	String message = event.getMessage();
+        	int numRecipients = event.getRecipients().size();
+        	ChatUtil.printDebug("Caught chat event, format \""+format+"\", message \""+message+"\", to "+numRecipients+" players");
+        	// END DEBUG
+        	
         	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.enable_format",true);
         	if(enable) {
 	        	// Format chat messages
@@ -230,20 +241,127 @@ public class PlayerListener implements Listener{
 				}
 	            KonPlayer player = playerManager.getPlayer(bukkitPlayer);
 	            KonKingdom kingdom = player.getKingdom();
-	            event.setCancelled(true);
 	            
+	            // Built-in format string
+	            boolean formatNameConfig = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.name_team_color",true);
+	        	boolean formatKingdomConfig = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.kingdom_team_color",true);
+	            /* %TITLE% */
 	            String title = "";
 	            if(player.getPlayerPrefix().isEnabled()) {
 	            	title = ChatUtil.parseHex(player.getPlayerPrefix().getMainPrefixName());
 	            }
+	            /* %PREFIX% */
 	            String prefix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPerms().getPrefix(bukkitPlayer));
+	            /* %SUFFIX% */
 	            String suffix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPerms().getSuffix(bukkitPlayer));
+	            /* %KINGDOM% */
 	            String kingdomName = kingdom.getName();
+	            /* %NAME% */
 	            String name = bukkitPlayer.getName();
-	            
-	            boolean formatName = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.name_team_color",true);
-	        	boolean formatKingdom = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.kingdom_team_color",true);
-	            
+	        	
+	        	
+	        	String rawFormat = Konquest.getChatMessage();
+	        	String parsedFormat = rawFormat;
+	        	try {
+	        		// Try to use Placeholder API to parse placeholders in the format string, if the JAR is present.
+	        		parsedFormat = PlaceholderAPI.setPlaceholders(bukkitPlayer, rawFormat);
+	        	} catch (Exception ignored) {
+	        		ChatUtil.printDebug("Failed to parse format message using PAPI");
+	        	}
+	        	
+	        	//TODO: Pass format thru PlaceholderAPI.setRelationalPlaceholders(Player one, Player two, String test)
+	        	
+	        	
+	        	// DEBUG
+	        	ChatUtil.printDebug("Using raw format: "+rawFormat);
+	        	ChatUtil.printDebug("Parsed format is: "+parsedFormat);
+	        	// END DEBUG
+	        	
+	        	// Change original event format to string from config, e.g.
+	        	// %COLOR1%%KINGDOM% &7| %COLOR2%%TITLE% &d%NAME% >>
+	        	// Replace %NAME% with %1$s, and append %2$s to the end. Format then becomes
+	        	// %COLOR1%%KINGDOM% &7| %COLOR2%%TITLE% &d%1$s >> %2$s
+	        	
+	        	// Send a sync event for each recipient group, then catch the GameChatMessagePreProcessEvent in the DiscordSRV listener.
+	        	// Use the player to determine global vs kingdom chat, and which channel (default global or kingdom name when kingdom chat).
+	        	/*
+	        	 * - Cancel the original chat event
+	        	 * - When sender is in global chat mode, call new sync event with all online players as recipients, and original message.
+	        	 * - When sender is in kingdom chat mode, call new sync event with all friendly kingdom members as recipients, and original message.
+	        	 * - Format message for each player group and send directly (like original)
+	        	 * 		- Barbarian sender formats w/ barbarian colors, sends to all
+	        	 * 		- Kingdom sender formats w/ friendly & enemy colors, sends to friendlies and enemies
+	        	 */
+	        	
+	        	String chatMessage = event.getMessage();
+	        	event.setCancelled(true);
+	        	HashSet<Player> recipients = new HashSet<Player>();
+	        	if(player.isGlobalChat()) {
+	        		recipients.addAll(playerManager.getBukkitPlayersOnline());
+	        	} else {
+	        		recipients.addAll(playerManager.getBukkitPlayersInKingdom(player.getKingdom()));
+	        	}
+	        	AsyncPlayerChatEvent recallChatEvent = new AsyncPlayerChatEvent(false, bukkitPlayer, chatMessage, recipients);
+	        	Bukkit.getServer().getPluginManager().callEvent(recallChatEvent);
+	        	
+	        	if(recallChatEvent.isCancelled()) {
+	        		return;
+	        	}
+	        	
+	        	// Send messages to players
+	        	for(KonPlayer viewerPlayer : playerManager.getPlayersOnline()) {
+	        		ChatColor teamColor = ChatColor.GOLD;
+	        		ChatColor titleColor = ChatColor.GOLD;
+	        		boolean doFormatName = true;
+	        		boolean doFormatKingdom = true;
+	        		String messageFormat = "";
+	        		
+	        		boolean sendMessage = false;
+	        		if(player.isGlobalChat()) {
+	        			// Sender is in global chat mode
+	        			teamColor = konquest.getDisplayPrimaryColor(viewerPlayer, player);
+	            		titleColor = konquest.getDisplaySecondaryColor(viewerPlayer, player);
+	            		doFormatName = formatNameConfig;
+	            		doFormatKingdom = formatKingdomConfig;
+	            		messageFormat = "";
+	            		sendMessage = true;
+	        		} else {
+	        			// Sender is in kingdom chat mode
+	        			if(viewerPlayer.getKingdom().equals(kingdom)) {
+	        				teamColor = Konquest.friendColor1;
+		            		titleColor = Konquest.friendColor1;
+		            		doFormatName = true;
+		            		doFormatKingdom = true;
+		            		messageFormat = ""+ChatColor.GREEN+ChatColor.ITALIC;
+		            		sendMessage = true;
+	        			} else if(viewerPlayer.isAdminBypassActive()) {
+	        				teamColor = ChatColor.GOLD;
+		            		titleColor = ChatColor.GOLD;
+		            		doFormatName = true;
+		            		doFormatKingdom = true;
+		            		messageFormat = ""+ChatColor.GOLD+ChatColor.ITALIC;
+		            		sendMessage = true;
+	        			}
+	        		}
+	        		
+	        		if(sendMessage) {
+		        		viewerPlayer.getBukkitPlayer().sendMessage(
+	            				ChatUtil.parseFormat(parsedFormat,
+	            						prefix,
+	            						suffix,
+	            						kingdomName,
+	            						title,
+	            						name,
+	            						teamColor,
+	            						titleColor,
+	            						doFormatName,
+	            						doFormatKingdom) +
+	        					Konquest.chatDivider + ChatColor.RESET + " " + messageFormat + event.getMessage());
+	        		}
+	        	}
+	        	
+	        	/*
+	        	// Original chat message replacement
 	            if(player.isGlobalChat()) {
 	            	//Global chat, all players see this format
 	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
@@ -259,8 +377,8 @@ public class PlayerListener implements Listener{
 	            						name,
 	            						teamColor,
 	            						titleColor,
-	            						formatName,
-	            						formatKingdom) +
+	            						formatNameConfig,
+	            						formatKingdomConfig) +
 	        					Konquest.chatDivider + ChatColor.RESET + " " + event.getMessage());
 	            	}
 	            } else {
@@ -296,6 +414,7 @@ public class PlayerListener implements Listener{
 	            		}
 	            	}
 	            }
+	            */
         	}
         }
     }

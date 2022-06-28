@@ -108,6 +108,22 @@ public interface KonquestPlayerManager {
 	public ArrayList<? extends KonquestPlayer> getPlayersInKingdom(KonquestKingdom kingdom);
 	
 	/**
+	 * Gets the Bukkit players currently online that are members of the given kingdom name.
+	 * 
+	 * @param kingdomName The kingdom name, ignoring case
+	 * @return The list of online players in the given kingdom
+	 */
+	public Collection<Player> getBukkitPlayersInKingdom(String kingdomName);
+	
+	/**
+	 * Gets the Bukkit players currently online that are members of the given kingdom object.
+	 * 
+	 * @param kingdom The kingdom instance
+	 * @return The list of online players in the given kingdom
+	 */
+	public Collection<Player> getBukkitPlayersInKingdom(KonquestKingdom kingdom);
+	
+	/**
 	 * Gets the names of players currently online that are members of the given kingdom name.
 	 * This is a convenience method.
 	 * 
@@ -133,10 +149,33 @@ public interface KonquestPlayerManager {
 	public ArrayList<? extends KonquestOfflinePlayer> getAllPlayersInKingdom(KonquestKingdom kingdom);
 	
 	/**
+	 * Gets all of the Bukkit players that are members of the given kingdom name.
+	 * 
+	 * @param kingdomName The kingdom name, ignoring case
+	 * @return The list of players in the given kingdom
+	 */
+	public Collection<OfflinePlayer> getAllBukkitPlayersInKingdom(String kingdomName);
+	
+	/**
+	 * Gets all of the Bukkit players that are members of the given kingdom object.
+	 * 
+	 * @param kingdom The kingdom instance
+	 * @return The list of players in the given kingdom
+	 */
+	public Collection<OfflinePlayer> getAllBukkitPlayersInKingdom(KonquestKingdom kingdom);
+	
+	/**
 	 * Gets all of Konquest's players that are currently online.
 	 * 
 	 * @return The collection of players
 	 */
 	public Collection<? extends KonquestPlayer> getPlayersOnline();
+	
+	/**
+	 * Gets all Bukkit players that are currently online.
+	 * 
+	 * @return The collection of players
+	 */
+	public Collection<Player> getBukkitPlayersOnline();
 	
 }
