@@ -24,6 +24,7 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
@@ -1602,6 +1603,19 @@ public class Konquest implements KonquestAPI, Timeable {
 			}
     	} else {
     		ChatUtil.printDebug("Could not call null Konquest event");
+    	}
+    }
+    
+    public static void callEvent(Event event) {
+    	if(event != null) {
+	    	try {
+	            Bukkit.getServer().getPluginManager().callEvent(event);
+			} catch(IllegalStateException e) {
+				ChatUtil.printConsoleError("Failed to call Bukkit event!");
+				e.printStackTrace();
+			}
+    	} else {
+    		ChatUtil.printDebug("Could not call null Bukkit event");
     	}
     }
 	

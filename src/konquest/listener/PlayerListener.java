@@ -24,8 +24,6 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
-import java.util.HashSet;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -224,13 +222,6 @@ public class PlayerListener implements Listener{
         //Check if the event was caused by a player
         if(event.isAsynchronous() && !event.isCancelled()) {
         	
-        	// DEBUG
-        	String format = event.getFormat();
-        	String message = event.getMessage();
-        	int numRecipients = event.getRecipients().size();
-        	ChatUtil.printDebug("Caught chat event, format \""+format+"\", message \""+message+"\", to "+numRecipients+" players");
-        	// END DEBUG
-        	
         	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.enable_format",true);
         	if(enable) {
 	        	// Format chat messages
@@ -259,54 +250,19 @@ public class PlayerListener implements Listener{
 	            /* %NAME% */
 	            String name = bukkitPlayer.getName();
 	        	
-	        	
 	        	String rawFormat = Konquest.getChatMessage();
-	        	String parsedFormat = rawFormat;
-	        	try {
-	        		// Try to use Placeholder API to parse placeholders in the format string, if the JAR is present.
-	        		parsedFormat = PlaceholderAPI.setPlaceholders(bukkitPlayer, rawFormat);
-	        	} catch (Exception ignored) {
-	        		ChatUtil.printDebug("Failed to parse format message using PAPI");
-	        	}
-	        	
-	        	//TODO: Pass format thru PlaceholderAPI.setRelationalPlaceholders(Player one, Player two, String test)
-	        	
-	        	
-	        	// DEBUG
-	        	ChatUtil.printDebug("Using raw format: "+rawFormat);
-	        	ChatUtil.printDebug("Parsed format is: "+parsedFormat);
-	        	// END DEBUG
-	        	
-	        	// Change original event format to string from config, e.g.
-	        	// %COLOR1%%KINGDOM% &7| %COLOR2%%TITLE% &d%NAME% >>
-	        	// Replace %NAME% with %1$s, and append %2$s to the end. Format then becomes
-	        	// %COLOR1%%KINGDOM% &7| %COLOR2%%TITLE% &d%1$s >> %2$s
-	        	
-	        	// Send a sync event for each recipient group, then catch the GameChatMessagePreProcessEvent in the DiscordSRV listener.
-	        	// Use the player to determine global vs kingdom chat, and which channel (default global or kingdom name when kingdom chat).
-	        	/*
-	        	 * - Cancel the original chat event
-	        	 * - When sender is in global chat mode, call new sync event with all online players as recipients, and original message.
-	        	 * - When sender is in kingdom chat mode, call new sync event with all friendly kingdom members as recipients, and original message.
-	        	 * - Format message for each player group and send directly (like original)
-	        	 * 		- Barbarian sender formats w/ barbarian colors, sends to all
-	        	 * 		- Kingdom sender formats w/ friendly & enemy colors, sends to friendlies and enemies
-	        	 */
-	        	
+	        	String parsedFormat = "";
 	        	String chatMessage = event.getMessage();
-	        	event.setCancelled(true);
-	        	HashSet<Player> recipients = new HashSet<Player>();
-	        	if(player.isGlobalChat()) {
-	        		recipients.addAll(playerManager.getBukkitPlayersOnline());
-	        	} else {
-	        		recipients.addAll(playerManager.getBukkitPlayersInKingdom(player.getKingdom()));
+	        	String chatChannel = "global";
+	        	if(!player.isGlobalChat()) {
+	        		chatChannel = player.getKingdom().getName();
 	        	}
-	        	AsyncPlayerChatEvent recallChatEvent = new AsyncPlayerChatEvent(false, bukkitPlayer, chatMessage, recipients);
-	        	Bukkit.getServer().getPluginManager().callEvent(recallChatEvent);
 	        	
-	        	if(recallChatEvent.isCancelled()) {
-	        		return;
-	        	}
+	        	// Send chat content to Discord first
+	        	konquest.getIntegrationManager().getDiscordSrv().sendGameChatToDiscord(event.getPlayer(), event.getMessage(), chatChannel, event.isCancelled());
+	        	// Then cancel the event. This causes DiscordSRV to not process the event on its own.
+	        	// We need to cancel the event so it doesn't execute on the server, and we can send custom format messages to players.
+	        	event.setCancelled(true);
 	        	
 	        	// Send messages to players
 	        	for(KonPlayer viewerPlayer : playerManager.getPlayersOnline()) {
@@ -345,19 +301,34 @@ public class PlayerListener implements Listener{
 	        		}
 	        		
 	        		if(sendMessage) {
-		        		viewerPlayer.getBukkitPlayer().sendMessage(
-	            				ChatUtil.parseFormat(parsedFormat,
-	            						prefix,
-	            						suffix,
-	            						kingdomName,
-	            						title,
-	            						name,
-	            						teamColor,
-	            						titleColor,
-	            						doFormatName,
-	            						doFormatKingdom) +
-	        					Konquest.chatDivider + ChatColor.RESET + " " + messageFormat + event.getMessage());
+	        			// Parse built-in placeholders
+	        			parsedFormat = ChatUtil.parseFormat(rawFormat,
+        						prefix,
+        						suffix,
+        						kingdomName,
+        						title,
+        						name,
+        						teamColor,
+        						titleColor,
+        						doFormatName,
+        						doFormatKingdom);
+	        			// Attempt to use PAPI for external placeholders
+	        			try {
+	    	        		// Try to parse placeholders in the format string, if the JAR is present.
+	    	        		parsedFormat = PlaceholderAPI.setPlaceholders(bukkitPlayer, parsedFormat);
+	    	        		// Try to parse relational placeholders
+	    	        		parsedFormat = PlaceholderAPI.setRelationalPlaceholders(viewerPlayer.getBukkitPlayer(), bukkitPlayer, parsedFormat);
+	    	        	} catch (Exception ignored) {}
+	        			// Send the chat message
+		        		viewerPlayer.getBukkitPlayer().sendMessage(parsedFormat + Konquest.chatDivider + ChatColor.RESET + " " + messageFormat + chatMessage);
 	        		}
+	        	}
+	        	
+	        	// Send message to console
+	        	if(player.isGlobalChat()) {
+	        		ChatUtil.printConsole(ChatColor.GOLD + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	        	} else {
+	        		ChatUtil.printConsole(ChatColor.GOLD + "["+kingdom.getName()+"] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
 	        	}
 	        	
 	        	/*

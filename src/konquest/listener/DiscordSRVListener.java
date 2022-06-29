@@ -1,22 +1,23 @@
 package konquest.listener;
 
-import konquest.Konquest;
+//import konquest.Konquest;
+//import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
-import github.scarsz.discordsrv.DiscordSRV;
+//import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.api.ListenerPriority;
 import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.*;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
+//import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+//import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 import github.scarsz.discordsrv.util.DiscordUtil;
-import org.bukkit.Bukkit;
+//import org.bukkit.Bukkit;
 
 public class DiscordSRVListener {
 
-	private Konquest konquest;
+	//private Konquest konquest;
 
-    public DiscordSRVListener(Konquest konquest) {
-        this.konquest = konquest;
+    public DiscordSRVListener() {
+        //this.konquest = konquest;
     }
     
     @Subscribe
@@ -35,23 +36,24 @@ public class DiscordSRVListener {
     public void discordMessageReceived(DiscordGuildMessageReceivedEvent event) {
         // Example of logging a message sent in Discord
 
-    	ChatUtil.printConsole("Received a chat message on Discord: " + event.getMessage());
+    	ChatUtil.printDebug("Received a chat message on Discord: " + event.getMessage());
     }
 
     @Subscribe(priority = ListenerPriority.MONITOR)
     public void aMessageWasSentInADiscordGuildByTheBot(DiscordGuildMessageSentEvent event) {
         // Example of logging a message sent in Minecraft (being sent to Discord)
     	
-    	ChatUtil.printConsole("A message was sent to Discord: " + event.getMessage());
+    	ChatUtil.printDebug("A message was sent to Discord: " + event.getMessage());
     }
 
     @Subscribe
     public void accountsLinked(AccountLinkedEvent event) {
         // Example of broadcasting a message when a new account link has been made
 
-        Bukkit.broadcastMessage(event.getPlayer().getName() + " just linked their MC account to their Discord user " + event.getUser() + "!");
+    	ChatUtil.printDebug(event.getPlayer().getName() + " just linked their MC account to their Discord user " + event.getUser() + "!");
     }
 
+    /*
     @Subscribe
     public void accountUnlinked(AccountUnlinkedEvent event) {
         // Example of DM:ing user on unlink
@@ -75,11 +77,30 @@ public class DiscordSRVListener {
         	ChatUtil.printConsoleAlert("Channel called \"unlinks\" could not be found in the DiscordSRV configuration");
         }
     }
-
+	*/
+    
+    /*
     @Subscribe
     public void discordMessageProcessed(DiscordGuildMessagePostProcessEvent event) {
         // Example of modifying a Discord -> Minecraft message
-        //event.setProcessedMessage(event.getProcessedMessage().replace("cat", "dog")); // dogs are superior to cats, obviously
+        event.setProcessedMessage(event.getProcessedMessage().replace("cat", "dog")); // dogs are superior to cats, obviously
     }
+    */
     
+    /*
+    @SuppressWarnings("deprecation")
+	@Subscribe
+    public void onGameMessagePreProcess(GameChatMessagePreProcessEvent event) {
+    	// Konquest has cleared the content of the message in Bukkit's AsyncPlayerChatEvent event.
+    	// Add the message back for DiscordSRV.
+    	KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
+    	if(player != null) {
+    		ChatUtil.printDebug("Modifying game message pre-process event");
+    		event.setMessage(player.getLastChatMessage());
+    		if(!player.isGlobalChat()) {
+    			event.setChannel(player.getKingdom().getName());
+    		}
+    	}
+    }
+    */
 }

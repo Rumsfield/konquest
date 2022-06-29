@@ -72,6 +72,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	private HashMap<Location,Color> monumentTemplateBoundary;
 	private HashSet<Location> monumentShowBoundary;
 	private Block lastTargetBlock;
+	private String lastChatMessage;
 	
 	public KonPlayer(Player bukkitPlayer, KonKingdom kingdom, boolean isBarbarian) {
 		super(bukkitPlayer, kingdom, isBarbarian);
@@ -111,6 +112,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		this.borderPlotMap = new HashMap<Location, Color>();
 		this.monumentTemplateBoundary = new HashMap<Location,Color>();
 		this.monumentShowBoundary = new HashSet<Location>();
+		this.lastChatMessage = "";
 	}
 	
 	public void addMobAttacker(Mob mob) {
@@ -257,6 +259,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		return combatTagTimer;
 	}
 	
+	public String getLastChatMessage() {
+		return lastChatMessage;
+	}
+	
 	// Setters
 	
 	/*
@@ -373,6 +379,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		} else {
 			flyDisableWarmupTimer.stopTimer();
 		}
+	}
+	
+	public void setLastChatMessage(String msg) {
+		lastChatMessage = msg;
 	}
 	
 	public void removeAllBorders() {

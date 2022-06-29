@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 import github.scarsz.discordsrv.util.DiscordUtil;
 import konquest.Konquest;
@@ -21,7 +22,7 @@ public class DiscordSrvHook implements PluginHook {
 	public DiscordSrvHook(Konquest konquest) {
 		this.konquest = konquest;
 		this.isEnabled = false;
-		this.discordSrvListener = new DiscordSRVListener(konquest);
+		this.discordSrvListener = new DiscordSRVListener();
 	}
 	
 	@Override
@@ -74,6 +75,30 @@ public class DiscordSrvHook implements PluginHook {
 		        	result = ChatColor.GREEN + "You're linked to " + user.getAsTag();
 		        }
 	        }
+		}
+		return result;
+	}
+	
+	public boolean sendGameToDiscordMessage(String message, String channel) {
+		boolean result = false;
+		if (isEnabled) {
+	        TextChannel textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName("channel");
+	
+	        // null if the channel isn't specified in the config.yml
+	        if (textChannel != null) {
+	            textChannel.sendMessage(message).queue();
+	            result = true;
+	        } else {
+	        	ChatUtil.printDebug("Channel called \""+channel+"\" could not be found in the DiscordSRV configuration");
+	        }
+		}
+        return result;
+	}
+	
+	public boolean sendGameChatToDiscord(Player player, String message, String channel, boolean isCancelled) {
+		boolean result = false;
+		if (isEnabled) {
+			DiscordSRV.getPlugin().processChatMessage(player, message, channel, isCancelled);
 		}
 		return result;
 	}
