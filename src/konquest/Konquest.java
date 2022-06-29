@@ -439,7 +439,6 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public KonPlayer initPlayer(Player bukkitPlayer) {
 		KonPlayer player = null;
-		bukkitPlayer.setScoreboard(getScoreboard());
     	// Fetch player from the database
     	// Also instantiates player object in PlayerManager
 		databaseThread.getDatabase().fetchPlayerData(bukkitPlayer);
@@ -448,8 +447,16 @@ public class Konquest implements KonquestAPI, Timeable {
 			return null;
 		}
     	player = playerManager.getPlayer(bukkitPlayer);
+    	if(player == null) {
+			ChatUtil.printDebug("Failed to init a null player!");
+			return null;
+		}
     	// Update all player's nametag color packets
-    	updateNamePackets(player);
+    	boolean isPlayerNametagFormatEnabled = configManager.getConfig("core").getBoolean("core.player_nametag_format",false);
+    	if(isPlayerNametagFormatEnabled) {
+    		bukkitPlayer.setScoreboard(getScoreboard());
+    		updateNamePackets(player);
+    	}
     	// Update offline protections
     	kingdomManager.updateKingdomOfflineProtection();
     	//if(player.isBarbarian()) {
@@ -1168,10 +1175,6 @@ public class Konquest implements KonquestAPI, Timeable {
      */
     public void updateNamePackets(KonPlayer player) {
     	if(!isPacketSendEnabled) {
-    		return;
-    	}
-    	boolean isPlayerNametagFormatEnabled = configManager.getConfig("core").getBoolean("core.player_nametag_format",false);
-    	if(!isPlayerNametagFormatEnabled) {
     		return;
     	}
     	// Loop over all online players, populate team lists and send each online player a team packet for arg player
