@@ -532,6 +532,20 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
 	}
 	
+	public boolean isLocInsideMonumentProtectionArea(Location loc) {
+		Point centerPoint = Konquest.toPoint(getCenterLoc());
+		Point testPoint = Konquest.toPoint(loc);
+		int baseDepth = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.settle_checks_depth",0);
+		if(baseDepth < 0) {
+			baseDepth = 0;
+		}
+		int bottomLevel = monument.getBaseY() - baseDepth;
+		if(bottomLevel < getWorld().getMinHeight()) {
+			baseDepth = getWorld().getMinHeight();
+		}
+		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y && loc.getBlockY() >= bottomLevel;
+	}
+	
 	/**
 	 * Method used for loading a monument on server start
 	 * @param base

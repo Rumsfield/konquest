@@ -146,7 +146,7 @@ public class EntityListener implements Listener {
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 					KonTown town = (KonTown)territory;
 					// Protect Town Monuments
-					if(town.isLocInsideCenterChunk(block.getLocation())) {
+					if(town.isLocInsideMonumentProtectionArea(block.getLocation())) {
 						ChatUtil.printDebug("protecting Town Monument");
 						event.setCancelled(true);
 						return;

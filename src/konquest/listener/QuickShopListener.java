@@ -65,7 +65,7 @@ public class QuickShopListener implements Listener{
 							event.setCancelled(true);
 							return;
 						}
-						if(((KonTown) territory).isLocInsideCenterChunk(event.getLocation())) {
+						if(((KonTown) territory).isLocInsideMonumentProtectionArea(event.getLocation())) {
 							//ChatUtil.printDebug("...chunk is monument");
 							//ChatUtil.sendError(event.getPlayer(), "Cannot create a shop inside monument!");
 							ChatUtil.sendError(event.getPlayer(), MessagePath.QUICKSHOP_ERROR_MONUMENT.getMessage());

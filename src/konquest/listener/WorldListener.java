@@ -111,7 +111,7 @@ public class WorldListener  implements Listener {
 		boolean result = false;
 		if(konquest.getKingdomManager().isChunkClaimed(loc)) {
 			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(loc);
-			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideCenterChunk(loc)) {
+			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideMonumentProtectionArea(loc)) {
 				result = true;
 			}
 		}

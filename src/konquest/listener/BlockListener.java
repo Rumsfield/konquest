@@ -146,7 +146,7 @@ public class BlockListener implements Listener {
 					if(player.getKingdom().equals(town.getKingdom())) {
 						// If player is allied...
 						// Stop all block breaks in center chunk
-						if(town.isLocInsideCenterChunk(breakLoc)) {
+						if(town.isLocInsideMonumentProtectionArea(breakLoc)) {
 							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 							event.setCancelled(true);
 							return;
@@ -296,7 +296,7 @@ public class BlockListener implements Listener {
 						}
 						
 						// If block is inside a monument, handle it
-						if(town.isLocInsideCenterChunk(breakLoc)) {
+						if(town.isLocInsideMonumentProtectionArea(breakLoc)) {
 							if(isMonument) {
 								// Prevent monument attack when template is blanking or invalid
 								if(!town.getKingdom().getMonumentTemplate().isValid() || town.getKingdom().isMonumentBlanking()) {
@@ -589,7 +589,7 @@ public class BlockListener implements Listener {
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 					KonTown town = (KonTown) territory;
 					// Prevent all block placements in center chunk
-					if(town.isLocInsideCenterChunk(event.getBlock().getLocation())) {
+					if(town.isLocInsideMonumentProtectionArea(event.getBlock().getLocation())) {
 						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
 						return;
@@ -886,7 +886,7 @@ public class BlockListener implements Listener {
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 					KonTown town = (KonTown)territory;
 					// Protect Town Monuments
-					if(town.isLocInsideCenterChunk(block.getLocation())) {
+					if(town.isLocInsideMonumentProtectionArea(block.getLocation())) {
 						ChatUtil.printDebug("protecting Town Monument");
 						event.setCancelled(true);
 						return;
@@ -987,7 +987,7 @@ public class BlockListener implements Listener {
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
 					// Check if this block is within a monument
-					if(town.isLocInsideCenterChunk(pushBlock.getLocation())) {
+					if(town.isLocInsideMonumentProtectionArea(pushBlock.getLocation())) {
 						//ChatUtil.printDebug("EVENT: Monument block pushed by piston, cancelling");
 						event.setCancelled(true);
 						return;
@@ -1033,7 +1033,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				if(territory instanceof KonTown) {
-					if(((KonTown) territory).isLocInsideCenterChunk(pushTo)) {
+					if(((KonTown) territory).isLocInsideMonumentProtectionArea(pushTo)) {
 						//ChatUtil.printDebug("EVENT: block attempted to move into a monument by piston, cancelling");
 						event.setCancelled(true);
 						return;
@@ -1084,7 +1084,7 @@ public class BlockListener implements Listener {
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
 					// Check if this block is within a monument
-					if(town.isLocInsideCenterChunk(pullBlock.getLocation())) {
+					if(town.isLocInsideMonumentProtectionArea(pullBlock.getLocation())) {
 						//ChatUtil.printDebug("EVENT: Monument block pulled by piston, cancelling");
 						event.setCancelled(true);
 						return;
@@ -1183,7 +1183,7 @@ public class BlockListener implements Listener {
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
 				// Prevent all spread inside Monument
-				if(town.isLocInsideCenterChunk(event.getBlock().getLocation())) {
+				if(town.isLocInsideMonumentProtectionArea(event.getBlock().getLocation())) {
 					event.setCancelled(true);
 					return;
 				}
@@ -1244,7 +1244,7 @@ public class BlockListener implements Listener {
 		boolean result = false;
 		if(kingdomManager.isChunkClaimed(block.getLocation())) {
 			KonTerritory territory = kingdomManager.getChunkTerritory(block.getLocation());
-			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideCenterChunk(block.getLocation())) {
+			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideMonumentProtectionArea(block.getLocation())) {
 				result = true;
 			}
 		}

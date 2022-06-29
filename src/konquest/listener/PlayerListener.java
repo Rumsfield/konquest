@@ -805,7 +805,7 @@ public class PlayerListener implements Listener{
     	if(kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
 			KonTerritory territory = kingdomManager.getChunkTerritory(event.getBlock().getLocation());
 			// Prevent all players from placing or picking up liquids inside of monuments
-			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideCenterChunk(event.getBlock().getLocation())) {
+			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideMonumentProtectionArea(event.getBlock().getLocation())) {
 				// The block is located inside a monument, cancel
 				//ChatUtil.printDebug("EVENT: Bucket used inside monument with block "+event.getBlock().getType().toString()+", cancelling");
 				event.setCancelled(true);
