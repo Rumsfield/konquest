@@ -19,6 +19,7 @@ core:
   directive_quests: true
   reset_legacy_health: true
   placeholder_request_limit: 60
+  player_nametag_format: true
   chat:
     tag: '&7[&6Konquest&7]&f '
     message: '%PREFIX% %KINGDOM% &7| %TITLE% %NAME% %SUFFIX% '

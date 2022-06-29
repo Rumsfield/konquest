@@ -1169,6 +1169,10 @@ public class Konquest implements KonquestAPI, Timeable {
     	if(!isPacketSendEnabled) {
     		return;
     	}
+    	boolean isPlayerNametagFormatEnabled = configManager.getConfig("core").getBoolean("core.player_nametag_format",false);
+    	if(!isPlayerNametagFormatEnabled) {
+    		return;
+    	}
     	// Loop over all online players, populate team lists and send each online player a team packet for arg player
     	// Send arg player packets for each team with lists of online players
 		List<String> friendlyNames = new ArrayList<String>();
