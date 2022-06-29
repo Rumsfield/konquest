@@ -202,12 +202,16 @@ public class SettleCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_HEIGHT.getMessage());
         			break;
         		case 13:
-        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Too much air or water below. Try settling somewhere else, or remove all air/water below you.");
-        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_AIR.getMessage());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_INIT.getMessage());
         			break;
         		case 14:
-        			//ChatUtil.sendError((Player) getSender(), "Could not settle: Problem claiming intial chunks.");
-        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_INIT.getMessage());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_AIR.getMessage());
+        			break;
+        		case 15:
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_WATER.getMessage());
+        			break;
+        		case 16:
+        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_CONTAINER.getMessage());
         			break;
         		default:
         			//ChatUtil.sendError((Player) getSender(), "Could not settle: Unknown cause. Contact an Admin!");
@@ -216,6 +220,13 @@ public class SettleCommand extends CommandBase {
         		}
         		//ChatUtil.sendMessage((Player) getSender(), "Use \"/k map\" for helpful info.", ChatColor.RED);
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SETTLE_NOTICE_MAP_HINT.getMessage());
+        		/*
+        		*   	   12 - error, town init fail, bad town height
+        		 *		   13 - error, town init fail, bad chunks
+        		 * 		   14 - error, town init fail, too much air below town
+        		 * 		   15 - error, town init fail, too much water below town
+        		 * 		   16 - error, town init fail, containers below monument
+        		 * */
         	}
         	
 			if(cost > 0 && settleStatus == 0) {

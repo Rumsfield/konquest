@@ -385,9 +385,11 @@ public class KingdomManager implements KonquestKingdomManager {
 	 * 		   21 - error, town init fail, invalid monument
 	 * 		   22 - error, town init fail, bad monument gradient
 	 * 		   23 - error, town init fail, monument placed on bedrock
-	 *  	   12 - error, town init fail, bad town height
-	 *  	   13 - error, town init fail, too much air
-	 *  	   14 - error, town init fail, bad chunks
+	 *   	   12 - error, town init fail, bad town height
+	 *		   13 - error, town init fail, bad chunks
+	 * 		   14 - error, town init fail, too much air below town
+	 * 		   15 - error, town init fail, too much water below town
+	 * 		   16 - error, town init fail, containers below monument
 	 */
 	public int addTown(Location loc, String name, String kingdomName) {
 		ChatUtil.printDebug("Attempting to add new town "+name+" for kingdom "+kingdomName);

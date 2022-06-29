@@ -554,7 +554,9 @@ command:
       fail-max: "Town is too far away from other territories. Currently %s chunks away, must be at most %s."
       fail-flat: "Your chunk area is not flat enough. Press F3+G to view chunk boundaries. Cut down trees and flatten the ground!"
       fail-height: "Bad elevation, try settling somewhere higher or lower."
-      fail-air: "Too much air or water below. Try settling somewhere else, or remove all air/water below you."
+      fail-air: "Too much air below the ground. Try settling somewhere else, or fill all air below you."
+      fail-water: "Too much water below the ground. Try settling somewhere else, or remove all water below you."
+      fail-container: "Too many containers below the ground. Try settling somewhere else, or remove all containers below you."
       fail-init: "Town could not claim initial chunks."
   spy:
     notice:
