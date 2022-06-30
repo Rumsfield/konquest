@@ -6,11 +6,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 import github.scarsz.discordsrv.util.DiscordUtil;
 import konquest.Konquest;
 import konquest.listener.DiscordSRVListener;
+import konquest.model.KonKingdom;
+import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 
 public class DiscordSrvHook implements PluginHook {
@@ -22,7 +25,7 @@ public class DiscordSrvHook implements PluginHook {
 	public DiscordSrvHook(Konquest konquest) {
 		this.konquest = konquest;
 		this.isEnabled = false;
-		this.discordSrvListener = new DiscordSRVListener();
+		this.discordSrvListener = new DiscordSRVListener(konquest);
 	}
 	
 	@Override
@@ -66,13 +69,13 @@ public class DiscordSrvHook implements PluginHook {
 		if (isEnabled) {
 			String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(player.getUniqueId());
 	        if (discordId == null) {
-	        	result = ChatColor.RED + "You are not linked";
+	        	result = ChatColor.RED + "You are not linked to Discord. Type /discord link";
 	        } else {
 	        	User user = DiscordUtil.getJda().getUserById(discordId);
 		        if (user == null) {
-		        	result = ChatColor.YELLOW + "Couldn't find the user you're linked to";
+		        	result = ChatColor.YELLOW + "Couldn't find the Discord user you're linked to.";
 		        } else {
-		        	result = ChatColor.GREEN + "You're linked to " + user.getAsTag();
+		        	result = ChatColor.GREEN + "You're linked to " + user.getAsTag() + " in Discord.";
 		        }
 	        }
 		}
@@ -95,12 +98,38 @@ public class DiscordSrvHook implements PluginHook {
         return result;
 	}
 	
-	public boolean sendGameChatToDiscord(Player player, String message, String channel, boolean isCancelled) {
-		boolean result = false;
+	public void sendGameChatToDiscord(Player player, String message, String channel, boolean isCancelled) {
 		if (isEnabled) {
 			DiscordSRV.getPlugin().processChatMessage(player, message, channel, isCancelled);
 		}
-		return result;
+	}
+	
+	// Send message from discord to kingdom chat
+	public void sendDiscordToGameChatKingdomChannel(User guildUser, Message guildMessage, String kingdomChannel) {
+		if (isEnabled) {
+			if(!kingdomChannel.equalsIgnoreCase("global") && konquest.getKingdomManager().isKingdom(kingdomChannel)) {
+				KonKingdom kingdom = konquest.getKingdomManager().getKingdom(kingdomChannel);
+				for(KonPlayer viewerPlayer : konquest.getPlayerManager().getPlayersOnline()) {
+					String messageFormat = "";
+					String chatFormat =  ChatColor.WHITE+"["+ChatColor.AQUA+"Discord"+ChatColor.WHITE+"] ";
+					String chatMessage = guildMessage.getContentDisplay();
+					boolean sendMessage = false;
+					if(viewerPlayer.getKingdom().equals(kingdom)) {
+						chatFormat = chatFormat + Konquest.friendColor1+kingdom.getName()+" "+guildUser.getName();
+						messageFormat = ""+ChatColor.GREEN+ChatColor.ITALIC;
+						sendMessage = true;
+					} else if(viewerPlayer.isAdminBypassActive()) {
+						chatFormat = chatFormat + ChatColor.GOLD+kingdom.getName()+" "+guildUser.getName();
+						messageFormat = ""+ChatColor.GOLD+ChatColor.ITALIC;
+						sendMessage = true;
+					}
+					
+					if(sendMessage) {
+						viewerPlayer.getBukkitPlayer().sendMessage(chatFormat + Konquest.chatDivider + ChatColor.RESET + " " + messageFormat + chatMessage);
+					}
+				}
+			}
+		}
 	}
 
 }

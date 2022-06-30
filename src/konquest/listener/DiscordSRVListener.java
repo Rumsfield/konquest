@@ -1,8 +1,9 @@
 package konquest.listener;
 
-//import konquest.Konquest;
+import konquest.Konquest;
 //import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
+import github.scarsz.discordsrv.DiscordSRV;
 //import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.api.ListenerPriority;
 import github.scarsz.discordsrv.api.Subscribe;
@@ -14,10 +15,10 @@ import github.scarsz.discordsrv.util.DiscordUtil;
 
 public class DiscordSRVListener {
 
-	//private Konquest konquest;
+	private Konquest konquest;
 
-    public DiscordSRVListener() {
-        //this.konquest = konquest;
+    public DiscordSRVListener(Konquest konquest) {
+        this.konquest = konquest;
     }
     
     @Subscribe
@@ -33,12 +34,26 @@ public class DiscordSRVListener {
     }
 
     @Subscribe(priority = ListenerPriority.MONITOR)
+    public void onDiscordMessagePostProcess(DiscordGuildMessagePostProcessEvent event) {
+    	String name = event.getAuthor().getName();
+    	String channel = event.getChannel().getName();
+    	String linkChannel = DiscordSRV.getPlugin().getDestinationGameChannelNameForTextChannel(event.getChannel());
+    	String message = event.getMessage().getContentDisplay();
+    	ChatUtil.printDebug("Received Discord message: Channel "+channel+"; Link "+linkChannel+"; Author "+name+"; Message "+message);
+    	
+    	// Send to kingdom chat if valid
+    	konquest.getIntegrationManager().getDiscordSrv().sendDiscordToGameChatKingdomChannel(event.getAuthor(), event.getMessage(), linkChannel);
+    }
+    
+    /*
+    @Subscribe(priority = ListenerPriority.MONITOR)
     public void discordMessageReceived(DiscordGuildMessageReceivedEvent event) {
         // Example of logging a message sent in Discord
 
     	ChatUtil.printDebug("Received a chat message on Discord: " + event.getMessage());
     }
-
+	*/
+    
     @Subscribe(priority = ListenerPriority.MONITOR)
     public void aMessageWasSentInADiscordGuildByTheBot(DiscordGuildMessageSentEvent event) {
         // Example of logging a message sent in Minecraft (being sent to Discord)
