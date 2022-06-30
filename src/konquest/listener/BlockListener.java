@@ -1406,17 +1406,22 @@ public class BlockListener implements Listener {
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CRITICAL.getMessage(remainingHits));
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRITICALS,1);
 			
+			String kingdomName = town.getKingdom().getName();
+					
 			// Alert all players of enemy Kingdom when the first critical block is broken
 			if(town.getMonument().getCriticalHits() == 1) {
-				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
 					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_1.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
+					// Discord integration
+					konquest.getIntegrationManager().getDiscordSrv().alertDiscordChannel(kingdomName, MessagePath.PROTECTION_NOTICE_RAID_DISCORD_CHANNEL.getMessage(town.getName()));
+					konquest.getIntegrationManager().getDiscordSrv().alertDiscordMember(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_DISCORD_DIRECT.getMessage(town.getName(),kingdomName));
 				}
 			}
 			
 			// Alert all players of enemy Kingdom when half of critical blocks are broken
 			if(town.getMonument().getCriticalHits() == maxCriticalhits/2) {
-				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
 					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_2.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
 				}
@@ -1424,7 +1429,7 @@ public class BlockListener implements Listener {
 			
 			// Alert all players of enemy Kingdom when all but 1 critical blocks are broken
 			if(town.getMonument().getCriticalHits() == maxCriticalhits-1) {
-				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
 					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_3.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
 				}

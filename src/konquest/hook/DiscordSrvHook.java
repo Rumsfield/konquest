@@ -33,7 +33,7 @@ public class DiscordSrvHook implements PluginHook {
 		// Attempt to integrate DiscordSRV
 		Plugin discordSrv = Bukkit.getPluginManager().getPlugin("DiscordSRV");
 		if (discordSrv != null && discordSrv.isEnabled()) {
-			if(konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv",false)) {
+			if(konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv.enable",false)) {
 				try {
 					DiscordSRV.api.subscribe(discordSrvListener);
 					isEnabled = true;
@@ -129,6 +129,38 @@ public class DiscordSrvHook implements PluginHook {
 					}
 				}
 			}
+		}
+	}
+	
+	// Sends the linked player a direct message
+	public void alertDiscordMember(Player player, String message) {
+		boolean doAlert = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv.raid_alert_direct",false);
+		if(isEnabled && doAlert) {
+			String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(player.getUniqueId());
+			if (discordId != null) {
+				User user = DiscordUtil.getJda().getUserById(discordId);
+				// will be null if the bot isn't in a Discord server with the user (eg. they left the main Discord server)
+		        if (user != null) {
+		            // opens/retrieves the private channel for the user & sends a message to it (if retrieving the private channel was successful)
+		            user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(message).queue());
+		        }
+			}
+		}
+	}
+	
+	// Sends the channel a message to @channel
+	public void alertDiscordChannel(String channel, String message) {
+		boolean doAlert = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv.raid_alert_channel",false);
+		if(isEnabled && doAlert) {
+			TextChannel textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName("channel");
+			
+	        // null if the channel isn't specified in the config.yml
+	        if (textChannel != null) {
+	        	String mention = textChannel.getAsMention();
+	            textChannel.sendMessage(mention + " " + message).queue();
+	        } else {
+	        	ChatUtil.printDebug("Channel called \""+channel+"\" could not be found in the DiscordSRV configuration");
+	        }
 		}
 	}
 

@@ -284,6 +284,8 @@ public enum MessagePath {
 	PROTECTION_NOTICE_RAID_CAPTURE_1            (3, "protection.notice.raid-capture-1"),
 	PROTECTION_NOTICE_RAID_CAPTURE_2            (3, "protection.notice.raid-capture-2"),
 	PROTECTION_NOTICE_RAID_CAPTURE_3            (3, "protection.notice.raid-capture-3"),
+	PROTECTION_NOTICE_RAID_DISCORD_CHANNEL      (1, "protection.notice.raid-discord-channel"),
+	PROTECTION_NOTICE_RAID_DISCORD_DIRECT       (2, "protection.notice.raid-discord-direct"),
 	PROTECTION_NOTICE_RAZE                      (1, "protection.notice.raze"),
 	PROTECTION_NOTICE_DESTROY                   (1, "protection.notice.destroy"),
 	PROTECTION_NOTICE_CONQUER                   (1, "protection.notice.conquer"),
