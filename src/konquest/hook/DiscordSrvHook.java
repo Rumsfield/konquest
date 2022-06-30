@@ -2,6 +2,7 @@ package konquest.hook;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -133,7 +134,7 @@ public class DiscordSrvHook implements PluginHook {
 	}
 	
 	// Sends the linked player a direct message
-	public void alertDiscordMember(Player player, String message) {
+	public void alertDiscordMember(OfflinePlayer player, String message) {
 		boolean doAlert = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv.raid_alert_direct",false);
 		if(isEnabled && doAlert) {
 			String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(player.getUniqueId());

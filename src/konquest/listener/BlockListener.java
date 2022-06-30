@@ -37,6 +37,7 @@ import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
@@ -1413,9 +1414,11 @@ public class BlockListener implements Listener {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
 					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_1.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
-					// Discord integration
-					konquest.getIntegrationManager().getDiscordSrv().alertDiscordChannel(kingdomName, MessagePath.PROTECTION_NOTICE_RAID_DISCORD_CHANNEL.getMessage(town.getName()));
-					konquest.getIntegrationManager().getDiscordSrv().alertDiscordMember(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_DISCORD_DIRECT.getMessage(town.getName(),kingdomName));
+				}
+				// Discord integration
+				konquest.getIntegrationManager().getDiscordSrv().alertDiscordChannel(kingdomName, MessagePath.PROTECTION_NOTICE_RAID_DISCORD_CHANNEL.getMessage(town.getName()));
+				for(OfflinePlayer allPlayer : playerManager.getAllBukkitPlayersInKingdom(kingdomName)) {
+					konquest.getIntegrationManager().getDiscordSrv().alertDiscordMember(allPlayer, MessagePath.PROTECTION_NOTICE_RAID_DISCORD_DIRECT.getMessage(town.getName(),kingdomName));
 				}
 			}
 			
