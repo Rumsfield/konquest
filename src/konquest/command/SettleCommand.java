@@ -130,6 +130,11 @@ public class SettleCommand extends CommandBase {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SETTLE_NOTICE_SUCCESS.getMessage(townName));
         		//ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+bukkitPlayer.getName()+" has settled the Town of "+ChatColor.AQUA+townName+ChatColor.LIGHT_PURPLE+" for Kingdom "+ChatColor.AQUA+player.getKingdom().getName());
         		ChatUtil.sendBroadcast(MessagePath.COMMAND_SETTLE_BROADCAST_SETTLE.getMessage(bukkitPlayer.getName(),townName,player.getKingdom().getName()));
+        		// Optionally apply starter shield
+        		int starterShieldDuration = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.shield_new_towns",0);
+        		if(starterShieldDuration > 0) {
+        			getKonquest().getShieldManager().shieldSet(town,starterShieldDuration);
+        		}
         		// Play a success sound
         		town.getWorld().playSound(town.getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)1, (float)1.2);
         		// Set player as Lord

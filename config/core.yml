@@ -111,6 +111,7 @@ core:
     armor_add: true
     max_shields: 432000
     max_armor: 9999
+    shield_new_towns: 0
     barbarians_destroy: true
     enemy_glow: true
     town_mobs: false
