@@ -215,7 +215,8 @@ public class PlayerListener implements Listener{
     
     /**
      * Fires on chat events
-     * Cancel and re-throw chat events for global and kingdom modes.
+     * Cancel the chat event and pass info to integrated plugins.
+     * Send formatted messages to recipients.
      * @param event
      */
     private void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
@@ -331,61 +332,6 @@ public class PlayerListener implements Listener{
 	        		ChatUtil.printConsole(ChatColor.GOLD + "["+kingdom.getName()+"] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
 	        	}
 	        	
-	        	/*
-	        	// Original chat message replacement
-	            if(player.isGlobalChat()) {
-	            	//Global chat, all players see this format
-	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
-	            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
-	            		ChatColor teamColor = konquest.getDisplayPrimaryColor(globalPlayer, player);
-	            		ChatColor titleColor = konquest.getDisplaySecondaryColor(globalPlayer, player);
-	            		globalPlayer.getBukkitPlayer().sendMessage(
-	            				ChatUtil.parseFormat(Konquest.getChatMessage(),
-	            						prefix,
-	            						suffix,
-	            						kingdomName,
-	            						title,
-	            						name,
-	            						teamColor,
-	            						titleColor,
-	            						formatNameConfig,
-	            						formatKingdomConfig) +
-	        					Konquest.chatDivider + ChatColor.RESET + " " + event.getMessage());
-	            	}
-	            } else {
-	            	//Team chat only (and admins)
-	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + "[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
-	            	for(KonPlayer teamPlayer : playerManager.getPlayersOnline()) {
-	            		if(teamPlayer.getKingdom().equals(kingdom)) {
-	            			teamPlayer.getBukkitPlayer().sendMessage(
-		            				ChatUtil.parseFormat(Konquest.getChatMessage(),
-		            						prefix,
-		            						suffix,
-		            						kingdomName,
-		            						title,
-		            						name,
-		            						Konquest.friendColor1,
-		            						Konquest.friendColor1,
-		            						true,
-		            						true) +
-		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
-	            		} else if(teamPlayer.isAdminBypassActive()) {
-	            			teamPlayer.getBukkitPlayer().sendMessage(
-		            				ChatUtil.parseFormat(Konquest.getChatMessage(),
-		            						prefix,
-		            						suffix,
-		            						kingdomName,
-		            						title,
-		            						name,
-		            						ChatColor.GOLD,
-		            						ChatColor.GOLD,
-		            						true,
-		            						true) +
-		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
-	            		}
-	            	}
-	            }
-	            */
         	}
         }
     }

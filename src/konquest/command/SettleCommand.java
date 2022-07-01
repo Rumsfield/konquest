@@ -225,13 +225,6 @@ public class SettleCommand extends CommandBase {
         		}
         		//ChatUtil.sendMessage((Player) getSender(), "Use \"/k map\" for helpful info.", ChatColor.RED);
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SETTLE_NOTICE_MAP_HINT.getMessage());
-        		/*
-        		*   	   12 - error, town init fail, bad town height
-        		 *		   13 - error, town init fail, bad chunks
-        		 * 		   14 - error, town init fail, too much air below town
-        		 * 		   15 - error, town init fail, too much water below town
-        		 * 		   16 - error, town init fail, containers below monument
-        		 * */
         	}
         	
 			if(cost > 0 && settleStatus == 0) {
