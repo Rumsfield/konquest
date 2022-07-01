@@ -48,8 +48,8 @@ core:
     quickshop: true
     luckperms: true
     dynmap: true
-    discordsrv:
-      enable: true
+    discordsrv: true
+    discordsrv_options:
       raid_alert_direct: false
       raid_alert_channel: true
   travel:

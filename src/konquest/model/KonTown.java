@@ -332,8 +332,13 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
             	}
             }
         }
+        // Lower minimum fill by 1, so that there is always a layer of stone under the monument base.
+        min_fill_y--;
+        if(min_fill_y < getCenterLoc().getWorld().getMinHeight()) {
+        	min_fill_y = getCenterLoc().getWorld().getMinHeight();
+        }
         //Date step4 = new Date();
-        //ChatUtil.printDebug("Pasting monument ("+fillChunk.getX()+","+fillChunk.getZ()+") at base "+monument_y+" found minimum Y level: "+min_fill_y);
+        ChatUtil.printDebug("Pasting monument ("+fillChunk.getX()+","+fillChunk.getZ()+") at base "+monument_y+" found minimum Y level: "+min_fill_y);
         // Fill air between world and monument base
         if(min_fill_y < monument_y) {
 	        for (int x = 0; x < 16; x++) {

@@ -65,22 +65,22 @@ public class KonMonument implements KonquestMonument {
 				int y = chunkSnap.getHighestBlockYAt(x, z);
 				//ChatUtil.printDebug("Checking chunk block "+x+","+z);
 				// Search for next highest block if current block is leaves
-				while(chunk.getBlock(x, y-1, z).isPassable() || !chunkSnap.getBlockType(x, y-1, z).isOccluding() || chunkSnap.getBlockType(x, y-1, z).equals(Material.AIR)) {
-					//ChatUtil.printDebug("	Found leaves or air at local position "+x+","+y+","+z);
+				while(chunk.getBlock(x, y, z).isPassable() || !chunkSnap.getBlockType(x, y, z).isOccluding() || chunkSnap.getBlockType(x, y, z).equals(Material.AIR)) {
+					//ChatUtil.printDebug("	Found undesirable "+chunkSnap.getBlockType(x, y, z).toString()+" at local position "+x+","+y+","+z);
 					y--;
 					if(y <= 0) {
 						ChatUtil.printDebug("Could not find non-leaves block in chunk "+chunkSnap.toString()+", local position "+x+","+y+","+z);
 						break;
 					}
 				}
-				//ChatUtil.printDebug("		Highest block: "+chunkSnap.getBlockType(x, y-1, z).toString());
+				//ChatUtil.printDebug("		Highest block: "+chunkSnap.getBlockType(x, y, z).toString());
 				if(y > maxY) {
 					maxY = y;
-					maxMaterial = chunkSnap.getBlockType(x, y-1, z).toString();
+					maxMaterial = chunkSnap.getBlockType(x, y, z).toString() + " at "+x+", "+y+", "+z;
 				}
 				if(y < minY) {
 					minY = y;
-					minMaterial = chunkSnap.getBlockType(x, y-1, z).toString();
+					minMaterial = chunkSnap.getBlockType(x, y, z).toString() + " at "+x+", "+y+", "+z;
 				}
 			}
 		}

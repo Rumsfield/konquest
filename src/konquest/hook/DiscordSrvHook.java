@@ -34,7 +34,7 @@ public class DiscordSrvHook implements PluginHook {
 		// Attempt to integrate DiscordSRV
 		Plugin discordSrv = Bukkit.getPluginManager().getPlugin("DiscordSRV");
 		if (discordSrv != null && discordSrv.isEnabled()) {
-			if(konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv.enable",false)) {
+			if(konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv",false)) {
 				try {
 					DiscordSRV.api.subscribe(discordSrvListener);
 					isEnabled = true;
@@ -83,10 +83,10 @@ public class DiscordSrvHook implements PluginHook {
 		return result;
 	}
 	
-	public boolean sendGameToDiscordMessage(String message, String channel) {
+	public boolean sendGameToDiscordMessage(String channel, String message) {
 		boolean result = false;
 		if (isEnabled) {
-	        TextChannel textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName("channel");
+	        TextChannel textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName(channel);
 	
 	        // null if the channel isn't specified in the config.yml
 	        if (textChannel != null) {
@@ -135,7 +135,7 @@ public class DiscordSrvHook implements PluginHook {
 	
 	// Sends the linked player a direct message
 	public void alertDiscordMember(OfflinePlayer player, String message) {
-		boolean doAlert = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv.raid_alert_direct",false);
+		boolean doAlert = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv_options.raid_alert_direct",false);
 		if(isEnabled && doAlert) {
 			String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(player.getUniqueId());
 			if (discordId != null) {
@@ -149,16 +149,16 @@ public class DiscordSrvHook implements PluginHook {
 		}
 	}
 	
-	// Sends the channel a message to @channel
+	// Sends the channel a message to @everyone
 	public void alertDiscordChannel(String channel, String message) {
-		boolean doAlert = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv.raid_alert_channel",false);
+		boolean doAlert = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv_options.raid_alert_channel",false);
 		if(isEnabled && doAlert) {
-			TextChannel textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName("channel");
+			TextChannel textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName(channel);
 			
 	        // null if the channel isn't specified in the config.yml
 	        if (textChannel != null) {
-	        	String mention = textChannel.getAsMention();
-	            textChannel.sendMessage(mention + " " + message).queue();
+	        	//String mention = textChannel.getAsMention();
+	            textChannel.sendMessage("@everyone " + message).queue();
 	        } else {
 	        	ChatUtil.printDebug("Channel called \""+channel+"\" could not be found in the DiscordSRV configuration");
 	        }
