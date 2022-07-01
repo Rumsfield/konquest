@@ -250,8 +250,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			return 4;
 		}
 		
-		// Verify there is not too much water in this chunk, no more than 5 layers of 16x16 blocks.
-		if(countWaterBlocks > 1280) {
+		// Verify there is not too much water in this chunk, no more than 10 layers of 16x16 blocks.
+		if(countWaterBlocks > 2560) {
 			ChatUtil.printDebug("Town init failed: too much water in the chunk");
 			return 5;
 		}
