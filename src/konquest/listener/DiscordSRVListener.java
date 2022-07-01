@@ -54,20 +54,24 @@ public class DiscordSRVListener {
     }
 	*/
     
+    /*
     @Subscribe(priority = ListenerPriority.MONITOR)
     public void aMessageWasSentInADiscordGuildByTheBot(DiscordGuildMessageSentEvent event) {
         // Example of logging a message sent in Minecraft (being sent to Discord)
     	
     	ChatUtil.printDebug("A message was sent to Discord: " + event.getMessage());
     }
+    */
 
+    /*
     @Subscribe
     public void accountsLinked(AccountLinkedEvent event) {
         // Example of broadcasting a message when a new account link has been made
 
     	ChatUtil.printDebug(event.getPlayer().getName() + " just linked their MC account to their Discord user " + event.getUser() + "!");
     }
-
+	*/
+    
     /*
     @Subscribe
     public void accountUnlinked(AccountUnlinkedEvent event) {
