@@ -301,9 +301,12 @@ protection:
     raid-capture-1: "%s is being conquered! Use \"/k travel %s\" to defend and receive %s Favor!"
     raid-capture-2: "%s is at half strength! Use \"/k travel %s\" to defend and receive %s Favor!"
     raid-capture-3: "%s is in critical condition! Use \"/k travel %s\" to defend and receive %s Favor!"
+    raid-discord-channel: "The enemy is capturing the town of %s, join the server now to defend!"
+    raid-discord-direct: "Enemy players are capturing the town of %s in your kingdom, %s! Join the server now to defend."
     raze: "The Town of %s has been destroyed by the Barbarian horde!"
     destroy: "You have destroyed %s for the glory of the Barbarian horde!"
     conquer: "The Town of %s has been conquered!"
+    conquer-discord: "The Town of %s has been conquered by %s!"
     capture: "You have conquered %s for the conquest of %s!"
     kingdom-warmup: "The Kingdom of %s will be protected in %s minutes."
     ruin: "You have captured the Ruin %s."
@@ -554,7 +557,9 @@ command:
       fail-max: "Town is too far away from other territories. Currently %s chunks away, must be at most %s."
       fail-flat: "Your chunk area is not flat enough. Press F3+G to view chunk boundaries. Cut down trees and flatten the ground!"
       fail-height: "Bad elevation, try settling somewhere higher or lower."
-      fail-air: "Too much air or water below. Try settling somewhere else, or remove all air/water below you."
+      fail-air: "Too much air below the ground. Try settling somewhere else, or fill all air below you."
+      fail-water: "Too much water below the ground. Try settling somewhere else, or remove all water below you."
+      fail-container: "Too many containers below the ground. Try settling somewhere else, or remove all containers below you."
       fail-init: "Town could not claim initial chunks."
   spy:
     notice:

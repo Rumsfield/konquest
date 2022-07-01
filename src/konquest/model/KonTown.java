@@ -29,6 +29,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.Container;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
@@ -157,8 +158,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	 * 			12 - error, monument gradient
 	 * 			13 - error, monument bedrock
 	 * 			2 - error, bad town height
-	 * 			3 - error, too much air below town
-	 * 			4 - error, bad chunks
+	 * 			3 - error, bad chunks
+	 * 			4 - error, too much air below town
+	 * 			5 - error, too much water below town
+	 * 			6 - error, containers below monument
 	 */
 	@Override
 	public int initClaim() {
@@ -205,17 +208,58 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			return 2;
 		}
 		
-		// Verify there is not too much air below the base Y location, no more than 10 layers of 16x16 blocks.
+		// Iterate over every block in the chunk to check for bad conditions
+		int countWaterBlocks = 0;
+		int countAirBlocks = 0;
+		int countContainers = 0;
 		int baseDepth = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.settle_checks_depth",0);
-		if(baseDepth > 0 && countAirBelowMonument(baseDepth) > 2560) {
+		int yMin = 0;
+		int yMax = monument.getBaseY();
+		if(baseDepth > 0) {
+			yMin = monument.getBaseY() - baseDepth;
+		}
+		if(yMin < getWorld().getMinHeight()) {
+			yMin = getWorld().getMinHeight();
+		}
+		if(yMax > getWorld().getMaxHeight()-1) {
+			yMax = getWorld().getMaxHeight()-1;
+		}
+		for (int x = 0; x <= 15; x++) {
+            for (int y = getWorld().getMinHeight(); y <= getWorld().getMaxHeight()-1; y++) {
+                for (int z = 0; z <= 15; z++) {
+                    Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
+                    // Checks for any block in the chunk
+                    if(currentBlock.getType().equals(Material.WATER)) {
+                    	countWaterBlocks++;
+                    }
+                    // Checks for blocks within min max monument Y levels
+                    if(y >= yMin && y <= yMax) {
+                    	if(currentBlock.getType().equals(Material.AIR)) {
+                    		countAirBlocks++;
+                        } else if(currentBlock.getState() instanceof Container) {
+                        	countContainers++;
+                        }
+                    }
+                }
+            }
+        }
+		
+		// Verify there is not too much air below the base Y location, no more than 10 layers of 16x16 blocks.
+		if(baseDepth > 0 && countAirBlocks > 2560) {
 			ChatUtil.printDebug("Town init failed: too much air below monument");
-			return 3;
+			return 4;
 		}
 		
-		// Verify there is not too much water in this chunk, no more than 5 layers of 16x16 blocks.
-		if(countWaterInChunk() > 1280) {
+		// Verify there is not too much water in this chunk, no more than 10 layers of 16x16 blocks.
+		if(countWaterBlocks > 2560) {
 			ChatUtil.printDebug("Town init failed: too much water in the chunk");
-			return 3;
+			return 5;
+		}
+		
+		// Verify there are not too many containers below the monument
+		if(baseDepth > 0 && countContainers > 0) {
+			ChatUtil.printDebug("Town init failed: too many containers in the chunk");
+			return 6;
 		}
         
 		// Add chunks around the monument chunk
@@ -225,7 +269,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		if(!addChunks(getKonquest().getAreaPoints(getCenterLoc(), radius))) {
 			ChatUtil.printDebug("Town init failed: problem adding some chunks");
-			return 4;
+			return 3;
 		}
 		
 		// Copy Monument template blocks into town center chunk
@@ -288,8 +332,13 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
             	}
             }
         }
+        // Lower minimum fill by 1, so that there is always a layer of stone under the monument base.
+        min_fill_y--;
+        if(min_fill_y < getCenterLoc().getWorld().getMinHeight()) {
+        	min_fill_y = getCenterLoc().getWorld().getMinHeight();
+        }
         //Date step4 = new Date();
-        //ChatUtil.printDebug("Pasting monument ("+fillChunk.getX()+","+fillChunk.getZ()+") at base "+monument_y+" found minimum Y level: "+min_fill_y);
+        ChatUtil.printDebug("Pasting monument ("+fillChunk.getX()+","+fillChunk.getZ()+") at base "+monument_y+" found minimum Y level: "+min_fill_y);
         // Fill air between world and monument base
         if(min_fill_y < monument_y) {
 	        for (int x = 0; x < 16; x++) {
@@ -486,6 +535,20 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		Point centerPoint = Konquest.toPoint(getCenterLoc());
 		Point testPoint = Konquest.toPoint(chunk);
 		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
+	}
+	
+	public boolean isLocInsideMonumentProtectionArea(Location loc) {
+		Point centerPoint = Konquest.toPoint(getCenterLoc());
+		Point testPoint = Konquest.toPoint(loc);
+		int baseDepth = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.settle_checks_depth",0);
+		if(baseDepth < 0) {
+			baseDepth = 0;
+		}
+		int bottomLevel = monument.getBaseY() - baseDepth;
+		if(bottomLevel < getWorld().getMinHeight()) {
+			baseDepth = getWorld().getMinHeight();
+		}
+		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y && loc.getBlockY() >= bottomLevel;
 	}
 	
 	/**

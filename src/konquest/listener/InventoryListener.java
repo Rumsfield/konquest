@@ -137,7 +137,7 @@ public class InventoryListener implements Listener {
 					}
 					// Attempt to put loot into empty chests within the monument
 					//if(town.isLocInsideCenterChunk(openLoc) && event.getInventory().getHolder() instanceof Chest) {
-					if(town.isLocInsideCenterChunk(openLoc) && event.getInventory().getType().equals(InventoryType.CHEST)) {
+					if(town.getMonument().isLocInside(openLoc) && event.getInventory().getType().equals(InventoryType.CHEST)) {
 						if(town.isPlayerLord(player.getOfflineBukkitPlayer()) || town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 							//if(isInventoryEmpty(event.getInventory())) {
 								// Update loot with default count as defined in core YML

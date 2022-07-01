@@ -330,7 +330,55 @@ public class PlayerManager implements KonquestPlayerManager {
     		allPlayers.put(offlinePlayer.getOfflineBukkitPlayer(), offlinePlayer);
     	}
     }
-    
-    
+
+	public Collection<Player> getBukkitPlayersInKingdom(String kingdomName) {
+		Collection<Player> playerList = new HashSet<Player>();
+    	for(Player bukkitPlayer : onlinePlayers.keySet()) {
+    		KonPlayer player = onlinePlayers.get(bukkitPlayer);
+    		if(player.getKingdom().getName().equalsIgnoreCase(kingdomName)) {
+    			playerList.add(bukkitPlayer);
+    		}
+    	}
+    	return playerList;
+	}
+
+	public Collection<Player> getBukkitPlayersInKingdom(KonquestKingdom kingdom) {
+		Collection<Player> playerList = new HashSet<Player>();
+    	for(Player bukkitPlayer : onlinePlayers.keySet()) {
+    		KonPlayer player = onlinePlayers.get(bukkitPlayer);
+    		if(player.getKingdom().equals(kingdom)) {
+    			playerList.add(bukkitPlayer);
+    		}
+    	}
+    	return playerList;
+	}
+
+	public Collection<OfflinePlayer> getAllBukkitPlayersInKingdom(String kingdomName) {
+		Collection<OfflinePlayer> playerList = new HashSet<OfflinePlayer>();
+    	for(OfflinePlayer bukkitOfflinePlayer : allPlayers.keySet()) {
+    		KonOfflinePlayer player = allPlayers.get(bukkitOfflinePlayer);
+    		if(player.getKingdom().getName().equalsIgnoreCase(kingdomName)) {
+    			playerList.add(bukkitOfflinePlayer);
+    		}
+    	}
+    	return playerList;
+	}
+
+	public Collection<OfflinePlayer> getAllBukkitPlayersInKingdom(KonquestKingdom kingdom) {
+    	Collection<OfflinePlayer> playerList = new HashSet<OfflinePlayer>();
+    	for(OfflinePlayer bukkitOfflinePlayer : allPlayers.keySet()) {
+    		KonOfflinePlayer player = allPlayers.get(bukkitOfflinePlayer);
+    		if(player.getKingdom().equals(kingdom)) {
+    			playerList.add(bukkitOfflinePlayer);
+    		}
+    	}
+    	return playerList;
+	}
+
+	public Collection<Player> getBukkitPlayersOnline() {
+		Collection<Player> result = new HashSet<Player>();
+    	result.addAll(onlinePlayers.keySet());
+    	return result;
+	}
 
 }

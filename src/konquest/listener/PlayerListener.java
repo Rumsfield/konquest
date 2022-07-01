@@ -20,6 +20,7 @@ import konquest.model.KonPlot;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 import konquest.utility.Timer;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -131,6 +132,11 @@ public class PlayerListener implements Listener{
             			}
             		}
             	}
+            	// DiscordSRV
+            	if(konquest.getIntegrationManager().getDiscordSrv().isEnabled()) {
+            		String message = konquest.getIntegrationManager().getDiscordSrv().getLinkMessage(bukkitPlayer);
+            		ChatUtil.sendNotice(bukkitPlayer, message);
+            	}
             }
         }, 10);
     }
@@ -209,12 +215,14 @@ public class PlayerListener implements Listener{
     
     /**
      * Fires on chat events
-     * All players always see global chat messages and team chat messages
+     * Cancel the chat event and pass info to integrated plugins.
+     * Send formatted messages to recipients.
      * @param event
      */
     private void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
         //Check if the event was caused by a player
         if(event.isAsynchronous() && !event.isCancelled()) {
+        	
         	boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.enable_format",true);
         	if(enable) {
 	        	// Format chat messages
@@ -225,72 +233,105 @@ public class PlayerListener implements Listener{
 				}
 	            KonPlayer player = playerManager.getPlayer(bukkitPlayer);
 	            KonKingdom kingdom = player.getKingdom();
-	            event.setCancelled(true);
 	            
+	            // Built-in format string
+	            boolean formatNameConfig = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.name_team_color",true);
+	        	boolean formatKingdomConfig = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.kingdom_team_color",true);
+	            /* %TITLE% */
 	            String title = "";
 	            if(player.getPlayerPrefix().isEnabled()) {
 	            	title = ChatUtil.parseHex(player.getPlayerPrefix().getMainPrefixName());
 	            }
-	            String prefix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsPrefix(bukkitPlayer));
-	            String suffix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPermsSuffix(bukkitPlayer));
+	            /* %PREFIX% */
+	            String prefix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPerms().getPrefix(bukkitPlayer));
+	            /* %SUFFIX% */
+	            String suffix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPerms().getSuffix(bukkitPlayer));
+	            /* %KINGDOM% */
 	            String kingdomName = kingdom.getName();
+	            /* %NAME% */
 	            String name = bukkitPlayer.getName();
-	            
-	            boolean formatName = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.name_team_color",true);
-	        	boolean formatKingdom = konquest.getConfigManager().getConfig("core").getBoolean("core.chat.kingdom_team_color",true);
-	            
-	            if(player.isGlobalChat()) {
-	            	//Global chat, all players see this format
-	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
-	            	for(KonPlayer globalPlayer : playerManager.getPlayersOnline()) {
-	            		ChatColor teamColor = konquest.getDisplayPrimaryColor(globalPlayer, player);
-	            		ChatColor titleColor = konquest.getDisplaySecondaryColor(globalPlayer, player);
-	            		globalPlayer.getBukkitPlayer().sendMessage(
-	            				ChatUtil.parseFormat(Konquest.getChatMessage(),
-	            						prefix,
-	            						suffix,
-	            						kingdomName,
-	            						title,
-	            						name,
-	            						teamColor,
-	            						titleColor,
-	            						formatName,
-	            						formatKingdom) +
-	        					Konquest.chatDivider + ChatColor.RESET + " " + event.getMessage());
-	            	}
-	            } else {
-	            	//Team chat only (and admins)
-	            	ChatUtil.printConsole(ChatColor.GOLD + kingdom.getName() + " | " + "[K] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
-	            	for(KonPlayer teamPlayer : playerManager.getPlayersOnline()) {
-	            		if(teamPlayer.getKingdom().equals(kingdom)) {
-	            			teamPlayer.getBukkitPlayer().sendMessage(
-		            				ChatUtil.parseFormat(Konquest.getChatMessage(),
-		            						prefix,
-		            						suffix,
-		            						kingdomName,
-		            						title,
-		            						name,
-		            						Konquest.friendColor1,
-		            						Konquest.friendColor1,
-		            						true,
-		            						true) +
-		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GREEN+ChatColor.ITALIC+event.getMessage());
-	            		} else if(teamPlayer.isAdminBypassActive()) {
-	            			teamPlayer.getBukkitPlayer().sendMessage(
-		            				ChatUtil.parseFormat(Konquest.getChatMessage(),
-		            						prefix,
-		            						suffix,
-		            						kingdomName,
-		            						title,
-		            						name,
-		            						ChatColor.GOLD,
-		            						ChatColor.GOLD,
-		            						true,
-		            						true) +
-		            				Konquest.chatDivider + ChatColor.RESET + " " + ChatColor.GOLD+ChatColor.ITALIC+event.getMessage());
-	            		}
-	            	}
-	            }
+	        	
+	        	String rawFormat = Konquest.getChatMessage();
+	        	String parsedFormat = "";
+	        	String chatMessage = event.getMessage();
+	        	String chatChannel = "global";
+	        	if(!player.isGlobalChat()) {
+	        		chatChannel = player.getKingdom().getName();
+	        	}
+	        	
+	        	// Send chat content to Discord first
+	        	konquest.getIntegrationManager().getDiscordSrv().sendGameChatToDiscord(event.getPlayer(), event.getMessage(), chatChannel, event.isCancelled());
+	        	// Then cancel the event. This causes DiscordSRV to not process the event on its own.
+	        	// We need to cancel the event so it doesn't execute on the server, and we can send custom format messages to players.
+	        	event.setCancelled(true);
+	        	
+	        	// Send messages to players
+	        	for(KonPlayer viewerPlayer : playerManager.getPlayersOnline()) {
+	        		ChatColor teamColor = ChatColor.GOLD;
+	        		ChatColor titleColor = ChatColor.GOLD;
+	        		boolean doFormatName = true;
+	        		boolean doFormatKingdom = true;
+	        		String messageFormat = "";
+	        		
+	        		boolean sendMessage = false;
+	        		if(player.isGlobalChat()) {
+	        			// Sender is in global chat mode
+	        			teamColor = konquest.getDisplayPrimaryColor(viewerPlayer, player);
+	            		titleColor = konquest.getDisplaySecondaryColor(viewerPlayer, player);
+	            		doFormatName = formatNameConfig;
+	            		doFormatKingdom = formatKingdomConfig;
+	            		messageFormat = "";
+	            		sendMessage = true;
+	        		} else {
+	        			// Sender is in kingdom chat mode
+	        			if(viewerPlayer.getKingdom().equals(kingdom)) {
+	        				teamColor = Konquest.friendColor1;
+		            		titleColor = Konquest.friendColor1;
+		            		doFormatName = true;
+		            		doFormatKingdom = true;
+		            		messageFormat = ""+ChatColor.GREEN+ChatColor.ITALIC;
+		            		sendMessage = true;
+	        			} else if(viewerPlayer.isAdminBypassActive()) {
+	        				teamColor = ChatColor.GOLD;
+		            		titleColor = ChatColor.GOLD;
+		            		doFormatName = true;
+		            		doFormatKingdom = true;
+		            		messageFormat = ""+ChatColor.GOLD+ChatColor.ITALIC;
+		            		sendMessage = true;
+	        			}
+	        		}
+	        		
+	        		if(sendMessage) {
+	        			// Parse built-in placeholders
+	        			parsedFormat = ChatUtil.parseFormat(rawFormat,
+        						prefix,
+        						suffix,
+        						kingdomName,
+        						title,
+        						name,
+        						teamColor,
+        						titleColor,
+        						doFormatName,
+        						doFormatKingdom);
+	        			// Attempt to use PAPI for external placeholders
+	        			try {
+	    	        		// Try to parse placeholders in the format string, if the JAR is present.
+	    	        		parsedFormat = PlaceholderAPI.setPlaceholders(bukkitPlayer, parsedFormat);
+	    	        		// Try to parse relational placeholders
+	    	        		parsedFormat = PlaceholderAPI.setRelationalPlaceholders(viewerPlayer.getBukkitPlayer(), bukkitPlayer, parsedFormat);
+	    	        	} catch (NoClassDefFoundError ignored) {}
+	        			// Send the chat message
+		        		viewerPlayer.getBukkitPlayer().sendMessage(parsedFormat + Konquest.chatDivider + ChatColor.RESET + " " + messageFormat + chatMessage);
+	        		}
+	        	}
+	        	
+	        	// Send message to console
+	        	if(player.isGlobalChat()) {
+	        		ChatUtil.printConsole(ChatColor.GOLD + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	        	} else {
+	        		ChatUtil.printConsole(ChatColor.GOLD + "["+kingdom.getName()+"] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+	        	}
+	        	
         	}
         }
     }
@@ -710,7 +751,7 @@ public class PlayerListener implements Listener{
     	if(kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
 			KonTerritory territory = kingdomManager.getChunkTerritory(event.getBlock().getLocation());
 			// Prevent all players from placing or picking up liquids inside of monuments
-			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideCenterChunk(event.getBlock().getLocation())) {
+			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideMonumentProtectionArea(event.getBlock().getLocation())) {
 				// The block is located inside a monument, cancel
 				//ChatUtil.printDebug("EVENT: Bucket used inside monument with block "+event.getBlock().getType().toString()+", cancelling");
 				event.setCancelled(true);

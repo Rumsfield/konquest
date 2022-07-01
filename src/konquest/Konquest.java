@@ -24,6 +24,7 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
@@ -232,6 +233,10 @@ public class Konquest implements KonquestAPI, Timeable {
 		ChatUtil.printDebug("Finished Initialization");
 	}
 	
+	public void disable() {
+		integrationManager.disable();
+	}
+	
 	private void initVersionHandlers() {
 		String version;
     	try {
@@ -434,7 +439,6 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public KonPlayer initPlayer(Player bukkitPlayer) {
 		KonPlayer player = null;
-		bukkitPlayer.setScoreboard(getScoreboard());
     	// Fetch player from the database
     	// Also instantiates player object in PlayerManager
 		databaseThread.getDatabase().fetchPlayerData(bukkitPlayer);
@@ -443,8 +447,16 @@ public class Konquest implements KonquestAPI, Timeable {
 			return null;
 		}
     	player = playerManager.getPlayer(bukkitPlayer);
+    	if(player == null) {
+			ChatUtil.printDebug("Failed to init a null player!");
+			return null;
+		}
     	// Update all player's nametag color packets
-    	updateNamePackets(player);
+    	boolean isPlayerNametagFormatEnabled = configManager.getConfig("core").getBoolean("core.player_nametag_format",false);
+    	if(isPlayerNametagFormatEnabled) {
+    		bukkitPlayer.setScoreboard(getScoreboard());
+    		updateNamePackets(player);
+    	}
     	// Update offline protections
     	kingdomManager.updateKingdomOfflineProtection();
     	//if(player.isBarbarian()) {
@@ -1594,6 +1606,19 @@ public class Konquest implements KonquestAPI, Timeable {
 			}
     	} else {
     		ChatUtil.printDebug("Could not call null Konquest event");
+    	}
+    }
+    
+    public static void callEvent(Event event) {
+    	if(event != null) {
+	    	try {
+	            Bukkit.getServer().getPluginManager().callEvent(event);
+			} catch(IllegalStateException e) {
+				ChatUtil.printConsoleError("Failed to call Bukkit event!");
+				e.printStackTrace();
+			}
+    	} else {
+    		ChatUtil.printDebug("Could not call null Bukkit event");
     	}
     }
 	

@@ -72,6 +72,7 @@ public class KonquestPlugin extends JavaPlugin {
 	public void onDisable() {
 		ChatUtil.printDebug("Executing onDisable...");
 		if(enableSuccess) {
+			konquest.disable();
 			konquest.getKingdomManager().saveKingdoms();
 			konquest.getCampManager().saveCamps();
 			konquest.getRuinManager().saveRuins();

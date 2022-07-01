@@ -37,6 +37,7 @@ import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
@@ -146,7 +147,7 @@ public class BlockListener implements Listener {
 					if(player.getKingdom().equals(town.getKingdom())) {
 						// If player is allied...
 						// Stop all block breaks in center chunk
-						if(town.isLocInsideCenterChunk(breakLoc)) {
+						if(town.isLocInsideMonumentProtectionArea(breakLoc)) {
 							ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 							event.setCancelled(true);
 							return;
@@ -296,7 +297,7 @@ public class BlockListener implements Listener {
 						}
 						
 						// If block is inside a monument, handle it
-						if(town.isLocInsideCenterChunk(breakLoc)) {
+						if(town.isLocInsideMonumentProtectionArea(breakLoc)) {
 							if(isMonument) {
 								// Prevent monument attack when template is blanking or invalid
 								if(!town.getKingdom().getMonumentTemplate().isValid() || town.getKingdom().isMonumentBlanking()) {
@@ -589,7 +590,7 @@ public class BlockListener implements Listener {
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 					KonTown town = (KonTown) territory;
 					// Prevent all block placements in center chunk
-					if(town.isLocInsideCenterChunk(event.getBlock().getLocation())) {
+					if(town.isLocInsideMonumentProtectionArea(event.getBlock().getLocation())) {
 						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
 						return;
@@ -886,7 +887,7 @@ public class BlockListener implements Listener {
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 					KonTown town = (KonTown)territory;
 					// Protect Town Monuments
-					if(town.isLocInsideCenterChunk(block.getLocation())) {
+					if(town.isLocInsideMonumentProtectionArea(block.getLocation())) {
 						ChatUtil.printDebug("protecting Town Monument");
 						event.setCancelled(true);
 						return;
@@ -987,7 +988,7 @@ public class BlockListener implements Listener {
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
 					// Check if this block is within a monument
-					if(town.isLocInsideCenterChunk(pushBlock.getLocation())) {
+					if(town.isLocInsideMonumentProtectionArea(pushBlock.getLocation())) {
 						//ChatUtil.printDebug("EVENT: Monument block pushed by piston, cancelling");
 						event.setCancelled(true);
 						return;
@@ -1033,7 +1034,7 @@ public class BlockListener implements Listener {
 					}
 				}
 				if(territory instanceof KonTown) {
-					if(((KonTown) territory).isLocInsideCenterChunk(pushTo)) {
+					if(((KonTown) territory).isLocInsideMonumentProtectionArea(pushTo)) {
 						//ChatUtil.printDebug("EVENT: block attempted to move into a monument by piston, cancelling");
 						event.setCancelled(true);
 						return;
@@ -1084,7 +1085,7 @@ public class BlockListener implements Listener {
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
 					// Check if this block is within a monument
-					if(town.isLocInsideCenterChunk(pullBlock.getLocation())) {
+					if(town.isLocInsideMonumentProtectionArea(pullBlock.getLocation())) {
 						//ChatUtil.printDebug("EVENT: Monument block pulled by piston, cancelling");
 						event.setCancelled(true);
 						return;
@@ -1183,7 +1184,7 @@ public class BlockListener implements Listener {
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
 				// Prevent all spread inside Monument
-				if(town.isLocInsideCenterChunk(event.getBlock().getLocation())) {
+				if(town.isLocInsideMonumentProtectionArea(event.getBlock().getLocation())) {
 					event.setCancelled(true);
 					return;
 				}
@@ -1244,7 +1245,7 @@ public class BlockListener implements Listener {
 		boolean result = false;
 		if(kingdomManager.isChunkClaimed(block.getLocation())) {
 			KonTerritory territory = kingdomManager.getChunkTerritory(block.getLocation());
-			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideCenterChunk(block.getLocation())) {
+			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideMonumentProtectionArea(block.getLocation())) {
 				result = true;
 			}
 		}
@@ -1384,6 +1385,8 @@ public class BlockListener implements Listener {
 					int y = town.getCenterLoc().getBlockY();
 					int z = town.getCenterLoc().getBlockZ();
 					konquest.getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(town.getName())+" ("+x+","+y+","+z+")");
+					// Broadcast to Discord
+					konquest.getIntegrationManager().getDiscordSrv().sendGameToDiscordMessage("global", ":crossed_swords: **"+MessagePath.PROTECTION_NOTICE_CONQUER_DISCORD.getMessage(town.getName(),town.getKingdom().getName())+"**");
 				} else {
 					ChatUtil.printDebug("Problem converting Town "+town.getName()+" from Kingdom "+town.getKingdom().getName()+" to "+player.getKingdom().getName());
 					// If, for example, a player in the Barbarians default kingdom captured the monument
@@ -1406,17 +1409,24 @@ public class BlockListener implements Listener {
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CRITICAL.getMessage(remainingHits));
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRITICALS,1);
 			
+			String kingdomName = town.getKingdom().getName();
+					
 			// Alert all players of enemy Kingdom when the first critical block is broken
 			if(town.getMonument().getCriticalHits() == 1) {
-				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
 					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_1.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
+				}
+				// Discord integration
+				konquest.getIntegrationManager().getDiscordSrv().alertDiscordChannel(kingdomName, MessagePath.PROTECTION_NOTICE_RAID_DISCORD_CHANNEL.getMessage(town.getName()));
+				for(OfflinePlayer allPlayer : playerManager.getAllBukkitPlayersInKingdom(kingdomName)) {
+					konquest.getIntegrationManager().getDiscordSrv().alertDiscordMember(allPlayer, MessagePath.PROTECTION_NOTICE_RAID_DISCORD_DIRECT.getMessage(town.getName(),kingdomName));
 				}
 			}
 			
 			// Alert all players of enemy Kingdom when half of critical blocks are broken
 			if(town.getMonument().getCriticalHits() == maxCriticalhits/2) {
-				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
 					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_2.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
 				}
@@ -1424,7 +1434,7 @@ public class BlockListener implements Listener {
 			
 			// Alert all players of enemy Kingdom when all but 1 critical blocks are broken
 			if(town.getMonument().getCriticalHits() == maxCriticalhits-1) {
-				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(town.getKingdom().getName())) {
+				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
 					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_3.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
 				}

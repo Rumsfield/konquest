@@ -19,6 +19,7 @@ core:
   directive_quests: true
   reset_legacy_health: true
   placeholder_request_limit: 60
+  player_nametag_format: true
   chat:
     tag: '&7[&6Konquest&7]&f '
     message: '%PREFIX% %KINGDOM% &7| %TITLE% %NAME% %SUFFIX% '
@@ -47,6 +48,10 @@ core:
     quickshop: true
     luckperms: true
     dynmap: true
+    discordsrv: true
+    discordsrv_options:
+      raid_alert_direct: false
+      raid_alert_channel: true
   travel:
     enable:
       towns: true
@@ -109,6 +114,7 @@ core:
     armor_add: true
     max_shields: 432000
     max_armor: 9999
+    shield_new_towns: 0
     barbarians_destroy: true
     enemy_glow: true
     town_mobs: false

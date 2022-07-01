@@ -46,7 +46,7 @@ public class QuickShopListener implements Listener{
 //		if(konquest.isWorldIgnored(event.getLocation().getWorld())) {
 //			return;
 //		}
-		if(integrationManager.isQuickShopEnabled()) {
+		if(integrationManager.getQuickShop().isEnabled()) {
 			//ChatUtil.printDebug("ShopPreCreateEvent: player "+event.getPlayer().getName()+" at "+event.getLocation().toString());
 			if(konquest.isWorldIgnored(event.getLocation())) {
 				return;
@@ -65,7 +65,7 @@ public class QuickShopListener implements Listener{
 							event.setCancelled(true);
 							return;
 						}
-						if(((KonTown) territory).isLocInsideCenterChunk(event.getLocation())) {
+						if(((KonTown) territory).isLocInsideMonumentProtectionArea(event.getLocation())) {
 							//ChatUtil.printDebug("...chunk is monument");
 							//ChatUtil.sendError(event.getPlayer(), "Cannot create a shop inside monument!");
 							ChatUtil.sendError(event.getPlayer(), MessagePath.QUICKSHOP_ERROR_MONUMENT.getMessage());
@@ -108,7 +108,7 @@ public class QuickShopListener implements Listener{
 		if(konquest.isWorldIgnored(event.getShop().getLocation())) {
 			return;
 		}
-		if(integrationManager.isQuickShopEnabled()) {
+		if(integrationManager.getQuickShop().isEnabled()) {
 			//ChatUtil.printDebug("ShopPurchaseEvent: owner "+Bukkit.getOfflinePlayer(event.getShop().getOwner()).getName()+" at "+event.getShop().getLocation());
 		
 			// Bypass all checks for admins in bypass mode
