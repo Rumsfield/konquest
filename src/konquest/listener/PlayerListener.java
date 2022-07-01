@@ -318,7 +318,7 @@ public class PlayerListener implements Listener{
 	    	        		parsedFormat = PlaceholderAPI.setPlaceholders(bukkitPlayer, parsedFormat);
 	    	        		// Try to parse relational placeholders
 	    	        		parsedFormat = PlaceholderAPI.setRelationalPlaceholders(viewerPlayer.getBukkitPlayer(), bukkitPlayer, parsedFormat);
-	    	        	} catch (Exception ignored) {}
+	    	        	} catch (NoClassDefFoundError ignored) {}
 	        			// Send the chat message
 		        		viewerPlayer.getBukkitPlayer().sendMessage(parsedFormat + Konquest.chatDivider + ChatColor.RESET + " " + messageFormat + chatMessage);
 	        		}
