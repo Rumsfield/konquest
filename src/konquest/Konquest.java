@@ -276,7 +276,7 @@ public class Konquest implements KonquestAPI, Timeable {
         		ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version.");
         		isPacketSendEnabled = true;
         	} else {
-        		ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is disabled! Check version.");
+        		ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is missing or disabled! Check version.");
         	}
     	} else {
     		ChatUtil.printConsoleError("Some Konquest features may not work for this unsupported server version.");
