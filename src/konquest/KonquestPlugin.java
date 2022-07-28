@@ -17,6 +17,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
@@ -121,13 +122,17 @@ public class KonquestPlugin extends JavaPlugin {
 	}
 	
 	private void setupProtocol() {
-		plib = null;
-		try {
-			plib = ProtocolLibrary.getProtocolManager();
-			isProtocolEnabled = true;
-		} catch(Exception e) {
-			ChatUtil.printConsoleError("Failed to load ProtocolLib, is it the latest version?");
-			e.printStackTrace();
+		Plugin protocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib");
+		if (protocolLib != null && protocolLib.isEnabled()) {
+			try {
+				plib = ProtocolLibrary.getProtocolManager();
+				isProtocolEnabled = true;
+			} catch(Exception | NoClassDefFoundError e) {
+				ChatUtil.printConsoleError("Failed to load ProtocolLib, is it the latest version?");
+				e.printStackTrace();
+			}
+		} else {
+			ChatUtil.printConsoleError("Failed to integrate ProtocolLib - missing or disabled.");
 		}
 	}
 	
