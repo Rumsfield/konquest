@@ -132,7 +132,7 @@ public class KonquestPlugin extends JavaPlugin {
 				e.printStackTrace();
 			}
 		} else {
-			ChatUtil.printConsoleAlert("Could not integrate ProtocolLib, missing or disabled.");
+			ChatUtil.printConsoleError("Failed to integrate ProtocolLib - missing or disabled.");
 		}
 	}
 	
