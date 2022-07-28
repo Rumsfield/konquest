@@ -249,24 +249,30 @@ public class Konquest implements KonquestAPI, Timeable {
     	boolean isVersionHandlerReady = false;
     	
     	// Version-specific cases
-    	switch(version) {
-    		case "v1_16_R3":
-    			versionHandler = new Handler_1_16_R3();
-    			break;
-    		case "v1_17_R1":
-    			versionHandler = new Handler_1_17_R1();
-    			break;
-    		case "v1_18_R1":
-    			versionHandler = new Handler_1_18_R1();
-    			break;
-    		case "v1_18_R2":
-    			versionHandler = new Handler_1_18_R2();
-    			break;
-    		case "v1_19_R1":
-    			versionHandler = new Handler_1_19_R1();
-    			break;
-    		default:
-    			break;
+    	try {
+	    	switch(version) {
+	    		case "v1_16_R3":
+	    			versionHandler = new Handler_1_16_R3();
+	    			break;
+	    		case "v1_17_R1":
+	    			versionHandler = new Handler_1_17_R1();
+	    			break;
+	    		case "v1_18_R1":
+	    			versionHandler = new Handler_1_18_R1();
+	    			break;
+	    		case "v1_18_R2":
+	    			versionHandler = new Handler_1_18_R2();
+	    			break;
+	    		case "v1_19_R1":
+	    			versionHandler = new Handler_1_19_R1();
+	    			break;
+	    		default:
+	    			ChatUtil.printConsoleError("This version of Minecraft is not supported by Konquest!");
+	    			break;
+	    	}
+    	} catch (Exception | NoClassDefFoundError e) {
+    		ChatUtil.printConsoleError("Failed to setup a version handler: ");
+    		e.printStackTrace();
     	}
     	isVersionHandlerReady = versionHandler != null;
     	
@@ -279,7 +285,7 @@ public class Konquest implements KonquestAPI, Timeable {
         		ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is missing or disabled! Check version.");
         	}
     	} else {
-    		ChatUtil.printConsoleError("Some Konquest features may not work for this unsupported server version.");
+    		ChatUtil.printConsoleError("Some Konquest features are disabled. See previous error messages.");
     	}
     	
 	}
