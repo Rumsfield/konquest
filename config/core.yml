@@ -104,6 +104,7 @@ core:
     capture_cooldown: 600
     raid_alert_cooldown: 30
     travel_cooldown: 120
+    travel_warmup: 3
     enable_upgrades: true
     enable_armor: true
     enable_shields: true
@@ -187,6 +188,7 @@ core:
     cost_travel: 1
     cost_travel_per_chunk: 0.01
     cost_travel_world: 5
+    cost_travel_camp: 0
     allow_travel_always: true
     rewards:
       settle_town: 50

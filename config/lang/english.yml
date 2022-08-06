@@ -606,6 +606,7 @@ command:
     notice:
       town-travel: "%s has traveled to %s."
       wild-travel: "Traveled to a random location in the Wild."
+      warmup: "Travel starts in %s."
     error:
       enemy-territory: "You can not travel within enemy territory!"
       no-home: "You do not have a home!"

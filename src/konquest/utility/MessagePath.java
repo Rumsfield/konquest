@@ -509,6 +509,7 @@ public enum MessagePath {
 	COMMAND_TOWN_ERROR_KNIGHT_RESIDENT          (0, "command.town.error.knight-resident"),
 	COMMAND_TRAVEL_NOTICE_TOWN_TRAVEL           (2, "command.travel.notice.town-travel"),
 	COMMAND_TRAVEL_NOTICE_WILD_TRAVEL           (0, "command.travel.notice.wild-travel"),
+	COMMAND_TRAVEL_NOTICE_WARMUP                (1, "command.travel.notice.warmup"),
 	COMMAND_TRAVEL_ERROR_ENEMY_TERRITORY        (0, "command.travel.error.enemy-territory"),
 	COMMAND_TRAVEL_ERROR_NO_HOME                (0, "command.travel.error.no-home"),
 	COMMAND_TRAVEL_ERROR_NO_CAMP                (0, "command.travel.error.no-camp"),

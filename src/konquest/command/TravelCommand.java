@@ -166,16 +166,23 @@ public class TravelCommand extends CommandBase {
                     return;
         		}
         	}
+        	
         	// Second, determine whether player can cover cost
-        	if(!destination.equals(TravelDestination.CAMP)) {
-	        	boolean isTravelAlwaysAllowed = getKonquest().getConfigManager().getConfig("core").getBoolean("core.favor.allow_travel_always",true);
-	        	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel",0.0);
-	        	double cost_per_chunk = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel_per_chunk",0.0);
-	        	double cost_world = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel_world",0.0);
-	        	cost = (cost < 0) ? 0 : cost;
-	        	cost_per_chunk = (cost_per_chunk < 0) ? 0 : cost_per_chunk;
-	        	double total_cost = 0;
-	        	int chunkDistance = Konquest.chunkDistance(travelLoc,bukkitPlayer.getLocation());
+    		boolean isTravelAlwaysAllowed = getKonquest().getConfigManager().getConfig("core").getBoolean("core.favor.allow_travel_always",true);
+        	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel",0.0);
+        	double cost_per_chunk = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel_per_chunk",0.0);
+        	double cost_world = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel_world",0.0);
+        	double cost_camp = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel_camp",0.0);
+        	cost = (cost < 0) ? 0 : cost;
+        	cost_per_chunk = (cost_per_chunk < 0) ? 0 : cost_per_chunk;
+        	cost_camp = (cost_camp < 0) ? 0 : cost_camp;
+        	double total_cost = 0;
+        	if(destination.equals(TravelDestination.CAMP)) {
+        		// Player is traveling to camp, fixed cost
+        		total_cost = cost_camp;
+        	} else {
+        		// Player is traveling to town, capital or wild
+        		int chunkDistance = Konquest.chunkDistance(travelLoc,bukkitPlayer.getLocation());
 	        	if(chunkDistance >= 0) {
 	        		// Value is chunk distance within the same world
 	        		total_cost = cost + cost_per_chunk*chunkDistance;
@@ -183,21 +190,37 @@ public class TravelCommand extends CommandBase {
 	        		// Value of -1 means travel points are between different worlds
 	        		total_cost = cost + cost_world;
 	        	}
-				if(!isTravelAlwaysAllowed && total_cost > 0) {
-					if(KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
-						//ChatUtil.sendError((Player) getSender(), "Not enough Favor, need "+total_cost);
-						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(total_cost));
-	                    return;
-					}
-				}
-				if(isTravelAlwaysAllowed && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
-	        		//ChatUtil.sendNotice((Player) getSender(), "Not enough Favor, this one's on us.");
-	        	} else {
-	                if(KonquestPlugin.withdrawPlayer(bukkitPlayer, total_cost)) {
-	                	getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)total_cost);
-	                }
-	        	}
         	}
+			if(!isTravelAlwaysAllowed && total_cost > 0) {
+				if(KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
+					//ChatUtil.sendError((Player) getSender(), "Not enough Favor, need "+total_cost);
+					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(total_cost));
+                    return;
+				}
+			}
+			if(isTravelAlwaysAllowed && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
+        		//ChatUtil.sendNotice((Player) getSender(), "Not enough Favor, this one's on us.");
+        	} else {
+                if(KonquestPlugin.withdrawPlayer(bukkitPlayer, total_cost)) {
+                	getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)total_cost);
+                }
+        	}
+			
+			// Condition destination location. Capital destinations have preserved look angles.
+			// Other destinations should use the player's current direction.
+			Location travelLocAng = travelLoc;
+			if(!destination.equals(TravelDestination.CAPITAL)) {
+				Location pLoc = bukkitPlayer.getLocation();
+				travelLocAng = new Location(travelLoc.getWorld(),travelLoc.getX(),travelLoc.getY(),travelLoc.getZ(),pLoc.getYaw(),pLoc.getPitch());
+			}
+			
+
+			// Wait for a warmup duration, then do stuff
+			// Cancel travel if player moves?
+			// 	- Players need a private flag: waiting for travel warmup
+			// 	- Player move listener needs to check this flag and optionally cancel it
+			// If player uses another travel command during warmup, cancel current warmup and begin a new one for new destination
+			
 			// Third, do stuff based on travel destination
         	switch (destination) {
         		case TOWN:
@@ -216,21 +239,18 @@ public class TravelCommand extends CommandBase {
 	    	    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TRAVEL_NOTICE_TOWN_TRAVEL.getMessage(bukkitPlayer.getName(),town.getName()));
 	    	    			}
 	    	    		}
-	            		Location pLoc = bukkitPlayer.getLocation();
-	            		Location tLoc = town.getSpawnLoc();
-	            		Location dest = new Location(tLoc.getWorld(),tLoc.getX(),tLoc.getY(),tLoc.getZ(),pLoc.getYaw(),pLoc.getPitch());
-	            		getKonquest().telePlayerLocation(bukkitPlayer, dest);
+	            		getKonquest().telePlayerLocation(bukkitPlayer, travelLocAng);
         			} else {
         				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
         			}
         			break;
         		case WILD:
-        			getKonquest().telePlayerLocation(bukkitPlayer, travelLoc);
+        			getKonquest().telePlayerLocation(bukkitPlayer, travelLocAng);
         			//ChatUtil.sendNotice((Player) getSender(), "Traveled to a random location in the Wild.");
         			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TRAVEL_NOTICE_WILD_TRAVEL.getMessage());
         			break;
         		default:
-        			getKonquest().telePlayerLocation(bukkitPlayer, travelLoc);
+        			getKonquest().telePlayerLocation(bukkitPlayer, travelLocAng);
         			break;
         	}
         }
