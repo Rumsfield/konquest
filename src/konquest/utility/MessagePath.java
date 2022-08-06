@@ -515,6 +515,7 @@ public enum MessagePath {
 	COMMAND_TRAVEL_ERROR_NO_CAMP                (0, "command.travel.error.no-camp"),
 	COMMAND_TRAVEL_ERROR_NO_TOWN                (0, "command.travel.error.no-town"),
 	COMMAND_TRAVEL_ERROR_COOLDOWN               (2, "command.travel.error.cooldown"),
+	COMMAND_TRAVEL_ERROR_CANCELED               (0, "command.travel.error.canceled"),
 	
 	QUICKSHOP_ERROR_ENEMY_CREATE                (0, "quickshop.error.enemy-create"),
 	QUICKSHOP_ERROR_ENEMY_USE                   (0, "quickshop.error.enemy-use"),

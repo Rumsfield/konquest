@@ -988,8 +988,20 @@ public class PlayerListener implements Listener{
     
     // Returns false when parent event should be cancelled
     private boolean onPlayerEnterLeaveChunk(Location moveTo, Location moveFrom, Player movePlayer) {
-    	// Evaluate chunk territory transitions only when players move between chunks
+    	// Evaluate player movement when they cross between blocks
+    	if(!moveTo.getBlock().equals(moveFrom.getBlock()) || !moveTo.getWorld().equals(moveFrom.getWorld())) {
+    		// Player moved to a new block
+    		// Try to cancel any travel warmup
+    		boolean doCancelTravelOnMove = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.travel_cancel_on_move", false);
+    		if(doCancelTravelOnMove) {
+    			boolean status = konquest.getTravelManager().cancelTravel(movePlayer);
+    			if(status) {
+    				ChatUtil.sendError(movePlayer, MessagePath.COMMAND_TRAVEL_ERROR_CANCELED.getMessage());
+    			}
+    		}
+    	}
     	
+    	// Evaluate chunk territory transitions only when players move between chunks
     	// Check if player moved between chunks or worlds
     	if(!moveTo.getChunk().equals(moveFrom.getChunk()) || !moveTo.getWorld().equals(moveFrom.getWorld())) {
     		

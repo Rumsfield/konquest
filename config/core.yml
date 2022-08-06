@@ -105,6 +105,7 @@ core:
     raid_alert_cooldown: 30
     travel_cooldown: 120
     travel_warmup: 3
+    travel_cancel_on_move: true
     enable_upgrades: true
     enable_armor: true
     enable_shields: true

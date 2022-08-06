@@ -6,29 +6,23 @@ import java.util.List;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.manager.TravelManager.TravelDestination;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonStatsType;
+import konquest.model.KonTerritory;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 public class TravelCommand extends CommandBase {
-
-	public enum TravelDestination {
-		CAPITAL,
-		CAMP,
-		HOME,
-		TOWN,
-		WILD;
-	}
 	
 	public TravelCommand(Konquest konquest, CommandSender sender, String[] args) {
         super(konquest, sender, args);
@@ -71,7 +65,8 @@ public class TravelCommand extends CommandBase {
         	String travelName = getArgs()[1];
         	Location travelLoc;
         	TravelDestination destination;
-        	KonTown town = null;
+        	KonTerritory travelTerritory = null;
+        	
         	if(travelName.equalsIgnoreCase("capital")) {
         		// Travel to capital
         		if(player.isBarbarian()) {
@@ -150,7 +145,11 @@ public class TravelCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(travelName));
                     return;
         		}
-        		town = player.getKingdom().getTown(travelName);
+        		KonTown town = player.getKingdom().getTown(travelName);
+        		if(town == null) {
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+        			return;
+        		}
         		if(town.isPlayerTravelDisabled(bukkitPlayer.getUniqueId())) {
         			String cooldown = town.getPlayerTravelCooldownString(bukkitPlayer.getUniqueId());
         			//ChatUtil.sendError((Player) getSender(), "You must wait "+cooldown+" before traveling to "+town.getName());
@@ -161,6 +160,7 @@ public class TravelCommand extends CommandBase {
         		if(isTownTravel) {
         			travelLoc = town.getSpawnLoc();
             		destination = TravelDestination.TOWN;
+            		travelTerritory = town;
         		} else {
             		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
                     return;
@@ -213,7 +213,6 @@ public class TravelCommand extends CommandBase {
 				Location pLoc = bukkitPlayer.getLocation();
 				travelLocAng = new Location(travelLoc.getWorld(),travelLoc.getX(),travelLoc.getY(),travelLoc.getZ(),pLoc.getYaw(),pLoc.getPitch());
 			}
-			
 
 			// Wait for a warmup duration, then do stuff
 			// Cancel travel if player moves?
@@ -221,38 +220,15 @@ public class TravelCommand extends CommandBase {
 			// 	- Player move listener needs to check this flag and optionally cancel it
 			// If player uses another travel command during warmup, cancel current warmup and begin a new one for new destination
 			
-			// Third, do stuff based on travel destination
-        	switch (destination) {
-        		case TOWN:
-        			if(town != null) {
-	        			town.addPlayerTravelCooldown(bukkitPlayer.getUniqueId());
-	            		// Give raid defender reward
-	            		if(town.isAttacked() && town.addDefender(bukkitPlayer)) {
-	            			ChatUtil.printDebug("Raid defense rewarded to player "+player.getBukkitPlayer().getName());
-	            			int defendReward = getKonquest().getConfigManager().getConfig("core").getInt("core.favor.rewards.defend_raid");
-	        	            KonquestPlugin.depositPlayer(player.getBukkitPlayer(), defendReward);
-	            		}
-	            		//TODO this might get spammy
-	            		for(OfflinePlayer resident : town.getPlayerResidents()) {
-	    	    			if(resident.isOnline() && (town.isPlayerLord(resident) || town.isPlayerKnight(resident))) {
-	    	    				//ChatUtil.sendNotice((Player) resident, bukkitPlayer.getName()+" has traveled to "+town.getName());
-	    	    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TRAVEL_NOTICE_TOWN_TRAVEL.getMessage(bukkitPlayer.getName(),town.getName()));
-	    	    			}
-	    	    		}
-	            		getKonquest().telePlayerLocation(bukkitPlayer, travelLocAng);
-        			} else {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-        			}
-        			break;
-        		case WILD:
-        			getKonquest().telePlayerLocation(bukkitPlayer, travelLocAng);
-        			//ChatUtil.sendNotice((Player) getSender(), "Traveled to a random location in the Wild.");
-        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TRAVEL_NOTICE_WILD_TRAVEL.getMessage());
-        			break;
-        		default:
-        			getKonquest().telePlayerLocation(bukkitPlayer, travelLocAng);
-        			break;
-        	}
+			int travelWarmup = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.travel_warmup",0);
+			travelWarmup = (travelWarmup < 0) ? 0 : travelWarmup;
+			if(travelWarmup > 0) {
+				String warmupTimeFormat = Konquest.getTimeFormat(travelWarmup, ChatColor.AQUA);
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TRAVEL_NOTICE_WARMUP.getMessage(warmupTimeFormat));
+			}
+			
+			getKonquest().getTravelManager().submitTravel(bukkitPlayer, destination, travelTerritory, travelLocAng, travelWarmup);
+			
         }
 	}
 	

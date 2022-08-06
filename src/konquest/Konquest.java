@@ -49,6 +49,7 @@ import konquest.manager.PlayerManager;
 import konquest.manager.PlotManager;
 import konquest.manager.RuinManager;
 import konquest.manager.ShieldManager;
+import konquest.manager.TravelManager;
 import konquest.manager.UpgradeManager;
 import konquest.map.MapHandler;
 import konquest.model.KonCamp;
@@ -116,6 +117,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	private PlaceholderManager placeholderManager;
 	private PlotManager plotManager;
 	private GuildManager guildManager;
+	private TravelManager travelManager;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
@@ -169,6 +171,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		placeholderManager = new PlaceholderManager(this);
 		plotManager = new PlotManager(this);
 		guildManager = new GuildManager(this);
+		travelManager = new TravelManager(this);
 		
 		versionHandler = null;
 		
@@ -665,6 +668,10 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public GuildManager getGuildManager() {
 		return guildManager;
+	}
+	
+	public TravelManager getTravelManager() {
+		return travelManager;
 	}
 	
 	public long getOfflineTimeoutSeconds() {
