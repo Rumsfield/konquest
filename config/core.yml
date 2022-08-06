@@ -167,6 +167,7 @@ core:
     clan_enable: false
     clan_allow_containers: false
     clan_allow_edit_offline: false
+    enemy_glow: true
   monuments:
     critical_block: OBSIDIAN
     destroy_amount: 12

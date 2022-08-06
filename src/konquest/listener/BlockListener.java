@@ -365,6 +365,10 @@ public class BlockListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
+					/* This camp can be attacked... */
+					
+					// Make the enemy glow
+					camp.applyGlow(event.getPlayer());
 					
 					// Remove the camp if a bed is broken within it
 					if(event.getBlock().getBlockData() instanceof Bed) {
