@@ -7,6 +7,7 @@ import java.util.List;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.manager.TravelManager.TravelDestination;
+import konquest.model.KonCamp;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonStatsType;
@@ -15,7 +16,6 @@ import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -78,6 +78,7 @@ public class TravelCommand extends CommandBase {
         		if(isCapitalTravel) {
         			travelLoc = player.getKingdom().getCapital().getSpawnLoc();
             		destination = TravelDestination.CAPITAL;
+            		travelTerritory = player.getKingdom().getCapital();
         		} else {
             		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
                     return;
@@ -96,8 +97,10 @@ public class TravelCommand extends CommandBase {
         		}
         		boolean isCampTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.camp",false);
         		if(isCampTravel) {
-        			travelLoc = getKonquest().getCampManager().getCamp((KonOfflinePlayer)player).getSpawnLoc();
+        			KonCamp travelCamp = getKonquest().getCampManager().getCamp((KonOfflinePlayer)player);
+        			travelLoc = travelCamp.getSpawnLoc();
             		destination = TravelDestination.CAMP;
+            		travelTerritory = travelCamp;
         		} else {
             		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
                     return;
@@ -223,8 +226,8 @@ public class TravelCommand extends CommandBase {
 			int travelWarmup = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.travel_warmup",0);
 			travelWarmup = (travelWarmup < 0) ? 0 : travelWarmup;
 			if(travelWarmup > 0) {
-				String warmupTimeFormat = Konquest.getTimeFormat(travelWarmup, ChatColor.AQUA);
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TRAVEL_NOTICE_WARMUP.getMessage(warmupTimeFormat));
+				String warmupTimeStr = ""+travelWarmup;
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TRAVEL_NOTICE_WARMUP.getMessage(warmupTimeStr));
 			}
 			
 			getKonquest().getTravelManager().submitTravel(bukkitPlayer, destination, travelTerritory, travelLocAng, travelWarmup);

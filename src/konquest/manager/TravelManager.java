@@ -48,7 +48,8 @@ public class TravelManager implements Timeable {
 			// There is a warmup time, queue the travel
 			Date now = new Date();
 			long warmupFinishTime = now.getTime() + (warmupSeconds*1000);
-			travelers.put(bukkitPlayer, new TravelPlan(destination, territory, travelLoc, warmupFinishTime));
+			travelers.put(bukkitPlayer, new TravelPlan(bukkitPlayer, destination, territory, travelLoc, warmupFinishTime));
+			ChatUtil.printDebug("Submitted new travel plan for "+bukkitPlayer.getName()+": now "+now.getTime()+" to "+warmupFinishTime+", size "+travelers.size());
 		} else {
 			// There is no warmup time, do the travel now
 			executeTravel(bukkitPlayer, destination, territory, travelLoc);
@@ -58,6 +59,7 @@ public class TravelManager implements Timeable {
 	// Returns true when the player's travel was successfully canceled
 	public boolean cancelTravel(Player bukkitPlayer) {
 		boolean result = false;
+		//TODO: Check that the traveler is not currently executing any teleportation
 		if(travelers.containsKey(bukkitPlayer)) {
 			travelers.remove(bukkitPlayer);
 			result = true;
@@ -67,6 +69,8 @@ public class TravelManager implements Timeable {
 	
 	private void executeTravel(Player bukkitPlayer, TravelDestination destination, KonTerritory territory, Location travelLoc) {
 		// Do special things depending on the destination type
+		String territoryName = territory == null ? "null" : territory.getName();
+		ChatUtil.printDebug("Executing travel for "+bukkitPlayer.getName()+" to "+destination.toString()+" "+territoryName);
 		switch (destination) {
 			case TOWN:
 				if(territory != null && territory instanceof KonTown) {
@@ -103,16 +107,23 @@ public class TravelManager implements Timeable {
 		} else if(taskID == travelExecutor.getTaskID()) {
 			// Evaluate all travelers for expired warmup times, and execute travel for them
 			ArrayList<Player> expiredTravelers = new ArrayList<Player>();
+			ArrayList<TravelPlan> expiredPlans = new ArrayList<TravelPlan>();
 			for(Player traveler : travelers.keySet()) {
-				if(new Date(travelers.get(traveler).getWarmupEndTime()).after(new Date())) {
+				Date now = new Date();
+				if(now.after(new Date(travelers.get(traveler).getWarmupEndTime()))) {
+					ChatUtil.printDebug("Found ready traveler "+traveler.getName()+", "+now.getTime()+" is after "+travelers.get(traveler).getWarmupEndTime());
 					// Warmup has expired for this traveler
-					executeTravel(traveler, travelers.get(traveler).getDestination(), travelers.get(traveler).getTerritory(), travelers.get(traveler).getLocation());
 					expiredTravelers.add(traveler);
+					expiredPlans.add(travelers.get(traveler));
 				}
 			}
 			// Remove travelers from the map
 			for(Player traveler : expiredTravelers) {
 				travelers.remove(traveler);
+			}
+			// Execute travel plans
+			for(TravelPlan plan : expiredPlans) {
+				executeTravel(plan.getTraveler(), plan.getDestination(), plan.getTerritory(), plan.getLocation());
 			}
 		}
 	}
