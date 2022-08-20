@@ -251,6 +251,55 @@ public class KingdomManager implements KonquestKingdomManager {
 		return 0;
 	}
 	
+	// See interface for method description
+	public int assignOfflinePlayerKingdom(KonquestOfflinePlayer offlinePlayerArg, String kingdomName, boolean force) {
+		if(!isKingdom(kingdomName)) {
+			return 1;
+		}
+		if(!(offlinePlayerArg instanceof KonOfflinePlayer)) {
+			return -1;
+		}
+		KonOfflinePlayer offlinePlayer = (KonOfflinePlayer)offlinePlayerArg;
+		
+		int config_max_player_diff = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.max_player_diff");
+		int smallestKingdomPlayerCount = 0;
+		int targetKingdomPlayerCount = 0;
+		if(config_max_player_diff != 0) {
+			// Find smallest kingdom, compare player count to this kingdom's
+			String smallestKingdomName = getSmallestKingdomName();
+			smallestKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(smallestKingdomName).size();
+			targetKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(kingdomName).size();
+		}
+		
+		// Join kingdom is max_player_diff is disabled, or if the desired kingdom is within the max diff
+		if(config_max_player_diff == 0 || force ||
+				(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
+			KonKingdom assignedKingdom = getKingdom(kingdomName);
+			// Remove player from any enemy towns
+			for(KonKingdom kingdom : kingdomMap.values()) {
+				if(!kingdom.equals(assignedKingdom)) {
+					for(KonTown town : kingdom.getTowns()) {
+			    		if(town.removePlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
+			    			konquest.getMapHandler().drawDynmapLabel(town);
+			    		}
+			    	}
+				}
+			}
+			// Remove any barbarian camps
+			konquest.getCampManager().removeCamp(offlinePlayer);
+			// Set kingdom
+			offlinePlayer.setKingdom(getKingdom(kingdomName));
+			offlinePlayer.setBarbarian(false);
+	    	// Updates
+	    	konquest.getMapHandler().drawDynmapLabel(getKingdom(kingdomName).getCapital());
+	    	konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
+	    	updateSmallestKingdom();
+		} else {
+			return 2;
+		}
+		return 0;
+	}
+	
 	/**
 	 * Exiles a player to the Barbarians and teleports to a random Wild location.
 	 * Sets their exileKingdom value to their current Kingdom.

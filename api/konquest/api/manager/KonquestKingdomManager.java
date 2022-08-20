@@ -69,6 +69,21 @@ public interface KonquestKingdomManager {
 	public int assignPlayerKingdom(KonquestPlayer player, String kingdomName, boolean force);
 	
 	/**
+	 * Assign an offline player to a kingdom.
+	 * Optionally enforces maximum kingdom membership difference based on Konquest configuration.
+	 * 
+	 * @param offlinePlayer The offline player to assign
+	 * @param kingdomName The kingdom name, case-sensitive
+	 * @param force Ignore max membership limits when true
+	 * @return status
+	 * 				<br>0 - success
+	 *  			<br>1 - kingdom name does not exist
+	 *  			<br>2 - the kingdom is full (config option max_player_diff)
+	 *             <br>-1 - internal error
+	 */
+	public int assignOfflinePlayerKingdom(KonquestOfflinePlayer offlinePlayer, String kingdomName, boolean force);
+	
+	/**
 	 * Exiles a player to the Barbarians and teleports to a random Wild location.
 	 * Sets their exileKingdom value to their current Kingdom.
 	 * Removes all stats and disables prefix.
