@@ -133,7 +133,7 @@ public class KingdomManager implements KonquestKingdomManager {
 			KonKingdom kingdom = kingdomMap.get(name);
 			// Exile all members
 			for(KonPlayer member : konquest.getPlayerManager().getPlayersInKingdom(kingdom)) {
-				exilePlayer(member,false,false);
+				exilePlayer(member,false,false,true);
 			}
 			// Remove all towns
 			for(KonTown town : kingdom.getTowns()) {
@@ -258,7 +258,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	 * @param player
 	 * @return true if not already barbarian and the teleport was successful, else false.
 	 */
-	public boolean exilePlayer(KonquestPlayer playerArg, boolean teleport, boolean clearStats) {
+	public boolean exilePlayer(KonquestPlayer playerArg, boolean teleport, boolean clearStats, boolean isFull) {
 		if(!(playerArg instanceof KonPlayer)) {
 			return false;
 		}
@@ -300,7 +300,11 @@ public class KingdomManager implements KonquestKingdomManager {
 	    		ChatUtil.printDebug("Could not teleport player "+player.getBukkitPlayer().getName()+" on exile, disabled or null location.");
 	    	}
     	}
-    	player.setExileKingdom(oldKingdom);
+    	if(isFull) {
+    		player.setExileKingdom(getBarbarians());
+		} else {
+			player.setExileKingdom(oldKingdom);
+		}
     	// Remove guild
     	konquest.getGuildManager().removePlayerGuild(player.getOfflineBukkitPlayer());
     	//boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
@@ -336,22 +340,26 @@ public class KingdomManager implements KonquestKingdomManager {
     	return true;
 	}
 	
-	public void exileOfflinePlayer(KonquestOfflinePlayer offlinePlayerArg) {
+	public boolean exileOfflinePlayer(KonquestOfflinePlayer offlinePlayerArg, boolean isFull) {
 		if(!(offlinePlayerArg instanceof KonOfflinePlayer)) {
-			return;
+			return false;
 		}
 		KonOfflinePlayer offlinePlayer = (KonOfflinePlayer)offlinePlayerArg;
 		if(offlinePlayer.isBarbarian()) {
-    		return;
+    		return false;
     	}
     	KonKingdom oldKingdom = offlinePlayer.getKingdom();
     	// Fire event
     	KonquestPlayerExileEvent invokeEvent = new KonquestPlayerExileEvent(konquest, offlinePlayer, oldKingdom);
 		Konquest.callKonquestEvent(invokeEvent);
 		if(invokeEvent.isCancelled()) {
-			return;
+			return false;
 		}
-    	offlinePlayer.setExileKingdom(oldKingdom);
+		if(isFull) {
+			offlinePlayer.setExileKingdom(getBarbarians());
+		} else {
+			offlinePlayer.setExileKingdom(oldKingdom);
+		}
     	// Remove guild
     	konquest.getGuildManager().removePlayerGuild(offlinePlayer.getOfflineBukkitPlayer());
     	// Remove residency
@@ -366,7 +374,7 @@ public class KingdomManager implements KonquestKingdomManager {
     	// Update stuff
     	konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
     	updateSmallestKingdom();
-    	return;
+    	return true;
 	}
 	
 	/**

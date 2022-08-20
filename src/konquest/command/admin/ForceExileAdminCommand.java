@@ -3,6 +3,7 @@ package konquest.command.admin;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.command.CommandBase;
+import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -28,35 +30,56 @@ public class ForceExileAdminCommand extends CommandBase {
             return;
         } else {
         	String playerName = getArgs()[2];
-        	KonPlayer player = getKonquest().getPlayerManager().getPlayerFromName(playerName);
-
-        	if(player == null) {
-        		//ChatUtil.sendError((Player) getSender(), "No such player");
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
-        		return;
-        	}
-        	if(getKonquest().getKingdomManager().exilePlayer(player,true,true)) {
-        		boolean doRemoveFavor = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.remove_favor", true);
-    			if(doRemoveFavor) {
-        			double balance = KonquestPlugin.getBalance(player.getBukkitPlayer());
-    	            KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), balance);
-    			}
-        		//ChatUtil.sendNotice(player.getBukkitPlayer(), "You have been exiled as a "+ChatColor.DARK_RED+"Barbarian");
-        		ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_CONFIRMED.getMessage());
-        		//ChatUtil.sendNotice((Player) getSender(), "Successfully exiled player "+playerName+" to Barbarians");
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEEXILE_NOTICE_PLAYER.getMessage(playerName));
-        	} else {
-        		//ChatUtil.sendError((Player) getSender(), "Could not exile player, already barbarian or bad random wild location.");
-        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEEXILE_ERROR_FAIL.getMessage());
-        		return;
-        	}
         	
+        	boolean doRemoveFavor = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.remove_favor", true);
+        	boolean doFullExile = false;
         	if(getArgs().length == 4 && getArgs()[3].equalsIgnoreCase("full")) {
-        		player.setExileKingdom(getKonquest().getKingdomManager().getBarbarians());
-        		//ChatUtil.sendNotice((Player) getSender(), "Successfully reset Exile Kingdom to Barbarians");
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEEXILE_NOTICE_FULL.getMessage(playerName));
+        		doFullExile = true;
+        		
         	}
         	
+        	// Allow for exile of either online or offline player
+        	// First, attempt to find online player
+        	KonPlayer player = getKonquest().getPlayerManager().getPlayerFromName(playerName);
+        	if(player == null) {
+        		// No online player was found, attempt to find an offline player
+        		KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
+        		if(offlinePlayer == null) {
+            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
+            		return;
+            	} else {
+            		// Found offline player, exile them
+            		if(getKonquest().getKingdomManager().exileOfflinePlayer(offlinePlayer,doFullExile)) {
+            			if(doRemoveFavor) {
+                			double balance = KonquestPlugin.getBalance(offlinePlayer.getOfflineBukkitPlayer());
+            	            KonquestPlugin.withdrawPlayer(offlinePlayer.getOfflineBukkitPlayer(), balance, true);
+            			}
+            			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEEXILE_NOTICE_PLAYER.getMessage(playerName));
+            			if(doFullExile) {
+                			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEEXILE_NOTICE_FULL.getMessage(playerName));
+                		}
+            		} else {
+            			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEEXILE_ERROR_FAIL.getMessage());
+                		return;
+            		}
+            	}
+        	} else {
+        		// Found online player, exile them
+        		if(getKonquest().getKingdomManager().exilePlayer(player,true,true,doFullExile)) {
+        			if(doRemoveFavor) {
+            			double balance = KonquestPlugin.getBalance(player.getBukkitPlayer());
+        	            KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), balance, true);
+        			}
+            		ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_CONFIRMED.getMessage());
+            		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEEXILE_NOTICE_PLAYER.getMessage(playerName));
+            		if(doFullExile) {
+            			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEEXILE_NOTICE_FULL.getMessage(playerName));
+            		}
+            	} else {
+            		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEEXILE_ERROR_FAIL.getMessage());
+            		return;
+            	}
+        	}
         }
     }
     
@@ -68,8 +91,8 @@ public class ForceExileAdminCommand extends CommandBase {
 		
 		if(getArgs().length == 3) {
 			List<String> playerList = new ArrayList<>();
-			for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
-				playerList.add(player.getBukkitPlayer().getName());
+			for(OfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllOfflinePlayers()) {
+				playerList.add(offlinePlayer.getName());
 			}
 			tabList.addAll(playerList);
 			// Trim down completion options based on current input

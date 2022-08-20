@@ -81,7 +81,7 @@ public class ExileCommand extends CommandBase {
         			
         		} else {
         			// Exile the player
-        			if(getKonquest().getKingdomManager().exilePlayer(player,true,true)) {
+        			if(getKonquest().getKingdomManager().exilePlayer(player,true,true,false)) {
             			boolean doRemoveFavor = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.remove_favor", true);
             			if(doRemoveFavor) {
 	            			double balance = KonquestPlugin.getBalance(bukkitPlayer);

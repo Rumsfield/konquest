@@ -76,17 +76,20 @@ public interface KonquestKingdomManager {
 	 * @param player The player to exile
 	 * @param teleport Teleport the player based on Konquest configuration when true
 	 * @param clearStats Remove all player stats and prefix when true
+	 * @param isFull Perform a full exile such that the player has no exile kingdom, like they just joined the server
 	 * @return True when the player was successfully exiled, else false
 	 */
-	public boolean exilePlayer(KonquestPlayer player, boolean teleport, boolean clearStats);
+	public boolean exilePlayer(KonquestPlayer player, boolean teleport, boolean clearStats, boolean isFull);
 	
 	/**
 	 * Forcibly exiles an offline player by updating their database information.
 	 * The next time they log on, they will be a barbarian.
 	 * 
 	 * @param offlinePlayer The player to exile
+	 * @param isFull Perform a full exile such that the player has no exile kingdom, like they just joined the server
+	 * @return True when the player was successfully exiled, else false
 	 */
-	public void exileOfflinePlayer(KonquestOfflinePlayer offlinePlayer);
+	public boolean exileOfflinePlayer(KonquestOfflinePlayer offlinePlayer, boolean isFull);
 	
 	/**
 	 * Create a new town centered at the given location, with the given name, for the given kingdom name.

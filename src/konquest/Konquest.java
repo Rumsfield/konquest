@@ -803,7 +803,7 @@ public class Konquest implements KonquestAPI, Timeable {
 						boolean doExile = configManager.getConfig("core").getBoolean("core.kingdoms.offline_timeout_exile",false);
 						if(!player.isBarbarian()) {
 							if(doExile) {
-								getKingdomManager().exileOfflinePlayer(player);
+								getKingdomManager().exileOfflinePlayer(player,true);
 							} else {
 								for(KonTown town : player.getKingdom().getTowns()) {
 									if(town.getPlayerResidents().contains(player.getOfflineBukkitPlayer())) {
