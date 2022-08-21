@@ -64,12 +64,46 @@ public class CampManager implements KonquestCampManager {
 	
 	public KonCamp getCamp(KonquestOfflinePlayer player) {
 		String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
+		return getCamp(uuid);
+	}
+	
+	public KonCamp getCamp(String uuid) {
 		return barbarianCamps.get(uuid);
+	}
+	
+	public KonCamp getCampFromName(String name) {
+		KonCamp result = null;
+		for(KonCamp camp : barbarianCamps.values()) {
+			if(camp.getName().equalsIgnoreCase(name)) {
+				result = camp;
+				break;
+			}
+		}
+		return result;
 	}
 	
 	public ArrayList<KonCamp> getCamps() {
 		ArrayList<KonCamp> camps = new ArrayList<KonCamp>(barbarianCamps.values());
 		return camps;
+	}
+	
+	public ArrayList<String> getCampNames() {
+		ArrayList<String> campNames = new ArrayList<String>();
+		for(KonCamp camp : barbarianCamps.values()) {
+			campNames.add(camp.getName());
+		}
+		return campNames;
+	}
+	
+	public boolean isCampName(String name) {
+		boolean result = false;
+		for(KonCamp camp : barbarianCamps.values()) {
+			if(camp.getName().equalsIgnoreCase(name)) {
+				result = true;
+				break;
+			}
+		}
+		return result;
 	}
 	
 	/**
