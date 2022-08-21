@@ -234,10 +234,11 @@ public class KonquestPlugin extends JavaPlugin {
 			//ChatUtil.printDebug("Applying discount of "+discount+"%");
 			double amountOff = amount * ((double)discount / 100);
 			amountMod = amount - amountOff;
-			//String amountF = String.format("%.2f",amountOff);
-			String amountF = econ.format(amountOff);
-			if(isOnlinePlayer) {
-				ChatUtil.sendNotice((Player)offlineBukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(discount,amountF), ChatColor.DARK_AQUA);
+			if(amountOff > 0) {
+				String amountF = econ.format(amountOff);
+				if(isOnlinePlayer) {
+					ChatUtil.sendNotice((Player)offlineBukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(discount,amountF), ChatColor.DARK_AQUA);
+				}
 			}
 		} else if(discount != 0) {
 			ChatUtil.printDebug("Failed to apply invalid discount of "+discount+"%");
