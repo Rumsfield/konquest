@@ -10,7 +10,6 @@ import konquest.manager.TravelManager.TravelDestination;
 import konquest.model.KonCamp;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
-import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
@@ -202,11 +201,9 @@ public class TravelCommand extends CommandBase {
 				}
 			}
 			if(isTravelAlwaysAllowed && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
+				// Override cost to 0 to allow the player to travel, when they don't have enough money.
         		//ChatUtil.sendNotice((Player) getSender(), "Not enough Favor, this one's on us.");
-        	} else {
-                if(KonquestPlugin.withdrawPlayer(bukkitPlayer, total_cost)) {
-                	getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)total_cost);
-                }
+				total_cost = 0;
         	}
 			
 			// Condition destination location. Capital destinations have preserved look angles.
@@ -223,14 +220,14 @@ public class TravelCommand extends CommandBase {
 			// 	- Player move listener needs to check this flag and optionally cancel it
 			// If player uses another travel command during warmup, cancel current warmup and begin a new one for new destination
 			
-			int travelWarmup = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.travel_warmup",0);
+			int travelWarmup = getKonquest().getConfigManager().getConfig("core").getInt("core.travel.warmup",0);
 			travelWarmup = (travelWarmup < 0) ? 0 : travelWarmup;
 			if(travelWarmup > 0) {
 				String warmupTimeStr = ""+travelWarmup;
 				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TRAVEL_NOTICE_WARMUP.getMessage(warmupTimeStr));
 			}
 			
-			getKonquest().getTravelManager().submitTravel(bukkitPlayer, destination, travelTerritory, travelLocAng, travelWarmup);
+			getKonquest().getTravelManager().submitTravel(bukkitPlayer, destination, travelTerritory, travelLocAng, travelWarmup, total_cost);
 			
         }
 	}

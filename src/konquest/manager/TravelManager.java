@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
+import konquest.model.KonPlayer;
+import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
@@ -42,17 +44,17 @@ public class TravelManager implements Timeable {
 		
 	}
 	
-	public void submitTravel(Player bukkitPlayer, TravelDestination destination, KonTerritory territory, Location travelLoc, int warmupSeconds) {
+	public void submitTravel(Player bukkitPlayer, TravelDestination destination, KonTerritory territory, Location travelLoc, int warmupSeconds, double cost) {
 		// determine warmup end time
 		if(warmupSeconds > 0) {
 			// There is a warmup time, queue the travel
 			Date now = new Date();
 			long warmupFinishTime = now.getTime() + (warmupSeconds*1000);
-			travelers.put(bukkitPlayer, new TravelPlan(bukkitPlayer, destination, territory, travelLoc, warmupFinishTime));
+			travelers.put(bukkitPlayer, new TravelPlan(bukkitPlayer, destination, territory, travelLoc, warmupFinishTime, cost));
 			ChatUtil.printDebug("Submitted new travel plan for "+bukkitPlayer.getName()+": now "+now.getTime()+" to "+warmupFinishTime+", size "+travelers.size());
 		} else {
 			// There is no warmup time, do the travel now
-			executeTravel(bukkitPlayer, destination, territory, travelLoc);
+			executeTravel(bukkitPlayer, destination, territory, travelLoc, cost);
 		}
 	}
 	
@@ -67,7 +69,7 @@ public class TravelManager implements Timeable {
 		return result;
 	}
 	
-	private void executeTravel(Player bukkitPlayer, TravelDestination destination, KonTerritory territory, Location travelLoc) {
+	private void executeTravel(Player bukkitPlayer, TravelDestination destination, KonTerritory territory, Location travelLoc, double cost) {
 		// Do special things depending on the destination type
 		String territoryName = territory == null ? "null" : territory.getName();
 		ChatUtil.printDebug("Executing travel for "+bukkitPlayer.getName()+" to "+destination.toString()+" "+territoryName);
@@ -84,7 +86,7 @@ public class TravelManager implements Timeable {
 		    		}
 		    		// Notify town officers of travel
 		    		for(OfflinePlayer resident : town.getPlayerResidents()) {
-		    			if(resident.isOnline() && (town.isPlayerLord(resident) || town.isPlayerKnight(resident))) {
+		    			if(resident.isOnline() && (town.isPlayerLord(resident) || town.isPlayerKnight(resident)) && !resident.getUniqueId().equals(bukkitPlayer.getUniqueId())) {
 		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TRAVEL_NOTICE_TOWN_TRAVEL.getMessage(bukkitPlayer.getName(),town.getName()));
 		    			}
 		    		}
@@ -97,6 +99,14 @@ public class TravelManager implements Timeable {
 				break;
 		}
 		konquest.telePlayerLocation(bukkitPlayer, travelLoc);
+		// Pay up
+		if(KonquestPlugin.withdrawPlayer(bukkitPlayer, cost)) {
+			// Successfully withdrew non-zero amount from player, update stats
+			KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+			if(player != null) {
+				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)cost);
+			}
+        }
 	}
 
 
@@ -123,7 +133,7 @@ public class TravelManager implements Timeable {
 			}
 			// Execute travel plans
 			for(TravelPlan plan : expiredPlans) {
-				executeTravel(plan.getTraveler(), plan.getDestination(), plan.getTerritory(), plan.getLocation());
+				executeTravel(plan.getTraveler(), plan.getDestination(), plan.getTerritory(), plan.getLocation(), plan.getCost());
 			}
 		}
 	}

@@ -992,7 +992,7 @@ public class PlayerListener implements Listener{
     	if(!moveTo.getBlock().equals(moveFrom.getBlock()) || !moveTo.getWorld().equals(moveFrom.getWorld())) {
     		// Player moved to a new block
     		// Try to cancel any travel warmup
-    		boolean doCancelTravelOnMove = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.travel_cancel_on_move", false);
+    		boolean doCancelTravelOnMove = konquest.getConfigManager().getConfig("core").getBoolean("core.travel.cancel_on_move", false);
     		if(doCancelTravelOnMove) {
     			boolean status = konquest.getTravelManager().cancelTravel(movePlayer);
     			if(status) {

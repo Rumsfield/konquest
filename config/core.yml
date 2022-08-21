@@ -62,6 +62,8 @@ core:
     wild_radius: 1000
     wild_center_x: 0
     wild_center_z: 0
+    warmup: 3
+    cancel_on_move: true
   kingdoms:
     capital_suffix: Capital
     capital_pvp: false
@@ -104,8 +106,6 @@ core:
     capture_cooldown: 600
     raid_alert_cooldown: 30
     travel_cooldown: 120
-    travel_warmup: 3
-    travel_cancel_on_move: true
     enable_upgrades: true
     enable_armor: true
     enable_shields: true
