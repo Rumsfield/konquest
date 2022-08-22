@@ -9,6 +9,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import konquest.Konquest;
 import konquest.api.model.KonquestTerritoryType;
@@ -86,9 +88,11 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 		return owner;
 	}
 	
+	/*
 	public void setOnlineOwner(Player player) {
 		owner = player;
 	}
+	*/
 	
 	public boolean isPlayerOwner(OfflinePlayer player) {
 		return player.getUniqueId().equals(owner.getUniqueId());
@@ -184,6 +188,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 		} else {
 			// Remove protection
 			isOfflineProtected = false;
+			protectedWarmupTimer.stopTimer();
 			protectedCountdownTimer.stopTimer();
 			campBarAll.setTitle(Konquest.barbarianColor+getName());
 		}
@@ -191,6 +196,14 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 	
 	public boolean isProtected() {
 		return isOfflineProtected;
+	}
+	
+	public void applyGlow(Player bukkitPlayer) {
+		boolean isGlowEnabled = getKonquest().getConfigManager().getConfig("core").getBoolean("core.camps.enemy_glow", true);
+		if(isGlowEnabled) {
+			bukkitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*5, 1));
+			//ChatUtil.printDebug("Applied glowing to "+bukkitPlayer.getName()+": "+bukkitPlayer.isGlowing());
+		}
 	}
 
 }

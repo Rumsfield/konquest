@@ -365,6 +365,12 @@ public class BlockListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
+					/* This camp can be attacked... */
+					
+					// Make the enemy glow
+					if(!camp.isPlayerOwner(event.getPlayer()) && !isMember) {
+						camp.applyGlow(event.getPlayer());
+					}
 					
 					// Remove the camp if a bed is broken within it
 					if(event.getBlock().getBlockData() instanceof Bed) {
@@ -376,7 +382,7 @@ public class BlockListener implements Listener {
 							event.setCancelled(true);
 							return;
 						}
-						campManager.removeCamp(camp.getOwner().getUniqueId().toString());
+						campManager.removeCamp(camp);
 						//ChatUtil.sendNotice(player.getBukkitPlayer(), "Destroyed "+camp.getName()+"!");
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY.getMessage(camp.getName()));
 						KonPlayer onlineOwner = playerManager.getPlayerFromName(camp.getOwner().getName());

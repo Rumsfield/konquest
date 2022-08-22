@@ -606,12 +606,14 @@ command:
     notice:
       town-travel: "%s has traveled to %s."
       wild-travel: "Traveled to a random location in the Wild."
+      warmup: "Travel starts in %s seconds."
     error:
       enemy-territory: "You can not travel within enemy territory!"
       no-home: "You do not have a home!"
       no-camp: "You do not have a camp!"
       no-town: "That town does not exist in your Kingdom."
       cooldown: "You must wait %s before traveling to %s."
+      canceled: "Your travel was canceled by movement."
 quickshop:
   error:
     enemy-create: "Cannot create a shop in enemy towns!"

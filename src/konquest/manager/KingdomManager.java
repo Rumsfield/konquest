@@ -41,8 +41,8 @@ import konquest.api.model.KonquestUpgrade;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestPlayer;
-import konquest.command.TravelCommand.TravelDestination;
 import konquest.display.OptionIcon.optionAction;
+import konquest.manager.TravelManager.TravelDestination;
 import konquest.model.KonBarDisplayer;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
@@ -133,7 +133,7 @@ public class KingdomManager implements KonquestKingdomManager {
 			KonKingdom kingdom = kingdomMap.get(name);
 			// Exile all members
 			for(KonPlayer member : konquest.getPlayerManager().getPlayersInKingdom(kingdom)) {
-				exilePlayer(member,false,false);
+				exilePlayer(member,false,false,true);
 			}
 			// Remove all towns
 			for(KonTown town : kingdom.getTowns()) {
@@ -251,6 +251,55 @@ public class KingdomManager implements KonquestKingdomManager {
 		return 0;
 	}
 	
+	// See interface for method description
+	public int assignOfflinePlayerKingdom(KonquestOfflinePlayer offlinePlayerArg, String kingdomName, boolean force) {
+		if(!isKingdom(kingdomName)) {
+			return 1;
+		}
+		if(!(offlinePlayerArg instanceof KonOfflinePlayer)) {
+			return -1;
+		}
+		KonOfflinePlayer offlinePlayer = (KonOfflinePlayer)offlinePlayerArg;
+		
+		int config_max_player_diff = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.max_player_diff");
+		int smallestKingdomPlayerCount = 0;
+		int targetKingdomPlayerCount = 0;
+		if(config_max_player_diff != 0) {
+			// Find smallest kingdom, compare player count to this kingdom's
+			String smallestKingdomName = getSmallestKingdomName();
+			smallestKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(smallestKingdomName).size();
+			targetKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(kingdomName).size();
+		}
+		
+		// Join kingdom is max_player_diff is disabled, or if the desired kingdom is within the max diff
+		if(config_max_player_diff == 0 || force ||
+				(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
+			KonKingdom assignedKingdom = getKingdom(kingdomName);
+			// Remove player from any enemy towns
+			for(KonKingdom kingdom : kingdomMap.values()) {
+				if(!kingdom.equals(assignedKingdom)) {
+					for(KonTown town : kingdom.getTowns()) {
+			    		if(town.removePlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
+			    			konquest.getMapHandler().drawDynmapLabel(town);
+			    		}
+			    	}
+				}
+			}
+			// Remove any barbarian camps
+			konquest.getCampManager().removeCamp(offlinePlayer);
+			// Set kingdom
+			offlinePlayer.setKingdom(getKingdom(kingdomName));
+			offlinePlayer.setBarbarian(false);
+	    	// Updates
+	    	konquest.getMapHandler().drawDynmapLabel(getKingdom(kingdomName).getCapital());
+	    	konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
+	    	updateSmallestKingdom();
+		} else {
+			return 2;
+		}
+		return 0;
+	}
+	
 	/**
 	 * Exiles a player to the Barbarians and teleports to a random Wild location.
 	 * Sets their exileKingdom value to their current Kingdom.
@@ -258,7 +307,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	 * @param player
 	 * @return true if not already barbarian and the teleport was successful, else false.
 	 */
-	public boolean exilePlayer(KonquestPlayer playerArg, boolean teleport, boolean clearStats) {
+	public boolean exilePlayer(KonquestPlayer playerArg, boolean teleport, boolean clearStats, boolean isFull) {
 		if(!(playerArg instanceof KonPlayer)) {
 			return false;
 		}
@@ -300,7 +349,11 @@ public class KingdomManager implements KonquestKingdomManager {
 	    		ChatUtil.printDebug("Could not teleport player "+player.getBukkitPlayer().getName()+" on exile, disabled or null location.");
 	    	}
     	}
-    	player.setExileKingdom(oldKingdom);
+    	if(isFull) {
+    		player.setExileKingdom(getBarbarians());
+		} else {
+			player.setExileKingdom(oldKingdom);
+		}
     	// Remove guild
     	konquest.getGuildManager().removePlayerGuild(player.getOfflineBukkitPlayer());
     	//boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean("core.exile.remove_stats", true);
@@ -336,22 +389,26 @@ public class KingdomManager implements KonquestKingdomManager {
     	return true;
 	}
 	
-	public void exileOfflinePlayer(KonquestOfflinePlayer offlinePlayerArg) {
+	public boolean exileOfflinePlayer(KonquestOfflinePlayer offlinePlayerArg, boolean isFull) {
 		if(!(offlinePlayerArg instanceof KonOfflinePlayer)) {
-			return;
+			return false;
 		}
 		KonOfflinePlayer offlinePlayer = (KonOfflinePlayer)offlinePlayerArg;
 		if(offlinePlayer.isBarbarian()) {
-    		return;
+    		return false;
     	}
     	KonKingdom oldKingdom = offlinePlayer.getKingdom();
     	// Fire event
     	KonquestPlayerExileEvent invokeEvent = new KonquestPlayerExileEvent(konquest, offlinePlayer, oldKingdom);
 		Konquest.callKonquestEvent(invokeEvent);
 		if(invokeEvent.isCancelled()) {
-			return;
+			return false;
 		}
-    	offlinePlayer.setExileKingdom(oldKingdom);
+		if(isFull) {
+			offlinePlayer.setExileKingdom(getBarbarians());
+		} else {
+			offlinePlayer.setExileKingdom(oldKingdom);
+		}
     	// Remove guild
     	konquest.getGuildManager().removePlayerGuild(offlinePlayer.getOfflineBukkitPlayer());
     	// Remove residency
@@ -366,7 +423,7 @@ public class KingdomManager implements KonquestKingdomManager {
     	// Update stuff
     	konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
     	updateSmallestKingdom();
-    	return;
+    	return true;
 	}
 	
 	/**

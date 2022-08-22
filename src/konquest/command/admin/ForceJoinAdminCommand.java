@@ -2,6 +2,7 @@ package konquest.command.admin;
 
 import konquest.Konquest;
 import konquest.command.CommandBase;
+import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -26,32 +28,46 @@ public class ForceJoinAdminCommand extends CommandBase {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         } else {
+        	int status = -1;
         	String playerName = getArgs()[2];
         	String kingdomName = getArgs()[3];
         	KonPlayer player = getKonquest().getPlayerManager().getPlayerFromName(playerName);
 
         	if(player == null) {
-        		//ChatUtil.sendError((Player) getSender(), "No such player");
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
-        		return;
+        		// No online player was found, attempt to find an offline player
+        		KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
+        		if(offlinePlayer == null) {
+            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
+            		return;
+            	} else {
+            		// Found offline player, force them to join a kingdom
+            		status = getKonquest().getKingdomManager().assignOfflinePlayerKingdom(offlinePlayer, kingdomName, true);
+            	}
+        	} else {
+        		// Found online player, force them to join a kingdom
+        		status = getKonquest().getKingdomManager().assignPlayerKingdom(player, kingdomName, true);
         	}
-        	if(!getKonquest().getKingdomManager().isKingdom(kingdomName)) {
-        		//ChatUtil.sendError((Player) getSender(), "No such kingdom");
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
-        		return;
-        	}
-        	int status = getKonquest().getKingdomManager().assignPlayerKingdom(player, kingdomName, true);
-        	if(status == 0) {
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEJOIN_NOTICE_SUCCESS.getMessage(playerName,kingdomName));
-			} else if(status == 2) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_LIMIT.getMessage(kingdomName));
-			} else if(status == 3) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage());
-			} else if(status == 4) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
-			} else {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-			}
+        	
+        	switch(status) {
+    		case 0:
+    			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCEJOIN_NOTICE_SUCCESS.getMessage(playerName,kingdomName));
+    			break;
+    		case 1:
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
+    			break;
+    		case 2:
+    			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_KINGDOM_LIMIT.getMessage(kingdomName));
+    			break;
+    		case 3:
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage());
+    			break;
+    		case 4:
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+    			break;
+    		default:
+    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			break;
+    		}
         }
     }
     
@@ -63,8 +79,8 @@ public class ForceJoinAdminCommand extends CommandBase {
 		
 		if(getArgs().length == 3) {
 			List<String> playerList = new ArrayList<>();
-			for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
-				playerList.add(player.getBukkitPlayer().getName());
+			for(OfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllOfflinePlayers()) {
+				playerList.add(offlinePlayer.getName());
 			}
 			tabList.addAll(playerList);
 			// Trim down completion options based on current input

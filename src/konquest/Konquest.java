@@ -49,6 +49,7 @@ import konquest.manager.PlayerManager;
 import konquest.manager.PlotManager;
 import konquest.manager.RuinManager;
 import konquest.manager.ShieldManager;
+import konquest.manager.TravelManager;
 import konquest.manager.UpgradeManager;
 import konquest.map.MapHandler;
 import konquest.model.KonCamp;
@@ -116,6 +117,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	private PlaceholderManager placeholderManager;
 	private PlotManager plotManager;
 	private GuildManager guildManager;
+	private TravelManager travelManager;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
@@ -169,6 +171,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		placeholderManager = new PlaceholderManager(this);
 		plotManager = new PlotManager(this);
 		guildManager = new GuildManager(this);
+		travelManager = new TravelManager(this);
 		
 		versionHandler = null;
 		
@@ -457,6 +460,7 @@ public class Konquest implements KonquestAPI, Timeable {
 			ChatUtil.printDebug("Failed to init a null player!");
 			return null;
 		}
+    	ChatUtil.printDebug("Initializing Konquest player "+bukkitPlayer.getName());
     	// Update all player's nametag color packets
     	boolean isPlayerNametagFormatEnabled = configManager.getConfig("core").getBoolean("core.player_nametag_format",false);
     	if(isPlayerNametagFormatEnabled) {
@@ -466,12 +470,15 @@ public class Konquest implements KonquestAPI, Timeable {
     	// Update offline protections
     	kingdomManager.updateKingdomOfflineProtection();
     	//if(player.isBarbarian()) {
+    	/*
     		KonCamp testCamp = campManager.getCamp(player);
     		if(testCamp != null) {
     			testCamp.setProtected(false);
     			testCamp.setOnlineOwner(bukkitPlayer);
     		}
+    	*/
     	//}
+    	campManager.deactivateCampProtection(player);
     	// Update player membership stats
     	kingdomManager.updatePlayerMembershipStats(player);
     	// Try to reset base health from legacy health upgrades
@@ -667,6 +674,10 @@ public class Konquest implements KonquestAPI, Timeable {
 		return guildManager;
 	}
 	
+	public TravelManager getTravelManager() {
+		return travelManager;
+	}
+	
 	public long getOfflineTimeoutSeconds() {
 		return offlineTimeoutSeconds;
 	}
@@ -796,7 +807,7 @@ public class Konquest implements KonquestAPI, Timeable {
 						boolean doExile = configManager.getConfig("core").getBoolean("core.kingdoms.offline_timeout_exile",false);
 						if(!player.isBarbarian()) {
 							if(doExile) {
-								getKingdomManager().exileOfflinePlayer(player);
+								getKingdomManager().exileOfflinePlayer(player,true);
 							} else {
 								for(KonTown town : player.getKingdom().getTowns()) {
 									if(town.getPlayerResidents().contains(player.getOfflineBukkitPlayer())) {
@@ -1266,6 +1277,7 @@ public class Konquest implements KonquestAPI, Timeable {
     	if(travelLocation.getWorld().isChunkLoaded(locPoint.x,locPoint.y)) {
     		ChatUtil.printDebug("Teleporting player "+player.getName()+" to loaded chunk");
     		player.teleport(destination,TeleportCause.PLUGIN);
+    		playTravelSound(player);
     	} else {
     		teleportLocationQueue.put(player,destination);
     		ChatUtil.printDebug("Queueing player "+player.getName()+" for unloaded chunk destination");
@@ -1298,6 +1310,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	    		if(qPoint.equals(cPoint) && chunk.getWorld().equals(qLoc.getWorld())) {
 	    			//Location destination = new Location(qLoc.getWorld(),qLoc.getBlockX()+0.5,qLoc.getBlockY()+1.0,qLoc.getBlockZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
 	    			qPlayer.teleport(qLoc,TeleportCause.PLUGIN);
+	    			playTravelSound(qPlayer);
 	    			ChatUtil.printDebug("Teleporting chunk queued player "+qPlayer.getName());
 	    			teleportLocationQueue.remove(qPlayer);
 	    		}
@@ -1408,18 +1421,67 @@ public class Konquest implements KonquestAPI, Timeable {
     public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory) {
     	ChatColor result = ChatColor.RED;
     	boolean isArmistice = false;
-    	if(contextTerritory instanceof KonTown) {
-    		isArmistice = guildManager.isArmistice(displayPlayer, (KonTown)contextTerritory);
-    	}
-    	if(displayPlayer.getKingdom().equals(contextTerritory.getKingdom())) {
-			result = friendColor1;
-		} else {
-			if(isArmistice) {
-				result = armisticeColor1;
-			} else {
-				result = enemyColor1;
+    	
+    	// Players see their own territory as green.
+    	// Camps are barb color to all (except owner see camp as green)
+    	// Neutrals are neutral color to all
+    	// enemy kingdoms are enemy color, except if armistice, then armistice color
+    	
+    	KonquestTerritoryType territorytype = contextTerritory.getTerritoryType();
+    	
+    	switch(territorytype) {
+		case WILD:
+			result = ChatColor.WHITE;
+			break;
+		case CAPITAL:
+			if(contextTerritory instanceof KonCapital) {
+				KonCapital capital = (KonCapital)contextTerritory;
+				if(displayPlayer.getKingdom().equals(capital.getKingdom())) {
+	    			result = friendColor1;
+	    		} else {
+	    			result = enemyColor1;
+	    		}
 			}
+			break;
+		case TOWN:
+			if(contextTerritory instanceof KonTown) {
+				KonTown town = (KonTown)contextTerritory;
+	    		isArmistice = guildManager.isArmistice(displayPlayer, town);
+	    		if(displayPlayer.getKingdom().equals(town.getKingdom())) {
+	    			result = friendColor1;
+	    		} else {
+	    			if(isArmistice) {
+	    				result = armisticeColor1;
+	    			} else {
+	    				result = enemyColor1;
+	    			}
+	    		}
+	    	}
+			break;
+		case CAMP:
+			if(contextTerritory instanceof KonCamp) {
+				KonCamp camp = (KonCamp)contextTerritory;
+				if(camp.isPlayerOwner(displayPlayer.getOfflineBukkitPlayer())) {
+					result = friendColor1;
+				} else {
+					result = barbarianColor;
+				}
+			}
+			break;
+		case RUIN:
+			result = neutralColor;
+			break;
+		case NEUTRAL:
+			result = neutralColor;
+			break;
+		case OTHER:
+			result = neutralColor;
+			break;
+		default:
+			result = enemyColor1;
+			break;
 		}
+
     	return result;
     }
     
@@ -1539,6 +1601,15 @@ public class Konquest implements KonquestAPI, Timeable {
     
     public static void playCampGroupSound(Location loc) {
     	loc.getWorld().playSound(loc, Sound.BLOCK_FENCE_GATE_OPEN, (float)1.0, (float)0.7);
+    }
+    
+    public static void playTravelSound(Player bukkitPlayer) {
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_EGG_THROW, (float)1.0, (float)0.1);
+            }
+        },1);
     }
     
     public static String getTimeFormat(int valSeconds, ChatColor color) {

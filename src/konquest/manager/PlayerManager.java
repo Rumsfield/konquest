@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Chunk;
@@ -230,6 +231,28 @@ public class PlayerManager implements KonquestPlayerManager {
     		if(offlinePlayer != null && 
     				offlinePlayer.getOfflineBukkitPlayer().getName() != null &&
     				offlinePlayer.getOfflineBukkitPlayer().getName().equalsIgnoreCase(displayName)) {
+    			return offlinePlayer;
+    		}
+    	}
+        return null;
+    }
+    
+    public KonPlayer getPlayerFromID(UUID id) {
+    	for(KonPlayer player : onlinePlayers.values()) {
+    		if(player != null &&
+    				player.getBukkitPlayer().getName() != null &&
+    				player.getBukkitPlayer().getUniqueId().equals(id)) {
+    			return player;
+    		}
+    	}
+        return null;
+    }
+    
+    public KonOfflinePlayer getOfflinePlayerFromID(UUID id) {
+    	for(KonOfflinePlayer offlinePlayer : allPlayers.values()) {
+    		if(offlinePlayer != null &&
+    				offlinePlayer.getOfflineBukkitPlayer().getName() != null &&
+    				offlinePlayer.getOfflineBukkitPlayer().getUniqueId().equals(id)) {
     			return offlinePlayer;
     		}
     	}

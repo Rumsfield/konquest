@@ -39,7 +39,11 @@ public class TravelAdminCommand  extends CommandBase {
         		destination = getKonquest().getRuinManager().getRuin(travelTo).getCenterLoc();
         		getKonquest().telePlayerLocation(bukkitPlayer, destination);
         		return;
-        	} else {
+        	} else if(getKonquest().getCampManager().isCampName(travelTo)) {
+        		destination = getKonquest().getCampManager().getCampFromName(travelTo).getCenterLoc();
+        		getKonquest().telePlayerLocation(bukkitPlayer, destination);
+        		return;
+            } else {
         		for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
         			if(kingdom.hasTown(travelTo)) {
         				getKonquest().telePlayerLocation(bukkitPlayer, kingdom.getTown(travelTo).getSpawnLoc());
@@ -47,7 +51,6 @@ public class TravelAdminCommand  extends CommandBase {
         			}
         		}
         	}
-        	//ChatUtil.sendError((Player) getSender(), "Travel destination does not exist");
         	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(travelTo));
         }
     }
@@ -64,9 +67,8 @@ public class TravelAdminCommand  extends CommandBase {
 			for(String kingdomName : kingdomList) {
 				tabList.addAll(getKonquest().getKingdomManager().getKingdom(kingdomName).getTownNames());
 			}
-			for(String ruinName : getKonquest().getRuinManager().getRuinNames()) {
-				tabList.add(ruinName);
-			}
+			tabList.addAll(getKonquest().getRuinManager().getRuinNames());
+			tabList.addAll(getKonquest().getCampManager().getCampNames());
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);

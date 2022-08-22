@@ -2,6 +2,7 @@ package konquest.api.manager;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -74,6 +75,22 @@ public interface KonquestPlayerManager {
 	 * @return The Konquest offline player if one exists, else null
 	 */
 	public KonquestOfflinePlayer getOfflinePlayerFromName(String displayName);
+	
+	/**
+	 * Gets a Konquest player object from the given UUID.
+	 * 
+	 * @param id The player UUID to look up
+	 * @return The Konquest player if one exists, else null
+	 */
+	public KonquestPlayer getPlayerFromID(UUID id);
+	
+	/**
+	 * Gets a Konquest offline player object from the given UUID.
+	 * 
+	 * @param id The player UUID to look up
+	 * @return The Konquest offline player if one exists, else null
+	 */
+	public KonquestOfflinePlayer getOfflinePlayerFromID(UUID id);
 	
 	/**
 	 * Gets all of Bukkit's OfflinePlayers from the Konquest player database.
