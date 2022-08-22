@@ -17,7 +17,6 @@ import org.bukkit.World;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.api.event.camp.KonquestCampCreateEvent;
@@ -106,6 +105,26 @@ public class CampManager implements KonquestCampManager {
 		return result;
 	}
 	
+	public void activateCampProtection(KonOfflinePlayer offlinePlayer) {
+		if(offlinePlayer != null) {
+    		KonCamp camp = getCamp(offlinePlayer);
+    		if(camp != null) {
+    			ChatUtil.printDebug("Set camp protection to true for player "+offlinePlayer.getOfflineBukkitPlayer().getName());
+    			camp.setProtected(true);
+    		}
+    	}
+	}
+	
+	public void deactivateCampProtection(KonOfflinePlayer offlinePlayer) {
+		if(offlinePlayer != null) {
+    		KonCamp camp = getCamp(offlinePlayer);
+    		if(camp != null) {
+    			ChatUtil.printDebug("Set camp protection to false for player "+offlinePlayer.getOfflineBukkitPlayer().getName());
+    			camp.setProtected(false);
+    		}
+    	}
+	}
+	
 	/**
 	 * addCamp - primary method for adding a camp for a barbarian
 	 * @param loc
@@ -158,9 +177,11 @@ public class CampManager implements KonquestCampManager {
 				Konquest.playCampGroupSound(loc);
 				// Notify group
 				for(KonCamp groupCamp : groupMap.get(newCamp).getCamps()) {
-					if(groupCamp.isOwnerOnline() && groupCamp.getOwner() instanceof Player) {
-						Player bukkitPlayer = (Player)groupCamp.getOwner();
-						ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_CAMP_CLAN_ADD.getMessage(newCamp.getName()));
+					if(groupCamp.isOwnerOnline()) {
+						KonPlayer ownerOnlinePlayer = konquest.getPlayerManager().getPlayerFromID(groupCamp.getOwner().getUniqueId());
+						if(ownerOnlinePlayer != null) {
+							ChatUtil.sendNotice(ownerOnlinePlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CLAN_ADD.getMessage(newCamp.getName()));
+						}
 					}
 				}
 			}
@@ -189,6 +210,11 @@ public class CampManager implements KonquestCampManager {
 		return removeCamp(uuid);
 	}
 	
+	public boolean removeCamp(KonCamp camp) {
+		String uuid = camp.getOwner().getUniqueId().toString();
+		return removeCamp(uuid);
+	}
+	
 	public boolean removeCamp(String uuid) {
 		if(barbarianCamps.containsKey(uuid)) {
 			ArrayList<Point> campPoints = new ArrayList<Point>();
@@ -210,9 +236,11 @@ public class CampManager implements KonquestCampManager {
 			refreshGroups();
 			// Notify group
 			for(KonCamp groupCamp : groupSet) {
-				if(groupCamp.isOwnerOnline() && groupCamp.getOwner() instanceof Player) {
-					Player bukkitPlayer = (Player)groupCamp.getOwner();
-					ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_CAMP_CLAN_REMOVE.getMessage(removedCamp.getName()));
+				if(groupCamp.isOwnerOnline()) {
+					KonPlayer ownerOnlinePlayer = konquest.getPlayerManager().getPlayerFromID(groupCamp.getOwner().getUniqueId());
+					if(ownerOnlinePlayer != null) {
+						ChatUtil.sendNotice(ownerOnlinePlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CLAN_REMOVE.getMessage(removedCamp.getName()));
+					}
 				}
 			}
 			konquest.getMapHandler().drawDynmapRemoveTerritory(removedCamp);

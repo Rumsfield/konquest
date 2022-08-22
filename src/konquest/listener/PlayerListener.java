@@ -147,7 +147,7 @@ public class PlayerListener implements Listener{
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerQuit(PlayerQuitEvent event) {
-    	//ChatUtil.printDebug("EVENT: Player Left");
+    	ChatUtil.printDebug("EVENT: Player Quit");
     	//playerManager.savePlayers();
     	// remove player from cache
     	Player bukkitPlayer = event.getPlayer();
@@ -160,17 +160,10 @@ public class PlayerListener implements Listener{
     	} else {
     		ChatUtil.printDebug("Null Player Left!");
     	}
-    	//playerManager.savePlayer(player);
     	// Update offline protections
     	kingdomManager.updateKingdomOfflineProtection();
-    	//playerManager.updateNumKingdomPlayersOnline();
-    	//playerManager.updateAllSavedPlayers();
-    	if(player.isBarbarian()) {
-    		KonCamp camp = campManager.getCamp(player);
-    		if(camp != null) {
-    			camp.setProtected(true);
-    		}
-    	}
+    	// Protect camp
+    	campManager.activateCampProtection(player);
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
@@ -1318,18 +1311,18 @@ public class PlayerListener implements Listener{
 				// Attempt to start a raid alert
 				if(!camp.isRaidAlertDisabled() && !player.isAdminBypassActive() && !player.getKingdom().isPeaceful()) {
 					// Verify online player
-					if(camp.isOwnerOnline() && camp.getOwner() instanceof Player) {
-						Player bukkitPlayer = (Player)camp.getOwner();
+					if(camp.isOwnerOnline()) {
 						boolean isMember = false;
 						if(konquest.getCampManager().isCampGrouped(camp)) {
 							isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
 						}
 						// Alert the camp owner if player is not a group member and online
-						if(playerManager.isOnlinePlayer(bukkitPlayer) && !isMember && !player.getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
-							KonPlayer ownerPlayer = playerManager.getPlayer(bukkitPlayer);
+						KonPlayer ownerOnlinePlayer = konquest.getPlayerManager().getPlayerFromID(camp.getOwner().getUniqueId());
+						if(ownerOnlinePlayer != null && !isMember && !player.getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
+							Player ownerBukkitPlayer = ownerOnlinePlayer.getBukkitPlayer();
 							//ChatUtil.sendNotice((Player)camp.getOwner(), "Enemy spotted in "+event.getTerritory().getName()+", use \"/k travel camp\" to defend!", ChatColor.DARK_RED);
-							ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_RAID.getMessage(camp.getName(),"camp"),ChatColor.DARK_RED);
-							ChatUtil.sendKonPriorityTitle(ownerPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+camp.getName(), 60, 1, 10);
+							ChatUtil.sendNotice(ownerBukkitPlayer, MessagePath.PROTECTION_NOTICE_RAID.getMessage(camp.getName(),"camp"),ChatColor.DARK_RED);
+							ChatUtil.sendKonPriorityTitle(ownerOnlinePlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+camp.getName(), 60, 1, 10);
 							// Start Raid Alert disable timer for target town
 							int raidAlertTimeSeconds = konquest.getConfigManager().getConfig("core").getInt("core.towns.raid_alert_cooldown");
 							ChatUtil.printDebug("Starting raid alert timer for "+raidAlertTimeSeconds+" seconds");

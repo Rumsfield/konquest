@@ -88,9 +88,11 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 		return owner;
 	}
 	
+	/*
 	public void setOnlineOwner(Player player) {
 		owner = player;
 	}
+	*/
 	
 	public boolean isPlayerOwner(OfflinePlayer player) {
 		return player.getUniqueId().equals(owner.getUniqueId());
@@ -186,6 +188,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 		} else {
 			// Remove protection
 			isOfflineProtected = false;
+			protectedWarmupTimer.stopTimer();
 			protectedCountdownTimer.stopTimer();
 			campBarAll.setTitle(Konquest.barbarianColor+getName());
 		}

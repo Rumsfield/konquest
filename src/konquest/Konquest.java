@@ -460,6 +460,7 @@ public class Konquest implements KonquestAPI, Timeable {
 			ChatUtil.printDebug("Failed to init a null player!");
 			return null;
 		}
+    	ChatUtil.printDebug("Initializing Konquest player "+bukkitPlayer.getName());
     	// Update all player's nametag color packets
     	boolean isPlayerNametagFormatEnabled = configManager.getConfig("core").getBoolean("core.player_nametag_format",false);
     	if(isPlayerNametagFormatEnabled) {
@@ -469,12 +470,15 @@ public class Konquest implements KonquestAPI, Timeable {
     	// Update offline protections
     	kingdomManager.updateKingdomOfflineProtection();
     	//if(player.isBarbarian()) {
+    	/*
     		KonCamp testCamp = campManager.getCamp(player);
     		if(testCamp != null) {
     			testCamp.setProtected(false);
     			testCamp.setOnlineOwner(bukkitPlayer);
     		}
+    	*/
     	//}
+    	campManager.deactivateCampProtection(player);
     	// Update player membership stats
     	kingdomManager.updatePlayerMembershipStats(player);
     	// Try to reset base health from legacy health upgrades
