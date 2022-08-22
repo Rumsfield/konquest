@@ -190,7 +190,7 @@ core:
     cost_travel: 1
     cost_travel_per_chunk: 0.01
     cost_travel_world: 5
-    cost_travel_camp: 0
+    cost_travel_camp: 5
     allow_travel_always: true
     rewards:
       settle_town: 50
