@@ -15,6 +15,7 @@ import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
+import konquest.model.KonPlayer.FollowType;
 import konquest.model.KonPlayer.RegionType;
 import konquest.model.KonPlot;
 import konquest.utility.ChatUtil;
@@ -1132,28 +1133,42 @@ public class PlayerListener implements Listener{
         	        },1);
         		}
         		
-        		// Auto claiming
-        		if(!isTerritoryTo) {
-        			if(player.isAdminClaimingFollow()) {
-        				// Admin claiming takes priority
-        				kingdomManager.claimForAdmin(movePlayer, moveTo);
-        				// Update territory variables for chunk boundary checks below
-        				isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
-        				isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
-        			} else if(player.isClaimingFollow()) {
-        				// Player is claim following
-        				boolean isClaimSuccess = kingdomManager.claimForPlayer(movePlayer, moveTo);
-            			if(!isClaimSuccess) {
-            				player.setIsClaimingFollow(false);
-            				//ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
-            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
-            			} else {
-            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_CLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
-            			}
-            			// Update territory variables for chunk boundary checks below
-        				isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
-        				isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
-        			}
+        		// Auto claiming & unclaiming
+        		if(player.isAutoFollowActive()) {
+	        		if(!isTerritoryTo) {
+	        			// Auto claim
+	        			if(player.getAutoFollow().equals(FollowType.ADMIN_CLAIM)) {
+	        				// Admin claiming takes priority
+	        				kingdomManager.claimForAdmin(movePlayer, moveTo);
+	        			} else if(player.getAutoFollow().equals(FollowType.CLAIM)) {
+	        				// Player is claim following
+	        				boolean isClaimSuccess = kingdomManager.claimForPlayer(movePlayer, moveTo);
+	            			if(!isClaimSuccess) {
+	            				player.setAutoFollow(FollowType.NONE);
+	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
+	            			} else {
+	            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_CLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
+	            			}
+	        			}
+	        		} else {
+	        			// Auto unclaim
+	        			if(player.getAutoFollow().equals(FollowType.ADMIN_UNCLAIM)) {
+	        				// Admin unclaiming takes priority
+	        				kingdomManager.unclaimForAdmin(movePlayer, moveTo);
+	        			} else if(player.getAutoFollow().equals(FollowType.UNCLAIM)) {
+	        				// Player is unclaim following
+	        				boolean isUnclaimSuccess = kingdomManager.unclaimForPlayer(movePlayer, moveTo);
+	            			if(!isUnclaimSuccess) {
+	            				player.setAutoFollow(FollowType.NONE);
+	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_FAIL_AUTO.getMessage());
+	            			} else {
+	            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_UNCLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
+	            			}
+	        			}
+	        		}
+	        		// Update territory variables for chunk boundary checks below
+    				isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
+    				isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
         		}
         		
     		} else {
@@ -1165,14 +1180,8 @@ public class PlayerListener implements Listener{
     			}
     			
     			// Disable movement-based flags
-    			if(player.isAdminClaimingFollow()) {
-    				player.setIsAdminClaimingFollow(false);
-    				//ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
-    				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
-    			}
-    			if(player.isClaimingFollow()) {
-    				player.setIsClaimingFollow(false);
-    				//ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
+    			if(player.isAutoFollowActive()) {
+    				player.setAutoFollow(FollowType.NONE);
     				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
     			}
     			if(player.isMapAuto()) {

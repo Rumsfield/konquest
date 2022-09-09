@@ -76,12 +76,20 @@ public abstract class KonTerritory implements KonquestTerritory {
 		return chunkList.remove(Konquest.toPoint(loc)) != null;
 	}
 	
+	public boolean removeChunk(Point point) {
+		return chunkList.remove(point) != null;
+	}
+	
 	public void clearChunks() {
 		chunkList.clear();
 	}
 	
 	public boolean isLocInside(Location loc) {
 		return loc.getWorld().equals(getWorld()) && chunkList.containsKey(Konquest.toPoint(loc));
+	}
+	
+	public boolean isLocInCenter(Location loc) {
+		return loc.getWorld().equals(getWorld()) && Konquest.toPoint(loc).equals(Konquest.toPoint(centerLoc));
 	}
 	
 	public boolean hasChunk(Chunk chunk) {
@@ -166,6 +174,7 @@ public abstract class KonTerritory implements KonquestTerritory {
 	
 	public abstract boolean addChunk(Point point);
 	
+	// Returns true if the chunk is allowed to be added
 	public abstract boolean testChunk(Point point);
 	
 }

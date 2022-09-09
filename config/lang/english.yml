@@ -614,6 +614,17 @@ command:
       no-town: "That town does not exist in your Kingdom."
       cooldown: "You must wait %s before traveling to %s."
       canceled: "Your travel was canceled by movement."
+  unclaim:
+    notice:
+      success: "Successfully unclaimed %s chunks of land from %s."
+      fail-auto: "Could not unclaim, disabled auto unclaim."
+      pass-auto: "Unclaimed"
+    error:
+      radius: "Radius must be greater than or equal to %s and less than or equal to %s."
+      fail-town: "Must unclaim from towns only."
+      fail-lord: "Failed to unclaim, you must be the town lord."
+      fail-unclaimed: "Failed to unclaim, no claims found."
+      fail-center: "Failed to unclaim, cannot remove territory center."
 quickshop:
   error:
     enemy-create: "Cannot create a shop in enemy towns!"
@@ -799,6 +810,7 @@ description:
   spy: "Reveal the location of an enemy town."
   settle: "Settle a new Town."
   claim: "Claim a chunk of land."
+  unclaim: "Unclaim a chunk of land."
   travel: "Teleport to a Town, your Camp or to your Capital."
   town: "Manage Towns you belong to."
   guild: "Manage kingdom guilds."

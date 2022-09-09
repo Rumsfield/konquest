@@ -8,7 +8,7 @@ public enum AdminCommandType {
 	MAKEKINGDOM		("konquest.command.admin.makekingdom",		"<kingdom>",														MessagePath.DESCRIPTION_ADMIN_MAKEKINGDOM.getMessage()),
 	MAKETOWN		("konquest.command.admin.maketown",			"<town> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_MAKETOWN.getMessage()),
 	CLAIM			("konquest.command.admin.claim",			"[radius|auto] [<radius>]",											MessagePath.DESCRIPTION_ADMIN_CLAIM.getMessage()),
-	UNCLAIM			("konquest.command.admin.unclaim",			"",																	MessagePath.DESCRIPTION_ADMIN_UNCLAIM.getMessage()),
+	UNCLAIM			("konquest.command.admin.unclaim",			"[radius|auto] [<radius>]",											MessagePath.DESCRIPTION_ADMIN_UNCLAIM.getMessage()),
 	REMOVEKINGDOM	("konquest.command.admin.removekingdom",	"<kingdom>",														MessagePath.DESCRIPTION_ADMIN_REMOVEKINGDOM.getMessage()),
 	REMOVETOWN		("konquest.command.admin.removetown",		"<kingdom> <town>",													MessagePath.DESCRIPTION_ADMIN_REMOVETOWN.getMessage()),
 	REMOVECAMP		("konquest.command.admin.removecamp",		"<player>",															MessagePath.DESCRIPTION_ADMIN_REMOVECAMP.getMessage()),

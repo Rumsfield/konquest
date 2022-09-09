@@ -93,6 +93,7 @@ core:
     wild_use: true
     wild_build: true
   towns:
+    allow_unclaim: true
     min_settle_height: 2
     max_settle_height: 200
     min_distance_town: 16

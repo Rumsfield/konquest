@@ -7,6 +7,7 @@ import java.util.List;
 import konquest.Konquest;
 import konquest.command.CommandBase;
 import konquest.model.KonPlayer;
+import konquest.model.KonPlayer.FollowType;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
@@ -54,59 +55,32 @@ public class ClaimAdminCommand extends CommandBase {
     					return;
     				}
     				getKonquest().getKingdomManager().claimRadiusForAdmin(bukkitPlayer, bukkitPlayer.getLocation(), radius);
-    				/*
-    				KonTerritory adjacentTerritory = null;
-					for(Point adjPoint : getKonquest().getAreaPoints(playerLoc, 2)) {
-						if(getKonquest().getKingdomManager().isChunkClaimed(adjPoint,playerLoc.getWorld())) {
-							adjacentTerritory = getKonquest().getKingdomManager().getChunkTerritory(adjPoint,playerLoc.getWorld());
-							break;
-						}
-					}
-					if(adjacentTerritory == null) {
-						//ChatUtil.sendError((Player) getSender(), "Must claim near an existing territory.");
-						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_CLAIM_ERROR_MISSING.getMessage());
-    					return;
-					}		
-    				ArrayList<Point> chunkList = getKonquest().getAreaPoints(playerLoc, radius);
-    				ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
-    				for(Point point : chunkList) {
-    					if(getKonquest().getKingdomManager().isChunkClaimed(point,playerWorld) && !getKonquest().getKingdomManager().getChunkTerritory(point,playerWorld).equals(adjacentTerritory)) {
-    						ChatUtil.printDebug("Found a chunk conflict");
-    						//ChatUtil.sendError((Player) getSender(), "Cannot claim over another territory.");
-    						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_CLAIM_ERROR_OVERLAP.getMessage());
-    						return;
-    					}
-    				}
-    				// Claim chunks for adjacent territory
-    				if(adjacentTerritory.addChunks(chunkList)) {
-    					//getKonquest().getKingdomManager().updateTerritoryCache();
-    					int numChunks = 0;
-    					for(Point point : chunkList) {
-    						getKonquest().getKingdomManager().addTerritory(playerWorld,point,adjacentTerritory);
-    						numChunks++;
-    					}
-    					getKonquest().getKingdomManager().updatePlayerBorderParticles(player);
-    					getKonquest().getMapHandler().drawDynmapUpdateTerritory(adjacentTerritory);
-    					//ChatUtil.sendNotice((Player) getSender(), "Successfully claimed chunks within radius "+radius+" for territory "+adjacentTerritory.getName());
-    					ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage(numChunks,adjacentTerritory.getName()));
-    				} else {
-    					//ChatUtil.sendError((Player) getSender(), "There was a problem claiming chunks within radius "+radius+" for territory "+adjacentTerritory.getName());
-    					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-    				}
-    				*/
         			break;
+        			
         		case "auto" :
-        			if(!player.isAdminClaimingFollow()) {
-        				player.setIsAdminClaimingFollow(true);
-        				//ChatUtil.sendNotice((Player) getSender(), "Enabled admin auto claim. Use this command again to disable.");
-        				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
-        				getKonquest().getKingdomManager().claimForAdmin(bukkitPlayer, playerLoc);
+        			boolean doAuto = false;
+        			// Check if player is already in an auto follow state
+        			if(player.isAutoFollowActive()) {
+        				// Check if player is already in claim state
+        				if(player.getAutoFollow().equals(FollowType.ADMIN_CLAIM)) {
+        					// Disable the auto state
+        					ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
+        					player.setAutoFollow(FollowType.NONE);
+        				} else {
+        					// Change state
+        					doAuto = true;
+        				}
         			} else {
-        				player.setIsAdminClaimingFollow(false);
-        				//ChatUtil.sendNotice((Player) getSender(), "Disabled admin auto claim.");
-        				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
+        				// Player is not in any auto mode, enter normal claim following state
+        				doAuto = true;
+        			}
+        			if(doAuto) {
+        				getKonquest().getKingdomManager().claimForAdmin(bukkitPlayer, playerLoc);
+        				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
+        				player.setAutoFollow(FollowType.ADMIN_CLAIM);
         			}
         			break;
+        			
         		default :
         			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
                     return;
