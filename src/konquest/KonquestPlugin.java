@@ -79,6 +79,7 @@ public class KonquestPlugin extends JavaPlugin {
 			konquest.getRuinManager().saveRuins();
 			konquest.getGuildManager().saveGuilds();
 			konquest.getRuinManager().removeAllGolems();
+			konquest.getKingdomManager().removeAllRabbits();
 			konquest.getConfigManager().saveConfigs();
 			konquest.getDatabaseThread().flushDatabase();
 			konquest.getDatabaseThread().getDatabase().getDatabaseConnection().disconnect();

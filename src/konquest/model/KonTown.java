@@ -798,11 +798,13 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	public void setAttacked(boolean val, KonPlayer attacker) {
 		if(val == true) {
-			if(isAttacked = false) {
+			if(!isAttacked) {
 				// Town is now under attack, update golem targets
 				this.isAttacked = true;
 				if(attacker != null) {
 					updateGolemTargets(attacker,false);
+					//TODO: Add rabbit spawn as part of a town upgrade
+					//rabbit.spawn();
 				}
 			} else {
 				this.isAttacked = true;
@@ -812,19 +814,24 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			monumentTimer.stopTimer();
 			monumentTimer.setTime(monumentRegenTimeSeconds);
 			monumentTimer.startTimer();
-			/*
-			if(!(isShielded || isArmored)) {
-				
-			}
-			*/
+
 		} else {
 			this.isAttacked = false;
 			defenders.clear();
+			rabbit.remove();
 		}
 	}
 	
 	public boolean isAttacked() {
 		return isAttacked;
+	}
+	
+	public void targetRabbitToPlayer(Player player) {
+		rabbit.targetTo(player);
+	}
+	
+	public void removeRabbit() {
+		rabbit.remove();
 	}
 	
 	public void updateBar() {
@@ -1295,10 +1302,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			}
 		}
 		return result;
-	}
-	
-	public void spawnRabbit() {
-		rabbit.spawn();
 	}
 	
 	public boolean isShielded() {

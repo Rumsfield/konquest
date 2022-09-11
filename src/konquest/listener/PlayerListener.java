@@ -501,6 +501,11 @@ public class PlayerListener implements Listener{
 	        		if(territory instanceof KonTown) {
 	        			KonTown town = (KonTown) territory;
 	        			//ChatUtil.printDebug("EVENT player interaction within town "+town.getName());
+	        			// Target player who interacts with monument blocks
+	        			if(town.isLocInsideMonumentProtectionArea(event.getClickedBlock().getLocation())) {
+	        				town.targetRabbitToPlayer(bukkitPlayer);
+	        			}
+	        			
 	        			// Prevent enemies from interacting with things like buttons, levers, pressure plates...
 	        			if(!player.getKingdom().equals(town.getKingdom()) && !town.isEnemyRedstoneAllowed()) {
 	        				//ChatUtil.printDebug("  running preventUse: town");

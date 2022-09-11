@@ -1416,6 +1416,9 @@ public class BlockListener implements Listener {
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRITICALS,1);
 			
 			String kingdomName = town.getKingdom().getName();
+			
+			// Target rabbit
+			town.targetRabbitToPlayer(player.getBukkitPlayer());
 					
 			// Alert all players of enemy Kingdom when the first critical block is broken
 			if(town.getMonument().getCriticalHits() == 1) {

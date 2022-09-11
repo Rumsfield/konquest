@@ -1564,6 +1564,14 @@ public class KingdomManager implements KonquestKingdomManager {
 		return neutrals;
 	}
 	
+	public void removeAllRabbits() {
+		for(KonKingdom kingdom : getKingdoms()) {
+			for(KonTown town : kingdom.getTowns()) {
+				town.removeRabbit();
+			}
+		}
+	}
+	
 	/**
 	 * Updates a town option based on action
 	 * @param action

@@ -2,8 +2,12 @@ package konquest.model;
 
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Rabbit;
+
+import konquest.utility.ChatUtil;
 
 public class KonTownRabbit {
 
@@ -19,9 +23,16 @@ public class KonTownRabbit {
 			Location modLoc = new Location(spawnLoc.getWorld(),spawnLoc.getX()+0.5,spawnLoc.getY()+1.0,spawnLoc.getZ()+0.5);
 			rabbit = (Rabbit)spawnLoc.getWorld().spawnEntity(modLoc, EntityType.RABBIT);
 			rabbit.setRabbitType(Rabbit.Type.THE_KILLER_BUNNY);
-			
+			double defaultValue = 0;
+			// Modify health
+			defaultValue = rabbit.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
+			rabbit.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(defaultValue*2);
+			rabbit.setHealth(defaultValue*2);
 			// Play spawn noise
-			spawnLoc.getWorld().playSound(spawnLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.8F);
+			spawnLoc.getWorld().playSound(spawnLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, 0.5F, 2.0F);
+			ChatUtil.printDebug("Spawned town rabbit");
+		} else {
+			ChatUtil.printDebug("Failed to spawn town rabbit");
 		}
 	}
 	
@@ -47,6 +58,15 @@ public class KonTownRabbit {
 			return rabbit.getLocation();
 		} else {
 			return spawnLoc;
+		}
+	}
+	
+	public void targetTo(LivingEntity target) {
+		if(rabbit != null && !rabbit.isDead()) {
+			rabbit.setTarget(null);
+			rabbit.setTarget(target);
+			// Play target noise
+			//spawnLoc.getWorld().playSound(rabbit.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.8F);
 		}
 	}
 	
