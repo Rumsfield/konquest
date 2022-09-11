@@ -1626,6 +1626,18 @@ public class KingdomManager implements KonquestKingdomManager {
 				}
 				result = true;
 				break;
+			case TOWN_GOLEM:
+				if(town.isGolemOffensive()) {
+					// Disable golem offense
+            		town.setIsGolemOffensive(false);
+            		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_GOLEM_DISABLE.getMessage(town.getName()));
+				} else {
+					// Enable golem offense
+					town.setIsGolemOffensive(true);
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_GOLEM_ENABLE.getMessage(town.getName()));
+				}
+				result = true;
+				break;
 			default:
 				break;
 		}
@@ -2586,6 +2598,9 @@ public class KingdomManager implements KonquestKingdomManager {
 		            	// Set redstone flag
 		            	boolean isRedstone = townSection.getBoolean("redstone",false);
 		            	town.setIsEnemyRedstoneAllowed(isRedstone);
+		            	// Set golem offensive flag
+		            	boolean isGolemOffensive = townSection.getBoolean("golem_offensive",false);
+		            	town.setIsGolemOffensive(isGolemOffensive);
 		            	// Assign Lord
 		            	String lordUUID = townSection.getString("lord","");
 		            	if(!lordUUID.equalsIgnoreCase("")) {
@@ -2708,6 +2723,7 @@ public class KingdomManager implements KonquestKingdomManager {
                 townInstanceSection.set("open", town.isOpen());
                 townInstanceSection.set("plot", town.isPlotOnly());
                 townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());
+                townInstanceSection.set("golem_offensive", town.isGolemOffensive());
                 townInstanceSection.set("shield", town.isShielded());
                 townInstanceSection.set("shield_time", town.getShieldEndTime());
                 townInstanceSection.set("armor", town.isArmored());

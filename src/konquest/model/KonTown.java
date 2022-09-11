@@ -62,6 +62,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private boolean isOpen;
 	private boolean isEnemyRedstoneAllowed;
 	private boolean isResidentPlotOnly;
+	private boolean isGolemOffensive;
 	private boolean isAttacked;
 	private boolean isShielded;
 	private boolean isArmored;
@@ -105,6 +106,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.isOpen = false; // init as a closed Town, requires Lord to add players as residents for build/container perms
 		this.isEnemyRedstoneAllowed = false;
 		this.isResidentPlotOnly = false;
+		this.isGolemOffensive = false;
 		this.isAttacked = false;
 		this.isShielded = false;
 		this.shieldEndTimeSeconds = 0;
@@ -943,6 +945,14 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	public boolean isPlotOnly() {
 		return isResidentPlotOnly ? true : false;
+	}
+	
+	public void setIsGolemOffensive(boolean val) {
+		isGolemOffensive = val;
+	}
+	
+	public boolean isGolemOffensive() {
+		return isGolemOffensive ? true : false;
 	}
 	
 	public boolean canClaimLordship(KonPlayer player) {
