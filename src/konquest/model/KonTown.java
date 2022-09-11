@@ -32,6 +32,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.IronGolem;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -680,7 +684,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			monument.clearCriticalHits();
 			//pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
 			reloadMonument();
-			setAttacked(false);
+			setAttacked(false,null);
 			//setBarProgress(1.0);
 			updateBar();
 			getWorld().playSound(getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)1, (float)0.8);
@@ -792,9 +796,17 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		monumentBarArmistice.setProgress(prog);
 	}
 	
-	public void setAttacked(boolean val) {
+	public void setAttacked(boolean val, KonPlayer attacker) {
 		if(val == true) {
-			this.isAttacked = true;
+			if(isAttacked = false) {
+				// Town is now under attack, update golem targets
+				this.isAttacked = true;
+				if(attacker != null) {
+					updateGolemTargets(attacker,false);
+				}
+			} else {
+				this.isAttacked = true;
+			}
 			// Start Monument regenerate timer for target town when no armor nor shield
 			int monumentRegenTimeSeconds = getKonquest().getConfigManager().getConfig("core").getInt("core.monuments.damage_regen");
 			monumentTimer.stopTimer();
@@ -922,6 +934,81 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		return result;
 	}
+	
+	public void updateGolemTargets(KonPlayer triggerPlayer, boolean useTriggerPlayerAsTarget) {
+    	// Ignore if town option Golem Offense is disabled and not under attack
+    	if(!isAttacked() && !isGolemOffensive()) {
+    		return;
+    	}
+    	// Command all nearby Iron Golems to target closest player, if enemy exists nearby, else don't change target
+    	// Find iron golems within the town max radius
+    	// Do not update targets if triggering player is in an armistice with this town
+    	boolean isTriggerPlayerArmistice = getKonquest().getGuildManager().isArmistice(triggerPlayer, this);
+    	boolean isGolemAttackEnemies = getKonquest().getConfigManager().getConfig("core").getBoolean("core.kingdoms.golem_attack_enemies");
+		if(isGolemAttackEnemies && !triggerPlayer.isAdminBypassActive() && !triggerPlayer.getKingdom().equals(getKingdom()) && !isTriggerPlayerArmistice) {
+			Location centerLoc = getCenterLoc();
+			int golumSearchRange = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_size",1); // chunks
+			int radius = 16*16;
+			if(golumSearchRange > 1) {
+				radius = golumSearchRange*16;
+			}
+			for(Entity e : centerLoc.getWorld().getNearbyEntities(centerLoc,radius,256,radius,(e) -> e.getType() == EntityType.IRON_GOLEM)) {
+				IronGolem golem = (IronGolem)e;
+				// Check for golem inside given territory or in wild
+				if(isLocInside(golem.getLocation()) || !getKonquest().getKingdomManager().isChunkClaimed(golem.getLocation())) {
+					
+					// Check for closest enemy player
+					boolean isNearbyPlayer = false;
+					double minDistance = 99;
+					KonPlayer nearestPlayer = null;
+					for(Entity p : golem.getNearbyEntities(32,32,32)) {
+						if(p instanceof Player) {
+							KonPlayer nearbyPlayer = getKonquest().getPlayerManager().getPlayer((Player)p);
+							if(nearbyPlayer != null && !nearbyPlayer.isAdminBypassActive() && !nearbyPlayer.getKingdom().equals(getKingdom()) && isLocInside(p.getLocation()) &&
+									(useTriggerPlayerAsTarget || !nearbyPlayer.equals(triggerPlayer))) {
+								// Found nearby player that might be a valid target
+								// Check for closest distance, and that the player is not in an armistice with this town
+								boolean isArmistice = getKonquest().getGuildManager().isArmistice(nearbyPlayer, this);
+								double distance = golem.getLocation().distance(p.getLocation());
+								if(distance < minDistance && !isArmistice) {
+									minDistance = distance;
+									isNearbyPlayer = true;
+									nearestPlayer = nearbyPlayer;
+								}
+							}
+						}
+					}
+					
+					// Attempt to remove current target
+					LivingEntity currentTarget = golem.getTarget();
+					//ChatUtil.printDebug("Golem: Evaluating new targets in territory "+territory.getName());
+					if(currentTarget != null && currentTarget instanceof Player) {
+						KonPlayer previousTargetPlayer = getKonquest().getPlayerManager().getPlayer((Player)currentTarget);
+						if(previousTargetPlayer != null) {
+							previousTargetPlayer.removeMobAttacker(golem);
+							//ChatUtil.printDebug("Golem: Removed mob attacker from player "+previousTargetPlayer.getBukkitPlayer().getName());
+						}
+					} else {
+						//ChatUtil.printDebug("Golem: Bad current target");
+					}
+					
+					// Attempt to apply new target, either closest player or default trigger player
+					if(isNearbyPlayer) {
+						//ChatUtil.printDebug("Golem: Found nearby player "+nearestPlayer.getBukkitPlayer().getName());
+						golem.setTarget(nearestPlayer.getBukkitPlayer());
+						nearestPlayer.addMobAttacker(golem);
+					} else if(useTriggerPlayerAsTarget){
+						//ChatUtil.printDebug("Golem: Targeting default player "+triggerPlayer.getBukkitPlayer().getName());
+						golem.setTarget(triggerPlayer.getBukkitPlayer());
+						triggerPlayer.addMobAttacker(golem);
+					}
+					
+				} else {
+					ChatUtil.printDebug("Golem: Not in this territory or wild");
+				}
+			}
+		}
+    }
 	
 	public void setIsOpen(boolean val) {
 		isOpen = val;
