@@ -1110,7 +1110,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	}
 	
 	public boolean unclaimForPlayer(Player bukkitPlayer, Location claimLoc) {
-		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		//KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
 		// Verify town at location, and player is lord
 		if(this.isChunkClaimed(claimLoc)) {
 			KonTerritory territory = this.getChunkTerritory(claimLoc);
@@ -1129,14 +1129,16 @@ public class KingdomManager implements KonquestKingdomManager {
 			return false;
 		}
 		
+		// Get territory name
+		KonTerritory territory = getChunkTerritory(claimLoc);
+		String territoryName = territory.getName();
+		
 		// Attempt to unclaim the current chunk
     	int unclaimStatus = unclaimChunk(claimLoc);
     	switch(unclaimStatus) {
     	case 0:
-    		KonTerritory territory = getChunkTerritory(claimLoc);
-    		String territoryName = territory.getName();
     		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_SUCCESS.getMessage("1",territoryName));
-    		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,-1);
+    		//konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,-1);
     		break;
     	case 1:
     		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_FAIL_UNCLAIMED.getMessage());
@@ -1263,7 +1265,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	}
 	
 	public boolean unclaimRadiusForPlayer(Player bukkitPlayer, Location claimLoc, int radius) {
-		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		//KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
 		// Verify town at location, and player is lord
 		if(this.isChunkClaimed(claimLoc)) {
 			KonTerritory territory = this.getChunkTerritory(claimLoc);
@@ -1298,7 +1300,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	    		postClaimLand = unclaimTerritory.getChunkPoints().size();
 	    		int numChunksClaimed = preClaimLand - postClaimLand;
 	    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_SUCCESS.getMessage(numChunksClaimed,unclaimTerritory.getName()));
-	    		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,-1*numChunksClaimed);
+	    		//konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,-1*numChunksClaimed);
 	    		break;
 	    	case 1:
 	    		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_FAIL_UNCLAIMED.getMessage());

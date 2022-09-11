@@ -1038,6 +1038,50 @@ public class PlayerListener implements Listener{
     		if(moveTo.getWorld().equals(moveFrom.getWorld())) {
     			// Player moved within the same world
         		
+    			// Auto claiming & unclaiming
+        		if(player.isAutoFollowActive()) {
+	        		if(!isTerritoryTo) {
+	        			// Auto claim
+	        			if(player.getAutoFollow().equals(FollowType.ADMIN_CLAIM)) {
+	        				// Admin claiming takes priority
+	        				kingdomManager.claimForAdmin(movePlayer, moveTo);
+	        			} else if(player.getAutoFollow().equals(FollowType.CLAIM)) {
+	        				// Player is claim following
+	        				boolean isClaimSuccess = kingdomManager.claimForPlayer(movePlayer, moveTo);
+	            			if(!isClaimSuccess) {
+	            				player.setAutoFollow(FollowType.NONE);
+	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
+	            			} else {
+	            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_CLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
+	            			}
+	        			}
+	        		} else {
+	        			// Auto unclaim
+	        			if(player.getAutoFollow().equals(FollowType.ADMIN_UNCLAIM)) {
+	        				// Admin unclaiming takes priority
+	        				kingdomManager.unclaimForAdmin(movePlayer, moveTo);
+	        			} else if(player.getAutoFollow().equals(FollowType.UNCLAIM)) {
+	        				// Player is unclaim following
+	        				boolean isUnclaimSuccess = kingdomManager.unclaimForPlayer(movePlayer, moveTo);
+	            			if(!isUnclaimSuccess) {
+	            				player.setAutoFollow(FollowType.NONE);
+	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_FAIL_AUTO.getMessage());
+	            			} else {
+	            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_UNCLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
+	            			}
+	        			}
+	        		}
+	        		// Update territory variables for chunk boundary checks below
+    				isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
+    				isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
+    				if(isTerritoryTo) {
+    					territoryTo = kingdomManager.getChunkTerritory(moveTo);
+    				}
+    				if(isTerritoryFrom) {
+    					territoryFrom = kingdomManager.getChunkTerritory(moveFrom);
+    				}
+        		}
+        		
         		// Chunk transition checks
         		if(!isTerritoryTo && isTerritoryFrom) { // When moving into the wild
         			// Display WILD
@@ -1130,44 +1174,6 @@ public class PlayerListener implements Listener{
         	            	kingdomManager.printPlayerMap(player, KingdomManager.DEFAULT_MAP_SIZE, moveTo);
         	            }
         	        },1);
-        		}
-        		
-        		// Auto claiming & unclaiming
-        		if(player.isAutoFollowActive()) {
-	        		if(!isTerritoryTo) {
-	        			// Auto claim
-	        			if(player.getAutoFollow().equals(FollowType.ADMIN_CLAIM)) {
-	        				// Admin claiming takes priority
-	        				kingdomManager.claimForAdmin(movePlayer, moveTo);
-	        			} else if(player.getAutoFollow().equals(FollowType.CLAIM)) {
-	        				// Player is claim following
-	        				boolean isClaimSuccess = kingdomManager.claimForPlayer(movePlayer, moveTo);
-	            			if(!isClaimSuccess) {
-	            				player.setAutoFollow(FollowType.NONE);
-	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
-	            			} else {
-	            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_CLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
-	            			}
-	        			}
-	        		} else {
-	        			// Auto unclaim
-	        			if(player.getAutoFollow().equals(FollowType.ADMIN_UNCLAIM)) {
-	        				// Admin unclaiming takes priority
-	        				kingdomManager.unclaimForAdmin(movePlayer, moveTo);
-	        			} else if(player.getAutoFollow().equals(FollowType.UNCLAIM)) {
-	        				// Player is unclaim following
-	        				boolean isUnclaimSuccess = kingdomManager.unclaimForPlayer(movePlayer, moveTo);
-	            			if(!isUnclaimSuccess) {
-	            				player.setAutoFollow(FollowType.NONE);
-	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_FAIL_AUTO.getMessage());
-	            			} else {
-	            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_UNCLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
-	            			}
-	        			}
-	        		}
-	        		// Update territory variables for chunk boundary checks below
-    				isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
-    				isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
         		}
         		
     		} else {
