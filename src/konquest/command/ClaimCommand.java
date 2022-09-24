@@ -92,6 +92,15 @@ public class ClaimCommand extends CommandBase {
         			}
         			break;
         			
+        		case "undo" :
+        			boolean isUndoSuccess = getKonquest().getKingdomManager().claimUndoForPlayer(player);
+        			if(isUndoSuccess) {
+        				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+        			} else {
+        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+        			}
+        			break;
+        			
         		default :
         			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
                     return;
@@ -105,13 +114,14 @@ public class ClaimCommand extends CommandBase {
 	
 	@Override
 	public List<String> tabComplete() {
-		// k claim [radius|auto] [<r>]
+		// k claim [radius|auto|undo] [<r>]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		
 		if(getArgs().length == 2) {
 			tabList.add("radius");
 			tabList.add("auto");
+			tabList.add("undo");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);
 			Collections.sort(matchedTabList);

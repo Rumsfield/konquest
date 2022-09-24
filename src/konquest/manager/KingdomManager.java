@@ -725,6 +725,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	    				updatePlayerBorderParticles(occupant);
 	    			}
 	    		}
+	    		
 				return 0;
 			} else {
 				return 2;
@@ -739,10 +740,13 @@ public class KingdomManager implements KonquestKingdomManager {
     	int claimStatus = claimChunk(claimLoc);
     	switch(claimStatus) {
     	case 0:
-    		//KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-    		//updatePlayerBorderParticles(player);
-    		//ChatUtil.sendNotice(bukkitPlayer, "Successfully added chunk for territory: "+getChunkTerritory(claimLoc.getChunk()).getName());
+    		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+    		KonTerritory territory = getChunkTerritory(claimLoc);
     		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+    		// Push claim to admin register
+    		Set<Point> claimSet = new HashSet<Point>();
+    		claimSet.add(Konquest.toPoint(claimLoc));
+    		player.getAdminClaimRegister().push(claimSet, territory);
     		break;
     	case 1:
     		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: no adjacent territory.");
@@ -798,7 +802,11 @@ public class KingdomManager implements KonquestKingdomManager {
     	case 0:
     		KonTerritory territory = getChunkTerritory(claimLoc);
     		String territoryName = territory.getName();
-    		//ChatUtil.sendNotice(bukkitPlayer, "Successfully claimed land for Town: "+territoryName);
+    		// Push claim to player register
+    		Set<Point> claimSet = new HashSet<Point>();
+    		claimSet.add(Konquest.toPoint(claimLoc));
+    		player.getPlayerClaimRegister().push(claimSet, territory);
+    		// Send message
     		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage("1",territoryName));
     		konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CLAIM_LAND);
     		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CLAIMED,1);
@@ -919,7 +927,16 @@ public class KingdomManager implements KonquestKingdomManager {
     		}
     	}
 		
+		// Find all unclaimed chunks to claim
+		HashSet<Point> toClaimChunks = new HashSet<Point>();
+    	for(Point point : konquest.getAreaPoints(claimLoc,radius)) {
+    		if(!isChunkClaimed(point,claimWorld) && claimTerritory.testChunk(point)) {
+    			toClaimChunks.add(point);
+    		}
+    	}
+    	
 		// Attempt to claim
+    	KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
     	int preClaimLand = claimTerritory.getChunkPoints().size();
     	int postClaimLand = preClaimLand;
     	int claimStatus = claimChunkRadius(claimLoc, radius);
@@ -928,6 +945,9 @@ public class KingdomManager implements KonquestKingdomManager {
 	    		postClaimLand = claimTerritory.getChunkPoints().size();
 	    		int numChunksClaimed = postClaimLand - preClaimLand;
 	    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage(numChunksClaimed,claimTerritory.getName()));
+	    		// Push claim to admin register
+	    		Set<Point> claimSet = new HashSet<Point>(toClaimChunks);
+	    		player.getAdminClaimRegister().push(claimSet, claimTerritory);
 	    		break;
 	    	case 1:
 	    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: no adjacent territory.");
@@ -974,7 +994,7 @@ public class KingdomManager implements KonquestKingdomManager {
     	// Find all unclaimed chunks to claim
 		HashSet<Point> toClaimChunks = new HashSet<Point>();
     	for(Point point : konquest.getAreaPoints(claimLoc,radius)) {
-    		if(!isChunkClaimed(point,claimWorld)) {
+    		if(!isChunkClaimed(point,claimWorld) && claimTerritory.testChunk(point)) {
     			toClaimChunks.add(point);
     		}
     	}
@@ -1005,6 +1025,9 @@ public class KingdomManager implements KonquestKingdomManager {
 	    	        	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)finalCost);
 	    	        }
 	    		}
+	    		// Push claim to player register
+	    		Set<Point> claimSet = new HashSet<Point>(toClaimChunks);
+	    		player.getPlayerClaimRegister().push(claimSet, claimTerritory);
 	    		break;
 	    	case 1:
 	    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: no adjacent territory.");
@@ -1022,6 +1045,104 @@ public class KingdomManager implements KonquestKingdomManager {
 	    		return false;
     	}
 		return true;
+	}
+	
+	// Returns true when any points have been removed.
+	// Returns false when no points were removed.
+	public boolean removeClaims(Set<Point> points, KonTerritory territory) {
+		
+		if(territory == null || points == null || points.isEmpty()) {
+			return false;
+		}
+		
+		World territoryWorld = territory.getWorld();
+		
+		// Player occupants
+		Set<KonPlayer> occupants = new HashSet<KonPlayer>();
+		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
+			if(territory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
+				occupants.add(occupant);
+			}
+		}
+		
+		// Remove territory
+		boolean doUpdates = false;
+		for(Point unclaimPoint : points) {
+			if(territory.getChunkList().containsKey(unclaimPoint) && territory instanceof KonTown) {
+				konquest.getPlotManager().removePlotPoint((KonTown)territory, unclaimPoint, territoryWorld);
+			}
+			if(territory.removeChunk(unclaimPoint)) {
+				removeTerritory(territoryWorld,unclaimPoint);
+				doUpdates = true;
+			}
+		}
+		if(doUpdates) {
+			for(KonPlayer occupant : occupants) {
+				updatePlayerBorderParticles(occupant);
+    		}
+			if(territory instanceof KonBarDisplayer) {
+				((KonBarDisplayer)territory).updateBarPlayers();
+			}
+			konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
+			konquest.getMapHandler().drawDynmapLabel(territory.getKingdom().getCapital());
+		}
+
+		return doUpdates ? true : false;
+	}
+	
+	
+	/*
+	 * Returns:
+	 * 	True when undo was successful
+	 *  False when undo failed (nothing to undo)
+	 */
+	public boolean claimUndoForAdmin(KonPlayer player) {
+		
+		if(player == null) {
+			return false;
+		}
+		
+		Set<Point> claimPoints = player.getAdminClaimRegister().getClaim();
+		KonTerritory claimTerritory = player.getAdminClaimRegister().getTerritory();
+		player.getAdminClaimRegister().pop();
+		
+		// Attempt removal
+		boolean status = removeClaims(claimPoints, claimTerritory);
+
+		return status ? true : false;
+	}
+
+	public boolean claimUndoForPlayer(KonPlayer player) {
+		
+		if(player == null) {
+			return false;
+		}
+		
+		Set<Point> claimPoints = player.getPlayerClaimRegister().getClaim();
+		KonTerritory claimTerritory = player.getPlayerClaimRegister().getTerritory();
+		player.getPlayerClaimRegister().pop();
+		
+		// Attempt removal
+		boolean status = removeClaims(claimPoints, claimTerritory);
+		
+		if(status == true) {
+			// Count claims, and reward a refund to player
+			int pointCount = 0;
+			for(Point p : claimPoints) {
+				if(claimTerritory.getChunkPoints().contains(p)) {
+					pointCount++;
+				}
+			}
+			double cost = konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
+	    	double totalCost = pointCount * cost;
+	    	// Reward favor
+    		if(cost > 0 && pointCount > 0) {
+    	        if(KonquestPlugin.depositPlayer(player.getBukkitPlayer(), totalCost)) {
+    	        	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)-totalCost);
+    	        }
+    		}
+		}
+		return status ? true : false;
 	}
 	
 	/**
@@ -1052,34 +1173,10 @@ public class KingdomManager implements KonquestKingdomManager {
 			return 4;
 		}
 		
-		// Pre-removal saves
-		// Player occupants
-		Set<KonPlayer> occupants = new HashSet<KonPlayer>();
-		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
-			if(territory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
-				occupants.add(occupant);
-			}
-		}
-		// Do removal
-		if(territory.getChunkList().containsKey(Konquest.toPoint(loc)) && territory instanceof KonTown) {
-			konquest.getPlotManager().removePlotPoint((KonTown)territory, loc);
-		}
-		if(territory.removeChunk(loc)) {
-			//updateTerritoryCache();
-			removeTerritory(loc);
-    		for(KonPlayer occupant : occupants) {
-				if(territory instanceof KonBarDisplayer) {
-					((KonBarDisplayer)territory).removeBarPlayer(occupant);
-				}
-				updatePlayerBorderParticles(occupant);
-    		}
-			konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
-			konquest.getMapHandler().drawDynmapLabel(territory.getKingdom().getCapital());
-		} else {
-			return 3;
-		}
+		// Attempt removal
+		boolean status = removeClaims(points, territory);
 
-		return 0;
+		return status ? 0 : 3;
 	}
 	
 	// Main method for admins to unclaim an individual chunk.
@@ -1164,10 +1261,10 @@ public class KingdomManager implements KonquestKingdomManager {
 	 * @return  0 - success
 	 * 			1 - error, no territory at location
 	 * 			2 - error, no chunks unclaimed
+	 * 			3 - error, chunks do not belong to territory
 	 * 			4 - error, event cancelled
 	 */
 	public int unclaimChunkRadius(Location loc, int radius) {
-		World locWorld = loc.getWorld();
 		
 		if(!isChunkClaimed(loc)) {
 			return 1;
@@ -1186,47 +1283,20 @@ public class KingdomManager implements KonquestKingdomManager {
     	
     	if(claimedChunks.isEmpty()) {
     		return 2;
-    	} else {
-    		// Fire event
-			Set<Point> points = new HashSet<Point>(claimedChunks);
-			KonquestTerritoryChunkEvent invokeEvent = new KonquestTerritoryChunkEvent(konquest, territory, loc, points, false);
-			Konquest.callKonquestEvent(invokeEvent);
-			if(invokeEvent.isCancelled()) {
-				return 4;
-			}
-			
-			// Player occupants
-			Set<KonPlayer> occupants = new HashSet<KonPlayer>();
-			for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
-				if(territory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
-					occupants.add(occupant);
-				}
-			}
-			
-			// Remove territory
-			boolean doUpdates = false;
-			for(Point unclaimPoint : claimedChunks) {
-				if(territory instanceof KonTown) {
-					konquest.getPlotManager().removePlotPoint((KonTown)territory, unclaimPoint, locWorld);
-				}
-				if(territory.removeChunk(unclaimPoint)) {
-					removeTerritory(locWorld,unclaimPoint);
-					doUpdates = true;
-				}
-			}
-			if(doUpdates) {
-				for(KonPlayer occupant : occupants) {
-					if(territory instanceof KonBarDisplayer) {
-						((KonBarDisplayer)territory).removeBarPlayer(occupant);
-					}
-					updatePlayerBorderParticles(occupant);
-	    		}
-				konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
-				konquest.getMapHandler().drawDynmapLabel(territory.getKingdom().getCapital());
-			}
     	}
+    	
+		// Fire event
+		Set<Point> points = new HashSet<Point>(claimedChunks);
+		KonquestTerritoryChunkEvent invokeEvent = new KonquestTerritoryChunkEvent(konquest, territory, loc, points, false);
+		Konquest.callKonquestEvent(invokeEvent);
+		if(invokeEvent.isCancelled()) {
+			return 4;
+		}
+		
+		// Attempt removal
+		boolean status = removeClaims(points, territory);
 
-		return 0;
+		return status ? 0 : 3;
 	}
 	
 	public boolean unclaimRadiusForAdmin(Player bukkitPlayer, Location claimLoc, int radius) {
@@ -1253,6 +1323,9 @@ public class KingdomManager implements KonquestKingdomManager {
 	    		return false;
 	    	case 2:
 	    		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_FAIL_UNCLAIMED.getMessage());
+	    		return false;
+	    	case 3:
+	    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 	    		return false;
 	    	case 4:
 	    		return false;
@@ -1307,6 +1380,9 @@ public class KingdomManager implements KonquestKingdomManager {
 	    		return false;
 	    	case 2:
 	    		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_FAIL_UNCLAIMED.getMessage());
+	    		return false;
+	    	case 3:
+	    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 	    		return false;
 	    	case 4:
 	    		return false;

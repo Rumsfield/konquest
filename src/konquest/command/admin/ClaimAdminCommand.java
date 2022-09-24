@@ -23,7 +23,7 @@ public class ClaimAdminCommand extends CommandBase {
     }
 
     public void execute() {
-    	// k admin claim [radius|auto] [<r>]
+    	// k admin claim [radius|auto|undo] [<r>]
     	if (getArgs().length > 4) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
@@ -81,6 +81,15 @@ public class ClaimAdminCommand extends CommandBase {
         			}
         			break;
         			
+        		case "undo" :
+        			boolean isUndoSuccess = getKonquest().getKingdomManager().claimUndoForAdmin(player);
+        			if(isUndoSuccess) {
+        				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+        			} else {
+        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+        			}
+        			break;
+        			
         		default :
         			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
                     return;
@@ -94,13 +103,14 @@ public class ClaimAdminCommand extends CommandBase {
     
     @Override
 	public List<String> tabComplete() {
-		// k admin claim [radius|auto] [<r>]
+		// k admin claim [radius|auto|undo] [<r>]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		
 		if(getArgs().length == 3) {
 			tabList.add("radius");
 			tabList.add("auto");
+			tabList.add("undo");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
