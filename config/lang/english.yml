@@ -155,7 +155,7 @@ menu:
     open: "All kingdom members can build and use chests"
     plot: "Residents can only build and use chests in plots"
     redstone: "Enemies can use redstone switches and doors"
-    golem: "Iron Golems will attack all enemies"
+    golem: "Iron Golems will attack all enemies who enter"
   plots:
     edit-add-land: "Add Land"
     edit-remove-land: "Remove Land"

@@ -121,6 +121,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
     	String isOpen = DisplayManager.boolean2Symbol(infoTown.isOpen());
     	String isPlotOnly = DisplayManager.boolean2Symbol(infoTown.isPlotOnly());
     	String isRedstone = DisplayManager.boolean2Symbol(infoTown.isEnemyRedstoneAllowed());
+    	String isGolemOffense = DisplayManager.boolean2Symbol(infoTown.isGolemOffensive());
     	String isProtected = DisplayManager.boolean2Symbol((infoTown.isCaptureDisabled() || infoTown.getKingdom().isOfflineProtected() || infoTown.isTownWatchProtected()));
     	String isAttacked = DisplayManager.boolean2Symbol(infoTown.isAttacked());
     	String isShielded = DisplayManager.boolean2Symbol(infoTown.isShielded());
@@ -130,6 +131,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
     	loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
     	loreList.add(loreColor+MessagePath.LABEL_PLOT.getMessage()+": "+isPlotOnly);
     	loreList.add(loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage()+": "+isRedstone);
+    	loreList.add(loreColor+MessagePath.LABEL_GOLEM_OFFENSE.getMessage()+": "+isGolemOffense);
     	loreList.add(loreColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage()+": "+isAttacked);
     	loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
     	loreList.add(loreColor+MessagePath.LABEL_SHIELD.getMessage()+": "+isShielded);
