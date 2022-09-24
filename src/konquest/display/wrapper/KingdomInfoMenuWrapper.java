@@ -181,6 +181,13 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			// Town Icons open a new town info menu for the associated player
 			TownIcon icon = (TownIcon)clickedIcon;
 			getKonquest().getDisplayManager().displayTownInfoMenu(clickPlayer,icon.getTown());
+		} else if(clickedIcon instanceof PlayerIcon) {
+			// Player Head Icons open a new info menu for the associated player
+			PlayerIcon icon = (PlayerIcon)clickedIcon;
+			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
+			if(clickPlayer != null && offlinePlayer != null && icon.getAction().equals(PlayerIconAction.DISPLAY_INFO)) {
+				getKonquest().getDisplayManager().displayPlayerInfoMenu(clickPlayer, offlinePlayer);
+			}
 		}
 	}
 
