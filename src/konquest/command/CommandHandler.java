@@ -49,30 +49,6 @@ public class CommandHandler  implements TabExecutor {
             	if (commandArg.equals(CommandType.ADMIN)) {
             		// Command is an admin command
             		new AdminCommand(konquest, sender, args).execute();
-            		/*
-            		if (args.length >= 2) {
-            			AdminCommandType adminArg = AdminCommandType.getCommand(args[1]);
-            			boolean hasBasePerm = sender.hasPermission(commandArg.permission());
-            			boolean hasSubPerm = sender.hasPermission(adminArg.permission());
-            			ChatUtil.printDebug("Command sender has permission base: "+hasBasePerm+" and sub: "+hasSubPerm);
-            			if (sender.hasPermission(commandArg.permission()) || sender.hasPermission(adminArg.permission())) {
-                			// Sender has permission for this admin command
-                			new AdminCommand(konquest, sender, args).execute();
-                		} else {
-                			// Sender does not have permission for this admin command
-                			ChatUtil.sendError((Player) sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+commandArg.permission());
-                			ChatUtil.sendError((Player) sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+adminArg.permission());
-                		}
-            		} else {
-            			if (sender.hasPermission(commandArg.permission())) {
-                			// Sender has permission for this admin command
-                			new AdminCommand(konquest, sender, args).execute();
-                		} else {
-                			// Sender does not have permission for this admin command
-                			ChatUtil.sendError((Player) sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+commandArg.permission());
-                		}
-            		}
-            		*/
             	} else {
             		// Command is a normal command
 	            	if (sender.hasPermission(commandArg.permission())) {
@@ -138,6 +114,9 @@ public class CommandHandler  implements TabExecutor {
 	                    case TRAVEL:
 	                        new TravelCommand(konquest, sender, args).execute();
 	                        break;
+	                    case UNCLAIM:
+	                        new UnclaimCommand(konquest, sender, args).execute();
+	                        break;
 	                    case HELP:
 	                        new HelpCommand(konquest, sender, args).execute();
 	                        break;
@@ -190,19 +169,6 @@ public class CommandHandler  implements TabExecutor {
             	if (commandArg.equals(CommandType.ADMIN)) {
             		// Command is an admin command
             		tabList.addAll(new AdminCommand(konquest, sender, args).tabComplete());
-            		/*
-            		if (args.length >= 2) {
-            			AdminCommandType adminArg = AdminCommandType.getCommand(args[1]);
-            			if (sender.hasPermission(commandArg.permission()) || sender.hasPermission(adminArg.permission())) {
-                			// Sender has permission for this admin command
-            				tabList.addAll(new AdminCommand(konquest, sender, args).tabComplete());
-                		}
-            		} else {
-            			if (sender.hasPermission(commandArg.permission())) {
-                			// Sender has permission for this admin command
-            				tabList.addAll(new AdminCommand(konquest, sender, args).tabComplete());
-                		}
-            		}*/
             	} else {
             		// Command is a normal command
 	            	if (sender.hasPermission(commandArg.permission())) {
@@ -212,20 +178,16 @@ public class CommandHandler  implements TabExecutor {
 	                        break;
 	                    case CHAT:
 	                    	tabList.addAll(new ChatCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for ChatCommand: "+args.length);
-	                        break;
+	                    	break;
 	                    case CLAIM:
 	                    	tabList.addAll(new ClaimCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for ClaimCommand: "+args.length);
-	                        break;
+	                    	break;
 	                    case EXILE:
 	                    	tabList.addAll(new ExileCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for ExileCommand: "+args.length);
-	                        break;
+	                    	break;
 	                    case FAVOR:
 	                    	tabList.addAll(new FavorCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for FavorCommand: "+args.length);
-	                        break;
+	                    	break;
 	                    case FLY:
 	                    	tabList.addAll(new FlyCommand(konquest, sender, args).tabComplete());
 	                        break;
@@ -234,71 +196,56 @@ public class CommandHandler  implements TabExecutor {
 	                        break;
 	                    case INFO:
 	                    	tabList.addAll(new InfoCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for InfoCommand: "+args.length);
-	                        break;
+	                    	break;
 	                    case JOIN:
 	                    	tabList.addAll(new JoinCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for JoinCommand: "+args.length);
-	                        break;
+	                    	break;
 	                    case LEAVE:
 	                    	tabList.addAll(new LeaveCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for JoinCommand: "+args.length);
-	                        break;
+	                    	break;
 	                    case LIST:
 	                    	tabList.addAll(new ListCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for ListCommand: "+args.length);
-	                        break;
+	                    	break;
 	                    case MAP:
 	                    	tabList.addAll(new MapCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for MapCommand: "+args.length);
-	                        break;
+	                    	break;
 	                    case PREFIX:
 	                    	tabList.addAll(new PrefixCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for SpyCommand: "+args.length);
 	                    	break;
 	                    case QUEST:
 	                    	tabList.addAll(new QuestCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for MapCommand: "+args.length);
-	                        break;
+	                    	break;
 	                    case SCORE:
 	                    	tabList.addAll(new ScoreCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for ScoreCommand: "+args.length);
 	                    	break;
 	                    case SETTLE:
 	                    	tabList.addAll(new SettleCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for SettleCommand: "+args.length);
 	                    	break;
 	                    case SPY:
 	                    	tabList.addAll(new SpyCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for SpyCommand: "+args.length);
 	                    	break;
 	                    case STATS:
 	                    	tabList.addAll(new StatsCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for SpyCommand: "+args.length);
 	                    	break;
 	                    case TOWN:
 	                    	tabList.addAll(new TownCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for TownCommand: "+args.length);
 	                        break;
 	                    case TRAVEL:
 	                    	tabList.addAll(new TravelCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for TravelCommand: "+args.length);
+	                        break;
+	                    case UNCLAIM:
+	                    	tabList.addAll(new UnclaimCommand(konquest, sender, args).tabComplete());
 	                        break;
 	                    case HELP:
 	                    	tabList.addAll(new HelpCommand(konquest, sender, args).tabComplete());
-	                    	//ChatUtil.printDebug("Tab Complete for HelpCommand: "+args.length);
 	                        break;
 	                    default:
-	                    	//ChatUtil.printDebug("Tab Complete for none: "+args.length);
 	                    	break;
 	            		}
 	            	}
             	}
         	}
-        } /*else {
-        //	ChatUtil.sendError((Player) sender, "Missing permission konquest.command");
-        //}*/
-		//ChatUtil.printDebug("Exiting onTabComplete");
+        }
         return tabList;
 	}
 	

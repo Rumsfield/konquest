@@ -8,13 +8,16 @@ import java.util.ListIterator;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.display.InfoIcon;
 import konquest.display.MenuIcon;
+import konquest.display.PlayerIcon;
 import konquest.display.TownIcon;
+import konquest.display.PlayerIcon.PlayerIconAction;
 import konquest.manager.DisplayManager;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
@@ -41,17 +44,24 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		ChatColor titleColor = DisplayManager.titleColor;
 		ChatColor loreColor = DisplayManager.loreColor;
 		ChatColor valueColor = DisplayManager.valueColor;
+		ChatColor hintColor = DisplayManager.hintColor;
 		
 		String pageLabel = "";
  		List<String> loreList;
  		InfoIcon info;
+ 		final int MAX_ICONS_PER_PAGE = 45;
+ 		
+ 		List<OfflinePlayer> allKingdomMembers = new ArrayList<OfflinePlayer>();
+ 		for(KonOfflinePlayer player : getKonquest().getPlayerManager().getAllPlayersInKingdom(infoKingdom)) {
+ 			allKingdomMembers.add(player.getOfflineBukkitPlayer());
+ 		}
 
  		// Page 0
 		pageLabel = titleColor+MessagePath.COMMAND_INFO_NOTICE_KINGDOM_HEADER.getMessage(infoKingdom.getName());
 		getMenu().addPage(0, 1, pageLabel);
 		/* Member Info Icon (2) */
 		int numKingdomPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(infoKingdom).size();
-    	int numAllKingdomPlayers = getKonquest().getPlayerManager().getAllPlayersInKingdom(infoKingdom).size();
+    	int numAllKingdomPlayers = allKingdomMembers.size();
     	loreList = new ArrayList<String>();
     	loreList.add(loreColor+MessagePath.LABEL_ONLINE_PLAYERS.getMessage()+": "+valueColor+numKingdomPlayers);
     	loreList.add(loreColor+MessagePath.LABEL_TOTAL_PLAYERS.getMessage()+": "+valueColor+numAllKingdomPlayers);
@@ -95,7 +105,6 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
     	
     	// Page 1+
 		List<KonTown> kingdomTowns = sortedTowns(infoKingdom);
-		final int MAX_ICONS_PER_PAGE = 45;
 		int pageTotal = (int)Math.ceil(((double)kingdomTowns.size())/MAX_ICONS_PER_PAGE);
 		if(pageTotal == 0) {
 			pageTotal = 1;
@@ -126,6 +135,37 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			}
 			pageNum++;
 		}
+		
+		// Page 2+
+		pageTotal = (int)Math.ceil(((double)allKingdomMembers.size())/MAX_ICONS_PER_PAGE);
+		if(pageTotal == 0) {
+			pageTotal = 1;
+		}
+		ListIterator<OfflinePlayer> memberIter = allKingdomMembers.listIterator();
+		for(int i = 0; i < pageTotal; i++) {
+			int numPageRows = (int)Math.ceil(((double)(allKingdomMembers.size() - i*MAX_ICONS_PER_PAGE))/9);
+			if(numPageRows < 1) {
+				numPageRows = 1;
+			} else if(numPageRows > 5) {
+				numPageRows = 5;
+			}
+			pageLabel = titleColor+infoKingdom.getName()+" "+MessagePath.LABEL_PLAYERS.getMessage()+" "+(i+1)+"/"+pageTotal;
+			getMenu().addPage(pageNum, numPageRows, pageLabel);
+			int slotIndex = 0;
+			while(slotIndex < MAX_ICONS_PER_PAGE && memberIter.hasNext()) {
+				/* Player Icon (n) */
+				OfflinePlayer currentMember = memberIter.next();
+				loreList = new ArrayList<String>();
+				loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
+				loreList.add(ChatColor.WHITE+MessagePath.LABEL_PLAYER.getMessage());
+		    	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
+		    	PlayerIcon player = new PlayerIcon(kingdomColor+currentMember.getName(),loreList,currentMember,slotIndex,true,PlayerIconAction.DISPLAY_INFO);
+		    	getMenu().getPage(pageNum).addIcon(player);
+				slotIndex++;
+			}
+			pageNum++;
+		}
+				
 		getMenu().refreshNavigationButtons();
 		getMenu().setPageIndex(0);
 	}
@@ -141,6 +181,13 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			// Town Icons open a new town info menu for the associated player
 			TownIcon icon = (TownIcon)clickedIcon;
 			getKonquest().getDisplayManager().displayTownInfoMenu(clickPlayer,icon.getTown());
+		} else if(clickedIcon instanceof PlayerIcon) {
+			// Player Head Icons open a new info menu for the associated player
+			PlayerIcon icon = (PlayerIcon)clickedIcon;
+			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
+			if(clickPlayer != null && offlinePlayer != null && icon.getAction().equals(PlayerIconAction.DISPLAY_INFO)) {
+				getKonquest().getDisplayManager().displayPlayerInfoMenu(clickPlayer, offlinePlayer);
+			}
 		}
 	}
 

@@ -32,17 +32,30 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		RUIN_SPAWN;
 	}
 	
+	/*
+	 * Follow logic:
+	 * 	Player starts with NONE, can enter any type state.
+	 * 	While in any type, enter again to return to NONE.
+	 *  While in any type and enter into a new type, switch to new state.
+	 */
+	public enum FollowType {
+		NONE,
+		CLAIM,
+		UNCLAIM,
+		ADMIN_CLAIM,
+		ADMIN_UNCLAIM;
+	}
+	
 	private Player bukkitPlayer;
 	//private KonKingdom exileKingdom;
 	
 	private RegionType settingRegion;
+	private FollowType autoFollow;
 	private String regionKingdomName;
 	private Location regionCornerOneBuffer;
 	private Location regionCornerTwoBuffer;
 	
 	private boolean isAdminBypassActive;
-	private boolean isClaimingFollow;
-	private boolean isAdminClaimingFollow;
 	private boolean isGlobalChat;
 	private boolean isExileConfirmed;
 	private boolean isMapAuto;
@@ -72,6 +85,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	private HashMap<Location,Color> monumentTemplateBoundary;
 	private HashSet<Location> monumentShowBoundary;
 	private Block lastTargetBlock;
+	private KonClaimRegister adminClaimRegister;
 	
 	public KonPlayer(Player bukkitPlayer, KonKingdom kingdom, boolean isBarbarian) {
 		super(bukkitPlayer, kingdom, isBarbarian);
@@ -82,8 +96,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		this.settingRegion = RegionType.NONE;
 		this.regionKingdomName = "";
 		this.isAdminBypassActive = false;
-		this.isClaimingFollow = false;
-		this.isAdminClaimingFollow = false;
+		this.autoFollow = FollowType.NONE;
 		this.isGlobalChat = true;
 		this.isExileConfirmed = false;
 		this.isMapAuto = false;
@@ -107,6 +120,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		this.directiveProgress = new HashMap<KonDirective,Integer>();
 		this.playerStats = new KonStats();
 		this.playerPrefix = new KonPrefix();
+		this.adminClaimRegister = new KonClaimRegister();
 		this.borderMap = new HashMap<Location, Color>();
 		this.borderPlotMap = new HashMap<Location, Color>();
 		this.monumentTemplateBoundary = new HashMap<Location,Color>();
@@ -189,12 +203,12 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		return isAdminBypassActive;
 	}
 	
-	public boolean isClaimingFollow() {
-		return isClaimingFollow;
+	public boolean isAutoFollowActive() {
+		return (!autoFollow.equals(FollowType.NONE));
 	}
 	
-	public boolean isAdminClaimingFollow() {
-		return isAdminClaimingFollow;
+	public FollowType getAutoFollow() {
+		return autoFollow;
 	}
 	
 	public boolean isGlobalChat() {
@@ -249,6 +263,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		return playerPrefix;
 	}
 	
+	public KonClaimRegister getAdminClaimRegister() {
+		return adminClaimRegister;
+	}
+	
 	public Timer getBorderUpdateLoopTimer() {
 		return borderUpdateLoopTimer;
 	}
@@ -298,12 +316,8 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		isAdminBypassActive = val;
 	}
 	
-	public void setIsClaimingFollow(boolean val) {
-		isClaimingFollow = val;
-	}
-	
-	public void setIsAdminClaimingFollow(boolean val) {
-		isAdminClaimingFollow = val;
+	public void setAutoFollow(FollowType val) {
+		autoFollow = val;
 	}
 	
 	public void setIsGlobalChat(boolean val) {

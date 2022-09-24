@@ -59,6 +59,7 @@ label:
   critical-hits: "Critical Hits"
   options: "Options"
   enemy-redstone: "Enemy Redstone"
+  golem-offense: "Iron Golem Offense"
   true: "True"
   false: "False"
   plot: "Plot"
@@ -154,6 +155,7 @@ menu:
     open: "All kingdom members can build and use chests"
     plot: "Residents can only build and use chests in plots"
     redstone: "Enemies can use redstone switches and doors"
+    golem: "Iron Golems will attack all enemies who enter"
   plots:
     edit-add-land: "Add Land"
     edit-remove-land: "Remove Land"
@@ -579,6 +581,8 @@ command:
       plot-disable: "%s now allows residents to build in town land and within plots."
       redstone-enable: "%s now allows enemies to use redstone switches and doors."
       redstone-disable: "%s now prevents enemies from using redstone switches and doors."
+      golem-enable: "Iron Golems in %s will attack all enemies within town land."
+      golem-disable: "Iron Golems in %s will only defend the town monument from enemies."
       add-invite-reminder: "You have been invited to join the town of %s."
       add-success: "Added %s as a resident of %s."
       add-invite: "Sending an invite to %s to join %s."
@@ -614,6 +618,17 @@ command:
       no-town: "That town does not exist in your Kingdom."
       cooldown: "You must wait %s before traveling to %s."
       canceled: "Your travel was canceled by movement."
+  unclaim:
+    notice:
+      success: "Successfully unclaimed %s chunks of land from %s."
+      fail-auto: "Could not unclaim, disabled auto unclaim."
+      pass-auto: "Unclaimed"
+    error:
+      radius: "Radius must be greater than or equal to %s and less than or equal to %s."
+      fail-town: "Must unclaim from towns only."
+      fail-lord: "Failed to unclaim, you must be the town lord."
+      fail-unclaimed: "Failed to unclaim, no claims found."
+      fail-center: "Failed to unclaim, cannot remove territory center."
 quickshop:
   error:
     enemy-create: "Cannot create a shop in enemy towns!"
@@ -799,6 +814,7 @@ description:
   spy: "Reveal the location of an enemy town."
   settle: "Settle a new Town."
   claim: "Claim a chunk of land."
+  unclaim: "Unclaim a chunk of land."
   travel: "Teleport to a Town, your Camp or to your Capital."
   town: "Manage Towns you belong to."
   guild: "Manage kingdom guilds."

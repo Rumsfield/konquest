@@ -174,6 +174,7 @@ public interface KonquestKingdomManager {
 	 * 			<br>1 - error, no adjacent territory
 	 * 			<br>2 - error, exceeds max distance
 	 * 			<br>3 - error, already claimed
+	 * 			<br>4 - error, cancelled by event
 	 */
 	public int claimChunk(Location loc);
 	
@@ -182,9 +183,14 @@ public interface KonquestKingdomManager {
 	 * Removes the chunk from the chunk map of the territory.
 	 * 
 	 * @param loc The location to unclaim
-	 * @return True if the chunk was successfully unclaimed, else false
+	 * @return  Status code
+	 * 			<br>0 - success
+	 * 			<br>1 - error, no territory at location
+	 *			<br>2 - error, location in center chunk
+	 * 			<br>3 - error, internal territory chunk not found
+	 * 			<br>4 - error, cancelled by event
 	 */
-	public boolean unclaimChunk(Location loc);
+	public int unclaimChunk(Location loc);
 	
 	/**
 	 * Checks whether the chunk at the given location is claimed by a territory.

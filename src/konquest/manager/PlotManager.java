@@ -4,6 +4,7 @@ import java.awt.Point;
 
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
@@ -60,18 +61,22 @@ public class PlotManager implements KonquestPlotManager {
 		return maxSize;
 	}
 	
-	public void removePlotPoint(KonTown town, Location loc) {
-		if(town.hasPlot(loc)) {
+	public void removePlotPoint(KonTown town, Point point, World world) {
+		if(town.hasPlot(point,world)) {
 			//ChatUtil.printDebug("Removing plot point in town "+town.getName());
-			KonPlot plot = town.getPlot(loc).clone();
+			KonPlot plot = town.getPlot(point,world).clone();
 			if(plot != null) {
 				town.removePlot(plot);
-				plot.removePoint(Konquest.toPoint(loc));
+				plot.removePoint(point);
 				if(!plot.getPoints().isEmpty()) {
 					town.putPlot(plot);
 				}
 			}
 		}
+	}
+	
+	public void removePlotPoint(KonTown town, Location loc) {
+		removePlotPoint(town,Konquest.toPoint(loc),loc.getWorld());
 	}
 	
 	public boolean addPlot(KonTown town, KonPlot plot) {

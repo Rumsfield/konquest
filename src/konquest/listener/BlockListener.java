@@ -268,7 +268,7 @@ public class BlockListener implements Listener {
 						}
 						
 						// Update MonumentBar state
-						town.setAttacked(true);
+						town.setAttacked(true,player);
 						town.updateBar();
 						town.applyGlow(event.getPlayer());
 						// Attempt to start a raid alert
@@ -1403,7 +1403,7 @@ public class BlockListener implements Listener {
 				town.getMonumentTimer().stopTimer();
 				// Reset the town MonumentBar
 				//town.resetBar();
-				town.setAttacked(false);
+				town.setAttacked(false,player);
 				town.setBarProgress(1.0);
 				town.updateBar();
 			}
@@ -1416,6 +1416,9 @@ public class BlockListener implements Listener {
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRITICALS,1);
 			
 			String kingdomName = town.getKingdom().getName();
+			
+			// Target rabbit
+			town.targetRabbitToPlayer(player.getBukkitPlayer());
 					
 			// Alert all players of enemy Kingdom when the first critical block is broken
 			if(town.getMonument().getCriticalHits() == 1) {

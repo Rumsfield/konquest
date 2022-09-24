@@ -44,16 +44,16 @@ public class TownOptionsMenuWrapper extends MenuWrapper {
     	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_OPEN.getMessage()));
     	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
     	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-		option = new OptionIcon(optionAction.TOWN_OPEN, loreColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.DARK_OAK_DOOR, 3);
+		option = new OptionIcon(optionAction.TOWN_OPEN, loreColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.DARK_OAK_DOOR, 2);
 		getMenu().getPage(0).addIcon(option);
 		
-		// Open Info Icon
+		// Plot Only Info Icon
 		currentValue = DisplayManager.boolean2Lang(town.isPlotOnly())+" "+DisplayManager.boolean2Symbol(town.isPlotOnly());
 		loreList = new ArrayList<String>();
     	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_PLOT.getMessage()));
     	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
     	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-		option = new OptionIcon(optionAction.TOWN_PLOT_ONLY, loreColor+MessagePath.LABEL_PLOT.getMessage(), loreList, Material.DIAMOND_SHOVEL, 4);
+		option = new OptionIcon(optionAction.TOWN_PLOT_ONLY, loreColor+MessagePath.LABEL_PLOT.getMessage(), loreList, Material.DIAMOND_SHOVEL, 3);
 		getMenu().getPage(0).addIcon(option);
 		
 		// Redstone Info Icon
@@ -63,6 +63,15 @@ public class TownOptionsMenuWrapper extends MenuWrapper {
     	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
     	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
 		option = new OptionIcon(optionAction.TOWN_REDSTONE, loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage(), loreList, Material.LEVER, 5);
+		getMenu().getPage(0).addIcon(option);
+		
+		// Golem Offensive Info Icon
+		currentValue = DisplayManager.boolean2Lang(town.isGolemOffensive())+" "+DisplayManager.boolean2Symbol(town.isGolemOffensive());
+		loreList = new ArrayList<String>();
+    	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_GOLEM.getMessage()));
+    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
+    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+		option = new OptionIcon(optionAction.TOWN_GOLEM, loreColor+MessagePath.LABEL_GOLEM_OFFENSE.getMessage(), loreList, Material.IRON_SWORD, 6);
 		getMenu().getPage(0).addIcon(option);
 		
 		getMenu().refreshNavigationButtons();

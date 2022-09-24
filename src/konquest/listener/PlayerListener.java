@@ -15,6 +15,7 @@ import konquest.model.KonRuin;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
+import konquest.model.KonPlayer.FollowType;
 import konquest.model.KonPlayer.RegionType;
 import konquest.model.KonPlot;
 import konquest.utility.ChatUtil;
@@ -40,9 +41,7 @@ import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.Event;
@@ -502,6 +501,11 @@ public class PlayerListener implements Listener{
 	        		if(territory instanceof KonTown) {
 	        			KonTown town = (KonTown) territory;
 	        			//ChatUtil.printDebug("EVENT player interaction within town "+town.getName());
+	        			// Target player who interacts with monument blocks
+	        			if(town.isLocInsideMonumentProtectionArea(event.getClickedBlock().getLocation())) {
+	        				town.targetRabbitToPlayer(bukkitPlayer);
+	        			}
+	        			
 	        			// Prevent enemies from interacting with things like buttons, levers, pressure plates...
 	        			if(!player.getKingdom().equals(town.getKingdom()) && !town.isEnemyRedstoneAllowed()) {
 	        				//ChatUtil.printDebug("  running preventUse: town");
@@ -801,11 +805,11 @@ public class PlayerListener implements Listener{
 			KonTerritory territoryFrom = kingdomManager.getChunkTerritory(currentLoc);
 			// Update bars
 			if(territoryFrom.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
-				((KonTown) territoryFrom).removeBarPlayer(player);
-				boolean isArmisticeFrom = konquest.getGuildManager().isArmistice(player, (KonTown)territoryFrom);
+				KonTown town = (KonTown) territoryFrom;
+				town.removeBarPlayer(player);
 				player.clearAllMobAttackers();
 				// Command all nearby Iron Golems to target nearby enemy players, ignore triggering player
-				updateGolemTargetsForTerritory(territoryFrom,player,false,isArmisticeFrom);
+				town.updateGolemTargets(player,false);
 			} else if(territoryFrom.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
 				((KonRuin) territoryFrom).removeBarPlayer(player);
 			} else if(territoryFrom.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
@@ -820,9 +824,9 @@ public class PlayerListener implements Listener{
 			KonTerritory territoryTo = kingdomManager.getChunkTerritory(respawnLoc);
 			// Update bars
 			if(territoryTo.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
-				boolean isArmisticeTo = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
-	    		((KonTown) territoryTo).addBarPlayer(player);
-				updateGolemTargetsForTerritory(territoryTo,player,true,isArmisticeTo);
+				KonTown town = (KonTown) territoryTo;
+				town.addBarPlayer(player);
+				town.updateGolemTargets(player,true);
 			} else if (territoryTo.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
 				((KonRuin) territoryTo).addBarPlayer(player);
 			} else if (territoryTo.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
@@ -1015,8 +1019,7 @@ public class PlayerListener implements Listener{
 			}
 			
 			boolean isArmisticeTo = false; // Is the player in an armistice with the to-territory?
-			boolean isArmisticeFrom = false; // Is the player in an armistice with the from-territory?
-			
+
 			// Fire event when either entering or leaving a territory
 			if(isTerritoryTo || isTerritoryFrom) {
 	    		KonquestTerritoryMoveEvent invokeEvent = new KonquestTerritoryMoveEvent(konquest, territoryTo, territoryFrom, player);
@@ -1030,13 +1033,54 @@ public class PlayerListener implements Listener{
     		if(isTerritoryTo && territoryTo instanceof KonTown) {
 				isArmisticeTo = konquest.getGuildManager().isArmistice(player, (KonTown)territoryTo);
 			}
-			if(isTerritoryFrom && territoryFrom instanceof KonTown) {
-				isArmisticeFrom = konquest.getGuildManager().isArmistice(player, (KonTown)territoryFrom);
-			}
     		
 			// Check world transition
     		if(moveTo.getWorld().equals(moveFrom.getWorld())) {
     			// Player moved within the same world
+        		
+    			// Auto claiming & unclaiming
+        		if(player.isAutoFollowActive()) {
+	        		if(!isTerritoryTo) {
+	        			// Auto claim
+	        			if(player.getAutoFollow().equals(FollowType.ADMIN_CLAIM)) {
+	        				// Admin claiming takes priority
+	        				kingdomManager.claimForAdmin(movePlayer, moveTo);
+	        			} else if(player.getAutoFollow().equals(FollowType.CLAIM)) {
+	        				// Player is claim following
+	        				boolean isClaimSuccess = kingdomManager.claimForPlayer(movePlayer, moveTo);
+	            			if(!isClaimSuccess) {
+	            				player.setAutoFollow(FollowType.NONE);
+	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
+	            			} else {
+	            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_CLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
+	            			}
+	        			}
+	        		} else {
+	        			// Auto unclaim
+	        			if(player.getAutoFollow().equals(FollowType.ADMIN_UNCLAIM)) {
+	        				// Admin unclaiming takes priority
+	        				kingdomManager.unclaimForAdmin(movePlayer, moveTo);
+	        			} else if(player.getAutoFollow().equals(FollowType.UNCLAIM)) {
+	        				// Player is unclaim following
+	        				boolean isUnclaimSuccess = kingdomManager.unclaimForPlayer(movePlayer, moveTo);
+	            			if(!isUnclaimSuccess) {
+	            				player.setAutoFollow(FollowType.NONE);
+	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_FAIL_AUTO.getMessage());
+	            			} else {
+	            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_UNCLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
+	            			}
+	        			}
+	        		}
+	        		// Update territory variables for chunk boundary checks below
+    				isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
+    				isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
+    				if(isTerritoryTo) {
+    					territoryTo = kingdomManager.getChunkTerritory(moveTo);
+    				}
+    				if(isTerritoryFrom) {
+    					territoryFrom = kingdomManager.getChunkTerritory(moveFrom);
+    				}
+        		}
         		
         		// Chunk transition checks
         		if(!isTerritoryTo && isTerritoryFrom) { // When moving into the wild
@@ -1044,7 +1088,7 @@ public class PlayerListener implements Listener{
         			ChatUtil.sendKonTitle(player, "", MessagePath.GENERIC_NOTICE_WILD.getMessage());
         			
         			// Do things appropriate to the type of territory
-        			onExitTerritory(territoryFrom,player,isArmisticeFrom);
+        			onExitTerritory(territoryFrom,player);
 
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
@@ -1088,7 +1132,7 @@ public class PlayerListener implements Listener{
     	            	
     	            	// Do things appropriate to the type of territory
     	    			// Exit Territory
-            			onExitTerritory(territoryFrom,player,isArmisticeFrom);
+            			onExitTerritory(territoryFrom,player);
             			// Entry Territory
     	    			onEnterTerritory(territoryTo,moveTo,moveFrom,player,isArmisticeTo);
     	    			
@@ -1108,7 +1152,7 @@ public class PlayerListener implements Listener{
     								// Enemy player
         							kingdomManager.applyTownNerf(player, town);
     							}
-    							updateGolemTargetsForTerritory(territoryTo,player,true,isArmisticeTo);
+    							town.updateGolemTargets(player,true);
         					} else {
         						// Friendly player
         						// Display plot message to friendly players
@@ -1132,30 +1176,6 @@ public class PlayerListener implements Listener{
         	        },1);
         		}
         		
-        		// Auto claiming
-        		if(!isTerritoryTo) {
-        			if(player.isAdminClaimingFollow()) {
-        				// Admin claiming takes priority
-        				kingdomManager.claimForAdmin(movePlayer, moveTo);
-        				// Update territory variables for chunk boundary checks below
-        				isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
-        				isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
-        			} else if(player.isClaimingFollow()) {
-        				// Player is claim following
-        				boolean isClaimSuccess = kingdomManager.claimForPlayer(movePlayer, moveTo);
-            			if(!isClaimSuccess) {
-            				player.setIsClaimingFollow(false);
-            				//ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
-            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
-            			} else {
-            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_CLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
-            			}
-            			// Update territory variables for chunk boundary checks below
-        				isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
-        				isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
-        			}
-        		}
-        		
     		} else {
     			// Player moved between worlds
     			
@@ -1165,14 +1185,8 @@ public class PlayerListener implements Listener{
     			}
     			
     			// Disable movement-based flags
-    			if(player.isAdminClaimingFollow()) {
-    				player.setIsAdminClaimingFollow(false);
-    				//ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
-    				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
-    			}
-    			if(player.isClaimingFollow()) {
-    				player.setIsClaimingFollow(false);
-    				//ChatUtil.sendNotice(bukkitPlayer, "Could not claim, disabled auto claim.");
+    			if(player.isAutoFollowActive()) {
+    				player.setAutoFollow(FollowType.NONE);
     				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
     			}
     			if(player.isMapAuto()) {
@@ -1183,7 +1197,7 @@ public class PlayerListener implements Listener{
     			player.setIsFlyEnabled(false);
         		
     			if(isTerritoryFrom) {
-    				onExitTerritory(territoryFrom,player,isArmisticeFrom);
+    				onExitTerritory(territoryFrom,player);
         			// Remove potion effects for all players
         			kingdomManager.clearTownNerf(player);
     			}
@@ -1271,7 +1285,7 @@ public class PlayerListener implements Listener{
 				// Display plot message to friendly players
 				displayPlotMessage(town, locTo, locFrom, player);
 				// Command all nearby Iron Golems to target enemy player, if no other closer player is present
-				updateGolemTargetsForTerritory(territoryTo,player,true,isArmisticeTo);
+				town.updateGolemTargets(player,true);
 				// Try to apply heart adjustments
 				kingdomManager.applyTownHearts(player,town);
 				// For an enemy player...
@@ -1342,7 +1356,7 @@ public class PlayerListener implements Listener{
 		return;
     }
     
-    private void onExitTerritory(KonTerritory territoryFrom, KonPlayer player, boolean isArmisticeFrom) {
+    private void onExitTerritory(KonTerritory territoryFrom, KonPlayer player) {
     	if(territoryFrom == null) {
     		return;
     	}
@@ -1353,7 +1367,7 @@ public class PlayerListener implements Listener{
 				town.removeBarPlayer(player);
 				player.clearAllMobAttackers();
 				// Command all nearby Iron Golems to target nearby enemy players, ignore triggering player
-				updateGolemTargetsForTerritory(territoryFrom,player,false,isArmisticeFrom);
+				town.updateGolemTargets(player,false);
 				// Try to clear heart adjustments
 				kingdomManager.clearTownHearts(player);
 				break;
@@ -1376,72 +1390,6 @@ public class PlayerListener implements Listener{
 				
 			default:
 				break;
-		}
-    }
-    
-    private void updateGolemTargetsForTerritory(KonTerritory territory, KonPlayer triggerPlayer, boolean useDefault, boolean isArmistice) {
-    	// Command all nearby Iron Golems to target closest player, if enemy exists nearby, else don't change target
-    	// Find iron golems within the town max radius
-    	boolean isGolemAttackEnemies = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.golem_attack_enemies");
-		if(isGolemAttackEnemies && !triggerPlayer.isAdminBypassActive() && !triggerPlayer.getKingdom().equals(territory.getKingdom()) && !isArmistice) {
-			Location centerLoc = territory.getCenterLoc();
-			int golumSearchRange = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_size",1); // chunks
-			int radius = 16*16;
-			if(golumSearchRange > 1) {
-				radius = golumSearchRange*16;
-			}
-			for(Entity e : centerLoc.getWorld().getNearbyEntities(centerLoc,radius,256,radius,(e) -> e.getType() == EntityType.IRON_GOLEM)) {
-				IronGolem golem = (IronGolem)e;
-				// Check for golem inside given territory or in wild
-				if(territory.isLocInside(golem.getLocation()) || !kingdomManager.isChunkClaimed(golem.getLocation())) {
-					
-					// Check for closest enemy player
-					boolean isNearbyPlayer = false;
-					double minDistance = 99;
-					KonPlayer nearestPlayer = null;
-					for(Entity p : golem.getNearbyEntities(32,32,32)) {
-						if(p instanceof Player) {
-							KonPlayer nearbyPlayer = playerManager.getPlayer((Player)p);
-							if(nearbyPlayer != null && !nearbyPlayer.isAdminBypassActive() && !nearbyPlayer.getKingdom().equals(territory.getKingdom()) && territory.isLocInside(p.getLocation()) &&
-									(useDefault || !nearbyPlayer.equals(triggerPlayer))) {
-								double distance = golem.getLocation().distance(p.getLocation());
-								if(distance < minDistance) {
-									minDistance = distance;
-									isNearbyPlayer = true;
-									nearestPlayer = nearbyPlayer;
-								}
-							}
-						}
-					}
-					
-					// Attempt to remove current target
-					LivingEntity currentTarget = golem.getTarget();
-					//ChatUtil.printDebug("Golem: Evaluating new targets in territory "+territory.getName());
-					if(currentTarget != null && currentTarget instanceof Player) {
-						KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
-						if(previousTargetPlayer != null) {
-							previousTargetPlayer.removeMobAttacker(golem);
-							//ChatUtil.printDebug("Golem: Removed mob attacker from player "+previousTargetPlayer.getBukkitPlayer().getName());
-						}
-					} else {
-						//ChatUtil.printDebug("Golem: Bad current target");
-					}
-					
-					// Attempt to apply new target, either closest player or default trigger player
-					if(isNearbyPlayer) {
-						//ChatUtil.printDebug("Golem: Found nearby player "+nearestPlayer.getBukkitPlayer().getName());
-						golem.setTarget(nearestPlayer.getBukkitPlayer());
-						nearestPlayer.addMobAttacker(golem);
-					} else if(useDefault){
-						//ChatUtil.printDebug("Golem: Targeting default player "+triggerPlayer.getBukkitPlayer().getName());
-						golem.setTarget(triggerPlayer.getBukkitPlayer());
-						triggerPlayer.addMobAttacker(golem);
-					}
-					
-				} else {
-					ChatUtil.printDebug("Golem: Not in this territory or wild");
-				}
-			}
 		}
     }
     

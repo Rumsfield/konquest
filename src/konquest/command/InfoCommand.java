@@ -72,7 +72,7 @@ public class InfoCommand extends CommandBase {
         		if(getKonquest().getKingdomManager().isKingdom(name)) {
         			displayState = infoType.KINGDOM;
         			kingdom = getKonquest().getKingdomManager().getKingdom(name);
-        		} else if(name.equalsIgnoreCase("barbarians")) {
+        		} else if(name.equalsIgnoreCase(MessagePath.LABEL_BARBARIANS.getMessage())) {
         			displayState = infoType.KINGDOM;
         			kingdom = getKonquest().getKingdomManager().getBarbarians();
         		} else if(foundTown) {
@@ -151,6 +151,7 @@ public class InfoCommand extends CommandBase {
 			tabList.addAll(townList);
 			tabList.addAll(guildList);
 			tabList.addAll(playerList);
+			tabList.add(MessagePath.LABEL_BARBARIANS.getMessage());
 			
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);
