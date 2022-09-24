@@ -85,7 +85,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	private HashMap<Location,Color> monumentTemplateBoundary;
 	private HashSet<Location> monumentShowBoundary;
 	private Block lastTargetBlock;
-	private KonClaimRegister playerClaimRegister;
 	private KonClaimRegister adminClaimRegister;
 	
 	public KonPlayer(Player bukkitPlayer, KonKingdom kingdom, boolean isBarbarian) {
@@ -121,7 +120,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		this.directiveProgress = new HashMap<KonDirective,Integer>();
 		this.playerStats = new KonStats();
 		this.playerPrefix = new KonPrefix();
-		this.playerClaimRegister = new KonClaimRegister();
 		this.adminClaimRegister = new KonClaimRegister();
 		this.borderMap = new HashMap<Location, Color>();
 		this.borderPlotMap = new HashMap<Location, Color>();
@@ -263,10 +261,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	
 	public KonPrefix getPlayerPrefix() {
 		return playerPrefix;
-	}
-	
-	public KonClaimRegister getPlayerClaimRegister() {
-		return playerClaimRegister;
 	}
 	
 	public KonClaimRegister getAdminClaimRegister() {

@@ -802,10 +802,6 @@ public class KingdomManager implements KonquestKingdomManager {
     	case 0:
     		KonTerritory territory = getChunkTerritory(claimLoc);
     		String territoryName = territory.getName();
-    		// Push claim to player register
-    		Set<Point> claimSet = new HashSet<Point>();
-    		claimSet.add(Konquest.toPoint(claimLoc));
-    		player.getPlayerClaimRegister().push(claimSet, territory);
     		// Send message
     		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage("1",territoryName));
     		konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CLAIM_LAND);
@@ -1025,9 +1021,6 @@ public class KingdomManager implements KonquestKingdomManager {
 	    	        	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)finalCost);
 	    	        }
 	    		}
-	    		// Push claim to player register
-	    		Set<Point> claimSet = new HashSet<Point>(toClaimChunks);
-	    		player.getPlayerClaimRegister().push(claimSet, claimTerritory);
 	    		break;
 	    	case 1:
 	    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: no adjacent territory.");
@@ -1109,39 +1102,6 @@ public class KingdomManager implements KonquestKingdomManager {
 		// Attempt removal
 		boolean status = removeClaims(claimPoints, claimTerritory);
 
-		return status ? true : false;
-	}
-
-	public boolean claimUndoForPlayer(KonPlayer player) {
-		
-		if(player == null) {
-			return false;
-		}
-		
-		Set<Point> claimPoints = player.getPlayerClaimRegister().getClaim();
-		KonTerritory claimTerritory = player.getPlayerClaimRegister().getTerritory();
-		player.getPlayerClaimRegister().pop();
-		
-		// Attempt removal
-		boolean status = removeClaims(claimPoints, claimTerritory);
-		
-		if(status == true) {
-			// Count claims, and reward a refund to player
-			int pointCount = 0;
-			for(Point p : claimPoints) {
-				if(claimTerritory.getChunkPoints().contains(p)) {
-					pointCount++;
-				}
-			}
-			double cost = konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
-	    	double totalCost = pointCount * cost;
-	    	// Reward favor
-    		if(cost > 0 && pointCount > 0) {
-    	        if(KonquestPlugin.depositPlayer(player.getBukkitPlayer(), totalCost)) {
-    	        	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)-totalCost);
-    	        }
-    		}
-		}
 		return status ? true : false;
 	}
 	

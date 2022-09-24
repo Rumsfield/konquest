@@ -16,7 +16,7 @@ public enum CommandType {
 	CHAT    (Material.EMERALD,          "konquest.command.chat",    "c",  "",                                                               MessagePath.DESCRIPTION_CHAT.getMessage()),
 	SPY     (Material.DIAMOND_SWORD,    "konquest.command.spy",     "",   "",                                                               MessagePath.DESCRIPTION_SPY.getMessage()),
 	SETTLE  (Material.DIAMOND_PICKAXE,  "konquest.command.settle",  "",   "<name>",                                                         MessagePath.DESCRIPTION_SETTLE.getMessage()),
-	CLAIM   (Material.DIAMOND_SHOVEL,   "konquest.command.claim",   "",   "[radius|auto|undo] [<radius>]",                                  MessagePath.DESCRIPTION_CLAIM.getMessage()),
+	CLAIM   (Material.DIAMOND_SHOVEL,   "konquest.command.claim",   "",   "[radius|auto] [<radius>]",                                       MessagePath.DESCRIPTION_CLAIM.getMessage()),
 	UNCLAIM (Material.COBWEB,           "konquest.command.unclaim", "",   "[radius|auto] [<radius>]",                                       MessagePath.DESCRIPTION_UNCLAIM.getMessage()),
 	TRAVEL  (Material.COMPASS,          "konquest.command.travel",  "t",  "<town>|capital|camp|wild",                                       MessagePath.DESCRIPTION_TRAVEL.getMessage()),
 	TOWN    (Material.IRON_DOOR,        "konquest.command.town",    "",   "<town> add|kick|knight|lord|rename|upgrade|shield|options|plots [player]", MessagePath.DESCRIPTION_TOWN.getMessage()),
