@@ -183,11 +183,10 @@ public interface KonquestKingdomManager {
 	 * Removes the chunk from the chunk map of the territory.
 	 * 
 	 * @param loc The location to unclaim
-	 * @return True if the chunk was successfully unclaimed, else false
 	 * @return  Status code
 	 * 			<br>0 - success
 	 * 			<br>1 - error, no territory at location
-	 *          <br>2 - error, location in center chunk
+	 *			<br>2 - error, location in center chunk
 	 * 			<br>3 - error, internal territory chunk not found
 	 * 			<br>4 - error, cancelled by event
 	 */
