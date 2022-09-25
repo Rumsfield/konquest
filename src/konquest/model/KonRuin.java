@@ -44,7 +44,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	 */
 	
 	public KonRuin(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
-		super(loc, name, kingdom, KonquestTerritoryType.RUIN, konquest);
+		super(loc, name, kingdom, konquest);
 		this.spawnTimer = new Timer(this);
 		this.captureTimer = new Timer(this);
 		this.isCaptureDisabled = false;
@@ -387,6 +387,11 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 				//ChatUtil.printDebug("Started respawn timer for golem in ruin "+getName());
 			}
 		}
+	}
+	
+	@Override
+	public KonquestTerritoryType getTerritoryType() {
+		return KonquestTerritoryType.RUIN;
 	}
 	
 }

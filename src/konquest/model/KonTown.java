@@ -59,7 +59,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private BossBar monumentBarAllies;
 	private BossBar monumentBarEnemies;
 	private BossBar monumentBarArmistice;
-	//private BossBar shieldArmorBarAll;
 	private UUID lord;
 	private HashMap<UUID,Boolean> residents;
 	private RequestKeeper joinRequestKeeper;
@@ -82,7 +81,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private HashMap<Point,KonPlot> plots;
 	
 	public KonTown(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
-		super(loc, name, kingdom, KonquestTerritoryType.TOWN, konquest);
+		super(loc, name, kingdom, konquest);
 		// Assume there is a valid Monument Template
 		this.monument = new KonMonument(loc);
 		this.monumentTimer = new Timer(this);
@@ -101,9 +100,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.monumentBarArmistice = Bukkit.getServer().createBossBar(Konquest.armisticeColor1+name, ChatUtil.mapBarColor(Konquest.armisticeColor1), BarStyle.SOLID);
 		this.monumentBarArmistice.setVisible(true);
 		this.monumentBarArmistice.setProgress(1.0);
-		//this.shieldArmorBarAll = Bukkit.getServer().createBossBar(ChatColor.DARK_AQUA+"Shield", BarColor.BLUE, BarStyle.SOLID);
-		//this.shieldArmorBarAll.setVisible(false);
-		//this.shieldArmorBarAll.setProgress(0);
 		this.lord = null; // init with no lord
 		this.residents = new HashMap<UUID,Boolean>();
 		this.joinRequestKeeper = new RequestKeeper();
@@ -1513,6 +1509,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	public void clearPlots() {
 		plots.clear();
+	}
+
+	@Override
+	public KonquestTerritoryType getTerritoryType() {
+		return KonquestTerritoryType.TOWN;
 	}
 	
 }

@@ -743,7 +743,7 @@ public enum MessagePath {
 	TERRITORY_TOWN                              (0, "territory.town"),
 	TERRITORY_CAMP                              (0, "territory.camp"),
 	TERRITORY_RUIN                              (0, "territory.ruin"),
-	TERRITORY_NEUTRAL                           (0, "territory.neutral"),
+	TERRITORY_SANCTUARY                         (0, "territory.sanctuary"),
 	TERRITORY_OTHER                             (0, "territory.other"),
 	
 	NULL_MESSAGE	(0,"");

@@ -2827,6 +2827,7 @@ public class KingdomManager implements KonquestKingdomManager {
     	String mapTownSymbol = "+"; // "\u25A4";// plus in square "+";
     	String mapCampSymbol = "="; // "\u25A7";// minus in square "=";
     	String mapRuinSymbol = "%"; // "\u25A9";// dot in square "%";
+    	String mapSanctuarySymbol = "~";
     	String mapCapitalSymbol = "#"; // "\u25A5";// cross in square "#";
     	String[][] map = new String[mapSize][mapSize];
     	// Determine player's direction
@@ -2945,6 +2946,9 @@ public class KingdomManager implements KonquestKingdomManager {
     			} else if(territory.getKingdom().equals(player.getKingdom())) {
     				mapSymbolColor = ChatColor.GREEN;
     				playerColor = ChatColor.DARK_GREEN;
+    			} else if(territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY)) {
+    				mapSymbolColor = ChatColor.AQUA;
+    				playerColor = ChatColor.DARK_AQUA;
     			} else if(territory.getKingdom().isPeaceful() || territory.getKingdom().equals(getNeutrals())) {
     				mapSymbolColor = ChatColor.GRAY;
     				playerColor = ChatColor.DARK_GRAY;
@@ -2968,8 +2972,8 @@ public class KingdomManager implements KonquestKingdomManager {
         		case RUIN:
         			map[mapX][mapY] = mapSymbolColor+mapRuinSymbol;
         			break;
-        		case OTHER:
-        			map[mapX][mapY] = ChatColor.WHITE+mapWildSymbol;
+        		case SANCTUARY:
+        			map[mapX][mapY] = mapSymbolColor+mapSanctuarySymbol;
         			break;
         		default:
         			map[mapX][mapY] = ChatColor.WHITE+mapWildSymbol;

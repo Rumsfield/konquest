@@ -96,6 +96,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	public static ChatColor armisticeColor2 = ChatColor.DARK_PURPLE;
 	public static ChatColor barbarianColor = ChatColor.YELLOW;
 	public static ChatColor neutralColor = ChatColor.GRAY;
+	public static ChatColor sanctuaryColor = ChatColor.DARK_AQUA;
 	public static String healthModName = "konquest.health_buff";
 	
 	private DatabaseThread databaseThread;
@@ -569,6 +570,10 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public ChatColor getNeutralColor() {
 		return neutralColor;
+	}
+	
+	public ChatColor getSanctuaryColor() {
+		return sanctuaryColor;
 	}
 	
 	/* Regular Methods */
@@ -1471,11 +1476,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		case RUIN:
 			result = neutralColor;
 			break;
-		case NEUTRAL:
-			result = neutralColor;
-			break;
-		case OTHER:
-			result = neutralColor;
+		case SANCTUARY:
+			result = sanctuaryColor;
 			break;
 		default:
 			result = enemyColor1;
