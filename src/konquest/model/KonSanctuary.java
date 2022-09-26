@@ -1,6 +1,8 @@
 package konquest.model;
 
 import java.awt.Point;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -13,14 +15,31 @@ import konquest.Konquest;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.utility.MessagePath;
 
-public class KonSanctuary extends KonTerritory implements KonBarDisplayer {
+public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPropertyFlagHolder {
 
 	private BossBar sanctuaryBarAll;
+	private Map<KonPropertyFlag,Boolean> properties;
 	
-	public KonSanctuary(Location loc, KonKingdom kingdom, Konquest konquest) {
-		super(loc, MessagePath.TERRITORY_SANCTUARY.getMessage(), kingdom, konquest);
-		this.sanctuaryBarAll = Bukkit.getServer().createBossBar(Konquest.sanctuaryColor+getName(), BarColor.WHITE, BarStyle.SEGMENTED_20);
+	public KonSanctuary(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
+		super(loc, name, kingdom, konquest);
+		this.sanctuaryBarAll = Bukkit.getServer().createBossBar(Konquest.sanctuaryColor+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SEGMENTED_20);
 		this.sanctuaryBarAll.setVisible(true);
+		
+		this.properties = new HashMap<KonPropertyFlag,Boolean>();
+		initProperties();
+	}
+	
+	private void initProperties() {
+		properties.clear();
+		//TODO: Replace defaults with config options
+		properties.put(KonPropertyFlag.TRAVEL, 	true);
+		properties.put(KonPropertyFlag.PVP, 	false);
+		properties.put(KonPropertyFlag.BUILD, 	false);
+		properties.put(KonPropertyFlag.USE, 	true);
+		properties.put(KonPropertyFlag.MOBS, 	false);
+		properties.put(KonPropertyFlag.PORTALS, true);
+		properties.put(KonPropertyFlag.ENTER, 	true);
+		properties.put(KonPropertyFlag.EXIT, 	true);
 	}
 
 	@Override
@@ -82,6 +101,35 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer {
 	@Override
 	public KonquestTerritoryType getTerritoryType() {
 		return KonquestTerritoryType.SANCTUARY;
+	}
+
+	@Override
+	public boolean setPropertyValue(KonPropertyFlag property, boolean value) {
+		boolean result = false;
+		if(properties.containsKey(property)) {
+			properties.put(property, value);
+			result = true;
+		}
+		return result;
+	}
+
+	@Override
+	public boolean getPropertyValue(KonPropertyFlag property) {
+		boolean result = false;
+		if(properties.containsKey(property)) {
+			result = properties.get(property);
+		}
+		return result;
+	}
+	
+	@Override
+	public boolean hasPropertyValue(KonPropertyFlag property) {
+		return properties.containsKey(property);
+	}
+
+	@Override
+	public Map<KonPropertyFlag, Boolean> getAllProperties() {
+		return new HashMap<KonPropertyFlag, Boolean>(properties);
 	}
 
 }
