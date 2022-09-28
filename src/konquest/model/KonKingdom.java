@@ -170,6 +170,7 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 	 * 			3 - Region does not contain the travel point
 	 * 			4 - Region is not within capital territory
 	 */
+	/*
 	public int createMonumentTemplate(Location corner1, Location corner2, Location travelPoint, boolean save) {
 		if(corner1 == null || corner2 == null || travelPoint == null) {
 			return 4;
@@ -251,6 +252,7 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 	public int createMonumentTemplate(Location corner1, Location corner2, Location travelPoint) {
 		return createMonumentTemplate(corner1, corner2, travelPoint, true);
 	}
+	*/
 	
 	public boolean isSmallest() {
 		return isSmallest;

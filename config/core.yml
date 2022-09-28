@@ -89,13 +89,25 @@ core:
     enemy_secondary: DARK_RED
     
     # (*) The primary color that players see for enemy players/towns with an armistice.
-    armistice_primary: LIGHT_PURPLE
+    #armistice_primary: LIGHT_PURPLE
     
     # (*) The secondary color that players see for enemy players/towns with an armistice.
-    armistice_secondary: DARK_PURPLE
+    #armistice_secondary: DARK_PURPLE
+    
+# NEW (*) The color that players see for sanctioned kingdoms.
+    sanctioned: LIGHT_PURPLE
+    
+# NEW (*) The color that players see for peaceful kingdoms.
+    peaceful: WHITE
+    
+# NEW (*) The color that players see for allied kingdoms.
+    allied: BLUE
     
     # (*) The color that all players see for barbarians.
     barbarian: YELLOW
+    
+# NEW (*) The color that players see for neutral territory, like ruins and sanctuaries.
+    neutral: GRAY
     
   # //// CORE.DATABASE \\\\
   database:
@@ -154,6 +166,9 @@ core:
     # //// CORE.TRAVEL.ENABLE \\\\
     enable:
     
+# NEW Allow players to travel to sanctuaries with the travel command (true/false)
+      sanctuary: true
+      
       # Allow players to travel to towns with the travel command (true/false)
       towns: true
       

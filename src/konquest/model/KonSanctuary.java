@@ -1,8 +1,10 @@
 package konquest.model;
 
 import java.awt.Point;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -19,27 +21,27 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 
 	private BossBar sanctuaryBarAll;
 	private Map<KonPropertyFlag,Boolean> properties;
+	private Map<String, KonMonumentTemplate> templates;
 	
 	public KonSanctuary(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, konquest);
-		this.sanctuaryBarAll = Bukkit.getServer().createBossBar(Konquest.sanctuaryColor+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SEGMENTED_20);
+		this.sanctuaryBarAll = Bukkit.getServer().createBossBar(Konquest.neutralColor+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SEGMENTED_20);
 		this.sanctuaryBarAll.setVisible(true);
-		
 		this.properties = new HashMap<KonPropertyFlag,Boolean>();
 		initProperties();
+		this.templates = new HashMap<String, KonMonumentTemplate>();
 	}
 	
 	private void initProperties() {
 		properties.clear();
-		//TODO: Replace defaults with config options
-		properties.put(KonPropertyFlag.TRAVEL, 	true);
-		properties.put(KonPropertyFlag.PVP, 	false);
-		properties.put(KonPropertyFlag.BUILD, 	false);
-		properties.put(KonPropertyFlag.USE, 	true);
-		properties.put(KonPropertyFlag.MOBS, 	false);
-		properties.put(KonPropertyFlag.PORTALS, true);
-		properties.put(KonPropertyFlag.ENTER, 	true);
-		properties.put(KonPropertyFlag.EXIT, 	true);
+		properties.put(KonPropertyFlag.TRAVEL, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.travel"));
+		properties.put(KonPropertyFlag.PVP, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.pvp"));
+		properties.put(KonPropertyFlag.BUILD, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.build"));
+		properties.put(KonPropertyFlag.USE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.use"));
+		properties.put(KonPropertyFlag.MOBS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.mobs"));
+		properties.put(KonPropertyFlag.PORTALS, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.portals"));
+		properties.put(KonPropertyFlag.ENTER, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.enter"));
+		properties.put(KonPropertyFlag.EXIT, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.exit"));
 	}
 
 	@Override
@@ -48,7 +50,6 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 			return;
 		}
 		sanctuaryBarAll.addPlayer(player.getBukkitPlayer());
-		
 	}
 
 	@Override
@@ -130,6 +131,48 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 	@Override
 	public Map<KonPropertyFlag, Boolean> getAllProperties() {
 		return new HashMap<KonPropertyFlag, Boolean>(properties);
+	}
+	
+	public Collection<KonMonumentTemplate> getTemplates() {
+		return templates.values();
+	}
+	
+	public Set<String> getTemplateNames() {
+		return templates.keySet();
+	}
+	
+	public boolean isTemplate(String name) {
+		return templates.containsKey(name.toLowerCase());
+	}
+	
+	public boolean addTemplate(String name, KonMonumentTemplate template) {
+		boolean result = false;
+		if(!templates.containsKey(name.toLowerCase())) {
+			templates.put(name.toLowerCase(), template);
+			result = true;
+		}
+		return result;
+	}
+	
+	public KonMonumentTemplate getTemplate(String name) {
+		KonMonumentTemplate result = null;
+		if(templates.containsKey(name.toLowerCase())) {
+			result = templates.get(name.toLowerCase());
+		}
+		return result;
+	}
+	
+	public boolean removeTemplate(String name) {
+		boolean result = false;
+		if(templates.containsKey(name.toLowerCase())) {
+			templates.remove(name.toLowerCase());
+			result = true;
+		}
+		return result;
+	}
+	
+	public void clearAllTemplates() {
+		templates.clear();
 	}
 
 }

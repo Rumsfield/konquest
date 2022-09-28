@@ -4,26 +4,24 @@ import org.bukkit.Location;
 
 public class KonMonumentTemplate {
 
-	private KonKingdom kingdom;
 	private Location corner1;
 	private Location corner2;
 	private Location travelPoint;
 	private boolean isValid;
 	private boolean hasLoot;
+	private String name;
 	
-	public KonMonumentTemplate(KonKingdom kingdom) {
-		this.kingdom = kingdom;
+	public KonMonumentTemplate(String name, Location corner1, Location corner2, Location travelPoint) {
+		this.name = name;
+		this.corner1 = corner1;
+		this.corner2 = corner2;
+		this.travelPoint = travelPoint;
 		this.isValid = false;
 		this.hasLoot = false;
 	}
 	
-	public KonMonumentTemplate(KonKingdom kingdom, Location corner1, Location corner2, Location travelPoint) {
-		this.kingdom = kingdom;
-		this.corner1 = corner1;
-		this.corner2 = corner2;
-		this.travelPoint = travelPoint;
-		this.isValid = true;
-		this.hasLoot = false;
+	public String getName() {
+		return name;
 	}
 	
 	public int getHeight() {
@@ -32,9 +30,6 @@ public class KonMonumentTemplate {
 		} else {
 			return 0;
 		}
-	}
-	public KonKingdom getKingdom() {
-		return kingdom;
 	}
 	
 	public boolean isValid() {

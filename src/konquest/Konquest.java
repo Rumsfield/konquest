@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -48,12 +49,14 @@ import konquest.manager.PlaceholderManager;
 import konquest.manager.PlayerManager;
 import konquest.manager.PlotManager;
 import konquest.manager.RuinManager;
+import konquest.manager.SanctuaryManager;
 import konquest.manager.ShieldManager;
 import konquest.manager.TravelManager;
 import konquest.manager.UpgradeManager;
 import konquest.map.MapHandler;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
+import konquest.model.KonColor;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
@@ -92,11 +95,11 @@ public class Konquest implements KonquestAPI, Timeable {
 	public static ChatColor friendColor2 = ChatColor.DARK_GREEN;
 	public static ChatColor enemyColor1 = ChatColor.RED;
 	public static ChatColor enemyColor2 = ChatColor.DARK_RED;
-	public static ChatColor armisticeColor1 = ChatColor.LIGHT_PURPLE;
-	public static ChatColor armisticeColor2 = ChatColor.DARK_PURPLE;
+	public static ChatColor sanctionedColor = ChatColor.LIGHT_PURPLE;
+	public static ChatColor peacefulColor = ChatColor.WHITE;
+	public static ChatColor alliedColor = ChatColor.BLUE;
 	public static ChatColor barbarianColor = ChatColor.YELLOW;
 	public static ChatColor neutralColor = ChatColor.GRAY;
-	public static ChatColor sanctuaryColor = ChatColor.DARK_AQUA;
 	public static String healthModName = "konquest.health_buff";
 	
 	private DatabaseThread databaseThread;
@@ -119,11 +122,14 @@ public class Konquest implements KonquestAPI, Timeable {
 	private PlotManager plotManager;
 	private GuildManager guildManager;
 	private TravelManager travelManager;
+	private SanctuaryManager sanctuaryManager;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
     private Team enemyTeam;
-    private Team armisticeTeam;
+    private Team sanctionedTeam;
+    private Team peacefulTeam;
+    private Team alliedTeam;
     private Team barbarianTeam;
     private VersionHandler versionHandler;
     private boolean isVersionHandlerEnabled;
@@ -173,6 +179,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		plotManager = new PlotManager(this);
 		guildManager = new GuildManager(this);
 		travelManager = new TravelManager(this);
+		sanctuaryManager = new SanctuaryManager(this);
 		
 		versionHandler = null;
 		
@@ -203,6 +210,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		
 		initColors();
 		languageManager.initialize();
+		sanctuaryManager.initialize();
 		kingdomManager.initialize();
 		ruinManager.initialize();
 		guildManager.initialize();
@@ -223,8 +231,12 @@ public class Konquest implements KonquestAPI, Timeable {
         friendlyTeam.setColor(friendColor1);
         enemyTeam = scoreboard.registerNewTeam("enemies");
         enemyTeam.setColor(enemyColor1);
-        armisticeTeam = scoreboard.registerNewTeam("armistice");
-        armisticeTeam.setColor(armisticeColor1);
+        sanctionedTeam = scoreboard.registerNewTeam("sanctioned");
+        sanctionedTeam.setColor(sanctionedColor);
+        peacefulTeam = scoreboard.registerNewTeam("peaceful");
+        peacefulTeam.setColor(peacefulColor);
+        alliedTeam = scoreboard.registerNewTeam("allied");
+        alliedTeam.setColor(alliedColor);
         barbarianTeam = scoreboard.registerNewTeam("barbarians");
         barbarianTeam.setColor(barbarianColor);
         
@@ -372,70 +384,107 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	private void initColors() {
 		ChatColor color;
+		String colorPath = "";
 		String configColor = "";
 		String defaultColor = "";
+		
 		/* Friendly Primary Color */
-		configColor = configManager.getConfig("core").getString("core.colors.friendly_primary","");
+		colorPath = "core.colors.friendly_primary";
+		configColor = configManager.getConfig("core").getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.friendly_primary");
-			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.friendly_primary: "+configColor+", using "+defaultColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			friendColor1 = color;
 		}
+		
 		/* Friendly Secondary Color */
-		configColor = configManager.getConfig("core").getString("core.colors.friendly_secondary","");
+		colorPath = "core.colors.friendly_secondary";
+		configColor = configManager.getConfig("core").getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.friendly_secondary");
-			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.friendly_secondary: "+configColor+", using "+defaultColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			friendColor2 = color;
 		}
+		
 		/* Enemy Primary Color */
-		configColor = configManager.getConfig("core").getString("core.colors.enemy_primary","");
+		colorPath = "core.colors.enemy_primary";
+		configColor = configManager.getConfig("core").getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.enemy_primary");
-			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.enemy_primary: "+configColor+", using "+defaultColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			enemyColor1 = color;
 		}
+
 		/* Enemy Secondary Color */
-		configColor = configManager.getConfig("core").getString("core.colors.enemy_secondary","");
+		colorPath = "core.colors.enemy_secondary";
+		configColor = configManager.getConfig("core").getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.enemy_secondary");
-			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.enemy_secondary: "+configColor+", using "+defaultColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			enemyColor2 = color;
 		}
-		/* Armistice Primary Color */
-		configColor = configManager.getConfig("core").getString("core.colors.armistice_primary","");
+
+		/* Sanctioned Color */
+		colorPath = "core.colors.sanctioned";
+		configColor = configManager.getConfig("core").getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.armistice_primary");
-			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.armistice_primary: "+configColor+", using "+defaultColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
-			armisticeColor1 = color;
+			sanctionedColor = color;
 		}
-		/* Armistice Secondary Color */
-		configColor = configManager.getConfig("core").getString("core.colors.armistice_secondary","");
+
+		/* Peaceful Color */
+		colorPath = "core.colors.peaceful";
+		configColor = configManager.getConfig("core").getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.armistice_secondary");
-			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.armistice_secondary: "+configColor+", using "+defaultColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
-			armisticeColor2 = color;
+			peacefulColor = color;
 		}
+		
+		/* Allied Color */
+		colorPath = "core.colors.allied";
+		configColor = configManager.getConfig("core").getString(colorPath,"");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
+		} else {
+			alliedColor = color;
+		}
+		
 		/* Barbarian Color */
-		configColor = configManager.getConfig("core").getString("core.colors.barbarian","");
+		colorPath = "core.colors.barbarian";
+		configColor = configManager.getConfig("core").getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString("core.colors.barbarian");
-			ChatUtil.printConsoleError("Invalid ChatColor name core.colors.barbarian: "+configColor+", using "+defaultColor);
+			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			barbarianColor = color;
+		}
+		
+		/* Neutral Color */
+		colorPath = "core.colors.neutral";
+		configColor = configManager.getConfig("core").getString(colorPath,"");
+		color = ChatUtil.parseColorCode(configColor);
+		if(color == null) {
+			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
+		} else {
+			neutralColor = color;
 		}
 	}
 	
@@ -532,6 +581,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public void save() {
 		// Save config files
+		sanctuaryManager.saveSanctuaries();
 		kingdomManager.saveKingdoms();
 		campManager.saveCamps();
 		ruinManager.saveRuins();
@@ -544,24 +594,28 @@ public class Konquest implements KonquestAPI, Timeable {
 		return friendColor1;
 	}
 	
-	public ChatColor getEnemyPrimaryColor() {
-		return enemyColor1;
-	}
-	
-	public ChatColor getArmisticePrimaryColor() {
-		return armisticeColor1;
-	}
-	
 	public ChatColor getFriendlySecondaryColor() {
 		return friendColor2;
+	}
+	
+	public ChatColor getEnemyPrimaryColor() {
+		return enemyColor1;
 	}
 	
 	public ChatColor getEnemySecondaryColor() {
 		return enemyColor2;
 	}
 	
-	public ChatColor getArmisticeSecondaryColor() {
-		return armisticeColor2;
+	public ChatColor getSanctionedColor() {
+		return sanctionedColor;
+	}
+	
+	public ChatColor getPeacefulColor() {
+		return peacefulColor;
+	}
+	
+	public ChatColor getAlliedColor() {
+		return alliedColor;
 	}
 	
 	public ChatColor getBarbarianColor() {
@@ -570,10 +624,6 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public ChatColor getNeutralColor() {
 		return neutralColor;
-	}
-	
-	public ChatColor getSanctuaryColor() {
-		return sanctuaryColor;
 	}
 	
 	/* Regular Methods */
@@ -607,6 +657,10 @@ public class Konquest implements KonquestAPI, Timeable {
 		return playerManager;
 	}
 	
+	public SanctuaryManager getSanctuaryManager() {
+		return sanctuaryManager;
+	}
+	
 	public KingdomManager getKingdomManager() {
 		return kingdomManager;
 	}
@@ -630,10 +684,6 @@ public class Konquest implements KonquestAPI, Timeable {
 	public CommandHandler getCommandHandler() {
 		return commandHandler;
 	}
-	
-	/*public String getWorldName() {
-		return worldName;
-	}*/
 	
 	public Scoreboard getScoreboard() {
 		return scoreboard;
@@ -736,6 +786,8 @@ public class Konquest implements KonquestAPI, Timeable {
 	 * 			5 - Error, name is a town
 	 * 			6 - Error, name is a ruin
 	 * 			7 - Error, name is a guild
+	 * 			8 - Error, name is a sanctuary
+	 * 			9 - Error, name is a template
 	 */
 	public int validateNameConstraints(String name) {
 		if(name == null || name.equals("") || !StringUtils.isAlphanumeric(name)) {
@@ -761,36 +813,24 @@ public class Konquest implements KonquestAPI, Timeable {
 		if(guildManager.isGuild(name)) {
 			return 7;
 		}
+		if(sanctuaryManager.isSanctuary(name)) {
+			return 8;
+		}
+		if(sanctuaryManager.isTemplate(name)) {
+			return 9;
+		}
 		return 0;
 	}
 	
 	public int validateName(String name, Player player) {
 		int result = validateNameConstraints(name);
 		if(player != null) {
-			switch(result) {
-				case 1:
-					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
-					break;
-				case 2:
-					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_LENGTH_NAME.getMessage());
-					break;
-				case 3:
-					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
-					break;
-				case 4:
-					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
-					break;
-				case 5:
-					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
-					break;
-				case 6:
-					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
-					break;
-				case 7:
-					ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
-					break;
-				default:
-					break;
+			if(result == 1) {
+				ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
+			} else if(result == 2) {
+				ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_LENGTH_NAME.getMessage());
+			} else if(result >= 3 && result <= 9) {
+				ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
 			}
 		}
 		return result;
@@ -1024,20 +1064,6 @@ public class Konquest implements KonquestAPI, Timeable {
 		return world.getChunkAt(point.x, point.y);
 	}
 	
-	/*
-	public static int distanceInChunks(Location loc1, Location loc2) {
-		return distanceInChunks(loc1.getChunk(), loc2.getChunk());
-	}
-	
-	public static int distanceInChunks(Chunk chunk1, Chunk chunk2) {
-		if(chunk1.getWorld().getName().equals(chunk2.getWorld().getName())) {
-			return Math.max(Math.abs(chunk1.getX() - chunk2.getX()), Math.abs(chunk1.getZ() - chunk2.getZ()));
-		} else {
-			return -1;
-		}
-	}
-	*/
-	
 	public static int chunkDistance(Location loc1, Location loc2) {
 		if(loc1.getWorld().getName().equals(loc2.getWorld().getName())) {
 			int loc1X = (int)Math.floor((double)loc1.getBlockX()/16);
@@ -1222,6 +1248,7 @@ public class Konquest implements KonquestAPI, Timeable {
     			}
     		}
     		// Send appropriate team packet to online player
+    		// TODO: KR update for new relationships
     		if(player.isBarbarian()) {
     			versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), barbarianTeam);
     		} else {
@@ -1294,20 +1321,6 @@ public class Konquest implements KonquestAPI, Timeable {
     	Point cPoint = toPoint(chunk);
     	Point qPoint;
 		Location qLoc;
-		/*
-    	if(!teleportTerritoryQueue.isEmpty()) {
-	    	for(Player qPlayer : teleportTerritoryQueue.keySet()) {
-	    		qLoc = teleportTerritoryQueue.get(qPlayer).getSpawnLoc();
-	    		qPoint = toPoint(qLoc);
-	    		if(qPoint.equals(cPoint) && chunk.getWorld().equals(qLoc.getWorld())) {
-	    			Location destination = new Location(qLoc.getWorld(),qLoc.getBlockX()+0.5,qLoc.getBlockY()+1.0,qLoc.getBlockZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
-	    			qPlayer.teleport(destination,TeleportCause.PLUGIN);
-	    			ChatUtil.printDebug("Teleporting territory queued player "+qPlayer.getName());
-	    			teleportTerritoryQueue.remove(qPlayer);
-	    		}
-	    	}
-    	}
-    	*/
     	if(!teleportLocationQueue.isEmpty()) {
 	    	for(Player qPlayer : teleportLocationQueue.keySet()) {
 	    		qLoc = teleportLocationQueue.get(qPlayer);
@@ -1357,25 +1370,6 @@ public class Konquest implements KonquestAPI, Timeable {
         	meta.setOwningPlayer(bukkitOfflinePlayer);
     		item.setItemMeta(meta);
     		headCache.put(bukkitOfflinePlayer.getUniqueId(),item);
-    		/*
-    		Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), new Runnable() {
-                @Override
-                public void run() {
-                	
-                	SkullMeta meta = (SkullMeta)item.getItemMeta();
-                	meta.setOwningPlayer(bukkitOfflinePlayer);
-            		item.setItemMeta(meta);
-            		
-            		Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
-                        @Override
-                        public void run() {
-                        	headCache.put(bukkitOfflinePlayer.getUniqueId(),item);
-                        }
-            		});
-            		
-                }
-            });
-			*/
     		return item;
     	} else {
     		return headCache.get(bukkitOfflinePlayer.getUniqueId());
@@ -1477,7 +1471,7 @@ public class Konquest implements KonquestAPI, Timeable {
 			result = neutralColor;
 			break;
 		case SANCTUARY:
-			result = sanctuaryColor;
+			result = neutralColor;
 			break;
 		default:
 			result = enemyColor1;

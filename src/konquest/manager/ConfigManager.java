@@ -33,6 +33,8 @@ public class ConfigManager{
 		updateConfigVersion("core");
 		addConfig("upgrades", new KonConfig("upgrades",false));
 		updateConfigVersion("upgrades");
+		addConfig("properties", new KonConfig("properties",false));
+		updateConfigVersion("properties");
 		addConfig("shields", new KonConfig("shields",false));
 		addConfig("loot", new KonConfig("loot",false));
 		addConfig("prefix", new KonConfig("prefix",false));
@@ -46,6 +48,7 @@ public class ConfigManager{
 		addConfig("camps", new KonConfig("data/camps"));
 		addConfig("ruins", new KonConfig("data/ruins"));
 		addConfig("guilds", new KonConfig("data/guilds"));
+		addConfig("sanctuaries", new KonConfig("data/sanctuaries"));
 
 		// Language files
 		addConfig("lang_english", new KonConfig("lang/english",false));
