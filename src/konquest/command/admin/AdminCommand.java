@@ -86,6 +86,9 @@ public class AdminCommand extends CommandBase {
 	                case RUIN:
 	                    new RuinAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 	                    break;
+	                case SANCTUARY:
+	                    new SanctuaryAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
 	                case SAVE:
 	                    new SaveAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 	                    break;
@@ -184,6 +187,9 @@ public class AdminCommand extends CommandBase {
 	                    break;
 	                case RUIN:
 	                	tabList.addAll(new RuinAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case SANCTUARY:
+	                	tabList.addAll(new SanctuaryAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
 	                    break;
 	                case SAVE:
 	                	tabList.addAll(new SaveAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());

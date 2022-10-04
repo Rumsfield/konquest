@@ -22,7 +22,7 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 	private String name;
 	private Konquest konquest;
 	private KonCapital capital;
-	private KonMonumentTemplate monumentTemplate;
+	//private KonMonumentTemplate monumentTemplate;
 	private ArrayList<Location> criticalBlockLocs;
 	private HashMap<String, KonTown> townMap;
 	private boolean isSmallest;
@@ -37,7 +37,7 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 		this.konquest = konquest;
 		this.capital = new KonCapital(loc, this, konquest);
 		this.townMap = new HashMap<String, KonTown>();
-		this.monumentTemplate = new KonMonumentTemplate(this);
+		//this.monumentTemplate = new KonMonumentTemplate(this);
 		this.criticalBlockLocs = new ArrayList<Location>();
 		this.isSmallest = false;
 		this.isPeaceful = false;
@@ -289,14 +289,11 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 	}
 	*/
 	
-	public void removeMonumentTemplate() {
-		monumentTemplate.setValid(false);
-		stopMonumentBlanking();
-	}
-	
+	/*
 	public KonMonumentTemplate getMonumentTemplate() {
 		return monumentTemplate;
 	}
+	*/
 	
 	public String getName() {
 		return name;

@@ -51,7 +51,8 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	
 	private RegionType settingRegion;
 	private FollowType autoFollow;
-	private String regionKingdomName;
+	private String regionTemplateName;
+	private String regionSanctuaryName;
 	private Location regionCornerOneBuffer;
 	private Location regionCornerTwoBuffer;
 	
@@ -94,7 +95,8 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		this.bukkitPlayer = bukkitPlayer;
 		//this.exileKingdom = kingdom;
 		this.settingRegion = RegionType.NONE;
-		this.regionKingdomName = "";
+		this.regionTemplateName = "";
+		this.regionSanctuaryName = "";
 		this.isAdminBypassActive = false;
 		this.autoFollow = FollowType.NONE;
 		this.isGlobalChat = true;
@@ -195,8 +197,12 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		return regionCornerTwoBuffer;
 	}
 	
-	public String getRegionKingdomName() {
-		return regionKingdomName;
+	public String getRegionTemplateName() {
+		return regionTemplateName;
+	}
+	
+	public String getRegionSanctuaryName() {
+		return regionSanctuaryName;
 	}
 	
 	public boolean isAdminBypassActive() {
@@ -308,8 +314,12 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		regionCornerTwoBuffer = loc;
 	}
 	
-	public void setRegionKingdomName(String name) {
-		regionKingdomName = name;
+	public void setRegionTemplateName(String name) {
+		regionTemplateName = name;
+	}
+	
+	public void setRegionSanctuaryName(String name) {
+		regionSanctuaryName = name;
 	}
 	
 	public void setIsAdminBypassActive(boolean val) {

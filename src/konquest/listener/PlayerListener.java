@@ -12,6 +12,7 @@ import konquest.model.KonCapital;
 import konquest.model.KonKingdom;
 import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
+import konquest.model.KonSanctuary;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
@@ -375,45 +376,55 @@ public class PlayerListener implements Listener{
         	switch (player.getRegionType()) {
 	        	case MONUMENT:
 	                if (player.getRegionCornerOneBuffer() == null) {
-	                	player.setRegionCornerOneBuffer(location);
-	                    //ChatUtil.sendNotice(bukkitPlayer, "Click on the second corner block of the region.");
-	                    //ChatUtil.sendNotice(bukkitPlayer, "Base area must be 16x16 (green particles).");
-	                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_2.getMessage(), ChatColor.LIGHT_PURPLE);
+	                	// Location is first corner, verify sanctuary
+	                	KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(location);
+	                	if(territory != null && territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY)) {
+	                		// Location is inside of a Sanctuary
+	                		String sanctuaryName = territory.getName();
+	                		player.setRegionSanctuaryName(sanctuaryName);
+	                		player.setRegionCornerOneBuffer(location);
+		                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_2.getMessage(), ChatColor.LIGHT_PURPLE);
+	                	} else {
+	                		// The first corner is not in a sanctuary, end the region setting flow
+	                		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage());
+	                		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SANCTUARY.getMessage());
+	                		player.setRegionCornerOneBuffer(null);
+		                    player.setRegionCornerTwoBuffer(null);
+		                    player.settingRegion(RegionType.NONE);
+		                    ChatUtil.printDebug("Ended setting monument region, no sanctuary");
+	                	}
 	                } else if (player.getRegionCornerTwoBuffer() == null) {
+	                	// Location is second corner, save to player
 	                	player.setRegionCornerTwoBuffer(location);
-	                    //ChatUtil.sendNotice(bukkitPlayer, "Click on the travel point block.");
 	                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_3.getMessage(), ChatColor.LIGHT_PURPLE);
 	                } else {
-	                	KonKingdom kingdom = kingdomManager.getKingdom(player.getRegionKingdomName());
-	                	int createMonumentStatus = kingdom.createMonumentTemplate(player.getRegionCornerOneBuffer(), player.getRegionCornerTwoBuffer(), location);
+	                	// Location is travel point, create template using saved data
+	                	KonSanctuary sanctuary = konquest.getSanctuaryManager().getSanctuary(player.getRegionSanctuaryName());
+	                	String templateName = player.getRegionTemplateName();
+	                	int createMonumentStatus = konquest.getSanctuaryManager().createMonumentTemplate(sanctuary, templateName, player.getRegionCornerOneBuffer(), player.getRegionCornerTwoBuffer(), location);
 	                	switch(createMonumentStatus) {
 	    				case 0:
 	    					//ChatUtil.sendNotice(bukkitPlayer, "Successfully created new Monument Template for kingdom "+player.getRegionKingdomName());
-	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(player.getRegionKingdomName()));
+	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(templateName));
 	    					kingdom.reloadLoadedTownMonuments();
 	    					break;
 	    				case 1:
 	    					int diffX = (int)Math.abs(player.getRegionCornerOneBuffer().getX()-player.getRegionCornerTwoBuffer().getX())+1;
 	    					int diffZ = (int)Math.abs(player.getRegionCornerOneBuffer().getZ()-player.getRegionCornerTwoBuffer().getZ())+1;
-	    					//ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, base must be 16x16 blocks but got "+diffX+"x"+diffZ);
 	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(diffX,diffZ));
 	    					break;
 	    				case 2:
 	    					String criticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.monuments.critical_block");
 	    					int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
-	    					//ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, it must contain at least "+maxCriticalhits+" "+criticalBlockTypeName+" blocks");
 	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(maxCriticalhits,criticalBlockTypeName));
 	    					break;
 	    				case 3:
-	    					//ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, travel point must be inside of the region");
 	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_TRAVEL.getMessage());
 	    					break;
 	    				case 4:
-	    					//ChatUtil.sendError(bukkitPlayer, "Failed to create Monument Template, region must be within "+player.getRegionKingdomName()+" Capital territory");
-	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CAPITAL.getMessage(player.getRegionKingdomName()));
+	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage());
 	    					break;
 	    				default:
-	    					//ChatUtil.sendError(bukkitPlayer, "Could not create Monument Template: Unknown cause = "+createMonumentStatus);
 	    					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(createMonumentStatus));
 	    					break;
 	    				}

@@ -56,6 +56,7 @@ import konquest.model.KonPlayerScoreAttributes;
 import konquest.model.KonPlayerScoreAttributes.KonPlayerScoreAttribute;
 import konquest.model.KonPlot;
 import konquest.model.KonRuin;
+import konquest.model.KonSanctuary;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryCache;
@@ -1040,9 +1041,12 @@ public class KingdomManager implements KonquestKingdomManager {
 		return true;
 	}
 	
+	/*
+	 * Main method for removing/unclaiming chunks of territory
+	 */
 	// Returns true when any points have been removed.
 	// Returns false when no points were removed.
-	public boolean removeClaims(Set<Point> points, KonTerritory territory) {
+	private boolean removeClaims(Set<Point> points, KonTerritory territory) {
 		
 		if(territory == null || points == null || points.isEmpty()) {
 			return false;
@@ -1060,11 +1064,23 @@ public class KingdomManager implements KonquestKingdomManager {
 		
 		// Remove territory
 		boolean doUpdates = false;
+		boolean allowUnclaim = true;
 		for(Point unclaimPoint : points) {
-			if(territory.getChunkList().containsKey(unclaimPoint) && territory instanceof KonTown) {
-				konquest.getPlotManager().removePlotPoint((KonTown)territory, unclaimPoint, territoryWorld);
+			allowUnclaim = true;
+			if(territory.getChunkList().containsKey(unclaimPoint)) {
+				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
+					// Remove any town plot points
+					konquest.getPlotManager().removePlotPoint((KonTown)territory, unclaimPoint, territoryWorld);
+				} else if(territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY)) {
+					// Prevent removing claims over monument templates
+					KonSanctuary sanctuary = (KonSanctuary)territory;
+					boolean status = sanctuary.isChunkOnTemplate(unclaimPoint, territoryWorld);
+					if(status) {
+						allowUnclaim = false;
+					}
+				}
 			}
-			if(territory.removeChunk(unclaimPoint)) {
+			if(allowUnclaim && territory.removeChunk(unclaimPoint)) {
 				removeTerritory(territoryWorld,unclaimPoint);
 				doUpdates = true;
 			}
@@ -1414,7 +1430,7 @@ public class KingdomManager implements KonquestKingdomManager {
 	}
 	
 	/*
-	 * More methods...
+	 * More methods... (a lot more)
 	 */
 	
 	public String getSmallestKingdomName() {
@@ -2814,6 +2830,10 @@ public class KingdomManager implements KonquestKingdomManager {
 		}
 		ChatUtil.printDebug("Saved Kingdoms");
 	}
+	
+	/*
+	 * Why are these methods in here?
+	 */
 	
 	public void printPlayerMap(KonPlayer player, int mapSize) {
 		printPlayerMap(player, mapSize, player.getBukkitPlayer().getLocation());

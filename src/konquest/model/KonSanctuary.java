@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -15,13 +16,17 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.api.model.KonquestTerritoryType;
+import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
+import konquest.utility.Timeable;
+import konquest.utility.Timer;
 
-public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPropertyFlagHolder {
+public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPropertyFlagHolder, Timeable {
 
 	private BossBar sanctuaryBarAll;
 	private Map<KonPropertyFlag,Boolean> properties;
 	private Map<String, KonMonumentTemplate> templates;
+	private Map<String, Timer> templateBlankingTimers; // Template name, timer
 	
 	public KonSanctuary(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, konquest);
@@ -30,6 +35,7 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 		this.properties = new HashMap<KonPropertyFlag,Boolean>();
 		initProperties();
 		this.templates = new HashMap<String, KonMonumentTemplate>();
+		this.templateBlankingTimers = new HashMap<String, Timer>();
 	}
 	
 	private void initProperties() {
@@ -162,10 +168,23 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 		return result;
 	}
 	
+	public KonMonumentTemplate getTemplate(Location loc) {
+		KonMonumentTemplate result = null;
+		for(KonMonumentTemplate template : templates.values()) {
+			if(template.isLocInside(loc)) {
+				result = template;
+				break;
+			}
+		}
+		return result;
+	}
+	
 	public boolean removeTemplate(String name) {
 		boolean result = false;
-		if(templates.containsKey(name.toLowerCase())) {
-			templates.remove(name.toLowerCase());
+		String nameLower = name.toLowerCase();
+		if(templates.containsKey(nameLower)) {
+			templates.get(nameLower).setValid(false);
+			templates.remove(nameLower);
 			result = true;
 		}
 		return result;
@@ -173,6 +192,70 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 	
 	public void clearAllTemplates() {
 		templates.clear();
+	}
+	
+	public boolean isChunkOnTemplate(Point point, World world) {
+		for(KonMonumentTemplate template : templates.values()) {
+			if(template.isInsideChunk(point, world)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void stopTemplateBlanking(String name) {
+		if(templateBlankingTimers.containsKey(name)) {
+			templateBlankingTimers.get(name).stopTimer();
+			templateBlankingTimers.remove(name);
+		}
+	}
+	
+	@Override
+	public void onEndTimer(int taskID) {
+		if(taskID == 0) {
+			ChatUtil.printDebug("Sanctuary Timer ended with null taskID!");
+		} else {
+			// Search for a template timer
+			for(String templateName : templateBlankingTimers.keySet()) {
+				if(taskID == templateBlankingTimers.get(templateName).getTaskID()) {
+					ChatUtil.printDebug("Sanctuary "+getName()+", Template "+templateName+" blanking Timer ended with taskID: "+taskID);
+					KonMonumentTemplate monumentTemplate = getTemplate(templateName);
+					if(monumentTemplate != null) {
+						// Re-validate monument template after edits
+						int status = getKonquest().getSanctuaryManager().validateTemplate(monumentTemplate,this);
+						
+						switch(status) {
+							case 0:
+								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(templateName));
+								monumentTemplate.setValid(true);
+								reloadLoadedTownMonuments();
+								break;
+							case 1:
+								Location c1 = monumentTemplate.getCornerOne();
+								Location c2 = monumentTemplate.getCornerTwo();
+								int diffX = (int)Math.abs(c1.getX()-c2.getX())+1;
+								int diffZ = (int)Math.abs(c1.getZ()-c2.getZ())+1;
+								ChatUtil.sendAdminBroadcast(templateName+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(diffX,diffZ));
+								break;
+							case 2:
+								String criticalBlockTypeName = getKonquest().getConfigManager().getConfig("core").getString("core.monuments.critical_block");
+								int maxCriticalhits = getKonquest().getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
+								ChatUtil.sendAdminBroadcast(templateName+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(maxCriticalhits,criticalBlockTypeName));
+								break;
+							case 3:
+								ChatUtil.sendAdminBroadcast(templateName+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_TRAVEL.getMessage());
+								break;
+							case 4:
+								ChatUtil.sendAdminBroadcast(templateName+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage());
+								break;
+							default:
+								break;
+						}
+					}
+				}
+				
+			}
+		}
 	}
 
 }

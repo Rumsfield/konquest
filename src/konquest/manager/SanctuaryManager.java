@@ -94,6 +94,16 @@ public class SanctuaryManager {
 		return sanctuaryMap.keySet();
 	}
 	
+	public String getSanctuaryNameOfTemplate(String name) {
+		String result = "";
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			if(sanctuary.isTemplate(name)) {
+				result = sanctuary.getName();
+			}
+		}
+		return result;
+	}
+	
 	public boolean isTemplate(String name) {
 		boolean result = false;
 		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
@@ -116,6 +126,19 @@ public class SanctuaryManager {
 		return result;
 	}
 	
+	public KonMonumentTemplate getTemplate(Location loc) {
+		KonMonumentTemplate result = null;
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			for(KonMonumentTemplate template : sanctuary.getTemplates()) {
+				if(template.isLocInside(loc)) {
+					result = template;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
 	public Set<String> getAllTemplateNames() {
 		Set<String> result = new HashSet<String>();
 		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
@@ -132,32 +155,70 @@ public class SanctuaryManager {
 	 * @param corner1		The first corner of the template region
 	 * @param corner2		The second (opposite) corner of the template region
 	 * @param travelPoint	The location for travel to the template region
-	 * @return  0 - Success
+	 * @return  The status code returned by validateTemplate()
+	 */
+	public int createMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint, boolean save) {
+		// Create new monument
+		KonMonumentTemplate template = new KonMonumentTemplate(name, corner1, corner2, travelPoint);
+		// Validate it
+		int status = validateTemplate(template, sanctuary);
+		
+		if(status == 0) {
+			// Passed all checks
+			template.setValid(true);
+			// Add to sanctuary
+			sanctuary.addTemplate(name, template);
+			// Before exit, save to file
+			if(save) {
+				saveSanctuaries();
+				konquest.getConfigManager().saveConfigs();
+			}
+		}
+		return status;
+	}
+	
+	public int createMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint) {
+		return createMonumentTemplate(sanctuary, name, corner1, corner2, travelPoint, true);
+	}
+	
+	/**
+	 * Checks a template for validation criteria.
+	 * This method modifies the reference of the 'template' argument.
+	 * @param sanctuary
+	 * @param template
+	 * @return Status code
+	 * 			0 - Success
 	 * 			1 - Region is not 16x16 blocks in base
 	 * 			2 - Region does not contain enough critical blocks
 	 * 			3 - Region does not contain the travel point
 	 * 			4 - Region is not within given sanctuary territory
 	 * 			5 - Bad name
+	 * 	
 	 */
-	public int createMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint, boolean save) {
-		if(corner1 == null || corner2 == null || travelPoint == null) {
-			ChatUtil.printDebug("Failed to create Monument Template, null locations");
+	public int validateTemplate(KonMonumentTemplate template, KonSanctuary sanctuary) {
+		if(sanctuary == null || template.getCornerOne() == null || template.getCornerTwo() == null || template.getTravelPoint() == null || template.getName() == null) {
+			ChatUtil.printDebug("Failed to validate Monument Template, null arguments");
 			return 4;
 		}
+		String name = template.getName();
+		Location corner1 = template.getCornerOne();
+		Location corner2 = template.getCornerTwo();
+		Location travelPoint = template.getTravelPoint();
+		
 		if(name.contains(" ") || konquest.validateNameConstraints(name) != 0) {
-			ChatUtil.printDebug("Failed to create Monument Template, bad name: \""+name+"\"");
+			ChatUtil.printDebug("Failed to validate Monument Template, bad name: \""+name+"\"");
 			return 5;
 		}
 		// Check that both corners are within territory
 		if(!sanctuary.isLocInside(corner1) || !sanctuary.isLocInside(corner2)) {
-			ChatUtil.printDebug("Failed to create Monument Template, corners are not inside sanctuary territory");
+			ChatUtil.printDebug("Failed to validate Monument Template, corners are not inside sanctuary territory");
 			return 4;
 		}
 		// Check 16x16 base dimensions
 		int diffX = (int)Math.abs(corner1.getX()-corner2.getX())+1;
 		int diffZ = (int)Math.abs(corner1.getZ()-corner2.getZ())+1;
 		if(diffX != 16 || diffZ != 16) {
-			ChatUtil.printDebug("Failed to create Monument Template, not 16x16: "+diffX+"x"+diffZ);
+			ChatUtil.printDebug("Failed to validate Monument Template, not 16x16: "+diffX+"x"+diffZ);
 			return 1;
 		}
 		// Check for at least as many critical blocks as required critical hits
@@ -194,7 +255,7 @@ public class SanctuaryManager {
             }
         }
 		if(criticalBlockCount < maxCriticalhits) {
-			ChatUtil.printDebug("Failed to create Monument Template, not enough critical blocks. Found "+criticalBlockCount+", required "+maxCriticalhits);
+			ChatUtil.printDebug("Failed to validate Monument Template, not enough critical blocks. Found "+criticalBlockCount+", required "+maxCriticalhits);
 			return 2;
 		}
 		// Check that travel point is inside of the corner bounds
@@ -204,27 +265,26 @@ public class SanctuaryManager {
 			ChatUtil.printDebug("Failed to create Monument Template, travel point is outside of corner bounds");
 			return 3;
 		}
-		// Passed all checks, create monument
-		KonMonumentTemplate template = new KonMonumentTemplate(name, corner1, corner2, travelPoint);
 		// Set loot flag
 		template.setLoot(containsChest);
 		if(containsChest) {
-			ChatUtil.printDebug("Created Monument Template "+name+" with loot chest(s)");
+			ChatUtil.printDebug("Validated Monument Template "+name+" with loot chest(s)");
 		} else {
-			ChatUtil.printDebug("Created Monument Template "+name+" without loot");
-		}
-		// Add to sanctuary
-		sanctuary.addTemplate(name, template);
-		// Before exit, save to file
-		if(save) {
-			saveSanctuaries();
-			konquest.getConfigManager().saveConfigs();
+			ChatUtil.printDebug("Validated Monument Template "+name+" without loot");
 		}
 		return 0;
 	}
 	
-	public int createMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint) {
-		return createMonumentTemplate(sanctuary, name, corner1, corner2, travelPoint, true);
+	public boolean removeMonumentTemplate(String name) {
+		boolean result = false;
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			if(sanctuary.isTemplate(name)) {
+				sanctuary.stopTemplateBlanking(name);
+				result = sanctuary.removeTemplate(name);
+				break;
+			}
+		}
+		return result;
 	}
 	
 	private void loadSanctuaries() {

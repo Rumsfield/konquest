@@ -65,7 +65,7 @@ public abstract class KonTerritory implements KonquestTerritory {
 	}
 	
 	public boolean removeChunk(Location loc) {
-		return chunkList.remove(Konquest.toPoint(loc)) != null;
+		return removeChunk(Konquest.toPoint(loc));
 	}
 	
 	public boolean removeChunk(Point point) {
