@@ -21,6 +21,7 @@ import konquest.model.KonMonumentTemplate;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonRuin;
+import konquest.model.KonSanctuary;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
@@ -1260,12 +1261,16 @@ public class BlockListener implements Listener {
 	
 	private void checkMonumentTemplateBlanking(BlockEvent event) {
 		// Monitor monument templates for blanking by edits from admin bypass players
-		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getBlock().getLocation());
-		if(territory instanceof KonCapital) {
-			KonMonumentTemplate template = territory.getKingdom().getMonumentTemplate();
-			if(template != null && template.isLocInside(event.getBlock().getLocation())) {
-				// Start monument blanking timer to prevent monument pastes
-				territory.getKingdom().startMonumentBlanking();
+		Location blockLoc = event.getBlock().getLocation();
+		if(konquest.getKingdomManager().isChunkClaimed(blockLoc)) {
+			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(blockLoc);
+			if(territory instanceof KonSanctuary) {
+				KonSanctuary sanctuary = (KonSanctuary)territory;
+				KonMonumentTemplate template = sanctuary.getTemplate(blockLoc);
+				if(template != null) {
+					// Start monument blanking timer to prevent monument pastes
+					sanctuary.startTemplateBlanking(template.getName());
+				}
 			}
 		}
 	}

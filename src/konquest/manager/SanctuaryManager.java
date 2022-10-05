@@ -69,6 +69,36 @@ public class SanctuaryManager {
 	
 	public boolean removeSanctuary(String name) {
 		boolean result = false;
+		
+		//TODO: KR Add conditions to check if this removal is allowed...
+		// If this sanctuary contains templates...
+		//		Check for at least 1 other template in another sanctuary
+		//		Switch all kingdoms with templates in this sanctuary to another valid template
+		//
+		// Or just don't allow? Think...
+		/*
+		 * Option 1: Allow sanctuary removal if other templates exist, and auto-assign to kingdoms with missing templates.
+		 * Pros:
+		 * 	- Easy to manage sanctuary territory
+		 * Cons:
+		 * 	- Can unintentionally remove a sanctuary with most templates
+		 * 	- More complicated code logic for automatically checking conditions, assigning missing templates
+		 * 
+		 * Option 2: Strict conditions, cannot remove sanctuary with active templates, cannot remove active templates, 
+		 * 			 must manually re-assign kingdoms to new templates to make all templates non-active within sanctuary
+		 * 			 in order to remove it.
+		 * Pros:
+		 * 	- Simpler code logic with strict rules
+		 * 	- More idiot-proof, with checks to prevent template removal
+		 * Cons:
+		 * 	- More cumbersome for admins to remove templates, need to modify every kingdom first
+		 * 
+		 * Conclusion: Hybrid approach. Cannot remove sanctuary with active templates, but allow explicit removal of those templates.
+		 * 			When removing templates, prompt to confirm and list number of kingdoms using that template. Those kingdoms
+		 * 			automatically get assigned another template. There must always be at least 1 valid template somewhere, cannot remove
+		 * 			the last template. Kingdoms with null template cannot be captured, etc.
+		 */
+		
 		KonSanctuary oldSanctuary = sanctuaryMap.remove(name.toLowerCase());
 		if(oldSanctuary != null) {
 			oldSanctuary.clearAllTemplates();
@@ -145,6 +175,14 @@ public class SanctuaryManager {
 			for(KonMonumentTemplate template : sanctuary.getTemplates()) {
 				result.add(template.getName());
 			}
+		}
+		return result;
+	}
+	
+	public int getNumTemplates() {
+		int result = 0;
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			result += sanctuary.getTemplates().size();
 		}
 		return result;
 	}

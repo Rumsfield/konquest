@@ -406,7 +406,7 @@ public class PlayerListener implements Listener{
 	    				case 0:
 	    					//ChatUtil.sendNotice(bukkitPlayer, "Successfully created new Monument Template for kingdom "+player.getRegionKingdomName());
 	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(templateName));
-	    					kingdom.reloadLoadedTownMonuments();
+	    					kingdomManager.reloadMonumentsForTemplate(konquest.getSanctuaryManager().getTemplate(templateName));
 	    					break;
 	    				case 1:
 	    					int diffX = (int)Math.abs(player.getRegionCornerOneBuffer().getX()-player.getRegionCornerTwoBuffer().getX())+1;

@@ -56,7 +56,6 @@ import konquest.manager.UpgradeManager;
 import konquest.map.MapHandler;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
-import konquest.model.KonColor;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
@@ -100,6 +99,11 @@ public class Konquest implements KonquestAPI, Timeable {
 	public static ChatColor alliedColor = ChatColor.BLUE;
 	public static ChatColor barbarianColor = ChatColor.YELLOW;
 	public static ChatColor neutralColor = ChatColor.GRAY;
+	
+	//TODO: KR Delete this
+	public static ChatColor armisticeColor1 = ChatColor.GRAY;
+	public static ChatColor armisticeColor2 = ChatColor.GRAY;
+	
 	public static String healthModName = "konquest.health_buff";
 	
 	private DatabaseThread databaseThread;

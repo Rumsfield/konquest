@@ -50,6 +50,7 @@ import konquest.model.KonKingdom;
 import konquest.model.KonKingdomScoreAttributes;
 import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
 import konquest.model.KonLeaderboard;
+import konquest.model.KonMonumentTemplate;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.model.KonPlayerScoreAttributes;
@@ -1626,6 +1627,14 @@ public class KingdomManager implements KonquestKingdomManager {
 		}
 	}
 	
+	public void reloadMonumentsForTemplate(KonMonumentTemplate template) {
+		for(KonKingdom kingdom : getKingdoms()) {
+			if(kingdom.isMonumentTemplateValid() && kingdom.getMonumentTemplate().equals(template)) {
+				kingdom.reloadLoadedTownMonuments();
+			}
+		}
+	}
+	
 	/**
 	 * Updates a town option based on action
 	 * @param action
@@ -2564,7 +2573,10 @@ public class KingdomManager implements KonquestKingdomManager {
 	            		}
 			        	// Create a Monument Template region for current Kingdom, avoid saving
 			        	// Creation of template will update critical locations within kingdom object
-		        		int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel, false);
+			        	
+			        	//TODO: KR update this
+		        		//int status = kingdomMap.get(kingdomName).createMonumentTemplate(monument_cornerone, monument_cornertwo, monument_travel, false);
+			        	int status = 0;
 		        		if(status != 0) {
 		        			String message = "Failed to load Monument Template for Kingdom "+kingdomName+", ";
 		        			switch(status) {
@@ -2766,7 +2778,8 @@ public class KingdomManager implements KonquestKingdomManager {
 	            monumentSection.set("cornertwo", new int[] {(int) kingdom.getMonumentTemplate().getCornerTwo().getBlockX(),
 						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getBlockY(),
 						 								 	(int) kingdom.getMonumentTemplate().getCornerTwo().getBlockZ()});
-	            monumentSection.set("criticals", konquest.formatLocationsToString(kingdom.getCriticals()));
+	            // TODO: KR update this
+	            //monumentSection.set("criticals", konquest.formatLocationsToString(kingdom.getCriticals()));
 			} else {
 				ChatUtil.printConsoleError("Failed to save invalid monument template for Kingdom "+kingdom.getName());
 			}

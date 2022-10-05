@@ -72,14 +72,14 @@ public class CommandHandler  implements TabExecutor {
 	                    case FLY:
 	                        new FlyCommand(konquest, sender, args).execute();
 	                        break;
-	                    case GUILD:
-	                        new GuildCommand(konquest, sender, args).execute();
-	                        break;
 	                    case INFO:
 	                        new InfoCommand(konquest, sender, args).execute();
 	                        break;
 	                    case JOIN:
 	                        new JoinCommand(konquest, sender, args).execute();
+	                        break;
+	                    case KINGDOM:
+	                        new KingdomCommand(konquest, sender, args).execute();
 	                        break;
 	                    case LEAVE:
 	                        new LeaveCommand(konquest, sender, args).execute();
@@ -191,15 +191,15 @@ public class CommandHandler  implements TabExecutor {
 	                    case FLY:
 	                    	tabList.addAll(new FlyCommand(konquest, sender, args).tabComplete());
 	                        break;
-	                    case GUILD:
-	                    	tabList.addAll(new GuildCommand(konquest, sender, args).tabComplete());
-	                        break;
 	                    case INFO:
 	                    	tabList.addAll(new InfoCommand(konquest, sender, args).tabComplete());
 	                    	break;
 	                    case JOIN:
 	                    	tabList.addAll(new JoinCommand(konquest, sender, args).tabComplete());
 	                    	break;
+	                    case KINGDOM:
+	                    	tabList.addAll(new KingdomCommand(konquest, sender, args).tabComplete());
+	                        break;
 	                    case LEAVE:
 	                    	tabList.addAll(new LeaveCommand(konquest, sender, args).tabComplete());
 	                    	break;

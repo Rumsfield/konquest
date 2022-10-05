@@ -203,10 +203,26 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 		return false;
 	}
 	
+	public void startTemplateBlanking(String name) {
+		KonMonumentTemplate template = getTemplate(name);
+		if(template != null) {
+			stopTemplateBlanking(name);
+			template.setValid(false);
+			Timer timer = new Timer(this);
+			timer.stopTimer();
+			timer.setTime(120);
+			timer.startTimer();
+			templateBlankingTimers.put(name.toLowerCase(), timer);
+			ChatUtil.printDebug("Starting 120 second monument blanking timer for template "+name);
+		}
+	}
+	
 	public void stopTemplateBlanking(String name) {
-		if(templateBlankingTimers.containsKey(name)) {
-			templateBlankingTimers.get(name).stopTimer();
-			templateBlankingTimers.remove(name);
+		String nameLower = name.toLowerCase();
+		if(templateBlankingTimers.containsKey(nameLower)) {
+			templateBlankingTimers.get(nameLower).stopTimer();
+			templateBlankingTimers.remove(nameLower);
+			ChatUtil.printDebug("Stopping monument blanking timer for template "+name);
 		}
 	}
 	
@@ -228,7 +244,7 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 							case 0:
 								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(templateName));
 								monumentTemplate.setValid(true);
-								reloadLoadedTownMonuments();
+								getKonquest().getKingdomManager().reloadMonumentsForTemplate(monumentTemplate);
 								break;
 							case 1:
 								Location c1 = monumentTemplate.getCornerOne();
