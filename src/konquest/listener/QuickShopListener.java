@@ -12,8 +12,8 @@ import org.maxgamer.quickshop.event.ShopPurchaseEvent;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.manager.IntegrationManager;
-import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
+import konquest.manager.TerritoryManager;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
 import konquest.model.KonPlayer;
@@ -26,13 +26,13 @@ public class QuickShopListener implements Listener{
 
 	private Konquest konquest;
 	private PlayerManager playerManager;
-	private KingdomManager kingdomManager;
+	private TerritoryManager territoryManager;
 	private IntegrationManager integrationManager;
 	
 	public QuickShopListener(KonquestPlugin plugin) {
 		this.konquest = plugin.getKonquestInstance();
 		this.playerManager = konquest.getPlayerManager();
-		this.kingdomManager = konquest.getKingdomManager();
+		this.territoryManager = konquest.getTerritoryManager();
 		this.integrationManager = konquest.getIntegrationManager();
 	}
 	
@@ -54,9 +54,9 @@ public class QuickShopListener implements Listener{
 			// Bypass all checks for admins in bypass mode
 			KonPlayer player = playerManager.getPlayer(event.getPlayer());
 			if(player != null && !player.isAdminBypassActive()) {
-				if(kingdomManager.isChunkClaimed(event.getLocation())) {
+				if(territoryManager.isChunkClaimed(event.getLocation())) {
 					//ChatUtil.printDebug("...checking claimed chunk");
-					KonTerritory territory = kingdomManager.getChunkTerritory(event.getLocation());
+					KonTerritory territory = territoryManager.getChunkTerritory(event.getLocation());
 					if(territory instanceof KonTown) {
 						if(!player.getKingdom().equals(territory.getKingdom())) {
 							//ChatUtil.printDebug("...chunk is enemy town");
@@ -116,8 +116,8 @@ public class QuickShopListener implements Listener{
 			KonPlayer player = playerManager.getPlayer(purchaser);
 			if(player != null && !player.isAdminBypassActive()) {
 				Location shopLoc = event.getShop().getLocation();
-				if(kingdomManager.isChunkClaimed(shopLoc)) {
-					KonTerritory territory = kingdomManager.getChunkTerritory(shopLoc);
+				if(territoryManager.isChunkClaimed(shopLoc)) {
+					KonTerritory territory = territoryManager.getChunkTerritory(shopLoc);
 					if(!player.getKingdom().equals(territory.getKingdom())) {
 						//ChatUtil.sendError(event.getPlayer(), "Cannot use enemy shops!");
 						ChatUtil.sendError(purchaser, MessagePath.QUICKSHOP_ERROR_ENEMY_USE.getMessage());

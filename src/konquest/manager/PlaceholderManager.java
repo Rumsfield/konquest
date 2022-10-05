@@ -49,6 +49,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 	private Konquest konquest;
 	private PlayerManager playerManager;
 	private KingdomManager kingdomManager;
+	private TerritoryManager territoryManager;
 	private int cooldownSeconds;
 	private Comparator<Ranked> rankedComparator;
 	private long topScoreCooldownTime;
@@ -64,6 +65,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		this.konquest = konquest;
 		this.playerManager = konquest.getPlayerManager();
 		this.kingdomManager = konquest.getKingdomManager();
+		this.territoryManager = konquest.getTerritoryManager();
 		this.cooldownSeconds = 0;
 		this.topScoreCooldownTime = 0L;
 		this.topTownCooldownTime = 0L;
@@ -208,8 +210,8 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		String result = "";
     	KonPlayer onlinePlayer = playerManager.getPlayer(player);
     	if(onlinePlayer != null && player.isOnline()) {
-        	if(kingdomManager.isChunkClaimed(player.getLocation())) {
-        		result = kingdomManager.getChunkTerritory(player.getLocation()).getTerritoryType().getLabel();
+        	if(territoryManager.isChunkClaimed(player.getLocation())) {
+        		result = territoryManager.getChunkTerritory(player.getLocation()).getTerritoryType().getLabel();
         	} else {
         		result = KonquestTerritoryType.WILD.getLabel();
         	}
@@ -221,8 +223,8 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		String result = "";
     	KonPlayer onlinePlayer = playerManager.getPlayer(player);
     	if(onlinePlayer != null && player.isOnline()) {
-        	if(kingdomManager.isChunkClaimed(player.getLocation())) {
-        		result = kingdomManager.getChunkTerritory(player.getLocation()).getName();
+        	if(territoryManager.isChunkClaimed(player.getLocation())) {
+        		result = territoryManager.getChunkTerritory(player.getLocation()).getName();
         	} else {
         		result = KonquestTerritoryType.WILD.getLabel();
         	}
@@ -234,7 +236,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		String result = "";
     	KonPlayer onlinePlayer = playerManager.getPlayer(player);
     	if(onlinePlayer != null && player.isOnline()) {
-    		result = boolean2Lang(kingdomManager.isChunkClaimed(player.getLocation()));
+    		result = boolean2Lang(territoryManager.isChunkClaimed(player.getLocation()));
     	}
     	return result;
 	}

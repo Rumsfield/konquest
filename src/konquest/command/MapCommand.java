@@ -5,20 +5,19 @@ import java.util.Collections;
 import java.util.List;
 
 import konquest.Konquest;
-import konquest.manager.KingdomManager;
+import konquest.manager.TerritoryManager;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
 import org.bukkit.Bukkit;
-//import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 public class MapCommand extends CommandBase {
 
-	private int mapSize = KingdomManager.DEFAULT_MAP_SIZE;
+	private int mapSize = TerritoryManager.DEFAULT_MAP_SIZE;
 	
 	public MapCommand(Konquest konquest, CommandSender sender, String[] args) {
         super(konquest, sender, args);
@@ -74,7 +73,7 @@ public class MapCommand extends CommandBase {
         	Bukkit.getScheduler().runTaskAsynchronously(getKonquest().getPlugin(), new Runnable() {
                 @Override
                 public void run() {
-                	getKonquest().getKingdomManager().printPlayerMap(player, mapSize);
+                	getKonquest().getTerritoryManager().printPlayerMap(player, mapSize);
                 }
             });
         	

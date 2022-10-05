@@ -958,7 +958,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			for(Entity e : centerLoc.getWorld().getNearbyEntities(centerLoc,radius,256,radius,(e) -> e.getType() == EntityType.IRON_GOLEM)) {
 				IronGolem golem = (IronGolem)e;
 				// Check for golem inside given territory or in wild
-				if(isLocInside(golem.getLocation()) || !getKonquest().getKingdomManager().isChunkClaimed(golem.getLocation())) {
+				if(isLocInside(golem.getLocation()) || !getKonquest().getTerritoryManager().isChunkClaimed(golem.getLocation())) {
 					
 					// Check for closest enemy player
 					boolean isNearbyPlayer = false;

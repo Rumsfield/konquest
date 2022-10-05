@@ -33,11 +33,11 @@ public class BorderCommand extends CommandBase {
         	if(player.isBorderDisplay()) {
         		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_BORDER_NOTICE_DISABLE.getMessage());
         		player.setIsBorderDisplay(false);
-        		getKonquest().getKingdomManager().stopPlayerBorderParticles(player);
+        		getKonquest().getTerritoryManager().stopPlayerBorderParticles(player);
         	} else {
         		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_BORDER_NOTICE_ENABLE.getMessage());
         		player.setIsBorderDisplay(true);
-        		getKonquest().getKingdomManager().updatePlayerBorderParticles(player);
+        		getKonquest().getTerritoryManager().updatePlayerBorderParticles(player);
         	}
         }
 	}

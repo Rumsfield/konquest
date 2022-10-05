@@ -29,12 +29,14 @@ public class RuinManager implements KonquestRuinManager {
 
 	private Konquest konquest;
 	private KingdomManager kingdomManager;
+	private TerritoryManager territoryManager;
 	private HashMap<String, KonRuin> ruinMap; // lower case name maps to ruin object
 	private Material ruinCriticalBlock;
 	
 	public RuinManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.kingdomManager = konquest.getKingdomManager();
+		this.territoryManager = konquest.getTerritoryManager();
 		this.ruinMap = new HashMap<String, KonRuin>();
 		this.ruinCriticalBlock = Material.OBSIDIAN;
 	}
@@ -97,8 +99,8 @@ public class RuinManager implements KonquestRuinManager {
 		boolean result = false;
 		if(ruinArg instanceof KonRuin) {
 			KonRuin ruin = (KonRuin) ruinArg;
-			if(kingdomManager.isChunkClaimed(loc)) {
-				if(ruin.equals(kingdomManager.getChunkTerritory(loc))) {
+			if(territoryManager.isChunkClaimed(loc)) {
+				if(ruin.equals(territoryManager.getChunkTerritory(loc))) {
 					result = true;
 				}
 			}
@@ -111,7 +113,7 @@ public class RuinManager implements KonquestRuinManager {
 		if(!name.contains(" ") && konquest.validateNameConstraints(name) == 0) {
 			// Verify no overlapping init chunks
 			for(Point point : konquest.getAreaPoints(loc, 2)) {
-				if(kingdomManager.isChunkClaimed(point,loc.getWorld())) {
+				if(territoryManager.isChunkClaimed(point,loc.getWorld())) {
 					ChatUtil.printDebug("Found a chunk conflict during ruin init: "+name);
 					return false;
 				}
@@ -121,7 +123,7 @@ public class RuinManager implements KonquestRuinManager {
 			ruinMap.put(nameLower, new KonRuin(loc, name, kingdomManager.getNeutrals(), konquest));
 			ruinMap.get(nameLower).initClaim();
 			ruinMap.get(nameLower).updateBarPlayers();
-			kingdomManager.addAllTerritory(loc.getWorld(),ruinMap.get(nameLower).getChunkList());
+			territoryManager.addAllTerritory(loc.getWorld(),ruinMap.get(nameLower).getChunkList());
 			konquest.getMapHandler().drawDynmapUpdateTerritory(ruinMap.get(nameLower));
 			result = true;
 		}
@@ -134,7 +136,7 @@ public class RuinManager implements KonquestRuinManager {
 		if(oldRuin != null) {
 			oldRuin.removeAllBarPlayers();
 			oldRuin.removeAllGolems();
-			kingdomManager.removeAllTerritory(oldRuin.getCenterLoc().getWorld(), oldRuin.getChunkList().keySet());
+			territoryManager.removeAllTerritory(oldRuin.getCenterLoc().getWorld(), oldRuin.getChunkList().keySet());
 			konquest.getMapHandler().drawDynmapRemoveTerritory(oldRuin);
 			ChatUtil.printDebug("Removed Ruin "+name);
 			oldRuin = null;
@@ -204,7 +206,7 @@ public class RuinManager implements KonquestRuinManager {
 	                		loc.setWorld(world);
 	                		ruin.addSpawnLocation(loc);
 	            		}
-	                	kingdomManager.addAllTerritory(world,ruin.getChunkList());
+	                	territoryManager.addAllTerritory(world,ruin.getChunkList());
 	        		} else {
 	        			String message = "Could not load ruin "+ruinName+", ruins.yml may be corrupted and needs to be deleted.";
 	            		ChatUtil.printConsoleError(message);

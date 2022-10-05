@@ -40,8 +40,8 @@ public class FlyCommand extends CommandBase {
         		} else {
         			// Verify player is in friendly territory
         			boolean isFriendly = false;
-        			if(getKonquest().getKingdomManager().isChunkClaimed(bukkitPlayer.getLocation())) {
-        				KonTerritory territory = getKonquest().getKingdomManager().getChunkTerritory(bukkitPlayer.getLocation());
+        			if(getKonquest().getTerritoryManager().isChunkClaimed(bukkitPlayer.getLocation())) {
+        				KonTerritory territory = getKonquest().getTerritoryManager().getChunkTerritory(bukkitPlayer.getLocation());
         				if(territory.getKingdom().equals(player.getKingdom())) {
         					isFriendly = true;
         				}

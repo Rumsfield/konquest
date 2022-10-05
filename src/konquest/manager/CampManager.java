@@ -34,6 +34,7 @@ public class CampManager implements KonquestCampManager {
 
 	private Konquest konquest;
 	private KingdomManager kingdomManager;
+	private TerritoryManager territoryManager;
 	private HashMap<String,KonCamp> barbarianCamps; // player uuids to camps
 	//private HashSet<KonCampGroup> barbarianGroups; // all camp groups
 	private HashMap<KonCamp,KonCampGroup> groupMap; // camps to groups
@@ -42,6 +43,7 @@ public class CampManager implements KonquestCampManager {
 	public CampManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.kingdomManager = konquest.getKingdomManager();
+		this.territoryManager = konquest.getTerritoryManager();
 		this.barbarianCamps = new HashMap<String, KonCamp>();
 		//this.barbarianGroups = new HashSet<KonCampGroup>();
 		this.groupMap = new HashMap<KonCamp,KonCampGroup>();
@@ -158,7 +160,7 @@ public class CampManager implements KonquestCampManager {
 			//ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
 			World addWorld = loc.getWorld();
 			for(Point point : konquest.getAreaPoints(loc, radius)) {
-				if(kingdomManager.isChunkClaimed(point,addWorld)) {
+				if(territoryManager.isChunkClaimed(point,addWorld)) {
 					ChatUtil.printDebug("Found a chunk conflict in camp placement for player "+player.getOfflineBukkitPlayer().getName()+" "+uuid);
 					return 1;
 				}
@@ -170,7 +172,7 @@ public class CampManager implements KonquestCampManager {
 			// Update bar players
 			newCamp.updateBarPlayers();
 			//update the chunk cache, add points to primary world cache
-			kingdomManager.addAllTerritory(loc.getWorld(),newCamp.getChunkList());
+			territoryManager.addAllTerritory(loc.getWorld(),newCamp.getChunkList());
 			// Refresh groups
 			refreshGroups();
 			if(groupMap.containsKey(newCamp)) {
@@ -227,7 +229,7 @@ public class CampManager implements KonquestCampManager {
 				removedCamp.getBedLocation().getBlock().breakNaturally();
 			}
 			//update the chunk cache, remove all points from primary world
-			kingdomManager.removeAllTerritory(removedCamp.getWorld(),removedCamp.getChunkList().keySet());
+			territoryManager.removeAllTerritory(removedCamp.getWorld(),removedCamp.getChunkList().keySet());
 			// Refresh groups
 			Collection<KonCamp> groupSet = new ArrayList<KonCamp>();
 			if(groupMap.containsKey(removedCamp)) {
@@ -386,8 +388,8 @@ public class CampManager implements KonquestCampManager {
 				// Search surroundings for all adjacent camps
 				HashSet<KonCamp> adjCamps = new HashSet<KonCamp>();
 				for(Point point : konquest.getBorderPoints(center, radius+1)) {
-					if(kingdomManager.isChunkClaimed(point,center.getWorld()) && kingdomManager.getChunkTerritory(point,center.getWorld()) instanceof KonCamp) {
-						KonCamp adjCamp = (KonCamp)kingdomManager.getChunkTerritory(point,center.getWorld());
+					if(territoryManager.isChunkClaimed(point,center.getWorld()) && territoryManager.getChunkTerritory(point,center.getWorld()) instanceof KonCamp) {
+						KonCamp adjCamp = (KonCamp)territoryManager.getChunkTerritory(point,center.getWorld());
 						adjCamps.add(adjCamp);
 					}
 				}
@@ -508,7 +510,7 @@ public class CampManager implements KonquestCampManager {
 	            		int status = addCamp(camp_center, offlinePlayer);
 	            		if(status == 0) {
 		            		getCamp(offlinePlayer).addPoints(konquest.formatStringToPoints(playerCampSection.getString("chunks")));
-		            		kingdomManager.addAllTerritory(world,getCamp(offlinePlayer).getChunkList());
+		            		territoryManager.addAllTerritory(world,getCamp(offlinePlayer).getChunkList());
 		            		totalCamps++;
 	            		} else {
 	            			ChatUtil.printDebug("Failed to add camp for player "+offlineBukkitPlayer.getName()+", error code: "+status);

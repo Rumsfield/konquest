@@ -7,6 +7,7 @@ import konquest.api.model.KonquestTerritoryType;
 import konquest.manager.CampManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
+import konquest.manager.TerritoryManager;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
 import konquest.model.KonKingdom;
@@ -79,12 +80,14 @@ public class PlayerListener implements Listener{
 	private Konquest konquest;
 	private PlayerManager playerManager;
 	private KingdomManager kingdomManager;
+	private TerritoryManager territoryManager;
 	private CampManager campManager;
 	
 	public PlayerListener(KonquestPlugin plugin) {
 		this.konquest = plugin.getKonquestInstance();
 		this.playerManager = konquest.getPlayerManager();
 		this.kingdomManager = konquest.getKingdomManager();
+		this.territoryManager = konquest.getTerritoryManager();
 		this.campManager = konquest.getCampManager();
 	}
 	
@@ -377,7 +380,7 @@ public class PlayerListener implements Listener{
 	        	case MONUMENT:
 	                if (player.getRegionCornerOneBuffer() == null) {
 	                	// Location is first corner, verify sanctuary
-	                	KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(location);
+	                	KonTerritory territory = territoryManager.getChunkTerritory(location);
 	                	if(territory != null && territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY)) {
 	                		// Location is inside of a Sanctuary
 	                		String sanctuaryName = territory.getName();
@@ -436,8 +439,8 @@ public class PlayerListener implements Listener{
 	        		break;
 	        	case RUIN_CRITICAL:
 	        		boolean validCriticalBlock = false;
-	        		if(kingdomManager.isChunkClaimed(location)) {
-	        			KonTerritory territory = kingdomManager.getChunkTerritory(location);
+	        		if(territoryManager.isChunkClaimed(location)) {
+	        			KonTerritory territory = territoryManager.getChunkTerritory(location);
 	        			if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
 	        				Material criticalType = konquest.getRuinManager().getRuinCriticalBlock();
 	        				if(event.getClickedBlock().getType().equals(criticalType)) {
@@ -460,8 +463,8 @@ public class PlayerListener implements Listener{
 	        		break;
 	        	case RUIN_SPAWN:
 	        		boolean validSpawnBlock = false;
-	        		if(kingdomManager.isChunkClaimed(location)) {
-	        			KonTerritory territory = kingdomManager.getChunkTerritory(location);
+	        		if(territoryManager.isChunkClaimed(location)) {
+	        			KonTerritory territory = territoryManager.getChunkTerritory(location);
 	        			if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
 	        				((KonRuin)territory).addSpawnLocation(location);
 	        				ruinName = territory.getName();
@@ -487,9 +490,9 @@ public class PlayerListener implements Listener{
         		
         		//ChatUtil.printDebug("EVENT player interaction with block "+clickedState.getType().toString()+" using action "+event.getAction().toString());
         		// Check for territory
-        		if(kingdomManager.isChunkClaimed(clickedState.getLocation())) {
+        		if(territoryManager.isChunkClaimed(clickedState.getLocation())) {
         			// Interaction occurred within claimed territory
-	        		KonTerritory territory = kingdomManager.getChunkTerritory(clickedState.getLocation());
+	        		KonTerritory territory = territoryManager.getChunkTerritory(clickedState.getLocation());
 	        		// Prevent players from interacting with blocks in Capitals
 	        		if(territory instanceof KonCapital) {
 	        			boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
@@ -569,9 +572,9 @@ public class PlayerListener implements Listener{
     	if(passenger instanceof Player) {
     		Player bukkitPlayer = (Player) passenger;
     		// Prevent entering vehicles in capitals
-    		if(konquest.getKingdomManager().isChunkClaimed(event.getVehicle().getLocation())) {
+    		if(territoryManager.isChunkClaimed(event.getVehicle().getLocation())) {
     			KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-        		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getVehicle().getLocation());
+        		KonTerritory territory = territoryManager.getChunkTerritory(event.getVehicle().getLocation());
         		if(player != null && territory != null && territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
         			boolean isEnemy = !territory.getKingdom().equals(player.getKingdom());
         			boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
@@ -610,9 +613,9 @@ public class PlayerListener implements Listener{
             return;
         }
 		//ChatUtil.printDebug("Caught player arrow interaction...");
-		if(!event.isCancelled() && kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
+		if(!event.isCancelled() && territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
 			KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-	        KonTerritory territory = kingdomManager.getChunkTerritory(event.getBlock().getLocation());
+	        KonTerritory territory = territoryManager.getChunkTerritory(event.getBlock().getLocation());
 	        // Protect territory from arrow interaction
 	        if(territory instanceof KonCapital) {
 	        	//ChatUtil.printDebug("Cancelling to protect capital");
@@ -645,8 +648,8 @@ public class PlayerListener implements Listener{
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
         
-        if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
-        	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation());
+        if(player != null && !player.isAdminBypassActive() && territoryManager.isChunkClaimed(event.getRightClicked().getLocation())) {
+        	KonTerritory territory = territoryManager.getChunkTerritory(event.getRightClicked().getLocation());
         	
         	ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" interacted at entity of type: "+clicked.getType().toString());
         	boolean isEntityAllowed = (clicked.getType().equals(EntityType.PLAYER));
@@ -689,8 +692,8 @@ public class PlayerListener implements Listener{
 		}
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-        if(player != null && !player.isAdminBypassActive() && kingdomManager.isChunkClaimed(event.getRightClicked().getLocation())) {
-        	KonTerritory territory = kingdomManager.getChunkTerritory(event.getRightClicked().getLocation());
+        if(player != null && !player.isAdminBypassActive() && territoryManager.isChunkClaimed(event.getRightClicked().getLocation())) {
+        	KonTerritory territory = territoryManager.getChunkTerritory(event.getRightClicked().getLocation());
         	// Capital protections...
         	boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
         	if(territory instanceof KonCapital && !isCapitalUseEnabled) {
@@ -756,8 +759,8 @@ public class PlayerListener implements Listener{
     }    
     
     private void onBucketUse(PlayerBucketEvent event) {
-    	if(kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
-			KonTerritory territory = kingdomManager.getChunkTerritory(event.getBlock().getLocation());
+    	if(territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
+			KonTerritory territory = territoryManager.getChunkTerritory(event.getBlock().getLocation());
 			// Prevent all players from placing or picking up liquids inside of monuments
 			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideMonumentProtectionArea(event.getBlock().getLocation())) {
 				// The block is located inside a monument, cancel
@@ -812,8 +815,8 @@ public class PlayerListener implements Listener{
     	// Update town bars
     	//ChatUtil.printDebug("Player "+event.getPlayer().getName()+" died at "+currentLoc.toString());
     	//ChatUtil.printDebug("Player "+event.getPlayer().getName()+" respawns at "+respawnLoc.toString());
-		if(kingdomManager.isChunkClaimed(currentLoc)) {
-			KonTerritory territoryFrom = kingdomManager.getChunkTerritory(currentLoc);
+		if(territoryManager.isChunkClaimed(currentLoc)) {
+			KonTerritory territoryFrom = territoryManager.getChunkTerritory(currentLoc);
 			// Update bars
 			if(territoryFrom.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 				KonTown town = (KonTown) territoryFrom;
@@ -831,8 +834,8 @@ public class PlayerListener implements Listener{
 			// Remove potion effects for all players
 			kingdomManager.clearTownNerf(player);
 		}
-		if(kingdomManager.isChunkClaimed(respawnLoc)) {
-			KonTerritory territoryTo = kingdomManager.getChunkTerritory(respawnLoc);
+		if(territoryManager.isChunkClaimed(respawnLoc)) {
+			KonTerritory territoryTo = territoryManager.getChunkTerritory(respawnLoc);
 			// Update bars
 			if(territoryTo.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 				KonTown town = (KonTown) territoryTo;
@@ -890,8 +893,8 @@ public class PlayerListener implements Listener{
 	    	// When portal into valid world...
 	    	if(konquest.isWorldValid(portalToLoc.getWorld())) {
 				// Protections for territory
-	    		if(konquest.getKingdomManager().isChunkClaimed(portalToLoc)) {
-		    		KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(portalToLoc);
+	    		if(territoryManager.isChunkClaimed(portalToLoc)) {
+		    		KonTerritory territory = territoryManager.getChunkTerritory(portalToLoc);
 					/*
 					KonquestPortalTerritoryEvent invokeEvent = new KonquestPortalTerritoryEvent(konquest, kingdomManager.getChunkTerritory(event.getTo().getChunk()), event.getPortalTravelAgent());
 		            Bukkit.getServer().getPluginManager().callEvent(invokeEvent);
@@ -957,8 +960,8 @@ public class PlayerListener implements Listener{
     	}
     	// Check for inter-chunk ender pearl
     	boolean isEnemyPearlBlocked = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_ender_pearl", false);
-    	boolean isTerritoryTo = kingdomManager.isChunkClaimed(event.getTo());
-    	boolean isTerritoryFrom = kingdomManager.isChunkClaimed(event.getFrom());
+    	boolean isTerritoryTo = territoryManager.isChunkClaimed(event.getTo());
+    	boolean isTerritoryFrom = territoryManager.isChunkClaimed(event.getFrom());
     	Player bukkitPlayer = event.getPlayer();
 		if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			//ChatUtil.printDebug("Failed to handle onPlayerEnterLeaveChunk for non-existent player");
@@ -970,13 +973,13 @@ public class PlayerListener implements Listener{
 		if(isEnemyPearlBlocked && event.getCause().equals(TeleportCause.ENDER_PEARL)) {
 			boolean isEnemyTerritory = false;
 			if(isTerritoryTo) {
-				KonTerritory territoryTo = kingdomManager.getChunkTerritory(event.getTo());
+				KonTerritory territoryTo = territoryManager.getChunkTerritory(event.getTo());
 				if(!player.getKingdom().equals(territoryTo.getKingdom())) {
 					isEnemyTerritory = true;
 				}
 			}
 			if(isTerritoryFrom) {
-				KonTerritory territoryFrom = kingdomManager.getChunkTerritory(event.getFrom());
+				KonTerritory territoryFrom = territoryManager.getChunkTerritory(event.getFrom());
 				if(!player.getKingdom().equals(territoryFrom.getKingdom())) {
 					isEnemyTerritory = true;
 				}
@@ -1018,15 +1021,15 @@ public class PlayerListener implements Listener{
 				return true;
 			}
         	KonPlayer player = playerManager.getPlayer(movePlayer);
-    		boolean isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
-    		boolean isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
+    		boolean isTerritoryTo = territoryManager.isChunkClaimed(moveTo);
+    		boolean isTerritoryFrom = territoryManager.isChunkClaimed(moveFrom);
     		KonTerritory territoryTo = null;
 			KonTerritory territoryFrom = null;
 			if(isTerritoryTo) {
-				territoryTo = kingdomManager.getChunkTerritory(moveTo);
+				territoryTo = territoryManager.getChunkTerritory(moveTo);
 			}
 			if(isTerritoryFrom) {
-				territoryFrom = kingdomManager.getChunkTerritory(moveFrom);
+				territoryFrom = territoryManager.getChunkTerritory(moveFrom);
 			}
 			
 			boolean isArmisticeTo = false; // Is the player in an armistice with the to-territory?
@@ -1055,10 +1058,10 @@ public class PlayerListener implements Listener{
 	        			// Auto claim
 	        			if(player.getAutoFollow().equals(FollowType.ADMIN_CLAIM)) {
 	        				// Admin claiming takes priority
-	        				kingdomManager.claimForAdmin(movePlayer, moveTo);
+	        				territoryManager.claimForAdmin(movePlayer, moveTo);
 	        			} else if(player.getAutoFollow().equals(FollowType.CLAIM)) {
 	        				// Player is claim following
-	        				boolean isClaimSuccess = kingdomManager.claimForPlayer(movePlayer, moveTo);
+	        				boolean isClaimSuccess = territoryManager.claimForPlayer(movePlayer, moveTo);
 	            			if(!isClaimSuccess) {
 	            				player.setAutoFollow(FollowType.NONE);
 	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
@@ -1070,10 +1073,10 @@ public class PlayerListener implements Listener{
 	        			// Auto unclaim
 	        			if(player.getAutoFollow().equals(FollowType.ADMIN_UNCLAIM)) {
 	        				// Admin unclaiming takes priority
-	        				kingdomManager.unclaimForAdmin(movePlayer, moveTo);
+	        				territoryManager.unclaimForAdmin(movePlayer, moveTo);
 	        			} else if(player.getAutoFollow().equals(FollowType.UNCLAIM)) {
 	        				// Player is unclaim following
-	        				boolean isUnclaimSuccess = kingdomManager.unclaimForPlayer(movePlayer, moveTo);
+	        				boolean isUnclaimSuccess = territoryManager.unclaimForPlayer(movePlayer, moveTo);
 	            			if(!isUnclaimSuccess) {
 	            				player.setAutoFollow(FollowType.NONE);
 	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_FAIL_AUTO.getMessage());
@@ -1083,13 +1086,13 @@ public class PlayerListener implements Listener{
 	        			}
 	        		}
 	        		// Update territory variables for chunk boundary checks below
-    				isTerritoryTo = kingdomManager.isChunkClaimed(moveTo);
-    				isTerritoryFrom = kingdomManager.isChunkClaimed(moveFrom);
+    				isTerritoryTo = territoryManager.isChunkClaimed(moveTo);
+    				isTerritoryFrom = territoryManager.isChunkClaimed(moveFrom);
     				if(isTerritoryTo) {
-    					territoryTo = kingdomManager.getChunkTerritory(moveTo);
+    					territoryTo = territoryManager.getChunkTerritory(moveTo);
     				}
     				if(isTerritoryFrom) {
-    					territoryFrom = kingdomManager.getChunkTerritory(moveFrom);
+    					territoryFrom = territoryManager.getChunkTerritory(moveFrom);
     				}
         		}
         		
@@ -1182,7 +1185,7 @@ public class PlayerListener implements Listener{
         			Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
         	            @Override
         	            public void run() {
-        	            	kingdomManager.printPlayerMap(player, KingdomManager.DEFAULT_MAP_SIZE, moveTo);
+        	            	territoryManager.printPlayerMap(player, TerritoryManager.DEFAULT_MAP_SIZE, moveTo);
         	            }
         	        },1);
         		}
@@ -1225,7 +1228,7 @@ public class PlayerListener implements Listener{
     		}
     		
     		// Border particle update
-    		kingdomManager.updatePlayerBorderParticles(player,moveTo);
+    		territoryManager.updatePlayerBorderParticles(player,moveTo);
     	}
     	return true;
     }

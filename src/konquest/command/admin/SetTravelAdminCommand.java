@@ -35,10 +35,10 @@ public class SetTravelAdminCommand extends CommandBase {
         	
         	Location playerLoc = bukkitPlayer.getLocation();
         	// Check if player's location is within a territory
-        	if(getKonquest().getKingdomManager().isChunkClaimed(playerLoc)) {
-        		getKonquest().getKingdomManager().getChunkTerritory(playerLoc).setSpawn(playerLoc);
+        	if(getKonquest().getTerritoryManager().isChunkClaimed(playerLoc)) {
+        		getKonquest().getTerritoryManager().getChunkTerritory(playerLoc).setSpawn(playerLoc);
         		//ChatUtil.sendNotice((Player) getSender(), "Successfully set new travel point in "+getKonquest().getKingdomManager().getChunkTerritory(playerLoc.getChunk()).getName());
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SETTRAVEL_NOTICE_SUCCESS.getMessage(getKonquest().getKingdomManager().getChunkTerritory(playerLoc).getName()));
+        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SETTRAVEL_NOTICE_SUCCESS.getMessage(getKonquest().getTerritoryManager().getChunkTerritory(playerLoc).getName()));
         	} else {
         		//ChatUtil.sendError((Player) getSender(), "Failed to set travel point in unknown territory");
         		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_SETTRAVEL_ERROR_FAIL.getMessage());

@@ -249,8 +249,8 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		boolean result = true;
 		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
 			Location playerLoc = player.getBukkitPlayer().getLocation();
-			if(getKonquest().getKingdomManager().isChunkClaimed(playerLoc)) {
-				if(getKonquest().getKingdomManager().getChunkTerritory(playerLoc).equals(this)) {
+			if(getKonquest().getTerritoryManager().isChunkClaimed(playerLoc)) {
+				if(getKonquest().getTerritoryManager().getChunkTerritory(playerLoc).equals(this)) {
 					result = false;
 					break;
 				}

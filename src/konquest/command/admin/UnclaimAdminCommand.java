@@ -54,7 +54,7 @@ public class UnclaimAdminCommand extends CommandBase {
     					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_UNCLAIM_ERROR_RADIUS.getMessage(min,max));
     					return;
     				}
-    				getKonquest().getKingdomManager().unclaimRadiusForAdmin(bukkitPlayer, bukkitPlayer.getLocation(), radius);
+    				getKonquest().getTerritoryManager().unclaimRadiusForAdmin(bukkitPlayer, bukkitPlayer.getLocation(), radius);
         			break;
         			
         		case "auto" :
@@ -75,7 +75,7 @@ public class UnclaimAdminCommand extends CommandBase {
         				doAuto = true;
         			}
         			if(doAuto) {
-        				boolean isUnclaimSuccess = getKonquest().getKingdomManager().unclaimForAdmin(bukkitPlayer, bukkitPlayer.getLocation());
+        				boolean isUnclaimSuccess = getKonquest().getTerritoryManager().unclaimForAdmin(bukkitPlayer, bukkitPlayer.getLocation());
         				if(isUnclaimSuccess) {
         					ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
             				player.setAutoFollow(FollowType.ADMIN_UNCLAIM);
@@ -89,7 +89,7 @@ public class UnclaimAdminCommand extends CommandBase {
         		}
         	} else {
         		// Unclaim the single chunk containing playerLoc for the current territory.
-        		getKonquest().getKingdomManager().unclaimForAdmin(bukkitPlayer, bukkitPlayer.getLocation());
+        		getKonquest().getTerritoryManager().unclaimForAdmin(bukkitPlayer, bukkitPlayer.getLocation());
         	}
         }
     }

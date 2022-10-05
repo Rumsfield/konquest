@@ -42,8 +42,8 @@ public class WorldListener  implements Listener {
 			// Check every block associated with the portal
 			for(BlockState current_blockState : event.getBlocks()) {
 				// Prevent portals from being created inside of Capitals and Monuments in the primary world
-				if(konquest.getKingdomManager().isChunkClaimed(current_blockState.getLocation())) {
-					KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(current_blockState.getLocation());
+				if(konquest.getTerritoryManager().isChunkClaimed(current_blockState.getLocation())) {
+					KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(current_blockState.getLocation());
 					
 					if(territory instanceof KonCapital) {
 						boolean isPortalAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_portal",false);
@@ -69,8 +69,8 @@ public class WorldListener  implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onChunkLoad(ChunkLoadEvent event) {
-		if(konquest.getKingdomManager().isChunkClaimed(Konquest.toPoint(event.getChunk()), event.getWorld())) {
-			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(Konquest.toPoint(event.getChunk()), event.getWorld());
+		if(konquest.getTerritoryManager().isChunkClaimed(Konquest.toPoint(event.getChunk()), event.getWorld())) {
+			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(Konquest.toPoint(event.getChunk()), event.getWorld());
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
 				if(town.isChunkCenter(event.getChunk())) {
@@ -109,8 +109,8 @@ public class WorldListener  implements Listener {
 	
 	private boolean isLocInsideMonument(Location loc) {
 		boolean result = false;
-		if(konquest.getKingdomManager().isChunkClaimed(loc)) {
-			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(loc);
+		if(konquest.getTerritoryManager().isChunkClaimed(loc)) {
+			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(loc);
 			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideMonumentProtectionArea(loc)) {
 				result = true;
 			}

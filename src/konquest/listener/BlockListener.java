@@ -14,6 +14,7 @@ import konquest.api.model.KonquestUpgrade;
 import konquest.manager.CampManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
+import konquest.manager.TerritoryManager;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
 import konquest.model.KonDirective;
@@ -66,6 +67,7 @@ public class BlockListener implements Listener {
 	private KonquestPlugin konquestPlugin;
 	private Konquest konquest;
 	private KingdomManager kingdomManager;
+	private TerritoryManager territoryManager;
 	private CampManager campManager;
 	private PlayerManager playerManager;
 	
@@ -74,6 +76,7 @@ public class BlockListener implements Listener {
 		this.konquest = konquestPlugin.getKonquestInstance();
 		this.playerManager = konquest.getPlayerManager();
 		this.kingdomManager = konquest.getKingdomManager();
+		this.territoryManager = konquest.getTerritoryManager();
 		this.campManager = konquest.getCampManager();
 	}
 	
@@ -100,11 +103,11 @@ public class BlockListener implements Listener {
 		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 		
 		// Monitor blocks in claimed territory
-		if(kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
+		if(territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
 			// Bypass event restrictions for player in Admin Bypass Mode
 			if(!player.isAdminBypassActive() && !player.getBukkitPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
 				//ChatUtil.printDebug("Evaluating blockBreak in claimed territory...");
-				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(event.getBlock().getLocation());
+				KonTerritory territory = territoryManager.getChunkTerritory(event.getBlock().getLocation());
 				Location breakLoc = event.getBlock().getLocation();
 				// Capital considerations...
 				if(territory instanceof KonCapital) {
@@ -554,10 +557,10 @@ public class BlockListener implements Listener {
 		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 		Location placeLoc = event.getBlock().getLocation();
 		// Monitor blocks in claimed territory
-		if(kingdomManager.isChunkClaimed(placeLoc)) {
+		if(territoryManager.isChunkClaimed(placeLoc)) {
 			// Bypass event restrictions for player in Admin Bypass Mode
 			if(!player.isAdminBypassActive()) {
-				KonTerritory territory = kingdomManager.getChunkTerritory(placeLoc);
+				KonTerritory territory = territoryManager.getChunkTerritory(placeLoc);
 				// Capital considerations...
 				if(territory instanceof KonCapital) {
 					boolean isCapitalBuild = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_build",false);
@@ -873,9 +876,9 @@ public class BlockListener implements Listener {
 			return;
 		}
 		for(Block block : event.blockList()) {
-			if(kingdomManager.isChunkClaimed(block.getLocation())) {
+			if(territoryManager.isChunkClaimed(block.getLocation())) {
 				ChatUtil.printDebug("effected block is inside claimed territory");
-				KonTerritory territory = kingdomManager.getChunkTerritory(block.getLocation());
+				KonTerritory territory = territoryManager.getChunkTerritory(block.getLocation());
 				Material blockMat = block.getType();
 				
 				// Protect Capitals
@@ -971,8 +974,8 @@ public class BlockListener implements Listener {
 		//boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
 		// review the list of affected blocks, prevent any movement of monument blocks
 		for(Block pushBlock : event.getBlocks()) {
-			if(kingdomManager.isChunkClaimed(pushBlock.getLocation())) {
-				KonTerritory territory = kingdomManager.getChunkTerritory(pushBlock.getLocation());
+			if(territoryManager.isChunkClaimed(pushBlock.getLocation())) {
+				KonTerritory territory = territoryManager.getChunkTerritory(pushBlock.getLocation());
 				if(territory instanceof KonCapital) {
 					KonCapital capital = (KonCapital) territory;
 					// Check if this block is within a monument template
@@ -1026,8 +1029,8 @@ public class BlockListener implements Listener {
 			}
 			// Check if this block will move into a monument or monument template
 			Location pushTo = new Location(pushBlock.getWorld(),pushBlock.getX()+event.getDirection().getModX(),pushBlock.getY()+event.getDirection().getModY(),pushBlock.getZ()+event.getDirection().getModZ());
-			if(kingdomManager.isChunkClaimed(pushTo)) {
-				KonTerritory territory = kingdomManager.getChunkTerritory(pushTo);
+			if(territoryManager.isChunkClaimed(pushTo)) {
+				KonTerritory territory = territoryManager.getChunkTerritory(pushTo);
 				if(territory instanceof KonCapital) {
 					KonMonumentTemplate template = territory.getKingdom().getMonumentTemplate();
 					if(template != null && template.isLocInside(pushBlock.getLocation())) {
@@ -1068,8 +1071,8 @@ public class BlockListener implements Listener {
 		//boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
 		// review the list of affected blocks, prevent any movement of monument blocks
 		for(Block pullBlock : event.getBlocks()) {
-			if(kingdomManager.isChunkClaimed(pullBlock.getLocation())) {
-				KonTerritory territory = kingdomManager.getChunkTerritory(pullBlock.getLocation());
+			if(territoryManager.isChunkClaimed(pullBlock.getLocation())) {
+				KonTerritory territory = territoryManager.getChunkTerritory(pullBlock.getLocation());
 				if(territory instanceof KonCapital) {
 					KonCapital capital = (KonCapital) territory;
 					// Check if this block is within a monument template
@@ -1138,14 +1141,14 @@ public class BlockListener implements Listener {
 		Location locTo = event.getToBlock().getLocation();
 		Location locFrom = event.getBlock().getLocation();
 		if(!locTo.equals(locFrom)) {
-    		boolean isTerritoryTo = kingdomManager.isChunkClaimed(locTo);
-    		boolean isTerritoryFrom = kingdomManager.isChunkClaimed(locFrom);
+    		boolean isTerritoryTo = territoryManager.isChunkClaimed(locTo);
+    		boolean isTerritoryFrom = territoryManager.isChunkClaimed(locFrom);
     		
     		if(isTerritoryTo) {
     			if(isTerritoryFrom) {
     				// Between enemy territories
-        			KonTerritory territoryTo = kingdomManager.getChunkTerritory(locTo);
-        			KonTerritory territoryFrom = kingdomManager.getChunkTerritory(locFrom);
+        			KonTerritory territoryTo = territoryManager.getChunkTerritory(locTo);
+        			KonTerritory territoryFrom = territoryManager.getChunkTerritory(locFrom);
         			if(!territoryTo.getKingdom().equals(territoryFrom.getKingdom())) {
         				event.setCancelled(true);
             			return;
@@ -1186,8 +1189,8 @@ public class BlockListener implements Listener {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
 		}
-		if(kingdomManager.isChunkClaimed(event.getBlock().getLocation())) {
-			KonTerritory territory = kingdomManager.getChunkTerritory(event.getBlock().getLocation());
+		if(territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
+			KonTerritory territory = territoryManager.getChunkTerritory(event.getBlock().getLocation());
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
 				// Prevent all spread inside Monument
@@ -1250,8 +1253,8 @@ public class BlockListener implements Listener {
 	
 	private boolean isBlockInsideMonument(Block block) {
 		boolean result = false;
-		if(kingdomManager.isChunkClaimed(block.getLocation())) {
-			KonTerritory territory = kingdomManager.getChunkTerritory(block.getLocation());
+		if(territoryManager.isChunkClaimed(block.getLocation())) {
+			KonTerritory territory = territoryManager.getChunkTerritory(block.getLocation());
 			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideMonumentProtectionArea(block.getLocation())) {
 				result = true;
 			}
@@ -1262,8 +1265,8 @@ public class BlockListener implements Listener {
 	private void checkMonumentTemplateBlanking(BlockEvent event) {
 		// Monitor monument templates for blanking by edits from admin bypass players
 		Location blockLoc = event.getBlock().getLocation();
-		if(konquest.getKingdomManager().isChunkClaimed(blockLoc)) {
-			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(blockLoc);
+		if(territoryManager.isChunkClaimed(blockLoc)) {
+			KonTerritory territory = territoryManager.getChunkTerritory(blockLoc);
 			if(territory instanceof KonSanctuary) {
 				KonSanctuary sanctuary = (KonSanctuary)territory;
 				KonMonumentTemplate template = sanctuary.getTemplate(blockLoc);
@@ -1326,7 +1329,7 @@ public class BlockListener implements Listener {
 						// Clear mob targets for all players within the old town
 						locPlayer.clearAllMobAttackers();
 						// Update particle border renders for nearby players
-						kingdomManager.updatePlayerBorderParticles(locPlayer);
+						territoryManager.updatePlayerBorderParticles(locPlayer);
 					}
 					// Update directive progress
 					konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CAPTURE_TOWN);
@@ -1381,7 +1384,7 @@ public class BlockListener implements Listener {
 						// Update particle border renders for nearby players
 						for(Chunk chunk : konquest.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
 							if(town.hasChunk(chunk)) {
-								kingdomManager.updatePlayerBorderParticles(onlinePlayer);
+								territoryManager.updatePlayerBorderParticles(onlinePlayer);
 								break;
 							}
 						}

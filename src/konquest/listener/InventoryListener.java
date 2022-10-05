@@ -68,7 +68,7 @@ public class InventoryListener implements Listener {
 		// Check for merchant trades in claimed territory of guilds
 		Location openLoc = event.getInventory().getLocation();
 		
-		if(openLoc != null && konquest.getKingdomManager().isChunkClaimed(openLoc)) {
+		if(openLoc != null && konquest.getTerritoryManager().isChunkClaimed(openLoc)) {
 			
 			if(!konquest.getPlayerManager().isOnlinePlayer((Player)event.getPlayer())) {
 				ChatUtil.printDebug("Failed to handle onInventoryOpen for non-existent player");
@@ -78,7 +78,7 @@ public class InventoryListener implements Listener {
 			// Bypass event restrictions for player in Admin Bypass Mode
 			if(!player.isAdminBypassActive()) {
 				//ChatUtil.printDebug("inventoryOpen Evaluating territory");
-				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(openLoc);
+				KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(openLoc);
 				// Prevent all inventory openings inside Capitals
 				boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
 				if(territory instanceof KonCapital && !isCapitalUseEnabled) {
@@ -374,8 +374,8 @@ public class InventoryListener implements Listener {
 			konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.ENCHANT_ITEM);
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.ENCHANTMENTS,1);
 			Location enchantLoc = event.getEnchantBlock().getLocation();
-			if(enchantLoc != null && konquest.getKingdomManager().isChunkClaimed(enchantLoc)) {
-				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(enchantLoc);
+			if(enchantLoc != null && konquest.getTerritoryManager().isChunkClaimed(enchantLoc)) {
+				KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(enchantLoc);
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown)territory;
 					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.ENCHANT);
@@ -401,8 +401,8 @@ public class InventoryListener implements Listener {
 				return;
 			}
 			Location enchantLoc = event.getEnchantBlock().getLocation();
-			if(enchantLoc != null && konquest.getKingdomManager().isChunkClaimed(enchantLoc)) {
-				KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(enchantLoc);
+			if(enchantLoc != null && konquest.getTerritoryManager().isChunkClaimed(enchantLoc)) {
+				KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(enchantLoc);
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown)territory;
 					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.ENCHANT);

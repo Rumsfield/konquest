@@ -176,7 +176,7 @@ public class SettleCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
         			break;
         		case 6:
-        			distance = getKonquest().getKingdomManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
+        			distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
         			int min_distance_capital = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
         			int min_distance_town = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
         			int min_distance = 0;
@@ -188,7 +188,7 @@ public class SettleCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
         			break;
         		case 7:
-        			distance = getKonquest().getKingdomManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
+        			distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
         			int max_distance_all = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_distance_all");
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_MAX.getMessage(distance,max_distance_all));
         			break;

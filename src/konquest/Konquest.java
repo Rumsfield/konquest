@@ -51,6 +51,7 @@ import konquest.manager.PlotManager;
 import konquest.manager.RuinManager;
 import konquest.manager.SanctuaryManager;
 import konquest.manager.ShieldManager;
+import konquest.manager.TerritoryManager;
 import konquest.manager.TravelManager;
 import konquest.manager.UpgradeManager;
 import konquest.map.MapHandler;
@@ -127,6 +128,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	private GuildManager guildManager;
 	private TravelManager travelManager;
 	private SanctuaryManager sanctuaryManager;
+	private TerritoryManager territoryManager;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
@@ -184,6 +186,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		guildManager = new GuildManager(this);
 		travelManager = new TravelManager(this);
 		sanctuaryManager = new SanctuaryManager(this);
+		territoryManager = new TerritoryManager(this);
 		
 		versionHandler = null;
 		
@@ -546,8 +549,8 @@ public class Konquest implements KonquestAPI, Timeable {
     	}
     	// Updates based on login position
     	Location loginLoc = bukkitPlayer.getLocation();
-    	if(kingdomManager.isChunkClaimed(loginLoc)) {
-			KonTerritory loginTerritory = kingdomManager.getChunkTerritory(loginLoc);
+    	if(territoryManager.isChunkClaimed(loginLoc)) {
+			KonTerritory loginTerritory = territoryManager.getChunkTerritory(loginLoc);
     		if(loginTerritory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) { 
 	    		// Player joined located within a Town
 	    		KonTown town = (KonTown) loginTerritory;
@@ -578,7 +581,7 @@ public class Konquest implements KonquestAPI, Timeable {
 			// Player joined located outside of a Town
 			kingdomManager.clearTownNerf(player);
 		}
-    	kingdomManager.updatePlayerBorderParticles(player);
+    	territoryManager.updatePlayerBorderParticles(player);
     	ChatUtil.resetTitle(bukkitPlayer);
 		return player;
 	}
@@ -667,6 +670,10 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public KingdomManager getKingdomManager() {
 		return kingdomManager;
+	}
+	
+	public TerritoryManager getTerritoryManager() {
+		return territoryManager;
 	}
 	
 	public CampManager getCampManager() {
@@ -1157,7 +1164,7 @@ public class Konquest implements KonquestAPI, Timeable {
 			randomNumZ = ThreadLocalRandom.current().nextInt(-1*(radius), (radius) + 1) + offsetZ;
 			randomNumY = world.getHighestBlockYAt(randomNumX,randomNumZ) + 3;
 			wildLoc = new Location(world, randomNumX, randomNumY, randomNumZ);
-			if(!kingdomManager.isChunkClaimed(wildLoc)) {
+			if(!territoryManager.isChunkClaimed(wildLoc)) {
 				foundValidLoc = true;
 			} else {
 				timeout++;

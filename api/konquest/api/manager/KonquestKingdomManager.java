@@ -176,7 +176,7 @@ public interface KonquestKingdomManager {
 	 * 			<br>3 - error, already claimed
 	 * 			<br>4 - error, cancelled by event
 	 */
-	public int claimChunk(Location loc);
+	//public int claimChunk(Location loc);
 	
 	/**
 	 * Unclaims the chunk at the given location from its associated territory.
@@ -190,7 +190,7 @@ public interface KonquestKingdomManager {
 	 * 			<br>3 - error, internal territory chunk not found
 	 * 			<br>4 - error, cancelled by event
 	 */
-	public int unclaimChunk(Location loc);
+	//public int unclaimChunk(Location loc);
 	
 	/**
 	 * Checks whether the chunk at the given location is claimed by a territory.
@@ -198,7 +198,7 @@ public interface KonquestKingdomManager {
 	 * @param loc The location to check
 	 * @return True when the location is inside of claimed territory, else false
 	 */
-	public boolean isChunkClaimed(Location loc);
+	//public boolean isChunkClaimed(Location loc);
 	
 	/**
 	 * Gets the territory at the given location.
@@ -207,7 +207,7 @@ public interface KonquestKingdomManager {
 	 * @param loc The location to request the territory
 	 * @return The territory at the given location, or null if no territory exists
 	 */
-	public KonquestTerritory getChunkTerritory(Location loc);
+	//public KonquestTerritory getChunkTerritory(Location loc);
 	
 	
 	/**
@@ -217,7 +217,7 @@ public interface KonquestKingdomManager {
 	 * @param loc The location to search
 	 * @return The distance in chunks to the nearest territory, or Integer.MAX_VALUE if not found
 	 */
-	public int getDistanceToClosestTerritory(Location loc);
+	//public int getDistanceToClosestTerritory(Location loc);
 	
 	/**
 	 * Gets a list of all kingdom names.

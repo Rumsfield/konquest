@@ -2,7 +2,7 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.manager.KingdomManager;
+import konquest.manager.TerritoryManager;
 import konquest.model.KonPlayer;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
@@ -22,19 +22,19 @@ public class HangingListener implements Listener {
 
 	private KonquestPlugin konquestPlugin;
 	private Konquest konquest;
-	private KingdomManager kingdomManager;
+	private TerritoryManager territoryManager;
 	
 	public HangingListener(KonquestPlugin plugin) {
 		this.konquestPlugin = plugin;
 		this.konquest = konquestPlugin.getKonquestInstance();
-		this.kingdomManager = konquest.getKingdomManager();
+		this.territoryManager = konquest.getTerritoryManager();
 	}
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onHangingPlace(HangingPlaceEvent event) {
 		Location placeLoc = event.getEntity().getLocation();
-		if(kingdomManager.isChunkClaimed(placeLoc)) {
-			KonTerritory territory = kingdomManager.getChunkTerritory(placeLoc);
+		if(territoryManager.isChunkClaimed(placeLoc)) {
+			KonTerritory territory = territoryManager.getChunkTerritory(placeLoc);
 			// Check for break inside of town
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
@@ -54,8 +54,8 @@ public class HangingListener implements Listener {
     public void onHangingBreak(HangingBreakByEntityEvent event) {
 		//ChatUtil.printDebug("EVENT: Hanging Entity Broke");
 		Location brakeLoc = event.getEntity().getLocation();
-		if(kingdomManager.isChunkClaimed(brakeLoc)) {
-			KonTerritory territory = kingdomManager.getChunkTerritory(brakeLoc);
+		if(territoryManager.isChunkClaimed(brakeLoc)) {
+			KonTerritory territory = territoryManager.getChunkTerritory(brakeLoc);
 			// Check for break inside of town
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
