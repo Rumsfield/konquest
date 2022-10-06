@@ -18,11 +18,12 @@ import org.bukkit.Sound;
 import konquest.Konquest;
 import konquest.api.model.KonquestKingdom;
 import konquest.utility.ChatUtil;
+import konquest.utility.CorePath;
 import konquest.utility.RequestKeeper;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
-public class KonKingdom implements Timeable, KonquestKingdom {
+public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHolder {
 
 	public enum Relationship {
 		ENEMY,
@@ -43,6 +44,9 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 	private boolean isOfflineProtected;
 	private Timer protectedWarmupTimer;
 	
+	private Map<KonPropertyFlag,Boolean> properties;
+	
+	private boolean isServerOperated;
 	private boolean isOpen;
 	private RequestKeeper joinRequestKeeper;
 	private UUID master;
@@ -60,6 +64,10 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 		this.isOfflineProtected = true;
 		this.protectedWarmupTimer = new Timer(this);
 		
+		this.properties = new HashMap<KonPropertyFlag,Boolean>();
+		initProperties();
+		
+		this.isServerOperated = false;
 		this.isOpen = false;
 		this.joinRequestKeeper = new RequestKeeper();
 		this.master = null;
@@ -75,6 +83,12 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 		this.townMap = new HashMap<String, KonTown>();
 	}
 	
+	private void initProperties() {
+		properties.clear();
+		properties.put(KonPropertyFlag.NEUTRAL, 	konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.neutral"));
+		properties.put(KonPropertyFlag.GOLEMS, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.golems"));
+	}
+	
 	public int initCapital() {
 		int status = capital.initClaim();
 		return status;
@@ -88,11 +102,42 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 		return isOpen ? true : false;
 	}
 	
-	/*
-	 * kingdoms:
-    neutral: false
-    golems: true
-	 */
+	public void setIServerOperated(boolean val) {
+		isServerOperated = val;
+	}
+	
+	public boolean isServerOperated() {
+		return isServerOperated ? true : false;
+	}
+
+	@Override
+	public boolean setPropertyValue(KonPropertyFlag property, boolean value) {
+		boolean result = false;
+		if(properties.containsKey(property)) {
+			properties.put(property, value);
+			result = true;
+		}
+		return result;
+	}
+
+	@Override
+	public boolean getPropertyValue(KonPropertyFlag property) {
+		boolean result = false;
+		if(properties.containsKey(property)) {
+			result = properties.get(property);
+		}
+		return result;
+	}
+	
+	@Override
+	public boolean hasPropertyValue(KonPropertyFlag property) {
+		return properties.containsKey(property);
+	}
+
+	@Override
+	public Map<KonPropertyFlag, Boolean> getAllProperties() {
+		return new HashMap<KonPropertyFlag, Boolean>(properties);
+	}
 	
 	/*
 	 * =================================================
@@ -108,7 +153,7 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 	public boolean setMaster(UUID id) {
 		// Master must be an existing member
 		boolean result = false;
-		if(members.containsKey(id)) {
+		if(!isServerOperated && members.containsKey(id)) {
 			master = id;
 			members.put(id,true); // Ensure member officer flag is true
 			result = true;
@@ -459,7 +504,7 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 	}
 	
 	public boolean isOfflineProtected() {
-		boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline");
+		boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE.getPath());
 		return isOfflineProtected && isBreakDisabledOffline;
 	}
 	

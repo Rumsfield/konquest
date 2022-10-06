@@ -46,6 +46,7 @@ import konquest.manager.TravelManager.TravelDestination;
 import konquest.model.KonBarDisplayer;
 import konquest.model.KonCamp;
 import konquest.model.KonDirective;
+import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
 import konquest.model.KonKingdomScoreAttributes;
 import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
@@ -63,11 +64,13 @@ import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryCache;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
+import konquest.utility.CorePath;
 import konquest.utility.LoadingPrinter;
 import konquest.utility.MessagePath;
+import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
-public class KingdomManager implements KonquestKingdomManager {
+public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 	private Konquest konquest;
 	private TerritoryManager territoryManager;
@@ -84,6 +87,17 @@ public class KingdomManager implements KonquestKingdomManager {
 	private HashMap<UUID,Integer> joinPlayerCooldowns;
 	private HashMap<UUID,Integer> exilePlayerCooldowns;
 	
+	private long payIntervalSeconds;
+	private double payPerChunk;
+	private double payPerResident;
+	private double payLimit;
+	private int payPercentOfficer;
+	private int payPercentMaster;
+	private double costRelation;
+	private double costCreate;
+	private double costRename;
+	private Timer payTimer;
+	
 	public KingdomManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.territoryManager = konquest.getTerritoryManager();
@@ -99,6 +113,17 @@ public class KingdomManager implements KonquestKingdomManager {
 		this.exileCooldownSeconds = 0;
 		this.joinPlayerCooldowns = new HashMap<UUID,Integer>();
 		this.exilePlayerCooldowns = new HashMap<UUID,Integer>();
+		
+		this.payIntervalSeconds = 0;
+		this.payPerChunk = 0;
+		this.payPerResident = 0;
+		this.payLimit = 0;
+		this.payPercentOfficer = 0;
+		this.payPercentMaster = 0;
+		this.costRelation = 0;
+		this.costCreate = 0;
+		this.costRename = 0;
+		this.payTimer = new Timer(this);
 	}
 	
 	public void initialize() {
@@ -111,6 +136,124 @@ public class KingdomManager implements KonquestKingdomManager {
 		updateKingdomOfflineProtection();
 		makeTownNerfs();
 		ChatUtil.printDebug("Kingdom Manager is ready");
+	}
+	
+	public void loadOptions() {
+		payIntervalSeconds 	= konquest.getConfigManager().getConfig("core").getLong(CorePath.FAVOR_KINGDOMS_PAY_INTERVAL_SECONDS.getPath());
+		payPerChunk 		= konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_CHUNK.getPath());
+		payPerResident 		= konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_RESIDENT.getPath());
+		payLimit 			= konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_PAY_LIMIT.getPath());
+		payPercentOfficer   = konquest.getConfigManager().getConfig("core").getInt(CorePath.FAVOR_KINGDOMS_BONUS_OFFICER_PERCENT.getPath());
+		payPercentMaster    = konquest.getConfigManager().getConfig("core").getInt(CorePath.FAVOR_KINGDOMS_BONUS_MASTER_PERCENT.getPath());
+		costCreate 	        = konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_COST_CREATE.getPath());
+		costRename 	        = konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_COST_RENAME.getPath());
+		costRelation 	    = konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_COST_RELATIONSHIP.getPath());
+		
+		payPerChunk = payPerChunk < 0 ? 0 : payPerChunk;
+		payPerResident = payPerResident < 0 ? 0 : payPerResident;
+		payLimit = payLimit < 0 ? 0 : payLimit;
+		costCreate = costCreate < 0 ? 0 : costCreate;
+		costRename = costRename < 0 ? 0 : costRename;
+		costRelation = costRelation < 0 ? 0 : costRelation;
+		payPercentOfficer = payPercentOfficer < 0 ? 0 : payPercentOfficer;
+		payPercentOfficer = payPercentOfficer > 100 ? 100 : payPercentOfficer;
+		payPercentMaster = payPercentMaster < 0 ? 0 : payPercentMaster;
+		payPercentMaster = payPercentMaster > 100 ? 100 : payPercentMaster;
+		
+		if(payIntervalSeconds > 0) {
+			payTimer.stopTimer();
+			payTimer.setTime((int)payIntervalSeconds);
+			payTimer.startLoopTimer();
+		}
+	}
+	
+	public double getCostRelation() {
+		return costRelation;
+	}
+	
+	public double getCostCreate() {
+		return costCreate;
+	}
+	
+	public double getCostRename() {
+		return costRename;
+	}
+	
+	@Override
+	public void onEndTimer(int taskID) {
+		if(taskID == 0) {
+			ChatUtil.printDebug("Kingdom Pay Timer ended with null taskID!");
+		} else if(taskID == payTimer.getTaskID()) {
+			ChatUtil.printDebug("Kingdom Pay timer completed a new cycle");
+			disbursePayments();
+		}
+		
+	}
+	
+	// Pays all kingdom members
+	private void disbursePayments() {
+		HashMap<OfflinePlayer,Double> payments = new HashMap<OfflinePlayer,Double>();
+		HashMap<OfflinePlayer,KonKingdom> memberships = new HashMap<OfflinePlayer,KonKingdom>();
+		HashMap<OfflinePlayer,KonKingdom> masters = new HashMap<OfflinePlayer,KonKingdom>();
+		HashMap<OfflinePlayer,KonKingdom> officers = new HashMap<OfflinePlayer,KonKingdom>();
+		HashMap<KonKingdom,Double> totalPay = new HashMap<KonKingdom,Double>();
+		// Initialize payment table
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			totalPay.put(kingdom, 0.0);
+			for(OfflinePlayer offlinePlayer : kingdom.getPlayerMembers()) {
+				if(offlinePlayer.isOnline()) {
+					payments.put(offlinePlayer, 0.0);
+					memberships.put(offlinePlayer, kingdom);
+					if(kingdom.isMaster(offlinePlayer.getUniqueId())) {
+						masters.put(offlinePlayer,kingdom);
+					} else if(kingdom.isOfficer(offlinePlayer.getUniqueId())) {
+						officers.put(offlinePlayer,kingdom);
+					}
+				}
+			}
+		}
+		// Determine pay amounts by town
+		OfflinePlayer lord;
+		int land;
+		int pop;
+		double pay;
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			for(KonTown town : kingdom.getTowns()) {
+				lord = town.getPlayerLord();
+				land = town.getChunkList().size();
+				pop = town.getNumResidents();
+				if(payments.containsKey(lord)) {
+					double totalPrev = totalPay.get(kingdom);
+					double lordPrev = payments.get(lord);
+					pay = (land*payPerChunk) + (pop*payPerResident);
+					payments.put(lord, lordPrev+pay);
+					totalPay.put(kingdom, totalPrev+pay);
+				}
+			}
+		}
+		// Deposit payments
+		double basePay;
+		double bonusPay;
+		double payAmount;
+		for(OfflinePlayer offlinePlayer : payments.keySet()) {
+			basePay = payments.get(offlinePlayer);
+			bonusPay = 0;
+			if(masters.containsKey(offlinePlayer)) {
+				bonusPay = ((double)payPercentMaster/100) * totalPay.get(masters.get(offlinePlayer));
+			} else if(officers.containsKey(offlinePlayer)) {
+				bonusPay = ((double)payPercentOfficer/100) * totalPay.get(officers.get(offlinePlayer));
+			}
+			payAmount = basePay + bonusPay;
+			if(payLimit > 0 && payAmount > payLimit) {
+				payAmount = payLimit;
+			}
+			if(offlinePlayer.isOnline() && payAmount > 0) {
+				Player player = (Player)offlinePlayer;
+				if(KonquestPlugin.depositPlayer(player, payAmount)) {
+	            	ChatUtil.sendNotice(player, MessagePath.COMMAND_GUILD_NOTICE_PAY.getMessage());
+	            }
+			}
+		}
 	}
 	
 	public boolean addKingdom(Location loc, String name) {

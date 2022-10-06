@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import konquest.Konquest;
 import konquest.model.KonConfig;
 import konquest.utility.ChatUtil;
+import konquest.utility.CorePath;
 
 public class ConfigManager{
 	
@@ -69,6 +70,9 @@ public class ConfigManager{
 				ChatUtil.printConsoleError("Failed to load invalid language file "+language+".yml in Konquest/lang folder. Using default lang/english.yml.");
 			}
 		}
+		
+		// Config validation
+		validateCorePaths();
 	}
 	
 	public FileConfiguration getLang() {
@@ -162,6 +166,21 @@ public class ConfigManager{
 			}
 			*/
 		}
+	}
+	
+	private boolean validateCorePaths() {
+		boolean result = true;
+		FileConfiguration coreConfig = getConfig("core");
+		for(CorePath path : CorePath.values()) {
+			if(!coreConfig.contains(path.getPath(),true)) {
+				result = false;
+				ChatUtil.printConsoleError("Core configuration file is missing path: "+path.getPath());
+			}
+		}
+		if(result == false) {
+			ChatUtil.printConsoleError("The Konquest core.yml config file may be corrupted. Try renaming or deleting the file, then restart the server.");
+		}
+		return result;
 	}
 
 }
