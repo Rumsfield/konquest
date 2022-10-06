@@ -304,7 +304,7 @@ public class BlockListener implements Listener {
 						if(town.isLocInsideMonumentProtectionArea(breakLoc)) {
 							if(isMonument) {
 								// Prevent monument attack when template is blanking or invalid
-								if(!town.getKingdom().getMonumentTemplate().isValid() || town.getKingdom().isMonumentBlanking()) {
+								if(!town.getKingdom().getMonumentTemplate().isValid()) {
 									ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 									event.setCancelled(true);
 									return;

@@ -125,7 +125,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	private MapHandler mapHandler;
 	private PlaceholderManager placeholderManager;
 	private PlotManager plotManager;
-	private GuildManager guildManager;
+	private GuildManager guildManager; //TODO: KR remove this
 	private TravelManager travelManager;
 	private SanctuaryManager sanctuaryManager;
 	private TerritoryManager territoryManager;

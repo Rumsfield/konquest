@@ -2,19 +2,37 @@ package konquest.model;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 
 import konquest.Konquest;
 import konquest.api.model.KonquestKingdom;
 import konquest.utility.ChatUtil;
+import konquest.utility.RequestKeeper;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
 public class KonKingdom implements Timeable, KonquestKingdom {
 
+	public enum Relationship {
+		ENEMY,
+		SANCTIONED,
+		PEACE,
+		ALLIED;
+	}
+	
+	public static final Relationship defaultRelation = Relationship.PEACE;
+	
 	private String name;
 	private Konquest konquest;
 	private KonCapital capital;
@@ -23,8 +41,13 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 	private boolean isSmallest;
 	private boolean isPeaceful;
 	private boolean isOfflineProtected;
-	private boolean isMonumentBlanking; //TODO KR remove this
 	private Timer protectedWarmupTimer;
+	
+	private boolean isOpen;
+	private RequestKeeper joinRequestKeeper;
+	private UUID master;
+	private Map<UUID,Boolean> members; // True = officer, False = regular
+	private Map<KonKingdom,Relationship> relationships;
 	
 	public KonKingdom(Location loc, String name, Konquest konquest) {
 		this.name = name;
@@ -35,8 +58,13 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 		this.isSmallest = false;
 		this.isPeaceful = false;
 		this.isOfflineProtected = true;
-		this.isMonumentBlanking = false;
 		this.protectedWarmupTimer = new Timer(this);
+		
+		this.isOpen = false;
+		this.joinRequestKeeper = new RequestKeeper();
+		this.master = null;
+		this.members = new HashMap<UUID,Boolean>();
+		this.relationships = new HashMap<KonKingdom,Relationship>();
 	}
 	
 	// Constructor meant for Barbarians, created on startup
@@ -51,6 +79,293 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 		int status = capital.initClaim();
 		return status;
 	}
+	
+	public void setIsOpen(boolean val) {
+		isOpen = val;
+	}
+	
+	public boolean isOpen() {
+		return isOpen ? true : false;
+	}
+	
+	/*
+	 * =================================================
+	 * Membership Rank Methods
+	 * =================================================
+	 */
+	
+	public void forceMaster(UUID id) {
+		master = id;
+		members.put(id,true); // Ensure member officer flag is true
+	}
+	
+	public boolean setMaster(UUID id) {
+		// Master must be an existing member
+		boolean result = false;
+		if(members.containsKey(id)) {
+			master = id;
+			members.put(id,true); // Ensure member officer flag is true
+			result = true;
+		}
+		return result;
+	}
+	
+	public boolean isMaster(UUID id) {
+		boolean status = false;
+		if(master != null) {
+			status = id.equals(master);
+		}
+		return status;
+	}
+	
+	/**
+	 * Set a member's officer status
+	 * @param id - Member UUID
+	 * @param val - True to make officer, false to make regular
+	 * @return True when member is updated, false if id is not a member or is master
+	 */
+	public boolean setOfficer(UUID id, boolean val) {
+		// Target ID must be a member to modify officer flag
+		boolean status = false;
+		if(members.containsKey(id) && !master.equals(id)) {
+			members.put(id,val);
+			status = true;
+		}
+		return status;
+	}
+	
+	// Returns true when player is Master or Officer
+	public boolean isOfficer(UUID id) {
+		boolean status = false;
+		if(members.containsKey(id)) {
+			status = members.get(id);
+		}
+		return status;
+	}
+	
+	/**
+	 * 
+	 * @param id - Player UUID to add as a member
+	 * @param isOfficer - officer flag, True = officer, False = regular
+	 * @return True if successfully added, false if already a member
+	 */
+	public boolean addMember(UUID id, boolean isOfficer) {
+		boolean status = false;
+		if(!members.containsKey(id)) {
+			members.put(id,isOfficer);
+			status = true;
+		}
+		return status;
+	}
+	
+	/**
+	 * 
+	 * @param id - Player UUID to remove from members
+	 * @return True if id was successfully removed, false if id was not a member or was master
+	 */
+	public boolean removeMember(UUID id) {
+		// Master cannot be removed as a member
+		boolean status = false;
+		if(members.containsKey(id) && !master.equals(id)) {
+			members.remove(id);
+			status = true;
+		}
+		return status;
+	}
+	
+	public boolean isMember(UUID id) {
+		return members.containsKey(id);
+	}
+	
+	public boolean isMasterValid() {
+		return master != null;
+	}
+	
+	public UUID getMaster() {
+		return master;
+	}
+	
+	public OfflinePlayer getPlayerMaster() {
+		if(master != null) {
+			return Bukkit.getOfflinePlayer(master);
+		}
+		return null;
+	}
+	
+	public ArrayList<OfflinePlayer> getPlayerOfficers() {
+		ArrayList<OfflinePlayer> officerList = new ArrayList<OfflinePlayer>();
+		for(UUID id : members.keySet()) {
+			if(members.get(id)) {
+				officerList.add(Bukkit.getOfflinePlayer(id));
+			}
+		}
+		return officerList;
+	}
+	
+	public ArrayList<OfflinePlayer> getPlayerOfficersOnly() {
+		ArrayList<OfflinePlayer> officerList = new ArrayList<OfflinePlayer>();
+		for(UUID id : members.keySet()) {
+			if(members.get(id) && !master.equals(id)) {
+				officerList.add(Bukkit.getOfflinePlayer(id));
+			}
+		}
+		return officerList;
+	}
+	
+	public ArrayList<OfflinePlayer> getPlayerMembers() {
+		ArrayList<OfflinePlayer> memberList = new ArrayList<OfflinePlayer>();
+		for(UUID id : members.keySet()) {
+			memberList.add(Bukkit.getOfflinePlayer(id));
+		}
+		return memberList;
+	}
+	
+	public ArrayList<OfflinePlayer> getPlayerMembersOnly() {
+		ArrayList<OfflinePlayer> memberList = new ArrayList<OfflinePlayer>();
+		for(UUID id : members.keySet()) {
+			if(!members.get(id)) {
+				memberList.add(Bukkit.getOfflinePlayer(id));
+			}
+		}
+		return memberList;
+	}
+	
+	/*
+	 * =================================================
+	 * Join Request Methods
+	 * =================================================
+	 */
+	
+	// Players who have tried joining but need to be added
+	public List<OfflinePlayer> getJoinRequests() {
+		return joinRequestKeeper.getJoinRequests();
+	}
+	
+	// Players who have been added but need to join
+	public List<OfflinePlayer> getJoinInvites() {
+		return joinRequestKeeper.getJoinInvites();
+	}
+	
+	public boolean addJoinRequest(UUID id, Boolean type) {
+		return joinRequestKeeper.addJoinRequest(id, type);
+	}
+	
+	// Does the player have an existing request to be added?
+	public boolean isJoinRequestValid(UUID id) {
+		return joinRequestKeeper.isJoinRequestValid(id);
+	}
+	
+	// Does the player have an existing invite to join?
+	public boolean isJoinInviteValid(UUID id) {
+		return joinRequestKeeper.isJoinInviteValid(id);
+	}
+	
+	public void removeJoinRequest(UUID id) {
+		joinRequestKeeper.removeJoinRequest(id);
+	}
+	
+	/*
+	 * =================================================
+	 * Relationship Methods
+	 * =================================================
+	 */
+	
+	public boolean addRelation(KonKingdom kingdom, Relationship relation) {
+		boolean result = false;
+		if(!relationships.containsKey(kingdom) && !kingdom.equals(this)) {
+			relationships.put(kingdom,relation);
+			result = true;
+		}
+		return result;
+	}
+	
+	public boolean removeRelation(KonKingdom kingdom) {
+		boolean result = false;
+		if(relationships.containsKey(kingdom)) {
+			relationships.remove(kingdom);
+			result = true;
+		}
+		return result;
+	}
+	
+	// No relationship means peace
+	public boolean hasRelation(KonKingdom kingdom) {
+		return relationships.containsKey(kingdom);
+	}
+	
+	public Relationship getRelation(KonKingdom kingdom) {
+		Relationship result = defaultRelation;
+		if(relationships.containsKey(kingdom)) {
+			result = relationships.get(kingdom);
+		}
+		return result;
+	}
+	
+	public Collection<KonKingdom> getRelationKingdoms() {
+		Set<KonKingdom> kingdoms = new HashSet<KonKingdom>();
+		kingdoms.addAll(relationships.keySet());
+		return kingdoms;
+	}
+	
+	public List<String> getRelationNames() {
+		List<String> result = new ArrayList<String>();
+		for(KonKingdom kingdom : relationships.keySet()) {
+			result.add(kingdom.getName());
+		}
+		return result;
+	}
+	
+	/*
+	 * =================================================
+	 * Query Methods
+	 * =================================================
+	 */
+	
+	public int getNumMembers() {
+		return members.size();
+	}
+	
+	public int getNumMembersOnline() {
+		int result = 0;
+		for(UUID id : members.keySet()) {
+			if(Bukkit.getOfflinePlayer(id).isOnline()) {
+				result++;
+			}
+		}
+		return result;
+	}
+	
+	/*
+	public int getNumTowns() {
+		int result = 0;
+		UUID lord = null;
+		for(KonTown town : this.getTowns()) {
+			lord = town.getLord();
+			if(lord != null && members.containsKey(lord)) {
+				result++;
+			}
+		}
+		return result;
+	}
+	
+	public int getNumLand() {
+		int result = 0;
+		UUID lord = null;
+		for(KonTown town : this.getTowns()) {
+			lord = town.getLord();
+			if(lord != null && members.containsKey(lord)) {
+				result += town.getChunkList().size();
+			}
+		}
+		return result;
+	}
+	*/
+	
+	/*
+	 * =================================================
+	 * Original Kingdom Methods
+	 * =================================================
+	 */
 	
 	/**
 	 * Adds a Town.
@@ -144,10 +459,6 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 	
 	public void setOfflineProtected(boolean val) {
 		isOfflineProtected = val;
-	}
-	
-	public boolean isMonumentBlanking() {
-		return isMonumentBlanking;
 	}
 	
 	public boolean isMonumentTemplateValid() {

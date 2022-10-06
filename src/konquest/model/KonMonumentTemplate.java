@@ -1,11 +1,15 @@
 package konquest.model;
 
 import java.awt.Point;
+import java.util.ArrayList;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 
 import konquest.Konquest;
+import konquest.utility.ChatUtil;
 
 public class KonMonumentTemplate {
 
@@ -24,6 +28,8 @@ public class KonMonumentTemplate {
 		this.isValid = false;
 		this.hasLoot = false;
 	}
+	
+	
 	
 	public String getName() {
 		return name;

@@ -523,7 +523,7 @@ public class KingdomManager implements KonquestKingdomManager {
 				}
 			}
 			// Verify valid monument template
-			if(getKingdom(kingdomName).getMonumentTemplate().isValid() && !getKingdom(kingdomName).isMonumentBlanking()) {
+			if(getKingdom(kingdomName).getMonumentTemplate().isValid()) {
 				// Modify location to max Y at given X,Z
 				Point point = Konquest.toPoint(loc);
 				int xLocal = loc.getBlockX() - (point.x*16);
