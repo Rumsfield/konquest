@@ -89,6 +89,12 @@ public class KonKingdom implements Timeable, KonquestKingdom {
 	}
 	
 	/*
+	 * kingdoms:
+    neutral: false
+    golems: true
+	 */
+	
+	/*
 	 * =================================================
 	 * Membership Rank Methods
 	 * =================================================

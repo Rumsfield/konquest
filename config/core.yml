@@ -206,19 +206,19 @@ core:
     capital_suffix: Capital
     
     # Allow player damage in capitals (true/false)
-    capital_pvp: false
+    #capital_pvp: false
     
     # Allow players to interact with blocks and containers in capitals (true/false)
-    capital_use: false
+    #capital_use: false
     
     # Allow players to build inside of capitals (true/false)
-    capital_build: false
+    #capital_build: false
     
     # Allow Nether portals within kingdom capital land (true/false)
-    capital_portal: false
+    #capital_portal: false
     
     # Allow all mob types to spawn within kingdom capital land (true/false)
-    capital_mobs: false
+    #capital_mobs: false
     
     # Prevent players in other kingdoms using containers in claimed land (true/false)
     protect_containers_use: true
@@ -227,10 +227,10 @@ core:
     protect_containers_break: true
     
     # Prevent enemy players from entering Kingdom Capitals (true/false)
-    no_enemy_enter: true
+    #no_enemy_enter: true
     
     # Prevent enemy players from traveling within Kingdom territory (true/false)
-    no_enemy_travel: true
+    #no_enemy_travel: true
     
     # Prevent enemy players from breaking any blocks in a Kingdom with no players online (true/false)
     no_enemy_edit_offline: true
@@ -393,6 +393,15 @@ core:
     - GRAVEL
     - SNOW
     
+# NEW    # Enable villager trade discounts based on town specialization professions (true/false)
+    discount_enable: true
+    
+# NEW    # Percentage between 0 and 100 of item amount to discount from villager trades (0 to disable, 0 <= integer <= 100)
+    discount_percent: 50
+    
+# NEW    # Allow normal per-player villager discounts to add to town specialization discounts (true/false)
+    discount_stack: true
+    
   # //// CORE.PLOTS \\\\
   plots:
   
@@ -412,37 +421,37 @@ core:
     ignore_knights: true
     
   # //// CORE.GUILDS \\\\
-  guilds:
+  #guilds:
   
     # Enable the guilds feature (true/false)
-    enable: true
+    #enable: true
     
     # Time in seconds between guild payments (0 to disable, integer >= 0)
-    pay_interval_seconds: 900
+    #pay_interval_seconds: 900
     
     # Amount of Favor per land chunk of towns belonging to guild members, to include in guild payments (decimal number >= 0)
-    pay_per_chunk: 0.25
+    #pay_per_chunk: 0.25
     
     # Amount of Favor per population of towns belonging to guild members, to include in guild payments (decimal number >= 0)
-    pay_per_resident: 0.10
+    #pay_per_resident: 0.10
     
     # The maximum amount of Favor a player can receive from a guild payment (0 to disable, integer >= 0)
-    pay_limit: 100
+    #pay_limit: 100
     
     # Percentage between 0 and 100 of normal guild payment to pay guild officers as a bonus (0 to disable, 0 <= integer <= 100)
-    bonus_officer_percent: 20
+    #bonus_officer_percent: 20
     
     # Percentage between 0 and 100 of normal guild payment to pay the guild master as a bonus (0 to disable, 0 <= integer <= 100)
-    bonus_master_percent: 50
+    #bonus_master_percent: 50
     
     # Enable villager trade discounts based on guild specialization professions (true/false)
-    discount_enable: true
+    #discount_enable: true
     
     # Percentage between 0 and 100 of item amount to discount from villager trades (0 to disable, 0 <= integer <= 100)
-    discount_percent: 50
+    #discount_percent: 50
     
     # Allow normal per-player villager discounts to add to guild specialization discounts (true/false)
-    discount_stack: true
+    #discount_stack: true
     
   # //// CORE.EXILE \\\\
   exile:
@@ -535,13 +544,13 @@ core:
     cost_spy: 200
     
     # Cost to settle a new Town (decimal >= 0)
-    cost_settle: 100
+    #cost_settle: 100
     
     # Additional cost for each town settled (decimal >= 0)
-    cost_settle_increment: 50
+    #cost_settle_increment: 50
     
     # Cost to rename a Town (decimal >= 0)
-    cost_rename: 50
+    #cost_rename: 50
     
     # Cost to claim land (decimal >= 0)
     cost_claim: 10
@@ -561,6 +570,51 @@ core:
     # Allow players to travel even when they can't pay the cost (true/false)
     allow_travel_always: true
     
+# NEW    # //// CORE.FAVOR.TOWNS \\\\
+    towns:
+    
+# NEW      # Cost to settle a new town (decimal >= 0)
+      cost_settle: 100
+      
+# NEW      # Additional cost for each town settled (decimal >= 0)
+      cost_settle_increment: 50
+      
+# NEW      # Cost to rename a town (decimal >= 0)
+      cost_rename: 50
+      
+# NEW      # Cost to change the specialization profession of a town (decimal >= 0)
+      cost_specialize: 200
+    
+# NEW # //// CORE.FAVOR.KINGDOMS \\\\
+    kingdoms:
+      
+# NEW      # Cost to create a new guild (decimal >= 0)
+      cost_create: 100
+      
+# NEW      # Cost to rename a guild (decimal >= 0)
+      cost_rename: 50
+      
+# NEW      # Cost to change relationship status with other kingdoms (decimal >= 0)
+      cost_relationship: 50
+      
+# NEW        # Time in seconds between payments (0 to disable, integer >= 0)
+      pay_interval_seconds: 900
+       
+# NEW        # Amount of Favor per land chunk of towns in a kingdom, to include in payments (decimal number >= 0)
+      pay_per_chunk: 0.25
+       
+# NEW        # Amount of Favor per population of towns in a kingdom, to include in payments (decimal number >= 0)
+      pay_per_resident: 0.10
+       
+# NEW        # The maximum amount of Favor a player can receive from a payment (0 to disable, integer >= 0)
+      pay_limit: 100
+       
+# NEW        # Percentage between 0 and 100 of normal payment to pay kingdom officers as a bonus (0 to disable, 0 <= integer <= 100)
+      bonus_officer_percent: 20
+       
+# NEW        # Percentage between 0 and 100 of normal payment to pay the kingdom master as a bonus (0 to disable, 0 <= integer <= 100)
+      bonus_master_percent: 50
+      
     # //// CORE.FAVOR.REWARDS \\\\
     rewards:
     
@@ -595,19 +649,19 @@ core:
       defend_raid: 50
       
     # //// CORE.FAVOR.GUILDS \\\\
-    guilds:
+    #guilds:
     
       # Cost to create a new guild (decimal >= 0)
-      cost_create: 100
+      #cost_create: 100
       
       # Cost to rename a guild (decimal >= 0)
-      cost_rename: 50
+      #cost_rename: 50
       
       # Cost to change the specialization profession of a guild (decimal >= 0)
-      cost_specialize: 200
+      #cost_specialize: 200
       
       # Cost to change relationship status with other guilds (decimal >= 0)
-      cost_relationship: 50
+      #cost_relationship: 50 
       
   # //// CORE.COMBAT \\\\
   combat:
