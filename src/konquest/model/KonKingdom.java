@@ -46,7 +46,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	private Map<KonPropertyFlag,Boolean> properties;
 	
-	private boolean isServerOperated;
+	private boolean isAdminOperated;
 	private boolean isOpen;
 	private RequestKeeper joinRequestKeeper;
 	private UUID master;
@@ -67,7 +67,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.properties = new HashMap<KonPropertyFlag,Boolean>();
 		initProperties();
 		
-		this.isServerOperated = false;
+		this.isAdminOperated = false;
 		this.isOpen = false;
 		this.joinRequestKeeper = new RequestKeeper();
 		this.master = null;
@@ -102,12 +102,12 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		return isOpen ? true : false;
 	}
 	
-	public void setIServerOperated(boolean val) {
-		isServerOperated = val;
+	public void setIsAdminOperated(boolean val) {
+		isAdminOperated = val;
 	}
 	
-	public boolean isServerOperated() {
-		return isServerOperated ? true : false;
+	public boolean isAdminOperated() {
+		return isAdminOperated ? true : false;
 	}
 
 	@Override
@@ -153,7 +153,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	public boolean setMaster(UUID id) {
 		// Master must be an existing member
 		boolean result = false;
-		if(!isServerOperated && members.containsKey(id)) {
+		if(!isAdminOperated && members.containsKey(id)) {
 			master = id;
 			members.put(id,true); // Ensure member officer flag is true
 			result = true;

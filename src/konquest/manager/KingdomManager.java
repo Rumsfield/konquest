@@ -27,9 +27,12 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Snow;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
@@ -190,7 +193,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		
 	}
 	
-	// Pays all kingdom members
+	/*
+	 * Kingdom payments for members
+	 * Total payment is based on all towns & land.
+	 * Kingdom members only get paid based on the towns & land they are lord of.
+	 * Kingdom officers/master get a bonus = percentage of total payment.
+	 */
 	private void disbursePayments() {
 		HashMap<OfflinePlayer,Double> payments = new HashMap<OfflinePlayer,Double>();
 		HashMap<OfflinePlayer,KonKingdom> memberships = new HashMap<OfflinePlayer,KonKingdom>();
@@ -256,24 +264,253 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 	}
 	
-	public boolean addKingdom(Location loc, String name) {
-		if(!name.contains(" ") && konquest.validateNameConstraints(name) == 0) {
-			kingdomMap.put(name, new KonKingdom(loc, name, konquest));
-			kingdomMap.get(name).initCapital();
-			kingdomMap.get(name).getCapital().updateBarPlayers();
-			updateSmallestKingdom();
-			territoryManager.addAllTerritory(loc.getWorld(),kingdomMap.get(name).getCapital().getChunkList());
-			konquest.getMapHandler().drawDynmapUpdateTerritory(kingdomMap.get(name).getCapital());
-			//ChatUtil.printDebug("Added new Kingdom "+name);
-			return true;
+
+	/**
+	 * Checks location constraints for new towns/capitals
+	 * @param loc - The location of the new territory
+	 * @return Status Code
+	 * 			0 - Success
+	 * 			1 - Error, location is in an invalid world
+	 * 			2 - Error, location too close to another territory
+	 * 			3 - Error, location too far from other territories
+	 * 			4 - Error, location overlaps with other territories
+	 */
+	private int validateTownLocationConstraints(Location loc) {
+		// Verify valid world
+		if(!konquest.isWorldValid(loc.getWorld())) {
+			ChatUtil.printDebug("Failed to add town, invalid world: "+loc.getWorld().getName());
+			return 1;
 		}
-		return false;
+		// Verify proximity to other territories
+		int min_distance_capital = konquest.getConfigManager().getConfig("core").getInt(CorePath.TOWNS_MIN_DISTANCE_CAPITAL.getPath());
+		int min_distance_town = konquest.getConfigManager().getConfig("core").getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
+		int searchDistance = 0;
+		int minDistance = Integer.MAX_VALUE;
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			searchDistance = Konquest.chunkDistance(loc, kingdom.getCapital().getCenterLoc());
+			if(searchDistance != -1 && min_distance_capital > 0 && searchDistance < min_distance_capital) {
+				ChatUtil.printDebug("Failed to add town, too close to capital "+kingdom.getCapital().getName());
+				return 2;
+			}
+			if(searchDistance != -1 && searchDistance < minDistance) {
+				minDistance = searchDistance;
+			}
+			for(KonTown town : kingdom.getTowns()) {
+				searchDistance = Konquest.chunkDistance(loc, town.getCenterLoc());
+				if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
+					ChatUtil.printDebug("Failed to add town, too close to town "+town.getName());
+					return 2;
+				}
+				if(searchDistance != -1 && searchDistance < minDistance) {
+					minDistance = searchDistance;
+				}
+			}
+		}
+		for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
+			searchDistance = Konquest.chunkDistance(loc, ruin.getCenterLoc());
+			if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
+				ChatUtil.printDebug("Failed to add town, too close to ruin "+ruin.getName());
+				return 2;
+			}
+			if(searchDistance != -1 && searchDistance < minDistance) {
+				minDistance = searchDistance;
+			}
+		}
+		for(KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
+			searchDistance = Konquest.chunkDistance(loc, sanctuary.getCenterLoc());
+			if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
+				ChatUtil.printDebug("Failed to add town, too close to sanctuary "+sanctuary.getName());
+				return 2;
+			}
+			if(searchDistance != -1 && searchDistance < minDistance) {
+				minDistance = searchDistance;
+			}
+		}
+		// Verify max distance
+		int maxLimit = konquest.getConfigManager().getConfig("core").getInt(CorePath.TOWNS_MAX_DISTANCE_ALL.getPath(),0);
+		if(minDistance != 0 && maxLimit > 0 && minDistance > maxLimit) {
+			ChatUtil.printDebug("Failed to add town, too far from other towns and capitals");
+			return 3;
+		}
+		// Verify no overlapping init chunks
+		int radius = konquest.getConfigManager().getConfig("core").getInt(CorePath.TOWNS_INIT_RADIUS.getPath(),2);
+		if(radius < 1) {
+			radius = 1;
+		}
+		ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
+		for(Point point : konquest.getAreaPoints(loc, radius)) {
+			if(territoryManager.isChunkClaimed(point,loc.getWorld())) {
+				ChatUtil.printDebug("Found a chunk conflict");
+				return 4;
+			}
+		}
+		// Return successfully
+		return 0;
+	}
+	
+	private void teleportAwayFromCenter(KonTown town) {
+		// Teleport player to safe place around monument, facing monument
+		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
+			if(town.isLocInsideCenterChunk(occupant.getBukkitPlayer().getLocation())) {
+				Location tpLoc = konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2);
+        		double x0,x1,z0,z1;
+        		x0 = tpLoc.getX();
+        		x1 = town.getCenterLoc().getX();
+        		z0 = tpLoc.getZ();
+        		z1 = town.getCenterLoc().getZ();
+        		float yaw = (float)(180-(Math.atan2((x0-x1),(z0-z1))*180/Math.PI));
+        		//ChatUtil.printDebug("Settle teleport used x0,z0;x1,z1: "+x0+","+z0+";"+x1+","+z1+" and calculated yaw degrees: "+yaw);
+        		tpLoc.setYaw(yaw);
+        		if(occupant.getBukkitPlayer().isInsideVehicle()) {
+        			ChatUtil.printDebug("Settling occupant player is in a vehicle, type "+occupant.getBukkitPlayer().getVehicle().getType().toString());
+        			Entity vehicle = occupant.getBukkitPlayer().getVehicle();
+        			List<Entity> passengers = vehicle.getPassengers();
+        			occupant.getBukkitPlayer().leaveVehicle();
+        			occupant.getBukkitPlayer().teleport(tpLoc,TeleportCause.PLUGIN);
+        			new BukkitRunnable() {
+        				public void run() {
+        					vehicle.teleport(tpLoc,TeleportCause.PLUGIN);
+        					for (Entity e : passengers) {
+        						vehicle.addPassenger(e);
+        					}
+        				}
+        			}.runTaskLater(konquest.getPlugin(), 10L);
+        			
+        		} else {
+        			occupant.getBukkitPlayer().teleport(tpLoc,TeleportCause.PLUGIN);
+        		}
+			}
+		}
+	}
+	
+	// This method directly adds a kingdom without doing any checks (override)
+	private void addKingdom(Location loc, String name) {
+		kingdomMap.put(name, new KonKingdom(loc, name, konquest));
+		kingdomMap.get(name).initCapital();
+		kingdomMap.get(name).getCapital().updateBarPlayers();
+		updateSmallestKingdom();
+		territoryManager.addAllTerritory(loc.getWorld(),kingdomMap.get(name).getCapital().getChunkList());
+		konquest.getMapHandler().drawDynmapUpdateTerritory(kingdomMap.get(name).getCapital());
+	}
+	
+	/**
+	 * Creates a new kingdom for a player.
+	 * The new kingdom must perform checks for creating the capital, similar to a new town.
+	 * The player must be a barbarian, and is made the master of the kingdom.
+	 * The player must pay favor to create the kingdom.
+	 * 
+	 * @param loc - The center location of the kingdom, used for capital
+	 * @param name - Kingdom name
+	 * @param master - Player who is the kingdom master
+	 * @return 0	- Success
+	 * 	       1	- Bad name
+	 * 		   2	- Master is not a barbarian
+	 *         3    - Not enough favor
+	 *         4	- Invalid world
+	 *         5 	- Too close to another territory
+	 *         6	- Too far from other territories
+	 *         7	- Will overlap with other territories
+	 *         -1	- Internal error
+	 */
+	public int createKingdom(Location loc, String name, KonPlayer master) {
+		Player bukkitPlayer = master.getBukkitPlayer();
+		// Verify name
+		if(konquest.validateNameConstraints(name) != 0) {
+			return 1;
+		}
+		// Verify player is barbarian
+		if(!master.isBarbarian()) {
+			return 2;
+		}
+		// Verify player can cover cost
+		if(costCreate > 0 && KonquestPlugin.getBalance(bukkitPlayer) < costCreate) {
+			return 3;
+    	}
+		// Verify position
+		/*
+		 * 			0 - Success
+		 * 			1 - Error, location is in an invalid world
+		 * 			2 - Error, location too close to another territory
+		 * 			3 - Error, location too far from other territories
+		 * 			4 - Error, location overlaps with other territories
+		 */
+		int locStatus = validateTownLocationConstraints(loc);
+		if(locStatus != 0) {
+			// Offset error code to fit in this method's return codes
+			return locStatus+3;
+		}
+		
+		/* Passed all checks, try to create kingdom */
+		
+		addKingdom(loc, name);
+		KonKingdom newKingdom = getKingdom(name);
+		if(newKingdom != null) {
+			// Withdraw cost
+			if(costCreate > 0 && KonquestPlugin.withdrawPlayer(bukkitPlayer, costCreate)) {
+	            konquest.getAccomplishmentManager().modifyPlayerStat(master,KonStatsType.FAVOR,(int)costCreate);
+			}
+			// Move player(s) out of center chunk (monument)
+			teleportAwayFromCenter(newKingdom.getCapital());
+			// Assign player to kingdom
+			assignPlayerKingdom(master, name, true);
+			// Make player master of kingdom
+			newKingdom.forceMaster(bukkitPlayer.getUniqueId());
+		} else {
+			return -1;
+		}
+		return 0;
+	}
+	
+	/**
+	 * Creates a new kingdom for the server (no player master)
+	 * The new kingdom must perform checks for creating the capital, similar to a new town.
+	 * 
+	 * @param loc - The center location of the kingdom, used for capital
+	 * @param name - Kingdom name
+	 * @return 0	- Success
+	 * 	       1	- Bad name
+	 *         4	- Invalid world
+	 *         5 	- Too close to another territory
+	 *         6	- Too far from other territories
+	 *         7	- Will overlap with other territories
+	 *         -1	- Internal error
+	 */
+	public int createAdminKingdom(Location loc, String name) {
+		// Verify name
+		if(konquest.validateNameConstraints(name) != 0) {
+			return 1;
+		}
+		// Verify position
+		/*
+		 * 			0 - Success
+		 * 			1 - Error, location is in an invalid world
+		 * 			2 - Error, location too close to another territory
+		 * 			3 - Error, location too far from other territories
+		 * 			4 - Error, location overlaps with other territories
+		 */
+		int locStatus = validateTownLocationConstraints(loc);
+		if(locStatus != 0) {
+			// Offset error code to fit in this method's return codes
+			return locStatus+3;
+		}
+		
+		/* Passed all checks, try to create kingdom */
+		
+		addKingdom(loc, name);
+		KonKingdom newKingdom = getKingdom(name);
+		if(newKingdom != null) {
+			newKingdom.setIsAdminOperated(true);
+		} else {
+			return -1;
+		}
+		return 0;
 	}
 	
 	public boolean removeKingdom(String name) {
 		if(kingdomMap.containsKey(name)) {
 			KonKingdom kingdom = kingdomMap.get(name);
-			// Exile all members
+			// Exile all members (online)
+			// When offline players join again, the missing kingdom should get caught and they'll be become barbarians
 			for(KonPlayer member : konquest.getPlayerManager().getPlayersInKingdom(kingdom)) {
 				exilePlayer(member,false,false,true);
 			}
@@ -318,78 +555,95 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return false;
 	}
 	
-	// See interface for method description
+	/*
+	 * Primary method for adding a player member to a kingdom
+	 */
+	/**
+	 * Assign a player to a kingdom and teleport them to the capital spawn point.
+	 * Optionally checks for join permissions based on Konquest configuration.
+	 * Optionally enforces maximum kingdom membership difference based on Konquest configuration.
+	 * 
+	 * @param player The player to assign
+	 * @param kingdomName The kingdom name, case-sensitive
+	 * @param force Ignore permission and max membership limits when true
+	 * @return status
+	 * 				<br>0 - success
+	 *  			<br>1 - kingdom name does not exist
+	 *  			<br>2 - the kingdom is full (config option max_player_diff)
+	 *  			<br>3 - missing permission
+	 *  			<br>4 - cancelled
+	 *             <br>-1 - internal error
+	 */
 	public int assignPlayerKingdom(KonquestPlayer playerArg, String kingdomName, boolean force) {
-		//TODO: Some sort of penalty for changing kingdoms, check if barbarian first
+		// Verify kingdom exists
 		if(isKingdom(kingdomName)) {
-			// Qualify interface
-			if(!(playerArg instanceof KonPlayer)) {
-				return -1;
-			}
-			KonPlayer player = (KonPlayer)playerArg;
-			
-			// Check for permission
-			boolean isPerKingdomJoin = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.per_kingdom_join_permissions",false);
-			if (isPerKingdomJoin && !force) {
-				String permission = "konquest.join."+getKingdom(kingdomName).getName().toLowerCase();
-				if(!player.getBukkitPlayer().hasPermission(permission)) {
-					return 3;
-				}
-			}
-			
-			int config_max_player_diff = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.max_player_diff");
-			int smallestKingdomPlayerCount = 0;
-			int targetKingdomPlayerCount = 0;
-			if(config_max_player_diff != 0) {
-				// Find smallest kingdom, compare player count to this kingdom's
-				String smallestKingdomName = getSmallestKingdomName();
-				smallestKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(smallestKingdomName).size();
-				targetKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(kingdomName).size();
-			}
-			// Join kingdom is max_player_diff is disabled, or if the desired kingdom is within the max diff
-			if(config_max_player_diff == 0 || force ||
-					(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
-				KonKingdom assignedKingdom = getKingdom(kingdomName);
-				// Fire event
-				KonquestPlayerKingdomEvent invokeEvent = new KonquestPlayerKingdomEvent(konquest, player, assignedKingdom, player.getExileKingdom());
-				Konquest.callKonquestEvent(invokeEvent);
-				if(invokeEvent.isCancelled()) {
-					return 4;
-				}
-				// Remove player from any enemy towns
-				for(KonKingdom kingdom : kingdomMap.values()) {
-					if(!kingdom.equals(assignedKingdom)) {
-						for(KonTown town : kingdom.getTowns()) {
-				    		if(town.removePlayerResident(player.getOfflineBukkitPlayer())) {
-				    			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_TOWN.getMessage(town.getName()));
-				    			konquest.getMapHandler().drawDynmapLabel(town);
-				    		}
-				    	}
-					}
-				}
-				// Remove any barbarian camps
-				konquest.getCampManager().removeCamp(player);
-				// Set kingdom
-				player.setKingdom(getKingdom(kingdomName));
-		    	player.setBarbarian(false);
-		    	// Teleport to capital
-		    	Location spawn = player.getKingdom().getCapital().getSpawnLoc();
-		    	konquest.telePlayerLocation(player.getBukkitPlayer(), spawn);
-		    	player.getBukkitPlayer().setBedSpawnLocation(spawn, true);
-		    	// Updates
-		    	getKingdom(kingdomName).getCapital().addBarPlayer(player);
-		    	updateSmallestKingdom();
-		    	konquest.updateNamePackets(player);
-		    	konquest.getDirectiveManager().displayBook(player);
-		    	konquest.getMapHandler().drawDynmapLabel(getKingdom(kingdomName).getCapital());
-		    	updateKingdomOfflineProtection();
-		    	territoryManager.updatePlayerBorderParticles(player);
-			} else {
-				return 2;
-			}
-		} else {
 			return 1;
 		}
+		// Qualify interface
+		if(!(playerArg instanceof KonPlayer)) {
+			return -1;
+		}
+		KonPlayer player = (KonPlayer)playerArg;
+		
+		// Check for permission
+		boolean isPerKingdomJoin = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_PER_KINGDOM_JOIN_PERMISSIONS.getPath(),false);
+		if (isPerKingdomJoin && !force) {
+			String permission = "konquest.join."+getKingdom(kingdomName).getName().toLowerCase();
+			if(!player.getBukkitPlayer().hasPermission(permission)) {
+				return 3;
+			}
+		}
+		
+		int config_max_player_diff = konquest.getConfigManager().getConfig("core").getInt(CorePath.KINGDOMS_MAX_PLAYER_DIFF.getPath(),0);
+		int smallestKingdomPlayerCount = 0;
+		int targetKingdomPlayerCount = 0;
+		if(config_max_player_diff != 0) {
+			// Find smallest kingdom, compare player count to this kingdom's
+			String smallestKingdomName = getSmallestKingdomName();
+			smallestKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(smallestKingdomName).size();
+			targetKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(kingdomName).size();
+		}
+		// Join kingdom is max_player_diff is disabled, or if the desired kingdom is within the max diff
+		if(config_max_player_diff == 0 || force || (config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
+			KonKingdom assignedKingdom = getKingdom(kingdomName);
+			// Fire event
+			KonquestPlayerKingdomEvent invokeEvent = new KonquestPlayerKingdomEvent(konquest, player, assignedKingdom, player.getExileKingdom());
+			Konquest.callKonquestEvent(invokeEvent);
+			if(invokeEvent.isCancelled()) {
+				return 4;
+			}
+			// Remove player from any enemy towns
+			for(KonKingdom kingdom : kingdomMap.values()) {
+				if(!kingdom.equals(assignedKingdom)) {
+					for(KonTown town : kingdom.getTowns()) {
+			    		if(town.removePlayerResident(player.getOfflineBukkitPlayer())) {
+			    			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_TOWN.getMessage(town.getName()));
+			    			konquest.getMapHandler().drawDynmapLabel(town);
+			    		}
+			    	}
+				}
+			}
+			// Remove any barbarian camps
+			konquest.getCampManager().removeCamp(player);
+			// Set kingdom
+			player.setKingdom(getKingdom(kingdomName));
+	    	player.setBarbarian(false);
+	    	// Teleport to capital
+	    	Location spawn = player.getKingdom().getCapital().getSpawnLoc();
+	    	konquest.telePlayerLocation(player.getBukkitPlayer(), spawn);
+	    	player.getBukkitPlayer().setBedSpawnLocation(spawn, true);
+	    	// Updates
+	    	getKingdom(kingdomName).getCapital().addBarPlayer(player);
+	    	updateSmallestKingdom();
+	    	konquest.updateNamePackets(player);
+	    	konquest.getDirectiveManager().displayBook(player);
+	    	konquest.getMapHandler().drawDynmapLabel(getKingdom(kingdomName).getCapital());
+	    	updateKingdomOfflineProtection();
+	    	territoryManager.updatePlayerBorderParticles(player);
+		} else {
+			return 2;
+		}
+
 		return 0;
 	}
 	
@@ -568,6 +822,306 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     	return true;
 	}
 	
+	/*
+	 * ===================================
+	 * Membership Methods
+	 * ===================================
+	 * These methods are used by commands for membership management.
+	 * Players requesting/invited to join, kicking members, promotions/demotions, etc.
+	 */
+	//TODO: KR Replace GUILD command messages with KINGDOM
+	
+	/**
+	 * Online Player requests to join the kingdom to the officers
+	 * @param player - The online player requesting to join the kingdom
+	 * @param kingdom - The target kingdom that the player requests to join
+	 */
+	public void joinKingdomRequest(KonPlayer player, KonKingdom kingdom) {
+		if(kingdom == null) {
+			return;
+		}
+		UUID id = player.getBukkitPlayer().getUniqueId();
+		// Player can be barbarians, or members of other kingdoms, when requesting to join a kingdom.
+		
+		// Cannot request to join your own current kingdom
+		if(player.getKingdom().equals(kingdom) || kingdom.isMember(id)) {
+			Konquest.playFailSound(player.getBukkitPlayer());
+			return;
+		}
+		
+		if(kingdom.isJoinInviteValid(id)) {
+			// There is already a valid invite, add the player to the kingdom
+			addMember(kingdom, id, false);
+			
+			//TODO: Use assignPlayerKingdom?
+			
+			kingdom.removeJoinRequest(id);
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(kingdom.getName()));
+			Konquest.playSuccessSound(player.getBukkitPlayer());
+		} else if(!kingdom.isJoinRequestValid(id)){
+			// Request to join if not already requested
+			kingdom.addJoinRequest(id, false);
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_REQUEST_JOIN.getMessage(kingdom.getName()));
+			Konquest.playSuccessSound(player.getBukkitPlayer());
+			broadcastOfficers(kingdom, MessagePath.COMMAND_GUILD_NOTICE_REQUEST_NEW.getMessage());
+		} else {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_REQUEST_SENT.getMessage(kingdom.getName()));
+			Konquest.playFailSound(player.getBukkitPlayer());
+		}
+	}
+	
+	/**
+	 * Officer approves or denies join request of (offline) player.
+	 * Check to ensure target player is not already a member.
+	 * @param player - The offline player target of the response
+	 * @param kingdom - The target kingdom that player wants to join
+	 * @param resp - True to approve, false to reject request
+	 * @return True when request response was successful, else false when target is already in this kingdom.
+	 */
+	public boolean respondKingdomRequest(OfflinePlayer player, KonKingdom kingdom, boolean resp) {
+		if(kingdom == null) {
+			return true;
+		}
+		UUID id = player.getUniqueId();
+		
+		if(kingdom.isJoinRequestValid(id)) {
+			if(resp) {
+				// Ensure the player is not already a kingdom member
+				if(kingdom.isMember(id)) {
+					return false;
+				}
+				// Approved join request, add player as member
+				addMember(kingdom, id, false);
+				
+				//TODO: Use assignPlayerKingdom?
+				
+				if(player.isOnline()) {
+					ChatUtil.sendNotice((Player)player, MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(kingdom.getName()));
+				}
+			} else {
+				// Denied join request
+				if(player.isOnline()) {
+					ChatUtil.sendError((Player)player, MessagePath.COMMAND_GUILD_ERROR_JOIN_DENY.getMessage(kingdom.getName()));
+				}
+			}
+			kingdom.removeJoinRequest(id);
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Officer invites (offline) player to join (with /kingdom add command).
+	 * Allow invites to players already in another kingdom.
+	 * @param player - The offline player that the officer invites to join their kingdom
+	 * @param kingdom - The target kingdom for the join invite
+	 * @return Error code:  0 - Success
+	 * 						1 - Player is already a member
+	 * 						2 - Player has already been invited
+	 * 						-1 - Internal error
+	 */
+	public int joinKingdomInvite(OfflinePlayer player, KonKingdom kingdom) {
+		if(kingdom == null) {
+			return -1;
+		}
+		UUID id = player.getUniqueId();
+		
+		// Cannot invite a member of this kingdom
+		if(kingdom.isMember(id)) {
+			return 1;
+		}
+		
+		if(kingdom.isJoinRequestValid(id)) {
+			// There is already a valid request, add the player to the kingdom
+			addMember(kingdom, id, false);
+			
+			//TODO: Use assignPlayerKingdom?
+			
+			kingdom.removeJoinRequest(id);
+			if(player.isOnline()) {
+				ChatUtil.sendNotice((Player)player, MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(kingdom.getName()));
+			}
+		} else if(!kingdom.isJoinInviteValid(id)) {
+			// Invite to join if not already invited
+			kingdom.addJoinRequest(id, true);
+			if(player.isOnline()) {
+				ChatUtil.sendNotice((Player)player, MessagePath.COMMAND_GUILD_NOTICE_INVITE_NEW.getMessage());
+			}
+		} else {
+			// The invite has already been sent, still pending
+			return 2;
+		}
+		
+		return 0;
+	}
+	
+	/**
+	 * Player accepts or declines join invite
+	 * @param player - The online player responding to the invite to join
+	 * @param kingdom - The target kingdom that the player is responding to
+	 * @param resp - True to accept, false to decline invite
+	 */
+	public boolean respondKingdomInvite(KonPlayer player, KonKingdom kingdom, boolean resp) {
+		if(kingdom == null) {
+			return false;
+		}
+		UUID id = player.getBukkitPlayer().getUniqueId();
+		
+		// Cannot accept invite from a member of this kingdom
+		if(kingdom.isMember(id)) {
+			return false;
+		}
+		
+		if(kingdom.isJoinInviteValid(id)) {
+			if(resp) {
+				// Accept join invite, add as member
+				addMember(kingdom, id, false);
+				
+				//TODO: Use assignPlayerKingdom?
+				
+				kingdom.removeJoinRequest(id);
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(kingdom.getName()));
+				Konquest.playSuccessSound(player.getBukkitPlayer());
+				return true;
+			} else {
+				// Denied join request
+				kingdom.removeJoinRequest(id);
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_INVITE_DECLINE.getMessage(kingdom.getName()));
+			}
+		}
+		
+		return false;
+	}
+	
+	public void leaveGuild(KonPlayer player, KonKingdom kingdom) {
+		if(kingdom != null) {
+			UUID id = player.getBukkitPlayer().getUniqueId();
+			boolean status = removeMember(kingdom, id);
+			if(status) {
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_LEAVE.getMessage(kingdom.getName()));
+				Konquest.playSuccessSound(player.getBukkitPlayer());
+			} else {
+				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_LEAVE_FAIL.getMessage());
+				Konquest.playFailSound(player.getBukkitPlayer());
+			}
+		}
+	}
+	
+	public boolean kickGuildMember(OfflinePlayer player, KonKingdom kingdom) {
+		boolean result = false;
+		if(kingdom != null) {
+			UUID id = player.getUniqueId();
+			result = removeMember(kingdom, id);
+		}
+		return result;
+	}
+	
+	public void removePlayerKingdom(OfflinePlayer player, KonKingdom kingdom) {
+		UUID id = player.getUniqueId();
+		if(kingdom != null) {
+			// Found kingdom where target player is a member
+			if(kingdom.isMaster(id)) {
+				// Player is master, transfer if possible
+				List<OfflinePlayer> officers = kingdom.getPlayerOfficersOnly();
+				if(!officers.isEmpty()) {
+					// Make the first officer into the master
+					transferMaster(officers.get(0),kingdom);
+					// Now remove the player
+					removeMember(kingdom, id);
+				} else {
+					// There are no officers
+					List<OfflinePlayer> members = kingdom.getPlayerMembersOnly();
+					if(!members.isEmpty()) {
+						// Make the first member into the master
+						transferMaster(members.get(0),kingdom);
+						// Now remove the player
+						removeMember(kingdom, id);
+					} else {
+						// There are no members to transfer master to, remove the kingdom
+						String name = kingdom.getName();
+						removeKingdom(name);
+					}
+				}
+			} else {
+				// Player is not the master, remove
+				removeMember(kingdom, id);
+			}
+		}
+	}
+	
+	public boolean promoteOfficer(OfflinePlayer player, KonKingdom kingdom) {
+		boolean result = false;
+		UUID id = player.getUniqueId();
+		if(!kingdom.isOfficer(id)) {
+			if(kingdom.setOfficer(id, true)) {
+				broadcastMembers(kingdom,MessagePath.COMMAND_GUILD_BROADCAST_PROMOTE.getMessage(player.getName(),kingdom.getName()));
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	public boolean demoteOfficer(OfflinePlayer player, KonKingdom kingdom) {
+		boolean result = false;
+		UUID id = player.getUniqueId();
+		if(kingdom.isOfficer(id)) {
+			if(kingdom.setOfficer(id, false)) {
+				broadcastMembers(kingdom,MessagePath.COMMAND_GUILD_BROADCAST_DEMOTE.getMessage(player.getName(),kingdom.getName()));
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	public void transferMaster(OfflinePlayer player, KonKingdom kingdom) {
+		UUID id = player.getUniqueId();
+		if(kingdom.isMember(id)) {
+			if(kingdom.setMaster(id)) {
+				broadcastMembers(kingdom,MessagePath.COMMAND_GUILD_BROADCAST_TRANSFER.getMessage(player.getName(),kingdom.getName()));
+			}
+		}
+	}
+	
+	private void broadcastMembers(KonKingdom kingdom, String message) {
+		if(kingdom != null) {
+			for(OfflinePlayer offlinePlayer : kingdom.getPlayerMembers()) {
+				if(offlinePlayer.isOnline()) {
+					Player player = (Player)offlinePlayer;
+					ChatUtil.sendNotice(player, message);
+				}
+			}
+		}
+	}
+	
+	private void broadcastOfficers(KonKingdom kingdom, String message) {
+		if(kingdom != null) {
+			for(OfflinePlayer offlinePlayer : kingdom.getPlayerOfficers()) {
+				if(offlinePlayer.isOnline()) {
+					Player player = (Player)offlinePlayer;
+					ChatUtil.sendNotice(player, message);
+				}
+			}
+		}
+	}
+	
+	private boolean removeMember(KonKingdom kingdom, UUID id) {
+		boolean result = kingdom.removeMember(id);
+		return result;
+	}
+	
+	private boolean addMember(KonKingdom kingdom, UUID id, boolean isOfficer) {
+		boolean result = kingdom.addMember(id, isOfficer);
+		//TODO: Use assignPlayerKingdom?
+		return result;
+	}
+	
+	/*
+	 * 
+	 * Town Methods
+	 * 
+	 */
+	
+	
 	/**
 	 * addTown - Primary method for adding a town
 	 * @param loc - location of town center
@@ -592,113 +1146,68 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 */
 	public int addTown(Location loc, String name, String kingdomName) {
 		ChatUtil.printDebug("Attempting to add new town "+name+" for kingdom "+kingdomName);
-		if(!name.contains(" ") && isKingdom(kingdomName) && konquest.validateNameConstraints(name) == 0) {
-			if(!konquest.isWorldValid(loc.getWorld())) {
-				ChatUtil.printDebug("Failed to add town, invalid world: "+loc.getWorld().getName());
-				return 5;
-			}
-			int min_distance_capital = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
-			int min_distance_town = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
-			int searchDistance = 0;
-			int minDistance = Integer.MAX_VALUE;
-			for(KonKingdom kingdom : kingdomMap.values()) {
-				// Verify name is not taken by existing towns or kingdoms
-				if(name.equalsIgnoreCase(kingdom.getName()) || kingdom.hasTown(name)) {
-					ChatUtil.printDebug("Failed to add town, name equals existing town or kingdom: "+name);
-					return 3;
-				}
-				// Verify proximity to other territories
-				searchDistance = Konquest.chunkDistance(loc, kingdom.getCapital().getCenterLoc());
-				if(searchDistance != -1 && min_distance_capital > 0 && searchDistance < min_distance_capital) {
-					ChatUtil.printDebug("Failed to add town, too close to capital "+kingdom.getCapital().getName());
-					return 6;
-				}
-				if(searchDistance != -1 && searchDistance < minDistance) {
-					minDistance = searchDistance;
-				}
-				for(KonTown town : kingdom.getTowns()) {
-					searchDistance = Konquest.chunkDistance(loc, town.getCenterLoc());
-					if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
-						ChatUtil.printDebug("Failed to add town, too close to town "+town.getName());
-						return 6;
-					}
-					if(searchDistance != -1 && searchDistance < minDistance) {
-						minDistance = searchDistance;
-					}
-				}
-			}
-			for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
-				if(name.equalsIgnoreCase(ruin.getName())) {
-					ChatUtil.printDebug("Failed to add town, name equals existing ruin: "+name);
-					return 3;
-				}
-				searchDistance = Konquest.chunkDistance(loc, ruin.getCenterLoc());
-				if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
-					ChatUtil.printDebug("Failed to add town, too close to ruin "+ruin.getName());
-					return 6;
-				}
-				if(searchDistance != -1 && searchDistance < minDistance) {
-					minDistance = searchDistance;
-				}
-			}
-			// Verify max distance
-			int maxLimit = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_distance_all",0);
-			if(minDistance != 0 && maxLimit > 0 && minDistance > maxLimit) {
-				ChatUtil.printDebug("Failed to add town, too far from other towns and capitals");
-				return 7;
-			}
-			for(TravelDestination keyword : TravelDestination.values()) {
-				if(name.equalsIgnoreCase(keyword.toString())) {
-					ChatUtil.printDebug("Failed to add town, name equals territory keyword: "+name);
-					return 3;
-				}
-			}
-			// Verify no overlapping init chunks
-			int radius = konquest.getConfigManager().getConfig("core").getInt("core.towns.init_radius");
-			if(radius < 1) {
-				radius = 1;
-			}
-			ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
-			for(Point point : konquest.getAreaPoints(loc, radius)) {
-				if(territoryManager.isChunkClaimed(point,loc.getWorld())) {
-					ChatUtil.printDebug("Found a chunk conflict");
-					return 1;
-				}
-			}
-			// Verify valid monument template
-			if(getKingdom(kingdomName).getMonumentTemplate().isValid()) {
-				// Modify location to max Y at given X,Z
-				Point point = Konquest.toPoint(loc);
-				int xLocal = loc.getBlockX() - (point.x*16);
-				int zLocal = loc.getBlockZ() - (point.y*16);
-				Chunk chunk = loc.getChunk();
-				int yFloor = chunk.getChunkSnapshot(true, false, false).getHighestBlockYAt(xLocal, zLocal);
-				while((chunk.getBlock(xLocal, yFloor, zLocal).isPassable() || !chunk.getBlock(xLocal, yFloor, zLocal).getType().isOccluding()) && yFloor > 0) {
-					yFloor--;
-				}
-				loc.setY(yFloor+1);
-				// Attempt to add the town
-				if(getKingdom(kingdomName).addTown(loc, name)) {
-					// Attempt to initialize the town
-					int initStatus = getKingdom(kingdomName).initTown(name);
-					if(initStatus == 0) {
-						// When a town is added successfully, update the chunk cache
-						//updateTerritoryCache();
-						territoryManager.addAllTerritory(loc.getWorld(),getKingdom(kingdomName).getTown(name).getChunkList());
-						konquest.getMapHandler().drawDynmapUpdateTerritory(getKingdom(kingdomName).getTown(name));
-						return 0;
-					} else {
-						// Remove town if init fails, exit code 10+
-						getKingdom(kingdomName).removeTown(name);
-						return 10+initStatus;
-					}
-				} else { return 3; }
-			} else { 
-				ChatUtil.printDebug("Failed to create town with invalid or blanked monument template.");
-				return 4;
-			}
+		
+		// Verify name
+		if(konquest.validateNameConstraints(name) != 0) {
+			return 3;
 		}
-		return 3;
+		
+		// Verify position
+		int locStatus = validateTownLocationConstraints(loc);
+		// Map original error codes
+		/*
+		 * 			0 - Success
+		 * 			1 - Error, location is in an invalid world
+		 * 			2 - Error, location too close to another territory
+		 * 			3 - Error, location too far from other territories
+		 * 			4 - Error, location overlaps with other territories
+		 */
+		if(locStatus == 1) {
+			return 5;
+		} else if(locStatus == 2) {
+			return 6;
+		} else if(locStatus == 3) {
+			return 7;
+		} else if(locStatus == 4) {
+			return 1;
+		}
+		
+		// Verify valid monument template
+		if(!getKingdom(kingdomName).getMonumentTemplate().isValid()) {
+			ChatUtil.printDebug("Failed to create town with invalid or blanked monument template.");
+			return 4;
+		}	
+			
+		/* Passed checks, start to create town */
+		
+		// Modify location to max Y at given X,Z
+		Point point = Konquest.toPoint(loc);
+		int xLocal = loc.getBlockX() - (point.x*16);
+		int zLocal = loc.getBlockZ() - (point.y*16);
+		Chunk chunk = loc.getChunk();
+		int yFloor = chunk.getChunkSnapshot(true, false, false).getHighestBlockYAt(xLocal, zLocal);
+		while((chunk.getBlock(xLocal, yFloor, zLocal).isPassable() || !chunk.getBlock(xLocal, yFloor, zLocal).getType().isOccluding()) && yFloor > 0) {
+			yFloor--;
+		}
+		loc.setY(yFloor+1);
+		// Attempt to add the town
+		if(getKingdom(kingdomName).addTown(loc, name)) {
+			// Attempt to initialize the town
+			int initStatus = getKingdom(kingdomName).initTown(name);
+			if(initStatus == 0) {
+				// When a town is added successfully, update the chunk cache
+				//updateTerritoryCache();
+				territoryManager.addAllTerritory(loc.getWorld(),getKingdom(kingdomName).getTown(name).getChunkList());
+				konquest.getMapHandler().drawDynmapUpdateTerritory(getKingdom(kingdomName).getTown(name));
+				return 0;
+			} else {
+				// Remove town if init fails, exit code 10+
+				getKingdom(kingdomName).removeTown(name);
+				return 10+initStatus;
+			}
+		} else {
+			return 3;
+		}
 	}
 	
 	/**

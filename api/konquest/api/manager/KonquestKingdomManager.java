@@ -28,7 +28,7 @@ public interface KonquestKingdomManager {
 	 * @param name The name of the new kingdom
 	 * @return True when the new kingdom is successfully created, else false
 	 */
-	public boolean addKingdom(Location loc, String name);
+	//public boolean addKingdom(Location loc, String name);
 	
 	/**
 	 * Remove a kingdom with the given name.

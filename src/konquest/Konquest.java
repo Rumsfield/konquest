@@ -54,6 +54,7 @@ import konquest.manager.ShieldManager;
 import konquest.manager.TerritoryManager;
 import konquest.manager.TravelManager;
 import konquest.manager.UpgradeManager;
+import konquest.manager.TravelManager.TravelDestination;
 import konquest.map.MapHandler;
 import konquest.model.KonCamp;
 import konquest.model.KonCapital;
@@ -799,9 +800,10 @@ public class Konquest implements KonquestAPI, Timeable {
 	 * 			7 - Error, name is a guild
 	 * 			8 - Error, name is a sanctuary
 	 * 			9 - Error, name is a template
+	 * 			10 - Error, name is territory travel reserved word
 	 */
 	public int validateNameConstraints(String name) {
-		if(name == null || name.equals("") || !StringUtils.isAlphanumeric(name)) {
+		if(name == null || name.equals("") || name.contains(" ") || !StringUtils.isAlphanumeric(name)) {
 			return 1;
     	}
     	if(name.length() > 20) {
@@ -830,6 +832,11 @@ public class Konquest implements KonquestAPI, Timeable {
 		if(sanctuaryManager.isTemplate(name)) {
 			return 9;
 		}
+		for(TravelDestination keyword : TravelDestination.values()) {
+			if(name.equalsIgnoreCase(keyword.toString())) {
+				return 10;
+			}
+		}
 		return 0;
 	}
 	
@@ -840,7 +847,7 @@ public class Konquest implements KonquestAPI, Timeable {
 				ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
 			} else if(result == 2) {
 				ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_LENGTH_NAME.getMessage());
-			} else if(result >= 3 && result <= 9) {
+			} else if(result >= 3) {
 				ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
 			}
 		}

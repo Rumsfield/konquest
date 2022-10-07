@@ -110,7 +110,7 @@ public class RuinManager implements KonquestRuinManager {
 	
 	public boolean addRuin(Location loc, String name) {
 		boolean result = false;
-		if(!name.contains(" ") && konquest.validateNameConstraints(name) == 0) {
+		if(konquest.validateNameConstraints(name) == 0) {
 			// Verify no overlapping init chunks
 			for(Point point : konquest.getAreaPoints(loc, 2)) {
 				if(territoryManager.isChunkClaimed(point,loc.getWorld())) {

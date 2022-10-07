@@ -49,7 +49,7 @@ public class SanctuaryManager {
 	
 	public boolean addSanctuary(Location loc, String name) {
 		boolean result = false;
-		if(!name.contains(" ") && konquest.validateNameConstraints(name) == 0) {
+		if(konquest.validateNameConstraints(name) == 0) {
 			// Verify no overlapping init chunks
 			for(Point point : konquest.getAreaPoints(loc, 2)) {
 				if(territoryManager.isChunkClaimed(point,loc.getWorld())) {
@@ -245,7 +245,7 @@ public class SanctuaryManager {
 		Location corner2 = template.getCornerTwo();
 		Location travelPoint = template.getTravelPoint();
 		
-		if(name.contains(" ") || konquest.validateNameConstraints(name) != 0) {
+		if(konquest.validateNameConstraints(name) != 0) {
 			ChatUtil.printDebug("Failed to validate Monument Template, bad name: \""+name+"\"");
 			return 5;
 		}
