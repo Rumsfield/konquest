@@ -162,6 +162,7 @@ public enum CorePath {
 	FAVOR_TOWNS_COST_SPECIALIZE                           ("core.favor.towns.cost_specialize"),
 	FAVOR_KINGDOMS_COST_CREATE                            ("core.favor.kingdoms.cost_create"),
 	FAVOR_KINGDOMS_COST_RENAME                            ("core.favor.kingdoms.cost_rename"),
+	FAVOR_KINGDOMS_COST_TEMPLATE                          ("core.favor.kingdoms.cost_template"),
 	FAVOR_KINGDOMS_COST_RELATIONSHIP                      ("core.favor.kingdoms.cost_relationship"),
 	FAVOR_KINGDOMS_PAY_INTERVAL_SECONDS                   ("core.favor.kingdoms.pay_interval_seconds"),
 	FAVOR_KINGDOMS_PAY_PER_CHUNK                          ("core.favor.kingdoms.pay_per_chunk"),

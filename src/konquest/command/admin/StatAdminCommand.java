@@ -121,8 +121,8 @@ public class StatAdminCommand extends CommandBase {
         		stats.setStat(stat, 0);
         		//ChatUtil.sendNotice((Player) getSender(), "Cleared stat "+stat.toString()+" for player "+bukkitPlayerName);
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_NOTICE_CLEAR.getMessage(stat.toString(),bukkitPlayerName));
-            	// Remove reference to offline player's stats
             	if(!isPlayerOnline) {
+            		getKonquest().getDatabaseThread().getDatabase().pushPlayerStats(offlinePlayer.getOfflineBukkitPlayer(), stats);
             		stats = null;
             	} else {
             		getKonquest().getAccomplishmentManager().initPlayerPrefixes(player);

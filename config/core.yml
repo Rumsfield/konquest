@@ -588,11 +588,14 @@ core:
 # NEW # //// CORE.FAVOR.KINGDOMS \\\\
     kingdoms:
       
-# NEW      # Cost to create a new guild (decimal >= 0)
+# NEW      # Cost to create a new kingdom (decimal >= 0)
       cost_create: 100
       
-# NEW      # Cost to rename a guild (decimal >= 0)
+# NEW      # Cost to rename a kingdom (decimal >= 0)
       cost_rename: 50
+      
+# NEW      # Cost to change the monument template of a kingdom (decimal >= 0)
+      cost_template: 200
       
 # NEW      # Cost to change relationship status with other kingdoms (decimal >= 0)
       cost_relationship: 50

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import konquest.Konquest;
@@ -46,7 +47,7 @@ import org.bukkit.potion.PotionEffectType;
  * @author Rumsfield
  * @prerequisites	The Town's Kingdom must have a valid Monument Template
  */
-public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplayer, Timeable {
+public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplayer, KonPropertyFlagHolder, Timeable {
 	
 	private KonMonument monument;
 	private Timer monumentTimer;
@@ -79,6 +80,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private HashMap<KonquestUpgrade,Integer> disabledUpgrades;
 	private KonTownRabbit rabbit;
 	private HashMap<Point,KonPlot> plots;
+	private Map<KonPropertyFlag,Boolean> properties;
 	
 	public KonTown(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, konquest);
@@ -119,6 +121,52 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.disabledUpgrades = new HashMap<KonquestUpgrade,Integer>();
 		this.rabbit = new KonTownRabbit(getSpawnLoc());
 		this.plots = new HashMap<Point,KonPlot>();
+		this.properties = new HashMap<KonPropertyFlag,Boolean>();
+		initProperties();
+	}
+	
+	private void initProperties() {
+		properties.clear();   
+		properties.put(KonPropertyFlag.CAPTURE, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.capture"));
+		properties.put(KonPropertyFlag.CLAIM, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.claim"));
+		properties.put(KonPropertyFlag.UNCLAIM, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.unclaim"));
+		properties.put(KonPropertyFlag.UPGRADE, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.upgrade"));
+		properties.put(KonPropertyFlag.PLOTS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.plots"));
+		properties.put(KonPropertyFlag.TRAVEL, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.travel"));
+		properties.put(KonPropertyFlag.PVP, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.pvp"));
+		properties.put(KonPropertyFlag.BUILD, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.build"));
+		properties.put(KonPropertyFlag.USE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.use"));
+		properties.put(KonPropertyFlag.MOBS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.mobs"));
+		properties.put(KonPropertyFlag.PORTALS, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.portals"));
+	}
+	
+	@Override
+	public boolean setPropertyValue(KonPropertyFlag property, boolean value) {
+		boolean result = false;
+		if(properties.containsKey(property)) {
+			properties.put(property, value);
+			result = true;
+		}
+		return result;
+	}
+
+	@Override
+	public boolean getPropertyValue(KonPropertyFlag property) {
+		boolean result = false;
+		if(properties.containsKey(property)) {
+			result = properties.get(property);
+		}
+		return result;
+	}
+	
+	@Override
+	public boolean hasPropertyValue(KonPropertyFlag property) {
+		return properties.containsKey(property);
+	}
+
+	@Override
+	public Map<KonPropertyFlag, Boolean> getAllProperties() {
+		return new HashMap<KonPropertyFlag, Boolean>(properties);
 	}
 
 	/**
@@ -167,6 +215,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	 */
 	@Override
 	public int initClaim() {
+		
+		if(!getKingdom().isMonumentTemplateValid()) {
+			return 11;
+		}
 		
 		// Verify monument template and chunk gradient and initialize travelPoint and baseY coordinate
 		int flatness = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.settle_check_flatness",3);
@@ -290,7 +342,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public boolean pasteMonumentFromTemplate(KonMonumentTemplate template) {
-		if(!template.isValid()) {
+		if(template == null || !template.isValid()) {
 			return false;
 		}
 		//Date start = new Date();
@@ -562,7 +614,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public int loadMonument(int base, KonMonumentTemplate template) {
 		int status = 0;
 		monument.setBaseY(base);
-		if(template.isValid()) {
+		if(template != null && template.isValid()) {
 			//monument.setHeight(template.getHeight());
 			monument.updateFromTemplate(template);
 			monument.setIsValid(true);

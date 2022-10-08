@@ -43,15 +43,13 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	private boolean isPeaceful;
 	private boolean isOfflineProtected;
 	private Timer protectedWarmupTimer;
-	
-	private Map<KonPropertyFlag,Boolean> properties;
-	
 	private boolean isAdminOperated;
 	private boolean isOpen;
 	private RequestKeeper joinRequestKeeper;
 	private UUID master;
 	private Map<UUID,Boolean> members; // True = officer, False = regular
 	private Map<KonKingdom,Relationship> relationships;
+	private Map<KonPropertyFlag,Boolean> properties;
 	
 	public KonKingdom(Location loc, String name, Konquest konquest) {
 		this.name = name;
@@ -63,16 +61,14 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.isPeaceful = false;
 		this.isOfflineProtected = true;
 		this.protectedWarmupTimer = new Timer(this);
-		
-		this.properties = new HashMap<KonPropertyFlag,Boolean>();
-		initProperties();
-		
 		this.isAdminOperated = false;
 		this.isOpen = false;
 		this.joinRequestKeeper = new RequestKeeper();
 		this.master = null;
 		this.members = new HashMap<UUID,Boolean>();
 		this.relationships = new HashMap<KonKingdom,Relationship>();
+		this.properties = new HashMap<KonPropertyFlag,Boolean>();
+		initProperties();
 	}
 	
 	// Constructor meant for Barbarians, created on startup
@@ -91,6 +87,9 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public int initCapital() {
 		int status = capital.initClaim();
+		if(status != 0) {
+			ChatUtil.printDebug("Problem initializing capital of "+name);
+		}
 		return status;
 	}
 	
@@ -527,6 +526,13 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	public KonMonumentTemplate getMonumentTemplate() {
 		return monumentTemplate;
 	}
+	
+	public void updateMonumentTemplate(KonMonumentTemplate template) {
+		setMonumentTemplate(template);
+		//TODO: Update all town monuments from new template
+	}
+	
+	
 	
 	public String getName() {
 		return name;

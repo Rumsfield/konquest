@@ -147,6 +147,17 @@ public class SanctuaryManager {
 		return result;
 	}
 	
+	public boolean isValidTemplate(String name) {
+		boolean result = false;
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			if(sanctuary.isTemplate(name) && sanctuary.getTemplate(name).isValid()) {
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
+	
 	public KonMonumentTemplate getTemplate(String name) {
 		KonMonumentTemplate result = null;
 		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
@@ -176,6 +187,18 @@ public class SanctuaryManager {
 		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
 			for(KonMonumentTemplate template : sanctuary.getTemplates()) {
 				result.add(template.getName());
+			}
+		}
+		return result;
+	}
+	
+	public Set<String> getAllValidTemplateNames() {
+		Set<String> result = new HashSet<String>();
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			for(KonMonumentTemplate template : sanctuary.getTemplates()) {
+				if(template.isValid()) {
+					result.add(template.getName());
+				}
 			}
 		}
 		return result;

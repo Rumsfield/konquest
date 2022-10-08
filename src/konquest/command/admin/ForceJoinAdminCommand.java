@@ -23,6 +23,10 @@ public class ForceJoinAdminCommand extends CommandBase {
     }
 
     public void execute() {
+    	//TODO: Refactor this
+    	ChatUtil.sendError((Player) getSender(), "Not implemented");
+		return;
+		/*
     	// k admin forcejoin player1 kingdom1
     	if (getArgs().length != 4) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -69,6 +73,7 @@ public class ForceJoinAdminCommand extends CommandBase {
     			break;
     		}
         }
+        */
     }
     
     @Override
