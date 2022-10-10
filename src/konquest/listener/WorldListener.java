@@ -75,7 +75,7 @@ public class WorldListener  implements Listener {
 				KonTown town = (KonTown) territory;
 				if(town.isChunkCenter(event.getChunk())) {
 					ChatUtil.printDebug("EVENT: Loaded monument chunk of town "+town.getName());
-					if(!town.getKingdom().getMonumentTemplate().isValid()) {
+					if(!town.getKingdom().isMonumentTemplateValid()) {
 						ChatUtil.printDebug("Could not paste monument in town "+town.getName()+" while monument template is invalid");
 					} else if(town.isAttacked()) {
 						ChatUtil.printDebug("Could not paste monument in town "+town.getName()+" while under attack");

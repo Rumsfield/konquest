@@ -117,7 +117,7 @@ public interface KonquestKingdomManager {
 	 * 		   <br>22 - error, town init fail, bad monument gradient
 	 * 		   <br>23 - error, town init fail, monument placed on bedrock
 	 */
-	public int addTown(Location loc, String name, String kingdomName);
+	public int createTown(Location loc, String name, String kingdomName);
 	
 	/**
 	 * Remove a town.

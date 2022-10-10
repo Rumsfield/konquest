@@ -85,14 +85,6 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		properties.put(KonPropertyFlag.GOLEMS, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.golems"));
 	}
 	
-	public int initCapital() {
-		int status = capital.initClaim();
-		if(status != 0) {
-			ChatUtil.printDebug("Problem initializing capital of "+name);
-		}
-		return status;
-	}
-	
 	public void setIsOpen(boolean val) {
 		isOpen = val;
 	}
@@ -417,6 +409,28 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	 * =================================================
 	 */
 	
+	public int initCapital() {
+		int status = capital.initClaim();
+		if(status != 0) {
+			ChatUtil.printDebug("Problem initializing capital of "+name);
+		}
+		return status;
+	}
+	
+	// Does not completely delete capital, but removes displays and monument
+	public boolean removeCapital() {
+		boolean result = false;
+		if(capital != null) {
+			ChatUtil.printDebug("Removed capital of kingdom "+name);
+			capital.removeAllBarPlayers();
+			result = capital.removeMonumentBlocks();
+			if(!result) {
+				ChatUtil.printDebug("Encountered problem removing monument blocks of capital");
+			}
+		}
+		return result;
+	}
+	
 	/**
 	 * Adds a Town.
 	 * @param loc - Location of center
@@ -444,7 +458,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	/**
 	 * Removes a town and all of its claims.
-	 * @param name 0 Name of Town
+	 * @param name - Name of Town
 	 * @return true if Town was successfully removed from the HashMap, else false.
 	 */
 	public boolean removeTown(String name) {
@@ -527,12 +541,22 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		return monumentTemplate;
 	}
 	
-	public void updateMonumentTemplate(KonMonumentTemplate template) {
-		setMonumentTemplate(template);
-		//TODO: Update all town monuments from new template
+	public String getMonumentTemplateName() {
+		String result = "";
+		if(monumentTemplate != null) {
+			result = monumentTemplate.getName();
+		}
+		return result;
 	}
 	
+	public boolean hasMonumentTemplate() {
+		return monumentTemplate != null;
+	}
 	
+	public void updateMonumentTemplate(KonMonumentTemplate template) {
+		setMonumentTemplate(template);
+		reloadLoadedTownMonuments();
+	}
 	
 	public String getName() {
 		return name;

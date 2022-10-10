@@ -3,6 +3,7 @@ package konquest.model;
 import konquest.Konquest;
 import konquest.api.model.KonquestCapital;
 import konquest.api.model.KonquestTerritoryType;
+import konquest.utility.CorePath;
 
 import org.bukkit.Location;
 
@@ -10,7 +11,7 @@ import org.bukkit.Location;
 public class KonCapital extends KonTown implements KonquestCapital {
 
 	public KonCapital(Location loc, KonKingdom kingdom, Konquest konquest) {
-		super(loc, kingdom.getName()+" "+konquest.getConfigManager().getConfig("core").getString("core.kingdoms.capital_suffix"), kingdom, konquest);
+		super(loc, kingdom.getName()+" "+konquest.getConfigManager().getConfig("core").getString(CorePath.KINGDOMS_CAPITAL_SUFFIX.getPath()), kingdom, konquest);
 		
 	}
 	
@@ -19,7 +20,7 @@ public class KonCapital extends KonTown implements KonquestCapital {
 	}
 	
 	public void updateName() {
-		setName(getKingdom().getName()+" "+getKonquest().getConfigManager().getConfig("core").getString("core.kingdoms.capital_suffix"));
+		setName(getKingdom().getName()+" "+getKonquest().getConfigManager().getConfig("core").getString(CorePath.KINGDOMS_CAPITAL_SUFFIX.getPath()));
 		updateBar();
 	}
 	
