@@ -35,8 +35,10 @@ import konquest.api.event.player.KonquestPlayerKingdomEvent;
 import konquest.api.manager.KonquestKingdomManager;
 import konquest.api.model.KonquestUpgrade;
 import konquest.api.model.KonquestTerritoryType;
+import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestPlayer;
+import konquest.api.model.KonquestRelationship;
 import konquest.display.OptionIcon.optionAction;
 import konquest.model.KonBarDisplayer;
 import konquest.model.KonKingdom;
@@ -520,6 +522,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			for(KonTown town : kingdom.getTowns()) {
 				removeTown(town.getName(),kingdom.getName());
 			}
+			// Clear all relationships
+			kingdom.clearActiveRelations();
+			kingdom.clearRelationRequests();
+			for(KonKingdom otherKingdom : kingdomMap.values()) {
+				otherKingdom.removeActiveRelation(kingdom);
+				otherKingdom.removeRelationRequest(kingdom);
+			}
+			// Delete the kingdom
 			kingdom = null;
 			KonKingdom oldKingdom = kingdomMap.remove(name);
 			if(oldKingdom != null) {
@@ -850,6 +860,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * 				3	- Failed to find valid teleport location
 	 * 				4	- cancelled by event
 	 * 				5	- Exile denied, player is a kingdom master
+	 * 				7   - Player not found
 	 */
 	public int exilePlayerBarbarian(UUID id, boolean teleport, boolean clearStats, boolean isFull) {
 		
@@ -1307,6 +1318,209 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return kingdom.addMember(id, isOfficer);
 	}
 	*/
+	
+	
+	/*
+	 * =================================================
+	 * Relationship Methods
+	 * =================================================
+	 */
+	
+	/*
+	 * Each kingdom has an internal map of its active relationship to other kingdoms, plus current relationship requests.
+	 * The default relation is peace.
+	 * Relationships are: enemy, sanction, peace, allied.
+	 * 
+	 * 
+	 * State flow for [kingdom1, kingdom2]...
+	 * 
+	 * JOINT STATE: PEACE
+	 * (Includes sanction limits)
+	 * [peace,peace] 			-> both kingdoms are at peace
+	 * - [allied,peace] 		-> kingdom1 requests alliance, kingdom2 must also change to allied
+	 *   - [allied,enemy]       -> kingdom2 becomes enemy, go to OPTION A or B
+	 *   - [allied,sanction]	-> kingdom2 sanctions kingdom1 instead of allied, no alliance bonuses
+	 *   - [allied,allied] 		-> both kingdoms allied, apply ALLIANCE
+	 * - [sanction,peace] 		-> if either kingdom is sanction, apply limits to other
+	 * OPTION A (instant war)
+	 * - [enemy,enemy]          -> if any kingdom changes to enemy, the other kingdom is forced to enemy as well, apply WAR
+	 * OPTION B (mutual war)
+	 * - [enemy,peace]			-> both kingdoms must change to enemy for war conditions, no war yet, resets other kingdom to default if allied
+	 *   - [enemy,allied]       -> INVALID: kingdoms cannot be allied with enemy kingdoms
+	 *   - [enemy,sanction]     -> kingdom2 sanctions kingdom1, still no war
+	 *   - [enemy,enemy]		-> when both kingdoms change to enemy, apply war
+	 *   
+	 * JOINT STATE: ALLIANCE
+	 * [allied,allied] 		    -> both kingdoms are in an alliance
+	 * - [peace,peace]      	-> kingdom2 changes to peace, breaks alliance, resets kingdom1 to default, apply PEACE
+	 * - [peace,sanction]   	-> kingdom2 changes to sanction, breaks alliance, resets kingdom1 to default, apply PEACE
+	 * - [peace,enemy]      	-> if either kingdom changes to enemy, apply PEACE then go to OPTION A or B (reset other to default)
+	 * 
+	 * JOINT STATE: WAR
+	 * [enemy,enemy]			-> both kingdoms are at war
+	 * - [enemy,allied]         -> INVALID: kingdoms cannot be allied in war
+	 * - [enemy,sanction]       -> INVALID: kingdoms cannot sanction in war
+	 * OPTION C (instant peace)
+	 * - [peace,peace]			-> if either kingdom at war changes to peace, other is forced to peace as well, apply PEACE
+	 * OPTION D (mutual peace)
+	 * - [peace,enemy]			-> both kingdoms must change to peace to end war conditions
+	 *   - [peace,allied]       -> INVALID: kingdoms cannot be allied in war
+	 *   - [peace,sanction] 	-> INVALID: kingdoms cannot sanction in war
+	 *   - [peace,peace] 		-> both kingdoms change to peace, apply PEACE
+	 * 
+	 */
+	 
+	public boolean changeKingdomRelation(KonKingdom kingdom, KonKingdom otherKingdom, KonquestRelationship relation, KonPlayer player, boolean isAdmin) {
+		
+		Player bukkitPlayer = player.getBukkitPlayer();
+		// Check cost
+		if(costRelation > 0 && !isAdmin) {
+			if(KonquestPlugin.getBalance(bukkitPlayer) < costRelation) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costRelation));
+                return false;
+			}
+    	}
+		
+		KonquestRelationship ourRelation = kingdom.getActiveRelation(otherKingdom);
+		KonquestRelationship theirRelation = otherKingdom.getActiveRelation(kingdom);
+		
+		if(ourRelation.equals(relation)) {
+			// Cannot change to existing active relation
+			return false;
+		}
+		
+		ChatUtil.printDebug("Changing kingdom "+kingdom.getName()+" relation to "+otherKingdom.getName()+", "+relation.toString());
+		ChatUtil.printDebug("Our relationship is currently "+ourRelation.toString());
+		ChatUtil.printDebug("Their relationship is currently "+theirRelation.toString());
+		
+		boolean isInstantWar = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_INSTANT_WAR.getPath(), false);
+		boolean isInstantPeace = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_INSTANT_PEACE.getPath(), false);
+		
+		// Relationship transition logic
+		if(relation.equals(KonquestRelationship.PEACE)) {
+			// Change to peace
+			if(ourRelation.equals(KonquestRelationship.ENEMY)) {
+				// We are enemies, try to make peace
+				if(isInstantPeace) {
+					// Instantly change to active peace, force them to peace too
+					setJointActiveRelation(kingdom,otherKingdom,relation);
+				} else {
+					// Check if they already request peace
+					if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(relation)) {
+						// Both sides request peace, change to active peace
+						setJointActiveRelation(kingdom,otherKingdom,relation);
+					} else {
+						// We request peace, still at war
+						kingdom.setRelationRequest(otherKingdom, relation);
+					}
+				}
+			} else {
+				// We are not enemies
+				if(ourRelation.equals(KonquestRelationship.ALLIED)) {
+					// We are allies
+					// Instantly break alliance, reset both of us to default
+					removeJointActiveRelation(kingdom,otherKingdom);
+				}
+				// Apply relation
+				kingdom.setActiveRelation(otherKingdom, relation);
+				kingdom.removeRelationRequest(otherKingdom);
+			}
+			
+		} else if (relation.equals(KonquestRelationship.SANCTIONED)) {
+			// Change to sanctioned
+			if(!ourRelation.equals(KonquestRelationship.ENEMY)) {
+				// Cannot sanction enemies
+				if(ourRelation.equals(KonquestRelationship.ALLIED)) {
+					// We are allies
+					// Instantly break alliance, reset both of us to default
+					removeJointActiveRelation(kingdom,otherKingdom);
+				}
+				// Apply relation
+				kingdom.setActiveRelation(otherKingdom, relation);
+				kingdom.removeRelationRequest(otherKingdom);
+			}
+			
+		} else if(relation.equals(KonquestRelationship.ENEMY)) {
+			// Attempt to declare war
+			if(isInstantWar) {
+				// Apply joint enemy
+				setJointActiveRelation(kingdom,otherKingdom,relation);
+			} else {
+				// Request war
+				// Check if they already request enemy
+				if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(relation)) {
+					// Both sides request enemy, change to active war
+					setJointActiveRelation(kingdom,otherKingdom,relation);
+				} else {
+					if(ourRelation.equals(KonquestRelationship.ALLIED)) {
+						// Instantly break alliance, reset both of us to default
+						removeJointActiveRelation(kingdom,otherKingdom);
+					}
+					// We request enemy
+					kingdom.setRelationRequest(otherKingdom, relation);
+				}
+			}
+			
+		} else if(relation.equals(KonquestRelationship.ALLIED)) {
+			// Attempt to form an alliance
+			if(!ourRelation.equals(KonquestRelationship.ENEMY)) {
+				// Cannot ally enemies
+				// Check if they already request allied
+				if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(relation)) {
+					// Both sides request allied, change to active alliance
+					setJointActiveRelation(kingdom,otherKingdom,relation);
+				} else {
+					// We request allied
+					kingdom.setRelationRequest(otherKingdom, relation);
+				}
+			}
+		}
+		
+		// Debug messaging
+		KonquestRelationship ourActiveRelation = kingdom.getActiveRelation(otherKingdom);
+		KonquestRelationship theirActiveRelation = otherKingdom.getActiveRelation(kingdom);
+		KonquestRelationship ourRelationRequest = kingdom.getRelationRequest(otherKingdom);
+		KonquestRelationship theirRelationRequest = otherKingdom.getRelationRequest(kingdom);
+		ChatUtil.printDebug("Finished: "+kingdom.getName()+" ["+ourActiveRelation.toString()+","+ourRelationRequest.toString()+"]; "+otherKingdom.getName()+" ["+theirActiveRelation.toString()+","+theirRelationRequest.toString()+"]");
+		
+		// Withdraw cost
+		if(costRelation > 0 && !isAdmin) {
+            if(KonquestPlugin.withdrawPlayer(bukkitPlayer, costRelation)) {
+            	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costRelation);
+            }
+		}
+		return true;
+	}
+	
+	private void setJointActiveRelation(KonKingdom kingdom1, KonKingdom kingdom2, KonquestRelationship relation) {
+		kingdom1.setActiveRelation(kingdom2, relation);
+		kingdom1.removeRelationRequest(kingdom2);
+		kingdom2.setActiveRelation(kingdom1, relation);
+		kingdom2.removeRelationRequest(kingdom1);
+	}
+	
+	private void removeJointActiveRelation(KonKingdom kingdom1, KonKingdom kingdom2) {
+		kingdom1.removeActiveRelation(kingdom2);
+		kingdom1.removeRelationRequest(kingdom2);
+		kingdom2.removeActiveRelation(kingdom1);
+		kingdom2.removeRelationRequest(kingdom1);
+	}
+	
+	public boolean isBothKingdomsEnemy(KonquestKingdom kingdom1, KonquestKingdom kingdom2) {
+		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.ENEMY) && kingdom2.getActiveRelation(kingdom1).equals(KonquestRelationship.ENEMY);
+	}
+	
+	public boolean isBothKingdomsAllied(KonquestKingdom kingdom1, KonquestKingdom kingdom2) {
+		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.ALLIED) && kingdom2.getActiveRelation(kingdom1).equals(KonquestRelationship.ALLIED);
+	}
+	
+	public boolean isKingdomSanctioned(KonquestKingdom kingdom1, KonquestKingdom kingdom2) {
+		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.SANCTIONED);
+	}
+	
+	public boolean isKingdomPeaceful(KonquestKingdom kingdom1, KonquestKingdom kingdom2) {
+		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.PEACE);
+	}
 	
 	/*
 	 * 
@@ -2277,6 +2491,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 	}
 	
+	//TODO: When loading kingdom relations, if equals default, don't add
+	
 	private void loadKingdoms() {
 		FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
         if (kingdomsConfig.get("kingdoms") == null) {
@@ -2339,11 +2555,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         			// Capital and Town Loading
         			// Load all towns
                 	boolean isMissingMonuments = false;
+                	boolean isMissingCapital = true;
                 	for(String townName : kingdomSection.getConfigurationSection("towns").getKeys(false)) {
                 		//ChatUtil.printDebug("Loading Town: "+townName);
                 		boolean isCapital = false;
                 		if(townName.equals("capital")) {
                 			isCapital = true;
+                			isMissingCapital = false;
                 		}
                     	ConfigurationSection townSection = kingdomSection.getConfigurationSection("towns."+townName);
                     	if(townSection != null) {
@@ -2497,10 +2715,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         	            	ChatUtil.printDebug("Internal error, null town section \""+townName+"\" in kingdoms.yml for kingdom "+kingdomName);
         	            }
                 	}
+                	if(isMissingCapital) {
+                		String message = "Kingdom "+kingdomName+" is missing a defined capital. Try removing and re-making the kingdom.";
+            			ChatUtil.printConsoleError(message);
+            			konquest.opStatusMessages.add(message);
+                	}
                 	if(isMissingMonuments) {
                 		konquest.opStatusMessages.add("Kingdom "+kingdomName+" has Towns with invalid Monuments. You must create a new Monument Template and restart the server.");
                 	}
-    	    		
         		} else {
         			// Error, world is not loaded
         			String message = "Failed to load kingdom "+kingdomName+" capital in an unloaded world, "+capitalWorld+". Check plugin load order.";
@@ -2514,6 +2736,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         }
 		ChatUtil.printDebug("Loaded Kingdoms");
 	}
+	
+	//TODO: Save kingdom relationships (active and request)
 	
 	public void saveKingdoms() {
 		FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");

@@ -205,6 +205,12 @@ core:
     # (*) Suffix to be appended to Kingdom names which will be the name of the Capital city (string)
     capital_suffix: Capital
     
+# NEW Any kingdom can start a war with another (true), else both kingdoms must agree to war (false) (true/false)
+    instant_war: true
+    
+# NEW Either kingdom can end a war with the enemy kingdom (true), else both kingdoms must agree to peace (false) (true/false)
+    instant_peace: false
+    
     # Allow player damage in capitals (true/false)
     #capital_pvp: false
     

@@ -17,6 +17,7 @@ import org.bukkit.Sound;
 
 import konquest.Konquest;
 import konquest.api.model.KonquestKingdom;
+import konquest.api.model.KonquestRelationship;
 import konquest.utility.ChatUtil;
 import konquest.utility.CorePath;
 import konquest.utility.RequestKeeper;
@@ -24,15 +25,8 @@ import konquest.utility.Timeable;
 import konquest.utility.Timer;
 
 public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHolder {
-
-	public enum Relationship {
-		ENEMY,
-		SANCTIONED,
-		PEACE,
-		ALLIED;
-	}
 	
-	public static final Relationship defaultRelation = Relationship.PEACE;
+	public static final KonquestRelationship defaultRelation = KonquestRelationship.PEACE;
 	
 	private String name;
 	private Konquest konquest;
@@ -48,7 +42,8 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	private RequestKeeper joinRequestKeeper;
 	private UUID master;
 	private Map<UUID,Boolean> members; // True = officer, False = regular
-	private Map<KonKingdom,Relationship> relationships;
+	private Map<KonquestKingdom,KonquestRelationship> activeRelationships; // Active relation state
+	private Map<KonquestKingdom,KonquestRelationship> requestRelationships; // Current relation requests to change state
 	private Map<KonPropertyFlag,Boolean> properties;
 	
 	public KonKingdom(Location loc, String name, Konquest konquest) {
@@ -66,7 +61,8 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.joinRequestKeeper = new RequestKeeper();
 		this.master = null;
 		this.members = new HashMap<UUID,Boolean>();
-		this.relationships = new HashMap<KonKingdom,Relationship>();
+		this.activeRelationships = new HashMap<KonquestKingdom,KonquestRelationship>();
+		this.requestRelationships = new HashMap<KonquestKingdom,KonquestRelationship>();
 		this.properties = new HashMap<KonPropertyFlag,Boolean>();
 		initProperties();
 	}
@@ -312,46 +308,97 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	 * =================================================
 	 */
 	
-	public boolean addRelation(KonKingdom kingdom, Relationship relation) {
+	/* Active Relationship */
+	
+	public boolean setActiveRelation(KonquestKingdom kingdom, KonquestRelationship relation) {
 		boolean result = false;
-		if(!relationships.containsKey(kingdom) && !kingdom.equals(this)) {
-			relationships.put(kingdom,relation);
+		if(!activeRelationships.containsKey(kingdom) && !kingdom.equals(this)) {
+			activeRelationships.put(kingdom,relation);
 			result = true;
 		}
 		return result;
 	}
 	
-	public boolean removeRelation(KonKingdom kingdom) {
+	public KonquestRelationship getActiveRelation(KonquestKingdom kingdom) {
+		KonquestRelationship result = defaultRelation;
+		if(activeRelationships.containsKey(kingdom)) {
+			result = activeRelationships.get(kingdom);
+		}
+		return result;
+	}
+	
+	public boolean removeActiveRelation(KonquestKingdom kingdom) {
 		boolean result = false;
-		if(relationships.containsKey(kingdom)) {
-			relationships.remove(kingdom);
+		if(activeRelationships.containsKey(kingdom)) {
+			activeRelationships.remove(kingdom);
 			result = true;
 		}
 		return result;
 	}
 	
-	// No relationship means peace
-	public boolean hasRelation(KonKingdom kingdom) {
-		return relationships.containsKey(kingdom);
+	public void clearActiveRelations() {
+		activeRelationships.clear();
 	}
 	
-	public Relationship getRelation(KonKingdom kingdom) {
-		Relationship result = defaultRelation;
-		if(relationships.containsKey(kingdom)) {
-			result = relationships.get(kingdom);
-		}
-		return result;
-	}
-	
-	public Collection<KonKingdom> getRelationKingdoms() {
-		Set<KonKingdom> kingdoms = new HashSet<KonKingdom>();
-		kingdoms.addAll(relationships.keySet());
+	public Collection<KonquestKingdom> getActiveRelationKingdoms() {
+		Set<KonquestKingdom> kingdoms = new HashSet<KonquestKingdom>();
+		kingdoms.addAll(activeRelationships.keySet());
 		return kingdoms;
 	}
 	
-	public List<String> getRelationNames() {
+	public List<String> getActiveRelationNames() {
 		List<String> result = new ArrayList<String>();
-		for(KonKingdom kingdom : relationships.keySet()) {
+		for(KonquestKingdom kingdom : activeRelationships.keySet()) {
+			result.add(kingdom.getName());
+		}
+		return result;
+	}
+	
+	/* Request Relationship */
+	
+	public boolean setRelationRequest(KonquestKingdom kingdom, KonquestRelationship relation) {
+		boolean result = false;
+		if(!requestRelationships.containsKey(kingdom) && !kingdom.equals(this)) {
+			requestRelationships.put(kingdom,relation);
+			result = true;
+		}
+		return result;
+	}
+	
+	public KonquestRelationship getRelationRequest(KonquestKingdom kingdom) {
+		KonquestRelationship result = defaultRelation;
+		if(requestRelationships.containsKey(kingdom)) {
+			result = requestRelationships.get(kingdom);
+		}
+		return result;
+	}
+	
+	public boolean hasRelationRequest(KonquestKingdom kingdom) {
+		return requestRelationships.containsKey(kingdom);
+	}
+	
+	public boolean removeRelationRequest(KonquestKingdom kingdom) {
+		boolean result = false;
+		if(requestRelationships.containsKey(kingdom)) {
+			requestRelationships.remove(kingdom);
+			result = true;
+		}
+		return result;
+	}
+	
+	public void clearRelationRequests() {
+		requestRelationships.clear();
+	}
+	
+	public Collection<KonquestKingdom> getRelationRequestKingdoms() {
+		Set<KonquestKingdom> kingdoms = new HashSet<KonquestKingdom>();
+		kingdoms.addAll(requestRelationships.keySet());
+		return kingdoms;
+	}
+	
+	public List<String> getRelationRequestNames() {
+		List<String> result = new ArrayList<String>();
+		for(KonquestKingdom kingdom : requestRelationships.keySet()) {
 			result.add(kingdom.getName());
 		}
 		return result;

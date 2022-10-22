@@ -35,6 +35,10 @@ public interface KonquestKingdom {
 	 */
 	public boolean isPeaceful();
 	
+	
+	//TODO: doc
+	public KonquestRelationship getActiveRelation(KonquestKingdom kingdom);
+	
 	/**
 	 * Checks whether this kingdom currently has a blanked monument template.
 	 * A monument template is blanked when a player in admin bypass mode edits it.

@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -40,7 +39,6 @@ import konquest.manager.CampManager;
 import konquest.manager.ConfigManager;
 import konquest.manager.DirectiveManager;
 import konquest.manager.DisplayManager;
-import konquest.manager.GuildManager;
 import konquest.manager.IntegrationManager;
 import konquest.manager.KingdomManager;
 import konquest.manager.LanguageManager;
@@ -78,7 +76,6 @@ import konquest.api.KonquestAPI;
 import konquest.api.event.KonquestEvent;
 import konquest.api.model.KonquestUpgrade;
 import konquest.api.model.KonquestTerritoryType;
-import konquest.api.model.KonquestGuild;
 import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestTerritory;
@@ -102,10 +99,6 @@ public class Konquest implements KonquestAPI, Timeable {
 	public static ChatColor barbarianColor = ChatColor.YELLOW;
 	public static ChatColor neutralColor = ChatColor.GRAY;
 	
-	//TODO: KR Delete this
-	public static ChatColor armisticeColor1 = ChatColor.GRAY;
-	public static ChatColor armisticeColor2 = ChatColor.GRAY;
-	
 	public static String healthModName = "konquest.health_buff";
 	
 	private DatabaseThread databaseThread;
@@ -126,7 +119,6 @@ public class Konquest implements KonquestAPI, Timeable {
 	private MapHandler mapHandler;
 	private PlaceholderManager placeholderManager;
 	private PlotManager plotManager;
-	private GuildManager guildManager; //TODO: KR remove this
 	private TravelManager travelManager;
 	private SanctuaryManager sanctuaryManager;
 	private TerritoryManager territoryManager;
@@ -184,7 +176,6 @@ public class Konquest implements KonquestAPI, Timeable {
 		mapHandler = new MapHandler(this);
 		placeholderManager = new PlaceholderManager(this);
 		plotManager = new PlotManager(this);
-		guildManager = new GuildManager(this);
 		travelManager = new TravelManager(this);
 		sanctuaryManager = new SanctuaryManager(this);
 		territoryManager = new TerritoryManager(this);
@@ -221,7 +212,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		sanctuaryManager.initialize();
 		kingdomManager.initialize();
 		ruinManager.initialize();
-		guildManager.initialize();
+		//guildManager.initialize();
 		initManagers();
 		initWorlds();
 		
@@ -330,6 +321,7 @@ public class Konquest implements KonquestAPI, Timeable {
 			chatMessage = ChatUtil.parseHex(configMessage);
 		}
 		ChatUtil.printDebug("Chat message is "+chatMessage);
+		kingdomManager.loadOptions();
 		integrationManager.initialize();
 		lootManager.initialize();
 		displayManager.initialize();
@@ -340,7 +332,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		shieldManager.initialize();
 		placeholderManager.initialize();
 		plotManager.initialize();
-		guildManager.loadOptions();
+		//guildManager.loadOptions();
 		offlineTimeoutSeconds = (long)(configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)*86400);
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;
@@ -593,7 +585,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		kingdomManager.saveKingdoms();
 		campManager.saveCamps();
 		ruinManager.saveRuins();
-		guildManager.saveGuilds();
+		//guildManager.saveGuilds();
 		configManager.saveConfigs();
 	}
 	
@@ -737,10 +729,6 @@ public class Konquest implements KonquestAPI, Timeable {
 		return plotManager;
 	}
 	
-	public GuildManager getGuildManager() {
-		return guildManager;
-	}
-	
 	public TravelManager getTravelManager() {
 		return travelManager;
 	}
@@ -797,7 +785,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	 * 			4 - Error, name is a kingdom
 	 * 			5 - Error, name is a town
 	 * 			6 - Error, name is a ruin
-	 * 			7 - Error, name is a guild
+	 * 			7 - Error, name is a guild [deprecated]
 	 * 			8 - Error, name is a sanctuary
 	 * 			9 - Error, name is a template
 	 * 			10 - Error, name is territory travel reserved word
@@ -822,9 +810,6 @@ public class Konquest implements KonquestAPI, Timeable {
 		}
 		if(ruinManager.isRuin(name)) {
 			return 6;
-		}
-		if(guildManager.isGuild(name)) {
-			return 7;
 		}
 		if(sanctuaryManager.isSanctuary(name)) {
 			return 8;
@@ -870,7 +855,9 @@ public class Konquest implements KonquestAPI, Timeable {
 						boolean doExile = configManager.getConfig("core").getBoolean("core.kingdoms.offline_timeout_exile",false);
 						if(!player.isBarbarian()) {
 							if(doExile) {
-								getKingdomManager().exileOfflinePlayer(player,true);
+								UUID id = player.getOfflineBukkitPlayer().getUniqueId();
+								// Full exile
+								getKingdomManager().exilePlayerBarbarian(id,false,false,true);
 							} else {
 								for(KonTown town : player.getKingdom().getTowns()) {
 									if(town.getPlayerResidents().contains(player.getOfflineBukkitPlayer())) {
@@ -1247,52 +1234,76 @@ public class Konquest implements KonquestAPI, Timeable {
     	// Send arg player packets for each team with lists of online players
 		List<String> friendlyNames = new ArrayList<String>();
 		List<String> enemyNames = new ArrayList<String>();
-		List<String> armisticeNames = new ArrayList<String>();
+		List<String> sanctionedNames = new ArrayList<String>();
+		List<String> peacefulNames = new ArrayList<String>();
+		List<String> alliedNames = new ArrayList<String>();
 		List<String> barbarianNames = new ArrayList<String>();
+		Team onlinePacketTeam = null;
     	for(KonPlayer onlinePlayer : playerManager.getPlayersOnline()) {
-    		boolean isArmistice = guildManager.isArmistice(onlinePlayer, player);
+    		
     		// Place online player in appropriate list w.r.t. player
     		if(onlinePlayer.isBarbarian()) {
     			barbarianNames.add(onlinePlayer.getBukkitPlayer().getName());
     		} else {
     			if(onlinePlayer.getKingdom().equals(player.getKingdom())) {
+    				// players are in the same kingdom
     				friendlyNames.add(onlinePlayer.getBukkitPlayer().getName());
     			} else {
-    				if(isArmistice) {
-    					armisticeNames.add(onlinePlayer.getBukkitPlayer().getName());
-    				} else {
+    				// players are in different kingdoms
+    				if(kingdomManager.isBothKingdomsEnemy(onlinePlayer.getKingdom(), player.getKingdom())) {
     					enemyNames.add(onlinePlayer.getBukkitPlayer().getName());
+    				} else if(kingdomManager.isBothKingdomsAllied(onlinePlayer.getKingdom(), player.getKingdom())) {
+    					alliedNames.add(onlinePlayer.getBukkitPlayer().getName());
+    				} else if(kingdomManager.isKingdomSanctioned(onlinePlayer.getKingdom(), player.getKingdom())) {
+    					sanctionedNames.add(onlinePlayer.getBukkitPlayer().getName());
+    				} else {
+    					// Assumed peaceful (default)
+    					peacefulNames.add(onlinePlayer.getBukkitPlayer().getName());
+    				}
+    			}
+    		}
+    		
+    		// Determine appropriate team for player w.r.t. online player
+    		if(player.isBarbarian()) {
+    			onlinePacketTeam = barbarianTeam;
+    		} else {
+    			if(player.getKingdom().equals(onlinePlayer.getKingdom())) {
+    				onlinePacketTeam = friendlyTeam;
+    			} else {
+    				// players are in different kingdoms
+    				if(kingdomManager.isBothKingdomsEnemy(player.getKingdom(), onlinePlayer.getKingdom())) {
+    					onlinePacketTeam = enemyTeam;
+    				} else if(kingdomManager.isKingdomSanctioned(player.getKingdom(), onlinePlayer.getKingdom())) {
+    					onlinePacketTeam = sanctionedTeam;
+    				} else if(kingdomManager.isBothKingdomsAllied(player.getKingdom(), onlinePlayer.getKingdom())) {
+    					onlinePacketTeam = alliedTeam;
+    				} else {
+    					// Assumed peaceful (default)
+    					onlinePacketTeam = peacefulTeam;
     				}
     			}
     		}
     		// Send appropriate team packet to online player
-    		// TODO: KR update for new relationships
-    		if(player.isBarbarian()) {
-    			versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), barbarianTeam);
-    		} else {
-    			if(player.getKingdom().equals(onlinePlayer.getKingdom())) {
-    				versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), friendlyTeam);
-    			} else {
-    				if(isArmistice) {
-    					versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), armisticeTeam);
-    				} else {
-    					versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), enemyTeam);
-    				}
-    			}
-    		}
+    		versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), onlinePacketTeam);
     	}
     	// Send packets to player
+    	if(!barbarianNames.isEmpty()) {
+    		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), barbarianNames, barbarianTeam);
+    	}
     	if(!friendlyNames.isEmpty()) {
     		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), friendlyNames, friendlyTeam);
     	}
     	if(!enemyNames.isEmpty()) {
     		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), enemyNames, enemyTeam);
     	}
-    	if(!armisticeNames.isEmpty()) {
-    		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), armisticeNames, armisticeTeam);
+    	if(!sanctionedNames.isEmpty()) {
+    		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), sanctionedNames, sanctionedTeam);
     	}
-    	if(!barbarianNames.isEmpty()) {
-    		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), barbarianNames, barbarianTeam);
+    	if(!alliedNames.isEmpty()) {
+    		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), alliedNames, alliedTeam);
+    	}
+    	if(!peacefulNames.isEmpty()) {
+    		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), peacefulNames, peacefulTeam);
     	}
     }
     
@@ -1394,32 +1405,36 @@ public class Konquest implements KonquestAPI, Timeable {
     	}
     }
     
-    /**
-     * Determines primary color based on player relationships
-     * @param displayPlayer - The target player to show the color to
-     * @param contextPlayer - The player to base the color from
-     * @param isArmistice - Are the two players in an armistice?
-     * @return Color
-     */
-    public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer) {
-    	ChatColor result = ChatColor.RED;
-    	boolean isArmistice = guildManager.isArmistice(displayPlayer, contextPlayer);
-    	if(contextPlayer.isBarbarian()) {
+
+    public ChatColor getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
+    	ChatColor result = neutralColor;
+    	if(contextKingdom.equals(kingdomManager.getBarbarians())) {
     		result = barbarianColor;
+		} else if(contextKingdom.equals(kingdomManager.getNeutrals())) {
+    		result = neutralColor;
 		} else {
-			if(displayPlayer.getKingdom().equals(contextPlayer.getKingdom())) {
+			if(displayKingdom.equals(contextKingdom)) {
 				result = friendColor1;
     		} else {
-    			if(isArmistice) {
-    				result = armisticeColor1;
-    			} else {
+    			if(kingdomManager.isBothKingdomsEnemy(displayKingdom, contextKingdom)) {
     				result = enemyColor1;
-    			}
+				} else if(kingdomManager.isBothKingdomsAllied(displayKingdom, contextKingdom)) {
+					result = alliedColor;
+				} else if(kingdomManager.isKingdomSanctioned(displayKingdom, contextKingdom)) {
+					result = sanctionedColor;
+				} else {
+					result = peacefulColor;
+				}
     		}
 		}
     	return result;
     }
     
+    public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer) {
+    	return getDisplayPrimaryColor(displayPlayer.getKingdom(),contextPlayer.getKingdom());
+    }
+    
+    /*
     public ChatColor getDisplayPrimaryColor(KonquestGuild displayGuild, KonquestGuild contextGuild) {
     	ChatColor result = ChatColor.RED;
     	boolean isArmistice = guildManager.isArmistice(displayGuild, contextGuild);
@@ -1434,7 +1449,13 @@ public class Konquest implements KonquestAPI, Timeable {
 		}
     	return result;
     }
+    */
     
+    public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory) {
+    	return getDisplayPrimaryColor(displayPlayer.getKingdom(),contextTerritory.getKingdom());
+    }
+    
+    /*
     public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory) {
     	ChatColor result = ChatColor.RED;
     	boolean isArmistice = false;
@@ -1498,14 +1519,41 @@ public class Konquest implements KonquestAPI, Timeable {
 
     	return result;
     }
+    */
     
-    /**
-     * Determines secondary color based on player relationships
-     * @param displayPlayer - The target player to show the color to
-     * @param contextPlayer - The player to base the color from
-     * @param isArmistice - Are the two players in an armistice?
-     * @return Color
-     */
+    public ChatColor getDisplaySecondaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
+    	ChatColor result = neutralColor;
+    	if(contextKingdom.equals(kingdomManager.getBarbarians())) {
+    		result = barbarianColor;
+		} else if(contextKingdom.equals(kingdomManager.getNeutrals())) {
+    		result = neutralColor;
+		} else {
+			if(displayKingdom.equals(contextKingdom)) {
+				result = friendColor2;
+    		} else {
+    			if(kingdomManager.isBothKingdomsEnemy(displayKingdom, contextKingdom)) {
+    				result = enemyColor2;
+				} else if(kingdomManager.isBothKingdomsAllied(displayKingdom, contextKingdom)) {
+					result = alliedColor;
+				} else if(kingdomManager.isKingdomSanctioned(displayKingdom, contextKingdom)) {
+					result = sanctionedColor;
+				} else {
+					result = peacefulColor;
+				}
+    		}
+		}
+    	return result;
+    }
+    
+    public ChatColor getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer) {
+    	return getDisplaySecondaryColor(displayPlayer.getKingdom(),contextPlayer.getKingdom());
+    }
+    
+    public ChatColor getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory) {
+    	return getDisplaySecondaryColor(displayPlayer.getKingdom(),contextTerritory.getKingdom());
+    }
+    
+    /*
     public ChatColor getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer) {
     	ChatColor result = ChatColor.RED;
     	boolean isArmistice = guildManager.isArmistice(displayPlayer, contextPlayer);
@@ -1571,6 +1619,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		}
     	return result;
     }
+    */
     
     public static void playSuccessSound(Player bukkitPlayer) {
     	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {

@@ -60,6 +60,8 @@ public enum CorePath {
 	TRAVEL_CANCEL_ON_MOVE                                 ("core.travel.cancel_on_move"),
 	
 	KINGDOMS_CAPITAL_SUFFIX                               ("core.kingdoms.capital_suffix"),
+	KINGDOMS_INSTANT_WAR                                  ("core.kingdoms.instant_war"),
+	KINGDOMS_INSTANT_PEACE                                ("core.kingdoms.instant_peace"),
 	KINGDOMS_PROTECT_CONTAINERS_USE                       ("core.kingdoms.protect_containers_use"),
 	KINGDOMS_PROTECT_CONTAINERS_BREAK                     ("core.kingdoms.protect_containers_break"),
 	KINGDOMS_NO_ENEMY_EDIT_OFFLINE                        ("core.kingdoms.no_enemy_edit_offline"),
