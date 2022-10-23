@@ -244,7 +244,7 @@ public class TerritoryManager {
 				// Display town info to players in the newly claimed chunk
 	    		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 	    			if(occupant.getBukkitPlayer().getLocation().getChunk().equals(loc.getChunk())) {
-	    				ChatColor color = konquest.getDisplayKingdomColor(occupant.getKingdom(), closestAdjTerr.getKingdom());
+	    				ChatColor color = konquest.getDisplayPrimaryColor(occupant, closestAdjTerr);
 	    				ChatUtil.sendKonTitle(occupant, "", color+closestAdjTerr.getName());
 	    				if(closestAdjTerr instanceof KonBarDisplayer) {
 	    					((KonBarDisplayer)closestAdjTerr).addBarPlayer(occupant);
@@ -416,7 +416,7 @@ public class TerritoryManager {
 			for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 				//if(occupant.getBukkitPlayer().getWorld().equals(claimWorld) && claimedChunks.contains(Konquest.toPoint(occupant.getBukkitPlayer().getLocation()))) {
 				if(closestTerritory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
-					ChatColor color = konquest.getDisplayKingdomColor(occupant.getKingdom(), closestTerritory.getKingdom());
+					ChatColor color = konquest.getDisplayPrimaryColor(occupant, closestTerritory);
 					ChatUtil.sendKonTitle(occupant, "", color+closestTerritory.getName());
 					if(closestTerritory instanceof KonBarDisplayer) {
 						((KonBarDisplayer)closestTerritory).addBarPlayer(occupant);

@@ -75,14 +75,8 @@ public class CommandHandler  implements TabExecutor {
 	                    case INFO:
 	                        new InfoCommand(konquest, sender, args).execute();
 	                        break;
-	                    case JOIN:
-	                        new JoinCommand(konquest, sender, args).execute();
-	                        break;
 	                    case KINGDOM:
 	                        new KingdomCommand(konquest, sender, args).execute();
-	                        break;
-	                    case LEAVE:
-	                        new LeaveCommand(konquest, sender, args).execute();
 	                        break;
 	                    case LIST:
 	                        new ListCommand(konquest, sender, args).execute();
@@ -194,15 +188,9 @@ public class CommandHandler  implements TabExecutor {
 	                    case INFO:
 	                    	tabList.addAll(new InfoCommand(konquest, sender, args).tabComplete());
 	                    	break;
-	                    case JOIN:
-	                    	tabList.addAll(new JoinCommand(konquest, sender, args).tabComplete());
-	                    	break;
 	                    case KINGDOM:
 	                    	tabList.addAll(new KingdomCommand(konquest, sender, args).tabComplete());
 	                        break;
-	                    case LEAVE:
-	                    	tabList.addAll(new LeaveCommand(konquest, sender, args).tabComplete());
-	                    	break;
 	                    case LIST:
 	                    	tabList.addAll(new ListCommand(konquest, sender, args).tabComplete());
 	                    	break;

@@ -1,50 +1,53 @@
-package konquest.display;
+package konquest.display.icon;
 
 import java.util.List;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import konquest.model.KonKingdom;
-import konquest.utility.MessagePath;
+public class OptionIcon implements MenuIcon {
 
-public class KingdomIcon implements MenuIcon {
-
-	private KonKingdom kingdom;
-	private ChatColor contextColor;
-	private Material material;
+	public enum optionAction {
+		TOWN_OPEN,
+		TOWN_PLOT_ONLY,
+		TOWN_REDSTONE,
+		TOWN_GOLEM;
+	}
+	
+	private optionAction action;
+	private String name;
 	private List<String> lore;
+	private Material mat;
 	private int index;
 	private ItemStack item;
 	
-	public KingdomIcon(KonKingdom kingdom, ChatColor contextColor, Material material, List<String> lore, int index) {
-		this.kingdom = kingdom;
-		this.contextColor = contextColor;
-		this.material = material;
+	public OptionIcon(optionAction action, String name, List<String> lore, Material mat, int index) {
+		this.action = action;
+		this.name = name;
 		this.lore = lore;
+		this.mat = mat;
 		this.index = index;
 		this.item = initItem();
 	}
 	
 	private ItemStack initItem() {
-		ItemStack item = new ItemStack(material,1);
+		ItemStack item = new ItemStack(mat);
 		ItemMeta meta = item.getItemMeta();
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
 				meta.addItemFlags(flag);
 			}
 		}
-		meta.setDisplayName(contextColor+kingdom.getName());
+		meta.setDisplayName(getName());
 		meta.setLore(lore);
 		item.setItemMeta(meta);
 		return item;
 	}
 	
-	public KonKingdom getKingdom() {
-		return kingdom;
+	public optionAction getAction() {
+		return action;
 	}
 	
 	@Override
@@ -54,10 +57,6 @@ public class KingdomIcon implements MenuIcon {
 
 	@Override
 	public String getName() {
-		String name = kingdom.getName();
-		if(name.equalsIgnoreCase("barbarians")) {
-			name = MessagePath.LABEL_BARBARIANS.getMessage();
-		}
 		return name;
 	}
 

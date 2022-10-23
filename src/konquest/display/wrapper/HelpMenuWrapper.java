@@ -9,9 +9,9 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.command.CommandType;
-import konquest.display.CommandIcon;
-import konquest.display.InfoIcon;
-import konquest.display.MenuIcon;
+import konquest.display.icon.CommandIcon;
+import konquest.display.icon.InfoIcon;
+import konquest.display.icon.MenuIcon;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;

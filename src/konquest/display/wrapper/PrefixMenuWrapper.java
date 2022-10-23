@@ -13,10 +13,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
-import konquest.display.MenuIcon;
-import konquest.display.PrefixCustomIcon;
-import konquest.display.PrefixIcon;
-import konquest.display.PrefixIcon.PrefixIconAction;
+import konquest.display.icon.MenuIcon;
+import konquest.display.icon.PrefixCustomIcon;
+import konquest.display.icon.PrefixIcon;
+import konquest.display.icon.PrefixIcon.PrefixIconAction;
 import konquest.manager.DisplayManager;
 import konquest.model.KonCustomPrefix;
 import konquest.model.KonPlayer;

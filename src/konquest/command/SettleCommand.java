@@ -85,7 +85,7 @@ public class SettleCommand extends CommandBase {
 				return;
 			}
         	// Add town
-        	int settleStatus = getKonquest().getKingdomManager().addTown(bukkitPlayer.getLocation(), townName, player.getKingdom().getName());
+        	int settleStatus = getKonquest().getKingdomManager().createTown(bukkitPlayer.getLocation(), townName, player.getKingdom().getName());
         	if(settleStatus == 0) { // on successful settle..
         		KonTown town = player.getKingdom().getTown(townName);
         		// Teleport player to safe place around monument, facing monument

@@ -1,4 +1,4 @@
-package konquest.display;
+package konquest.display.icon;
 
 import java.util.List;
 
@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import konquest.Konquest;
 import konquest.model.KonTown;
 import konquest.utility.MessagePath;
 
@@ -22,17 +21,9 @@ public class TownIcon implements MenuIcon {
 	private int index;
 	private ItemStack item;
 	
-	public TownIcon(KonTown town, boolean isFriendly, boolean isArmistice, Material material, List<String> lore, int index) {
+	public TownIcon(KonTown town, ChatColor contextColor, Material material, List<String> lore, int index) {
 		this.town = town;
-		if(isFriendly) {
-			contextColor = Konquest.friendColor1;
-		} else {
-			if(isArmistice) {
-				contextColor = Konquest.armisticeColor1;
-			} else {
-				contextColor = Konquest.enemyColor1;
-			}
-		}
+		this.contextColor = contextColor;
 		this.material = material;
 		this.lore = lore;
 		this.index = index;

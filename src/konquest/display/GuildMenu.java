@@ -14,7 +14,12 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Villager;
 
 import konquest.Konquest;
-import konquest.display.PlayerIcon.PlayerIconAction;
+import konquest.display.icon.GuildIcon;
+import konquest.display.icon.InfoIcon;
+import konquest.display.icon.MenuIcon;
+import konquest.display.icon.PlayerIcon;
+import konquest.display.icon.ProfessionIcon;
+import konquest.display.icon.PlayerIcon.PlayerIconAction;
 import konquest.manager.DisplayManager;
 import konquest.manager.GuildManager;
 import konquest.model.KonGuild;

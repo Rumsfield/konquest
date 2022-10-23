@@ -13,11 +13,11 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.display.InfoIcon;
-import konquest.display.MenuIcon;
-import konquest.display.PlayerIcon;
-import konquest.display.TownIcon;
-import konquest.display.PlayerIcon.PlayerIconAction;
+import konquest.display.icon.InfoIcon;
+import konquest.display.icon.MenuIcon;
+import konquest.display.icon.PlayerIcon;
+import konquest.display.icon.TownIcon;
+import konquest.display.icon.PlayerIcon.PlayerIconAction;
 import konquest.manager.DisplayManager;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;

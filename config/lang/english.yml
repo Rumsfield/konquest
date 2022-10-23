@@ -78,7 +78,9 @@ placeholder:
   friendly: "Friendly"
   enemy: "Enemy"
   barbarian: "Barbarian"
-  armistice: "Armistice"
+  ally: "Ally"
+  sanctioned: "Sanctioned"
+  peaceful: "Peaceful"
 map:
   barbarian: "Barbarian"
   barbarians: "Barbarians"
@@ -340,6 +342,7 @@ command:
         full: "Successfully reset player %s exile kingdom to Barbarians."
       error:
         fail: "Could not exile player, already barbarian or bad random wild location."
+        master: "Could not exile player, they are a kingdom master. Force transfer master or remove the kingdom first."
     forcejoin:
       notice:
         success: "Successfully set player %s to kingdom %s."
@@ -455,6 +458,7 @@ command:
       town: "Banished from %s!"
     error:
       cooldown: "You must wait before becoming a barbarian: %s"
+      master: "You are a kingdom master! Transfer master or disband your kingdom first."
   favor:
     notice:
       message: "You have %s Favor, costs are..."

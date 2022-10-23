@@ -62,6 +62,8 @@ public enum CorePath {
 	KINGDOMS_CAPITAL_SUFFIX                               ("core.kingdoms.capital_suffix"),
 	KINGDOMS_INSTANT_WAR                                  ("core.kingdoms.instant_war"),
 	KINGDOMS_INSTANT_PEACE                                ("core.kingdoms.instant_peace"),
+	KINGDOMS_ALLOW_SANCTIONED_PVP                         ("core.kingdoms.allow_sanctioned_pvp"),
+	KINGDOMS_ALLOW_PEACEFUL_PVP                           ("core.kingdoms.allow_peaceful_pvp"),
 	KINGDOMS_PROTECT_CONTAINERS_USE                       ("core.kingdoms.protect_containers_use"),
 	KINGDOMS_PROTECT_CONTAINERS_BREAK                     ("core.kingdoms.protect_containers_break"),
 	KINGDOMS_NO_ENEMY_EDIT_OFFLINE                        ("core.kingdoms.no_enemy_edit_offline"),

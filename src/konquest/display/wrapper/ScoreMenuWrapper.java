@@ -7,11 +7,11 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
-import konquest.display.InfoIcon;
-import konquest.display.KingdomIcon;
-import konquest.display.MenuIcon;
-import konquest.display.PlayerIcon;
-import konquest.display.PlayerIcon.PlayerIconAction;
+import konquest.display.icon.InfoIcon;
+import konquest.display.icon.KingdomIcon;
+import konquest.display.icon.MenuIcon;
+import konquest.display.icon.PlayerIcon;
+import konquest.display.icon.PlayerIcon.PlayerIconAction;
 import konquest.manager.DisplayManager;
 import konquest.model.KonKingdomScoreAttributes;
 import konquest.model.KonLeaderboard;

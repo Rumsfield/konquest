@@ -4,12 +4,14 @@ import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
+import konquest.utility.CorePath;
 import konquest.utility.MessagePath;
 import konquest.utility.Timer;
 //import net.milkbowl.vault.economy.EconomyResponse;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -81,20 +83,26 @@ public class ExileCommand extends CommandBase {
         			
         		} else {
         			// Exile the player
-        			if(getKonquest().getKingdomManager().exilePlayer(player,true,true,false)) {
-            			boolean doRemoveFavor = getKonquest().getConfigManager().getConfig("core").getBoolean("core.exile.remove_favor", true);
+        			UUID id = bukkitPlayer.getUniqueId();
+        			int status = getKonquest().getKingdomManager().exilePlayerBarbarian(id,true,true,false);
+        			
+        			if(status == 0) {
+        				boolean doRemoveFavor = getKonquest().getConfigManager().getConfig("core").getBoolean(CorePath.EXILE_REMOVE_FAVOR.getPath(), true);
             			if(doRemoveFavor) {
 	            			double balance = KonquestPlugin.getBalance(bukkitPlayer);
 	            			KonquestPlugin.withdrawPlayer(bukkitPlayer, balance);
             			}
-                    	//ChatUtil.sendNotice((Player) getSender(), ChatColor.GRAY+"You have been exiled as a "+ChatColor.DARK_RED+"Barbarian"+ChatColor.GRAY+", place a bed to create your Camp.");
                     	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_EXILE_NOTICE_CONFIRMED.getMessage());
                     	player.setIsExileConfirmed(false);
                     	player.getExileConfirmTimer().stopTimer();
                     	// Apply cooldown
                     	getKonquest().getKingdomManager().applyPlayerExileCooldown(bukkitPlayer);
-            		} else {
-            			//ChatUtil.sendError((Player) getSender(), "Internal error, could not exile. Contact an Admin!");
+        			} else if(status == 4) {
+        				//Do nothing
+        				ChatUtil.printDebug("Exile cancelled by event");
+        			} else if(status == 5) {
+        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_EXILE_ERROR_MASTER.getMessage());
+        			} else {
             			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
             		}
         		}

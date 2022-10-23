@@ -77,7 +77,6 @@ public class KonquestPlugin extends JavaPlugin {
 			konquest.getKingdomManager().saveKingdoms();
 			konquest.getCampManager().saveCamps();
 			konquest.getRuinManager().saveRuins();
-			konquest.getGuildManager().saveGuilds();
 			konquest.getRuinManager().removeAllGolems();
 			konquest.getKingdomManager().removeAllRabbits();
 			konquest.getConfigManager().saveConfigs();

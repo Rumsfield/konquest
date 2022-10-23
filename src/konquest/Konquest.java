@@ -84,6 +84,16 @@ import konquest.database.DatabaseThread;
 
 public class Konquest implements KonquestAPI, Timeable {
 
+	public enum RelationRole {
+		BARBARIAN,
+		NEUTRAL,
+		FRIENDLY,
+		ENEMY,
+		ALLIED,
+		SANCTIONED,
+		PEACEFUL;
+	}
+	
 	private KonquestPlugin plugin;
 	private static Konquest instance;
 	private static String chatTag;
@@ -1405,28 +1415,64 @@ public class Konquest implements KonquestAPI, Timeable {
     	}
     }
     
-
-    public ChatColor getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
-    	ChatColor result = neutralColor;
+    public RelationRole getRelationRole(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
+    	RelationRole result = RelationRole.NEUTRAL;
     	if(contextKingdom.equals(kingdomManager.getBarbarians())) {
-    		result = barbarianColor;
+    		result = RelationRole.BARBARIAN;
 		} else if(contextKingdom.equals(kingdomManager.getNeutrals())) {
-    		result = neutralColor;
+    		result = RelationRole.NEUTRAL;
 		} else {
 			if(displayKingdom.equals(contextKingdom)) {
-				result = friendColor1;
+				result = RelationRole.FRIENDLY;
     		} else {
     			if(kingdomManager.isBothKingdomsEnemy(displayKingdom, contextKingdom)) {
-    				result = enemyColor1;
+    				result = RelationRole.ENEMY;
 				} else if(kingdomManager.isBothKingdomsAllied(displayKingdom, contextKingdom)) {
-					result = alliedColor;
+					result = RelationRole.ALLIED;
 				} else if(kingdomManager.isKingdomSanctioned(displayKingdom, contextKingdom)) {
-					result = sanctionedColor;
+					result = RelationRole.SANCTIONED;
+				} else if(kingdomManager.isKingdomPeaceful(displayKingdom, contextKingdom)) {
+					result = RelationRole.PEACEFUL;
 				} else {
-					result = peacefulColor;
+					result = RelationRole.NEUTRAL;
 				}
     		}
 		}
+    	return result;
+    }
+    
+    public boolean isPlayerEnemy(KonOfflinePlayer offlinePlayer, KonKingdom kingdom) {
+    	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.ENEMY);
+    }
+
+    public ChatColor getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
+    	ChatColor result = neutralColor;
+    	RelationRole role = getRelationRole(displayKingdom,contextKingdom);
+    	switch(role) {
+	    	case BARBARIAN:
+	    		result = barbarianColor;
+	    		break;
+	    	case NEUTRAL:
+	    		result = neutralColor;
+	    		break;
+	    	case ENEMY:
+	    		result = enemyColor1;
+	    		break;
+	    	case FRIENDLY:
+	    		result = friendColor1;
+	    		break;
+	    	case ALLIED:
+	    		result = alliedColor;
+	    		break;
+	    	case SANCTIONED:
+	    		result = sanctionedColor;
+	    		break;
+	    	case PEACEFUL:
+	    		result = peacefulColor;
+	    		break;
+    		default:
+    			break;
+    	}
     	return result;
     }
     
@@ -1523,25 +1569,32 @@ public class Konquest implements KonquestAPI, Timeable {
     
     public ChatColor getDisplaySecondaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
     	ChatColor result = neutralColor;
-    	if(contextKingdom.equals(kingdomManager.getBarbarians())) {
-    		result = barbarianColor;
-		} else if(contextKingdom.equals(kingdomManager.getNeutrals())) {
-    		result = neutralColor;
-		} else {
-			if(displayKingdom.equals(contextKingdom)) {
-				result = friendColor2;
-    		} else {
-    			if(kingdomManager.isBothKingdomsEnemy(displayKingdom, contextKingdom)) {
-    				result = enemyColor2;
-				} else if(kingdomManager.isBothKingdomsAllied(displayKingdom, contextKingdom)) {
-					result = alliedColor;
-				} else if(kingdomManager.isKingdomSanctioned(displayKingdom, contextKingdom)) {
-					result = sanctionedColor;
-				} else {
-					result = peacefulColor;
-				}
-    		}
-		}
+    	RelationRole role = getRelationRole(displayKingdom,contextKingdom);
+    	switch(role) {
+	    	case BARBARIAN:
+	    		result = barbarianColor;
+	    		break;
+	    	case NEUTRAL:
+	    		result = neutralColor;
+	    		break;
+	    	case ENEMY:
+	    		result = enemyColor2;
+	    		break;
+	    	case FRIENDLY:
+	    		result = friendColor2;
+	    		break;
+	    	case ALLIED:
+	    		result = alliedColor;
+	    		break;
+	    	case SANCTIONED:
+	    		result = sanctionedColor;
+	    		break;
+	    	case PEACEFUL:
+	    		result = peacefulColor;;
+	    		break;
+    		default:
+    			break;
+    	}
     	return result;
     }
     

@@ -10,10 +10,10 @@ import java.util.HashMap;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
+import konquest.Konquest.RelationRole;
 import konquest.KonquestPlugin;
 import konquest.api.manager.KonquestPlaceholderManager;
 import konquest.api.model.KonquestTerritoryType;
-import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
@@ -313,12 +313,14 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
     	return result;
 	}
 	
+	/*
 	public String getGuild(Player player) {
 		String result = "";
 		KonGuild guild = konquest.getGuildManager().getPlayerGuild(player);
     	result = guild == null ? "" : guild.getName();
     	return result;
 	}
+	*/
 	
 	/*
 	 * Placeholder Relational Requesters
@@ -329,20 +331,31 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		KonPlayer onlinePlayerOne = playerManager.getPlayer(playerOne);
 		KonPlayer onlinePlayerTwo = playerManager.getPlayer(playerTwo);
 		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
-			boolean isArmistice = konquest.getGuildManager().isArmistice(onlinePlayerOne, onlinePlayerTwo);
-	    	if(onlinePlayerTwo.isBarbarian()) {
-	    		result = MessagePath.PLACEHOLDER_BARBARIAN.getMessage();
-			} else {
-				if(onlinePlayerOne.getKingdom().equals(onlinePlayerTwo.getKingdom())) {
-					result = MessagePath.PLACEHOLDER_FRIENDLY.getMessage();
-	    		} else {
-	    			if(isArmistice) {
-	    				result = MessagePath.PLACEHOLDER_ARMISTICE.getMessage();
-	    			} else {
-	    				result = MessagePath.PLACEHOLDER_ENEMY.getMessage();
-	    			}
-	    		}
-			}
+			KonKingdom kingdomOne = onlinePlayerOne.getKingdom();
+			KonKingdom kingdomTwo = onlinePlayerTwo.getKingdom();
+			RelationRole role = konquest.getRelationRole(kingdomOne, kingdomTwo);
+			switch(role) {
+		    	case BARBARIAN:
+		    		result = MessagePath.PLACEHOLDER_BARBARIAN.getMessage();;
+		    		break;
+		    	case ENEMY:
+		    		result = MessagePath.PLACEHOLDER_ENEMY.getMessage();
+		    		break;
+		    	case FRIENDLY:
+		    		result = MessagePath.PLACEHOLDER_FRIENDLY.getMessage();
+		    		break;
+		    	case ALLIED:
+		    		result = MessagePath.PLACEHOLDER_ALLY.getMessage();
+		    		break;
+		    	case SANCTIONED:
+		    		result = MessagePath.PLACEHOLDER_SANCTIONED.getMessage();
+		    		break;
+		    	case PEACEFUL:
+		    		result = MessagePath.PLACEHOLDER_PEACEFUL.getMessage();
+		    		break;
+	    		default:
+	    			break;
+	    	}
 		}
 		return result;
 	}

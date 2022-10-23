@@ -7,9 +7,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
-import konquest.display.ArmorIcon;
-import konquest.display.MenuIcon;
-import konquest.display.ShieldIcon;
+import konquest.display.icon.ArmorIcon;
+import konquest.display.icon.MenuIcon;
+import konquest.display.icon.ShieldIcon;
 import konquest.manager.DisplayManager;
 import konquest.model.KonArmor;
 import konquest.model.KonPlayer;

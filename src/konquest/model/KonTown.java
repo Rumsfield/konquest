@@ -9,11 +9,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import konquest.Konquest;
+import konquest.Konquest.RelationRole;
 import konquest.api.model.KonquestUpgrade;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestTown;
 import konquest.utility.BlockPaster;
 import konquest.utility.ChatUtil;
+import konquest.utility.CorePath;
 import konquest.utility.MessagePath;
 import konquest.utility.RequestKeeper;
 import konquest.utility.Timeable;
@@ -57,9 +59,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private HashMap<UUID, Timer> playerTravelTimers;
 	private boolean isCaptureDisabled;
 	private boolean isRaidAlertDisabled;
-	private BossBar monumentBarAllies;
+	private BossBar monumentBarFriendlies;
 	private BossBar monumentBarEnemies;
-	private BossBar monumentBarArmistice;
+	private BossBar monumentBarAllies;
+	private BossBar monumentBarSanctioned;
+	private BossBar monumentBarPeaceful;
 	private UUID lord;
 	private HashMap<UUID,Boolean> residents;
 	private RequestKeeper joinRequestKeeper;
@@ -93,15 +97,23 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.playerTravelTimers = new HashMap<UUID, Timer>();
 		this.isCaptureDisabled = false;
 		this.isRaidAlertDisabled = false;
-		this.monumentBarAllies = Bukkit.getServer().createBossBar(Konquest.friendColor1+name, ChatUtil.mapBarColor(Konquest.friendColor1), BarStyle.SOLID);
-		this.monumentBarAllies.setVisible(true);
-		this.monumentBarAllies.setProgress(1.0);
+		// Display bars
+		this.monumentBarFriendlies = Bukkit.getServer().createBossBar(Konquest.friendColor1+name, ChatUtil.mapBarColor(Konquest.friendColor1), BarStyle.SOLID);
+		this.monumentBarFriendlies.setVisible(true);
+		this.monumentBarFriendlies.setProgress(1.0);
 		this.monumentBarEnemies = Bukkit.getServer().createBossBar(Konquest.enemyColor1+name, ChatUtil.mapBarColor(Konquest.enemyColor1), BarStyle.SOLID);
 		this.monumentBarEnemies.setVisible(true);
 		this.monumentBarEnemies.setProgress(1.0);
-		this.monumentBarArmistice = Bukkit.getServer().createBossBar(Konquest.armisticeColor1+name, ChatUtil.mapBarColor(Konquest.armisticeColor1), BarStyle.SOLID);
-		this.monumentBarArmistice.setVisible(true);
-		this.monumentBarArmistice.setProgress(1.0);
+		this.monumentBarAllies = Bukkit.getServer().createBossBar(Konquest.alliedColor+name, ChatUtil.mapBarColor(Konquest.alliedColor), BarStyle.SOLID);
+		this.monumentBarAllies.setVisible(true);
+		this.monumentBarAllies.setProgress(1.0);
+		this.monumentBarSanctioned = Bukkit.getServer().createBossBar(Konquest.sanctionedColor+name, ChatUtil.mapBarColor(Konquest.sanctionedColor), BarStyle.SOLID);
+		this.monumentBarSanctioned.setVisible(true);
+		this.monumentBarSanctioned.setProgress(1.0);
+		this.monumentBarPeaceful = Bukkit.getServer().createBossBar(Konquest.peacefulColor+name, ChatUtil.mapBarColor(Konquest.peacefulColor), BarStyle.SOLID);
+		this.monumentBarPeaceful.setVisible(true);
+		this.monumentBarPeaceful.setProgress(1.0);
+		// Other stuff
 		this.lord = null; // init with no lord
 		this.residents = new HashMap<UUID,Boolean>();
 		this.joinRequestKeeper = new RequestKeeper();
@@ -790,58 +802,83 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public void updateBarPlayers() {
-		monumentBarAllies.removeAll();
+		monumentBarFriendlies.removeAll();
 		monumentBarEnemies.removeAll();
-		monumentBarArmistice.removeAll();
-		//shieldArmorBarAll.removeAll();
+		monumentBarAllies.removeAll();
+		monumentBarSanctioned.removeAll();
+		monumentBarPeaceful.removeAll();
 		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
 			Player bukkitPlayer = player.getBukkitPlayer();
 			if(isLocInside(bukkitPlayer.getLocation())) {
-				if(player.getKingdom().equals(getKingdom())) {
-					monumentBarAllies.addPlayer(bukkitPlayer);
-				} else {
-					if(getKonquest().getGuildManager().isArmistice(player, this)) {
-						monumentBarArmistice.addPlayer(bukkitPlayer);
-					} else {
-						monumentBarEnemies.addPlayer(bukkitPlayer);
-					}
-				}
-				//shieldArmorBarAll.addPlayer(bukkitPlayer);
+				RelationRole role = getKonquest().getRelationRole(player.getKingdom(),getKingdom());
+				switch(role) {
+			    	case ENEMY:
+			    		monumentBarEnemies.addPlayer(bukkitPlayer);
+			    		break;
+			    	case FRIENDLY:
+			    		monumentBarFriendlies.addPlayer(bukkitPlayer);
+			    		break;
+			    	case ALLIED:
+			    		monumentBarAllies.addPlayer(bukkitPlayer);
+			    		break;
+			    	case SANCTIONED:
+			    		monumentBarSanctioned.addPlayer(bukkitPlayer);
+			    		break;
+			    	case PEACEFUL:
+			    		monumentBarPeaceful.addPlayer(bukkitPlayer);
+			    		break;
+		    		default:
+		    			break;
+		    	}
 			}
 		}
 	}
 	
 	public void addBarPlayer(KonPlayer player) {
-		if(player.getKingdom().equals(getKingdom())) {
-			monumentBarAllies.addPlayer(player.getBukkitPlayer());
-		} else {
-			if(getKonquest().getGuildManager().isArmistice(player, this)) {
-				monumentBarArmistice.addPlayer(player.getBukkitPlayer());
-			} else {
-				monumentBarEnemies.addPlayer(player.getBukkitPlayer());
-			}
+		RelationRole role = getKonquest().getRelationRole(player.getKingdom(),getKingdom());
+		switch(role) {
+	    	case ENEMY:
+	    		monumentBarEnemies.addPlayer(player.getBukkitPlayer());
+	    		break;
+	    	case FRIENDLY:
+	    		monumentBarFriendlies.addPlayer(player.getBukkitPlayer());
+	    		break;
+	    	case ALLIED:
+	    		monumentBarAllies.addPlayer(player.getBukkitPlayer());
+	    		break;
+	    	case SANCTIONED:
+	    		monumentBarSanctioned.addPlayer(player.getBukkitPlayer());
+	    		break;
+	    	case PEACEFUL:
+	    		monumentBarPeaceful.addPlayer(player.getBukkitPlayer());
+	    		break;
+			default:
+				break;
 		}
-		//shieldArmorBarAll.addPlayer(player.getBukkitPlayer());
 	}
 	
 	public void removeBarPlayer(KonPlayer player) {
-		monumentBarAllies.removePlayer(player.getBukkitPlayer());
+		monumentBarFriendlies.removePlayer(player.getBukkitPlayer());
 		monumentBarEnemies.removePlayer(player.getBukkitPlayer());
-		monumentBarArmistice.removePlayer(player.getBukkitPlayer());
-		//shieldArmorBarAll.removePlayer(player.getBukkitPlayer());
+		monumentBarAllies.removePlayer(player.getBukkitPlayer());
+		monumentBarSanctioned.removePlayer(player.getBukkitPlayer());
+		monumentBarPeaceful.removePlayer(player.getBukkitPlayer());
 	}
 	
 	public void removeAllBarPlayers() {
-		monumentBarAllies.removeAll();
+		monumentBarFriendlies.removeAll();
 		monumentBarEnemies.removeAll();
-		monumentBarArmistice.removeAll();
-		//shieldArmorBarAll.removeAll();
+		monumentBarAllies.removeAll();
+		monumentBarSanctioned.removeAll();
+		monumentBarPeaceful.removeAll();
 	}
 	
 	public void setBarProgress(double prog) {
-		monumentBarAllies.setProgress(prog);
+		monumentBarFriendlies.setProgress(prog);
 		monumentBarEnemies.setProgress(prog);
-		monumentBarArmistice.setProgress(prog);
+		monumentBarAllies.setProgress(prog);
+		monumentBarSanctioned.setProgress(prog);
+		monumentBarPeaceful.setProgress(prog);
 	}
 	
 	public void setAttacked(boolean val, KonPlayer attacker) {
@@ -892,7 +929,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		 */
 		String separator = " - ";
 		int remainingSeconds = 0;
-		String remainingTime = "";
 		String armor = MessagePath.LABEL_ARMOR.getMessage();
 		String shield = MessagePath.LABEL_SHIELD.getMessage();
 		String critical = MessagePath.LABEL_CRITICAL_HITS.getMessage();
@@ -900,54 +936,60 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		// Set title conditions
 		if(isShielded && isArmored) {
 			remainingSeconds = getRemainingShieldTimeSeconds();
-			remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor1);
-			monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+remainingTime);
-			remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor1);
-			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+remainingTime);
-			remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.armisticeColor1);
-			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+remainingTime);
+			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor1));
+			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor1));
+			monumentBarAllies.setTitle(Konquest.alliedColor+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor));
+			monumentBarSanctioned.setTitle(Konquest.sanctionedColor+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.sanctionedColor));
+			monumentBarPeaceful.setTitle(Konquest.peacefulColor+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor));
 		} else if(isShielded) {
 			remainingSeconds = getRemainingShieldTimeSeconds();
-			remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor1);
-			monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+shield+" "+remainingTime);
-			remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor1);
-			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+shield+" "+remainingTime);
-			remainingTime = Konquest.getTimeFormat(remainingSeconds,Konquest.armisticeColor1);
-			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+separator+shield+" "+remainingTime);
+			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor1));
+			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor1));
+			monumentBarAllies.setTitle(Konquest.alliedColor+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor));
+			monumentBarSanctioned.setTitle(Konquest.sanctionedColor+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.sanctionedColor));
+			monumentBarPeaceful.setTitle(Konquest.peacefulColor+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor));
 		} else if(isArmored) {
-			monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName()+separator+armorCurrentBlocks+" "+armor);
 			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+armorCurrentBlocks+" "+armor);
-			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarAllies.setTitle(Konquest.alliedColor+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarSanctioned.setTitle(Konquest.sanctionedColor+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarPeaceful.setTitle(Konquest.peacefulColor+getName()+separator+armorCurrentBlocks+" "+armor);
 		} else if(isAttacked) {
-			monumentBarAllies.setTitle(Konquest.friendColor1+getName()+separator+critical);
+			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName()+separator+critical);
 			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+critical);
-			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName()+separator+critical);
+			monumentBarAllies.setTitle(Konquest.alliedColor+getName()+separator+critical);
+			monumentBarSanctioned.setTitle(Konquest.sanctionedColor+getName()+separator+critical);
+			monumentBarPeaceful.setTitle(Konquest.peacefulColor+getName()+separator+critical);
 		} else {
-			monumentBarAllies.setTitle(Konquest.friendColor1+getName());
+			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName());
 			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName());
-			monumentBarArmistice.setTitle(Konquest.armisticeColor1+getName());
+			monumentBarAllies.setTitle(Konquest.alliedColor+getName());
+			monumentBarSanctioned.setTitle(Konquest.sanctionedColor+getName());
+			monumentBarPeaceful.setTitle(Konquest.peacefulColor+getName());
 		}
 		
 		// Set progress conditions
 		if(isShielded || isArmored) {
-			monumentBarAllies.setStyle(BarStyle.SEGMENTED_10);
-			monumentBarEnemies.setStyle(BarStyle.SEGMENTED_10);
-			monumentBarArmistice.setStyle(BarStyle.SEGMENTED_10);
+			setAllBarStyle(BarStyle.SEGMENTED_10);
 			setBarProgress(armorProgress);
 		} else if(isAttacked) {
-			monumentBarAllies.setStyle(BarStyle.SOLID);
-			monumentBarEnemies.setStyle(BarStyle.SOLID);
-			monumentBarArmistice.setStyle(BarStyle.SOLID);
+			setAllBarStyle(BarStyle.SOLID);
 			// Set bar with critical hits
 			int maxCriticalhits = getKonquest().getKingdomManager().getMaxCriticalHits();
 			double progress = (double)(maxCriticalhits - getMonument().getCriticalHits()) / (double)maxCriticalhits;
 			setBarProgress(progress);
 		} else {
-			monumentBarAllies.setStyle(BarStyle.SOLID);
-			monumentBarEnemies.setStyle(BarStyle.SOLID);
-			monumentBarArmistice.setStyle(BarStyle.SOLID);
+			setAllBarStyle(BarStyle.SOLID);
 			setBarProgress(1.0);
 		}
+	}
+	
+	private void setAllBarStyle(BarStyle style) {
+		monumentBarFriendlies.setStyle(style);
+		monumentBarEnemies.setStyle(style);
+		monumentBarAllies.setStyle(style);
+		monumentBarSanctioned.setStyle(style);
+		monumentBarPeaceful.setStyle(style);
 	}
 	
 	public boolean addDefender(Player bukkitPlayer) {
@@ -995,14 +1037,14 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
     	if(!isAttacked() && !isGolemOffensive()) {
     		return;
     	}
-    	// Command all nearby Iron Golems to target closest player, if enemy exists nearby, else don't change target
+    	// Command all nearby Iron Golems to target closest enemy player, if enemy exists nearby, else don't change target
     	// Find iron golems within the town max radius
-    	// Do not update targets if triggering player is in an armistice with this town
-    	boolean isTriggerPlayerArmistice = getKonquest().getGuildManager().isArmistice(triggerPlayer, this);
-    	boolean isGolemAttackEnemies = getKonquest().getConfigManager().getConfig("core").getBoolean("core.kingdoms.golem_attack_enemies");
-		if(isGolemAttackEnemies && !triggerPlayer.isAdminBypassActive() && !triggerPlayer.getKingdom().equals(getKingdom()) && !isTriggerPlayerArmistice) {
+    	// Do not update targets if triggering player is not an enemy of this town
+    	boolean isTriggerPlayerEnemy = getKonquest().isPlayerEnemy(triggerPlayer, getKingdom());
+    	boolean isGolemAttackEnemies = getKonquest().getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_GOLEM_ATTACK_ENEMIES.getPath());
+		if(isGolemAttackEnemies && !triggerPlayer.isAdminBypassActive() && !triggerPlayer.getKingdom().equals(getKingdom()) && isTriggerPlayerEnemy) {
 			Location centerLoc = getCenterLoc();
-			int golumSearchRange = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_size",1); // chunks
+			int golumSearchRange = getKonquest().getConfigManager().getConfig("core").getInt(CorePath.TOWNS_MAX_SIZE.getPath(),1); // chunks
 			int radius = 16*16;
 			if(golumSearchRange > 1) {
 				radius = golumSearchRange*16;
@@ -1022,10 +1064,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 							if(nearbyPlayer != null && !nearbyPlayer.isAdminBypassActive() && !nearbyPlayer.getKingdom().equals(getKingdom()) && isLocInside(p.getLocation()) &&
 									(useTriggerPlayerAsTarget || !nearbyPlayer.equals(triggerPlayer))) {
 								// Found nearby player that might be a valid target
-								// Check for closest distance, and that the player is not in an armistice with this town
-								boolean isArmistice = getKonquest().getGuildManager().isArmistice(nearbyPlayer, this);
+								// Check for closest distance, and that the player is an enemy
+								boolean isEnemy = getKonquest().isPlayerEnemy(nearbyPlayer, getKingdom());
 								double distance = golem.getLocation().distance(p.getLocation());
-								if(distance < minDistance && !isArmistice) {
+								if(distance < minDistance && isEnemy) {
 									minDistance = distance;
 									isNearbyPlayer = true;
 									nearestPlayer = nearbyPlayer;

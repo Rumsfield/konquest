@@ -49,8 +49,6 @@ permissions:
     default: op
     children:
       konquest.command.help: true
-      konquest.command.join: true
-      konquest.command.leave: true
       konquest.command.exile: true
       konquest.command.info: true
       konquest.command.chat: true
@@ -67,21 +65,12 @@ permissions:
       konquest.command.stats: true
       konquest.command.prefix: true
       konquest.command.town: true
-      konquest.command.guild: true
       konquest.command.fly: true
       konquest.command.border: true
       konquest.command.admin.*: true
 
   konquest.command.help:
     description: Display help in chat
-    default: true
-
-  konquest.command.join:
-    description: Join a kingdom or town
-    default: true
-    
-  konquest.command.leave:
-    description: Leave a town
     default: true
 
   konquest.command.exile:
@@ -146,10 +135,6 @@ permissions:
     
   konquest.command.town:
     description: Manage a town
-    default: true
-
-  konquest.command.guild:
-    description: Manage a kingdom guild
     default: true
 
   konquest.command.fly:

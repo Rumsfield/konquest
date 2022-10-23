@@ -1,4 +1,4 @@
-package konquest.display;
+package konquest.display.icon;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package konquest.display;
+package konquest.display.icon;
 
 import org.bukkit.inventory.ItemStack;
 
