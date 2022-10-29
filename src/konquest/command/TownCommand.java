@@ -28,7 +28,7 @@ public class TownCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		// k town <name> add|kick|knight|lord|rename|upgrade|shield|options|plots [arg]
+		// k town <name> join|leave|add|kick|knight|lord|rename|upgrade|shield|options|plots [arg]
 		if (getArgs().length != 3 && getArgs().length != 4) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
@@ -44,6 +44,12 @@ public class TownCommand extends CommandBase {
     		}
     		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	
+    		// Verify player is not a barbarian
+    		if(player.isBarbarian()) {
+    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+        		return;
+    		}
+    		
         	// Verify town exists within sender's Kingdom
         	if(!player.getKingdom().hasTown(townName)) {
         		//ChatUtil.sendError((Player) getSender(), "No such Town in your Kingdom");
@@ -92,48 +98,80 @@ public class TownCommand extends CommandBase {
             	}
         		getKonquest().getDisplayManager().displayTownOptionsMenu(bukkitPlayer, town);
         		break;
-        	/*
-        	case "open":
-        		// Verify player is lord of the Town
-            	if(!town.isPlayerLord(player.getOfflineBukkitPlayer())) {
-            		//ChatUtil.sendError((Player) getSender(), "You must be the Lord of "+townName+" to do this");
-            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-            		return;
-            	}
-            	if(town.isOpen()) {
-            		//ChatUtil.sendNotice((Player) getSender(), townName+" is already open for access by all players");
-            		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_OPEN.getMessage(townName));
-            	} else {
-            		town.setIsOpen(true);
-            		for(OfflinePlayer resident : town.getPlayerResidents()) {
-		    			if(resident.isOnline()) {
-		    				//ChatUtil.sendNotice((Player) resident, "Opened "+townName+" for access by all players");
-		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_OPEN.getMessage(townName));
-		    			}
-		    		}
-            	}
+        		
+        	case "join":
+        		// Attempt to join the given town name
+        		if(!player.isBarbarian()) {
+        			if(town.isPlayerResident(bukkitPlayer)) {
+        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_JOIN_ERROR_TOWN_MEMBER.getMessage(townName));
+        				return;
+        			}
+        			UUID myId = bukkitPlayer.getUniqueId();
+        			if(town.isOpen() || town.isJoinInviteValid(myId)) {
+        				// There is an existing invite to join, or the town is open, add the player as a resident
+        				town.removeJoinRequest(myId);
+    	    			// Add the player as a resident
+    			    	if(town.addPlayerResident(bukkitPlayer,false)) {
+    			    		for(OfflinePlayer resident : town.getPlayerResidents()) {
+    			    			if(resident.isOnline()) {
+    			    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_JOIN_NOTICE_TOWN_RESIDENT.getMessage(bukkitPlayer.getName(),townName));
+    			    			}
+    			    		}
+    			    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
+    			    	}
+        			} else {
+        				if(town.isJoinRequestValid(myId)) {
+        					// There is already an existing join request
+        					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_JOIN_ERROR_TOWN_REQUEST.getMessage(townName));
+        				} else {
+        					if(town.getNumResidents() == 0) {
+        						// The town is empty, make the player into the lord
+        						town.setPlayerLord((OfflinePlayer)bukkitPlayer);
+        						town.removeJoinRequest(myId);
+        			    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
+        			    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_JOIN_NOTICE_TOWN_JOIN_LORD.getMessage(townName));
+        					} else {
+        						// Create a new join request
+            					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_JOIN_NOTICE_TOWN_REQUEST.getMessage(townName));
+            					town.addJoinRequest(myId, false);
+            					town.notifyJoinRequest(myId);
+        					}
+        				}
+        			}
+        		} else {
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
+        		}
         		break;
-        	case "close":
-        		// Verify player is lord of the Town
-            	if(!town.isPlayerLord(player.getOfflineBukkitPlayer())) {
-            		//ChatUtil.sendError((Player) getSender(), "You must be the Lord of "+townName+" to do this");
-            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-            		return;
-            	}
-            	if(town.isOpen()) {
-            		town.setIsOpen(false);
-            		for(OfflinePlayer resident : town.getPlayerResidents()) {
-		    			if(resident.isOnline()) {
-		    				//ChatUtil.sendNotice((Player) resident, "Closed "+townName+", only residents may build and access containers");
-		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_CLOSE.getMessage(townName));
-		    			}
-		    		}
-            	} else {
-            		//ChatUtil.sendNotice((Player) getSender(), townName+" is already closed for residents only");
-            		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_CLOSE.getMessage(townName));
-            	}
+        		
+        	case "leave":
+        		// Attempt to leave the given town
+    			UUID myId = bukkitPlayer.getUniqueId();
+    			if(town.isPlayerResident(bukkitPlayer)) {
+    				// Player is resident trying to leave
+    				// Remove the player as a resident
+    		    	if(town.removePlayerResident(bukkitPlayer)) {
+    		    		for(OfflinePlayer resident : town.getPlayerResidents()) {
+    		    			if(resident.isOnline()) {
+    		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_LEAVE_NOTICE_TOWN_RESIDENT.getMessage(bukkitPlayer.getName(),townName));
+    		    			}
+    		    		}
+    		    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_LEAVE_NOTICE_PLAYER.getMessage(townName));
+    		    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
+    		    	} else {
+    		    		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_LEAVE_ERROR_NO_RESIDENT.getMessage(townName));
+    		    	}
+    			} else {
+    				// Player is not resident, try to decline join invite
+    				if(town.isJoinInviteValid(myId)) {
+    					// There is an existing invite to join, remove the player from the invites list
+    					town.removeJoinRequest(myId);
+    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_LEAVE_NOTICE_INVITE_DECLINE.getMessage(townName));
+    				} else {
+    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_LEAVE_ERROR_NO_RESIDENT.getMessage(townName));
+    				}
+    			}
         		break;
-        	*/
+        		
 			case "add":
 				// Verify player is elite or lord of the Town
 	        	if(!town.isPlayerLord(player.getOfflineBukkitPlayer()) && !town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
@@ -557,23 +595,23 @@ public class TownCommand extends CommandBase {
 
 	@Override
 	public List<String> tabComplete() {
-		// k town <name> add|kick|knight|lord|rename|upgrade|shield|options|plots [arg]
+		// k town <name> join|leave|add|kick|knight|lord|rename|upgrade|shield|options|plots [arg]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		Player bukkitPlayer = (Player) getSender();
 		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 		if(getArgs().length == 2) {
-			// Suggest town names where the player is elite or if lord is not set
+			// Suggest all town names in player's kingdom
 			for(KonTown town : player.getKingdom().getTowns()) {
-				if(town.isPlayerKnight(bukkitPlayer) || !town.isLordValid()) {
-					tabList.add(town.getName());
-				}
+				tabList.add(town.getName());
 			}
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 3) {
 			// suggest sub-commands
+			tabList.add("join");
+			tabList.add("leave");
 			tabList.add("add");
 			tabList.add("kick");
 			tabList.add("lord");
