@@ -71,6 +71,8 @@ public enum MessagePath {
 	LABEL_OFFICER                               (0, "label.officer"),
 	LABEL_OFFICERS                              (0, "label.officers"),
 	LABEL_MASTER                                (0, "label.master"),
+	LABEL_ADMIN_KINGDOM                         (0, "label.admin-kingdom"),
+	LABEL_MONUMENT                              (0, "label.monument"),
 			
 	PLACEHOLDER_FRIENDLY                        (0, "placeholder.friendly"),
 	PLACEHOLDER_ENEMY                           (0, "placeholder.enemy"),

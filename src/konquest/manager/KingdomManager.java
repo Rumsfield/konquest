@@ -1652,6 +1652,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		} else {
 			if(displayKingdom.equals(contextKingdom)) {
 				result = RelationRole.FRIENDLY;
+    		} else if (displayKingdom.equals(getBarbarians())) {
+    			result = RelationRole.ENEMY;
     		} else {
     			if(isBothKingdomsEnemy(displayKingdom, contextKingdom)) {
     				result = RelationRole.ENEMY;
@@ -2384,7 +2386,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	public KonKingdomScoreAttributes getKingdomScoreAttributes(KonKingdom kingdom) {
 		KonKingdomScoreAttributes scoreAttributes = new KonKingdomScoreAttributes();
-		if(!kingdom.equals(barbarians) && !kingdom.isPeaceful()) {
+		//if(!kingdom.equals(barbarians) && !kingdom.isPeaceful()) {
+		if(kingdom.isCreated() && !kingdom.isPeaceful()) {
 			// Gather Kingdom metrics
 			int numKingdomTowns = kingdom.getTowns().size();
 	    	ArrayList<KonOfflinePlayer> allPlayersInKingdom = konquest.getPlayerManager().getAllPlayersInKingdom(kingdom.getName());

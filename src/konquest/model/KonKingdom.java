@@ -34,7 +34,6 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	private KonMonumentTemplate monumentTemplate;
 	private HashMap<String, KonTown> townMap;
 	private boolean isSmallest;
-	private boolean isPeaceful;
 	private boolean isOfflineProtected;
 	private Timer protectedWarmupTimer;
 	private boolean isCreated;
@@ -54,7 +53,6 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.townMap = new HashMap<String, KonTown>();
 		this.monumentTemplate = null; // new kingdoms start with null template
 		this.isSmallest = false;
-		this.isPeaceful = false;
 		this.isOfflineProtected = true;
 		this.protectedWarmupTimer = new Timer(this);
 		this.isCreated = true;
@@ -102,6 +100,10 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public boolean isAdminOperated() {
 		return isAdminOperated ? true : false;
+	}
+	
+	public boolean isPeaceful() {
+		return getPropertyValue(KonPropertyFlag.NEUTRAL);
 	}
 
 	@Override
@@ -228,6 +230,10 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public UUID getMaster() {
 		return master;
+	}
+	
+	public void clearMaster() {
+		master = null;
 	}
 	
 	public OfflinePlayer getPlayerMaster() {
@@ -559,14 +565,6 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public void setSmallest(boolean val) {
 		isSmallest = val;
-	}
-	
-	public boolean isPeaceful() {
-		return isPeaceful;
-	}
-	
-	public void setPeaceful(boolean val) {
-		isPeaceful = val;
 	}
 	
 	public boolean isOfflineProtected() {

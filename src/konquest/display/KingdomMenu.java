@@ -801,7 +801,6 @@ public class KingdomMenu implements ViewableMenu {
 					break;
 				case A_LIST:
 					// Do nothing for now
-					//TODO: Open separate guild info menu
 					break;
 				case B_RELATIONSHIP:
 					// Clicking icons goes to diplomacy view

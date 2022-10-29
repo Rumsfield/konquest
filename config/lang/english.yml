@@ -74,6 +74,8 @@ label:
   officer: "Officer"
   officers: "Officers"
   master: "Master"
+  admin-kingdom: "Admin Kingdom"
+  monument: "Monument"
 placeholder:
   friendly: "Friendly"
   enemy: "Enemy"

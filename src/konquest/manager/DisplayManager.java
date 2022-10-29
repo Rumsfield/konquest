@@ -12,12 +12,11 @@ import org.bukkit.inventory.Inventory;
 
 import konquest.Konquest;
 import konquest.display.DisplayMenu;
-import konquest.display.GuildMenu;
+import konquest.display.KingdomMenu;
 import konquest.display.PagedMenu;
 import konquest.display.PlotMenu;
 import konquest.display.ViewableMenu;
 import konquest.display.icon.MenuIcon;
-import konquest.display.wrapper.GuildInfoMenuWrapper;
 import konquest.display.wrapper.HelpMenuWrapper;
 import konquest.display.wrapper.KingdomInfoMenuWrapper;
 import konquest.display.wrapper.MenuWrapper;
@@ -28,7 +27,6 @@ import konquest.display.wrapper.TownInfoMenuWrapper;
 import konquest.display.wrapper.TownOptionsMenuWrapper;
 import konquest.display.wrapper.TownShieldMenuWrapper;
 import konquest.display.wrapper.TownUpgradeMenuWrapper;
-import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
@@ -188,17 +186,6 @@ public class DisplayManager {
 		}
 	}
 	
-	/*
-	private void showDisplayMenu(Player bukkitPlayer, Inventory inv) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	bukkitPlayer.openInventory(inv);
-            }
-        });
-	}
-	*/
-	
 	private void showMenuWrapper(Player bukkitPlayer, MenuWrapper wrapper) {
 		//ChatUtil.printDebug("Put and opened menu wrapper, size: "+pagedMenus.size());
 		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
@@ -311,17 +298,6 @@ public class DisplayManager {
 		showMenuWrapper(bukkitPlayer,wrapper);
    	}
    	
-   	// Guild Info
-   	public void displayGuildInfoMenu(KonPlayer displayPlayer, KonGuild infoGuild) {
-   		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
-   		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-   		// Create menu
-		GuildInfoMenuWrapper wrapper = new GuildInfoMenuWrapper(konquest, infoGuild, displayPlayer);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
-   	}
-   	
    	/*
 	 * ===============================================
 	 * Prefix Menu
@@ -359,13 +335,13 @@ public class DisplayManager {
    	
    	/*
 	 * ===============================================
-	 * Guild Menu
+	 * Kingdom Menu
 	 * ===============================================
 	 */
-   	public void displayGuildMenu(KonPlayer displayPlayer, KonGuild guild, boolean isAdmin) {
+   	public void displayKingdomMenu(KonPlayer displayPlayer, KonKingdom kingdom, boolean isAdmin) {
    		//ChatUtil.printDebug("Displaying new guild menu to "+bukkitPlayer.getName()+", current menu size is "+plotMenus.size());
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		GuildMenu newMenu = new GuildMenu(konquest.getGuildManager(), displayPlayer, guild, isAdmin);
+		KingdomMenu newMenu = new KingdomMenu(konquest, displayPlayer, kingdom, isAdmin);
 		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
