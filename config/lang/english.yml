@@ -870,4 +870,9 @@ territory:
   ruin: "Ruin"
   sanctuary: "Sanctuary"
   other: "Other"
+relationship:
+  enemy: "Enemy"
+  sanctioned: "Sanctioned"
+  peace: "Peace"
+  allied: "Allied"
   

@@ -1,6 +1,6 @@
 package konquest.display;
 
-public interface StateMenu {
+public interface ViewableMenu {
 
 	public DisplayMenu getCurrentView();
 	

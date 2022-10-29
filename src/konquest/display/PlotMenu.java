@@ -24,7 +24,7 @@ import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-public class PlotMenu implements StateMenu {
+public class PlotMenu implements ViewableMenu {
 
 	enum PlotState {
 		ROOT,

@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import konquest.Konquest;
-import konquest.Konquest.RelationRole;
 import konquest.api.model.KonquestUpgrade;
+import konquest.manager.KingdomManager.RelationRole;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestTown;
 import konquest.utility.BlockPaster;
@@ -810,7 +810,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
 			Player bukkitPlayer = player.getBukkitPlayer();
 			if(isLocInside(bukkitPlayer.getLocation())) {
-				RelationRole role = getKonquest().getRelationRole(player.getKingdom(),getKingdom());
+				RelationRole role = getKonquest().getKingdomManager().getRelationRole(player.getKingdom(),getKingdom());
 				switch(role) {
 			    	case ENEMY:
 			    		monumentBarEnemies.addPlayer(bukkitPlayer);
@@ -835,7 +835,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public void addBarPlayer(KonPlayer player) {
-		RelationRole role = getKonquest().getRelationRole(player.getKingdom(),getKingdom());
+		RelationRole role = getKonquest().getKingdomManager().getRelationRole(player.getKingdom(),getKingdom());
 		switch(role) {
 	    	case ENEMY:
 	    		monumentBarEnemies.addPlayer(player.getBukkitPlayer());
@@ -1040,7 +1040,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
     	// Command all nearby Iron Golems to target closest enemy player, if enemy exists nearby, else don't change target
     	// Find iron golems within the town max radius
     	// Do not update targets if triggering player is not an enemy of this town
-    	boolean isTriggerPlayerEnemy = getKonquest().isPlayerEnemy(triggerPlayer, getKingdom());
+    	boolean isTriggerPlayerEnemy = getKonquest().getKingdomManager().isPlayerEnemy(triggerPlayer, getKingdom());
     	boolean isGolemAttackEnemies = getKonquest().getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_GOLEM_ATTACK_ENEMIES.getPath());
 		if(isGolemAttackEnemies && !triggerPlayer.isAdminBypassActive() && !triggerPlayer.getKingdom().equals(getKingdom()) && isTriggerPlayerEnemy) {
 			Location centerLoc = getCenterLoc();
@@ -1065,7 +1065,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 									(useTriggerPlayerAsTarget || !nearbyPlayer.equals(triggerPlayer))) {
 								// Found nearby player that might be a valid target
 								// Check for closest distance, and that the player is an enemy
-								boolean isEnemy = getKonquest().isPlayerEnemy(nearbyPlayer, getKingdom());
+								boolean isEnemy = getKonquest().getKingdomManager().isPlayerEnemy(nearbyPlayer, getKingdom());
 								double distance = golem.getLocation().distance(p.getLocation());
 								if(distance < minDistance && isEnemy) {
 									minDistance = distance;

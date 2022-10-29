@@ -756,6 +756,11 @@ public enum MessagePath {
 	TERRITORY_SANCTUARY                         (0, "territory.sanctuary"),
 	TERRITORY_OTHER                             (0, "territory.other"),
 	
+	RELATIONSHIP_ENEMY                          (0, "relationship.enemy"),
+	RELATIONSHIP_SANCTIONED                     (0, "relationship.sanctioned"),
+	RELATIONSHIP_PEACE                          (0, "relationship.peace"),
+	RELATIONSHIP_ALLIED                         (0, "relationship.allied"),
+	
 	NULL_MESSAGE	(0,"");
 	
 	private String path;

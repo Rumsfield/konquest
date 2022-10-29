@@ -76,7 +76,7 @@ public class ScoreMenuWrapper extends MenuWrapper {
 		getMenu().addPage(1, 1, pageLabel);
 		//info = new InfoIcon(kingdomColor+scorePlayer.getKingdom().getName()+" "+MessagePath.MENU_SCORE_KINGDOM_SCORE.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_SCORE.getMessage()+": "+ChatColor.DARK_PURPLE+kingdomScore), Material.GOLDEN_HELMET, 2, false);
 		//newMenu.getPage(1).addIcon(info);
-		KingdomIcon kingdomInfo = new KingdomIcon(scorePlayer.getKingdom(),kingdomColor,Material.GOLDEN_HELMET,Arrays.asList(loreColor+MessagePath.LABEL_INFORMATION.getMessage(), hintColor+MessagePath.MENU_SCORE_HINT.getMessage()),2);
+		KingdomIcon kingdomInfo = new KingdomIcon(scorePlayer.getKingdom(),kingdomColor,Arrays.asList(loreColor+MessagePath.LABEL_INFORMATION.getMessage(), hintColor+MessagePath.MENU_SCORE_HINT.getMessage()),2,false);
 		getMenu().getPage(1).addIcon(kingdomInfo);
 		info = new InfoIcon(kingdomColor+MessagePath.MENU_SCORE_KINGDOM_TOWNS.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+kingdomScoreAttributes.getAttributeValue(KonKingdomScoreAttribute.TOWNS), loreColor+MessagePath.LABEL_SCORE.getMessage()+": "+ChatColor.DARK_PURPLE+kingdomScoreAttributes.getAttributeScore(KonKingdomScoreAttribute.TOWNS)), Material.OBSIDIAN, 3, false);
 		getMenu().getPage(1).addIcon(info);

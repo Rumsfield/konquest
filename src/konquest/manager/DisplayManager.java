@@ -15,7 +15,7 @@ import konquest.display.DisplayMenu;
 import konquest.display.GuildMenu;
 import konquest.display.PagedMenu;
 import konquest.display.PlotMenu;
-import konquest.display.StateMenu;
+import konquest.display.ViewableMenu;
 import konquest.display.icon.MenuIcon;
 import konquest.display.wrapper.GuildInfoMenuWrapper;
 import konquest.display.wrapper.HelpMenuWrapper;
@@ -40,7 +40,7 @@ public class DisplayManager {
 
 	private Konquest konquest;
 	private HashMap<Inventory, MenuWrapper> pagedMenus;
-	private HashMap<Inventory, StateMenu> stateMenus;
+	private HashMap<Inventory, ViewableMenu> stateMenus;
 	private HashSet<Player> playerViewerCache;
 	
 	public static ChatColor titleColor = ChatColor.BLACK;
@@ -51,7 +51,7 @@ public class DisplayManager {
 	public DisplayManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.pagedMenus = new HashMap<Inventory, MenuWrapper>();
-		this.stateMenus = new HashMap<Inventory, StateMenu>();
+		this.stateMenus = new HashMap<Inventory, ViewableMenu>();
 		this.playerViewerCache = new HashSet<Player>();
 	}
 	
@@ -140,7 +140,7 @@ public class DisplayManager {
 			} else if(stateMenus.containsKey(inv)) {
 				// Handle menu navigation and states
 				// Every clickable icon in a menu view will update the state and refresh the open inventory
-				StateMenu clickMenu = stateMenus.get(inv);
+				ViewableMenu clickMenu = stateMenus.get(inv);
 				DisplayMenu currentView = clickMenu.getCurrentView();
 				if(currentView == null || !currentView.getInventory().equals(inv)) {
 					ChatUtil.printDebug("State menu view is not current!");

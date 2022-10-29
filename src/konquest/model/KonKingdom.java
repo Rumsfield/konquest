@@ -37,6 +37,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	private boolean isPeaceful;
 	private boolean isOfflineProtected;
 	private Timer protectedWarmupTimer;
+	private boolean isCreated;
 	private boolean isAdminOperated;
 	private boolean isOpen;
 	private RequestKeeper joinRequestKeeper;
@@ -56,6 +57,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.isPeaceful = false;
 		this.isOfflineProtected = true;
 		this.protectedWarmupTimer = new Timer(this);
+		this.isCreated = true;
 		this.isAdminOperated = false;
 		this.isOpen = false;
 		this.joinRequestKeeper = new RequestKeeper();
@@ -73,12 +75,17 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.konquest = konquest;
 		this.capital = new KonCapital(new Location(konquest.getPlugin().getServer().getWorld("world"),0,65,0), "Barbarian", this, konquest);
 		this.townMap = new HashMap<String, KonTown>();
+		this.isCreated = false;
 	}
 	
 	private void initProperties() {
 		properties.clear();
 		properties.put(KonPropertyFlag.NEUTRAL, 	konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.neutral"));
 		properties.put(KonPropertyFlag.GOLEMS, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.golems"));
+	}
+	
+	public boolean isCreated() {
+		return isCreated;
 	}
 	
 	public void setIsOpen(boolean val) {
@@ -424,7 +431,6 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		return result;
 	}
 	
-	/*
 	public int getNumTowns() {
 		int result = 0;
 		UUID lord = null;
@@ -448,7 +454,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		}
 		return result;
 	}
-	*/
+	
 	
 	/*
 	 * =================================================

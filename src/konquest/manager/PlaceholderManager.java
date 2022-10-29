@@ -10,10 +10,10 @@ import java.util.HashMap;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
-import konquest.Konquest.RelationRole;
 import konquest.KonquestPlugin;
 import konquest.api.manager.KonquestPlaceholderManager;
 import konquest.api.model.KonquestTerritoryType;
+import konquest.manager.KingdomManager.RelationRole;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
@@ -333,7 +333,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
 			KonKingdom kingdomOne = onlinePlayerOne.getKingdom();
 			KonKingdom kingdomTwo = onlinePlayerTwo.getKingdom();
-			RelationRole role = konquest.getRelationRole(kingdomOne, kingdomTwo);
+			RelationRole role = kingdomManager.getRelationRole(kingdomOne, kingdomTwo);
 			switch(role) {
 		    	case BARBARIAN:
 		    		result = MessagePath.PLACEHOLDER_BARBARIAN.getMessage();;

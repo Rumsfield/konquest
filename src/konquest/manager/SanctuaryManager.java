@@ -204,6 +204,18 @@ public class SanctuaryManager {
 		return result;
 	}
 	
+	public Set<KonMonumentTemplate> getAllValidTemplates() {
+		Set<KonMonumentTemplate> result = new HashSet<KonMonumentTemplate>();
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			for(KonMonumentTemplate template : sanctuary.getTemplates()) {
+				if(template.isValid()) {
+					result.add(template);
+				}
+			}
+		}
+		return result;
+	}
+	
 	public int getNumTemplates() {
 		int result = 0;
 		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
@@ -303,6 +315,8 @@ public class SanctuaryManager {
 		topBlockY = (c1Y < c2Y) ? c2Y : c1Y;
 		topBlockZ = (c1Z < c2Z) ? c2Z : c1Z;
 		int criticalBlockCount = 0;
+		int totalBlockCount = 0;
+		int lootChestCount = 0;
 		boolean containsChest = false;
 		for (int x = bottomBlockX; x <= topBlockX; x++) {
             for (int y = bottomBlockY; y <= topBlockY; y++) {
@@ -312,7 +326,11 @@ public class SanctuaryManager {
                 		criticalBlockCount++;
                 		criticalBlockLocs.add(monumentBlock.getLocation());
                 	} else if(monumentBlock.getState() instanceof Chest) {
+                		lootChestCount++;
                 		containsChest = true;
+                	}
+                	if(monumentBlock.getType().isSolid()) {
+                		totalBlockCount++;
                 	}
                 }
             }
@@ -328,7 +346,10 @@ public class SanctuaryManager {
 			ChatUtil.printDebug("Failed to create Monument Template, travel point is outside of corner bounds");
 			return 3;
 		}
-		// Set loot flag
+		// Set template info
+		template.setNumBlocks(totalBlockCount);
+		template.setNumCriticals(criticalBlockCount);
+		template.setNumLootChests(lootChestCount);
 		template.setLoot(containsChest);
 		if(containsChest) {
 			ChatUtil.printDebug("Validated Monument Template "+name+" with loot chest(s)");

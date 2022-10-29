@@ -15,6 +15,9 @@ public class KonMonumentTemplate {
 	private boolean isValid;
 	private boolean hasLoot;
 	private String name;
+	private int numCriticals;
+	private int numBlocks;
+	private int numLootChests;
 	
 	public KonMonumentTemplate(String name, Location corner1, Location corner2, Location travelPoint) {
 		this.name = name;
@@ -23,6 +26,21 @@ public class KonMonumentTemplate {
 		this.travelPoint = travelPoint;
 		this.isValid = false;
 		this.hasLoot = false;
+		this.numCriticals = 0;
+		this.numBlocks = 0;
+		this.numLootChests = 0;
+	}
+	
+	public int getNumCriticals() {
+		return numCriticals;
+	}
+	
+	public int getNumBlocks() {
+		return numBlocks;
+	}
+	
+	public int getNumLootChests() {
+		return numLootChests;
 	}
 	
 	public String getName() {
@@ -51,6 +69,18 @@ public class KonMonumentTemplate {
 	
 	public Location getTravelPoint() {
 		return travelPoint;
+	}
+	
+	public void setNumCriticals(int val) {
+		numCriticals = val;
+	}
+	
+	public void setNumBlocks(int val) {
+		numBlocks = val;
+	}
+	
+	public void setNumLootChests(int val) {
+		numLootChests = val;
 	}
 	
 	public void setCornerOne(Location loc) {

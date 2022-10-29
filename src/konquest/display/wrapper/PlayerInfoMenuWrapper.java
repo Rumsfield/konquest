@@ -66,7 +66,7 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
     		loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.LABEL_PROTECTED.getMessage());
     	}
     	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
-    	KingdomIcon kingdom = new KingdomIcon(infoPlayer.getKingdom(),kingdomColor,Material.GOLDEN_HELMET,loreList,2);
+    	KingdomIcon kingdom = new KingdomIcon(infoPlayer.getKingdom(),kingdomColor,loreList,2,false);
     	getMenu().getPage(0).addIcon(kingdom);
     	/* Guild Icon (3) */
 		KonGuild guild = getKonquest().getGuildManager().getPlayerGuild(infoPlayer.getOfflineBukkitPlayer());

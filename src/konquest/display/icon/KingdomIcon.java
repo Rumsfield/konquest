@@ -15,22 +15,20 @@ public class KingdomIcon implements MenuIcon {
 
 	private KonKingdom kingdom;
 	private ChatColor contextColor;
-	private Material material;
 	private List<String> lore;
 	private int index;
 	private ItemStack item;
 	
-	public KingdomIcon(KonKingdom kingdom, ChatColor contextColor, Material material, List<String> lore, int index) {
+	public KingdomIcon(KonKingdom kingdom, ChatColor contextColor, List<String> lore, int index, boolean isClickable) {
 		this.kingdom = kingdom;
 		this.contextColor = contextColor;
-		this.material = material;
 		this.lore = lore;
 		this.index = index;
 		this.item = initItem();
 	}
 	
 	private ItemStack initItem() {
-		ItemStack item = new ItemStack(material,1);
+		ItemStack item = new ItemStack(Material.GOLDEN_HELMET,1);
 		ItemMeta meta = item.getItemMeta();
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {

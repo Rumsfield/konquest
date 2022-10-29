@@ -41,6 +41,7 @@ import konquest.manager.DirectiveManager;
 import konquest.manager.DisplayManager;
 import konquest.manager.IntegrationManager;
 import konquest.manager.KingdomManager;
+import konquest.manager.KingdomManager.RelationRole;
 import konquest.manager.LanguageManager;
 import konquest.manager.LootManager;
 import konquest.manager.PlaceholderManager;
@@ -83,16 +84,6 @@ import konquest.command.CommandHandler;
 import konquest.database.DatabaseThread;
 
 public class Konquest implements KonquestAPI, Timeable {
-
-	public enum RelationRole {
-		BARBARIAN,
-		NEUTRAL,
-		FRIENDLY,
-		ENEMY,
-		ALLIED,
-		SANCTIONED,
-		PEACEFUL;
-	}
 	
 	private KonquestPlugin plugin;
 	private static Konquest instance;
@@ -1414,40 +1405,10 @@ public class Konquest implements KonquestAPI, Timeable {
     		return headCache.get(bukkitOfflinePlayer.getUniqueId());
     	}
     }
-    
-    public RelationRole getRelationRole(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
-    	RelationRole result = RelationRole.NEUTRAL;
-    	if(contextKingdom.equals(kingdomManager.getBarbarians())) {
-    		result = RelationRole.BARBARIAN;
-		} else if(contextKingdom.equals(kingdomManager.getNeutrals())) {
-    		result = RelationRole.NEUTRAL;
-		} else {
-			if(displayKingdom.equals(contextKingdom)) {
-				result = RelationRole.FRIENDLY;
-    		} else {
-    			if(kingdomManager.isBothKingdomsEnemy(displayKingdom, contextKingdom)) {
-    				result = RelationRole.ENEMY;
-				} else if(kingdomManager.isBothKingdomsAllied(displayKingdom, contextKingdom)) {
-					result = RelationRole.ALLIED;
-				} else if(kingdomManager.isKingdomSanctioned(displayKingdom, contextKingdom)) {
-					result = RelationRole.SANCTIONED;
-				} else if(kingdomManager.isKingdomPeaceful(displayKingdom, contextKingdom)) {
-					result = RelationRole.PEACEFUL;
-				} else {
-					result = RelationRole.NEUTRAL;
-				}
-    		}
-		}
-    	return result;
-    }
-    
-    public boolean isPlayerEnemy(KonOfflinePlayer offlinePlayer, KonKingdom kingdom) {
-    	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.ENEMY);
-    }
 
     public ChatColor getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
     	ChatColor result = neutralColor;
-    	RelationRole role = getRelationRole(displayKingdom,contextKingdom);
+    	RelationRole role = kingdomManager.getRelationRole(displayKingdom,contextKingdom);
     	switch(role) {
 	    	case BARBARIAN:
 	    		result = barbarianColor;
@@ -1569,7 +1530,7 @@ public class Konquest implements KonquestAPI, Timeable {
     
     public ChatColor getDisplaySecondaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
     	ChatColor result = neutralColor;
-    	RelationRole role = getRelationRole(displayKingdom,contextKingdom);
+    	RelationRole role = kingdomManager.getRelationRole(displayKingdom,contextKingdom);
     	switch(role) {
 	    	case BARBARIAN:
 	    		result = barbarianColor;
