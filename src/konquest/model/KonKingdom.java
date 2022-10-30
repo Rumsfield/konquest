@@ -67,13 +67,25 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		initProperties();
 	}
 	
-	// Constructor meant for Barbarians, created on startup
+	// Constructor meant for default kingdoms created on startup (Barbarians, Neutrals)
 	public KonKingdom(String name, Konquest konquest) {
 		this.name = name;
 		this.konquest = konquest;
-		this.capital = new KonCapital(new Location(konquest.getPlugin().getServer().getWorld("world"),0,65,0), "Barbarian", this, konquest);
+		this.capital = new KonCapital(new Location(konquest.getPlugin().getServer().getWorld("world"),0,65,0), "konquest_default", this, konquest);
 		this.townMap = new HashMap<String, KonTown>();
+		this.monumentTemplate = null; // new kingdoms start with null template
+		this.isSmallest = false;
+		this.isOfflineProtected = false;
+		this.protectedWarmupTimer = new Timer(this);
 		this.isCreated = false;
+		this.isAdminOperated = false;
+		this.isOpen = true;
+		this.joinRequestKeeper = new RequestKeeper();
+		this.master = null;
+		this.members = new HashMap<UUID,Boolean>();
+		this.activeRelationships = new HashMap<KonquestKingdom,KonquestRelationship>();
+		this.requestRelationships = new HashMap<KonquestKingdom,KonquestRelationship>();
+		this.properties = new HashMap<KonPropertyFlag,Boolean>();
 	}
 	
 	private void initProperties() {
@@ -139,17 +151,20 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	 * =================================================
 	 * Membership Rank Methods
 	 * =================================================
+	 * Only created kingdoms can have members
 	 */
 	
 	public void forceMaster(UUID id) {
-		master = id;
-		members.put(id,true); // Ensure member officer flag is true
+		if(isCreated) {
+			master = id;
+			members.put(id,true); // Ensure member officer flag is true
+		}
 	}
 	
 	public boolean setMaster(UUID id) {
 		// Master must be an existing member
 		boolean result = false;
-		if(!isAdminOperated && members.containsKey(id)) {
+		if(isCreated && !isAdminOperated && members.containsKey(id)) {
 			master = id;
 			members.put(id,true); // Ensure member officer flag is true
 			result = true;
@@ -159,7 +174,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public boolean isMaster(UUID id) {
 		boolean status = false;
-		if(master != null) {
+		if(isCreated && master != null) {
 			status = id.equals(master);
 		}
 		return status;
@@ -174,7 +189,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	public boolean setOfficer(UUID id, boolean val) {
 		// Target ID must be a member to modify officer flag
 		boolean status = false;
-		if(members.containsKey(id) && !master.equals(id)) {
+		if(isCreated && members.containsKey(id) && !master.equals(id)) {
 			members.put(id,val);
 			status = true;
 		}
@@ -184,7 +199,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	// Returns true when player is Master or Officer
 	public boolean isOfficer(UUID id) {
 		boolean status = false;
-		if(members.containsKey(id)) {
+		if(isCreated && members.containsKey(id)) {
 			status = members.get(id);
 		}
 		return status;
@@ -198,7 +213,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	 */
 	public boolean addMember(UUID id, boolean isOfficer) {
 		boolean status = false;
-		if(!members.containsKey(id)) {
+		if(isCreated && !members.containsKey(id)) {
 			members.put(id,isOfficer);
 			status = true;
 		}
@@ -206,6 +221,8 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	/**
+	 * Removes a player member, as well as their town residencies.
+	 * Only works for created kingdoms.
 	 * 
 	 * @param id - Player UUID to remove from members
 	 * @return True if id was successfully removed, false if id was not a member or was master
@@ -213,19 +230,27 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	public boolean removeMember(UUID id) {
 		// Master cannot be removed as a member
 		boolean status = false;
-		if(members.containsKey(id) && !master.equals(id)) {
+		if(isCreated && members.containsKey(id) && !master.equals(id)) {
+			// Remove membership
 			members.remove(id);
+			// Remove residencies
+	    	OfflinePlayer townPlayer = Bukkit.getOfflinePlayer(id);
+	    	for(KonTown town : getTowns()) {
+	    		if(town.removePlayerResident(townPlayer)) {
+	    			konquest.getMapHandler().drawDynmapLabel(town);
+	    		}
+	    	}
 			status = true;
 		}
 		return status;
 	}
 	
 	public boolean isMember(UUID id) {
-		return members.containsKey(id);
+		return isCreated && members.containsKey(id);
 	}
 	
 	public boolean isMasterValid() {
-		return master != null;
+		return isCreated && master != null;
 	}
 	
 	public UUID getMaster() {
@@ -236,8 +261,12 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		master = null;
 	}
 	
+	public void clearMembers() {
+		members.clear();
+	}
+	
 	public OfflinePlayer getPlayerMaster() {
-		if(master != null) {
+		if(isCreated && master != null) {
 			return Bukkit.getOfflinePlayer(master);
 		}
 		return null;

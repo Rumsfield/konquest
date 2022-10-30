@@ -41,7 +41,7 @@ public class KingdomMenu implements ViewableMenu {
 	enum MenuState {
 		ROOT,
 		A_JOIN,
-		A_LEAVE,
+		A_EXILE,
 		A_INVITE,
 		A_LIST,
 		B_RELATIONSHIP,
@@ -75,7 +75,7 @@ public class KingdomMenu implements ViewableMenu {
 	
 	/* Icon slot indexes */
 	private final int ROOT_SLOT_JOIN 			= 0;
-	private final int ROOT_SLOT_LEAVE 			= 2;
+	private final int ROOT_SLOT_EXILE 			= 2;
 	private final int ROOT_SLOT_INFO 			= 4;
 	private final int ROOT_SLOT_INVITE 			= 6;
 	private final int ROOT_SLOT_LIST 			= 8;
@@ -180,10 +180,10 @@ public class KingdomMenu implements ViewableMenu {
 		views.put(MenuState.ROOT, renderView);
 		refreshNavigationButtons(MenuState.ROOT);
 		
-		/* Leave View */
-		renderView = createLeaveView();
-		views.put(MenuState.A_LEAVE, renderView);
-		refreshNavigationButtons(MenuState.A_LEAVE);
+		/* Exile View */
+		renderView = createExileView();
+		views.put(MenuState.A_EXILE, renderView);
+		refreshNavigationButtons(MenuState.A_EXILE);
 	}
 	
 	private DisplayMenu createRootView() {
@@ -219,7 +219,12 @@ public class KingdomMenu implements ViewableMenu {
 		
 		loreList.clear();
 		loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_LEAVE.getMessage());
-		icon = new InfoIcon(regularColor+MessagePath.MENU_GUILD_LEAVE.getMessage(), loreList, Material.ARROW, ROOT_SLOT_LEAVE, true);
+		//TODO: context description
+		String exileDescription = "Become a barbarian, lose all favor and stats.";
+		for(String line : Konquest.stringPaginate(exileDescription)) {
+			loreList.add(loreColor+line);
+		}
+		icon = new InfoIcon(regularColor+"Exile", loreList, Material.ARROW, ROOT_SLOT_EXILE, true);
 		result.addIcon(icon);
 
 		loreList.clear();
@@ -296,11 +301,11 @@ public class KingdomMenu implements ViewableMenu {
 		return result;
 	}
 	
-	private DisplayMenu createLeaveView() {
+	private DisplayMenu createExileView() {
 		DisplayMenu result;
 		InfoIcon icon;
 		List<String> loreList = new ArrayList<String>();
-		result = new DisplayMenu(2, getTitle(MenuState.A_LEAVE));
+		result = new DisplayMenu(2, getTitle(MenuState.A_EXILE));
 		
 		loreList.clear();
 		loreList.add(loreColor+MessagePath.MENU_GUILD_HINT_LEAVE.getMessage());
@@ -705,10 +710,10 @@ public class KingdomMenu implements ViewableMenu {
 						currentState = MenuState.A_JOIN;
 						result = goToKingdomView(currentState);
 						
-					} else if(slot == ROOT_SLOT_LEAVE) {
-						// Clicked to leave their kingdom
+					} else if(slot == ROOT_SLOT_EXILE) {
+						// Clicked to exile from their kingdom
 						if(isCreatedKingdom) {
-							currentState = MenuState.A_LEAVE;
+							currentState = MenuState.A_EXILE;
 							result = views.get(currentState);
 						} else {
 							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_NO_GUILD.getMessage());
@@ -776,10 +781,10 @@ public class KingdomMenu implements ViewableMenu {
 						result = null; // Close menu
 					}
 					break;
-				case A_LEAVE:
+				case A_EXILE:
 					if(slot == SLOT_YES) {
 						// Exile the player
-						manager.menuLeaveKingdom(player, kingdom);
+						manager.menuExileKingdom(player, kingdom);
 					} else if(slot == SLOT_NO) {
 						// Do nothing, just close the menu
 					}
@@ -934,7 +939,7 @@ public class KingdomMenu implements ViewableMenu {
 			case A_JOIN:
 				result = color+MessagePath.MENU_GUILD_TITLE_JOIN.getMessage();
 				break;
-			case A_LEAVE:
+			case A_EXILE:
 				result = color+MessagePath.MENU_GUILD_TITLE_CONFIRM.getMessage();
 				break;
 			case A_INVITE:
@@ -1054,7 +1059,7 @@ public class KingdomMenu implements ViewableMenu {
 			view.addIcon(navIconEmpty(navStart+6));
 			view.addIcon(navIconEmpty(navStart+7));
 			view.addIcon(navIconEmpty(navStart+8));
-		} else if(context.equals(MenuState.A_LEAVE) || context.equals(MenuState.B_DIPLOMACY) || context.equals(MenuState.C_TEMPLATE) || context.equals(MenuState.C_DISBAND)) {
+		} else if(context.equals(MenuState.A_EXILE) || context.equals(MenuState.B_DIPLOMACY) || context.equals(MenuState.C_TEMPLATE) || context.equals(MenuState.C_DISBAND)) {
 			// Close [4], Return [5]
 			view.addIcon(navIconEmpty(navStart+0));
 			view.addIcon(navIconEmpty(navStart+1));

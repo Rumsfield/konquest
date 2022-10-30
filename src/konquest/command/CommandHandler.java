@@ -63,9 +63,6 @@ public class CommandHandler  implements TabExecutor {
 	                    case CLAIM:
 	                        new ClaimCommand(konquest, sender, args).execute();
 	                        break;
-	                    case EXILE:
-	                        new ExileCommand(konquest, sender, args).execute();
-	                        break;
 	                    case FAVOR:
 	                        new FavorCommand(konquest, sender, args).execute();
 	                        break;
@@ -175,9 +172,6 @@ public class CommandHandler  implements TabExecutor {
 	                    	break;
 	                    case CLAIM:
 	                    	tabList.addAll(new ClaimCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case EXILE:
-	                    	tabList.addAll(new ExileCommand(konquest, sender, args).tabComplete());
 	                    	break;
 	                    case FAVOR:
 	                    	tabList.addAll(new FavorCommand(konquest, sender, args).tabComplete());

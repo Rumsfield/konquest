@@ -49,7 +49,6 @@ permissions:
     default: op
     children:
       konquest.command.help: true
-      konquest.command.exile: true
       konquest.command.info: true
       konquest.command.chat: true
       konquest.command.claim: true
@@ -71,10 +70,6 @@ permissions:
 
   konquest.command.help:
     description: Display help in chat
-    default: true
-
-  konquest.command.exile:
-    description: Exile yourself as a barbarian
     default: true
     
   konquest.command.info:

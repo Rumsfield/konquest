@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import konquest.Konquest;
-import konquest.model.KonDirective;
-import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
-import konquest.model.KonMonumentTemplate;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
@@ -73,7 +71,7 @@ public class KingdomCommand extends CommandBase {
 	            				return;
 	    	            	}
 
-	                    	int status = getKonquest().getKingdomManager().createKingdom(bukkitPlayer.getLocation(), kingdomName, templateName, player);
+	                    	int status = getKonquest().getKingdomManager().createKingdom(bukkitPlayer.getLocation(), kingdomName, templateName, player, false);
 	                    	
 	                    	if(status == 0) {
 	                    		// Successful kingdom creation
@@ -198,10 +196,14 @@ public class KingdomCommand extends CommandBase {
 	    						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
 	    		        		return;
 	    					}
-	            			//TODO: KR special check for master?
-	    			    	
-	            			playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
-	            			boolean status = getKonquest().getKingdomManager().kickKingdomMember(offlinePlayer.getOfflineBukkitPlayer(), kingdom);
+	    			    	OfflinePlayer bukkitOfflinePlayer = offlinePlayer.getOfflineBukkitPlayer();
+	            			if(kingdom.isMaster(bukkitOfflinePlayer.getUniqueId())) {
+	            				//TODO: Path this
+	            				ChatUtil.sendError(bukkitPlayer, "Cannot kick kingdom master");
+	            				return;
+	            			}
+	            			playerName = bukkitOfflinePlayer.getName();
+	            			boolean status = getKonquest().getKingdomManager().kickKingdomMember(bukkitOfflinePlayer, kingdom);
 	            			if(status) {
 	            				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_KICK.getMessage(playerName));
 	            			} else {
@@ -240,7 +242,7 @@ public class KingdomCommand extends CommandBase {
 	            					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
 	            					break;
 	            				case 3:
-	            					String cost = String.format("%.2f",getKonquest().getGuildManager().getCostRename());
+	            					String cost = String.format("%.2f",getKonquest().getKingdomManager().getCostRename());
 	            					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
 	            					break;
 	        					default:

@@ -8,7 +8,7 @@ public enum CommandType {
 	HELP    (Material.LANTERN,          "konquest.command.help",    "h",  "",                                                               MessagePath.DESCRIPTION_HELP.getMessage()),
 	//JOIN    (Material.GOLDEN_HELMET,    "konquest.command.join",    "",   "[<kingdom>|<town>]",                                             MessagePath.DESCRIPTION_JOIN.getMessage()),
 	//LEAVE   (Material.FEATHER,          "konquest.command.leave",   "",   "<town>",                                                         MessagePath.DESCRIPTION_LEAVE.getMessage()),
-	EXILE   (Material.TNT,              "konquest.command.exile",   "",   "",                                                               MessagePath.DESCRIPTION_EXILE.getMessage()),
+	//EXILE   (Material.TNT,              "konquest.command.exile",   "",   "",                                                               MessagePath.DESCRIPTION_EXILE.getMessage()),
 	INFO    (Material.SPRUCE_SIGN,      "konquest.command.info",    "i",  "[<kingdom>|<town>|<player>]",                                    MessagePath.DESCRIPTION_INFO.getMessage()),
 	LIST    (Material.PAPER,            "konquest.command.list",    "l",  "kingdoms|towns",                                                 MessagePath.DESCRIPTION_LIST.getMessage()),
 	FAVOR   (Material.GOLD_INGOT,       "konquest.command.favor",   "f",  "",                                                               MessagePath.DESCRIPTION_FAVOR.getMessage()),

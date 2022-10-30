@@ -208,7 +208,10 @@ public class PlayerManager implements KonquestPlayerManager {
 		}
 		// Put online player into cache
 		if(bukkitOfflinePlayer.getName() != null) {
-			allPlayers.put(bukkitOfflinePlayer, (KonOfflinePlayer)player);
+			// Removing the cast to KonOfflinePlayer should preserve the same object in both allPlayers and onlinePlayers maps.
+			// When a KonPlayer is modified from onlinePlayers, it should also reflect in allPlayers, and vice-versa.
+			allPlayers.put(bukkitOfflinePlayer, player);
+			//allPlayers.put(bukkitOfflinePlayer, (KonOfflinePlayer)player);
 		}
 	}
 

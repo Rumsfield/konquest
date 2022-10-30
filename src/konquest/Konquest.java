@@ -857,13 +857,15 @@ public class Konquest implements KonquestAPI, Timeable {
 						if(!player.isBarbarian()) {
 							if(doExile) {
 								UUID id = player.getOfflineBukkitPlayer().getUniqueId();
-								// Full exile
-								getKingdomManager().exilePlayerBarbarian(id,false,false,true);
+								// Forced full exile
+								String kingdomName = player.getKingdom().getName();
+								int status = getKingdomManager().exilePlayerBarbarian(id,false,false,true,true);
+								ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" by exile from kingdom "+kingdomName+", status "+status);
 							} else {
 								for(KonTown town : player.getKingdom().getTowns()) {
 									if(town.getPlayerResidents().contains(player.getOfflineBukkitPlayer())) {
 										boolean status = town.removePlayerResident(player.getOfflineBukkitPlayer());
-										ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from town "+town.getName()+" in kingdom "+player.getKingdom().getName()+", got "+status);
+										ChatUtil.printDebug("Pruned player "+player.getOfflineBukkitPlayer().getName()+" from town "+town.getName()+" in kingdom "+player.getKingdom().getName()+", status "+status);
 									}
 								}
 							}

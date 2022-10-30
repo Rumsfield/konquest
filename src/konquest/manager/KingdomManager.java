@@ -433,14 +433,31 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 *         -1	- Internal error
 	 */
 	public int createKingdom(Location centerLocation, String kingdomName, String templateName, KonPlayer master, boolean isAdmin) {
+		/*
+		 * Criteria for creating a kingdom:
+		 * 
+		 * Player must be a barbarian and not a member of another kingdom.
+		 * Player must have favor to pay the cost to create.
+		 * Player must provide valid name.
+		 * Player must specify valid template.
+		 * The location must be valid for creating the capital territory.
+		 * 
+		 */
 		Player bukkitPlayer = master.getBukkitPlayer();
 		// Verify name
 		if(konquest.validateNameConstraints(kingdomName) != 0) {
 			return 1;
 		}
-		// Verify player is barbarian
-		if(!isAdmin && !master.isBarbarian()) {
-			return 2;
+		// Verify player is barbarian, not a member of another kingdom
+		if(!isAdmin) {
+			if(!master.isBarbarian()) {
+				return 2;
+			}
+			for(KonKingdom kingdom : kingdomMap.values()) {
+				if(kingdom.isMember(master.getBukkitPlayer().getUniqueId())) {
+					return 2;
+				}
+			}
 		}
 		// Verify player can cover cost
 		if(!isAdmin && costCreate > 0 && KonquestPlugin.getBalance(bukkitPlayer) < costCreate) {
@@ -451,7 +468,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return 4;
 		}
 		
-		// Verify position
+		// Verify position (return codes 4 - 8)
 		/*
 		 * 			0 - Success
 		 * 			1 - Error, location is in an invalid world
@@ -495,12 +512,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					if(costCreate > 0 && KonquestPlugin.withdrawPlayer(bukkitPlayer, costCreate)) {
 			            konquest.getAccomplishmentManager().modifyPlayerStat(master,KonStatsType.FAVOR,(int)costCreate);
 					}
-					// Move player(s) out of center chunk (monument)
-					teleportAwayFromCenter(newKingdom.getCapital());
 					// Assign player to kingdom
 					assignPlayerKingdom(bukkitPlayer.getUniqueId(), kingdomName, true);
 					// Make player master of kingdom
 					newKingdom.forceMaster(bukkitPlayer.getUniqueId());
+					// Move player(s) out of center chunk (monument)
+					teleportAwayFromCenter(newKingdom.getCapital());
 				}
 			} else {
 				// Failed to pass all init checks, remove the kingdom
@@ -524,9 +541,25 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public boolean removeKingdom(String name) {
 		if(kingdomMap.containsKey(name)) {
 			KonKingdom kingdom = kingdomMap.get(name);
-			// Exile all members
+			// Clear all membership
+			kingdom.clearMaster();
+			kingdom.clearMembers();
+			// Manually exile all members
+			//TODO: Keep an eye on this. 
+			// The allPlayers map should contain online KonPlayers as well.
+			// Modifying a KonOfflinePlayer from the allPlayers map should reflect on any KonPlayers in
+			// the onlinePlayer map too.
 			for(KonOfflinePlayer member : konquest.getPlayerManager().getAllPlayersInKingdom(kingdom)) {
-				exilePlayerBarbarian(member.getOfflineBukkitPlayer().getUniqueId(),false,false,true);
+				String playerName = member.getOfflineBukkitPlayer().getName();
+				if(member instanceof KonPlayer) {
+					ChatUtil.printDebug("Removing online KonPlayer "+playerName+" to barbarian.");
+				} else {
+					ChatUtil.printDebug("Removing offline KonOfflinePlayer "+playerName+" to barbarian.");
+				}
+				member.setKingdom(getBarbarians());
+				member.setExileKingdom(getBarbarians());
+				member.setBarbarian(true);
+				konquest.getDatabaseThread().getDatabase().setOfflinePlayer(member); // push to database
 			}
 			// Remove all towns
 			for(KonTown town : kingdom.getTowns()) {
@@ -551,7 +584,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				ChatUtil.printDebug("Removed Kingdom "+name);
 				return true;
 			}
+			ChatUtil.printDebug("Failed to remove null Kingdom "+name);
 		}
+		ChatUtil.printDebug("Failed to remove unknown Kingdom "+name);
 		return false;
 	}
 	
@@ -619,6 +654,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * 			2 - Invalid template
 	 * 			3 - Not enough favor
 	 */
+	/*
 	public int changeKingdomTemplate(String kingdomName, KonMonumentTemplate template, KonPlayer player, boolean ignoreCost) {
 		//TODO: Fix duplicate method? menuChangeKingdomTemplate
 		// Verify kingdom exists
@@ -644,21 +680,32 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return 0;
 	}
+	*/
 	
 	/*
 	 * =================================================
 	 * Player Assignment Methods
 	 * =================================================
 	 * 1. Assign player to kingdom
-	 * 		Player can be barbarian or kingdom member
+	 * 		Player can be barbarian or kingdom member, but NOT master
 	 * 2. Exile player to barbarians
-	 * 		Player MUST be kingdom member
+	 * 		Player MUST be kingdom member, but NOT master
 	 * 
 	 * Players have two states: Barbarian or Kingdom Member.
 	 * When a player wants to join a kingdom, the assignment method handles any 
 	 * previous kingdom and joins the player to the new one.
 	 * When a player wants to just leave a kingdom and have no kingdom, they become 
 	 * barbarian by the exile method.
+	 * 
+	 * Players that are kingdom masters cannot exile/become barbarians.
+	 * If the player is initiating the exile, they must first transfer master or disband.
+	 * If an admin or konquest initiates a forced exile, then master is auto
+	 * transferred to another member, or if no members exist, disband the kingdom.
+	 * 
+	 * Similarly, players that are kingdom masters cannot join other kingdoms.
+	 * If the player tries to join another kingdom, they must first transfer master or disband.
+	 * If an admin or konquest forces the player to join, then master is auto
+	 * transferred to another member, or if no members exist, disband the kingdom.
 	 */
 	
 	
@@ -667,6 +714,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * Assign a player to a kingdom and teleport them to the capital spawn point.
 	 * Optionally checks for join permissions based on Konquest configuration.
 	 * Optionally enforces maximum kingdom membership difference based on Konquest configuration.
+	 * Applies join cooldown.
 	 * 
 	 * @param id The player to assign, by UUID
 	 * @param kingdomName The kingdom name, case-sensitive
@@ -680,7 +728,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 *  			5 	- joining is denied, player is already member
 	 *  			6	- joining is denied, player is a kingdom master
 	 *  			7	- joining is denied, failed switch criteria
-	 *  			8 	- Unknown player ID
+	 *  			8   - joining is denied, cooldown
+	 *  			9 	- Unknown player ID
 	 *             -1 	- internal error
 	 */
 	public int assignPlayerKingdom(UUID id, String kingdomName, boolean force) {
@@ -726,7 +775,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			offlinePlayer = konquest.getPlayerManager().getOfflinePlayerFromID(id);
 			if(offlinePlayer == null) {
 				// No player found for the given UUID
-				return 8;
+				return 9;
 			}
 		} else {
 			// Found an online player
@@ -743,14 +792,18 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(joinKingdom.equals(playerKingdom) || joinKingdom.isMember(id)) {
 			return 5;
 		}
-		// Check for player that's already a kingdom master
-		for(KonKingdom kingdom : getKingdoms()) {
-			if(kingdom.isMaster(id)) {
-				return 6;
-			}
-		}
 		// These checks may be bypassed when forced
 		if(!force) {
+			// Check for player that's already a kingdom master
+			for(KonKingdom kingdom : getKingdoms()) {
+				if(kingdom.isMaster(id)) {
+					return 6;
+				}
+			}
+			// Check for cooldown
+    		if(isOnline && isPlayerJoinCooldown(onlinePlayer.getBukkitPlayer())) {
+    			return 8;
+    		}
 			// Check for permission (online only)
 			boolean isPerKingdomJoin = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_PER_KINGDOM_JOIN_PERMISSIONS.getPath(),false);
 			if(isOnline && isPerKingdomJoin) {
@@ -777,18 +830,25 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			if(config_max_player_diff != 0 && !(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
 				return 2;
 			}
+			// Fire event (online only)
+			if(isOnline) {
+				KonquestPlayerKingdomEvent invokeEvent = new KonquestPlayerKingdomEvent(konquest, onlinePlayer, joinKingdom, onlinePlayer.getExileKingdom());
+				Konquest.callKonquestEvent(invokeEvent);
+				if(invokeEvent.isCancelled()) {
+					return 4;
+				}
+			}
 		}
 		
 		/* Passed all checks */
+		// playerKingdom could be Barbarians
 		
-		// Fire event (online only)
-		if(isOnline) {
-			KonquestPlayerKingdomEvent invokeEvent = new KonquestPlayerKingdomEvent(konquest, onlinePlayer, joinKingdom, onlinePlayer.getExileKingdom());
-			Konquest.callKonquestEvent(invokeEvent);
-			if(invokeEvent.isCancelled()) {
-				return 4;
-			}
-		}
+		// Remove any barbarian camps
+		konquest.getCampManager().removeCamp(id.toString());
+		
+		// This is probably unnecessary, the KonKingdom#removeMember method removes residencies of that kingdom.
+		// As long as we do out proper bookkeeping, the player should have no other residencies in other kingdoms.
+		/*
 		// Remove player from any enemy towns (both online & offline)
 		OfflinePlayer townPlayer = isOnline ? onlinePlayer.getOfflineBukkitPlayer() : offlinePlayer.getOfflineBukkitPlayer();
 		for(KonKingdom kingdom : kingdomMap.values()) {
@@ -803,14 +863,32 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		    	}
 			}
 		}
-		// Remove any barbarian camps
-		konquest.getCampManager().removeCamp(id.toString());
-		// Remove membership from old kingdom
-		boolean removeStatus = playerKingdom.removeMember(id);
-		if(!removeStatus) {
-    		ChatUtil.printDebug("Failed to remove member "+id.toString()+" from kingdom "+playerKingdom.getName());
-    		return -1;
-    	}
+		*/
+		
+		// Only perform membership updates on created kingdoms
+		if(playerKingdom.isCreated()) {
+			// Remove membership from old kingdom
+			boolean removeStatus = false;
+	    	if(force) {
+	    		// Force the removal of membership
+	    		// The player could be master here
+	    		// Potentially transfer master or disband old kingdom
+	    		removeStatus = removeKingdomMemberForced(id,playerKingdom);
+	    	} else {
+	    		// The player shouldn't be master due to checks
+	    		removeStatus = playerKingdom.removeMember(id);
+	    	}
+			if(removeStatus) {
+				if(isOnline) {
+					ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), "Removed from kingdom and all towns");
+				}
+	    	} else {
+	    		// Something went very wrong, the prior checks should have avoided this
+	    		ChatUtil.printDebug("Failed to remove member "+id.toString()+" from kingdom "+playerKingdom.getName());
+	    		return -1;
+	    	}
+		}
+
 		// Add membership to new kingdom
     	boolean memberStatus = joinKingdom.addMember(id, false);
     	if(!memberStatus) {
@@ -837,9 +915,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         	updateKingdomOfflineProtection();
         	konquest.updateNamePackets(onlinePlayer);
         	territoryManager.updatePlayerBorderParticles(onlinePlayer);
-        	//if(!force) {
-        	//	konquest.getDirectiveManager().displayBook(onlinePlayer);
-        	//}
+        	// Apply cooldown
+        	if(!force) {
+        		applyPlayerJoinCooldown(onlinePlayer.getBukkitPlayer());
+        	}
     	} else {
     		offlinePlayer.setKingdom(joinKingdom);
     		offlinePlayer.setExileKingdom(joinKingdom);
@@ -859,21 +938,25 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * (Optionally) Teleports to a random Wild location.
 	 * (Optionally) Removes all stats and disables prefix.
 	 * (Optionally) Resets their exileKingdom to Barbarians, making them look like a new player to Konquest.
+	 * Applies exile cooldown timer.
 	 * 
 	 * @param player The player to exile
 	 * @param teleport Teleport the player based on Konquest configuration when true
 	 * @param clearStats Remove all player stats and prefix when true
 	 * @param isFull Perform a full exile such that the player has no exile kingdom, like they just joined the server
+	 * @param force Ignore most checks when true
 	 * @return status
 	 * 				0	- success
 	 * 				1	- Player is already a barbarian
 	 * 				2	- Invalid world
 	 * 				3	- Failed to find valid teleport location
 	 * 				4	- cancelled by event
-	 * 				5	- Exile denied, player is a kingdom master
-	 * 				7   - Player not found
+	 * 				6	- Exile denied, player is a kingdom master
+	 * 				8   - Cooldown remaining
+	 * 				9   - Unknown player ID
+	 *             -1 	- internal error
 	 */
-	public int exilePlayerBarbarian(UUID id, boolean teleport, boolean clearStats, boolean isFull) {
+	public int exilePlayerBarbarian(UUID id, boolean teleport, boolean clearStats, boolean isFull, boolean force) {
 		
 		// Determine offline/online player
 		KonOfflinePlayer offlinePlayer = null;
@@ -885,36 +968,44 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			offlinePlayer = konquest.getPlayerManager().getOfflinePlayerFromID(id);
 			if(offlinePlayer == null) {
 				// No player found for the given UUID
-				return 7;
+				return 9;
 			}
 		} else {
 			// Found an online player
 			isOnline = true;
 		}
-		// Check for barbarian player
+		// Check for barbarian player or default kingdom
+		KonKingdom oldKingdom = isOnline ? onlinePlayer.getKingdom() : offlinePlayer.getKingdom();
 		boolean isPlayerBarbarian = isOnline ? onlinePlayer.isBarbarian() : offlinePlayer.isBarbarian();
-		if(isPlayerBarbarian) {
+		if(isPlayerBarbarian || !oldKingdom.isCreated()) {
     		return 1;
     	}
-		// Check for valid world (online only)
-		if(isOnline && !konquest.isWorldValid(onlinePlayer.getBukkitPlayer().getLocation().getWorld())) {
-	    	return 2;
-		}
-		// Check for player that's already a kingdom master
-		for(KonKingdom kingdom : getKingdoms()) {
-			if(kingdom.isMaster(id)) {
-				return 5;
+		// These checks are bypassed when forced
+		if(!force) {
+			// Check for valid world (online only)
+			if(isOnline && !konquest.isWorldValid(onlinePlayer.getBukkitPlayer().getLocation().getWorld())) {
+		    	return 2;
+			}
+			// Check for player that's already a kingdom master
+			for(KonKingdom kingdom : getKingdoms()) {
+				if(kingdom.isMaster(id)) {
+					return 6;
+				}
+			}
+			// Check for cooldown
+			if(isOnline && isPlayerExileCooldown(onlinePlayer.getBukkitPlayer())) {
+				return 8;
+			}
+			// Fire event (online and offline)
+			KonquestPlayerExileEvent invokeEvent = new KonquestPlayerExileEvent(konquest, offlinePlayer, oldKingdom);
+			Konquest.callKonquestEvent(invokeEvent);
+			if(invokeEvent.isCancelled()) {
+				return 4;
 			}
 		}
-		
-    	KonKingdom oldKingdom = isOnline ? onlinePlayer.getKingdom() : offlinePlayer.getKingdom();
+
+		/* At this point, oldKingdom should be a player-created kingdom and most checks passed */
     	
-    	// Fire event (online and offline)
-		KonquestPlayerExileEvent invokeEvent = new KonquestPlayerExileEvent(konquest, offlinePlayer, oldKingdom);
-		Konquest.callKonquestEvent(invokeEvent);
-		if(invokeEvent.isCancelled()) {
-			return 4;
-		}
     	// Try to teleport the player (online only)
     	if(isOnline && teleport) {
     		boolean doWorldSpawn = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.EXILE_TELEPORT_WORLD_SPAWN.getPath(), false);
@@ -953,23 +1044,30 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		}
     	}
     	
-    	// Remove residencies
-    	OfflinePlayer townPlayer = isOnline ? onlinePlayer.getOfflineBukkitPlayer() : offlinePlayer.getOfflineBukkitPlayer();
-    	for(KonTown town : oldKingdom.getTowns()) {
-    		if(town.removePlayerResident(townPlayer)) {
-    			konquest.getMapHandler().drawDynmapLabel(town);
-    			if(isOnline) {
-    				ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_TOWN.getMessage(town.getName()));
-    			}
-    		}
-    	}
-    	
     	// Remove membership from old kingdom
-		boolean removeStatus = oldKingdom.removeMember(id);
-		if(!removeStatus) {
+    	// Now, the player should be in a created kingdom with a membership.
+    	boolean removeStatus = false;
+    	if(force) {
+    		// Force the removal of membership
+    		// The player could be master here
+    		// Potentially transfer master or disband old kingdom
+    		removeStatus = removeKingdomMemberForced(id,oldKingdom);
+    	} else {
+    		// The player shouldn't be master due to checks
+    		removeStatus = oldKingdom.removeMember(id);
+    	}
+		if(removeStatus) {
+			if(isOnline) {
+				ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), "Removed from kingdom and all towns");
+			}
+    	} else {
+    		// Something went very wrong, the prior checks should have avoided this
     		ChatUtil.printDebug("Failed to remove member "+id.toString()+" from kingdom "+oldKingdom.getName());
     		return -1;
     	}
+		
+		/* Now, oldKingdom is possibly removed. Re-acquire current kingdom of player. */
+		oldKingdom = isOnline ? onlinePlayer.getKingdom() : offlinePlayer.getKingdom();
     	
     	KonKingdom exileKingdom = isFull ? getBarbarians() : oldKingdom;
     	if(isOnline) {
@@ -988,6 +1086,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		// Updates
     		konquest.updateNamePackets(onlinePlayer);
     		territoryManager.updatePlayerBorderParticles(onlinePlayer);
+    		// Cooldown
+    		if(!force) {
+    			applyPlayerExileCooldown(onlinePlayer.getBukkitPlayer());
+    		}
     	} else {
     		offlinePlayer.setKingdom(getBarbarians());
     		offlinePlayer.setExileKingdom(exileKingdom);
@@ -1039,6 +1141,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			
 			// There is already a valid invite, assign the player to the kingdom
 			int status = assignPlayerKingdom(id,kingdom.getName(),false);
+			//TODO: expand error messaging
 			if(status != 0) {
 				Konquest.playFailSound(player.getBukkitPlayer());
 				return;
@@ -1054,6 +1157,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			Konquest.playSuccessSound(player.getBukkitPlayer());
 			broadcastOfficers(kingdom, MessagePath.COMMAND_GUILD_NOTICE_REQUEST_NEW.getMessage());
 		} else {
+			// A join request has already been sent, do nothing
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_REQUEST_SENT.getMessage(kingdom.getName()));
 			Konquest.playFailSound(player.getBukkitPlayer());
 		}
@@ -1104,6 +1208,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	/**
 	 * Officer invites (offline) player to join (with /kingdom add command).
+	 * Kingdom must be closed to send invites.
 	 * Allow invites to players already in another kingdom.
 	 * Inviting a player who has already requested to join always lets them join.
 	 * @param player - The offline player that the officer invites to join their kingdom
@@ -1111,6 +1216,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @return Error code:  0 - Success
 	 * 						1 - Player is already a member
 	 * 						2 - Player has already been invited
+	 * 						3 - Kingdom must be closed to send invites
 	 * 						-1 - Internal error
 	 */
 	public int joinKingdomInvite(OfflinePlayer player, KonKingdom kingdom) {
@@ -1124,10 +1230,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return 1;
 		}
 		
+		// Cannot invite members to an open kingdom
+		if(kingdom.isOpen()) {
+			return 3;
+		}
+		
 		if(kingdom.isJoinRequestValid(id)) {
 			// There is already a valid request, add the player to the kingdom
+			// 
 			int status = assignPlayerKingdom(id,kingdom.getName(),false);
 			if(status != 0) {
+				
 				return -1;
 			}
 			
@@ -1188,53 +1301,61 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return false;
 	}
 	
-	// Effectively just a wrapper for exile
-	public void menuLeaveKingdom(KonPlayer player, KonKingdom kingdom) {
+	// Effectively just a wrapper for exile for online players by their choice
+	public void menuExileKingdom(KonPlayer player, KonKingdom kingdom) {
 		if(kingdom != null && kingdom.isCreated()) {
 			UUID id = player.getBukkitPlayer().getUniqueId();
-			int status = exilePlayerBarbarian(id,true,true,false);
+			int status = exilePlayerBarbarian(id,true,true,false,false);
 			if(status == 0) {
 				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_LEAVE.getMessage(kingdom.getName()));
 				Konquest.playSuccessSound(player.getBukkitPlayer());
 			} else {
-				//TODO: Expand error messaging
+				//TODO: Expand error messaging for each return code of exilePlayerBarbarian
 				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_LEAVE_FAIL.getMessage());
 				Konquest.playFailSound(player.getBukkitPlayer());
 			}
 		}
 	}
 	
-	/*
+	// Wrapper for exile for offline players
+	// Used by officers to remove players from their kingdom
 	public boolean kickKingdomMember(OfflinePlayer player, KonKingdom kingdom) {
 		boolean result = false;
-		if(kingdom != null) {
+		if(kingdom != null && kingdom.isCreated()) {
 			UUID id = player.getUniqueId();
-			result = removeMember(kingdom, id);
+			int status = exilePlayerBarbarian(id,true,true,false,false);
+			if(status == 0) {
+				result = true;
+			}
+			//TODO: expand messaging or return more error codes
 		}
 		return result;
 	}
-	*/
-	
 	
 	/**
 	 * Removes a kingdom member and handles master transfers.
+	 * This is mainly used for forcibly removing players from kingdoms, like for offline pruning.
 	 * If player is master, attempts to transfer master to officers first, then members.
 	 * If no other members than master, removes the kingdom.
+	 * 
+	 * When there are other members, this method returns with the player removed from kingdom membership,
+	 * but the player's kingdom fields are unchanged.
+	 * When there are no other members, the kingdom is removed and the player's kingdom fields
+	 * are modified to be barbarian.
+	 * 
 	 * @param player
 	 * @param kingdom
 	 */
-	/* Unused?
-	private boolean removeKingdomMember(OfflinePlayer player, KonKingdom kingdom) {
+	private boolean removeKingdomMemberForced(UUID id, KonKingdom kingdom) {
 		boolean result = false;
-		UUID id = player.getUniqueId();
-		if(kingdom != null) {
-			// Found kingdom where target player is a member
+		if(kingdom != null && kingdom.isCreated()) {
+			// Attempt to handle master transfer
 			if(kingdom.isMaster(id)) {
 				// Player is master, transfer if possible
 				List<OfflinePlayer> officers = kingdom.getPlayerOfficersOnly();
 				if(!officers.isEmpty()) {
 					// Make the first officer into the master
-					transferMaster(officers.get(0),kingdom);
+					kingdom.setMaster(officers.get(0).getUniqueId());
 					// Now remove the player
 					result = kingdom.removeMember(id);
 				} else {
@@ -1242,13 +1363,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					List<OfflinePlayer> members = kingdom.getPlayerMembersOnly();
 					if(!members.isEmpty()) {
 						// Make the first member into the master
-						transferMaster(members.get(0),kingdom);
+						kingdom.setMaster(members.get(0).getUniqueId());
 						// Now remove the player
 						result = kingdom.removeMember(id);
 					} else {
 						// There are no members to transfer master to, remove the kingdom
+						// This will also exile all players to barbarians, including the given ID
 						String name = kingdom.getName();
-						removeKingdom(name);
+						result = removeKingdom(name);
 					}
 				}
 			} else {
@@ -1258,7 +1380,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return result;
 	}
-	*/
 	
 	/* Unused?
 	private boolean addKingdomMember(OfflinePlayer player, KonKingdom kingdom, boolean isOfficer) {

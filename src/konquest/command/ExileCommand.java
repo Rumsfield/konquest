@@ -49,6 +49,7 @@ public class ExileCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
         		return;
         	} else {
+        		
         		// Check for cooldown
         		if(getKonquest().getKingdomManager().isPlayerExileCooldown(bukkitPlayer)) {
         			int remainingCooldown = getKonquest().getKingdomManager().getExileCooldownRemainingSeconds(bukkitPlayer);
@@ -56,6 +57,7 @@ public class ExileCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_EXILE_ERROR_COOLDOWN.getMessage(cooldownTimeStr));
         			return;
         		}
+        		
         		// Confirm with the player
         		if(!player.isExileConfirmed()) {
         			boolean isAllowSwitch = getKonquest().getConfigManager().getConfig("core").getBoolean("core.kingdoms.allow_exile_switch",false);
@@ -84,7 +86,7 @@ public class ExileCommand extends CommandBase {
         		} else {
         			// Exile the player
         			UUID id = bukkitPlayer.getUniqueId();
-        			int status = getKonquest().getKingdomManager().exilePlayerBarbarian(id,true,true,false);
+        			int status = getKonquest().getKingdomManager().exilePlayerBarbarian(id,true,true,false,false);
         			
         			if(status == 0) {
         				boolean doRemoveFavor = getKonquest().getConfigManager().getConfig("core").getBoolean(CorePath.EXILE_REMOVE_FAVOR.getPath(), true);

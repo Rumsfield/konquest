@@ -10,7 +10,6 @@ import org.bukkit.Material;
 import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestPlayer;
-import konquest.api.model.KonquestTerritory;
 import konquest.api.model.KonquestTown;
 
 /**
@@ -79,20 +78,25 @@ public interface KonquestKingdomManager {
 	 * (Optionally) Teleports to a random Wild location.
 	 * (Optionally) Removes all stats and disables prefix.
 	 * (Optionally) Resets their exileKingdom to Barbarians, making them look like a new player to Konquest.
+	 * Applies exile cooldown timer.
 	 * 
-	 * @param id The player to exile, by UUID
+	 * @param player The player to exile
 	 * @param teleport Teleport the player based on Konquest configuration when true
 	 * @param clearStats Remove all player stats and prefix when true
 	 * @param isFull Perform a full exile such that the player has no exile kingdom, like they just joined the server
+	 * @param force Ignore most checks when true
 	 * @return status
 	 * 				<br>0	- success
 	 * 				<br>1	- Player is already a barbarian
 	 * 				<br>2	- Invalid world
 	 * 				<br>3	- Failed to find valid teleport location
 	 * 				<br>4	- cancelled by event
-	 * 				<br>5	- Exile denied, player is a kingdom master
+	 * 				<br>6	- Exile denied, player is a kingdom master
+	 * 				<br>8   - Cooldown remaining
+	 * 				<br>9   - Unknown player ID
+	 *             <br>-1 	- internal error
 	 */
-	public int exilePlayerBarbarian(UUID id, boolean teleport, boolean clearStats, boolean isFull);
+	public int exilePlayerBarbarian(UUID id, boolean teleport, boolean clearStats, boolean isFull, boolean force);
 	
 	/**
 	 * Create a new town centered at the given location, with the given name, for the given kingdom name.

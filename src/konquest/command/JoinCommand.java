@@ -73,7 +73,7 @@ public class JoinCommand extends CommandBase {
     					isAllowSwitch) {
     				// Allow barbarians to join any kingdom when they're new (exile kingdom = barbarians) or if switching is allowed in config
     				// Allow barbarians to join their exiled kingdoms
-        			int status = getKonquest().getKingdomManager().assignPlayerKingdom(player, joinName, false);
+        			int status = getKonquest().getKingdomManager().assignPlayerKingdom(bukkitPlayer.getUniqueId(), joinName, false);
         			switch(status) {
 	        			case 0:
 	        				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_JOIN_NOTICE_KINGDOM_JOIN.getMessage(ChatColor.AQUA+joinName));
