@@ -937,6 +937,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * Sets their exileKingdom value to their current Kingdom.
 	 * (Optionally) Teleports to a random Wild location.
 	 * (Optionally) Removes all stats and disables prefix.
+	 * (Optionally) Removes all favor.
 	 * (Optionally) Resets their exileKingdom to Barbarians, making them look like a new player to Konquest.
 	 * Applies exile cooldown timer.
 	 * 
@@ -1006,6 +1007,31 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 		/* At this point, oldKingdom should be a player-created kingdom and most checks passed */
     	
+		// Remove membership from old kingdom
+    	// Now, the player should be in a created kingdom with a membership.
+    	boolean removeStatus = false;
+    	if(force) {
+    		// Force the removal of membership
+    		// The player could be master here
+    		// Potentially transfer master or disband old kingdom
+    		removeStatus = removeKingdomMemberForced(id,oldKingdom);
+    	} else {
+    		// The player shouldn't be master due to checks
+    		removeStatus = oldKingdom.removeMember(id);
+    	}
+		if(removeStatus) {
+			if(isOnline) {
+				ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), "Removed from kingdom and all towns");
+			}
+    	} else {
+    		// Something went very wrong, the prior checks should have avoided this
+    		ChatUtil.printDebug("Failed to remove member "+id.toString()+" from kingdom "+oldKingdom.getName());
+    		return -1;
+    	}
+		
+		/* Now, oldKingdom is possibly removed. Re-acquire current kingdom of player. */
+		oldKingdom = isOnline ? onlinePlayer.getKingdom() : offlinePlayer.getKingdom();
+		
     	// Try to teleport the player (online only)
     	if(isOnline && teleport) {
     		boolean doWorldSpawn = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.EXILE_TELEPORT_WORLD_SPAWN.getPath(), false);
@@ -1044,30 +1070,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		}
     	}
     	
-    	// Remove membership from old kingdom
-    	// Now, the player should be in a created kingdom with a membership.
-    	boolean removeStatus = false;
-    	if(force) {
-    		// Force the removal of membership
-    		// The player could be master here
-    		// Potentially transfer master or disband old kingdom
-    		removeStatus = removeKingdomMemberForced(id,oldKingdom);
-    	} else {
-    		// The player shouldn't be master due to checks
-    		removeStatus = oldKingdom.removeMember(id);
-    	}
-		if(removeStatus) {
-			if(isOnline) {
-				ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), "Removed from kingdom and all towns");
-			}
-    	} else {
-    		// Something went very wrong, the prior checks should have avoided this
-    		ChatUtil.printDebug("Failed to remove member "+id.toString()+" from kingdom "+oldKingdom.getName());
-    		return -1;
-    	}
-		
-		/* Now, oldKingdom is possibly removed. Re-acquire current kingdom of player. */
-		oldKingdom = isOnline ? onlinePlayer.getKingdom() : offlinePlayer.getKingdom();
+    	// Remove favor
+    	boolean doRemoveFavor = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.EXILE_REMOVE_FAVOR.getPath(), true);
+    	OfflinePlayer offlineBukkitPlayer = isOnline ? onlinePlayer.getOfflineBukkitPlayer() : offlinePlayer.getOfflineBukkitPlayer();
+    	if(doRemoveFavor) {
+			double balance = KonquestPlugin.getBalance(offlineBukkitPlayer);
+			KonquestPlugin.withdrawPlayer(offlineBukkitPlayer, balance);
+		}
     	
     	KonKingdom exileKingdom = isFull ? getBarbarians() : oldKingdom;
     	if(isOnline) {
@@ -1237,7 +1246,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		
 		if(kingdom.isJoinRequestValid(id)) {
 			// There is already a valid request, add the player to the kingdom
-			// 
+			//TODO: Handle error conditions for assignment
 			int status = assignPlayerKingdom(id,kingdom.getName(),false);
 			if(status != 0) {
 				
@@ -1284,6 +1293,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			if(resp) {
 				int status = assignPlayerKingdom(id,kingdom.getName(),false);
 				if(status != 0) {
+					Konquest.playFailSound(player.getBukkitPlayer());
 					return false;
 				}
 				

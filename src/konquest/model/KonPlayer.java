@@ -58,7 +58,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	
 	private boolean isAdminBypassActive;
 	private boolean isGlobalChat;
-	private boolean isExileConfirmed;
 	private boolean isMapAuto;
 	private boolean isGiveLordConfirmed;
 	private boolean isPriorityTitleDisplay;
@@ -66,7 +65,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	private boolean isFlying;
 	private boolean isBorderDisplay;
 	
-	private Timer exileConfirmTimer;
 	private Timer giveLordConfirmTimer;
 	private Timer priorityTitleDisplayTimer;
 	private Timer borderUpdateLoopTimer;
@@ -100,14 +98,12 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		this.isAdminBypassActive = false;
 		this.autoFollow = FollowType.NONE;
 		this.isGlobalChat = true;
-		this.isExileConfirmed = false;
 		this.isMapAuto = false;
 		this.isGiveLordConfirmed = false;
 		this.isPriorityTitleDisplay = false;
 		this.isCombatTagged = false;
 		this.isFlying = false;
 		this.isBorderDisplay = true;
-		this.exileConfirmTimer = new Timer(this);
 		this.giveLordConfirmTimer = new Timer(this);
 		this.priorityTitleDisplayTimer = new Timer(this);
 		this.borderUpdateLoopTimer = new Timer(this);
@@ -221,14 +217,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		return isGlobalChat;
 	}
 	
-	public boolean isExileConfirmed() {
-		return isExileConfirmed;
-	}
-	
-	public Timer getExileConfirmTimer() {
-		return exileConfirmTimer;
-	}
-	
 	public boolean isMapAuto() {
 		return isMapAuto;
 	}
@@ -334,10 +322,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		isGlobalChat = val;
 	}
 	
-	public void setIsExileConfirmed(boolean val) {
-		isExileConfirmed = val;
-	}
-	
 	public void setIsGiveLordConfirmed(boolean val) {
 		isGiveLordConfirmed = val;
 	}
@@ -416,7 +400,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	}
 	
 	public void stopTimers() {
-		exileConfirmTimer.stopTimer();
 		giveLordConfirmTimer.stopTimer();
 		priorityTitleDisplayTimer.stopTimer();
 		borderUpdateLoopTimer.stopTimer();
@@ -455,10 +438,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	public void onEndTimer(int taskID) {
 		if(taskID == 0) {
 			ChatUtil.printDebug("Player Timer ended with null taskID!");
-		} else if(taskID == exileConfirmTimer.getTaskID()) {
-			// Clear exile confirmation
-			//ChatUtil.printDebug("Player exile confirmation Timer ended with taskID: "+taskID+" for "+bukkitPlayer.getName());
-			isExileConfirmed = false;
 		} else if(taskID == giveLordConfirmTimer.getTaskID()) {
 			// Clear give lord confirmation
 			//ChatUtil.printDebug("Player give lord confirmation Timer ended with taskID: "+taskID+" for "+bukkitPlayer.getName());
