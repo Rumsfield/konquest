@@ -12,7 +12,7 @@ public enum AdminCommandType {
 	//REMOVEKINGDOM	("konquest.command.admin.removekingdom",	"<kingdom>",														MessagePath.DESCRIPTION_ADMIN_REMOVEKINGDOM.getMessage()),
 	//REMOVETOWN		("konquest.command.admin.removetown",		"<kingdom> <town>",													MessagePath.DESCRIPTION_ADMIN_REMOVETOWN.getMessage()),
 	//REMOVECAMP		("konquest.command.admin.removecamp",		"<player>",															MessagePath.DESCRIPTION_ADMIN_REMOVECAMP.getMessage()),
-	
+	//TODO: KR Update descriptions
 	/* New */
 	KINGDOM		    ("konquest.command.admin.kingdom",			"menu|create|add|kick|rename <kingdom> [<name>] [<template>]",		MessagePath.DESCRIPTION_ADMIN_MAKEKINGDOM.getMessage()),
 	TOWN		    ("konquest.command.admin.town",			    "menu|create|add|kick|rename|takeover <town> [<name>]",				MessagePath.DESCRIPTION_ADMIN_MAKEKINGDOM.getMessage()),

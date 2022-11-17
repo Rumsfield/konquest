@@ -1,5 +1,8 @@
 package konquest.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public enum KonPropertyFlag {
 //TODO: Replace these strings with MessagePaths
 	
@@ -68,6 +71,14 @@ public enum KonPropertyFlag {
 			if(p.toString().equalsIgnoreCase(flag)) {
 				result = true;
 			}
+		}
+		return result;
+	}
+	
+	public static Set<String> getFlagStrings() {
+		Set<String> result = new HashSet<String>();
+		for(KonPropertyFlag p : KonPropertyFlag.values()) {
+			result.add(p.toString());
 		}
 		return result;
 	}

@@ -2111,6 +2111,24 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return false;
 	}
 	
+	public ArrayList<String> getTownNames() {
+		ArrayList<String> names = new ArrayList<String>();
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			names.addAll(kingdom.getTownNames());
+		}
+		return names;
+	}
+	
+	public KonTown getTown(String name) {
+		KonTown result = null;
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			if(kingdom.hasTown(name)) {
+				result = kingdom.getTown(name);
+			}
+		}
+		return result;
+	}
+	
 	public boolean isTown(String name) {
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			if(kingdom.hasTown(name)) {
