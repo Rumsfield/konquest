@@ -145,6 +145,17 @@ public class RuinManager implements KonquestRuinManager {
 		return result;
 	}
 	
+	public boolean renameRuin(String name, String newName) {
+		boolean result = false;
+		if(isRuin(name) && konquest.validateNameConstraints(newName) == 0) {
+			ruinMap.get(name.toLowerCase()).setName(newName);
+			KonRuin ruin = ruinMap.remove(name.toLowerCase());
+			ruinMap.put(newName.toLowerCase(), ruin);
+			result = true;
+		}
+		return result;
+	}
+	
 	public KonRuin getRuin(String name) {
 		return ruinMap.get(name.toLowerCase());
 	}

@@ -22,8 +22,8 @@ public class SanctuaryAdminCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		// k admin sanctuary create|remove <name>
-		if (getArgs().length != 4) {
+		// k admin sanctuary create|remove|rename <name> [<name>]
+		if (getArgs().length != 4 && getArgs().length != 5) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         }
@@ -65,6 +65,27 @@ public class SanctuaryAdminCommand extends CommandBase {
         	} else {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_REMOVE.getMessage(name));
         	}
+		} else if(cmdMode.equalsIgnoreCase("rename")) {
+			if (getArgs().length == 5) {
+				if(!getKonquest().getSanctuaryManager().isSanctuary(name)) {
+					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(name));
+	                return;
+				}
+				String newName = getArgs()[4];
+				if(getKonquest().validateName(newName,bukkitPlayer) != 0) {
+	        		return;
+	        	}
+				boolean pass = getKonquest().getSanctuaryManager().renameSanctuary(name,newName);
+				if(!pass) {
+	        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_RENAME.getMessage(name,newName));
+	                return;
+	        	} else {
+	        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_RENAME.getMessage(name,newName));
+	        	}
+			} else {
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	            return;
+			}
 		} else {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
@@ -73,12 +94,13 @@ public class SanctuaryAdminCommand extends CommandBase {
 	
 	@Override
 	public List<String> tabComplete() {
-		// k admin sanctuary create|remove <name>
+		// k admin sanctuary create|remove|rename <name> [<name>]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		if(getArgs().length == 3) {
 			tabList.add("create");
 			tabList.add("remove");
+			tabList.add("rename");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
@@ -91,6 +113,14 @@ public class SanctuaryAdminCommand extends CommandBase {
 			}
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
+		} else if(getArgs().length == 5) {
+			String subCmd = getArgs()[2];
+			if(subCmd.equalsIgnoreCase("rename")) {
+				tabList.add("***");
+			}
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
 		}
 		return matchedTabList;

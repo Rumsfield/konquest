@@ -114,6 +114,17 @@ public class SanctuaryManager {
 		return result;
 	}
 	
+	public boolean renameSanctuary(String name, String newName) {
+		boolean result = false;
+		if(isSanctuary(name) && konquest.validateNameConstraints(newName) == 0) {
+			sanctuaryMap.get(name.toLowerCase()).setName(newName);
+			KonSanctuary sanctuary = sanctuaryMap.remove(name.toLowerCase());
+			sanctuaryMap.put(newName.toLowerCase(), sanctuary);
+			result = true;
+		}
+		return result;
+	}
+	
 	public KonSanctuary getSanctuary(String name) {
 		return sanctuaryMap.get(name.toLowerCase());
 	}

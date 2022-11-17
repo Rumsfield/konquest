@@ -30,7 +30,6 @@ public class FlagAdminCommand extends CommandBase {
 	 */
 
     public void execute() {
-        //OLD  k admin flag flag1 [arguments]
     	// k admin flag <name> [<flag>] [<value>]
     	if (getArgs().length != 3 && getArgs().length != 4 && getArgs().length != 5) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -122,7 +121,6 @@ public class FlagAdminCommand extends CommandBase {
     
     @Override
 	public List<String> tabComplete() {
-    	//OLD k admin flag flag1 [arguments]
     	// k admin flag <name> [<flag>] [<value>]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();

@@ -390,21 +390,25 @@ command:
       notice:
         create: "Successfully created new Ruin: %s"
         remove: "Successfully removed Ruin: %s"
+        rename: "Successfully changed Ruin name from %s to %s."
         criticals: "Removed all previous critical blocks from %s, click on blocks to add."
         spawns: "Removed all previous spawn blocks from %s, click on blocks to add."
         add: "Block added to Ruin %s."
       error:
         create: "Could not create Ruin %s, bad name or territory overlap."
         remove: "Failed to remove unknown Ruin %s."
+        rename: "Failed to rename Ruin %s to %s."
         match: "Clicked block does not match type: %s"
         invalid: "Could not add this block to a valid Ruin."
     sanctuary:
       notice:
         create: "Successfully created new Sanctuary: %s"
         remove: "Successfully removed Sanctuary: %s"
+        rename: "Successfully changed Sanctuary name from %s to %s."
       error:
         create: "Could not create Sanctuary %s, bad name or territory overlap."
         remove: "Failed to remove unknown Sanctuary %s."
+        rename: "Failed to rename Sanctuary %s to %s."
     save:
       notice:
         message: "Saved all kingdoms, camps and ruins to files."
