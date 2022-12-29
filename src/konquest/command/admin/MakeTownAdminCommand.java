@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.Location;
+//import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -35,13 +35,14 @@ public class MakeTownAdminCommand extends CommandBase {
                 return;
         	}
         	
-        	Location playerLoc = bukkitPlayer.getLocation();
+        	//Location playerLoc = bukkitPlayer.getLocation();
         	String townName = getArgs()[2];
         	if(getKonquest().validateName(townName,bukkitPlayer) != 0) {
         		return;
         	}
         	String kingdomName = getArgs()[3];
-        	int exitCode = getKonquest().getKingdomManager().addTown(playerLoc, townName, kingdomName);
+        	//int exitCode = getKonquest().getKingdomManager().addTown(playerLoc, townName, kingdomName);
+        	int exitCode = 0;
         	if(exitCode == 0) {
         		bukkitPlayer.teleport(getKonquest().getKingdomManager().getKingdom(kingdomName).getTown(townName).getSpawnLoc());
         		//ChatUtil.sendNotice((Player) getSender(), "Successfully created new Town: "+townName);

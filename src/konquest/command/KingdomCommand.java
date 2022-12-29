@@ -289,7 +289,7 @@ public class KingdomCommand extends CommandBase {
 				tabList.add("***");
 			} else if(subCommand.equalsIgnoreCase("add")) {
 				List<String> playerList = new ArrayList<>();
-				for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllPlayersInKingdom(player.getKingdom())) {
+				for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllKonquestOfflinePlayers()) {
 					name = offlinePlayer.getOfflineBukkitPlayer().getName();
 					if(name != null && kingdom != null && !kingdom.isMember(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
 						playerList.add(name);
@@ -298,7 +298,7 @@ public class KingdomCommand extends CommandBase {
 				tabList.addAll(playerList);
 			} else if(subCommand.equalsIgnoreCase("kick")) {
 				List<String> playerList = new ArrayList<>();
-				for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllPlayersInKingdom(player.getKingdom())) {
+				for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllKonquestOfflinePlayers()) {
 					name = offlinePlayer.getOfflineBukkitPlayer().getName();
 					if(name != null && kingdom != null && kingdom.isMember(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
 						playerList.add(name);

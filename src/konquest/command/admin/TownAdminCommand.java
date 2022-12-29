@@ -15,13 +15,14 @@ public class TownAdminCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		// TODO Auto-generated method stub
-		
+		// k admin town menu|create|remove|add|kick|rename|takeover <town> [<name>]
+		//TODO KR implement town menus
 	}
 
 	@Override
 	public List<String> tabComplete() {
-		// TODO Auto-generated method stub
+		// k admin town menu|create|remove|add|kick|rename|takeover <town> [<name>]
+		
 		return null;
 	}
 }

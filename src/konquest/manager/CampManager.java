@@ -202,6 +202,9 @@ public class CampManager implements KonquestCampManager {
 				// Fire event
 				KonquestCampCreateEvent invokeEvent = new KonquestCampCreateEvent(konquest, newCamp, player);
 				Konquest.callKonquestEvent(invokeEvent);
+				// Post-camp setup
+				player.getBukkitPlayer().setBedSpawnLocation(loc, true);
+				ChatUtil.sendKonTitle(player, "", Konquest.barbarianColor+newCamp.getName());
 			}
 		}
 		return result;

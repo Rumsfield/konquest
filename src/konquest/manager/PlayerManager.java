@@ -304,6 +304,22 @@ public class PlayerManager implements KonquestPlayerManager {
     	return playerNameList;
     }
     
+    public ArrayList<String> getPlayerNames() {
+    	ArrayList<String> playerNameList = new ArrayList<String>();
+    	for(KonPlayer player : onlinePlayers.values()) {
+    		playerNameList.add(player.getBukkitPlayer().getName());
+    	}
+    	return playerNameList;
+    }
+    
+    public ArrayList<String> getAllPlayerNames() {
+    	ArrayList<String> playerNameList = new ArrayList<String>();
+    	for(KonOfflinePlayer player : allPlayers.values()) {
+    		playerNameList.add(player.getOfflineBukkitPlayer().getName());
+    	}
+    	return playerNameList;
+    }
+    
     public ArrayList<KonOfflinePlayer> getAllPlayersInKingdom(String kingdomName) {
     	//ChatUtil.printDebug("Gathering all players in Kingdom "+kingdomName);
     	ArrayList<KonOfflinePlayer> playerList = new ArrayList<KonOfflinePlayer>();

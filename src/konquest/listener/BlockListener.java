@@ -764,11 +764,8 @@ public class BlockListener implements Listener {
 					}
 					int status = campManager.addCampForPlayer(event.getBlock().getLocation(), player);
 					if(status == 0) { // on successful camp setup...
-						player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
 						//ChatUtil.sendNotice(event.getPlayer(), "Successfully set up camp");
 						ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
-						String territoryName = campManager.getCamp((KonOfflinePlayer)player).getName();
-						ChatUtil.sendKonTitle(player, "", ChatColor.YELLOW+territoryName);
 					} else {
 						switch(status) {
 				    	case 1:

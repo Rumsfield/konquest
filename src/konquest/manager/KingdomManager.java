@@ -519,6 +519,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					// Move player(s) out of center chunk (monument)
 					teleportAwayFromCenter(newKingdom.getCapital());
 				}
+				// Update border particles
+				konquest.getTerritoryManager().updatePlayerBorderParticles(master);
 			} else {
 				// Failed to pass all init checks, remove the kingdom
 				newKingdom.removeCapital();

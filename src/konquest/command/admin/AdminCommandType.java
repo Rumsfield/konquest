@@ -14,8 +14,8 @@ public enum AdminCommandType {
 	//REMOVECAMP		("konquest.command.admin.removecamp",		"<player>",															MessagePath.DESCRIPTION_ADMIN_REMOVECAMP.getMessage()),
 	//TODO: KR Update descriptions
 	/* New */
-	KINGDOM		    ("konquest.command.admin.kingdom",			"menu|create|add|kick|rename <kingdom> [<name>] [<template>]",		MessagePath.DESCRIPTION_ADMIN_MAKEKINGDOM.getMessage()),
-	TOWN		    ("konquest.command.admin.town",			    "menu|create|add|kick|rename|takeover <town> [<name>]",				MessagePath.DESCRIPTION_ADMIN_MAKEKINGDOM.getMessage()),
+	KINGDOM		    ("konquest.command.admin.kingdom",			"menu|create|remove|add|kick|rename <kingdom> [<name>]",			MessagePath.DESCRIPTION_ADMIN_MAKEKINGDOM.getMessage()),
+	TOWN		    ("konquest.command.admin.town",			    "menu|create|remove|add|kick|rename|takeover <town> [<name>]",		MessagePath.DESCRIPTION_ADMIN_MAKEKINGDOM.getMessage()),
 	CAMP		    ("konquest.command.admin.camp",			    "create|remove <player>",											MessagePath.DESCRIPTION_ADMIN_MAKEKINGDOM.getMessage()),
 	CAPTURE		    ("konquest.command.admin.capture",			"<town> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_MAKEKINGDOM.getMessage()),
 	/* End */
