@@ -10,7 +10,7 @@ public enum CommandType {
 	//LEAVE   (Material.FEATHER,          "konquest.command.leave",   "",   "<town>",                                                         MessagePath.DESCRIPTION_LEAVE.getMessage()),
 	//EXILE   (Material.TNT,              "konquest.command.exile",   "",   "",                                                               MessagePath.DESCRIPTION_EXILE.getMessage()),
 	INFO    (Material.SPRUCE_SIGN,      "konquest.command.info",    "i",  "[<kingdom>|<town>|<player>]",                                    MessagePath.DESCRIPTION_INFO.getMessage()),
-	LIST    (Material.PAPER,            "konquest.command.list",    "l",  "kingdoms|towns",                                                 MessagePath.DESCRIPTION_LIST.getMessage()),
+	LIST    (Material.PAPER,            "konquest.command.list",    "l",  "[kingdom|town] [<page>]",                                        MessagePath.DESCRIPTION_LIST.getMessage()),
 	FAVOR   (Material.GOLD_INGOT,       "konquest.command.favor",   "f",  "",                                                               MessagePath.DESCRIPTION_FAVOR.getMessage()),
 	MAP     (Material.FILLED_MAP,       "konquest.command.map",     "m",  "[far|auto]",                                                     MessagePath.DESCRIPTION_MAP.getMessage()),
 	CHAT    (Material.EMERALD,          "konquest.command.chat",    "c",  "",                                                               MessagePath.DESCRIPTION_CHAT.getMessage()),

@@ -79,6 +79,7 @@ public class ListAdminCommand extends CommandBase {
 	        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 	                return;
         	}
+        	Collections.sort(lines);
         	
         	// Display paged lines to player
         	int numLines = lines.size();
