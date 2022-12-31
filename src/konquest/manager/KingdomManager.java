@@ -1827,6 +1827,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.ENEMY);
     }
     
+    public boolean isPlayerFriendly(KonOfflinePlayer offlinePlayer, KonKingdom kingdom) {
+    	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.FRIENDLY);
+    }
+    
+    public boolean isPlayerBarbarian(KonOfflinePlayer offlinePlayer, KonKingdom kingdom) {
+    	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.BARBARIAN);
+    }
+    
 	/*
 	 * 
 	 * Town Methods

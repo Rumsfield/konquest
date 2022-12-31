@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.api.model.KonquestKingdom;
@@ -247,6 +248,10 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public boolean isMember(UUID id) {
 		return isCreated && members.containsKey(id);
+	}
+	
+	public boolean isMember(Player player) {
+		return isMember(player.getUniqueId());
 	}
 	
 	public boolean isMasterValid() {

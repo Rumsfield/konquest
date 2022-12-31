@@ -11,9 +11,9 @@ public enum KonPropertyFlag {
 	PVP				("PvP", 		"Allow player damage"), // Done in EntityListener
 	PVE				("PvE", 		"Allow entity damage"), // Done in EntityListener
 	BUILD			("Build", 		"Allow block edits"), // Done in BlockListener
-	USE				("Use", 		"Allow using blocks"),
+	USE				("Use", 		"Allow using blocks"), // Done in InventoryListener, ...
 	MOBS			("Mobs", 		"Allow mobs to spawn"), // Done in EntityListener
-	PORTALS			("Portals", 	"Allow players to use portals"),
+	PORTALS			("Portals", 	"Allow players to use portals"), // Done in WorldListener
 	ENTER			("Enter", 		"Allow players to enter"),
 	EXIT			("Exit", 		"Allow players to exit"),
 	

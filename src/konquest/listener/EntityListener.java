@@ -31,6 +31,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Animals;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -49,6 +50,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -371,6 +373,32 @@ public class EntityListener implements Listener {
 					}
 				}
 			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+    public void onArrowInteract(EntityInteractEvent event) {
+    	if(konquest.isWorldIgnored(event.getEntity().getLocation())) {
+			return;
+		}
+    	// prevent arrows from interacting with things
+		if (!(event.getEntity() instanceof Arrow)) {
+            return;
+        }
+		//ChatUtil.printDebug("Caught arrow interaction...");
+		if(!event.isCancelled() && territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
+	        KonTerritory territory = territoryManager.getChunkTerritory(event.getBlock().getLocation());
+	        // Protect territory from arrow interaction
+	        // Property Flag Holders
+ 			if(territory instanceof KonPropertyFlagHolder) {
+ 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+ 				if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
+ 					if(!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
+ 						event.setCancelled(true);
+ 						return;
+ 					}
+ 				}
+ 			}
 		}
 	}
 	
