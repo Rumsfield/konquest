@@ -1293,6 +1293,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		return result;
 	}
 	
+	public Map<KonquestUpgrade,Integer> getUpgrades() {
+		Map<KonquestUpgrade,Integer> result = new HashMap<KonquestUpgrade,Integer>(upgrades);
+		return result;
+	}
+	
 	public void addUpgrade(KonquestUpgrade upgrade, int level) {
 		upgrades.put(upgrade, level);
 	}

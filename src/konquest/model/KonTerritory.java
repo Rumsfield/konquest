@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import konquest.Konquest;
 import konquest.api.model.KonquestTerritoryType;
@@ -61,7 +62,12 @@ public abstract class KonTerritory implements KonquestTerritory {
 		for(Point point : points) {
 			chunkList.put(point, this);
 		}
-		//ChatUtil.printDebug("Added points in territory "+name);
+	}
+	
+	public void addPoints(Set<Point> points) {
+		for(Point point : points) {
+			chunkList.put(point, this);
+		}
 	}
 	
 	public boolean removeChunk(Location loc) {

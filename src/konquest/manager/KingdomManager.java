@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,6 +37,7 @@ import konquest.api.manager.KonquestKingdomManager;
 import konquest.api.model.KonquestUpgrade;
 import konquest.display.icon.OptionIcon.optionAction;
 import konquest.api.model.KonquestTerritoryType;
+import konquest.api.model.KonquestTown;
 import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestPlayer;
@@ -67,13 +69,30 @@ import konquest.utility.Timer;
 
 public class KingdomManager implements KonquestKingdomManager, Timeable {
 
+	/**
+	 * KingdomManager.RelationRole
+	 * These are all possible relationship states between kingdoms/towns/players.
+	 */
 	public enum RelationRole {
+		/* Player/territory is barbarian */
 		BARBARIAN,
+		
+		/* Territory has no kingdom (ruin, sanctuary, etc) */
 		NEUTRAL,
+		
+		/* Player/territory are in the same kingdom */
 		FRIENDLY,
+		
+		/* Player/territory are in an enemy kingdom */
 		ENEMY,
+		
+		/* Player/territory are in an allied kingdom */
 		ALLIED,
+		
+		/* Player/territory are in a sanctioned kingdom */
 		SANCTIONED,
+		
+		/* Player/territory are in a peaceful kingdom */
 		PEACEFUL;
 	}
 	
@@ -1961,32 +1980,34 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @param name - Town name
 	 * @param oldKingdomName - Kingdom name of conquered Town
 	 * @param conquerPlayer - Player who initiated the conquering
-	 * @return true if all names exist, else false
+	 * @return the captured town
 	 */
-	public boolean captureTownForPlayer(String name, String oldKingdomName, KonquestPlayer conquerPlayerArg) {
+	public KonquestTown captureTownForPlayer(String name, String oldKingdomName, KonquestPlayer conquerPlayerArg) {
 		if(conquerPlayerArg == null) {
-			return false;
+			return null;
 		}
 		if(!(conquerPlayerArg instanceof KonPlayer)) {
-			return false;
+			return null;
 		}
 		KonPlayer conquerPlayer = (KonPlayer)conquerPlayerArg;
 		
 		if(conquerPlayer.isBarbarian()) {
-			return false;
+			return null;
 		}
-		if(captureTown(name, oldKingdomName, conquerPlayer.getKingdom())) {
-			conquerPlayer.getKingdom().getTown(name).setPlayerLord(conquerPlayer.getOfflineBukkitPlayer());
-			return true;
+		KonTown town = captureTown(name, oldKingdomName, conquerPlayer.getKingdom());
+		if(town != null) {
+			town.setPlayerLord(conquerPlayer.getOfflineBukkitPlayer());
+			return town;
 		}
-		return false;
+		return null;
 	}
 	
-	public boolean captureTown(String name, String oldKingdomName, KonKingdom conquerKingdom) {
+	public KonTown captureTown(String name, String oldKingdomName, KonKingdom conquerKingdom) {
 		if(!conquerKingdom.isMonumentTemplateValid()) {
-			return false;
+			ChatUtil.printDebug("Failed to capture town for kingdom with invalid template: "+conquerKingdom.getName());
+			return null;
 		}
-		boolean captureUpgrades = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.capture_upgrades",true);
+		boolean captureUpgrades = konquest.getCore().getBoolean(CorePath.TOWNS_CAPTURE_UPGRADES.getPath(),true);
 		if(isKingdom(oldKingdomName) && getKingdom(oldKingdomName).hasTown(name)) {
 			konquest.getMapHandler().drawDynmapRemoveTerritory(getKingdom(oldKingdomName).getTown(name));
 			getKingdom(oldKingdomName).getTown(name).purgeResidents();
@@ -2007,12 +2028,95 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			konquest.getMapHandler().drawDynmapLabel(getKingdom(oldKingdomName).getCapital());
 			konquest.getMapHandler().drawDynmapLabel(conquerKingdom.getCapital());
 			konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(conquerKingdom.getTown(name).getChunkList().keySet(),conquerKingdom.getTown(name).getWorld());
-			return true;
+			return conquerKingdom.getTown(name);
 		}
-		return false;
+		return null;
 	}
 	
+	/**
+	 * Primary method for transferring ownership of a capital between kingdoms
+	 * @param oldKingdomName - Kingdom name of conquered Town
+	 * @param conquerPlayer - Player who initiated the conquering
+	 * @return true if all names exist, else false
+	 */
+	public KonquestTown captureCapitalForPlayer(String oldKingdomName, KonquestPlayer conquerPlayerArg) {
+		if(conquerPlayerArg == null) {
+			return null;
+		}
+		if(!(conquerPlayerArg instanceof KonPlayer)) {
+			return null;
+		}
+		KonPlayer conquerPlayer = (KonPlayer)conquerPlayerArg;
+		
+		if(conquerPlayer.isBarbarian()) {
+			return null;
+		}
+		KonTown town = captureCapital(oldKingdomName, conquerPlayer.getKingdom());
+		if(town != null) {
+			town.setPlayerLord(conquerPlayer.getOfflineBukkitPlayer());
+			return town;
+		}
+		return null;
+	}
 	
+	public KonTown captureCapital(String oldKingdomName, KonKingdom conquerKingdom) {
+		if(!conquerKingdom.isMonumentTemplateValid()) {
+			ChatUtil.printDebug("Failed to capture capital for kingdom with invalid template: "+conquerKingdom.getName());
+			return null;
+		}
+		boolean captureUpgrades = konquest.getCore().getBoolean(CorePath.TOWNS_CAPTURE_UPGRADES.getPath(),true);
+		if(isKingdom(oldKingdomName)) {
+			// Capture the capital of the old kingdom as a new town for the conquering kingdom.
+			Location townLoc = getKingdom(oldKingdomName).getCapital().getCenterLoc();
+			String townName = oldKingdomName;
+			String townKingdom = conquerKingdom.getName();
+			Set<Point> townLand = getKingdom(oldKingdomName).getCapital().getChunkPoints();
+			Map<KonPropertyFlag,Boolean> townProperties = getKingdom(oldKingdomName).getCapital().getAllProperties();
+			Map<KonquestUpgrade,Integer> townUpgrades = getKingdom(oldKingdomName).getCapital().getUpgrades();
+			// Remove the old kingdom
+			removeKingdom(oldKingdomName);
+			// Validate town name
+			int nameStatus = konquest.validateNameConstraints(townName);
+			if(nameStatus != 0) {
+				ChatUtil.printDebug("Failed to name captured capital to "+townName+", validation failed with status code "+nameStatus);
+				return null;
+			}
+			// Create a new town
+			int status = createTown(townLoc,townName,townKingdom);
+			if(status != 0) {
+				// Successfully created new town, update it
+				KonTown town = conquerKingdom.getTown(townName);
+				// Add land
+				town.addPoints(townLand);
+				// Update territory cache
+            	territoryManager.addAllTerritory(town.getWorld(),town.getChunkList());
+				// Add properties
+            	for(KonPropertyFlag flag : townProperties.keySet()) {
+            		town.setPropertyValue(flag, townProperties.get(flag));
+            	}
+            	// Add upgrades
+            	if(captureUpgrades) {
+	            	for(KonquestUpgrade upgrade : townUpgrades.keySet()) {
+	            		town.addUpgrade(upgrade, townUpgrades.get(upgrade));
+	            	}
+	            	// Update upgrade status
+	            	konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
+            	}
+            	// Update display bar, nerfs, etc
+            	refreshTownNerfs(town);
+    			refreshTownHearts(town);
+				town.updateBarPlayers();
+				konquest.getMapHandler().drawDynmapUpdateTerritory(town);
+				konquest.getMapHandler().drawDynmapLabel(conquerKingdom.getCapital());
+				konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(town.getChunkList().keySet(),town.getWorld());
+				return town;
+			} else {
+				ChatUtil.printDebug("Failed to create new town over captured capital, status code "+status);
+				return null;
+			}
+		}
+		return null;
+	}
 	
 	
 	

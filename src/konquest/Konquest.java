@@ -23,6 +23,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
@@ -100,7 +101,11 @@ public class Konquest implements KonquestAPI, Timeable {
 	public static ChatColor barbarianColor = ChatColor.YELLOW;
 	public static ChatColor neutralColor = ChatColor.GRAY;
 	
-	public static String healthModName = "konquest.health_buff";
+	public static ChatColor blockedProtectionColor = ChatColor.DARK_RED;
+	public static ChatColor blockedShieldColor = ChatColor.DARK_AQUA;
+	public static ChatColor blockedFlagColor = ChatColor.DARK_GRAY;
+	
+	public static String healthModName = "konquest.health_buff"; // never change this :)
 	
 	private DatabaseThread databaseThread;
 	private AccomplishmentManager accomplishmentManager;
@@ -676,6 +681,10 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public ConfigManager getConfigManager() {
 		return configManager;
+	}
+	
+	public FileConfiguration getCore() {
+		return configManager.getConfig("core");
 	}
 	
 	public IntegrationManager getIntegrationManager() {

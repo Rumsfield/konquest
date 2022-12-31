@@ -151,9 +151,9 @@ public interface KonquestKingdomManager {
 	 * @param name The name of the town to capture
 	 * @param oldKingdomName The name of the town's current kingdom
 	 * @param conquerPlayer The player to capture the town for
-	 * @return True when the town is successfully captured, else false
+	 * @return The captured town when successful, else null
 	 */
-	public boolean captureTownForPlayer(String name, String oldKingdomName, KonquestPlayer conquerPlayer);
+	public KonquestTown captureTownForPlayer(String name, String oldKingdomName, KonquestPlayer conquerPlayer);
 	
 	/**
 	 * Claims the chunk at the given location for the nearest adjacent territory.

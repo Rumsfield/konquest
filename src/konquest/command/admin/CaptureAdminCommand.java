@@ -31,7 +31,6 @@ public class CaptureAdminCommand extends CommandBase {
         } else {
         	String townName = getArgs()[2];
         	String kingdomName = getArgs()[3];
-        	boolean status = false;
         	if(getKonquest().getKingdomManager().isKingdom(kingdomName)) {
         		KonKingdom kingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
         		if(kingdom.isCreated() && !kingdom.hasTown(townName)) {
@@ -45,8 +44,8 @@ public class CaptureAdminCommand extends CommandBase {
         			if(town == null) {
         				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(townName));
         			} else {
-        				status = getKonquest().getKingdomManager().captureTown(townName, town.getKingdom().getName(), kingdom);
-        				if(status) {
+        				KonTown capturedTown = (KonTown)getKonquest().getKingdomManager().captureTown(townName, town.getKingdom().getName(), kingdom);
+        				if(capturedTown != null) {
         					ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
         					// Remove mob targets
     						for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {

@@ -205,6 +205,9 @@ core:
     # (*) Suffix to be appended to Kingdom names which will be the name of the Capital city (string)
     capital_suffix: Capital
     
+# NEW Capitals will be immune from capture while there are this many other towns in the kingdom (0 to disable, integer >= 0)
+    capital_immunity_towns: 3
+    
 # NEW Any kingdom can start a war with another (true), else both kingdoms must agree to war (false) (true/false)
     instant_war: true
     
@@ -237,6 +240,9 @@ core:
     
     # Prevent players in other kingdoms breaking containers in claimed land (true/false)
     protect_containers_break: true
+    
+# NEW Prevent containers from exploding in claimed land (true/false)
+    protect_containers_explode: true
     
     # Prevent enemy players from entering Kingdom Capitals (true/false)
     #no_enemy_enter: true

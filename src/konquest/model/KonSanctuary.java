@@ -151,6 +151,17 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 		return templates.containsKey(name.toLowerCase());
 	}
 	
+	public boolean isLocInsideTemplate(Location loc) {
+		boolean result = false;
+		for(KonMonumentTemplate template : templates.values()) {
+			if(template.isLocInside(loc)) {
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
+	
 	public boolean addTemplate(String name, KonMonumentTemplate template) {
 		boolean result = false;
 		if(!templates.containsKey(name.toLowerCase())) {

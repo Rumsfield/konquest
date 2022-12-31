@@ -467,25 +467,28 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	public int getNumTowns() {
-		int result = 0;
-		UUID lord = null;
-		for(KonTown town : this.getTowns()) {
-			lord = town.getLord();
-			if(lord != null && members.containsKey(lord)) {
-				result++;
-			}
-		}
-		return result;
+		return townMap.size();
 	}
 	
 	public int getNumLand() {
 		int result = 0;
-		UUID lord = null;
-		for(KonTown town : this.getTowns()) {
-			lord = town.getLord();
-			if(lord != null && members.containsKey(lord)) {
-				result += town.getChunkList().size();
+		for(KonTown town : townMap.values()) {
+			result += town.getChunkList().size();
+		}
+		return result;
+	}
+	
+	public boolean isCapitalImmune() {
+		boolean result = true;
+		int immunityThreshold = konquest.getCore().getInt(CorePath.KINGDOMS_CAPITAL_IMMUNITY_TOWNS.getPath(),0);
+		if(immunityThreshold > 0) {
+			// Capital can only be capture when there are less towns than threshold
+			if(getNumTowns() < immunityThreshold) {
+				result = false;
 			}
+		} else {
+			// Capital can always be captured
+			result = false;
 		}
 		return result;
 	}
