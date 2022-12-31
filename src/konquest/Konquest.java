@@ -68,6 +68,7 @@ import konquest.nms.Handler_1_17_R1;
 import konquest.nms.Handler_1_18_R1;
 import konquest.nms.Handler_1_18_R2;
 import konquest.nms.Handler_1_19_R1;
+import konquest.nms.Handler_1_19_R2;
 import konquest.nms.VersionHandler;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
@@ -284,6 +285,9 @@ public class Konquest implements KonquestAPI, Timeable {
 	    			break;
 	    		case "v1_19_R1":
 	    			versionHandler = new Handler_1_19_R1();
+	    			break;
+	    		case "v1_19_R2":
+	    			versionHandler = new Handler_1_19_R2();
 	    			break;
 	    		default:
 	    			ChatUtil.printConsoleError("This version of Minecraft is not supported by Konquest!");

@@ -1,7 +1,7 @@
 name: Konquest
 description: A plugin for land claiming and territory control
 author: Rumsfield
-version: 0.10.3
+version: 0.11.0
 api-version: 1.16
 load: POSTWORLD
 main: konquest.KonquestPlugin
@@ -85,7 +85,7 @@ permissions:
     default: true
     
   konquest.command.unclaim:
-    description: Unlaim land for a town
+    description: Unclaim land for a town
     default: true
     
   konquest.command.list:
