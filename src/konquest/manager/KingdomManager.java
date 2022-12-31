@@ -97,7 +97,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	private Konquest konquest;
-	private TerritoryManager territoryManager;
 	private HashMap<String, KonKingdom> kingdomMap;
 	private KonKingdom barbarians;
 	private KonKingdom neutrals;
@@ -125,7 +124,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	public KingdomManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.territoryManager = konquest.getTerritoryManager();
 		this.kingdomMap = new HashMap<String, KonKingdom>();
 		this.barbarians = null;
 		this.neutrals = null;
@@ -368,7 +366,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
 		for(Point point : konquest.getAreaPoints(loc, radius)) {
-			if(territoryManager.isChunkClaimed(point,loc.getWorld())) {
+			if(konquest.getTerritoryManager().isChunkClaimed(point,loc.getWorld())) {
 				ChatUtil.printDebug("Found a chunk conflict");
 				return 4;
 			}
@@ -478,14 +476,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				}
 			}
 		}
-		// Verify player can cover cost
-		if(!isAdmin && costCreate > 0 && KonquestPlugin.getBalance(bukkitPlayer) < costCreate) {
-			return 3;
-    	}
 		// Verify valid monument template
 		if(!konquest.getSanctuaryManager().isValidTemplate(templateName)) {
 			return 4;
 		}
+		// Verify player can cover cost
+		if(!isAdmin && costCreate > 0 && KonquestPlugin.getBalance(bukkitPlayer) < costCreate) {
+			return 3;
+    	}
 		
 		// Verify position (return codes 4 - 8)
 		/*
@@ -519,7 +517,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				// Capital territory initialized successfully, finish kingdom setup
 				newKingdom.getCapital().updateBarPlayers();
 				updateSmallestKingdom();
-				territoryManager.addAllTerritory(centerLocation.getWorld(),newKingdom.getCapital().getChunkList());
+				konquest.getTerritoryManager().addAllTerritory(centerLocation.getWorld(),newKingdom.getCapital().getChunkList());
 				konquest.getMapHandler().drawDynmapUpdateTerritory(newKingdom.getCapital());
 				if(isAdmin) {
 					// This kingdom is operated by admins only
@@ -599,7 +597,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			if(oldKingdom != null) {
 				// Remove capital
 				oldKingdom.removeCapital();
-				territoryManager.removeAllTerritory(oldKingdom.getCapital().getWorld(),oldKingdom.getCapital().getChunkList().keySet());
+				konquest.getTerritoryManager().removeAllTerritory(oldKingdom.getCapital().getWorld(),oldKingdom.getCapital().getChunkList().keySet());
 				konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
 				oldKingdom = null;
 				ChatUtil.printDebug("Removed Kingdom "+name);
@@ -935,7 +933,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         	// Updates
         	updateKingdomOfflineProtection();
         	konquest.updateNamePackets(onlinePlayer);
-        	territoryManager.updatePlayerBorderParticles(onlinePlayer);
+        	konquest.getTerritoryManager().updatePlayerBorderParticles(onlinePlayer);
         	// Apply cooldown
         	if(!force) {
         		applyPlayerJoinCooldown(onlinePlayer.getBukkitPlayer());
@@ -1115,7 +1113,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		}
     		// Updates
     		konquest.updateNamePackets(onlinePlayer);
-    		territoryManager.updatePlayerBorderParticles(onlinePlayer);
+    		konquest.getTerritoryManager().updatePlayerBorderParticles(onlinePlayer);
     		// Cooldown
     		if(!force) {
     			applyPlayerExileCooldown(onlinePlayer.getBukkitPlayer());
@@ -1917,7 +1915,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			if(initStatus == 0) {
 				// When a town is added successfully, update the chunk cache
 				//updateTerritoryCache();
-				territoryManager.addAllTerritory(loc.getWorld(),getKingdom(kingdomName).getTown(name).getChunkList());
+				konquest.getTerritoryManager().addAllTerritory(loc.getWorld(),getKingdom(kingdomName).getTown(name).getChunkList());
 				konquest.getMapHandler().drawDynmapUpdateTerritory(getKingdom(kingdomName).getTown(name));
 
 				return 0;
@@ -1949,7 +1947,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			if(kingdom.removeTown(name)) {
 				// When a town is removed successfully, update the chunk cache
 				//updateTerritoryCache();
-				territoryManager.removeAllTerritory(town.getWorld(),townPoints);
+				konquest.getTerritoryManager().removeAllTerritory(town.getWorld(),townPoints);
 				konquest.getMapHandler().drawDynmapRemoveTerritory(town);
 				konquest.getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
 				konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(townPoints,town.getWorld());
@@ -2097,7 +2095,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				// Add land
 				town.addPoints(townLand);
 				// Update territory cache
-            	territoryManager.addAllTerritory(town.getWorld(),town.getChunkList());
+				konquest.getTerritoryManager().addAllTerritory(town.getWorld(),town.getChunkList());
 				// Add properties
             	for(KonPropertyFlag flag : townProperties.keySet()) {
             		town.setPropertyValue(flag, townProperties.get(flag));
@@ -3038,7 +3036,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         		            	// Add all Town chunk claims
         		            	town.addPoints(konquest.formatStringToPoints(townSection.getString("chunks")));
         		            	// Update territory cache
-        		            	territoryManager.addAllTerritory(townWorld,town.getChunkList());
+        		            	konquest.getTerritoryManager().addAllTerritory(townWorld,town.getChunkList());
         			        	// Set shield
         			        	boolean isShieldActive = townSection.getBoolean("shield",false);
         			        	int shieldTime = townSection.getInt("shield_time",0);

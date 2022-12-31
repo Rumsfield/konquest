@@ -35,6 +35,7 @@ import konquest.model.KonTerritory;
 import konquest.model.KonTerritoryCache;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
+import konquest.utility.CorePath;
 import konquest.utility.MessagePath;
 import konquest.utility.Timer;
 
@@ -1213,12 +1214,12 @@ public class TerritoryManager {
 			
 		}
 		// Verify max distance
-		int max_distance_all = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_distance_all");
-		if(max_distance_all > 0 && minDistance > max_distance_all) {
+		int max_distance_all = konquest.getCore().getInt(CorePath.TOWNS_MAX_DISTANCE_ALL.getPath());
+		if(max_distance_all > 0 && closestTerritory != null && minDistance > max_distance_all) {
 			isLocValidSettle = false;
 		}
 		// Verify no overlapping init chunks
-		int radius = konquest.getConfigManager().getConfig("core").getInt("core.towns.init_radius");
+		int radius = konquest.getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath());
 		for(Point point : konquest.getAreaPoints(center, radius)) {
 			if(isChunkClaimed(point,center.getWorld())) {
 				isLocValidSettle = false;

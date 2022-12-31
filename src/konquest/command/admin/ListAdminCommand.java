@@ -80,32 +80,40 @@ public class ListAdminCommand extends CommandBase {
 	                return;
         	}
         	Collections.sort(lines);
+        	ChatUtil.printDebug("List mode "+mode.toString()+" with "+lines.size()+" lines.");
         	
-        	// Display paged lines to player
-        	int numLines = lines.size();
-        	int totalPages = (int)Math.ceil((double)numLines/MAX_LINES); // 1-based
-        	int page = 0; // 0-based
-        	if (getArgs().length == 4) {
-        		try {
-        			page = Integer.parseInt(getArgs()[3]);
-    			}
-    			catch (NumberFormatException e) {
-    				page = 0;
-    			}
-        	}
-        	// Clamp page index
-        	page = page < 0 ? 0 : page;
-        	page = page > totalPages-1 ? totalPages-1 : page;
-        	// Determine line start and end
-        	int startIdx = page * MAX_LINES;
-        	int endIdx = startIdx + MAX_LINES;
-        	// Display lines to player
-        	//TODO: KR path this
-        	String header = "Konquest "+mode.toString()+" List, page "+(page+1)+"/"+(totalPages);
-        	ChatUtil.sendNotice((Player) getSender(),header);
-        	for (int i = startIdx; i < endIdx && i < numLines; i++) {
-        		String line = lines.get(i);
-        		ChatUtil.sendNotice((Player) getSender(),(i+1)+". "+line);
+        	if(lines.isEmpty()) {
+        		// Nothing to display
+        		String header = "Konquest "+mode.toString()+" List, page 0/0";
+            	ChatUtil.sendNotice((Player) getSender(),header);
+        	} else {
+        		// Display paged lines to player
+        		int numLines = lines.size(); // should be 1 or more
+            	int totalPages = (int)Math.ceil((double)numLines/MAX_LINES); // 1-based
+            	totalPages = totalPages < 1 ? 1 : totalPages; // clamp to 1
+            	int page = 1; // 1-based
+            	if (getArgs().length == 3) {
+            		try {
+            			page = Integer.parseInt(getArgs()[2]);
+        			}
+        			catch (NumberFormatException e) {
+        				page = 1;
+        			}
+            	}
+            	// Clamp page index
+            	page = page < 1 ? 1 : page;
+            	page = page > totalPages ? totalPages : page;
+            	// Determine line start and end
+            	int startIdx = (page-1) * MAX_LINES;
+            	int endIdx = startIdx + MAX_LINES ;
+            	// Display lines to player
+            	//TODO: KR path this
+            	String header = "Konquest "+mode.toString()+" List, page "+(page+1)+"/"+(totalPages);
+            	ChatUtil.sendNotice((Player) getSender(),header);
+            	for (int i = startIdx; i < endIdx && i < numLines; i++) {
+            		String line = lines.get(i);
+            		ChatUtil.sendNotice((Player) getSender(),(i+1)+". "+line);
+            	}
         	}
         }
     }

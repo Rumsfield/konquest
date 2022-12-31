@@ -25,14 +25,10 @@ import konquest.utility.ChatUtil;
 public class SanctuaryManager {
 
 	private Konquest konquest;
-	private KingdomManager kingdomManager;
-	private TerritoryManager territoryManager;
 	private HashMap<String, KonSanctuary> sanctuaryMap; // lower case name maps to sanctuary object
 	
 	public SanctuaryManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.kingdomManager = konquest.getKingdomManager();
-		this.territoryManager = konquest.getTerritoryManager();
 		this.sanctuaryMap = new HashMap<String, KonSanctuary>();
 	}
 	
@@ -52,17 +48,17 @@ public class SanctuaryManager {
 		if(konquest.validateNameConstraints(name) == 0) {
 			// Verify no overlapping init chunks
 			for(Point point : konquest.getAreaPoints(loc, 2)) {
-				if(territoryManager.isChunkClaimed(point,loc.getWorld())) {
+				if(konquest.getTerritoryManager().isChunkClaimed(point,loc.getWorld())) {
 					ChatUtil.printDebug("Found a chunk conflict during sanctuary init: "+name);
 					return false;
 				}
 			}
 			// Add sanctuary to map with lower-case key
 			String nameLower = name.toLowerCase();
-			sanctuaryMap.put(nameLower, new KonSanctuary(loc, name, kingdomManager.getNeutrals(), konquest));
+			sanctuaryMap.put(nameLower, new KonSanctuary(loc, name, konquest.getKingdomManager().getNeutrals(), konquest));
 			sanctuaryMap.get(nameLower).initClaim();
 			sanctuaryMap.get(nameLower).updateBarPlayers();
-			territoryManager.addAllTerritory(loc.getWorld(),sanctuaryMap.get(nameLower).getChunkList());
+			konquest.getTerritoryManager().addAllTerritory(loc.getWorld(),sanctuaryMap.get(nameLower).getChunkList());
 			konquest.getMapHandler().drawDynmapUpdateTerritory(sanctuaryMap.get(nameLower));
 			result = true;
 		}
@@ -105,7 +101,7 @@ public class SanctuaryManager {
 		if(oldSanctuary != null) {
 			oldSanctuary.clearAllTemplates();
 			oldSanctuary.removeAllBarPlayers();
-			territoryManager.removeAllTerritory(oldSanctuary.getCenterLoc().getWorld(), oldSanctuary.getChunkList().keySet());
+			konquest.getTerritoryManager().removeAllTerritory(oldSanctuary.getCenterLoc().getWorld(), oldSanctuary.getChunkList().keySet());
 			konquest.getMapHandler().drawDynmapRemoveTerritory(oldSanctuary);
 			ChatUtil.printDebug("Removed Sanctuary "+name);
 			oldSanctuary = null;
@@ -429,7 +425,7 @@ public class SanctuaryManager {
 		        		sanctuary.setSpawn(sanctuarySpawn);
 		        		// Set territory chunks
 	        			sanctuary.addPoints(konquest.formatStringToPoints(sanctuarySection.getString("chunks","")));
-	        			territoryManager.addAllTerritory(sanctuaryWorld,sanctuary.getChunkList());
+	        			konquest.getTerritoryManager().addAllTerritory(sanctuaryWorld,sanctuary.getChunkList());
 	        			// Set properties
 	        			ConfigurationSection sanctuaryPropertiesSection = sanctuarySection.getConfigurationSection("properties");
 	        			for(String propertyName : sanctuaryPropertiesSection.getKeys(false)) {

@@ -214,6 +214,10 @@ public class KingdomMenu implements ViewableMenu {
 		
 		loreList.clear();
 		loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_JOIN.getMessage());
+		String joinTip = "Or, create your own kingdom with /k kingdom create.";
+		for(String line : Konquest.stringPaginate(joinTip)) {
+			loreList.add(loreColor+line);
+		}
 		icon = new InfoIcon(regularColor+MessagePath.MENU_GUILD_JOIN.getMessage(), loreList, Material.SADDLE, ROOT_SLOT_JOIN, true);
 		result.addIcon(icon);
 		

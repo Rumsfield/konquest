@@ -103,6 +103,7 @@ public class KingdomCommand extends CommandBase {
 		                    			break;
 		                    		case 4:
 		                    			//TODO: KR message - That is not a valid monument template
+		                    			ChatUtil.sendError((Player) getSender(), "Invalid monument template, "+templateName);
 		                    			break;
 		                    		case 5:
 		                    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
