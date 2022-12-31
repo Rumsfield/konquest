@@ -936,7 +936,7 @@ public class BlockListener implements Listener {
 					return;
 				}
 				// Town & Capital protections
-				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN) || territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+				if(territory instanceof KonTown) {
 					KonTown town = (KonTown)territory;
 					// Protect Town Monuments
 					if(town.isLocInsideMonumentProtectionArea(block.getLocation())) {

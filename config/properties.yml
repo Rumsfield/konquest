@@ -7,6 +7,7 @@
 # Properties for territories
 #	TRAVEL			Allow travel to this territory
 #	PVP				Allow player damage
+#	PVE				Allow entity damage
 #	BUILD			Allow block edits
 #	USE				Allow using blocks
 #	MOBS			Allow mobs to spawn
@@ -36,6 +37,7 @@ properties:
     exit: true
     travel: true
     pvp: false
+    pve: false
     build: false
     use: true
     mobs: false
@@ -47,8 +49,9 @@ properties:
     upgrade: true
     plots: true
     travel: true
-    pvp: false
-    build: false
+    pvp: true
+    pve: true
+    build: true
     use: true
     mobs: false
     portals: true

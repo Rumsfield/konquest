@@ -56,8 +56,7 @@ import konquest.manager.TravelManager;
 import konquest.manager.UpgradeManager;
 import konquest.manager.TravelManager.TravelDestination;
 import konquest.map.MapHandler;
-import konquest.model.KonCamp;
-import konquest.model.KonCapital;
+import konquest.model.KonBarDisplayer;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
@@ -77,7 +76,6 @@ import konquest.utility.Timer;
 import konquest.api.KonquestAPI;
 import konquest.api.event.KonquestEvent;
 import konquest.api.model.KonquestUpgrade;
-import konquest.api.model.KonquestTerritoryType;
 import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestTerritory;
@@ -525,15 +523,6 @@ public class Konquest implements KonquestAPI, Timeable {
     	}
     	// Update offline protections
     	kingdomManager.updateKingdomOfflineProtection();
-    	//if(player.isBarbarian()) {
-    	/*
-    		KonCamp testCamp = campManager.getCamp(player);
-    		if(testCamp != null) {
-    			testCamp.setProtected(false);
-    			testCamp.setOnlineOwner(bukkitPlayer);
-    		}
-    	*/
-    	//}
     	campManager.deactivateCampProtection(player);
     	// Update player membership stats
     	kingdomManager.updatePlayerMembershipStats(player);
@@ -550,31 +539,27 @@ public class Konquest implements KonquestAPI, Timeable {
     	Location loginLoc = bukkitPlayer.getLocation();
     	if(territoryManager.isChunkClaimed(loginLoc)) {
 			KonTerritory loginTerritory = territoryManager.getChunkTerritory(loginLoc);
-    		if(loginTerritory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) { 
-	    		// Player joined located within a Town
+			if(loginTerritory instanceof KonBarDisplayer) {
+				((KonBarDisplayer)loginTerritory).addBarPlayer(player);
+			}
+			if(loginTerritory instanceof KonRuin) {
+    			((KonRuin)loginTerritory).spawnAllGolems();
+    		}
+    		if(loginTerritory instanceof KonTown) { 
+	    		// Player joined located within a Town/Capital
 	    		KonTown town = (KonTown) loginTerritory;
-	    		town.addBarPlayer(player);
 	    		// For enemy players, apply effects
-	    		if(!player.getKingdom().equals(town.getKingdom())) {
-	    			kingdomManager.applyTownNerf(player, town);
+	    		RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), loginTerritory.getKingdom());
+	    		if(playerRole.equals(RelationRole.FRIENDLY)) {
+	    			kingdomManager.applyTownHearts(player, town);
+	    		} else {
 	    			kingdomManager.clearTownHearts(player);
+	    		}
+	    		if(playerRole.equals(RelationRole.ENEMY)) {
+	    			kingdomManager.applyTownNerf(player, town);
 	    		} else {
 	    			kingdomManager.clearTownNerf(player);
-	    			kingdomManager.applyTownHearts(player, town);
 	    		}
-    		} else if(loginTerritory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
-    			// Player joined located within a Ruin
-    			KonRuin ruin = (KonRuin) loginTerritory;
-    			ruin.addBarPlayer(player);
-    			ruin.spawnAllGolems();
-    		} else if(loginTerritory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
-    			// Player joined located within a Capital
-    			KonCapital capital = (KonCapital) loginTerritory;
-    			capital.addBarPlayer(player);
-    		} else if(loginTerritory.getTerritoryType().equals(KonquestTerritoryType.CAMP)) {
-    			// Player joined located within a Camp
-    			KonCamp camp = (KonCamp) loginTerritory;
-    			camp.addBarPlayer(player);
     		}
 		} else {
 			// Player joined located outside of a Town

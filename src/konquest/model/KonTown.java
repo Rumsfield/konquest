@@ -146,6 +146,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		properties.put(KonPropertyFlag.PLOTS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.plots"));
 		properties.put(KonPropertyFlag.TRAVEL, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.travel"));
 		properties.put(KonPropertyFlag.PVP, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.pvp"));
+		properties.put(KonPropertyFlag.PVE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.pve"));
 		properties.put(KonPropertyFlag.BUILD, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.build"));
 		properties.put(KonPropertyFlag.USE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.use"));
 		properties.put(KonPropertyFlag.MOBS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.mobs"));
