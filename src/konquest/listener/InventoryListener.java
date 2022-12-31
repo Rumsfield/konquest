@@ -3,32 +3,33 @@ package konquest.listener;
 import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.model.KonquestUpgrade;
+import konquest.manager.KingdomManager;
 import konquest.manager.PlayerManager;
+import konquest.manager.KingdomManager.RelationRole;
 import konquest.model.KonCamp;
-import konquest.model.KonCapital;
 import konquest.model.KonDirective;
 import konquest.model.KonPlayer;
+import konquest.model.KonPropertyFlag;
+import konquest.model.KonPropertyFlagHolder;
 import konquest.model.KonStatsType;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
+import konquest.utility.CorePath;
 import konquest.utility.MessagePath;
 
 import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-//import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
-//import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -50,11 +51,13 @@ public class InventoryListener implements Listener {
 
 	private KonquestPlugin konquestPlugin;
 	private Konquest konquest;
+	private KingdomManager kingdomManager;
 	private PlayerManager playerManager;
 	
 	public InventoryListener(KonquestPlugin plugin) {
 		this.konquestPlugin = plugin;
 		this.konquest = konquestPlugin.getKonquestInstance();
+		this.kingdomManager = konquest.getKingdomManager();
 		this.playerManager = konquest.getPlayerManager();
 	}
 	
@@ -79,30 +82,33 @@ public class InventoryListener implements Listener {
 			if(!player.isAdminBypassActive()) {
 				//ChatUtil.printDebug("inventoryOpen Evaluating territory");
 				KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(openLoc);
-				// Prevent all inventory openings inside Capitals
-				boolean isCapitalUseEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_use",false);
-				if(territory instanceof KonCapital && !isCapitalUseEnabled) {
-					//ChatUtil.printDebug("Cancelled inventory open event in "+territory.getName());
-					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-					event.setCancelled(true);
-					return;
+
+				// Property Flag Holders
+				if(territory instanceof KonPropertyFlagHolder) {
+					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+					if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
+						if(!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
+							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
+						}
+					}
 				}
 				
-				boolean isEnemyInvetoryOpenDenied = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.protect_containers_use");
-				
+				RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+
 				// Town restrictions for inventories
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
-					// Prevent all inventory openings by enemies
-					if(isEnemyInvetoryOpenDenied && !player.getKingdom().equals(town.getKingdom())) {
-						//ChatUtil.printDebug("Cancelled inventory open event in "+territory.getName());
-						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					// Prevent all inventory openings by non-friendlies
+					boolean isEnemyInvetoryOpenDenied = konquest.getCore().getBoolean(CorePath.KINGDOMS_PROTECT_CONTAINERS_USE.getPath());
+					if(isEnemyInvetoryOpenDenied && !playerRole.equals(RelationRole.FRIENDLY)) {
+						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
 						return;
 					}
 					// Notify player when there is no lord
 					if(town.canClaimLordship(player)) {
-						//ChatUtil.sendNotice(player.getBukkitPlayer(), town.getName()+" has no leader! Use \"/k town <name> lord <your name>\" to claim Lordship.");
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),player.getBukkitPlayer().getName()));
 					}
 					// Prevent non-residents in closed towns from opening inventories that can hold items
@@ -136,45 +142,38 @@ public class InventoryListener implements Listener {
 						}
 					}
 					// Attempt to put loot into empty chests within the monument
-					//if(town.isLocInsideCenterChunk(openLoc) && event.getInventory().getHolder() instanceof Chest) {
 					if(town.getMonument().isLocInside(openLoc) && event.getInventory().getType().equals(InventoryType.CHEST)) {
 						if(town.isPlayerLord(player.getOfflineBukkitPlayer()) || town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
-							//if(isInventoryEmpty(event.getInventory())) {
-								// Update loot with default count as defined in core YML
-								boolean result = konquest.getLootManager().updateMonumentLoot(event.getInventory(), town);
-								ChatUtil.printDebug("Attempted to update loot in town "+territory.getName()+", got "+result);
-								if(result) {
-									event.getInventory().getLocation().getWorld().playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
-								} else {
-									//ChatUtil.sendNotice(player.getBukkitPlayer(), "Come back later!");
-									ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_LOOT_LATER.getMessage());
-								}
-							//} else {
-							//	ChatUtil.sendNotice(player.getBukkitPlayer(), "Empty the chest to get more loot.");
-							//}
+							// Update loot with default count as defined in core YML
+							boolean result = konquest.getLootManager().updateMonumentLoot(event.getInventory(), town);
+							ChatUtil.printDebug("Attempted to update loot in town "+territory.getName()+", got "+result);
+							if(result) {
+								event.getInventory().getLocation().getWorld().playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
+							} else {
+								ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_LOOT_LATER.getMessage());
+							}
 						} else {
-							//ChatUtil.sendNotice(player.getBukkitPlayer(), "You must be a knight or the lord of "+town.getName()+" to open this!");
 							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 							event.setCancelled(true);
 							return;
 						}
 					}
 					// Attempt to modify merchant trades based on guild specialization and relationships with player
-					konquest.getGuildManager().applyTradeDiscounts(player, town, event.getInventory());
+					//TODO: Implement town-based trade specialization discounts
+					//konquest.getKingdomManager().applyTradeDiscounts(player, town, event.getInventory());
 				}
 				
 				// Prevent all inventory openings except for camp owner and clan members when allowed
-				boolean isCampContainersProtected = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.protect_containers", true);
+				boolean isCampContainersProtected = konquest.getCore().getBoolean(CorePath.CAMPS_PROTECT_CONTAINERS.getPath(), true);
 				if(territory instanceof KonCamp && isCampContainersProtected) {
 					KonCamp camp = (KonCamp) territory;
-					boolean isMemberAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_allow_containers", false);
+					boolean isMemberAllowed = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ALLOW_CONTAINERS.getPath(), false);
 					boolean isMember = false;
 					if(konquest.getCampManager().isCampGrouped(camp)) {
 						isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
 					}
 					if(!(isMember && isMemberAllowed) && !player.getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
-						//ChatUtil.printDebug("Cancelled inventory open event in "+territory.getName());
-						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
 						return;
 					}
@@ -200,14 +199,6 @@ public class InventoryListener implements Listener {
 			KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
 			if(player != null && slot < event.getView().getTopInventory().getSize()) {
 				event.setResult(Event.Result.DENY);
-				/*
-				// DEBUG
-				String action = event.getAction().name();
-				String type = event.getClick().name();
-				String result = event.getResult().name();
-				ChatUtil.printDebug("Display click type "+type+", action "+action+", result "+result);
-				// END DEBUG
-				*/
 				event.setCancelled(true);
 				if(event.getClick().equals(ClickType.LEFT) || event.getClick().equals(ClickType.RIGHT)) {
 					boolean clickType = (event.getClick().equals(ClickType.RIGHT)) ? false : true;
@@ -223,7 +214,7 @@ public class InventoryListener implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.NORMAL)
-    public void onInventoryClick(InventoryClickEvent event) {
+    public void onNetheriteCraft(InventoryClickEvent event) {
 		if(!event.isCancelled()) {
 			// Check for picking up netherite items for stats
 			if(event.getAction().equals(InventoryAction.PICKUP_ALL) && event.getClickedInventory() instanceof SmithingInventory &&
@@ -248,34 +239,6 @@ public class InventoryListener implements Listener {
 					}
 				}
 			}
-			/*
-			// Prevent putting stuff into monument loot chests
-			Location openLoc = event.getInventory().getLocation();
-			if(openLoc != null && konquest.getKingdomManager().isChunkClaimed(openLoc.getChunk())) {
-				KonPlayer player = playerManager.getPlayer((Player)event.getWhoClicked());
-				// Bypass event restrictions for player in Admin Bypass Mode
-				if(!player.isAdminBypassActive()) {
-					KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(openLoc.getChunk());
-					if(territory instanceof KonTown) {
-						KonTown town = (KonTown) territory;
-						if(town.isLocInsideCenterChunk(openLoc) && event.getInventory().getHolder() instanceof Chest) {
-							int slot = event.getRawSlot();
-							InventoryAction action = event.getAction();
-							ChatUtil.printDebug("Inventory click event in monument loot chest slot "+slot+" with action "+action.toString());
-							if(event.getAction().equals(InventoryAction.PLACE_ALL) ||
-									event.getAction().equals(InventoryAction.PLACE_ONE) ||
-									event.getAction().equals(InventoryAction.PLACE_SOME) ||
-									event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) ||
-									event.getAction().equals(InventoryAction.SWAP_WITH_CURSOR)) {
-								if(slot < event.getView().getTopInventory().getSize()) {
-									event.setCancelled(true);
-									return;
-								}
-							}
-						}
-					}
-				}
-			}*/
 		}
 	}
 	
@@ -424,19 +387,5 @@ public class InventoryListener implements Listener {
 			}
 		}
 	}
-	
-	/*
-	private boolean isInventoryEmpty(Inventory inv) {
-		//ChatUtil.printDebug("Checking for empty inventory "+inv.toString());
-		boolean result = true;
-		for(ItemStack item : inv.getStorageContents()) {
-			if(item != null) {
-				//ChatUtil.printDebug("Found non-null inventory item! It's not empty.");
-				result = false;
-				break;
-			}
-		}
-		return result;
-	}
-	*/
+
 }

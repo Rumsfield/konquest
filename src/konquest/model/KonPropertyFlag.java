@@ -8,8 +8,8 @@ public enum KonPropertyFlag {
 	
 	// Properties for territories
 	TRAVEL			("Travel", 		"Allow travel to this territory"),
-	PVP				("PvP", 		"Allow player damage"),
-	PVE				("PvE", 		"Allow entity damage"),
+	PVP				("PvP", 		"Allow player damage"), // Done in EntityListener
+	PVE				("PvE", 		"Allow entity damage"), // Done in EntityListener
 	BUILD			("Build", 		"Allow block edits"), // Done in BlockListener
 	USE				("Use", 		"Allow using blocks"),
 	MOBS			("Mobs", 		"Allow mobs to spawn"), // Done in EntityListener

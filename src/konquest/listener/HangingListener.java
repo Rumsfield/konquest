@@ -9,7 +9,6 @@ import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,7 +41,7 @@ public class HangingListener implements Listener {
 				if(town.getMonument().isLocInside(placeLoc)) {
 					ChatUtil.printDebug("EVENT: Hanging placed inside of monument");
 					KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
-					ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 					event.setCancelled(true);
 					return;
 				}
@@ -64,7 +63,7 @@ public class HangingListener implements Listener {
 					ChatUtil.printDebug("EVENT: Hanging broke inside of monument");
 					if(event.getRemover() instanceof Player) {
 						KonPlayer player = konquest.getPlayerManager().getPlayer((Player)event.getRemover());
-						ChatUtil.sendKonPriorityTitle(player, "", ChatColor.DARK_RED+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 					}
 					event.setCancelled(true);
 					return;
