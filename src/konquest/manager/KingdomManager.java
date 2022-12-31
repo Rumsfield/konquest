@@ -3151,7 +3151,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         		ChatUtil.printDebug("Internal error, missing capital section in kingdoms.yml for kingdom "+kingdomName);
         	}
         }
-		ChatUtil.printDebug("Loaded Kingdoms");
+        if(kingdomMap.isEmpty()) {
+			ChatUtil.printDebug("No Kingdoms to load!");
+		} else {
+			ChatUtil.printDebug("Loaded Kingdoms");
+		}
 	}
 	
 	//TODO: Save kingdom relationships (active and request)
@@ -3245,7 +3249,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
                 }
             }
 		}
-		ChatUtil.printDebug("Saved Kingdoms");
+		if(kingdomMap.isEmpty()) {
+			ChatUtil.printDebug("No Kingdoms to save!");
+		} else {
+			ChatUtil.printDebug("Saved Kingdoms");
+		}
 	}
 	
 }

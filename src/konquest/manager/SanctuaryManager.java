@@ -504,6 +504,11 @@ public class SanctuaryManager {
     			konquest.opStatusMessages.add(message);
     		}
         }
+        if(sanctuaryMap.isEmpty()) {
+			ChatUtil.printDebug("No Sanctuaries to load!");
+		} else {
+			ChatUtil.printDebug("Loaded Sanctuaries");
+		}
 	}
 	
 	public void saveSanctuaries() {
@@ -588,6 +593,11 @@ public class SanctuaryManager {
 					ChatUtil.printConsoleError("Failed to save invalid monument template named "+monumentName+", in Sanctuary "+name);
 				}
 			}
+		}
+		if(sanctuaryMap.isEmpty()) {
+			ChatUtil.printDebug("No Sanctuaries to save!");
+		} else {
+			ChatUtil.printDebug("Saved Sanctuaries");
 		}
 	}
 	
