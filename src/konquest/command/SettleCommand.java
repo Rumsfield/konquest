@@ -9,6 +9,7 @@ import konquest.model.KonPlayer;
 import konquest.model.KonStatsType;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
+import konquest.utility.CorePath;
 import konquest.utility.MessagePath;
 
 import java.util.ArrayList;
@@ -142,11 +143,11 @@ public class SettleCommand extends CommandBase {
         			break;
         		case 6:
         			distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
-        			int min_distance_capital = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
-        			int min_distance_town = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
+        			int min_distance_sanc = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_SANCTUARY.getPath());
+        			int min_distance_town = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
         			int min_distance = 0;
-        			if(min_distance_capital < min_distance_town) {
-        				min_distance = min_distance_capital;
+        			if(min_distance_sanc < min_distance_town) {
+        				min_distance = min_distance_sanc;
         			} else {
         				min_distance = min_distance_town;
         			}

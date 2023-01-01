@@ -317,8 +317,11 @@ core:
     # Minimum distance in chunks between Towns and other Towns (0 to disable, integer >= 0)
     min_distance_town: 16
     
+# NEW Minimum distance in chunks between Towns and Sanctuaries (0 to disable, integer >= 0)
+    min_distance_sanctuary: 16
+    
     # Minimum distance in chunks between Towns and Capitals (0 to disable, integer >= 0)
-    min_distance_capital: 16
+    #min_distance_capital: 16
     
     # Maximum distance in chunks between Towns and all other territory (0 to disable, integer >= 0)
     max_distance_all: 99

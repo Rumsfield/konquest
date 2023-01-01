@@ -15,6 +15,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.Inventory;
 
 import konquest.Konquest;
 import konquest.model.KonMonumentTemplate;
@@ -34,8 +35,16 @@ public class SanctuaryManager {
 	
 	
 	public void initialize() {
+		// Loads sanctuary territories and monument templates
 		loadSanctuaries();
 		ChatUtil.printDebug("Sanctuary Manager is ready");
+	}
+	
+	public void refresh() {
+		// Resets all sanctuary kingdoms, used during plugin enable init sequence
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			sanctuary.setKingdom(konquest.getKingdomManager().getNeutrals());
+		}
 	}
 	
 	public boolean isSanctuary(String name) {
@@ -237,9 +246,23 @@ public class SanctuaryManager {
 	 * @param corner1		The first corner of the template region
 	 * @param corner2		The second (opposite) corner of the template region
 	 * @param travelPoint	The location for travel to the template region
-	 * @return  The status code returned by validateTemplate()
+	 * @return  The status code
+	 * 			0 - success
+	 * 			1 - Region is not 16x16 blocks in base
+	 * 			2 - Region does not contain enough critical blocks
+	 * 			3 - Region does not contain the travel point
+	 * 			4 - Region is not within given sanctuary territory
+	 * 			5 - Bad name
 	 */
 	public int createMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint, boolean save) {
+		/*
+		 * Only add a new template when all verification checks pass.
+		 */
+		if(konquest.validateNameConstraints(name) != 0) {
+			ChatUtil.printDebug("Failed to create Monument Template, bad name: \""+name+"\"");
+			return 5;
+		}
+		
 		// Create new monument
 		KonMonumentTemplate template = new KonMonumentTemplate(name, corner1, corner2, travelPoint);
 		// Validate it
@@ -274,7 +297,6 @@ public class SanctuaryManager {
 	 * 			2 - Region does not contain enough critical blocks
 	 * 			3 - Region does not contain the travel point
 	 * 			4 - Region is not within given sanctuary territory
-	 * 			5 - Bad name
 	 * 	
 	 */
 	public int validateTemplate(KonMonumentTemplate template, KonSanctuary sanctuary) {
@@ -287,10 +309,6 @@ public class SanctuaryManager {
 		Location corner2 = template.getCornerTwo();
 		Location travelPoint = template.getTravelPoint();
 		
-		if(konquest.validateNameConstraints(name) != 0) {
-			ChatUtil.printDebug("Failed to validate Monument Template, bad name: \""+name+"\"");
-			return 5;
-		}
 		// Check that both corners are within territory
 		if(!sanctuary.isLocInside(corner1) || !sanctuary.isLocInside(corner2)) {
 			ChatUtil.printDebug("Failed to validate Monument Template, corners are not inside sanctuary territory");
@@ -306,6 +324,7 @@ public class SanctuaryManager {
 		// Check for at least as many critical blocks as required critical hits
 		// Also check for any chests for loot flag
 		ArrayList<Location> criticalBlockLocs = new ArrayList<Location>();
+		HashSet<Inventory> lootInventories = new HashSet<Inventory>();
 		int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
 		int bottomBlockX, bottomBlockY, bottomBlockZ = 0;
 		int topBlockX, topBlockY, topBlockZ = 0;
@@ -333,7 +352,13 @@ public class SanctuaryManager {
                 		criticalBlockCount++;
                 		criticalBlockLocs.add(monumentBlock.getLocation());
                 	} else if(monumentBlock.getState() instanceof Chest) {
-                		lootChestCount++;
+                		Inventory chestInv = ((Chest)monumentBlock.getState()).getSnapshotInventory();
+                		// Check to see if this block's associated inventory has already been counted
+                		if(!lootInventories.contains(chestInv)) {
+                			// We haven't seen this inventory yet, count it and add it.
+                			lootChestCount++;
+                    		lootInventories.add(chestInv);
+                		}
                 		containsChest = true;
                 	}
                 	if(monumentBlock.getType().isSolid()) {
@@ -456,9 +481,11 @@ public class SanctuaryManager {
 			        		z = sectionList.get(2);
 				        	Location templateCornerTwo = new Location(sanctuaryWorld,x,y,z);
 	        				// Create template
+				        	// If it fails validation, it does not get stored in memory and will not be saved back into the data file.
+				        	// This effectively removes it from the server.
 				        	int status = createMonumentTemplate(sanctuary, templateName, templateCornerOne, templateCornerTwo, templateTravel, false);
 				        	if(status != 0) {
-			        			String message = "Failed to load Monument Template for Sanctuary "+sanctuaryName+", ";
+			        			String message = "Failed to load Monument Template "+templateName+" for Sanctuary "+sanctuaryName+", ";
 			        			switch(status) {
 				        			case 1:
 				        				message = message+"base dimensions are not 16x16 blocks.";
@@ -571,23 +598,24 @@ public class SanctuaryManager {
 				sanctuaryPropertiesSection.set(flag.toString(), sanctuary.getAllProperties().get(flag));
 			}
 			// Monuments
+			// Any template in memory, valid or invalid, gets saved to data file.
+			// When it gets loaded again by plugin onEnable, validation checks will print detailed errors.
 			ConfigurationSection sanctuaryMonumentsSection = sanctuarySection.createSection("monuments");
 			for(String monumentName : sanctuary.getTemplateNames()) {
 				KonMonumentTemplate template = sanctuary.getTemplate(monumentName);
-				if(template.isValid()) {
-		            ConfigurationSection monumentSection = sanctuaryMonumentsSection.createSection(monumentName);
-		            monumentSection.set("travel", new int[] {(int) template.getTravelPoint().getBlockX(),
-															 (int) template.getTravelPoint().getBlockY(),
-															 (int) template.getTravelPoint().getBlockZ()});
-		            monumentSection.set("cornerone", new int[] {(int) template.getCornerOne().getBlockX(),
-							 								 	(int) template.getCornerOne().getBlockY(),
-							 								 	(int) template.getCornerOne().getBlockZ()});
-		            monumentSection.set("cornertwo", new int[] {(int) template.getCornerTwo().getBlockX(),
-							 								 	(int) template.getCornerTwo().getBlockY(),
-							 								 	(int) template.getCornerTwo().getBlockZ()});
-				} else {
-					ChatUtil.printConsoleError("Failed to save invalid monument template named "+monumentName+", in Sanctuary "+name);
+				if(!template.isValid()) { 
+					ChatUtil.printConsoleError("Saved invalid monument template named "+monumentName+", in Sanctuary "+name+".");
 				}
+	            ConfigurationSection monumentSection = sanctuaryMonumentsSection.createSection(monumentName);
+	            monumentSection.set("travel", new int[] {(int) template.getTravelPoint().getBlockX(),
+														 (int) template.getTravelPoint().getBlockY(),
+														 (int) template.getTravelPoint().getBlockZ()});
+	            monumentSection.set("cornerone", new int[] {(int) template.getCornerOne().getBlockX(),
+						 								 	(int) template.getCornerOne().getBlockY(),
+						 								 	(int) template.getCornerOne().getBlockZ()});
+	            monumentSection.set("cornertwo", new int[] {(int) template.getCornerTwo().getBlockX(),
+						 								 	(int) template.getCornerTwo().getBlockY(),
+						 								 	(int) template.getCornerTwo().getBlockZ()});
 			}
 		}
 		if(sanctuaryMap.isEmpty()) {

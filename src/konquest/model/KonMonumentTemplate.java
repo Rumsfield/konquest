@@ -13,6 +13,7 @@ public class KonMonumentTemplate {
 	private Location corner2;
 	private Location travelPoint;
 	private boolean isValid;
+	private boolean isBlanking;
 	private boolean hasLoot;
 	private String name;
 	private int numCriticals;
@@ -25,6 +26,7 @@ public class KonMonumentTemplate {
 		this.corner2 = corner2;
 		this.travelPoint = travelPoint;
 		this.isValid = false;
+		this.isBlanking = false;
 		this.hasLoot = false;
 		this.numCriticals = 0;
 		this.numBlocks = 0;
@@ -57,6 +59,10 @@ public class KonMonumentTemplate {
 	
 	public boolean isValid() {
 		return isValid;
+	}
+	
+	public boolean isBlanking() {
+		return isBlanking;
 	}
 	
 	public Location getCornerOne() {
@@ -97,6 +103,10 @@ public class KonMonumentTemplate {
 	
 	public void setValid(boolean isNewValid) {
 		isValid = isNewValid;
+	}
+	
+	public void setBlanking(boolean isNewBlanking) {
+		isBlanking = isNewBlanking;
 	}
 	
 	public void setLoot(boolean val) {

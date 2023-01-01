@@ -51,12 +51,12 @@ public class RuinAdminCommand extends CommandBase {
         	}
         	boolean pass = getKonquest().getRuinManager().addRuin(playerLoc, ruinName);
         	if(!pass) {
-        		//ChatUtil.sendError((Player) getSender(), "Failed to create new Ruin: "+ruinName);
         		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_ERROR_CREATE.getMessage(ruinName));
                 return;
         	} else {
-        		//ChatUtil.sendNotice((Player) getSender(), "Successfully created new Ruin: "+ruinName);
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CREATE.getMessage(ruinName));
+        		// Render border particles
+        		getKonquest().getTerritoryManager().updatePlayerBorderParticles(player);
         	}
 		} else if(cmdMode.equalsIgnoreCase("remove")) {
 			// Check for valid ruin
@@ -66,11 +66,9 @@ public class RuinAdminCommand extends CommandBase {
 			}
 			boolean pass = getKonquest().getRuinManager().removeRuin(ruinName);
         	if(!pass) {
-        		//ChatUtil.sendError((Player) getSender(), "Failed to remove Ruin: "+ruinName);
         		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_ERROR_REMOVE.getMessage(ruinName));
                 return;
         	} else {
-        		//ChatUtil.sendNotice((Player) getSender(), "Successfully removed Ruin: "+ruinName);
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_REMOVE.getMessage(ruinName));
         	}
 		} else if(cmdMode.equalsIgnoreCase("rename")) {
@@ -96,7 +94,6 @@ public class RuinAdminCommand extends CommandBase {
 			}
 		} else if(cmdMode.equalsIgnoreCase("criticals")) {
         	if(player.isSettingRegion()) {
-        		//ChatUtil.sendError((Player) getSender(), "Cannot do this while setting regions");
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_REGION.getMessage());
                 return;
         	}
@@ -107,13 +104,10 @@ public class RuinAdminCommand extends CommandBase {
 			}
 			getKonquest().getRuinManager().getRuin(ruinName).clearCriticalLocations();
 			player.settingRegion(RegionType.RUIN_CRITICAL);
-        	//ChatUtil.sendNotice((Player) getSender(), "Removed all previous critical blocks from "+ruinName+", click on blocks to add.");
-        	//ChatUtil.sendNotice((Player) getSender(), "Click on Air to cancel.");
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CRITICALS.getMessage(ruinName), ChatColor.LIGHT_PURPLE);
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 		} else if(cmdMode.equalsIgnoreCase("spawns")) {
         	if(player.isSettingRegion()) {
-        		//ChatUtil.sendError((Player) getSender(), "Cannot do this while setting regions");
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_REGION.getMessage());
                 return;
         	}
@@ -124,8 +118,6 @@ public class RuinAdminCommand extends CommandBase {
 			}
 			getKonquest().getRuinManager().getRuin(ruinName).clearSpawnLocations();
 			player.settingRegion(RegionType.RUIN_SPAWN);
-        	//ChatUtil.sendNotice((Player) getSender(), "Removed all previous spawn blocks from "+ruinName+", click on blocks to add.");
-        	//ChatUtil.sendNotice((Player) getSender(), "Click on Air to cancel.");
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_SPAWNS.getMessage(ruinName), ChatColor.LIGHT_PURPLE);
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 		} else {

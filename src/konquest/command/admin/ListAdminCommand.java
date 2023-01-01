@@ -108,7 +108,7 @@ public class ListAdminCommand extends CommandBase {
             	int endIdx = startIdx + MAX_LINES ;
             	// Display lines to player
             	//TODO: KR path this
-            	String header = "Konquest "+mode.toString()+" List, page "+(page+1)+"/"+(totalPages);
+            	String header = "Konquest "+mode.toString()+" List, page "+page+"/"+(totalPages);
             	ChatUtil.sendNotice((Player) getSender(),header);
             	for (int i = startIdx; i < endIdx && i < numLines; i++) {
             		String line = lines.get(i);

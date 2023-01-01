@@ -2,6 +2,7 @@ package konquest.command.admin;
 
 import konquest.Konquest;
 import konquest.command.CommandBase;
+import konquest.model.KonMonumentTemplate;
 import konquest.model.KonPlayer;
 import konquest.model.KonPlayer.RegionType;
 import konquest.utility.ChatUtil;
@@ -68,7 +69,7 @@ public class MonumentAdminCommand extends CommandBase {
         	} else if(cmdMode.equalsIgnoreCase("remove")) {
         		// Confirm name is a template
         		if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
         			return;
         		}
         		// Remove template
@@ -82,7 +83,7 @@ public class MonumentAdminCommand extends CommandBase {
         		
         		// Confirm name is a template
         		if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
         			return;
         		}
         		
@@ -97,6 +98,41 @@ public class MonumentAdminCommand extends CommandBase {
         		//} else {
         		//	ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_NONE.getMessage(templateName));
         		//}
+        		
+        	} else if(cmdMode.equalsIgnoreCase("status")) {
+        		// Confirm name is a template
+        		if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
+        			return;
+        		}
+        		/*
+        		 * Monument Template status info:
+        		 * - Name
+        		 * - Sanctuary
+        		 * - Is valid
+        		 * - Is blanking
+        		 * - Total blocks
+        		 * - Critical blocks
+        		 * - Loot chests
+        		 */
+        		ChatColor loreColor = ChatColor.YELLOW;
+        		ChatColor valueColor = ChatColor.AQUA;
+        		KonMonumentTemplate template = getKonquest().getSanctuaryManager().getTemplate(templateName);
+        		String tempName = template.getName();
+        		String sanctuaryName = getKonquest().getSanctuaryManager().getSanctuaryNameOfTemplate(templateName);
+        		String isValid = String.format("%s", template.isValid());
+        		String isBlanking = String.format("%s", template.isBlanking());
+        		String allBlocks = String.format("%d", template.getNumBlocks());
+        		String critBlocks = String.format("%d", template.getNumCriticals());
+        		String lootChests = String.format("%d", template.getNumLootChests());
+        		
+        		ChatUtil.sendNotice(bukkitPlayer, "Template "+tempName+" Status");
+        		ChatUtil.sendMessage(bukkitPlayer, loreColor+"Sanctuary: "+valueColor+sanctuaryName);
+        		ChatUtil.sendMessage(bukkitPlayer, loreColor+"Valid: "+valueColor+isValid);
+        		ChatUtil.sendMessage(bukkitPlayer, loreColor+"Modified: "+valueColor+isBlanking);
+        		ChatUtil.sendMessage(bukkitPlayer, loreColor+"Total Blocks: "+valueColor+allBlocks);
+        		ChatUtil.sendMessage(bukkitPlayer, loreColor+"Critical Blocks: "+valueColor+critBlocks);
+        		ChatUtil.sendMessage(bukkitPlayer, loreColor+"Loot Chests: "+valueColor+lootChests);
         		
         	} else {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -113,6 +149,7 @@ public class MonumentAdminCommand extends CommandBase {
 			tabList.add("create");
 			tabList.add("remove");
 			tabList.add("show");
+			tabList.add("status");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
@@ -120,7 +157,7 @@ public class MonumentAdminCommand extends CommandBase {
 			String subCmd = getArgs()[2];
 			if(subCmd.equalsIgnoreCase("create")) {
 				tabList.add("***");
-			} else if(subCmd.equalsIgnoreCase("remove") || subCmd.equalsIgnoreCase("show")) {
+			} else {
 				tabList.addAll(getKonquest().getSanctuaryManager().getAllTemplateNames());
 			}
 			// Trim down completion options based on current input

@@ -309,13 +309,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return 1;
 		}
 		// Verify proximity to other territories
-		int min_distance_capital = konquest.getConfigManager().getConfig("core").getInt(CorePath.TOWNS_MIN_DISTANCE_CAPITAL.getPath());
-		int min_distance_town = konquest.getConfigManager().getConfig("core").getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
+		int min_distance_sanc = konquest.getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_SANCTUARY.getPath());
+		int min_distance_town = konquest.getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
 		int searchDistance = 0;
 		int minDistance = Integer.MAX_VALUE;
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			searchDistance = Konquest.chunkDistance(loc, kingdom.getCapital().getCenterLoc());
-			if(searchDistance != -1 && min_distance_capital > 0 && searchDistance < min_distance_capital) {
+			if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
 				ChatUtil.printDebug("Failed to add town, too close to capital "+kingdom.getCapital().getName());
 				return 2;
 			}
@@ -345,7 +345,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		for(KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
 			searchDistance = Konquest.chunkDistance(loc, sanctuary.getCenterLoc());
-			if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
+			if(searchDistance != -1 && min_distance_sanc > 0 && searchDistance < min_distance_sanc) {
 				ChatUtil.printDebug("Failed to add town, too close to sanctuary "+sanctuary.getName());
 				return 2;
 			}
@@ -423,6 +423,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * When the kingdom is player operated:
 	 * The player must be a barbarian, and is made the master of the kingdom;
 	 * The player must pay favor to create the kingdom.
+	 * The player is made the kingdom master, and lord of the capital.
 	 * When the kingdom is admin operated:
 	 * There is no cost to create, and there is no kingdom master.
 	 * 
@@ -530,11 +531,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			            konquest.getAccomplishmentManager().modifyPlayerStat(master,KonStatsType.FAVOR,(int)costCreate);
 					}
 					// Assign player to kingdom
-					assignPlayerKingdom(bukkitPlayer.getUniqueId(), kingdomName, true);
+					int assignStatus = assignPlayerKingdom(bukkitPlayer.getUniqueId(), kingdomName, true);
+					if(assignStatus != 0) {
+						ChatUtil.printDebug("Failed to assign player "+bukkitPlayer.getName()+" to created kingdom "+kingdomName+", status code "+assignStatus);
+					}
 					// Make player master of kingdom
 					newKingdom.forceMaster(bukkitPlayer.getUniqueId());
+					// Make player lord of capital
+					newKingdom.getCapital().setPlayerLord(bukkitPlayer);
+					
 					// Move player(s) out of center chunk (monument)
-					teleportAwayFromCenter(newKingdom.getCapital());
+					//teleportAwayFromCenter(newKingdom.getCapital());
 				}
 				// Update border particles
 				konquest.getTerritoryManager().updatePlayerBorderParticles(master);
@@ -1794,7 +1801,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	public RelationRole getRelationRole(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
-    	RelationRole result = RelationRole.NEUTRAL;
+    	if(displayKingdom == null || contextKingdom == null) {
+    		ChatUtil.printDebug("Failed to evaluate relation of null kingdom");
+    		return RelationRole.NEUTRAL;
+    	}
+		RelationRole result = RelationRole.NEUTRAL;
     	if(contextKingdom.equals(getBarbarians())) {
     		result = RelationRole.BARBARIAN;
 		} else if(contextKingdom.equals(getNeutrals())) {

@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import konquest.Konquest;
 import konquest.api.model.KonquestTerritoryType;
 import konquest.utility.ChatUtil;
+import konquest.utility.CorePath;
 import konquest.utility.MessagePath;
 import konquest.utility.Timeable;
 import konquest.utility.Timer;
@@ -219,17 +220,26 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 		KonMonumentTemplate template = getTemplate(name);
 		if(template != null) {
 			stopTemplateBlanking(name);
+			template.setBlanking(true);
 			template.setValid(false);
 			Timer timer = new Timer(this);
 			timer.stopTimer();
-			timer.setTime(120);
+			timer.setTime(60);
 			timer.startTimer();
 			templateBlankingTimers.put(name.toLowerCase(), timer);
-			ChatUtil.printDebug("Starting 120 second monument blanking timer for template "+name);
+			ChatUtil.printDebug("Starting 60 second monument blanking timer for template "+name);
+		} else {
+			ChatUtil.printDebug("Failed to start blanking for unknown template "+name);
 		}
 	}
 	
 	public void stopTemplateBlanking(String name) {
+		KonMonumentTemplate template = getTemplate(name);
+		if(template != null) {
+			template.setBlanking(false);
+		} else {
+			ChatUtil.printDebug("Failed to stop blanking for unknown template "+name);
+		}
 		String nameLower = name.toLowerCase();
 		if(templateBlankingTimers.containsKey(nameLower)) {
 			templateBlankingTimers.get(nameLower).stopTimer();
@@ -256,6 +266,7 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 							case 0:
 								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(templateName));
 								monumentTemplate.setValid(true);
+								monumentTemplate.setBlanking(false);
 								getKonquest().getKingdomManager().reloadMonumentsForTemplate(monumentTemplate);
 								break;
 							case 1:
@@ -266,8 +277,8 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 								ChatUtil.sendAdminBroadcast(templateName+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(diffX,diffZ));
 								break;
 							case 2:
-								String criticalBlockTypeName = getKonquest().getConfigManager().getConfig("core").getString("core.monuments.critical_block");
-								int maxCriticalhits = getKonquest().getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
+								String criticalBlockTypeName = getKonquest().getCore().getString(CorePath.MONUMENTS_CRITICAL_BLOCK.getPath());
+								int maxCriticalhits = getKonquest().getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
 								ChatUtil.sendAdminBroadcast(templateName+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(maxCriticalhits,criticalBlockTypeName));
 								break;
 							case 3:
@@ -277,6 +288,7 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 								ChatUtil.sendAdminBroadcast(templateName+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage());
 								break;
 							default:
+								ChatUtil.sendAdminBroadcast(templateName+": "+"Failed to refresh monument template, check manually.");
 								break;
 						}
 					}

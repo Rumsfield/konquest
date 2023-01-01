@@ -77,8 +77,9 @@ public class KingdomCommand extends CommandBase {
 	                    		// Successful kingdom creation
 	                    		//TODO: KR messages
 	                    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_CREATE.getMessage(kingdomName));
-	                    		ChatUtil.sendBroadcast(MessagePath.COMMAND_SETTLE_BROADCAST_SETTLE.getMessage(bukkitPlayer.getName(),kingdomName));
-	                    		
+	                    		//ChatUtil.sendBroadcast(MessagePath.COMMAND_SETTLE_BROADCAST_SETTLE.getMessage(bukkitPlayer.getName(),kingdomName));
+	                    		ChatUtil.sendBroadcast(bukkitPlayer.getName()+" created the kingdom of "+kingdomName);
+	                    				
 	                    		// Open kingdom menu for newly created kingdom
 	                    		KonKingdom newKingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
 	                    		getKonquest().getDisplayManager().displayKingdomMenu(player, newKingdom, false);
@@ -96,6 +97,7 @@ public class KingdomCommand extends CommandBase {
 		                    			break;
 		                    		case 2:
 		                    			//TODO: KR message - You must be a barbarian to create a kingdom. Use k exile
+		                    			ChatUtil.sendError((Player) getSender(), "You must be a barbarian to create a kingdom.");
 		                    			break;
 		                    		case 3:
 		                    			String cost = String.format("%.2f",getKonquest().getKingdomManager().getCostCreate());
@@ -110,11 +112,11 @@ public class KingdomCommand extends CommandBase {
 		                    			break;
 		                    		case 6:
 		                    			int distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
-		                    			int min_distance_capital = getKonquest().getConfigManager().getConfig("core").getInt(CorePath.TOWNS_MIN_DISTANCE_CAPITAL.getPath());
-		                    			int min_distance_town = getKonquest().getConfigManager().getConfig("core").getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
+		                    			int min_distance_sanc = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_SANCTUARY.getPath());
+		                    			int min_distance_town = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
 		                    			int min_distance = 0;
-		                    			if(min_distance_capital < min_distance_town) {
-		                    				min_distance = min_distance_capital;
+		                    			if(min_distance_sanc < min_distance_town) {
+		                    				min_distance = min_distance_sanc;
 		                    			} else {
 		                    				min_distance = min_distance_town;
 		                    			}

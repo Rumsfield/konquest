@@ -22,7 +22,7 @@ public class TravelAdminCommand  extends CommandBase {
     }
 
     public void execute() {
-    	// k admin travel kingdom1|town1|ruin1
+    	// k admin travel <name>
     	if (getArgs().length != 3 && getArgs().length != 4) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
@@ -35,12 +35,16 @@ public class TravelAdminCommand  extends CommandBase {
         		destination = getKonquest().getKingdomManager().getKingdom(travelTo).getCapital().getSpawnLoc();
         		getKonquest().telePlayerLocation(bukkitPlayer, destination);
         		return;
+        	} else if(getKonquest().getSanctuaryManager().isSanctuary(travelTo)) {
+        		destination = getKonquest().getSanctuaryManager().getSanctuary(travelTo).getSpawnLoc();
+        		getKonquest().telePlayerLocation(bukkitPlayer, destination);
+        		return;
         	} else if(getKonquest().getRuinManager().isRuin(travelTo)) {
-        		destination = getKonquest().getRuinManager().getRuin(travelTo).getCenterLoc();
+        		destination = getKonquest().getRuinManager().getRuin(travelTo).getSpawnLoc();
         		getKonquest().telePlayerLocation(bukkitPlayer, destination);
         		return;
         	} else if(getKonquest().getCampManager().isCampName(travelTo)) {
-        		destination = getKonquest().getCampManager().getCampFromName(travelTo).getCenterLoc();
+        		destination = getKonquest().getCampManager().getCampFromName(travelTo).getSpawnLoc();
         		getKonquest().telePlayerLocation(bukkitPlayer, destination);
         		return;
             } else {
@@ -57,7 +61,7 @@ public class TravelAdminCommand  extends CommandBase {
     
     @Override
 	public List<String> tabComplete() {
-    	// k admin travel town1|kingdom1|ruin1
+    	// k admin travel <name>
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 
@@ -69,6 +73,7 @@ public class TravelAdminCommand  extends CommandBase {
 			}
 			tabList.addAll(getKonquest().getRuinManager().getRuinNames());
 			tabList.addAll(getKonquest().getCampManager().getCampNames());
+			tabList.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);

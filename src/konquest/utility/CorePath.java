@@ -90,7 +90,7 @@ public enum CorePath {
 	TOWNS_MIN_SETTLE_HEIGHT                               ("core.towns.min_settle_height"),
 	TOWNS_MAX_SETTLE_HEIGHT                               ("core.towns.max_settle_height"),
 	TOWNS_MIN_DISTANCE_TOWN                               ("core.towns.min_distance_town"),
-	TOWNS_MIN_DISTANCE_CAPITAL                            ("core.towns.min_distance_capital"),
+	TOWNS_MIN_DISTANCE_SANCTUARY                          ("core.towns.min_distance_sanctuary"),
 	TOWNS_MAX_DISTANCE_ALL                                ("core.towns.max_distance_all"),
 	TOWNS_MAX_SIZE                                        ("core.towns.max_size"),
 	TOWNS_SETTLE_CHECKS_DEPTH                             ("core.towns.settle_checks_depth"),

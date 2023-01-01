@@ -186,6 +186,12 @@ public class TerritoryManager {
 				minDistance = searchDist;
 			}
 		}
+		for(KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
+			searchDist = Konquest.chunkDistance(loc, sanctuary.getCenterLoc());
+			if(searchDist != -1 && searchDist < minDistance) {
+				minDistance = searchDist;
+			}
+		}
 		return minDistance;
 	}
 	
@@ -1137,7 +1143,7 @@ public class TerritoryManager {
     	String mapTownSymbol = "+"; // "\u25A4";// plus in square "+";
     	String mapCampSymbol = "="; // "\u25A7";// minus in square "=";
     	String mapRuinSymbol = "%"; // "\u25A9";// dot in square "%";
-    	String mapSanctuarySymbol = "~";
+    	String mapSanctuarySymbol = "$";
     	String mapCapitalSymbol = "#"; // "\u25A5";// cross in square "#";
     	String[][] map = new String[mapSize][mapSize];
     	// Determine player's direction
@@ -1159,8 +1165,8 @@ public class TerritoryManager {
 		int minDistance = Integer.MAX_VALUE;
 		int proximity = Integer.MAX_VALUE;
 		int searchDist = 0;
-		int min_distance_capital = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
-		int min_distance_town = konquest.getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
+		int min_distance_sanc = konquest.getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_SANCTUARY.getPath());
+		int min_distance_town = konquest.getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
 		if(!konquest.isWorldValid(center.getWorld())) {
 			isLocValidSettle = false;
 		}
@@ -1172,7 +1178,7 @@ public class TerritoryManager {
 					proximity = searchDist;
 					closestTerritory = kingdom.getCapital();
 				}
-				if(searchDist < min_distance_capital) {
+				if(searchDist < min_distance_town) {
 					isLocValidSettle = false;
 				}
 			}
@@ -1203,6 +1209,19 @@ public class TerritoryManager {
 				}
 			}
 		}
+		for(KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
+			searchDist = Konquest.chunkDistance(center, sanctuary.getCenterLoc());
+			if(searchDist != -1) {
+				if(searchDist < minDistance) {
+					minDistance = searchDist;
+					proximity = searchDist;
+					closestTerritory = sanctuary;
+				}
+				if(searchDist < min_distance_sanc) {
+					isLocValidSettle = false;
+				}
+			}
+		}
 		for(KonCamp camp : konquest.getCampManager().getCamps()) {
 			searchDist = Konquest.chunkDistance(center, camp.getCenterLoc());
 			if(searchDist != -1) {
@@ -1211,7 +1230,6 @@ public class TerritoryManager {
 					closestTerritory = camp;
 				}
 			}
-			
 		}
 		// Verify max distance
 		int max_distance_all = konquest.getCore().getInt(CorePath.TOWNS_MAX_DISTANCE_ALL.getPath());
@@ -1226,7 +1244,6 @@ public class TerritoryManager {
 			}
 		}
     	String settleTip = MessagePath.MENU_MAP_SETTLE_HINT.getMessage();
-    	//if(isLocValidSettlement(center)) {
     	if(isLocValidSettle) {
     		settleTip = ChatColor.GOLD+settleTip;
     	} else {

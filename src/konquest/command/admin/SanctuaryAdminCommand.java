@@ -11,6 +11,7 @@ import org.bukkit.util.StringUtil;
 
 import konquest.Konquest;
 import konquest.command.CommandBase;
+import konquest.model.KonPlayer;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
@@ -52,6 +53,9 @@ public class SanctuaryAdminCommand extends CommandBase {
                 return;
         	} else {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_CREATE.getMessage(name));
+        		// Render border particles
+        		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
+        		getKonquest().getTerritoryManager().updatePlayerBorderParticles(player);
         	}
 		} else if(cmdMode.equalsIgnoreCase("remove")) {
 			if(!getKonquest().getSanctuaryManager().isSanctuary(name)) {

@@ -187,11 +187,11 @@ public class Konquest implements KonquestAPI, Timeable {
 		
 		versionHandler = null;
 		
-		chatPriority = defaultChatPriority;
-		worlds = new ArrayList<World>();
-		isWhitelist = false;
-		isBlacklistIgnored = false;
-		opStatusMessages = new ArrayList<String>();
+		this.chatPriority = defaultChatPriority;
+		this.worlds = new ArrayList<World>();
+		this.isWhitelist = false;
+		this.isBlacklistIgnored = false;
+		this.opStatusMessages = new ArrayList<String>();
 		this.saveTimer = new Timer(this);
 		this.compassTimer = new Timer(this);
 		this.pingTimer = new Timer(this);
@@ -199,9 +199,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		this.offlineTimeoutSeconds = 0;
 		this.isVersionHandlerEnabled = false;
 		this.isPacketSendEnabled = false;
-		
-		//teleportTerritoryQueue = new HashMap<Player,KonTerritory>();
-		teleportLocationQueue = new HashMap<Player,Location>();
+		this.teleportLocationQueue = new HashMap<Player,Location>();
 	}
 	
 	public void initialize() {
@@ -214,10 +212,10 @@ public class Konquest implements KonquestAPI, Timeable {
 		
 		initColors();
 		languageManager.initialize();
-		sanctuaryManager.initialize();
-		kingdomManager.initialize();
+		sanctuaryManager.initialize(); // Load sanctuaries and monument templates
+		kingdomManager.initialize(); // Load all kingdoms + towns
+		sanctuaryManager.refresh(); // Update sanctuary references to neutrals kingdom
 		ruinManager.initialize();
-		//guildManager.initialize();
 		initManagers();
 		initWorlds();
 		

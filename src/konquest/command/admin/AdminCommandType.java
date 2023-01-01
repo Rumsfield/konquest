@@ -20,7 +20,7 @@ public enum AdminCommandType {
 	CAPTURE		    ("konquest.command.admin.capture",			"<town> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_MAKEKINGDOM.getMessage()),
 	/* End */
 	
-	MONUMENT		("konquest.command.admin.monument",			"create|remove|show <name>",										MessagePath.DESCRIPTION_ADMIN_MONUMENT.getMessage()),
+	MONUMENT		("konquest.command.admin.monument",			"create|remove|show|status <name>",									MessagePath.DESCRIPTION_ADMIN_MONUMENT.getMessage()),
 	LIST			("konquest.command.admin.list",				"[kingdom|town|camp|ruin|sanctuary] [<page>]",						MessagePath.DESCRIPTION_ADMIN_LIST.getMessage()),
 	//FORCECAPTURE	("konquest.command.admin.forcecapture",		"<town> <kingdom>",													MessagePath.DESCRIPTION_ADMIN_FORCECAPTURE.getMessage()),
 	//FORCEJOIN 		("konquest.command.admin.forcejoin",		"<player> <kingdom>",												MessagePath.DESCRIPTION_ADMIN_FORCEJOIN.getMessage()),
