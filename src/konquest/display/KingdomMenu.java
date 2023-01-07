@@ -292,7 +292,7 @@ public class KingdomMenu implements ViewableMenu {
 				
 				loreList.clear();
 				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_SPECIALIZE.getMessage());
-				icon = new InfoIcon(masterColor+MessagePath.MENU_GUILD_SPECIAL.getMessage(), loreList, Material.ANVIL, ROOT_SLOT_TEMPLATE, true);
+				icon = new InfoIcon(masterColor+"Monument Template", loreList, Material.ANVIL, ROOT_SLOT_TEMPLATE, true);
 				result.addIcon(icon);
 				
 				loreList.clear();

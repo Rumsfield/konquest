@@ -20,7 +20,7 @@ public enum CommandType {
 	UNCLAIM (Material.COBWEB,           "konquest.command.unclaim", "",   "[radius|auto] [<radius>]",                                       MessagePath.DESCRIPTION_UNCLAIM.getMessage()),
 	TRAVEL  (Material.COMPASS,          "konquest.command.travel",  "t",  "<town>|capital|camp|wild|home",                                  MessagePath.DESCRIPTION_TRAVEL.getMessage()),
 	KINGDOM (Material.GOLDEN_SWORD,     "konquest.command.kingdom", "k",  "[menu|create|add|kick|rename] [<name>] [<template>]",            MessagePath.DESCRIPTION_KINGDOM.getMessage()),
-	TOWN    (Material.IRON_DOOR,        "konquest.command.town",    "",   "<town> [menu|join|leave|add|kick|rename|takeover] [<player>]",   MessagePath.DESCRIPTION_TOWN.getMessage()),
+	TOWN    (Material.IRON_DOOR,        "konquest.command.town",    "",   "<town> [menu|join|leave|add|kick|knight|lord|rename] [<name>]",  MessagePath.DESCRIPTION_TOWN.getMessage()),
 	//TOWN    (Material.IRON_DOOR,        "konquest.command.town",    "",   "<town> add|kick|knight|lord|rename|upgrade|shield|options|plots [player]", MessagePath.DESCRIPTION_TOWN.getMessage()),
 	//GUILD   (Material.GOLDEN_AXE,       "konquest.command.guild",   "g",  "[menu|create|add|kick|rename] [name]",                           MessagePath.DESCRIPTION_GUILD.getMessage()),
 	QUEST   (Material.WRITABLE_BOOK,    "konquest.command.quest",   "q",  "",                                                               MessagePath.DESCRIPTION_QUEST.getMessage()),

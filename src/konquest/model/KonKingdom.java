@@ -655,6 +655,15 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		return capital;
 	}
 	
+	public boolean hasCapital() {
+		return capital != null;
+	}
+	
+	public boolean hasCapital(String name) {
+		// Check that name matches kingdom name
+		return name.equalsIgnoreCase(this.name) && capital != null;
+	}
+	
 	// This can return an empty list
 	public ArrayList<String> getTownNames() {
 		ArrayList<String> names = new ArrayList<String>(townMap.keySet());
