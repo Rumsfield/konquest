@@ -9,10 +9,10 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/Vault-1.7.3.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/spigot-api-1.19.2-R0.1-SNAPSHOT-shaded.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/spigot-api-1.19.3-R0.1-SNAPSHOT-shaded.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/QuickShop-4.0.9.10.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/LuckPerms-Bukkit-5.4.9.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/sqlite-jdbc-3.36.0.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/sqlite-jdbc-3.40.0.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/ProtocolLib.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/PlaceholderAPI-2.11.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ryan/Documents/Minecraft/Java Plugins/Konquest/lib/Dynmap-3.4-beta-2-spigot.jar"/>
