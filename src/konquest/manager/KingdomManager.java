@@ -43,6 +43,7 @@ import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestPlayer;
 import konquest.api.model.KonquestRelationship;
 import konquest.model.KonBarDisplayer;
+import konquest.model.KonCapital;
 import konquest.model.KonKingdom;
 import konquest.model.KonKingdomScoreAttributes;
 import konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
@@ -1878,6 +1879,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		
 		// Verify name
 		if(konquest.validateNameConstraints(name) != 0) {
+			ChatUtil.printDebug("Town name "+name+" failed name validation");
+			return 3;
+		}
+		if(!isKingdom(kingdomName)) {
+			ChatUtil.printDebug("Kingdom name "+kingdomName+" failed name validation");
 			return 3;
 		}
 		
@@ -1925,10 +1931,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			int initStatus = getKingdom(kingdomName).initTown(name);
 			if(initStatus == 0) {
 				// When a town is added successfully, update the chunk cache
-				//updateTerritoryCache();
 				konquest.getTerritoryManager().addAllTerritory(loc.getWorld(),getKingdom(kingdomName).getTown(name).getChunkList());
 				konquest.getMapHandler().drawDynmapUpdateTerritory(getKingdom(kingdomName).getTown(name));
-
+				// Update territory bar
+				getKingdom(kingdomName).getTown(name).updateBarPlayers();
 				return 0;
 			} else {
 				// Remove town if init fails, exit code 10+
@@ -2255,6 +2261,25 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public boolean isTown(String name) {
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			if(kingdom.hasTown(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public KonCapital getCapital(String name) {
+		KonCapital result = null;
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			if(kingdom.hasCapital(name)) {
+				result = kingdom.getCapital();
+			}
+		}
+		return result;
+	}
+	
+	public boolean isCapital(String name) {
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			if(kingdom.hasCapital(name)) {
 				return true;
 			}
 		}
