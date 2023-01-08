@@ -1520,8 +1520,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 	}
 	
+	// The primary way to change a kingdom's template, from the kingdom GUI menu
 	public void menuChangeKingdomTemplate(KonKingdom kingdom, KonMonumentTemplate template, KonPlayer player, boolean ignoreCost) {
-		//TODO: Fix duplicate method? changeKingdomTemplate
 		//TODO: Update message paths
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Verify template is valid
@@ -1546,7 +1546,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
             konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costTemplate);
 		}
 		
-		ChatUtil.sendNotice(player.getBukkitPlayer(), "Updated tempalte");
+		ChatUtil.sendNotice(player.getBukkitPlayer(), "Updated tempalte to "+template.getName());
 		Konquest.playSuccessSound(player.getBukkitPlayer());
 		return;
 	}

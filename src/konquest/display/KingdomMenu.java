@@ -107,6 +107,7 @@ public class KingdomMenu implements ViewableMenu {
 	private KonKingdom kingdom;
 	private KonKingdom diplomacyKingdom;
 	private boolean isCreatedKingdom;
+	private boolean isServerKingdom;
 	private boolean isAdmin;
 	private AccessType menuAccess;
 	private Comparator<KonKingdom> kingdomComparator;
@@ -122,9 +123,38 @@ public class KingdomMenu implements ViewableMenu {
 		this.kingdom = kingdom;
 		this.diplomacyKingdom = null;
 		this.isCreatedKingdom = false; // Is this kingdom created by players, i.e. not barbarians or neutrals
+		this.isServerKingdom = false; // Is this kingdom created by an admin for the server
 		this.isAdmin = isAdmin;
 		this.menuAccess = AccessType.REGULAR;
-		this.kingdomComparator = new Comparator<KonKingdom>() {
+		this.kingdomComparator = null;
+		
+		initializeMenu();
+		renderDefaultViews();
+	}
+	
+	
+	private void initializeMenu() {
+		if(kingdom != null) {
+			if(kingdom.isCreated()) {
+				isCreatedKingdom = true;
+				UUID id = player.getBukkitPlayer().getUniqueId();
+				if(isAdmin) {
+					menuAccess = AccessType.MASTER;
+				} else {
+					if(kingdom.isMaster(id)) {
+						menuAccess = AccessType.MASTER;
+					} else if(kingdom.isOfficer(id)) {
+						menuAccess = AccessType.OFFICER;
+					} else if(kingdom.isMember(id)) {
+						menuAccess = AccessType.REGULAR;
+					}
+				}
+			}
+			if(kingdom.isAdminOperated()) {
+				isServerKingdom = true;
+			}
+		}
+		kingdomComparator = new Comparator<KonKingdom>() {
    			@Override
    			public int compare(final KonKingdom k1, KonKingdom k2) {
    				// sort by land, then population
@@ -147,29 +177,6 @@ public class KingdomMenu implements ViewableMenu {
    				return result;
    			}
    		};
-		
-		initializeMenu();
-		renderDefaultViews();
-	}
-	
-	
-	private void initializeMenu() {
-		if(kingdom != null && kingdom.isCreated()) {
-			isCreatedKingdom = true;
-			UUID id = player.getBukkitPlayer().getUniqueId();
-			if(isAdmin) {
-				menuAccess = AccessType.MASTER;
-			} else {
-				if(kingdom.isMaster(id)) {
-					menuAccess = AccessType.MASTER;
-				} else if(kingdom.isOfficer(id)) {
-					menuAccess = AccessType.OFFICER;
-				} else if(kingdom.isMember(id)) {
-					menuAccess = AccessType.REGULAR;
-				}
-			}
-			
-		}
 	}
 	
 	private void renderDefaultViews() {
@@ -212,6 +219,7 @@ public class KingdomMenu implements ViewableMenu {
 		
 		result = new DisplayMenu(rows, getTitle(MenuState.ROOT));
 		
+		/* Join Icon */
 		loreList.clear();
 		loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_JOIN.getMessage());
 		String joinTip = "Or, create your own kingdom with /k kingdom create.";
@@ -221,6 +229,7 @@ public class KingdomMenu implements ViewableMenu {
 		icon = new InfoIcon(regularColor+MessagePath.MENU_GUILD_JOIN.getMessage(), loreList, Material.SADDLE, ROOT_SLOT_JOIN, true);
 		result.addIcon(icon);
 		
+		/* Exile Icon */
 		loreList.clear();
 		loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_LEAVE.getMessage());
 		//TODO: context description
@@ -231,6 +240,7 @@ public class KingdomMenu implements ViewableMenu {
 		icon = new InfoIcon(regularColor+"Exile", loreList, Material.ARROW, ROOT_SLOT_EXILE, true);
 		result.addIcon(icon);
 
+		/* Invites Icon */
 		loreList.clear();
 		loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_INVITES.getMessage());
 		int numInvites = manager.getInviteKingdoms(player).size();
@@ -240,22 +250,27 @@ public class KingdomMenu implements ViewableMenu {
 		icon = new InfoIcon(regularColor+MessagePath.MENU_GUILD_INVITES.getMessage(), loreList, Material.WRITABLE_BOOK, ROOT_SLOT_INVITE, true);
 		result.addIcon(icon);
 		
+		/* List Icon */
 		loreList.clear();
 		loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_LIST.getMessage());
 		icon = new InfoIcon(regularColor+MessagePath.MENU_GUILD_LIST.getMessage(), loreList, Material.LECTERN, ROOT_SLOT_LIST, true);
 		result.addIcon(icon);
 		
+		// These icons only appear for created kingdoms
 		if(isCreatedKingdom) {
+			/* Kingdom Info Icon */
 			loreList = new ArrayList<String>();
 			icon = new KingdomIcon(kingdom,kingdomColor,loreList,ROOT_SLOT_INFO,false);
 			result.addIcon(icon);
 
 			if(menuAccess.equals(AccessType.OFFICER) || menuAccess.equals(AccessType.MASTER)) {
+				/* Relations Icon */
 				loreList = new ArrayList<String>();
 				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_RELATION.getMessage());
 				icon = new InfoIcon(officerColor+MessagePath.MENU_GUILD_RELATION.getMessage(), loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, true);
 				result.addIcon(icon);
 				
+				/* Requests Icon */
 				loreList.clear();
 				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_REQUESTS.getMessage());
 				int numRequests = kingdom.getJoinRequests().size();
@@ -267,20 +282,25 @@ public class KingdomMenu implements ViewableMenu {
 			}
 			
 			if(menuAccess.equals(AccessType.MASTER)) {
+				/* Promote Icon */
 				loreList = new ArrayList<String>();
 				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_PROMOTE.getMessage());
 				icon = new InfoIcon(masterColor+MessagePath.MENU_GUILD_PROMOTE.getMessage(), loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, true);
 				result.addIcon(icon);
 				
+				/* Demote Icon */
 				loreList.clear();
 				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_DEMOTE.getMessage());
 				icon = new InfoIcon(masterColor+MessagePath.MENU_GUILD_DEMOTE.getMessage(), loreList, Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, true);
 				result.addIcon(icon);
 				
-				loreList.clear();
-				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_TRANSFER.getMessage());
-				icon = new InfoIcon(masterColor+MessagePath.MENU_GUILD_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, true);
-				result.addIcon(icon);
+				/* Transfer Icon */
+				if(!isServerKingdom) {
+					loreList.clear();
+					loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_TRANSFER.getMessage());
+					icon = new InfoIcon(masterColor+MessagePath.MENU_GUILD_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, true);
+					result.addIcon(icon);
+				}
 				
 				/* Open/Close Button */
 				String currentValue = DisplayManager.boolean2Lang(kingdom.isOpen())+" "+DisplayManager.boolean2Symbol(kingdom.isOpen());
@@ -290,11 +310,13 @@ public class KingdomMenu implements ViewableMenu {
 				icon = new InfoIcon(masterColor+MessagePath.MENU_GUILD_OPEN.getMessage(), loreList, Material.IRON_DOOR, ROOT_SLOT_OPEN, true);
 				result.addIcon(icon);
 				
+				/* Template Icon */
 				loreList.clear();
-				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_SPECIALIZE.getMessage());
+				loreList.add(loreColor+"Change the monument template for all towns.");
 				icon = new InfoIcon(masterColor+"Monument Template", loreList, Material.ANVIL, ROOT_SLOT_TEMPLATE, true);
 				result.addIcon(icon);
 				
+				/* Disband Icon */
 				loreList.clear();
 				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_DISBAND.getMessage());
 				icon = new InfoIcon(masterColor+MessagePath.MENU_GUILD_DISBAND.getMessage(), loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);

@@ -575,7 +575,8 @@ public class TerritoryManager {
 	}
 	
 	/*
-	 * Main method for removing/unclaiming chunks of territory
+	 * Main method for removing/unclaiming chunks of territory.
+	 * Handles territory spawn set to center if chunk contains spawn.
 	 */
 	// Returns true when any points have been removed.
 	// Returns false when no points were removed.
@@ -586,6 +587,7 @@ public class TerritoryManager {
 		}
 		
 		World territoryWorld = territory.getWorld();
+		Point territorySpawn = Konquest.toPoint(territory.getSpawnLoc());
 		
 		// Player occupants
 		Set<KonPlayer> occupants = new HashSet<KonPlayer>();
@@ -600,6 +602,7 @@ public class TerritoryManager {
 		boolean allowUnclaim = true;
 		for(Point unclaimPoint : points) {
 			allowUnclaim = true;
+			// Check for allowed conditions
 			if(territory.getChunkList().containsKey(unclaimPoint)) {
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.TOWN)) {
 					// Remove any town plot points
@@ -613,7 +616,14 @@ public class TerritoryManager {
 					}
 				}
 			}
+			// Attempt to remove
 			if(allowUnclaim && territory.removeChunk(unclaimPoint)) {
+				// Check for spawn
+				if(territorySpawn.equals(unclaimPoint)) {
+					// Chunk containing spawn is being removed
+					// TODO: refresh from monument template if town?
+					territory.setSpawn(territory.getCenterLoc());
+				}
 				removeTerritory(territoryWorld,unclaimPoint);
 				doUpdates = true;
 			}

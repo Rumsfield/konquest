@@ -196,7 +196,7 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 		boolean result = false;
 		String nameLower = name.toLowerCase();
 		if(templates.containsKey(nameLower)) {
-			templates.get(nameLower).setValid(false);
+			//templates.get(nameLower).setValid(false);
 			templates.remove(nameLower);
 			result = true;
 		}

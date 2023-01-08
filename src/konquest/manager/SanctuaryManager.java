@@ -18,6 +18,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.Inventory;
 
 import konquest.Konquest;
+import konquest.model.KonKingdom;
 import konquest.model.KonMonumentTemplate;
 import konquest.model.KonPropertyFlag;
 import konquest.model.KonSanctuary;
@@ -74,49 +75,36 @@ public class SanctuaryManager {
 		return result;
 	}
 	
+	// Return false if the removal was not allowed
 	public boolean removeSanctuary(String name) {
-		boolean result = false;
-		
-		//TODO: KR Add conditions to check if this removal is allowed...
-		// If this sanctuary contains templates...
-		//		Check for at least 1 other template in another sanctuary
-		//		Switch all kingdoms with templates in this sanctuary to another valid template
-		//
-		// Or just don't allow? Think...
 		/*
-		 * Option 1: Allow sanctuary removal if other templates exist, and auto-assign to kingdoms with missing templates.
-		 * Pros:
-		 * 	- Easy to manage sanctuary territory
-		 * Cons:
-		 * 	- Can unintentionally remove a sanctuary with most templates
-		 * 	- More complicated code logic for automatically checking conditions, assigning missing templates
-		 * 
-		 * Option 2: Strict conditions, cannot remove sanctuary with active templates, cannot remove active templates, 
-		 * 			 must manually re-assign kingdoms to new templates to make all templates non-active within sanctuary
-		 * 			 in order to remove it.
-		 * Pros:
-		 * 	- Simpler code logic with strict rules
-		 * 	- More idiot-proof, with checks to prevent template removal
-		 * Cons:
-		 * 	- More cumbersome for admins to remove templates, need to modify every kingdom first
-		 * 
-		 * Conclusion: Hybrid approach. Cannot remove sanctuary with active templates, but allow explicit removal of those templates.
-		 * 			When removing templates, prompt to confirm and list number of kingdoms using that template. Those kingdoms
-		 * 			automatically get assigned another template. There must always be at least 1 valid template somewhere, cannot remove
-		 * 			the last template. Kingdoms with null template cannot be captured, etc.
+		 * 1) Removing a sanctuary also removes all templates within.
+		 * 2) When removing a template, active kingdoms get re-assigned to another valid template, if one exists, else the kingdoms have a null template.
+		 * 3) When a new template is created, all kingdoms with invalid templates get assigned to it.
 		 */
 		
+		// Check if name exists
+		if(!isSanctuary(name)) {
+			return false;
+		}
+		// Remove the sanctuary
 		KonSanctuary oldSanctuary = sanctuaryMap.remove(name.toLowerCase());
 		if(oldSanctuary != null) {
+			// Clear all templates
 			oldSanctuary.clearAllTemplates();
+			// Remove display bars
 			oldSanctuary.removeAllBarPlayers();
+			// Remove territory
 			konquest.getTerritoryManager().removeAllTerritory(oldSanctuary.getCenterLoc().getWorld(), oldSanctuary.getChunkList().keySet());
 			konquest.getMapHandler().drawDynmapRemoveTerritory(oldSanctuary);
 			ChatUtil.printDebug("Removed Sanctuary "+name);
+			// De-reference the object
 			oldSanctuary = null;
-			result = true;
+			// Update kingdom template assignments
+			refreshKingdomTemplates();
+			return true;
 		}
-		return result;
+		return false;
 	}
 	
 	public boolean renameSanctuary(String name, String newName) {
@@ -236,6 +224,43 @@ public class SanctuaryManager {
 		int result = 0;
 		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
 			result += sanctuary.getTemplates().size();
+		}
+		return result;
+	}
+	
+	/**
+	 * For each kingdom with a null template, assign any remaining valid template
+	 */
+	public void refreshKingdomTemplates() {
+		ChatUtil.printDebug("Refreshing all kingdom templates...");
+		// Check for valid templates
+		Set<KonMonumentTemplate> templates = getAllValidTemplates();
+		if(!templates.isEmpty()) {
+			// Choose a template
+			KonMonumentTemplate chosenTemplate = templates.iterator().next();
+			// Assign kingdoms in need
+			for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+				if(!kingdom.hasMonumentTemplate()) {
+					ChatUtil.printDebug("Updating kingdom "+kingdom.getName()+" to template "+chosenTemplate.getName());
+					kingdom.updateMonumentTemplate(chosenTemplate);
+				}
+			}
+		} else {
+			ChatUtil.printDebug("No valid templates exist!");
+		}
+	}
+	
+	public boolean removeMonumentTemplate(String name) {
+		boolean result = false;
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			if(sanctuary.isTemplate(name)) {
+				sanctuary.stopTemplateBlanking(name);
+				result = sanctuary.removeTemplate(name);
+				break;
+			}
+		}
+		if(result) {
+			refreshKingdomTemplates();
 		}
 		return result;
 	}
@@ -389,18 +414,6 @@ public class SanctuaryManager {
 			ChatUtil.printDebug("Validated Monument Template "+name+" without loot");
 		}
 		return 0;
-	}
-	
-	public boolean removeMonumentTemplate(String name) {
-		boolean result = false;
-		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
-			if(sanctuary.isTemplate(name)) {
-				sanctuary.stopTemplateBlanking(name);
-				result = sanctuary.removeTemplate(name);
-				break;
-			}
-		}
-		return result;
 	}
 	
 	private void loadSanctuaries() {
