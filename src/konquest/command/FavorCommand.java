@@ -49,12 +49,9 @@ public class FavorCommand extends CommandBase {
         	ChatUtil.sendMessage(bukkitPlayer, "Rename: "+ChatColor.AQUA+cost_rename);
         	ChatUtil.sendMessage(bukkitPlayer, "Claim: "+ChatColor.AQUA+cost_claim);
         	ChatUtil.sendMessage(bukkitPlayer, "Travel: "+ChatColor.AQUA+cost_travel);
-        	if(getKonquest().getGuildManager().isEnabled()) {
-	        	ChatUtil.sendMessage(bukkitPlayer, "Guild Create: "+ChatColor.AQUA+getKonquest().getGuildManager().getCostCreate());
-	        	ChatUtil.sendMessage(bukkitPlayer, "Guild Rename: "+ChatColor.AQUA+getKonquest().getGuildManager().getCostRename());
-	        	ChatUtil.sendMessage(bukkitPlayer, "Guild Specialize: "+ChatColor.AQUA+getKonquest().getGuildManager().getCostSpecial());
-	        	ChatUtil.sendMessage(bukkitPlayer, "Guild Relation: "+ChatColor.AQUA+getKonquest().getGuildManager().getCostRelation());
-        	}
+        	ChatUtil.sendMessage(bukkitPlayer, "Kingdom Create: "+ChatColor.AQUA+getKonquest().getKingdomManager().getCostCreate());
+        	ChatUtil.sendMessage(bukkitPlayer, "Kingdom Rename: "+ChatColor.AQUA+getKonquest().getKingdomManager().getCostRename());
+        	ChatUtil.sendMessage(bukkitPlayer, "Kingdom Relation: "+ChatColor.AQUA+getKonquest().getKingdomManager().getCostRelation());
         }
 	}
 	

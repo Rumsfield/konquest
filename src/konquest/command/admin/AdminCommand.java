@@ -35,56 +35,35 @@ public class AdminCommand extends CommandBase {
 		            case BYPASS:
 		                new BypassAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 		                break;
+		            case CAMP:
+		                new CampAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+		                break;
+		            case CAPTURE:
+		                new CaptureAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+		                break;
 	            	case CLAIM:
 	                    new ClaimAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 	                    break;
 	            	case FLAG:
 	                    new FlagAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 	                    break;
-	            	case FORCECAPTURE:
-	                    new ForceCaptureAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case FORCEEXILE:
-	                    new ForceExileAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case FORCEJOIN:
-	                    new ForceJoinAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case FORCETOWN:
-	                    new ForceTownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case FORCEGUILD:
-	                    new ForceGuildAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
 	                case HELP:
 	                    new HelpAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 	                    break;
+	                case KINGDOM:
+		                new KingdomAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+		                break;
 	                case LIST:
 	                    new ListAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case MAKEKINGDOM:
-	                    new MakeKingdomAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case MAKETOWN:
-	                    new MakeTownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 	                    break;
 	                case MONUMENT:
 	                    new MonumentAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 	                    break;
-	                case REMOVEKINGDOM:
-	                    new RemoveKingdomAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case REMOVETOWN:
-	                    new RemoveTownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case REMOVECAMP:
-	                    new RemoveCampAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case RENAME:
-	                    new RenameAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
 	                case RUIN:
 	                    new RuinAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+	                    break;
+	                case SANCTUARY:
+	                    new SanctuaryAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 	                    break;
 	                case SAVE:
 	                    new SaveAdminCommand(getKonquest(), getSender(), getArgs()).execute();
@@ -95,6 +74,9 @@ public class AdminCommand extends CommandBase {
 	                case STAT:
 	                    new StatAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 	                    break;
+	                case TOWN:
+		                new TownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
+		                break;
 	                case TRAVEL:
 	                    new TravelAdminCommand(getKonquest(), getSender(), getArgs()).execute();
 	                    break;
@@ -134,56 +116,35 @@ public class AdminCommand extends CommandBase {
 		            case BYPASS:
 		                tabList.addAll(new BypassAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
 		                break;
+		            case CAMP:
+		                tabList.addAll(new CampAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+		                break;
+		            case CAPTURE:
+		                tabList.addAll(new CaptureAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+		                break;
 	            	case CLAIM:
 	            		tabList.addAll(new ClaimAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
 	                    break;
 	            	case FLAG:
 	            		tabList.addAll(new FlagAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
 	                    break;
-	            	case FORCECAPTURE:
-	                	tabList.addAll(new ForceCaptureAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case FORCEEXILE:
-	                	tabList.addAll(new ForceExileAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case FORCEJOIN:
-	                	tabList.addAll(new ForceJoinAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case FORCETOWN:
-	                	tabList.addAll(new ForceTownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case FORCEGUILD:
-	                	tabList.addAll(new ForceGuildAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
 	                case HELP:
 	                	tabList.addAll(new HelpAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
 	                    break;
+	                case KINGDOM:
+		                tabList.addAll(new KingdomAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+		                break;
 	                case LIST:
 	                	tabList.addAll(new ListAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case MAKEKINGDOM:
-	                	tabList.addAll(new MakeKingdomAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case MAKETOWN:
-	                	tabList.addAll(new MakeTownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
 	                    break;
 	                case MONUMENT:
 	                	tabList.addAll(new MonumentAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
 	                    break;
-	                case REMOVEKINGDOM:
-	                	tabList.addAll(new RemoveKingdomAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case REMOVETOWN:
-	                	tabList.addAll(new RemoveTownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case REMOVECAMP:
-	                	tabList.addAll(new RemoveCampAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case RENAME:
-	                	tabList.addAll(new RenameAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
 	                case RUIN:
 	                	tabList.addAll(new RuinAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+	                    break;
+	                case SANCTUARY:
+	                	tabList.addAll(new SanctuaryAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
 	                    break;
 	                case SAVE:
 	                	tabList.addAll(new SaveAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
@@ -194,6 +155,9 @@ public class AdminCommand extends CommandBase {
 	                case STAT:
 	                	tabList.addAll(new StatAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
 	                    break;
+	                case TOWN:
+		                tabList.addAll(new TownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
+		                break;
 	                case TRAVEL:
 	                	tabList.addAll(new TravelAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
 	                    break;

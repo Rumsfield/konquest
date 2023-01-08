@@ -30,13 +30,9 @@ public enum KonquestTerritoryType {
 	 */
 	RUIN		(MessagePath.TERRITORY_RUIN.getMessage()),
 	/**
-	 * Neutral land, not yet implemented
+	 * Sanctuary land
 	 */
-	NEUTRAL		(MessagePath.TERRITORY_NEUTRAL.getMessage()),
-	/**
-	 * Unknown territory
-	 */
-	OTHER		(MessagePath.TERRITORY_OTHER.getMessage());
+	SANCTUARY	(MessagePath.TERRITORY_SANCTUARY.getMessage());
 
 	private String label;
 	

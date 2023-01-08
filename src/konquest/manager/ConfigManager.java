@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import konquest.Konquest;
 import konquest.model.KonConfig;
 import konquest.utility.ChatUtil;
+import konquest.utility.CorePath;
 
 public class ConfigManager{
 	
@@ -33,6 +34,8 @@ public class ConfigManager{
 		updateConfigVersion("core");
 		addConfig("upgrades", new KonConfig("upgrades",false));
 		updateConfigVersion("upgrades");
+		addConfig("properties", new KonConfig("properties",false));
+		updateConfigVersion("properties");
 		addConfig("shields", new KonConfig("shields",false));
 		addConfig("loot", new KonConfig("loot",false));
 		addConfig("prefix", new KonConfig("prefix",false));
@@ -41,11 +44,10 @@ public class ConfigManager{
 		migrateConfigFile("kingdoms.yml","data/kingdoms.yml");
 		migrateConfigFile("camps.yml","data/camps.yml");
 		migrateConfigFile("ruins.yml","data/ruins.yml");
-		migrateConfigFile("guilds.yml","data/guilds.yml");
 		addConfig("kingdoms", new KonConfig("data/kingdoms"));
 		addConfig("camps", new KonConfig("data/camps"));
 		addConfig("ruins", new KonConfig("data/ruins"));
-		addConfig("guilds", new KonConfig("data/guilds"));
+		addConfig("sanctuaries", new KonConfig("data/sanctuaries"));
 
 		// Language files
 		addConfig("lang_english", new KonConfig("lang/english",false));
@@ -68,6 +70,9 @@ public class ConfigManager{
 				ChatUtil.printConsoleError("Failed to load invalid language file "+language+".yml in Konquest/lang folder. Using default lang/english.yml.");
 			}
 		}
+		
+		// Config validation
+		validateCorePaths();
 	}
 	
 	public FileConfiguration getLang() {
@@ -161,6 +166,21 @@ public class ConfigManager{
 			}
 			*/
 		}
+	}
+	
+	private boolean validateCorePaths() {
+		boolean result = true;
+		FileConfiguration coreConfig = getConfig("core");
+		for(CorePath path : CorePath.values()) {
+			if(!coreConfig.contains(path.getPath(),true)) {
+				result = false;
+				ChatUtil.printConsoleError("Core configuration file is missing path: "+path.getPath());
+			}
+		}
+		if(result == false) {
+			ChatUtil.printConsoleError("The Konquest core.yml config file may be corrupted. Try renaming or deleting the file, then restart the server.");
+		}
+		return result;
 	}
 
 }

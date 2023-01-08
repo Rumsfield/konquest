@@ -154,14 +154,6 @@ public interface KonquestPlaceholderManager {
 	public String getCombatTag(Player player);
 	
 	/**
-	 * Gets the name of the player's current guild.
-	 * 
-	 * @param player The player
-	 * @return The guild name, or an empty string when player is invalid
-	 */
-	public String getGuild(Player player);
-	
-	/**
 	 * Gets the relationship type between the two players.
 	 * This is the language file definition of the following types:
 	 * <p>

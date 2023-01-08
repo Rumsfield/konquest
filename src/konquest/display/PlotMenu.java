@@ -15,13 +15,16 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
-import konquest.display.PlayerIcon.PlayerIconAction;
+import konquest.display.icon.InfoIcon;
+import konquest.display.icon.MenuIcon;
+import konquest.display.icon.PlayerIcon;
+import konquest.display.icon.PlayerIcon.PlayerIconAction;
 import konquest.model.KonPlot;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 
-public class PlotMenu implements StateMenu {
+public class PlotMenu implements ViewableMenu {
 
 	enum PlotState {
 		ROOT,

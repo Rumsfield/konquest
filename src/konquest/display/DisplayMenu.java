@@ -8,6 +8,8 @@ import org.bukkit.inventory.Inventory;
 
 import konquest.Konquest;
 //import konquest.utility.ChatUtil;
+import konquest.display.icon.MenuIcon;
+import konquest.display.icon.PlayerIcon;
 
 public class DisplayMenu {
 

@@ -7,10 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import konquest.Konquest;
-import konquest.display.MenuIcon;
-import konquest.display.OptionIcon;
 import konquest.manager.DisplayManager;
-import konquest.display.OptionIcon.optionAction;
+import konquest.display.icon.MenuIcon;
+import konquest.display.icon.OptionIcon;
+import konquest.display.icon.OptionIcon.optionAction;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;
 import konquest.utility.MessagePath;

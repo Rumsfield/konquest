@@ -40,6 +40,10 @@ public class KonMonument implements KonquestMonument {
 	 * 			3 = bedrock placement
 	 */
 	public int initialize(KonMonumentTemplate template, Location centerLoc, int flatness) {
+		if(template == null) {
+			return 1;
+		}
+		
 		// Verify valid template
 		if(!template.isValid()) {
 			ChatUtil.printDebug("Monument init failed: template is not valid");
@@ -122,7 +126,7 @@ public class KonMonument implements KonquestMonument {
 	
 	public boolean updateFromTemplate(KonMonumentTemplate template) {
 		// Verify valid template
-		if(template != null && !template.isValid()) {
+		if(template == null || !template.isValid()) {
 			return false;
 		}
 		// Translate travel point location

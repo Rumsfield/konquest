@@ -1,0 +1,57 @@
+# Default Properties
+# 
+# Kingdoms, Sanctuaries and Towns/Capitals each have unique properties per instance.
+# When players make new ones, these default properties are applied.
+# Admins can change the values of these properties in-game.
+# 
+# Properties for territories
+#	TRAVEL			Allow travel to this territory
+#	PVP				Allow player damage
+#	PVE				Allow entity damage
+#	BUILD			Allow block edits
+#	USE				Allow using blocks
+#	MOBS			Allow mobs to spawn
+#	PORTALS			Allow players to use portals
+#	ENTER			Allow players to enter
+#	EXIT			Allow players to exit
+# 
+# Properties specifically for towns/capitals
+#	CAPTURE			Allow this town to be captured
+#	CLAIM			Allow players to claim land
+#	UNCLAIM			Allow players to unclaim land
+#	UPGRADE			Allow players to upgrade this town
+#	PLOTS			Allow players to set town plots
+# 
+# Properties for kingdoms
+#	NEUTRAL			Make this kingdom only peaceful
+#	GOLEMS			Enable iron golems to attack enemies
+# 
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
+properties:
+  kingdoms:
+    neutral: false
+    golems: true
+  sanctuaries:
+    enter: true
+    exit: true
+    travel: true
+    pvp: false
+    pve: false
+    build: false
+    use: true
+    mobs: false
+    portals: true
+  towns:
+    capture: true
+    claim: true
+    unclaim: true
+    upgrade: true
+    plots: true
+    travel: true
+    pvp: true
+    pve: true
+    build: true
+    use: true
+    mobs: false
+    portals: true

@@ -74,11 +74,15 @@ label:
   officer: "Officer"
   officers: "Officers"
   master: "Master"
+  admin-kingdom: "Admin Kingdom"
+  monument: "Monument"
 placeholder:
   friendly: "Friendly"
   enemy: "Enemy"
   barbarian: "Barbarian"
-  armistice: "Armistice"
+  ally: "Ally"
+  sanctioned: "Sanctioned"
+  peaceful: "Peaceful"
 map:
   barbarian: "Barbarian"
   barbarians: "Barbarians"
@@ -340,6 +344,7 @@ command:
         full: "Successfully reset player %s exile kingdom to Barbarians."
       error:
         fail: "Could not exile player, already barbarian or bad random wild location."
+        master: "Could not exile player, they are a kingdom master. Force transfer master or remove the kingdom first."
     forcejoin:
       notice:
         success: "Successfully set player %s to kingdom %s."
@@ -367,15 +372,16 @@ command:
         create-1: "Now creating new Monument Template, click on the first corner block of the region."
         create-2: "Click on the second corner block of the region, when all particles are green."
         create-3: "Click on the travel point block."
-        success: "Successfully created new Monument Template for Kingdom %s."
-        remove: "Removed Monument Template for Kingdom %s."
-        show: "Showing existing Monument Template for Kingdom %s."
+        success: "Successfully created new Monument Template %s."
+        remove: "Removed Monument Template %s."
+        show: "Showing existing Monument Template %s in Sanctuary %s."
+        sanctuary: "Create Sanctuary territory before creating Monument Templates."
       error:
-        none: "There is no valid Monument Template for Kingdom %s."
+        none: "Monument Template %s is currently not valid."
         fail-base: "Failed to create Monument Template, base must be 16x16 blocks but got %s by %s."
         fail-critical: "Failed to create Monument Template, it must contain at least %s %s blocks."
         fail-travel: "Failed to create Monument Template, travel point must be inside of the region."
-        fail-capital: "Failed to create Monument Template, region must be within %s Capital territory."
+        fail-region: "Failed to create Monument Template, region corners must be within Sanctuary territory."
     rename:
       notice:
         kingdom: "Successfully renamed Kingdom %s to %s."
@@ -384,14 +390,25 @@ command:
       notice:
         create: "Successfully created new Ruin: %s"
         remove: "Successfully removed Ruin: %s"
+        rename: "Successfully changed Ruin name from %s to %s."
         criticals: "Removed all previous critical blocks from %s, click on blocks to add."
         spawns: "Removed all previous spawn blocks from %s, click on blocks to add."
         add: "Block added to Ruin %s."
       error:
         create: "Could not create Ruin %s, bad name or territory overlap."
         remove: "Failed to remove unknown Ruin %s."
+        rename: "Failed to rename Ruin %s to %s."
         match: "Clicked block does not match type: %s"
         invalid: "Could not add this block to a valid Ruin."
+    sanctuary:
+      notice:
+        create: "Successfully created new Sanctuary: %s"
+        remove: "Successfully removed Sanctuary: %s"
+        rename: "Successfully changed Sanctuary name from %s to %s."
+      error:
+        create: "Could not create Sanctuary %s, bad name or territory overlap."
+        remove: "Failed to remove unknown Sanctuary %s."
+        rename: "Failed to rename Sanctuary %s to %s."
     save:
       notice:
         message: "Saved all kingdoms, camps and ruins to files."
@@ -447,6 +464,7 @@ command:
       town: "Banished from %s!"
     error:
       cooldown: "You must wait before becoming a barbarian: %s"
+      master: "You are a kingdom master! Transfer master or disband your kingdom first."
   favor:
     notice:
       message: "You have %s Favor, costs are..."
@@ -816,8 +834,8 @@ description:
   claim: "Claim a chunk of land."
   unclaim: "Unclaim a chunk of land."
   travel: "Teleport to a Town, your Camp or to your Capital."
+  kingdom: "Create or manage kingdoms."
   town: "Manage Towns you belong to."
-  guild: "Manage kingdom guilds."
   quest: "Display your quest log."
   stats: "Display your Accomplishment stats."
   prefix: "Set your prefix title."
@@ -834,7 +852,7 @@ description:
   admin-removekingdom: "Removes a Kingdom and all claimed Capital and Town chunks."
   admin-removetown: "Removes a Town from a Kingdom and all claimed Town chunks."
   admin-removecamp: "Removes a Camp owned by the given Barbarian player."
-  admin-monument: "Creates, removes or shows the Monument Template for a Kingdom."
+  admin-monument: "Creates, removes or shows a Monument Template."
   admin-list: "Display all Kingdoms or Towns of a Kingdom."
   admin-forcecapture: "Forces a town to be captured by the given Kingdom."
   admin-forcejoin: "Forces a player to join a Kingdom and teleports them to the Capital."
@@ -843,6 +861,7 @@ description:
   admin-forceguild: "Forces a Guild to accept the provided management sub-commands."
   admin-rename: "Renames a Kingdom or Town to newName."
   admin-ruin: "Manage a Ruin territory."
+  admin-sanctuary: "Manage a Sanctuary territory."
   admin-save: "Saves Kingdoms and Players data files."
   admin-settravel: "Sets the travel point for the territory you're in."
   admin-travel: "Teleport to the specified kingdom or town."
@@ -855,6 +874,11 @@ territory:
   town: "Town"
   camp: "Camp"
   ruin: "Ruin"
-  neutral: "Neutral"
+  sanctuary: "Sanctuary"
   other: "Other"
+relationship:
+  enemy: "Enemy"
+  sanctioned: "Sanctioned"
+  peace: "Peace"
+  allied: "Allied"
   

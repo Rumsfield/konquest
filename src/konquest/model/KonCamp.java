@@ -32,7 +32,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 	private BossBar campBarAll;
 	
 	public KonCamp(Location loc, OfflinePlayer owner, KonKingdom kingdom, Konquest konquest) {
-		super(loc, MessagePath.LABEL_CAMP.getMessage().trim()+"_"+owner.getName(), kingdom, KonquestTerritoryType.CAMP, konquest);
+		super(loc, MessagePath.LABEL_CAMP.getMessage().trim()+"_"+owner.getName(), kingdom, konquest);
 		
 		this.owner = owner;
 		this.raidAlertTimer = new Timer(this);
@@ -204,6 +204,11 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 			bukkitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*5, 1));
 			//ChatUtil.printDebug("Applied glowing to "+bukkitPlayer.getName()+": "+bukkitPlayer.isGlowing());
 		}
+	}
+	
+	@Override
+	public KonquestTerritoryType getTerritoryType() {
+		return KonquestTerritoryType.CAMP;
 	}
 
 }

@@ -342,6 +342,7 @@ public class ChatUtil {
 	
 	public static void resetTitle(Player player) {
 		player.resetTitle();
+		player.sendTitle("", "", 1, 1, 1);
 	}
 	
 	

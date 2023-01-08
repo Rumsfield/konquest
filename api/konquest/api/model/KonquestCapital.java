@@ -1,7 +1,7 @@
 package konquest.api.model;
 
 /**
- * A capital is a special territory of a kingdom, which contains the monument template structure.
+ * A capital is a special town which is the primary territory of a kingdom.
  * No public API methods exist for now.
  * 
  * @author Rumsfield

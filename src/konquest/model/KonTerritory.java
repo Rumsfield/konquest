@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import konquest.Konquest;
 import konquest.api.model.KonquestTerritoryType;
@@ -21,25 +22,17 @@ public abstract class KonTerritory implements KonquestTerritory {
 	private Location spawnLoc;
 	private KonKingdom kingdom;
 	private String name;
-	private KonquestTerritoryType territoryType;
 	private Konquest konquest;
 	
 	
-	public KonTerritory(Location loc, String name, KonKingdom kingdom, KonquestTerritoryType territoryType, Konquest konquest) {
+	public KonTerritory(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		this.centerLoc = loc;
 		this.spawnLoc = loc;
 		this.name = name;
 		this.kingdom = kingdom;
-		this.territoryType = territoryType;
 		this.konquest = konquest;
 		chunkList = new HashMap<Point,KonTerritory>();
-		//chunkList.put(loc.getChunk(),this);
 	}
-	/*
-	public void addChunk(Chunk chunk) {
-		chunkList.put(konquest.toPoint(chunk),this);
-		ChatUtil.printDebug("Added chunk in territory "+name);
-	}*/
 	
 	public boolean addChunks(ArrayList<Point> points) {
 		boolean pass = true;
@@ -69,11 +62,16 @@ public abstract class KonTerritory implements KonquestTerritory {
 		for(Point point : points) {
 			chunkList.put(point, this);
 		}
-		//ChatUtil.printDebug("Added points in territory "+name);
+	}
+	
+	public void addPoints(Set<Point> points) {
+		for(Point point : points) {
+			chunkList.put(point, this);
+		}
 	}
 	
 	public boolean removeChunk(Location loc) {
-		return chunkList.remove(Konquest.toPoint(loc)) != null;
+		return removeChunk(Konquest.toPoint(loc));
 	}
 	
 	public boolean removeChunk(Point point) {
@@ -131,10 +129,6 @@ public abstract class KonTerritory implements KonquestTerritory {
 		return kingdom;
 	}
 	
-	public KonquestTerritoryType getTerritoryType() {
-		return territoryType;
-	}
-	
 	public HashMap<Point,KonTerritory> getChunkList() {
 		return chunkList;
 	}
@@ -170,11 +164,11 @@ public abstract class KonTerritory implements KonquestTerritory {
 	 */
 	public abstract int initClaim();
 	
-	//public abstract boolean addChunk(Chunk chunk);
-	
 	public abstract boolean addChunk(Point point);
 	
 	// Returns true if the chunk is allowed to be added
 	public abstract boolean testChunk(Point point);
+	
+	public abstract KonquestTerritoryType getTerritoryType();
 	
 }

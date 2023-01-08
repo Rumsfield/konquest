@@ -1,7 +1,7 @@
 name: Konquest
 description: A plugin for land claiming and territory control
 author: Rumsfield
-version: 0.10.3
+version: 0.11.0
 api-version: 1.16
 load: POSTWORLD
 main: konquest.KonquestPlugin
@@ -49,9 +49,6 @@ permissions:
     default: op
     children:
       konquest.command.help: true
-      konquest.command.join: true
-      konquest.command.leave: true
-      konquest.command.exile: true
       konquest.command.info: true
       konquest.command.chat: true
       konquest.command.claim: true
@@ -67,25 +64,12 @@ permissions:
       konquest.command.stats: true
       konquest.command.prefix: true
       konquest.command.town: true
-      konquest.command.guild: true
       konquest.command.fly: true
       konquest.command.border: true
       konquest.command.admin.*: true
 
   konquest.command.help:
     description: Display help in chat
-    default: true
-
-  konquest.command.join:
-    description: Join a kingdom or town
-    default: true
-    
-  konquest.command.leave:
-    description: Leave a town
-    default: true
-
-  konquest.command.exile:
-    description: Exile yourself as a barbarian
     default: true
     
   konquest.command.info:
@@ -101,7 +85,7 @@ permissions:
     default: true
     
   konquest.command.unclaim:
-    description: Unlaim land for a town
+    description: Unclaim land for a town
     default: true
     
   konquest.command.list:
@@ -148,10 +132,6 @@ permissions:
     description: Manage a town
     default: true
 
-  konquest.command.guild:
-    description: Manage a kingdom guild
-    default: true
-
   konquest.command.fly:
     description: Fly in friendly territory
     default: op
@@ -165,27 +145,20 @@ permissions:
     default: op
     children:
       konquest.command.admin.bypass: true
+      konquest.command.admin.camp: true
+      konquest.command.admin.capture: true
       konquest.command.admin.claim: true
       konquest.command.admin.flag: true
-      konquest.command.admin.forcecapture: true
-      konquest.command.admin.forceexile: true
-      konquest.command.admin.forceguild: true
-      konquest.command.admin.forcejoin: true
-      konquest.command.admin.forcetown: true
       konquest.command.admin.help: true
+      konquest.command.admin.kingdom: true
       konquest.command.admin.list: true
-      konquest.command.admin.makekingdom: true
-      konquest.command.admin.maketown: true
       konquest.command.admin.monument: true
       konquest.command.admin.reload: true
-      konquest.command.admin.removecamp: true
-      konquest.command.admin.removekingdom: true
-      konquest.command.admin.removetown: true
-      konquest.command.admin.rename: true
       konquest.command.admin.ruin: true
       konquest.command.admin.save: true
       konquest.command.admin.settravel: true
       konquest.command.admin.stat: true
+      konquest.command.admin.town: true
       konquest.command.admin.travel: true
       konquest.command.admin.unclaim: true
   
@@ -193,6 +166,14 @@ permissions:
     description: Toggle admin bypass mode
     default: op
   
+  konquest.command.admin.camp:
+    description: Manage player Barbarian camps
+    default: op
+    
+  konquest.command.admin.capture:
+    description: Force a town to be captured by another Kingdom
+    default: op
+    
   konquest.command.admin.claim:
     description: Claim land chunks
     default: op
@@ -201,40 +182,16 @@ permissions:
     description: Set kingdom flags
     default: op
   
-  konquest.command.admin.forcecapture:
-    description: Forces a town to be captured by the given Kingdom
-    default: op
-  
-  konquest.command.admin.forceexile:
-    description: Forces a player to become a Barbarian
-    default: op
-  
-  konquest.command.admin.forceguild:
-    description: Forces a Guild to accept the provided management sub-commands
-    default: op
-    
-  konquest.command.admin.forcejoin:
-    description: Forces a player to join a Kingdom
-    default: op
-  
-  konquest.command.admin.forcetown:
-    description: Forces a Town to accept the provided management sub-commands
-    default: op
-  
   konquest.command.admin.help:
     description: Display the admin help message
     default: op
   
+  konquest.command.admin.kingdom:
+    description: Manage player and server Kingdoms
+    default: op
+    
   konquest.command.admin.list:
     description: Display all Kingdoms or Towns of a Kingdom
-    default: op
-  
-  konquest.command.admin.makekingdom:
-    description: Create a new Kingdom
-    default: op
-  
-  konquest.command.admin.maketown:
-    description: Create a new Town for a Kingdom
     default: op
   
   konquest.command.admin.monument:
@@ -243,22 +200,6 @@ permissions:
   
   konquest.command.admin.reload:
     description: Reloads configuration files
-    default: op
-  
-  konquest.command.admin.removecamp:
-    description: Removes a Camp owned by the given Barbarian player
-    default: op
-  
-  konquest.command.admin.removekingdom:
-    description: Removes a Kingdom and all claimed Capital and Town chunks
-    default: op
-  
-  konquest.command.admin.removetown:
-    description: Removes a Town from a Kingdom and all claimed Town chunks
-    default: op
-  
-  konquest.command.admin.rename:
-    description: Renames a Kingdom or Town to newName
     default: op
   
   konquest.command.admin.ruin:
@@ -277,6 +218,10 @@ permissions:
     description: Manage player stats
     default: op
   
+  konquest.command.admin.town:
+    description: Manage Towns
+    default: op
+    
   konquest.command.admin.travel:
     description: Teleport to the specified kingdom or town
     default: op

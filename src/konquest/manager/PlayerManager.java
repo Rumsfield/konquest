@@ -208,7 +208,10 @@ public class PlayerManager implements KonquestPlayerManager {
 		}
 		// Put online player into cache
 		if(bukkitOfflinePlayer.getName() != null) {
-			allPlayers.put(bukkitOfflinePlayer, (KonOfflinePlayer)player);
+			// Removing the cast to KonOfflinePlayer should preserve the same object in both allPlayers and onlinePlayers maps.
+			// When a KonPlayer is modified from onlinePlayers, it should also reflect in allPlayers, and vice-versa.
+			allPlayers.put(bukkitOfflinePlayer, player);
+			//allPlayers.put(bukkitOfflinePlayer, (KonOfflinePlayer)player);
 		}
 	}
 
@@ -297,6 +300,22 @@ public class PlayerManager implements KonquestPlayerManager {
     		if(player.getKingdom().getName().equalsIgnoreCase(kingdomName)) {
     			playerNameList.add(player.getBukkitPlayer().getName());
     		}
+    	}
+    	return playerNameList;
+    }
+    
+    public ArrayList<String> getPlayerNames() {
+    	ArrayList<String> playerNameList = new ArrayList<String>();
+    	for(KonPlayer player : onlinePlayers.values()) {
+    		playerNameList.add(player.getBukkitPlayer().getName());
+    	}
+    	return playerNameList;
+    }
+    
+    public ArrayList<String> getAllPlayerNames() {
+    	ArrayList<String> playerNameList = new ArrayList<String>();
+    	for(KonOfflinePlayer player : allPlayers.values()) {
+    		playerNameList.add(player.getOfflineBukkitPlayer().getName());
     	}
     	return playerNameList;
     }

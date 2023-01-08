@@ -12,12 +12,11 @@ import org.bukkit.inventory.Inventory;
 
 import konquest.Konquest;
 import konquest.display.DisplayMenu;
-import konquest.display.GuildMenu;
-import konquest.display.MenuIcon;
+import konquest.display.KingdomMenu;
 import konquest.display.PagedMenu;
 import konquest.display.PlotMenu;
-import konquest.display.StateMenu;
-import konquest.display.wrapper.GuildInfoMenuWrapper;
+import konquest.display.ViewableMenu;
+import konquest.display.icon.MenuIcon;
 import konquest.display.wrapper.HelpMenuWrapper;
 import konquest.display.wrapper.KingdomInfoMenuWrapper;
 import konquest.display.wrapper.MenuWrapper;
@@ -25,10 +24,10 @@ import konquest.display.wrapper.PlayerInfoMenuWrapper;
 import konquest.display.wrapper.PrefixMenuWrapper;
 import konquest.display.wrapper.ScoreMenuWrapper;
 import konquest.display.wrapper.TownInfoMenuWrapper;
+import konquest.display.wrapper.TownManagementMenuWrapper;
 import konquest.display.wrapper.TownOptionsMenuWrapper;
 import konquest.display.wrapper.TownShieldMenuWrapper;
 import konquest.display.wrapper.TownUpgradeMenuWrapper;
-import konquest.model.KonGuild;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
@@ -40,7 +39,7 @@ public class DisplayManager {
 
 	private Konquest konquest;
 	private HashMap<Inventory, MenuWrapper> pagedMenus;
-	private HashMap<Inventory, StateMenu> stateMenus;
+	private HashMap<Inventory, ViewableMenu> stateMenus;
 	private HashSet<Player> playerViewerCache;
 	
 	public static ChatColor titleColor = ChatColor.BLACK;
@@ -51,7 +50,7 @@ public class DisplayManager {
 	public DisplayManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.pagedMenus = new HashMap<Inventory, MenuWrapper>();
-		this.stateMenus = new HashMap<Inventory, StateMenu>();
+		this.stateMenus = new HashMap<Inventory, ViewableMenu>();
 		this.playerViewerCache = new HashSet<Player>();
 	}
 	
@@ -140,7 +139,7 @@ public class DisplayManager {
 			} else if(stateMenus.containsKey(inv)) {
 				// Handle menu navigation and states
 				// Every clickable icon in a menu view will update the state and refresh the open inventory
-				StateMenu clickMenu = stateMenus.get(inv);
+				ViewableMenu clickMenu = stateMenus.get(inv);
 				DisplayMenu currentView = clickMenu.getCurrentView();
 				if(currentView == null || !currentView.getInventory().equals(inv)) {
 					ChatUtil.printDebug("State menu view is not current!");
@@ -188,17 +187,6 @@ public class DisplayManager {
 		}
 	}
 	
-	/*
-	private void showDisplayMenu(Player bukkitPlayer, Inventory inv) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	bukkitPlayer.openInventory(inv);
-            }
-        });
-	}
-	*/
-	
 	private void showMenuWrapper(Player bukkitPlayer, MenuWrapper wrapper) {
 		//ChatUtil.printDebug("Put and opened menu wrapper, size: "+pagedMenus.size());
 		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
@@ -228,9 +216,18 @@ public class DisplayManager {
 	
 	/*
 	 * ===============================================
-	 * Town Menus
+	 * Town Management Menus
 	 * ===============================================
 	 */
+	public void displayTownManagementMenu(KonPlayer displayPlayer, KonTown town, boolean isAdmin) {
+   		playMenuOpenSound(displayPlayer.getBukkitPlayer());
+ 		// Create menu
+   		TownManagementMenuWrapper wrapper = new TownManagementMenuWrapper(konquest, town, displayPlayer, isAdmin);
+		wrapper.constructMenu();
+		// Display menu
+		showMenuWrapper(displayPlayer.getBukkitPlayer(),wrapper);
+   	}
+	
 	public void displayTownUpgradeMenu(Player bukkitPlayer, KonTown town) {
 		playMenuOpenSound(bukkitPlayer);
 		// Create menu
@@ -241,12 +238,21 @@ public class DisplayManager {
 	}
 	
 	public void displayTownShieldMenu(Player bukkitPlayer, KonTown town) {
-		playMenuOpenSound(bukkitPlayer);
-		// Create menu
-		TownShieldMenuWrapper wrapper = new TownShieldMenuWrapper(konquest, town);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
+		// Verify either shields or armors are enabled
+    	boolean isShieldsEnabled = konquest.getShieldManager().isShieldsEnabled();
+    	boolean isArmorsEnabled = konquest.getShieldManager().isArmorsEnabled();
+    	if(!isShieldsEnabled && !isArmorsEnabled) {
+    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+    		return;
+    	} else {
+    		// Open the menu
+    		playMenuOpenSound(bukkitPlayer);
+    		// Create menu
+    		TownShieldMenuWrapper wrapper = new TownShieldMenuWrapper(konquest, town);
+    		wrapper.constructMenu();
+    		// Display menu
+    		showMenuWrapper(bukkitPlayer,wrapper);
+    	}
 	}
 
 	public void displayTownOptionsMenu(Player bukkitPlayer, KonTown town) {
@@ -256,6 +262,28 @@ public class DisplayManager {
 		wrapper.constructMenu();
 		// Display menu
 		showMenuWrapper(bukkitPlayer,wrapper);
+	}
+	
+	public void displayPlotMenu(Player bukkitPlayer, KonTown town) {
+		// Verify plots are enabled
+    	boolean isPlotsEnabled = konquest.getPlotManager().isEnabled();
+    	if(!isPlotsEnabled) {
+    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+    		return;
+    	} else {
+    		// Open the menu
+    		playMenuOpenSound(bukkitPlayer);
+    		int maxSize = konquest.getPlotManager().getMaxSize();
+    		PlotMenu newMenu = new PlotMenu(town, bukkitPlayer, maxSize);
+    		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
+    		// Schedule delayed task to display inventory to player
+    		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
+                @Override
+                public void run() {
+                	bukkitPlayer.openInventory(newMenu.getCurrentView().getInventory());
+                }
+            },1);
+    	}
 	}
 	
 	/*
@@ -311,17 +339,6 @@ public class DisplayManager {
 		showMenuWrapper(bukkitPlayer,wrapper);
    	}
    	
-   	// Guild Info
-   	public void displayGuildInfoMenu(KonPlayer displayPlayer, KonGuild infoGuild) {
-   		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
-   		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-   		// Create menu
-		GuildInfoMenuWrapper wrapper = new GuildInfoMenuWrapper(konquest, infoGuild, displayPlayer);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
-   	}
-   	
    	/*
 	 * ===============================================
 	 * Prefix Menu
@@ -339,33 +356,13 @@ public class DisplayManager {
    	
    	/*
 	 * ===============================================
-	 * Plot Menu
+	 * Kingdom Menu
 	 * ===============================================
 	 */
-   	public void displayPlotMenu(Player bukkitPlayer, KonTown town) {
-   		//ChatUtil.printDebug("Displaying new plots menu to "+bukkitPlayer.getName()+", current menu size is "+plotMenus.size());
-		playMenuOpenSound(bukkitPlayer);
-		int maxSize = konquest.getPlotManager().getMaxSize();
-		PlotMenu newMenu = new PlotMenu(town, bukkitPlayer, maxSize);
-		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
-		// Schedule delayed task to display inventory to player
-		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	bukkitPlayer.openInventory(newMenu.getCurrentView().getInventory());
-            }
-        },1);
-	}
-   	
-   	/*
-	 * ===============================================
-	 * Guild Menu
-	 * ===============================================
-	 */
-   	public void displayGuildMenu(KonPlayer displayPlayer, KonGuild guild, boolean isAdmin) {
+   	public void displayKingdomMenu(KonPlayer displayPlayer, KonKingdom kingdom, boolean isAdmin) {
    		//ChatUtil.printDebug("Displaying new guild menu to "+bukkitPlayer.getName()+", current menu size is "+plotMenus.size());
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		GuildMenu newMenu = new GuildMenu(konquest.getGuildManager(), displayPlayer, guild, isAdmin);
+		KingdomMenu newMenu = new KingdomMenu(konquest, displayPlayer, kingdom, isAdmin);
 		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {

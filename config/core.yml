@@ -89,13 +89,25 @@ core:
     enemy_secondary: DARK_RED
     
     # (*) The primary color that players see for enemy players/towns with an armistice.
-    armistice_primary: LIGHT_PURPLE
+    #armistice_primary: LIGHT_PURPLE
     
     # (*) The secondary color that players see for enemy players/towns with an armistice.
-    armistice_secondary: DARK_PURPLE
+    #armistice_secondary: DARK_PURPLE
+    
+# NEW (*) The color that players see for sanctioned kingdoms.
+    sanctioned: LIGHT_PURPLE
+    
+# NEW (*) The color that players see for peaceful kingdoms.
+    peaceful: WHITE
+    
+# NEW (*) The color that players see for allied kingdoms.
+    allied: BLUE
     
     # (*) The color that all players see for barbarians.
     barbarian: YELLOW
+    
+# NEW (*) The color that players see for neutral territory, like ruins and sanctuaries.
+    neutral: GRAY
     
   # //// CORE.DATABASE \\\\
   database:
@@ -154,6 +166,9 @@ core:
     # //// CORE.TRAVEL.ENABLE \\\\
     enable:
     
+# NEW Allow players to travel to sanctuaries with the travel command (true/false)
+      sanctuary: true
+      
       # Allow players to travel to towns with the travel command (true/false)
       towns: true
       
@@ -190,20 +205,35 @@ core:
     # (*) Suffix to be appended to Kingdom names which will be the name of the Capital city (string)
     capital_suffix: Capital
     
+# NEW Capitals will be immune from capture while there are this many other towns in the kingdom (0 to disable, integer >= 0)
+    capital_immunity_towns: 3
+    
+# NEW Any kingdom can start a war with another (true), else both kingdoms must agree to war (false) (true/false)
+    instant_war: true
+    
+# NEW Either kingdom can end a war with the enemy kingdom (true), else both kingdoms must agree to peace (false) (true/false)
+    instant_peace: false
+    
+# NEW Allow players to pvp with other kingdoms that are sanctioned (true/false)
+    allow_sanctioned_pvp: true
+    
+# NEW Allow players to pvp with other kingdoms that are peaceful (true/false)
+    allow_peaceful_pvp: false
+    
     # Allow player damage in capitals (true/false)
-    capital_pvp: false
+    #capital_pvp: false
     
     # Allow players to interact with blocks and containers in capitals (true/false)
-    capital_use: false
+    #capital_use: false
     
     # Allow players to build inside of capitals (true/false)
-    capital_build: false
+    #capital_build: false
     
     # Allow Nether portals within kingdom capital land (true/false)
-    capital_portal: false
+    #capital_portal: false
     
     # Allow all mob types to spawn within kingdom capital land (true/false)
-    capital_mobs: false
+    #capital_mobs: false
     
     # Prevent players in other kingdoms using containers in claimed land (true/false)
     protect_containers_use: true
@@ -211,11 +241,14 @@ core:
     # Prevent players in other kingdoms breaking containers in claimed land (true/false)
     protect_containers_break: true
     
+# NEW Prevent containers from exploding in claimed land (true/false)
+    protect_containers_explode: true
+    
     # Prevent enemy players from entering Kingdom Capitals (true/false)
-    no_enemy_enter: true
+    #no_enemy_enter: true
     
     # Prevent enemy players from traveling within Kingdom territory (true/false)
-    no_enemy_travel: true
+    #no_enemy_travel: true
     
     # Prevent enemy players from breaking any blocks in a Kingdom with no players online (true/false)
     no_enemy_edit_offline: true
@@ -284,8 +317,11 @@ core:
     # Minimum distance in chunks between Towns and other Towns (0 to disable, integer >= 0)
     min_distance_town: 16
     
+# NEW Minimum distance in chunks between Towns and Sanctuaries (0 to disable, integer >= 0)
+    min_distance_sanctuary: 16
+    
     # Minimum distance in chunks between Towns and Capitals (0 to disable, integer >= 0)
-    min_distance_capital: 16
+    #min_distance_capital: 16
     
     # Maximum distance in chunks between Towns and all other territory (0 to disable, integer >= 0)
     max_distance_all: 99
@@ -378,6 +414,15 @@ core:
     - GRAVEL
     - SNOW
     
+# NEW    # Enable villager trade discounts based on town specialization professions (true/false)
+    discount_enable: true
+    
+# NEW    # Percentage between 0 and 100 of item amount to discount from villager trades (0 to disable, 0 <= integer <= 100)
+    discount_percent: 50
+    
+# NEW    # Allow normal per-player villager discounts to add to town specialization discounts (true/false)
+    discount_stack: true
+    
   # //// CORE.PLOTS \\\\
   plots:
   
@@ -397,37 +442,37 @@ core:
     ignore_knights: true
     
   # //// CORE.GUILDS \\\\
-  guilds:
+  #guilds:
   
     # Enable the guilds feature (true/false)
-    enable: true
+    #enable: true
     
     # Time in seconds between guild payments (0 to disable, integer >= 0)
-    pay_interval_seconds: 900
+    #pay_interval_seconds: 900
     
     # Amount of Favor per land chunk of towns belonging to guild members, to include in guild payments (decimal number >= 0)
-    pay_per_chunk: 0.25
+    #pay_per_chunk: 0.25
     
     # Amount of Favor per population of towns belonging to guild members, to include in guild payments (decimal number >= 0)
-    pay_per_resident: 0.10
+    #pay_per_resident: 0.10
     
     # The maximum amount of Favor a player can receive from a guild payment (0 to disable, integer >= 0)
-    pay_limit: 100
+    #pay_limit: 100
     
     # Percentage between 0 and 100 of normal guild payment to pay guild officers as a bonus (0 to disable, 0 <= integer <= 100)
-    bonus_officer_percent: 20
+    #bonus_officer_percent: 20
     
     # Percentage between 0 and 100 of normal guild payment to pay the guild master as a bonus (0 to disable, 0 <= integer <= 100)
-    bonus_master_percent: 50
+    #bonus_master_percent: 50
     
     # Enable villager trade discounts based on guild specialization professions (true/false)
-    discount_enable: true
+    #discount_enable: true
     
     # Percentage between 0 and 100 of item amount to discount from villager trades (0 to disable, 0 <= integer <= 100)
-    discount_percent: 50
+    #discount_percent: 50
     
     # Allow normal per-player villager discounts to add to guild specialization discounts (true/false)
-    discount_stack: true
+    #discount_stack: true
     
   # //// CORE.EXILE \\\\
   exile:
@@ -520,13 +565,13 @@ core:
     cost_spy: 200
     
     # Cost to settle a new Town (decimal >= 0)
-    cost_settle: 100
+    #cost_settle: 100
     
     # Additional cost for each town settled (decimal >= 0)
-    cost_settle_increment: 50
+    #cost_settle_increment: 50
     
     # Cost to rename a Town (decimal >= 0)
-    cost_rename: 50
+    #cost_rename: 50
     
     # Cost to claim land (decimal >= 0)
     cost_claim: 10
@@ -546,6 +591,54 @@ core:
     # Allow players to travel even when they can't pay the cost (true/false)
     allow_travel_always: true
     
+# NEW    # //// CORE.FAVOR.TOWNS \\\\
+    towns:
+    
+# NEW      # Cost to settle a new town (decimal >= 0)
+      cost_settle: 100
+      
+# NEW      # Additional cost for each town settled (decimal >= 0)
+      cost_settle_increment: 50
+      
+# NEW      # Cost to rename a town (decimal >= 0)
+      cost_rename: 50
+      
+# NEW      # Cost to change the specialization profession of a town (decimal >= 0)
+      cost_specialize: 200
+    
+# NEW # //// CORE.FAVOR.KINGDOMS \\\\
+    kingdoms:
+      
+# NEW      # Cost to create a new kingdom (decimal >= 0)
+      cost_create: 100
+      
+# NEW      # Cost to rename a kingdom (decimal >= 0)
+      cost_rename: 50
+      
+# NEW      # Cost to change the monument template of a kingdom (decimal >= 0)
+      cost_template: 200
+      
+# NEW      # Cost to change relationship status with other kingdoms (decimal >= 0)
+      cost_relationship: 50
+      
+# NEW        # Time in seconds between payments (0 to disable, integer >= 0)
+      pay_interval_seconds: 900
+       
+# NEW        # Amount of Favor per land chunk of towns in a kingdom, to include in payments (decimal number >= 0)
+      pay_per_chunk: 0.25
+       
+# NEW        # Amount of Favor per population of towns in a kingdom, to include in payments (decimal number >= 0)
+      pay_per_resident: 0.10
+       
+# NEW        # The maximum amount of Favor a player can receive from a payment (0 to disable, integer >= 0)
+      pay_limit: 100
+       
+# NEW        # Percentage between 0 and 100 of normal payment to pay kingdom officers as a bonus (0 to disable, 0 <= integer <= 100)
+      bonus_officer_percent: 20
+       
+# NEW        # Percentage between 0 and 100 of normal payment to pay the kingdom master as a bonus (0 to disable, 0 <= integer <= 100)
+      bonus_master_percent: 50
+      
     # //// CORE.FAVOR.REWARDS \\\\
     rewards:
     
@@ -580,19 +673,19 @@ core:
       defend_raid: 50
       
     # //// CORE.FAVOR.GUILDS \\\\
-    guilds:
+    #guilds:
     
       # Cost to create a new guild (decimal >= 0)
-      cost_create: 100
+      #cost_create: 100
       
       # Cost to rename a guild (decimal >= 0)
-      cost_rename: 50
+      #cost_rename: 50
       
       # Cost to change the specialization profession of a guild (decimal >= 0)
-      cost_specialize: 200
+      #cost_specialize: 200
       
       # Cost to change relationship status with other guilds (decimal >= 0)
-      cost_relationship: 50
+      #cost_relationship: 50 
       
   # //// CORE.COMBAT \\\\
   combat:

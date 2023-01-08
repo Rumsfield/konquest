@@ -4,8 +4,8 @@ import org.bukkit.inventory.Inventory;
 
 import konquest.Konquest;
 import konquest.display.DisplayMenu;
-import konquest.display.MenuIcon;
 import konquest.display.PagedMenu;
+import konquest.display.icon.MenuIcon;
 import konquest.model.KonPlayer;
 
 public abstract class MenuWrapper {

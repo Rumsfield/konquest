@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
+import konquest.display.icon.InfoIcon;
 import konquest.utility.ChatUtil;
 import konquest.utility.MessagePath;
 

@@ -52,8 +52,8 @@ public class TravelCommand extends CommandBase {
 			boolean blockEnemyTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_travel");
 			if (blockEnemyTravel) {
 				Location playerLoc = bukkitPlayer.getLocation();
-				if(getKonquest().getKingdomManager().isChunkClaimed(playerLoc)) {
-					if(!getKonquest().getKingdomManager().getChunkTerritory(playerLoc).getKingdom().equals(player.getKingdom())) {
+				if(getKonquest().getTerritoryManager().isChunkClaimed(playerLoc)) {
+					if(!getKonquest().getTerritoryManager().getChunkTerritory(playerLoc).getKingdom().equals(player.getKingdom())) {
 						//ChatUtil.sendError((Player) getSender(), "Cannot travel within enemy territory!");
 						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_ENEMY_TERRITORY.getMessage());
 	                    return;

@@ -173,10 +173,6 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
 	        case "combat_tag":
 	        	result = placeholderManager.getCombatTag(player);
 	        	break;
-	        /* %konquest_guild% - player's guild name */
-	        case "guild":
-	        	result = placeholderManager.getGuild(player);
-	        	break;
 	        /* %konquest_top_score_1% - kingdom name and score in rank 1 */
 	        case "top_score_1":
 	        	result = placeholderManager.getTopScore(1);

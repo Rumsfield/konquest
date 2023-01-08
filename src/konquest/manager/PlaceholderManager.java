@@ -13,7 +13,7 @@ import konquest.Konquest;
 import konquest.KonquestPlugin;
 import konquest.api.manager.KonquestPlaceholderManager;
 import konquest.api.model.KonquestTerritoryType;
-import konquest.model.KonGuild;
+import konquest.manager.KingdomManager.RelationRole;
 import konquest.model.KonKingdom;
 import konquest.model.KonOfflinePlayer;
 import konquest.model.KonPlayer;
@@ -49,6 +49,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 	private Konquest konquest;
 	private PlayerManager playerManager;
 	private KingdomManager kingdomManager;
+	private TerritoryManager territoryManager;
 	private int cooldownSeconds;
 	private Comparator<Ranked> rankedComparator;
 	private long topScoreCooldownTime;
@@ -64,6 +65,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		this.konquest = konquest;
 		this.playerManager = konquest.getPlayerManager();
 		this.kingdomManager = konquest.getKingdomManager();
+		this.territoryManager = konquest.getTerritoryManager();
 		this.cooldownSeconds = 0;
 		this.topScoreCooldownTime = 0L;
 		this.topTownCooldownTime = 0L;
@@ -208,8 +210,8 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		String result = "";
     	KonPlayer onlinePlayer = playerManager.getPlayer(player);
     	if(onlinePlayer != null && player.isOnline()) {
-        	if(kingdomManager.isChunkClaimed(player.getLocation())) {
-        		result = kingdomManager.getChunkTerritory(player.getLocation()).getTerritoryType().getLabel();
+        	if(territoryManager.isChunkClaimed(player.getLocation())) {
+        		result = territoryManager.getChunkTerritory(player.getLocation()).getTerritoryType().getLabel();
         	} else {
         		result = KonquestTerritoryType.WILD.getLabel();
         	}
@@ -221,8 +223,8 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		String result = "";
     	KonPlayer onlinePlayer = playerManager.getPlayer(player);
     	if(onlinePlayer != null && player.isOnline()) {
-        	if(kingdomManager.isChunkClaimed(player.getLocation())) {
-        		result = kingdomManager.getChunkTerritory(player.getLocation()).getName();
+        	if(territoryManager.isChunkClaimed(player.getLocation())) {
+        		result = territoryManager.getChunkTerritory(player.getLocation()).getName();
         	} else {
         		result = KonquestTerritoryType.WILD.getLabel();
         	}
@@ -234,7 +236,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		String result = "";
     	KonPlayer onlinePlayer = playerManager.getPlayer(player);
     	if(onlinePlayer != null && player.isOnline()) {
-    		result = boolean2Lang(kingdomManager.isChunkClaimed(player.getLocation()));
+    		result = boolean2Lang(territoryManager.isChunkClaimed(player.getLocation()));
     	}
     	return result;
 	}
@@ -311,12 +313,14 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
     	return result;
 	}
 	
+	/*
 	public String getGuild(Player player) {
 		String result = "";
 		KonGuild guild = konquest.getGuildManager().getPlayerGuild(player);
     	result = guild == null ? "" : guild.getName();
     	return result;
 	}
+	*/
 	
 	/*
 	 * Placeholder Relational Requesters
@@ -327,20 +331,31 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		KonPlayer onlinePlayerOne = playerManager.getPlayer(playerOne);
 		KonPlayer onlinePlayerTwo = playerManager.getPlayer(playerTwo);
 		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
-			boolean isArmistice = konquest.getGuildManager().isArmistice(onlinePlayerOne, onlinePlayerTwo);
-	    	if(onlinePlayerTwo.isBarbarian()) {
-	    		result = MessagePath.PLACEHOLDER_BARBARIAN.getMessage();
-			} else {
-				if(onlinePlayerOne.getKingdom().equals(onlinePlayerTwo.getKingdom())) {
-					result = MessagePath.PLACEHOLDER_FRIENDLY.getMessage();
-	    		} else {
-	    			if(isArmistice) {
-	    				result = MessagePath.PLACEHOLDER_ARMISTICE.getMessage();
-	    			} else {
-	    				result = MessagePath.PLACEHOLDER_ENEMY.getMessage();
-	    			}
-	    		}
-			}
+			KonKingdom kingdomOne = onlinePlayerOne.getKingdom();
+			KonKingdom kingdomTwo = onlinePlayerTwo.getKingdom();
+			RelationRole role = kingdomManager.getRelationRole(kingdomOne, kingdomTwo);
+			switch(role) {
+		    	case BARBARIAN:
+		    		result = MessagePath.PLACEHOLDER_BARBARIAN.getMessage();;
+		    		break;
+		    	case ENEMY:
+		    		result = MessagePath.PLACEHOLDER_ENEMY.getMessage();
+		    		break;
+		    	case FRIENDLY:
+		    		result = MessagePath.PLACEHOLDER_FRIENDLY.getMessage();
+		    		break;
+		    	case ALLIED:
+		    		result = MessagePath.PLACEHOLDER_ALLY.getMessage();
+		    		break;
+		    	case SANCTIONED:
+		    		result = MessagePath.PLACEHOLDER_SANCTIONED.getMessage();
+		    		break;
+		    	case PEACEFUL:
+		    		result = MessagePath.PLACEHOLDER_PEACEFUL.getMessage();
+		    		break;
+	    		default:
+	    			break;
+	    	}
 		}
 		return result;
 	}

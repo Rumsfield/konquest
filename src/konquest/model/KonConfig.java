@@ -31,14 +31,14 @@ public class KonConfig {
 		this.name = name;
 		this.fileName = name+".yml";
 		this.doSave = true;
-		plugin = Konquest.getInstance().getPlugin();
+		this.plugin = Konquest.getInstance().getPlugin();
 	}
 	
 	public KonConfig(String name, boolean doSave) {
 		this.name = name;
 		this.fileName = name+".yml";
 		this.doSave = doSave;
-		plugin = Konquest.getInstance().getPlugin();
+		this.plugin = Konquest.getInstance().getPlugin();
 	}
 	
 	// returns false if the configuration could not be loaded from a default resource or file
@@ -48,7 +48,8 @@ public class KonConfig {
 		config = new YamlConfiguration();
 		if (file != null) {
 			try {
-				config.load(file);
+				//config.load(file);
+				config = YamlConfiguration.loadConfiguration(file);
 			} catch (Exception e) {
 				e.printStackTrace();
 				ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check bad file for syntax errors.");
@@ -80,6 +81,7 @@ public class KonConfig {
 					}
 				}
 			}
+			config.options().parseComments(true);
 		} catch (IOException exception) {
 			exception.printStackTrace();
 			result = false;
@@ -114,6 +116,7 @@ public class KonConfig {
 	    if (!file.exists()) {
 	    	try {
 	    		plugin.saveResource(fileName, false);
+	    		ChatUtil.printConsoleAlert("Saved default resource "+fileName);
 	    	} catch(IllegalArgumentException e) {
 	    		result = false;
 	    		ChatUtil.printConsoleError("Unknown resource "+fileName+", check spelling.");

@@ -7,8 +7,8 @@ import org.bukkit.entity.Player;
 
 import konquest.Konquest;
 import konquest.api.model.KonquestUpgrade;
-import konquest.display.MenuIcon;
-import konquest.display.UpgradeIcon;
+import konquest.display.icon.MenuIcon;
+import konquest.display.icon.UpgradeIcon;
 import konquest.manager.DisplayManager;
 import konquest.model.KonPlayer;
 import konquest.model.KonTown;

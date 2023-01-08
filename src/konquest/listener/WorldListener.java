@@ -2,26 +2,20 @@ package konquest.listener;
 
 import konquest.Konquest;
 import konquest.KonquestPlugin;
-import konquest.model.KonCapital;
-//import konquest.model.KonMapRenderer;
+import konquest.model.KonPropertyFlag;
+import konquest.model.KonPropertyFlagHolder;
+import konquest.model.KonSanctuary;
 import konquest.model.KonTerritory;
 import konquest.model.KonTown;
 import konquest.utility.ChatUtil;
 
 import org.bukkit.Location;
-//import org.bukkit.Bukkit;
-//import org.bukkit.Chunk;
-//import org.bukkit.Location;
-//import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
-//import org.bukkit.event.server.MapInitializeEvent;
 import org.bukkit.event.world.PortalCreateEvent;
-//import org.bukkit.map.MapRenderer;
-//import org.bukkit.map.MapView;
 import org.bukkit.event.world.StructureGrowEvent;
 
 public class WorldListener  implements Listener {
@@ -42,25 +36,24 @@ public class WorldListener  implements Listener {
 			// Check every block associated with the portal
 			for(BlockState current_blockState : event.getBlocks()) {
 				// Prevent portals from being created inside of Capitals and Monuments in the primary world
-				if(konquest.getKingdomManager().isChunkClaimed(current_blockState.getLocation())) {
-					KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(current_blockState.getLocation());
-					
-					if(territory instanceof KonCapital) {
-						boolean isPortalAllowed = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.capital_portal",false);
-						if(!isPortalAllowed) {
-							ChatUtil.printDebug("EVENT: Portal creation stopped inside of capital "+territory.getName());
-							event.setCancelled(true);
-							return;
+				if(konquest.getTerritoryManager().isChunkClaimed(current_blockState.getLocation())) {
+					KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(current_blockState.getLocation());
+					// Property Flag Holders
+					if(territory instanceof KonPropertyFlagHolder) {
+						KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+						if(flagHolder.hasPropertyValue(KonPropertyFlag.PORTALS)) {
+							if(!flagHolder.getPropertyValue(KonPropertyFlag.PORTALS)) {
+								ChatUtil.printDebug("EVENT: Portal creation stopped inside of "+territory.getName());
+								event.setCancelled(true);
+								return;
+							}
 						}
 					}
-					
-					if(territory instanceof KonTown) {
-						KonTown town = (KonTown) territory;
-						if(town.isLocInsideCenterChunk(current_blockState.getLocation())) {
-							ChatUtil.printDebug("EVENT: Portal creation stopped inside of town monument "+territory.getName());
-							event.setCancelled(true);
-							return;
-						}
+					// Check for portal inside monument/template
+					if(isLocInsideMonument(current_blockState.getLocation())) {
+						ChatUtil.printDebug("EVENT: Portal creation stopped inside of monument "+territory.getName());
+						event.setCancelled(true);
+						return;
 					}
 				}
 			}
@@ -69,14 +62,14 @@ public class WorldListener  implements Listener {
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onChunkLoad(ChunkLoadEvent event) {
-		if(konquest.getKingdomManager().isChunkClaimed(Konquest.toPoint(event.getChunk()), event.getWorld())) {
-			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(Konquest.toPoint(event.getChunk()), event.getWorld());
+		if(konquest.getTerritoryManager().isChunkClaimed(Konquest.toPoint(event.getChunk()), event.getWorld())) {
+			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(Konquest.toPoint(event.getChunk()), event.getWorld());
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
 				if(town.isChunkCenter(event.getChunk())) {
 					ChatUtil.printDebug("EVENT: Loaded monument chunk of town "+town.getName());
-					if(town.getKingdom().isMonumentBlanking()) {
-						ChatUtil.printDebug("Could not paste monument in town "+town.getName()+" while monument template is blanked");
+					if(!town.getKingdom().isMonumentTemplateValid()) {
+						ChatUtil.printDebug("Could not paste monument in town "+town.getName()+" while monument template is invalid");
 					} else if(town.isAttacked()) {
 						ChatUtil.printDebug("Could not paste monument in town "+town.getName()+" while under attack");
 					} else {
@@ -107,10 +100,16 @@ public class WorldListener  implements Listener {
 		}
 	}
 	
+	/*
+	 * Check if the given block is inside any town/capital monument or monument template
+	 */
 	private boolean isLocInsideMonument(Location loc) {
 		boolean result = false;
-		if(konquest.getKingdomManager().isChunkClaimed(loc)) {
-			KonTerritory territory = konquest.getKingdomManager().getChunkTerritory(loc);
+		if(konquest.getTerritoryManager().isChunkClaimed(loc)) {
+			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(loc);
+			if(territory instanceof KonSanctuary && ((KonSanctuary) territory).isLocInsideTemplate(loc)) {
+				result = true;
+			}
 			if(territory instanceof KonTown && ((KonTown) territory).isLocInsideMonumentProtectionArea(loc)) {
 				result = true;
 			}

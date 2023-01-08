@@ -1,0 +1,588 @@
+package konquest.command.admin;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import konquest.Konquest;
+import konquest.api.model.KonquestUpgrade;
+import konquest.command.CommandBase;
+import konquest.model.KonOfflinePlayer;
+import konquest.model.KonTown;
+import konquest.utility.ChatUtil;
+import konquest.utility.MessagePath;
+
+public class TownAdminCommand extends CommandBase {
+
+	/*
+	 * The admin town command is different than the player town command.
+	 * This command is mostly text-based, and does not use the management menu.
+	 * It directly opens menus for plots and options.
+	 * Otherwise, it uses more text commands to give more control over town properties.
+	 */
+	
+	public TownAdminCommand(Konquest konquest, CommandSender sender, String[] args) {
+        super(konquest, sender, args);
+    }
+
+	@Override
+	public void execute() {
+		// k admin town create|remove|add|kick|lord|knight|rename|upgrade|shield|armor|plots|options <town> [<name>] [<arg>]
+		if (getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+            return;
+        } else {
+        	Player bukkitPlayer = (Player) getSender();
+        	World bukkitWorld = bukkitPlayer.getWorld();
+        	
+        	String subCmd = getArgs()[2];
+        	String townName = getArgs()[3];
+
+        	KonTown town = null;
+        	
+        	// Pre-checks based on sub-commands
+        	if(subCmd.equalsIgnoreCase("create")) {
+        		// Creating a town
+        		// Check for valid world location
+            	if(!getKonquest().isWorldValid(bukkitWorld)) {
+            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+                    return;
+            	}
+            	// Check town name
+            	if(getKonquest().validateName(townName,bukkitPlayer) != 0) {
+            		// Messages handled within method
+            		return;
+            	}
+        	} else if(subCmd.equalsIgnoreCase("remove")) {
+        		// Removing a town
+        		if(getKonquest().getKingdomManager().isTown(townName)) {
+        			town = getKonquest().getKingdomManager().getTown(townName);
+        		} else {
+        			// Cannot remove the capital with this command
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(townName));
+                    return;
+        		}
+        	} else {
+        		// Command on existing town
+        		// Verify town or capital exists
+        		boolean isTown = getKonquest().getKingdomManager().isTown(townName);
+        		boolean isCapital = getKonquest().getKingdomManager().isCapital(townName);
+        		if(isTown) {
+            		town = getKonquest().getKingdomManager().getTown(townName);
+            	} else if(isCapital) {
+            		town = getKonquest().getKingdomManager().getCapital(townName);
+            	} else {
+            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(townName));
+            		return;
+            	}
+        	}
+
+        	// Action based on sub-command
+        	switch(subCmd.toLowerCase()) {
+        	case "options":
+        		// Sanity check for town
+            	if(town == null) {
+            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+            		return;
+            	}
+        		// Directly open options menu
+        		getKonquest().getDisplayManager().displayTownOptionsMenu((Player) getSender(), town);
+        		break;
+        		
+        	case "plots":
+        		// Sanity check for town
+            	if(town == null) {
+            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+            		return;
+            	}
+        		// Directly open plots menu
+	        	getKonquest().getDisplayManager().displayPlotMenu((Player) getSender(), town);
+        		break;
+        		
+        	case "create":
+        		if (getArgs().length == 5) {
+					String kingdomName = getArgs()[4];
+					// Verify kingdom name up-front
+					if(!getKonquest().getKingdomManager().isKingdom(kingdomName)) {
+						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(kingdomName));
+	                    return;
+					}
+					// Attempt to create the town
+					int exitCode = getKonquest().getKingdomManager().createTown(bukkitPlayer.getLocation(), townName, kingdomName);
+		        	if(exitCode == 0) {
+		        		KonTown createdTown = getKonquest().getKingdomManager().getTown(townName);
+		        		if(createdTown != null) {
+		        			bukkitPlayer.teleport(getKonquest().getKingdomManager().getKingdom(kingdomName).getTown(townName).getSpawnLoc());
+			        		// Update labels
+			        		getKonquest().getMapHandler().drawDynmapLabel(createdTown);
+			        		getKonquest().getMapHandler().drawDynmapLabel(createdTown.getKingdom().getCapital());
+			        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SETTLE_NOTICE_SUCCESS.getMessage(townName));
+		        		} else {
+		        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+		            		return;
+		        		}
+		        	} else {
+		        		int distance = 0;
+		        		switch(exitCode) {
+		        		case 1:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_OVERLAP.getMessage());
+		        			break;
+		        		case 2:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PLACEMENT.getMessage());
+		        			break;
+		        		case 3:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_NAME.getMessage());
+		        			break;
+		        		case 4:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_TEMPLATE.getMessage());
+		        			break;
+		        		case 5:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+		        			break;
+		        		case 6:
+		        			distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
+		        			int min_distance_capital = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
+		        			int min_distance_town = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
+		        			int min_distance = 0;
+		        			if(min_distance_capital < min_distance_town) {
+		        				min_distance = min_distance_capital;
+		        			} else {
+		        				min_distance = min_distance_town;
+		        			}
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
+		        			break;
+		        		case 7:
+		        			distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
+		        			int max_distance_all = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_distance_all");
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_MAX.getMessage(distance,max_distance_all));
+		        			break;
+		        		case 21:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+		        			break;
+		        		case 22:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_FLAT.getMessage());
+		        			break;
+		        		case 23:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_HEIGHT.getMessage());
+		        			break;
+		        		case 12:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_HEIGHT.getMessage());
+		        			break;
+		        		case 13:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_INIT.getMessage());
+		        			break;
+		        		case 14:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_AIR.getMessage());
+		        			break;
+		        		case 15:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_WATER.getMessage());
+		        			break;
+		        		case 16:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_CONTAINER.getMessage());
+		        			break;
+		        		default:
+		        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+		        			return;
+		        		}
+		        	}
+        		} else {
+			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+			    }
+        		break;
+        		
+        	case "remove":
+        		if (getArgs().length == 5) {
+					String kingdomName = getArgs()[4];
+					// Verify kingdom name up-front
+					if(!getKonquest().getKingdomManager().isKingdom(kingdomName)) {
+						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(kingdomName));
+	                    return;
+					}
+					// Attempt to remove the town
+					boolean status = getKonquest().getKingdomManager().removeTown(townName, kingdomName);
+		        	if(status) {
+		        		ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+		        	} else {
+		        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(townName));
+		                return;
+		        	}
+        		} else {
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+        		}
+        		break;
+        	
+			case "add":
+				if (getArgs().length == 5) {
+					String playerName = getArgs()[4];
+			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
+			    	if(offlinePlayer == null) {
+						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
+		        		return;
+					}
+			    	if(!offlinePlayer.getKingdom().equals(town.getKingdom())) {
+			    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
+		        		return;
+			    	}
+			    	// Add the player as a resident
+			    	if(town.addPlayerResident(offlinePlayer.getOfflineBukkitPlayer(),false)) {
+			    		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_ADD_SUCCESS.getMessage(playerName,townName));
+			    	} else {
+			    		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TOWN_ERROR_ADD_RESIDENT.getMessage(playerName,townName));
+			    	}
+			    } else {
+			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+			    }
+			    break;
+			    
+			case "kick":
+				if (getArgs().length == 5) {
+					String playerName = getArgs()[4];
+					KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
+					if(offlinePlayer == null) {
+						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
+		        		return;
+					}
+			    	// Remove the player as a resident
+			    	if(town.removePlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
+			    		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_KICK_RESIDENT.getMessage(playerName,townName));
+			    	} else {
+			    		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TOWN_ERROR_KICK_FAIL.getMessage(playerName,townName));
+			    	}
+			    } else {
+			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+			    }
+				break;
+				
+			case "lord":
+				if (getArgs().length == 5) {
+					String playerName = getArgs()[4];
+        			// Give lordship
+        			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
+        			if(offlinePlayer == null) {
+						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
+		        		return;
+					}
+        			if(!offlinePlayer.getKingdom().equals(town.getKingdom())) {
+			    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
+		        		return;
+			    	}
+        			town.setPlayerLord(offlinePlayer.getOfflineBukkitPlayer());
+        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_LORD_SUCCESS.getMessage(townName,playerName));
+			    } else {
+			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+			    }
+				break;
+				
+			case "knight":
+				if (getArgs().length == 5) {
+					String playerName = getArgs()[4];
+			    	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
+			    	if(offlinePlayer == null) {
+						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
+		        		return;
+					}
+			    	if(!offlinePlayer.getKingdom().equals(town.getKingdom())) {
+			    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
+		        		return;
+			    	}
+			    	// Set resident's elite status
+			    	if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
+			    		if(town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer())) {
+			    			// Clear elite
+			    			town.setPlayerKnight(offlinePlayer.getOfflineBukkitPlayer(), false);
+			    			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_CLEAR.getMessage(playerName,townName));
+			    		} else {
+			    			// Set elite
+			    			town.setPlayerKnight(offlinePlayer.getOfflineBukkitPlayer(), true);
+			    			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_SET.getMessage(playerName,townName));
+			    		}
+			    	} else {
+			    		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TOWN_ERROR_KNIGHT_RESIDENT.getMessage());
+			    	}
+			    } else {
+			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+			    }
+			    break;
+			    
+			case "rename":
+	        	if (getArgs().length == 5) {
+					String newTownName = getArgs()[4];
+	        		// Rename the town
+	        		boolean success = town.getKingdom().renameTown(townName, newTownName);
+	        		if(success) {
+	        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_NOTICE_RENAME.getMessage(townName,newTownName));
+	        		}
+	        	} else {
+	        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+	        	}
+	        	break;
+	        	
+			case "upgrade":
+				if (getArgs().length == 6) {
+					String upgradeName = getArgs()[4];
+					String upgradeLevelStr = getArgs()[5];
+	        		KonquestUpgrade upgrade = KonquestUpgrade.getUpgrade(upgradeName);
+	        		if(upgrade == null) {
+	        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_UPGRADE.getMessage());
+		        		return;
+	        		}
+	        		if(!upgradeLevelStr.equalsIgnoreCase("")) {
+	        			int upgradeLevel = 0;
+	        			try {
+	        				upgradeLevel = Integer.parseInt(upgradeLevelStr);
+	        			} 
+	        			catch(NumberFormatException e) {
+	        				ChatUtil.printDebug("Failed to parse string as int: "+e.getMessage());
+	        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_LEVEL.getMessage());
+			        		return;
+	        			}
+	        			if(!getKonquest().getUpgradeManager().isEnabled()) {
+	        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+	        				return;
+	        			}
+	        			if(upgradeLevel < 0 || upgradeLevel > upgrade.getMaxLevel()) {
+	        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_LEVEL.getMessage());
+			        		return;
+	        			}
+	        			// Set town upgrade and level
+	        			boolean status = getKonquest().getUpgradeManager().applyTownUpgrade(town, upgrade, upgradeLevel);
+	        			if(status) {
+	        				ChatUtil.sendNotice((Player) getSender(), MessagePath.MENU_UPGRADE_ADD.getMessage(upgrade.getDescription(),upgradeLevel,town.getName()));
+	        			}
+	        			
+	        		} else {
+	        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_LEVEL.getMessage());
+		        		return;
+	        		}
+	        	} else {
+	        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_UPGRADE.getMessage());
+	        		return;
+	        	}
+	        	break;
+	        	
+			case "shield":
+				// /k admin forcetown shield clear|set|add [#]
+				String shieldSubCmd = "";
+				String shieldValStr = "";
+				if (getArgs().length >= 5) {
+					shieldSubCmd = getArgs()[4];
+				}
+				if (getArgs().length == 6) {
+					shieldValStr = getArgs()[5];
+				}
+				if(!shieldSubCmd.equals("")) {
+					// Parse the sub-command, clear|set|add
+					if(shieldSubCmd.equalsIgnoreCase("clear")) {
+						town.deactivateShield();
+						ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+					} else {
+						int shieldVal = 0;
+						if(!shieldValStr.equals("")) {
+							try {
+								shieldVal = Integer.parseInt(shieldValStr);
+		        			} 
+		        			catch(NumberFormatException e) {
+		        				ChatUtil.printDebug("Failed to parse string as int: "+e.getMessage());
+		        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(e.getMessage()));
+				        		return;
+		        			}
+							// Parse remaining sub-command options
+							if(shieldSubCmd.equalsIgnoreCase("set")) {
+								if(getKonquest().getShieldManager().shieldSet(town, shieldVal)) {
+									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+								} else {
+									// Shields cannot be negative
+									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_BAD_SHIELD.getMessage());
+								}
+							} else if(shieldSubCmd.equalsIgnoreCase("add")) {
+								if(getKonquest().getShieldManager().shieldAdd(town, shieldVal)) {
+									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+								} else {
+									// Shields cannot be negative
+									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_BAD_SHIELD.getMessage());
+								}
+							} else {
+								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				        		return;
+							}
+						} else {
+							ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			        		return;
+						}
+					}
+				} else {
+					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+				}
+				break;
+				
+			case "armor":
+				// /k admin forcetown armor clear|set|add [#]
+				String armorSubCmd = "";
+				String armorValStr = "";
+				if (getArgs().length >= 5) {
+					armorSubCmd = getArgs()[4];
+				}
+				if (getArgs().length == 6) {
+					armorValStr = getArgs()[5];
+				}
+				if(!armorSubCmd.equals("")) {
+					// Parse the sub-command, clear|set|add
+					if(armorSubCmd.equalsIgnoreCase("clear")) {
+						town.deactivateArmor();
+						ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+					} else {
+						int armorVal = 0;
+						if(!armorValStr.equals("")) {
+							try {
+								armorVal = Integer.parseInt(armorValStr);
+		        			} 
+		        			catch(NumberFormatException e) {
+		        				ChatUtil.printDebug("Failed to parse string as int: "+e.getMessage());
+		        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(e.getMessage()));
+				        		return;
+		        			}
+							// Parse remaining sub-command options
+							if(armorSubCmd.equalsIgnoreCase("set")) {
+								if(getKonquest().getShieldManager().armorSet(town, armorVal)) {
+									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+								} else {
+									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_BAD_ARMOR.getMessage());
+								}
+							} else if(armorSubCmd.equalsIgnoreCase("add")) {
+								if(getKonquest().getShieldManager().armorAdd(town, armorVal)) {
+									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+								} else {
+									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_BAD_ARMOR.getMessage());
+								}
+							} else {
+								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				        		return;
+							}
+						} else {
+							ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			        		return;
+						}
+					}
+				} else {
+					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		return;
+				}
+				break;
+			
+        	default:
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+        		return;
+        	}
+        }
+	}
+
+	@Override
+	public List<String> tabComplete() {
+		// k admin town create|remove|add|kick|lord|knight|rename|upgrade|shield|armor|plots|options <town> [<name>] [<arg>]
+		List<String> tabList = new ArrayList<>();
+		final List<String> matchedTabList = new ArrayList<>();
+		if(getArgs().length == 3) {
+			// suggest sub-commands
+			tabList.add("create");
+			tabList.add("remove");
+			tabList.add("add");
+			tabList.add("kick");
+			tabList.add("lord");
+			tabList.add("knight");
+			tabList.add("rename");
+			tabList.add("upgrade");
+			tabList.add("shield");
+			tabList.add("armor");
+			tabList.add("plots");
+			tabList.add("options");
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
+		} else if(getArgs().length == 4) {
+			// Town name
+			List<String> townList = new ArrayList<String>();
+			String subCommand = getArgs()[2];
+			if(subCommand.equalsIgnoreCase("create")) {
+				// Suggest new name
+				townList.add("***");
+			} else if(subCommand.equalsIgnoreCase("remove")) {
+				// Suggest existing town names only
+				townList.addAll(getKonquest().getKingdomManager().getTownNames());
+			} else {
+				// Suggest existing town + capital names
+				townList.addAll(getKonquest().getKingdomManager().getTownNames());
+				townList.addAll(getKonquest().getKingdomManager().getKingdomNames());
+			}
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
+		} else if(getArgs().length == 5) {
+			// suggest appropriate arguments
+			String subCommand = getArgs()[2];
+			String townName = getArgs()[3];
+			String name;
+			if(subCommand.equalsIgnoreCase("add") || subCommand.equalsIgnoreCase("kick") || subCommand.equalsIgnoreCase("lord") || subCommand.equalsIgnoreCase("knight")) {
+				// Player name
+				KonTown town = getKonquest().getKingdomManager().getTown(townName);
+				List<String> playerList = new ArrayList<>();
+				for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllPlayersInKingdom(town.getKingdom())) {
+					name = offlinePlayer.getOfflineBukkitPlayer().getName();
+					if(name != null) {
+						playerList.add(name);
+					}
+				}
+				tabList.addAll(playerList);
+			} else if(subCommand.equalsIgnoreCase("create") || subCommand.equalsIgnoreCase("remove")) {
+				// Kingdom name
+				tabList.addAll(getKonquest().getKingdomManager().getKingdomNames());
+			} else if(subCommand.equalsIgnoreCase("rename")) {
+				// New name
+				tabList.add("***");
+			} else if(subCommand.equalsIgnoreCase("upgrade")) {
+				for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
+					tabList.add(upgrade.toString().toLowerCase());
+				}
+			} else if(subCommand.equalsIgnoreCase("shield") || subCommand.equalsIgnoreCase("armor")) {
+				tabList.add("clear");
+				tabList.add("set");
+				tabList.add("add");
+			}
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
+		} else if(getArgs().length == 6) {
+			// suggest appropriate arguments
+			String subCommand = getArgs()[2];
+			if(subCommand.equalsIgnoreCase("upgrade")) {
+				String upgradeName = getArgs()[4];
+				KonquestUpgrade upgrade = KonquestUpgrade.getUpgrade(upgradeName);
+				if(upgrade != null) {
+					for(int i=0;i<=upgrade.getMaxLevel();i++) {
+						tabList.add(String.valueOf(i));
+					}
+				}
+			} else if(subCommand.equalsIgnoreCase("shield") || subCommand.equalsIgnoreCase("armor")) {
+				String modifier = getArgs()[4];
+				if(modifier.equalsIgnoreCase("set") || modifier.equalsIgnoreCase("add")) {
+					tabList.add("#");
+				}
+			}
+			StringUtil.copyPartialMatches(getArgs()[5], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
+		}
+		return matchedTabList;
+	}
+}

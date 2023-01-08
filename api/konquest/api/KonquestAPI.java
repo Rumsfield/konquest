@@ -8,14 +8,12 @@ import org.bukkit.World;
 import org.bukkit.scoreboard.Scoreboard;
 
 import konquest.api.manager.KonquestCampManager;
-import konquest.api.manager.KonquestGuildManager;
 import konquest.api.manager.KonquestKingdomManager;
 import konquest.api.manager.KonquestPlayerManager;
 import konquest.api.manager.KonquestPlotManager;
 import konquest.api.manager.KonquestRuinManager;
 import konquest.api.manager.KonquestShieldManager;
 import konquest.api.manager.KonquestUpgradeManager;
-import konquest.api.model.KonquestGuild;
 import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestTerritory;
@@ -42,13 +40,6 @@ public interface KonquestAPI {
 	 * @return The enemy primary color
 	 */
 	public ChatColor getEnemyPrimaryColor();
-
-	/**
-	 * Gets the armistice primary color, from core.yml.
-	 * 
-	 * @return The armistice primary color
-	 */
-	public ChatColor getArmisticePrimaryColor();
 	
 	/**
 	 * Gets the friendly secondary color, from core.yml.
@@ -65,11 +56,25 @@ public interface KonquestAPI {
 	public ChatColor getEnemySecondaryColor();
 	
 	/**
-	 * Gets the armistice secondary color, from core.yml.
+	 * Gets the sanctioned color, from core.yml.
 	 * 
-	 * @return The armistice secondary color
+	 * @return The sanctioned color
 	 */
-	public ChatColor getArmisticeSecondaryColor();
+	public ChatColor getSanctionedColor();
+	
+	/**
+	 * Gets the peaceful color, from core.yml.
+	 * 
+	 * @return The peaceful color
+	 */
+	public ChatColor getPeacefulColor();
+	
+	/**
+	 * Gets the allied color, from core.yml.
+	 * 
+	 * @return The allied color
+	 */
+	public ChatColor getAlliedColor();
 	
 	/**
 	 * Gets the barbarian color, from core.yml.
@@ -158,13 +163,6 @@ public interface KonquestAPI {
 	public KonquestPlotManager getPlotManager();
 	
 	/**
-	 * Gets the guild manager, for all things guild related.
-	 * 
-	 * @return The guild manager
-	 */
-	public KonquestGuildManager getGuildManager();
-	
-	/**
 	 * Checks if a location is in a valid world.
 	 * Invalid worlds prevent some Konquest commands.
 	 * 
@@ -221,7 +219,17 @@ public interface KonquestAPI {
 	
 	/**
 	 * Gets the primary display color based on relationships. This color is set in the Konquest configuration.
-	 * There is a color for each relationship: friendly, enemy, armistice, barbarian
+	 * There is a color for each {@link konquest.api.model.KonquestRelationship relationship}.
+	 * 
+	 * @param displayKingdom The observing kingdom that should see the color
+	 * @param contextKingdom The target kingdom who's relationship to the observer determines the color
+	 * @return The primary display color
+	 */
+	public ChatColor getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom);
+	
+	/**
+	 * Gets the primary display color based on relationships. This color is set in the Konquest configuration.
+	 * There is a color for each {@link konquest.api.model.KonquestRelationship relationship}.
 	 * 
 	 * @param displayPlayer The observing player who should see the color
 	 * @param contextPlayer The target player who's relationship to the observer determines the color
@@ -231,17 +239,7 @@ public interface KonquestAPI {
 	
 	/**
 	 * Gets the primary display color based on relationships. This color is set in the Konquest configuration.
-	 * There is a color for each relationship: friendly, enemy, armistice
-	 * 
-	 * @param displayGuild The observing guild who should see the color
-	 * @param contextGuild The target guild who's relationship to the observer determines the color
-	 * @return The primary display color
-	 */
-	public ChatColor getDisplayPrimaryColor(KonquestGuild displayGuild, KonquestGuild contextGuild);
-	
-	/**
-	 * Gets the primary display color based on relationships. This color is set in the Konquest configuration.
-	 * There is a color for each relationship: friendly, enemy, armistice
+	 * There is a color for each {@link konquest.api.model.KonquestRelationship relationship}.
 	 * 
 	 * @param displayPlayer The observing player who should see the color
 	 * @param contextTerritory The target town who's relationship to the observer determines the color
@@ -251,7 +249,17 @@ public interface KonquestAPI {
 	
 	/**
 	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
-	 * There is a color for each relationship: friendly, enemy, armistice, barbarian
+	 * There is a color for each {@link konquest.api.model.KonquestRelationship relationship}.
+	 * 
+	 * @param displayKingdom The observing kingdom that should see the color
+	 * @param contextKingdom The target kingdom who's relationship to the observer determines the color
+	 * @return The secondary display color
+	 */
+	public ChatColor getDisplaySecondaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom);
+	
+	/**
+	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
+	 * There is a color for each {@link konquest.api.model.KonquestRelationship relationship}.
 	 * 
 	 * @param displayPlayer The observing player who should see the color
 	 * @param contextPlayer The target player who's relationship to the observer determines the color
@@ -261,33 +269,13 @@ public interface KonquestAPI {
 	
 	/**
 	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
-	 * There is a color for each relationship: friendly, enemy, armistice
-	 * 
-	 * @param displayGuild The observing guild who should see the color
-	 * @param contextGuild The target guild who's relationship to the observer determines the color
-	 * @return The secondary display color
-	 */
-	public ChatColor getDisplaySecondaryColor(KonquestGuild displayGuild, KonquestGuild contextGuild);
-	
-	/**
-	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
-	 * There is a color for each relationship: friendly, enemy, armistice
+	 * There is a color for each {@link konquest.api.model.KonquestRelationship relationship}.
 	 * 
 	 * @param displayPlayer The observing player who should see the color
 	 * @param contextTerritory The target town who's relationship to the observer determines the color
 	 * @return The secondary display color
 	 */
 	public ChatColor getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);
-	
-	/**
-	 * Gets the kingdom display color based on relationships. This color is set in the Konquest configuration.
-	 * There is a color for each relationship: friendly, enemy, barbarian, neutral
-	 * 
-	 * @param displayKingdom The observing kingdom that should see the color
-	 * @param contextKingdom The target kingdom who's relationship to the observer determines the color
-	 * @return The kingdom display color
-	 */
-	public ChatColor getDisplayKingdomColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom);
 	
 	/**
 	 * Utility method to convert a location to a point representation of the chunk that contains the location.

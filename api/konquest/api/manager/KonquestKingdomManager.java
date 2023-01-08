@@ -2,6 +2,7 @@ package konquest.api.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -9,7 +10,6 @@ import org.bukkit.Material;
 import konquest.api.model.KonquestKingdom;
 import konquest.api.model.KonquestOfflinePlayer;
 import konquest.api.model.KonquestPlayer;
-import konquest.api.model.KonquestTerritory;
 import konquest.api.model.KonquestTown;
 
 /**
@@ -28,7 +28,7 @@ public interface KonquestKingdomManager {
 	 * @param name The name of the new kingdom
 	 * @return True when the new kingdom is successfully created, else false
 	 */
-	public boolean addKingdom(Location loc, String name);
+	//public boolean addKingdom(Location loc, String name);
 	
 	/**
 	 * Remove a kingdom with the given name.
@@ -48,63 +48,55 @@ public interface KonquestKingdomManager {
 	 * @param newName The new name for the kingdom
 	 * @return True when the new name is valid and successfully applied to the kingdom, else false
 	 */
-	public boolean renameKingdom(String oldName, String newName);
+	//public boolean renameKingdom(String oldName, String newName);
 	
 	/**
+	 * Primary method for adding a player member to a kingdom.
 	 * Assign a player to a kingdom and teleport them to the capital spawn point.
 	 * Optionally checks for join permissions based on Konquest configuration.
 	 * Optionally enforces maximum kingdom membership difference based on Konquest configuration.
 	 * 
-	 * @param player The player to assign
+	 * @param id The player to assign, by UUID
 	 * @param kingdomName The kingdom name, case-sensitive
 	 * @param force Ignore permission and max membership limits when true
 	 * @return status
-	 * 				<br>0 - success
-	 *  			<br>1 - kingdom name does not exist
-	 *  			<br>2 - the kingdom is full (config option max_player_diff)
-	 *  			<br>3 - missing permission
-	 *  			<br>4 - cancelled
-	 *             <br>-1 - internal error
+	 * 				<br>0	- success
+	 *  			<br>1 	- kingdom name does not exist
+	 *  			<br>2 	- the kingdom is full (config option max_player_diff)
+	 *  			<br>3 	- missing permission
+	 *  			<br>4 	- cancelled
+	 *  			<br>5 	- joining is denied, player is already member
+	 *  			<br>6	- joining is denied, failed switch criteria
+	 *  			<br>7 	- Unknown player ID
+	 *             <br>-1 	- internal error
 	 */
-	public int assignPlayerKingdom(KonquestPlayer player, String kingdomName, boolean force);
+	public int assignPlayerKingdom(UUID id, String kingdomName, boolean force);
 	
 	/**
-	 * Assign an offline player to a kingdom.
-	 * Optionally enforces maximum kingdom membership difference based on Konquest configuration.
-	 * 
-	 * @param offlinePlayer The offline player to assign
-	 * @param kingdomName The kingdom name, case-sensitive
-	 * @param force Ignore max membership limits when true
-	 * @return status
-	 * 				<br>0 - success
-	 *  			<br>1 - kingdom name does not exist
-	 *  			<br>2 - the kingdom is full (config option max_player_diff)
-	 *             <br>-1 - internal error
-	 */
-	public int assignOfflinePlayerKingdom(KonquestOfflinePlayer offlinePlayer, String kingdomName, boolean force);
-	
-	/**
-	 * Exiles a player to the Barbarians and teleports to a random Wild location.
+	 * Exiles a player to be a Barbarian.
 	 * Sets their exileKingdom value to their current Kingdom.
-	 * Removes all stats and disables prefix.
+	 * (Optionally) Teleports to a random Wild location.
+	 * (Optionally) Removes all stats and disables prefix.
+	 * (Optionally) Resets their exileKingdom to Barbarians, making them look like a new player to Konquest.
+	 * Applies exile cooldown timer.
 	 * 
 	 * @param player The player to exile
 	 * @param teleport Teleport the player based on Konquest configuration when true
 	 * @param clearStats Remove all player stats and prefix when true
 	 * @param isFull Perform a full exile such that the player has no exile kingdom, like they just joined the server
-	 * @return True when the player was successfully exiled, else false
+	 * @param force Ignore most checks when true
+	 * @return status
+	 * 				<br>0	- success
+	 * 				<br>1	- Player is already a barbarian
+	 * 				<br>2	- Invalid world
+	 * 				<br>3	- Failed to find valid teleport location
+	 * 				<br>4	- cancelled by event
+	 * 				<br>6	- Exile denied, player is a kingdom master
+	 * 				<br>8   - Cooldown remaining
+	 * 				<br>9   - Unknown player ID
+	 *             <br>-1 	- internal error
 	 */
-	public boolean exilePlayer(KonquestPlayer player, boolean teleport, boolean clearStats, boolean isFull);
-	
-	/**
-	 * Forcibly exiles an offline player by updating their database information.
-	 * The next time they log on, they will be a barbarian.
-	 * 
-	 * @param offlinePlayer The player to exile
-	 * @param isFull Perform a full exile such that the player has no exile kingdom, like they just joined the server
-	 * @return True when the player was successfully exiled, else false
-	 */
-	public boolean exileOfflinePlayer(KonquestOfflinePlayer offlinePlayer, boolean isFull);
+	public int exilePlayerBarbarian(UUID id, boolean teleport, boolean clearStats, boolean isFull, boolean force);
 	
 	/**
 	 * Create a new town centered at the given location, with the given name, for the given kingdom name.
@@ -129,7 +121,7 @@ public interface KonquestKingdomManager {
 	 * 		   <br>22 - error, town init fail, bad monument gradient
 	 * 		   <br>23 - error, town init fail, monument placed on bedrock
 	 */
-	public int addTown(Location loc, String name, String kingdomName);
+	public int createTown(Location loc, String name, String kingdomName);
 	
 	/**
 	 * Remove a town.
@@ -159,9 +151,9 @@ public interface KonquestKingdomManager {
 	 * @param name The name of the town to capture
 	 * @param oldKingdomName The name of the town's current kingdom
 	 * @param conquerPlayer The player to capture the town for
-	 * @return True when the town is successfully captured, else false
+	 * @return The captured town when successful, else null
 	 */
-	public boolean captureTownForPlayer(String name, String oldKingdomName, KonquestPlayer conquerPlayer);
+	public KonquestTown captureTownForPlayer(String name, String oldKingdomName, KonquestPlayer conquerPlayer);
 	
 	/**
 	 * Claims the chunk at the given location for the nearest adjacent territory.
@@ -176,7 +168,7 @@ public interface KonquestKingdomManager {
 	 * 			<br>3 - error, already claimed
 	 * 			<br>4 - error, cancelled by event
 	 */
-	public int claimChunk(Location loc);
+	//public int claimChunk(Location loc);
 	
 	/**
 	 * Unclaims the chunk at the given location from its associated territory.
@@ -190,7 +182,7 @@ public interface KonquestKingdomManager {
 	 * 			<br>3 - error, internal territory chunk not found
 	 * 			<br>4 - error, cancelled by event
 	 */
-	public int unclaimChunk(Location loc);
+	//public int unclaimChunk(Location loc);
 	
 	/**
 	 * Checks whether the chunk at the given location is claimed by a territory.
@@ -198,7 +190,7 @@ public interface KonquestKingdomManager {
 	 * @param loc The location to check
 	 * @return True when the location is inside of claimed territory, else false
 	 */
-	public boolean isChunkClaimed(Location loc);
+	//public boolean isChunkClaimed(Location loc);
 	
 	/**
 	 * Gets the territory at the given location.
@@ -207,7 +199,7 @@ public interface KonquestKingdomManager {
 	 * @param loc The location to request the territory
 	 * @return The territory at the given location, or null if no territory exists
 	 */
-	public KonquestTerritory getChunkTerritory(Location loc);
+	//public KonquestTerritory getChunkTerritory(Location loc);
 	
 	
 	/**
@@ -217,7 +209,7 @@ public interface KonquestKingdomManager {
 	 * @param loc The location to search
 	 * @return The distance in chunks to the nearest territory, or Integer.MAX_VALUE if not found
 	 */
-	public int getDistanceToClosestTerritory(Location loc);
+	//public int getDistanceToClosestTerritory(Location loc);
 	
 	/**
 	 * Gets a list of all kingdom names.
