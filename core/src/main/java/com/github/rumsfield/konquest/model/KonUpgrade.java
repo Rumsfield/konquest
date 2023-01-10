@@ -1,6 +1,6 @@
 package com.github.rumsfield.konquest.model;
 
-import com.github.rumsfield.konquest.api.model.KonquestUpgradable;
+import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Material;
 
@@ -12,13 +12,12 @@ import org.bukkit.Material;
  * @author Rumsfield
  *
  */
-public enum KonquestUpgrade implements KonquestUpgradable {
+public enum KonUpgrade implements KonquestUpgrade {
 
 	/**
 	 * Monument Loot upgrade
 	 */
-	LOOT 		(3, Material.GOLD_INGOT, 				MessagePath.UPGRADE_DROPS_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_LOOT_LEVEL_1.getMessage(), MessagePath.UPGRADE_LOOT_LEVEL_2.getMessage(), MessagePath.UPGRADE_LOOT_LEVEL_3.getMessage()}),
-	/**
+	LOOT 		(3, Material.GOLD_INGOT, 				MessagePath.UPGRADE_LOOT_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_LOOT_LEVEL_1.getMessage(), MessagePath.UPGRADE_LOOT_LEVEL_2.getMessage(), MessagePath.UPGRADE_LOOT_LEVEL_3.getMessage()}),	/**
 	 * Animal Drops upgrade
 	 */
 	DROPS		(1, Material.LEATHER, 					MessagePath.UPGRADE_DROPS_NAME.getMessage(), 	new String[] {MessagePath.UPGRADE_DROPS_LEVEL_1.getMessage()}),
@@ -52,7 +51,7 @@ public enum KonquestUpgrade implements KonquestUpgradable {
 	private final String description;
 	private final String[] levelDescriptions;
 	
-	KonquestUpgrade(int levels, Material icon, String description, String[] levelDescriptions) {
+	KonUpgrade(int levels, Material icon, String description, String[] levelDescriptions) {
 		this.levels = levels;
 		this.icon = icon;
 		this.description = description;
@@ -113,9 +112,9 @@ public enum KonquestUpgrade implements KonquestUpgradable {
 	 * @param name The name of the enum
 	 * @return The KonquestUpgrade enum that matches name
 	 */
-	public static KonquestUpgrade getUpgrade(String name) {
-		KonquestUpgrade result = null;
-		for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
+	public static KonUpgrade getUpgrade(String name) {
+		KonUpgrade result = null;
+		for(KonUpgrade upgrade : KonUpgrade.values()) {
 			if(upgrade.toString().equalsIgnoreCase(name)) {
 				result = upgrade;
 			}

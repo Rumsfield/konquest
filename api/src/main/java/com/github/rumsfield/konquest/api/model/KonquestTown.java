@@ -150,7 +150,7 @@ public interface KonquestTown extends KonquestTerritory {
 	 * @param upgrade The upgrade to check
 	 * @return True if this town has the upgrade enabled, else false
 	 */
-	boolean hasUpgrade(KonquestUpgradable upgrade);
+	boolean hasUpgrade(KonquestUpgrade upgrade);
 	
 	/**
 	 * Checks whether this town has the given upgrade, but it's disabled.
@@ -159,7 +159,7 @@ public interface KonquestTown extends KonquestTerritory {
 	 * @param upgrade The upgrade to check
 	 * @return True if the upgrade is disabled, else false
 	 */
-	boolean isUpgradeDisabled(KonquestUpgradable upgrade);
+	boolean isUpgradeDisabled(KonquestUpgrade upgrade);
 	
 	/**
 	 * Checks whether the town is protected by the Town Watch upgrade.

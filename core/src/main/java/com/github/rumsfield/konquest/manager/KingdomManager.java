@@ -35,7 +35,7 @@ import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerExileEvent;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerKingdomEvent;
 import com.github.rumsfield.konquest.api.manager.KonquestKingdomManager;
-import com.github.rumsfield.konquest.model.KonquestUpgrade;
+import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.display.icon.OptionIcon.optionAction;
 import com.github.rumsfield.konquest.model.KonBarDisplayer;
 import com.github.rumsfield.konquest.model.KonCapital;
@@ -2090,7 +2090,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			String townKingdom = conquerKingdom.getName();
 			Set<Point> townLand = getKingdom(oldKingdomName).getCapital().getChunkPoints();
 			Map<KonPropertyFlag,Boolean> townProperties = getKingdom(oldKingdomName).getCapital().getAllProperties();
-			Map<KonquestUpgradable,Integer> townUpgrades = getKingdom(oldKingdomName).getCapital().getUpgrades();
+			Map<KonquestUpgrade,Integer> townUpgrades = getKingdom(oldKingdomName).getCapital().getUpgrades();
 			// Remove the old kingdom
 			removeKingdom(oldKingdomName);
 			// Validate town name
@@ -2114,7 +2114,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
             	}
             	// Add upgrades
             	if(captureUpgrades) {
-	            	for(KonquestUpgradable upgrade : townUpgrades.keySet()) {
+	            	for(KonquestUpgrade upgrade : townUpgrades.keySet()) {
 	            		town.addUpgrade(upgrade, townUpgrades.get(upgrade));
 	            	}
 	            	// Update upgrade status
@@ -2392,7 +2392,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public void applyTownNerf(KonPlayer player, KonTown town) {
 		if(!player.isAdminBypassActive()) {
 			for(PotionEffectType pot : townNerfs.keySet()) {
-				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.FATIGUE);
+				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.FATIGUE);
 				int upgradedPotLevel = townNerfs.get(pot) + upgradeLevel;
 				player.getBukkitPlayer().addPotionEffect(new PotionEffect(pot, 9999999, upgradedPotLevel));
 			}
@@ -2435,7 +2435,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	public void applyTownHearts(KonPlayer player, KonTown town) {
 		if(player.getKingdom().equals(town.getKingdom())) {
-			int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.HEALTH);
+			int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.HEALTH);
 			if(upgradeLevel >= 1) {
 				//double upgradedBaseHealth = 20 + (upgradeLevel*2);
 				//player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(upgradedBaseHealth);
@@ -3126,7 +3126,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         		            	if(townSection.contains("upgrades")) {
         		            		for(String upgradeName : townSection.getConfigurationSection("upgrades").getKeys(false)) {
         		            			int level = townSection.getInt("upgrades."+upgradeName);
-        		            			KonquestUpgrade upgrade = KonquestUpgrade.getUpgrade(upgradeName);
+        		            			KonUpgrade upgrade = KonUpgrade.getUpgrade(upgradeName);
         		            			if(upgrade != null) {
         		            				town.addUpgrade(upgrade, level);
         		            			}
@@ -3262,7 +3262,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
                 	townInstanceRequestsSection.set(uuid, true);
                 }
                 ConfigurationSection townInstanceUpgradeSection = townInstanceSection.createSection("upgrades");
-                for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
+                for(KonUpgrade upgrade : KonUpgrade.values()) {
                 	int level = town.getRawUpgradeLevel(upgrade);
                 	if(level > 0) {
                 		townInstanceUpgradeSection.set(upgrade.toString(), level);

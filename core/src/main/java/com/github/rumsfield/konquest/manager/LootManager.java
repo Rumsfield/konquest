@@ -21,7 +21,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonquestUpgrade;
+import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.model.KonMonumentTemplate;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
@@ -320,7 +320,7 @@ public class LootManager implements Timeable{
 	}
 	
 	public boolean updateMonumentLoot(Inventory inventory, KonTown town) {
-		int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.LOOT);
+		int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.LOOT);
 		int upgradedLootCount = lootCount + upgradeLevel;
 		return updateMonumentLoot(inventory,upgradedLootCount);
 	}

@@ -4,11 +4,11 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.manager.KonquestUpgradeManager;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
-import com.github.rumsfield.konquest.api.model.KonquestUpgradable;
+import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonStatsType;
 import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.model.KonquestUpgrade;
+import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.configuration.ConfigurationSection;
@@ -22,14 +22,14 @@ import java.util.List;
 public class UpgradeManager implements KonquestUpgradeManager {
 	
 	private Konquest konquest;
-	private HashMap<KonquestUpgrade,List<Integer>> upgradeCosts;
-	private HashMap<KonquestUpgrade,List<Integer>> upgradePopulations;
+	private HashMap<KonUpgrade,List<Integer>> upgradeCosts;
+	private HashMap<KonUpgrade,List<Integer>> upgradePopulations;
 	private boolean isEnabled;
 	
 	public UpgradeManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.upgradeCosts = new HashMap<KonquestUpgrade,List<Integer>>();
-		this.upgradePopulations = new HashMap<KonquestUpgrade,List<Integer>>();
+		this.upgradeCosts = new HashMap<KonUpgrade,List<Integer>>();
+		this.upgradePopulations = new HashMap<KonUpgrade,List<Integer>>();
 		this.isEnabled = false;
 	}
 	
@@ -61,10 +61,10 @@ public class UpgradeManager implements KonquestUpgradeManager {
         }
         List<Integer> costList;
         List<Integer> popList;
-        KonquestUpgrade upgrade;
+        KonUpgrade upgrade;
         boolean status = true;
         for(String upgradeName : upgradesConfig.getConfigurationSection("upgrades").getKeys(false)) {
-        	upgrade = KonquestUpgrade.getUpgrade(upgradeName);
+        	upgrade = KonUpgrade.getUpgrade(upgradeName);
         	if(upgrade != null) {
         		ConfigurationSection upgradeSection = upgradesConfig.getConfigurationSection("upgrades."+upgradeName);
         		costList = new ArrayList<Integer>();
@@ -105,12 +105,12 @@ public class UpgradeManager implements KonquestUpgradeManager {
 	 * @param town
 	 * @return
 	 */
-	public HashMap<KonquestUpgradable,Integer> getAvailableUpgrades(KonquestTown townArg) {
-		HashMap<KonquestUpgradable,Integer> result = new HashMap<>();
+	public HashMap<KonquestUpgrade,Integer> getAvailableUpgrades(KonquestTown townArg) {
+		HashMap<KonquestUpgrade,Integer> result = new HashMap<>();
 		if(townArg instanceof KonTown) {
 			KonTown town = (KonTown) townArg;
 			//ChatUtil.printDebug("Generating available upgrades for town "+town.getName());
-			for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
+			for(KonUpgrade upgrade : KonUpgrade.values()) {
 				int currentLevel = town.getRawUpgradeLevel(upgrade);
 				int nextLevel = currentLevel+1;
 				int nextCost = getUpgradeCost(upgrade,nextLevel);
@@ -123,7 +123,7 @@ public class UpgradeManager implements KonquestUpgradeManager {
 		return result;
 	}
 	
-	public int getUpgradeCost(KonquestUpgradable upgrade, int level) {
+	public int getUpgradeCost(KonquestUpgrade upgrade, int level) {
 		int result = -1;
 		if(level > 0 && level <= upgrade.getMaxLevel()) {
 			if(upgradeCosts.containsKey(upgrade)) {
@@ -133,7 +133,7 @@ public class UpgradeManager implements KonquestUpgradeManager {
 		return result;
 	}
 	
-	public int getUpgradePopulation(KonquestUpgradable upgrade, int level) {
+	public int getUpgradePopulation(KonquestUpgrade upgrade, int level) {
 		int result = 0;
 		if(level > 0 && level <= upgrade.getMaxLevel()) {
 			if(upgradePopulations.containsKey(upgrade)) {
@@ -150,7 +150,7 @@ public class UpgradeManager implements KonquestUpgradeManager {
 	 * @param level
 	 * @return True on successful addition of the upgrade, else false.
 	 */
-	public boolean addTownUpgrade(KonTown town, KonquestUpgrade upgrade, int level, Player bukkitPlayer) {
+	public boolean addTownUpgrade(KonTown town, KonUpgrade upgrade, int level, Player bukkitPlayer) {
 		// Check that upgrades are enabled
 		if(!isEnabled) {
 			//ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": upgrades are currently disabled. Talk to an admin!");
@@ -181,7 +181,7 @@ public class UpgradeManager implements KonquestUpgradeManager {
 		}
 		// Passed all checks, add the upgrade
 		town.addUpgrade(upgrade, level);
-		if(upgrade.equals(KonquestUpgrade.HEALTH)) {
+		if(upgrade.equals(KonUpgrade.HEALTH)) {
 			konquest.getKingdomManager().refreshTownHearts(town);
 		}
 		//ChatUtil.sendNotice(bukkitPlayer, "Added "+upgrade.getDescription()+" level "+level+"!");
@@ -197,7 +197,7 @@ public class UpgradeManager implements KonquestUpgradeManager {
 		return true;
 	}
 	
-	public boolean applyTownUpgrade(KonquestTown townArg, KonquestUpgradable upgrade, int level) {
+	public boolean applyTownUpgrade(KonquestTown townArg, KonquestUpgrade upgrade, int level) {
 		if(!isEnabled) {
 			return false;
 		}
@@ -209,7 +209,7 @@ public class UpgradeManager implements KonquestUpgradeManager {
 		}
 		KonTown town = (KonTown) townArg;
 		town.addUpgrade(upgrade, level);
-		if(upgrade.equals(KonquestUpgrade.HEALTH)) {
+		if(upgrade.equals(KonUpgrade.HEALTH)) {
 			konquest.getKingdomManager().refreshTownHearts(town);
 		}
 		ChatUtil.printDebug("Applied upgrade "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
@@ -217,7 +217,7 @@ public class UpgradeManager implements KonquestUpgradeManager {
 		return true;
 	}
 	
-	public int getTownUpgradeLevel(KonquestTown townArg, KonquestUpgradable upgrade) {
+	public int getTownUpgradeLevel(KonquestTown townArg, KonquestUpgrade upgrade) {
 		int result = 0;
 		if(isEnabled && townArg instanceof KonTown) {
 			KonTown town = (KonTown) townArg;
@@ -227,7 +227,7 @@ public class UpgradeManager implements KonquestUpgradeManager {
 	}
 	
 	public void updateTownDisabledUpgrades(KonTown town) {
-		for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
+		for(KonUpgrade upgrade : KonUpgrade.values()) {
 			// If the town has this upgrade...
 			int level = town.getRawUpgradeLevel(upgrade);
 			if(level > 0) {

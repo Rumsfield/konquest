@@ -1,7 +1,7 @@
 package com.github.rumsfield.konquest.api.manager;
 
 import com.github.rumsfield.konquest.api.model.KonquestTown;
-import com.github.rumsfield.konquest.api.model.KonquestUpgradable;
+import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
 
 import java.util.HashMap;
 
@@ -28,7 +28,7 @@ public interface KonquestUpgradeManager {
 	 * @param town The town to search for available upgrades
 	 * @return A map of available upgrades and their levels
 	 */
-	public HashMap<KonquestUpgradable,Integer> getAvailableUpgrades(KonquestTown town);
+	public HashMap<KonquestUpgrade,Integer> getAvailableUpgrades(KonquestTown town);
 	
 	/**
 	 * Gets the cost in favor of the given upgrade and level.
@@ -39,7 +39,7 @@ public interface KonquestUpgradeManager {
 	 * @param level The level of the given upgrade
 	 * @return The cost in favor, or -1 when level is not valid
 	 */
-	public int getUpgradeCost(KonquestUpgradable upgrade, int level);
+	public int getUpgradeCost(KonquestUpgrade upgrade, int level);
 	
 	/**
 	 * Gets the population requirement of the given upgrade and level.
@@ -50,7 +50,7 @@ public interface KonquestUpgradeManager {
 	 * @param level The level of the given upgrade
 	 * @return The population, or 0 when level is not valid
 	 */
-	public int getUpgradePopulation(KonquestUpgradable upgrade, int level);
+	public int getUpgradePopulation(KonquestUpgrade upgrade, int level);
 	
 	/**
 	 * Gets the current upgrade level of the given town.
@@ -60,7 +60,7 @@ public interface KonquestUpgradeManager {
 	 * @param upgrade The upgrade
 	 * @return The level of the upgrade, or 0 if the upgrade is not applied
 	 */
-	public int getTownUpgradeLevel(KonquestTown town, KonquestUpgradable upgrade);
+	public int getTownUpgradeLevel(KonquestTown town, KonquestUpgrade upgrade);
 	
 	/**
 	 * Apply the given upgrade and level to the given town.
@@ -73,6 +73,6 @@ public interface KonquestUpgradeManager {
 	 * @param level The level of the upgrade
 	 * @return True when the upgrade is applied successfully, else false
 	 */
-	public boolean applyTownUpgrade(KonquestTown town, KonquestUpgradable upgrade, int level);
+	public boolean applyTownUpgrade(KonquestTown town, KonquestUpgrade upgrade, int level);
 	
 }

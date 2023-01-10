@@ -10,7 +10,7 @@ import com.github.rumsfield.konquest.api.event.town.KonquestTownAttackEvent;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownCaptureEvent;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownDestroyEvent;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.model.KonquestUpgrade;
+import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.manager.CampManager;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
@@ -210,11 +210,11 @@ public class BlockListener implements Listener {
 							return;
 						}
 						// If town is upgraded to require a minimum online resident amount, prevent block edits
-						int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.WATCH);
+						int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
 						if(upgradeLevel > 0) {
 							int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
 							if(town.getNumResidentsOnline() < minimumOnlineResidents) {
-								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(),KonquestUpgrade.WATCH.getDescription(),minimumOnlineResidents));
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(),minimumOnlineResidents));
 								event.setCancelled(true);
 								return;
 							}
@@ -661,11 +661,11 @@ public class BlockListener implements Listener {
 							return;
 						}
 						// If town is upgraded to require a minimum online resident amount, prevent block damage
-						int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.WATCH);
+						int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
 						if(upgradeLevel > 0) {
 							int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
 							if(town.getNumResidentsOnline() < minimumOnlineResidents) {
-								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(),KonquestUpgrade.WATCH.getDescription(),minimumOnlineResidents));
+								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(),minimumOnlineResidents));
 								event.setCancelled(true);
 								return;
 							}
@@ -951,7 +951,7 @@ public class BlockListener implements Listener {
 						return;
 					}
 					// If town is upgraded to require a minimum online resident amount, prevent block damage
-					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.WATCH);
+					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
 					if(upgradeLevel > 0) {
 						int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
 						if(town.getNumResidentsOnline() < minimumOnlineResidents) {
@@ -1259,7 +1259,7 @@ public class BlockListener implements Listener {
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
 				// Prevent fire spread inside upgraded Towns
-				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.DAMAGE);
+				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DAMAGE);
 				if(event.getSource().getType().equals(Material.FIRE) && upgradeLevel >= 1) {
 					ChatUtil.printDebug("EVENT: Stopped fire spread in upgraded town, DAMAGE");
 					event.getSource().setType(Material.AIR);
@@ -1267,7 +1267,7 @@ public class BlockListener implements Listener {
 					return;
 				}
 				// If town is upgraded to require a minimum online resident amount, prevent block damage
-				int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.WATCH);
+				int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
 				if(event.getSource().getType().equals(Material.FIRE) && upgradeLevelWatch > 0) {
 					int minimumOnlineResidents = upgradeLevelWatch; // 1, 2, 3
 					if(town.getNumResidentsOnline() < minimumOnlineResidents) {

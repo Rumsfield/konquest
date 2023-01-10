@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonquestUpgrade;
+import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonTown;
@@ -333,7 +333,7 @@ public class TownAdminCommand extends CommandBase {
 				if (getArgs().length == 6) {
 					String upgradeName = getArgs()[4];
 					String upgradeLevelStr = getArgs()[5];
-	        		KonquestUpgrade upgrade = KonquestUpgrade.getUpgrade(upgradeName);
+	        		KonUpgrade upgrade = KonUpgrade.getUpgrade(upgradeName);
 	        		if(upgrade == null) {
 	        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_UPGRADE.getMessage());
 		        		return;
@@ -552,7 +552,7 @@ public class TownAdminCommand extends CommandBase {
 				// New name
 				tabList.add("***");
 			} else if(subCommand.equalsIgnoreCase("upgrade")) {
-				for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
+				for(KonUpgrade upgrade : KonUpgrade.values()) {
 					tabList.add(upgrade.toString().toLowerCase());
 				}
 			} else if(subCommand.equalsIgnoreCase("shield") || subCommand.equalsIgnoreCase("armor")) {
@@ -568,7 +568,7 @@ public class TownAdminCommand extends CommandBase {
 			String subCommand = getArgs()[2];
 			if(subCommand.equalsIgnoreCase("upgrade")) {
 				String upgradeName = getArgs()[4];
-				KonquestUpgrade upgrade = KonquestUpgrade.getUpgrade(upgradeName);
+				KonUpgrade upgrade = KonUpgrade.getUpgrade(upgradeName);
 				if(upgrade != null) {
 					for(int i=0;i<=upgrade.getMaxLevel();i++) {
 						tabList.add(String.valueOf(i));

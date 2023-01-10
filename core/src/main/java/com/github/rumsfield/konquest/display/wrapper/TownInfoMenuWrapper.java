@@ -10,7 +10,7 @@ import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.model.KonquestUpgrade;
+import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
@@ -149,7 +149,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		pageLabel = titleColor+infoTown.getName()+" "+MessagePath.LABEL_UPGRADES.getMessage();
 		getMenu().addPage(1, 1, pageLabel);
 		int index = 0;
-		for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
+		for(KonUpgrade upgrade : KonUpgrade.values()) {
 			int currentLevel = infoTown.getRawUpgradeLevel(upgrade);
 			if(currentLevel > 0) {
 				String formattedUpgrade = ChatColor.LIGHT_PURPLE+upgrade.getDescription()+" "+currentLevel;

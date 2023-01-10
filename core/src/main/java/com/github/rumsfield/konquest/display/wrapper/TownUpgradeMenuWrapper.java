@@ -1,13 +1,13 @@
 package com.github.rumsfield.konquest.display.wrapper;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.api.model.KonquestUpgradable;
+import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.display.icon.UpgradeIcon;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.model.KonquestUpgrade;
+import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -29,9 +29,9 @@ public class TownUpgradeMenuWrapper extends MenuWrapper {
 		// Page 0
 		String pageLabel = titleColor+MessagePath.MENU_UPGRADE_TITLE.getMessage();
 		getMenu().addPage(0, 1, pageLabel);
-		HashMap<KonquestUpgradable,Integer> availableUpgrades = getKonquest().getUpgradeManager().getAvailableUpgrades(town);
+		HashMap<KonquestUpgrade,Integer> availableUpgrades = getKonquest().getUpgradeManager().getAvailableUpgrades(town);
 		int index = 0;
-		for(KonquestUpgrade upgrade : KonquestUpgrade.values()) {
+		for(KonUpgrade upgrade : KonUpgrade.values()) {
 			if(availableUpgrades.containsKey(upgrade)) {
 				int cost = getKonquest().getUpgradeManager().getUpgradeCost(upgrade, availableUpgrades.get(upgrade));
 				int pop = getKonquest().getUpgradeManager().getUpgradePopulation(upgrade, availableUpgrades.get(upgrade));

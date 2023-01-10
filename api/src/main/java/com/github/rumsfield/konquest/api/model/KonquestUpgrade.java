@@ -10,7 +10,7 @@ import org.bukkit.Material;
  * @author TropicalShadow
  *
  */
-public interface KonquestUpgradable {
+public interface KonquestUpgrade {
 
     /**
      * Gets the maximum levels for this upgrade.

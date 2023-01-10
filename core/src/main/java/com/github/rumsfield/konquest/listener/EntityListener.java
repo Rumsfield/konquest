@@ -4,7 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerCombatTagEvent;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.model.KonquestUpgrade;
+import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.manager.TerritoryManager;
@@ -158,7 +158,7 @@ public class EntityListener implements Listener {
 						return;
 					}
 					// If town is upgraded to require a minimum online resident amount, prevent block damage
-					int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.WATCH);
+					int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
 					if(upgradeLevelWatch > 0) {
 						int minimumOnlineResidents = upgradeLevelWatch; // 1, 2, 3
 						if(town.getNumResidentsOnline() < minimumOnlineResidents) {
@@ -168,7 +168,7 @@ public class EntityListener implements Listener {
 						}
 					}
 					// Protect when town has upgrade
-					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.DAMAGE);
+					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DAMAGE);
 					if(upgradeLevel >= 2) {
 						ChatUtil.printDebug("protecting upgraded Town DAMAGE");
 						event.setCancelled(true);
@@ -527,11 +527,11 @@ public class EntityListener implements Listener {
 							return;
 	    				}
 	    				// If town is upgraded to require a minimum online resident amount, prevent block damage
-						int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.WATCH);
+						int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
 						if(upgradeLevelWatch > 0) {
 							int minimumOnlineResidents = upgradeLevelWatch; // 1, 2, 3
 							if(town.getNumResidentsOnline() < minimumOnlineResidents) {
-								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(),KonquestUpgrade.WATCH.getDescription(),minimumOnlineResidents));
+								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(),minimumOnlineResidents));
 								event.setCancelled(true);
 								return;
 							}
@@ -787,7 +787,7 @@ public class EntityListener implements Listener {
 			KonTerritory territory = territoryManager.getChunkTerritory(event.getEntity().getLocation());
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown)territory;
-				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonquestUpgrade.DROPS);
+				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DROPS);
 				if(upgradeLevel >= 1) {
 					// Add 1 to all drops
 					for(ItemStack item : event.getDrops()) {

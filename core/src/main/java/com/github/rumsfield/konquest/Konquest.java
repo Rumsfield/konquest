@@ -76,7 +76,7 @@ import com.github.rumsfield.konquest.utility.Timeable;
 import com.github.rumsfield.konquest.utility.Timer;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.event.KonquestEvent;
-import com.github.rumsfield.konquest.model.KonquestUpgrade;
+import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
 import com.github.rumsfield.konquest.api.model.KonquestTerritory;
@@ -894,7 +894,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	    			for(KonKingdom kingdom : enemyKingdoms) {
 	    				for(KonTown town : kingdom.getTowns()) {
 	    					// Only find enemy towns which do not have the counter-intelligence upgrade level 2+
-	    					int upgradeLevel = upgradeManager.getTownUpgradeLevel(town, KonquestUpgrade.COUNTER);
+	    					int upgradeLevel = upgradeManager.getTownUpgradeLevel(town, KonUpgrade.COUNTER);
 	    					if(upgradeLevel < 2) {
 	    						int townDist = chunkDistance(player.getBukkitPlayer().getLocation(), town.getCenterLoc());
 	    						if(townDist != -1 && townDist < minDistance) {
