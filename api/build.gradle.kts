@@ -9,7 +9,7 @@ dependencies{
 
 tasks {
     shadowJar {
-        archiveBaseName.set(project.name)
+        archiveBaseName.set(rootProject.name+"-"+project.name)
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir/build/libs"))
     }
