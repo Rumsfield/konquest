@@ -14,10 +14,10 @@ import java.util.List;
 
 public class ArmorIcon implements MenuIcon {
 
-	private KonArmor armor;
-	private boolean isAvailable;
-	private int population;
-	private int index;
+	private final KonArmor armor;
+	private final boolean isAvailable;
+	private final int population;
+	private final int index;
 	ItemStack item;
 	
 	public ArmorIcon(KonArmor armor, boolean isAvailable, int population, int index) {
@@ -29,12 +29,15 @@ public class ArmorIcon implements MenuIcon {
 	}
 	
 	private ItemStack initItem() {
-		Material mat = Material.DIAMOND_CHESTPLATE;
-		if(!isAvailable) {
-			mat = Material.IRON_BARS;
+		Material itemMaterial;
+		if(isAvailable){
+			itemMaterial = Material.DIAMOND_CHESTPLATE;
+		}else {
+			itemMaterial = Material.IRON_BARS;
 		}
-		ItemStack item = new ItemStack(mat,1);
+		ItemStack item = new ItemStack(itemMaterial,1);
 		ItemMeta meta = item.getItemMeta();
+		assert meta != null;
 		meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
@@ -42,7 +45,7 @@ public class ArmorIcon implements MenuIcon {
 			}
 		}
 		int totalCost = population * armor.getCost();
-		List<String> loreList = new ArrayList<String>();
+		List<String> loreList = new ArrayList<>();
 		loreList.add(ChatColor.DARK_AQUA+""+armor.getBlocks());
     	loreList.add(ChatColor.YELLOW+MessagePath.LABEL_COST.getMessage()+": "+ChatColor.AQUA+totalCost);
     	if(isAvailable) {

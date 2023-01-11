@@ -1,13 +1,11 @@
 package com.github.rumsfield.konquest.manager;
 
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.model.KonKingdom;
+import com.github.rumsfield.konquest.model.KonMonumentTemplate;
+import com.github.rumsfield.konquest.model.KonPropertyFlag;
+import com.github.rumsfield.konquest.model.KonSanctuary;
+import com.github.rumsfield.konquest.utility.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -17,21 +15,18 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.Inventory;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonMonumentTemplate;
-import com.github.rumsfield.konquest.model.KonPropertyFlag;
-import com.github.rumsfield.konquest.model.KonSanctuary;
-import com.github.rumsfield.konquest.utility.ChatUtil;
+import java.awt.*;
+import java.util.List;
+import java.util.*;
 
 public class SanctuaryManager {
 
-	private Konquest konquest;
-	private HashMap<String, KonSanctuary> sanctuaryMap; // lower case name maps to sanctuary object
+	private final Konquest konquest;
+	private final HashMap<String, KonSanctuary> sanctuaryMap; // lower case name maps to sanctuary object
 	
 	public SanctuaryManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.sanctuaryMap = new HashMap<String, KonSanctuary>();
+		this.sanctuaryMap = new HashMap<>();
 	}
 	
 	
@@ -84,9 +79,7 @@ public class SanctuaryManager {
 		 */
 		
 		// Check if name exists
-		if(!isSanctuary(name)) {
-			return false;
-		}
+		if(!isSanctuary(name)) return false;
 		// Remove the sanctuary
 		KonSanctuary oldSanctuary = sanctuaryMap.remove(name.toLowerCase());
 		if(oldSanctuary != null) {
@@ -187,7 +180,7 @@ public class SanctuaryManager {
 	}
 	
 	public Set<String> getAllTemplateNames() {
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
 			for(KonMonumentTemplate template : sanctuary.getTemplates()) {
 				result.add(template.getName());
@@ -197,7 +190,7 @@ public class SanctuaryManager {
 	}
 	
 	public Set<String> getAllValidTemplateNames() {
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
 			for(KonMonumentTemplate template : sanctuary.getTemplates()) {
 				if(template.isValid()) {
@@ -209,7 +202,7 @@ public class SanctuaryManager {
 	}
 	
 	public Set<KonMonumentTemplate> getAllValidTemplates() {
-		Set<KonMonumentTemplate> result = new HashSet<KonMonumentTemplate>();
+		Set<KonMonumentTemplate> result = new HashSet<>();
 		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
 			for(KonMonumentTemplate template : sanctuary.getTemplates()) {
 				if(template.isValid()) {
@@ -314,8 +307,8 @@ public class SanctuaryManager {
 	/**
 	 * Checks a template for validation criteria.
 	 * This method modifies the reference of the 'template' argument.
-	 * @param sanctuary
-	 * @param template
+	 * @param template The template to validate
+	 * @param sanctuary The sanctuary that contains this template
 	 * @return Status code
 	 * 			0 - Success
 	 * 			1 - Region is not 16x16 blocks in base
@@ -348,23 +341,22 @@ public class SanctuaryManager {
 		}
 		// Check for at least as many critical blocks as required critical hits
 		// Also check for any chests for loot flag
-		ArrayList<Location> criticalBlockLocs = new ArrayList<Location>();
-		HashSet<Inventory> lootInventories = new HashSet<Inventory>();
+		HashSet<Inventory> lootInventories = new HashSet<>();
 		int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
-		int bottomBlockX, bottomBlockY, bottomBlockZ = 0;
-		int topBlockX, topBlockY, topBlockZ = 0;
+		int bottomBlockX, bottomBlockY, bottomBlockZ;
+		int topBlockX, topBlockY, topBlockZ;
 		int c1X = corner1.getBlockX();
 		int c1Y = corner1.getBlockY();
 		int c1Z = corner1.getBlockZ();
 		int c2X = corner2.getBlockX();
 		int c2Y = corner2.getBlockY();
 		int c2Z = corner2.getBlockZ();
-		bottomBlockX = (c1X < c2X) ? c1X : c2X;
-		bottomBlockY = (c1Y < c2Y) ? c1Y : c2Y;
-		bottomBlockZ = (c1Z < c2Z) ? c1Z : c2Z;
-		topBlockX = (c1X < c2X) ? c2X : c1X;
-		topBlockY = (c1Y < c2Y) ? c2Y : c1Y;
-		topBlockZ = (c1Z < c2Z) ? c2Z : c1Z;
+		bottomBlockX = Math.min(c1X, c2X);
+		bottomBlockY = Math.min(c1Y, c2Y);
+		bottomBlockZ = Math.min(c1Z, c2Z);
+		topBlockX = Math.max(c1X, c2X);
+		topBlockY = Math.max(c1Y, c2Y);
+		topBlockZ = Math.max(c1Z, c2Z);
 		int criticalBlockCount = 0;
 		int totalBlockCount = 0;
 		int lootChestCount = 0;
@@ -375,7 +367,6 @@ public class SanctuaryManager {
                 	Block monumentBlock = corner1.getWorld().getBlockAt(x, y, z);
                 	if(monumentBlock.getType().equals(konquest.getKingdomManager().getTownCriticalBlock())) {
                 		criticalBlockCount++;
-                		criticalBlockLocs.add(monumentBlock.getLocation());
                 	} else if(monumentBlock.getState() instanceof Chest) {
                 		Inventory chestInv = ((Chest)monumentBlock.getState()).getSnapshotInventory();
                 		// Check to see if this block's associated inventory has already been counted
@@ -396,7 +387,7 @@ public class SanctuaryManager {
 			ChatUtil.printDebug("Failed to validate Monument Template, not enough critical blocks. Found "+criticalBlockCount+", required "+maxCriticalhits);
 			return 2;
 		}
-		// Check that travel point is inside of the corner bounds
+		// Check that travel point is inside the corner bounds
 		if(travelPoint.getBlockX() < bottomBlockX || travelPoint.getBlockX() > topBlockX ||
 				travelPoint.getBlockY() < bottomBlockY || travelPoint.getBlockY() > topBlockY ||
 				travelPoint.getBlockZ() < bottomBlockZ || travelPoint.getBlockZ() > topBlockZ) {
@@ -596,14 +587,14 @@ public class SanctuaryManager {
 			KonSanctuary sanctuary = sanctuaryMap.get(name);
 			ConfigurationSection sanctuarySection = root.createSection(sanctuary.getName());
 			sanctuarySection.set("world", sanctuary.getWorld().getName());
-			sanctuarySection.set("spawn", new int[] {(int) sanctuary.getSpawnLoc().getBlockX(),
-												   (int) sanctuary.getSpawnLoc().getBlockY(),
-												   (int) sanctuary.getSpawnLoc().getBlockZ(),
+			sanctuarySection.set("spawn", new int[] {sanctuary.getSpawnLoc().getBlockX(),
+					sanctuary.getSpawnLoc().getBlockY(),
+					sanctuary.getSpawnLoc().getBlockZ(),
 												   (int) sanctuary.getSpawnLoc().getPitch(),
 												   (int) sanctuary.getSpawnLoc().getYaw()});
-			sanctuarySection.set("center", new int[] {(int) sanctuary.getCenterLoc().getBlockX(),
-					 								(int) sanctuary.getCenterLoc().getBlockY(),
-					 								(int) sanctuary.getCenterLoc().getBlockZ()});
+			sanctuarySection.set("center", new int[] {sanctuary.getCenterLoc().getBlockX(),
+					sanctuary.getCenterLoc().getBlockY(),
+					sanctuary.getCenterLoc().getBlockZ()});
 			sanctuarySection.set("chunks", konquest.formatPointsToString(sanctuary.getChunkList().keySet()));
 			// Properties
 			ConfigurationSection sanctuaryPropertiesSection = sanctuarySection.createSection("properties");
@@ -620,15 +611,15 @@ public class SanctuaryManager {
 					ChatUtil.printConsoleError("Saved invalid monument template named "+monumentName+", in Sanctuary "+name+".");
 				}
 	            ConfigurationSection monumentSection = sanctuaryMonumentsSection.createSection(monumentName);
-	            monumentSection.set("travel", new int[] {(int) template.getTravelPoint().getBlockX(),
-														 (int) template.getTravelPoint().getBlockY(),
-														 (int) template.getTravelPoint().getBlockZ()});
-	            monumentSection.set("cornerone", new int[] {(int) template.getCornerOne().getBlockX(),
-						 								 	(int) template.getCornerOne().getBlockY(),
-						 								 	(int) template.getCornerOne().getBlockZ()});
-	            monumentSection.set("cornertwo", new int[] {(int) template.getCornerTwo().getBlockX(),
-						 								 	(int) template.getCornerTwo().getBlockY(),
-						 								 	(int) template.getCornerTwo().getBlockZ()});
+	            monumentSection.set("travel", new int[] {template.getTravelPoint().getBlockX(),
+						template.getTravelPoint().getBlockY(),
+						template.getTravelPoint().getBlockZ()});
+	            monumentSection.set("cornerone", new int[] {template.getCornerOne().getBlockX(),
+						template.getCornerOne().getBlockY(),
+						template.getCornerOne().getBlockZ()});
+	            monumentSection.set("cornertwo", new int[] {template.getCornerTwo().getBlockX(),
+						template.getCornerTwo().getBlockY(),
+						template.getCornerTwo().getBlockZ()});
 			}
 		}
 		if(sanctuaryMap.isEmpty()) {

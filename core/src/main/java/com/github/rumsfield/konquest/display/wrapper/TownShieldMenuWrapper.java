@@ -1,11 +1,5 @@
 package com.github.rumsfield.konquest.display.wrapper;
 
-import java.util.List;
-import java.util.ListIterator;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.icon.ArmorIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
@@ -16,10 +10,15 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonShield;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+
+import java.util.List;
+import java.util.ListIterator;
 
 public class TownShieldMenuWrapper extends MenuWrapper {
 
-	private KonTown town;
+	private final KonTown town;
 	
 	public TownShieldMenuWrapper(Konquest konquest, KonTown town) {
 		super(konquest);
@@ -28,9 +27,9 @@ public class TownShieldMenuWrapper extends MenuWrapper {
 
 	@Override
 	public void constructMenu() {
-		String pageLabel = "";
+		String pageLabel;
 		ChatColor titleColor = DisplayManager.titleColor;
-		int pageTotal = 0;
+		int pageTotal;
 		final int MAX_ICONS_PER_PAGE = 45;
 		
 		// Page 0+

@@ -7,11 +7,12 @@ import com.github.rumsfield.konquest.display.DisplayMenu;
 import com.github.rumsfield.konquest.display.PagedMenu;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.model.KonPlayer;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class MenuWrapper {
 	
-	private PagedMenu menu;
-	private Konquest konquest;
+	private final PagedMenu menu;
+	private final Konquest konquest;
 	
 	public MenuWrapper(Konquest konquest) {
 		this.konquest = konquest;
@@ -25,8 +26,8 @@ public abstract class MenuWrapper {
 	public PagedMenu getMenu() {
 		return menu;
 	}
-	
-	// This can return null!
+
+	@Nullable
 	public Inventory getCurrentInventory() {
 		DisplayMenu currentPage = menu.getCurrentPage();
 		if(currentPage != null) {

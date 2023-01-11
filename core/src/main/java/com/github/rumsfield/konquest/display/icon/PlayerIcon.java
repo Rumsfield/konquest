@@ -1,30 +1,27 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import java.util.List;
-
-//import org.bukkit.Material;
+import com.github.rumsfield.konquest.Konquest;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-//import org.bukkit.inventory.meta.SkullMeta;
 
-import com.github.rumsfield.konquest.Konquest;
+import java.util.List;
 
 public class PlayerIcon implements MenuIcon {
 
 	public enum PlayerIconAction {
 		DISPLAY_SCORE,
 		DISPLAY_INFO,
-		GUILD;
-	}
+		GUILD
+    }
 	
-	private String name;
-	private List<String> lore;
-	private OfflinePlayer player;
-	private int index;
-	private boolean isClickable;
-	private PlayerIconAction action;
+	private final String name;
+	private final List<String> lore;
+	private final OfflinePlayer player;
+	private final int index;
+	private final boolean isClickable;
+	private final PlayerIconAction action;
 	
 	public PlayerIcon(String name, List<String> lore, OfflinePlayer player, int index, boolean isClickable, PlayerIconAction action) {
 		this.name = name;
@@ -35,23 +32,6 @@ public class PlayerIcon implements MenuIcon {
 		this.action = action;
 	}
 
-	/*private ItemStack initItem() {
-		ItemStack item = Konquest.getInstance().getPlayerHead(player);
-		ItemMeta meta = item.getItemMeta();
-		//ItemStack item = new ItemStack(Material.PLAYER_HEAD);
-		//SkullMeta meta = (SkullMeta)item.getItemMeta();
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
-		meta.setDisplayName(getName());
-		meta.setLore(lore);
-		//meta.setOwningPlayer(player);
-		item.setItemMeta(meta);
-		return item;
-	}*/
-	
 	public PlayerIconAction getAction() {
 		return action;
 	}
@@ -74,6 +54,7 @@ public class PlayerIcon implements MenuIcon {
 	public ItemStack getItem() {
 		ItemStack item = Konquest.getInstance().getPlayerHead(player);
 		ItemMeta meta = item.getItemMeta();
+		assert meta != null;
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
 				meta.addItemFlags(flag);

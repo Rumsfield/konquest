@@ -1,19 +1,5 @@
 package com.github.rumsfield.konquest.display;
 
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.UUID;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
@@ -23,7 +9,27 @@ import com.github.rumsfield.konquest.model.KonPlot;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+
+/*
+ * State Flow
+ * ROOT -> ROOT_CREATE -> EDIT_LAND_ADD -> EDIT_PLAYER_ADD -> (Finish)
+ * ROOT -> ROOT_DELETE -> (Finish)
+ * ROOT -> ROOT_EDIT -> EDIT -> EDIT_LAND_ADD -> (Finish)
+ * ROOT -> ROOT_EDIT -> EDIT -> EDIT_LAND_REMOVE -> (Finish)
+ * ROOT -> ROOT_EDIT -> EDIT -> EDIT_PLAYER_ADD -> (Finish)
+ * ROOT -> ROOT_EDIT -> EDIT -> EDIT_PLAYER_REMOVE -> (Finish)
+ *
+ * Plot edits are done to temporary plot object and committed to town upon finish.
+ */
 public class PlotMenu implements ViewableMenu {
 
 	enum PlotState {
@@ -38,28 +44,18 @@ public class PlotMenu implements ViewableMenu {
 		EDIT_LAND_REMOVE,
 		EDIT_PLAYER_SHOW,
 		EDIT_PLAYER_ADD,
-		EDIT_PLAYER_REMOVE;
+		EDIT_PLAYER_REMOVE
 	}
-	/*
-	 * State Flow
-	 * ROOT -> ROOT_CREATE -> EDIT_LAND_ADD -> EDIT_PLAYER_ADD -> (Finish)
-	 * ROOT -> ROOT_DELETE -> (Finish)
-	 * ROOT -> ROOT_EDIT -> EDIT -> EDIT_LAND_ADD -> (Finish)
-	 * ROOT -> ROOT_EDIT -> EDIT -> EDIT_LAND_REMOVE -> (Finish)
-	 * ROOT -> ROOT_EDIT -> EDIT -> EDIT_PLAYER_ADD -> (Finish)
-	 * ROOT -> ROOT_EDIT -> EDIT -> EDIT_PLAYER_REMOVE -> (Finish)
-	 * 
-	 * Plot edits are done to temporary plot object and committed to town upon finish.
-	 */
+
 	
-	private KonTown town;
+	private final KonTown town;
 	private Point center;
 	private Point origin;
-	private Player bukkitPlayer;
-	private int maxSize;
-	private Location playerLoc;
-	private HashMap<PlotState,DisplayMenu> views;
-	private ArrayList<DisplayMenu> playerPages;
+	private final Player bukkitPlayer;
+	private final int maxSize;
+	private final Location playerLoc;
+	private final HashMap<PlotState,DisplayMenu> views;
+	private final ArrayList<DisplayMenu> playerPages;
 	private int currentPlayerPage;
 	private PlotState currentPlotState;
 	private KonPlot editPlot = null;
@@ -79,11 +75,11 @@ public class PlotMenu implements ViewableMenu {
 		this.town = town;
 		this.bukkitPlayer = bukkitPlayer;
 		this.maxSize = maxSize;
-		this.playerLoc = bukkitPlayer.getLocation();;
+		this.playerLoc = bukkitPlayer.getLocation();
 		this.center = Konquest.toPoint(playerLoc);
 		this.origin = center;
-		this.views = new HashMap<PlotState,DisplayMenu>();
-		this.playerPages = new ArrayList<DisplayMenu>();
+		this.views = new HashMap<>();
+		this.playerPages = new ArrayList<>();
 		this.currentPlayerPage = 0;
 		this.currentPlotState = PlotState.ROOT;
 		initializeMenu();
@@ -92,20 +88,6 @@ public class PlotMenu implements ViewableMenu {
 	
 	private void initializeMenu() {
 		// Create empty display views by default
-		/*
-		playerPages.add(new DisplayMenu(2, ChatColor.BLACK+town.getName()+" Player"));
-		views.put(PlotState.ROOT, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Plots"));
-		views.put(PlotState.ROOT_CREATE, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Create Plot"));
-		views.put(PlotState.ROOT_DELETE, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Delete Plot"));
-		views.put(PlotState.ROOT_EDIT, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Edit Plot"));
-		views.put(PlotState.CREATE_LAND_ADD, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Add Land"));
-		views.put(PlotState.CREATE_PLAYER_ADD, new DisplayMenu(2, ChatColor.BLACK+town.getName()+" Add Player"));
-		views.put(PlotState.EDIT, new DisplayMenu(2, ChatColor.BLACK+town.getName()+" Edit"));
-		views.put(PlotState.EDIT_LAND_ADD, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Add Land"));
-		views.put(PlotState.EDIT_LAND_REMOVE, new DisplayMenu(6, ChatColor.BLACK+town.getName()+" Remove Land"));
-		views.put(PlotState.EDIT_PLAYER_ADD, new DisplayMenu(2, ChatColor.BLACK+town.getName()+" Add Player"));
-		views.put(PlotState.EDIT_PLAYER_REMOVE, new DisplayMenu(2, ChatColor.BLACK+town.getName()+" Remove Player"));
-		*/
 		if(!town.isLocInside(playerLoc)) {
 			center = Konquest.toPoint(town.getCenterLoc());
 		}
@@ -147,7 +129,7 @@ public class PlotMenu implements ViewableMenu {
 		Point drawPoint;
 		KonPlot drawPlot;
 		int colorSelect = 0;
-		HashMap<KonPlot,Material> plotColorMap = new HashMap<KonPlot,Material>();
+		HashMap<KonPlot,Material> plotColorMap = new HashMap<>();
 		int index = 0;
 		for(int r = -2; r <= 2; r++) {
 			for(int c = -4; c <= 4; c++) {
@@ -156,14 +138,13 @@ public class PlotMenu implements ViewableMenu {
 				drawPlot = null;
 				if(town.getChunkList().containsKey(drawPoint)) {
 					// This tile is claimed by the town
-					loreList = new ArrayList<String>();
-					//loreList.add(ChatColor.GOLD+""+drawPoint.x+","+drawPoint.y);
+					loreList = new ArrayList<>();
 			    	boolean isClickable = false;
 					Material landMat = Material.GREEN_STAINED_GLASS_PANE;
 					String landTitle = ChatColor.GREEN+MessagePath.MENU_PLOTS_TOWN_LAND.getMessage()+" | "+drawPoint.x+","+drawPoint.y;
 					boolean isPlot = false;
-					// Render all town land, then plots, then remove oldPlot if exist, then render editPlot if exist.
-					// Draw different plots in a sequence of stained glass pane colors.
+					// Render all town land, then plots, then remove oldPlot if exists, then render editPlot if exists.
+					// Draw different plots in a sequence of stained-glass pane colors.
 					if(town.hasPlot(drawPoint, town.getWorld())) {
 						drawPlot = town.getPlot(drawPoint, town.getWorld());
 						// Determine plot color
@@ -241,7 +222,6 @@ public class PlotMenu implements ViewableMenu {
 					}
 					// Add other info to lore
 					if(Konquest.toPoint(playerLoc).equals(drawPoint)) {
-						//landMat = Material.PLAYER_HEAD;
 						loreList.add(ChatColor.YELLOW+MessagePath.MENU_PLOTS_HERE.getMessage());
 					}
 					// Build icon and add to menu view
@@ -262,10 +242,10 @@ public class PlotMenu implements ViewableMenu {
 		final int MAX_ICONS_PER_PAGE = 45;
 		playerPages.clear();
 		currentPlayerPage = 0;
-		String loreStr = "";
-		boolean isClickable = false;
+		String loreStr;
+		boolean isClickable;
 		// Determine list of players for this paged view
-		List<OfflinePlayer> players = new ArrayList<OfflinePlayer>();
+		List<OfflinePlayer> players = new ArrayList<>();
 		if(context.equals(PlotState.EDIT_PLAYER_ADD) || context.equals(PlotState.CREATE_PLAYER_ADD)) {
 			players.addAll(town.getPlayerResidents());
 			players.removeAll(plot.getUserOfflinePlayers());
@@ -304,7 +284,7 @@ public class PlotMenu implements ViewableMenu {
 			while(slotIndex < MAX_ICONS_PER_PAGE && playerIter.hasNext()) {
 				/* Player Icon (n) */
 				OfflinePlayer currentPlayer = playerIter.next();
-				loreList = new ArrayList<String>();
+				loreList = new ArrayList<>();
 				loreList.add(loreStr);
 		    	PlayerIcon player = new PlayerIcon(ChatColor.GREEN+currentPlayer.getName(),loreList,currentPlayer,slotIndex,isClickable,PlayerIconAction.DISPLAY_INFO);
 				playerPages.get(pageNum).addIcon(player);
@@ -332,16 +312,12 @@ public class PlotMenu implements ViewableMenu {
 		if(slot <= navMaxIndex && slot >= navMinIndex) {
 			// Clicked in navigation bar, do something based on current state
 			int index = slot-navMinIndex;
-			//ChatUtil.printDebug("Plot Menu navigation update: State "+currentPlotState.toString()+", Index "+index);
 			switch(currentPlotState) {
 				case ROOT:
 					// Scroll arrows [0,1,2,3], close [4], create [5], delete [6], edit [7]
 					if(index >= 0 && index <= 3) {
 						result = scrollView(index);
-					} else if(index == 4) {
-						// Close
-						result = null;
-					} else if(index == 5) {
+					}else if(index == 5) {
 						// Create
 						result = goToState(PlotState.ROOT_CREATE);
 					} else if(index == 6) {
@@ -353,40 +329,11 @@ public class PlotMenu implements ViewableMenu {
 					}
 					break;
 				case ROOT_CREATE:
-					// Scroll arrows [0,1,2,3], close [4], return [5]
-					if(index >= 0 && index <= 3) {
-						result = scrollView(index);
-					} else if(index == 4) {
-						// Close
-						result = null;
-					} else if(index == 5) {
-						// Return
-						editPlot = null;
-						oldPlot = null;
-						result = goToState(PlotState.ROOT);
-					}
-					break;
+				case ROOT_EDIT:
 				case ROOT_DELETE:
 					// Scroll arrows [0,1,2,3], close [4], return [5]
 					if(index >= 0 && index <= 3) {
 						result = scrollView(index);
-					} else if(index == 4) {
-						// Close
-						result = null;
-					} else if(index == 5) {
-						// Return
-						editPlot = null;
-						oldPlot = null;
-						result = goToState(PlotState.ROOT);
-					}
-					break;
-				case ROOT_EDIT:
-					// Scroll arrows [0,1,2,3], close [4], return [5]
-					if(index >= 0 && index <= 3) {
-						result = scrollView(index);
-					} else if(index == 4) {
-						// Close
-						result = null;
 					} else if(index == 5) {
 						// Return
 						editPlot = null;
@@ -398,9 +345,6 @@ public class PlotMenu implements ViewableMenu {
 					// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
 					if(index >= 0 && index <= 3) {
 						result = scrollView(index);
-					} else if(index == 4) {
-						// Close
-						result = null;
 					} else if(index == 5) {
 						// Return
 						editPlot = null;
@@ -415,9 +359,6 @@ public class PlotMenu implements ViewableMenu {
 					// (back [0]) close [4], return [5], finish [6], (next [8])
 					if(index == 0) {
 						result = goPageBack();
-					} else if(index == 4) {
-						// Close
-						result = null;
 					} else if(index == 5) {
 						// Return
 						if(editPlot != null) {
@@ -426,7 +367,6 @@ public class PlotMenu implements ViewableMenu {
 						result = goToState(PlotState.CREATE_LAND_ADD);
 					} else if(index == 6) {
 						// Finish
-						result = null;
 						commitPlot();
 					} else if(index == 8) {
 						result = goPageNext();
@@ -434,10 +374,7 @@ public class PlotMenu implements ViewableMenu {
 					break;
 				case EDIT:
 					// Close [4], return [5]
-					if(index == 4) {
-						// Close
-						result = null;
-					} else if(index == 5) {
+					if(index == 5) {
 						// Return
 						editPlot = null;
 						oldPlot = null;
@@ -445,86 +382,29 @@ public class PlotMenu implements ViewableMenu {
 					}
 					break;
 				case EDIT_LAND_ADD:
-					// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
-					if(index >= 0 && index <= 3) {
-						result = scrollView(index);
-					} else if(index == 4) {
-						// Close
-						result = null;
-					} else if(index == 5) {
-						// Return
-						result = goToState(PlotState.EDIT);
-					} else if(index == 6) {
-						// Finish
-						result = null;
-						commitPlot();
-					}
-					break;
 				case EDIT_LAND_REMOVE:
 					// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
 					if(index >= 0 && index <= 3) {
 						result = scrollView(index);
-					} else if(index == 4) {
-						// Close
-						result = null;
-					} else if(index == 5) {
+					}  else if(index == 5) {
 						// Return
 						result = goToState(PlotState.EDIT);
 					} else if(index == 6) {
 						// Finish
-						result = null;
 						commitPlot();
 					}
 					break;
 				case EDIT_PLAYER_SHOW:
-					// (back [0]) close [4], return [5], finish [6], (next [8])
-					if(index == 0) {
-						result = goPageBack();
-					} else if(index == 4) {
-						// Close
-						result = null;
-					} else if(index == 5) {
-						// Return
-						result = goToState(PlotState.EDIT);
-					} else if(index == 6) {
-						// Finish
-						result = null;
-						commitPlot();
-					} else if(index == 8) {
-						result = goPageNext();
-					}
-					break;
 				case EDIT_PLAYER_ADD:
-					// (back [0]) close [4], return [5], finish [6], (next [8])
-					if(index == 0) {
-						result = goPageBack();
-					} else if(index == 4) {
-						// Close
-						result = null;
-					} else if(index == 5) {
-						// Return
-						result = goToState(PlotState.EDIT);
-					} else if(index == 6) {
-						// Finish
-						result = null;
-						commitPlot();
-					} else if(index == 8) {
-						result = goPageNext();
-					}
-					break;
 				case EDIT_PLAYER_REMOVE:
 					// (back [0]) close [4], return [5], finish [6], (next [8])
 					if(index == 0) {
 						result = goPageBack();
-					} else if(index == 4) {
-						// Close
-						result = null;
-					} else if(index == 5) {
+					}  else if(index == 5) {
 						// Return
 						result = goToState(PlotState.EDIT);
 					} else if(index == 6) {
 						// Finish
-						result = null;
 						commitPlot();
 					} else if(index == 8) {
 						result = goPageNext();
@@ -554,7 +434,6 @@ public class PlotMenu implements ViewableMenu {
 						// Choose plot to remove
 						oldPlot = town.getPlot(clickPoint,town.getWorld());
 						editPlot = null;
-						result = null;
 						commitPlot();
 					}
 					break;
@@ -581,7 +460,7 @@ public class PlotMenu implements ViewableMenu {
 					break;
 				case CREATE_PLAYER_ADD:
 					// Check for player icon click, add to chosen plot
-					if(clickedIcon != null && clickedIcon instanceof PlayerIcon && editPlot != null) {
+					if(clickedIcon instanceof PlayerIcon && editPlot != null) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
 						editPlot.addUser(icon.getOfflinePlayer());
 						result = goToState(PlotState.CREATE_PLAYER_ADD);
@@ -633,7 +512,7 @@ public class PlotMenu implements ViewableMenu {
 					break;
 				case EDIT_PLAYER_ADD:
 					// Check for player icon click, add to chosen plot
-					if(clickedIcon != null && clickedIcon instanceof PlayerIcon && editPlot != null) {
+					if(clickedIcon instanceof PlayerIcon && editPlot != null) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
 						editPlot.addUser(icon.getOfflinePlayer());
 						result = goToState(PlotState.EDIT_PLAYER_ADD);
@@ -641,7 +520,7 @@ public class PlotMenu implements ViewableMenu {
 					break;
 				case EDIT_PLAYER_SHOW:
 					// Check for player icon click, move player to first index in user list
-					if(clickedIcon != null && clickedIcon instanceof PlayerIcon && editPlot != null) {
+					if(clickedIcon instanceof PlayerIcon && editPlot != null) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
 						List<UUID> members = editPlot.getUsers();
 						if(members.remove(icon.getOfflinePlayer().getUniqueId())) {
@@ -654,7 +533,7 @@ public class PlotMenu implements ViewableMenu {
 					break;
 				case EDIT_PLAYER_REMOVE:
 					// Check for player icon click, remove from chosen plot
-					if(clickedIcon != null && clickedIcon instanceof PlayerIcon && editPlot != null) {
+					if(clickedIcon instanceof PlayerIcon && editPlot != null) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
 						editPlot.removeUser(icon.getOfflinePlayer());
 						result = goToState(PlotState.EDIT_PLAYER_REMOVE);
@@ -672,22 +551,22 @@ public class PlotMenu implements ViewableMenu {
 		DisplayMenu result = null;
 		if(index == 0) {
 			// Scroll left
-			origin = new Point(origin.x - 1, origin.y + 0);
+			origin = new Point(origin.x - 1, origin.y);
 			result = createLandView(origin,currentPlotState);
 			views.put(currentPlotState, result);
 		} else if(index == 1) {
 			// Scroll up
-			origin = new Point(origin.x + 0, origin.y - 1);
+			origin = new Point(origin.x, origin.y - 1);
 			result = createLandView(origin,currentPlotState);
 			views.put(currentPlotState, result);
 		} else if(index == 2) {
 			// Scroll down
-			origin = new Point(origin.x + 0, origin.y + 1);
+			origin = new Point(origin.x, origin.y + 1);
 			result = createLandView(origin,currentPlotState);
 			views.put(currentPlotState, result);
 		} else if(index == 3) {
 			// Scroll right
-			origin = new Point(origin.x + 1, origin.y + 0);
+			origin = new Point(origin.x + 1, origin.y);
 			result = createLandView(origin,currentPlotState);
 			views.put(currentPlotState, result);
 		}
@@ -699,51 +578,24 @@ public class PlotMenu implements ViewableMenu {
 		currentPlotState = context;
 		switch(context) {
 			case ROOT:
-				result = createLandView(origin,currentPlotState);
-				views.put(currentPlotState, result);
-				break;
 			case ROOT_CREATE:
-				result = createLandView(origin,currentPlotState);
-				views.put(currentPlotState, result);
-				break;
 			case ROOT_DELETE:
-				result = createLandView(origin,currentPlotState);
-				views.put(currentPlotState, result);
-				break;
 			case ROOT_EDIT:
-				result = createLandView(origin,currentPlotState);
-				views.put(currentPlotState, result);
-				break;
 			case CREATE_LAND_ADD:
+			case EDIT_LAND_REMOVE:
+			case EDIT_LAND_ADD:
 				result = createLandView(origin,currentPlotState);
 				views.put(currentPlotState, result);
 				break;
 			case CREATE_PLAYER_ADD:
+			case EDIT_PLAYER_REMOVE:
+			case EDIT_PLAYER_ADD:
+			case EDIT_PLAYER_SHOW:
 				result = createPlayerView(editPlot,currentPlotState);
 				views.put(currentPlotState, result);
 				break;
 			case EDIT:
 				result = views.get(currentPlotState);
-				break;
-			case EDIT_LAND_ADD:
-				result = createLandView(origin,currentPlotState);
-				views.put(currentPlotState, result);
-				break;
-			case EDIT_LAND_REMOVE:
-				result = createLandView(origin,currentPlotState);
-				views.put(currentPlotState, result);
-				break;
-			case EDIT_PLAYER_SHOW:
-				result = createPlayerView(editPlot,currentPlotState);
-				views.put(currentPlotState, result);
-				break;
-			case EDIT_PLAYER_ADD:
-				result = createPlayerView(editPlot,currentPlotState);
-				views.put(currentPlotState, result);
-				break;
-			case EDIT_PLAYER_REMOVE:
-				result = createPlayerView(editPlot,currentPlotState);
-				views.put(currentPlotState, result);
 				break;
 			default:
 				break;
@@ -752,7 +604,7 @@ public class PlotMenu implements ViewableMenu {
 	}
 	
 	private DisplayMenu goPageBack() {
-		DisplayMenu result = null;
+		DisplayMenu result;
 		int newIndex = currentPlayerPage-1;
 		if(newIndex >= 0) {
 			currentPlayerPage = newIndex;
@@ -763,7 +615,7 @@ public class PlotMenu implements ViewableMenu {
 	}
 	
 	private DisplayMenu goPageNext() {
-		DisplayMenu result = null;
+		DisplayMenu result;
 		int newIndex = currentPlayerPage+1;
 		if(newIndex < playerPages.size()) {
 			currentPlayerPage = newIndex;
@@ -797,7 +649,7 @@ public class PlotMenu implements ViewableMenu {
 		}
 		if(context.equals(PlotState.ROOT)) {
 			// Scroll arrows [0,1,2,3], close [4], create [5], delete [6], edit [7]
-			view.addIcon(navIconScrollLeft(navStart+0));
+			view.addIcon(navIconScrollLeft(navStart));
 			view.addIcon(navIconScrollUp(navStart+1));
 			view.addIcon(navIconScrollDown(navStart+2));
 			view.addIcon(navIconScrollRight(navStart+3));
@@ -808,7 +660,7 @@ public class PlotMenu implements ViewableMenu {
 			view.addIcon(navIconEmpty(navStart+8));
 		} else if(context.equals(PlotState.ROOT_CREATE) || context.equals(PlotState.ROOT_DELETE) || context.equals(PlotState.ROOT_EDIT)) {
 			// Scroll arrows [0,1,2,3], close [4], return [5]
-			view.addIcon(navIconScrollLeft(navStart+0));
+			view.addIcon(navIconScrollLeft(navStart));
 			view.addIcon(navIconScrollUp(navStart+1));
 			view.addIcon(navIconScrollDown(navStart+2));
 			view.addIcon(navIconScrollRight(navStart+3));
@@ -819,7 +671,7 @@ public class PlotMenu implements ViewableMenu {
 			view.addIcon(navIconEmpty(navStart+8));
 		} else if(context.equals(PlotState.CREATE_LAND_ADD) || context.equals(PlotState.EDIT_LAND_ADD) || context.equals(PlotState.EDIT_LAND_REMOVE)) {
 			// Scroll arrows [0,1,2,3], close [4], return [5], finish [6]
-			view.addIcon(navIconScrollLeft(navStart+0));
+			view.addIcon(navIconScrollLeft(navStart));
 			view.addIcon(navIconScrollUp(navStart+1));
 			view.addIcon(navIconScrollDown(navStart+2));
 			view.addIcon(navIconScrollRight(navStart+3));
@@ -832,9 +684,9 @@ public class PlotMenu implements ViewableMenu {
 			// (back [0]) close [4], return [5], finish [6], (next [8])
 			if(currentPlayerPage > 0) {
 				// Place a back button
-				view.addIcon(navIconBack(navStart+0));
+				view.addIcon(navIconBack(navStart));
 			} else {
-				view.addIcon(navIconEmpty(navStart+0));
+				view.addIcon(navIconEmpty(navStart));
 			}
 			if(currentPlayerPage < playerPages.size()-1) {
 				// Place a next button
@@ -851,7 +703,7 @@ public class PlotMenu implements ViewableMenu {
 			view.addIcon(navIconEmpty(navStart+7));
 		} else if(context.equals(PlotState.EDIT)) {
 			// Close [4], return [5]
-			view.addIcon(navIconEmpty(navStart+0));
+			view.addIcon(navIconEmpty(navStart));
 			view.addIcon(navIconEmpty(navStart+1));
 			view.addIcon(navIconEmpty(navStart+2));
 			view.addIcon(navIconEmpty(navStart+3));
@@ -880,25 +732,21 @@ public class PlotMenu implements ViewableMenu {
 				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_EDIT.getMessage();
 				break;
 			case CREATE_LAND_ADD:
+			case EDIT_LAND_ADD:
 				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_ADD_LAND.getMessage();
 				break;
 			case CREATE_PLAYER_ADD:
+			case EDIT_PLAYER_ADD:
 				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_ADD_PLAYERS.getMessage();
 				break;
 			case EDIT:
 				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_EDIT_OPTIONS.getMessage();
-				break;
-			case EDIT_LAND_ADD:
-				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_ADD_LAND.getMessage();
 				break;
 			case EDIT_LAND_REMOVE:
 				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_REMOVE_LAND.getMessage();
 				break;
 			case EDIT_PLAYER_SHOW:
 				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_SHOW_PLAYERS.getMessage();
-				break;
-			case EDIT_PLAYER_ADD:
-				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_ADD_PLAYERS.getMessage();
 				break;
 			case EDIT_PLAYER_REMOVE:
 				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_REMOVE_PLAYERS.getMessage();
@@ -927,24 +775,23 @@ public class PlotMenu implements ViewableMenu {
 		 */
 		int xDiff = (slot % 9) - 4;
 		int yDiff = Math.floorDiv(slot, 9) - 2;
-		Point result = new Point(origin.x + xDiff, origin.y + yDiff);
-		return result;
+		return new Point(origin.x + xDiff, origin.y + yDiff);
 	}
 	
 	private InfoIcon navIconScrollLeft(int index) {
-		return new InfoIcon(ChatColor.GOLD+"\u25C0",Collections.emptyList(),Material.STONE_BUTTON,index,true);
+		return new InfoIcon(ChatColor.GOLD+"◀",Collections.emptyList(),Material.STONE_BUTTON,index,true);
 	}
 	
 	private InfoIcon navIconScrollRight(int index) {
-		return new InfoIcon(ChatColor.GOLD+"\u25B6",Collections.emptyList(),Material.STONE_BUTTON,index,true);
+		return new InfoIcon(ChatColor.GOLD+"▶",Collections.emptyList(),Material.STONE_BUTTON,index,true);
 	}
 	
 	private InfoIcon navIconScrollUp(int index) {
-		return new InfoIcon(ChatColor.GOLD+"\u25B2",Collections.emptyList(),Material.STONE_BUTTON,index,true);
+		return new InfoIcon(ChatColor.GOLD+"▲",Collections.emptyList(),Material.STONE_BUTTON,index,true);
 	}
 	
 	private InfoIcon navIconScrollDown(int index) {
-		return new InfoIcon(ChatColor.GOLD+"\u25BC",Collections.emptyList(),Material.STONE_BUTTON,index,true);
+		return new InfoIcon(ChatColor.GOLD+"▼",Collections.emptyList(),Material.STONE_BUTTON,index,true);
 	}
 	
 	private InfoIcon navIconCreate(int index) {

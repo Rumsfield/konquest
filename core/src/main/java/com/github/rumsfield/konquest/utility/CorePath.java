@@ -195,7 +195,7 @@ public enum CorePath {
 	NONE									  ("");
 	
 	
-	private String path;
+	private final String path;
 	
 	CorePath(String path) {
 		this.path = path;

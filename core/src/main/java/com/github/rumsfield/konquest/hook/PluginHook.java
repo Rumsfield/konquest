@@ -2,10 +2,10 @@ package com.github.rumsfield.konquest.hook;
 
 public interface PluginHook {
 
-	public void reload();
+	default void reload() {}
 	
-	public void shutdown();
+	default void shutdown(){}
 	
-	public boolean isEnabled();
+	boolean isEnabled();
 	
 }

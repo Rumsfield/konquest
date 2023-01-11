@@ -1,8 +1,8 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.model.KonShield;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -10,16 +10,15 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonShield;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShieldIcon implements MenuIcon {
 
-	private KonShield shield;
-	private boolean isAvailable;
-	private int population;
-	private int index;
+	private final KonShield shield;
+	private final boolean isAvailable;
+	private final int population;
+	private final int index;
 	ItemStack item;
 	
 	public ShieldIcon(KonShield shield, boolean isAvailable, int population, int index) {
@@ -37,6 +36,7 @@ public class ShieldIcon implements MenuIcon {
 		}
 		ItemStack item = new ItemStack(mat,1);
 		ItemMeta meta = item.getItemMeta();
+		assert meta != null;
 		meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
@@ -44,8 +44,7 @@ public class ShieldIcon implements MenuIcon {
 			}
 		}
 		int totalCost = population * shield.getCost();
-		List<String> loreList = new ArrayList<String>();
-		//loreList.add(ChatColor.BOLD+""+ChatColor.DARK_AQUA+shield.getDurationFormat());
+		List<String> loreList = new ArrayList<>();
 		loreList.add(Konquest.getTimeFormat(shield.getDurationSeconds(), ChatColor.DARK_AQUA));
     	loreList.add(ChatColor.YELLOW+MessagePath.LABEL_COST.getMessage()+": "+ChatColor.AQUA+totalCost);
     	if(isAvailable) {

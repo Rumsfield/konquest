@@ -21,21 +21,21 @@ import java.util.Set;
 
 public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplayer, Timeable {
 
-	private Timer spawnTimer;
-	private Timer captureTimer;
+	private final Timer spawnTimer;
+	private final Timer captureTimer;
 	private boolean isCaptureDisabled;
-	private BossBar ruinBarAll;
-	private HashMap<Location,Boolean> criticalLocations; // Block location, enabled flag
-	private HashMap<Location,KonRuinGolem> spawnLocations; // Block location, Ruin Golem
+	private final BossBar ruinBarAll;
+	private final HashMap<Location,Boolean> criticalLocations; // Block location, enabled flag
+	private final HashMap<Location,KonRuinGolem> spawnLocations; // Block location, Ruin Golem
 
 	/*
 	 * Ruin Golem Behavior:
-	 * + All spawn when player enters ruin & not on respawn cooldown & ruin is not disabled
+	 * + All spawn when player enters ruin & not on respawn cool-down & ruin is not disabled
 	 * + All alive target player that interacts with critical block (begins mining)
-	 * + When a golem is killed, respawn at location after cooldown if players are inside ruin & ruin is not disabled
+	 * + When a golem is killed, respawn at location after cool-down if players are inside ruin & ruin is not disabled
 	 * + When a target player leaves the ruin, stop targeting
 	 * + Kill all alive when a ruin is captured
-	 * + Remove all when a ruin ends capture cooldown & no players are inside
+	 * + Remove all when a ruin ends capture cool-down & no players are inside
 	 * + When a golem changes target to a monster due to pathfinding, kill the monster and switch targets back to last player
 	 */
 	public KonRuin(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
@@ -45,8 +45,8 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		this.isCaptureDisabled = false;
 		this.ruinBarAll = Bukkit.getServer().createBossBar(ChatColor.WHITE+name, BarColor.WHITE, BarStyle.SOLID);
 		this.ruinBarAll.setVisible(true);
-		this.criticalLocations = new HashMap<Location,Boolean>();
-		this.spawnLocations = new HashMap<Location,KonRuinGolem>();
+		this.criticalLocations = new HashMap<>();
+		this.spawnLocations = new HashMap<>();
 	}
 
 	@Override
@@ -95,7 +95,6 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 					golem.setIsRespawnCooldown(false);
 					if(!isCaptureDisabled && !isEmpty()) {
 						golem.spawn();
-						//ChatUtil.printDebug("Respawned golem in ruin "+getName());
 					} else {
 						ChatUtil.printDebug("Failed to respawn golem in disabled or empty ruin "+getName());
 					}
@@ -157,8 +156,8 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		}
 	}
 	
-	public void setBarProgress(double prog) {
-		ruinBarAll.setProgress(prog);
+	public void setBarProgress(double progress) {
+		ruinBarAll.setProgress(progress);
 	}
 
 	public void addCriticalLocation(Location loc) {
@@ -319,7 +318,6 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		for(KonRuinGolem golem : spawnLocations.values()) {
 			golem.targetTo(player);
 		}
-		//ChatUtil.printDebug("Targeting all golems to player "+player.getName());
 	}
 	
 	public void targetGolemToPlayer(Player player, IronGolem targetGolem) {
@@ -328,7 +326,6 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 				golem.targetTo(player);
 			}
 		}
-		//ChatUtil.printDebug("Targeting player "+player.getName());
 	}
 	
 	public void targetGolemToLast(IronGolem targetGolem) {
@@ -355,7 +352,6 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 				golem.dropTargets();
 			}
 		}
-		//ChatUtil.printDebug("Stopped targeting player "+player.getName());
 	}
 	
 	public boolean isGolem(IronGolem testGolem) {
@@ -378,7 +374,6 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 				golem.getRespawnTimer().stopTimer();
 				golem.getRespawnTimer().setTime(golemRespawnTimeSeconds);
 				golem.getRespawnTimer().startTimer();
-				//ChatUtil.printDebug("Started respawn timer for golem in ruin "+getName());
 			}
 		}
 	}

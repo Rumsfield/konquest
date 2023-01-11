@@ -1,21 +1,20 @@
 package com.github.rumsfield.konquest.command.admin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonPlayer.RegionType;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class RuinAdminCommand extends CommandBase {
 
@@ -52,8 +51,7 @@ public class RuinAdminCommand extends CommandBase {
         	boolean pass = getKonquest().getRuinManager().addRuin(playerLoc, ruinName);
         	if(!pass) {
         		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_ERROR_CREATE.getMessage(ruinName));
-                return;
-        	} else {
+			} else {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CREATE.getMessage(ruinName));
         		// Render border particles
         		getKonquest().getTerritoryManager().updatePlayerBorderParticles(player);
@@ -67,8 +65,7 @@ public class RuinAdminCommand extends CommandBase {
 			boolean pass = getKonquest().getRuinManager().removeRuin(ruinName);
         	if(!pass) {
         		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_ERROR_REMOVE.getMessage(ruinName));
-                return;
-        	} else {
+			} else {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_REMOVE.getMessage(ruinName));
         	}
 		} else if(cmdMode.equalsIgnoreCase("rename")) {
@@ -84,13 +81,11 @@ public class RuinAdminCommand extends CommandBase {
 				boolean pass = getKonquest().getRuinManager().renameRuin(ruinName,newName);
 				if(!pass) {
 	        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_ERROR_RENAME.getMessage(ruinName,newName));
-	                return;
-	        	} else {
+				} else {
 	        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_RENAME.getMessage(ruinName,newName));
 	        	}
 			} else {
 				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-	            return;
 			}
 		} else if(cmdMode.equalsIgnoreCase("criticals")) {
         	if(player.isSettingRegion()) {
@@ -122,7 +117,6 @@ public class RuinAdminCommand extends CommandBase {
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 		} else {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
 		}
 	}
 

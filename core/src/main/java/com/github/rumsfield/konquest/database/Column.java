@@ -1,7 +1,7 @@
 package com.github.rumsfield.konquest.database;
 
 public class Column {
-    private String name;
+    private final String name;
     private String type;
     private String defaultValue;
     private Table table;

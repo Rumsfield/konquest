@@ -16,7 +16,7 @@ import java.util.HashMap;
 
 public class TownUpgradeMenuWrapper extends MenuWrapper {
 
-	private KonTown town;
+	private final KonTown town;
 	
 	public TownUpgradeMenuWrapper(Konquest konquest, KonTown town) {
 		super(konquest);

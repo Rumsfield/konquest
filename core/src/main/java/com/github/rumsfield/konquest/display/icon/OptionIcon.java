@@ -1,11 +1,11 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import java.util.List;
-
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
 
 public class OptionIcon implements MenuIcon {
 
@@ -13,15 +13,15 @@ public class OptionIcon implements MenuIcon {
 		TOWN_OPEN,
 		TOWN_PLOT_ONLY,
 		TOWN_REDSTONE,
-		TOWN_GOLEM;
-	}
+		TOWN_GOLEM
+    }
 	
-	private optionAction action;
-	private String name;
-	private List<String> lore;
-	private Material mat;
-	private int index;
-	private ItemStack item;
+	private final optionAction action;
+	private final String name;
+	private final List<String> lore;
+	private final Material mat;
+	private final int index;
+	private final ItemStack item;
 	
 	public OptionIcon(optionAction action, String name, List<String> lore, Material mat, int index) {
 		this.action = action;
@@ -35,6 +35,7 @@ public class OptionIcon implements MenuIcon {
 	private ItemStack initItem() {
 		ItemStack item = new ItemStack(mat);
 		ItemMeta meta = item.getItemMeta();
+		assert meta != null;
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
 				meta.addItemFlags(flag);

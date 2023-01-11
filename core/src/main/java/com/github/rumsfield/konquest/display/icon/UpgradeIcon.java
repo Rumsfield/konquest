@@ -32,12 +32,13 @@ public class UpgradeIcon implements MenuIcon{
 	private ItemStack initItem() {
 		ItemStack item = new ItemStack(upgrade.getIcon(),1);
 		ItemMeta meta = item.getItemMeta();
+		assert meta != null;
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
 				meta.addItemFlags(flag);
 			}
 		}
-		List<String> loreList = new ArrayList<String>();
+		List<String> loreList = new ArrayList<>();
 		loreList.add(ChatColor.YELLOW+MessagePath.LABEL_LEVEL.getMessage()+" "+level);
 		loreList.add(ChatColor.YELLOW+MessagePath.LABEL_COST.getMessage()+": "+ChatColor.AQUA+cost);
 		loreList.add(ChatColor.YELLOW+MessagePath.LABEL_POPULATION.getMessage()+": "+ChatColor.AQUA+pop);
@@ -79,53 +80,3 @@ public class UpgradeIcon implements MenuIcon{
 	}
 
 }
-
-/*
-public class UpgradeIcon extends MenuIcon{
-
-	KonUpgrade upgrade;
-	int level;
-	int cost;
-	int pop;
-	
-	public UpgradeIcon(KonUpgrade upgrade, int level, int index, int cost, int pop) {
-		super(upgrade.getDescription(), index);
-		this.upgrade = upgrade;
-		this.level = level;
-		this.cost = cost;
-		this.pop = pop;
-		setItem(initItem());
-	}
-
-	@Override
-	public ItemStack initItem() {
-		ItemStack item = new ItemStack(upgrade.getIcon(),1);
-		ItemMeta meta = item.getItemMeta();
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
-		List<String> loreList = new ArrayList<String>();
-		loreList.add(ChatColor.YELLOW+"Level "+level);
-		loreList.add(ChatColor.YELLOW+"Cost: "+ChatColor.AQUA+cost);
-		loreList.add(ChatColor.YELLOW+"Population: "+ChatColor.AQUA+pop);
-		for(String line : Konquest.stringPaginate(upgrade.getLevelDescription(level))) {
-			loreList.add(ChatColor.RED+line);
-		}
-		meta.setDisplayName(ChatColor.GOLD+upgrade.getDescription());
-		meta.setLore(loreList);
-		item.setItemMeta(meta);
-		return item;
-	}
-	
-	public KonUpgrade getUpgrade() {
-		return upgrade;
-	}
-	
-	public int getLevel() {
-		return level;
-	}
-
-}
-*/

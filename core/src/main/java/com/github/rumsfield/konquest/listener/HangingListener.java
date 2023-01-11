@@ -8,28 +8,24 @@ import com.github.rumsfield.konquest.model.KonTerritory;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 
 public class HangingListener implements Listener {
 
-	private KonquestPlugin konquestPlugin;
-	private Konquest konquest;
-	private TerritoryManager territoryManager;
+	private final Konquest konquest;
+	private final TerritoryManager territoryManager;
 	
 	public HangingListener(KonquestPlugin plugin) {
-		this.konquestPlugin = plugin;
-		this.konquest = konquestPlugin.getKonquestInstance();
+		this.konquest = plugin.getKonquestInstance();
 		this.territoryManager = konquest.getTerritoryManager();
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onHangingPlace(HangingPlaceEvent event) {
 		Location placeLoc = event.getEntity().getLocation();
 		if(territoryManager.isChunkClaimed(placeLoc)) {
@@ -43,15 +39,13 @@ public class HangingListener implements Listener {
 					KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 					event.setCancelled(true);
-					return;
 				}
 			}
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onHangingBreak(HangingBreakByEntityEvent event) {
-		//ChatUtil.printDebug("EVENT: Hanging Entity Broke");
 		Location brakeLoc = event.getEntity().getLocation();
 		if(territoryManager.isChunkClaimed(brakeLoc)) {
 			KonTerritory territory = territoryManager.getChunkTerritory(brakeLoc);
@@ -66,7 +60,6 @@ public class HangingListener implements Listener {
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 					}
 					event.setCancelled(true);
-					return;
 				}
 			}
 		}

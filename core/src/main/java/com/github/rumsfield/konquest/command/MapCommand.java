@@ -1,19 +1,18 @@
 package com.github.rumsfield.konquest.command;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.manager.TerritoryManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MapCommand extends CommandBase {
 
@@ -27,16 +26,9 @@ public class MapCommand extends CommandBase {
 		// k map [far|f|auto|a]
     	if (getArgs().length != 1 && getArgs().length != 2) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
-        	//World bukkitWorld = bukkitPlayer.getWorld();
-        	/*
-        	if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
-        		ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_WORLD.toString());
-                return;
-        	}*/
-        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
+			if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
@@ -44,24 +36,17 @@ public class MapCommand extends CommandBase {
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 			// Display formatted text in chat as chunk map
         	// 10 lines of text by default
-        	//int mapSize = 9; // must be odd so that player's chunk is in the center
         	
         	if(getArgs().length == 2) {
-        		/*if(!getArgs()[1].equalsIgnoreCase("far") && !getArgs()[1].equalsIgnoreCase("f")) {
-        			ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_PARAMETERS.toString());
-                    return;
-        		}*/
         		if(getArgs()[1].equalsIgnoreCase("far") || getArgs()[1].equalsIgnoreCase("f")) {
         			mapSize = 19;
         		} else if(getArgs()[1].equalsIgnoreCase("auto") || getArgs()[1].equalsIgnoreCase("a")) {
         			if(player.isMapAuto()) {
         				player.setIsMapAuto(false);
-        				//ChatUtil.sendNotice((Player) getSender(), "Disabled auto map");
         				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
         				return;
         			} else {
         				player.setIsMapAuto(true);
-        				//ChatUtil.sendNotice((Player) getSender(), "Enabled auto map");
         				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
         			}
         		} else {
@@ -70,12 +55,8 @@ public class MapCommand extends CommandBase {
         		}
         	}
         	
-        	Bukkit.getScheduler().runTaskAsynchronously(getKonquest().getPlugin(), new Runnable() {
-                @Override
-                public void run() {
-                	getKonquest().getTerritoryManager().printPlayerMap(player, mapSize);
-                }
-            });
+        	Bukkit.getScheduler().runTaskAsynchronously(getKonquest().getPlugin(),
+					() -> getKonquest().getTerritoryManager().printPlayerMap(player, mapSize));
         	
         }
 	}

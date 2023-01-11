@@ -24,17 +24,12 @@ public class Handler_1_19_R1 implements VersionHandler {
 	@Override
 	public void applyTradeDiscount(double discountPercent, boolean isStack, MerchantInventory merchantInventory) {
 		// Get and set special price with API methods
-		int amount = 0;
-		int discount = 0;
+		int amount;
+		int discount;
 		Merchant tradeHost = merchantInventory.getMerchant();
-		List<MerchantRecipe> tradeListDiscounted = new ArrayList<MerchantRecipe>();
+		List<MerchantRecipe> tradeListDiscounted = new ArrayList<>();
 		for(MerchantRecipe trade : tradeHost.getRecipes()) {
-			//ChatUtil.printDebug("Found trade for "+trade.getResult().getType().toString()+" with price mult "+trade.getPriceMultiplier()+
-			//		", special "+trade.getSpecialPrice()+", uses "+trade.getUses()+", max "+trade.getMaxUses());
 			List<ItemStack> ingredientList = trade.getIngredients();
-			//for(ItemStack ingredient : ingredientList) {
-			//	ChatUtil.printDebug("  Has ingredient "+ingredient.getType().toString()+", amount: "+ingredient.getAmount());
-			//}
 			if(!ingredientList.isEmpty()) {
 				amount = ingredientList.get(0).getAmount();
 				discount = (int)(amount*discountPercent*-1);

@@ -1,11 +1,10 @@
 package com.github.rumsfield.konquest.model;
 
-import java.awt.Point;
-
+import com.github.rumsfield.konquest.Konquest;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import com.github.rumsfield.konquest.Konquest;
+import java.awt.*;
 
 public class KonMonumentTemplate {
 
@@ -15,7 +14,7 @@ public class KonMonumentTemplate {
 	private boolean isValid;
 	private boolean isBlanking;
 	private boolean hasLoot;
-	private String name;
+	private final String name;
 	private int numCriticals;
 	private int numBlocks;
 	private int numLootChests;
@@ -124,14 +123,11 @@ public class KonMonumentTemplate {
         int bottomBlockX = Math.min(corner1.getBlockX(), corner2.getBlockX());
         int bottomBlockY = Math.min(corner1.getBlockY(), corner2.getBlockY());
         int bottomBlockZ = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
-        if(loc.getBlockX() <= topBlockX && loc.getBlockY() <= topBlockY && loc.getBlockZ() <= topBlockZ &&
-        		loc.getBlockX() >= bottomBlockX && loc.getBlockY() >= bottomBlockY && loc.getBlockZ() >= bottomBlockZ) {
-        	return true;
-        }
-		return false;
+		return loc.getBlockX() <= topBlockX && loc.getBlockY() <= topBlockY && loc.getBlockZ() <= topBlockZ &&
+				loc.getBlockX() >= bottomBlockX && loc.getBlockY() >= bottomBlockY && loc.getBlockZ() >= bottomBlockZ;
 	}
 	
-	// Returns true if this template's region is inside of the given chunk (point,world)
+	// Returns true if this template's region is inside the given chunk (point,world)
 	public boolean isInsideChunk(Point point, World world) {
 		boolean result = false;
 		if(corner1.getWorld().equals(world) && corner2.getWorld().equals(world)) {

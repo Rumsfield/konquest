@@ -1,24 +1,19 @@
 package com.github.rumsfield.konquest.manager;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonStatsType;
 import com.github.rumsfield.konquest.model.KonTerritory;
 import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.Timeable;
-import com.github.rumsfield.konquest.utility.Timer;
-import com.github.rumsfield.konquest.utility.TravelPlan;
+import com.github.rumsfield.konquest.utility.*;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 public class TravelManager implements Timeable {
 
@@ -27,16 +22,16 @@ public class TravelManager implements Timeable {
 		CAMP,
 		HOME,
 		TOWN,
-		WILD;
+		WILD
 	}
 	
-	private Konquest konquest;
-	private HashMap<Player, TravelPlan> travelers;
-	private Timer travelExecutor;
+	private final Konquest konquest;
+	private final HashMap<Player, TravelPlan> travelers;
+	private final Timer travelExecutor;
 	
 	public TravelManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.travelers = new HashMap<Player, TravelPlan>();
+		this.travelers = new HashMap<>();
 		this.travelExecutor = new Timer(this);
 		this.travelExecutor.stopTimer();
 		this.travelExecutor.setTime(1);
@@ -49,7 +44,7 @@ public class TravelManager implements Timeable {
 		if(warmupSeconds > 0) {
 			// There is a warmup time, queue the travel
 			Date now = new Date();
-			long warmupFinishTime = now.getTime() + (warmupSeconds*1000);
+			long warmupFinishTime = now.getTime() + (warmupSeconds* 1000L);
 			travelers.put(bukkitPlayer, new TravelPlan(bukkitPlayer, destination, territory, travelLoc, warmupFinishTime, cost));
 			ChatUtil.printDebug("Submitted new travel plan for "+bukkitPlayer.getName()+": now "+now.getTime()+" to "+warmupFinishTime+", size "+travelers.size());
 		} else {
@@ -75,7 +70,7 @@ public class TravelManager implements Timeable {
 		ChatUtil.printDebug("Executing travel for "+bukkitPlayer.getName()+" to "+destination.toString()+" "+territoryName);
 		switch (destination) {
 			case TOWN:
-				if(territory != null && territory instanceof KonTown) {
+				if(territory instanceof KonTown) {
 					KonTown town = (KonTown)(territory);
 					town.addPlayerTravelCooldown(bukkitPlayer.getUniqueId());
 		    		// Give raid defender reward
@@ -116,8 +111,8 @@ public class TravelManager implements Timeable {
 			ChatUtil.printDebug("Travel Executor Timer ended with null taskID!");
 		} else if(taskID == travelExecutor.getTaskID()) {
 			// Evaluate all travelers for expired warmup times, and execute travel for them
-			ArrayList<Player> expiredTravelers = new ArrayList<Player>();
-			ArrayList<TravelPlan> expiredPlans = new ArrayList<TravelPlan>();
+			ArrayList<Player> expiredTravelers = new ArrayList<>();
+			ArrayList<TravelPlan> expiredPlans = new ArrayList<>();
 			for(Player traveler : travelers.keySet()) {
 				Date now = new Date();
 				if(now.after(new Date(travelers.get(traveler).getWarmupEndTime()))) {

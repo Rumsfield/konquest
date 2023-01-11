@@ -1,11 +1,14 @@
 package com.github.rumsfield.konquest.manager;
 
-import java.lang.reflect.Field;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.model.KonMonumentTemplate;
+import com.github.rumsfield.konquest.model.KonPlayer;
+import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.model.KonUpgrade;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.Timeable;
+import com.github.rumsfield.konquest.utility.Timer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,69 +23,33 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonUpgrade;
-import com.github.rumsfield.konquest.model.KonMonumentTemplate;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.Timeable;
-import com.github.rumsfield.konquest.utility.Timer;
+import java.lang.reflect.Field;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class LootManager implements Timeable{
 
-	private Konquest konquest;
-	private HashMap<Location, Long> lootRefreshLog;
+	private final Konquest konquest;
+	private final HashMap<Location, Long> lootRefreshLog;
 	private long refreshTimeSeconds;
 	private long markedRefreshTime;
 	private int lootCount;
-	private Random randomness;
-	private Timer lootRefreshTimer;
-	private HashMap<ItemStack,Integer> lootTable;
-	
-	/*
-	 * Monument loot is divided into different categories:
-	 * Valuables - Gold Ingots, Iron Ingots, Diamonds, Emeralds
-	 * Enchantment Books - Randomly applied enchantments on books
-	 * Eggs - Randomly generated eggs
-	 * Exotics - end stone, prismarine, purpur, mycelium
-	 * Food - cooked meat, etc
-	 * Others - Saddle, End Pearl, Blaze Rod, Music Disc
-	 */
-	/*
-	public enum LootType {
-		VALUABLE (4),
-		POTIONS (9),
-		FOOD (6),
-		HORSE (4),
-		EXTRA (4),
-		JUNK (2),
-		MUSIC (1),
-		ENCHANTMENT_BOOK (2);
-		private final int p;
-		private static int totalP = 32;
-		LootType(int p) {
-			this.p = p;
-		}
-		public int probability() {
-			return p;
-		}
-		public static int total() {
-			return totalP;
-		}
-	}
-	*/
+	private final Random randomness;
+	private final Timer lootRefreshTimer;
+	private final HashMap<ItemStack,Integer> lootTable;
+
 	
 	public LootManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.refreshTimeSeconds = (long)0.0;
-		this.markedRefreshTime = (long)0.0;
-		this.lootRefreshLog = new HashMap<Location, Long>();
+		this.refreshTimeSeconds = 0;
+		this.markedRefreshTime = 0;
+		this.lootRefreshLog = new HashMap<>();
 		this.lootCount = 0;
 		this.randomness = new Random();
 		this.lootRefreshTimer = new Timer(this);
-		this.lootTable = new HashMap<ItemStack,Integer>();
+		this.lootTable = new HashMap<>();
 	}
 	
 	public void initialize() {
@@ -115,8 +82,8 @@ public class LootManager implements Timeable{
         	ChatUtil.printDebug("There is no loot section in loot.yml");
             return false;
         }
-        ConfigurationSection lootEntry = null;
-        boolean status = true;
+        ConfigurationSection lootEntry;
+        boolean status;
         ChatUtil.printDebug("Loading loot...");
         
         // Load items
@@ -137,14 +104,14 @@ public class LootManager implements Timeable{
             	if(lootEntry != null) {
 	            	if(lootEntry.contains("amount")) {
 	            		itemAmount = lootEntry.getInt("amount",1);
-	            		itemAmount = itemAmount < 1 ? 1 : itemAmount;
+	            		itemAmount = Math.max(itemAmount, 1);
 	        		} else {
 	        			ChatUtil.printConsoleError("loot.yml is missing amount for item: "+itemName);
 	        			status = false;
 	        		}
 	            	if(lootEntry.contains("weight")) {
 	            		itemWeight = lootEntry.getInt("weight",0);
-	            		itemWeight = itemWeight < 0 ? 0 : itemWeight;
+	            		itemWeight = Math.max(itemWeight, 0);
 	        		} else {
 	        			ChatUtil.printConsoleError("loot.yml is missing weight for item: "+itemName);
 	        			status = false;
@@ -192,7 +159,7 @@ public class LootManager implements Timeable{
 	        		}
 	            	if(lootEntry.contains("weight")) {
 	            		itemWeight = lootEntry.getInt("weight",0);
-	            		itemWeight = itemWeight < 0 ? 0 : itemWeight;
+	            		itemWeight = Math.max(itemWeight, 0);
 	        		} else {
 	        			ChatUtil.printConsoleError("loot.yml is missing weight for potion: "+potionName);
 	        			status = false;
@@ -220,7 +187,7 @@ public class LootManager implements Timeable{
         }
         
         // Load enchanted books
-        Enchantment bookType = null;
+        Enchantment bookType;
         ConfigurationSection ebookSection = lootConfig.getConfigurationSection("loot.enchanted_books");
         if(ebookSection != null) {
         	for(String enchantName : ebookSection.getKeys(false)) {
@@ -236,14 +203,14 @@ public class LootManager implements Timeable{
             	if(lootEntry != null) {
 	            	if(lootEntry.contains("level")) {
 	            		itemLevel = lootEntry.getInt("level",0);
-	            		itemLevel = itemLevel < 0 ? 0 : itemLevel;
+	            		itemLevel = Math.max(itemLevel, 0);
 	        		} else {
 	        			ChatUtil.printConsoleError("loot.yml is missing level for enchantment: "+enchantName);
 	        			status = false;
 	        		}
 	            	if(lootEntry.contains("weight")) {
 	            		itemWeight = lootEntry.getInt("weight",0);
-	            		itemWeight = itemWeight < 0 ? 0 : itemWeight;
+	            		itemWeight = Math.max(itemWeight, 0);
 	        		} else {
 	        			ChatUtil.printConsoleError("loot.yml is missing weight for enchantment: "+enchantName);
 	        			status = false;
@@ -279,9 +246,7 @@ public class LootManager implements Timeable{
 			Class<?> c = Enchantment.class;
 			Field field = c.getDeclaredField(fieldName);
 			result = (Enchantment)field.get(null);
-		} catch(NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-			//ChatUtil.printConsoleError("Enchantment field "+fieldName+" does not match any known enchantments!");
-		}
+		} catch(NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ignored) {}
 		return result;
 	}
 	
@@ -293,23 +258,18 @@ public class LootManager implements Timeable{
 	 * 		   false: The inventory was not filled, probably due to unexpired refresh time
 	 */
 	public boolean updateMonumentLoot(Inventory inventory, int count) {
-		//ChatUtil.printDebug("Attempting to update monument loot in "+inventory.toString());
 		Date now = new Date();
 		Location invLoc = inventory.getLocation();
-		//ChatUtil.printDebug("Updating monument loot...");
 		if(lootRefreshLog.containsKey(invLoc)) {
-			//ChatUtil.printDebug("Found a logged inventory");
 			long loggedLastFilledTime = lootRefreshLog.get(invLoc);
 			Date lastFilledDate = new Date(loggedLastFilledTime);
 			if(lastFilledDate.after(new Date(markedRefreshTime))) {
 				// Inventory is not yet done refreshing
-				//ChatUtil.printDebug("...Found unexpired loot");
 				return false;
 			}
 		}
 		clearUpperInventory(inventory);
 		fillLoot(inventory, count);
-		//long refreshFinishedTime = now.getTime() + (refreshTimeSeconds*1000);
 		long lootLastFilledTime = now.getTime();
 		lootRefreshLog.put(invLoc,lootLastFilledTime);
 		return true;
@@ -330,158 +290,18 @@ public class LootManager implements Timeable{
 	}
 	
 	private void fillLoot(Inventory inventory, int count) {
-		//ChatUtil.printDebug("...Filling loot");
-		int availableSlot = 0;
+		int availableSlot;
 		// Generate new items
 		for(int i=0;i<count;i++) {
 			availableSlot = inventory.firstEmpty();
 			if(availableSlot == -1) {
-				ChatUtil.printDebug("Failed to find empty slot for generated loot in inventory "+inventory.toString());
+				ChatUtil.printDebug("Failed to find empty slot for generated loot in inventory "+ inventory);
 			} else {
 				inventory.setItem(availableSlot,chooseRandomItem(lootTable));
-				//ChatUtil.printDebug("...Setting item in slot "+availableSlot);
 			}
 		}
 	}
-	
-	/*
-	private ItemStack generateRandomLoot() {
-		// Randomly choose LootType
-		int typeChoice = randomness.nextInt(LootType.total());
-		int typeWindow = 0;
-		LootType type = LootType.values()[0];
-		for(LootType t : LootType.values()) {
-			if(typeChoice < typeWindow + t.probability()) {
-				type = t;
-				break;
-			}
-			typeWindow = typeWindow + t.probability();
-		}
-		//ChatUtil.printDebug("Generating Loot Type "+type.toString()+" from choice "+typeChoice);
-		// Randomly create item stack relevant to the type
-		ItemStack item = null;
-		HashMap<ItemStack,Integer> itemOptions = new HashMap<ItemStack,Integer>();
-		switch(type) {
-			case VALUABLE:
-				itemOptions.put(new ItemStack(Material.GOLD_INGOT, 	18), 	1);
-				itemOptions.put(new ItemStack(Material.IRON_INGOT, 	36), 	1);
-				itemOptions.put(new ItemStack(Material.DIAMOND, 	4), 	1);
-				itemOptions.put(new ItemStack(Material.EMERALD, 	18), 	1);
-				itemOptions.put(new ItemStack(Material.COAL, 		64), 	1);
-				itemOptions.put(new ItemStack(Material.GUNPOWDER, 	20), 	1);
-				item = chooseRandomItem(itemOptions);
-				break;
-			case POTIONS:
-				itemOptions.put(new ItemStack(Material.BLAZE_ROD, 		  8), 6);
-				itemOptions.put(new ItemStack(Material.NETHER_WART, 	  8), 6);
-				itemOptions.put(new ItemStack(Material.GLOWSTONE_DUST, 	 12), 6);
-				itemOptions.put(new ItemStack(Material.EXPERIENCE_BOTTLE, 5), 4);
-				ItemStack potion;
-				PotionMeta meta;
-				potion = new ItemStack(Material.POTION, 1);
-				meta = (PotionMeta) potion.getItemMeta();
-				meta.setBasePotionData(new PotionData(PotionType.SPEED, false, false));
-				potion.setItemMeta(meta);
-				itemOptions.put(potion, 3);
-				potion = new ItemStack(Material.POTION, 1);
-				meta = (PotionMeta) potion.getItemMeta();
-				meta.setBasePotionData(new PotionData(PotionType.REGEN, false, false));
-				potion.setItemMeta(meta);
-				itemOptions.put(potion, 3);
-				potion = new ItemStack(Material.POTION, 1);
-				meta = (PotionMeta) potion.getItemMeta();
-				meta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL, false, false));
-				potion.setItemMeta(meta);
-				itemOptions.put(potion, 3);
-				potion = new ItemStack(Material.POTION, 1);
-				meta = (PotionMeta) potion.getItemMeta();
-				meta.setBasePotionData(new PotionData(PotionType.JUMP, false, false));
-				potion.setItemMeta(meta);
-				itemOptions.put(potion, 3);
-				potion = new ItemStack(Material.POTION, 1);
-				meta = (PotionMeta) potion.getItemMeta();
-				meta.setBasePotionData(new PotionData(PotionType.SLOW_FALLING, false, false));
-				potion.setItemMeta(meta);
-				itemOptions.put(potion, 3);
-				potion = new ItemStack(Material.POTION, 1);
-				meta = (PotionMeta) potion.getItemMeta();
-				meta.setBasePotionData(new PotionData(PotionType.FIRE_RESISTANCE, false, false));
-				potion.setItemMeta(meta);
-				itemOptions.put(potion, 3);
-				item = chooseRandomItem(itemOptions);
-				break;
-			case FOOD:
-				itemOptions.put(new ItemStack(Material.COOKED_BEEF, 	8), 	1);
-				itemOptions.put(new ItemStack(Material.COOKED_PORKCHOP, 8), 	1);
-				itemOptions.put(new ItemStack(Material.COOKED_CHICKEN, 	8), 	1);
-				itemOptions.put(new ItemStack(Material.BREAD, 			16), 	1);
-				item = chooseRandomItem(itemOptions);
-				break;
-			case HORSE:
-				itemOptions.put(new ItemStack(Material.SADDLE, 						1), 4);
-				itemOptions.put(new ItemStack(Material.IRON_HORSE_ARMOR, 			1), 5);
-				itemOptions.put(new ItemStack(Material.GOLDEN_HORSE_ARMOR, 			1), 4);
-				itemOptions.put(new ItemStack(Material.DIAMOND_HORSE_ARMOR, 		1), 2);
-				itemOptions.put(new ItemStack(Material.HORSE_SPAWN_EGG, 			1), 4);
-				itemOptions.put(new ItemStack(Material.ZOMBIE_HORSE_SPAWN_EGG, 		1), 1);
-				itemOptions.put(new ItemStack(Material.SKELETON_HORSE_SPAWN_EGG, 	1), 1);
-				item = chooseRandomItem(itemOptions);
-				break;
-			case EXTRA:
-				itemOptions.put(new ItemStack(Material.ENDER_PEARL, 		4), 2);
-				itemOptions.put(new ItemStack(Material.MELON, 				4), 2);
-				itemOptions.put(new ItemStack(Material.PUMPKIN, 			4), 2);
-				itemOptions.put(new ItemStack(Material.SHEEP_SPAWN_EGG, 	2), 2);
-				itemOptions.put(new ItemStack(Material.COW_SPAWN_EGG, 		2), 3);
-				itemOptions.put(new ItemStack(Material.BOOK, 				6), 4);
-				itemOptions.put(new ItemStack(Material.NAME_TAG, 			1), 1);
-				item = chooseRandomItem(itemOptions);
-				break;
-			case JUNK:
-				itemOptions.put(new ItemStack(Material.COBWEB, 				4), 2);
-				itemOptions.put(new ItemStack(Material.EGG, 				4), 3);
-				itemOptions.put(new ItemStack(Material.FIREWORK_ROCKET, 	4), 2);
-				itemOptions.put(new ItemStack(Material.CARROT_ON_A_STICK, 	1), 1);
-				item = chooseRandomItem(itemOptions);
-				break;
-			case MUSIC:
-				itemOptions.put(new ItemStack(Material.MUSIC_DISC_11, 		1), 1);
-				itemOptions.put(new ItemStack(Material.MUSIC_DISC_13, 		1), 1);
-				itemOptions.put(new ItemStack(Material.MUSIC_DISC_BLOCKS, 	1), 1);
-				itemOptions.put(new ItemStack(Material.MUSIC_DISC_CAT, 		1), 1);
-				itemOptions.put(new ItemStack(Material.MUSIC_DISC_CHIRP, 	1), 1);
-				itemOptions.put(new ItemStack(Material.MUSIC_DISC_FAR, 		1), 1);
-				itemOptions.put(new ItemStack(Material.MUSIC_DISC_MALL, 	1), 1);
-				itemOptions.put(new ItemStack(Material.MUSIC_DISC_MELLOHI, 	1), 1);
-				itemOptions.put(new ItemStack(Material.MUSIC_DISC_STAL, 	1), 1);
-				itemOptions.put(new ItemStack(Material.MUSIC_DISC_STRAD, 	1), 1);
-				itemOptions.put(new ItemStack(Material.MUSIC_DISC_WAIT, 	1), 1);
-				itemOptions.put(new ItemStack(Material.MUSIC_DISC_WARD, 	1), 1);
-				item = chooseRandomItem(itemOptions);
-				break;
-			case ENCHANTMENT_BOOK:
-				int itemIndex = randomness.nextInt(Enchantment.values().length);
-				Enchantment enchant = Enchantment.values()[itemIndex];
-				Material itemMaterial = Material.ENCHANTED_BOOK;
-				int itemCount = 1;
-				int enchantLevel = randomness.nextInt(enchant.getMaxLevel()+1);
-				if(enchantLevel < enchant.getStartLevel()) {
-					enchantLevel = enchant.getStartLevel();
-				}
-				item = new ItemStack(itemMaterial, itemCount);
-				EnchantmentStorageMeta enchantMeta = (EnchantmentStorageMeta)item.getItemMeta();
-				//ChatUtil.printDebug("Adding enchantment "+enchant.toString()+", level "+enchantLevel);
-				enchantMeta.addStoredEnchant(enchant, enchantLevel, true);
-				item.setItemMeta(enchantMeta);
-				break;
-			default:
-				break;
-		}
-		//ChatUtil.printDebug("Generated item is "+item.getType().toString());
-		return item;
-	}
-	*/
-	
+
 	private ItemStack chooseRandomItem(HashMap<ItemStack,Integer> itemOptions) {
 		ItemStack item = new ItemStack(Material.DIRT,1);
 		ItemMeta defaultMeta = item.getItemMeta();
@@ -520,13 +340,12 @@ public class LootManager implements Timeable{
 							enchantMeta.removeStoredEnchant(e);
 							enchantMeta.addStoredEnchant(e, newLevel, true);
 							item.setItemMeta(enchantMeta);
-							ChatUtil.printDebug("Enchanted loot item "+item.getType().toString()+" updated "+e.getKey().getKey()+" from level 0 to "+newLevel);
+							ChatUtil.printDebug("Enchanted loot item "+ item.getType() +" updated "+e.getKey().getKey()+" from level 0 to "+newLevel);
 						}
 					}
 				}
 			}
 		}
-		//ChatUtil.printDebug("Choosing random item out of "+total+", chose "+typeChoice+", got "+item.getType().toString());
 		return item;
 	}
 
@@ -534,13 +353,14 @@ public class LootManager implements Timeable{
 	public void onEndTimer(int taskID) {
 		if(taskID == 0) {
 			ChatUtil.printDebug("Loot Refresh Timer ended with null taskID!");
-		} else if(taskID == lootRefreshTimer.getTaskID()) {
+			return;
+		}
+		if(taskID == lootRefreshTimer.getTaskID()) {
 			markedRefreshTime = new Date().getTime();
 			ChatUtil.printDebug("Loot Refresh timer marked new availability time");
 			for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
 				KonMonumentTemplate template = player.getKingdom().getMonumentTemplate();
 				if(!player.isBarbarian() && template != null && template.hasLoot()) {
-					//ChatUtil.sendNotice(player.getBukkitPlayer(), "New town monument loot is available.");
 					ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_LOOT.getMessage());
 				}
 			}

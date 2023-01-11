@@ -1,15 +1,14 @@
 package com.github.rumsfield.konquest.command;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.Collections;
+import java.util.List;
 
 public class QuestCommand extends CommandBase {
 
@@ -21,8 +20,7 @@ public class QuestCommand extends CommandBase {
 		// k quest
     	if (getArgs().length != 1) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	// Check for global enable
         	if(!getKonquest().getDirectiveManager().isEnabled()) {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());

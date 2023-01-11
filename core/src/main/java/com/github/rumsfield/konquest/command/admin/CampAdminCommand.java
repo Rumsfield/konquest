@@ -1,20 +1,19 @@
 package com.github.rumsfield.konquest.command.admin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class CampAdminCommand extends CommandBase {
 
@@ -67,8 +66,7 @@ public class CampAdminCommand extends CommandBase {
         		ChatUtil.sendNotice((Player) getSender(), "Successfully created a camp for player "+targetPlayer.getOfflineBukkitPlayer().getName());
         	} else {
         		ChatUtil.sendError((Player) getSender(), "Failed to create a camp :(");
-                return;
-        	}
+			}
         	
 		} else if(cmdMode.equalsIgnoreCase("remove")) {
 			if(!getKonquest().getCampManager().isCampSet(targetPlayer)) {
@@ -84,12 +82,10 @@ public class CampAdminCommand extends CommandBase {
 				}
 			} else {
 				ChatUtil.sendError((Player) getSender(), "Failed to remove the camp :(");
-                return;
 			}
 			
 		} else {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
 		}
 
 	}

@@ -1,11 +1,5 @@
 package com.github.rumsfield.konquest.display.wrapper;
 
-import java.util.Arrays;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.KingdomIcon;
@@ -13,22 +7,21 @@ import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.display.icon.PlayerIcon;
 import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
-import com.github.rumsfield.konquest.model.KonKingdomScoreAttributes;
-import com.github.rumsfield.konquest.model.KonLeaderboard;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonPlayerScoreAttributes;
-import com.github.rumsfield.konquest.model.KonStats;
-import com.github.rumsfield.konquest.model.KonStatsType;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
 import com.github.rumsfield.konquest.model.KonPlayerScoreAttributes.KonPlayerScoreAttribute;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+
+import java.util.Arrays;
 
 public class ScoreMenuWrapper extends MenuWrapper {
 	
-	private KonOfflinePlayer scorePlayer;
-	private KonPlayer observer;
+	private final KonOfflinePlayer scorePlayer;
+	private final KonPlayer observer;
 	
 	public ScoreMenuWrapper(Konquest konquest, KonOfflinePlayer scorePlayer, KonPlayer observer) {
 		super(konquest);
@@ -42,8 +35,8 @@ public class ScoreMenuWrapper extends MenuWrapper {
 		KonKingdomScoreAttributes kingdomScoreAttributes = getKonquest().getKingdomManager().getKingdomScoreAttributes(scorePlayer.getKingdom());
 		int playerScore = playerScoreAttributes.getScore();
 		int kingdomScore = kingdomScoreAttributes.getScore();
-		String pageLabel = "";
-		int i = 0;
+		String pageLabel;
+		int i;
 		InfoIcon info;
 
 		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer, scorePlayer);
@@ -55,8 +48,6 @@ public class ScoreMenuWrapper extends MenuWrapper {
 		// Page 0
 		pageLabel = titleColor+scorePlayer.getOfflineBukkitPlayer().getName()+" "+MessagePath.LABEL_SCORE.getMessage()+": "+playerScore;
 		getMenu().addPage(0, 1, pageLabel);
-		//info = new InfoIcon(kingdomColor+scorePlayer.getOfflineBukkitPlayer().getName()+" "+MessagePath.MENU_SCORE_PLAYER_SCORE.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_SCORE.getMessage()+": "+ChatColor.DARK_PURPLE+playerScore), Material.DIAMOND_HELMET, 0, false);
-		//newMenu.getPage(0).addIcon(info);
 		PlayerIcon playerInfo = new PlayerIcon(kingdomColor+scorePlayer.getOfflineBukkitPlayer().getName(),Arrays.asList(loreColor+MessagePath.LABEL_INFORMATION.getMessage(), hintColor+MessagePath.MENU_SCORE_HINT.getMessage()),scorePlayer.getOfflineBukkitPlayer(),1,true,PlayerIconAction.DISPLAY_INFO);
 		getMenu().getPage(0).addIcon(playerInfo);
 		info = new InfoIcon(kingdomColor+MessagePath.MENU_SCORE_TOWN_1.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+playerScoreAttributes.getAttributeValue(KonPlayerScoreAttribute.TOWN_LORDS), loreColor+MessagePath.LABEL_SCORE.getMessage()+": "+ChatColor.DARK_PURPLE+playerScoreAttributes.getAttributeScore(KonPlayerScoreAttribute.TOWN_LORDS)), Material.PURPLE_CONCRETE, 2, false);
@@ -74,8 +65,6 @@ public class ScoreMenuWrapper extends MenuWrapper {
 		// Page 1
 		pageLabel = titleColor+scorePlayer.getKingdom().getName()+" "+MessagePath.LABEL_SCORE.getMessage()+": "+kingdomScore;
 		getMenu().addPage(1, 1, pageLabel);
-		//info = new InfoIcon(kingdomColor+scorePlayer.getKingdom().getName()+" "+MessagePath.MENU_SCORE_KINGDOM_SCORE.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_SCORE.getMessage()+": "+ChatColor.DARK_PURPLE+kingdomScore), Material.GOLDEN_HELMET, 2, false);
-		//newMenu.getPage(1).addIcon(info);
 		KingdomIcon kingdomInfo = new KingdomIcon(scorePlayer.getKingdom(),kingdomColor,Arrays.asList(loreColor+MessagePath.LABEL_INFORMATION.getMessage(), hintColor+MessagePath.MENU_SCORE_HINT.getMessage()),2,false);
 		getMenu().getPage(1).addIcon(kingdomInfo);
 		info = new InfoIcon(kingdomColor+MessagePath.MENU_SCORE_KINGDOM_TOWNS.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+kingdomScoreAttributes.getAttributeValue(KonKingdomScoreAttribute.TOWNS), loreColor+MessagePath.LABEL_SCORE.getMessage()+": "+ChatColor.DARK_PURPLE+kingdomScoreAttributes.getAttributeScore(KonKingdomScoreAttribute.TOWNS)), Material.OBSIDIAN, 3, false);
@@ -90,26 +79,21 @@ public class ScoreMenuWrapper extends MenuWrapper {
 		pageLabel = titleColor+scorePlayer.getOfflineBukkitPlayer().getName()+" "+MessagePath.LABEL_STATS.getMessage();
 		getMenu().addPage(2, 3, pageLabel);
 		KonPlayer player = getKonquest().getPlayerManager().getPlayerFromName(scorePlayer.getOfflineBukkitPlayer().getName());
-    	boolean isPlayerOnline = false;
-    	KonStats stats;
+		KonStats stats;
     	if(player == null) {
     		// Use offline player, pull stats from DB
     		stats = getKonquest().getDatabaseThread().getDatabase().pullPlayerStats(scorePlayer.getOfflineBukkitPlayer());
     	} else {
     		// Use online player's active stats
     		stats = player.getPlayerStats();
-    		isPlayerOnline = true;
-    	}
+		}
     	i = 0;
-    	int statValue = 0;
+    	int statValue;
     	for(KonStatsType stat : KonStatsType.values()) {
     		statValue = stats.getStat(stat);
     		info = new InfoIcon(ChatColor.GOLD+stat.displayName(),Arrays.asList(loreColor+stat.description(),valueColor+""+statValue),stat.getMaterial(),i,false);
     		getMenu().getPage(2).addIcon(info);
     		i++;
-    	}
-    	if(!isPlayerOnline) {
-    		stats = null;
     	}
 		// Page 3
 		pageLabel = titleColor+scorePlayer.getKingdom().getName()+" "+MessagePath.LABEL_LEADERBOARD.getMessage();
@@ -141,7 +125,7 @@ public class ScoreMenuWrapper extends MenuWrapper {
 			// Player Head Icons open a new info menu for the associated player
 			PlayerIcon icon = (PlayerIcon)clickedIcon;
 			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
-			if(clickPlayer != null && offlinePlayer != null) {
+			if(offlinePlayer != null) {
 				switch(icon.getAction()) {
 					case DISPLAY_INFO:
 						getKonquest().getDisplayManager().displayPlayerInfoMenu(clickPlayer, offlinePlayer);

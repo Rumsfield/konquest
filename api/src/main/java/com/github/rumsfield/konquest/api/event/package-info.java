@@ -9,7 +9,7 @@
  * 	
  *     public MyExampleListener() {}
  * 	
- *     {@literal@}EventHandler(priority = EventPriority.NORMAL)
+ *     &#064;EventHandler()
  *     public void onExampleEvent(KonquestEvent event) {
  *         // do something
  *     }

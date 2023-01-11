@@ -24,8 +24,8 @@ import java.util.ListIterator;
 
 public class TownInfoMenuWrapper extends MenuWrapper {
 
-	private KonTown infoTown;
-	private KonPlayer observer;
+	private final KonTown infoTown;
+	private final KonPlayer observer;
 	
 	public TownInfoMenuWrapper(Konquest konquest, KonTown infoTown, KonPlayer observer) {
 		super(konquest);
@@ -36,11 +36,11 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 	@Override
 	public void constructMenu() {
 
-		String pageLabel = "";
+		String pageLabel;
  		List<String> loreList;
  		InfoIcon info;
  		final int MAX_ICONS_PER_PAGE = 45;
-		int pageTotal = 1;
+		int pageTotal;
 		
 		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer, infoTown);
  		ChatColor titleColor = DisplayManager.titleColor;
@@ -48,8 +48,8 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		ChatColor valueColor = DisplayManager.valueColor;
 		ChatColor hintColor = DisplayManager.hintColor;
 		
-		List<OfflinePlayer> townKnights = new ArrayList<OfflinePlayer>();
-		List<OfflinePlayer> townResidents = new ArrayList<OfflinePlayer>();
+		List<OfflinePlayer> townKnights = new ArrayList<>();
+		List<OfflinePlayer> townResidents = new ArrayList<>();
 		for(OfflinePlayer resident : infoTown.getPlayerResidents()) {
 			if(!infoTown.isPlayerLord(resident)) {
 				if(infoTown.isPlayerKnight(resident)) {
@@ -66,7 +66,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		/* Kingdom Info Icon (0) */
 		int numKingdomPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(infoTown.getKingdom()).size();
     	int numAllKingdomPlayers = getKonquest().getPlayerManager().getAllPlayersInKingdom(infoTown.getKingdom()).size();
-    	loreList = new ArrayList<String>();
+    	loreList = new ArrayList<>();
     	loreList.add(loreColor+MessagePath.LABEL_PLAYERS.getMessage()+": "+valueColor+numKingdomPlayers+"/"+numAllKingdomPlayers);
     	if(infoTown.getKingdom().isOfflineProtected()) {
     		loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.LABEL_PROTECTED.getMessage());
@@ -76,7 +76,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
     	getMenu().getPage(0).addIcon(kingdom);
 
 		/* Lord Player Info Icon (2) */
-		loreList = new ArrayList<String>();
+		loreList = new ArrayList<>();
 		if(infoTown.isLordValid()) {
 			OfflinePlayer lordPlayer = infoTown.getPlayerLord();
 			loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
@@ -92,14 +92,14 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			getMenu().getPage(0).addIcon(info);
 		}
 		/* Invites Info Icon (3) */
-		loreList = new ArrayList<String>();
+		loreList = new ArrayList<>();
 		for(OfflinePlayer invitee : infoTown.getJoinInvites()) {
 			loreList.add(loreColor+invitee.getName());
 		}
 		info = new InfoIcon(kingdomColor+MessagePath.LABEL_INVITES.getMessage(),loreList,Material.DIAMOND,3,false);
 		getMenu().getPage(0).addIcon(info);
 		/* Requests Info Icon (4) */
-		loreList = new ArrayList<String>();
+		loreList = new ArrayList<>();
 		for(OfflinePlayer requestee : infoTown.getJoinRequests()) {
 			loreList.add(loreColor+requestee.getName());
 		}
@@ -115,7 +115,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
     	String isShielded = DisplayManager.boolean2Symbol(infoTown.isShielded());
     	String isArmored = DisplayManager.boolean2Symbol(infoTown.isArmored());
     	String isPeaceful = DisplayManager.boolean2Symbol(infoTown.getKingdom().isPeaceful());
-    	loreList = new ArrayList<String>();
+    	loreList = new ArrayList<>();
     	loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
     	loreList.add(loreColor+MessagePath.LABEL_PLOT.getMessage()+": "+isPlotOnly);
     	loreList.add(loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage()+": "+isRedstone);
@@ -130,17 +130,17 @@ public class TownInfoMenuWrapper extends MenuWrapper {
     	/* Health Info Icon (6) */
     	int maxCriticalhits = getKonquest().getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
 		int townHealth = maxCriticalhits - infoTown.getMonument().getCriticalHits();
-    	loreList = new ArrayList<String>();
+    	loreList = new ArrayList<>();
     	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+townHealth+"/"+maxCriticalhits);
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_HEALTH.getMessage(), loreList, Material.GOLDEN_APPLE, 6, false);
     	getMenu().getPage(0).addIcon(info);
     	/* Land Info Icon (7) */
-    	loreList = new ArrayList<String>();
+    	loreList = new ArrayList<>();
     	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+infoTown.getChunkList().size());
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_LAND.getMessage(), loreList, Material.GRASS_BLOCK, 7, false);
     	getMenu().getPage(0).addIcon(info);
     	/* Population Info Icon (8) */
-    	loreList = new ArrayList<String>();
+    	loreList = new ArrayList<>();
     	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+infoTown.getNumResidents());
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_POPULATION.getMessage(), loreList, Material.WHITE_BED, 8, false);
     	getMenu().getPage(0).addIcon(info);
@@ -163,7 +163,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 						formattedUpgrade = ChatColor.GRAY+""+ChatColor.STRIKETHROUGH+upgrade.getDescription()+" "+reducedLevel;
 					}
 				}
-				loreList = new ArrayList<String>();
+				loreList = new ArrayList<>();
 				for(String line : Konquest.stringPaginate(upgrade.getLevelDescription(level))) {
 					loreList.add(ChatColor.RED+line);
 				}
@@ -194,7 +194,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			while(slotIndex < MAX_ICONS_PER_PAGE && knightIter.hasNext()) {
 				/* Player Icon (n) */
 				OfflinePlayer currentKnight = knightIter.next();
-				loreList = new ArrayList<String>();
+				loreList = new ArrayList<>();
 				loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
 				loreList.add(ChatColor.DARK_BLUE+MessagePath.LABEL_KNIGHT.getMessage());
 		    	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
@@ -224,7 +224,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			while(slotIndex < MAX_ICONS_PER_PAGE && residentIter.hasNext()) {
 				/* Player Icon (n) */
 				OfflinePlayer currentResident = residentIter.next();
-				loreList = new ArrayList<String>();
+				loreList = new ArrayList<>();
 				loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
 				loreList.add(ChatColor.WHITE+MessagePath.LABEL_RESIDENT.getMessage());
 		    	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
@@ -254,7 +254,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			// Player Head Icons open a new info menu for the associated player
 			PlayerIcon icon = (PlayerIcon)clickedIcon;
 			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
-			if(clickPlayer != null && offlinePlayer != null && icon.getAction().equals(PlayerIconAction.DISPLAY_INFO)) {
+			if(offlinePlayer != null && icon.getAction().equals(PlayerIconAction.DISPLAY_INFO)) {
 				getKonquest().getDisplayManager().displayPlayerInfoMenu(clickPlayer, offlinePlayer);
 			}
 		}

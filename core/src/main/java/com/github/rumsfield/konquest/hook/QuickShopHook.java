@@ -28,7 +28,7 @@ public class QuickShopHook implements PluginHook {
 	public void reload() {
 		// Attempt to integrate QuickShop
 		quickShopAPI = (QuickShopAPI) Bukkit.getPluginManager().getPlugin("QuickShop");
-		if(quickShopAPI != null){
+		if(quickShopAPI == null){
 			ChatUtil.printConsoleAlert("Could not integrate QuickShop, missing or disabled.");
 			return;
 		}
@@ -37,38 +37,39 @@ public class QuickShopHook implements PluginHook {
 			ChatUtil.printConsoleAlert("Could not integrate QuickShop, disabled.");
 			return;
 		}
-		if(konquest.getConfigManager().getConfig("core").getBoolean("core.integration.quickshop",false)) {
-			// Verify version requirement
-			String ver = plugin.getDescription().getVersion();
-			String reqMin = "4.0.9.4";
-			String reqMax = "4.0.9.10";
-			boolean isMinVersion = false;
-			boolean isMaxVersion = false;
-			try {
-				Version installedVersion = new Version(ver);
-				Version minimumVersion = new Version(reqMin);
-				Version maximumVersion = new Version(reqMax);
-				isMinVersion = (installedVersion.compareTo(minimumVersion) >= 0);
-				isMaxVersion = (installedVersion.compareTo(maximumVersion) <= 0);
-			} catch(IllegalArgumentException e) {
-				e.printStackTrace();
-			}
-			if(isMinVersion && isMaxVersion) {
-				isEnabled = true;
-				konquest.getPlugin().getServer().getPluginManager().registerEvents(new QuickShopListener(konquest.getPlugin()), konquest.getPlugin());
-				ChatUtil.printConsoleAlert("Successfully integrated QuickShop version "+ver);
-			} else {
-				if(isMinVersion) {
-					ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too new. You must revert it to at most version "+reqMax);
-				} else if(isMaxVersion) {
-					ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too old. You must update it to at least version "+reqMin);
-				} else {
-					ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is unknown. You must use a version between "+reqMin+" and "+reqMax);
-				}
-			}
-		} else {
+		if(!konquest.getConfigManager().getConfig("core").getBoolean("core.integration.quickshop",false)) {
 			ChatUtil.printConsoleAlert("Disabled QuickShop integration from core config settings.");
+			return;
 		}
+
+		// Verify version requirement
+		String ver = plugin.getDescription().getVersion();
+		String reqMin = "4.0.9.4";
+		String reqMax = "4.0.9.10";
+		boolean isAboveMinVersion = false;
+		boolean isBelowMaxVersion = false;
+		try {
+			Version installedVersion = new Version(ver);
+			Version minimumVersion = new Version(reqMin);
+			Version maximumVersion = new Version(reqMax);
+			isAboveMinVersion = (installedVersion.compareTo(minimumVersion) >= 0);
+			isBelowMaxVersion = (installedVersion.compareTo(maximumVersion) <= 0);
+		} catch(IllegalArgumentException e) {
+			e.printStackTrace();
+		}
+
+		if(!isAboveMinVersion){
+			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too old. You must update it to at least version "+reqMin);
+			return;
+		}
+		if(!isBelowMaxVersion){
+			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too new. You must revert it to at most version "+reqMax);
+			return;
+		}
+
+		isEnabled = true;
+		konquest.getPlugin().getServer().getPluginManager().registerEvents(new QuickShopListener(konquest.getPlugin()), konquest.getPlugin());
+		ChatUtil.printConsoleAlert("Successfully integrated QuickShop version " + ver);
 
 	}
 	

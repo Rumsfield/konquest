@@ -1,19 +1,19 @@
 package com.github.rumsfield.konquest.utility;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-
 public class RequestKeeper {
 
-	private HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident (invite), false = requesting add from lord/knight)
+	private final HashMap<UUID,Boolean> joinRequests; // Player UUID, invite direction (true = requesting join to resident (invite), false = requesting add from lord/knight)
 	
 	public RequestKeeper() {
-		this.joinRequests = new HashMap<UUID,Boolean>();
+		this.joinRequests = new HashMap<>();
 	}
 	
 	public void clearRequests() {
@@ -22,9 +22,9 @@ public class RequestKeeper {
 	
 	// Players who have tried joining but need to be added
 	public List<OfflinePlayer> getJoinRequests() {
-		ArrayList<OfflinePlayer> result = new ArrayList<OfflinePlayer>();
+		ArrayList<OfflinePlayer> result = new ArrayList<>();
 		for(UUID id : joinRequests.keySet()) {
-			if(joinRequests.get(id) == false) {
+			if(!joinRequests.get(id)) {
 				result.add(Bukkit.getOfflinePlayer(id));
 			}
 		}
@@ -33,9 +33,9 @@ public class RequestKeeper {
 	
 	// Players who have been added but need to accept the invite to join
 	public List<OfflinePlayer> getJoinInvites() {
-		ArrayList<OfflinePlayer> result = new ArrayList<OfflinePlayer>();
+		ArrayList<OfflinePlayer> result = new ArrayList<>();
 		for(UUID id : joinRequests.keySet()) {
-			if(joinRequests.get(id) == true) {
+			if(joinRequests.get(id)) {
 				result.add(Bukkit.getOfflinePlayer(id));
 			}
 		}
@@ -55,7 +55,7 @@ public class RequestKeeper {
 	public boolean isJoinRequestValid(UUID id) {
 		boolean result = false;
 		if(joinRequests.containsKey(id)) {
-			result = (joinRequests.get(id) == false);
+			result = (!joinRequests.get(id));
 		}
 		return result;
 	}
@@ -64,7 +64,7 @@ public class RequestKeeper {
 	public boolean isJoinInviteValid(UUID id) {
 		boolean result = false;
 		if(joinRequests.containsKey(id)) {
-			result = (joinRequests.get(id) == true);
+			result = (joinRequests.get(id));
 		}
 		return result;
 	}

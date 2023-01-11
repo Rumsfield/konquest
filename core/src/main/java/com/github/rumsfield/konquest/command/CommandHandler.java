@@ -1,49 +1,42 @@
 package com.github.rumsfield.konquest.command;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-//import java.util.Arrays;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.command.admin.AdminCommand;
+import com.github.rumsfield.konquest.command.admin.AdminCommandType;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-//import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
+import org.jetbrains.annotations.NotNull;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.command.admin.AdminCommand;
-import com.github.rumsfield.konquest.command.admin.AdminCommandType;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-//public class CommandHandler  implements CommandExecutor {
 public class CommandHandler  implements TabExecutor {
 
-	private Konquest konquest;
+	private final Konquest konquest;
 	
 	public CommandHandler(Konquest konquest) {
         this.konquest = konquest;
     }
 	
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player)) {
             Bukkit.getLogger().info("You need to be a player to issue commands.");
             return false;
         }
-        
-        //ChatUtil.printDebug("New Command, player "+sender.getName()+" args "+Arrays.toString(args));
+
         if (sender.hasPermission("konquest.command")) {
         	if (args.length == 0) {
         		new KonquestCommand(konquest, sender).execute();
-        		//ChatUtil.printDebug("Command had no args");
             } else {
             	//Get command type. If args[0] is not a command, defaults to HELP
             	CommandType commandArg = CommandType.getCommand(args[0]);
-            	//ChatUtil.printDebug("Command type is "+commandArg.toString());
             	
             	// Handle admin commands differently from normal commands
             	if (commandArg.equals(CommandType.ADMIN)) {
@@ -127,7 +120,7 @@ public class CommandHandler  implements TabExecutor {
     }
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+	public List<String> onTabComplete(CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
 		List<String> tabList = new ArrayList<>();
 
 		if (sender.hasPermission("konquest.command")) {

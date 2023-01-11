@@ -10,7 +10,7 @@ import org.bukkit.Material;
 
 public class KonMonument implements KonquestMonument {
 
-	private Location centerLoc;
+	private final Location centerLoc;
 	private int baseY;
 	private int height;
 	private Location travelPoint;
@@ -32,7 +32,9 @@ public class KonMonument implements KonquestMonument {
 	
 	/**
 	 * Initialize a monument from a kingdom's monument template
-	 * @param template
+	 * @param template the template to use
+	 * @param centerLoc the location to center the monument at
+	 * @param flatness the flatness of the monument
 	 * @return status code:
 	 * 			0 = success
 	 * 			1 = invalid template
@@ -67,24 +69,21 @@ public class KonMonument implements KonquestMonument {
 		for(int x=0;x<16;x++) {
 			for(int z=0;z<16;z++) {
 				int y = chunkSnap.getHighestBlockYAt(x, z);
-				//ChatUtil.printDebug("Checking chunk block "+x+","+z);
 				// Search for next highest block if current block is leaves
 				while(chunk.getBlock(x, y, z).isPassable() || !chunkSnap.getBlockType(x, y, z).isOccluding() || chunkSnap.getBlockType(x, y, z).equals(Material.AIR)) {
-					//ChatUtil.printDebug("	Found undesirable "+chunkSnap.getBlockType(x, y, z).toString()+" at local position "+x+","+y+","+z);
 					y--;
 					if(y <= 0) {
-						ChatUtil.printDebug("Could not find non-leaves block in chunk "+chunkSnap.toString()+", local position "+x+","+y+","+z);
+						ChatUtil.printDebug("Could not find non-leaves block in chunk "+ chunkSnap +", local position "+x+","+y+","+z);
 						break;
 					}
 				}
-				//ChatUtil.printDebug("		Highest block: "+chunkSnap.getBlockType(x, y, z).toString());
 				if(y > maxY) {
 					maxY = y;
-					maxMaterial = chunkSnap.getBlockType(x, y, z).toString() + " at "+x+", "+y+", "+z;
+					maxMaterial = chunkSnap.getBlockType(x, y, z) + " at "+x+", "+y+", "+z;
 				}
 				if(y < minY) {
 					minY = y;
-					minMaterial = chunkSnap.getBlockType(x, y, z).toString() + " at "+x+", "+y+", "+z;
+					minMaterial = chunkSnap.getBlockType(x, y, z) + " at "+x+", "+y+", "+z;
 				}
 			}
 		}
@@ -134,24 +133,18 @@ public class KonMonument implements KonquestMonument {
         int minBlockY = Math.min(template.getCornerOne().getBlockY(), template.getCornerTwo().getBlockY());
         int minBlockZ = Math.min(template.getCornerOne().getBlockZ(), template.getCornerTwo().getBlockZ());
         
-		//ChatUtil.printDebug("Updating monument travel point");
-		//ChatUtil.printDebug("Using template base point "+minBlockX+","+minBlockY+","+minBlockZ);
         // Offsets from chunk origin to travel location
 		int offsetX = (int)(template.getTravelPoint().getX() - minBlockX);
 		int offsetY = (int)(template.getTravelPoint().getY() - minBlockY);
 		int offsetZ = (int)(template.getTravelPoint().getZ() - minBlockZ);
-		//ChatUtil.printDebug("Using template offset "+offsetX+","+offsetY+","+offsetZ);
-		
+
 		// Calculate monument chunk origin block location
 		int mX = (int)Math.floor((double)centerLoc.getBlockX()/16)*16;
 		int mZ = (int)Math.floor((double)centerLoc.getBlockZ()/16)*16;
 		
 		travelPoint = new Location(centerLoc.getWorld(),mX+offsetX,baseY+offsetY+1,mZ+offsetZ);
 		
-		//travelPoint = centerLoc.getChunk().getBlock(0, baseY+1, 0).getLocation().clone().add(offsetX, offsetY+1, offsetZ);
-		//ChatUtil.printDebug("Updated new travel location "+travelPoint.getX()+","+travelPoint.getY()+","+travelPoint.getZ());
 		height = template.getHeight();
-		//isValid = template.isValid();
 		return true;
 	}
 
@@ -191,15 +184,10 @@ public class KonMonument implements KonquestMonument {
 	}
 	
 	public boolean isLocInside(Location loc) {
-		//ChatUtil.printDebug("Evaluating whether location is inside Monument region: "+loc.toString());
-		if(height == 0) {
-			return false;
-		}
+		if(height == 0) return false;
 		Chunk centerChunk = centerLoc.getChunk();
 		Chunk testChunk = loc.getChunk();
 		boolean isChunkMatch = centerLoc.getWorld().equals(loc.getWorld()) && centerChunk.getX() == testChunk.getX() && centerChunk.getZ() == testChunk.getZ();
-		//ChatUtil.printDebug("Chunk match: "+isChunkMatch);	
-		//ChatUtil.printDebug("Comparing Y "+loc.getBlockY()+" to baseY "+baseY+" and height "+height);
 		return isChunkMatch && loc.getBlockY() >= baseY && loc.getBlockY() < baseY+height;
 	}
 	

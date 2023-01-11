@@ -1,15 +1,14 @@
 package com.github.rumsfield.konquest.api.event.territory;
 
-import java.awt.Point;
-import java.util.Set;
-
+import com.github.rumsfield.konquest.api.KonquestAPI;
+import com.github.rumsfield.konquest.api.event.KonquestEvent;
+import com.github.rumsfield.konquest.api.model.KonquestTerritory;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.Cancellable;
 
-import com.github.rumsfield.konquest.api.KonquestAPI;
-import com.github.rumsfield.konquest.api.event.KonquestEvent;
-import com.github.rumsfield.konquest.api.model.KonquestTerritory;
+import java.awt.*;
+import java.util.Set;
 
 /**
  * Represents a generic change of a territory's land chunk.
@@ -26,10 +25,10 @@ public class KonquestTerritoryChunkEvent extends KonquestEvent implements Cancel
 
 	private boolean isCancelled;
 	
-	private KonquestTerritory territory;
-	private Location location;
-	private Set<Point> points;
-	private boolean isClaimed;
+	private final KonquestTerritory territory;
+	private final Location location;
+	private final Set<Point> points;
+	private final boolean isClaimed;
 	
 	/**
 	 * Default constructor
@@ -89,7 +88,7 @@ public class KonquestTerritoryChunkEvent extends KonquestEvent implements Cancel
 	/**
 	 * Checks whether the territory is claiming the chunk or not.
 	 * 
-	 * @return True when the territory is claiming the chunk, else false when it is unclaiming it.
+	 * @return True when the territory is claiming the chunk, else false when it is un-claiming it.
 	 */
 	public boolean isClaimed() {
 		return isClaimed;

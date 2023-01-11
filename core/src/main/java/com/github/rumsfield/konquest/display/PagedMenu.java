@@ -1,30 +1,29 @@
 package com.github.rumsfield.konquest.display;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
+import com.github.rumsfield.konquest.display.icon.InfoIcon;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
-import com.github.rumsfield.konquest.display.icon.InfoIcon;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import java.util.ArrayList;
+import java.util.Collections;
 
+/**
+ * @implNote Pages must have a bottom row dedicated to navigation buttons
+ */
 public class PagedMenu {
 
-	private ArrayList<DisplayMenu> pages;
+	private final ArrayList<DisplayMenu> pages;
 	private int currentPageIndex;
 	
 	public PagedMenu() {
-		this.pages = new ArrayList<DisplayMenu>();
+		this.pages = new ArrayList<>();
 		this.currentPageIndex = 0;
 	}
 	
-	/*
-	 * Pages must have a bottom row dedicated to navigation buttons
-	 */
-	
+
 	public void addPage(int index, int rows, String label) {
 		if(index > pages.size()) {
 			ChatUtil.printDebug("Failed to add page beyond list index");

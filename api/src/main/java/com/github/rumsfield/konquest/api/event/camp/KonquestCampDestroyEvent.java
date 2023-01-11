@@ -21,8 +21,8 @@ public class KonquestCampDestroyEvent extends KonquestCampEvent implements Cance
 
 	private boolean isCancelled;
 	
-	private KonquestPlayer player;
-	private Location location;
+	private final KonquestPlayer player;
+	private final Location location;
 	
 	/**
 	 * Default constructor

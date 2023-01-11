@@ -1,29 +1,23 @@
 package com.github.rumsfield.konquest.database;
 
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.model.*;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
-
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonDirective;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonPrefixType;
-import com.github.rumsfield.konquest.model.KonStats;
-import com.github.rumsfield.konquest.model.KonStatsType;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
-
 public class KonquestDB extends Database{
 
 	private boolean isReady;
-	private Konquest konquest;
+	private final Konquest konquest;
 	
 	public KonquestDB(DatabaseType type, Konquest konquest) {
         super(type);
@@ -152,15 +146,14 @@ public class KonquestDB extends Database{
     public ArrayList<KonOfflinePlayer> getAllSavedPlayers() {
     	ArrayList<KonOfflinePlayer> players = new ArrayList<KonOfflinePlayer>();
     	ResultSet player = selectAll("players");
-    	String uuid = "";
-    	String kingdomName = "";
-    	boolean isBarbarian = true;
+    	String uuid;
+    	String kingdomName;
+    	boolean isBarbarian;
     	try {
             while (player.next()) {
             	uuid = player.getString("uuid");
             	kingdomName = player.getString("kingdom");
             	isBarbarian = (player.getInt("barbarian") == 1);
-            	//ChatUtil.printDebug("Database player row: "+uuid+", "+kingdomName+", "+isBarbarian);
             	if(kingdomName==null) { kingdomName = konquest.getKingdomManager().getBarbarians().getName(); }
             	OfflinePlayer offlineBukkitPlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
             	// Check that a valid offlinePlayer was fetched by checking for not null name
@@ -236,36 +229,29 @@ public class KonquestDB extends Database{
     		// Get stats and directives for the player
             ResultSet stats = select("stats", "uuid", bukkitPlayer.getUniqueId().toString());
             ResultSet directives = select("directives", "uuid", bukkitPlayer.getUniqueId().toString());
-            String allDirectives = "";
-            String allStats = "";
             try {
                 while (stats.next()) {
                 	for(KonStatsType statEnum : KonStatsType.values()) {
                 		int statProgress = stats.getInt(statEnum.toString());
                 		player.getPlayerStats().setStat(statEnum, statProgress);
-                		allStats = allStats+statEnum.toString()+":"+statProgress+",";
                 	}
                 }
                 while (directives.next()) {
                 	for(KonDirective dirEnum : KonDirective.values()) {
                 		int directiveProgress = directives.getInt(dirEnum.toString());
                 		player.setDirectiveProgress(dirEnum, directiveProgress);
-                		allDirectives = allDirectives+dirEnum.toString()+":"+directiveProgress+",";
                 	}
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 ChatUtil.printDebug("Could not get stats and directives for "+bukkitPlayer.getName());
             }
-            //ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" stats = "+allStats);
-            //ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" directives = "+allDirectives);
             // Update custom prefixes
             ResultSet customs = select("customs", "uuid", bukkitPlayer.getUniqueId().toString());
             try {
                 while (customs.next()) {
                 	for(String label : konquest.getAccomplishmentManager().getCustomPrefixLabels()) {
                 		boolean isAvailable = customs.getBoolean(label);
-                		//ChatUtil.printDebug("Fetched player "+bukkitPlayer.getName()+" custom "+label+" is "+String.valueOf(isAvailable));
                 		if(isAvailable) {
                 			player.getPlayerPrefix().addAvailableCustom(label);
                 		}
@@ -290,19 +276,12 @@ public class KonquestDB extends Database{
             if(!prefixStatus && konquest.getAccomplishmentManager().isEnabled()) {
             	ChatUtil.printDebug("Failed to assign main prefix or custom prefix to player "+bukkitPlayer.getName());
     			// Schedule messages to display after 20-tick delay (1 second)
-    	    	Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-    	            @Override
-    	            public void run() {
-    	            	//ChatUtil.sendError(bukkitPlayer, "Your prefix has been reverted to default.");
-    	            	ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_PREFIX_ERROR_DEFAULT.getMessage());
-    	            }
-    	        }, 20);
+    	    	Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), () -> {
+                    //ChatUtil.sendError(bukkitPlayer, "Your prefix has been reverted to default.");
+                    ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_PREFIX_ERROR_DEFAULT.getMessage());
+                }, 20);
             }
         	player.getPlayerPrefix().setEnable(enablePrefix);
-        }
-        if(player == null) {
-        	ChatUtil.printDebug("Bad fetch of null player "+bukkitPlayer.getName());
-        	return;
         }
     }
 
@@ -360,7 +339,6 @@ public class KonquestDB extends Database{
     }
     
     public void flushPlayerData(Player bukkitPlayer) {
-    	//ChatUtil.printDebug("Flushing player database for "+bukkitPlayer.getDisplayName());
     	if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to flush non-existent player to database");
 			return;

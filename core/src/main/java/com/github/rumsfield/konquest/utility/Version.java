@@ -1,14 +1,16 @@
 package com.github.rumsfield.konquest.utility;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Copied from stackoverflow
- * https://stackoverflow.com/questions/198431/how-do-you-compare-two-version-strings-in-java
+ * <a href="https://stackoverflow.com/questions/198431/how-do-you-compare-two-version-strings-in-java">Stackoverflow</a>
  * @author alex
  *
  */
 public class Version implements Comparable<Version> {
 
-    private String version;
+    private final String version;
 
     public final String get() {
         return this.version;
@@ -22,9 +24,7 @@ public class Version implements Comparable<Version> {
         this.version = version;
     }
 
-    @Override public int compareTo(Version that) {
-        if(that == null)
-            return 1;
+    @Override public int compareTo(@NotNull Version that) {
         String[] thisParts = this.get().split("\\.");
         String[] thatParts = that.get().split("\\.");
         int length = Math.max(thisParts.length, thatParts.length);

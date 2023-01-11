@@ -1,23 +1,8 @@
 package com.github.rumsfield.konquest.display.wrapper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ListIterator;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
-import com.github.rumsfield.konquest.display.icon.InfoIcon;
-import com.github.rumsfield.konquest.display.icon.KingdomIcon;
-import com.github.rumsfield.konquest.display.icon.MenuIcon;
-import com.github.rumsfield.konquest.display.icon.PlayerIcon;
-import com.github.rumsfield.konquest.display.icon.TownIcon;
+import com.github.rumsfield.konquest.display.icon.*;
 import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
@@ -25,11 +10,16 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+
+import java.util.*;
 
 public class PlayerInfoMenuWrapper extends MenuWrapper {
 
-	private KonOfflinePlayer infoPlayer;
-	private KonPlayer observer;
+	private final KonOfflinePlayer infoPlayer;
+	private final KonPlayer observer;
 	
 	public PlayerInfoMenuWrapper(Konquest konquest, KonOfflinePlayer infoPlayer, KonPlayer observer) {
 		super(konquest);
@@ -46,7 +36,7 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		ChatColor valueColor = DisplayManager.valueColor;
 		ChatColor hintColor = DisplayManager.hintColor;
 
-		String pageLabel = "";
+		String pageLabel;
 		List<String> loreList;
  		
  		// Page 0
@@ -56,7 +46,7 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		/* Kingdom Icon (2) */
 		int numKingdomPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(infoPlayer.getKingdom()).size();
     	int numAllKingdomPlayers = getKonquest().getPlayerManager().getAllPlayersInKingdom(infoPlayer.getKingdom()).size();
-    	loreList = new ArrayList<String>();
+    	loreList = new ArrayList<>();
     	if(infoPlayer.getKingdom().isMaster(infoPlayer.getOfflineBukkitPlayer().getUniqueId())) {
 			loreList.add(ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage());
 		} else if(infoPlayer.getKingdom().isOfficer(infoPlayer.getOfflineBukkitPlayer().getUniqueId())) {
@@ -74,14 +64,14 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		
 		/* Player Score Icon (4) */
 		int score = getKonquest().getKingdomManager().getPlayerScore(infoPlayer);
-		loreList = new ArrayList<String>();
+		loreList = new ArrayList<>();
 		loreList.add(loreColor+MessagePath.MENU_SCORE_PLAYER_SCORE.getMessage()+": "+valueColor+score);
 		loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
 		PlayerIcon playerScore = new PlayerIcon(kingdomColor+infoPlayer.getOfflineBukkitPlayer().getName(),loreList,infoPlayer.getOfflineBukkitPlayer(),4,true,PlayerIconAction.DISPLAY_SCORE);
 		getMenu().getPage(0).addIcon(playerScore);
 		/* Favor Info Icon (5) */
 		String balanceF = String.format("%.2f",KonquestPlugin.getBalance(infoPlayer.getOfflineBukkitPlayer()));
-		InfoIcon info = new InfoIcon(kingdomColor+MessagePath.LABEL_FAVOR.getMessage(), Arrays.asList(loreColor+MessagePath.LABEL_FAVOR.getMessage()+": "+valueColor+balanceF), Material.GOLD_INGOT, 5, false);
+		InfoIcon info = new InfoIcon(kingdomColor+MessagePath.LABEL_FAVOR.getMessage(), Collections.singletonList(loreColor + MessagePath.LABEL_FAVOR.getMessage() + ": " + valueColor + balanceF), Material.GOLD_INGOT, 5, false);
 		getMenu().getPage(0).addIcon(info);
 		// Page 1+
 		List<KonTown> playerTowns = sortedTowns(infoPlayer);
@@ -105,7 +95,7 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 			while(slotIndex < MAX_ICONS_PER_PAGE && townIter.hasNext()) {
 				/* Town Icon (n) */
 				KonTown currentTown = townIter.next();
-				loreList = new ArrayList<String>();
+				loreList = new ArrayList<>();
 				if(currentTown.isPlayerLord(infoPlayer.getOfflineBukkitPlayer())) {
 					loreList.add(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage());
 				} else if(currentTown.isPlayerKnight(infoPlayer.getOfflineBukkitPlayer())) {
@@ -137,7 +127,7 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 			// Player Head Icons open a new score menu for the associated player
 			PlayerIcon icon = (PlayerIcon)clickedIcon;
 			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
-			if(clickPlayer != null && offlinePlayer != null && icon.getAction().equals(PlayerIconAction.DISPLAY_SCORE)) {
+			if(offlinePlayer != null && icon.getAction().equals(PlayerIconAction.DISPLAY_SCORE)) {
 				getKonquest().getDisplayManager().displayScoreMenu(clickPlayer, offlinePlayer);
 			}
 		} else if(clickedIcon instanceof KingdomIcon) {
@@ -153,11 +143,11 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 	
 	// Sort player town list by Lord, Knight, Resident, and then by population, and then by size
  	private List<KonTown> sortedTowns(KonOfflinePlayer player) {
- 		List<KonTown> sortedTowns = new ArrayList<KonTown>();
+ 		List<KonTown> sortedTowns = new ArrayList<>();
  		// Determine town group lists
- 		List<KonTown> lordTowns = new ArrayList<KonTown>();
- 		List<KonTown> knightTowns = new ArrayList<KonTown>();
- 		List<KonTown> residentTowns = new ArrayList<KonTown>();
+ 		List<KonTown> lordTowns = new ArrayList<>();
+ 		List<KonTown> knightTowns = new ArrayList<>();
+ 		List<KonTown> residentTowns = new ArrayList<>();
  		for(KonTown town : getKonquest().getKingdomManager().getPlayerResidenceTowns(player)) {
  			if(town.isPlayerLord(player.getOfflineBukkitPlayer())) {
  				lordTowns.add(town);
@@ -168,27 +158,24 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
  			}
  		}
  		// Sort each town list by population then size
-  		Comparator<KonTown> townComparator = new Comparator<KonTown>() {
-  			@Override
-  			public int compare(final KonTown k1, KonTown k2) {
-  				int result = 0;
-  				if(k1.getNumResidents() < k2.getNumResidents()) {
-  					result = 1;
-  				} else if(k1.getNumResidents() > k2.getNumResidents()) {
-  					result = -1;
-  				} else {
-  					if(k1.getChunkList().size() < k2.getChunkList().size()) {
-  						result = 1;
-  					} else if(k1.getChunkList().size() > k2.getChunkList().size()) {
-  						result = -1;
-  					}
-  				}
-  				return result;
-  			}
-  		};
- 		Collections.sort(lordTowns, townComparator);
- 		Collections.sort(knightTowns, townComparator);
- 		Collections.sort(residentTowns, townComparator);
+  		Comparator<KonTown> townComparator = (townOne, townTwo) -> {
+			  int result = 0;
+			  if(townOne.getNumResidents() < townTwo.getNumResidents()) {
+				  result = 1;
+			  } else if(townOne.getNumResidents() > townTwo.getNumResidents()) {
+				  result = -1;
+			  } else {
+				  if(townOne.getChunkList().size() < townTwo.getChunkList().size()) {
+					  result = 1;
+				  } else if(townOne.getChunkList().size() > townTwo.getChunkList().size()) {
+					  result = -1;
+				  }
+			  }
+			  return result;
+		  };
+ 		lordTowns.sort(townComparator);
+ 		knightTowns.sort(townComparator);
+ 		residentTowns.sort(townComparator);
  		// Add sorted towns to result list
  		sortedTowns.addAll(lordTowns);
  		sortedTowns.addAll(knightTowns);

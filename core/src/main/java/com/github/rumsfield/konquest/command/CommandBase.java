@@ -1,15 +1,14 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
+import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-import org.bukkit.command.CommandSender;
-
 public abstract class CommandBase {
 
-    private Konquest konquest;
-    private CommandSender sender;
+    private final Konquest konquest;
+    private final CommandSender sender;
     private String[] args;
 
     public CommandBase(Konquest konquest, CommandSender sender, String[] args) {

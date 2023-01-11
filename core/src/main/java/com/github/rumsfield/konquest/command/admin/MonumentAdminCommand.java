@@ -7,17 +7,16 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonPlayer.RegionType;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MonumentAdminCommand extends CommandBase {
 	
@@ -29,8 +28,7 @@ public class MonumentAdminCommand extends CommandBase {
     	// k admin monument create|remove|show <name>
     	if (getArgs().length != 4) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
@@ -78,8 +76,6 @@ public class MonumentAdminCommand extends CommandBase {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_REMOVE.getMessage(templateName));
         		
         	} else if(cmdMode.equalsIgnoreCase("show")) {
-        		//boolean isValid = getKonquest().getKingdomManager().getKingdom(kingdomName).getMonumentTemplate().isValid();
-        		//if(isValid) {
         		
         		// Confirm name is a template
         		if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {
@@ -94,11 +90,7 @@ public class MonumentAdminCommand extends CommandBase {
     			player.startMonumentShow(loc0, loc1);
     			String sanctuaryName = getKonquest().getSanctuaryManager().getSanctuaryNameOfTemplate(templateName);
     			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SHOW.getMessage(templateName,sanctuaryName));
-        			
-        		//} else {
-        		//	ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_NONE.getMessage(templateName));
-        		//}
-        		
+
         	} else if(cmdMode.equalsIgnoreCase("status")) {
         		// Confirm name is a template
         		if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {

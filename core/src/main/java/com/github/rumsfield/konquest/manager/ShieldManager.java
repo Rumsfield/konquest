@@ -1,41 +1,35 @@
 package com.github.rumsfield.konquest.manager;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.KonquestPlugin;
+import com.github.rumsfield.konquest.api.manager.KonquestShieldManager;
+import com.github.rumsfield.konquest.api.model.KonquestTown;
+import com.github.rumsfield.konquest.model.*;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.KonquestPlugin;
-import com.github.rumsfield.konquest.api.manager.KonquestShieldManager;
-import com.github.rumsfield.konquest.api.model.KonquestTown;
-import com.github.rumsfield.konquest.model.KonArmor;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonShield;
-import com.github.rumsfield.konquest.model.KonStatsType;
-import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class ShieldManager implements KonquestShieldManager {
 
-	private Konquest konquest;
+	private final Konquest konquest;
 	private boolean isShieldsEnabled;
 	private boolean isArmorsEnabled;
-	private ArrayList<KonShield> shields;
-	private ArrayList<KonArmor> armors;
+	private final ArrayList<KonShield> shields;
+	private final ArrayList<KonArmor> armors;
 	
 	public ShieldManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.isShieldsEnabled = false;
 		this.isArmorsEnabled = false;
-		this.shields = new ArrayList<KonShield>();
-		this.armors = new ArrayList<KonArmor>();
+		this.shields = new ArrayList<>();
+		this.armors = new ArrayList<>();
 	}
 	
 	public void initialize() {
@@ -67,12 +61,13 @@ public class ShieldManager implements KonquestShieldManager {
             return false;
         }
         KonShield newShield;
-        for(String shieldName : shieldsConfig.getConfigurationSection("shields").getKeys(false)) {
-        	boolean status = true;
+		boolean status = true;
+		for(String shieldName : shieldsConfig.getConfigurationSection("shields").getKeys(false)) {
         	int shieldTime = 0;
         	int shieldCost = 0;
         	ConfigurationSection shieldSection = shieldsConfig.getConfigurationSection("shields."+shieldName);
-        	if(shieldSection.contains("charge")) {
+			assert shieldSection != null;
+			if(shieldSection.contains("charge")) {
         		shieldTime = shieldSection.getInt("charge",0);
     		} else {
     			ChatUtil.printDebug("Shields.yml is missing charge section for shield: "+shieldName);
@@ -82,16 +77,11 @@ public class ShieldManager implements KonquestShieldManager {
         		shieldCost = shieldSection.getInt("cost",0);
     		} else {
     			ChatUtil.printDebug("Shields.yml is missing cost section for shield: "+shieldName);
-    			status = false;
-    		}
-        	if(status || shieldTime == 0 || shieldCost == 0) {
-        		newShield = new KonShield(shieldName,shieldTime,shieldCost);
-        		shields.add(newShield);
-        	} else {
-        		ChatUtil.printConsoleError("Invalid shield option: "+shieldName+". Must include valid time and cost values.");
-        	}
-        }
-		return true;
+			}
+			newShield = new KonShield(shieldName, shieldTime, shieldCost);
+			shields.add(newShield);
+		}
+		return status;
 	}
 	
 	private boolean loadArmors() {
@@ -102,12 +92,13 @@ public class ShieldManager implements KonquestShieldManager {
             return false;
         }
         KonArmor newArmor;
-        for(String armorName : shieldsConfig.getConfigurationSection("armors").getKeys(false)) {
-        	boolean status = true;
+		boolean status = true;
+		for(String armorName : shieldsConfig.getConfigurationSection("armors").getKeys(false)) {
         	int armorBlocks = 0;
         	int armorCost = 0;
         	ConfigurationSection armorSection = shieldsConfig.getConfigurationSection("armors."+armorName);
-        	if(armorSection.contains("charge")) {
+			assert armorSection != null;
+			if(armorSection.contains("charge")) {
         		armorBlocks = armorSection.getInt("charge",0);
     		} else {
     			ChatUtil.printDebug("Shields.yml is missing charge section for armor: "+armorName);
@@ -119,21 +110,17 @@ public class ShieldManager implements KonquestShieldManager {
     			ChatUtil.printDebug("Shields.yml is missing cost section for armor: "+armorName);
     			status = false;
     		}
-        	if(status || armorBlocks == 0 || armorCost == 0) {
-        		newArmor = new KonArmor(armorName,armorBlocks,armorCost);
-        		armors.add(newArmor);
-        	} else {
-        		ChatUtil.printConsoleError("Invalid armor option: "+armorName+". Must include valid blocks and cost values.");
-        	}
-        }
-		return true;
+			newArmor = new KonArmor(armorName, armorBlocks, armorCost);
+			armors.add(newArmor);
+		}
+		return status;
 	}
 	
 	public KonShield getShield(String id) {
 		KonShield result = null;
-		for(KonShield s : shields) {
-			if(s.getId().equalsIgnoreCase(id)) {
-				result = s;
+		for(KonShield shield : shields) {
+			if(shield.getId().equalsIgnoreCase(id)) {
+				result = shield;
 				break;
 			}
 		}
@@ -211,7 +198,7 @@ public class ShieldManager implements KonquestShieldManager {
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
         if(KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost)) {
         	if(player != null) {
-        		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)requiredCost);
+        		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR, requiredCost);
         	}
         }
 		return true;
@@ -268,7 +255,7 @@ public class ShieldManager implements KonquestShieldManager {
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
         if(KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost)) {
         	if(player != null) {
-        		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)requiredCost);
+        		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR, requiredCost);
         	}
         }
 		return true;
@@ -298,39 +285,36 @@ public class ShieldManager implements KonquestShieldManager {
 	
 	/**
 	 * Sets a town's shields for (value) seconds from now
-	 * @param town
-	 * 		The town to modify shields
-	 * @param value
-	 * 		Time in seconds from now to end shields. If 0, deactivate shields.
+	 * @param townArg The town to modify shields
+	 * @param value Time in seconds from now to end shields. If 0, deactivate shields.
 	 */
 	public boolean shieldSet(KonquestTown townArg, int value) {
 		boolean result = false;
-		if(townArg instanceof KonTown) {
-			KonTown town = (KonTown) townArg;
-			Date now = new Date();
-			int newEndTime = (int)(now.getTime()/1000) + value;
-			if(town.isShielded()) {
-				if(value <= 0) {
-					town.deactivateShield();
-				} else {
-					town.activateShield(newEndTime);
-				}
-				result = true;
+		if(!(townArg instanceof KonTown)) return false;
+		KonTown town = (KonTown) townArg;
+		Date now = new Date();
+		int newEndTime = (int)(now.getTime()/1000) + value;
+		if(town.isShielded()) {
+			if(value <= 0) {
+				town.deactivateShield();
 			} else {
-				if(value > 0) {
-					town.activateShield(newEndTime);
-					result = true;
-				}
+				town.activateShield(newEndTime);
+			}
+			result = true;
+		} else {
+			if(value > 0) {
+				town.activateShield(newEndTime);
+				result = true;
 			}
 		}
+
 		return result;
 	}
 	
 	/**
 	 * Adds to a town's shields in seconds, positive or negative
-	 * @param town
-	 * @param value
-	 * 		Time in seconds to add to current shields. If result is <= 0, deactivate shields.
+	 * @param townArg The town to modify shields
+	 * @param value Time in seconds to add to current shields. If result is <= 0, deactivate shields.
 	 */
 	public boolean shieldAdd(KonquestTown townArg, int value) {
 		boolean result = false;
@@ -359,27 +343,24 @@ public class ShieldManager implements KonquestShieldManager {
 
 	/**
 	 * Sets a town's armor for (value) blocks
-	 * @param town
-	 * 		The town to modify armor
-	 * @param value
-	 * 		Amount of blocks to set the town's armor to. If 0, deactivate armor.
+	 * @param townArg The town to modify armor
+	 * @param value Amount of blocks to set the town's armor to. If 0, deactivate armor.
 	 */
 	public boolean armorSet(KonquestTown townArg, int value) {
 		boolean result = false;
-		if(townArg instanceof KonTown) {
-			KonTown town = (KonTown) townArg;
-			if(town.isArmored()) {
-				if(value <= 0) {
-					town.deactivateArmor();
-				} else {
-					town.activateArmor(value);
-				}
-				result = true;
+		if(!(townArg instanceof KonTown)) return false;
+		KonTown town = (KonTown) townArg;
+		if(town.isArmored()) {
+			if(value <= 0) {
+				town.deactivateArmor();
 			} else {
-				if(value > 0) {
-					town.activateArmor(value);
-					result = true;
-				}
+				town.activateArmor(value);
+			}
+			result = true;
+		} else {
+			if(value > 0) {
+				town.activateArmor(value);
+				result = true;
 			}
 		}
 		return result;
@@ -387,29 +368,27 @@ public class ShieldManager implements KonquestShieldManager {
 	
 	/**
 	 * Adds to a town's armor in blocks, positive or negative
-	 * @param town
-	 * @param value
-	 * 		Blocks to add to current armor. If result is <= 0, deactivate armor.
+	 * @param townArg The town to modify armor
+	 * @param value Blocks to add to current armor. If result is <= 0, deactivate armor.
 	 */
 	public boolean armorAdd(KonquestTown townArg, int value) {
 		boolean result = false;
-		if(townArg instanceof KonTown) {
-			KonTown town = (KonTown) townArg;
-			int newBlocks = value;
+		if(!(townArg instanceof KonTown)) return false;
+		KonTown town = (KonTown) townArg;
+		int newBlocks = value;
+		if(town.isArmored()) {
+			newBlocks = town.getArmorBlocks() + value;
+		}
+		if(newBlocks <= 0) {
+			// Blocks is 0 or less, deactivate armor and do nothing
 			if(town.isArmored()) {
-				newBlocks = town.getArmorBlocks() + value;
-			}
-			if(newBlocks <= 0) {
-				// Blocks is 0 or less, deactivate armor and do nothing
-				if(town.isArmored()) {
-					town.deactivateArmor();
-					result = true;
-				}
-			} else {
-				// Blocks are valid, add to armor
-				town.activateArmor(newBlocks);
+				town.deactivateArmor();
 				result = true;
 			}
+		} else {
+			// Blocks are valid, add to armor
+			town.activateArmor(newBlocks);
+			result = true;
 		}
 		return result;
 	}

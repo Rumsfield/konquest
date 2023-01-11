@@ -6,16 +6,15 @@ import com.github.rumsfield.konquest.model.KonPropertyFlag;
 import com.github.rumsfield.konquest.model.KonPropertyFlagHolder;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
 public class FlagAdminCommand extends CommandBase {
 	
@@ -36,8 +35,7 @@ public class FlagAdminCommand extends CommandBase {
     	// k admin flag <name> [<flag>] [<value>]
     	if (getArgs().length != 3 && getArgs().length != 4 && getArgs().length != 5) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-    	} else {
+		} else {
     		
     		// Check for valid holder name
     		String holderName = getArgs()[2];
@@ -110,7 +108,7 @@ public class FlagAdminCommand extends CommandBase {
             		// k admin flag <name> <flag> <value>
             		// Set new value for flag
             		String flagValue = getArgs()[4];
-            		boolean bValue = Boolean.valueOf(flagValue);
+            		boolean bValue = Boolean.parseBoolean(flagValue);
             		boolean status = holder.setPropertyValue(flagArg, bValue);
             		if(status) {
             			// Successfully assigned value

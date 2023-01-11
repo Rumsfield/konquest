@@ -1,21 +1,20 @@
 package com.github.rumsfield.konquest.command.admin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.command.CommandBase;
+import com.github.rumsfield.konquest.model.KonOfflinePlayer;
+import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.model.KonUpgrade;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonUpgrade;
-import com.github.rumsfield.konquest.command.CommandBase;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
-import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class TownAdminCommand extends CommandBase {
 
@@ -35,8 +34,7 @@ public class TownAdminCommand extends CommandBase {
 		// k admin town create|remove|add|kick|lord|knight|rename|upgrade|shield|armor|plots|options <town> [<name>] [<arg>]
 		if (getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
         	
@@ -127,7 +125,7 @@ public class TownAdminCommand extends CommandBase {
 		            		return;
 		        		}
 		        	} else {
-		        		int distance = 0;
+		        		int distance;
 		        		switch(exitCode) {
 		        		case 1:
 		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_OVERLAP.getMessage());
@@ -148,13 +146,8 @@ public class TownAdminCommand extends CommandBase {
 		        			distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
 		        			int min_distance_capital = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_capital");
 		        			int min_distance_town = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
-		        			int min_distance = 0;
-		        			if(min_distance_capital < min_distance_town) {
-		        				min_distance = min_distance_capital;
-		        			} else {
-		        				min_distance = min_distance_town;
-		        			}
-		        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
+		        			int min_distance = Math.min(min_distance_capital, min_distance_town);
+							ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
 		        			break;
 		        		case 7:
 		        			distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
@@ -339,7 +332,7 @@ public class TownAdminCommand extends CommandBase {
 		        		return;
 	        		}
 	        		if(!upgradeLevelStr.equalsIgnoreCase("")) {
-	        			int upgradeLevel = 0;
+	        			int upgradeLevel;
 	        			try {
 	        				upgradeLevel = Integer.parseInt(upgradeLevelStr);
 	        			} 
@@ -388,7 +381,7 @@ public class TownAdminCommand extends CommandBase {
 						town.deactivateShield();
 						ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 					} else {
-						int shieldVal = 0;
+						int shieldVal;
 						if(!shieldValStr.equals("")) {
 							try {
 								shieldVal = Integer.parseInt(shieldValStr);
@@ -444,7 +437,7 @@ public class TownAdminCommand extends CommandBase {
 						town.deactivateArmor();
 						ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 					} else {
-						int armorVal = 0;
+						int armorVal;
 						if(!armorValStr.equals("")) {
 							try {
 								armorVal = Integer.parseInt(armorValStr);
@@ -484,8 +477,7 @@ public class TownAdminCommand extends CommandBase {
 			
         	default:
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-        		return;
-        	}
+			}
         }
 	}
 
@@ -513,7 +505,7 @@ public class TownAdminCommand extends CommandBase {
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 4) {
 			// Town name
-			List<String> townList = new ArrayList<String>();
+			List<String> townList = new ArrayList<>();
 			String subCommand = getArgs()[2];
 			if(subCommand.equalsIgnoreCase("create")) {
 				// Suggest new name
@@ -527,7 +519,7 @@ public class TownAdminCommand extends CommandBase {
 				townList.addAll(getKonquest().getKingdomManager().getKingdomNames());
 			}
 			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
+			StringUtil.copyPartialMatches(getArgs()[3], townList, matchedTabList);
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 5) {
 			// suggest appropriate arguments

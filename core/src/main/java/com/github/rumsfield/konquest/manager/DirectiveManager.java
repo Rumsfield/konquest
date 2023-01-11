@@ -1,31 +1,30 @@
 package com.github.rumsfield.konquest.manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.model.KonDirective;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class DirectiveManager {
 	
-	private Konquest konquest;
-	private HashMap<KonDirective,Double> rewardTable;
+	private final Konquest konquest;
+	private final HashMap<KonDirective,Double> rewardTable;
 	private boolean isEnabled;
 	
 	public DirectiveManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.rewardTable = new HashMap<KonDirective,Double>();
+		this.rewardTable = new HashMap<>();
 		this.isEnabled = false;
 	}
 	
@@ -38,7 +37,6 @@ public class DirectiveManager {
 				reward = konquest.getConfigManager().getConfig("core").getDouble("core.favor.rewards."+dirName,0.0);
 			}
 			rewardTable.put(dir,reward);
-			//ChatUtil.printDebug("Initialized reward "+reward+" for directive "+dirName);
 		}
 		isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.directive_quests",true);
 		ChatUtil.printDebug("Directive Manager is ready, enabled: "+isEnabled);
@@ -51,18 +49,17 @@ public class DirectiveManager {
 	/**
 	 * Primary method for updating progress and giving rewards for completion.
 	 * @param player - KonPlayer assessing progress
-	 * @param directive - KonDirective to asses
+	 * @param directive - KonDirective to assess
 	 */
 	public void updateDirectiveProgress(KonPlayer player, KonDirective directive) {
 		if(isEnabled) {
 			// Check for valid permissions
 			if(!player.getBukkitPlayer().hasPermission(directive.permission())) {
-				ChatUtil.printDebug("Player "+player.getBukkitPlayer().getName()+" does not have permission for directive "+directive.toString());
+				ChatUtil.printDebug("Player "+player.getBukkitPlayer().getName()+" does not have permission for directive "+ directive);
 				return;
 			}
 			// Check to see if player is already at max progress (complete)
 			int currentProgress = player.getDirectiveProgress(directive);
-			//ChatUtil.printDebug("Updating directive progress for "+player.getBukkitPlayer().getName()+" "+directive.toString()+", currently "+currentProgress);
 			if(currentProgress < directive.stages()) {
 				// Increment directive progress
 				int newProgress = currentProgress + 1;
@@ -76,8 +73,6 @@ public class DirectiveManager {
 		            	ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_QUEST.getMessage()+": "+ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+directive.title());
 		            }
 				}
-			} else {
-				//ChatUtil.printDebug("Player "+player.getBukkitPlayer().getName()+" has already completed directive "+directive.toString());
 			}
 		}
 	}
@@ -85,8 +80,9 @@ public class DirectiveManager {
 	public void displayBook(KonPlayer player) {
 		if(isEnabled) {
 			ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-			List<String> pages = new ArrayList<String>();
+			List<String> pages = new ArrayList<>();
 			BookMeta meta = (BookMeta)Bukkit.getServer().getItemFactory().getItemMeta(Material.WRITTEN_BOOK);
+			assert meta != null;
 			// Format book cover
 			meta.setAuthor("Konquest");
 			meta.setGeneration(BookMeta.Generation.ORIGINAL);

@@ -1,25 +1,23 @@
 package com.github.rumsfield.konquest.command;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.manager.TravelManager.TravelDestination;
 import com.github.rumsfield.konquest.model.KonCamp;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTerritory;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class TravelCommand extends CommandBase {
 	
@@ -31,13 +29,11 @@ public class TravelCommand extends CommandBase {
 		// k travel town1|capital|camp|home|wild
     	if (getArgs().length != 2) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
         	
         	World bukkitWorld = bukkitPlayer.getWorld();
         	if(!getKonquest().isWorldValid(bukkitWorld)) {
-        		//ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_WORLD.toString());
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
@@ -54,7 +50,6 @@ public class TravelCommand extends CommandBase {
 				Location playerLoc = bukkitPlayer.getLocation();
 				if(getKonquest().getTerritoryManager().isChunkClaimed(playerLoc)) {
 					if(!getKonquest().getTerritoryManager().getChunkTerritory(playerLoc).getKingdom().equals(player.getKingdom())) {
-						//ChatUtil.sendError((Player) getSender(), "Cannot travel within enemy territory!");
 						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_ENEMY_TERRITORY.getMessage());
 	                    return;
 					}
@@ -69,7 +64,6 @@ public class TravelCommand extends CommandBase {
         	if(travelName.equalsIgnoreCase("capital")) {
         		// Travel to capital
         		if(player.isBarbarian()) {
-            		//ChatUtil.sendError((Player) getSender(), "Barbarians can only travel to camp");
             		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
                     return;
             	}
@@ -85,18 +79,16 @@ public class TravelCommand extends CommandBase {
         	} else if(travelName.equalsIgnoreCase("camp")) {
         		// Travel to camp
         		if(!player.isBarbarian()) {
-        			//ChatUtil.sendError((Player) getSender(), "Only Barbarians can travel to Camps.");
         			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
                     return;
         		}
-        		if(!getKonquest().getCampManager().isCampSet((KonOfflinePlayer)player)) {
-        			//ChatUtil.sendError((Player) getSender(), "You do not have a Camp!");
+        		if(!getKonquest().getCampManager().isCampSet(player)) {
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_NO_CAMP.getMessage());
                     return;
         		}
         		boolean isCampTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.camp",false);
         		if(isCampTravel) {
-        			KonCamp travelCamp = getKonquest().getCampManager().getCamp((KonOfflinePlayer)player);
+        			KonCamp travelCamp = getKonquest().getCampManager().getCamp(player);
         			travelLoc = travelCamp.getSpawnLoc();
             		destination = TravelDestination.CAMP;
             		travelTerritory = travelCamp;
@@ -107,13 +99,11 @@ public class TravelCommand extends CommandBase {
         	} else if(travelName.equalsIgnoreCase("home")) {
         		// Travel to bed home
         		if(player.isBarbarian()) {
-        			//ChatUtil.sendError((Player) getSender(), "Barbarians cannot travel to Home.");
         			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
                     return;
         		}
         		Location bedLoc = player.getBukkitPlayer().getBedSpawnLocation();
         		if(bedLoc == null) {
-        			//ChatUtil.sendError((Player) getSender(), "You do not have a bed home!");
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_NO_HOME.getMessage());
                     return;
         		}
@@ -138,12 +128,10 @@ public class TravelCommand extends CommandBase {
         	} else {
         		// Travel to town
         		if(player.isBarbarian()) {
-            		//ChatUtil.sendError((Player) getSender(), "Barbarians can only travel to camp");
             		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
                     return;
             	}
         		if(!player.getKingdom().hasTown(travelName)) {
-        			//ChatUtil.sendError((Player) getSender(), "That town does not exist in your Kingdom.");
         			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(travelName));
                     return;
         		}
@@ -154,7 +142,6 @@ public class TravelCommand extends CommandBase {
         		}
         		if(town.isPlayerTravelDisabled(bukkitPlayer.getUniqueId())) {
         			String cooldown = town.getPlayerTravelCooldownString(bukkitPlayer.getUniqueId());
-        			//ChatUtil.sendError((Player) getSender(), "You must wait "+cooldown+" before traveling to "+town.getName());
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_COOLDOWN.getMessage(cooldown,town.getName()));
                     return;
         		}
@@ -178,7 +165,7 @@ public class TravelCommand extends CommandBase {
         	cost = (cost < 0) ? 0 : cost;
         	cost_per_chunk = (cost_per_chunk < 0) ? 0 : cost_per_chunk;
         	cost_camp = (cost_camp < 0) ? 0 : cost_camp;
-        	double total_cost = 0;
+        	double total_cost;
         	if(destination.equals(TravelDestination.CAMP)) {
         		// Player is traveling to camp, fixed cost
         		total_cost = cost_camp;
@@ -195,14 +182,12 @@ public class TravelCommand extends CommandBase {
         	}
 			if(!isTravelAlwaysAllowed && total_cost > 0) {
 				if(KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
-					//ChatUtil.sendError((Player) getSender(), "Not enough Favor, need "+total_cost);
 					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(total_cost));
                     return;
 				}
 			}
 			if(isTravelAlwaysAllowed && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
 				// Override cost to 0 to allow the player to travel, when they don't have enough money.
-        		//ChatUtil.sendNotice((Player) getSender(), "Not enough Favor, this one's on us.");
 				total_cost = 0;
         	}
 			
@@ -221,7 +206,7 @@ public class TravelCommand extends CommandBase {
 			// If player uses another travel command during warmup, cancel current warmup and begin a new one for new destination
 			
 			int travelWarmup = getKonquest().getConfigManager().getConfig("core").getInt("core.travel.warmup",0);
-			travelWarmup = (travelWarmup < 0) ? 0 : travelWarmup;
+			travelWarmup = Math.max(travelWarmup, 0);
 			if(travelWarmup > 0) {
 				String warmupTimeStr = ""+travelWarmup;
 				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TRAVEL_NOTICE_WARMUP.getMessage(warmupTimeStr));

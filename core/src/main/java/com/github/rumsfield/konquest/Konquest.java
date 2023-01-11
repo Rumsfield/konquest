@@ -1,26 +1,25 @@
 package com.github.rumsfield.konquest;
 
-import java.awt.Point;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ThreadLocalRandom;
-
+import com.github.rumsfield.konquest.api.KonquestAPI;
+import com.github.rumsfield.konquest.api.event.KonquestEvent;
+import com.github.rumsfield.konquest.api.model.KonquestKingdom;
+import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
+import com.github.rumsfield.konquest.api.model.KonquestTerritory;
+import com.github.rumsfield.konquest.command.CommandHandler;
+import com.github.rumsfield.konquest.database.DatabaseThread;
+import com.github.rumsfield.konquest.manager.*;
+import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
+import com.github.rumsfield.konquest.manager.TravelManager.TravelDestination;
+import com.github.rumsfield.konquest.map.MapHandler;
+import com.github.rumsfield.konquest.model.*;
+import com.github.rumsfield.konquest.nms.*;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.Timeable;
+import com.github.rumsfield.konquest.utility.Timer;
+import com.google.common.collect.MapMaker;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -33,59 +32,16 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import com.google.common.collect.MapMaker;
-
-import com.github.rumsfield.konquest.manager.AccomplishmentManager;
-import com.github.rumsfield.konquest.manager.CampManager;
-import com.github.rumsfield.konquest.manager.ConfigManager;
-import com.github.rumsfield.konquest.manager.DirectiveManager;
-import com.github.rumsfield.konquest.manager.DisplayManager;
-import com.github.rumsfield.konquest.manager.IntegrationManager;
-import com.github.rumsfield.konquest.manager.KingdomManager;
-import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
-import com.github.rumsfield.konquest.manager.LanguageManager;
-import com.github.rumsfield.konquest.manager.LootManager;
-import com.github.rumsfield.konquest.manager.PlaceholderManager;
-import com.github.rumsfield.konquest.manager.PlayerManager;
-import com.github.rumsfield.konquest.manager.PlotManager;
-import com.github.rumsfield.konquest.manager.RuinManager;
-import com.github.rumsfield.konquest.manager.SanctuaryManager;
-import com.github.rumsfield.konquest.manager.ShieldManager;
-import com.github.rumsfield.konquest.manager.TerritoryManager;
-import com.github.rumsfield.konquest.manager.TravelManager;
-import com.github.rumsfield.konquest.manager.UpgradeManager;
-import com.github.rumsfield.konquest.manager.TravelManager.TravelDestination;
-import com.github.rumsfield.konquest.map.MapHandler;
-import com.github.rumsfield.konquest.model.KonBarDisplayer;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonRuin;
-import com.github.rumsfield.konquest.model.KonTerritory;
-import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.nms.Handler_1_16_R3;
-import com.github.rumsfield.konquest.nms.Handler_1_17_R1;
-import com.github.rumsfield.konquest.nms.Handler_1_18_R1;
-import com.github.rumsfield.konquest.nms.Handler_1_18_R2;
-import com.github.rumsfield.konquest.nms.Handler_1_19_R1;
-import com.github.rumsfield.konquest.nms.Handler_1_19_R2;
-import com.github.rumsfield.konquest.nms.VersionHandler;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.Timeable;
-import com.github.rumsfield.konquest.utility.Timer;
-import com.github.rumsfield.konquest.api.KonquestAPI;
-import com.github.rumsfield.konquest.api.event.KonquestEvent;
-import com.github.rumsfield.konquest.model.KonUpgrade;
-import com.github.rumsfield.konquest.api.model.KonquestKingdom;
-import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
-import com.github.rumsfield.konquest.api.model.KonquestTerritory;
-import com.github.rumsfield.konquest.command.CommandHandler;
-import com.github.rumsfield.konquest.database.DatabaseThread;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Konquest implements KonquestAPI, Timeable {
 	
-	private KonquestPlugin plugin;
+	private final KonquestPlugin plugin;
 	private static Konquest instance;
 	private static String chatTag;
 	private static String chatMessage;
@@ -106,27 +62,27 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public static String healthModName = "konquest.health_buff"; // never change this :)
 	
-	private DatabaseThread databaseThread;
-	private AccomplishmentManager accomplishmentManager;
-	private DirectiveManager directiveManager;
-	private PlayerManager playerManager;
-	private KingdomManager kingdomManager;
-	private CampManager campManager;
-	private ConfigManager configManager;
-	private IntegrationManager integrationManager;
-	private LootManager lootManager;
-	private CommandHandler commandHandler;
-	private DisplayManager displayManager;
-	private UpgradeManager upgradeManager;
-	private ShieldManager shieldManager;
-	private RuinManager ruinManager;
-	private LanguageManager languageManager;
-	private MapHandler mapHandler;
-	private PlaceholderManager placeholderManager;
-	private PlotManager plotManager;
-	private TravelManager travelManager;
-	private SanctuaryManager sanctuaryManager;
-	private TerritoryManager territoryManager;
+	private final DatabaseThread databaseThread;
+	private final AccomplishmentManager accomplishmentManager;
+	private final DirectiveManager directiveManager;
+	private final PlayerManager playerManager;
+	private final KingdomManager kingdomManager;
+	private final CampManager campManager;
+	private final ConfigManager configManager;
+	private final IntegrationManager integrationManager;
+	private final LootManager lootManager;
+	private final CommandHandler commandHandler;
+	private final DisplayManager displayManager;
+	private final UpgradeManager upgradeManager;
+	private final ShieldManager shieldManager;
+	private final RuinManager ruinManager;
+	private final LanguageManager languageManager;
+	private final MapHandler mapHandler;
+	private final PlaceholderManager placeholderManager;
+	private final PlotManager plotManager;
+	private final TravelManager travelManager;
+	private final SanctuaryManager sanctuaryManager;
+	private final TerritoryManager territoryManager;
 	
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
@@ -141,21 +97,21 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	private EventPriority chatPriority;
 	private static final EventPriority defaultChatPriority = EventPriority.HIGH;
-    private List<World> worlds;
+    private final List<World> worlds;
     private boolean isWhitelist;
     private boolean isBlacklistIgnored;
 	public List<String> opStatusMessages;
-	private Timer saveTimer;
-	private Timer compassTimer;
-	private Timer pingTimer;
+	private final Timer saveTimer;
+	private final Timer compassTimer;
+	private final Timer pingTimer;
 	private int saveIntervalSeconds;
 	private long offlineTimeoutSeconds;
 	public ConcurrentMap<Player, Location> lastPlaced = new MapMaker().
             weakKeys().
             weakValues().
             makeMap();
-	private ConcurrentMap<UUID, ItemStack> headCache = new MapMaker().makeMap();
-	private HashMap<Player,Location> teleportLocationQueue;
+	private final ConcurrentMap<UUID, ItemStack> headCache = new MapMaker().makeMap();
+	private final HashMap<Player,Location> teleportLocationQueue;
 	
 	public Konquest(KonquestPlugin plugin) {
 		this.plugin = plugin;
@@ -188,10 +144,10 @@ public class Konquest implements KonquestAPI, Timeable {
 		versionHandler = null;
 		
 		this.chatPriority = defaultChatPriority;
-		this.worlds = new ArrayList<World>();
+		this.worlds = new ArrayList<>();
 		this.isWhitelist = false;
 		this.isBlacklistIgnored = false;
-		this.opStatusMessages = new ArrayList<String>();
+		this.opStatusMessages = new ArrayList<>();
 		this.saveTimer = new Timer(this);
 		this.compassTimer = new Timer(this);
 		this.pingTimer = new Timer(this);
@@ -199,7 +155,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		this.offlineTimeoutSeconds = 0;
 		this.isVersionHandlerEnabled = false;
 		this.isPacketSendEnabled = false;
-		this.teleportLocationQueue = new HashMap<Player,Location>();
+		this.teleportLocationQueue = new HashMap<>();
 	}
 	
 	public void initialize() {
@@ -264,7 +220,7 @@ public class Konquest implements KonquestAPI, Timeable {
     		return;
     	}
     	ChatUtil.printConsoleAlert("Your server version is "+version+", "+Bukkit.getServer().getBukkitVersion());
-    	boolean isVersionHandlerReady = false;
+    	boolean isVersionHandlerReady;
     	
     	// Version-specific cases
     	try {
@@ -339,7 +295,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		placeholderManager.initialize();
 		plotManager.initialize();
 		//guildManager.loadOptions();
-		offlineTimeoutSeconds = (long)(configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)*86400);
+		offlineTimeoutSeconds = configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)* 86400L;
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;
 			ChatUtil.printConsoleError("offline_timeout_seconds in core.yml is less than 1 day, overriding to 1 day to prevent data loss.");
@@ -390,9 +346,9 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	private void initColors() {
 		ChatColor color;
-		String colorPath = "";
-		String configColor = "";
-		String defaultColor = "";
+		String colorPath;
+		String configColor;
+		String defaultColor;
 		
 		/* Friendly Primary Color */
 		colorPath = "core.colors.friendly_primary";
@@ -503,7 +459,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	public KonPlayer initPlayer(Player bukkitPlayer) {
-		KonPlayer player = null;
+		KonPlayer player;
     	// Fetch player from the database
     	// Also instantiates player object in PlayerManager
 		databaseThread.getDatabase().fetchPlayerData(bukkitPlayer);
@@ -747,7 +703,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	public boolean isWorldValid(World world) {
-		boolean result = false;
+		boolean result;
 		if(isWhitelist) {
 			result = worlds.contains(world);
 		} else {
@@ -921,12 +877,12 @@ public class Konquest implements KonquestAPI, Timeable {
 	// Helper methods
 	/**
 	 * Gets chunks around loc, (2r-1)^2 chunks squared
-	 * @param loc
-	 * @param radius
+	 * @param loc location of area
+	 * @param radius radius of area around loc
 	 * @return (2r-1)^2 chunks squared
 	 */
 	public ArrayList<Chunk> getAreaChunks(Location loc, int radius) {
-		ArrayList<Chunk> areaChunks = new ArrayList<Chunk>();
+		ArrayList<Chunk> areaChunks = new ArrayList<>();
 		areaChunks.add(loc.getChunk());
 		int curX = loc.getChunk().getX();
 		int curZ = loc.getChunk().getZ();
@@ -941,12 +897,11 @@ public class Konquest implements KonquestAPI, Timeable {
 				}
 			}
 		}
-		//ChatUtil.printDebug("Got chunks: "+Arrays.toString(areaChunks.toArray()));
 		return areaChunks;
 	}
 
 	public ArrayList<Point> getAreaPoints(Location loc, int radius) {
-		ArrayList<Point> areaPoints = new ArrayList<Point>();
+		ArrayList<Point> areaPoints = new ArrayList<>();
 		Point center = toPoint(loc);
 		areaPoints.add(center);
 		if(radius > 0) {
@@ -965,12 +920,12 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	/**
 	 * Gets chunks surrounding loc, (2r-1)^2-1 chunks squared
-	 * @param loc
-	 * @param radius
+	 * @param loc location of area
+	 * @param radius radius of area around loc
 	 * @return (2r-1)^2 chunks squared
 	 */
 	public ArrayList<Chunk> getSurroundingChunks(Location loc, int radius) {
-		ArrayList<Chunk> areaChunks = new ArrayList<Chunk>();
+		ArrayList<Chunk> areaChunks = new ArrayList<>();
 		int curX = loc.getChunk().getX();
 		int curZ = loc.getChunk().getZ();
 		if(radius > 0) {
@@ -988,7 +943,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	public ArrayList<Point> getSurroundingPoints(Location loc, int radius) {
-		ArrayList<Point> areaPoints = new ArrayList<Point>();
+		ArrayList<Point> areaPoints = new ArrayList<>();
 		Point center = toPoint(loc);
 		if(radius > 0) {
 			int min = (radius-1)*-1;
@@ -1005,7 +960,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	public ArrayList<Point> getBorderPoints(Location loc, int radius) {
-		ArrayList<Point> areaPoints = new ArrayList<Point>();
+		ArrayList<Point> areaPoints = new ArrayList<>();
 		Point center = toPoint(loc);
 		if(radius > 0) {
 			int min = (radius-1)*-1;
@@ -1022,7 +977,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	public ArrayList<Chunk> getSideChunks(Chunk chunk) {
-		ArrayList<Chunk> sideChunks = new ArrayList<Chunk>();
+		ArrayList<Chunk> sideChunks = new ArrayList<>();
 		int[] coordLUTX = {0,1,0,-1};
 		int[] coordLUTZ = {1,0,-1,0};
 		int curX = chunk.getX();
@@ -1034,7 +989,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	public ArrayList<Chunk> getSideChunks(Location loc) {
-		ArrayList<Chunk> sideChunks = new ArrayList<Chunk>();
+		ArrayList<Chunk> sideChunks = new ArrayList<>();
 		int[] coordLUTX = {0,1,0,-1};
 		int[] coordLUTZ = {1,0,-1,0};
 		int curX = loc.getChunk().getX();
@@ -1046,7 +1001,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	public ArrayList<Point> getSidePoints(Location loc) {
-		ArrayList<Point> sidePoints = new ArrayList<Point>();
+		ArrayList<Point> sidePoints = new ArrayList<>();
 		Point center = toPoint(loc);
 		int[] coordLUTX = {0,1,0,-1};
 		int[] coordLUTZ = {1,0,-1,0};
@@ -1081,17 +1036,17 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	public String formatPointsToString(Collection<Point> points) {
-		String result = "";
+		StringBuilder result = new StringBuilder();
         for(Point point : points) {
         	int x = (int)point.getX();
         	int y = (int)point.getY();
-        	result = result+x+","+y+".";
+        	result.append(x).append(",").append(y).append(".");
         }
-        return result;
+        return result.toString();
 	}
 	
 	public ArrayList<Point> formatStringToPoints(String coords) {
-		ArrayList<Point> points = new ArrayList<Point>();
+		ArrayList<Point> points = new ArrayList<>();
 		String[] coord_list = coords.split("\\.");
 		//ChatUtil.printDebug("Split coords: "+Arrays.toString(coord_list));
 		for(String coord : coord_list) {
@@ -1109,18 +1064,18 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	public String formatLocationsToString(Collection<Location> locs) {
-		String result = "";
+		StringBuilder result = new StringBuilder();
         for(Location loc : locs) {
         	int x = loc.getBlockX();
         	int y = loc.getBlockY();
         	int z = loc.getBlockZ();
-        	result = result+x+","+y+","+z+".";
+        	result.append(x).append(",").append(y).append(",").append(z).append(".");
         }
-        return result;
+        return result.toString();
 	}
 	
 	public ArrayList<Location> formatStringToLocations(String coords, World world) {
-		ArrayList<Location> locations = new ArrayList<Location>();
+		ArrayList<Location> locations = new ArrayList<>();
 		String[] coord_list = coords.split("\\.");
 		//ChatUtil.printDebug("Split coords: "+Arrays.toString(coord_list));
 		for(String coord : coord_list) {
@@ -1147,9 +1102,9 @@ public class Konquest implements KonquestAPI, Timeable {
 		int offsetZ = configManager.getConfig("core").getInt("core.travel.wild_center_z",0);
 		radius = radius > 0 ? radius : 2;
 		ChatUtil.printDebug("Generating random wilderness location at center "+offsetX+","+offsetZ+" in radius "+radius);
-		int randomNumX = 0;
-		int randomNumZ = 0;
-		int randomNumY = 0;
+		int randomNumX;
+		int randomNumZ;
+		int randomNumY;
 		boolean foundValidLoc = false;
 		int timeout = 0;
 		while(!foundValidLoc) {
@@ -1174,17 +1129,17 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	/**
 	 * Gets a random location in a square chunk area, excluding the center chunk
-	 * @param center
-	 * @param radius
-	 * @return
+	 * @param center A block centered location
+	 * @param radius a radius
+	 * @return random location within radius of the center
 	 */
 	public Location getSafeRandomCenteredLocation(Location center, int radius) {
 		Location randLoc = null;
 		ChatUtil.printDebug("Generating random centered location for radius "+radius);
-		int randomChunkIdx = 0;
-		int randomNumX = 0;
-		int randomNumZ = 0;
-		int randomNumY = 0;
+		int randomChunkIdx;
+		int randomNumX;
+		int randomNumZ;
+		int randomNumY;
 		boolean foundValidLoc = false;
 		int timeout = 0;
 		while(!foundValidLoc) {
@@ -1197,8 +1152,8 @@ public class Konquest implements KonquestAPI, Timeable {
 			Block randBlockDown = chunkList.get(randomChunkIdx).getBlock(randomNumX, randomNumY-1, randomNumZ);
 			randLoc = randBlock.getLocation();
 			randLoc.add(0.5,2,0.5);
-			ChatUtil.printDebug("Checking block material target: "+randBlock.getType().toString());
-			ChatUtil.printDebug("Checking block material down: "+randBlockDown.getType().toString());
+			ChatUtil.printDebug("Checking block material target: "+ randBlock.getType());
+			ChatUtil.printDebug("Checking block material down: "+ randBlockDown.getType());
 			if(!randBlockDown.getType().equals(Material.LAVA)) {
 				foundValidLoc = true;
 			} else {
@@ -1223,7 +1178,7 @@ public class Konquest implements KonquestAPI, Timeable {
     
     /**
      * Sends updated team packets for the given player
-     * @param player
+     * @param player The player to send the packets to
      */
     public void updateNamePackets(KonPlayer player) {
     	if(!isPacketSendEnabled) {
@@ -1231,13 +1186,13 @@ public class Konquest implements KonquestAPI, Timeable {
     	}
     	// Loop over all online players, populate team lists and send each online player a team packet for arg player
     	// Send arg player packets for each team with lists of online players
-		List<String> friendlyNames = new ArrayList<String>();
-		List<String> enemyNames = new ArrayList<String>();
-		List<String> sanctionedNames = new ArrayList<String>();
-		List<String> peacefulNames = new ArrayList<String>();
-		List<String> alliedNames = new ArrayList<String>();
-		List<String> barbarianNames = new ArrayList<String>();
-		Team onlinePacketTeam = null;
+		List<String> friendlyNames = new ArrayList<>();
+		List<String> enemyNames = new ArrayList<>();
+		List<String> sanctionedNames = new ArrayList<>();
+		List<String> peacefulNames = new ArrayList<>();
+		List<String> alliedNames = new ArrayList<>();
+		List<String> barbarianNames = new ArrayList<>();
+		Team onlinePacketTeam;
     	for(KonPlayer onlinePlayer : playerManager.getPlayersOnline()) {
     		
     		// Place online player in appropriate list w.r.t. player
@@ -1283,7 +1238,7 @@ public class Konquest implements KonquestAPI, Timeable {
     			}
     		}
     		// Send appropriate team packet to online player
-    		versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Arrays.asList(player.getBukkitPlayer().getName()), onlinePacketTeam);
+    		versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Collections.singletonList(player.getBukkitPlayer().getName()), onlinePacketTeam);
     	}
     	// Send packets to player
     	if(!barbarianNames.isEmpty()) {
@@ -1332,8 +1287,7 @@ public class Konquest implements KonquestAPI, Timeable {
     
     public void telePlayerLocation(Player player, Location travelLocation) {
     	Point locPoint = toPoint(travelLocation);
-    	Location qLoc = travelLocation;
-		Location destination = new Location(qLoc.getWorld(),qLoc.getBlockX()+0.5,qLoc.getBlockY()+1.0,qLoc.getBlockZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
+		Location destination = new Location(travelLocation.getWorld(), travelLocation.getBlockX()+0.5, travelLocation.getBlockY()+1.0, travelLocation.getBlockZ()+0.5, travelLocation.getYaw(), travelLocation.getPitch());
     	if(travelLocation.getWorld().isChunkLoaded(locPoint.x,locPoint.y)) {
     		ChatUtil.printDebug("Teleporting player "+player.getName()+" to loaded chunk");
     		player.teleport(destination,TeleportCause.PLUGIN);
@@ -1365,25 +1319,25 @@ public class Konquest implements KonquestAPI, Timeable {
     }
     
     public static List<String> stringPaginate(String sentence) {
-    	ArrayList<String> result = new ArrayList<String>();
+    	ArrayList<String> result = new ArrayList<>();
     	String[] words = sentence.split(" ");
-    	String line = "";
+    	StringBuilder line = new StringBuilder();
     	// create lines no more than 30 characters (including spaces) long
     	for(int i=0;i<words.length;i++) {
     		String test = line + words[i];
     		if(i == words.length-1) {
     			if(test.length() > 30) {
-        			result.add(line.trim());
+        			result.add(line.toString().trim());
         			result.add(words[i].trim());
         		} else {
         			result.add(test.trim());
         		}
     		} else {
     			if(test.length() > 30) {
-        			result.add(line.trim());
-        			line = words[i] + " ";
+        			result.add(line.toString().trim());
+        			line = new StringBuilder(words[i] + " ");
         		} else {
-        			line = line + words[i] + " ";
+        			line.append(words[i]).append(" ");
         		}
     		}
     	}
@@ -1391,7 +1345,7 @@ public class Konquest implements KonquestAPI, Timeable {
     }
     
     public ItemStack getPlayerHead(OfflinePlayer bukkitOfflinePlayer) {
-    	if(bukkitOfflinePlayer.getUniqueId() != null && !headCache.containsKey(bukkitOfflinePlayer.getUniqueId())) {
+		if(!headCache.containsKey(bukkitOfflinePlayer.getUniqueId())) {
     		ChatUtil.printDebug("Missing "+bukkitOfflinePlayer.getName()+" player head in the cache, creating...");
     		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
     		SkullMeta meta = (SkullMeta)item.getItemMeta();
@@ -1549,8 +1503,8 @@ public class Konquest implements KonquestAPI, Timeable {
 	    		result = sanctionedColor;
 	    		break;
 	    	case PEACEFUL:
-	    		result = peacefulColor;;
-	    		break;
+	    		result = peacefulColor;
+				break;
     		default:
     			break;
     	}
@@ -1634,36 +1588,20 @@ public class Konquest implements KonquestAPI, Timeable {
     */
     
     public static void playSuccessSound(Player bukkitPlayer) {
-    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_FLUTE, (float)1.0, (float)1.3);
-            }
-        },1);
-    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_FLUTE, (float)1.0, (float)1.7);
-            }
-        },4);
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
+				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_FLUTE, (float)1.0, (float)1.3),1);
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
+				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_FLUTE, (float)1.0, (float)1.7),4);
     }
     
     public static void playFailSound(Player bukkitPlayer) {
-    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, (float)0.5, (float)1.4);
-            }
-        },1);
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
+				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, (float)0.5, (float)1.4),1);
     }
     
     public static void playDiscountSound(Player bukkitPlayer) {
-    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_VILLAGER_CELEBRATE, (float)1.0, (float)1.0);
-            }
-        },1);
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
+				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_VILLAGER_CELEBRATE, (float)1.0, (float)1.0),1);
     }
     
     public static void playTownArmorSound(Player bukkitPlayer) {
@@ -1679,12 +1617,8 @@ public class Konquest implements KonquestAPI, Timeable {
     }
     
     public static void playTravelSound(Player bukkitPlayer) {
-    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_EGG_THROW, (float)1.0, (float)0.1);
-            }
-        },1);
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
+				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_EGG_THROW, (float)1.0, (float)0.1),1);
     }
     
     public static String getTimeFormat(int valSeconds, ChatColor color) {
@@ -1698,8 +1632,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		if(valSeconds <= 30) {
 			numColor = ChatColor.DARK_RED;
 		}
-		String result = "";
-		String format = "";
+		String result;
+		String format;
 		
 		if(days != 0) {
 			format = numColor+"%03d"+nColor+"D:"+numColor+"%02d"+nColor+"H:"+numColor+"%02d"+nColor+"M:"+numColor+"%02d"+nColor+"S";
@@ -1723,9 +1657,8 @@ public class Konquest implements KonquestAPI, Timeable {
     	if(!offlineBukkitPlayer.isOnline()) {
     		date = new Date(offlineBukkitPlayer.getLastPlayed()); // Last joined
     	}
-    	//SimpleDateFormat formater = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
-    	SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-        return formater.format(date);
+    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+        return formatter.format(date);
     }
     
     public static EventPriority getEventPriority(String priority) {
@@ -1733,9 +1666,7 @@ public class Konquest implements KonquestAPI, Timeable {
     	if(priority != null) {
     		try {
     			result = EventPriority.valueOf(priority.toUpperCase());
-    		} catch(IllegalArgumentException e) {
-    			// do nothing
-    		}
+    		} catch(IllegalArgumentException ignored) {}
     	}
     	return result;
     }

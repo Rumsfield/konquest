@@ -2,24 +2,13 @@ package com.github.rumsfield.konquest.listener;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
-import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.manager.KingdomManager;
-import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
-import com.github.rumsfield.konquest.model.KonCamp;
-import com.github.rumsfield.konquest.model.KonDirective;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonPropertyFlag;
-import com.github.rumsfield.konquest.model.KonPropertyFlagHolder;
-import com.github.rumsfield.konquest.model.KonStatsType;
-import com.github.rumsfield.konquest.model.KonTerritory;
-import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.manager.PlayerManager;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
-
-import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,37 +25,27 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.CraftItemEvent;
-import org.bukkit.event.inventory.FurnaceExtractEvent;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.SmithingInventory;
 
+import java.util.Map;
+
 public class InventoryListener implements Listener {
 
-	private KonquestPlugin konquestPlugin;
-	private Konquest konquest;
-	private KingdomManager kingdomManager;
-	private PlayerManager playerManager;
+	private final Konquest konquest;
+	private final KingdomManager kingdomManager;
+	private final PlayerManager playerManager;
 	
 	public InventoryListener(KonquestPlugin plugin) {
-		this.konquestPlugin = plugin;
-		this.konquest = konquestPlugin.getKonquestInstance();
+		this.konquest = plugin.getKonquestInstance();
 		this.kingdomManager = konquest.getKingdomManager();
 		this.playerManager = konquest.getPlayerManager();
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onInventoryOpen(InventoryOpenEvent event) {
-		//ChatUtil.printDebug("EVENT: inventoryOpen");
-		if(konquest.isWorldIgnored(event.getInventory().getLocation())) {
-			return;
-		}
+		if(konquest.isWorldIgnored(event.getInventory().getLocation())) return;
 		// Monitor blocks in claimed territory
 		// Check for merchant trades in claimed territory of guilds
 		Location openLoc = event.getInventory().getLocation();
@@ -175,45 +154,38 @@ public class InventoryListener implements Listener {
 					if(!(isMember && isMemberAllowed) && !player.getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
-						return;
 					}
 				}
 			}
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onInventoryClose(InventoryCloseEvent event) {
 		// When a player closes a display menu inventory
-		if(konquest.getDisplayManager().isDisplayMenu(event.getInventory())) {
-			konquest.getDisplayManager().onDisplayMenuClose(event.getInventory(), event.getPlayer());
-		}
+		if(konquest.getDisplayManager().isNotDisplayMenu(event.getInventory())) return;
+		konquest.getDisplayManager().onDisplayMenuClose(event.getInventory(), event.getPlayer());
 	}
 	
 	@EventHandler(priority = EventPriority.LOW)
     public void onDisplayMenuClick(InventoryClickEvent event) {
-		// When a player clicks inside of a display menu inventory
-		if(konquest.getDisplayManager().isDisplayMenu(event.getClickedInventory())) {
-			int slot = event.getRawSlot();
-			Player bukkitPlayer = (Player) event.getWhoClicked();
-			KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-			if(player != null && slot < event.getView().getTopInventory().getSize()) {
-				event.setResult(Event.Result.DENY);
-				event.setCancelled(true);
-				if(event.getClick().equals(ClickType.LEFT) || event.getClick().equals(ClickType.RIGHT)) {
-					boolean clickType = (event.getClick().equals(ClickType.RIGHT)) ? false : true;
-					Bukkit.getScheduler().runTask(konquest.getPlugin(), new Runnable() {
-			            @Override
-			            public void run() {
-			            	konquest.getDisplayManager().onDisplayMenuClick(player, event.getClickedInventory(), slot, clickType);
-			            }
-			        });
-				}
-			}
+		// When a player clicks inside a display menu inventory
+		if(konquest.getDisplayManager().isNotDisplayMenu(event.getClickedInventory())) return;
+		int slot = event.getRawSlot();
+		Player bukkitPlayer = (Player) event.getWhoClicked();
+		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		if(player == null || slot >= event.getView().getTopInventory().getSize()) return;
+		event.setResult(Event.Result.DENY);
+		event.setCancelled(true);
+		if(event.getClick().equals(ClickType.LEFT) || event.getClick().equals(ClickType.RIGHT)) {
+			boolean clickType = !event.getClick().equals(ClickType.RIGHT);
+			Bukkit.getScheduler().runTask(konquest.getPlugin(),
+					() -> konquest.getDisplayManager().onDisplayMenuClick(player, event.getClickedInventory(), slot, clickType));
 		}
+
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onNetheriteCraft(InventoryClickEvent event) {
 		if(!event.isCancelled()) {
 			// Check for picking up netherite items for stats
@@ -221,7 +193,6 @@ public class InventoryListener implements Listener {
 					!konquest.isWorldIgnored(event.getInventory().getLocation())) {
 				Material itemType = event.getCurrentItem().getType();
 				int slot = event.getRawSlot();
-				//ChatUtil.printDebug("Inventory pickup event in smithing table slot "+slot+" with item "+itemType.toString());
 				HumanEntity human = event.getWhoClicked();
 				KonPlayer player = playerManager.getPlayer((Player)human);
 				if(player != null && (itemType.equals(Material.NETHERITE_AXE) ||
@@ -242,71 +213,68 @@ public class InventoryListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onCraftItem(CraftItemEvent event) {
 		if(konquest.isWorldIgnored(event.getInventory().getLocation())) {
 			return;
 		}
 		HumanEntity human = event.getWhoClicked();
-		if(!event.isCancelled() && human instanceof Player) {
-			if(!konquest.getPlayerManager().isOnlinePlayer((Player)human)) {
-				ChatUtil.printDebug("Failed to handle onCraftItem for non-existent player");
-				return;
-			}
-			Material recipeMaterial = event.getRecipe().getResult().getType();
-			KonPlayer player = konquest.getPlayerManager().getPlayer((Player)human);
-			if(recipeMaterial.equals(Material.IRON_HELMET) ||
-					recipeMaterial.equals(Material.IRON_CHESTPLATE) ||
-					recipeMaterial.equals(Material.IRON_LEGGINGS) ||
-					recipeMaterial.equals(Material.IRON_BOOTS)) {
-				// Player crafted a component of iron armor
-				konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CRAFT_ARMOR);
-				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,2);
-			} else if(recipeMaterial.equals(Material.DIAMOND_HELMET) ||
-					recipeMaterial.equals(Material.DIAMOND_CHESTPLATE) ||
-					recipeMaterial.equals(Material.DIAMOND_LEGGINGS) ||
-					recipeMaterial.equals(Material.DIAMOND_BOOTS)) {
-				// Player crafted a component of diamond armor
-				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,3);
-			} else if(recipeMaterial.equals(Material.GOLDEN_HELMET) ||
-					recipeMaterial.equals(Material.GOLDEN_CHESTPLATE) ||
-					recipeMaterial.equals(Material.GOLDEN_LEGGINGS) ||
-					recipeMaterial.equals(Material.GOLDEN_BOOTS)) {
-				// Player crafted a component of gold armor
-				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,1);
-			} else if(recipeMaterial.equals(Material.LEATHER_HELMET) ||
-					recipeMaterial.equals(Material.LEATHER_CHESTPLATE) ||
-					recipeMaterial.equals(Material.LEATHER_LEGGINGS) ||
-					recipeMaterial.equals(Material.LEATHER_BOOTS)) {
-				// Player crafted a component of leather armor
-				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,1);
-			} else if(recipeMaterial.equals(Material.IRON_AXE) ||
-					recipeMaterial.equals(Material.IRON_HOE) ||
-					recipeMaterial.equals(Material.IRON_SHOVEL) ||
-					recipeMaterial.equals(Material.IRON_PICKAXE) ||
-					recipeMaterial.equals(Material.IRON_SWORD)) {
-				// Player crafted an iron item
-				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,1);
-			} else if(recipeMaterial.equals(Material.DIAMOND_AXE) ||
-					recipeMaterial.equals(Material.DIAMOND_HOE) ||
-					recipeMaterial.equals(Material.DIAMOND_SHOVEL) ||
-					recipeMaterial.equals(Material.DIAMOND_PICKAXE) ||
-					recipeMaterial.equals(Material.DIAMOND_SWORD)) {
-				// Player crafted a diamond item
-				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,2);
-			}
-			// Check for edible item
-			if(recipeMaterial.isEdible()) {
-				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FOOD,event.getCurrentItem().getAmount());
-			}
+		if(event.isCancelled() || !(human instanceof Player)) return;
+		if(!konquest.getPlayerManager().isOnlinePlayer((Player)human)) {
+			ChatUtil.printDebug("Failed to handle onCraftItem for non-existent player");
+			return;
+		}
+		Material recipeMaterial = event.getRecipe().getResult().getType();
+		KonPlayer player = konquest.getPlayerManager().getPlayer((Player)human);
+		if(recipeMaterial.equals(Material.IRON_HELMET) ||
+				recipeMaterial.equals(Material.IRON_CHESTPLATE) ||
+				recipeMaterial.equals(Material.IRON_LEGGINGS) ||
+				recipeMaterial.equals(Material.IRON_BOOTS)) {
+			// Player crafted a component of iron armor
+			konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CRAFT_ARMOR);
+			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,2);
+		} else if(recipeMaterial.equals(Material.DIAMOND_HELMET) ||
+				recipeMaterial.equals(Material.DIAMOND_CHESTPLATE) ||
+				recipeMaterial.equals(Material.DIAMOND_LEGGINGS) ||
+				recipeMaterial.equals(Material.DIAMOND_BOOTS)) {
+			// Player crafted a component of diamond armor
+			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,3);
+		} else if(recipeMaterial.equals(Material.GOLDEN_HELMET) ||
+				recipeMaterial.equals(Material.GOLDEN_CHESTPLATE) ||
+				recipeMaterial.equals(Material.GOLDEN_LEGGINGS) ||
+				recipeMaterial.equals(Material.GOLDEN_BOOTS)) {
+			// Player crafted a component of gold armor
+			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,1);
+		} else if(recipeMaterial.equals(Material.LEATHER_HELMET) ||
+				recipeMaterial.equals(Material.LEATHER_CHESTPLATE) ||
+				recipeMaterial.equals(Material.LEATHER_LEGGINGS) ||
+				recipeMaterial.equals(Material.LEATHER_BOOTS)) {
+			// Player crafted a component of leather armor
+			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,1);
+		} else if(recipeMaterial.equals(Material.IRON_AXE) ||
+				recipeMaterial.equals(Material.IRON_HOE) ||
+				recipeMaterial.equals(Material.IRON_SHOVEL) ||
+				recipeMaterial.equals(Material.IRON_PICKAXE) ||
+				recipeMaterial.equals(Material.IRON_SWORD)) {
+			// Player crafted an iron item
+			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,1);
+		} else if(recipeMaterial.equals(Material.DIAMOND_AXE) ||
+				recipeMaterial.equals(Material.DIAMOND_HOE) ||
+				recipeMaterial.equals(Material.DIAMOND_SHOVEL) ||
+				recipeMaterial.equals(Material.DIAMOND_PICKAXE) ||
+				recipeMaterial.equals(Material.DIAMOND_SWORD)) {
+			// Player crafted a diamond item
+			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,2);
+		}
+		// Check for edible item
+		if(recipeMaterial.isEdible()) {
+			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FOOD,event.getCurrentItem().getAmount());
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onFurnaceExtract(FurnaceExtractEvent event) {
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
 		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onFurnaceExtract for non-existent player");
 			return;
@@ -323,69 +291,63 @@ public class InventoryListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onEnchantItem(EnchantItemEvent event) {
-		if(!event.isCancelled()) {
-			if(konquest.isWorldIgnored(event.getInventory().getLocation())) {
-				return;
-			}
-			if(!konquest.getPlayerManager().isOnlinePlayer(event.getEnchanter())) {
-				ChatUtil.printDebug("Failed to handle onEnchantItem for non-existent player");
-				return;
-			}
-			KonPlayer player = playerManager.getPlayer(event.getEnchanter());
-			konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.ENCHANT_ITEM);
-			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.ENCHANTMENTS,1);
-			Location enchantLoc = event.getEnchantBlock().getLocation();
-			if(enchantLoc != null && konquest.getTerritoryManager().isChunkClaimed(enchantLoc)) {
-				KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(enchantLoc);
-				if(territory instanceof KonTown) {
-					KonTown town = (KonTown)territory;
-					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.ENCHANT);
-					if(upgradeLevel >= 1) {
-						// Add 1 (if possible) to all applied enchantment levels
-						Map<Enchantment,Integer> enchantsToAdd = event.getEnchantsToAdd();
-						for(Enchantment enchant : enchantsToAdd.keySet()) {
-							int enchantLevel = enchantsToAdd.get(enchant);
-							if(enchantLevel < enchant.getMaxLevel()) {
-								enchantsToAdd.replace(enchant, enchantLevel+1);
-							}
+		if(event.isCancelled())return;
+		if(konquest.isWorldIgnored(event.getInventory().getLocation())) return;
+		if(!konquest.getPlayerManager().isOnlinePlayer(event.getEnchanter())) {
+			ChatUtil.printDebug("Failed to handle onEnchantItem for non-existent player");
+			return;
+		}
+		KonPlayer player = playerManager.getPlayer(event.getEnchanter());
+		konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.ENCHANT_ITEM);
+		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.ENCHANTMENTS,1);
+		Location enchantLoc = event.getEnchantBlock().getLocation();
+		if(konquest.getTerritoryManager().isChunkClaimed(enchantLoc)) {
+			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(enchantLoc);
+			if(territory instanceof KonTown) {
+				KonTown town = (KonTown)territory;
+				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.ENCHANT);
+				if(upgradeLevel >= 1) {
+					// Add 1 (if possible) to all applied enchantment levels
+					Map<Enchantment,Integer> enchantsToAdd = event.getEnchantsToAdd();
+					for(Enchantment enchant : enchantsToAdd.keySet()) {
+						int enchantLevel = enchantsToAdd.get(enchant);
+						if(enchantLevel < enchant.getMaxLevel()) {
+							enchantsToAdd.replace(enchant, enchantLevel+1);
 						}
 					}
 				}
 			}
 		}
+
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onPrepareItemEnchant(PrepareItemEnchantEvent event) {
-		if(!event.isCancelled()) {
-			if(konquest.isWorldIgnored(event.getInventory().getLocation())) {
-				return;
-			}
-			Location enchantLoc = event.getEnchantBlock().getLocation();
-			if(enchantLoc != null && konquest.getTerritoryManager().isChunkClaimed(enchantLoc)) {
-				KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(enchantLoc);
-				if(territory instanceof KonTown) {
-					KonTown town = (KonTown)territory;
-					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.ENCHANT);
-					if(upgradeLevel >= 1) {
-						// Add 1 (if possible) to all enchantment offers
-						EnchantmentOffer[] offers = event.getOffers();
-						for(int i=0;i<offers.length;i++) {
-							if(offers[i] != null) {
-								int enchantLevel = offers[i].getEnchantmentLevel();
-								int enchantMaxLevel = offers[i].getEnchantment().getMaxLevel();
-								if(enchantLevel < enchantMaxLevel) {
-									offers[i].setEnchantmentLevel(enchantLevel+1);
-									//ChatUtil.printDebug("Added 1 level to enchantment offer "+offers[i].getEnchantment().getKey().getNamespace()+" in upgraded town");
-								}
-							}
-						}
-					}
+		if(event.isCancelled())return;
+		if(konquest.isWorldIgnored(event.getInventory().getLocation())) return;
+
+		Location enchantLoc = event.getEnchantBlock().getLocation();
+		if(!konquest.getTerritoryManager().isChunkClaimed(enchantLoc)) return;
+		KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(enchantLoc);
+		if(!(territory instanceof KonTown)) return;
+		KonTown town = (KonTown)territory;
+		int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.ENCHANT);
+		if(upgradeLevel < 1)return;
+
+		// Add 1 (if possible) to all enchantment offers
+		EnchantmentOffer[] offers = event.getOffers();
+		for (EnchantmentOffer offer : offers) {
+			if (offer != null) {
+				int enchantLevel = offer.getEnchantmentLevel();
+				int enchantMaxLevel = offer.getEnchantment().getMaxLevel();
+				if (enchantLevel < enchantMaxLevel) {
+					offer.setEnchantmentLevel(enchantLevel + 1);
 				}
 			}
 		}
+
 	}
 
 }

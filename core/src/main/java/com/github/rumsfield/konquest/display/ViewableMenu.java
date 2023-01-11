@@ -2,7 +2,7 @@ package com.github.rumsfield.konquest.display;
 
 public interface ViewableMenu {
 
-	public DisplayMenu getCurrentView();
+	DisplayMenu getCurrentView();
 	
-	public DisplayMenu updateState(int slot, boolean clickType);
+	DisplayMenu updateState(int slot, boolean clickType);
 }

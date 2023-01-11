@@ -12,7 +12,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
  */
 public class KonquestTownEvent extends KonquestEvent {
 
-	private KonquestTown town;
+	private final KonquestTown town;
 	
 	/**
 	 * Default constructor

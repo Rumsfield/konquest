@@ -27,8 +27,8 @@ public class KonquestTownCaptureEvent extends KonquestTownEvent implements Cance
 
 	private boolean isCancelled;
 	
-	private KonquestPlayer player;
-	private KonquestKingdom newKingdom;
+	private final KonquestPlayer player;
+	private final KonquestKingdom newKingdom;
 	
 	/**
 	 * Default constructor

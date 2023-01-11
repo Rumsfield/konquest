@@ -4,13 +4,13 @@ import java.util.Map;
 
 public interface KonPropertyFlagHolder {
 
-	public boolean setPropertyValue(KonPropertyFlag property, boolean value);
+	boolean setPropertyValue(KonPropertyFlag property, boolean value);
 	
-	public boolean getPropertyValue(KonPropertyFlag property);
+	boolean getPropertyValue(KonPropertyFlag property);
 	
-	public boolean hasPropertyValue(KonPropertyFlag property);
+	boolean hasPropertyValue(KonPropertyFlag property);
 	
-	public Map<KonPropertyFlag,Boolean> getAllProperties();
+	Map<KonPropertyFlag,Boolean> getAllProperties();
 	
 	
 }

@@ -2,9 +2,9 @@ package com.github.rumsfield.konquest.model;
 
 public class KonArmor {
 
-	private String id;
-	private int blocks;
-	private int cost;
+	private final String id;
+	private final int blocks;
+	private final int cost;
 	
 	public KonArmor(String id, int blocks, int cost) {
 		this.id = id;

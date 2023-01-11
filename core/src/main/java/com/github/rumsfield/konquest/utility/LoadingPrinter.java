@@ -1,15 +1,15 @@
 package com.github.rumsfield.konquest.utility;
 
-import java.util.Date;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
+import java.util.Date;
+
 public class LoadingPrinter {
 
-	private int total;
+	private final int total;
 	private int progress;
-	private String title;
+	private final String title;
 	private final int normalTotal = 10;
 	private int normalProgress;
 	private Date start;

@@ -19,7 +19,7 @@ public class KonquestPlayerCampEvent extends KonquestPlayerEvent implements Canc
 
 	private boolean isCancelled;
 	
-	private Location location;
+	private final Location location;
 	
 	/**
 	 * Default constructor

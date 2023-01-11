@@ -16,8 +16,8 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
  */
 public class KonquestPlayerKingdomEvent extends KonquestPlayerEvent implements Cancellable {
 
-	private KonquestKingdom newKingdom;
-	private KonquestKingdom oldKingdom;
+	private final KonquestKingdom newKingdom;
+	private final KonquestKingdom oldKingdom;
 	private boolean isCancelled;
 	
 	/**

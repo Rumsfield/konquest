@@ -1,14 +1,13 @@
 package com.github.rumsfield.konquest.command;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.Collections;
+import java.util.List;
 
 public class KonquestCommand extends CommandBase{
 
@@ -17,20 +16,12 @@ public class KonquestCommand extends CommandBase{
     }
 
     public void execute() {
-        /*
-    	getSender().sendMessage(new String[] {
-                "Konquest",
-                "By Rumsfield",
-                "Use /k help for more information"
-        });
-        */
-    	if(getSender() instanceof Player) {
-    		Player bukkitPlayer = (Player) getSender();
-    		getKonquest().getDisplayManager().displayHelpMenu(bukkitPlayer);
-    	} else {
-    		//ChatUtil.printConsole("You must be a player do use this command!");
-    		ChatUtil.printConsoleError(MessagePath.GENERIC_ERROR_NO_PLAYER.getMessage());
-    	}
+		if(!(getSender() instanceof Player)){
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			return;
+		}
+
+		getKonquest().getDisplayManager().displayHelpMenu((Player) getSender());
     }
     
     @Override

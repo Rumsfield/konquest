@@ -1,15 +1,5 @@
 package com.github.rumsfield.konquest.command;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
@@ -19,6 +9,15 @@ import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import com.github.rumsfield.konquest.utility.Timer;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class TownCommand extends CommandBase {
 
@@ -31,8 +30,7 @@ public class TownCommand extends CommandBase {
 		// k town <town> [menu|join|leave|add|kick|knight|lord|rename] [<name>]
 		if (getArgs().length != 2 && getArgs().length != 3 && getArgs().length != 4) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
@@ -41,7 +39,8 @@ public class TownCommand extends CommandBase {
     		}
     		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
     		// Verify player is not a barbarian
-    		if(player.isBarbarian()) {
+			assert player != null;
+			if(player.isBarbarian()) {
     			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
         		return;
     		}
@@ -50,7 +49,7 @@ public class TownCommand extends CommandBase {
         	String townName = getArgs()[1];
         	boolean isTown = player.getKingdom().hasTown(townName);
         	boolean isCapital = player.getKingdom().hasCapital(townName);
-        	KonTown town = null;
+        	KonTown town;
         	if(isTown) {
         		town = player.getKingdom().getTown(townName);
         	} else if(isCapital) {
@@ -66,8 +65,7 @@ public class TownCommand extends CommandBase {
         			getKonquest().getDisplayManager().displayTownManagementMenu(player, town, false);
         		} else {
         			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-	        		return;
-        		}
+				}
         	} else if(getArgs().length >= 3) {
         		// Has sub-commands
         		String subCmd = getArgs()[2];
@@ -126,7 +124,7 @@ public class TownCommand extends CommandBase {
 	        				} else {
 	        					if(town.getNumResidents() == 0) {
 	        						// The town is empty, make the player into the lord
-	        						town.setPlayerLord((OfflinePlayer)bukkitPlayer);
+	        						town.setPlayerLord(bukkitPlayer);
 	        						town.removeJoinRequest(myId);
 	        			    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
 	        			    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_JOIN_NOTICE_TOWN_JOIN_LORD.getMessage(townName));
@@ -233,7 +231,6 @@ public class TownCommand extends CommandBase {
 				    		}
 				    	}
 				    } else {
-				    	//ChatUtil.sendError((Player) getSender(), "Must provide a player name!");
 				    	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		        		return;
 				    }
@@ -338,14 +335,14 @@ public class TownCommand extends CommandBase {
 						playerName = getArgs()[3];
 					}
 					if(!playerName.equalsIgnoreCase("")) {
+						KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
+						if(offlinePlayer == null) {
+							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
+							return;
+						}
 						if(isSenderOwner) {
 							// The current Town owner is giving away Lordship
-							KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
-		        			if(offlinePlayer == null) {
-								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
-				        		return;
-							}
-		        			if(!offlinePlayer.getKingdom().equals(town.getKingdom())) {
+							if(!offlinePlayer.getKingdom().equals(town.getKingdom())) {
 					    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
 				        		return;
 					    	}
@@ -381,12 +378,7 @@ public class TownCommand extends CommandBase {
 			        		}
 						} else {
 							// A non-owner is giving themselves Lord
-							KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
-		        			if(offlinePlayer == null) {
-								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
-				        		return;
-							}
-		        			if(!offlinePlayer.getOfflineBukkitPlayer().getUniqueId().equals(player.getBukkitPlayer().getUniqueId())) {
+							if(!offlinePlayer.getOfflineBukkitPlayer().getUniqueId().equals(player.getBukkitPlayer().getUniqueId())) {
 		        				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_LORD_SELF.getMessage());
 				        		return;
 		        			}
@@ -442,7 +434,6 @@ public class TownCommand extends CommandBase {
 					    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_CLEAR.getMessage(playerName,townName));
 					    			}
 					    		}
-				    			//ChatUtil.sendNotice((Player) getSender(), "Use this command again to set Knight status.");
 				    		} else {
 				    			// Set elite
 				    			town.setPlayerKnight(offlinePlayer.getOfflineBukkitPlayer(), true);
@@ -451,7 +442,6 @@ public class TownCommand extends CommandBase {
 					    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_SET.getMessage(playerName,townName));
 					    			}
 					    		}
-				    			//ChatUtil.sendNotice((Player) getSender(), "Use this command again to remove Knight status.");
 				    		}
 		        			if(onlinePlayer != null) {
 				    			getKonquest().getKingdomManager().updatePlayerMembershipStats(onlinePlayer);
@@ -488,7 +478,6 @@ public class TownCommand extends CommandBase {
 		            		return;
 		            	}
 		        		// Rename the town
-		        		//boolean success = player.getKingdom().renameTown(townName, newTownName);
 		        		boolean success = getKonquest().getKingdomManager().renameTown(townName, newTownName, town.getKingdom().getName());
 		        		if(success) {
 		        			for(OfflinePlayer resident : town.getPlayerResidents()) {
@@ -513,8 +502,7 @@ public class TownCommand extends CommandBase {
 		        	
 	        	default:
 	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-	        		return;
-	        	}
+				}
         	}
         }
 	}

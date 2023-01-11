@@ -11,15 +11,14 @@ import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class SettleCommand extends CommandBase {
 
@@ -31,11 +30,9 @@ public class SettleCommand extends CommandBase {
 		// k settle town1
 		if (getArgs().length == 1) {
             ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_MISSING_NAME.getMessage());
-            return;
-        } else if (getArgs().length > 2) {
+		} else if (getArgs().length > 2) {
            ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_SPACE_NAME.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
         	
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
@@ -102,7 +99,7 @@ public class SettleCommand extends CommandBase {
         		KonquestTownSettleEvent invokePostEvent = new KonquestTownSettleEvent(getKonquest(), town, player, town.getKingdom());
     			Konquest.callKonquestEvent(invokePostEvent);
         	} else {
-        		int distance = 0;
+        		int distance;
         		switch(settleStatus) {
         		case 1:
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_OVERLAP.getMessage());
@@ -123,13 +120,8 @@ public class SettleCommand extends CommandBase {
         			distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
         			int min_distance_sanc = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_SANCTUARY.getPath());
         			int min_distance_town = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
-        			int min_distance = 0;
-        			if(min_distance_sanc < min_distance_town) {
-        				min_distance = min_distance_sanc;
-        			} else {
-        				min_distance = min_distance_town;
-        			}
-        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
+        			int min_distance = Math.min(min_distance_sanc, min_distance_town);
+					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
         			break;
         		case 7:
         			distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());

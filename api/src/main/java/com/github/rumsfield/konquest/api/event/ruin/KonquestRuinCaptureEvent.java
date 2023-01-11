@@ -1,12 +1,11 @@
 package com.github.rumsfield.konquest.api.event.ruin;
 
-import java.util.List;
-
-import org.bukkit.event.Cancellable;
-
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestRuin;
+import org.bukkit.event.Cancellable;
+
+import java.util.List;
 
 /**
  * Called before a player captures a ruin, but after {@link KonquestRuinAttackEvent KonquestRuinAttackEvent}
@@ -23,8 +22,8 @@ public class KonquestRuinCaptureEvent extends KonquestRuinEvent implements Cance
 
 	private boolean isCancelled;
 	
-	private KonquestPlayer player;
-	private List<? extends KonquestPlayer> rewardPlayers;
+	private final KonquestPlayer player;
+	private final List<? extends KonquestPlayer> rewardPlayers;
 	
 	/**
 	 * Default constructor
@@ -36,6 +35,8 @@ public class KonquestRuinCaptureEvent extends KonquestRuinEvent implements Cance
 	public KonquestRuinCaptureEvent(KonquestAPI konquest, KonquestRuin ruin, KonquestPlayer player, List<? extends KonquestPlayer> rewardPlayers) {
 		super(konquest, ruin);
 		this.isCancelled = false;
+		this.player = player;
+		this.rewardPlayers = rewardPlayers;
 	}
 
 	/**

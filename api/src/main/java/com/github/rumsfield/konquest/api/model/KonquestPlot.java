@@ -23,7 +23,7 @@ public interface KonquestPlot {
 	 * @param point The point to check
 	 * @return True when this plot contains the point, else false
 	 */
-	public boolean hasPoint(Point point);
+    boolean hasPoint(Point point);
 	
 	/**
 	 * Checks whether the given player is a member (user) of this plot.
@@ -31,20 +31,20 @@ public interface KonquestPlot {
 	 * @param player The player to check
 	 * @return True when the player is a member, else false
 	 */
-	public boolean hasUser(OfflinePlayer player);
+    boolean hasUser(OfflinePlayer player);
 	
 	/**
 	 * Gets the list of all land (points) for this plot.
 	 * 
 	 * @return The list of points
 	 */
-	public List<Point> getPoints();
+    List<Point> getPoints();
 	
 	/**
 	 * Gets the list of all members (users) for this plot.
 	 * 
 	 * @return The list of players
 	 */
-	public List<OfflinePlayer> getUserOfflinePlayers();
+    List<OfflinePlayer> getUserOfflinePlayers();
 	
 }

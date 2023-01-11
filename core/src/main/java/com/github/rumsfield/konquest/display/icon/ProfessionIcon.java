@@ -1,20 +1,20 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import java.util.List;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.List;
+
 public class ProfessionIcon implements MenuIcon {
 
-	private String name;
-	private List<String> lore;
-	private Villager.Profession profession;
-	private int index;
-	private boolean isClickable;
+	private final String name;
+	private final List<String> lore;
+	private final Villager.Profession profession;
+	private final int index;
+	private final boolean isClickable;
 	
 	public ProfessionIcon(String name, List<String> lore, Villager.Profession profession, int index, boolean isClickable) {
 		this.name = name;
@@ -42,6 +42,7 @@ public class ProfessionIcon implements MenuIcon {
 	public ItemStack getItem() {
 		ItemStack item = new ItemStack(getMat(),1);
 		ItemMeta meta = item.getItemMeta();
+		assert meta != null;
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
 				meta.addItemFlags(flag);

@@ -1,20 +1,5 @@
 package com.github.rumsfield.konquest.manager;
 
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.manager.KonquestRuinManager;
@@ -24,16 +9,23 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonRuin;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+
+import java.awt.*;
+import java.util.List;
+import java.util.*;
 
 public class RuinManager implements KonquestRuinManager {
 
-	private Konquest konquest;
-	private HashMap<String, KonRuin> ruinMap; // lower case name maps to ruin object
+	private final Konquest konquest;
+	private final HashMap<String, KonRuin> ruinMap; // lower case name maps to ruin object
 	private Material ruinCriticalBlock;
 	
 	public RuinManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.ruinMap = new HashMap<String, KonRuin>();
+		this.ruinMap = new HashMap<>();
 		this.ruinCriticalBlock = Material.OBSIDIAN;
 	}
 	
@@ -69,7 +61,6 @@ public class RuinManager implements KonquestRuinManager {
 			}
 			if(rewardExp > 0) {
 				friendly.getBukkitPlayer().giveExp(rewardExp);
-				//ChatUtil.sendNotice(friendly.getBukkitPlayer(), ChatColor.WHITE+"EXP rewarded: "+ChatColor.GREEN+rewardExp);
 				ChatUtil.sendNotice(friendly.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_REWARD_EXP.getMessage(rewardExp));
 			}
 		}
@@ -77,7 +68,7 @@ public class RuinManager implements KonquestRuinManager {
 	
 	// returns list of players in kingdom inside ruin
 	public List<KonPlayer> getRuinPlayers(KonRuin ruin, KonKingdom kingdom) {
-		List<KonPlayer> players = new ArrayList<KonPlayer>();
+		List<KonPlayer> players = new ArrayList<>();
 		for(KonPlayer friendly : konquest.getPlayerManager().getPlayersInKingdom(kingdom)) {
 			if(isLocInsideRuin(ruin,friendly.getBukkitPlayer().getLocation())) {
 				players.add(friendly);
@@ -240,9 +231,9 @@ public class RuinManager implements KonquestRuinManager {
 			KonRuin ruin = ruinMap.get(name);
 			ConfigurationSection ruinSection = root.createSection(ruin.getName());
 			ruinSection.set("world", ruin.getWorld().getName());
-			ruinSection.set("center", new int[] {(int) ruin.getCenterLoc().getBlockX(),
-					 							 (int) ruin.getCenterLoc().getBlockY(),
-					 							 (int) ruin.getCenterLoc().getBlockZ()});
+			ruinSection.set("center", new int[] {ruin.getCenterLoc().getBlockX(),
+					ruin.getCenterLoc().getBlockY(),
+					ruin.getCenterLoc().getBlockZ()});
 			ruinSection.set("chunks", konquest.formatPointsToString(ruin.getChunkList().keySet()));
 			ruinSection.set("criticals", konquest.formatLocationsToString(ruin.getCriticalLocations()));
 			ruinSection.set("spawns", konquest.formatLocationsToString(ruin.getSpawnLocations()));

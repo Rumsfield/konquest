@@ -1,10 +1,11 @@
 package com.github.rumsfield.konquest.manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.KonquestPlugin;
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerPrefixEvent;
+import com.github.rumsfield.konquest.model.*;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -14,40 +15,25 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.KonquestPlugin;
-import com.github.rumsfield.konquest.api.event.player.KonquestPlayerPrefixEvent;
-import com.github.rumsfield.konquest.model.KonCustomPrefix;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonPrefix;
-import com.github.rumsfield.konquest.model.KonPrefixCategory;
-import com.github.rumsfield.konquest.model.KonPrefixType;
-import com.github.rumsfield.konquest.model.KonStats;
-import com.github.rumsfield.konquest.model.KonStatsType;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
-/**
- * 
- * @author 
- *
- */
 public class AccomplishmentManager {
 
-	private Konquest konquest;
+	private final Konquest konquest;
 	private boolean isEnabled;
-	private HashMap<String,KonCustomPrefix> customPrefixes;
+	private final HashMap<String,KonCustomPrefix> customPrefixes;
 	
 	public AccomplishmentManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.isEnabled = false;
-		this.customPrefixes = new HashMap<String,KonCustomPrefix>();
+		this.customPrefixes = new HashMap<>();
 	}
 	
 	public void initialize() {
-		boolean configEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.accomplishment_prefix");
-		isEnabled = configEnabled;
-		//loadCustomPrefixes(); // moved to database init
+		isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.accomplishment_prefix");
 		ChatUtil.printDebug("Accomplishment Manager is ready with prefix "+isEnabled);
 	}
 	
@@ -58,43 +44,42 @@ public class AccomplishmentManager {
 	//TODO: Store category level map in KonStats object instead of re-calculating for every stat update
 	public void modifyPlayerStat(KonPlayer player, KonStatsType stat, int amount) {
 		// Increase stat by amount and check for prefix updates when not in admin bypass
-		if(!player.isAdminBypassActive() && !player.isBarbarian()) {
-			KonStats playerStats = player.getPlayerStats();
-			KonPrefix playerPrefix = player.getPlayerPrefix();
-			// Increase stat
-			playerStats.increaseStat(stat, amount);
-			if(isEnabled) {
-				// Determine stat category level
-				double level = 0;
-				for(KonStatsType statCheck : KonStatsType.values()) {
-					if(statCheck.getCategory().equals(stat.getCategory())) {
-						level = level + (playerStats.getStat(statCheck) * statCheck.weight());
-					}
-				}
-				// Apply any missing qualifying prefixes in category
-				for(KonPrefixType pre : KonPrefixType.values()) {
-					if(pre.category().equals(stat.getCategory()) && pre.level() <= level && !playerPrefix.hasPrefix(pre)) {
-						ChatUtil.printDebug("Accomplishment unlock for player "+player.getBukkitPlayer().getName()+" with prefix "+pre.getName());
-						playerPrefix.addPrefix(pre);
-						//ChatUtil.sendTitle(player.getBukkitPlayer(), ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+"You've made an Accomplishment!", 60);
-						//ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+"You've made an Accomplishment!", 60, 5, 10);
-						//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+"Accomplishment prefix unlocked: "+ChatColor.DARK_PURPLE+pre.getName());
-						ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+MessagePath.GENERIC_NOTICE_ACCOMPLISHMENT.getMessage(), 60, 5, 10);
-						ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+MessagePath.GENERIC_NOTICE_PREFIX_UNLOCK.getMessage()+": "+ChatColor.DARK_PURPLE+pre.getName());
-						player.getBukkitPlayer().getWorld().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)1.0);
-					}
-				}
+		if(player.isAdminBypassActive() || player.isBarbarian())return;
+		KonStats playerStats = player.getPlayerStats();
+		KonPrefix playerPrefix = player.getPlayerPrefix();
+		// Increase stat
+		playerStats.increaseStat(stat, amount);
+		if(!isEnabled) return;
+		// Determine stat category level
+		double level = 0;
+		for(KonStatsType statCheck : KonStatsType.values()) {
+			if(statCheck.getCategory().equals(stat.getCategory())) {
+				level = level + (playerStats.getStat(statCheck) * statCheck.weight());
 			}
 		}
+		// Apply any missing qualifying prefixes in category
+		for(KonPrefixType pre : KonPrefixType.values()) {
+			if(pre.category().equals(stat.getCategory()) && pre.level() <= level && !playerPrefix.hasPrefix(pre)) {
+				ChatUtil.printDebug("Accomplishment unlock for player "+player.getBukkitPlayer().getName()+" with prefix "+pre.getName());
+				playerPrefix.addPrefix(pre);
+				//ChatUtil.sendTitle(player.getBukkitPlayer(), ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+"You've made an Accomplishment!", 60);
+				//ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+"You've made an Accomplishment!", 60, 5, 10);
+				//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+"Accomplishment prefix unlocked: "+ChatColor.DARK_PURPLE+pre.getName());
+				ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+MessagePath.GENERIC_NOTICE_ACCOMPLISHMENT.getMessage(), 60, 5, 10);
+				ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+MessagePath.GENERIC_NOTICE_PREFIX_UNLOCK.getMessage()+": "+ChatColor.DARK_PURPLE+pre.getName());
+				player.getBukkitPlayer().getWorld().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)1.0);
+			}
+		}
+
 	}
 	
 	/**
 	 * Load prefixes based on stat conditions, only to be used on player join & fetch database info
-	 * @param player
+	 * @param player KonPlayer object
 	 */
 	public void initPlayerPrefixes(KonPlayer player) {
 		if(isEnabled) {
-			HashMap<KonPrefixCategory,Double> categoryLevels = new HashMap<KonPrefixCategory,Double>();
+			HashMap<KonPrefixCategory,Double> categoryLevels = new HashMap<>();
 			KonStats playerStats = player.getPlayerStats();
 			KonPrefix playerPrefix = player.getPlayerPrefix();
 			// Determine player's prefix category levels based on each stat
@@ -111,10 +96,8 @@ public class AccomplishmentManager {
 			for(KonPrefixType pre : KonPrefixType.values()) {
 				int prefixLevel = pre.level();
 				double playerLevel = categoryLevels.get(pre.category());
-				//ChatUtil.printDebug("Evaluating prefix "+pre.getName()+" with level "+prefixLevel+" for player "+player.getBukkitPlayer().getName()+" with level "+playerLevel);
 				if(prefixLevel <= playerLevel) {
 					playerPrefix.addPrefix(pre);
-					//ChatUtil.printDebug("    Added prefix!");
 				}
 			}
 		}
@@ -123,9 +106,10 @@ public class AccomplishmentManager {
 	public void displayStats(KonPlayer player) {
 		KonStats playerStats = player.getPlayerStats();
 		ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-		List<String> pages = new ArrayList<String>();
+		List<String> pages = new ArrayList<>();
 		BookMeta meta = (BookMeta)Bukkit.getServer().getItemFactory().getItemMeta(Material.WRITTEN_BOOK);
 		// Format book cover
+		assert meta != null;
 		meta.setAuthor("Konquest");
 		meta.setGeneration(BookMeta.Generation.ORIGINAL);
 		meta.setTitle(MessagePath.MENU_STATS_TITLE.getMessage());
@@ -146,7 +130,7 @@ public class AccomplishmentManager {
 				}
 			}
 			// Find next available prefix
-			String unlockedPrefixNames = "";
+			StringBuilder unlockedPrefixNames = new StringBuilder();
 			String nextPrefixName = "";
 			double nextLevel = Double.MAX_VALUE;
 			for(KonPrefixType pre : KonPrefixType.values()) {
@@ -157,7 +141,7 @@ public class AccomplishmentManager {
 							nextLevel = pre.level();
 						}
 					} else {
-						unlockedPrefixNames = unlockedPrefixNames+pre.getName()+" ";
+						unlockedPrefixNames.append(pre.getName()).append(" ");
 					}
 				}
 			}
@@ -208,11 +192,9 @@ public class AccomplishmentManager {
 			// Fire event
 			KonquestPlayerPrefixEvent invokeEvent = new KonquestPlayerPrefixEvent(konquest, player, "", true);
 			Konquest.callKonquestEvent(invokeEvent);
-			//ChatUtil.sendNotice((Player) getSender(), "Turned off your prefix title");
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_DISABLE.getMessage());
 			result = true;
 		} else {
-			//ChatUtil.sendNotice((Player) getSender(), "Your prefix title is already off");
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_DISABLE.getMessage());
 		}
 		return result;
@@ -225,11 +207,9 @@ public class AccomplishmentManager {
 			// Fire event
 			KonquestPlayerPrefixEvent invokeEvent = new KonquestPlayerPrefixEvent(konquest, player, prefix.getName(), false);
 			Konquest.callKonquestEvent(invokeEvent);
-			//ChatUtil.sendNotice((Player) getSender(), "Your prefix is now "+prefixChosen.getName());
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(prefix.getName()));
 			result = true;
 		} else {
-			//ChatUtil.sendNotice((Player) getSender(), "The prefix "+prefixChosen.getName()+" is not unlocked!");
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_NEW.getMessage(prefix.getName()));
 		}
 		return result;
@@ -244,17 +224,17 @@ public class AccomplishmentManager {
         	ChatUtil.printDebug("There is no prefix section in prefix.yml");
             return;
         }
-        boolean status = true;
+        boolean status;
         String prefixName = "";
         int prefixCost = 0;
-        ConfigurationSection prefixEntry = null;
+        ConfigurationSection prefixEntry;
     	for(String prefixLabel : prefixConfig.getConfigurationSection("prefix").getKeys(false)) {
     		status = true;
     		prefixEntry = prefixConfig.getConfigurationSection("prefix."+prefixLabel);
     		if(prefixEntry != null && prefixLabel.matches("[A-Za-z0-9_]+")) {
         		if(prefixEntry.contains("name")) {
         			prefixName = prefixEntry.getString("name","");
-        			if(prefixName.equals("") || prefixName.isEmpty()) {
+        			if(prefixName.isEmpty()) {
         				ChatUtil.printConsoleError("prefix.yml has an invalid name for prefix: "+prefixLabel);
             			status = false;
         			}
@@ -264,7 +244,7 @@ public class AccomplishmentManager {
         		}
         		if(prefixEntry.contains("cost")) {
         			prefixCost = prefixEntry.getInt("cost",0);
-        			prefixCost = prefixCost < 0 ? 0 : prefixCost;
+        			prefixCost = Math.max(prefixCost, 0);
         		} else {
         			ChatUtil.printConsoleError("prefix.yml is missing cost for prefix: "+prefixLabel);
         			status = false;
@@ -284,23 +264,19 @@ public class AccomplishmentManager {
 	}
 	
 	public List<KonCustomPrefix> getCustomPrefixes() {
-		List<KonCustomPrefix> result = new ArrayList<KonCustomPrefix>();
-		for(KonCustomPrefix c : customPrefixes.values()) {
-			result.add(c);
-		}
-		return result;
+		return new ArrayList<>(customPrefixes.values());
 	}
 	
 	/**
 	 * Sets a player prefix without checks
-	 * @param player
-	 * @param label
-	 * @return
+	 * @param player - player to set prefix for
+	 * @param prefixKey - prefix label
+	 * @return true if successful, false if not
 	 */
-	public boolean setPlayerCustomPrefix(KonPlayer player, String label) {
+	public boolean setPlayerCustomPrefix(KonPlayer player, String prefixKey) {
 		boolean result = false;
-		if(customPrefixes.containsKey(label)) {
-			KonCustomPrefix prefix = customPrefixes.get(label);
+		if(customPrefixes.containsKey(prefixKey)) {
+			KonCustomPrefix prefix = customPrefixes.get(prefixKey);
 			if(player.getPlayerPrefix().setCustomPrefix(prefix)) {
 				result = true;
 			}
@@ -310,48 +286,46 @@ public class AccomplishmentManager {
 	
 	/**
 	 * Sets a player prefix with checks
-	 * @param player
-	 * @param label
-	 * @return
+	 * @param player - player to set prefix for
+	 * @param prefix - prefix label
+	 * @return true if successful, false if not
 	 */
 	public boolean applyPlayerCustomPrefix(KonPlayer player, KonCustomPrefix prefix) {
-		boolean result = false;
 		boolean checkPassed = false;
 		// check for permission, available and cost
-		if(player.getBukkitPlayer().hasPermission("konquest.prefix."+prefix.getLabel())) {
-			if(player.getPlayerPrefix().isCustomAvailable(prefix.getLabel())) {
-				// Player already owns this prefix
-				checkPassed = true;
-			} else {
-				// Attempt to purchase this prefix
-				int cost = prefix.getCost();
-				if(cost > 0) {
-		        	if(KonquestPlugin.getBalance(player.getBukkitPlayer()) < cost) {
-						// player is too poor
-		        		ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
-					} else if(KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), cost)) {
-			            checkPassed = true;
-					}
-	        	} else {
-					// it's free!
-					checkPassed = true;
-				}
-			}
-		} else {
+		if(!player.getBukkitPlayer().hasPermission("konquest.prefix."+prefix.getLabel())) {
 			// no permission
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
 		}
-		if(checkPassed) {
-			player.getPlayerPrefix().addAvailableCustom(prefix.getLabel());
-			if(player.getPlayerPrefix().setCustomPrefix(prefix)) {
-				player.getPlayerPrefix().setEnable(true);
-				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(ChatUtil.parseHex(prefix.getName())));
-				result = true;
+		if(player.getPlayerPrefix().isCustomAvailable(prefix.getLabel())) {
+			// Player already owns this prefix
+			checkPassed = true;
+		} else {
+			// Attempt to purchase this prefix
+			int cost = prefix.getCost();
+			if(cost > 0) {
+				if(KonquestPlugin.getBalance(player.getBukkitPlayer()) < cost) {
+					// player is too poor
+					ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
+				} else if(KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), cost)) {
+					checkPassed = true;
+				}
 			} else {
-				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+				// it's free!
+				checkPassed = true;
 			}
 		}
-		return result;
+		if(!checkPassed) return false;
+
+		player.getPlayerPrefix().addAvailableCustom(prefix.getLabel());
+		if(!player.getPlayerPrefix().setCustomPrefix(prefix)) {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return false;
+		}
+		player.getPlayerPrefix().setEnable(true);
+		ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_NEW.getMessage(ChatUtil.parseHex(prefix.getName())));
+		return true;
 	}
 
 }

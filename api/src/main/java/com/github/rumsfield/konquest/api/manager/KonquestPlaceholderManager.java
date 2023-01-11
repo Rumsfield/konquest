@@ -21,7 +21,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return The kingdom name, or an empty string when player is invalid
 	 */
-	public String getKingdom(Player player);
+    String getKingdom(Player player);
 	
 	/**
 	 * Gets the player's current exile kingdom name.
@@ -30,7 +30,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return The exile kingdom name, or an empty string when player is invalid
 	 */
-	public String getExile(Player player);
+    String getExile(Player player);
 	
 	/**
 	 * Gets the player's current barbarian status.
@@ -38,7 +38,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return "True" if the player is barbarian, else "False", or an empty string when player is invalid
 	 */
-	public String getBarbarian(Player player);
+    String getBarbarian(Player player);
 	
 	/**
 	 * Gets a comma-separated list of the towns in which the player is a lord.
@@ -46,7 +46,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return The list of town names, or an empty string when player is invalid
 	 */
-	public String getTownsLord(Player player);
+    String getTownsLord(Player player);
 	
 	/**
 	 * Gets a comma-separated list of the towns in which the player is a knight.
@@ -54,7 +54,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return The list of town names, or an empty string when player is invalid
 	 */
-	public String getTownsKnight(Player player);
+    String getTownsKnight(Player player);
 	
 	/**
 	 * Gets a comma-separated list of the towns in which the player is a resident.
@@ -62,7 +62,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return The list of town names, or an empty string when player is invalid
 	 */
-	public String getTownsResident(Player player);
+    String getTownsResident(Player player);
 	
 	/**
 	 * Gets a comma-separated list of all towns in which the player is resident, knight or lord.
@@ -70,16 +70,16 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return The list of town names, or an empty string when player is invalid
 	 */
-	public String getTownsAll(Player player);
+    String getTownsAll(Player player);
 	
 	/**
 	 * Gets the type of territory that the player is currently in.
-	 * This is the language file definition mapped to the {@link konquest.api.model.KonquestTerritoryType KonquestTerritoryType} enum.
+	 * This is the language file definition mapped to the {@link com.github.rumsfield.konquest.api.model.KonquestTerritoryType KonquestTerritoryType} enum.
 	 * 
 	 * @param player The player
 	 * @return The territory type, or an empty string when player is invalid
 	 */
-	public String getTerritory(Player player);
+    String getTerritory(Player player);
 	
 	/**
 	 * Gets the name of the territory that the player is currently in.
@@ -87,7 +87,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return The territory name, or an empty string when player is invalid
 	 */
-	public String getLand(Player player);
+    String getLand(Player player);
 	
 	/**
 	 * Gets the status of the chunk where the player is.
@@ -95,7 +95,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return "True" if the chunk is claimed, else "False", or an empty string when player is invalid
 	 */
-	public String getClaimed(Player player);
+    String getClaimed(Player player);
 	
 	/**
 	 * Gets the current score of the player.
@@ -103,7 +103,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return The score value, or an empty string when player is invalid
 	 */
-	public String getScore(Player player);
+    String getScore(Player player);
 	
 	/**
 	 * Gets the current prefix of the player.
@@ -111,7 +111,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return The prefix title, or an empty string when player is invalid
 	 */
-	public String getPrefix(Player player);
+    String getPrefix(Player player);
 	
 	/**
 	 * Gets the number of towns in which the player is a lord.
@@ -119,7 +119,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return The number of towns, or an empty string when player is invalid
 	 */
-	public String getLordships(Player player);
+    String getLordships(Player player);
 	
 	/**
 	 * Gets the number of towns in which the player is a resident, knight or lord.
@@ -127,7 +127,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return The number of towns, or an empty string when player is invalid
 	 */
-	public String getResidencies(Player player);
+    String getResidencies(Player player);
 	
 	/**
 	 * Gets the status of the player's chat mode.
@@ -135,7 +135,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return "True" if the player is in global chat, else "False", or an empty string when player is invalid
 	 */
-	public String getChat(Player player);
+    String getChat(Player player);
 	
 	/**
 	 * Gets the status of the player's combat tag.
@@ -143,7 +143,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return "True" if the player is combat tagged, else "False", or an empty string when player is invalid
 	 */
-	public String getCombat(Player player);
+    String getCombat(Player player);
 	
 	/**
 	 * Gets the combat tag string from the Konquest configuration.
@@ -151,7 +151,7 @@ public interface KonquestPlaceholderManager {
 	 * @param player The player
 	 * @return The combat tag if the player is combat tagged, else an empty string, or an empty string when player is invalid
 	 */
-	public String getCombatTag(Player player);
+    String getCombatTag(Player player);
 	
 	/**
 	 * Gets the relationship type between the two players.
@@ -167,7 +167,7 @@ public interface KonquestPlaceholderManager {
 	 * @param playerTwo The second player who is the context of the request
 	 * @return The relationship between the two players, or an empty string when either player is invalid
 	 */
-	public String getRelation(Player playerOne, Player playerTwo);
+    String getRelation(Player playerOne, Player playerTwo);
 	
 	/**
 	 * Gets the relationship color between the two players.
@@ -177,7 +177,7 @@ public interface KonquestPlaceholderManager {
 	 * @param playerTwo The second player who is the context of the request
 	 * @return The relationship color between the two players, or an empty string when either player is invalid
 	 */
-	public String getRelationColor(Player playerOne, Player playerTwo);
+    String getRelationColor(Player playerOne, Player playerTwo);
 	
 	/**
 	 * Gets the kingdom name and score value, separated by a space, in the given rank of the leaderboard.
@@ -186,7 +186,7 @@ public interface KonquestPlaceholderManager {
 	 * @param rank The kingdom rank, between 1 and the total number of kingdoms.
 	 * @return The kingdom score value, or "---" when the rank is invalid.
 	 */
-	public String getTopScore(int rank);
+    String getTopScore(int rank);
 	
 	/**
 	 * Gets the kingdom name and number of towns, separated by a space, in the given rank of the leaderboard.
@@ -195,7 +195,7 @@ public interface KonquestPlaceholderManager {
 	 * @param rank The kingdom rank, between 1 and the total number of kingdoms.
 	 * @return The number of towns, or "---" when the rank is invalid.
 	 */
-	public String getTopTown(int rank);
+    String getTopTown(int rank);
 	
 	/**
 	 * Gets the kingdom name and total land, separated by a space, in the given rank of the leaderboard.
@@ -204,7 +204,7 @@ public interface KonquestPlaceholderManager {
 	 * @param rank The kingdom rank, between 1 and the total number of kingdoms.
 	 * @return The total number of land chunks, or "---" when the rank is invalid.
 	 */
-	public String getTopLand(int rank);
+    String getTopLand(int rank);
 	
 	/**
 	 * Gets the total number of players in the given kingdom name.
@@ -213,7 +213,7 @@ public interface KonquestPlaceholderManager {
 	 * @param name The kingdom name
 	 * @return The number of players, or an empty string when the kingdom name is invalid
 	 */
-	public String getKingdomPlayers(String name);
+    String getKingdomPlayers(String name);
 	
 	/**
 	 * Gets the current number of online players in the given kingdom name.
@@ -222,7 +222,7 @@ public interface KonquestPlaceholderManager {
 	 * @param name The kingdom name
 	 * @return The number of online players, or an empty string when the kingdom name is invalid
 	 */
-	public String getKingdomOnline(String name);
+    String getKingdomOnline(String name);
 	
 	/**
 	 * Gets the total number of towns in the given kingdom name.
@@ -231,7 +231,7 @@ public interface KonquestPlaceholderManager {
 	 * @param name The kingdom name
 	 * @return The number of towns, or an empty string when the kingdom name is invalid
 	 */
-	public String getKingdomTowns(String name);
+    String getKingdomTowns(String name);
 	
 	/**
 	 * Gets the total number of land chunks in the given kingdom name.
@@ -240,7 +240,7 @@ public interface KonquestPlaceholderManager {
 	 * @param name The kingdom name
 	 * @return The number of land chunks, or an empty string when the kingdom name is invalid
 	 */
-	public String getKingdomLand(String name);
+    String getKingdomLand(String name);
 	
 	/**
 	 * Gets the total amount of favor owned by players in the given kingdom name.
@@ -249,7 +249,7 @@ public interface KonquestPlaceholderManager {
 	 * @param name The kingdom name
 	 * @return The amount of favor, or an empty string when the kingdom name is invalid
 	 */
-	public String getKingdomFavor(String name);
+    String getKingdomFavor(String name);
 	
 	/**
 	 * Gets the kingdom score of the given kingdom name.
@@ -258,6 +258,6 @@ public interface KonquestPlaceholderManager {
 	 * @param name The kingdom name
 	 * @return The kingdom score, or an empty string when the kingdom name is invalid
 	 */
-	public String getKingdomScore(String name);
+    String getKingdomScore(String name);
 
 }

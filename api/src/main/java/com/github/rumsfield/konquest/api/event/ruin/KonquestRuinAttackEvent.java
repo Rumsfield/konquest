@@ -21,8 +21,8 @@ public class KonquestRuinAttackEvent extends KonquestRuinEvent implements Cancel
 
 	private boolean isCancelled;
 	
-	private KonquestPlayer attacker;
-	private Block block;
+	private final KonquestPlayer attacker;
+	private final Block block;
 	
 	/**
 	 * Default constructor

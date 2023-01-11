@@ -1,34 +1,22 @@
 package com.github.rumsfield.konquest.display.wrapper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.display.icon.PrefixCustomIcon;
 import com.github.rumsfield.konquest.display.icon.PrefixIcon;
 import com.github.rumsfield.konquest.display.icon.PrefixIcon.PrefixIconAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
-import com.github.rumsfield.konquest.model.KonCustomPrefix;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonPrefixCategory;
-import com.github.rumsfield.konquest.model.KonPrefixType;
-import com.github.rumsfield.konquest.model.KonStatsType;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+
+import java.util.*;
 
 public class PrefixMenuWrapper extends MenuWrapper {
 
-	private KonPlayer observer;
+	private final KonPlayer observer;
 	
 	public PrefixMenuWrapper(Konquest konquest, KonPlayer observer) {
 		super(konquest);
@@ -42,7 +30,7 @@ public class PrefixMenuWrapper extends MenuWrapper {
 		ChatColor loreColor = DisplayManager.loreColor;
 		ChatColor valueColor = DisplayManager.valueColor;
 		ChatColor hintColor = DisplayManager.hintColor;
-		String pageLabel = "";
+		String pageLabel;
 		String playerPrefix = "";
 		if(observer.getPlayerPrefix().isEnabled()) {
 			playerPrefix = ChatUtil.parseHex(observer.getPlayerPrefix().getMainPrefixName());
@@ -53,13 +41,12 @@ public class PrefixMenuWrapper extends MenuWrapper {
 		
 		// Top row of page 0 is "Off" and info icons
 		// Start a new row for each category. Categories use as many rows as needed to fit all prefixes
-		//ChatUtil.printDebug("Displaying new prefix menu...");
 		// Determine number of pages and rows per category
-		List<KonPrefixType> allPrefixes = new ArrayList<KonPrefixType>();
-		Map<KonPrefixCategory,Double> categoryLevels = new HashMap<KonPrefixCategory,Double>();
+		List<KonPrefixType> allPrefixes = new ArrayList<>();
+		Map<KonPrefixCategory,Double> categoryLevels = new HashMap<>();
 		int totalRows = 1;
 		for(KonPrefixCategory category : KonPrefixCategory.values()) {
-			List<KonPrefixType> prefixList = new ArrayList<KonPrefixType>();
+			List<KonPrefixType> prefixList = new ArrayList<>();
 			double level = 0;
 			for(KonStatsType statCheck : KonStatsType.values()) {
 				if(statCheck.getCategory().equals(category)) {
@@ -79,11 +66,9 @@ public class PrefixMenuWrapper extends MenuWrapper {
 			// count is total number of icons per category
 			// 9 icons per row
 			int rows = (int)Math.ceil(((double)count)/ICONS_PER_ROW);
-			//ChatUtil.printDebug("  Counted "+rows+" rows for category "+category.getTitle());
 			totalRows += rows;
 		}
 		int pageTotal = (int)Math.ceil(((double)totalRows)/MAX_ROWS_PER_PAGE);
-		//ChatUtil.printDebug("  Counted "+totalRows+" total rows");
 		
 		// Page 0+
 		int pageNum = 0;
@@ -93,11 +78,10 @@ public class PrefixMenuWrapper extends MenuWrapper {
 			int numPageRows = Math.min((totalRows - i*MAX_ROWS_PER_PAGE),MAX_ROWS_PER_PAGE);
 			pageLabel = titleColor+playerPrefix+" "+titleColor+observer.getBukkitPlayer().getName()+" "+(i+1)+"/"+pageTotal;
 			getMenu().addPage(pageNum, numPageRows, pageLabel);
-			//ChatUtil.printDebug("  Created page "+i+" with "+numPageRows+" rows");
 			int slotIndex = 0;
 			// Off and Info Icons on first row of page 0
 			if(pageNum == 0) {
-				PrefixIcon offIcon = new PrefixIcon(KonPrefixType.getDefault(),Arrays.asList(hintColor+MessagePath.MENU_PREFIX_HINT_DISABLE.getMessage()),4,true,PrefixIconAction.DISABLE_PREFIX);
+				PrefixIcon offIcon = new PrefixIcon(KonPrefixType.getDefault(), Collections.singletonList(hintColor + MessagePath.MENU_PREFIX_HINT_DISABLE.getMessage()),4,true,PrefixIconAction.DISABLE_PREFIX);
 				getMenu().getPage(pageNum).addIcon(offIcon);
 				slotIndex = 9;
 			}
@@ -127,7 +111,7 @@ public class PrefixMenuWrapper extends MenuWrapper {
 		}
 		// Page N+
 		List<String> loreList;
-		boolean isAllowed = false;
+		boolean isAllowed;
 		List<KonCustomPrefix> allCustoms = getKonquest().getAccomplishmentManager().getCustomPrefixes();
 		pageTotal = (int)Math.ceil(((double)allCustoms.size())/MAX_ICONS_PER_PAGE);
 		if(pageTotal == 0) {
@@ -147,7 +131,7 @@ public class PrefixMenuWrapper extends MenuWrapper {
 				int slotIndex = 0;
 				while(slotIndex < MAX_ICONS_PER_PAGE && customIter.hasNext()) {
 					/* Custom Prefix Icon (n) */
-					loreList = new ArrayList<String>();
+					loreList = new ArrayList<>();
 					KonCustomPrefix currentCustom = customIter.next();
 					if(!observer.getPlayerPrefix().isCustomAvailable(currentCustom.getLabel())) {
 						loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+currentCustom.getCost());
@@ -208,19 +192,16 @@ public class PrefixMenuWrapper extends MenuWrapper {
 	// Sort prefix by level low-to-high
    	private List<KonPrefixType> sortedPrefix(List<KonPrefixType> inputList) {
    		// Sort each prefix list by level
-   		Comparator<KonPrefixType> prefixComparator = new Comparator<KonPrefixType>() {
-   			@Override
-   			public int compare(final KonPrefixType k1, KonPrefixType k2) {
-   				int result = 0;
-   				if(k1.level() < k2.level()) {
-   					result = -1;
-   				} else if(k1.level() > k2.level()) {
-   					result = 1;
-   				}
-   				return result;
-   			}
-   		};
-   		Collections.sort(inputList, prefixComparator);
+   		Comparator<KonPrefixType> prefixComparator = (prefixTypeOne, prefixTypeTwo) -> {
+			   int result = 0;
+			   if(prefixTypeOne.level() < prefixTypeTwo.level()) {
+				   result = -1;
+			   } else if(prefixTypeOne.level() > prefixTypeTwo.level()) {
+				   result = 1;
+			   }
+			   return result;
+		   };
+   		inputList.sort(prefixComparator);
    		
    		return inputList;
    	}

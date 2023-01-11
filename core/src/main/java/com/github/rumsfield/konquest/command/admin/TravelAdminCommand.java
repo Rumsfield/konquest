@@ -5,15 +5,14 @@ import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class TravelAdminCommand  extends CommandBase {
 	
@@ -25,8 +24,7 @@ public class TravelAdminCommand  extends CommandBase {
     	// k admin travel <name>
     	if (getArgs().length != 3 && getArgs().length != 4) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
         	
         	String travelTo = getArgs()[2];

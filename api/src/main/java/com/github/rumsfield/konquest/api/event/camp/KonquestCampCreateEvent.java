@@ -17,7 +17,7 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
  */
 public class KonquestCampCreateEvent extends KonquestCampEvent {
 
-	private KonquestPlayer player;
+	private final KonquestPlayer player;
 	
 	/**
 	 * Default constructor

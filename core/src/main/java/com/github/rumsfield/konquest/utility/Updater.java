@@ -11,8 +11,8 @@ import java.util.Scanner;
 
 public class Updater {
 
-    private JavaPlugin plugin;
-    private int resourceId;
+    private final JavaPlugin plugin;
+    private final int resourceId;
 
     public Updater(JavaPlugin plugin, int resourceId) {
         this.plugin = plugin;

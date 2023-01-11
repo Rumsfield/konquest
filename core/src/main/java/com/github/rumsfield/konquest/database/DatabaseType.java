@@ -6,7 +6,7 @@ public enum DatabaseType {
 	MYSQL ("mysql.jar"),
     SQLITE ("sqlite.jar");
 
-    private String driver;
+    private final String driver;
 
     DatabaseType(String driver) {
         this.driver = driver;

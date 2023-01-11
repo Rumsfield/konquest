@@ -21,15 +21,15 @@ import java.util.List;
 
 public class UpgradeManager implements KonquestUpgradeManager {
 	
-	private Konquest konquest;
-	private HashMap<KonUpgrade,List<Integer>> upgradeCosts;
-	private HashMap<KonUpgrade,List<Integer>> upgradePopulations;
+	private final Konquest konquest;
+	private final HashMap<KonUpgrade,List<Integer>> upgradeCosts;
+	private final HashMap<KonUpgrade,List<Integer>> upgradePopulations;
 	private boolean isEnabled;
 	
 	public UpgradeManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.upgradeCosts = new HashMap<KonUpgrade,List<Integer>>();
-		this.upgradePopulations = new HashMap<KonUpgrade,List<Integer>>();
+		this.upgradeCosts = new HashMap<>();
+		this.upgradePopulations = new HashMap<>();
 		this.isEnabled = false;
 	}
 	
@@ -67,9 +67,10 @@ public class UpgradeManager implements KonquestUpgradeManager {
         	upgrade = KonUpgrade.getUpgrade(upgradeName);
         	if(upgrade != null) {
         		ConfigurationSection upgradeSection = upgradesConfig.getConfigurationSection("upgrades."+upgradeName);
-        		costList = new ArrayList<Integer>();
-        		popList = new ArrayList<Integer>();
-        		if(upgradeSection.contains("costs")) {
+        		costList = new ArrayList<>();
+        		popList = new ArrayList<>();
+				assert upgradeSection != null;
+				if(upgradeSection.contains("costs")) {
         			costList = upgradeSection.getIntegerList("costs");
         		} else {
         			ChatUtil.printDebug("Upgrades.yml is missing costs section for: "+upgradeName);
@@ -102,22 +103,19 @@ public class UpgradeManager implements KonquestUpgradeManager {
 	 * Provides a list of upgrades available for purchase for the given town.
 	 * Checks for valid cost and level requirements
 	 * Upgrade levels will not be listed if cost is less than 0 (e.g. -1)
-	 * @param town
-	 * @return
+	 * @param townArg KonquestTown to check
+	 * @return Map of KonquestUpgrade to Integer of next level available
 	 */
 	public HashMap<KonquestUpgrade,Integer> getAvailableUpgrades(KonquestTown townArg) {
 		HashMap<KonquestUpgrade,Integer> result = new HashMap<>();
-		if(townArg instanceof KonTown) {
-			KonTown town = (KonTown) townArg;
-			//ChatUtil.printDebug("Generating available upgrades for town "+town.getName());
-			for(KonUpgrade upgrade : KonUpgrade.values()) {
-				int currentLevel = town.getRawUpgradeLevel(upgrade);
-				int nextLevel = currentLevel+1;
-				int nextCost = getUpgradeCost(upgrade,nextLevel);
-				//ChatUtil.printDebug("Upgrade "+upgrade.toString()+" is at level "+currentLevel+" out of "+upgrade.getMaxLevel());
-				if(nextCost >= 0 && nextLevel <= upgrade.getMaxLevel()) {
-					result.put(upgrade, nextLevel);
-				}
+		if(!(townArg instanceof KonTown)) return result;
+		KonTown town = (KonTown) townArg;
+		for(KonUpgrade upgrade : KonUpgrade.values()) {
+			int currentLevel = town.getRawUpgradeLevel(upgrade);
+			int nextLevel = currentLevel+1;
+			int nextCost = getUpgradeCost(upgrade,nextLevel);
+			if(nextCost >= 0 && nextLevel <= upgrade.getMaxLevel()) {
+				result.put(upgrade, nextLevel);
 			}
 		}
 		return result;
@@ -145,22 +143,21 @@ public class UpgradeManager implements KonquestUpgradeManager {
 	
 	/**
 	 * Main method for applying town upgrades.
-	 * @param town
-	 * @param upgrade
-	 * @param level
+	 * @param town the town to upgrade
+	 * @param upgrade upgrade to apply
+	 * @param level the level
+	 * @param bukkitPlayer player
 	 * @return True on successful addition of the upgrade, else false.
 	 */
 	public boolean addTownUpgrade(KonTown town, KonUpgrade upgrade, int level, Player bukkitPlayer) {
 		// Check that upgrades are enabled
 		if(!isEnabled) {
-			//ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": upgrades are currently disabled. Talk to an admin!");
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return false;
 		}
 		// Check that the town has the previous level, if applicable
 		int currentLevel = town.getUpgradeLevel(upgrade);
 		if(level < 1 || level > upgrade.getMaxLevel() || level != currentLevel+1) {
-			//ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": level is greater than maximum or too high from current level ("+currentLevel+")");
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_LEVEL.getMessage(upgrade.getDescription(),level,currentLevel));
 			return false;
 		}
@@ -168,14 +165,12 @@ public class UpgradeManager implements KonquestUpgradeManager {
 		int currentPopulation = town.getNumResidents();
 		int requiredPopulation = upgradePopulations.get(upgrade).get(level-1);
 		if(currentPopulation < requiredPopulation) {
-			//ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": town population is too low, requires "+requiredPopulation);
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_POPULATION.getMessage(upgrade.getDescription(),level,requiredPopulation));
 			return false;
 		}
 		// Check that the player has enough favor
 		int requiredCost = upgradeCosts.get(upgrade).get(level-1);
 		if(KonquestPlugin.getBalance(bukkitPlayer) < requiredCost) {
-			//ChatUtil.sendError(bukkitPlayer, "Error adding "+upgrade.getDescription()+" level "+level+": requires "+requiredCost+" Favor");
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_COST.getMessage(upgrade.getDescription(),level,requiredCost));
             return false;
 		}
@@ -184,29 +179,22 @@ public class UpgradeManager implements KonquestUpgradeManager {
 		if(upgrade.equals(KonUpgrade.HEALTH)) {
 			konquest.getKingdomManager().refreshTownHearts(town);
 		}
-		//ChatUtil.sendNotice(bukkitPlayer, "Added "+upgrade.getDescription()+" level "+level+"!");
 		ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_UPGRADE_ADD.getMessage(upgrade.getDescription(),level,town.getName()));
 		ChatUtil.printDebug("Applied new upgrade "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
 		// Withdraw cost
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
         if(KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost)) {
         	if(player != null) {
-        		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)requiredCost);
+        		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR, requiredCost);
         	}
         }
 		return true;
 	}
 	
 	public boolean applyTownUpgrade(KonquestTown townArg, KonquestUpgrade upgrade, int level) {
-		if(!isEnabled) {
-			return false;
-		}
-		if(level < 0 || level > upgrade.getMaxLevel()) {
-			return false;
-		}
-		if(!(townArg instanceof KonTown)) {
-			return false;
-		}
+		if(!isEnabled) return false;
+		if(level < 0 || level > upgrade.getMaxLevel()) return false;
+		if(!(townArg instanceof KonTown)) return false;
 		KonTown town = (KonTown) townArg;
 		town.addUpgrade(upgrade, level);
 		if(upgrade.equals(KonUpgrade.HEALTH)) {

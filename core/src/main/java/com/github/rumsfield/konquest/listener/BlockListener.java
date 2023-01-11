@@ -10,39 +10,17 @@ import com.github.rumsfield.konquest.api.event.town.KonquestTownAttackEvent;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownCaptureEvent;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownDestroyEvent;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.manager.CampManager;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
 import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.manager.TerritoryManager;
-import com.github.rumsfield.konquest.model.KonCamp;
-import com.github.rumsfield.konquest.model.KonDirective;
-import com.github.rumsfield.konquest.model.KonMonumentTemplate;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonPropertyFlag;
-import com.github.rumsfield.konquest.model.KonPropertyFlagHolder;
-import com.github.rumsfield.konquest.model.KonRuin;
-import com.github.rumsfield.konquest.model.KonSanctuary;
-import com.github.rumsfield.konquest.model.KonStatsType;
-import com.github.rumsfield.konquest.model.KonTerritory;
-import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import com.github.rumsfield.konquest.utility.Timer;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.Effect;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.type.Bed;
@@ -51,32 +29,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockGrowEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-public class BlockListener implements Listener {
+import java.util.ArrayList;
+import java.util.List;
 
-	private KonquestPlugin konquestPlugin;
-	private Konquest konquest;
-	private KingdomManager kingdomManager;
-	private TerritoryManager territoryManager;
-	private CampManager campManager;
-	private PlayerManager playerManager;
+public class BlockListener implements Listener {
+	private final Konquest konquest;
+	private final KingdomManager kingdomManager;
+	private final TerritoryManager territoryManager;
+	private final CampManager campManager;
+	private final PlayerManager playerManager;
 	
 	public BlockListener(KonquestPlugin plugin) {
-		this.konquestPlugin = plugin;
-		this.konquest = konquestPlugin.getKonquestInstance();
+		this.konquest = plugin.getKonquestInstance();
 		this.playerManager = konquest.getPlayerManager();
 		this.kingdomManager = konquest.getKingdomManager();
 		this.territoryManager = konquest.getTerritoryManager();
@@ -93,18 +61,12 @@ public class BlockListener implements Listener {
 	/**
 	 * Fires when a block breaks.
 	 * Check for breaks inside Monuments by enemies. Peaceful members cannot break other territories.
-	 * @param event
 	 */
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onBlockBreak(BlockBreakEvent event) {
-		//ChatUtil.printDebug("EVENT: blockBreak");
-		if(event.isCancelled()) {
-			return;
-		}
+		if(event.isCancelled()) return;
 		
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
 		
 		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onBlockBreak for non-existent player");
@@ -116,7 +78,6 @@ public class BlockListener implements Listener {
 		if(territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
 			// Bypass event restrictions for player in Admin Bypass Mode
 			if(!player.isAdminBypassActive() && !player.getBukkitPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
-				//ChatUtil.printDebug("Evaluating blockBreak in claimed territory...");
 				Location breakLoc = event.getBlock().getLocation();
 				KonTerritory territory = territoryManager.getChunkTerritory(breakLoc);
 				
@@ -138,6 +99,7 @@ public class BlockListener implements Listener {
 				boolean isCapital = territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL);
 				boolean isTown = territory.getTerritoryType().equals(KonquestTerritoryType.TOWN);
 				if(isCapital || isTown) {
+					assert territory instanceof KonTown;
 					KonTown town = (KonTown) territory;
 					// Check player's relationship to this town
 					RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
@@ -212,9 +174,8 @@ public class BlockListener implements Listener {
 						// If town is upgraded to require a minimum online resident amount, prevent block edits
 						int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
 						if(upgradeLevel > 0) {
-							int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
-							if(town.getNumResidentsOnline() < minimumOnlineResidents) {
-								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(),minimumOnlineResidents));
+							if(town.getNumResidentsOnline() < upgradeLevel) {
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevel));
 								event.setCancelled(true);
 								return;
 							}
@@ -344,6 +305,7 @@ public class BlockListener implements Listener {
 					 * Camp checks
 					 */
 					case CAMP:
+						assert territory instanceof KonCamp;
 						KonCamp camp = (KonCamp)territory;
 						boolean isMemberAllowedContainers = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ALLOW_CONTAINERS.getPath(), false);
 						boolean isMemberAllowedEdit = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ALLOW_EDIT_OFFLINE.getPath(), false);
@@ -400,6 +362,7 @@ public class BlockListener implements Listener {
 					 * Ruin checks
 					 */
 					case RUIN:
+						assert territory instanceof KonRuin;
 						KonRuin ruin = (KonRuin)territory;
 						// Check for expired cooldown
 						if(ruin.isCaptureDisabled()) {
@@ -466,6 +429,7 @@ public class BlockListener implements Listener {
 					 * Sanctuary checks
 					 */
 					case SANCTUARY:
+						assert territory instanceof KonSanctuary;
 						KonSanctuary sanctuary = (KonSanctuary)territory;
 						// Always prevent monument template edits
 						KonMonumentTemplate template = sanctuary.getTemplate(breakLoc);
@@ -495,7 +459,6 @@ public class BlockListener implements Listener {
 				notifyAdminBypass(event.getPlayer());
 				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 				event.setCancelled(true);
-				return;
 			}
 		}
     }
@@ -510,7 +473,7 @@ public class BlockListener implements Listener {
 				boolean isDrop = event.isDropItems();
 				ChatUtil.printDebug("Diamond ore block break dropping items: "+isDrop);
 				ItemStack handItem = event.getPlayer().getInventory().getItemInMainHand();
-				if(isDrop && handItem != null && !handItem.containsEnchantment(Enchantment.SILK_TOUCH)) {
+				if(isDrop && !handItem.containsEnchantment(Enchantment.SILK_TOUCH)) {
 					if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 						ChatUtil.printDebug("Failed to handle onBlockBreakLow for non-existent player");
 						return;
@@ -549,16 +512,14 @@ public class BlockListener implements Listener {
 			}
 		}
 	}
-	
+
 	/**
 	 * Fires when blocks are placed.
 	 * Prevent placing blocks inside protected territories.
 	 * Check for barbarian bed placement.
-	 * @param event
 	 */
 	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockPlace(BlockPlaceEvent event) {
-		//ChatUtil.printDebug("EVENT: blockPlace");
 		if(event.isCancelled()) {
 			return;
 		}
@@ -599,6 +560,7 @@ public class BlockListener implements Listener {
 				boolean isCapital = territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL);
 				boolean isTown = territory.getTerritoryType().equals(KonquestTerritoryType.TOWN);
 				if(isCapital || isTown) {
+					assert territory instanceof KonTown;
 					KonTown town = (KonTown) territory;
 					// Check player's relationship to this town
 					RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
@@ -663,9 +625,8 @@ public class BlockListener implements Listener {
 						// If town is upgraded to require a minimum online resident amount, prevent block damage
 						int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
 						if(upgradeLevel > 0) {
-							int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
-							if(town.getNumResidentsOnline() < minimumOnlineResidents) {
-								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(),minimumOnlineResidents));
+							if(town.getNumResidentsOnline() < upgradeLevel) {
+								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevel));
 								event.setCancelled(true);
 								return;
 							}
@@ -732,6 +693,7 @@ public class BlockListener implements Listener {
 					 * Camp checks
 					 */
 					case CAMP:
+						assert territory instanceof KonCamp;
 						KonCamp camp = (KonCamp)territory;
 						boolean isMemberAllowedEdit = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ALLOW_EDIT_OFFLINE.getPath(), false);
 						boolean isMember = false;
@@ -778,6 +740,7 @@ public class BlockListener implements Listener {
 					 * Sanctuary checks
 					 */
 					case SANCTUARY:
+						assert territory instanceof KonSanctuary;
 						KonSanctuary sanctuary = (KonSanctuary)territory;
 						// Always prevent monument template edits
 						KonMonumentTemplate template = sanctuary.getTemplate(placeLoc);
@@ -833,18 +796,14 @@ public class BlockListener implements Listener {
 				    		break;
 				    	case 4:
 				    		// This error message is removed because it could be annoying to see it every time a bed is placed when camps are disabled.
-				    		//ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 				    		break;
 				    	case 5:
 				    		// This error message is removed because it could be annoying to see it every time a bed is placed in an invalid world.
-				    		//ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
-				    		//event.setCancelled(true);
 				    		break;
 				    	default:
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 				    		break;
 						}
-						return;
 					}
 				} else {
 					// Wild placement by non-barbarian
@@ -854,7 +813,6 @@ public class BlockListener implements Listener {
 						notifyAdminBypass(event.getPlayer());
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
-						return;
 					}
 				}
 			}
@@ -872,7 +830,6 @@ public class BlockListener implements Listener {
 				return;
 			}
 			Material placedMat = event.getBlockPlaced().getType();
-			//ChatUtil.printDebug("EVENT: Placed material "+placedMat.toString());
 			if(placedMat.equals(Material.WHEAT) ||
 					placedMat.equals(Material.POTATOES) ||
 					placedMat.equals(Material.CARROTS) ||
@@ -908,15 +865,11 @@ public class BlockListener implements Listener {
 	/**
 	 * Fires when blocks explode.
 	 * Protect capitals from explosions, and optionally protect chests inside claimed territory.
-	 * @param event
 	 */
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onBlockExplode(BlockExplodeEvent event) {
 		// Protect blocks inside of territory
-		//ChatUtil.printDebug("EVENT: blockExplode");
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
 		for(Block block : event.blockList()) {
 			if(territoryManager.isChunkClaimed(block.getLocation())) {
 				ChatUtil.printDebug("effected block is inside claimed territory");
@@ -976,6 +929,7 @@ public class BlockListener implements Listener {
 				}
 				// Camp protections
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.CAMP)) {
+					assert territory instanceof KonCamp;
 					KonCamp camp = (KonCamp)territory;
 					// Protect offline owner camps
 					if(camp.isProtected()) {
@@ -1015,23 +969,21 @@ public class BlockListener implements Listener {
 	 * Allow admin bypass
 	 * 
 	 */
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onPistonExtend(BlockPistonExtendEvent event) {
 		// TODO: Add blocked messages to players somehow
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
 		Location pistonBaseLoc = event.getBlock().getLocation();
-		List<Location> checkLocs = new ArrayList<Location>();
+		List<Location> checkLocs = new ArrayList<>();
 		// Gather list of locations to check
 		for(Block pushBlock : event.getBlocks()) {
 			Location blockLoc = pushBlock.getLocation();
 			if(!checkLocs.contains(blockLoc)) {
-				blockLoc.add(blockLoc);
+				checkLocs.add(blockLoc);
 			}
 			Location pushTo = new Location(pushBlock.getWorld(),pushBlock.getX()+event.getDirection().getModX(),pushBlock.getY()+event.getDirection().getModY(),pushBlock.getZ()+event.getDirection().getModZ());
 			if(!checkLocs.contains(pushTo)) {
-				blockLoc.add(pushTo);
+				checkLocs.add(pushTo);
 			}
 		}
 		// Review the list of affected blocks
@@ -1060,7 +1012,7 @@ public class BlockListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
-					// Check if block is inside of an offline kingdom
+					// Check if block is inside an offline kingdom
 					if(playerManager.getPlayersInKingdom(territory.getKingdom()).isEmpty()) {
 						event.setCancelled(true);
 						return;
@@ -1085,7 +1037,7 @@ public class BlockListener implements Listener {
 						return;
 					}
 					// If piston is inside but block is outside
-					if(isBaseInside && !isBlockInside) {
+					if(!isBlockInside) {
 						event.setCancelled(true);
 						return;
 					}
@@ -1101,22 +1053,20 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onPistonRetract(BlockPistonRetractEvent event) {
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
+		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
 		Location pistonBaseLoc = event.getBlock().getLocation();
-		List<Location> checkLocs = new ArrayList<Location>();
+		List<Location> checkLocs = new ArrayList<>();
 		// Gather list of locations to check
 		for(Block pullBlock : event.getBlocks()) {
 			Location blockLoc = pullBlock.getLocation();
 			if(!checkLocs.contains(blockLoc)) {
-				blockLoc.add(blockLoc);
+				checkLocs.add(blockLoc);
 			}
 			Location pullTo = new Location(pullBlock.getWorld(),pullBlock.getX()+event.getDirection().getModX(),pullBlock.getY()+event.getDirection().getModY(),pullBlock.getZ()+event.getDirection().getModZ());
 			if(!checkLocs.contains(pullTo)) {
-				blockLoc.add(pullTo);
+				checkLocs.add(pullTo);
 			}
 		}
 		// Review the list of affected blocks
@@ -1145,7 +1095,7 @@ public class BlockListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
-					// Check if block is inside of an offline kingdom
+					// Check if block is inside an offline kingdom
 					if(playerManager.getPlayersInKingdom(territory.getKingdom()).isEmpty()) {
 						event.setCancelled(true);
 						return;
@@ -1170,7 +1120,7 @@ public class BlockListener implements Listener {
 						return;
 					}
 					// If piston is inside but block is outside
-					if(isBaseInside && !isBlockInside) {
+					if(!isBlockInside) {
 						event.setCancelled(true);
 						return;
 					}
@@ -1186,7 +1136,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onFluidFlow(BlockFromToEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
@@ -1210,40 +1160,36 @@ public class BlockListener implements Listener {
         			KonTerritory territoryFrom = territoryManager.getChunkTerritory(locFrom);
         			if(!territoryTo.getKingdom().equals(territoryFrom.getKingdom())) {
         				event.setCancelled(true);
-            			return;
-        			}
+					}
     			} else {
     				// Wild to any territory
         			event.setCancelled(true);
-        			return;
-    			}
+				}
     		}
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onBlockForm(BlockFormEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
 		}
 		if(isBlockInsideMonument(event.getBlock())) {
 			event.setCancelled(true);
-			return;
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onBlockGrow(BlockGrowEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
 		}
 		if(isBlockInsideMonument(event.getBlock())) {
 			event.setCancelled(true);
-			return;
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onBlockSpread(BlockSpreadEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
@@ -1269,8 +1215,7 @@ public class BlockListener implements Listener {
 				// If town is upgraded to require a minimum online resident amount, prevent block damage
 				int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
 				if(event.getSource().getType().equals(Material.FIRE) && upgradeLevelWatch > 0) {
-					int minimumOnlineResidents = upgradeLevelWatch; // 1, 2, 3
-					if(town.getNumResidentsOnline() < minimumOnlineResidents) {
+					if(town.getNumResidentsOnline() < upgradeLevelWatch) {
 						ChatUtil.printDebug("EVENT: Stopped fire spread in upgraded town, WATCH");
 						event.getSource().setType(Material.AIR);
 						event.setCancelled(true);
@@ -1295,20 +1240,17 @@ public class BlockListener implements Listener {
 					event.getSource().setType(Material.AIR);
 				}
 				event.setCancelled(true);
-				return;
 			}
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onBlockIgnite(BlockIgniteEvent event) {
-		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-			return;
-		}
-		if(isBlockInsideMonument(event.getBlock())) {
-			event.setCancelled(true);
-			return;
-		}
+		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
+		if(!isBlockInsideMonument(event.getBlock())) return;
+
+		event.setCancelled(true);
+
 	}
 	
 	/*
@@ -1368,8 +1310,8 @@ public class BlockListener implements Listener {
 				}
 				// Destroy the town when the enemy is a barbarian
 				String townName = town.getName();
-				ArrayList<KonPlayer> monumentPlayers = new ArrayList<KonPlayer>();
-				ArrayList<KonPlayer> townLocPlayers = new ArrayList<KonPlayer>();
+				ArrayList<KonPlayer> monumentPlayers = new ArrayList<>();
+				ArrayList<KonPlayer> townLocPlayers = new ArrayList<>();
 				for(KonPlayer onlinePlayer : playerManager.getPlayersOnline()) {
 					if(town.isLocInsideCenterChunk(onlinePlayer.getBukkitPlayer().getLocation())) {
 						monumentPlayers.add(onlinePlayer);
@@ -1417,10 +1359,7 @@ public class BlockListener implements Listener {
 					// Broadcast to Dynmap
 					konquest.getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_RAZE.getMessage(townName)+" ("+x+","+y+","+z+")");
 				}
-				//// Stop the town monument timer
-				//ChatUtil.printDebug("Stopping monument timer with taskID "+townMonumentTimer.getTaskID());
-				//townMonumentTimer.stopTimer();
-
+				// Stop the town monument timer
 			} else {
 				// Fire event
 				KonquestTownCaptureEvent invokeEvent = new KonquestTownCaptureEvent(konquest, town, player, player.getKingdom());
@@ -1429,7 +1368,7 @@ public class BlockListener implements Listener {
 					return;
 				}
 				// Conquer the town for the enemy player's kingdom
-				KonTown capturedTown = null;
+				KonTown capturedTown;
 				if(isCapital) {
 					// Capture the capital
 					capturedTown = (KonTown)kingdomManager.captureCapitalForPlayer(town.getKingdom().getName(), player);
@@ -1503,7 +1442,6 @@ public class BlockListener implements Listener {
 			// Town has not yet been captured
 			int remainingHits = maxCriticalhits - town.getMonument().getCriticalHits();
 			int defendReward = konquest.getCore().getInt(CorePath.FAVOR_REWARDS_DEFEND_RAID.getPath());
-			//ChatUtil.sendNotice(event.getPlayer().getBukkitPlayer(), "Critical Strike! "+remainingHits+" Critical Blocks remain.");
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CRITICAL.getMessage(remainingHits));
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRITICALS,1);
 			

@@ -1,17 +1,13 @@
 package com.github.rumsfield.konquest.map;
 
-import java.awt.Point;
-import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.Collections;
-//import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-
-import org.bukkit.Location;
-
 import com.github.rumsfield.konquest.model.KonTerritory;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import org.bukkit.Location;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 //TODO: X and Z corner double[]'s are primary boundary contour. Internal unclaimed points yield secondary contours within primary area that will
 // be shaded white. These dead zones will be kept in a collection that can be used to spawn secondary AreaMarkers to mark the unclaimed pockets.
@@ -20,20 +16,20 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 
 public class AreaTerritory {
 
-	private Set<Point> areaPoints;
-	private List<double[]> xPoints;
-	private List<double[]> zPoints;
-	private List<double[]> xContours;
-	private List<double[]> zContours;
-	private String worldName;
-	private Location center;
+	private final Set<Point> areaPoints;
+	private final List<double[]> xPoints;
+	private final List<double[]> zPoints;
+	private final List<double[]> xContours;
+	private final List<double[]> zContours;
+	private final String worldName;
+	private final Location center;
 	
-	private static enum FaceDirection {
+	private enum FaceDirection {
 		NE,
 		SE,
 		SW,
-		NW;
-	}
+		NW
+    }
 	
 	private static class Coord {
 		int x, z;
@@ -46,7 +42,7 @@ public class AreaTerritory {
 			this.face = face;
 		}
 		public String toString() {
-        	return String.format("{%d,%d,%s,%s}",x,z,String.valueOf(isConvex),face.toString());
+        	return String.format("{%d,%d,%s,%s}",x,z, isConvex,face.toString());
         }
 	}
 	
@@ -54,28 +50,28 @@ public class AreaTerritory {
 		this.worldName = territory.getWorld().getName();
 		this.areaPoints = territory.getChunkList().keySet();
 		this.center = territory.getCenterLoc();
-		this.xPoints = new ArrayList<double[]>();
-		this.zPoints = new ArrayList<double[]>();
-		this.xContours = new ArrayList<double[]>();
-		this.zContours = new ArrayList<double[]>();
+		this.xPoints = new ArrayList<>();
+		this.zPoints = new ArrayList<>();
+		this.xContours = new ArrayList<>();
+		this.zContours = new ArrayList<>();
 		calculateCorners();
 	}
 	
 	private void calculateCorners() {
-		ArrayList<Coord> cornerList = new ArrayList<Coord>();
+		ArrayList<Coord> cornerList = new ArrayList<>();
 		
 		int[] cornerLUTX = {1,	1,	-1,	-1};
 		int[] cornerLUTZ = {1, -1,  -1,  1};
 		int[] offsetLUTX = {16,	16,	 0,	 0};
 		int[] offsetLUTZ = {16, 0,	 0,	 16};
 		FaceDirection[] dirLUT = {FaceDirection.NE,FaceDirection.SE,FaceDirection.SW,FaceDirection.NW};
-		boolean adj1, adj2, opp = false;
+		boolean adj1, adj2, opp;
 		
 		for(Point p : areaPoints) {
 			/* Evaluate Corners */
 			for(int i = 0; i < 4; i++) {
-				adj1 = areaPoints.contains(new Point(p.x+0,            p.y+cornerLUTZ[i]));
-				adj2 = areaPoints.contains(new Point(p.x+cornerLUTX[i],p.y+0));
+				adj1 = areaPoints.contains(new Point(p.x,            p.y+cornerLUTZ[i]));
+				adj2 = areaPoints.contains(new Point(p.x+cornerLUTX[i], p.y));
 				opp  = areaPoints.contains(new Point(p.x+cornerLUTX[i],p.y+cornerLUTZ[i]));
 				if(adj1 && adj2 && !opp) {
 					cornerList.add(new Coord(p.x*16+offsetLUTX[i],p.y*16+offsetLUTZ[i],false,dirLUT[i]));
@@ -153,14 +149,13 @@ public class AreaTerritory {
 	 * @return List of contours
 	 */
 	private List<List<Coord>> sortedCoords(List<Coord> coords) {
-		List<List<Coord>> sortedList = new ArrayList<List<Coord>>();
-		List<Coord> remainingCorners = new ArrayList<Coord>();
-		remainingCorners.addAll(coords);
+		List<List<Coord>> sortedList = new ArrayList<>();
+		List<Coord> remainingCorners = new ArrayList<>(coords);
 		//
 		int timeout = 9001;
 		while(!remainingCorners.isEmpty() && timeout > 0) {
 
-			List<Coord> contour = new ArrayList<Coord>();
+			List<Coord> contour = new ArrayList<>();
 			// Find max x corner
 			Coord current = remainingCorners.get(0);
 			for (Coord c : remainingCorners) {
@@ -182,28 +177,28 @@ public class AreaTerritory {
 						switch (current.face) {
 							case NE:
 								if (current.x == c.x && current.z > c.z) {
-									if ((candidate != null && c.z > candidate.z) || candidate == null) {
+									if (candidate == null || c.z > candidate.z) {
 										candidate = c;
 									}
 								}
 								break;
 							case SE:
 								if (current.z == c.z && current.x > c.x) {
-									if ((candidate != null && c.x > candidate.x) || candidate == null) {
+									if (candidate == null || c.x > candidate.x) {
 										candidate = c;
 									}
 								}
 								break;
 							case SW:
 								if (current.x == c.x && current.z < c.z) {
-									if ((candidate != null && c.z < candidate.z) || candidate == null) {
+									if (candidate == null || c.z < candidate.z) {
 										candidate = c;
 									}
 								}
 								break;
 							case NW:
 								if (current.z == c.z && current.x < c.x) {
-									if ((candidate != null && c.x < candidate.x) || candidate == null) {
+									if (candidate == null || c.x < candidate.x) {
 										candidate = c;
 									}
 								}
@@ -215,28 +210,28 @@ public class AreaTerritory {
 						switch (current.face) {
 							case NE:
 								if (current.z == c.z && current.x < c.x) {
-									if ((candidate != null && c.x < candidate.x) || candidate == null) {
+									if (candidate == null || c.x < candidate.x) {
 										candidate = c;
 									}
 								}
 								break;
 							case SE:
 								if (current.x == c.x && current.z > c.z) {
-									if ((candidate != null && c.z > candidate.z) || candidate == null) {
+									if (candidate == null || c.z > candidate.z) {
 										candidate = c;
 									}
 								}
 								break;
 							case SW:
 								if (current.z == c.z && current.x > c.x) {
-									if ((candidate != null && c.x > candidate.x) || candidate == null) {
+									if (candidate == null || c.x > candidate.x) {
 										candidate = c;
 									}
 								}
 								break;
 							case NW:
 								if (current.x == c.x && current.z < c.z) {
-									if ((candidate != null && c.z < candidate.z) || candidate == null) {
+									if (candidate == null || c.z < candidate.z) {
 										candidate = c;
 									}
 								}
@@ -250,10 +245,8 @@ public class AreaTerritory {
 					remainingCorners.remove(candidate);
 					contour.add(candidate);
 					current = candidate;
-					//ChatUtil.printDebug("  Found next corner: "+candidate.toString());
 				} else {
 					isSearchSuccessful = false;
-					//ChatUtil.printDebug("Could not find corner contiguous corner, stopping contour search.");
 				}
 			}
 			if(!contour.isEmpty()) {

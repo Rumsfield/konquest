@@ -1,22 +1,21 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.github.rumsfield.konquest.model.KonMonumentTemplate;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.github.rumsfield.konquest.model.KonMonumentTemplate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TemplateIcon implements MenuIcon {
 
-	private KonMonumentTemplate template;
-	private List<String> lore;
-	private int index;
-	private boolean isClickable;
+	private final KonMonumentTemplate template;
+	private final List<String> lore;
+	private final int index;
+	private final boolean isClickable;
 	
 	public TemplateIcon(KonMonumentTemplate template, List<String> lore, int index, boolean isClickable) {
 		this.template = template;
@@ -47,12 +46,13 @@ public class TemplateIcon implements MenuIcon {
 	public ItemStack getItem() {
 		ItemStack item = new ItemStack(Material.OBSIDIAN,1);
 		ItemMeta meta = item.getItemMeta();
+		assert meta != null;
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
 				meta.addItemFlags(flag);
 			}
 		}
-		List<String> itemLore = new ArrayList<String>();
+		List<String> itemLore = new ArrayList<>();
 		//TODO: Replace with message paths
 		itemLore.add(ChatColor.YELLOW+"Total Blocks: "+ChatColor.AQUA+template.getNumBlocks());
 		itemLore.add(ChatColor.YELLOW+"Critical Blocks: "+ChatColor.AQUA+template.getNumCriticals());

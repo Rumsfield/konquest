@@ -9,12 +9,12 @@ import com.github.rumsfield.konquest.model.KonTerritory;
 public class TravelPlan {
 	// Wrapper class for information regarding a player's travel
 	
-	private Player traveler;
-	private TravelDestination destination;
-	private KonTerritory territory;
-	private Location location;
-	private long warmupEndTime;
-	private double cost;
+	private final Player traveler;
+	private final TravelDestination destination;
+	private final KonTerritory territory;
+	private final Location location;
+	private final long warmupEndTime;
+	private final double cost;
 	
 	public TravelPlan(Player traveler, TravelDestination destination, KonTerritory territory, Location location, long warmupEndTime, double cost) {
 		this.traveler = traveler;

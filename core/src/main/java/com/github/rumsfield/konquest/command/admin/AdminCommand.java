@@ -1,18 +1,17 @@
 package com.github.rumsfield.konquest.command.admin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.command.KonquestCommand;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class AdminCommand extends CommandBase {
 
@@ -22,7 +21,6 @@ public class AdminCommand extends CommandBase {
 
     public void execute() {
         if (getArgs().length == 1) {
-        	//ChatUtil.sendNotice((Player) getSender(), "Try \"/k admin help\" for a list of available commands");
         	if (getSender().hasPermission(AdminCommandType.HELP.permission())) {
         		new HelpAdminCommand(getKonquest(), getSender(), getArgs()).execute();
         	} else {

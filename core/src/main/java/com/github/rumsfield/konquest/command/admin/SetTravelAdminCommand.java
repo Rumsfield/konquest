@@ -4,14 +4,13 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-
-import java.util.Collections;
-import java.util.List;
-
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.Collections;
+import java.util.List;
 
 public class SetTravelAdminCommand extends CommandBase {
 	
@@ -23,8 +22,7 @@ public class SetTravelAdminCommand extends CommandBase {
     	// k admin setTravel
     	if (getArgs().length != 2) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
 
@@ -37,10 +35,8 @@ public class SetTravelAdminCommand extends CommandBase {
         	// Check if player's location is within a territory
         	if(getKonquest().getTerritoryManager().isChunkClaimed(playerLoc)) {
         		getKonquest().getTerritoryManager().getChunkTerritory(playerLoc).setSpawn(playerLoc);
-        		//ChatUtil.sendNotice((Player) getSender(), "Successfully set new travel point in "+getKonquest().getKingdomManager().getChunkTerritory(playerLoc.getChunk()).getName());
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SETTRAVEL_NOTICE_SUCCESS.getMessage(getKonquest().getTerritoryManager().getChunkTerritory(playerLoc).getName()));
         	} else {
-        		//ChatUtil.sendError((Player) getSender(), "Failed to set travel point in unknown territory");
         		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_SETTRAVEL_ERROR_FAIL.getMessage());
         	}
         }

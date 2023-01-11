@@ -13,11 +13,10 @@ import java.util.Set;
  * 	Push data
  *  Get current data, then pop
  */
-
 public class KonClaimRegister {
 
-	private ArrayList<Set<Point>> claimRegister;
-	private ArrayList<KonTerritory> territoryRegister;
+	private final ArrayList<Set<Point>> claimRegister;
+	private final ArrayList<KonTerritory> territoryRegister;
 	private final int MAX = 10;
 	
 	private Set<Point> currentClaim;
@@ -25,9 +24,9 @@ public class KonClaimRegister {
 	
 	
 	public KonClaimRegister() {
-		this.claimRegister = new ArrayList<Set<Point>>();
-		this.territoryRegister = new ArrayList<KonTerritory>();
-		this.currentClaim = new HashSet<Point>();
+		this.claimRegister = new ArrayList<>();
+		this.territoryRegister = new ArrayList<>();
+		this.currentClaim = new HashSet<>();
 		this.currentTerritory = null;
 	}
 	
@@ -80,7 +79,7 @@ public class KonClaimRegister {
 	
 	private void update() {
 		if(claimRegister.isEmpty()) {
-			currentClaim = new HashSet<Point>();
+			currentClaim = new HashSet<>();
 		} else {
 			currentClaim = claimRegister.get(0);
 		}

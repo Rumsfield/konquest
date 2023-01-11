@@ -16,34 +16,34 @@ public interface KonquestPlayer extends KonquestOfflinePlayer {
 	 * 
 	 * @return The player
 	 */
-	public Player getBukkitPlayer();
+    Player getBukkitPlayer();
 	
 	/**
 	 * Get whether the player is in Admin Bypass mode.
 	 * 
 	 * @return True when in admin bypass mode, else false
 	 */
-	public boolean isAdminBypassActive();
+    boolean isAdminBypassActive();
 	
 	/**
 	 * Get whether the player is using global chat or kingdom chat.
 	 * 
 	 * @return True when using global chat, else false
 	 */
-	public boolean isGlobalChat();
+    boolean isGlobalChat();
 	
 	/**
 	 * Get whether the player is combat tagged.
 	 * 
 	 * @return True when the player is combat tagged, else false
 	 */
-	public boolean isCombatTagged();
+    boolean isCombatTagged();
 	
 	/**
 	 * Get whether the player is using the fly command within friendly territory.
 	 * 
 	 * @return True when the player is flying, else false
 	 */
-	public boolean isFlyEnabled();
+    boolean isFlyEnabled();
 	
 }

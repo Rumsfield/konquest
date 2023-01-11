@@ -6,19 +6,19 @@ import java.util.HashSet;
 
 public class KonPrefix {
 
-	private ArrayList<KonPrefixType> prefixList;
+	private final ArrayList<KonPrefixType> prefixList;
 	private KonPrefixType mainPrefix;
 	private boolean enabled;
 	private KonCustomPrefix customPrefix;
-	private HashSet<String> availableCustoms;
+	private final HashSet<String> availableCustoms;
 	
 	public KonPrefix() {
-		this.prefixList = new ArrayList<KonPrefixType>();
+		this.prefixList = new ArrayList<>();
 		this.prefixList.add(KonPrefixType.getDefault());
 		this.mainPrefix = KonPrefixType.getDefault();
 		this.enabled = false;
 		this.customPrefix = null;
-		this.availableCustoms = new HashSet<String>();
+		this.availableCustoms = new HashSet<>();
 	}
 	
 	public void setEnable(boolean en) {
@@ -26,7 +26,7 @@ public class KonPrefix {
 	}
 	
 	public boolean isEnabled() {
-		return (enabled == true);
+		return (enabled);
 	}
 	
 	public void addPrefix(KonPrefixType prefix) {
@@ -48,8 +48,8 @@ public class KonPrefix {
 	}
 	
 	/**
-	 * Set the player's main prefix if it is a valid added prefix
-	 * @param prefix
+	 * Set the player's main prefix if it is a valid-added prefix
+	 * @param prefix the prefix to set
 	 */
 	public boolean setPrefix(KonPrefixType prefix) {
 		boolean result = false;
@@ -87,7 +87,7 @@ public class KonPrefix {
 	}
 	
 	public Collection<String> getPrefixNames() {
-		Collection<String> result = new ArrayList<String>();
+		Collection<String> result = new ArrayList<>();
 		for(KonPrefixType pre : prefixList) {
 			result.add(pre.getName());
 		}

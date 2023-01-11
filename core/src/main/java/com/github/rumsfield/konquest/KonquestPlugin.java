@@ -159,7 +159,7 @@ public class KonquestPlugin extends JavaPlugin {
             return false;
         }
         econ = rsp.getProvider();
-        return econ != null;
+        return true;
     }
 	
 	public static Economy getEconomy() {
@@ -169,10 +169,9 @@ public class KonquestPlugin extends JavaPlugin {
 	/*
 	 * Economy wrapper functions. Attempt to use Vault API methods, and then try depreciated methods if those fail.
 	 */
-	
 	@SuppressWarnings("deprecation")
 	public static double getBalance(OfflinePlayer offlineBukkitPlayer) {
-		double result = 0;
+		double result;
 		try {
 			result = econ.getBalance(offlineBukkitPlayer);
 		} catch(Exception e) {
@@ -229,7 +228,7 @@ public class KonquestPlugin extends JavaPlugin {
 			amountMod = amount - amountOff;
 			if(amountOff > 0) {
 				String amountF = econ.format(amountOff);
-				if(isOnlinePlayer) {
+				if(offlineBukkitPlayer.isOnline()) {
 					ChatUtil.sendNotice((Player)offlineBukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(discount,amountF), ChatColor.DARK_AQUA);
 				}
 			}
@@ -278,7 +277,7 @@ public class KonquestPlugin extends JavaPlugin {
 		boolean result = false;
 		boolean isOnlinePlayer = offlineBukkitPlayer instanceof Player;
 		// Perform transaction
-		EconomyResponse resp = null;
+		EconomyResponse resp;
 		try {
 			resp = econ.depositPlayer(offlineBukkitPlayer, amount);
 		} catch(Exception e) {
@@ -316,11 +315,11 @@ public class KonquestPlugin extends JavaPlugin {
 	
 	/**
 	 * This method is stupid, and is specific to unique way that AConomy implements its Vault API methods.
-	 * @param offlineBukkitPlayer
+	 * @param offlineBukkitPlayer The player to format
 	 * @return String of player's UUID when server is online-mode=true, else player's lowercase name.
 	 */
 	private static String formatStringForAConomyPlugin(OfflinePlayer offlineBukkitPlayer) {
-		String playerString = "";
+		String playerString;
 		if(Bukkit.getServer().getOnlineMode()) {
 			playerString = offlineBukkitPlayer.getUniqueId().toString();
 		} else {

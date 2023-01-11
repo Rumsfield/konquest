@@ -1,31 +1,28 @@
 package com.github.rumsfield.konquest.model;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.Map;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.KonquestPlugin;
+import com.github.rumsfield.konquest.utility.ChatUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.KonquestPlugin;
-import com.github.rumsfield.konquest.utility.ChatUtil;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Map;
+import java.util.Objects;
 
 public class KonConfig {
 	private File file;
-	private String name;
-	private String fileName;
+	private final String name;
+	private final String fileName;
 	private YamlConfiguration config;
-	private boolean doSave;
+	private final boolean doSave;
 	
-	private KonquestPlugin plugin;
+	private final KonquestPlugin plugin;
 	
 	public KonConfig(String name) {
 		this.name = name;
@@ -68,25 +65,18 @@ public class KonConfig {
 			}
 		}
 		// look for defaults in jar, if any
-		try {
-			InputStream defaultFile = plugin.getResource(fileName);
-			if (defaultFile != null) {
-				Reader defaultConfigStream = new InputStreamReader(defaultFile, "UTF8");
-				if (defaultConfigStream != null) {
-					YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
-					if(isFileValid) {
-						config.setDefaults(defaultConfig);
-					} else {
-						config = defaultConfig;
-					}
-				}
+        InputStream defaultFile = plugin.getResource(fileName);
+        if (defaultFile != null) {
+            Reader defaultConfigStream = new InputStreamReader(defaultFile, StandardCharsets.UTF_8);
+			YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
+			if(isFileValid) {
+				config.setDefaults(defaultConfig);
+			} else {
+				config = defaultConfig;
 			}
-			config.options().parseComments(true);
-		} catch (IOException exception) {
-			exception.printStackTrace();
-			result = false;
 		}
-		return result;
+        config.options().parseComments(true);
+        return result;
 	}
 	
 	public FileConfiguration getConfig() {
@@ -165,32 +155,26 @@ public class KonConfig {
 						ChatUtil.printConsoleError("Failed to save old config "+oldFileName+".");
 					}
 			    }
-				try {
-					Reader defaultConfigStream = new InputStreamReader(plugin.getResource(fileName), "UTF8");
-					if (defaultConfigStream != null) {
-						YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
-						// Update any valid non-defaults
-						Map<String,Object> allPaths = config.getValues(true);
-						for(String path : allPaths.keySet()) {
-							if(defaultConfig.contains(path,false) && !(allPaths.get(path) instanceof ConfigurationSection)) {
-								defaultConfig.set(path, allPaths.get(path));
-							}
-						}
-						// Update version
-						defaultConfig.set("version", pluginVersion);
-						file = new File(plugin.getDataFolder(), fileName);
-						try {
-							defaultConfig.save(file);
-					    } catch (IOException exception) {
-					    	exception.printStackTrace();
-					    }
-						// Reload from new file
-						reloadConfig();
-						ChatUtil.printConsoleAlert("Updated config file \""+fileName+"\" to version "+pluginVersion);
+                Reader defaultConfigStream = new InputStreamReader(Objects.requireNonNull(plugin.getResource(fileName)), StandardCharsets.UTF_8);
+				YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
+				// Update any valid non-defaults
+				Map<String,Object> allPaths = config.getValues(true);
+				for(String path : allPaths.keySet()) {
+					if(defaultConfig.contains(path,false) && !(allPaths.get(path) instanceof ConfigurationSection)) {
+						defaultConfig.set(path, allPaths.get(path));
 					}
+				}
+				// Update version
+				defaultConfig.set("version", pluginVersion);
+				file = new File(plugin.getDataFolder(), fileName);
+				try {
+					defaultConfig.save(file);
 				} catch (IOException exception) {
 					exception.printStackTrace();
 				}
+				// Reload from new file
+				reloadConfig();
+				ChatUtil.printConsoleAlert("Updated config file \""+fileName+"\" to version "+pluginVersion);
 			}
 			result = true;
 		}

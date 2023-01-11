@@ -1,13 +1,13 @@
 package com.github.rumsfield.konquest.database;
 
+import com.github.rumsfield.konquest.utility.ChatUtil;
+
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import com.github.rumsfield.konquest.utility.ChatUtil;
-
 public class AsyncUpdateSQL implements Runnable {
-    private DatabaseConnection connection;
-    private String query;
+    private final DatabaseConnection connection;
+    private final String query;
 
     public AsyncUpdateSQL(DatabaseConnection connection, String query) {
         this.connection = connection;

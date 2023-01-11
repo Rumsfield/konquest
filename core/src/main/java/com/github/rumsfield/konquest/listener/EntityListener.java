@@ -62,11 +62,11 @@ import org.bukkit.projectiles.ProjectileSource;
 
 public class EntityListener implements Listener {
 
-	private KonquestPlugin konquestPlugin;
-	private Konquest konquest;
-	private KingdomManager kingdomManager;
-	private TerritoryManager territoryManager;
-	private PlayerManager playerManager;
+	private final KonquestPlugin konquestPlugin;
+	private final Konquest konquest;
+	private final KingdomManager kingdomManager;
+	private final TerritoryManager territoryManager;
+	private final PlayerManager playerManager;
 	
 	public EntityListener(KonquestPlugin plugin) {
 		this.konquestPlugin = plugin;
@@ -76,57 +76,51 @@ public class EntityListener implements Listener {
 		this.territoryManager = konquest.getTerritoryManager();
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onItemSpawn(ItemSpawnEvent event) {
-		//ChatUtil.printDebug("EVENT: Item spawned");
 		Location dropLoc = event.getEntity().getLocation();
-		if(territoryManager.isChunkClaimed(dropLoc)) {
-			KonTerritory territory = territoryManager.getChunkTerritory(dropLoc);
-			// Check for break inside of town
-			if(territory instanceof KonTown) {
-				KonTown town = (KonTown) territory;
-				// Check for break inside of town's monument
-				if(town.getMonument().isItemDropsDisabled() && town.getMonument().isLocInside(dropLoc)) {
-					//ChatUtil.printDebug("Item drops are currently disabled in "+town.getName()+" monument, removing");
-					event.getEntity().remove();
-				}
+		if(!territoryManager.isChunkClaimed(dropLoc)) return;
+
+		KonTerritory territory = territoryManager.getChunkTerritory(dropLoc);
+		// Check for break inside of town
+		if(territory instanceof KonTown) {
+			KonTown town = (KonTown) territory;
+			// Check for break inside of town's monument
+			if(town.getMonument().isItemDropsDisabled() && town.getMonument().isLocInside(dropLoc)) {
+				event.getEntity().remove();
 			}
 		}
+
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)
     public void onEntityBreed(EntityBreedEvent event) {
-		if(!event.isCancelled()) {
-			if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
+		if(event.isCancelled())  return;
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
+		if(event.getBreeder() instanceof Player) {
+			Player bukkitPlayer = (Player)event.getBreeder();
+			if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
+				ChatUtil.printDebug("Failed to handle onEntityBreed for non-existent player");
 				return;
 			}
-			if(event.getBreeder() instanceof Player) {
-				Player bukkitPlayer = (Player)event.getBreeder();
-				if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-					ChatUtil.printDebug("Failed to handle onEntityBreed for non-existent player");
-					return;
-				}
-				KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.BREED,1);
-			}
+			KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.BREED,1);
 		}
+
 	}
 	
 	/**
 	 * Fires when entities explode.
 	 * Protect territory from explosions, and optionally protect chests inside claimed territory.
-	 * @param event
 	 */
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onEntityExplode(EntityExplodeEvent event) {
 		// Protect blocks inside of territory
-		//ChatUtil.printDebug("EVENT: entityExplode");
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
 			return;
 		}
 		for(Block block : event.blockList()) {
 			if(territoryManager.isChunkClaimed(block.getLocation())) {
-				//ChatUtil.printDebug("EVENT: effected block is inside claimed territory");
 				KonTerritory territory = territoryManager.getChunkTerritory(block.getLocation());
 				Material blockMat = block.getType();
 				
@@ -160,8 +154,7 @@ public class EntityListener implements Listener {
 					// If town is upgraded to require a minimum online resident amount, prevent block damage
 					int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
 					if(upgradeLevelWatch > 0) {
-						int minimumOnlineResidents = upgradeLevelWatch; // 1, 2, 3
-						if(town.getNumResidentsOnline() < minimumOnlineResidents) {
+						if(town.getNumResidentsOnline() < upgradeLevelWatch) {
 							ChatUtil.printDebug("protecting upgraded Town WATCH");
 							event.setCancelled(true);
 							return;
@@ -205,46 +198,45 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onMobSpawn(CreatureSpawnEvent event) {
-		// Inside of claimed territory...
-		if(territoryManager.isChunkClaimed(event.getLocation())) {
-			KonTerritory territory = territoryManager.getChunkTerritory(event.getLocation());
-			//ChatUtil.printDebug("EVENT: Creature spawned in territory "+territory.getTerritoryType().toString()+", cause: "+event.getSpawnReason().toString());
-			// Property Flag Holders
-			if(territory instanceof KonPropertyFlagHolder) {
-				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
-				if(flagHolder.hasPropertyValue(KonPropertyFlag.MOBS)) {
-					if(!flagHolder.getPropertyValue(KonPropertyFlag.MOBS)) {
-						// Conditions to block spawning...
-						if(event.getSpawnReason().equals(SpawnReason.DROWNED) || 
-								event.getSpawnReason().equals(SpawnReason.JOCKEY) ||
-								event.getSpawnReason().equals(SpawnReason.BUILD_WITHER) ||
-								event.getSpawnReason().equals(SpawnReason.LIGHTNING) ||
-								event.getSpawnReason().equals(SpawnReason.MOUNT) ||
-								event.getSpawnReason().equals(SpawnReason.NATURAL) ||
-								event.getSpawnReason().equals(SpawnReason.PATROL) ||
-								event.getSpawnReason().equals(SpawnReason.RAID) ||
-								event.getSpawnReason().equals(SpawnReason.REINFORCEMENTS) ||
-								event.getSpawnReason().equals(SpawnReason.VILLAGE_INVASION)) {
-							event.setCancelled(true);
-							return;
-						}
+		if(!territoryManager.isChunkClaimed(event.getLocation())) return;
+		// Inside claimed territory...
+		KonTerritory territory = territoryManager.getChunkTerritory(event.getLocation());
+		//ChatUtil.printDebug("EVENT: Creature spawned in territory "+territory.getTerritoryType().toString()+", cause: "+event.getSpawnReason().toString());
+		// Property Flag Holders
+		if(territory instanceof KonPropertyFlagHolder) {
+			KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+			if(flagHolder.hasPropertyValue(KonPropertyFlag.MOBS)) {
+				if(!flagHolder.getPropertyValue(KonPropertyFlag.MOBS)) {
+					// Conditions to block spawning...
+					if(event.getSpawnReason().equals(SpawnReason.DROWNED) ||
+							event.getSpawnReason().equals(SpawnReason.JOCKEY) ||
+							event.getSpawnReason().equals(SpawnReason.BUILD_WITHER) ||
+							event.getSpawnReason().equals(SpawnReason.LIGHTNING) ||
+							event.getSpawnReason().equals(SpawnReason.MOUNT) ||
+							event.getSpawnReason().equals(SpawnReason.NATURAL) ||
+							event.getSpawnReason().equals(SpawnReason.PATROL) ||
+							event.getSpawnReason().equals(SpawnReason.RAID) ||
+							event.getSpawnReason().equals(SpawnReason.REINFORCEMENTS) ||
+							event.getSpawnReason().equals(SpawnReason.VILLAGE_INVASION)) {
+						event.setCancelled(true);
+						return;
 					}
 				}
 			}
-			// When a spawn event happens in a Ruin
-			if(territory instanceof KonRuin) {
-				// Conditions to block spawning...
-				EntityType eType = event.getEntityType();
-				SpawnReason eReason = event.getSpawnReason();
-				boolean stopOnType = !(eType.equals(EntityType.ARMOR_STAND) || eType.equals(EntityType.IRON_GOLEM));
-				boolean stopOnReason = !(eReason.equals(SpawnReason.COMMAND) || eReason.equals(SpawnReason.CUSTOM) || eReason.equals(SpawnReason.DEFAULT) || eReason.equals(SpawnReason.SPAWNER));
-				if(stopOnType && stopOnReason) {
-					event.setCancelled(true);
-					return;
-				}
+		}
+		// When a spawn event happens in a Ruin
+		if(territory instanceof KonRuin) {
+			// Conditions to block spawning...
+			EntityType eType = event.getEntityType();
+			SpawnReason eReason = event.getSpawnReason();
+			boolean stopOnType = !(eType.equals(EntityType.ARMOR_STAND) || eType.equals(EntityType.IRON_GOLEM));
+			boolean stopOnReason = !(eReason.equals(SpawnReason.COMMAND) || eReason.equals(SpawnReason.CUSTOM) || eReason.equals(SpawnReason.DEFAULT) || eReason.equals(SpawnReason.SPAWNER));
+			if(stopOnType && stopOnReason) {
+				event.setCancelled(true);
 			}
+
 		}
     }
 	
@@ -284,11 +276,9 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onEntityPotionEffect(EntityPotionEffectEvent event) {
-		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-			return;
-		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		// prevent milk buckets from removing town nerfs in enemy towns
 		if(!event.isCancelled() && event.getEntity() instanceof Player) {
 			if(!konquest.getPlayerManager().isOnlinePlayer((Player)event.getEntity())) {
@@ -307,28 +297,10 @@ public class EntityListener implements Listener {
 			}
     	}
 	}
-	
-	/* Removed as an unnecessary feature
-	@EventHandler(priority = EventPriority.NORMAL)
-    public void onEntityInteract(EntityInteractEvent event) {
-		// prevent items from interacting with pressure plates
-		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-			return;
-		}
-		//String entity = event.getEntity().getType().toString();
-		//String block = event.getBlock().getType().toString();
-		//ChatUtil.printDebug("Entity "+entity+" interacted with block "+block);
-		if(event.getEntityType().equals(EntityType.DROPPED_ITEM)) {
-			event.setCancelled(true);
-		}
-	}
-	*/
-	
+
 	@EventHandler(priority = EventPriority.LOW)
     public void onEntityTarget(EntityTargetEvent event) {
-		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-			return;
-		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		// Prevent Iron Golems from targeting friendly players
 		Entity target = event.getTarget();
 		Entity e = event.getEntity();
@@ -339,7 +311,7 @@ public class EntityListener implements Listener {
 			// Protect friendly players in claimed land
 			if(target instanceof Player && territoryManager.isChunkClaimed(eLoc)) {
 				Player bukkitPlayer = (Player)target;
-				if(!konquest.getPlayerManager().isOnlinePlayer((Player)bukkitPlayer)) {
+				if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 					ChatUtil.printDebug("Failed to handle onEntityTarget for non-existent player");
 				} else {
 					KonPlayer player = playerManager.getPlayer(bukkitPlayer);
@@ -356,36 +328,24 @@ public class EntityListener implements Listener {
 			if(!(target instanceof Player) && target instanceof LivingEntity) {
 				for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
 					if(ruin.isGolem(golemAttacker)) {
-						//ChatUtil.printDebug("Cancelling Ruin Golem target of non-player "+target.getType().toString()+", "+event.getReason().toString());
-						//((LivingEntity)target).damage(((LivingEntity)target).getHealth());
 						target.getWorld().spawnParticle(Particle.SOUL,target.getLocation(),10);
 						target.remove();
 						eLoc.getWorld().playSound(eLoc, Sound.ENTITY_GHAST_DEATH, 1.0F, 0.1F);
-						//event.setTarget(ruin.getGolemLastTarget(golemAttacker));
 						event.setCancelled(true);
 						// Scheduled delayed task to change target back to last player if present
-						Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-	        	            @Override
-	        	            public void run() {
-	        	            	ruin.targetGolemToLast(golemAttacker);
-	        	            }
-	        	        },1);
+						Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(),
+								() -> ruin.targetGolemToLast(golemAttacker),1);
 					}
 				}
 			}
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onArrowInteract(EntityInteractEvent event) {
-    	if(konquest.isWorldIgnored(event.getEntity().getLocation())) {
-			return;
-		}
+    	if(konquest.isWorldIgnored(event.getEntity().getLocation())) return;
     	// prevent arrows from interacting with things
-		if (!(event.getEntity() instanceof Arrow)) {
-            return;
-        }
-		//ChatUtil.printDebug("Caught arrow interaction...");
+		if (!(event.getEntity() instanceof Arrow)) return;
 		if(!event.isCancelled() && territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
 	        KonTerritory territory = territoryManager.getChunkTerritory(event.getBlock().getLocation());
 	        // Protect territory from arrow interaction
@@ -395,34 +355,31 @@ public class EntityListener implements Listener {
  				if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
  					if(!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
  						event.setCancelled(true);
- 						return;
- 					}
+					}
  				}
  			}
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onEntityDamage(EntityDamageEvent event) {
-		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-			return;
-		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld()))return;
 		Location damageLoc = event.getEntity().getLocation();
-		if(territoryManager.isChunkClaimed(damageLoc)) {
-			KonTerritory territory = territoryManager.getChunkTerritory(damageLoc);
-			// Check for damage inside of town
-			if(territory instanceof KonTown) {
-				KonTown town = (KonTown) territory;
-				// Check for damage inside of town's monument
-				if(town.getMonument().isDamageDisabled() && town.getMonument().isLocInside(damageLoc)) {
-					ChatUtil.printDebug("Damage is currently disabled in "+town.getName()+" monument, cancelling");
-					event.setCancelled(true);
-				}
+		if(!territoryManager.isChunkClaimed(damageLoc)) return;
+		KonTerritory territory = territoryManager.getChunkTerritory(damageLoc);
+		// Check for damage inside of town
+		if(territory instanceof KonTown) {
+			KonTown town = (KonTown) territory;
+			// Check for damage inside of town's monument
+			if(town.getMonument().isDamageDisabled() && town.getMonument().isLocInside(damageLoc)) {
+				ChatUtil.printDebug("Damage is currently disabled in "+town.getName()+" monument, cancelling");
+				event.setCancelled(true);
 			}
 		}
+
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onEntityDamageByPlayer(EntityDamageByEntityEvent event) {
 		// Player damages an entity (non-player)
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
@@ -430,24 +387,14 @@ public class EntityListener implements Listener {
 		}
 		Entity entityVictim = event.getEntity();
 		EntityType eType = event.getEntity().getType();
-		if(entityVictim instanceof Player) {
-			// Victim is a player, skip this event.
-			return;
-		}
-		//ChatUtil.printDebug("EVENT: Entity "+eType.toString()+" damaged by entity "+dType.toString());
-		Player bukkitPlayer = null;
+		if(entityVictim instanceof Player) return;// Victim is a player, skip this event.
+		Player bukkitPlayer;
 		if (event.getDamager() instanceof AbstractArrow) {
 			AbstractArrow arrow = (AbstractArrow) event.getDamager();
-            //ChatUtil.printDebug("...Attacker was an Arrow");
-            if (arrow.getShooter() instanceof Player) {
-            	bukkitPlayer = (Player) arrow.getShooter();
-            	//ChatUtil.printDebug("...Arrow shooter was a Player");
-            } else {
-            	return;
-            }
+            if (!(arrow.getShooter() instanceof Player))return;
+			bukkitPlayer = (Player) arrow.getShooter();
         } else if (event.getDamager() instanceof Player) {
         	bukkitPlayer = (Player) event.getDamager();
-        	//ChatUtil.printDebug("...Attacker was a Player");
         } else { // if neither player nor arrow shot by player
             return;
         }
@@ -529,9 +476,8 @@ public class EntityListener implements Listener {
 	    				// If town is upgraded to require a minimum online resident amount, prevent block damage
 						int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
 						if(upgradeLevelWatch > 0) {
-							int minimumOnlineResidents = upgradeLevelWatch; // 1, 2, 3
-							if(town.getNumResidentsOnline() < minimumOnlineResidents) {
-								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(),minimumOnlineResidents));
+							if(town.getNumResidentsOnline() < upgradeLevelWatch) {
+								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevelWatch));
 								event.setCancelled(true);
 								return;
 							}
@@ -570,17 +516,13 @@ public class EntityListener implements Listener {
     				if(golem.getHealth() - event.getFinalDamage() > 0) {
     					// Iron Golem lives
 	    				LivingEntity currentTarget = golem.getTarget();
-	    				//ChatUtil.printDebug("Golem: Evaluating new targets in territory "+territory.getName());
-	    				if(currentTarget != null && currentTarget instanceof Player) {
+	    				if(currentTarget instanceof Player) {
 	    					if(!konquest.getPlayerManager().isOnlinePlayer((Player)currentTarget)) {
 	    						ChatUtil.printDebug("Failed to handle onEntityDamageByPlayer golem targeting for non-existent player");
 	    					} else {
 		    					KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
 		    					previousTargetPlayer.removeMobAttacker(golem);
 	    					}
-	    					//ChatUtil.printDebug("Golem: Removed mob attacker from player "+previousTargetPlayer.getBukkitPlayer().getName());
-	    				} else {
-	    					//ChatUtil.printDebug("Golem: Bad current target");
 	    				}
 	    				golem.setTarget(bukkitPlayer);
 	    				player.addMobAttacker(golem);
@@ -601,7 +543,7 @@ public class EntityListener implements Listener {
 		
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onPlayerDamageByPlayer(EntityDamageByEntityEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
 			return;
@@ -611,29 +553,23 @@ public class EntityListener implements Listener {
         boolean isEggAttack = false;
         if (event.getEntity() instanceof Player) {
         	victimBukkitPlayer = (Player) event.getEntity();
-        	//ChatUtil.printDebug("Player was attacked by an entity");
             if (event.getDamager() instanceof AbstractArrow) {
             	AbstractArrow arrow = (AbstractArrow) event.getDamager();
-                //ChatUtil.printDebug("...Attacker was an Arrow");
                 if (arrow.getShooter() instanceof Player) {
                 	attackerBukkitPlayer = (Player) arrow.getShooter();
-                	//ChatUtil.printDebug("...Arrow shooter was a Player");
                 } else {
                 	return;
                 }
             } else if (event.getDamager() instanceof Egg) {
-            	//ChatUtil.printDebug("...Attacker was an Egg");
             	Egg egg = (Egg)event.getDamager();
             	if (egg.getShooter() instanceof Player) {
                 	attackerBukkitPlayer = (Player) egg.getShooter();
                 	isEggAttack = true;
-                	//ChatUtil.printDebug("...Egg thrower was a Player");
                 } else {
                 	return;
                 }
             } else if (event.getDamager() instanceof Player) {
             	attackerBukkitPlayer = (Player) event.getDamager();
-            	//ChatUtil.printDebug("...Attacker was a Player");
             } else { // if neither player nor arrow
                 return;
             }
@@ -663,7 +599,7 @@ public class EntityListener implements Listener {
     					}
     				}
     			}
-            	// Prevent damage of victim inside of peaceful territory if the victim is a member
+            	// Prevent damage to victim inside peaceful territory if the victim is a member
             	if(territory.getKingdom().isPeaceful() && territory.getKingdom().equals(victimPlayer.getKingdom())) {
             		event.setCancelled(true);
                 	return;
@@ -692,7 +628,6 @@ public class EntityListener implements Listener {
             }
             
             // Check for death, update directive progress & stat
-            //ChatUtil.printDebug("Player Damage: "+attackerBukkitPlayer.getName()+" attacked "+victimBukkitPlayer.getName()+", current health: "+victimBukkitPlayer.getHealth()+", damage dealt: "+event.getFinalDamage());
             if(victimBukkitPlayer.getHealth() - event.getFinalDamage() <= 0) {
             	konquest.getDirectiveManager().updateDirectiveProgress(attackerPlayer, KonDirective.KILL_ENEMY);
             	konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.KILLS,1);
@@ -715,7 +650,6 @@ public class EntityListener implements Listener {
 	            		victimPlayer.getCombatTagTimer().setTime(combatTagCooldownSeconds);
 	            		victimPlayer.getCombatTagTimer().startTimer();
 	            		victimPlayer.setIsCombatTagged(true);
-	            		//ChatUtil.printDebug("Refreshed combat tag timer for player "+victimBukkitPlayer.getName());
 					}
             	}
             }
@@ -723,7 +657,7 @@ public class EntityListener implements Listener {
         }
     }
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onPlayerDeath(PlayerDeathEvent event) {
 		Player bukkitPlayer = event.getEntity();
 		KonPlayer player = playerManager.getPlayer(bukkitPlayer);
@@ -734,7 +668,7 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onEntityDeath(EntityDeathEvent event) {
 		EntityType eType = event.getEntity().getType();
 		if(eType.equals(EntityType.IRON_GOLEM) && event.getEntity() instanceof IronGolem) {
@@ -746,12 +680,9 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
-		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-			return;
-		}
-		//ChatUtil.printDebug("EVENT: Player interacted with item "+event.getItem().getType().toString());
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		ProjectileSource source = event.getEntity().getShooter();
 		if(event.getEntityType().equals(EntityType.SPLASH_POTION) && source instanceof Player) {
 			Player bukkitPlayer = (Player)source;
@@ -762,11 +693,9 @@ public class EntityListener implements Listener {
     	}
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler()
     public void onAnimalDeathItem(EntityDeathEvent event) {
-		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-			return;
-		}
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		// Check for ruin golem
 		boolean cancelGolemDrops = konquest.getConfigManager().getConfig("core").getBoolean("core.ruins.no_golem_drops", true);
 		EntityType eType = event.getEntity().getType();
@@ -792,32 +721,11 @@ public class EntityListener implements Listener {
 					// Add 1 to all drops
 					for(ItemStack item : event.getDrops()) {
 						int droppedAmount = item.getAmount();
-						//ChatUtil.printDebug("EVENT: Dropping additional item "+item.getType().toString()+", was "+droppedAmount+", added 1.");
 						item.setAmount(droppedAmount+1);
 					}
 				}
 			}
 		}
 	}
-	
-	/*
-	@EventHandler(priority = EventPriority.NORMAL)
-    public void onFoodLevelChange(FoodLevelChangeEvent event) {
-		if(event.getEntity() instanceof Player && kingdomManager.isChunkClaimed(event.getEntity().getLocation().getChunk())) {
-			KonTerritory territory = kingdomManager.getChunkTerritory(event.getEntity().getLocation().getChunk());
-			Player bukkitPlayer = (Player)event.getEntity();
-			KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-			if(player.getKingdom().equals(territory.getKingdom()) && territory instanceof KonTown) {
-				KonTown town = (KonTown)territory;
-				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.HUNGER);
-				if(upgradeLevel >= 1) {
-					//ChatUtil.printDebug("EVENT: Cancelling hunger event for friendly player in town "+town.getName());
-					bukkitPlayer.setFoodLevel(20);
-					event.setCancelled(true);
-					return;
-				}
-			}
-		}
-	}
-	*/
+
 }

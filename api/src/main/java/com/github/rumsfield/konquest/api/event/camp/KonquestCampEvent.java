@@ -12,7 +12,7 @@ import com.github.rumsfield.konquest.api.model.KonquestCamp;
  */
 public class KonquestCampEvent extends KonquestEvent {
 
-	private KonquestCamp camp;
+	private final KonquestCamp camp;
 	
 	/**
 	 * Default constructor

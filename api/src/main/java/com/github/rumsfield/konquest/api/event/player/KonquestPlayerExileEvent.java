@@ -19,8 +19,8 @@ import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
 public class KonquestPlayerExileEvent extends KonquestEvent implements Cancellable {
 
 	private boolean isCancelled;
-	private KonquestOfflinePlayer offlinePlayer;
-	private KonquestKingdom oldKingdom;
+	private final KonquestOfflinePlayer offlinePlayer;
+	private final KonquestKingdom oldKingdom;
 	
 	/**
 	 * Default constructor

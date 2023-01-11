@@ -1,5 +1,10 @@
 package com.github.rumsfield.konquest.database;
 
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,25 +12,13 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import org.bukkit.configuration.file.FileConfiguration;
-
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-
-
-//import com.github.rumsfield.konquest.utility.ChatUtil;
+import java.util.concurrent.*;
 
 public class DatabaseConnection {
 
     private Connection connection;
-    private ExecutorService queryExecutor;
-    private DatabaseType type;
+    private final ExecutorService queryExecutor;
+    private final DatabaseType type;
 
     public DatabaseConnection(DatabaseType type) {
         queryExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -42,9 +35,8 @@ public class DatabaseConnection {
         	case SQLITE:
         		try {
         			ChatUtil.printConsoleAlert("Connecting to SQLite database");
-        			migrateDatabaseFile("KonquestDatabase.db","data/KonquestDatabase.db");
-                	String databaseName = "plugins/Konquest/data/KonquestDatabase";
-                    connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName + ".db", properties);
+        			File databaseFile = migrateDatabaseFile();
+                    connection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getAbsolutePath(), properties);
                     return;
                 } catch (SQLException e) {
                 	ChatUtil.printConsoleAlert("Failed to connect to SQLite database!");
@@ -83,7 +75,7 @@ public class DatabaseConnection {
                 }
         		break;
         	default:
-        		ChatUtil.printConsoleError("Could not connect to unknown database type "+type.toString());
+        		ChatUtil.printConsoleError("Could not connect to unknown database type "+ type);
         }
         
     }
@@ -95,63 +87,13 @@ public class DatabaseConnection {
                 queryExecutor.awaitTermination(5, TimeUnit.SECONDS);
                 connection.close();
             }
-        } catch (SQLException e) {
+        } catch (SQLException | InterruptedException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+        }
 
         connection = null;
     }
 
-    /*
-    public void executeUpdate(String query) {
-        Statement statement = null;
-
-        try {
-        	ChatUtil.printDebug("Executing SQL Update: "+query);
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            ChatUtil.printConsoleError("Failed to execute SQL update, is the connection closed?");
-        } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                ChatUtil.printConsoleError("Failed to close SQL update statement, is the connection closed?");
-            }
-        }
-    }
-    
-    public ResultSet executeQuery(String query) {
-    	Statement statement = null;
-    	ResultSet result = null;
-    	
-    	try {
-            statement = connection.createStatement();
-            ChatUtil.printDebug("Executing SQL Query: "+query);
-            result = statement.executeQuery(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            ChatUtil.printConsoleError("Failed to execute SQL query, is the connection closed?");
-        } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                ChatUtil.printConsoleError("Failed to close SQL query statement, is the connection closed?");
-            }
-        }
-    	return result;
-    }
-	*/
-    
     public PreparedStatement prepare(String sql) {
         if (connection == null) {
             return null;
@@ -198,7 +140,7 @@ public class DatabaseConnection {
 
     public boolean pingDatabase() {
     	boolean result = false;
-        Statement statement = null;
+        Statement statement;
         try {
             statement = connection.createStatement();
             statement.executeQuery("SELECT 1;");
@@ -217,7 +159,7 @@ public class DatabaseConnection {
     
     private boolean testConnection(boolean reconnect) {
     	boolean result = false;
-    	Statement statement = null;
+    	Statement statement;
         try {
             statement = connection.createStatement();
             statement.executeQuery("SELECT 1;");
@@ -240,20 +182,22 @@ public class DatabaseConnection {
     	return result;
     }
     
-    private void migrateDatabaseFile(String oldPath, String newpath) {
-		File oldFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), oldPath);
-		File newFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), newpath);
-		if(oldFile.exists()) {
-			Path source = oldFile.toPath();
-			Path destination = newFile.toPath();
-			try {
-				Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
-				oldFile.delete();
-				ChatUtil.printConsoleAlert("Migrated database file "+oldPath+" to "+newpath);
-			} catch (IOException e) {
-				e.printStackTrace();
-				ChatUtil.printDebug("Failed to move database file "+oldPath+" to "+newpath);
-			}
-		}
+    private @NotNull File migrateDatabaseFile() {
+        final String oldFileName = "Konquestdatabase.db";
+        final String newFileName = "data/KonquestDatabase.db";
+		File oldFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), oldFileName);
+		File newFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), newFileName);
+        if(!oldFile.exists()) return newFile;
+        Path source = oldFile.toPath();
+        Path destination = newFile.toPath();
+        try {
+            Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
+            oldFile.delete();
+            ChatUtil.printConsoleAlert("Migrated database file "+oldFileName+" to "+newFileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+            ChatUtil.printDebug("Failed to move database file "+oldFileName+" to "+newFileName);
+        }
+        return newFile;
 	}
 }

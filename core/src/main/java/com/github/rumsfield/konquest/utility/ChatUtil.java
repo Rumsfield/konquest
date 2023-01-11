@@ -2,30 +2,28 @@ package com.github.rumsfield.konquest.utility;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonPlayer;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 public class ChatUtil {
 
-	private static ChatColor broadcastColor = ChatColor.LIGHT_PURPLE;
-	private static ChatColor noticeColor = ChatColor.GRAY;
-	private static ChatColor errorColor = ChatColor.RED;
-	private static ChatColor alertColor = ChatColor.GOLD;
-	//private static String tag = "�7[�6Konquest�7]�f "; /*Replaced with Konquest.getChatTag()*/
-	
+	private static final ChatColor broadcastColor = ChatColor.LIGHT_PURPLE;
+	private static final ChatColor noticeColor = ChatColor.GRAY;
+	private static final ChatColor errorColor = ChatColor.RED;
+	private static final ChatColor alertColor = ChatColor.GOLD;
+
 	/**
 	 * Formats hex color codes, written by user zwrumpy
-	 * https://www.spigotmc.org/threads/hex-color-code-translate.449748/#post-4270781
-	 * @param message
-	 * @return
+	 * <a href="https://www.spigotmc.org/threads/hex-color-code-translate.449748/#post-4270781">...</a>
+	 * @param message The message to format
+	 * @return The formatted message
 	 */
 	public static String parseHex(String message) {
 		Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
@@ -35,9 +33,9 @@ public class ChatUtil {
             String replaceSharp = hexCode.replace('#', 'x');
            
             char[] ch = replaceSharp.toCharArray();
-            StringBuilder builder = new StringBuilder("");
+            StringBuilder builder = new StringBuilder();
             for (char c : ch) {
-                builder.append("&" + c);
+                builder.append("&").append(c);
             }
            
             message = message.replace(hexCode, builder.toString());
@@ -66,11 +64,11 @@ public class ChatUtil {
 	 * 		%KINGDOM% with kingdom arg
 	 * 		%TITLE% with title arg
 	 * 		%NAME% with name arg
-	 * @param base - Base format that may or may not contain %PREFIX%, %SUFFIX%, %KINGDOM%, %TITLE% or %NAME%.
-	 * @param kingdom
-	 * @param title
-	 * @param name
-	 * @return
+	 * @param base Base format that may or may not contain %PREFIX%, %SUFFIX%, %KINGDOM%, %TITLE% or %NAME%.
+	 * @param kingdom Kingdom name to replace %KINGDOM% with
+	 * @param title Title to replace %TITLE% with
+	 * @param name Name to replace %NAME% with
+	 * @return Formatted string
 	 */
 	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, ChatColor teamColor, ChatColor titleColor, boolean formatName, boolean formatKingdom) {
 		String message = base;
@@ -175,53 +173,30 @@ public class ChatUtil {
 	public static BarColor mapBarColor(ChatColor reference) {
 		BarColor result = BarColor.WHITE;
 		switch(reference) {
-			case BLACK:
-				result = BarColor.PURPLE;
-				break;
-			case DARK_BLUE:
-				result = BarColor.BLUE;
-				break;
-			case DARK_GREEN:
-				result = BarColor.GREEN;
-				break;
-			case DARK_AQUA:
-				result = BarColor.BLUE;
-				break;
-			case DARK_RED:
-				result = BarColor.RED;
-				break;
-			case DARK_PURPLE:
-				result = BarColor.PURPLE;
-				break;
+			case YELLOW:
 			case GOLD:
 				result = BarColor.YELLOW;
 				break;
-			case GRAY:
-				result = BarColor.WHITE;
-				break;
-			case DARK_GRAY:
-				result = BarColor.WHITE;
+			case RED:
+			case DARK_RED:
+				result = BarColor.RED;
 				break;
 			case BLUE:
-				result = BarColor.BLUE;
-				break;
-			case GREEN:
-				result = BarColor.GREEN;
-				break;
+			case DARK_BLUE:
+			case DARK_AQUA:
 			case AQUA:
 				result = BarColor.BLUE;
 				break;
-			case RED:
-				result = BarColor.RED;
+			case GREEN:
+			case DARK_GREEN:
+				result = BarColor.GREEN;
+				break;
+			case BLACK:
+			case DARK_PURPLE:
+				result = BarColor.PURPLE;
 				break;
 			case LIGHT_PURPLE:
 				result = BarColor.PINK;
-				break;
-			case YELLOW:
-				result = BarColor.YELLOW;
-				break;
-			case WHITE:
-				result = BarColor.WHITE;
 				break;
 			default:
 				break;
@@ -260,8 +235,7 @@ public class ChatUtil {
 	}
 	
 	public static void sendMessage(Player player, String message) {
-		String notice = message;
-		player.sendMessage(notice);
+		player.sendMessage(message);
 	}
 	
 	public static void sendMessage(Player player, String message, ChatColor color) {
@@ -319,20 +293,7 @@ public class ChatUtil {
 			player.getBukkitPlayer().sendTitle(title, subtitle, fadeInTicks, durationTicks, fadeOutTicks);
 		}
 	}
-	
-	/*
-	public static void sendTitle(Player player, String title, String subtitle) {
-		player.sendTitle(title, subtitle, 10, 40, 10);
-	}
-	
-	public static void sendTitle(Player player, String title, String subtitle, int duration) {
-		if(duration < 0) {
-			duration = -1;
-		}
-		player.sendTitle(title, subtitle, 10, duration, 10);
-	}
-	*/
-	
+
 	public static void sendConstantTitle(Player player, String title, String subtitle) {
 		if(title.equals("")) {
 			title = " ";
