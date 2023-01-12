@@ -24,6 +24,7 @@ public class ClaimCommand extends CommandBase {
 		// k claim [radius|auto] [<r>]
     	if (getArgs().length > 3) {
             ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			return;
 		}
 		Player bukkitPlayer = (Player) getSender();
 		World bukkitWorld = bukkitPlayer.getWorld();
