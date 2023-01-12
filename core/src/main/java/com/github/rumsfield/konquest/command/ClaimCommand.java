@@ -51,8 +51,7 @@ public class ClaimCommand extends CommandBase {
 			return;
 		}
 		String claimMode = getArgs()[1];
-		switch(claimMode) {
-		case "radius" :
+		if(claimMode.equalsIgnoreCase("radius")){
 			if(getArgs().length != 3) {
 				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 				return;
@@ -67,9 +66,8 @@ public class ClaimCommand extends CommandBase {
 				return;
 			}
 			getKonquest().getTerritoryManager().claimRadiusForPlayer(bukkitPlayer, bukkitPlayer.getLocation(), radius);
-			break;
 
-		case "auto" :
+		}else if (claimMode.equalsIgnoreCase("auto")){
 			boolean doAuto = false;
 			// Check if player is already in an auto follow state
 			if(player.isAutoFollowActive()) {
@@ -93,9 +91,7 @@ public class ClaimCommand extends CommandBase {
 					player.setAutoFollow(FollowType.CLAIM);
 				}
 			}
-			break;
-
-		default :
+		}else{
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		}
 	}
