@@ -17,7 +17,7 @@ public class KonquestCommand extends CommandBase{
 
     public void execute() {
 		if(!(getSender() instanceof Player)){
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			ChatUtil.printConsoleError(MessagePath.GENERIC_ERROR_NO_PLAYER.getMessage());
 			return;
 		}
 
