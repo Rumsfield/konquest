@@ -1,20 +1,19 @@
 package com.github.rumsfield.konquest.command.admin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonPlayer.FollowType;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ClaimAdminCommand extends CommandBase {
 	
@@ -26,8 +25,7 @@ public class ClaimAdminCommand extends CommandBase {
     	// k admin claim [radius|auto|undo] [<r>]
     	if (getArgs().length > 4) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
@@ -36,7 +34,6 @@ public class ClaimAdminCommand extends CommandBase {
     		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	Location playerLoc = bukkitPlayer.getLocation();
-        	//World playerWorld = playerLoc.getWorld();
         	if(getArgs().length > 2) {
         		String claimMode = getArgs()[2];
         		switch(claimMode) {
@@ -50,7 +47,6 @@ public class ClaimAdminCommand extends CommandBase {
         			final int max = 16;
     				if(radius < min || radius > max) {
     					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-    					//ChatUtil.sendError((Player) getSender(), "Radius must be greater than 0 and less than or equal to 16.");
     					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_CLAIM_ERROR_RADIUS.getMessage(min,max));
     					return;
     				}
@@ -92,8 +88,7 @@ public class ClaimAdminCommand extends CommandBase {
         			
         		default :
         			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-                    return;
-        		}
+				}
         	} else {
         		// Claim the single chunk containing playerLoc for the adjacent territory.
         		getKonquest().getTerritoryManager().claimForAdmin(bukkitPlayer, playerLoc);

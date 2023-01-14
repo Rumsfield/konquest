@@ -18,8 +18,8 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
  */
 public class KonquestTownSettleEvent extends KonquestTownEvent {
 
-	private KonquestPlayer player;
-	private KonquestKingdom kingdom;
+	private final KonquestPlayer player;
+	private final KonquestKingdom kingdom;
 	
 	/**
 	 * Default constructor

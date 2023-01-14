@@ -1,14 +1,5 @@
 package com.github.rumsfield.konquest.command;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
@@ -16,6 +7,14 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 //TODO: KR replace GUILD messages with KINGDOM
 public class KingdomCommand extends CommandBase {
@@ -29,8 +28,7 @@ public class KingdomCommand extends CommandBase {
 		// kingdom [menu|create|add|kick|rename] [name] [template]
 		if (getArgs().length != 1 && getArgs().length != 2 && getArgs().length != 3 && getArgs().length != 4) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	
         	// Check for player
         	Player bukkitPlayer = (Player) getSender();
@@ -77,7 +75,6 @@ public class KingdomCommand extends CommandBase {
 	                    		// Successful kingdom creation
 	                    		//TODO: KR messages
 	                    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_CREATE.getMessage(kingdomName));
-	                    		//ChatUtil.sendBroadcast(MessagePath.COMMAND_SETTLE_BROADCAST_SETTLE.getMessage(bukkitPlayer.getName(),kingdomName));
 	                    		ChatUtil.sendBroadcast(bukkitPlayer.getName()+" created the kingdom of "+kingdomName);
 	                    				
 	                    		// Open kingdom menu for newly created kingdom
@@ -87,7 +84,6 @@ public class KingdomCommand extends CommandBase {
 	                    		// Updates
 	                    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
 	                    		//TODO: Add directive
-	                    		//getKonquest().getDirectiveManager().updateDirectiveProgress(player, KonDirective.SETTLE_TOWN);
 	                    		
 	                    	} else {
 	                    		switch(status) {
@@ -114,13 +110,8 @@ public class KingdomCommand extends CommandBase {
 		                    			int distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
 		                    			int min_distance_sanc = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_SANCTUARY.getPath());
 		                    			int min_distance_town = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
-		                    			int min_distance = 0;
-		                    			if(min_distance_sanc < min_distance_town) {
-		                    				min_distance = min_distance_sanc;
-		                    			} else {
-		                    				min_distance = min_distance_town;
-		                    			}
-		                    			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
+		                    			int min_distance = Math.min(min_distance_sanc, min_distance_town);
+										ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
 		                    			//TODO: KR message
 		                    			break;
 		                    		case 7:
@@ -316,8 +307,7 @@ public class KingdomCommand extends CommandBase {
 			// Suggest template name when creating
 			String subCommand = getArgs()[1];
 			if(subCommand.equalsIgnoreCase("create")) {
-				List<String> templateList = new ArrayList<>();
-				templateList.addAll(getKonquest().getSanctuaryManager().getAllValidTemplateNames());
+				List<String> templateList = new ArrayList<>(getKonquest().getSanctuaryManager().getAllValidTemplateNames());
 				tabList.addAll(templateList);
 			}
 			// Trim down completion options based on current input

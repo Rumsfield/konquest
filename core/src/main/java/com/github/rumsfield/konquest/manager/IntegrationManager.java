@@ -1,8 +1,6 @@
 package com.github.rumsfield.konquest.manager;
 
 
-import java.util.HashSet;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.hook.DiscordSrvHook;
 import com.github.rumsfield.konquest.hook.LuckPermsHook;
@@ -10,16 +8,18 @@ import com.github.rumsfield.konquest.hook.PluginHook;
 import com.github.rumsfield.konquest.hook.QuickShopHook;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 
+import java.util.HashSet;
+
 
 public class IntegrationManager {
 
-	private HashSet<PluginHook> hooks;
-	private LuckPermsHook luckpermsHook;
-	private QuickShopHook quickshopHook;
-	private DiscordSrvHook discordsrvHook;
+	private final HashSet<PluginHook> hooks;
+	private final LuckPermsHook luckpermsHook;
+	private final QuickShopHook quickshopHook;
+	private final DiscordSrvHook discordsrvHook;
 	
 	public IntegrationManager(Konquest konquest) {
-		this.hooks = new HashSet<PluginHook>();
+		this.hooks = new HashSet<>();
 		// Define new hooks
 		luckpermsHook = new LuckPermsHook(konquest);
 		quickshopHook = new QuickShopHook(konquest);

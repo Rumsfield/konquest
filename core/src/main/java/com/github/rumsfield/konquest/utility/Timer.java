@@ -7,12 +7,12 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 public class Timer {
 
-	private BukkitScheduler scheduler;
+	private final BukkitScheduler scheduler;
     private Runnable task;
     private int taskID;
     private int time;
     private int looptime;
-    private Timeable timekeeper;
+    private final Timeable timekeeper;
     private boolean isRunning;
     
     public Timer(Timeable timekeeper) {
@@ -63,13 +63,11 @@ public class Timer {
             return;
         }
 
-        task = new Runnable() {
-            public void run() {
-                time--;
-                if (time <= -1) {
-                    timekeeper.onEndTimer(taskID);
-                    stopTimer();
-                }
+        task = () -> {
+            time--;
+            if (time <= -1) {
+                timekeeper.onEndTimer(taskID);
+                stopTimer();
             }
         };
         taskID = scheduler.scheduleSyncRepeatingTask(Konquest.getInstance().getPlugin(), task, 0, 20);
@@ -82,14 +80,11 @@ public class Timer {
             return;
         }
 
-        task = new Runnable() {
-            public void run() {
-                time--;
-                if (time <= -1) {
-                    timekeeper.onEndTimer(taskID);
-                    time = looptime;
-                }
-                //ChatUtil.printDebug("Running timer loop task, time is "+time);
+        task = () -> {
+            time--;
+            if (time <= -1) {
+                timekeeper.onEndTimer(taskID);
+                time = looptime;
             }
         };
         taskID = scheduler.scheduleSyncRepeatingTask(Konquest.getInstance().getPlugin(), task, 0, 20);
@@ -102,14 +97,11 @@ public class Timer {
             return;
         }
 
-        task = new Runnable() {
-            public void run() {
-                time--;
-                if (time <= -1) {
-                    timekeeper.onEndTimer(taskID);
-                    time = looptime;
-                }
-                //ChatUtil.printDebug("Running timer loop task, time is "+time);
+        task = () -> {
+            time--;
+            if (time <= -1) {
+                timekeeper.onEndTimer(taskID);
+                time = looptime;
             }
         };
         taskID = scheduler.scheduleSyncRepeatingTask(Konquest.getInstance().getPlugin(), task, 0, ticks);

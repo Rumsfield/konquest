@@ -1,10 +1,10 @@
 package com.github.rumsfield.konquest.api.model;
 
-import java.awt.Point;
-import java.util.HashSet;
-
 import org.bukkit.Location;
 import org.bukkit.World;
+
+import java.awt.*;
+import java.util.HashSet;
 
 /**
  * The base interface for any territory.
@@ -20,7 +20,7 @@ public interface KonquestTerritory {
 	 * @param loc The location to check
 	 * @return True when the location is inside, else false
 	 */
-	public boolean isLocInside(Location loc);
+	boolean isLocInside(Location loc);
 	
 	/**
 	 * Checks whether the given location is outside of this territory but adjacent.
@@ -29,21 +29,21 @@ public interface KonquestTerritory {
 	 * @param loc The location to check
 	 * @return True when the location is directly adjacent to this territory, else false
 	 */
-	public boolean isLocAdjacent(Location loc);
+	boolean isLocAdjacent(Location loc);
 	
 	/**
 	 * Gets the center location of this territory.
 	 * 
 	 * @return The center location
 	 */
-	public Location getCenterLoc();
+	Location getCenterLoc();
 	
 	/**
 	 * Gets the world of this territory.
 	 * 
 	 * @return The territory's world
 	 */
-	public World getWorld();
+	World getWorld();
 	
 	/**
 	 * Gets the spawn location of this territory.
@@ -51,21 +51,21 @@ public interface KonquestTerritory {
 	 * 
 	 * @return The spawn location
 	 */
-	public Location getSpawnLoc();
+	Location getSpawnLoc();
 	
 	/**
 	 * Gets the name of this territory.
 	 * 
 	 * @return The name
 	 */
-	public String getName();
+	String getName();
 	
 	/**
 	 * Gets the territory's kingdom.
 	 * 
 	 * @return The kingdom object
 	 */
-	public KonquestKingdom getKingdom();
+	KonquestKingdom getKingdom();
 	
 	/**
 	 * Gets the territory type of this territory.
@@ -73,7 +73,7 @@ public interface KonquestTerritory {
 	 * 
 	 * @return The territory type
 	 */
-	public KonquestTerritoryType getTerritoryType();
+	KonquestTerritoryType getTerritoryType();
 	
 	/**
 	 * Gets the set of all land chunks claimed by this territory, as points.
@@ -81,6 +81,6 @@ public interface KonquestTerritory {
 	 * 
 	 * @return The set of claimed points
 	 */
-	public HashSet<Point> getChunkPoints();
+	HashSet<Point> getChunkPoints();
 	
 }

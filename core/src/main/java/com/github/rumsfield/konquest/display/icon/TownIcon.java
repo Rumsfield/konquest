@@ -1,7 +1,7 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import java.util.List;
-
+import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -9,17 +9,16 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import java.util.List;
 
 public class TownIcon implements MenuIcon {
 
-	private KonTown town;
-	private ChatColor contextColor;
+	private final KonTown town;
+	private final ChatColor contextColor;
 	private Material material;
-	private List<String> lore;
-	private int index;
-	private ItemStack item;
+	private final List<String> lore;
+	private final int index;
+	private final ItemStack item;
 	
 	public TownIcon(KonTown town, ChatColor contextColor, Material material, List<String> lore, int index) {
 		this.town = town;
@@ -40,6 +39,7 @@ public class TownIcon implements MenuIcon {
 		}
 		ItemStack item = new ItemStack(material,1);
 		ItemMeta meta = item.getItemMeta();
+		assert meta != null;
 		// Add applicable labels
 		if(town.isAttacked()) {
 			lore.add(ChatColor.DARK_RED+""+ChatColor.ITALIC+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage());

@@ -6,6 +6,7 @@ import org.bukkit.map.MapCursor;
 import org.bukkit.map.MapCursorCollection;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+import org.jetbrains.annotations.NotNull;
 
 public class KonMapRenderer extends MapRenderer {
 
@@ -19,7 +20,7 @@ public class KonMapRenderer extends MapRenderer {
 	}
 	
 	@Override
-	public void render(MapView view, MapCanvas canvas, Player player) {
+	public void render(@NotNull MapView view, MapCanvas canvas, @NotNull Player player) {
 		canvas.setCursors(cursors);
 	}
 

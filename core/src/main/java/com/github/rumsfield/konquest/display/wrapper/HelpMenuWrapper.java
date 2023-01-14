@@ -1,12 +1,5 @@
 package com.github.rumsfield.konquest.display.wrapper;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.display.icon.CommandIcon;
@@ -15,6 +8,12 @@ import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+
+import java.util.Collections;
+import java.util.List;
 
 public class HelpMenuWrapper extends MenuWrapper {
 
@@ -25,9 +24,9 @@ public class HelpMenuWrapper extends MenuWrapper {
 	@Override
 	public void constructMenu() {
 
-		int i = 0;
-		int cost = 0;
-		int cost_incr = 0;
+		int itemIndex = 0;
+		int cost;
+		int cost_incr;
 		double cost_spy = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_spy",0.0);
     	double cost_settle = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_settle",0.0);
     	double cost_settle_incr = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_settle_increment",0.0);
@@ -61,19 +60,15 @@ public class HelpMenuWrapper extends MenuWrapper {
 					cost_incr = 0;
 					break;
 			} 
-			CommandIcon icon = new CommandIcon(cmd, cost, cost_incr, i);
+			CommandIcon icon = new CommandIcon(cmd, cost, cost_incr, itemIndex);
 			getMenu().getPage(0).addIcon(icon);
-			i++;
+			itemIndex++;
 		}
 		// Add info icons
-		List<String> loreList = Arrays.asList(MessagePath.MENU_HELP_COMMUNITY.getMessage());
-		InfoIcon info = new InfoIcon(MessagePath.MENU_HELP_COMMUNITY.getMessage(), loreList, Material.MINECART, i, true);
-		if(communityLink == null) {
-			communityLink = "";
-		}
+		List<String> loreList = Collections.singletonList(MessagePath.MENU_HELP_COMMUNITY.getMessage());
+		InfoIcon info = new InfoIcon(MessagePath.MENU_HELP_COMMUNITY.getMessage(), loreList, Material.MINECART, itemIndex, true);
 		info.setInfo(ChatColor.GOLD+MessagePath.MENU_HELP_HINT.getMessage()+": "+ChatColor.DARK_PURPLE+ChatColor.UNDERLINE+communityLink);
 		getMenu().getPage(0).addIcon(info);
-		i++;
 		
 		getMenu().refreshNavigationButtons();
 		getMenu().setPageIndex(0);
@@ -87,12 +82,12 @@ public class HelpMenuWrapper extends MenuWrapper {
 			CommandIcon icon = (CommandIcon)clickedIcon;
 			CommandType cmd = icon.getCommand();
 			
-			String cmdArgsFormatted = cmd.arguments();
-        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA);
-        	cmdArgsFormatted = cmdArgsFormatted.replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA);
-        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA);
-        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\]", ChatColor.GRAY+"]"+ChatColor.AQUA);
-        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
+			String cmdArgsFormatted = cmd.arguments()
+					.replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA)
+					.replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA)
+					.replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA)
+					.replaceAll("]", ChatColor.GRAY+"]"+ChatColor.AQUA)
+					.replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
         	
 			ChatUtil.sendNotice(bukkitPlayer, ChatColor.GOLD+"/k "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted);
 		} else if(clickedIcon instanceof InfoIcon) {

@@ -1,5 +1,12 @@
 package com.github.rumsfield.konquest.manager;
 
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.model.KonConfig;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,24 +14,16 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonConfig;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-
 public class ConfigManager{
 	
-	private Konquest konquest;
-	private HashMap<String, KonConfig> configCache;
+	private final Konquest konquest;
+	private final HashMap<String, KonConfig> configCache;
 	private String language;
 	private FileConfiguration langConfig;
 	
 	public ConfigManager(Konquest konquest) {
 		this.konquest = konquest;
-        this.configCache = new HashMap<String, KonConfig>();
+        this.configCache = new HashMap<>();
         this.language = "english";
 	}
         
@@ -157,14 +156,6 @@ public class ConfigManager{
 				e.printStackTrace();
 				ChatUtil.printConsoleError("Failed to move file "+oldPath+" to "+newpath);
 			}
-			/*
-			if(oldFile.renameTo(newFile)) {
-				oldFile.delete();
-				ChatUtil.printConsoleAlert("Migrated data file "+oldPath+" to "+newpath);
-			} else {
-				ChatUtil.printDebug("Failed to rename file "+oldPath+" to "+newpath);
-			}
-			*/
 		}
 	}
 	
@@ -177,7 +168,7 @@ public class ConfigManager{
 				ChatUtil.printConsoleError("Core configuration file is missing path: "+path.getPath());
 			}
 		}
-		if(result == false) {
+		if(!result) {
 			ChatUtil.printConsoleError("The Konquest core.yml config file may be corrupted. Try renaming or deleting the file, then restart the server.");
 		}
 		return result;

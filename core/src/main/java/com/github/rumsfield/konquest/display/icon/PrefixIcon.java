@@ -1,29 +1,28 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import java.util.List;
-
+import com.github.rumsfield.konquest.model.KonPrefixType;
+import com.github.rumsfield.konquest.utility.MessagePath;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.github.rumsfield.konquest.model.KonPrefixType;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import net.md_5.bungee.api.ChatColor;
+import java.util.List;
 
 public class PrefixIcon implements MenuIcon {
 
 	public enum PrefixIconAction {
 		APPLY_PREFIX,
-		DISABLE_PREFIX;
-	}
+		DISABLE_PREFIX
+    }
 	
-	private PrefixIconAction action;
-	private List<String> lore;
-	private int index;
-	private boolean isClickable;
-	private KonPrefixType prefix;
-	private ItemStack item;
+	private final PrefixIconAction action;
+	private final List<String> lore;
+	private final int index;
+	private final boolean isClickable;
+	private final KonPrefixType prefix;
+	private final ItemStack item;
 	
 	public PrefixIcon(KonPrefixType prefix, List<String> lore, int index, boolean isClickable, PrefixIconAction action) {
 		this.prefix = prefix;
@@ -37,6 +36,7 @@ public class PrefixIcon implements MenuIcon {
 	private ItemStack initItem() {
 		ItemStack item = new ItemStack(Material.IRON_BARS);
 		ItemMeta meta = item.getItemMeta();
+		assert meta != null;
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
 				meta.addItemFlags(flag);

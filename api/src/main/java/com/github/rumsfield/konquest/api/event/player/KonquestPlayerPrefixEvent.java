@@ -11,8 +11,8 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
  */
 public class KonquestPlayerPrefixEvent extends KonquestPlayerEvent {
 
-	private String prefix;
-	private boolean isDisabled;
+	private final String prefix;
+	private final boolean isDisabled;
 	
 	/**
 	 * Default constructor

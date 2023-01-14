@@ -11,7 +11,7 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 
 public class KonTownRabbit {
 
-	private Location spawnLoc;
+	private final Location spawnLoc;
 	private Rabbit rabbit;
 	
 	public KonTownRabbit(Location spawnLoc) {
@@ -19,11 +19,11 @@ public class KonTownRabbit {
 	}
 	
 	public void spawn() {
-		if(rabbit == null || (rabbit != null && rabbit.isDead())) {
+		if(rabbit == null || rabbit.isDead()) {
 			Location modLoc = new Location(spawnLoc.getWorld(),spawnLoc.getX()+0.5,spawnLoc.getY()+1.0,spawnLoc.getZ()+0.5);
 			rabbit = (Rabbit)spawnLoc.getWorld().spawnEntity(modLoc, EntityType.RABBIT);
 			rabbit.setRabbitType(Rabbit.Type.THE_KILLER_BUNNY);
-			double defaultValue = 0;
+			double defaultValue;
 			// Modify health
 			defaultValue = rabbit.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
 			rabbit.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(defaultValue*2);
@@ -66,7 +66,6 @@ public class KonTownRabbit {
 			rabbit.setTarget(null);
 			rabbit.setTarget(target);
 			// Play target noise
-			//spawnLoc.getWorld().playSound(rabbit.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.8F);
 		}
 	}
 	

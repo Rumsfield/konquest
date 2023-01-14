@@ -1,22 +1,21 @@
 package com.github.rumsfield.konquest.model;
 
-import java.util.ArrayList;
-
+import com.github.rumsfield.konquest.utility.ChatUtil;
 import org.bukkit.OfflinePlayer;
 
-import com.github.rumsfield.konquest.utility.ChatUtil;
+import java.util.ArrayList;
 
 public class KonLeaderboard {
 
-	private ArrayList<String> leaderNames;
-	private ArrayList<Integer> leaderScores;
-	private ArrayList<OfflinePlayer> leaderPlayers;
+	private final ArrayList<String> leaderNames;
+	private final ArrayList<Integer> leaderScores;
+	private final ArrayList<OfflinePlayer> leaderPlayers;
 	private int entries;
 	
 	public KonLeaderboard() {
-		this.leaderNames = new ArrayList<String>();
-		this.leaderScores = new ArrayList<Integer>();
-		this.leaderPlayers = new ArrayList<OfflinePlayer>();
+		this.leaderNames = new ArrayList<>();
+		this.leaderScores = new ArrayList<>();
+		this.leaderPlayers = new ArrayList<>();
 		this.entries = 0;
 	}
 	

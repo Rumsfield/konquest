@@ -1,19 +1,18 @@
 package com.github.rumsfield.konquest.command;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonPlayer.FollowType;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class UnclaimCommand extends CommandBase {
 
@@ -31,8 +30,7 @@ public class UnclaimCommand extends CommandBase {
 		
 		if (getArgs().length > 3) {
             ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
         	// Verify that this command is being used in the default world
@@ -51,62 +49,62 @@ public class UnclaimCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
                 return;
         	}
-        	
-        	if(getArgs().length > 1) {
-        		String unclaimMode = getArgs()[1];
-        		switch(unclaimMode) {
-        		case "radius" :
-        			if(getArgs().length != 3) {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-        	            return;
-        			}
-        			
-        			final int min = 1;
-        			final int max = 5;
-    				int radius = Integer.parseInt(getArgs()[2]);
-    				if(radius < min || radius > max) {
-    					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-    					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_UNCLAIM_ERROR_RADIUS.getMessage(min,max));
-    					return;
-    				}
-    				getKonquest().getTerritoryManager().unclaimRadiusForPlayer(bukkitPlayer, bukkitPlayer.getLocation(), radius);
-    				
-        			break;
-        			
-        		case "auto" :
-        			boolean doAuto = false;
-        			// Check if player is already in an auto follow state
-        			if(player.isAutoFollowActive()) {
-        				// Check if player is already in claim state
-        				if(player.getAutoFollow().equals(FollowType.UNCLAIM)) {
-        					// Disable the auto state
-        					ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
-        					player.setAutoFollow(FollowType.NONE);
-        				} else {
-        					// Change state
-        					doAuto = true;
-        				}
-        			} else {
-        				// Player is not in any auto mode, enter normal unclaim following state
-        				doAuto = true;
-        			}
-        			if(doAuto) {
-        				boolean isUnclaimSuccess = getKonquest().getTerritoryManager().unclaimForPlayer(bukkitPlayer, bukkitPlayer.getLocation());
-        				if(isUnclaimSuccess) {
-        					ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
-            				player.setAutoFollow(FollowType.UNCLAIM);
-        				}
-        			}
-        			break;
-        			
-        		default :
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-                    return;
-        		}
-        	} else {
-        		// Unclaim the single chunk containing playerLoc for the current territory.
-        		getKonquest().getTerritoryManager().unclaimForPlayer(bukkitPlayer, bukkitPlayer.getLocation());
-        	}
+
+			if(getArgs().length <= 1) {
+				// Unclaim the single chunk containing playerLoc for the current territory.
+				getKonquest().getTerritoryManager().unclaimForPlayer(bukkitPlayer, bukkitPlayer.getLocation());
+			}
+
+			String unclaimMode = getArgs()[1];
+			switch(unclaimMode) {
+			case "radius" :
+				if(getArgs().length != 3) {
+					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					return;
+				}
+
+				final int min = 1;
+				final int max = 5;
+				int radius = Integer.parseInt(getArgs()[2]);
+				if(radius < min || radius > max) {
+					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_UNCLAIM_ERROR_RADIUS.getMessage(min,max));
+					return;
+				}
+				getKonquest().getTerritoryManager().unclaimRadiusForPlayer(bukkitPlayer, bukkitPlayer.getLocation(), radius);
+
+				break;
+
+			case "auto" :
+				boolean doAuto = false;
+				// Check if player is already in an auto follow state
+				if(player.isAutoFollowActive()) {
+					// Check if player is already in claim state
+					if(player.getAutoFollow().equals(FollowType.UNCLAIM)) {
+						// Disable the auto state
+						ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
+						player.setAutoFollow(FollowType.NONE);
+					} else {
+						// Change state
+						doAuto = true;
+					}
+				} else {
+					// Player is not in any auto mode, enter normal un-claim following state
+					doAuto = true;
+				}
+				if(doAuto) {
+					boolean isUnclaimSuccess = getKonquest().getTerritoryManager().unclaimForPlayer(bukkitPlayer, bukkitPlayer.getLocation());
+					if(isUnclaimSuccess) {
+						ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
+						player.setAutoFollow(FollowType.UNCLAIM);
+					}
+				}
+				break;
+
+			default :
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			}
+
         }
 	}
 	

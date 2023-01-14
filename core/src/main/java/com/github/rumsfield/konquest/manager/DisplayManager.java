@@ -1,46 +1,32 @@
 package com.github.rumsfield.konquest.manager;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Sound;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.display.DisplayMenu;
-import com.github.rumsfield.konquest.display.KingdomMenu;
-import com.github.rumsfield.konquest.display.PagedMenu;
-import com.github.rumsfield.konquest.display.PlotMenu;
-import com.github.rumsfield.konquest.display.ViewableMenu;
+import com.github.rumsfield.konquest.display.*;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
-import com.github.rumsfield.konquest.display.wrapper.HelpMenuWrapper;
-import com.github.rumsfield.konquest.display.wrapper.KingdomInfoMenuWrapper;
-import com.github.rumsfield.konquest.display.wrapper.MenuWrapper;
-import com.github.rumsfield.konquest.display.wrapper.PlayerInfoMenuWrapper;
-import com.github.rumsfield.konquest.display.wrapper.PrefixMenuWrapper;
-import com.github.rumsfield.konquest.display.wrapper.ScoreMenuWrapper;
-import com.github.rumsfield.konquest.display.wrapper.TownInfoMenuWrapper;
-import com.github.rumsfield.konquest.display.wrapper.TownManagementMenuWrapper;
-import com.github.rumsfield.konquest.display.wrapper.TownOptionsMenuWrapper;
-import com.github.rumsfield.konquest.display.wrapper.TownShieldMenuWrapper;
-import com.github.rumsfield.konquest.display.wrapper.TownUpgradeMenuWrapper;
+import com.github.rumsfield.konquest.display.wrapper.*;
 import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class DisplayManager {
 
-	private Konquest konquest;
-	private HashMap<Inventory, MenuWrapper> pagedMenus;
-	private HashMap<Inventory, ViewableMenu> stateMenus;
-	private HashSet<Player> playerViewerCache;
+	private final Konquest konquest;
+	private final HashMap<Inventory, MenuWrapper> pagedMenus;
+	private final HashMap<Inventory, ViewableMenu> stateMenus;
+	private final HashSet<Player> playerViewerCache;
 	
 	public static ChatColor titleColor = ChatColor.BLACK;
 	public static ChatColor loreColor = ChatColor.YELLOW;
@@ -49,9 +35,9 @@ public class DisplayManager {
 	
 	public DisplayManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.pagedMenus = new HashMap<Inventory, MenuWrapper>();
-		this.stateMenus = new HashMap<Inventory, ViewableMenu>();
-		this.playerViewerCache = new HashSet<Player>();
+		this.pagedMenus = new HashMap<>();
+		this.stateMenus = new HashMap<>();
+		this.playerViewerCache = new HashSet<>();
 	}
 	
 	public void initialize() {
@@ -62,30 +48,18 @@ public class DisplayManager {
 	 * Common menu methods
 	 */
 	
-	public boolean isPlayerViewingMenu(Player player) {
-		boolean result = false;
-		if(player != null) {
-			result = playerViewerCache.contains(player);
-		}
-		return result;
+	public boolean isPlayerViewingMenu(@Nullable Player player) {
+		if(player == null) return false;
+		return playerViewerCache.contains(player);
 	}
 	
-	public boolean isDisplayMenu(Inventory inv) {
-		boolean result = false;
-		if(inv != null) {
-			if(pagedMenus.containsKey(inv)) {
-				result = true;
-			} else if(stateMenus.containsKey(inv)) {
-				result = true;
-			}
-		}
-		return result;
+	public boolean isNotDisplayMenu(@Nullable Inventory inv) {
+		if(inv == null) return true;
+		return !pagedMenus.containsKey(inv) && !stateMenus.containsKey(inv);
 	}
 	
 	public void onDisplayMenuClick(KonPlayer clickPlayer, Inventory inv, int slot, boolean clickType) {
-		if(inv == null) {
-			return;
-		}
+		if(inv == null) return;
 		Player bukkitPlayer = clickPlayer.getBukkitPlayer();
 		try {
 			// Switch pages and handle navigation button clicks
@@ -176,27 +150,19 @@ public class DisplayManager {
 	}
 	
 	public void onDisplayMenuClose(Inventory inv, HumanEntity owner) {
-		if(pagedMenus.containsKey(inv)) {
-			pagedMenus.remove(inv);
-		}
-		if(stateMenus.containsKey(inv)) {
-			stateMenus.remove(inv);
-		}
+		pagedMenus.remove(inv);
+		stateMenus.remove(inv);
 		if(owner instanceof Player) {
 			playerViewerCache.remove((Player)owner);
 		}
 	}
 	
 	private void showMenuWrapper(Player bukkitPlayer, MenuWrapper wrapper) {
-		//ChatUtil.printDebug("Put and opened menu wrapper, size: "+pagedMenus.size());
 		pagedMenus.put(wrapper.getCurrentInventory(), wrapper);
-		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	bukkitPlayer.openInventory(wrapper.getCurrentInventory());
-            	playerViewerCache.add(bukkitPlayer);
-            }
-        });
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), () -> {
+			bukkitPlayer.openInventory(wrapper.getCurrentInventory());
+			playerViewerCache.add(bukkitPlayer);
+		});
 	}
 	
 	/*
@@ -205,7 +171,6 @@ public class DisplayManager {
 	 * ===============================================
 	 */
 	public void displayHelpMenu(Player bukkitPlayer) {
-		//ChatUtil.printDebug("Displaying new help menu to "+bukkitPlayer.getName()+", current menu size is "+menuCache.size());
 		playMenuOpenSound(bukkitPlayer);
 		// Create menu
 		HelpMenuWrapper wrapper = new HelpMenuWrapper(konquest);
@@ -243,8 +208,7 @@ public class DisplayManager {
     	boolean isArmorsEnabled = konquest.getShieldManager().isArmorsEnabled();
     	if(!isShieldsEnabled && !isArmorsEnabled) {
     		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
-    		return;
-    	} else {
+		} else {
     		// Open the menu
     		playMenuOpenSound(bukkitPlayer);
     		// Create menu
@@ -269,20 +233,15 @@ public class DisplayManager {
     	boolean isPlotsEnabled = konquest.getPlotManager().isEnabled();
     	if(!isPlotsEnabled) {
     		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
-    		return;
-    	} else {
+		} else {
     		// Open the menu
     		playMenuOpenSound(bukkitPlayer);
     		int maxSize = konquest.getPlotManager().getMaxSize();
     		PlotMenu newMenu = new PlotMenu(town, bukkitPlayer, maxSize);
     		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
     		// Schedule delayed task to display inventory to player
-    		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-                @Override
-                public void run() {
-                	bukkitPlayer.openInventory(newMenu.getCurrentView().getInventory());
-                }
-            },1);
+    		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(),
+					() -> bukkitPlayer.openInventory(newMenu.getCurrentView().getInventory()),1);
     	}
 	}
 	
@@ -360,17 +319,11 @@ public class DisplayManager {
 	 * ===============================================
 	 */
    	public void displayKingdomMenu(KonPlayer displayPlayer, KonKingdom kingdom, boolean isAdmin) {
-   		//ChatUtil.printDebug("Displaying new guild menu to "+bukkitPlayer.getName()+", current menu size is "+plotMenus.size());
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
 		KingdomMenu newMenu = new KingdomMenu(konquest, displayPlayer, kingdom, isAdmin);
 		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
 		// Schedule delayed task to display inventory to player
-		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentView().getInventory());
-            }
-        },1);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), () -> displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentView().getInventory()),1);
 	}
    	
    	/*
@@ -378,19 +331,13 @@ public class DisplayManager {
 	 */
  	
    	public static String boolean2Symbol(boolean val) {
- 		String result = ChatColor.DARK_RED+""+ChatColor.BOLD+"\u274C";
-    	if(val) {
-    		result = ChatColor.DARK_GREEN+""+ChatColor.BOLD+"\u2713";
-    	}
-    	return result;
+	   if(val)return ChatColor.DARK_GREEN+""+ChatColor.BOLD+"✓";
+	   return ChatColor.DARK_RED+""+ChatColor.BOLD+"❌";
  	}
  	
    	public static String boolean2Lang(boolean val) {
- 		String result = MessagePath.LABEL_FALSE.getMessage();
- 		if(val) {
- 			result = MessagePath.LABEL_TRUE.getMessage();
- 		}
- 		return result;
+	   if(val) return MessagePath.LABEL_TRUE.getMessage();
+	   return MessagePath.LABEL_FALSE.getMessage();
  	}
  	
    	private void playMenuClickSound(Player bukkitPlayer) {

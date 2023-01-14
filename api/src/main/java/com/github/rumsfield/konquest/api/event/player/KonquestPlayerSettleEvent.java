@@ -21,9 +21,9 @@ public class KonquestPlayerSettleEvent extends KonquestPlayerEvent implements Ca
 
 	private boolean isCancelled;
 	
-	private KonquestKingdom kingdom;
-	private Location location;
-	private String name;
+	private final KonquestKingdom kingdom;
+	private final Location location;
+	private final String name;
 	
 	/**
 	 * Default constructor

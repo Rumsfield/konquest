@@ -20,12 +20,12 @@ public class KonKingdomScoreAttributes {
 		}
 	}
 
-	private HashMap<KonKingdomScoreAttribute,Integer> attributeMap;
-	private HashMap<KonKingdomScoreAttribute,Integer> attributeWeights;
+	private final HashMap<KonKingdomScoreAttribute,Integer> attributeMap;
+	private final HashMap<KonKingdomScoreAttribute,Integer> attributeWeights;
 	
 	public KonKingdomScoreAttributes() {
-		this.attributeMap = new HashMap<KonKingdomScoreAttribute,Integer>();
-		this.attributeWeights = new HashMap<KonKingdomScoreAttribute,Integer>();
+		this.attributeMap = new HashMap<>();
+		this.attributeWeights = new HashMap<>();
 		for(KonKingdomScoreAttribute attribute : KonKingdomScoreAttribute.values()) {
 			attributeMap.put(attribute, 0);
 			attributeWeights.put(attribute, attribute.getWeight());

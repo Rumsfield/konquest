@@ -1,13 +1,13 @@
 package com.github.rumsfield.konquest.database;
 
-import java.sql.ResultSet;
-
 import com.github.rumsfield.konquest.utility.ChatUtil;
+
+import java.sql.ResultSet;
 
 
 public abstract class Database {
-    private DatabaseConnection databaseConnection;
-    private DatabaseType type;
+    private final DatabaseConnection databaseConnection;
+    private final DatabaseType type;
 
     public Database(DatabaseType type) {
         this.type = type;
@@ -25,32 +25,28 @@ public abstract class Database {
     }
 
     public boolean exists(String table) {
-    	String query = "";
+    	String query;
     	if(type.equals(DatabaseType.SQLITE)) {
     		query = "SELECT name FROM sqlite_master WHERE type='table' AND name='"+table+"';";
     	} else if(type.equals(DatabaseType.MYSQL)) {
     		query = "SHOW TABLES LIKE '"+table+"';";
     	} else {
-    		ChatUtil.printDebug("Failed to check for existing table in unknown database type: "+type.toString());
+    		ChatUtil.printDebug("Failed to check for existing table in unknown database type: "+ type);
     		return false;
     	}
     	ResultSet result = databaseConnection.scheduleQuery(query);
     	boolean hasRow = false;
         try {
         	hasRow = result.next();
-        	//ChatUtil.printDebug("SQL table "+table+" exists? "+hasRow);
         } catch (Exception e) {
-        	//e.printStackTrace();
             ChatUtil.printDebug("Got null SQL result: "+e.getMessage());
-            hasRow = false;
-            //ChatUtil.printDebug("SQL table "+table+" exists encountered an exception! "+hasRow);
         }
         return hasRow;
     }
     
     public boolean exists(String table, String column) {
-    	String query = "";
-    	int nameIndex = 1;
+    	String query;
+    	int nameIndex;
     	if(type.equals(DatabaseType.SQLITE)) {
     		query = "PRAGMA table_info('"+table+"');";
     		nameIndex = 2;
@@ -58,7 +54,7 @@ public abstract class Database {
     		query = "DESCRIBE "+table+";";
     		nameIndex = 1;
     	} else {
-    		ChatUtil.printDebug("Failed to check for existing table column in unknown database type: "+type.toString());
+    		ChatUtil.printDebug("Failed to check for existing table column in unknown database type: "+ type);
     		return false;
     	}
     	ResultSet result = databaseConnection.scheduleQuery(query);
@@ -69,51 +65,13 @@ public abstract class Database {
         			hasColumn = true;
         			break;
         		}
-        		//ChatUtil.printDebug("SQL table "+table+" column info: "+result.getString(1)+", "+result.getString(2));
         	}
-        	//ChatUtil.printDebug("SQL table "+table+" column "+column+" exists? "+hasColumn);
         } catch (Exception e) {
-        	//e.printStackTrace();
             ChatUtil.printDebug("Got null SQL result: "+e.getMessage());
-            //ChatUtil.printDebug("SQL table "+table+" column "+column+" exist encountered an exception! "+hasColumn);
         }
         return hasColumn;
     }
-    
-    /*public boolean exists(String table, String column) {
-    	String query = "SELECT * FROM "+table+" LIMIT 1;";
-    	ResultSet result = databaseConnection.scheduleQuery(query);
-    	//ResultSet result = databaseConnection.executeQuery(query);
-    	boolean hasColumn = false;
-    	int colIndex = -1;
-        try {
-        	if(result.next()){
-        		colIndex = result.findColumn(column);
-        		hasColumn = (colIndex != -1);
-        	}
-        	ChatUtil.printDebug("SQL table "+table+" column "+column+" exists? "+colIndex+", "+hasColumn);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            hasColumn = false;
-            ChatUtil.printDebug("SQL table "+table+" column "+column+" exist encountered an exception! "+hasColumn);
-        }
-        return hasColumn;
-    }*/
 
-    /*public boolean exists(String table, String column) {
-    	String query = "SELECT COUNT(*) AS CNTREC FROM pragma_table_info('"+table+"') WHERE name='"+column+"';";
-    	ResultSet result = databaseConnection.scheduleQuery(query);
-    	boolean hasColumn = false;
-        try {
-        	hasColumn = result.next();
-        	ChatUtil.printDebug("SQL table "+table+" column "+column+" exists? "+hasColumn);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            ChatUtil.printDebug("SQL table "+table+" column "+column+" exist encountered an exception! "+hasColumn);
-        }
-        return hasColumn;
-    }*/
-    
     public boolean exists(String table, String column, String search) {
         String query = "SELECT COUNT(1) FROM " + table + " WHERE " + column + " = '" + search +"';";
         ResultSet result = databaseConnection.scheduleQuery(query);
@@ -123,16 +81,11 @@ public abstract class Database {
                 count = result.getInt(1);
             }
         } catch (Exception e) {
-            //e.printStackTrace();
             ChatUtil.printDebug("Got null SQL result: "+e.getMessage());
             return false;
         }
 
-        if (count == 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return count != 0;
     }
 
     public void insert(String table, String[] columns, String[] values) {
@@ -149,7 +102,7 @@ public abstract class Database {
         sql.append(") VALUES (");
 
         for (int index = 0; index < values.length; index++) {
-            sql.append("'" + values[index] + "'");
+            sql.append("'").append(values[index]).append("'");
             if (index != (values.length - 1)) {
                 sql.append(",");
                 sql.append(" ");

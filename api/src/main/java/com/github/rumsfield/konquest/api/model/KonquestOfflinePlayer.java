@@ -17,27 +17,27 @@ public interface KonquestOfflinePlayer {
 	 * 
 	 * @return The offline player
 	 */
-	public OfflinePlayer getOfflineBukkitPlayer();
+    OfflinePlayer getOfflineBukkitPlayer();
 	
 	/**
 	 * Get the player's current kingdom.
 	 * 
 	 * @return The current kingdom
 	 */
-	public KonquestKingdom getKingdom();
+    KonquestKingdom getKingdom();
 	
 	/**
 	 * Get the player's exile kingdom. This is the previous kingdom that the player was a member of.
 	 * 
 	 * @return The exile kingdom
 	 */
-	public KonquestKingdom getExileKingdom();
+    KonquestKingdom getExileKingdom();
 	
 	/**
 	 * Get whether the player is a barbarian.
 	 * 
 	 * @return True when the player is a barbarian, else false
 	 */
-	public boolean isBarbarian();
+    boolean isBarbarian();
 	
 }

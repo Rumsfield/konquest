@@ -1,12 +1,11 @@
 package com.github.rumsfield.konquest.model;
 
-import java.util.Collection;
-import java.util.HashSet;
-
-import org.bukkit.OfflinePlayer;
-
 import com.github.rumsfield.konquest.api.model.KonquestCamp;
 import com.github.rumsfield.konquest.api.model.KonquestCampGroup;
+import org.bukkit.OfflinePlayer;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Represents a group of adjacent camps
@@ -14,10 +13,10 @@ import com.github.rumsfield.konquest.api.model.KonquestCampGroup;
  */
 public class KonCampGroup implements KonquestCampGroup {
 
-	private HashSet<KonCamp> camps;
+	private final HashSet<KonCamp> camps;
 	
 	public KonCampGroup() {
-		this.camps = new HashSet<KonCamp>();
+		this.camps = new HashSet<>();
 	}
 	
 	public boolean containsCamp(KonquestCamp camp) {

@@ -1,28 +1,27 @@
 package com.github.rumsfield.konquest.model;
 
-import java.awt.Point;
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestTerritory;
+import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.World;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.api.model.KonquestTerritory;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
-
 public abstract class KonTerritory implements KonquestTerritory {
 
-	private HashMap<Point,KonTerritory> chunkList;
-	private Location centerLoc;
+	private final HashMap<Point,KonTerritory> chunkList;
+	private final Location centerLoc;
 	private Location spawnLoc;
 	private KonKingdom kingdom;
 	private String name;
-	private Konquest konquest;
+	private final Konquest konquest;
 	
 	
 	public KonTerritory(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
@@ -31,7 +30,7 @@ public abstract class KonTerritory implements KonquestTerritory {
 		this.name = name;
 		this.kingdom = kingdom;
 		this.konquest = konquest;
-		chunkList = new HashMap<Point,KonTerritory>();
+		chunkList = new HashMap<>();
 	}
 	
 	public boolean addChunks(ArrayList<Point> points) {
@@ -47,16 +46,15 @@ public abstract class KonTerritory implements KonquestTerritory {
 	
 	/**
 	 * Directly adds a single point to the chunkMap without any checks (override)
-	 * @param point
+	 * @param point the point to add
 	 */
 	public void addPoint(Point point) {
 		chunkList.put(point,  this);
-		//ChatUtil.printDebug("Added point in territory "+name);
 	}
 	
 	/**
 	 * Directly adds points to the chunkMap without any checks (override)
-	 * @param points
+	 * @param points the points to add
 	 */
 	public void addPoints(ArrayList<Point> points) {
 		for(Point point : points) {
@@ -134,7 +132,7 @@ public abstract class KonTerritory implements KonquestTerritory {
 	}
 	
 	public HashSet<Point> getChunkPoints() {
-		return new HashSet<Point>(chunkList.keySet());
+		return new HashSet<>(chunkList.keySet());
 	}
 	
 	public Konquest getKonquest() {

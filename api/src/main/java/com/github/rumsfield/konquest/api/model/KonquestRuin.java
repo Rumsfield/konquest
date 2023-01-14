@@ -1,8 +1,8 @@
 package com.github.rumsfield.konquest.api.model;
 
-import java.util.Set;
-
 import org.bukkit.Location;
+
+import java.util.Set;
 
 /**
  * A ruin territory with critical blocks and optional ruin golem spawn points.
@@ -19,21 +19,21 @@ public interface KonquestRuin extends KonquestTerritory {
 	 * 
 	 * @return True when this ruin cannot be captured, else false
 	 */
-	public boolean isCaptureDisabled();
+    boolean isCaptureDisabled();
 	
 	/**
 	 * Gets a set of all critical block locations in this ruin.
 	 * 
 	 * @return The set of locations
 	 */
-	public Set<Location> getCriticalLocations();
+    Set<Location> getCriticalLocations();
 	
 	/**
 	 * Gets a set of all ruin golem spawn locations in this ruin.
 	 * 
 	 * @return The set of locations
 	 */
-	public Set<Location> getSpawnLocations();
+    Set<Location> getSpawnLocations();
 	
 	/**
 	 * Gets the remaining number of unbroken critical blocks.
@@ -41,13 +41,13 @@ public interface KonquestRuin extends KonquestTerritory {
 	 * 
 	 * @return The amount of unbroken critical blocks.
 	 */
-	public int getRemainingCriticalHits();
+    int getRemainingCriticalHits();
 	
 	/**
 	 * Checks if there are any online players inside of this ruin.
 	 * 
 	 * @return True when there are no players inside of this ruin, else false
 	 */
-	public boolean isEmpty();
+    boolean isEmpty();
 
 }

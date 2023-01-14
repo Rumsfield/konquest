@@ -15,6 +15,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.List;
@@ -28,22 +29,22 @@ import java.util.*;
  */
 public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplayer, KonPropertyFlagHolder, Timeable {
 	
-	private KonMonument monument;
-	private Timer monumentTimer;
-	private Timer captureTimer;
-	private Timer raidAlertTimer;
-	private Timer shieldTimer;
-	private HashMap<UUID, Timer> playerTravelTimers;
+	private final KonMonument monument;
+	private final Timer monumentTimer;
+	private final Timer captureTimer;
+	private final Timer raidAlertTimer;
+	private final Timer shieldTimer;
+	private final HashMap<UUID, Timer> playerTravelTimers;
 	private boolean isCaptureDisabled;
 	private boolean isRaidAlertDisabled;
-	private BossBar monumentBarFriendlies;
-	private BossBar monumentBarEnemies;
-	private BossBar monumentBarAllies;
-	private BossBar monumentBarSanctioned;
-	private BossBar monumentBarPeaceful;
+	private final BossBar monumentBarFriendlies;
+	private final BossBar monumentBarEnemies;
+	private final BossBar monumentBarAllies;
+	private final BossBar monumentBarSanctioned;
+	private final BossBar monumentBarPeaceful;
 	private UUID lord;
-	private HashMap<UUID,Boolean> residents;
-	private RequestKeeper joinRequestKeeper;
+	private final HashMap<UUID,Boolean> residents;
+	private final RequestKeeper joinRequestKeeper;
 	private boolean isOpen;
 	private boolean isEnemyRedstoneAllowed;
 	private boolean isResidentPlotOnly;
@@ -56,12 +57,12 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private int armorTotalBlocks;
 	private int armorCurrentBlocks;
 	private double armorProgress;
-	private ArrayList<UUID> defenders;
-	private HashMap<KonquestUpgrade,Integer> upgrades;
-	private HashMap<KonquestUpgrade,Integer> disabledUpgrades;
-	private KonTownRabbit rabbit;
-	private HashMap<Point,KonPlot> plots;
-	private Map<KonPropertyFlag,Boolean> properties;
+	private final ArrayList<UUID> defenders;
+	private final HashMap<KonquestUpgrade,Integer> upgrades;
+	private final HashMap<KonquestUpgrade,Integer> disabledUpgrades;
+	private final KonTownRabbit rabbit;
+	private final HashMap<Point,KonPlot> plots;
+	private final Map<KonPropertyFlag,Boolean> properties;
 	
 	public KonTown(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, konquest);
@@ -71,7 +72,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.captureTimer = new Timer(this);
 		this.raidAlertTimer = new Timer(this);
 		this.shieldTimer = new Timer(this);
-		this.playerTravelTimers = new HashMap<UUID, Timer>();
+		this.playerTravelTimers = new HashMap<>();
 		this.isCaptureDisabled = false;
 		this.isRaidAlertDisabled = false;
 		// Display bars
@@ -92,7 +93,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.monumentBarPeaceful.setProgress(1.0);
 		// Other stuff
 		this.lord = null; // init with no lord
-		this.residents = new HashMap<UUID,Boolean>();
+		this.residents = new HashMap<>();
 		this.joinRequestKeeper = new RequestKeeper();
 		this.isOpen = false; // init as a closed Town, requires Lord to add players as residents for build/container perms
 		this.isEnemyRedstoneAllowed = false;
@@ -105,12 +106,12 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.armorTotalBlocks = 0;
 		this.armorCurrentBlocks = 0;
 		this.armorProgress = 0.0;
-		this.defenders = new ArrayList<UUID>();
-		this.upgrades = new HashMap<KonquestUpgrade,Integer>();
-		this.disabledUpgrades = new HashMap<KonquestUpgrade,Integer>();
+		this.defenders = new ArrayList<>();
+		this.upgrades = new HashMap<>();
+		this.disabledUpgrades = new HashMap<>();
 		this.rabbit = new KonTownRabbit(getSpawnLoc());
-		this.plots = new HashMap<Point,KonPlot>();
-		this.properties = new HashMap<KonPropertyFlag,Boolean>();
+		this.plots = new HashMap<>();
+		this.properties = new HashMap<>();
 		initProperties();
 	}
 	
@@ -156,12 +157,12 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 
 	@Override
 	public Map<KonPropertyFlag, Boolean> getAllProperties() {
-		return new HashMap<KonPropertyFlag, Boolean>(properties);
+		return new HashMap<>(properties);
 	}
 
 	/**
 	 * Adds a chunk to the chunkMap and checks to make sure its within the max distance from town center
-	 * @param chunk
+	 * @param point - the chunk to add
 	 * @return true if chunk is within max distance from town center, else false
 	 */
 	@Override
@@ -348,23 +349,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
         
         // Determine minimum Y level of paste chunk below monument Y base
         int monument_y = monument.getBaseY();
-        int fill_y = getCenterLoc().getWorld().getMinHeight();
+        int fill_y;
         int min_fill_y = getCenterLoc().getWorld().getMinHeight();
-        //Date step1 = new Date();
-        /*
-        int pasteX = (int)Math.floor((double)getCenterLoc().getBlockX()/16);
-        int pasteZ = (int)Math.floor((double)getCenterLoc().getBlockZ()/16);
-        if(getCenterLoc().getWorld().isChunkLoaded(pasteX,pasteZ)) {
-        	ChatUtil.printDebug("Paste fill chunk ("+pasteX+","+pasteZ+") is loaded");
-        } else {
-        	ChatUtil.printDebug("Paste fill chunk ("+pasteX+","+pasteZ+") is NOT loaded!");
-        }
-        */
-        //Chunk fillChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
+
         Chunk fillChunk = getCenterLoc().getChunk();
-        //Date step2 = new Date();
         ChunkSnapshot fillChunkSnap = fillChunk.getChunkSnapshot(true,false,false);
-        //Date step3 = new Date();
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
             	fill_y = fillChunkSnap.getHighestBlockYAt(x, z);
@@ -393,75 +382,16 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	            }
 	        }
         }
-        //Date step5 = new Date();
-        //Chunk pasteChunk = getCenterLoc().getWorld().getChunkAt(getCenterLoc());
         World templateWorld = template.getCornerOne().getWorld();
         BlockPaster monumentPaster = new BlockPaster(fillChunk,templateWorld,bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
         for (int y = bottomBlockY; y <= topBlockY; y++) {
         	monumentPaster.setY(y);
-        	//BlockPaster monumentPaster = new BlockPaster(getCenterLoc(),y,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
         	monumentPaster.startPaste();
         }
         monument.setIsItemDropsDisabled(false);
         monument.setIsDamageDisabled(false);
-        //Date step6 = new Date();
-        /*
-        int s1 = (int)(step1.getTime()-start.getTime());
-    	int s2 = (int)(step2.getTime()-start.getTime());
-		int s3 = (int)(step3.getTime()-start.getTime());
-		int s4 = (int)(step4.getTime()-start.getTime());
-		int s5 = (int)(step5.getTime()-start.getTime());
-		int s6 = (int)(step6.getTime()-start.getTime());
-		ChatUtil.printDebug("Monument paste timings: "+s1+","+s2+","+s3+","+s4+","+s5+","+s6);
-		*/
 		return true;
 	}
-
-	/*
-	public boolean pasteMonumentFromTemplate(KonMonumentTemplate template) {
-		
-		if(!template.isValid()) {
-			return false;
-		}
-		monument.setIsItemDropsDisabled(true);
-		
-		int topBlockX = Math.max(template.getCornerOne().getBlockX(), template.getCornerTwo().getBlockX());
-        int topBlockY = Math.max(template.getCornerOne().getBlockY(), template.getCornerTwo().getBlockY());
-        int topBlockZ = Math.max(template.getCornerOne().getBlockZ(), template.getCornerTwo().getBlockZ());
-        int bottomBlockX = Math.min(template.getCornerOne().getBlockX(), template.getCornerTwo().getBlockX());
-        int bottomBlockY = Math.min(template.getCornerOne().getBlockY(), template.getCornerTwo().getBlockY());
-        int bottomBlockZ = Math.min(template.getCornerOne().getBlockZ(), template.getCornerTwo().getBlockZ());
-        
-        for (int x = bottomBlockX; x <= topBlockX; x++) {
-            for (int y = bottomBlockY; y <= topBlockY; y++) {
-                for (int z = bottomBlockZ; z <= topBlockZ; z++) {
-                    Block templateBlock = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getBlockAt(x, y, z);
-                    Block monumentBlock = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getChunkAt(getCenterLoc()).getBlock(x-bottomBlockX, y-bottomBlockY+monument.getBaseY(), z-bottomBlockZ);
-                    int base_y = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getChunkAt(getCenterLoc()).getChunkSnapshot(true,false,false).getHighestBlockYAt(x-bottomBlockX, z-bottomBlockZ);
-                    int monument_y = monument.getBaseY();
-                    // Fill air between world and monument base
-                    if(y == bottomBlockY && base_y < monument_y) {
-                    	for (int k = base_y; k <= monument_y; k++) {
-                    		Block fillBlock = Bukkit.getServer().getWorld(getKonquest().getWorldName()).getChunkAt(getCenterLoc()).getBlock(x-bottomBlockX, k, z-bottomBlockZ);
-                    		fillBlock.setType(Material.STONE);
-                    	}
-                    }
-                    // Set local block to monument template block
-                    monumentBlock.setType(templateBlock.getType());
-                    monumentBlock.setBlockData(templateBlock.getBlockData().clone());
-                    //Remove snow
-                    if(monumentBlock.getBlockData() instanceof Snow) {
-                    	//Snowable snowBlockData = (Snowable)monumentBlock.getBlockData();
-                    	//snowBlockData.setSnowy(false);
-                    	monumentBlock.setType(Material.AIR);
-                    }
-                }
-            }
-        }
-        monument.setIsItemDropsDisabled(false);
-		return true;
-	}
-	*/
 
 	public boolean removeMonumentBlocks() {
 		if(!monument.isValid()) {
@@ -493,7 +423,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	/**
 	 * Counts all water blocks in the entire chunk
-	 * @return
+	 * @return amount of water blocks
 	 */
 	public int countWaterInChunk() {
 		int count = 0;
@@ -513,7 +443,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	/**
 	 * Count the number of air blocks below the monument base, for height specified by limit
 	 * @param limit - The height below the monument base to check for air
-	 * @return
+	 * @return amount of air blocks
 	 */
 	public int countAirBelowMonument(int limit) {
 		int count = 0;
@@ -540,35 +470,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
         }
 		return count;
 	}
-	
-	/*
-	public void fillAirBelowMonument() {
-		for (int x = 0; x <= 15; x++) {
-            for (int y = 0; y <= monument.getBaseY(); y++) {
-                for (int z = 0; z <= 15; z++) {
-                    Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
-                    if(currentBlock.getType().equals(Material.AIR)) {
-                    	currentBlock.setType(Material.STONE);
-                    }
-                }
-            }
-        }
-	}
-	
-	public void fillAllBelowMonument() {
-		for (int x = 0; x <= 15; x++) {
-            for (int y = 0; y <= monument.getBaseY(); y++) {
-                for (int z = 0; z <= 15; z++) {
-                    Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
-                    if(!currentBlock.getType().equals(Material.BEDROCK)) {
-                    	currentBlock.setType(Material.STONE);
-                    }
-                }
-            }
-        }
-	}
-	*/
-	
+
 	public boolean isLocInsideCenterChunk(Location loc) {
 		Point centerPoint = Konquest.toPoint(getCenterLoc());
 		Point testPoint = Konquest.toPoint(loc);
@@ -597,18 +499,15 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	/**
 	 * Method used for loading a monument on server start
-	 * @param base
-	 * @param height
-	 * @param isValid
+	 * @param base base
+	 * @param template the monument template
 	 */
 	public int loadMonument(int base, KonMonumentTemplate template) {
 		int status = 0;
 		monument.setBaseY(base);
 		if(template != null && template.isValid()) {
-			//monument.setHeight(template.getHeight());
 			monument.updateFromTemplate(template);
 			monument.setIsValid(true);
-			//pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
 		} else {
 			status = 1;
 		}
@@ -697,7 +596,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public String getPlayerTravelCooldownString(UUID uuid) {
 		String cooldownTime = "";
 		if(playerTravelTimers.containsKey(uuid)) {
-			//cooldownTime = ""+playerTravelTimers.get(uuid).getMinutes()+":"+playerTravelTimers.get(uuid).getSeconds();
 			cooldownTime = String.format("%02d:%02d", playerTravelTimers.get(uuid).getMinutes(), playerTravelTimers.get(uuid).getSeconds());
 		}
 		return cooldownTime;
@@ -720,31 +618,23 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			ChatUtil.printDebug("Monument Timer ended with taskID: "+taskID);
 			// When a monument timer ends
 			monument.clearCriticalHits();
-			//pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
 			reloadMonument();
 			setAttacked(false,null);
-			//setBarProgress(1.0);
 			updateBar();
 			getWorld().playSound(getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)1, (float)0.8);
-			//String kingdomName = getKingdom().getName();
-			//int numPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(kingdomName).size();
-			//ChatUtil.printDebug("Found "+numPlayers+" in Kingdom "+kingdomName+" for message sender");
 			for(KonPlayer player : getKonquest().getPlayerManager().getPlayersInKingdom(getKingdom().getName())) {
-				//ChatUtil.printDebug("Sent monument safe message to player "+player.getBukkitPlayer().getName());
-				//ChatUtil.sendNotice(player.getBukkitPlayer(), "The Town of "+getName()+" is safe, for now...", ChatColor.DARK_GREEN);
 				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_SAFE.getMessage(getName()), ChatColor.GREEN);
 			}
 		} else if(taskID == captureTimer.getTaskID()) {
 			ChatUtil.printDebug("Capture Timer ended with taskID: "+taskID);
-			// When a capture cooldown timer ends
+			// When a capture cool-down timer ends
 			isCaptureDisabled = false;
 		} else if(taskID == raidAlertTimer.getTaskID()) {
 			ChatUtil.printDebug("Raid Alert Timer ended with taskID: "+taskID);
-			// When a raid alert cooldown timer ends
+			// When a raid alert cool-down timer ends
 			isRaidAlertDisabled = false;
 		} else if(taskID == shieldTimer.getTaskID()) {
 			// When shield loop timer ends (1 second loop)
-			//ChatUtil.printDebug("Town "+getName()+" shield tick with taskID: "+taskID);
 			Date now = new Date();
 			shieldNowTimeSeconds = (int)(now.getTime()/1000);
 			if(shieldEndTimeSeconds < shieldNowTimeSeconds) {
@@ -754,7 +644,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				updateBar();
 			}
 		} else {
-			// Check for timer in player travel cooldown map
+			// Check for timer in player travel cool-down map
 			for(UUID uuid : playerTravelTimers.keySet()) {
 				if(taskID == playerTravelTimers.get(uuid).getTaskID()) {
 					String name = Bukkit.getOfflinePlayer(uuid).getName();
@@ -860,14 +750,13 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public void setAttacked(boolean val, KonPlayer attacker) {
-		if(val == true) {
+		if(val) {
 			if(!isAttacked) {
 				// Town is now under attack, update golem targets
 				this.isAttacked = true;
 				if(attacker != null) {
 					updateGolemTargets(attacker,false);
 					//TODO: Add rabbit spawn as part of a town upgrade
-					//rabbit.spawn();
 				}
 			} else {
 				this.isAttacked = true;
@@ -1090,7 +979,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public boolean isOpen() {
-		return isOpen ? true : false;
+		return isOpen;
 	}
 	
 	public void setIsEnemyRedstoneAllowed(boolean val) {
@@ -1098,7 +987,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public boolean isEnemyRedstoneAllowed() {
-		return isEnemyRedstoneAllowed ? true : false;
+		return isEnemyRedstoneAllowed;
 	}
 	
 	public void setIsPlotOnly(boolean val) {
@@ -1106,7 +995,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public boolean isPlotOnly() {
-		return isResidentPlotOnly ? true : false;
+		return isResidentPlotOnly;
 	}
 	
 	public void setIsGolemOffensive(boolean val) {
@@ -1114,7 +1003,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public boolean isGolemOffensive() {
-		return isGolemOffensive ? true : false;
+		return isGolemOffensive;
 	}
 	
 	public boolean canClaimLordship(KonPlayer player) {
@@ -1225,7 +1114,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public boolean isLordValid() {
-		return lord != null ? true : false;
+		return lord != null;
 	}
 	
 	public OfflinePlayer getPlayerLord() {
@@ -1240,7 +1129,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public ArrayList<OfflinePlayer> getPlayerKnights() {
-		ArrayList<OfflinePlayer> eliteList = new ArrayList<OfflinePlayer>();
+		ArrayList<OfflinePlayer> eliteList = new ArrayList<>();
 		for(UUID id : residents.keySet()) {
 			if(residents.get(id)) {
 				eliteList.add(Bukkit.getOfflinePlayer(id));
@@ -1250,7 +1139,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public ArrayList<OfflinePlayer> getPlayerResidents() {
-		ArrayList<OfflinePlayer> residentList = new ArrayList<OfflinePlayer>();
+		ArrayList<OfflinePlayer> residentList = new ArrayList<>();
 		for(UUID id : residents.keySet()) {
 			residentList.add(Bukkit.getOfflinePlayer(id));
 		}
@@ -1272,7 +1161,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public Map<KonquestUpgrade,Integer> getUpgrades() {
-		Map<KonquestUpgrade,Integer> result = new HashMap<KonquestUpgrade,Integer>(upgrades);
+		Map<KonquestUpgrade,Integer> result = new HashMap<>(upgrades);
 		return result;
 	}
 	
@@ -1461,9 +1350,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				deactivateArmor();
 			} else {
 				armorProgress = (double)armorCurrentBlocks/armorTotalBlocks;
-				//shieldArmorBarAll.setProgress(progress);
-				//refreshShieldBarTitle();
-				//setBarProgress(progress);
 				updateBar();
 			}
 		}
@@ -1560,12 +1446,12 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		return result;
 	}
 	
-	// This can return null!
+	@Nullable
 	public KonPlot getPlot(Location loc) {
 		return getPlot(Konquest.toPoint(loc), loc.getWorld());
 	}
 	
-	// This can return null!
+	@Nullable
 	public KonPlot getPlot(Point p, World w) {
 		KonPlot result = null;
 		if(this.getChunkList().containsKey(p) && w.equals(getWorld())) {
@@ -1575,7 +1461,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public List<KonPlot> getPlots() {
-		ArrayList<KonPlot> result = new ArrayList<KonPlot>();
+		ArrayList<KonPlot> result = new ArrayList<>();
 		for(KonPlot plot : plots.values()) {
 			if(!result.contains(plot)) {
 				result.add(plot);

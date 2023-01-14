@@ -771,8 +771,8 @@ public enum MessagePath {
 	
 	NULL_MESSAGE	(0,"");
 	
-	private String path;
-	private int formats;
+	private final String path;
+	private final int formats;
 	
 	MessagePath(int formats, String path) {
 		this.path = path;

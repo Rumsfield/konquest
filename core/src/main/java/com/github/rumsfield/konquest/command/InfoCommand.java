@@ -1,9 +1,5 @@
 package com.github.rumsfield.konquest.command;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
@@ -11,18 +7,21 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class InfoCommand extends CommandBase {
 
 	public enum infoType {
 		KINGDOM,
 		TOWN,
-		PLAYER;
+		PLAYER
 	}
 	
 	public InfoCommand(Konquest konquest, CommandSender sender, String[] args) {
@@ -33,10 +32,9 @@ public class InfoCommand extends CommandBase {
 		// k info <kingdomName>|<townName>|<playerName>
 		if (getArgs().length != 1 && getArgs().length != 2) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
-        	infoType displayState = infoType.KINGDOM;
+        	infoType displayState;
         	// Init info as own player's
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
@@ -72,15 +70,11 @@ public class InfoCommand extends CommandBase {
         			displayState = infoType.TOWN;
         		} else {
         			// Check for Player
-        			//ChatUtil.printDebug("Parsing player");
         			KonOfflinePlayer otherPlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(name);
-        			//ChatUtil.printDebug("Fetched KonOfflinePlayer");
         			if(otherPlayer != null) {
-        				//ChatUtil.printDebug("Player is not null");
         				displayState = infoType.PLAYER;
         				player = otherPlayer;
         			} else {
-            			//ChatUtil.sendError((Player) getSender(), "Failed to find unknown name, check spelling: "+name);
             			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(name));
             	        return;
         			}
@@ -117,12 +111,11 @@ public class InfoCommand extends CommandBase {
 		final List<String> matchedTabList = new ArrayList<>();
 		if(getArgs().length == 2) {
 			List<String> kingdomList = getKonquest().getKingdomManager().getKingdomNames();
-			List<String> townList = new ArrayList<String>();
+			List<String> townList = new ArrayList<>();
 			for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
 				townList.addAll(kingdom.getTownNames());
 			}
 			List<String> playerList = new ArrayList<>();
-			//for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
 			for(OfflinePlayer bukkitOfflinePlayer : getKonquest().getPlayerManager().getAllOfflinePlayers()) {
 				playerList.add(bukkitOfflinePlayer.getName());
 			}

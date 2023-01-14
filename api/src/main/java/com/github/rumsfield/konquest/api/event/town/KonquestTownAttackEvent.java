@@ -21,10 +21,10 @@ public class KonquestTownAttackEvent extends KonquestTownEvent implements Cancel
 
 	private boolean isCancelled;
 	
-	private KonquestPlayer attacker;
-	private Block block;
-	private boolean isMonument;
-	private boolean isCritical;
+	private final KonquestPlayer attacker;
+	private final Block block;
+	private final boolean isMonument;
+	private final boolean isCritical;
 	
 	/**
 	 * Default constructor
@@ -63,7 +63,7 @@ public class KonquestTownAttackEvent extends KonquestTownEvent implements Cancel
 	}
 	
 	/**
-	 * Checks whether the block was broken anywhere inside of the monument.
+	 * Checks whether the block was broken anywhere inside the monument.
 	 * 
 	 * @return True when the block is inside the town monument, else false
 	 */

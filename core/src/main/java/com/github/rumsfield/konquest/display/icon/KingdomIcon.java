@@ -12,11 +12,11 @@ import java.util.List;
 
 public class KingdomIcon implements MenuIcon {
 
-	private KonKingdom kingdom;
-	private ChatColor contextColor;
-	private List<String> lore;
-	private int index;
-	private ItemStack item;
+	private final KonKingdom kingdom;
+	private final ChatColor contextColor;
+	private final List<String> lore;
+	private final int index;
+	private final ItemStack item;
 	
 	public KingdomIcon(KonKingdom kingdom, ChatColor contextColor, List<String> lore, int index, boolean isClickable) {
 		this.kingdom = kingdom;
@@ -29,6 +29,7 @@ public class KingdomIcon implements MenuIcon {
 	private ItemStack initItem() {
 		ItemStack item = new ItemStack(Material.GOLDEN_HELMET,1);
 		ItemMeta meta = item.getItemMeta();
+		assert meta != null;
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
 				meta.addItemFlags(flag);

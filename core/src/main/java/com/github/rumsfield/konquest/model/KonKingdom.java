@@ -1,57 +1,47 @@
 package com.github.rumsfield.konquest.model;
 
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestKingdom;
+import com.github.rumsfield.konquest.api.model.KonquestRelationship;
+import com.github.rumsfield.konquest.utility.Timer;
+import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.api.model.KonquestKingdom;
-import com.github.rumsfield.konquest.api.model.KonquestRelationship;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.RequestKeeper;
-import com.github.rumsfield.konquest.utility.Timeable;
-import com.github.rumsfield.konquest.utility.Timer;
+import java.awt.*;
+import java.util.List;
+import java.util.*;
 
 public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHolder {
 	
 	public static final KonquestRelationship defaultRelation = KonquestRelationship.PEACE;
 	
 	private String name;
-	private Konquest konquest;
-	private KonCapital capital;
+	private final Konquest konquest;
+	private final KonCapital capital;
 	private KonMonumentTemplate monumentTemplate;
-	private HashMap<String, KonTown> townMap;
+	private final HashMap<String, KonTown> townMap;
 	private boolean isSmallest;
 	private boolean isOfflineProtected;
-	private Timer protectedWarmupTimer;
-	private boolean isCreated;
+	private final Timer protectedWarmupTimer;
+	private final boolean isCreated;
 	private boolean isAdminOperated;
 	private boolean isOpen;
-	private RequestKeeper joinRequestKeeper;
+	private final RequestKeeper joinRequestKeeper;
 	private UUID master;
-	private Map<UUID,Boolean> members; // True = officer, False = regular
-	private Map<KonquestKingdom,KonquestRelationship> activeRelationships; // Active relation state
-	private Map<KonquestKingdom,KonquestRelationship> requestRelationships; // Current relation requests to change state
-	private Map<KonPropertyFlag,Boolean> properties;
+	private final Map<UUID,Boolean> members; // True = officer, False = regular
+	private final Map<KonquestKingdom,KonquestRelationship> activeRelationships; // Active relation state
+	private final Map<KonquestKingdom,KonquestRelationship> requestRelationships; // Current relation requests to change state
+	private final Map<KonPropertyFlag,Boolean> properties;
 	
 	public KonKingdom(Location loc, String name, Konquest konquest) {
 		this.name = name;
 		this.konquest = konquest;
 		this.capital = new KonCapital(loc, this, konquest);
-		this.townMap = new HashMap<String, KonTown>();
+		this.townMap = new HashMap<>();
 		this.monumentTemplate = null; // new kingdoms start with null template
 		this.isSmallest = false;
 		this.isOfflineProtected = true;
@@ -61,10 +51,10 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.isOpen = false;
 		this.joinRequestKeeper = new RequestKeeper();
 		this.master = null;
-		this.members = new HashMap<UUID,Boolean>();
-		this.activeRelationships = new HashMap<KonquestKingdom,KonquestRelationship>();
-		this.requestRelationships = new HashMap<KonquestKingdom,KonquestRelationship>();
-		this.properties = new HashMap<KonPropertyFlag,Boolean>();
+		this.members = new HashMap<>();
+		this.activeRelationships = new HashMap<>();
+		this.requestRelationships = new HashMap<>();
+		this.properties = new HashMap<>();
 		initProperties();
 	}
 	
@@ -73,7 +63,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.name = name;
 		this.konquest = konquest;
 		this.capital = new KonCapital(new Location(konquest.getPlugin().getServer().getWorld("world"),0,65,0), "konquest_default", this, konquest);
-		this.townMap = new HashMap<String, KonTown>();
+		this.townMap = new HashMap<>();
 		this.monumentTemplate = null; // new kingdoms start with null template
 		this.isSmallest = false;
 		this.isOfflineProtected = false;
@@ -83,10 +73,10 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.isOpen = true;
 		this.joinRequestKeeper = new RequestKeeper();
 		this.master = null;
-		this.members = new HashMap<UUID,Boolean>();
-		this.activeRelationships = new HashMap<KonquestKingdom,KonquestRelationship>();
-		this.requestRelationships = new HashMap<KonquestKingdom,KonquestRelationship>();
-		this.properties = new HashMap<KonPropertyFlag,Boolean>();
+		this.members = new HashMap<>();
+		this.activeRelationships = new HashMap<>();
+		this.requestRelationships = new HashMap<>();
+		this.properties = new HashMap<>();
 	}
 	
 	private void initProperties() {
@@ -104,7 +94,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	public boolean isOpen() {
-		return isOpen ? true : false;
+		return isOpen;
 	}
 	
 	public void setIsAdminOperated(boolean val) {
@@ -112,7 +102,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	public boolean isAdminOperated() {
-		return isAdminOperated ? true : false;
+		return isAdminOperated;
 	}
 	
 	public boolean isPeaceful() {
@@ -145,7 +135,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 
 	@Override
 	public Map<KonPropertyFlag, Boolean> getAllProperties() {
-		return new HashMap<KonPropertyFlag, Boolean>(properties);
+		return new HashMap<>(properties);
 	}
 	
 	/*
@@ -156,10 +146,10 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	 */
 	
 	public void forceMaster(UUID id) {
-		if(isCreated) {
-			master = id;
-			members.put(id,true); // Ensure member officer flag is true
-		}
+		if(!isCreated)return;
+		master = id;
+		members.put(id,true); // Ensure member officer flag is true
+
 	}
 	
 	public boolean setMaster(UUID id) {
@@ -278,7 +268,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	public ArrayList<OfflinePlayer> getPlayerOfficers() {
-		ArrayList<OfflinePlayer> officerList = new ArrayList<OfflinePlayer>();
+		ArrayList<OfflinePlayer> officerList = new ArrayList<>();
 		for(UUID id : members.keySet()) {
 			if(members.get(id)) {
 				officerList.add(Bukkit.getOfflinePlayer(id));
@@ -288,7 +278,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	public ArrayList<OfflinePlayer> getPlayerOfficersOnly() {
-		ArrayList<OfflinePlayer> officerList = new ArrayList<OfflinePlayer>();
+		ArrayList<OfflinePlayer> officerList = new ArrayList<>();
 		for(UUID id : members.keySet()) {
 			if(members.get(id) && !master.equals(id)) {
 				officerList.add(Bukkit.getOfflinePlayer(id));
@@ -298,7 +288,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	public ArrayList<OfflinePlayer> getPlayerMembers() {
-		ArrayList<OfflinePlayer> memberList = new ArrayList<OfflinePlayer>();
+		ArrayList<OfflinePlayer> memberList = new ArrayList<>();
 		for(UUID id : members.keySet()) {
 			memberList.add(Bukkit.getOfflinePlayer(id));
 		}
@@ -306,7 +296,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	public ArrayList<OfflinePlayer> getPlayerMembersOnly() {
-		ArrayList<OfflinePlayer> memberList = new ArrayList<OfflinePlayer>();
+		ArrayList<OfflinePlayer> memberList = new ArrayList<>();
 		for(UUID id : members.keySet()) {
 			if(!members.get(id)) {
 				memberList.add(Bukkit.getOfflinePlayer(id));
@@ -388,13 +378,11 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	public Collection<KonquestKingdom> getActiveRelationKingdoms() {
-		Set<KonquestKingdom> kingdoms = new HashSet<KonquestKingdom>();
-		kingdoms.addAll(activeRelationships.keySet());
-		return kingdoms;
+		return new HashSet<>(activeRelationships.keySet());
 	}
 	
 	public List<String> getActiveRelationNames() {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		for(KonquestKingdom kingdom : activeRelationships.keySet()) {
 			result.add(kingdom.getName());
 		}
@@ -438,13 +426,11 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	public Collection<KonquestKingdom> getRelationRequestKingdoms() {
-		Set<KonquestKingdom> kingdoms = new HashSet<KonquestKingdom>();
-		kingdoms.addAll(requestRelationships.keySet());
-		return kingdoms;
+		return new HashSet<>(requestRelationships.keySet());
 	}
 	
 	public List<String> getRelationRequestNames() {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		for(KonquestKingdom kingdom : requestRelationships.keySet()) {
 			result.add(kingdom.getName());
 		}
@@ -487,7 +473,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		boolean result = true;
 		int immunityThreshold = konquest.getCore().getInt(CorePath.KINGDOMS_CAPITAL_IMMUNITY_TOWNS.getPath(),0);
 		if(immunityThreshold > 0) {
-			// Capital can only be capture when there are less towns than threshold
+			// Capital can only be capture when there are fewer towns than threshold
 			if(getNumTowns() < immunityThreshold) {
 				result = false;
 			}
@@ -536,10 +522,8 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	public boolean addTown(Location loc, String name) {
 		if(!hasTown(name)) {
 			townMap.put(name, new KonTown(loc, name, this, konquest));
-			//ChatUtil.printDebug("Added town "+name);
 			return true;
 		} else {
-			//ChatUtil.printDebug("Town already exists: "+name);
 			return false;
 		}
 	}
@@ -666,8 +650,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	// This can return an empty list
 	public ArrayList<String> getTownNames() {
-		ArrayList<String> names = new ArrayList<String>(townMap.keySet());
-		return names;
+		return new ArrayList<>(townMap.keySet());
 	}
 	
 	public KonTown getTown(String name) {
@@ -688,8 +671,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	public ArrayList<KonTown> getTowns() {
-		ArrayList<KonTown> towns = new ArrayList<KonTown>(townMap.values());
-		return towns;
+		return new ArrayList<>(townMap.values());
 	}
 	
 	public boolean isTownMapEmpty() {

@@ -14,7 +14,7 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
 public abstract class KonquestEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
-	private KonquestAPI konquest;
+	private final KonquestAPI konquest;
 	
 	/**
 	 * Construct an event with a reference to the Konquest API

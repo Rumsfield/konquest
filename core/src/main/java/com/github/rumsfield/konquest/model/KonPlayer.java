@@ -5,23 +5,13 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import com.github.rumsfield.konquest.utility.Timeable;
 import com.github.rumsfield.konquest.utility.Timer;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-
-import org.bukkit.ChatColor;
-import org.bukkit.ChunkSnapshot;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+
+import java.util.*;
 
 public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timeable {
 
@@ -29,7 +19,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		NONE,
 		MONUMENT,
 		RUIN_CRITICAL,
-		RUIN_SPAWN;
+		RUIN_SPAWN
 	}
 	
 	/*
@@ -43,11 +33,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		CLAIM,
 		UNCLAIM,
 		ADMIN_CLAIM,
-		ADMIN_UNCLAIM;
+		ADMIN_UNCLAIM
 	}
 	
-	private Player bukkitPlayer;
-	//private KonKingdom exileKingdom;
+	private final Player bukkitPlayer;
 	
 	private RegionType settingRegion;
 	private FollowType autoFollow;
@@ -65,33 +54,31 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	private boolean isFlying;
 	private boolean isBorderDisplay;
 	
-	private Timer giveLordConfirmTimer;
-	private Timer priorityTitleDisplayTimer;
-	private Timer borderUpdateLoopTimer;
-	private Timer monumentTemplateLoopTimer;
-	private Timer monumentShowLoopTimer;
-	private Timer combatTagTimer;
-	private Timer flyDisableWarmupTimer;
+	private final Timer giveLordConfirmTimer;
+	private final Timer priorityTitleDisplayTimer;
+	private final Timer borderUpdateLoopTimer;
+	private final Timer monumentTemplateLoopTimer;
+	private final Timer monumentShowLoopTimer;
+	private final Timer combatTagTimer;
+	private final Timer flyDisableWarmupTimer;
 	private long recordPlayCooldownTime;
 	private int monumentShowLoopCount;
 	private long flyDisableTime;
-	private ArrayList<Mob> targetMobList;
-	private HashMap<KonDirective,Integer> directiveProgress;
-	private KonStats playerStats;
-	private KonPrefix playerPrefix;
-	private HashMap<Location, Color> borderMap;
-	private HashMap<Location, Color> borderPlotMap;
-	private HashMap<Location,Color> monumentTemplateBoundary;
-	private HashSet<Location> monumentShowBoundary;
+	private final ArrayList<Mob> targetMobList;
+	private final HashMap<KonDirective,Integer> directiveProgress;
+	private final KonStats playerStats;
+	private final KonPrefix playerPrefix;
+	private final HashMap<Location, Color> borderMap;
+	private final HashMap<Location, Color> borderPlotMap;
+	private final HashMap<Location,Color> monumentTemplateBoundary;
+	private final HashSet<Location> monumentShowBoundary;
 	private Block lastTargetBlock;
-	private KonClaimRegister adminClaimRegister;
+	private final KonClaimRegister adminClaimRegister;
 	
 	public KonPlayer(Player bukkitPlayer, KonKingdom kingdom, boolean isBarbarian) {
 		super(bukkitPlayer, kingdom, isBarbarian);
-		//super((OfflinePlayer) bukkitPlayer, kingdom, isBarbarian);
-		
+
 		this.bukkitPlayer = bukkitPlayer;
-		//this.exileKingdom = kingdom;
 		this.settingRegion = RegionType.NONE;
 		this.regionTemplateName = "";
 		this.regionSanctuaryName = "";
@@ -114,15 +101,15 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		this.recordPlayCooldownTime = 0;
 		this.monumentShowLoopCount = 0;
 		this.flyDisableTime = 0;
-		this.targetMobList = new ArrayList<Mob>();
-		this.directiveProgress = new HashMap<KonDirective,Integer>();
+		this.targetMobList = new ArrayList<>();
+		this.directiveProgress = new HashMap<>();
 		this.playerStats = new KonStats();
 		this.playerPrefix = new KonPrefix();
 		this.adminClaimRegister = new KonClaimRegister();
-		this.borderMap = new HashMap<Location, Color>();
-		this.borderPlotMap = new HashMap<Location, Color>();
-		this.monumentTemplateBoundary = new HashMap<Location,Color>();
-		this.monumentShowBoundary = new HashSet<Location>();
+		this.borderMap = new HashMap<>();
+		this.borderPlotMap = new HashMap<>();
+		this.monumentTemplateBoundary = new HashMap<>();
+		this.monumentShowBoundary = new HashSet<>();
 	}
 	
 	public void addMobAttacker(Mob mob) {
@@ -158,7 +145,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		if(directiveProgress.isEmpty()) {
 			return Collections.emptySet();
 		} else {
-			return (Collection<KonDirective>) directiveProgress.keySet();
+			return directiveProgress.keySet();
 		}
 	}
 	
@@ -170,12 +157,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	public Player getBukkitPlayer() {
 		return bukkitPlayer;
 	}
-	
-	/*
-	public KonKingdom getExileKingdom() {
-		return exileKingdom;
-	}
-	*/
 	
 	public boolean isSettingRegion() {
 		return (!settingRegion.equals(RegionType.NONE));
@@ -270,12 +251,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	}
 	
 	// Setters
-	
-	/*
-	public void setExileKingdom(KonKingdom newKingdom) {
-		exileKingdom = newKingdom;
-	}
-	*/
 	
 	public void settingRegion(RegionType type) {
 		settingRegion = type;
@@ -415,7 +390,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	
 	public void markRecordPlayCooldown() {
 		Date now = new Date();
-		// Set record cooldown time for 60 seconds from now
+		// Set record cool-down time for 60 seconds from now
 		recordPlayCooldownTime = now.getTime() + (60*1000);
 	}
 	
@@ -440,11 +415,9 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 			ChatUtil.printDebug("Player Timer ended with null taskID!");
 		} else if(taskID == giveLordConfirmTimer.getTaskID()) {
 			// Clear give lord confirmation
-			//ChatUtil.printDebug("Player give lord confirmation Timer ended with taskID: "+taskID+" for "+bukkitPlayer.getName());
 			isGiveLordConfirmed = false;
 		} else if(taskID == priorityTitleDisplayTimer.getTaskID()) {
 			// Clear priority title display
-			//ChatUtil.printDebug("Player priority title display Timer ended with taskID: "+taskID+" for "+bukkitPlayer.getName());
 			isPriorityTitleDisplay = false;
 		} else if(taskID == borderUpdateLoopTimer.getTaskID()) {
 			Color particleColor;
@@ -502,7 +475,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	private void updateMonumentTemplateBoundary() {
     	Block target = bukkitPlayer.getTargetBlock(null, 3);
 		if(lastTargetBlock == null || !lastTargetBlock.equals(target)) {
-			//ChatUtil.printDebug("Rendering new monument template boundary for "+bukkitPlayer.getName());
 			lastTargetBlock = target;
 			// Check for player creating monument template
     		if(isSettingRegion() && getRegionType().equals(RegionType.MONUMENT)) {
@@ -587,7 +559,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
     }
 	
 	private HashSet<Location> getEdgeLocations(Location loc0, Location loc1) {
-    	HashSet<Location> locationSet = new HashSet<Location>();
+    	HashSet<Location> locationSet = new HashSet<>();
 		// Add X lines
 		int xMax,xMin;
 		if(loc1.getBlockX() > loc0.getBlockX()) {

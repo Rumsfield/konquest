@@ -1,17 +1,15 @@
 package com.github.rumsfield.konquest.command.admin;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.command.CommandBase;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.command.CommandBase;
-//import com.github.rumsfield.konquest.command.admin.AdminCommandType;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import java.util.Collections;
+import java.util.List;
 
 public class HelpAdminCommand extends CommandBase {
 	
@@ -20,17 +18,17 @@ public class HelpAdminCommand extends CommandBase {
     }
 
     public void execute() {
-        String message = "";
+        String message;
         //ChatUtil.sendNotice((Player) getSender(), "Admin Help: Command, Arguments, Description");
         ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_HELP_NOTICE_MESSAGE.getMessage());
         for(AdminCommandType cmd : AdminCommandType.values()) {
-        	
-        	String cmdArgsFormatted = cmd.arguments();
-        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA);
-        	cmdArgsFormatted = cmdArgsFormatted.replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA);
-        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA);
-        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\]", ChatColor.GRAY+"]"+ChatColor.AQUA);
-        	cmdArgsFormatted = cmdArgsFormatted.replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
+
+			String cmdArgsFormatted = cmd.arguments()
+					.replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA)
+					.replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA)
+					.replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA)
+					.replaceAll("]", ChatColor.GRAY+"]"+ChatColor.AQUA)
+					.replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
         	
         	message = ChatColor.GOLD+"/k admin "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted+": "+ChatColor.WHITE+cmd.description();
             ChatUtil.sendMessage((Player) getSender(), message);

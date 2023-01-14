@@ -1,14 +1,5 @@
 package com.github.rumsfield.konquest.command.admin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.model.KonKingdom;
@@ -17,6 +8,14 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class KingdomAdminCommand extends CommandBase {
 
@@ -29,8 +28,7 @@ public class KingdomAdminCommand extends CommandBase {
 		// k admin kingdom menu|create|remove|add|kick|rename <kingdom> [<name>]
 		if (getArgs().length != 4 && getArgs().length != 5) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	
         	// Check for player
         	Player bukkitPlayer = (Player) getSender();
@@ -108,13 +106,8 @@ public class KingdomAdminCommand extends CommandBase {
 	                    			int distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
 	                    			int min_distance_sanc = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_SANCTUARY.getPath());
 	                    			int min_distance_town = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
-	                    			int min_distance = 0;
-	                    			if(min_distance_sanc < min_distance_town) {
-	                    				min_distance = min_distance_sanc;
-	                    			} else {
-	                    				min_distance = min_distance_town;
-	                    			}
-	                    			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
+	                    			int min_distance = Math.min(min_distance_sanc, min_distance_town);
+									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
 	                    			//TODO: KR message
 	                    			break;
 	                    		case 7:

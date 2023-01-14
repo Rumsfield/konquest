@@ -1,8 +1,10 @@
 package com.github.rumsfield.konquest.map;
 
-import java.util.Date;
-import java.util.HashMap;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
+import com.github.rumsfield.konquest.model.*;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.dynmap.DynmapAPI;
@@ -11,35 +13,27 @@ import org.dynmap.markers.Marker;
 import org.dynmap.markers.MarkerIcon;
 import org.dynmap.markers.MarkerSet;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonCamp;
-import com.github.rumsfield.konquest.model.KonCapital;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonRuin;
-import com.github.rumsfield.konquest.model.KonTerritory;
-import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class MapHandler {
 	
-	private Konquest konquest;
+	private final Konquest konquest;
 	private boolean isEnabled;
-	private HashMap<KonTerritory,AreaTerritory> areaCache;
+	private final HashMap<KonTerritory,AreaTerritory> areaCache;
 	
 	private static DynmapAPI dapi = null;
 	
 	private final int ruinColor = 0x242424;
 	private final int campColor = 0xa3a10a;
-	//private final int capitalColor = 0xb942f5;
-	//private final int townColor = 0xed921a;
 	private final int lineDefaultColor = 0x000000;
 	private final int lineCapitalColor = 0x8010d0;
 	
 	public MapHandler(Konquest konquest) {
 		this.konquest = konquest;
 		this.isEnabled = false;
-		this.areaCache = new HashMap<KonTerritory,AreaTerritory>();
+		this.areaCache = new HashMap<>();
 	}
 	
 	public void initialize() {
@@ -93,18 +87,15 @@ public class MapHandler {
 	
 	/**
 	 * Draws a territory with Dynmap, when created or updated
-	 * @param territory
+	 * @param territory Territory to draw
 	 */
 	public void drawDynmapUpdateTerritory(KonTerritory territory) {
-		if (!isEnabled) {
-			return;
-		}
+		if (!isEnabled) return;
 		
-		if (!isTerritoryValid(territory)) {
+		if (isTerritoryInvalid(territory)) {
 			ChatUtil.printDebug("Could not draw territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
 			return;
 		}
-		//ChatUtil.printDebug("Drawing Dynmap area of territory "+territory.getName());
 		String groupId = getGroupId(territory);
 		String groupLabel = getGroupLabel(territory);
 		String areaId = getAreaId(territory);
@@ -119,8 +110,8 @@ public class MapHandler {
 		if (territoryGroup == null) {
 			territoryGroup = dapi.getMarkerAPI().createMarkerSet(groupId, groupLabel, dapi.getMarkerAPI().getMarkerIcons(), false);
 		}
-		String pointId = "";
-		String contourId = "";
+		String pointId;
+		String contourId;
 		AreaMarker areaPoint;
 		AreaMarker areaContour;
 		// Prune any points and contours
@@ -128,13 +119,11 @@ public class MapHandler {
 		if(areaCache.containsKey(territory)) {
 			// Territory is already rendered
 			AreaTerritory oldArea = areaCache.get(territory);
-			//ChatUtil.printDebug("Updating existing territory from "+oldArea.getNumContours()+" to "+drawArea.getNumContours()+" contours, "+oldArea.getNumPoints()+" to "+drawArea.getNumPoints()+" points.");
 			for(int i = (oldArea.getNumContours()-1); i >= drawArea.getNumContours(); i--) {
 				contourId = areaId + ".contour." + i;
 				areaContour = territoryGroup.findAreaMarker(contourId);
 				if (areaContour != null) {
 					// Delete area from group
-					//ChatUtil.printDebug("Pruned contour ID "+contourId);
 					areaContour.deleteMarker();
 				}
 			}
@@ -143,7 +132,6 @@ public class MapHandler {
 				areaPoint = territoryGroup.findAreaMarker(pointId);
 				if (areaPoint != null) {
 					// Delete area from group
-					//ChatUtil.printDebug("Pruned point ID "+pointId);
 					areaPoint.deleteMarker();
 				}
 			}
@@ -194,14 +182,12 @@ public class MapHandler {
 	
 	/**
 	 * Deletes a territory with Dynmap, when destroyed or removed
-	 * @param territory
+	 * @param territory Territory to delete
 	 */
 	public void drawDynmapRemoveTerritory(KonTerritory territory) {
-		if (!isEnabled) {
-			return;
-		}
+		if (!isEnabled) return;
 		
-		if (!isTerritoryValid(territory)) {
+		if (isTerritoryInvalid(territory)) {
 			ChatUtil.printDebug("Could not delete territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
 			return;
 		}
@@ -214,8 +200,8 @@ public class MapHandler {
 		if (territoryGroup != null) {
 			if(areaCache.containsKey(territory)) {
 				// Territory is already rendered, remove all points and contours
-				String pointId = "";
-				String contourId = "";
+				String pointId;
+				String contourId;
 				AreaMarker areaPoint;
 				AreaMarker areaContour;
 				AreaTerritory oldArea = areaCache.get(territory);
@@ -253,10 +239,8 @@ public class MapHandler {
 	}
 	
 	public void drawDynmapLabel(KonTerritory territory) {
-		if (!isEnabled) {
-			return;
-		}
-		if (!isTerritoryValid(territory)) {
+		if (!isEnabled) return;
+		if (isTerritoryInvalid(territory)) {
 			ChatUtil.printDebug("Could not update label for territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
 			return;
 		}
@@ -268,7 +252,7 @@ public class MapHandler {
 			// Update all area point labels
 			if(areaCache.containsKey(territory)) {
 				// Territory is already rendered, remove all points and contours
-				String pointId = "";
+				String pointId;
 				AreaMarker areaPoint;
 				AreaTerritory oldArea = areaCache.get(territory);
 				for(int i = 0; i < oldArea.getNumPoints(); i++) {
@@ -286,16 +270,12 @@ public class MapHandler {
 	}
 	
 	public void postDynmapBroadcast(String message) {
-		if (!isEnabled) {
-			return;
-		}
+		if (!isEnabled) return;
 		dapi.sendBroadcastToWeb("Konquest", message);
 	}
 	
 	public void drawDynmapAllTerritories() {
-		if (!isEnabled) {
-			return;
-		}
+		if (!isEnabled) return;
 		Date start = new Date();
 		
 		// Ruins
@@ -332,8 +312,6 @@ public class MapHandler {
 				result = result+".marker.camp";
 				break;
 			case CAPITAL:
-				result = result+".marker."+territory.getKingdom().getName().toLowerCase();
-				break;
 			case TOWN:
 				result = result+".marker."+territory.getKingdom().getName().toLowerCase();
 				break;
@@ -353,8 +331,6 @@ public class MapHandler {
 				result = "Konquest Barbarian Camps";
 				break;
 			case CAPITAL:
-				result = "Konquest Kingdom "+territory.getKingdom().getName();
-				break;
 			case TOWN:
 				result = "Konquest Kingdom "+territory.getKingdom().getName();
 				break;
@@ -452,11 +428,7 @@ public class MapHandler {
 				result = campColor;
 				break;
 			case CAPITAL:
-				//result = capitalColor;
-				result = stringToRGB(territory.getKingdom().getName());
-				break;
 			case TOWN:
-				//result = townColor;
 				result = stringToRGB(territory.getKingdom().getName());
 				break;
 			default:
@@ -467,44 +439,25 @@ public class MapHandler {
 	
 	private int getLineColor(KonTerritory territory) {
 		int result = lineDefaultColor;
-		switch (territory.getTerritoryType()) {
-			case RUIN:
-				result = lineDefaultColor;
-				break;
-			case CAMP:
-				result = lineDefaultColor;
-				break;
-			case CAPITAL:
-				result = lineCapitalColor;
-				break;
-			case TOWN:
-				result = lineDefaultColor;
-				break;
-			default:
-				break;
+		if (Objects.requireNonNull(territory.getTerritoryType()) == KonquestTerritoryType.CAPITAL) {
+			result = lineCapitalColor;
 		}
 		return result;
 	}
 	
-	private boolean isTerritoryValid(KonTerritory territory) {
+	private boolean isTerritoryInvalid(KonTerritory territory) {
 		boolean result = false;
 		switch (territory.getTerritoryType()) {
 			case RUIN:
-				result = true;
-				break;
 			case CAMP:
-				result = true;
-				break;
 			case CAPITAL:
-				result = true;
-				break;
 			case TOWN:
 				result = true;
 				break;
 			default:
 				break;
 		}
-		return result;
+		return !result;
 	}
 	
 	private String getIconId(KonTerritory territory) {
@@ -572,7 +525,6 @@ public class MapHandler {
 	
 	private int stringToRGB(String input) {
 		int hash = input.hashCode();
-		int hexColor = hash & 0xFFFFFF;
-		return hexColor;
+		return hash & 0xFFFFFF;
 	}
 }

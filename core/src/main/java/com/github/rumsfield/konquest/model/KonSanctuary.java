@@ -1,11 +1,8 @@
 package com.github.rumsfield.konquest.model;
 
-import java.awt.Point;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
+import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -14,29 +11,27 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.Timeable;
-import com.github.rumsfield.konquest.utility.Timer;
+import java.awt.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPropertyFlagHolder, Timeable {
 
-	private BossBar sanctuaryBarAll;
-	private Map<KonPropertyFlag,Boolean> properties;
-	private Map<String, KonMonumentTemplate> templates;
-	private Map<String, Timer> templateBlankingTimers; // Template name, timer
+	private final BossBar sanctuaryBarAll;
+	private final Map<KonPropertyFlag,Boolean> properties;
+	private final Map<String, KonMonumentTemplate> templates;
+	private final Map<String, Timer> templateBlankingTimers; // Template name, timer
 	
 	public KonSanctuary(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, konquest);
 		this.sanctuaryBarAll = Bukkit.getServer().createBossBar(Konquest.neutralColor+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SEGMENTED_20);
 		this.sanctuaryBarAll.setVisible(true);
-		this.properties = new HashMap<KonPropertyFlag,Boolean>();
+		this.properties = new HashMap<>();
 		initProperties();
-		this.templates = new HashMap<String, KonMonumentTemplate>();
-		this.templateBlankingTimers = new HashMap<String, Timer>();
+		this.templates = new HashMap<>();
+		this.templateBlankingTimers = new HashMap<>();
 	}
 	
 	private void initProperties() {
@@ -138,7 +133,7 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 
 	@Override
 	public Map<KonPropertyFlag, Boolean> getAllProperties() {
-		return new HashMap<KonPropertyFlag, Boolean>(properties);
+		return new HashMap<>(properties);
 	}
 	
 	public Collection<KonMonumentTemplate> getTemplates() {
@@ -196,7 +191,6 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 		boolean result = false;
 		String nameLower = name.toLowerCase();
 		if(templates.containsKey(nameLower)) {
-			//templates.get(nameLower).setValid(false);
 			templates.remove(nameLower);
 			result = true;
 		}

@@ -1,16 +1,15 @@
 package com.github.rumsfield.konquest.manager;
 
-import java.util.IllegalFormatException;
-
-import org.bukkit.configuration.file.FileConfiguration;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.configuration.file.FileConfiguration;
+
+import java.util.IllegalFormatException;
 
 public class LanguageManager {
 
-	private Konquest konquest;
+	private final Konquest konquest;
 	private FileConfiguration lang;
 	private boolean isValid;
 	
@@ -38,7 +37,7 @@ public class LanguageManager {
 	}
 	
 	public String get(MessagePath messagePath, Object ...args) {
-		String result = "";
+		String result;
 		String path = messagePath.getPath();
 		if(lang.contains(path)) {
 			int formats = messagePath.getFormats();
@@ -47,7 +46,7 @@ public class LanguageManager {
 			}
 			if(args.length > 0) {
 				try {
-					result = String.format(lang.getString(messagePath.getPath()), (Object[])args);
+					result = String.format(lang.getString(messagePath.getPath()), args);
 				} catch(IllegalFormatException e) {
 					ChatUtil.printConsoleError("Language file has bad message format for path "+path+": "+e.getMessage());
 					result = lang.getString(messagePath.getPath());
@@ -73,7 +72,7 @@ public class LanguageManager {
 					result = false;
 					ChatUtil.printConsoleError("Language file is missing message for path: "+messagePath.getPath());
 				} else if(formats > 0) {
-					// Count occurances of "%s" within message to verify format count
+					// Count occurrences of "%s" within message to verify format count
 					int lastIndex = 0;
 					int count = 0;
 					while(lastIndex != -1) {

@@ -1,23 +1,5 @@
 package com.github.rumsfield.konquest.manager;
 
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
-import org.bukkit.block.data.type.Bed;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.event.camp.KonquestCampCreateEvent;
 import com.github.rumsfield.konquest.api.manager.KonquestCampManager;
@@ -29,20 +11,30 @@ import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
+import org.bukkit.block.data.type.Bed;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.jetbrains.annotations.Nullable;
+
+import java.awt.*;
+import java.util.List;
+import java.util.*;
 
 public class CampManager implements KonquestCampManager {
 
-	private Konquest konquest;
-	private HashMap<String,KonCamp> barbarianCamps; // player uuids to camps
-	//private HashSet<KonCampGroup> barbarianGroups; // all camp groups
-	private HashMap<KonCamp,KonCampGroup> groupMap; // camps to groups
+	private final Konquest konquest;
+	private final HashMap<String,KonCamp> barbarianCamps; // player uuids to camps
+	private final HashMap<KonCamp,KonCampGroup> groupMap; // camps to groups
 	private boolean isClanEnabled;
 	
 	public CampManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.barbarianCamps = new HashMap<String, KonCamp>();
-		//this.barbarianGroups = new HashSet<KonCampGroup>();
-		this.groupMap = new HashMap<KonCamp,KonCampGroup>();
+		this.barbarianCamps = new HashMap<>();
+		this.groupMap = new HashMap<>();
 		this.isClanEnabled = false;
 	}
 	
@@ -80,12 +72,11 @@ public class CampManager implements KonquestCampManager {
 	}
 	
 	public ArrayList<KonCamp> getCamps() {
-		ArrayList<KonCamp> camps = new ArrayList<KonCamp>(barbarianCamps.values());
-		return camps;
+		return new ArrayList<>(barbarianCamps.values());
 	}
 	
 	public ArrayList<String> getCampNames() {
-		ArrayList<String> campNames = new ArrayList<String>();
+		ArrayList<String> campNames = new ArrayList<>();
 		for(KonCamp camp : barbarianCamps.values()) {
 			campNames.add(camp.getName());
 		}
@@ -103,30 +94,26 @@ public class CampManager implements KonquestCampManager {
 		return result;
 	}
 	
-	public void activateCampProtection(KonOfflinePlayer offlinePlayer) {
-		if(offlinePlayer != null) {
-    		KonCamp camp = getCamp(offlinePlayer);
-    		if(camp != null) {
-    			ChatUtil.printDebug("Set camp protection to true for player "+offlinePlayer.getOfflineBukkitPlayer().getName());
-    			camp.setProtected(true);
-    		}
-    	}
+	public void activateCampProtection(@Nullable KonOfflinePlayer offlinePlayer) {
+		if(offlinePlayer == null)return;
+		KonCamp camp = getCamp(offlinePlayer);
+		if(camp == null) return;
+		ChatUtil.printDebug("Set camp protection to true for player "+offlinePlayer.getOfflineBukkitPlayer().getName());
+		camp.setProtected(true);
 	}
 	
 	public void deactivateCampProtection(KonOfflinePlayer offlinePlayer) {
-		if(offlinePlayer != null) {
-    		KonCamp camp = getCamp(offlinePlayer);
-    		if(camp != null) {
-    			ChatUtil.printDebug("Set camp protection to false for player "+offlinePlayer.getOfflineBukkitPlayer().getName());
-    			camp.setProtected(false);
-    		}
-    	}
+		if(offlinePlayer == null) return;
+		KonCamp camp = getCamp(offlinePlayer);
+		if(camp == null) return;
+		ChatUtil.printDebug("Set camp protection to false for player "+offlinePlayer.getOfflineBukkitPlayer().getName());
+		camp.setProtected(false);
 	}
 	
 	/**
 	 * addCamp - primary method for adding a camp for a barbarian
-	 * @param loc
-	 * @param player
+	 * @param loc - location of the camp
+	 * @param player - player adding the camp
 	 * @return status 	0 = success
 	 * 					1 = camp init claims overlap with existing territory
 	 * 					2 = camp already exists for player
@@ -145,7 +132,6 @@ public class CampManager implements KonquestCampManager {
 			return 5;
 		}
 		String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
-		//ChatUtil.printDebug("Attempting to add new Camp for player "+player.getOfflineBukkitPlayer().getName()+" "+uuid);
 		if(!player.isBarbarian()) {
 			ChatUtil.printDebug("Failed to add camp, player "+player.getOfflineBukkitPlayer().getName()+" "+uuid+" is not a barbarian!");
 			return 3;
@@ -153,7 +139,6 @@ public class CampManager implements KonquestCampManager {
 		if(!barbarianCamps.containsKey(uuid)) {
 			// Verify no overlapping init chunks
 			int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
-			//ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
 			World addWorld = loc.getWorld();
 			for(Point point : konquest.getAreaPoints(loc, radius)) {
 				if(konquest.getTerritoryManager().isChunkClaimed(point,addWorld)) {
@@ -194,7 +179,7 @@ public class CampManager implements KonquestCampManager {
 		int result = addCamp(loc, player);
 		if(result == 0) {
 			KonCamp newCamp = getCamp(player);
-			if(newCamp != null && player != null) {
+			if(newCamp != null) {
 				// Fire event
 				KonquestCampCreateEvent invokeEvent = new KonquestCampCreateEvent(konquest, newCamp, player);
 				Konquest.callKonquestEvent(invokeEvent);
@@ -218,8 +203,7 @@ public class CampManager implements KonquestCampManager {
 	
 	public boolean removeCamp(String uuid) {
 		if(barbarianCamps.containsKey(uuid)) {
-			ArrayList<Point> campPoints = new ArrayList<Point>();
-			campPoints.addAll(barbarianCamps.get(uuid).getChunkList().keySet());
+			ArrayList<Point> campPoints = new ArrayList<>(barbarianCamps.get(uuid).getChunkList().keySet());
 			konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(campPoints,barbarianCamps.get(uuid).getWorld());
 			KonCamp removedCamp = barbarianCamps.remove(uuid);
 			removedCamp.removeAllBarPlayers();
@@ -230,7 +214,7 @@ public class CampManager implements KonquestCampManager {
 			//update the chunk cache, remove all points from primary world
 			konquest.getTerritoryManager().removeAllTerritory(removedCamp.getWorld(),removedCamp.getChunkList().keySet());
 			// Refresh groups
-			Collection<KonCamp> groupSet = new ArrayList<KonCamp>();
+			Collection<KonCamp> groupSet = new ArrayList<>();
 			if(groupMap.containsKey(removedCamp)) {
 				groupSet = groupMap.get(removedCamp).getCamps();
 			}
@@ -265,127 +249,20 @@ public class CampManager implements KonquestCampManager {
 	public boolean isCampGroupsEnabled() {
 		return isClanEnabled;
 	}
-	
-	/**
-	 * Attempts to remove a camp from a group
-	 * @param camp - a removed camp
-	 * @return true when camp has been removed from a group
-	 */
-	/*
-	private boolean removeUpdateGroup(KonCamp camp) {
-		boolean result = false;
-		// check for existing group
-		if(!groupMap.containsKey(camp)) {
-			result = true;
-		} else {
-			// Camp belongs to a group
-			KonCampGroup mainGroup = groupMap.get(camp);
-			// Search surroundings for all adjacent camps
-			HashSet<KonCamp> adjCamps = new HashSet<KonCamp>();
-			Location center = camp.getCenterLoc();
-			int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
-			for(Point point : konquest.getBorderPoints(center, radius+1)) {
-				if(kingdomManager.isChunkClaimed(point,center.getWorld()) && kingdomManager.getChunkTerritory(point,center.getWorld()) instanceof KonCamp) {
-					KonCamp adjCamp = (KonCamp)kingdomManager.getChunkTerritory(point,center.getWorld());
-					adjCamps.add(adjCamp);
-				}
-			}
-			// Remove camp from main group
-			mainGroup.removeCamp(camp);
-			groupMap.remove(camp);
-			// Update groups of remaining adjacent camps
-			
-			
-		}
-		return result;
-	}
-	*/
-	/**
-	 * Attempts to add camp to a group
-	 * @param camp - a new camp
-	 * @return true when camp has been added to a group
-	 */
-	/*
-	private boolean addUpdateGroup(KonCamp camp) {
-		boolean result = false;
-		// check for existing group
-		if(groupMap.containsKey(camp)) {
-			result = true;
-		} else {
-			// Camp has no group
-			// Search surroundings for all adjacent camps
-			HashSet<KonCamp> adjCamps = new HashSet<KonCamp>();
-			Location center = camp.getCenterLoc();
-			int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
-			for(Point point : konquest.getBorderPoints(center, radius+1)) {
-				if(kingdomManager.isChunkClaimed(point,center.getWorld()) && kingdomManager.getChunkTerritory(point,center.getWorld()) instanceof KonCamp) {
-					KonCamp adjCamp = (KonCamp)kingdomManager.getChunkTerritory(point,center.getWorld());
-					adjCamps.add(adjCamp);
-				}
-			}
-			// Find any existing groups
-			HashSet<KonCampGroup> adjGroups = new HashSet<KonCampGroup>();
-			for(KonCamp adjCamp : adjCamps) {
-				if(groupMap.containsKey(adjCamp)) {
-					adjGroups.add(groupMap.get(adjCamp));
-				}
-			}
-			// Attempt to form groups
-			if(adjGroups.isEmpty()) {
-				// There are no adjacent groups, try to make one
-				if(!adjCamps.isEmpty()) {
-					// Make a new group with the adjacent camp(s)
-					KonCampGroup campGroup = new KonCampGroup();
-					campGroup.addCamp(camp);
-					groupMap.put(camp, campGroup);
-					for(KonCamp adjCamp : adjCamps) {
-						campGroup.addCamp(adjCamp);
-						groupMap.put(adjCamp, campGroup);
-					}
-					barbarianGroups.add(campGroup);
-					result = true;
-				}
-			} else {
-				// There are other adjacent group(s)
-				Iterator<KonCampGroup> groupIter = adjGroups.iterator();
-				if(groupIter.hasNext()) {
-					KonCampGroup mainGroup = groupIter.next(); // choose arbitrary group as main
-					// Add camp and all adjacent camps to main group
-					mainGroup.addCamp(camp);
-					groupMap.put(camp, mainGroup);
-					for(KonCamp adjCamp : adjCamps) {
-						mainGroup.addCamp(adjCamp);
-						groupMap.put(adjCamp, mainGroup);
-					}
-					// Merge other group(s) into main and prune
-					while(groupIter.hasNext()) {
-						KonCampGroup mergeGroup = groupIter.next();
-						mainGroup.mergeGroup(mergeGroup);
-						mergeGroup.clearCamps();
-						barbarianGroups.remove(mergeGroup);
-					}
-					result = true;
-				}
-			}
-		}
-		return result;
-	}
-	*/
+
 	private void refreshGroups() {
 		groupMap.clear();
-		if(!isClanEnabled) {
-			return;
-		}
+		if(!isClanEnabled) return;
 		int totalGroups = 0;
 		int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
-		Location center = null;
+		Location center;
 		// Evaluate each camp for adjacent camps, creating groups as necessary
 		for(KonCamp currCamp : barbarianCamps.values()) {
 			// Verify camp is not already in a group
 			if(!groupMap.containsKey(currCamp)) {
 				center = currCamp.getCenterLoc();
 				// Search surroundings for all adjacent camps
-				HashSet<KonCamp> adjCamps = new HashSet<KonCamp>();
+				HashSet<KonCamp> adjCamps = new HashSet<>();
 				for(Point point : konquest.getBorderPoints(center, radius+1)) {
 					if(konquest.getTerritoryManager().isChunkClaimed(point,center.getWorld()) && konquest.getTerritoryManager().getChunkTerritory(point,center.getWorld()) instanceof KonCamp) {
 						KonCamp adjCamp = (KonCamp)konquest.getTerritoryManager().getChunkTerritory(point,center.getWorld());
@@ -393,7 +270,7 @@ public class CampManager implements KonquestCampManager {
 					}
 				}
 				// Find any existing groups
-				HashSet<KonCampGroup> adjGroups = new HashSet<KonCampGroup>();
+				HashSet<KonCampGroup> adjGroups = new HashSet<>();
 				for(KonCamp adjCamp : adjCamps) {
 					if(groupMap.containsKey(adjCamp)) {
 						adjGroups.add(groupMap.get(adjCamp));
@@ -437,36 +314,6 @@ public class CampManager implements KonquestCampManager {
 					}
 				}
 			}
-			/*
-			// Search surrounding chunks
-			KonCampGroup campGroup = null;
-			int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
-			for(Point point : konquest.getBorderPoints(currCenter, radius+1)) {
-				if(kingdomManager.isChunkClaimed(point,currCenter.getWorld()) && kingdomManager.getChunkTerritory(point,currCenter.getWorld()) instanceof KonCamp) {
-					KonCamp adjCamp = (KonCamp)kingdomManager.getChunkTerritory(point,currCenter.getWorld());
-					// Found adjacent camp, decide to make new group or add
-					if(groupMap.containsKey(currCamp)) {
-						// current camp is already in a group
-						campGroup = groupMap.get(currCamp);
-						campGroup.addCamp(adjCamp);
-						groupMap.put(adjCamp, campGroup);
-					} else if(groupMap.containsKey(adjCamp)) {
-						// adjacent camp is already in a group
-						campGroup = groupMap.get(adjCamp);
-						campGroup.addCamp(currCamp);
-						groupMap.put(currCamp, campGroup);
-					} else {
-						// neither camps are in a group, create new one
-						campGroup = new KonCampGroup();
-						campGroup.addCamp(adjCamp);
-						groupMap.put(adjCamp, campGroup);
-						campGroup.addCamp(currCamp);
-						groupMap.put(currCamp, campGroup);
-						totalGroups++;
-					}
-				}
-			}
-			*/
 		}
 		ChatUtil.printDebug("Refreshed "+totalGroups+" camp groups");
 	}
@@ -520,13 +367,8 @@ public class CampManager implements KonquestCampManager {
             			konquest.opStatusMessages.add(message);
                 	}
         		} else {
-        			if(offlineBukkitPlayer != null) {
-        				ChatUtil.printDebug("Failed to find player "+offlineBukkitPlayer.getName()+" when adding their camp");
-        			} else {
-        				ChatUtil.printDebug("Failed to find null player when adding their camp");
-        			}
-        			
-        		}
+					ChatUtil.printDebug("Failed to find player " + offlineBukkitPlayer.getName() + " when adding their camp");
+				}
         	}
         }
         ChatUtil.printDebug("Updated all camps from camps.yml, total "+totalCamps);
@@ -540,9 +382,9 @@ public class CampManager implements KonquestCampManager {
 			KonCamp camp = barbarianCamps.get(uuid);
 			ConfigurationSection campSection = root.createSection(uuid);
 			campSection.set("world", camp.getWorld().getName());
-			campSection.set("center", new int[] {(int) camp.getCenterLoc().getBlockX(),
-					 							 (int) camp.getCenterLoc().getBlockY(),
-					 							 (int) camp.getCenterLoc().getBlockZ()});
+			campSection.set("center", new int[] {camp.getCenterLoc().getBlockX(),
+					camp.getCenterLoc().getBlockY(),
+					camp.getCenterLoc().getBlockZ()});
 	        campSection.set("chunks", konquest.formatPointsToString(camp.getChunkList().keySet()));
 		}
 	}

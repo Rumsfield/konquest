@@ -1,23 +1,22 @@
 package com.github.rumsfield.konquest.display.wrapper;
 
-import java.util.ArrayList;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.display.icon.MenuIcon;
+import com.github.rumsfield.konquest.display.icon.OptionIcon;
+import com.github.rumsfield.konquest.display.icon.OptionIcon.optionAction;
+import com.github.rumsfield.konquest.manager.DisplayManager;
+import com.github.rumsfield.konquest.model.KonPlayer;
+import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.manager.DisplayManager;
-import com.github.rumsfield.konquest.display.icon.MenuIcon;
-import com.github.rumsfield.konquest.display.icon.OptionIcon;
-import com.github.rumsfield.konquest.display.icon.OptionIcon.optionAction;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import java.util.ArrayList;
 
 public class TownOptionsMenuWrapper extends MenuWrapper {
 
-	private KonTown town;
+	private final KonTown town;
 	
 	public TownOptionsMenuWrapper(Konquest konquest, KonTown town) {
 		super(konquest);
@@ -40,8 +39,7 @@ public class TownOptionsMenuWrapper extends MenuWrapper {
 		
 		// Open Info Icon
 		currentValue = DisplayManager.boolean2Lang(town.isOpen())+" "+DisplayManager.boolean2Symbol(town.isOpen());
-		loreList = new ArrayList<String>();
-    	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_OPEN.getMessage()));
+		loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_OPEN.getMessage()));
     	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
     	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
 		option = new OptionIcon(optionAction.TOWN_OPEN, loreColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.DARK_OAK_DOOR, 2);
@@ -49,8 +47,7 @@ public class TownOptionsMenuWrapper extends MenuWrapper {
 		
 		// Plot Only Info Icon
 		currentValue = DisplayManager.boolean2Lang(town.isPlotOnly())+" "+DisplayManager.boolean2Symbol(town.isPlotOnly());
-		loreList = new ArrayList<String>();
-    	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_PLOT.getMessage()));
+		loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_PLOT.getMessage()));
     	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
     	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
 		option = new OptionIcon(optionAction.TOWN_PLOT_ONLY, loreColor+MessagePath.LABEL_PLOT.getMessage(), loreList, Material.DIAMOND_SHOVEL, 3);
@@ -58,8 +55,7 @@ public class TownOptionsMenuWrapper extends MenuWrapper {
 		
 		// Redstone Info Icon
 		currentValue = DisplayManager.boolean2Lang(town.isEnemyRedstoneAllowed())+" "+DisplayManager.boolean2Symbol(town.isEnemyRedstoneAllowed());
-		loreList = new ArrayList<String>();
-    	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_REDSTONE.getMessage()));
+		loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_REDSTONE.getMessage()));
     	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
     	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
 		option = new OptionIcon(optionAction.TOWN_REDSTONE, loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage(), loreList, Material.LEVER, 5);
@@ -67,8 +63,7 @@ public class TownOptionsMenuWrapper extends MenuWrapper {
 		
 		// Golem Offensive Info Icon
 		currentValue = DisplayManager.boolean2Lang(town.isGolemOffensive())+" "+DisplayManager.boolean2Symbol(town.isGolemOffensive());
-		loreList = new ArrayList<String>();
-    	loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_GOLEM.getMessage()));
+		loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_GOLEM.getMessage()));
     	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
     	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
 		option = new OptionIcon(optionAction.TOWN_GOLEM, loreColor+MessagePath.LABEL_GOLEM_OFFENSE.getMessage(), loreList, Material.IRON_SWORD, 6);

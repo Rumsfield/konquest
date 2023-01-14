@@ -31,11 +31,11 @@ public enum KonPropertyFlag {
 	NONE			("N/A", 		"Nothing");
 	
 	private final String name;
-	private final String descripton;
+	private final String description;
 	
-	KonPropertyFlag(String name, String descripton) {
+	KonPropertyFlag(String name, String description) {
 		this.name = name;
-		this.descripton = descripton;
+		this.description = description;
 	}
 	
 	public String getName() {
@@ -43,7 +43,7 @@ public enum KonPropertyFlag {
 	}
 	
 	public String getDescription() {
-		return descripton;
+		return description;
 	}
 	
 	/**
@@ -77,7 +77,7 @@ public enum KonPropertyFlag {
 	}
 	
 	public static Set<String> getFlagStrings() {
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		for(KonPropertyFlag p : KonPropertyFlag.values()) {
 			result.add(p.toString());
 		}

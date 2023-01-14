@@ -4,14 +4,13 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
 public class ListAdminCommand extends CommandBase {
 	
@@ -20,7 +19,7 @@ public class ListAdminCommand extends CommandBase {
 		TOWN,
 		CAMP,
 		RUIN,
-		SANCTUARY;
+		SANCTUARY
 	}
 	
 	private final int MAX_LINES = 8;
@@ -34,8 +33,7 @@ public class ListAdminCommand extends CommandBase {
     	// k admin list [kingdom|town|camp|ruin|sanctuary] [<page>]
     	if (getArgs().length > 4) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	
         	// Determine list mode
         	ListType mode = ListType.KINGDOM;
@@ -58,7 +56,7 @@ public class ListAdminCommand extends CommandBase {
         	}
         	
         	// Populate list lines
-        	List<String> lines = new ArrayList<String>();
+        	List<String> lines = new ArrayList<>();
         	switch(mode) {
 	        	case KINGDOM:
 	                lines.addAll(getKonquest().getKingdomManager().getKingdomNames());
@@ -80,35 +78,32 @@ public class ListAdminCommand extends CommandBase {
 	                return;
         	}
         	Collections.sort(lines);
-        	ChatUtil.printDebug("List mode "+mode.toString()+" with "+lines.size()+" lines.");
+        	ChatUtil.printDebug("List mode "+ mode +" with "+lines.size()+" lines.");
         	
         	if(lines.isEmpty()) {
         		// Nothing to display
-        		String header = "Konquest "+mode.toString()+" List, page 0/0";
+        		String header = "Konquest "+ mode +" List, page 0/0";
             	ChatUtil.sendNotice((Player) getSender(),header);
         	} else {
         		// Display paged lines to player
         		int numLines = lines.size(); // should be 1 or more
             	int totalPages = (int)Math.ceil((double)numLines/MAX_LINES); // 1-based
-            	totalPages = totalPages < 1 ? 1 : totalPages; // clamp to 1
+            	totalPages = Math.max(totalPages, 1); // clamp to 1
             	int page = 1; // 1-based
             	if (getArgs().length == 3) {
             		try {
             			page = Integer.parseInt(getArgs()[2]);
         			}
-        			catch (NumberFormatException e) {
-        				page = 1;
-        			}
+        			catch (NumberFormatException ignored) {}
             	}
             	// Clamp page index
-            	page = page < 1 ? 1 : page;
-            	page = page > totalPages ? totalPages : page;
+            	page = Math.min(Math.max(page, 1), totalPages);
             	// Determine line start and end
             	int startIdx = (page-1) * MAX_LINES;
             	int endIdx = startIdx + MAX_LINES ;
             	// Display lines to player
             	//TODO: KR path this
-            	String header = "Konquest "+mode.toString()+" List, page "+page+"/"+(totalPages);
+            	String header = "Konquest "+ mode +" List, page "+page+"/"+(totalPages);
             	ChatUtil.sendNotice((Player) getSender(),header);
             	for (int i = startIdx; i < endIdx && i < numLines; i++) {
             		String line = lines.get(i);

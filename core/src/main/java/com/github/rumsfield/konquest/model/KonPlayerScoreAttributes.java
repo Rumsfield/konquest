@@ -22,10 +22,10 @@ public class KonPlayerScoreAttributes {
 		}
 	}
 	
-	private HashMap<KonPlayerScoreAttribute,Integer> attributeMap;
+	private final HashMap<KonPlayerScoreAttribute,Integer> attributeMap;
 	
 	public KonPlayerScoreAttributes() {
-		this.attributeMap = new HashMap<KonPlayerScoreAttribute,Integer>();
+		this.attributeMap = new HashMap<>();
 		for(KonPlayerScoreAttribute attribute : KonPlayerScoreAttribute.values()) {
 			attributeMap.put(attribute, 0);
 		}

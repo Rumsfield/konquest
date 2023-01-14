@@ -16,14 +16,14 @@ public interface KonquestCamp extends KonquestTerritory {
 	 * 
 	 * @return True when the camp owner is online, else false
 	 */
-	public boolean isOwnerOnline();
+    boolean isOwnerOnline();
 	
 	/**
 	 * Gets the player who owns this camp.
 	 * 
 	 * @return The player owner
 	 */
-	public OfflinePlayer getOwner();
+    OfflinePlayer getOwner();
 	
 	/**
 	 * Checks whether the given player is the owner of this camp.
@@ -31,14 +31,14 @@ public interface KonquestCamp extends KonquestTerritory {
 	 * @param player The player to check
 	 * @return True when the player is the owner, else false
 	 */
-	public boolean isPlayerOwner(OfflinePlayer player);
+    boolean isPlayerOwner(OfflinePlayer player);
 	
 	/**
 	 * Gets the location of the bed in this camp.
 	 * 
 	 * @return The bed location
 	 */
-	public Location getBedLocation();
+    Location getBedLocation();
 	
 	/**
 	 * Checks whether this camp is currently protected from attacks.
@@ -47,5 +47,5 @@ public interface KonquestCamp extends KonquestTerritory {
 	 * 
 	 * @return True when the camp is protected, else false
 	 */
-	public boolean isProtected();
+    boolean isProtected();
 }

@@ -16,8 +16,8 @@ public enum KonPrefixCategory {
 	JOKING			(MessagePath.PREFIX_CATEGORY_JOKING.getMessage(), 		Material.BROWN_WOOL),
 	ROYALTY			(MessagePath.PREFIX_CATEGORY_ROYALTY.getMessage(), 		Material.ORANGE_WOOL);
 	
-	private String title;
-	private Material displayMaterial;
+	private final String title;
+	private final Material displayMaterial;
 	KonPrefixCategory(String title, Material mat) {
 		this.title = title;
 		this.displayMaterial = mat;

@@ -12,7 +12,7 @@ import com.github.rumsfield.konquest.api.model.KonquestRuin;
  */
 public class KonquestRuinEvent extends KonquestEvent {
 
-	private KonquestRuin ruin;
+	private final KonquestRuin ruin;
 	
 	/**
 	 * Default constructor

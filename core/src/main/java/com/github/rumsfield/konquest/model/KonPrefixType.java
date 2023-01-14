@@ -99,9 +99,10 @@ public enum KonPrefixType {
 	public static boolean isPrefixName(String name) {
 		boolean result = false;
 		for(KonPrefixType pre : KonPrefixType.values()) {
-			if(pre.getName().equalsIgnoreCase(name)) {
-				result = true;
-			}
+            if (pre.getName().equalsIgnoreCase(name)) {
+                result = true;
+                break;
+            }
 		}
 		return result;
 	}

@@ -1,23 +1,18 @@
 package com.github.rumsfield.konquest.manager;
 
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.KonquestPlugin;
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerExileEvent;
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerKingdomEvent;
+import com.github.rumsfield.konquest.api.manager.KonquestKingdomManager;
 import com.github.rumsfield.konquest.api.model.*;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
+import com.github.rumsfield.konquest.display.icon.OptionIcon.optionAction;
+import com.github.rumsfield.konquest.model.*;
+import com.github.rumsfield.konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
+import com.github.rumsfield.konquest.model.KonPlayerScoreAttributes.KonPlayerScoreAttribute;
+import com.github.rumsfield.konquest.utility.Timer;
+import com.github.rumsfield.konquest.utility.*;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
@@ -29,39 +24,12 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.KonquestPlugin;
-import com.github.rumsfield.konquest.api.event.player.KonquestPlayerExileEvent;
-import com.github.rumsfield.konquest.api.event.player.KonquestPlayerKingdomEvent;
-import com.github.rumsfield.konquest.api.manager.KonquestKingdomManager;
-import com.github.rumsfield.konquest.model.KonUpgrade;
-import com.github.rumsfield.konquest.display.icon.OptionIcon.optionAction;
-import com.github.rumsfield.konquest.model.KonBarDisplayer;
-import com.github.rumsfield.konquest.model.KonCapital;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonKingdomScoreAttributes;
-import com.github.rumsfield.konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
-import com.github.rumsfield.konquest.model.KonLeaderboard;
-import com.github.rumsfield.konquest.model.KonMonumentTemplate;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonPlayerScoreAttributes;
-import com.github.rumsfield.konquest.model.KonPlayerScoreAttributes.KonPlayerScoreAttribute;
-import com.github.rumsfield.konquest.model.KonPlot;
-import com.github.rumsfield.konquest.model.KonPropertyFlag;
-import com.github.rumsfield.konquest.model.KonRuin;
-import com.github.rumsfield.konquest.model.KonSanctuary;
-import com.github.rumsfield.konquest.model.KonStats;
-import com.github.rumsfield.konquest.model.KonStatsType;
-import com.github.rumsfield.konquest.model.KonTerritory;
-import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.LoadingPrinter;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.Timeable;
-import com.github.rumsfield.konquest.utility.Timer;
+import java.awt.*;
+import java.util.List;
+import java.util.*;
 
 public class KingdomManager implements KonquestKingdomManager, Timeable {
 
@@ -89,22 +57,22 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		SANCTIONED,
 		
 		/* Player/territory are in a peaceful kingdom */
-		PEACEFUL;
+		PEACEFUL
 	}
 	
-	private Konquest konquest;
-	private HashMap<String, KonKingdom> kingdomMap;
+	private final Konquest konquest;
+	private final HashMap<String, KonKingdom> kingdomMap;
 	private KonKingdom barbarians;
 	private KonKingdom neutrals;
-	private HashMap<PotionEffectType,Integer> townNerfs;
+	private final HashMap<PotionEffectType,Integer> townNerfs;
 	private Material townCriticalBlock;
 	private int maxCriticalHits;
-	private HashSet<Material> armorBlocks;
+	private final HashSet<Material> armorBlocks;
 	private boolean isArmorBlockWhitelist;
 	private int joinCooldownSeconds;
 	private int exileCooldownSeconds;
-	private HashMap<UUID,Integer> joinPlayerCooldowns;
-	private HashMap<UUID,Integer> exilePlayerCooldowns;
+	private final HashMap<UUID,Integer> joinPlayerCooldowns;
+	private final HashMap<UUID,Integer> exilePlayerCooldowns;
 	
 	private long payIntervalSeconds;
 	private double payPerChunk;
@@ -116,22 +84,22 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private double costCreate;
 	private double costRename;
 	private double costTemplate;
-	private Timer payTimer;
+	private final Timer payTimer;
 	
 	public KingdomManager(Konquest konquest) {
 		this.konquest = konquest;
-		this.kingdomMap = new HashMap<String, KonKingdom>();
+		this.kingdomMap = new HashMap<>();
 		this.barbarians = null;
 		this.neutrals = null;
-		this.townNerfs = new HashMap<PotionEffectType,Integer>();
+		this.townNerfs = new HashMap<>();
 		this.townCriticalBlock = Material.OBSIDIAN;
 		this.maxCriticalHits = 12;
-		this.armorBlocks = new HashSet<Material>();
+		this.armorBlocks = new HashSet<>();
 		this.isArmorBlockWhitelist = false;
 		this.joinCooldownSeconds = 0;
 		this.exileCooldownSeconds = 0;
-		this.joinPlayerCooldowns = new HashMap<UUID,Integer>();
-		this.exilePlayerCooldowns = new HashMap<UUID,Integer>();
+		this.joinPlayerCooldowns = new HashMap<>();
+		this.exilePlayerCooldowns = new HashMap<>();
 		
 		this.payIntervalSeconds = 0;
 		this.payPerChunk = 0;
@@ -177,10 +145,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		costRename = costRename < 0 ? 0 : costRename;
 		costTemplate = costTemplate < 0 ? 0 : costTemplate;
 		costRelation = costRelation < 0 ? 0 : costRelation;
-		payPercentOfficer = payPercentOfficer < 0 ? 0 : payPercentOfficer;
-		payPercentOfficer = payPercentOfficer > 100 ? 100 : payPercentOfficer;
-		payPercentMaster = payPercentMaster < 0 ? 0 : payPercentMaster;
-		payPercentMaster = payPercentMaster > 100 ? 100 : payPercentMaster;
+		payPercentOfficer = Math.max(payPercentOfficer, 0);
+		payPercentOfficer = Math.min(payPercentOfficer, 100);
+		payPercentMaster = Math.max(payPercentMaster, 0);
+		payPercentMaster = Math.min(payPercentMaster, 100);
 		
 		if(payIntervalSeconds > 0) {
 			payTimer.stopTimer();
@@ -216,25 +184,23 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		
 	}
 	
-	/*
-	 * Kingdom payments for members
-	 * Total payment is based on all towns & land.
-	 * Kingdom members only get paid based on the towns & land they are lord of.
-	 * Kingdom officers/master get a bonus = percentage of total payment.
+	/**
+	 * Kingdom payments for members<br>
+	 * Total payment is based on all towns & land.<br>
+	 * Kingdom members only get paid based on the towns & land they are lord of.<br>
+	 * Kingdom officers/master get a bonus = percentage of total payment.<br>
 	 */
 	private void disbursePayments() {
-		HashMap<OfflinePlayer,Double> payments = new HashMap<OfflinePlayer,Double>();
-		HashMap<OfflinePlayer,KonKingdom> memberships = new HashMap<OfflinePlayer,KonKingdom>();
-		HashMap<OfflinePlayer,KonKingdom> masters = new HashMap<OfflinePlayer,KonKingdom>();
-		HashMap<OfflinePlayer,KonKingdom> officers = new HashMap<OfflinePlayer,KonKingdom>();
-		HashMap<KonKingdom,Double> totalPay = new HashMap<KonKingdom,Double>();
+		HashMap<OfflinePlayer,Double> payments = new HashMap<>();
+		HashMap<OfflinePlayer,KonKingdom> masters = new HashMap<>();
+		HashMap<OfflinePlayer,KonKingdom> officers = new HashMap<>();
+		HashMap<KonKingdom,Double> totalPay = new HashMap<>();
 		// Initialize payment table
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			totalPay.put(kingdom, 0.0);
 			for(OfflinePlayer offlinePlayer : kingdom.getPlayerMembers()) {
 				if(offlinePlayer.isOnline()) {
 					payments.put(offlinePlayer, 0.0);
-					memberships.put(offlinePlayer, kingdom);
 					if(kingdom.isMaster(offlinePlayer.getUniqueId())) {
 						masters.put(offlinePlayer,kingdom);
 					} else if(kingdom.isOfficer(offlinePlayer.getUniqueId())) {
@@ -307,7 +273,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Verify proximity to other territories
 		int min_distance_sanc = konquest.getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_SANCTUARY.getPath());
 		int min_distance_town = konquest.getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
-		int searchDistance = 0;
+		int searchDistance;
 		int minDistance = Integer.MAX_VALUE;
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			searchDistance = Konquest.chunkDistance(loc, kingdom.getCapital().getCenterLoc());
@@ -351,7 +317,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		// Verify max distance
 		int maxLimit = konquest.getConfigManager().getConfig("core").getInt(CorePath.TOWNS_MAX_DISTANCE_ALL.getPath(),0);
-		if(minDistance != 0 && maxLimit > 0 && minDistance > maxLimit) {
+		if(maxLimit > 0 && minDistance > maxLimit) {
 			ChatUtil.printDebug("Failed to add town, too far from other towns and capitals");
 			return 3;
 		}
@@ -385,7 +351,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         		//ChatUtil.printDebug("Settle teleport used x0,z0;x1,z1: "+x0+","+z0+";"+x1+","+z1+" and calculated yaw degrees: "+yaw);
         		tpLoc.setYaw(yaw);
         		if(occupant.getBukkitPlayer().isInsideVehicle()) {
-        			ChatUtil.printDebug("Settling occupant player is in a vehicle, type "+occupant.getBukkitPlayer().getVehicle().getType().toString());
+        			ChatUtil.printDebug("Settling occupant player is in a vehicle, type "+ occupant.getBukkitPlayer().getVehicle().getType());
         			Entity vehicle = occupant.getBukkitPlayer().getVehicle();
         			List<Entity> passengers = vehicle.getPassengers();
         			occupant.getBukkitPlayer().leaveVehicle();
@@ -413,18 +379,19 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 */
 	
 	/**
-	 * Creates a new kingdom.
-	 * The new kingdom must perform checks for creating the capital, similar to a new town.
-	 * The isAdmin argument controls whether the kingdom is admin operated (true) or player operated (false).
-	 * When the kingdom is player operated:
-	 * The player must be a barbarian, and is made the master of the kingdom;
-	 * The player must pay favor to create the kingdom.
-	 * The player is made the kingdom master, and lord of the capital.
-	 * When the kingdom is admin operated:
-	 * There is no cost to create, and there is no kingdom master.
+	 * Creates a new kingdom.<br>
+	 * The new kingdom must perform checks for creating the capital, similar to a new town.<br>
+	 * The isAdmin argument controls whether the kingdom is admin operated (true) or player operated (false).<br>
+	 * When the kingdom is player operated:<br>
+	 * The player must be a barbarian, and is made the master of the kingdom;<br>
+	 * The player must pay favor to create the kingdom.<br>
+	 * The player is made the kingdom master, and lord of the capital.<br>
+	 * When the kingdom is admin operated:<br>
+	 * There is no cost to create, and there is no kingdom master.<br>
 	 * 
-	 * @param loc - The center location of the kingdom, used for capital
-	 * @param name - Kingdom name
+	 * @param centerLocation - The center location of the kingdom, used for capital
+	 * @param kingdomName - Kingdom name
+	 * @param templateName - Template name
 	 * @param master - Player who is the kingdom master
 	 * @param isAdmin - Is the kingdom admin operated (true) or player operated (false)
 	 * @return 0	- Success
@@ -663,47 +630,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return 0;
 	}
-	
-	/**
-	 * Changes a kingdom's monument template and updates all towns/capital
-	 * @param kingdomName
-	 * @param template
-	 * @param player
-	 * @param ignoreCost
-	 * @return Status code
-	 * 			0 - Success
-	 * 			1 - Unknown kingdom name
-	 * 			2 - Invalid template
-	 * 			3 - Not enough favor
-	 */
-	/*
-	public int changeKingdomTemplate(String kingdomName, KonMonumentTemplate template, KonPlayer player, boolean ignoreCost) {
-		//TODO: Fix duplicate method? menuChangeKingdomTemplate
-		// Verify kingdom exists
-		if(!isKingdom(kingdomName)) {
-			return 1;
-		}
-		// Verify template is valid
-		if(template == null || !template.isValid()) {
-			return 2;
-		}
-		Player bukkitPlayer = player.getBukkitPlayer();
-		// Check cost
-		if(!ignoreCost && costTemplate > 0 && KonquestPlugin.getBalance(bukkitPlayer) < costTemplate) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costTemplate));
-            return 3;
-    	}
-		// Update template
-		KonKingdom kingdom = getKingdom(kingdomName);
-		kingdom.updateMonumentTemplate(template);
-		// Withdraw cost
-		if(!ignoreCost && costTemplate > 0 && KonquestPlugin.withdrawPlayer(bukkitPlayer, costTemplate)) {
-            konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costTemplate);
-		}
-		return 0;
-	}
-	*/
-	
+
 	/*
 	 * =================================================
 	 * Player Assignment Methods
@@ -736,7 +663,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * Assign a player to a kingdom and teleport them to the capital spawn point.
 	 * Optionally checks for join permissions based on Konquest configuration.
 	 * Optionally enforces maximum kingdom membership difference based on Konquest configuration.
-	 * Applies join cooldown.
+	 * Applies join cool-down.
 	 * 
 	 * @param id The player to assign, by UUID
 	 * @param kingdomName The kingdom name, case-sensitive
@@ -750,7 +677,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 *  			5 	- joining is denied, player is already member
 	 *  			6	- joining is denied, player is a kingdom master
 	 *  			7	- joining is denied, failed switch criteria
-	 *  			8   - joining is denied, cooldown
+	 *  			8   - joining is denied, cool-down
 	 *  			9 	- Unknown player ID
 	 *             -1 	- internal error
 	 */
@@ -775,16 +702,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		 * 		Removes old town residencies and updates territory bars
 		 * 		Updates name packets for the player
 		 * 		Updates dynmap label for old & new capitals
-		 * 		Updates smallest kingdom
+		 * 		Updates the smallest kingdom
 		 * 		Updates offline protections
 		 * 		Updates border particles for player
 		 * 		
 		 */
     	
 		// Verify kingdom exists
-		if(!isKingdom(kingdomName)) {
-			return 1;
-		}
+		if(!isKingdom(kingdomName)) return 1;
 		// Determine offline/online player
 		// When an online player is found, modify their KonPlayer object.
 		// When an offline player is found, update their KonOfflinePlayer object and push to the database.
@@ -822,7 +747,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					return 6;
 				}
 			}
-			// Check for cooldown
+			// Check for cool-down
     		if(isOnline && isPlayerJoinCooldown(onlinePlayer.getBukkitPlayer())) {
     			return 8;
     		}
@@ -844,12 +769,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			int smallestKingdomPlayerCount = 0;
 			int targetKingdomPlayerCount = 0;
 			if(config_max_player_diff != 0) {
-				// Find smallest kingdom, compare player count to this kingdom's
+				// Find the smallest kingdom, compare player count to this kingdom's
 				String smallestKingdomName = getSmallestKingdomName();
 				smallestKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(smallestKingdomName).size();
 				targetKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(kingdomName).size();
 			}
-			if(config_max_player_diff != 0 && !(config_max_player_diff != 0 && targetKingdomPlayerCount < (smallestKingdomPlayerCount+config_max_player_diff))) {
+			if(config_max_player_diff != 0 && !(targetKingdomPlayerCount < smallestKingdomPlayerCount + config_max_player_diff)) {
 				return 2;
 			}
 			// Fire event (online only)
@@ -867,26 +792,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		
 		// Remove any barbarian camps
 		konquest.getCampManager().removeCamp(id.toString());
-		
-		// This is probably unnecessary, the KonKingdom#removeMember method removes residencies of that kingdom.
-		// As long as we do out proper bookkeeping, the player should have no other residencies in other kingdoms.
-		/*
-		// Remove player from any enemy towns (both online & offline)
-		OfflinePlayer townPlayer = isOnline ? onlinePlayer.getOfflineBukkitPlayer() : offlinePlayer.getOfflineBukkitPlayer();
-		for(KonKingdom kingdom : kingdomMap.values()) {
-			if(!kingdom.equals(joinKingdom)) {
-				for(KonTown town : kingdom.getTowns()) {
-		    		if(town.removePlayerResident(townPlayer)) {
-		    			konquest.getMapHandler().drawDynmapLabel(town);
-		    			if(isOnline) {
-		    				ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), MessagePath.COMMAND_EXILE_NOTICE_TOWN.getMessage(town.getName()));
-		    			}
-		    		}
-		    	}
-			}
-		}
-		*/
-		
+
 		// Only perform membership updates on created kingdoms
 		if(playerKingdom.isCreated()) {
 			// Remove membership from old kingdom
@@ -906,7 +812,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				}
 	    	} else {
 	    		// Something went very wrong, the prior checks should have avoided this
-	    		ChatUtil.printDebug("Failed to remove member "+id.toString()+" from kingdom "+playerKingdom.getName());
+	    		ChatUtil.printDebug("Failed to remove member "+ id +" from kingdom "+playerKingdom.getName());
 	    		return -1;
 	    	}
 		}
@@ -914,7 +820,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Add membership to new kingdom
     	boolean memberStatus = joinKingdom.addMember(id, false);
     	if(!memberStatus) {
-    		ChatUtil.printDebug("Failed to add member "+id.toString()+" to kingdom "+joinKingdom.getName());
+    		ChatUtil.printDebug("Failed to add member "+ id +" to kingdom "+joinKingdom.getName());
     		return -1;
     	}
     	
@@ -922,11 +828,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		onlinePlayer.setKingdom(joinKingdom);
     		onlinePlayer.setExileKingdom(joinKingdom);
     		onlinePlayer.setBarbarian(false);
-        	// Teleport to capital
-        	//Location spawn = joinKingdom.getCapital().getSpawnLoc();
-        	//konquest.telePlayerLocation(onlinePlayer.getBukkitPlayer(), spawn);
-        	//onlinePlayer.getBukkitPlayer().setBedSpawnLocation(spawn, true);
-    		//joinKingdom.getCapital().addBarPlayer(onlinePlayer);
     		// Refresh any territory bars
     		KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(onlinePlayer.getBukkitPlayer().getLocation());
     		if(territory != null && territory instanceof KonBarDisplayer) {
@@ -937,7 +838,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         	updateKingdomOfflineProtection();
         	konquest.updateNamePackets(onlinePlayer);
         	konquest.getTerritoryManager().updatePlayerBorderParticles(onlinePlayer);
-        	// Apply cooldown
+        	// Apply cool-down
         	if(!force) {
         		applyPlayerJoinCooldown(onlinePlayer.getBukkitPlayer());
         	}
@@ -961,9 +862,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * (Optionally) Removes all stats and disables prefix.
 	 * (Optionally) Removes all favor.
 	 * (Optionally) Resets their exileKingdom to Barbarians, making them look like a new player to Konquest.
-	 * Applies exile cooldown timer.
+	 * Applies exile cool-down timer.
 	 * 
-	 * @param player The player to exile
+	 * @param id The UUID of the player who is being exiled
 	 * @param teleport Teleport the player based on Konquest configuration when true
 	 * @param clearStats Remove all player stats and prefix when true
 	 * @param isFull Perform a full exile such that the player has no exile kingdom, like they just joined the server
@@ -975,7 +876,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * 				3	- Failed to find valid teleport location
 	 * 				4	- cancelled by event
 	 * 				6	- Exile denied, player is a kingdom master
-	 * 				8   - Cooldown remaining
+	 * 				8   - Cool-down remaining
 	 * 				9   - Unknown player ID
 	 *             -1 	- internal error
 	 */
@@ -1015,7 +916,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					return 6;
 				}
 			}
-			// Check for cooldown
+			// Check for cool-down
 			if(isOnline && isPlayerExileCooldown(onlinePlayer.getBukkitPlayer())) {
 				return 8;
 			}
@@ -1110,14 +1011,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		onlinePlayer.setBarbarian(true);
     		// Refresh any territory bars
     		KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(onlinePlayer.getBukkitPlayer().getLocation());
-    		if(territory != null && territory instanceof KonBarDisplayer) {
+    		if(territory instanceof KonBarDisplayer) {
     			((KonBarDisplayer)territory).removeBarPlayer(onlinePlayer);
     			((KonBarDisplayer)territory).addBarPlayer(onlinePlayer);
     		}
     		// Updates
     		konquest.updateNamePackets(onlinePlayer);
     		konquest.getTerritoryManager().updatePlayerBorderParticles(onlinePlayer);
-    		// Cooldown
+    		// Cool-down
     		if(!force) {
     			applyPlayerExileCooldown(onlinePlayer.getBukkitPlayer());
     		}
@@ -1210,30 +1111,29 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		UUID id = player.getUniqueId();
 		
-		if(kingdom.isJoinRequestValid(id)) {
-			if(resp) {
-				// Ensure the player is not already a kingdom member
-				if(kingdom.isMember(id)) {
-					return false;
-				}
-				// Approved join request, add player as member
-				int status = assignPlayerKingdom(id,kingdom.getName(),false);
-				if(status != 0) {
-					return false;
-				}
-				
-				if(player.isOnline()) {
-					ChatUtil.sendNotice((Player)player, MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(kingdom.getName()));
-				}
-			} else {
-				// Denied join request
-				if(player.isOnline()) {
-					ChatUtil.sendError((Player)player, MessagePath.COMMAND_GUILD_ERROR_JOIN_DENY.getMessage(kingdom.getName()));
-				}
+		if(!kingdom.isJoinRequestValid(id)) return true;
+		if(resp) {
+			// Ensure the player is not already a kingdom member
+			if(kingdom.isMember(id)) {
+				return false;
 			}
-			kingdom.removeJoinRequest(id);
+			// Approved join request, add player as member
+			int status = assignPlayerKingdom(id,kingdom.getName(),false);
+			if(status != 0) {
+				return false;
+			}
+
+			if(player.isOnline()) {
+				ChatUtil.sendNotice((Player)player, MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(kingdom.getName()));
+			}
+		} else {
+			// Denied join request
+			if(player.isOnline()) {
+				ChatUtil.sendError((Player)player, MessagePath.COMMAND_GUILD_ERROR_JOIN_DENY.getMessage(kingdom.getName()));
+			}
 		}
-		
+		kingdom.removeJoinRequest(id);
+
 		return true;
 	}
 	
@@ -1257,14 +1157,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		UUID id = player.getUniqueId();
 		
 		// Cannot invite a member of this kingdom
-		if(kingdom.isMember(id)) {
-			return 1;
-		}
+		if(kingdom.isMember(id)) return 1;
 		
 		// Cannot invite members to an open kingdom
-		if(kingdom.isOpen()) {
-			return 3;
-		}
+		if(kingdom.isOpen()) return 3;
 		
 		if(kingdom.isJoinRequestValid(id)) {
 			// There is already a valid request, add the player to the kingdom
@@ -1301,51 +1197,45 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @param resp - True to accept and join kingdom, false to decline invite
 	 */
 	public boolean menuRespondKingdomInvite(KonPlayer player, KonKingdom kingdom, boolean resp) {
-		if(kingdom == null) {
-			return false;
-		}
+		if(kingdom == null) return false;
 		UUID id = player.getBukkitPlayer().getUniqueId();
 		
 		// Cannot accept invite from a member of this kingdom
-		if(kingdom.isMember(id)) {
+		if(kingdom.isMember(id)) return false;
+		
+		if(!kingdom.isJoinInviteValid(id)) return false;
+		if(!resp){
+			// Denied join request
+			kingdom.removeJoinRequest(id);
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_INVITE_DECLINE.getMessage(kingdom.getName()));
 			return false;
 		}
-		
-		if(kingdom.isJoinInviteValid(id)) {
-			if(resp) {
-				int status = assignPlayerKingdom(id,kingdom.getName(),false);
-				if(status != 0) {
-					Konquest.playFailSound(player.getBukkitPlayer());
-					return false;
-				}
-				
-				kingdom.removeJoinRequest(id);
-				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(kingdom.getName()));
-				Konquest.playSuccessSound(player.getBukkitPlayer());
-				return true;
-			} else {
-				// Denied join request
-				kingdom.removeJoinRequest(id);
-				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_INVITE_DECLINE.getMessage(kingdom.getName()));
-			}
+
+		int status = assignPlayerKingdom(id,kingdom.getName(),false);
+		if(status != 0) {
+			Konquest.playFailSound(player.getBukkitPlayer());
+			return false;
 		}
-		
-		return false;
+
+		kingdom.removeJoinRequest(id);
+		ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_JOINED.getMessage(kingdom.getName()));
+		Konquest.playSuccessSound(player.getBukkitPlayer());
+		return true;
+
 	}
 	
 	// Effectively just a wrapper for exile for online players by their choice
 	public void menuExileKingdom(KonPlayer player, KonKingdom kingdom) {
-		if(kingdom != null && kingdom.isCreated()) {
-			UUID id = player.getBukkitPlayer().getUniqueId();
-			int status = exilePlayerBarbarian(id,true,true,false,false);
-			if(status == 0) {
-				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_LEAVE.getMessage(kingdom.getName()));
-				Konquest.playSuccessSound(player.getBukkitPlayer());
-			} else {
-				//TODO: Expand error messaging for each return code of exilePlayerBarbarian
-				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_LEAVE_FAIL.getMessage());
-				Konquest.playFailSound(player.getBukkitPlayer());
-			}
+		if(kingdom == null || !kingdom.isCreated())return;
+		UUID id = player.getBukkitPlayer().getUniqueId();
+		int status = exilePlayerBarbarian(id,true,true,false,false);
+		if(status == 0) {
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_LEAVE.getMessage(kingdom.getName()));
+			Konquest.playSuccessSound(player.getBukkitPlayer());
+		} else {
+			//TODO: Expand error messaging for each return code of exilePlayerBarbarian
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_LEAVE_FAIL.getMessage());
+			Konquest.playFailSound(player.getBukkitPlayer());
 		}
 	}
 	
@@ -1353,75 +1243,69 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	// Used by officers to remove players from their kingdom
 	public boolean kickKingdomMember(OfflinePlayer player, KonKingdom kingdom) {
 		boolean result = false;
-		if(kingdom != null && kingdom.isCreated()) {
-			UUID id = player.getUniqueId();
-			int status = exilePlayerBarbarian(id,true,true,false,false);
-			if(status == 0) {
-				result = true;
-			}
-			//TODO: expand messaging or return more error codes
+		if(kingdom == null || !kingdom.isCreated())return result;
+
+		UUID id = player.getUniqueId();
+		int status = exilePlayerBarbarian(id,true,true,false,false);
+		if(status == 0) {
+			result = true;
 		}
+		//TODO: expand messaging or return more error codes
+
 		return result;
 	}
 	
 	/**
-	 * Removes a kingdom member and handles master transfers.
-	 * This is mainly used for forcibly removing players from kingdoms, like for offline pruning.
-	 * If player is master, attempts to transfer master to officers first, then members.
-	 * If no other members than master, removes the kingdom.
-	 * 
-	 * When there are other members, this method returns with the player removed from kingdom membership,
-	 * but the player's kingdom fields are unchanged.
+	 * Removes a kingdom member and handles master transfers.<br>
+	 * This is mainly used for forcibly removing players from kingdoms, like for offline pruning.<br>
+	 * If player is master, attempts to transfer master to officers first, then members.<br>
+	 * If no other members than master, removes the kingdom.<br>
+	 * <br>
+	 * When there are other members, this method returns with the player removed from kingdom membership,<br>
+	 * but the player's kingdom fields are unchanged.<br>
 	 * When there are no other members, the kingdom is removed and the player's kingdom fields
 	 * are modified to be barbarian.
 	 * 
-	 * @param player
-	 * @param kingdom
+	 * @param id - The UUID of the player to remove
+	 * @param kingdom - the kingdom to remove the player from
 	 */
 	private boolean removeKingdomMemberForced(UUID id, KonKingdom kingdom) {
 		boolean result = false;
-		if(kingdom != null && kingdom.isCreated()) {
-			// Attempt to handle master transfer
-			if(kingdom.isMaster(id)) {
-				// Player is master, transfer if possible
-				List<OfflinePlayer> officers = kingdom.getPlayerOfficersOnly();
-				if(!officers.isEmpty()) {
-					// Make the first officer into the master
-					kingdom.setMaster(officers.get(0).getUniqueId());
+		if(kingdom == null || !kingdom.isCreated())return result;
+		// Attempt to handle master transfer
+		if(kingdom.isMaster(id)) {
+			// Player is master, transfer if possible
+			List<OfflinePlayer> officers = kingdom.getPlayerOfficersOnly();
+			if(!officers.isEmpty()) {
+				// Make the first officer into the master
+				kingdom.setMaster(officers.get(0).getUniqueId());
+				// Now remove the player
+				result = kingdom.removeMember(id);
+			} else {
+				// There are no officers
+				List<OfflinePlayer> members = kingdom.getPlayerMembersOnly();
+				if(!members.isEmpty()) {
+					// Make the first member into the master
+					kingdom.setMaster(members.get(0).getUniqueId());
 					// Now remove the player
 					result = kingdom.removeMember(id);
 				} else {
-					// There are no officers
-					List<OfflinePlayer> members = kingdom.getPlayerMembersOnly();
-					if(!members.isEmpty()) {
-						// Make the first member into the master
-						kingdom.setMaster(members.get(0).getUniqueId());
-						// Now remove the player
-						result = kingdom.removeMember(id);
-					} else {
-						// There are no members to transfer master to, remove the kingdom
-						// This will also exile all players to barbarians, including the given ID
-						String name = kingdom.getName();
-						result = removeKingdom(name);
-					}
+					// There are no members to transfer master to, remove the kingdom
+					// This will also exile all players to barbarians, including the given ID
+					String name = kingdom.getName();
+					result = removeKingdom(name);
 				}
-			} else {
-				// Player is not the master, remove
-				result = kingdom.removeMember(id);
 			}
+		} else {
+			// Player is not the master, remove
+			result = kingdom.removeMember(id);
 		}
+
 		return result;
 	}
 	
-	/* Unused?
-	private boolean addKingdomMember(OfflinePlayer player, KonKingdom kingdom, boolean isOfficer) {
-		UUID id = player.getUniqueId();
-		return kingdom.addMember(id, isOfficer);
-	}
-	*/
-	
 	public List<KonKingdom> getInviteKingdoms(KonPlayer player) {
-		List<KonKingdom> result = new ArrayList<KonKingdom>();
+		List<KonKingdom> result = new ArrayList<>();
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			if(!player.getKingdom().equals(kingdom) && kingdom.isJoinInviteValid(player.getBukkitPlayer().getUniqueId())) {
 				result.add(kingdom);
@@ -1431,87 +1315,82 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	public boolean menuPromoteOfficer(OfflinePlayer player, KonKingdom kingdom) {
-		boolean result = false;
 		UUID id = player.getUniqueId();
-		if(!kingdom.isOfficer(id)) {
-			if(kingdom.setOfficer(id, true)) {
-				broadcastMembers(kingdom,MessagePath.COMMAND_GUILD_BROADCAST_PROMOTE.getMessage(player.getName(),kingdom.getName()));
-				result = true;
-			}
+		if(kingdom.isOfficer(id))return false;
+
+		if(kingdom.setOfficer(id, true)) {
+			broadcastMembers(kingdom,MessagePath.COMMAND_GUILD_BROADCAST_PROMOTE.getMessage(player.getName(),kingdom.getName()));
+			return true;
 		}
-		return result;
+
+		return false;
 	}
 	
 	public boolean menuDemoteOfficer(OfflinePlayer player, KonKingdom kingdom) {
-		boolean result = false;
 		UUID id = player.getUniqueId();
-		if(kingdom.isOfficer(id)) {
-			if(kingdom.setOfficer(id, false)) {
-				broadcastMembers(kingdom,MessagePath.COMMAND_GUILD_BROADCAST_DEMOTE.getMessage(player.getName(),kingdom.getName()));
-				result = true;
-			}
+		if(!kingdom.isOfficer(id))return false;
+
+		if(kingdom.setOfficer(id, false)) {
+			broadcastMembers(kingdom,MessagePath.COMMAND_GUILD_BROADCAST_DEMOTE.getMessage(player.getName(),kingdom.getName()));
+			return true;
 		}
-		return result;
+
+		return false;
 	}
 	
 	public void menuTransferMaster(OfflinePlayer master, KonKingdom kingdom, KonPlayer sender) {
 		UUID id = master.getUniqueId();
-		if(kingdom.isMember(id)) {
-			if(kingdom.setMaster(id)) {
-				broadcastMembers(kingdom,MessagePath.COMMAND_GUILD_BROADCAST_TRANSFER.getMessage(master.getName(),kingdom.getName()));
-				Konquest.playSuccessSound(sender.getBukkitPlayer());
-				return;
-			}
+		if(!kingdom.isMember(id) || !kingdom.isMaster(id)){
+			Konquest.playFailSound(sender.getBukkitPlayer());
+			return;
 		}
-		Konquest.playFailSound(sender.getBukkitPlayer());
+		broadcastMembers(kingdom,MessagePath.COMMAND_GUILD_BROADCAST_TRANSFER.getMessage(master.getName(),kingdom.getName()));
+		Konquest.playSuccessSound(sender.getBukkitPlayer());
+		return;
 	}
 	
 	private void broadcastMembers(KonKingdom kingdom, String message) {
-		if(kingdom != null) {
-			for(OfflinePlayer offlinePlayer : kingdom.getPlayerMembers()) {
-				if(offlinePlayer.isOnline()) {
-					Player player = (Player)offlinePlayer;
-					ChatUtil.sendNotice(player, message);
-				}
+		if(kingdom == null)return;
+		for(OfflinePlayer offlinePlayer : kingdom.getPlayerMembers()) {
+			if(offlinePlayer.isOnline()) {
+				Player player = (Player)offlinePlayer;
+				ChatUtil.sendNotice(player, message);
 			}
 		}
 	}
 	
 	private void broadcastOfficers(KonKingdom kingdom, String message) {
-		if(kingdom != null) {
-			for(OfflinePlayer offlinePlayer : kingdom.getPlayerOfficers()) {
-				if(offlinePlayer.isOnline()) {
-					Player player = (Player)offlinePlayer;
-					ChatUtil.sendNotice(player, message);
-				}
+		if(kingdom == null) return;
+		for(OfflinePlayer offlinePlayer : kingdom.getPlayerOfficers()) {
+			if(offlinePlayer.isOnline()) {
+				Player player = (Player)offlinePlayer;
+				ChatUtil.sendNotice(player, message);
 			}
 		}
 	}
 	
 	//TODO: Update messages from guild to kingdom
 	public void menuToggleKingdomOpen(KonKingdom kingdom, KonPlayer player) {
-		if(kingdom != null && kingdom.isCreated()) {
-			if(kingdom.isOpen()) {
-				kingdom.setIsOpen(false);
-				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_CLOSED.getMessage(kingdom.getName()));
-			} else {
-				kingdom.setIsOpen(true);
-				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_OPEN.getMessage(kingdom.getName()));
-			}
+		if(kingdom == null || !kingdom.isCreated())return;
+		if(kingdom.isOpen()) {
+			kingdom.setIsOpen(false);
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_CLOSED.getMessage(kingdom.getName()));
+		} else {
+			kingdom.setIsOpen(true);
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_OPEN.getMessage(kingdom.getName()));
 		}
 	}
 	
 	public void menuDisbandKingdom(KonKingdom kingdom, KonPlayer player) {
-		if(kingdom != null && kingdom.isCreated()) {
-			boolean status = removeKingdom(kingdom.getName());
-			if(status) {
-				//TODO: update message path
-				ChatUtil.sendNotice(player.getBukkitPlayer(), "Disbanded kingdom");
-				Konquest.playSuccessSound(player.getBukkitPlayer());
-			} else {
-				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-				Konquest.playFailSound(player.getBukkitPlayer());
-			}
+		if(kingdom == null || !kingdom.isCreated())return;
+		boolean status = removeKingdom(kingdom.getName());
+		if(status) {
+			//TODO: update message path
+			ChatUtil.sendNotice(player.getBukkitPlayer(), "Disbanded kingdom");
+			Konquest.playSuccessSound(player.getBukkitPlayer());
+		} else {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			Konquest.playFailSound(player.getBukkitPlayer());
 		}
 	}
 	
@@ -1543,7 +1422,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		
 		ChatUtil.sendNotice(player.getBukkitPlayer(), "Updated tempalte to "+template.getName());
 		Konquest.playSuccessSound(player.getBukkitPlayer());
-		return;
 	}
 	
 	
@@ -1598,11 +1476,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 */
 	 
 	//TODO: menu messaging
-	public boolean menuChangeKingdomRelation(KonKingdom kingdom, KonKingdom otherKingdom, KonquestRelationship relation, KonPlayer player, boolean isAdmin) {
+	public boolean menuChangeKingdomRelation(@Nullable KonKingdom kingdom,@Nullable  KonKingdom otherKingdom,@NotNull KonquestRelationship relation,@NotNull KonPlayer player, boolean isAdmin) {
 		
-		if(kingdom == null || otherKingdom == null) {
-			return false;
-		}
+		if(kingdom == null || otherKingdom == null) return false;
 		
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Check cost
@@ -1624,7 +1500,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		
 		ChatUtil.printDebug("Changing kingdom "+kingdom.getName()+" relation to "+otherKingdom.getName()+", "+relation.toString());
-		ChatUtil.printDebug("Our relationship is currently "+ourRelation.toString());
+		ChatUtil.printDebug("Our relationship is currently "+ ourRelation);
 		ChatUtil.printDebug("Their relationship is currently "+theirRelation.toString());
 		
 		boolean isInstantWar = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_INSTANT_WAR.getPath(), false);
@@ -1698,7 +1574,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		} else if(relation.equals(KonquestRelationship.ALLIED)) {
 			// Attempt to form an alliance
 			if(!ourRelation.equals(KonquestRelationship.ENEMY)) {
-				// Cannot ally enemies
+				// Cannot allay enemies
 				// Check if they already request allied
 				if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(relation)) {
 					// Both sides request allied, change to active alliance
@@ -1728,34 +1604,22 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return true;
 	}
 	
-	public boolean isValidRelationChoice(KonKingdom kingdom1, KonKingdom kingdom2, KonquestRelationship relation) {
+	public boolean isValidRelationChoice(@NotNull KonKingdom kingdom1,@NotNull  KonKingdom kingdom2,@NotNull KonquestRelationship relation) {
 		boolean result = false;
 		KonquestRelationship ourRelation = kingdom1.getActiveRelation(kingdom2);
 		// Relationship choice logic
 		switch(relation) {
 			case PEACE:
+			case ENEMY:
+				// Can always choose enemy
 				// Can always choose peace
 				result = true;
 				break;
 			case SANCTIONED:
-				if(ourRelation.equals(KonquestRelationship.ENEMY)) {
-					// Cannot sanction enemies
-					result = false;
-				} else {
-					result = true;
-				}
-				break;
-			case ENEMY:
-				// Can always choose enemy
-				result = true;
-				break;
 			case ALLIED:
-				if(ourRelation.equals(KonquestRelationship.ENEMY)) {
-					// Cannot ally enemies
-					result = false;
-				} else {
-					result = true;
-				}
+				// Cannot ally enemies
+				// Cannot sanction enemies
+				result = !ourRelation.equals(KonquestRelationship.ENEMY);
 				break;
 			default:
 				break;
@@ -1766,42 +1630,42 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return result;
 	}
 	
-	private void setJointActiveRelation(KonKingdom kingdom1, KonKingdom kingdom2, KonquestRelationship relation) {
+	private void setJointActiveRelation(@NotNull KonKingdom kingdom1,@NotNull KonKingdom kingdom2,@NotNull KonquestRelationship relation) {
 		kingdom1.setActiveRelation(kingdom2, relation);
 		kingdom1.setRelationRequest(kingdom2, relation);
 		kingdom2.setActiveRelation(kingdom1, relation);
 		kingdom2.setRelationRequest(kingdom1, relation);
 	}
 	
-	private void removeJointActiveRelation(KonKingdom kingdom1, KonKingdom kingdom2) {
+	private void removeJointActiveRelation(@NotNull KonKingdom kingdom1,@NotNull KonKingdom kingdom2) {
 		kingdom1.removeActiveRelation(kingdom2);
 		kingdom1.removeRelationRequest(kingdom2);
 		kingdom2.removeActiveRelation(kingdom1);
 		kingdom2.removeRelationRequest(kingdom1);
 	}
 	
-	public boolean isBothKingdomsEnemy(KonquestKingdom kingdom1, KonquestKingdom kingdom2) {
+	public boolean isBothKingdomsEnemy(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
 		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.ENEMY) && kingdom2.getActiveRelation(kingdom1).equals(KonquestRelationship.ENEMY);
 	}
 	
-	public boolean isBothKingdomsAllied(KonquestKingdom kingdom1, KonquestKingdom kingdom2) {
+	public boolean isBothKingdomsAllied(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
 		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.ALLIED) && kingdom2.getActiveRelation(kingdom1).equals(KonquestRelationship.ALLIED);
 	}
 	
-	public boolean isKingdomSanctioned(KonquestKingdom kingdom1, KonquestKingdom kingdom2) {
+	public boolean isKingdomSanctioned(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
 		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.SANCTIONED);
 	}
 	
-	public boolean isKingdomPeaceful(KonquestKingdom kingdom1, KonquestKingdom kingdom2) {
+	public boolean isKingdomPeaceful(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
 		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.PEACE);
 	}
 	
-	public RelationRole getRelationRole(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
+	public RelationRole getRelationRole(@Nullable KonquestKingdom displayKingdom,@Nullable KonquestKingdom contextKingdom) {
     	if(displayKingdom == null || contextKingdom == null) {
     		ChatUtil.printDebug("Failed to evaluate relation of null kingdom");
     		return RelationRole.NEUTRAL;
     	}
-		RelationRole result = RelationRole.NEUTRAL;
+		RelationRole result;
     	if(contextKingdom.equals(getBarbarians())) {
     		result = RelationRole.BARBARIAN;
 		} else if(contextKingdom.equals(getNeutrals())) {
@@ -1828,15 +1692,15 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     	return result;
     }
     
-    public boolean isPlayerEnemy(KonOfflinePlayer offlinePlayer, KonKingdom kingdom) {
+    public boolean isPlayerEnemy(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
     	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.ENEMY);
     }
     
-    public boolean isPlayerFriendly(KonOfflinePlayer offlinePlayer, KonKingdom kingdom) {
+    public boolean isPlayerFriendly(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
     	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.FRIENDLY);
     }
     
-    public boolean isPlayerBarbarian(KonOfflinePlayer offlinePlayer, KonKingdom kingdom) {
+    public boolean isPlayerBarbarian(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
     	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.BARBARIAN);
     }
     
@@ -1869,7 +1733,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * 		   15 - error, town init fail, too much water below town
 	 * 		   16 - error, town init fail, containers below monument
 	 */
-	public int createTown(Location loc, String name, String kingdomName) {
+	public int createTown(@NotNull Location loc, String name, String kingdomName) {
 		ChatUtil.printDebug("Attempting to add new town "+name+" for kingdom "+kingdomName);
 		
 		// Verify name
@@ -1943,75 +1807,63 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	/**
 	 * Primary method for removing a town
-	 * @param name
-	 * @param kingdomName
-	 * @return
+	 * @param name - name of town
+	 * @param kingdomName - name of kingdom that the town belongs to
+	 * @return true on success, false on failure
 	 */
 	public boolean removeTown(String name, String kingdomName) {
-		if(isKingdom(kingdomName) && getKingdom(kingdomName).hasTown(name)) {
-			KonKingdom kingdom = getKingdom(kingdomName);
-			KonTown town = kingdom.getTown(name);
-			ArrayList<Point> townPoints = new ArrayList<Point>();
-			townPoints.addAll(town.getChunkList().keySet());
-			clearAllTownNerfs(town);
-			clearAllTownHearts(town);
-			town.removeAllBarPlayers();
-			if(kingdom.removeTown(name)) {
-				// When a town is removed successfully, update the chunk cache
-				//updateTerritoryCache();
-				konquest.getTerritoryManager().removeAllTerritory(town.getWorld(),townPoints);
-				konquest.getMapHandler().drawDynmapRemoveTerritory(town);
-				konquest.getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
-				konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(townPoints,town.getWorld());
-				return true;
-			}
-		}
-		return false;
+		if(!isKingdom(kingdomName) || !getKingdom(kingdomName).hasTown(name))return false;
+		KonKingdom kingdom = getKingdom(kingdomName);
+		KonTown town = kingdom.getTown(name);
+		ArrayList<Point> townPoints = new ArrayList<>(town.getChunkList().keySet());
+		clearAllTownNerfs(town);
+		clearAllTownHearts(town);
+		town.removeAllBarPlayers();
+		if(!kingdom.removeTown(name)) return false;
+		// When a town is removed successfully, update the chunk cache
+		//updateTerritoryCache();
+		konquest.getTerritoryManager().removeAllTerritory(town.getWorld(),townPoints);
+		konquest.getMapHandler().drawDynmapRemoveTerritory(town);
+		konquest.getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
+		konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(townPoints,town.getWorld());
+		return true;
 	}
 	
 	
 	/**
 	 * Primary method for renaming a town
-	 * @param oldName
-	 * @param newName
-	 * @param kingdomName
-	 * @return
+	 * @param oldName - old name of town
+	 * @param newName - new name of town
+	 * @param kingdomName - name of kingdom town belongs to
+	 * @return true on success, false on failure
 	 */
 	public boolean renameTown(String oldName, String newName, String kingdomName) {
-		if(isKingdom(kingdomName) && getKingdom(kingdomName).hasTown(oldName)) {
-			KonKingdom kingdom = getKingdom(kingdomName);
-			konquest.getMapHandler().drawDynmapRemoveTerritory(kingdom.getTown(oldName));
-			boolean success = kingdom.renameTown(oldName, newName);
-			if (success) {
-				KonTown town = kingdom.getTown(newName);
-				if (town != null) {
-					konquest.getMapHandler().drawDynmapUpdateTerritory(town);
-				}
-				return true;
-			}
+		if(!isKingdom(kingdomName) || !getKingdom(kingdomName).hasTown(oldName))return false;
+		KonKingdom kingdom = getKingdom(kingdomName);
+		konquest.getMapHandler().drawDynmapRemoveTerritory(kingdom.getTown(oldName));
+		boolean success = kingdom.renameTown(oldName, newName);
+		if(!success) return false;
+		KonTown town = kingdom.getTown(newName);
+		if (town != null) {
+			konquest.getMapHandler().drawDynmapUpdateTerritory(town);
 		}
-		return false;
+		return true;
 	}
 	
 	/**
 	 * Primary method for transferring ownership of a town between kingdoms
 	 * @param name - Town name
 	 * @param oldKingdomName - Kingdom name of conquered Town
-	 * @param conquerPlayer - Player who initiated the conquering
+	 * @param conquerPlayerArg - Player who initiated the conquering
 	 * @return the captured town
 	 */
-	public KonquestTown captureTownForPlayer(String name, String oldKingdomName, KonquestPlayer conquerPlayerArg) {
-		if(conquerPlayerArg == null) {
-			return null;
-		}
-		if(!(conquerPlayerArg instanceof KonPlayer)) {
-			return null;
-		}
+	@Nullable
+	public KonquestTown captureTownForPlayer(String name, String oldKingdomName,@Nullable KonquestPlayer conquerPlayerArg) {
+		if(conquerPlayerArg == null) return null;
+		if(!(conquerPlayerArg instanceof KonPlayer)) return null;
 		KonPlayer conquerPlayer = (KonPlayer)conquerPlayerArg;
 		
-		if(conquerPlayer.isBarbarian()) {
-			return null;
-		}
+		if(conquerPlayer.isBarbarian()) return null;
 		KonTown town = captureTown(name, oldKingdomName, conquerPlayer.getKingdom());
 		if(town != null) {
 			town.setPlayerLord(conquerPlayer.getOfflineBukkitPlayer());
@@ -2019,8 +1871,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return null;
 	}
-	
-	public KonTown captureTown(String name, String oldKingdomName, KonKingdom conquerKingdom) {
+
+	@Nullable
+	public KonTown captureTown(String name, String oldKingdomName,@NotNull KonKingdom conquerKingdom) {
 		if(!conquerKingdom.isMonumentTemplateValid()) {
 			ChatUtil.printDebug("Failed to capture town for kingdom with invalid template: "+conquerKingdom.getName());
 			return null;
@@ -2054,10 +1907,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	/**
 	 * Primary method for transferring ownership of a capital between kingdoms
 	 * @param oldKingdomName - Kingdom name of conquered Town
-	 * @param conquerPlayer - Player who initiated the conquering
-	 * @return true if all names exist, else false
+	 * @param conquerPlayerArg - Player who initiated the conquering
+	 * @return KonquestTown if all names exist, else null
 	 */
-	public KonquestTown captureCapitalForPlayer(String oldKingdomName, KonquestPlayer conquerPlayerArg) {
+	@Nullable
+	public KonquestTown captureCapitalForPlayer(String oldKingdomName,@Nullable KonquestPlayer conquerPlayerArg) {
 		if(conquerPlayerArg == null) {
 			return null;
 		}
@@ -2076,8 +1930,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return null;
 	}
-	
-	public KonTown captureCapital(String oldKingdomName, KonKingdom conquerKingdom) {
+
+	@Nullable
+	public KonTown captureCapital(String oldKingdomName, @NotNull KonKingdom conquerKingdom) {
 		if(!conquerKingdom.isMonumentTemplateValid()) {
 			ChatUtil.printDebug("Failed to capture capital for kingdom with invalid template: "+conquerKingdom.getName());
 			return null;
@@ -2086,7 +1941,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(isKingdom(oldKingdomName)) {
 			// Capture the capital of the old kingdom as a new town for the conquering kingdom.
 			Location townLoc = getKingdom(oldKingdomName).getCapital().getCenterLoc();
-			String townName = oldKingdomName;
 			String townKingdom = conquerKingdom.getName();
 			Set<Point> townLand = getKingdom(oldKingdomName).getCapital().getChunkPoints();
 			Map<KonPropertyFlag,Boolean> townProperties = getKingdom(oldKingdomName).getCapital().getAllProperties();
@@ -2094,16 +1948,16 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			// Remove the old kingdom
 			removeKingdom(oldKingdomName);
 			// Validate town name
-			int nameStatus = konquest.validateNameConstraints(townName);
+			int nameStatus = konquest.validateNameConstraints(oldKingdomName);
 			if(nameStatus != 0) {
-				ChatUtil.printDebug("Failed to name captured capital to "+townName+", validation failed with status code "+nameStatus);
+				ChatUtil.printDebug("Failed to name captured capital to "+ oldKingdomName +", validation failed with status code "+nameStatus);
 				return null;
 			}
 			// Create a new town
-			int status = createTown(townLoc,townName,townKingdom);
+			int status = createTown(townLoc, oldKingdomName,townKingdom);
 			if(status != 0) {
 				// Successfully created new town, update it
-				KonTown town = conquerKingdom.getTown(townName);
+				KonTown town = conquerKingdom.getTown(oldKingdomName);
 				// Add land
 				town.addPoints(townLand);
 				// Update territory cache
@@ -2190,13 +2044,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	public ArrayList<String> getKingdomNames() {
-		ArrayList<String> names = new ArrayList<String>(kingdomMap.keySet());
-		return names;
+		return new ArrayList<>(kingdomMap.keySet());
 	}
 	
 	public ArrayList<KonKingdom> getKingdoms() {
-		ArrayList<KonKingdom> kingdoms = new ArrayList<KonKingdom>(kingdomMap.values());
-		return kingdoms;
+		return new ArrayList<>(kingdomMap.values());
 	}
 	
 	public KonKingdom getKingdom(String name) {
@@ -2218,10 +2070,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	public boolean isKingdom(String name) {
-		boolean isKingdom = false;
 		// Check for exact String key match
-		isKingdom = kingdomMap.containsKey(name);
-		if(isKingdom) {
+		if(kingdomMap.containsKey(name)) {
 			return true;
 		} else {
 			// Check for case-insensitive name
@@ -2234,15 +2084,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Could not find a kingdom by name
 		return false;
 	}
-	
+
+	@NotNull
 	public ArrayList<String> getTownNames() {
-		ArrayList<String> names = new ArrayList<String>();
+		ArrayList<String> names = new ArrayList<>();
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			names.addAll(kingdom.getTownNames());
 		}
 		return names;
 	}
-	
+
+	@Nullable
 	public KonTown getTown(String name) {
 		KonTown result = null;
 		for(KonKingdom kingdom : kingdomMap.values()) {
@@ -2252,7 +2104,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return result;
 	}
-	
+
 	public boolean isTown(String name) {
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			if(kingdom.hasTown(name)) {
@@ -2261,7 +2113,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return false;
 	}
-	
+
+	@Nullable
 	public KonCapital getCapital(String name) {
 		KonCapital result = null;
 		for(KonKingdom kingdom : kingdomMap.values()) {
@@ -2307,9 +2160,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	/**
 	 * Updates a town option based on action
-	 * @param action
-	 * @param town
-	 * @param bukkitPlayer
+	 * @param action - The action to perform
+	 * @param town - The town to update
+	 * @param bukkitPlayer - the player who is performing the action
 	 * @return true if action was successful
 	 */
 	public boolean changeTownOption(optionAction action, KonTown town, Player bukkitPlayer) {
@@ -2424,7 +2277,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 	}
-	
+
+	@NotNull
 	public Set<PotionEffectType> getTownNerfs() {
 		return townNerfs.keySet();
 	}
@@ -2465,8 +2319,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	public void clearTownHearts(KonPlayer player) {
-		//double defaultValue = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
-		//player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(defaultValue);
 		String modName = Konquest.healthModName;
 		// Search for modifier and remove
 		AttributeInstance playerHealthAtt = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH);
@@ -2506,8 +2358,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			for(KonKingdom kingdom : getKingdoms()) {
 				ArrayList<KonPlayer> onlineKingdomPlayers = konquest.getPlayerManager().getPlayersInKingdom(kingdom.getName());
 				int numOnlineKingdomPlayers = onlineKingdomPlayers.size();
+				Timer protectedWarmupTimer = kingdom.getProtectedWarmupTimer();
 				if((offlineProtectedMinimumPlayers <= 0 && onlineKingdomPlayers.isEmpty()) || (numOnlineKingdomPlayers < offlineProtectedMinimumPlayers)) {
-					Timer protectedWarmupTimer = kingdom.getProtectedWarmupTimer();
 					if(offlineProtectedWarmupSeconds > 0 && protectedWarmupTimer.getTime() == -1 && !kingdom.isOfflineProtected()) {
 						// start timer
 						ChatUtil.printDebug("Starting kingdom protection warmup timer for "+offlineProtectedWarmupSeconds+" seconds: "+kingdom.getName());
@@ -2517,13 +2369,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						int warmupMinutes = offlineProtectedWarmupSeconds / 60;
 						int warmupSeconds = offlineProtectedWarmupSeconds % 60;
 						String warmupTime = String.format("%d:%02d", warmupMinutes , warmupSeconds);
-						//ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+"The Kingdom of "+ChatColor.RED+kingdom.getName()+ChatColor.LIGHT_PURPLE+" will be protected in "+ChatColor.AQUA+warmupTime+ChatColor.LIGHT_PURPLE+" minutes.");
 						ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_NOTICE_KINGDOM_WARMUP.getMessage(kingdom.getName(),warmupTime));
 					}
 				} else {
 					// stop timer, clear protection
-					//ChatUtil.printDebug("Clearing kingdom protection: "+kingdom.getName());
-					Timer protectedWarmupTimer = kingdom.getProtectedWarmupTimer();
 					kingdom.setOfflineProtected(false);
 					protectedWarmupTimer.stopTimer();
 				}
@@ -2542,7 +2391,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	public List<KonTown> getPlayerLordshipTowns(KonquestOfflinePlayer player) {
-		List<KonTown> townNames = new ArrayList<KonTown>();
+		List<KonTown> townNames = new ArrayList<>();
 		if(player.getKingdom() instanceof KonKingdom) {
 			KonKingdom kingdom = (KonKingdom)player.getKingdom();
 			for(KonTown town : kingdom.getTowns()) {
@@ -2553,9 +2402,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return townNames;
 	}
-	
+
+	@NotNull
 	public List<KonTown> getPlayerKnightTowns(KonquestOfflinePlayer player) {
-		List<KonTown> townNames = new ArrayList<KonTown>();
+		List<KonTown> townNames = new ArrayList<>();
 		if(player.getKingdom() instanceof KonKingdom) {
 			KonKingdom kingdom = (KonKingdom)player.getKingdom();
 			for(KonTown town : kingdom.getTowns()) {
@@ -2566,9 +2416,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return townNames;
 	}
-	
+
+	@NotNull
 	public List<KonTown> getPlayerResidenceTowns(KonquestOfflinePlayer player) {
-		List<KonTown> townNames = new ArrayList<KonTown>();
+		List<KonTown> townNames = new ArrayList<>();
 		if(player.getKingdom() instanceof KonKingdom) {
 			KonKingdom kingdom = (KonKingdom)player.getKingdom();
 			for(KonTown town : kingdom.getTowns()) {
@@ -2597,20 +2448,19 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		player.getPlayerStats().setStat(KonStatsType.KNIGHTS, countElite);
 		player.getPlayerStats().setStat(KonStatsType.RESIDENTS, countResident);
 	}
-	
+
+	@NotNull
 	public KonLeaderboard getKingdomLeaderboard(KonKingdom kingdom) {
 		KonLeaderboard leaderboard = new KonLeaderboard();
-		if(kingdom.equals(barbarians)) {
-			return leaderboard;
-		}
+		if(kingdom.equals(barbarians)) return leaderboard;
 		// Determine scores for all players within towns
-		HashMap<OfflinePlayer,KonPlayerScoreAttributes> memberScores = new HashMap<OfflinePlayer,KonPlayerScoreAttributes>();
-		int numTownLords = 0;
-		int numTownKnights = 0;
-		int numTownResidents = 0;
-		int numLordLand = 0;
-		int numKnightLand = 0;
-		int numResidentLand = 0;
+		HashMap<OfflinePlayer,KonPlayerScoreAttributes> memberScores = new HashMap<>();
+		int numTownLords;
+		int numTownKnights;
+		int numTownResidents;
+		int numLordLand;
+		int numKnightLand;
+		int numResidentLand;
 		for(KonTown town : kingdom.getTowns()) {
 			for(OfflinePlayer offlinePlayer : town.getPlayerResidents()) {
 				numTownLords = 0;
@@ -2675,7 +2525,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return leaderboard;
 	}
-	
+
+	@NotNull
 	public KonKingdomScoreAttributes getKingdomScoreAttributes(KonKingdom kingdom) {
 		KonKingdomScoreAttributes scoreAttributes = new KonKingdomScoreAttributes();
 		//if(!kingdom.equals(barbarians) && !kingdom.isPeaceful()) {
@@ -2707,10 +2558,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	public int getKingdomScore(KonKingdom kingdom) {
-		int score = getKingdomScoreAttributes(kingdom).getScore();
-		return score;
+		return getKingdomScoreAttributes(kingdom).getScore();
 	}
-	
+
+	@NotNull
 	public KonPlayerScoreAttributes getPlayerScoreAttributes(KonOfflinePlayer offlinePlayer) {
 		KonPlayerScoreAttributes scoreAttributes = new KonPlayerScoreAttributes();
 		if(!offlinePlayer.isBarbarian() && !offlinePlayer.getKingdom().isPeaceful()) {
@@ -2744,8 +2595,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	public int getPlayerScore(KonOfflinePlayer offlinePlayer) {
-		int score = getPlayerScoreAttributes(offlinePlayer).getScore();
-		return score;
+		return getPlayerScoreAttributes(offlinePlayer).getScore();
 	}
 	
 	
@@ -2758,127 +2608,110 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 	}
 	
-	// Returns true when the player is still in cooldown, else false
+	// Returns true when the player is still in cool-down, else false
 	public boolean isPlayerJoinCooldown(Player player) {
-		boolean result = false;
-		// Check if player is currently in cooldown.
-		// If cooldown has expired, remove it.
+		// Check if player is currently in cool-down.
+		// If cool-down has expired, remove it.
 		UUID id = player.getUniqueId();
-		if(joinPlayerCooldowns.containsKey(id)) {
-			long endSeconds = joinPlayerCooldowns.get(id);
-			Date now = new Date();
-			if(now.after(new Date(endSeconds*1000))) {
-				// The cooldown has expired
-				joinPlayerCooldowns.remove(id);
-			} else {
-				// The player is still in cooldown
-				result = true;
-			}
+		if(!joinPlayerCooldowns.containsKey(id))return false;
+		long endSeconds = joinPlayerCooldowns.get(id);
+		Date now = new Date();
+		if(now.after(new Date(endSeconds*1000))) {
+			// The cool-down has expired
+			joinPlayerCooldowns.remove(id);
+			return false;
 		}
-		return result;
+
+		return true;
 	}
 	
 	public void applyPlayerJoinCooldown(Player player) {
-		if(joinCooldownSeconds > 0) {
-			UUID id = player.getUniqueId();
-			int endTimeSeconds = (int)((new Date()).getTime()/1000) + joinCooldownSeconds;
-			joinPlayerCooldowns.put(id, endTimeSeconds);
-		}
+		if(joinCooldownSeconds <= 0)return;
+		UUID id = player.getUniqueId();
+		int endTimeSeconds = (int)((new Date()).getTime()/1000) + joinCooldownSeconds;
+		joinPlayerCooldowns.put(id, endTimeSeconds);
 	}
 	
 	public int getJoinCooldownRemainingSeconds(Player player) {
 		int result = 0;
 		UUID id = player.getUniqueId();
-		if(joinPlayerCooldowns.containsKey(id)) {
-			int endSeconds = joinPlayerCooldowns.get(id);
-			Date now = new Date();
-			if(now.before(new Date((long)endSeconds*1000))) {
-				result = endSeconds - (int)(now.getTime()/1000);
-			}
+		if(!joinPlayerCooldowns.containsKey(id))return 0;
+		int endSeconds = joinPlayerCooldowns.get(id);
+		Date now = new Date();
+		if(now.after(new Date((long)endSeconds*1000))){
+			return 0;
 		}
-		return result;
+		return endSeconds - (int)(now.getTime()/1000);
 	}
 	
-	// Returns true when the player is still in cooldown, else false
+	// Returns true when the player is still in cool-down, else false
 	public boolean isPlayerExileCooldown(Player player) {
 		boolean result = false;
-		// Check if player is currently in cooldown.
-		// If cooldown has expired, remove it.
+		// Check if player is currently in cool-down.
+		// If cool-down has expired, remove it.
 		UUID id = player.getUniqueId();
-		if(exilePlayerCooldowns.containsKey(id)) {
-			long endSeconds = exilePlayerCooldowns.get(id);
-			Date now = new Date();
-			if(now.after(new Date(endSeconds*1000))) {
-				// The cooldown has expired
-				exilePlayerCooldowns.remove(id);
-			} else {
-				// The player is still in cooldown
-				result = true;
-			}
+		if(!exilePlayerCooldowns.containsKey(id))return false;
+		long endSeconds = exilePlayerCooldowns.get(id);
+		Date now = new Date();
+		if(now.after(new Date(endSeconds*1000))) {
+			// The cooldown has expired
+			exilePlayerCooldowns.remove(id);
+			return false;
 		}
-		return result;
+		// The player is still in cool-down
+		return true;
 	}
 	
 	public void applyPlayerExileCooldown(Player player) {
-		if(exileCooldownSeconds > 0) {
-			UUID id = player.getUniqueId();
-			int endTimeSeconds = (int)((new Date()).getTime()/1000) + exileCooldownSeconds;
-			exilePlayerCooldowns.put(id, endTimeSeconds);
-		}
+		if(exileCooldownSeconds <= 0)return;
+		UUID id = player.getUniqueId();
+		int endTimeSeconds = (int)((new Date()).getTime()/1000) + exileCooldownSeconds;
+		exilePlayerCooldowns.put(id, endTimeSeconds);
 	}
 	
 	public int getExileCooldownRemainingSeconds(Player player) {
 		int result = 0;
 		UUID id = player.getUniqueId();
-		if(exilePlayerCooldowns.containsKey(id)) {
-			int endSeconds = exilePlayerCooldowns.get(id);
-			Date now = new Date();
-			if(now.before(new Date((long)endSeconds*1000))) {
-				result = endSeconds - (int)(now.getTime()/1000);
-			}
+		if(!exilePlayerCooldowns.containsKey(id))return 0;
+		int endSeconds = exilePlayerCooldowns.get(id);
+		Date now = new Date();
+		if(now.after(new Date((long)endSeconds*1000))){
+			return 0;
 		}
-		return result;
+		return endSeconds - (int)(now.getTime()/1000);
 	}
 	
 	public void loadJoinExileCooldowns() {
 		joinCooldownSeconds = konquest.getConfigManager().getConfig("core").getInt(CorePath.KINGDOMS_JOIN_COOLDOWN.getPath(),0);
 		exileCooldownSeconds = konquest.getConfigManager().getConfig("core").getInt(CorePath.KINGDOMS_EXILE_COOLDOWN.getPath(),0);
-		// Check any existing cooldowns, ensure less than config values.
-		// Join cooldown map
+		// Check any existing cool-downs, ensure less than config values.
+		// Join cool-down map
 		if(!joinPlayerCooldowns.isEmpty()) {
-			HashMap<UUID,Integer> updateJoinMap = new HashMap<UUID,Integer>();
+			HashMap<UUID,Integer> updateJoinMap = new HashMap<>();
 			if(joinCooldownSeconds > 0) {
 				int nowSeconds = (int)((new Date()).getTime()/1000);
 				int maxEndSeconds = nowSeconds + joinCooldownSeconds;
 				for(UUID u : joinPlayerCooldowns.keySet()) {
 					int endSeconds = joinPlayerCooldowns.get(u);
-					if(endSeconds > maxEndSeconds) {
-						// Existing cooldown is longer than new config setting, shorten it.
-						updateJoinMap.put(u, maxEndSeconds);
-					} else {
-						// Existing cooldown is under config, preserve it.
-						updateJoinMap.put(u, endSeconds);
-					}
+					// Existing cool-down is longer than new config setting, shorten it.
+					// Existing cool-down is under config, preserve it.
+					updateJoinMap.put(u, Math.min(endSeconds, maxEndSeconds));
 				}
 			}
 			joinPlayerCooldowns.clear();
 			joinPlayerCooldowns.putAll(updateJoinMap);
 		}
-		// Exile cooldown map
+		// Exile cool-down map
 		if(!exilePlayerCooldowns.isEmpty()) {
-			HashMap<UUID,Integer> updateExileMap = new HashMap<UUID,Integer>();
+			HashMap<UUID,Integer> updateExileMap = new HashMap<>();
 			if(exileCooldownSeconds > 0) {
 				int nowSeconds = (int)((new Date()).getTime()/1000);
 				int maxEndSeconds = nowSeconds + exileCooldownSeconds;
 				for(UUID u : exilePlayerCooldowns.keySet()) {
 					int endSeconds = exilePlayerCooldowns.get(u);
-					if(endSeconds > maxEndSeconds) {
-						// Existing cooldown is longer than new config setting, shorten it.
-						updateExileMap.put(u, maxEndSeconds);
-					} else {
-						// Existing cooldown is under config, preserve it.
-						updateExileMap.put(u, endSeconds);
-					}
+					// Existing cool-down is longer than new config setting, shorten it.
+					// Existing cool-down is under config, preserve it.
+					updateExileMap.put(u, Math.min(endSeconds, maxEndSeconds));
 				}
 			}
 			exilePlayerCooldowns.clear();
@@ -2923,15 +2756,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		boolean isListEnabled = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.TOWNS_ARMOR_BLACKLIST_ENABLE.getPath(),false);
 		if(isListEnabled) {
 			List<String> armorList = konquest.getConfigManager().getConfig("core").getStringList(CorePath.TOWNS_ARMOR_BLACKLIST.getPath());
-			Material mat = null;
+			Material mat;
 			for(String entry : armorList) {
-				try {
-					mat = Material.valueOf(entry);
-					if(mat != null && !armorBlocks.contains(mat)) {
-						armorBlocks.add(mat);
-					}
-				} catch(IllegalArgumentException e) {
-					ChatUtil.printConsoleError("Invalid armor list entry, "+entry+", ignoring.");
+				mat = Material.matchMaterial(entry);
+				if(mat != null) {
+					armorBlocks.add(mat);
+				}else{
+					ChatUtil.printConsoleAlert("Invalid material \""+entry+"\" in "+CorePath.TOWNS_ARMOR_BLACKLIST.getPath()+", ignoring.");
 				}
 			}
 		}
@@ -2998,12 +2829,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         					ChatUtil.printDebug("Failed to set invalid property "+propertyName+" to Kingdom "+kingdomName);
         				}
         			}
-        			// Capital and Town Loading
-        			// Load all towns
+        			// Capital and Town Loading all towns
                 	boolean isMissingMonuments = false;
                 	boolean isMissingCapital = true;
                 	for(String townName : kingdomSection.getConfigurationSection("towns").getKeys(false)) {
-                		//ChatUtil.printDebug("Loading Town: "+townName);
                 		boolean isCapital = false;
                 		if(townName.equals("capital")) {
                 			isCapital = true;
@@ -3096,7 +2925,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         		            	// Assign Lord
         		            	String lordUUID = townSection.getString("lord","");
         		            	if(!lordUUID.equalsIgnoreCase("")) {
-        		            		//ChatUtil.printDebug("Town "+townName+" Lord ID is: \""+lordUUID+"\"");
         		            		UUID playerID = Konquest.idFromString(lordUUID);
         		            		if(playerID != null) {
         		            			town.setLord(playerID);
@@ -3112,8 +2940,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         			            		boolean isElite = townSection.getBoolean("residents."+residentUUID);
         			            		town.addPlayerResident(Bukkit.getOfflinePlayer(UUID.fromString(residentUUID)),isElite);
         			            	}
-        		            	} else {
-        		            		//ChatUtil.printDebug("Town "+townName+" does not have any stored residents");
         		            	}
         		            	// Add invite requests
         		            	if(townSection.contains("requests")) {
@@ -3138,9 +2964,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         		            	if(townSection.contains("plots")) {
         		            		for(String plotIndex : townSection.getConfigurationSection("plots").getKeys(false)) {
         		            			//ChatUtil.printDebug("Creating plot "+plotIndex+" for town "+town.getName());
-        		            			HashSet<Point> points = new HashSet<Point>();
-        		            			points.addAll(konquest.formatStringToPoints(townSection.getString("plots."+plotIndex+".chunks")));
-        		            			ArrayList<UUID> users = new ArrayList<UUID>();
+										HashSet<Point> points = new HashSet<>(konquest.formatStringToPoints(townSection.getString("plots." + plotIndex + ".chunks")));
+        		            			ArrayList<UUID> users = new ArrayList<>();
         		            			for(String user : townSection.getStringList("plots."+plotIndex+".members")) {
         		            				users.add(UUID.fromString(user));
         		            			}
@@ -3205,7 +3030,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				kingdomPropertiesSection.set(flag.toString(), kingdom.getAllProperties().get(flag));
 			}
 			// Towns + Capital
-			List<KonTown> allTowns = new ArrayList<KonTown>();
+			List<KonTown> allTowns = new ArrayList<>();
 			allTowns.add(kingdom.getCapital());
 			allTowns.addAll(kingdom.getTowns());
 			ConfigurationSection townsSection = kingdomSection.createSection("towns");
@@ -3223,14 +3048,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				}
             	townInstanceSection.set("world", town.getWorld().getName());
             	townInstanceSection.set("base", town.getMonument().getBaseY());
-            	townInstanceSection.set("spawn", new int[] {(int) town.getSpawnLoc().getBlockX(),
-						   									(int) town.getSpawnLoc().getBlockY(),
-						   									(int) town.getSpawnLoc().getBlockZ(),
+            	townInstanceSection.set("spawn", new int[] {town.getSpawnLoc().getBlockX(),
+						town.getSpawnLoc().getBlockY(),
+						town.getSpawnLoc().getBlockZ(),
 						   									(int) town.getSpawnLoc().getPitch(),
 						   									(int) town.getSpawnLoc().getYaw()});
-            	townInstanceSection.set("center", new int[] {(int) town.getCenterLoc().getBlockX(),
-						 									 (int) town.getCenterLoc().getBlockY(),
-						 									 (int) town.getCenterLoc().getBlockZ()});
+            	townInstanceSection.set("center", new int[] {town.getCenterLoc().getBlockX(),
+						town.getCenterLoc().getBlockY(),
+						town.getCenterLoc().getBlockZ()});
                 townInstanceSection.set("chunks", konquest.formatPointsToString(town.getChunkList().keySet()));
                 townInstanceSection.set("open", town.isOpen());
                 townInstanceSection.set("plot", town.isPlotOnly());

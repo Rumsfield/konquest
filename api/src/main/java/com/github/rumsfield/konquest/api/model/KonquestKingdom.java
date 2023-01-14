@@ -17,7 +17,7 @@ public interface KonquestKingdom {
 	 * 
 	 * @return True when this kingdom is the smallest, else false
 	 */
-	public boolean isSmallest();
+    boolean isSmallest();
 	
 	/**
 	 * Checks whether this kingdom is currently protected from attacks.
@@ -26,49 +26,39 @@ public interface KonquestKingdom {
 	 * 
 	 * @return True when this kingdom is protected, else false
 	 */
-	public boolean isOfflineProtected();
+    boolean isOfflineProtected();
 	
 	/**
 	 * Get whether the kingdom is peaceful. Peaceful kingdoms cannot be attacked, or attack others.
 	 * 
 	 * @return True if peaceful, else false
 	 */
-	public boolean isPeaceful();
+    boolean isPeaceful();
 	
 	
 	//TODO: doc
-	public KonquestRelationship getActiveRelation(KonquestKingdom kingdom);
-	
-	/**
-	 * Checks whether this kingdom currently has a blanked monument template.
-	 * A monument template is blanked when a player in admin bypass mode edits it.
-	 * Blanking lasts for 2 minutes after the last block edit.
-	 * When a kingdom's monument template is blanked, players cannot settle new towns, enemies cannot attack town monuments, and monuments will not refresh.
-	 * 
-	 * @return True when the monument template is blanked, else false
-	 */
-	//public boolean isMonumentBlanking();
+    KonquestRelationship getActiveRelation(KonquestKingdom kingdom);
 	
 	/**
 	 * Get the name of this kingdom.
 	 * 
 	 * @return The name
 	 */
-	public String getName();
+    String getName();
 	
 	/**
 	 * Gets the capital territory instance for this kingdom.
 	 * 
 	 * @return The capital territory
 	 */
-	public KonquestCapital getCapital();
+    KonquestCapital getCapital();
 	
 	/**
 	 * Gets the list of all town names in this kingdom.
 	 * 
 	 * @return The list of towns
 	 */
-	public ArrayList<String> getTownNames();
+    ArrayList<String> getTownNames();
 	
 	/**
 	 * Checks whether this kingdom has a town with the given name.
@@ -76,7 +66,7 @@ public interface KonquestKingdom {
 	 * @param name The town name to check
 	 * @return True when a town exists with the given name in this kingdom, else false
 	 */
-	public boolean hasTown(String name);
+    boolean hasTown(String name);
 	
 	/**
 	 * Gets the town instance by the given name.
@@ -84,13 +74,13 @@ public interface KonquestKingdom {
 	 * @param name The town name
 	 * @return The town instance
 	 */
-	public KonquestTown getTown(String name);
+    KonquestTown getTown(String name);
 	
 	/**
 	 * Get a list of all towns in this kingdom.
 	 * 
 	 * @return The list of towns
 	 */
-	public ArrayList<? extends KonquestTown> getTowns();
+    ArrayList<? extends KonquestTown> getTowns();
 	
 }

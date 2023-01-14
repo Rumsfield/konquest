@@ -8,5 +8,5 @@ public enum CardinalDirection {
 	SOUTH,
 	SOUTHWEST,
 	WEST,
-	NORTHWEST;
+	NORTHWEST
 }

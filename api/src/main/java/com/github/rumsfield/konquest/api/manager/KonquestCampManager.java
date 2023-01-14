@@ -1,10 +1,10 @@
 package com.github.rumsfield.konquest.api.manager;
 
-import java.util.ArrayList;
-
 import com.github.rumsfield.konquest.api.model.KonquestCamp;
 import com.github.rumsfield.konquest.api.model.KonquestCampGroup;
 import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
+
+import java.util.ArrayList;
 
 /**
  * A manager for barbarian camps in Konquest.
@@ -20,7 +20,7 @@ public interface KonquestCampManager {
 	 * @param player The player to check
 	 * @return True if the player has a camp, else false
 	 */
-	public boolean isCampSet(KonquestOfflinePlayer player);
+    boolean isCampSet(KonquestOfflinePlayer player);
 	
 	/**
 	 * Gets the camp that belongs to a barbarian player. Returns null when the camp does not exist.
@@ -28,14 +28,14 @@ public interface KonquestCampManager {
 	 * @param player The camp owner
 	 * @return The camp
 	 */
-	public KonquestCamp getCamp(KonquestOfflinePlayer player);
+    KonquestCamp getCamp(KonquestOfflinePlayer player);
 	
 	/**
 	 * Gets all camps.
 	 * 
 	 * @return The list of camps
 	 */
-	public ArrayList<? extends KonquestCamp> getCamps();
+    ArrayList<? extends KonquestCamp> getCamps();
 	
 	/**
 	 * Remove a camp territory and break the bed inside.
@@ -43,14 +43,14 @@ public interface KonquestCampManager {
 	 * @param player The camp owner
 	 * @return True when the camp is removed successfully, else false
 	 */
-	public boolean removeCamp(KonquestOfflinePlayer player);
+    boolean removeCamp(KonquestOfflinePlayer player);
 	
 	/**
 	 * Checks whether camp groups (clans) are enabled in the Konquest configuration.
 	 * 
 	 * @return True when camp groups are enabled, else false
 	 */
-	public boolean isCampGroupsEnabled();
+    boolean isCampGroupsEnabled();
 	
 	/**
 	 * Checks whether the given camp is part of a camp group (clan).
@@ -59,7 +59,7 @@ public interface KonquestCampManager {
 	 * @param camp The camp to check
 	 * @return True when the camp is part of a group, else false
 	 */
-	public boolean isCampGrouped(KonquestCamp camp);
+    boolean isCampGrouped(KonquestCamp camp);
 	
 	/**
 	 * Gets the camp group of the given camp.
@@ -68,5 +68,5 @@ public interface KonquestCampManager {
 	 * @param camp The camp
 	 * @return The camp group, or null if no group exists
 	 */
-	public KonquestCampGroup getCampGroup(KonquestCamp camp);
+    KonquestCampGroup getCampGroup(KonquestCamp camp);
 }

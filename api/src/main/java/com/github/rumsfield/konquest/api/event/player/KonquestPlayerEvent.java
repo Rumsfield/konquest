@@ -12,7 +12,7 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
  */
 public class KonquestPlayerEvent extends KonquestEvent {
 
-	private KonquestPlayer player;
+	private final KonquestPlayer player;
 	
 	/**
 	 * Default constructor

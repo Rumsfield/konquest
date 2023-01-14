@@ -15,14 +15,14 @@ public interface KonquestShieldManager {
 	 * 
 	 * @return True when shields are enabled, else false
 	 */
-	public boolean isShieldsEnabled();
+    boolean isShieldsEnabled();
 	
 	/**
 	 * Checks whether armors are enabled from the Konquest configuration.
 	 * 
 	 * @return True when armors are enabled, else false
 	 */
-	public boolean isArmorsEnabled();
+    boolean isArmorsEnabled();
 	
 	/**
 	 * Sets a town's shields to expire a number of seconds from now.
@@ -33,7 +33,7 @@ public interface KonquestShieldManager {
 	 * @param value Time in seconds from now to end shields
 	 * @return True when shields were successfully set, else false
 	 */
-	public boolean shieldSet(KonquestTown town, int value);
+    boolean shieldSet(KonquestTown town, int value);
 	
 	/**
 	 * Adds to a town's shields in seconds, positive or negative.
@@ -44,7 +44,7 @@ public interface KonquestShieldManager {
 	 * @param value Time in seconds to add to shields
 	 * @return True when the shields were successfully added, else false
 	 */
-	public boolean shieldAdd(KonquestTown town, int value);
+    boolean shieldAdd(KonquestTown town, int value);
 	
 	/**
 	 * Sets a town's armor amount in blocks.
@@ -55,7 +55,7 @@ public interface KonquestShieldManager {
 	 * @param value Amount of armor
 	 * @return True when armor was successfully set, else false
 	 */
-	public boolean armorSet(KonquestTown town, int value);
+    boolean armorSet(KonquestTown town, int value);
 	
 	/**
 	 * Adds to a town's armor in blocks, positive or negative.
@@ -66,7 +66,7 @@ public interface KonquestShieldManager {
 	 * @param value Amount of armor to add
 	 * @return True when the armor was successfully added, else false
 	 */
-	public boolean armorAdd(KonquestTown town, int value);
+    boolean armorAdd(KonquestTown town, int value);
 	
 	/**
 	 * Gets the time in seconds at which the town's shields will expire.
@@ -76,7 +76,7 @@ public interface KonquestShieldManager {
 	 * @param town The town
 	 * @return The time in seconds when shields expire
 	 */
-	public int getTownShieldTime(KonquestTown town);
+    int getTownShieldTime(KonquestTown town);
 	
 	/**
 	 * Gets the amount of armor blocks the town currently has.
@@ -84,6 +84,6 @@ public interface KonquestShieldManager {
 	 * @param town The town
 	 * @return The amount of armor blocks
 	 */
-	public int getTownArmorBlocks(KonquestTown town);
+    int getTownArmorBlocks(KonquestTown town);
 	
 }

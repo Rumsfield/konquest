@@ -1,24 +1,22 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import java.util.List;
-
-//import org.bukkit.ChatColor;
+import com.github.rumsfield.konquest.model.KonCustomPrefix;
+import com.github.rumsfield.konquest.utility.ChatUtil;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.github.rumsfield.konquest.model.KonCustomPrefix;
-import com.github.rumsfield.konquest.utility.ChatUtil;
+import java.util.List;
 
 public class PrefixCustomIcon implements MenuIcon {
 
-	private List<String> lore;
-	private int index;
-	private boolean isClickable;
-	private KonCustomPrefix prefix;
-	private ItemStack item;
+	private final List<String> lore;
+	private final int index;
+	private final boolean isClickable;
+	private final KonCustomPrefix prefix;
+	private final ItemStack item;
 	
 	public PrefixCustomIcon(KonCustomPrefix prefix, List<String> lore, int index, boolean isClickable) {
 		this.prefix = prefix;
@@ -31,6 +29,7 @@ public class PrefixCustomIcon implements MenuIcon {
 	private ItemStack initItem() {
 		ItemStack item = new ItemStack(Material.IRON_BARS);
 		ItemMeta meta = item.getItemMeta();
+		assert meta != null;
 		if(isClickable) {
 			meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
 		}
@@ -42,7 +41,6 @@ public class PrefixCustomIcon implements MenuIcon {
 		if(isClickable) {
 			item.setType(Material.GOLD_BLOCK);
 		}
-		//String displayName = ChatColor.translateAlternateColorCodes('&', prefix.getName());
 		String displayName = ChatUtil.parseHex(prefix.getName());
 		meta.setDisplayName(displayName);
 		meta.setLore(lore);

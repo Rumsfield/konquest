@@ -6,15 +6,14 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonPlayer.FollowType;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class UnclaimAdminCommand extends CommandBase {
 	
@@ -26,8 +25,7 @@ public class UnclaimAdminCommand extends CommandBase {
     	// k admin unclaim [radius|auto] [<r>]
 		if (getArgs().length > 4) {
             ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
         	// Verify that this command is being used in the default world
@@ -71,7 +69,7 @@ public class UnclaimAdminCommand extends CommandBase {
         					doAuto = true;
         				}
         			} else {
-        				// Player is not in any auto mode, enter normal unclaim following state
+        				// Player is not in any auto mode, enter normal un-claim following state
         				doAuto = true;
         			}
         			if(doAuto) {
@@ -85,8 +83,7 @@ public class UnclaimAdminCommand extends CommandBase {
         			
         		default :
         			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-                    return;
-        		}
+				}
         	} else {
         		// Unclaim the single chunk containing playerLoc for the current territory.
         		getKonquest().getTerritoryManager().unclaimForAdmin(bukkitPlayer, bukkitPlayer.getLocation());

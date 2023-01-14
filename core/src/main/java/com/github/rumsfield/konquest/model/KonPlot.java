@@ -1,25 +1,24 @@
 package com.github.rumsfield.konquest.model;
 
-import java.awt.Point;
+import com.github.rumsfield.konquest.api.model.KonquestPlot;
+import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-
-import com.github.rumsfield.konquest.api.model.KonquestPlot;
-import com.github.rumsfield.konquest.utility.MessagePath;
-
 public class KonPlot implements KonquestPlot {
 
-	private HashSet<Point> points;
-	private ArrayList<UUID> users;
+	private final HashSet<Point> points;
+	private final ArrayList<UUID> users;
 	
 	public KonPlot(Point origin) {
-		this.points = new HashSet<Point>();
-		this.users = new ArrayList<UUID>();
+		this.points = new HashSet<>();
+		this.users = new ArrayList<>();
 		this.points.add(origin);
 	}
 	
@@ -45,11 +44,7 @@ public class KonPlot implements KonquestPlot {
 	}
 	
 	public List<Point> getPoints() {
-		ArrayList<Point> result = new ArrayList<Point>();
-		for(Point p : points) {
-			result.add(p);
-		}
-		return result;
+		return new ArrayList<>(points);
 	}
 	
 	public void addUsers(List<UUID> u) {
@@ -85,7 +80,7 @@ public class KonPlot implements KonquestPlot {
 	}
 	
 	public List<OfflinePlayer> getUserOfflinePlayers() {
-		ArrayList<OfflinePlayer> result = new ArrayList<OfflinePlayer>();
+		ArrayList<OfflinePlayer> result = new ArrayList<>();
 		for(UUID id : users) {
 			result.add(Bukkit.getOfflinePlayer(id));
 		}
@@ -93,13 +88,11 @@ public class KonPlot implements KonquestPlot {
 	}
 	
 	public List<UUID> getUsers() {
-		ArrayList<UUID> result = new ArrayList<UUID>();
-		result.addAll(users);
-		return result;
+		return new ArrayList<>(users);
 	}
 	
 	public List<String> getUserStrings() {
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		for(UUID id : users) {
 			result.add(id.toString());
 		}
@@ -120,10 +113,8 @@ public class KonPlot implements KonquestPlot {
 	
 	@Override
 	public KonPlot clone() {
-		HashSet<Point> clonePoints = new HashSet<Point>();
-		ArrayList<UUID> cloneUsers = new ArrayList<UUID>();
-		clonePoints.addAll(points);
-		cloneUsers.addAll(users);
+		HashSet<Point> clonePoints = new HashSet<>(points);
+		ArrayList<UUID> cloneUsers = new ArrayList<>(users);
 		return new KonPlot(clonePoints,cloneUsers);
 	}
 }

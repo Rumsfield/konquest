@@ -1,7 +1,12 @@
 package com.github.rumsfield.konquest.model;
 
-import java.awt.Point;
-
+import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestCamp;
+import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.Timeable;
+import com.github.rumsfield.konquest.utility.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -12,24 +17,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.api.model.KonquestCamp;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.Timeable;
-import com.github.rumsfield.konquest.utility.Timer;
+import java.awt.*;
 
 public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplayer, Timeable {
 	
-	private OfflinePlayer owner;
-	private Timer raidAlertTimer;
-	private Timer protectedWarmupTimer;
-	private Timer protectedCountdownTimer;
+	private final OfflinePlayer owner;
+	private final Timer raidAlertTimer;
+	private final Timer protectedWarmupTimer;
+	private final Timer protectedCountdownTimer;
 	private boolean isRaidAlertDisabled;
 	private boolean isOfflineProtected;
 	private Location bedLocation;
-	private BossBar campBarAll;
+	private final BossBar campBarAll;
 	
 	public KonCamp(Location loc, OfflinePlayer owner, KonKingdom kingdom, Konquest konquest) {
 		super(loc, MessagePath.LABEL_CAMP.getMessage().trim()+"_"+owner.getName(), kingdom, konquest);
@@ -70,7 +69,6 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 
 	@Override
 	public boolean addChunk(Point point) {
-		//addPoint(getKonquest().toPoint(chunk));
 		addPoint(point);
 		return true;
 	}
@@ -87,12 +85,6 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 	public OfflinePlayer getOwner() {
 		return owner;
 	}
-	
-	/*
-	public void setOnlineOwner(Player player) {
-		owner = player;
-	}
-	*/
 	
 	public boolean isPlayerOwner(OfflinePlayer player) {
 		return player.getUniqueId().equals(owner.getUniqueId());
@@ -200,10 +192,8 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 	
 	public void applyGlow(Player bukkitPlayer) {
 		boolean isGlowEnabled = getKonquest().getConfigManager().getConfig("core").getBoolean("core.camps.enemy_glow", true);
-		if(isGlowEnabled) {
-			bukkitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*5, 1));
-			//ChatUtil.printDebug("Applied glowing to "+bukkitPlayer.getName()+": "+bukkitPlayer.isGlowing());
-		}
+		if (!isGlowEnabled) return;
+		bukkitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 5, 1));
 	}
 	
 	@Override

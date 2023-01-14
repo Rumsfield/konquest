@@ -1,25 +1,18 @@
 package com.github.rumsfield.konquest.utility;
 
-/**
- * Copied from https://github.com/Bastian/bStats-Metrics/blob/single-file/bukkit/Metrics.java
- */
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import javax.net.ssl.HttpsURLConnection;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,13 +23,9 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
-import javax.net.ssl.HttpsURLConnection;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
-
+/**
+ * Copied from <a href="https://github.com/Bastian/bStats-Metrics/blob/single-file/bukkit/Metrics.java">Github/Bastian</a>
+ */
 public class Metrics {
 
   private final Plugin plugin;
@@ -47,8 +36,8 @@ public class Metrics {
    * Creates a new Metrics instance.
    *
    * @param plugin Your plugin instance.
-   * @param serviceId The id of the service. It can be found at <a
-   *     href="https://bstats.org/what-is-my-plugin-id">What is my plugin id?</a>
+   * @param serviceId The id of the service. It can be found at
+   *                 <a href="https://bstats.org/what-is-my-plugin-id">What is my plugin id?</a>
    */
   @SuppressWarnings("deprecation")
 public Metrics(JavaPlugin plugin, int serviceId) {
@@ -185,7 +174,7 @@ public Metrics(JavaPlugin plugin, int serviceId) {
      * @param platform The platform of the service.
      * @param serviceId The id of the service.
      * @param serverUuid The server uuid.
-     * @param enabled Whether or not data sending is enabled.
+     * @param enabled Whether data sending is enabled.
      * @param appendPlatformDataConsumer A consumer that receives a {@code JsonObjectBuilder} and
      *     appends all platform-specific data.
      * @param appendServiceDataConsumer A consumer that receives a {@code JsonObjectBuilder} and
@@ -196,9 +185,9 @@ public Metrics(JavaPlugin plugin, int serviceId) {
      * @param checkServiceEnabledSupplier A supplier to check if the service is still enabled.
      * @param errorLogger A consumer that accepts log message and an error.
      * @param infoLogger A consumer that accepts info log messages.
-     * @param logErrors Whether or not errors should be logged.
-     * @param logSentData Whether or not the sent data should be logged.
-     * @param logResponseStatusText Whether or not the response status text should be logged.
+     * @param logErrors Whether errors should be logged.
+     * @param logSentData Whether the data sent should be logged.
+     * @param logResponseStatusText Whether the response status text should be logged.
      */
     public MetricsBase(
         String platform,
@@ -648,7 +637,7 @@ public Metrics(JavaPlugin plugin, int serviceId) {
   /**
    * An extremely simple JSON builder.
    *
-   * <p>While this class is neither feature-rich nor the most performant one, it's sufficient enough
+   * <p>While this class is neither feature-rich nor the most performant one, it's sufficient
    * for its use-case.
    */
   public static class JsonObjectBuilder {
@@ -802,7 +791,7 @@ public Metrics(JavaPlugin plugin, int serviceId) {
     }
 
     /**
-     * Escapes the given string like stated in https://www.ietf.org/rfc/rfc4627.txt.
+     * Escapes the given string like stated in <a href="https://www.ietf.org/rfc/rfc4627.txt">ietf link</a>.
      *
      * <p>This method escapes only the necessary characters '"', '\'. and '\u0000' - '\u001F'.
      * Compact escapes are not used (e.g., '\n' is escaped as "\u000a" and not as "\n").

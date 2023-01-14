@@ -10,10 +10,10 @@ import java.util.List;
 
 public class RelationIcon implements MenuIcon {
 
-	private KonquestRelationship relation;
-	private List<String> lore;
-	private int index;
-	private boolean isClickable;
+	private final KonquestRelationship relation;
+	private final List<String> lore;
+	private final int index;
+	private final boolean isClickable;
 	
 	public RelationIcon(KonquestRelationship relation, List<String> lore, int index, boolean isClickable) {
 		this.relation = relation;
@@ -40,13 +40,13 @@ public class RelationIcon implements MenuIcon {
 	public ItemStack getItem() {
 		ItemStack item = new ItemStack(relation.getIcon(),1);
 		ItemMeta meta = item.getItemMeta();
+		assert meta != null;
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
 				meta.addItemFlags(flag);
 			}
 		}
-		List<String> itemLore = new ArrayList<String>();
-		itemLore.addAll(lore);
+		List<String> itemLore = new ArrayList<>(lore);
 		meta.setDisplayName(getName());
 		meta.setLore(itemLore);
 		item.setItemMeta(meta);

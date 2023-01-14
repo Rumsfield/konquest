@@ -1,13 +1,5 @@
 package com.github.rumsfield.konquest.command.admin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.model.KonKingdom;
@@ -15,6 +7,13 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class CaptureAdminCommand extends CommandBase {
 
@@ -27,8 +26,7 @@ public class CaptureAdminCommand extends CommandBase {
 		// k admin capture <town> <kingdom>
 		if (getArgs().length != 4) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	String townName = getArgs()[2];
         	String kingdomName = getArgs()[3];
         	if(getKonquest().getKingdomManager().isKingdom(kingdomName)) {
@@ -44,7 +42,7 @@ public class CaptureAdminCommand extends CommandBase {
         			if(town == null) {
         				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(townName));
         			} else {
-        				KonTown capturedTown = (KonTown)getKonquest().getKingdomManager().captureTown(townName, town.getKingdom().getName(), kingdom);
+        				KonTown capturedTown = getKonquest().getKingdomManager().captureTown(townName, town.getKingdom().getName(), kingdom);
         				if(capturedTown != null) {
         					ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
         					// Remove mob targets
@@ -75,7 +73,7 @@ public class CaptureAdminCommand extends CommandBase {
 		final List<String> matchedTabList = new ArrayList<>();
 		if(getArgs().length == 3) {
 			// Suggest town names
-			List<String> townList = new ArrayList<String>();
+			List<String> townList = new ArrayList<>();
 			for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
 				townList.addAll(kingdom.getTownNames());
 			}

@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import com.github.rumsfield.konquest.manager.PlaceholderManager;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.clip.placeholderapi.expansion.Relational;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This class will be registered through the register-method in the 
@@ -12,8 +13,8 @@ import me.clip.placeholderapi.expansion.Relational;
  */
 public class KonquestPlaceholderExpansion extends PlaceholderExpansion implements Relational {
 
-	private KonquestPlugin plugin;
-	private PlaceholderManager placeholderManager;
+	private final KonquestPlugin plugin;
+	private final PlaceholderManager placeholderManager;
 	
 	public KonquestPlaceholderExpansion(KonquestPlugin plugin) {
 		this.plugin = plugin;
@@ -33,7 +34,7 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
     }
 	
 	/**
-     * Because this is a internal class, this check is not needed
+     * Because this is an internal class, this check is not needed,
      * and we can simply return {@code true}
      *
      * @return Always true since it's an internal class.
@@ -44,58 +45,58 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
     }
     
     /**
-     * The name of the person who created this expansion should go here.
-     * For convienience do we return the author from the plugin.yml
+     * The name of the person who created this expansion should go here. <br>
+     * For convenience do we return the author from the plugin.yml
      * 
      * @return The name of the author as a String.
      */
     @Override
-    public String getAuthor(){
+    public @NotNull String getAuthor(){
         return plugin.getDescription().getAuthors().toString();
     }
 
     /**
-     * The placeholder identifier should go here.
-     * This is what tells PlaceholderAPI to call our onRequest 
+     * The placeholder identifier should go here. <br>
+     * This is what tells PlaceholderAPI to call our onRequest
      * method to obtain a value if a placeholder starts with our 
-     * identifier.
+     * identifier. <br>
      * The identifier has to be lowercase and can't contain _ or %
      *
      * @return The identifier in {@code %<identifier>_<value>%} as String.
      */
     @Override
-    public String getIdentifier(){
+    public @NotNull String getIdentifier(){
         return "konquest";
     }
 
     /**
-     * This is the version of the expansion.
+     * This is the version of the expansion. <br>
      * You don't have to use numbers, since it is set as a String.
-     *
+	 * <br>
      * For convienience do we return the version from the plugin.yml
      *
      * @return The version as a String.
      */
     @Override
-    public String getVersion(){
+    public @NotNull String getVersion(){
         return plugin.getDescription().getVersion();
     }
     
     /**
      * This is the method called when a placeholder with our identifier 
-     * is found and needs a value.
-     * We specify the value identifier in this method.
+     * is found and needs a value. <br>
+     * We specify the value identifier in this method. <br>
      * Since version 2.9.1 can you use OfflinePlayers in your requests.
      *
      * @param  player
-     *         A {@link org.bukkit.Player Player}.
+     *         A {@link org.bukkit.entity.Player Player}.
      * @param  identifier
      *         A String containing the identifier/value.
      *
      * @return possibly-null String of the requested identifier.
      */
     @Override
-    public String onPlaceholderRequest(Player player, String identifier){
+    public String onPlaceholderRequest(Player player, @NotNull String identifier){
 
         if(player == null){
             return "";
@@ -301,42 +302,42 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
 	        		try {
 	        			String kingdomName = identifierLower.substring(8);
 	        			result = placeholderManager.getKingdomPlayers(kingdomName);
-	        		} catch(IndexOutOfBoundsException e) {}
+	        		} catch(IndexOutOfBoundsException ignored) {}
 	        		
         		/* %konquest_online_<kingdom>% */
 	        	} else if(identifierLower.matches("online_[a-zA-Z0-9]+")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(7);
 	        			result = placeholderManager.getKingdomOnline(kingdomName);
-	        		} catch(IndexOutOfBoundsException e) {}
+	        		} catch(IndexOutOfBoundsException ignored) {}
 	        		
         		/* %konquest_towns_<kingdom>% */
 	        	} else if(identifierLower.matches("towns_[a-zA-Z0-9]+")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(6);
 	        			result = placeholderManager.getKingdomTowns(kingdomName);
-	        		} catch(IndexOutOfBoundsException e) {}
+	        		} catch(IndexOutOfBoundsException ignored) {}
 	        		
         		/* %konquest_land_<kingdom>% */
 	        	} else if(identifierLower.matches("land_[a-zA-Z0-9]+")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(5);
 	        			result = placeholderManager.getKingdomLand(kingdomName);
-	        		} catch(IndexOutOfBoundsException e) {}
+	        		} catch(IndexOutOfBoundsException ignored) {}
 	        		
         		/* %konquest_favor_<kingdom>% */
 	        	} else if(identifierLower.matches("favor_[a-zA-Z0-9]+")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(6);
 	        			result = placeholderManager.getKingdomFavor(kingdomName);
-	        		} catch(IndexOutOfBoundsException e) {}
+	        		} catch(IndexOutOfBoundsException ignored) {}
 	        		
         		/* %konquest_score_<kingdom>% */
 	        	} else if(identifierLower.matches("score_[a-zA-Z0-9]+")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(6);
 	        			result = placeholderManager.getKingdomScore(kingdomName);
-	        		} catch(IndexOutOfBoundsException e) {}
+	        		} catch(IndexOutOfBoundsException ignored) {}
 	        		
 	        	}
 	        	break;

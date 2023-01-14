@@ -1,19 +1,18 @@
 package com.github.rumsfield.konquest.command.admin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class SanctuaryAdminCommand extends CommandBase {
 
@@ -50,8 +49,7 @@ public class SanctuaryAdminCommand extends CommandBase {
         	boolean pass = getKonquest().getSanctuaryManager().addSanctuary(playerLoc, name);
         	if(!pass) {
         		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_CREATE.getMessage(name));
-                return;
-        	} else {
+			} else {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_CREATE.getMessage(name));
         		// Render border particles
         		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
@@ -65,8 +63,7 @@ public class SanctuaryAdminCommand extends CommandBase {
 			boolean pass = getKonquest().getSanctuaryManager().removeSanctuary(name);
         	if(!pass) {
         		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_REMOVE.getMessage(name));
-                return;
-        	} else {
+			} else {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_REMOVE.getMessage(name));
         	}
 		} else if(cmdMode.equalsIgnoreCase("rename")) {
@@ -82,17 +79,14 @@ public class SanctuaryAdminCommand extends CommandBase {
 				boolean pass = getKonquest().getSanctuaryManager().renameSanctuary(name,newName);
 				if(!pass) {
 	        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_RENAME.getMessage(name,newName));
-	                return;
-	        	} else {
+				} else {
 	        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_RENAME.getMessage(name,newName));
 	        	}
 			} else {
 				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-	            return;
 			}
 		} else {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
 		}
 	}
 	

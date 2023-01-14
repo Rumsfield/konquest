@@ -2,9 +2,9 @@ package com.github.rumsfield.konquest.model;
 
 public class KonCustomPrefix {
 
-	private String label;
-	private String name;
-	private int cost;
+	private final String label;
+	private final String name;
+	private final int cost;
 	
 	public KonCustomPrefix(String label, String name, int cost) {
 		this.label = label;

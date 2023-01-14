@@ -21,8 +21,8 @@ public class KonquestPlayerCombatTagEvent extends KonquestPlayerEvent implements
 
 	private boolean isCancelled;
 	
-	private KonquestPlayer attacker;
-	private Location location;
+	private final KonquestPlayer attacker;
+	private final Location location;
 	
 	/**
 	 * Default constructor

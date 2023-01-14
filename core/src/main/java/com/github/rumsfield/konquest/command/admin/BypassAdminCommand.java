@@ -5,13 +5,12 @@ import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-
-import java.util.Collections;
-import java.util.List;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.Collections;
+import java.util.List;
 
 public class BypassAdminCommand extends CommandBase {
 	
@@ -23,8 +22,7 @@ public class BypassAdminCommand extends CommandBase {
         // k admin bypass
     	if (getArgs().length != 2) {
             ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-            return;
-        } else {
+		} else {
         	Player bukkitPlayer = (Player) getSender();
         	
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {

@@ -1,24 +1,21 @@
 package com.github.rumsfield.konquest.display;
 
-import java.util.HashMap;
-
-import org.bukkit.Bukkit;
-import org.bukkit.inventory.Inventory;
-//import org.bukkit.inventory.ItemStack;
-
 import com.github.rumsfield.konquest.Konquest;
-//import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.display.icon.PlayerIcon;
+import org.bukkit.Bukkit;
+import org.bukkit.inventory.Inventory;
+
+import java.util.HashMap;
 
 public class DisplayMenu {
 
-	private Inventory inventory;
-	private HashMap<Integer,MenuIcon> iconMap;
+	private final Inventory inventory;
+	private final HashMap<Integer,MenuIcon> iconMap;
 	
 	public DisplayMenu (int rows, String label) {
 		inventory = Bukkit.createInventory(null, rows*9, label);
-		iconMap = new HashMap<Integer,MenuIcon>();
+		iconMap = new HashMap<>();
 	}
 	
 	public Inventory getInventory() {
@@ -26,17 +23,6 @@ public class DisplayMenu {
     }
 	
 	public void addIcon(MenuIcon icon) {
-		/*
-		ItemStack iconItem = icon.getItem();
-		if(iconItem == null) {
-			ChatUtil.printDebug("Added null item to slot "+icon.getIndex()+" from icon "+icon.getName());
-		}
-		if(icon instanceof PlayerIcon) {
-			putItemAsync(inventory, icon.getIndex(), iconItem);
-		} else {
-			inventory.setItem(icon.getIndex(), iconItem);
-		}
-		*/
 		iconMap.put(icon.getIndex(), icon);
 	}
 	
@@ -45,43 +31,20 @@ public class DisplayMenu {
 	}
 	
 	public void updateIcons() {
-		Bukkit.getScheduler().runTaskAsynchronously(Konquest.getInstance().getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	// Set non-player heads first
-            	for(MenuIcon icon : iconMap.values()) {
-            		if(!(icon instanceof PlayerIcon)) {
-            			inventory.setItem(icon.getIndex(), icon.getItem());
-            		}
-        		}
-            	// Set player heads last
-            	for(MenuIcon icon : iconMap.values()) {
-            		if((icon instanceof PlayerIcon)) {
-            			inventory.setItem(icon.getIndex(), icon.getItem());
-            		}
-        		}
-            }
-        });
-	}
-	
-	/*
-	public void updateIcons() {
-		for(MenuIcon icon : iconMap.values()) {
-			if(icon instanceof PlayerIcon) {
-				putItemAsync(inventory, icon.getIndex(), icon.getItem());
-			} else {
-				inventory.setItem(icon.getIndex(), icon.getItem());
+		Bukkit.getScheduler().runTaskAsynchronously(Konquest.getInstance().getPlugin(), () -> {
+			// Set non-player heads first
+			for(MenuIcon icon : iconMap.values()) {
+				if(!(icon instanceof PlayerIcon)) {
+					inventory.setItem(icon.getIndex(), icon.getItem());
+				}
 			}
-		}
+			// Set player heads last
+			for(MenuIcon icon : iconMap.values()) {
+				if((icon instanceof PlayerIcon)) {
+					inventory.setItem(icon.getIndex(), icon.getItem());
+				}
+			}
+		});
 	}
-	
-	private void putItemAsync(Inventory inv, int slot, ItemStack item) {
-		Bukkit.getScheduler().runTaskAsynchronously(Konquest.getInstance().getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-            	inv.setItem(slot, item);
-            }
-        });
-	}
-	*/
+
 }

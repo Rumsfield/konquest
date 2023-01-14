@@ -42,7 +42,7 @@ public enum KonDirective {
 	
 	/**
 	 * Gets a KonDirective enum given a string command.
-	 * @param dir - The string name of the KonDirective
+	 * @param name The string name of the KonDirective
 	 * @return KonDirective - Corresponding enum
 	 */
 	public static KonDirective getDirective(String name) {

@@ -6,7 +6,7 @@ import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
 
 public class KonOfflinePlayer implements KonquestOfflinePlayer {
 
-	private OfflinePlayer offlineBukkitPlayer;
+	private final OfflinePlayer offlineBukkitPlayer;
 	private KonKingdom kingdom;
 	private KonKingdom exileKingdom;
 	private boolean isBarbarian;

@@ -22,9 +22,9 @@ public class KonquestTerritoryMoveEvent extends KonquestEvent implements Cancell
 
 	private boolean isCancelled;
 	
-	private KonquestTerritory territoryTo;
-	private KonquestTerritory territoryFrom;
-	private KonquestPlayer player;
+	private final KonquestTerritory territoryTo;
+	private final KonquestTerritory territoryFrom;
+	private final KonquestPlayer player;
 	
 	/**
 	 * Default constructor
