@@ -331,8 +331,8 @@ public class DisplayManager {
 	 */
  	
    	public static String boolean2Symbol(boolean val) {
-	   if(val)return ChatColor.DARK_GREEN+""+ChatColor.BOLD+"✓";
-	   return ChatColor.DARK_RED+""+ChatColor.BOLD+"❌";
+	   if(val)return ChatColor.DARK_GREEN+""+ChatColor.BOLD+ "\u2713";
+	   return ChatColor.DARK_RED+""+ChatColor.BOLD+ "\u274C";
  	}
  	
    	public static String boolean2Lang(boolean val) {

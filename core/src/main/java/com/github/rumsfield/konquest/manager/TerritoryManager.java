@@ -1094,25 +1094,25 @@ public class TerritoryManager {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Generate Map
     	Point originPoint = Konquest.toPoint(center);
-    	String mapWildSymbol = "-"; // "▢";// empty square "-";
-    	String mapTownSymbol = "+"; // "▤";// plus in square "+";
-    	String mapCampSymbol = "="; // "▧";// minus in square "=";
-    	String mapRuinSymbol = "%"; // "▩";// dot in square "%";
+    	String mapWildSymbol = "-";
+    	String mapTownSymbol = "+";
+    	String mapCampSymbol = "=";
+    	String mapRuinSymbol = "%";
     	String mapSanctuarySymbol = "$";
-    	String mapCapitalSymbol = "#"; // "▥";// cross in square "#";
+    	String mapCapitalSymbol = "#";
     	String[][] map = new String[mapSize][mapSize];
     	// Determine player's direction
     	BlockFace playerFace = bukkitPlayer.getFacing();
     	String mapPlayer = "!";
     	ChatColor playerColor;
     	if(playerFace.equals(BlockFace.NORTH)) {
-    		mapPlayer = "▲";// "△";// "^";
+    		mapPlayer = "\u25B2";// "^"
     	} else if(playerFace.equals(BlockFace.EAST)) {
-    		mapPlayer = "▶";// "▷";// ">";
+    		mapPlayer = "\u25B6";// ">"
     	} else if(playerFace.equals(BlockFace.SOUTH)) {
-    		mapPlayer = "▼";// "▽";// "v";
+    		mapPlayer = "\u25BC";// "v"
     	} else if(playerFace.equals(BlockFace.WEST)) {
-    		mapPlayer = "◀";// "◁";// "<";
+    		mapPlayer = "\u25C0";// "<"
     	}
     	// Determine settlement status and proximity
     	KonTerritory closestTerritory = null;
