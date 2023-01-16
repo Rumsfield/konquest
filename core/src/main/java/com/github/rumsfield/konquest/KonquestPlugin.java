@@ -58,7 +58,7 @@ public class KonquestPlugin extends JavaPlugin {
         checkForUpdates();
         // Done!
         enableSuccess = true;
-        ChatUtil.printConsoleAlert("Plugin enabled. Written by Rumsfield.");
+        ChatUtil.printConsoleAlert("Plugin enabled. Created by Rumsfield.");
 	}
 	
 	@Override

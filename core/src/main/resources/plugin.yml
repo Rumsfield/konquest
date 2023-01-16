@@ -4,7 +4,7 @@ author: Rumsfield
 version: @version@
 api-version: 1.16
 load: POSTWORLD
-main: konquest.KonquestPlugin
+main: com.github.rumsfield.konquest.KonquestPlugin
 depend: [Vault]
 softdepend:
 - ProtocolLib
