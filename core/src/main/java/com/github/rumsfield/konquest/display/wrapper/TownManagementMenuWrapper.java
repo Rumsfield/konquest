@@ -5,6 +5,8 @@ import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
+import com.github.rumsfield.konquest.model.KonPropertyFlag;
+import com.github.rumsfield.konquest.model.KonPropertyFlagHolder;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -37,12 +39,16 @@ public class TownManagementMenuWrapper extends MenuWrapper {
  		ChatColor titleColor = DisplayManager.titleColor;
 		ChatColor loreColor = DisplayManager.loreColor;
 		ChatColor hintColor = DisplayManager.hintColor;
-		
+
+		boolean isUpgradable = false;
+		boolean isPlotable = false;
 		boolean isLord = false;
 		boolean isKnight = false;
 		String townName = "null";
 		
 		if(manageTown != null) {
+			isUpgradable = manageTown.getPropertyValue(KonPropertyFlag.UPGRADE);
+			isPlotable = manageTown.getPropertyValue(KonPropertyFlag.PLOTS);
 			isLord = manageTown.isPlayerLord(observer.getOfflineBukkitPlayer());
 			isKnight = manageTown.isPlayerKnight(observer.getOfflineBukkitPlayer());
 			townName = manageTown.getName();
@@ -67,7 +73,7 @@ public class TownManagementMenuWrapper extends MenuWrapper {
 	    	}
 		}
     	/* Plots Info Icon (3) */
-		if(isAdmin || isLord || isKnight) {
+		if(isAdmin || ((isLord || isKnight) && isPlotable)) {
 			// Verify plots are enabled
 	    	boolean isPlotsEnabled = getKonquest().getPlotManager().isEnabled();
 	    	if(isPlotsEnabled) {
@@ -80,7 +86,7 @@ public class TownManagementMenuWrapper extends MenuWrapper {
 	    	}
 		}
     	/* Upgrades Info Icon (5) */
-		if(isAdmin || isLord) {
+		if(isAdmin || (isLord && isUpgradable)) {
 			loreList = new ArrayList<>();
 	    	loreList.add(loreColor+"Apply town upgrades.");
 	    	loreList.add(hintColor+"Click to manage");

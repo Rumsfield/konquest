@@ -178,13 +178,15 @@ public class TerritoryManager {
 	/**
 	 * claimChunk - Primary method for claiming chunks for closest adjacent territories
 	 * @param loc - Location of the chunk to claim
+	 * @param force - Ignore some checks
 	 * @return  0 - success
 	 * 			1 - error, no adjacent territory
 	 * 			2 - error, exceeds max distance
 	 * 			3 - error, already claimed
 	 * 			4 - error, cancelled by event
+	 * 			5 - error, blocked by property flag
 	 */
-	public int claimChunk(Location loc) {
+	public int claimChunk(Location loc, boolean force) {
 		if(isChunkClaimed(loc)) {
 			return 3;
 		}
@@ -210,6 +212,13 @@ public class TerritoryManager {
 		if(foundAdjTerr) {
 			Point addPoint = Konquest.toPoint(loc);
 			if(closestAdjTerr.getWorld().equals(loc.getWorld()) && closestAdjTerr.testChunk(addPoint)) {
+				// Check property flag
+				if(closestAdjTerr instanceof KonPropertyFlagHolder && !force) {
+					KonPropertyFlagHolder holder = (KonPropertyFlagHolder)closestAdjTerr;
+					if(holder.hasPropertyValue(KonPropertyFlag.CLAIM) && !holder.getPropertyValue(KonPropertyFlag.CLAIM)) {
+						return 5;
+					}
+				}
 				// Fire event
 				Set<Point> points = new HashSet<>();
 				points.add(addPoint);
@@ -246,7 +255,7 @@ public class TerritoryManager {
 	// Main method for admins to claim an individual chunk.
 	// Calls event.
 	public void claimForAdmin(@NotNull Player bukkitPlayer, @NotNull Location claimLoc) {
-    	int claimStatus = claimChunk(claimLoc);
+    	int claimStatus = claimChunk(claimLoc,true);
     	switch(claimStatus) {
     	case 0:
     		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
@@ -258,21 +267,18 @@ public class TerritoryManager {
     		player.getAdminClaimRegister().push(claimSet, territory);
     		break;
     	case 1:
-    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: no adjacent territory.");
     		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_ADJACENT.getMessage());
     		break;
     	case 2:
-    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: too far from territory center.");
     		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_FAR.getMessage());
     		break;
     	case 3:
-    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: already claimed.");
     		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_CLAIMED.getMessage());
     		break;
     	case 4:
+			// Cancelled by external event handler, skip error message
     		break;
     	default:
-    		//ChatUtil.sendError(bukkitPlayer, "Failed to claim chunk: unknown.");
     		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(claimStatus));
     		break;
     	}
@@ -305,7 +311,7 @@ public class TerritoryManager {
             return false;
 		}
     	// Attempt to claim the current chunk
-    	int claimStatus = claimChunk(claimLoc);
+    	int claimStatus = claimChunk(claimLoc,false);
     	switch(claimStatus) {
     	case 0:
     		KonTerritory territory = getChunkTerritory(claimLoc);
@@ -325,7 +331,11 @@ public class TerritoryManager {
     		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_CLAIMED.getMessage());
     		break;
     	case 4:
+			// Cancelled by external event handler, skip error message
     		break;
+		case 5:
+			ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_BLOCKED.getMessage());
+			break;
     	default:
     		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(claimStatus));
     		break;
@@ -345,8 +355,9 @@ public class TerritoryManager {
 	 * 			1 - error, no adjacent territory
 	 * 			2 - error, no chunks claimed
 	 * 			4 - error, event cancelled
+	 * 			5 - error, 	blocked by property flag
 	 */
-	public int claimChunkRadius(Location loc, int radius) {
+	public int claimChunkRadius(Location loc, int radius, boolean force) {
 		World claimWorld = loc.getWorld();
 		
 		// Find adjacent or current territory
@@ -374,6 +385,13 @@ public class TerritoryManager {
     	if(claimedChunks.isEmpty()) {
     		return 2;
     	} else {
+			// Check property flag
+			if(closestTerritory instanceof KonPropertyFlagHolder && !force) {
+				KonPropertyFlagHolder holder = (KonPropertyFlagHolder)closestTerritory;
+				if(holder.hasPropertyValue(KonPropertyFlag.CLAIM) && !holder.getPropertyValue(KonPropertyFlag.CLAIM)) {
+					return 5;
+				}
+			}
     		// Fire event
 			Set<Point> points = new HashSet<>(claimedChunks);
 			KonquestTerritoryChunkEvent invokeEvent = new KonquestTerritoryChunkEvent(konquest, closestTerritory, loc, points, true);
@@ -439,7 +457,7 @@ public class TerritoryManager {
     	KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
     	int preClaimLand = claimTerritory.getChunkPoints().size();
     	int postClaimLand;
-    	int claimStatus = claimChunkRadius(claimLoc, radius);
+    	int claimStatus = claimChunkRadius(claimLoc, radius, true);
     	switch(claimStatus) {
 	    	case 0:
 	    		postClaimLand = claimTerritory.getChunkPoints().size();
@@ -456,6 +474,7 @@ public class TerritoryManager {
 	    		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_FAR.getMessage());
 	    		return false;
 	    	case 4:
+				// Cancelled by external event handler, skip error message
 	    		return false;
 	    	default:
 	    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(claimStatus));
@@ -504,7 +523,7 @@ public class TerritoryManager {
     	// Attempt to claim
     	int preClaimLand = claimTerritory.getChunkPoints().size();
     	int postClaimLand;
-    	int claimStatus = claimChunkRadius(claimLoc, radius);
+    	int claimStatus = claimChunkRadius(claimLoc, radius, false);
     	switch(claimStatus) {
 	    	case 0:
 	    		postClaimLand = claimTerritory.getChunkPoints().size();
@@ -527,7 +546,11 @@ public class TerritoryManager {
 	    		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_FAIL_FAR.getMessage());
 	    		return false;
 	    	case 4:
+				// Cancelled by external event handler, skip error message
 	    		return false;
+			case 5:
+				ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_BLOCKED.getMessage());
+				return false;
 	    	default:
 	    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(claimStatus));
 	    		return false;
@@ -628,8 +651,9 @@ public class TerritoryManager {
 	 * 			2 - error, center chunk
 	 * 			3 - error, territory chunk not found
 	 * 			4 - error, cancelled by event
+	 * 			5 - error, blocked by property flag
 	 */
-	public int unclaimChunk(Location loc) {
+	public int unclaimChunk(Location loc, boolean force) {
 		if(!isChunkClaimed(loc)) {
 			return 1;
 		}
@@ -638,7 +662,13 @@ public class TerritoryManager {
 		if(territory.isLocInCenter(loc)) {
 			return 2;
 		}
-
+		// Check property flag
+		if(territory instanceof KonPropertyFlagHolder && !force) {
+			KonPropertyFlagHolder holder = (KonPropertyFlagHolder)territory;
+			if(holder.hasPropertyValue(KonPropertyFlag.UNCLAIM) && !holder.getPropertyValue(KonPropertyFlag.UNCLAIM)) {
+				return 5;
+			}
+		}
 		// Fire event
 		Set<Point> points = new HashSet<>();
 		points.add(Konquest.toPoint(loc));
@@ -657,7 +687,7 @@ public class TerritoryManager {
 	// Main method for admins to un-claim an individual chunk.
     // Calls event.
 	public boolean unclaimForAdmin(Player bukkitPlayer, Location claimLoc) {
-		int unclaimStatus = unclaimChunk(claimLoc);
+		int unclaimStatus = unclaimChunk(claimLoc, true);
     	switch(unclaimStatus) {
     	case 0:
     		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
@@ -672,6 +702,7 @@ public class TerritoryManager {
     		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     		break;
     	case 4:
+			// Cancelled by external event handler, skip error message
     		break;
     	default:
     		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(unclaimStatus));
@@ -705,7 +736,7 @@ public class TerritoryManager {
 		String territoryName = territory.getName();
 		
 		// Attempt to unclaim the current chunk
-    	int unclaimStatus = unclaimChunk(claimLoc);
+    	int unclaimStatus = unclaimChunk(claimLoc,false);
     	switch(unclaimStatus) {
     	case 0:
     		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_SUCCESS.getMessage("1",territoryName));
@@ -719,8 +750,12 @@ public class TerritoryManager {
     	case 3:
     		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     		break;
-    	case 4:
-    		break;
+		case 4:
+			// Cancelled by external event handler, skip error message
+			break;
+		case 5:
+			ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_BLOCKED.getMessage());
+			break;
     	default:
     		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(unclaimStatus));
     		break;
@@ -736,8 +771,9 @@ public class TerritoryManager {
 	 * 			2 - error, no chunks unclaimed
 	 * 			3 - error, chunks do not belong to territory
 	 * 			4 - error, event cancelled
+	 * 			5 - error, blocked by property flag
 	 */
-	public int unclaimChunkRadius(Location loc, int radius) {
+	public int unclaimChunkRadius(Location loc, int radius, boolean force) {
 		if(!isChunkClaimed(loc)) return 1;
 		
 		KonTerritory territory = getChunkTerritory(loc);
@@ -754,7 +790,13 @@ public class TerritoryManager {
     	if(claimedChunks.isEmpty()) {
     		return 2;
     	}
-    	
+		// Check property flag
+		if(territory instanceof KonPropertyFlagHolder && !force) {
+			KonPropertyFlagHolder holder = (KonPropertyFlagHolder)territory;
+			if(holder.hasPropertyValue(KonPropertyFlag.UNCLAIM) && !holder.getPropertyValue(KonPropertyFlag.UNCLAIM)) {
+				return 5;
+			}
+		}
 		// Fire event
 		Set<Point> points = new HashSet<>(claimedChunks);
 		KonquestTerritoryChunkEvent invokeEvent = new KonquestTerritoryChunkEvent(konquest, territory, loc, points, false);
@@ -781,7 +823,7 @@ public class TerritoryManager {
 		// Attempt to unclaim
     	int preClaimLand = unclaimTerritory.getChunkPoints().size();
     	int postClaimLand;
-    	int unclaimStatus = unclaimChunkRadius(claimLoc, radius);
+    	int unclaimStatus = unclaimChunkRadius(claimLoc, radius, true);
     	switch(unclaimStatus) {
 	    	case 0:
 	    		postClaimLand = unclaimTerritory.getChunkPoints().size();
@@ -791,18 +833,19 @@ public class TerritoryManager {
 	    	case 1:
 			case 2:
 				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_FAIL_UNCLAIMED.getMessage());
-	    		return false;
+				break;
 			case 3:
 	    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-	    		return false;
+				break;
 	    	case 4:
-	    		return false;
+				// Cancelled by external event handler, skip error message
+				break;
 	    	default:
 	    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(unclaimStatus));
-	    		return false;
+				break;
     	}
 		
-		return true;
+		return unclaimStatus == 0;
 	}
 	
 	public boolean unclaimRadiusForPlayer(Player bukkitPlayer, Location claimLoc, int radius) {
@@ -835,7 +878,7 @@ public class TerritoryManager {
 		// Attempt to un-claim
     	int preClaimLand = unclaimTerritory.getChunkPoints().size();
     	int postClaimLand;
-    	int unclaimStatus = unclaimChunkRadius(claimLoc, radius);
+    	int unclaimStatus = unclaimChunkRadius(claimLoc, radius, false);
     	switch(unclaimStatus) {
 	    	case 0:
 	    		postClaimLand = unclaimTerritory.getChunkPoints().size();
@@ -846,18 +889,22 @@ public class TerritoryManager {
 	    	case 1:
 			case 2:
 				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_FAIL_UNCLAIMED.getMessage());
-	    		return false;
+				break;
 			case 3:
 	    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-	    		return false;
-	    	case 4:
-	    		return false;
+				break;
+			case 4:
+				// Cancelled by external event handler, skip error message
+				break;
+			case 5:
+				ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_BLOCKED.getMessage());
+				break;
 	    	default:
 	    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(unclaimStatus));
-	    		return false;
+				break;
     	}
 		
-		return true;
+		return unclaimStatus == 0;
 	}
 	
 	/*

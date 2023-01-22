@@ -7,26 +7,26 @@ public enum KonPropertyFlag {
 //TODO: Replace these strings with MessagePaths
 	
 	// Properties for territories
-	TRAVEL			("Travel", 		"Allow travel to this territory"),
+	TRAVEL			("Travel", 		"Allow travel to this territory"), // Done in TravelCommand
 	PVP				("PvP", 		"Allow player damage"), // Done in EntityListener
 	PVE				("PvE", 		"Allow entity damage"), // Done in EntityListener
 	BUILD			("Build", 		"Allow block edits"), // Done in BlockListener
 	USE				("Use", 		"Allow using blocks"), // Done in InventoryListener, ...
 	MOBS			("Mobs", 		"Allow mobs to spawn"), // Done in EntityListener
 	PORTALS			("Portals", 	"Allow players to use portals"), // Done in WorldListener
-	ENTER			("Enter", 		"Allow players to enter"),
-	EXIT			("Exit", 		"Allow players to exit"),
+	ENTER			("Enter", 		"Allow players to enter"), // Done in PlayerListener
+	EXIT			("Exit", 		"Allow players to exit"), // Done in PlayerListener
 	
 	// Properties specifically for towns/capitals
-	CAPTURE			("Capture", 	"Allow this town to be captured"),
-	CLAIM			("Claim", 		"Allow players to claim land"),
-	UNCLAIM			("Unclaim", 	"Allow players to unclaim land"),
-	UPGRADE			("Upgrade", 	"Allow players to upgrade this town"),
-	PLOTS			("Plots", 		"Allow players to set town plots"),
+	CAPTURE			("Capture", 	"Allow this town to be captured"), // Done in BlockListener
+	CLAIM			("Claim", 		"Allow players to claim land"), // Done in TerritoryManager
+	UNCLAIM			("Unclaim", 	"Allow players to unclaim land"), // Done in TerritoryManager
+	UPGRADE			("Upgrade", 	"Allow players to upgrade this town"), // Done in TownManagementMenuWrapper
+	PLOTS			("Plots", 		"Allow players to set town plots"), // Done in TownManagementMenuWrapper
 	
 	// Properties for kingdoms
 	NEUTRAL			("Neutral", 	"Make this kingdom only peaceful"),
-	GOLEMS			("Golems", 		"Enable iron golems to attack enemies"),
+	GOLEMS			("Golems", 		"Enable iron golems to attack enemies"), // Done in KonTown
 	
 	NONE			("N/A", 		"Nothing");
 	

@@ -904,6 +904,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
     	if(!isAttacked() && !isGolemOffensive()) {
     		return;
     	}
+		// Ignore if kingdom property flag is disabled
+		if(!getKingdom().getPropertyValue(KonPropertyFlag.GOLEMS)) {
+			return;
+		}
     	// Command all nearby Iron Golems to target closest enemy player, if enemy exists nearby, else don't change target
     	// Find iron golems within the town max radius
     	// Do not update targets if triggering player is not an enemy of this town

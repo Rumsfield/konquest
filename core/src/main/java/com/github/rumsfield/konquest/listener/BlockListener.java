@@ -259,6 +259,12 @@ public class BlockListener implements Listener {
 										event.setCancelled(true);
 										return;
 									}
+									// Prevent capture for property flag
+									if(!town.getPropertyValue(KonPropertyFlag.CAPTURE)) {
+										ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+										event.setCancelled(true);
+										return;
+									}
 									// Cancel item drops on the broken blocks
 									event.setDropItems(false);
 									// Handle town capture/destroy
