@@ -44,13 +44,16 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		String pageLabel;
  		List<String> loreList;
  		InfoIcon info;
- 		final int MAX_ICONS_PER_PAGE = 45;
- 		int slotIndex = 1;
- 		int pageIndex = 0;
- 		int pageRows = 1;
- 		
+		final int MAX_ICONS_PER_PAGE = 45;
+		int slotIndex = 1;
+		int pageIndex = 0;
+		int pageRows = 1;
+
+		OfflinePlayer masterPlayer = infoKingdom.getPlayerMaster();
  		List<OfflinePlayer> allKingdomMembers = new ArrayList<>();
- 		allKingdomMembers.add(infoKingdom.getPlayerMaster());
+		if(masterPlayer != null) {
+			allKingdomMembers.add(masterPlayer);
+		}
  		allKingdomMembers.addAll(infoKingdom.getPlayerOfficersOnly());
  		allKingdomMembers.addAll(infoKingdom.getPlayerMembersOnly());
 
@@ -61,9 +64,9 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		/* Master Player Info Icon (1) */
 		loreList = new ArrayList<>();
 		if(infoKingdom.isMasterValid()) {
-			OfflinePlayer masterPlayer = infoKingdom.getPlayerMaster();
 			loreList.add(ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage());
 			loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
+			assert masterPlayer != null;
 			PlayerIcon playerInfo = new PlayerIcon(kingdomColor+masterPlayer.getName(),loreList,masterPlayer,slotIndex,true,PlayerIconAction.DISPLAY_INFO);
 			getMenu().getPage(pageIndex).addIcon(playerInfo);
 		} else {
@@ -189,19 +192,21 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			while(slotIndex < MAX_ICONS_PER_PAGE && memberIter.hasNext()) {
 				/* Player Icon (n) */
 				OfflinePlayer currentMember = memberIter.next();
-				loreList = new ArrayList<>();
-				loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
-				String playerType = ChatColor.WHITE+MessagePath.LABEL_MEMBER.getMessage();
-				if(infoKingdom.isMaster(currentMember.getUniqueId())) {
-					playerType = ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage();
-				} else if(infoKingdom.isOfficer(currentMember.getUniqueId())) {
-					playerType = ChatColor.BLUE+MessagePath.LABEL_OFFICER.getMessage();
+				if(currentMember != null) {
+					loreList = new ArrayList<>();
+					loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
+					String playerType = ChatColor.WHITE+MessagePath.LABEL_MEMBER.getMessage();
+					if(infoKingdom.isMaster(currentMember.getUniqueId())) {
+						playerType = ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage();
+					} else if(infoKingdom.isOfficer(currentMember.getUniqueId())) {
+						playerType = ChatColor.BLUE+MessagePath.LABEL_OFFICER.getMessage();
+					}
+					loreList.add(playerType);
+					loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
+					PlayerIcon player = new PlayerIcon(kingdomColor+currentMember.getName(),loreList,currentMember,slotIndex,true,PlayerIconAction.DISPLAY_INFO);
+					getMenu().getPage(pageIndex).addIcon(player);
+					slotIndex++;
 				}
-				loreList.add(playerType);
-		    	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
-		    	PlayerIcon player = new PlayerIcon(kingdomColor+currentMember.getName(),loreList,currentMember,slotIndex,true,PlayerIconAction.DISPLAY_INFO);
-		    	getMenu().getPage(pageIndex).addIcon(player);
-				slotIndex++;
 			}
 			pageIndex++;
 		}

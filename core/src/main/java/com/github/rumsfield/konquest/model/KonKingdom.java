@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.List;
@@ -260,7 +261,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		members.clear();
 	}
 	
-	public OfflinePlayer getPlayerMaster() {
+	public @Nullable OfflinePlayer getPlayerMaster() {
 		if(isCreated && master != null) {
 			return Bukkit.getOfflinePlayer(master);
 		}

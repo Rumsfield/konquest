@@ -25,6 +25,10 @@ public class KingdomCommand extends CommandBase {
 
 	@Override
 	public void execute() {
+		// Notify sender when admin
+		if(getSender().hasPermission("konquest.command.admin") && getKonquest().getSanctuaryManager().getNumTemplates() == 0) {
+			ChatUtil.sendError((Player) getSender(),"There are no monument templates. Create one in a sanctuary with \"k admin monument\"");
+		}
 		// kingdom [menu|create|add|kick|rename] [name] [template]
 		if (getArgs().length != 1 && getArgs().length != 2 && getArgs().length != 3 && getArgs().length != 4) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
