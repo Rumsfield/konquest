@@ -18,6 +18,7 @@ import java.util.HashMap;
 public class TravelManager implements Timeable {
 
 	public enum TravelDestination {
+		SANCTUARY,
 		CAPITAL,
 		CAMP,
 		HOME,

@@ -506,21 +506,20 @@ public class TownAdminCommand extends CommandBase {
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 4) {
 			// Town name
-			List<String> townList = new ArrayList<>();
 			String subCommand = getArgs()[2];
 			if(subCommand.equalsIgnoreCase("create")) {
 				// Suggest new name
-				townList.add("***");
+				tabList.add("***");
 			} else if(subCommand.equalsIgnoreCase("remove")) {
 				// Suggest existing town names only
-				townList.addAll(getKonquest().getKingdomManager().getTownNames());
+				tabList.addAll(getKonquest().getKingdomManager().getTownNames());
 			} else {
 				// Suggest existing town + capital names
-				townList.addAll(getKonquest().getKingdomManager().getTownNames());
-				townList.addAll(getKonquest().getKingdomManager().getKingdomNames());
+				tabList.addAll(getKonquest().getKingdomManager().getTownNames());
+				tabList.addAll(getKonquest().getKingdomManager().getKingdomNames());
 			}
 			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[3], townList, matchedTabList);
+			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 5) {
 			// suggest appropriate arguments

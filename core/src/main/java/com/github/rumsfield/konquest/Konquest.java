@@ -159,6 +159,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	public void initialize() {
 		// Initialize managers
 		configManager.initialize();
+		checkCorePaths();
 		boolean debug = getCore().getBoolean(CorePath.DEBUG.getPath());
 		ChatUtil.printDebug("Debug is "+debug);
 		String worldName = getCore().getString(CorePath.WORLD_NAME.getPath());
@@ -445,6 +446,15 @@ public class Konquest implements KonquestAPI, Timeable {
 			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			neutralColor = color;
+		}
+	}
+
+	private void checkCorePaths() {
+		// Checks all CorePath enums to ensure they have a valid core.yml path.
+		for(CorePath testPath : CorePath.values()) {
+			if(!getCore().contains(testPath.getPath())) {
+				ChatUtil.printConsoleError("Internal error, core path "+testPath.getPath()+" does not exist within core.yml file.");
+			}
 		}
 	}
 	
