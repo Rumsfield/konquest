@@ -8,6 +8,7 @@ import com.github.rumsfield.konquest.model.KonMonument;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
@@ -35,7 +36,7 @@ public class PlayerManager implements KonquestPlayerManager {
 	public void initialize() {
 		// Gather all block commands from core config
 		blockedCommands.clear();
-		blockedCommands.addAll(konquest.getConfigManager().getConfig("core").getStringList("core.combat.prevent_command_list"));
+		blockedCommands.addAll(konquest.getCore().getStringList(CorePath.COMBAT_PREVENT_COMMAND_LIST.getPath()));
 		
 		//blockedCommands
 		

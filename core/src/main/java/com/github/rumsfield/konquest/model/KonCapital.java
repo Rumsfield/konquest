@@ -11,7 +11,7 @@ import org.bukkit.Location;
 public class KonCapital extends KonTown implements KonquestCapital {
 
 	public KonCapital(Location loc, KonKingdom kingdom, Konquest konquest) {
-		super(loc, kingdom.getName()+" "+konquest.getConfigManager().getConfig("core").getString(CorePath.KINGDOMS_CAPITAL_SUFFIX.getPath()), kingdom, konquest);
+		super(loc, kingdom.getName()+" "+konquest.getCore().getString(CorePath.KINGDOMS_CAPITAL_SUFFIX.getPath()), kingdom, konquest);
 		
 	}
 	
@@ -20,7 +20,7 @@ public class KonCapital extends KonTown implements KonquestCapital {
 	}
 	
 	public void updateName() {
-		setName(getKingdom().getName()+" "+getKonquest().getConfigManager().getConfig("core").getString(CorePath.KINGDOMS_CAPITAL_SUFFIX.getPath()));
+		setName(getKingdom().getName()+" "+getKonquest().getCore().getString(CorePath.KINGDOMS_CAPITAL_SUFFIX.getPath()));
 		updateBar();
 	}
 	

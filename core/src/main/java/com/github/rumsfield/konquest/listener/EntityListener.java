@@ -697,7 +697,7 @@ public class EntityListener implements Listener {
     public void onAnimalDeathItem(EntityDeathEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		// Check for ruin golem
-		boolean cancelGolemDrops = konquest.getConfigManager().getConfig("core").getBoolean("core.ruins.no_golem_drops", true);
+		boolean cancelGolemDrops = konquest.getCore().getBoolean(CorePath.RUINS_NO_GOLEM_DROPS.getPath(), true);
 		EntityType eType = event.getEntity().getType();
 		if(event.getEntity() instanceof IronGolem && eType.equals(EntityType.IRON_GOLEM) && cancelGolemDrops) {
 			IronGolem deadGolem = (IronGolem)event.getEntity();

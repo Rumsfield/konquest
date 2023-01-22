@@ -6,6 +6,7 @@ import com.github.rumsfield.konquest.model.KonMonumentTemplate;
 import com.github.rumsfield.konquest.model.KonPropertyFlag;
 import com.github.rumsfield.konquest.model.KonSanctuary;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -342,7 +343,7 @@ public class SanctuaryManager {
 		// Check for at least as many critical blocks as required critical hits
 		// Also check for any chests for loot flag
 		HashSet<Inventory> lootInventories = new HashSet<>();
-		int maxCriticalhits = konquest.getConfigManager().getConfig("core").getInt("core.monuments.destroy_amount");
+		int maxCriticalhits = konquest.getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
 		int bottomBlockX, bottomBlockY, bottomBlockZ;
 		int topBlockX, topBlockY, topBlockZ;
 		int c1X = corner1.getBlockX();

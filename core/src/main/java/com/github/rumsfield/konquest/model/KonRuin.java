@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestRuin;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.Timeable;
 import com.github.rumsfield.konquest.utility.Timer;
 import org.bukkit.Bukkit;
@@ -259,7 +260,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	public void spawnAllGolems() {
 		if(!isCaptureDisabled) {
 			// Prune any golems not linked to this ruin
-			int min_distance_town = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_distance_town");
+			int min_distance_town = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
 			for(Entity ent : getCenterLoc().getWorld().getNearbyEntities(getCenterLoc(), min_distance_town*16, 64, min_distance_town*16)) {
 				if(ent.getType().equals(EntityType.IRON_GOLEM) && ent instanceof IronGolem) {
 					IronGolem foundGolem = (IronGolem)ent;
@@ -370,7 +371,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 			if(golem.matches(deadGolem)) {
 				golem.setIsRespawnCooldown(true);
 				golem.setLastTarget(null);
-				int golemRespawnTimeSeconds = getKonquest().getConfigManager().getConfig("core").getInt("core.ruins.respawn_cooldown");
+				int golemRespawnTimeSeconds = getKonquest().getCore().getInt(CorePath.RUINS_RESPAWN_COOLDOWN.getPath());
 				golem.getRespawnTimer().stopTimer();
 				golem.getRespawnTimer().setTime(golemRespawnTimeSeconds);
 				golem.getRespawnTimer().startTimer();

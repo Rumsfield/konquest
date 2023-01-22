@@ -6,6 +6,7 @@ import com.github.rumsfield.konquest.api.manager.KonquestShieldManager;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -34,10 +35,10 @@ public class ShieldManager implements KonquestShieldManager {
 	
 	public void initialize() {
 		if(loadShields()) {
-			isShieldsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_shields",false);
+			isShieldsEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_ENABLE_SHIELDS.getPath(),false);
 		}
 		if(loadArmors()) {
-			isArmorsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_armor",false);
+			isArmorsEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_ENABLE_ARMOR.getPath(),false);
 		}
 		// Check for shields or armor that must be disabled, due to reload
 		for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
@@ -161,21 +162,21 @@ public class ShieldManager implements KonquestShieldManager {
 		}
 		
 		// Check that town is not under attack optionally
-		boolean isAttackCheckEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.shields_while_attacked",false);
+		boolean isAttackCheckEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_SHIELDS_WHILE_ATTACKED.getPath(),false);
 		if(!isAttackCheckEnabled && town.isAttacked()) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_ATTACK.getMessage());
             return false;
 		}
 		
 		// Check that town does not have an active shield optionally
-		boolean isShieldAddEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.shields_add",false);
+		boolean isShieldAddEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_SHIELDS_ADD.getPath(),false);
 		if(!isShieldAddEnabled && town.isShielded()) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_ADD.getMessage());
             return false;
 		}
 		
 		// Check that town does not exceed maximum optionally
-		int maxShields = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_shields",0);
+		int maxShields = konquest.getCore().getInt(CorePath.TOWNS_MAX_SHIELDS.getPath(),0);
 		if(maxShields > 0 && shield.getDurationSeconds()+town.getRemainingShieldTimeSeconds() > maxShields) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_MAX.getMessage(maxShields));
             return false;
@@ -218,21 +219,21 @@ public class ShieldManager implements KonquestShieldManager {
 		}
 		
 		// Check that town is not under attack optionally
-		boolean isAttackCheckEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.armor_while_attacked",false);
+		boolean isAttackCheckEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_ARMOR_WHILE_ATTACKED.getPath(),false);
 		if(!isAttackCheckEnabled && town.isAttacked()) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_ATTACK.getMessage());
             return false;
 		}
 		
 		// Check that town does not have an active armor optionally
-		boolean isArmorAddEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.armor_add",false);
+		boolean isArmorAddEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_ARMOR_ADD.getPath(),false);
 		if(!isArmorAddEnabled && town.isArmored()) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_ADD.getMessage());
             return false;
 		}
 		
 		// Check that town does not exceed maximum optionally
-		int maxArmor = konquest.getConfigManager().getConfig("core").getInt("core.towns.max_armor",0);
+		int maxArmor = konquest.getCore().getInt(CorePath.TOWNS_MAX_ARMOR.getPath(),0);
 		if(maxArmor > 0 && armor.getBlocks()+town.getArmorBlocks() > maxArmor) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_MAX.getMessage(maxArmor));
             return false;

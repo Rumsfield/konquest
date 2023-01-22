@@ -10,6 +10,7 @@ import com.github.rumsfield.konquest.model.KonCampGroup;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -40,7 +41,7 @@ public class CampManager implements KonquestCampManager {
 	
 	// intended to be called after database has connected and loaded player tables
 	public void initCamps() {
-		isClanEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.clan_enable",false);
+		isClanEnabled = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ENABLE.getPath(),false);
 		loadCamps();
 		refreshGroups();
 		ChatUtil.printDebug("Loaded camps and groups");
@@ -122,7 +123,7 @@ public class CampManager implements KonquestCampManager {
 	 *                  5 = world is invalid
 	 */
 	public int addCamp(Location loc, KonOfflinePlayer player) {
-		boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.enable",true);
+		boolean enable = konquest.getCore().getBoolean(CorePath.CAMPS_ENABLE.getPath(),true);
 		if(!enable) {
 			ChatUtil.printDebug("Failed to add camp, feature disabled!");
 			return 4;
@@ -138,7 +139,7 @@ public class CampManager implements KonquestCampManager {
 		}
 		if(!barbarianCamps.containsKey(uuid)) {
 			// Verify no overlapping init chunks
-			int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
+			int radius = konquest.getCore().getInt(CorePath.CAMPS_INIT_RADIUS.getPath());
 			World addWorld = loc.getWorld();
 			for(Point point : konquest.getAreaPoints(loc, radius)) {
 				if(konquest.getTerritoryManager().isChunkClaimed(point,addWorld)) {
@@ -254,7 +255,7 @@ public class CampManager implements KonquestCampManager {
 		groupMap.clear();
 		if(!isClanEnabled) return;
 		int totalGroups = 0;
-		int radius = konquest.getConfigManager().getConfig("core").getInt("core.camps.init_radius");
+		int radius = konquest.getCore().getInt(CorePath.CAMPS_INIT_RADIUS.getPath());
 		Location center;
 		// Evaluate each camp for adjacent camps, creating groups as necessary
 		for(KonCamp currCamp : barbarianCamps.values()) {
@@ -319,7 +320,7 @@ public class CampManager implements KonquestCampManager {
 	}
 	
 	private void loadCamps() {
-		boolean enable = konquest.getConfigManager().getConfig("core").getBoolean("core.camps.enable",true);
+		boolean enable = konquest.getCore().getBoolean(CorePath.CAMPS_ENABLE.getPath(),true);
 		if(!enable) {
 			ChatUtil.printConsoleAlert("Disabled barbarian camps");
 			return;
@@ -334,7 +335,7 @@ public class CampManager implements KonquestCampManager {
         double x,y,z;
         List<Double> sectionList;
         String worldName;
-        String defaultWorldName = konquest.getConfigManager().getConfig("core").getString("core.world_name","world");
+        String defaultWorldName = konquest.getCore().getString(CorePath.WORLD_NAME.getPath(),"world");
         int totalCamps = 0;
         for(String uuid : playerSet) {
         	if(campsSection.contains(uuid)) {

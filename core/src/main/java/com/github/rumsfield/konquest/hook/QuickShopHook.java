@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.hook;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.listener.QuickShopListener;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.Version;
 import org.bukkit.*;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,7 +38,7 @@ public class QuickShopHook implements PluginHook {
 			ChatUtil.printConsoleAlert("Could not integrate QuickShop, disabled.");
 			return;
 		}
-		if(!konquest.getConfigManager().getConfig("core").getBoolean("core.integration.quickshop",false)) {
+		if(!konquest.getCore().getBoolean(CorePath.INTEGRATION_QUICKSHOP.getPath(),false)) {
 			ChatUtil.printConsoleAlert("Disabled QuickShop integration from core config settings.");
 			return;
 		}

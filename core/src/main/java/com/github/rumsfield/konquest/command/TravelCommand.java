@@ -8,6 +8,7 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTerritory;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -45,7 +46,7 @@ public class TravelCommand extends CommandBase {
     		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 			// Verify player is not in enemy territory
-			boolean blockEnemyTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_travel");
+			boolean blockEnemyTravel = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_NO_ENEMY_TRAVEL.getPath());
 			if (blockEnemyTravel) {
 				Location playerLoc = bukkitPlayer.getLocation();
 				if(getKonquest().getTerritoryManager().isChunkClaimed(playerLoc)) {
@@ -67,7 +68,7 @@ public class TravelCommand extends CommandBase {
             		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
                     return;
             	}
-        		boolean isCapitalTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.capital",false);
+        		boolean isCapitalTravel = getKonquest().getCore().getBoolean(CorePath.TRAVEL_ENABLE_CAPITAL.getPath(),false);
         		if(isCapitalTravel) {
         			travelLoc = player.getKingdom().getCapital().getSpawnLoc();
             		destination = TravelDestination.CAPITAL;
@@ -86,7 +87,7 @@ public class TravelCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_NO_CAMP.getMessage());
                     return;
         		}
-        		boolean isCampTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.camp",false);
+        		boolean isCampTravel = getKonquest().getCore().getBoolean(CorePath.TRAVEL_ENABLE_CAMP.getPath(),false);
         		if(isCampTravel) {
         			KonCamp travelCamp = getKonquest().getCampManager().getCamp(player);
         			travelLoc = travelCamp.getSpawnLoc();
@@ -107,7 +108,7 @@ public class TravelCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_NO_HOME.getMessage());
                     return;
         		}
-        		boolean isHomeTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.home",false);
+        		boolean isHomeTravel = getKonquest().getCore().getBoolean(CorePath.TRAVEL_ENABLE_HOME.getPath(),false);
         		if(isHomeTravel) {
         			travelLoc = bedLoc;
             		destination = TravelDestination.HOME;
@@ -117,7 +118,7 @@ public class TravelCommand extends CommandBase {
         		}
         	} else if(travelName.equalsIgnoreCase("wild")) {
         		// Travel to random wild location
-        		boolean isWildTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.wild",false);
+        		boolean isWildTravel = getKonquest().getCore().getBoolean(CorePath.TRAVEL_ENABLE_WILD.getPath(),false);
         		if(isWildTravel) {
         			travelLoc = getKonquest().getRandomWildLocation(bukkitWorld);
             		destination = TravelDestination.WILD;
@@ -145,7 +146,7 @@ public class TravelCommand extends CommandBase {
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_COOLDOWN.getMessage(cooldown,town.getName()));
                     return;
         		}
-        		boolean isTownTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.towns",false);
+        		boolean isTownTravel = getKonquest().getCore().getBoolean(CorePath.TRAVEL_ENABLE_TOWNS.getPath(),false);
         		if(isTownTravel) {
         			travelLoc = town.getSpawnLoc();
             		destination = TravelDestination.TOWN;
@@ -157,11 +158,11 @@ public class TravelCommand extends CommandBase {
         	}
         	
         	// Second, determine whether player can cover cost
-    		boolean isTravelAlwaysAllowed = getKonquest().getConfigManager().getConfig("core").getBoolean("core.favor.allow_travel_always",true);
-        	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel",0.0);
-        	double cost_per_chunk = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel_per_chunk",0.0);
-        	double cost_world = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel_world",0.0);
-        	double cost_camp = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel_camp",0.0);
+    		boolean isTravelAlwaysAllowed = getKonquest().getCore().getBoolean(CorePath.FAVOR_ALLOW_TRAVEL_ALWAYS.getPath(),true);
+        	double cost = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_TRAVEL.getPath(),0.0);
+        	double cost_per_chunk = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_TRAVEL_PER_CHUNK.getPath(),0.0);
+        	double cost_world = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_TRAVEL_WORLD.getPath(),0.0);
+        	double cost_camp = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_TRAVEL_CAMP.getPath(),0.0);
         	cost = (cost < 0) ? 0 : cost;
         	cost_per_chunk = (cost_per_chunk < 0) ? 0 : cost_per_chunk;
         	cost_camp = (cost_camp < 0) ? 0 : cost_camp;
@@ -205,7 +206,7 @@ public class TravelCommand extends CommandBase {
 			// 	- Player move listener needs to check this flag and optionally cancel it
 			// If player uses another travel command during warmup, cancel current warmup and begin a new one for new destination
 			
-			int travelWarmup = getKonquest().getConfigManager().getConfig("core").getInt("core.travel.warmup",0);
+			int travelWarmup = getKonquest().getCore().getInt(CorePath.TRAVEL_WARMUP.getPath(),0);
 			travelWarmup = Math.max(travelWarmup, 0);
 			if(travelWarmup > 0) {
 				String warmupTimeStr = ""+travelWarmup;
@@ -223,11 +224,11 @@ public class TravelCommand extends CommandBase {
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		if(getArgs().length == 2) {
-			boolean isCapitalTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.capital",false);
-			boolean isTownTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.towns",false);
-			boolean isHomeTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.home",false);
-			boolean isCampTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.camp",false);
-			boolean isWildTravel = getKonquest().getConfigManager().getConfig("core").getBoolean("core.travel.enable.wild",false);
+			boolean isCapitalTravel = getKonquest().getCore().getBoolean(CorePath.TRAVEL_ENABLE_CAPITAL.getPath(),false);
+			boolean isTownTravel = getKonquest().getCore().getBoolean(CorePath.TRAVEL_ENABLE_TOWNS.getPath(),false);
+			boolean isHomeTravel = getKonquest().getCore().getBoolean(CorePath.TRAVEL_ENABLE_HOME.getPath(),false);
+			boolean isCampTravel = getKonquest().getCore().getBoolean(CorePath.TRAVEL_ENABLE_CAMP.getPath(),false);
+			boolean isWildTravel = getKonquest().getCore().getBoolean(CorePath.TRAVEL_ENABLE_WILD.getPath(),false);
 			Player bukkitPlayer = (Player) getSender();
 			KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 			if(player.isBarbarian()) {

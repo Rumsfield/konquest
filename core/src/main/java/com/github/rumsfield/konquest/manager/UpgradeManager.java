@@ -10,6 +10,7 @@ import com.github.rumsfield.konquest.model.KonStatsType;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -43,7 +44,7 @@ public class UpgradeManager implements KonquestUpgradeManager {
         		ChatUtil.printConsoleError("Failed to load bad upgrades from upgrades.yml. Try deleting all upgrades files and re-starting the server.");
         	}
         }
-		isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.towns.enable_upgrades",false);
+		isEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_ENABLE_UPGRADES.getPath(),false);
 		ChatUtil.printDebug("Upgrade Manager is ready, enabled "+isEnabled);
 	}
 	

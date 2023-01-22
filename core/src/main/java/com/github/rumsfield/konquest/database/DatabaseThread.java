@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.database;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 
 public class DatabaseThread implements Runnable {
     private final Konquest konquest;
@@ -43,7 +44,7 @@ public class DatabaseThread implements Runnable {
     }
 
     public void createDatabase() {
-    	String dbType = konquest.getConfigManager().getConfig("core").getString("core.database.connection","sqlite");
+    	String dbType = konquest.getCore().getString(CorePath.DATABASE_CONNECTION.getPath(),"sqlite");
     	DatabaseType type = DatabaseType.getType(dbType);
     	database = new KonquestDB(type,konquest);
     }

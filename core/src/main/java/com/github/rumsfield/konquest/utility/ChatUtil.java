@@ -205,7 +205,7 @@ public class ChatUtil {
 	}
 	
 	public static void printDebug(String message) {
-		if(Konquest.getInstance().getConfigManager().getConfig("core").getBoolean("core.debug")) {
+		if(Konquest.getInstance().getCore().getBoolean(CorePath.DEBUG.getPath())) {
         	Bukkit.getServer().getConsoleSender().sendMessage("[Konquest DEBUG] " + message);
         }
 	}

@@ -8,6 +8,7 @@ import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonRuin;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
@@ -49,8 +50,8 @@ public class RuinManager implements KonquestRuinManager {
 	}
 	
 	public void rewardPlayers(KonRuin ruin, KonKingdom kingdom) {
-		int rewardFavor = konquest.getConfigManager().getConfig("core").getInt("core.ruins.capture_reward_favor",0);
-		int rewardExp = konquest.getConfigManager().getConfig("core").getInt("core.ruins.capture_reward_exp",0);
+		int rewardFavor = konquest.getCore().getInt(CorePath.RUINS_CAPTURE_REWARD_FAVOR.getPath(),0);
+		int rewardExp = konquest.getCore().getInt(CorePath.RUINS_CAPTURE_REWARD_EXP.getPath(),0);
 		for(KonPlayer friendly : getRuinPlayers(ruin,kingdom)) {
 			// Give reward to player
 			if(rewardFavor > 0) {
@@ -160,7 +161,7 @@ public class RuinManager implements KonquestRuinManager {
 	}
 	
 	private void loadCriticalBlocks() {
-		String ruinCriticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString("core.ruins.critical_block","");
+		String ruinCriticalBlockTypeName = konquest.getCore().getString(CorePath.RUINS_CRITICAL_BLOCK.getPath(),"");
 		try {
 			ruinCriticalBlock = Material.valueOf(ruinCriticalBlockTypeName);
 		} catch(IllegalArgumentException e) {

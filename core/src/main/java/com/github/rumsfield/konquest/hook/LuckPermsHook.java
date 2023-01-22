@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.hook;
 
+import com.github.rumsfield.konquest.utility.CorePath;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -34,7 +35,7 @@ public class LuckPermsHook implements PluginHook {
 			ChatUtil.printConsoleAlert("Could not integrate LuckPerms, missing or disabled.");
 			return;
 		}
-		if(!konquest.getConfigManager().getConfig("core").getBoolean("core.integration.luckperms",false)) {
+		if(!konquest.getCore().getBoolean(CorePath.INTEGRATION_LUCKPERMS.getPath(),false)) {
 			ChatUtil.printConsoleAlert("Disabled LuckPerms integration from core config settings.");
 			return;
 		}

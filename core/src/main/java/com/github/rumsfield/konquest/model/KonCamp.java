@@ -3,10 +3,7 @@ package com.github.rumsfield.konquest.model;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestCamp;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.Timeable;
-import com.github.rumsfield.konquest.utility.Timer;
+import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -46,7 +43,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 	}
 	
 	private void initProtection() {
-		boolean isOfflineProtectedEnabled = getKonquest().getConfigManager().getConfig("core").getBoolean("core.camps.no_enemy_edit_offline",true);
+		boolean isOfflineProtectedEnabled = getKonquest().getCore().getBoolean(CorePath.CAMPS_NO_ENEMY_EDIT_OFFLINE.getPath(),true);
 		if(isOfflineProtectedEnabled && !isOwnerOnline()) {
 			// Immediately enable protection
 			isOfflineProtected = true;
@@ -60,7 +57,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 	 * 			4 - error, bad chunk
 	 */
 	public int initClaim() {
-		if(!addChunks(getKonquest().getAreaPoints(getCenterLoc(), getKonquest().getConfigManager().getConfig("core").getInt("core.camps.init_radius")))) {
+		if(!addChunks(getKonquest().getAreaPoints(getCenterLoc(), getKonquest().getCore().getInt(CorePath.CAMPS_INIT_RADIUS.getPath())))) {
 			ChatUtil.printDebug("Camp init failed: problem adding some chunks");
 			return 4;
 		}
@@ -159,8 +156,8 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 	public void setProtected(boolean val) {
 		if(val) {
 			// Optionally start warmup timer to protect this camp
-			boolean isOfflineProtectedEnabled = getKonquest().getConfigManager().getConfig("core").getBoolean("core.camps.no_enemy_edit_offline",true);
-			int offlineProtectedWarmupSeconds = getKonquest().getConfigManager().getConfig("core").getInt("core.camps.no_enemy_edit_offline_warmup",0);
+			boolean isOfflineProtectedEnabled = getKonquest().getCore().getBoolean(CorePath.CAMPS_NO_ENEMY_EDIT_OFFLINE.getPath(),true);
+			int offlineProtectedWarmupSeconds = getKonquest().getCore().getInt(CorePath.CAMPS_NO_ENEMY_EDIT_OFFLINE_WARMUP.getPath(),0);
 			if(isOfflineProtectedEnabled) {
 				if(offlineProtectedWarmupSeconds > 0 && protectedWarmupTimer.getTime() == -1 && !isOfflineProtected) {
 					// Start warmup timer
@@ -191,7 +188,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 	}
 	
 	public void applyGlow(Player bukkitPlayer) {
-		boolean isGlowEnabled = getKonquest().getConfigManager().getConfig("core").getBoolean("core.camps.enemy_glow", true);
+		boolean isGlowEnabled = getKonquest().getCore().getBoolean(CorePath.CAMPS_ENEMY_GLOW.getPath(), true);
 		if (!isGlowEnabled) return;
 		bukkitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 5, 1));
 	}

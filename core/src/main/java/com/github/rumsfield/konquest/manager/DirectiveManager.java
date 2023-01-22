@@ -5,6 +5,7 @@ import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.model.KonDirective;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -33,12 +34,13 @@ public class DirectiveManager {
 		for(KonDirective dir : KonDirective.values()) {
 			String dirName = dir.toString().toLowerCase();
 			double reward = 10;
-			if(konquest.getConfigManager().getConfig("core").contains("core.favor.rewards."+dirName)) {
-				reward = konquest.getConfigManager().getConfig("core").getDouble("core.favor.rewards."+dirName,0.0);
+			//TODO: Figure out how to use CorePath enums for this...
+			if(konquest.getCore().contains("core.favor.rewards."+dirName)) {
+				reward = konquest.getCore().getDouble("core.favor.rewards."+dirName,0.0);
 			}
 			rewardTable.put(dir,reward);
 		}
-		isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.directive_quests",true);
+		isEnabled = konquest.getCore().getBoolean(CorePath.DIRECTIVE_QUESTS.getPath(),true);
 		ChatUtil.printDebug("Directive Manager is ready, enabled: "+isEnabled);
 	}
 	

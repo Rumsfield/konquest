@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.hook;
 
+import com.github.rumsfield.konquest.utility.CorePath;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -38,7 +39,7 @@ public class DiscordSrvHook implements PluginHook {
 			return;
 		}
 
-		if(!konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv",false)) {
+		if(!konquest.getCore().getBoolean(CorePath.INTEGRATION_DISCORDSRV.getPath(),false)) {
 			ChatUtil.printConsoleAlert("Disabled DiscordSRV integration from core config settings.");
 			return;
 		}
@@ -134,7 +135,7 @@ public class DiscordSrvHook implements PluginHook {
 	
 	// Sends the linked player a direct message
 	public void alertDiscordMember(OfflinePlayer player, String message) {
-		boolean doAlert = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv_options.raid_alert_direct",false);
+		boolean doAlert = konquest.getCore().getBoolean(CorePath.INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_DIRECT.getPath(),false);
 		if(isEnabled && doAlert) {
 			String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(player.getUniqueId());
 			if (discordId != null) {
@@ -150,7 +151,7 @@ public class DiscordSrvHook implements PluginHook {
 	
 	// Sends the channel a message to @everyone
 	public void alertDiscordChannel(String channel, String message) {
-		boolean doAlert = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.discordsrv_options.raid_alert_channel",false);
+		boolean doAlert = konquest.getCore().getBoolean(CorePath.INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_CHANNEL.getPath(),false);
 		if(!isEnabled || !doAlert)return;
 		TextChannel textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName(channel);
 

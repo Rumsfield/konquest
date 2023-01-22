@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.database;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,15 +47,15 @@ public class DatabaseConnection {
         	case MYSQL:
         		try {
         			ChatUtil.printConsoleAlert("Connecting to MySQL database");
-        			FileConfiguration coreConfig = Konquest.getInstance().getConfigManager().getConfig("core");
-                	String hostname = coreConfig.getString("core.database.mysql.hostname");
-                	String port = coreConfig.getString("core.database.mysql.port");
-                	String database = coreConfig.getString("core.database.mysql.database");
-                	String username = coreConfig.getString("core.database.mysql.username","");
+        			FileConfiguration coreConfig = Konquest.getInstance().getCore();
+                	String hostname = coreConfig.getString(CorePath.DATABASE_MYSQL_HOSTNAME.getPath());
+                	String port = coreConfig.getString(CorePath.DATABASE_MYSQL_PORT.getPath());
+                	String database = coreConfig.getString(CorePath.DATABASE_MYSQL_DATABASE.getPath());
+                	String username = coreConfig.getString(CorePath.DATABASE_MYSQL_USERNAME.getPath(),"");
                 	properties.put("user", username);
-                	String password = coreConfig.getString("core.database.mysql.password","");
+                	String password = coreConfig.getString(CorePath.DATABASE_MYSQL_PASSWORD.getPath(),"");
                     properties.put("password", password);
-                    for(String nameValuePair : coreConfig.getStringList("core.database.mysql.properties")) {
+                    for(String nameValuePair : coreConfig.getStringList(CorePath.DATABASE_MYSQL_PROPERTIES.getPath())) {
                     	String[] propNameValue = nameValuePair.split("=",2);
                     	if(propNameValue.length == 2) {
                     		properties.put(propNameValue[0], propNameValue[1]);

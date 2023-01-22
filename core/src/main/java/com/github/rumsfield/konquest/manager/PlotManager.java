@@ -6,6 +6,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
 import com.github.rumsfield.konquest.model.KonPlot;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -32,11 +33,11 @@ public class PlotManager implements KonquestPlotManager {
 	}
 	
 	public void initialize() {
-		isPlotsEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.enable",false);
-		isAllowBuild = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.allow_build",false);
-		isAllowContainers = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.allow_containers",false);
-		isIgnoreKnights = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.ignore_knights",false);
-		maxSize = konquest.getConfigManager().getConfig("core").getInt("core.plots.max_size",16);
+		isPlotsEnabled = konquest.getCore().getBoolean(CorePath.PLOTS_ENABLE.getPath(),false);
+		isAllowBuild = konquest.getCore().getBoolean(CorePath.PLOTS_ALLOW_BUILD.getPath(),false);
+		isAllowContainers = konquest.getCore().getBoolean(CorePath.PLOTS_ALLOW_CONTAINERS.getPath(),false);
+		isIgnoreKnights = konquest.getCore().getBoolean(CorePath.PLOTS_IGNORE_KNIGHTS.getPath(),false);
+		maxSize = konquest.getCore().getInt(CorePath.PLOTS_MAX_SIZE.getPath(),16);
 		ChatUtil.printDebug("Plot Manager is ready, enabled: "+isPlotsEnabled);
 	}
 	
@@ -78,7 +79,7 @@ public class PlotManager implements KonquestPlotManager {
 	}
 	
 	public boolean addPlot(KonTown town, KonPlot plot) {
-		boolean enabled = konquest.getConfigManager().getConfig("core").getBoolean("core.plots.enable",false);
+		boolean enabled = konquest.getCore().getBoolean(CorePath.PLOTS_ENABLE.getPath(),false);
 		if(!enabled) return true;
 		// Verify plot points exist within town
 		for(Point p : plot.getPoints()) {

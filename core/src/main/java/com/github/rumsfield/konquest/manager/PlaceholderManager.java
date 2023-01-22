@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.entity.Player;
 
@@ -90,7 +91,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 			kingdomCache.put(val, new HashMap<>());
 			kingdomCooldownTimes.put(val, 0L);
 		}
-		cooldownSeconds = konquest.getConfigManager().getConfig("core").getInt("core.placeholder_request_limit",0);
+		cooldownSeconds = konquest.getCore().getInt(CorePath.PLACEHOLDER_REQUEST_LIMIT.getPath(),0);
 		ChatUtil.printDebug("Placeholder Manager is ready with cool-down seconds: "+cooldownSeconds);
 	}
 	
@@ -283,7 +284,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 	
 	public String getCombatTag(Player player) {
 		KonPlayer onlinePlayer = playerManager.getPlayer(player);
-		return (onlinePlayer != null && onlinePlayer.isCombatTagged()) ? ChatUtil.parseHex(konquest.getConfigManager().getConfig("core").getString("core.combat.placeholder_tag","")) : "";
+		return (onlinePlayer != null && onlinePlayer.isCombatTagged()) ? ChatUtil.parseHex(konquest.getCore().getString(CorePath.COMBAT_PLACEHOLDER_TAG.getPath(),"")) : "";
 	}
 
 	/*

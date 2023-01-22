@@ -590,7 +590,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	public boolean isOfflineProtected() {
-		boolean isBreakDisabledOffline = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE.getPath());
+		boolean isBreakDisabledOffline = konquest.getCore().getBoolean(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE.getPath());
 		return isOfflineProtected && isBreakDisabledOffline;
 	}
 	

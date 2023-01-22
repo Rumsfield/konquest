@@ -5,10 +5,7 @@ import com.github.rumsfield.konquest.model.KonMonumentTemplate;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.model.KonUpgrade;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.Timeable;
-import com.github.rumsfield.konquest.utility.Timer;
+import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -54,14 +51,14 @@ public class LootManager implements Timeable{
 	
 	public void initialize() {
 		// Parse config for refresh time
-		refreshTimeSeconds = konquest.getConfigManager().getConfig("core").getLong("core.monuments.loot_refresh",(long)0.0);
+		refreshTimeSeconds = konquest.getCore().getLong(CorePath.MONUMENTS_LOOT_REFRESH.getPath(),0L);
 		if(refreshTimeSeconds > 0) {
 			lootRefreshTimer.stopTimer();
 			lootRefreshTimer.setTime((int)refreshTimeSeconds);
 			lootRefreshTimer.startLoopTimer();
 		}
 		markedRefreshTime = new Date().getTime();
-		lootCount = konquest.getConfigManager().getConfig("core").getInt("core.monuments.loot_count",0);
+		lootCount = konquest.getCore().getInt(CorePath.MONUMENTS_LOOT_COUNT.getPath(),0);
 		if(lootCount < 0) {
 			lootCount = 0;
 		}

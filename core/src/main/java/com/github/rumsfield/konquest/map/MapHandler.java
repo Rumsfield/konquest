@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -37,7 +38,7 @@ public class MapHandler {
 	}
 	
 	public void initialize() {
-		boolean doRegistration = konquest.getConfigManager().getConfig("core").getBoolean("core.integration.dynmap",false);
+		boolean doRegistration = konquest.getCore().getBoolean(CorePath.INTEGRATION_DYNMAP.getPath(),false);
 		Plugin dynmap = Bukkit.getPluginManager().getPlugin("dynmap");
 		if (dynmap != null && dynmap.isEnabled()) {
 			if(doRegistration) {

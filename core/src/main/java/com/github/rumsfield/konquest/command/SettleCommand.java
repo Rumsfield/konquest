@@ -46,8 +46,8 @@ public class SettleCommand extends CommandBase {
                 return;
         	}
         	
-        	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_settle");
-        	double incr = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_settle_increment");
+        	double cost = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
+        	double incr = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath());
         	int townCount = getKonquest().getKingdomManager().getPlayerLordships(player);
         	double adj_cost = (((double)townCount)*incr) + cost;
         	if(cost > 0) {
@@ -78,7 +78,7 @@ public class SettleCommand extends CommandBase {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SETTLE_NOTICE_SUCCESS.getMessage(townName));
         		ChatUtil.sendBroadcast(MessagePath.COMMAND_SETTLE_BROADCAST_SETTLE.getMessage(bukkitPlayer.getName(),townName,player.getKingdom().getName()));
         		// Optionally apply starter shield
-        		int starterShieldDuration = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.shield_new_towns",0);
+        		int starterShieldDuration = getKonquest().getCore().getInt(CorePath.TOWNS_SHIELD_NEW_TOWNS.getPath(),0);
         		if(starterShieldDuration > 0) {
         			getKonquest().getShieldManager().shieldSet(town,starterShieldDuration);
         		}
@@ -125,7 +125,7 @@ public class SettleCommand extends CommandBase {
         			break;
         		case 7:
         			distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
-        			int max_distance_all = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_distance_all");
+        			int max_distance_all = getKonquest().getCore().getInt(CorePath.TOWNS_MAX_DISTANCE_ALL.getPath());
         			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_MAX.getMessage(distance,max_distance_all));
         			break;
         		case 21:

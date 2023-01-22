@@ -76,7 +76,7 @@ public class TravelManager implements Timeable {
 		    		// Give raid defender reward
 		    		if(town.isAttacked() && town.addDefender(bukkitPlayer)) {
 		    			ChatUtil.printDebug("Raid defense rewarded to player "+bukkitPlayer.getName());
-		    			int defendReward = konquest.getConfigManager().getConfig("core").getInt("core.favor.rewards.defend_raid");
+		    			int defendReward = konquest.getCore().getInt(CorePath.FAVOR_REWARDS_DEFEND_RAID.getPath());
 			            KonquestPlugin.depositPlayer(bukkitPlayer, defendReward);
 		    		}
 		    		// Notify town officers of travel

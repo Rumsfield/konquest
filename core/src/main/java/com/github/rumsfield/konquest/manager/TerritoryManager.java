@@ -298,7 +298,7 @@ public class TerritoryManager {
 			}
     	}
     	// Ensure player can cover the cost
-    	double cost = konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
+    	double cost = konquest.getCore().getDouble(CorePath.FAVOR_COST_CLAIM.getPath());
     	if(KonquestPlugin.getBalance(bukkitPlayer) < cost) {
 			//ChatUtil.sendError(bukkitPlayer, "Not enough Favor, need "+cost);
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
@@ -495,7 +495,7 @@ public class TerritoryManager {
     	}
     	// Ensure player can cover the cost
     	int unclaimedChunkAmount = toClaimChunks.size();
-    	double cost = konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
+    	double cost = konquest.getCore().getDouble(CorePath.FAVOR_COST_CLAIM.getPath());
     	double totalCost = unclaimedChunkAmount * cost;
     	if(KonquestPlugin.getBalance(bukkitPlayer) < totalCost) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(totalCost));

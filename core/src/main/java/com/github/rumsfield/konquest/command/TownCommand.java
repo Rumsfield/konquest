@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonStatsType;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import com.github.rumsfield.konquest.utility.Timer;
 import org.bukkit.OfflinePlayer;
@@ -466,7 +467,7 @@ public class TownCommand extends CommandBase {
 					}
 		        	if(!newTownName.equalsIgnoreCase("")) {
 		        		// Verify enough favor
-		            	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_rename",0.0);
+		            	double cost = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_RENAME.getPath(),0.0);
 		    			if(cost > 0) {
 		    				if(KonquestPlugin.getBalance(bukkitPlayer) < cost) {
 		    					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));

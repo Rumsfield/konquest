@@ -47,7 +47,7 @@ public enum CorePath {
 	INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_DIRECT      ("core.integration.discordsrv_options.raid_alert_direct"),
 	INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_CHANNEL     ("core.integration.discordsrv_options.raid_alert_channel"),
 	
-	TRAVEL_ENABLE_SANCTUARY                               ("core.travel.enable.sanctuary"),
+	TRAVEL_ENABLE_SANCTUARY                               ("core.travel.enable.sanctuary"),//TODO implement this
 	TRAVEL_ENABLE_TOWNS                                   ("core.travel.enable.towns"),
 	TRAVEL_ENABLE_CAPITAL                                 ("core.travel.enable.capital"),
 	TRAVEL_ENABLE_HOME                                    ("core.travel.enable.home"),
@@ -68,6 +68,7 @@ public enum CorePath {
 	KINGDOMS_PROTECT_CONTAINERS_USE                       ("core.kingdoms.protect_containers_use"),
 	KINGDOMS_PROTECT_CONTAINERS_BREAK                     ("core.kingdoms.protect_containers_break"),
 	KINGDOMS_PROTECT_CONTAINERS_EXPLODE                   ("core.kingdoms.protect_containers_explode"),
+	KINGDOMS_NO_ENEMY_TRAVEL                              ("core.kingdoms.no_enemy_travel"),
 	KINGDOMS_NO_ENEMY_EDIT_OFFLINE                        ("core.kingdoms.no_enemy_edit_offline"),
 	KINGDOMS_NO_ENEMY_EDIT_OFFLINE_WARMUP                 ("core.kingdoms.no_enemy_edit_offline_warmup"),
 	KINGDOMS_NO_ENEMY_EDIT_OFFLINE_MINIMUM                ("core.kingdoms.no_enemy_edit_offline_minimum"),
@@ -113,13 +114,12 @@ public enum CorePath {
 	TOWNS_SHIELD_NEW_TOWNS                                ("core.towns.shield_new_towns"),
 	TOWNS_BARBARIANS_DESTROY                              ("core.towns.barbarians_destroy"),
 	TOWNS_ENEMY_GLOW                                      ("core.towns.enemy_glow"),
-	TOWNS_TOWN_MOBS                                       ("core.towns.town_mobs"),
 	TOWNS_ARMOR_BLACKLIST_ENABLE                          ("core.towns.armor_blacklist_enable"),
 	TOWNS_ARMOR_BLACKLIST_REVERSE                         ("core.towns.armor_blacklist_reverse"),
 	TOWNS_ARMOR_BLACKLIST                                 ("core.towns.armor_blacklist"),
-	TOWNS_DISCOUNT_ENABLE                                 ("core.towns.discount_enable"),
-	TOWNS_DISCOUNT_PERCENT                                ("core.towns.discount_percent"),
-	TOWNS_DISCOUNT_STACK                                  ("core.towns.discount_stack"),
+	TOWNS_DISCOUNT_ENABLE                                 ("core.towns.discount_enable"),//TODO implement this
+	TOWNS_DISCOUNT_PERCENT                                ("core.towns.discount_percent"),//TODO implement this
+	TOWNS_DISCOUNT_STACK                                  ("core.towns.discount_stack"),//TODO implement this
 	
 	PLOTS_ENABLE                                          ("core.plots.enable"),
 	PLOTS_MAX_SIZE                                        ("core.plots.max_size"),
@@ -165,7 +165,7 @@ public enum CorePath {
 	FAVOR_TOWNS_COST_SETTLE                               ("core.favor.towns.cost_settle"),
 	FAVOR_TOWNS_COST_SETTLE_INCREMENT                     ("core.favor.towns.cost_settle_increment"),
 	FAVOR_TOWNS_COST_RENAME                               ("core.favor.towns.cost_rename"),
-	FAVOR_TOWNS_COST_SPECIALIZE                           ("core.favor.towns.cost_specialize"),
+	FAVOR_TOWNS_COST_SPECIALIZE                           ("core.favor.towns.cost_specialize"),//TODO implement this
 	FAVOR_KINGDOMS_COST_CREATE                            ("core.favor.kingdoms.cost_create"),
 	FAVOR_KINGDOMS_COST_RENAME                            ("core.favor.kingdoms.cost_rename"),
 	FAVOR_KINGDOMS_COST_TEMPLATE                          ("core.favor.kingdoms.cost_template"),

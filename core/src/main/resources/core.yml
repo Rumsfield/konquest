@@ -248,7 +248,7 @@ core:
     #no_enemy_enter: true
     
     # Prevent enemy players from traveling within Kingdom territory (true/false)
-    #no_enemy_travel: true
+    no_enemy_travel: true
     
     # Prevent enemy players from breaking any blocks in a Kingdom with no players online (true/false)
     no_enemy_edit_offline: true
@@ -390,7 +390,7 @@ core:
     enemy_glow: true
     
     # Allow all mob types to spawn within town land (true/false)
-    town_mobs: false
+    #town_mobs: false
     
     # Enable the armor blacklist, which excludes certain blocks from counting against town armor (true/false)
     armor_blacklist_enable: true

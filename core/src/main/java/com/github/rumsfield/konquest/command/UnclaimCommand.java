@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonPlayer.FollowType;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -22,7 +23,7 @@ public class UnclaimCommand extends CommandBase {
 	
 	public void execute() {
 		// k unclaim [radius|auto] [<r>]
-    	boolean isEnabled = getKonquest().getConfigManager().getConfig("core").getBoolean("core.towns.allow_unclaim",false);
+    	boolean isEnabled = getKonquest().getCore().getBoolean(CorePath.TOWNS_ALLOW_UNCLAIM.getPath(),false);
 		if (!isEnabled) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return;

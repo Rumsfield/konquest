@@ -13,9 +13,7 @@ import com.github.rumsfield.konquest.manager.TravelManager.TravelDestination;
 import com.github.rumsfield.konquest.map.MapHandler;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.nms.*;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.Timeable;
+import com.github.rumsfield.konquest.utility.*;
 import com.github.rumsfield.konquest.utility.Timer;
 import com.google.common.collect.MapMaker;
 import org.apache.commons.lang.StringUtils;
@@ -161,9 +159,9 @@ public class Konquest implements KonquestAPI, Timeable {
 	public void initialize() {
 		// Initialize managers
 		configManager.initialize();
-		boolean debug = configManager.getConfig("core").getBoolean("core.debug");
+		boolean debug = getCore().getBoolean(CorePath.DEBUG.getPath());
 		ChatUtil.printDebug("Debug is "+debug);
-		String worldName = configManager.getConfig("core").getString("core.world_name");
+		String worldName = getCore().getString(CorePath.WORLD_NAME.getPath());
 		ChatUtil.printDebug("Primary world is "+worldName);
 		
 		initColors();
@@ -275,10 +273,10 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	private void initManagers() {
-		String configTag = configManager.getConfig("core").getString("core.chat.tag");
+		String configTag = getCore().getString(CorePath.CHAT_TAG.getPath());
 		chatTag = ChatUtil.parseHex(configTag);
 		ChatUtil.printDebug("Chat tag is "+chatTag);
-		String configMessage = configManager.getConfig("core").getString("core.chat.message","");
+		String configMessage = getCore().getString(CorePath.CHAT_MESSAGE.getPath(),"");
 		if(!configMessage.equals("")) {
 			chatMessage = ChatUtil.parseHex(configMessage);
 		}
@@ -295,12 +293,12 @@ public class Konquest implements KonquestAPI, Timeable {
 		placeholderManager.initialize();
 		plotManager.initialize();
 		//guildManager.loadOptions();
-		offlineTimeoutSeconds = configManager.getConfig("core").getInt("core.kingdoms.offline_timeout_days",0)* 86400L;
+		offlineTimeoutSeconds = getCore().getInt(CorePath.KINGDOMS_OFFLINE_TIMEOUT_DAYS.getPath(),0)* 86400L;
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;
 			ChatUtil.printConsoleError("offline_timeout_seconds in core.yml is less than 1 day, overriding to 1 day to prevent data loss.");
 		}
-		saveIntervalSeconds = configManager.getConfig("core").getInt("core.save_interval",60)*60;
+		saveIntervalSeconds = getCore().getInt(CorePath.SAVE_INTERVAL.getPath(),60)*60;
 		ChatUtil.printConsoleAlert("Save interval is "+saveIntervalSeconds+" seconds");
 		if(saveIntervalSeconds > 0) {
 			saveTimer.stopTimer();
@@ -314,7 +312,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		pingTimer.setTime(60*60); // 1 hour database ping interval
 		pingTimer.startLoopTimer();
 		// Set chat even priority
-		chatPriority = getEventPriority(configManager.getConfig("core").getString("core.chat.priority","HIGH"));
+		chatPriority = getEventPriority(getCore().getString(CorePath.CHAT_PRIORITY.getPath(),"HIGH"));
 		// Update kingdom stuff
 		kingdomManager.loadArmorBlacklist();
 		kingdomManager.loadJoinExileCooldowns();
@@ -325,9 +323,9 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	private void initWorlds() {
-		List<String> worldNameList = configManager.getConfig("core").getStringList("core.world_blacklist");
-		isWhitelist = configManager.getConfig("core").getBoolean("core.world_blacklist_reverse",false);
-		isBlacklistIgnored = configManager.getConfig("core").getBoolean("core.world_blacklist_ignore",false);
+		List<String> worldNameList = getCore().getStringList(CorePath.WORLD_BLACKLIST.getPath());
+		isWhitelist = getCore().getBoolean(CorePath.WORLD_BLACKLIST_REVERSE.getPath(),false);
+		isBlacklistIgnored = getCore().getBoolean(CorePath.WORLD_BLACKLIST_IGNORE.getPath(),false);
 		// Verify listed worlds exist
 		for(String name : worldNameList) {
 			boolean matches = false;
@@ -351,99 +349,99 @@ public class Konquest implements KonquestAPI, Timeable {
 		String defaultColor;
 		
 		/* Friendly Primary Color */
-		colorPath = "core.colors.friendly_primary";
-		configColor = configManager.getConfig("core").getString(colorPath,"");
+		colorPath = CorePath.COLORS_FRIENDLY_PRIMARY.getPath();
+		configColor = getCore().getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			defaultColor = getCore().getDefaults().getString(colorPath);
 			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			friendColor1 = color;
 		}
 		
 		/* Friendly Secondary Color */
-		colorPath = "core.colors.friendly_secondary";
-		configColor = configManager.getConfig("core").getString(colorPath,"");
+		colorPath = CorePath.COLORS_FRIENDLY_SECONDARY.getPath();
+		configColor = getCore().getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			defaultColor = getCore().getDefaults().getString(colorPath);
 			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			friendColor2 = color;
 		}
 		
 		/* Enemy Primary Color */
-		colorPath = "core.colors.enemy_primary";
-		configColor = configManager.getConfig("core").getString(colorPath,"");
+		colorPath = CorePath.COLORS_ENEMY_PRIMARY.getPath();
+		configColor = getCore().getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			defaultColor = getCore().getDefaults().getString(colorPath);
 			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			enemyColor1 = color;
 		}
 
 		/* Enemy Secondary Color */
-		colorPath = "core.colors.enemy_secondary";
-		configColor = configManager.getConfig("core").getString(colorPath,"");
+		colorPath = CorePath.COLORS_ENEMY_SECONDARY.getPath();
+		configColor = getCore().getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			defaultColor = getCore().getDefaults().getString(colorPath);
 			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			enemyColor2 = color;
 		}
 
 		/* Sanctioned Color */
-		colorPath = "core.colors.sanctioned";
-		configColor = configManager.getConfig("core").getString(colorPath,"");
+		colorPath = CorePath.COLORS_SANCTIONED.getPath();
+		configColor = getCore().getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			defaultColor = getCore().getDefaults().getString(colorPath);
 			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			sanctionedColor = color;
 		}
 
 		/* Peaceful Color */
-		colorPath = "core.colors.peaceful";
-		configColor = configManager.getConfig("core").getString(colorPath,"");
+		colorPath = CorePath.COLORS_PEACEFUL.getPath();
+		configColor = getCore().getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			defaultColor = getCore().getDefaults().getString(colorPath);
 			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			peacefulColor = color;
 		}
 		
 		/* Allied Color */
-		colorPath = "core.colors.allied";
-		configColor = configManager.getConfig("core").getString(colorPath,"");
+		colorPath = CorePath.COLORS_ALLIED.getPath();
+		configColor = getCore().getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			defaultColor = getCore().getDefaults().getString(colorPath);
 			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			alliedColor = color;
 		}
 		
 		/* Barbarian Color */
-		colorPath = "core.colors.barbarian";
-		configColor = configManager.getConfig("core").getString(colorPath,"");
+		colorPath = CorePath.COLORS_BARBARIAN.getPath();
+		configColor = getCore().getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			defaultColor = getCore().getDefaults().getString(colorPath);
 			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			barbarianColor = color;
 		}
 		
 		/* Neutral Color */
-		colorPath = "core.colors.neutral";
-		configColor = configManager.getConfig("core").getString(colorPath,"");
+		colorPath = CorePath.COLORS_NEUTRAL.getPath();
+		configColor = getCore().getString(colorPath,"");
 		color = ChatUtil.parseColorCode(configColor);
 		if(color == null) {
-			defaultColor = configManager.getConfig("core").getDefaults().getString(colorPath);
+			defaultColor = getCore().getDefaults().getString(colorPath);
 			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
 		} else {
 			neutralColor = color;
@@ -474,7 +472,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		}
     	ChatUtil.printDebug("Initializing Konquest player "+bukkitPlayer.getName());
     	// Update all player's nametag color packets
-    	boolean isPlayerNametagFormatEnabled = configManager.getConfig("core").getBoolean("core.player_nametag_format",false);
+    	boolean isPlayerNametagFormatEnabled = getCore().getBoolean(CorePath.PLAYER_NAMETAG_FORMAT.getPath(),false);
     	if(isPlayerNametagFormatEnabled) {
     		bukkitPlayer.setScoreboard(getScoreboard());
     		updateNamePackets(player);
@@ -486,7 +484,7 @@ public class Konquest implements KonquestAPI, Timeable {
     	kingdomManager.updatePlayerMembershipStats(player);
     	// Try to reset base health from legacy health upgrades
     	kingdomManager.clearTownHearts(player);
-    	boolean doReset = configManager.getConfig("core").getBoolean("core.reset_legacy_health",false);
+    	boolean doReset = getCore().getBoolean(CorePath.RESET_LEGACY_HEALTH.getPath(),false);
     	if(doReset) {
     		double baseHealth = bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
     		if(baseHealth > 20) {
@@ -729,7 +727,6 @@ public class Konquest implements KonquestAPI, Timeable {
 	/**
 	 * Checks for name conflicts and constraints for all namable objects
 	 * @param name - The name of an object (town, ruin, etc)
-	 * @param player - The player requesting the name, to be sent status messages
 	 * @return Status code
 	 * 			0 - Success, no issue found
 	 * 			1 - Error, name is not strictly alpha-numeric
@@ -805,7 +802,7 @@ public class Konquest implements KonquestAPI, Timeable {
 					long lastPlayedTime = player.getOfflineBukkitPlayer().getLastPlayed();
 					if(lastPlayedTime > 0 && now.after(new Date(lastPlayedTime + (offlineTimeoutSeconds*1000)))) {
 						// Offline player has exceeded timeout period, prune from residencies and camp
-						boolean doExile = configManager.getConfig("core").getBoolean("core.kingdoms.offline_timeout_exile",false);
+						boolean doExile = getCore().getBoolean(CorePath.KINGDOMS_OFFLINE_TIMEOUT_EXILE.getPath(),false);
 						if(!player.isBarbarian()) {
 							if(doExile) {
 								UUID id = player.getOfflineBukkitPlayer().getUniqueId();
@@ -1097,9 +1094,9 @@ public class Konquest implements KonquestAPI, Timeable {
 	// This can return null!
 	public Location getRandomWildLocation(World world) {
 		Location wildLoc = null;
-		int radius = configManager.getConfig("core").getInt("core.travel.wild_radius",500);
-		int offsetX = configManager.getConfig("core").getInt("core.travel.wild_center_x",0);
-		int offsetZ = configManager.getConfig("core").getInt("core.travel.wild_center_z",0);
+		int radius = getCore().getInt(CorePath.TRAVEL_WILD_RADIUS.getPath(),500);
+		int offsetX = getCore().getInt(CorePath.TRAVEL_WILD_CENTER_X.getPath(),0);
+		int offsetZ = getCore().getInt(CorePath.TRAVEL_WILD_CENTER_Z.getPath(),0);
 		radius = radius > 0 ? radius : 2;
 		ChatUtil.printDebug("Generating random wilderness location at center "+offsetX+","+offsetZ+" in radius "+radius);
 		int randomNumX;

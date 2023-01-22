@@ -112,7 +112,7 @@ public class KingdomAdminCommand extends CommandBase {
 	                    			break;
 	                    		case 7:
 	                    			distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
-	                    			int max_distance_all = getKonquest().getConfigManager().getConfig("core").getInt(CorePath.TOWNS_MAX_DISTANCE_ALL.getPath());
+	                    			int max_distance_all = getKonquest().getCore().getInt(CorePath.TOWNS_MAX_DISTANCE_ALL.getPath());
 	                    			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_MAX.getMessage(distance,max_distance_all));
 	                    			//TODO: KR message
 	                    			break;

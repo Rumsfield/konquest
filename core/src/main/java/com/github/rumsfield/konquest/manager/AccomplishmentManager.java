@@ -5,6 +5,7 @@ import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerPrefixEvent;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -33,7 +34,7 @@ public class AccomplishmentManager {
 	}
 	
 	public void initialize() {
-		isEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.accomplishment_prefix");
+		isEnabled = konquest.getCore().getBoolean(CorePath.ACCOMPLISHMENT_PREFIX.getPath());
 		ChatUtil.printDebug("Accomplishment Manager is ready with prefix "+isEnabled);
 	}
 	

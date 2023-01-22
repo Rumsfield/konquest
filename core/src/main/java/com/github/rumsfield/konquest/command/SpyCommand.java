@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
@@ -47,7 +48,7 @@ public class SpyCommand extends CommandBase {
     		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	// Verify enough favor
-        	double cost = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_spy",0.0);
+        	double cost = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_SPY.getPath(),0.0);
 			if(cost > 0) {
 				if(KonquestPlugin.getBalance(bukkitPlayer) < cost) {
 					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));

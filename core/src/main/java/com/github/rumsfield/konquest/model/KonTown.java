@@ -177,7 +177,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	@Override
 	public boolean testChunk(Point point) {
 		Point centerChunk = Konquest.toPoint(getCenterLoc());
-		int maxChunkRange = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_size");
+		int maxChunkRange = getKonquest().getCore().getInt(CorePath.TOWNS_MAX_SIZE.getPath());
 		if(maxChunkRange < 0) {
 			maxChunkRange = 0;
 		}
@@ -212,7 +212,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		
 		// Verify monument template and chunk gradient and initialize travelPoint and baseY coordinate
-		int flatness = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.settle_check_flatness",3);
+		int flatness = getKonquest().getCore().getInt(CorePath.TOWNS_SETTLE_CHECK_FLATNESS.getPath(),3);
 		int monumentStatus = monument.initialize(getKingdom().getMonumentTemplate(), getCenterLoc(), flatness);
 		if(monumentStatus != 0) {
 			ChatUtil.printDebug("Town init failed: monument did not initialize correctly");
@@ -220,8 +220,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		
 		// Verify monument paste Y level is within config min/max range
-		int config_min_y = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.min_settle_height");
-		int config_max_y = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.max_settle_height");
+		int config_min_y = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_SETTLE_HEIGHT.getPath());
+		int config_max_y = getKonquest().getCore().getInt(CorePath.TOWNS_MAX_SETTLE_HEIGHT.getPath());
 		if(config_min_y < 0) {
 			config_min_y = 0;
 		}
@@ -257,7 +257,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		int countWaterBlocks = 0;
 		int countAirBlocks = 0;
 		int countContainers = 0;
-		int baseDepth = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.settle_checks_depth",0);
+		int baseDepth = getKonquest().getCore().getInt(CorePath.TOWNS_SETTLE_CHECKS_DEPTH.getPath(),0);
 		int yMin = 0;
 		int yMax = monument.getBaseY();
 		if(baseDepth > 0) {
@@ -308,7 +308,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
         
 		// Add chunks around the monument chunk
-		int radius = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.init_radius");
+		int radius = getKonquest().getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath());
 		if(radius < 1) {
 			radius = 1;
 		}
@@ -486,7 +486,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public boolean isLocInsideMonumentProtectionArea(Location loc) {
 		Point centerPoint = Konquest.toPoint(getCenterLoc());
 		Point testPoint = Konquest.toPoint(loc);
-		int baseDepth = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.settle_checks_depth",0);
+		int baseDepth = getKonquest().getCore().getInt(CorePath.TOWNS_SETTLE_CHECKS_DEPTH.getPath(),0);
 		if(baseDepth < 0) {
 			baseDepth = 0;
 		}
@@ -570,7 +570,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		if(playerTravelTimers.containsKey(uuid)) {
 			return false;
 		}
-		int travelCooldownSeconds = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.travel_cooldown");
+		int travelCooldownSeconds = getKonquest().getCore().getInt(CorePath.TOWNS_TRAVEL_COOLDOWN.getPath());
 		Timer travelCooldownTimer = new Timer(this);
 		travelCooldownTimer.stopTimer();
 		travelCooldownTimer.setTime(travelCooldownSeconds);
@@ -762,7 +762,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				this.isAttacked = true;
 			}
 			// Start Monument regenerate timer for target town when no armor nor shield
-			int monumentRegenTimeSeconds = getKonquest().getConfigManager().getConfig("core").getInt("core.monuments.damage_regen");
+			int monumentRegenTimeSeconds = getKonquest().getCore().getInt(CorePath.MONUMENTS_DAMAGE_REGEN.getPath());
 			monumentTimer.stopTimer();
 			monumentTimer.setTime(monumentRegenTimeSeconds);
 			monumentTimer.startTimer();
@@ -869,7 +869,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public void applyGlow(Player bukkitPlayer) {
-		boolean isGlowEnabled = getKonquest().getConfigManager().getConfig("core").getBoolean("core.towns.enemy_glow", true);
+		boolean isGlowEnabled = getKonquest().getCore().getBoolean(CorePath.TOWNS_ENEMY_GLOW.getPath(), true);
 		if(isGlowEnabled) {
 			bukkitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*5, 1));
 			//ChatUtil.printDebug("Applied glowing to "+bukkitPlayer.getName()+": "+bukkitPlayer.isGlowing());
@@ -888,7 +888,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				}
 			}
 			// Start Raid Alert disable timer for target town
-			int raidAlertTimeSeconds = getKonquest().getConfigManager().getConfig("core").getInt("core.towns.raid_alert_cooldown");
+			int raidAlertTimeSeconds = getKonquest().getCore().getInt(CorePath.TOWNS_RAID_ALERT_COOLDOWN.getPath());
 			ChatUtil.printDebug("Starting raid alert timer for "+raidAlertTimeSeconds+" seconds in town "+getName());
 			Timer raidAlertTimer = getRaidAlertTimer();
 			setIsRaidAlertDisabled(true);
@@ -908,10 +908,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
     	// Find iron golems within the town max radius
     	// Do not update targets if triggering player is not an enemy of this town
     	boolean isTriggerPlayerEnemy = getKonquest().getKingdomManager().isPlayerEnemy(triggerPlayer, getKingdom());
-    	boolean isGolemAttackEnemies = getKonquest().getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_GOLEM_ATTACK_ENEMIES.getPath());
+    	boolean isGolemAttackEnemies = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_GOLEM_ATTACK_ENEMIES.getPath());
 		if(isGolemAttackEnemies && !triggerPlayer.isAdminBypassActive() && !triggerPlayer.getKingdom().equals(getKingdom()) && isTriggerPlayerEnemy) {
 			Location centerLoc = getCenterLoc();
-			int golumSearchRange = getKonquest().getConfigManager().getConfig("core").getInt(CorePath.TOWNS_MAX_SIZE.getPath(),1); // chunks
+			int golumSearchRange = getKonquest().getCore().getInt(CorePath.TOWNS_MAX_SIZE.getPath(),1); // chunks
 			int radius = 16*16;
 			if(golumSearchRange > 1) {
 				radius = golumSearchRange*16;

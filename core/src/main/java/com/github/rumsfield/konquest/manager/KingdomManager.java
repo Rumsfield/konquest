@@ -127,16 +127,16 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	public void loadOptions() {
-		payIntervalSeconds 	= konquest.getConfigManager().getConfig("core").getLong(CorePath.FAVOR_KINGDOMS_PAY_INTERVAL_SECONDS.getPath());
-		payPerChunk 		= konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_CHUNK.getPath());
-		payPerResident 		= konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_RESIDENT.getPath());
-		payLimit 			= konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_PAY_LIMIT.getPath());
-		payPercentOfficer   = konquest.getConfigManager().getConfig("core").getInt(CorePath.FAVOR_KINGDOMS_BONUS_OFFICER_PERCENT.getPath());
-		payPercentMaster    = konquest.getConfigManager().getConfig("core").getInt(CorePath.FAVOR_KINGDOMS_BONUS_MASTER_PERCENT.getPath());
-		costCreate 	        = konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_COST_CREATE.getPath());
-		costRename 	        = konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_COST_RENAME.getPath());
-		costTemplate        = konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_COST_TEMPLATE.getPath());
-		costRelation 	    = konquest.getConfigManager().getConfig("core").getDouble(CorePath.FAVOR_KINGDOMS_COST_RELATIONSHIP.getPath());
+		payIntervalSeconds 	= konquest.getCore().getLong(CorePath.FAVOR_KINGDOMS_PAY_INTERVAL_SECONDS.getPath());
+		payPerChunk 		= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_CHUNK.getPath());
+		payPerResident 		= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_RESIDENT.getPath());
+		payLimit 			= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_LIMIT.getPath());
+		payPercentOfficer   = konquest.getCore().getInt(CorePath.FAVOR_KINGDOMS_BONUS_OFFICER_PERCENT.getPath());
+		payPercentMaster    = konquest.getCore().getInt(CorePath.FAVOR_KINGDOMS_BONUS_MASTER_PERCENT.getPath());
+		costCreate 	        = konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_CREATE.getPath());
+		costRename 	        = konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_RENAME.getPath());
+		costTemplate        = konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_TEMPLATE.getPath());
+		costRelation 	    = konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_RELATIONSHIP.getPath());
 		
 		payPerChunk = payPerChunk < 0 ? 0 : payPerChunk;
 		payPerResident = payPerResident < 0 ? 0 : payPerResident;
@@ -316,13 +316,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 		// Verify max distance
-		int maxLimit = konquest.getConfigManager().getConfig("core").getInt(CorePath.TOWNS_MAX_DISTANCE_ALL.getPath(),0);
+		int maxLimit = konquest.getCore().getInt(CorePath.TOWNS_MAX_DISTANCE_ALL.getPath(),0);
 		if(maxLimit > 0 && minDistance > maxLimit) {
 			ChatUtil.printDebug("Failed to add town, too far from other towns and capitals");
 			return 3;
 		}
 		// Verify no overlapping init chunks
-		int radius = konquest.getConfigManager().getConfig("core").getInt(CorePath.TOWNS_INIT_RADIUS.getPath(),2);
+		int radius = konquest.getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath(),2);
 		if(radius < 1) {
 			radius = 1;
 		}
@@ -752,7 +752,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     			return 8;
     		}
 			// Check for permission (online only)
-			boolean isPerKingdomJoin = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_PER_KINGDOM_JOIN_PERMISSIONS.getPath(),false);
+			boolean isPerKingdomJoin = konquest.getCore().getBoolean(CorePath.KINGDOMS_PER_KINGDOM_JOIN_PERMISSIONS.getPath(),false);
 			if(isOnline && isPerKingdomJoin) {
 				String permission = "konquest.join."+getKingdom(kingdomName).getName().toLowerCase();
 				if(!onlinePlayer.getBukkitPlayer().hasPermission(permission)) {
@@ -760,12 +760,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				}
 			}
 			// Check switching criteria (online only)
-			boolean isAllowSwitch = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_ALLOW_EXILE_SWITCH.getPath(),false);
+			boolean isAllowSwitch = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_EXILE_SWITCH.getPath(),false);
 			if(isOnline && !joinKingdom.equals(onlinePlayer.getExileKingdom()) && !getBarbarians().equals(onlinePlayer.getExileKingdom()) && !isAllowSwitch) {
 				return 7;
 			}
 			// Check if max_player_diff is disabled, or if the desired kingdom is within the max diff (both online & offline)
-			int config_max_player_diff = konquest.getConfigManager().getConfig("core").getInt(CorePath.KINGDOMS_MAX_PLAYER_DIFF.getPath(),0);
+			int config_max_player_diff = konquest.getCore().getInt(CorePath.KINGDOMS_MAX_PLAYER_DIFF.getPath(),0);
 			int smallestKingdomPlayerCount = 0;
 			int targetKingdomPlayerCount = 0;
 			if(config_max_player_diff != 0) {
@@ -957,8 +957,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		
     	// Try to teleport the player (online only)
     	if(isOnline && teleport) {
-    		boolean doWorldSpawn = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.EXILE_TELEPORT_WORLD_SPAWN.getPath(), false);
-    		boolean doWildTeleport = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.EXILE_TELEPORT_WILD.getPath(), true);
+    		boolean doWorldSpawn = konquest.getCore().getBoolean(CorePath.EXILE_TELEPORT_WORLD_SPAWN.getPath(), false);
+    		boolean doWildTeleport = konquest.getCore().getBoolean(CorePath.EXILE_TELEPORT_WILD.getPath(), true);
     		World playerWorld = onlinePlayer.getBukkitPlayer().getLocation().getWorld();
     		Location exileLoc = null;
     		if(doWorldSpawn) {
@@ -980,7 +980,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     	}
     	
     	// Clear stats and prefix
-    	boolean doRemoveStats = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.EXILE_REMOVE_STATS.getPath(), true);
+    	boolean doRemoveStats = konquest.getCore().getBoolean(CorePath.EXILE_REMOVE_STATS.getPath(), true);
     	if(doRemoveStats && clearStats) {
     		if(isOnline) {
     			onlinePlayer.getPlayerStats().clearStats();
@@ -994,7 +994,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     	}
     	
     	// Remove favor
-    	boolean doRemoveFavor = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.EXILE_REMOVE_FAVOR.getPath(), true);
+    	boolean doRemoveFavor = konquest.getCore().getBoolean(CorePath.EXILE_REMOVE_FAVOR.getPath(), true);
     	OfflinePlayer offlineBukkitPlayer = isOnline ? onlinePlayer.getOfflineBukkitPlayer() : offlinePlayer.getOfflineBukkitPlayer();
     	if(doRemoveFavor) {
 			double balance = KonquestPlugin.getBalance(offlineBukkitPlayer);
@@ -1503,8 +1503,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		ChatUtil.printDebug("Our relationship is currently "+ ourRelation);
 		ChatUtil.printDebug("Their relationship is currently "+theirRelation.toString());
 		
-		boolean isInstantWar = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_INSTANT_WAR.getPath(), false);
-		boolean isInstantPeace = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.KINGDOMS_INSTANT_PEACE.getPath(), false);
+		boolean isInstantWar = konquest.getCore().getBoolean(CorePath.KINGDOMS_INSTANT_WAR.getPath(), false);
+		boolean isInstantPeace = konquest.getCore().getBoolean(CorePath.KINGDOMS_INSTANT_PEACE.getPath(), false);
 		
 		// Relationship transition logic
 		if(relation.equals(KonquestRelationship.PEACE)) {
@@ -2350,9 +2350,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 
 	public void updateKingdomOfflineProtection() {
-		boolean isOfflineProtectedEnabled = konquest.getConfigManager().getConfig("core").getBoolean("core.kingdoms.no_enemy_edit_offline",true);
-		int offlineProtectedWarmupSeconds = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.no_enemy_edit_offline_warmup",0);
-		int offlineProtectedMinimumPlayers = konquest.getConfigManager().getConfig("core").getInt("core.kingdoms.no_enemy_edit_offline_minimum",0);
+		boolean isOfflineProtectedEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE.getPath(),true);
+		int offlineProtectedWarmupSeconds = konquest.getCore().getInt(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE_WARMUP.getPath(),0);
+		int offlineProtectedMinimumPlayers = konquest.getCore().getInt(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE_MINIMUM.getPath(),0);
 		if(isOfflineProtectedEnabled) {
 			// For each kingdom, start protection warmup timer if no players are online, else ensure the timer is stopped
 			for(KonKingdom kingdom : getKingdoms()) {
@@ -2544,8 +2544,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	    		numKingdomFavor += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
 	    	}
 	    	// Gather favor costs
-	    	int cost_settle = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_settle");
-	    	int cost_claim = (int)konquest.getConfigManager().getConfig("core").getDouble("core.favor.cost_claim");
+	    	int cost_settle = (int)konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
+	    	int cost_claim = (int)konquest.getCore().getDouble(CorePath.FAVOR_COST_CLAIM.getPath());
 	    	// Set attributes
 	    	scoreAttributes.setAttributeWeight(KonKingdomScoreAttribute.TOWNS, cost_settle+2);
 	    	scoreAttributes.setAttributeWeight(KonKingdomScoreAttribute.LAND, cost_claim+1);
@@ -2682,8 +2682,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	public void loadJoinExileCooldowns() {
-		joinCooldownSeconds = konquest.getConfigManager().getConfig("core").getInt(CorePath.KINGDOMS_JOIN_COOLDOWN.getPath(),0);
-		exileCooldownSeconds = konquest.getConfigManager().getConfig("core").getInt(CorePath.KINGDOMS_EXILE_COOLDOWN.getPath(),0);
+		joinCooldownSeconds = konquest.getCore().getInt(CorePath.KINGDOMS_JOIN_COOLDOWN.getPath(),0);
+		exileCooldownSeconds = konquest.getCore().getInt(CorePath.KINGDOMS_EXILE_COOLDOWN.getPath(),0);
 		// Check any existing cool-downs, ensure less than config values.
 		// Join cool-down map
 		if(!joinPlayerCooldowns.isEmpty()) {
@@ -2728,8 +2728,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	private void loadCriticalBlocks() {
-		maxCriticalHits = konquest.getConfigManager().getConfig("core").getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath(),12);
-		String townCriticalBlockTypeName = konquest.getConfigManager().getConfig("core").getString(CorePath.MONUMENTS_CRITICAL_BLOCK.getPath(),"");
+		maxCriticalHits = konquest.getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath(),12);
+		String townCriticalBlockTypeName = konquest.getCore().getString(CorePath.MONUMENTS_CRITICAL_BLOCK.getPath(),"");
 		try {
 			townCriticalBlock = Material.valueOf(townCriticalBlockTypeName);
 		} catch(IllegalArgumentException e) {
@@ -2752,10 +2752,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public void loadArmorBlacklist() {
 		armorBlocks.clear();
 		// True = list is a whitelist, False = list is a blacklist (Default false)
-		isArmorBlockWhitelist = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.TOWNS_ARMOR_BLACKLIST_REVERSE.getPath(),false);
-		boolean isListEnabled = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.TOWNS_ARMOR_BLACKLIST_ENABLE.getPath(),false);
+		isArmorBlockWhitelist = konquest.getCore().getBoolean(CorePath.TOWNS_ARMOR_BLACKLIST_REVERSE.getPath(),false);
+		boolean isListEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_ARMOR_BLACKLIST_ENABLE.getPath(),false);
 		if(isListEnabled) {
-			List<String> armorList = konquest.getConfigManager().getConfig("core").getStringList(CorePath.TOWNS_ARMOR_BLACKLIST.getPath());
+			List<String> armorList = konquest.getCore().getStringList(CorePath.TOWNS_ARMOR_BLACKLIST.getPath());
 			Material mat;
 			for(String entry : armorList) {
 				mat = Material.matchMaterial(entry);
@@ -2776,13 +2776,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         	ChatUtil.printDebug("There is no kingdoms section in kingdoms.yml");
             return;
         }
-        boolean isShieldsEnabled = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.TOWNS_ENABLE_SHIELDS.getPath(),false);
-        boolean isArmorsEnabled = konquest.getConfigManager().getConfig("core").getBoolean(CorePath.TOWNS_ENABLE_ARMOR.getPath(),false);
+        boolean isShieldsEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_ENABLE_SHIELDS.getPath(),false);
+        boolean isArmorsEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_ENABLE_ARMOR.getPath(),false);
         double x,y,z;
         float pitch,yaw;
         List<Double> sectionList;
         String worldName;
-        String defaultWorldName = konquest.getConfigManager().getConfig("core").getString(CorePath.WORLD_NAME.getPath(),"world");
+        String defaultWorldName = konquest.getCore().getString(CorePath.WORLD_NAME.getPath(),"world");
         // Count all towns
         int numTowns = 0;
         for(String kingdomName : kingdomsConfig.getConfigurationSection("kingdoms").getKeys(false)) {

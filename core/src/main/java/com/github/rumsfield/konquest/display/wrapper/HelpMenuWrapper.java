@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -27,12 +28,13 @@ public class HelpMenuWrapper extends MenuWrapper {
 		int itemIndex = 0;
 		int cost;
 		int cost_incr;
-		double cost_spy = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_spy",0.0);
-    	double cost_settle = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_settle",0.0);
-    	double cost_settle_incr = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_settle_increment",0.0);
-    	double cost_claim = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_claim",0.0);
-    	double cost_travel = getKonquest().getConfigManager().getConfig("core").getDouble("core.favor.cost_travel",0.0);
-    	String communityLink = getKonquest().getConfigManager().getConfig("core").getString("core.community_link","");
+
+		double cost_spy = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_SPY.getPath(),0.0);
+		double cost_settle = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath(),0.0);
+		double cost_settle_incr = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath(),0.0);
+		double cost_claim = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_CLAIM.getPath(),0.0);
+		double cost_travel = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_TRAVEL.getPath(),0.0);
+    	String communityLink = getKonquest().getCore().getString(CorePath.COMMUNITY_LINK.getPath(),"");
 
 		// Page 0
     	getMenu().addPage(0, (int)Math.ceil(((double)(CommandType.values().length+1))/9), ChatColor.BLACK+MessagePath.MENU_HELP_TITLE.getMessage());
