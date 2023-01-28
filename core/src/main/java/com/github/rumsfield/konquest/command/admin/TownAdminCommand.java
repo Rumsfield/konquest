@@ -22,7 +22,7 @@ public class TownAdminCommand extends CommandBase {
 	/*
 	 * The admin town command is different than the player town command.
 	 * This command is mostly text-based, and does not use the management menu.
-	 * It directly opens menus for plots and options.
+	 * It directly opens menus for plots, specialize and options.
 	 * Otherwise, it uses more text commands to give more control over town properties.
 	 */
 	
@@ -102,7 +102,17 @@ public class TownAdminCommand extends CommandBase {
         		// Directly open plots menu
 	        	getKonquest().getDisplayManager().displayPlotMenu((Player) getSender(), town);
         		break;
-        		
+
+			case "specialize":
+				// Sanity check for town
+				if(town == null) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+					return;
+				}
+				// Directly open specialize menu
+				getKonquest().getDisplayManager().displayTownSpecializationMenu((Player) getSender(), town, true);
+				break;
+
         	case "create":
         		if (getArgs().length == 5) {
 					String kingdomName = getArgs()[4];

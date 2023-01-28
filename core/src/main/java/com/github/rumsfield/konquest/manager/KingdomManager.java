@@ -20,6 +20,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -1422,6 +1423,27 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		
 		ChatUtil.sendNotice(player.getBukkitPlayer(), "Updated tempalte to "+template.getName());
 		Konquest.playSuccessSound(player.getBukkitPlayer());
+	}
+
+	// The primary way to change a town's specialization
+	public boolean menuChangeTownSpecialization(KonTown town, Villager.Profession profession, KonPlayer player, boolean isAdmin) {
+		Player bukkitPlayer = player.getBukkitPlayer();
+		double costSpecial = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SPECIALIZE.getPath());
+		// Check cost
+		if(costSpecial > 0 && !isAdmin) {
+			if(KonquestPlugin.getBalance(bukkitPlayer) < costSpecial) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costSpecial));
+				return false;
+			}
+		}
+		town.setSpecialization(profession);
+		// Withdraw cost
+		if(costSpecial > 0 && !isAdmin) {
+			if(KonquestPlugin.withdrawPlayer(bukkitPlayer, costSpecial)) {
+				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costSpecial);
+			}
+		}
+		return true;
 	}
 	
 	

@@ -9,6 +9,7 @@ import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -243,6 +244,21 @@ public class DisplayManager {
     		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(),
 					() -> bukkitPlayer.openInventory(newMenu.getCurrentView().getInventory()),1);
     	}
+	}
+
+	public void displayTownSpecializationMenu(Player bukkitPlayer, KonTown town, boolean isAdmin) {
+		// Verify trade specializations are enabled
+		boolean isSpecialEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath());
+		if(!isSpecialEnabled) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+		} else {
+			playMenuOpenSound(bukkitPlayer);
+			// Create menu
+			TownSpecializationMenuWrapper wrapper = new TownSpecializationMenuWrapper(konquest, town, isAdmin);
+			wrapper.constructMenu();
+			// Display menu
+			showMenuWrapper(bukkitPlayer,wrapper);
+		}
 	}
 	
 	/*

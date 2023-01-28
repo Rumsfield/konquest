@@ -13,6 +13,8 @@ import org.bukkit.block.Container;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.*;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
@@ -63,6 +65,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private final KonTownRabbit rabbit;
 	private final HashMap<Point,KonPlot> plots;
 	private final Map<KonPropertyFlag,Boolean> properties;
+	private Villager.Profession specialization;
 	
 	public KonTown(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, konquest);
@@ -113,6 +116,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.plots = new HashMap<>();
 		this.properties = new HashMap<>();
 		initProperties();
+		this.specialization = Villager.Profession.NONE;
 	}
 	
 	private void initProperties() {
@@ -158,6 +162,92 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	@Override
 	public Map<KonPropertyFlag, Boolean> getAllProperties() {
 		return new HashMap<>(properties);
+	}
+
+	public void setSpecialization(Villager.Profession newSpec) {
+		specialization = newSpec;
+	}
+
+	public Villager.Profession getSpecialization() {
+		return specialization;
+	}
+
+	public void applyTradeDiscounts(KonPlayer player, Inventory inv) {
+		/*
+		 * Ensure inventory is from a not-null merchant
+		 * Check that the player is either member or treaty with town guild, or has no guild
+		 * Get all merchant trades in the inventory and apply special price
+		 */
+		boolean isDiscountEnabled = getKonquest().getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath());
+		if(!isDiscountEnabled) {
+			return;
+		}
+		if(inv != null && inv.getType().equals(InventoryType.MERCHANT) && inv instanceof MerchantInventory) {
+			MerchantInventory merch = (MerchantInventory)inv;
+			if(merch.getHolder() != null && merch.getHolder() instanceof Villager) {
+				// The inventory belongs to a valid merchant villager entity
+
+				// Check that the merchant is of the correct specialized profession
+				Villager host = (Villager)merch.getHolder();
+				if(host.getProfession().equals(this.getSpecialization())) {
+					RelationRole playerRole = getKonquest().getKingdomManager().getRelationRole(player.getKingdom(), this.getKingdom());
+					// Prevent enemies and sanctioned players from getting a discount
+					if(playerRole.equals(RelationRole.ENEMY) || playerRole.equals(RelationRole.SANCTIONED)) {
+						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_SANCTION.getMessage(this.getName()));
+						return;
+					}
+					double discountPercent = getKonquest().getCore().getDouble(CorePath.TOWNS_DISCOUNT_PERCENT.getPath());
+					boolean isDiscountStack = getKonquest().getCore().getBoolean(CorePath.TOWNS_DISCOUNT_STACK.getPath());
+					if(discountPercent > 0) {
+						// Try to use 1.18 API first, catch missing method error and then try to use version handler
+						// Proceed with discounts for the valid villager's profession
+						double priceAdj = (double)discountPercent/100;
+						boolean doNotification = false;
+						try {
+							// Get and set special price with API methods
+							int amount = 0;
+							int discount = 0;
+							Merchant tradeHost = merch.getMerchant();
+							List<MerchantRecipe> tradeListDiscounted = new ArrayList<MerchantRecipe>();
+							for(MerchantRecipe trade : tradeHost.getRecipes()) {
+								ChatUtil.printDebug("Found trade for "+trade.getResult().getType().toString()+" with price mult "+trade.getPriceMultiplier()+
+										", special "+trade.getSpecialPrice()+", uses "+trade.getUses()+", max "+trade.getMaxUses());
+								List<ItemStack> ingredientList = trade.getIngredients();
+								for(ItemStack ingredient : ingredientList) {
+									ChatUtil.printDebug("  Has ingredient "+ingredient.getType().toString()+", amount: "+ingredient.getAmount());
+								}
+								if(!ingredientList.isEmpty()) {
+									amount = ingredientList.get(0).getAmount();
+									discount = (int)(amount*priceAdj*-1);
+									if(isDiscountStack) {
+										discount += trade.getSpecialPrice();
+									}
+									trade.setSpecialPrice(discount);
+									ChatUtil.printDebug("  Applied special price "+discount);
+								}
+								tradeListDiscounted.add(trade);
+							}
+							tradeHost.setRecipes(tradeListDiscounted);
+							doNotification = true;
+						} catch (NoSuchMethodError compatibility) {
+							ChatUtil.printDebug("Attempting to use version handler to apply trade discounts...");
+							if(getKonquest().isVersionHandlerEnabled()) {
+								getKonquest().getVersionHandler().applyTradeDiscount(priceAdj, isDiscountStack, merch);
+								doNotification = true;
+							} else {
+								ChatUtil.printDebug("Version handler is not available.");
+							}
+						}
+						// Notify player
+						if(doNotification) {
+							Konquest.playDiscountSound(player.getBukkitPlayer());
+							String discountStr = ""+discountPercent;
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_DISCOUNT.getMessage(this.getName(),discountStr));
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**

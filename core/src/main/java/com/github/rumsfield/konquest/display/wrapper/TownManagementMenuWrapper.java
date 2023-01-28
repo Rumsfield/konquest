@@ -9,6 +9,7 @@ import com.github.rumsfield.konquest.model.KonPropertyFlag;
 import com.github.rumsfield.konquest.model.KonPropertyFlagHolder;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -45,7 +46,7 @@ public class TownManagementMenuWrapper extends MenuWrapper {
 		boolean isLord = false;
 		boolean isKnight = false;
 		String townName = "null";
-		
+
 		if(manageTown != null) {
 			isUpgradable = manageTown.getPropertyValue(KonPropertyFlag.UPGRADE);
 			isPlotable = manageTown.getPropertyValue(KonPropertyFlag.PLOTS);
@@ -58,7 +59,7 @@ public class TownManagementMenuWrapper extends MenuWrapper {
 		pageLabel = titleColor+townName+" Town Management";
 		getMenu().addPage(0, 1, pageLabel);
 		
-		/* Shields Info Icon (1) */
+		/* Shields Info Icon (0) */
 		if(isAdmin || isLord || isKnight) {
 			// Verify either shields or armors are enabled
 	    	boolean isShieldsEnabled = getKonquest().getShieldManager().isShieldsEnabled();
@@ -67,12 +68,12 @@ public class TownManagementMenuWrapper extends MenuWrapper {
 	    		loreList = new ArrayList<>();
 		    	loreList.add(loreColor+"Apply town shields and armor.");
 		    	loreList.add(hintColor+"Click to manage");
-		    	info = new InfoIcon("Shields", loreList, Material.SHIELD, 1, true);
+		    	info = new InfoIcon("Shields", loreList, Material.SHIELD, 0, true);
 		    	info.setInfo("shields");
 		    	getMenu().getPage(0).addIcon(info);
 	    	}
 		}
-    	/* Plots Info Icon (3) */
+    	/* Plots Info Icon (1) */
 		if(isAdmin || ((isLord || isKnight) && isPlotable)) {
 			// Verify plots are enabled
 	    	boolean isPlotsEnabled = getKonquest().getPlotManager().isEnabled();
@@ -80,30 +81,47 @@ public class TownManagementMenuWrapper extends MenuWrapper {
 	    		loreList = new ArrayList<>();
 		    	loreList.add(loreColor+"Edit town plots.");
 		    	loreList.add(hintColor+"Click to manage");
-		    	info = new InfoIcon("Plots", loreList, Material.GRASS, 3, true);
+		    	info = new InfoIcon("Plots", loreList, Material.GRASS, 1, true);
 		    	info.setInfo("plots");
 		    	getMenu().getPage(0).addIcon(info);
 	    	}
 		}
-    	/* Upgrades Info Icon (5) */
+    	/* Upgrades Info Icon (2) */
 		if(isAdmin || (isLord && isUpgradable)) {
-			loreList = new ArrayList<>();
-	    	loreList.add(loreColor+"Apply town upgrades.");
-	    	loreList.add(hintColor+"Click to manage");
-	    	info = new InfoIcon("Upgrades", loreList, Material.GOLDEN_APPLE, 5, true);
-	    	info.setInfo("upgrades");
-	    	getMenu().getPage(0).addIcon(info);
+			// Verify upgrades are enabled
+			boolean isUpgradesEnabled = getKonquest().getUpgradeManager().isEnabled();
+			if(isUpgradesEnabled) {
+				loreList = new ArrayList<>();
+				loreList.add(loreColor+"Apply town upgrades.");
+				loreList.add(hintColor+"Click to manage");
+				info = new InfoIcon("Upgrades", loreList, Material.GOLDEN_APPLE, 2, true);
+				info.setInfo("upgrades");
+				getMenu().getPage(0).addIcon(info);
+			}
 		}
-    	/* Upgrades Info Icon (7) */
+		/* Specialization Info Icon (3) */
+		if(isAdmin || isLord) {
+			// Verify town trade specializations are enabled
+			boolean isSpecialEnabled = getKonquest().getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath());
+			if(isSpecialEnabled) {
+				loreList = new ArrayList<>();
+				loreList.add(loreColor+"Change trade specialization.");
+				loreList.add(hintColor+"Click to manage");
+				info = new InfoIcon("Specialization", loreList, Material.LECTERN, 3, true);
+				info.setInfo("special");
+				getMenu().getPage(0).addIcon(info);
+			}
+		}
+    	/* Options Info Icon (4) */
 		if(isAdmin || isLord) {
 			loreList = new ArrayList<>();
 	    	loreList.add(loreColor+"Edit town options.");
 	    	loreList.add(hintColor+"Click to manage");
-	    	info = new InfoIcon("Options", loreList, Material.WRITABLE_BOOK, 7, true);
+	    	info = new InfoIcon("Options", loreList, Material.WRITABLE_BOOK, 4, true);
 	    	info.setInfo("options");
 	    	getMenu().getPage(0).addIcon(info);
 		}
-		
+
 		getMenu().refreshNavigationButtons();
 		getMenu().setPageIndex(0);
 	}
@@ -135,6 +153,10 @@ public class TownManagementMenuWrapper extends MenuWrapper {
 				case "options":
 					// Open options menu
 					getKonquest().getDisplayManager().displayTownOptionsMenu(bukkitPlayer, manageTown);
+					break;
+				case "special":
+					// Open specialization menu
+					getKonquest().getDisplayManager().displayTownSpecializationMenu(bukkitPlayer, manageTown, isAdmin);
 					break;
 				default:
 					// Unknown icon info

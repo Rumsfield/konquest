@@ -138,8 +138,7 @@ public class InventoryListener implements Listener {
 						}
 					}
 					// Attempt to modify merchant trades based on guild specialization and relationships with player
-					//TODO: Implement town-based trade specialization discounts
-					//konquest.getKingdomManager().applyTradeDiscounts(player, town, event.getInventory());
+					town.applyTradeDiscounts(player, event.getInventory());
 				}
 				
 				// Prevent all inventory openings except for camp owner and clan members when allowed
