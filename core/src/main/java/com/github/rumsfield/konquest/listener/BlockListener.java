@@ -73,6 +73,10 @@ public class BlockListener implements Listener {
 			return;
 		}
 		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
+		if(player == null) {
+			ChatUtil.printDebug("Failed to handle onBlockBreak for null player");
+			return;
+		}
 		
 		// Monitor blocks in claimed territory
 		if(territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
@@ -80,12 +84,27 @@ public class BlockListener implements Listener {
 			if(!player.isAdminBypassActive() && !player.getBukkitPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
 				Location breakLoc = event.getBlock().getLocation();
 				KonTerritory territory = territoryManager.getChunkTerritory(breakLoc);
-				
+
+				// Pre-check
+				// Always allow monument critical blocks to be broken
+				boolean isAlwaysAllowed = false;
+				if(territory instanceof KonTown) {
+					KonTown town = (KonTown) territory;
+					if(town.getMonument().isLocInside(breakLoc) && event.getBlock().getType().equals(konquest.getKingdomManager().getTownCriticalBlock())) {
+						isAlwaysAllowed = true;
+					}
+				} else if(territory instanceof KonRuin) {
+					KonRuin ruin = (KonRuin) territory;
+					if(ruin.isCriticalLocation(breakLoc)) {
+						isAlwaysAllowed = true;
+					}
+				}
+
 				// Property Flag Holders
 				if(territory instanceof KonPropertyFlagHolder) {
 					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 					if(flagHolder.hasPropertyValue(KonPropertyFlag.BUILD)) {
-						if(!flagHolder.getPropertyValue(KonPropertyFlag.BUILD)) {
+						if(!flagHolder.getPropertyValue(KonPropertyFlag.BUILD) && !isAlwaysAllowed) {
 							notifyAdminBypass(event.getPlayer());
 							// Block it
 							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -95,11 +114,12 @@ public class BlockListener implements Listener {
 					}
 				}
 				
-				// Checks for capital and town
-				boolean isCapital = territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL);
-				boolean isTown = territory.getTerritoryType().equals(KonquestTerritoryType.TOWN);
-				if(isCapital || isTown) {
-					assert territory instanceof KonTown;
+				// Territory-specific handling
+				if(territory instanceof KonTown) {
+					// Checks for capital and town
+					boolean isCapital = territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL);
+					boolean isTown = territory.getTerritoryType().equals(KonquestTerritoryType.TOWN);
+
 					KonTown town = (KonTown) territory;
 					// Check player's relationship to this town
 					RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
@@ -288,169 +308,129 @@ public class BlockListener implements Listener {
 							return;
 						}
 					}
-				}
-				
-				// Territory-specific checks
-				switch(territory.getTerritoryType()) {
-					
-					/*
-					 * Capital checks
-					 */
-					case CAPITAL:
-						// TBD
-						break;
-						
-					/*
-					 * Town checks
-					 */
-					case TOWN:
-						// TBD
-						break;
-						
-					/*
-					 * Camp checks
-					 */
-					case CAMP:
-						assert territory instanceof KonCamp;
-						KonCamp camp = (KonCamp)territory;
-						boolean isMemberAllowedContainers = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ALLOW_CONTAINERS.getPath(), false);
-						boolean isMemberAllowedEdit = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ALLOW_EDIT_OFFLINE.getPath(), false);
-						boolean isMember = false;
-						if(konquest.getCampManager().isCampGrouped(camp)) {
-							isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
-						}
-						// If the camp owner is not online, prevent block breaking optionally
-						if(camp.isProtected() && !(isMember && isMemberAllowedEdit)) {
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP.getMessage(camp.getName()));
+				} else if(territory instanceof KonCamp) {
+					KonCamp camp = (KonCamp)territory;
+					boolean isMemberAllowedContainers = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ALLOW_CONTAINERS.getPath(), false);
+					boolean isMemberAllowedEdit = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ALLOW_EDIT_OFFLINE.getPath(), false);
+					boolean isMember = false;
+					if(konquest.getCampManager().isCampGrouped(camp)) {
+						isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
+					}
+					// If the camp owner is not online, prevent block breaking optionally
+					if(camp.isProtected() && !(isMember && isMemberAllowedEdit)) {
+						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP.getMessage(camp.getName()));
+						event.setCancelled(true);
+						return;
+					}
+					// If block is a container, protect (optionally) from players other than the owner
+					boolean isProtectChest = konquest.getCore().getBoolean(CorePath.CAMPS_PROTECT_CONTAINERS.getPath(),true);
+					if(isProtectChest && !(isMember && isMemberAllowedContainers) && !camp.isPlayerOwner(event.getPlayer()) && event.getBlock().getState() instanceof BlockInventoryHolder) {
+						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						event.setCancelled(true);
+						return;
+					}
+					// Prevent group members from breaking beds they don't own
+					if(isMember && !camp.isPlayerOwner(event.getPlayer()) && event.getBlock().getBlockData() instanceof Bed) {
+						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						event.setCancelled(true);
+						return;
+					}
+					/* This camp can be attacked... */
+					// Make the enemy glow
+					if(!camp.isPlayerOwner(event.getPlayer()) && !isMember) {
+						camp.applyGlow(event.getPlayer());
+					}
+					// Remove the camp if a bed is broken within it
+					if(event.getBlock().getBlockData() instanceof Bed) {
+						// Fire event
+						KonquestCampDestroyEvent invokeEvent = new KonquestCampDestroyEvent(konquest, camp, player, event.getBlock().getLocation());
+						Konquest.callKonquestEvent(invokeEvent);
+						// Check for cancelled
+						if(invokeEvent.isCancelled()) {
 							event.setCancelled(true);
 							return;
 						}
-						// If block is a container, protect (optionally) from players other than the owner
-						boolean isProtectChest = konquest.getCore().getBoolean(CorePath.CAMPS_PROTECT_CONTAINERS.getPath(),true);
-						if(isProtectChest && !(isMember && isMemberAllowedContainers) && !camp.isPlayerOwner(event.getPlayer()) && event.getBlock().getState() instanceof BlockInventoryHolder) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-							event.setCancelled(true);
-							return;
-						}
-						// Prevent group members from breaking beds they don't own
-						if(isMember && !camp.isPlayerOwner(event.getPlayer()) && event.getBlock().getBlockData() instanceof Bed) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-							event.setCancelled(true);
-							return;
-						}
-						/* This camp can be attacked... */
-						// Make the enemy glow
-						if(!camp.isPlayerOwner(event.getPlayer()) && !isMember) {
-							camp.applyGlow(event.getPlayer());
-						}
-						// Remove the camp if a bed is broken within it
-						if(event.getBlock().getBlockData() instanceof Bed) {
-							// Fire event
-							KonquestCampDestroyEvent invokeEvent = new KonquestCampDestroyEvent(konquest, camp, player, event.getBlock().getLocation());
-							Konquest.callKonquestEvent(invokeEvent);
-							// Check for cancelled
-							if(invokeEvent.isCancelled()) {
-								event.setCancelled(true);
-								return;
-							}
-							campManager.removeCamp(camp);
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY.getMessage(camp.getName()));
-							KonPlayer onlineOwner = playerManager.getPlayerFromName(camp.getOwner().getName());
-							if(onlineOwner != null) {
-								ChatUtil.sendError(onlineOwner.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY_OWNER.getMessage());
-							} else {
-								ChatUtil.printDebug("Failed attempt to send camp destruction message to offline owner "+camp.getOwner().getName());
-							}
-						}
-						break;
-						
-					/*
-					 * Ruin checks
-					 */
-					case RUIN:
-						assert territory instanceof KonRuin;
-						KonRuin ruin = (KonRuin)territory;
-						// Check for expired cooldown
-						if(ruin.isCaptureDisabled()) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(ruin.getCaptureCooldownString()));
-							event.setCancelled(true);
-							return;
-						}
-						// Check for broken critical block within this Ruin
-						if(ruin.isCriticalLocation(breakLoc)) {
-							// Fire event for every attack
-							KonquestRuinAttackEvent invokeEvent = new KonquestRuinAttackEvent(konquest, ruin, player, event.getBlock());
-							Konquest.callKonquestEvent(invokeEvent);
-							if(invokeEvent.isCancelled()) {
-								event.setCancelled(true);
-								return;
-							}
-							// Fire event for pre-capture
-							if(ruin.getRemainingCriticalHits() == 0) {
-								List<KonPlayer> rewardPlayers = konquest.getRuinManager().getRuinPlayers(ruin,player.getKingdom());
-								KonquestRuinCaptureEvent invokeEventCapture = new KonquestRuinCaptureEvent(konquest, ruin, player, rewardPlayers);
-								Konquest.callKonquestEvent(invokeEventCapture);
-								if(invokeEventCapture.isCancelled()) {
-									event.setCancelled(true);
-									return;
-								}
-							}
-							// Prevent critical block drop
-							event.setDropItems(false);
-							// Restart capture cooldown timer
-							int ruinCaptureTimeSeconds = konquest.getCore().getInt(CorePath.RUINS_CAPTURE_COOLDOWN.getPath());
-							Timer captureTimer = ruin.getCaptureTimer();
-							captureTimer.stopTimer();
-							captureTimer.setTime(ruinCaptureTimeSeconds);
-							captureTimer.startTimer();
-							ChatUtil.printDebug("Starting ruin capture timer for "+ruinCaptureTimeSeconds+" seconds with taskID "+captureTimer.getTaskID()+" for Ruin "+ruin.getName());
-							// Disable broken critical block
-							ruin.setCriticalLocationEnabled(breakLoc, false);
-							// Update bar progress
-							double progress = (double)(ruin.getRemainingCriticalHits()) / (double)ruin.getMaxCriticalHits();
-							ruin.setBarProgress(progress);
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CRITICAL.getMessage(ruin.getRemainingCriticalHits()));
-							event.getBlock().getWorld().playSound(breakLoc, Sound.BLOCK_FIRE_EXTINGUISH, 1.0F, 0.6F);
-							// Evaluate critical blocks
-							if(ruin.getRemainingCriticalHits() == 0) {
-								ruin.setIsCaptureDisabled(true);
-								konquest.getRuinManager().rewardPlayers(ruin,player.getKingdom());
-							} else {
-								// Force all alive golems to respawn
-								ruin.respawnAllDistantGolems();
-								// All golems target player
-								ruin.targetAllGolemsToPlayer(event.getPlayer());
-							}
+						campManager.removeCamp(camp);
+						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY.getMessage(camp.getName()));
+						KonPlayer onlineOwner = playerManager.getPlayerFromName(camp.getOwner().getName());
+						if(onlineOwner != null) {
+							ChatUtil.sendError(onlineOwner.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY_OWNER.getMessage());
 						} else {
-							notifyAdminBypass(event.getPlayer());
-							// Prevent all other block breaks
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.printDebug("Failed attempt to send camp destruction message to offline owner "+camp.getOwner().getName());
+						}
+					}
+				} else if(territory instanceof KonRuin) {
+					KonRuin ruin = (KonRuin)territory;
+					// Check for expired cooldown
+					if(ruin.isCaptureDisabled()) {
+						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(ruin.getCaptureCooldownString()));
+						event.setCancelled(true);
+						return;
+					}
+					// Check for broken critical block within this Ruin
+					if(ruin.isCriticalLocation(breakLoc)) {
+						// Fire event for every attack
+						KonquestRuinAttackEvent invokeEvent = new KonquestRuinAttackEvent(konquest, ruin, player, event.getBlock());
+						Konquest.callKonquestEvent(invokeEvent);
+						if(invokeEvent.isCancelled()) {
 							event.setCancelled(true);
 							return;
 						}
-						break;
-						
-					/*
-					 * Sanctuary checks
-					 */
-					case SANCTUARY:
-						assert territory instanceof KonSanctuary;
-						KonSanctuary sanctuary = (KonSanctuary)territory;
-						// Always prevent monument template edits
-						KonMonumentTemplate template = sanctuary.getTemplate(breakLoc);
-						if(template != null) {
-							notifyAdminBypass(event.getPlayer());
-							// Block it
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-							event.setCancelled(true);
-							return;
+						// Fire event for pre-capture
+						if(ruin.getRemainingCriticalHits() == 0) {
+							List<KonPlayer> rewardPlayers = konquest.getRuinManager().getRuinPlayers(ruin,player.getKingdom());
+							KonquestRuinCaptureEvent invokeEventCapture = new KonquestRuinCaptureEvent(konquest, ruin, player, rewardPlayers);
+							Konquest.callKonquestEvent(invokeEventCapture);
+							if(invokeEventCapture.isCancelled()) {
+								event.setCancelled(true);
+								return;
+							}
 						}
-						break;
-						
-					default:
-						// Unknown territory type, do nothing.
-						break;
+						// Prevent critical block drop
+						event.setDropItems(false);
+						// Restart capture cooldown timer
+						int ruinCaptureTimeSeconds = konquest.getCore().getInt(CorePath.RUINS_CAPTURE_COOLDOWN.getPath());
+						Timer captureTimer = ruin.getCaptureTimer();
+						captureTimer.stopTimer();
+						captureTimer.setTime(ruinCaptureTimeSeconds);
+						captureTimer.startTimer();
+						ChatUtil.printDebug("Starting ruin capture timer for "+ruinCaptureTimeSeconds+" seconds with taskID "+captureTimer.getTaskID()+" for Ruin "+ruin.getName());
+						// Disable broken critical block
+						ruin.setCriticalLocationEnabled(breakLoc, false);
+						// Update bar progress
+						double progress = (double)(ruin.getRemainingCriticalHits()) / (double)ruin.getMaxCriticalHits();
+						ruin.setBarProgress(progress);
+						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CRITICAL.getMessage(ruin.getRemainingCriticalHits()));
+						event.getBlock().getWorld().playSound(breakLoc, Sound.BLOCK_FIRE_EXTINGUISH, 1.0F, 0.6F);
+						// Evaluate critical blocks
+						if(ruin.getRemainingCriticalHits() == 0) {
+							ruin.setIsCaptureDisabled(true);
+							konquest.getRuinManager().rewardPlayers(ruin,player.getKingdom());
+						} else {
+							// Force all alive golems to respawn
+							ruin.respawnAllDistantGolems();
+							// All golems target player
+							ruin.targetAllGolemsToPlayer(event.getPlayer());
+						}
+					} else {
+						notifyAdminBypass(event.getPlayer());
+						// Prevent all other block breaks
+						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						event.setCancelled(true);
+						return;
+					}
+				} else if(territory instanceof KonSanctuary) {
+					KonSanctuary sanctuary = (KonSanctuary)territory;
+					// Always prevent monument template edits
+					KonMonumentTemplate template = sanctuary.getTemplate(breakLoc);
+					if(template != null) {
+						notifyAdminBypass(event.getPlayer());
+						// Block it
+						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						event.setCancelled(true);
+						return;
+					}
 				}
 				
 			} else {
