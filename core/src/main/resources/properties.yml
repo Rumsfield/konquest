@@ -1,6 +1,6 @@
 # Default Properties
 # 
-# Kingdoms, Sanctuaries and Towns/Capitals each have unique properties per instance.
+# Kingdoms, Sanctuaries, Ruins and Towns/Capitals each have unique properties per instance.
 # When players make new ones, these default properties are applied.
 # Admins can change the values of these properties in-game.
 # 
@@ -41,6 +41,13 @@ properties:
     build: false
     use: true
     mobs: false
+    portals: true
+  ruins:
+    enter: true
+    exit: true
+    pvp: true
+    pve: true
+    use: true
     portals: true
   towns:
     capture: true

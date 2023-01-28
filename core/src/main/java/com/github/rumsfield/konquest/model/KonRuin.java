@@ -18,14 +18,16 @@ import org.bukkit.entity.*;
 
 import java.awt.*;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplayer, Timeable {
+public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplayer, KonPropertyFlagHolder, Timeable {
 
 	private final Timer spawnTimer;
 	private final Timer captureTimer;
 	private boolean isCaptureDisabled;
 	private final BossBar ruinBarAll;
+	private final Map<KonPropertyFlag,Boolean> properties;
 	private final HashMap<Location,Boolean> criticalLocations; // Block location, enabled flag
 	private final HashMap<Location,KonRuinGolem> spawnLocations; // Block location, Ruin Golem
 
@@ -48,6 +50,47 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		this.ruinBarAll.setVisible(true);
 		this.criticalLocations = new HashMap<>();
 		this.spawnLocations = new HashMap<>();
+		this.properties = new HashMap<>();
+		initProperties();
+	}
+
+	private void initProperties() {
+		properties.clear();
+		properties.put(KonPropertyFlag.PVP, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.pvp"));
+		properties.put(KonPropertyFlag.PVE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.pve"));
+		properties.put(KonPropertyFlag.USE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.use"));
+		properties.put(KonPropertyFlag.PORTALS, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.portals"));
+		properties.put(KonPropertyFlag.ENTER, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.enter"));
+		properties.put(KonPropertyFlag.EXIT, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.exit"));
+	}
+
+	@Override
+	public boolean setPropertyValue(KonPropertyFlag property, boolean value) {
+		boolean result = false;
+		if(properties.containsKey(property)) {
+			properties.put(property, value);
+			result = true;
+		}
+		return result;
+	}
+
+	@Override
+	public boolean getPropertyValue(KonPropertyFlag property) {
+		boolean result = false;
+		if(properties.containsKey(property)) {
+			result = properties.get(property);
+		}
+		return result;
+	}
+
+	@Override
+	public boolean hasPropertyValue(KonPropertyFlag property) {
+		return properties.containsKey(property);
+	}
+
+	@Override
+	public Map<KonPropertyFlag, Boolean> getAllProperties() {
+		return new HashMap<>(properties);
 	}
 
 	@Override
