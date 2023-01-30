@@ -5,10 +5,7 @@ import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestRelationship;
 import com.github.rumsfield.konquest.utility.Timer;
 import com.github.rumsfield.konquest.utility.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -304,6 +301,18 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 			}
 		}
 		return memberList;
+	}
+
+	public String getPlayerRoleName(KonOfflinePlayer offlinePlayer) {
+		String result = "";
+		if(isMaster(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
+			result = ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage();
+		} else if(isOfficer(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
+			result = ChatColor.BLUE+MessagePath.LABEL_OFFICER.getMessage();
+		} else if(isMember(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
+			result = ChatColor.WHITE+MessagePath.LABEL_MEMBER.getMessage();
+		}
+		return result;
 	}
 	
 	/*

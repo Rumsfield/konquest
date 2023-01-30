@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.Konquest;
 import org.bukkit.Material;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemFlag;
@@ -40,7 +41,7 @@ public class ProfessionIcon implements MenuIcon {
 
 	@Override
 	public ItemStack getItem() {
-		ItemStack item = new ItemStack(getMat(),1);
+		ItemStack item = new ItemStack(Konquest.getProfessionMaterial(profession),1);
 		ItemMeta meta = item.getItemMeta();
 		assert meta != null;
 		for(ItemFlag flag : ItemFlag.values()) {
@@ -57,59 +58,5 @@ public class ProfessionIcon implements MenuIcon {
 	@Override
 	public boolean isClickable() {
 		return isClickable;
-	}
-	
-	private Material getMat() {
-		Material result = Material.EMERALD;
-		switch(profession) {
-			case ARMORER:
-				result = Material.BLAST_FURNACE;
-				break;
-			case BUTCHER:
-				result = Material.SMOKER;
-				break;
-			case CARTOGRAPHER:
-				result = Material.CARTOGRAPHY_TABLE;
-				break;
-			case CLERIC:
-				result = Material.BREWING_STAND;
-				break;
-			case FARMER:
-				result = Material.COMPOSTER;
-				break;
-			case FISHERMAN:
-				result = Material.BARREL;
-				break;
-			case FLETCHER:
-				result = Material.FLETCHING_TABLE;
-				break;
-			case LEATHERWORKER:
-				result = Material.CAULDRON;
-				break;
-			case LIBRARIAN:
-				result = Material.LECTERN;
-				break;
-			case MASON:
-				result = Material.STONECUTTER;
-				break;
-			case NITWIT:
-				result = Material.PUFFERFISH_BUCKET;
-				break;
-			case NONE:
-				result = Material.GRAVEL;
-				break;
-			case SHEPHERD:
-				result = Material.LOOM;
-				break;
-			case TOOLSMITH:
-				result = Material.SMITHING_TABLE;
-				break;
-			case WEAPONSMITH:
-				result = Material.GRINDSTONE;
-				break;
-			default:
-				break;
-		}
-		return result;
 	}
 }

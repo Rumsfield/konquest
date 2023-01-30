@@ -42,7 +42,10 @@ public class KingdomCommand extends CommandBase {
     			return;
     		}
     		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-    		
+			if(player == null) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+				return;
+			}
     		// Check for player's kingdom, should be either barbarians or another non-null kingdom
     		KonKingdom kingdom = player.getKingdom();
     		if(kingdom == null) {
@@ -77,18 +80,20 @@ public class KingdomCommand extends CommandBase {
 	                    	
 	                    	if(status == 0) {
 	                    		// Successful kingdom creation
+								KonKingdom createdKingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
 	                    		//TODO: KR messages
 	                    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_CREATE.getMessage(kingdomName));
 	                    		ChatUtil.sendBroadcast(bukkitPlayer.getName()+" created the kingdom of "+kingdomName);
-	                    				
-	                    		// Open kingdom menu for newly created kingdom
+								// Teleport player to safe place around monument, facing monument
+								getKonquest().getKingdomManager().teleportAwayFromCenter(createdKingdom.getCapital());
+								// Play a success sound
+								Konquest.playTownSettleSound(bukkitPlayer.getLocation());
+								// Open kingdom menu for newly created kingdom
 	                    		KonKingdom newKingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
 	                    		getKonquest().getDisplayManager().displayKingdomMenu(player, newKingdom, false);
-	                    		
 	                    		// Updates
 	                    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
 	                    		//TODO: Add directive
-	                    		
 	                    	} else {
 	                    		switch(status) {
 		                    		case 1:

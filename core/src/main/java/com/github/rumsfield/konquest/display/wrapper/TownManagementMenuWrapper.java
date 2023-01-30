@@ -81,7 +81,7 @@ public class TownManagementMenuWrapper extends MenuWrapper {
 	    		loreList = new ArrayList<>();
 		    	loreList.add(loreColor+"Edit town plots.");
 		    	loreList.add(hintColor+"Click to manage");
-		    	info = new InfoIcon("Plots", loreList, Material.GRASS, 1, true);
+		    	info = new InfoIcon("Plots", loreList, Material.GRASS_BLOCK, 1, true);
 		    	info.setInfo("plots");
 		    	getMenu().getPage(0).addIcon(info);
 	    	}

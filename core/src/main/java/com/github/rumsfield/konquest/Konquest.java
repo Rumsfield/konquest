@@ -22,6 +22,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -43,7 +44,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	private static Konquest instance;
 	private static String chatTag;
 	private static String chatMessage;
-	public static final String chatDivider = "�7�";
+	public static final String chatDivider = "§7»";
 	public static ChatColor friendColor1 = ChatColor.GREEN;
 	public static ChatColor friendColor2 = ChatColor.DARK_GREEN;
 	public static ChatColor enemyColor1 = ChatColor.RED;
@@ -114,8 +115,8 @@ public class Konquest implements KonquestAPI, Timeable {
 	public Konquest(KonquestPlugin plugin) {
 		this.plugin = plugin;
 		instance = this;
-		chatTag = "�7[�6Konquest�7]�f ";
-		chatMessage = "%PREFIX% %KINGDOM% �7| %TITLE% %NAME% %SUFFIX% ";
+		chatTag = "§7[§6Konquest§7]§f ";
+		chatMessage = "%PREFIX% %KINGDOM% §7| %TITLE% %NAME% %SUFFIX% ";
 		
 		databaseThread = new DatabaseThread(this);
 		accomplishmentManager = new AccomplishmentManager(this);
@@ -1294,7 +1295,7 @@ public class Konquest implements KonquestAPI, Timeable {
     
     public void telePlayerLocation(Player player, Location travelLocation) {
     	Point locPoint = toPoint(travelLocation);
-		Location destination = new Location(travelLocation.getWorld(), travelLocation.getBlockX()+0.5, travelLocation.getBlockY()+1.0, travelLocation.getBlockZ()+0.5, travelLocation.getYaw(), travelLocation.getPitch());
+		Location destination = new Location(travelLocation.getWorld(), travelLocation.getBlockX()+0.5, travelLocation.getBlockY()+0.5, travelLocation.getBlockZ()+0.5, travelLocation.getYaw(), travelLocation.getPitch());
     	if(travelLocation.getWorld().isChunkLoaded(locPoint.x,locPoint.y)) {
     		ChatUtil.printDebug("Teleporting player "+player.getName()+" to loaded chunk");
     		player.teleport(destination,TeleportCause.PLUGIN);
@@ -1618,6 +1619,10 @@ public class Konquest implements KonquestAPI, Timeable {
     public static void playTownArmorSound(Location loc) {
     	loc.getWorld().playSound(loc, Sound.ENTITY_SHULKER_SHOOT, (float)1.0, (float)2);
     }
+
+	public static void playTownSettleSound(Location loc) {
+		loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_USE, (float)0.5, (float)1);
+	}
     
     public static void playCampGroupSound(Location loc) {
     	loc.getWorld().playSound(loc, Sound.BLOCK_FENCE_GATE_OPEN, (float)1.0, (float)0.7);
@@ -1711,5 +1716,59 @@ public class Konquest implements KonquestAPI, Timeable {
     		ChatUtil.printDebug("Could not call null Bukkit event");
     	}
     }
+
+	public static Material getProfessionMaterial(Villager.Profession profession) {
+		Material result = Material.EMERALD;
+		switch(profession) {
+			case ARMORER:
+				result = Material.BLAST_FURNACE;
+				break;
+			case BUTCHER:
+				result = Material.SMOKER;
+				break;
+			case CARTOGRAPHER:
+				result = Material.CARTOGRAPHY_TABLE;
+				break;
+			case CLERIC:
+				result = Material.BREWING_STAND;
+				break;
+			case FARMER:
+				result = Material.COMPOSTER;
+				break;
+			case FISHERMAN:
+				result = Material.BARREL;
+				break;
+			case FLETCHER:
+				result = Material.FLETCHING_TABLE;
+				break;
+			case LEATHERWORKER:
+				result = Material.CAULDRON;
+				break;
+			case LIBRARIAN:
+				result = Material.LECTERN;
+				break;
+			case MASON:
+				result = Material.STONECUTTER;
+				break;
+			case NITWIT:
+				result = Material.PUFFERFISH_BUCKET;
+				break;
+			case NONE:
+				result = Material.GRAVEL;
+				break;
+			case SHEPHERD:
+				result = Material.LOOM;
+				break;
+			case TOOLSMITH:
+				result = Material.SMITHING_TABLE;
+				break;
+			case WEAPONSMITH:
+				result = Material.GRINDSTONE;
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
 	
 }

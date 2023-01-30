@@ -34,7 +34,7 @@ public enum AdminCommandType {
 	SETTRAVEL		("konquest.command.admin.settravel",		"",																	MessagePath.DESCRIPTION_ADMIN_SETTRAVEL.getMessage()),												
 	TRAVEL			("konquest.command.admin.travel",			"<name>",                                   						MessagePath.DESCRIPTION_ADMIN_TRAVEL.getMessage()),
 	RELOAD			("konquest.command.admin.reload",			"", 																MessagePath.DESCRIPTION_ADMIN_RELOAD.getMessage()),
-	FLAG			("konquest.command.admin.flag",				"<name> [<flag>] [<value>]",                                   		MessagePath.DESCRIPTION_ADMIN_FLAG.getMessage()),
+	FLAG			("konquest.command.admin.flag",				"[capital] <name> [<flag>] [<value>]",                                   		MessagePath.DESCRIPTION_ADMIN_FLAG.getMessage()),
 	STAT			("konquest.command.admin.stat",				"<player> <stat> show|set|add|clear [<value>]",						MessagePath.DESCRIPTION_ADMIN_STAT.getMessage());
 	
 	private final String permission;

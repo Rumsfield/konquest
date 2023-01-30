@@ -8,10 +8,7 @@ import com.github.rumsfield.konquest.display.icon.PlayerIcon;
 import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
 import com.github.rumsfield.konquest.display.icon.TownIcon;
 import com.github.rumsfield.konquest.manager.DisplayManager;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
@@ -45,7 +42,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
  		List<String> loreList;
  		InfoIcon info;
 		final int MAX_ICONS_PER_PAGE = 45;
-		int slotIndex = 1;
+		int slotIndex;
 		int pageIndex = 0;
 		int pageRows = 1;
 
@@ -60,8 +57,19 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
  		// Page 0
 		pageLabel = titleColor+MessagePath.COMMAND_INFO_NOTICE_KINGDOM_HEADER.getMessage(infoKingdom.getName());
 		getMenu().addPage(pageIndex, pageRows, pageLabel);
-		
+
+		/* Capital Info Icon (0) */
+		slotIndex = 0;
+		KonCapital capital = infoKingdom.getCapital();
+		loreList = new ArrayList<>();
+		loreList.add(loreColor+"Capital");
+		loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+capital.getNumResidents());
+		loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+capital.getChunkList().size());
+		TownIcon capitalIcon = new TownIcon(capital,kingdomColor,getKonquest().getKingdomManager().getTownCriticalBlock(),loreList,slotIndex);
+		getMenu().getPage(pageIndex).addIcon(capitalIcon);
+
 		/* Master Player Info Icon (1) */
+		slotIndex = 1;
 		loreList = new ArrayList<>();
 		if(infoKingdom.isMasterValid()) {
 			loreList.add(ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage());
@@ -98,14 +106,12 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
     	String isProtected = DisplayManager.boolean2Symbol(infoKingdom.isOfflineProtected());
     	String isOpen = DisplayManager.boolean2Symbol(infoKingdom.isOpen());
     	String isAdminOperated = DisplayManager.boolean2Symbol(infoKingdom.isAdminOperated());
-    	String templateName = infoKingdom.getMonumentTemplateName();
     	loreList = new ArrayList<>();
     	loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
     	loreList.add(loreColor+MessagePath.LABEL_SMALLEST.getMessage()+": "+isSmallest);
     	loreList.add(loreColor+MessagePath.LABEL_PROTECTED.getMessage()+": "+isProtected);
     	loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
     	loreList.add(loreColor+MessagePath.LABEL_ADMIN_KINGDOM.getMessage()+": "+isAdminOperated);
-    	loreList.add(loreColor+MessagePath.LABEL_MONUMENT.getMessage()+": "+templateName);
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, slotIndex, false);
     	getMenu().getPage(pageIndex).addIcon(info);
     	
@@ -139,6 +145,29 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
     	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+numKingdomLand);
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_LAND.getMessage(), loreList, Material.GRASS_BLOCK, slotIndex, false);
     	getMenu().getPage(pageIndex).addIcon(info);
+
+		/* Template Info Icon (7) */
+		slotIndex = 7;
+		loreList = new ArrayList<>();
+		// TODO message paths
+		if(infoKingdom.hasMonumentTemplate()) {
+			KonMonumentTemplate template = infoKingdom.getMonumentTemplate();
+			loreList.add(loreColor+"Name"+": "+valueColor+template.getName());
+			loreList.add(loreColor+"Blocks"+": "+valueColor+template.getNumBlocks());
+			loreList.add(loreColor+"Critical Hits"+": "+valueColor+template.getNumCriticals());
+			loreList.add(loreColor+"Loot Chests"+": "+valueColor+template.getNumLootChests());
+			if(template.isBlanking()) {
+				loreList.add(ChatColor.RED+"Temporarily Disabled");
+			}
+			info = new InfoIcon(kingdomColor+"Monument Template", loreList, Material.CRAFTING_TABLE, slotIndex, false);
+		} else {
+			String invalidMessage = "Kingdom master must choose a template from the kingdom menu.";
+			for(String line : Konquest.stringPaginate(invalidMessage)) {
+				loreList.add(loreColor+line);
+			}
+			info = new InfoIcon(ChatColor.RED+"Invalid",loreList,Material.BARRIER,slotIndex,false);
+		}
+		getMenu().getPage(pageIndex).addIcon(info);
     	
     	// Page 1+
     	// Town List

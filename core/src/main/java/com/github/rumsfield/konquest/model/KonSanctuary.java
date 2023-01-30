@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.model;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.utility.*;
+import com.github.rumsfield.konquest.utility.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -12,10 +13,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
 import java.awt.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPropertyFlagHolder, Timeable {
 
@@ -141,7 +139,11 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 	}
 	
 	public Set<String> getTemplateNames() {
-		return templates.keySet();
+		Set<String> result = new HashSet<>();
+		for(KonMonumentTemplate template : templates.values()) {
+			result.add(template.getName());
+		}
+		return result;
 	}
 	
 	public boolean isTemplate(String name) {

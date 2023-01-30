@@ -175,7 +175,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public void applyTradeDiscounts(KonPlayer player, Inventory inv) {
 		/*
 		 * Ensure inventory is from a not-null merchant
-		 * Check that the player is either member or treaty with town guild, or has no guild
 		 * Get all merchant trades in the inventory and apply special price
 		 */
 		boolean isDiscountEnabled = getKonquest().getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath());
@@ -190,12 +189,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				// Check that the merchant is of the correct specialized profession
 				Villager host = (Villager)merch.getHolder();
 				if(host.getProfession().equals(this.getSpecialization())) {
-					RelationRole playerRole = getKonquest().getKingdomManager().getRelationRole(player.getKingdom(), this.getKingdom());
-					// Prevent enemies and sanctioned players from getting a discount
-					if(playerRole.equals(RelationRole.ENEMY) || playerRole.equals(RelationRole.SANCTIONED)) {
-						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_SANCTION.getMessage(this.getName()));
-						return;
-					}
 					double discountPercent = getKonquest().getCore().getDouble(CorePath.TOWNS_DISCOUNT_PERCENT.getPath());
 					boolean isDiscountStack = getKonquest().getCore().getBoolean(CorePath.TOWNS_DISCOUNT_STACK.getPath());
 					if(discountPercent > 0) {

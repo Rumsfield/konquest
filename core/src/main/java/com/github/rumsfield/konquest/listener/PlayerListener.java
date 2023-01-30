@@ -9,20 +9,9 @@ import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.manager.TerritoryManager;
 import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
-import com.github.rumsfield.konquest.model.KonBarDisplayer;
-import com.github.rumsfield.konquest.model.KonCamp;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonRuin;
-import com.github.rumsfield.konquest.model.KonSanctuary;
-import com.github.rumsfield.konquest.model.KonStatsType;
-import com.github.rumsfield.konquest.model.KonTerritory;
-import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.model.KonPlayer.FollowType;
 import com.github.rumsfield.konquest.model.KonPlayer.RegionType;
-import com.github.rumsfield.konquest.model.KonPlot;
-import com.github.rumsfield.konquest.model.KonPropertyFlag;
-import com.github.rumsfield.konquest.model.KonPropertyFlagHolder;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -828,31 +817,21 @@ public class PlayerListener implements Listener {
 
     	// Check for inter-chunk ender pearl
     	boolean isEnemyPearlBlocked = konquest.getCore().getBoolean(CorePath.KINGDOMS_NO_ENEMY_ENDER_PEARL.getPath(), false);
-    	boolean isTerritoryTo = territoryManager.isChunkClaimed(event.getTo());
-    	boolean isTerritoryFrom = territoryManager.isChunkClaimed(event.getFrom());
     	Player bukkitPlayer = event.getPlayer();
 		if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) return;
 		KonPlayer player = playerManager.getPlayer(bukkitPlayer);
 		// Inter-chunk checks
 		// Prevent enemies teleporting to ender pearls thrown into enemy land or out of enemy land
-		if(!isEnemyPearlBlocked || !event.getCause().equals(TeleportCause.ENDER_PEARL)) return;
-		boolean isEnemyTerritory = false;
-		if(isTerritoryTo) {
-			KonTerritory territoryTo = territoryManager.getChunkTerritory(event.getTo());
-			if(!player.getKingdom().equals(territoryTo.getKingdom())) {
-				isEnemyTerritory = true;
+		if(isEnemyPearlBlocked && event.getCause().equals(TeleportCause.ENDER_PEARL)) {
+			boolean isEnemyTo = territoryManager.isChunkClaimed(event.getTo()) &&
+					!kingdomManager.isPlayerFriendly(player, territoryManager.getChunkTerritory(event.getTo()).getKingdom());
+			boolean isEnemyFrom = territoryManager.isChunkClaimed(event.getFrom()) &&
+					!kingdomManager.isPlayerFriendly(player, territoryManager.getChunkTerritory(event.getFrom()).getKingdom());
+			if(isEnemyTo || isEnemyFrom) {
+				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				event.setCancelled(true);
+				return;
 			}
-		}
-		if(isTerritoryFrom) {
-			KonTerritory territoryFrom = territoryManager.getChunkTerritory(event.getFrom());
-			if(!player.getKingdom().equals(territoryFrom.getKingdom())) {
-				isEnemyTerritory = true;
-			}
-		}
-		if(isEnemyTerritory) {
-			ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-			event.setCancelled(true);
-			return;
 		}
 
 		// General chunk transition handler
@@ -920,10 +899,10 @@ public class PlayerListener implements Listener {
 	        			// Auto claim
 	        			if(player.getAutoFollow().equals(FollowType.ADMIN_CLAIM)) {
 	        				// Admin claiming takes priority
-	        				territoryManager.claimForAdmin(movePlayer, moveTo);
+	        				territoryManager.claimForAdmin(player, moveTo);
 	        			} else if(player.getAutoFollow().equals(FollowType.CLAIM)) {
 	        				// Player is claim following
-	        				boolean isClaimSuccess = territoryManager.claimForPlayer(movePlayer, moveTo);
+	        				boolean isClaimSuccess = territoryManager.claimForPlayer(player, moveTo);
 	            			if(!isClaimSuccess) {
 	            				player.setAutoFollow(FollowType.NONE);
 	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
@@ -1252,8 +1231,13 @@ public class PlayerListener implements Listener {
     			}
     		} else {
     			if((isPlotFrom || !town.isLocInside(fromLoc)) && town.isLocInside(toLoc)) {
-    				// Moved out of plot or other territory or wild into town land
-    				plotMessage = MessagePath.MENU_PLOTS_TOWN_LAND.getMessage();
+    				// Moved out of plot or other territory or wild into town/capital land
+					if(town instanceof KonCapital) {
+						//TODO KR use message path
+						plotMessage = "Capital Land";
+					} else {
+						plotMessage = MessagePath.MENU_PLOTS_TOWN_LAND.getMessage();
+					}
     				plotMessageColor = ChatColor.DARK_GREEN;
     				doDisplay = true;
     			}

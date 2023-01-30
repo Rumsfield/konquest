@@ -779,19 +779,23 @@ public class PlotMenu implements ViewableMenu {
 	}
 	
 	private InfoIcon navIconScrollLeft(int index) {
-		return new InfoIcon(ChatColor.GOLD+"◀",Collections.emptyList(),Material.STONE_BUTTON,index,true);
+		// Note: Unicode characters do not render correctly in game, must use escape sequence code.
+		return new InfoIcon(ChatColor.GOLD+"\u25C0",Collections.emptyList(),Material.STONE_BUTTON,index,true);
 	}
 	
 	private InfoIcon navIconScrollRight(int index) {
-		return new InfoIcon(ChatColor.GOLD+"▶",Collections.emptyList(),Material.STONE_BUTTON,index,true);
+		// Note: Unicode characters do not render correctly in game, must use escape sequence code.
+		return new InfoIcon(ChatColor.GOLD+"\u25B6",Collections.emptyList(),Material.STONE_BUTTON,index,true);
 	}
 	
 	private InfoIcon navIconScrollUp(int index) {
-		return new InfoIcon(ChatColor.GOLD+"▲",Collections.emptyList(),Material.STONE_BUTTON,index,true);
+		// Note: Unicode characters do not render correctly in game, must use escape sequence code.
+		return new InfoIcon(ChatColor.GOLD+"\u25B2",Collections.emptyList(),Material.STONE_BUTTON,index,true);
 	}
 	
 	private InfoIcon navIconScrollDown(int index) {
-		return new InfoIcon(ChatColor.GOLD+"▼",Collections.emptyList(),Material.STONE_BUTTON,index,true);
+		// Note: Unicode characters do not render correctly in game, must use escape sequence code.
+		return new InfoIcon(ChatColor.GOLD+"\u25BC",Collections.emptyList(),Material.STONE_BUTTON,index,true);
 	}
 	
 	private InfoIcon navIconCreate(int index) {

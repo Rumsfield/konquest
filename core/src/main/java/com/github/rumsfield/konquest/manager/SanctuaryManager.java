@@ -121,7 +121,11 @@ public class SanctuaryManager {
 	}
 	
 	public Set<String> getSanctuaryNames() {
-		return sanctuaryMap.keySet();
+		Set<String> result = new HashSet<>();
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			result.add(sanctuary.getName());
+		}
+		return result;
 	}
 	
 	public String getSanctuaryNameOfTemplate(String name) {

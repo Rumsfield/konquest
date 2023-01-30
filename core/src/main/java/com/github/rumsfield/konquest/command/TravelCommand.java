@@ -47,11 +47,13 @@ public class TravelCommand extends CommandBase {
 				return;
 			}
 			// Verify player is not in enemy territory
+			// But always allow travel from neutral kingdom (ruins, sanctuary)
 			boolean blockEnemyTravel = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_NO_ENEMY_TRAVEL.getPath());
 			if (blockEnemyTravel) {
 				Location playerLoc = bukkitPlayer.getLocation();
 				if(getKonquest().getTerritoryManager().isChunkClaimed(playerLoc)) {
-					if(!getKonquest().getTerritoryManager().getChunkTerritory(playerLoc).getKingdom().equals(player.getKingdom())) {
+					KonKingdom locKingdom = getKonquest().getTerritoryManager().getChunkTerritory(playerLoc).getKingdom();
+					if(!locKingdom.equals(getKonquest().getKingdomManager().getNeutrals()) && !locKingdom.equals(player.getKingdom())) {
 						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_ENEMY_TERRITORY.getMessage());
 	                    return;
 					}

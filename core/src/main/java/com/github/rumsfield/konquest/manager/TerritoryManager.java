@@ -254,11 +254,11 @@ public class TerritoryManager {
 	
 	// Main method for admins to claim an individual chunk.
 	// Calls event.
-	public void claimForAdmin(@NotNull Player bukkitPlayer, @NotNull Location claimLoc) {
-    	int claimStatus = claimChunk(claimLoc,true);
+	public void claimForAdmin(@NotNull KonPlayer player, @NotNull Location claimLoc) {
+		Player bukkitPlayer = player.getBukkitPlayer();
+		int claimStatus = claimChunk(claimLoc,true);
     	switch(claimStatus) {
     	case 0:
-    		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
     		KonTerritory territory = getChunkTerritory(claimLoc);
     		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
     		// Push claim to admin register
@@ -286,27 +286,22 @@ public class TerritoryManager {
 	
 	// Main method for players to claim an individual chunk.
 	// Calls event.
-	public boolean claimForPlayer(@NotNull Player bukkitPlayer,@NotNull Location claimLoc) {
-		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+	public boolean claimForPlayer(@NotNull KonPlayer player, @NotNull Location claimLoc) {
+		Player bukkitPlayer = player.getBukkitPlayer();
 		World claimWorld = claimLoc.getWorld();
-		// Verify no surrounding enemy or capital territory
+		// Verify no surrounding territory from other kingdoms
     	for(Point point : konquest.getAreaPoints(claimLoc,2)) {
-			if(!isChunkClaimed(point,claimWorld)) continue;
-			if(player != null && !player.getKingdom().equals(getChunkTerritory(point,claimWorld).getKingdom())) {
-				//ChatUtil.sendError(bukkitPlayer, "You are too close to enemy territory!");
-				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
-				return false;
-			}
-			if(getChunkTerritory(point,claimWorld).getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
-				//ChatUtil.sendError(bukkitPlayer, "You are too close to the Capital!");
-				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
-				return false;
+			if(isChunkClaimed(point,claimWorld)) {
+				KonTerritory territory = getChunkTerritory(point,claimWorld);
+				if(territory != null && !player.getKingdom().equals(territory.getKingdom())) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
+					return false;
+				}
 			}
     	}
     	// Ensure player can cover the cost
     	double cost = konquest.getCore().getDouble(CorePath.FAVOR_COST_CLAIM.getPath());
     	if(KonquestPlugin.getBalance(bukkitPlayer) < cost) {
-			//ChatUtil.sendError(bukkitPlayer, "Not enough Favor, need "+cost);
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
             return false;
 		}
@@ -424,9 +419,9 @@ public class TerritoryManager {
 		return 0;
 	}
 	
-	public boolean claimRadiusForAdmin(Player bukkitPlayer, Location claimLoc, int radius) {
+	public boolean claimRadiusForAdmin(@NotNull KonPlayer player, Location claimLoc, int radius) {
 		World claimWorld = claimLoc.getWorld();
-		
+		Player bukkitPlayer = player.getBukkitPlayer();
 		// Find adjacent or current territory
 		KonTerritory claimTerritory = getAdjacentTerritory(claimLoc);
 		if(claimTerritory == null) {
@@ -438,7 +433,6 @@ public class TerritoryManager {
 		for(Point point : konquest.getAreaPoints(claimLoc,radius+1)) {
     		if(isChunkClaimed(point,claimWorld)) {
     			if(!claimTerritory.getKingdom().equals(getChunkTerritory(point,claimWorld).getKingdom())) {
-    				//ChatUtil.sendError(bukkitPlayer, "Too close to enemy territory!");
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
     				return false;
     			}
@@ -454,7 +448,6 @@ public class TerritoryManager {
     	}
     	
 		// Attempt to claim
-    	KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
     	int preClaimLand = claimTerritory.getChunkPoints().size();
     	int postClaimLand;
     	int claimStatus = claimChunkRadius(claimLoc, radius, true);
@@ -483,22 +476,19 @@ public class TerritoryManager {
 		return true;
 	}
 	
-	public boolean claimRadiusForPlayer(Player bukkitPlayer, Location claimLoc, int radius) {
-		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+	public boolean claimRadiusForPlayer(@NotNull KonPlayer player, Location claimLoc, int radius) {
+		Player bukkitPlayer = player.getBukkitPlayer();
 		World claimWorld = claimLoc.getWorld();
-		// Verify no surrounding enemy or capital territory
-    	for(Point point : konquest.getAreaPoints(claimLoc,radius+1)) {
-    		if(isChunkClaimed(point,claimWorld)) {
-    			if(player != null && !player.getKingdom().equals(getChunkTerritory(point,claimWorld).getKingdom())) {
-    				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
-    				return false;
-    			}
-    			if(getChunkTerritory(point,claimWorld).getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
-    				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
-    				return false;
-    			}
-    		}
-    	}
+		// Verify no surrounding territory from other kingdoms
+		for(Point point : konquest.getAreaPoints(claimLoc,radius+1)) {
+			if(isChunkClaimed(point,claimWorld)) {
+				KonTerritory territory = getChunkTerritory(point,claimWorld);
+				if(territory != null && !player.getKingdom().equals(territory.getKingdom())) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
+					return false;
+				}
+			}
+		}
     	// Find adjacent or current territory
 		KonTerritory claimTerritory = getAdjacentTerritory(claimLoc);
 		if(claimTerritory == null) {
@@ -1152,6 +1142,7 @@ public class TerritoryManager {
     	BlockFace playerFace = bukkitPlayer.getFacing();
     	String mapPlayer = "!";
     	ChatColor playerColor;
+		// Note: Unicode characters do not render correctly in game, must use escape sequence code.
     	if(playerFace.equals(BlockFace.NORTH)) {
     		mapPlayer = "\u25B2";// "^"
     	} else if(playerFace.equals(BlockFace.EAST)) {

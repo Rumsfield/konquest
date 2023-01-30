@@ -27,6 +27,7 @@ import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.BlockInventoryHolder;
+import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.SmithingInventory;
 
 import java.util.Map;
@@ -79,24 +80,37 @@ public class InventoryListener implements Listener {
 				// Town restrictions for inventories
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
-					// Prevent all inventory openings by non-friendlies
-					boolean isEnemyInvetoryOpenDenied = konquest.getCore().getBoolean(CorePath.KINGDOMS_PROTECT_CONTAINERS_USE.getPath());
-					if(isEnemyInvetoryOpenDenied && !playerRole.equals(RelationRole.FRIENDLY)) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-						event.setCancelled(true);
-						return;
-					}
-					// Notify player when there is no lord
-					if(town.canClaimLordship(player)) {
-						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),player.getBukkitPlayer().getName()));
-					}
-					// Prevent non-residents in closed towns from opening inventories that can hold items
-					// However this still allows them to open inventories like enchantment tables, crating bench, etc.
-					// Protect land and plots
-					if(event.getInventory().getHolder() instanceof BlockInventoryHolder ||
+					// Protection checks
+					if(event.getInventory().getType().equals(InventoryType.MERCHANT) &&
+							event.getInventory() instanceof MerchantInventory) {
+						// Inventory is a Villager merchant
+
+						// Prevent opening by enemy and sanction kingdom members
+						if(playerRole.equals(RelationRole.ENEMY) || playerRole.equals(RelationRole.SANCTIONED)) {
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_SANCTION.getMessage(town.getName()));
+							event.setCancelled(true);
+							return;
+						}
+						// Attempt to modify merchant trades based on town specialization and relationships with player
+						town.applyTradeDiscounts(player, event.getInventory());
+					} else if(event.getInventory().getHolder() instanceof BlockInventoryHolder ||
 							 event.getInventory().getHolder() instanceof DoubleChest ||
 							 event.getInventory().getHolder() instanceof Vehicle) {
 						// Inventory can hold items, or is a vehicle with storage
+
+						// Prevent inventory openings by non-friendlies
+						boolean isEnemyInventoryOpenDenied = konquest.getCore().getBoolean(CorePath.KINGDOMS_PROTECT_CONTAINERS_USE.getPath());
+						if(isEnemyInventoryOpenDenied && !playerRole.equals(RelationRole.FRIENDLY)) {
+							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
+						}
+						// Notify player when there is no lord
+						if(town.canClaimLordship(player)) {
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),player.getBukkitPlayer().getName()));
+						}
+						// Prevent non-residents in closed towns from opening inventories that can hold items
+						// However this still allows them to open inventories like enchantment tables, crafting bench, etc.
 						// Protect land and plots
 						if(!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
 							// Stop all edits by non-resident in closed towns
@@ -137,8 +151,6 @@ public class InventoryListener implements Listener {
 							return;
 						}
 					}
-					// Attempt to modify merchant trades based on guild specialization and relationships with player
-					town.applyTradeDiscounts(player, event.getInventory());
 				}
 				
 				// Prevent all inventory openings except for camp owner and clan members when allowed

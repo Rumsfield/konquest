@@ -128,24 +128,22 @@ public class TownInfoMenuWrapper extends MenuWrapper {
     	loreList.add(loreColor+MessagePath.LABEL_PROTECTED.getMessage()+": "+isProtected);
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, 5, false);
     	getMenu().getPage(0).addIcon(info);
-    	/* Health Info Icon (6) */
-    	int maxCriticalhits = getKonquest().getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
-		int townHealth = maxCriticalhits - infoTown.getMonument().getCriticalHits();
+		/* Stats Info Icon (6) */
+		int maxCriticalHits = getKonquest().getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
+		int townHealth = maxCriticalHits - infoTown.getMonument().getCriticalHits();
+		loreList = new ArrayList<>();
+		loreList.add(loreColor+MessagePath.LABEL_HEALTH.getMessage()+": "+valueColor+townHealth+"/"+maxCriticalHits);
+		loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+infoTown.getChunkList().size());
+		loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+infoTown.getNumResidents());
+		info = new InfoIcon(kingdomColor+MessagePath.LABEL_STATS.getMessage(), loreList, Material.BELL, 6, false);
+		getMenu().getPage(0).addIcon(info);
+    	/* Specialization Info Icon (7) */
     	loreList = new ArrayList<>();
-    	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+townHealth+"/"+maxCriticalhits);
-    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_HEALTH.getMessage(), loreList, Material.GOLDEN_APPLE, 6, false);
+		loreList.add(valueColor+infoTown.getSpecialization().name());
+		Material specialMat = Konquest.getProfessionMaterial(infoTown.getSpecialization());
+    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_SPECIALIZATION.getMessage(), loreList, specialMat, 7, false);
     	getMenu().getPage(0).addIcon(info);
-    	/* Land Info Icon (7) */
-    	loreList = new ArrayList<>();
-    	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+infoTown.getChunkList().size());
-    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_LAND.getMessage(), loreList, Material.GRASS_BLOCK, 7, false);
-    	getMenu().getPage(0).addIcon(info);
-    	/* Population Info Icon (8) */
-    	loreList = new ArrayList<>();
-    	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+infoTown.getNumResidents());
-    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_POPULATION.getMessage(), loreList, Material.WHITE_BED, 8, false);
-    	getMenu().getPage(0).addIcon(info);
-    	
+
     	// Page 1
 		pageLabel = titleColor+infoTown.getName()+" "+MessagePath.LABEL_UPGRADES.getMessage();
 		getMenu().addPage(1, 1, pageLabel);

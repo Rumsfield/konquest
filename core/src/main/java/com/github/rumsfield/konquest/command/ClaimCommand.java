@@ -47,7 +47,7 @@ public class ClaimCommand extends CommandBase {
 
 		if(getArgs().length <= 1){
 			// Claim the single chunk containing playerLoc for the adjacent territory.
-			getKonquest().getTerritoryManager().claimForPlayer(bukkitPlayer, bukkitPlayer.getLocation());
+			getKonquest().getTerritoryManager().claimForPlayer(player, bukkitPlayer.getLocation());
 			return;
 		}
 		String claimMode = getArgs()[1];
@@ -65,7 +65,7 @@ public class ClaimCommand extends CommandBase {
 				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_CLAIM_ERROR_RADIUS.getMessage(min,max));
 				return;
 			}
-			getKonquest().getTerritoryManager().claimRadiusForPlayer(bukkitPlayer, bukkitPlayer.getLocation(), radius);
+			getKonquest().getTerritoryManager().claimRadiusForPlayer(player, bukkitPlayer.getLocation(), radius);
 
 		}else if (claimMode.equalsIgnoreCase("auto")){
 			boolean doAuto = false;
@@ -85,7 +85,7 @@ public class ClaimCommand extends CommandBase {
 				doAuto = true;
 			}
 			if(doAuto) {
-				boolean isClaimSuccess = getKonquest().getTerritoryManager().claimForPlayer(bukkitPlayer, bukkitPlayer.getLocation());
+				boolean isClaimSuccess = getKonquest().getTerritoryManager().claimForPlayer(player, bukkitPlayer.getLocation());
 				if(isClaimSuccess) {
 					ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
 					player.setAutoFollow(FollowType.CLAIM);

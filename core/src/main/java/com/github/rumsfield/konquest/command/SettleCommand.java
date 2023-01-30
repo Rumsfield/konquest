@@ -74,7 +74,7 @@ public class SettleCommand extends CommandBase {
         		KonTown town = player.getKingdom().getTown(townName);
         		// Teleport player to safe place around monument, facing monument
         		getKonquest().getKingdomManager().teleportAwayFromCenter(town);
-
+				// Send messages
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SETTLE_NOTICE_SUCCESS.getMessage(townName));
         		ChatUtil.sendBroadcast(MessagePath.COMMAND_SETTLE_BROADCAST_SETTLE.getMessage(bukkitPlayer.getName(),townName,player.getKingdom().getName()));
         		// Optionally apply starter shield
@@ -83,8 +83,8 @@ public class SettleCommand extends CommandBase {
         			getKonquest().getShieldManager().shieldSet(town,starterShieldDuration);
         		}
         		// Play a success sound
-        		town.getWorld().playSound(town.getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)0.5, (float)1.2);
-        		// Set player as Lord
+				Konquest.playTownSettleSound(bukkitPlayer.getLocation());
+				// Set player as Lord
         		town.setPlayerLord(player.getOfflineBukkitPlayer());
         		// Update directive progress
         		getKonquest().getDirectiveManager().updateDirectiveProgress(player, KonDirective.SETTLE_TOWN);

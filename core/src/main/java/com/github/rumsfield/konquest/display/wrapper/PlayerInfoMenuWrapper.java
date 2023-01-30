@@ -47,12 +47,9 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		int numKingdomPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(infoPlayer.getKingdom()).size();
     	int numAllKingdomPlayers = getKonquest().getPlayerManager().getAllPlayersInKingdom(infoPlayer.getKingdom()).size();
     	loreList = new ArrayList<>();
-    	if(infoPlayer.getKingdom().isMaster(infoPlayer.getOfflineBukkitPlayer().getUniqueId())) {
-			loreList.add(ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage());
-		} else if(infoPlayer.getKingdom().isOfficer(infoPlayer.getOfflineBukkitPlayer().getUniqueId())) {
-			loreList.add(ChatColor.BLUE+MessagePath.LABEL_OFFICER.getMessage());
-		} else if(infoPlayer.getKingdom().isMember(infoPlayer.getOfflineBukkitPlayer().getUniqueId())) {
-			loreList.add(ChatColor.WHITE+MessagePath.LABEL_MEMBER.getMessage());
+		String kingdomRole = infoPlayer.getKingdom().getPlayerRoleName(infoPlayer);
+		if(!kingdomRole.equals("")) {
+			loreList.add(kingdomRole);
 		}
     	loreList.add(loreColor+MessagePath.LABEL_PLAYERS.getMessage()+": "+valueColor+numKingdomPlayers+"/"+numAllKingdomPlayers);
     	if(infoPlayer.getKingdom().isOfflineProtected()) {

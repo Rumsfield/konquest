@@ -2919,6 +2919,15 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         		            	town.addPoints(konquest.formatStringToPoints(townSection.getString("chunks")));
         		            	// Update territory cache
         		            	konquest.getTerritoryManager().addAllTerritory(townWorld,town.getChunkList());
+								// Set specialization
+								String specializationName = townSection.getString("specialization","NONE");
+								Villager.Profession profession = Villager.Profession.NONE;
+								try {
+									profession = Villager.Profession.valueOf(specializationName);
+								} catch(Exception e) {
+									ChatUtil.printConsoleAlert("Failed to parse profession "+specializationName+" for town "+townName);
+								}
+								town.setSpecialization(profession);
         			        	// Set shield
         			        	boolean isShieldActive = townSection.getBoolean("shield",false);
         			        	int shieldTime = townSection.getInt("shield_time",0);
@@ -3079,7 +3088,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						town.getCenterLoc().getBlockY(),
 						town.getCenterLoc().getBlockZ()});
                 townInstanceSection.set("chunks", konquest.formatPointsToString(town.getChunkList().keySet()));
-                townInstanceSection.set("open", town.isOpen());
+				townInstanceSection.set("specialization", town.getSpecialization().toString());
+				townInstanceSection.set("open", town.isOpen());
                 townInstanceSection.set("plot", town.isPlotOnly());
                 townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());
                 townInstanceSection.set("golem_offensive", town.isGolemOffensive());
