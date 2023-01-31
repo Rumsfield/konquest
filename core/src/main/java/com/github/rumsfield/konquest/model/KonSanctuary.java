@@ -39,6 +39,7 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 		properties.put(KonPropertyFlag.PVE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.pve"));
 		properties.put(KonPropertyFlag.BUILD, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.build"));
 		properties.put(KonPropertyFlag.USE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.use"));
+		properties.put(KonPropertyFlag.CHEST, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.chest"));
 		properties.put(KonPropertyFlag.MOBS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.mobs"));
 		properties.put(KonPropertyFlag.PORTALS, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.portals"));
 		properties.put(KonPropertyFlag.ENTER, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.enter"));

@@ -542,7 +542,7 @@ public class PlayerListener implements Listener {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 				if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
 					// Block non-allowed entity interaction
-					if(!(flagHolder.getPropertyValue(KonPropertyFlag.USE) || isEntityAllowed)) {
+					if(!isEntityAllowed && !flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
 						return;
@@ -568,7 +568,8 @@ public class PlayerListener implements Listener {
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
         if(player != null && !player.isAdminBypassActive() && territoryManager.isChunkClaimed(event.getRightClicked().getLocation())) {
-        	KonTerritory territory = territoryManager.getChunkTerritory(event.getRightClicked().getLocation());
+			KonTerritory territory = territoryManager.getChunkTerritory(event.getRightClicked().getLocation());
+			ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" manipulated armor stand in territory "+ territory.getName());
         	// Property Flag Holders
 			if(territory instanceof KonPropertyFlagHolder) {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
@@ -659,6 +660,15 @@ public class PlayerListener implements Listener {
 				} else if(territory instanceof KonCamp && !((KonCamp)territory).isPlayerOwner(event.getPlayer())) {
 					// Block is inside a non-owned camp
 					cancelUse = true;
+				}
+				// General property flag
+				if(territory instanceof KonPropertyFlagHolder) {
+					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+					if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
+						if(!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
+							cancelUse = true;
+						}
+					}
 				}
 				
 				if(cancelUse) {

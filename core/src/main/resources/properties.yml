@@ -10,6 +10,7 @@
 #	PVE				Allow entity damage
 #	BUILD			Allow block edits
 #	USE				Allow using blocks
+#   CHEST			Allow using containers
 #	MOBS			Allow mobs to spawn
 #	PORTALS			Allow players to use portals
 #	ENTER			Allow players to enter
@@ -40,6 +41,7 @@ properties:
     pve: false
     build: false
     use: true
+    chest: false
     mobs: false
     portals: true
   ruins:
@@ -48,6 +50,7 @@ properties:
     pvp: true
     pve: true
     use: true
+    chest: true
     portals: true
   towns:
     capture: true
@@ -60,5 +63,6 @@ properties:
     pve: true
     build: true
     use: true
+    chest: true
     mobs: false
     portals: true

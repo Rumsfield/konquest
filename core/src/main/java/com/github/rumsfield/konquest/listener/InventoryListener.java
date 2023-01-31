@@ -60,29 +60,31 @@ public class InventoryListener implements Listener {
 			KonPlayer player = playerManager.getPlayer((Player)event.getPlayer());
 			// Bypass event restrictions for player in Admin Bypass Mode
 			if(!player.isAdminBypassActive()) {
-				//ChatUtil.printDebug("inventoryOpen Evaluating territory");
+				// Determine type of inventory
+				boolean isContainer = event.getInventory().getHolder() instanceof BlockInventoryHolder ||
+						event.getInventory().getHolder() instanceof DoubleChest ||
+						event.getInventory().getHolder() instanceof Vehicle;
+				boolean isMerchant = event.getInventory().getType().equals(InventoryType.MERCHANT) &&
+						event.getInventory() instanceof MerchantInventory;
+				// Get territory
 				KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(openLoc);
-
 				// Property Flag Holders
-				if(territory instanceof KonPropertyFlagHolder) {
+				if(isContainer && territory instanceof KonPropertyFlagHolder) {
 					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
-					if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
-						if(!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
+					if(flagHolder.hasPropertyValue(KonPropertyFlag.CHEST)) {
+						if(!flagHolder.getPropertyValue(KonPropertyFlag.CHEST)) {
 							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 							event.setCancelled(true);
 							return;
 						}
 					}
 				}
-				
 				RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
-
 				// Town restrictions for inventories
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
 					// Protection checks
-					if(event.getInventory().getType().equals(InventoryType.MERCHANT) &&
-							event.getInventory() instanceof MerchantInventory) {
+					if(isMerchant) {
 						// Inventory is a Villager merchant
 
 						// Prevent opening by enemy and sanction kingdom members
@@ -93,9 +95,7 @@ public class InventoryListener implements Listener {
 						}
 						// Attempt to modify merchant trades based on town specialization and relationships with player
 						town.applyTradeDiscounts(player, event.getInventory());
-					} else if(event.getInventory().getHolder() instanceof BlockInventoryHolder ||
-							 event.getInventory().getHolder() instanceof DoubleChest ||
-							 event.getInventory().getHolder() instanceof Vehicle) {
+					} else if(isContainer) {
 						// Inventory can hold items, or is a vehicle with storage
 
 						// Prevent inventory openings by non-friendlies
