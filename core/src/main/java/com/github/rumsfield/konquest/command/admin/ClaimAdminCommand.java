@@ -50,7 +50,7 @@ public class ClaimAdminCommand extends CommandBase {
     					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_CLAIM_ERROR_RADIUS.getMessage(min,max));
     					return;
     				}
-    				getKonquest().getTerritoryManager().claimRadiusForAdmin(bukkitPlayer, bukkitPlayer.getLocation(), radius);
+    				getKonquest().getTerritoryManager().claimRadiusForAdmin(player, bukkitPlayer.getLocation(), radius);
         			break;
         			
         		case "auto" :
@@ -71,7 +71,7 @@ public class ClaimAdminCommand extends CommandBase {
         				doAuto = true;
         			}
         			if(doAuto) {
-        				getKonquest().getTerritoryManager().claimForAdmin(bukkitPlayer, playerLoc);
+        				getKonquest().getTerritoryManager().claimForAdmin(player, playerLoc);
         				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
         				player.setAutoFollow(FollowType.ADMIN_CLAIM);
         			}
@@ -91,7 +91,7 @@ public class ClaimAdminCommand extends CommandBase {
 				}
         	} else {
         		// Claim the single chunk containing playerLoc for the adjacent territory.
-        		getKonquest().getTerritoryManager().claimForAdmin(bukkitPlayer, playerLoc);
+        		getKonquest().getTerritoryManager().claimForAdmin(player, playerLoc);
         	}
         }
     }

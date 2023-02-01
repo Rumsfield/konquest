@@ -589,7 +589,7 @@ public class KingdomMenu implements ViewableMenu {
 		currentPage = 0;
 		String loreHintStr1;
 		String loreHintStr2 = "";
-		PlayerIconAction iconAction = PlayerIconAction.GUILD;
+		PlayerIconAction iconAction = PlayerIconAction.DISPLAY_INFO;
 		boolean isClickable;
 		List<OfflinePlayer> players = new ArrayList<>();
 		
@@ -642,12 +642,9 @@ public class KingdomMenu implements ViewableMenu {
 				loreList = new ArrayList<>();
 				String lastOnlineFormat = Konquest.getLastSeenFormat(currentPlayer);
 				loreList.add(valueColor+lastOnlineFormat);
-				if(kingdom.isMaster(currentPlayer.getUniqueId())) {
-					loreList.add(ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage());
-				} else if(kingdom.isOfficer(currentPlayer.getUniqueId())) {
-					loreList.add(ChatColor.BLUE+MessagePath.LABEL_OFFICER.getMessage());
-				} else if(kingdom.isMember(currentPlayer.getUniqueId())) {
-					loreList.add(ChatColor.WHITE+MessagePath.LABEL_MEMBER.getMessage());
+				String kingdomRole = kingdom.getPlayerRoleName(currentPlayer);
+				if(!kingdomRole.equals("")) {
+					loreList.add(kingdomRole);
 				}
 				if(!loreHintStr1.equals("")) {
 					loreList.add(hintColor+loreHintStr1);
