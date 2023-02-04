@@ -117,17 +117,29 @@ public class PlayerManager implements KonquestPlayerManager {
     	} else {
     		// Player's barbarian flag is false, should belong to a kingdom
     		KonKingdom playerKingdom = konquest.getKingdomManager().getKingdom(kingdomName);
-    		if(playerKingdom.equals(konquest.getKingdomManager().getBarbarians())) {
-    			// The player's kingdom is barbarians but barbarian flag is false
-    			// The player's kingdom was probably removed or changed names while offline
-    			// Override the barbarian flag to force the player into barbarians
-    			importedPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), true);
-    			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_FORCE_BARBARIAN.getMessage());
-    			ChatUtil.printDebug("Forced non-barbarian player with no kingdom to become a barbarian");
-    		} else {
-    			// The player has a valid kingdom and barbarian flag is false
-    			importedPlayer = new KonPlayer(bukkitPlayer, playerKingdom, false);
-    		}
+
+			// Check for valid kingdom membership
+			if(playerKingdom.equals(konquest.getKingdomManager().getBarbarians())) {
+				// The player's kingdom does not exist
+				// Possibly renamed or removed
+				//TODO: Search for any other kingdoms with membership
+				importedPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), true);
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_FORCE_BARBARIAN.getMessage());
+				ChatUtil.printDebug("Forced non-barbarian player with missing kingdom to become a barbarian");
+			} else {
+				// The player's kingdom was found
+				if(playerKingdom.isMember(bukkitPlayer.getUniqueId())) {
+					// The player is a kingdom member
+					importedPlayer = new KonPlayer(bukkitPlayer, playerKingdom, false);
+				} else {
+					// The player is not a member of their kingdom
+					// Possibly kicked or renamed
+					//TODO: Search for any other kingdoms with membership
+					importedPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), true);
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_FORCE_BARBARIAN.getMessage());
+					ChatUtil.printDebug("Forced non-barbarian player without kingdom membership to become a barbarian");
+				}
+			}
     	}
     	
     	// Check if player has exceeded offline timeout

@@ -610,7 +610,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			konquest.getMapHandler().drawDynmapRemoveTerritory(town);
 		}
 		konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
-		oldKingdom = null;
 		getKingdom(oldName).setName(newName);
 		KonKingdom kingdom = kingdomMap.remove(oldName);
 		kingdomMap.put(newName, kingdom);
@@ -657,7 +656,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	/**
 	 * Primary method for adding a player member to a kingdom.
-	 * Assign a player to a kingdom and teleport them to the capital spawn point.
+	 * Assign a player to a kingdom.
 	 * Optionally checks for join permissions based on Konquest configuration.
 	 * Optionally enforces maximum kingdom membership difference based on Konquest configuration.
 	 * Applies join cool-down.
@@ -2847,6 +2846,33 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         					ChatUtil.printDebug("Failed to set invalid property "+propertyName+" to Kingdom "+kingdomName);
         				}
         			}
+					// Kingdom Membership
+					// Assign Master
+					String masterUUID = kingdomSection.getString("master","");
+					if(!masterUUID.equalsIgnoreCase("")) {
+						UUID playerID = Konquest.idFromString(masterUUID);
+						if(playerID != null) {
+							newKingdom.forceMaster(playerID);
+						} else {
+							ChatUtil.printDebug("Kingdom "+kingdomName+" has a null UUID! Master remains invalid");
+						}
+					} else {
+						ChatUtil.printDebug("Kingdom "+kingdomName+" does not have a stored Master ID");
+					}
+					// Populate Members
+					if(kingdomSection.contains("members")) {
+						for(String residentUUID : kingdomSection.getConfigurationSection("members").getKeys(false)) {
+							boolean isOfficer = kingdomSection.getBoolean("members."+residentUUID);
+							newKingdom.addMember(UUID.fromString(residentUUID),isOfficer);
+						}
+					}
+					// Add invite requests
+					if(kingdomSection.contains("requests")) {
+						for(String requestUUID : kingdomSection.getConfigurationSection("requests").getKeys(false)) {
+							boolean type = kingdomSection.getBoolean("requests."+requestUUID);
+							newKingdom.addJoinRequest(UUID.fromString(requestUUID), type);
+						}
+					}
         			// Capital and Town Loading all towns
                 	boolean isMissingMonuments = false;
                 	boolean isMissingCapital = true;
@@ -3055,6 +3081,28 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ConfigurationSection kingdomPropertiesSection = kingdomSection.createSection("properties");
 			for(KonPropertyFlag flag : kingdom.getAllProperties().keySet()) {
 				kingdomPropertiesSection.set(flag.toString(), kingdom.getAllProperties().get(flag));
+			}
+			// Kingdom Membership
+			kingdomSection.set("master", "");
+			ConfigurationSection kingdomMemberSection = kingdomSection.createSection("members");
+			for(OfflinePlayer member : kingdom.getPlayerMembers()) {
+				String uuid = member.getUniqueId().toString();
+				if(kingdom.isMaster(member.getUniqueId())) {
+					kingdomSection.set("master", uuid);
+				} else if(kingdom.isOfficer(member.getUniqueId())) {
+					kingdomMemberSection.set(uuid, true);
+				} else {
+					kingdomMemberSection.set(uuid, false);
+				}
+			}
+			ConfigurationSection kingdomRequestsSection = kingdomSection.createSection("requests");
+			for(OfflinePlayer requestee : kingdom.getJoinRequests()) {
+				String uuid = requestee.getUniqueId().toString();
+				kingdomRequestsSection.set(uuid, false);
+			}
+			for(OfflinePlayer invitee : kingdom.getJoinInvites()) {
+				String uuid = invitee.getUniqueId().toString();
+				kingdomRequestsSection.set(uuid, true);
 			}
 			// Towns + Capital
 			List<KonTown> allTowns = new ArrayList<>();
