@@ -313,6 +313,17 @@ public class DisplayManager {
 		// Display menu
 		showMenuWrapper(bukkitPlayer,wrapper);
    	}
+
+	// Monument Template Info
+	public void displayTemplateInfoMenu(KonPlayer displayPlayer) {
+		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
+		playMenuOpenSound(displayPlayer.getBukkitPlayer());
+		// Create menu
+		MonumentTemplateInfoMenuWrapper wrapper = new MonumentTemplateInfoMenuWrapper(konquest);
+		wrapper.constructMenu();
+		// Display menu
+		showMenuWrapper(bukkitPlayer,wrapper);
+	}
    	
    	/*
 	 * ===============================================

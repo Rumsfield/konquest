@@ -21,7 +21,8 @@ public class InfoCommand extends CommandBase {
 	public enum infoType {
 		KINGDOM,
 		TOWN,
-		PLAYER
+		PLAYER,
+		TEMPLATE
 	}
 	
 	public InfoCommand(Konquest konquest, CommandSender sender, String[] args) {
@@ -29,7 +30,7 @@ public class InfoCommand extends CommandBase {
     }
 	
 	public void execute() {
-		// k info <kingdomName>|<townName>|<playerName>
+		// k info <kingdomName>|<townName>|<playerName>|templates
 		if (getArgs().length != 1 && getArgs().length != 2) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		} else {
@@ -60,7 +61,9 @@ public class InfoCommand extends CommandBase {
     				}
     			}
         		//Check for info type
-        		if(getKonquest().getKingdomManager().isKingdom(name)) {
+				if(name.equalsIgnoreCase("templates")) {
+					displayState = infoType.TEMPLATE;
+				} else if(getKonquest().getKingdomManager().isKingdom(name)) {
         			displayState = infoType.KINGDOM;
         			kingdom = getKonquest().getKingdomManager().getKingdom(name);
         		} else if(name.equalsIgnoreCase(MessagePath.LABEL_BARBARIANS.getMessage())) {
@@ -82,6 +85,9 @@ public class InfoCommand extends CommandBase {
         	}
 
         	switch(displayState) {
+			case TEMPLATE: // Display monument template info
+				getKonquest().getDisplayManager().displayTemplateInfoMenu(sender);
+				break;
         	case KINGDOM: // Display kingdom info
         		getKonquest().getDisplayManager().displayKingdomInfoMenu(sender, kingdom);
         		break;
@@ -106,7 +112,7 @@ public class InfoCommand extends CommandBase {
 	
 	@Override
 	public List<String> tabComplete() {
-		// k info <kingdomName>|<townName>|<playerName>
+		// k info <kingdomName>|<townName>|<playerName>|templates
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		if(getArgs().length == 2) {
@@ -119,7 +125,8 @@ public class InfoCommand extends CommandBase {
 			for(OfflinePlayer bukkitOfflinePlayer : getKonquest().getPlayerManager().getAllOfflinePlayers()) {
 				playerList.add(bukkitOfflinePlayer.getName());
 			}
-			
+
+			tabList.add("templates");
 			tabList.addAll(kingdomList);
 			tabList.addAll(townList);
 			tabList.addAll(playerList);
