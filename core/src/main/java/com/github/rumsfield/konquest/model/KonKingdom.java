@@ -223,15 +223,19 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 			// Remove membership
 			members.remove(id);
 			// Remove residencies
-	    	OfflinePlayer townPlayer = Bukkit.getOfflinePlayer(id);
-	    	for(KonTown town : getTowns()) {
-	    		if(town.removePlayerResident(townPlayer)) {
-	    			konquest.getMapHandler().drawDynmapLabel(town);
-	    		}
-	    	}
+			removeTownResidencies(id);
 			status = true;
 		}
 		return status;
+	}
+
+	public void removeTownResidencies(UUID id) {
+		OfflinePlayer townPlayer = Bukkit.getOfflinePlayer(id);
+		for(KonTown town : getTowns()) {
+			if(town.removePlayerResident(townPlayer)) {
+				konquest.getMapHandler().drawDynmapLabel(town);
+			}
+		}
 	}
 	
 	public boolean isMember(UUID id) {

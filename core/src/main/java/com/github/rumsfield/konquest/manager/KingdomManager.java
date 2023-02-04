@@ -1324,7 +1324,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	public boolean menuDemoteOfficer(OfflinePlayer player, KonKingdom kingdom) {
 		UUID id = player.getUniqueId();
-		if(!kingdom.isOfficer(id))return false;
+		if(!kingdom.isOfficer(id)) {
+			return false;
+		}
 
 		if(kingdom.setOfficer(id, false)) {
 			broadcastMembers(kingdom,MessagePath.COMMAND_GUILD_BROADCAST_DEMOTE.getMessage(player.getName(),kingdom.getName()));
@@ -1336,13 +1338,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	public void menuTransferMaster(OfflinePlayer master, KonKingdom kingdom, KonPlayer sender) {
 		UUID id = master.getUniqueId();
-		if(!kingdom.isMember(id) || !kingdom.isMaster(id)){
+		if(kingdom.isMember(id) && kingdom.setMaster(id)) {
+			broadcastMembers(kingdom,MessagePath.COMMAND_GUILD_BROADCAST_TRANSFER.getMessage(master.getName(),kingdom.getName()));
+			Konquest.playSuccessSound(sender.getBukkitPlayer());
+		} else {
 			Konquest.playFailSound(sender.getBukkitPlayer());
-			return;
+			ChatUtil.sendError(sender.getBukkitPlayer(), MessagePath.GENERIC_ERROR_FAILED.getPath());
 		}
-		broadcastMembers(kingdom,MessagePath.COMMAND_GUILD_BROADCAST_TRANSFER.getMessage(master.getName(),kingdom.getName()));
-		Konquest.playSuccessSound(sender.getBukkitPlayer());
-		return;
 	}
 	
 	private void broadcastMembers(KonKingdom kingdom, String message) {

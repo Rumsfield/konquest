@@ -17,12 +17,14 @@ public class KingdomIcon implements MenuIcon {
 	private final List<String> lore;
 	private final int index;
 	private final ItemStack item;
+	private final boolean isClickable;
 	
 	public KingdomIcon(KonKingdom kingdom, ChatColor contextColor, List<String> lore, int index, boolean isClickable) {
 		this.kingdom = kingdom;
 		this.contextColor = contextColor;
 		this.lore = lore;
 		this.index = index;
+		this.isClickable = isClickable;
 		this.item = initItem();
 	}
 	
@@ -66,7 +68,7 @@ public class KingdomIcon implements MenuIcon {
 
 	@Override
 	public boolean isClickable() {
-		return true;
+		return isClickable;
 	}
 
 }

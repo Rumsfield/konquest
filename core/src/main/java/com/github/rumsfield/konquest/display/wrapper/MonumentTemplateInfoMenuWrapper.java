@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display.wrapper;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.display.icon.TemplateIcon;
 import com.github.rumsfield.konquest.manager.DisplayManager;
@@ -11,6 +12,7 @@ import com.github.rumsfield.konquest.model.KonSanctuary;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -88,13 +90,14 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
                 /* Template Icon (n) */
                 KonMonumentTemplate currentTemplate = templateIter.next();
                 loreList = new ArrayList<>();
-                loreList.add(loreColor+"Name"+":"+valueColor+currentTemplate.getName());
-                loreList.add(loreColor+"Sanctuary"+":"+valueColor+templateSanctuaryMap.get(currentTemplate));
-                loreList.add(loreColor+"Kingdoms"+":"+valueColor+templateUsedKingdomsMap.get(currentTemplate));
-                loreList.add(loreColor+"Cost"+":"+valueColor+currentTemplate.getCost());
-                loreList.add(loreColor+"Critical Hits"+":"+valueColor+currentTemplate.getNumCriticals());
-                loreList.add(loreColor+"Loot Chests"+":"+valueColor+currentTemplate.getNumLootChests());
-                TemplateIcon icon = new TemplateIcon(currentTemplate,loreList,slotIndex,false);
+                loreList.add(loreColor+"Name"+": "+valueColor+currentTemplate.getName());
+                loreList.add(loreColor+"Sanctuary"+": "+valueColor+templateSanctuaryMap.get(currentTemplate));
+                loreList.add(loreColor+"Kingdoms"+": "+valueColor+templateUsedKingdomsMap.get(currentTemplate));
+                loreList.add(loreColor+"Cost"+": "+valueColor+currentTemplate.getCost());
+                loreList.add(loreColor+"Critical Hits"+": "+valueColor+currentTemplate.getNumCriticals());
+                loreList.add(loreColor+"Loot Chests"+": "+valueColor+currentTemplate.getNumLootChests());
+                InfoIcon icon = new InfoIcon(ChatColor.GOLD+"Monument Template", loreList, Material.CRAFTING_TABLE, slotIndex, false);
+                //TemplateIcon icon = new TemplateIcon(currentTemplate,loreList,slotIndex,false);
                 getMenu().getPage(pageNum).addIcon(icon);
                 slotIndex++;
             }
@@ -107,11 +110,6 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
 
     @Override
     public void onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
-        Player bukkitPlayer = clickPlayer.getBukkitPlayer();
-        if(clickedIcon instanceof TemplateIcon) {
-            // Template Icons close the GUI and print their name in chat
-            TemplateIcon icon = (TemplateIcon)clickedIcon;
-            ChatUtil.sendNotice(bukkitPlayer, icon.getName());
-        }
+        // This menu has no clickable icons.
     }
 }

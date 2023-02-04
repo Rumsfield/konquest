@@ -32,7 +32,7 @@ public class TownAdminCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		// k admin town create|remove|add|kick|lord|knight|rename|upgrade|shield|armor|plots|options <town> [<name>] [<arg>]
+		// k admin town create|destroy|add|kick|lord|knight|rename|upgrade|shield|armor|plots|options <town> [<name>] [<arg>]
 		if (getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		} else {
@@ -57,7 +57,7 @@ public class TownAdminCommand extends CommandBase {
             		// Messages handled within method
             		return;
             	}
-        	} else if(subCmd.equalsIgnoreCase("remove")) {
+        	} else if(subCmd.equalsIgnoreCase("destroy")) {
         		// Removing a town
         		if(getKonquest().getKingdomManager().isTown(townName)) {
         			town = getKonquest().getKingdomManager().getTown(townName);
@@ -500,7 +500,7 @@ public class TownAdminCommand extends CommandBase {
 		if(getArgs().length == 3) {
 			// suggest sub-commands
 			tabList.add("create");
-			tabList.add("remove");
+			tabList.add("destroy");
 			tabList.add("add");
 			tabList.add("kick");
 			tabList.add("lord");

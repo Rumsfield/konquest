@@ -23,7 +23,7 @@ public class CampAdminCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		// k admin camp create|remove <player>
+		// k admin camp create|destroy <player>
 		//TODO: KR add message paths
 		if (getArgs().length != 4) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -68,7 +68,7 @@ public class CampAdminCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), "Failed to create a camp :(");
 			}
         	
-		} else if(cmdMode.equalsIgnoreCase("remove")) {
+		} else if(cmdMode.equalsIgnoreCase("destroy")) {
 			if(!getKonquest().getCampManager().isCampSet(targetPlayer)) {
 				ChatUtil.sendError((Player) getSender(), "Player does not have a camp.");
                 return;
@@ -97,7 +97,7 @@ public class CampAdminCommand extends CommandBase {
 		final List<String> matchedTabList = new ArrayList<>();
 		if(getArgs().length == 3) {
 			tabList.add("create");
-			tabList.add("remove");
+			tabList.add("destroy");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);

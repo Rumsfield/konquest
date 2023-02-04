@@ -25,7 +25,7 @@ public class KingdomAdminCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		// k admin kingdom menu|create|remove|add|kick|rename <kingdom> [<name>]
+		// k admin kingdom menu|create|destroy|add|kick|rename <kingdom> [<name>]
 		if (getArgs().length != 4 && getArgs().length != 5) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		} else {
@@ -130,7 +130,7 @@ public class KingdomAdminCommand extends CommandBase {
             		}
             		break;
             	
-            	case "remove":
+            	case "destroy":
             		// Remove a kingdom
             		boolean pass = getKonquest().getKingdomManager().removeKingdom(kingdomName);
                 	if(!pass) {
@@ -250,7 +250,7 @@ public class KingdomAdminCommand extends CommandBase {
 			// suggest sub-commands
 			tabList.add("menu");
 			tabList.add("create");
-			tabList.add("remove");
+			tabList.add("destroy");
 			tabList.add("add");
 			tabList.add("kick");
 			tabList.add("rename");

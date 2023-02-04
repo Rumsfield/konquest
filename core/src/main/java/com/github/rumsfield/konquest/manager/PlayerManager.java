@@ -3,13 +3,11 @@ package com.github.rumsfield.konquest.manager;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.manager.KonquestPlayerManager;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonMonument;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
-import com.github.rumsfield.konquest.model.KonPlayer;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -138,6 +136,8 @@ public class PlayerManager implements KonquestPlayerManager {
 					importedPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), true);
 					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_FORCE_BARBARIAN.getMessage());
 					ChatUtil.printDebug("Forced non-barbarian player without kingdom membership to become a barbarian");
+					// Remove any town residencies to be safe
+					playerKingdom.removeTownResidencies(bukkitPlayer.getUniqueId());
 				}
 			}
     	}

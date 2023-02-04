@@ -141,7 +141,6 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		if(infoKingdom.hasMonumentTemplate()) {
 			KonMonumentTemplate template = infoKingdom.getMonumentTemplate();
 			loreList.add(loreColor+"Name"+": "+valueColor+template.getName());
-			loreList.add(loreColor+"Blocks"+": "+valueColor+template.getNumBlocks());
 			loreList.add(loreColor+"Critical Hits"+": "+valueColor+template.getNumCriticals());
 			loreList.add(loreColor+"Loot Chests"+": "+valueColor+template.getNumLootChests());
 			if(template.isBlanking()) {
