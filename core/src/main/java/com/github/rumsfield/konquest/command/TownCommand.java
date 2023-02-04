@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
+import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonStatsType;
@@ -343,14 +344,21 @@ public class TownCommand extends CommandBase {
 						}
 						if(isSenderOwner) {
 							// The current Town owner is giving away Lordship
+							// Check for enemy new lord
 							if(!offlinePlayer.getKingdom().equals(town.getKingdom())) {
 					    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
 				        		return;
 					    	}
+							// Check for self new lord
 		        			if(offlinePlayer.getOfflineBukkitPlayer().getUniqueId().equals(player.getBukkitPlayer().getUniqueId())) {
 		        				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 				        		return;
 		        			}
+							// Check for kingdom master, capital lord
+							if(town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && town.getKingdom().isMaster(player.getBukkitPlayer().getUniqueId())) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+								return;
+							}
 							// Confirm with the player
 			        		if(!player.isGiveLordConfirmed()) {
 			        			// Prompt the player to confirm
