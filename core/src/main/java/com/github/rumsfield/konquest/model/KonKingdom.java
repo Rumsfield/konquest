@@ -237,11 +237,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	public boolean isMember(UUID id) {
 		return isCreated && members.containsKey(id);
 	}
-	
-	public boolean isMember(Player player) {
-		return isMember(player.getUniqueId());
-	}
-	
+
 	public boolean isMasterValid() {
 		return isCreated && master != null;
 	}

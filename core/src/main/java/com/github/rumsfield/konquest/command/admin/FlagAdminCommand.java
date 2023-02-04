@@ -58,11 +58,13 @@ public class FlagAdminCommand extends CommandBase {
 				// Found ruin
 				holder = getKonquest().getRuinManager().getRuin(holderName);
 			} else if(holderName.equals("capital")) {
-				String capitalName = getArgs()[3];
-				if(getKonquest().getKingdomManager().isKingdom(capitalName)) {
-					// Found kingdom capital
-					holder = getKonquest().getKingdomManager().getKingdom(capitalName).getCapital();
-					isCapital = true;
+				if(getArgs().length > 3) {
+					String capitalName = getArgs()[3];
+					if(getKonquest().getKingdomManager().isKingdom(capitalName)) {
+						// Found kingdom capital
+						holder = getKonquest().getKingdomManager().getKingdom(capitalName).getCapital();
+						isCapital = true;
+					}
 				}
 			}
     		if(holder == null) {

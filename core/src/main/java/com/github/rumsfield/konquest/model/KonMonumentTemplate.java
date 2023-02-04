@@ -15,21 +15,32 @@ public class KonMonumentTemplate {
 	private boolean isBlanking;
 	private boolean hasLoot;
 	private final String name;
+	private double cost;
 	private int numCriticals;
 	private int numBlocks;
 	private int numLootChests;
+
+	private Location shadowCorner1;
+	private Location shadowCorner2;
+	private Location shadowTravelPoint;
+	private double shadowCost;
 	
-	public KonMonumentTemplate(String name, Location corner1, Location corner2, Location travelPoint) {
+	public KonMonumentTemplate(String name, Location corner1, Location corner2, Location travelPoint, double cost) {
 		this.name = name;
 		this.corner1 = corner1;
 		this.corner2 = corner2;
 		this.travelPoint = travelPoint;
+		this.cost = cost;
 		this.isValid = false;
 		this.isBlanking = false;
 		this.hasLoot = false;
 		this.numCriticals = 0;
 		this.numBlocks = 0;
 		this.numLootChests = 0;
+		this.shadowCorner1 = null;
+		this.shadowCorner2 = null;
+		this.shadowTravelPoint = null;
+		this.shadowCost = 0;
 	}
 	
 	public int getNumCriticals() {
@@ -46,6 +57,10 @@ public class KonMonumentTemplate {
 	
 	public String getName() {
 		return name;
+	}
+
+	public double getCost() {
+		return cost;
 	}
 	
 	public int getHeight() {
@@ -89,15 +104,34 @@ public class KonMonumentTemplate {
 	}
 	
 	public void setCornerOne(Location loc) {
+		shadowCorner1 = corner1;
 		corner1 = loc;
 	}
 	
 	public void setCornerTwo(Location loc) {
+		shadowCorner2 = corner2;
 		corner2 = loc;
 	}
 	
 	public void setTravelPoint(Location loc) {
+		shadowTravelPoint = travelPoint;
 		travelPoint = loc;
+	}
+
+	public void setCost(double cost) {
+		shadowCost = this.cost;
+		this.cost = cost;
+	}
+
+	public boolean restorePrevious() {
+		if(shadowCorner1 != null && shadowCorner2 != null && shadowTravelPoint != null) {
+			corner1 = shadowCorner1;
+			corner2 = shadowCorner2;
+			travelPoint = shadowTravelPoint;
+			cost = shadowCost;
+			return true;
+		}
+		return false;
 	}
 	
 	public void setValid(boolean isNewValid) {

@@ -436,7 +436,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				return 2;
 			}
 			for(KonKingdom kingdom : kingdomMap.values()) {
-				if(kingdom.isMember(master.getBukkitPlayer().getUniqueId())) {
+				if(kingdom.isMember(bukkitPlayer.getUniqueId())) {
 					return 2;
 				}
 			}
@@ -480,8 +480,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			
 			if(initStatus == 0) {
 				// Capital territory initialized successfully, finish kingdom setup
-				newKingdom.getCapital().updateBarPlayers();
-				updateSmallestKingdom();
 				konquest.getTerritoryManager().addAllTerritory(centerLocation.getWorld(),newKingdom.getCapital().getChunkList());
 				konquest.getMapHandler().drawDynmapUpdateTerritory(newKingdom.getCapital());
 				if(isAdmin) {
@@ -503,12 +501,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					newKingdom.forceMaster(bukkitPlayer.getUniqueId());
 					// Make player lord of capital
 					newKingdom.getCapital().setPlayerLord(bukkitPlayer);
-					
-					// Move player(s) out of center chunk (monument)
-					//teleportAwayFromCenter(newKingdom.getCapital());
 				}
 				// Update border particles
 				konquest.getTerritoryManager().updatePlayerBorderParticles(master);
+				newKingdom.getCapital().updateBarPlayers();
 			} else {
 				// Failed to pass all init checks, remove the kingdom
 				newKingdom.removeCapital();

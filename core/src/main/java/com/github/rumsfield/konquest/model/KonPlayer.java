@@ -44,6 +44,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	private String regionSanctuaryName;
 	private Location regionCornerOneBuffer;
 	private Location regionCornerTwoBuffer;
+	private double regionTemplateCost;
 	
 	private boolean isAdminBypassActive;
 	private boolean isGlobalChat;
@@ -82,6 +83,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		this.settingRegion = RegionType.NONE;
 		this.regionTemplateName = "";
 		this.regionSanctuaryName = "";
+		this.regionTemplateCost = 0;
 		this.isAdminBypassActive = false;
 		this.autoFollow = FollowType.NONE;
 		this.isGlobalChat = true;
@@ -180,6 +182,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	
 	public String getRegionSanctuaryName() {
 		return regionSanctuaryName;
+	}
+
+	public double getRegionTemplateCost() {
+		return regionTemplateCost;
 	}
 	
 	public boolean isAdminBypassActive() {
@@ -283,6 +289,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	
 	public void setRegionSanctuaryName(String name) {
 		regionSanctuaryName = name;
+	}
+
+	public void setRegionTemplateCost(double cost) {
+		regionTemplateCost = cost;
 	}
 	
 	public void setIsAdminBypassActive(boolean val) {

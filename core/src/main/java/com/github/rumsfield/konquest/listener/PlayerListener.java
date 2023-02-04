@@ -361,15 +361,18 @@ public class PlayerListener implements Listener {
 	                	// Location is travel point, create template using saved data
 	                	KonSanctuary sanctuary = konquest.getSanctuaryManager().getSanctuary(player.getRegionSanctuaryName());
 	                	String templateName = player.getRegionTemplateName();
-	                	int createMonumentStatus = konquest.getSanctuaryManager().createMonumentTemplate(sanctuary, templateName, player.getRegionCornerOneBuffer(), player.getRegionCornerTwoBuffer(), location);
+						double templateCost = player.getRegionTemplateCost();
+						Location templateCorner1 = player.getRegionCornerOneBuffer();
+						Location templateCorner2 = player.getRegionCornerTwoBuffer();
+	                	int createMonumentStatus = konquest.getSanctuaryManager().createMonumentTemplate(sanctuary, templateName, templateCorner1, templateCorner2, location, templateCost);
 	                	switch(createMonumentStatus) {
 	    				case 0:
 	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(templateName));
 	    					kingdomManager.reloadMonumentsForTemplate(konquest.getSanctuaryManager().getTemplate(templateName));
 	    					break;
 	    				case 1:
-	    					int diffX = (int)Math.abs(player.getRegionCornerOneBuffer().getX()-player.getRegionCornerTwoBuffer().getX())+1;
-	    					int diffZ = (int)Math.abs(player.getRegionCornerOneBuffer().getZ()-player.getRegionCornerTwoBuffer().getZ())+1;
+	    					int diffX = (int)Math.abs(templateCorner1.getX()-templateCorner2.getX())+1;
+	    					int diffZ = (int)Math.abs(templateCorner1.getZ()-templateCorner2.getZ())+1;
 	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(diffX,diffZ));
 	    					break;
 	    				case 2:
@@ -389,6 +392,7 @@ public class PlayerListener implements Listener {
 	    				}
 	                    player.setRegionCornerOneBuffer(null);
 	                    player.setRegionCornerTwoBuffer(null);
+						player.setRegionTemplateCost(0.0);
 	                    player.settingRegion(RegionType.NONE);
 	                    ChatUtil.printDebug("Finished setting monument region");
 	                }

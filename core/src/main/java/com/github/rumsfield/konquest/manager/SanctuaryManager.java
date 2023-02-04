@@ -264,7 +264,7 @@ public class SanctuaryManager {
 	}
 	
 	/**
-	 * createMonumentTemplate - Creates a new monument template, verifies stuff.
+	 * createMonumentTemplate - Creates a new monument template, or updates an existing one.
 	 * @param sanctuary		The sanctuary territory that contains this new template
 	 * @param corner1		The first corner of the template region
 	 * @param corner2		The second (opposite) corner of the template region
@@ -277,36 +277,68 @@ public class SanctuaryManager {
 	 * 			4 - Region is not within given sanctuary territory
 	 * 			5 - Bad name
 	 */
-	public int createMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint, boolean save) {
-		/*
-		 * Only add a new template when all verification checks pass.
-		 */
-		if(konquest.validateNameConstraints(name) != 0) {
-			ChatUtil.printDebug("Failed to create Monument Template, bad name: \""+name+"\"");
-			return 5;
-		}
-		
-		// Create new monument
-		KonMonumentTemplate template = new KonMonumentTemplate(name, corner1, corner2, travelPoint);
-		// Validate it
-		int status = validateTemplate(template, sanctuary);
-		
-		if(status == 0) {
-			// Passed all checks
-			template.setValid(true);
-			// Add to sanctuary
-			sanctuary.addTemplate(name, template);
-			// Before exit, save to file
-			if(save) {
-				saveSanctuaries();
-				konquest.getConfigManager().saveConfigs();
+	public int createMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint, double cost, boolean save) {
+		// Check if the given name is an existing template
+		KonMonumentTemplate template;
+		int status;
+		if(isTemplate(name)) {
+			// The template already exists, update it
+			template = getTemplate(name);
+			boolean  isExistingTemplateValid = template.isValid();
+			template.setCornerOne(corner1);
+			template.setCornerTwo(corner2);
+			template.setTravelPoint(travelPoint);
+			template.setCost(cost);
+			template.setValid(false);
+			// Validate it
+			status = validateTemplate(template, sanctuary);
+			// Check for success
+			if(status == 0) {
+				// Passed all checks, update template
+				template.setValid(true);
+			} else {
+				// Updated fields failed validation, revert them
+				boolean restoreCheck = template.restorePrevious();
+				// Re-validate previous template fields
+				if(restoreCheck) {
+					status = validateTemplate(template, sanctuary);
+					if(status == 0) {
+						// Passed restore checks
+						template.setValid(true);
+					}
+				} else {
+					// Restored template fields are null, this shouldn't happen :(
+					ChatUtil.printDebug("Failed to restore Monument Template, null fields: \""+name+"\"");
+					status = -1;
+				}
 			}
+		} else {
+			// There is no template, try to create a new one
+			if(konquest.validateNameConstraints(name) != 0) {
+				ChatUtil.printDebug("Failed to create Monument Template, bad name: \""+name+"\"");
+				return 5;
+			}
+			template = new KonMonumentTemplate(name, corner1, corner2, travelPoint, cost);
+			// Validate it
+			status = validateTemplate(template, sanctuary);
+			// Check for success
+			if(status == 0) {
+				// Passed all checks
+				template.setValid(true);
+				// Add to sanctuary
+				sanctuary.addTemplate(name, template);
+			}
+		}
+		// Before exit, save to file
+		if(status == 0 && save) {
+			saveSanctuaries();
+			konquest.getConfigManager().saveConfigs();
 		}
 		return status;
 	}
 	
-	public int createMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint) {
-		return createMonumentTemplate(sanctuary, name, corner1, corner2, travelPoint, true);
+	public int createMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint, double cost) {
+		return createMonumentTemplate(sanctuary, name, corner1, corner2, travelPoint, cost, true);
 	}
 	
 	/**
@@ -420,6 +452,7 @@ public class SanctuaryManager {
         }
         double x,y,z;
         float pitch,yaw;
+		double cost;
         List<Double> sectionList;
         String worldName;
         KonSanctuary sanctuary;
@@ -462,6 +495,7 @@ public class SanctuaryManager {
 	        			konquest.getTerritoryManager().addAllTerritory(sanctuaryWorld,sanctuary.getChunkList());
 	        			// Set properties
 	        			ConfigurationSection sanctuaryPropertiesSection = sanctuarySection.getConfigurationSection("properties");
+						assert sanctuaryPropertiesSection != null;
 	        			for(String propertyName : sanctuaryPropertiesSection.getKeys(false)) {
 	        				boolean value = sanctuaryPropertiesSection.getBoolean(propertyName);
 	        				KonPropertyFlag property = KonPropertyFlag.getFlag(propertyName);
@@ -472,9 +506,11 @@ public class SanctuaryManager {
 	        			}
 	        			// Load Monument Templates
 	        			ConfigurationSection sanctuaryMonumentsSection = sanctuarySection.getConfigurationSection("monuments");
+						assert sanctuaryMonumentsSection != null;
 	        			for(String templateName : sanctuaryMonumentsSection.getKeys(false)) {
 	        				ConfigurationSection templateSection = sanctuaryMonumentsSection.getConfigurationSection(templateName);
-	        				sectionList = templateSection.getDoubleList("travel");
+							cost = templateSection.getDouble("cost",0.0);
+							sectionList = templateSection.getDoubleList("travel");
 			        		x = sectionList.get(0);
 			        		y = sectionList.get(1);
 			        		z = sectionList.get(2);
@@ -492,7 +528,7 @@ public class SanctuaryManager {
 	        				// Create template
 				        	// If it fails validation, it does not get stored in memory and will not be saved back into the data file.
 				        	// This effectively removes it from the server.
-				        	int status = createMonumentTemplate(sanctuary, templateName, templateCornerOne, templateCornerTwo, templateTravel, false);
+				        	int status = createMonumentTemplate(sanctuary, templateName, templateCornerOne, templateCornerTwo, templateTravel, cost, false);
 				        	if(status != 0) {
 			        			String message = "Failed to load Monument Template "+templateName+" for Sanctuary "+sanctuaryName+", ";
 			        			switch(status) {
@@ -572,6 +608,7 @@ public class SanctuaryManager {
 		 * 				exit: ?
 		 * 			monuments:
 		 * 				<name>:
+		 *                  cost:
 		 * 					travel:
 		 * 					- ?
 		 * 					- ?
@@ -616,6 +653,7 @@ public class SanctuaryManager {
 					ChatUtil.printConsoleError("Saved invalid monument template named "+monumentName+", in Sanctuary "+name+".");
 				}
 	            ConfigurationSection monumentSection = sanctuaryMonumentsSection.createSection(monumentName);
+				monumentSection.set("cost", template.getCost());
 	            monumentSection.set("travel", new int[] {template.getTravelPoint().getBlockX(),
 						template.getTravelPoint().getBlockY(),
 						template.getTravelPoint().getBlockZ()});
