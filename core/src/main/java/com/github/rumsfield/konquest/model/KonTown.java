@@ -597,7 +597,19 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		return status;
 	}
-	
+
+	/**
+	 * Updates a monument, meant for changing the kingdom's monument template
+	 */
+	public void updateMonument() {
+		if(getKingdom().isMonumentTemplateValid()) {
+			monument.updateFromTemplate(getKingdom().getMonumentTemplate());
+			setSpawn(monument.getTravelPoint());
+		} else {
+			ChatUtil.printDebug("Failed to update monument from template for town "+getName());
+		}
+	}
+
 	/**
 	 * Reloads a monument from template, meant to be used when server loads the chunk
 	 */
@@ -607,12 +619,14 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			result = monument.updateFromTemplate(getKingdom().getMonumentTemplate());
 			pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
 			setSpawn(monument.getTravelPoint());
+		} else {
+			ChatUtil.printDebug("Failed to reload monument from template for town "+getName());
 		}
 		return result;
 	}
 	
 	/**
-	 * Updates a monument from template, meant to be used for town capture
+	 * Updates a monument from template, meant to be used for town capture and template change
 	 */
 	public void refreshMonument() {
 		if(monument.isValid()) {
@@ -620,6 +634,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			monument.clearCriticalHits();
 			monument.updateFromTemplate(getKingdom().getMonumentTemplate());
 			setSpawn(monument.getTravelPoint());
+			Konquest.playTownSettleSound(this.getCenterLoc());
 			// Delay paste by 1 tick
 			Bukkit.getScheduler().scheduleSyncDelayedTask(getKonquest().getPlugin(), new Runnable() {
 	            @Override
@@ -627,6 +642,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	            	pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
 	            }
 	        },1);
+		} else {
+			ChatUtil.printDebug("Failed to refresh monument from template for town "+getName());
 		}
 	}
 	

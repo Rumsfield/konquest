@@ -89,15 +89,15 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
             while(slotIndex < MAX_ICONS_PER_PAGE && templateIter.hasNext()) {
                 /* Template Icon (n) */
                 KonMonumentTemplate currentTemplate = templateIter.next();
+                double totalCost = getKonquest().getKingdomManager().getCostTemplate()+currentTemplate.getCost();
                 loreList = new ArrayList<>();
                 loreList.add(loreColor+"Name"+": "+valueColor+currentTemplate.getName());
                 loreList.add(loreColor+"Sanctuary"+": "+valueColor+templateSanctuaryMap.get(currentTemplate));
                 loreList.add(loreColor+"Kingdoms"+": "+valueColor+templateUsedKingdomsMap.get(currentTemplate));
-                loreList.add(loreColor+"Cost"+": "+valueColor+currentTemplate.getCost());
                 loreList.add(loreColor+"Critical Hits"+": "+valueColor+currentTemplate.getNumCriticals());
                 loreList.add(loreColor+"Loot Chests"+": "+valueColor+currentTemplate.getNumLootChests());
+                loreList.add(loreColor+"Favor Cost"+": "+valueColor+totalCost);
                 InfoIcon icon = new InfoIcon(ChatColor.GOLD+"Monument Template", loreList, Material.CRAFTING_TABLE, slotIndex, false);
-                //TemplateIcon icon = new TemplateIcon(currentTemplate,loreList,slotIndex,false);
                 getMenu().getPage(pageNum).addIcon(icon);
                 slotIndex++;
             }

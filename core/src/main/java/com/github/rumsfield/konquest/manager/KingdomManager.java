@@ -445,8 +445,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(!konquest.getSanctuaryManager().isValidTemplate(templateName)) {
 			return 4;
 		}
+		KonMonumentTemplate template = konquest.getSanctuaryManager().getTemplate(templateName);
 		// Verify player can cover cost
-		if(!isAdmin && costCreate > 0 && KonquestPlugin.getBalance(bukkitPlayer) < costCreate) {
+		double totalCost = costCreate + template.getCost();
+		if(!isAdmin && totalCost > 0 && KonquestPlugin.getBalance(bukkitPlayer) < totalCost) {
 			return 3;
     	}
 		
@@ -465,8 +467,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		
 		/* Passed all checks, try to create kingdom */
-		
-		KonMonumentTemplate template = konquest.getSanctuaryManager().getTemplate(templateName);
 		
 		kingdomMap.put(kingdomName, new KonKingdom(centerLocation, kingdomName, konquest));
 		
@@ -489,8 +489,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					// This kingdom is operated by players
 					newKingdom.setIsAdminOperated(false);
 					// Withdraw cost
-					if(costCreate > 0 && KonquestPlugin.withdrawPlayer(bukkitPlayer, costCreate)) {
-			            konquest.getAccomplishmentManager().modifyPlayerStat(master,KonStatsType.FAVOR,(int)costCreate);
+					if(totalCost > 0 && KonquestPlugin.withdrawPlayer(bukkitPlayer, totalCost)) {
+			            konquest.getAccomplishmentManager().modifyPlayerStat(master,KonStatsType.FAVOR,(int)totalCost);
 					}
 					// Assign player to kingdom
 					int assignStatus = assignPlayerKingdom(bukkitPlayer.getUniqueId(), kingdomName, true);
@@ -1402,23 +1402,27 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			Konquest.playFailSound(player.getBukkitPlayer());
 			return;
 		}
-		
+		// Check capital is not under attack
+		if(kingdom.getCapital().isAttacked()) {
+			ChatUtil.sendError(bukkitPlayer, "Cannot change template while capital is under attack");
+			Konquest.playFailSound(player.getBukkitPlayer());
+			return;
+		}
 		// Check cost
-		if(!ignoreCost && costTemplate > 0 && KonquestPlugin.getBalance(bukkitPlayer) < costTemplate) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costTemplate));
+		double totalCost = costTemplate + template.getCost();
+		if(!ignoreCost && totalCost > 0 && KonquestPlugin.getBalance(bukkitPlayer) < totalCost) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(totalCost));
 			Konquest.playFailSound(player.getBukkitPlayer());
             return;
     	}
-		
 		// Update template
 		kingdom.updateMonumentTemplate(template);
-		
 		// Withdraw cost
-		if(!ignoreCost && costTemplate > 0 && KonquestPlugin.withdrawPlayer(bukkitPlayer, costTemplate)) {
-            konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costTemplate);
+		if(!ignoreCost && totalCost > 0 && KonquestPlugin.withdrawPlayer(bukkitPlayer, totalCost)) {
+            konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)totalCost);
 		}
-		
-		ChatUtil.sendNotice(player.getBukkitPlayer(), "Updated tempalte to "+template.getName());
+		// Success
+		ChatUtil.sendNotice(player.getBukkitPlayer(), "Updated template to "+template.getName());
 		Konquest.playSuccessSound(player.getBukkitPlayer());
 	}
 

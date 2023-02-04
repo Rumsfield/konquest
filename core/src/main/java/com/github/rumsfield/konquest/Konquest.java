@@ -783,6 +783,13 @@ public class Konquest implements KonquestAPI, Timeable {
 				return 10;
 			}
 		}
+		List<String> reservedWords = new ArrayList<>();
+		reservedWords.add("templates");
+		for(String word : reservedWords) {
+			if(name.equalsIgnoreCase(word)) {
+				return 10;
+			}
+		}
 		return 0;
 	}
 	

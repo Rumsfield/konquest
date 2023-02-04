@@ -1271,22 +1271,15 @@ public class PlayerListener implements Listener {
 			// Prevent use of specific usable blocks
 			BlockState clickedState = event.getClickedBlock().getState();
 			BlockData clickedBlockData = clickedState.getBlockData();
-			//ChatUtil.printDebug("  checking block data of type "+clickedBlockData.getMaterial());
-			boolean sendAdminHint = false;
 			if(clickedBlockData instanceof Door ||
 					clickedBlockData instanceof Gate ||
 					clickedBlockData instanceof Switch ||
 					clickedBlockData instanceof TrapDoor) {
 				event.setUseInteractedBlock(Event.Result.DENY);
 				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-				sendAdminHint = true;
 			} else if(clickedState.getType().isInteractable()) {
 				event.setUseInteractedBlock(Event.Result.DENY);
 				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-				sendAdminHint = true;
-			}
-			if(sendAdminHint && event.getPlayer().hasPermission("konquest.command.admin")) {
-				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
 			}
 		}
     }

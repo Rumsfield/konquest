@@ -639,7 +639,14 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	
 	public void updateMonumentTemplate(KonMonumentTemplate template) {
+		// Update kingdom's template
 		setMonumentTemplate(template);
+		// Update all towns + capital monument
+		getCapital().updateMonument();
+		for(KonTown town : getTowns()) {
+			town.updateMonument();
+		}
+		// Reload towns in loaded chunks
 		reloadLoadedTownMonuments();
 	}
 	
@@ -735,7 +742,10 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public void reloadLoadedTownMonuments() {
 		Point tPoint;
-		for(KonTown town : getTowns()) {
+		List<KonTown> allTownsAndCapital = new ArrayList<>();
+		allTownsAndCapital.add(getCapital());
+		allTownsAndCapital.addAll(getTowns());
+		for(KonTown town : allTownsAndCapital) {
 			tPoint = Konquest.toPoint(town.getCenterLoc());
 			if(town.getWorld().isChunkLoaded(tPoint.x,tPoint.y)) {
 				if(town.isAttacked()) {
@@ -749,8 +759,8 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 						}
 					}
 					// Update monument from template
+					Konquest.playTownSettleSound(town.getCenterLoc());
 					town.reloadMonument();
-					town.getWorld().playSound(town.getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)1, (float)0.8);
 				}
 			}
 		}

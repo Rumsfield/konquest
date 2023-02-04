@@ -350,7 +350,7 @@ public class KingdomMenu implements ViewableMenu {
 		DisplayMenu result;
 		pages.clear();
 		currentPage = 0;
-		List<KonMonumentTemplate> templates = new ArrayList<>(konquest.getSanctuaryManager().getAllValidTemplates());
+		List<KonMonumentTemplate> templates = new ArrayList<>(konquest.getSanctuaryManager().getAllTemplates());
 		templates.remove(kingdom.getMonumentTemplate());
 		
 		// Create page(s)
@@ -376,14 +376,24 @@ public class KingdomMenu implements ViewableMenu {
 				/* Template Icon (n) */
 				KonMonumentTemplate template = listIter.next();
 				loreList = new ArrayList<>();
-				if(!isAdmin) {
-					String cost = String.format("%.2f",manager.getCostTemplate());
-					loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
+				boolean isClickable = true;
+				if(template.isValid()) {
+					if(!isAdmin) {
+						double totalCost = manager.getCostTemplate() + template.getCost();
+						String cost = String.format("%.2f",totalCost);
+						loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
+					}
+					loreList.add(hintColor+"Click to apply");
+				} else {
+					// Invalid template, check for blanking
+					loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+"X");
+					if(template.isBlanking()) {
+						loreList.add(ChatColor.RED+"Unavailable");
+					} else {
+						loreList.add(ChatColor.RED+"Invalid");
+					}
+					isClickable = false;
 				}
-				boolean isClickable = template.isValid();
-
-				loreList.add(loreColor+"Cost: X");
-				loreList.add(hintColor+"Click to apply");
 				TemplateIcon templateIcon = new TemplateIcon(template,loreList,slotIndex,isClickable);
 		    	pages.get(pageNum).addIcon(templateIcon);
 				slotIndex++;

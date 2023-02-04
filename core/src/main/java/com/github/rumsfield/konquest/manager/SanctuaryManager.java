@@ -11,10 +11,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
+import org.bukkit.block.data.type.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.inventory.Inventory;
 
 import java.awt.*;
 import java.util.List;
@@ -205,7 +204,15 @@ public class SanctuaryManager {
 		}
 		return result;
 	}
-	
+
+	public Set<KonMonumentTemplate> getAllTemplates() {
+		Set<KonMonumentTemplate> result = new HashSet<>();
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			result.addAll(sanctuary.getTemplates());
+		}
+		return result;
+	}
+
 	public Set<KonMonumentTemplate> getAllValidTemplates() {
 		Set<KonMonumentTemplate> result = new HashSet<>();
 		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
@@ -378,7 +385,6 @@ public class SanctuaryManager {
 		}
 		// Check for at least as many critical blocks as required critical hits
 		// Also check for any chests for loot flag
-		HashSet<Inventory> lootInventories = new HashSet<>();
 		int maxCriticalhits = konquest.getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
 		int bottomBlockX, bottomBlockY, bottomBlockZ;
 		int topBlockX, topBlockY, topBlockZ;
@@ -404,14 +410,13 @@ public class SanctuaryManager {
                 	Block monumentBlock = corner1.getWorld().getBlockAt(x, y, z);
                 	if(monumentBlock.getType().equals(konquest.getKingdomManager().getTownCriticalBlock())) {
                 		criticalBlockCount++;
-                	} else if(monumentBlock.getState() instanceof Chest) {
-                		Inventory chestInv = ((Chest)monumentBlock.getState()).getSnapshotInventory();
-                		// Check to see if this block's associated inventory has already been counted
-                		if(!lootInventories.contains(chestInv)) {
-                			// We haven't seen this inventory yet, count it and add it.
-                			lootChestCount++;
-                    		lootInventories.add(chestInv);
-                		}
+                	} else if(monumentBlock.getState().getBlockData() instanceof Chest) {
+						// Found a chest block.
+						// Only count single chests and "right" sides of double chests.
+						Chest blockChestData = (Chest)monumentBlock.getState().getBlockData();
+						if(blockChestData.getType().equals(Chest.Type.SINGLE) || blockChestData.getType().equals(Chest.Type.RIGHT)) {
+							lootChestCount++;
+						}
                 		containsChest = true;
                 	}
                 	if(monumentBlock.getType().isSolid()) {
@@ -437,7 +442,7 @@ public class SanctuaryManager {
 		template.setNumLootChests(lootChestCount);
 		template.setLoot(containsChest);
 		if(containsChest) {
-			ChatUtil.printDebug("Validated Monument Template "+name+" with loot chest(s)");
+			ChatUtil.printDebug("Validated Monument Template "+name+" with "+lootChestCount+" loot chest(s)");
 		} else {
 			ChatUtil.printDebug("Validated Monument Template "+name+" without loot");
 		}

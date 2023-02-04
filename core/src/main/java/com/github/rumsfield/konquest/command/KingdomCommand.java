@@ -105,7 +105,9 @@ public class KingdomCommand extends CommandBase {
 		                    			ChatUtil.sendError((Player) getSender(), "You must be a barbarian to create a kingdom.");
 		                    			break;
 		                    		case 3:
-		                    			String cost = String.format("%.2f",getKonquest().getKingdomManager().getCostCreate());
+										double templateCost = getKonquest().getSanctuaryManager().getTemplate(templateName).getCost();
+										double totalCost = getKonquest().getKingdomManager().getCostCreate() + templateCost;
+		                    			String cost = String.format("%.2f",totalCost);
 		                    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
 		                    			break;
 		                    		case 4:

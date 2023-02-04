@@ -54,7 +54,6 @@ public class TemplateIcon implements MenuIcon {
 		}
 		List<String> itemLore = new ArrayList<>();
 		//TODO: Replace with message paths
-		itemLore.add(ChatColor.YELLOW+"Total Blocks: "+ChatColor.AQUA+template.getNumBlocks());
 		itemLore.add(ChatColor.YELLOW+"Critical Blocks: "+ChatColor.AQUA+template.getNumCriticals());
 		itemLore.add(ChatColor.YELLOW+"Loot Chests: "+ChatColor.AQUA+template.getNumLootChests());
 		itemLore.addAll(lore);
