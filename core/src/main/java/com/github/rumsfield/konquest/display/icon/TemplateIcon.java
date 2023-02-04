@@ -44,7 +44,7 @@ public class TemplateIcon implements MenuIcon {
 
 	@Override
 	public ItemStack getItem() {
-		ItemStack item = new ItemStack(Material.OBSIDIAN,1);
+		ItemStack item = new ItemStack(Material.CRAFTING_TABLE,1);
 		ItemMeta meta = item.getItemMeta();
 		assert meta != null;
 		for(ItemFlag flag : ItemFlag.values()) {

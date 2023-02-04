@@ -58,8 +58,8 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		pageLabel = titleColor+MessagePath.COMMAND_INFO_NOTICE_KINGDOM_HEADER.getMessage(infoKingdom.getName());
 		getMenu().addPage(pageIndex, pageRows, pageLabel);
 
-		/* Capital Info Icon (0) */
-		slotIndex = 0;
+		/* Capital Info Icon (1) */
+		slotIndex = 1;
 		KonCapital capital = infoKingdom.getCapital();
 		loreList = new ArrayList<>();
 		loreList.add(loreColor+"Capital");
@@ -68,8 +68,8 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		TownIcon capitalIcon = new TownIcon(capital,kingdomColor,getKonquest().getKingdomManager().getTownCriticalBlock(),loreList,slotIndex);
 		getMenu().getPage(pageIndex).addIcon(capitalIcon);
 
-		/* Master Player Info Icon (1) */
-		slotIndex = 1;
+		/* Master Player Info Icon (2) */
+		slotIndex = 2;
 		loreList = new ArrayList<>();
 		if(infoKingdom.isMasterValid()) {
 			loreList.add(ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage());
@@ -87,8 +87,8 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			getMenu().getPage(pageIndex).addIcon(info);
 		}
 		
-		/* Member Info Icon (2) */
-		slotIndex = 2;
+		/* Member Info Icon (3) */
+		slotIndex = 3;
 		int numKingdomPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(infoKingdom).size();
     	int numAllKingdomPlayers = allKingdomMembers.size();
     	int numKingdomOfficers = infoKingdom.getPlayerOfficersOnly().size();
@@ -99,8 +99,8 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PLAYERS.getMessage(), loreList, Material.PLAYER_HEAD, slotIndex, false);
     	getMenu().getPage(pageIndex).addIcon(info);
     	
-    	/* Properties Info Icon (3) */
-    	slotIndex = 3;
+    	/* Properties Info Icon (5) */
+    	slotIndex = 5;
     	String isPeaceful = DisplayManager.boolean2Symbol(infoKingdom.isPeaceful());
     	String isSmallest = DisplayManager.boolean2Symbol(infoKingdom.isSmallest());
     	String isProtected = DisplayManager.boolean2Symbol(infoKingdom.isOfflineProtected());
@@ -114,37 +114,25 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
     	loreList.add(loreColor+MessagePath.LABEL_ADMIN_KINGDOM.getMessage()+": "+isAdminOperated);
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, slotIndex, false);
     	getMenu().getPage(pageIndex).addIcon(info);
-    	
-    	/* Favor Info Icon (4) */
-    	slotIndex = 4;
-    	ArrayList<KonOfflinePlayer> allPlayersInKingdom = getKonquest().getPlayerManager().getAllPlayersInKingdom(infoKingdom);
-    	int numKingdomFavor = 0;
-    	for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
-    		numKingdomFavor += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
-    	}
-    	loreList = new ArrayList<>();
-    	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+numKingdomFavor);
-    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_FAVOR.getMessage(), loreList, Material.GOLD_BLOCK, slotIndex, false);
-    	getMenu().getPage(pageIndex).addIcon(info);
-    	
-    	/* Towns Info Icon (5) */
-    	slotIndex = 5;
-    	int numKingdomTowns = infoKingdom.getTowns().size();
-    	loreList = new ArrayList<>();
-    	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+numKingdomTowns);
-    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_TOWNS.getMessage(), loreList, getKonquest().getKingdomManager().getTownCriticalBlock(), slotIndex, false);
-    	getMenu().getPage(pageIndex).addIcon(info);
-    	
-    	/* Land Info Icon (6) */
-    	slotIndex = 6;
-    	int numKingdomLand = 0;
-    	for(KonTown town : infoKingdom.getTowns()) {
-    		numKingdomLand += town.getChunkList().size();
-    	}
-    	loreList = new ArrayList<>();
-    	loreList.add(loreColor+MessagePath.LABEL_TOTAL.getMessage()+": "+valueColor+numKingdomLand);
-    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_LAND.getMessage(), loreList, Material.GRASS_BLOCK, slotIndex, false);
-    	getMenu().getPage(pageIndex).addIcon(info);
+
+		/* Stats Info Icon (6) */
+		slotIndex = 6;
+		ArrayList<KonOfflinePlayer> allPlayersInKingdom = getKonquest().getPlayerManager().getAllPlayersInKingdom(infoKingdom);
+		int numKingdomFavor = 0;
+		for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
+			numKingdomFavor += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
+		}
+		int numKingdomTowns = infoKingdom.getTowns().size();
+		int numKingdomLand = 0;
+		for(KonTown town : infoKingdom.getTowns()) {
+			numKingdomLand += town.getChunkList().size();
+		}
+		loreList = new ArrayList<>();
+		loreList.add(loreColor+MessagePath.LABEL_FAVOR.getMessage()+": "+valueColor+numKingdomFavor);
+		loreList.add(loreColor+MessagePath.LABEL_TOWNS.getMessage()+": "+valueColor+numKingdomTowns);
+		loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+numKingdomLand);
+		info = new InfoIcon(kingdomColor+MessagePath.LABEL_INFORMATION.getMessage(), loreList, Material.ENDER_EYE, slotIndex, false);
+		getMenu().getPage(pageIndex).addIcon(info);
 
 		/* Template Info Icon (7) */
 		slotIndex = 7;
