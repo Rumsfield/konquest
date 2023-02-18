@@ -21,8 +21,7 @@ public class InfoCommand extends CommandBase {
 	public enum infoType {
 		KINGDOM,
 		TOWN,
-		PLAYER,
-		TEMPLATE
+		PLAYER
 	}
 	
 	public InfoCommand(Konquest konquest, CommandSender sender, String[] args) {
@@ -30,7 +29,7 @@ public class InfoCommand extends CommandBase {
     }
 	
 	public void execute() {
-		// k info <kingdomName>|<townName>|<playerName>|templates
+		// k info <kingdomName>|<townName>|<playerName>
 		if (getArgs().length != 1 && getArgs().length != 2) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		} else {
@@ -61,9 +60,7 @@ public class InfoCommand extends CommandBase {
     				}
     			}
         		//Check for info type
-				if(name.equalsIgnoreCase("templates")) {
-					displayState = infoType.TEMPLATE;
-				} else if(getKonquest().getKingdomManager().isKingdom(name)) {
+				if(getKonquest().getKingdomManager().isKingdom(name)) {
         			displayState = infoType.KINGDOM;
         			kingdom = getKonquest().getKingdomManager().getKingdom(name);
         		} else if(name.equalsIgnoreCase(MessagePath.LABEL_BARBARIANS.getMessage())) {
@@ -85,9 +82,6 @@ public class InfoCommand extends CommandBase {
         	}
 
         	switch(displayState) {
-			case TEMPLATE: // Display monument template info
-				getKonquest().getDisplayManager().displayTemplateInfoMenu(sender);
-				break;
         	case KINGDOM: // Display kingdom info
         		getKonquest().getDisplayManager().displayKingdomInfoMenu(sender, kingdom);
         		break;
@@ -126,7 +120,6 @@ public class InfoCommand extends CommandBase {
 				playerList.add(bukkitOfflinePlayer.getName());
 			}
 
-			tabList.add("templates");
 			tabList.addAll(kingdomList);
 			tabList.addAll(townList);
 			tabList.addAll(playerList);

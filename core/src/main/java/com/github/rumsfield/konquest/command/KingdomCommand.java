@@ -29,7 +29,7 @@ public class KingdomCommand extends CommandBase {
 		if(getSender().hasPermission("konquest.command.admin") && getKonquest().getSanctuaryManager().getNumTemplates() == 0) {
 			ChatUtil.sendError((Player) getSender(),"There are no monument templates. Create one in a sanctuary with \"k admin monument\"");
 		}
-		// kingdom [menu|create|add|kick|rename] [name] [template]
+		// kingdom [menu|create|add|kick|rename|templates] [name] [template]
 		if (getArgs().length != 1 && getArgs().length != 2 && getArgs().length != 3 && getArgs().length != 4) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		} else {
@@ -141,7 +141,8 @@ public class KingdomCommand extends CommandBase {
 	                    		}
 	                    	}
 	            		} else {
-	            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+							//TODO: KR message path
+	            			ChatUtil.sendError((Player) getSender(), "You must specify a template name. View templates with /k kingdom templates.");
 	            		}
 	            		break;
 	            	case "add":
@@ -258,6 +259,10 @@ public class KingdomCommand extends CommandBase {
 	            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 	            		}
 	            		break;
+					case "templates":
+						// Show monument template info menu
+						getKonquest().getDisplayManager().displayTemplateInfoMenu(player);
+						break;
             		default:
             			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             			break;
@@ -268,7 +273,7 @@ public class KingdomCommand extends CommandBase {
 
 	@Override
 	public List<String> tabComplete() {
-		// k kingdom [menu|create|add|kick|rename] [name] [template]
+		// k kingdom [menu|create|add|kick|rename|templates] [name] [template]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		Player bukkitPlayer = (Player) getSender();
@@ -281,6 +286,7 @@ public class KingdomCommand extends CommandBase {
 			tabList.add("add");
 			tabList.add("kick");
 			tabList.add("rename");
+			tabList.add("templates");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);
 			Collections.sort(matchedTabList);

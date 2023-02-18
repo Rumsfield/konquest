@@ -45,6 +45,9 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		int slotIndex;
 		int pageIndex = 0;
 		int pageRows = 1;
+		int pageTotal = 1;
+
+		// Limit which icons appear if the kingdom is not created (e.g. a default Neutrals or Barbarian)
 
 		OfflinePlayer masterPlayer = infoKingdom.getPlayerMaster();
  		List<OfflinePlayer> allKingdomMembers = new ArrayList<>();
@@ -59,34 +62,38 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		getMenu().addPage(pageIndex, pageRows, pageLabel);
 
 		/* Capital Info Icon (1) */
-		slotIndex = 1;
-		KonCapital capital = infoKingdom.getCapital();
-		loreList = new ArrayList<>();
-		loreList.add(loreColor+"Capital");
-		loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+capital.getNumResidents());
-		loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+capital.getChunkList().size());
-		TownIcon capitalIcon = new TownIcon(capital,kingdomColor,getKonquest().getKingdomManager().getTownCriticalBlock(),loreList,slotIndex);
-		getMenu().getPage(pageIndex).addIcon(capitalIcon);
+		if(infoKingdom.isCreated()) {
+			slotIndex = 1;
+			KonCapital capital = infoKingdom.getCapital();
+			loreList = new ArrayList<>();
+			loreList.add(loreColor + "Capital");
+			loreList.add(loreColor + MessagePath.LABEL_POPULATION.getMessage() + ": " + valueColor + capital.getNumResidents());
+			loreList.add(loreColor + MessagePath.LABEL_LAND.getMessage() + ": " + valueColor + capital.getChunkList().size());
+			TownIcon capitalIcon = new TownIcon(capital, kingdomColor, getKonquest().getKingdomManager().getTownCriticalBlock(), loreList, slotIndex);
+			getMenu().getPage(pageIndex).addIcon(capitalIcon);
+		}
 
 		/* Master Player Info Icon (2) */
-		slotIndex = 2;
-		loreList = new ArrayList<>();
-		if(infoKingdom.isMasterValid()) {
-			loreList.add(ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage());
-			loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
-			assert masterPlayer != null;
-			PlayerIcon playerInfo = new PlayerIcon(kingdomColor+masterPlayer.getName(),loreList,masterPlayer,slotIndex,true,PlayerIconAction.DISPLAY_INFO);
-			getMenu().getPage(pageIndex).addIcon(playerInfo);
-		} else {
-			//for(String line : Konquest.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getName(), observer.getBukkitPlayer().getName()))) {
-			//	loreList.add(ChatColor.RED+line);
-			//}
-			//TODO: Add message for no master?
-			loreList.add(ChatColor.RED+"No master");
-			info = new InfoIcon(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage(),loreList,Material.BARRIER,slotIndex,false);
-			getMenu().getPage(pageIndex).addIcon(info);
+		if(infoKingdom.isCreated()) {
+			slotIndex = 2;
+			loreList = new ArrayList<>();
+			if (infoKingdom.isMasterValid()) {
+				loreList.add(ChatColor.LIGHT_PURPLE + MessagePath.LABEL_MASTER.getMessage());
+				loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
+				assert masterPlayer != null;
+				PlayerIcon playerInfo = new PlayerIcon(kingdomColor + masterPlayer.getName(), loreList, masterPlayer, slotIndex, true, PlayerIconAction.DISPLAY_INFO);
+				getMenu().getPage(pageIndex).addIcon(playerInfo);
+			} else {
+				//for(String line : Konquest.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getName(), observer.getBukkitPlayer().getName()))) {
+				//	loreList.add(ChatColor.RED+line);
+				//}
+				//TODO: Add message for no master?
+				loreList.add(ChatColor.RED + "No master");
+				info = new InfoIcon(ChatColor.DARK_PURPLE + MessagePath.LABEL_LORD.getMessage(), loreList, Material.BARRIER, slotIndex, false);
+				getMenu().getPage(pageIndex).addIcon(info);
+			}
 		}
-		
+
 		/* Member Info Icon (3) */
 		slotIndex = 3;
 		int numKingdomPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(infoKingdom).size();
@@ -135,59 +142,63 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		getMenu().getPage(pageIndex).addIcon(info);
 
 		/* Template Info Icon (7) */
-		slotIndex = 7;
-		loreList = new ArrayList<>();
-		// TODO message paths
-		if(infoKingdom.hasMonumentTemplate()) {
-			KonMonumentTemplate template = infoKingdom.getMonumentTemplate();
-			loreList.add(loreColor+"Name"+": "+valueColor+template.getName());
-			loreList.add(loreColor+"Critical Hits"+": "+valueColor+template.getNumCriticals());
-			loreList.add(loreColor+"Loot Chests"+": "+valueColor+template.getNumLootChests());
-			if(template.isBlanking()) {
-				loreList.add(ChatColor.RED+"Temporarily Disabled");
+		if(infoKingdom.isCreated()) {
+			slotIndex = 7;
+			loreList = new ArrayList<>();
+			// TODO message paths
+			if (infoKingdom.hasMonumentTemplate()) {
+				KonMonumentTemplate template = infoKingdom.getMonumentTemplate();
+				loreList.add(loreColor + "Name" + ": " + valueColor + template.getName());
+				loreList.add(loreColor + "Critical Hits" + ": " + valueColor + template.getNumCriticals());
+				loreList.add(loreColor + "Loot Chests" + ": " + valueColor + template.getNumLootChests());
+				if (template.isBlanking()) {
+					loreList.add(ChatColor.RED + "Temporarily Disabled");
+				}
+				info = new InfoIcon(kingdomColor + "Monument Template", loreList, Material.CRAFTING_TABLE, slotIndex, false);
+			} else {
+				String invalidMessage = "Kingdom master must choose a template from the kingdom menu.";
+				for (String line : Konquest.stringPaginate(invalidMessage)) {
+					loreList.add(loreColor + line);
+				}
+				info = new InfoIcon(ChatColor.RED + "Invalid", loreList, Material.BARRIER, slotIndex, false);
 			}
-			info = new InfoIcon(kingdomColor+"Monument Template", loreList, Material.CRAFTING_TABLE, slotIndex, false);
-		} else {
-			String invalidMessage = "Kingdom master must choose a template from the kingdom menu.";
-			for(String line : Konquest.stringPaginate(invalidMessage)) {
-				loreList.add(loreColor+line);
-			}
-			info = new InfoIcon(ChatColor.RED+"Invalid",loreList,Material.BARRIER,slotIndex,false);
+			getMenu().getPage(pageIndex).addIcon(info);
 		}
-		getMenu().getPage(pageIndex).addIcon(info);
-    	
+		pageIndex++;
+
     	// Page 1+
     	// Town List
-		List<KonTown> kingdomTowns = sortedTowns(infoKingdom);
-		int pageTotal = (int)Math.ceil(((double)kingdomTowns.size())/MAX_ICONS_PER_PAGE);
-		if(pageTotal == 0) {
-			pageTotal = 1;
-		}
-		pageIndex = 1;
-		ListIterator<KonTown> townIter = kingdomTowns.listIterator();
-		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)(kingdomTowns.size() - i*MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows < 1) {
-				numPageRows = 1;
-			} else if(numPageRows > 5) {
-				numPageRows = 5;
+		if(infoKingdom.isCreated()) {
+			List<KonTown> kingdomTowns = sortedTowns(infoKingdom);
+			pageTotal = (int) Math.ceil(((double) kingdomTowns.size()) / MAX_ICONS_PER_PAGE);
+			if (pageTotal == 0) {
+				pageTotal = 1;
 			}
-			pageLabel = titleColor+infoKingdom.getName()+" "+MessagePath.LABEL_TOWNS.getMessage()+" "+(i+1)+"/"+pageTotal;
-			getMenu().addPage(pageIndex, numPageRows, pageLabel);
-			slotIndex = 0;
-			while(slotIndex < MAX_ICONS_PER_PAGE && townIter.hasNext()) {
-				/* Town Icon (n) */
-				KonTown currentTown = townIter.next();
-				loreList = new ArrayList<>();
-				loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+currentTown.getNumResidents());
-		    	loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+currentTown.getChunkList().size());
-		    	TownIcon townIcon = new TownIcon(currentTown,kingdomColor,getKonquest().getKingdomManager().getTownCriticalBlock(),loreList,slotIndex);
-		    	getMenu().getPage(pageIndex).addIcon(townIcon);
-				slotIndex++;
+			ListIterator<KonTown> townIter = kingdomTowns.listIterator();
+			for (int i = 0; i < pageTotal; i++) {
+				int numPageRows = (int) Math.ceil(((double) (kingdomTowns.size() - i * MAX_ICONS_PER_PAGE)) / 9);
+				if (numPageRows < 1) {
+					numPageRows = 1;
+				} else if (numPageRows > 5) {
+					numPageRows = 5;
+				}
+				pageLabel = titleColor + infoKingdom.getName() + " " + MessagePath.LABEL_TOWNS.getMessage() + " " + (i + 1) + "/" + pageTotal;
+				getMenu().addPage(pageIndex, numPageRows, pageLabel);
+				slotIndex = 0;
+				while (slotIndex < MAX_ICONS_PER_PAGE && townIter.hasNext()) {
+					/* Town Icon (n) */
+					KonTown currentTown = townIter.next();
+					loreList = new ArrayList<>();
+					loreList.add(loreColor + MessagePath.LABEL_POPULATION.getMessage() + ": " + valueColor + currentTown.getNumResidents());
+					loreList.add(loreColor + MessagePath.LABEL_LAND.getMessage() + ": " + valueColor + currentTown.getChunkList().size());
+					TownIcon townIcon = new TownIcon(currentTown, kingdomColor, getKonquest().getKingdomManager().getTownCriticalBlock(), loreList, slotIndex);
+					getMenu().getPage(pageIndex).addIcon(townIcon);
+					slotIndex++;
+				}
+				pageIndex++;
 			}
-			pageIndex++;
 		}
-		
+
 		// Page 2+
 		// All kingdom members
 		pageTotal = (int)Math.ceil(((double)allKingdomMembers.size())/MAX_ICONS_PER_PAGE);

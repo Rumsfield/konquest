@@ -63,6 +63,7 @@ permissions:
       konquest.command.spy: true
       konquest.command.stats: true
       konquest.command.prefix: true
+      konquest.command.kingdom: true
       konquest.command.town: true
       konquest.command.fly: true
       konquest.command.border: true
@@ -127,7 +128,11 @@ permissions:
   konquest.command.prefix:
     description: Choose a prefix for your name in chat
     default: true
-    
+
+  konquest.command.kingdom:
+    description: Manage a kingdom
+    default: true
+
   konquest.command.town:
     description: Manage a town
     default: true
@@ -155,6 +160,7 @@ permissions:
       konquest.command.admin.monument: true
       konquest.command.admin.reload: true
       konquest.command.admin.ruin: true
+      konquest.command.admin.sanctuary: true
       konquest.command.admin.save: true
       konquest.command.admin.settravel: true
       konquest.command.admin.stat: true
@@ -205,7 +211,11 @@ permissions:
   konquest.command.admin.ruin:
     description: Manage a Ruin territory
     default: op
-  
+
+  konquest.command.admin.sanctuary:
+    description: Manage a Sanctuary territory
+    default: op
+
   konquest.command.admin.save:
     description: Saves Kingdoms and Players data files
     default: op

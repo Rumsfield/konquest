@@ -567,6 +567,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				konquest.getTerritoryManager().removeAllTerritory(oldKingdom.getCapital().getWorld(),oldKingdom.getCapital().getChunkList().keySet());
 				konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
 				oldKingdom = null;
+				// Update particle borders of everyone
+				//TODO: optimize this to only nearby players?
+				for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
+					konquest.getTerritoryManager().updatePlayerBorderParticles(player);
+				}
 				ChatUtil.printDebug("Removed Kingdom "+name);
 				return true;
 			}
