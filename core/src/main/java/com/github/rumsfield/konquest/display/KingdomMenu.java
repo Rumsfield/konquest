@@ -259,10 +259,12 @@ public class KingdomMenu implements ViewableMenu {
 				loreList.clear();
 				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_REQUESTS.getMessage());
 				int numRequests = kingdom.getJoinRequests().size();
+				Material requestMat = Material.GLASS_BOTTLE;
 				if(numRequests > 0) {
 					loreList.add(valueColor+""+numRequests);
+					requestMat = Material.HONEY_BOTTLE;
 				}
-				icon = new InfoIcon(officerColor+MessagePath.MENU_GUILD_REQUESTS.getMessage(), loreList, Material.JUKEBOX, ROOT_SLOT_REQUESTS, true);
+				icon = new InfoIcon(officerColor+MessagePath.MENU_GUILD_REQUESTS.getMessage(), loreList, requestMat, ROOT_SLOT_REQUESTS, true);
 				result.addIcon(icon);
 			}
 			
@@ -404,24 +406,26 @@ public class KingdomMenu implements ViewableMenu {
 		return result;
 	}
 	
-	/**
-	 * Visualizing diplomacy<br>
-	 * <br>
-	 * Relationships view lists all other kingdoms and their relationship, with icon format:<br>
-	 * 		Colored by current relation<br>
-	 * 		Name = Kingdom name<br>
-	 * 		Lore0 = Currently: {@code <active relation>}<br>
-	 * 		Lore1 = +-----------+<br>
-	 * 		Lore2 = Our Stance: {@code <our request relation>}<br>
-	 * 		Lore3 = Their Stance: {@code <their request relation>}<br>
-	 *      Lore4 = Click to change our stance<br>
-	 * <br>
-	 * Diplomacy view shows info on chosen kingdom, and all relationship options.<br>
-	 * Show same kingdom icon (not clickable) and all relationships with context tips.<br>
-	 * 		Name = {@code <Relationship>}<br>
-	 * 		Lore0 = {@code <context description based on instant war/peace, their stance>}<br>
-	 * 		Lore1 = {@code <click to enact, if clickable based on context/conditions>}<br>
+	/*
+	 * Visualizing diplomacy
+	 *
+	 * Relationships view lists all other kingdoms and their relationship, with icon format:
+	 * 		Colored by current relation
+	 * 		Name = Kingdom name
+	 * 		Lore0 = Currently: <active relation>
+	 * 		Lore1 = +-----------+
+	 * 		Lore2 = Our Stance: <our request relation>
+	 * 		Lore3 = Their Stance: <their request relation>
+	 *      Lore4 = Click to change our stance
+	 *
+	 * Diplomacy view shows info on chosen kingdom, and all relationship options.
+	 * Show same kingdom icon (not clickable) and all relationships with context tips.
+	 * 		Name = <Relationship>
+	 * 		Lore0 = <context description based on instant war/peace, their stance>
+	 * 		Lore1 = <click to enact, if clickable based on context/conditions>
 	 */
+
+
 	private DisplayMenu createDiplomacyView() {
 		//B_DIPLOMACY
 		// diplomacyKingdom is the global variable to keep track of current kingdom changing status
@@ -648,10 +652,9 @@ public class KingdomMenu implements ViewableMenu {
 			while(slotIndex < MAX_ICONS_PER_PAGE && listIter.hasNext()) {
 				/* Player Icon (n) */
 				OfflinePlayer currentPlayer = listIter.next();
-				ChatColor guildColor = ChatColor.GREEN;
 				loreList = new ArrayList<>();
 				String lastOnlineFormat = Konquest.getLastSeenFormat(currentPlayer);
-				loreList.add(valueColor+lastOnlineFormat);
+				loreList.add(loreColor+"Last Seen "+valueColor+lastOnlineFormat);
 				String kingdomRole = kingdom.getPlayerRoleName(currentPlayer);
 				if(!kingdomRole.equals("")) {
 					loreList.add(kingdomRole);
@@ -662,7 +665,7 @@ public class KingdomMenu implements ViewableMenu {
 				if(!loreHintStr2.equals("")) {
 					loreList.add(hintColor+loreHintStr2);
 				}
-		    	PlayerIcon playerIcon = new PlayerIcon(guildColor+currentPlayer.getName(),loreList,currentPlayer,slotIndex,isClickable,iconAction);
+		    	PlayerIcon playerIcon = new PlayerIcon(ChatColor.GOLD+currentPlayer.getName(),loreList,currentPlayer,slotIndex,isClickable,iconAction);
 		    	pages.get(pageNum).addIcon(playerIcon);
 				slotIndex++;
 			}

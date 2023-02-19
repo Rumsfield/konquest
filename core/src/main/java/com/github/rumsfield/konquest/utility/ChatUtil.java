@@ -5,9 +5,12 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -256,6 +259,24 @@ public class ChatUtil {
 	public static void sendAdminBroadcast(String message) {
 		String notice = Konquest.getChatTag() + broadcastColor + message;
 		Bukkit.broadcast(notice,"konquest.command.admin");
+	}
+
+	public static void sendCommaNotice(Player player, List<String> values) {
+		sendCommaNotice(player, values, noticeColor);
+	}
+
+	public static void sendCommaNotice(Player player, List<String> values, ChatColor color) {
+		StringBuilder message = new StringBuilder();
+		ListIterator<String> listIter = values.listIterator();
+		while(listIter.hasNext()) {
+			String currentValue = listIter.next();
+			message.append(currentValue);
+			if(listIter.hasNext()) {
+				message.append(", ");
+			}
+		}
+		String notice = Konquest.getChatTag() + color + message;
+		player.sendMessage(notice);
 	}
 	
 	public static void sendKonTitle(KonPlayer player, String title, String subtitle) {

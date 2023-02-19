@@ -1671,19 +1671,51 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		kingdom2.removeActiveRelation(kingdom1);
 		kingdom2.removeRelationRequest(kingdom1);
 	}
-	
+
+	/**
+	 * Check to see if a kingdom is an enemy
+	 * @param kingdom1 The reference kingdom
+	 * @param kingdom2 The target kingdom
+	 * @return True when both kingdoms have an active enemy relationship with each other, or either kingdom is Barbarians
+	 */
 	public boolean isBothKingdomsEnemy(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
+		// Barbarians are always enemies to other kingdoms
+		if(kingdom1.equals(getBarbarians()) || kingdom2.equals(getBarbarians())) {
+			return true;
+		}
 		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.ENEMY) && kingdom2.getActiveRelation(kingdom1).equals(KonquestRelationship.ENEMY);
 	}
-	
+
+	/**
+	 * Check to see if a kingdom is an ally
+	 * @param kingdom1 The reference kingdom
+	 * @param kingdom2 The target kingdom
+	 * @return True when both kingdoms have an active allied relationship with each other, and neither kingdom is Barbarians
+	 */
 	public boolean isBothKingdomsAllied(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
+		// Barbarians are never allied to other kingdoms
+		if(kingdom1.equals(getBarbarians()) || kingdom2.equals(getBarbarians())) {
+			return false;
+		}
 		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.ALLIED) && kingdom2.getActiveRelation(kingdom1).equals(KonquestRelationship.ALLIED);
 	}
-	
+
+	/**
+	 * Check to see if a kingdom is sanctioned
+	 * @param kingdom1 The reference kingdom
+	 * @param kingdom2 The target kingdom
+	 * @return True when the reference kingdom sanctions the target kingdom
+	 */
 	public boolean isKingdomSanctioned(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
 		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.SANCTIONED);
 	}
-	
+
+	/**
+	 * Check to see if a kingdom is peaceful
+	 * @param kingdom1 The reference kingdom
+	 * @param kingdom2 The target kingdom
+	 * @return True when the reference kingdom is peaceful with the target kingdom
+	 */
 	public boolean isKingdomPeaceful(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
 		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.PEACE);
 	}

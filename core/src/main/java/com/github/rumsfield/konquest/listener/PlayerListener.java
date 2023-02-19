@@ -64,6 +64,9 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 
+import java.util.ArrayList;
+import java.util.UUID;
+
 
 public class PlayerListener implements Listener {
 
@@ -109,7 +112,58 @@ public class PlayerListener implements Listener {
 				}
 				konquest.opStatusMessages.clear();
 			}
-			// Messages for town joining
+			// Messages for kingdom & town membership
+			// Notify players with outstanding kingdom/town invites.
+			// Notify town elites & kingdom officers of any pending join requests.
+			ArrayList<String> townRequestNames = new ArrayList<>();
+			ArrayList<String> townInviteNames = new ArrayList<>();
+			ArrayList<String> kingdomInviteNames = new ArrayList<>();
+
+			boolean isKingdomRequests = false;
+			boolean isTownRequests = false;
+
+			UUID id = player.getBukkitPlayer().getUniqueId();
+			for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
+				// Determine pending invite lists
+				if(kingdom.isJoinInviteValid(id)) {
+					kingdomInviteNames.add(kingdom.getName());
+				}
+				for(KonTown town : kingdom.getTowns()) {
+					if(town.isJoinInviteValid(id)) {
+						townInviteNames.add(town.getName());
+					}
+					if(!town.getJoinRequests().isEmpty() && town.isPlayerKnight(player.getBukkitPlayer())) {
+						townRequestNames.add(town.getName());
+						isTownRequests = true;
+					}
+				}
+				if(!kingdom.getJoinRequests().isEmpty() && kingdom.isOfficer(id)) {
+					isKingdomRequests = true;
+				}
+			}
+
+			// Notify requests
+			if(isKingdomRequests) {
+				String message = "Players requested to join your kingdom. Use \"/k kingdom\", then choose Requests to respond.";
+				ChatUtil.sendNotice(bukkitPlayer, message, ChatColor.LIGHT_PURPLE);
+			}
+			if(isTownRequests) {
+				String message = "Players want to become residents of your towns. Use \"/k town\" command to respond.";
+				ChatUtil.sendNotice(bukkitPlayer, message, ChatColor.LIGHT_PURPLE);
+				ChatUtil.sendCommaNotice(bukkitPlayer, townRequestNames, ChatColor.LIGHT_PURPLE);
+			}
+			// Notify invites
+			if(!kingdomInviteNames.isEmpty()) {
+				String message = "You have pending invites to join kingdoms. Use \"/k kingdom\", then choose Invites to respond.";
+				ChatUtil.sendNotice(bukkitPlayer, message);
+				ChatUtil.sendCommaNotice(bukkitPlayer, kingdomInviteNames);
+			}
+			if(!townInviteNames.isEmpty()) {
+				String message = "You have pending invites to join towns. Use \"/k town\" command to respond.";
+				ChatUtil.sendNotice(bukkitPlayer, message);
+				ChatUtil.sendCommaNotice(bukkitPlayer, townInviteNames);
+			}
+			/*
 			for(KonTown town : player.getKingdom().getTowns()) {
 				if(town.isJoinInviteValid(player.getBukkitPlayer().getUniqueId())) {
 					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_JOIN_INVITE.getMessage(town.getName(),town.getName(),town.getName()), ChatColor.LIGHT_PURPLE);
@@ -120,6 +174,8 @@ public class PlayerListener implements Listener {
 					}
 				}
 			}
+			*/
+
 			// DiscordSRV
 			if(konquest.getIntegrationManager().getDiscordSrv().isEnabled()) {
 				String message = konquest.getIntegrationManager().getDiscordSrv().getLinkMessage(bukkitPlayer);
@@ -283,7 +339,7 @@ public class PlayerListener implements Listener {
 					parsedFormat = PlaceholderAPI.setRelationalPlaceholders(viewerPlayer.getBukkitPlayer(), bukkitPlayer, parsedFormat);
 				} catch (NoClassDefFoundError ignored) {}
 				// Send the chat message
-				viewerPlayer.getBukkitPlayer().sendMessage(parsedFormat + Konquest.chatDivider + ChatColor.RESET + " " + messageFormat + chatMessage);
+				viewerPlayer.getBukkitPlayer().sendMessage(parsedFormat + ChatColor.DARK_GRAY + Konquest.chatDivider + ChatColor.RESET + " " + messageFormat + chatMessage);
 			}
 		}
 

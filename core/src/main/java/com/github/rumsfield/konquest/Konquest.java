@@ -44,7 +44,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	private static Konquest instance;
 	private static String chatTag;
 	private static String chatMessage;
-	public static final String chatDivider = "§7»";
+	public static final String chatDivider = "»";
 	public static ChatColor friendColor1 = ChatColor.GREEN;
 	public static ChatColor friendColor2 = ChatColor.DARK_GREEN;
 	public static ChatColor enemyColor1 = ChatColor.RED;
@@ -1218,7 +1218,7 @@ public class Konquest implements KonquestAPI, Timeable {
     				// players are in the same kingdom
     				friendlyNames.add(onlinePlayer.getBukkitPlayer().getName());
     			} else {
-    				// players are in different kingdoms
+    				// players are in different kingdoms (one could be Barbarians)
     				if(kingdomManager.isBothKingdomsEnemy(onlinePlayer.getKingdom(), player.getKingdom())) {
     					enemyNames.add(onlinePlayer.getBukkitPlayer().getName());
     				} else if(kingdomManager.isBothKingdomsAllied(onlinePlayer.getKingdom(), player.getKingdom())) {

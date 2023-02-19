@@ -309,6 +309,7 @@ public class TravelCommand extends CommandBase {
 			if(player.isBarbarian()) {
 				if(isCampTravel) {tabList.add("camp");}
 				if(isWildTravel) {tabList.add("wild");}
+				if(isSanctuaryTravel) {tabList.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());}
 	    	} else {
 				if(isHomeTravel) {tabList.add("home");}
 				if(isWildTravel) {tabList.add("wild");}
