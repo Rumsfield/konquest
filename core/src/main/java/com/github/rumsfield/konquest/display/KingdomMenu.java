@@ -229,16 +229,18 @@ public class KingdomMenu implements ViewableMenu {
 		loreList.clear();
 		loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_INVITES.getMessage());
 		int numInvites = manager.getInviteKingdoms(player).size();
+		Material inviteMat = Material.BOOK;
 		if(numInvites > 0) {
 			loreList.add(valueColor+""+numInvites);
+			inviteMat = Material.WRITABLE_BOOK;
 		}
-		icon = new InfoIcon(regularColor+MessagePath.MENU_GUILD_INVITES.getMessage(), loreList, Material.WRITABLE_BOOK, ROOT_SLOT_INVITE, true);
+		icon = new InfoIcon(regularColor+MessagePath.MENU_GUILD_INVITES.getMessage(), loreList, inviteMat, ROOT_SLOT_INVITE, true);
 		result.addIcon(icon);
 		
 		/* List Icon */
 		loreList.clear();
 		loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_LIST.getMessage());
-		icon = new InfoIcon(regularColor+MessagePath.MENU_GUILD_LIST.getMessage(), loreList, Material.LECTERN, ROOT_SLOT_LIST, true);
+		icon = new InfoIcon(regularColor+MessagePath.MENU_GUILD_LIST.getMessage(), loreList, Material.PAPER, ROOT_SLOT_LIST, true);
 		result.addIcon(icon);
 		
 		// These icons only appear for created kingdoms
@@ -665,7 +667,7 @@ public class KingdomMenu implements ViewableMenu {
 				if(!loreHintStr2.equals("")) {
 					loreList.add(hintColor+loreHintStr2);
 				}
-		    	PlayerIcon playerIcon = new PlayerIcon(ChatColor.GOLD+currentPlayer.getName(),loreList,currentPlayer,slotIndex,isClickable,iconAction);
+		    	PlayerIcon playerIcon = new PlayerIcon(ChatColor.LIGHT_PURPLE+currentPlayer.getName(),loreList,currentPlayer,slotIndex,isClickable,iconAction);
 		    	pages.get(pageNum).addIcon(playerIcon);
 				slotIndex++;
 			}
@@ -835,6 +837,11 @@ public class KingdomMenu implements ViewableMenu {
 						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
 						boolean status = manager.menuRespondKingdomRequest(clickPlayer, kingdom, clickType);
 						if(status) {
+							if(clickType) {
+								ChatUtil.sendNotice(player.getBukkitPlayer(),"Accepted kingdom join request for player "+clickPlayer.getName());
+							} else {
+								ChatUtil.sendNotice(player.getBukkitPlayer(),"Denied kingdom join request for player "+clickPlayer.getName());
+							}
 							Konquest.playSuccessSound(player.getBukkitPlayer());
 						} else {
 							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_PLAYER_GUILD.getMessage(clickPlayer.getName()));

@@ -539,6 +539,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				String playerName = member.getOfflineBukkitPlayer().getName();
 				if(member instanceof KonPlayer) {
 					ChatUtil.printDebug("Removing online KonPlayer "+playerName+" to barbarian.");
+					KonPlayer onlinePlayer = (KonPlayer)member;
+					// Online-only updates
+					onlinePlayer.getPlayerPrefix().setEnable(false);
+					konquest.updateNamePackets(onlinePlayer);
 				} else {
 					ChatUtil.printDebug("Removing offline KonOfflinePlayer "+playerName+" to barbarian.");
 				}

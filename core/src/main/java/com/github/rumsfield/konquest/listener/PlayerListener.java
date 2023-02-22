@@ -117,16 +117,15 @@ public class PlayerListener implements Listener {
 			// Notify town elites & kingdom officers of any pending join requests.
 			ArrayList<String> townRequestNames = new ArrayList<>();
 			ArrayList<String> townInviteNames = new ArrayList<>();
-			ArrayList<String> kingdomInviteNames = new ArrayList<>();
 
+			boolean isKingdomInvites = false;
 			boolean isKingdomRequests = false;
-			boolean isTownRequests = false;
 
 			UUID id = player.getBukkitPlayer().getUniqueId();
 			for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
 				// Determine pending invite lists
 				if(kingdom.isJoinInviteValid(id)) {
-					kingdomInviteNames.add(kingdom.getName());
+					isKingdomInvites = true;
 				}
 				for(KonTown town : kingdom.getTowns()) {
 					if(town.isJoinInviteValid(id)) {
@@ -134,7 +133,6 @@ public class PlayerListener implements Listener {
 					}
 					if(!town.getJoinRequests().isEmpty() && town.isPlayerKnight(player.getBukkitPlayer())) {
 						townRequestNames.add(town.getName());
-						isTownRequests = true;
 					}
 				}
 				if(!kingdom.getJoinRequests().isEmpty() && kingdom.isOfficer(id)) {
@@ -147,16 +145,15 @@ public class PlayerListener implements Listener {
 				String message = "Players requested to join your kingdom. Use \"/k kingdom\", then choose Requests to respond.";
 				ChatUtil.sendNotice(bukkitPlayer, message, ChatColor.LIGHT_PURPLE);
 			}
-			if(isTownRequests) {
+			if(!townRequestNames.isEmpty()) {
 				String message = "Players want to become residents of your towns. Use \"/k town\" command to respond.";
 				ChatUtil.sendNotice(bukkitPlayer, message, ChatColor.LIGHT_PURPLE);
 				ChatUtil.sendCommaNotice(bukkitPlayer, townRequestNames, ChatColor.LIGHT_PURPLE);
 			}
 			// Notify invites
-			if(!kingdomInviteNames.isEmpty()) {
+			if(isKingdomInvites) {
 				String message = "You have pending invites to join kingdoms. Use \"/k kingdom\", then choose Invites to respond.";
 				ChatUtil.sendNotice(bukkitPlayer, message);
-				ChatUtil.sendCommaNotice(bukkitPlayer, kingdomInviteNames);
 			}
 			if(!townInviteNames.isEmpty()) {
 				String message = "You have pending invites to join towns. Use \"/k town\" command to respond.";
@@ -596,7 +593,7 @@ public class PlayerListener implements Listener {
         	KonTerritory territory = territoryManager.getChunkTerritory(clicked.getLocation());
         	// Entity exceptions are always allowed to interact
         	ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" interacted at entity of type: "+ clicked.getType());
-        	boolean isEntityAllowed = (clicked.getType().equals(EntityType.PLAYER));
+        	boolean isEntityAllowed = (clicked.getType().equals(EntityType.PLAYER) || clicked.getType().equals(EntityType.VILLAGER));
         	// Property Flag Holders
 			if(territory instanceof KonPropertyFlagHolder) {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
