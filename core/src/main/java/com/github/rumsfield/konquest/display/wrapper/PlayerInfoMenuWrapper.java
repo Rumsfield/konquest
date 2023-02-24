@@ -102,7 +102,8 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 				}
 		    	loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+currentTown.getNumResidents());
 		    	loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+currentTown.getChunkList().size());
-		    	TownIcon town = new TownIcon(currentTown,kingdomColor,getKonquest().getKingdomManager().getTownCriticalBlock(),loreList,slotIndex);
+				loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
+		    	TownIcon town = new TownIcon(currentTown,kingdomColor,loreList,slotIndex,true);
 		    	getMenu().getPage(pageNum).addIcon(town);
 				slotIndex++;
 			}

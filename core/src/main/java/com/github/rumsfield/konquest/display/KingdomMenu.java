@@ -43,19 +43,20 @@ public class KingdomMenu implements ViewableMenu {
 		C_DISBAND
 	}
 
-	/**
-	 * Menu Layout <br>
-	 * Labels with * are a new menu state. <br>
-	 * Labels with + are icon buttons. <br>
-	 * <br>
-	 * Access  | Labels... <br>
-	 * ----------------------------------------------------------------------------------<br>
-	 * Regular | *Join   		*Leave		+Info		*Invites	*List 		<br>
+	/*
+	 * Menu Layout
+	 * Labels with * are a new menu state.
+	 * Labels with + are icon buttons.
+	 *
+	 * Access  | Labels...
+	 * ----------------------------------------------------------------------------------
+	 * Regular | *Join   		*Leave		+Info		*Invites	*List
 	 * Officer | *Relationship	*Requests<br>
-	 * Master  | *Promote 		*Demote 	*Transfer 	+Open		*Template 	 *Disband<br>
-	 * <br>
+	 * Master  | *Promote 		*Demote 	*Transfer 	+Open		*Template 	 *Disband
+	 *
 	 * Relationship selects other kingdom and opens diplomacy view, which selects new status (enemy, ally, etc)
 	 */
+
 	enum AccessType {
 		REGULAR,
 		OFFICER,
@@ -81,11 +82,11 @@ public class KingdomMenu implements ViewableMenu {
 	private final int SLOT_NO 					= 5;
 	
 	private final int MAX_ICONS_PER_PAGE 		= 45;
-	
-	private final ChatColor loreColor = ChatColor.YELLOW;
-	private final ChatColor valueColor = ChatColor.AQUA;
-	private final ChatColor hintColor = ChatColor.GOLD;
-	
+
+	private final ChatColor loreColor = DisplayManager.loreColor;
+	private final ChatColor valueColor = DisplayManager.valueColor;
+	private final ChatColor hintColor = DisplayManager.hintColor;
+
 	private final HashMap<MenuState,DisplayMenu> views;
 	private final ArrayList<DisplayMenu> pages;
 	private int currentPage;

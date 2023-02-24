@@ -69,7 +69,8 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			loreList.add(loreColor + "Capital");
 			loreList.add(loreColor + MessagePath.LABEL_POPULATION.getMessage() + ": " + valueColor + capital.getNumResidents());
 			loreList.add(loreColor + MessagePath.LABEL_LAND.getMessage() + ": " + valueColor + capital.getChunkList().size());
-			TownIcon capitalIcon = new TownIcon(capital, kingdomColor, getKonquest().getKingdomManager().getTownCriticalBlock(), loreList, slotIndex);
+			loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
+			TownIcon capitalIcon = new TownIcon(capital, kingdomColor, loreList, slotIndex, true);
 			getMenu().getPage(pageIndex).addIcon(capitalIcon);
 		}
 
@@ -191,7 +192,8 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 					loreList = new ArrayList<>();
 					loreList.add(loreColor + MessagePath.LABEL_POPULATION.getMessage() + ": " + valueColor + currentTown.getNumResidents());
 					loreList.add(loreColor + MessagePath.LABEL_LAND.getMessage() + ": " + valueColor + currentTown.getChunkList().size());
-					TownIcon townIcon = new TownIcon(currentTown, kingdomColor, getKonquest().getKingdomManager().getTownCriticalBlock(), loreList, slotIndex);
+					loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
+					TownIcon townIcon = new TownIcon(currentTown, kingdomColor, loreList, slotIndex, true);
 					getMenu().getPage(pageIndex).addIcon(townIcon);
 					slotIndex++;
 				}
