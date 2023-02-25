@@ -143,8 +143,12 @@ public class ShieldManager implements KonquestShieldManager {
 	public List<KonArmor> getArmors() {
 		return armors;
 	}
-	
+
 	public boolean activateTownShield(KonShield shield, KonTown town, Player bukkitPlayer) {
+		return activateTownShield(shield, town, bukkitPlayer, false);
+	}
+
+	public boolean activateTownShield(KonShield shield, KonTown town, Player bukkitPlayer, boolean ignoreCost) {
 		if(!isShieldsEnabled) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return false;
@@ -156,7 +160,7 @@ public class ShieldManager implements KonquestShieldManager {
 		
 		// Check that the player has enough favor
 		int requiredCost = shield.getCost()*town.getNumResidents();
-		if(KonquestPlugin.getBalance(bukkitPlayer) < requiredCost) {
+		if(!ignoreCost && KonquestPlugin.getBalance(bukkitPlayer) < requiredCost) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_COST.getMessage(requiredCost));
             return false;
 		}
@@ -197,15 +201,19 @@ public class ShieldManager implements KonquestShieldManager {
 		
 		// Withdraw cost
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-        if(KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost)) {
+        if(!ignoreCost && KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost)) {
         	if(player != null) {
         		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR, requiredCost);
         	}
         }
 		return true;
 	}
-	
+
 	public boolean activateTownArmor(KonArmor armor, KonTown town, Player bukkitPlayer) {
+		return activateTownArmor(armor, town, bukkitPlayer, false);
+	}
+
+	public boolean activateTownArmor(KonArmor armor, KonTown town, Player bukkitPlayer, boolean ignoreCost) {
 		if(!isArmorsEnabled) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return false;
@@ -213,7 +221,7 @@ public class ShieldManager implements KonquestShieldManager {
 		
 		// Check that the player has enough favor
 		int requiredCost = armor.getCost()*town.getNumResidents();
-		if(KonquestPlugin.getBalance(bukkitPlayer) < requiredCost) {
+		if(!ignoreCost && KonquestPlugin.getBalance(bukkitPlayer) < requiredCost) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_COST.getMessage(requiredCost));
             return false;
 		}
@@ -254,7 +262,7 @@ public class ShieldManager implements KonquestShieldManager {
 		
 		// Withdraw cost
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-        if(KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost)) {
+        if(!ignoreCost && KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost)) {
         	if(player != null) {
         		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR, requiredCost);
         	}

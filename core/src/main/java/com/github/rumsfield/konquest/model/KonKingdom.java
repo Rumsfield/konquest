@@ -308,12 +308,13 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	public String getPlayerRoleName(OfflinePlayer offlinePlayer) {
 		String result = "";
+		ChatColor kingdomRoleColor = ChatColor.DARK_AQUA;
 		if(isMaster(offlinePlayer.getUniqueId())) {
-			result = ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage();
+			result = kingdomRoleColor+MessagePath.LABEL_MASTER.getMessage();
 		} else if(isOfficer(offlinePlayer.getUniqueId())) {
-			result = ChatColor.BLUE+MessagePath.LABEL_OFFICER.getMessage();
+			result = kingdomRoleColor+MessagePath.LABEL_OFFICER.getMessage();
 		} else if(isMember(offlinePlayer.getUniqueId())) {
-			result = ChatColor.WHITE+MessagePath.LABEL_MEMBER.getMessage();
+			result = kingdomRoleColor+MessagePath.LABEL_MEMBER.getMessage();
 		}
 		return result;
 	}

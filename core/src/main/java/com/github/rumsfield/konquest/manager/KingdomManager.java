@@ -74,7 +74,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private int exileCooldownSeconds;
 	private final HashMap<UUID,Integer> joinPlayerCooldowns;
 	private final HashMap<UUID,Integer> exilePlayerCooldowns;
-	
+
+	// Config Settings
 	private long payIntervalSeconds;
 	private double payPerChunk;
 	private double payPerResident;
@@ -85,6 +86,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private double costCreate;
 	private double costRename;
 	private double costTemplate;
+	private boolean discountEnable;
+	private int discountPercent;
+	private boolean discountStack;
+
 	private final Timer payTimer;
 	
 	public KingdomManager(Konquest konquest) {
@@ -128,6 +133,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	public void loadOptions() {
+		// Kingdom Settings
 		payIntervalSeconds 	= konquest.getCore().getLong(CorePath.FAVOR_KINGDOMS_PAY_INTERVAL_SECONDS.getPath());
 		payPerChunk 		= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_CHUNK.getPath());
 		payPerResident 		= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_RESIDENT.getPath());
@@ -156,6 +162,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			payTimer.setTime((int)payIntervalSeconds);
 			payTimer.startLoopTimer();
 		}
+
+		// Town Settings
+		discountEnable 	    = konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath());
+		discountPercent		= konquest.getCore().getInt(CorePath.TOWNS_DISCOUNT_PERCENT.getPath());
+		discountStack		= konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_STACK.getPath());
+
+		discountPercent = Math.max(discountPercent,0);
+		discountPercent = Math.min(discountPercent,100);
 	}
 	
 	public double getCostRelation() {
@@ -172,6 +186,18 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	public double getCostTemplate() {
 		return costTemplate;
+	}
+
+	public boolean getIsDiscountEnable() {
+		return discountEnable;
+	}
+
+	public int getDiscountPercent() {
+		return discountPercent;
+	}
+
+	public boolean getIsDiscountStack() {
+		return discountStack;
 	}
 	
 	@Override
@@ -1478,6 +1504,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costSpecial);
 			}
 		}
+		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_SPECIALIZE.getMessage(town.getName(),profession.name()));
 		return true;
 	}
 	
@@ -2300,8 +2327,115 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return true;
 	}
 
+	// A town lord/knight promotes or demotes a resident
+	public boolean menuPromoteDemoteTownKnight(KonPlayer sender, OfflinePlayer member, KonTown town, boolean action) {
+		Player bukkitPlayer = sender.getBukkitPlayer();
+		UUID id = member.getUniqueId();
+		if(!town.isPlayerLord(bukkitPlayer)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		KonOfflinePlayer offlinePlayer = konquest.getPlayerManager().getOfflinePlayer(member);
+		if(offlinePlayer == null) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(member.getName()));
+			return false;
+		}
+		if(!offlinePlayer.getKingdom().equals(town.getKingdom())) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
+			return false;
+		}
+		if(id.equals(bukkitPlayer.getUniqueId()) || town.isLord(id)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		if(town.isPlayerResident(member)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_KNIGHT_RESIDENT.getMessage());
+			return false;
+		}
+		// Set resident's elite status
+		KonPlayer onlinePlayer = konquest.getPlayerManager().getPlayerFromID(id);
+		if(action) {
+			// Action is true, try to promote
+			if(town.isPlayerKnight(member)) {
+				ChatUtil.sendError(bukkitPlayer, "That player is already a town knight.");
+				return false;
+			}
+			town.setPlayerKnight(member, true);
+			for(OfflinePlayer resident : town.getPlayerResidents()) {
+				if(resident.isOnline()) {
+					ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_SET.getMessage(member.getName(),town.getName()));
+				}
+			}
+		} else {
+			// Action is false, try to demote
+			if(!town.isPlayerKnight(member)) {
+				ChatUtil.sendError(bukkitPlayer, "That player is already a town resident.");
+				return false;
+			}
+			town.setPlayerKnight(offlinePlayer.getOfflineBukkitPlayer(), false);
+			for(OfflinePlayer resident : town.getPlayerResidents()) {
+				if(resident.isOnline()) {
+					ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_CLEAR.getMessage(member.getName(),town.getName()));
+				}
+			}
+		}
+		if(onlinePlayer != null) {
+			updatePlayerMembershipStats(onlinePlayer);
+		}
+		return true;
+	}
 
-
+	// A town lord or admin is transferring town lordship to another member
+	public boolean menuTransferTownLord(KonPlayer sender, OfflinePlayer member, KonTown town, boolean isAdmin) {
+		// In this method, the sender must be the current town lord, or there is no valid lord, or an admin is transferring.
+		// The member player will be the new town lord.
+		Player bukkitPlayer = sender.getBukkitPlayer();
+		UUID id = member.getUniqueId();
+		if(town.isLordValid()) {
+			// Lord exists, only permit access to owner
+			if(!isAdmin && !town.isPlayerLord(bukkitPlayer)) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+				return false;
+			}
+		}
+		KonOfflinePlayer offlinePlayer = konquest.getPlayerManager().getOfflinePlayer(member);
+		if(offlinePlayer == null) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(member.getName()));
+			return false;
+		}
+		// Check for enemy new lord
+		if(!offlinePlayer.getKingdom().equals(town.getKingdom())) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
+			return false;
+		}
+		// Check for member resident
+		if(!town.isPlayerResident(member)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		// Check for self new lord
+		if(id.equals(bukkitPlayer.getUniqueId())) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		// Check for kingdom capital, cannot transfer lord (lord must be kingdom master)
+		if(town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		// Transfer lordship
+		town.setPlayerLord(member);
+		for(OfflinePlayer resident : town.getPlayerResidents()) {
+			if(resident.isOnline()) {
+				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_LORD_SUCCESS.getMessage(town.getName(),member.getName()));
+			}
+		}
+		KonPlayer onlinePlayer = konquest.getPlayerManager().getPlayerFromID(id);
+		if(onlinePlayer != null) {
+			updatePlayerMembershipStats(onlinePlayer);
+		}
+		return true;
+	}
 	/*
 	 * More methods... (a lot more)
 	 */

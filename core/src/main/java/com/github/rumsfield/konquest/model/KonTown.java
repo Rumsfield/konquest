@@ -1242,6 +1242,16 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		return eliteList;
 	}
+
+	public ArrayList<OfflinePlayer> getPlayerKnightsOnly() {
+		ArrayList<OfflinePlayer> eliteList = new ArrayList<>();
+		for(UUID id : residents.keySet()) {
+			if(residents.get(id) && !lord.equals(id)) {
+				eliteList.add(Bukkit.getOfflinePlayer(id));
+			}
+		}
+		return eliteList;
+	}
 	
 	public ArrayList<OfflinePlayer> getPlayerResidents() {
 		ArrayList<OfflinePlayer> residentList = new ArrayList<>();
@@ -1249,6 +1259,29 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			residentList.add(Bukkit.getOfflinePlayer(id));
 		}
 		return residentList;
+	}
+
+	public ArrayList<OfflinePlayer> getPlayerResidentsOnly() {
+		ArrayList<OfflinePlayer> residentList = new ArrayList<>();
+		for(UUID id : residents.keySet()) {
+			if(!residents.get(id)) {
+				residentList.add(Bukkit.getOfflinePlayer(id));
+			}
+		}
+		return residentList;
+	}
+
+	public String getPlayerRoleName(OfflinePlayer offlinePlayer) {
+		String result = "";
+		ChatColor townRoleColor = ChatColor.LIGHT_PURPLE;
+		if(isLord(offlinePlayer.getUniqueId())) {
+			result = townRoleColor+MessagePath.LABEL_LORD.getMessage();
+		} else if(isPlayerKnight(offlinePlayer)) {
+			result = townRoleColor+MessagePath.LABEL_KNIGHT.getMessage();
+		} else if(isPlayerResident(offlinePlayer)) {
+			result = townRoleColor+MessagePath.LABEL_RESIDENT.getMessage();
+		}
+		return result;
 	}
 	
 	public int getNumResidents() {
