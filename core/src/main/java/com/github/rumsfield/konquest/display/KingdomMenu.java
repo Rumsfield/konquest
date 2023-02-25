@@ -23,11 +23,11 @@ import java.util.*;
  * Officer players: B_*
  * Master players: C_*
  */
-public class KingdomMenu implements ViewableMenu {
+public class KingdomMenu extends StateMenu implements ViewableMenu {
 	//TODO: Update all message paths to replace guild
 	
 
-	enum MenuState {
+	enum MenuState implements State {
 		ROOT,
 		A_JOIN,
 		A_EXILE,
@@ -57,7 +57,7 @@ public class KingdomMenu implements ViewableMenu {
 	 * Relationship selects other kingdom and opens diplomacy view, which selects new status (enemy, ally, etc)
 	 */
 
-	enum AccessType {
+	enum AccessType implements Access {
 		REGULAR,
 		OFFICER,
 		MASTER
@@ -80,18 +80,11 @@ public class KingdomMenu implements ViewableMenu {
 	
 	private final int SLOT_YES 					= 3;
 	private final int SLOT_NO 					= 5;
-	
-	private final int MAX_ICONS_PER_PAGE 		= 45;
 
 	private final ChatColor loreColor = DisplayManager.loreColor;
 	private final ChatColor valueColor = DisplayManager.valueColor;
 	private final ChatColor hintColor = DisplayManager.hintColor;
 
-	private final HashMap<MenuState,DisplayMenu> views;
-	private final ArrayList<DisplayMenu> pages;
-	private int currentPage;
-	private MenuState currentState;
-	private final Konquest konquest;
 	private final KingdomManager manager;
 	private final KonPlayer player;
 	private final KonKingdom kingdom;
@@ -99,15 +92,10 @@ public class KingdomMenu implements ViewableMenu {
 	private boolean isCreatedKingdom;
 	private boolean isServerKingdom;
 	private final boolean isAdmin;
-	private AccessType menuAccess;
 	private Comparator<KonKingdom> kingdomComparator;
 	
 	public KingdomMenu(Konquest konquest, KonPlayer player, KonKingdom kingdom, boolean isAdmin) {
-		this.views = new HashMap<>();
-		this.pages = new ArrayList<>();
-		this.currentPage = 0;
-		this.currentState = MenuState.ROOT;
-		this.konquest = konquest;
+		super(konquest, MenuState.ROOT, AccessType.REGULAR);
 		this.manager = konquest.getKingdomManager();
 		this.player = player;
 		this.kingdom = kingdom;
@@ -115,7 +103,6 @@ public class KingdomMenu implements ViewableMenu {
 		this.isCreatedKingdom = false; // Is this kingdom created by players, i.e. not barbarians or neutrals
 		this.isServerKingdom = false; // Is this kingdom created by an admin for the server
 		this.isAdmin = isAdmin;
-		this.menuAccess = AccessType.REGULAR;
 		this.kingdomComparator = null;
 		
 		initializeMenu();
@@ -189,19 +176,11 @@ public class KingdomMenu implements ViewableMenu {
 		ChatColor masterColor = ChatColor.LIGHT_PURPLE;
 		ChatColor kingdomColor = konquest.getDisplayPrimaryColor(player.getKingdom(), kingdom);
 		
-		int rows = 2;
-		switch(menuAccess) {
-			case REGULAR:
-				rows = 2;
-				break;
-			case OFFICER:
-				rows = 3;
-				break;
-			case MASTER:
-				rows = 4;
-				break;
-			default:
-				break;
+		int rows = 2; // default rows for regular
+		if(menuAccess.equals(AccessType.OFFICER)) {
+			rows = 3;
+		} else if(menuAccess.equals(AccessType.MASTER)) {
+			rows = 4;
 		}
 		
 		result = new DisplayMenu(rows, getTitle(MenuState.ROOT));
@@ -361,21 +340,13 @@ public class KingdomMenu implements ViewableMenu {
 		// Create page(s)
 		String pageLabel;
 		List<String> loreList;
-		int pageTotal = (int)Math.ceil(((double)templates.size())/MAX_ICONS_PER_PAGE);
-		if(pageTotal == 0) {
-			pageTotal = 1;
-		}
+		int pageTotal = getTotalPages(templates.size());
 		int pageNum = 0;
 		ListIterator<KonMonumentTemplate> listIter = templates.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)(templates.size() - i*MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows < 1) {
-				numPageRows = 1;
-			} else if(numPageRows > 5) {
-				numPageRows = 5;
-			}
+			int pageRows = getNumPageRows(templates.size(), i);
 			pageLabel = getTitle(MenuState.C_TEMPLATE)+" "+(i+1)+"/"+pageTotal;
-			pages.add(pageNum, new DisplayMenu(numPageRows+1, pageLabel));
+			pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
 			int slotIndex = 0;
 			while(slotIndex < MAX_ICONS_PER_PAGE && listIter.hasNext()) {
 				/* Template Icon (n) */
@@ -555,21 +526,13 @@ public class KingdomMenu implements ViewableMenu {
 		// Create page(s)
 		String pageLabel;
 		List<String> loreList;
-		int pageTotal = (int)Math.ceil(((double)kingdoms.size())/MAX_ICONS_PER_PAGE);
-		if(pageTotal == 0) {
-			pageTotal = 1;
-		}
+		int pageTotal = getTotalPages(kingdoms.size());
 		int pageNum = 0;
 		ListIterator<KonKingdom> listIter = kingdoms.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)(kingdoms.size() - i*MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows < 1) {
-				numPageRows = 1;
-			} else if(numPageRows > 5) {
-				numPageRows = 5;
-			}
+			int pageRows = getNumPageRows(kingdoms.size(), i);
 			pageLabel = getTitle(context)+" "+(i+1)+"/"+pageTotal;
-			pages.add(pageNum, new DisplayMenu(numPageRows+1, pageLabel));
+			pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
 			int slotIndex = 0;
 			while(slotIndex < MAX_ICONS_PER_PAGE && listIter.hasNext()) {
 				/* Kingdom Icon (n) */
@@ -636,21 +599,13 @@ public class KingdomMenu implements ViewableMenu {
 		// Create page(s)
 		String pageLabel;
 		List<String> loreList;
-		int pageTotal = (int)Math.ceil(((double)players.size())/MAX_ICONS_PER_PAGE);
-		if(pageTotal == 0) {
-			pageTotal = 1;
-		}
+		int pageTotal = getTotalPages(players.size());
 		int pageNum = 0;
 		ListIterator<OfflinePlayer> listIter = players.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
-			int numPageRows = (int)Math.ceil(((double)(players.size() - i*MAX_ICONS_PER_PAGE))/9);
-			if(numPageRows < 1) {
-				numPageRows = 1;
-			} else if(numPageRows > 5) {
-				numPageRows = 5;
-			}
+			int pageRows = getNumPageRows(players.size(), i);
 			pageLabel = getTitle(context)+" "+(i+1)+"/"+pageTotal;
-			pages.add(pageNum, new DisplayMenu(numPageRows+1, pageLabel));
+			pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
 			int slotIndex = 0;
 			while(slotIndex < MAX_ICONS_PER_PAGE && listIter.hasNext()) {
 				/* Player Icon (n) */
@@ -708,13 +663,14 @@ public class KingdomMenu implements ViewableMenu {
 		} else if(slot < navMinIndex) {
 			// Click in non-navigation slot
 			MenuIcon clickedIcon = views.get(currentState).getIcon(slot);
-			switch(currentState) {
+			MenuState currentMenuState = (MenuState)currentState;
+			switch(currentMenuState) {
 				case ROOT:
 					if(slot == ROOT_SLOT_JOIN) {
 						// Clicked to join a kingdom
 						// Allow any player to always go to the join view
 						currentState = MenuState.A_JOIN;
-						result = goToKingdomView(currentState);
+						result = goToKingdomView(MenuState.A_JOIN);
 						
 					} else if(slot == ROOT_SLOT_EXILE) {
 						// Clicked to exile from their kingdom
@@ -729,37 +685,37 @@ public class KingdomMenu implements ViewableMenu {
 					} else if(slot == ROOT_SLOT_INVITE) {
 						// Clicked to view invites
 						currentState = MenuState.A_INVITE;
-						result = goToKingdomView(currentState);
+						result = goToKingdomView(MenuState.A_INVITE);
 						
 					} else if(slot == ROOT_SLOT_LIST) {
 						// Clicked to view all kingdom list
 						currentState = MenuState.A_LIST;
-						result = goToKingdomView(currentState);
+						result = goToKingdomView(MenuState.A_LIST);
 						
 					} else if(slot == ROOT_SLOT_RELATIONSHIPS) {
 						// Clicked to modify relationships
 						currentState = MenuState.B_RELATIONSHIP;
-						result = goToKingdomView(currentState);
+						result = goToKingdomView(MenuState.B_RELATIONSHIP);
 						
 					} else if(slot == ROOT_SLOT_REQUESTS) {
 						// Clicked to view join requests
 						currentState = MenuState.B_REQUESTS;
-						result = goToPlayerView(currentState);
+						result = goToPlayerView(MenuState.B_REQUESTS);
 						
 					} else if(slot == ROOT_SLOT_PROMOTE) {
 						// Clicked to view members to promote
 						currentState = MenuState.C_PROMOTE;
-						result = goToPlayerView(currentState);
+						result = goToPlayerView(MenuState.C_PROMOTE);
 						
 					} else if(slot == ROOT_SLOT_DEMOTE) {
 						// Clicked to view officers to demote
 						currentState = MenuState.C_DEMOTE;
-						result = goToPlayerView(currentState);
+						result = goToPlayerView(MenuState.C_DEMOTE);
 						
 					} else if(slot == ROOT_SLOT_TRANSFER) {
 						// Clicked to view members to transfer master
 						currentState = MenuState.C_TRANSFER;
-						result = goToPlayerView(currentState);
+						result = goToPlayerView(MenuState.C_TRANSFER);
 						
 					} else if(slot == ROOT_SLOT_DISBAND) {
 						// Clicked to disband kingdom
@@ -798,7 +754,7 @@ public class KingdomMenu implements ViewableMenu {
 						boolean status = manager.menuRespondKingdomInvite(player, clickKingdom, clickType);
 						if(!status) {
 							// Invite declined, player assignment unchanged
-							result = goToKingdomView(currentState);
+							result = goToKingdomView(MenuState.A_INVITE);
 						}
 					}
 					break;
@@ -824,7 +780,7 @@ public class KingdomMenu implements ViewableMenu {
 						if(status) {
 							// Return to relationship view
 							currentState = MenuState.B_RELATIONSHIP;
-							result = goToKingdomView(currentState);
+							result = goToKingdomView(MenuState.B_RELATIONSHIP);
 							Konquest.playSuccessSound(player.getBukkitPlayer());
 						} else {
 							//TODO: update messaging, in manager method
@@ -848,7 +804,7 @@ public class KingdomMenu implements ViewableMenu {
 							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_PLAYER_GUILD.getMessage(clickPlayer.getName()));
 							Konquest.playFailSound(player.getBukkitPlayer());
 						}
-						result = goToPlayerView(currentState);
+						result = goToPlayerView(MenuState.B_REQUESTS);
 					}
 					break;
 				case C_PROMOTE:
@@ -859,7 +815,7 @@ public class KingdomMenu implements ViewableMenu {
 						if(status) {
 							Konquest.playSuccessSound(player.getBukkitPlayer());
 						}
-						result = goToPlayerView(currentState);
+						result = goToPlayerView(MenuState.C_PROMOTE);
 					}
 					break;
 				case C_DEMOTE:
@@ -870,7 +826,7 @@ public class KingdomMenu implements ViewableMenu {
 						if(status) {
 							Konquest.playSuccessSound(player.getBukkitPlayer());
 						}
-						result = goToPlayerView(currentState);
+						result = goToPlayerView(MenuState.C_DEMOTE);
 					}
 					break;
 				case C_TRANSFER:
@@ -914,18 +870,12 @@ public class KingdomMenu implements ViewableMenu {
 			case ROOT:
 				if(isCreatedKingdom) {
 					String titleAccess = "";
-					switch(menuAccess) {
-						case REGULAR:
-							titleAccess = MessagePath.LABEL_MEMBER.getMessage();
-							break;
-						case OFFICER:
-							titleAccess = MessagePath.LABEL_OFFICER.getMessage();
-							break;
-						case MASTER:
-							titleAccess = MessagePath.LABEL_MASTER.getMessage();
-							break;
-						default:
-							break;
+					if(menuAccess.equals(AccessType.REGULAR)) {
+						titleAccess = MessagePath.LABEL_MEMBER.getMessage();
+					} else if(menuAccess.equals(AccessType.OFFICER)) {
+						titleAccess = MessagePath.LABEL_OFFICER.getMessage();
+					} else if(menuAccess.equals(AccessType.MASTER)) {
+						titleAccess = MessagePath.LABEL_MASTER.getMessage();
 					}
 					result = color+name+" "+MessagePath.LABEL_GUILD.getMessage()+" "+titleAccess;
 				} else {
@@ -976,28 +926,6 @@ public class KingdomMenu implements ViewableMenu {
 		return result;
 	}
 	
-	private DisplayMenu goPageBack() {
-		DisplayMenu result;
-		int newIndex = currentPage-1;
-		if(newIndex >= 0) {
-			currentPage = newIndex;
-		}
-		result = pages.get(currentPage);
-		views.put(currentState, result);
-		return result;
-	}
-	
-	private DisplayMenu goPageNext() {
-		DisplayMenu result;
-		int newIndex = currentPage+1;
-		if(newIndex < pages.size()) {
-			currentPage = newIndex;
-		}
-		result = pages.get(currentPage);
-		views.put(currentState, result);
-		return result;
-	}
-	
 	private DisplayMenu goToKingdomView(MenuState context) {
 		DisplayMenu result = createKingdomView(context);
 		views.put(context, result);
@@ -1037,7 +965,7 @@ public class KingdomMenu implements ViewableMenu {
 	/**
 	 * Place all navigation button icons on view given context and update icons
 	 */
-	private void refreshNavigationButtons(MenuState context) {
+	void refreshNavigationButtons(State context) {
 		DisplayMenu view = views.get(context);
 		int navStart = view.getInventory().getSize()-9;
 		if(navStart < 0) {
@@ -1091,26 +1019,6 @@ public class KingdomMenu implements ViewableMenu {
 			view.addIcon(navIconEmpty(navStart+7));
 		}
 		view.updateIcons();
-	}
-	
-	private InfoIcon navIconClose(int index) {
-		return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_CLOSE.getMessage(),Collections.emptyList(),Material.STRUCTURE_VOID,index,true);
-	}
-	
-	private InfoIcon navIconBack(int index) {
-		return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_BACK.getMessage(),Collections.emptyList(),Material.ENDER_PEARL,index,true);
-	}
-	
-	private InfoIcon navIconNext(int index) {
-		return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_NEXT.getMessage(),Collections.emptyList(),Material.ENDER_PEARL,index,true);
-	}
-	
-	private InfoIcon navIconEmpty(int index) {
-		return new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,index,false);
-	}
-	
-	private InfoIcon navIconReturn(int index) {
-		return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_RETURN.getMessage(),Collections.emptyList(),Material.FIREWORK_ROCKET,index,true);
 	}
 	
 }

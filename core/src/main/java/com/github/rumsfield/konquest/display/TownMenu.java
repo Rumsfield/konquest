@@ -8,15 +8,14 @@ import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
 import java.util.*;
 
-public class TownMenu implements ViewableMenu {
+public class TownMenu extends StateMenu implements ViewableMenu {
     //TODO: Message paths
-    enum MenuState {
+    enum MenuState implements State {
         ROOT,
         JOIN,
         LEAVE,
@@ -36,22 +35,13 @@ public class TownMenu implements ViewableMenu {
     private final ChatColor valueColor = DisplayManager.valueColor;
     private final ChatColor hintColor = DisplayManager.hintColor;
 
-    private final HashMap<TownMenu.MenuState,DisplayMenu> views;
-    private final ArrayList<DisplayMenu> pages;
-    private int currentPage;
-    private TownMenu.MenuState currentState;
-    private final Konquest konquest;
     private final KingdomManager manager;
     private final KonPlayer player;
     private final KonKingdom kingdom;
     private Comparator<KonTown> townComparator;
 
     public TownMenu(Konquest konquest, KonPlayer player) {
-        this.views = new HashMap<>();
-        this.pages = new ArrayList<>();
-        this.currentPage = 0;
-        this.currentState = TownMenu.MenuState.ROOT;
-        this.konquest = konquest;
+        super(konquest, MenuState.ROOT, null);
         this.manager = konquest.getKingdomManager();
         this.player = player;
         this.kingdom = player.getKingdom();
@@ -151,7 +141,7 @@ public class TownMenu implements ViewableMenu {
         return result;
     }
 
-    private DisplayMenu createTownView(TownMenu.MenuState context) {
+    private DisplayMenu createTownView(MenuState context) {
         // A paged view of towns, with lore based on context
         DisplayMenu result;
         pages.clear();
@@ -204,22 +194,13 @@ public class TownMenu implements ViewableMenu {
         // Create page(s)
         String pageLabel;
         List<String> loreList;
-        int MAX_ICONS_PER_PAGE = 45;
-        int pageTotal = (int)Math.ceil(((double)towns.size())/ MAX_ICONS_PER_PAGE);
-        if(pageTotal == 0) {
-            pageTotal = 1;
-        }
+        int pageTotal = getTotalPages(towns.size());
         int pageNum = 0;
         ListIterator<KonTown> listIter = towns.listIterator();
         for(int i = 0; i < pageTotal; i++) {
-            int numPageRows = (int)Math.ceil(((double)(towns.size() - i* MAX_ICONS_PER_PAGE))/9);
-            if(numPageRows < 1) {
-                numPageRows = 1;
-            } else if(numPageRows > 5) {
-                numPageRows = 5;
-            }
+            int pageRows = getNumPageRows(towns.size(), i);
             pageLabel = getTitle(context)+" "+(i+1)+"/"+pageTotal;
-            pages.add(pageNum, new DisplayMenu(numPageRows+1, pageLabel));
+            pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
             int slotIndex = 0;
             while(slotIndex < MAX_ICONS_PER_PAGE && listIter.hasNext()) {
                 /* Town Icon (n) */
@@ -263,34 +244,35 @@ public class TownMenu implements ViewableMenu {
             } else if(index == 5) {
                 // Return to previous root
                 result = goToRootView();
-                currentState = TownMenu.MenuState.ROOT;
+                currentState = MenuState.ROOT;
             } else if(index == 8) {
                 result = goPageNext();
             }
         } else if(slot < navMinIndex) {
             // Click in non-navigation slot
             MenuIcon clickedIcon = views.get(currentState).getIcon(slot);
-            switch(currentState) {
+            MenuState currentMenuState = (MenuState)currentState;
+            switch(currentMenuState) {
                 case ROOT:
                     if(slot == ROOT_SLOT_JOIN) {
-                        currentState = TownMenu.MenuState.JOIN;
-                        result = goToTownView(currentState);
+                        currentState = MenuState.JOIN;
+                        result = goToTownView(MenuState.JOIN);
 
                     } else if(slot == ROOT_SLOT_LEAVE) {
-                        currentState = TownMenu.MenuState.LEAVE;
-                        result = goToTownView(currentState);
+                        currentState = MenuState.LEAVE;
+                        result = goToTownView(MenuState.LEAVE);
 
                     } else if(slot == ROOT_SLOT_LIST) {
-                        currentState = TownMenu.MenuState.LIST;
-                        result = goToTownView(currentState);
+                        currentState = MenuState.LIST;
+                        result = goToTownView(MenuState.LIST);
 
                     } else if(slot == ROOT_SLOT_INVITES) {
-                        currentState = TownMenu.MenuState.INVITES;
-                        result = goToTownView(currentState);
+                        currentState = MenuState.INVITES;
+                        result = goToTownView(MenuState.INVITES);
 
                     } else if(slot == ROOT_SLOT_REQUESTS) {
-                        currentState = TownMenu.MenuState.REQUESTS;
-                        result = goToTownView(currentState);
+                        currentState = MenuState.REQUESTS;
+                        result = goToTownView(MenuState.REQUESTS);
 
                     }
                     break;
@@ -303,7 +285,7 @@ public class TownMenu implements ViewableMenu {
                         if(status) {
                             // Successful response
                             Konquest.playSuccessSound(player.getBukkitPlayer());
-                            result = goToTownView(currentState);
+                            result = goToTownView(MenuState.JOIN);
                         } else {
                             // Something went wrong
                             Konquest.playFailSound(player.getBukkitPlayer());
@@ -319,7 +301,7 @@ public class TownMenu implements ViewableMenu {
                         if(status) {
                             // Successful response
                             Konquest.playSuccessSound(player.getBukkitPlayer());
-                            result = goToTownView(currentState);
+                            result = goToTownView(MenuState.LEAVE);
                         } else {
                             // Something went wrong
                             Konquest.playFailSound(player.getBukkitPlayer());
@@ -339,7 +321,7 @@ public class TownMenu implements ViewableMenu {
                         if(status) {
                             // Successful response
                             Konquest.playSuccessSound(player.getBukkitPlayer());
-                            result = goToTownView(currentState);
+                            result = goToTownView(MenuState.INVITES);
                         } else {
                             // Something went wrong
                             Konquest.playFailSound(player.getBukkitPlayer());
@@ -362,7 +344,7 @@ public class TownMenu implements ViewableMenu {
         return result;
     }
 
-    private String getTitle(TownMenu.MenuState context) {
+    private String getTitle(MenuState context) {
         String result = "error";
         ChatColor color = ChatColor.BLACK;
         switch(context) {
@@ -390,28 +372,6 @@ public class TownMenu implements ViewableMenu {
         return result;
     }
 
-    private DisplayMenu goPageBack() {
-        DisplayMenu result;
-        int newIndex = currentPage-1;
-        if(newIndex >= 0) {
-            currentPage = newIndex;
-        }
-        result = pages.get(currentPage);
-        views.put(currentState, result);
-        return result;
-    }
-
-    private DisplayMenu goPageNext() {
-        DisplayMenu result;
-        int newIndex = currentPage+1;
-        if(newIndex < pages.size()) {
-            currentPage = newIndex;
-        }
-        result = pages.get(currentPage);
-        views.put(currentState, result);
-        return result;
-    }
-
     private DisplayMenu goToTownView(TownMenu.MenuState context) {
         DisplayMenu result = createTownView(context);
         views.put(context, result);
@@ -427,14 +387,14 @@ public class TownMenu implements ViewableMenu {
     /**
      * Place all navigation button icons on view given context and update icons
      */
-    private void refreshNavigationButtons(TownMenu.MenuState context) {
+    void refreshNavigationButtons(State context) {
         DisplayMenu view = views.get(context);
         int navStart = view.getInventory().getSize()-9;
         if(navStart < 0) {
             ChatUtil.printDebug("Town menu nav buttons failed to refresh in context "+context.toString());
             return;
         }
-        if(context.equals(TownMenu.MenuState.ROOT)) {
+        if(context.equals(MenuState.ROOT)) {
             // Close [4]
             view.addIcon(navIconEmpty(navStart));
             view.addIcon(navIconEmpty(navStart+1));
@@ -445,8 +405,8 @@ public class TownMenu implements ViewableMenu {
             view.addIcon(navIconEmpty(navStart+6));
             view.addIcon(navIconEmpty(navStart+7));
             view.addIcon(navIconEmpty(navStart+8));
-        } else if(context.equals(TownMenu.MenuState.JOIN) || context.equals(TownMenu.MenuState.LEAVE) || context.equals(TownMenu.MenuState.LIST) ||
-                context.equals(TownMenu.MenuState.INVITES) || context.equals(TownMenu.MenuState.REQUESTS)) {
+        } else if(context.equals(MenuState.JOIN) || context.equals(MenuState.LEAVE) || context.equals(MenuState.LIST) ||
+                context.equals(MenuState.INVITES) || context.equals(MenuState.REQUESTS)) {
             // (back [0]) close [4], return [5] (next [8])
             if(currentPage > 0) {
                 // Place a back button
@@ -471,23 +431,4 @@ public class TownMenu implements ViewableMenu {
         view.updateIcons();
     }
 
-    private InfoIcon navIconClose(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_CLOSE.getMessage(),Collections.emptyList(),Material.STRUCTURE_VOID,index,true);
-    }
-
-    private InfoIcon navIconBack(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_BACK.getMessage(),Collections.emptyList(),Material.ENDER_PEARL,index,true);
-    }
-
-    private InfoIcon navIconNext(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_NEXT.getMessage(),Collections.emptyList(),Material.ENDER_PEARL,index,true);
-    }
-
-    private InfoIcon navIconEmpty(int index) {
-        return new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,index,false);
-    }
-
-    private InfoIcon navIconReturn(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_RETURN.getMessage(),Collections.emptyList(),Material.FIREWORK_ROCKET,index,true);
-    }
 }
