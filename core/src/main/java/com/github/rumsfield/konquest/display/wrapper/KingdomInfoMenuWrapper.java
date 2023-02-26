@@ -2,11 +2,8 @@ package com.github.rumsfield.konquest.display.wrapper;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
-import com.github.rumsfield.konquest.display.icon.InfoIcon;
-import com.github.rumsfield.konquest.display.icon.MenuIcon;
-import com.github.rumsfield.konquest.display.icon.PlayerIcon;
+import com.github.rumsfield.konquest.display.icon.*;
 import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
-import com.github.rumsfield.konquest.display.icon.TownIcon;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
@@ -40,7 +37,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		
 		String pageLabel;
  		List<String> loreList;
- 		InfoIcon info;
+ 		MenuIcon info;
 		final int MAX_ICONS_PER_PAGE = 45;
 		int slotIndex;
 		int pageIndex = 0;
@@ -67,8 +64,6 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			KonCapital capital = infoKingdom.getCapital();
 			loreList = new ArrayList<>();
 			loreList.add(loreColor + "Capital");
-			loreList.add(loreColor + MessagePath.LABEL_POPULATION.getMessage() + ": " + valueColor + capital.getNumResidents());
-			loreList.add(loreColor + MessagePath.LABEL_LAND.getMessage() + ": " + valueColor + capital.getChunkList().size());
 			loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
 			TownIcon capitalIcon = new TownIcon(capital, kingdomColor, loreList, slotIndex, true);
 			getMenu().getPage(pageIndex).addIcon(capitalIcon);
@@ -149,13 +144,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			// TODO message paths
 			if (infoKingdom.hasMonumentTemplate()) {
 				KonMonumentTemplate template = infoKingdom.getMonumentTemplate();
-				loreList.add(loreColor + "Name" + ": " + valueColor + template.getName());
-				loreList.add(loreColor + "Critical Hits" + ": " + valueColor + template.getNumCriticals());
-				loreList.add(loreColor + "Loot Chests" + ": " + valueColor + template.getNumLootChests());
-				if (template.isBlanking()) {
-					loreList.add(ChatColor.RED + "Temporarily Disabled");
-				}
-				info = new InfoIcon(kingdomColor + "Monument Template", loreList, Material.CRAFTING_TABLE, slotIndex, false);
+				info = new TemplateIcon(template,loreList,slotIndex,false);
 			} else {
 				String invalidMessage = "Kingdom master must choose a template from the kingdom menu.";
 				for (String line : Konquest.stringPaginate(invalidMessage)) {
@@ -190,8 +179,6 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 					/* Town Icon (n) */
 					KonTown currentTown = townIter.next();
 					loreList = new ArrayList<>();
-					loreList.add(loreColor + MessagePath.LABEL_POPULATION.getMessage() + ": " + valueColor + currentTown.getNumResidents());
-					loreList.add(loreColor + MessagePath.LABEL_LAND.getMessage() + ": " + valueColor + currentTown.getChunkList().size());
 					loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
 					TownIcon townIcon = new TownIcon(currentTown, kingdomColor, loreList, slotIndex, true);
 					getMenu().getPage(pageIndex).addIcon(townIcon);

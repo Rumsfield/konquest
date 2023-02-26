@@ -261,8 +261,6 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                 /* Player Icon (n) */
                 OfflinePlayer currentPlayer = listIter.next();
                 loreList = new ArrayList<>();
-                String lastOnlineFormat = Konquest.getLastSeenFormat(currentPlayer);
-                loreList.add(loreColor+"Last Seen "+valueColor+lastOnlineFormat);
                 String townRole = town.getPlayerRoleName(currentPlayer);
                 if(!townRole.equals("")) {
                     loreList.add(townRole);

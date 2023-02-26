@@ -34,6 +34,7 @@ public class DisplayManager {
 	public static String valueFormat 		= ""+ChatColor.AQUA;
 	public static String hintFormat 		= ""+ChatColor.GOLD+ChatColor.UNDERLINE;
 	public static String propertyFormat 	= ""+ChatColor.LIGHT_PURPLE+ChatColor.ITALIC;
+	public static String alertFormat 		= ""+ChatColor.RED+ChatColor.ITALIC;
 	
 	public DisplayManager(Konquest konquest) {
 		this.konquest = konquest;

@@ -1271,6 +1271,9 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		return residentList;
 	}
 
+	public String getPlayerRoleName(KonOfflinePlayer offlinePlayer) {
+		return getPlayerRoleName(offlinePlayer.getOfflineBukkitPlayer());
+	}
 	public String getPlayerRoleName(OfflinePlayer offlinePlayer) {
 		String result = "";
 		ChatColor townRoleColor = ChatColor.LIGHT_PURPLE;

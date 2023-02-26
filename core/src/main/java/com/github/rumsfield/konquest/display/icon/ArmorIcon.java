@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonArmor;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
@@ -19,6 +20,10 @@ public class ArmorIcon implements MenuIcon {
 	private final int population;
 	private final int index;
 	ItemStack item;
+
+	private final String loreColor = DisplayManager.loreFormat;
+	private final String valueColor = DisplayManager.valueFormat;
+	private final String hintColor = DisplayManager.hintFormat;
 	
 	public ArmorIcon(KonArmor armor, boolean isAvailable, int population, int index) {
 		this.armor = armor;
@@ -47,9 +52,9 @@ public class ArmorIcon implements MenuIcon {
 		int totalCost = population * armor.getCost();
 		List<String> loreList = new ArrayList<>();
 		loreList.add(ChatColor.DARK_AQUA+""+armor.getBlocks());
-    	loreList.add(ChatColor.YELLOW+MessagePath.LABEL_COST.getMessage()+": "+ChatColor.AQUA+totalCost);
+    	loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+totalCost);
     	if(isAvailable) {
-    		loreList.add(ChatColor.GOLD+MessagePath.MENU_SHIELD_HINT.getMessage());
+    		loreList.add(hintColor+MessagePath.MENU_SHIELD_HINT.getMessage());
     	}
     	meta.setDisplayName(ChatColor.GOLD+armor.getId()+" "+MessagePath.LABEL_ARMOR.getMessage());
 		meta.setLore(loreList);

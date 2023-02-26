@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
@@ -19,6 +20,9 @@ public class UpgradeIcon implements MenuIcon{
 	int pop;
 	int index;
 	ItemStack item;
+
+	private final String loreColor = DisplayManager.loreFormat;
+	private final String valueColor = DisplayManager.valueFormat;
 	
 	public UpgradeIcon(KonUpgrade upgrade, int level, int index, int cost, int pop) {
 		this.upgrade = upgrade;
@@ -39,11 +43,11 @@ public class UpgradeIcon implements MenuIcon{
 			}
 		}
 		List<String> loreList = new ArrayList<>();
-		loreList.add(ChatColor.YELLOW+MessagePath.LABEL_LEVEL.getMessage()+" "+level);
-		loreList.add(ChatColor.YELLOW+MessagePath.LABEL_COST.getMessage()+": "+ChatColor.AQUA+cost);
-		loreList.add(ChatColor.YELLOW+MessagePath.LABEL_POPULATION.getMessage()+": "+ChatColor.AQUA+pop);
+		loreList.add(loreColor+MessagePath.LABEL_LEVEL.getMessage()+" "+level);
+		loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
+		loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+pop);
 		for(String line : Konquest.stringPaginate(upgrade.getLevelDescription(level))) {
-			loreList.add(ChatColor.RED+line);
+			loreList.add(loreColor+line);
 		}
 		meta.setDisplayName(ChatColor.GOLD+upgrade.getDescription());
 		meta.setLore(loreList);

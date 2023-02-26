@@ -36,8 +36,8 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
         int pageTotal;
 
         String titleColor = DisplayManager.titleFormat;
-        String loreColor = DisplayManager.titleFormat;
-        String valueColor = DisplayManager.titleFormat;
+        String loreColor = DisplayManager.loreFormat;
+        String valueColor = DisplayManager.valueFormat;
 
         /*
          * Display an icon for each valid monument template. Show:

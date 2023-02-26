@@ -1,11 +1,13 @@
 package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.manager.DisplayManager;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerIcon implements MenuIcon {
@@ -21,7 +23,10 @@ public class PlayerIcon implements MenuIcon {
 	private final int index;
 	private final boolean isClickable;
 	private final PlayerIconAction action;
-	
+
+	private final String loreColor = DisplayManager.loreFormat;
+	private final String valueColor = DisplayManager.valueFormat;
+
 	public PlayerIcon(String name, List<String> lore, OfflinePlayer player, int index, boolean isClickable, PlayerIconAction action) {
 		this.name = name;
 		this.lore = lore;
@@ -54,13 +59,18 @@ public class PlayerIcon implements MenuIcon {
 		ItemStack item = Konquest.getInstance().getPlayerHead(player);
 		ItemMeta meta = item.getItemMeta();
 		assert meta != null;
+		List<String> loreList = new ArrayList<>();
+		String lastOnlineFormat = Konquest.getLastSeenFormat(player);
+		//TODO KR message path
+		loreList.add(loreColor+"Last Seen "+valueColor+lastOnlineFormat);
+		loreList.addAll(lore);
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
 				meta.addItemFlags(flag);
 			}
 		}
 		meta.setDisplayName(getName());
-		meta.setLore(lore);
+		meta.setLore(loreList);
 		item.setItemMeta(meta);
 		return item;
 	}

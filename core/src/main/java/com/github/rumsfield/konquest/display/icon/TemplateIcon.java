@@ -1,6 +1,8 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonMonumentTemplate;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -16,7 +18,11 @@ public class TemplateIcon implements MenuIcon {
 	private final List<String> lore;
 	private final int index;
 	private final boolean isClickable;
-	
+
+	private final String loreColor = DisplayManager.loreFormat;
+	private final String valueColor = DisplayManager.valueFormat;
+	private final String alertColor = DisplayManager.alertFormat;
+
 	public TemplateIcon(KonMonumentTemplate template, List<String> lore, int index, boolean isClickable) {
 		this.template = template;
 		this.lore = lore;
@@ -54,10 +60,18 @@ public class TemplateIcon implements MenuIcon {
 		}
 		List<String> itemLore = new ArrayList<>();
 		//TODO: Replace with message paths
-		itemLore.add(ChatColor.YELLOW+"Critical Blocks: "+ChatColor.AQUA+template.getNumCriticals());
-		itemLore.add(ChatColor.YELLOW+"Loot Chests: "+ChatColor.AQUA+template.getNumLootChests());
+		if(template != null) {
+			itemLore.add(loreColor+"Name: "+valueColor+template.getName());
+			itemLore.add(loreColor+"Critical Hits: "+valueColor+template.getNumCriticals());
+			itemLore.add(loreColor+"Loot Chests: "+valueColor+template.getNumLootChests());
+			if(!template.isValid()) {
+				itemLore.add(alertColor + "Invalid");
+			} else if(template.isBlanking()) {
+				itemLore.add(alertColor + "Temporarily Disabled");
+			}
+		}
 		itemLore.addAll(lore);
-		meta.setDisplayName(getName());
+		meta.setDisplayName(ChatColor.GOLD+"Monument Template");
 		meta.setLore(itemLore);
 		item.setItemMeta(meta);
 		return item;

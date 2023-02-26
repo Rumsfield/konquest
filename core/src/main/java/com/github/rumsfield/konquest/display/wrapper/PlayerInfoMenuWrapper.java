@@ -93,16 +93,8 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 				/* Town Icon (n) */
 				KonTown currentTown = townIter.next();
 				loreList = new ArrayList<>();
-				if(currentTown.isPlayerLord(infoPlayer.getOfflineBukkitPlayer())) {
-					loreList.add(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage());
-				} else if(currentTown.isPlayerKnight(infoPlayer.getOfflineBukkitPlayer())) {
-					loreList.add(ChatColor.DARK_BLUE+MessagePath.LABEL_KNIGHT.getMessage());
-				} else {
-					loreList.add(loreColor+MessagePath.LABEL_RESIDENT.getMessage());
-				}
-		    	loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+currentTown.getNumResidents());
-		    	loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+currentTown.getChunkList().size());
-				loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
+				loreList.add(currentTown.getPlayerRoleName(infoPlayer));
+		    	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
 		    	TownIcon town = new TownIcon(currentTown,kingdomColor,loreList,slotIndex,true);
 		    	getMenu().getPage(pageNum).addIcon(town);
 				slotIndex++;

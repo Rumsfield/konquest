@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandType;
+import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemFlag;
@@ -18,7 +19,11 @@ public class CommandIcon implements MenuIcon{
 	private final int cost_incr;
 	private final int index;
 	private final ItemStack item;
-	
+
+	private final String loreColor = DisplayManager.loreFormat;
+	private final String valueColor = DisplayManager.valueFormat;
+	private final String hintColor = DisplayManager.hintFormat;
+
 	public CommandIcon(CommandType command, int cost, int cost_incr, int index) {
 		this.command = command;
 		this.cost = cost;
@@ -38,10 +43,10 @@ public class CommandIcon implements MenuIcon{
 		}
 		List<String> loreList = new ArrayList<>();
 		if(cost > 0) {
-			loreList.add(ChatColor.GOLD+MessagePath.LABEL_COST.getMessage()+": "+ChatColor.AQUA+cost);
+			loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
 		}
 		if(cost_incr > 0) {
-			loreList.add(ChatColor.RED+MessagePath.LABEL_INCREMENT_COST.getMessage()+": "+ChatColor.AQUA+cost_incr);
+			loreList.add(loreColor+MessagePath.LABEL_INCREMENT_COST.getMessage()+": "+valueColor+cost_incr);
 		}
 		loreList.addAll(Konquest.stringPaginate(command.description()));
 		meta.setDisplayName(ChatColor.GOLD+getName());

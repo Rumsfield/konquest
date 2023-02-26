@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
@@ -20,6 +21,11 @@ public class TownIcon implements MenuIcon {
 	private final int index;
 	private final boolean isClickable;
 	private final ItemStack item;
+
+	private final String alertColor = DisplayManager.alertFormat;
+	private final String propertyColor = DisplayManager.propertyFormat;
+	private final String loreColor = DisplayManager.loreFormat;
+	private final String valueColor = DisplayManager.valueFormat;
 	
 	public TownIcon(KonTown town, ChatColor contextColor, List<String> lore, int index, boolean isClickable) {
 		this.town = town;
@@ -37,7 +43,6 @@ public class TownIcon implements MenuIcon {
 			material = Material.RED_WOOL;
 		} else if(town.isArmored()) {
 			material = Material.STONE_BRICKS;
-			
 		}
 		ItemStack item = new ItemStack(material,1);
 		ItemMeta meta = item.getItemMeta();
@@ -45,19 +50,20 @@ public class TownIcon implements MenuIcon {
 		// Add applicable labels
 		List<String> loreList = new ArrayList<>();
 		if(town.isAttacked()) {
-			loreList.add(ChatColor.DARK_RED+""+ChatColor.ITALIC+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage());
+			loreList.add(alertColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage());
 		}
 		if(town.isOpen()) {
-			loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.LABEL_OPEN.getMessage());
+			loreList.add(propertyColor+MessagePath.LABEL_OPEN.getMessage());
 		}
 		if(town.isArmored()) {
-			loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.LABEL_ARMOR.getMessage());
+			loreList.add(propertyColor+MessagePath.LABEL_ARMOR.getMessage());
 		}
 		if(town.isShielded()) {
 			meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
-			loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.LABEL_SHIELD.getMessage());
+			loreList.add(propertyColor+MessagePath.LABEL_SHIELD.getMessage());
 		}
-		//lore.add(ChatColor.GOLD+MessagePath.MENU_SCORE_HINT.getMessage());
+		loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage() + ": " + valueColor + town.getNumResidents());
+		loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage() + ": " + valueColor + town.getChunkList().size());
 		loreList.addAll(lore);
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {

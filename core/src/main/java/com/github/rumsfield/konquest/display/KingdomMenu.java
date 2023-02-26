@@ -364,11 +364,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				} else {
 					// Invalid template, check for blanking
 					loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+"X");
-					if(template.isBlanking()) {
-						loreList.add(ChatColor.RED+"Unavailable");
-					} else {
-						loreList.add(ChatColor.RED+"Invalid");
-					}
 					isClickable = false;
 				}
 				TemplateIcon templateIcon = new TemplateIcon(template,loreList,slotIndex,isClickable);
@@ -612,8 +607,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				/* Player Icon (n) */
 				OfflinePlayer currentPlayer = listIter.next();
 				loreList = new ArrayList<>();
-				String lastOnlineFormat = Konquest.getLastSeenFormat(currentPlayer);
-				loreList.add(loreColor+"Last Seen "+valueColor+lastOnlineFormat);
 				String kingdomRole = kingdom.getPlayerRoleName(currentPlayer);
 				if(!kingdomRole.equals("")) {
 					loreList.add(kingdomRole);
