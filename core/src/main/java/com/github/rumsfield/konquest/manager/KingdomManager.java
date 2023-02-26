@@ -2107,7 +2107,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 	/*
 	 * =================================================
-	 * Town Menu Methods
+	 * Town Management Methods
 	 * =================================================
 	 */
 
@@ -2269,24 +2269,24 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 
 	// A town lord/knight invites (offline) player to join (with /town add command)
-	public boolean joinTownInvite(KonPlayer sender, OfflinePlayer invitee, KonTown town) {
+	public boolean addTownPlayer(KonPlayer sender, KonOfflinePlayer player, KonTown town) {
 		Player bukkitPlayer = sender.getBukkitPlayer();
-		UUID id = invitee.getUniqueId();
 		if(!town.isPlayerLord(bukkitPlayer) && !town.isPlayerKnight(bukkitPlayer)) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
-		KonOfflinePlayer offlinePlayer = konquest.getPlayerManager().getOfflinePlayer(invitee);
-		if(offlinePlayer == null) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(invitee.getName()));
+		if(player == null) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return false;
 		}
-		if(!offlinePlayer.getKingdom().equals(town.getKingdom())) {
+		OfflinePlayer offlinePlayer = player.getOfflineBukkitPlayer();
+		UUID id = offlinePlayer.getUniqueId();
+		if(!player.getKingdom().equals(town.getKingdom())) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
 			return false;
 		}
-		if(town.isPlayerResident(invitee)) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_ADD_RESIDENT.getMessage(invitee.getName(),town.getName()));
+		if(town.isPlayerResident(offlinePlayer)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_ADD_RESIDENT.getMessage(offlinePlayer.getName(),town.getName()));
 			return false;
 		}
 		KonPlayer onlinePlayer = konquest.getPlayerManager().getPlayerFromID(id);
@@ -2295,7 +2295,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Otherwise create join invite
 		if(town.isJoinInviteValid(id)) {
 			// There is already a join invite for this player
-			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_ADD_INVITE_RESIDENT.getMessage(invitee.getName(),town.getName()));
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_ADD_INVITE_RESIDENT.getMessage(offlinePlayer.getName(),town.getName()));
 			if(onlinePlayer != null) {
 				ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_ADD_INVITE_REMINDER.getMessage(town.getName()));
 			}
@@ -2305,10 +2305,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				// This player has already requested to join, add them
 				town.removeJoinRequest(id);
 				// Add the player as a resident
-				if(town.addPlayerResident(offlinePlayer.getOfflineBukkitPlayer(),false)) {
+				if(town.addPlayerResident(offlinePlayer,false)) {
 					for(OfflinePlayer resident : town.getPlayerResidents()) {
 						if(resident.isOnline()) {
-							ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_ADD_SUCCESS.getMessage(invitee.getName(),town.getName()));
+							ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_ADD_SUCCESS.getMessage(offlinePlayer.getName(),town.getName()));
 						}
 					}
 					if(onlinePlayer != null) {
@@ -2317,12 +2317,53 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				}
 			} else {
 				// Create a new join invite
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_ADD_INVITE.getMessage(invitee.getName(),town.getName()));
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_ADD_INVITE.getMessage(offlinePlayer.getName(),town.getName()));
 				town.addJoinRequest(id, true);
 				if(onlinePlayer != null) {
 					ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_ADD_INVITE_PLAYER.getMessage(town.getName(),town.getName(),town.getName()));
 				}
 			}
+		}
+		return true;
+	}
+
+	// A town lord/knight kicks (offline) player (with /town kick command)
+	public boolean kickTownPlayer(KonPlayer sender, KonOfflinePlayer player, KonTown town) {
+		Player bukkitPlayer = sender.getBukkitPlayer();
+		if(!town.isPlayerLord(bukkitPlayer) && !town.isPlayerKnight(bukkitPlayer)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		if(player == null) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return false;
+		}
+		OfflinePlayer offlinePlayer = player.getOfflineBukkitPlayer();
+		// Check for existing resident
+		if(!town.isPlayerResident(offlinePlayer)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_KICK_FAIL.getMessage(offlinePlayer.getName(),town.getName()));
+			return false;
+		}
+		// Prevent kicking the town lord
+		if(town.isPlayerLord(player.getOfflineBukkitPlayer())) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		UUID id = offlinePlayer.getUniqueId();
+		KonPlayer onlinePlayer = konquest.getPlayerManager().getPlayerFromID(offlinePlayer.getUniqueId());
+		// Attempt to kick current resident
+		if(town.removePlayerResident(offlinePlayer)) {
+			town.removeJoinRequest(id);
+			for(OfflinePlayer resident : town.getPlayerResidents()) {
+				if(resident.isOnline()) {
+					ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_KICK_RESIDENT.getMessage(offlinePlayer.getName(),town.getName()));
+				}
+			}
+			if(onlinePlayer != null) {
+				updatePlayerMembershipStats(onlinePlayer);
+			}
+		} else {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_KICK_FAIL.getMessage(offlinePlayer.getName(),town.getName()));
 		}
 		return true;
 	}
@@ -2436,6 +2477,55 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return true;
 	}
+
+	// An online player tries to become lord of an abandoned town
+	public boolean lordTownTakeover(KonPlayer player, KonTown town) {
+		Player bukkitPlayer = player.getBukkitPlayer();
+		// Verify conditions for takeover
+		if(town.isLordValid()) {
+			// Lord exists, cannot take over town
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		} else {
+			// Lord does not exist
+			if(!town.isOpen()) {
+				// Check player roles in closed towns only, allow any member to claim lordship in open towns
+				if(!town.getPlayerKnights().isEmpty()) {
+					// Elite residents exist, permit access to them
+					if(!town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
+						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+						return false;
+					}
+				} else {
+					// No Elite residents exist
+					if(!town.getPlayerResidents().isEmpty()) {
+						// Residents for this town exist, permit access to them
+						if(!town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+							return false;
+						}
+					} else {
+						// No residents exist, permit access to any Kingdom member
+						if(!town.getKingdom().equals(player.getKingdom())) {
+							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_ENEMY_TOWN.getMessage());
+							return false;
+						}
+					}
+				}
+			}
+		}
+		// At this point, the player may take over the town as lord
+		town.setPlayerLord(bukkitPlayer);
+		town.removeJoinRequest(bukkitPlayer.getUniqueId());
+		for(OfflinePlayer resident : town.getPlayerResidents()) {
+			if(resident.isOnline()) {
+				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_LORD_CLAIM.getMessage(bukkitPlayer.getName(),town.getName()));
+			}
+		}
+		updatePlayerMembershipStats(player);
+		return true;
+	}
+
 	/*
 	 * More methods... (a lot more)
 	 */

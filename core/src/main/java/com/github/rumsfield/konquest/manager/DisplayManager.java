@@ -179,88 +179,7 @@ public class DisplayManager {
 		// Display menu
 		showMenuWrapper(bukkitPlayer,wrapper);
 	}
-	
-	/*
-	 * ===============================================
-	 * Town Management Menus
-	 * ===============================================
-	 */
-	public void displayTownManagementMenu(KonPlayer displayPlayer, KonTown town, boolean isAdmin) {
-   		playMenuOpenSound(displayPlayer.getBukkitPlayer());
- 		// Create menu
-   		TownManagementMenuWrapper wrapper = new TownManagementMenuWrapper(konquest, town, displayPlayer, isAdmin);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(displayPlayer.getBukkitPlayer(),wrapper);
-   	}
-	
-	public void displayTownUpgradeMenu(Player bukkitPlayer, KonTown town) {
-		playMenuOpenSound(bukkitPlayer);
-		// Create menu
-		TownUpgradeMenuWrapper wrapper = new TownUpgradeMenuWrapper(konquest, town);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
-	}
-	
-	public void displayTownShieldMenu(Player bukkitPlayer, KonTown town) {
-		// Verify either shields or armors are enabled
-    	boolean isShieldsEnabled = konquest.getShieldManager().isShieldsEnabled();
-    	boolean isArmorsEnabled = konquest.getShieldManager().isArmorsEnabled();
-    	if(!isShieldsEnabled && !isArmorsEnabled) {
-    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
-		} else {
-    		// Open the menu
-    		playMenuOpenSound(bukkitPlayer);
-    		// Create menu
-    		TownShieldMenuWrapper wrapper = new TownShieldMenuWrapper(konquest, town);
-    		wrapper.constructMenu();
-    		// Display menu
-    		showMenuWrapper(bukkitPlayer,wrapper);
-    	}
-	}
 
-	public void displayTownOptionsMenu(Player bukkitPlayer, KonTown town) {
-		playMenuOpenSound(bukkitPlayer);
-		// Create menu
-		TownOptionsMenuWrapper wrapper = new TownOptionsMenuWrapper(konquest, town);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
-	}
-	
-	public void displayPlotMenu(Player bukkitPlayer, KonTown town) {
-		// Verify plots are enabled
-    	boolean isPlotsEnabled = konquest.getPlotManager().isEnabled();
-    	if(!isPlotsEnabled) {
-    		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
-		} else {
-    		// Open the menu
-    		playMenuOpenSound(bukkitPlayer);
-    		int maxSize = konquest.getPlotManager().getMaxSize();
-    		PlotMenu newMenu = new PlotMenu(town, bukkitPlayer, maxSize);
-    		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
-    		// Schedule delayed task to display inventory to player
-    		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(),
-					() -> bukkitPlayer.openInventory(newMenu.getCurrentView().getInventory()),1);
-    	}
-	}
-
-	public void displayTownSpecializationMenu(Player bukkitPlayer, KonTown town, boolean isAdmin) {
-		// Verify trade specializations are enabled
-		boolean isSpecialEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath());
-		if(!isSpecialEnabled) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
-		} else {
-			playMenuOpenSound(bukkitPlayer);
-			// Create menu
-			TownSpecializationMenuWrapper wrapper = new TownSpecializationMenuWrapper(konquest, town, isAdmin);
-			wrapper.constructMenu();
-			// Display menu
-			showMenuWrapper(bukkitPlayer,wrapper);
-		}
-	}
-	
 	/*
 	 * ===============================================
 	 * Score Menu
@@ -351,6 +270,44 @@ public class DisplayManager {
 		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), () -> displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentView().getInventory()),1);
+	}
+
+	/*
+	 * ===============================================
+	 * Town Menus
+	 * ===============================================
+	 */
+	public void displayTownMenu(KonPlayer displayPlayer) {
+		playMenuOpenSound(displayPlayer.getBukkitPlayer());
+		TownMenu newMenu = new TownMenu(konquest, displayPlayer);
+		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
+		// Schedule delayed task to display inventory to player
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), () -> displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentView().getInventory()),1);
+	}
+
+	public void displayTownManagementMenu(KonPlayer displayPlayer, KonTown town, boolean isAdmin) {
+		playMenuOpenSound(displayPlayer.getBukkitPlayer());
+		TownManagementMenu newMenu = new TownManagementMenu(konquest, displayPlayer, town, isAdmin);
+		stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
+		// Schedule delayed task to display inventory to player
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), () -> displayPlayer.getBukkitPlayer().openInventory(newMenu.getCurrentView().getInventory()),1);
+	}
+
+	public void displayPlotMenu(Player bukkitPlayer, KonTown town) {
+		// Verify plots are enabled
+		boolean isPlotsEnabled = konquest.getPlotManager().isEnabled();
+		if(!isPlotsEnabled) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+		} else {
+			// Open the menu
+			playMenuOpenSound(bukkitPlayer);
+			int maxSize = konquest.getPlotManager().getMaxSize();
+			PlotMenu newMenu = new PlotMenu(town, bukkitPlayer, maxSize);
+			stateMenus.put(newMenu.getCurrentView().getInventory(), newMenu);
+			// Schedule delayed task to display inventory to player
+			Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(),
+					() -> bukkitPlayer.openInventory(newMenu.getCurrentView().getInventory()),1);
+		}
 	}
    	
    	/*

@@ -152,7 +152,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
         List<KonTown> towns = new ArrayList<>();
 
         // Determine list of towns given context
-        if(context.equals(TownMenu.MenuState.JOIN)) {
+        if(context.equals(MenuState.JOIN)) {
             // List of all valid towns able to join (sends request)
             for(KonTown town : kingdom.getTowns()) {
                 if(!town.isPlayerResident(player.getOfflineBukkitPlayer())) {
@@ -162,7 +162,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
             loreHintStr1 = "Click to request";
             loreHintStr2 = "Click to join";
             isClickable = true;
-        } else if(context.equals(TownMenu.MenuState.LEAVE)) {
+        } else if(context.equals(MenuState.LEAVE)) {
             // List of towns that the player can leave
             for(KonTown town : kingdom.getTowns()) {
                 if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
@@ -171,16 +171,18 @@ public class TownMenu extends StateMenu implements ViewableMenu {
             }
             loreHintStr1 = "Click to leave";
             isClickable = true;
-        } else if(context.equals(TownMenu.MenuState.LIST)) {
+        } else if(context.equals(MenuState.LIST)) {
             // List of all towns
             towns.addAll(kingdom.getTowns());
-        } else if(context.equals(TownMenu.MenuState.INVITES)) {
+            loreHintStr1 = "Click to view";
+            isClickable = true;
+        } else if(context.equals(MenuState.INVITES)) {
             // Towns that have invited the player to join as a resident
             towns.addAll(manager.getInviteTowns(player));
             loreHintStr1 = "Left-click to accept";
             loreHintStr2 = "Right-click to decline";
             isClickable = true;
-        } else if(context.equals(TownMenu.MenuState.REQUESTS)) {
+        } else if(context.equals(MenuState.REQUESTS)) {
             // Towns with pending resident join requests
             towns.addAll(manager.getRequestTowns(player));
             loreHintStr1 = "Click to manage";
@@ -282,14 +284,8 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                         TownIcon icon = (TownIcon)clickedIcon;
                         KonTown clickTown = icon.getTown();
                         boolean status = manager.menuJoinTownRequest(player, clickTown);
-                        if(status) {
-                            // Successful response
-                            Konquest.playSuccessSound(player.getBukkitPlayer());
-                            result = goToTownView(MenuState.JOIN);
-                        } else {
-                            // Something went wrong
-                            Konquest.playFailSound(player.getBukkitPlayer());
-                        }
+                        playStatusSound(player.getBukkitPlayer(),status);
+                        result = goToTownView(MenuState.JOIN);
                     }
                     break;
                 case LEAVE:
@@ -298,19 +294,17 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                         TownIcon icon = (TownIcon)clickedIcon;
                         KonTown clickTown = icon.getTown();
                         boolean status = manager.menuLeaveTown(player, clickTown);
-                        if(status) {
-                            // Successful response
-                            Konquest.playSuccessSound(player.getBukkitPlayer());
-                            result = goToTownView(MenuState.LEAVE);
-                        } else {
-                            // Something went wrong
-                            Konquest.playFailSound(player.getBukkitPlayer());
-                        }
+                        playStatusSound(player.getBukkitPlayer(),status);
+                        result = goToTownView(MenuState.LEAVE);
                     }
                     break;
                 case LIST:
-                    // Do nothing for now
-                    //TODO open a town info menu?
+                    // Clicking opens a town info menu
+                    if(clickedIcon instanceof TownIcon) {
+                        TownIcon icon = (TownIcon)clickedIcon;
+                        KonTown clickTown = icon.getTown();
+                        konquest.getDisplayManager().displayTownInfoMenu(player, clickTown);
+                    }
                     break;
                 case INVITES:
                     // Clicking accepts or denies a town residence invite
@@ -318,14 +312,8 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                         TownIcon icon = (TownIcon)clickedIcon;
                         KonTown clickTown = icon.getTown();
                         boolean status = manager.menuRespondTownInvite(player, clickTown, clickType);
-                        if(status) {
-                            // Successful response
-                            Konquest.playSuccessSound(player.getBukkitPlayer());
-                            result = goToTownView(MenuState.INVITES);
-                        } else {
-                            // Something went wrong
-                            Konquest.playFailSound(player.getBukkitPlayer());
-                        }
+                        playStatusSound(player.getBukkitPlayer(),status);
+                        result = goToTownView(MenuState.INVITES);
                     }
                     break;
                 case REQUESTS:
@@ -333,7 +321,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                     if(clickedIcon instanceof TownIcon) {
                         TownIcon icon = (TownIcon)clickedIcon;
                         KonTown clickTown = icon.getTown();
-                        //TODO: open management menu
+                        konquest.getDisplayManager().displayTownManagementMenu(player,clickTown,false);
                     }
                     break;
                 default:
