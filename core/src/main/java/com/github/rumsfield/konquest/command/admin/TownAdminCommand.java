@@ -32,7 +32,7 @@ public class TownAdminCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		// k admin town create|destroy|add|kick|lord|knight|rename|upgrade|shield|armor|plots|options <town> [<name>] [<arg>]
+		// k admin town create|destroy|add|kick|rename|upgrade|shield|armor|plots|options|specialize <town> [<name>] [<arg>]
 		if (getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		} else {
@@ -90,7 +90,7 @@ public class TownAdminCommand extends CommandBase {
             		return;
             	}
         		// Directly open options menu
-        		getKonquest().getDisplayManager().displayTownOptionsMenu((Player) getSender(), town);
+        		getKonquest().getDisplayManager().displayTownOptionsMenu(bukkitPlayer, town);
         		break;
         		
         	case "plots":
@@ -100,7 +100,7 @@ public class TownAdminCommand extends CommandBase {
             		return;
             	}
         		// Directly open plots menu
-	        	getKonquest().getDisplayManager().displayPlotMenu((Player) getSender(), town);
+	        	getKonquest().getDisplayManager().displayTownPlotMenu(bukkitPlayer, town);
         		break;
 
 			case "specialize":
@@ -110,7 +110,7 @@ public class TownAdminCommand extends CommandBase {
 					return;
 				}
 				// Directly open specialize menu
-				getKonquest().getDisplayManager().displayTownSpecializationMenu((Player) getSender(), town, true);
+				getKonquest().getDisplayManager().displayTownSpecializationMenu(bukkitPlayer, town, true);
 				break;
 
         	case "create":
@@ -200,7 +200,7 @@ public class TownAdminCommand extends CommandBase {
 			    }
         		break;
         		
-        	case "remove":
+        	case "destroy":
         		if (getArgs().length == 5) {
 					String kingdomName = getArgs()[4];
 					// Verify kingdom name up-front
@@ -511,6 +511,7 @@ public class TownAdminCommand extends CommandBase {
 			tabList.add("armor");
 			tabList.add("plots");
 			tabList.add("options");
+			tabList.add("specialize");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
@@ -520,7 +521,7 @@ public class TownAdminCommand extends CommandBase {
 			if(subCommand.equalsIgnoreCase("create")) {
 				// Suggest new name
 				tabList.add("***");
-			} else if(subCommand.equalsIgnoreCase("remove")) {
+			} else if(subCommand.equalsIgnoreCase("destroy")) {
 				// Suggest existing town names only
 				tabList.addAll(getKonquest().getKingdomManager().getTownNames());
 			} else {
@@ -547,7 +548,7 @@ public class TownAdminCommand extends CommandBase {
 					}
 				}
 				tabList.addAll(playerList);
-			} else if(subCommand.equalsIgnoreCase("create") || subCommand.equalsIgnoreCase("remove")) {
+			} else if(subCommand.equalsIgnoreCase("create") || subCommand.equalsIgnoreCase("destroy")) {
 				// Kingdom name
 				tabList.addAll(getKonquest().getKingdomManager().getKingdomNames());
 			} else if(subCommand.equalsIgnoreCase("rename")) {

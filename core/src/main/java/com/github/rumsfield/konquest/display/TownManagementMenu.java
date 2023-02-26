@@ -532,7 +532,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
 
                     } else if(slot == ROOT_SLOT_PLOTS) {
                         // Open the plots menu
-                        konquest.getDisplayManager().displayPlotMenu(player.getBukkitPlayer(),town);
+                        konquest.getDisplayManager().displayTownPlotMenu(player.getBukkitPlayer(),town);
                         // Return null result to close this menu
 
                     } else if(slot == ROOT_SLOT_SHIELD) {
