@@ -28,10 +28,10 @@ public class TownOptionsMenuWrapper extends MenuWrapper {
 		OptionIcon option;
 		ArrayList<String> loreList;
 		String currentValue;
-		ChatColor titleColor = DisplayManager.titleColor;
-		ChatColor loreColor = DisplayManager.loreColor;
-		ChatColor valueColor = DisplayManager.valueColor;
-		ChatColor hintColor = DisplayManager.hintColor;
+		String titleColor = DisplayManager.titleFormat;
+		String loreColor = DisplayManager.loreFormat;
+		String valueColor = DisplayManager.valueFormat;
+		String hintColor = DisplayManager.hintFormat;
 		
 		// Page 0
 		String pageLabel = titleColor+town.getName()+" "+MessagePath.LABEL_OPTIONS.getMessage();

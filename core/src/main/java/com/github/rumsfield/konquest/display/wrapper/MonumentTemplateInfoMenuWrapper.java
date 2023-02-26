@@ -35,9 +35,9 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
         final int MAX_ICONS_PER_PAGE = 45;
         int pageTotal;
 
-        ChatColor titleColor = DisplayManager.titleColor;
-        ChatColor loreColor = DisplayManager.loreColor;
-        ChatColor valueColor = DisplayManager.valueColor;
+        String titleColor = DisplayManager.titleFormat;
+        String loreColor = DisplayManager.titleFormat;
+        String valueColor = DisplayManager.titleFormat;
 
         /*
          * Display an icon for each valid monument template. Show:

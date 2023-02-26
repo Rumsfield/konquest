@@ -25,7 +25,7 @@ public class TownUpgradeMenuWrapper extends MenuWrapper {
 
 	@Override
 	public void constructMenu() {
-		ChatColor titleColor = DisplayManager.titleColor;
+		String titleColor = DisplayManager.titleFormat;
 		// Page 0
 		String pageLabel = titleColor+MessagePath.MENU_UPGRADE_TITLE.getMessage();
 		getMenu().addPage(0, 1, pageLabel);

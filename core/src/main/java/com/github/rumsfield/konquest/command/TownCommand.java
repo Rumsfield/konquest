@@ -199,11 +199,12 @@ public class TownCommand extends CommandBase {
 						return;
 					}
 					// Rename the town
-					boolean success = getKonquest().getKingdomManager().renameTown(town.getName(), newTownName, town.getKingdom().getName());
+					String oldTownName = town.getName();
+					boolean success = getKonquest().getKingdomManager().renameTown(oldTownName, newTownName, town.getKingdom().getName());
 					if(success) {
 						for(OfflinePlayer resident : town.getPlayerResidents()) {
 							if(resident.isOnline()) {
-								ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_RENAME.getMessage(bukkitPlayer.getName(),town.getName(),newTownName));
+								ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_RENAME.getMessage(bukkitPlayer.getName(),oldTownName,newTownName));
 							}
 						}
 						// Withdraw cost from player

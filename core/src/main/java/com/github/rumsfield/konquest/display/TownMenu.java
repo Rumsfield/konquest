@@ -27,13 +27,13 @@ public class TownMenu extends StateMenu implements ViewableMenu {
     /* Icon slot indexes */
     private final int ROOT_SLOT_JOIN 			= 0;
     private final int ROOT_SLOT_LEAVE 			= 2;
-    private final int ROOT_SLOT_INVITES 		= 4;
-    private final int ROOT_SLOT_LIST 			= 6;
-    private final int ROOT_SLOT_REQUESTS 		= 8;
+    private final int ROOT_SLOT_REQUESTS 		= 4;
+    private final int ROOT_SLOT_INVITES 		= 6;
+    private final int ROOT_SLOT_LIST 			= 8;
 
-    private final ChatColor loreColor = DisplayManager.loreColor;
-    private final ChatColor valueColor = DisplayManager.valueColor;
-    private final ChatColor hintColor = DisplayManager.hintColor;
+    private final String loreColor = DisplayManager.loreFormat;
+    private final String valueColor = DisplayManager.valueFormat;
+    private final String hintColor = DisplayManager.hintFormat;
 
     private final KingdomManager manager;
     private final KonPlayer player;
@@ -81,8 +81,8 @@ public class TownMenu extends StateMenu implements ViewableMenu {
 
         /* Root View */
         renderView = createRootView();
-        views.put(TownMenu.MenuState.ROOT, renderView);
-        refreshNavigationButtons(TownMenu.MenuState.ROOT);
+        views.put(MenuState.ROOT, renderView);
+        refreshNavigationButtons(MenuState.ROOT);
 
     }
 
@@ -95,7 +95,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
 
         final int rows = 1;
 
-        result = new DisplayMenu(rows, getTitle(TownMenu.MenuState.ROOT));
+        result = new DisplayMenu(rows+1, getTitle(TownMenu.MenuState.ROOT));
 
         /* Join Icon */
         loreList.add(loreColor+"Join a new town");
@@ -173,6 +173,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
             isClickable = true;
         } else if(context.equals(MenuState.LIST)) {
             // List of all towns
+            towns.add(kingdom.getCapital());
             towns.addAll(kingdom.getTowns());
             loreHintStr1 = "Click to view";
             isClickable = true;

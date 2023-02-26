@@ -29,10 +29,11 @@ public class DisplayManager {
 	private final HashMap<Inventory, ViewableMenu> stateMenus;
 	private final HashSet<Player> playerViewerCache;
 	
-	public static ChatColor titleColor = ChatColor.BLACK;
-	public static ChatColor loreColor = ChatColor.YELLOW;
-	public static ChatColor valueColor = ChatColor.AQUA;
-	public static ChatColor hintColor = ChatColor.GOLD;
+	public static String titleFormat 		= ""+ChatColor.BLACK;
+	public static String loreFormat 		= ""+ChatColor.YELLOW;
+	public static String valueFormat 		= ""+ChatColor.AQUA;
+	public static String hintFormat 		= ""+ChatColor.GOLD+ChatColor.UNDERLINE;
+	public static String propertyFormat 	= ""+ChatColor.LIGHT_PURPLE+ChatColor.ITALIC;
 	
 	public DisplayManager(Konquest konquest) {
 		this.konquest = konquest;

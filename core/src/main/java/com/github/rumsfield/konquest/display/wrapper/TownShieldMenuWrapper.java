@@ -28,7 +28,7 @@ public class TownShieldMenuWrapper extends MenuWrapper {
 	@Override
 	public void constructMenu() {
 		String pageLabel;
-		ChatColor titleColor = DisplayManager.titleColor;
+		String titleColor = DisplayManager.titleFormat;
 		int pageTotal;
 		final int MAX_ICONS_PER_PAGE = 45;
 		

@@ -44,10 +44,10 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		int pageTotal;
 		
 		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer, infoTown);
- 		ChatColor titleColor = DisplayManager.titleColor;
-		ChatColor loreColor = DisplayManager.loreColor;
-		ChatColor valueColor = DisplayManager.valueColor;
-		ChatColor hintColor = DisplayManager.hintColor;
+ 		String titleColor = DisplayManager.titleFormat;
+		String loreColor = DisplayManager.loreFormat;
+		String valueColor = DisplayManager.valueFormat;
+		String hintColor = DisplayManager.hintFormat;
 		
 		List<OfflinePlayer> townKnights = new ArrayList<>();
 		List<OfflinePlayer> townResidents = new ArrayList<>();
@@ -64,7 +64,8 @@ public class TownInfoMenuWrapper extends MenuWrapper {
  		// Page 0
 		pageLabel = titleColor+MessagePath.COMMAND_INFO_NOTICE_TOWN_HEADER.getMessage(infoTown.getName());
 		getMenu().addPage(0, 1, pageLabel);
-		/* Kingdom Info Icon (0) */
+
+		/* Kingdom Info Icon (1) */
 		int numKingdomPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(infoTown.getKingdom()).size();
     	int numAllKingdomPlayers = getKonquest().getPlayerManager().getAllPlayersInKingdom(infoTown.getKingdom()).size();
     	loreList = new ArrayList<>();
@@ -73,7 +74,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
     		loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.LABEL_PROTECTED.getMessage());
     	}
     	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
-    	KingdomIcon kingdom = new KingdomIcon(infoTown.getKingdom(),kingdomColor,loreList,0,false);
+    	KingdomIcon kingdom = new KingdomIcon(infoTown.getKingdom(),kingdomColor,loreList,1,false);
     	getMenu().getPage(0).addIcon(kingdom);
 
 		/* Lord Player Info Icon (2) */
@@ -92,21 +93,8 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			info = new InfoIcon(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage(),loreList,Material.BARRIER,2,false);
 			getMenu().getPage(0).addIcon(info);
 		}
-		/* Invites Info Icon (3) */
-		loreList = new ArrayList<>();
-		for(OfflinePlayer invitee : infoTown.getJoinInvites()) {
-			loreList.add(loreColor+invitee.getName());
-		}
-		info = new InfoIcon(kingdomColor+MessagePath.LABEL_INVITES.getMessage(),loreList,Material.DIAMOND,3,false);
-		getMenu().getPage(0).addIcon(info);
-		/* Requests Info Icon (4) */
-		loreList = new ArrayList<>();
-		for(OfflinePlayer requestee : infoTown.getJoinRequests()) {
-			loreList.add(loreColor+requestee.getName());
-		}
-		info = new InfoIcon(kingdomColor+MessagePath.LABEL_REQUESTS.getMessage(),loreList,Material.EMERALD,4,false);
-		getMenu().getPage(0).addIcon(info);
-		/* Properties Info Icon (5) */
+
+		/* Properties Info Icon (4) */
     	String isOpen = DisplayManager.boolean2Symbol(infoTown.isOpen());
     	String isPlotOnly = DisplayManager.boolean2Symbol(infoTown.isPlotOnly());
     	String isRedstone = DisplayManager.boolean2Symbol(infoTown.isEnemyRedstoneAllowed());
@@ -126,8 +114,9 @@ public class TownInfoMenuWrapper extends MenuWrapper {
     	loreList.add(loreColor+MessagePath.LABEL_SHIELD.getMessage()+": "+isShielded);
     	loreList.add(loreColor+MessagePath.LABEL_ARMOR.getMessage()+": "+isArmored);
     	loreList.add(loreColor+MessagePath.LABEL_PROTECTED.getMessage()+": "+isProtected);
-    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, 5, false);
+    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, 4, false);
     	getMenu().getPage(0).addIcon(info);
+
 		/* Stats Info Icon (6) */
 		int maxCriticalHits = getKonquest().getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
 		int townHealth = maxCriticalHits - infoTown.getMonument().getCriticalHits();

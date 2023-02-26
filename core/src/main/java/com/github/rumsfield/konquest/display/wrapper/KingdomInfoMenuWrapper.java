@@ -33,10 +33,10 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 	public void constructMenu() {
 		
 		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer.getKingdom(), infoKingdom);
-		ChatColor titleColor = DisplayManager.titleColor;
-		ChatColor loreColor = DisplayManager.loreColor;
-		ChatColor valueColor = DisplayManager.valueColor;
-		ChatColor hintColor = DisplayManager.hintColor;
+		String titleColor = DisplayManager.titleFormat;
+		String loreColor = DisplayManager.titleFormat;
+		String valueColor = DisplayManager.titleFormat;
+		String hintColor = DisplayManager.titleFormat;
 		
 		String pageLabel;
  		List<String> loreList;

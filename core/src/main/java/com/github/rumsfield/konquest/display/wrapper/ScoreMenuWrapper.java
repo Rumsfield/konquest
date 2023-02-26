@@ -40,10 +40,10 @@ public class ScoreMenuWrapper extends MenuWrapper {
 		InfoIcon info;
 
 		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer, scorePlayer);
-		ChatColor titleColor = DisplayManager.titleColor;
-		ChatColor loreColor = DisplayManager.loreColor;
-		ChatColor valueColor = DisplayManager.valueColor;
-		ChatColor hintColor = DisplayManager.hintColor;
+		String titleColor = DisplayManager.titleFormat;
+		String loreColor = DisplayManager.loreFormat;
+		String valueColor = DisplayManager.valueFormat;
+		String hintColor = DisplayManager.hintFormat;
 		
 		// Page 0
 		pageLabel = titleColor+scorePlayer.getOfflineBukkitPlayer().getName()+" "+MessagePath.LABEL_SCORE.getMessage()+": "+playerScore;

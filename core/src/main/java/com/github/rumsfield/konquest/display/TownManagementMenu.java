@@ -50,9 +50,9 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
     private final int ROOT_SLOT_OPTIONS 		= 15;
     private final int ROOT_SLOT_SPECIALIZATION	= 16;
 
-    private final ChatColor loreColor = DisplayManager.loreColor;
-    private final ChatColor valueColor = DisplayManager.valueColor;
-    private final ChatColor hintColor = DisplayManager.hintColor;
+    private final String loreColor = DisplayManager.loreFormat;
+    private final String valueColor = DisplayManager.loreFormat;
+    private final String hintColor = DisplayManager.loreFormat;
 
     private final KingdomManager manager;
     private final KonPlayer player;
@@ -103,14 +103,13 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         List<String> loreList = new ArrayList<>();
         ChatColor officerColor = ChatColor.BLUE;
         ChatColor masterColor = ChatColor.LIGHT_PURPLE;
-        ChatColor kingdomColor = konquest.getDisplayPrimaryColor(player.getKingdom(), town.getKingdom());
 
         int rows = 1;
         if(menuAccess.equals(AccessType.LORD)) {
             rows = 2;
         }
 
-        result = new DisplayMenu(rows, getTitle(MenuState.ROOT));
+        result = new DisplayMenu(rows+1, getTitle(MenuState.ROOT));
 
         if(menuAccess.equals(AccessType.DEFAULT)) {
             // Invalid access, error icon
@@ -199,13 +198,14 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
 
                 /* Specialization Icon */
                 loreList.clear();
+                loreList.add(loreColor+"Current: "+valueColor+town.getSpecialization().name());
                 loreList.add(loreColor+"Choose a trade specialization.");
                 boolean isSpecializationClickable = true;
                 if(!konquest.getKingdomManager().getIsDiscountEnable()) {
                     isSpecializationClickable = false;
                     loreList.add(ChatColor.RED+"Disabled");
                 }
-                icon = new InfoIcon(masterColor+"Specialization", loreList, Material.LECTERN, ROOT_SLOT_SPECIALIZATION, isSpecializationClickable);
+                icon = new InfoIcon(masterColor+"Specialization", loreList, Material.EMERALD, ROOT_SLOT_SPECIALIZATION, isSpecializationClickable);
                 result.addIcon(icon);
             }
         }
@@ -273,7 +273,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                 if(!loreHintStr2.equals("")) {
                     loreList.add(hintColor+loreHintStr2);
                 }
-                PlayerIcon playerIcon = new PlayerIcon(ChatColor.BOLD+currentPlayer.getName(),loreList,currentPlayer,slotIndex,isClickable,iconAction);
+                PlayerIcon playerIcon = new PlayerIcon(ChatColor.GREEN+currentPlayer.getName(),loreList,currentPlayer,slotIndex,isClickable,iconAction);
                 pages.get(pageNum).addIcon(playerIcon);
                 slotIndex++;
             }
@@ -288,7 +288,6 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         pages.clear();
         currentPage = 0;
         String pageLabel;
-        ChatColor titleColor = DisplayManager.titleColor;
 
         boolean isShieldsEnabled = konquest.getShieldManager().isShieldsEnabled();
         if(!isShieldsEnabled) {
@@ -302,7 +301,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         ListIterator<KonShield> shieldIter = allShields.listIterator();
         for(int i = 0; i < pageTotal; i++) {
             int pageRows = getNumPageRows(allShields.size(), i);
-            pageLabel = titleColor+town.getName()+" "+MessagePath.LABEL_SHIELDS.getMessage()+" "+(i+1)+"/"+pageTotal;
+            pageLabel = getTitle(MenuState.A_SHIELD)+" "+(i+1)+"/"+pageTotal;
             pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
             int slotIndex = 0;
             while(slotIndex < MAX_ICONS_PER_PAGE && shieldIter.hasNext()) {
@@ -323,7 +322,6 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         pages.clear();
         currentPage = 0;
         String pageLabel;
-        ChatColor titleColor = DisplayManager.titleColor;
 
         boolean isArmorsEnabled = konquest.getShieldManager().isArmorsEnabled();
         if(!isArmorsEnabled) {
@@ -337,7 +335,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         ListIterator<KonArmor> armorIter = allArmors.listIterator();
         for(int i = 0; i < pageTotal; i++) {
             int pageRows = getNumPageRows(allArmors.size(), i);
-            pageLabel = titleColor+town.getName()+" "+MessagePath.LABEL_ARMORS.getMessage()+" "+(i+1)+"/"+pageTotal;
+            pageLabel = getTitle(MenuState.A_ARMOR)+" "+(i+1)+"/"+pageTotal;
             pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
             int slotIndex = 0;
             while(slotIndex < MAX_ICONS_PER_PAGE && armorIter.hasNext()) {
@@ -358,7 +356,6 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         pages.clear();
         currentPage = 0;
         String pageLabel;
-        ChatColor titleColor = DisplayManager.titleColor;
 
         boolean isUpgradesEnabled = konquest.getUpgradeManager().isEnabled();
         if(!isUpgradesEnabled) {
@@ -379,7 +376,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         ListIterator<KonUpgrade> upgradeIter = allUpgrades.listIterator();
         for(int i = 0; i < pageTotal; i++) {
             int pageRows = getNumPageRows(allUpgrades.size(), i);
-            pageLabel = titleColor+town.getName()+" "+MessagePath.MENU_UPGRADE_TITLE.getMessage()+" "+(i+1)+"/"+pageTotal;
+            pageLabel = getTitle(MenuState.B_UPGRADES)+" "+(i+1)+"/"+pageTotal;
             pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
             int slotIndex = 0;
             while(slotIndex < MAX_ICONS_PER_PAGE && upgradeIter.hasNext()) {
@@ -406,13 +403,9 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         ArrayList<String> loreList;
         String currentValue;
         String pageLabel;
-        ChatColor titleColor = DisplayManager.titleColor;
-        ChatColor loreColor = DisplayManager.loreColor;
-        ChatColor valueColor = DisplayManager.valueColor;
-        ChatColor hintColor = DisplayManager.hintColor;
 
         // Page 0
-        pageLabel = titleColor+town.getName()+" "+MessagePath.LABEL_OPTIONS.getMessage();
+        pageLabel = getTitle(MenuState.B_OPTIONS);
         int pageNum = 0;
         int pageRows = 1;
         pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
@@ -458,10 +451,6 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         pages.clear();
         currentPage = 0;
         String pageLabel;
-        ChatColor titleColor = DisplayManager.titleColor;
-        ChatColor loreColor = DisplayManager.loreColor;
-        ChatColor valueColor = DisplayManager.valueColor;
-        ChatColor hintColor = DisplayManager.hintColor;
 
         boolean isSpecializationEnabled = konquest.getKingdomManager().getIsDiscountEnable();
         if(!isSpecializationEnabled) {
@@ -469,7 +458,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         }
 
         // Page 0
-        pageLabel = titleColor+ "Trade Specializations";
+        pageLabel = getTitle(MenuState.B_SPECIALIZATION);
         int numEntries = Villager.Profession.values().length - 1; // Subtract one to omit current specialization choice
         int pageRows = (int)Math.ceil((double)numEntries / 9);
         int pageNum = 0;
@@ -664,9 +653,9 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
 
     private String getTitle(MenuState context) {
         String result = "error";
-        ChatColor color = ChatColor.BLACK;
+        String color = DisplayManager.titleFormat;
         if(isAdmin) {
-            color = ChatColor.GOLD;
+            color = ""+ChatColor.GOLD;
         }
         String name = "";
         if(town != null) {
@@ -674,16 +663,16 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         }
         switch(context) {
             case ROOT:
-                result = color+name+" "+"Town Management";
+                result = color+name+" "+"Menu";
                 break;
             case A_REQUESTS:
-                result = color+"Requests";
+                result = color+name+" "+"Requests";
                 break;
             case A_SHIELD:
-                result = color+"Shields";
+                result = color+name+" "+"Shields";
                 break;
             case A_ARMOR:
-                result = color+"Armor";
+                result = color+name+" "+"Armor";
                 break;
             case B_PROMOTE:
                 result = color+"Promote Knights";
@@ -695,10 +684,10 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                 result = color+"Transfer Lordship";
                 break;
             case B_UPGRADES:
-                result = color+"Upgrades";
+                result = color+name+" "+"Upgrades";
                 break;
             case B_OPTIONS:
-                result = color+"Options";
+                result = color+name+" "+"Options";
                 break;
             case B_SPECIALIZATION:
                 result = color+"Trade Specialization";

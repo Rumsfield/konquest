@@ -562,6 +562,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			// the onlinePlayer map too.
 			for(KonOfflinePlayer member : konquest.getPlayerManager().getAllPlayersInKingdom(kingdom)) {
 				String playerName = member.getOfflineBukkitPlayer().getName();
+				member.setKingdom(getBarbarians());
+				member.setExileKingdom(getBarbarians());
+				member.setBarbarian(true);
 				if(member instanceof KonPlayer) {
 					ChatUtil.printDebug("Removing online KonPlayer "+playerName+" to barbarian.");
 					KonPlayer onlinePlayer = (KonPlayer)member;
@@ -571,9 +574,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				} else {
 					ChatUtil.printDebug("Removing offline KonOfflinePlayer "+playerName+" to barbarian.");
 				}
-				member.setKingdom(getBarbarians());
-				member.setExileKingdom(getBarbarians());
-				member.setBarbarian(true);
 				konquest.getDatabaseThread().getDatabase().setOfflinePlayer(member); // push to database
 			}
 			// Remove all towns

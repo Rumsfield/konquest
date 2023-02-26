@@ -26,10 +26,10 @@ public class PrefixMenuWrapper extends MenuWrapper {
 	@Override
 	public void constructMenu() {
 
-		ChatColor titleColor = DisplayManager.titleColor;
-		ChatColor loreColor = DisplayManager.loreColor;
-		ChatColor valueColor = DisplayManager.valueColor;
-		ChatColor hintColor = DisplayManager.hintColor;
+		String titleColor = DisplayManager.titleFormat;
+		String loreColor = DisplayManager.loreFormat;
+		String valueColor = DisplayManager.valueFormat;
+		String hintColor = DisplayManager.hintFormat;
 		String pageLabel;
 		String playerPrefix = "";
 		if(observer.getPlayerPrefix().isEnabled()) {

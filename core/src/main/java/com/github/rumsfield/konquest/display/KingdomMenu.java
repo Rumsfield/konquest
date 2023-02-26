@@ -81,9 +81,9 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	private final int SLOT_YES 					= 3;
 	private final int SLOT_NO 					= 5;
 
-	private final ChatColor loreColor = DisplayManager.loreColor;
-	private final ChatColor valueColor = DisplayManager.valueColor;
-	private final ChatColor hintColor = DisplayManager.hintColor;
+	private final String loreColor = DisplayManager.loreFormat;
+	private final String valueColor = DisplayManager.valueFormat;
+	private final String hintColor = DisplayManager.hintFormat;
 
 	private final KingdomManager manager;
 	private final KonPlayer player;
@@ -281,6 +281,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				
 				/* Template Icon */
 				loreList.clear();
+				loreList.add(loreColor+"Current: "+valueColor+kingdom.getMonumentTemplateName());
 				loreList.add(loreColor+"Change the monument template for all towns.");
 				icon = new InfoIcon(masterColor+"Monument Template", loreList, Material.ANVIL, ROOT_SLOT_TEMPLATE, true);
 				result.addIcon(icon);
