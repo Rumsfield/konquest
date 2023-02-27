@@ -1676,7 +1676,7 @@ public class Konquest implements KonquestAPI, Timeable {
     	if(!offlineBukkitPlayer.isOnline()) {
     		date = new Date(offlineBukkitPlayer.getLastPlayed()); // Last joined
     	}
-    	SimpleDateFormat formatter = new SimpleDateFormat("MM dd, yyyy HH:mm");
+    	SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm");
         return formatter.format(date);
     }
     

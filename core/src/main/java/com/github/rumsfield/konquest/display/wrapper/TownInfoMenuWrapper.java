@@ -65,26 +65,26 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		pageLabel = titleColor+MessagePath.COMMAND_INFO_NOTICE_TOWN_HEADER.getMessage(infoTown.getName());
 		getMenu().addPage(0, 1, pageLabel);
 
-		/* Kingdom Info Icon (1) */
+		/* Kingdom Info Icon (2) */
 		loreList = new ArrayList<>();
     	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
-    	KingdomIcon kingdom = new KingdomIcon(infoTown.getKingdom(),kingdomColor,loreList,1,true);
+    	KingdomIcon kingdom = new KingdomIcon(infoTown.getKingdom(),kingdomColor,loreList,2,true);
     	getMenu().getPage(0).addIcon(kingdom);
 
-		/* Lord Player Info Icon (2) */
+		/* Lord Player Info Icon (3) */
 		loreList = new ArrayList<>();
 		if(infoTown.isLordValid()) {
 			OfflinePlayer lordPlayer = infoTown.getPlayerLord();
 			loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
 			loreList.add(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage());
 			loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
-			PlayerIcon playerInfo = new PlayerIcon(kingdomColor+lordPlayer.getName(),loreList,lordPlayer,2,true,PlayerIconAction.DISPLAY_INFO);
+			PlayerIcon playerInfo = new PlayerIcon(kingdomColor+lordPlayer.getName(),loreList,lordPlayer,3,true,PlayerIconAction.DISPLAY_INFO);
 			getMenu().getPage(0).addIcon(playerInfo);
 		} else {
 			for(String line : Konquest.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getName(), observer.getBukkitPlayer().getName()))) {
 				loreList.add(ChatColor.RED+line);
 			}
-			info = new InfoIcon(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage(),loreList,Material.BARRIER,2,false);
+			info = new InfoIcon(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage(),loreList,Material.BARRIER,3,false);
 			getMenu().getPage(0).addIcon(info);
 		}
 
@@ -111,20 +111,20 @@ public class TownInfoMenuWrapper extends MenuWrapper {
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, 4, false);
     	getMenu().getPage(0).addIcon(info);
 
-		/* Stats Info Icon (6) */
+		/* Stats Info Icon (5) */
 		int maxCriticalHits = getKonquest().getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
 		int townHealth = maxCriticalHits - infoTown.getMonument().getCriticalHits();
 		loreList = new ArrayList<>();
 		loreList.add(loreColor+MessagePath.LABEL_HEALTH.getMessage()+": "+valueColor+townHealth+"/"+maxCriticalHits);
 		loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+infoTown.getChunkList().size());
 		loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+infoTown.getNumResidents());
-		info = new InfoIcon(kingdomColor+MessagePath.LABEL_STATS.getMessage(), loreList, Material.BELL, 6, false);
+		info = new InfoIcon(kingdomColor+MessagePath.LABEL_STATS.getMessage(), loreList, Material.BELL, 5, false);
 		getMenu().getPage(0).addIcon(info);
-    	/* Specialization Info Icon (7) */
+    	/* Specialization Info Icon (6) */
     	loreList = new ArrayList<>();
 		loreList.add(valueColor+infoTown.getSpecialization().name());
 		Material specialMat = Konquest.getProfessionMaterial(infoTown.getSpecialization());
-    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_SPECIALIZATION.getMessage(), loreList, specialMat, 7, false);
+    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_SPECIALIZATION.getMessage(), loreList, specialMat, 6, false);
     	getMenu().getPage(0).addIcon(info);
 
     	// Page 1

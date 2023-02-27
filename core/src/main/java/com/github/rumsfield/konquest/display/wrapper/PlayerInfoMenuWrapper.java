@@ -60,12 +60,10 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		/* General Info Icon (5) */
 		String balanceF = String.format("%.2f",KonquestPlugin.getBalance(infoPlayer.getOfflineBukkitPlayer()));
 		int numResidentTowns = getKonquest().getKingdomManager().getPlayerResidencies(infoPlayer);
-		int numLordTowns = getKonquest().getKingdomManager().getPlayerLordships(infoPlayer);
 		String kingdomRole = infoPlayer.getKingdom().getPlayerRoleName(infoPlayer);
 		loreList = new ArrayList<>();
 		loreList.add(loreColor + MessagePath.LABEL_FAVOR.getMessage() + ": " + valueColor + balanceF);
 		loreList.add(loreColor + MessagePath.LABEL_RESIDENCIES.getMessage() + ": " + valueColor + numResidentTowns);
-		loreList.add(loreColor + MessagePath.LABEL_TOWNS.getMessage() + ": " + valueColor + numLordTowns);
 		//TODO KR message path
 		loreList.add(loreColor + "Kingdom Role" + ": " + valueColor + kingdomRole);
 

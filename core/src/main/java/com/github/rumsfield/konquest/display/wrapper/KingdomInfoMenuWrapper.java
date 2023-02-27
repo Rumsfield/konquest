@@ -34,6 +34,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		String loreColor = DisplayManager.loreFormat;
 		String valueColor = DisplayManager.valueFormat;
 		String hintColor = DisplayManager.hintFormat;
+		String propertyColor = DisplayManager.propertyFormat;
 		
 		String pageLabel;
  		List<String> loreList;
@@ -73,7 +74,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			slotIndex = 2;
 			loreList = new ArrayList<>();
 			if (infoKingdom.isMasterValid()) {
-				loreList.add(ChatColor.LIGHT_PURPLE + MessagePath.LABEL_MASTER.getMessage());
+				loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
 				loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
 				assert masterPlayer != null;
 				PlayerIcon playerInfo = new PlayerIcon(kingdomColor + masterPlayer.getName(), loreList, masterPlayer, slotIndex, true, PlayerIconAction.DISPLAY_INFO);
@@ -124,9 +125,9 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
 			numKingdomFavor += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
 		}
-		int numKingdomTowns = infoKingdom.getTowns().size();
+		int numKingdomTowns = infoKingdom.getCapitalTowns().size();
 		int numKingdomLand = 0;
-		for(KonTown town : infoKingdom.getTowns()) {
+		for(KonTown town : infoKingdom.getCapitalTowns()) {
 			numKingdomLand += town.getChunkList().size();
 		}
 		loreList = new ArrayList<>();
@@ -209,14 +210,8 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 				OfflinePlayer currentMember = memberIter.next();
 				if(currentMember != null) {
 					loreList = new ArrayList<>();
-					loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
-					String playerType = ChatColor.WHITE+MessagePath.LABEL_MEMBER.getMessage();
-					if(infoKingdom.isMaster(currentMember.getUniqueId())) {
-						playerType = ChatColor.LIGHT_PURPLE+MessagePath.LABEL_MASTER.getMessage();
-					} else if(infoKingdom.isOfficer(currentMember.getUniqueId())) {
-						playerType = ChatColor.BLUE+MessagePath.LABEL_OFFICER.getMessage();
-					}
-					loreList.add(playerType);
+					//TODO KR message path
+					loreList.add(loreColor+"Kingdom Role"+": "+valueColor+infoKingdom.getPlayerRoleName(currentMember));
 					loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
 					PlayerIcon player = new PlayerIcon(kingdomColor+currentMember.getName(),loreList,currentMember,slotIndex,true,PlayerIconAction.DISPLAY_INFO);
 					getMenu().getPage(pageIndex).addIcon(player);
