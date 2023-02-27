@@ -15,6 +15,7 @@ import java.util.List;
 public class TemplateIcon implements MenuIcon {
 
 	private final KonMonumentTemplate template;
+	private final ChatColor contextColor;
 	private final List<String> lore;
 	private final int index;
 	private final boolean isClickable;
@@ -23,8 +24,9 @@ public class TemplateIcon implements MenuIcon {
 	private final String valueColor = DisplayManager.valueFormat;
 	private final String alertColor = DisplayManager.alertFormat;
 
-	public TemplateIcon(KonMonumentTemplate template, List<String> lore, int index, boolean isClickable) {
+	public TemplateIcon(KonMonumentTemplate template, ChatColor contextColor, List<String> lore, int index, boolean isClickable) {
 		this.template = template;
+		this.contextColor = contextColor;
 		this.lore = lore;
 		this.index = index;
 		this.isClickable = isClickable;
@@ -61,17 +63,17 @@ public class TemplateIcon implements MenuIcon {
 		List<String> itemLore = new ArrayList<>();
 		//TODO: Replace with message paths
 		if(template != null) {
-			itemLore.add(loreColor+"Name: "+valueColor+template.getName());
-			itemLore.add(loreColor+"Critical Hits: "+valueColor+template.getNumCriticals());
-			itemLore.add(loreColor+"Loot Chests: "+valueColor+template.getNumLootChests());
 			if(!template.isValid()) {
 				itemLore.add(alertColor + "Invalid");
 			} else if(template.isBlanking()) {
 				itemLore.add(alertColor + "Temporarily Disabled");
 			}
+			itemLore.add(loreColor+"Name: "+valueColor+template.getName());
+			itemLore.add(loreColor+"Critical Hits: "+valueColor+template.getNumCriticals());
+			itemLore.add(loreColor+"Loot Chests: "+valueColor+template.getNumLootChests());
 		}
 		itemLore.addAll(lore);
-		meta.setDisplayName(ChatColor.GOLD+"Monument Template");
+		meta.setDisplayName(contextColor+"Monument Template");
 		meta.setLore(itemLore);
 		item.setItemMeta(meta);
 		return item;

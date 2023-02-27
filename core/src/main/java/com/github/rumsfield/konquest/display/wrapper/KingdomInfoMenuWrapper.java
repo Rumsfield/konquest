@@ -31,9 +31,9 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		
 		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer.getKingdom(), infoKingdom);
 		String titleColor = DisplayManager.titleFormat;
-		String loreColor = DisplayManager.titleFormat;
-		String valueColor = DisplayManager.titleFormat;
-		String hintColor = DisplayManager.titleFormat;
+		String loreColor = DisplayManager.loreFormat;
+		String valueColor = DisplayManager.valueFormat;
+		String hintColor = DisplayManager.hintFormat;
 		
 		String pageLabel;
  		List<String> loreList;
@@ -63,7 +63,6 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			slotIndex = 1;
 			KonCapital capital = infoKingdom.getCapital();
 			loreList = new ArrayList<>();
-			loreList.add(loreColor + "Capital");
 			loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
 			TownIcon capitalIcon = new TownIcon(capital, kingdomColor, loreList, slotIndex, true);
 			getMenu().getPage(pageIndex).addIcon(capitalIcon);
@@ -144,7 +143,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			// TODO message paths
 			if (infoKingdom.hasMonumentTemplate()) {
 				KonMonumentTemplate template = infoKingdom.getMonumentTemplate();
-				info = new TemplateIcon(template,loreList,slotIndex,false);
+				info = new TemplateIcon(template,kingdomColor,loreList,slotIndex,false);
 			} else {
 				String invalidMessage = "Kingdom master must choose a template from the kingdom menu.";
 				for (String line : Konquest.stringPaginate(invalidMessage)) {

@@ -66,15 +66,9 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		getMenu().addPage(0, 1, pageLabel);
 
 		/* Kingdom Info Icon (1) */
-		int numKingdomPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(infoTown.getKingdom()).size();
-    	int numAllKingdomPlayers = getKonquest().getPlayerManager().getAllPlayersInKingdom(infoTown.getKingdom()).size();
-    	loreList = new ArrayList<>();
-    	loreList.add(loreColor+MessagePath.LABEL_PLAYERS.getMessage()+": "+valueColor+numKingdomPlayers+"/"+numAllKingdomPlayers);
-    	if(infoTown.getKingdom().isOfflineProtected()) {
-    		loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.LABEL_PROTECTED.getMessage());
-    	}
+		loreList = new ArrayList<>();
     	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
-    	KingdomIcon kingdom = new KingdomIcon(infoTown.getKingdom(),kingdomColor,loreList,1,false);
+    	KingdomIcon kingdom = new KingdomIcon(infoTown.getKingdom(),kingdomColor,loreList,1,true);
     	getMenu().getPage(0).addIcon(kingdom);
 
 		/* Lord Player Info Icon (2) */

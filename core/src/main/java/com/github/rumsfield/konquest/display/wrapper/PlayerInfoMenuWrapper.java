@@ -43,20 +43,10 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		pageLabel = titleColor+MessagePath.LABEL_PLAYER.getMessage()+" "+infoPlayer.getOfflineBukkitPlayer().getName();
 		getMenu().addPage(0, 1, pageLabel);
 		
-		/* Kingdom Icon (2) */
-		int numKingdomPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(infoPlayer.getKingdom()).size();
-    	int numAllKingdomPlayers = getKonquest().getPlayerManager().getAllPlayersInKingdom(infoPlayer.getKingdom()).size();
-    	loreList = new ArrayList<>();
-		String kingdomRole = infoPlayer.getKingdom().getPlayerRoleName(infoPlayer);
-		if(!kingdomRole.equals("")) {
-			loreList.add(kingdomRole);
-		}
-    	loreList.add(loreColor+MessagePath.LABEL_PLAYERS.getMessage()+": "+valueColor+numKingdomPlayers+"/"+numAllKingdomPlayers);
-    	if(infoPlayer.getKingdom().isOfflineProtected()) {
-    		loreList.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+MessagePath.LABEL_PROTECTED.getMessage());
-    	}
+		/* Kingdom Icon (3) */
+		loreList = new ArrayList<>();
     	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
-    	KingdomIcon kingdom = new KingdomIcon(infoPlayer.getKingdom(),kingdomColor,loreList,2,true);
+    	KingdomIcon kingdom = new KingdomIcon(infoPlayer.getKingdom(),kingdomColor,loreList,3,true);
     	getMenu().getPage(0).addIcon(kingdom);
 		
 		/* Player Score Icon (4) */
@@ -66,10 +56,22 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
 		PlayerIcon playerScore = new PlayerIcon(kingdomColor+infoPlayer.getOfflineBukkitPlayer().getName(),loreList,infoPlayer.getOfflineBukkitPlayer(),4,true,PlayerIconAction.DISPLAY_SCORE);
 		getMenu().getPage(0).addIcon(playerScore);
-		/* Favor Info Icon (5) */
+
+		/* General Info Icon (5) */
 		String balanceF = String.format("%.2f",KonquestPlugin.getBalance(infoPlayer.getOfflineBukkitPlayer()));
-		InfoIcon info = new InfoIcon(kingdomColor+MessagePath.LABEL_FAVOR.getMessage(), Collections.singletonList(loreColor + MessagePath.LABEL_FAVOR.getMessage() + ": " + valueColor + balanceF), Material.GOLD_INGOT, 5, false);
+		int numResidentTowns = getKonquest().getKingdomManager().getPlayerResidencies(infoPlayer);
+		int numLordTowns = getKonquest().getKingdomManager().getPlayerLordships(infoPlayer);
+		String kingdomRole = infoPlayer.getKingdom().getPlayerRoleName(infoPlayer);
+		loreList = new ArrayList<>();
+		loreList.add(loreColor + MessagePath.LABEL_FAVOR.getMessage() + ": " + valueColor + balanceF);
+		loreList.add(loreColor + MessagePath.LABEL_RESIDENCIES.getMessage() + ": " + valueColor + numResidentTowns);
+		loreList.add(loreColor + MessagePath.LABEL_TOWNS.getMessage() + ": " + valueColor + numLordTowns);
+		//TODO KR message path
+		loreList.add(loreColor + "Kingdom Role" + ": " + valueColor + kingdomRole);
+
+		InfoIcon info = new InfoIcon(kingdomColor+MessagePath.LABEL_INFORMATION.getMessage(), loreList, Material.ENDER_EYE, 5, false);
 		getMenu().getPage(0).addIcon(info);
+
 		// Page 1+
 		List<KonTown> playerTowns = sortedTowns(infoPlayer);
 		final int MAX_ICONS_PER_PAGE = 45;

@@ -366,7 +366,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+"X");
 					isClickable = false;
 				}
-				TemplateIcon templateIcon = new TemplateIcon(template,loreList,slotIndex,isClickable);
+				TemplateIcon templateIcon = new TemplateIcon(template,ChatColor.GOLD,loreList,slotIndex,isClickable);
 		    	pages.get(pageNum).addIcon(templateIcon);
 				slotIndex++;
 			}

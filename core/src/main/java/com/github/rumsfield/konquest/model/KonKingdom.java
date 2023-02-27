@@ -308,13 +308,12 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	}
 	public String getPlayerRoleName(OfflinePlayer offlinePlayer) {
 		String result = "";
-		ChatColor kingdomRoleColor = ChatColor.DARK_AQUA;
 		if(isMaster(offlinePlayer.getUniqueId())) {
-			result = kingdomRoleColor+MessagePath.LABEL_MASTER.getMessage();
+			result = MessagePath.LABEL_MASTER.getMessage();
 		} else if(isOfficer(offlinePlayer.getUniqueId())) {
-			result = kingdomRoleColor+MessagePath.LABEL_OFFICER.getMessage();
+			result = MessagePath.LABEL_OFFICER.getMessage();
 		} else if(isMember(offlinePlayer.getUniqueId())) {
-			result = kingdomRoleColor+MessagePath.LABEL_MEMBER.getMessage();
+			result = MessagePath.LABEL_MEMBER.getMessage();
 		}
 		return result;
 	}
@@ -693,6 +692,12 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public ArrayList<KonTown> getTowns() {
 		return new ArrayList<>(townMap.values());
+	}
+
+	public ArrayList<KonTown> getCapitalTowns() {
+		ArrayList<KonTown> result = new ArrayList<>(townMap.values());
+		result.add(capital);
+		return result;
 	}
 	
 	public boolean isTownMapEmpty() {

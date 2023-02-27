@@ -2678,7 +2678,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	public void removeAllRabbits() {
 		for(KonKingdom kingdom : getKingdoms()) {
-			for(KonTown town : kingdom.getTowns()) {
+			for(KonTown town : kingdom.getCapitalTowns()) {
 				town.removeRabbit();
 			}
 		}
@@ -2914,62 +2914,72 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 	}
 	
-	public int getPlayerLordships(KonPlayer player) {
+	public int getPlayerLordships(KonOfflinePlayer player) {
 		int count = 0;
-		for(KonTown town : player.getKingdom().getTowns()) {
+		for(KonTown town : player.getKingdom().getCapitalTowns()) {
 			if(town.isPlayerLord(player.getOfflineBukkitPlayer())) {
 				count = count + 1;
 			}
 		}
 		return count;
 	}
+
+	public int getPlayerResidencies(KonOfflinePlayer player) {
+		int count = 0;
+		for(KonTown town : player.getKingdom().getCapitalTowns()) {
+			if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+				count++;
+			}
+		}
+		return count;
+	}
 	
 	public List<KonTown> getPlayerLordshipTowns(KonquestOfflinePlayer player) {
-		List<KonTown> townNames = new ArrayList<>();
+		List<KonTown> towns = new ArrayList<>();
 		if(player.getKingdom() instanceof KonKingdom) {
 			KonKingdom kingdom = (KonKingdom)player.getKingdom();
-			for(KonTown town : kingdom.getTowns()) {
+			for(KonTown town : kingdom.getCapitalTowns()) {
 				if(town.isPlayerLord(player.getOfflineBukkitPlayer())) {
-					townNames.add(town);
+					towns.add(town);
 				}
 			}
 		}
-		return townNames;
+		return towns;
 	}
 
 	@NotNull
 	public List<KonTown> getPlayerKnightTowns(KonquestOfflinePlayer player) {
-		List<KonTown> townNames = new ArrayList<>();
+		List<KonTown> towns = new ArrayList<>();
 		if(player.getKingdom() instanceof KonKingdom) {
 			KonKingdom kingdom = (KonKingdom)player.getKingdom();
-			for(KonTown town : kingdom.getTowns()) {
+			for(KonTown town : kingdom.getCapitalTowns()) {
 				if(town.isPlayerKnight(player.getOfflineBukkitPlayer()) && !town.isPlayerLord(player.getOfflineBukkitPlayer())) {
-					townNames.add(town);
+					towns.add(town);
 				}
 			}
 		}
-		return townNames;
+		return towns;
 	}
 
 	@NotNull
 	public List<KonTown> getPlayerResidenceTowns(KonquestOfflinePlayer player) {
-		List<KonTown> townNames = new ArrayList<>();
+		List<KonTown> towns = new ArrayList<>();
 		if(player.getKingdom() instanceof KonKingdom) {
 			KonKingdom kingdom = (KonKingdom)player.getKingdom();
-			for(KonTown town : kingdom.getTowns()) {
+			for(KonTown town : kingdom.getCapitalTowns()) {
 				if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
-					townNames.add(town);
+					towns.add(town);
 				}
 			}
 		}
-		return townNames;
+		return towns;
 	}
 	
 	public void updatePlayerMembershipStats(KonPlayer player) {
 		int countLord = 0;
 		int countElite = 0;
 		int countResident = 0;
-		for(KonTown town : player.getKingdom().getTowns()) {
+		for(KonTown town : player.getKingdom().getCapitalTowns()) {
 			if(town.isPlayerLord(player.getOfflineBukkitPlayer())) {
 				countLord = countLord + 1;
 			} else if(town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
@@ -2995,7 +3005,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		int numLordLand;
 		int numKnightLand;
 		int numResidentLand;
-		for(KonTown town : kingdom.getTowns()) {
+		for(KonTown town : kingdom.getCapitalTowns()) {
 			for(OfflinePlayer offlinePlayer : town.getPlayerResidents()) {
 				numTownLords = 0;
 				numTownKnights = 0;
@@ -3070,7 +3080,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	    	ArrayList<KonOfflinePlayer> allPlayersInKingdom = konquest.getPlayerManager().getAllPlayersInKingdom(kingdom.getName());
 	    	int numAllKingdomPlayers = allPlayersInKingdom.size();
 	    	int numKingdomLand = 0;
-	    	for(KonTown town : kingdom.getTowns()) {
+	    	for(KonTown town : kingdom.getCapitalTowns()) {
 	    		numKingdomLand += town.getChunkList().size();
 	    	}
 	    	int numKingdomFavor = 0;
@@ -3106,7 +3116,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			int numLordLand = 0;
 			int numKnightLand = 0;
 			int numResidentLand = 0;
-			for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
+			for(KonTown town : offlinePlayer.getKingdom().getCapitalTowns()) {
 				if(town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
 					numTownLords++;
 					numLordLand += town.getChunkList().size();
