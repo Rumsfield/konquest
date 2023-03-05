@@ -601,9 +601,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	/**
 	 * Updates a monument, meant for changing the kingdom's monument template
 	 */
-	public void updateMonument() {
+	public void updateMonumentFromTemplate() {
 		if(getKingdom().isMonumentTemplateValid()) {
 			monument.updateFromTemplate(getKingdom().getMonumentTemplate());
+			monument.setIsValid(true);
 			setSpawn(monument.getTravelPoint());
 		} else {
 			ChatUtil.printDebug("Failed to update monument from template for town "+getName());
@@ -611,7 +612,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 
 	/**
-	 * Reloads a monument from template, meant to be used when server loads the chunk
+	 * Reloads a monument from template, meant to be used when server loads the chunk, or re-generate after attack
 	 */
 	public boolean reloadMonument() {
 		boolean result = false;
@@ -1110,7 +1111,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public boolean isGolemOffensive() {
 		return isGolemOffensive;
 	}
-	
+
+	/*
+	Membership Methods
+	 */
+
 	public boolean canClaimLordship(KonPlayer player) {
 		boolean result = false;
 		if(!isLordValid()) {

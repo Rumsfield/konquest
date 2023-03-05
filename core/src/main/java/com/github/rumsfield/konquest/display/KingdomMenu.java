@@ -81,6 +81,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	private final int SLOT_YES 					= 3;
 	private final int SLOT_NO 					= 5;
 
+	private final String propertyColor = DisplayManager.propertyFormat;
 	private final String loreColor = DisplayManager.loreFormat;
 	private final String valueColor = DisplayManager.valueFormat;
 	private final String hintColor = DisplayManager.hintFormat;
@@ -355,7 +356,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				loreList = new ArrayList<>();
 				boolean isClickable = true;
 				if(template.isValid()) {
-					if(!isAdmin) {
+					if(!isAdmin && kingdom.hasMonumentTemplate()) {
 						double totalCost = manager.getCostTemplate() + template.getCost();
 						String cost = String.format("%.2f",totalCost);
 						loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
@@ -479,8 +480,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		DisplayMenu result;
 		pages.clear();
 		currentPage = 0;
-		String loreHintStr1 = "";
-		String loreHintStr2 = "";
 		boolean isClickable = false;
 		List<KonKingdom> kingdoms = new ArrayList<>();
 		
@@ -491,7 +490,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			if(isCreatedKingdom) {
 				kingdoms.remove(kingdom);
 			}
-			loreHintStr1 = MessagePath.MENU_GUILD_HINT_JOIN.getMessage();
 			isClickable = true;
 		} else if(context.equals(MenuState.A_INVITE)) {
 			// List of kingdoms with valid join invite for player
@@ -499,19 +497,17 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			if(isCreatedKingdom) {
 				kingdoms.remove(kingdom);
 			}
-			loreHintStr1 = MessagePath.MENU_GUILD_HINT_INVITE_1.getMessage();
-			loreHintStr2 = MessagePath.MENU_GUILD_HINT_INVITE_2.getMessage();
 			isClickable = true;
 		} else if(context.equals(MenuState.A_LIST)) {
 			// List of all kingdoms, friendly and enemy, with normal info
 			kingdoms.addAll(manager.getKingdoms());
+			isClickable = true;
 		} else if(context.equals(MenuState.B_RELATIONSHIP)) {
 			// List of all kingdoms, friendly and enemy, with relationship status and click hints
 			kingdoms.addAll(manager.getKingdoms());
 			if(isCreatedKingdom) {
 				kingdoms.remove(kingdom);
 			}
-			loreHintStr1 = MessagePath.MENU_GUILD_HINT_RELATION.getMessage();
 			isClickable = true;
 		} else {
 			return null;
@@ -541,11 +537,27 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					loreList.add(loreColor+MessagePath.MENU_GUILD_OUR_STATUS.getMessage()+": "+valueColor+ourStatus);
 					loreList.add(loreColor+MessagePath.MENU_GUILD_THEIR_STATUS.getMessage()+": "+valueColor+theirStatus);
 				}
-				if(!loreHintStr1.equals("")) {
-					loreList.add(hintColor+loreHintStr1);
-				}
-				if(!loreHintStr2.equals("")) {
-					loreList.add(hintColor+loreHintStr2);
+				// Context-specific lore
+				switch(context) {
+					case A_JOIN:
+						if(currentKingdom.isOpen()) {
+							loreList.add(hintColor+"Click to join now");
+						} else {
+							loreList.add(hintColor+"Click to request");
+						}
+						break;
+					case A_INVITE:
+						loreList.add(hintColor+MessagePath.MENU_GUILD_HINT_INVITE_1.getMessage());
+						loreList.add(hintColor+MessagePath.MENU_GUILD_HINT_INVITE_2.getMessage());
+						break;
+					case A_LIST:
+						loreList.add(hintColor+"Click to view");
+						break;
+					case B_RELATIONSHIP:
+						loreList.add(hintColor+MessagePath.MENU_GUILD_HINT_RELATION.getMessage());
+						break;
+					default:
+						break;
 				}
 				KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,contextColor,loreList,slotIndex,isClickable);
 		    	pages.get(pageNum).addIcon(kingdomIcon);
@@ -609,7 +621,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				loreList = new ArrayList<>();
 				String kingdomRole = kingdom.getPlayerRoleName(currentPlayer);
 				if(!kingdomRole.equals("")) {
-					loreList.add(kingdomRole);
+					loreList.add(propertyColor+kingdomRole);
 				}
 				if(!loreHintStr1.equals("")) {
 					loreList.add(hintColor+loreHintStr1);
@@ -753,7 +765,12 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					}
 					break;
 				case A_LIST:
-					// Do nothing for now
+					// Clicking opens a kingdom info menu
+					if(clickedIcon instanceof KingdomIcon) {
+						KingdomIcon icon = (KingdomIcon)clickedIcon;
+						KonKingdom clickKingdom = icon.getKingdom();
+						konquest.getDisplayManager().displayKingdomInfoMenu(player, clickKingdom);
+					}
 					break;
 				case B_RELATIONSHIP:
 					// Clicking icons goes to diplomacy view

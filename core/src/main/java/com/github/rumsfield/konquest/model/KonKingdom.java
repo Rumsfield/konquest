@@ -642,9 +642,8 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		// Update kingdom's template
 		setMonumentTemplate(template);
 		// Update all towns + capital monument
-		getCapital().updateMonument();
-		for(KonTown town : getTowns()) {
-			town.updateMonument();
+		for(KonTown town : getCapitalTowns()) {
+			town.updateMonumentFromTemplate();
 		}
 		// Reload towns in loaded chunks
 		reloadLoadedTownMonuments();

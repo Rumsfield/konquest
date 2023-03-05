@@ -49,6 +49,10 @@ public class TownIcon implements MenuIcon {
 		assert meta != null;
 		// Add applicable labels
 		List<String> loreList = new ArrayList<>();
+		if(!town.isLordValid()) {
+			//TODO KR message path
+			loreList.add(alertColor+"No Lord");
+		}
 		if(town.isAttacked()) {
 			loreList.add(alertColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage());
 		}

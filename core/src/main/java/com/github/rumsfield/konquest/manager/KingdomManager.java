@@ -1469,8 +1469,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return;
 		}
 		// Check cost
+		boolean hasTemplate = kingdom.hasMonumentTemplate();
 		double totalCost = costTemplate + template.getCost();
-		if(!ignoreCost && totalCost > 0 && KonquestPlugin.getBalance(bukkitPlayer) < totalCost) {
+		if(!ignoreCost && hasTemplate && totalCost > 0 && KonquestPlugin.getBalance(bukkitPlayer) < totalCost) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(totalCost));
 			Konquest.playFailSound(player.getBukkitPlayer());
             return;
@@ -1478,7 +1479,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Update template
 		kingdom.updateMonumentTemplate(template);
 		// Withdraw cost
-		if(!ignoreCost && totalCost > 0 && KonquestPlugin.withdrawPlayer(bukkitPlayer, totalCost)) {
+		if(!ignoreCost && hasTemplate && totalCost > 0 && KonquestPlugin.withdrawPlayer(bukkitPlayer, totalCost)) {
             konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)totalCost);
 		}
 		// Success
@@ -2164,7 +2165,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
 			return false;
 		}
-		if(town.isPlayerResident(bukkitPlayer)) {
+		if(!town.isPlayerResident(bukkitPlayer)) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_LEAVE_ERROR_NO_RESIDENT.getMessage(town.getName()));
 			return false;
 		}
@@ -2373,6 +2374,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		Player bukkitPlayer = sender.getBukkitPlayer();
 		UUID id = member.getUniqueId();
 		if(!town.isPlayerLord(bukkitPlayer)) {
+			// Only town lord can promote & demote
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
@@ -2382,14 +2384,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return false;
 		}
 		if(!offlinePlayer.getKingdom().equals(town.getKingdom())) {
+			// Target player must be a kingdom member
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
 			return false;
 		}
 		if(id.equals(bukkitPlayer.getUniqueId()) || town.isLord(id)) {
+			// Target player cannot be the town lord, or the sender
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
-		if(town.isPlayerResident(member)) {
+		if(!town.isPlayerResident(member)) {
+			// Target player must be a town resident
 			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_KNIGHT_RESIDENT.getMessage());
 			return false;
 		}
@@ -3359,7 +3364,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     	        		newKingdom.setMonumentTemplate(template);
     	        	} else {
     	        		ChatUtil.printConsoleError("Missing monument template \""+templateName+"\" for Kingdom "+kingdomName+" in loaded data file!");
-    	        		konquest.opStatusMessages.add("Missing monument template for Kingdom "+kingdomName+"! Use \"TBD\" to specify a monument template for this Kingdom.");
+    	        		konquest.opStatusMessages.add("Missing monument template for Kingdom "+kingdomName+"! Use \"/k admin kingdom\" to set a monument template for this Kingdom.");
     	        	}
     	    		// Kingdom Properties
         			ConfigurationSection kingdomPropertiesSection = kingdomSection.getConfigurationSection("properties");
@@ -3570,7 +3575,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
             			konquest.opStatusMessages.add(message);
                 	}
                 	if(isMissingMonuments) {
-                		konquest.opStatusMessages.add("Kingdom "+kingdomName+" has Towns with invalid Monuments. You must create a new Monument Template and restart the server.");
+                		konquest.opStatusMessages.add("Kingdom "+kingdomName+" has Towns with invalid Monuments. You must set up a valid Monument Template and restart the server.");
                 	}
         		} else {
         			// Error, world is not loaded

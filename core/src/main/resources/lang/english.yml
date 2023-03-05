@@ -378,10 +378,11 @@ command:
         sanctuary: "Create Sanctuary territory before creating Monument Templates."
       error:
         none: "Monument Template %s is currently not valid."
-        fail-base: "Failed to create Monument Template, base must be 16x16 blocks but got %s by %s."
-        fail-critical: "Failed to create Monument Template, it must contain at least %s %s blocks."
-        fail-travel: "Failed to create Monument Template, travel point must be inside of the region."
-        fail-region: "Failed to create Monument Template, region corners must be within Sanctuary territory."
+        fail-base: "Failed to create Monument Template %s, base must be 16x16 blocks but got %s by %s."
+        fail-critical: "Failed to create Monument Template %s, it must contain at least %s %s blocks."
+        fail-travel: "Failed to create Monument Template %s, travel point must be inside of the region."
+        fail-region: "Failed to create Monument Template %s, region corners must be within Sanctuary territory."
+        fail-reset: "Failed to reset Monument Template %s, restored to previous state."
     rename:
       notice:
         kingdom: "Successfully renamed Kingdom %s to %s."
@@ -572,7 +573,7 @@ command:
       fail-name: "Invalid Town name, already taken or has spaces."
       fail-overlap: "Town overlaps with a nearby territory."
       fail-placement: "Could not find a good Monument placement."
-      fail-template: "Invalid Monument Template. Use \"/k admin monument <kingdom> create\""
+      fail-template: "Invalid or unavailable Monument Template."
       fail-proximity: "Town is too close to another territory. Currently %s chunks away, must be at least %s."
       fail-max: "Town is too far away from other territories. Currently %s chunks away, must be at most %s."
       fail-flat: "Your chunk area is not flat enough. Press F3+G to view chunk boundaries. Cut down trees and flatten the ground!"
@@ -615,7 +616,7 @@ command:
       knight-set: "%s has been Knighted in %s."
       knight-clear: "%s is no longer a Knight in %s."
       rename: "Lord %s has renamed the Town of %s to %s."
-      no-lord: "%s is abandoned! Use \"/k town %s lord %s\" to claim Lordship."
+      no-lord: "%s is abandoned! Use \"/k town %s lord\" to claim Lordship."
     error:
       open: "%s is already open for access by all players."
       close: "%s is already closed for residents only."

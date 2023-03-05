@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 public class ChatUtil {
 
+	private static final ChatColor adminBroadcastColor= ChatColor.DARK_PURPLE;
 	private static final ChatColor broadcastColor = ChatColor.LIGHT_PURPLE;
 	private static final ChatColor noticeColor = ChatColor.GRAY;
 	private static final ChatColor errorColor = ChatColor.RED;
@@ -257,8 +258,8 @@ public class ChatUtil {
 	}
 	
 	public static void sendAdminBroadcast(String message) {
-		String notice = Konquest.getChatTag() + broadcastColor + message;
-		Bukkit.broadcast(notice,"konquest.command.admin");
+		String notice = Konquest.getChatTag() + adminBroadcastColor + message;
+		Bukkit.broadcast(notice,"konquest.command.admin.*");
 	}
 
 	public static void sendCommaNotice(Player player, List<String> values) {

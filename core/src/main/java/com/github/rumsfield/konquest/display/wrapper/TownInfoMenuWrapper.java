@@ -45,6 +45,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		
 		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer, infoTown);
  		String titleColor = DisplayManager.titleFormat;
+		String propertyColor = DisplayManager.propertyFormat;
 		String loreColor = DisplayManager.loreFormat;
 		String valueColor = DisplayManager.valueFormat;
 		String hintColor = DisplayManager.hintFormat;
@@ -75,16 +76,15 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		loreList = new ArrayList<>();
 		if(infoTown.isLordValid()) {
 			OfflinePlayer lordPlayer = infoTown.getPlayerLord();
-			loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
-			loreList.add(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage());
+			loreList.add(propertyColor+MessagePath.LABEL_LORD.getMessage());
 			loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
 			PlayerIcon playerInfo = new PlayerIcon(kingdomColor+lordPlayer.getName(),loreList,lordPlayer,3,true,PlayerIconAction.DISPLAY_INFO);
 			getMenu().getPage(0).addIcon(playerInfo);
 		} else {
-			for(String line : Konquest.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getName(), observer.getBukkitPlayer().getName()))) {
+			for(String line : Konquest.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getName()))) {
 				loreList.add(ChatColor.RED+line);
 			}
-			info = new InfoIcon(ChatColor.DARK_PURPLE+MessagePath.LABEL_LORD.getMessage(),loreList,Material.BARRIER,3,false);
+			info = new InfoIcon(kingdomColor+MessagePath.LABEL_LORD.getMessage(),loreList,Material.BARRIER,3,false);
 			getMenu().getPage(0).addIcon(info);
 		}
 
@@ -177,8 +177,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 				/* Player Icon (n) */
 				OfflinePlayer currentKnight = knightIter.next();
 				loreList = new ArrayList<>();
-				loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
-				loreList.add(ChatColor.DARK_BLUE+MessagePath.LABEL_KNIGHT.getMessage());
+				loreList.add(propertyColor+MessagePath.LABEL_KNIGHT.getMessage());
 		    	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
 		    	PlayerIcon player = new PlayerIcon(kingdomColor+currentKnight.getName(),loreList,currentKnight,slotIndex,true,PlayerIconAction.DISPLAY_INFO);
 		    	getMenu().getPage(pageNum).addIcon(player);
@@ -207,8 +206,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 				/* Player Icon (n) */
 				OfflinePlayer currentResident = residentIter.next();
 				loreList = new ArrayList<>();
-				loreList.add(loreColor+MessagePath.LABEL_INFORMATION.getMessage());
-				loreList.add(ChatColor.WHITE+MessagePath.LABEL_RESIDENT.getMessage());
+				loreList.add(propertyColor+MessagePath.LABEL_RESIDENT.getMessage());
 		    	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
 		    	PlayerIcon player = new PlayerIcon(kingdomColor+currentResident.getName(),loreList,currentResident,slotIndex,true,PlayerIconAction.DISPLAY_INFO);
 		    	getMenu().getPage(pageNum).addIcon(player);

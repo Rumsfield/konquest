@@ -19,6 +19,10 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
+/**
+ * A Sanctuary is a territory which contains monument templates.
+ * A monument template can exist in an invalid state, where it does not meet specific criteria (critical blocks, size, etc).
+ */
 public class SanctuaryManager {
 
 	private final Konquest konquest;
@@ -276,6 +280,9 @@ public class SanctuaryManager {
 	 * @param corner1		The first corner of the template region
 	 * @param corner2		The second (opposite) corner of the template region
 	 * @param travelPoint	The location for travel to the template region
+	 * @param cost          The unique cost of this template, in addition to the base confi cost
+	 * @param save          Whether to save to file upon successful creation
+	 * @param forceLoad     Whether to force a template to be added even when invalid
 	 * @return  The status code
 	 * 			0 - success
 	 * 			1 - Region is not 16x16 blocks in base
@@ -283,15 +290,15 @@ public class SanctuaryManager {
 	 * 			3 - Region does not contain the travel point
 	 * 			4 - Region is not within given sanctuary territory
 	 * 			5 - Bad name
+	 * 		    10 - Update to existing template failed, restored previous template
 	 */
-	public int createMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint, double cost, boolean save) {
+	public int createMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint, double cost, boolean save, boolean forceLoad) {
 		// Check if the given name is an existing template
 		KonMonumentTemplate template;
 		int status;
 		if(isTemplate(name)) {
 			// The template already exists, update it
 			template = getTemplate(name);
-			boolean  isExistingTemplateValid = template.isValid();
 			template.setCornerOne(corner1);
 			template.setCornerTwo(corner2);
 			template.setTravelPoint(travelPoint);
@@ -303,7 +310,9 @@ public class SanctuaryManager {
 			if(status == 0) {
 				// Passed all checks, update template
 				template.setValid(true);
+				ChatUtil.printDebug("Updated existing template "+name);
 			} else {
+				ChatUtil.printDebug("Failed to update existing template "+name);
 				// Updated fields failed validation, revert them
 				boolean restoreCheck = template.restorePrevious();
 				// Re-validate previous template fields
@@ -312,6 +321,10 @@ public class SanctuaryManager {
 					if(status == 0) {
 						// Passed restore checks
 						template.setValid(true);
+						ChatUtil.printDebug("Restored existing template "+name);
+						return 10;
+					} else {
+						ChatUtil.printDebug("Failed to validate restored existing template "+name);
 					}
 				} else {
 					// Restored template fields are null, this shouldn't happen :(
@@ -334,6 +347,13 @@ public class SanctuaryManager {
 				template.setValid(true);
 				// Add to sanctuary
 				sanctuary.addTemplate(name, template);
+				ChatUtil.printDebug("Created new valid template "+name);
+			} else {
+				// Add to sanctuary when invalid if forced to
+				if(forceLoad) {
+					sanctuary.addTemplate(name, template);
+				}
+				ChatUtil.printDebug("Created new invalid template "+name);
 			}
 		}
 		// Before exit, save to file
@@ -345,7 +365,11 @@ public class SanctuaryManager {
 	}
 	
 	public int createMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint, double cost) {
-		return createMonumentTemplate(sanctuary, name, corner1, corner2, travelPoint, cost, true);
+		return createMonumentTemplate(sanctuary, name, corner1, corner2, travelPoint, cost, true, false);
+	}
+
+	public int loadMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint, double cost) {
+		return createMonumentTemplate(sanctuary, name, corner1, corner2, travelPoint, cost, false, true);
 	}
 	
 	/**
@@ -425,6 +449,11 @@ public class SanctuaryManager {
                 }
             }
         }
+		// Set template info
+		template.setNumBlocks(totalBlockCount);
+		template.setNumCriticals(criticalBlockCount);
+		template.setNumLootChests(lootChestCount);
+		template.setLoot(containsChest);
 		if(criticalBlockCount < maxCriticalhits) {
 			ChatUtil.printDebug("Failed to validate Monument Template, not enough critical blocks. Found "+criticalBlockCount+", required "+maxCriticalhits);
 			return 2;
@@ -436,11 +465,6 @@ public class SanctuaryManager {
 			ChatUtil.printDebug("Failed to create Monument Template, travel point is outside of corner bounds");
 			return 3;
 		}
-		// Set template info
-		template.setNumBlocks(totalBlockCount);
-		template.setNumCriticals(criticalBlockCount);
-		template.setNumLootChests(lootChestCount);
-		template.setLoot(containsChest);
 		if(containsChest) {
 			ChatUtil.printDebug("Validated Monument Template "+name+" with "+lootChestCount+" loot chest(s)");
 		} else {
@@ -530,12 +554,11 @@ public class SanctuaryManager {
 			        		y = sectionList.get(1);
 			        		z = sectionList.get(2);
 				        	Location templateCornerTwo = new Location(sanctuaryWorld,x,y,z);
-	        				// Create template
-				        	// If it fails validation, it does not get stored in memory and will not be saved back into the data file.
-				        	// This effectively removes it from the server.
-				        	int status = createMonumentTemplate(sanctuary, templateName, templateCornerOne, templateCornerTwo, templateTravel, cost, false);
+	        				// Create  & validate template
+							// If it fails validation, it is still loaded into memory, but marked as invalid.
+				        	int status = loadMonumentTemplate(sanctuary, templateName, templateCornerOne, templateCornerTwo, templateTravel, cost);
 				        	if(status != 0) {
-			        			String message = "Failed to load Monument Template "+templateName+" for Sanctuary "+sanctuaryName+", ";
+			        			String message = "Invalid Monument Template "+templateName+" for Sanctuary "+sanctuaryName+", ";
 			        			switch(status) {
 				        			case 1:
 				        				message = message+"base dimensions are not 16x16 blocks.";

@@ -54,18 +54,17 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
         ArrayList<KonMonumentTemplate> allTemplates = new ArrayList<>();
         for(KonSanctuary sanctuary : getKonquest().getSanctuaryManager().getSanctuaries()) {
             for(KonMonumentTemplate template : sanctuary.getTemplates()) {
-                if(template.isValid()) {
-                    allTemplates.add(template);
-                    templateSanctuaryMap.put(template,sanctuary.getName());
-                    // Count kingdoms using this template
-                    int count = 0;
-                    for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
-                        if(kingdom.getMonumentTemplate().equals(template)) {
-                            count++;
-                        }
+                allTemplates.add(template);
+                templateSanctuaryMap.put(template,sanctuary.getName());
+                // Count kingdoms using this template
+                int count = 0;
+                for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
+                    KonMonumentTemplate kingdomTemplate = kingdom.getMonumentTemplate();
+                    if(kingdomTemplate != null && kingdomTemplate.equals(template)) {
+                        count++;
                     }
-                    templateUsedKingdomsMap.put(template,count);
                 }
+                templateUsedKingdomsMap.put(template,count);
             }
         }
 

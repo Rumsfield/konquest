@@ -146,7 +146,7 @@ public class InventoryListener implements Listener {
 								ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_LOOT_LATER.getMessage());
 							}
 						} else {
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 							event.setCancelled(true);
 							return;
 						}

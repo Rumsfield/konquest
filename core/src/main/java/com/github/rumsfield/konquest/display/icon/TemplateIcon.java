@@ -64,9 +64,11 @@ public class TemplateIcon implements MenuIcon {
 		//TODO: Replace with message paths
 		if(template != null) {
 			if(!template.isValid()) {
-				itemLore.add(alertColor + "Invalid");
-			} else if(template.isBlanking()) {
-				itemLore.add(alertColor + "Temporarily Disabled");
+				if(template.isBlanking()) {
+					itemLore.add(alertColor + "Unavailable");
+				} else {
+					itemLore.add(alertColor + "Invalid");
+				}
 			}
 			itemLore.add(loreColor+"Name: "+valueColor+template.getName());
 			itemLore.add(loreColor+"Critical Hits: "+valueColor+template.getNumCriticals());

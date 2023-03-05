@@ -42,7 +42,7 @@ public class LanguageManager {
 		if(lang.contains(path)) {
 			int formats = messagePath.getFormats();
 			if(formats != args.length) {
-				ChatUtil.printConsoleError("Language file message format mismatch. Expected "+formats+", got "+args.length+" for path "+path);
+				ChatUtil.printConsoleError("Language file message format mismatch. Expected "+formats+" '%s', got "+args.length+" for path "+path);
 			}
 			if(args.length > 0) {
 				try {

@@ -426,19 +426,25 @@ public class PlayerListener implements Listener {
 	    				case 1:
 	    					int diffX = (int)Math.abs(templateCorner1.getX()-templateCorner2.getX())+1;
 	    					int diffZ = (int)Math.abs(templateCorner1.getZ()-templateCorner2.getZ())+1;
-	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(diffX,diffZ));
+	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(templateName,diffX,diffZ));
 	    					break;
 	    				case 2:
 	    					String criticalBlockTypeName = konquest.getCore().getString(CorePath.MONUMENTS_CRITICAL_BLOCK.getPath());
 	    					int maxCriticalhits = konquest.getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
-	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(maxCriticalhits,criticalBlockTypeName));
+	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(templateName,maxCriticalhits,criticalBlockTypeName));
 	    					break;
 	    				case 3:
-	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_TRAVEL.getMessage());
+	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_TRAVEL.getMessage(templateName));
 	    					break;
 	    				case 4:
-	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage());
+	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage(templateName));
 	    					break;
+						case 5:
+							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage());
+							break;
+						case 10:
+							ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_RESET.getMessage(templateName));
+							break;
 	    				default:
 	    					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(createMonumentStatus));
 	    					break;

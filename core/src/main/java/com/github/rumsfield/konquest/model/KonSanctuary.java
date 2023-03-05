@@ -216,6 +216,10 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 	public void startTemplateBlanking(String name) {
 		KonMonumentTemplate template = getTemplate(name);
 		if(template != null) {
+			if(!template.isBlanking()) {
+				ChatUtil.sendBroadcast("Monument Template "+template.getName()+" is unavailable.");
+				ChatUtil.printDebug("Starting monument blanking for template "+name);
+			}
 			stopTemplateBlanking(name);
 			template.setBlanking(true);
 			template.setValid(false);
@@ -224,7 +228,6 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 			timer.setTime(60);
 			timer.startTimer();
 			templateBlankingTimers.put(name.toLowerCase(), timer);
-			ChatUtil.printDebug("Starting 60 second monument blanking timer for template "+name);
 		} else {
 			ChatUtil.printDebug("Failed to start blanking for unknown template "+name);
 		}
@@ -241,7 +244,6 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 		if(templateBlankingTimers.containsKey(nameLower)) {
 			templateBlankingTimers.get(nameLower).stopTimer();
 			templateBlankingTimers.remove(nameLower);
-			ChatUtil.printDebug("Stopping monument blanking timer for template "+name);
 		}
 	}
 	
@@ -258,10 +260,11 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 					if(monumentTemplate != null) {
 						// Re-validate monument template after edits
 						int status = getKonquest().getSanctuaryManager().validateTemplate(monumentTemplate,this);
-						
+						ChatUtil.printDebug("Template validation completed with return code: "+status);
 						switch(status) {
 							case 0:
-								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(templateName));
+								//ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(templateName));
+								ChatUtil.sendBroadcast("Monument Template "+templateName+" is now available.");
 								monumentTemplate.setValid(true);
 								monumentTemplate.setBlanking(false);
 								getKonquest().getKingdomManager().reloadMonumentsForTemplate(monumentTemplate);
@@ -271,21 +274,21 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 								Location c2 = monumentTemplate.getCornerTwo();
 								int diffX = (int)Math.abs(c1.getX()-c2.getX())+1;
 								int diffZ = (int)Math.abs(c1.getZ()-c2.getZ())+1;
-								ChatUtil.sendAdminBroadcast(templateName+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(diffX,diffZ));
+								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(templateName,diffX,diffZ));
 								break;
 							case 2:
 								String criticalBlockTypeName = getKonquest().getCore().getString(CorePath.MONUMENTS_CRITICAL_BLOCK.getPath());
 								int maxCriticalhits = getKonquest().getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
-								ChatUtil.sendAdminBroadcast(templateName+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(maxCriticalhits,criticalBlockTypeName));
+								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(templateName,maxCriticalhits,criticalBlockTypeName));
 								break;
 							case 3:
-								ChatUtil.sendAdminBroadcast(templateName+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_TRAVEL.getMessage());
+								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_TRAVEL.getMessage(templateName));
 								break;
 							case 4:
-								ChatUtil.sendAdminBroadcast(templateName+": "+MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage());
+								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage(templateName));
 								break;
 							default:
-								ChatUtil.sendAdminBroadcast(templateName+": "+"Failed to refresh monument template, check manually.");
+								ChatUtil.printDebug("Monument blanking timer ended with unknown status for template "+templateName);
 								break;
 						}
 					}

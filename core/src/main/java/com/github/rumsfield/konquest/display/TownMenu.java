@@ -146,8 +146,6 @@ public class TownMenu extends StateMenu implements ViewableMenu {
         DisplayMenu result;
         pages.clear();
         currentPage = 0;
-        String loreHintStr1 = "";
-        String loreHintStr2 = "";
         boolean isClickable = false;
         List<KonTown> towns = new ArrayList<>();
 
@@ -159,8 +157,6 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                     towns.add(town);
                 }
             }
-            loreHintStr1 = "Click to request";
-            loreHintStr2 = "Click to join";
             isClickable = true;
         } else if(context.equals(MenuState.LEAVE)) {
             // List of towns that the player can leave
@@ -169,24 +165,19 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                     towns.add(town);
                 }
             }
-            loreHintStr1 = "Click to leave";
             isClickable = true;
         } else if(context.equals(MenuState.LIST)) {
             // List of all towns
             towns.add(kingdom.getCapital());
             towns.addAll(kingdom.getTowns());
-            loreHintStr1 = "Click to view";
             isClickable = true;
         } else if(context.equals(MenuState.INVITES)) {
             // Towns that have invited the player to join as a resident
             towns.addAll(manager.getInviteTowns(player));
-            loreHintStr1 = "Left-click to accept";
-            loreHintStr2 = "Right-click to decline";
             isClickable = true;
         } else if(context.equals(MenuState.REQUESTS)) {
             // Towns with pending resident join requests
             towns.addAll(manager.getRequestTowns(player));
-            loreHintStr1 = "Click to manage";
             isClickable = true;
         } else {
             return null;
@@ -210,11 +201,30 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                 KonTown currentTown = listIter.next();
                 ChatColor contextColor = konquest.getFriendlyPrimaryColor();
                 loreList = new ArrayList<>();
-                if(!loreHintStr1.equals("")) {
-                    loreList.add(hintColor+loreHintStr1);
-                }
-                if(!loreHintStr2.equals("")) {
-                    loreList.add(hintColor+loreHintStr2);
+                // Context-based lore
+                switch(context) {
+                    case JOIN:
+                        if(currentTown.isOpen()) {
+                            loreList.add(hintColor+"Click to join now");
+                        } else {
+                            loreList.add(hintColor+"Click to request");
+                        }
+                        break;
+                    case LEAVE:
+                        loreList.add(hintColor+"Click to leave");
+                        break;
+                    case LIST:
+                        loreList.add(hintColor+"Click to view");
+                        break;
+                    case INVITES:
+                        loreList.add(hintColor+"Left-click to accept");
+                        loreList.add(hintColor+"Right-click to decline");
+                        break;
+                    case REQUESTS:
+                        loreList.add(hintColor+"Click to manage");
+                        break;
+                    default:
+                        break;
                 }
                 TownIcon icon = new TownIcon(currentTown,contextColor,loreList,slotIndex,isClickable);
                 pages.get(pageNum).addIcon(icon);

@@ -50,6 +50,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
     private final int ROOT_SLOT_OPTIONS 		= 15;
     private final int ROOT_SLOT_SPECIALIZATION	= 16;
 
+    private final String propertyColor = DisplayManager.propertyFormat;
     private final String loreColor = DisplayManager.loreFormat;
     private final String valueColor = DisplayManager.loreFormat;
     private final String hintColor = DisplayManager.loreFormat;
@@ -263,7 +264,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                 loreList = new ArrayList<>();
                 String townRole = town.getPlayerRoleName(currentPlayer);
                 if(!townRole.equals("")) {
-                    loreList.add(townRole);
+                    loreList.add(propertyColor+townRole);
                 }
                 if(!loreHintStr1.equals("")) {
                     loreList.add(hintColor+loreHintStr1);
