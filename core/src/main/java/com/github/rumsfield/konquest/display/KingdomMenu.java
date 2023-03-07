@@ -1,7 +1,7 @@
 package com.github.rumsfield.konquest.display;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.api.model.KonquestRelationship;
+import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.display.icon.*;
 import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
@@ -10,6 +10,7 @@ import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonMonumentTemplate;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.Labeler;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -395,16 +396,15 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	 * 		Lore0 = <context description based on instant war/peace, their stance>
 	 * 		Lore1 = <click to enact, if clickable based on context/conditions>
 	 */
-
+	//TODO re-do this
 
 	private DisplayMenu createDiplomacyView() {
-		//B_DIPLOMACY
 		// diplomacyKingdom is the global variable to keep track of current kingdom changing status
 		
 		DisplayMenu result;
-		RelationIcon icon;
+		DiplomacyIcon icon;
 		
-		int numIcons = KonquestRelationship.values().length + 2; // Add 2 for kingdom info and spacer
+		int numIcons = KonquestDiplomacyType.values().length + 2; // Add 2 for kingdom info and spacer
 		int numRows = (int)Math.ceil((double)numIcons / 9);
 		result = new DisplayMenu(numRows+1, getTitle(MenuState.B_DIPLOMACY));
 		int index = 0;
@@ -413,10 +413,10 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		// Create kingdom info
 		ChatColor contextColor = konquest.getDisplayPrimaryColor(kingdom, diplomacyKingdom);
 		loreList = new ArrayList<>();
-		String ourStatus = kingdom.getActiveRelation(diplomacyKingdom).getLabel();
-		String theirStatus = diplomacyKingdom.getActiveRelation(kingdom).getLabel();
-		String ourRequestStatus = kingdom.getRelationRequest(diplomacyKingdom).getLabel();
-		String theirRequestStatus = diplomacyKingdom.getRelationRequest(kingdom).getLabel();
+		String ourStatus = Labeler.lookup(kingdom.getActiveRelation(diplomacyKingdom));
+		String theirStatus = Labeler.lookup(diplomacyKingdom.getActiveRelation(kingdom));
+		String ourRequestStatus = Labeler.lookup(kingdom.getRelationRequest(diplomacyKingdom));
+		String theirRequestStatus = Labeler.lookup(diplomacyKingdom.getRelationRequest(kingdom));
 		loreList.add(loreColor+"Our Stance"+": "+valueColor+ourStatus);
 		loreList.add(loreColor+"Their Stance"+": "+valueColor+theirStatus);
 		loreList.add(loreColor+"+-------------+");
@@ -428,7 +428,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		
 		// Only create relation options for created kingdoms
 		if(isCreatedKingdom) {
-			for(KonquestRelationship relation : KonquestRelationship.values()) {
+			for(KonquestDiplomacyType relation : KonquestDiplomacyType.values()) {
 				// Determine context lore for this relation and the stance of kingdom with diplomacyKingdom
 				loreList = new ArrayList<>();
 				// Is this relation a valid option in the current relationship?
@@ -466,7 +466,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					isClickable = true;
 				}
 				// Create icon
-				icon = new RelationIcon(relation,loreList,index,isClickable);
+				icon = new DiplomacyIcon(relation,loreList,index,isClickable);
 				result.addIcon(icon);
 				index++;
 			}
@@ -532,8 +532,8 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				ChatColor contextColor = konquest.getDisplayPrimaryColor(kingdom, currentKingdom);
 				loreList = new ArrayList<>();
 				if(isCreatedKingdom) {
-					String ourStatus = kingdom.getActiveRelation(currentKingdom).getLabel();
-					String theirStatus = currentKingdom.getActiveRelation(kingdom).getLabel();
+					String ourStatus = Labeler.lookup(kingdom.getActiveRelation(currentKingdom));
+					String theirStatus = Labeler.lookup(currentKingdom.getActiveRelation(kingdom));
 					loreList.add(loreColor+MessagePath.MENU_GUILD_OUR_STATUS.getMessage()+": "+valueColor+ourStatus);
 					loreList.add(loreColor+MessagePath.MENU_GUILD_THEIR_STATUS.getMessage()+": "+valueColor+theirStatus);
 				}
@@ -783,9 +783,9 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					break;
 				case B_DIPLOMACY:
 					// Clicking changes the relationship of kingdoms
-					if(clickedIcon instanceof RelationIcon) {
-						RelationIcon icon = (RelationIcon)clickedIcon;
-						KonquestRelationship clickRelation = icon.getRelation();
+					if(clickedIcon instanceof DiplomacyIcon) {
+						DiplomacyIcon icon = (DiplomacyIcon)clickedIcon;
+						KonquestDiplomacyType clickRelation = icon.getRelation();
 						boolean status = manager.menuChangeKingdomRelation(kingdom, diplomacyKingdom, clickRelation, player, isAdmin);
 						diplomacyKingdom = null;
 						if(status) {

@@ -8,6 +8,7 @@ import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.Labeler;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.entity.Player;
 
@@ -193,9 +194,9 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
     	KonPlayer onlinePlayer = playerManager.getPlayer(player);
     	if(onlinePlayer != null && player.isOnline()) {
         	if(territoryManager.isChunkClaimed(player.getLocation())) {
-        		result = territoryManager.getChunkTerritory(player.getLocation()).getTerritoryType().getLabel();
+        		result = Labeler.lookup(territoryManager.getChunkTerritory(player.getLocation()).getTerritoryType());
         	} else {
-        		result = KonquestTerritoryType.WILD.getLabel();
+        		result = Labeler.lookup(KonquestTerritoryType.WILD);
         	}
     	}
     	return result;
@@ -208,7 +209,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
         	if(territoryManager.isChunkClaimed(player.getLocation())) {
         		result = territoryManager.getChunkTerritory(player.getLocation()).getName();
         	} else {
-        		result = KonquestTerritoryType.WILD.getLabel();
+        		result = Labeler.lookup(KonquestTerritoryType.WILD);
         	}
     	}
     	return result;

@@ -1075,7 +1075,19 @@ public class TerritoryManager {
 		}
 		return locationMap;
 	}
-	
+
+	public void updateTownDisplayBars(KonKingdom kingdom) {
+		for(KonTown town : kingdom.getCapitalTowns()) {
+			town.updateBarPlayers();
+		}
+	}
+
+	public void updatePlayerBorderParticles(KonKingdom kingdom) {
+		for(KonPlayer player : konquest.getPlayerManager().getPlayersInKingdom(kingdom)) {
+			updatePlayerBorderParticles(player);
+		}
+	}
+
 	public void updatePlayerBorderParticles(KonPlayer player) {
 		updatePlayerBorderParticles(player, player.getBukkitPlayer().getLocation());
 	}

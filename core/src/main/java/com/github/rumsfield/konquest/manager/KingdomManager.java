@@ -1559,10 +1559,19 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 *   - [peace,peace] 		-> both kingdoms change to peace, apply PEACE
 	 * 
 	 */
-	 
-	//TODO: menu messaging
-	public boolean menuChangeKingdomRelation(@Nullable KonKingdom kingdom,@Nullable  KonKingdom otherKingdom,@NotNull KonquestRelationship relation,@NotNull KonPlayer player, boolean isAdmin) {
-		
+
+	/**
+	 * This method attempts to update the diplomatic states of two kingdoms.
+	 * It handles validation of state changes, instant state changes and diplomatic requests.
+	 * @param kingdom		The source kingdom initiating the change (ours)
+	 * @param otherKingdom	The target kingdom in question (theirs)
+	 * @param relation		The new diplomatic state to change to
+	 * @param player		The player performing the change
+	 * @param isAdmin		Whether the player is an admin (to bypass some checks)
+	 * @return				True when the change was successful
+	 */
+	public boolean menuChangeKingdomRelation(@Nullable KonKingdom kingdom, @Nullable  KonKingdom otherKingdom, @NotNull KonquestDiplomacyType relation, @NotNull KonPlayer player, boolean isAdmin) {
+
 		if(kingdom == null || otherKingdom == null) return false;
 		
 		Player bukkitPlayer = player.getBukkitPlayer();
@@ -1574,152 +1583,219 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
                 return false;
 			}
     	}
-		
-		KonquestRelationship ourRelation = kingdom.getActiveRelation(otherKingdom);
-		KonquestRelationship theirRelation = otherKingdom.getActiveRelation(kingdom);
-		
-		if(ourRelation.equals(relation)) {
+
+		// Our current state with the other kingdom
+		KonquestDiplomacyType ourActiveState = kingdom.getActiveRelation(otherKingdom);
+		// Their current request of us (if any)
+		KonquestDiplomacyType ourRequestState = kingdom.getRelationRequest(otherKingdom);
+		// Their current state with us
+		KonquestDiplomacyType theirActiveState = otherKingdom.getActiveRelation(kingdom);
+		// Our current diplomatic request of them (if any)
+		KonquestDiplomacyType theirRequestState = otherKingdom.getRelationRequest(kingdom);
+
+		ChatUtil.printDebug("Attempting to change kingdom "+kingdom.getName()+" relation to "+otherKingdom.getName()+": "+relation.toString());
+		ChatUtil.printDebug("Our states ["+ourActiveState+","+ourRequestState+"]; Their states ["+theirActiveState+","+theirRequestState+"]");
+
+		// Check for valid relation change given current states
+		if(ourActiveState.equals(relation)) {
 			// Cannot change to existing active relation
-			Konquest.playFailSound(player.getBukkitPlayer());
+			ChatUtil.sendError(bukkitPlayer,"Cannot choose the current diplomatic relationship.");
 			return false;
 		}
-		
-		ChatUtil.printDebug("Changing kingdom "+kingdom.getName()+" relation to "+otherKingdom.getName()+", "+relation.toString());
-		ChatUtil.printDebug("Our relationship is currently "+ ourRelation);
-		ChatUtil.printDebug("Their relationship is currently "+theirRelation.toString());
-		
+		if(ourActiveState.equals(KonquestDiplomacyType.ENEMY) && (relation.equals(KonquestDiplomacyType.ALLIED) || relation.equals(KonquestDiplomacyType.SANCTIONED))) {
+			// Cannot change to Allied, Sanctioned when currently enemy
+			ChatUtil.sendError(bukkitPlayer,"You may only request peace when at war.");
+			return false;
+		}
+		if(ourActiveState.equals(KonquestDiplomacyType.ALLIED) && relation.equals(KonquestDiplomacyType.ENEMY)) {
+			// Cannot change to Enemy when currently Allied
+			ChatUtil.sendError(bukkitPlayer,"Cannot declare war on an allied kingdom.");
+			return false;
+		}
+
+		// Verify allowable current state combination
+		boolean isAllowedStates = true;
+		switch(ourActiveState) {
+			case PEACE:
+			case SANCTIONED:
+				if(theirActiveState.equals(KonquestDiplomacyType.ALLIED) || theirActiveState.equals(KonquestDiplomacyType.ENEMY)) {
+					isAllowedStates = false;
+				}
+				break;
+			case ALLIED:
+				if(!theirActiveState.equals(KonquestDiplomacyType.ALLIED)) {
+					isAllowedStates = false;
+				}
+				break;
+			case ENEMY:
+				if(!theirActiveState.equals(KonquestDiplomacyType.ENEMY)) {
+					isAllowedStates = false;
+				}
+				break;
+			default:
+				isAllowedStates = false;
+				break;
+		}
+		if(!isAllowedStates) {
+			ChatUtil.printDebug("Found invalid state combination, reverting to default.");
+			kingdom.removeActiveRelation(otherKingdom);
+			otherKingdom.removeActiveRelation(kingdom);
+			ChatUtil.sendError(bukkitPlayer,"Internal error, reverted to default diplomatic relationship.");
+			return false;
+		}
+
+		// Does any change to war by one side instantly force the other into war?
 		boolean isInstantWar = konquest.getCore().getBoolean(CorePath.KINGDOMS_INSTANT_WAR.getPath(), false);
+		// Does a change from war to peace by one side instantly force the other into peace?
 		boolean isInstantPeace = konquest.getCore().getBoolean(CorePath.KINGDOMS_INSTANT_PEACE.getPath(), false);
-		
+
+		/* At this point, the active states are valid and the change request can be processed */
+		//TODO KR message path
+
 		// Relationship transition logic
-		if(relation.equals(KonquestRelationship.PEACE)) {
-			// Change to peace
-			if(ourRelation.equals(KonquestRelationship.ENEMY)) {
-				// We are enemies, try to make peace
-				if(isInstantPeace) {
-					// Instantly change to active peace, force them to peace too
-					setJointActiveRelation(kingdom,otherKingdom,relation);
-				} else {
-					// Check if they already request peace
-					if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(relation)) {
-						// Both sides request peace, change to active peace
+		switch(relation) {
+			case PEACE:
+				// Our kingdom wants to make peace
+				if(ourActiveState.equals(KonquestDiplomacyType.ENEMY)) {
+					// We are enemies, try to make peace
+					if(isInstantPeace) {
+						// Instantly change to active peace, force them to peace too
 						setJointActiveRelation(kingdom,otherKingdom,relation);
+						ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" have made peace!");
 					} else {
-						// We request peace, still at war
-						kingdom.setRelationRequest(otherKingdom, relation);
+						// Request peace from them
+						if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(relation)) {
+							// Both sides request peace, change to active peace
+							setJointActiveRelation(kingdom,otherKingdom,relation);
+							ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" have made peace!");
+						} else {
+							// We request peace, still at war
+							otherKingdom.setRelationRequest(kingdom,relation);
+							broadcastMembers(otherKingdom,"The kingdom of "+kingdom.getName()+" requests to make peace.");
+						}
 					}
-				}
-			} else {
-				// We are not enemies
-				if(ourRelation.equals(KonquestRelationship.ALLIED)) {
-					// We are allies
-					// Instantly break alliance, reset both of us to default
-					removeJointActiveRelation(kingdom,otherKingdom);
-				}
-				// Apply relation
-				kingdom.setActiveRelation(otherKingdom, relation);
-				kingdom.removeRelationRequest(otherKingdom);
-			}
-			
-		} else if (relation.equals(KonquestRelationship.SANCTIONED)) {
-			// Change to sanctioned
-			if(!ourRelation.equals(KonquestRelationship.ENEMY)) {
-				// Cannot sanction enemies
-				if(ourRelation.equals(KonquestRelationship.ALLIED)) {
-					// We are allies
-					// Instantly break alliance, reset both of us to default
-					removeJointActiveRelation(kingdom,otherKingdom);
-				}
-				// Apply relation
-				kingdom.setActiveRelation(otherKingdom, relation);
-				kingdom.removeRelationRequest(otherKingdom);
-			}
-			
-		} else if(relation.equals(KonquestRelationship.ENEMY)) {
-			// Attempt to declare war
-			if(isInstantWar) {
-				// Apply joint enemy
-				setJointActiveRelation(kingdom,otherKingdom,relation);
-			} else {
-				// Request war
-				// Check if they already request enemy
-				if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(relation)) {
-					// Both sides request enemy, change to active war
-					setJointActiveRelation(kingdom,otherKingdom,relation);
 				} else {
-					if(ourRelation.equals(KonquestRelationship.ALLIED)) {
-						// Instantly break alliance, reset both of us to default
-						removeJointActiveRelation(kingdom,otherKingdom);
+					// We are not enemies
+					if(ourActiveState.equals(KonquestDiplomacyType.ALLIED)) {
+						// We are allies, instantly break alliance and set both to peace
+						setJointActiveRelation(kingdom,otherKingdom,relation);
+						ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" are no longer allies!");
+					} else {
+						// Apply active relation only to our kingdom
+						kingdom.setActiveRelation(otherKingdom, relation);
+						// Remove any relation request from other kingdom
+						otherKingdom.removeRelationRequest(kingdom);
+						ChatUtil.sendBroadcast("The kingdom of "+kingdom.getName()+" has made peace with "+otherKingdom.getName()+".");
 					}
-					// We request enemy
-					kingdom.setRelationRequest(otherKingdom, relation);
 				}
-			}
-			
-		} else if(relation.equals(KonquestRelationship.ALLIED)) {
-			// Attempt to form an alliance
-			if(!ourRelation.equals(KonquestRelationship.ENEMY)) {
-				// Cannot allay enemies
-				// Check if they already request allied
+				break;
+			case SANCTIONED:
+				// Our kingdom wants to sanction the other
+				if(ourActiveState.equals(KonquestDiplomacyType.ALLIED)) {
+					// We are allies, instantly break alliance and set both to peace
+					removeJointActiveRelation(kingdom,otherKingdom);
+					ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" are no longer allies!");
+				}
+				// Apply sanction
+				kingdom.setActiveRelation(otherKingdom, relation);
+				// Remove any relation request from other kingdom
+				otherKingdom.removeRelationRequest(kingdom);
+				ChatUtil.sendBroadcast("The kingdom of "+kingdom.getName()+" has sanctioned "+otherKingdom.getName()+".");
+				break;
+			case ALLIED:
+				// Our kingdom wants to ally the other
 				if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(relation)) {
 					// Both sides request allied, change to active alliance
 					setJointActiveRelation(kingdom,otherKingdom,relation);
+					ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" have formed an alliance!");
 				} else {
 					// We request allied
-					kingdom.setRelationRequest(otherKingdom, relation);
+					otherKingdom.setRelationRequest(kingdom,relation);
+					broadcastMembers(otherKingdom,"The kingdom of "+kingdom.getName()+" requests to make an alliance.");
 				}
-			}
+				break;
+			case ENEMY:
+				// Our kingdom wants to declare war
+				if(isInstantWar) {
+					// Instantly change to active enemy, force them to enemy too
+					setJointActiveRelation(kingdom,otherKingdom,relation);
+					ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" are at war!");
+				} else {
+					// Request war
+					// Check if they already request enemy
+					if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(relation)) {
+						// Both sides request enemy, change to active war
+						setJointActiveRelation(kingdom,otherKingdom,relation);
+						ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" are at war!");
+					} else {
+						// We request enemy
+						otherKingdom.setRelationRequest(kingdom, relation);
+						broadcastMembers(otherKingdom,"The kingdom of "+kingdom.getName()+" requests war.");
+					}
+				}
+				break;
+			default:
+				break;
 		}
 		
 		// Debug messaging
-		KonquestRelationship ourActiveRelation = kingdom.getActiveRelation(otherKingdom);
-		KonquestRelationship theirActiveRelation = otherKingdom.getActiveRelation(kingdom);
-		KonquestRelationship ourRelationRequest = kingdom.getRelationRequest(otherKingdom);
-		KonquestRelationship theirRelationRequest = otherKingdom.getRelationRequest(kingdom);
-		ChatUtil.printDebug("Finished: "+kingdom.getName()+" ["+ourActiveRelation.toString()+","+ourRelationRequest.toString()+"]; "+otherKingdom.getName()+" ["+theirActiveRelation.toString()+","+theirRelationRequest.toString()+"]");
-		
+		// Our current state with the other kingdom
+		KonquestDiplomacyType ourNewActiveState = kingdom.getActiveRelation(otherKingdom);
+		// Their current request of us (if any)
+		KonquestDiplomacyType ourNewRequestState = kingdom.getRelationRequest(otherKingdom);
+		// Their current state with us
+		KonquestDiplomacyType theirNewActiveState = otherKingdom.getActiveRelation(kingdom);
+		// Our current diplomatic request of them (if any)
+		KonquestDiplomacyType theirNewRequestState = otherKingdom.getRelationRequest(kingdom);
+		ChatUtil.printDebug("Finished; Our states ["+ourNewActiveState+","+ourNewRequestState+"]; Their states ["+theirNewActiveState+","+theirNewRequestState+"]");
+
+		// Update all kingdoms & players for new relationship (when it changes)
+		// 1. Update all player name colors
+		// 2. Update all border particles
+		// 3. Update all territory display bars
+		if(!ourActiveState.equals(ourNewActiveState)) {
+			konquest.updateNamePackets(kingdom);
+			konquest.getTerritoryManager().updatePlayerBorderParticles(kingdom);
+			konquest.getTerritoryManager().updateTownDisplayBars(kingdom);
+		}
+		if(!theirActiveState.equals(theirNewActiveState)) {
+			konquest.updateNamePackets(otherKingdom);
+			konquest.getTerritoryManager().updatePlayerBorderParticles(otherKingdom);
+			konquest.getTerritoryManager().updateTownDisplayBars(otherKingdom);
+		}
+
 		// Withdraw cost
 		if(costRelation > 0 && !isAdmin) {
             if(KonquestPlugin.withdrawPlayer(bukkitPlayer, costRelation)) {
             	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costRelation);
             }
 		}
-		
-		Konquest.playSuccessSound(player.getBukkitPlayer());
+
 		return true;
 	}
 	
-	public boolean isValidRelationChoice(@NotNull KonKingdom kingdom1,@NotNull  KonKingdom kingdom2,@NotNull KonquestRelationship relation) {
-		boolean result = false;
-		KonquestRelationship ourRelation = kingdom1.getActiveRelation(kingdom2);
-		// Relationship choice logic
-		switch(relation) {
-			case PEACE:
-			case ENEMY:
-				// Can always choose enemy
-				// Can always choose peace
-				result = true;
-				break;
-			case SANCTIONED:
-			case ALLIED:
-				// Cannot ally enemies
-				// Cannot sanction enemies
-				result = !ourRelation.equals(KonquestRelationship.ENEMY);
-				break;
-			default:
-				break;
-		}
+	public boolean isValidRelationChoice(@NotNull KonKingdom kingdom1,@NotNull  KonKingdom kingdom2,@NotNull KonquestDiplomacyType relation) {
+		KonquestDiplomacyType ourRelation = kingdom1.getActiveRelation(kingdom2);
 		if(ourRelation.equals(relation)) {
-			result = false;
+			// Cannot change to existing active relation
+			return false;
+		} else if(ourRelation.equals(KonquestDiplomacyType.ENEMY) && (relation.equals(KonquestDiplomacyType.ALLIED) || relation.equals(KonquestDiplomacyType.SANCTIONED))) {
+			// Cannot change to Allied, Sanctioned when currently enemy
+			return false;
+		} else if(ourRelation.equals(KonquestDiplomacyType.ALLIED) && relation.equals(KonquestDiplomacyType.ENEMY)) {
+			// Cannot change to Enemy when currently Allied
+			return false;
 		}
-		return result;
+		return true;
 	}
 	
-	private void setJointActiveRelation(@NotNull KonKingdom kingdom1,@NotNull KonKingdom kingdom2,@NotNull KonquestRelationship relation) {
+	private void setJointActiveRelation(@NotNull KonKingdom kingdom1,@NotNull KonKingdom kingdom2,@NotNull KonquestDiplomacyType relation) {
+		// Force both kingdoms to have the given active relationship
+		// Remove any relation requests
 		kingdom1.setActiveRelation(kingdom2, relation);
-		kingdom1.setRelationRequest(kingdom2, relation);
+		kingdom1.removeRelationRequest(kingdom2);
 		kingdom2.setActiveRelation(kingdom1, relation);
-		kingdom2.setRelationRequest(kingdom1, relation);
+		kingdom2.removeRelationRequest(kingdom1);
 	}
 	
 	private void removeJointActiveRelation(@NotNull KonKingdom kingdom1,@NotNull KonKingdom kingdom2) {
@@ -1740,7 +1816,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(kingdom1.equals(getBarbarians()) || kingdom2.equals(getBarbarians())) {
 			return true;
 		}
-		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.ENEMY) && kingdom2.getActiveRelation(kingdom1).equals(KonquestRelationship.ENEMY);
+		return kingdom1.getActiveRelation(kingdom2).equals(KonquestDiplomacyType.ENEMY) && kingdom2.getActiveRelation(kingdom1).equals(KonquestDiplomacyType.ENEMY);
 	}
 
 	/**
@@ -1754,7 +1830,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(kingdom1.equals(getBarbarians()) || kingdom2.equals(getBarbarians())) {
 			return false;
 		}
-		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.ALLIED) && kingdom2.getActiveRelation(kingdom1).equals(KonquestRelationship.ALLIED);
+		return kingdom1.getActiveRelation(kingdom2).equals(KonquestDiplomacyType.ALLIED) && kingdom2.getActiveRelation(kingdom1).equals(KonquestDiplomacyType.ALLIED);
 	}
 
 	/**
@@ -1764,7 +1840,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @return True when the reference kingdom sanctions the target kingdom
 	 */
 	public boolean isKingdomSanctioned(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
-		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.SANCTIONED);
+		return kingdom1.getActiveRelation(kingdom2).equals(KonquestDiplomacyType.SANCTIONED);
 	}
 
 	/**
@@ -1774,7 +1850,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @return True when the reference kingdom is peaceful with the target kingdom
 	 */
 	public boolean isKingdomPeaceful(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
-		return kingdom1.getActiveRelation(kingdom2).equals(KonquestRelationship.PEACE);
+		return kingdom1.getActiveRelation(kingdom2).equals(KonquestDiplomacyType.PEACE);
 	}
 	
 	public RelationRole getRelationRole(@Nullable KonquestKingdom displayKingdom,@Nullable KonquestKingdom contextKingdom) {

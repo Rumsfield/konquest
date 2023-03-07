@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import com.github.rumsfield.konquest.api.model.KonquestRelationship;
+import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
+import com.github.rumsfield.konquest.utility.Labeler;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -8,21 +9,21 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RelationIcon implements MenuIcon {
+public class DiplomacyIcon implements MenuIcon {
 
-	private final KonquestRelationship relation;
+	private final KonquestDiplomacyType relation;
 	private final List<String> lore;
 	private final int index;
 	private final boolean isClickable;
 	
-	public RelationIcon(KonquestRelationship relation, List<String> lore, int index, boolean isClickable) {
+	public DiplomacyIcon(KonquestDiplomacyType relation, List<String> lore, int index, boolean isClickable) {
 		this.relation = relation;
 		this.lore = lore;
 		this.index = index;
 		this.isClickable = isClickable;
 	}
 	
-	public KonquestRelationship getRelation() {
+	public KonquestDiplomacyType getRelation() {
 		return relation;
 	}
 	
@@ -33,7 +34,7 @@ public class RelationIcon implements MenuIcon {
 
 	@Override
 	public String getName() {
-		return relation.getLabel();
+		return Labeler.lookup(relation);
 	}
 
 	@Override

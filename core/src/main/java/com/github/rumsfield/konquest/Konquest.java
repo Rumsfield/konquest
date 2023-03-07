@@ -1284,10 +1284,12 @@ public class Konquest implements KonquestAPI, Timeable {
     		}
     	}
     }
-    
-    public void updateNamePackets(UUID id) {
-    	OfflinePlayer offlineBukkitPlayer = Bukkit.getOfflinePlayer(id);
-    	updateNamePackets(offlineBukkitPlayer);
+
+	// Updates the name packets for all online players in a kingdom
+    public void updateNamePackets(KonKingdom kingdom) {
+    	for(KonPlayer player : playerManager.getPlayersInKingdom(kingdom)) {
+			updateNamePackets(player);
+		}
     }
     
     public static UUID idFromString(String id) {

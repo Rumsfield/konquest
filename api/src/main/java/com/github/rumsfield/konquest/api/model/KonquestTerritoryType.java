@@ -10,41 +10,26 @@ public enum KonquestTerritoryType {
 	/**
 	 * The wild, which is no territory
 	 */
-	WILD		("territory.wild"),
+	WILD,
 	/**
 	 * Kingdom capital
 	 */
-	CAPITAL		("territory.capital"),
+	CAPITAL,
 	/**
 	 * Town
 	 */
-	TOWN		("territory.town"),
+	TOWN,
 	/**
 	 * Barbarian camp
 	 */
-	CAMP		("territory.camp"),
+	CAMP,
 	/**
 	 * Ruin
 	 */
-	RUIN		("territory.ruin"),
+	RUIN,
 	/**
 	 * Sanctuary land
 	 */
-	SANCTUARY	("territory.sanctuary");
-
-	private final String label;
-	
-	KonquestTerritoryType(String label) {
-		this.label = label;
-	}
-	
-	/**
-	 * Gets the display label from the Konquest language files
-	 * 
-	 * @return The label
-	 */
-	public String getLabel() {
-		return label;
-	}
+	SANCTUARY
 
 }

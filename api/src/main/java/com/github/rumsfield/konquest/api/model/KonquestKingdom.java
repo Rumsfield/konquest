@@ -34,10 +34,15 @@ public interface KonquestKingdom {
 	 * @return True if peaceful, else false
 	 */
     boolean isPeaceful();
-	
-	
-	//TODO: doc
-    KonquestRelationship getActiveRelation(KonquestKingdom kingdom);
+
+
+	/**
+	 * Get the active diplomatic relationship of this kingdom to the given kingdom.
+	 *
+	 * @param kingdom The other kingdom to compare
+	 * @return The diplomacy type of this kingdom relative to the given kingdom
+	 */
+	KonquestDiplomacyType getActiveRelation(KonquestKingdom kingdom);
 	
 	/**
 	 * Get the name of this kingdom.

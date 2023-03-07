@@ -1,12 +1,11 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
-import com.github.rumsfield.konquest.api.model.KonquestRelationship;
 import com.github.rumsfield.konquest.utility.Timer;
 import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.*;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -15,7 +14,7 @@ import java.util.*;
 
 public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHolder {
 	
-	public static final KonquestRelationship defaultRelation = KonquestRelationship.PEACE;
+	public static final KonquestDiplomacyType defaultRelation = KonquestDiplomacyType.getDefault();
 	
 	private String name;
 	private final Konquest konquest;
@@ -31,8 +30,8 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	private final RequestKeeper joinRequestKeeper;
 	private UUID master;
 	private final Map<UUID,Boolean> members; // True = officer, False = regular
-	private final Map<KonquestKingdom,KonquestRelationship> activeRelationships; // Active relation state
-	private final Map<KonquestKingdom,KonquestRelationship> requestRelationships; // Current relation requests to change state
+	private final Map<KonquestKingdom, KonquestDiplomacyType> activeRelationships; // This kingdom's active diplomatic state with other kingdoms
+	private final Map<KonquestKingdom, KonquestDiplomacyType> requestRelationships; // Other kingdom's requested diplomatic state with this kingdom
 	private final Map<KonPropertyFlag,Boolean> properties;
 	
 	public KonKingdom(Location loc, String name, Konquest konquest) {
@@ -357,33 +356,31 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	 * Relationship Methods
 	 * =================================================
 	 */
+	// Kingdom manager handles valid relationships, these methods are simple book-keeping
 	
 	/* Active Relationship */
 	
-	public boolean setActiveRelation(KonquestKingdom kingdom, KonquestRelationship relation) {
-		boolean result = false;
-		if(!activeRelationships.containsKey(kingdom) && !kingdom.equals(this)) {
-			activeRelationships.put(kingdom,relation);
-			result = true;
+	public void setActiveRelation(KonquestKingdom kingdom, KonquestDiplomacyType relation) {
+		// Prevent setting self relation
+		if(kingdom.equals(this)) {
+			return;
 		}
-		return result;
-	}
-	
-	public KonquestRelationship getActiveRelation(KonquestKingdom kingdom) {
-		KonquestRelationship result = defaultRelation;
-		if(activeRelationships.containsKey(kingdom)) {
-			result = activeRelationships.get(kingdom);
-		}
-		return result;
-	}
-	
-	public boolean removeActiveRelation(KonquestKingdom kingdom) {
-		boolean result = false;
-		if(activeRelationships.containsKey(kingdom)) {
+		// Only add non-default relationships
+		if(relation.equals(defaultRelation)) {
+			// Remove map entry when default
 			activeRelationships.remove(kingdom);
-			result = true;
+		} else {
+			// Set relationship
+			activeRelationships.put(kingdom,relation);
 		}
-		return result;
+	}
+	
+	public KonquestDiplomacyType getActiveRelation(KonquestKingdom kingdom) {
+		return activeRelationships.getOrDefault(kingdom, defaultRelation);
+	}
+	
+	public void removeActiveRelation(KonquestKingdom kingdom) {
+		activeRelationships.remove(kingdom);
 	}
 	
 	public void clearActiveRelations() {
@@ -404,34 +401,25 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	/* Request Relationship */
 	
-	public boolean setRelationRequest(KonquestKingdom kingdom, KonquestRelationship relation) {
-		boolean result = false;
-		if(!requestRelationships.containsKey(kingdom) && !kingdom.equals(this)) {
-			requestRelationships.put(kingdom,relation);
-			result = true;
+	public void setRelationRequest(KonquestKingdom kingdom, KonquestDiplomacyType relation) {
+		// Prevent setting self relation
+		if(kingdom.equals(this)) {
+			return;
 		}
-		return result;
+		// Set request relationship
+		requestRelationships.put(kingdom,relation);
 	}
 	
-	public KonquestRelationship getRelationRequest(KonquestKingdom kingdom) {
-		KonquestRelationship result = defaultRelation;
-		if(requestRelationships.containsKey(kingdom)) {
-			result = requestRelationships.get(kingdom);
-		}
-		return result;
+	public KonquestDiplomacyType getRelationRequest(KonquestKingdom kingdom) {
+		return requestRelationships.getOrDefault(kingdom, defaultRelation);
 	}
 	
 	public boolean hasRelationRequest(KonquestKingdom kingdom) {
 		return requestRelationships.containsKey(kingdom);
 	}
 	
-	public boolean removeRelationRequest(KonquestKingdom kingdom) {
-		boolean result = false;
-		if(requestRelationships.containsKey(kingdom)) {
-			requestRelationships.remove(kingdom);
-			result = true;
-		}
-		return result;
+	public void removeRelationRequest(KonquestKingdom kingdom) {
+		requestRelationships.remove(kingdom);
 	}
 	
 	public void clearRelationRequests() {

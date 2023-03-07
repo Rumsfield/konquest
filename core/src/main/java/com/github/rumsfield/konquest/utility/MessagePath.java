@@ -1,8 +1,6 @@
 package com.github.rumsfield.konquest.utility;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.api.model.KonquestRelationship;
-import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 
 public enum MessagePath {
 
@@ -757,18 +755,18 @@ public enum MessagePath {
 	DESCRIPTION_ADMIN_FLAG                      (0, "description.admin-flag"),
 	DESCRIPTION_ADMIN_STAT                      (0, "description.admin-stat"),
 	
-	TERRITORY_WILD                              (0, KonquestTerritoryType.WILD.getLabel()),
-	TERRITORY_CAPITAL                           (0, KonquestTerritoryType.CAPITAL.getLabel()),
-	TERRITORY_TOWN                              (0, KonquestTerritoryType.TOWN.getLabel()),
-	TERRITORY_CAMP                              (0, KonquestTerritoryType.CAMP.getLabel()),
-	TERRITORY_RUIN                              (0, KonquestTerritoryType.RUIN.getLabel()),
-	TERRITORY_SANCTUARY                         (0, KonquestTerritoryType.SANCTUARY.getLabel()),
+	TERRITORY_WILD                              (0, "territory.wild"),
+	TERRITORY_CAPITAL                           (0, "territory.capital"),
+	TERRITORY_TOWN                              (0, "territory.town"),
+	TERRITORY_CAMP                              (0, "territory.camp"),
+	TERRITORY_RUIN                              (0, "territory.ruin"),
+	TERRITORY_SANCTUARY                         (0, "territory.sanctuary"),
 	TERRITORY_OTHER                             (0, "territory.other"),
 	
-	RELATIONSHIP_ENEMY                          (0, KonquestRelationship.ENEMY.getLabel()),
-	RELATIONSHIP_SANCTIONED                     (0, KonquestRelationship.SANCTIONED.getLabel()),
-	RELATIONSHIP_PEACE                          (0, KonquestRelationship.PEACE.getLabel()),
-	RELATIONSHIP_ALLIED                         (0, KonquestRelationship.ALLIED.getLabel()),
+	RELATIONSHIP_ENEMY                          (0, "relationship.enemy"),
+	RELATIONSHIP_SANCTIONED                     (0, "relationship.sanctioned"),
+	RELATIONSHIP_PEACE                          (0, "relationship.peace"),
+	RELATIONSHIP_ALLIED                         (0, "relationship.allied"),
 	
 	NULL_MESSAGE	(0,"");
 	
