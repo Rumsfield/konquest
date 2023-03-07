@@ -1042,13 +1042,20 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		onlinePlayer.setKingdom(getBarbarians());
     		onlinePlayer.setExileKingdom(exileKingdom);
     		onlinePlayer.setBarbarian(true);
-    		// Refresh any territory bars
+    		// Territory updates at player's location
     		KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(onlinePlayer.getBukkitPlayer().getLocation());
     		if(territory instanceof KonBarDisplayer) {
-    			((KonBarDisplayer)territory).removeBarPlayer(onlinePlayer);
-    			((KonBarDisplayer)territory).addBarPlayer(onlinePlayer);
+				// Update display bars
+				KonBarDisplayer barDisplayer = (KonBarDisplayer)territory;
+				barDisplayer.removeBarPlayer(onlinePlayer);
+				barDisplayer.addBarPlayer(onlinePlayer);
     		}
-    		// Updates
+			if(territory instanceof KonTown) {
+				// Send a raid alert (barbarians are always a threat to towns)
+				KonTown town = (KonTown)territory;
+				town.sendRaidAlert();
+			}
+    		// General Updates
     		konquest.updateNamePackets(onlinePlayer);
     		konquest.getTerritoryManager().updatePlayerBorderParticles(onlinePlayer);
     		// Cool-down

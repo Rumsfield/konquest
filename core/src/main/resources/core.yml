@@ -94,20 +94,38 @@ core:
     # (*) The secondary color that players see for enemy players/towns with an armistice.
     #armistice_secondary: DARK_PURPLE
     
-# NEW (*) The color that players see for sanctioned kingdoms.
-    sanctioned: LIGHT_PURPLE
+# NEW (*) The primary color that players see for sanctioned kingdoms.
+    sanctioned_primary: LIGHT_PURPLE
+
+# NEW (*) The secondary color that players see for sanctioned kingdoms.
+    sanctioned_secondary: DARK_PURPLE
     
-# NEW (*) The color that players see for peaceful kingdoms.
-    peaceful: WHITE
+# NEW (*) The primary color that players see for peaceful kingdoms.
+    peaceful_primary: AQUA
+
+# NEW (*) The secondary color that players see for peaceful kingdoms.
+    peaceful_secondary: DARK_AQUA
     
-# NEW (*) The color that players see for allied kingdoms.
-    allied: BLUE
+# NEW (*) The primary color that players see for allied kingdoms.
+    allied_primary: BLUE
+
+# NEW (*) The secondary color that players see for allied kingdoms.
+    allied_secondary: DARK_BLUE
     
     # (*) The color that all players see for barbarians.
-    barbarian: YELLOW
+    #barbarian: YELLOW
+
+# NEW (*) The primary color that all players see for barbarians.
+    barbarian_primary: YELLOW
+
+# NEW (*) The secondary color that all players see for barbarians.
+    barbarian_secondary: GOLD
     
-# NEW (*) The color that players see for neutral territory, like ruins and sanctuaries.
-    neutral: GRAY
+# NEW (*) The primary color that players see for neutral territory, like ruins and sanctuaries.
+    neutral_primary: GRAY
+
+# NEW (*) The secondary color that players see for neutral territory, like ruins and sanctuaries.
+    neutral_secondary: DARK_GRAY
     
   # //// CORE.DATABASE \\\\
   database:

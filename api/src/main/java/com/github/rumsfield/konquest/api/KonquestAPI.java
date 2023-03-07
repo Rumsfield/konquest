@@ -26,20 +26,20 @@ public interface KonquestAPI {
 	 * @return The friendly primary color
 	 */
 	ChatColor getFriendlyPrimaryColor();
-	
+
+	/**
+	 * Gets the friendly secondary color, from core.yml.
+	 *
+	 * @return The friendly secondary color
+	 */
+	ChatColor getFriendlySecondaryColor();
+
 	/**
 	 * Gets the enemy primary color, from core.yml.
 	 * 
 	 * @return The enemy primary color
 	 */
 	ChatColor getEnemyPrimaryColor();
-	
-	/**
-	 * Gets the friendly secondary color, from core.yml.
-	 * 
-	 * @return The friendly secondary color
-	 */
-	ChatColor getFriendlySecondaryColor();
 	
 	/**
 	 * Gets the enemy secondary color, from core.yml.
@@ -49,40 +49,75 @@ public interface KonquestAPI {
 	ChatColor getEnemySecondaryColor();
 	
 	/**
-	 * Gets the sanctioned color, from core.yml.
+	 * Gets the sanctioned primary color, from core.yml.
 	 * 
-	 * @return The sanctioned color
+	 * @return The sanctioned primary color
 	 */
-	ChatColor getSanctionedColor();
-	
+	ChatColor getSanctionedPrimaryColor();
+
 	/**
-	 * Gets the peaceful color, from core.yml.
-	 * 
-	 * @return The peaceful color
+	 * Gets the sanctioned secondary color, from core.yml.
+	 *
+	 * @return The sanctioned secondary color
 	 */
-	ChatColor getPeacefulColor();
-	
+	ChatColor getSanctionedSecondaryColor();
+
 	/**
-	 * Gets the allied color, from core.yml.
+	 * Gets the peaceful primary color, from core.yml.
 	 * 
-	 * @return The allied color
+	 * @return The peaceful primary color
 	 */
-	ChatColor getAlliedColor();
-	
+	ChatColor getPeacefulPrimaryColor();
+
 	/**
-	 * Gets the barbarian color, from core.yml.
-	 * 
-	 * @return The barbarian color
+	 * Gets the peaceful secondary color, from core.yml.
+	 *
+	 * @return The peaceful secondary color
 	 */
-	ChatColor getBarbarianColor();
-	
+	ChatColor getPeacefulSecondaryColor();
+
 	/**
-	 * Gets the neutral color, from core.yml.
+	 * Gets the allied primary color, from core.yml.
 	 * 
-	 * @return The neutral color
+	 * @return The allied primary color
 	 */
-	ChatColor getNeutralColor();
-	
+	ChatColor getAlliedPrimaryColor();
+
+	/**
+	 * Gets the allied secondary color, from core.yml.
+	 *
+	 * @return The allied secondary color
+	 */
+	ChatColor getAlliedSecondaryColor();
+
+	/**
+	 * Gets the barbarian primary color, from core.yml.
+	 * 
+	 * @return The barbarian primary color
+	 */
+	ChatColor getBarbarianPrimaryColor();
+
+	/**
+	 * Gets the barbarian secondary color, from core.yml.
+	 *
+	 * @return The barbarian secondary color
+	 */
+	ChatColor getBarbarianSecondaryColor();
+
+	/**
+	 * Gets the neutral primary color, from core.yml.
+	 * 
+	 * @return The neutral primary color
+	 */
+	ChatColor getNeutralPrimaryColor();
+
+	/**
+	 * Gets the neutral secondary color, from core.yml.
+	 *
+	 * @return The neutral secondary color
+	 */
+	ChatColor getNeutralSecondaryColor();
+
 	/**
 	 * Gets the primary Konquest scoreboard with teams.
 	 * 

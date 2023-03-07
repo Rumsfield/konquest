@@ -85,13 +85,13 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.monumentBarEnemies = Bukkit.getServer().createBossBar(Konquest.enemyColor1+name, ChatUtil.mapBarColor(Konquest.enemyColor1), BarStyle.SOLID);
 		this.monumentBarEnemies.setVisible(true);
 		this.monumentBarEnemies.setProgress(1.0);
-		this.monumentBarAllies = Bukkit.getServer().createBossBar(Konquest.alliedColor+name, ChatUtil.mapBarColor(Konquest.alliedColor), BarStyle.SOLID);
+		this.monumentBarAllies = Bukkit.getServer().createBossBar(Konquest.alliedColor1+name, ChatUtil.mapBarColor(Konquest.alliedColor1), BarStyle.SOLID);
 		this.monumentBarAllies.setVisible(true);
 		this.monumentBarAllies.setProgress(1.0);
-		this.monumentBarSanctioned = Bukkit.getServer().createBossBar(Konquest.sanctionedColor+name, ChatUtil.mapBarColor(Konquest.sanctionedColor), BarStyle.SOLID);
+		this.monumentBarSanctioned = Bukkit.getServer().createBossBar(Konquest.sanctionedColor1+name, ChatUtil.mapBarColor(Konquest.sanctionedColor1), BarStyle.SOLID);
 		this.monumentBarSanctioned.setVisible(true);
 		this.monumentBarSanctioned.setProgress(1.0);
-		this.monumentBarPeaceful = Bukkit.getServer().createBossBar(Konquest.peacefulColor+name, ChatUtil.mapBarColor(Konquest.peacefulColor), BarStyle.SOLID);
+		this.monumentBarPeaceful = Bukkit.getServer().createBossBar(Konquest.peacefulColor1+name, ChatUtil.mapBarColor(Konquest.peacefulColor1), BarStyle.SOLID);
 		this.monumentBarPeaceful.setVisible(true);
 		this.monumentBarPeaceful.setProgress(1.0);
 		// Other stuff
@@ -907,34 +907,34 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			remainingSeconds = getRemainingShieldTimeSeconds();
 			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor1));
 			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor1));
-			monumentBarAllies.setTitle(Konquest.alliedColor+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor));
-			monumentBarSanctioned.setTitle(Konquest.sanctionedColor+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.sanctionedColor));
-			monumentBarPeaceful.setTitle(Konquest.peacefulColor+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor));
+			monumentBarAllies.setTitle(Konquest.alliedColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor1));
+			monumentBarSanctioned.setTitle(Konquest.sanctionedColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.sanctionedColor1));
+			monumentBarPeaceful.setTitle(Konquest.peacefulColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor1));
 		} else if(isShielded) {
 			remainingSeconds = getRemainingShieldTimeSeconds();
 			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor1));
 			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor1));
-			monumentBarAllies.setTitle(Konquest.alliedColor+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor));
-			monumentBarSanctioned.setTitle(Konquest.sanctionedColor+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.sanctionedColor));
-			monumentBarPeaceful.setTitle(Konquest.peacefulColor+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor));
+			monumentBarAllies.setTitle(Konquest.alliedColor1+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor1));
+			monumentBarSanctioned.setTitle(Konquest.sanctionedColor1+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.sanctionedColor1));
+			monumentBarPeaceful.setTitle(Konquest.peacefulColor1+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor1));
 		} else if(isArmored) {
 			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName()+separator+armorCurrentBlocks+" "+armor);
 			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+armorCurrentBlocks+" "+armor);
-			monumentBarAllies.setTitle(Konquest.alliedColor+getName()+separator+armorCurrentBlocks+" "+armor);
-			monumentBarSanctioned.setTitle(Konquest.sanctionedColor+getName()+separator+armorCurrentBlocks+" "+armor);
-			monumentBarPeaceful.setTitle(Konquest.peacefulColor+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarAllies.setTitle(Konquest.alliedColor1+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarSanctioned.setTitle(Konquest.sanctionedColor1+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarPeaceful.setTitle(Konquest.peacefulColor1+getName()+separator+armorCurrentBlocks+" "+armor);
 		} else if(isAttacked) {
 			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName()+separator+critical);
 			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName()+separator+critical);
-			monumentBarAllies.setTitle(Konquest.alliedColor+getName()+separator+critical);
-			monumentBarSanctioned.setTitle(Konquest.sanctionedColor+getName()+separator+critical);
-			monumentBarPeaceful.setTitle(Konquest.peacefulColor+getName()+separator+critical);
+			monumentBarAllies.setTitle(Konquest.alliedColor1+getName()+separator+critical);
+			monumentBarSanctioned.setTitle(Konquest.sanctionedColor1+getName()+separator+critical);
+			monumentBarPeaceful.setTitle(Konquest.peacefulColor1+getName()+separator+critical);
 		} else {
 			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName());
 			monumentBarEnemies.setTitle(Konquest.enemyColor1+getName());
-			monumentBarAllies.setTitle(Konquest.alliedColor+getName());
-			monumentBarSanctioned.setTitle(Konquest.sanctionedColor+getName());
-			monumentBarPeaceful.setTitle(Konquest.peacefulColor+getName());
+			monumentBarAllies.setTitle(Konquest.alliedColor1+getName());
+			monumentBarSanctioned.setTitle(Konquest.sanctionedColor1+getName());
+			monumentBarPeaceful.setTitle(Konquest.peacefulColor1+getName());
 		}
 		
 		// Set progress conditions

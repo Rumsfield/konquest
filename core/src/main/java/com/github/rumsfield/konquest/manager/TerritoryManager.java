@@ -1153,6 +1153,7 @@ public class TerritoryManager {
     	// Determine player's direction
     	BlockFace playerFace = bukkitPlayer.getFacing();
     	String mapPlayer = "!";
+		ChatColor mapSymbolColor;
     	ChatColor playerColor;
 		// Note: Unicode characters do not render correctly in game, must use escape sequence code.
     	if(playerFace.equals(BlockFace.NORTH)) {
@@ -1271,23 +1272,9 @@ public class TerritoryManager {
     		}
     		if(isChunkClaimed(mapPoint,center.getWorld())) {
     			KonTerritory territory = getChunkTerritory(mapPoint,center.getWorld());
-    			ChatColor mapSymbolColor = ChatColor.WHITE;
-    			if(territory.getKingdom().equals(konquest.getKingdomManager().getBarbarians())) {
-    				mapSymbolColor = ChatColor.YELLOW;
-    				playerColor = ChatColor.GOLD;
-    			} else if(territory.getKingdom().equals(player.getKingdom())) {
-    				mapSymbolColor = ChatColor.GREEN;
-    				playerColor = ChatColor.DARK_GREEN;
-    			} else if(territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY)) {
-    				mapSymbolColor = ChatColor.AQUA;
-    				playerColor = ChatColor.DARK_AQUA;
-    			} else if(territory.getKingdom().isPeaceful() || territory.getKingdom().equals(konquest.getKingdomManager().getNeutrals())) {
-    				mapSymbolColor = ChatColor.GRAY;
-    				playerColor = ChatColor.DARK_GRAY;
-    			} else {
-    				mapSymbolColor = ChatColor.RED;
-    				playerColor = ChatColor.DARK_RED;
-    			}
+				assert territory != null;
+				mapSymbolColor = konquest.getDisplayPrimaryColor(player,territory);
+				playerColor = konquest.getDisplaySecondaryColor(player,territory);
     			switch(territory.getTerritoryType()) {
         		case WILD:
         			map[mapX][mapY] = ChatColor.WHITE+mapWildSymbol;

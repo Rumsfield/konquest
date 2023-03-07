@@ -49,12 +49,17 @@ public class Konquest implements KonquestAPI, Timeable {
 	public static ChatColor friendColor2 = ChatColor.DARK_GREEN;
 	public static ChatColor enemyColor1 = ChatColor.RED;
 	public static ChatColor enemyColor2 = ChatColor.DARK_RED;
-	public static ChatColor sanctionedColor = ChatColor.LIGHT_PURPLE;
-	public static ChatColor peacefulColor = ChatColor.WHITE;
-	public static ChatColor alliedColor = ChatColor.BLUE;
-	public static ChatColor barbarianColor = ChatColor.YELLOW;
-	public static ChatColor neutralColor = ChatColor.GRAY;
-	
+	public static ChatColor sanctionedColor1 = ChatColor.LIGHT_PURPLE;
+	public static ChatColor sanctionedColor2 = ChatColor.DARK_PURPLE;
+	public static ChatColor peacefulColor1 = ChatColor.AQUA;
+	public static ChatColor peacefulColor2 = ChatColor.DARK_AQUA;
+	public static ChatColor alliedColor1 = ChatColor.BLUE;
+	public static ChatColor alliedColor2 = ChatColor.DARK_BLUE;
+	public static ChatColor barbarianColor1 = ChatColor.YELLOW;
+	public static ChatColor barbarianColor2 = ChatColor.GOLD;
+	public static ChatColor neutralColor1 = ChatColor.GRAY;
+	public static ChatColor neutralColor2 = ChatColor.DARK_GRAY;
+
 	public static ChatColor blockedProtectionColor = ChatColor.DARK_RED;
 	public static ChatColor blockedShieldColor = ChatColor.DARK_AQUA;
 	public static ChatColor blockedFlagColor = ChatColor.DARK_GRAY;
@@ -190,13 +195,13 @@ public class Konquest implements KonquestAPI, Timeable {
         enemyTeam = scoreboard.registerNewTeam("enemies");
         enemyTeam.setColor(enemyColor1);
         sanctionedTeam = scoreboard.registerNewTeam("sanctioned");
-        sanctionedTeam.setColor(sanctionedColor);
+        sanctionedTeam.setColor(sanctionedColor1);
         peacefulTeam = scoreboard.registerNewTeam("peaceful");
-        peacefulTeam.setColor(peacefulColor);
+        peacefulTeam.setColor(peacefulColor1);
         alliedTeam = scoreboard.registerNewTeam("allied");
-        alliedTeam.setColor(alliedColor);
+        alliedTeam.setColor(alliedColor1);
         barbarianTeam = scoreboard.registerNewTeam("barbarians");
-        barbarianTeam.setColor(barbarianColor);
+        barbarianTeam.setColor(barbarianColor1);
         
         // Set up version-specific classes
         initVersionHandlers();
@@ -345,109 +350,56 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	private void initColors() {
-		ChatColor color;
-		String colorPath;
-		String configColor;
-		String defaultColor;
-		
-		/* Friendly Primary Color */
-		colorPath = CorePath.COLORS_FRIENDLY_PRIMARY.getPath();
-		configColor = getCore().getString(colorPath,"");
-		color = ChatUtil.parseColorCode(configColor);
-		if(color == null) {
-			defaultColor = getCore().getDefaults().getString(colorPath);
-			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
-		} else {
-			friendColor1 = color;
+		HashMap<CorePath,ChatColor> colorMap = new HashMap<>();
+		colorMap.put(CorePath.COLORS_FRIENDLY_PRIMARY,ChatColor.GREEN);
+		colorMap.put(CorePath.COLORS_FRIENDLY_SECONDARY,ChatColor.DARK_GREEN);
+		colorMap.put(CorePath.COLORS_ENEMY_PRIMARY,ChatColor.RED);
+		colorMap.put(CorePath.COLORS_ENEMY_SECONDARY,ChatColor.DARK_RED);
+		colorMap.put(CorePath.COLORS_SANCTIONED_PRIMARY,ChatColor.LIGHT_PURPLE);
+		colorMap.put(CorePath.COLORS_SANCTIONED_SECONDARY,ChatColor.DARK_PURPLE);
+		colorMap.put(CorePath.COLORS_PEACEFUL_PRIMARY,ChatColor.AQUA);
+		colorMap.put(CorePath.COLORS_PEACEFUL_SECONDARY,ChatColor.DARK_AQUA);
+		colorMap.put(CorePath.COLORS_ALLIED_PRIMARY,ChatColor.BLUE);
+		colorMap.put(CorePath.COLORS_ALLIED_SECONDARY,ChatColor.DARK_BLUE);
+		colorMap.put(CorePath.COLORS_BARBARIAN_PRIMARY,ChatColor.YELLOW);
+		colorMap.put(CorePath.COLORS_BARBARIAN_SECONDARY,ChatColor.GOLD);
+		colorMap.put(CorePath.COLORS_NEUTRAL_PRIMARY,ChatColor.GRAY);
+		colorMap.put(CorePath.COLORS_NEUTRAL_SECONDARY,ChatColor.DARK_GRAY);
+		HashMap<CorePath,ChatColor> updateMap = new HashMap<>();
+		// Parse colors from config
+		for(CorePath colorPath : colorMap.keySet()) {
+			String configColor = getCore().getString(colorPath.getPath(),"");
+			ChatColor color = ChatUtil.parseColorCode(configColor);
+			if(color == null) {
+				// Failed to match config setting to valid color
+				String defaultColor = colorMap.get(colorPath).toString();
+				ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
+			} else {
+				// Update color map from config
+				updateMap.put(colorPath,color);
+			}
 		}
-		
-		/* Friendly Secondary Color */
-		colorPath = CorePath.COLORS_FRIENDLY_SECONDARY.getPath();
-		configColor = getCore().getString(colorPath,"");
-		color = ChatUtil.parseColorCode(configColor);
-		if(color == null) {
-			defaultColor = getCore().getDefaults().getString(colorPath);
-			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
-		} else {
-			friendColor2 = color;
+		// Update color map
+		for(CorePath colorPath : updateMap.keySet()) {
+			if(colorMap.containsKey(colorPath)) {
+				colorMap.put(colorPath,updateMap.get(colorPath));
+			}
 		}
-		
-		/* Enemy Primary Color */
-		colorPath = CorePath.COLORS_ENEMY_PRIMARY.getPath();
-		configColor = getCore().getString(colorPath,"");
-		color = ChatUtil.parseColorCode(configColor);
-		if(color == null) {
-			defaultColor = getCore().getDefaults().getString(colorPath);
-			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
-		} else {
-			enemyColor1 = color;
-		}
-
-		/* Enemy Secondary Color */
-		colorPath = CorePath.COLORS_ENEMY_SECONDARY.getPath();
-		configColor = getCore().getString(colorPath,"");
-		color = ChatUtil.parseColorCode(configColor);
-		if(color == null) {
-			defaultColor = getCore().getDefaults().getString(colorPath);
-			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
-		} else {
-			enemyColor2 = color;
-		}
-
-		/* Sanctioned Color */
-		colorPath = CorePath.COLORS_SANCTIONED.getPath();
-		configColor = getCore().getString(colorPath,"");
-		color = ChatUtil.parseColorCode(configColor);
-		if(color == null) {
-			defaultColor = getCore().getDefaults().getString(colorPath);
-			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
-		} else {
-			sanctionedColor = color;
-		}
-
-		/* Peaceful Color */
-		colorPath = CorePath.COLORS_PEACEFUL.getPath();
-		configColor = getCore().getString(colorPath,"");
-		color = ChatUtil.parseColorCode(configColor);
-		if(color == null) {
-			defaultColor = getCore().getDefaults().getString(colorPath);
-			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
-		} else {
-			peacefulColor = color;
-		}
-		
-		/* Allied Color */
-		colorPath = CorePath.COLORS_ALLIED.getPath();
-		configColor = getCore().getString(colorPath,"");
-		color = ChatUtil.parseColorCode(configColor);
-		if(color == null) {
-			defaultColor = getCore().getDefaults().getString(colorPath);
-			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
-		} else {
-			alliedColor = color;
-		}
-		
-		/* Barbarian Color */
-		colorPath = CorePath.COLORS_BARBARIAN.getPath();
-		configColor = getCore().getString(colorPath,"");
-		color = ChatUtil.parseColorCode(configColor);
-		if(color == null) {
-			defaultColor = getCore().getDefaults().getString(colorPath);
-			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
-		} else {
-			barbarianColor = color;
-		}
-		
-		/* Neutral Color */
-		colorPath = CorePath.COLORS_NEUTRAL.getPath();
-		configColor = getCore().getString(colorPath,"");
-		color = ChatUtil.parseColorCode(configColor);
-		if(color == null) {
-			defaultColor = getCore().getDefaults().getString(colorPath);
-			ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
-		} else {
-			neutralColor = color;
-		}
+		// Assign color fields
+		friendColor1         = colorMap.get(CorePath.COLORS_FRIENDLY_PRIMARY);
+		friendColor2         = colorMap.get(CorePath.COLORS_FRIENDLY_SECONDARY);
+		enemyColor1          = colorMap.get(CorePath.COLORS_ENEMY_PRIMARY);
+		enemyColor2          = colorMap.get(CorePath.COLORS_ENEMY_SECONDARY);
+		sanctionedColor1     = colorMap.get(CorePath.COLORS_SANCTIONED_PRIMARY);
+		sanctionedColor2     = colorMap.get(CorePath.COLORS_SANCTIONED_SECONDARY);
+		peacefulColor1       = colorMap.get(CorePath.COLORS_PEACEFUL_PRIMARY);
+		peacefulColor2       = colorMap.get(CorePath.COLORS_PEACEFUL_SECONDARY);
+		alliedColor1         = colorMap.get(CorePath.COLORS_ALLIED_PRIMARY);
+		alliedColor2         = colorMap.get(CorePath.COLORS_ALLIED_SECONDARY);
+		barbarianColor1      = colorMap.get(CorePath.COLORS_BARBARIAN_PRIMARY);
+		barbarianColor2      = colorMap.get(CorePath.COLORS_BARBARIAN_SECONDARY);
+		neutralColor1        = colorMap.get(CorePath.COLORS_NEUTRAL_PRIMARY);
+		neutralColor2        = colorMap.get(CorePath.COLORS_NEUTRAL_SECONDARY);
 	}
 
 	private void checkCorePaths() {
@@ -564,26 +516,46 @@ public class Konquest implements KonquestAPI, Timeable {
 		return enemyColor2;
 	}
 	
-	public ChatColor getSanctionedColor() {
-		return sanctionedColor;
+	public ChatColor getSanctionedPrimaryColor() {
+		return sanctionedColor1;
 	}
-	
-	public ChatColor getPeacefulColor() {
-		return peacefulColor;
+
+	public ChatColor getSanctionedSecondaryColor() {
+		return sanctionedColor2;
 	}
-	
-	public ChatColor getAlliedColor() {
-		return alliedColor;
+
+	public ChatColor getPeacefulPrimaryColor() {
+		return peacefulColor1;
 	}
-	
-	public ChatColor getBarbarianColor() {
-		return barbarianColor;
+
+	public ChatColor getPeacefulSecondaryColor() {
+		return peacefulColor2;
 	}
-	
-	public ChatColor getNeutralColor() {
-		return neutralColor;
+
+	public ChatColor getAlliedPrimaryColor() {
+		return alliedColor1;
 	}
-	
+
+	public ChatColor getAlliedSecondaryColor() {
+		return alliedColor2;
+	}
+
+	public ChatColor getBarbarianPrimaryColor() {
+		return barbarianColor1;
+	}
+
+	public ChatColor getBarbarianSecondaryColor() {
+		return barbarianColor2;
+	}
+
+	public ChatColor getNeutralPrimaryColor() {
+		return neutralColor1;
+	}
+
+	public ChatColor getNeutralSecondaryColor() {
+		return neutralColor2;
+	}
+
 	/* Regular Methods */
 	
 	public static Konquest getInstance() {
@@ -1376,14 +1348,14 @@ public class Konquest implements KonquestAPI, Timeable {
     }
 
     public ChatColor getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
-    	ChatColor result = neutralColor;
+    	ChatColor result = neutralColor1;
     	RelationRole role = kingdomManager.getRelationRole(displayKingdom,contextKingdom);
     	switch(role) {
 	    	case BARBARIAN:
-	    		result = barbarianColor;
+	    		result = barbarianColor1;
 	    		break;
 	    	case NEUTRAL:
-	    		result = neutralColor;
+	    		result = neutralColor1;
 	    		break;
 	    	case ENEMY:
 	    		result = enemyColor1;
@@ -1392,13 +1364,13 @@ public class Konquest implements KonquestAPI, Timeable {
 	    		result = friendColor1;
 	    		break;
 	    	case ALLIED:
-	    		result = alliedColor;
+	    		result = alliedColor1;
 	    		break;
 	    	case SANCTIONED:
-	    		result = sanctionedColor;
+	    		result = sanctionedColor1;
 	    		break;
 	    	case PEACEFUL:
-	    		result = peacefulColor;
+	    		result = peacefulColor1;
 	    		break;
     		default:
     			break;
@@ -1410,102 +1382,19 @@ public class Konquest implements KonquestAPI, Timeable {
     	return getDisplayPrimaryColor(displayPlayer.getKingdom(),contextPlayer.getKingdom());
     }
     
-    /*
-    public ChatColor getDisplayPrimaryColor(KonquestGuild displayGuild, KonquestGuild contextGuild) {
-    	ChatColor result = ChatColor.RED;
-    	boolean isArmistice = guildManager.isArmistice(displayGuild, contextGuild);
-    	if(displayGuild.getKingdom().equals(contextGuild.getKingdom())) {
-			result = friendColor1;
-		} else {
-			if(isArmistice) {
-				result = armisticeColor1;
-			} else {
-				result = enemyColor1;
-			}
-		}
-    	return result;
-    }
-    */
-    
     public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory) {
     	return getDisplayPrimaryColor(displayPlayer.getKingdom(),contextTerritory.getKingdom());
     }
     
-    /*
-    public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory) {
-    	ChatColor result = ChatColor.RED;
-    	boolean isArmistice = false;
-    	
-    	// Players see their own territory as green.
-    	// Camps are barb color to all (except owner see camp as green)
-    	// Neutrals are neutral color to all
-    	// enemy kingdoms are enemy color, except if armistice, then armistice color
-    	
-    	KonquestTerritoryType territorytype = contextTerritory.getTerritoryType();
-    	
-    	switch(territorytype) {
-		case WILD:
-			result = ChatColor.WHITE;
-			break;
-		case CAPITAL:
-			if(contextTerritory instanceof KonCapital) {
-				KonCapital capital = (KonCapital)contextTerritory;
-				if(displayPlayer.getKingdom().equals(capital.getKingdom())) {
-	    			result = friendColor1;
-	    		} else {
-	    			result = enemyColor1;
-	    		}
-			}
-			break;
-		case TOWN:
-			if(contextTerritory instanceof KonTown) {
-				KonTown town = (KonTown)contextTerritory;
-	    		isArmistice = guildManager.isArmistice(displayPlayer, town);
-	    		if(displayPlayer.getKingdom().equals(town.getKingdom())) {
-	    			result = friendColor1;
-	    		} else {
-	    			if(isArmistice) {
-	    				result = armisticeColor1;
-	    			} else {
-	    				result = enemyColor1;
-	    			}
-	    		}
-	    	}
-			break;
-		case CAMP:
-			if(contextTerritory instanceof KonCamp) {
-				KonCamp camp = (KonCamp)contextTerritory;
-				if(camp.isPlayerOwner(displayPlayer.getOfflineBukkitPlayer())) {
-					result = friendColor1;
-				} else {
-					result = barbarianColor;
-				}
-			}
-			break;
-		case RUIN:
-			result = neutralColor;
-			break;
-		case SANCTUARY:
-			result = neutralColor;
-			break;
-		default:
-			result = enemyColor1;
-			break;
-		}
-
-    	return result;
-    }
-    */
-    
     public ChatColor getDisplaySecondaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
-    	ChatColor result = neutralColor;
+    	ChatColor result = neutralColor2;
     	RelationRole role = kingdomManager.getRelationRole(displayKingdom,contextKingdom);
     	switch(role) {
 	    	case BARBARIAN:
-	    		result = barbarianColor;
+	    		result = barbarianColor2;
 	    		break;
 	    	case NEUTRAL:
-	    		result = neutralColor;
+	    		result = neutralColor2;
 	    		break;
 	    	case ENEMY:
 	    		result = enemyColor2;
@@ -1514,13 +1403,13 @@ public class Konquest implements KonquestAPI, Timeable {
 	    		result = friendColor2;
 	    		break;
 	    	case ALLIED:
-	    		result = alliedColor;
+	    		result = alliedColor2;
 	    		break;
 	    	case SANCTIONED:
-	    		result = sanctionedColor;
+	    		result = sanctionedColor2;
 	    		break;
 	    	case PEACEFUL:
-	    		result = peacefulColor;
+	    		result = peacefulColor2;
 				break;
     		default:
     			break;

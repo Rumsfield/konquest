@@ -37,7 +37,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 		this.isRaidAlertDisabled = false;
 		this.isOfflineProtected = false;
 		this.bedLocation = loc;
-		this.campBarAll = Bukkit.getServer().createBossBar(Konquest.barbarianColor+getName(), ChatUtil.mapBarColor(Konquest.barbarianColor), BarStyle.SOLID);
+		this.campBarAll = Bukkit.getServer().createBossBar(Konquest.barbarianColor1+getName(), ChatUtil.mapBarColor(Konquest.barbarianColor1), BarStyle.SOLID);
 		this.campBarAll.setVisible(true);
 		initProtection();
 	}
@@ -47,7 +47,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 		if(isOfflineProtectedEnabled && !isOwnerOnline()) {
 			// Immediately enable protection
 			isOfflineProtected = true;
-			campBarAll.setTitle(Konquest.barbarianColor+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
+			campBarAll.setTitle(Konquest.barbarianColor1+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
 		}
 	}
 
@@ -120,11 +120,11 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 			// When a protection warmup timer ends
 			isOfflineProtected = true;
 			protectedCountdownTimer.stopTimer();
-			campBarAll.setTitle(Konquest.barbarianColor+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
+			campBarAll.setTitle(Konquest.barbarianColor1+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
 		} else if(taskID == protectedCountdownTimer.getTaskID()) {
 			// Update protection countdown title
 			String remainingTime = Konquest.getTimeFormat(protectedWarmupTimer.getTime(),ChatColor.RED);
-			campBarAll.setTitle(Konquest.barbarianColor+getName()+" "+remainingTime);
+			campBarAll.setTitle(Konquest.barbarianColor1+getName()+" "+remainingTime);
 			//ChatUtil.printDebug("Camp protection countdown tick with taskID: "+taskID);
 		} else {
 			ChatUtil.printDebug("Camp Timer ended with unknown taskID: "+taskID);
@@ -171,7 +171,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 				} else if(offlineProtectedWarmupSeconds <= 0) {
 					// Immediately enable protection
 					isOfflineProtected = true;
-					campBarAll.setTitle(Konquest.barbarianColor+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
+					campBarAll.setTitle(Konquest.barbarianColor1+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
 				}
 			}
 		} else {
@@ -179,7 +179,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 			isOfflineProtected = false;
 			protectedWarmupTimer.stopTimer();
 			protectedCountdownTimer.stopTimer();
-			campBarAll.setTitle(Konquest.barbarianColor+getName());
+			campBarAll.setTitle(Konquest.barbarianColor1+getName());
 		}
 	}
 	

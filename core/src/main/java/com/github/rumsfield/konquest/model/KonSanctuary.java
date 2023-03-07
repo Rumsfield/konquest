@@ -24,7 +24,7 @@ public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPr
 	
 	public KonSanctuary(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, konquest);
-		this.sanctuaryBarAll = Bukkit.getServer().createBossBar(Konquest.neutralColor+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SEGMENTED_20);
+		this.sanctuaryBarAll = Bukkit.getServer().createBossBar(Konquest.neutralColor1+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SEGMENTED_20);
 		this.sanctuaryBarAll.setVisible(true);
 		this.properties = new HashMap<>();
 		initProperties();
