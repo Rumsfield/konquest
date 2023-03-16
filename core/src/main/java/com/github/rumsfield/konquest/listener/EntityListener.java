@@ -586,8 +586,10 @@ public class EntityListener implements Listener {
             // Check for protections for attacks within claimed territory
             boolean isWildDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_PVP.getPath(), true);
             boolean isAttackInTerritory = territoryManager.isChunkClaimed(victimBukkitPlayer.getLocation());
+			boolean isVictimInsideFriendlyTerritory = false;
             if(isAttackInTerritory) {
             	KonTerritory territory = territoryManager.getChunkTerritory(victimBukkitPlayer.getLocation());
+				assert territory != null;
             	// Property Flag Holders
     			if(territory instanceof KonPropertyFlagHolder) {
     				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
@@ -600,7 +602,8 @@ public class EntityListener implements Listener {
     				}
     			}
             	// Prevent damage to victim inside peaceful territory if the victim is a member
-            	if(territory.getKingdom().isPeaceful() && territory.getKingdom().equals(victimPlayer.getKingdom())) {
+				isVictimInsideFriendlyTerritory = territory.getKingdom().equals(victimPlayer.getKingdom());
+            	if(territory.getKingdom().isPeaceful() && isVictimInsideFriendlyTerritory) {
             		event.setCancelled(true);
                 	return;
             	}
@@ -621,7 +624,7 @@ public class EntityListener implements Listener {
             if(attackerRole.equals(RelationRole.FRIENDLY) ||
             		attackerRole.equals(RelationRole.ALLY) ||
 					attackerRole.equals(RelationRole.TRADE) ||
-            		(!isPeaceDamageEnabled && attackerRole.equals(RelationRole.PEACEFUL))) {
+            		(attackerRole.equals(RelationRole.PEACEFUL) && (!isPeaceDamageEnabled || isVictimInsideFriendlyTerritory))) {
             	ChatUtil.sendKonPriorityTitle(attackerPlayer, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 				event.setCancelled(true);
 				return;

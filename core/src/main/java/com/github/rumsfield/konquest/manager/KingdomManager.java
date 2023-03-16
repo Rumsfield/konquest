@@ -1671,6 +1671,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 							ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" have made peace!");
 						} else {
 							// We request peace, still at war
+							if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.PEACE)) {
+								ChatUtil.sendError(bukkitPlayer,"Already requested to change diplomacy.");
+								return false;
+							}
 							otherKingdom.setRelationRequest(kingdom,relation);
 							broadcastMembers(otherKingdom,"The kingdom of "+kingdom.getName()+" requests to make peace.");
 						}
@@ -1698,6 +1702,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" are now trading.");
 					} else {
 						// We request trade
+						if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.TRADE)) {
+							ChatUtil.sendError(bukkitPlayer,"Already requested to change diplomacy.");
+							return false;
+						}
 						otherKingdom.setRelationRequest(kingdom,relation);
 						broadcastMembers(otherKingdom,"The kingdom of "+kingdom.getName()+" requests to trade.");
 					}
@@ -1715,6 +1723,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" have formed an alliance.");
 				} else {
 					// We request allied
+					if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.ALLIANCE)) {
+						ChatUtil.sendError(bukkitPlayer,"Already requested to change diplomacy.");
+						return false;
+					}
 					otherKingdom.setRelationRequest(kingdom,relation);
 					broadcastMembers(otherKingdom,"The kingdom of "+kingdom.getName()+" requests to make an alliance.");
 				}
@@ -1734,6 +1746,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" are at war!");
 					} else {
 						// We request enemy
+						if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.WAR)) {
+							ChatUtil.sendError(bukkitPlayer,"Already requested to change diplomacy.");
+							return false;
+						}
 						otherKingdom.setRelationRequest(kingdom, relation);
 						broadcastMembers(otherKingdom,"The kingdom of "+kingdom.getName()+" requests war.");
 					}
@@ -1914,8 +1930,24 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.FRIENDLY);
     }
 
+	public boolean isPlayerTrade(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
+		return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.TRADE);
+	}
+
+	public boolean isPlayerPeace(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
+		return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.PEACEFUL);
+	}
+
 	public boolean isPlayerForeign(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
 		return !getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.FRIENDLY);
+	}
+
+	public boolean isKingdomBarbarian(@NotNull KonKingdom kingdom) {
+		return kingdom.equals(barbarians);
+	}
+
+	public boolean isKingdomNeutral(@NotNull KonKingdom kingdom) {
+		return kingdom.equals(neutrals);
 	}
 
 	/*

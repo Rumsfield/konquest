@@ -2,6 +2,8 @@ package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
+import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
+import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.TravelManager.TravelDestination;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
@@ -18,9 +20,12 @@ import java.util.Collections;
 import java.util.List;
 
 public class TravelCommand extends CommandBase {
+
+	KingdomManager kManager;
 	
 	public TravelCommand(Konquest konquest, CommandSender sender, String[] args) {
         super(konquest, sender, args);
+		this.kManager = getKonquest().getKingdomManager();
     }
 	
 	public void execute() {
@@ -47,15 +52,21 @@ public class TravelCommand extends CommandBase {
 				return;
 			}
 			// Verify player is not in enemy territory
-			// But always allow travel from neutral kingdom (ruins, sanctuary)
 			boolean blockEnemyTravel = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_NO_ENEMY_TRAVEL.getPath());
 			if (blockEnemyTravel) {
 				Location playerLoc = bukkitPlayer.getLocation();
 				if(getKonquest().getTerritoryManager().isChunkClaimed(playerLoc)) {
-					KonKingdom locKingdom = getKonquest().getTerritoryManager().getChunkTerritory(playerLoc).getKingdom();
-					if(!locKingdom.equals(getKonquest().getKingdomManager().getNeutrals()) && !locKingdom.equals(player.getKingdom())) {
+					KonTerritory locTerritory = getKonquest().getTerritoryManager().getChunkTerritory(playerLoc);
+					assert locTerritory != null;
+					KonKingdom locKingdom = locTerritory.getKingdom();
+					boolean isTravelAllowed = locTerritory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY) ||
+							locKingdom.equals(player.getKingdom()) ||
+							kManager.isPlayerPeace(player,locKingdom) ||
+							kManager.isPlayerTrade(player,locKingdom) ||
+							kManager.isPlayerAlly(player,locKingdom);
+					if(!isTravelAllowed) {
 						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_ENEMY_TERRITORY.getMessage());
-	                    return;
+						return;
 					}
 				}
 			}
