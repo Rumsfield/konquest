@@ -79,16 +79,17 @@ public class InventoryListener implements Listener {
 						}
 					}
 				}
-				RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+				RelationRole territoryRole = kingdomManager.getRelationRole(territory.getKingdom(), player.getKingdom());
 				// Town restrictions for inventories
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
 					// Protection checks
 					if(isMerchant) {
 						// Inventory is a Villager merchant
-
+						// Only friendly, trade and ally players can use merchants
+						boolean isMerchantAllowed = territoryRole.equals(RelationRole.FRIENDLY) || territoryRole.equals(RelationRole.TRADE) || territoryRole.equals(RelationRole.ALLY);
 						// Prevent opening by enemy and sanction kingdom members
-						if(playerRole.equals(RelationRole.ENEMY) || playerRole.equals(RelationRole.SANCTIONED)) {
+						if(!isMerchantAllowed) {
 							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_SANCTION.getMessage(town.getName()));
 							event.setCancelled(true);
 							return;
@@ -100,7 +101,7 @@ public class InventoryListener implements Listener {
 
 						// Prevent inventory openings by non-friendlies
 						boolean isEnemyInventoryOpenDenied = konquest.getCore().getBoolean(CorePath.KINGDOMS_PROTECT_CONTAINERS_USE.getPath());
-						if(isEnemyInventoryOpenDenied && !playerRole.equals(RelationRole.FRIENDLY)) {
+						if(isEnemyInventoryOpenDenied && !territoryRole.equals(RelationRole.FRIENDLY)) {
 							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 							event.setCancelled(true);
 							return;

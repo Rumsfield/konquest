@@ -78,7 +78,7 @@ public enum MessagePath {
 	PLACEHOLDER_ENEMY                           (0, "placeholder.enemy"),
 	PLACEHOLDER_BARBARIAN                       (0, "placeholder.barbarian"),
 	PLACEHOLDER_ALLY                            (0, "placeholder.ally"),
-	PLACEHOLDER_SANCTIONED                      (0, "placeholder.sanctioned"),
+	PLACEHOLDER_TRADER                          (0, "placeholder.trader"),
 	PLACEHOLDER_PEACEFUL                        (0, "placeholder.peaceful"),
 
     MAP_BARBARIAN                               (0, "map.barbarian"),
@@ -762,11 +762,11 @@ public enum MessagePath {
 	TERRITORY_RUIN                              (0, "territory.ruin"),
 	TERRITORY_SANCTUARY                         (0, "territory.sanctuary"),
 	TERRITORY_OTHER                             (0, "territory.other"),
-	
-	RELATIONSHIP_ENEMY                          (0, "relationship.enemy"),
-	RELATIONSHIP_SANCTIONED                     (0, "relationship.sanctioned"),
-	RELATIONSHIP_PEACE                          (0, "relationship.peace"),
-	RELATIONSHIP_ALLIED                         (0, "relationship.allied"),
+
+	DIPLOMACY_WAR                               (0, "diplomacy.war"),
+	DIPLOMACY_PEACE                             (0, "diplomacy.peace"),
+	DIPLOMACY_TRADE                             (0, "diplomacy.trade"),
+	DIPLOMACY_ALLIANCE                          (0, "diplomacy.alliance"),
 	
 	NULL_MESSAGE	(0,"");
 	

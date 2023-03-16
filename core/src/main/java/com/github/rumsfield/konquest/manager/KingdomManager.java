@@ -48,17 +48,18 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		/* Player/territory are in the same kingdom */
 		FRIENDLY,
 		
-		/* Player/territory are in an enemy kingdom */
+		/* Player/territory are in kingdoms at war */
 		ENEMY,
-		
-		/* Player/territory are in an allied kingdom */
-		ALLIED,
-		
-		/* Player/territory are in a sanctioned kingdom */
-		SANCTIONED,
-		
-		/* Player/territory are in a peaceful kingdom */
-		PEACEFUL
+
+		/* Player/territory are in kingdoms at peace */
+		PEACEFUL,
+
+		/* Player/territory are in trading kingdoms */
+		TRADE,
+
+		/* Player/territory are in allied kingdoms */
+		ALLY
+
 	}
 	
 	private final Konquest konquest;
@@ -82,13 +83,16 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private double payLimit;
 	private int payPercentOfficer;
 	private int payPercentMaster;
-	private double costRelation;
 	private double costCreate;
 	private double costRename;
 	private double costTemplate;
 	private boolean discountEnable;
 	private int discountPercent;
 	private boolean discountStack;
+	private double costDiplomacyWar;
+	private double costDiplomacyPeace;
+	private double costDiplomacyTrade;
+	private double costDiplomacyAlliance;
 
 	private final Timer payTimer;
 	
@@ -113,10 +117,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		this.payLimit = 0;
 		this.payPercentOfficer = 0;
 		this.payPercentMaster = 0;
-		this.costRelation = 0;
 		this.costCreate = 0;
 		this.costRename = 0;
 		this.costTemplate = 0;
+		this.costDiplomacyWar = 0;
+		this.costDiplomacyPeace = 0;
+		this.costDiplomacyTrade = 0;
+		this.costDiplomacyAlliance = 0;
 		this.payTimer = new Timer(this);
 	}
 	
@@ -134,16 +141,19 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	public void loadOptions() {
 		// Kingdom Settings
-		payIntervalSeconds 	= konquest.getCore().getLong(CorePath.FAVOR_KINGDOMS_PAY_INTERVAL_SECONDS.getPath());
-		payPerChunk 		= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_CHUNK.getPath());
-		payPerResident 		= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_RESIDENT.getPath());
-		payLimit 			= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_LIMIT.getPath());
-		payPercentOfficer   = konquest.getCore().getInt(CorePath.FAVOR_KINGDOMS_BONUS_OFFICER_PERCENT.getPath());
-		payPercentMaster    = konquest.getCore().getInt(CorePath.FAVOR_KINGDOMS_BONUS_MASTER_PERCENT.getPath());
-		costCreate 	        = konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_CREATE.getPath());
-		costRename 	        = konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_RENAME.getPath());
-		costTemplate        = konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_TEMPLATE.getPath());
-		costRelation 	    = konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_RELATIONSHIP.getPath());
+		payIntervalSeconds 		= konquest.getCore().getLong(CorePath.FAVOR_KINGDOMS_PAY_INTERVAL_SECONDS.getPath());
+		payPerChunk 			= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_CHUNK.getPath());
+		payPerResident 			= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_RESIDENT.getPath());
+		payLimit 				= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_LIMIT.getPath());
+		payPercentOfficer   	= konquest.getCore().getInt(CorePath.FAVOR_KINGDOMS_BONUS_OFFICER_PERCENT.getPath());
+		payPercentMaster    	= konquest.getCore().getInt(CorePath.FAVOR_KINGDOMS_BONUS_MASTER_PERCENT.getPath());
+		costCreate 	        	= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_CREATE.getPath());
+		costRename 	        	= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_RENAME.getPath());
+		costTemplate        	= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_TEMPLATE.getPath());
+		costDiplomacyWar 		= konquest.getCore().getDouble(CorePath.FAVOR_DIPLOMACY_COST_WAR.getPath());
+		costDiplomacyPeace 		= konquest.getCore().getDouble(CorePath.FAVOR_DIPLOMACY_COST_PEACE.getPath());
+		costDiplomacyTrade 		= konquest.getCore().getDouble(CorePath.FAVOR_DIPLOMACY_COST_TRADE.getPath());
+		costDiplomacyAlliance 	= konquest.getCore().getDouble(CorePath.FAVOR_DIPLOMACY_COST_ALLIANCE.getPath());
 		
 		payPerChunk = payPerChunk < 0 ? 0 : payPerChunk;
 		payPerResident = payPerResident < 0 ? 0 : payPerResident;
@@ -151,7 +161,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		costCreate = costCreate < 0 ? 0 : costCreate;
 		costRename = costRename < 0 ? 0 : costRename;
 		costTemplate = costTemplate < 0 ? 0 : costTemplate;
-		costRelation = costRelation < 0 ? 0 : costRelation;
+		costDiplomacyWar = Math.max(costDiplomacyWar,0);
+		costDiplomacyPeace = Math.max(costDiplomacyPeace,0);
+		costDiplomacyTrade = Math.max(costDiplomacyTrade,0);
+		costDiplomacyAlliance = Math.max(costDiplomacyAlliance,0);
 		payPercentOfficer = Math.max(payPercentOfficer, 0);
 		payPercentOfficer = Math.min(payPercentOfficer, 100);
 		payPercentMaster = Math.max(payPercentMaster, 0);
@@ -172,8 +185,20 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		discountPercent = Math.min(discountPercent,100);
 	}
 	
-	public double getCostRelation() {
-		return costRelation;
+	public double getCostDiplomacyWar() {
+		return costDiplomacyWar;
+	}
+
+	public double getCostDiplomacyPeace() {
+		return costDiplomacyPeace;
+	}
+
+	public double getCostDiplomacyTrade() {
+		return costDiplomacyTrade;
+	}
+
+	public double getCostDiplomacyAlliance() {
+		return costDiplomacyAlliance;
 	}
 	
 	public double getCostCreate() {
@@ -1583,6 +1608,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Check cost
+		double costRelation = getRelationCost(relation);
 		if(costRelation > 0 && !isAdmin) {
 			if(KonquestPlugin.getBalance(bukkitPlayer) < costRelation) {
 				Konquest.playFailSound(player.getBukkitPlayer());
@@ -1604,46 +1630,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		ChatUtil.printDebug("Our states ["+ourActiveState+","+ourRequestState+"]; Their states ["+theirActiveState+","+theirRequestState+"]");
 
 		// Check for valid relation change given current states
-		if(ourActiveState.equals(relation)) {
-			// Cannot change to existing active relation
-			ChatUtil.sendError(bukkitPlayer,"Cannot choose the current diplomatic relationship.");
-			return false;
-		}
-		if(ourActiveState.equals(KonquestDiplomacyType.ENEMY) && (relation.equals(KonquestDiplomacyType.ALLIED) || relation.equals(KonquestDiplomacyType.SANCTIONED))) {
-			// Cannot change to Allied, Sanctioned when currently enemy
-			ChatUtil.sendError(bukkitPlayer,"You may only request peace when at war.");
-			return false;
-		}
-		if(ourActiveState.equals(KonquestDiplomacyType.ALLIED) && relation.equals(KonquestDiplomacyType.ENEMY)) {
-			// Cannot change to Enemy when currently Allied
-			ChatUtil.sendError(bukkitPlayer,"Cannot declare war on an allied kingdom.");
+		if(!isValidRelationChoice(kingdom, otherKingdom, relation)) {
+			ChatUtil.sendError(bukkitPlayer, "Invalid relationship change.");
 			return false;
 		}
 
 		// Verify allowable current state combination
-		boolean isAllowedStates = true;
-		switch(ourActiveState) {
-			case PEACE:
-			case SANCTIONED:
-				if(theirActiveState.equals(KonquestDiplomacyType.ALLIED) || theirActiveState.equals(KonquestDiplomacyType.ENEMY)) {
-					isAllowedStates = false;
-				}
-				break;
-			case ALLIED:
-				if(!theirActiveState.equals(KonquestDiplomacyType.ALLIED)) {
-					isAllowedStates = false;
-				}
-				break;
-			case ENEMY:
-				if(!theirActiveState.equals(KonquestDiplomacyType.ENEMY)) {
-					isAllowedStates = false;
-				}
-				break;
-			default:
-				isAllowedStates = false;
-				break;
-		}
-		if(!isAllowedStates) {
+		if(!ourActiveState.equals(theirActiveState)) {
+			// There is a relation mismatch, revert to default
 			ChatUtil.printDebug("Found invalid state combination, reverting to default.");
 			kingdom.removeActiveRelation(otherKingdom);
 			otherKingdom.removeActiveRelation(kingdom);
@@ -1663,7 +1657,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		switch(relation) {
 			case PEACE:
 				// Our kingdom wants to make peace
-				if(ourActiveState.equals(KonquestDiplomacyType.ENEMY)) {
+				if(ourActiveState.equals(KonquestDiplomacyType.WAR)) {
 					// We are enemies, try to make peace
 					if(isInstantPeace) {
 						// Instantly change to active peace, force them to peace too
@@ -1671,7 +1665,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" have made peace!");
 					} else {
 						// Request peace from them
-						if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(relation)) {
+						if(kingdom.hasRelationRequest(otherKingdom) && kingdom.getRelationRequest(otherKingdom).equals(relation)) {
 							// Both sides request peace, change to active peace
 							setJointActiveRelation(kingdom,otherKingdom,relation);
 							ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" have made peace!");
@@ -1683,45 +1677,49 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					}
 				} else {
 					// We are not enemies
-					if(ourActiveState.equals(KonquestDiplomacyType.ALLIED)) {
+					if(ourActiveState.equals(KonquestDiplomacyType.ALLIANCE)) {
 						// We are allies, instantly break alliance and set both to peace
 						setJointActiveRelation(kingdom,otherKingdom,relation);
 						ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" are no longer allies!");
-					} else {
-						// Apply active relation only to our kingdom
-						kingdom.setActiveRelation(otherKingdom, relation);
-						// Remove any relation request from other kingdom
-						otherKingdom.removeRelationRequest(kingdom);
-						ChatUtil.sendBroadcast("The kingdom of "+kingdom.getName()+" has made peace with "+otherKingdom.getName()+".");
+					} else if(ourActiveState.equals(KonquestDiplomacyType.TRADE)) {
+						// We are trade partners, instantly go back to peace
+						setJointActiveRelation(kingdom,otherKingdom,relation);
+						ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" are no longer trading!");
 					}
 				}
 				break;
-			case SANCTIONED:
-				// Our kingdom wants to sanction the other
-				if(ourActiveState.equals(KonquestDiplomacyType.ALLIED)) {
-					// We are allies, instantly break alliance and set both to peace
+			case TRADE:
+				// Our kingdom wants to trade with the other
+				if(ourActiveState.equals(KonquestDiplomacyType.PEACE)) {
+					// We are at peace, request to trade
+					if(kingdom.hasRelationRequest(otherKingdom) && kingdom.getRelationRequest(otherKingdom).equals(relation)) {
+						// Both sides request trade, change to active trading
+						setJointActiveRelation(kingdom,otherKingdom,relation);
+						ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" are now trading.");
+					} else {
+						// We request trade
+						otherKingdom.setRelationRequest(kingdom,relation);
+						broadcastMembers(otherKingdom,"The kingdom of "+kingdom.getName()+" requests to trade.");
+					}
+				} else if(ourActiveState.equals(KonquestDiplomacyType.ALLIANCE)) {
+					// We are allies, instantly break alliance and set both to trade
 					removeJointActiveRelation(kingdom,otherKingdom);
 					ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" are no longer allies!");
 				}
-				// Apply sanction
-				kingdom.setActiveRelation(otherKingdom, relation);
-				// Remove any relation request from other kingdom
-				otherKingdom.removeRelationRequest(kingdom);
-				ChatUtil.sendBroadcast("The kingdom of "+kingdom.getName()+" has sanctioned "+otherKingdom.getName()+".");
 				break;
-			case ALLIED:
+			case ALLIANCE:
 				// Our kingdom wants to ally the other
-				if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(relation)) {
+				if(kingdom.hasRelationRequest(otherKingdom) && kingdom.getRelationRequest(otherKingdom).equals(relation)) {
 					// Both sides request allied, change to active alliance
 					setJointActiveRelation(kingdom,otherKingdom,relation);
-					ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" have formed an alliance!");
+					ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" have formed an alliance.");
 				} else {
 					// We request allied
 					otherKingdom.setRelationRequest(kingdom,relation);
 					broadcastMembers(otherKingdom,"The kingdom of "+kingdom.getName()+" requests to make an alliance.");
 				}
 				break;
-			case ENEMY:
+			case WAR:
 				// Our kingdom wants to declare war
 				if(isInstantWar) {
 					// Instantly change to active enemy, force them to enemy too
@@ -1730,7 +1728,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				} else {
 					// Request war
 					// Check if they already request enemy
-					if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(relation)) {
+					if(kingdom.hasRelationRequest(otherKingdom) && kingdom.getRelationRequest(otherKingdom).equals(relation)) {
 						// Both sides request enemy, change to active war
 						setJointActiveRelation(kingdom,otherKingdom,relation);
 						ChatUtil.sendBroadcast("The kingdoms of "+kingdom.getName()+" and "+otherKingdom.getName()+" are at war!");
@@ -1781,19 +1779,34 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return true;
 	}
 	
-	public boolean isValidRelationChoice(@NotNull KonKingdom kingdom1,@NotNull  KonKingdom kingdom2,@NotNull KonquestDiplomacyType relation) {
+	public boolean isValidRelationChoice(@NotNull KonKingdom kingdom1,@NotNull KonKingdom kingdom2,@NotNull KonquestDiplomacyType relation) {
 		KonquestDiplomacyType ourRelation = kingdom1.getActiveRelation(kingdom2);
 		if(ourRelation.equals(relation)) {
 			// Cannot change to existing active relation
 			return false;
-		} else if(ourRelation.equals(KonquestDiplomacyType.ENEMY) && (relation.equals(KonquestDiplomacyType.ALLIED) || relation.equals(KonquestDiplomacyType.SANCTIONED))) {
-			// Cannot change to Allied, Sanctioned when currently enemy
+		} else if(ourRelation.equals(KonquestDiplomacyType.WAR) && !relation.equals(KonquestDiplomacyType.PEACE)) {
+			// Can only change to peace when currently enemy
 			return false;
-		} else if(ourRelation.equals(KonquestDiplomacyType.ALLIED) && relation.equals(KonquestDiplomacyType.ENEMY)) {
-			// Cannot change to Enemy when currently Allied
+		} else if(ourRelation.equals(KonquestDiplomacyType.ALLIANCE) && relation.equals(KonquestDiplomacyType.WAR)) {
+			// Cannot change to war when currently Allied
 			return false;
 		}
 		return true;
+	}
+
+	public double getRelationCost(@NotNull KonquestDiplomacyType relation) {
+		switch(relation) {
+			case WAR:
+				return costDiplomacyWar;
+			case PEACE:
+				return costDiplomacyPeace;
+			case TRADE:
+				return costDiplomacyTrade;
+			case ALLIANCE:
+				return costDiplomacyAlliance;
+			default:
+				return 0;
+		}
 	}
 	
 	private void setJointActiveRelation(@NotNull KonKingdom kingdom1,@NotNull KonKingdom kingdom2,@NotNull KonquestDiplomacyType relation) {
@@ -1813,54 +1826,51 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 
 	/**
-	 * Check to see if a kingdom is an enemy
+	 * Get the shared diplomatic type of two kingdoms.
+	 * Performs error checking to ensure both kingdoms have the same active relation.
+	 * If there is a mismatch, they are reset to default (peace).
 	 * @param kingdom1 The reference kingdom
 	 * @param kingdom2 The target kingdom
-	 * @return True when both kingdoms have an active enemy relationship with each other, or either kingdom is Barbarians
+	 * @return The diplomatic type
 	 */
-	public boolean isBothKingdomsEnemy(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
-		// Barbarians are always enemies to other kingdoms
-		if(kingdom1.equals(getBarbarians()) || kingdom2.equals(getBarbarians())) {
-			return true;
+	public KonquestDiplomacyType getDiplomaticState(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
+		// Default kingdoms are always at war (barbarian & neutral)
+		if(!kingdom1.isCreated() || !kingdom2.isCreated()) {
+			return KonquestDiplomacyType.WAR;
 		}
-		return kingdom1.getActiveRelation(kingdom2).equals(KonquestDiplomacyType.ENEMY) && kingdom2.getActiveRelation(kingdom1).equals(KonquestDiplomacyType.ENEMY);
-	}
-
-	/**
-	 * Check to see if a kingdom is an ally
-	 * @param kingdom1 The reference kingdom
-	 * @param kingdom2 The target kingdom
-	 * @return True when both kingdoms have an active allied relationship with each other, and neither kingdom is Barbarians
-	 */
-	public boolean isBothKingdomsAllied(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
-		// Barbarians are never allied to other kingdoms
-		if(kingdom1.equals(getBarbarians()) || kingdom2.equals(getBarbarians())) {
-			return false;
+		// Evaluate two created kingdoms
+		if(kingdom1.getActiveRelation(kingdom2).equals(kingdom2.getActiveRelation(kingdom1))) {
+			// Both kingdoms have a matching active relation
+			return kingdom1.getActiveRelation(kingdom2);
+		} else {
+			// There is a relation mismatch, revert to default
+			if(kingdom1 instanceof KonKingdom) {
+				((KonKingdom)kingdom1).removeActiveRelation(kingdom2);
+			}
+			if(kingdom2 instanceof KonKingdom) {
+				((KonKingdom)kingdom2).removeActiveRelation(kingdom1);
+			}
+			return KonquestDiplomacyType.getDefault();
 		}
-		return kingdom1.getActiveRelation(kingdom2).equals(KonquestDiplomacyType.ALLIED) && kingdom2.getActiveRelation(kingdom1).equals(KonquestDiplomacyType.ALLIED);
 	}
 
-	/**
-	 * Check to see if a kingdom is sanctioned
-	 * @param kingdom1 The reference kingdom
-	 * @param kingdom2 The target kingdom
-	 * @return True when the reference kingdom sanctions the target kingdom
-	 */
-	public boolean isKingdomSanctioned(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
-		return kingdom1.getActiveRelation(kingdom2).equals(KonquestDiplomacyType.SANCTIONED);
+	public boolean isKingdomWar(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
+		return getDiplomaticState(kingdom1, kingdom2).equals(KonquestDiplomacyType.WAR);
 	}
 
-	/**
-	 * Check to see if a kingdom is peaceful
-	 * @param kingdom1 The reference kingdom
-	 * @param kingdom2 The target kingdom
-	 * @return True when the reference kingdom is peaceful with the target kingdom
-	 */
-	public boolean isKingdomPeaceful(@NotNull KonquestKingdom kingdom1,@NotNull KonquestKingdom kingdom2) {
-		return kingdom1.getActiveRelation(kingdom2).equals(KonquestDiplomacyType.PEACE);
+	public boolean isKingdomPeace(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
+		return getDiplomaticState(kingdom1, kingdom2).equals(KonquestDiplomacyType.PEACE);
+	}
+
+	public boolean isKingdomTrade(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
+		return getDiplomaticState(kingdom1, kingdom2).equals(KonquestDiplomacyType.TRADE);
+	}
+
+	public boolean isKingdomAlliance(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
+		return getDiplomaticState(kingdom1, kingdom2).equals(KonquestDiplomacyType.ALLIANCE);
 	}
 	
-	public RelationRole getRelationRole(@Nullable KonquestKingdom displayKingdom,@Nullable KonquestKingdom contextKingdom) {
+	public RelationRole getRelationRole(@Nullable KonquestKingdom displayKingdom, @Nullable KonquestKingdom contextKingdom) {
     	if(displayKingdom == null || contextKingdom == null) {
     		ChatUtil.printDebug("Failed to evaluate relation of null kingdom");
     		return RelationRole.NEUTRAL;
@@ -1876,13 +1886,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		} else if (displayKingdom.equals(getBarbarians())) {
     			result = RelationRole.ENEMY;
     		} else {
-    			if(isBothKingdomsEnemy(displayKingdom, contextKingdom)) {
+    			if(isKingdomWar(displayKingdom, contextKingdom)) {
     				result = RelationRole.ENEMY;
-				} else if(isBothKingdomsAllied(displayKingdom, contextKingdom)) {
-					result = RelationRole.ALLIED;
-				} else if(isKingdomSanctioned(displayKingdom, contextKingdom)) {
-					result = RelationRole.SANCTIONED;
-				} else if(isKingdomPeaceful(displayKingdom, contextKingdom)) {
+				} else if(isKingdomAlliance(displayKingdom, contextKingdom)) {
+					result = RelationRole.ALLY;
+				} else if(isKingdomTrade(displayKingdom, contextKingdom)) {
+					result = RelationRole.TRADE;
+				} else if(isKingdomPeace(displayKingdom, contextKingdom)) {
 					result = RelationRole.PEACEFUL;
 				} else {
 					result = RelationRole.NEUTRAL;
@@ -1891,18 +1901,22 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
     	return result;
     }
-    
+
     public boolean isPlayerEnemy(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
     	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.ENEMY);
     }
+
+	public boolean isPlayerAlly(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
+		return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.ALLY);
+	}
     
     public boolean isPlayerFriendly(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
     	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.FRIENDLY);
     }
-    
-    public boolean isPlayerBarbarian(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
-    	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.BARBARIAN);
-    }
+
+	public boolean isPlayerForeign(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
+		return !getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.FRIENDLY);
+	}
 
 	/*
 	 * =================================================

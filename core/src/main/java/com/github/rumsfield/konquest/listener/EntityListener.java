@@ -615,13 +615,13 @@ public class EntityListener implements Listener {
             }
             
             // Prevent optional damage based on relations
-            boolean isSanctionDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_SANCTIONED_PVP.getPath(), true);
+			// Kingdoms at peace may allow pvp. Kingdoms in alliance or trade cannot pvp.
             boolean isPeaceDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_PEACEFUL_PVP.getPath(), false);
             RelationRole attackerRole = kingdomManager.getRelationRole(attackerPlayer.getKingdom(), victimPlayer.getKingdom());
             if(attackerRole.equals(RelationRole.FRIENDLY) ||
-            		attackerRole.equals(RelationRole.ALLIED) ||
-            		(!isPeaceDamageEnabled && attackerRole.equals(RelationRole.PEACEFUL)) ||
-            		(!isSanctionDamageEnabled && attackerRole.equals(RelationRole.SANCTIONED))) {
+            		attackerRole.equals(RelationRole.ALLY) ||
+					attackerRole.equals(RelationRole.TRADE) ||
+            		(!isPeaceDamageEnabled && attackerRole.equals(RelationRole.PEACEFUL))) {
             	ChatUtil.sendKonPriorityTitle(attackerPlayer, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 				event.setCancelled(true);
 				return;

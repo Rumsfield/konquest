@@ -81,7 +81,7 @@ placeholder:
   enemy: "Enemy"
   barbarian: "Barbarian"
   ally: "Ally"
-  sanctioned: "Sanctioned"
+  trader: "Trader"
   peaceful: "Peaceful"
 map:
   barbarian: "Barbarian"
@@ -877,9 +877,9 @@ territory:
   ruin: "Ruin"
   sanctuary: "Sanctuary"
   other: "Other"
-relationship:
-  enemy: "Enemy"
-  sanctioned: "Sanctioned"
+diplomacy:
+  war: "War"
   peace: "Peace"
-  allied: "Allied"
+  trade: "Trade"
+  alliance: "Alliance"
   

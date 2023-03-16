@@ -11,21 +11,21 @@ import org.bukkit.Material;
 public enum KonquestDiplomacyType {
 
     /**
-     * Enemy kingdoms are at war and can attack each other.
+     * Kingdoms at war can attack each other and capture towns.
      */
-    ENEMY				(Material.TNT),
+    WAR				    (Material.TNT),
     /**
-     * Sanctioned kingdoms cannot trade and may allow pvp between members.
-     */
-    SANCTIONED			(Material.SOUL_SAND),
-    /**
-     * Peaceful kingdoms can trade and may allow pvp between members.
+     * Peaceful kingdoms cannot fight in towns and may allow pvp.
      */
     PEACE				(Material.QUARTZ_PILLAR),
     /**
-     * Allied kingdoms can travel to each other's towns and prevent pvp.
+     * Trading kingdoms allow villager trades and cannot pvp.
      */
-    ALLIED				(Material.DIAMOND_BLOCK);
+    TRADE			    (Material.GOLD_BLOCK),
+    /**
+     * Allied kingdoms can travel to each other's towns and share a defense pact.
+     */
+    ALLIANCE			(Material.DIAMOND_BLOCK);
 
     private final Material icon;
 

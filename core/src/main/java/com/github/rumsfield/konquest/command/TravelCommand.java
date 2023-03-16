@@ -177,7 +177,7 @@ public class TravelCommand extends CommandBase {
 						return;
 					}
 					// Check for player's own kingdom or allied kingdom
-					if(!player.getKingdom().equals(travelCapital.getKingdom()) && !getKonquest().getKingdomManager().isBothKingdomsAllied(player.getKingdom(),travelCapital.getKingdom())) {
+					if(!player.getKingdom().equals(travelCapital.getKingdom()) && !getKonquest().getKingdomManager().isPlayerAlly(player,travelCapital.getKingdom())) {
 						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 						return;
 					}
@@ -205,7 +205,7 @@ public class TravelCommand extends CommandBase {
 						return;
 					}
 					// Check for player's own town or allied town
-					if(!player.getKingdom().equals(travelTown.getKingdom()) && !getKonquest().getKingdomManager().isBothKingdomsAllied(player.getKingdom(),travelTown.getKingdom())) {
+					if(!player.getKingdom().equals(travelTown.getKingdom()) && !getKonquest().getKingdomManager().isPlayerAlly(player,travelTown.getKingdom())) {
 						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 						return;
 					}
@@ -316,7 +316,7 @@ public class TravelCommand extends CommandBase {
 				if(isSanctuaryTravel) {tabList.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());}
 				if(isCapitalTravel) {tabList.add("capital");}
 				for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
-					if(player.getKingdom().equals(kingdom) || getKonquest().getKingdomManager().isBothKingdomsAllied(player.getKingdom(),kingdom)) {
+					if(player.getKingdom().equals(kingdom) || getKonquest().getKingdomManager().isKingdomAlliance(player.getKingdom(),kingdom)) {
 						if(isCapitalTravel) {tabList.add(kingdom.getName());}
 						if(isTownTravel) {tabList.addAll(kingdom.getTownNames());}
 					}

@@ -310,11 +310,11 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		    	case FRIENDLY:
 		    		result = MessagePath.PLACEHOLDER_FRIENDLY.getMessage();
 		    		break;
-		    	case ALLIED:
+		    	case ALLY:
 		    		result = MessagePath.PLACEHOLDER_ALLY.getMessage();
 		    		break;
-		    	case SANCTIONED:
-		    		result = MessagePath.PLACEHOLDER_SANCTIONED.getMessage();
+		    	case TRADE:
+		    		result = MessagePath.PLACEHOLDER_TRADER.getMessage();
 		    		break;
 		    	case PEACEFUL:
 		    		result = MessagePath.PLACEHOLDER_PEACEFUL.getMessage();

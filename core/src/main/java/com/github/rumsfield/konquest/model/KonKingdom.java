@@ -361,6 +361,10 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	/* Active Relationship */
 	
 	public void setActiveRelation(KonquestKingdom kingdom, KonquestDiplomacyType relation) {
+		// Only allow created kingdoms to set relations
+		if(!isCreated || !kingdom.isCreated()) {
+			return;
+		}
 		// Prevent setting self relation
 		if(kingdom.equals(this)) {
 			return;
@@ -402,6 +406,10 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	/* Request Relationship */
 	
 	public void setRelationRequest(KonquestKingdom kingdom, KonquestDiplomacyType relation) {
+		// Only allow created kingdoms to set relations
+		if(!isCreated || !kingdom.isCreated()) {
+			return;
+		}
 		// Prevent setting self relation
 		if(kingdom.equals(this)) {
 			return;

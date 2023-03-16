@@ -35,6 +35,13 @@ public interface KonquestKingdom {
 	 */
     boolean isPeaceful();
 
+	/**
+	 * Get whether the kingdom is created by players.
+	 * Non-created kingdoms are the defaults included by Konquest: Barbarians and Neutrals.
+	 *
+	 * @return True if created, else false
+	 */
+	boolean isCreated();
 
 	/**
 	 * Get the active diplomatic relationship of this kingdom to the given kingdom.

@@ -10,6 +10,7 @@ import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonMonumentTemplate;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.Labeler;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
@@ -83,6 +84,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	private final int SLOT_NO 					= 5;
 
 	private final String propertyColor = DisplayManager.propertyFormat;
+	private final String alertColor = DisplayManager.alertFormat;
 	private final String loreColor = DisplayManager.loreFormat;
 	private final String valueColor = DisplayManager.valueFormat;
 	private final String hintColor = DisplayManager.hintFormat;
@@ -134,7 +136,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			}
 		}
 		kingdomComparator = (kingdomOne, kingdomTwo) -> {
-			// sort by land, then population
+			// sort by towns, then population
 			int result = 0;
 			int g1Land = kingdomOne.getNumLand();
 			int g2Land = kingdomTwo.getNumLand();
@@ -384,11 +386,9 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	 * Relationships view lists all other kingdoms and their relationship, with icon format:
 	 * 		Colored by current relation
 	 * 		Name = Kingdom name
-	 * 		Lore0 = Currently: <active relation>
-	 * 		Lore1 = +-----------+
-	 * 		Lore2 = Our Stance: <our request relation>
-	 * 		Lore3 = Their Stance: <their request relation>
-	 *      Lore4 = Click to change our stance
+	 * 		Lore0 = Our Stance: <our active relation>
+	 * 		Lore1 = Their Stance: <their active relation>
+	 *      Lore2 = Click to change our stance
 	 *
 	 * Diplomacy view shows info on chosen kingdom, and all relationship options.
 	 * Show same kingdom icon (not clickable) and all relationships with context tips.
@@ -396,7 +396,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	 * 		Lore0 = <context description based on instant war/peace, their stance>
 	 * 		Lore1 = <click to enact, if clickable based on context/conditions>
 	 */
-	//TODO re-do this
 
 	private DisplayMenu createDiplomacyView() {
 		// diplomacyKingdom is the global variable to keep track of current kingdom changing status
@@ -409,25 +408,35 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		result = new DisplayMenu(numRows+1, getTitle(MenuState.B_DIPLOMACY));
 		int index = 0;
 		List<String> loreList;
+
+		KonquestDiplomacyType currentDiplomacy = manager.getDiplomaticState(kingdom,diplomacyKingdom);
 		
 		// Create kingdom info
 		ChatColor contextColor = konquest.getDisplayPrimaryColor(kingdom, diplomacyKingdom);
 		loreList = new ArrayList<>();
-		String ourStatus = Labeler.lookup(kingdom.getActiveRelation(diplomacyKingdom));
-		String theirStatus = Labeler.lookup(diplomacyKingdom.getActiveRelation(kingdom));
-		String ourRequestStatus = Labeler.lookup(kingdom.getRelationRequest(diplomacyKingdom));
-		String theirRequestStatus = Labeler.lookup(diplomacyKingdom.getRelationRequest(kingdom));
-		loreList.add(loreColor+"Our Stance"+": "+valueColor+ourStatus);
-		loreList.add(loreColor+"Their Stance"+": "+valueColor+theirStatus);
-		loreList.add(loreColor+"+-------------+");
-		loreList.add(loreColor+"Our Request"+": "+valueColor+ourRequestStatus);
-		loreList.add(loreColor+"Their Request"+": "+valueColor+theirRequestStatus);
+		String diplomacyState = Labeler.lookup(currentDiplomacy);
+		loreList.add(loreColor+"Diplomacy"+": "+valueColor+diplomacyState);
+		if(kingdom.hasRelationRequest(diplomacyKingdom)) {
+			// They have sent a valid diplomacy change request to us
+			String ourRequestStatus = Labeler.lookup(kingdom.getRelationRequest(diplomacyKingdom));
+			loreList.add(alertColor+"They Requested"+": "+valueColor+ourRequestStatus);
+		}
+		if(diplomacyKingdom.hasRelationRequest(kingdom)) {
+			// We have sent a valid diplomacy change request to them
+			String theirRequestStatus = Labeler.lookup(diplomacyKingdom.getRelationRequest(kingdom));
+			loreList.add(alertColor+"We Requested"+": "+valueColor+theirRequestStatus);
+		}
 		KingdomIcon kingdomIcon = new KingdomIcon(diplomacyKingdom,contextColor,loreList,index,false);
 		result.addIcon(kingdomIcon);
-		index = 2;
 		
 		// Only create relation options for created kingdoms
+		index = 2;
 		if(isCreatedKingdom) {
+			// Does any change to war by one side instantly force the other into war?
+			boolean isInstantWar = konquest.getCore().getBoolean(CorePath.KINGDOMS_INSTANT_WAR.getPath(), false);
+			// Does a change from war to peace by one side instantly force the other into peace?
+			boolean isInstantPeace = konquest.getCore().getBoolean(CorePath.KINGDOMS_INSTANT_PEACE.getPath(), false);
+
 			for(KonquestDiplomacyType relation : KonquestDiplomacyType.values()) {
 				// Determine context lore for this relation and the stance of kingdom with diplomacyKingdom
 				loreList = new ArrayList<>();
@@ -441,15 +450,34 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					relationColor = ChatColor.GOLD;
 					switch(relation) {
 						case PEACE:
-							description = "Request for peace";
+							// Context descriptions
+							if(currentDiplomacy.equals(KonquestDiplomacyType.WAR)) {
+								if(isInstantPeace) {
+									description = "Instantly declare peace";
+								} else {
+									description = "Request for peace";
+								}
+							} else if(currentDiplomacy.equals(KonquestDiplomacyType.TRADE)) {
+								description = "End trade and declare peace";
+							} else if(currentDiplomacy.equals(KonquestDiplomacyType.ALLIANCE)) {
+								description = "End alliance and declare peace";
+							}
 							break;
-						case SANCTIONED:
-							description = "Stop trade, enable pvp?";
+						case TRADE:
+							if(currentDiplomacy.equals(KonquestDiplomacyType.PEACE)) {
+								description = "Request for trade";
+							} else if(currentDiplomacy.equals(KonquestDiplomacyType.ALLIANCE)) {
+								description = "End alliance and declare trade";
+							}
 							break;
-						case ENEMY:
-							description = "Declare war on an enemy";
+						case WAR:
+							if(isInstantWar) {
+								description = "Instantly declare war";
+							} else {
+								description = "Request for war";
+							}
 							break;
-						case ALLIED:
+						case ALLIANCE:
 							description = "Request for alliance";
 							break;
 						default:
@@ -459,7 +487,8 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				loreList.add(relationColor+description);
 				if(isValidChoice) {
 					if(!isAdmin) {
-						String cost = String.format("%.2f",manager.getCostRelation());
+						double costRelation = manager.getRelationCost(relation);
+						String cost = String.format("%.2f",costRelation);
 						loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
 					}
 					loreList.add(hintColor+"Click to enact");
@@ -532,10 +561,18 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				ChatColor contextColor = konquest.getDisplayPrimaryColor(kingdom, currentKingdom);
 				loreList = new ArrayList<>();
 				if(isCreatedKingdom) {
-					String ourStatus = Labeler.lookup(kingdom.getActiveRelation(currentKingdom));
-					String theirStatus = Labeler.lookup(currentKingdom.getActiveRelation(kingdom));
-					loreList.add(loreColor+MessagePath.MENU_GUILD_OUR_STATUS.getMessage()+": "+valueColor+ourStatus);
-					loreList.add(loreColor+MessagePath.MENU_GUILD_THEIR_STATUS.getMessage()+": "+valueColor+theirStatus);
+					String diplomacyState = Labeler.lookup(manager.getDiplomaticState(kingdom,currentKingdom));
+					loreList.add(loreColor+"Diplomacy"+": "+valueColor+diplomacyState);
+					if(kingdom.hasRelationRequest(diplomacyKingdom)) {
+						// They have sent a valid diplomacy change request to us
+						String ourRequestStatus = Labeler.lookup(kingdom.getRelationRequest(diplomacyKingdom));
+						loreList.add(alertColor+"They Requested"+": "+valueColor+ourRequestStatus);
+					}
+					if(diplomacyKingdom.hasRelationRequest(kingdom)) {
+						// We have sent a valid diplomacy change request to them
+						String theirRequestStatus = Labeler.lookup(diplomacyKingdom.getRelationRequest(kingdom));
+						loreList.add(alertColor+"We Requested"+": "+valueColor+theirRequestStatus);
+					}
 				}
 				// Context-specific lore
 				switch(context) {

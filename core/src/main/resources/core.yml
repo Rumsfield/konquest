@@ -94,11 +94,11 @@ core:
     # (*) The secondary color that players see for enemy players/towns with an armistice.
     #armistice_secondary: DARK_PURPLE
     
-# NEW (*) The primary color that players see for sanctioned kingdoms.
-    sanctioned_primary: LIGHT_PURPLE
+# NEW (*) The primary color that players see for trading kingdoms.
+    trade_primary: LIGHT_PURPLE
 
-# NEW (*) The secondary color that players see for sanctioned kingdoms.
-    sanctioned_secondary: DARK_PURPLE
+# NEW (*) The secondary color that players see for trading kingdoms.
+    trade_secondary: DARK_PURPLE
     
 # NEW (*) The primary color that players see for peaceful kingdoms.
     peaceful_primary: AQUA
@@ -107,10 +107,10 @@ core:
     peaceful_secondary: DARK_AQUA
     
 # NEW (*) The primary color that players see for allied kingdoms.
-    allied_primary: BLUE
+    ally_primary: BLUE
 
 # NEW (*) The secondary color that players see for allied kingdoms.
-    allied_secondary: DARK_BLUE
+    ally_secondary: DARK_BLUE
     
     # (*) The color that all players see for barbarians.
     #barbarian: YELLOW
@@ -224,16 +224,13 @@ core:
     capital_suffix: Capital
     
 # NEW Capitals will be immune from capture while there are this many other towns in the kingdom (0 to disable, integer >= 0)
-    capital_immunity_towns: 3
+    capital_immunity_towns: 2
     
 # NEW Any kingdom can start a war with another (true), else both kingdoms must agree to war (false) (true/false)
     instant_war: true
     
 # NEW Either kingdom can end a war with the enemy kingdom (true), else both kingdoms must agree to peace (false) (true/false)
     instant_peace: false
-    
-# NEW Allow players to pvp with other kingdoms that are sanctioned (true/false)
-    allow_sanctioned_pvp: true
     
 # NEW Allow players to pvp with other kingdoms that are peaceful (true/false)
     allow_peaceful_pvp: false
@@ -399,7 +396,7 @@ core:
     max_armor: 9999
     
     # Free shield duration in seconds for all newly settled towns (0 to disable, integer >= 0)
-    shield_new_towns: 0
+    shield_new_towns: 600
     
     # Allow barbarian players to destroy towns when true, else prevent barbarians from attacking town monuments (true/false)
     barbarians_destroy: true
@@ -636,9 +633,6 @@ core:
 # NEW      # Cost to change the monument template of a kingdom (decimal >= 0)
       cost_template: 200
       
-# NEW      # Cost to change relationship status with other kingdoms (decimal >= 0)
-      cost_relationship: 50
-      
 # NEW        # Time in seconds between payments (0 to disable, integer >= 0)
       pay_interval_seconds: 900
        
@@ -656,7 +650,22 @@ core:
        
 # NEW        # Percentage between 0 and 100 of normal payment to pay the kingdom master as a bonus (0 to disable, 0 <= integer <= 100)
       bonus_master_percent: 50
-      
+
+# NEW # //// CORE.FAVOR.DIPLOMACY \\\\
+    diplomacy:
+
+# NEW      # Cost to declare war on another kingdom (decimal >= 0)
+      cost_war: 50
+
+# NEW      # Cost to make peace with another kingdom (decimal >= 0)
+      cost_peace: 0
+
+# NEW      # Cost to trade with another kingdom (decimal >= 0)
+      cost_trade: 50
+
+# NEW      # Cost to make an alliance with another kingdom (decimal >= 0)
+      cost_alliance: 100
+
     # //// CORE.FAVOR.REWARDS \\\\
     rewards:
     

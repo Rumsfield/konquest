@@ -50,7 +50,6 @@ public class FavorCommand extends CommandBase {
         	ChatUtil.sendMessage(bukkitPlayer, "Town Rename: "+ChatColor.AQUA+cost_town_rename);
         	ChatUtil.sendMessage(bukkitPlayer, "Kingdom Create: "+ChatColor.AQUA+getKonquest().getKingdomManager().getCostCreate());
         	ChatUtil.sendMessage(bukkitPlayer, "Kingdom Rename: "+ChatColor.AQUA+getKonquest().getKingdomManager().getCostRename());
-        	ChatUtil.sendMessage(bukkitPlayer, "Kingdom Relation: "+ChatColor.AQUA+getKonquest().getKingdomManager().getCostRelation());
         }
 	}
 	

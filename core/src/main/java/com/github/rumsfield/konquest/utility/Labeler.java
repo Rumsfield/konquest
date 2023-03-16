@@ -10,14 +10,14 @@ public class Labeler {
 
     public static String lookup(KonquestDiplomacyType type) {
         switch(type) {
-            case ENEMY:
-                return MessagePath.RELATIONSHIP_ENEMY.getMessage();
+            case WAR:
+                return MessagePath.DIPLOMACY_WAR.getMessage();
             case PEACE:
-                return MessagePath.RELATIONSHIP_PEACE.getMessage();
-            case ALLIED:
-                return MessagePath.RELATIONSHIP_ALLIED.getMessage();
-            case SANCTIONED:
-                return MessagePath.RELATIONSHIP_SANCTIONED.getMessage();
+                return MessagePath.DIPLOMACY_PEACE.getMessage();
+            case TRADE:
+                return MessagePath.DIPLOMACY_TRADE.getMessage();
+            case ALLIANCE:
+                return MessagePath.DIPLOMACY_ALLIANCE.getMessage();
             default:
                 break;
         }
