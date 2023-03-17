@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.display.wrapper;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
+import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.display.icon.*;
 import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
@@ -39,7 +40,6 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		String pageLabel;
  		List<String> loreList;
  		MenuIcon info;
-		final int MAX_ICONS_PER_PAGE = 45;
 		int slotIndex;
 		int pageIndex = 0;
 		int pageRows = 1;
@@ -156,22 +156,82 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		}
 		pageIndex++;
 
-    	// Page 1+
-    	// Town List
+    	// Pages for created kingdoms
 		if(infoKingdom.isCreated()) {
-			List<KonTown> kingdomTowns = sortedTowns(infoKingdom);
-			pageTotal = (int) Math.ceil(((double) kingdomTowns.size()) / MAX_ICONS_PER_PAGE);
-			if (pageTotal == 0) {
-				pageTotal = 1;
+
+			/* Enemy Kingdoms */
+			List<KonKingdom> enemyKingdoms = infoKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.WAR);
+			enemyKingdoms.sort(kingdomComparator);
+			pageTotal = getTotalPages(enemyKingdoms.size());
+			ListIterator<KonKingdom> enemyIterator = enemyKingdoms.listIterator();
+			for (int i = 0; i < pageTotal; i++) {
+				int numPageRows = getNumPageRows(enemyKingdoms.size(),i);
+				pageLabel = titleColor + infoKingdom.getName() + " " + MessagePath.DIPLOMACY_WAR.getMessage() + " " + (i + 1) + "/" + pageTotal;
+				getMenu().addPage(pageIndex, numPageRows, pageLabel);
+				slotIndex = 0;
+				while (slotIndex < MAX_ICONS_PER_PAGE && enemyIterator.hasNext()) {
+					/* Kingdom Icon (n) */
+					KonKingdom currentKingdom = enemyIterator.next();
+					loreList = new ArrayList<>();
+					loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
+					KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,Konquest.enemyColor1,loreList,slotIndex,true);
+					getMenu().getPage(pageIndex).addIcon(kingdomIcon);
+					slotIndex++;
+				}
+				pageIndex++;
 			}
+
+			/* Allied Kingdoms */
+			List<KonKingdom> allyKingdoms = infoKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.ALLIANCE);
+			allyKingdoms.sort(kingdomComparator);
+			pageTotal = getTotalPages(allyKingdoms.size());
+			ListIterator<KonKingdom> allyIterator = allyKingdoms.listIterator();
+			for (int i = 0; i < pageTotal; i++) {
+				int numPageRows = getNumPageRows(allyKingdoms.size(),i);
+				pageLabel = titleColor + infoKingdom.getName() + " " + MessagePath.DIPLOMACY_ALLIANCE.getMessage() + " " + (i + 1) + "/" + pageTotal;
+				getMenu().addPage(pageIndex, numPageRows, pageLabel);
+				slotIndex = 0;
+				while (slotIndex < MAX_ICONS_PER_PAGE && allyIterator.hasNext()) {
+					/* Kingdom Icon (n) */
+					KonKingdom currentKingdom = allyIterator.next();
+					loreList = new ArrayList<>();
+					loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
+					KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,Konquest.alliedColor1,loreList,slotIndex,true);
+					getMenu().getPage(pageIndex).addIcon(kingdomIcon);
+					slotIndex++;
+				}
+				pageIndex++;
+			}
+
+			/* Trade Kingdoms */
+			List<KonKingdom> tradeKingdoms = infoKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.TRADE);
+			tradeKingdoms.sort(kingdomComparator);
+			pageTotal = getTotalPages(tradeKingdoms.size());
+			ListIterator<KonKingdom> tradeIterator = tradeKingdoms.listIterator();
+			for (int i = 0; i < pageTotal; i++) {
+				int numPageRows = getNumPageRows(tradeKingdoms.size(),i);
+				pageLabel = titleColor + infoKingdom.getName() + " " + MessagePath.DIPLOMACY_TRADE.getMessage() + " " + (i + 1) + "/" + pageTotal;
+				getMenu().addPage(pageIndex, numPageRows, pageLabel);
+				slotIndex = 0;
+				while (slotIndex < MAX_ICONS_PER_PAGE && tradeIterator.hasNext()) {
+					/* Kingdom Icon (n) */
+					KonKingdom currentKingdom = tradeIterator.next();
+					loreList = new ArrayList<>();
+					loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
+					KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,Konquest.tradeColor1,loreList,slotIndex,true);
+					getMenu().getPage(pageIndex).addIcon(kingdomIcon);
+					slotIndex++;
+				}
+				pageIndex++;
+			}
+
+			/* Town List */
+			List<KonTown> kingdomTowns = infoKingdom.getTowns();
+			kingdomTowns.sort(townComparator);
+			pageTotal = getTotalPages(kingdomTowns.size());
 			ListIterator<KonTown> townIter = kingdomTowns.listIterator();
 			for (int i = 0; i < pageTotal; i++) {
-				int numPageRows = (int) Math.ceil(((double) (kingdomTowns.size() - i * MAX_ICONS_PER_PAGE)) / 9);
-				if (numPageRows < 1) {
-					numPageRows = 1;
-				} else if (numPageRows > 5) {
-					numPageRows = 5;
-				}
+				int numPageRows = getNumPageRows(kingdomTowns.size(),i);
 				pageLabel = titleColor + infoKingdom.getName() + " " + MessagePath.LABEL_TOWNS.getMessage() + " " + (i + 1) + "/" + pageTotal;
 				getMenu().addPage(pageIndex, numPageRows, pageLabel);
 				slotIndex = 0;
@@ -245,28 +305,4 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		}
 	}
 
-	// Sort kingdom town list by population then size
-  	private List<KonTown> sortedTowns(KonKingdom kingdom) {
-  		List<KonTown> sortedTowns = kingdom.getTowns();
-
-  		// Sort each town list by population then size
-  		Comparator<KonTown> townComparator = (townOne, townTwo) -> {
-			  int result = 0;
-			  if(townOne.getNumResidents() < townTwo.getNumResidents()) {
-				  result = 1;
-			  } else if(townOne.getNumResidents() > townTwo.getNumResidents()) {
-				  result = -1;
-			  } else {
-				  if(townOne.getChunkList().size() < townTwo.getChunkList().size()) {
-					  result = 1;
-				  } else if(townOne.getChunkList().size() > townTwo.getChunkList().size()) {
-					  result = -1;
-				  }
-			  }
-			  return result;
-		  };
-  		sortedTowns.sort(townComparator);
-  		
-  		return sortedTowns;
-  	}
 }

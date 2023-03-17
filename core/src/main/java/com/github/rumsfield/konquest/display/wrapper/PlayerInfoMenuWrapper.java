@@ -147,22 +147,6 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
  				residentTowns.add(town);
  			}
  		}
- 		// Sort each town list by population then size
-  		Comparator<KonTown> townComparator = (townOne, townTwo) -> {
-			  int result = 0;
-			  if(townOne.getNumResidents() < townTwo.getNumResidents()) {
-				  result = 1;
-			  } else if(townOne.getNumResidents() > townTwo.getNumResidents()) {
-				  result = -1;
-			  } else {
-				  if(townOne.getChunkList().size() < townTwo.getChunkList().size()) {
-					  result = 1;
-				  } else if(townOne.getChunkList().size() > townTwo.getChunkList().size()) {
-					  result = -1;
-				  }
-			  }
-			  return result;
-		  };
  		lordTowns.sort(townComparator);
  		knightTowns.sort(townComparator);
  		residentTowns.sort(townComparator);

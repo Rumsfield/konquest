@@ -394,6 +394,16 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	public Collection<KonquestKingdom> getActiveRelationKingdoms() {
 		return new HashSet<>(activeRelationships.keySet());
 	}
+
+	public List<KonKingdom> getActiveRelationKingdoms(KonquestDiplomacyType relation) {
+		List<KonKingdom> result = new ArrayList<>();
+		for(KonquestKingdom kingdom : activeRelationships.keySet()) {
+			if(activeRelationships.get(kingdom).equals(relation) && kingdom instanceof KonKingdom) {
+				result.add((KonKingdom)kingdom);
+			}
+		}
+		return result;
+	}
 	
 	public List<String> getActiveRelationNames() {
 		List<String> result = new ArrayList<>();
