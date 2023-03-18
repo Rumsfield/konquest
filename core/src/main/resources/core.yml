@@ -101,16 +101,16 @@ core:
     trade_secondary: DARK_PURPLE
     
 # NEW (*) The primary color that players see for peaceful kingdoms.
-    peaceful_primary: AQUA
+    peaceful_primary: WHITE
 
 # NEW (*) The secondary color that players see for peaceful kingdoms.
-    peaceful_secondary: DARK_AQUA
+    peaceful_secondary: GRAY
     
 # NEW (*) The primary color that players see for allied kingdoms.
-    ally_primary: BLUE
+    ally_primary: AQUA
 
 # NEW (*) The secondary color that players see for allied kingdoms.
-    ally_secondary: DARK_BLUE
+    ally_secondary: DARK_AQUA
     
     # (*) The color that all players see for barbarians.
     #barbarian: YELLOW
