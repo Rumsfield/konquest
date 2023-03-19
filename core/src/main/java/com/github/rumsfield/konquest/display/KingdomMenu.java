@@ -563,14 +563,14 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				if(isCreatedKingdom) {
 					String diplomacyState = Labeler.lookup(manager.getDiplomaticState(kingdom,currentKingdom));
 					loreList.add(loreColor+"Diplomacy"+": "+valueColor+diplomacyState);
-					if(kingdom.hasRelationRequest(diplomacyKingdom)) {
+					if(kingdom.hasRelationRequest(currentKingdom)) {
 						// They have sent a valid diplomacy change request to us
-						String ourRequestStatus = Labeler.lookup(kingdom.getRelationRequest(diplomacyKingdom));
+						String ourRequestStatus = Labeler.lookup(kingdom.getRelationRequest(currentKingdom));
 						loreList.add(alertColor+"They Requested"+": "+valueColor+ourRequestStatus);
 					}
-					if(diplomacyKingdom.hasRelationRequest(kingdom)) {
+					if(currentKingdom.hasRelationRequest(kingdom)) {
 						// We have sent a valid diplomacy change request to them
-						String theirRequestStatus = Labeler.lookup(diplomacyKingdom.getRelationRequest(kingdom));
+						String theirRequestStatus = Labeler.lookup(currentKingdom.getRelationRequest(kingdom));
 						loreList.add(alertColor+"We Requested"+": "+valueColor+theirRequestStatus);
 					}
 				}
@@ -687,6 +687,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		// Assume a clickable icon was clicked
 		// Do something based on current state and clicked slot
 		DisplayMenu result = null;
+		MenuState currentMenuState = (MenuState)currentState;
 		int navMaxIndex = getCurrentView().getInventory().getSize()-1;
 		int navMinIndex = getCurrentView().getInventory().getSize()-9;
 		if(slot <= navMaxIndex && slot >= navMinIndex) {
@@ -696,17 +697,22 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			if(index == 0) {
 				result = goPageBack();
 			} else if(index == 5) {
-				// Return to previous root
-				//result = views.get(MenuState.ROOT);
-				result = goToRootView();
-				currentState = MenuState.ROOT;
+				// Return to previous
+				if(currentMenuState.equals(MenuState.B_DIPLOMACY)) {
+					// Return to relationship from diplomacy
+					currentState = MenuState.B_RELATIONSHIP;
+					result = goToKingdomView(MenuState.B_RELATIONSHIP);
+				} else {
+					// Default return to root
+					result = goToRootView();
+					currentState = MenuState.ROOT;
+				}
 			} else if(index == 8) {
 				result = goPageNext();
 			}
 		} else if(slot < navMinIndex) {
 			// Click in non-navigation slot
 			MenuIcon clickedIcon = views.get(currentState).getIcon(slot);
-			MenuState currentMenuState = (MenuState)currentState;
 			switch(currentMenuState) {
 				case ROOT:
 					if(slot == ROOT_SLOT_JOIN) {

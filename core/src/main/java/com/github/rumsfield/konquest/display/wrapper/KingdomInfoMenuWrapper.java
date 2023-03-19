@@ -302,6 +302,10 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			if(offlinePlayer != null && icon.getAction().equals(PlayerIconAction.DISPLAY_INFO)) {
 				getKonquest().getDisplayManager().displayPlayerInfoMenu(clickPlayer, offlinePlayer);
 			}
+		} else if(clickedIcon instanceof KingdomIcon) {
+			// Kingdom Icons open a new kingdom info menu for the associated player
+			KingdomIcon icon = (KingdomIcon)clickedIcon;
+			getKonquest().getDisplayManager().displayKingdomInfoMenu(clickPlayer,icon.getKingdom());
 		}
 	}
 

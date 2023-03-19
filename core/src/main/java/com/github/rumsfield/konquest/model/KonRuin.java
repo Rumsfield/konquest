@@ -46,7 +46,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		this.spawnTimer = new Timer(this);
 		this.captureTimer = new Timer(this);
 		this.isCaptureDisabled = false;
-		this.ruinBarAll = Bukkit.getServer().createBossBar(ChatColor.WHITE+name, BarColor.WHITE, BarStyle.SOLID);
+		this.ruinBarAll = Bukkit.getServer().createBossBar(Konquest.neutralColor1+name, BarColor.WHITE, BarStyle.SOLID);
 		this.ruinBarAll.setVisible(true);
 		this.criticalLocations = new HashMap<>();
 		this.spawnLocations = new HashMap<>();

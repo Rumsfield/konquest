@@ -1,7 +1,9 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.utility.Labeler;
+import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -48,7 +50,24 @@ public class DiplomacyIcon implements MenuIcon {
 			}
 		}
 		List<String> itemLore = new ArrayList<>(lore);
-		meta.setDisplayName(getName());
+		ChatColor nameColor = ChatColor.GOLD;
+		switch(relation) {
+			case WAR:
+				nameColor = Konquest.enemyColor1;
+				break;
+			case PEACE:
+				nameColor = Konquest.peacefulColor1;
+				break;
+			case TRADE:
+				nameColor = Konquest.tradeColor1;
+				break;
+			case ALLIANCE:
+				nameColor = Konquest.alliedColor1;
+				break;
+			default:
+				break;
+		}
+		meta.setDisplayName(nameColor+getName());
 		meta.setLore(itemLore);
 		item.setItemMeta(meta);
 		return item;

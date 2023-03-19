@@ -112,6 +112,15 @@ public class PlayerListener implements Listener {
 				}
 				konquest.opStatusMessages.clear();
 			}
+
+			// Messages for kingdom diplomacy
+			boolean isDiplomacyRequestsPending = !player.getKingdom().getRelationRequestKingdoms().isEmpty();
+			boolean isPlayerKingdomOfficer = player.getKingdom().isOfficer(bukkitPlayer.getUniqueId());
+			if(isDiplomacyRequestsPending && isPlayerKingdomOfficer) {
+				String message = "Your kingdom has pending diplomacy requests. Use \"/k kingdom\", then choose Relationships to respond.";
+				ChatUtil.sendNotice(bukkitPlayer, message, ChatColor.GOLD);
+			}
+
 			// Messages for kingdom & town membership
 			// Notify players with outstanding kingdom/town invites.
 			// Notify town elites & kingdom officers of any pending join requests.
@@ -160,18 +169,6 @@ public class PlayerListener implements Listener {
 				ChatUtil.sendNotice(bukkitPlayer, message);
 				ChatUtil.sendCommaNotice(bukkitPlayer, townInviteNames);
 			}
-			/*
-			for(KonTown town : player.getKingdom().getTowns()) {
-				if(town.isJoinInviteValid(player.getBukkitPlayer().getUniqueId())) {
-					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_JOIN_INVITE.getMessage(town.getName(),town.getName(),town.getName()), ChatColor.LIGHT_PURPLE);
-				}
-				if(town.isPlayerKnight(bukkitPlayer)) {
-					for(OfflinePlayer invitee : town.getJoinRequests()) {
-						ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_JOIN_REQUEST.getMessage(invitee.getName(),town.getName(),town.getName(),invitee.getName(),town.getName(),invitee.getName()), ChatColor.LIGHT_PURPLE);
-					}
-				}
-			}
-			*/
 
 			// DiscordSRV
 			if(konquest.getIntegrationManager().getDiscordSrv().isEnabled()) {
