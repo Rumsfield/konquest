@@ -75,6 +75,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private int exileCooldownSeconds;
 	private final HashMap<UUID,Integer> joinPlayerCooldowns;
 	private final HashMap<UUID,Integer> exilePlayerCooldowns;
+	private ArrayList<DiplomacyTicket> diplomacyTickets;
 
 	// Config Settings
 	private long payIntervalSeconds;
@@ -110,6 +111,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		this.exileCooldownSeconds = 0;
 		this.joinPlayerCooldowns = new HashMap<>();
 		this.exilePlayerCooldowns = new HashMap<>();
+		this.diplomacyTickets = new ArrayList<>();
 		
 		this.payIntervalSeconds = 0;
 		this.payPerChunk = 0;
@@ -3443,8 +3445,42 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 	}
-	
-	//TODO: When loading kingdom relations, if equals default, don't add
+
+	/**
+	 * This method is meant to run after all kingdoms have been loaded from file
+	 */
+	private void assignDiplomacyTickets() {
+		// Go through all tickets and set relations
+		for(DiplomacyTicket ticket : diplomacyTickets) {
+			// Get owner kingdom
+			KonKingdom kingdom  = getKingdom(ticket.getOwnerKingdomName());
+			if(!kingdom.isCreated()) {
+				// Must be a created kingdom (not barbarian, neutral) to have relationships
+				continue;
+			}
+			// Get other kingdom
+			KonKingdom otherKingdom = getKingdom(ticket.getOtherKingdomName());
+			if(!otherKingdom.isCreated()) {
+				// Must be a created kingdom (not barbarian, neutral) to have relationships
+				continue;
+			}
+			// Get diplomatic relation
+			KonquestDiplomacyType relation = ticket.getRelation();
+			if(relation == null) {
+				continue;
+			}
+			// Check for active vs request
+			if(ticket.isActive()) {
+				// Relation is active
+				kingdom.setActiveRelation(otherKingdom, relation);
+			} else {
+				// Relation is request
+				kingdom.setRelationRequest(otherKingdom, relation);
+			}
+		}
+		// Finished, clear tickets
+		diplomacyTickets.clear();
+	}
 	
 	private void loadKingdoms() {
 		FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
@@ -3459,6 +3495,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         List<Double> sectionList;
         String worldName;
         String defaultWorldName = konquest.getCore().getString(CorePath.WORLD_NAME.getPath(),"world");
+		diplomacyTickets.clear();
         // Count all towns
         int numTowns = 0;
         for(String kingdomName : kingdomsConfig.getConfigurationSection("kingdoms").getKeys(false)) {
@@ -3530,6 +3567,34 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						for(String requestUUID : kingdomSection.getConfigurationSection("requests").getKeys(false)) {
 							boolean type = kingdomSection.getBoolean("requests."+requestUUID);
 							newKingdom.addJoinRequest(UUID.fromString(requestUUID), type);
+						}
+					}
+					// Kingdom Diplomacy
+					// Submit names and relationships to a queue for later assignment, once all kingdoms have been loaded
+					if(kingdomSection.contains("diplomacy_active")) {
+						for(String diplomacyKingdomName : kingdomSection.getConfigurationSection("diplomacy_active").getKeys(false)) {
+							String relationName = kingdomSection.getConfigurationSection("diplomacy_active").getString(diplomacyKingdomName);
+							KonquestDiplomacyType relation = KonquestDiplomacyType.getDefault();
+							try {
+								relation = KonquestDiplomacyType.valueOf(relationName);
+							} catch(Exception e) {
+								ChatUtil.printConsoleAlert("Failed to parse active diplomacy relation "+relationName+" between kingdoms "+kingdomName+" and "+diplomacyKingdomName);
+							}
+							DiplomacyTicket ticket = new DiplomacyTicket(kingdomName, diplomacyKingdomName, relation, true);
+							diplomacyTickets.add(ticket);
+						}
+					}
+					if(kingdomSection.contains("diplomacy_request")) {
+						for(String diplomacyKingdomName : kingdomSection.getConfigurationSection("diplomacy_request").getKeys(false)) {
+							String relationName = kingdomSection.getConfigurationSection("diplomacy_request").getString(diplomacyKingdomName);
+							KonquestDiplomacyType relation = KonquestDiplomacyType.getDefault();
+							try {
+								relation = KonquestDiplomacyType.valueOf(relationName);
+							} catch(Exception e) {
+								ChatUtil.printConsoleAlert("Failed to parse request diplomacy relation "+relationName+" between kingdoms "+kingdomName+" and "+diplomacyKingdomName);
+							}
+							DiplomacyTicket ticket = new DiplomacyTicket(kingdomName, diplomacyKingdomName, relation, false);
+							diplomacyTickets.add(ticket);
 						}
 					}
         			// Capital and Town Loading all towns
@@ -3720,11 +3785,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         if(kingdomMap.isEmpty()) {
 			ChatUtil.printDebug("No Kingdoms to load!");
 		} else {
+			// Some kingdoms exist, assign diplomacy relationships
+			assignDiplomacyTickets();
 			ChatUtil.printDebug("Loaded Kingdoms");
 		}
 	}
-	
-	//TODO: Save kingdom relationships (active and request)
 	
 	public void saveKingdoms() {
 		FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
@@ -3762,6 +3827,15 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			for(OfflinePlayer invitee : kingdom.getJoinInvites()) {
 				String uuid = invitee.getUniqueId().toString();
 				kingdomRequestsSection.set(uuid, true);
+			}
+			// Kingdom Diplomacy
+			ConfigurationSection kingdomRelationActiveSection = kingdomSection.createSection("diplomacy_active");
+			for(KonquestKingdom diplomacyKingdom : kingdom.getActiveRelationKingdoms()) {
+				kingdomRelationActiveSection.set(diplomacyKingdom.getName(), kingdom.getActiveRelation(diplomacyKingdom).toString());
+			}
+			ConfigurationSection kingdomRelationRequestSection = kingdomSection.createSection("diplomacy_request");
+			for(KonquestKingdom diplomacyKingdom : kingdom.getRelationRequestKingdoms()) {
+				kingdomRelationRequestSection.set(diplomacyKingdom.getName(), kingdom.getRelationRequest(diplomacyKingdom).toString());
 			}
 			// Towns + Capital
 			List<KonTown> allTowns = new ArrayList<>();
