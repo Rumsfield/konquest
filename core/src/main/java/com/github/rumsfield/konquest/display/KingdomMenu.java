@@ -523,18 +523,33 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						loreList.add(alertColor+MessagePath.MENU_KINGDOM_WE_REQUESTED.getMessage()+": "+valueColor+theirRequestStatus);
 					}
 				}
-				// Context-specific lore
+				// Context-specific lore + click conditions
+				boolean isKingdomClickable = true;
 				switch(context) {
 					case A_JOIN:
-						if(currentKingdom.isOpen()) {
-							loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_JOIN_NOW.getMessage());
+						// Check if the player can join the current kingdom
+						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom)) {
+							if(currentKingdom.isOpen()) {
+								loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_JOIN_NOW.getMessage());
+							} else {
+								loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_JOIN.getMessage());
+							}
 						} else {
-							loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_JOIN.getMessage());
+							// The kingdom is unavailable to join at this time
+							loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+							isKingdomClickable = false;
 						}
 						break;
 					case A_INVITE:
-						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_ACCEPT.getMessage());
-						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_DECLINE.getMessage());
+						// Check if the player can join the current kingdom
+						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom)) {
+							loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_ACCEPT.getMessage());
+							loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_DECLINE.getMessage());
+						} else {
+							// The kingdom is unavailable to join at this time
+							loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+							isKingdomClickable = false;
+						}
 						break;
 					case A_LIST:
 						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_LIST.getMessage());
@@ -545,7 +560,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					default:
 						break;
 				}
-				KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,contextColor,loreList,slotIndex,isClickable);
+				KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,contextColor,loreList,slotIndex,(isClickable && isKingdomClickable));
 		    	pages.get(pageNum).addIcon(kingdomIcon);
 				slotIndex++;
 			}

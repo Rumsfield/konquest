@@ -208,11 +208,10 @@ public class PlayerManager implements KonquestPlayerManager {
 
     public KonPlayer getPlayerFromName(String displayName) {
     	for(KonPlayer player : onlinePlayers.values()) {
-    		if(player != null) {
-				player.getBukkitPlayer().getName();
-				if (player.getBukkitPlayer().getName().equalsIgnoreCase(displayName)) {
-					return player;
-				}
+			if(player != null &&
+					player.getBukkitPlayer().getName() != null &&
+					player.getBukkitPlayer().getName().equalsIgnoreCase(displayName)) {
+				return player;
 			}
     	}
         return null;
@@ -231,11 +230,10 @@ public class PlayerManager implements KonquestPlayerManager {
     
     public KonPlayer getPlayerFromID(UUID id) {
     	for(KonPlayer player : onlinePlayers.values()) {
-    		if(player != null) {
-				player.getBukkitPlayer().getName();
-				if (player.getBukkitPlayer().getUniqueId().equals(id)) {
-					return player;
-				}
+    		if(player != null &&
+					player.getBukkitPlayer().getName() != null &&
+					player.getBukkitPlayer().getUniqueId().equals(id)) {
+				return player;
 			}
     	}
         return null;

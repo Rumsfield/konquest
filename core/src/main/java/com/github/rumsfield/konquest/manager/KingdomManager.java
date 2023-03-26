@@ -32,6 +32,10 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
+//TODO: Split this class up into smaller manager classes, like
+// - KingdomManager: All kingdom query, actions, memberships, etc
+// - TownManager: All town query, actions, memberships, etc
+// - DiplomacyManager: All kingdom relationships, diplomacy actions
 public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 	/**
@@ -704,6 +708,51 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return false;
 	}
 
+	/**
+	 * Checks whether an online player may join the given kingdom,
+	 * using common checks. This method is intended for these scenarios:
+	 * - Player sending join request (closed kingdom) or trying to join (open kingdom).
+	 * - Player accepting a join invite.
+	 * The player must be online.
+	 * @param player - The online player that is attempting to join
+	 * @param kingdom - The target kingdom for joining
+	 * @return True when the player may join, else false
+	 */
+	public boolean isPlayerJoinKingdomAllowed(KonPlayer player, KonKingdom kingdom) {
+		UUID id = player.getBukkitPlayer().getUniqueId();
+		// Check that player is not a member
+		if(kingdom.equals(player.getKingdom()) || kingdom.isMember(id)) {
+			return false;
+		}
+		// Check for player that's already a kingdom master
+		for(KonKingdom otherKingdom : getKingdoms()) {
+			if(otherKingdom.isMaster(id)) {
+				return false;
+			}
+		}
+		// Check for cool-down
+		if(isPlayerJoinCooldown(player.getBukkitPlayer())) {
+			return false;
+		}
+		// Check for permission (online only)
+		boolean isPerKingdomJoin = konquest.getCore().getBoolean(CorePath.KINGDOMS_PER_KINGDOM_JOIN_PERMISSIONS.getPath(),false);
+		String permission = "konquest.join."+kingdom.getName().toLowerCase();
+		if(isPerKingdomJoin && !player.getBukkitPlayer().hasPermission(permission)) {
+			return false;
+		}
+		// Check switching criteria
+		boolean isAllowSwitch = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_EXILE_SWITCH.getPath(),false);
+		if(!isAllowSwitch && !kingdom.equals(player.getExileKingdom()) && !getBarbarians().equals(player.getExileKingdom())) {
+			return false;
+		}
+		// Check if max_player_diff is disabled, or if the desired kingdom is within the max diff (both online & offline)
+		if(isKingdomMembershipFull(kingdom)) {
+			return false;
+		}
+		// Finished all checks
+		return true;
+	}
+
 	/*
 	 * =================================================
 	 * Player Assignment Methods
@@ -791,7 +840,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// When an offline player is found, update their KonOfflinePlayer object and push to the database.
 		KonOfflinePlayer offlinePlayer = null;
 		KonPlayer onlinePlayer = null;
-		boolean isOnline = false;
+		boolean isOnline = true;
 		onlinePlayer = konquest.getPlayerManager().getPlayerFromID(id);
 		if(onlinePlayer == null) {
 			// No online player found, check offline players
@@ -800,9 +849,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				// No player found for the given UUID
 				return 9;
 			}
-		} else {
-			// Found an online player
-			isOnline = true;
+			isOnline = false;
 		}
 		// At this point, either onlinePlayer or offlinePlayer is null
 		// isOnline = true -> onlinePlayer is not null
@@ -812,6 +859,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		
 		// Check for existing membership (both online & offline)
 		KonKingdom playerKingdom = isOnline ? onlinePlayer.getKingdom() : offlinePlayer.getKingdom();
+		KonKingdom playerExileKingdom = isOnline ? onlinePlayer.getExileKingdom() : offlinePlayer.getExileKingdom();
 		if(joinKingdom.equals(playerKingdom) || joinKingdom.isMember(id)) {
 			return 5;
 		}
@@ -824,20 +872,21 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				}
 			}
 			// Check for cool-down
-    		if(isOnline && isPlayerJoinCooldown(onlinePlayer.getBukkitPlayer())) {
-    			return 8;
-    		}
+			boolean isCooldown = isOnline ? isPlayerJoinCooldown(onlinePlayer.getBukkitPlayer()) : isPlayerJoinCooldown(offlinePlayer.getOfflineBukkitPlayer());
+			if(isCooldown) {
+				return 8;
+			}
 			// Check for permission (online only)
 			boolean isPerKingdomJoin = konquest.getCore().getBoolean(CorePath.KINGDOMS_PER_KINGDOM_JOIN_PERMISSIONS.getPath(),false);
 			if(isOnline && isPerKingdomJoin) {
-				String permission = "konquest.join."+getKingdom(kingdomName).getName().toLowerCase();
+				String permission = "konquest.join."+joinKingdom.getName().toLowerCase();
 				if(!onlinePlayer.getBukkitPlayer().hasPermission(permission)) {
 					return 3;
 				}
 			}
-			// Check switching criteria (online only)
+			// Check switching criteria
 			boolean isAllowSwitch = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_EXILE_SWITCH.getPath(),false);
-			if(isOnline && !joinKingdom.equals(onlinePlayer.getExileKingdom()) && !getBarbarians().equals(onlinePlayer.getExileKingdom()) && !isAllowSwitch) {
+			if(!isAllowSwitch && !joinKingdom.equals(playerExileKingdom) && !getBarbarians().equals(playerExileKingdom)) {
 				return 7;
 			}
 			// Check if max_player_diff is disabled, or if the desired kingdom is within the max diff (both online & offline)
@@ -3367,7 +3416,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	// Returns true when the player is still in cool-down, else false
-	public boolean isPlayerJoinCooldown(Player player) {
+	public boolean isPlayerJoinCooldown(OfflinePlayer player) {
 		// Check if player is currently in cool-down.
 		// If cool-down has expired, remove it.
 		UUID id = player.getUniqueId();
