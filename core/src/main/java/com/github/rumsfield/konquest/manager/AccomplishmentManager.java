@@ -60,15 +60,27 @@ public class AccomplishmentManager {
 		}
 		// Apply any missing qualifying prefixes in category
 		for(KonPrefixType pre : KonPrefixType.values()) {
-			if(pre.category().equals(stat.getCategory()) && pre.level() <= level && !playerPrefix.hasPrefix(pre)) {
+			if(!pre.category().equals(stat.getCategory())) {
+				// Skip prefixes that do not belong to this stat category
+				continue;
+			}
+			if(pre.level() <= level && !playerPrefix.hasPrefix(pre)) {
+				// Add a prefix that meets the current level
 				ChatUtil.printDebug("Accomplishment unlock for player "+player.getBukkitPlayer().getName()+" with prefix "+pre.getName());
 				playerPrefix.addPrefix(pre);
-				//ChatUtil.sendTitle(player.getBukkitPlayer(), ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+"You've made an Accomplishment!", 60);
-				//ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+"You've made an Accomplishment!", 60, 5, 10);
-				//ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+"Accomplishment prefix unlocked: "+ChatColor.DARK_PURPLE+pre.getName());
 				ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+MessagePath.GENERIC_NOTICE_ACCOMPLISHMENT.getMessage(), 60, 5, 10);
 				ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+MessagePath.GENERIC_NOTICE_PREFIX_UNLOCK.getMessage()+": "+ChatColor.DARK_PURPLE+pre.getName());
 				player.getBukkitPlayer().getWorld().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)1.0);
+			} else if(playerPrefix.hasPrefix(pre) && pre.level() > level) {
+				// Remove a prefix that is below the current level
+				ChatUtil.printDebug("Accomplishment reverted for player "+player.getBukkitPlayer().getName()+" with prefix "+pre.getName());
+				playerPrefix.removePrefix(pre);
+				if(playerPrefix.getMainPrefix().equals(pre)) {
+					// Disable prefix if it was removed
+					playerPrefix.setEnable(false);
+				}
+				ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+MessagePath.GENERIC_NOTICE_PREFIX_LOST.getMessage()+": "+ChatColor.DARK_RED+pre.getName());
+				player.getBukkitPlayer().getWorld().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)0.1);
 			}
 		}
 

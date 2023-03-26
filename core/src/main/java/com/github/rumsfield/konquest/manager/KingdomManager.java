@@ -1621,6 +1621,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		boolean status = removeKingdom(kingdomName);
 		if(status) {
 			ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_DISBAND.getMessage(kingdomName));
+			// Update stats
+			konquest.getAccomplishmentManager().modifyPlayerStat(player, KonStatsType.KINGDOMS, -1);
 			return true;
 		} else {
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());

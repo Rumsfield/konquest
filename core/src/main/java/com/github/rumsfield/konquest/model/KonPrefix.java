@@ -34,13 +34,9 @@ public class KonPrefix {
 			prefixList.add(prefix);
 		}
 	}
-	
-	public void addPrefix(Collection<KonPrefixType> prefixes) {
-		for(KonPrefixType pre : prefixes) {
-			if(!prefixList.contains(pre)) {
-				prefixList.add(pre);
-			}
-		}
+
+	public void removePrefix(KonPrefixType prefix) {
+		prefixList.remove(prefix);
 	}
 	
 	public void clear() {

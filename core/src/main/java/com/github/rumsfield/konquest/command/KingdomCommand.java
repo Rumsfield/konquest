@@ -1,10 +1,7 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonDirective;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
-import com.github.rumsfield.konquest.model.KonPlayer;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -95,6 +92,8 @@ public class KingdomCommand extends CommandBase {
 	                    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
 								// Update directive progress
 								getKonquest().getDirectiveManager().updateDirectiveProgress(player, KonDirective.CREATE_KINGDOM);
+								// Update stats
+								getKonquest().getAccomplishmentManager().modifyPlayerStat(player, KonStatsType.KINGDOMS, 1);
 	                    	} else {
 	                    		switch(status) {
 		                    		case 1:

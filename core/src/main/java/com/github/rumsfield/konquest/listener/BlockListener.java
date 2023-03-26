@@ -1399,6 +1399,9 @@ public class BlockListener implements Listener {
 					konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CAPTURE_TOWN);
 					// Update stat
 					konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CAPTURES,1);
+					if(isCapital) {
+						konquest.getAccomplishmentManager().modifyPlayerStat(player, KonStatsType.CONQUESTS, 1);
+					}
 					// Broadcast to Dynmap
 					int x = capturedTown.getCenterLoc().getBlockX();
 					int y = capturedTown.getCenterLoc().getBlockY();

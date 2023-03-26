@@ -323,6 +323,7 @@ generic:
     wild: "The Wild"
     accomplishment: "You've made an Accomplishment!"
     prefix-unlock: "Accomplishment prefix unlocked"
+    prefix-lost: "Lost accomplishment prefix"
     quest: "Quest complete"
     loot: "New town monument loot is available."
     absent: "You have been absent for too long and have been kicked from all towns."
@@ -814,8 +815,10 @@ stat:
   egg-info: "Players egged"
   fish: "Fish"
   fish-info: "Fishing skill"
-  special: "Special"
-  special-info: "Special points"
+  kingdoms: "Kingdoms"
+  kingdoms-info: "New kingdoms created"
+  conquests: "Conquests"
+  conquests-info: "Enemy kingdoms conquered"
 upgrade:
   loot:
     name: "Monument Loot"
