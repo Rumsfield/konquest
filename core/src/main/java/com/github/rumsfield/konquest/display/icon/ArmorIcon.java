@@ -18,6 +18,7 @@ public class ArmorIcon implements MenuIcon {
 	private final KonArmor armor;
 	private final boolean isAvailable;
 	private final int population;
+	private final int land;
 	private final int index;
 	ItemStack item;
 
@@ -25,10 +26,11 @@ public class ArmorIcon implements MenuIcon {
 	private final String valueColor = DisplayManager.valueFormat;
 	private final String hintColor = DisplayManager.hintFormat;
 	
-	public ArmorIcon(KonArmor armor, boolean isAvailable, int population, int index) {
+	public ArmorIcon(KonArmor armor, boolean isAvailable, int population, int land, int index) {
 		this.armor = armor;
 		this.isAvailable = isAvailable;
 		this.population = population;
+		this.land = land;
 		this.index = index;
 		this.item = initItem();
 	}
@@ -49,7 +51,7 @@ public class ArmorIcon implements MenuIcon {
 				meta.addItemFlags(flag);
 			}
 		}
-		int totalCost = population * armor.getCost();
+		int totalCost = armor.getCost() + (armor.getCostPerResident()*population) + (armor.getCostPerLand()*land);
 		List<String> loreList = new ArrayList<>();
 		loreList.add(ChatColor.DARK_AQUA+""+armor.getBlocks());
     	loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+totalCost);

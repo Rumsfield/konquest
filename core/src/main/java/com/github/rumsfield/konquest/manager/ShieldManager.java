@@ -55,66 +55,89 @@ public class ShieldManager implements KonquestShieldManager {
 	}
 	
 	private boolean loadShields() {
+		// Attempt to load shields from file
 		shields.clear();
 		FileConfiguration shieldsConfig = konquest.getConfigManager().getConfig("shields");
         if (shieldsConfig.get("shields") == null) {
         	ChatUtil.printDebug("There is no shields section in shields.yml");
             return false;
         }
+		// Add shields and use default values when fields are missing
         KonShield newShield;
-		boolean status = true;
 		for(String shieldName : shieldsConfig.getConfigurationSection("shields").getKeys(false)) {
-        	int shieldTime = 0;
-        	int shieldCost = 0;
+        	int shieldTime = 120;
+        	int shieldCost = 50;
+			int shieldCostPerResident = 0;
+			int shieldCostPerLand = 0;
         	ConfigurationSection shieldSection = shieldsConfig.getConfigurationSection("shields."+shieldName);
 			assert shieldSection != null;
 			if(shieldSection.contains("charge")) {
         		shieldTime = shieldSection.getInt("charge",0);
     		} else {
-    			ChatUtil.printDebug("Shields.yml is missing charge section for shield: "+shieldName);
-    			status = false;
+    			ChatUtil.printConsoleError("Shields.yml is missing \"charge\" section for shield \""+shieldName+"\", using default 120.");
     		}
         	if(shieldSection.contains("cost")) {
         		shieldCost = shieldSection.getInt("cost",0);
     		} else {
-    			ChatUtil.printDebug("Shields.yml is missing cost section for shield: "+shieldName);
+    			ChatUtil.printConsoleError("Shields.yml is missing \"cost\" section for shield \""+shieldName+"\", using default 50.");
 			}
-			newShield = new KonShield(shieldName, shieldTime, shieldCost);
+			if(shieldSection.contains("cost_per_resident")) {
+				shieldCostPerResident = shieldSection.getInt("cost_per_resident",0);
+			} else {
+				ChatUtil.printConsoleError("Shields.yml is missing \"cost_per_resident\" section for shield \""+shieldName+"\", using default 0.");
+			}
+			if(shieldSection.contains("cost_per_land")) {
+				shieldCostPerLand = shieldSection.getInt("cost_per_land",0);
+			} else {
+				ChatUtil.printConsoleError("Shields.yml is missing \"cost_per_land\" section for shield \""+shieldName+"\", using default 0.");
+			}
+			newShield = new KonShield(shieldName, shieldTime, shieldCost, shieldCostPerResident, shieldCostPerLand);
 			shields.add(newShield);
 		}
-		return status;
+		return true;
 	}
 	
 	private boolean loadArmors() {
+		// Attempt to load armors from file
 		armors.clear();
 		FileConfiguration shieldsConfig = konquest.getConfigManager().getConfig("shields");
         if (shieldsConfig.get("armors") == null) {
         	ChatUtil.printDebug("There is no armors section in shields.yml");
             return false;
         }
+		// Add armors and use default values when fields are missing
         KonArmor newArmor;
-		boolean status = true;
 		for(String armorName : shieldsConfig.getConfigurationSection("armors").getKeys(false)) {
-        	int armorBlocks = 0;
-        	int armorCost = 0;
+        	int armorBlocks = 50;
+        	int armorCost = 20;
+			int armorCostPerResident = 0;
+			int armorCostPerLand = 0;
         	ConfigurationSection armorSection = shieldsConfig.getConfigurationSection("armors."+armorName);
 			assert armorSection != null;
 			if(armorSection.contains("charge")) {
         		armorBlocks = armorSection.getInt("charge",0);
     		} else {
-    			ChatUtil.printDebug("Shields.yml is missing charge section for armor: "+armorName);
-    			status = false;
+				ChatUtil.printConsoleError("Shields.yml is missing \"charge\" section for armor \""+armorName+"\", using default 50.");
     		}
         	if(armorSection.contains("cost")) {
         		armorCost = armorSection.getInt("cost",0);
     		} else {
-    			ChatUtil.printDebug("Shields.yml is missing cost section for armor: "+armorName);
-    			status = false;
+    			ChatUtil.printConsoleError("Shields.yml is missing \"cost\" section for armor \""+armorName+"\", using default 20.");
     		}
-			newArmor = new KonArmor(armorName, armorBlocks, armorCost);
+			if(armorSection.contains("cost_per_resident")) {
+				armorCostPerResident = armorSection.getInt("cost_per_resident",0);
+			} else {
+				ChatUtil.printConsoleError("Shields.yml is missing \"cost_per_resident\" section for armor \""+armorName+"\", using default 0.");
+			}
+			if(armorSection.contains("cost_per_land")) {
+				armorCostPerLand = armorSection.getInt("cost_per_land",0);
+			} else {
+				ChatUtil.printConsoleError("Shields.yml is missing \"cost_per_land\" section for armor \""+armorName+"\", using default 0.");
+			}
+			newArmor = new KonArmor(armorName, armorBlocks, armorCost, armorCostPerResident, armorCostPerLand);
 			armors.add(newArmor);
 		}
-		return status;
+		return true;
 	}
 	
 	public KonShield getShield(String id) {
@@ -144,6 +167,14 @@ public class ShieldManager implements KonquestShieldManager {
 		return armors;
 	}
 
+	public int getTotalCostShield(KonShield shield, KonTown town) {
+		return shield.getCost() + (shield.getCostPerResident()*town.getNumResidents()) + (shield.getCostPerLand()*town.getNumLand());
+	}
+
+	public int getTotalCostArmor(KonArmor armor, KonTown town) {
+		return armor.getCost() + (armor.getCostPerResident()*town.getNumResidents()) + (armor.getCostPerLand()*town.getNumLand());
+	}
+
 	public boolean activateTownShield(KonShield shield, KonTown town, Player bukkitPlayer) {
 		return activateTownShield(shield, town, bukkitPlayer, false);
 	}
@@ -159,7 +190,7 @@ public class ShieldManager implements KonquestShieldManager {
 		int endTime = (int)(now.getTime()/1000) + shieldTime;
 		
 		// Check that the player has enough favor
-		int requiredCost = shield.getCost()*town.getNumResidents();
+		int requiredCost = getTotalCostShield(shield, town);
 		if(!ignoreCost && KonquestPlugin.getBalance(bukkitPlayer) < requiredCost) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_COST.getMessage(requiredCost));
             return false;
@@ -220,7 +251,7 @@ public class ShieldManager implements KonquestShieldManager {
 		}
 		
 		// Check that the player has enough favor
-		int requiredCost = armor.getCost()*town.getNumResidents();
+		int requiredCost = getTotalCostArmor(armor, town);
 		if(!ignoreCost && KonquestPlugin.getBalance(bukkitPlayer) < requiredCost) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_SHIELD_FAIL_COST.getMessage(requiredCost));
             return false;

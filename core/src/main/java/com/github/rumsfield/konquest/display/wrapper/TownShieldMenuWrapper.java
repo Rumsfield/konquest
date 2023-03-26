@@ -55,7 +55,7 @@ public class TownShieldMenuWrapper extends MenuWrapper {
 				while(slotIndex < MAX_ICONS_PER_PAGE && shieldIter.hasNext()) {
 					/* Shield Icon (n) */
 					KonShield currentShield = shieldIter.next();
-			    	ShieldIcon shieldIcon = new ShieldIcon(currentShield, true, town.getNumResidents(), slotIndex);
+			    	ShieldIcon shieldIcon = new ShieldIcon(currentShield, true, town.getNumResidents(), town.getNumLand(), slotIndex);
 			    	getMenu().getPage(pageNum).addIcon(shieldIcon);
 					slotIndex++;
 				}
@@ -85,7 +85,7 @@ public class TownShieldMenuWrapper extends MenuWrapper {
 				while(slotIndex < MAX_ICONS_PER_PAGE && armorIter.hasNext()) {
 					/* Armor Icon (n) */
 					KonArmor currentArmor = armorIter.next();
-			    	ArmorIcon armorIcon = new ArmorIcon(currentArmor, true, town.getNumResidents(), slotIndex);
+			    	ArmorIcon armorIcon = new ArmorIcon(currentArmor, true, town.getNumResidents(), town.getNumLand(), slotIndex);
 			    	getMenu().getPage(pageNum).addIcon(armorIcon);
 					slotIndex++;
 				}

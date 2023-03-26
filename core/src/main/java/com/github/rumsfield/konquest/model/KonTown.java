@@ -1303,7 +1303,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		return result;
 	}
-	
+
+	public int getNumLand() {
+		return getChunkList().size();
+	}
+
 	public int getNumResidents() {
 		return residents.size();
 	}

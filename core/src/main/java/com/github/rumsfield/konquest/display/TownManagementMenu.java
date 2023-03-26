@@ -314,7 +314,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
             while(slotIndex < MAX_ICONS_PER_PAGE && shieldIter.hasNext()) {
                 /* Shield Icon (n) */
                 KonShield currentShield = shieldIter.next();
-                ShieldIcon shieldIcon = new ShieldIcon(currentShield, true, town.getNumResidents(), slotIndex);
+                ShieldIcon shieldIcon = new ShieldIcon(currentShield, true, town.getNumResidents(), town.getNumLand(), slotIndex);
                 pages.get(pageNum).addIcon(shieldIcon);
                 slotIndex++;
             }
@@ -348,7 +348,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
             while(slotIndex < MAX_ICONS_PER_PAGE && armorIter.hasNext()) {
                 /* Armor Icon (n) */
                 KonArmor currentArmor = armorIter.next();
-                ArmorIcon armorIcon = new ArmorIcon(currentArmor, true, town.getNumResidents(), slotIndex);
+                ArmorIcon armorIcon = new ArmorIcon(currentArmor, true, town.getNumResidents(), town.getNumLand(), slotIndex);
                 pages.get(pageNum).addIcon(armorIcon);
                 slotIndex++;
             }

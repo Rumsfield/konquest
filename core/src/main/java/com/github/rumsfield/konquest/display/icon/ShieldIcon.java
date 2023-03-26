@@ -19,6 +19,7 @@ public class ShieldIcon implements MenuIcon {
 	private final KonShield shield;
 	private final boolean isAvailable;
 	private final int population;
+	private final int land;
 	private final int index;
 	ItemStack item;
 
@@ -26,10 +27,11 @@ public class ShieldIcon implements MenuIcon {
 	private final String valueColor = DisplayManager.valueFormat;
 	private final String hintColor = DisplayManager.hintFormat;
 	
-	public ShieldIcon(KonShield shield, boolean isAvailable, int population, int index) {
+	public ShieldIcon(KonShield shield, boolean isAvailable, int population, int land, int index) {
 		this.shield = shield;
 		this.isAvailable = isAvailable;
 		this.population = population;
+		this.land = land;
 		this.index = index;
 		this.item = initItem();
 	}
@@ -48,7 +50,7 @@ public class ShieldIcon implements MenuIcon {
 				meta.addItemFlags(flag);
 			}
 		}
-		int totalCost = population * shield.getCost();
+		int totalCost = shield.getCost() + (shield.getCostPerResident()*population) + (shield.getCostPerLand()*land);
 		List<String> loreList = new ArrayList<>();
 		loreList.add(Konquest.getTimeFormat(shield.getDurationSeconds(), ChatColor.DARK_AQUA));
     	loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+totalCost);
