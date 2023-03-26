@@ -330,8 +330,6 @@ generic:
     clicked-air: "Clicked in Air, cancelled region creation."
     success: "Success!"
     small-kingdom: "Your Kingdom is currently the smallest, enjoy a %s percent experience boost!"
-    join-invite: "You're invited to join the town of %s, use \"/k join %s\" to accept or \"/k leave %s\" to decline."
-    join-request: "%s wants to join %s, use \"/k town %s add %s\" to allow, \"/k town %s kick %s\" to deny."
     wild: "The Wild"
     accomplishment: "You've made an Accomplishment!"
     prefix-unlock: "Accomplishment prefix unlocked"

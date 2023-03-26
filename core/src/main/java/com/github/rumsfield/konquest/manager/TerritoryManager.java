@@ -369,12 +369,18 @@ public class TerritoryManager {
     		}
     	}
     	
-    	// Test chunks
+    	// Test chunks to see if they are allowed to be added to the territory
+		boolean isAnyChunkBeyondDistanceLimit = false;
     	HashSet<Point> claimedChunks = new HashSet<>();
     	for(Point newChunk : unclaimedChunks) {
 			if(closestTerritory.testChunk(newChunk)) {
 				claimedChunks.add(newChunk);
+			} else {
+				isAnyChunkBeyondDistanceLimit = true;
 			}
+		}
+		if(isAnyChunkBeyondDistanceLimit) {
+			ChatUtil.printDebug("Not all chunks could be claimed due to max distance limit");
 		}
     	
     	if(claimedChunks.isEmpty()) {
@@ -680,7 +686,8 @@ public class TerritoryManager {
 		int unclaimStatus = unclaimChunk(claimLoc, true);
     	switch(unclaimStatus) {
     	case 0:
-    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+			String territoryName = getChunkTerritory(claimLoc).getName();
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_SUCCESS.getMessage("1",territoryName));
     		break;
     	case 1:
     		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_FAIL_UNCLAIMED.getMessage());

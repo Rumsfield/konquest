@@ -1256,7 +1256,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		// Cannot invite members to an open kingdom
 		if(kingdom.isOpen()) {
-			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_INVITE_OPEN.getMessage(requester.getName()));
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_INVITE_OPEN.getMessage());
 			return false;
 		}
 		
@@ -2287,6 +2287,26 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * =================================================
 	 */
 
+	private void broadcastResidents(KonTown town, String message) {
+		if(town == null)return;
+		for(OfflinePlayer offlinePlayer : town.getPlayerResidents()) {
+			if(offlinePlayer.isOnline()) {
+				Player player = (Player)offlinePlayer;
+				ChatUtil.sendNotice(player, message);
+			}
+		}
+	}
+
+	private void broadcastKnights(KonTown town, String message) {
+		if(town == null) return;
+		for(OfflinePlayer offlinePlayer : town.getPlayerKnights()) {
+			if(offlinePlayer.isOnline()) {
+				Player player = (Player)offlinePlayer;
+				ChatUtil.sendNotice(player, message);
+			}
+		}
+	}
+
 	// A player requests to join a town from the menu
 	public boolean menuJoinTownRequest(KonPlayer player, KonTown town) {
 		Player bukkitPlayer = player.getBukkitPlayer();
@@ -2327,7 +2347,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				// Create a new join request
 				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REQUEST_SENT.getMessage(town.getName()));
 				town.addJoinRequest(myId, false);
-				town.notifyJoinRequest(myId);
+				broadcastKnights(town, MessagePath.COMMAND_TOWN_NOTICE_REQUEST_RECEIVED.getMessage());
 			}
 		}
 		return true;
@@ -2435,7 +2455,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		} else {
 			// Denied the request
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_KICK_REMOVE.getMessage(requester.getName(),town.getName()));
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REQUEST_DECLINED.getMessage(requester.getName()));
 			if(onlinePlayer != null) {
 				ChatUtil.sendError(onlinePlayer.getBukkitPlayer(), MessagePath.COMMAND_TOWN_ERROR_REQUEST_DENY.getMessage(town.getName()));
 			}
@@ -2460,8 +2480,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
 			return;
 		}
+		// Cannot invite a resident of this town
 		if(town.isPlayerResident(offlinePlayer)) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_INVITE_MEMBER.getMessage(offlinePlayer.getName()));
+			return;
+		}
+		// Cannot invite to an open town
+		if(town.isOpen()) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_INVITE_OPEN.getMessage());
 			return;
 		}
 		KonPlayer onlinePlayer = konquest.getPlayerManager().getPlayerFromID(id);
@@ -2667,7 +2693,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			// Check player roles in closed towns only, allow any member to claim lordship in open towns
 			if(!town.getPlayerKnights().isEmpty()) {
 				// Elite residents exist, permit access to them
-				if(!town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
+				if(!town.isPlayerKnight(bukkitPlayer)) {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 					return;
 				}
@@ -2675,7 +2701,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				// No Elite residents exist
 				if(!town.getPlayerResidents().isEmpty()) {
 					// Residents for this town exist, permit access to them
-					if(!town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+					if(!town.isPlayerResident(bukkitPlayer)) {
 						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 						return;
 					}

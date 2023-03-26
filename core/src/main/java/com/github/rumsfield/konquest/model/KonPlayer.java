@@ -49,13 +49,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	private boolean isAdminBypassActive;
 	private boolean isGlobalChat;
 	private boolean isMapAuto;
-	private boolean isGiveLordConfirmed;
 	private boolean isPriorityTitleDisplay;
 	private boolean isCombatTagged;
 	private boolean isFlying;
 	private boolean isBorderDisplay;
-	
-	private final Timer giveLordConfirmTimer;
 	private final Timer priorityTitleDisplayTimer;
 	private final Timer borderUpdateLoopTimer;
 	private final Timer monumentTemplateLoopTimer;
@@ -88,12 +85,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		this.autoFollow = FollowType.NONE;
 		this.isGlobalChat = true;
 		this.isMapAuto = false;
-		this.isGiveLordConfirmed = false;
 		this.isPriorityTitleDisplay = false;
 		this.isCombatTagged = false;
 		this.isFlying = false;
 		this.isBorderDisplay = true;
-		this.giveLordConfirmTimer = new Timer(this);
 		this.priorityTitleDisplayTimer = new Timer(this);
 		this.borderUpdateLoopTimer = new Timer(this);
 		this.monumentTemplateLoopTimer = new Timer(this);
@@ -208,10 +203,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		return isMapAuto;
 	}
 	
-	public boolean isGiveLordConfirmed() {
-		return isGiveLordConfirmed;
-	}
-	
 	public boolean isPriorityTitleDisplay() {
 		return isPriorityTitleDisplay;
 	}
@@ -226,10 +217,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	
 	public boolean isBorderDisplay() {
 		return isBorderDisplay;
-	}
-	
-	public Timer getGiveLordConfirmTimer() {
-		return giveLordConfirmTimer;
 	}
 	
 	public Timer getPriorityTitleDisplayTimer() {
@@ -307,10 +294,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		isGlobalChat = val;
 	}
 	
-	public void setIsGiveLordConfirmed(boolean val) {
-		isGiveLordConfirmed = val;
-	}
-	
 	public void setIsPriorityTitleDisplay(boolean val) {
 		isPriorityTitleDisplay = val;
 	}
@@ -385,7 +368,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	}
 	
 	public void stopTimers() {
-		giveLordConfirmTimer.stopTimer();
 		priorityTitleDisplayTimer.stopTimer();
 		borderUpdateLoopTimer.stopTimer();
 		monumentTemplateLoopTimer.stopTimer();
@@ -423,9 +405,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	public void onEndTimer(int taskID) {
 		if(taskID == 0) {
 			ChatUtil.printDebug("Player Timer ended with null taskID!");
-		} else if(taskID == giveLordConfirmTimer.getTaskID()) {
-			// Clear give lord confirmation
-			isGiveLordConfirmed = false;
 		} else if(taskID == priorityTitleDisplayTimer.getTaskID()) {
 			// Clear priority title display
 			isPriorityTitleDisplay = false;

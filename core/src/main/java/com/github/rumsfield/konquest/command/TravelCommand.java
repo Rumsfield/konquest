@@ -217,7 +217,7 @@ public class TravelCommand extends CommandBase {
 					}
 					// Check for player's own town or allied town
 					if(!player.getKingdom().equals(travelTown.getKingdom()) && !getKonquest().getKingdomManager().isPlayerAlly(player,travelTown.getKingdom())) {
-						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_NO_TOWN.getMessage());
 						return;
 					}
 					// Check for property flag

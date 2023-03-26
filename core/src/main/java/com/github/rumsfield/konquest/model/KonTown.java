@@ -260,6 +260,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	@Override
 	public boolean testChunk(Point point) {
+		// Tests a chunk to make sure it is within the max town size limit
 		Point centerChunk = Konquest.toPoint(getCenterLoc());
 		int maxChunkRange = getKonquest().getCore().getInt(CorePath.TOWNS_MAX_SIZE.getPath());
 		if(maxChunkRange < 0) {
@@ -1382,17 +1383,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	public void removeJoinRequest(UUID id) {
 		joinRequestKeeper.removeJoinRequest(id);
-	}
-	
-	public void notifyJoinRequest(UUID id) {
-		String name = Bukkit.getOfflinePlayer(id).getName();
-		for(OfflinePlayer offlinePlayer : getPlayerKnights()) {
-			if(offlinePlayer.isOnline()) {
-				//ChatUtil.sendNotice((Player)offlinePlayer, "Received new request from "+name+" to join "+getName());
-				//ChatUtil.sendNotice((Player)offlinePlayer, name+" wants to join "+getName()+", use \"/k town "+getName()+" add "+name+"\" to allow, \"/k town "+getName()+" kick "+name+"\" to deny", ChatColor.LIGHT_PURPLE);
-				ChatUtil.sendNotice((Player)offlinePlayer, MessagePath.GENERIC_NOTICE_JOIN_REQUEST.getMessage(name,getName(),getName(),name,getName(),name), ChatColor.LIGHT_PURPLE);
-			}
-		}
 	}
 	
 	public boolean isTownWatchProtected() {
