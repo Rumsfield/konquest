@@ -50,8 +50,7 @@ public class TownIcon implements MenuIcon {
 		// Add applicable labels
 		List<String> loreList = new ArrayList<>();
 		if(!town.isLordValid()) {
-			//TODO KR message path
-			loreList.add(alertColor+"No Lord");
+			loreList.add(alertColor+MessagePath.LABEL_NO_LORD.getMessage());
 		}
 		if(town.isAttacked()) {
 			loreList.add(alertColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage());

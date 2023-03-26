@@ -8,13 +8,14 @@ import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
 import java.util.*;
 
 public class TownMenu extends StateMenu implements ViewableMenu {
-    //TODO: Message paths
+
     enum MenuState implements State {
         ROOT,
         JOIN,
@@ -38,42 +39,14 @@ public class TownMenu extends StateMenu implements ViewableMenu {
     private final KingdomManager manager;
     private final KonPlayer player;
     private final KonKingdom kingdom;
-    private Comparator<KonTown> townComparator;
 
     public TownMenu(Konquest konquest, KonPlayer player) {
         super(konquest, MenuState.ROOT, null);
         this.manager = konquest.getKingdomManager();
         this.player = player;
         this.kingdom = player.getKingdom();
-        this.townComparator = null;
 
-        initializeMenu();
         renderDefaultViews();
-    }
-
-    private void initializeMenu() {
-        //TODO other init?
-
-        townComparator = (townOne, townTwo) -> {
-            // sort by land, then population
-            int result = 0;
-            int g1Land = townOne.getChunkList().size();
-            int g2Land = townTwo.getChunkList().size();
-            if(g1Land < g2Land) {
-                result = 1;
-            } else if(g1Land > g2Land) {
-                result = -1;
-            } else {
-                int g1Pop = townOne.getNumResidents();
-                int g2Pop = townTwo.getNumResidents();
-                if(g1Pop < g2Pop) {
-                    result = 1;
-                } else if(g1Pop > g2Pop) {
-                    result = -1;
-                }
-            }
-            return result;
-        };
     }
 
     private void renderDefaultViews() {
@@ -95,47 +68,47 @@ public class TownMenu extends StateMenu implements ViewableMenu {
 
         final int rows = 1;
 
-        result = new DisplayMenu(rows+1, getTitle(TownMenu.MenuState.ROOT));
+        result = new DisplayMenu(rows+1, getTitle(MenuState.ROOT));
 
         /* Join Icon */
-        loreList.add(loreColor+"Join a new town");
-        icon = new InfoIcon(kingdomColor+"Join", loreList, Material.SADDLE, ROOT_SLOT_JOIN, true);
+        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_JOIN.getMessage(),loreColor));
+        icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_JOIN.getMessage(), loreList, Material.SADDLE, ROOT_SLOT_JOIN, true);
         result.addIcon(icon);
 
         /* Exile Icon */
         loreList.clear();
-        loreList.add(loreColor+"Leave an existing town");
-        icon = new InfoIcon(kingdomColor+"Leave", loreList, Material.ARROW, ROOT_SLOT_LEAVE, true);
+        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_LEAVE.getMessage(),loreColor));
+        icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_LEAVE.getMessage(), loreList, Material.ARROW, ROOT_SLOT_LEAVE, true);
         result.addIcon(icon);
 
         /* List Icon */
         loreList.clear();
-        loreList.add(loreColor+"List all towns in your kingdom");
-        icon = new InfoIcon(kingdomColor+"List", loreList, Material.PAPER, ROOT_SLOT_LIST, true);
+        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_LIST.getMessage(),loreColor));
+        icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_LIST.getMessage(), loreList, Material.PAPER, ROOT_SLOT_LIST, true);
         result.addIcon(icon);
 
         /* Invites Icon */
         loreList.clear();
-        loreList.add(loreColor+"Show town resident invites");
+        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_INVITES.getMessage(),loreColor));
         int numInvites = manager.getInviteTowns(player).size();
         Material inviteMat = Material.BOOK;
         if(numInvites > 0) {
             loreList.add(valueColor+""+numInvites);
             inviteMat = Material.WRITABLE_BOOK;
         }
-        icon = new InfoIcon(kingdomColor+"Invites", loreList, inviteMat, ROOT_SLOT_INVITES, true);
+        icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_INVITES.getMessage(), loreList, inviteMat, ROOT_SLOT_INVITES, true);
         result.addIcon(icon);
 
         /* Requests Icon */
         loreList.clear();
-        loreList.add(loreColor+"Show town resident requests");
+        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_REQUESTS.getMessage(),loreColor));
         int numRequests = manager.getRequestTowns(player).size();
         Material requestMat = Material.GLASS_BOTTLE;
         if(numRequests > 0) {
             loreList.add(valueColor+""+numRequests);
             requestMat = Material.HONEY_BOTTLE;
         }
-        icon = new InfoIcon(kingdomColor+"Requests", loreList, requestMat, ROOT_SLOT_REQUESTS, true);
+        icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_REQUESTS.getMessage(), loreList, requestMat, ROOT_SLOT_REQUESTS, true);
         result.addIcon(icon);
 
         return result;
@@ -205,23 +178,23 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                 switch(context) {
                     case JOIN:
                         if(currentTown.isOpen()) {
-                            loreList.add(hintColor+"Click to join now");
+                            loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_JOIN_NOW.getMessage());
                         } else {
-                            loreList.add(hintColor+"Click to request");
+                            loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_JOIN.getMessage());
                         }
                         break;
                     case LEAVE:
-                        loreList.add(hintColor+"Click to leave");
+                        loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_LEAVE.getMessage());
                         break;
                     case LIST:
-                        loreList.add(hintColor+"Click to view");
+                        loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_LIST.getMessage());
                         break;
                     case INVITES:
-                        loreList.add(hintColor+"Left-click to accept");
-                        loreList.add(hintColor+"Right-click to decline");
+                        loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_ACCEPT.getMessage());
+                        loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_DECLINE.getMessage());
                         break;
                     case REQUESTS:
-                        loreList.add(hintColor+"Click to manage");
+                        loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_REQUESTS.getMessage());
                         break;
                     default:
                         break;
@@ -348,22 +321,22 @@ public class TownMenu extends StateMenu implements ViewableMenu {
         ChatColor color = ChatColor.BLACK;
         switch(context) {
             case ROOT:
-                result = color+"Town Menu";
+                result = color+MessagePath.MENU_TOWN_TITLE_ROOT.getMessage();
                 break;
             case JOIN:
-                result = color+"Join a Town";
+                result = color+MessagePath.MENU_TOWN_TITLE_JOIN.getMessage();
                 break;
             case LEAVE:
-                result = color+"Leave a Town";
+                result = color+MessagePath.MENU_TOWN_TITLE_LEAVE.getMessage();
                 break;
             case LIST:
-                result = color+"List Towns";
+                result = color+MessagePath.MENU_TOWN_TITLE_LIST.getMessage();
                 break;
             case INVITES:
-                result = color+"Resident Invites";
+                result = color+MessagePath.MENU_TOWN_TITLE_INVITES.getMessage();
                 break;
             case REQUESTS:
-                result = color+"Resident Requests";
+                result = color+MessagePath.MENU_TOWN_TITLE_REQUESTS.getMessage();
                 break;
             default:
                 break;

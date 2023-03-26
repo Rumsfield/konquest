@@ -34,18 +34,18 @@ public class MonumentAdminCommand extends CommandBase {
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	
         	if(!getKonquest().isWorldValid(bukkitWorld)) {
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
         	
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
-    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
     		}
         	
         	if(player.isSettingRegion()) {
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_REGION.getMessage());
+        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_REGION.getMessage());
                 return;
         	}
 
@@ -54,14 +54,15 @@ public class MonumentAdminCommand extends CommandBase {
         	if(cmdMode.equalsIgnoreCase("create")) {
 				// Creating a new template
 				if (getArgs().length != 5) {
-					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 					return;
 				}
 				double costNum = 0;
 				try {
 					costNum = Double.parseDouble(getArgs()[4]);
 				} catch (NumberFormatException e) {
-					ChatUtil.sendError((Player) getSender(), "Invalid number: " + e.getMessage());
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_VALUE.getMessage());
+					ChatUtil.sendError(bukkitPlayer, e.getMessage());
 					return;
 				}
 				costNum = Math.max(costNum, 0);
@@ -74,30 +75,30 @@ public class MonumentAdminCommand extends CommandBase {
 				player.setRegionTemplateName(templateName);
 				player.setRegionTemplateCost(costNum);
 				// Send flow messages
-				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_1.getMessage(), ChatColor.LIGHT_PURPLE);
-				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_1.getMessage(), ChatColor.LIGHT_PURPLE);
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 			} else if(cmdMode.equalsIgnoreCase("reset")) {
 				// Resetting an existing template fields
 				if (getArgs().length != 5) {
-					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 					return;
 				}
 				double costNum = 0;
 				try {
 					costNum = Double.parseDouble(getArgs()[4]);
 				} catch (NumberFormatException e) {
-					ChatUtil.sendError((Player) getSender(), "Invalid number: " + e.getMessage());
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_VALUE.getMessage());
+					ChatUtil.sendError(bukkitPlayer, e.getMessage());
 					return;
 				}
 				costNum = Math.max(costNum, 0);
 				// Check for existing valid template name
 				if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {
-					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
 					return;
 				}
 				if(!getKonquest().getSanctuaryManager().getTemplate(templateName).isValid()) {
-					//TODO: KR message path
-					ChatUtil.sendError((Player) getSender(), "Invalid template");
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_NONE.getMessage(templateName));
 					return;
 				}
 				// Begin region setting flow
@@ -105,24 +106,24 @@ public class MonumentAdminCommand extends CommandBase {
 				player.setRegionTemplateName(templateName);
 				player.setRegionTemplateCost(costNum);
 				// Send flow messages
-				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_1.getMessage(), ChatColor.LIGHT_PURPLE);
-				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_1.getMessage(), ChatColor.LIGHT_PURPLE);
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 
         	} else if(cmdMode.equalsIgnoreCase("remove")) {
         		// Confirm name is a template
         		if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
         			return;
         		}
         		// Remove template
         		player.settingRegion(RegionType.NONE);
         		getKonquest().getSanctuaryManager().removeMonumentTemplate(templateName);
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_REMOVE.getMessage(templateName));
+        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_REMOVE.getMessage(templateName));
         		
         	} else if(cmdMode.equalsIgnoreCase("show")) {
         		// Confirm name is a template
         		if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
         			return;
         		}
         		// Show template even when invalid
@@ -131,12 +132,12 @@ public class MonumentAdminCommand extends CommandBase {
     			Location loc1 = getKonquest().getSanctuaryManager().getTemplate(templateName).getCornerTwo();
     			player.startMonumentShow(loc0, loc1);
     			String sanctuaryName = getKonquest().getSanctuaryManager().getSanctuaryNameOfTemplate(templateName);
-    			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SHOW.getMessage(templateName,sanctuaryName));
+    			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SHOW.getMessage(templateName,sanctuaryName));
 
         	} else if(cmdMode.equalsIgnoreCase("status")) {
         		// Confirm name is a template
         		if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
         			return;
         		}
         		ChatColor loreColor = ChatColor.YELLOW;
@@ -150,18 +151,16 @@ public class MonumentAdminCommand extends CommandBase {
         		String allBlocks = String.format("%d", template.getNumBlocks());
         		String critBlocks = String.format("%d", template.getNumCriticals());
         		String lootChests = String.format("%d", template.getNumLootChests());
-        		//TODO: KR message paths
-        		ChatUtil.sendNotice(bukkitPlayer, "Template "+tempName+" Status");
-        		ChatUtil.sendMessage(bukkitPlayer, loreColor+"Sanctuary: "+valueColor+sanctuaryName);
-				ChatUtil.sendMessage(bukkitPlayer, loreColor+"Cost: "+valueColor+cost);
-        		ChatUtil.sendMessage(bukkitPlayer, loreColor+"Valid: "+valueColor+isValid);
-        		ChatUtil.sendMessage(bukkitPlayer, loreColor+"Modified: "+valueColor+isBlanking);
-        		ChatUtil.sendMessage(bukkitPlayer, loreColor+"Total Blocks: "+valueColor+allBlocks);
-        		ChatUtil.sendMessage(bukkitPlayer, loreColor+"Critical Blocks: "+valueColor+critBlocks);
-        		ChatUtil.sendMessage(bukkitPlayer, loreColor+"Loot Chests: "+valueColor+lootChests);
-        		
+        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage()+" "+tempName);
+				ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_SANCTUARY.getMessage()+": "+valueColor+sanctuaryName);
+				ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
+        		ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_VALID.getMessage()+": "+valueColor+isValid);
+        		ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_MODIFIED.getMessage()+": "+valueColor+isBlanking);
+        		ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_BLOCKS.getMessage()+": "+valueColor+allBlocks);
+        		ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_CRITICAL_HITS.getMessage()+": "+valueColor+critBlocks);
+        		ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_LOOT_CHESTS.getMessage()+": "+valueColor+lootChests);
         	} else {
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
         	}
         }
     }

@@ -84,7 +84,6 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 				//	loreList.add(ChatColor.RED+line);
 				//}
 				//TODO: Add message for no master?
-				loreList.add(ChatColor.RED + "No master");
 				info = new InfoIcon(ChatColor.DARK_PURPLE + MessagePath.LABEL_LORD.getMessage(), loreList, Material.BARRIER, slotIndex, false);
 				getMenu().getPage(pageIndex).addIcon(info);
 			}
@@ -141,16 +140,11 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		if(infoKingdom.isCreated()) {
 			slotIndex = 7;
 			loreList = new ArrayList<>();
-			// TODO message paths
 			if (infoKingdom.hasMonumentTemplate()) {
 				KonMonumentTemplate template = infoKingdom.getMonumentTemplate();
 				info = new TemplateIcon(template,kingdomColor,loreList,slotIndex,false);
 			} else {
-				String invalidMessage = "Kingdom master must choose a template from the kingdom menu.";
-				for (String line : Konquest.stringPaginate(invalidMessage)) {
-					loreList.add(loreColor + line);
-				}
-				info = new InfoIcon(ChatColor.RED + "Invalid", loreList, Material.BARRIER, slotIndex, false);
+				info = new InfoIcon(ChatColor.RED+MessagePath.LABEL_INVALID.getMessage(), loreList, Material.BARRIER, slotIndex, false);
 			}
 			getMenu().getPage(pageIndex).addIcon(info);
 		}

@@ -26,8 +26,6 @@ import java.util.*;
  * Master players: C_*
  */
 public class KingdomMenu extends StateMenu implements ViewableMenu {
-	//TODO: Update all message paths to replace guild
-	
 
 	enum MenuState implements State {
 		ROOT,
@@ -96,7 +94,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	private boolean isCreatedKingdom;
 	private boolean isServerKingdom;
 	private final boolean isAdmin;
-	private Comparator<KonKingdom> kingdomComparator;
 	
 	public KingdomMenu(Konquest konquest, KonPlayer player, KonKingdom kingdom, boolean isAdmin) {
 		super(konquest, MenuState.ROOT, AccessType.REGULAR);
@@ -107,7 +104,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		this.isCreatedKingdom = false; // Is this kingdom created by players, i.e. not barbarians or neutrals
 		this.isServerKingdom = false; // Is this kingdom created by an admin for the server
 		this.isAdmin = isAdmin;
-		this.kingdomComparator = null;
 		
 		initializeMenu();
 		renderDefaultViews();
@@ -135,26 +131,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				isServerKingdom = true;
 			}
 		}
-		kingdomComparator = (kingdomOne, kingdomTwo) -> {
-			// sort by towns, then population
-			int result = 0;
-			int g1Land = kingdomOne.getNumLand();
-			int g2Land = kingdomTwo.getNumLand();
-			if(g1Land < g2Land) {
-				result = 1;
-			} else if(g1Land > g2Land) {
-				result = -1;
-			} else {
-				int g1Pop = kingdomOne.getNumMembers();
-				int g2Pop = kingdomTwo.getNumMembers();
-				if(g1Pop < g2Pop) {
-					result = 1;
-				} else if(g1Pop > g2Pop) {
-					result = -1;
-				}
-			}
-			return result;
-		};
 	}
 	
 	private void renderDefaultViews() {
@@ -190,41 +166,32 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		result = new DisplayMenu(rows, getTitle(MenuState.ROOT));
 		
 		/* Join Icon */
-		loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_JOIN.getMessage());
-		String joinTip = "Or, create your own kingdom with /k kingdom create.";
-		for(String line : Konquest.stringPaginate(joinTip)) {
-			loreList.add(loreColor+line);
-		}
-		icon = new InfoIcon(regularColor+MessagePath.MENU_GUILD_JOIN.getMessage(), loreList, Material.SADDLE, ROOT_SLOT_JOIN, true);
+		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_JOIN.getMessage(),loreColor));
+		icon = new InfoIcon(regularColor+MessagePath.MENU_KINGDOM_JOIN.getMessage(), loreList, Material.SADDLE, ROOT_SLOT_JOIN, true);
 		result.addIcon(icon);
 		
 		/* Exile Icon */
 		loreList.clear();
-		loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_LEAVE.getMessage());
-		//TODO: context description
-		String exileDescription = "Become a barbarian, lose all favor and stats.";
-		for(String line : Konquest.stringPaginate(exileDescription)) {
-			loreList.add(loreColor+line);
-		}
-		icon = new InfoIcon(regularColor+"Exile", loreList, Material.ARROW, ROOT_SLOT_EXILE, true);
+		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_EXILE.getMessage(),loreColor));
+		icon = new InfoIcon(regularColor+MessagePath.MENU_KINGDOM_EXILE.getMessage(), loreList, Material.ARROW, ROOT_SLOT_EXILE, true);
 		result.addIcon(icon);
 
 		/* Invites Icon */
 		loreList.clear();
-		loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_INVITES.getMessage());
+		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_INVITES.getMessage(),loreColor));
 		int numInvites = manager.getInviteKingdoms(player).size();
 		Material inviteMat = Material.BOOK;
 		if(numInvites > 0) {
 			loreList.add(valueColor+""+numInvites);
 			inviteMat = Material.WRITABLE_BOOK;
 		}
-		icon = new InfoIcon(regularColor+MessagePath.MENU_GUILD_INVITES.getMessage(), loreList, inviteMat, ROOT_SLOT_INVITE, true);
+		icon = new InfoIcon(regularColor+MessagePath.MENU_KINGDOM_INVITES.getMessage(), loreList, inviteMat, ROOT_SLOT_INVITE, true);
 		result.addIcon(icon);
 		
 		/* List Icon */
 		loreList.clear();
-		loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_LIST.getMessage());
-		icon = new InfoIcon(regularColor+MessagePath.MENU_GUILD_LIST.getMessage(), loreList, Material.PAPER, ROOT_SLOT_LIST, true);
+		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_LIST.getMessage(),loreColor));
+		icon = new InfoIcon(regularColor+MessagePath.MENU_KINGDOM_LIST.getMessage(), loreList, Material.PAPER, ROOT_SLOT_LIST, true);
 		result.addIcon(icon);
 		
 		// These icons only appear for created kingdoms
@@ -237,41 +204,41 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			if(menuAccess.equals(AccessType.OFFICER) || menuAccess.equals(AccessType.MASTER)) {
 				/* Relations Icon */
 				loreList = new ArrayList<>();
-				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_RELATION.getMessage());
-				icon = new InfoIcon(officerColor+MessagePath.MENU_GUILD_RELATION.getMessage(), loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, true);
+				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_RELATION.getMessage(),loreColor));
+				icon = new InfoIcon(officerColor+MessagePath.MENU_KINGDOM_RELATION.getMessage(), loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, true);
 				result.addIcon(icon);
 				
 				/* Requests Icon */
 				loreList.clear();
-				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_REQUESTS.getMessage());
+				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_REQUESTS.getMessage(),loreColor));
 				int numRequests = kingdom.getJoinRequests().size();
 				Material requestMat = Material.GLASS_BOTTLE;
 				if(numRequests > 0) {
 					loreList.add(valueColor+""+numRequests);
 					requestMat = Material.HONEY_BOTTLE;
 				}
-				icon = new InfoIcon(officerColor+MessagePath.MENU_GUILD_REQUESTS.getMessage(), loreList, requestMat, ROOT_SLOT_REQUESTS, true);
+				icon = new InfoIcon(officerColor+MessagePath.MENU_KINGDOM_REQUESTS.getMessage(), loreList, requestMat, ROOT_SLOT_REQUESTS, true);
 				result.addIcon(icon);
 			}
 			
 			if(menuAccess.equals(AccessType.MASTER)) {
 				/* Promote Icon */
 				loreList = new ArrayList<>();
-				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_PROMOTE.getMessage());
-				icon = new InfoIcon(masterColor+MessagePath.MENU_GUILD_PROMOTE.getMessage(), loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, true);
+				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_PROMOTE.getMessage(),loreColor));
+				icon = new InfoIcon(masterColor+MessagePath.MENU_KINGDOM_PROMOTE.getMessage(), loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, true);
 				result.addIcon(icon);
 				
 				/* Demote Icon */
 				loreList.clear();
-				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_DEMOTE.getMessage());
-				icon = new InfoIcon(masterColor+MessagePath.MENU_GUILD_DEMOTE.getMessage(), loreList, Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, true);
+				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DEMOTE.getMessage(),loreColor));
+				icon = new InfoIcon(masterColor+MessagePath.MENU_KINGDOM_DEMOTE.getMessage(), loreList, Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, true);
 				result.addIcon(icon);
 				
 				/* Transfer Icon */
 				if(!isServerKingdom) {
 					loreList.clear();
-					loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_TRANSFER.getMessage());
-					icon = new InfoIcon(masterColor+MessagePath.MENU_GUILD_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, true);
+					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_TRANSFER.getMessage(),loreColor));
+					icon = new InfoIcon(masterColor+MessagePath.MENU_KINGDOM_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, true);
 					result.addIcon(icon);
 				}
 				
@@ -280,20 +247,20 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				loreList.clear();
 		    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
 		    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-				icon = new InfoIcon(masterColor+MessagePath.MENU_GUILD_OPEN.getMessage(), loreList, Material.IRON_DOOR, ROOT_SLOT_OPEN, true);
+				icon = new InfoIcon(masterColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.IRON_DOOR, ROOT_SLOT_OPEN, true);
 				result.addIcon(icon);
 				
 				/* Template Icon */
 				loreList.clear();
-				loreList.add(loreColor+"Current: "+valueColor+kingdom.getMonumentTemplateName());
-				loreList.add(loreColor+"Change the monument template for all towns.");
-				icon = new InfoIcon(masterColor+"Monument Template", loreList, Material.ANVIL, ROOT_SLOT_TEMPLATE, true);
+				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_TEMPLATE.getMessage(),loreColor));
+				loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+kingdom.getMonumentTemplateName()));
+				icon = new InfoIcon(masterColor+MessagePath.MENU_KINGDOM_TEMPLATE.getMessage(), loreList, Material.ANVIL, ROOT_SLOT_TEMPLATE, true);
 				result.addIcon(icon);
 				
 				/* Disband Icon */
 				loreList.clear();
-				loreList.add(loreColor+MessagePath.MENU_GUILD_DESCRIPTION_DISBAND.getMessage());
-				icon = new InfoIcon(masterColor+MessagePath.MENU_GUILD_DISBAND.getMessage(), loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
+				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DISBAND.getMessage(),loreColor));
+				icon = new InfoIcon(masterColor+MessagePath.MENU_KINGDOM_DISBAND.getMessage(), loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
 				result.addIcon(icon);
 			}
 		}
@@ -307,12 +274,12 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		List<String> loreList = new ArrayList<>();
 		result = new DisplayMenu(2, getTitle(MenuState.A_EXILE));
 
-		loreList.add(loreColor+MessagePath.MENU_GUILD_HINT_LEAVE.getMessage());
+		loreList.add(loreColor+MessagePath.MENU_KINGDOM_HINT_EXILE.getMessage());
 		icon = new InfoIcon(DisplayManager.boolean2Symbol(true), loreList, Material.GLOWSTONE_DUST, SLOT_YES, true);
 		result.addIcon(icon);
 		
 		loreList.clear();
-		loreList.add(loreColor+MessagePath.MENU_GUILD_HINT_EXIT.getMessage());
+		loreList.add(loreColor+MessagePath.MENU_KINGDOM_HINT_EXIT.getMessage());
 		icon = new InfoIcon(DisplayManager.boolean2Symbol(false), loreList, Material.REDSTONE, SLOT_NO, true);
 		result.addIcon(icon);
 		return result;
@@ -324,12 +291,12 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		List<String> loreList = new ArrayList<>();
 		result = new DisplayMenu(2, getTitle(MenuState.C_DISBAND));
 
-		loreList.add(hintColor+MessagePath.MENU_GUILD_HINT_DISBAND.getMessage());
+		loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_DISBAND.getMessage());
 		icon = new InfoIcon(DisplayManager.boolean2Symbol(true), loreList, Material.GLOWSTONE_DUST, SLOT_YES, true);
 		result.addIcon(icon);
 		
 		loreList.clear();
-		loreList.add(hintColor+MessagePath.MENU_GUILD_HINT_EXIT.getMessage());
+		loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_EXIT.getMessage());
 		icon = new InfoIcon(DisplayManager.boolean2Symbol(false), loreList, Material.REDSTONE, SLOT_NO, true);
 		result.addIcon(icon);
 		return result;
@@ -364,7 +331,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						String cost = String.format("%.2f",totalCost);
 						loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
 					}
-					loreList.add(hintColor+"Click to apply");
+					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_TEMPLATE.getMessage());
 				} else {
 					// Invalid template, check for blanking
 					loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+"X");
@@ -379,23 +346,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		result = pages.get(currentPage);
 		return result;
 	}
-	
-	/*
-	 * Visualizing diplomacy
-	 *
-	 * Relationships view lists all other kingdoms and their relationship, with icon format:
-	 * 		Colored by current relation
-	 * 		Name = Kingdom name
-	 * 		Lore0 = Our Stance: <our active relation>
-	 * 		Lore1 = Their Stance: <their active relation>
-	 *      Lore2 = Click to change our stance
-	 *
-	 * Diplomacy view shows info on chosen kingdom, and all relationship options.
-	 * Show same kingdom icon (not clickable) and all relationships with context tips.
-	 * 		Name = <Relationship>
-	 * 		Lore0 = <context description based on instant war/peace, their stance>
-	 * 		Lore1 = <click to enact, if clickable based on context/conditions>
-	 */
 
 	private DisplayMenu createDiplomacyView() {
 		// diplomacyKingdom is the global variable to keep track of current kingdom changing status
@@ -415,16 +365,16 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		ChatColor contextColor = konquest.getDisplayPrimaryColor(kingdom, diplomacyKingdom);
 		loreList = new ArrayList<>();
 		String diplomacyState = Labeler.lookup(currentDiplomacy);
-		loreList.add(loreColor+"Diplomacy"+": "+valueColor+diplomacyState);
+		loreList.add(loreColor+MessagePath.LABEL_DIPLOMACY.getMessage()+": "+valueColor+diplomacyState);
 		if(kingdom.hasRelationRequest(diplomacyKingdom)) {
 			// They have sent a valid diplomacy change request to us
 			String ourRequestStatus = Labeler.lookup(kingdom.getRelationRequest(diplomacyKingdom));
-			loreList.add(alertColor+"They Requested"+": "+valueColor+ourRequestStatus);
+			loreList.add(alertColor+MessagePath.MENU_KINGDOM_THEY_REQUESTED.getMessage()+": "+valueColor+ourRequestStatus);
 		}
 		if(diplomacyKingdom.hasRelationRequest(kingdom)) {
 			// We have sent a valid diplomacy change request to them
 			String theirRequestStatus = Labeler.lookup(diplomacyKingdom.getRelationRequest(kingdom));
-			loreList.add(alertColor+"We Requested"+": "+valueColor+theirRequestStatus);
+			loreList.add(alertColor+MessagePath.MENU_KINGDOM_WE_REQUESTED.getMessage()+": "+valueColor+theirRequestStatus);
 		}
 		KingdomIcon kingdomIcon = new KingdomIcon(diplomacyKingdom,contextColor,loreList,index,false);
 		result.addIcon(kingdomIcon);
@@ -443,9 +393,8 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				// Is this relation a valid option in the current relationship?
 				boolean isValidChoice = manager.isValidRelationChoice(kingdom, diplomacyKingdom, relation);
 				ChatColor relationColor = ChatColor.GRAY;
-				String description = "Unavailable";
+				String description = MessagePath.LABEL_UNAVAILABLE.getMessage();
 				boolean isClickable = false;
-				//TODO: Update context logic, message paths
 				if(isValidChoice) {
 					relationColor = ChatColor.GOLD;
 					switch(relation) {
@@ -453,45 +402,45 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 							// Context descriptions
 							if(currentDiplomacy.equals(KonquestDiplomacyType.WAR)) {
 								if(isInstantPeace) {
-									description = "Instantly declare peace";
+									description = MessagePath.MENU_KINGDOM_DIPLOMACY_PEACE_WAR_INSTANT.getMessage();
 								} else {
-									description = "Request for peace";
+									description = MessagePath.MENU_KINGDOM_DIPLOMACY_PEACE_WAR_REQUEST.getMessage();
 								}
 							} else if(currentDiplomacy.equals(KonquestDiplomacyType.TRADE)) {
-								description = "End trade and declare peace";
+								description = MessagePath.MENU_KINGDOM_DIPLOMACY_PEACE_TRADE.getMessage();
 							} else if(currentDiplomacy.equals(KonquestDiplomacyType.ALLIANCE)) {
-								description = "End alliance and declare peace";
+								description = MessagePath.MENU_KINGDOM_DIPLOMACY_PEACE_ALLIANCE.getMessage();
 							}
 							break;
 						case TRADE:
 							if(currentDiplomacy.equals(KonquestDiplomacyType.PEACE)) {
-								description = "Request for trade";
+								description = MessagePath.MENU_KINGDOM_DIPLOMACY_TRADE_PEACE.getMessage();
 							} else if(currentDiplomacy.equals(KonquestDiplomacyType.ALLIANCE)) {
-								description = "End alliance and declare trade";
+								description = MessagePath.MENU_KINGDOM_DIPLOMACY_TRADE_ALLIANCE.getMessage();
 							}
 							break;
 						case WAR:
 							if(isInstantWar) {
-								description = "Instantly declare war";
+								description = MessagePath.MENU_KINGDOM_DIPLOMACY_WAR_INSTANT.getMessage();
 							} else {
-								description = "Request for war";
+								description = MessagePath.MENU_KINGDOM_DIPLOMACY_WAR_REQUEST.getMessage();
 							}
 							break;
 						case ALLIANCE:
-							description = "Request for alliance";
+							description = MessagePath.MENU_KINGDOM_DIPLOMACY_ALLIANCE.getMessage();
 							break;
 						default:
 							break;
 					}
 				}
-				loreList.add(relationColor+description);
+				loreList.addAll(Konquest.stringPaginate(description,relationColor));
 				if(isValidChoice) {
 					if(!isAdmin) {
 						double costRelation = manager.getRelationCost(relation);
 						String cost = String.format("%.2f",costRelation);
 						loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
 					}
-					loreList.add(hintColor+"Click to enact");
+					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_DIPLOMACY.getMessage());
 					isClickable = true;
 				}
 				// Create icon
@@ -562,36 +511,36 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				loreList = new ArrayList<>();
 				if(isCreatedKingdom) {
 					String diplomacyState = Labeler.lookup(manager.getDiplomaticState(kingdom,currentKingdom));
-					loreList.add(loreColor+"Diplomacy"+": "+valueColor+diplomacyState);
+					loreList.add(loreColor+MessagePath.LABEL_DIPLOMACY.getMessage()+": "+valueColor+diplomacyState);
 					if(kingdom.hasRelationRequest(currentKingdom)) {
 						// They have sent a valid diplomacy change request to us
 						String ourRequestStatus = Labeler.lookup(kingdom.getRelationRequest(currentKingdom));
-						loreList.add(alertColor+"They Requested"+": "+valueColor+ourRequestStatus);
+						loreList.add(alertColor+MessagePath.MENU_KINGDOM_THEY_REQUESTED.getMessage()+": "+valueColor+ourRequestStatus);
 					}
 					if(currentKingdom.hasRelationRequest(kingdom)) {
 						// We have sent a valid diplomacy change request to them
 						String theirRequestStatus = Labeler.lookup(currentKingdom.getRelationRequest(kingdom));
-						loreList.add(alertColor+"We Requested"+": "+valueColor+theirRequestStatus);
+						loreList.add(alertColor+MessagePath.MENU_KINGDOM_WE_REQUESTED.getMessage()+": "+valueColor+theirRequestStatus);
 					}
 				}
 				// Context-specific lore
 				switch(context) {
 					case A_JOIN:
 						if(currentKingdom.isOpen()) {
-							loreList.add(hintColor+"Click to join now");
+							loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_JOIN_NOW.getMessage());
 						} else {
-							loreList.add(hintColor+"Click to request");
+							loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_JOIN.getMessage());
 						}
 						break;
 					case A_INVITE:
-						loreList.add(hintColor+MessagePath.MENU_GUILD_HINT_INVITE_1.getMessage());
-						loreList.add(hintColor+MessagePath.MENU_GUILD_HINT_INVITE_2.getMessage());
+						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_ACCEPT.getMessage());
+						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_DECLINE.getMessage());
 						break;
 					case A_LIST:
-						loreList.add(hintColor+"Click to view");
+						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_LIST.getMessage());
 						break;
 					case B_RELATIONSHIP:
-						loreList.add(hintColor+MessagePath.MENU_GUILD_HINT_RELATION.getMessage());
+						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_RELATION.getMessage());
 						break;
 					default:
 						break;
@@ -621,21 +570,21 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		// Determine list of players given context
 		if(context.equals(MenuState.B_REQUESTS)) {
 			players.addAll(kingdom.getJoinRequests());
-			loreHintStr1 = MessagePath.MENU_GUILD_HINT_REQUEST_1.getMessage();
-			loreHintStr2 = MessagePath.MENU_GUILD_HINT_REQUEST_2.getMessage();
+			loreHintStr1 = MessagePath.MENU_KINGDOM_HINT_ACCEPT.getMessage();
+			loreHintStr2 = MessagePath.MENU_KINGDOM_HINT_DECLINE.getMessage();
 			isClickable = true;
 		} else if(context.equals(MenuState.C_PROMOTE)) {
 			players.addAll(kingdom.getPlayerMembersOnly());
-			loreHintStr1 = MessagePath.MENU_GUILD_HINT_PROMOTE.getMessage();
+			loreHintStr1 = MessagePath.MENU_KINGDOM_HINT_PROMOTE.getMessage();
 			isClickable = true;
 		} else if(context.equals(MenuState.C_DEMOTE)) {
 			players.addAll(kingdom.getPlayerOfficersOnly());
-			loreHintStr1 = MessagePath.MENU_GUILD_HINT_DEMOTE.getMessage();
+			loreHintStr1 = MessagePath.MENU_KINGDOM_HINT_DEMOTE.getMessage();
 			isClickable = true;
 		} else if(context.equals(MenuState.C_TRANSFER)) {
 			players.addAll(kingdom.getPlayerOfficersOnly());
 			players.addAll(kingdom.getPlayerMembersOnly());
-			loreHintStr1 = MessagePath.MENU_GUILD_HINT_TRANSFER.getMessage();
+			loreHintStr1 = MessagePath.MENU_KINGDOM_HINT_TRANSFER.getMessage();
 			isClickable = true;
 		} else {
 			return null;
@@ -727,7 +676,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 							currentState = MenuState.A_EXILE;
 							result = views.get(currentState);
 						} else {
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_NO_GUILD.getMessage());
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
 							Konquest.playFailSound(player.getBukkitPlayer());
 						}
 						
@@ -787,13 +736,15 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					if(clickedIcon instanceof KingdomIcon) {
 						KingdomIcon icon = (KingdomIcon)clickedIcon;
 						KonKingdom clickKingdom = icon.getKingdom();
-						manager.menuJoinKingdomRequest(player, clickKingdom);
+						boolean status = manager.menuJoinKingdomRequest(player, clickKingdom);
+						playStatusSound(player.getBukkitPlayer(),status);
 					}
 					break;
 				case A_EXILE:
 					if(slot == SLOT_YES) {
 						// Exile the player
-						manager.menuExileKingdom(player, kingdom);
+						boolean status = manager.menuExileKingdom(player);
+						playStatusSound(player.getBukkitPlayer(),status);
 					}
 					break;
 				case A_INVITE:
@@ -801,6 +752,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						KingdomIcon icon = (KingdomIcon)clickedIcon;
 						KonKingdom clickKingdom = icon.getKingdom();
 						boolean status = manager.menuRespondKingdomInvite(player, clickKingdom, clickType);
+						playStatusSound(player.getBukkitPlayer(),status);
 						if(!status) {
 							// Invite declined, player assignment unchanged
 							result = goToKingdomView(MenuState.A_INVITE);
@@ -830,15 +782,12 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						DiplomacyIcon icon = (DiplomacyIcon)clickedIcon;
 						KonquestDiplomacyType clickRelation = icon.getRelation();
 						boolean status = manager.menuChangeKingdomRelation(kingdom, diplomacyKingdom, clickRelation, player, isAdmin);
+						playStatusSound(player.getBukkitPlayer(),status);
 						diplomacyKingdom = null;
 						if(status) {
 							// Return to relationship view
 							currentState = MenuState.B_RELATIONSHIP;
 							result = goToKingdomView(MenuState.B_RELATIONSHIP);
-							Konquest.playSuccessSound(player.getBukkitPlayer());
-						} else {
-							//TODO: update messaging, in manager method
-							Konquest.playFailSound(player.getBukkitPlayer());
 						}
 					}
 					break;
@@ -846,18 +795,8 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					if(clickedIcon instanceof PlayerIcon) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
 						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
-						boolean status = manager.menuRespondKingdomRequest(clickPlayer, kingdom, clickType);
-						if(status) {
-							if(clickType) {
-								ChatUtil.sendNotice(player.getBukkitPlayer(),"Accepted kingdom join request for player "+clickPlayer.getName());
-							} else {
-								ChatUtil.sendNotice(player.getBukkitPlayer(),"Denied kingdom join request for player "+clickPlayer.getName());
-							}
-							Konquest.playSuccessSound(player.getBukkitPlayer());
-						} else {
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_PLAYER_GUILD.getMessage(clickPlayer.getName()));
-							Konquest.playFailSound(player.getBukkitPlayer());
-						}
+						boolean status = manager.menuRespondKingdomRequest(player, clickPlayer, kingdom, clickType);
+						playStatusSound(player.getBukkitPlayer(),status);
 						result = goToPlayerView(MenuState.B_REQUESTS);
 					}
 					break;
@@ -866,9 +805,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
 						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
 						boolean status = manager.menuPromoteOfficer(clickPlayer, kingdom);
-						if(status) {
-							Konquest.playSuccessSound(player.getBukkitPlayer());
-						}
+						playStatusSound(player.getBukkitPlayer(),status);
 						result = goToPlayerView(MenuState.C_PROMOTE);
 					}
 					break;
@@ -877,9 +814,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
 						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
 						boolean status = manager.menuDemoteOfficer(clickPlayer, kingdom);
-						if(status) {
-							Konquest.playSuccessSound(player.getBukkitPlayer());
-						}
+						playStatusSound(player.getBukkitPlayer(),status);
 						result = goToPlayerView(MenuState.C_DEMOTE);
 					}
 					break;
@@ -887,19 +822,22 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					if(clickedIcon instanceof PlayerIcon) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
 						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
-						manager.menuTransferMaster(clickPlayer, kingdom, player);
+						boolean status = manager.menuTransferMaster(clickPlayer, kingdom, player);
+						playStatusSound(player.getBukkitPlayer(),status);
 					}
 					break;
 				case C_TEMPLATE:
 					if(clickedIcon instanceof TemplateIcon) {
 						TemplateIcon icon = (TemplateIcon)clickedIcon;
 						KonMonumentTemplate template = icon.getTemplate();
-						manager.menuChangeKingdomTemplate(kingdom, template, player, isAdmin);
+						boolean status = manager.menuChangeKingdomTemplate(kingdom, template, player, isAdmin);
+						playStatusSound(player.getBukkitPlayer(),status);
 					}
 					break;
 				case C_DISBAND:
 					if(slot == SLOT_YES) {
-						manager.menuDisbandKingdom(kingdom,player);
+						boolean status = manager.menuDisbandKingdom(kingdom,player);
+						playStatusSound(player.getBukkitPlayer(),status);
 					}
 					break;
 				default:
@@ -933,46 +871,44 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					}
 					result = color+name+" "+MessagePath.LABEL_GUILD.getMessage()+" "+titleAccess;
 				} else {
-					result = color+MessagePath.MENU_GUILD_TITLE_ROOT.getMessage();
+					result = color+MessagePath.MENU_KINGDOM_TITLE_ROOT.getMessage();
 				}
 				break;
 			case A_JOIN:
-				result = color+MessagePath.MENU_GUILD_TITLE_JOIN.getMessage();
+				result = color+MessagePath.MENU_KINGDOM_TITLE_JOIN.getMessage();
 				break;
 			case A_EXILE:
-				result = color+MessagePath.MENU_GUILD_TITLE_CONFIRM.getMessage();
+				result = color+MessagePath.MENU_KINGDOM_TITLE_CONFIRM.getMessage();
 				break;
 			case A_INVITE:
-				result = color+MessagePath.MENU_GUILD_TITLE_INVITES.getMessage();
+				result = color+MessagePath.MENU_KINGDOM_TITLE_INVITES.getMessage();
 				break;
 			case A_LIST:
-				result = color+MessagePath.MENU_GUILD_TITLE_LIST.getMessage();
+				result = color+MessagePath.MENU_KINGDOM_TITLE_LIST.getMessage();
 				break;
 			case B_RELATIONSHIP:
-				result = color+MessagePath.MENU_GUILD_TITLE_RELATIONS.getMessage();
+				result = color+MessagePath.MENU_KINGDOM_TITLE_RELATIONS.getMessage();
 				break;
 			case B_DIPLOMACY:
-				//TODO: path this
-				result = color+"Diplomacy";
+				result = color+MessagePath.MENU_KINGDOM_TITLE_DIPLOMACY.getMessage();
 				break;
 			case B_REQUESTS:
-				result = color+MessagePath.MENU_GUILD_TITLE_REQUESTS.getMessage();
+				result = color+MessagePath.MENU_KINGDOM_TITLE_REQUESTS.getMessage();
 				break;
 			case C_PROMOTE:
-				result = color+MessagePath.MENU_GUILD_TITLE_PROMOTION.getMessage();
+				result = color+MessagePath.MENU_KINGDOM_TITLE_PROMOTION.getMessage();
 				break;
 			case C_DEMOTE:
-				result = color+MessagePath.MENU_GUILD_TITLE_DEMOTION.getMessage();
+				result = color+MessagePath.MENU_KINGDOM_TITLE_DEMOTION.getMessage();
 				break;
 			case C_TRANSFER:
-				result = color+MessagePath.MENU_GUILD_TITLE_TRANSFER.getMessage();
+				result = color+MessagePath.MENU_KINGDOM_TITLE_TRANSFER.getMessage();
 				break;
 			case C_TEMPLATE:
-				//TODO: update this
-				result = color+MessagePath.MENU_GUILD_TITLE_SPECIALIZE.getMessage();
+				result = color+MessagePath.MENU_KINGDOM_TITLE_TEMPLATE.getMessage();
 				break;
 			case C_DISBAND:
-				result = color+MessagePath.MENU_GUILD_TITLE_DISBAND.getMessage(name);
+				result = color+MessagePath.MENU_KINGDOM_TITLE_DISBAND.getMessage();
 				break;
 			default:
 				break;
@@ -1023,7 +959,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		DisplayMenu view = views.get(context);
 		int navStart = view.getInventory().getSize()-9;
 		if(navStart < 0) {
-			ChatUtil.printDebug("Guild menu nav buttons failed to refresh in context "+context.toString());
+			ChatUtil.printDebug("Kingdom menu nav buttons failed to refresh in context "+context.toString());
 			return;
 		}
 		if(context.equals(MenuState.ROOT)) {

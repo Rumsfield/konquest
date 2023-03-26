@@ -147,7 +147,7 @@ public class BlockListener implements Listener {
 						*/
 						// Notify player when there is no lord
 						if(town.canClaimLordship(player)) {
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),player.getBukkitPlayer().getName()));
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName()));
 						}
 						// Protect land and plots
 						if(!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
@@ -214,8 +214,7 @@ public class BlockListener implements Listener {
 							if(isCapital && territory.getKingdom().isCapitalImmune()) {
 								// Capital is immune and cannot be captured
 								int numTowns = territory.getKingdom().getNumTowns();
-								//TODO: KR path this
-								ChatUtil.sendError(event.getPlayer(), "This capital is immune to attacks while "+numTowns+" towns remain.");
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAPITAL_IMMUNE.getMessage(numTowns, territory.getKingdom().getName()));
 								event.setCancelled(true);
 								return;
 							}
@@ -562,7 +561,7 @@ public class BlockListener implements Listener {
 					if(playerRole.equals(RelationRole.FRIENDLY)) {
 						// Notify player when there is no lord
 						if(town.canClaimLordship(player)) {
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),player.getBukkitPlayer().getName()));
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName()));
 						}
 						// Protect land and plots
 						if(!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {

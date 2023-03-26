@@ -64,9 +64,7 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		loreList = new ArrayList<>();
 		loreList.add(loreColor + MessagePath.LABEL_FAVOR.getMessage() + ": " + valueColor + balanceF);
 		loreList.add(loreColor + MessagePath.LABEL_RESIDENCIES.getMessage() + ": " + valueColor + numResidentTowns);
-		//TODO KR message path
-		loreList.add(loreColor + "Kingdom Role" + ": " + valueColor + kingdomRole);
-
+		loreList.add(loreColor + MessagePath.LABEL_KINGDOM_ROLE.getMessage() + ": " + valueColor + kingdomRole);
 		InfoIcon info = new InfoIcon(kingdomColor+MessagePath.LABEL_INFORMATION.getMessage(), loreList, Material.ENDER_EYE, 5, false);
 		getMenu().getPage(0).addIcon(info);
 

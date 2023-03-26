@@ -5,10 +5,7 @@ import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.manager.KonquestUpgradeManager;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
 import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonStatsType;
-import com.github.rumsfield.konquest.model.KonTown;
-import com.github.rumsfield.konquest.model.KonUpgrade;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -153,6 +150,10 @@ public class UpgradeManager implements KonquestUpgradeManager {
 	public boolean addTownUpgrade(KonTown town, KonUpgrade upgrade, int level, Player bukkitPlayer) {
 		// Check that upgrades are enabled
 		if(!isEnabled) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return false;
+		}
+		if(town.hasPropertyValue(KonPropertyFlag.UPGRADE) && !town.getPropertyValue(KonPropertyFlag.UPGRADE)) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return false;
 		}

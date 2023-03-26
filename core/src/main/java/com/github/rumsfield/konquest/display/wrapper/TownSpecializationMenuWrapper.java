@@ -36,7 +36,7 @@ public class TownSpecializationMenuWrapper extends MenuWrapper {
         String hintColor = DisplayManager.hintFormat;
 
         // Page 0
-        String pageLabel = titleColor+ "Trade Specializations";
+        String pageLabel = titleColor+ MessagePath.MENU_TOWN_SPECIAL.getMessage();
 
         ProfessionIcon icon;
         int numEntries = Villager.Profession.values().length - 1; // Subtract one to omit current specialization choice
@@ -44,12 +44,13 @@ public class TownSpecializationMenuWrapper extends MenuWrapper {
         getMenu().addPage(0, numRows, pageLabel);
         int index = 0;
         List<String> loreList = new ArrayList<>();
+        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_LORE_SPECIAL.getMessage(),loreColor));
         if(!isAdmin) {
             double costSpecial = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SPECIALIZE.getPath());
             String cost = String.format("%.2f",costSpecial);
             loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
         }
-        loreList.add(hintColor+MessagePath.MENU_GUILD_HINT_SPECIAL.getMessage());
+        loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_SPECIAL.getMessage());
         for(Villager.Profession profession : Villager.Profession.values()) {
             if(town != null && !profession.equals(town.getSpecialization())) {
                 icon = new ProfessionIcon(ChatColor.GOLD+profession.name(),loreList,profession,index,true);
@@ -71,7 +72,7 @@ public class TownSpecializationMenuWrapper extends MenuWrapper {
             Villager.Profession clickProfession = icon.getProfession();
             boolean status = getKonquest().getKingdomManager().menuChangeTownSpecialization(town, clickProfession, clickPlayer, isAdmin);
             if(status) {
-                ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_SPECIALIZE.getMessage(town.getName(),clickProfession.name()));
+                ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_SPECIALIZE.getMessage(town.getName(),clickProfession.name()));
                 Konquest.playSuccessSound(bukkitPlayer);
             } else {
                 Konquest.playFailSound(bukkitPlayer);

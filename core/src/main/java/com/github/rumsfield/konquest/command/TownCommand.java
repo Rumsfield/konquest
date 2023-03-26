@@ -50,7 +50,7 @@ public class TownCommand extends CommandBase {
 		// Verify player is not a barbarian
 		assert player != null;
 		if (player.isBarbarian()) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
 			return;
 		}
 		// Verify town or capital exists within sender's Kingdom
@@ -104,7 +104,7 @@ public class TownCommand extends CommandBase {
 				}
 			}
 			if(notifyLordTakeover) {
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),bukkitPlayer.getName()));
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName()));
 			}
 
 			// Action based on sub-command
@@ -127,14 +127,8 @@ public class TownCommand extends CommandBase {
 						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
 						return;
 					}
-					// Call manager method
-					boolean status = getKonquest().getKingdomManager().addTownPlayer(player, invitee, town);
-					//TODO: redo these messages
-					if(status) {
-						ChatUtil.sendNotice(bukkitPlayer,"Invite Success");
-					} else {
-						ChatUtil.sendError(bukkitPlayer,"Invite Failed");
-					}
+					// Call manager method, includes messages
+					getKonquest().getKingdomManager().addTownPlayer(player, invitee, town);
 				} else {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 					return;
@@ -150,14 +144,8 @@ public class TownCommand extends CommandBase {
 						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
 						return;
 					}
-					// Call manager method
-					boolean status = getKonquest().getKingdomManager().kickTownPlayer(player, kickPlayer, town);
-					//TODO: redo these messages
-					if(status) {
-						ChatUtil.sendNotice(bukkitPlayer,"Kick Success");
-					} else {
-						ChatUtil.sendError(bukkitPlayer,"Kick Failed");
-					}
+					// Call manager method, includes messages
+					getKonquest().getKingdomManager().kickTownPlayer(player, kickPlayer, town);
 				} else {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 					return;
@@ -166,14 +154,8 @@ public class TownCommand extends CommandBase {
 
 			case "lord":
 				if(getArgs().length == 3) {
-					// Call manager method
-					boolean status = getKonquest().getKingdomManager().lordTownTakeover(player, town);
-					//TODO: redo these messages
-					if(status) {
-						ChatUtil.sendNotice(bukkitPlayer,"Lord Takeover Success");
-					} else {
-						ChatUtil.sendError(bukkitPlayer,"Lord Takeover Failed");
-					}
+					// Call manager method, includes messages
+					getKonquest().getKingdomManager().lordTownTakeover(player, town);
 				} else {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 					return;

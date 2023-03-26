@@ -77,7 +77,11 @@ public class ConfigManager{
 	public FileConfiguration getLang() {
 		return langConfig;
 	}
-	
+
+	public String getLangName() {
+		return language;
+	}
+
 	public FileConfiguration getConfig(String key) {
 		FileConfiguration result = new YamlConfiguration();
 		if(!configCache.containsKey(key)) {

@@ -1167,7 +1167,7 @@ public class PlayerListener implements Listener {
 			KonTown town = (KonTown) territoryTo;
 			// Notify player if town is abandoned
 			if(town.getPlayerResidents().isEmpty() && town.getKingdom().equals(player.getKingdom())) {
-				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),player.getBukkitPlayer().getName()));
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName()));
 			}
 			// Display plot message to friendly players
 			displayPlotMessage(town, locTo, locFrom, player);
@@ -1303,8 +1303,7 @@ public class PlayerListener implements Listener {
     			if((isPlotFrom || !town.isLocInside(fromLoc)) && town.isLocInside(toLoc)) {
     				// Moved out of plot or other territory or wild into town/capital land
 					if(town instanceof KonCapital) {
-						//TODO KR use message path
-						plotMessage = "Capital Land";
+						plotMessage = MessagePath.MENU_PLOTS_CAPITAL_LAND.getMessage();
 					} else {
 						plotMessage = MessagePath.MENU_PLOTS_TOWN_LAND.getMessage();
 					}

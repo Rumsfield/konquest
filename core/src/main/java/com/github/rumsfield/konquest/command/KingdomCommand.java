@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-//TODO: KR replace GUILD messages with KINGDOM
 public class KingdomCommand extends CommandBase {
 	
 	public KingdomCommand(Konquest konquest, CommandSender sender, String[] args) {
@@ -27,7 +27,7 @@ public class KingdomCommand extends CommandBase {
 	public void execute() {
 		// Notify sender when admin
 		if(getSender().hasPermission("konquest.command.admin") && getKonquest().getSanctuaryManager().getNumTemplates() == 0) {
-			ChatUtil.sendError((Player) getSender(),"There are no monument templates. Create one in a sanctuary with \"k admin monument\"");
+			ChatUtil.sendError((Player) getSender(),MessagePath.COMMAND_KINGDOM_ERROR_NO_TEMPLATES.getMessage());
 		}
 		// kingdom [menu|create|add|kick|rename|templates] [name] [template]
 		if (getArgs().length != 1 && getArgs().length != 2 && getArgs().length != 3 && getArgs().length != 4) {
@@ -52,6 +52,7 @@ public class KingdomCommand extends CommandBase {
     			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
     		}
+			String kingdomName = kingdom.getName();
     		
         	if(getArgs().length == 1) {
         		// No sub-command, open kingdom menu
@@ -69,27 +70,25 @@ public class KingdomCommand extends CommandBase {
 	            		// Create a new kingdom
 	            		// Needs kingdom name and template name arguments
 	            		if(getArgs().length == 4) {
-	            			String kingdomName = getArgs()[2];
+	            			String newKingdomName = getArgs()[2];
 	            			String templateName = getArgs()[3];
-	            			if(getKonquest().validateName(kingdomName,bukkitPlayer) != 0) {
+	            			if(getKonquest().validateName(newKingdomName,bukkitPlayer) != 0) {
 	            				// Player receives error message within validateName method
 	            				return;
 	    	            	}
 
-	                    	int status = getKonquest().getKingdomManager().createKingdom(bukkitPlayer.getLocation(), kingdomName, templateName, player, false);
+	                    	int status = getKonquest().getKingdomManager().createKingdom(bukkitPlayer.getLocation(), newKingdomName, templateName, player, false);
 	                    	
 	                    	if(status == 0) {
 	                    		// Successful kingdom creation
-								KonKingdom createdKingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
-	                    		//TODO: KR messages
-	                    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_CREATE.getMessage(kingdomName));
-	                    		ChatUtil.sendBroadcast(bukkitPlayer.getName()+" created the kingdom of "+kingdomName);
+								KonKingdom createdKingdom = getKonquest().getKingdomManager().getKingdom(newKingdomName);
+	                    		ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_CREATE.getMessage(bukkitPlayer.getName(), newKingdomName));
 								// Teleport player to safe place around monument, facing monument
 								getKonquest().getKingdomManager().teleportAwayFromCenter(createdKingdom.getCapital());
 								// Play a success sound
 								Konquest.playTownSettleSound(bukkitPlayer.getLocation());
 								// Open kingdom menu for newly created kingdom
-	                    		KonKingdom newKingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
+	                    		KonKingdom newKingdom = getKonquest().getKingdomManager().getKingdom(newKingdomName);
 	                    		getKonquest().getDisplayManager().displayKingdomMenu(player, newKingdom, false);
 	                    		// Updates
 	                    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
@@ -97,12 +96,11 @@ public class KingdomCommand extends CommandBase {
 	                    	} else {
 	                    		switch(status) {
 		                    		case 1:
-		                    			//ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
-		                    			//TODO: KR message - That name is already taken
+										// Note that this error should not be reached due to previous checks
+		                    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
 		                    			break;
 		                    		case 2:
-		                    			//TODO: KR message - You must be a barbarian to create a kingdom. Use k exile
-		                    			ChatUtil.sendError((Player) getSender(), "You must be a barbarian to create a kingdom.");
+		                    			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_BARBARIAN_CREATE.getMessage());
 		                    			break;
 		                    		case 3:
 										double templateCost = getKonquest().getSanctuaryManager().getTemplate(templateName).getCost();
@@ -111,29 +109,25 @@ public class KingdomCommand extends CommandBase {
 		                    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
 		                    			break;
 		                    		case 4:
-		                    			//TODO: KR message - That is not a valid monument template
-		                    			ChatUtil.sendError((Player) getSender(), "Invalid monument template, "+templateName);
+		                    			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_INVALID_TEMPLATE.getMessage());
 		                    			break;
 		                    		case 5:
-		                    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+		                    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
 		                    			break;
 		                    		case 6:
 		                    			int distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
 		                    			int min_distance_sanc = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_SANCTUARY.getPath());
 		                    			int min_distance_town = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
 		                    			int min_distance = Math.min(min_distance_sanc, min_distance_town);
-										ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
-		                    			//TODO: KR message
+										ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_PROXIMITY.getMessage(distance,min_distance));
 		                    			break;
 		                    		case 7:
 		                    			distance = getKonquest().getTerritoryManager().getDistanceToClosestTerritory(bukkitPlayer.getLocation());
 		                    			int max_distance_all = getKonquest().getCore().getInt(CorePath.TOWNS_MAX_DISTANCE_ALL.getPath());
-		                    			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_MAX.getMessage(distance,max_distance_all));
-		                    			//TODO: KR message
+		                    			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_MAX.getMessage(distance,max_distance_all));
 		                    			break;
 		                    		case 8:
-		                    			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_FAIL_PLACEMENT.getMessage());
-		                    			//TODO: KR message
+		                    			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_PLACEMENT.getMessage());
 		                    			break;
 	                    			default:
 	                    				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
@@ -141,8 +135,7 @@ public class KingdomCommand extends CommandBase {
 	                    		}
 	                    	}
 	            		} else {
-							//TODO: KR message path
-	            			ChatUtil.sendError((Player) getSender(), "You must specify a template name. View templates with /k kingdom templates.");
+							ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_KINGDOM_ERROR_MISSING_TEMPLATE.getMessage());
 	            		}
 	            		break;
 	            	case "add":
@@ -163,24 +156,10 @@ public class KingdomCommand extends CommandBase {
 	    		        		return;
 	    					}
 	            			playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
-	            			int status = getKonquest().getKingdomManager().joinKingdomInvite(offlinePlayer.getOfflineBukkitPlayer(), kingdom);
-	            			if(status == 0) {
-	            				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_GUILD_NOTICE_INVITE.getMessage(playerName));
-	            			} else {
-	            				switch(status) {
-		            				case 1:
-		            					//TODO: KR message - Player is already a member
-		            					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
-		            					break;
-		            				case 2:
-		            					//TODO: KR message - Player has already been invited, pending response
-		            					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_GUILD_ERROR_ADD_MEMBER.getMessage(playerName));
-		            					break;
-	            					default:
-	            						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
-	            						break;
-	            				}
-	            			}
+	            			boolean status = getKonquest().getKingdomManager().joinKingdomInvite(player, offlinePlayer.getOfflineBukkitPlayer(), kingdom);
+							if(status) {
+								ChatUtil.sendNotice((Player)player, MessagePath.COMMAND_KINGDOM_NOTICE_INVITE_SENT.getMessage(playerName));
+							}
 	            		} else {
 	            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 	            		}
@@ -204,17 +183,14 @@ public class KingdomCommand extends CommandBase {
 	    					}
 	    			    	OfflinePlayer bukkitOfflinePlayer = offlinePlayer.getOfflineBukkitPlayer();
 	            			if(kingdom.isMaster(bukkitOfflinePlayer.getUniqueId())) {
-	            				//TODO: Path this
-	            				ChatUtil.sendError(bukkitPlayer, "Cannot kick kingdom master");
+	            				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_KICK_MASTER.getMessage());
 	            				return;
 	            			}
 	            			playerName = bukkitOfflinePlayer.getName();
-	            			boolean status = getKonquest().getKingdomManager().kickKingdomMember(bukkitOfflinePlayer, kingdom);
-	            			if(status) {
-	            				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_KICK.getMessage(playerName));
-	            			} else {
-	            				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
-	            			}
+	            			boolean status = getKonquest().getKingdomManager().kickKingdomMember(player, bukkitOfflinePlayer);
+							if(status) {
+								ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_KICK.getMessage(playerName));
+							}
 	            		} else {
 	            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 	            		}
@@ -239,7 +215,8 @@ public class KingdomCommand extends CommandBase {
 	                    	int status = getKonquest().getKingdomManager().renameKingdom(oldName, newName, player, false);
 	                    	switch(status) {
 	            				case 0:
-	            					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_GUILD_NOTICE_RENAME.getMessage(newName));
+	            					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_RENAME.getMessage(newName));
+									ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_RENAME.getMessage(oldName,newName));
 	            					break;
 	            				case 1:
 	            					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage());

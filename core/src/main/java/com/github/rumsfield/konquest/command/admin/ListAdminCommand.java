@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.command.admin;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
+import com.github.rumsfield.konquest.command.ListType;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.command.CommandSender;
@@ -13,17 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ListAdminCommand extends CommandBase {
-	
-	enum ListType {
-		KINGDOM,
-		TOWN,
-		CAMP,
-		RUIN,
-		SANCTUARY
-	}
-	
-	private final int MAX_LINES = 8;
-	
+
 	public ListAdminCommand(Konquest konquest, CommandSender sender, String[] args) {
         super(konquest, sender, args);
     }
@@ -34,7 +25,8 @@ public class ListAdminCommand extends CommandBase {
     	if (getArgs().length > 4) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		} else {
-        	
+			Player bukkitPlayer = (Player) getSender();
+
         	// Determine list mode
         	ListType mode = ListType.KINGDOM;
         	if (getArgs().length >= 3) {
@@ -50,7 +42,7 @@ public class ListAdminCommand extends CommandBase {
         		} else if(listMode.equalsIgnoreCase("sanctuary")) {
         			mode = ListType.SANCTUARY;
         		} else {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
                     return;
         		}
         	}
@@ -74,7 +66,7 @@ public class ListAdminCommand extends CommandBase {
 	        		lines.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
 	        		break;
 	        	default :
-	        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 	                return;
         	}
         	Collections.sort(lines);
@@ -82,12 +74,13 @@ public class ListAdminCommand extends CommandBase {
         	
         	if(lines.isEmpty()) {
         		// Nothing to display
-        		String header = "Konquest "+ mode +" List, page 0/0";
-            	ChatUtil.sendNotice((Player) getSender(),header);
+				String header = MessagePath.COMMAND_LIST_NOTICE_HEADER.getMessage(mode.getLabel()) + " 0/0";
+            	ChatUtil.sendNotice(bukkitPlayer,header);
         	} else {
         		// Display paged lines to player
         		int numLines = lines.size(); // should be 1 or more
-            	int totalPages = (int)Math.ceil((double)numLines/MAX_LINES); // 1-based
+				int MAX_LINES = 8;
+				int totalPages = (int)Math.ceil((double)numLines/ MAX_LINES); // 1-based
             	totalPages = Math.max(totalPages, 1); // clamp to 1
             	int page = 1; // 1-based
             	if (getArgs().length == 3) {
@@ -100,15 +93,16 @@ public class ListAdminCommand extends CommandBase {
             	page = Math.min(Math.max(page, 1), totalPages);
             	// Determine line start and end
             	int startIdx = (page-1) * MAX_LINES;
-            	int endIdx = startIdx + MAX_LINES ;
+            	int endIdx = startIdx + MAX_LINES;
             	// Display lines to player
-            	//TODO: KR path this
-            	String header = "Konquest "+ mode +" List, page "+page+"/"+(totalPages);
-            	ChatUtil.sendNotice((Player) getSender(),header);
-            	for (int i = startIdx; i < endIdx && i < numLines; i++) {
-            		String line = lines.get(i);
-            		ChatUtil.sendNotice((Player) getSender(),(i+1)+". "+line);
-            	}
+				String header = MessagePath.COMMAND_LIST_NOTICE_HEADER.getMessage(mode.getLabel()) + " "+page+"/"+totalPages;
+            	ChatUtil.sendNotice(bukkitPlayer,header);
+				List<String> pageLines = new ArrayList<>();
+				for (int i = startIdx; i < endIdx && i < numLines; i++) {
+					String line = (i+1)+". "+lines.get(i);
+					pageLines.add(line);
+				}
+				ChatUtil.sendCommaNotice(bukkitPlayer,pageLines);
         	}
         }
     }

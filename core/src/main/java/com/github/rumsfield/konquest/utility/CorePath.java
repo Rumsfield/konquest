@@ -121,9 +121,9 @@ public enum CorePath {
 	TOWNS_ARMOR_BLACKLIST_ENABLE                          ("core.towns.armor_blacklist_enable"),
 	TOWNS_ARMOR_BLACKLIST_REVERSE                         ("core.towns.armor_blacklist_reverse"),
 	TOWNS_ARMOR_BLACKLIST                                 ("core.towns.armor_blacklist"),
-	TOWNS_DISCOUNT_ENABLE                                 ("core.towns.discount_enable"),//TODO implement this
-	TOWNS_DISCOUNT_PERCENT                                ("core.towns.discount_percent"),//TODO implement this
-	TOWNS_DISCOUNT_STACK                                  ("core.towns.discount_stack"),//TODO implement this
+	TOWNS_DISCOUNT_ENABLE                                 ("core.towns.discount_enable"),
+	TOWNS_DISCOUNT_PERCENT                                ("core.towns.discount_percent"),
+	TOWNS_DISCOUNT_STACK                                  ("core.towns.discount_stack"),
 	
 	PLOTS_ENABLE                                          ("core.plots.enable"),
 	PLOTS_MAX_SIZE                                        ("core.plots.max_size"),

@@ -90,7 +90,7 @@ public class InventoryListener implements Listener {
 						boolean isMerchantAllowed = territoryRole.equals(RelationRole.FRIENDLY) || territoryRole.equals(RelationRole.TRADE) || territoryRole.equals(RelationRole.ALLY);
 						// Prevent opening by enemy and sanction kingdom members
 						if(!isMerchantAllowed) {
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_ERROR_SANCTION.getMessage(town.getName()));
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_MERCHANT.getMessage(town.getKingdom().getName()));
 							event.setCancelled(true);
 							return;
 						}
@@ -108,7 +108,7 @@ public class InventoryListener implements Listener {
 						}
 						// Notify player when there is no lord
 						if(town.canClaimLordship(player)) {
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName(),player.getBukkitPlayer().getName()));
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName()));
 						}
 						// Prevent non-residents in closed towns from opening inventories that can hold items
 						// However this still allows them to open inventories like enchantment tables, crafting bench, etc.

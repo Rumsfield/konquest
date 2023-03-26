@@ -90,9 +90,9 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
                 KonMonumentTemplate currentTemplate = templateIter.next();
                 double totalCost = getKonquest().getKingdomManager().getCostTemplate()+currentTemplate.getCost();
                 loreList = new ArrayList<>();
-                loreList.add(loreColor+"Sanctuary"+": "+valueColor+templateSanctuaryMap.get(currentTemplate));
-                loreList.add(loreColor+"Kingdoms"+": "+valueColor+templateUsedKingdomsMap.get(currentTemplate));
-                loreList.add(loreColor+"Favor Cost"+": "+valueColor+totalCost);
+                loreList.add(loreColor+MessagePath.LABEL_SANCTUARY.getMessage()+": "+valueColor+templateSanctuaryMap.get(currentTemplate));
+                loreList.add(loreColor+MessagePath.LABEL_KINGDOMS.getMessage()+": "+valueColor+templateUsedKingdomsMap.get(currentTemplate));
+                loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+totalCost);
                 TemplateIcon templateIcon = new TemplateIcon(currentTemplate,ChatColor.GOLD,loreList,slotIndex,false);
                 getMenu().getPage(pageNum).addIcon(templateIcon);
                 slotIndex++;

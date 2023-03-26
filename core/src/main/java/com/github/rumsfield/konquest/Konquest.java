@@ -1335,6 +1335,20 @@ public class Konquest implements KonquestAPI, Timeable {
     	}
     	return result;
     }
+
+	public static List<String> stringPaginate(String sentence, String format) {
+		ArrayList<String> result = new ArrayList<>();
+		List<String> lines = stringPaginate(sentence);
+		for(String line : lines) {
+			result.add(format+line);
+		}
+		return result;
+	}
+
+	public static List<String> stringPaginate(String sentence, ChatColor format) {
+		String formatStr = ""+format;
+		return stringPaginate(sentence,formatStr);
+	}
     
     public ItemStack getPlayerHead(OfflinePlayer bukkitOfflinePlayer) {
 		if(!headCache.containsKey(bukkitOfflinePlayer.getUniqueId())) {

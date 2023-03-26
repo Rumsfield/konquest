@@ -236,7 +236,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 						if(doNotification) {
 							Konquest.playDiscountSound(player.getBukkitPlayer());
 							String discountStr = ""+discountPercent;
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_GUILD_NOTICE_DISCOUNT.getMessage(this.getName(),discountStr));
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_DISCOUNT.getMessage(getKingdom().getName(),discountStr));
 						}
 					}
 				}

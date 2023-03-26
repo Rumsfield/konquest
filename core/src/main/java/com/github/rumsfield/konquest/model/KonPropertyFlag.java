@@ -1,33 +1,36 @@
 package com.github.rumsfield.konquest.model;
 
+import com.github.rumsfield.konquest.utility.MessagePath;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public enum KonPropertyFlag {
-//TODO: Replace these strings with MessagePaths
-	
+	// Note that the name field must match the enum name so that the admin flag command can match them.
+	// Descriptions come from MessagePath so that they can be translated.
+
 	// Properties for territories
-	TRAVEL			("Travel", 		"Allow travel to this territory"), // Done in TravelCommand
-	PVP				("PvP", 		"Allow player damage"), // Done in EntityListener
-	PVE				("PvE", 		"Allow entity damage"), // Done in EntityListener
-	BUILD			("Build", 		"Allow block edits"), // Done in BlockListener
-	USE				("Use", 		"Allow using blocks"), // Done in InventoryListener, ...
-	CHEST			("Chest", 		"Allow using containers"),
-	MOBS			("Mobs", 		"Allow mobs to spawn"), // Done in EntityListener
-	PORTALS			("Portals", 	"Allow players to use portals"), // Done in WorldListener
-	ENTER			("Enter", 		"Allow players to enter"), // Done in PlayerListener
-	EXIT			("Exit", 		"Allow players to exit"), // Done in PlayerListener
+	TRAVEL			("Travel", 	MessagePath.PROPERTIES_TRAVEL.getMessage()), // Done in TravelCommand
+	PVP				("PvP", 		MessagePath.PROPERTIES_PVP.getMessage()), // Done in EntityListener
+	PVE				("PvE", 		MessagePath.PROPERTIES_PVE.getMessage()), // Done in EntityListener
+	BUILD			("Build", 	MessagePath.PROPERTIES_BUILD.getMessage()), // Done in BlockListener
+	USE				("Use", 		MessagePath.PROPERTIES_USE.getMessage()), // Done in InventoryListener, ...
+	CHEST			("Chest", 	MessagePath.PROPERTIES_CHEST.getMessage()),
+	MOBS			("Mobs", 		MessagePath.PROPERTIES_MOBS.getMessage()), // Done in EntityListener
+	PORTALS			("Portals", 	MessagePath.PROPERTIES_PORTALS.getMessage()), // Done in WorldListener
+	ENTER			("Enter", 	MessagePath.PROPERTIES_ENTER.getMessage()), // Done in PlayerListener
+	EXIT			("Exit", 		MessagePath.PROPERTIES_EXIT.getMessage()), // Done in PlayerListener
 	
 	// Properties specifically for towns/capitals
-	CAPTURE			("Capture", 	"Allow this town to be captured"), // Done in BlockListener
-	CLAIM			("Claim", 		"Allow players to claim land"), // Done in TerritoryManager
-	UNCLAIM			("Unclaim", 	"Allow players to unclaim land"), // Done in TerritoryManager
-	UPGRADE			("Upgrade", 	"Allow players to upgrade this town"), // Done in TownManagementMenuWrapper
-	PLOTS			("Plots", 		"Allow players to set town plots"), // Done in TownManagementMenuWrapper
+	CAPTURE			("Capture", 	MessagePath.PROPERTIES_CAPTURE.getMessage()), // Done in BlockListener
+	CLAIM			("Claim", 	MessagePath.PROPERTIES_CLAIM.getMessage()), // Done in TerritoryManager
+	UNCLAIM			("Unclaim", 	MessagePath.PROPERTIES_UNCLAIM.getMessage()), // Done in TerritoryManager
+	UPGRADE			("Upgrade", 	MessagePath.PROPERTIES_UPGRADE.getMessage()), // Done in TownManagementMenuWrapper
+	PLOTS			("Plots", 	MessagePath.PROPERTIES_PLOTS.getMessage()), // Done in TownManagementMenuWrapper
 	
 	// Properties for kingdoms
-	NEUTRAL			("Neutral", 	"Make this kingdom only peaceful"),
-	GOLEMS			("Golems", 		"Enable iron golems to attack enemies"), // Done in KonTown
+	NEUTRAL			("Neutral", 	MessagePath.PROPERTIES_NEUTRAL.getMessage()),
+	GOLEMS			("Golems", 	MessagePath.PROPERTIES_GOLEMS.getMessage()), // Done in KonTown
 	
 	NONE			("N/A", 		"Nothing");
 	

@@ -128,7 +128,6 @@ public class SpyCommand extends CommandBase {
 			} else {
 				dist = MessagePath.COMMAND_SPY_NOTICE_VERY_DISTANT.getMessage();
 			}
-			ChatUtil.sendNotice(bukkitPlayer, "A spy has recovered this map of a "+dist+" enemy town!");
 			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SPY_NOTICE_SUCCESS.getMessage(dist));
         }
 		

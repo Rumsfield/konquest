@@ -24,15 +24,14 @@ public class CampAdminCommand extends CommandBase {
 	@Override
 	public void execute() {
 		// k admin camp create|destroy <player>
-		//TODO: KR add message paths
+		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length != 4) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             return;
         }
-		Player bukkitPlayer = (Player) getSender();
 		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to find non-existent player");
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return;
 		}
 		String cmdMode = getArgs()[2];
@@ -41,51 +40,68 @@ public class CampAdminCommand extends CommandBase {
 		// Qualify arguments
 		KonOfflinePlayer targetPlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
 		if(targetPlayer == null) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage());
 			return;
 		}
 		if(!targetPlayer.isBarbarian()) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PLAYER.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PLAYER.getMessage());
 			return;
 		}
-		
+		String targetName = targetPlayer.getOfflineBukkitPlayer().getName();
+
 		// Execute sub-commands
 		if(cmdMode.equalsIgnoreCase("create")) {
 			// Create a new camp for the target player
 			if(getKonquest().isWorldIgnored(bukkitPlayer.getWorld())) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
 				return;
 			}
 			if(getKonquest().getCampManager().isCampSet(targetPlayer)) {
-				ChatUtil.sendError((Player) getSender(), "Player already has a camp, remove it first before creating a new one.");
+				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_CAMP_ERROR_CREATE_EXIST.getMessage());
                 return;
 			}
 			Location playerLoc = bukkitPlayer.getLocation();
 			int status = getKonquest().getCampManager().addCamp(playerLoc, targetPlayer);
-        	if(status == 0) {
-        		ChatUtil.sendNotice((Player) getSender(), "Successfully created a camp for player "+targetPlayer.getOfflineBukkitPlayer().getName());
-        	} else {
-        		ChatUtil.sendError((Player) getSender(), "Failed to create a camp :(");
+			switch(status) {
+				case 0:
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_CAMP_NOTICE_CREATE.getMessage(targetName));
+					break;
+				case 1:
+					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
+					break;
+				case 2:
+					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
+					break;
+				case 3:
+					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
+					break;
+				case 4:
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+					break;
+				case 5:
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+					break;
+				default:
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+					break;
 			}
-        	
 		} else if(cmdMode.equalsIgnoreCase("destroy")) {
 			if(!getKonquest().getCampManager().isCampSet(targetPlayer)) {
-				ChatUtil.sendError((Player) getSender(), "Player does not have a camp.");
+				ChatUtil.sendError(bukkitPlayer, "Player does not have a camp.");
                 return;
 			}
 			boolean status = getKonquest().getCampManager().removeCamp(targetPlayer);
 			if(status) {
-				ChatUtil.sendNotice((Player) getSender(), "Successfully removed the camp for player "+targetPlayer.getOfflineBukkitPlayer().getName());
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_CAMP_NOTICE_DESTROY.getMessage(targetName));
 				KonPlayer onlineOwner = getKonquest().getPlayerManager().getPlayerFromName(playerName);
 				if(onlineOwner != null) {
 					ChatUtil.sendError(onlineOwner.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY_OWNER.getMessage());
 				}
 			} else {
-				ChatUtil.sendError((Player) getSender(), "Failed to remove the camp :(");
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			}
-			
 		} else {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		}
 
 	}

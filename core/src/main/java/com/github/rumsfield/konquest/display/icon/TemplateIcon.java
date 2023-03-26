@@ -61,21 +61,20 @@ public class TemplateIcon implements MenuIcon {
 			}
 		}
 		List<String> itemLore = new ArrayList<>();
-		//TODO: Replace with message paths
 		if(template != null) {
 			if(!template.isValid()) {
 				if(template.isBlanking()) {
-					itemLore.add(alertColor + "Unavailable");
+					itemLore.add(alertColor + MessagePath.LABEL_UNAVAILABLE.getMessage());
 				} else {
-					itemLore.add(alertColor + "Invalid");
+					itemLore.add(alertColor + MessagePath.LABEL_INVALID.getMessage());
 				}
 			}
-			itemLore.add(loreColor+"Name: "+valueColor+template.getName());
-			itemLore.add(loreColor+"Critical Hits: "+valueColor+template.getNumCriticals());
-			itemLore.add(loreColor+"Loot Chests: "+valueColor+template.getNumLootChests());
+			itemLore.add(loreColor+MessagePath.LABEL_NAME.getMessage()+": "+valueColor+template.getName());
+			itemLore.add(loreColor+MessagePath.LABEL_CRITICAL_HITS.getMessage()+": "+valueColor+template.getNumCriticals());
+			itemLore.add(loreColor+MessagePath.LABEL_LOOT_CHESTS.getMessage()+": "+valueColor+template.getNumLootChests());
 		}
 		itemLore.addAll(lore);
-		meta.setDisplayName(contextColor+"Monument Template");
+		meta.setDisplayName(contextColor+MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage());
 		meta.setLore(itemLore);
 		item.setItemMeta(meta);
 		return item;

@@ -22,7 +22,7 @@ public class TownAdminCommand extends CommandBase {
 	/*
 	 * The admin town command is different than the player town command.
 	 * This command is mostly text-based, and does not use the management menu.
-	 * It directly opens menus for plots, specialize and options.
+	 * It directly opens some menus that support an admin mode.
 	 * Otherwise, it uses more text commands to give more control over town properties.
 	 */
 	
@@ -236,9 +236,9 @@ public class TownAdminCommand extends CommandBase {
 			    	}
 			    	// Add the player as a resident
 			    	if(town.addPlayerResident(offlinePlayer.getOfflineBukkitPlayer(),false)) {
-			    		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_ADD_SUCCESS.getMessage(playerName,townName));
+			    		ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 			    	} else {
-			    		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TOWN_ERROR_ADD_RESIDENT.getMessage(playerName,townName));
+			    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			    	}
 			    } else {
 			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -325,8 +325,10 @@ public class TownAdminCommand extends CommandBase {
 	        		// Rename the town
 	        		boolean success = town.getKingdom().renameTown(townName, newTownName);
 	        		if(success) {
-	        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_NOTICE_RENAME.getMessage(townName,newTownName));
-	        		}
+	        			ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+	        		} else {
+						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+					}
 	        	} else {
 	        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 	        		return;
@@ -339,7 +341,7 @@ public class TownAdminCommand extends CommandBase {
 					String upgradeLevelStr = getArgs()[5];
 	        		KonUpgrade upgrade = KonUpgrade.getUpgrade(upgradeName);
 	        		if(upgrade == null) {
-	        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_UPGRADE.getMessage());
+	        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage());
 		        		return;
 	        		}
 	        		if(!upgradeLevelStr.equalsIgnoreCase("")) {
@@ -349,7 +351,7 @@ public class TownAdminCommand extends CommandBase {
 	        			} 
 	        			catch(NumberFormatException e) {
 	        				ChatUtil.printDebug("Failed to parse string as int: "+e.getMessage());
-	        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_LEVEL.getMessage());
+	        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 			        		return;
 	        			}
 	        			if(!getKonquest().getUpgradeManager().isEnabled()) {
@@ -357,7 +359,7 @@ public class TownAdminCommand extends CommandBase {
 	        				return;
 	        			}
 	        			if(upgradeLevel < 0 || upgradeLevel > upgrade.getMaxLevel()) {
-	        				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_LEVEL.getMessage());
+	        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 			        		return;
 	        			}
 	        			// Set town upgrade and level
@@ -367,11 +369,11 @@ public class TownAdminCommand extends CommandBase {
 	        			}
 	        			
 	        		} else {
-	        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_LEVEL.getMessage());
+	        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		        		return;
 	        		}
 	        	} else {
-	        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_NO_UPGRADE.getMessage());
+	        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 	        		return;
 	        	}
 	        	break;
@@ -408,14 +410,14 @@ public class TownAdminCommand extends CommandBase {
 									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 								} else {
 									// Shields cannot be negative
-									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_BAD_SHIELD.getMessage());
+									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 								}
 							} else if(shieldSubCmd.equalsIgnoreCase("add")) {
 								if(getKonquest().getShieldManager().shieldAdd(town, shieldVal)) {
 									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 								} else {
 									// Shields cannot be negative
-									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_BAD_SHIELD.getMessage());
+									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 								}
 							} else {
 								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -463,13 +465,13 @@ public class TownAdminCommand extends CommandBase {
 								if(getKonquest().getShieldManager().armorSet(town, armorVal)) {
 									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 								} else {
-									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_BAD_ARMOR.getMessage());
+									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 								}
 							} else if(armorSubCmd.equalsIgnoreCase("add")) {
 								if(getKonquest().getShieldManager().armorAdd(town, armorVal)) {
 									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 								} else {
-									ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_FORCETOWN_ERROR_BAD_ARMOR.getMessage());
+									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 								}
 							} else {
 								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());

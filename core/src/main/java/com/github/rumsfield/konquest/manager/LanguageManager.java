@@ -28,6 +28,7 @@ public class LanguageManager {
 			} else {
 				ChatUtil.printConsoleError("Failed to validate language messages. Correct the above issues with the language YAML file.");
 			}
+			checkMessages();
 		}
 		ChatUtil.printDebug("Language Manager is ready");
 	}
@@ -93,5 +94,26 @@ public class LanguageManager {
 			}
 		}
 		return result;
+	}
+
+	private void checkMessages() {
+		// Checks every lang YML entry for a matching enum. YML entries without an enum are printed.
+		boolean isAnyMissing = false;
+		for(String path : lang.getKeys(true)) {
+			boolean isFound = false;
+			for(MessagePath messagePath : MessagePath.values()) {
+				if(messagePath.getPath().equals(path)) {
+					isFound = true;
+					break;
+				}
+			}
+			if(!isFound) {
+				isAnyMissing = true;
+				ChatUtil.printConsoleError("Language path is orphaned: "+path);
+			}
+		}
+		if(isAnyMissing) {
+			ChatUtil.printConsoleError("Remove the above paths from the language file: "+konquest.getConfigManager().getLangName());
+		}
 	}
 }

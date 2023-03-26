@@ -21,9 +21,7 @@ public class FlagAdminCommand extends CommandBase {
 	public FlagAdminCommand(Konquest konquest, CommandSender sender, String[] args) {
         super(konquest, sender, args);
     }
-	
-	private final String flagLine = "| %-10s %-10s %s";
-	
+
 	/*
 	 * The following classes are known property holders
 	 * 	- KonKingdom (kingdom name)
@@ -72,6 +70,12 @@ public class FlagAdminCommand extends CommandBase {
     			return;
     		}
 
+			String flagLine = "| %-16s %-8s %s";
+			String header = String.format(flagLine,
+					MessagePath.COMMAND_ADMIN_FLAG_NOTICE_FLAG.getMessage(),
+					MessagePath.COMMAND_ADMIN_FLAG_NOTICE_VALUE.getMessage(),
+					MessagePath.COMMAND_ADMIN_FLAG_NOTICE_DESCRIPTION.getMessage());
+
 			// Number of arguments to list available flags of the given holder
 			int num_args_list = 3;
 			// Number of arguments to display a specific flag
@@ -90,9 +94,7 @@ public class FlagAdminCommand extends CommandBase {
         		Map<KonPropertyFlag,Boolean> holderFlags = holder.getAllProperties();
         		
         		// List all holder properties and values
-        		//TODO: Replace with message path
-        		 ChatUtil.sendNotice((Player) getSender(), "All Properties");
-        		String header = String.format(flagLine, "Flag", "Value", "Description");
+				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FLAG_NOTICE_ALL_PROPERTIES.getMessage());
                 ChatUtil.sendMessage((Player) getSender(), ChatColor.GOLD+header);
                 for(KonPropertyFlag flag : holderFlags.keySet()) {
                 	String line = String.format(flagLine, flag.getName(), holderFlags.get(flag), flag.getDescription());
@@ -116,9 +118,8 @@ public class FlagAdminCommand extends CommandBase {
             		// k admin flag <name> <flag>
             		// Display current value and description of given flag
             		boolean flagValue = holder.getPropertyValue(flagArg);
-            		String header = String.format(flagLine, "Flag", "Value", "Description");
             		String line = String.format(flagLine, flagArg.getName(), flagValue, flagArg.getDescription());
-            		ChatUtil.sendNotice((Player) getSender(), "Single Property");
+            		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SINGLE_PROPERTY.getMessage());
             		ChatUtil.sendMessage((Player) getSender(), ChatColor.GOLD+header);
             		ChatUtil.sendMessage((Player) getSender(), line);
             		
@@ -130,7 +131,7 @@ public class FlagAdminCommand extends CommandBase {
             		boolean status = holder.setPropertyValue(flagArg, bValue);
             		if(status) {
             			// Successfully assigned value
-            			ChatUtil.sendNotice((Player) getSender(), "Set property "+flagArg.getName()+" of "+holderName+" to "+bValue);
+            			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SET.getMessage(flagArg.getName(), holderName, bValue));
             		} else {
             			// Failed to assign value
             			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());

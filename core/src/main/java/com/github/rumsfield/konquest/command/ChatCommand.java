@@ -23,13 +23,7 @@ public class ChatCommand extends CommandBase {
 			return;
 		}
 		Player bukkitPlayer = (Player) getSender();
-		/*
-		World bukkitWorld = bukkitPlayer.getWorld();
 
-		if(!bukkitWorld.getName().equals(getKonquest().getWorldName())) {
-			ChatUtil.sendError((Player) getSender(), MessageStatic.INVALID_WORLD.toString());
-			return;
-		}*/
 		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to find non-existent player");
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());

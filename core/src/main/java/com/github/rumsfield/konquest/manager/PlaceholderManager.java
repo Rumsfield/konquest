@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 //TODO: Add enums for each placeholder, implement list of players per-enum with request cooldown times.
+
 // A placeholder cannot be requested until after the cooldown time, configurable duration.
 // Cooldown time applies to every placeholder.
 // Previous placeholder result is cached and returned for requests made before cooldown time ends.

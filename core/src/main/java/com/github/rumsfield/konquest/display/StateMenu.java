@@ -2,6 +2,8 @@ package com.github.rumsfield.konquest.display;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
+import com.github.rumsfield.konquest.model.KonKingdom;
+import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -9,6 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 public abstract class StateMenu {
@@ -24,6 +27,8 @@ public abstract class StateMenu {
     protected final ArrayList<DisplayMenu> pages;
     protected int currentPage;
 
+    protected final Comparator<KonTown> townComparator;
+    protected final Comparator<KonKingdom> kingdomComparator;
     protected final int MAX_ICONS_PER_PAGE 		= 45;
 
     public StateMenu(Konquest konquest, State initialState, Access initialAccess) {
@@ -33,6 +38,48 @@ public abstract class StateMenu {
         this.currentState = initialState;
         this.menuAccess = initialAccess;
         this.konquest = konquest;
+
+        this.townComparator = (townOne, townTwo) -> {
+            // sort by land, then population
+            int result = 0;
+            int g1Land = townOne.getChunkList().size();
+            int g2Land = townTwo.getChunkList().size();
+            if(g1Land < g2Land) {
+                result = 1;
+            } else if(g1Land > g2Land) {
+                result = -1;
+            } else {
+                int g1Pop = townOne.getNumResidents();
+                int g2Pop = townTwo.getNumResidents();
+                if(g1Pop < g2Pop) {
+                    result = 1;
+                } else if(g1Pop > g2Pop) {
+                    result = -1;
+                }
+            }
+            return result;
+        };
+
+        this.kingdomComparator = (kingdomOne, kingdomTwo) -> {
+            // sort by towns, then population
+            int result = 0;
+            int g1Land = kingdomOne.getNumLand();
+            int g2Land = kingdomTwo.getNumLand();
+            if(g1Land < g2Land) {
+                result = 1;
+            } else if(g1Land > g2Land) {
+                result = -1;
+            } else {
+                int g1Pop = kingdomOne.getNumMembers();
+                int g2Pop = kingdomTwo.getNumMembers();
+                if(g1Pop < g2Pop) {
+                    result = 1;
+                } else if(g1Pop > g2Pop) {
+                    result = -1;
+                }
+            }
+            return result;
+        };
     }
 
     // To be implemented by subclass.
