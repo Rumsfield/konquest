@@ -66,6 +66,7 @@ public enum CorePath {
 	
 	KINGDOMS_CAPITAL_SUFFIX                               ("core.kingdoms.capital_suffix"),
 	KINGDOMS_CAPITAL_IMMUNITY_TOWNS                       ("core.kingdoms.capital_immunity_towns"),
+	KINGDOMS_ALLY_DEFENSE_PACT                            ("core.kingdoms.ally_defense_pact"),
 	KINGDOMS_INSTANT_WAR                                  ("core.kingdoms.instant_war"),
 	KINGDOMS_INSTANT_PEACE                                ("core.kingdoms.instant_peace"),
 	KINGDOMS_ALLOW_PEACEFUL_PVP                           ("core.kingdoms.allow_peaceful_pvp"),

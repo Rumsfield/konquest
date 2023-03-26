@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.model.KonDirective;
 import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
@@ -92,7 +93,8 @@ public class KingdomCommand extends CommandBase {
 	                    		getKonquest().getDisplayManager().displayKingdomMenu(player, newKingdom, false);
 	                    		// Updates
 	                    		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
-	                    		//TODO: Add directive
+								// Update directive progress
+								getKonquest().getDirectiveManager().updateDirectiveProgress(player, KonDirective.CREATE_KINGDOM);
 	                    	} else {
 	                    		switch(status) {
 		                    		case 1:

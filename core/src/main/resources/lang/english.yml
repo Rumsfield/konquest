@@ -8,7 +8,6 @@
 version: 0.0.0
 label:
   admin-kingdom: "Admin Kingdom"
-  armistice: "Armistice"
   armor: "Armor"
   armors: "Armors"
   back: "Back"
@@ -26,13 +25,10 @@ label:
   false: "False"
   favor: "Favor"
   golem-offense: "Iron Golem Offense"
-  guild: "Guild"
   health: "Health"
-  hostile: "Hostile"
   increment-cost: "Increment Cost"
   information: "Information"
   invalid: "Invalid"
-  invites: "Invites"
   kingdom: "Kingdom"
   kingdom-role: "Kingdom Role"
   kingdoms: "Kingdoms"
@@ -67,12 +63,10 @@ label:
   population: "Population"
   properties: "Properties"
   protected: "Protected"
-  requests: "Requests"
   residencies: "Residencies"
   resident: "Resident"
   residents: "Residents"
   ruin: "Ruin"
-  ruins: "Ruins"
   sanctuary: "Sanctuary"
   score: "Score"
   shield: "Shield"
@@ -84,7 +78,6 @@ label:
   total: "Total"
   town: "Town"
   towns: "Towns"
-  treaty: "Treaty"
   true: "True"
   unavailable: "Unavailable"
   upgrades: "Upgrades"
@@ -135,7 +128,6 @@ menu:
     community: "Community"
     hint: "Click to join"
   score:
-    kingdom-score: "Kingdom Score"
     kingdom-towns: "Kingdom Towns"
     kingdom-land: "Kingdom Land"
     kingdom-favor: "Kingdom Favor"
@@ -261,7 +253,6 @@ menu:
     invites: "Invites"
     list: "List"
     relation: "Relationships"
-    diplomacy: "Diplomacy"
     requests: "Requests"
     promote: "Promote"
     demote: "Demote"
@@ -273,7 +264,6 @@ menu:
     description-invites: "View your kingdom invites"
     description-list: "View all kingdoms"
     description-relation: "Modify relationships with other kingdoms"
-    description-diplomacy: "Change kingdom diplomacy"
     description-requests: "View kingdom membership requests"
     description-promote: "Promote members to officers"
     description-demote: "Demote officers to members"
@@ -425,38 +415,12 @@ command:
         value: "Value"
         description: "Description"
         set: "Set property %s of %s to new value %s."
-    forceexile:
-      notice:
-        player: "Successfully exiled player %s to Barbarians."
-        full: "Successfully reset player %s exile kingdom to Barbarians."
-      error:
-        fail: "Could not exile player, already barbarian or bad random wild location."
-        master: "Could not exile player, they are a kingdom master. Force transfer master or remove the kingdom first."
-    forcejoin:
-      notice:
-        success: "Successfully set player %s to kingdom %s."
-    forcetown:
-      notice:
-        rename: "Successfully changed town name %s to %s."
-      error:
-        no-upgrade: "Invalid upgrade name."
-        no-level: "Invalid upgrade level."
-        bad-shield: "Shields cannot be negative."
-        bad-armor: "Armor cannot be negative."
     help:
       notice:
         message: "Admin Help: Command, Arguments, Description"
     kingdom:
       broadcast:
         create: "The Admin Kingdom of %s has been created!"
-    makekingdom:
-      notice:
-        prompt-1: "Successfully created new Kingdom Capital for %s."
-        prompt-2: "Claim additional land with \"/k admin claim\"."
-        prompt-3: "Set the capital spawn point with \"/k admin settravel\"."
-        prompt-4: "Next, set up the Monument Template with \"/k admin monument %s create\"."
-      error:
-        name: "The Kingdom name is already taken or has spaces."
     monument:
       notice:
         create-1: "Now creating new Monument Template, click on the first corner block of the region."
@@ -474,10 +438,6 @@ command:
         fail-travel: "Failed to create Monument Template %s, travel point must be inside of the region."
         fail-region: "Failed to create Monument Template %s, region corners must be within Sanctuary territory."
         fail-reset: "Failed to reset Monument Template %s, restored to previous state."
-    rename:
-      notice:
-        kingdom: "Successfully renamed Kingdom %s to %s."
-        town: "Successfully renamed Town %s to %s."
     ruin:
       notice:
         create: "Successfully created new Ruin: %s"
@@ -518,11 +478,6 @@ command:
       error:
         name: "Invalid stat %s, could not match to existing stats."
         value: "Invalid stat value: %s"
-    unclaim:
-      notice:
-        success: "Successfully removed chunk from territory %s."
-      error:
-        fail: "Failed to unclaim this chunk."
   border:
     notice:
       enable: "Displaying particle borders"
@@ -538,70 +493,14 @@ command:
       pass-auto: "Claimed"
     error:
       radius: "Radius must be greater than or equal to %s and less than or equal to %s."
-      radius-partial: "Failed to claim all land, too far from center. Claimed %s chunks of land for %s."
       missing: "Must claim near existing territory."
-      overlap: "Cannot claim over another territory."
       proximity: "Too close to another territory."
       fail-adjacent: "Failed to claim, no adjacent territory."
       fail-far: "Failed to claim, too far from territory center."
       fail-claimed: "Failed to claim, already claimed."
-  exile:
-    notice:
-      prompt-line-1: "Are you sure you want to become a Barbarian?"
-      prompt-line-2: "You will lose all Favor, stats and titles, and be sent to a random location in the wild."
-      prompt-line-3a: "Once exiled, you may join any other Kingdom."
-      prompt-line-3b: "You can only rejoin your current Kingdom, else you must ask an admin to switch Kingdoms."
-      prompt-line-4: "Use this command again to confirm."
-      confirmed: "You have been exiled as a Barbarian, place a bed to create your Camp."
-      town: "Banished from %s!"
-    error:
-      cooldown: "You must wait before becoming a barbarian: %s"
-      master: "You are a kingdom master! Transfer master or disband your kingdom first."
   favor:
     notice:
       message: "You have %s Favor, costs are..."
-  guild:
-    broadcast:
-      sanction-remove-1: "Removed sanction on %s Guild."
-      sanction-remove-2: "%s Guild has removed the sanction on your guild!"
-      sanction-add-1: "Added sanction on %s Guild."
-      sanction-add-2: "%s Guild has added a sanction on your guild!"
-      armistice-remove-1: "Broke the armistice with %s Guild."
-      armistice-remove-2: "%s Guild has broken the armistice with your guild!"
-      armistice-accept-1: "Your guild agreed to an armistice with %s Guild."
-      armistice-accept-2: "%s Guild has accepted an armistice with your guild!"
-      armistice-offer-1: "Offered an armistice with %s Guild."
-      armistice-offer-2: "%s Guild has offered an armistice with your guild!"
-      transfer: "%s is now the guild master of %s Guild."
-      promote: "%s has been promoted to guild officer of %s Guild."
-      demote: "%s has been demoted to guild member of %s Guild."
-    notice:
-      create: "Successfully created new guild, %s"
-      invite: "Invited player %s to the guild."
-      kick: "Kicked player %s from the guild."
-      rename: "Successfully changed name to %s Guild."
-      specialize: "Successfully changed %s Guild specialization to %s."
-      pay: "Received guild payment."
-      discount: "%s Guild gives you a %s percent discount with this merchant."
-      open: "%s Guild is now open to join."
-      closed: "%s Guild is now closed for invites only."
-      joined: "Joined %s Guild."
-      request-join: "Sent request to join %s Guild."
-      request-new: "New guild join request, type \"/k guild\" to review."
-      invite-new: "Received new guild invite. Type \"/k guild\" to respond to invites."
-      invite-decline: "%s Guild join invite declined."
-      leave: "Successfully left %s Guild."
-    error:
-      other-guild: "You are already in another guild."
-      no-guild: "You are not in a guild."
-      player-guild: "%s is already in another guild."
-      sanction: "%s Guild is blocking your guild from trade discounts with this merchant!"
-      leave-first: "Leave your current guild first."
-      request-sent: "You have already requested to join %s Guild."
-      join-deny: "%s Guild join request denied."
-      leave-fail: "Failed to leave. Disband or transfer guild master first."
-      add-member: "%s is already a guild member."
-      add-invite-member: "%s has already been invited to join the guild."
   help:
     notice:
       message: "Help - Command, Arguments, Description, Alias"
@@ -609,23 +508,6 @@ command:
     notice:
       kingdom-header: "Kingdom of %s"
       town-header: "Town of %s"
-  join:
-    broadcast:
-      player-join: "%s has joined Kingdom %s"
-    notice:
-      kingdom-join: "Joined Kingdom %s"
-      town-resident: "%s has joined as a resident of %s"
-      town-join-lord: "You have joined as the lord of %s"
-      town-request: "Sending a request to join %s. Wait for the Lord or Knight to add you."
-    error:
-      no-kingdoms: "There are no Kingdoms. Create one with \"/k admin makekingdom <name>\"."
-      kingdom-limit: "The Kingdom %s has too many players! Use \"/k join\" to join the smallest Kingdom."
-      kingdom-denied: "You cannot join a rival Kingdom. Ask an admin to move you."
-      kingdom-member: "You are already a member."
-      kingdom-exile: "You cannot switch Kingdoms unless you are exiled. Use \"/k exile\"."
-      kingdom-cooldown: "You must wait before joining another kingdom: %s"
-      town-member: "You are already a resident of %s"
-      town-request: "You have already requested to join %s"
   kingdom:
     broadcast:
       create: "%s has created the Kingdom of %s"
@@ -650,7 +532,7 @@ command:
       request-sent: "Sent member request to join %s."
       request-received: "New kingdom join request, type \"/k kingdom\" to review."
       request-declined: "Denied kingdom join request for player %s."
-      invite-sent: "Invited % to join the kingdom."
+      invite-sent: "Invited %s to join the kingdom."
       invite-received: "Received kingdom invite, type \"/k kingdom\" to respond."
       invite-declined: "Declined invitation to join %s."
       exile: "You are now exiled from %s as a barbarian."
@@ -682,13 +564,6 @@ command:
       merchant: "Cannot trade with merchants in the Kingdom of %s, need Trade or Allied diplomacy."
       diplomacy-exists: "A request to change diplomacy already exists."
       template-attack: "Cannot change monument template while the Kingdom Capital is under attack."
-  leave:
-    notice:
-      town-resident: "%s has left the town of %s"
-      player: "You have left the town of %s"
-      invite-decline: "You declined the invite to join %s"
-    error:
-      no-resident: "You are not a resident of %s"
   list:
     notice:
       header: "%s List"
@@ -749,11 +624,7 @@ command:
       redstone-disable: "%s now prevents enemies from using redstone switches and doors."
       golem-enable: "Iron Golems in %s will attack all enemies within town land."
       golem-disable: "Iron Golems in %s will only defend the town monument from enemies."
-      kick-remove: "Removed join invite of %s for %s."
       kick-resident: "Kicked resident %s from town %s."
-      lord-prompt-1: "Are you sure you want to give Lordship of %s?"
-      lord-prompt-2: "You will no longer own this town and be made a Knight resident."
-      lord-prompt-3: "Use this command again to confirm."
       lord-success: "Gave Lordship of %s to %s."
       lord-claim: "%s has claimed Lordship of %s!"
       knight-set: "%s has been Knighted in %s."
@@ -766,14 +637,11 @@ command:
       request-sent: "Sent resident request to join %s."
       request-received: "New town join request, type \"/k town\" to review."
       request-declined: "Denied town join request for player %s."
-      invite-sent: "Invited % to join the town of %s."
+      invite-sent: "Invited %s to join the town of %s."
       invite-received: "Received town invite, type \"/k town\" to respond."
       invite-declined: "Declined invitation to join %s."
     error:
-      open: "%s is already open for access by all players."
-      close: "%s is already closed for residents only."
       kick-fail: "%s is not a resident of %s."
-      lord-self: "You may only claim Lordship for yourself!"
       knight-resident: "Knights must be added as residents first."
       invite-member: "%s is already a town resident."
       invite-exists: "%s has already been invited to join the town."

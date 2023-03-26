@@ -217,6 +217,9 @@ core:
     # Capitals will be immune from capture while there are this many other towns in the kingdom (0 to disable, integer >= 0)
     capital_immunity_towns: 2
     
+    # Declaring war on a kingdom will also declare war on their allies (true), else only the target kingdom will be at war (false) (true/false)
+    ally_defense_pact: true
+
     # Any kingdom can start a war with another (true), else both kingdoms must agree to war (false) (true/false)
     instant_war: true
     

@@ -244,6 +244,7 @@ permissions:
     description: Gives access to all Konquest directives
     default: true
     children:
+      konquest.directive.kingdom: true
       konquest.directive.settle: true
       konquest.directive.claim: true
       konquest.directive.build: true
@@ -253,6 +254,10 @@ permissions:
       konquest.directive.attack: true
       konquest.directive.capture: true
       konquest.directive.kill: true
+
+  konquest.directive.kingdom:
+    description: Receive a reward for creating your first kingdom
+    default: true
 
   konquest.directive.settle:
     description: Receive a reward for settling your first town

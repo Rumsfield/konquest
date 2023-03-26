@@ -1696,6 +1696,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		boolean isInstantWar = konquest.getCore().getBoolean(CorePath.KINGDOMS_INSTANT_WAR.getPath(), false);
 		// Does a change from war to peace by one side instantly force the other into peace?
 		boolean isInstantPeace = konquest.getCore().getBoolean(CorePath.KINGDOMS_INSTANT_PEACE.getPath(), false);
+		// Does a declaration of war also include the target kingdom's allies?
+		boolean isDefensePact = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_DEFENSE_PACT.getPath(), false);
 
 		/* At this point, the active states are valid and the change request can be processed */
 
@@ -1779,10 +1781,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				break;
 			case WAR:
 				// Our kingdom wants to declare war
+				boolean isWarDeclared = false;
 				if(isInstantWar) {
 					// Instantly change to active enemy, force them to enemy too
 					setJointActiveRelation(kingdom,otherKingdom,relation);
 					ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_WAR.getMessage(kingdom.getName(),otherKingdom.getName()));
+					isWarDeclared = true;
 				} else {
 					// Request war
 					// Check if they already request enemy
@@ -1790,6 +1794,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						// Both sides request enemy, change to active war
 						setJointActiveRelation(kingdom,otherKingdom,relation);
 						ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_WAR.getMessage(kingdom.getName(),otherKingdom.getName()));
+						isWarDeclared = true;
 					} else {
 						// We request enemy
 						if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.WAR)) {
@@ -1798,6 +1803,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						}
 						otherKingdom.setRelationRequest(kingdom, relation);
 						broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_WAR_REQUEST.getMessage(kingdom.getName()));
+					}
+				}
+				// Check for defense pact with allies
+				if(isWarDeclared && isDefensePact) {
+					// Set war with all allies of target kingdom
+					for(KonKingdom otherAlly : otherKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.ALLIANCE)) {
+						if(!otherAlly.equals(kingdom)) {
+							// Declare war on their allies
+							setJointActiveRelation(kingdom,otherAlly,relation);
+							ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_WAR.getMessage(kingdom.getName(),otherAlly.getName()));
+						}
 					}
 				}
 				break;

@@ -869,7 +869,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					} else if(menuAccess.equals(AccessType.MASTER)) {
 						titleAccess = MessagePath.LABEL_MASTER.getMessage();
 					}
-					result = color+name+" "+MessagePath.LABEL_GUILD.getMessage()+" "+titleAccess;
+					result = color+name+" "+MessagePath.LABEL_KINGDOM.getMessage()+" "+titleAccess;
 				} else {
 					result = color+MessagePath.MENU_KINGDOM_TITLE_ROOT.getMessage();
 				}

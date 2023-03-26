@@ -22,7 +22,6 @@ public enum MessagePath {
 	LABEL_FALSE                             	(0, "label.false"),
 	LABEL_FAVOR                                 (0, "label.favor"),
 	LABEL_GOLEM_OFFENSE                         (0, "label.golem-offense"),
-	LABEL_GUILD                                 (0, "label.guild"),
 	LABEL_HEALTH                                (0, "label.health"),
 	LABEL_INCREMENT_COST                        (0, "label.increment-cost"),
 	LABEL_INFORMATION                          	(0, "label.information"),

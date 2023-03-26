@@ -403,7 +403,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 
 	private void checkCorePaths() {
-		// Checks all CorePath enums to ensure they have a valid core.yml path.
+		// Check all CorePath enums to ensure they have a valid core.yml path.
 		for(CorePath testPath : CorePath.values()) {
 			if(!getCore().contains(testPath.getPath())) {
 				ChatUtil.printConsoleError("Internal error, core path "+testPath.getPath()+" does not exist within core.yml file.");

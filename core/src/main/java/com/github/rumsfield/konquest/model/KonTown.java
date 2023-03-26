@@ -600,35 +600,51 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 
 	/**
-	 * Updates a monument, meant for changing the kingdom's monument template
+	 * Updates the monument when the kingdom changes templates
 	 */
 	public void updateMonumentFromTemplate() {
+		// Check that the template is valid
 		if(getKingdom().isMonumentTemplateValid()) {
+			// Update this town's monument travel point and height based on template
 			monument.updateFromTemplate(getKingdom().getMonumentTemplate());
+			// Force the monument to be valid
 			monument.setIsValid(true);
-			setSpawn(monument.getTravelPoint());
 		} else {
-			ChatUtil.printDebug("Failed to update monument from template for town "+getName());
+			ChatUtil.printDebug("Failed to update monument from invalid template for town "+getName());
 		}
 	}
 
 	/**
-	 * Reloads a monument from template, meant to be used when server loads the chunk, or re-generate after attack
+	 * Reloads a monument from template and pastes it into the town.
+	 * Known uses:
+	 * - World chunk load
+	 * - Post-attack regenerate
+	 * - Kingdom template change
 	 */
 	public boolean reloadMonument() {
-		boolean result = false;
-		if(monument.isValid()) {
-			result = monument.updateFromTemplate(getKingdom().getMonumentTemplate());
-			pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
-			setSpawn(monument.getTravelPoint());
-		} else {
-			ChatUtil.printDebug("Failed to reload monument from template for town "+getName());
+		if(!monument.isValid()) {
+			ChatUtil.printDebug("Failed to reload invalid monument for town "+getName());
+			return false;
 		}
-		return result;
+		if(!getKingdom().isMonumentTemplateValid()) {
+			ChatUtil.printDebug("Failed to reload monument from invalid template for town "+getName());
+			return false;
+		}
+		if(this.isAttacked) {
+			ChatUtil.printDebug("Failed to reload monument for attacked town "+getName());
+			return false;
+		}
+		// Paste the template into the town
+		pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
+		// Update this town's monument travel point and height based on template
+		monument.updateFromTemplate(getKingdom().getMonumentTemplate());
+		// Update the town spawn point
+		setSpawn(monument.getTravelPoint());
+		return true;
 	}
 	
 	/**
-	 * Updates a monument from template, meant to be used for town capture and template change
+	 * Refreshes a monument from template, meant to be used for town capture
 	 */
 	public void refreshMonument() {
 		if(monument.isValid()) {
@@ -721,8 +737,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			ChatUtil.printDebug("Monument Timer ended with taskID: "+taskID);
 			// When a monument timer ends
 			monument.clearCriticalHits();
-			reloadMonument();
 			setAttacked(false,null);
+			reloadMonument();
 			updateBar();
 			getWorld().playSound(getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)1, (float)0.8);
 			for(KonPlayer player : getKonquest().getPlayerManager().getPlayersInKingdom(getKingdom().getName())) {

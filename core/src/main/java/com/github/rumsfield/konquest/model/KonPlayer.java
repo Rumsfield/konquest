@@ -138,18 +138,6 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		return result;
 	}
 	
-	public Collection<KonDirective> getDirectives() {
-		if(directiveProgress.isEmpty()) {
-			return Collections.emptySet();
-		} else {
-			return directiveProgress.keySet();
-		}
-	}
-	
-	public void clearAllDirectives() {
-		directiveProgress.clear();
-	}
-	
 	// Getters
 	public Player getBukkitPlayer() {
 		return bukkitPlayer;
