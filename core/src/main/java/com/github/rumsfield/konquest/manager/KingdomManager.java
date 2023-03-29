@@ -82,6 +82,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private ArrayList<DiplomacyTicket> diplomacyTickets;
 
 	// Config Settings
+	private boolean isAdminOnly;
 	private long payIntervalSeconds;
 	private double payPerChunk;
 	private double payPerResident;
@@ -116,7 +117,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		this.joinPlayerCooldowns = new HashMap<>();
 		this.exilePlayerCooldowns = new HashMap<>();
 		this.diplomacyTickets = new ArrayList<>();
-		
+
+		this.isAdminOnly = false;
 		this.payIntervalSeconds = 0;
 		this.payPerChunk = 0;
 		this.payPerResident = 0;
@@ -147,6 +149,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	public void loadOptions() {
 		// Kingdom Settings
+		isAdminOnly				= konquest.getCore().getBoolean(CorePath.KINGDOMS_CREATE_ADMIN_ONLY.getPath());
 		payIntervalSeconds 		= konquest.getCore().getLong(CorePath.FAVOR_KINGDOMS_PAY_INTERVAL_SECONDS.getPath());
 		payPerChunk 			= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_CHUNK.getPath());
 		payPerResident 			= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_PAY_PER_RESIDENT.getPath());
@@ -471,6 +474,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 *         -1	- Internal error
 	 */
 	public int createKingdom(Location centerLocation, String kingdomName, String templateName, KonPlayer master, boolean isAdmin) {
+		if(isAdminOnly && !isAdmin) {
+			return -1;
+		}
+
 		/*
 		 * Criteria for creating a kingdom:
 		 * 

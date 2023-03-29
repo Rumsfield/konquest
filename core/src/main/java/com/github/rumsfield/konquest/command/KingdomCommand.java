@@ -66,6 +66,12 @@ public class KingdomCommand extends CommandBase {
 	            		break;
 	            	case "create":
 	            		// Create a new kingdom
+						// Check if players can create kingdoms from config
+						boolean isAdminOnly = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_CREATE_ADMIN_ONLY.getPath());
+						if(isAdminOnly) {
+							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+							return;
+						}
 	            		// Needs kingdom name and template name arguments
 	            		if(getArgs().length == 4) {
 	            			String newKingdomName = getArgs()[2];
