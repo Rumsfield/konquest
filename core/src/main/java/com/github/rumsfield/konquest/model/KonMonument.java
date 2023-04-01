@@ -39,7 +39,7 @@ public class KonMonument implements KonquestMonument {
 	 * 			0 = success
 	 * 			1 = invalid template
 	 * 			2 = bad chunk gradient
-	 * 			3 = bedrock placement
+	 * 			3 = bad location, on bedrock or outside gradiant
 	 */
 	public int initialize(KonMonumentTemplate template, Location centerLoc, int flatness) {
 		if(template == null) {

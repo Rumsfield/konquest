@@ -280,20 +280,22 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	/**
 	 * initClaim - initializes the Monument, pastes the template and claims chunks.
 	 * @return  0 - success
-	 * 			11 - error, monument invalid
-	 * 			12 - error, monument gradient
-	 * 			13 - error, monument bedrock
+	 * 			1 - error, monument did not paste correctly
 	 * 			2 - error, bad town height
 	 * 			3 - error, bad chunks
 	 * 			4 - error, too much air below town
 	 * 			5 - error, too much water below town
 	 * 			6 - error, containers below monument
+	 * 		    7 - error, monument template is invalid
+	 * 		  	11 - error, monument invalid
+	 * 	  		12 - error, monument gradient
+	 * 	  		13 - error, monument bad location (bedrock, outside gradient)
 	 */
 	@Override
 	public int initClaim() {
 		
 		if(!getKingdom().isMonumentTemplateValid()) {
-			return 11;
+			return 7;
 		}
 		
 		// Verify monument template and chunk gradient and initialize travelPoint and baseY coordinate

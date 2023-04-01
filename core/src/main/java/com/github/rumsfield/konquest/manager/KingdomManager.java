@@ -463,14 +463,16 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 *         6 	- Too close to another territory
 	 *         7	- Too far from other territories
 	 *         8	- Will overlap with other territories
-	 *         21 - error, town init fail, invalid monument
-	 * 		   22 - error, town init fail, bad monument gradient
-	 * 		   23 - error, town init fail, monument placed on bedrock
+	 *         11 - error, town init fail, monument paste failed
 	 *   	   12 - error, town init fail, bad town height
 	 *		   13 - error, town init fail, bad chunks
 	 * 		   14 - error, town init fail, too much air below town
 	 * 		   15 - error, town init fail, too much water below town
 	 * 		   16 - error, town init fail, containers below monument
+	 * 		   17 - error, town init fail, template is invalid
+	 * 		   21 - error, town init fail, invalid monument
+	 * 	  	   22 - error, town init fail, bad monument gradient
+	 * 	  	   23 - error, town init fail, bad monument location (bedrock, outside gradient)
 	 *         -1	- Internal error
 	 */
 	public int createKingdom(Location centerLocation, String kingdomName, String templateName, KonPlayer master, boolean isAdmin) {
@@ -570,9 +572,22 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				newKingdom.getCapital().updateBarPlayers();
 			} else {
 				// Failed to pass all init checks, remove the kingdom
+				ChatUtil.printDebug("Kingdom capital init failed, error code: "+initStatus);
 				newKingdom.removeCapital();
 				kingdomMap.remove(kingdomName);
 				newKingdom = null;
+				/*
+				 * 			1 - error, monument did not paste correctly
+				 * 			2 - error, bad town height
+	 			 * 			3 - error, bad chunks
+				 * 			4 - error, too much air below town
+	 			 * 			5 - error, too much water below town
+	 			 * 			6 - error, containers below monument
+	 			 * 		    7 - error, monument template is invalid
+				 * 		  	11 - error, monument invalid
+				 * 	  		12 - error, monument gradient
+				 * 	  		13 - error, monument bad location (bedrock, outside gradient)
+				 */
 				return 10+initStatus;
 			}
 		} else {
@@ -2320,7 +2335,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 			// Create a new town
 			int status = createTown(townLoc, oldKingdomName,townKingdom);
-			if(status != 0) {
+			if(status == 0) {
 				// Successfully created new town, update it
 				KonTown town = conquerKingdom.getTown(oldKingdomName);
 				// Add land

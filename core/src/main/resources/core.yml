@@ -396,10 +396,6 @@ core:
     - JUNGLE_LEAVES
     - OAK_LEAVES
     - SPRUCE_LEAVES
-    - GRASS_BLOCK
-    - DIRT
-    - SAND
-    - GRAVEL
     - SNOW
     
     # Enable villager trade discounts based on town specialization professions (true/false)
