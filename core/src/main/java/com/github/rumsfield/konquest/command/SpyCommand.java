@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
+import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
@@ -63,14 +64,12 @@ public class SpyCommand extends CommandBase {
 			}
 			
 			// Find the nearest enemy town
-			ArrayList<KonKingdom> enemyKingdoms = getKonquest().getKingdomManager().getKingdoms();
-			if(!enemyKingdoms.isEmpty()) {
-				enemyKingdoms.remove(player.getKingdom());
-			}
+			KonKingdom playerKingdom = player.getKingdom();
+			List<KonKingdom> enemyKingdoms = playerKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.WAR);
 			KonTerritory closestTerritory = null;
 			int minDistance = Integer.MAX_VALUE;
 			for(KonKingdom kingdom : enemyKingdoms) {
-				for(KonTown town : kingdom.getTowns()) {
+				for(KonTown town : kingdom.getCapitalTowns()) {
 					// Only find enemy towns which do not have the counter-intelligence upgrade level 1+
 					int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.COUNTER);
 					if(upgradeLevel < 1) {

@@ -27,7 +27,7 @@ public class KingdomCommand extends CommandBase {
 		if(getSender().hasPermission("konquest.command.admin") && getKonquest().getSanctuaryManager().getNumTemplates() == 0) {
 			ChatUtil.sendError((Player) getSender(),MessagePath.COMMAND_KINGDOM_ERROR_NO_TEMPLATES.getMessage());
 		}
-		// kingdom [menu|create|add|kick|rename|templates] [name] [template]
+		// kingdom [menu|create|add|kick|rename|templates] [template] [name]
 		if (getArgs().length != 1 && getArgs().length != 2 && getArgs().length != 3 && getArgs().length != 4) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		} else {
@@ -74,8 +74,8 @@ public class KingdomCommand extends CommandBase {
 						}
 	            		// Needs kingdom name and template name arguments
 	            		if(getArgs().length == 4) {
-	            			String newKingdomName = getArgs()[2];
-	            			String templateName = getArgs()[3];
+	            			String templateName = getArgs()[2];
+							String newKingdomName = getArgs()[3];
 	            			if(getKonquest().validateName(newKingdomName,bukkitPlayer) != 0) {
 	            				// Player receives error message within validateName method
 	            				return;
@@ -161,9 +161,10 @@ public class KingdomCommand extends CommandBase {
 	                    				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 	                    				break;
 	                    		}
+								ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SETTLE_NOTICE_MAP_HINT.getMessage());
 	                    	}
 	            		} else {
-							ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_KINGDOM_ERROR_MISSING_TEMPLATE.getMessage());
+							ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_MISSING_TEMPLATE.getMessage());
 	            		}
 	            		break;
 	            	case "add":
@@ -301,7 +302,10 @@ public class KingdomCommand extends CommandBase {
 			// suggest appropriate arguments
 			String subCommand = getArgs()[1];
 			String name;
-			if(subCommand.equalsIgnoreCase("create") || subCommand.equalsIgnoreCase("rename")) {
+			if(subCommand.equalsIgnoreCase("create")) {
+				List<String> templateList = new ArrayList<>(getKonquest().getSanctuaryManager().getAllValidTemplateNames());
+				tabList.addAll(templateList);
+			} else if(subCommand.equalsIgnoreCase("rename")) {
 				tabList.add("***");
 			} else if(subCommand.equalsIgnoreCase("add")) {
 				List<String> playerList = new ArrayList<>();
@@ -326,11 +330,9 @@ public class KingdomCommand extends CommandBase {
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 4) {
-			// Suggest template name when creating
 			String subCommand = getArgs()[1];
 			if(subCommand.equalsIgnoreCase("create")) {
-				List<String> templateList = new ArrayList<>(getKonquest().getSanctuaryManager().getAllValidTemplateNames());
-				tabList.addAll(templateList);
+				tabList.add("***");
 			}
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);

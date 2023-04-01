@@ -366,10 +366,10 @@ core:
     armor_add: true
     
     # Maximum shield duration in seconds that a town can have (0 to disable, integer >= 0)
-    max_shields: 432000
+    max_shields: 86400
     
     # Maximum armor amount in blocks that a town can have (0 to disable, integer >= 0)
-    max_armor: 9999
+    max_armor: 1000
     
     # Free shield duration in seconds for all newly settled towns (0 to disable, integer >= 0)
     shield_new_towns: 600

@@ -151,10 +151,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		DisplayMenu result;
 		MenuIcon icon;
 		List<String> loreList = new ArrayList<>();
-		ChatColor regularColor = ChatColor.GREEN;
-		ChatColor officerColor = ChatColor.BLUE;
-		ChatColor masterColor = ChatColor.LIGHT_PURPLE;
-		ChatColor kingdomColor = konquest.getDisplayPrimaryColor(player.getKingdom(), kingdom);
+		ChatColor kingdomColor = Konquest.friendColor1;
 		
 		int rows = 2; // default rows for regular
 		if(menuAccess.equals(AccessType.OFFICER)) {
@@ -167,13 +164,13 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		
 		/* Join Icon */
 		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_JOIN.getMessage(),loreColor));
-		icon = new InfoIcon(regularColor+MessagePath.MENU_KINGDOM_JOIN.getMessage(), loreList, Material.SADDLE, ROOT_SLOT_JOIN, true);
+		icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_JOIN.getMessage(), loreList, Material.SADDLE, ROOT_SLOT_JOIN, true);
 		result.addIcon(icon);
 		
 		/* Exile Icon */
 		loreList.clear();
 		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_EXILE.getMessage(),loreColor));
-		icon = new InfoIcon(regularColor+MessagePath.MENU_KINGDOM_EXILE.getMessage(), loreList, Material.ARROW, ROOT_SLOT_EXILE, true);
+		icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_EXILE.getMessage(), loreList, Material.ARROW, ROOT_SLOT_EXILE, true);
 		result.addIcon(icon);
 
 		/* Invites Icon */
@@ -185,31 +182,34 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			loreList.add(valueColor+""+numInvites);
 			inviteMat = Material.WRITABLE_BOOK;
 		}
-		icon = new InfoIcon(regularColor+MessagePath.MENU_KINGDOM_INVITES.getMessage(), loreList, inviteMat, ROOT_SLOT_INVITE, true);
+		icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_INVITES.getMessage(), loreList, inviteMat, ROOT_SLOT_INVITE, true);
 		result.addIcon(icon);
 		
 		/* List Icon */
 		loreList.clear();
 		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_LIST.getMessage(),loreColor));
-		icon = new InfoIcon(regularColor+MessagePath.MENU_KINGDOM_LIST.getMessage(), loreList, Material.PAPER, ROOT_SLOT_LIST, true);
+		icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_LIST.getMessage(), loreList, Material.PAPER, ROOT_SLOT_LIST, true);
 		result.addIcon(icon);
 		
 		// These icons only appear for created kingdoms
 		if(isCreatedKingdom) {
 			/* Kingdom Info Icon */
 			loreList = new ArrayList<>();
-			icon = new KingdomIcon(kingdom,kingdomColor,loreList,ROOT_SLOT_INFO,false);
+			loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_LIST.getMessage());
+			icon = new KingdomIcon(kingdom,kingdomColor,loreList,ROOT_SLOT_INFO,true);
 			result.addIcon(icon);
 
 			if(menuAccess.equals(AccessType.OFFICER) || menuAccess.equals(AccessType.MASTER)) {
 				/* Relations Icon */
 				loreList = new ArrayList<>();
+				loreList.add(propertyColor+MessagePath.LABEL_OFFICER.getMessage());
 				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_RELATION.getMessage(),loreColor));
-				icon = new InfoIcon(officerColor+MessagePath.MENU_KINGDOM_RELATION.getMessage(), loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, true);
+				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_RELATION.getMessage(), loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, true);
 				result.addIcon(icon);
 				
 				/* Requests Icon */
 				loreList.clear();
+				loreList.add(propertyColor+MessagePath.LABEL_OFFICER.getMessage());
 				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_REQUESTS.getMessage(),loreColor));
 				int numRequests = kingdom.getJoinRequests().size();
 				Material requestMat = Material.GLASS_BOTTLE;
@@ -217,50 +217,56 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					loreList.add(valueColor+""+numRequests);
 					requestMat = Material.HONEY_BOTTLE;
 				}
-				icon = new InfoIcon(officerColor+MessagePath.MENU_KINGDOM_REQUESTS.getMessage(), loreList, requestMat, ROOT_SLOT_REQUESTS, true);
+				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_REQUESTS.getMessage(), loreList, requestMat, ROOT_SLOT_REQUESTS, true);
 				result.addIcon(icon);
 			}
 			
 			if(menuAccess.equals(AccessType.MASTER)) {
 				/* Promote Icon */
 				loreList = new ArrayList<>();
+				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_PROMOTE.getMessage(),loreColor));
-				icon = new InfoIcon(masterColor+MessagePath.MENU_KINGDOM_PROMOTE.getMessage(), loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, true);
+				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_PROMOTE.getMessage(), loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, true);
 				result.addIcon(icon);
 				
 				/* Demote Icon */
 				loreList.clear();
+				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DEMOTE.getMessage(),loreColor));
-				icon = new InfoIcon(masterColor+MessagePath.MENU_KINGDOM_DEMOTE.getMessage(), loreList, Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, true);
+				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_DEMOTE.getMessage(), loreList, Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, true);
 				result.addIcon(icon);
 				
 				/* Transfer Icon */
 				if(!isServerKingdom) {
 					loreList.clear();
+					loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_TRANSFER.getMessage(),loreColor));
-					icon = new InfoIcon(masterColor+MessagePath.MENU_KINGDOM_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, true);
+					icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, true);
 					result.addIcon(icon);
 				}
 				
 				/* Open/Close Button */
 				String currentValue = DisplayManager.boolean2Lang(kingdom.isOpen())+" "+DisplayManager.boolean2Symbol(kingdom.isOpen());
 				loreList.clear();
+				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 		    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
 		    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-				icon = new InfoIcon(masterColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.IRON_DOOR, ROOT_SLOT_OPEN, true);
+				icon = new InfoIcon(kingdomColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.IRON_DOOR, ROOT_SLOT_OPEN, true);
 				result.addIcon(icon);
 				
 				/* Template Icon */
 				loreList.clear();
+				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_TEMPLATE.getMessage(),loreColor));
 				loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+kingdom.getMonumentTemplateName()));
-				icon = new InfoIcon(masterColor+MessagePath.MENU_KINGDOM_TEMPLATE.getMessage(), loreList, Material.ANVIL, ROOT_SLOT_TEMPLATE, true);
+				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_TEMPLATE.getMessage(), loreList, Material.ANVIL, ROOT_SLOT_TEMPLATE, true);
 				result.addIcon(icon);
 				
 				/* Disband Icon */
 				loreList.clear();
+				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DISBAND.getMessage(),loreColor));
-				icon = new InfoIcon(masterColor+MessagePath.MENU_KINGDOM_DISBAND.getMessage(), loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
+				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_DISBAND.getMessage(), loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
 				result.addIcon(icon);
 			}
 		}
@@ -524,32 +530,27 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					}
 				}
 				// Context-specific lore + click conditions
-				boolean isKingdomClickable = true;
 				switch(context) {
 					case A_JOIN:
 						// Check if the player can join the current kingdom
-						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom)) {
-							if(currentKingdom.isOpen()) {
-								loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_JOIN_NOW.getMessage());
-							} else {
-								loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_JOIN.getMessage());
-							}
-						} else {
+						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0) {
 							// The kingdom is unavailable to join at this time
 							loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
-							isKingdomClickable = false;
+						}
+						if(currentKingdom.isOpen()) {
+							loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_JOIN_NOW.getMessage());
+						} else {
+							loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_JOIN.getMessage());
 						}
 						break;
 					case A_INVITE:
 						// Check if the player can join the current kingdom
-						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom)) {
-							loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_ACCEPT.getMessage());
-							loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_DECLINE.getMessage());
-						} else {
+						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0) {
 							// The kingdom is unavailable to join at this time
 							loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
-							isKingdomClickable = false;
 						}
+						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_ACCEPT.getMessage());
+						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_DECLINE.getMessage());
 						break;
 					case A_LIST:
 						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_LIST.getMessage());
@@ -560,7 +561,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					default:
 						break;
 				}
-				KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,contextColor,loreList,slotIndex,(isClickable && isKingdomClickable));
+				KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,contextColor,loreList,slotIndex,isClickable);
 		    	pages.get(pageNum).addIcon(kingdomIcon);
 				slotIndex++;
 			}
@@ -695,6 +696,10 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 							Konquest.playFailSound(player.getBukkitPlayer());
 						}
 						
+					}  else if(slot == ROOT_SLOT_INFO) {
+						// Open the kingdom info menu
+						konquest.getDisplayManager().displayKingdomInfoMenu(player, kingdom);
+
 					} else if(slot == ROOT_SLOT_INVITE) {
 						// Clicked to view invites
 						currentState = MenuState.A_INVITE;
@@ -847,6 +852,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						KonMonumentTemplate template = icon.getTemplate();
 						boolean status = manager.menuChangeKingdomTemplate(kingdom, template, player, isAdmin);
 						playStatusSound(player.getBukkitPlayer(),status);
+						result = goToTemplateView();
 					}
 					break;
 				case C_DISBAND:
@@ -875,19 +881,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		}
 		switch(context) {
 			case ROOT:
-				if(isCreatedKingdom) {
-					String titleAccess = "";
-					if(menuAccess.equals(AccessType.REGULAR)) {
-						titleAccess = MessagePath.LABEL_MEMBER.getMessage();
-					} else if(menuAccess.equals(AccessType.OFFICER)) {
-						titleAccess = MessagePath.LABEL_OFFICER.getMessage();
-					} else if(menuAccess.equals(AccessType.MASTER)) {
-						titleAccess = MessagePath.LABEL_MASTER.getMessage();
-					}
-					result = color+name+" "+MessagePath.LABEL_KINGDOM.getMessage()+" "+titleAccess;
-				} else {
-					result = color+MessagePath.MENU_KINGDOM_TITLE_ROOT.getMessage();
-				}
+				result = color+name+" "+MessagePath.MENU_KINGDOM_TITLE_ROOT.getMessage();
 				break;
 			case A_JOIN:
 				result = color+MessagePath.MENU_KINGDOM_TITLE_JOIN.getMessage();

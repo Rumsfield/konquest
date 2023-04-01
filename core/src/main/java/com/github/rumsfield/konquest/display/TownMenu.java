@@ -64,7 +64,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
         MenuIcon icon;
         List<String> loreList = new ArrayList<>();
 
-        ChatColor kingdomColor = konquest.getFriendlyPrimaryColor();
+        ChatColor kingdomColor = Konquest.friendColor1;
 
         final int rows = 1;
 
@@ -125,7 +125,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
         // Determine list of towns given context
         if(context.equals(MenuState.JOIN)) {
             // List of all valid towns able to join (sends request)
-            for(KonTown town : kingdom.getTowns()) {
+            for(KonTown town : kingdom.getCapitalTowns()) {
                 if(!town.isPlayerResident(player.getOfflineBukkitPlayer())) {
                     towns.add(town);
                 }
@@ -133,7 +133,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
             isClickable = true;
         } else if(context.equals(MenuState.LEAVE)) {
             // List of towns that the player can leave
-            for(KonTown town : kingdom.getTowns()) {
+            for(KonTown town : kingdom.getCapitalTowns()) {
                 if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
                     towns.add(town);
                 }
@@ -141,8 +141,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
             isClickable = true;
         } else if(context.equals(MenuState.LIST)) {
             // List of all towns
-            towns.add(kingdom.getCapital());
-            towns.addAll(kingdom.getTowns());
+            towns.addAll(kingdom.getCapitalTowns());
             isClickable = true;
         } else if(context.equals(MenuState.INVITES)) {
             // Towns that have invited the player to join as a resident

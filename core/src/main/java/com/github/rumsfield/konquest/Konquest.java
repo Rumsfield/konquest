@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.event.KonquestEvent;
+import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
 import com.github.rumsfield.konquest.api.model.KonquestTerritory;
@@ -828,14 +829,11 @@ public class Konquest implements KonquestAPI, Timeable {
 						isWorldValid(player.getBukkitPlayer().getWorld()) &&
 						player.getBukkitPlayer().getInventory().contains(Material.COMPASS)) {
 					// Find nearest enemy town
-	    			ArrayList<KonKingdom> enemyKingdoms = kingdomManager.getKingdoms();
-	    			if(!enemyKingdoms.isEmpty()) {
-	    				enemyKingdoms.remove(player.getKingdom());
-	    			}
+	    			List<KonKingdom> enemyKingdoms = player.getKingdom().getActiveRelationKingdoms(KonquestDiplomacyType.WAR);
 	    			KonTerritory nearestTerritory = null;
 	    			int minDistance = Integer.MAX_VALUE;
 	    			for(KonKingdom kingdom : enemyKingdoms) {
-	    				for(KonTown town : kingdom.getTowns()) {
+	    				for(KonTown town : kingdom.getCapitalTowns()) {
 	    					// Only find enemy towns which do not have the counter-intelligence upgrade level 2+
 	    					int upgradeLevel = upgradeManager.getTownUpgradeLevel(town, KonUpgrade.COUNTER);
 	    					if(upgradeLevel < 2) {

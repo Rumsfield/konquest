@@ -49,11 +49,15 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 
 		OfflinePlayer masterPlayer = infoKingdom.getPlayerMaster();
  		List<OfflinePlayer> allKingdomMembers = new ArrayList<>();
-		if(masterPlayer != null) {
-			allKingdomMembers.add(masterPlayer);
+		if(infoKingdom.isCreated()) {
+			if(masterPlayer != null) {
+				allKingdomMembers.add(masterPlayer);
+			}
+			allKingdomMembers.addAll(infoKingdom.getPlayerOfficersOnly());
+			allKingdomMembers.addAll(infoKingdom.getPlayerMembersOnly());
+		} else {
+			allKingdomMembers.addAll(getKonquest().getPlayerManager().getAllBukkitPlayersInKingdom(infoKingdom));
 		}
- 		allKingdomMembers.addAll(infoKingdom.getPlayerOfficersOnly());
- 		allKingdomMembers.addAll(infoKingdom.getPlayerMembersOnly());
 
  		// Page 0
 		pageLabel = titleColor+MessagePath.COMMAND_INFO_NOTICE_KINGDOM_HEADER.getMessage(infoKingdom.getName());
@@ -124,10 +128,10 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
 			numKingdomFavor += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
 		}
-		int numKingdomTowns = infoKingdom.getCapitalTowns().size();
+		int numKingdomTowns = infoKingdom.getTowns().size();
 		int numKingdomLand = 0;
 		for(KonTown town : infoKingdom.getCapitalTowns()) {
-			numKingdomLand += town.getChunkList().size();
+			numKingdomLand += town.getNumLand();
 		}
 		loreList = new ArrayList<>();
 		loreList.add(loreColor+MessagePath.LABEL_FAVOR.getMessage()+": "+valueColor+numKingdomFavor);
