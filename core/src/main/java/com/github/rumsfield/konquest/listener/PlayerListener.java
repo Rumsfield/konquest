@@ -3,12 +3,12 @@ package com.github.rumsfield.konquest.listener;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.territory.KonquestTerritoryMoveEvent;
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.manager.CampManager;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.manager.TerritoryManager;
-import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.model.KonPlayer.FollowType;
 import com.github.rumsfield.konquest.model.KonPlayer.RegionType;
@@ -25,7 +25,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
@@ -523,17 +522,17 @@ public class PlayerListener implements Listener {
 	        		// Town protections...
 	        		if(territory instanceof KonTown) {
 	        			KonTown town = (KonTown) territory;
-	        			RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+						KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
 	        			// Target player who interacts with monument blocks
 	        			if(town.isLocInsideMonumentProtectionArea(event.getClickedBlock().getLocation())) {
 	        				town.targetRabbitToPlayer(bukkitPlayer);
 	        			}
 	        			// Prevent enemies from interacting with things like buttons, levers, pressure plates...
-	        			if(!playerRole.equals(RelationRole.FRIENDLY) && !town.isEnemyRedstoneAllowed()) {
+	        			if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) && !town.isEnemyRedstoneAllowed()) {
 	        				preventUse(event,player);
 	    				}
 	        			// Prevent enemies and non-residents from interacting with item frames
-	        			if(!playerRole.equals(RelationRole.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+	        			if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
 	        				Material clickedMat = event.getClickedBlock().getType();
 	        				if(clickedMat.equals(Material.ITEM_FRAME)) {
 	        					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -612,9 +611,9 @@ public class PlayerListener implements Listener {
         	// Town protections...
     		if(territory instanceof KonTown && !isEntityAllowed) {
     			KonTown town = (KonTown) territory;
-    			RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+				KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
     			// Prevent enemies and non-residents from interacting with entities
-    			if(!playerRole.equals(RelationRole.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+    			if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
     				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
     				event.setCancelled(true);
 				}

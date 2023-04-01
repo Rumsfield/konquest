@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.manager;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.territory.KonquestTerritoryChunkEvent;
+import com.github.rumsfield.konquest.api.manager.KonquestTerritoryManager;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
@@ -21,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.*;
 
-public class TerritoryManager {
+public class TerritoryManager implements KonquestTerritoryManager {
 
 	private final Konquest konquest;
 	private final HashMap<World,KonTerritoryCache> territoryWorldCache;
@@ -1364,6 +1365,20 @@ public class TerritoryManager {
     		}
     		ChatUtil.sendMessage(bukkitPlayer, mapLine.toString());
     	}
+	}
+
+	/**
+	 * Protection Methods
+	 */
+
+	public boolean canPlayerBreakBlocks(Player player, Location loc) {
+
+		return true;
+	}
+
+	public boolean canPlayerPlaceBlocks(Player player, Location loc) {
+
+		return true;
 	}
 	
 }

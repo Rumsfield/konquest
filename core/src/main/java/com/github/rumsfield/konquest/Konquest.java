@@ -2,14 +2,10 @@ package com.github.rumsfield.konquest;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.event.KonquestEvent;
-import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
-import com.github.rumsfield.konquest.api.model.KonquestKingdom;
-import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
-import com.github.rumsfield.konquest.api.model.KonquestTerritory;
+import com.github.rumsfield.konquest.api.model.*;
 import com.github.rumsfield.konquest.command.CommandHandler;
 import com.github.rumsfield.konquest.database.DatabaseThread;
 import com.github.rumsfield.konquest.manager.*;
-import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
 import com.github.rumsfield.konquest.manager.TravelManager.TravelDestination;
 import com.github.rumsfield.konquest.map.MapHandler;
 import com.github.rumsfield.konquest.model.*;
@@ -469,13 +465,13 @@ public class Konquest implements KonquestAPI, Timeable {
 	    		// Player joined located within a Town/Capital
 	    		KonTown town = (KonTown) loginTerritory;
 	    		// For enemy players, apply effects
-	    		RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), loginTerritory.getKingdom());
-	    		if(playerRole.equals(RelationRole.FRIENDLY)) {
+	    		KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), loginTerritory.getKingdom());
+	    		if(playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
 	    			kingdomManager.applyTownHearts(player, town);
 	    		} else {
 	    			kingdomManager.clearTownHearts(player);
 	    		}
-	    		if(playerRole.equals(RelationRole.ENEMY)) {
+	    		if(playerRole.equals(KonquestRelationshipType.ENEMY)) {
 	    			kingdomManager.applyTownNerf(player, town);
 	    		} else {
 	    			kingdomManager.clearTownNerf(player);
@@ -1180,7 +1176,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		Team onlinePacketTeam;
     	for(KonPlayer onlinePlayer : playerManager.getPlayersOnline()) {
     		// Place online player in appropriate list w.r.t. player
-			RelationRole otherPlayerRole = kingdomManager.getRelationRole(player.getKingdom(),onlinePlayer.getKingdom());
+			KonquestRelationshipType otherPlayerRole = kingdomManager.getRelationRole(player.getKingdom(),onlinePlayer.getKingdom());
 			switch(otherPlayerRole) {
 				case BARBARIAN:
 					barbarianNames.add(onlinePlayer.getBukkitPlayer().getName());
@@ -1203,7 +1199,7 @@ public class Konquest implements KonquestAPI, Timeable {
 					break;
 			}
     		// Determine appropriate team for player w.r.t. online player
-			RelationRole thisPlayerRole = kingdomManager.getRelationRole(onlinePlayer.getKingdom(),player.getKingdom());
+			KonquestRelationshipType thisPlayerRole = kingdomManager.getRelationRole(onlinePlayer.getKingdom(),player.getKingdom());
 			switch(thisPlayerRole) {
 				case BARBARIAN:
 					onlinePacketTeam = barbarianTeam;
@@ -1364,7 +1360,7 @@ public class Konquest implements KonquestAPI, Timeable {
 
     public ChatColor getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
     	ChatColor result = neutralColor1;
-    	RelationRole role = kingdomManager.getRelationRole(displayKingdom,contextKingdom);
+		KonquestRelationshipType role = kingdomManager.getRelationRole(displayKingdom,contextKingdom);
     	switch(role) {
 	    	case BARBARIAN:
 	    		result = barbarianColor1;
@@ -1403,7 +1399,7 @@ public class Konquest implements KonquestAPI, Timeable {
     
     public ChatColor getDisplaySecondaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
     	ChatColor result = neutralColor2;
-    	RelationRole role = kingdomManager.getRelationRole(displayKingdom,contextKingdom);
+		KonquestRelationshipType role = kingdomManager.getRelationRole(displayKingdom,contextKingdom);
     	switch(role) {
 	    	case BARBARIAN:
 	    		result = barbarianColor2;

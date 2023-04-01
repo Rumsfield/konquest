@@ -3,8 +3,8 @@ package com.github.rumsfield.konquest.manager;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.manager.KonquestPlaceholderManager;
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
@@ -300,7 +300,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
 			KonKingdom kingdomOne = onlinePlayerOne.getKingdom();
 			KonKingdom kingdomTwo = onlinePlayerTwo.getKingdom();
-			RelationRole role = kingdomManager.getRelationRole(kingdomOne, kingdomTwo);
+			KonquestRelationshipType role = kingdomManager.getRelationRole(kingdomOne, kingdomTwo);
 			switch(role) {
 		    	case BARBARIAN:
 		    		result = MessagePath.PLACEHOLDER_BARBARIAN.getMessage();

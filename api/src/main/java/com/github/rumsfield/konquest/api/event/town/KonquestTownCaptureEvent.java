@@ -12,6 +12,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
  * <p>
  * Players capture towns for their kingdoms when they destroy the final critical block in the town monument.
  * When a town is captured, it transfers ownership to the attacking player's kingdom.
+ * If the town is a capital, then the old kingdom will be removed, and the capital will be converted into a town for the new kingdom.
  * Canceling this event will prevent the town from being captured, but the final critical block will still be broken.
  * </p>
  * 
@@ -29,6 +30,7 @@ public class KonquestTownCaptureEvent extends KonquestTownEvent implements Cance
 	
 	private final KonquestPlayer player;
 	private final KonquestKingdom newKingdom;
+	private final boolean isCapital;
 	
 	/**
 	 * Default constructor
@@ -36,12 +38,14 @@ public class KonquestTownCaptureEvent extends KonquestTownEvent implements Cance
 	 * @param town The town
 	 * @param player The player
 	 * @param newKingdom The town's new kingdom
+	 * @param isCapital Whether the town was a capital
 	 */
-	public KonquestTownCaptureEvent(KonquestAPI konquest, KonquestTown town, KonquestPlayer player, KonquestKingdom newKingdom) {
+	public KonquestTownCaptureEvent(KonquestAPI konquest, KonquestTown town, KonquestPlayer player, KonquestKingdom newKingdom, boolean isCapital) {
 		super(konquest, town);
 		this.isCancelled = false;
 		this.player = player;
 		this.newKingdom = newKingdom;
+		this.isCapital = isCapital;
 	}
 	
 	/**
@@ -60,6 +64,15 @@ public class KonquestTownCaptureEvent extends KonquestTownEvent implements Cance
 	 */
 	public KonquestKingdom getNewKingdom() {
 		return newKingdom;
+	}
+
+	/**
+	 * Checks whether the town is a capital of the old kingdom.
+	 *
+	 * @return Whether the town is a capital
+	 */
+	public boolean isCapital() {
+		return isCapital;
 	}
 	
 	@Override

@@ -1,10 +1,10 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
 import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
-import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
 import com.github.rumsfield.konquest.utility.Timer;
 import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.*;
@@ -799,7 +799,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
 			Player bukkitPlayer = player.getBukkitPlayer();
 			if(isLocInside(bukkitPlayer.getLocation())) {
-				RelationRole role = getKonquest().getKingdomManager().getRelationRole(player.getKingdom(),getKingdom());
+				KonquestRelationshipType role = getKonquest().getKingdomManager().getRelationRole(player.getKingdom(),getKingdom());
 				switch(role) {
 			    	case ENEMY:
 						monumentBarWar.addPlayer(bukkitPlayer);
@@ -824,7 +824,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public void addBarPlayer(KonPlayer player) {
-		RelationRole role = getKonquest().getKingdomManager().getRelationRole(player.getKingdom(),getKingdom());
+		KonquestRelationshipType role = getKonquest().getKingdomManager().getRelationRole(player.getKingdom(),getKingdom());
 		switch(role) {
 	    	case ENEMY:
 	    		monumentBarWar.addPlayer(player.getBukkitPlayer());

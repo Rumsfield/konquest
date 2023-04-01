@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestSanctuary;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.utility.*;
 import com.github.rumsfield.konquest.utility.Timer;
@@ -15,7 +16,7 @@ import org.bukkit.entity.Player;
 import java.awt.*;
 import java.util.*;
 
-public class KonSanctuary extends KonTerritory implements KonBarDisplayer, KonPropertyFlagHolder, Timeable {
+public class KonSanctuary extends KonTerritory implements KonquestSanctuary, KonBarDisplayer, KonPropertyFlagHolder, Timeable {
 
 	private final BossBar sanctuaryBarAll;
 	private final Map<KonPropertyFlag,Boolean> properties;

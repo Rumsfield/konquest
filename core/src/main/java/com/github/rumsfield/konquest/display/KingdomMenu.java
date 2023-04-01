@@ -365,7 +365,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		int index = 0;
 		List<String> loreList;
 
-		KonquestDiplomacyType currentDiplomacy = manager.getDiplomaticState(kingdom,diplomacyKingdom);
+		KonquestDiplomacyType currentDiplomacy = manager.getDiplomacy(kingdom,diplomacyKingdom);
 		
 		// Create kingdom info
 		ChatColor contextColor = konquest.getDisplayPrimaryColor(kingdom, diplomacyKingdom);
@@ -516,7 +516,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				ChatColor contextColor = konquest.getDisplayPrimaryColor(kingdom, currentKingdom);
 				loreList = new ArrayList<>();
 				if(isCreatedKingdom) {
-					String diplomacyState = Labeler.lookup(manager.getDiplomaticState(kingdom,currentKingdom));
+					String diplomacyState = Labeler.lookup(manager.getDiplomacy(kingdom,currentKingdom));
 					loreList.add(loreColor+MessagePath.LABEL_DIPLOMACY.getMessage()+": "+valueColor+diplomacyState);
 					if(kingdom.hasRelationRequest(currentKingdom)) {
 						// They have sent a valid diplomacy change request to us

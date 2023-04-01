@@ -37,34 +37,6 @@ import java.util.*;
 // - TownManager: All town query, actions, memberships, etc
 // - DiplomacyManager: All kingdom relationships, diplomacy actions
 public class KingdomManager implements KonquestKingdomManager, Timeable {
-
-	/**
-	 * KingdomManager.RelationRole
-	 * These are all possible relationship states between kingdoms/towns/players.
-	 */
-	public enum RelationRole {
-		/* Player/territory is barbarian */
-		BARBARIAN,
-		
-		/* Territory has no kingdom (ruin, sanctuary, etc) */
-		NEUTRAL,
-		
-		/* Player/territory are in the same kingdom */
-		FRIENDLY,
-		
-		/* Player/territory are in kingdoms at war */
-		ENEMY,
-
-		/* Player/territory are in kingdoms at peace */
-		PEACEFUL,
-
-		/* Player/territory are in trading kingdoms */
-		TRADE,
-
-		/* Player/territory are in allied kingdoms */
-		ALLY
-
-	}
 	
 	private final Konquest konquest;
 	private final HashMap<String, KonKingdom> kingdomMap;
@@ -439,15 +411,15 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 */
 	
 	/**
-	 * Creates a new kingdom.<br>
-	 * The new kingdom must perform checks for creating the capital, similar to a new town.<br>
-	 * The isAdmin argument controls whether the kingdom is admin operated (true) or player operated (false).<br>
-	 * When the kingdom is player operated:<br>
-	 * The player must be a barbarian, and is made the master of the kingdom;<br>
-	 * The player must pay favor to create the kingdom.<br>
-	 * The player is made the kingdom master, and lord of the capital.<br>
-	 * When the kingdom is admin operated:<br>
-	 * There is no cost to create, and there is no kingdom master.<br>
+	 * Creates a new kingdom.
+	 * The new kingdom must perform checks for creating the capital, similar to a new town.
+	 * The isAdmin argument controls whether the kingdom is admin operated (true) or player operated (false).
+	 * When the kingdom is player operated:
+	 * The player must be a barbarian, and is made the master of the kingdom;
+	 * The player must pay favor to create the kingdom.
+	 * The player is made the kingdom master, and lord of the capital.
+	 * When the kingdom is admin operated:
+	 * There is no cost to create, and there is no kingdom master.
 	 * 
 	 * @param centerLocation - The center location of the kingdom, used for capital
 	 * @param kingdomName - Kingdom name
@@ -1986,7 +1958,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @param kingdom2 The target kingdom
 	 * @return The diplomatic type
 	 */
-	public KonquestDiplomacyType getDiplomaticState(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
+	public KonquestDiplomacyType getDiplomacy(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
 		// Default kingdoms are always at war (barbarian & neutral)
 		if(!kingdom1.isCreated() || !kingdom2.isCreated()) {
 			return KonquestDiplomacyType.WAR;
@@ -2008,47 +1980,47 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 
 	public boolean isKingdomWar(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
-		return getDiplomaticState(kingdom1, kingdom2).equals(KonquestDiplomacyType.WAR);
+		return getDiplomacy(kingdom1, kingdom2).equals(KonquestDiplomacyType.WAR);
 	}
 
 	public boolean isKingdomPeace(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
-		return getDiplomaticState(kingdom1, kingdom2).equals(KonquestDiplomacyType.PEACE);
+		return getDiplomacy(kingdom1, kingdom2).equals(KonquestDiplomacyType.PEACE);
 	}
 
 	public boolean isKingdomTrade(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
-		return getDiplomaticState(kingdom1, kingdom2).equals(KonquestDiplomacyType.TRADE);
+		return getDiplomacy(kingdom1, kingdom2).equals(KonquestDiplomacyType.TRADE);
 	}
 
 	public boolean isKingdomAlliance(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
-		return getDiplomaticState(kingdom1, kingdom2).equals(KonquestDiplomacyType.ALLIANCE);
+		return getDiplomacy(kingdom1, kingdom2).equals(KonquestDiplomacyType.ALLIANCE);
 	}
 	
-	public RelationRole getRelationRole(@Nullable KonquestKingdom displayKingdom, @Nullable KonquestKingdom contextKingdom) {
+	public KonquestRelationshipType getRelationRole(@Nullable KonquestKingdom displayKingdom, @Nullable KonquestKingdom contextKingdom) {
     	if(displayKingdom == null || contextKingdom == null) {
     		ChatUtil.printDebug("Failed to evaluate relation of null kingdom");
-    		return RelationRole.NEUTRAL;
+    		return KonquestRelationshipType.NEUTRAL;
     	}
-		RelationRole result;
+		KonquestRelationshipType result;
     	if(contextKingdom.equals(getBarbarians())) {
-    		result = RelationRole.BARBARIAN;
+    		result = KonquestRelationshipType.BARBARIAN;
 		} else if(contextKingdom.equals(getNeutrals())) {
-    		result = RelationRole.NEUTRAL;
+    		result = KonquestRelationshipType.NEUTRAL;
 		} else {
 			if(displayKingdom.equals(contextKingdom)) {
-				result = RelationRole.FRIENDLY;
+				result = KonquestRelationshipType.FRIENDLY;
     		} else if (displayKingdom.equals(getBarbarians())) {
-    			result = RelationRole.ENEMY;
+    			result = KonquestRelationshipType.ENEMY;
     		} else {
     			if(isKingdomWar(displayKingdom, contextKingdom)) {
-    				result = RelationRole.ENEMY;
+    				result = KonquestRelationshipType.ENEMY;
 				} else if(isKingdomAlliance(displayKingdom, contextKingdom)) {
-					result = RelationRole.ALLY;
+					result = KonquestRelationshipType.ALLY;
 				} else if(isKingdomTrade(displayKingdom, contextKingdom)) {
-					result = RelationRole.TRADE;
+					result = KonquestRelationshipType.TRADE;
 				} else if(isKingdomPeace(displayKingdom, contextKingdom)) {
-					result = RelationRole.PEACEFUL;
+					result = KonquestRelationshipType.PEACEFUL;
 				} else {
-					result = RelationRole.NEUTRAL;
+					result = KonquestRelationshipType.NEUTRAL;
 				}
     		}
 		}
@@ -2056,27 +2028,27 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     }
 
     public boolean isPlayerEnemy(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
-    	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.ENEMY);
+    	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(KonquestRelationshipType.ENEMY);
     }
 
 	public boolean isPlayerAlly(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
-		return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.ALLY);
+		return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(KonquestRelationshipType.ALLY);
 	}
     
     public boolean isPlayerFriendly(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
-    	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.FRIENDLY);
+    	return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(KonquestRelationshipType.FRIENDLY);
     }
 
 	public boolean isPlayerTrade(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
-		return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.TRADE);
+		return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(KonquestRelationshipType.TRADE);
 	}
 
 	public boolean isPlayerPeace(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
-		return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.PEACEFUL);
+		return getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(KonquestRelationshipType.PEACEFUL);
 	}
 
 	public boolean isPlayerForeign(@NotNull KonOfflinePlayer offlinePlayer,@NotNull KonKingdom kingdom) {
-		return !getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(RelationRole.FRIENDLY);
+		return !getRelationRole(offlinePlayer.getKingdom(),kingdom).equals(KonquestRelationshipType.FRIENDLY);
 	}
 
 	public boolean isKingdomBarbarian(@NotNull KonKingdom kingdom) {
@@ -2107,14 +2079,16 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * 			5 - error, bad town placement, invalid world
 	 * 			6 - error, bad town placement, too close
 	 * 			7 - error, bad town placement, too far
-	 * 		   21 - error, town init fail, invalid monument
-	 * 		   22 - error, town init fail, bad monument gradient
-	 * 		   23 - error, town init fail, monument placed on bedrock
+	 * 		   11 - error, town init fail, bad monument paste
 	 *   	   12 - error, town init fail, bad town height
 	 *		   13 - error, town init fail, bad chunks
 	 * 		   14 - error, town init fail, too much air below town
 	 * 		   15 - error, town init fail, too much water below town
 	 * 		   16 - error, town init fail, containers below monument
+	 * 		   17 - error, town init fail, invalid monument template
+	 * 		   21 - error, town init fail, invalid monument
+	 * 		   22 - error, town init fail, bad monument gradient
+	 * 		   23 - error, town init fail, monument bad location (bedrock, outside gradient)
 	 */
 	public int createTown(@NotNull Location loc, String name, String kingdomName) {
 		ChatUtil.printDebug("Attempting to add new town "+name+" for kingdom "+kingdomName);

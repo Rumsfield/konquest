@@ -3,12 +3,12 @@ package com.github.rumsfield.konquest.listener;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerCombatTagEvent;
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.manager.TerritoryManager;
-import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
 import com.github.rumsfield.konquest.model.KonDirective;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonPropertyFlag;
@@ -289,8 +289,8 @@ public class EntityListener implements Listener {
 			if(event.getCause().equals(EntityPotionEffectEvent.Cause.MILK) && territoryManager.isChunkClaimed(eventLoc)) {
 				KonTerritory territory = territoryManager.getChunkTerritory(eventLoc);
 				KonPlayer player = konquest.getPlayerManager().getPlayer((Player)event.getEntity());
-				RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
-				if(playerRole.equals(RelationRole.ENEMY) && kingdomManager.isTownNerf(event.getModifiedType())) {
+				KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+				if(playerRole.equals(KonquestRelationshipType.ENEMY) && kingdomManager.isTownNerf(event.getModifiedType())) {
 					ChatUtil.printDebug("Cancelling milk bucket removal of town nerfs for player "+player.getBukkitPlayer().getName()+" in territory "+territory.getName());
 					event.setCancelled(true);
 				}
@@ -443,11 +443,11 @@ public class EntityListener implements Listener {
         	// Town protections
         	if(territory instanceof KonTown) {
     			KonTown town = (KonTown) territory;
-    			RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+				KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
     			//ChatUtil.printDebug("EVENT player entity interaction within town "+town.getName());
     			
     			// Preventions for non-friendlies and non-residents
-    			if(!playerRole.equals(RelationRole.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+    			if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
     				// Cannot damage item frames
     				if(eType.equals(EntityType.ITEM_FRAME)) {
     					event.setCancelled(true);
@@ -455,7 +455,7 @@ public class EntityListener implements Listener {
     				}
     			}
     			// Preventions for non-residents only
-    			if(playerRole.equals(RelationRole.FRIENDLY) && !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+    			if(playerRole.equals(KonquestRelationshipType.FRIENDLY) && !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
     				// Cannot damage farm animals, ever!
     				if(event.getEntity() instanceof Animals || event.getEntity() instanceof Villager) {
     					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(town.getName()));
@@ -464,7 +464,7 @@ public class EntityListener implements Listener {
     				}
     			}
     			// Preventions for non-friendlies
-    			if(!playerRole.equals(RelationRole.FRIENDLY)) {
+    			if(!playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
     				// Check for farm animal or villager damage
     				if(event.getEntity() instanceof Animals || event.getEntity() instanceof Villager) {
     					// Cannot kill mobs within offline kingdom's town
@@ -483,7 +483,7 @@ public class EntityListener implements Listener {
 							}
 						}
 						// If the player is not enemy with the town, prevent event
-						if(!playerRole.equals(RelationRole.ENEMY)) {
+						if(!playerRole.equals(KonquestRelationshipType.ENEMY)) {
 							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 							event.setCancelled(true);
 							return;
@@ -504,13 +504,13 @@ public class EntityListener implements Listener {
     			}
     			// Prevent friendlies from hurting iron golems
     			boolean isFriendlyGolemAttack = konquest.getCore().getBoolean(CorePath.KINGDOMS_ATTACK_FRIENDLY_GOLEMS.getPath());
-    			if(!isFriendlyGolemAttack && !playerRole.equals(RelationRole.ENEMY) && eType.equals(EntityType.IRON_GOLEM)) {
+    			if(!isFriendlyGolemAttack && !playerRole.equals(KonquestRelationshipType.ENEMY) && eType.equals(EntityType.IRON_GOLEM)) {
     				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_GOLEM.getMessage(town.getName()));
 					event.setCancelled(true);
 					return;
     			}
     			// Force iron golems to target enemies
-    			if(playerRole.equals(RelationRole.ENEMY) && eType.equals(EntityType.IRON_GOLEM)) {
+    			if(playerRole.equals(KonquestRelationshipType.ENEMY) && eType.equals(EntityType.IRON_GOLEM)) {
     				IronGolem golem = (IronGolem)event.getEntity();
     				// Check if Iron Golem dies from damage
     				if(golem.getHealth() - event.getFinalDamage() > 0) {
@@ -620,11 +620,11 @@ public class EntityListener implements Listener {
             // Prevent optional damage based on relations
 			// Kingdoms at peace may allow pvp. Kingdoms in alliance or trade cannot pvp.
             boolean isPeaceDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_PEACEFUL_PVP.getPath(), false);
-            RelationRole attackerRole = kingdomManager.getRelationRole(attackerPlayer.getKingdom(), victimPlayer.getKingdom());
-            if(attackerRole.equals(RelationRole.FRIENDLY) ||
-            		attackerRole.equals(RelationRole.ALLY) ||
-					attackerRole.equals(RelationRole.TRADE) ||
-            		(attackerRole.equals(RelationRole.PEACEFUL) && (!isPeaceDamageEnabled || isVictimInsideFriendlyTerritory))) {
+			KonquestRelationshipType attackerRole = kingdomManager.getRelationRole(attackerPlayer.getKingdom(), victimPlayer.getKingdom());
+            if(attackerRole.equals(KonquestRelationshipType.FRIENDLY) ||
+            		attackerRole.equals(KonquestRelationshipType.ALLY) ||
+					attackerRole.equals(KonquestRelationshipType.TRADE) ||
+            		(attackerRole.equals(KonquestRelationshipType.PEACEFUL) && (!isPeaceDamageEnabled || isVictimInsideFriendlyTerritory))) {
             	ChatUtil.sendKonPriorityTitle(attackerPlayer, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 				event.setCancelled(true);
 				return;

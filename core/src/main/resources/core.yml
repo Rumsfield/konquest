@@ -595,7 +595,10 @@ core:
 
     # //// CORE.FAVOR.REWARDS \\\\
     rewards:
-    
+
+      # Quest reward for creating a kingdom, requires konquest.directive.kingdom permission (integer >= 0)
+      create_kingdom: 50
+
       # Quest reward for settling a town, requires konquest.directive.settle permission (integer >= 0)
       settle_town: 50
       

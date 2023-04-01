@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.api.model;
 
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Villager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -207,5 +208,13 @@ public interface KonquestTown extends KonquestTerritory {
 	 * @return The list of plots
 	 */
 	List<? extends KonquestPlot> getPlots();
+
+	/**
+	 * Gets the town villager profession specialization.
+	 * Villagers inside of this town with the resulting profession may give trade discounts.
+	 *
+	 * @return The villager profession
+	 */
+	Villager.Profession getSpecialization();
 
 }

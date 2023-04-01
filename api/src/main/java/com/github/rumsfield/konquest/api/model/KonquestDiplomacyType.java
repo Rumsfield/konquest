@@ -23,7 +23,7 @@ public enum KonquestDiplomacyType {
      */
     TRADE			    (Material.GOLD_BLOCK),
     /**
-     * Allied kingdoms can travel to each other's towns and share a defense pact.
+     * Allied kingdoms can travel to each other's towns and may share a defense pact.
      */
     ALLIANCE			(Material.DIAMOND_BLOCK);
 

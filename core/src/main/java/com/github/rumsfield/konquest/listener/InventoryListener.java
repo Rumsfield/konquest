@@ -2,8 +2,8 @@ package com.github.rumsfield.konquest.listener;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.manager.KingdomManager;
-import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
 import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
@@ -79,7 +79,7 @@ public class InventoryListener implements Listener {
 						}
 					}
 				}
-				RelationRole territoryRole = kingdomManager.getRelationRole(territory.getKingdom(), player.getKingdom());
+				KonquestRelationshipType territoryRole = kingdomManager.getRelationRole(territory.getKingdom(), player.getKingdom());
 				// Town restrictions for inventories
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
@@ -87,7 +87,7 @@ public class InventoryListener implements Listener {
 					if(isMerchant) {
 						// Inventory is a Villager merchant
 						// Only friendly, trade and ally players can use merchants
-						boolean isMerchantAllowed = territoryRole.equals(RelationRole.FRIENDLY) || territoryRole.equals(RelationRole.TRADE) || territoryRole.equals(RelationRole.ALLY);
+						boolean isMerchantAllowed = territoryRole.equals(KonquestRelationshipType.FRIENDLY) || territoryRole.equals(KonquestRelationshipType.TRADE) || territoryRole.equals(KonquestRelationshipType.ALLY);
 						// Prevent opening by enemy and sanction kingdom members
 						if(!isMerchantAllowed) {
 							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_MERCHANT.getMessage(town.getKingdom().getName()));
@@ -101,7 +101,7 @@ public class InventoryListener implements Listener {
 
 						// Prevent inventory openings by non-friendlies
 						boolean isEnemyInventoryOpenDenied = konquest.getCore().getBoolean(CorePath.KINGDOMS_PROTECT_CONTAINERS_USE.getPath());
-						if(isEnemyInventoryOpenDenied && !territoryRole.equals(RelationRole.FRIENDLY)) {
+						if(isEnemyInventoryOpenDenied && !territoryRole.equals(KonquestRelationshipType.FRIENDLY)) {
 							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 							event.setCancelled(true);
 							return;

@@ -44,6 +44,15 @@ public interface KonquestKingdom {
 	boolean isCreated();
 
 	/**
+	 * Get whether the kingdom is operated by admins.
+	 * Admin kingdoms cannot have player masters or officers, where player-operated kingdoms can.
+	 * Admin kingdoms are created using admin commands.
+	 *
+	 * @return True if admin operated, else false
+	 */
+	boolean isAdminOperated();
+
+	/**
 	 * Get the active diplomatic relationship of this kingdom to the given kingdom.
 	 *
 	 * @param kingdom The other kingdom to compare

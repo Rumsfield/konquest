@@ -1,9 +1,6 @@
 package com.github.rumsfield.konquest.api.manager;
 
-import com.github.rumsfield.konquest.api.model.KonquestKingdom;
-import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
-import com.github.rumsfield.konquest.api.model.KonquestPlayer;
-import com.github.rumsfield.konquest.api.model.KonquestTown;
+import com.github.rumsfield.konquest.api.model.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -47,8 +44,10 @@ public interface KonquestKingdomManager {
 	 *  			<br>3 	- missing permission
 	 *  			<br>4 	- cancelled
 	 *  			<br>5 	- joining is denied, player is already member
-	 *  			<br>6	- joining is denied, failed switch criteria
-	 *  			<br>7 	- Unknown player ID
+	 *  		    <br>6 	- joining is denied, player is a kingdom master
+	 *  			<br>7	- joining is denied, failed switch criteria
+	 *  		    <br>8	- joining is denied, cool-down
+	 *  			<br>9 	- Unknown player ID
 	 *             <br>-1 	- internal error
 	 */
     int assignPlayerKingdom(UUID id, String kingdomName, boolean force);
@@ -69,8 +68,6 @@ public interface KonquestKingdomManager {
 	 * @return status
 	 * 				<br>0	- success
 	 * 				<br>1	- Player is already a barbarian
-	 * 				<br>2	- Invalid world
-	 * 				<br>3	- Failed to find valid teleport location
 	 * 				<br>4	- cancelled by event
 	 * 				<br>6	- Exile denied, player is a kingdom master
 	 * 				<br>8   - Cool-down remaining
@@ -90,17 +87,20 @@ public interface KonquestKingdomManager {
 	 * @return  Status code
 	 * 			<br>0 - success
 	 * 			<br>1 - error, initial territory chunks conflict with another territory
-	 * 			<br>3 - error, bad name
+	 * 			<br>3 - error, invalid name
 	 * 			<br>4 - error, invalid monument template
 	 * 			<br>5 - error, bad town placement, invalid world
 	 * 			<br>6 - error, bad town placement, too close to another territory
 	 * 			<br>7 - error, bad town placement, too far from other territories
 	 *  	   <br>12 - error, town init fail, bad town height
-	 *  	   <br>13 - error, town init fail, too much air
-	 *  	   <br>14 - error, town init fail, bad chunks
+	 *  	   <br>13 - error, town init fail, could not add land chunks
+	 *  	   <br>14 - error, town init fail, too much air below town
+	 *  	   <br>15 - error, town init fail, too much water below town
+	 *  	   <br>16 - error, town init fail, containers below monument
+	 *  	   <br>17 - error, town init fail, invalid monument template
      * 		   <br>21 - error, town init fail, invalid monument
-	 * 		   <br>22 - error, town init fail, bad monument gradient
-	 * 		   <br>23 - error, town init fail, monument placed on bedrock
+	 * 		   <br>22 - error, town init fail, land height gradient is too high
+	 * 		   <br>23 - error, town init fail, location is on bedrock or outside of gradient range
 	 */
     int createTown(Location loc, String name, String kingdomName);
 	
@@ -229,5 +229,25 @@ public interface KonquestKingdomManager {
 	 * @return The number of maximum critical hits
 	 */
     int getMaxCriticalHits();
+
+	/**
+	 * Get the shared diplomatic type of two kingdoms.
+	 * Performs error checking to ensure both kingdoms have the same active relation.
+	 * If there is a mismatch, they are reset to default (peace).
+	 *
+	 * @param kingdom1 The reference kingdom
+	 * @param kingdom2 The target kingdom
+	 * @return The diplomatic type
+	 */
+	KonquestDiplomacyType getDiplomacy(KonquestKingdom kingdom1, KonquestKingdom kingdom2);
+
+	/**
+	 * Get the relationship type of two kingdoms.
+	 *
+	 * @param kingdom1 The reference kingdom
+	 * @param kingdom2 The target kingdom
+	 * @return The relationship type
+	 */
+	KonquestRelationshipType getRelationRole(KonquestKingdom kingdom1, KonquestKingdom kingdom2);
 	
 }

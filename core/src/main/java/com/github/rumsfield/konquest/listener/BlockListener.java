@@ -9,10 +9,10 @@ import com.github.rumsfield.konquest.api.event.ruin.KonquestRuinCaptureEvent;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownAttackEvent;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownCaptureEvent;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownDestroyEvent;
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.manager.CampManager;
 import com.github.rumsfield.konquest.manager.KingdomManager;
-import com.github.rumsfield.konquest.manager.KingdomManager.RelationRole;
 import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.manager.TerritoryManager;
 import com.github.rumsfield.konquest.model.*;
@@ -122,17 +122,17 @@ public class BlockListener implements Listener {
 
 					KonTown town = (KonTown) territory;
 					// Check player's relationship to this town
-					RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
+					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
 					
 					// Stop all block edits in center chunk by non-enemies
-					if(!playerRole.equals(RelationRole.ENEMY) && town.isLocInsideMonumentProtectionArea(breakLoc)) {
+					if(!playerRole.equals(KonquestRelationshipType.ENEMY) && town.isLocInsideMonumentProtectionArea(breakLoc)) {
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
 						return;
 					}
 					
 					// Checks for friendly players
-					if(playerRole.equals(RelationRole.FRIENDLY)) {
+					if(playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
 						/*
 						Open:
 							all players can edit blocks outside of plots
@@ -208,7 +208,7 @@ public class BlockListener implements Listener {
 							return;
 						}
 						// Check for enemy player
-						if(playerRole.equals(RelationRole.ENEMY)) {
+						if(playerRole.equals(KonquestRelationshipType.ENEMY)) {
 							// The player is an enemy and may edit blocks
 							// Check for capital capture conditions
 							if(isCapital && territory.getKingdom().isCapitalImmune()) {
@@ -548,7 +548,7 @@ public class BlockListener implements Listener {
 					assert territory instanceof KonTown;
 					KonTown town = (KonTown) territory;
 					// Check player's relationship to this town
-					RelationRole playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
+					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
 					
 					// Stop all block edits in center chunk
 					if(town.isLocInsideMonumentProtectionArea(placeLoc)) {
@@ -558,7 +558,7 @@ public class BlockListener implements Listener {
 					}
 					
 					// Checks for friendly players
-					if(playerRole.equals(RelationRole.FRIENDLY)) {
+					if(playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
 						// Notify player when there is no lord
 						if(town.canClaimLordship(player)) {
 							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName()));
@@ -624,7 +624,7 @@ public class BlockListener implements Listener {
 							return;
 						}
 						// Check for enemy player
-						if(playerRole.equals(RelationRole.ENEMY)) {
+						if(playerRole.equals(KonquestRelationshipType.ENEMY)) {
 							// The player is an enemy and may edit blocks
 							// Verify town can be captured
 							if(town.isCaptureDisabled()) {
@@ -1347,7 +1347,7 @@ public class BlockListener implements Listener {
 				// Stop the town monument timer
 			} else {
 				// Fire event
-				KonquestTownCaptureEvent invokeEvent = new KonquestTownCaptureEvent(konquest, town, player, player.getKingdom());
+				KonquestTownCaptureEvent invokeEvent = new KonquestTownCaptureEvent(konquest, town, player, player.getKingdom(), isCapital);
 				Konquest.callKonquestEvent(invokeEvent);
 				if(invokeEvent.isCancelled()) {
 					return;

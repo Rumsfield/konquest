@@ -7,6 +7,6 @@ package com.github.rumsfield.konquest.api.model;
  * @author Rumsfield
  *
  */
-public interface KonquestCapital extends KonquestTerritory {
+public interface KonquestCapital extends KonquestTown {
 
 }
