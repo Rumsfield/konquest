@@ -49,18 +49,18 @@ public interface KonquestAPI {
 	ChatColor getEnemySecondaryColor();
 	
 	/**
-	 * Gets the sanctioned primary color, from core.yml.
+	 * Gets the trade primary color, from core.yml.
 	 * 
-	 * @return The sanctioned primary color
+	 * @return The trade primary color
 	 */
-	ChatColor getSanctionedPrimaryColor();
+	ChatColor getTradePrimaryColor();
 
 	/**
-	 * Gets the sanctioned secondary color, from core.yml.
+	 * Gets the trade secondary color, from core.yml.
 	 *
-	 * @return The sanctioned secondary color
+	 * @return The trade secondary color
 	 */
-	ChatColor getSanctionedSecondaryColor();
+	ChatColor getTradeSecondaryColor();
 
 	/**
 	 * Gets the peaceful primary color, from core.yml.
@@ -154,6 +154,13 @@ public interface KonquestAPI {
 	 * @return The kingdom manager
 	 */
 	KonquestKingdomManager getKingdomManager();
+
+	/**
+	 * Gets the territory manager, for all things land/territory related.
+	 *
+	 * @return The territory manager
+	 */
+	KonquestTerritoryManager getTerritoryManager();
 	
 	/**
 	 * Gets the camp manager, for all things camp related.

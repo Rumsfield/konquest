@@ -513,11 +513,11 @@ public class Konquest implements KonquestAPI, Timeable {
 		return enemyColor2;
 	}
 	
-	public ChatColor getSanctionedPrimaryColor() {
+	public ChatColor getTradePrimaryColor() {
 		return tradeColor1;
 	}
 
-	public ChatColor getSanctionedSecondaryColor() {
+	public ChatColor getTradeSecondaryColor() {
 		return tradeColor2;
 	}
 
