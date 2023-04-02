@@ -21,7 +21,9 @@
 # calculated by the weight of the individual entry divided by the sum of all weights. For example, in this default
 # table, GOLD_INGOT has a weight of 4, and the sum of all weights is 150, so the percent probability of GOLD_INGOT
 # is (4/150) * 100 = 2.67%. Entries with larger weights are more likely to be chosen as loot.
-# 
+#
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
 loot:
   items:
     GOLD_INGOT:

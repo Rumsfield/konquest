@@ -127,13 +127,11 @@ public class KonConfig {
 			// Update config version to current plugin version
 			if(fileVersion.equals("0.0.0")) {
 				// The config is a default resource, update 0.0.0 to plugin version
-				if(config.contains("version")) {
-					config.set("version", pluginVersion);
-					try {
-				        config.save(file);
-				    } catch (IOException exception) {
-				    	exception.printStackTrace();
-				    }
+				config.set("version", pluginVersion);
+				try {
+					config.save(file);
+				} catch (IOException exception) {
+					exception.printStackTrace();
 				}
 				ChatUtil.printConsoleAlert("Created default config file \""+fileName+"\" for version "+pluginVersion);
 			} else {

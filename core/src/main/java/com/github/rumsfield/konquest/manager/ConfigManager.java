@@ -1,9 +1,12 @@
 package com.github.rumsfield.konquest.manager;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.model.KonConfig;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.Version;
+import com.github.rumsfield.konquest.utility.ZipUtility;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -12,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ConfigManager{
@@ -26,19 +30,29 @@ public class ConfigManager{
         this.configCache = new HashMap<>();
         this.language = "english";
 	}
-        
+
+	/**
+	 * Loads all config and data files.
+	 * Handles migrations and updates from older versions.
+	 * When an older version has incompatible data files, zip up the plugins/Konquest folder
+	 * as an archive and proceed with plugin startup.
+	 */
 	public void initialize() {
 		// Config Settings - unsaved
 		addConfig("core", new KonConfig("core",false));
+		checkIncompatibleUpdate();
 		updateConfigVersion("core");
 		addConfig("upgrades", new KonConfig("upgrades",false));
 		updateConfigVersion("upgrades");
 		addConfig("properties", new KonConfig("properties",false));
 		updateConfigVersion("properties");
 		addConfig("shields", new KonConfig("shields",false));
+		updateConfigVersion("shields");
 		addConfig("loot", new KonConfig("loot",false));
+		updateConfigVersion("loot");
 		addConfig("prefix", new KonConfig("prefix",false));
-		
+		updateConfigVersion("prefix");
+
 		// Data Storage
 		migrateConfigFile("kingdoms.yml","data/kingdoms.yml");
 		migrateConfigFile("camps.yml","data/camps.yml");
@@ -176,6 +190,53 @@ public class ConfigManager{
 			ChatUtil.printConsoleError("The Konquest core.yml config file may be corrupted. Try renaming or deleting the file, then restart the server.");
 		}
 		return result;
+	}
+
+	/**
+	 * Known incompatible version boundaries:
+	 * 	0.11.0
+	 */
+	private void checkIncompatibleUpdate() {
+		// Get the core config and check for incompatible version changes
+		ArrayList<Version> versionBoundaries = new ArrayList<>();
+		versionBoundaries.add(new Version("0.11.0"));
+
+		KonquestPlugin plugin = Konquest.getInstance().getPlugin();
+		FileConfiguration core = configCache.get("core").getConfig();
+		String fileVersionStr = core.getString("version","0.0.0");
+		String pluginVersionStr = plugin.getDescription().getVersion();
+		Version coreVersion = new Version(fileVersionStr);
+		Version pluginVersion = new Version(pluginVersionStr);
+
+		for (Version boundary : versionBoundaries) {
+			if(coreVersion.compareTo(boundary) < 0 && pluginVersion.compareTo(boundary) >= 0) {
+				// Core config file version is earlier than a boundary version.
+				// Print messages and archive the Konquest folder.
+				ChatUtil.printConsoleError("/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\");
+				ChatUtil.printConsoleError("Updating from Konquest version "+fileVersionStr+" to version "+pluginVersionStr+" is not supported!");
+				ChatUtil.printConsoleError("Not all plugin data (towns, players, etc) is guaranteed to transfer to the new version.");
+				ChatUtil.printConsoleError("The original plugin data folder will be archived to Konquest_"+fileVersionStr+".zip.");
+				ChatUtil.printConsoleError("---> Recommended to delete the Konquest folder and restart the server. <---");
+				ChatUtil.printConsoleError("/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\");
+				// Archive to zip
+				String destFolder = plugin.getDataFolder().getParent();
+				String destName = plugin.getDataFolder().getName()+"_"+fileVersionStr+".zip";
+				String archiveName = destFolder + File.pathSeparator + destName;
+				ChatUtil.printConsole("Archive is: "+archiveName);
+				ArrayList<File> zipSources = new ArrayList<>();
+				zipSources.add(plugin.getDataFolder());
+				ZipUtility zipUtil = new ZipUtility();
+				try {
+					zipUtil.zip(zipSources, archiveName);
+				} catch (Exception ex) {
+					// some errors occurred
+					ChatUtil.printConsoleError("Failed to archive Konquest plugin folder.");
+					ex.printStackTrace();
+				}
+				// Exit the checking loop
+				break;
+			}
+		}
 	}
 
 }

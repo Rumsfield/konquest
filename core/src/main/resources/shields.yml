@@ -20,7 +20,9 @@
 # Names can have spaces. Costs must be greater than or equal to zero.
 # Lines that begin with "#" (like this one) are comments, and do not change any settings.
 # Use a YAML parser to make sure this file is correctly formatted with no errors, like https://yaml-online-parser.appspot.com/
-# 
+#
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
 shields:
   Short:
     charge: 1800
