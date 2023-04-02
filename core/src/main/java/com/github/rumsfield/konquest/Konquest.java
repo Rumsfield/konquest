@@ -245,6 +245,10 @@ public class Konquest implements KonquestAPI, Timeable {
 	    		case "v1_19_R2":
 	    			versionHandler = new Handler_1_19_R2();
 	    			break;
+				case "v1_19_R3":
+					//TODO Make a new handler, but 1_19_R2 probably will work fine
+					versionHandler = new Handler_1_19_R2();
+					break;
 	    		default:
 	    			ChatUtil.printConsoleError("This version of Minecraft is not supported by Konquest!");
 	    			break;
