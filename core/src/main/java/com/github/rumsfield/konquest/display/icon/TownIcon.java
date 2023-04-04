@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -49,6 +50,10 @@ public class TownIcon implements MenuIcon {
 		assert meta != null;
 		// Add applicable labels
 		List<String> loreList = new ArrayList<>();
+		if(town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) &&
+				town.getKingdom().isCapitalImmune()) {
+			loreList.add(alertColor+MessagePath.LABEL_IMMUNITY.getMessage());
+		}
 		if(!town.isLordValid()) {
 			loreList.add(alertColor+MessagePath.LABEL_NO_LORD.getMessage());
 		}

@@ -121,11 +121,12 @@ public class KonConfig {
 	        return false;
 	    }
 		boolean result = false;
+		boolean hasVersion = config.contains("version");
 		String fileVersion = config.getString("version","0.0.0");
 		String pluginVersion = plugin.getDescription().getVersion();
 		if(!fileVersion.equalsIgnoreCase(pluginVersion)) {
 			// Update config version to current plugin version
-			if(fileVersion.equals("0.0.0")) {
+			if(hasVersion && fileVersion.equals("0.0.0")) {
 				// The config is a default resource, update 0.0.0 to plugin version
 				config.set("version", pluginVersion);
 				try {

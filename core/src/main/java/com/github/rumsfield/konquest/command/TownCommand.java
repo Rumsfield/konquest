@@ -35,7 +35,7 @@ public class TownCommand extends CommandBase {
 		// Open a specific town management menu
 		// /k town <town>
 
-		// k town [<town>] [menu|add|kick|lord|rename] [<name>]
+		// k town [<town>] [menu|invite|kick|lord|rename] [<name>]
 		if (getArgs().length < 1 || getArgs().length > 4) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 			return;
@@ -65,7 +65,7 @@ public class TownCommand extends CommandBase {
 			} else if (isCapital) {
 				town = player.getKingdom().getCapital();
 			} else {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage());
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(townName));
 				return;
 			}
 		}
@@ -118,7 +118,7 @@ public class TownCommand extends CommandBase {
 				getKonquest().getDisplayManager().displayTownManagementMenu(player, town, false);
 				break;
 
-			case "add":
+			case "invite":
 				if(getArgs().length == 4) {
 					// Get invite player from name
 					String playerName = getArgs()[3];
@@ -211,7 +211,7 @@ public class TownCommand extends CommandBase {
 
 	@Override
 	public List<String> tabComplete() {
-		// k town [<town>] [menu|add|kick|lord|rename] [<name>]
+		// k town [<town>] [menu|invite|kick|lord|rename] [<name>]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		Player bukkitPlayer = (Player) getSender();
@@ -229,7 +229,7 @@ public class TownCommand extends CommandBase {
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length == 3) {
 			// suggest sub-commands
-			tabList.add("add");
+			tabList.add("invite");
 			tabList.add("kick");
 			tabList.add("lord");
 			tabList.add("rename");
@@ -241,7 +241,7 @@ public class TownCommand extends CommandBase {
 			// suggest appropriate arguments
 			String subCommand = getArgs()[2];
 			String name;
-			if(subCommand.equalsIgnoreCase("add") || subCommand.equalsIgnoreCase("kick")) {
+			if(subCommand.equalsIgnoreCase("invite") || subCommand.equalsIgnoreCase("kick")) {
 				List<String> playerList = new ArrayList<>();
 				for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllPlayersInKingdom(player.getKingdom())) {
 					name = offlinePlayer.getOfflineBukkitPlayer().getName();
