@@ -43,13 +43,13 @@ public class LanguageManager {
 		if(lang.contains(path)) {
 			int formats = messagePath.getFormats();
 			if(formats != args.length) {
-				ChatUtil.printConsoleError("Language file message format mismatch. Expected "+formats+" '%s', got "+args.length+" for path "+path);
+				ChatUtil.printConsoleError("Internal language path mismatch, expected "+formats+" '%s', got "+args.length+" for path "+path+". Report this to the plugin author!");
 			}
 			if(args.length > 0) {
 				try {
 					result = String.format(lang.getString(messagePath.getPath()), args);
 				} catch(IllegalFormatException e) {
-					ChatUtil.printConsoleError("Language file has bad message format for path "+path+": "+e.getMessage());
+					ChatUtil.printConsoleError("Language file expects "+formats+" '%s' for path "+path+": "+e.getMessage());
 					result = lang.getString(messagePath.getPath());
 				}
 			} else {
@@ -104,6 +104,7 @@ public class LanguageManager {
 				boolean isFound = false;
 				for(MessagePath messagePath : MessagePath.values()) {
 					if(messagePath.getPath().equals(path)) {
+						// Found a matching enum.
 						isFound = true;
 						break;
 					}

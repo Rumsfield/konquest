@@ -379,6 +379,8 @@ protection:
     conquer-discord: "The Town of %s has been conquered by %s!"
     capture: "You have conquered %s for the conquest of %s!"
     kingdom-warmup: "The Kingdom of %s will be protected in %s minutes."
+    kingdom-conquer: "The Kingdom of %s has been conquered by %s!"
+    kingdom-raze: "The Kingdom of %s has been destroyed by the Barbarian horde!"
     ruin: "You have captured the Ruin %s."
     safe: "The Town of %s is safe, for now..."
     attacked: "Under Attack"
@@ -529,7 +531,6 @@ command:
       promote: "%s has been promoted to Kingdom Officer of %s."
       demote: "%s has been demoted to Kingdom Member of %s."
       disband: "The Kingdom of %s has been disbanded!"
-      conquer: "The Kingdom of %s has been conquered by %s!"
     notice:
       request-sent: "Sent member request to join %s."
       request-received: "New kingdom join request, type \"/k kingdom\" to review."
@@ -545,6 +546,7 @@ command:
       closed: "Kingdom is now closed for invites only."
       template: "Updated the Kingdom Monument Template to %s."
       pay: "Received kingdom payment."
+      diplomacy-sent: "Sent diplomacy request to the Kingdom of %s."
     error:
       no-templates: "There are no monument templates. Create one in a sanctuary with \"k admin monument\""
       barbarian-create: "You must be a barbarian to create a kingdom. Use the Exile option in the kingdom menu."

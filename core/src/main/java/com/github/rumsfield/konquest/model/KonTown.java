@@ -789,6 +789,14 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public Timer getRaidAlertTimer() {
 		return raidAlertTimer;
 	}
+
+	public void stopTimers() {
+		monumentTimer.stopTimer();
+		captureTimer.stopTimer();
+		raidAlertTimer.stopTimer();
+		shieldTimer.stopTimer();
+		playerTravelTimers.clear();
+	}
 	
 	public void updateBarPlayers() {
 		monumentBarFriendlies.removeAll();

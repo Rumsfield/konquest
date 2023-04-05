@@ -959,8 +959,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         	if(!force) {
         		applyPlayerJoinCooldown(onlinePlayer.getBukkitPlayer());
         	}
-			// Broadcast
-			ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_JOIN.getMessage(onlinePlayer.getBukkitPlayer().getName(),joinKingdom.getName()));
     	} else {
     		offlinePlayer.setKingdom(joinKingdom);
     		offlinePlayer.setExileKingdom(joinKingdom);
@@ -1021,6 +1019,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(isPlayerBarbarian || !oldKingdom.isCreated()) {
     		return 1;
     	}
+		String oldKingdomName = oldKingdom.getName();
 		// These checks are bypassed when forced
 		if(!force) {
 			// Check for player that's already a kingdom master
@@ -1135,7 +1134,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		if(!force) {
     			applyPlayerExileCooldown(onlinePlayer.getBukkitPlayer());
     		}
-			ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_EXILE.getMessage());
+			ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_EXILE.getMessage(oldKingdomName));
     	} else {
     		offlinePlayer.setKingdom(getBarbarians());
     		offlinePlayer.setExileKingdom(exileKingdom);
@@ -1207,12 +1206,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			// There is already a valid invite, assign the player to the kingdom
 			int status = assignPlayerKingdom(id,kingdom.getName(),false);
 			kingdom.removeJoinRequest(id);
-			// Join broadcast is sent within assignPlayerKingdom, when successful
 			if(status != 0) {
 				// Any errors here should have already been caught by the pre-check above
 				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 				return false;
 			}
+			// Broadcast successful join
+			ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_JOIN.getMessage(player.getBukkitPlayer().getName(),kingdom.getName()));
 		} else if(!kingdom.isJoinRequestValid(id)){
 			// Request to join if not already requested
 			kingdom.addJoinRequest(id, false);
@@ -1288,6 +1288,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 			return false;
 		}
+		// Broadcast successful join
+		ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_JOIN.getMessage(requester.getName(),kingdom.getName()));
 		return true;
 	}
 	
@@ -1344,6 +1346,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				}
 				return false;
 			}
+			// Broadcast successful join
+			ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_JOIN.getMessage(invitee.getName(),kingdom.getName()));
 		} else if(!kingdom.isJoinInviteValid(id)) {
 			// Invite to join if not already invited
 			kingdom.addJoinRequest(id, true);
@@ -1409,6 +1413,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 			return false;
 		}
+		// Broadcast successful join
+		ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_JOIN.getMessage(player.getBukkitPlayer().getName(),kingdom.getName()));
 		return true;
 	}
 	
@@ -1780,6 +1786,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 								return false;
 							}
 							otherKingdom.setRelationRequest(kingdom,relation);
+							ChatUtil.sendNotice(bukkitPlayer,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
 							broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_PEACE_REQUEST.getMessage(kingdom.getName()));
 						}
 					}
@@ -1811,6 +1818,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 							return false;
 						}
 						otherKingdom.setRelationRequest(kingdom,relation);
+						ChatUtil.sendNotice(bukkitPlayer,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
 						broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_TRADE_REQUEST.getMessage(kingdom.getName()));
 					}
 				} else if(ourActiveState.equals(KonquestDiplomacyType.ALLIANCE)) {
@@ -1832,6 +1840,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						return false;
 					}
 					otherKingdom.setRelationRequest(kingdom,relation);
+					ChatUtil.sendNotice(bukkitPlayer,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
 					broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_ALLY_REQUEST.getMessage(kingdom.getName()));
 				}
 				break;
@@ -1858,6 +1867,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 							return false;
 						}
 						otherKingdom.setRelationRequest(kingdom, relation);
+						ChatUtil.sendNotice(bukkitPlayer,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
 						broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_WAR_REQUEST.getMessage(kingdom.getName()));
 					}
 				}
@@ -2184,10 +2194,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		ArrayList<Point> townPoints = new ArrayList<>(town.getChunkList().keySet());
 		clearAllTownNerfs(town);
 		clearAllTownHearts(town);
-		town.removeAllBarPlayers();
 		if(!kingdom.removeTown(name)) return false;
 		// When a town is removed successfully, update the chunk cache
-		//updateTerritoryCache();
 		konquest.getTerritoryManager().removeAllTerritory(town.getWorld(),townPoints);
 		konquest.getMapHandler().drawDynmapRemoveTerritory(town);
 		konquest.getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
@@ -2346,7 +2354,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				konquest.getMapHandler().drawDynmapUpdateTerritory(town);
 				konquest.getMapHandler().drawDynmapLabel(conquerKingdom.getCapital());
 				konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(town.getChunkList().keySet(),town.getWorld());
-				ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_CONQUER.getMessage(oldKingdomName,conquerKingdom.getName()));
 				return town;
 			} else {
 				ChatUtil.printDebug("Failed to create new town over captured capital, status code "+status);

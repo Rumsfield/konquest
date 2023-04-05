@@ -1295,6 +1295,7 @@ public class BlockListener implements Listener {
 				}
 				// Destroy the town when the enemy is a barbarian
 				String townName = town.getName();
+				String kingdomName = town.getKingdom().getName();
 				ArrayList<KonPlayer> monumentPlayers = new ArrayList<>();
 				ArrayList<KonPlayer> townLocPlayers = new ArrayList<>();
 				for(KonPlayer onlinePlayer : playerManager.getPlayersOnline()) {
@@ -1310,7 +1311,6 @@ public class BlockListener implements Listener {
 				int z = town.getCenterLoc().getBlockZ();
 				//Timer townMonumentTimer = town.getMonumentTimer();
 				Location townCenterLoc = town.getCenterLoc();
-				
 				boolean result = false;
 				if(isCapital) {
 					// Destroy the kingdom
@@ -1328,6 +1328,11 @@ public class BlockListener implements Listener {
 				
 				if(result) {
 					// Town is removed, no longer exists
+					if(isCapital) {
+						ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_KINGDOM_RAZE.getMessage(kingdomName));
+					} else {
+						ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_RAZE.getMessage(townName));
+					}
 					ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_DESTROY.getMessage(townName));
 					for(KonPlayer monPlayer : monumentPlayers) {
 						monPlayer.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(townCenterLoc, 2));
@@ -1344,7 +1349,7 @@ public class BlockListener implements Listener {
 					// Broadcast to Dynmap
 					konquest.getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_RAZE.getMessage(townName)+" ("+x+","+y+","+z+")");
 				}
-				// Stop the town monument timer
+
 			} else {
 				// Fire event
 				KonquestTownCaptureEvent invokeEvent = new KonquestTownCaptureEvent(konquest, town, player, player.getKingdom(), isCapital);
@@ -1353,6 +1358,8 @@ public class BlockListener implements Listener {
 					return;
 				}
 				// Conquer the town for the enemy player's kingdom
+				String oldKingdomName = town.getKingdom().getName();
+				String newKingdomName = player.getKingdom().getName();
 				KonTown capturedTown;
 				if(isCapital) {
 					// Capture the capital
@@ -1364,7 +1371,11 @@ public class BlockListener implements Listener {
 				
 				if(capturedTown != null) {
 					town = null;
-					ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(capturedTown.getName()));
+					if(isCapital) {
+						ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_KINGDOM_CONQUER.getMessage(oldKingdomName,newKingdomName));
+					} else {
+						ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(capturedTown.getName()));
+					}
 					ChatUtil.printDebug("Monument conversion in Town "+capturedTown.getName());
 					ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAPTURE.getMessage(capturedTown.getName(),player.getKingdom().getName()));
 					// Start Capture disable timer for target town

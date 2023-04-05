@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display.wrapper;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.KingdomIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
@@ -98,16 +99,20 @@ public class TownInfoMenuWrapper extends MenuWrapper {
     	String isShielded = DisplayManager.boolean2Symbol(infoTown.isShielded());
     	String isArmored = DisplayManager.boolean2Symbol(infoTown.isArmored());
     	String isPeaceful = DisplayManager.boolean2Symbol(infoTown.getKingdom().isPeaceful());
+		String isImmune = DisplayManager.boolean2Symbol(infoTown.getKingdom().isCapitalImmune());
     	loreList = new ArrayList<>();
-    	loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
-    	loreList.add(loreColor+MessagePath.LABEL_PLOT.getMessage()+": "+isPlotOnly);
-    	loreList.add(loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage()+": "+isRedstone);
+    	if(infoTown.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+			loreList.add(loreColor+MessagePath.LABEL_IMMUNITY.getMessage()+": "+isImmune);
+		}
+		loreList.add(loreColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage()+": "+isAttacked);
+		loreList.add(loreColor+MessagePath.LABEL_PROTECTED.getMessage()+": "+isProtected);
+		loreList.add(loreColor+MessagePath.LABEL_SHIELD.getMessage()+": "+isShielded);
+		loreList.add(loreColor+MessagePath.LABEL_ARMOR.getMessage()+": "+isArmored);
+		loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
+		loreList.add(loreColor+MessagePath.LABEL_PLOT.getMessage()+": "+isPlotOnly);
+		loreList.add(loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage()+": "+isRedstone);
     	loreList.add(loreColor+MessagePath.LABEL_GOLEM_OFFENSE.getMessage()+": "+isGolemOffense);
-    	loreList.add(loreColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage()+": "+isAttacked);
     	loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
-    	loreList.add(loreColor+MessagePath.LABEL_SHIELD.getMessage()+": "+isShielded);
-    	loreList.add(loreColor+MessagePath.LABEL_ARMOR.getMessage()+": "+isArmored);
-    	loreList.add(loreColor+MessagePath.LABEL_PROTECTED.getMessage()+": "+isProtected);
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, 4, false);
     	getMenu().getPage(0).addIcon(info);
 

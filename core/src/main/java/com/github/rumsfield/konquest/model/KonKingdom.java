@@ -565,12 +565,20 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		if(oldTown != null) {
 			ChatUtil.printDebug("Removed town "+name);
 			oldTown.removeAllBarPlayers();
+			oldTown.purgeResidents();
+			oldTown.clearPlots();
+			oldTown.clearUpgrades();
+			oldTown.clearShieldsArmors();
+			oldTown.stopTimers();
 			boolean pass = oldTown.removeMonumentBlocks();
 			if(!pass) {
 				ChatUtil.printDebug("Encountered problem removing monument blocks");
 			}
+			oldTown = null;
+			return true;
+		} else {
+			return false;
 		}
-		return oldTown != null;
 	}
 	
 	public KonTown removeTownConquer(String name) {

@@ -130,7 +130,7 @@ public class KingdomAdminCommand extends CommandBase {
             		break;
             		
             	case "add":
-            		// Invite a new kingdom member
+            		// Force a player to join a kingdom
             		if(getArgs().length == 5) {
             			String playerName = getArgs()[4];
             			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
@@ -145,7 +145,8 @@ public class KingdomAdminCommand extends CommandBase {
 						switch(status) {
 							case 0:
 								// Success
-								ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+								// Broadcast successful join
+								ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_JOIN.getMessage(playerName,kingdom.getName()));
 								break;
 							case 5:
 								// Player is already a member
