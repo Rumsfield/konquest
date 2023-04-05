@@ -121,7 +121,7 @@ public class KonConfig {
 	        return false;
 	    }
 		boolean result = false;
-		boolean hasVersion = config.contains("version");
+		boolean hasVersion = config.contains("version",true);
 		String fileVersion = config.getString("version","0.0.0");
 		String pluginVersion = plugin.getDescription().getVersion();
 		if(!fileVersion.equalsIgnoreCase(pluginVersion)) {

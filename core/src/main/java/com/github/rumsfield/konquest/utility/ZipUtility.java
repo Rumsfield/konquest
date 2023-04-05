@@ -67,10 +67,10 @@ public class ZipUtility {
     private void zipDirectory(File folder, String parentFolder, ZipOutputStream zos) throws FileNotFoundException, IOException {
         for (File file : folder.listFiles()) {
             if (file.isDirectory()) {
-                zipDirectory(file, parentFolder + "/" + file.getName(), zos);
+                zipDirectory(file, parentFolder + File.separator + file.getName(), zos);
                 continue;
             }
-            zos.putNextEntry(new ZipEntry(parentFolder + "/" + file.getName()));
+            zos.putNextEntry(new ZipEntry(parentFolder + File.separator + file.getName()));
             BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
             long bytesRead = 0;
             byte[] bytesIn = new byte[BUFFER_SIZE];

@@ -214,15 +214,15 @@ public class ConfigManager{
 				// Print messages and archive the Konquest folder.
 				ChatUtil.printConsoleError("/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\");
 				ChatUtil.printConsoleError("Updating from Konquest version "+fileVersionStr+" to version "+pluginVersionStr+" is not supported!");
-				ChatUtil.printConsoleError("Not all plugin data (towns, players, etc) is guaranteed to transfer to the new version.");
+				ChatUtil.printConsoleError("Not all plugin data is guaranteed to transfer to the new version.");
 				ChatUtil.printConsoleError("The original plugin data folder will be archived to Konquest_"+fileVersionStr+".zip.");
-				ChatUtil.printConsoleError("---> Recommended to delete the Konquest folder and restart the server. <---");
+				ChatUtil.printConsoleError("--> Recommended to delete the Konquest folder and restart the server. <--");
 				ChatUtil.printConsoleError("/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\");
 				// Archive to zip
-				String destFolder = plugin.getDataFolder().getParent();
+				String destFolder = plugin.getDataFolder().getParentFile().getAbsolutePath();
 				String destName = plugin.getDataFolder().getName()+"_"+fileVersionStr+".zip";
-				String archiveName = destFolder + File.pathSeparator + destName;
-				ChatUtil.printConsole("Archive is: "+archiveName);
+				String archiveName = destFolder + File.separator + destName;
+				ChatUtil.printConsole("Archive: "+archiveName);
 				ArrayList<File> zipSources = new ArrayList<>();
 				zipSources.add(plugin.getDataFolder());
 				ZipUtility zipUtil = new ZipUtility();
