@@ -120,7 +120,9 @@ public class PlayerManager implements KonquestPlayerManager {
 			if(playerKingdom.equals(konquest.getKingdomManager().getBarbarians())) {
 				// The player's kingdom does not exist
 				// Possibly renamed or removed
-				//TODO: Search for any other kingdoms with membership
+				//TODO: Search for any other kingdoms with membership?
+				// When a kingdom is renamed, all offline players have their database entry updated with the new kingdom name.
+				// For now, just make them into a barbarian.
 				importedPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), true);
 				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_FORCE_BARBARIAN.getMessage());
 				ChatUtil.printDebug("Forced non-barbarian player with missing kingdom to become a barbarian");
@@ -132,7 +134,9 @@ public class PlayerManager implements KonquestPlayerManager {
 				} else {
 					// The player is not a member of their kingdom
 					// Possibly kicked or renamed
-					//TODO: Search for any other kingdoms with membership
+					//TODO: Search for any other kingdoms with membership?
+					// The most likely scenario is that the player was kicked.
+					// Just make them a barbarian.
 					importedPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), true);
 					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_FORCE_BARBARIAN.getMessage());
 					ChatUtil.printDebug("Forced non-barbarian player without kingdom membership to become a barbarian");
@@ -145,20 +149,16 @@ public class PlayerManager implements KonquestPlayerManager {
     	// Check if player has exceeded offline timeout
     	long timeoutSeconds = konquest.getOfflineTimeoutSeconds();
     	long lastSeenTimeMilliseconds = bukkitPlayer.getLastPlayed();
-    	boolean isOfflineTimeout = false;
     	// ignore this check if timeout is 0 or if there is no lastSeen timestamp
     	if(timeoutSeconds != 0 && lastSeenTimeMilliseconds != 0) {
     		Date now = new Date();
     		if(now.after(new Date(lastSeenTimeMilliseconds + (timeoutSeconds*1000)))) {
     			ChatUtil.printDebug("Player has exceeded offline timeout");
-    			isOfflineTimeout = true;
+				// Inform player of purged residencies
+				// The process of purging the player should have already happened in the past, this
+				// check is just to inform them that it happened.
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ABSENT.getMessage());
     		}
-    	}
-    	
-    	// Inform player of purged residencies
-    	if(isOfflineTimeout) {
-    		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ABSENT.getMessage());
-    		ChatUtil.printDebug("Exiled player");
     	}
     	
     	// Update player's exile kingdom

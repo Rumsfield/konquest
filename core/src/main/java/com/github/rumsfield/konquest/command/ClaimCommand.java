@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonPlayer.FollowType;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -52,6 +53,11 @@ public class ClaimCommand extends CommandBase {
 		}
 		String claimMode = getArgs()[1];
 		if(claimMode.equalsIgnoreCase("radius")){
+			boolean isAllowed = getKonquest().getCore().getBoolean(CorePath.TOWNS_ALLOW_CLAIM_RADIUS.getPath());
+			if(!isAllowed) {
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+				return;
+			}
 			if(getArgs().length != 3) {
 				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 				return;
@@ -68,6 +74,11 @@ public class ClaimCommand extends CommandBase {
 			getKonquest().getTerritoryManager().claimRadiusForPlayer(player, bukkitPlayer.getLocation(), radius);
 
 		}else if (claimMode.equalsIgnoreCase("auto")){
+			boolean isAllowed = getKonquest().getCore().getBoolean(CorePath.TOWNS_ALLOW_CLAIM_AUTO.getPath());
+			if(!isAllowed) {
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+				return;
+			}
 			boolean doAuto = false;
 			// Check if player is already in an auto follow state
 			if(player.isAutoFollowActive()) {

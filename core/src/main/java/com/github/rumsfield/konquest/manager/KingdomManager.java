@@ -3256,6 +3256,41 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return towns;
 	}
+
+	/**
+	 * Check every kingdom and town and ensure the player has
+	 * valid memberships.
+	 * @param player The player to check
+	 */
+	public void checkPlayerMemberships(KonPlayer player) {
+		KonKingdom playerKingdom = player.getKingdom();
+		Player bukkitPlayer = player.getBukkitPlayer();
+		UUID id = bukkitPlayer.getUniqueId();
+		for(KonKingdom kingdom : getKingdoms()) {
+			// Skip player's kingdom
+			if(kingdom.equals(playerKingdom)) {
+				continue;
+			}
+			// Ensure player is not a member of other kingdoms
+			if(kingdom.isMember(id)) {
+				if(kingdom.removeMember(id)) {
+					ChatUtil.printDebug("Cleaned kingdom membership of "+kingdom.getName()+" for player "+bukkitPlayer.getName());
+				} else {
+					ChatUtil.printDebug("FAILED to clean kingdom membership of "+kingdom.getName()+" for player "+bukkitPlayer.getName());
+				}
+			}
+			// Ensure player is not a resident of other kingdom towns
+			for(KonTown town : kingdom.getCapitalTowns()) {
+				if(town.isPlayerResident(bukkitPlayer)) {
+					if(town.removePlayerResident(bukkitPlayer)) {
+						ChatUtil.printDebug("Cleaned town residency of "+town.getName()+" in kingdom "+kingdom.getName()+" for player "+bukkitPlayer.getName());
+					} else {
+						ChatUtil.printDebug("FAILED to clean town residency of "+town.getName()+" in kingdom "+kingdom.getName()+" for player "+bukkitPlayer.getName());
+					}
+				}
+			}
+		}
+	}
 	
 	public void updatePlayerMembershipStats(KonPlayer player) {
 		int countLord = 0;

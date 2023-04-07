@@ -441,6 +441,8 @@ public class Konquest implements KonquestAPI, Timeable {
     		bukkitPlayer.setScoreboard(getScoreboard());
     		updateNamePackets(player);
     	}
+		// Sanity check player's memberships with all kingdoms/towns
+		kingdomManager.checkPlayerMemberships(player);
     	// Update offline protections
     	kingdomManager.updateKingdomOfflineProtection();
     	campManager.deactivateCampProtection(player);

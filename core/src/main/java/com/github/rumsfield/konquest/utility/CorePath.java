@@ -94,6 +94,8 @@ public enum CorePath {
 	KINGDOMS_WILD_BUILD                                   ("core.kingdoms.wild_build"),
 	
 	TOWNS_ALLOW_UNCLAIM                                   ("core.towns.allow_unclaim"),
+	TOWNS_ALLOW_CLAIM_RADIUS                              ("core.towns.allow_claim_radius"),
+	TOWNS_ALLOW_CLAIM_AUTO                                ("core.towns.allow_claim_auto"),
 	TOWNS_MIN_SETTLE_HEIGHT                               ("core.towns.min_settle_height"),
 	TOWNS_MAX_SETTLE_HEIGHT                               ("core.towns.max_settle_height"),
 	TOWNS_MIN_DISTANCE_TOWN                               ("core.towns.min_distance_town"),

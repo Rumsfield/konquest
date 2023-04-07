@@ -300,6 +300,12 @@ core:
   
     # Allow town lords to unclaim town land (true/false)
     allow_unclaim: true
+
+    # Allow players to use the claim radius sub-command (true/false)
+    allow_claim_radius: true
+
+    # Allow players to use the claim auto sub-command (true/false)
+    allow_claim_auto: true
     
     # Minimum height level for new town settlements (0 to disable, 0 - 256)
     min_settle_height: 2
