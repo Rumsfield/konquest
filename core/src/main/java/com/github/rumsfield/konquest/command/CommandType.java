@@ -5,25 +5,25 @@ import org.bukkit.Material;
 import com.github.rumsfield.konquest.utility.MessagePath;
 
 public enum CommandType {
-	HELP    (Material.LANTERN,          "konquest.command.help",    "h",  "",                                                               MessagePath.DESCRIPTION_HELP.getMessage()),
+	HELP    (Material.LANTERN,          "konquest.command.help",    "h",  "[<page>]",                                                               MessagePath.DESCRIPTION_HELP.getMessage()),
 	INFO    (Material.SPRUCE_SIGN,      "konquest.command.info",    "i",  "[<kingdom>|<town>|<player>]",                                    MessagePath.DESCRIPTION_INFO.getMessage()),
 	LIST    (Material.PAPER,            "konquest.command.list",    "l",  "[kingdom|town] [<page>]",                                        MessagePath.DESCRIPTION_LIST.getMessage()),
-	FAVOR   (Material.GOLD_INGOT,       "konquest.command.favor",   "f",  "",                                                               MessagePath.DESCRIPTION_FAVOR.getMessage()),
+	KINGDOM (Material.GOLDEN_SWORD,     "konquest.command.kingdom", "k",  "[menu|create|invite|kick|rename|templates] [<template>] [<name>]",  MessagePath.DESCRIPTION_KINGDOM.getMessage()),
+	TOWN    (Material.OBSIDIAN,         "konquest.command.town",    "t",  "[<town>] [menu|invite|kick|lord|rename] [<name>]",                  MessagePath.DESCRIPTION_TOWN.getMessage()),
 	MAP     (Material.FILLED_MAP,       "konquest.command.map",     "m",  "[far|auto]",                                                     MessagePath.DESCRIPTION_MAP.getMessage()),
-	CHAT    (Material.EMERALD,          "konquest.command.chat",    "c",  "",                                                               MessagePath.DESCRIPTION_CHAT.getMessage()),
-	SPY     (Material.IRON_BARS,        "konquest.command.spy",     "",   "",                                                               MessagePath.DESCRIPTION_SPY.getMessage()),
 	SETTLE  (Material.DIAMOND_PICKAXE,  "konquest.command.settle",  "",   "<name>",                                                         MessagePath.DESCRIPTION_SETTLE.getMessage()),
 	CLAIM   (Material.DIAMOND_SHOVEL,   "konquest.command.claim",   "",   "[radius|auto] [<radius>]",                                       MessagePath.DESCRIPTION_CLAIM.getMessage()),
 	UNCLAIM (Material.COBWEB,           "konquest.command.unclaim", "",   "[radius|auto] [<radius>]",                                       MessagePath.DESCRIPTION_UNCLAIM.getMessage()),
 	TRAVEL  (Material.COMPASS,          "konquest.command.travel",  "v",  "<town>|<kingdom>|<sanctuary>|capital|home|wild|camp",            MessagePath.DESCRIPTION_TRAVEL.getMessage()),
-	KINGDOM (Material.GOLDEN_SWORD,     "konquest.command.kingdom", "k",  "[menu|create|invite|kick|rename|templates] [<template>] [<name>]",  MessagePath.DESCRIPTION_KINGDOM.getMessage()),
-	TOWN    (Material.OBSIDIAN,         "konquest.command.town",    "t",  "[<town>] [menu|invite|kick|lord|rename] [<name>]",                  MessagePath.DESCRIPTION_TOWN.getMessage()),
+	CHAT    (Material.EMERALD,          "konquest.command.chat",    "c",  "",                                                               MessagePath.DESCRIPTION_CHAT.getMessage()),
+	SPY     (Material.IRON_BARS,        "konquest.command.spy",     "",   "",                                                               MessagePath.DESCRIPTION_SPY.getMessage()),
+	FAVOR   (Material.GOLD_INGOT,       "konquest.command.favor",   "f",  "",                                                               MessagePath.DESCRIPTION_FAVOR.getMessage()),
+	SCORE   (Material.DIAMOND,          "konquest.command.score",   "",   "[<player>|all]",                                                 MessagePath.DESCRIPTION_SCORE.getMessage()),
 	QUEST   (Material.WRITABLE_BOOK,    "konquest.command.quest",   "q",  "",                                                               MessagePath.DESCRIPTION_QUEST.getMessage()),
 	STATS   (Material.BOOK,             "konquest.command.stats",   "s",  "",                                                               MessagePath.DESCRIPTION_STATS.getMessage()),
 	PREFIX  (Material.NAME_TAG,         "konquest.command.prefix",  "p",  "",                                                               MessagePath.DESCRIPTION_PREFIX.getMessage()),
-	SCORE   (Material.DIAMOND,          "konquest.command.score",   "",   "[<player>|all]",                                                 MessagePath.DESCRIPTION_SCORE.getMessage()),
-	FLY     (Material.ELYTRA,           "konquest.command.fly",     "",   "",                                                               MessagePath.DESCRIPTION_FLY.getMessage()),
 	BORDER  (Material.GREEN_CARPET,     "konquest.command.border",  "b",  "",                                                               MessagePath.DESCRIPTION_BORDER.getMessage()),
+	FLY     (Material.ELYTRA,           "konquest.command.fly",     "",   "",                                                               MessagePath.DESCRIPTION_FLY.getMessage()),
 	ADMIN   (Material.NETHER_STAR,      "konquest.command.admin",   "",   "",                                                               MessagePath.DESCRIPTION_ADMIN.getMessage());
 
 	private final String permission;
