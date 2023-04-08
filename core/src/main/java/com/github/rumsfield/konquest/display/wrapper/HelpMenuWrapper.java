@@ -2,30 +2,37 @@ package com.github.rumsfield.konquest.display.wrapper;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandType;
+import com.github.rumsfield.konquest.command.admin.AdminCommandType;
+import com.github.rumsfield.konquest.display.icon.AdminCommandIcon;
 import com.github.rumsfield.konquest.display.icon.CommandIcon;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
+import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.Labeler;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class HelpMenuWrapper extends MenuWrapper {
 
-	public HelpMenuWrapper(Konquest konquest) {
+	private final Player observer;
+
+	public HelpMenuWrapper(Konquest konquest, Player observer) {
 		super(konquest);
+		this.observer = observer;
 	}
 	
 	@Override
 	public void constructMenu() {
 
-		int itemIndex = 0;
 		int cost;
 		int cost_incr;
 
@@ -36,8 +43,21 @@ public class HelpMenuWrapper extends MenuWrapper {
 		double cost_travel = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_TRAVEL.getPath(),0.0);
     	String communityLink = getKonquest().getCore().getString(CorePath.COMMUNITY_LINK.getPath(),"");
 
-		// Page 0
-    	getMenu().addPage(0, (int)Math.ceil(((double)(CommandType.values().length+1))/9), ChatColor.BLACK+MessagePath.MENU_HELP_TITLE.getMessage());
+		String titleColor = DisplayManager.titleFormat;
+
+		String pageLabel;
+		List<String> loreList;
+		MenuIcon icon;
+		int slotIndex;
+		int pageIndex;
+		int pageRows;
+
+		// Page 0 - Player Commands
+		pageLabel = titleColor+MessagePath.MENU_HELP_TITLE.getMessage();
+		pageRows = (int)Math.ceil(((double)(CommandType.values().length+1))/9);
+		pageIndex = 0;
+		slotIndex = 0;
+		getMenu().addPage(pageIndex, pageRows, pageLabel);
     	// Add command icons
 		for(CommandType cmd : CommandType.values()) {
 			switch (cmd) {
@@ -61,17 +81,78 @@ public class HelpMenuWrapper extends MenuWrapper {
 					cost = 0;
 					cost_incr = 0;
 					break;
-			} 
-			CommandIcon icon = new CommandIcon(cmd, cost, cost_incr, itemIndex);
-			getMenu().getPage(0).addIcon(icon);
-			itemIndex++;
+			}
+			icon = new CommandIcon(cmd, cost, cost_incr, slotIndex);
+			getMenu().getPage(pageIndex).addIcon(icon);
+			slotIndex++;
 		}
 		// Add info icons
-		List<String> loreList = Collections.singletonList(MessagePath.MENU_HELP_COMMUNITY.getMessage());
-		InfoIcon info = new InfoIcon(MessagePath.MENU_HELP_COMMUNITY.getMessage(), loreList, Material.MINECART, itemIndex, true);
-		info.setInfo(ChatColor.GOLD+MessagePath.MENU_HELP_HINT.getMessage()+": "+ChatColor.DARK_PURPLE+ChatColor.UNDERLINE+communityLink);
-		getMenu().getPage(0).addIcon(info);
-		
+		loreList = new ArrayList<>();
+		InfoIcon info = new InfoIcon(MessagePath.MENU_HELP_COMMUNITY.getMessage(), loreList, Material.MINECART, slotIndex, true);
+		info.setInfo(ChatColor.GOLD+MessagePath.MENU_HELP_HINT.getMessage()+": "+ChatColor.LIGHT_PURPLE+ChatColor.UNDERLINE+communityLink);
+		getMenu().getPage(pageIndex).addIcon(info);
+		pageIndex++;
+
+		// Page 1 - Admin Commands (conditional)
+		// First, find all admin commands that the observer has permission to use
+		List<AdminCommandType> allowedCmdList = new ArrayList<>();
+		for(AdminCommandType adminCmd : AdminCommandType.values()) {
+			if(observer.hasPermission(adminCmd.permission())) {
+				allowedCmdList.add(adminCmd);
+			}
+		}
+		// Create admin page if there are any allowed commands
+		if(!allowedCmdList.isEmpty()) {
+			pageLabel = titleColor+MessagePath.MENU_HELP_ADMIN.getMessage();
+			pageRows = (int)Math.ceil(((double)(allowedCmdList.size()+1))/9);
+			slotIndex = 0;
+			getMenu().addPage(pageIndex, pageRows, pageLabel);
+			// Add command icons
+			for(AdminCommandType adminCmd : allowedCmdList) {
+				icon = new AdminCommandIcon(adminCmd, slotIndex);
+				getMenu().getPage(pageIndex).addIcon(icon);
+				slotIndex++;
+			}
+			pageIndex++;
+		}
+
+		// Page 2 - Tips
+		pageLabel = titleColor+MessagePath.MENU_HELP_TIPS.getMessage();
+		pageRows = 2;
+		slotIndex = 0;
+		getMenu().addPage(pageIndex, pageRows, pageLabel);
+		String[] tips = {
+				MessagePath.MENU_HELP_TIP_1.getMessage(),
+				MessagePath.MENU_HELP_TIP_2.getMessage(),
+				MessagePath.MENU_HELP_TIP_3.getMessage(),
+				MessagePath.MENU_HELP_TIP_4.getMessage(),
+				MessagePath.MENU_HELP_TIP_5.getMessage(),
+				MessagePath.MENU_HELP_TIP_6.getMessage(),
+				MessagePath.MENU_HELP_TIP_7.getMessage(),
+				MessagePath.MENU_HELP_TIP_8.getMessage(),
+				MessagePath.MENU_HELP_TIP_9.getMessage()
+		};
+		Material[] iconMaterials = {
+				Material.ORANGE_BANNER,
+				Material.YELLOW_BANNER,
+				Material.LIME_BANNER,
+				Material.GREEN_BANNER,
+				Material.CYAN_BANNER,
+				Material.LIGHT_BLUE_BANNER,
+				Material.BLUE_BANNER,
+				Material.PURPLE_BANNER,
+				Material.MAGENTA_BANNER
+		};
+		for(int i = 0; i < 9; i++) {
+			String tip = tips[i];
+			Material iconMaterial = iconMaterials[i];
+			loreList = new ArrayList<>();
+			loreList.addAll(Konquest.stringPaginate(tip,ChatColor.LIGHT_PURPLE));
+			icon = new InfoIcon(MessagePath.LABEL_INFORMATION.getMessage(), loreList, iconMaterial, slotIndex, false);
+			getMenu().getPage(pageIndex).addIcon(icon);
+			slotIndex++;
+		}
+
 		getMenu().refreshNavigationButtons();
 		getMenu().setPageIndex(0);
 	}
@@ -83,15 +164,14 @@ public class HelpMenuWrapper extends MenuWrapper {
 			// Command Icons close the GUI and print a command in chat
 			CommandIcon icon = (CommandIcon)clickedIcon;
 			CommandType cmd = icon.getCommand();
-			
-			String cmdArgsFormatted = cmd.arguments()
-					.replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA)
-					.replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA)
-					.replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA)
-					.replaceAll("]", ChatColor.GRAY+"]"+ChatColor.AQUA)
-					.replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
-        	
-			ChatUtil.sendNotice(bukkitPlayer, ChatColor.GOLD+"/k "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted);
+			String commandFormat = Labeler.format(cmd);
+			ChatUtil.sendNotice(bukkitPlayer, commandFormat);
+		} else if(clickedIcon instanceof AdminCommandIcon) {
+			// Admin Command Icons close the GUI and print a command in chat
+			AdminCommandIcon icon = (AdminCommandIcon)clickedIcon;
+			AdminCommandType cmd = icon.getCommand();
+			String commandFormat = Labeler.format(cmd);
+			ChatUtil.sendNotice(bukkitPlayer, commandFormat);
 		} else if(clickedIcon instanceof InfoIcon) {
 			// Info Icons close the GUI and print their info in chat
 			InfoIcon icon = (InfoIcon)clickedIcon;

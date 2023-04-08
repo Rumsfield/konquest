@@ -22,7 +22,6 @@ public class CommandIcon implements MenuIcon{
 
 	private final String loreColor = DisplayManager.loreFormat;
 	private final String valueColor = DisplayManager.valueFormat;
-	private final String hintColor = DisplayManager.hintFormat;
 
 	public CommandIcon(CommandType command, int cost, int cost_incr, int index) {
 		this.command = command;
@@ -48,7 +47,7 @@ public class CommandIcon implements MenuIcon{
 		if(cost_incr > 0) {
 			loreList.add(loreColor+MessagePath.LABEL_INCREMENT_COST.getMessage()+": "+valueColor+cost_incr);
 		}
-		loreList.addAll(Konquest.stringPaginate(command.description()));
+		loreList.addAll(Konquest.stringPaginate(command.description(),loreColor));
 		meta.setDisplayName(ChatColor.GOLD+getName());
 		meta.setLore(loreList);
 		item.setItemMeta(meta);

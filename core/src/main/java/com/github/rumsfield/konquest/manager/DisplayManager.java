@@ -176,7 +176,7 @@ public class DisplayManager {
 	public void displayHelpMenu(Player bukkitPlayer) {
 		playMenuOpenSound(bukkitPlayer);
 		// Create menu
-		HelpMenuWrapper wrapper = new HelpMenuWrapper(konquest);
+		HelpMenuWrapper wrapper = new HelpMenuWrapper(konquest, bukkitPlayer);
 		wrapper.constructMenu();
 		// Display menu
 		showMenuWrapper(bukkitPlayer,wrapper);

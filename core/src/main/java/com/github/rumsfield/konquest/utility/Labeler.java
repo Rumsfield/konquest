@@ -2,6 +2,9 @@ package com.github.rumsfield.konquest.utility;
 
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
+import com.github.rumsfield.konquest.command.CommandType;
+import com.github.rumsfield.konquest.command.admin.AdminCommandType;
+import org.bukkit.ChatColor;
 
 /**
  * Provides static methods for looking up MessagePath labels from API enums
@@ -42,6 +45,26 @@ public class Labeler {
                 break;
         }
         return "";
+    }
+
+    public static String format(CommandType type) {
+        String cmdArgsFormatted = type.arguments()
+                .replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA)
+                .replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA)
+                .replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA)
+                .replaceAll("]", ChatColor.GRAY+"]"+ChatColor.AQUA)
+                .replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
+        return ChatColor.GOLD+"/k "+type.toString().toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted;
+    }
+
+    public static String format(AdminCommandType type) {
+        String cmdArgsFormatted = type.arguments()
+                .replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA)
+                .replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA)
+                .replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA)
+                .replaceAll("]", ChatColor.GRAY+"]"+ChatColor.AQUA)
+                .replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
+        return ChatColor.GOLD+"/k admin "+type.toString().toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted;
     }
 
 }

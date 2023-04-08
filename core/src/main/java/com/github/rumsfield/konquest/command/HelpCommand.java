@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.Labeler;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -26,14 +27,12 @@ public class HelpCommand extends CommandBase{
 		// Populate help lines
 		List<String> lines = new ArrayList<>();
         for(CommandType cmd : CommandType.values()) {
-        	String alias = cmd.alias();
-        	String cmdArgsFormatted = cmd.arguments()
-					.replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA)
-					.replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA)
-					.replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA)
-					.replaceAll("]", ChatColor.GRAY+"]"+ChatColor.AQUA)
-					.replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
-			String message = ChatColor.GOLD+"/k "+cmd.toString().toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted+ChatColor.WHITE+": "+cmd.description()+ChatColor.LIGHT_PURPLE+alias;
+        	String alias = "";
+			if(!cmd.alias().equals("")) {
+				alias = ", "+cmd.alias();
+			}
+			String commandFormat = Labeler.format(cmd);
+			String message = commandFormat+ChatColor.WHITE+": "+cmd.description()+ChatColor.LIGHT_PURPLE+alias;
 			lines.add(message);
         }
 		// Check for any help lines

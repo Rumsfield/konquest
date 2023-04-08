@@ -400,6 +400,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				boolean isValidChoice = manager.isValidRelationChoice(kingdom, diplomacyKingdom, relation);
 				ChatColor relationColor = ChatColor.GRAY;
 				String description = MessagePath.LABEL_UNAVAILABLE.getMessage();
+				String detailedInfo = "";
 				boolean isClickable = false;
 				if(isValidChoice) {
 					relationColor = ChatColor.GOLD;
@@ -417,6 +418,8 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 							} else if(currentDiplomacy.equals(KonquestDiplomacyType.ALLIANCE)) {
 								description = MessagePath.MENU_KINGDOM_DIPLOMACY_PEACE_ALLIANCE.getMessage();
 							}
+							// Detailed Info
+							detailedInfo = MessagePath.MENU_KINGDOM_DIPLOMACY_PEACE_INFO.getMessage();
 							break;
 						case TRADE:
 							if(currentDiplomacy.equals(KonquestDiplomacyType.PEACE)) {
@@ -424,6 +427,8 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 							} else if(currentDiplomacy.equals(KonquestDiplomacyType.ALLIANCE)) {
 								description = MessagePath.MENU_KINGDOM_DIPLOMACY_TRADE_ALLIANCE.getMessage();
 							}
+							// Detailed Info
+							detailedInfo = MessagePath.MENU_KINGDOM_DIPLOMACY_TRADE_INFO.getMessage();
 							break;
 						case WAR:
 							if(isInstantWar) {
@@ -431,9 +436,13 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 							} else {
 								description = MessagePath.MENU_KINGDOM_DIPLOMACY_WAR_REQUEST.getMessage();
 							}
+							// Detailed Info
+							detailedInfo = MessagePath.MENU_KINGDOM_DIPLOMACY_WAR_INFO.getMessage();
 							break;
 						case ALLIANCE:
 							description = MessagePath.MENU_KINGDOM_DIPLOMACY_ALLIANCE.getMessage();
+							// Detailed Info
+							detailedInfo = MessagePath.MENU_KINGDOM_DIPLOMACY_ALLIANCE_INFO.getMessage();
 							break;
 						default:
 							break;
@@ -441,6 +450,8 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				}
 				loreList.addAll(Konquest.stringPaginate(description,relationColor));
 				if(isValidChoice) {
+					loreList.add(" "); // spacer
+					loreList.addAll(Konquest.stringPaginate(detailedInfo,ChatColor.LIGHT_PURPLE));
 					if(!isAdmin) {
 						double costRelation = manager.getRelationCost(relation);
 						String cost = String.format("%.2f",costRelation);
