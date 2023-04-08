@@ -147,7 +147,7 @@ public class BlockListener implements Listener {
 						*/
 						// Notify player when there is no lord
 						if(town.canClaimLordship(player)) {
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName()));
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getTravelName()));
 						}
 						// Protect land and plots
 						if(!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
@@ -212,14 +212,16 @@ public class BlockListener implements Listener {
 							// The player is an enemy and may edit blocks
 							// Check for capital capture conditions
 							if(isCapital && territory.getKingdom().isCapitalImmune()) {
-								// Capital is immune and cannot be captured
+								// Capital is immune and cannot be attacked
 								int numTowns = territory.getKingdom().getNumTowns();
+								ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAPITAL_IMMUNE.getMessage(numTowns, territory.getKingdom().getName()));
 								event.setCancelled(true);
 								return;
 							}
 							// Verify town can be captured
 							if(town.isCaptureDisabled()) {
+								ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(town.getCaptureCooldownString()));
 								event.setCancelled(true);
 								return;
@@ -561,7 +563,7 @@ public class BlockListener implements Listener {
 					if(playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
 						// Notify player when there is no lord
 						if(town.canClaimLordship(player)) {
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName()));
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getTravelName()));
 						}
 						// Protect land and plots
 						if(!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
@@ -626,8 +628,18 @@ public class BlockListener implements Listener {
 						// Check for enemy player
 						if(playerRole.equals(KonquestRelationshipType.ENEMY)) {
 							// The player is an enemy and may edit blocks
+							// Check for capital capture conditions
+							if(isCapital && territory.getKingdom().isCapitalImmune()) {
+								// Capital is immune and cannot be attacked
+								int numTowns = territory.getKingdom().getNumTowns();
+								ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAPITAL_IMMUNE.getMessage(numTowns, territory.getKingdom().getName()));
+								event.setCancelled(true);
+								return;
+							}
 							// Verify town can be captured
 							if(town.isCaptureDisabled()) {
+								ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(town.getCaptureCooldownString()));
 								event.setCancelled(true);
 								return;
@@ -857,19 +869,18 @@ public class BlockListener implements Listener {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
 		for(Block block : event.blockList()) {
 			if(territoryManager.isChunkClaimed(block.getLocation())) {
-				ChatUtil.printDebug("effected block is inside claimed territory");
 				KonTerritory territory = territoryManager.getChunkTerritory(block.getLocation());
 				Material blockMat = block.getType();
 				
 				// Protect Sanctuaries
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY)) {
-					ChatUtil.printDebug("protecting Sanctuary");
+					ChatUtil.printDebug("protecting Sanctuary from block explosion");
 					event.setCancelled(true);
 					return;
 				}
 				// Protect Peaceful Territory
 				if(territory.getKingdom().isPeaceful()) {
-					ChatUtil.printDebug("protecting peaceful kingdom");
+					ChatUtil.printDebug("protecting peaceful kingdom from block explosion");
 					event.setCancelled(true);
 					return;
 				}
@@ -878,13 +889,13 @@ public class BlockListener implements Listener {
 					KonTown town = (KonTown)territory;
 					// Protect Town Monuments
 					if(town.isLocInsideMonumentProtectionArea(block.getLocation())) {
-						ChatUtil.printDebug("protecting Town Monument");
+						ChatUtil.printDebug("protecting Town Monument from block explosion");
 						event.setCancelled(true);
 						return;
 					}
 					// Protect towns when all kingdom members are offline
 					if(playerManager.getPlayersInKingdom(town.getKingdom()).isEmpty()) {
-						ChatUtil.printDebug("protecting offline Town");
+						ChatUtil.printDebug("protecting offline Town from block explosion");
 						event.setCancelled(true);
 						return;
 					}
@@ -893,10 +904,23 @@ public class BlockListener implements Listener {
 					if(upgradeLevel > 0) {
 						int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
 						if(town.getNumResidentsOnline() < minimumOnlineResidents) {
-							ChatUtil.printDebug("protecting upgraded Town");
+							ChatUtil.printDebug("protecting upgraded Town from block explosion");
 							event.setCancelled(true);
 							return;
 						}
+					}
+					// Check for capital capture conditions
+					if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && territory.getKingdom().isCapitalImmune()) {
+						// Capital is immune and cannot be attacked
+						ChatUtil.printDebug("protecting immune capital from block explosion");
+						event.setCancelled(true);
+						return;
+					}
+					// Verify town can be captured
+					if(town.isCaptureDisabled()) {
+						ChatUtil.printDebug("protecting town in capture cooldown from block explosion");
+						event.setCancelled(true);
+						return;
 					}
 					// If town is shielded, prevent all enemy block edits
 					if(town.isShielded()) {
@@ -918,7 +942,7 @@ public class BlockListener implements Listener {
 					KonCamp camp = (KonCamp)territory;
 					// Protect offline owner camps
 					if(camp.isProtected()) {
-						ChatUtil.printDebug("EVENT: protecting offline camp from explosion");
+						ChatUtil.printDebug("EVENT: protecting offline camp from block explosion");
 						event.setCancelled(true);
 						return;
 					}
@@ -927,19 +951,19 @@ public class BlockListener implements Listener {
 				// Protect chests
 				boolean isProtectChest = konquest.getCore().getBoolean(CorePath.KINGDOMS_PROTECT_CONTAINERS_EXPLODE.getPath(),true);
 				if(isProtectChest && event.getBlock().getState() instanceof BlockInventoryHolder) {
-					ChatUtil.printDebug("EVENT: protecting chest inside territory from explosion");
+					ChatUtil.printDebug("EVENT: protecting chest inside territory from block explosion");
 					event.setCancelled(true);
 					return;
 				}
 				// Protect beds
 				if(event.getBlock().getBlockData() instanceof Bed) {
-					ChatUtil.printDebug("EVENT: protecting bed inside territory from explosion");
+					ChatUtil.printDebug("EVENT: protecting bed inside territory from block explosion");
 					event.setCancelled(true);
 					return;
 				}
 				// Protect Ruins
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
-					ChatUtil.printDebug("protecting Ruin");
+					ChatUtil.printDebug("protecting Ruin from block explosion");
 					event.setCancelled(true);
 					return;
 				}
@@ -1453,7 +1477,7 @@ public class BlockListener implements Listener {
 			if(town.getMonument().getCriticalHits() == 1) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
-					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_1.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
+					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_1.getMessage(town.getName(),town.getTravelName(),defendReward),ChatColor.DARK_RED);
 				}
 				// Discord integration
 				konquest.getIntegrationManager().getDiscordSrv().alertDiscordChannel(kingdomName, MessagePath.PROTECTION_NOTICE_RAID_DISCORD_CHANNEL.getMessage(town.getName()));
@@ -1466,7 +1490,7 @@ public class BlockListener implements Listener {
 			if(town.getMonument().getCriticalHits() == maxCriticalhits/2) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
-					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_2.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
+					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_2.getMessage(town.getName(),town.getTravelName(),defendReward),ChatColor.DARK_RED);
 				}
 			}
 			
@@ -1474,7 +1498,7 @@ public class BlockListener implements Listener {
 			if(town.getMonument().getCriticalHits() == maxCriticalhits-1) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
-					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_3.getMessage(town.getName(),town.getName(),defendReward),ChatColor.DARK_RED);
+					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_3.getMessage(town.getName(),town.getTravelName(),defendReward),ChatColor.DARK_RED);
 				}
 			}
 		}

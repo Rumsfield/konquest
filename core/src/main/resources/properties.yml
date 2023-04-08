@@ -24,14 +24,14 @@
 #	PLOTS			Allow players to set town plots
 # 
 # Properties for kingdoms
-#	NEUTRAL			Make this kingdom only peaceful
+#	PEACEFUL		Make this kingdom only peaceful
 #	GOLEMS			Enable iron golems to attack enemies
 # 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
 properties:
   kingdoms:
-    neutral: false
+    peaceful: false
     golems: true
   sanctuaries:
     enter: true

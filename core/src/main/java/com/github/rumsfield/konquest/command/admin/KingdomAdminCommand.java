@@ -27,6 +27,11 @@ public class KingdomAdminCommand extends CommandBase {
 
 	@Override
 	public void execute() {
+		// Notify sender of missing templates
+		if(getKonquest().getSanctuaryManager().getNumTemplates() == 0) {
+			ChatUtil.sendError((Player) getSender(),MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_NO_TEMPLATES.getMessage());
+		}
+
 		// k admin kingdom menu|create|destroy|add|kick|rename <kingdom> [<name>]
 		if (getArgs().length != 4 && getArgs().length != 5) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -44,21 +49,19 @@ public class KingdomAdminCommand extends CommandBase {
     		// Get sub-command and target kingdom
     		String subCmd = getArgs()[2];
     		String kingdomName = getArgs()[3];
-    		// Check for valid kingdom
-    		if(!getKonquest().getKingdomManager().isKingdom(kingdomName)) {
-    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage());
-    			return;
-    		}
-    		KonKingdom kingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
-    		if(kingdom == null || !kingdom.isCreated()) {
-    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-    			return;
-    		}
+			KonKingdom kingdom;
     		
     		// Execute sub-commands
     		switch(subCmd.toLowerCase()) {
             	case "menu":
             		// Open the kingdom menu
+					// Check for valid kingdom
+					if(!getKonquest().getKingdomManager().isKingdom(kingdomName)) {
+						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
+						return;
+					}
+					kingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
+					assert kingdom != null;
             		getKonquest().getDisplayManager().displayKingdomMenu(player, kingdom, true);
             		break;
             		
@@ -108,6 +111,27 @@ public class KingdomAdminCommand extends CommandBase {
 								case 8:
 									ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_PLACEMENT.getMessage());
 									break;
+								case 12:
+									ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_HEIGHT.getMessage());
+									break;
+								case 13:
+									ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_INIT.getMessage());
+									break;
+								case 14:
+									ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_AIR.getMessage());
+									break;
+								case 15:
+									ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_WATER.getMessage());
+									break;
+								case 16:
+									ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_CONTAINER.getMessage());
+									break;
+								case 22:
+									ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_FLAT.getMessage());
+									break;
+								case 23:
+									ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_HEIGHT.getMessage());
+									break;
 								default:
 									ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 									break;
@@ -140,6 +164,13 @@ public class KingdomAdminCommand extends CommandBase {
     					}
             			playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
 						UUID id = offlinePlayer.getOfflineBukkitPlayer().getUniqueId();
+						// Check for valid kingdom
+						if(!getKonquest().getKingdomManager().isKingdom(kingdomName)) {
+							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
+							return;
+						}
+						kingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
+						assert kingdom != null;
 						// Force player assignment into kingdom
 						int status = getKonquest().getKingdomManager().assignPlayerKingdom(id,kingdom.getName(),true);
 						switch(status) {
@@ -196,6 +227,13 @@ public class KingdomAdminCommand extends CommandBase {
             		// Rename your kingdom
             		if(getArgs().length == 5) {
             			String newName = getArgs()[4];
+						// Check for valid kingdom
+						if(!getKonquest().getKingdomManager().isKingdom(kingdomName)) {
+							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
+							return;
+						}
+						kingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
+						assert kingdom != null;
             			String oldName = kingdom.getName();
             			if(getKonquest().validateName(newName,bukkitPlayer) != 0) {
             				// Player receives error message within validateName method
@@ -264,7 +302,6 @@ public class KingdomAdminCommand extends CommandBase {
 			// suggest appropriate names
 			String subCommand = getArgs()[2];
 			String kingdomName = getArgs()[3];
-			KonKingdom kingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
 			String name;
 			if(subCommand.equalsIgnoreCase("create")) {
 				// template name
@@ -274,6 +311,7 @@ public class KingdomAdminCommand extends CommandBase {
 				tabList.add("***");
 			} else if(subCommand.equalsIgnoreCase("add")) {
 				// non-kingdom member names
+				KonKingdom kingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
 				if(kingdom != null && kingdom.isCreated()) {
 					for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllKonquestOfflinePlayers()) {
 						name = offlinePlayer.getOfflineBukkitPlayer().getName();
@@ -284,6 +322,7 @@ public class KingdomAdminCommand extends CommandBase {
 				}
 			} else if(subCommand.equalsIgnoreCase("kick")) {
 				// kingdom member names
+				KonKingdom kingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
 				if(kingdom != null && kingdom.isCreated()) {
 					for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllKonquestOfflinePlayers()) {
 						name = offlinePlayer.getOfflineBukkitPlayer().getName();

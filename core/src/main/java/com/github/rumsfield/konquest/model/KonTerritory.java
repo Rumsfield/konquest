@@ -122,6 +122,14 @@ public abstract class KonTerritory implements KonquestTerritory {
 	public String getName() {
 		return name;
 	}
+
+	public String getTravelName() {
+		if(getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+			return kingdom.getName();
+		} else {
+			return name;
+		}
+	}
 	
 	public KonKingdom getKingdom() {
 		return kingdom;

@@ -482,6 +482,10 @@ public class Konquest implements KonquestAPI, Timeable {
 	    		} else {
 	    			kingdomManager.clearTownNerf(player);
 	    		}
+				// Send a raid alert for enemies and barbarians
+				if(playerRole.equals(KonquestRelationshipType.ENEMY) || playerRole.equals(KonquestRelationshipType.BARBARIAN)) {
+					town.sendRaidAlert();
+				}
     		}
 		} else {
 			// Player joined located outside of a Town

@@ -36,7 +36,7 @@ core:
   # URL which will appear in the "/k" community link icon (string)
   community_link: www.google.com
   
-  # Enable the usage of accomplishment prefixes applied to player names (true/false)
+  # (*) Enable the usage of accomplishment prefixes applied to player names (true/false)
   accomplishment_prefix: true
   
   # Enable the "/k quest" command and built-in quest rewards (true/false)

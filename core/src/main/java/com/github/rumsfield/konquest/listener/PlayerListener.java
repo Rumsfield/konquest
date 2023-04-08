@@ -1166,7 +1166,7 @@ public class PlayerListener implements Listener {
 			KonTown town = (KonTown) territoryTo;
 			// Notify player if town is abandoned
 			if(town.getPlayerResidents().isEmpty() && town.getKingdom().equals(player.getKingdom())) {
-				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName()));
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getTravelName()));
 			}
 			// Display plot message to friendly players
 			displayPlotMessage(town, locTo, locFrom, player);

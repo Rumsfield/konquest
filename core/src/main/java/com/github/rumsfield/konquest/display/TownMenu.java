@@ -72,18 +72,21 @@ public class TownMenu extends StateMenu implements ViewableMenu {
 
         /* Join Icon */
         loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_JOIN.getMessage(),loreColor));
+        loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
         icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_JOIN.getMessage(), loreList, Material.SADDLE, ROOT_SLOT_JOIN, true);
         result.addIcon(icon);
 
         /* Exile Icon */
         loreList.clear();
         loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_LEAVE.getMessage(),loreColor));
+        loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
         icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_LEAVE.getMessage(), loreList, Material.ARROW, ROOT_SLOT_LEAVE, true);
         result.addIcon(icon);
 
         /* List Icon */
         loreList.clear();
         loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_LIST.getMessage(),loreColor));
+        loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
         icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_LIST.getMessage(), loreList, Material.PAPER, ROOT_SLOT_LIST, true);
         result.addIcon(icon);
 
@@ -96,6 +99,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
             loreList.add(valueColor+""+numInvites);
             inviteMat = Material.WRITABLE_BOOK;
         }
+        loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
         icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_INVITES.getMessage(), loreList, inviteMat, ROOT_SLOT_INVITES, true);
         result.addIcon(icon);
 
@@ -108,6 +112,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
             loreList.add(valueColor+""+numRequests);
             requestMat = Material.HONEY_BOTTLE;
         }
+        loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
         icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_REQUESTS.getMessage(), loreList, requestMat, ROOT_SLOT_REQUESTS, true);
         result.addIcon(icon);
 

@@ -82,9 +82,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			PlayerIcon playerInfo = new PlayerIcon(kingdomColor+lordPlayer.getName(),loreList,lordPlayer,3,true,PlayerIconAction.DISPLAY_INFO);
 			getMenu().getPage(0).addIcon(playerInfo);
 		} else {
-			for(String line : Konquest.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getName()))) {
-				loreList.add(ChatColor.RED+line);
-			}
+			loreList.addAll(Konquest.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getTravelName()), ChatColor.RED));
 			info = new InfoIcon(kingdomColor+MessagePath.LABEL_LORD.getMessage(),loreList,Material.BARRIER,3,false);
 			getMenu().getPage(0).addIcon(info);
 		}

@@ -43,8 +43,8 @@ public class HelpAdminCommand extends CommandBase {
 		int maxPages = (int)Math.ceil(((double)numLines)/MAX_LINES_PER_PAGE);
 		// Get page index to display
 		int page = 1;
-		if (getArgs().length >= 2) {
-			String pageArg = getArgs()[1];
+		if (getArgs().length >= 3) {
+			String pageArg = getArgs()[2];
 			try {
 				page = Integer.parseInt(pageArg);
 			}

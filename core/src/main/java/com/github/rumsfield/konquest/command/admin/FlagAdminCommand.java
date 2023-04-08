@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.command.admin;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
+import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonPropertyFlag;
 import com.github.rumsfield.konquest.model.KonPropertyFlagHolder;
 import com.github.rumsfield.konquest.utility.ChatUtil;
@@ -70,12 +71,6 @@ public class FlagAdminCommand extends CommandBase {
     			return;
     		}
 
-			String flagLine = "| %-16s %-8s %s";
-			String header = String.format(flagLine,
-					MessagePath.COMMAND_ADMIN_FLAG_NOTICE_FLAG.getMessage(),
-					MessagePath.COMMAND_ADMIN_FLAG_NOTICE_VALUE.getMessage(),
-					MessagePath.COMMAND_ADMIN_FLAG_NOTICE_DESCRIPTION.getMessage());
-
 			// Number of arguments to list available flags of the given holder
 			int num_args_list = 3;
 			// Number of arguments to display a specific flag
@@ -95,10 +90,11 @@ public class FlagAdminCommand extends CommandBase {
         		
         		// List all holder properties and values
 				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FLAG_NOTICE_ALL_PROPERTIES.getMessage());
-                ChatUtil.sendMessage((Player) getSender(), ChatColor.GOLD+header);
                 for(KonPropertyFlag flag : holderFlags.keySet()) {
-                	String line = String.format(flagLine, flag.getName(), holderFlags.get(flag), flag.getDescription());
-                	ChatUtil.sendMessage((Player) getSender(), line);
+					String flagLine = "| "+DisplayManager.loreFormat+flag.getName()+": "+DisplayManager.valueFormat+holderFlags.get(flag);
+					String descLine = "\\-- "+flag.getDescription();
+                	ChatUtil.sendMessage((Player) getSender(), flagLine);
+					ChatUtil.sendMessage((Player) getSender(), descLine);
                 }
 
             } else if (getArgs().length > num_args_list) {
@@ -117,11 +113,12 @@ public class FlagAdminCommand extends CommandBase {
             	if (getArgs().length == num_args_disp) {
             		// k admin flag <name> <flag>
             		// Display current value and description of given flag
+					ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SINGLE_PROPERTY.getMessage());
             		boolean flagValue = holder.getPropertyValue(flagArg);
-            		String line = String.format(flagLine, flagArg.getName(), flagValue, flagArg.getDescription());
-            		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SINGLE_PROPERTY.getMessage());
-            		ChatUtil.sendMessage((Player) getSender(), ChatColor.GOLD+header);
-            		ChatUtil.sendMessage((Player) getSender(), line);
+					String flagLine = "| "+DisplayManager.loreFormat+flagArg.getName()+": "+DisplayManager.valueFormat+flagValue;
+					String descLine = "\\-- "+flagArg.getDescription();
+					ChatUtil.sendMessage((Player) getSender(), flagLine);
+					ChatUtil.sendMessage((Player) getSender(), descLine);
             		
             	} else if (getArgs().length == num_args_set) {
             		// k admin flag <name> <flag> <value>

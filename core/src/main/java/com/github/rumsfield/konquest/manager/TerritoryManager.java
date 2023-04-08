@@ -1161,8 +1161,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
     	// Determine player's direction
     	BlockFace playerFace = bukkitPlayer.getFacing();
     	String mapPlayer = "!";
-		ChatColor mapSymbolColor;
-    	ChatColor playerColor;
+		ChatColor mapSymbolColor = ChatColor.WHITE;
+    	ChatColor playerColor = ChatColor.WHITE;
 		// Note: Unicode characters do not render correctly in game, must use escape sequence code.
     	if(playerFace.equals(BlockFace.NORTH)) {
     		mapPlayer = "\u25B2";// "^"
@@ -1316,21 +1316,11 @@ public class TerritoryManager implements KonquestTerritoryManager {
     		}
     	}
     	// Determine distance to the closest territory
-    	ChatColor closestTerritoryColor = ChatColor.GRAY;
+    	ChatColor closestTerritoryColor = ChatColor.WHITE;
     	int distance = 0;
     	if(closestTerritory != null) {
     		distance = proximity;
-    		if(closestTerritory.getKingdom().equals(konquest.getKingdomManager().getBarbarians())) {
-    			closestTerritoryColor = ChatColor.YELLOW;
-    		}  else if(closestTerritory.getKingdom().equals(konquest.getKingdomManager().getNeutrals())) {
-    			closestTerritoryColor = ChatColor.DARK_GRAY;
-    		} else {
-    			if(player.getKingdom().equals(closestTerritory.getKingdom())) {
-        			closestTerritoryColor = ChatColor.GREEN;
-        		} else {
-        			closestTerritoryColor = ChatColor.RED;
-        		}
-    		}
+			closestTerritoryColor = mapSymbolColor;
     	}
     	String distStr;
     	int maxDist = 99;

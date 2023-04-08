@@ -24,8 +24,8 @@ public class KingdomCommand extends CommandBase {
 	@Override
 	public void execute() {
 		// Notify sender when admin
-		if(getSender().hasPermission("konquest.command.admin") && getKonquest().getSanctuaryManager().getNumTemplates() == 0) {
-			ChatUtil.sendError((Player) getSender(),MessagePath.COMMAND_KINGDOM_ERROR_NO_TEMPLATES.getMessage());
+		if(getSender().hasPermission("konquest.command.admin.monument") && getKonquest().getSanctuaryManager().getNumTemplates() == 0) {
+			ChatUtil.sendError((Player) getSender(),MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_NO_TEMPLATES.getMessage());
 		}
 		// kingdom [menu|create|invite|kick|rename|templates] [template] [name]
 		if (getArgs().length != 1 && getArgs().length != 2 && getArgs().length != 3 && getArgs().length != 4) {

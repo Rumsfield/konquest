@@ -29,7 +29,7 @@ public class HelpCommand extends CommandBase{
         for(CommandType cmd : CommandType.values()) {
         	String alias = "";
 			if(!cmd.alias().equals("")) {
-				alias = ", "+cmd.alias();
+				alias = " ("+cmd.alias()+")";
 			}
 			String commandFormat = Labeler.format(cmd);
 			String message = commandFormat+ChatColor.WHITE+": "+cmd.description()+ChatColor.LIGHT_PURPLE+alias;

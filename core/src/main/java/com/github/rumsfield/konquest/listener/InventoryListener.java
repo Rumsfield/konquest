@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.listener;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
+import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.model.*;
@@ -108,7 +109,7 @@ public class InventoryListener implements Listener {
 						}
 						// Notify player when there is no lord
 						if(town.canClaimLordship(player)) {
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName()));
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getTravelName()));
 						}
 						// Prevent non-residents in closed towns from opening inventories that can hold items
 						// However this still allows them to open inventories like enchantment tables, crafting bench, etc.

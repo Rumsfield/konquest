@@ -29,7 +29,7 @@ public enum KonPropertyFlag {
 	PLOTS			("Plots", 	MessagePath.PROPERTIES_PLOTS.getMessage()), // Done in TownManagementMenuWrapper
 	
 	// Properties for kingdoms
-	NEUTRAL			("Neutral", 	MessagePath.PROPERTIES_NEUTRAL.getMessage()),
+	PEACEFUL		("Peaceful", 	MessagePath.PROPERTIES_PEACEFUL.getMessage()),
 	GOLEMS			("Golems", 	MessagePath.PROPERTIES_GOLEMS.getMessage()), // Done in KonTown
 	
 	NONE			("N/A", 		"Nothing");

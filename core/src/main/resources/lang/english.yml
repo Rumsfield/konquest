@@ -131,14 +131,14 @@ menu:
     community: "Community"
     hint: "Click to join"
     tip-1: "Barbarians are default players who have no kingdom. They can place beds to make camps, attack other barbarians, and destroy towns."
-    tip-2: "Use "/k kingdom" to open the kingdom menu and join kingdoms, or use "/k kingdom create" to make your own."
+    tip-2: "Use \"/k kingdom\" to open the kingdom menu and join kingdoms, or use \"/k kingdom create\" to make your own."
     tip-3: "The diplomacy options for other kingdoms are: peace, trade, alliance, war. Enemy kingdoms at war can capture each other's towns."
-    tip-4: "Use "/k settle" to create new towns for your kingdom. Use "/k map" to see surrounding land and a tip on whether your location can be settled."
-    tip-5: "Open the general Town Menu with "/k town" to join and leave towns in your kingdom. Use "/k town <name>" for managing a town, like upgrades or residents."
+    tip-4: "Use \"/k settle\" to create new towns for your kingdom. Use \"/k map\" to see surrounding land and a tip on whether your location can be settled."
+    tip-5: "Open the general Town Menu with \"/k town\" to join and leave towns in your kingdom. Use \"/k town <name>\" for managing a town, like upgrades or residents."
     tip-6: "Claim town land to protect containers and animals from enemies, increase your stats and score, and to prevent monsters from spawning."
-    tip-7: "Use "/k town <name>" and choose Plots to set up town plots where only specific residents can build. Change town options to let residents only build in their plots."
+    tip-7: "Use \"/k town <name>\" and choose Plots to set up town plots where only specific residents can build. Change town options to let residents only build in their plots."
     tip-8: "Build Iron Golems to protect your towns from enemy players. Seek out Ruins and defeat the Ruin Golems for a reward."
-    tip-9: "Use "/k stats" and "/k score" to view player statistics. Use "/k prefix" to set your own chat title. Unlock titles with increased stats."
+    tip-9: "Use \"/k stats\" and \"/k score\" to view player statistics. Use \"/k prefix\" to set your own chat title. Unlock titles with increased stats."
   score:
     kingdom-towns: "Kingdom Towns"
     kingdom-land: "Kingdom Land"
@@ -240,6 +240,7 @@ menu:
     description-upgrades: "Apply town upgrades"
     description-options: "Edit town options"
     description-special: "Choose a profession for trade discounts"
+    hint-open: "Click to open"
     hint-join: "Click to send a join request"
     hint-join-now: "Click to instantly join"
     hint-leave: "Click to leave"
@@ -282,6 +283,7 @@ menu:
     description-transfer: "Transfer master to another member"
     description-template: "Change kingdom monument template"
     description-disband: "Disband and delete the kingdom"
+    hint-open: "Click to open"
     hint-exile: "Click to become a barbarian"
     hint-exit: "Exit the menu"
     hint-disband: "Click to delete your kingdom"
@@ -430,9 +432,6 @@ command:
       notice:
         all-properties: "All Properties"
         single-property: "Single Property"
-        flag: "Flag"
-        value: "Value"
-        description: "Description"
         set: "Set property %s of %s to new value %s."
     help:
       notice:
@@ -440,6 +439,8 @@ command:
     kingdom:
       broadcast:
         create: "The Admin Kingdom of %s has been created!"
+      error:
+        no-templates: "There are no monument templates. Create one in a sanctuary with \"k admin monument\""
     monument:
       notice:
         create-1: "Now creating new Monument Template, click on the first corner block of the region."
@@ -563,7 +564,6 @@ command:
       pay: "Received kingdom payment."
       diplomacy-sent: "Sent diplomacy request to the Kingdom of %s."
     error:
-      no-templates: "There are no monument templates. Create one in a sanctuary with \"k admin monument\""
       barbarian-create: "You must be a barbarian to create a kingdom. Use the Exile option in the kingdom menu."
       invalid-template: "That is an invalid monument template. Check spelling or choose another."
       missing-template: "You must specify a template name. View templates with \"/k kingdom templates\""
@@ -939,5 +939,5 @@ properties:
   unclaim: "Allow players to unclaim land"
   upgrade: "Allow players to upgrade this town"
   plots: "Allow players to set town plots"
-  neutral: "Make a kingdom only peaceful"
+  peaceful: "Make a kingdom only peaceful"
   golems: "Enable iron golems to attack enemies"

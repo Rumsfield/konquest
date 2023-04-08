@@ -104,7 +104,7 @@ public class TownCommand extends CommandBase {
 				}
 			}
 			if(notifyLordTakeover) {
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getName()));
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(town.getName(),town.getTravelName()));
 			}
 
 			// Action based on sub-command

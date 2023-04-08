@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.command.admin;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
+import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.model.KonUpgrade;
@@ -540,16 +541,21 @@ public class TownAdminCommand extends CommandBase {
 			String townName = getArgs()[3];
 			String name;
 			if(subCommand.equalsIgnoreCase("add") || subCommand.equalsIgnoreCase("kick") || subCommand.equalsIgnoreCase("lord") || subCommand.equalsIgnoreCase("knight")) {
-				// Player name
-				KonTown town = getKonquest().getKingdomManager().getTown(townName);
-				List<String> playerList = new ArrayList<>();
-				for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllPlayersInKingdom(town.getKingdom())) {
-					name = offlinePlayer.getOfflineBukkitPlayer().getName();
-					if(name != null) {
-						playerList.add(name);
+				// Player name that belongs to kingdom of town/capital
+				KonKingdom townKingdom = null;
+				if(getKonquest().getKingdomManager().isCapital(townName)) {
+					townKingdom = getKonquest().getKingdomManager().getCapital(townName).getKingdom();
+				} else if(getKonquest().getKingdomManager().isTown(townName)) {
+					townKingdom = getKonquest().getKingdomManager().getTown(townName).getKingdom();
+				}
+				if(townKingdom != null) {
+					for(KonOfflinePlayer offlinePlayer : getKonquest().getPlayerManager().getAllPlayersInKingdom(townKingdom)) {
+						name = offlinePlayer.getOfflineBukkitPlayer().getName();
+						if(name != null) {
+							tabList.add(name);
+						}
 					}
 				}
-				tabList.addAll(playerList);
 			} else if(subCommand.equalsIgnoreCase("create") || subCommand.equalsIgnoreCase("destroy")) {
 				// Kingdom name
 				tabList.addAll(getKonquest().getKingdomManager().getKingdomNames());

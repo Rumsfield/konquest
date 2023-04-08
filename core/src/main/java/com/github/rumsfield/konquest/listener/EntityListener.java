@@ -126,13 +126,13 @@ public class EntityListener implements Listener {
 				
 				// Protect Sanctuaries always
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY)) {
-					ChatUtil.printDebug("protecting Sanctuary");
+					ChatUtil.printDebug("protecting Sanctuary from entity explosion");
 					event.setCancelled(true);
 					return;
 				}
 				// Protect Ruins always
 				if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
-					ChatUtil.printDebug("protecting Ruin");
+					ChatUtil.printDebug("protecting Ruin from entity explosion");
 					event.setCancelled(true);
 					return;
 				}
@@ -141,13 +141,13 @@ public class EntityListener implements Listener {
 					KonTown town = (KonTown)territory;
 					// Protect Town Monuments
 					if(town.isLocInsideMonumentProtectionArea(block.getLocation())) {
-						ChatUtil.printDebug("protecting Town Monument");
+						ChatUtil.printDebug("protecting Town Monument from entity explosion");
 						event.setCancelled(true);
 						return;
 					}
 					// Protect towns when all kingdom members are offline
 					if(playerManager.getPlayersInKingdom(town.getKingdom()).isEmpty()) {
-						ChatUtil.printDebug("protecting offline Town");
+						ChatUtil.printDebug("protecting offline Town from entity explosion");
 						event.setCancelled(true);
 						return;
 					}
@@ -155,7 +155,7 @@ public class EntityListener implements Listener {
 					int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
 					if(upgradeLevelWatch > 0) {
 						if(town.getNumResidentsOnline() < upgradeLevelWatch) {
-							ChatUtil.printDebug("protecting upgraded Town WATCH");
+							ChatUtil.printDebug("protecting upgraded Town WATCH from entity explosion");
 							event.setCancelled(true);
 							return;
 						}
@@ -163,7 +163,20 @@ public class EntityListener implements Listener {
 					// Protect when town has upgrade
 					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DAMAGE);
 					if(upgradeLevel >= 2) {
-						ChatUtil.printDebug("protecting upgraded Town DAMAGE");
+						ChatUtil.printDebug("protecting upgraded Town DAMAGE from entity explosion");
+						event.setCancelled(true);
+						return;
+					}
+					// Check for capital capture conditions
+					if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && territory.getKingdom().isCapitalImmune()) {
+						// Capital is immune and cannot be attacked
+						ChatUtil.printDebug("protecting immune capital from entity explosion");
+						event.setCancelled(true);
+						return;
+					}
+					// Verify town can be captured
+					if(town.isCaptureDisabled()) {
+						ChatUtil.printDebug("protecting town in capture cooldown from entity explosion");
 						event.setCancelled(true);
 						return;
 					}
@@ -184,13 +197,13 @@ public class EntityListener implements Listener {
 				// Protect chests
 				boolean isProtectChest = konquest.getCore().getBoolean(CorePath.KINGDOMS_PROTECT_CONTAINERS_EXPLODE.getPath(),true);
 				if(isProtectChest && block.getState() instanceof BlockInventoryHolder) {
-					ChatUtil.printDebug("protecting chest inside Town");
+					ChatUtil.printDebug("protecting chest inside Town from entity explosion");
 					event.setCancelled(true);
 					return;
 				}
 				// Protect beds
 				if(block.getBlockData() instanceof Bed) {
-					ChatUtil.printDebug("protecting bed inside territory from explosion");
+					ChatUtil.printDebug("protecting bed inside territory from entity explosion");
 					event.setCancelled(true);
 					return;
 				}
@@ -485,6 +498,22 @@ public class EntityListener implements Listener {
 						// If the player is not enemy with the town, prevent event
 						if(!playerRole.equals(KonquestRelationshipType.ENEMY)) {
 							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
+						}
+						// Check for capital immunity
+						if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && territory.getKingdom().isCapitalImmune()) {
+							// Capital is immune and cannot be attacked
+							int numTowns = territory.getKingdom().getNumTowns();
+							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAPITAL_IMMUNE.getMessage(numTowns, territory.getKingdom().getName()));
+							event.setCancelled(true);
+							return;
+						}
+						// Verify town can be attacked
+						if(town.isCaptureDisabled()) {
+							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(town.getCaptureCooldownString()));
 							event.setCancelled(true);
 							return;
 						}

@@ -38,7 +38,7 @@ public class KingdomIcon implements MenuIcon {
 	private ItemStack initItem() {
 		// Determine material
 		Material material = Material.DIAMOND_HELMET;
-		if(kingdom.isOpen()) {
+		if(kingdom.isAdminOperated()) {
 			material = Material.GOLDEN_HELMET;
 		}
 		ItemStack item = new ItemStack(material,1);
@@ -46,6 +46,12 @@ public class KingdomIcon implements MenuIcon {
 		assert meta != null;
 		// Add applicable labels
 		List<String> loreList = new ArrayList<>();
+		if(kingdom.isAdminOperated()) {
+			loreList.add(propertyColor+MessagePath.LABEL_ADMIN_KINGDOM.getMessage());
+		}
+		if(kingdom.isPeaceful()) {
+			loreList.add(propertyColor+MessagePath.LABEL_PEACEFUL.getMessage());
+		}
 		if(kingdom.isOpen()) {
 			loreList.add(propertyColor+MessagePath.LABEL_OPEN.getMessage());
 		}

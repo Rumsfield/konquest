@@ -522,6 +522,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				if(isAdmin) {
 					// This kingdom is operated by admins only
 					newKingdom.setIsAdminOperated(true);
+					// Make the kingdom open for joining by default
+					newKingdom.setIsOpen(true);
 				} else {
 					// This kingdom is operated by players
 					newKingdom.setIsAdminOperated(false);
@@ -1622,7 +1624,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_CLOSED.getMessage(kingdom.getName()));
 		} else {
 			kingdom.setIsOpen(true);
-			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_OPEN.getMessage(kingdom.getName()));
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_OPEN.getMessage());
 		}
 	}
 	
@@ -2742,11 +2744,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
-		// Check for kingdom capital, cannot transfer lord (lord must be kingdom master)
-		if(town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-			return false;
-		}
 		// Transfer lordship
 		town.setPlayerLord(member);
 		for(OfflinePlayer resident : town.getPlayerResidents()) {
@@ -2761,7 +2758,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return true;
 	}
 
-	// An online player tries to become lord of an abandoned town
+	/**
+	 * An online player tries to become lord of an abandoned town.
+	 * This also works for capitals.
+	 * @param player The player attempting to claim lordship
+	 * @param town The town that has no lord
+	 */
 	public void lordTownTakeover(KonPlayer player, KonTown town) {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Verify conditions for takeover
@@ -3739,6 +3741,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         				}
         			}
 					// Kingdom Membership
+					// Set open flag
+					boolean isKingdomOpen = kingdomSection.getBoolean("open",false);
+					newKingdom.setIsOpen(isKingdomOpen);
 					// Assign Master
 					String masterUUID = kingdomSection.getString("master","");
 					if(!masterUUID.equalsIgnoreCase("")) {
@@ -4003,6 +4008,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				kingdomPropertiesSection.set(flag.toString(), kingdom.getAllProperties().get(flag));
 			}
 			// Kingdom Membership
+			kingdomSection.set("open", kingdom.isOpen());
 			kingdomSection.set("master", "");
 			ConfigurationSection kingdomMemberSection = kingdomSection.createSection("members");
 			for(OfflinePlayer member : kingdom.getPlayerMembers()) {

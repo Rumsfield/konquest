@@ -84,11 +84,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 				PlayerIcon playerInfo = new PlayerIcon(kingdomColor + masterPlayer.getName(), loreList, masterPlayer, slotIndex, true, PlayerIconAction.DISPLAY_INFO);
 				getMenu().getPage(pageIndex).addIcon(playerInfo);
 			} else {
-				//for(String line : Konquest.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getName(), observer.getBukkitPlayer().getName()))) {
-				//	loreList.add(ChatColor.RED+line);
-				//}
-				//TODO: Add message for no master?
-				info = new InfoIcon(ChatColor.DARK_PURPLE + MessagePath.LABEL_LORD.getMessage(), loreList, Material.BARRIER, slotIndex, false);
+				info = new InfoIcon(ChatColor.DARK_RED + MessagePath.LABEL_MASTER.getMessage(), loreList, Material.BARRIER, slotIndex, false);
 				getMenu().getPage(pageIndex).addIcon(info);
 			}
 		}
@@ -113,12 +109,12 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
     	String isOpen = DisplayManager.boolean2Symbol(infoKingdom.isOpen());
     	String isAdminOperated = DisplayManager.boolean2Symbol(infoKingdom.isAdminOperated());
     	loreList = new ArrayList<>();
-    	loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
-    	loreList.add(loreColor+MessagePath.LABEL_SMALLEST.getMessage()+": "+isSmallest);
-    	loreList.add(loreColor+MessagePath.LABEL_PROTECTED.getMessage()+": "+isProtected);
-    	loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
-    	loreList.add(loreColor+MessagePath.LABEL_ADMIN_KINGDOM.getMessage()+": "+isAdminOperated);
-    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, slotIndex, false);
+		loreList.add(loreColor+MessagePath.LABEL_ADMIN_KINGDOM.getMessage()+": "+isAdminOperated);
+		loreList.add(loreColor+MessagePath.LABEL_PROTECTED.getMessage()+": "+isProtected);
+		loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
+		loreList.add(loreColor+MessagePath.LABEL_SMALLEST.getMessage()+": "+isSmallest);
+		loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
+		info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, slotIndex, false);
     	getMenu().getPage(pageIndex).addIcon(info);
 
 		/* Stats Info Icon (6) */

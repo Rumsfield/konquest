@@ -54,7 +54,7 @@ public class HelpMenuWrapper extends MenuWrapper {
 
 		// Page 0 - Player Commands
 		pageLabel = titleColor+MessagePath.MENU_HELP_TITLE.getMessage();
-		pageRows = (int)Math.ceil(((double)(CommandType.values().length+1))/9);
+		pageRows = (int)Math.ceil(((double)(CommandType.values().length))/9);
 		pageIndex = 0;
 		slotIndex = 0;
 		getMenu().addPage(pageIndex, pageRows, pageLabel);
@@ -104,7 +104,7 @@ public class HelpMenuWrapper extends MenuWrapper {
 		// Create admin page if there are any allowed commands
 		if(!allowedCmdList.isEmpty()) {
 			pageLabel = titleColor+MessagePath.MENU_HELP_ADMIN.getMessage();
-			pageRows = (int)Math.ceil(((double)(allowedCmdList.size()+1))/9);
+			pageRows = (int)Math.ceil(((double)(allowedCmdList.size()))/9);
 			slotIndex = 0;
 			getMenu().addPage(pageIndex, pageRows, pageLabel);
 			// Add command icons
@@ -118,7 +118,7 @@ public class HelpMenuWrapper extends MenuWrapper {
 
 		// Page 2 - Tips
 		pageLabel = titleColor+MessagePath.MENU_HELP_TIPS.getMessage();
-		pageRows = 2;
+		pageRows = 1;
 		slotIndex = 0;
 		getMenu().addPage(pageIndex, pageRows, pageLabel);
 		String[] tips = {
