@@ -13,6 +13,17 @@ tasks {
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir/build/libs"))
     }
+
+    register<Javadoc>("generateJavadoc"){
+        source = sourceSets.main.get().allJava
+        classpath += project.configurations.getByName("compileClasspath").asFileTree
+        title = rootProject.name+" "+project.version+" Documentation"
+
+        options.overview("overview.html")
+
+        destinationDir = file("$rootDir/doc")
+    }
+
 }
 
 java{
