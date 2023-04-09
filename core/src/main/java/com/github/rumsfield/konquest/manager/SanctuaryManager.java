@@ -368,8 +368,33 @@ public class SanctuaryManager {
 		return createMonumentTemplate(sanctuary, name, corner1, corner2, travelPoint, cost, true, false);
 	}
 
-	public int loadMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint, double cost) {
-		return createMonumentTemplate(sanctuary, name, corner1, corner2, travelPoint, cost, false, true);
+	public void loadMonumentTemplate(KonSanctuary sanctuary, String name, Location corner1, Location corner2, Location travelPoint, double cost) {
+		int status = createMonumentTemplate(sanctuary, name, corner1, corner2, travelPoint, cost, false, true);
+		if(status != 0) {
+			String message = "Invalid Monument Template "+name+" for Sanctuary "+sanctuary.getName()+", ";
+			switch(status) {
+				case 1:
+					message = message+"base dimensions are not 16x16 blocks.";
+					break;
+				case 2:
+					message = message+"region does not contain enough critical blocks.";
+					break;
+				case 3:
+					message = message+"region does not contain a travel point.";
+					break;
+				case 4:
+					message = message+"region is not within territory.";
+					break;
+				case 5:
+					message = message+"invalid name.";
+					break;
+				default:
+					message = message+"unknown reason.";
+					break;
+			}
+			ChatUtil.printConsoleError(message);
+			konquest.opStatusMessages.add(message);
+		}
 	}
 	
 	/**
@@ -556,32 +581,7 @@ public class SanctuaryManager {
 				        	Location templateCornerTwo = new Location(sanctuaryWorld,x,y,z);
 	        				// Create  & validate template
 							// If it fails validation, it is still loaded into memory, but marked as invalid.
-				        	int status = loadMonumentTemplate(sanctuary, templateName, templateCornerOne, templateCornerTwo, templateTravel, cost);
-				        	if(status != 0) {
-			        			String message = "Invalid Monument Template "+templateName+" for Sanctuary "+sanctuaryName+", ";
-			        			switch(status) {
-				        			case 1:
-				        				message = message+"base dimensions are not 16x16 blocks.";
-				        				break;
-				        			case 2:
-				        				message = message+"region does not contain enough critical blocks.";
-				        				break;
-				        			case 3:
-				        				message = message+"region does not contain a travel point.";
-				        				break;
-				        			case 4:
-				        				message = message+"region is not within territory.";
-				        				break;
-				        			case 5:
-				        				message = message+"invalid name.";
-				        				break;
-			        				default:
-			        					message = message+"unknown reason.";
-			        					break;
-			        			}
-			        			ChatUtil.printConsoleError(message);
-			        			konquest.opStatusMessages.add(message);
-			        		}
+				        	loadMonumentTemplate(sanctuary, templateName, templateCornerOne, templateCornerTwo, templateTravel, cost);
 	        			}
 	        			// Done
 	        		} else {

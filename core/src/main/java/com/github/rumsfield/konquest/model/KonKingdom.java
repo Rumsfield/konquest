@@ -27,6 +27,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	private final boolean isCreated;
 	private boolean isAdminOperated;
 	private boolean isOpen;
+	private boolean isLegacy;
 	private final RequestKeeper joinRequestKeeper;
 	private UUID master;
 	private final Map<UUID,Boolean> members; // True = officer, False = regular
@@ -46,6 +47,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.isCreated = true;
 		this.isAdminOperated = false;
 		this.isOpen = false;
+		this.isLegacy = false;
 		this.joinRequestKeeper = new RequestKeeper();
 		this.master = null;
 		this.members = new HashMap<>();
@@ -68,6 +70,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.isCreated = false;
 		this.isAdminOperated = false;
 		this.isOpen = true;
+		this.isLegacy = false;
 		this.joinRequestKeeper = new RequestKeeper();
 		this.master = null;
 		this.members = new HashMap<>();
@@ -92,6 +95,14 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public boolean isOpen() {
 		return isOpen;
+	}
+
+	public void setIsLegacy(boolean val) {
+		isLegacy = val;
+	}
+
+	public boolean isLegacy() {
+		return isLegacy;
 	}
 	
 	public void setIsAdminOperated(boolean val) {

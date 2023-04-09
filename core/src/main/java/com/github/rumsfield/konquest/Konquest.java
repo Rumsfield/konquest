@@ -176,6 +176,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		ruinManager.initialize();
 		initManagers();
 		initWorlds();
+		kingdomManager.loadLegacyKingdomMemberships();
 		
 		databaseThread.setSleepSeconds(saveIntervalSeconds);
 		if(!databaseThread.isRunning()) {
@@ -300,7 +301,6 @@ public class Konquest implements KonquestAPI, Timeable {
 		shieldManager.initialize();
 		placeholderManager.initialize();
 		plotManager.initialize();
-		//guildManager.loadOptions();
 		offlineTimeoutSeconds = getCore().getInt(CorePath.KINGDOMS_OFFLINE_TIMEOUT_DAYS.getPath(),0)* 86400L;
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;
