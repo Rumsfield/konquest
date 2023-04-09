@@ -21,7 +21,7 @@ tasks {
 
         options.overview("overview.html")
 
-        destinationDir = file("$rootDir/doc")
+        setDestinationDir(file("$rootDir/doc"))
     }
 
 }
