@@ -7,6 +7,8 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
 
 /**
  * A manager for town plots in Konquest.
+ * A town plot is a collection of claimed town land chunks where only specific town residents may build.
+ * Depending on Konquest configuration settings, the town lord and town knights may be able to build in any town plot.
  * 
  * @author Rumsfield
  *
