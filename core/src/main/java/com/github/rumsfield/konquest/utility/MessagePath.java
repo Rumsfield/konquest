@@ -383,6 +383,8 @@ public enum MessagePath {
 	PROTECTION_NOTICE_RUIN                      (1, "protection.notice.ruin"),
 	PROTECTION_NOTICE_SAFE                      (1, "protection.notice.safe"),
 	PROTECTION_NOTICE_ATTACKED                  (0, "protection.notice.attacked"),
+	PROTECTION_NOTICE_TEMPLATE_MODIFY           (1, "protection.notice.template-modify"),
+	PROTECTION_NOTICE_TEMPLATE_READY           (1, "protection.notice.template-ready"),
 	PROTECTION_ERROR_BLOCKED                    (0, "protection.error.blocked"),
 	PROTECTION_ERROR_NOT_RESIDENT               (1, "protection.error.not-resident"),
 	PROTECTION_ERROR_NOT_PLOT                   (0, "protection.error.not-plot"),

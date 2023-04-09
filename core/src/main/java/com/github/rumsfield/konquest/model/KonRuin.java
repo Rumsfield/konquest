@@ -197,6 +197,11 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 			}
 		}
 	}
+
+	@Override
+	public void updateBarTitle() {
+		ruinBarAll.setTitle(Konquest.neutralColor1+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName());
+	}
 	
 	public void setBarProgress(double progress) {
 		ruinBarAll.setProgress(progress);

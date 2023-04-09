@@ -374,6 +374,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 			if(town.isLocInsideCenterChunk(occupant.getBukkitPlayer().getLocation())) {
 				Location tpLoc = konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2);
+				if(tpLoc == null) {
+					ChatUtil.printDebug("Failed to teleport player "+occupant.getBukkitPlayer().getName()+" to a safe location.");
+					continue;
+				}
         		double x0,x1,z0,z1;
         		x0 = tpLoc.getX();
         		x1 = town.getCenterLoc().getX();

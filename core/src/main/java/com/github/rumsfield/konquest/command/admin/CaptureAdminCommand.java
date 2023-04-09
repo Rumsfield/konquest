@@ -1,7 +1,6 @@
 package com.github.rumsfield.konquest.command.admin;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
@@ -111,7 +110,7 @@ public class CaptureAdminCommand extends CommandBase {
 				capturedTown.getMonumentTimer().stopTimer();
 				capturedTown.setAttacked(false,null);
 				capturedTown.setBarProgress(1.0);
-				capturedTown.updateBar();
+				capturedTown.updateBarTitle();
 			} else {
 				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			}

@@ -209,7 +209,7 @@ public class ConfigManager{
 		Version pluginVersion = new Version(pluginVersionStr);
 
 		for (Version boundary : versionBoundaries) {
-			if(coreVersion.compareTo(boundary) < 0 && pluginVersion.compareTo(boundary) >= 0) {
+			if(!coreVersion.equals(new Version("0.0.0")) && coreVersion.compareTo(boundary) < 0 && pluginVersion.compareTo(boundary) >= 0) {
 				// Core config file version is earlier than a boundary version.
 				// Print messages and archive the Konquest folder.
 				ChatUtil.printConsoleError("/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\");

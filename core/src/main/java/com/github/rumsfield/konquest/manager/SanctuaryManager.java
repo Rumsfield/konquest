@@ -110,6 +110,8 @@ public class SanctuaryManager {
 			sanctuaryMap.get(name.toLowerCase()).setName(newName);
 			KonSanctuary sanctuary = sanctuaryMap.remove(name.toLowerCase());
 			sanctuaryMap.put(newName.toLowerCase(), sanctuary);
+			sanctuary.updateBarTitle();
+			sanctuary.updateBarPlayers();
 			result = true;
 		}
 		return result;

@@ -401,6 +401,8 @@ protection:
     ruin: "You have captured the Ruin %s."
     safe: "The Town of %s is safe, for now..."
     attacked: "Under Attack"
+    template-modify: "Monument Template %s is being modified and is temporarily unavailable."
+    template-ready: "Monument Template %s is now available."
   error:
     blocked: "Blocked"
     not-resident: "You must be a resident of %s to do this."
@@ -443,7 +445,7 @@ command:
         admin-set: "The Kingdom of %s is now an admin kingdom."
         admin-clear: "The Kingdom of %s is now a regular kingdom."
       error:
-        no-templates: "There are no monument templates. Create one in a sanctuary with \"k admin monument\""
+        no-templates: "There are no monument templates. Create one in a sanctuary with \"/k admin monument\""
         admin-set: "The Kingdom of %s is already an admin kingdom."
         admin-clear: "The Kingdom of %s is already a regular kingdom."
     monument:
@@ -454,7 +456,7 @@ command:
         success: "Successfully created new Monument Template %s."
         remove: "Removed Monument Template %s."
         show: "Showing existing Monument Template %s in Sanctuary %s."
-        sanctuary: "Create Sanctuary territory before creating Monument Templates."
+        sanctuary: "Create Sanctuary territory with \"/k admin sanctuary\" before creating Monument Templates."
       error:
         none: "Monument Template %s is currently not valid."
         value: "Cost value is not a number."
@@ -479,8 +481,8 @@ command:
         invalid: "Could not add this block to a valid Ruin."
     sanctuary:
       notice:
-        create: "Successfully created new Sanctuary: %s"
-        remove: "Successfully removed Sanctuary: %s"
+        create: "Successfully created new Sanctuary %s, add more land with \"/k admin claim\"."
+        remove: "Successfully removed Sanctuary %s"
         rename: "Successfully changed Sanctuary name from %s to %s."
       error:
         create: "Could not create Sanctuary %s, bad name or territory overlap."

@@ -9,4 +9,6 @@ public interface KonBarDisplayer {
 	void removeAllBarPlayers();
 	
 	void updateBarPlayers();
+
+	void updateBarTitle();
 }

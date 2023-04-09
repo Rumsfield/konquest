@@ -395,7 +395,8 @@ public class PlayerListener implements Listener {
 		                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_2.getMessage(), ChatColor.LIGHT_PURPLE);
 	                	} else {
 	                		// The first corner is not in a sanctuary, end the region setting flow
-	                		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage());
+							String templateName = player.getRegionTemplateName();
+	                		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage(templateName));
 	                		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SANCTUARY.getMessage());
 	                		player.setRegionCornerOneBuffer(null);
 		                    player.setRegionCornerTwoBuffer(null);

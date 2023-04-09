@@ -1132,8 +1132,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		int randomNumY;
 		boolean foundValidLoc = false;
 		int timeout = 0;
+		ArrayList<Chunk> chunkList = getSurroundingChunks(center, radius);
 		while(!foundValidLoc) {
-			ArrayList<Chunk> chunkList = getSurroundingChunks(center, radius);
 			randomChunkIdx = ThreadLocalRandom.current().nextInt(0, chunkList.size());
 			randomNumX = ThreadLocalRandom.current().nextInt(0, 16);
 			randomNumZ = ThreadLocalRandom.current().nextInt(0, 16);
@@ -1144,7 +1144,7 @@ public class Konquest implements KonquestAPI, Timeable {
 			randLoc.add(0.5,2,0.5);
 			ChatUtil.printDebug("Checking block material target: "+ randBlock.getType());
 			ChatUtil.printDebug("Checking block material down: "+ randBlockDown.getType());
-			if(!randBlockDown.getType().equals(Material.LAVA)) {
+			if(!randBlockDown.getType().equals(Material.LAVA) && randBlockDown.getType().isSolid()) {
 				foundValidLoc = true;
 			} else {
 				timeout++;

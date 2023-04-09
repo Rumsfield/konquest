@@ -240,7 +240,7 @@ public class BlockListener implements Listener {
 							}
 							// Update MonumentBar state
 							town.setAttacked(true,player);
-							town.updateBar();
+							town.updateBarTitle();
 							town.applyGlow(event.getPlayer());
 							// Attempt to start a raid alert
 							town.sendRaidAlert();
@@ -1306,7 +1306,7 @@ public class BlockListener implements Listener {
 		town.getMonument().addCriticalHit();
 		int maxCriticalhits = konquest.getKingdomManager().getMaxCriticalHits();
 		// Update bar progress
-		town.updateBar();
+		town.updateBarTitle();
 		// Evaluate town capture conditions
 		if(town.getMonument().getCriticalHits() >= maxCriticalhits) {
 			// The Town is at critical max, conquer or destroy
@@ -1447,7 +1447,7 @@ public class BlockListener implements Listener {
 					capturedTown.getMonumentTimer().stopTimer();
 					capturedTown.setAttacked(false,player);
 					capturedTown.setBarProgress(1.0);
-					capturedTown.updateBar();
+					capturedTown.updateBarTitle();
 				} else {
 					ChatUtil.printDebug("Problem converting Town "+town.getName()+" from Kingdom "+town.getKingdom().getName()+" to "+player.getKingdom().getName());
 					// If, for example, a player in the Barbarians default kingdom captured the monument
@@ -1458,7 +1458,7 @@ public class BlockListener implements Listener {
 					// Reset the town MonumentBar
 					town.setAttacked(false,player);
 					town.setBarProgress(1.0);
-					town.updateBar();
+					town.updateBarTitle();
 				}
 			}
 		} else {

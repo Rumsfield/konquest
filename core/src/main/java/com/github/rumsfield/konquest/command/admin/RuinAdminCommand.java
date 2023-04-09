@@ -44,6 +44,10 @@ public class RuinAdminCommand extends CommandBase {
 		String ruinName = getArgs()[3];
 		
 		if(cmdMode.equalsIgnoreCase("create")) {
+			if (getArgs().length != 4) {
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				return;
+			}
 			Location playerLoc = bukkitPlayer.getLocation();
 			if(getKonquest().validateName(ruinName,bukkitPlayer) != 0) {
         		return;

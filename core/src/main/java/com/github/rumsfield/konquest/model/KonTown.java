@@ -741,7 +741,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			monument.clearCriticalHits();
 			setAttacked(false,null);
 			reloadMonument();
-			updateBar();
+			updateBarTitle();
 			getWorld().playSound(getCenterLoc(), Sound.BLOCK_ANVIL_USE, (float)1, (float)0.8);
 			for(KonPlayer player : getKonquest().getPlayerManager().getPlayersInKingdom(getKingdom().getName())) {
 				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_SAFE.getMessage(getName()), ChatColor.GREEN);
@@ -762,7 +762,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				deactivateShield();
 			} else {
 				//refreshShieldBarTitle();
-				updateBar();
+				updateBarTitle();
 			}
 		} else {
 			// Check for timer in player travel cool-down map
@@ -913,7 +913,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		rabbit.remove();
 	}
 	
-	public void updateBar() {
+	public void updateBarTitle() {
 		/*
 		 * When town block is broken without shield or armor, attacked=true & show critical hit progress.
 		 * If shields or armor are added while attacked, preserve attacked state and critical progress in background,
@@ -1453,7 +1453,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		//shieldArmorBarAll.setVisible(true);
 		//refreshShieldBarTitle();
-		updateBar();
+		updateBarTitle();
 	}
 	
 	public void deactivateShield() {
@@ -1463,7 +1463,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		isShielded = false;
 		shieldTimer.stopTimer();
 		//refreshShieldBarTitle();
-		updateBar();
+		updateBarTitle();
 	}
 	
 	public void activateArmor(int val) {
@@ -1480,7 +1480,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		//shieldArmorBarAll.setProgress(1.0);
 		//setBarProgress(1.0);
 		//refreshShieldBarTitle();
-		updateBar();
+		updateBarTitle();
 	}
 	
 	public void deactivateArmor() {
@@ -1494,7 +1494,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		armorTotalBlocks = 0;
 		armorProgress = 0.0;
 		//refreshShieldBarTitle();
-		updateBar();
+		updateBarTitle();
 	}
 	
 	public void clearShieldsArmors() {
@@ -1511,7 +1511,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				deactivateArmor();
 			} else {
 				armorProgress = (double)armorCurrentBlocks/armorTotalBlocks;
-				updateBar();
+				updateBarTitle();
 			}
 		}
 		return result;

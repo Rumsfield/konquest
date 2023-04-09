@@ -152,6 +152,11 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 			}
 		}
 	}
+
+	@Override
+	public void updateBarTitle() {
+		campBarAll.setTitle(Konquest.barbarianColor1+getName());
+	}
 	
 	public void setProtected(boolean val) {
 		if(val) {

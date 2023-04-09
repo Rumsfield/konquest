@@ -42,6 +42,10 @@ public class SanctuaryAdminCommand extends CommandBase {
 		String name = getArgs()[3];
 		
 		if(cmdMode.equalsIgnoreCase("create")) {
+			if (getArgs().length != 4) {
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				return;
+			}
 			Location playerLoc = bukkitPlayer.getLocation();
 			if(getKonquest().validateName(name,bukkitPlayer) != 0) {
         		return;
@@ -106,7 +110,7 @@ public class SanctuaryAdminCommand extends CommandBase {
 			String subCmd = getArgs()[2];
 			if(subCmd.equalsIgnoreCase("create")) {
 				tabList.add("***");
-			} else if(subCmd.equalsIgnoreCase("remove")) {
+			} else if(subCmd.equalsIgnoreCase("remove") || subCmd.equalsIgnoreCase("rename")) {
 				tabList.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
 			}
 			// Trim down completion options based on current input

@@ -86,6 +86,11 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 	}
 
 	@Override
+	public void updateBarTitle() {
+		sanctuaryBarAll.setTitle(Konquest.neutralColor1+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName());
+	}
+
+	@Override
 	public int initClaim() {
 		addChunk(Konquest.toPoint(getCenterLoc()));
 		return 0;
@@ -218,7 +223,7 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 		KonMonumentTemplate template = getTemplate(name);
 		if(template != null) {
 			if(!template.isBlanking()) {
-				ChatUtil.sendBroadcast("Monument Template "+template.getName()+" is unavailable.");
+				ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_TEMPLATE_MODIFY.getMessage(template.getName()));
 				ChatUtil.printDebug("Starting monument blanking for template "+name);
 			}
 			stopTemplateBlanking(name);
@@ -264,8 +269,7 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 						ChatUtil.printDebug("Template validation completed with return code: "+status);
 						switch(status) {
 							case 0:
-								//ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(templateName));
-								ChatUtil.sendBroadcast("Monument Template "+templateName+" is now available.");
+								ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_TEMPLATE_READY.getMessage(monumentTemplate.getName()));
 								monumentTemplate.setValid(true);
 								monumentTemplate.setBlanking(false);
 								getKonquest().getKingdomManager().reloadMonumentsForTemplate(monumentTemplate);
@@ -275,21 +279,21 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 								Location c2 = monumentTemplate.getCornerTwo();
 								int diffX = (int)Math.abs(c1.getX()-c2.getX())+1;
 								int diffZ = (int)Math.abs(c1.getZ()-c2.getZ())+1;
-								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(templateName,diffX,diffZ));
+								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(monumentTemplate.getName(),diffX,diffZ));
 								break;
 							case 2:
 								String criticalBlockTypeName = getKonquest().getCore().getString(CorePath.MONUMENTS_CRITICAL_BLOCK.getPath());
 								int maxCriticalhits = getKonquest().getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
-								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(templateName,maxCriticalhits,criticalBlockTypeName));
+								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(monumentTemplate.getName(),maxCriticalhits,criticalBlockTypeName));
 								break;
 							case 3:
-								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_TRAVEL.getMessage(templateName));
+								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_TRAVEL.getMessage(monumentTemplate.getName()));
 								break;
 							case 4:
-								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage(templateName));
+								ChatUtil.sendAdminBroadcast(MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage(monumentTemplate.getName()));
 								break;
 							default:
-								ChatUtil.printDebug("Monument blanking timer ended with unknown status for template "+templateName);
+								ChatUtil.printDebug("Monument blanking timer ended with unknown status for template "+monumentTemplate.getName());
 								break;
 						}
 					}

@@ -21,7 +21,7 @@ public class KonCapital extends KonTown implements KonquestCapital {
 	
 	public void updateName() {
 		setName(getKingdom().getName()+" "+getKonquest().getCore().getString(CorePath.KINGDOMS_CAPITAL_SUFFIX.getPath()));
-		updateBar();
+		updateBarTitle();
 	}
 	
 	@Override

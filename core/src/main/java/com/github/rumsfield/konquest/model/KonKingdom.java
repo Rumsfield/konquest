@@ -621,7 +621,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 			town.setName(newName);
 			townMap.remove(oldNameActual);
 			townMap.put(newName, town);
-			townMap.get(newName).updateBar();
+			townMap.get(newName).updateBarTitle();
 			townMap.get(newName).updateBarPlayers();
 			return true;
 		}
