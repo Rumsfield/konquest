@@ -273,7 +273,7 @@ menu:
     template: "Templates"
     disband: "Disband"
     description-join: "Request to join a kingdom, or create your own with /k kingdom create"
-    description-exile: "Leave your current kingdom and become a barbarian, lose all favor and stats"
+    description-exile: "Leave your current kingdom and become a barbarian"
     description-invites: "View your kingdom invites"
     description-list: "View all kingdoms"
     description-relation: "Modify relationships with other kingdoms"
@@ -439,8 +439,13 @@ command:
     kingdom:
       broadcast:
         create: "The Admin Kingdom of %s has been created!"
+      notice:
+        admin-set: "The Kingdom of %s is now an admin kingdom."
+        admin-clear: "The Kingdom of %s is now a regular kingdom."
       error:
         no-templates: "There are no monument templates. Create one in a sanctuary with \"k admin monument\""
+        admin-set: "The Kingdom of %s is already an admin kingdom."
+        admin-clear: "The Kingdom of %s is already a regular kingdom."
     monument:
       notice:
         create-1: "Now creating new Monument Template, click on the first corner block of the region."
@@ -555,6 +560,8 @@ command:
       invite-received: "Received kingdom invite, type \"/k kingdom\" to respond."
       invite-declined: "Declined invitation to join %s."
       exile: "You are now exiled from %s as a barbarian."
+      exile-stats: "Removed all stats from exile!"
+      exile-favor: "Removed all favor from exile!"
       kick: "Kicked player %s from the kingdom."
       rename: "Successfully changed kingdom name to %s."
       discount: "The Kingdom of %s gives you a %s percent discount with this merchant."

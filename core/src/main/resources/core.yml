@@ -435,10 +435,10 @@ core:
   exile:
     
     # Set a player's currency balance to 0 when exiled (true/flase)
-    remove_favor: true
+    remove_favor: false
     
     # Remove all stats and accomplishment prefixes from a player when exiled (true/false)
-    remove_stats: true
+    remove_stats: false
     
     # Teleport a player to a random location in the wild of their current world upon exile (true/false)
     teleport_wild: true

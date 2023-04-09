@@ -213,7 +213,8 @@ public class ConfigManager{
 				// Core config file version is earlier than a boundary version.
 				// Print messages and archive the Konquest folder.
 				ChatUtil.printConsoleError("/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\");
-				ChatUtil.printConsoleError("Updating from Konquest version "+fileVersionStr+" to version "+pluginVersionStr+" is not supported!");
+				ChatUtil.printConsoleError("Updating from Konquest version "+fileVersionStr+" to version "+pluginVersionStr+" requires extra setup!");
+				ChatUtil.printConsoleError("You must review all kingdoms for correctness, or delete the Konquest folder.");
 				ChatUtil.printConsoleError("Not all plugin data is guaranteed to transfer to the new version.");
 				ChatUtil.printConsoleError("The original plugin data folder will be archived to Konquest_"+fileVersionStr+".zip.");
 				ChatUtil.printConsoleError("--> Recommended to delete the Konquest folder and restart the server. <--");

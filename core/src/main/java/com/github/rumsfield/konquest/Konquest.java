@@ -176,7 +176,6 @@ public class Konquest implements KonquestAPI, Timeable {
 		ruinManager.initialize();
 		initManagers();
 		initWorlds();
-		kingdomManager.loadLegacyKingdomMemberships();
 		
 		databaseThread.setSleepSeconds(saveIntervalSeconds);
 		if(!databaseThread.isRunning()) {

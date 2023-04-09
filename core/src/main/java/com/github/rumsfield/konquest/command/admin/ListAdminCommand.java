@@ -5,6 +5,7 @@ import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.command.ListType;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -80,17 +81,21 @@ public class ListAdminCommand extends CommandBase {
         		// Display paged lines to player
         		int numLines = lines.size(); // should be 1 or more
 				int MAX_LINES = 8;
-				int totalPages = (int)Math.ceil((double)numLines/ MAX_LINES); // 1-based
+				int totalPages = (int)Math.ceil(((double)numLines)/MAX_LINES); // 1-based
             	totalPages = Math.max(totalPages, 1); // clamp to 1
             	int page = 1; // 1-based
-            	if (getArgs().length == 3) {
+            	if (getArgs().length == 4) {
             		try {
-            			page = Integer.parseInt(getArgs()[2]);
+            			page = Integer.parseInt(getArgs()[3]);
         			}
-        			catch (NumberFormatException ignored) {}
+					catch (NumberFormatException ex) {
+						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(ex.getMessage()));
+						return;
+					}
             	}
             	// Clamp page index
-            	page = Math.min(Math.max(page, 1), totalPages);
+				page = Math.min(page,totalPages);
+				page = Math.max(page,1);
             	// Determine line start and end
             	int startIdx = (page-1) * MAX_LINES;
             	int endIdx = startIdx + MAX_LINES;
@@ -99,7 +104,7 @@ public class ListAdminCommand extends CommandBase {
             	ChatUtil.sendNotice(bukkitPlayer,header);
 				List<String> pageLines = new ArrayList<>();
 				for (int i = startIdx; i < endIdx && i < numLines; i++) {
-					String line = (i+1)+". "+lines.get(i);
+					String line = ""+ ChatColor.GOLD+(i+1)+". "+ChatColor.AQUA+lines.get(i);
 					pageLines.add(line);
 				}
 				ChatUtil.sendCommaNotice(bukkitPlayer,pageLines);

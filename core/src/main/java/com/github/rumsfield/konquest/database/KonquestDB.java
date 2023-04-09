@@ -35,6 +35,7 @@ public class KonquestDB extends Database{
         konquest.getAccomplishmentManager().loadCustomPrefixes();
         spawnTables();
         konquest.getPlayerManager().initAllSavedPlayers();
+        konquest.getKingdomManager().loadLegacyKingdomMemberships();
         konquest.getCampManager().initCamps();
         konquest.getMapHandler().drawDynmapAllTerritories();
         isReady = true;

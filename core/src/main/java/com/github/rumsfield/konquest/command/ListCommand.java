@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.command;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -19,7 +20,7 @@ public class ListCommand extends CommandBase {
 	
 	// Display a paged list of names
     public void execute() {
-    	// k list [kingdom|town] [<page>]
+    	// k list [kingdom|town|sanctuary] [<page>]
     	if (getArgs().length > 3) {
     		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 		} else {
@@ -33,7 +34,9 @@ public class ListCommand extends CommandBase {
 					mode = ListType.KINGDOM;
 				} else if(listMode.equalsIgnoreCase("town")) {
         			mode = ListType.TOWN;
-        		} else {
+        		} else if(listMode.equalsIgnoreCase("sanctuary")) {
+					mode = ListType.SANCTUARY;
+				} else {
         			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
                     return;
         		}
@@ -48,6 +51,9 @@ public class ListCommand extends CommandBase {
 	        	case TOWN:
 	        		lines.addAll(getKonquest().getKingdomManager().getTownNames());
 	        		break;
+				case SANCTUARY:
+					lines.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
+					break;
 	        	default :
 	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
 	                return;
@@ -63,17 +69,21 @@ public class ListCommand extends CommandBase {
         		// Display paged lines to player
         		int numLines = lines.size(); // should be 1 or more
 				int MAX_LINES = 8;
-				int totalPages = (int)Math.ceil((double)numLines/ MAX_LINES); // 1-based
-            	totalPages = Math.max(totalPages, 1); // clamp to 1
+				int totalPages = (int)Math.ceil(((double)numLines)/MAX_LINES); // 1-based
+            	totalPages = Math.max(totalPages, 1);
             	int page = 1; // 1-based
             	if (getArgs().length == 3) {
             		try {
             			page = Integer.parseInt(getArgs()[2]);
         			}
-        			catch (NumberFormatException ignored) {}
+					catch (NumberFormatException ex) {
+						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(ex.getMessage()));
+						return;
+					}
             	}
             	// Clamp page index
-            	page = Math.min(Math.max(page, 1), totalPages);
+				page = Math.min(page,totalPages);
+				page = Math.max(page,1);
             	// Determine line start and end
             	int startIdx = (page-1) * MAX_LINES;
             	int endIdx = startIdx + MAX_LINES;
@@ -82,7 +92,7 @@ public class ListCommand extends CommandBase {
             	ChatUtil.sendNotice(bukkitPlayer,header);
 				List<String> pageLines = new ArrayList<>();
             	for (int i = startIdx; i < endIdx && i < numLines; i++) {
-            		String line = (i+1)+". "+lines.get(i);
+            		String line = ""+ChatColor.GOLD+(i+1)+". "+ChatColor.AQUA+lines.get(i);
 					pageLines.add(line);
             	}
 				ChatUtil.sendCommaNotice(bukkitPlayer,pageLines);
@@ -92,13 +102,14 @@ public class ListCommand extends CommandBase {
     
     @Override
 	public List<String> tabComplete() {
-    	// k list [kingdom|town] [<page>]
+    	// k list [kingdom|town|sanctuary] [<page>]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		
 		if(getArgs().length == 2) {
 			tabList.add("kingdom");
 			tabList.add("town");
+			tabList.add("sanctuary");
 			
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);

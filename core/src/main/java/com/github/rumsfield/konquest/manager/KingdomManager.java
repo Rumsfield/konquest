@@ -1092,6 +1092,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		if(isOnline) {
     			onlinePlayer.getPlayerStats().clearStats();
     			onlinePlayer.getPlayerPrefix().setEnable(false);
+				ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_EXILE_STATS.getMessage());
     		} else {
     			KonStats stats = konquest.getDatabaseThread().getDatabase().pullPlayerStats(offlinePlayer.getOfflineBukkitPlayer());
     			stats.clearStats();
@@ -1106,6 +1107,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     	if(doRemoveFavor) {
 			double balance = KonquestPlugin.getBalance(offlineBukkitPlayer);
 			KonquestPlugin.withdrawPlayer(offlineBukkitPlayer, balance);
+			if(isOnline) {
+				ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_EXILE_FAVOR.getMessage());
+			}
 		}
     	
     	KonKingdom exileKingdom = isFull ? getBarbarians() : oldKingdom;
@@ -1621,7 +1625,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(kingdom == null || !kingdom.isCreated())return;
 		if(kingdom.isOpen()) {
 			kingdom.setIsOpen(false);
-			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_CLOSED.getMessage(kingdom.getName()));
+			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_CLOSED.getMessage());
 		} else {
 			kingdom.setIsOpen(true);
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_OPEN.getMessage());
@@ -3711,7 +3715,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
         	ConfigurationSection capitalSection = kingdomSection.getConfigurationSection("towns.capital");
 			if(capitalSection == null) {
 				// Error, there is no capital section
-				ChatUtil.printDebug("Internal error, missing capital section in kingdoms.yml for kingdom "+kingdomName);
+				ChatUtil.printConsoleError("Bad data format in kingdoms.yml for kingdom "+kingdomName+", attempting to migrate legacy kingdom to current format.");
 				// This kingdom data may be from an older version, attempt to migrate.
 				boolean legacyStatus = loadLegacyKingdom(kingdomSection, kingdomName);
 				String message;
@@ -3966,6 +3970,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Set territory chunks
 		sanctuary.addPoints(capital_chunks);
 		konquest.getTerritoryManager().addAllTerritory(capitalWorld,sanctuary.getChunkList());
+		ChatUtil.printConsoleAlert("Created new sanctuary "+sanctuaryName+" from legacy kingdom migration.");
 
 		// Create a new monument template
 		double cost = 0;
@@ -3973,14 +3978,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// If it fails validation, it is still loaded into memory, but marked as invalid.
 		String templateName = kingdomName+"Template";
 		konquest.getSanctuaryManager().loadMonumentTemplate(sanctuary, templateName, monument_cornerone, monument_cornertwo, monument_travel, cost);
+		ChatUtil.printConsoleAlert("Created new monument template "+templateName+" from legacy kingdom migration.");
 
 		// Identify the town which will become the capital.
 		String capitalName = "";
 		int capitalPopulation = 0;
+		int capitalLand = 0;
 		for(String townName : townNames) {
 			ConfigurationSection townSection = townsSection.getConfigurationSection(townName);
 			assert townSection != null;
 			int townPopulation = 0;
+			int townLand = 0;
 			// Count town lord
 			String lordUUID = townSection.getString("lord","");
 			if(!lordUUID.equalsIgnoreCase("")) {
@@ -3991,10 +3999,30 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			if(townResidentsSection != null) {
 				townPopulation += townResidentsSection.getKeys(false).size();
 			}
+			// Count town land
+			String townChunks = townSection.getString("chunks");
+			if(townChunks != null) {
+				townLand += konquest.formatStringToPoints(townChunks).size();
+			}
 			// Compare to previous
-			if(townPopulation >= capitalPopulation) {
+			ChatUtil.printDebug("Evaluating for capital: "+townName+", "+townLand+", "+townPopulation);
+			// First compare by land
+			if(townLand > capitalLand) {
+				// This town has more land than the previous largest
 				capitalPopulation = townPopulation;
 				capitalName = townName;
+				capitalLand = townLand;
+				ChatUtil.printDebug("Chose largest land: "+townName);
+			} else if(townLand == capitalLand) {
+				// This town has the same land as the previous largest
+				// Compare by population
+				if(townPopulation >= capitalPopulation) {
+					// This town has greater or equal population than the previous largest
+					capitalPopulation = townPopulation;
+					capitalName = townName;
+					capitalLand = townLand;
+					ChatUtil.printDebug("Chose largest land, largest pop: "+townName);
+				}
 			}
 		}
 
@@ -4018,6 +4046,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		newKingdom.setIsLegacy(true);
 		// Set to open
 		newKingdom.setIsOpen(true);
+		// Set to admin kingdom
+		newKingdom.setIsAdminOperated(true);
 		// Load towns
 		for(String townName : townsSection.getKeys(false)) {
 			boolean isCapital = townName.equals(capitalName);
@@ -4222,10 +4252,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				// Skip this kingdom
 				continue;
 			}
+			String kingdomName = kingdom.getName();
+			ChatUtil.printDebug("Loading memberships for legacy kingdom "+kingdomName);
 			// Find players
 			for(KonOfflinePlayer member : konquest.getPlayerManager().getAllPlayersInKingdom(kingdom)) {
 				UUID id = member.getOfflineBukkitPlayer().getUniqueId();
 				kingdom.addMember(id,false);
+				String playerName = member.getOfflineBukkitPlayer().getName();
+				ChatUtil.printDebug("Added membership for player "+playerName+" in legacy kingdom "+kingdomName);
 			}
 		}
 	}

@@ -224,7 +224,7 @@ public class KingdomAdminCommand extends CommandBase {
             		break;
             		
             	case "rename":
-            		// Rename your kingdom
+            		// Rename the kingdom
             		if(getArgs().length == 5) {
             			String newName = getArgs()[4];
 						// Check for valid kingdom
@@ -263,7 +263,51 @@ public class KingdomAdminCommand extends CommandBase {
             			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
             		}
             		break;
-        		default:
+
+				case "admin":
+					// Set whether a kingdom is admin operated
+					if(getArgs().length == 5) {
+						String newValue = getArgs()[4];
+						boolean isNewValue = Boolean.parseBoolean(newValue);
+
+						// Check for valid kingdom
+						if(!getKonquest().getKingdomManager().isKingdom(kingdomName)) {
+							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
+							return;
+						}
+						kingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
+						assert kingdom != null;
+						boolean isAdminOperated = kingdom.isAdminOperated();
+
+						// Flag switch logic
+						if(isNewValue) {
+							// Make the kingdom into an admin kingdom, if not already
+							if(isAdminOperated) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_ADMIN_SET.getMessage(kingdom.getName()));
+								return;
+							}
+							// Set admin operated flag
+							kingdom.setIsAdminOperated(true);
+							// Clear master
+							kingdom.clearMaster();
+							ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_KINGDOM_NOTICE_ADMIN_SET.getMessage(kingdom.getName()));
+						} else {
+							// Make the kingdom into a regular kingdom, if not already
+							if(!isAdminOperated) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_ADMIN_CLEAR.getMessage(kingdom.getName()));
+								return;
+							}
+							// Clear admin operated flag
+							kingdom.setIsAdminOperated(false);
+							ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_KINGDOM_NOTICE_ADMIN_CLEAR.getMessage(kingdom.getName()));
+						}
+					} else {
+						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					}
+
+					break;
+
+				default:
         			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
         			break;
     		}
@@ -284,6 +328,7 @@ public class KingdomAdminCommand extends CommandBase {
 			tabList.add("add");
 			tabList.add("kick");
 			tabList.add("rename");
+			tabList.add("admin");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
@@ -331,6 +376,10 @@ public class KingdomAdminCommand extends CommandBase {
 						}
 					}
 				}
+			} else if(subCommand.equalsIgnoreCase("admin")) {
+				// Suggest values
+				tabList.add(String.valueOf(true));
+				tabList.add(String.valueOf(false));
 			}
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);

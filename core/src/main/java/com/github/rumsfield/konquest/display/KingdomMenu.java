@@ -462,7 +462,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				}
 				loreList.addAll(Konquest.stringPaginate(description,relationColor));
 				if(isValidChoice) {
-					loreList.add(" "); // spacer
 					loreList.addAll(Konquest.stringPaginate(detailedInfo,ChatColor.LIGHT_PURPLE));
 					if(!isAdmin) {
 						double costRelation = manager.getRelationCost(relation);

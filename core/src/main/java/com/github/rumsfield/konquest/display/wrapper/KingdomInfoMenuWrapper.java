@@ -264,7 +264,9 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 				OfflinePlayer currentMember = memberIter.next();
 				if(currentMember != null) {
 					loreList = new ArrayList<>();
-					loreList.add(propertyColor+infoKingdom.getPlayerRoleName(currentMember));
+					if(infoKingdom.isCreated()) {
+						loreList.add(propertyColor+infoKingdom.getPlayerRoleName(currentMember));
+					}
 					loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
 					PlayerIcon player = new PlayerIcon(kingdomColor+currentMember.getName(),loreList,currentMember,slotIndex,true,PlayerIconAction.DISPLAY_INFO);
 					getMenu().getPage(pageIndex).addIcon(player);
