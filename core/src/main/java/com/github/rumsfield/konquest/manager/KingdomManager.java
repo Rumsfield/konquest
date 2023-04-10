@@ -1679,7 +1679,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
             konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)totalCost);
 		}
 		// Success
-		ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_TEMPLATE.getMessage(template.getName()));
+		ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_TEMPLATE.getMessage());
 		return true;
 	}
 

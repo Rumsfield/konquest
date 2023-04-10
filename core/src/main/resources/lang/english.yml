@@ -102,6 +102,8 @@ map:
   ruin: "Ruin"
   critical-hits: "Critical Hits"
   golem-spawns: "Golem Spawns"
+  sanctuary: "Sanctuary"
+  templates: "Monument Templates"
 menu:
   stats:
     title: "Accomplishment Stats"

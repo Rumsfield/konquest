@@ -99,7 +99,9 @@ public enum MessagePath {
     MAP_RUIN                                    (0, "map.ruin"),
     MAP_CRITICAL_HITS                        	(0, "map.critical-hits"),
     MAP_GOLEM_SPAWNS                        	(0, "map.golem-spawns"),
-    
+	MAP_SANCTUARY                               (0, "map.sanctuary"),
+	MAP_TEMPLATES                               (0, "map.templates"),
+
 	MENU_STATS_TITLE                            (0, "menu.stats.title"),
 	MENU_STATS_INTRO_1                          (0, "menu.stats.intro-1"),
 	MENU_STATS_INTRO_2                          (0, "menu.stats.intro-2"),

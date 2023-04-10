@@ -25,7 +25,8 @@ public class MapHandler {
 	private final HashMap<KonTerritory,AreaTerritory> areaCache;
 	
 	private static DynmapAPI dapi = null;
-	
+
+	private final int sanctuaryColor = 0x646464;
 	private final int ruinColor = 0x242424;
 	private final int campColor = 0xa3a10a;
 	private final int lineDefaultColor = 0x000000;
@@ -64,6 +65,10 @@ public class MapHandler {
 	
 	/*
 	 * Dynmap Area ID formats:
+	 * Sanctuaries
+	 * 		MarkerSet Group:  		konquest.marker.sanctuary
+	 * 		AreaMarker Points: 		konquest.area.sanctuary.<name>.point.<n>
+	 * 		AreaMarker Contours: 	konquest.area.sanctuary.<name>.contour.<n>
 	 * Ruins
 	 * 		MarkerSet Group:  		konquest.marker.ruin
 	 * 		AreaMarker Points: 		konquest.area.ruin.<name>.point.<n>
@@ -278,7 +283,12 @@ public class MapHandler {
 	public void drawDynmapAllTerritories() {
 		if (!isEnabled) return;
 		Date start = new Date();
-		
+
+		// Sanctuaries
+		for (KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
+			drawDynmapUpdateTerritory(sanctuary);
+		}
+
 		// Ruins
 		for (KonRuin ruin : konquest.getRuinManager().getRuins()) {
 			drawDynmapUpdateTerritory(ruin);
@@ -306,6 +316,9 @@ public class MapHandler {
 	private String getGroupId(KonTerritory territory) {
 		String result = "konquest";
 		switch (territory.getTerritoryType()) {
+			case SANCTUARY:
+				result = result+".marker.sanctuary";
+				break;
 			case RUIN:
 				result = result+".marker.ruin";
 				break;
@@ -325,6 +338,9 @@ public class MapHandler {
 	private String getGroupLabel(KonTerritory territory) {
 		String result = "Konquest";
 		switch (territory.getTerritoryType()) {
+			case SANCTUARY:
+				result = "Konquest Sanctuaries";
+				break;
 			case RUIN:
 				result = "Konquest Ruins";
 				break;
@@ -344,6 +360,9 @@ public class MapHandler {
 	private String getAreaId(KonTerritory territory) {
 		String result = "konquest";
 		switch (territory.getTerritoryType()) {
+			case SANCTUARY:
+				result = result+".area.sanctuary."+territory.getName().toLowerCase();
+				break;
 			case RUIN:
 				result = result+".area.ruin."+territory.getName().toLowerCase();
 				break;
@@ -365,6 +384,15 @@ public class MapHandler {
 	private String getAreaLabel(KonTerritory territory) {
 		String result = "Konquest";
 		switch (territory.getTerritoryType()) {
+			case SANCTUARY:
+				KonSanctuary sanctuary = (KonSanctuary)territory;
+				int numTemplates = sanctuary.getTemplates().size();
+				result = "<p>"+
+						"<b>"+sanctuary.getName() + "</b><br>" +
+						MessagePath.MAP_SANCTUARY.getMessage() + "<br>" +
+						MessagePath.MAP_TEMPLATES.getMessage() + ": " + numTemplates + "<br>" +
+						"</p>";
+				break;
 			case RUIN:
 				KonRuin ruin = (KonRuin)territory;
 				int numCriticals = ruin.getMaxCriticalHits();
@@ -422,6 +450,9 @@ public class MapHandler {
 	private int getAreaColor(KonTerritory territory) {
 		int result = 0xFFFFFF;
 		switch (territory.getTerritoryType()) {
+			case SANCTUARY:
+				result = sanctuaryColor;
+				break;
 			case RUIN:
 				result = ruinColor;
 				break;
@@ -449,6 +480,7 @@ public class MapHandler {
 	private boolean isTerritoryInvalid(KonTerritory territory) {
 		boolean result = false;
 		switch (territory.getTerritoryType()) {
+			case SANCTUARY:
 			case RUIN:
 			case CAMP:
 			case CAPITAL:
@@ -464,6 +496,9 @@ public class MapHandler {
 	private String getIconId(KonTerritory territory) {
 		String result = "konquest";
 		switch (territory.getTerritoryType()) {
+			case SANCTUARY:
+				result = result+".icon.sanctuary."+territory.getName().toLowerCase();
+				break;
 			case RUIN:
 				result = result+".icon.ruin."+territory.getName().toLowerCase();
 				break;
@@ -485,6 +520,9 @@ public class MapHandler {
 	private String getIconLabel(KonTerritory territory) {
 		String result = "Konquest";
 		switch (territory.getTerritoryType()) {
+			case SANCTUARY:
+				result = MessagePath.MAP_SANCTUARY.getMessage()+" "+territory.getName();
+				break;
 			case RUIN:
 				result = MessagePath.MAP_RUIN.getMessage()+" "+territory.getName();
 				break;
@@ -506,6 +544,9 @@ public class MapHandler {
 	private MarkerIcon getIconMarker(KonTerritory territory) {
 		MarkerIcon result = null;
 		switch (territory.getTerritoryType()) {
+			case SANCTUARY:
+				result = dapi.getMarkerAPI().getMarkerIcon("temple");
+				break;
 			case RUIN:
 				result = dapi.getMarkerAPI().getMarkerIcon("tower");
 				break;
