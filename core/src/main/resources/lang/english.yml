@@ -460,7 +460,6 @@ command:
         show: "Showing existing Monument Template %s in Sanctuary %s."
         sanctuary: "Create Sanctuary territory with \"/k admin sanctuary\" before creating Monument Templates."
       error:
-        none: "Monument Template %s is currently not valid."
         value: "Cost value is not a number."
         fail-base: "Failed to create Monument Template %s, base must be 16x16 blocks but got %s by %s."
         fail-critical: "Failed to create Monument Template %s, it must contain at least %s %s blocks."
@@ -695,6 +694,7 @@ command:
       no-town: "That town does not exist in your Kingdom."
       cooldown: "You must wait %s before traveling to %s."
       canceled: "Your travel was canceled by movement."
+      disabled: "Travel to that territory is disabled."
   unclaim:
     notice:
       success: "Successfully unclaimed %s chunks of land from %s."

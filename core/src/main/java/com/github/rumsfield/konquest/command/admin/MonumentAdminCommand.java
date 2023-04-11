@@ -97,9 +97,10 @@ public class MonumentAdminCommand extends CommandBase {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
 					return;
 				}
-				if(!getKonquest().getSanctuaryManager().getTemplate(templateName).isValid()) {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_NONE.getMessage(templateName));
-					return;
+				// Stop any template blanking
+				String sanctuaryName = getKonquest().getSanctuaryManager().getSanctuaryNameOfTemplate(templateName);
+				if(getKonquest().getSanctuaryManager().isSanctuary(sanctuaryName)) {
+					getKonquest().getSanctuaryManager().getSanctuary(sanctuaryName).stopTemplateBlanking(templateName);
 				}
 				// Begin region setting flow
 				player.settingRegion(RegionType.MONUMENT);

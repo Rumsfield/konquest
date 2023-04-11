@@ -263,15 +263,28 @@ public class SanctuaryManager {
 	
 	public boolean removeMonumentTemplate(String name) {
 		boolean result = false;
+		String sanctuaryName = "";
 		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
 			if(sanctuary.isTemplate(name)) {
 				sanctuary.stopTemplateBlanking(name);
 				result = sanctuary.removeTemplate(name);
+				sanctuaryName = sanctuary.getName();
 				break;
 			}
 		}
 		if(result) {
+			ChatUtil.printDebug("Removed template "+name+" from sanctuary "+sanctuaryName);
+			// Clear templates from kingdoms
+			for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+				if(kingdom.getMonumentTemplateName().equals(name)) {
+					kingdom.clearMonumentTemplate();
+					ChatUtil.printDebug("Cleared monument template from kingdom "+kingdom.getName());
+				}
+			}
+			// Try to update templates
 			refreshKingdomTemplates();
+		} else {
+			ChatUtil.printDebug("Failed to remove template "+name);
 		}
 		return result;
 	}

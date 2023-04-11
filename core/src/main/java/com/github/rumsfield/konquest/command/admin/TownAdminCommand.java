@@ -300,16 +300,26 @@ public class TownAdminCommand extends CommandBase {
 			    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
 		        		return;
 			    	}
+					if(town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
+						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+						return;
+					}
 			    	// Set resident's elite status
 			    	if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
 			    		if(town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer())) {
 			    			// Clear elite
-			    			town.setPlayerKnight(offlinePlayer.getOfflineBukkitPlayer(), false);
-			    			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_CLEAR.getMessage(playerName,townName));
+			    			if(town.setPlayerKnight(offlinePlayer.getOfflineBukkitPlayer(), false)) {
+								ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_CLEAR.getMessage(playerName,townName));
+							} else {
+								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+							}
 			    		} else {
 			    			// Set elite
-			    			town.setPlayerKnight(offlinePlayer.getOfflineBukkitPlayer(), true);
-			    			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_SET.getMessage(playerName,townName));
+			    			if(town.setPlayerKnight(offlinePlayer.getOfflineBukkitPlayer(), true)) {
+								ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_SET.getMessage(playerName,townName));
+							} else {
+								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+							}
 			    		}
 			    	} else {
 			    		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TOWN_ERROR_KNIGHT_RESIDENT.getMessage());

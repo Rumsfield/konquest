@@ -101,12 +101,12 @@ public class FlagAdminCommand extends CommandBase {
             	
             	String flagName = getArgs()[num_args_list];
             	if(!KonPropertyFlag.contains(flagName)) {
-            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(holderName));
+            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(flagName));
         			return;
             	}
             	KonPropertyFlag flagArg = KonPropertyFlag.getFlag(flagName);
             	if(!holder.hasPropertyValue(flagArg)) {
-            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(holderName));
+            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(flagName));
         			return;
             	}
             	

@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.api.model.KonquestRuin;
 import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonRuin;
+import com.github.rumsfield.konquest.model.KonSanctuary;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -139,6 +140,8 @@ public class RuinManager implements KonquestRuinManager {
 			ruinMap.get(name.toLowerCase()).setName(newName);
 			KonRuin ruin = ruinMap.remove(name.toLowerCase());
 			ruinMap.put(newName.toLowerCase(), ruin);
+			ruin.updateBarTitle();
+			ruin.updateBarPlayers();
 			result = true;
 		}
 		return result;
@@ -153,7 +156,11 @@ public class RuinManager implements KonquestRuinManager {
 	}
 	
 	public Set<String> getRuinNames() {
-		return ruinMap.keySet();
+		Set<String> result = new HashSet<>();
+		for(KonRuin ruin : ruinMap.values()) {
+			result.add(ruin.getName());
+		}
+		return result;
 	}
 	
 	public Material getRuinCriticalBlock() {

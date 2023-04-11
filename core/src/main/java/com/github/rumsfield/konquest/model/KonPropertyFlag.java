@@ -83,7 +83,9 @@ public enum KonPropertyFlag {
 	public static Set<String> getFlagStrings() {
 		Set<String> result = new HashSet<>();
 		for(KonPropertyFlag p : KonPropertyFlag.values()) {
-			result.add(p.toString());
+			if(!p.equals(KonPropertyFlag.NONE)) {
+				result.add(p.toString());
+			}
 		}
 		return result;
 	}

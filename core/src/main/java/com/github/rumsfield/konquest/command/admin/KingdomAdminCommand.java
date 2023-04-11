@@ -80,8 +80,11 @@ public class KingdomAdminCommand extends CommandBase {
                     	
                     	if(status == 0) {
                     		// Successful kingdom creation
+							KonKingdom createdKingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
                     		ChatUtil.sendBroadcast(MessagePath.COMMAND_ADMIN_KINGDOM_BROADCAST_CREATE.getMessage(kingdomName));
-                    		// Open kingdom menu for newly created kingdom
+							// Teleport player to safe place around monument, facing monument
+							getKonquest().getKingdomManager().teleportAwayFromCenter(createdKingdom.getCapital());
+							// Open kingdom menu for newly created kingdom
                     		KonKingdom newKingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
                     		getKonquest().getDisplayManager().displayKingdomMenu(player, newKingdom, true);
                     	} else {
@@ -250,10 +253,6 @@ public class KingdomAdminCommand extends CommandBase {
             					break;
             				case 2:
             					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
-            					break;
-            				case 3:
-            					String cost = String.format("%.2f",getKonquest().getKingdomManager().getCostRename());
-            					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
             					break;
         					default:
         						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());

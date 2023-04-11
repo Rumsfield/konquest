@@ -34,7 +34,9 @@ public class ListCommand extends CommandBase {
 					mode = ListType.KINGDOM;
 				} else if(listMode.equalsIgnoreCase("town")) {
         			mode = ListType.TOWN;
-        		} else if(listMode.equalsIgnoreCase("sanctuary")) {
+        		} else if(listMode.equalsIgnoreCase("ruin")) {
+					mode = ListType.RUIN;
+				} else if(listMode.equalsIgnoreCase("sanctuary")) {
 					mode = ListType.SANCTUARY;
 				} else {
         			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
@@ -51,6 +53,9 @@ public class ListCommand extends CommandBase {
 	        	case TOWN:
 	        		lines.addAll(getKonquest().getKingdomManager().getTownNames());
 	        		break;
+				case RUIN:
+					lines.addAll(getKonquest().getRuinManager().getRuinNames());
+					break;
 				case SANCTUARY:
 					lines.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
 					break;

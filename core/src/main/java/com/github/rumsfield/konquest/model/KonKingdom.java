@@ -668,6 +668,10 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		}
 		return result;
 	}
+
+	public void clearMonumentTemplate() {
+		monumentTemplate = null;
+	}
 	
 	public boolean hasMonumentTemplate() {
 		return monumentTemplate != null;

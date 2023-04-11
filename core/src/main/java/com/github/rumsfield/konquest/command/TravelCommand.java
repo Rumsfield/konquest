@@ -103,6 +103,7 @@ public class TravelCommand extends CommandBase {
 				// Check for property flag
 				if(!travelCapital.getPropertyValue(KonPropertyFlag.TRAVEL)) {
 					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_DISABLED.getMessage());
 					return;
 				}
 				travelLoc = travelCapital.getSpawnLoc();
@@ -167,6 +168,7 @@ public class TravelCommand extends CommandBase {
 					// Check for property flag
 					if(!travelSanctuary.getPropertyValue(KonPropertyFlag.TRAVEL)) {
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_DISABLED.getMessage());
 						return;
 					}
 					travelLoc = travelSanctuary.getSpawnLoc();
@@ -195,6 +197,7 @@ public class TravelCommand extends CommandBase {
 					// Check for property flag
 					if(!travelCapital.getPropertyValue(KonPropertyFlag.TRAVEL)) {
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_DISABLED.getMessage());
 						return;
 					}
 					travelLoc = travelCapital.getSpawnLoc();
@@ -223,6 +226,7 @@ public class TravelCommand extends CommandBase {
 					// Check for property flag
 					if(!travelTown.getPropertyValue(KonPropertyFlag.TRAVEL)) {
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_DISABLED.getMessage());
 						return;
 					}
 					// Check town travel cooldown

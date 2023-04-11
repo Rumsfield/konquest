@@ -1189,7 +1189,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public boolean setPlayerKnight(OfflinePlayer player, boolean val) {
 		boolean status = true;
 		UUID playerUUID = player.getUniqueId();
-		if(residents.containsKey(playerUUID)) {
+		if(residents.containsKey(playerUUID) && !isLord(playerUUID)) {
 			residents.put(playerUUID,val);
 		} else {
 			status = false;

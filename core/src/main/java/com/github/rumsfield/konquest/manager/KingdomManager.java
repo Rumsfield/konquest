@@ -1511,7 +1511,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			List<OfflinePlayer> officers = kingdom.getPlayerOfficersOnly();
 			if(!officers.isEmpty()) {
 				// Make the first officer into the master
-				kingdom.setMaster(officers.get(0).getUniqueId());
+				OfflinePlayer newMaster = officers.get(0);
+				kingdom.setMaster(newMaster.getUniqueId());
+				broadcastMembers(kingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_TRANSFER.getMessage(newMaster.getName(),kingdom.getName()));
 				// Now remove the player
 				result = kingdom.removeMember(id);
 			} else {
@@ -1519,7 +1521,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				List<OfflinePlayer> members = kingdom.getPlayerMembersOnly();
 				if(!members.isEmpty()) {
 					// Make the first member into the master
-					kingdom.setMaster(members.get(0).getUniqueId());
+					OfflinePlayer newMaster = members.get(0);
+					kingdom.setMaster(newMaster.getUniqueId());
+					broadcastMembers(kingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_TRANSFER.getMessage(newMaster.getName(),kingdom.getName()));
 					// Now remove the player
 					result = kingdom.removeMember(id);
 				} else {
@@ -1527,6 +1531,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					// This will also exile all players to barbarians, including the given ID
 					String name = kingdom.getName();
 					result = removeKingdom(name);
+					if(result) {
+						ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_DISBAND.getMessage(name));
+					}
 				}
 			}
 		} else {
