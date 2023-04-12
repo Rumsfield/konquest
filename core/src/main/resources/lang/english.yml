@@ -432,6 +432,7 @@ command:
         destroy: "Successfully removed the camp for player %s."
       error:
         create-exist: "Player already has a camp, remove it first before creating a new one."
+        destroy-exist: "Player does not have a camp."
     flag:
       notice:
         all-properties: "All Properties"
@@ -559,9 +560,11 @@ command:
       request-sent: "Sent member request to join %s."
       request-received: "New kingdom join request, type \"/k kingdom\" to review."
       request-declined: "Denied kingdom join request for player %s."
+      request-pending: "Players requested to join your kingdom. Use \"/k kingdom\", then choose Requests to respond."
       invite-sent: "Invited %s to join the kingdom."
       invite-received: "Received kingdom invite, type \"/k kingdom\" to respond."
       invite-declined: "Declined invitation to join %s."
+      invite-pending: "You have pending invites to join kingdoms. Use \"/k kingdom\", then choose Invites to respond."
       exile: "You are now exiled from %s as a barbarian."
       exile-stats: "Removed all stats from exile!"
       exile-favor: "Removed all favor from exile!"
@@ -573,6 +576,7 @@ command:
       template: "Updated the Kingdom Monument Template to %s."
       pay: "Received kingdom payment."
       diplomacy-sent: "Sent diplomacy request to the Kingdom of %s."
+      diplomacy-pending: "Your kingdom has pending diplomacy requests. Use \"/k kingdom\", then choose Relationships to respond."
     error:
       barbarian-create: "You must be a barbarian to create a kingdom. Use the Exile option in the kingdom menu."
       invalid-template: "That is an invalid monument template. Check spelling or choose another."
@@ -667,9 +671,11 @@ command:
       request-sent: "Sent resident request to join %s."
       request-received: "New town join request, type \"/k town\" to review."
       request-declined: "Denied town join request for player %s."
+      request-pending: "Players want to become residents of your towns. Use \"/k town\" command to respond."
       invite-sent: "Invited %s to join the town of %s."
       invite-received: "Received town invite, type \"/k town\" to respond."
       invite-declined: "Declined invitation to join %s."
+      invite-pending: "You have pending invites to join towns. Use \"/k town\" command to respond."
     error:
       kick-fail: "%s is not a resident of %s."
       knight-resident: "Knights must be added as residents first."
@@ -885,8 +891,8 @@ upgrade:
 description:
   help: "Display the help message."
   info: "Display info about different things."
-  list: "List the Towns in your Kingdom."
-  favor: "Display your current Favor from the King."
+  list: "List different Territories."
+  favor: "Display your currency as Favor."
   map: "Display a map of claimed chunks."
   chat: "Switch between global and kingdom-only chat."
   spy: "Reveal the location of an enemy town."

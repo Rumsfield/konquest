@@ -127,6 +127,7 @@ public class CaptureAdminCommand extends CommandBase {
 			List<String> townList = new ArrayList<>();
 			for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
 				townList.addAll(kingdom.getTownNames());
+				townList.add(kingdom.getName());
 			}
 			tabList.addAll(townList);
 			// Trim down completion options based on current input

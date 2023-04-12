@@ -611,6 +611,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			monument.updateFromTemplate(getKingdom().getMonumentTemplate());
 			// Force the monument to be valid
 			monument.setIsValid(true);
+			// Update the town spawn point
+			setSpawn(monument.getTravelPoint());
 		} else {
 			ChatUtil.printDebug("Failed to update monument from invalid template for town "+getName());
 		}

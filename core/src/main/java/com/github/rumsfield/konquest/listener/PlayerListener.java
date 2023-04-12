@@ -116,8 +116,7 @@ public class PlayerListener implements Listener {
 			boolean isDiplomacyRequestsPending = !player.getKingdom().getRelationRequestKingdoms().isEmpty();
 			boolean isPlayerKingdomOfficer = player.getKingdom().isOfficer(bukkitPlayer.getUniqueId());
 			if(isDiplomacyRequestsPending && isPlayerKingdomOfficer) {
-				String message = "Your kingdom has pending diplomacy requests. Use \"/k kingdom\", then choose Relationships to respond.";
-				ChatUtil.sendNotice(bukkitPlayer, message, ChatColor.GOLD);
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_PENDING.getMessage(), ChatColor.GOLD);
 			}
 
 			// Messages for kingdom & town membership
@@ -150,23 +149,19 @@ public class PlayerListener implements Listener {
 
 			// Notify requests
 			if(isKingdomRequests) {
-				String message = "Players requested to join your kingdom. Use \"/k kingdom\", then choose Requests to respond.";
-				ChatUtil.sendNotice(bukkitPlayer, message, ChatColor.LIGHT_PURPLE);
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_REQUEST_PENDING.getMessage(), ChatColor.LIGHT_PURPLE);
 			}
 			if(!townRequestNames.isEmpty()) {
-				String message = "Players want to become residents of your towns. Use \"/k town\" command to respond.";
-				ChatUtil.sendNotice(bukkitPlayer, message, ChatColor.LIGHT_PURPLE);
-				ChatUtil.sendCommaNotice(bukkitPlayer, townRequestNames, ChatColor.LIGHT_PURPLE);
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REQUEST_PENDING.getMessage(), ChatColor.LIGHT_PURPLE);
+				ChatUtil.sendCommaMessage(bukkitPlayer, townRequestNames, ChatColor.LIGHT_PURPLE);
 			}
 			// Notify invites
 			if(isKingdomInvites) {
-				String message = "You have pending invites to join kingdoms. Use \"/k kingdom\", then choose Invites to respond.";
-				ChatUtil.sendNotice(bukkitPlayer, message);
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_INVITE_PENDING.getMessage());
 			}
 			if(!townInviteNames.isEmpty()) {
-				String message = "You have pending invites to join towns. Use \"/k town\" command to respond.";
-				ChatUtil.sendNotice(bukkitPlayer, message);
-				ChatUtil.sendCommaNotice(bukkitPlayer, townInviteNames);
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_INVITE_PENDING.getMessage());
+				ChatUtil.sendCommaMessage(bukkitPlayer, townInviteNames);
 			}
 
 			// DiscordSRV
@@ -417,6 +412,7 @@ public class PlayerListener implements Listener {
 	                	int createMonumentStatus = konquest.getSanctuaryManager().createMonumentTemplate(sanctuary, templateName, templateCorner1, templateCorner2, location, templateCost);
 	                	switch(createMonumentStatus) {
 	    				case 0:
+							ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_TEMPLATE_READY.getMessage(templateName));
 	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(templateName));
 	    					kingdomManager.reloadMonumentsForTemplate(konquest.getSanctuaryManager().getTemplate(templateName));
 	    					break;

@@ -661,7 +661,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return 1;
 		}
 				
-		if(konquest.validateNameConstraints(newName) == 0) {
+		if(konquest.validateNameConstraints(newName) != 0) {
 			return 2;
 		}
 		
@@ -1686,7 +1686,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
             konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)totalCost);
 		}
 		// Success
-		ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_TEMPLATE.getMessage());
+		ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_TEMPLATE.getMessage(template.getName()));
 		return true;
 	}
 

@@ -176,12 +176,17 @@ public class TownCommand extends CommandBase {
 						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
 						return;
 					}
+					String oldTownName = town.getName();
+					// Check for town name
+					if(!getKonquest().getKingdomManager().isTown(oldTownName)) {
+						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(oldTownName));
+						return;
+					}
 					// Check new name constraints
 					if(getKonquest().validateName(newTownName,bukkitPlayer) != 0) {
 						return;
 					}
 					// Rename the town
-					String oldTownName = town.getName();
 					boolean success = getKonquest().getKingdomManager().renameTown(oldTownName, newTownName, town.getKingdom().getName());
 					if(success) {
 						for(OfflinePlayer resident : town.getPlayerResidents()) {

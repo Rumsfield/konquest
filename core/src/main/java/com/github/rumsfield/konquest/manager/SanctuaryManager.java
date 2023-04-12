@@ -87,6 +87,8 @@ public class SanctuaryManager {
 		// Remove the sanctuary
 		KonSanctuary oldSanctuary = sanctuaryMap.remove(name.toLowerCase());
 		if(oldSanctuary != null) {
+			// Get template names that are being removed
+			Set<String> templateNames = oldSanctuary.getTemplateNames();
 			// Clear all templates
 			oldSanctuary.clearAllTemplates();
 			// Remove display bars
@@ -97,6 +99,13 @@ public class SanctuaryManager {
 			ChatUtil.printDebug("Removed Sanctuary "+name);
 			// De-reference the object
 			oldSanctuary = null;
+			// Clear templates from kingdoms
+			for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+				if(templateNames.contains(kingdom.getMonumentTemplateName())) {
+					kingdom.clearMonumentTemplate();
+					ChatUtil.printDebug("Cleared monument template from kingdom "+kingdom.getName());
+				}
+			}
 			// Update kingdom template assignments
 			refreshKingdomTemplates();
 			return true;

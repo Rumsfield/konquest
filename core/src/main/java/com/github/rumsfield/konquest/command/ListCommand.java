@@ -100,7 +100,7 @@ public class ListCommand extends CommandBase {
             		String line = ""+ChatColor.GOLD+(i+1)+". "+ChatColor.AQUA+lines.get(i);
 					pageLines.add(line);
             	}
-				ChatUtil.sendCommaNotice(bukkitPlayer,pageLines);
+				ChatUtil.sendCommaMessage(bukkitPlayer,pageLines);
         	}
         }
     }
@@ -114,6 +114,7 @@ public class ListCommand extends CommandBase {
 		if(getArgs().length == 2) {
 			tabList.add("kingdom");
 			tabList.add("town");
+			tabList.add("ruin");
 			tabList.add("sanctuary");
 			
 			// Trim down completion options based on current input

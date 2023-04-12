@@ -5,7 +5,6 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 
@@ -262,11 +261,11 @@ public class ChatUtil {
 		Bukkit.broadcast(notice,"konquest.command.admin.*");
 	}
 
-	public static void sendCommaNotice(Player player, List<String> values) {
-		sendCommaNotice(player, values, noticeColor);
+	public static void sendCommaMessage(Player player, List<String> values) {
+		sendCommaMessage(player, values, noticeColor);
 	}
 
-	public static void sendCommaNotice(Player player, List<String> values, ChatColor color) {
+	public static void sendCommaMessage(Player player, List<String> values, ChatColor color) {
 		StringBuilder message = new StringBuilder();
 		ListIterator<String> listIter = values.listIterator();
 		while(listIter.hasNext()) {
@@ -276,7 +275,7 @@ public class ChatUtil {
 				message.append(", ");
 			}
 		}
-		String notice = Konquest.getChatTag() + color + message;
+		String notice = "" + color + message;
 		player.sendMessage(notice);
 	}
 	

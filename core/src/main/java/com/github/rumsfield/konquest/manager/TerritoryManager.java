@@ -1320,7 +1320,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
     	int distance = 0;
     	if(closestTerritory != null) {
     		distance = proximity;
-			closestTerritoryColor = mapSymbolColor;
+			closestTerritoryColor = konquest.getDisplayPrimaryColor(player,closestTerritory);
     	}
     	String distStr;
     	int maxDist = 99;

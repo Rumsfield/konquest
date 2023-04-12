@@ -107,7 +107,7 @@ public class ListAdminCommand extends CommandBase {
 					String line = ""+ ChatColor.GOLD+(i+1)+". "+ChatColor.AQUA+lines.get(i);
 					pageLines.add(line);
 				}
-				ChatUtil.sendCommaNotice(bukkitPlayer,pageLines);
+				ChatUtil.sendCommaMessage(bukkitPlayer,pageLines);
         	}
         }
     }

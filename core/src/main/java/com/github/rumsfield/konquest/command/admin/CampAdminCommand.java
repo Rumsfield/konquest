@@ -6,11 +6,17 @@ import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,10 +49,6 @@ public class CampAdminCommand extends CommandBase {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage());
 			return;
 		}
-		if(!targetPlayer.isBarbarian()) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PLAYER.getMessage());
-			return;
-		}
 		String targetName = targetPlayer.getOfflineBukkitPlayer().getName();
 
 		// Execute sub-commands
@@ -56,12 +58,41 @@ public class CampAdminCommand extends CommandBase {
 				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
 				return;
 			}
+			if(!targetPlayer.isBarbarian()) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PLAYER.getMessage());
+				return;
+			}
 			if(getKonquest().getCampManager().isCampSet(targetPlayer)) {
 				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_CAMP_ERROR_CREATE_EXIST.getMessage());
                 return;
 			}
-			Location playerLoc = bukkitPlayer.getLocation();
-			int status = getKonquest().getCampManager().addCamp(playerLoc, targetPlayer);
+			Location bedLocation = bukkitPlayer.getLocation();
+
+			// Determine solid location to place bed
+			Chunk chunk = bedLocation.getChunk();
+			Point point = Konquest.toPoint(bedLocation);
+			int xLocal = bedLocation.getBlockX() - (point.x*16);
+			int zLocal = bedLocation.getBlockZ() - (point.y*16);
+			int yFloor = chunk.getChunkSnapshot(true, false, false).getHighestBlockYAt(xLocal, zLocal);
+			while((chunk.getBlock(xLocal, yFloor, zLocal).isPassable() || !chunk.getBlock(xLocal, yFloor, zLocal).getType().isOccluding()) && yFloor > 0) {
+				yFloor--;
+			}
+			bedLocation.setY(yFloor+1);
+
+			// Place a bed
+			// Author: LogicalDark
+			// https://www.spigotmc.org/threads/door-and-bed-placement.217786/#post-4478501
+			BlockState bedFoot = bedLocation.getBlock().getState();
+			BlockState bedHead = bedFoot.getBlock().getRelative(BlockFace.SOUTH).getState();
+			BlockData bedHeadData = Bukkit.getServer().createBlockData("minecraft:white_bed[facing=south,occupied=false,part=head]");
+			BlockData bedFootData = Bukkit.getServer().createBlockData("minecraft:white_bed[facing=south,occupied=false,part=foot]");
+			bedFoot.setBlockData(bedFootData);
+			bedHead.setBlockData(bedHeadData);
+			bedFoot.update(true, false);
+			bedHead.update(true, true);
+
+			// Create the camp
+			int status = getKonquest().getCampManager().addCamp(bedLocation, targetPlayer);
 			switch(status) {
 				case 0:
 					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_CAMP_NOTICE_CREATE.getMessage(targetName));
@@ -87,7 +118,7 @@ public class CampAdminCommand extends CommandBase {
 			}
 		} else if(cmdMode.equalsIgnoreCase("destroy")) {
 			if(!getKonquest().getCampManager().isCampSet(targetPlayer)) {
-				ChatUtil.sendError(bukkitPlayer, "Player does not have a camp.");
+				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_CAMP_ERROR_DESTROY_EXIST.getMessage());
                 return;
 			}
 			boolean status = getKonquest().getCampManager().removeCamp(targetPlayer);
