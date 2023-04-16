@@ -3,12 +3,11 @@ package com.github.rumsfield.konquest.listener;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.manager.TerritoryManager;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonTerritory;
-import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,19 +45,29 @@ public class HangingListener implements Listener {
 	
 	@EventHandler()
     public void onHangingBreak(HangingBreakByEntityEvent event) {
+		// Handle hanging breaks by players
+		if(!(event.getRemover() instanceof Player)) return;
+		KonPlayer player = konquest.getPlayerManager().getPlayer((Player)event.getRemover());
+		if(player == null) return;
 		Location brakeLoc = event.getEntity().getLocation();
-		if(territoryManager.isChunkClaimed(brakeLoc)) {
+		if(!player.isAdminBypassActive() && territoryManager.isChunkClaimed(brakeLoc)) {
 			KonTerritory territory = territoryManager.getChunkTerritory(brakeLoc);
-			// Check for break inside of town
+
+			// Sanctuary & Ruin protections
+			if((territory instanceof KonSanctuary) || (territory instanceof KonRuin)) {
+				// Prevent breaking all hanging things
+				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				event.setCancelled(true);
+				return;
+			}
+
+			// Town protections
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
 				// Check for break inside of town's monument
 				if(town.getMonument().isLocInside(brakeLoc)) {
-					ChatUtil.printDebug("EVENT: Hanging broke inside of monument");
-					if(event.getRemover() instanceof Player) {
-						KonPlayer player = konquest.getPlayerManager().getPlayer((Player)event.getRemover());
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-					}
+					ChatUtil.printDebug("EVENT: Hanging broke inside of town monument");
+					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 					event.setCancelled(true);
 				}
 			}

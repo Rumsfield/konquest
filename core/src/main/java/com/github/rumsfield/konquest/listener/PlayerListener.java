@@ -25,6 +25,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
@@ -492,6 +493,8 @@ public class PlayerListener implements Listener {
             event.setCancelled(true);
         } else {
         	// When a player is not setting regions...
+			//ChatUtil.printDebug("Interaction: block "+event.hasBlock()+", item "+event.hasItem()+"; "+event.getMaterial());
+			// Handle block interactions
         	if(!player.isAdminBypassActive() && event.hasBlock()) {
         		BlockState clickedState = event.getClickedBlock().getState();
         		// Check for territory
@@ -508,6 +511,16 @@ public class PlayerListener implements Listener {
 							}
 						}
 					}
+					// Sanctuary protections...
+					if(territory instanceof KonSanctuary) {
+						// Prevent painting placement
+						if(event.hasItem() && event.getMaterial().equals(Material.PAINTING)) {
+							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setUseInteractedBlock(Event.Result.DENY);
+							event.setCancelled(true);
+							return;
+						}
+					}
 	        		// Ruin protections...
 	        		if(territory instanceof KonRuin) {
 	        			KonRuin ruin = (KonRuin)territory;
@@ -515,6 +528,13 @@ public class PlayerListener implements Listener {
 	        			if(ruin.isCriticalLocation(event.getClickedBlock().getLocation())) {
 	        				ruin.targetAllGolemsToPlayer(bukkitPlayer);
 	        			}
+						// Prevent painting placement
+						if(event.hasItem() && event.getMaterial().equals(Material.PAINTING)) {
+							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setUseInteractedBlock(Event.Result.DENY);
+							event.setCancelled(true);
+							return;
+						}
 	        		}
 	        		// Town protections...
 	        		if(territory instanceof KonTown) {
@@ -547,19 +567,19 @@ public class PlayerListener implements Listener {
         			}
         		}
         	}
-        	// Check for item...
-        	if(event.hasItem()) {
-            	if(event.getItem().getType().isRecord() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-            		if(event.hasBlock() && event.getClickedBlock().getType().equals(Material.JUKEBOX) &&
-            				!konquest.isWorldIgnored(event.getClickedBlock().getLocation())) {
-            			// Update music stat when not on record cooldown
-            			if(player.isRecordPlayCooldownOver()) {
-            				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.MUSIC,1);
-            				player.markRecordPlayCooldown();
-            			}
-            		}
-            	}
-        	}
+        	// Jukebox handler
+			if(event.hasItem() &&
+					event.getItem().getType().isRecord() &&
+					event.getAction().equals(Action.RIGHT_CLICK_BLOCK) &&
+					event.hasBlock() &&
+					event.getClickedBlock().getType().equals(Material.JUKEBOX) &&
+					!konquest.isWorldIgnored(event.getClickedBlock().getLocation()) ) {
+				// Update music stat when not on record cooldown
+				if(player.isRecordPlayCooldownOver()) {
+					konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.MUSIC,1);
+					player.markRecordPlayCooldown();
+				}
+			}
         }
     }
     
@@ -592,7 +612,9 @@ public class PlayerListener implements Listener {
         	KonTerritory territory = territoryManager.getChunkTerritory(clicked.getLocation());
         	// Entity exceptions are always allowed to interact
         	ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" interacted at entity of type: "+ clicked.getType());
-        	boolean isEntityAllowed = (clicked.getType().equals(EntityType.PLAYER) || clicked.getType().equals(EntityType.VILLAGER));
+        	boolean isEntityAllowed = (clicked.getType().equals(EntityType.PLAYER) ||
+					clicked.getType().equals(EntityType.VILLAGER) ||
+					clicked.getType().equals(EntityType.BOAT));
         	// Property Flag Holders
 			if(territory instanceof KonPropertyFlagHolder) {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
