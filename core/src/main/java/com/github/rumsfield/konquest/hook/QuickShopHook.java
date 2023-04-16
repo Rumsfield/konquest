@@ -93,7 +93,7 @@ public class QuickShopHook implements PluginHook {
 					for(Map.Entry<Location, Shop> entry : shopList.entrySet()) {
 						Location shopLoc = entry.getKey();
 						final OfflinePlayer owner = Bukkit.getOfflinePlayer(entry.getValue().getOwner());
-						world.playEffect(shopLoc, Effect.IRON_TRAPDOOR_TOGGLE, null);
+						world.playEffect(shopLoc, Effect.ANVIL_BREAK, null);
 						ChatUtil.printDebug("Deleting shop owned by "+owner.getName());
 						entry.getValue().delete();
 					}
