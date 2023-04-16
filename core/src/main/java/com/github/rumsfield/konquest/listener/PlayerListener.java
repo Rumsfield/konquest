@@ -740,51 +740,47 @@ public class PlayerListener implements Listener {
 		}
     }
     
-    @EventHandler(priority = EventPriority.LOW)
-    public void onPlayerRespawn(PlayerRespawnEvent event) {
-    	Location currentLoc = event.getPlayer().getLocation();
-    	Location respawnLoc = event.getRespawnLocation();
+    @EventHandler()
+    public void onPlayerRespawnOverride(PlayerRespawnEvent event) {
     	if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onPlayerRespawn for non-existent player");
 			return;
 		}
     	KonPlayer player = playerManager.getPlayer(event.getPlayer());
+		if(player == null) return;
     	// Send respawn to capital if no bed exists
     	if(!event.isBedSpawn()) {
     		if(!player.isBarbarian()) {
     			event.setRespawnLocation(player.getKingdom().getCapital().getSpawnLoc());
     		}
     	}
-    	// Update town bars
-		if(territoryManager.isChunkClaimed(currentLoc)) {
-			KonTerritory territoryFrom = territoryManager.getChunkTerritory(currentLoc);
-			// Update bars
-			if(territoryFrom instanceof KonBarDisplayer) {
-				((KonBarDisplayer)territoryFrom).removeBarPlayer(player);
-			}
-			// Other checks
-			if(territoryFrom instanceof KonTown) {
-				KonTown town = (KonTown) territoryFrom;
-				player.clearAllMobAttackers();
-				// Command all nearby Iron Golems to target nearby enemy players, ignore triggering player
-				town.updateGolemTargets(player,false);
-			}
-			// Remove potion effects for all players
-			kingdomManager.clearTownNerf(player);
-		}
-		if(territoryManager.isChunkClaimed(respawnLoc)) {
-			KonTerritory territoryTo = territoryManager.getChunkTerritory(respawnLoc);
-			// Update bars
-			if(territoryTo instanceof KonBarDisplayer) {
-				((KonBarDisplayer)territoryTo).addBarPlayer(player);
-			}
-			// Other checks
-			if(territoryTo instanceof KonTown) {
-				KonTown town = (KonTown) territoryTo;
-				town.updateGolemTargets(player,true);
-			}
-		}
     }
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerRespawnFinal(PlayerRespawnEvent event) {
+		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
+			ChatUtil.printDebug("Failed to handle onPlayerRespawn for non-existent player");
+			return;
+		}
+		KonPlayer player = playerManager.getPlayer(event.getPlayer());
+		if(player == null) return;
+		Location deathLoc = event.getPlayer().getLocation();
+		Location respawnLoc = event.getRespawnLocation();
+		boolean isTerritoryTo = territoryManager.isChunkClaimed(respawnLoc);
+		boolean isTerritoryFrom = territoryManager.isChunkClaimed(deathLoc);
+		KonTerritory territoryTo = null;
+		KonTerritory territoryFrom = null;
+		if(isTerritoryFrom) {
+			territoryFrom = territoryManager.getChunkTerritory(deathLoc);
+			// Exit Territory
+			onExitTerritory(territoryFrom,player);
+		}
+		if(isTerritoryTo) {
+			territoryTo = territoryManager.getChunkTerritory(respawnLoc);
+			// Entry Territory
+			onEnterTerritory(territoryTo,respawnLoc,deathLoc,player);
+		}
+	}
     
     @EventHandler()
     public void onPlayerExpChange(PlayerExpChangeEvent event) {
