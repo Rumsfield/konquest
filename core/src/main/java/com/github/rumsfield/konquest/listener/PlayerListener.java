@@ -511,16 +511,6 @@ public class PlayerListener implements Listener {
 							}
 						}
 					}
-					// Sanctuary protections...
-					if(territory instanceof KonSanctuary) {
-						// Prevent painting placement
-						if(event.hasItem() && event.getMaterial().equals(Material.PAINTING)) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-							event.setUseInteractedBlock(Event.Result.DENY);
-							event.setCancelled(true);
-							return;
-						}
-					}
 	        		// Ruin protections...
 	        		if(territory instanceof KonRuin) {
 	        			KonRuin ruin = (KonRuin)territory;
@@ -528,13 +518,6 @@ public class PlayerListener implements Listener {
 	        			if(ruin.isCriticalLocation(event.getClickedBlock().getLocation())) {
 	        				ruin.targetAllGolemsToPlayer(bukkitPlayer);
 	        			}
-						// Prevent painting placement
-						if(event.hasItem() && event.getMaterial().equals(Material.PAINTING)) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-							event.setUseInteractedBlock(Event.Result.DENY);
-							event.setCancelled(true);
-							return;
-						}
 	        		}
 	        		// Town protections...
 	        		if(territory instanceof KonTown) {

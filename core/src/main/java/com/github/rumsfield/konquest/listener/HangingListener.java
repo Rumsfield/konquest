@@ -26,16 +26,26 @@ public class HangingListener implements Listener {
 	
 	@EventHandler()
     public void onHangingPlace(HangingPlaceEvent event) {
+		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
+		if(player == null) return;
 		Location placeLoc = event.getEntity().getLocation();
-		if(territoryManager.isChunkClaimed(placeLoc)) {
+		if(!player.isAdminBypassActive() && territoryManager.isChunkClaimed(placeLoc)) {
 			KonTerritory territory = territoryManager.getChunkTerritory(placeLoc);
+
+			// Sanctuary & Ruin protections
+			if((territory instanceof KonSanctuary) || (territory instanceof KonRuin)) {
+				// Prevent placing all hanging things
+				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				event.setCancelled(true);
+				return;
+			}
+
 			// Check for break inside of town
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
 				// Check for break inside of town's monument
 				if(town.getMonument().isLocInside(placeLoc)) {
 					ChatUtil.printDebug("EVENT: Hanging placed inside of monument");
-					KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 					event.setCancelled(true);
 				}
