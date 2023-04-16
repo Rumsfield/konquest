@@ -65,6 +65,7 @@ public enum CorePath {
 	TRAVEL_CANCEL_ON_MOVE                                 ("core.travel.cancel_on_move"),
 	
 	KINGDOMS_CAPITAL_SUFFIX                               ("core.kingdoms.capital_suffix"),
+	KINGDOMS_CAPITAL_RESPAWN                              ("core.kingdoms.capital_respawn"),
 	KINGDOMS_CAPITAL_IMMUNITY_TOWNS                       ("core.kingdoms.capital_immunity_towns"),
 	KINGDOMS_ALLY_DEFENSE_PACT                            ("core.kingdoms.ally_defense_pact"),
 	KINGDOMS_INSTANT_WAR                                  ("core.kingdoms.instant_war"),

@@ -740,26 +740,25 @@ public class PlayerListener implements Listener {
 		}
     }
     
-    @EventHandler()
-    public void onPlayerRespawnOverride(PlayerRespawnEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerRespawnCapital(PlayerRespawnEvent event) {
     	if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
-			ChatUtil.printDebug("Failed to handle onPlayerRespawn for non-existent player");
+			ChatUtil.printDebug("Failed to handle onPlayerRespawnCapital for non-existent player");
 			return;
 		}
     	KonPlayer player = playerManager.getPlayer(event.getPlayer());
 		if(player == null) return;
     	// Send respawn to capital if no bed exists
-    	if(!event.isBedSpawn()) {
-    		if(!player.isBarbarian()) {
-    			event.setRespawnLocation(player.getKingdom().getCapital().getSpawnLoc());
-    		}
+		boolean isCapitalRespawn = konquest.getCore().getBoolean(CorePath.KINGDOMS_CAPITAL_RESPAWN.getPath(),true);
+    	if(!event.isBedSpawn() && !player.isBarbarian() && isCapitalRespawn) {
+			event.setRespawnLocation(player.getKingdom().getCapital().getSpawnLoc());
     	}
     }
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerRespawnFinal(PlayerRespawnEvent event) {
 		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
-			ChatUtil.printDebug("Failed to handle onPlayerRespawn for non-existent player");
+			ChatUtil.printDebug("Failed to handle onPlayerRespawnFinal for non-existent player");
 			return;
 		}
 		KonPlayer player = playerManager.getPlayer(event.getPlayer());

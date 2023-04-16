@@ -213,6 +213,9 @@ core:
   
     # (*) Suffix to be appended to Kingdom names which will be the name of the Capital city (string)
     capital_suffix: Capital
+
+    # Force players to respawn at their kingdom capital (true/false)
+    capital_respawn: true
     
     # Capitals will be immune from capture while there are this many other towns in the kingdom (0 to disable, integer >= 0)
     capital_immunity_towns: 2
