@@ -33,6 +33,7 @@ import org.bukkit.event.block.*;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.nio.channels.ScatteringByteChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -450,13 +451,20 @@ public class BlockListener implements Listener {
 		}
     }
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onDiamondMine(BlockBreakEvent event) {
 		if(!event.isCancelled()) {
 			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 				return;
 			}
-			if(event.getBlock().getType().equals(Material.DIAMOND_ORE)) {
+			boolean isDiamondBreak = false;
+			try {
+				Material blockType = event.getBlock().getType();
+				isDiamondBreak = blockType.equals(Material.DIAMOND_ORE) || blockType.equals(Material.DEEPSLATE_DIAMOND_ORE);
+			} catch(Exception ignored) {
+				ChatUtil.printDebug("Failed to evaluate diamond break material, the API is probably older.");
+			}
+			if(isDiamondBreak) {
 				boolean isDrop = event.isDropItems();
 				ChatUtil.printDebug("Diamond ore block break dropping items: "+isDrop);
 				ItemStack handItem = event.getPlayer().getInventory().getItemInMainHand();

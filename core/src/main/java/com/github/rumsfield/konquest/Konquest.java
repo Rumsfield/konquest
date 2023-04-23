@@ -1087,6 +1087,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	// This can return null!
 	public Location getRandomWildLocation(World world) {
 		Location wildLoc = null;
+		final int MAX_ATTEMPTS = 100;
 		int radius = getCore().getInt(CorePath.TRAVEL_WILD_RADIUS.getPath(),500);
 		int offsetX = getCore().getInt(CorePath.TRAVEL_WILD_CENTER_X.getPath(),0);
 		int offsetZ = getCore().getInt(CorePath.TRAVEL_WILD_CENTER_Z.getPath(),0);
@@ -1097,23 +1098,37 @@ public class Konquest implements KonquestAPI, Timeable {
 		int randomNumY;
 		boolean foundValidLoc = false;
 		int timeout = 0;
+		// Metrics for criteria checking
+		int numClaimed = 0;
+		int numWater = 0;
 		while(!foundValidLoc) {
-			randomNumX = ThreadLocalRandom.current().nextInt(-1*(radius), (radius) + 1) + offsetX;
-			randomNumZ = ThreadLocalRandom.current().nextInt(-1*(radius), (radius) + 1) + offsetZ;
-			randomNumY = world.getHighestBlockYAt(randomNumX,randomNumZ) + 3;
-			wildLoc = new Location(world, randomNumX, randomNumY, randomNumZ);
-			if(!territoryManager.isChunkClaimed(wildLoc)) {
-				foundValidLoc = true;
-			} else {
-				timeout++;
-				ChatUtil.printDebug("Got claimed location, trying again...");
-			}
-			if(timeout > 100) {
-				ChatUtil.printDebug("There was a problem getting a random wilderness location: timeout");
+			if(timeout > MAX_ATTEMPTS) {
+				ChatUtil.printDebug("Failed to get a random wilderness location. Claimed attempts: "+numClaimed+"; Water attempts: "+numWater);
 				return null;
 			}
+			// Generate new location
+			randomNumX = ThreadLocalRandom.current().nextInt(-1*(radius), (radius) + 1) + offsetX;
+			randomNumZ = ThreadLocalRandom.current().nextInt(-1*(radius), (radius) + 1) + offsetZ;
+			Block randomBlock = world.getHighestBlockAt(randomNumX,randomNumZ);
+			randomNumY = randomBlock.getY() + 2;
+			wildLoc = new Location(world, randomNumX, randomNumY, randomNumZ);
+			// Check for valid location criteria
+			if(territoryManager.isChunkClaimed(wildLoc)) {
+				// This location is claimed
+				numClaimed++;
+				timeout++;
+				continue;
+			}
+			if(randomBlock.getType().equals(Material.WATER)) {
+				// This location is water
+				numWater++;
+				timeout++;
+				continue;
+			}
+			// Passed all checks
+			foundValidLoc = true;
 		}
-		ChatUtil.printDebug("Got wilderness location "+wildLoc.getX()+","+wildLoc.getY()+","+wildLoc.getZ());
+		ChatUtil.printDebug("Got wilderness location "+wildLoc.getX()+","+wildLoc.getY()+","+wildLoc.getZ()+". Claimed attempts: "+numClaimed+"; Water attempts: "+numWater);
 		return wildLoc;
 	}
 	

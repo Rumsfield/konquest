@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class LootManager implements Timeable{
 
@@ -310,7 +311,7 @@ public class LootManager implements Timeable{
 			for(int p : itemOptions.values()) {
 				total = total + p;
 			}
-			int typeChoice = randomness.nextInt(total);
+			int typeChoice = ThreadLocalRandom.current().nextInt(total);
 			int typeWindow = 0;
 			for(ItemStack i : itemOptions.keySet()) {
 				if(typeChoice < typeWindow + itemOptions.get(i)) {
@@ -330,7 +331,7 @@ public class LootManager implements Timeable{
 					for(Enchantment e : enchants.keySet()) {
 						if(enchants.get(e) == 0) {
 							// Choose random level
-							int newLevel = randomness.nextInt(e.getMaxLevel()+1);
+							int newLevel = ThreadLocalRandom.current().nextInt(e.getMaxLevel()+1);
 							if(newLevel < e.getStartLevel()) {
 								newLevel = e.getStartLevel();
 							}

@@ -78,13 +78,13 @@ public class MapHandler {
 	 * 		AreaMarker Points: 		konquest.area.camp.<name>.point.<n>
 	 * 		AreaMarker Contours: 	konquest.area.camp.<name>.contour.<n>
 	 * Kingdoms
-	 * 		MarkerSet Group:  		konquest.marker.<kingdom>
+	 * 		MarkerSet Group:  		konquest.marker.kingdom
 	 * 		Capital
-	 * 		AreaMarker Points: 		konquest.area.<kingdom>.capital.point.<n>
-	 * 		AreaMarker Contours: 	konquest.area.<kingdom>.capital.contour.<n>
+	 * 		AreaMarker Points: 		konquest.area.kingdom.<kingdom>.capital.point.<n>
+	 * 		AreaMarker Contours: 	konquest.area.kingdom.<kingdom>.capital.contour.<n>
 	 * 		Towns
-	 * 		AreaMarker Points: 		konquest.area.<kingdom>.<town>.point.<n>
-	 * 		AreaMarker Contours: 	konquest.area.<kingdom>.<town>.contour.<n>
+	 * 		AreaMarker Points: 		konquest.area.kingdom.<kingdom>.<town>.point.<n>
+	 * 		AreaMarker Contours: 	konquest.area.kingdom.<kingdom>.<town>.contour.<n>
 	 */
 	
 	//TODO: Make this class into a listener, make events for territory updates, deletes, etc
@@ -327,7 +327,7 @@ public class MapHandler {
 				break;
 			case CAPITAL:
 			case TOWN:
-				result = result+".marker."+territory.getKingdom().getName().toLowerCase();
+				result = result+".marker.kingdom";
 				break;
 			default:
 				break;
@@ -349,7 +349,7 @@ public class MapHandler {
 				break;
 			case CAPITAL:
 			case TOWN:
-				result = "Konquest Kingdom "+territory.getKingdom().getName();
+				result = "Konquest Kingdoms";
 				break;
 			default:
 				break;
@@ -370,10 +370,10 @@ public class MapHandler {
 				result = result+".area.camp."+territory.getName().toLowerCase();
 				break;
 			case CAPITAL:
-				result = result+".area."+territory.getKingdom().getName().toLowerCase()+".capital";
+				result = result+".area.kingdom."+territory.getKingdom().getName().toLowerCase()+".capital";
 				break;
 			case TOWN:
-				result = result+".area."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase();
+				result = result+".area.kingdom."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase();
 				break;
 			default:
 				break;
@@ -413,15 +413,24 @@ public class MapHandler {
 				break;
 			case CAPITAL:
 				KonCapital capital = (KonCapital)territory;
+				String capitalLordName = "-";
+				if(capital.getPlayerLord() != null) {
+					capitalLordName = capital.getPlayerLord().getName();
+				}
 				int numKingdomTowns = territory.getKingdom().getTowns().size();
 				int numKingdomLand = 0;
-		    	for(KonTown town : territory.getKingdom().getTowns()) {
-		    		numKingdomLand += town.getChunkList().size();
+		    	for(KonTown town : territory.getKingdom().getCapitalTowns()) {
+		    		numKingdomLand += town.getNumLand();
 		    	}
 				int numAllKingdomPlayers = konquest.getPlayerManager().getAllPlayersInKingdom(territory.getKingdom()).size();
 				result = "<p>"+
 						"<b>"+capital.getName() + "</b><br>" +
-						MessagePath.MAP_KINGDOM.getMessage() + ": " + capital.getKingdom().getName() + "<br>" +
+						MessagePath.MAP_LORD.getMessage() + ": " + capitalLordName + "<br>" +
+						MessagePath.MAP_LAND.getMessage() + ": " + capital.getNumLand() + "<br>" +
+						MessagePath.MAP_POPULATION.getMessage() + ": " + capital.getNumResidents() + "<br>" +
+						"</p><br>" +
+						"<p>"+
+						"<b>"+capital.getKingdom().getName() + "</b><br>" +
 						MessagePath.MAP_TOWNS.getMessage() + ": " + numKingdomTowns + "<br>" +
 						MessagePath.MAP_LAND.getMessage() + ": " + numKingdomLand + "<br>" +
 						MessagePath.MAP_PLAYERS.getMessage() + ": " + numAllKingdomPlayers + "<br>" +
@@ -429,15 +438,15 @@ public class MapHandler {
 				break;
 			case TOWN:
 				KonTown town = (KonTown)territory;
-				String lordName = "-";
+				String townLordName = "-";
 				if(town.getPlayerLord() != null) {
-					lordName = town.getPlayerLord().getName();
+					townLordName = town.getPlayerLord().getName();
 				}
 				result = "<p>"+
 						"<b>"+town.getName() + "</b><br>" +
 						MessagePath.MAP_KINGDOM.getMessage() + ": " + town.getKingdom().getName() + "<br>" +
-						MessagePath.MAP_LORD.getMessage() + ": " + lordName + "<br>" +
-						MessagePath.MAP_LAND.getMessage() + ": " + town.getChunkList().size() + "<br>" +
+						MessagePath.MAP_LORD.getMessage() + ": " + townLordName + "<br>" +
+						MessagePath.MAP_LAND.getMessage() + ": " + town.getNumLand() + "<br>" +
 						MessagePath.MAP_POPULATION.getMessage() + ": " + town.getNumResidents() + "<br>" +
 						"</p>";
 				break;
@@ -506,10 +515,10 @@ public class MapHandler {
 				result = result+".icon.camp."+territory.getName().toLowerCase();
 				break;
 			case CAPITAL:
-				result = result+".icon."+territory.getKingdom().getName().toLowerCase()+".capital";
+				result = result+".icon.kingdom."+territory.getKingdom().getName().toLowerCase()+".capital";
 				break;
 			case TOWN:
-				result = result+".icon."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase();
+				result = result+".icon.kingdom."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase();
 				break;
 			default:
 				break;

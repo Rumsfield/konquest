@@ -381,7 +381,7 @@ core:
     max_armor: 1000
     
     # Free shield duration in seconds for all newly settled towns (0 to disable, integer >= 0)
-    shield_new_towns: 600
+    shield_new_towns: 3600
     
     # Allow barbarian players to destroy towns when true, else prevent barbarians from attacking town monuments (true/false)
     barbarians_destroy: true
@@ -522,7 +522,7 @@ core:
   favor:
   
     # Cost to use the spy command (decimal >= 0)
-    cost_spy: 200
+    cost_spy: 75
     
     # Cost to claim land (decimal >= 0)
     cost_claim: 10

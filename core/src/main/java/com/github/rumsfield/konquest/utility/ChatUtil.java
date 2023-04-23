@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 public class ChatUtil {
 
-	private static final ChatColor adminBroadcastColor= ChatColor.DARK_PURPLE;
+	private static final ChatColor adminBroadcastColor= ChatColor.GOLD;
 	private static final ChatColor broadcastColor = ChatColor.LIGHT_PURPLE;
 	private static final ChatColor noticeColor = ChatColor.GRAY;
 	private static final ChatColor errorColor = ChatColor.RED;

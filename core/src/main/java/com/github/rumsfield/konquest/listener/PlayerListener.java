@@ -1006,7 +1006,7 @@ public class PlayerListener implements Listener {
         		// Chunk transition checks
         		if(!isTerritoryTo && isTerritoryFrom) { // When moving into the wild
         			// Check if exit is allowed
-        			if(!isAllowedExitTerritory(territoryFrom,player) && !force) return false;
+        			if(isDeniedExitTerritory(territoryFrom,player,force)) return false;
         			// Display WILD
         			ChatUtil.sendKonTitle(player, "", MessagePath.GENERIC_NOTICE_WILD.getMessage());
         			// Do things appropriate to the type of territory
@@ -1017,7 +1017,7 @@ public class PlayerListener implements Listener {
         			player.setFlyDisableWarmup(true);
         		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
         			// Check if entry is allowed
-        			if(!isAllowedEnterTerritory(territoryTo,player) && !force) return false;
+        			if(isDeniedEnterTerritory(territoryTo,player,force)) return false;
         			// Set message color based on enemy territory
         			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
 	                // Display Territory Name
@@ -1034,11 +1034,11 @@ public class PlayerListener implements Listener {
         			// Check for differing territories, if true then display new Territory Name and send message to enemies
         			if(!territoryTo.equals(territoryFrom)) { // moving between different territories
         				// Check if exit is allowed
-            			if(!isAllowedExitTerritory(territoryFrom,player) && !force) {
+            			if(isDeniedExitTerritory(territoryFrom,player,force)) {
             				return false;
             			}
         				// Check if entry is allowed
-            			if(!isAllowedEnterTerritory(territoryTo,player) && !force) {
+            			if(isDeniedEnterTerritory(territoryTo,player,force)) {
             				return false;
             			}
         				// Set message color based on To territory
@@ -1083,9 +1083,9 @@ public class PlayerListener implements Listener {
     			// Player moved between worlds
     			
     			// Check if exit is allowed
-    			if(isTerritoryFrom && !isAllowedExitTerritory(territoryFrom,player) && !force) return false;
+    			if(isTerritoryFrom && isDeniedExitTerritory(territoryFrom,player,force)) return false;
     			// Check if entry is allowed
-    			if(isTerritoryTo && !isAllowedEnterTerritory(territoryTo,player) && !force) return false;
+    			if(isTerritoryTo && isDeniedEnterTerritory(territoryTo,player,force)) return false;
     			
     			// Disable movement-based flags
     			if(player.isAutoFollowActive()) {
@@ -1122,13 +1122,14 @@ public class PlayerListener implements Listener {
     	return true;
     }
     
-    // Return true to allow entry, else false to deny entry
-    private boolean isAllowedEnterTerritory(KonTerritory territoryTo, KonPlayer player) {
-    	if(territoryTo == null) return true;// Unknown territory, just allow it
+    // Return true to deny entry, else false to allow entry
+    private boolean isDeniedEnterTerritory(KonTerritory territoryTo, KonPlayer player, boolean force) {
+    	if(territoryTo == null) return false;// Unknown territory, just allow it
+		if(force) return false; // Forced entry, allow it
     	// Admin bypass always enter
-    	if(player.isAdminBypassActive()) return true;
+    	if(player.isAdminBypassActive()) return false;
     	// Friendlies can always enter
-    	if(territoryTo.getKingdom().equals(player.getKingdom())) return true;
+    	if(territoryTo.getKingdom().equals(player.getKingdom())) return false;
     	// Property Flag Holders
 		if(territoryTo instanceof KonPropertyFlagHolder) {
 			KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territoryTo;
@@ -1145,11 +1146,11 @@ public class PlayerListener implements Listener {
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
 					}
 					// Cancel the movement
-					return false;
+					return true;
 				}
 			}
 		}
-		return true;
+		return false;
     }
     
     private void onEnterTerritory(KonTerritory territoryTo, Location locTo, Location locFrom, KonPlayer player) {
@@ -1219,13 +1220,14 @@ public class PlayerListener implements Listener {
 		}
 	}
     
-    // Return true to allow exit, else false to deny exit
-    private boolean isAllowedExitTerritory(KonTerritory territoryFrom, KonPlayer player) {
-    	if(territoryFrom == null) return true; // Unknown territory, just allow it
+    // Return true to deny exit, else false to allow exit
+    private boolean isDeniedExitTerritory(KonTerritory territoryFrom, KonPlayer player, boolean force) {
+    	if(territoryFrom == null) return false; // Unknown territory, just allow it
+		if(force) return false; // Forced exit, allow it
     	// Admin bypass always exit
-    	if(player.isAdminBypassActive()) return true;
+    	if(player.isAdminBypassActive()) return false;
     	// Friendlies can always exit
-    	if(territoryFrom.getKingdom().equals(player.getKingdom())) return true;
+    	if(territoryFrom.getKingdom().equals(player.getKingdom())) return false;
     	// Property Flag Holders
 		if(territoryFrom instanceof KonPropertyFlagHolder) {
 			KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territoryFrom;
@@ -1242,11 +1244,11 @@ public class PlayerListener implements Listener {
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
 					}
 					// Cancel the movement
-					return false;
+					return true;
 				}
 			}
 		}
-		return true;
+		return false;
     }
     
     private void onExitTerritory(KonTerritory territoryFrom, KonPlayer player) {

@@ -242,13 +242,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				}
 			}
 		}
-		// Determine pay amounts by town
+		// Determine pay amounts by town + capital
 		OfflinePlayer lord;
 		int land;
 		int pop;
 		double pay;
 		for(KonKingdom kingdom : kingdomMap.values()) {
-			for(KonTown town : kingdom.getTowns()) {
+			for(KonTown town : kingdom.getCapitalTowns()) {
 				lord = town.getPlayerLord();
 				land = town.getChunkList().size();
 				pop = town.getNumResidents();
