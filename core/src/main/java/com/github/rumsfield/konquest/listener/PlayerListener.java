@@ -527,10 +527,19 @@ public class PlayerListener implements Listener {
 	        			if(town.isLocInsideMonumentProtectionArea(event.getClickedBlock().getLocation())) {
 	        				town.targetRabbitToPlayer(bukkitPlayer);
 	        			}
-	        			// Prevent enemies from interacting with things like buttons, levers, pressure plates...
-	        			if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) && !town.isEnemyRedstoneAllowed()) {
-	        				preventUse(event,player);
-	    				}
+						// Protections for non-friendlies
+						if(!playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
+							// Check for allowed usage like buttons, levers
+							if(!town.isEnemyRedstoneAllowed() && preventUse(event,player)) {
+								event.setCancelled(true);
+								return;
+							}
+							// Try to protected physical interaction like pressure plates, trampling farmland
+							if(preventPhysical(event,player)) {
+								event.setCancelled(true);
+								return;
+							}
+						}
 	        			// Prevent enemies and non-residents from interacting with item frames
 	        			if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
 	        				Material clickedMat = event.getClickedBlock().getType();
@@ -546,7 +555,14 @@ public class PlayerListener implements Listener {
         			// Interaction occurred in the wild
         			boolean isWildUse = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_USE.getPath(), true);
         			if(!isWildUse && !konquest.isWorldIgnored(clickedState.getLocation())) {
-        				preventUse(event,player);
+        				if(preventUse(event,player)) {
+							event.setCancelled(true);
+							return;
+						}
+						if(preventPhysical(event,player)) {
+							event.setCancelled(true);
+							return;
+						}
         			}
         		}
         	}
@@ -1314,13 +1330,10 @@ public class PlayerListener implements Listener {
 			player.getBukkitPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plotMessageColor+plotMessage));
     	}
     }
-    
-    private void preventUse(PlayerInteractEvent event, KonPlayer player) {
-    	if(event.getAction().equals(Action.PHYSICAL)) {
-			// Prevent all physical stepping interaction
-			event.setUseInteractedBlock(Event.Result.DENY);
-			ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-		} else if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+
+	// Returns true if use was canceled, else false
+    private boolean preventUse(PlayerInteractEvent event, KonPlayer player) {
+    	if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 			// Prevent use of specific usable blocks
 			BlockState clickedState = event.getClickedBlock().getState();
 			BlockData clickedBlockData = clickedState.getBlockData();
@@ -1334,7 +1347,20 @@ public class PlayerListener implements Listener {
 				event.setUseInteractedBlock(Event.Result.DENY);
 				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 			}
+			return true;
 		}
+		return false;
     }
+
+	// Returns true if physical interaction was canceled, else false
+	private boolean preventPhysical(PlayerInteractEvent event, KonPlayer player) {
+		if(event.getAction().equals(Action.PHYSICAL)) {
+			// Prevent all physical stepping interaction
+			event.setUseInteractedBlock(Event.Result.DENY);
+			ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+			return true;
+		}
+		return false;
+	}
     
 }

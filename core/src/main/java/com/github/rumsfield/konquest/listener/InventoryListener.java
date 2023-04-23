@@ -28,6 +28,7 @@ import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.BlockInventoryHolder;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.SmithingInventory;
 
@@ -180,7 +181,7 @@ public class InventoryListener implements Listener {
 		konquest.getDisplayManager().onDisplayMenuClose(event.getInventory(), event.getPlayer());
 	}
 	
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onDisplayMenuClick(InventoryClickEvent event) {
 		// When a player clicks inside a display menu inventory
 		if(konquest.getDisplayManager().isNotDisplayMenu(event.getClickedInventory())) return;
@@ -200,27 +201,60 @@ public class InventoryListener implements Listener {
 	
 	@EventHandler()
     public void onNetheriteCraft(InventoryClickEvent event) {
-		if(!event.isCancelled()) {
-			// Check for picking up netherite items for stats
-			if(event.getAction().equals(InventoryAction.PICKUP_ALL) && event.getClickedInventory() instanceof SmithingInventory &&
-					!konquest.isWorldIgnored(event.getInventory().getLocation())) {
-				Material itemType = event.getCurrentItem().getType();
-				int slot = event.getRawSlot();
-				HumanEntity human = event.getWhoClicked();
-				KonPlayer player = playerManager.getPlayer((Player)human);
-				if(player != null && (itemType.equals(Material.NETHERITE_AXE) ||
-						itemType.equals(Material.NETHERITE_HOE) ||
-						itemType.equals(Material.NETHERITE_SHOVEL) ||
-						itemType.equals(Material.NETHERITE_PICKAXE) ||
-						itemType.equals(Material.NETHERITE_SWORD) ||
-						itemType.equals(Material.NETHERITE_HELMET) ||
-						itemType.equals(Material.NETHERITE_CHESTPLATE) ||
-						itemType.equals(Material.NETHERITE_LEGGINGS) ||
-						itemType.equals(Material.NETHERITE_BOOTS))) {
-					if(slot == 2) {
-						// Player crafted a netherite item
-						konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,5);
-					}
+		if(event.isCancelled()) return;
+		// Check for picking up netherite items for stats
+		if(event.getAction().equals(InventoryAction.PICKUP_ALL) && event.getClickedInventory() instanceof SmithingInventory &&
+				!konquest.isWorldIgnored(event.getInventory().getLocation())) {
+			Material itemType = event.getCurrentItem().getType();
+			int slot = event.getRawSlot();
+			HumanEntity human = event.getWhoClicked();
+			KonPlayer player = playerManager.getPlayer((Player)human);
+			if(player != null && (itemType.equals(Material.NETHERITE_AXE) ||
+					itemType.equals(Material.NETHERITE_HOE) ||
+					itemType.equals(Material.NETHERITE_SHOVEL) ||
+					itemType.equals(Material.NETHERITE_PICKAXE) ||
+					itemType.equals(Material.NETHERITE_SWORD) ||
+					itemType.equals(Material.NETHERITE_HELMET) ||
+					itemType.equals(Material.NETHERITE_CHESTPLATE) ||
+					itemType.equals(Material.NETHERITE_LEGGINGS) ||
+					itemType.equals(Material.NETHERITE_BOOTS))) {
+				if(slot == 2) {
+					// Player crafted a netherite item
+					konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRAFTED,5);
+				}
+			}
+		}
+	}
+
+	@EventHandler()
+	public void onMonumentChestClick(InventoryClickEvent event) {
+		// Prevent placing items into chests located in a town monument
+		if(event.isCancelled()) return;
+		Inventory clickedInventory = event.getClickedInventory();
+		if(clickedInventory == null) return;
+		Location inventoryLocation = clickedInventory.getLocation();
+		if(inventoryLocation == null) return;
+		// These actions will be prohibited, if done in town monument chest inventories
+		boolean isActionProtected = event.getAction().equals(InventoryAction.PLACE_ALL) ||
+				event.getAction().equals(InventoryAction.PLACE_ONE) ||
+				event.getAction().equals(InventoryAction.PLACE_SOME) ||
+				event.getAction().equals(InventoryAction.SWAP_WITH_CURSOR) ||
+				event.getAction().equals(InventoryAction.HOTBAR_SWAP);
+		if(!isActionProtected) return;
+		// Check for ignored world
+		if(konquest.isWorldIgnored(inventoryLocation)) return;
+		// Check for territory at inventory location
+		if(konquest.getTerritoryManager().isChunkClaimed(inventoryLocation)) {
+			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(inventoryLocation);
+			// Check for town
+			if(territory instanceof KonTown) {
+				KonTown town = (KonTown) territory;
+				// Check for inventory inside monument
+				if(town.getMonument().isLocInside(inventoryLocation)) {
+					// At this point, due to previous checks, the inventory is inside of a town monument
+					// and is one of the prohibited actions. Cancel this event.
+					ChatUtil.printDebug("Cancelling player item placement into monument inventory of town "+town.getName());
+					event.setCancelled(true);
 				}
 			}
 		}

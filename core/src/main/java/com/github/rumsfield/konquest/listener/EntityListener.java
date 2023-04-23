@@ -36,19 +36,8 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.entity.EntityBreedEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityInteractEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -717,6 +706,35 @@ public class EntityListener implements Listener {
 				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.POTIONS,1);
 			}
     	}
+	}
+
+	@EventHandler()
+	public void onProjectileHit(ProjectileHitEvent event) {
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
+		ProjectileSource source = event.getEntity().getShooter();
+		// Protections for splash potions only
+		if(event.getEntityType().equals(EntityType.SPLASH_POTION) && source instanceof Player) {
+			Player bukkitPlayer = (Player)source;
+			KonPlayer player = playerManager.getPlayer(bukkitPlayer);
+
+			// Protections for territories
+			if(player != null && !player.isAdminBypassActive() && territoryManager.isChunkClaimed(event.getEntity().getLocation())) {
+				KonTerritory territory = territoryManager.getChunkTerritory(event.getEntity().getLocation());
+
+				if(territory instanceof KonTown) {
+					// Only allow splash potions in the town when source player is friendly or enemy (war)
+					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+					if(!playerRole.equals(KonquestRelationshipType.ENEMY) && !playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
+						event.setCancelled(true);
+						return;
+					}
+				} else if(territory instanceof KonSanctuary) {
+					// Prevent all splash potions
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
 	}
 	
 	@EventHandler()
