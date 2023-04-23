@@ -21,17 +21,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Egg;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.IronGolem;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -99,72 +89,113 @@ public class EntityListener implements Listener {
 	@EventHandler()
     public void onEntityExplode(EntityExplodeEvent event) {
 		// Protect blocks inside of territory
-		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-			return;
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
+		if(event.isCancelled()) return;
+
+		// First, check for whole-territory protections
+		Location explosionLoc = event.getLocation();
+		boolean isInTerritory = false;
+		KonTerritory wholeTerritory = null;
+		if(territoryManager.isChunkClaimed(explosionLoc)) {
+			wholeTerritory = territoryManager.getChunkTerritory(explosionLoc);
+			isInTerritory = true;
+		} else {
+			for(Block block : event.blockList()) {
+				if(territoryManager.isChunkClaimed(block.getLocation())) {
+					wholeTerritory = territoryManager.getChunkTerritory(block.getLocation());
+					isInTerritory = true;
+					break;
+				}
+			}
 		}
+		if(isInTerritory && wholeTerritory != null) {
+			// Protect Sanctuaries always
+			if(wholeTerritory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY)) {
+				ChatUtil.printDebug("protecting Sanctuary from entity explosion");
+				event.setCancelled(true);
+				return;
+			}
+			// Protect Ruins always
+			if(wholeTerritory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
+				ChatUtil.printDebug("protecting Ruin from entity explosion");
+				event.setCancelled(true);
+				return;
+			}
+			// Conditional town/capital protections
+			if(wholeTerritory instanceof KonTown) {
+				KonTown town = (KonTown)wholeTerritory;
+				// Protect against TNT ignited by non-enemies
+				if(event.getEntity() instanceof TNTPrimed) {
+					TNTPrimed tnt = (TNTPrimed)event.getEntity();
+					Entity tntSource = tnt.getSource();
+					if(tntSource instanceof Player) {
+						Player tntSender = (Player)tntSource;
+						KonPlayer player = playerManager.getPlayer(tntSender);
+						if(player != null) {
+							KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
+							if(!playerRole.equals(KonquestRelationshipType.ENEMY)) {
+								ChatUtil.printDebug("protecting Town from non-enemy TNT entity explosion");
+								event.setCancelled(true);
+								return;
+							}
+						}
+					}
+				}
+				// Protect towns when all kingdom members are offline
+				if(town.getKingdom().isOfflineProtected()) {
+					ChatUtil.printDebug("protecting offline Town from entity explosion");
+					event.setCancelled(true);
+					return;
+				}
+				// If town is upgraded to require a minimum online resident amount, prevent block damage
+				int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
+				if(upgradeLevelWatch > 0) {
+					if(town.getNumResidentsOnline() < upgradeLevelWatch) {
+						ChatUtil.printDebug("protecting upgraded Town WATCH from entity explosion");
+						event.setCancelled(true);
+						return;
+					}
+				}
+				// Protect when town has upgrade
+				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DAMAGE);
+				if(upgradeLevel >= 2) {
+					ChatUtil.printDebug("protecting upgraded Town DAMAGE from entity explosion");
+					event.setCancelled(true);
+					return;
+				}
+				// Check for capital capture conditions
+				if(wholeTerritory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && town.getKingdom().isCapitalImmune()) {
+					// Capital is immune and cannot be attacked
+					ChatUtil.printDebug("protecting immune capital from entity explosion");
+					event.setCancelled(true);
+					return;
+				}
+				// Verify town can be captured
+				if(town.isCaptureDisabled()) {
+					ChatUtil.printDebug("protecting town in capture cooldown from entity explosion");
+					event.setCancelled(true);
+					return;
+				}
+				// If town is shielded, prevent all explosions
+				if(town.isShielded()) {
+					ChatUtil.printDebug("protecting shielded town from entity explosion");
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
+
+		// Second, evaluate individual blocks affected by the explosion for block-based protections
 		for(Block block : event.blockList()) {
 			if(territoryManager.isChunkClaimed(block.getLocation())) {
 				KonTerritory territory = territoryManager.getChunkTerritory(block.getLocation());
 				Material blockMat = block.getType();
-				
-				// Protect Sanctuaries always
-				if(territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY)) {
-					ChatUtil.printDebug("protecting Sanctuary from entity explosion");
-					event.setCancelled(true);
-					return;
-				}
-				// Protect Ruins always
-				if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
-					ChatUtil.printDebug("protecting Ruin from entity explosion");
-					event.setCancelled(true);
-					return;
-				}
 				// Town protections
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown)territory;
 					// Protect Town Monuments
 					if(town.isLocInsideMonumentProtectionArea(block.getLocation())) {
 						ChatUtil.printDebug("protecting Town Monument from entity explosion");
-						event.setCancelled(true);
-						return;
-					}
-					// Protect towns when all kingdom members are offline
-					if(playerManager.getPlayersInKingdom(town.getKingdom()).isEmpty()) {
-						ChatUtil.printDebug("protecting offline Town from entity explosion");
-						event.setCancelled(true);
-						return;
-					}
-					// If town is upgraded to require a minimum online resident amount, prevent block damage
-					int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-					if(upgradeLevelWatch > 0) {
-						if(town.getNumResidentsOnline() < upgradeLevelWatch) {
-							ChatUtil.printDebug("protecting upgraded Town WATCH from entity explosion");
-							event.setCancelled(true);
-							return;
-						}
-					}
-					// Protect when town has upgrade
-					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DAMAGE);
-					if(upgradeLevel >= 2) {
-						ChatUtil.printDebug("protecting upgraded Town DAMAGE from entity explosion");
-						event.setCancelled(true);
-						return;
-					}
-					// Check for capital capture conditions
-					if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && territory.getKingdom().isCapitalImmune()) {
-						// Capital is immune and cannot be attacked
-						ChatUtil.printDebug("protecting immune capital from entity explosion");
-						event.setCancelled(true);
-						return;
-					}
-					// Verify town can be captured
-					if(town.isCaptureDisabled()) {
-						ChatUtil.printDebug("protecting town in capture cooldown from entity explosion");
-						event.setCancelled(true);
-						return;
-					}
-					// If town is shielded, prevent all explosions
-					if(town.isShielded()) {
 						event.setCancelled(true);
 						return;
 					}
@@ -339,21 +370,17 @@ public class EntityListener implements Listener {
 	
 	@EventHandler()
     public void onArrowInteract(EntityInteractEvent event) {
+		// prevent arrows from interacting with things like pressure plates
+		// Checks
+		if(event.isCancelled()) return;
     	if(konquest.isWorldIgnored(event.getEntity().getLocation())) return;
-    	// prevent arrows from interacting with things
 		if (!(event.getEntity() instanceof Arrow)) return;
-		if(!event.isCancelled() && territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
-	        KonTerritory territory = territoryManager.getChunkTerritory(event.getBlock().getLocation());
-	        // Protect territory from arrow interaction
-	        // Property Flag Holders
- 			if(territory instanceof KonPropertyFlagHolder) {
- 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
- 				if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
- 					if(!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
- 						event.setCancelled(true);
-					}
- 				}
- 			}
+		// Protect claimed territory
+		if(territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
+	        // Protect all territory from arrow interaction
+			if(event.getEntityType().equals(EntityType.DROPPED_ITEM)) {
+				event.setCancelled(true);
+			}
 		}
 	}
 	
