@@ -52,13 +52,21 @@ public class TownOptionsMenuWrapper extends MenuWrapper {
     	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
 		option = new OptionIcon(optionAction.TOWN_PLOT_ONLY, loreColor+MessagePath.LABEL_PLOT.getMessage(), loreList, Material.DIAMOND_SHOVEL, 3);
 		getMenu().getPage(0).addIcon(option);
-		
+
+		// Friendly Redstone Info Icon
+		currentValue = DisplayManager.boolean2Lang(town.isFriendlyRedstoneAllowed())+" "+DisplayManager.boolean2Symbol(town.isFriendlyRedstoneAllowed());
+		loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_FRIENDLY_REDSTONE.getMessage()));
+		loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
+		loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+		option = new OptionIcon(OptionIcon.optionAction.TOWN_FRIENDLY_REDSTONE, loreColor+MessagePath.LABEL_FRIENDLY_REDSTONE.getMessage(), loreList, Material.LEVER, 4);
+		getMenu().getPage(0).addIcon(option);
+
 		// Redstone Info Icon
 		currentValue = DisplayManager.boolean2Lang(town.isEnemyRedstoneAllowed())+" "+DisplayManager.boolean2Symbol(town.isEnemyRedstoneAllowed());
 		loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_REDSTONE.getMessage()));
     	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
     	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-		option = new OptionIcon(optionAction.TOWN_REDSTONE, loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage(), loreList, Material.LEVER, 5);
+		option = new OptionIcon(optionAction.TOWN_REDSTONE, loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage(), loreList, Material.REDSTONE, 5);
 		getMenu().getPage(0).addIcon(option);
 		
 		// Golem Offensive Info Icon

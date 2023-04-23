@@ -527,6 +527,19 @@ public class PlayerListener implements Listener {
 	        			if(town.isLocInsideMonumentProtectionArea(event.getClickedBlock().getLocation())) {
 	        				town.targetRabbitToPlayer(bukkitPlayer);
 	        			}
+						// Protections for friendly non-residents of closed towns
+						if(playerRole.equals(KonquestRelationshipType.FRIENDLY) && !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+							// Check for allowed usage like buttons, levers
+							if(!town.isFriendlyRedstoneAllowed() && preventUse(event,player)) {
+								event.setCancelled(true);
+								return;
+							}
+							// Try to protected physical interaction like pressure plates, trampling farmland
+							if(preventPhysical(event,player)) {
+								event.setCancelled(true);
+								return;
+							}
+						}
 						// Protections for non-friendlies
 						if(!playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
 							// Check for allowed usage like buttons, levers

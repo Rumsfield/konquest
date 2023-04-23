@@ -3041,6 +3041,18 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				}
 				result = true;
 				break;
+			case TOWN_FRIENDLY_REDSTONE:
+				if(town.isFriendlyRedstoneAllowed()) {
+					// Disable friendly redstone
+					town.setIsFriendlyRedstoneAllowed(false);
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_FRIENDLY_REDSTONE_DISABLE.getMessage(town.getName()));
+				} else {
+					// Enable friendly redstone
+					town.setIsFriendlyRedstoneAllowed(true);
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_FRIENDLY_REDSTONE_ENABLE.getMessage(town.getName()));
+				}
+				result = true;
+				break;
 			case TOWN_REDSTONE:
 				if(town.isEnemyRedstoneAllowed()) {
 					// Disable enemy redstone
@@ -4182,9 +4194,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Set plot flag
 		boolean isPlotOnly = townSection.getBoolean("plot",false);
 		town.setIsPlotOnly(isPlotOnly);
-		// Set redstone flag
-		boolean isRedstone = townSection.getBoolean("redstone",false);
-		town.setIsEnemyRedstoneAllowed(isRedstone);
+		// Set redstone flags
+		boolean isFriendlyRedstone = townSection.getBoolean("friendly_redstone",false);
+		town.setIsFriendlyRedstoneAllowed(isFriendlyRedstone);
+		boolean isEnemyRedstone = townSection.getBoolean("redstone",false);
+		town.setIsEnemyRedstoneAllowed(isEnemyRedstone);
 		// Set golem offensive flag
 		boolean isGolemOffensive = townSection.getBoolean("golem_offensive",false);
 		town.setIsGolemOffensive(isGolemOffensive);
@@ -4353,6 +4367,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				townInstanceSection.set("specialization", town.getSpecialization().toString());
 				townInstanceSection.set("open", town.isOpen());
                 townInstanceSection.set("plot", town.isPlotOnly());
+				townInstanceSection.set("friendly_redstone", town.isFriendlyRedstoneAllowed());
                 townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());
                 townInstanceSection.set("golem_offensive", town.isGolemOffensive());
                 townInstanceSection.set("shield", town.isShielded());
