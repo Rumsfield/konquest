@@ -124,14 +124,26 @@ public class EntityListener implements Listener {
 			// Conditional town/capital protections
 			if(wholeTerritory instanceof KonTown) {
 				KonTown town = (KonTown)wholeTerritory;
+
+				//TODO: Implement this...
 				// Protect against TNT ignited by non-enemies
+				/*
+				ChatUtil.printDebug("Evaluating entity explosion in town...");
 				if(event.getEntity() instanceof TNTPrimed) {
+					ChatUtil.printDebug("  explosion is primed TNT");
 					TNTPrimed tnt = (TNTPrimed)event.getEntity();
 					Entity tntSource = tnt.getSource();
+					if(tntSource == null) {
+						ChatUtil.printDebug("  source is null!");
+					} else {
+						ChatUtil.printDebug("  source: "+tntSource.getType());
+					}
 					if(tntSource instanceof Player) {
+						ChatUtil.printDebug("  source is player");
 						Player tntSender = (Player)tntSource;
 						KonPlayer player = playerManager.getPlayer(tntSender);
 						if(player != null) {
+							ChatUtil.printDebug("  found KonPlayer");
 							KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
 							if(!playerRole.equals(KonquestRelationshipType.ENEMY)) {
 								ChatUtil.printDebug("protecting Town from non-enemy TNT entity explosion");
@@ -141,6 +153,7 @@ public class EntityListener implements Listener {
 						}
 					}
 				}
+				*/
 				// Protect towns when all kingdom members are offline
 				if(town.getKingdom().isOfflineProtected()) {
 					ChatUtil.printDebug("protecting offline Town from entity explosion");
@@ -736,31 +749,41 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler()
-	public void onProjectileHit(ProjectileHitEvent event) {
+	public void onPotionSplash(PotionSplashEvent event) {
+		// Common handler
+		onPotionThrown(event);
+	}
+
+	@EventHandler()
+	public void onLingeringPotionSplash(LingeringPotionSplashEvent event) {
+		// Common handler
+		onPotionThrown(event);
+	}
+
+	private void onPotionThrown(ProjectileHitEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		ProjectileSource source = event.getEntity().getShooter();
-		// Protections for splash potions only
-		if(event.getEntityType().equals(EntityType.SPLASH_POTION) && source instanceof Player) {
-			Player bukkitPlayer = (Player)source;
-			KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-
-			// Protections for territories
-			if(player != null && !player.isAdminBypassActive() && territoryManager.isChunkClaimed(event.getEntity().getLocation())) {
-				KonTerritory territory = territoryManager.getChunkTerritory(event.getEntity().getLocation());
-
-				if(territory instanceof KonTown) {
-					// Only allow splash potions in the town when source player is friendly or enemy (war)
-					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
-					if(!playerRole.equals(KonquestRelationshipType.ENEMY) && !playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
-						event.setCancelled(true);
-						return;
-					}
-				} else if(territory instanceof KonSanctuary) {
-					// Prevent all splash potions
-					event.setCancelled(true);
-					return;
-				}
+		// Check for splash potion thrown by player
+		if(!(event.getEntityType().equals(EntityType.SPLASH_POTION) && source instanceof Player)) return;
+		Player bukkitPlayer = (Player)source;
+		KonPlayer player = playerManager.getPlayer(bukkitPlayer);
+		// Check for claimed territory
+		if(player == null || player.isAdminBypassActive() || !territoryManager.isChunkClaimed(event.getEntity().getLocation())) return;
+		KonTerritory territory = territoryManager.getChunkTerritory(event.getEntity().getLocation());
+		// Check for protected territories
+		if(territory instanceof KonTown) {
+			// Only allow splash potions in the town when source player is friendly or enemy (war)
+			KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+			if(!playerRole.equals(KonquestRelationshipType.ENEMY) && !playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
+				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				event.setCancelled(true);
+				return;
 			}
+		} else if(territory instanceof KonSanctuary) {
+			// Prevent all splash potions
+			ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+			event.setCancelled(true);
+			return;
 		}
 	}
 	

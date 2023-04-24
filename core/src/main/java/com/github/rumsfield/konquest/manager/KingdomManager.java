@@ -4195,7 +4195,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		boolean isPlotOnly = townSection.getBoolean("plot",false);
 		town.setIsPlotOnly(isPlotOnly);
 		// Set redstone flags
-		boolean isFriendlyRedstone = townSection.getBoolean("friendly_redstone",false);
+		boolean isFriendlyRedstone = townSection.getBoolean("friendly_redstone",true);
 		town.setIsFriendlyRedstoneAllowed(isFriendlyRedstone);
 		boolean isEnemyRedstone = townSection.getBoolean("redstone",false);
 		town.setIsEnemyRedstoneAllowed(isEnemyRedstone);

@@ -428,7 +428,7 @@ public class MapHandler {
 						MessagePath.MAP_LORD.getMessage() + ": " + capitalLordName + "<br>" +
 						MessagePath.MAP_LAND.getMessage() + ": " + capital.getNumLand() + "<br>" +
 						MessagePath.MAP_POPULATION.getMessage() + ": " + capital.getNumResidents() + "<br>" +
-						"</p><br>" +
+						"</p>"+
 						"<p>"+
 						"<b>"+capital.getKingdom().getName() + "</b><br>" +
 						MessagePath.MAP_TOWNS.getMessage() + ": " + numKingdomTowns + "<br>" +

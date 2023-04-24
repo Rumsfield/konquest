@@ -1,6 +1,8 @@
 package com.github.rumsfield.konquest.display.wrapper;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.command.CommandType;
+import com.github.rumsfield.konquest.display.icon.CommandIcon;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.display.icon.TemplateIcon;
@@ -10,6 +12,7 @@ import com.github.rumsfield.konquest.model.KonMonumentTemplate;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonSanctuary;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.Labeler;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -93,7 +96,7 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
                 loreList.add(loreColor+MessagePath.LABEL_SANCTUARY.getMessage()+": "+valueColor+templateSanctuaryMap.get(currentTemplate));
                 loreList.add(loreColor+MessagePath.LABEL_KINGDOMS.getMessage()+": "+valueColor+templateUsedKingdomsMap.get(currentTemplate));
                 loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+totalCost);
-                TemplateIcon templateIcon = new TemplateIcon(currentTemplate,ChatColor.GOLD,loreList,slotIndex,false);
+                TemplateIcon templateIcon = new TemplateIcon(currentTemplate,ChatColor.GOLD,loreList,slotIndex,true);
                 getMenu().getPage(pageNum).addIcon(templateIcon);
                 slotIndex++;
             }
@@ -106,6 +109,14 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
 
     @Override
     public void onIconClick(KonPlayer clickPlayer, MenuIcon clickedIcon) {
-        // This menu has no clickable icons.
+        Player bukkitPlayer = clickPlayer.getBukkitPlayer();
+        if(clickedIcon instanceof TemplateIcon) {
+            // Template Icons close the GUI and print a command in chat
+            TemplateIcon icon = (TemplateIcon)clickedIcon;
+            KonMonumentTemplate template = icon.getTemplate();
+            //TODO derive this from CommandType?
+            String createCmdNotice = ChatColor.GOLD+"/k kingdom create "+template.getName()+" ***";
+            ChatUtil.sendNotice(bukkitPlayer, createCmdNotice);
+        }
     }
 }
