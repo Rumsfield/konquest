@@ -1119,8 +1119,8 @@ public class Konquest implements KonquestAPI, Timeable {
 				timeout++;
 				continue;
 			}
-			if(randomBlock.getType().equals(Material.WATER)) {
-				// This location is water
+			if(!randomBlock.getType().isSolid()) {
+				// This location is liquid
 				numWater++;
 				timeout++;
 				continue;

@@ -387,13 +387,15 @@ public class EntityListener implements Listener {
 		// Checks
 		if(event.isCancelled()) return;
     	if(konquest.isWorldIgnored(event.getEntity().getLocation())) return;
-		if (!(event.getEntity() instanceof Arrow)) return;
+		boolean isProtectedType = event.getEntityType().equals(EntityType.DROPPED_ITEM) ||
+				event.getEntityType().equals(EntityType.ARROW) ||
+				event.getEntityType().equals(EntityType.SPECTRAL_ARROW);
+		if(!isProtectedType) return;
 		// Protect claimed territory
 		if(territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
-	        // Protect all territory from arrow interaction
-			if(event.getEntityType().equals(EntityType.DROPPED_ITEM)) {
-				event.setCancelled(true);
-			}
+			//ChatUtil.printDebug("Entity interacting in claimed territory: "+event.getEntityType());
+	        // Protect all territory from arrow & dropped item interaction
+			event.setCancelled(true);
 		}
 	}
 	

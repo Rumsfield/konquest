@@ -9,6 +9,7 @@ import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.RandomWildLocationSearchTask;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -74,7 +75,7 @@ public class TravelCommand extends CommandBase {
 			 * First, determine where the travel location is
 			 */
         	String travelName = getArgs()[1];
-        	Location travelLoc;
+        	Location travelLoc = null;
         	TravelDestination destination;
         	KonTerritory travelTerritory = null;
 			boolean isSanctuaryTravel = getKonquest().getCore().getBoolean(CorePath.TRAVEL_ENABLE_SANCTUARY.getPath(),false);
@@ -150,8 +151,22 @@ public class TravelCommand extends CommandBase {
             		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
                     return;
         		}
-				travelLoc = getKonquest().getRandomWildLocation(bukkitWorld);
+				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TRAVEL_NOTICE_WILD_SEARCH.getMessage());
 				destination = TravelDestination.WILD;
+				// Wild travel is a little different.
+				// It takes a lot of effort to load random chunks and find a valid travel location,
+				// too much effort for 1 tick. So the search will take place in a separate thread
+				// over multiple ticks. When the task is finished, use a lamba expression to submit the travel.
+				RandomWildLocationSearchTask task = new RandomWildLocationSearchTask(getKonquest(),bukkitWorld,location -> {
+					if(location == null) {
+						ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TRAVEL_ERROR_WILD_TIMEOUT.getMessage());
+					} else {
+						getKonquest().getTravelManager().submitTravel(bukkitPlayer, destination, null, location);
+					}
+				});
+				// schedule the task to run once every 20 ticks (20 ticks per second)
+				task.runTaskTimer(getKonquest().getPlugin(), 0L, 20L);
+
         	} else {
         		// Given name is not a fixed option, check for valid names
 				if(getKonquest().getSanctuaryManager().isSanctuary(travelName)) {
@@ -244,65 +259,8 @@ public class TravelCommand extends CommandBase {
 				}
         	}
 
-			/*
-			 * Second, determine whether player can cover cost
-			 */
-    		boolean isTravelAlwaysAllowed = getKonquest().getCore().getBoolean(CorePath.FAVOR_ALLOW_TRAVEL_ALWAYS.getPath(),true);
-        	double cost = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_TRAVEL.getPath(),0.0);
-        	double cost_per_chunk = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_TRAVEL_PER_CHUNK.getPath(),0.0);
-        	double cost_world = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_TRAVEL_WORLD.getPath(),0.0);
-        	double cost_camp = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_TRAVEL_CAMP.getPath(),0.0);
-        	cost = (cost < 0) ? 0 : cost;
-        	cost_per_chunk = (cost_per_chunk < 0) ? 0 : cost_per_chunk;
-        	cost_camp = (cost_camp < 0) ? 0 : cost_camp;
-        	double total_cost;
-        	if(destination.equals(TravelDestination.CAMP)) {
-        		// Player is traveling to camp, fixed cost
-        		total_cost = cost_camp;
-        	} else {
-        		// Player is traveling to town, capital, sanctuary or wild
-        		int chunkDistance = Konquest.chunkDistance(travelLoc,bukkitPlayer.getLocation());
-	        	if(chunkDistance >= 0) {
-	        		// Value is chunk distance within the same world
-	        		total_cost = cost + cost_per_chunk*chunkDistance;
-	        	} else {
-	        		// Value of -1 means travel points are between different worlds
-	        		total_cost = cost + cost_world;
-	        	}
-        	}
-			if(!isTravelAlwaysAllowed && total_cost > 0) {
-				if(KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
-					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(total_cost));
-                    return;
-				}
-			}
-			if(isTravelAlwaysAllowed && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
-				// Override cost to 0 to allow the player to travel, when they don't have enough money.
-				total_cost = 0;
-        	}
-			
-			// Condition destination location. Sanctuary destinations have preserved look angles.
-			// Other destinations should use the player's current direction.
-			Location travelLocAng = travelLoc;
-			if(!destination.equals(TravelDestination.SANCTUARY)) {
-				Location pLoc = bukkitPlayer.getLocation();
-				travelLocAng = new Location(travelLoc.getWorld(),travelLoc.getX(),travelLoc.getY(),travelLoc.getZ(),pLoc.getYaw(),pLoc.getPitch());
-			}
-
-			// Wait for a warmup duration, then do stuff
-			// Cancel travel if player moves?
-			// 	- Players need a private flag: waiting for travel warmup
-			// 	- Player move listener needs to check this flag and optionally cancel it
-			// If player uses another travel command during warmup, cancel current warmup and begin a new one for new destination
-			int travelWarmup = getKonquest().getCore().getInt(CorePath.TRAVEL_WARMUP.getPath(),0);
-			travelWarmup = Math.max(travelWarmup, 0);
-			if(travelWarmup > 0) {
-				String warmupTimeStr = ""+travelWarmup;
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TRAVEL_NOTICE_WARMUP.getMessage(warmupTimeStr));
-			}
-
 			// Submit the travel to the manager. It will take things from here.
-			getKonquest().getTravelManager().submitTravel(bukkitPlayer, destination, travelTerritory, travelLocAng, travelWarmup, total_cost);
+			getKonquest().getTravelManager().submitTravel(bukkitPlayer, destination, travelTerritory, travelLoc);
 			
         }
 	}

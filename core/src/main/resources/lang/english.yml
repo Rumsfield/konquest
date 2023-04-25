@@ -695,9 +695,11 @@ command:
   travel:
     notice:
       town-travel: "%s has traveled to %s."
+      wild-search: "Searching for a random Wild location..."
       wild-travel: "Traveled to a random location in the Wild."
       warmup: "Travel starts in %s seconds."
     error:
+      wild-timeout: "Failed to find a suitable location in the Wild."
       enemy-territory: "You can not travel within enemy territory!"
       no-home: "You do not have a home!"
       no-camp: "You do not have a camp!"

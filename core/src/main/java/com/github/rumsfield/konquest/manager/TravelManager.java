@@ -40,17 +40,71 @@ public class TravelManager implements Timeable {
 		
 	}
 	
-	public void submitTravel(Player bukkitPlayer, TravelDestination destination, KonTerritory territory, Location travelLoc, int warmupSeconds, double cost) {
+	public void submitTravel(Player bukkitPlayer, TravelDestination destination, KonTerritory territory, Location travelLoc) {
+		if(travelLoc == null) return;
+
+		// Determine whether player can cover cost
+		boolean isTravelAlwaysAllowed = konquest.getCore().getBoolean(CorePath.FAVOR_ALLOW_TRAVEL_ALWAYS.getPath(),true);
+		double cost = konquest.getCore().getDouble(CorePath.FAVOR_COST_TRAVEL.getPath(),0.0);
+		double cost_per_chunk = konquest.getCore().getDouble(CorePath.FAVOR_COST_TRAVEL_PER_CHUNK.getPath(),0.0);
+		double cost_world = konquest.getCore().getDouble(CorePath.FAVOR_COST_TRAVEL_WORLD.getPath(),0.0);
+		double cost_camp = konquest.getCore().getDouble(CorePath.FAVOR_COST_TRAVEL_CAMP.getPath(),0.0);
+		cost = (cost < 0) ? 0 : cost;
+		cost_per_chunk = (cost_per_chunk < 0) ? 0 : cost_per_chunk;
+		cost_camp = (cost_camp < 0) ? 0 : cost_camp;
+		double total_cost;
+		if(destination.equals(TravelDestination.CAMP)) {
+			// Player is traveling to camp, fixed cost
+			total_cost = cost_camp;
+		} else {
+			// Player is traveling to town, capital, sanctuary or wild
+			int chunkDistance = Konquest.chunkDistance(travelLoc,bukkitPlayer.getLocation());
+			if(chunkDistance >= 0) {
+				// Value is chunk distance within the same world
+				total_cost = cost + cost_per_chunk*chunkDistance;
+			} else {
+				// Value of -1 means travel points are between different worlds
+				total_cost = cost + cost_world;
+			}
+		}
+		if(!isTravelAlwaysAllowed && total_cost > 0) {
+			if(KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(total_cost));
+				return;
+			}
+		}
+		if(isTravelAlwaysAllowed && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
+			// Override cost to 0 to allow the player to travel, when they don't have enough money.
+			total_cost = 0;
+		}
+		// Condition destination location. Sanctuary destinations have preserved look angles.
+		// Other destinations should use the player's current direction.
+		Location travelLocAng = travelLoc;
+		if(!destination.equals(TravelDestination.SANCTUARY)) {
+			Location pLoc = bukkitPlayer.getLocation();
+			travelLocAng = new Location(travelLoc.getWorld(),travelLoc.getX(),travelLoc.getY(),travelLoc.getZ(),pLoc.getYaw(),pLoc.getPitch());
+		}
+		// Wait for a warmup duration, then do stuff
+		// Cancel travel if player moves?
+		// 	- Players need a private flag: waiting for travel warmup
+		// 	- Player move listener needs to check this flag and optionally cancel it
+		// If player uses another travel command during warmup, cancel current warmup and begin a new one for new destination
+		int warmupSeconds = konquest.getCore().getInt(CorePath.TRAVEL_WARMUP.getPath(),0);
+		warmupSeconds = Math.max(warmupSeconds, 0);
+		if(warmupSeconds > 0) {
+			String warmupTimeStr = ""+warmupSeconds;
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TRAVEL_NOTICE_WARMUP.getMessage(warmupTimeStr));
+		}
 		// determine warmup end time
 		if(warmupSeconds > 0) {
 			// There is a warmup time, queue the travel
 			Date now = new Date();
 			long warmupFinishTime = now.getTime() + (warmupSeconds* 1000L);
-			travelers.put(bukkitPlayer, new TravelPlan(bukkitPlayer, destination, territory, travelLoc, warmupFinishTime, cost));
+			travelers.put(bukkitPlayer, new TravelPlan(bukkitPlayer, destination, territory, travelLocAng, warmupFinishTime, total_cost));
 			ChatUtil.printDebug("Submitted new travel plan for "+bukkitPlayer.getName()+": now "+now.getTime()+" to "+warmupFinishTime+", size "+travelers.size());
 		} else {
 			// There is no warmup time, do the travel now
-			executeTravel(bukkitPlayer, destination, territory, travelLoc, cost);
+			executeTravel(bukkitPlayer, destination, territory, travelLocAng, total_cost);
 		}
 	}
 	
@@ -69,6 +123,7 @@ public class TravelManager implements Timeable {
 		// Do special things depending on the destination type
 		String territoryName = territory == null ? "null" : territory.getName();
 		ChatUtil.printDebug("Executing travel for "+bukkitPlayer.getName()+" to "+destination.toString()+" "+territoryName);
+		konquest.telePlayerLocation(bukkitPlayer, travelLoc);
 		switch (destination) {
 			case TOWN:
 				if(territory instanceof KonTown) {
@@ -94,7 +149,6 @@ public class TravelManager implements Timeable {
 			default:
 				break;
 		}
-		konquest.telePlayerLocation(bukkitPlayer, travelLoc);
 		// Pay up
 		if(KonquestPlugin.withdrawPlayer(bukkitPlayer, cost)) {
 			// Successfully withdrew non-zero amount from player, update stats
