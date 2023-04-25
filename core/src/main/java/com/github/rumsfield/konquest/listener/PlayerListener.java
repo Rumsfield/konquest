@@ -28,11 +28,10 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.AnaloguePowerable;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.Door;
-import org.bukkit.block.data.type.Gate;
-import org.bukkit.block.data.type.Switch;
-import org.bukkit.block.data.type.TrapDoor;
+import org.bukkit.block.data.Powerable;
+import org.bukkit.block.data.type.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -1346,32 +1345,31 @@ public class PlayerListener implements Listener {
 
 	// Returns true if use was canceled, else false
     private boolean preventUse(PlayerInteractEvent event, KonPlayer player) {
-    	if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+    	if(event.hasBlock() && event.getClickedBlock() != null) {
 			// Prevent use of specific usable blocks
 			BlockState clickedState = event.getClickedBlock().getState();
 			BlockData clickedBlockData = clickedState.getBlockData();
-			if(clickedBlockData instanceof Door ||
-					clickedBlockData instanceof Gate ||
-					clickedBlockData instanceof Switch ||
-					clickedBlockData instanceof TrapDoor) {
+			if(clickedBlockData instanceof AnaloguePowerable ||
+					clickedBlockData instanceof Powerable ||
+					clickedState.getType().isInteractable()) {
 				event.setUseInteractedBlock(Event.Result.DENY);
 				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-			} else if(clickedState.getType().isInteractable()) {
-				event.setUseInteractedBlock(Event.Result.DENY);
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				return true;
 			}
-			return true;
 		}
 		return false;
     }
 
 	// Returns true if physical interaction was canceled, else false
 	private boolean preventPhysical(PlayerInteractEvent event, KonPlayer player) {
-		if(event.getAction().equals(Action.PHYSICAL)) {
-			// Prevent all physical stepping interaction
-			event.setUseInteractedBlock(Event.Result.DENY);
-			ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-			return true;
+		if(event.hasBlock() && event.getClickedBlock() != null) {
+			BlockData clickedBlockData = event.getClickedBlock().getBlockData();
+			if(event.getAction().equals(Action.PHYSICAL) && clickedBlockData instanceof Farmland) {
+				// Prevent all physical stepping interaction, like trampling farmland
+				event.setUseInteractedBlock(Event.Result.DENY);
+				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				return true;
+			}
 		}
 		return false;
 	}

@@ -234,13 +234,14 @@ public class InventoryListener implements Listener {
 		if(clickedInventory == null) return;
 		Location inventoryLocation = clickedInventory.getLocation();
 		if(inventoryLocation == null) return;
+		if(!clickedInventory.getType().equals(InventoryType.CHEST)) return;
 		// These actions will be prohibited, if done in town monument chest inventories
-		boolean isActionProtected = event.getAction().equals(InventoryAction.PLACE_ALL) ||
-				event.getAction().equals(InventoryAction.PLACE_ONE) ||
-				event.getAction().equals(InventoryAction.PLACE_SOME) ||
-				event.getAction().equals(InventoryAction.SWAP_WITH_CURSOR) ||
-				event.getAction().equals(InventoryAction.HOTBAR_SWAP);
-		if(!isActionProtected) return;
+		boolean isActionAllowed = event.getAction().equals(InventoryAction.PICKUP_ALL) ||
+				event.getAction().equals(InventoryAction.PICKUP_HALF) ||
+				event.getAction().equals(InventoryAction.PICKUP_ONE) ||
+				event.getAction().equals(InventoryAction.PICKUP_SOME) ||
+				event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY);
+		if(isActionAllowed) return;
 		// Check for ignored world
 		if(konquest.isWorldIgnored(inventoryLocation)) return;
 		// Check for territory at inventory location
