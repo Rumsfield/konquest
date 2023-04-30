@@ -34,7 +34,7 @@ public class KingdomAdminCommand extends CommandBase {
 
 		// k admin kingdom menu|create|destroy|add|kick|rename <kingdom> [<name>]
 		if (getArgs().length != 4 && getArgs().length != 5) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		} else {
         	
         	// Check for player
@@ -94,7 +94,7 @@ public class KingdomAdminCommand extends CommandBase {
 									ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
 									break;
 								case 4:
-									ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_INVALID_TEMPLATE.getMessage());
+									ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_INVALID_TEMPLATE.getMessage(templateName));
 									break;
 								case 5:
 									ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
@@ -141,7 +141,7 @@ public class KingdomAdminCommand extends CommandBase {
 							}
                     	}
             		} else {
-            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
             		}
             		break;
             	
@@ -191,7 +191,7 @@ public class KingdomAdminCommand extends CommandBase {
 								break;
 						}
             		} else {
-            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
             		}
             		break;
             		
@@ -222,7 +222,7 @@ public class KingdomAdminCommand extends CommandBase {
 								break;
 						}
             		} else {
-            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
             		}
             		break;
             		
@@ -259,7 +259,7 @@ public class KingdomAdminCommand extends CommandBase {
         						break;
         				}
             		} else {
-            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
             		}
             		break;
 
@@ -301,13 +301,13 @@ public class KingdomAdminCommand extends CommandBase {
 							ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_KINGDOM_NOTICE_ADMIN_CLEAR.getMessage(kingdom.getName()));
 						}
 					} else {
-						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 					}
 
 					break;
 
 				default:
-        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
         			break;
     		}
 

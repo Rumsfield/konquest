@@ -19,7 +19,7 @@ public class SaveAdminCommand extends CommandBase {
     public void execute() {
     	// k admin save
     	if (getArgs().length != 2) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
         } else {
 
         	getKonquest().save();

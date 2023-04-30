@@ -26,7 +26,7 @@ public class StatAdminCommand extends CommandBase {
 	public void execute() {
 		// k admin stat <player> <stat> show|set|add|clear [<value>]
 		if (getArgs().length != 5 && getArgs().length != 6) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		} else {
         	String playerName = getArgs()[2];
         	String statName = getArgs()[3];
@@ -119,7 +119,7 @@ public class StatAdminCommand extends CommandBase {
             	}
         		break;
         	default:
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 			}
         }
 	}

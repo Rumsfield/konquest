@@ -35,7 +35,7 @@ public class TownAdminCommand extends CommandBase {
 	public void execute() {
 		// k admin town create|destroy|add|kick|rename|upgrade|shield|armor|plots|options|specialize <town> [<name>] [<arg>]
 		if (getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		} else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
@@ -196,7 +196,7 @@ public class TownAdminCommand extends CommandBase {
 		        		}
 		        	}
         		} else {
-			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 	        		return;
 			    }
         		break;
@@ -218,7 +218,7 @@ public class TownAdminCommand extends CommandBase {
 		                return;
 		        	}
         		} else {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 	        		return;
         		}
         		break;
@@ -242,7 +242,7 @@ public class TownAdminCommand extends CommandBase {
 			    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			    	}
 			    } else {
-			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 	        		return;
 			    }
 			    break;
@@ -262,7 +262,7 @@ public class TownAdminCommand extends CommandBase {
 			    		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TOWN_ERROR_KICK_FAIL.getMessage(playerName,townName));
 			    	}
 			    } else {
-			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 	        		return;
 			    }
 				break;
@@ -283,7 +283,7 @@ public class TownAdminCommand extends CommandBase {
         			town.setPlayerLord(offlinePlayer.getOfflineBukkitPlayer());
         			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_TOWN_NOTICE_LORD_SUCCESS.getMessage(townName,playerName));
 			    } else {
-			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 	        		return;
 			    }
 				break;
@@ -325,7 +325,7 @@ public class TownAdminCommand extends CommandBase {
 			    		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TOWN_ERROR_KNIGHT_RESIDENT.getMessage());
 			    	}
 			    } else {
-			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			    	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 	        		return;
 			    }
 			    break;
@@ -341,7 +341,7 @@ public class TownAdminCommand extends CommandBase {
 						ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 					}
 	        	} else {
-	        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 	        		return;
 	        	}
 	        	break;
@@ -362,7 +362,7 @@ public class TownAdminCommand extends CommandBase {
 	        			} 
 	        			catch(NumberFormatException e) {
 	        				ChatUtil.printDebug("Failed to parse string as int: "+e.getMessage());
-	        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 			        		return;
 	        			}
 	        			if(!getKonquest().getUpgradeManager().isEnabled()) {
@@ -370,7 +370,7 @@ public class TownAdminCommand extends CommandBase {
 	        				return;
 	        			}
 	        			if(upgradeLevel < 0 || upgradeLevel > upgrade.getMaxLevel()) {
-	        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 			        		return;
 	        			}
 	        			// Set town upgrade and level
@@ -380,11 +380,11 @@ public class TownAdminCommand extends CommandBase {
 	        			}
 	        			
 	        		} else {
-	        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		        		return;
 	        		}
 	        	} else {
-	        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 	        		return;
 	        	}
 	        	break;
@@ -421,26 +421,26 @@ public class TownAdminCommand extends CommandBase {
 									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 								} else {
 									// Shields cannot be negative
-									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 								}
 							} else if(shieldSubCmd.equalsIgnoreCase("add")) {
 								if(getKonquest().getShieldManager().shieldAdd(town, shieldVal)) {
 									ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 								} else {
 									// Shields cannot be negative
-									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 								}
 							} else {
-								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 				        		return;
 							}
 						} else {
-							ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+							ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 			        		return;
 						}
 					}
 				} else {
-					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 	        		return;
 				}
 				break;
@@ -485,22 +485,22 @@ public class TownAdminCommand extends CommandBase {
 									ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 								}
 							} else {
-								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+								ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 				        		return;
 							}
 						} else {
-							ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+							ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 			        		return;
 						}
 					}
 				} else {
-					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 	        		return;
 				}
 				break;
 			
         	default:
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 			}
         }
 	}

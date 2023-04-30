@@ -27,7 +27,7 @@ public class MonumentAdminCommand extends CommandBase {
     public void execute() {
     	// k admin monument create|remove|reset|show|status <name> [<cost>]
     	if (getArgs().length != 4 && getArgs().length != 5) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		} else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
@@ -53,19 +53,21 @@ public class MonumentAdminCommand extends CommandBase {
         	String templateName = getArgs()[3];
         	if(cmdMode.equalsIgnoreCase("create")) {
 				// Creating a new template
-				if (getArgs().length != 5) {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				if (getArgs().length != 4 || getArgs().length != 5) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 					return;
 				}
 				double costNum = 0;
-				try {
-					costNum = Double.parseDouble(getArgs()[4]);
-				} catch (NumberFormatException e) {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_VALUE.getMessage());
-					ChatUtil.sendError(bukkitPlayer, e.getMessage());
-					return;
+				if (getArgs().length == 5) {
+					try {
+						costNum = Double.parseDouble(getArgs()[4]);
+					} catch (NumberFormatException e) {
+						ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_VALUE.getMessage());
+						ChatUtil.sendError(bukkitPlayer, e.getMessage());
+						return;
+					}
+					costNum = Math.max(costNum, 0);
 				}
-				costNum = Math.max(costNum, 0);
 				// Validate name first
 				if (getKonquest().validateName(templateName, bukkitPlayer) != 0) {
 					return;
@@ -80,7 +82,7 @@ public class MonumentAdminCommand extends CommandBase {
 			} else if(cmdMode.equalsIgnoreCase("reset")) {
 				// Resetting an existing template fields
 				if (getArgs().length != 5) {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 					return;
 				}
 				double costNum = 0;
@@ -161,7 +163,7 @@ public class MonumentAdminCommand extends CommandBase {
         		ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_CRITICAL_HITS.getMessage()+": "+valueColor+critBlocks);
         		ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_LOOT_CHESTS.getMessage()+": "+valueColor+lootChests);
         	} else {
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
         	}
         }
     }

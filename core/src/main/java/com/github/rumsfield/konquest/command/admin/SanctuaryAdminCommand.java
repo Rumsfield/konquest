@@ -24,7 +24,7 @@ public class SanctuaryAdminCommand extends CommandBase {
 	public void execute() {
 		// k admin sanctuary create|remove|rename <name> [<name>]
 		if (getArgs().length != 4 && getArgs().length != 5) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
             return;
         }
 		Player bukkitPlayer = (Player) getSender();
@@ -43,7 +43,7 @@ public class SanctuaryAdminCommand extends CommandBase {
 		
 		if(cmdMode.equalsIgnoreCase("create")) {
 			if (getArgs().length != 4) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 				return;
 			}
 			Location playerLoc = bukkitPlayer.getLocation();
@@ -87,10 +87,10 @@ public class SanctuaryAdminCommand extends CommandBase {
 	        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_RENAME.getMessage(name,newName));
 	        	}
 			} else {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 			}
 		} else {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		}
 	}
 	

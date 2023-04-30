@@ -23,7 +23,7 @@ public class TravelAdminCommand  extends CommandBase {
     public void execute() {
     	// k admin travel <name>
     	if (getArgs().length != 3 && getArgs().length != 4) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		} else {
         	Player bukkitPlayer = (Player) getSender();
         	

@@ -25,7 +25,7 @@ public class CaptureAdminCommand extends CommandBase {
 	public void execute() {
 		// k admin capture <town> <kingdom>
 		if (getArgs().length != 4) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		} else {
         	String townName = getArgs()[2];
         	String kingdomName = getArgs()[3];

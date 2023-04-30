@@ -355,6 +355,7 @@ generic:
     internal: "Internal error, contact an admin."
     internal-message: "Internal error: %s"
     invalid-parameters: "The command did not have valid parameters. Use /k help."
+    invalid-parameters-admin: "The admin command did not have valid parameters. Use /k admin help."
     invalid-world: "The command cannot be used in this world."
     no-permission: "You do not have permission to do that."
     no-allow: "You are not allowed to do that."
@@ -450,7 +451,7 @@ command:
         admin-set: "The Kingdom of %s is now an admin kingdom."
         admin-clear: "The Kingdom of %s is now a regular kingdom."
       error:
-        no-templates: "There are no monument templates. Create one in a sanctuary with \"/k admin monument\""
+        no-templates: "There are no monument templates. Create one in a sanctuary with \"/k admin monument create (name)\""
         admin-set: "The Kingdom of %s is already an admin kingdom."
         admin-clear: "The Kingdom of %s is already a regular kingdom."
     monument:
@@ -461,7 +462,7 @@ command:
         success: "Successfully created new Monument Template %s."
         remove: "Removed Monument Template %s."
         show: "Showing existing Monument Template %s in Sanctuary %s."
-        sanctuary: "Create Sanctuary territory with \"/k admin sanctuary\" before creating Monument Templates."
+        sanctuary: "Create Sanctuary territory with \"/k admin sanctuary create (name)\" before creating Monument Templates."
       error:
         value: "Cost value is not a number."
         fail-base: "Failed to create Monument Template %s, base must be 16x16 blocks but got %s by %s."
@@ -581,7 +582,7 @@ command:
       diplomacy-pending: "Your kingdom has pending diplomacy requests. Use \"/k kingdom\", then choose Relationships to respond."
     error:
       barbarian-create: "You must be a barbarian to create a kingdom. Use the Exile option in the kingdom menu."
-      invalid-template: "That is an invalid monument template. Check spelling or choose another."
+      invalid-template: "%s is an invalid monument template. Check spelling or choose another."
       missing-template: "You must specify a template name. View templates with \"/k kingdom templates\""
       missing-name: "You must specify a kingdom name."
       invite-member: "%s is already a kingdom member."

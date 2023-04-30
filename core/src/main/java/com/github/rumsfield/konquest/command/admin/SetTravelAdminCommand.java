@@ -21,7 +21,7 @@ public class SetTravelAdminCommand extends CommandBase {
     public void execute() {
     	// k admin setTravel
     	if (getArgs().length != 2) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		} else {
         	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();

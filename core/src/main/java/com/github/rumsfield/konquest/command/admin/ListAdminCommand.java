@@ -24,7 +24,7 @@ public class ListAdminCommand extends CommandBase {
     public void execute() {
     	// k admin list [kingdom|town|camp|ruin|sanctuary] [<page>]
     	if (getArgs().length > 4) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		} else {
 			Player bukkitPlayer = (Player) getSender();
 
@@ -43,7 +43,7 @@ public class ListAdminCommand extends CommandBase {
         		} else if(listMode.equalsIgnoreCase("sanctuary")) {
         			mode = ListType.SANCTUARY;
         		} else {
-        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
                     return;
         		}
         	}
@@ -67,7 +67,7 @@ public class ListAdminCommand extends CommandBase {
 	        		lines.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
 	        		break;
 	        	default :
-	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 	                return;
         	}
         	Collections.sort(lines);

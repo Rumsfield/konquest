@@ -35,7 +35,7 @@ public class FlagAdminCommand extends CommandBase {
     public void execute() {
     	// k admin flag [capital] <name> [<flag>] [<value>]
     	if (getArgs().length != 3 && getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		} else {
 			// The arg ordering is tricky.
 			// First try to match the arg with a known holder.

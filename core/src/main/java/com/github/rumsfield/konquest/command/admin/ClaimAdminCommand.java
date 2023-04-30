@@ -24,7 +24,7 @@ public class ClaimAdminCommand extends CommandBase {
     public void execute() {
     	// k admin claim [radius|auto|undo] [<r>]
     	if (getArgs().length > 4) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		} else {
         	Player bukkitPlayer = (Player) getSender();
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
@@ -39,14 +39,14 @@ public class ClaimAdminCommand extends CommandBase {
         		switch(claimMode) {
         		case "radius" :
         			if(getArgs().length != 4) {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
         	            return;
         			}
     				int radius = Integer.parseInt(getArgs()[3]);
     				final int min = 1;
         			final int max = 16;
     				if(radius < min || radius > max) {
-    					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+    					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
     					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_CLAIM_ERROR_RADIUS.getMessage(min,max));
     					return;
     				}
@@ -87,7 +87,7 @@ public class ClaimAdminCommand extends CommandBase {
         			break;
         			
         		default :
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 				}
         	} else {
         		// Claim the single chunk containing playerLoc for the adjacent territory.

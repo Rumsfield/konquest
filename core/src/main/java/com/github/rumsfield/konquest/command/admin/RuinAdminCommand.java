@@ -26,7 +26,7 @@ public class RuinAdminCommand extends CommandBase {
 	public void execute() {
 		// k admin ruin create|remove|rename|criticals|spawns <name> [<name>]
 		if (getArgs().length != 4 && getArgs().length != 5) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
             return;
         }
 		Player bukkitPlayer = (Player) getSender();
@@ -45,7 +45,7 @@ public class RuinAdminCommand extends CommandBase {
 		
 		if(cmdMode.equalsIgnoreCase("create")) {
 			if (getArgs().length != 4) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 				return;
 			}
 			Location playerLoc = bukkitPlayer.getLocation();
@@ -89,7 +89,7 @@ public class RuinAdminCommand extends CommandBase {
 	        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_RENAME.getMessage(ruinName,newName));
 	        	}
 			} else {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 			}
 		} else if(cmdMode.equalsIgnoreCase("criticals")) {
         	if(player.isSettingRegion()) {
@@ -120,7 +120,7 @@ public class RuinAdminCommand extends CommandBase {
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_SPAWNS.getMessage(ruinName), ChatColor.LIGHT_PURPLE);
         	ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 		} else {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		}
 	}
 
