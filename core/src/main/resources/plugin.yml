@@ -35,7 +35,9 @@ permissions:
     description: Gives access to all Konquest permissions
     default: op
     children:
+      konquest.command: true
       konquest.command.*: true
+      konquest.admin.*: true
       konquest.directive.*: true
       konquest.compass: true
       konquest.join: true
@@ -67,7 +69,6 @@ permissions:
       konquest.command.town: true
       konquest.command.fly: true
       konquest.command.border: true
-      konquest.command.admin.*: true
 
   konquest.command.help:
     description: Display help in chat
@@ -145,98 +146,98 @@ permissions:
     description: Toggle particle borders of territories and plots
     default: true
     
-  konquest.command.admin.*:
+  konquest.admin.*:
     description: All admin commands
     default: op
     children:
-      konquest.command.admin.bypass: true
-      konquest.command.admin.camp: true
-      konquest.command.admin.capture: true
-      konquest.command.admin.claim: true
-      konquest.command.admin.flag: true
-      konquest.command.admin.help: true
-      konquest.command.admin.kingdom: true
-      konquest.command.admin.list: true
-      konquest.command.admin.monument: true
-      konquest.command.admin.reload: true
-      konquest.command.admin.ruin: true
-      konquest.command.admin.sanctuary: true
-      konquest.command.admin.save: true
-      konquest.command.admin.settravel: true
-      konquest.command.admin.stat: true
-      konquest.command.admin.town: true
-      konquest.command.admin.travel: true
-      konquest.command.admin.unclaim: true
+      konquest.admin.bypass: true
+      konquest.admin.camp: true
+      konquest.admin.capture: true
+      konquest.admin.claim: true
+      konquest.admin.flag: true
+      konquest.admin.help: true
+      konquest.admin.kingdom: true
+      konquest.admin.list: true
+      konquest.admin.monument: true
+      konquest.admin.reload: true
+      konquest.admin.ruin: true
+      konquest.admin.sanctuary: true
+      konquest.admin.save: true
+      konquest.admin.settravel: true
+      konquest.admin.stat: true
+      konquest.admin.town: true
+      konquest.admin.travel: true
+      konquest.admin.unclaim: true
   
-  konquest.command.admin.bypass:
+  konquest.admin.bypass:
     description: Toggle admin bypass mode
     default: op
   
-  konquest.command.admin.camp:
+  konquest.admin.camp:
     description: Manage player Barbarian camps
     default: op
     
-  konquest.command.admin.capture:
+  konquest.admin.capture:
     description: Force a town to be captured by another Kingdom
     default: op
     
-  konquest.command.admin.claim:
+  konquest.admin.claim:
     description: Claim land chunks
     default: op
   
-  konquest.command.admin.flag:
+  konquest.admin.flag:
     description: Set kingdom flags
     default: op
   
-  konquest.command.admin.help:
+  konquest.admin.help:
     description: Display the admin help message
     default: op
   
-  konquest.command.admin.kingdom:
+  konquest.admin.kingdom:
     description: Manage player and server Kingdoms
     default: op
     
-  konquest.command.admin.list:
+  konquest.admin.list:
     description: Display all Kingdoms or Towns of a Kingdom
     default: op
   
-  konquest.command.admin.monument:
+  konquest.admin.monument:
     description: Creates, removes or shows the Monument Template for a Kingdom
     default: op
   
-  konquest.command.admin.reload:
+  konquest.admin.reload:
     description: Reloads configuration files
     default: op
   
-  konquest.command.admin.ruin:
+  konquest.admin.ruin:
     description: Manage a Ruin territory
     default: op
 
-  konquest.command.admin.sanctuary:
+  konquest.admin.sanctuary:
     description: Manage a Sanctuary territory
     default: op
 
-  konquest.command.admin.save:
+  konquest.admin.save:
     description: Saves Kingdoms and Players data files
     default: op
   
-  konquest.command.admin.settravel:
+  konquest.admin.settravel:
     description: Sets the travel point for the territory you're in
     default: op
   
-  konquest.command.admin.stat:
+  konquest.admin.stat:
     description: Manage player stats
     default: op
   
-  konquest.command.admin.town:
+  konquest.admin.town:
     description: Manage Towns
     default: op
     
-  konquest.command.admin.travel:
+  konquest.admin.travel:
     description: Teleport to the specified kingdom or town
     default: op
   
-  konquest.command.admin.unclaim:
+  konquest.admin.unclaim:
     description: Return a chunk to the Wild
     default: op
 
