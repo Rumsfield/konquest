@@ -115,7 +115,7 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
             TemplateIcon icon = (TemplateIcon)clickedIcon;
             KonMonumentTemplate template = icon.getTemplate();
             //TODO derive this from CommandType?
-            String createCmdNotice = ChatColor.GOLD+"/k kingdom create "+template.getName()+" ***";
+            String createCmdNotice = ChatColor.GOLD+"/k kingdom create "+template.getName()+" (name)";
             ChatUtil.sendNotice(bukkitPlayer, createCmdNotice);
         }
     }

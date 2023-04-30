@@ -53,10 +53,6 @@ public class MonumentAdminCommand extends CommandBase {
         	String templateName = getArgs()[3];
         	if(cmdMode.equalsIgnoreCase("create")) {
 				// Creating a new template
-				if (getArgs().length != 4 || getArgs().length != 5) {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
-					return;
-				}
 				double costNum = 0;
 				if (getArgs().length == 5) {
 					try {
