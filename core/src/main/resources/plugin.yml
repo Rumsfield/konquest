@@ -1,0 +1,313 @@
+name: Konquest
+description: A plugin for land claiming and territory control
+author: Rumsfield
+version: @version@
+api-version: 1.16
+load: POSTWORLD
+main: com.github.rumsfield.konquest.KonquestPlugin
+depend: [Vault]
+softdepend:
+- ProtocolLib
+- QuickShop
+- LuckPerms
+- PlaceholderAPI
+- dynmap
+- EconomyPlus
+- Economy
+- XConomy
+- EssentialsX
+- Multiverse-Core
+- Multiverse-Inventories
+- Multiverse-Portals
+- Multiverse-NetherPortals
+- DiscordSRV
+commands:
+  konquest:
+    description: Base Konquest command
+    usage: /<command> [sub-command] [arguments]
+    permission: konquest.command
+  k:
+    description: Display help menu
+    usage: /<command> [sub-command] [arguments]
+    permission: konquest.command
+permissions:
+  konquest.*:
+    description: Gives access to all Konquest permissions
+    default: op
+    children:
+      konquest.command: true
+      konquest.command.*: true
+      konquest.admin.*: true
+      konquest.directive.*: true
+      konquest.compass: true
+      konquest.join: true
+
+  konquest.command:
+    description: Base command permission
+    default: true
+    
+  konquest.command.*:
+    description: Gives access to all Konquest commands
+    default: op
+    children:
+      konquest.command.help: true
+      konquest.command.info: true
+      konquest.command.chat: true
+      konquest.command.claim: true
+      konquest.command.unclaim: true
+      konquest.command.list: true
+      konquest.command.map: true
+      konquest.command.settle: true
+      konquest.command.travel: true
+      konquest.command.favor: true
+      konquest.command.quest: true
+      konquest.command.score: true
+      konquest.command.spy: true
+      konquest.command.stats: true
+      konquest.command.prefix: true
+      konquest.command.kingdom: true
+      konquest.command.town: true
+      konquest.command.fly: true
+      konquest.command.border: true
+
+  konquest.command.help:
+    description: Display help in chat
+    default: true
+    
+  konquest.command.info:
+    description: Display info on a kingdom, town or player
+    default: true
+    
+  konquest.command.chat:
+    description: Toggle between global and kingdom-only chat
+    default: true
+
+  konquest.command.claim:
+    description: Claim land for an adjacent town
+    default: true
+    
+  konquest.command.unclaim:
+    description: Unclaim land for a town
+    default: true
+    
+  konquest.command.list:
+    description: Display a list of kingdoms or towns
+    default: true
+
+  konquest.command.map:
+    description: Display a map of surrounding land in chat
+    default: true
+
+  konquest.command.settle:
+    description: Settle a new town
+    default: true
+
+  konquest.command.travel:
+    description: Travel to a friendly town
+    default: true
+
+  konquest.command.favor:
+    description: Display your favor and costs
+    default: true
+    
+  konquest.command.quest:
+    description: Display the quest book
+    default: true
+
+  konquest.command.score:
+    description: Display a kingdom's score
+    default: true
+    
+  konquest.command.spy:
+    description: Purchase a map centered on an enemy town
+    default: true
+    
+  konquest.command.stats:
+    description: Display the stats book
+    default: true
+    
+  konquest.command.prefix:
+    description: Choose a prefix for your name in chat
+    default: true
+
+  konquest.command.kingdom:
+    description: Manage a kingdom
+    default: true
+
+  konquest.command.town:
+    description: Manage a town
+    default: true
+
+  konquest.command.fly:
+    description: Fly in friendly territory
+    default: op
+    
+  konquest.command.border:
+    description: Toggle particle borders of territories and plots
+    default: true
+    
+  konquest.admin.*:
+    description: All admin commands
+    default: op
+    children:
+      konquest.admin.bypass: true
+      konquest.admin.camp: true
+      konquest.admin.capture: true
+      konquest.admin.claim: true
+      konquest.admin.flag: true
+      konquest.admin.help: true
+      konquest.admin.kingdom: true
+      konquest.admin.list: true
+      konquest.admin.monument: true
+      konquest.admin.reload: true
+      konquest.admin.ruin: true
+      konquest.admin.sanctuary: true
+      konquest.admin.save: true
+      konquest.admin.settravel: true
+      konquest.admin.stat: true
+      konquest.admin.town: true
+      konquest.admin.travel: true
+      konquest.admin.unclaim: true
+  
+  konquest.admin.bypass:
+    description: Toggle admin bypass mode
+    default: op
+  
+  konquest.admin.camp:
+    description: Manage player Barbarian camps
+    default: op
+    
+  konquest.admin.capture:
+    description: Force a town to be captured by another Kingdom
+    default: op
+    
+  konquest.admin.claim:
+    description: Claim land chunks
+    default: op
+  
+  konquest.admin.flag:
+    description: Set kingdom flags
+    default: op
+  
+  konquest.admin.help:
+    description: Display the admin help message
+    default: op
+  
+  konquest.admin.kingdom:
+    description: Manage player and server Kingdoms
+    default: op
+    
+  konquest.admin.list:
+    description: Display all Kingdoms or Towns of a Kingdom
+    default: op
+  
+  konquest.admin.monument:
+    description: Creates, removes or shows the Monument Template for a Kingdom
+    default: op
+  
+  konquest.admin.reload:
+    description: Reloads configuration files
+    default: op
+  
+  konquest.admin.ruin:
+    description: Manage a Ruin territory
+    default: op
+
+  konquest.admin.sanctuary:
+    description: Manage a Sanctuary territory
+    default: op
+
+  konquest.admin.save:
+    description: Saves Kingdoms and Players data files
+    default: op
+  
+  konquest.admin.settravel:
+    description: Sets the travel point for the territory you're in
+    default: op
+  
+  konquest.admin.stat:
+    description: Manage player stats
+    default: op
+  
+  konquest.admin.town:
+    description: Manage Towns
+    default: op
+    
+  konquest.admin.travel:
+    description: Teleport to the specified kingdom or town
+    default: op
+  
+  konquest.admin.unclaim:
+    description: Return a chunk to the Wild
+    default: op
+
+  konquest.directive.*:
+    description: Gives access to all Konquest directives
+    default: true
+    children:
+      konquest.directive.kingdom: true
+      konquest.directive.settle: true
+      konquest.directive.claim: true
+      konquest.directive.build: true
+      konquest.directive.golem: true
+      konquest.directive.armor: true
+      konquest.directive.enchant: true
+      konquest.directive.attack: true
+      konquest.directive.capture: true
+      konquest.directive.kill: true
+
+  konquest.directive.kingdom:
+    description: Receive a reward for creating your first kingdom
+    default: true
+
+  konquest.directive.settle:
+    description: Receive a reward for settling your first town
+    default: true
+    
+  konquest.directive.claim:
+    description: Receive a reward for claiming your first 5 chunks
+    default: true
+    
+  konquest.directive.build:
+    description: Receive a reward for building structures in a town
+    default: true
+    
+  konquest.directive.golem:
+    description: Receive a reward for creating an iron golem in a town
+    default: true
+    
+  konquest.directive.armor:
+    description: Receive a reward for crafting a set of iron armor
+    default: true
+    
+  konquest.directive.enchant:
+    description: Receive a reward for enchanting tools and weapons
+    default: true
+    
+  konquest.directive.attack:
+    description: Receive a reward for attacking an enemy town
+    default: true
+    
+  konquest.directive.capture:
+    description: Receive a reward for capturing an enemy town
+    default: true
+    
+  konquest.directive.kill:
+    description: Receive a reward for killing an enemy player
+    default: true
+    
+  konquest.compass:
+    description: Compass points to nearest enemy town
+    default: true
+  
+  konquest.join:
+    description: Join a kingdom
+    default: op
+    
+  konquest.discount:
+    description: Applies a percent discount on all Favor withdraws
+    default: false
+    
+  konquest.prefix:
+    description: Grants access to a custom prefix
+    default: false
