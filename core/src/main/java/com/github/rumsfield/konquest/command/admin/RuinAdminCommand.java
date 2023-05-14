@@ -57,8 +57,6 @@ public class RuinAdminCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_ERROR_CREATE.getMessage(ruinName));
 			} else {
         		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CREATE.getMessage(ruinName));
-        		// Render border particles
-        		getKonquest().getTerritoryManager().updatePlayerBorderParticles(player);
         	}
 		} else if(cmdMode.equalsIgnoreCase("remove")) {
 			// Check for valid ruin

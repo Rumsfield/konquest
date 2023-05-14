@@ -1,10 +1,7 @@
 package com.github.rumsfield.konquest.manager;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonMonumentTemplate;
-import com.github.rumsfield.konquest.model.KonPropertyFlag;
-import com.github.rumsfield.konquest.model.KonSanctuary;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import org.bukkit.Bukkit;
@@ -67,7 +64,11 @@ public class SanctuaryManager {
 			sanctuaryMap.put(nameLower, new KonSanctuary(loc, name, konquest.getKingdomManager().getNeutrals(), konquest));
 			sanctuaryMap.get(nameLower).initClaim();
 			sanctuaryMap.get(nameLower).updateBarPlayers();
+			// Update territory cache
 			konquest.getTerritoryManager().addAllTerritory(loc.getWorld(),sanctuaryMap.get(nameLower).getChunkList());
+			// Update border particles
+			konquest.getTerritoryManager().updatePlayerBorderParticles(loc);
+			// Update maps
 			konquest.getMapHandler().drawDynmapUpdateTerritory(sanctuaryMap.get(nameLower));
 			result = true;
 		}
@@ -87,6 +88,7 @@ public class SanctuaryManager {
 		// Remove the sanctuary
 		KonSanctuary oldSanctuary = sanctuaryMap.remove(name.toLowerCase());
 		if(oldSanctuary != null) {
+			ArrayList<KonPlayer> nearbyPlayers = konquest.getPlayerManager().getPlayersNearTerritory(oldSanctuary);
 			// Get template names that are being removed
 			Set<String> templateNames = oldSanctuary.getTemplateNames();
 			// Clear all templates
@@ -95,6 +97,11 @@ public class SanctuaryManager {
 			oldSanctuary.removeAllBarPlayers();
 			// Remove territory
 			konquest.getTerritoryManager().removeAllTerritory(oldSanctuary.getCenterLoc().getWorld(), oldSanctuary.getChunkList().keySet());
+			// Update border particles
+			for(KonPlayer player : nearbyPlayers) {
+				konquest.getTerritoryManager().updatePlayerBorderParticles(player);
+			}
+			// Update maps
 			konquest.getMapHandler().drawDynmapRemoveTerritory(oldSanctuary);
 			ChatUtil.printDebug("Removed Sanctuary "+name);
 			// De-reference the object

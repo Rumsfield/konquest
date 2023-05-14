@@ -15,12 +15,15 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Snow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class TerritoryManager implements KonquestTerritoryManager {
 
@@ -1090,12 +1093,28 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		}
 	}
 
+	// Find all players near the given center location and update their border particles.
+	public void updatePlayerBorderParticles(Location center) {
+		if(center == null) return;
+		World world = center.getWorld();
+		if(world == null) return;
+		for(Entity nearbyEntity : world.getNearbyEntities(center, 64, 256, 64,(e) -> e instanceof Player)) {
+			try {
+				Player player = (Player)nearbyEntity;
+				KonPlayer onlinePlayer = konquest.getPlayerManager().getPlayer(player);
+				updatePlayerBorderParticles(onlinePlayer);
+			} catch(Exception ignored) {}
+		}
+	}
+
+	// Update border particles for all players in the given kingdom.
 	public void updatePlayerBorderParticles(KonKingdom kingdom) {
 		for(KonPlayer player : konquest.getPlayerManager().getPlayersInKingdom(kingdom)) {
 			updatePlayerBorderParticles(player);
 		}
 	}
 
+	// Update border particles for a single player at their current location.
 	public void updatePlayerBorderParticles(KonPlayer player) {
 		updatePlayerBorderParticles(player, player.getBukkitPlayer().getLocation());
 	}

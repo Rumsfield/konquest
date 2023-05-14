@@ -323,6 +323,20 @@ public class PlayerManager implements KonquestPlayerManager {
     	}
     	return playerList;
     }
+
+	// Returns a list of players inside or near the edge (within 2 chunks) of a territory
+	public ArrayList<KonPlayer> getPlayersNearTerritory(KonTerritory territory) {
+		ArrayList<KonPlayer> playerList = new ArrayList<>();
+		for(KonPlayer onlinePlayer : onlinePlayers.values()) {
+			for(Chunk chunk : konquest.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
+				if(territory.hasChunk(chunk)) {
+					playerList.add(onlinePlayer);
+					break;
+				}
+			}
+		}
+		return playerList;
+	}
     
     public ArrayList<KonPlayer> getPlayersInMonument(KonMonument monument) {
     	ArrayList<KonPlayer> playerList = new ArrayList<>();

@@ -546,7 +546,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					newKingdom.getCapital().setPlayerLord(bukkitPlayer);
 				}
 				// Update border particles
-				konquest.getTerritoryManager().updatePlayerBorderParticles(master);
+				konquest.getTerritoryManager().updatePlayerBorderParticles(newKingdom.getCapital().getCenterLoc());
 				newKingdom.getCapital().updateBarPlayers();
 			} else {
 				// Failed to pass all init checks, remove the kingdom
@@ -629,7 +629,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
 				oldKingdom = null;
 				// Update particle borders of everyone
-				//TODO: optimize this to only nearby players?
+				// All kingdom's towns and capital were removed, so just update everyone's border particles.
 				for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
 					konquest.getTerritoryManager().updatePlayerBorderParticles(player);
 				}
@@ -2224,11 +2224,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			// Attempt to initialize the town
 			int initStatus = getKingdom(kingdomName).initTown(name);
 			if(initStatus == 0) {
+				KonTown newTown = getKingdom(kingdomName).getTown(name);
 				// When a town is added successfully, update the chunk cache
-				konquest.getTerritoryManager().addAllTerritory(loc.getWorld(),getKingdom(kingdomName).getTown(name).getChunkList());
-				konquest.getMapHandler().drawDynmapUpdateTerritory(getKingdom(kingdomName).getTown(name));
+				konquest.getTerritoryManager().addAllTerritory(loc.getWorld(),newTown.getChunkList());
+				konquest.getMapHandler().drawDynmapUpdateTerritory(newTown);
 				// Update territory bar
-				getKingdom(kingdomName).getTown(name).updateBarPlayers();
+				newTown.updateBarPlayers();
+				// Update border particles
+				konquest.getTerritoryManager().updatePlayerBorderParticles(newTown.getCenterLoc());
 				return 0;
 			} else {
 				// Remove town if init fails, exit code 10+
@@ -2251,13 +2254,20 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		KonKingdom kingdom = getKingdom(kingdomName);
 		KonTown town = kingdom.getTown(name);
 		ArrayList<Point> townPoints = new ArrayList<>(town.getChunkList().keySet());
+		ArrayList<KonPlayer> nearbyPlayers = konquest.getPlayerManager().getPlayersNearTerritory(town);
 		clearAllTownNerfs(town);
 		clearAllTownHearts(town);
 		if(!kingdom.removeTown(name)) return false;
 		// When a town is removed successfully, update the chunk cache
 		konquest.getTerritoryManager().removeAllTerritory(town.getWorld(),townPoints);
+		// Update border particles
+		for(KonPlayer player : nearbyPlayers) {
+			konquest.getTerritoryManager().updatePlayerBorderParticles(player);
+		}
+		// Update maps
 		konquest.getMapHandler().drawDynmapRemoveTerritory(town);
 		konquest.getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
+		// Update shops
 		konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(townPoints,town.getWorld());
 		return true;
 	}
