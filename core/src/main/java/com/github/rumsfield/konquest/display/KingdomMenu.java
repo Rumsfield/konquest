@@ -291,12 +291,14 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				result.addIcon(icon);
 				
 				/* Disband Icon */
-				loreList.clear();
-				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
-				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DISBAND.getMessage(),loreColor));
-				loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_DISBAND.getMessage(), loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
-				result.addIcon(icon);
+				if(!isServerKingdom) {
+					loreList.clear();
+					loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
+					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DISBAND.getMessage(), loreColor));
+					loreList.add(hintColor + MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					icon = new InfoIcon(kingdomColor + MessagePath.MENU_KINGDOM_DISBAND.getMessage(), loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
+					result.addIcon(icon);
+				}
 			}
 		}
 		

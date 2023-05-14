@@ -211,11 +211,19 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	 * @return True if successfully added, false if already a member
 	 */
 	public boolean addMember(UUID id, boolean isOfficer) {
-		if(isCreated && !members.containsKey(id)) {
-			members.put(id,isOfficer);
-			return true;
+		// Cannot add members if kingdom is not created
+		if(!isCreated) {
+			ChatUtil.printDebug("Failed to add member to non-created kingdom "+getName());
+			return false;
 		}
-		return false;
+		// Cannot add existing members
+		if(members.containsKey(id)) {
+			ChatUtil.printDebug("Failed to add existing member to kingdom "+getName());
+			return false;
+		}
+		// Add member
+		members.put(id,isOfficer);
+		return true;
 	}
 	
 	/**
@@ -229,20 +237,23 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	public boolean removeMember(UUID id) {
 		// Master cannot be removed as a member
 		if(master != null && master.equals(id)) {
+			ChatUtil.printDebug("Failed to remove master from kingdom "+getName());
 			return false;
 		}
 		// Cannot remove members if kingdom is not created
 		if(!isCreated) {
+			ChatUtil.printDebug("Failed to remove member from non-created kingdom "+getName());
 			return false;
 		}
-		if(members.containsKey(id)) {
-			// Remove membership
-			members.remove(id);
-			// Remove residencies
-			removeTownResidencies(id);
-			return true;
+		if(!members.containsKey(id)) {
+			ChatUtil.printDebug("Failed to remove non-existent member from kingdom "+getName());
+			return false;
 		}
-		return false;
+		// Remove membership
+		members.remove(id);
+		// Remove residencies
+		removeTownResidencies(id);
+		return true;
 	}
 
 	public void removeTownResidencies(UUID id) {
@@ -294,11 +305,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	public ArrayList<OfflinePlayer> getPlayerOfficersOnly() {
 		ArrayList<OfflinePlayer> officerList = new ArrayList<>();
 		for(UUID id : members.keySet()) {
-			// Skip master
-			if(master != null && master.equals(id)) {
-				continue;
-			}
-			if(members.get(id)) {
+			if(!(master != null && master.equals(id)) && members.get(id)) {
 				officerList.add(Bukkit.getOfflinePlayer(id));
 			}
 		}
