@@ -10,7 +10,9 @@ import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 
@@ -53,8 +55,8 @@ public class HangingListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
-    public void onHangingBreak(HangingBreakByEntityEvent event) {
+	@EventHandler(priority = EventPriority.LOW)
+    public void onHangingBreakPlayer(HangingBreakByEntityEvent event) {
 		// Handle hanging breaks by players
 		if(!(event.getRemover() instanceof Player)) return;
 		KonPlayer player = konquest.getPlayerManager().getPlayer((Player)event.getRemover());
@@ -83,4 +85,20 @@ public class HangingListener implements Listener {
 			}
 		}
     }
+
+	@EventHandler()
+	public void onHangingBreakMonument(HangingBreakByEntityEvent event) {
+		// Handle hanging breaks during monument changes
+		Location brakeLoc = event.getEntity().getLocation();
+		if(!territoryManager.isChunkClaimed(brakeLoc)) return;
+		KonTerritory territory = territoryManager.getChunkTerritory(brakeLoc);
+		// Check for break inside of town monument
+		if(territory instanceof KonTown) {
+			KonTown town = (KonTown) territory;
+			if(town.getMonument().isItemDropsDisabled() && town.getMonument().isLocInside(brakeLoc)) {
+				event.getEntity().remove();
+			}
+		}
+
+	}
 }

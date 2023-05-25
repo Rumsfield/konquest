@@ -404,7 +404,6 @@ public enum MessagePath {
 	PROTECTION_ERROR_CAMP_FAIL_BARBARIAN        (0, "protection.error.camp-fail-barbarian"),
 	PROTECTION_ERROR_CAPTURE                    (1, "protection.error.capture"),
 	PROTECTION_ERROR_GOLEM                      (1, "protection.error.golem"),
-	PROTECTION_ERROR_CAPITAL_ENTER              (0, "protection.error.capital-enter"),
 	PROTECTION_ERROR_TAG_BLOCKED                (0, "protection.error.tag-blocked"),
 	PROTECTION_ERROR_PORTAL_EXIT                (0, "protection.error.portal-exit"),
 	PROTECTION_ERROR_CAPITAL_IMMUNE             (2, "protection.error.capital-immune"),

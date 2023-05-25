@@ -730,7 +730,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	 * 			10 - Error, name is territory travel reserved word
 	 */
 	public int validateNameConstraints(String name) {
-		if(name == null || name.equals("") || name.contains(" ") || !StringUtils.isAlphanumeric(name)) {
+		if(name == null || name.equals("") || name.contains(" ") || !name.matches("([A-Za-z0-9_]+)")) {
 			return 1;
     	}
     	if(name.length() > 20) {

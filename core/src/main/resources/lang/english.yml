@@ -423,7 +423,6 @@ protection:
     camp-fail-barbarian: "Camping failed: You are not a Barbarian."
     capture: "This territory cannot be captured for another %s."
     golem: "You cannot hurt friendly Iron Golems in the Town of %s."
-    capital-enter: "Cannot enter enemy Kingdom Capitals."
     tag-blocked: "This command is blocked while in combat."
     portal-exit: "Your exit portal is inside of protected territory, move your portal!"
     capital-immune: "This capital is immune to attacks while %s towns remain in the Kingdom of %s."
