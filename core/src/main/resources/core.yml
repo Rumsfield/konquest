@@ -570,10 +570,10 @@ core:
       cost_template: 200
       
       # Time in seconds between payments (0 to disable, integer >= 0)
-      pay_interval_seconds: 900
+      pay_interval_seconds: 1800
        
       # Amount of Favor per land chunk of towns in a kingdom, to include in payments (decimal number >= 0)
-      pay_per_chunk: 0.25
+      pay_per_chunk: 0.20
        
       # Amount of Favor per population of towns in a kingdom, to include in payments (decimal number >= 0)
       pay_per_resident: 0.10

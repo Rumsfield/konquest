@@ -1066,25 +1066,27 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		oldKingdom = isOnline ? onlinePlayer.getKingdom() : offlinePlayer.getKingdom();
 		
     	// Try to teleport the player (online only)
-		World playerWorld = onlinePlayer.getBukkitPlayer().getLocation().getWorld();
-    	if(isOnline && teleport && playerWorld != null && konquest.isWorldValid(playerWorld)) {
-    		boolean doWorldSpawn = konquest.getCore().getBoolean(CorePath.EXILE_TELEPORT_WORLD_SPAWN.getPath(), false);
-    		boolean doWildTeleport = konquest.getCore().getBoolean(CorePath.EXILE_TELEPORT_WILD.getPath(), true);
-    		Location exileLoc = null;
-    		if(doWorldSpawn) {
-    			exileLoc = playerWorld.getSpawnLocation();
-    		} else if(doWildTeleport) {
-    			exileLoc = konquest.getRandomWildLocation(playerWorld);
-    		} else {
-    			ChatUtil.printDebug("Teleport for player "+onlinePlayer.getBukkitPlayer().getName()+" on exile is disabled.");
-    		}
-	    	if(exileLoc != null) {
-	    		konquest.telePlayerLocation(onlinePlayer.getBukkitPlayer(), exileLoc);
-	    		onlinePlayer.getBukkitPlayer().setBedSpawnLocation(exileLoc, true);
-	    	} else {
-	    		ChatUtil.printDebug("Could not teleport player "+onlinePlayer.getBukkitPlayer().getName()+" on exile, disabled or null location.");
-	    	}
-    	}
+		if(isOnline) {
+			World playerWorld = onlinePlayer.getBukkitPlayer().getLocation().getWorld();
+			if (teleport && playerWorld != null && konquest.isWorldValid(playerWorld)) {
+				boolean doWorldSpawn = konquest.getCore().getBoolean(CorePath.EXILE_TELEPORT_WORLD_SPAWN.getPath(), false);
+				boolean doWildTeleport = konquest.getCore().getBoolean(CorePath.EXILE_TELEPORT_WILD.getPath(), true);
+				Location exileLoc = null;
+				if (doWorldSpawn) {
+					exileLoc = playerWorld.getSpawnLocation();
+				} else if (doWildTeleport) {
+					exileLoc = konquest.getRandomWildLocation(playerWorld);
+				} else {
+					ChatUtil.printDebug("Teleport for player " + onlinePlayer.getBukkitPlayer().getName() + " on exile is disabled.");
+				}
+				if (exileLoc != null) {
+					konquest.telePlayerLocation(onlinePlayer.getBukkitPlayer(), exileLoc);
+					onlinePlayer.getBukkitPlayer().setBedSpawnLocation(exileLoc, true);
+				} else {
+					ChatUtil.printDebug("Could not teleport player " + onlinePlayer.getBukkitPlayer().getName() + " on exile, disabled or null location.");
+				}
+			}
+		}
     	
     	// Clear stats and prefix
     	boolean doRemoveStats = konquest.getCore().getBoolean(CorePath.EXILE_REMOVE_STATS.getPath(), true);
@@ -1510,8 +1512,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return false;
 		}
 
-		// First, try to transfer master to another player (or remove the kingdom)
-		if(isPlayerMaster) {
+		// First, try to transfer master to another player (or remove the kingdom) when not admin operated
+		if(isPlayerMaster && !kingdom.isAdminOperated()) {
 			ChatUtil.printDebug("Attempting to transfer master in kingdom "+kingdomName+", force = true");
 			// Player is master, transfer if possible
 			List<OfflinePlayer> officers = kingdom.getPlayerOfficersOnly();
@@ -1542,7 +1544,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						ChatUtil.printDebug("Could not transfer master to member player "+newMaster.getName()+" in kingdom "+kingdomName);
 						return false;
 					}
-				} else if(!kingdom.isAdminOperated()) {
+				} else {
 					// There are no members to transfer master to, remove the kingdom
 					// This will also exile all players to barbarians, including the given ID
 					String name = kingdom.getName();
@@ -1556,6 +1558,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					}
 				}
 			}
+		}
+		// Extra check for master in admin kingdom (shouldn't usually happen)
+		if(kingdom.isMaster(playerID) && kingdom.isAdminOperated()) {
+			// Clear the master
+			kingdom.clearMaster();
 		}
 
 		// Second, attempt to remove the player from the kingdom
@@ -1645,10 +1652,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		UUID id = master.getUniqueId();
 		if(kingdom.isMember(id) && kingdom.setMaster(id)) {
 			broadcastMembers(kingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_TRANSFER.getMessage(master.getName(),kingdom.getName()));
-			ChatUtil.sendNotice(sender.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_SUCCESS.getPath());
+			ChatUtil.sendNotice(sender.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 			return true;
 		} else {
-			ChatUtil.sendError(sender.getBukkitPlayer(), MessagePath.GENERIC_ERROR_FAILED.getPath());
+			ChatUtil.sendError(sender.getBukkitPlayer(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			return false;
 		}
 	}

@@ -81,6 +81,22 @@ public class EntityListener implements Listener {
 		}
 
 	}
+
+	/**
+	 * Prevent Endermen from picking up blocks in claimed territory
+	 * @param event The block change event
+	 */
+	@EventHandler()
+	public void onEntityBlockChange(EntityChangeBlockEvent event) {
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
+		if(event.isCancelled()) return;
+		// Check for territory
+		if(event.getEntityType().equals(EntityType.ENDERMAN) && territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
+			// Enderman block change happened in claimed territory, protect everything always
+			event.setCancelled(true);
+			return;
+		}
+	}
 	
 	/**
 	 * Fires when entities explode.
