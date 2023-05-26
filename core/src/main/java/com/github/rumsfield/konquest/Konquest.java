@@ -136,11 +136,11 @@ public class Konquest implements KonquestAPI, Timeable {
 		ruinManager = new RuinManager(this);
 		languageManager = new LanguageManager(this);
 		mapHandler = new MapHandler(this);
-		placeholderManager = new PlaceholderManager(this);
 		plotManager = new PlotManager(this);
 		travelManager = new TravelManager(this);
 		sanctuaryManager = new SanctuaryManager(this);
 		territoryManager = new TerritoryManager(this);
+		placeholderManager = new PlaceholderManager(this);
 		
 		versionHandler = null;
 		

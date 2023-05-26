@@ -354,7 +354,6 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		String result = "---";
 		Date now = new Date();
 		if(now.after(new Date(topScoreCooldownTime))) {
-			ChatUtil.printDebug("Fetching new placeholder top score");
 			// The cool-down time is over
 			// Create ranked list of kingdoms
 			topScoreList = new ArrayList<>();
@@ -366,8 +365,6 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 	   		topScoreList.sort(rankedComparator);
 	   		// Update cool-down time
 	   		topScoreCooldownTime = now.getTime() + (cooldownSeconds* 1000L);
-		} else {
-			ChatUtil.printDebug("Fetching cached placeholder top score");
 		}
 		// Get requested rank
 		if(rank > 0 && rank <= topScoreList.size()) {
