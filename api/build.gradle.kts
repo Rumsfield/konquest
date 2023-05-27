@@ -17,7 +17,7 @@ tasks {
     register<Javadoc>("generateJavadoc"){
         source = sourceSets.main.get().allJava
         classpath += project.configurations.getByName("compileClasspath").asFileTree
-        title = rootProject.name+" "+project.version+" Documentation"
+        title = "Konquest ${project.version} Documentation"
         options.overview("overview.html")
         setDestinationDir(file("$rootDir/doc"))
     }
