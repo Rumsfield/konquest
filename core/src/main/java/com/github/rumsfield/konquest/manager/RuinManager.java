@@ -112,7 +112,11 @@ public class RuinManager implements KonquestRuinManager {
 			ruinMap.put(nameLower, new KonRuin(loc, name, konquest.getKingdomManager().getNeutrals(), konquest));
 			ruinMap.get(nameLower).initClaim();
 			ruinMap.get(nameLower).updateBarPlayers();
+			// Update territory cache
 			konquest.getTerritoryManager().addAllTerritory(loc.getWorld(),ruinMap.get(nameLower).getChunkList());
+			// Update border particles
+			konquest.getTerritoryManager().updatePlayerBorderParticles(loc);
+			// Update maps
 			konquest.getMapHandler().drawDynmapUpdateTerritory(ruinMap.get(nameLower));
 			result = true;
 		}
@@ -123,9 +127,15 @@ public class RuinManager implements KonquestRuinManager {
 		boolean result = false;
 		KonRuin oldRuin = ruinMap.remove(name.toLowerCase());
 		if(oldRuin != null) {
+			ArrayList<KonPlayer> nearbyPlayers = konquest.getPlayerManager().getPlayersNearTerritory(oldRuin);
 			oldRuin.removeAllBarPlayers();
 			oldRuin.removeAllGolems();
+			// Update territory cache
 			konquest.getTerritoryManager().removeAllTerritory(oldRuin.getCenterLoc().getWorld(), oldRuin.getChunkList().keySet());
+			// Update border particles
+			for(KonPlayer player : nearbyPlayers) {
+				konquest.getTerritoryManager().updatePlayerBorderParticles(player);
+			}
 			konquest.getMapHandler().drawDynmapRemoveTerritory(oldRuin);
 			ChatUtil.printDebug("Removed Ruin "+name);
 			oldRuin = null;

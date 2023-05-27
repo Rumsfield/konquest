@@ -453,7 +453,7 @@ public class PlayerListener implements Listener {
 	        		boolean validCriticalBlock = false;
 	        		if(territoryManager.isChunkClaimed(location)) {
 	        			KonTerritory territory = territoryManager.getChunkTerritory(location);
-	        			if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
+	        			if(territory instanceof KonRuin) {
 	        				Material criticalType = konquest.getRuinManager().getRuinCriticalBlock();
 	        				if(event.getClickedBlock().getType().equals(criticalType)) {
 	        					((KonRuin)territory).addCriticalLocation(location);
@@ -474,7 +474,7 @@ public class PlayerListener implements Listener {
 	        		boolean validSpawnBlock = false;
 	        		if(territoryManager.isChunkClaimed(location)) {
 	        			KonTerritory territory = territoryManager.getChunkTerritory(location);
-	        			if(territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
+	        			if(territory instanceof KonRuin) {
 	        				((KonRuin)territory).addSpawnLocation(location);
 	        				ruinName = territory.getName();
 	        				validSpawnBlock = true;

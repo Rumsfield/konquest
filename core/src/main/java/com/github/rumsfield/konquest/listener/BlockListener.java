@@ -54,7 +54,7 @@ public class BlockListener implements Listener {
 	
 	private void notifyAdminBypass(Player player) {
 		// Notify admins about using bypass
-		if(player.hasPermission("konquest.command.admin")) {
+		if(player.hasPermission("konquest.admin.bypass")) {
 			ChatUtil.sendNotice(player,MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
 		}
 	}
@@ -737,6 +737,7 @@ public class BlockListener implements Listener {
 					 */
 					case RUIN:
 						// Prevent all placement within ruins
+						notifyAdminBypass(event.getPlayer());
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
 						return;

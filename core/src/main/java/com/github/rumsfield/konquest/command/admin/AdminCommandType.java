@@ -18,7 +18,7 @@ public enum AdminCommandType {
 	SANCTUARY   (Material.BEDROCK,				"konquest.admin.sanctuary",    "create|remove|rename <name> [<name>]",                         MessagePath.DESCRIPTION_ADMIN_SANCTUARY.getMessage()),
 	TRAVEL      (Material.COMPASS,				"konquest.admin.travel",       "<name>",                                                       MessagePath.DESCRIPTION_ADMIN_TRAVEL.getMessage()),
 	SETTRAVEL   (Material.OAK_SIGN,				"konquest.admin.settravel",    "",                                                             MessagePath.DESCRIPTION_ADMIN_SETTRAVEL.getMessage()),
-	FLAG        (Material.ORANGE_BANNER,		"konquest.admin.flag",         "[capital] <name> [<flag>] [<value>]",                          MessagePath.DESCRIPTION_ADMIN_FLAG.getMessage()),
+	FLAG        (Material.ORANGE_BANNER,		"konquest.admin.flag",         "kingdom|capital|town|sanctuary|ruin <name> [<flag>] [<value>]", MessagePath.DESCRIPTION_ADMIN_FLAG.getMessage()),
 	STAT        (Material.BOOKSHELF,			"konquest.admin.stat",         "<player> <stat> show|set|add|clear [<value>]",                 MessagePath.DESCRIPTION_ADMIN_STAT.getMessage()),
 	SAVE        (Material.TOTEM_OF_UNDYING,		"konquest.admin.save",         "",                                                             MessagePath.DESCRIPTION_ADMIN_SAVE.getMessage()),
 	RELOAD      (Material.GLOWSTONE,			"konquest.admin.reload",       "",                                                             MessagePath.DESCRIPTION_ADMIN_RELOAD.getMessage());

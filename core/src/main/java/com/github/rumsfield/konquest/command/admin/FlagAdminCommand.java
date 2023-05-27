@@ -25,66 +25,53 @@ public class FlagAdminCommand extends CommandBase {
 
 	/*
 	 * The following classes are known property holders
-	 * 	- KonKingdom (kingdom name)
-	 *  - KonCapital ("capital" + kingdom name)
-	 * 	- KonTown (town name)
-	 * 	- KonSanctuary (sanctuary name)
-	 *  - KonRuin (ruin name)
+	 * 	- KonKingdom
+	 *  - KonCapital
+	 * 	- KonTown
+	 * 	- KonSanctuary
+	 *  - KonRuin
 	 */
 
     public void execute() {
-    	// k admin flag [capital] <name> [<flag>] [<value>]
-    	if (getArgs().length != 3 && getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
+    	// k admin flag kingdom|capital|town|sanctuary|ruin <name> [<flag>] [<value>]
+    	if (getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
 		} else {
-			// The arg ordering is tricky.
-			// First try to match the arg with a known holder.
-			// Then check if it is "capital", then shift all args down 1.
-    		boolean isCapital = false;
+
+			String holderType = getArgs()[2];
+			String holderName = getArgs()[3];
+			KonPropertyFlagHolder holder = null;
+
     		// Check for valid holder name
-    		String holderName = getArgs()[2];
-    		KonPropertyFlagHolder holder = null;
-    		if(getKonquest().getKingdomManager().isKingdom(holderName)) {
-    			// Found kingdom
-    			holder = getKonquest().getKingdomManager().getKingdom(holderName);
-    		} else if(getKonquest().getKingdomManager().isTown(holderName)) {
-    			// Found town
-    			holder = getKonquest().getKingdomManager().getTown(holderName);
-    		} else if(getKonquest().getSanctuaryManager().isSanctuary(holderName)) {
-    			// Found sanctuary
-    			holder = getKonquest().getSanctuaryManager().getSanctuary(holderName);
-    		} else if(getKonquest().getRuinManager().isRuin(holderName)) {
-				// Found ruin
-				holder = getKonquest().getRuinManager().getRuin(holderName);
-			} else if(holderName.equals("capital")) {
-				if(getArgs().length > 3) {
-					String capitalName = getArgs()[3];
-					if(getKonquest().getKingdomManager().isKingdom(capitalName)) {
+			switch(holderType) {
+				case "kingdom":
+					holder = getKonquest().getKingdomManager().getKingdom(holderName);
+					break;
+				case "capital":
+					if(getKonquest().getKingdomManager().isKingdom(holderName)) {
 						// Found kingdom capital
-						holder = getKonquest().getKingdomManager().getKingdom(capitalName).getCapital();
-						isCapital = true;
+						holder = getKonquest().getKingdomManager().getKingdom(holderName).getCapital();
 					}
-				}
+					break;
+				case "town":
+					holder = getKonquest().getKingdomManager().getTown(holderName);
+					break;
+				case "sanctuary":
+					holder = getKonquest().getSanctuaryManager().getSanctuary(holderName);
+					break;
+				case "ruin":
+					holder = getKonquest().getRuinManager().getRuin(holderName);
+					break;
+				default:
+					break;
 			}
     		if(holder == null) {
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(holderName));
     			return;
     		}
-
-			// Number of arguments to list available flags of the given holder
-			int num_args_list = 3;
-			// Number of arguments to display a specific flag
-			int num_args_disp = 4;
-			// Number of arguments to set a given flag
-			int num_args_set = 5;
-			if(isCapital) {
-				num_args_list = 4;
-				num_args_disp = 5;
-				num_args_set = 6;
-			}
     		
-    		if (getArgs().length == num_args_list) {
-    			// k admin flag <name>
+    		if (getArgs().length == 4) {
+    			// k admin flag kingdom|capital|town|sanctuary|ruin <name>
         		// List available flags for the given property holder
         		Map<KonPropertyFlag,Boolean> holderFlags = holder.getAllProperties();
         		
@@ -97,9 +84,9 @@ public class FlagAdminCommand extends CommandBase {
 					ChatUtil.sendMessage((Player) getSender(), descLine);
                 }
 
-            } else if (getArgs().length > num_args_list) {
+            } else if (getArgs().length > 4) {
             	
-            	String flagName = getArgs()[num_args_list];
+            	String flagName = getArgs()[4];
             	if(!KonPropertyFlag.contains(flagName)) {
             		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(flagName));
         			return;
@@ -110,8 +97,8 @@ public class FlagAdminCommand extends CommandBase {
         			return;
             	}
             	
-            	if (getArgs().length == num_args_disp) {
-            		// k admin flag <name> <flag>
+            	if (getArgs().length == 5) {
+            		// k admin flag kingdom|capital|town|sanctuary|ruin <name> <flag>
             		// Display current value and description of given flag
 					ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SINGLE_PROPERTY.getMessage());
             		boolean flagValue = holder.getPropertyValue(flagArg);
@@ -120,10 +107,10 @@ public class FlagAdminCommand extends CommandBase {
 					ChatUtil.sendMessage((Player) getSender(), flagLine);
 					ChatUtil.sendMessage((Player) getSender(), descLine);
             		
-            	} else if (getArgs().length == num_args_set) {
-            		// k admin flag <name> <flag> <value>
+            	} else if (getArgs().length == 6) {
+            		// k admin flag kingdom|capital|town|sanctuary|ruin <name> <flag> <value>
             		// Set new value for flag
-            		String flagValue = getArgs()[num_args_set-1];
+            		String flagValue = getArgs()[5];
             		boolean bValue = Boolean.parseBoolean(flagValue);
             		boolean status = holder.setPropertyValue(flagArg, bValue);
             		if(status) {
@@ -140,61 +127,92 @@ public class FlagAdminCommand extends CommandBase {
     
     @Override
 	public List<String> tabComplete() {
-    	// k admin flag [capital] <name> [<flag>] [<value>]
+    	// k admin flag kingdom|capital|town|sanctuary|ruin <name> [<flag>] [<value>]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
-		
+
 		if(getArgs().length == 3) {
-			// Suggest all known property holders
-			tabList.addAll(getKonquest().getKingdomManager().getKingdomNames());
-			tabList.addAll(getKonquest().getKingdomManager().getTownNames());
-			tabList.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
-			tabList.addAll(getKonquest().getRuinManager().getRuinNames());
+			// Suggest all types
+			tabList.add("kingdom");
 			tabList.add("capital");
+			tabList.add("town");
+			tabList.add("sanctuary");
+			tabList.add("ruin");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
-		} else if(getArgs().length >= 4) {
-			// Conditional suggestion indexes
-			boolean isCapital = false;
-			String holderName = getArgs()[2];
-			if(holderName.equals("capital")) {
-				isCapital = true;
-			}
-			// Number of arguments to suggest kingdoms
-			int num_args_kingdom = 3;
-			// Number of arguments to suggest properties
-			int num_args_properties = 4;
-			// Number of arguments to suggest properties
-			int num_args_values = 5;
-			if(isCapital) {
-				num_args_kingdom = 4;
-				num_args_properties = 5;
-				num_args_values = 6;
-			}
+		} else if(getArgs().length > 3) {
+			String holderType = getArgs()[2];
 
-			if(getArgs().length == num_args_kingdom) {
-				// Suggest kingdoms
-				tabList.addAll(getKonquest().getKingdomManager().getKingdomNames());
+			if(getArgs().length == 4) {
+				// Suggest all known property holders
+				switch(holderType) {
+					case "kingdom":
+					case "capital":
+						tabList.addAll(getKonquest().getKingdomManager().getKingdomNames());
+						break;
+					case "town":
+						tabList.addAll(getKonquest().getKingdomManager().getTownNames());
+						break;
+					case "sanctuary":
+						tabList.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
+						break;
+					case "ruin":
+						tabList.addAll(getKonquest().getRuinManager().getRuinNames());
+						break;
+					default:
+						break;
+				}
 				// Trim down completion options based on current input
-				StringUtil.copyPartialMatches(getArgs()[num_args_kingdom-1], tabList, matchedTabList);
+				StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
 				Collections.sort(matchedTabList);
-			} else if(getArgs().length == num_args_properties) {
+			} else if(getArgs().length == 5) {
 				// Suggest properties
-				tabList.addAll(KonPropertyFlag.getFlagStrings());
+				String holderName = getArgs()[3];
+				KonPropertyFlagHolder holder = null;
+				switch(holderType) {
+					case "kingdom":
+						holder = getKonquest().getKingdomManager().getKingdom(holderName);
+						break;
+					case "capital":
+						if(getKonquest().getKingdomManager().isKingdom(holderName)) {
+							// Found kingdom capital
+							holder = getKonquest().getKingdomManager().getKingdom(holderName).getCapital();
+						}
+						break;
+					case "town":
+						holder = getKonquest().getKingdomManager().getTown(holderName);
+						break;
+					case "sanctuary":
+						holder = getKonquest().getSanctuaryManager().getSanctuary(holderName);
+						break;
+					case "ruin":
+						holder = getKonquest().getRuinManager().getRuin(holderName);
+						break;
+					default:
+						break;
+				}
+				if(holder != null) {
+					for(KonPropertyFlag flag : holder.getAllProperties().keySet()) {
+						tabList.add(flag.toString());
+					}
+				}
 				// Trim down completion options based on current input
-				StringUtil.copyPartialMatches(getArgs()[num_args_properties-1], tabList, matchedTabList);
+				StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
 				Collections.sort(matchedTabList);
-			} else if(getArgs().length == num_args_values) {
+			} else if(getArgs().length == 6) {
 				// Suggest values
 				tabList.add(String.valueOf(true));
 				tabList.add(String.valueOf(false));
 				// Trim down completion options based on current input
-				StringUtil.copyPartialMatches(getArgs()[num_args_values-1], tabList, matchedTabList);
+				StringUtil.copyPartialMatches(getArgs()[5], tabList, matchedTabList);
 				Collections.sort(matchedTabList);
 			}
 
+
 		}
+
+
 		return matchedTabList;
 	}
 }

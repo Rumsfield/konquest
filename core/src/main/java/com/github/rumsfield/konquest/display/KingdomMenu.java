@@ -92,7 +92,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	private final KonKingdom kingdom;
 	private KonKingdom diplomacyKingdom;
 	private boolean isCreatedKingdom;
-	private boolean isServerKingdom;
 	private final boolean isAdmin;
 	
 	public KingdomMenu(Konquest konquest, KonPlayer player, KonKingdom kingdom, boolean isAdmin) {
@@ -102,7 +101,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		this.kingdom = kingdom;
 		this.diplomacyKingdom = null;
 		this.isCreatedKingdom = false; // Is this kingdom created by players, i.e. not barbarians or neutrals
-		this.isServerKingdom = false; // Is this kingdom created by an admin for the server
 		this.isAdmin = isAdmin;
 		
 		initializeMenu();
@@ -126,9 +124,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						menuAccess = AccessType.REGULAR;
 					}
 				}
-			}
-			if(kingdom.isAdminOperated()) {
-				isServerKingdom = true;
 			}
 		}
 	}
@@ -222,12 +217,14 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 
 			if(menuAccess.equals(AccessType.OFFICER) || menuAccess.equals(AccessType.MASTER)) {
 				/* Relations Icon */
-				loreList = new ArrayList<>();
-				loreList.add(propertyColor+MessagePath.LABEL_OFFICER.getMessage());
-				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_RELATION.getMessage(),loreColor));
-				loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_RELATION.getMessage(), loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, true);
-				result.addIcon(icon);
+				if(!kingdom.isPeaceful()) {
+					loreList = new ArrayList<>();
+					loreList.add(propertyColor+MessagePath.LABEL_OFFICER.getMessage());
+					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_RELATION.getMessage(),loreColor));
+					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_RELATION.getMessage(), loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, true);
+					result.addIcon(icon);
+				}
 				
 				/* Requests Icon */
 				loreList.clear();
@@ -262,7 +259,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				result.addIcon(icon);
 				
 				/* Transfer Icon */
-				if(!isServerKingdom) {
+				if(!kingdom.isAdminOperated()) {
 					loreList.clear();
 					loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_TRANSFER.getMessage(),loreColor));
@@ -291,12 +288,14 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				result.addIcon(icon);
 				
 				/* Disband Icon */
-				loreList.clear();
-				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
-				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DISBAND.getMessage(),loreColor));
-				loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_DISBAND.getMessage(), loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
-				result.addIcon(icon);
+				if(!kingdom.isAdminOperated()) {
+					loreList.clear();
+					loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
+					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DISBAND.getMessage(), loreColor));
+					loreList.add(hintColor + MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					icon = new InfoIcon(kingdomColor + MessagePath.MENU_KINGDOM_DISBAND.getMessage(), loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
+					result.addIcon(icon);
+				}
 			}
 		}
 		
@@ -527,9 +526,10 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			isClickable = true;
 		} else if(context.equals(MenuState.B_RELATIONSHIP)) {
 			// List of all kingdoms, friendly and enemy, with relationship status and click hints
-			kingdoms.addAll(manager.getKingdoms());
-			if(isCreatedKingdom) {
-				kingdoms.remove(kingdom);
+			for(KonKingdom otherKingdom : manager.getKingdoms()) {
+				if(!otherKingdom.equals(kingdom) && !otherKingdom.isPeaceful()) {
+					kingdoms.add(otherKingdom);
+				}
 			}
 			isClickable = true;
 		} else {

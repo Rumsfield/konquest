@@ -4,10 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestRuin;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.utility.*;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -207,26 +204,40 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		ruinBarAll.setProgress(progress);
 	}
 
-	public void addCriticalLocation(Location loc) {
+	public boolean addCriticalLocation(Location loc) {
+		// Check that the location is inside of this ruin
+		if(!this.isLocInside(loc)) return false;
+		// Check that the block at the location is a critical type
+		if(!loc.getBlock().getType().equals(getKonquest().getRuinManager().getRuinCriticalBlock())) return false;
 		criticalLocations.put(loc, true);
 		getKonquest().getMapHandler().drawDynmapLabel(this);
+		return true;
 	}
 	
-	public void addCriticalLocation(Set<Location> locs) {
+	public boolean addCriticalLocation(Set<Location> locs) {
 		for(Location loc : locs) {
-			criticalLocations.put(loc, true);
+			if(!addCriticalLocation(loc)) {
+				return false;
+			}
 		}
+		return true;
 	}
 	
-	public void addSpawnLocation(Location loc) {
+	public boolean addSpawnLocation(Location loc) {
+		// Check that the location is inside of this ruin
+		if(!this.isLocInside(loc)) return false;
 		spawnLocations.put(loc, new KonRuinGolem(loc, this));
 		getKonquest().getMapHandler().drawDynmapLabel(this);
+		return true;
 	}
 	
-	public void addSpawnLocation(Set<Location> locs) {
+	public boolean addSpawnLocation(Set<Location> locs) {
 		for(Location loc : locs) {
-			addSpawnLocation(loc);
+			if(!addSpawnLocation(loc)) {
+				return false;
+			}
 		}
+		return true;
 	}
 	
 	public boolean isCriticalLocation(Location loc) {

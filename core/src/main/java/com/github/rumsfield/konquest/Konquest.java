@@ -136,11 +136,11 @@ public class Konquest implements KonquestAPI, Timeable {
 		ruinManager = new RuinManager(this);
 		languageManager = new LanguageManager(this);
 		mapHandler = new MapHandler(this);
-		placeholderManager = new PlaceholderManager(this);
 		plotManager = new PlotManager(this);
 		travelManager = new TravelManager(this);
 		sanctuaryManager = new SanctuaryManager(this);
 		territoryManager = new TerritoryManager(this);
+		placeholderManager = new PlaceholderManager(this);
 		
 		versionHandler = null;
 		
@@ -730,7 +730,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	 * 			10 - Error, name is territory travel reserved word
 	 */
 	public int validateNameConstraints(String name) {
-		if(name == null || name.equals("") || name.contains(" ") || !StringUtils.isAlphanumeric(name)) {
+		if(name == null || name.equals("") || name.contains(" ") || !name.matches("([A-Za-z0-9_]+)")) {
 			return 1;
     	}
     	if(name.length() > 20) {

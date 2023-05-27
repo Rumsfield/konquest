@@ -323,6 +323,20 @@ public class PlayerManager implements KonquestPlayerManager {
     	}
     	return playerList;
     }
+
+	// Returns a list of players inside or near the edge (within 2 chunks) of a territory
+	public ArrayList<KonPlayer> getPlayersNearTerritory(KonTerritory territory) {
+		ArrayList<KonPlayer> playerList = new ArrayList<>();
+		for(KonPlayer onlinePlayer : onlinePlayers.values()) {
+			for(Chunk chunk : konquest.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
+				if(territory.hasChunk(chunk)) {
+					playerList.add(onlinePlayer);
+					break;
+				}
+			}
+		}
+		return playerList;
+	}
     
     public ArrayList<KonPlayer> getPlayersInMonument(KonMonument monument) {
     	ArrayList<KonPlayer> playerList = new ArrayList<>();
@@ -343,13 +357,30 @@ public class PlayerManager implements KonquestPlayerManager {
     public Collection<KonPlayer> getPlayersOnline() {
 		return new HashSet<>(onlinePlayers.values());
     }
-    
-    public void initAllSavedPlayers() {
+
+	/**
+	 * This method should only be called on plugin enable,
+	 * when the database is initialized.
+	 * Fetch all saved players from the database, and add them to
+	 * the allPlayers cache.
+	 * Run checks to ensure that database kingdom matches membership in that kingdom.
+	 */
+	public void initAllSavedPlayers() {
     	allPlayers.clear();
-    	//ChatUtil.printDebug("Initializing PlayerManager allPlayers cache... ");
+    	// Fetch all players from database
     	for(KonOfflinePlayer offlinePlayer : konquest.getDatabaseThread().getDatabase().getAllSavedPlayers()) {
-    		//ChatUtil.printDebug("Adding offlinePlayer "+offlinePlayer.getOfflineBukkitPlayer().getName());
+    		// Add player to cache
     		allPlayers.put(offlinePlayer.getOfflineBukkitPlayer(), offlinePlayer);
+			// Check player's kingdom
+			KonKingdom playerKingdom = offlinePlayer.getKingdom();
+			UUID id = offlinePlayer.getOfflineBukkitPlayer().getUniqueId();
+			String playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
+			if(playerKingdom.isCreated() && !playerKingdom.isMember(id)) {
+				// The player is not in the membership list of the kingdom from their database entry.
+				// This should not happen.
+				ChatUtil.printDebug("Init allPlayers cache failed to match kingdom membership for player "+playerName+" in kingdom "+playerKingdom.getName());
+				playerKingdom.addMember(id,false);
+			}
     	}
     }
 

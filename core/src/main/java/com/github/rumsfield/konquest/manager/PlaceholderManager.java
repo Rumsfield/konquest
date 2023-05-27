@@ -354,7 +354,6 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		String result = "---";
 		Date now = new Date();
 		if(now.after(new Date(topScoreCooldownTime))) {
-			ChatUtil.printDebug("Fetching new placeholder top score");
 			// The cool-down time is over
 			// Create ranked list of kingdoms
 			topScoreList = new ArrayList<>();
@@ -366,8 +365,6 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 	   		topScoreList.sort(rankedComparator);
 	   		// Update cool-down time
 	   		topScoreCooldownTime = now.getTime() + (cooldownSeconds* 1000L);
-		} else {
-			ChatUtil.printDebug("Fetching cached placeholder top score");
 		}
 		// Get requested rank
 		if(rank > 0 && rank <= topScoreList.size()) {
@@ -429,7 +426,16 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 	/*
 	 * Placeholder Kingdom Requesters
 	 */
-	
+
+	public String getPlayerKingdomPlayers(Player player) {
+		String result = "";
+		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
+		if(offlinePlayer != null) {
+			result = getKingdomPlayers(offlinePlayer.getKingdom().getName());
+		}
+		return result;
+	}
+
 	public String getKingdomPlayers(String name) {
 		String result = "";
 		// Check cool-down time, update cache if expired
@@ -450,7 +456,16 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		}
 		return result;
 	}
-	
+
+	public String getPlayerKingdomOnline(Player player) {
+		String result = "";
+		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
+		if(offlinePlayer != null) {
+			result = getKingdomOnline(offlinePlayer.getKingdom().getName());
+		}
+		return result;
+	}
+
 	public String getKingdomOnline(String name) {
 		String result = "";
 		// Check cool-down time, update cache if expired
@@ -471,7 +486,16 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		}
 		return result;
 	}
-	
+
+	public String getPlayerKingdomTowns(Player player) {
+		String result = "";
+		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
+		if(offlinePlayer != null) {
+			result = getKingdomTowns(offlinePlayer.getKingdom().getName());
+		}
+		return result;
+	}
+
 	public String getKingdomTowns(String name) {
 		String result = "";
 		// Check cool-down time, update cache if expired
@@ -492,7 +516,16 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		}
 		return result;
 	}
-	
+
+	public String getPlayerKingdomLand(Player player) {
+		String result = "";
+		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
+		if(offlinePlayer != null) {
+			result = getKingdomLand(offlinePlayer.getKingdom().getName());
+		}
+		return result;
+	}
+
 	public String getKingdomLand(String name) {
 		String result = "";
 		// Check cool-down time, update cache if expired
@@ -516,7 +549,16 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		}
 		return result;
 	}
-	
+
+	public String getPlayerKingdomFavor(Player player) {
+		String result = "";
+		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
+		if(offlinePlayer != null) {
+			result = getKingdomFavor(offlinePlayer.getKingdom().getName());
+		}
+		return result;
+	}
+
 	public String getKingdomFavor(String name) {
 		String result = "";
 		// Check cool-down time, update cache if expired
@@ -540,7 +582,16 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		}
 		return result;
 	}
-	
+
+	public String getPlayerKingdomScore(Player player) {
+		String result = "";
+		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
+		if(offlinePlayer != null) {
+			result = getKingdomScore(offlinePlayer.getKingdom().getName());
+		}
+		return result;
+	}
+
 	public String getKingdomScore(String name) {
 		String result = "";
 		// Check cool-down time, update cache if expired
