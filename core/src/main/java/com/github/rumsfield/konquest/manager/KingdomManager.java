@@ -1771,6 +1771,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	/**
 	 * This method attempts to update the diplomatic states of two kingdoms.
 	 * It handles validation of state changes, instant state changes and diplomatic requests.
+	 * A peaceful kingdom (from flag property) is always in the peace relation with other kingdoms.
 	 * @param kingdom		The source kingdom initiating the change (ours)
 	 * @param otherKingdom	The target kingdom in question (theirs)
 	 * @param relation		The new diplomatic state to change to
@@ -1779,10 +1780,19 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @return				True when the change was successful, else false when the change could not be processed
 	 */
 	public boolean menuChangeKingdomRelation(@Nullable KonKingdom kingdom, @Nullable  KonKingdom otherKingdom, @NotNull KonquestDiplomacyType relation, @NotNull KonPlayer player, boolean isAdmin) {
-
 		if(kingdom == null || otherKingdom == null) return false;
-		
 		Player bukkitPlayer = player.getBukkitPlayer();
+
+		// Check for peaceful kingdom flag
+		if(kingdom.isPeaceful() || otherKingdom.isPeaceful()) {
+			// Cannot change relation for peaceful kingdoms, revert to default
+			ChatUtil.printDebug("Tried to change relation of peaceful kingdom(s), reverting to default.");
+			kingdom.removeActiveRelation(otherKingdom);
+			otherKingdom.removeActiveRelation(kingdom);
+			ChatUtil.sendError(bukkitPlayer,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return false;
+		}
+
 		// Check cost
 		double costRelation = getRelationCost(relation);
 		if(costRelation > 0 && !isAdmin) {

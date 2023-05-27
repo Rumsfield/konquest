@@ -359,6 +359,8 @@ public enum MessagePath {
 	PROTECTION_NOTICE_IGNORE                    (0, "protection.notice.ignore"),
 	PROTECTION_NOTICE_PEACEFUL_TOWN             (1, "protection.notice.peaceful-town"),
 	PROTECTION_NOTICE_PEACEFUL_PLAYER           (0, "protection.notice.peaceful-player"),
+	PROTECTION_NOTICE_PEACEFUL_VICTIM           (0, "protection.notice.peaceful-victim"),
+	PROTECTION_NOTICE_PEACEFUL_ATTACKER         (0, "protection.notice.peaceful-attacker"),
 	PROTECTION_NOTICE_CAMP_DESTROY              (1, "protection.notice.camp-destroy"),
 	PROTECTION_NOTICE_CAMP_DESTROY_OWNER        (0, "protection.notice.camp-destroy-owner"),
 	PROTECTION_NOTICE_CAMP_CREATE               (0, "protection.notice.camp-create"),

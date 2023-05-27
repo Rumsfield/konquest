@@ -385,6 +385,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	 * =================================================
 	 */
 	// Kingdom manager handles valid relationships, these methods are simple book-keeping
+	// If this kingdom is peaceful, never change active relations to other than default (peace)
 	
 	/* Active Relationship */
 	
@@ -395,6 +396,10 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		}
 		// Prevent setting self relation
 		if(kingdom.equals(this)) {
+			return;
+		}
+		// Prevent relations when peaceful
+		if(isPeaceful()) {
 			return;
 		}
 		// Only add non-default relationships

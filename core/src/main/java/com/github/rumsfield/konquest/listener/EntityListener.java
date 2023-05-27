@@ -170,6 +170,12 @@ public class EntityListener implements Listener {
 					}
 				}
 				*/
+				// Protect peaceful towns
+				if(town.getKingdom().isPeaceful()) {
+					ChatUtil.printDebug("protecting peaceful Town from entity explosion");
+					event.setCancelled(true);
+					return;
+				}
 				// Protect towns when all kingdom members are offline
 				if(town.getKingdom().isOfflineProtected()) {
 					ChatUtil.printDebug("protecting offline Town from entity explosion");
@@ -519,6 +525,12 @@ public class EntityListener implements Listener {
     			}
     			// Preventions for non-friendlies
     			if(!playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
+					// Protect peaceful towns
+					if(town.getKingdom().isPeaceful()) {
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_PEACEFUL_TOWN.getMessage(town.getName()));
+						event.setCancelled(true);
+						return;
+					}
     				// Check for farm animal or villager damage
     				if(event.getEntity() instanceof Animals || event.getEntity() instanceof Villager) {
     					// Cannot kill mobs within offline kingdom's town
@@ -653,6 +665,18 @@ public class EntityListener implements Listener {
             if(victimPlayer == null || attackerPlayer == null) {
             	return;
             }
+			// Protect victim if they're peaceful
+			if(victimPlayer.getKingdom().isPeaceful()) {
+				ChatUtil.sendNotice(attackerBukkitPlayer, MessagePath.PROTECTION_NOTICE_PEACEFUL_VICTIM.getMessage());
+				event.setCancelled(true);
+				return;
+			}
+			// Protect victim when attacker is peaceful
+			if(attackerPlayer.getKingdom().isPeaceful()) {
+				ChatUtil.sendNotice(attackerBukkitPlayer, MessagePath.PROTECTION_NOTICE_PEACEFUL_ATTACKER.getMessage());
+				event.setCancelled(true);
+				return;
+			}
             // Check for protections for attacks within claimed territory
             boolean isWildDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_PVP.getPath(), true);
             boolean isAttackInTerritory = territoryManager.isChunkClaimed(victimBukkitPlayer.getLocation());
