@@ -79,14 +79,4 @@ public enum KonPropertyFlag {
 		}
 		return result;
 	}
-	
-	public static Set<String> getFlagStrings() {
-		Set<String> result = new HashSet<>();
-		for(KonPropertyFlag p : KonPropertyFlag.values()) {
-			if(!p.equals(KonPropertyFlag.NONE)) {
-				result.add(p.toString());
-			}
-		}
-		return result;
-	}
 }
