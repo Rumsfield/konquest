@@ -31,17 +31,15 @@ public class TravelCommand extends CommandBase {
 	
 	public void execute() {
 		// k travel <town>|<kingdom>|<sanctuary>|capital|home|wild|camp
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length != 2) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.TRAVEL);
 		} else {
-        	Player bukkitPlayer = (Player) getSender();
-        	
         	World bukkitWorld = bukkitPlayer.getWorld();
         	if(!getKonquest().isWorldValid(bukkitWorld)) {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}
-        	
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());

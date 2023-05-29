@@ -34,8 +34,9 @@ public class FlagAdminCommand extends CommandBase {
 
     public void execute() {
     	// k admin flag kingdom|capital|town|sanctuary|ruin <name> [<flag>] [<value>]
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.FLAG);
 		} else {
 
 			String holderType = getArgs()[2];
@@ -66,7 +67,7 @@ public class FlagAdminCommand extends CommandBase {
 					break;
 			}
     		if(holder == null) {
-    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(holderName));
+    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(holderName));
     			return;
     		}
     		
@@ -76,7 +77,7 @@ public class FlagAdminCommand extends CommandBase {
         		Map<KonPropertyFlag,Boolean> holderFlags = holder.getAllProperties();
         		
         		// List all holder properties and values
-				ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FLAG_NOTICE_ALL_PROPERTIES.getMessage());
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_FLAG_NOTICE_ALL_PROPERTIES.getMessage());
                 for(KonPropertyFlag flag : holderFlags.keySet()) {
 					String flagLine = "| "+DisplayManager.loreFormat+flag.getName()+": "+DisplayManager.valueFormat+holderFlags.get(flag);
 					String descLine = "\\-- "+flag.getDescription();
@@ -88,24 +89,24 @@ public class FlagAdminCommand extends CommandBase {
             	
             	String flagName = getArgs()[4];
             	if(!KonPropertyFlag.contains(flagName)) {
-            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(flagName));
+            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(flagName));
         			return;
             	}
             	KonPropertyFlag flagArg = KonPropertyFlag.getFlag(flagName);
             	if(!holder.hasPropertyValue(flagArg)) {
-            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(flagName));
+            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(flagName));
         			return;
             	}
             	
             	if (getArgs().length == 5) {
             		// k admin flag kingdom|capital|town|sanctuary|ruin <name> <flag>
             		// Display current value and description of given flag
-					ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SINGLE_PROPERTY.getMessage());
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SINGLE_PROPERTY.getMessage());
             		boolean flagValue = holder.getPropertyValue(flagArg);
 					String flagLine = "| "+DisplayManager.loreFormat+flagArg.getName()+": "+DisplayManager.valueFormat+flagValue;
 					String descLine = "\\-- "+flagArg.getDescription();
-					ChatUtil.sendMessage((Player) getSender(), flagLine);
-					ChatUtil.sendMessage((Player) getSender(), descLine);
+					ChatUtil.sendMessage(bukkitPlayer, flagLine);
+					ChatUtil.sendMessage(bukkitPlayer, descLine);
             		
             	} else if (getArgs().length == 6) {
             		// k admin flag kingdom|capital|town|sanctuary|ruin <name> <flag> <value>
@@ -115,10 +116,10 @@ public class FlagAdminCommand extends CommandBase {
             		boolean status = holder.setPropertyValue(flagArg, bValue);
             		if(status) {
             			// Successfully assigned value
-            			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SET.getMessage(flagArg.getName(), holderName, bValue));
+            			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SET.getMessage(flagArg.getName(), holderName, bValue));
             		} else {
             			// Failed to assign value
-            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
             		}
             	}
             }	

@@ -21,10 +21,10 @@ public class ListCommand extends CommandBase {
 	// Display a paged list of names
     public void execute() {
     	// k list [kingdom|town|sanctuary] [<page>]
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length > 3) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.LIST);
 		} else {
-        	Player bukkitPlayer = (Player) getSender();
 
         	// Determine list mode
         	ListType mode = ListType.KINGDOM;
@@ -39,7 +39,7 @@ public class ListCommand extends CommandBase {
 				} else if(listMode.equalsIgnoreCase("sanctuary")) {
 					mode = ListType.SANCTUARY;
 				} else {
-        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					sendInvalidArgMessage(bukkitPlayer,CommandType.LIST);
                     return;
         		}
         	}
@@ -60,7 +60,7 @@ public class ListCommand extends CommandBase {
 					lines.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
 					break;
 	        	default :
-	        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					sendInvalidArgMessage(bukkitPlayer,CommandType.LIST);
 	                return;
         	}
         	Collections.sort(lines);

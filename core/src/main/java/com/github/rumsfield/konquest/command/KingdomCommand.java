@@ -28,12 +28,12 @@ public class KingdomCommand extends CommandBase {
 			ChatUtil.sendError((Player) getSender(),MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_NO_TEMPLATES.getMessage());
 		}
 		// kingdom [menu|create|invite|kick|rename|templates] [template] [name]
+		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length != 1 && getArgs().length != 2 && getArgs().length != 3 && getArgs().length != 4) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.KINGDOM);
 		} else {
         	
         	// Check for player
-        	Player bukkitPlayer = (Player) getSender();
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
@@ -200,7 +200,7 @@ public class KingdomCommand extends CommandBase {
 								ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_INVITE_SENT.getMessage(playerName));
 							}
 	            		} else {
-	            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+							sendInvalidArgMessage(bukkitPlayer,CommandType.KINGDOM);
 	            		}
 	            		break;
 	            	case "kick":
@@ -231,7 +231,7 @@ public class KingdomCommand extends CommandBase {
 								ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_KICK.getMessage(playerName));
 							}
 	            		} else {
-	            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+							sendInvalidArgMessage(bukkitPlayer,CommandType.KINGDOM);
 	            		}
 	            		break;
 	            	case "rename":
@@ -272,7 +272,7 @@ public class KingdomCommand extends CommandBase {
 	        						break;
 	        				}
 	            		} else {
-	            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+							sendInvalidArgMessage(bukkitPlayer,CommandType.KINGDOM);
 	            		}
 	            		break;
 					case "templates":
@@ -280,7 +280,7 @@ public class KingdomCommand extends CommandBase {
 						getKonquest().getDisplayManager().displayTemplateInfoMenu(player);
 						break;
             		default:
-            			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+						sendInvalidArgMessage(bukkitPlayer,CommandType.KINGDOM);
             			break;
         		}
         	}

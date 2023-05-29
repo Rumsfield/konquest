@@ -32,8 +32,8 @@ public class CampAdminCommand extends CommandBase {
 		// k admin camp create|destroy <player>
 		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length != 4) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
-            return;
+			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.CAMP);
+			return;
         }
 		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to find non-existent player");
@@ -132,7 +132,7 @@ public class CampAdminCommand extends CommandBase {
 				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			}
 		} else {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.CAMP);
 		}
 
 	}

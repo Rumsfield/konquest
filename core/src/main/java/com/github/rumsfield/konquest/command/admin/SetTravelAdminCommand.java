@@ -20,10 +20,10 @@ public class SetTravelAdminCommand extends CommandBase {
 
     public void execute() {
     	// k admin setTravel
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length != 2) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.SETTRAVEL);
 		} else {
-        	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
 
         	if(!getKonquest().isWorldValid(bukkitWorld)) {

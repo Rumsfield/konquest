@@ -496,7 +496,7 @@ command:
         rename: "Failed to rename Sanctuary %s to %s."
     save:
       notice:
-        message: "Saved all kingdoms, camps and ruins to files."
+        message: "Saved all data to files."
     settravel:
       notice:
         success: "Successfully set new travel point in %s."

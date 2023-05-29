@@ -25,13 +25,13 @@ public class ScoreCommand extends CommandBase {
 	public void execute() {
 		// k score [<player>|all]
 		// do not score peaceful kingdoms or barbarians
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length != 1 && getArgs().length != 2) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.SCORE);
 		} else {
-        	Player bukkitPlayer = (Player) getSender();
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
-    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
     		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
@@ -41,24 +41,24 @@ public class ScoreCommand extends CommandBase {
         	if(getArgs().length == 1) {
         		// Display player's own score GUI
         		if(player.isBarbarian()) {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
         		} else if(kingdom.isPeaceful()) {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdom.getName()));
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdom.getName()));
         		} else {
         			kingdomScore = getKonquest().getKingdomManager().getKingdomScore(kingdom);
         			playerScore = getKonquest().getKingdomManager().getPlayerScore(player);
-        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SCORE_NOTICE_SCORE.getMessage(playerScore,kingdom.getName(),kingdomScore));
+        			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SCORE_NOTICE_SCORE.getMessage(playerScore,kingdom.getName(),kingdomScore));
         			// Display Score GUI
         			getKonquest().getDisplayManager().displayScoreMenu(player, player);
         		}
         	} else if(getArgs()[1].equalsIgnoreCase("all")) {
         		// Score all Kingdoms
-            	ChatUtil.sendNotice((Player) getSender(), ChatColor.GOLD+MessagePath.COMMAND_SCORE_NOTICE_ALL_HEADER.getMessage());
+            	ChatUtil.sendNotice(bukkitPlayer, ChatColor.GOLD+MessagePath.COMMAND_SCORE_NOTICE_ALL_HEADER.getMessage());
         		for(KonKingdom allKingdom : getKonquest().getKingdomManager().getKingdoms()) {
         			if(!kingdom.isPeaceful()) {
 	        			int score = getKonquest().getKingdomManager().getKingdomScore(allKingdom);
 						String color = ""+getKonquest().getDisplayPrimaryColor(player.getKingdom(),allKingdom);
-	        			ChatUtil.sendMessage((Player) getSender(), color+allKingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+score);
+	        			ChatUtil.sendMessage(bukkitPlayer, color+allKingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+score);
         			}
         		}
         	} else {
@@ -66,19 +66,19 @@ public class ScoreCommand extends CommandBase {
         		// Verify player exists
             	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
             	if(offlinePlayer == null) {
-            		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
+            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
                     return;
             	}
             	kingdom = offlinePlayer.getKingdom();
             	String offlinePlayerName = offlinePlayer.getOfflineBukkitPlayer().getName();
             	if(offlinePlayer.isBarbarian()) {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(offlinePlayerName));
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(offlinePlayerName));
         		} else if(kingdom.isPeaceful()) {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdom.getName()));
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdom.getName()));
         		} else {
         			kingdomScore = getKonquest().getKingdomManager().getKingdomScore(kingdom);
         			playerScore = getKonquest().getKingdomManager().getPlayerScore(offlinePlayer);
-        			ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SCORE_NOTICE_PLAYER.getMessage(offlinePlayerName,playerScore,kingdom.getName(),kingdomScore));
+        			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SCORE_NOTICE_PLAYER.getMessage(offlinePlayerName,playerScore,kingdom.getName(),kingdomScore));
         			// Display Score GUI
         			getKonquest().getDisplayManager().displayScoreMenu(player, offlinePlayer);
         		}

@@ -36,14 +36,14 @@ public class TownCommand extends CommandBase {
 		// /k town <town>
 
 		// k town [<town>] [menu|invite|kick|lord|rename] [<name>]
+		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length < 1 || getArgs().length > 4) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
 			return;
 		}
-		Player bukkitPlayer = (Player) getSender();
 		if (!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to find non-existent player");
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return;
 		}
 		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
@@ -130,7 +130,7 @@ public class TownCommand extends CommandBase {
 					// Call manager method, includes messages
 					getKonquest().getKingdomManager().addTownPlayer(player, invitee, town);
 				} else {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
 					return;
 				}
 				break;
@@ -147,7 +147,7 @@ public class TownCommand extends CommandBase {
 					// Call manager method, includes messages
 					getKonquest().getKingdomManager().kickTownPlayer(player, kickPlayer, town);
 				} else {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
 					return;
 				}
 				break;
@@ -157,7 +157,7 @@ public class TownCommand extends CommandBase {
 					// Call manager method, includes messages
 					getKonquest().getKingdomManager().lordTownTakeover(player, town);
 				} else {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
 					return;
 				}
 				break;
@@ -202,13 +202,13 @@ public class TownCommand extends CommandBase {
 						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 					}
 				} else {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
 					return;
 				}
 				break;
 
 			default:
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
 			}
 		}
 
