@@ -354,8 +354,8 @@ generic:
     deny-barbarian: "Barbarians cannot do this."
     internal: "Internal error, contact an admin."
     internal-message: "Internal error: %s"
-    invalid-parameters: "The command did not have valid parameters. Use /k help."
-    invalid-parameters-admin: "The admin command did not have valid parameters. Use /k admin help."
+    invalid-parameters: "The command had incorrect arguments. Use /k help."
+    invalid-parameters-admin: "The admin command had incorrect arguments. Use /k admin help."
     invalid-world: "The command cannot be used in this world."
     no-permission: "You do not have permission to do that."
     no-allow: "You are not allowed to do that."
@@ -537,6 +537,8 @@ command:
   help:
     notice:
       message: "Help - Command, Arguments, Description, Alias"
+    error:
+      page: "The page value must be a number."
   info:
     notice:
       kingdom-header: "Kingdom of %s"
