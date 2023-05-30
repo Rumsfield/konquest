@@ -39,23 +39,10 @@ public class MapHandler {
 	}
 	
 	public void initialize() {
-		boolean doRegistration = konquest.getCore().getBoolean(CorePath.INTEGRATION_DYNMAP.getPath(),false);
-		Plugin dynmap = Bukkit.getPluginManager().getPlugin("dynmap");
-		if (dynmap != null && dynmap.isEnabled()) {
-			if(doRegistration) {
-				dapi = (DynmapAPI) Bukkit.getServer().getPluginManager().getPlugin("dynmap");
-				if(dapi != null) {
-					isEnabled = true;
-					ChatUtil.printConsoleAlert("Successfully registered Dynmap.");
-				} else {
-					ChatUtil.printConsoleError("Failed to register Dynmap. Is it disabled?");
-				}
-			} else {
-				ChatUtil.printConsoleAlert("Disabled Dynmap integration from core config settings.");
-			}
-				
-		} else {
-			ChatUtil.printConsoleAlert("Could not integrate Dynmap, missing or disabled.");
+		// Get Dynmap API from integration manager
+		isEnabled = konquest.getIntegrationManager().getDynmap().isEnabled();
+		if(isEnabled) {
+			dapi = konquest.getIntegrationManager().getDynmap().getDynmapAPI();
 		}
 	}
 	

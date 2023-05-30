@@ -1,7 +1,5 @@
 package com.github.rumsfield.konquest;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.listener.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
@@ -15,7 +13,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
@@ -25,45 +22,48 @@ public class KonquestPlugin extends JavaPlugin {
 	
 	private Konquest konquest;
 	private PluginManager pluginManager;
-	private boolean isProtocolEnabled = false;
 	private static Economy econ = null;
 	private boolean enableSuccess = false;
-	private static ProtocolManager plib = null;
+
+	boolean isSetupEconomy = false;
+	boolean isSetupMetrics = false;
+	boolean isSetupPlaceholders = false;
 
 	@Override
 	public void onEnable() {
 		pluginManager = getServer().getPluginManager();
 		konquest = new Konquest(this);
+		// Display logo in console
+		printLogo();
         // Check for Vault & Economy
- 		if (!setupEconomy()) {
+		isSetupEconomy = setupEconomy();
+ 		if (!isSetupEconomy) {
  			getLogger().severe(String.format("%s disabled due to bad or missing economy plugin.", getDescription().getName()));
  			pluginManager.disablePlugin(this);
             return;
         }
  		// Enable metrics
- 		loadMetrics();
-        // Enable protocol
- 		setupProtocol();
+ 		isSetupMetrics = loadMetrics();
  		// Register command executors & listeners
-        getCommand("konquest").setExecutor(konquest.getCommandHandler());
-        getCommand("k").setExecutor(konquest.getCommandHandler());
         registerListeners();
         // Initialize core
         konquest.initialize();
         // Register API
         registerApi(konquest);
         // Register placeholders
-        registerPlaceholders();
+		isSetupPlaceholders = registerPlaceholders();
         // Check for updates
         checkForUpdates();
         // Done!
         enableSuccess = true;
-        ChatUtil.printConsoleAlert("Plugin enabled. Created by Rumsfield.");
+		// Display status in console
+		printEnableStatus();
+
+		ChatUtil.printConsoleAlert("Successfully enabled.");
 	}
 	
 	@Override
 	public void onDisable() {
-		ChatUtil.printDebug("Executing onDisable...");
 		if(enableSuccess) {
 			konquest.disable();
 			konquest.getSanctuaryManager().saveSanctuaries();
@@ -75,60 +75,40 @@ public class KonquestPlugin extends JavaPlugin {
 			konquest.getConfigManager().saveConfigs();
 			konquest.getDatabaseThread().flushDatabase();
 			konquest.getDatabaseThread().getDatabase().getDatabaseConnection().disconnect();
-			ChatUtil.printDebug("Finished onDisable");
 		}
 	}
 	
 	public Konquest getKonquestInstance() {
 		return konquest;
 	}
-	
-	public static ProtocolManager getProtocolManager() {
-		return plib;
-	}
-	
-	public boolean isProtocolEnabled() {
-		return isProtocolEnabled;
-	}
-	
+
 	private void registerListeners() {
+		// Set command executors
+		getCommand("konquest").setExecutor(konquest.getCommandHandler());
+		getCommand("k").setExecutor(konquest.getCommandHandler());
+		// Register event listeners
 		pluginManager.registerEvents(new PlayerListener(this), this);
 		pluginManager.registerEvents(new EntityListener(this), this);
 		pluginManager.registerEvents(new BlockListener(this), this);
 		pluginManager.registerEvents(new InventoryListener(this), this);
 		pluginManager.registerEvents(new HangingListener(this), this);
 		pluginManager.registerEvents(new WorldListener(this), this);
-		//pluginManager.registerEvents(new QuickShopListener(this), this);
 	}
 	
 	private void registerApi(KonquestAPI api) {
 		this.getServer().getServicesManager().register(KonquestAPI.class, api, this, ServicePriority.Normal);
 	}
 	
-	private void loadMetrics() {
+	private boolean loadMetrics() {
 		try {
-	        new Metrics(this, 11980);
+			return new Metrics(this, 11980).isEnabled();
 		} catch(Exception e) {
 			ChatUtil.printConsoleError("Failed to load plugin metrics with bStats:");
 			ChatUtil.printConsoleError(e.getMessage());
 		}
+		return false;
 	}
-	
-	private void setupProtocol() {
-		Plugin protocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib");
-		if (protocolLib != null && protocolLib.isEnabled()) {
-			try {
-				plib = ProtocolLibrary.getProtocolManager();
-				isProtocolEnabled = true;
-			} catch(Exception | NoClassDefFoundError e) {
-				ChatUtil.printConsoleError("Failed to load ProtocolLib, is it the latest version?");
-				e.printStackTrace();
-			}
-		} else {
-			ChatUtil.printConsoleError("Failed to integrate ProtocolLib - missing or disabled.");
-		}
-	}
-	
+
 	private void checkForUpdates() {
 		new Updater(this, 92220).getVersion(version -> {
             if (this.getDescription().getVersion().equalsIgnoreCase(version)) {
@@ -141,11 +121,12 @@ public class KonquestPlugin extends JavaPlugin {
         });
 	}
 	
-	private void registerPlaceholders() {
-		if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+	private boolean registerPlaceholders() {
+		if (konquest.getIntegrationManager().getPlaceholderAPI().isEnabled()) {
 			new KonquestPlaceholderExpansion(this).register();
-			ChatUtil.printConsoleAlert("Successfully registered Placeholders.");
+			return true;
 		}
+		return false;
 	}
 	
 	private boolean setupEconomy() {
@@ -161,10 +142,53 @@ public class KonquestPlugin extends JavaPlugin {
         econ = rsp.getProvider();
         return true;
     }
-	
-	public static Economy getEconomy() {
-        return econ;
-    }
+
+	private void printLogo() {
+		String color1 = ChatUtil.parseHex("#FFA000");
+		String color2 = ChatUtil.parseHex("#FFB020");
+		String color3 = ChatUtil.parseHex("#FFC040");
+		String color4 = ChatUtil.parseHex("#FFD060");
+		String color5 = ChatUtil.parseHex("#FFE080");
+		String color6 = ChatUtil.parseHex("#FFF0A0");
+		String [] logo = {
+				color1+" _  __                                 _   ",
+				color2+"| |/ /___  _ __   __ _ _   _  ___  ___| |_ ",
+				color3+"| ' // _ \\| '_ \\ / _` | | | |/ _ \\/ __| __|",
+				color4+"| . \\ (_) | | | | (_| | |_| |  __/\\__ \\ |_ ",
+				color5+"|_|\\_\\___/|_| |_|\\__, |\\__,_|\\___||___/\\__|",
+				color6+"                    |_|                    ",
+				color1+"========== Konquest by Rumsfield =========="
+		};
+		for (String row : logo) {
+			String line = "    " + row;
+			Bukkit.getServer().getConsoleSender().sendMessage(line);
+		}
+	}
+
+	private void printEnableStatus() {
+		String [] status = {
+				"Anonymous Metrics           -> " + boolean2status(isSetupMetrics),
+				"Economy Linked              -> " + boolean2status(isSetupEconomy),
+				"Placeholders Registered     -> " + boolean2status(isSetupPlaceholders),
+				"Team Colors Registered      -> " + boolean2status(konquest.isVersionHandlerEnabled()),
+				"Minecraft Version Supported -> " + boolean2status(konquest.isVersionSupported()),
+		};
+		ChatUtil.printConsoleAlert("Final Status...");
+		for (String row : status) {
+			String line = ChatColor.GOLD+"> "+ChatColor.RESET + row;
+			Bukkit.getServer().getConsoleSender().sendMessage(line);
+		}
+	}
+
+	private String boolean2status(boolean val) {
+		String result = "";
+		if(val) {
+			result = ChatUtil.parseHex("#60C030")+"Success"; // Green
+		} else {
+			result = ChatUtil.parseHex("#FF2020")+"Fail"; // Red
+		}
+		return result;
+	}
 	
 	/*
 	 * Economy wrapper functions. Attempt to use Vault API methods, and then try depreciated methods if those fail.

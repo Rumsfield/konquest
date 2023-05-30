@@ -26,29 +26,33 @@ public class LuckPermsHook implements PluginHook {
 		this.isEnabled = false;
 		this.lpAPI = null;
 	}
-	
+
 	@Override
-	public void reload() {
+	public String getPluginName() {
+		return "LuckPerms";
+	}
+
+	@Override
+	public int reload() {
 		// Attempt to integrate Luckperms
 		Plugin luckPerms = Bukkit.getPluginManager().getPlugin("LuckPerms");
-		if(luckPerms == null || !luckPerms.isEnabled()){
-			ChatUtil.printConsoleAlert("Could not integrate LuckPerms, missing or disabled.");
-			return;
+		if(luckPerms == null){
+			return 1;
+		}
+		if(!luckPerms.isEnabled()){
+			return 2;
 		}
 		if(!konquest.getCore().getBoolean(CorePath.INTEGRATION_LUCKPERMS.getPath(),false)) {
-			ChatUtil.printConsoleAlert("Disabled LuckPerms integration from core config settings.");
-			return;
+			return 3;
 		}
-
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
 		if(provider == null){
 			ChatUtil.printConsoleError("Failed to integrate LuckPerms, plugin not found or disabled");
-			return;
+			return -1;
 		}
-
 		lpAPI = provider.getProvider();
 		isEnabled = true;
-		ChatUtil.printConsoleAlert("Successfully integrated LuckPerms");
+		return 0;
 	}
 
 	@Override

@@ -29,30 +29,34 @@ public class DiscordSrvHook implements PluginHook {
 		this.isEnabled = false;
 		this.discordSrvListener = new DiscordSRVListener(konquest);
 	}
-	
+
 	@Override
-	public void reload() {
+	public String getPluginName() {
+		return "DiscordSRV";
+	}
+
+	@Override
+	public int reload() {
 		// Attempt to integrate DiscordSRV
 		Plugin discordSrv = Bukkit.getPluginManager().getPlugin("DiscordSRV");
-		if(discordSrv == null || !discordSrv.isEnabled()){
-			ChatUtil.printConsoleAlert("Could not integrate DiscordSRV, missing or disabled.");
-			return;
+		if(discordSrv == null){
+			return 1;
 		}
-
+		if(!discordSrv.isEnabled()){
+			return 2;
+		}
 		if(!konquest.getCore().getBoolean(CorePath.INTEGRATION_DISCORDSRV.getPath(),false)) {
-			ChatUtil.printConsoleAlert("Disabled DiscordSRV integration from core config settings.");
-			return;
+			return 3;
 		}
-
 		try {
 			DiscordSRV.api.subscribe(discordSrvListener);
 			isEnabled = true;
-			ChatUtil.printConsoleAlert("Successfully integrated DiscordSRV");
+			return 0;
 		} catch (Exception e) {
 			ChatUtil.printConsoleError("Failed to integrate DiscordSRV, see exception message:");
 			e.printStackTrace();
+			return -1;
 		}
-
 	}
 	
 	@Override
