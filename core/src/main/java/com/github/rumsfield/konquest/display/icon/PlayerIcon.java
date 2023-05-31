@@ -25,6 +25,7 @@ public class PlayerIcon implements MenuIcon {
 	private final boolean isClickable;
 	private final PlayerIconAction action;
 
+	private final String propertyColor = DisplayManager.propertyFormat;
 	private final String loreColor = DisplayManager.loreFormat;
 	private final String valueColor = DisplayManager.valueFormat;
 
@@ -62,6 +63,7 @@ public class PlayerIcon implements MenuIcon {
 		assert meta != null;
 		List<String> loreList = new ArrayList<>();
 		String lastOnlineFormat = Konquest.getLastSeenFormat(player);
+		loreList.add(propertyColor+MessagePath.LABEL_PLAYER.getMessage());
 		loreList.add(loreColor+ MessagePath.LABEL_LAST_SEEN.getMessage(valueColor+lastOnlineFormat));
 		loreList.addAll(lore);
 		for(ItemFlag flag : ItemFlag.values()) {
