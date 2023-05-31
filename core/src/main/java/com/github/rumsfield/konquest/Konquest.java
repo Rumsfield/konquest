@@ -177,6 +177,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		ruinManager.initialize();
 		initManagers();
 		initWorlds();
+		printConfigFeatures();
 		
 		databaseThread.setSleepSeconds(saveIntervalSeconds);
 		if(!databaseThread.isRunning()) {
@@ -257,7 +258,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		if(isProtocolLibEnabled) {
 			if(versionHandler != null) {
 				isVersionHandlerEnabled = true;
-				ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version.");
+				ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version");
 			}
 		} else {
 			ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is missing or disabled! Check version.");
@@ -268,10 +269,12 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	public void reload() {
+		ChatUtil.printConsoleAlert("Reloading config files");
 		configManager.reloadConfigs();
 		initManagers();
 		initWorlds();
-		ChatUtil.printDebug("Finished Reload");
+		printConfigFeatures();
+		ChatUtil.printConsoleAlert("Finished reload");
 	}
 	
 	private void initManagers() {
@@ -401,6 +404,39 @@ public class Konquest implements KonquestAPI, Timeable {
 				ChatUtil.printConsoleError("Internal error, core path "+testPath.getPath()+" does not exist within core.yml file.");
 			}
 		}
+	}
+
+	private void printConfigFeatures() {
+		String lineTemplate = "%-30s -> %s";
+		String [] status = {
+				String.format(lineTemplate,"Accomplishment Prefixes",boolean2enable(getCore().getBoolean(CorePath.ACCOMPLISHMENT_PREFIX.getPath()))),
+				String.format(lineTemplate,"Tutorial Quests",boolean2enable(getCore().getBoolean(CorePath.DIRECTIVE_QUESTS.getPath()))),
+				String.format(lineTemplate,"Chat Formatting",boolean2enable(getCore().getBoolean(CorePath.CHAT_ENABLE_FORMAT.getPath()))),
+				String.format(lineTemplate,"Admin Kingdoms Only",boolean2enable(getCore().getBoolean(CorePath.KINGDOMS_CREATE_ADMIN_ONLY.getPath()))),
+				String.format(lineTemplate,"Combat Tag",boolean2enable(getCore().getBoolean(CorePath.COMBAT_PREVENT_COMMAND_ON_DAMAGE.getPath()))),
+				String.format(lineTemplate,"Town Upgrades",boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_UPGRADES.getPath()))),
+				String.format(lineTemplate,"Town Shields",boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_SHIELDS.getPath()))),
+				String.format(lineTemplate,"Town Armor",boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_ARMOR.getPath()))),
+				String.format(lineTemplate,"Town Specializations",boolean2enable(getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath()))),
+				String.format(lineTemplate,"Town Plots",boolean2enable(getCore().getBoolean(CorePath.PLOTS_ENABLE.getPath()))),
+				String.format(lineTemplate,"Barbarian Camps",boolean2enable(getCore().getBoolean(CorePath.CAMPS_ENABLE.getPath()))),
+				String.format(lineTemplate,"Barbarian Clans",boolean2enable(getCore().getBoolean(CorePath.CAMPS_CLAN_ENABLE.getPath())))
+		};
+		ChatUtil.printConsoleAlert("Feature Summary...");
+		for (String row : status) {
+			String line = ChatColor.GOLD+"> "+ChatColor.RESET + row;
+			Bukkit.getServer().getConsoleSender().sendMessage(line);
+		}
+	}
+
+	private String boolean2enable(boolean val) {
+		String result = "";
+		if(val) {
+			result = ChatUtil.parseHex("#60C030")+"Enabled"; // Green
+		} else {
+			result = ChatUtil.parseHex("#B040C0")+"Disabled"; // Light Purple
+		}
+		return result;
 	}
 	
 	public void initOnlinePlayers() {

@@ -56,7 +56,7 @@ public class IntegrationManager {
 		for(int i = 0; i < hooks.size(); i++) {
 			PluginHook hook = hooks.get(i);
 			int code = statusList.get(i);
-			String hookStatus = String.format(ChatColor.GOLD+"> "+ChatColor.RESET+"%-16s -> %s",hook.getPluginName(),getStatus(code));
+			String hookStatus = String.format(ChatColor.GOLD+"> "+ChatColor.RESET+"%-30s -> %s",hook.getPluginName(),getStatus(code));
 			Bukkit.getServer().getConsoleSender().sendMessage(hookStatus);
 		}
 	}

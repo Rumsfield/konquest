@@ -2,10 +2,7 @@ package com.github.rumsfield.konquest;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.listener.*;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.Metrics;
-import com.github.rumsfield.konquest.utility.Updater;
+import com.github.rumsfield.konquest.utility.*;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
@@ -59,7 +56,7 @@ public class KonquestPlugin extends JavaPlugin {
 		// Display status in console
 		printEnableStatus();
 
-		ChatUtil.printConsoleAlert("Successfully enabled.");
+		ChatUtil.printConsoleAlert("Successfully enabled");
 	}
 	
 	@Override
@@ -166,12 +163,13 @@ public class KonquestPlugin extends JavaPlugin {
 	}
 
 	private void printEnableStatus() {
+		String lineTemplate = "%-30s -> %s";
 		String [] status = {
-				"Anonymous Metrics           -> " + boolean2status(isSetupMetrics),
-				"Economy Linked              -> " + boolean2status(isSetupEconomy),
-				"Placeholders Registered     -> " + boolean2status(isSetupPlaceholders),
-				"Team Colors Registered      -> " + boolean2status(konquest.isVersionHandlerEnabled()),
-				"Minecraft Version Supported -> " + boolean2status(konquest.isVersionSupported()),
+				String.format(lineTemplate,"Anonymous Metrics",boolean2status(isSetupMetrics)),
+				String.format(lineTemplate,"Economy Linked",boolean2status(isSetupEconomy)),
+				String.format(lineTemplate,"Placeholders Registered",boolean2status(isSetupPlaceholders)),
+				String.format(lineTemplate,"Team Colors Registered",boolean2status(konquest.isVersionHandlerEnabled())),
+				String.format(lineTemplate,"Minecraft Version Supported",boolean2status(konquest.isVersionSupported()))
 		};
 		ChatUtil.printConsoleAlert("Final Status...");
 		for (String row : status) {
