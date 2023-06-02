@@ -63,7 +63,6 @@ public class KonquestPlugin extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-		ChatUtil.printDebug("Executing onDisable...");
 		if(enableSuccess) {
 			konquest.disable();
 			konquest.getSanctuaryManager().saveSanctuaries();
@@ -75,7 +74,6 @@ public class KonquestPlugin extends JavaPlugin {
 			konquest.getConfigManager().saveConfigs();
 			konquest.getDatabaseThread().flushDatabase();
 			konquest.getDatabaseThread().getDatabase().getDatabaseConnection().disconnect();
-			ChatUtil.printDebug("Finished onDisable");
 		}
 	}
 	

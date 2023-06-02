@@ -457,14 +457,14 @@ public class BlockListener implements Listener {
 			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 				return;
 			}
-			boolean isDiamondBreak = false;
+			Material blockType = event.getBlock().getType();
+			boolean isDiamondBreak = blockType.equals(Material.DIAMOND_ORE);
+			boolean isDeepslateDiamondBreak = false;
 			try {
-				Material blockType = event.getBlock().getType();
-				isDiamondBreak = blockType.equals(Material.DIAMOND_ORE) || blockType.equals(Material.DEEPSLATE_DIAMOND_ORE);
-			} catch(Exception ignored) {
-				ChatUtil.printDebug("Failed to evaluate diamond break material, the API is probably older.");
-			}
-			if(isDiamondBreak) {
+				isDeepslateDiamondBreak = blockType.equals(Material.DEEPSLATE_DIAMOND_ORE);
+			} catch(Exception | NoSuchFieldError ignored) {}
+
+			if(isDiamondBreak || isDeepslateDiamondBreak) {
 				boolean isDrop = event.isDropItems();
 				ChatUtil.printDebug("Diamond ore block break dropping items: "+isDrop);
 				ItemStack handItem = event.getPlayer().getInventory().getItemInMainHand();
