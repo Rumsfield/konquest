@@ -141,20 +141,20 @@ public class KonquestPlugin extends JavaPlugin {
     }
 
 	private void printLogo() {
-		String color1 = ChatUtil.parseHex("#FFA000");
-		String color2 = ChatUtil.parseHex("#FFB020");
-		String color3 = ChatUtil.parseHex("#FFC040");
-		String color4 = ChatUtil.parseHex("#FFD060");
-		String color5 = ChatUtil.parseHex("#FFE080");
-		String color6 = ChatUtil.parseHex("#FFF0A0");
+//		String color1 = ChatUtil.parseHex("#FFA000");
+//		String color2 = ChatUtil.parseHex("#FFB020");
+//		String color3 = ChatUtil.parseHex("#FFC040");
+//		String color4 = ChatUtil.parseHex("#FFD060");
+//		String color5 = ChatUtil.parseHex("#FFE080");
+//		String color6 = ChatUtil.parseHex("#FFF0A0");
 		String [] logo = {
-				color1+" _  __                                 _   ",
-				color2+"| |/ /___  _ __   __ _ _   _  ___  ___| |_ ",
-				color3+"| ' // _ \\| '_ \\ / _` | | | |/ _ \\/ __| __|",
-				color4+"| . \\ (_) | | | | (_| | |_| |  __/\\__ \\ |_ ",
-				color5+"|_|\\_\\___/|_| |_|\\__, |\\__,_|\\___||___/\\__|",
-				color6+"                    |_|                    ",
-				color1+"========== Konquest by Rumsfield =========="
+				ChatColor.GOLD+" _  __                                 _   ",
+				ChatColor.GOLD+"| |/ /___  _ __   __ _ _   _  ___  ___| |_ ",
+				ChatColor.GOLD+"| ' // _ \\| '_ \\ / _` | | | |/ _ \\/ __| __|",
+				ChatColor.GOLD+"| . \\ (_) | | | | (_| | |_| |  __/\\__ \\ |_ ",
+				ChatColor.GOLD+"|_|\\_\\___/|_| |_|\\__, |\\__,_|\\___||___/\\__|",
+				ChatColor.GOLD+"                    |_|                    ",
+				ChatColor.GOLD+"========== Konquest by Rumsfield =========="
 		};
 		for (String row : logo) {
 			String line = "    " + row;
@@ -181,9 +181,11 @@ public class KonquestPlugin extends JavaPlugin {
 	private String boolean2status(boolean val) {
 		String result = "";
 		if(val) {
-			result = ChatUtil.parseHex("#60C030")+"Success"; // Green
+			//result = ChatUtil.parseHex("#60C030")+"Success"; // Green
+			result = ChatColor.DARK_GREEN+"Success";
 		} else {
-			result = ChatUtil.parseHex("#FF2020")+"Fail"; // Red
+			//result = ChatUtil.parseHex("#FF2020")+"Fail"; // Red
+			result = ChatColor.DARK_RED+"Fail";
 		}
 		return result;
 	}

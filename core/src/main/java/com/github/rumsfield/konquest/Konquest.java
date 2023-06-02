@@ -432,9 +432,11 @@ public class Konquest implements KonquestAPI, Timeable {
 	private String boolean2enable(boolean val) {
 		String result = "";
 		if(val) {
-			result = ChatUtil.parseHex("#60C030")+"Enabled"; // Green
+			//result = ChatUtil.parseHex("#60C030")+"Enabled"; // Green
+			result = ChatColor.DARK_GREEN+"Enabled";
 		} else {
-			result = ChatUtil.parseHex("#B040C0")+"Disabled"; // Light Purple
+			//result = ChatUtil.parseHex("#B040C0")+"Disabled"; // Light Purple
+			result = ChatColor.DARK_RED+"Disabled";
 		}
 		return result;
 	}

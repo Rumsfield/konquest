@@ -73,19 +73,24 @@ public class IntegrationManager {
 		String result = "";
 		switch(code) {
 			case 0:
-				result = ChatUtil.parseHex("#60C030")+"Active"; // Green
+				//result = ChatUtil.parseHex("#60C030")+"Active"; // Green
+				result = ChatColor.DARK_GREEN+"Active";
 				break;
 			case 1:
-				result = ChatUtil.parseHex("#5080B0")+"Missing JAR"; // Light Blue
+				//result = ChatUtil.parseHex("#5080B0")+"Missing JAR"; // Light Blue
+				result = ChatColor.DARK_AQUA+"Missing JAR";
 				break;
 			case 2:
-				result = ChatUtil.parseHex("#B040C0")+"Disabled"; // Light Purple
+				//result = ChatUtil.parseHex("#B040C0")+"Disabled"; // Light Purple
+				result = ChatColor.LIGHT_PURPLE+"Disabled";
 				break;
 			case 3:
-				result = ChatUtil.parseHex("#808080")+"Inactive"; // Dark Gray
+				//result = ChatUtil.parseHex("#808080")+"Inactive"; // Dark Gray
+				result = ChatColor.GRAY+"Inactive";
 				break;
 			default:
-				result = ChatUtil.parseHex("#FF2020")+"Failed"; // Red
+				//result = ChatUtil.parseHex("#FF2020")+"Failed"; // Red
+				result = ChatColor.DARK_RED+"Failed";
 				break;
 		}
 		return result;
