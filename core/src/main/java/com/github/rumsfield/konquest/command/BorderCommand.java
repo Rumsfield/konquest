@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.command;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.Labeler;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -18,14 +19,14 @@ public class BorderCommand extends CommandBase {
 	
 	public void execute() {
 		// k border
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length != 1) {
-            ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.BORDER);
 			return;
 		}
-		Player bukkitPlayer = (Player) getSender();
 		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to find non-existent player");
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return;
 		}
 		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);

@@ -20,10 +20,10 @@ public class FlyCommand extends CommandBase {
 	
 	public void execute() {
 		// k fly
+		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length != 1) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.FLY);
 		} else {
-        	Player bukkitPlayer = (Player) getSender();
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());

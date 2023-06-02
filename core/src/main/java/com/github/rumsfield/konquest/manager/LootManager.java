@@ -34,7 +34,6 @@ public class LootManager implements Timeable{
 	private long refreshTimeSeconds;
 	private long markedRefreshTime;
 	private int lootCount;
-	private final Random randomness;
 	private final Timer lootRefreshTimer;
 	private final HashMap<ItemStack,Integer> lootTable;
 
@@ -45,7 +44,6 @@ public class LootManager implements Timeable{
 		this.markedRefreshTime = 0;
 		this.lootRefreshLog = new HashMap<>();
 		this.lootCount = 0;
-		this.randomness = new Random();
 		this.lootRefreshTimer = new Timer(this);
 		this.lootTable = new HashMap<>();
 	}
@@ -64,7 +62,7 @@ public class LootManager implements Timeable{
 			lootCount = 0;
 		}
 		if(loadLoot()) {
-			ChatUtil.printConsoleAlert("Loaded loot table from loot.yml");
+			ChatUtil.printDebug("Loaded loot table from loot.yml");
 		} else {
 			ChatUtil.printConsoleError("Failed to load loot table, check for syntax errors.");
 		}

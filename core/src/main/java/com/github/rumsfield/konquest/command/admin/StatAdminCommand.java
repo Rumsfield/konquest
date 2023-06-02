@@ -25,8 +25,9 @@ public class StatAdminCommand extends CommandBase {
 	@Override
 	public void execute() {
 		// k admin stat <player> <stat> show|set|add|clear [<value>]
+		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length != 5 && getArgs().length != 6) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.STAT);
 		} else {
         	String playerName = getArgs()[2];
         	String statName = getArgs()[3];
@@ -34,7 +35,7 @@ public class StatAdminCommand extends CommandBase {
         	// Verify player exists
         	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
         	if(offlinePlayer == null) {
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
+        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
                 return;
         	}
         	String bukkitPlayerName = offlinePlayer.getOfflineBukkitPlayer().getName();
@@ -52,7 +53,7 @@ public class StatAdminCommand extends CommandBase {
         	// Verify stat exists
         	KonStatsType stat = KonStatsType.getStat(statName);
         	if(stat == null) {
-        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_ERROR_NAME.getMessage(statName));
+        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_STAT_ERROR_NAME.getMessage(statName));
                 return;
         	}
         	// Perform sub-commands
@@ -62,7 +63,7 @@ public class StatAdminCommand extends CommandBase {
         	switch(subCmd.toLowerCase()) {
         	case "show":
         		currentValue = stats.getStat(stat);
-            	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_NOTICE_SHOW.getMessage(stat.toString(),bukkitPlayerName,currentValue));
+            	ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_STAT_NOTICE_SHOW.getMessage(stat.toString(),bukkitPlayerName,currentValue));
             	// Remove reference to offline player's stats
             	if(!isPlayerOnline) {
             		stats = null;
@@ -75,11 +76,11 @@ public class StatAdminCommand extends CommandBase {
         		try {
         			valueNum = Integer.parseInt(value);
         		} catch(NumberFormatException e) {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_ERROR_VALUE.getMessage(e.getMessage()));
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_STAT_ERROR_VALUE.getMessage(e.getMessage()));
                     return;
         		}
         		stats.setStat(stat, valueNum);
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_NOTICE_SET.getMessage(stat.toString(),bukkitPlayerName,valueNum));
+        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_STAT_NOTICE_SET.getMessage(stat.toString(),bukkitPlayerName,valueNum));
         		if(!isPlayerOnline) {
         			getKonquest().getDatabaseThread().getDatabase().pushPlayerStats(offlinePlayer.getOfflineBukkitPlayer(), stats);
         			stats = null;
@@ -94,13 +95,13 @@ public class StatAdminCommand extends CommandBase {
         		try {
         			valueNum = Integer.parseInt(value);
         		} catch(NumberFormatException e) {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_ERROR_VALUE.getMessage(e.getMessage()));
+        			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_STAT_ERROR_VALUE.getMessage(e.getMessage()));
                     return;
         		}
         		currentValue = stats.getStat(stat);
         		int newValue = currentValue+valueNum;
         		stats.setStat(stat, newValue);
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_NOTICE_ADD.getMessage(valueNum,stat.toString(),bukkitPlayerName,newValue));
+        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_STAT_NOTICE_ADD.getMessage(valueNum,stat.toString(),bukkitPlayerName,newValue));
         		if(!isPlayerOnline) {
         			getKonquest().getDatabaseThread().getDatabase().pushPlayerStats(offlinePlayer.getOfflineBukkitPlayer(), stats);
         			stats = null;
@@ -110,7 +111,7 @@ public class StatAdminCommand extends CommandBase {
         		break;
         	case "clear":
         		stats.setStat(stat, 0);
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_STAT_NOTICE_CLEAR.getMessage(stat.toString(),bukkitPlayerName));
+        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_STAT_NOTICE_CLEAR.getMessage(stat.toString(),bukkitPlayerName));
             	if(!isPlayerOnline) {
             		getKonquest().getDatabaseThread().getDatabase().pushPlayerStats(offlinePlayer.getOfflineBukkitPlayer(), stats);
             		stats = null;
@@ -119,7 +120,7 @@ public class StatAdminCommand extends CommandBase {
             	}
         		break;
         	default:
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+				sendInvalidArgMessage(bukkitPlayer, AdminCommandType.STAT);
 			}
         }
 	}

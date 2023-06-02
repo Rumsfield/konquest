@@ -90,6 +90,8 @@ public Metrics(JavaPlugin plugin, int serviceId) {
             logResponseStatusText);
   }
 
+  public boolean isEnabled() { return metricsBase.enabled; }
+
   /**
    * Adds a custom chart.
    *

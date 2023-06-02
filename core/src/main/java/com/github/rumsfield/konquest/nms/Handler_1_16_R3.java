@@ -1,9 +1,9 @@
 package com.github.rumsfield.konquest.nms;
 
 import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.reflect.FieldAccessException;
-import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import net.minecraft.server.v1_16_R3.Entity;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -64,7 +64,7 @@ public class Handler_1_16_R3 implements VersionHandler {
 			fieldPlayersSuccess = true;
 			
 			try {
-			    KonquestPlugin.getProtocolManager().sendServerPacket(player, teamPacket);
+				ProtocolLibrary.getProtocolManager().sendServerPacket(player, teamPacket);
 			} catch (InvocationTargetException e) {
 			    throw new RuntimeException(
 			        "Cannot send packet " + teamPacket, e);
