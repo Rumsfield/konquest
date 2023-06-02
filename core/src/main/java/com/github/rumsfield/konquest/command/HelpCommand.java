@@ -50,8 +50,9 @@ public class HelpCommand extends CommandBase{
 			try {
 				page = Integer.parseInt(pageArg);
 			}
-			catch (NumberFormatException ex) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(ex.getMessage()));
+			catch (NumberFormatException ignored) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_HELP_ERROR_PAGE.getMessage());
+				sendInvalidArgMessage(bukkitPlayer,CommandType.HELP);
 				return;
 			}
 			page = Math.max(page,1);

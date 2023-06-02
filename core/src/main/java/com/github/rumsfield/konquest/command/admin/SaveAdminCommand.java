@@ -18,13 +18,14 @@ public class SaveAdminCommand extends CommandBase {
 
     public void execute() {
     	// k admin save
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length != 2) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.SAVE);
         } else {
 
         	getKonquest().save();
 
-        	ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SAVE_NOTICE_MESSAGE.getMessage());
+        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_SAVE_NOTICE_MESSAGE.getMessage());
         }
     }
     

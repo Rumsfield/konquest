@@ -23,26 +23,26 @@ public class ClaimCommand extends CommandBase {
 	
 	public void execute() {
 		// k claim [radius|auto] [<r>]
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length > 3) {
-            ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.CLAIM);
 			return;
 		}
-		Player bukkitPlayer = (Player) getSender();
 		World bukkitWorld = bukkitPlayer.getWorld();
 		// Verify that this command is being used in the default world
 		if(!getKonquest().isWorldValid(bukkitWorld)) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
 			return;
 		}
 		// Verify no Barbarians are using this command
 		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to find non-existent player");
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return;
 		}
 		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
 		if(player.isBarbarian()) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
 			return;
 		}
 
@@ -55,20 +55,19 @@ public class ClaimCommand extends CommandBase {
 		if(claimMode.equalsIgnoreCase("radius")){
 			boolean isAllowed = getKonquest().getCore().getBoolean(CorePath.TOWNS_ALLOW_CLAIM_RADIUS.getPath());
 			if(!isAllowed) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 				return;
 			}
 			if(getArgs().length != 3) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+				sendInvalidArgMessage(bukkitPlayer,CommandType.CLAIM);
 				return;
 			}
 			final int min = 1;
 			final int max = 5;
 			int radius = Integer.parseInt(getArgs()[2]);
 			if(radius < min || radius > max) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-				//ChatUtil.sendError((Player) getSender(), "Radius must be greater than 0 and less than or equal to 5.");
-				ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_CLAIM_ERROR_RADIUS.getMessage(min,max));
+				sendInvalidArgMessage(bukkitPlayer,CommandType.CLAIM);
+				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_RADIUS.getMessage(min,max));
 				return;
 			}
 			getKonquest().getTerritoryManager().claimRadiusForPlayer(player, bukkitPlayer.getLocation(), radius);
@@ -76,7 +75,7 @@ public class ClaimCommand extends CommandBase {
 		}else if (claimMode.equalsIgnoreCase("auto")){
 			boolean isAllowed = getKonquest().getCore().getBoolean(CorePath.TOWNS_ALLOW_CLAIM_AUTO.getPath());
 			if(!isAllowed) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 				return;
 			}
 			boolean doAuto = false;
@@ -85,7 +84,7 @@ public class ClaimCommand extends CommandBase {
 				// Check if player is already in claim state
 				if(player.getAutoFollow().equals(FollowType.CLAIM)) {
 					// Disable the auto state
-					ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
 					player.setAutoFollow(FollowType.NONE);
 				} else {
 					// Change state
@@ -98,12 +97,12 @@ public class ClaimCommand extends CommandBase {
 			if(doAuto) {
 				boolean isClaimSuccess = getKonquest().getTerritoryManager().claimForPlayer(player, bukkitPlayer.getLocation());
 				if(isClaimSuccess) {
-					ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
 					player.setAutoFollow(FollowType.CLAIM);
 				}
 			}
 		}else{
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.CLAIM);
 		}
 	}
 	

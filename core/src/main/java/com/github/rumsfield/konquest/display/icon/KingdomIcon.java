@@ -48,6 +48,8 @@ public class KingdomIcon implements MenuIcon {
 		List<String> loreList = new ArrayList<>();
 		if(kingdom.isAdminOperated()) {
 			loreList.add(propertyColor+MessagePath.LABEL_ADMIN_KINGDOM.getMessage());
+		} else {
+			loreList.add(propertyColor+MessagePath.LABEL_KINGDOM.getMessage());
 		}
 		if(kingdom.isPeaceful()) {
 			loreList.add(propertyColor+MessagePath.LABEL_PEACEFUL.getMessage());

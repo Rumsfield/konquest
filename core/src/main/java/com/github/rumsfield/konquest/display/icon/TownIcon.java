@@ -50,6 +50,7 @@ public class TownIcon implements MenuIcon {
 		assert meta != null;
 		// Add applicable labels
 		List<String> loreList = new ArrayList<>();
+		// Alerts
 		if(town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) &&
 				town.getKingdom().isCapitalImmune()) {
 			loreList.add(alertColor+MessagePath.LABEL_IMMUNITY.getMessage());
@@ -59,6 +60,12 @@ public class TownIcon implements MenuIcon {
 		}
 		if(town.isAttacked()) {
 			loreList.add(alertColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage());
+		}
+		// Properties
+		if(town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+			loreList.add(propertyColor+MessagePath.TERRITORY_CAPITAL.getMessage());
+		} else {
+			loreList.add(propertyColor+MessagePath.TERRITORY_TOWN.getMessage());
 		}
 		if(town.isOpen()) {
 			loreList.add(propertyColor+MessagePath.LABEL_OPEN.getMessage());
@@ -70,6 +77,7 @@ public class TownIcon implements MenuIcon {
 			meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
 			loreList.add(propertyColor+MessagePath.LABEL_SHIELD.getMessage());
 		}
+		// Lore
 		loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage() + ": " + valueColor + town.getNumResidents());
 		loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage() + ": " + valueColor + town.getChunkList().size());
 		loreList.addAll(lore);

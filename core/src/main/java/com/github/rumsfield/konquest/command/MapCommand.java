@@ -24,10 +24,10 @@ public class MapCommand extends CommandBase {
 	
 	public void execute() {
 		// k map [far|f|auto|a]
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length != 1 && getArgs().length != 2) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.MAP);
 		} else {
-        	Player bukkitPlayer = (Player) getSender();
 			if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
@@ -50,7 +50,7 @@ public class MapCommand extends CommandBase {
         				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
         			}
         		} else {
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+					sendInvalidArgMessage(bukkitPlayer,CommandType.MAP);
                     return;
         		}
         	}

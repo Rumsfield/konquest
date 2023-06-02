@@ -23,10 +23,10 @@ public class UnclaimAdminCommand extends CommandBase {
 
     public void execute() {
     	// k admin unclaim [radius|auto] [<r>]
+		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length > 4) {
-            ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.UNCLAIM);
 		} else {
-        	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
         	// Verify that this command is being used in the default world
         	if(!getKonquest().isWorldValid(bukkitWorld)) {
@@ -40,7 +40,7 @@ public class UnclaimAdminCommand extends CommandBase {
         		switch(unclaimMode) {
         		case "radius" :
         			if(getArgs().length != 4) {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+						sendInvalidArgMessage(bukkitPlayer, AdminCommandType.UNCLAIM);
         	            return;
         			}
         			
@@ -48,7 +48,7 @@ public class UnclaimAdminCommand extends CommandBase {
         			final int max = 16;
     				int radius = Integer.parseInt(getArgs()[3]);
     				if(radius < min || radius > max) {
-    					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+						sendInvalidArgMessage(bukkitPlayer, AdminCommandType.UNCLAIM);
     					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_UNCLAIM_ERROR_RADIUS.getMessage(min,max));
     					return;
     				}
@@ -82,7 +82,7 @@ public class UnclaimAdminCommand extends CommandBase {
         			break;
         			
         		default :
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+					sendInvalidArgMessage(bukkitPlayer, AdminCommandType.UNCLAIM);
 				}
         	} else {
         		// Unclaim the single chunk containing playerLoc for the current territory.
