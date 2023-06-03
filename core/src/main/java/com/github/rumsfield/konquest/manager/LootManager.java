@@ -6,25 +6,28 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.utility.*;
+import com.github.rumsfield.konquest.utility.Timer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
 import java.lang.reflect.Field;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class LootManager implements Timeable{
@@ -34,9 +37,11 @@ public class LootManager implements Timeable{
 	private long refreshTimeSeconds;
 	private long markedRefreshTime;
 	private int lootCount;
-	private final Random randomness;
 	private final Timer lootRefreshTimer;
+	private final Timer armorStandUpdateTimer;
 	private final HashMap<ItemStack,Integer> lootTable;
+	private final LinkedList<ArmorStand> armorStandTimers;
+	private final NamespacedKey armorStandTimerPersistentKey;
 
 	
 	public LootManager(Konquest konquest) {
@@ -45,9 +50,11 @@ public class LootManager implements Timeable{
 		this.markedRefreshTime = 0;
 		this.lootRefreshLog = new HashMap<>();
 		this.lootCount = 0;
-		this.randomness = new Random();
 		this.lootRefreshTimer = new Timer(this);
+		this.armorStandUpdateTimer = new Timer(this);
 		this.lootTable = new HashMap<>();
+		this.armorStandTimers = new LinkedList<>();
+		this.armorStandTimerPersistentKey = new NamespacedKey(Konquest.getInstance().getPlugin(), "isTimer");
 	}
 	
 	public void initialize() {
@@ -58,6 +65,8 @@ public class LootManager implements Timeable{
 			lootRefreshTimer.setTime((int)refreshTimeSeconds);
 			lootRefreshTimer.startLoopTimer();
 		}
+		armorStandUpdateTimer.setTime(0);
+		armorStandUpdateTimer.startLoopTimer();
 		markedRefreshTime = new Date().getTime();
 		lootCount = konquest.getCore().getInt(CorePath.MONUMENTS_LOOT_COUNT.getPath(),0);
 		if(lootCount < 0) {
@@ -69,6 +78,18 @@ public class LootManager implements Timeable{
 			ChatUtil.printConsoleError("Failed to load loot table, check for syntax errors.");
 		}
 		ChatUtil.printDebug("Loot Manager is ready with loot count: "+lootCount);
+	}
+
+	private void addArmorStand(Location location) {
+		ArmorStand armorStand = Objects.requireNonNull(location.getWorld()).spawn(location.add(0.5, -1, 0.5), ArmorStand.class);
+		armorStand.setVisible(false);
+		armorStand.setCanPickupItems(false);
+		armorStand.setAI(false);
+		armorStand.setGravity(false);
+		armorStand.setCustomNameVisible(true);
+		armorStand.getPersistentDataContainer().set(this.armorStandTimerPersistentKey, PersistentDataType.STRING, "true");
+		armorStand.setCustomName(Konquest.getTimeFormat(this.lootRefreshTimer.getTime(), ChatColor.WHITE));
+		this.armorStandTimers.add(armorStand);
 	}
 	
 	// Loads loot table from file
@@ -270,6 +291,8 @@ public class LootManager implements Timeable{
 		fillLoot(inventory, count);
 		long lootLastFilledTime = now.getTime();
 		lootRefreshLog.put(invLoc,lootLastFilledTime);
+		invLoc.getWorld().getNearbyEntities(invLoc, 1, 1, 1, (e) -> e.getType() == EntityType.ARMOR_STAND && e.getPersistentDataContainer().has(armorStandTimerPersistentKey, PersistentDataType.STRING)).forEach(Entity::remove);
+		addArmorStand(invLoc);
 		return true;
 	}
 	
@@ -347,12 +370,17 @@ public class LootManager implements Timeable{
 		return item;
 	}
 
+	public void removeArmorStands() {
+		this.armorStandTimers.forEach(Entity::remove);
+	}
+
 	@Override
 	public void onEndTimer(int taskID) {
 		if(taskID == 0) {
 			ChatUtil.printDebug("Loot Refresh Timer ended with null taskID!");
 			return;
 		}
+
 		if(taskID == lootRefreshTimer.getTaskID()) {
 			markedRefreshTime = new Date().getTime();
 			ChatUtil.printDebug("Loot Refresh timer marked new availability time");
@@ -362,6 +390,11 @@ public class LootManager implements Timeable{
 					ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_LOOT.getMessage());
 				}
 			}
+			removeArmorStands();
+		}
+
+		if (taskID == armorStandUpdateTimer.getTaskID()) {
+			this.armorStandTimers.forEach(armorStand -> armorStand.setCustomName(Konquest.getTimeFormat(this.lootRefreshTimer.getTime(), ChatColor.WHITE)));
 		}
 	}
 }

@@ -9,7 +9,7 @@ dependencies{
 
 tasks {
     shadowJar {
-        archiveBaseName.set(rootProject.name+"-"+project.name)
+        archiveBaseName.set("Konquest-${project.name}")
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir/build/libs"))
     }

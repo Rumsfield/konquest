@@ -75,6 +75,7 @@ public class KonquestPlugin extends JavaPlugin {
 			konquest.getConfigManager().saveConfigs();
 			konquest.getDatabaseThread().flushDatabase();
 			konquest.getDatabaseThread().getDatabase().getDatabaseConnection().disconnect();
+			konquest.getLootManager().removeArmorStands();
 			ChatUtil.printDebug("Finished onDisable");
 		}
 	}
