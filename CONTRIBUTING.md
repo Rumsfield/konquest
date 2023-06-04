@@ -25,11 +25,11 @@ of the Konquest repository and follow the flow:
 
 ## Working on Topics
 A topic is any task or update to the code. It could be a new feature or a bug fix.
-Every topic must have an associated issue in the repository's Issues page.
+Every topic must have an associated issue in the repository's [Issues page](https://github.com/Rumsfield/konquest/issues).
 Each issue has an ID number, which is used to reference the topic branch name.
 
 ### Topic branch naming convention
-Topic branche names must use 1 of 3 keywords:
+Topic branch names must use 1 of 2 keywords:
 * `feature` - For most topics, related to adding, removing or optimizing code.
 * `bugfix` - For generally fixing broken things in the code.
 
@@ -79,15 +79,23 @@ and commit the resolved files. Remember to merge `develop` into your branch at l
 
 When your work is finished, create a new [Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)
 to merge it into the `develop` branch.
-* **DO NOT** merge branches directly into `develop` or `main`.
-* **DO NOT** commit directly in `develop` or `main`.
+* **DO NOT** merge your topic branch directly into `develop` or `main` using the `git merge` command.
+* **DO NOT** commit directly in `develop` or `main` using the `git commit` command.
 * **ALWAYS** use Pull Requests to merge branches back into `develop`.
 
 Once the Pull Request is merged and closed, **do not delete** the topic branch and just leave it alone.
 
 ## Preparing Releases
 Usually the latest work on the `develop` branch becomes the next release.
-Planning for the content of a release may be done in an issue, by tracking which topic issues to include.
+Planning for the content of a release is done in an issue, by tracking which topic issues to include.
+
+Create a topic branch for the new release, after all other desired topic branches have been merged into `develop`.
+In the release branch, 
+* Update the project version.
+* Re-generate the Javadoc if there were API-related changes.
+* Do a final play test of a plugin build in a fresh server.
+
+Merge the release branch back into `develop` like normal when finished.
 
 ### Release versioning
 Release versions follow a MAJOR.MINOR.PATCH format. The project version is defined in [this gradle script](https://github.com/Rumsfield/konquest/blob/main/build.gradle.kts).
