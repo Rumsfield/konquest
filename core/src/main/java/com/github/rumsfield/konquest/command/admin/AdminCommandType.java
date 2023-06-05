@@ -7,7 +7,7 @@ public enum AdminCommandType {
 	HELP        (Material.REDSTONE_TORCH,		"konquest.admin.help",         "[<page>]",                                                     MessagePath.DESCRIPTION_ADMIN_HELP.getMessage()),
 	BYPASS      (Material.SPECTRAL_ARROW,		"konquest.admin.bypass",       "",                                                             MessagePath.DESCRIPTION_ADMIN_BYPASS.getMessage()),
 	LIST        (Material.PAPER,				"konquest.admin.list",         "[kingdom|town|camp|ruin|sanctuary] [<page>]",                  MessagePath.DESCRIPTION_ADMIN_LIST.getMessage()),
-	KINGDOM     (Material.GOLDEN_SWORD,			"konquest.admin.kingdom",      "menu|create|destroy|add|kick|rename|admin <kingdom> [<name>]", MessagePath.DESCRIPTION_ADMIN_KINGDOM.getMessage()),
+	KINGDOM     (Material.GOLDEN_SWORD,			"konquest.admin.kingdom",      "menu|create|destroy|add|kick|rename|admin|webcolor <kingdom> [<name>]", MessagePath.DESCRIPTION_ADMIN_KINGDOM.getMessage()),
 	TOWN        (Material.OBSIDIAN,				"konquest.admin.town",         "create|destroy|add|kick|lord|knight|rename|upgrade|shield|armor|plots|options|specialize <town> [<name>] [<arg>]",  MessagePath.DESCRIPTION_ADMIN_TOWN.getMessage()),
 	CAMP        (Material.ORANGE_BED,			"konquest.admin.camp",         "create|destroy <player>",                                      MessagePath.DESCRIPTION_ADMIN_CAMP.getMessage()),
 	CLAIM       (Material.DIAMOND_SHOVEL,		"konquest.admin.claim",        "[radius|auto|undo] [<radius>]",                                MessagePath.DESCRIPTION_ADMIN_CLAIM.getMessage()),

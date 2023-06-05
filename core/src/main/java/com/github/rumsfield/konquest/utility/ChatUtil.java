@@ -206,6 +206,46 @@ public class ChatUtil {
 		}
 		return result;
 	}
+
+	/**
+	 * Get a RGB color int from a string name. Supported names:
+	 * 1. Any ColorRGB enum name (maps to Bukkit.Color fields)
+	 * 2. A hex color code with format #RRGGBB
+	 * @param colorStr The name of the color, or hex code
+	 * @return The RGB color integer value, or -1 if no valid color could be found.
+	 */
+	public static int lookupColorRGB(String colorStr) {
+		// First, check for ColorRGB name
+		ColorRGB namedColor = ColorRGB.fromName(colorStr);
+		if(namedColor != null) {
+			// Found valid color
+			return namedColor.getColor().asRGB();
+		}
+		// Second, check for hex color code
+		if(colorStr.matches("#[a-fA-F0-9]{6}")) {
+			try {
+				return Integer.decode(colorStr);
+			} catch(NumberFormatException ignored) {}
+		}
+		// Couldn't find a supported color
+		return -1;
+	}
+
+	/**
+	 * Get the name of the color, or hex value as a string.
+	 * @param hexVal The integer RGB color value
+	 * @return The string color name or hex numbers
+	 */
+	public static String reverseLookupColorRGB(int hexVal) {
+		// First, check if the hex matches a ColorRGB enum
+		ColorRGB hexColor = ColorRGB.fromColor(Color.fromRGB(hexVal));
+		if(hexColor != null) {
+			// Found valid color
+			return hexColor.getName();
+		}
+		// Second, format the hex value into a string
+		return "#"+Integer.toHexString(hexVal);
+	}
 	
 	public static void printDebug(String message) {
 		if(Konquest.getInstance().getCore().getBoolean(CorePath.DEBUG.getPath())) {

@@ -3849,6 +3849,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			// Kingdom Operating Mode
 			boolean isAdmin = kingdomSection.getBoolean("admin", false);
 			newKingdom.setIsAdminOperated(isAdmin);
+			// Kingdom Web Color
+			int webColor = kingdomSection.getInt("webcolor", -1);
+			newKingdom.setWebColor(webColor);
 			// Kingdom Template
 			String templateName = kingdomSection.getString("template","");
 			if(konquest.getSanctuaryManager().isTemplate(templateName)) {
@@ -4370,6 +4373,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			kingdomSection.set("template",kingdom.getMonumentTemplateName());
 			// Kingdom Operating Mode
 			kingdomSection.set("admin",kingdom.isAdminOperated());
+			// Kingdom Web Color
+			kingdomSection.set("webcolor",kingdom.getWebColor());
 			// Kingdom Properties
 			ConfigurationSection kingdomPropertiesSection = kingdomSection.createSection("properties");
 			for(KonPropertyFlag flag : kingdom.getAllProperties().keySet()) {

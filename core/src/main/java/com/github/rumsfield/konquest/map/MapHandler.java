@@ -457,7 +457,12 @@ public class MapHandler {
 				break;
 			case CAPITAL:
 			case TOWN:
-				result = stringToRGB(territory.getKingdom().getName());
+				int webColor = territory.getKingdom().getWebColor();
+				if(webColor == -1) {
+					result = stringToRGB(territory.getKingdom().getName());
+				} else {
+					result = webColor;
+				}
 				break;
 			default:
 				break;
