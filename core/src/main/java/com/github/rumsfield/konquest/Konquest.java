@@ -243,6 +243,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	    		case "v1_19_R1":
 				case "v1_19_R2":
 				case "v1_19_R3":
+				case "v1_20_R1":
 					if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
 	    			break;
 	    		default:
