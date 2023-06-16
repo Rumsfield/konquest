@@ -50,6 +50,9 @@ core:
   
   # Enable player nametag colors. This may override other plugin nametag formatting (true/false)
   player_nametag_format: true
+
+  # The number of automatic data backups to keep before deleting the oldest ones (0 to disable creating any backups, integer >= 0)
+  backup_data_amount: 10
   
   # //// CORE.CHAT \\\\
   chat:

@@ -62,6 +62,9 @@ public class ConfigManager{
 		addConfig("ruins", new KonConfig("data/ruins"));
 		addConfig("sanctuaries", new KonConfig("data/sanctuaries"));
 
+		// Backup Readme
+		Konquest.getInstance().getPlugin().saveResource("backup-instructions-readme.txt", true);
+
 		// Language files
 		addConfig("lang_english", new KonConfig("lang/english",false));
 		updateConfigVersion("lang_english");
