@@ -6,6 +6,7 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.Version;
 import org.bukkit.*;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.maxgamer.quickshop.api.QuickShopAPI;
 import org.maxgamer.quickshop.api.shop.Shop;
@@ -23,28 +24,29 @@ public class QuickShopHook implements PluginHook {
 	public QuickShopHook(Konquest konquest) {
 		this.konquest = konquest;
 		this.isEnabled = false;
+		this.quickShopAPI = null;
 	}
-	
+
 	@Override
-	public void reload() {
+	public String getPluginName() {
+		return "QuickShop";
+	}
+
+	@Override
+	public int reload() {
 		// Attempt to integrate QuickShop
-		quickShopAPI = (QuickShopAPI) Bukkit.getPluginManager().getPlugin("QuickShop");
-		if(quickShopAPI == null){
-			ChatUtil.printConsoleAlert("Could not integrate QuickShop, missing or disabled.");
-			return;
+		Plugin quickShop = Bukkit.getPluginManager().getPlugin("QuickShop");
+		if(quickShop == null) {
+			return 1;
 		}
-		final JavaPlugin plugin = (JavaPlugin) quickShopAPI;
-		if (!plugin.isEnabled()){
-			ChatUtil.printConsoleAlert("Could not integrate QuickShop, disabled.");
-			return;
+		if(!quickShop.isEnabled()) {
+			return 2;
 		}
 		if(!konquest.getCore().getBoolean(CorePath.INTEGRATION_QUICKSHOP.getPath(),false)) {
-			ChatUtil.printConsoleAlert("Disabled QuickShop integration from core config settings.");
-			return;
+			return 3;
 		}
-
 		// Verify version requirement
-		String ver = plugin.getDescription().getVersion();
+		String ver = quickShop.getDescription().getVersion();
 		String reqMin = "4.0.9.4";
 		String reqMax = "4.0.9.10";
 		boolean isAboveMinVersion = false;
@@ -61,17 +63,17 @@ public class QuickShopHook implements PluginHook {
 
 		if(!isAboveMinVersion){
 			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too old. You must update it to at least version "+reqMin);
-			return;
+			return -1;
 		}
 		if(!isBelowMaxVersion){
 			ChatUtil.printConsoleError("Failed to integrate QuickShop, plugin version "+ver+" is too new. You must revert it to at most version "+reqMax);
-			return;
+			return -1;
 		}
 
+		quickShopAPI = (QuickShopAPI) quickShop;
 		isEnabled = true;
 		konquest.getPlugin().getServer().getPluginManager().registerEvents(new QuickShopListener(konquest.getPlugin()), konquest.getPlugin());
-		ChatUtil.printConsoleAlert("Successfully integrated QuickShop version " + ver);
-
+		return 0;
 	}
 	
 	@Override

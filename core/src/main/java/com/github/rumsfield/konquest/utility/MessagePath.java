@@ -478,6 +478,7 @@ public enum MessagePath {
 	COMMAND_CLAIM_ERROR_FAIL_CLAIMED            (0, "command.claim.error.fail-claimed"),
 	COMMAND_FAVOR_NOTICE_MESSAGE                (1, "command.favor.notice.message"),
 	COMMAND_HELP_NOTICE_MESSAGE                 (0, "command.help.notice.message"),
+	COMMAND_HELP_ERROR_PAGE                     (0, "command.help.error.page"),
 	COMMAND_INFO_NOTICE_KINGDOM_HEADER          (1, "command.info.notice.kingdom-header"),
 	COMMAND_INFO_NOTICE_TOWN_HEADER             (1, "command.info.notice.town-header"),
 	COMMAND_KINGDOM_BROADCAST_CREATE            (2, "command.kingdom.broadcast.create"),

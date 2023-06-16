@@ -93,8 +93,8 @@ public class Konquest implements KonquestAPI, Timeable {
     private Team alliedTeam;
     private Team barbarianTeam;
     private VersionHandler versionHandler;
+	private boolean isVersionSupported;
     private boolean isVersionHandlerEnabled;
-    private boolean isPacketSendEnabled;
 	
 	private EventPriority chatPriority;
 	private static final EventPriority defaultChatPriority = EventPriority.HIGH;
@@ -154,8 +154,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		this.pingTimer = new Timer(this);
 		this.saveIntervalSeconds = 0;
 		this.offlineTimeoutSeconds = 0;
+		this.isVersionSupported = true;
 		this.isVersionHandlerEnabled = false;
-		this.isPacketSendEnabled = false;
 		this.teleportLocationQueue = new HashMap<>();
 	}
 	
@@ -164,6 +164,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		configManager.initialize();
 		checkCorePaths();
 		boolean debug = getCore().getBoolean(CorePath.DEBUG.getPath());
+		ChatUtil.printDebug("Beginning core Konquest initialization");
 		ChatUtil.printDebug("Debug is "+debug);
 		String worldName = getCore().getString(CorePath.WORLD_NAME.getPath());
 		ChatUtil.printDebug("Primary world is "+worldName);
@@ -176,6 +177,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		ruinManager.initialize();
 		initManagers();
 		initWorlds();
+		printConfigFeatures();
 		
 		databaseThread.setSleepSeconds(saveIntervalSeconds);
 		if(!databaseThread.isRunning()) {
@@ -201,12 +203,12 @@ public class Konquest implements KonquestAPI, Timeable {
         barbarianTeam.setColor(barbarianColor1);
         
         // Set up version-specific classes
-        initVersionHandlers();
+		initVersionHandlers();
 		
 		// Render Maps
 		mapHandler.initialize();
 		
-		ChatUtil.printDebug("Finished Initialization");
+		ChatUtil.printDebug("Finished core Konquest initialization");
 	}
 	
 	public void disable() {
@@ -222,62 +224,58 @@ public class Konquest implements KonquestAPI, Timeable {
     		return;
     	}
     	ChatUtil.printConsoleAlert("Your server version is "+version+", "+Bukkit.getServer().getBukkitVersion());
-    	boolean isVersionHandlerReady;
-    	
+    	boolean isProtocolLibEnabled = integrationManager.getProtocolLib().isEnabled();
     	// Version-specific cases
     	try {
 	    	switch(version) {
 	    		case "v1_16_R3":
-	    			versionHandler = new Handler_1_16_R3();
+					if(isProtocolLibEnabled) { versionHandler = new Handler_1_16_R3(); }
 	    			break;
 	    		case "v1_17_R1":
-	    			versionHandler = new Handler_1_17_R1();
+					if(isProtocolLibEnabled) { versionHandler = new Handler_1_17_R1(); }
 	    			break;
 	    		case "v1_18_R1":
-	    			versionHandler = new Handler_1_18_R1();
+					if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R1(); }
 	    			break;
 	    		case "v1_18_R2":
-	    			versionHandler = new Handler_1_18_R2();
+					if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R2(); }
 	    			break;
 	    		case "v1_19_R1":
-	    			versionHandler = new Handler_1_19_R1();
-	    			break;
-	    		case "v1_19_R2":
-	    			versionHandler = new Handler_1_19_R2();
-	    			break;
+				case "v1_19_R2":
 				case "v1_19_R3":
-					//TODO Make a new handler, but 1_19_R2 probably will work fine
-					versionHandler = new Handler_1_19_R2();
-					break;
+				case "v1_20_R1":
+					if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
+	    			break;
 	    		default:
+					isVersionSupported = false;
 	    			ChatUtil.printConsoleError("This version of Minecraft is not supported by Konquest!");
 	    			break;
 	    	}
     	} catch (Exception | NoClassDefFoundError e) {
-    		ChatUtil.printConsoleError("Failed to setup a version handler: ");
+    		ChatUtil.printConsoleError("Failed to setup a version handler, ProtocolLib is probably missing. ");
     		e.printStackTrace();
     	}
-    	isVersionHandlerReady = versionHandler != null;
-    	
-    	if(isVersionHandlerReady) {
-    		isVersionHandlerEnabled = true;
-    		if(plugin.isProtocolEnabled()) {
-        		ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version.");
-        		isPacketSendEnabled = true;
-        	} else {
-        		ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is missing or disabled! Check version.");
-        	}
-    	} else {
-    		ChatUtil.printConsoleError("Some Konquest features are disabled. See previous error messages.");
-    	}
-    	
+
+		if(isProtocolLibEnabled) {
+			if(versionHandler != null) {
+				isVersionHandlerEnabled = true;
+				ChatUtil.printConsoleAlert("Successfully registered name color packets for this server version");
+			}
+		} else {
+			ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is missing or disabled! Check version.");
+		}
+		if(!isVersionHandlerEnabled) {
+			ChatUtil.printConsoleError("Some Konquest features are disabled. See previous error messages.");
+		}
 	}
 	
 	public void reload() {
+		ChatUtil.printConsoleAlert("Reloading config files");
 		configManager.reloadConfigs();
 		initManagers();
 		initWorlds();
-		ChatUtil.printDebug("Finished Reload");
+		printConfigFeatures();
+		ChatUtil.printConsoleAlert("Finished reload");
 	}
 	
 	private void initManagers() {
@@ -303,10 +301,9 @@ public class Konquest implements KonquestAPI, Timeable {
 		offlineTimeoutSeconds = getCore().getInt(CorePath.KINGDOMS_OFFLINE_TIMEOUT_DAYS.getPath(),0)* 86400L;
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;
-			ChatUtil.printConsoleError("offline_timeout_seconds in core.yml is less than 1 day, overriding to 1 day to prevent data loss.");
+			ChatUtil.printConsoleError("Offline timeout setting is less than 1 day, overriding to 1 day to prevent data loss.");
 		}
 		saveIntervalSeconds = getCore().getInt(CorePath.SAVE_INTERVAL.getPath(),60)*60;
-		ChatUtil.printConsoleAlert("Save interval is "+saveIntervalSeconds+" seconds");
 		if(saveIntervalSeconds > 0) {
 			saveTimer.stopTimer();
 			saveTimer.setTime(saveIntervalSeconds);
@@ -326,7 +323,6 @@ public class Konquest implements KonquestAPI, Timeable {
 		kingdomManager.updateSmallestKingdom();
 		kingdomManager.updateAllTownDisabledUpgrades();
 		kingdomManager.updateKingdomOfflineProtection();
-		
 	}
 	
 	private void initWorlds() {
@@ -409,6 +405,41 @@ public class Konquest implements KonquestAPI, Timeable {
 				ChatUtil.printConsoleError("Internal error, core path "+testPath.getPath()+" does not exist within core.yml file.");
 			}
 		}
+	}
+
+	private void printConfigFeatures() {
+		String lineTemplate = "%-30s -> %s";
+		String [] status = {
+				String.format(lineTemplate,"Accomplishment Prefixes",boolean2enable(getCore().getBoolean(CorePath.ACCOMPLISHMENT_PREFIX.getPath()))),
+				String.format(lineTemplate,"Tutorial Quests",boolean2enable(getCore().getBoolean(CorePath.DIRECTIVE_QUESTS.getPath()))),
+				String.format(lineTemplate,"Chat Formatting",boolean2enable(getCore().getBoolean(CorePath.CHAT_ENABLE_FORMAT.getPath()))),
+				String.format(lineTemplate,"Admin Kingdoms Only",boolean2enable(getCore().getBoolean(CorePath.KINGDOMS_CREATE_ADMIN_ONLY.getPath()))),
+				String.format(lineTemplate,"Combat Tag",boolean2enable(getCore().getBoolean(CorePath.COMBAT_PREVENT_COMMAND_ON_DAMAGE.getPath()))),
+				String.format(lineTemplate,"Town Upgrades",boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_UPGRADES.getPath()))),
+				String.format(lineTemplate,"Town Shields",boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_SHIELDS.getPath()))),
+				String.format(lineTemplate,"Town Armor",boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_ARMOR.getPath()))),
+				String.format(lineTemplate,"Town Specializations",boolean2enable(getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath()))),
+				String.format(lineTemplate,"Town Plots",boolean2enable(getCore().getBoolean(CorePath.PLOTS_ENABLE.getPath()))),
+				String.format(lineTemplate,"Barbarian Camps",boolean2enable(getCore().getBoolean(CorePath.CAMPS_ENABLE.getPath()))),
+				String.format(lineTemplate,"Barbarian Clans",boolean2enable(getCore().getBoolean(CorePath.CAMPS_CLAN_ENABLE.getPath())))
+		};
+		ChatUtil.printConsoleAlert("Feature Summary...");
+		for (String row : status) {
+			String line = ChatColor.GOLD+"> "+ChatColor.RESET + row;
+			Bukkit.getServer().getConsoleSender().sendMessage(line);
+		}
+	}
+
+	private String boolean2enable(boolean val) {
+		String result = "";
+		if(val) {
+			//result = ChatUtil.parseHex("#60C030")+"Enabled"; // Green
+			result = ChatColor.DARK_GREEN+"Enabled";
+		} else {
+			//result = ChatUtil.parseHex("#B040C0")+"Disabled"; // Light Purple
+			result = ChatColor.DARK_RED+"Disabled";
+		}
+		return result;
 	}
 	
 	public void initOnlinePlayers() {
@@ -576,7 +607,9 @@ public class Konquest implements KonquestAPI, Timeable {
 		// This can be null!
 		return versionHandler;
 	}
-	
+
+	public boolean isVersionSupported() { return isVersionSupported; }
+
 	public boolean isVersionHandlerEnabled() {
 		return isVersionHandlerEnabled;
 	}
@@ -1186,7 +1219,7 @@ public class Konquest implements KonquestAPI, Timeable {
      * @param player The player to send the packets to
      */
     public void updateNamePackets(KonPlayer player) {
-    	if(!isPacketSendEnabled) {
+    	if(!isVersionHandlerEnabled) {
     		return;
     	}
     	// Loop over all online players, populate team lists and send each online player a team packet for arg player

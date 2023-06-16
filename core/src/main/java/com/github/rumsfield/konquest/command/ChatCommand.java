@@ -18,12 +18,11 @@ public class ChatCommand extends CommandBase {
 	
 	public void execute() {
 		// k chat
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length != 1) {
-            ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.CHAT);
 			return;
 		}
-		Player bukkitPlayer = (Player) getSender();
-
 		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to find non-existent player");
 			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());

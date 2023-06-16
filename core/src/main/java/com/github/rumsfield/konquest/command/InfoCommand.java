@@ -30,10 +30,10 @@ public class InfoCommand extends CommandBase {
 	
 	public void execute() {
 		// k info <kingdomName>|<townName>|<playerName>
+		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length != 1 && getArgs().length != 2) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.INFO);
 		} else {
-        	Player bukkitPlayer = (Player) getSender();
         	infoType displayState;
         	// Init info as own player's
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {

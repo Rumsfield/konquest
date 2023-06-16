@@ -3791,14 +3791,16 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		ConfigurationSection rootConfig = kingdomsConfig.getConfigurationSection("kingdoms");
 		assert rootConfig != null;
         // Count all towns
+		int numKingdoms = 0;
         int numTowns = 0;
         for(String kingdomName : rootConfig.getKeys(false)) {
 			ConfigurationSection kingdomTownsSection = rootConfig.getConfigurationSection(kingdomName+".towns");
 			if(kingdomTownsSection != null) {
 				numTowns += kingdomTownsSection.getKeys(false).size();
 			}
+			numKingdoms++;
         }
-        LoadingPrinter loadBar = new LoadingPrinter(numTowns,"Loading "+numTowns+" Towns");
+        LoadingPrinter loadBar = new LoadingPrinter(numTowns,"Loading "+numKingdoms+" Kingdoms with "+numTowns+" Towns");
         // Load all Kingdoms
         for(String kingdomName : rootConfig.getKeys(false)) {
         	ConfigurationSection kingdomSection = rootConfig.getConfigurationSection(kingdomName);

@@ -22,11 +22,10 @@ public class TravelAdminCommand  extends CommandBase {
 
     public void execute() {
     	// k admin travel <name>
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length != 3 && getArgs().length != 4) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.TRAVEL);
 		} else {
-        	Player bukkitPlayer = (Player) getSender();
-        	
         	String travelTo = getArgs()[2];
         	Location destination;
         	if(getKonquest().getKingdomManager().isKingdom(travelTo)) {
@@ -53,7 +52,7 @@ public class TravelAdminCommand  extends CommandBase {
         			}
         		}
         	}
-        	ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(travelTo));
+        	ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(travelTo));
         }
     }
     

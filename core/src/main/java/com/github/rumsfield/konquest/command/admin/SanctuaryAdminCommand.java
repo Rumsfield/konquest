@@ -23,18 +23,18 @@ public class SanctuaryAdminCommand extends CommandBase {
 	@Override
 	public void execute() {
 		// k admin sanctuary create|remove|rename <name> [<name>]
+		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length != 4 && getArgs().length != 5) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.SANCTUARY);
             return;
         }
-		Player bukkitPlayer = (Player) getSender();
 		if(getKonquest().isWorldIgnored(bukkitPlayer.getWorld())) {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
 			return;
 		}
 		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to find non-existent player");
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return;
 		}
 
@@ -43,7 +43,7 @@ public class SanctuaryAdminCommand extends CommandBase {
 		
 		if(cmdMode.equalsIgnoreCase("create")) {
 			if (getArgs().length != 4) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+				sendInvalidArgMessage(bukkitPlayer, AdminCommandType.SANCTUARY);
 				return;
 			}
 			Location playerLoc = bukkitPlayer.getLocation();
@@ -52,28 +52,28 @@ public class SanctuaryAdminCommand extends CommandBase {
         	}
         	boolean pass = getKonquest().getSanctuaryManager().addSanctuary(playerLoc, name);
         	if(!pass) {
-        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_CREATE.getMessage(name));
+        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_CREATE.getMessage(name));
 			} else {
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_CREATE.getMessage(name));
+        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_CREATE.getMessage(name));
         		// Render border particles
         		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         		getKonquest().getTerritoryManager().updatePlayerBorderParticles(player);
         	}
 		} else if(cmdMode.equalsIgnoreCase("remove")) {
 			if(!getKonquest().getSanctuaryManager().isSanctuary(name)) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(name));
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(name));
                 return;
 			}
 			boolean pass = getKonquest().getSanctuaryManager().removeSanctuary(name);
         	if(!pass) {
-        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_REMOVE.getMessage(name));
+        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_REMOVE.getMessage(name));
 			} else {
-        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_REMOVE.getMessage(name));
+        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_REMOVE.getMessage(name));
         	}
 		} else if(cmdMode.equalsIgnoreCase("rename")) {
 			if (getArgs().length == 5) {
 				if(!getKonquest().getSanctuaryManager().isSanctuary(name)) {
-					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(name));
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(name));
 	                return;
 				}
 				String newName = getArgs()[4];
@@ -82,15 +82,15 @@ public class SanctuaryAdminCommand extends CommandBase {
 	        	}
 				boolean pass = getKonquest().getSanctuaryManager().renameSanctuary(name,newName);
 				if(!pass) {
-	        		ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_RENAME.getMessage(name,newName));
+	        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_RENAME.getMessage(name,newName));
 				} else {
-	        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_RENAME.getMessage(name,newName));
+	        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_RENAME.getMessage(name,newName));
 	        	}
 			} else {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+				sendInvalidArgMessage(bukkitPlayer, AdminCommandType.SANCTUARY);
 			}
 		} else {
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.SANCTUARY);
 		}
 	}
 	

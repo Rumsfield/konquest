@@ -75,7 +75,6 @@ public class KonConfig {
 				config = defaultConfig;
 			}
 		}
-        config.options().parseComments(true);
         return result;
 	}
 	

@@ -24,8 +24,9 @@ public class CaptureAdminCommand extends CommandBase {
 	@Override
 	public void execute() {
 		// k admin capture <town> <kingdom>
+		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length != 4) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.CAPTURE);
 		} else {
         	String townName = getArgs()[2];
         	String kingdomName = getArgs()[3];
@@ -36,7 +37,7 @@ public class CaptureAdminCommand extends CommandBase {
 
 			// Check for existing kingdom
 			if(!getKonquest().getKingdomManager().isKingdom(kingdomName)) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
 				return;
 			}
 			KonKingdom kingdom = getKonquest().getKingdomManager().getKingdom(kingdomName);
@@ -44,7 +45,7 @@ public class CaptureAdminCommand extends CommandBase {
 
 			// Check for existing town in kingdom
 			if(!kingdom.isCreated() || kingdom.hasTown(townName) || kingdom.hasCapital(townName)) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 				return;
 			}
 			// Find town
@@ -60,7 +61,7 @@ public class CaptureAdminCommand extends CommandBase {
 			}
 			// Check for found town or capital name
 			if(town == null) {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(townName));
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(townName));
 				return;
 			}
 
@@ -80,7 +81,7 @@ public class CaptureAdminCommand extends CommandBase {
 				} else {
 					ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(townName));
 				}
-				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 				// For all online players...
 				for(KonPlayer onlinePlayer : getKonquest().getPlayerManager().getPlayersOnline()) {
 					// Teleport all players inside center chunk to new spawn location
@@ -112,7 +113,7 @@ public class CaptureAdminCommand extends CommandBase {
 				capturedTown.setBarProgress(1.0);
 				capturedTown.updateBarTitle();
 			} else {
-				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			}
         }
 	}

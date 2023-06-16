@@ -23,13 +23,13 @@ public class ClaimAdminCommand extends CommandBase {
 
     public void execute() {
     	// k admin claim [radius|auto|undo] [<r>]
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length > 4) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.CLAIM);
 		} else {
-        	Player bukkitPlayer = (Player) getSender();
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
-    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
     		}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
@@ -39,15 +39,15 @@ public class ClaimAdminCommand extends CommandBase {
         		switch(claimMode) {
         		case "radius" :
         			if(getArgs().length != 4) {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+						sendInvalidArgMessage(bukkitPlayer, AdminCommandType.CLAIM);
         	            return;
         			}
     				int radius = Integer.parseInt(getArgs()[3]);
     				final int min = 1;
         			final int max = 16;
     				if(radius < min || radius > max) {
-    					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
-    					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_CLAIM_ERROR_RADIUS.getMessage(min,max));
+						sendInvalidArgMessage(bukkitPlayer, AdminCommandType.CLAIM);
+    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_RADIUS.getMessage(min,max));
     					return;
     				}
     				getKonquest().getTerritoryManager().claimRadiusForAdmin(player, bukkitPlayer.getLocation(), radius);
@@ -60,7 +60,7 @@ public class ClaimAdminCommand extends CommandBase {
         				// Check if player is already in claim state
         				if(player.getAutoFollow().equals(FollowType.ADMIN_CLAIM)) {
         					// Disable the auto state
-        					ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
+        					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
         					player.setAutoFollow(FollowType.NONE);
         				} else {
         					// Change state
@@ -72,7 +72,7 @@ public class ClaimAdminCommand extends CommandBase {
         			}
         			if(doAuto) {
         				getKonquest().getTerritoryManager().claimForAdmin(player, playerLoc);
-        				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
+        				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
         				player.setAutoFollow(FollowType.ADMIN_CLAIM);
         			}
         			break;
@@ -80,14 +80,14 @@ public class ClaimAdminCommand extends CommandBase {
         		case "undo" :
         			boolean isUndoSuccess = getKonquest().getTerritoryManager().claimUndoForAdmin(player);
         			if(isUndoSuccess) {
-        				ChatUtil.sendNotice((Player) getSender(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+        				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
         			} else {
-        				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+        				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
         			}
         			break;
         			
         		default :
-        			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
+					sendInvalidArgMessage(bukkitPlayer, AdminCommandType.CLAIM);
 				}
         	} else {
         		// Claim the single chunk containing playerLoc for the adjacent territory.

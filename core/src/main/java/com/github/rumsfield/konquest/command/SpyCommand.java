@@ -31,10 +31,10 @@ public class SpyCommand extends CommandBase {
 	@Override
 	public void execute() {
 		// k spy
+		Player bukkitPlayer = (Player) getSender();
     	if (getArgs().length != 1) {
-    		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			sendInvalidArgMessage(bukkitPlayer,CommandType.SPY);
 		} else {
-        	Player bukkitPlayer = (Player) getSender();
         	World bukkitWorld = bukkitPlayer.getWorld();
         	// Verify allowed world
         	if(!getKonquest().isWorldValid(bukkitWorld)) {

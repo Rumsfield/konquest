@@ -43,18 +43,18 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		pageLabel = titleColor+MessagePath.LABEL_PLAYER.getMessage()+" "+infoPlayer.getOfflineBukkitPlayer().getName();
 		getMenu().addPage(0, 1, pageLabel);
 		
-		/* Kingdom Icon (3) */
+		/* Kingdom Icon (2) */
 		loreList = new ArrayList<>();
     	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
-    	KingdomIcon kingdom = new KingdomIcon(infoPlayer.getKingdom(),kingdomColor,loreList,3,true);
+    	KingdomIcon kingdom = new KingdomIcon(infoPlayer.getKingdom(),kingdomColor,loreList,2,true);
     	getMenu().getPage(0).addIcon(kingdom);
 		
-		/* Player Score Icon (4) */
+		/* Player Score Icon (3) */
 		int score = getKonquest().getKingdomManager().getPlayerScore(infoPlayer);
 		loreList = new ArrayList<>();
 		loreList.add(loreColor+MessagePath.MENU_SCORE_PLAYER_SCORE.getMessage()+": "+valueColor+score);
 		loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
-		PlayerIcon playerScore = new PlayerIcon(kingdomColor+infoPlayer.getOfflineBukkitPlayer().getName(),loreList,infoPlayer.getOfflineBukkitPlayer(),4,true,PlayerIconAction.DISPLAY_SCORE);
+		PlayerIcon playerScore = new PlayerIcon(kingdomColor+infoPlayer.getOfflineBukkitPlayer().getName(),loreList,infoPlayer.getOfflineBukkitPlayer(),3,true,PlayerIconAction.DISPLAY_SCORE);
 		getMenu().getPage(0).addIcon(playerScore);
 
 		/* General Info Icon (5) */

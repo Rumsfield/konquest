@@ -73,7 +73,7 @@ public class LootManager implements Timeable{
 			lootCount = 0;
 		}
 		if(loadLoot()) {
-			ChatUtil.printConsoleAlert("Loaded loot table from loot.yml");
+			ChatUtil.printDebug("Loaded loot table from loot.yml");
 		} else {
 			ChatUtil.printConsoleError("Failed to load loot table, check for syntax errors.");
 		}
