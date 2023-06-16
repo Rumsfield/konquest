@@ -81,7 +81,8 @@ public class LootManager implements Timeable{
 	}
 
 	private void addArmorStand(Location location) {
-		ArmorStand armorStand = Objects.requireNonNull(location.getWorld()).spawn(location.add(0.5, -1, 0.5), ArmorStand.class);
+		Location armorStandLoc = new Location(location.getWorld(),location.getX()+0.5,location.getY()-1,location.getZ()+0.5);
+		ArmorStand armorStand = Objects.requireNonNull(location.getWorld()).spawn(armorStandLoc, ArmorStand.class);
 		armorStand.setVisible(false);
 		armorStand.setCanPickupItems(false);
 		armorStand.setAI(false);
