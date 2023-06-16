@@ -39,7 +39,8 @@ Step 3:
     In the "Extract Compressed (Zipped) Folders" menu, click the Extract button.
 
 Step 4:
-    Make sure that a new "data" folder exists with the file contents shown in the above section.
+    Move the "data" folder from within the extracted backup up one level into the plugins/Konquest/ folder.
+    Make sure that the new "data" folder exists with the file contents shown in the above section.
 
 Step 5:
     Start the server and watch the console for any error messages.
