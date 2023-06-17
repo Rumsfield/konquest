@@ -7,15 +7,20 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.Version;
 import com.github.rumsfield.konquest.utility.ZipUtility;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class ConfigManager{
@@ -40,6 +45,7 @@ public class ConfigManager{
 	public void initialize() {
 		// Config Settings - unsaved
 		addConfig("core", new KonConfig("core",false));
+		createBackupData();
 		checkIncompatibleUpdate();
 		updateConfigVersion("core");
 		addConfig("upgrades", new KonConfig("upgrades",false));
@@ -61,6 +67,9 @@ public class ConfigManager{
 		addConfig("camps", new KonConfig("data/camps"));
 		addConfig("ruins", new KonConfig("data/ruins"));
 		addConfig("sanctuaries", new KonConfig("data/sanctuaries"));
+
+		// Backup Readme
+		Konquest.getInstance().getPlugin().saveResource("backup-instructions-readme.txt", true);
 
 		// Language files
 		addConfig("lang_english", new KonConfig("lang/english",false));
@@ -99,7 +108,7 @@ public class ConfigManager{
 	public FileConfiguration getConfig(String key) {
 		FileConfiguration result = new YamlConfiguration();
 		if(!configCache.containsKey(key)) {
-			ChatUtil.printConsoleError("Failed to find non-existant config "+key);
+			ChatUtil.printConsoleError("Bad internal reference to file "+key);
 		} else {
 			result =  configCache.get(key).getConfig();
 		}
@@ -115,10 +124,6 @@ public class ConfigManager{
 			}
 		}
 		return status;
-	}
-	
-	public HashMap<String, KonConfig> getConfigCache() {
-		return configCache;
 	}
 	
 	public Konquest getKonquest() {
@@ -190,6 +195,52 @@ public class ConfigManager{
 			ChatUtil.printConsoleError("The Konquest core.yml config file may be corrupted. Try renaming or deleting the file, then restart the server.");
 		}
 		return result;
+	}
+
+	private void createBackupData() {
+		int numBackups = konquest.getCore().getInt(CorePath.BACKUP_DATA_AMOUNT.getPath());
+		numBackups = Math.max(numBackups,0); // minimum 0
+		if(numBackups == 0) {
+			ChatUtil.printConsoleAlert("Data backups are disabled.");
+			return;
+		}
+		// Create a backup ZIP
+		String dateStr = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new java.util.Date());
+		KonquestPlugin plugin = Konquest.getInstance().getPlugin();
+		File konquestFolder = plugin.getDataFolder();
+		File dataFolder = new File(konquestFolder, "data");
+		if(!dataFolder.exists()) {
+			ChatUtil.printConsoleAlert("Skipping backup, data folder not found.");
+			return;
+		}
+		String destFolder = konquestFolder.getAbsolutePath();
+		String destName = "backup_data_"+dateStr+".zip";
+		String archiveName = destFolder + File.separator + destName;
+		ChatUtil.printConsoleAlert("Creating backup archive: "+destName);
+		ArrayList<File> zipSources = new ArrayList<>();
+		zipSources.add(dataFolder);
+		ZipUtility zipUtil = new ZipUtility();
+		try {
+			zipUtil.zip(zipSources, archiveName);
+		} catch (Exception ex) {
+			// some errors occurred
+			ChatUtil.printConsoleError("Failed to create backup archive of "+dataFolder.getPath());
+			ex.printStackTrace();
+		}
+		// Remove old backup ZIP(s)
+		FileFilter fileFilter = new WildcardFileFilter("backup_data_*.zip");
+		File[] allBackupArchives = konquestFolder.listFiles(fileFilter);
+		if(allBackupArchives != null && allBackupArchives.length > numBackups) {
+			// Found more backup ZIP files than limit setting
+			// Sort by date modified
+			Arrays.sort(allBackupArchives, Comparator.comparingLong(File::lastModified));
+			// Delete the oldest
+			int numDelete = allBackupArchives.length - numBackups;
+			for(int i = 0; i < numDelete; i++) {
+				ChatUtil.printConsoleAlert("Deleting backup archive: "+allBackupArchives[i].getName());
+				allBackupArchives[i].delete();
+			}
+		}
 	}
 
 	/**
