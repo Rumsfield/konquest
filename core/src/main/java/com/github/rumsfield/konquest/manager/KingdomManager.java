@@ -52,6 +52,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private final HashMap<UUID,Integer> joinPlayerCooldowns;
 	private final HashMap<UUID,Integer> exilePlayerCooldowns;
 	private ArrayList<DiplomacyTicket> diplomacyTickets;
+	private boolean isKingdomDataNull;
 
 	// Config Settings
 	private boolean isAdminOnly;
@@ -89,6 +90,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		this.joinPlayerCooldowns = new HashMap<>();
 		this.exilePlayerCooldowns = new HashMap<>();
 		this.diplomacyTickets = new ArrayList<>();
+		this.isKingdomDataNull = false;
 
 		this.isAdminOnly = false;
 		this.payIntervalSeconds = 0;
@@ -3779,7 +3781,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private void loadKingdoms() {
 		FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
         if (kingdomsConfig.get("kingdoms") == null) {
-        	ChatUtil.printDebug("There is no kingdoms section in kingdoms.yml");
+        	ChatUtil.printConsoleError("Failed to load any kingdoms from kingdoms.yml! Check file permissions.");
+			isKingdomDataNull = true;
             return;
         }
 
@@ -3964,7 +3967,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
         }
         if(kingdomMap.isEmpty()) {
-			ChatUtil.printDebug("No Kingdoms to load!");
+			ChatUtil.printConsoleAlert("There are no Kingdoms.");
 		} else {
 			// Some kingdoms exist, assign diplomacy relationships
 			assignDiplomacyTickets();
@@ -4364,6 +4367,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	public void saveKingdoms() {
+		if(isKingdomDataNull && kingdomMap.isEmpty()) {
+			// There was probably an issue loading kingdoms, do not save.
+			ChatUtil.printConsoleError("Aborted saving kingdom data because a problem was encountered while loading data from kingdoms.yml");
+			return;
+		}
 		FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
 		kingdomsConfig.set("kingdoms", null); // reset kingdoms config
 		ConfigurationSection root = kingdomsConfig.createSection("kingdoms");

@@ -50,6 +50,9 @@ core:
   
   # Enable player nametag colors. This may override other plugin nametag formatting (true/false)
   player_nametag_format: true
+
+  # The number of automatic data backups to keep before deleting the oldest ones (0 to disable creating any backups, integer >= 0)
+  backup_data_amount: 10
   
   # //// CORE.CHAT \\\\
   chat:
@@ -278,7 +281,7 @@ core:
     attack_friendly_golems: false
     
     # Kingdoms with this many players more than other Kingdoms will not accept new players (0 to disable, integer >= 0)
-    max_player_diff: 4
+    max_player_diff: 0
     
     # Allow barbarians to join any kingdom, even when exiled (true) or prevent exiled barbarians from switching kingdoms (false) (true/false)
     allow_exile_switch: true
@@ -336,7 +339,7 @@ core:
     settle_checks_depth: 32
     
     # Maximum height difference in blocks in the chunks of new town settlements (-1 to disable, integer >= 0)
-    settle_check_flatness: 3
+    settle_check_flatness: 4
     
     # Radius of initial settlements. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 1)
     init_radius: 2
@@ -348,7 +351,7 @@ core:
     capture_cooldown: 600
     
     # Time in seconds between raid alerts for Towns (integer >= 0)
-    raid_alert_cooldown: 30
+    raid_alert_cooldown: 60
     
     # Time in seconds for travel cool-down (integer >= 0)
     travel_cooldown: 120

@@ -31,12 +31,14 @@ public class CampManager implements KonquestCampManager {
 	private final HashMap<String,KonCamp> barbarianCamps; // player uuids to camps
 	private final HashMap<KonCamp,KonCampGroup> groupMap; // camps to groups
 	private boolean isClanEnabled;
+	private boolean isCampDataNull;
 	
 	public CampManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.barbarianCamps = new HashMap<>();
 		this.groupMap = new HashMap<>();
 		this.isClanEnabled = false;
+		this.isCampDataNull = false;
 	}
 	
 	// intended to be called after database has connected and loaded player tables
@@ -327,7 +329,8 @@ public class CampManager implements KonquestCampManager {
 		}
 		FileConfiguration campsConfig = konquest.getConfigManager().getConfig("camps");
         if (campsConfig.get("camps") == null) {
-        	ChatUtil.printDebug("There is no camps section in camps.yml");
+			ChatUtil.printConsoleError("Failed to load any camps from camps.yml! Check file permissions.");
+			isCampDataNull = true;
             return;
         }
         ConfigurationSection campsSection = campsConfig.getConfigurationSection("camps");
@@ -376,6 +379,11 @@ public class CampManager implements KonquestCampManager {
     }
 	
 	public void saveCamps() {
+		if(isCampDataNull && barbarianCamps.isEmpty()) {
+			// There was probably an issue loading camps, do not save.
+			ChatUtil.printConsoleError("Aborted saving camp data because a problem was encountered while loading data from camps.yml");
+			return;
+		}
 		FileConfiguration campsConfig = konquest.getConfigManager().getConfig("camps");
 		campsConfig.set("camps", null); // reset camps config
 		ConfigurationSection root = campsConfig.createSection("camps");
