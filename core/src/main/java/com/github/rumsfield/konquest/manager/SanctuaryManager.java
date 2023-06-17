@@ -24,10 +24,12 @@ public class SanctuaryManager {
 
 	private final Konquest konquest;
 	private final HashMap<String, KonSanctuary> sanctuaryMap; // lower case name maps to sanctuary object
+	private boolean isSanctuaryDataNull;
 	
 	public SanctuaryManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.sanctuaryMap = new HashMap<>();
+		this.isSanctuaryDataNull = false;
 	}
 	
 	
@@ -532,7 +534,8 @@ public class SanctuaryManager {
 	private void loadSanctuaries() {
 		FileConfiguration sanctuariesConfig = konquest.getConfigManager().getConfig("sanctuaries");
         if (sanctuariesConfig.get("sanctuaries") == null) {
-        	ChatUtil.printDebug("There is no sanctuaries section in sanctuaries.yml");
+        	ChatUtil.printConsoleError("Failed to load any sanctuaries from sanctuaries.yml! Check file permissions.");
+			isSanctuaryDataNull = true;
             return;
         }
         double x,y,z;
@@ -681,6 +684,11 @@ public class SanctuaryManager {
 		 * 					- ?
 		 * 					- ?
 		 */
+		if(isSanctuaryDataNull && sanctuaryMap.isEmpty()) {
+			// There was probably an issue loading sanctuaries, do not save.
+			ChatUtil.printConsoleError("Aborted saving sanctuary data because a problem was encountered while loading data from sanctuaries.yml");
+			return;
+		}
 		FileConfiguration sanctuariesConfig = konquest.getConfigManager().getConfig("sanctuaries");
 		sanctuariesConfig.set("sanctuaries", null); // reset sanctuaries config
 		ConfigurationSection root = sanctuariesConfig.createSection("sanctuaries");

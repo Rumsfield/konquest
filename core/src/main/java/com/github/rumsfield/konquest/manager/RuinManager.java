@@ -24,11 +24,13 @@ public class RuinManager implements KonquestRuinManager {
 	private final Konquest konquest;
 	private final HashMap<String, KonRuin> ruinMap; // lower case name maps to ruin object
 	private Material ruinCriticalBlock;
+	private boolean isRuinDataNull;
 	
 	public RuinManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.ruinMap = new HashMap<>();
 		this.ruinCriticalBlock = Material.OBSIDIAN;
+		this.isRuinDataNull = false;
 	}
 	
 	public void initialize() {
@@ -191,7 +193,8 @@ public class RuinManager implements KonquestRuinManager {
 	private void loadRuins() {
 		FileConfiguration ruinsConfig = konquest.getConfigManager().getConfig("ruins");
         if (ruinsConfig.get("ruins") == null) {
-        	ChatUtil.printDebug("There is no ruins section in ruins.yml");
+        	ChatUtil.printConsoleError("Failed to load any ruins from ruins.yml! Check file permissions.");
+			isRuinDataNull = true;
             return;
         }
         double x,y,z;
@@ -242,6 +245,11 @@ public class RuinManager implements KonquestRuinManager {
 	}
 	
 	public void saveRuins() {
+		if(isRuinDataNull && ruinMap.isEmpty()) {
+			// There was probably an issue loading ruins, do not save.
+			ChatUtil.printConsoleError("Aborted saving ruin data because a problem was encountered while loading data from ruins.yml");
+			return;
+		}
 		FileConfiguration ruinsConfig = konquest.getConfigManager().getConfig("ruins");
 		ruinsConfig.set("ruins", null); // reset ruins config
 		ConfigurationSection root = ruinsConfig.createSection("ruins");
