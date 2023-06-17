@@ -14,7 +14,8 @@ public enum CorePath {
 	RESET_LEGACY_HEALTH                                   ("core.reset_legacy_health"),
 	PLACEHOLDER_REQUEST_LIMIT                             ("core.placeholder_request_limit"),
 	PLAYER_NAMETAG_FORMAT                                 ("core.player_nametag_format"),
-	
+	BACKUP_DATA_AMOUNT                                    ("core.backup_data_amount"),
+
 	CHAT_TAG                                              ("core.chat.tag"),
 	CHAT_MESSAGE                                          ("core.chat.message"),
 	CHAT_KINGDOM_TEAM_COLOR                               ("core.chat.kingdom_team_color"),
