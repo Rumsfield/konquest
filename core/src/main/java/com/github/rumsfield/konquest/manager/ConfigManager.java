@@ -7,7 +7,6 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.Version;
 import com.github.rumsfield.konquest.utility.ZipUtility;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -228,8 +227,8 @@ public class ConfigManager{
 			ex.printStackTrace();
 		}
 		// Remove old backup ZIP(s)
-		FileFilter fileFilter = new WildcardFileFilter("backup_data_*.zip");
-		File[] allBackupArchives = konquestFolder.listFiles(fileFilter);
+		FileFilter backupFileFilter = (file) -> file.getName().matches("backup_data_.+\\.zip");
+		File[] allBackupArchives = konquestFolder.listFiles(backupFileFilter);
 		if(allBackupArchives != null && allBackupArchives.length > numBackups) {
 			// Found more backup ZIP files than limit setting
 			// Sort by date modified
