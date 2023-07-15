@@ -77,7 +77,14 @@ public class MapHandler {
 	//TODO: Make this class into a listener, make events for territory updates, deletes, etc
 	
 	//TODO: Figure out way to have created and removed areas update on web page without refresh
-	
+
+	public void drawDynmapUpdateTerritory(KonKingdom kingdom) {
+		drawDynmapUpdateTerritory(kingdom.getCapital());
+		for (KonTown town : kingdom.getTowns()) {
+			drawDynmapUpdateTerritory(town);
+		}
+	}
+
 	/**
 	 * Draws a territory with Dynmap, when created or updated
 	 * @param territory Territory to draw
@@ -142,8 +149,9 @@ public class MapHandler {
 					areaContour.setLineStyle(1, 1, lineColor);
 				}
 			} else {
-				// Area already exists, update corners
+				// Area already exists, update corners and color
 				areaContour.setCornerLocations(drawArea.getXContour(i), drawArea.getZContour(i));
+				areaContour.setFillStyle(0, areaColor);
 			}
 		}
 		for(int i = 0; i < drawArea.getNumPoints(); i++) {
@@ -158,9 +166,10 @@ public class MapHandler {
 					areaPoint.setLabel(areaLabel,true);
 				}
 			} else {
-				// Area already exists, update corners and label
+				// Area already exists, update corners and label and color
 				areaPoint.setCornerLocations(drawArea.getXPoint(i), drawArea.getZPoint(i));
 				areaPoint.setLabel(areaLabel,true);
+				areaPoint.setFillStyle(0.5, areaColor);
 			}
 		}
 		Marker territoryIcon = territoryGroup.findMarker(iconId);
@@ -288,11 +297,7 @@ public class MapHandler {
 		
 		// Kingdoms
 		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
-			drawDynmapUpdateTerritory(kingdom.getCapital());
-			// Towns
-			for (KonTown town : kingdom.getTowns()) {
-				drawDynmapUpdateTerritory(town);
-			}
+			drawDynmapUpdateTerritory(kingdom);
 		}
 		
 		Date end = new Date();
@@ -457,7 +462,12 @@ public class MapHandler {
 				break;
 			case CAPITAL:
 			case TOWN:
-				result = stringToRGB(territory.getKingdom().getName());
+				int webColor = territory.getKingdom().getWebColor();
+				if(webColor == -1) {
+					result = stringToRGB(territory.getKingdom().getName());
+				} else {
+					result = webColor;
+				}
 				break;
 			default:
 				break;

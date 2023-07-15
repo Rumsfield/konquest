@@ -238,6 +238,9 @@ core:
     # Only allow admins to create new kingdoms (true), else players can create their own kingdoms (false) (true/false)
     create_admin_only: false
 
+    # Only allow admins to change the colors of kingdoms on web maps like Dynmap (true), else all kingdom masters can set the web color of their own kingdoms (false) (true/false)
+    web_color_admin_only: true
+
     # Prevent players in other kingdoms using containers in claimed land (true/false)
     protect_containers_use: true
     

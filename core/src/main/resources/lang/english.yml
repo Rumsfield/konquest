@@ -583,6 +583,8 @@ command:
       pay: "Received kingdom payment."
       diplomacy-sent: "Sent diplomacy request to the Kingdom of %s."
       diplomacy-pending: "Your kingdom has pending diplomacy requests. Use \"/k kingdom\", then choose Relationships to respond."
+      web-color-show: "The Kingdom of %s has a web map color of: %s"
+      web-color-set: "Set the web map color of %s to: %s"
     error:
       barbarian-create: "You must be a barbarian to create a kingdom. Use the Exile option in the kingdom menu."
       invalid-template: "%s is an invalid monument template. Check spelling or choose another."
@@ -604,6 +606,7 @@ command:
       merchant: "Cannot trade with merchants in the Kingdom of %s, need Trade or Allied diplomacy."
       diplomacy-exists: "A request to change diplomacy already exists."
       template-attack: "Cannot change monument template while the Kingdom Capital is under attack."
+      web-color-invalid: "Invalid color, must match a color name or hex code starting with #"
   list:
     notice:
       header: "%s List"

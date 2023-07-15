@@ -34,6 +34,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	private final Map<KonquestKingdom, KonquestDiplomacyType> activeRelationships; // This kingdom's active diplomatic state with other kingdoms
 	private final Map<KonquestKingdom, KonquestDiplomacyType> requestRelationships; // Other kingdom's requested diplomatic state with this kingdom
 	private final Map<KonPropertyFlag,Boolean> properties;
+	private int webColor;
 	
 	public KonKingdom(Location loc, String name, Konquest konquest) {
 		this.name = name;
@@ -55,6 +56,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.requestRelationships = new HashMap<>();
 		this.properties = new HashMap<>();
 		initProperties();
+		this.webColor = -1;
 	}
 	
 	// Constructor meant for default kingdoms created on startup (Barbarians, Neutrals)
@@ -77,6 +79,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.activeRelationships = new HashMap<>();
 		this.requestRelationships = new HashMap<>();
 		this.properties = new HashMap<>();
+		this.webColor = -1;
 	}
 	
 	private void initProperties() {
@@ -115,6 +118,14 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public boolean isPeaceful() {
 		return getPropertyValue(KonPropertyFlag.PEACEFUL);
+	}
+
+	public void setWebColor(int val) {
+		webColor = val;
+	}
+
+	public int getWebColor() {
+		return webColor;
 	}
 
 	@Override
