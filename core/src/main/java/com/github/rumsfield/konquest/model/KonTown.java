@@ -123,19 +123,25 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	private void initProperties() {
 		properties.clear();   
-		properties.put(KonPropertyFlag.CAPTURE, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.capture"));
-		properties.put(KonPropertyFlag.CLAIM, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.claim"));
-		properties.put(KonPropertyFlag.UNCLAIM, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.unclaim"));
-		properties.put(KonPropertyFlag.UPGRADE, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.upgrade"));
-		properties.put(KonPropertyFlag.PLOTS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.plots"));
-		properties.put(KonPropertyFlag.TRAVEL, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.travel"));
-		properties.put(KonPropertyFlag.PVP, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.pvp"));
-		properties.put(KonPropertyFlag.PVE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.pve"));
-		properties.put(KonPropertyFlag.BUILD, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.build"));
-		properties.put(KonPropertyFlag.USE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.use"));
-		properties.put(KonPropertyFlag.CHEST, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.chest"));
-		properties.put(KonPropertyFlag.MOBS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.mobs"));
-		properties.put(KonPropertyFlag.PORTALS, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.portals"));
+		properties.put(KonPropertyFlag.CAPTURE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.capture"));
+		properties.put(KonPropertyFlag.CLAIM, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.claim"));
+		properties.put(KonPropertyFlag.UNCLAIM, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.unclaim"));
+		properties.put(KonPropertyFlag.UPGRADE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.upgrade"));
+		properties.put(KonPropertyFlag.PLOTS, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.plots"));
+		properties.put(KonPropertyFlag.TRAVEL, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.travel"));
+		properties.put(KonPropertyFlag.PVP, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.pvp"));
+		properties.put(KonPropertyFlag.PVE, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.pve"));
+		properties.put(KonPropertyFlag.BUILD, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.build"));
+		properties.put(KonPropertyFlag.USE, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.use"));
+		properties.put(KonPropertyFlag.CHEST, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.chest"));
+		properties.put(KonPropertyFlag.MOBS, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.mobs"));
+		properties.put(KonPropertyFlag.PORTALS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.portals"));
+		properties.put(KonPropertyFlag.JOIN, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.join"));
+		properties.put(KonPropertyFlag.LEAVE, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.leave"));
+		properties.put(KonPropertyFlag.PROMOTE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.promote"));
+		properties.put(KonPropertyFlag.DEMOTE, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.demote"));
+		properties.put(KonPropertyFlag.TRANSFER, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.transfer"));
+
 	}
 	
 	@Override

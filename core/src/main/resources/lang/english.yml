@@ -971,3 +971,8 @@ properties:
   plots: "Allow players to set town plots"
   peaceful: "Make a kingdom only peaceful"
   golems: "Enable iron golems to attack enemies"
+  join: "Allow players to join"
+  leave: "Allow players to leave"
+  promote: "Allow promotion of players"
+  demote: "Allow demotion of players"
+  transfer: "Allow ownership transfer"

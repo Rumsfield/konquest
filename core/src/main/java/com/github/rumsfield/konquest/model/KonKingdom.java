@@ -86,6 +86,12 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		properties.clear();
 		properties.put(KonPropertyFlag.PEACEFUL, 	konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.peaceful"));
 		properties.put(KonPropertyFlag.GOLEMS, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.golems"));
+		properties.put(KonPropertyFlag.JOIN, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.join"));
+		properties.put(KonPropertyFlag.LEAVE, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.leave"));
+		properties.put(KonPropertyFlag.PROMOTE, 	konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.promote"));
+		properties.put(KonPropertyFlag.DEMOTE, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.demote"));
+		properties.put(KonPropertyFlag.TRANSFER, 	konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.transfer"));
+
 	}
 	
 	public boolean isCreated() {

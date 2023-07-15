@@ -870,6 +870,11 @@ public enum MessagePath {
 	PROPERTIES_PLOTS							(0, "properties.plots"),
 	PROPERTIES_PEACEFUL							(0, "properties.peaceful"),
 	PROPERTIES_GOLEMS							(0, "properties.golems"),
+	PROPERTIES_JOIN								(0, "properties.join"),
+	PROPERTIES_LEAVE							(0, "properties.leave"),
+	PROPERTIES_PROMOTE							(0, "properties.promote"),
+	PROPERTIES_DEMOTE							(0, "properties.demote"),
+	PROPERTIES_TRANSFER							(0, "properties.transfer"),
 
 	NULL_MESSAGE	(0,"");
 	

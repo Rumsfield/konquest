@@ -10,28 +10,35 @@ public enum KonPropertyFlag {
 	// Descriptions come from MessagePath so that they can be translated.
 
 	// Properties for territories
-	TRAVEL			("Travel", 	MessagePath.PROPERTIES_TRAVEL.getMessage()), // Done in TravelCommand
-	PVP				("PvP", 		MessagePath.PROPERTIES_PVP.getMessage()), // Done in EntityListener
-	PVE				("PvE", 		MessagePath.PROPERTIES_PVE.getMessage()), // Done in EntityListener
-	BUILD			("Build", 	MessagePath.PROPERTIES_BUILD.getMessage()), // Done in BlockListener
-	USE				("Use", 		MessagePath.PROPERTIES_USE.getMessage()), // Done in InventoryListener, ...
+	TRAVEL			("Travel", 	MessagePath.PROPERTIES_TRAVEL.getMessage()),
+	PVP				("PvP", 		MessagePath.PROPERTIES_PVP.getMessage()),
+	PVE				("PvE", 		MessagePath.PROPERTIES_PVE.getMessage()),
+	BUILD			("Build", 	MessagePath.PROPERTIES_BUILD.getMessage()),
+	USE				("Use", 		MessagePath.PROPERTIES_USE.getMessage()),
 	CHEST			("Chest", 	MessagePath.PROPERTIES_CHEST.getMessage()),
-	MOBS			("Mobs", 		MessagePath.PROPERTIES_MOBS.getMessage()), // Done in EntityListener
-	PORTALS			("Portals", 	MessagePath.PROPERTIES_PORTALS.getMessage()), // Done in WorldListener
-	ENTER			("Enter", 	MessagePath.PROPERTIES_ENTER.getMessage()), // Done in PlayerListener
-	EXIT			("Exit", 		MessagePath.PROPERTIES_EXIT.getMessage()), // Done in PlayerListener
+	MOBS			("Mobs", 		MessagePath.PROPERTIES_MOBS.getMessage()),
+	PORTALS			("Portals", 	MessagePath.PROPERTIES_PORTALS.getMessage()),
+	ENTER			("Enter", 	MessagePath.PROPERTIES_ENTER.getMessage()),
+	EXIT			("Exit", 		MessagePath.PROPERTIES_EXIT.getMessage()),
 	
 	// Properties specifically for towns/capitals
-	CAPTURE			("Capture", 	MessagePath.PROPERTIES_CAPTURE.getMessage()), // Done in BlockListener
-	CLAIM			("Claim", 	MessagePath.PROPERTIES_CLAIM.getMessage()), // Done in TerritoryManager
-	UNCLAIM			("Unclaim", 	MessagePath.PROPERTIES_UNCLAIM.getMessage()), // Done in TerritoryManager
-	UPGRADE			("Upgrade", 	MessagePath.PROPERTIES_UPGRADE.getMessage()), // Done in TownManagementMenuWrapper
-	PLOTS			("Plots", 	MessagePath.PROPERTIES_PLOTS.getMessage()), // Done in TownManagementMenuWrapper
+	CAPTURE			("Capture", 	MessagePath.PROPERTIES_CAPTURE.getMessage()),
+	CLAIM			("Claim", 	MessagePath.PROPERTIES_CLAIM.getMessage()),
+	UNCLAIM			("Unclaim", 	MessagePath.PROPERTIES_UNCLAIM.getMessage()),
+	UPGRADE			("Upgrade", 	MessagePath.PROPERTIES_UPGRADE.getMessage()),
+	PLOTS			("Plots", 	MessagePath.PROPERTIES_PLOTS.getMessage()),
 	
 	// Properties for kingdoms
 	PEACEFUL		("Peaceful", 	MessagePath.PROPERTIES_PEACEFUL.getMessage()),
-	GOLEMS			("Golems", 	MessagePath.PROPERTIES_GOLEMS.getMessage()), // Done in KonTown
-	
+	GOLEMS			("Golems", 	MessagePath.PROPERTIES_GOLEMS.getMessage()),
+
+	// Properties for membership
+	JOIN			("Join", 		MessagePath.PROPERTIES_JOIN.getMessage()),
+	LEAVE			("Leave", 	MessagePath.PROPERTIES_LEAVE.getMessage()),
+	PROMOTE			("Promote", 	MessagePath.PROPERTIES_PROMOTE.getMessage()),
+	DEMOTE			("Demote", 	MessagePath.PROPERTIES_DEMOTE.getMessage()),
+	TRANSFER		("Transfer", 	MessagePath.PROPERTIES_TRANSFER.getMessage()),
+
 	NONE			("N/A", 		"Nothing");
 	
 	private final String name;
