@@ -342,10 +342,7 @@ public class KingdomAdminCommand extends CommandBase {
 							}
 						}
 						// Update map
-						getKonquest().getMapHandler().drawDynmapUpdateTerritory(kingdom.getCapital());
-						for (KonTown town : kingdom.getTowns()) {
-							getKonquest().getMapHandler().drawDynmapUpdateTerritory(town);
-						}
+						getKonquest().getMapHandler().drawDynmapUpdateTerritory(kingdom);
 						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_WEB_COLOR_SET.getMessage(kingdom.getName(),colorStr));
 					} else {
 						// Incorrect arguments
@@ -375,6 +372,7 @@ public class KingdomAdminCommand extends CommandBase {
 			tabList.add("kick");
 			tabList.add("rename");
 			tabList.add("admin");
+			tabList.add("webcolor");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
