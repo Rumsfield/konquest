@@ -10,34 +10,34 @@ public enum KonPropertyFlag {
 	// Descriptions come from MessagePath so that they can be translated.
 
 	// Properties for territories
-	TRAVEL			("Travel", 	MessagePath.PROPERTIES_TRAVEL.getMessage()),
-	PVP				("PvP", 		MessagePath.PROPERTIES_PVP.getMessage()),
-	PVE				("PvE", 		MessagePath.PROPERTIES_PVE.getMessage()),
-	BUILD			("Build", 	MessagePath.PROPERTIES_BUILD.getMessage()),
-	USE				("Use", 		MessagePath.PROPERTIES_USE.getMessage()),
-	CHEST			("Chest", 	MessagePath.PROPERTIES_CHEST.getMessage()),
-	MOBS			("Mobs", 		MessagePath.PROPERTIES_MOBS.getMessage()),
-	PORTALS			("Portals", 	MessagePath.PROPERTIES_PORTALS.getMessage()),
-	ENTER			("Enter", 	MessagePath.PROPERTIES_ENTER.getMessage()),
-	EXIT			("Exit", 		MessagePath.PROPERTIES_EXIT.getMessage()),
+	TRAVEL			(MessagePath.PROPERTIES_TRAVEL_NAME.getMessage(), 	MessagePath.PROPERTIES_TRAVEL.getMessage()),
+	PVP				(MessagePath.PROPERTIES_PVP_NAME.getMessage(), 		MessagePath.PROPERTIES_PVP.getMessage()),
+	PVE				(MessagePath.PROPERTIES_PVE_NAME.getMessage(), 		MessagePath.PROPERTIES_PVE.getMessage()),
+	BUILD			(MessagePath.PROPERTIES_BUILD_NAME.getMessage(), 	MessagePath.PROPERTIES_BUILD.getMessage()),
+	USE				(MessagePath.PROPERTIES_USE_NAME.getMessage(), 		MessagePath.PROPERTIES_USE.getMessage()),
+	CHEST			(MessagePath.PROPERTIES_CHEST_NAME.getMessage(), 	MessagePath.PROPERTIES_CHEST.getMessage()),
+	MOBS			(MessagePath.PROPERTIES_MOBS_NAME.getMessage(), 	MessagePath.PROPERTIES_MOBS.getMessage()),
+	PORTALS			(MessagePath.PROPERTIES_PORTALS_NAME.getMessage(), 	MessagePath.PROPERTIES_PORTALS.getMessage()),
+	ENTER			(MessagePath.PROPERTIES_ENTER_NAME.getMessage(), 	MessagePath.PROPERTIES_ENTER.getMessage()),
+	EXIT			(MessagePath.PROPERTIES_EXIT_NAME.getMessage(), 	MessagePath.PROPERTIES_EXIT.getMessage()),
 	
 	// Properties specifically for towns/capitals
-	CAPTURE			("Capture", 	MessagePath.PROPERTIES_CAPTURE.getMessage()),
-	CLAIM			("Claim", 	MessagePath.PROPERTIES_CLAIM.getMessage()),
-	UNCLAIM			("Unclaim", 	MessagePath.PROPERTIES_UNCLAIM.getMessage()),
-	UPGRADE			("Upgrade", 	MessagePath.PROPERTIES_UPGRADE.getMessage()),
-	PLOTS			("Plots", 	MessagePath.PROPERTIES_PLOTS.getMessage()),
+	CAPTURE			(MessagePath.PROPERTIES_CAPTURE_NAME.getMessage(), 	MessagePath.PROPERTIES_CAPTURE.getMessage()),
+	CLAIM			(MessagePath.PROPERTIES_CLAIM_NAME.getMessage(), 	MessagePath.PROPERTIES_CLAIM.getMessage()),
+	UNCLAIM			(MessagePath.PROPERTIES_UNCLAIM_NAME.getMessage(), 	MessagePath.PROPERTIES_UNCLAIM.getMessage()),
+	UPGRADE			(MessagePath.PROPERTIES_UPGRADE_NAME.getMessage(), 	MessagePath.PROPERTIES_UPGRADE.getMessage()),
+	PLOTS			(MessagePath.PROPERTIES_PLOTS_NAME.getMessage(), 	MessagePath.PROPERTIES_PLOTS.getMessage()),
 	
 	// Properties for kingdoms
-	PEACEFUL		("Peaceful", 	MessagePath.PROPERTIES_PEACEFUL.getMessage()),
-	GOLEMS			("Golems", 	MessagePath.PROPERTIES_GOLEMS.getMessage()),
+	PEACEFUL		(MessagePath.PROPERTIES_PEACEFUL_NAME.getMessage(), MessagePath.PROPERTIES_PEACEFUL.getMessage()),
+	GOLEMS			(MessagePath.PROPERTIES_GOLEMS_NAME.getMessage(), 	MessagePath.PROPERTIES_GOLEMS.getMessage()),
 
 	// Properties for membership
-	JOIN			("Join", 		MessagePath.PROPERTIES_JOIN.getMessage()),
-	LEAVE			("Leave", 	MessagePath.PROPERTIES_LEAVE.getMessage()),
-	PROMOTE			("Promote", 	MessagePath.PROPERTIES_PROMOTE.getMessage()),
-	DEMOTE			("Demote", 	MessagePath.PROPERTIES_DEMOTE.getMessage()),
-	TRANSFER		("Transfer", 	MessagePath.PROPERTIES_TRANSFER.getMessage()),
+	JOIN			(MessagePath.PROPERTIES_JOIN_NAME.getMessage(), 	MessagePath.PROPERTIES_JOIN.getMessage()),
+	LEAVE			(MessagePath.PROPERTIES_LEAVE_NAME.getMessage(), 	MessagePath.PROPERTIES_LEAVE.getMessage()),
+	PROMOTE			(MessagePath.PROPERTIES_PROMOTE_NAME.getMessage(), 	MessagePath.PROPERTIES_PROMOTE.getMessage()),
+	DEMOTE			(MessagePath.PROPERTIES_DEMOTE_NAME.getMessage(), 	MessagePath.PROPERTIES_DEMOTE.getMessage()),
+	TRANSFER		(MessagePath.PROPERTIES_TRANSFER_NAME.getMessage(), MessagePath.PROPERTIES_TRANSFER.getMessage()),
 
 	NONE			("N/A", 		"Nothing");
 	
