@@ -36,7 +36,7 @@ dependencies{
     compileOnly("me.clip:placeholderapi:2.11.2")
     compileOnly("net.luckperms:api:5.4")
 
-    implementation("org.xerial:sqlite-jdbc:3.40.0.0")
+    implementation("org.xerial:sqlite-jdbc:3.40.1.0")
     implementation(project(":api"))
 }
 
