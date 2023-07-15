@@ -126,6 +126,26 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		return getPropertyValue(KonPropertyFlag.PEACEFUL);
 	}
 
+	public boolean isJoinable() {
+		return getPropertyValue(KonPropertyFlag.JOIN);
+	}
+
+	public boolean isLeaveable() {
+		return getPropertyValue(KonPropertyFlag.LEAVE);
+	}
+
+	public boolean isPromoteable() {
+		return getPropertyValue(KonPropertyFlag.PROMOTE);
+	}
+
+	public boolean isDemoteable() {
+		return getPropertyValue(KonPropertyFlag.DEMOTE);
+	}
+
+	public boolean isTransferable() {
+		return getPropertyValue(KonPropertyFlag.TRANSFER);
+	}
+
 	public void setWebColor(int val) {
 		webColor = val;
 	}

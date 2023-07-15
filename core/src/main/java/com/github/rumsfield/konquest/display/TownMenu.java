@@ -32,6 +32,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
     private final int ROOT_SLOT_INVITES 		= 6;
     private final int ROOT_SLOT_LIST 			= 8;
 
+    private final String alertColor = DisplayManager.alertFormat;
     private final String loreColor = DisplayManager.loreFormat;
     private final String valueColor = DisplayManager.valueFormat;
     private final String hintColor = DisplayManager.hintFormat;
@@ -175,20 +176,32 @@ public class TownMenu extends StateMenu implements ViewableMenu {
             int slotIndex = 0;
             while(slotIndex < MAX_ICONS_PER_PAGE && listIter.hasNext()) {
                 /* Town Icon (n) */
+                boolean isCurrentTownClickable = true;
                 KonTown currentTown = listIter.next();
                 ChatColor contextColor = konquest.getFriendlyPrimaryColor();
                 loreList = new ArrayList<>();
                 // Context-based lore
                 switch(context) {
                     case JOIN:
-                        if(currentTown.isOpen()) {
-                            loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_JOIN_NOW.getMessage());
+                        if(currentTown.isJoinable()) {
+                            if(currentTown.isOpen()) {
+                                loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_JOIN_NOW.getMessage());
+                            } else {
+                                loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_JOIN.getMessage());
+                            }
                         } else {
-                            loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_JOIN.getMessage());
+                            isCurrentTownClickable = false;
+                            loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
                         }
+
                         break;
                     case LEAVE:
-                        loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_LEAVE.getMessage());
+                        if(currentTown.isLeaveable()) {
+                            loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_LEAVE.getMessage());
+                        } else {
+                            isCurrentTownClickable = false;
+                            loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+                        }
                         break;
                     case LIST:
                         loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_LIST.getMessage());
@@ -203,7 +216,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                     default:
                         break;
                 }
-                TownIcon icon = new TownIcon(currentTown,contextColor,loreList,slotIndex,isClickable);
+                TownIcon icon = new TownIcon(currentTown,contextColor,loreList,slotIndex,(isClickable && isCurrentTownClickable));
                 pages.get(pageNum).addIcon(icon);
                 slotIndex++;
             }

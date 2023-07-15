@@ -143,7 +143,28 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		properties.put(KonPropertyFlag.TRANSFER, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.transfer"));
 
 	}
-	
+
+	public boolean isJoinable() {
+		return getPropertyValue(KonPropertyFlag.JOIN);
+	}
+
+	public boolean isLeaveable() {
+		return getPropertyValue(KonPropertyFlag.LEAVE);
+	}
+
+	public boolean isPromoteable() {
+		return getPropertyValue(KonPropertyFlag.PROMOTE);
+	}
+
+	public boolean isDemoteable() {
+		return getPropertyValue(KonPropertyFlag.DEMOTE);
+	}
+
+	public boolean isTransferable() {
+		return getPropertyValue(KonPropertyFlag.TRANSFER);
+	}
+
+
 	@Override
 	public boolean setPropertyValue(KonPropertyFlag property, boolean value) {
 		boolean result = false;
