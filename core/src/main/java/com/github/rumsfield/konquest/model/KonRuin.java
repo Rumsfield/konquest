@@ -11,6 +11,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.*;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -48,15 +49,24 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		initProperties();
 	}
 
-	private void initProperties() {
+	public static java.util.List<KonPropertyFlag> getProperties() {
+		java.util.List<KonPropertyFlag> result = new ArrayList<>();
+		result.add(KonPropertyFlag.PVP);
+		result.add(KonPropertyFlag.PVE);
+		result.add(KonPropertyFlag.USE);
+		result.add(KonPropertyFlag.CHEST);
+		result.add(KonPropertyFlag.PORTALS);
+		result.add(KonPropertyFlag.ENTER);
+		result.add(KonPropertyFlag.EXIT);
+		return result;
+	}
+
+	@Override
+	public void initProperties() {
 		properties.clear();
-		properties.put(KonPropertyFlag.PVP, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.pvp"));
-		properties.put(KonPropertyFlag.PVE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.pve"));
-		properties.put(KonPropertyFlag.USE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.use"));
-		properties.put(KonPropertyFlag.CHEST, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.chest"));
-		properties.put(KonPropertyFlag.PORTALS, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.portals"));
-		properties.put(KonPropertyFlag.ENTER, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.enter"));
-		properties.put(KonPropertyFlag.EXIT, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.exit"));
+		for (KonPropertyFlag flag : getProperties()) {
+			properties.put(flag, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins."+flag.toString().toLowerCase()));
+		}
 	}
 
 	@Override

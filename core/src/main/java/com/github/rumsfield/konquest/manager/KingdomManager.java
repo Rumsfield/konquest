@@ -1025,7 +1025,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(isPlayerBarbarian || !oldKingdom.isCreated()) {
     		return 1;
     	}
-		String oldKingdomName = oldKingdom.getName();
 		// These checks are bypassed when forced
 		if(!force) {
 			// Check for player that's already a kingdom master
@@ -1064,8 +1063,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		return -1;
     	}
 		
-		/* Now, oldKingdom is possibly removed. Re-acquire current kingdom of player. */
+		/* Now, oldKingdom is possibly removed. Re-acquire current kingdom of player (could be Barbarians). */
 		oldKingdom = isOnline ? onlinePlayer.getKingdom() : offlinePlayer.getKingdom();
+		String oldKingdomName = oldKingdom.getName();
 		
     	// Try to teleport the player (online only)
 		if(isOnline) {
@@ -1115,15 +1115,15 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_EXILE_FAVOR.getMessage());
 			}
 		}
-    	
+
     	KonKingdom exileKingdom = isFull ? getBarbarians() : oldKingdom;
     	if(isOnline) {
     		// Force into global chat mode
     		onlinePlayer.setIsGlobalChat(true);
         	// Make into barbarian
+			onlinePlayer.setBarbarian(true);
+			onlinePlayer.setExileKingdom(exileKingdom);
     		onlinePlayer.setKingdom(getBarbarians());
-    		onlinePlayer.setExileKingdom(exileKingdom);
-    		onlinePlayer.setBarbarian(true);
     		// Territory updates at player's location
     		KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(onlinePlayer.getBukkitPlayer().getLocation());
     		if(territory instanceof KonBarDisplayer) {
@@ -1153,7 +1153,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     	}
     	
     	// Common updates
-    	konquest.getMapHandler().drawDynmapLabel(oldKingdom.getCapital());
+    	konquest.getMapHandler().drawDynmapLabel(getKingdom(oldKingdomName).getCapital());
     	updateSmallestKingdom();
     	updateKingdomOfflineProtection();
     	
@@ -1180,6 +1180,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(kingdom == null) return false;
 		UUID id = player.getBukkitPlayer().getUniqueId();
 		// Player can be barbarians, or members of other kingdoms, when requesting to join a kingdom.
+
+		// Check for join/leave property flags, only for created kingdoms (not barbarians)
+		if((kingdom.isCreated() && !kingdom.isJoinable()) || (player.getKingdom().isCreated() && !player.getKingdom().isLeaveable())) {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
 
 		// Pre-check for allowable join conditions
 		// These checks are made again within assignPlayerKingdom, but we need to notify the player here of any errors
@@ -1245,35 +1251,39 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @param resp - True to approve, false to reject request
 	 * @return True when request response was successful, else false when target is already in this kingdom.
 	 */
-	public boolean menuRespondKingdomRequest(KonPlayer player, OfflinePlayer requester, KonKingdom kingdom, boolean resp) {
+	public boolean menuRespondKingdomRequest(KonPlayer player, KonOfflinePlayer requester, KonKingdom kingdom, boolean resp) {
 		if(kingdom == null) return true;
-		UUID id = requester.getUniqueId();
+		OfflinePlayer offlineBukkitPlayer = requester.getOfflineBukkitPlayer();
+		UUID id = offlineBukkitPlayer.getUniqueId();
 
-		// Check the requester is not already a kingdom member
-		if(kingdom.isMember(id)) {
-			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_INVITE_MEMBER.getMessage());
-			return false;
-		}
 		// Check for valid request
 		if(!kingdom.isJoinRequestValid(id)) {
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			return false;
 		}
+		kingdom.removeJoinRequest(id);
 		// Is the request denied?
 		if(!resp){
-			// Denied request
-			kingdom.removeJoinRequest(id);
 			// Notify officer
-			ChatUtil.sendNotice(player.getBukkitPlayer(),MessagePath.COMMAND_KINGDOM_NOTICE_REQUEST_DECLINED.getMessage(requester.getName()));
+			ChatUtil.sendNotice(player.getBukkitPlayer(),MessagePath.COMMAND_KINGDOM_NOTICE_REQUEST_DECLINED.getMessage(offlineBukkitPlayer.getName()));
 			// Notify requester
-			if(requester.isOnline()) {
-				ChatUtil.sendError((Player)requester, MessagePath.COMMAND_KINGDOM_ERROR_REQUEST_DENY.getMessage(kingdom.getName()));
+			if(offlineBukkitPlayer.isOnline()) {
+				ChatUtil.sendError((Player)offlineBukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_REQUEST_DENY.getMessage(kingdom.getName()));
 			}
+			return false;
+		}
+		// Check the requester is not already a kingdom member
+		if(kingdom.isMember(id)) {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_INVITE_MEMBER.getMessage(offlineBukkitPlayer.getName()));
+			return false;
+		}
+		// Check for join/leave property flags, only for created kingdoms (not barbarians)
+		if((kingdom.isCreated() && !kingdom.isJoinable()) || (requester.getKingdom().isCreated() && !requester.getKingdom().isLeaveable())) {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
 
 		int status = assignPlayerKingdom(id,kingdom.getName(),false);
-		kingdom.removeJoinRequest(id);
 		if(status != 0) {
 			switch(status) {
 				case 2:
@@ -1289,7 +1299,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_JOIN_SWITCH.getMessage());
 					break;
 				case 8:
-					String remainCooldown = getJoinCooldownRemainingTimeFormat(requester,ChatColor.RED);
+					String remainCooldown = getJoinCooldownRemainingTimeFormat(offlineBukkitPlayer,ChatColor.RED);
 					ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_JOIN_COOLDOWN.getMessage(remainCooldown));
 					break;
 				default:
@@ -1299,12 +1309,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return false;
 		}
 		// Broadcast successful join
-		ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_JOIN.getMessage(requester.getName(),kingdom.getName()));
+		ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_JOIN.getMessage(offlineBukkitPlayer.getName(),kingdom.getName()));
 		return true;
 	}
 	
 	/**
-	 * Officer invites (offline) player to join (with /kingdom add command).
+	 * Officer invites (offline) player to join.
 	 * Kingdom must be closed to send invites.
 	 * Allow invites to players already in another kingdom.
 	 * Inviting a player who has already requested to join always lets them join.
@@ -1313,13 +1323,19 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @param kingdom - The target kingdom for the join invite
 	 * @return True when the invite was successful
 	 */
-	public boolean joinKingdomInvite(KonPlayer player, OfflinePlayer invitee, KonKingdom kingdom) {
+	public boolean joinKingdomInvite(KonPlayer player, KonOfflinePlayer invitee, KonKingdom kingdom) {
 		if(kingdom == null) return false;
-		UUID id = invitee.getUniqueId();
-		
+		OfflinePlayer offlineBukkitPlayer = invitee.getOfflineBukkitPlayer();
+		UUID id = offlineBukkitPlayer.getUniqueId();
+
+		// Check for join/leave property flags, only for created kingdoms (not barbarians)
+		if((kingdom.isCreated() && !kingdom.isJoinable()) || (invitee.getKingdom().isCreated() && !invitee.getKingdom().isLeaveable())) {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
 		// Cannot invite a member of this kingdom
 		if(kingdom.isMember(id)) {
-			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_INVITE_MEMBER.getMessage(invitee.getName()));
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_INVITE_MEMBER.getMessage(offlineBukkitPlayer.getName()));
 			return false;
 		}
 		// Cannot invite members to an open kingdom
@@ -1347,7 +1363,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_JOIN_SWITCH.getMessage());
 						break;
 					case 8:
-						String remainCooldown = getJoinCooldownRemainingTimeFormat(invitee,ChatColor.RED);
+						String remainCooldown = getJoinCooldownRemainingTimeFormat(offlineBukkitPlayer,ChatColor.RED);
 						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_JOIN_COOLDOWN.getMessage(remainCooldown));
 						break;
 					default:
@@ -1357,16 +1373,16 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				return false;
 			}
 			// Broadcast successful join
-			ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_JOIN.getMessage(invitee.getName(),kingdom.getName()));
+			ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_JOIN.getMessage(offlineBukkitPlayer.getName(),kingdom.getName()));
 		} else if(!kingdom.isJoinInviteValid(id)) {
 			// Invite to join if not already invited
 			kingdom.addJoinRequest(id, true);
-			if(invitee.isOnline()) {
-				ChatUtil.sendNotice((Player)invitee, MessagePath.COMMAND_KINGDOM_NOTICE_INVITE_RECEIVED.getMessage());
+			if(offlineBukkitPlayer.isOnline()) {
+				ChatUtil.sendNotice((Player)offlineBukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_INVITE_RECEIVED.getMessage());
 			}
 		} else {
 			// The invite has already been sent, still pending
-			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_INVITE_EXISTS.getMessage(invitee.getName()));
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_ERROR_INVITE_EXISTS.getMessage(offlineBukkitPlayer.getName()));
 			return false;
 		}
 		return true;
@@ -1387,15 +1403,19 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			return false;
 		}
+		kingdom.removeJoinRequest(id);
 		if(!resp){
 			// Denied join request
-			kingdom.removeJoinRequest(id);
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_INVITE_DECLINED.getMessage(kingdom.getName()));
+			return false;
+		}
+		// Check for join/leave property flags, only for created kingdoms (not barbarians)
+		if((kingdom.isCreated() && !kingdom.isJoinable()) || (player.getKingdom().isCreated() && !player.getKingdom().isLeaveable())) {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
 
 		int status = assignPlayerKingdom(id,kingdom.getName(),false);
-		kingdom.removeJoinRequest(id);
 		if(status != 0) {
 			switch(status) {
 				case 2:
@@ -1432,6 +1452,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	// This method is called when a player chooses the exile button in the kingdom menu.
 	public boolean menuExileKingdom(KonPlayer player) {
 		UUID id = player.getBukkitPlayer().getUniqueId();
+		// Check for leave property flag
+		if(!player.getKingdom().isLeaveable()) {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
 		// Attempt to exile player, sends notice
 		int status = exilePlayerBarbarian(id,true,true,false,false);
 		if(status == 0) {
@@ -1462,6 +1487,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	// Wrapper for exile for offline players
 	// Used by officers to remove players from their kingdom
 	public boolean kickKingdomMember(KonPlayer player, OfflinePlayer member) {
+		// Assume that the member is in the same kingdom as the player
+		// Check for leave property flag
+		if(!player.getKingdom().isLeaveable()) {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
 		int status = exilePlayerBarbarian(member.getUniqueId(),true,true,false,false);
 		if(status == 0) {
 			return true;
@@ -2488,6 +2519,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_JOIN_MEMBER.getMessage());
 			return false;
 		}
+		// Check for join property flag
+		if(!town.isJoinable()) {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
 		UUID myId = bukkitPlayer.getUniqueId();
 		if(town.isOpen() || town.isJoinInviteValid(myId)) {
 			// There is an existing invite to join, or the town is open, add the player as a resident
@@ -2534,6 +2570,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			return false;
 		}
+		// Check for leave property flag
+		if(!town.isLeaveable()) {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
 		// Remove the player as a resident
 		if(town.removePlayerResident(bukkitPlayer)) {
 			for(OfflinePlayer resident : town.getPlayerResidents()) {
@@ -2553,6 +2594,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	// A player responds to an invite to join a town from the menu
 	public boolean menuRespondTownInvite(KonPlayer player, KonTown town, boolean resp) {
 		Player bukkitPlayer = player.getBukkitPlayer();
+		UUID myId = bukkitPlayer.getUniqueId();
+		if(!town.isJoinInviteValid(myId)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+			return false;
+		}
+		town.removeJoinRequest(myId);
 		if(player.isBarbarian()) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
 			return false;
@@ -2561,12 +2608,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_JOIN_MEMBER.getMessage(town.getName()));
 			return false;
 		}
-		UUID myId = bukkitPlayer.getUniqueId();
-		if(!town.isJoinInviteValid(myId)) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+		// Check for join property flag
+		if(!town.isJoinable()) {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
-		town.removeJoinRequest(myId);
 		if(resp) {
 			// Accept the invite
 			if(town.addPlayerResident(bukkitPlayer,false)) {
@@ -2588,7 +2634,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public boolean menuRespondTownRequest(KonPlayer sender, OfflinePlayer requester, KonTown town, boolean resp) {
 		Player bukkitPlayer = sender.getBukkitPlayer();
 		UUID id = requester.getUniqueId();
+		if(!town.isJoinRequestValid(id)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+			return false;
+		}
 		if(!town.isPlayerLord(bukkitPlayer) && !town.isPlayerKnight(bukkitPlayer)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		town.removeJoinRequest(id);
+		// Check for join property flag
+		if(!town.isJoinable()) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
@@ -2605,12 +2661,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_INVITE_MEMBER.getMessage(requester.getName()));
 			return false;
 		}
-		if(!town.isJoinRequestValid(id)) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
-			return false;
-		}
 		KonPlayer onlinePlayer = konquest.getPlayerManager().getPlayerFromID(id);
-		town.removeJoinRequest(id);
 		if(resp) {
 			// Accepted the request
 			if(town.addPlayerResident(requester,false)) {
@@ -2633,7 +2684,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return true;
 	}
 
-	// A town lord/knight invites (offline) player to join (with /town add command)
+	// A town lord/knight invites (offline) player to join
 	public void addTownPlayer(KonPlayer sender, KonOfflinePlayer player, KonTown town) {
 		Player bukkitPlayer = sender.getBukkitPlayer();
 		if(!town.isPlayerLord(bukkitPlayer) && !town.isPlayerKnight(bukkitPlayer)) {
@@ -2642,6 +2693,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		if(player == null) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return;
+		}
+		// Check for join property flag
+		if(!town.isJoinable()) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return;
 		}
 		OfflinePlayer offlinePlayer = player.getOfflineBukkitPlayer();
@@ -2703,6 +2759,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		if(player == null) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return;
+		}
+		// Check for leave property flag
+		if(!town.isLeaveable()) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return;
 		}
 		OfflinePlayer offlinePlayer = player.getOfflineBukkitPlayer();
@@ -2853,8 +2914,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public void lordTownTakeover(KonPlayer player, KonTown town) {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Verify conditions for takeover
-		if(town.isLordValid()) {
-			// Lord exists, cannot take over town
+		if(town.isLordValid() || !town.isJoinable()) {
+			// Lord exists or town cannot be joined, cannot take over town
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return;
 		}

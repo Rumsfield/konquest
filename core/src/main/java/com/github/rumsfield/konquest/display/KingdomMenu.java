@@ -8,6 +8,7 @@ import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonMonumentTemplate;
+import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
@@ -217,14 +218,19 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 
 			if(menuAccess.equals(AccessType.OFFICER) || menuAccess.equals(AccessType.MASTER)) {
 				/* Relations Icon */
-				if(!kingdom.isPeaceful()) {
-					loreList = new ArrayList<>();
-					loreList.add(propertyColor+MessagePath.LABEL_OFFICER.getMessage());
-					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_RELATION.getMessage(),loreColor));
+				boolean isRelationsClickable = true;
+				loreList = new ArrayList<>();
+				loreList.add(propertyColor+MessagePath.LABEL_OFFICER.getMessage());
+				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_RELATION.getMessage(),loreColor));
+				if(kingdom.isPeaceful()) {
+					isRelationsClickable = false;
+					// This option is unavailable due to property flags
+					loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+				} else {
 					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-					icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_RELATION.getMessage(), loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, true);
-					result.addIcon(icon);
 				}
+				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_RELATION.getMessage(), loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, isRelationsClickable);
+				result.addIcon(icon);
 				
 				/* Requests Icon */
 				loreList.clear();
@@ -243,28 +249,49 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			
 			if(menuAccess.equals(AccessType.MASTER)) {
 				/* Promote Icon */
+				boolean isPromoteClickable = true;
 				loreList = new ArrayList<>();
 				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_PROMOTE.getMessage(),loreColor));
-				loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_PROMOTE.getMessage(), loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, true);
+				if(kingdom.isPromoteable() || isAdmin) {
+					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+				} else {
+					// This option is unavailable due to property flags
+					isPromoteClickable = false;
+					loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+				}
+				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_PROMOTE.getMessage(), loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, isPromoteClickable);
 				result.addIcon(icon);
 				
 				/* Demote Icon */
+				boolean isDemoteClickable = true;
 				loreList.clear();
 				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DEMOTE.getMessage(),loreColor));
-				loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_DEMOTE.getMessage(), loreList, Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, true);
+				if(kingdom.isDemoteable() || isAdmin) {
+					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+				} else {
+					// This option is unavailable due to property flags
+					isDemoteClickable = false;
+					loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+				}
+				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_DEMOTE.getMessage(), loreList, Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, isDemoteClickable);
 				result.addIcon(icon);
 				
 				/* Transfer Icon */
 				if(!kingdom.isAdminOperated()) {
+					boolean isTransferClickable = true;
 					loreList.clear();
 					loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_TRANSFER.getMessage(),loreColor));
-					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-					icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, true);
+					if(kingdom.isTransferable() || isAdmin) {
+						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					} else {
+						// This option is unavailable due to property flags
+						isTransferClickable = false;
+						loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+					}
+					icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, isTransferClickable);
 					result.addIcon(icon);
 				}
 				
@@ -575,7 +602,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				switch(context) {
 					case A_JOIN:
 						// Check if the player can join the current kingdom
-						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0) {
+						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0 || !currentKingdom.isJoinable() || !kingdom.isLeaveable()) {
 							// The kingdom is unavailable to join at this time
 							loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
 						}
@@ -587,7 +614,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						break;
 					case A_INVITE:
 						// Check if the player can join the current kingdom
-						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0) {
+						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0 || !currentKingdom.isJoinable() || !kingdom.isLeaveable()) {
 							// The kingdom is unavailable to join at this time
 							loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
 						}
@@ -856,7 +883,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				case B_REQUESTS:
 					if(clickedIcon instanceof PlayerIcon) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
-						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
+						KonOfflinePlayer clickPlayer = konquest.getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
 						boolean status = manager.menuRespondKingdomRequest(player, clickPlayer, kingdom, clickType);
 						playStatusSound(player.getBukkitPlayer(),status);
 						result = goToPlayerView(MenuState.B_REQUESTS);

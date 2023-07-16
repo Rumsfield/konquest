@@ -137,7 +137,10 @@ public interface KonquestAPI {
 	 * 			<br>4 - Error, name is a kingdom
 	 * 			<br>5 - Error, name is a town
 	 * 			<br>6 - Error, name is a ruin
-	 * 			<br>7 - Error, name is a guild
+	 * 			<br>7 - Error, name is a guild [deprecated]
+	 * 	  		<br>8 - Error, name is a sanctuary
+	 * 	  		<br>9 - Error, name is a template
+	 * 	  		<br>10 - Error, name is reserved word
 	 */
 	int validateNameConstraints(String name);
 	

@@ -120,24 +120,59 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		initProperties();
 		this.specialization = Villager.Profession.NONE;
 	}
-	
-	private void initProperties() {
-		properties.clear();   
-		properties.put(KonPropertyFlag.CAPTURE, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.capture"));
-		properties.put(KonPropertyFlag.CLAIM, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.claim"));
-		properties.put(KonPropertyFlag.UNCLAIM, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.unclaim"));
-		properties.put(KonPropertyFlag.UPGRADE, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.upgrade"));
-		properties.put(KonPropertyFlag.PLOTS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.plots"));
-		properties.put(KonPropertyFlag.TRAVEL, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.travel"));
-		properties.put(KonPropertyFlag.PVP, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.pvp"));
-		properties.put(KonPropertyFlag.PVE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.pve"));
-		properties.put(KonPropertyFlag.BUILD, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.build"));
-		properties.put(KonPropertyFlag.USE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.use"));
-		properties.put(KonPropertyFlag.CHEST, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.chest"));
-		properties.put(KonPropertyFlag.MOBS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.mobs"));
-		properties.put(KonPropertyFlag.PORTALS, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.portals"));
+
+	public static List<KonPropertyFlag> getProperties() {
+		List<KonPropertyFlag> result = new ArrayList<>();
+		result.add(KonPropertyFlag.CAPTURE);
+		result.add(KonPropertyFlag.CLAIM);
+		result.add(KonPropertyFlag.UNCLAIM);
+		result.add(KonPropertyFlag.UPGRADE);
+		result.add(KonPropertyFlag.PLOTS);
+		result.add(KonPropertyFlag.TRAVEL);
+		result.add(KonPropertyFlag.PVP);
+		result.add(KonPropertyFlag.PVE);
+		result.add(KonPropertyFlag.BUILD);
+		result.add(KonPropertyFlag.USE);
+		result.add(KonPropertyFlag.CHEST);
+		result.add(KonPropertyFlag.MOBS);
+		result.add(KonPropertyFlag.PORTALS);
+		result.add(KonPropertyFlag.JOIN);
+		result.add(KonPropertyFlag.LEAVE);
+		result.add(KonPropertyFlag.PROMOTE);
+		result.add(KonPropertyFlag.DEMOTE);
+		result.add(KonPropertyFlag.TRANSFER);
+		return result;
 	}
-	
+
+	@Override
+	public void initProperties() {
+		properties.clear();
+		for (KonPropertyFlag flag : getProperties()) {
+			properties.put(flag, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns."+flag.toString().toLowerCase()));
+		}
+	}
+
+	public boolean isJoinable() {
+		return getPropertyValue(KonPropertyFlag.JOIN);
+	}
+
+	public boolean isLeaveable() {
+		return getPropertyValue(KonPropertyFlag.LEAVE);
+	}
+
+	public boolean isPromoteable() {
+		return getPropertyValue(KonPropertyFlag.PROMOTE);
+	}
+
+	public boolean isDemoteable() {
+		return getPropertyValue(KonPropertyFlag.DEMOTE);
+	}
+
+	public boolean isTransferable() {
+		return getPropertyValue(KonPropertyFlag.TRANSFER);
+	}
+
+
 	@Override
 	public boolean setPropertyValue(KonPropertyFlag property, boolean value) {
 		boolean result = false;
