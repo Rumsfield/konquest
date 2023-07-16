@@ -1646,11 +1646,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return result;
 	}
 
-	// Get all towns within the player's kingdom, of which the player is a knight or lord, which have resident join requests
-	public List<KonTown> getRequestTowns(KonOfflinePlayer player) {
+	// Get all towns within the player's kingdom, of which the player is a knight or lord
+	public List<KonTown> getManageTowns(KonOfflinePlayer player) {
 		List<KonTown> result = new ArrayList<>();
 		for(KonTown town : player.getKingdom().getCapitalTowns()) {
-			if(town.isPlayerKnight(player.getOfflineBukkitPlayer()) && !town.getJoinRequests().isEmpty()) {
+			if(town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 				result.add(town);
 			}
 		}

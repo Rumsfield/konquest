@@ -22,17 +22,18 @@ public class TownMenu extends StateMenu implements ViewableMenu {
         LEAVE,
         LIST,
         INVITES,
-        REQUESTS
+        MANAGE
     }
 
     /* Icon slot indexes */
     private final int ROOT_SLOT_JOIN 			= 0;
     private final int ROOT_SLOT_LEAVE 			= 2;
-    private final int ROOT_SLOT_REQUESTS 		= 4;
+    private final int ROOT_SLOT_MANAGE 		    = 4;
     private final int ROOT_SLOT_INVITES 		= 6;
     private final int ROOT_SLOT_LIST 			= 8;
 
     private final String alertColor = DisplayManager.alertFormat;
+    private final String propertyColor = DisplayManager.propertyFormat;
     private final String loreColor = DisplayManager.loreFormat;
     private final String valueColor = DisplayManager.valueFormat;
     private final String hintColor = DisplayManager.hintFormat;
@@ -104,17 +105,11 @@ public class TownMenu extends StateMenu implements ViewableMenu {
         icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_INVITES.getMessage(), loreList, inviteMat, ROOT_SLOT_INVITES, true);
         result.addIcon(icon);
 
-        /* Requests Icon */
+        /* Manage Icon */
         loreList.clear();
-        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_REQUESTS.getMessage(),loreColor));
-        int numRequests = manager.getRequestTowns(player).size();
-        Material requestMat = Material.GLASS_BOTTLE;
-        if(numRequests > 0) {
-            loreList.add(valueColor+""+numRequests);
-            requestMat = Material.HONEY_BOTTLE;
-        }
+        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_MANAGE.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-        icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_REQUESTS.getMessage(), loreList, requestMat, ROOT_SLOT_REQUESTS, true);
+        icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_MANAGE.getMessage(), loreList, Material.BOOKSHELF, ROOT_SLOT_MANAGE, true);
         result.addIcon(icon);
 
         return result;
@@ -153,9 +148,9 @@ public class TownMenu extends StateMenu implements ViewableMenu {
             // Towns that have invited the player to join as a resident
             towns.addAll(manager.getInviteTowns(player));
             isClickable = true;
-        } else if(context.equals(MenuState.REQUESTS)) {
-            // Towns with pending resident join requests
-            towns.addAll(manager.getRequestTowns(player));
+        } else if(context.equals(MenuState.MANAGE)) {
+            // Towns that the player can manage
+            towns.addAll(manager.getManageTowns(player));
             isClickable = true;
         } else {
             return null;
@@ -210,8 +205,19 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                         loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_ACCEPT.getMessage());
                         loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_DECLINE.getMessage());
                         break;
-                    case REQUESTS:
-                        loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_REQUESTS.getMessage());
+                    case MANAGE:
+                        // Display lord or knight
+                        if(currentTown.isPlayerLord(player.getBukkitPlayer())) {
+                            loreList.add(propertyColor+MessagePath.LABEL_LORD.getMessage());
+                        } else if(currentTown.isPlayerKnight(player.getBukkitPlayer())) {
+                            loreList.add(propertyColor+MessagePath.LABEL_KNIGHT.getMessage());
+                        }
+                        // Display number of pending requests
+                        int numRequests = currentTown.getJoinRequests().size();
+                        if(numRequests > 0) {
+                            loreList.add(alertColor+MessagePath.MENU_TOWN_REQUESTS.getMessage()+": "+numRequests);
+                        }
+                        loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_MANAGE.getMessage());
                         break;
                     default:
                         break;
@@ -273,9 +279,9 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                         currentState = MenuState.INVITES;
                         result = goToTownView(MenuState.INVITES);
 
-                    } else if(slot == ROOT_SLOT_REQUESTS) {
-                        currentState = MenuState.REQUESTS;
-                        result = goToTownView(MenuState.REQUESTS);
+                    } else if(slot == ROOT_SLOT_MANAGE) {
+                        currentState = MenuState.MANAGE;
+                        result = goToTownView(MenuState.MANAGE);
 
                     }
                     break;
@@ -317,7 +323,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                         result = goToTownView(MenuState.INVITES);
                     }
                     break;
-                case REQUESTS:
+                case MANAGE:
                     // Clicking opens a town-specific management menu
                     if(clickedIcon instanceof TownIcon) {
                         TownIcon icon = (TownIcon)clickedIcon;
@@ -352,8 +358,8 @@ public class TownMenu extends StateMenu implements ViewableMenu {
             case INVITES:
                 result = color+MessagePath.MENU_TOWN_TITLE_INVITES.getMessage();
                 break;
-            case REQUESTS:
-                result = color+MessagePath.MENU_TOWN_TITLE_REQUESTS.getMessage();
+            case MANAGE:
+                result = color+MessagePath.MENU_TOWN_TITLE_MANAGE_TOWN.getMessage();
                 break;
             default:
                 break;
@@ -395,7 +401,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
             view.addIcon(navIconEmpty(navStart+7));
             view.addIcon(navIconEmpty(navStart+8));
         } else if(context.equals(MenuState.JOIN) || context.equals(MenuState.LEAVE) || context.equals(MenuState.LIST) ||
-                context.equals(MenuState.INVITES) || context.equals(MenuState.REQUESTS)) {
+                context.equals(MenuState.INVITES) || context.equals(MenuState.MANAGE)) {
             // (back [0]) close [4], return [5] (next [8])
             if(currentPage > 0) {
                 // Place a back button
