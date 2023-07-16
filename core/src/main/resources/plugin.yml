@@ -37,6 +37,7 @@ permissions:
     children:
       konquest.command: true
       konquest.command.*: true
+      konquest.create.*: true
       konquest.admin.*: true
       konquest.directive.*: true
       konquest.compass: true
@@ -146,6 +147,26 @@ permissions:
     description: Toggle particle borders of territories and plots
     default: true
     
+  konquest.create.*:
+    description: Gives access to creating all territories
+    default: op
+    children:
+      konquest.create.camp: true
+      konquest.create.town: true
+      konquest.create.kingdom: true
+
+  konquest.create.camp:
+    description: Create barbarian camps
+    default: true
+
+  konquest.create.town:
+    description: Create towns as a kingdom member
+    default: true
+
+  konquest.create.kingdom:
+    description: Create new kingdoms
+    default: true
+
   konquest.admin.*:
     description: All admin commands
     default: op

@@ -73,6 +73,11 @@ public class KingdomCommand extends CommandBase {
 							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 							return;
 						}
+						// Check for permission
+						if(!bukkitPlayer.hasPermission("konquest.create.kingdom")) {
+							ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" konquest.create.kingdom");
+							return;
+						}
 	            		// Needs kingdom name and template name arguments
 						if(getArgs().length == 2) {
 							ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_MISSING_TEMPLATE.getMessage());
