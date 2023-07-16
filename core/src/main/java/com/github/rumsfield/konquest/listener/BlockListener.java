@@ -774,7 +774,7 @@ public class BlockListener implements Listener {
 			// Attempt to create a camp for barbarians who place a bed
 			if(!player.isAdminBypassActive()) {
 				// Check if the player is a barbarian placing a bed
-				if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed) {
+				if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && player.getBukkitPlayer().hasPermission("konquest.create.camp")) {
 					// Fire event
 					KonquestPlayerCampEvent invokePreEvent = new KonquestPlayerCampEvent(konquest, player, event.getBlock().getLocation());
 					Konquest.callKonquestEvent(invokePreEvent);

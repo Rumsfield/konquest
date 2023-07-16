@@ -41,6 +41,27 @@ permissions:
       konquest.directive.*: true
       konquest.compass: true
       konquest.join: true
+      konquest.create.*: true
+
+  konquest.create.*:
+    description: Gives access to creating all territories
+    default: op
+    children:
+      konquest.create.camp: true
+      konquest.create.town: true
+      konquest.create.kingdom: true
+
+  konquest.create.camp:
+    description: Create barbarian camps
+    default: true
+
+  konquest.create.town:
+    description: Create towns as a kingdom member
+    default: true
+
+  konquest.create.kingdom:
+    description: Create new kingdoms
+    default: true
 
   konquest.command:
     description: Base command permission
