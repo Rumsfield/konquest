@@ -120,8 +120,9 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		initProperties();
 		this.specialization = Villager.Profession.NONE;
 	}
-	
-	private void initProperties() {
+
+	@Override
+	public void initProperties() {
 		properties.clear();   
 		properties.put(KonPropertyFlag.CAPTURE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.capture"));
 		properties.put(KonPropertyFlag.CLAIM, 		getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.claim"));

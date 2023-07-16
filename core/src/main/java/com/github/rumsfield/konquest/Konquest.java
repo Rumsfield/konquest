@@ -760,7 +760,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	 * 			7 - Error, name is a guild [deprecated]
 	 * 			8 - Error, name is a sanctuary
 	 * 			9 - Error, name is a template
-	 * 			10 - Error, name is territory travel reserved word
+	 * 			10 - Error, name is reserved word
 	 */
 	public int validateNameConstraints(String name) {
 		if(name == null || name.equals("") || name.contains(" ") || !name.matches("([A-Za-z0-9_]+)")) {
@@ -795,7 +795,14 @@ public class Konquest implements KonquestAPI, Timeable {
 			}
 		}
 		List<String> reservedWords = new ArrayList<>();
+		reservedWords.add("konquest");
+		reservedWords.add("kingdom");
+		reservedWords.add("town");
+		reservedWords.add("camp");
+		reservedWords.add("ruin");
+		reservedWords.add("sanctuary");
 		reservedWords.add("templates");
+		reservedWords.add("all");
 		for(String word : reservedWords) {
 			if(name.equalsIgnoreCase(word)) {
 				return 10;

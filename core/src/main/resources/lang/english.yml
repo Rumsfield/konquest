@@ -442,6 +442,7 @@ command:
         all-properties: "All Properties"
         single-property: "Single Property"
         set: "Set property %s of %s to new value %s."
+        reset: "Reset all properties to default values in properties.yml"
     help:
       notice:
         message: "Admin Help: Command, Arguments, Description"

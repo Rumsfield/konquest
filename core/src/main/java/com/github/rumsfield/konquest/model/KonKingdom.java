@@ -81,8 +81,9 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.properties = new HashMap<>();
 		this.webColor = -1;
 	}
-	
-	private void initProperties() {
+
+	@Override
+	public void initProperties() {
 		properties.clear();
 		properties.put(KonPropertyFlag.PEACEFUL, 	konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.peaceful"));
 		properties.put(KonPropertyFlag.GOLEMS, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.golems"));

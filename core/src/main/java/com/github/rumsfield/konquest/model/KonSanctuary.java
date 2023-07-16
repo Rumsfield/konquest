@@ -32,8 +32,9 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 		this.templates = new HashMap<>();
 		this.templateBlankingTimers = new HashMap<>();
 	}
-	
-	private void initProperties() {
+
+	@Override
+	public void initProperties() {
 		properties.clear();
 		properties.put(KonPropertyFlag.TRAVEL, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.travel"));
 		properties.put(KonPropertyFlag.PVP, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.pvp"));

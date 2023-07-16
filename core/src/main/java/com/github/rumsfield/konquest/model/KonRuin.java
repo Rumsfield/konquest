@@ -48,7 +48,8 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		initProperties();
 	}
 
-	private void initProperties() {
+	@Override
+	public void initProperties() {
 		properties.clear();
 		properties.put(KonPropertyFlag.PVP, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.pvp"));
 		properties.put(KonPropertyFlag.PVE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.ruins.pve"));

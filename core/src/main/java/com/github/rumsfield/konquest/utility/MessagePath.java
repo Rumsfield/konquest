@@ -417,6 +417,7 @@ public enum MessagePath {
 	COMMAND_ADMIN_FLAG_NOTICE_ALL_PROPERTIES    (0, "command.admin.flag.notice.all-properties"),
 	COMMAND_ADMIN_FLAG_NOTICE_SINGLE_PROPERTY   (0, "command.admin.flag.notice.single-property"),
 	COMMAND_ADMIN_FLAG_NOTICE_SET    			(3, "command.admin.flag.notice.set"),
+	COMMAND_ADMIN_FLAG_NOTICE_RESET    			(0, "command.admin.flag.notice.reset"),
 	COMMAND_ADMIN_KINGDOM_BROADCAST_CREATE      (1, "command.admin.kingdom.broadcast.create"),
 	COMMAND_ADMIN_KINGDOM_NOTICE_ADMIN_SET      (1, "command.admin.kingdom.notice.admin-set"),
 	COMMAND_ADMIN_KINGDOM_NOTICE_ADMIN_CLEAR    (1, "command.admin.kingdom.notice.admin-clear"),
