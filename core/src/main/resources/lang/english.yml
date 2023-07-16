@@ -264,9 +264,9 @@ menu:
     title-leave: "Leave a Town"
     title-list: "Town List"
     title-invites: "Resident Invites"
-    title-manage: "Managed Towns"
+    title-manage-town: "Managed Towns"
     title-requests: "Resident Requests"
-    title-manage-root: "%s Menu"
+    title-manage: "%s Menu"
   kingdom:
     join: "Join"
     exile: "Exile"

@@ -359,7 +359,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                 result = color+MessagePath.MENU_TOWN_TITLE_INVITES.getMessage();
                 break;
             case MANAGE:
-                result = color+MessagePath.MENU_TOWN_TITLE_MANAGE.getMessage();
+                result = color+MessagePath.MENU_TOWN_TITLE_MANAGE_TOWN.getMessage();
                 break;
             default:
                 break;

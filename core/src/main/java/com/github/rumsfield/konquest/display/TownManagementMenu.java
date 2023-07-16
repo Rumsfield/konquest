@@ -724,7 +724,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         }
         switch(context) {
             case ROOT:
-                result = color+MessagePath.MENU_TOWN_TITLE_MANAGE_ROOT.getMessage(name);
+                result = color+MessagePath.MENU_TOWN_TITLE_MANAGE.getMessage(name);
                 break;
             case A_REQUESTS:
                 result = color+MessagePath.MENU_TOWN_TITLE_REQUESTS.getMessage();
