@@ -244,7 +244,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                 loreList.add(propertyColor+MessagePath.LABEL_LORD.getMessage());
                 loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_OPTIONS.getMessage(),loreColor));
                 loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
-                icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_OPTIONS.getMessage(), loreList, Material.PAPER, ROOT_SLOT_OPTIONS, true);
+                icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_OPTIONS.getMessage(), loreList, Material.OAK_SIGN, ROOT_SLOT_OPTIONS, true);
                 result.addIcon(icon);
 
                 /* Specialization Icon */

@@ -129,8 +129,8 @@ public class InventoryListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
-							if(town.isPlotOnly() && !town.isPlayerKnight(player.getOfflineBukkitPlayer()) && !town.hasPlot(openLoc)) {
-								// Stop when non-elite player edits non-plot land
+							if(town.isPlotOnly() && !town.isPlayerKnight(player.getOfflineBukkitPlayer()) && !town.hasPlot(openLoc) && !town.getMonument().isLocInside(openLoc)) {
+								// Stop when non-elite player edits non-plot land (excluding monument)
 								ChatUtil.sendError((Player)event.getPlayer(), MessagePath.PROTECTION_ERROR_ONLY_PLOT.getMessage());
 								event.setCancelled(true);
 								return;
