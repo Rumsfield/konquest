@@ -724,10 +724,10 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         }
         switch(context) {
             case ROOT:
-                result = color+MessagePath.MENU_TOWN_TITLE_MANAGE.getMessage(name);
+                result = color+MessagePath.MENU_TOWN_TITLE_MANAGE_ROOT.getMessage(name);
                 break;
             case A_REQUESTS:
-                result = color+MessagePath.MENU_TOWN_REQUESTS.getMessage();
+                result = color+MessagePath.MENU_TOWN_TITLE_REQUESTS.getMessage();
                 break;
             case A_SHIELD:
                 result = color+MessagePath.MENU_TOWN_SHIELDS.getMessage();
