@@ -3,9 +3,7 @@ package com.github.rumsfield.konquest.command.admin;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.manager.DisplayManager;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonPropertyFlag;
-import com.github.rumsfield.konquest.model.KonPropertyFlagHolder;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
@@ -119,13 +117,25 @@ public class FlagAdminCommand extends CommandBase {
 							holderType + "(" + numHolders + ")";
 					ChatUtil.sendNotice(bukkitPlayer, header);
 					if(infoHolder != null) {
-						Map<KonPropertyFlag,Boolean> holderFlags = infoHolder.getAllProperties();
-						for(KonPropertyFlag flag : holderFlags.keySet()) {
-							String flagName = flag.getName();
-							String flagDescription = flag.getDescription();
-							String infoLine = DisplayManager.loreFormat + flag + ": " + flagName +
-									ChatColor.RESET + " | " + flagDescription;
-							ChatUtil.sendMessage((Player) getSender(), infoLine);
+						for(KonPropertyFlag flag : KonPropertyFlag.values()) {
+							if(infoHolder.hasPropertyValue(flag)) {
+								int numTrue = 0;
+								int numFalse = 0;
+								for (KonPropertyFlagHolder countHolder : holders) {
+									if(countHolder.getPropertyValue(flag)) {
+										numTrue++;
+									} else {
+										numFalse++;
+									}
+								}
+								String flagName = flag.getName();
+								String flagValues = true + "(" + numTrue + "), " + ChatColor.RED + false + "(" + numFalse + ")";
+								String flagDescription = flag.getDescription();
+								String infoLine = DisplayManager.loreFormat + flag + ": " +
+										DisplayManager.valueFormat + flagName + " = " + flagValues +
+										ChatColor.RESET + " | " + flagDescription;
+								ChatUtil.sendMessage((Player) getSender(), infoLine);
+							}
 						}
 					}
 				} else {
@@ -134,15 +144,16 @@ public class FlagAdminCommand extends CommandBase {
 							holderType + " " + holderName;
 					ChatUtil.sendNotice(bukkitPlayer, header);
 					if(infoHolder != null) {
-						Map<KonPropertyFlag,Boolean> holderFlags = infoHolder.getAllProperties();
-						for(KonPropertyFlag flag : holderFlags.keySet()) {
-							String flagName = flag.getName();
-							String flagValue = String.valueOf(holderFlags.get(flag));
-							String flagDescription = flag.getDescription();
-							String infoLine = DisplayManager.loreFormat + flag + ": " + flagName +
-									DisplayManager.valueFormat + " = " + flagValue +
-									ChatColor.RESET + " | " + flagDescription;
-							ChatUtil.sendMessage((Player) getSender(), infoLine);
+						for(KonPropertyFlag flag : KonPropertyFlag.values()) {
+							if(infoHolder.hasPropertyValue(flag)) {
+								String flagName = flag.getName();
+								String flagValue = infoHolder.getPropertyValue(flag) ? ""+true : ChatColor.RED + ""+false;
+								String flagDescription = flag.getDescription();
+								String infoLine = DisplayManager.loreFormat + flag + ": " +
+										DisplayManager.valueFormat + flagName + " = " + flagValue +
+										ChatColor.RESET + " | " + flagDescription;
+								ChatUtil.sendMessage((Player) getSender(), infoLine);
+							}
 						}
 					}
 				}
@@ -189,10 +200,10 @@ public class FlagAdminCommand extends CommandBase {
 								holderType + "(" + numHolders + ")";
 						ChatUtil.sendNotice(bukkitPlayer, header);
 						String flagName = flag.getName();
-						String flagValues = true + "(" + numTrue + "), " + false + "(" + numFalse + ")";
+						String flagValues = true + "(" + numTrue + "), " + ChatColor.RED + false + "(" + numFalse + ")";
 						String flagDescription = flag.getDescription();
-						String infoLine = DisplayManager.loreFormat + flag + ": " + flagName +
-								DisplayManager.valueFormat + " = " + flagValues +
+						String infoLine = DisplayManager.loreFormat + flag + ": " +
+								DisplayManager.valueFormat + flagName + " = " + flagValues +
 								ChatColor.RESET + " | " + flagDescription;
 						ChatUtil.sendMessage((Player) getSender(), infoLine);
 					} else {
@@ -201,10 +212,10 @@ public class FlagAdminCommand extends CommandBase {
 								holderType + " " + holderName;
 						ChatUtil.sendNotice(bukkitPlayer, header);
 						String flagName = flag.getName();
-						String flagValue = String.valueOf(infoHolder.getPropertyValue(flag));
+						String flagValue = infoHolder.getPropertyValue(flag) ? ""+true : ChatColor.RED + ""+false;
 						String flagDescription = flag.getDescription();
-						String infoLine = DisplayManager.loreFormat + flag + ": " + flagName +
-								DisplayManager.valueFormat + " = " + flagValue +
+						String infoLine = DisplayManager.loreFormat + flag + ": " +
+								DisplayManager.valueFormat + flagName + " = " + flagValue +
 								ChatColor.RESET + " | " + flagDescription;
 						ChatUtil.sendMessage((Player) getSender(), infoLine);
 					}
@@ -246,7 +257,7 @@ public class FlagAdminCommand extends CommandBase {
 			Collections.sort(matchedTabList);
 		} else if(getArgs().length > 3) {
 			String holderType = getArgs()[2];
-
+			holderType = holderType.toLowerCase();
 			if(getArgs().length == 4) {
 				// Suggest all known property holders
 				switch(holderType) {
@@ -272,52 +283,43 @@ public class FlagAdminCommand extends CommandBase {
 				Collections.sort(matchedTabList);
 			} else if(getArgs().length == 5) {
 				// Suggest properties
-				String holderName = getArgs()[3];
-				KonPropertyFlagHolder holder = null;
+				ArrayList<KonPropertyFlag> flags = new ArrayList<>();
 				switch(holderType) {
 					case "kingdom":
-						holder = getKonquest().getKingdomManager().getKingdom(holderName);
+						flags.addAll(KonKingdom.getProperties());
 						break;
 					case "capital":
-						if(getKonquest().getKingdomManager().isKingdom(holderName)) {
-							// Found kingdom capital
-							holder = getKonquest().getKingdomManager().getKingdom(holderName).getCapital();
-						}
-						break;
 					case "town":
-						holder = getKonquest().getKingdomManager().getTown(holderName);
+						flags.addAll(KonTown.getProperties());
 						break;
 					case "sanctuary":
-						holder = getKonquest().getSanctuaryManager().getSanctuary(holderName);
+						flags.addAll(KonSanctuary.getProperties());
 						break;
 					case "ruin":
-						holder = getKonquest().getRuinManager().getRuin(holderName);
+						flags.addAll(KonRuin.getProperties());
 						break;
 					default:
 						break;
 				}
-				if(holder != null) {
-					for(KonPropertyFlag flag : holder.getAllProperties().keySet()) {
-						tabList.add(flag.toString());
-					}
+				for(KonPropertyFlag flag : flags) {
+					tabList.add(flag.toString());
 				}
 				tabList.add("reset");
 				// Trim down completion options based on current input
 				StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
 				Collections.sort(matchedTabList);
 			} else if(getArgs().length == 6) {
-				// Suggest values
-				tabList.add(String.valueOf(true));
-				tabList.add(String.valueOf(false));
+				String flagName = getArgs()[4];
+				if(!flagName.equalsIgnoreCase("reset")) {
+					// Suggest values
+					tabList.add(String.valueOf(true));
+					tabList.add(String.valueOf(false));
+				}
 				// Trim down completion options based on current input
 				StringUtil.copyPartialMatches(getArgs()[5], tabList, matchedTabList);
 				Collections.sort(matchedTabList);
 			}
-
-
 		}
-
-
 		return matchedTabList;
 	}
 }

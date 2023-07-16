@@ -82,17 +82,24 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.webColor = -1;
 	}
 
+	public static List<KonPropertyFlag> getProperties() {
+		List<KonPropertyFlag> result = new ArrayList<>();
+		result.add(KonPropertyFlag.PEACEFUL);
+		result.add(KonPropertyFlag.GOLEMS);
+		result.add(KonPropertyFlag.JOIN);
+		result.add(KonPropertyFlag.LEAVE);
+		result.add(KonPropertyFlag.PROMOTE);
+		result.add(KonPropertyFlag.DEMOTE);
+		result.add(KonPropertyFlag.TRANSFER);
+		return result;
+	}
+
 	@Override
 	public void initProperties() {
 		properties.clear();
-		properties.put(KonPropertyFlag.PEACEFUL, 	konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.peaceful"));
-		properties.put(KonPropertyFlag.GOLEMS, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.golems"));
-		properties.put(KonPropertyFlag.JOIN, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.join"));
-		properties.put(KonPropertyFlag.LEAVE, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.leave"));
-		properties.put(KonPropertyFlag.PROMOTE, 	konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.promote"));
-		properties.put(KonPropertyFlag.DEMOTE, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.demote"));
-		properties.put(KonPropertyFlag.TRANSFER, 	konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.transfer"));
-
+		for (KonPropertyFlag flag : getProperties()) {
+			properties.put(flag, konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms."+flag.toString().toLowerCase()));
+		}
 	}
 	
 	public boolean isCreated() {

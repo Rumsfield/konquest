@@ -33,6 +33,8 @@
 #   PROMOTE			Allow promotion of players
 #   DEMOTE			Allow demotion of players
 #   TRANSFER		Allow ownership transfer
+#
+# Remember to use the "/k admin reload" command after modifying this file if the server is running.
 # 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0

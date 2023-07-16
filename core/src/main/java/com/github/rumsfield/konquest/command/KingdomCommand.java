@@ -196,7 +196,7 @@ public class KingdomCommand extends CommandBase {
 	    		        		return;
 	    					}
 	            			playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
-	            			boolean status = getKonquest().getKingdomManager().joinKingdomInvite(player, offlinePlayer.getOfflineBukkitPlayer(), kingdom);
+	            			boolean status = getKonquest().getKingdomManager().joinKingdomInvite(player, offlinePlayer, kingdom);
 							if(status) {
 								ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_INVITE_SENT.getMessage(playerName));
 							}

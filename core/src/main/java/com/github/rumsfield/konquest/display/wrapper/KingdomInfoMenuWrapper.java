@@ -119,9 +119,11 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
 		loreList.add(loreColor+MessagePath.PROPERTIES_JOIN_NAME.getMessage()+": "+isJoin);
 		loreList.add(loreColor+MessagePath.PROPERTIES_LEAVE_NAME.getMessage()+": "+isLeave);
-		loreList.add(loreColor+MessagePath.PROPERTIES_PROMOTE_NAME.getMessage()+": "+isPromote);
-		loreList.add(loreColor+MessagePath.PROPERTIES_DEMOTE_NAME.getMessage()+": "+isDemote);
-		loreList.add(loreColor+MessagePath.PROPERTIES_TRANSFER_NAME.getMessage()+": "+isTransfer);
+		if(!infoKingdom.isAdminOperated()) {
+			loreList.add(loreColor+MessagePath.PROPERTIES_PROMOTE_NAME.getMessage()+": "+isPromote);
+			loreList.add(loreColor+MessagePath.PROPERTIES_DEMOTE_NAME.getMessage()+": "+isDemote);
+			loreList.add(loreColor+MessagePath.PROPERTIES_TRANSFER_NAME.getMessage()+": "+isTransfer);
+		}
 		loreList.add(loreColor+MessagePath.LABEL_SMALLEST.getMessage()+": "+isSmallest);
 		loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
 		info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, slotIndex, false);

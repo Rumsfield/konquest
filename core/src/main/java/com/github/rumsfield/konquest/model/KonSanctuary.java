@@ -33,19 +33,27 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 		this.templateBlankingTimers = new HashMap<>();
 	}
 
+	public static java.util.List<KonPropertyFlag> getProperties() {
+		java.util.List<KonPropertyFlag> result = new ArrayList<>();
+		result.add(KonPropertyFlag.TRAVEL);
+		result.add(KonPropertyFlag.PVP);
+		result.add(KonPropertyFlag.PVE);
+		result.add(KonPropertyFlag.BUILD);
+		result.add(KonPropertyFlag.USE);
+		result.add(KonPropertyFlag.CHEST);
+		result.add(KonPropertyFlag.MOBS);
+		result.add(KonPropertyFlag.PORTALS);
+		result.add(KonPropertyFlag.ENTER);
+		result.add(KonPropertyFlag.EXIT);
+		return result;
+	}
+
 	@Override
 	public void initProperties() {
 		properties.clear();
-		properties.put(KonPropertyFlag.TRAVEL, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.travel"));
-		properties.put(KonPropertyFlag.PVP, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.pvp"));
-		properties.put(KonPropertyFlag.PVE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.pve"));
-		properties.put(KonPropertyFlag.BUILD, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.build"));
-		properties.put(KonPropertyFlag.USE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.use"));
-		properties.put(KonPropertyFlag.CHEST, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.chest"));
-		properties.put(KonPropertyFlag.MOBS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.mobs"));
-		properties.put(KonPropertyFlag.PORTALS, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.portals"));
-		properties.put(KonPropertyFlag.ENTER, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.enter"));
-		properties.put(KonPropertyFlag.EXIT, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.exit"));
+		for (KonPropertyFlag flag : getProperties()) {
+			properties.put(flag, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries."+flag.toString().toLowerCase()));
+		}
 	}
 
 	@Override

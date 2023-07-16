@@ -8,6 +8,7 @@ import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonMonumentTemplate;
+import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
@@ -601,7 +602,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				switch(context) {
 					case A_JOIN:
 						// Check if the player can join the current kingdom
-						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0 || !currentKingdom.isJoinable()) {
+						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0 || !currentKingdom.isJoinable() || !kingdom.isLeaveable()) {
 							// The kingdom is unavailable to join at this time
 							loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
 						}
@@ -613,7 +614,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						break;
 					case A_INVITE:
 						// Check if the player can join the current kingdom
-						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0 || !currentKingdom.isJoinable()) {
+						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0 || !currentKingdom.isJoinable() || !kingdom.isLeaveable()) {
 							// The kingdom is unavailable to join at this time
 							loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
 						}
@@ -882,7 +883,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				case B_REQUESTS:
 					if(clickedIcon instanceof PlayerIcon) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
-						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
+						KonOfflinePlayer clickPlayer = konquest.getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
 						boolean status = manager.menuRespondKingdomRequest(player, clickPlayer, kingdom, clickType);
 						playStatusSound(player.getBukkitPlayer(),status);
 						result = goToPlayerView(MenuState.B_REQUESTS);
