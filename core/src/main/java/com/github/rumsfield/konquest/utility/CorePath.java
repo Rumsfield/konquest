@@ -148,9 +148,11 @@ public enum CorePath {
 	CAMPS_PROTECT_CONTAINERS                              ("core.camps.protect_containers"),
 	CAMPS_NO_ENEMY_EDIT_OFFLINE                           ("core.camps.no_enemy_edit_offline"),
 	CAMPS_NO_ENEMY_EDIT_OFFLINE_WARMUP                    ("core.camps.no_enemy_edit_offline_warmup"),
+	CAMPS_NO_ENEMY_TRAVEL                                 ("core.camps.no_enemy_travel"),
 	CAMPS_CLAN_ENABLE                                     ("core.camps.clan_enable"),
 	CAMPS_CLAN_ALLOW_CONTAINERS                           ("core.camps.clan_allow_containers"),
 	CAMPS_CLAN_ALLOW_EDIT_OFFLINE                         ("core.camps.clan_allow_edit_offline"),
+	CAMPS_CLAN_ALLOW_JOIN_OFFLINE                         ("core.camps.clan_allow_join_offline"),
 	CAMPS_ENEMY_GLOW                                      ("core.camps.enemy_glow"),
 	
 	MONUMENTS_CRITICAL_BLOCK                              ("core.monuments.critical_block"),
