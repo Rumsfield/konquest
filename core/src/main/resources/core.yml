@@ -472,8 +472,11 @@ core:
     
     # Time in seconds when a camp is protected from when the owner disconnects (integer >= 0)
     no_enemy_edit_offline_warmup: 120
+
+    # Prevent enemy players from traveling within camps (true/false)
+    no_enemy_travel: true
     
-    # [EXPERIMENTAL] Enable camp clans when barbarian camps are placed next to each other (true/false)
+    # [EXPERIMENTAL] (*) Enable camp clans when barbarian camps are placed next to each other (true/false)
     clan_enable: false
     
     # [EXPERIMENTAL] Allow barbarians to access containers in camps from the same clan, CAN BE ABUSED! (true/false)
@@ -481,6 +484,9 @@ core:
     
     # [EXPERIMENTAL] Allow barbarians to edit blocks in offline-protected camps from the same clan, CAN BE ABUSED! (true/false)
     clan_allow_edit_offline: false
+
+    # [EXPERIMENTAL] Allow barbarians to join a clan with their camp while all other clan members are offline (true/false)
+    clan_allow_join_offline: false
     
     # Apply the Glowing effect to enemies that break blocks within a camp (true/false)
     enemy_glow: true
