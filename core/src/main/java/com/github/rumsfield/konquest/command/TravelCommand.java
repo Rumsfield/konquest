@@ -52,21 +52,21 @@ public class TravelCommand extends CommandBase {
 			}
 			// Verify player is not in enemy territory
 			boolean blockEnemyTravel = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_NO_ENEMY_TRAVEL.getPath());
-			if (blockEnemyTravel) {
-				Location playerLoc = bukkitPlayer.getLocation();
-				if(getKonquest().getTerritoryManager().isChunkClaimed(playerLoc)) {
-					KonTerritory locTerritory = getKonquest().getTerritoryManager().getChunkTerritory(playerLoc);
-					assert locTerritory != null;
-					KonKingdom locKingdom = locTerritory.getKingdom();
-					boolean isTravelAllowed = locTerritory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY) ||
-							locKingdom.equals(player.getKingdom()) ||
-							kManager.isPlayerPeace(player,locKingdom) ||
-							kManager.isPlayerTrade(player,locKingdom) ||
-							kManager.isPlayerAlly(player,locKingdom);
-					if(!isTravelAllowed) {
-						ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_ENEMY_TERRITORY.getMessage());
-						return;
-					}
+			boolean blockCampTravel = getKonquest().getCore().getBoolean(CorePath.CAMPS_NO_ENEMY_TRAVEL.getPath());
+			Location playerLoc = bukkitPlayer.getLocation();
+			if(getKonquest().getTerritoryManager().isChunkClaimed(playerLoc)) {
+				KonTerritory locTerritory = getKonquest().getTerritoryManager().getChunkTerritory(playerLoc);
+				assert locTerritory != null;
+				KonKingdom locKingdom = locTerritory.getKingdom();
+				boolean isKingdomTravelAllowed = locTerritory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY) ||
+						locKingdom.equals(player.getKingdom()) ||
+						kManager.isPlayerPeace(player, locKingdom) ||
+						kManager.isPlayerTrade(player, locKingdom) ||
+						kManager.isPlayerAlly(player, locKingdom);
+				boolean isCampTravelBlocked = (locTerritory instanceof KonCamp) && !((KonCamp)locTerritory).isPlayerOwner(bukkitPlayer);
+				if((blockEnemyTravel && !isKingdomTravelAllowed) || (blockCampTravel && isCampTravelBlocked)) {
+					ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_TRAVEL_ERROR_ENEMY_TERRITORY.getMessage());
+					return;
 				}
 			}
 			/*
