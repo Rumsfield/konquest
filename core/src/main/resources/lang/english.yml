@@ -426,6 +426,7 @@ protection:
     camp-create: "Cannot create more than one Camp. Destroy the bed in your current Camp before placing a new bed."
     camp-fail-overlap: "Camping failed: New claims overlap with existing territory."
     camp-fail-barbarian: "Camping failed: You are not a Barbarian."
+    camp-fail-offline: "Camping failed: All surrounding camp owners are offline."
     capture: "This territory cannot be captured for another %s."
     golem: "You cannot hurt friendly Iron Golems in the Town of %s."
     tag-blocked: "This command is blocked while in combat."

@@ -806,6 +806,9 @@ public class BlockListener implements Listener {
 				    	case 5:
 				    		// This error message is removed because it could be annoying to see it every time a bed is placed in an invalid world.
 				    		break;
+						case 6:
+							ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OFFLINE.getMessage());
+							break;
 				    	default:
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 				    		break;

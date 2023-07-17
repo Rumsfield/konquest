@@ -476,7 +476,7 @@ core:
     # Prevent enemy players from breaking any blocks in camps when owners are offline (true/false)
     no_enemy_travel: true
     
-    # [EXPERIMENTAL] Enable camp clans when barbarian camps are placed next to each other (true/false)
+    # [EXPERIMENTAL] (*) Enable camp clans when barbarian camps are placed next to each other (true/false)
     clan_enable: false
     
     # [EXPERIMENTAL] Allow barbarians to access containers in camps from the same clan, CAN BE ABUSED! (true/false)

@@ -407,6 +407,7 @@ public enum MessagePath {
 	PROTECTION_ERROR_CAMP_CREATE                (0, "protection.error.camp-create"),
 	PROTECTION_ERROR_CAMP_FAIL_OVERLAP          (0, "protection.error.camp-fail-overlap"),
 	PROTECTION_ERROR_CAMP_FAIL_BARBARIAN        (0, "protection.error.camp-fail-barbarian"),
+	PROTECTION_ERROR_CAMP_FAIL_OFFLINE          (0, "protection.error.camp-fail-offline"),
 	PROTECTION_ERROR_CAPTURE                    (1, "protection.error.capture"),
 	PROTECTION_ERROR_GOLEM                      (1, "protection.error.golem"),
 	PROTECTION_ERROR_TAG_BLOCKED                (0, "protection.error.tag-blocked"),
