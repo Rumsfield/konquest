@@ -473,7 +473,7 @@ core:
     # Time in seconds when a camp is protected from when the owner disconnects (integer >= 0)
     no_enemy_edit_offline_warmup: 120
 
-    # Prevent enemy players from breaking any blocks in camps when owners are offline (true/false)
+    # Prevent enemy players from traveling within camps (true/false)
     no_enemy_travel: true
     
     # [EXPERIMENTAL] (*) Enable camp clans when barbarian camps are placed next to each other (true/false)
