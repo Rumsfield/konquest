@@ -602,7 +602,9 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				switch(context) {
 					case A_JOIN:
 						// Check if the player can join the current kingdom
-						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0 || !currentKingdom.isJoinable() || !kingdom.isLeaveable()) {
+						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0 ||
+								!currentKingdom.isJoinable() ||
+								(kingdom.isCreated() && !kingdom.isLeaveable())) {
 							// The kingdom is unavailable to join at this time
 							loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
 						}
@@ -614,7 +616,9 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						break;
 					case A_INVITE:
 						// Check if the player can join the current kingdom
-						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0 || !currentKingdom.isJoinable() || !kingdom.isLeaveable()) {
+						if(manager.isPlayerJoinKingdomAllowed(player, currentKingdom) != 0 ||
+								!currentKingdom.isJoinable() ||
+								(kingdom.isCreated() && !kingdom.isLeaveable())) {
 							// The kingdom is unavailable to join at this time
 							loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
 						}
