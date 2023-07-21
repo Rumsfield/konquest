@@ -98,6 +98,8 @@ public class SanctuaryManager {
 			// Remove display bars
 			oldSanctuary.removeAllBarPlayers();
 			// Remove territory
+			ArrayList<Point> sanctuaryPoints = new ArrayList<>(oldSanctuary.getChunkList().keySet());
+			konquest.getShopHandler().deleteShopsInPoints(sanctuaryPoints,oldSanctuary.getWorld());
 			konquest.getTerritoryManager().removeAllTerritory(oldSanctuary.getCenterLoc().getWorld(), oldSanctuary.getChunkList().keySet());
 			// Update border particles
 			for(KonPlayer player : nearbyPlayers) {
