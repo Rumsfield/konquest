@@ -62,14 +62,9 @@ public class Handler_1_18_R1 implements VersionHandler {
 
 			teamPacket.getSpecificModifier(Collection.class).write(0,teamNames);
 			fieldPlayersSuccess = true;
-			
-			try {
-				ProtocolLibrary.getProtocolManager().sendServerPacket(player, teamPacket);
-			} catch (InvocationTargetException e) {
-			    throw new RuntimeException(
-			        "Cannot send packet " + teamPacket, e);
-			}
-			
+
+			ProtocolLibrary.getProtocolManager().sendServerPacket(player, teamPacket);
+
 		} catch(FieldAccessException e) {
 			ChatUtil.printDebug("Failed to create team packet for player "+player.getName()+", field status is "+fieldNameSuccess+","+fieldModeSuccess+","+fieldPlayersSuccess+": "+e.getMessage());
 		}

@@ -2015,11 +2015,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			konquest.updateNamePackets(kingdom);
 			konquest.getTerritoryManager().updatePlayerBorderParticles(kingdom);
 			konquest.getTerritoryManager().updateTownDisplayBars(kingdom);
+			refreshTownNerfs(kingdom);
 		}
 		if(!theirActiveState.equals(theirNewActiveState)) {
 			konquest.updateNamePackets(otherKingdom);
 			konquest.getTerritoryManager().updatePlayerBorderParticles(otherKingdom);
 			konquest.getTerritoryManager().updateTownDisplayBars(otherKingdom);
+			refreshTownNerfs(otherKingdom);
 		}
 
 		// Withdraw cost
@@ -2318,7 +2320,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		konquest.getMapHandler().drawDynmapRemoveTerritory(town);
 		konquest.getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
 		// Update shops
-		konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(townPoints,town.getWorld());
+		konquest.getShopHandler().deleteShopsInPoints(townPoints,town.getWorld());
 		return true;
 	}
 
@@ -2390,7 +2392,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			konquest.getMapHandler().drawDynmapUpdateTerritory(conquerKingdom.getTown(name));
 			konquest.getMapHandler().drawDynmapLabel(getKingdom(oldKingdomName).getCapital());
 			konquest.getMapHandler().drawDynmapLabel(conquerKingdom.getCapital());
-			konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(conquerKingdom.getTown(name).getChunkList().keySet(),conquerKingdom.getTown(name).getWorld());
+			konquest.getShopHandler().deleteShopsInPoints(conquerKingdom.getTown(name).getChunkList().keySet(),conquerKingdom.getTown(name).getWorld());
 			return conquerKingdom.getTown(name);
 		}
 		return null;
@@ -2472,7 +2474,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				town.updateBarPlayers();
 				konquest.getMapHandler().drawDynmapUpdateTerritory(town);
 				konquest.getMapHandler().drawDynmapLabel(conquerKingdom.getCapital());
-				konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(town.getChunkList().keySet(),town.getWorld());
+				konquest.getShopHandler().deleteShopsInPoints(town.getChunkList().keySet(),town.getWorld());
 				return town;
 			} else {
 				ChatUtil.printDebug("Failed to create new town over captured capital, status code "+status);
@@ -3246,12 +3248,18 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public void refreshTownNerfs(KonTown town) {
 		for(KonPlayer player : konquest.getPlayerManager().getPlayersOnline()) {
 			if(town.isLocInside(player.getBukkitPlayer().getLocation())) {
-				if(player.getKingdom().equals(town.getKingdom())) {
-					clearTownNerf(player);
-				} else {
+				if(isPlayerEnemy(player, town.getKingdom())) {
 					applyTownNerf(player, town);
+				} else {
+					clearTownNerf(player);
 				}
 			}
+		}
+	}
+
+	public void refreshTownNerfs(KonKingdom kingdom) {
+		for(KonTown town : kingdom.getCapitalTowns()) {
+			refreshTownNerfs(town);
 		}
 	}
 

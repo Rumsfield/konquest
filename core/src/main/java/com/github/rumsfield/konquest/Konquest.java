@@ -10,6 +10,7 @@ import com.github.rumsfield.konquest.manager.TravelManager.TravelDestination;
 import com.github.rumsfield.konquest.map.MapHandler;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.nms.*;
+import com.github.rumsfield.konquest.shop.ShopHandler;
 import com.github.rumsfield.konquest.utility.*;
 import com.github.rumsfield.konquest.utility.Timer;
 import com.google.common.collect.MapMaker;
@@ -79,6 +80,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	private final RuinManager ruinManager;
 	private final LanguageManager languageManager;
 	private final MapHandler mapHandler;
+	private final ShopHandler shopHandler;
 	private final PlaceholderManager placeholderManager;
 	private final PlotManager plotManager;
 	private final TravelManager travelManager;
@@ -136,6 +138,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		ruinManager = new RuinManager(this);
 		languageManager = new LanguageManager(this);
 		mapHandler = new MapHandler(this);
+		shopHandler = new ShopHandler(this);
 		plotManager = new PlotManager(this);
 		travelManager = new TravelManager(this);
 		sanctuaryManager = new SanctuaryManager(this);
@@ -692,6 +695,10 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public MapHandler getMapHandler() {
 		return mapHandler;
+	}
+
+	public ShopHandler getShopHandler() {
+		return shopHandler;
 	}
 	
 	public PlaceholderManager getPlaceholderManager() {

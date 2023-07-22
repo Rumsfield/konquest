@@ -640,13 +640,14 @@ public enum MessagePath {
 	COMMAND_UNCLAIM_ERROR_FAIL_LORD             (0, "command.unclaim.error.fail-lord"),
 	COMMAND_UNCLAIM_ERROR_FAIL_UNCLAIMED        (0, "command.unclaim.error.fail-unclaimed"),
 	COMMAND_UNCLAIM_ERROR_FAIL_CENTER           (0, "command.unclaim.error.fail-center"),
-	
-	QUICKSHOP_ERROR_ENEMY_CREATE                (0, "quickshop.error.enemy-create"),
-	QUICKSHOP_ERROR_ENEMY_USE                   (0, "quickshop.error.enemy-use"),
-	QUICKSHOP_ERROR_MONUMENT                    (0, "quickshop.error.monument"),
-	QUICKSHOP_ERROR_CAMP                        (0, "quickshop.error.camp"),
-	QUICKSHOP_ERROR_FAIL                        (0, "quickshop.error.fail"),
-	QUICKSHOP_ERROR_WILD                        (0, "quickshop.error.wild"),
+
+	SHOP_ERROR_USE_DISABLED                     (0, "shop.error.use-disabled"),
+	SHOP_ERROR_USE_RELATION                     (0, "shop.error.use-relation"),
+	SHOP_ERROR_CREATE_TOWN                      (0, "shop.error.create-town"),
+	SHOP_ERROR_CREATE_CAMP                      (0, "shop.error.create-camp"),
+	SHOP_ERROR_CREATE_MONUMENT                  (0, "shop.error.create-monument"),
+	SHOP_ERROR_CREATE_FAIL                      (0, "shop.error.create-fail"),
+	SHOP_ERROR_CREATE_WILD                      (0, "shop.error.create-wild"),
 
 	DIRECTIVE_CREATE_KINGDOM                    (0, "directive.create-kingdom"),
 	DIRECTIVE_CREATE_KINGDOM_INFO               (0, "directive.create-kingdom-info"),
@@ -880,6 +881,8 @@ public enum MessagePath {
 	PROPERTIES_PROMOTE							(0, "properties.promote"),
 	PROPERTIES_DEMOTE							(0, "properties.demote"),
 	PROPERTIES_TRANSFER							(0, "properties.transfer"),
+	PROPERTIES_SHOP  							(0, "properties.shop"),
+
 	PROPERTIES_TRAVEL_NAME						(0, "properties.travel-name"),
 	PROPERTIES_PVP_NAME							(0, "properties.pvp-name"),
 	PROPERTIES_PVE_NAME							(0, "properties.pve-name"),
@@ -902,6 +905,7 @@ public enum MessagePath {
 	PROPERTIES_PROMOTE_NAME						(0, "properties.promote-name"),
 	PROPERTIES_DEMOTE_NAME						(0, "properties.demote-name"),
 	PROPERTIES_TRANSFER_NAME					(0, "properties.transfer-name"),
+	PROPERTIES_SHOP_NAME						(0, "properties.shop-name"),
 
 	NULL_MESSAGE	(0,"");
 	

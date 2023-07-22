@@ -8,6 +8,7 @@ main: com.github.rumsfield.konquest.KonquestPlugin
 depend: [Vault]
 softdepend:
 - ProtocolLib
+- ChestShop
 - QuickShop
 - LuckPerms
 - PlaceholderAPI

@@ -1039,8 +1039,6 @@ public class PlayerListener implements Listener {
         			ChatUtil.sendKonTitle(player, "", MessagePath.GENERIC_NOTICE_WILD.getMessage());
         			// Do things appropriate to the type of territory
         			onExitTerritory(territoryFrom,player);
-        			// Remove potion effects for all players
-        			kingdomManager.clearTownNerf(player);
         			// Begin fly disable warmup
         			player.setFlyDisableWarmup(true);
         		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
@@ -1092,7 +1090,11 @@ public class PlayerListener implements Listener {
         						kingdomManager.applyTownNerf(player, town);
         						// Update golem targets
         						town.updateGolemTargets(player,true);
-        					} else if(kingdomManager.isPlayerFriendly(player, town.getKingdom())) {
+        					} else {
+								// Remove potion effects
+								kingdomManager.clearTownNerf(player);
+							}
+							if(kingdomManager.isPlayerFriendly(player, town.getKingdom())) {
         						// Display plot message to friendly players
         						displayPlotMessage(town, moveTo, moveFrom, player);
         					}
@@ -1129,8 +1131,6 @@ public class PlayerListener implements Listener {
         		
     			if(isTerritoryFrom) {
     				onExitTerritory(territoryFrom,player);
-        			// Remove potion effects for all players
-        			kingdomManager.clearTownNerf(player);
     			}
     			
     			if(isTerritoryTo) {
@@ -1293,6 +1293,8 @@ public class PlayerListener implements Listener {
 			town.updateGolemTargets(player,false);
 			// Try to clear heart adjustments
 			kingdomManager.clearTownHearts(player);
+			// Remove potion effects
+			kingdomManager.clearTownNerf(player);
 		} else if(territoryFrom instanceof KonRuin) {
 			KonRuin ruin = (KonRuin)territoryFrom;
 			ruin.stopTargetingPlayer(player.getBukkitPlayer());
@@ -1353,7 +1355,11 @@ public class PlayerListener implements Listener {
 					clickedBlockData instanceof Powerable ||
 					clickedState.getType().isInteractable()) {
 				event.setUseInteractedBlock(Event.Result.DENY);
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				if(!(clickedState instanceof Sign)) {
+					// Only display "Blocked" title when not interacting with a sign
+					// This is mainly for using chest shops
+					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				}
 				return true;
 			}
 		}

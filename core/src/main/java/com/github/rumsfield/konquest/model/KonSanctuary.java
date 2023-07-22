@@ -45,6 +45,7 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 		result.add(KonPropertyFlag.PORTALS);
 		result.add(KonPropertyFlag.ENTER);
 		result.add(KonPropertyFlag.EXIT);
+		result.add(KonPropertyFlag.SHOP);
 		return result;
 	}
 

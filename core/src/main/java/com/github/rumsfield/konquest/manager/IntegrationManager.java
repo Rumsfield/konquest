@@ -16,6 +16,7 @@ public class IntegrationManager {
 
 	private final ArrayList<PluginHook> hooks;
 	private final LuckPermsHook luckpermsHook;
+	private final ChestShopHook chestshopHook;
 	private final QuickShopHook quickshopHook;
 	private final DiscordSrvHook discordsrvHook;
 	private final DynmapHook dynmapHook;
@@ -26,6 +27,7 @@ public class IntegrationManager {
 		this.hooks = new ArrayList<>();
 		// Define new hooks
 		luckpermsHook = new LuckPermsHook(konquest);
+		chestshopHook = new ChestShopHook(konquest);
 		quickshopHook = new QuickShopHook(konquest);
 		discordsrvHook = new DiscordSrvHook(konquest);
 		dynmapHook = new DynmapHook(konquest);
@@ -38,6 +40,7 @@ public class IntegrationManager {
 		hooks.add(dynmapHook);
 		hooks.add(discordsrvHook);
 		hooks.add(quickshopHook);
+		hooks.add(chestshopHook);
 
 	}
 	
@@ -98,6 +101,10 @@ public class IntegrationManager {
 	
 	public LuckPermsHook getLuckPerms() {
 		return luckpermsHook;
+	}
+
+	public ChestShopHook getChestShop() {
+		return chestshopHook;
 	}
 	
 	public QuickShopHook getQuickShop() {
