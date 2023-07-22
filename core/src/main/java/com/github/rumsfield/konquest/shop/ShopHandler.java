@@ -12,6 +12,7 @@ import org.maxgamer.quickshop.api.shop.Shop;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,6 +45,7 @@ public class ShopHandler {
         if(konquest.getIntegrationManager().getQuickShop().isEnabled()) {
             QuickShopAPI quickshop = konquest.getIntegrationManager().getQuickShop().getAPI();
             if(quickshop != null) {
+                HashMap<String,Integer> removedShops = new HashMap<>();
                 for(Point point : points) {
                     int chunkX = point.x;
                     int chunkZ = point.y;
@@ -53,10 +55,20 @@ public class ShopHandler {
                             Location shopLoc = entry.getKey();
                             final OfflinePlayer owner = Bukkit.getOfflinePlayer(entry.getValue().getOwner());
                             world.playEffect(shopLoc, Effect.ANVIL_BREAK, null);
-                            ChatUtil.printDebug("Deleting shop owned by "+owner.getName());
                             entry.getValue().delete();
+                            // Record metrics
+                            String ownerName = owner.getName();
+                            if(removedShops.containsKey(ownerName)) {
+                                int previousNum = removedShops.get(ownerName);
+                                removedShops.put(ownerName,previousNum+1);
+                            } else {
+                                removedShops.put(ownerName,1);
+                            }
                         }
                     }
+                }
+                for(String name : removedShops.keySet()) {
+                    ChatUtil.printDebug("Deleted "+removedShops.get(name)+" QuickShop chest(s) owned by "+name);
                 }
             }
         }
