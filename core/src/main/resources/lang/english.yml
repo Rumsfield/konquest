@@ -730,14 +730,15 @@ command:
       fail-lord: "Failed to unclaim, you must be the town lord."
       fail-unclaimed: "Failed to unclaim, no claims found."
       fail-center: "Failed to unclaim, cannot remove territory center."
-quickshop:
+shop:
   error:
-    enemy-create: "Cannot create a shop in enemy towns!"
-    enemy-use: "Cannot use enemy shops!"
-    monument: "Cannot create a shop inside monument!"
-    camp: "Can only create shops in your own camp!"
-    fail: "Cannot create a shop here!"
-    wild: "Cannot create shops in the wild!"
+    use-disabled: "Cannot use shops here!"
+    use-relation: "Cannot trade with this shop, the town's kingdom must be friendly, allied or in a trade agreement."
+    create-town: "Can only create shops in friendly towns."
+    create-camp: "Can only create shops in your own camp."
+    create-monument: "Cannot create a shop inside of monuments!"
+    create-fail: "Cannot create a shop here!"
+    create-wild: "Cannot create shops in the wild!"
 directive:
   create-kingdom: "Foundations"
   create-kingdom-info: "Create your own Kingdom."
@@ -1003,3 +1004,5 @@ properties:
   demote: "Allow demotion of players"
   transfer-name: "Transfer"
   transfer: "Allow ownership transfer"
+  shop-name: "Shop"
+  shop: "Allow players to create shops"

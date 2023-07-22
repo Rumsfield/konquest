@@ -28,6 +28,13 @@ public class ShopHandler {
         this.konquest = konquest;
     }
 
+    private void notifyAdminBypass(Player player) {
+        // Notify admins about using bypass
+        if(player.hasPermission("konquest.admin.bypass")) {
+            ChatUtil.sendNotice(player,MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
+        }
+    }
+
 
 
     public void deleteShopsInPoints(Collection<Point> points, World world) {
@@ -65,29 +72,23 @@ public class ShopHandler {
     public boolean onShopUse(Location shopLoc, Player bukkitPlayer) {
         if(konquest.isWorldIgnored(shopLoc)) return true;
         KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+        if(player == null) return true;
+        boolean isShopClaimed = konquest.getTerritoryManager().isChunkClaimed(shopLoc);
+        if(!isShopClaimed) return true;
+        KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(shopLoc);
+        assert territory != null;
 
-        // QuickShop
-        if(konquest.getIntegrationManager().getQuickShop().isEnabled()) {
-            QuickShopAPI quickshop = konquest.getIntegrationManager().getQuickShop().getAPI();
-            if (quickshop != null) {
-                // Bypass all checks for admins in bypass mode
-                if(player != null && !player.isAdminBypassActive()) {
-                    if(konquest.getTerritoryManager().isChunkClaimed(shopLoc)) {
-                        KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(shopLoc);
-                        assert territory != null;
-                        boolean isRelationAllowed = konquest.getKingdomManager().isPlayerFriendly(player,territory.getKingdom()) ||
-                                konquest.getKingdomManager().isPlayerTrade(player,territory.getKingdom()) ||
-                                konquest.getKingdomManager().isPlayerAlly(player,territory.getKingdom()) ||
-                                territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY);
-                        if(!isRelationAllowed) {
-                            ChatUtil.sendError(bukkitPlayer, MessagePath.QUICKSHOP_ERROR_ENEMY_USE.getMessage());
-                            return false;
-                        }
-                    }
-                }
-            }
+        boolean isRelationAllowed = konquest.getKingdomManager().isPlayerFriendly(player,territory.getKingdom()) ||
+                konquest.getKingdomManager().isPlayerTrade(player,territory.getKingdom()) ||
+                konquest.getKingdomManager().isPlayerAlly(player,territory.getKingdom()) ||
+                territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY);
+
+        // Bypass all checks for admins in bypass mode
+        if(!player.isAdminBypassActive() && !isRelationAllowed) {
+            notifyAdminBypass(bukkitPlayer);
+            ChatUtil.sendError(bukkitPlayer, MessagePath.SHOP_ERROR_USE_RELATION.getMessage());
+            return false;
         }
-        // Other shop plugins
 
         return true;
     }
@@ -95,37 +96,62 @@ public class ShopHandler {
     public boolean onShopCreate(Location shopLoc, Player bukkitPlayer) {
         if(konquest.isWorldIgnored(shopLoc)) return true;
         KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+        if(player == null) return true;
         boolean isShopClaimed = konquest.getTerritoryManager().isChunkClaimed(shopLoc);
         // Prevent creating any shops in the wild
         if(!isShopClaimed) {
-            ChatUtil.sendError(bukkitPlayer, MessagePath.QUICKSHOP_ERROR_WILD.getMessage());
+            ChatUtil.sendError(bukkitPlayer, MessagePath.SHOP_ERROR_CREATE_WILD.getMessage());
             return false;
         }
         KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(shopLoc);
         assert territory != null;
 
-        // QuickShop
-        if(konquest.getIntegrationManager().getQuickShop().isEnabled()) {
-            QuickShopAPI quickshop = konquest.getIntegrationManager().getQuickShop().getAPI();
-            if(quickshop != null && player != null && !player.isAdminBypassActive()) {
-                if(territory instanceof KonTown) {
-                    KonTown town = (KonTown)territory;
-                    if(!konquest.getKingdomManager().isPlayerFriendly(player,town.getKingdom())) {
-                        ChatUtil.sendError(bukkitPlayer, MessagePath.QUICKSHOP_ERROR_ENEMY_USE.getMessage());
-                        return false;
-                    }
-                    if(town.isLocInsideMonumentProtectionArea(shopLoc)) {
-                        ChatUtil.sendError(bukkitPlayer, MessagePath.QUICKSHOP_ERROR_MONUMENT.getMessage());
-                        return false;
-                    }
-                }
-                if(territory instanceof KonCamp && !((KonCamp)territory).isPlayerOwner(bukkitPlayer)) {
-                    ChatUtil.sendError(bukkitPlayer, MessagePath.QUICKSHOP_ERROR_CAMP.getMessage());
-                    return false;
-                }
+        boolean isPropertyAllowed = true;
+        if(territory instanceof KonPropertyFlagHolder) {
+            KonPropertyFlagHolder holder = (KonPropertyFlagHolder)territory;
+            if(holder.hasPropertyValue(KonPropertyFlag.SHOP)) {
+                isPropertyAllowed = holder.getPropertyValue(KonPropertyFlag.SHOP);
             }
         }
-        // Other shop plugins
+
+        // Always prevent shops in monuments and templates
+        if(territory instanceof KonSanctuary) {
+            // Protect templates
+            KonSanctuary sanctuary = (KonSanctuary) territory;
+            if (sanctuary.isLocInsideTemplate(shopLoc)) {
+                ChatUtil.sendError(bukkitPlayer, MessagePath.SHOP_ERROR_CREATE_MONUMENT.getMessage());
+                return false;
+            }
+        } else if(territory instanceof KonTown) {
+            // Protect monuments
+            KonTown town = (KonTown) territory;
+            if (town.isLocInsideMonumentProtectionArea(shopLoc)) {
+                ChatUtil.sendError(bukkitPlayer, MessagePath.SHOP_ERROR_CREATE_MONUMENT.getMessage());
+                return false;
+            }
+        }
+
+        // Check for admin bypass
+        if(!player.isAdminBypassActive()) {
+            if(!isPropertyAllowed) {
+                notifyAdminBypass(bukkitPlayer);
+                ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+                ChatUtil.sendError(bukkitPlayer, MessagePath.SHOP_ERROR_CREATE_FAIL.getMessage());
+                return false;
+            }
+            if(territory instanceof KonTown) {
+                KonTown town = (KonTown) territory;
+                if (!konquest.getKingdomManager().isPlayerFriendly(player, town.getKingdom())) {
+                    notifyAdminBypass(bukkitPlayer);
+                    ChatUtil.sendError(bukkitPlayer, MessagePath.SHOP_ERROR_CREATE_TOWN.getMessage());
+                    return false;
+                }
+            } else if(territory instanceof KonCamp && !((KonCamp)territory).isPlayerOwner(bukkitPlayer)) {
+                notifyAdminBypass(bukkitPlayer);
+                ChatUtil.sendError(bukkitPlayer, MessagePath.SHOP_ERROR_CREATE_CAMP.getMessage());
+                return false;
+            }
+        }
 
         return true;
     }

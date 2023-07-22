@@ -141,6 +141,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		result.add(KonPropertyFlag.PROMOTE);
 		result.add(KonPropertyFlag.DEMOTE);
 		result.add(KonPropertyFlag.TRANSFER);
+		result.add(KonPropertyFlag.SHOP);
 		return result;
 	}
 

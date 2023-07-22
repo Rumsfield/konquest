@@ -20,7 +20,8 @@ public enum KonPropertyFlag {
 	PORTALS			(MessagePath.PROPERTIES_PORTALS_NAME.getMessage(), 	MessagePath.PROPERTIES_PORTALS.getMessage()),
 	ENTER			(MessagePath.PROPERTIES_ENTER_NAME.getMessage(), 	MessagePath.PROPERTIES_ENTER.getMessage()),
 	EXIT			(MessagePath.PROPERTIES_EXIT_NAME.getMessage(), 	MessagePath.PROPERTIES_EXIT.getMessage()),
-	
+	SHOP			(MessagePath.PROPERTIES_SHOP_NAME.getMessage(), 	MessagePath.PROPERTIES_SHOP.getMessage()),
+
 	// Properties specifically for towns/capitals
 	CAPTURE			(MessagePath.PROPERTIES_CAPTURE_NAME.getMessage(), 	MessagePath.PROPERTIES_CAPTURE.getMessage()),
 	CLAIM			(MessagePath.PROPERTIES_CLAIM_NAME.getMessage(), 	MessagePath.PROPERTIES_CLAIM.getMessage()),

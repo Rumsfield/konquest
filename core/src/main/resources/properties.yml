@@ -15,6 +15,7 @@
 #	PORTALS			Allow players to use portals
 #	ENTER			Allow players to enter
 #	EXIT			Allow players to exit
+#   SHOP            Allow players to create shops
 # 
 # Properties specifically for towns/capitals
 #	CAPTURE			Allow this town to be captured
@@ -58,6 +59,7 @@ properties:
     chest: false
     mobs: false
     portals: true
+    shop: false
   ruins:
     enter: true
     exit: true
@@ -85,3 +87,4 @@ properties:
     promote: true
     demote: true
     transfer: true
+    shop: true
