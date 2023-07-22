@@ -23,6 +23,7 @@ public class ChestShopListener implements Listener {
         boolean status = shopHandler.onShopCreate(event.getSign().getLocation(), event.getPlayer());
         if(!status) {
             event.setCancelled(true);
+            event.setOutcome(PreShopCreationEvent.CreationOutcome.NO_PERMISSION_FOR_TERRAIN);
         }
     }
 

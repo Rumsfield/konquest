@@ -178,7 +178,6 @@ public class ShopHandler {
         if(!player.isAdminBypassActive()) {
             if(!isPropertyAllowed) {
                 notifyAdminBypass(bukkitPlayer);
-                ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
                 ChatUtil.sendError(bukkitPlayer, MessagePath.SHOP_ERROR_CREATE_FAIL.getMessage());
                 return false;
             }
