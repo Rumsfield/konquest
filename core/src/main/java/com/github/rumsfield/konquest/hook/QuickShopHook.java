@@ -2,20 +2,11 @@ package com.github.rumsfield.konquest.hook;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.listener.QuickShopListener;
-import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.Version;
 import org.bukkit.*;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.dynmap.DynmapAPI;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.api.QuickShopAPI;
-import org.maxgamer.quickshop.api.shop.Shop;
-
-import java.awt.*;
-import java.util.Collection;
-import java.util.Map;
 
 public class QuickShopHook implements PluginHook {
 
