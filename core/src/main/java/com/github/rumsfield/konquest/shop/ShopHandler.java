@@ -1,11 +1,13 @@
 package com.github.rumsfield.konquest.shop;
 
+import com.Acrobot.ChestShop.ChestShop;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.*;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.maxgamer.quickshop.api.QuickShopAPI;
 import org.maxgamer.quickshop.api.shop.Shop;
@@ -14,6 +16,7 @@ import java.awt.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 /**
  * This class manages generic chest shops:
@@ -23,7 +26,7 @@ import java.util.Map;
  */
 public class ShopHandler {
 
-    private Konquest konquest;
+    private final Konquest konquest;
 
     public ShopHandler(Konquest konquest) {
         this.konquest = konquest;
@@ -36,8 +39,13 @@ public class ShopHandler {
         }
     }
 
-
-
+    /**
+     * This method removes all shops within the chunks represented as points.
+     * This gets called mostly when a town is captured, or camps are destroyed.
+     * Only the shops are destroyed, not the chests + item contents.
+     * @param points - The X,Y points that represent chunks (X,Z)
+     * @param world - The world that contains the chunks
+     */
     public void deleteShopsInPoints(Collection<Point> points, World world) {
         if(points.isEmpty() || world == null) return;
 
@@ -52,9 +60,7 @@ public class ShopHandler {
                     Map<Location, Shop> shopList = quickshop.getShopManager().getShops(world.getName(), chunkX, chunkZ);
                     if(shopList != null) {
                         for(Map.Entry<Location, Shop> entry : shopList.entrySet()) {
-                            Location shopLoc = entry.getKey();
                             final OfflinePlayer owner = Bukkit.getOfflinePlayer(entry.getValue().getOwner());
-                            world.playEffect(shopLoc, Effect.ANVIL_BREAK, null);
                             entry.getValue().delete();
                             // Record metrics
                             String ownerName = owner.getName();
@@ -72,6 +78,25 @@ public class ShopHandler {
                 }
             }
         }
+
+        // ChestShop
+        if(konquest.getIntegrationManager().getChestShop().isEnabled()) {
+            ChestShop chestshop = konquest.getIntegrationManager().getChestShop().getAPI();
+            if (chestshop != null) {
+                int totalRemovedShops = 0;
+                // Find signs within the chunks and delete them
+                for(Point point : points) {
+                    List<Sign> signShops = ChestShopFinder.findShopSigns(world,point.x,point.y);
+                    totalRemovedShops += signShops.size();
+                    // Break all sign shops
+                    for(Sign shop : signShops) {
+                        shop.getBlock().breakNaturally();
+                    }
+                }
+                ChatUtil.printDebug("Deleted "+totalRemovedShops+" ChestShop chest(s)");
+            }
+        }
+
         // Other shop plugins
     }
 
@@ -105,6 +130,12 @@ public class ShopHandler {
         return true;
     }
 
+    /**
+     * Called when a player tries to create a shop.
+     * @param shopLoc - The location of the chest shop.
+     * @param bukkitPlayer - The player attempting to create it.
+     * @return True if the creation is allowed, else false to cancel the creation.
+     */
     public boolean onShopCreate(Location shopLoc, Player bukkitPlayer) {
         if(konquest.isWorldIgnored(shopLoc)) return true;
         KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);

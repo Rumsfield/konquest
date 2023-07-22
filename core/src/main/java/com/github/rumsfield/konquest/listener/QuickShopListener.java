@@ -11,7 +11,7 @@ import org.maxgamer.quickshop.api.event.PlayerShopClickEvent;
 import org.maxgamer.quickshop.api.event.ShopPreCreateEvent;
 import org.maxgamer.quickshop.api.event.ShopPurchaseEvent;
 
-public class QuickShopListener implements Listener{
+public class QuickShopListener implements Listener {
 
 	private final ShopHandler shopHandler;
 	

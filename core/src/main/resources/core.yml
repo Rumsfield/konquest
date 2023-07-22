@@ -150,7 +150,10 @@ core:
       
   # //// CORE.INTEGRATION \\\\
   integration:
-  
+
+    # (*) Enable plugin integration with ChestShop (true/false)
+    chestshop: true
+
     # (*) Enable plugin integration with QuickShop (true/false)
     quickshop: true
     

@@ -45,7 +45,8 @@ public enum CorePath {
 	DATABASE_MYSQL_USERNAME                               ("core.database.mysql.username"),
 	DATABASE_MYSQL_PASSWORD                               ("core.database.mysql.password"),
 	DATABASE_MYSQL_PROPERTIES                             ("core.database.mysql.properties"),
-	
+
+	INTEGRATION_CHESTSHOP                                 ("core.integration.chestshop"),
 	INTEGRATION_QUICKSHOP                                 ("core.integration.quickshop"),
 	INTEGRATION_LUCKPERMS                                 ("core.integration.luckperms"),
 	INTEGRATION_DYNMAP                                    ("core.integration.dynmap"),
