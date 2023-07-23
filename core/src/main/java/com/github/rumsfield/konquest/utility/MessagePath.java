@@ -858,6 +858,7 @@ public enum MessagePath {
 	DIPLOMACY_PEACE                             (0, "diplomacy.peace"),
 	DIPLOMACY_TRADE                             (0, "diplomacy.trade"),
 	DIPLOMACY_ALLIANCE                          (0, "diplomacy.alliance"),
+	DIPLOMACY_SELF                              (0, "diplomacy.self"),
 
 	PROPERTIES_TRAVEL							(0, "properties.travel"),
 	PROPERTIES_PVP								(0, "properties.pvp"),

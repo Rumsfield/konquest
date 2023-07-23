@@ -17,7 +17,7 @@ import java.util.List;
 public class TownIcon implements MenuIcon {
 
 	private final KonTown town;
-	private final ChatColor contextColor;
+	private final String contextColor;
 	private final List<String> lore;
 	private final int index;
 	private final boolean isClickable;
@@ -28,7 +28,7 @@ public class TownIcon implements MenuIcon {
 	private final String loreColor = DisplayManager.loreFormat;
 	private final String valueColor = DisplayManager.valueFormat;
 	
-	public TownIcon(KonTown town, ChatColor contextColor, List<String> lore, int index, boolean isClickable) {
+	public TownIcon(KonTown town, String contextColor, List<String> lore, int index, boolean isClickable) {
 		this.town = town;
 		this.contextColor = contextColor;
 		this.isClickable = isClickable;

@@ -327,12 +327,22 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		return result;
 	}
 	
-	public String getRelationColor(Player playerOne, Player playerTwo) {
+	public String getRelationPrimaryColor(Player playerOne, Player playerTwo) {
 		String result = "";
 		KonPlayer onlinePlayerOne = playerManager.getPlayer(playerOne);
 		KonPlayer onlinePlayerTwo = playerManager.getPlayer(playerTwo);
 		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
 			result = ""+konquest.getDisplayPrimaryColor(onlinePlayerOne, onlinePlayerTwo);
+		}
+		return result;
+	}
+
+	public String getRelationSecondaryColor(Player playerOne, Player playerTwo) {
+		String result = "";
+		KonPlayer onlinePlayerOne = playerManager.getPlayer(playerOne);
+		KonPlayer onlinePlayerTwo = playerManager.getPlayer(playerTwo);
+		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
+			result = ""+konquest.getDisplaySecondaryColor(onlinePlayerOne, onlinePlayerTwo);
 		}
 		return result;
 	}

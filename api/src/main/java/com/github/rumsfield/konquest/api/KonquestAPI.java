@@ -25,98 +25,98 @@ public interface KonquestAPI {
 	 * 
 	 * @return The friendly primary color
 	 */
-	ChatColor getFriendlyPrimaryColor();
+	String getFriendlyPrimaryColor();
 
 	/**
 	 * Gets the friendly secondary color, from core.yml.
 	 *
 	 * @return The friendly secondary color
 	 */
-	ChatColor getFriendlySecondaryColor();
+	String getFriendlySecondaryColor();
 
 	/**
 	 * Gets the enemy primary color, from core.yml.
 	 * 
 	 * @return The enemy primary color
 	 */
-	ChatColor getEnemyPrimaryColor();
+	String getEnemyPrimaryColor();
 	
 	/**
 	 * Gets the enemy secondary color, from core.yml.
 	 * 
 	 * @return The enemy secondary color
 	 */
-	ChatColor getEnemySecondaryColor();
+	String getEnemySecondaryColor();
 	
 	/**
 	 * Gets the trade primary color, from core.yml.
 	 * 
 	 * @return The trade primary color
 	 */
-	ChatColor getTradePrimaryColor();
+	String getTradePrimaryColor();
 
 	/**
 	 * Gets the trade secondary color, from core.yml.
 	 *
 	 * @return The trade secondary color
 	 */
-	ChatColor getTradeSecondaryColor();
+	String getTradeSecondaryColor();
 
 	/**
 	 * Gets the peaceful primary color, from core.yml.
 	 * 
 	 * @return The peaceful primary color
 	 */
-	ChatColor getPeacefulPrimaryColor();
+	String getPeacefulPrimaryColor();
 
 	/**
 	 * Gets the peaceful secondary color, from core.yml.
 	 *
 	 * @return The peaceful secondary color
 	 */
-	ChatColor getPeacefulSecondaryColor();
+	String getPeacefulSecondaryColor();
 
 	/**
 	 * Gets the allied primary color, from core.yml.
 	 * 
 	 * @return The allied primary color
 	 */
-	ChatColor getAlliedPrimaryColor();
+	String getAlliedPrimaryColor();
 
 	/**
 	 * Gets the allied secondary color, from core.yml.
 	 *
 	 * @return The allied secondary color
 	 */
-	ChatColor getAlliedSecondaryColor();
+	String getAlliedSecondaryColor();
 
 	/**
 	 * Gets the barbarian primary color, from core.yml.
 	 * 
 	 * @return The barbarian primary color
 	 */
-	ChatColor getBarbarianPrimaryColor();
+	String getBarbarianPrimaryColor();
 
 	/**
 	 * Gets the barbarian secondary color, from core.yml.
 	 *
 	 * @return The barbarian secondary color
 	 */
-	ChatColor getBarbarianSecondaryColor();
+	String getBarbarianSecondaryColor();
 
 	/**
 	 * Gets the neutral primary color, from core.yml.
 	 * 
 	 * @return The neutral primary color
 	 */
-	ChatColor getNeutralPrimaryColor();
+	String getNeutralPrimaryColor();
 
 	/**
 	 * Gets the neutral secondary color, from core.yml.
 	 *
 	 * @return The neutral secondary color
 	 */
-	ChatColor getNeutralSecondaryColor();
+	String getNeutralSecondaryColor();
 
 	/**
 	 * Gets the primary Konquest scoreboard with teams.
@@ -263,7 +263,7 @@ public interface KonquestAPI {
 	 * @param contextKingdom The target kingdom whose relationship to the observer determines the color
 	 * @return The primary display color
 	 */
-	ChatColor getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom);
+	String getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom);
 	
 	/**
 	 * Gets the primary display color based on relationships. This color is set in the Konquest configuration.
@@ -273,7 +273,7 @@ public interface KonquestAPI {
 	 * @param contextPlayer The target player whose relationship to the observer determines the color
 	 * @return The primary display color
 	 */
-	ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer);
+	String getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer);
 	
 	/**
 	 * Gets the primary display color based on relationships. This color is set in the Konquest configuration.
@@ -283,7 +283,7 @@ public interface KonquestAPI {
 	 * @param contextTerritory The target town whose relationship to the observer determines the color
 	 * @return The primary display color
 	 */
-	ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);
+	String getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);
 	
 	/**
 	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
@@ -293,7 +293,7 @@ public interface KonquestAPI {
 	 * @param contextKingdom The target kingdom whose relationship to the observer determines the color
 	 * @return The secondary display color
 	 */
-	ChatColor getDisplaySecondaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom);
+	String getDisplaySecondaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom);
 	
 	/**
 	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
@@ -303,7 +303,7 @@ public interface KonquestAPI {
 	 * @param contextPlayer The target player whose relationship to the observer determines the color
 	 * @return The secondary display color
 	 */
-	ChatColor getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer);
+	String getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer);
 	
 	/**
 	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
@@ -313,7 +313,7 @@ public interface KonquestAPI {
 	 * @param contextTerritory The target town whose relationship to the observer determines the color
 	 * @return The secondary display color
 	 */
-	ChatColor getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);
+	String getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);
 	
 	/**
 	 * Utility method to convert a location to a point representation of the chunk that contains the location.

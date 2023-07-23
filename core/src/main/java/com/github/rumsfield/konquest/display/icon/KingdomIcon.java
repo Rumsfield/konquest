@@ -16,7 +16,7 @@ import java.util.List;
 public class KingdomIcon implements MenuIcon {
 
 	private final KonKingdom kingdom;
-	private final ChatColor contextColor;
+	private final String contextColor;
 	private final List<String> lore;
 	private final int index;
 	private final ItemStack item;
@@ -26,7 +26,7 @@ public class KingdomIcon implements MenuIcon {
 	private final String loreColor = DisplayManager.loreFormat;
 	private final String valueColor = DisplayManager.valueFormat;
 
-	public KingdomIcon(KonKingdom kingdom, ChatColor contextColor, List<String> lore, int index, boolean isClickable) {
+	public KingdomIcon(KonKingdom kingdom, String contextColor, List<String> lore, int index, boolean isClickable) {
 		this.kingdom = kingdom;
 		this.contextColor = contextColor;
 		this.lore = lore;

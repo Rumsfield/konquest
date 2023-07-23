@@ -50,19 +50,19 @@ public class DiplomacyIcon implements MenuIcon {
 			}
 		}
 		List<String> itemLore = new ArrayList<>(lore);
-		ChatColor nameColor = ChatColor.GOLD;
+		String nameColor = ""+ChatColor.GOLD;
 		switch(relation) {
 			case WAR:
-				nameColor = Konquest.enemyColor1;
+				nameColor = Konquest.enemyColor2;
 				break;
 			case PEACE:
-				nameColor = Konquest.peacefulColor1;
+				nameColor = Konquest.peacefulColor2;
 				break;
 			case TRADE:
-				nameColor = Konquest.tradeColor1;
+				nameColor = Konquest.tradeColor2;
 				break;
 			case ALLIANCE:
-				nameColor = Konquest.alliedColor1;
+				nameColor = Konquest.alliedColor2;
 				break;
 			default:
 				break;

@@ -39,7 +39,7 @@ public class ScoreMenuWrapper extends MenuWrapper {
 		int i;
 		InfoIcon info;
 
-		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer, scorePlayer);
+		String kingdomColor = getKonquest().getDisplaySecondaryColor(observer, scorePlayer);
 		String titleColor = DisplayManager.titleFormat;
 		String loreColor = DisplayManager.loreFormat;
 		String valueColor = DisplayManager.valueFormat;

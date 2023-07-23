@@ -30,7 +30,7 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 	@Override
 	public void constructMenu() {
 
- 		ChatColor kingdomColor = getKonquest().getDisplayPrimaryColor(observer, infoPlayer);
+ 		String kingdomColor = getKonquest().getDisplaySecondaryColor(observer, infoPlayer);
 		String titleColor = DisplayManager.titleFormat;
 		String loreColor = DisplayManager.loreFormat;
 		String valueColor = DisplayManager.valueFormat;
@@ -60,11 +60,13 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		/* General Info Icon (5) */
 		String balanceF = String.format("%.2f",KonquestPlugin.getBalance(infoPlayer.getOfflineBukkitPlayer()));
 		int numResidentTowns = getKonquest().getKingdomManager().getPlayerResidencies(infoPlayer);
-		String kingdomRole = infoPlayer.getKingdom().getPlayerRoleName(infoPlayer);
 		String kingdomName = infoPlayer.getKingdom().getName();
 		loreList = new ArrayList<>();
 		loreList.add(loreColor + MessagePath.LABEL_KINGDOM.getMessage() + ": " + valueColor + kingdomName);
-		loreList.add(loreColor + MessagePath.LABEL_KINGDOM_ROLE.getMessage() + ": " + valueColor + kingdomRole);
+		if(infoPlayer.getKingdom().isCreated()) {
+			String kingdomRole = infoPlayer.getKingdom().getPlayerRoleName(infoPlayer);
+			loreList.add(loreColor + MessagePath.LABEL_KINGDOM_ROLE.getMessage() + ": " + valueColor + kingdomRole);
+		}
 		loreList.add(loreColor + MessagePath.LABEL_FAVOR.getMessage() + ": " + valueColor + balanceF);
 		loreList.add(loreColor + MessagePath.LABEL_RESIDENCIES.getMessage() + ": " + valueColor + numResidentTowns);
 		InfoIcon info = new InfoIcon(kingdomColor+MessagePath.LABEL_INFORMATION.getMessage(), loreList, Material.ENDER_EYE, 5, false);

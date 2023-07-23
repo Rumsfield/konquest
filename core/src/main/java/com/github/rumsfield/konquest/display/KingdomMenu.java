@@ -147,7 +147,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		DisplayMenu result;
 		MenuIcon icon;
 		List<String> loreList = new ArrayList<>();
-		ChatColor kingdomColor = Konquest.friendColor1;
+		String kingdomColor = Konquest.friendColor2;
 		boolean isClickable;
 		
 		int rows = 2; // default rows for regular
@@ -398,7 +398,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+"X");
 					isClickable = false;
 				}
-				TemplateIcon templateIcon = new TemplateIcon(template,ChatColor.GOLD,loreList,slotIndex,isClickable);
+				TemplateIcon templateIcon = new TemplateIcon(template,""+ChatColor.GOLD,loreList,slotIndex,isClickable);
 		    	pages.get(pageNum).addIcon(templateIcon);
 				slotIndex++;
 			}
@@ -423,7 +423,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		KonquestDiplomacyType currentDiplomacy = manager.getDiplomacy(kingdom,diplomacyKingdom);
 		
 		// Create kingdom info
-		ChatColor contextColor = konquest.getDisplayPrimaryColor(kingdom, diplomacyKingdom);
+		String contextColor = konquest.getDisplaySecondaryColor(kingdom, diplomacyKingdom);
 		loreList = new ArrayList<>();
 		String diplomacyState = Labeler.lookup(currentDiplomacy);
 		loreList.add(loreColor+MessagePath.LABEL_DIPLOMACY.getMessage()+": "+valueColor+diplomacyState);
@@ -579,7 +579,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			while(slotIndex < MAX_ICONS_PER_PAGE && listIter.hasNext()) {
 				/* Kingdom Icon (n) */
 				KonKingdom currentKingdom = listIter.next();
-				ChatColor contextColor = konquest.getDisplayPrimaryColor(kingdom, currentKingdom);
+				String contextColor = konquest.getDisplaySecondaryColor(kingdom, currentKingdom);
 				loreList = new ArrayList<>();
 				if(isCreatedKingdom) {
 					if(!currentKingdom.equals(kingdom)) {
