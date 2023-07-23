@@ -8,6 +8,7 @@ import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.Labeler;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -30,12 +31,14 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 	@Override
 	public void constructMenu() {
 
-		String kingdomColor = getKonquest().getDisplayPrimaryColor(observer.getKingdom(), infoKingdom);
+		KonquestDiplomacyType currentDiplomacy = getKonquest().getKingdomManager().getDiplomacy(observer.getKingdom(),infoKingdom);
+		String kingdomColor = getKonquest().getDisplaySecondaryColor(observer.getKingdom(), infoKingdom);
 		String titleColor = DisplayManager.titleFormat;
 		String loreColor = DisplayManager.loreFormat;
 		String valueColor = DisplayManager.valueFormat;
 		String hintColor = DisplayManager.hintFormat;
 		String propertyColor = DisplayManager.propertyFormat;
+		String alertColor = DisplayManager.alertFormat;
 		
 		String pageLabel;
  		List<String> loreList;
@@ -62,6 +65,28 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
  		// Page 0
 		pageLabel = titleColor+MessagePath.COMMAND_INFO_NOTICE_KINGDOM_HEADER.getMessage(infoKingdom.getName());
 		getMenu().addPage(pageIndex, pageRows, pageLabel);
+
+		/* Relationship Icon (1) */
+		slotIndex = 1;
+		loreList = new ArrayList<>();
+		if(observer.getKingdom().equals(infoKingdom)) {
+			loreList.add(loreColor+MessagePath.DIPLOMACY_SELF.getMessage());
+		} else {
+			String diplomacyState = Labeler.lookup(currentDiplomacy);
+			loreList.add(loreColor+MessagePath.LABEL_DIPLOMACY.getMessage()+": "+valueColor+diplomacyState);
+			if(observer.getKingdom().hasRelationRequest(infoKingdom)) {
+				// They have sent a valid diplomacy change request to us
+				String ourRequestStatus = Labeler.lookup(observer.getKingdom().getRelationRequest(infoKingdom));
+				loreList.add(alertColor+MessagePath.MENU_KINGDOM_THEY_REQUESTED.getMessage()+": "+valueColor+ourRequestStatus);
+			}
+			if(infoKingdom.hasRelationRequest(observer.getKingdom())) {
+				// We have sent a valid diplomacy change request to them
+				String theirRequestStatus = Labeler.lookup(infoKingdom.getRelationRequest(observer.getKingdom()));
+				loreList.add(alertColor+MessagePath.MENU_KINGDOM_WE_REQUESTED.getMessage()+": "+valueColor+theirRequestStatus);
+			}
+		}
+		InfoIcon relationIcon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_RELATION.getMessage(),loreList,Material.GOLDEN_SWORD,slotIndex,false);
+		getMenu().getPage(pageIndex).addIcon(relationIcon);
 
 		/* Capital Info Icon (2) */
 		if(infoKingdom.isCreated()) {
@@ -180,7 +205,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 					KonKingdom currentKingdom = enemyIterator.next();
 					loreList = new ArrayList<>();
 					loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
-					KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,Konquest.enemyColor1,loreList,slotIndex,true);
+					KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,Konquest.enemyColor2,loreList,slotIndex,true);
 					getMenu().getPage(pageIndex).addIcon(kingdomIcon);
 					slotIndex++;
 				}
@@ -202,7 +227,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 					KonKingdom currentKingdom = allyIterator.next();
 					loreList = new ArrayList<>();
 					loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
-					KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,Konquest.alliedColor1,loreList,slotIndex,true);
+					KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,Konquest.alliedColor2,loreList,slotIndex,true);
 					getMenu().getPage(pageIndex).addIcon(kingdomIcon);
 					slotIndex++;
 				}
@@ -224,7 +249,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 					KonKingdom currentKingdom = tradeIterator.next();
 					loreList = new ArrayList<>();
 					loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
-					KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,Konquest.tradeColor1,loreList,slotIndex,true);
+					KingdomIcon kingdomIcon = new KingdomIcon(currentKingdom,Konquest.tradeColor2,loreList,slotIndex,true);
 					getMenu().getPage(pageIndex).addIcon(kingdomIcon);
 					slotIndex++;
 				}

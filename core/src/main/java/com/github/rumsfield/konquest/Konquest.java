@@ -580,60 +580,60 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	/* API Methods */
-	public ChatColor getFriendlyPrimaryColor() {
-		return ChatUtil.lookupChatColor(friendColor1);
+	public String getFriendlyPrimaryColor() {
+		return friendColor1;
 	}
 	
-	public ChatColor getFriendlySecondaryColor() {
-		return ChatUtil.lookupChatColor(friendColor2);
+	public String getFriendlySecondaryColor() {
+		return friendColor2;
 	}
 	
-	public ChatColor getEnemyPrimaryColor() {
-		return ChatUtil.lookupChatColor(enemyColor1);
+	public String getEnemyPrimaryColor() {
+		return enemyColor1;
 	}
 	
-	public ChatColor getEnemySecondaryColor() {
-		return ChatUtil.lookupChatColor(enemyColor2);
+	public String getEnemySecondaryColor() {
+		return enemyColor2;
 	}
 	
-	public ChatColor getTradePrimaryColor() {
-		return ChatUtil.lookupChatColor(tradeColor1);
+	public String getTradePrimaryColor() {
+		return tradeColor1;
 	}
 
-	public ChatColor getTradeSecondaryColor() {
-		return ChatUtil.lookupChatColor(tradeColor2);
+	public String getTradeSecondaryColor() {
+		return tradeColor2;
 	}
 
-	public ChatColor getPeacefulPrimaryColor() {
-		return ChatUtil.lookupChatColor(peacefulColor1);
+	public String getPeacefulPrimaryColor() {
+		return peacefulColor1;
 	}
 
-	public ChatColor getPeacefulSecondaryColor() {
-		return ChatUtil.lookupChatColor(peacefulColor2);
+	public String getPeacefulSecondaryColor() {
+		return peacefulColor2;
 	}
 
-	public ChatColor getAlliedPrimaryColor() {
-		return ChatUtil.lookupChatColor(alliedColor1);
+	public String getAlliedPrimaryColor() {
+		return alliedColor1;
 	}
 
-	public ChatColor getAlliedSecondaryColor() {
-		return ChatUtil.lookupChatColor(alliedColor2);
+	public String getAlliedSecondaryColor() {
+		return alliedColor2;
 	}
 
-	public ChatColor getBarbarianPrimaryColor() {
-		return ChatUtil.lookupChatColor(barbarianColor1);
+	public String getBarbarianPrimaryColor() {
+		return barbarianColor1;
 	}
 
-	public ChatColor getBarbarianSecondaryColor() {
-		return ChatUtil.lookupChatColor(barbarianColor2);
+	public String getBarbarianSecondaryColor() {
+		return barbarianColor2;
 	}
 
-	public ChatColor getNeutralPrimaryColor() {
-		return ChatUtil.lookupChatColor(neutralColor1);
+	public String getNeutralPrimaryColor() {
+		return neutralColor1;
 	}
 
-	public ChatColor getNeutralSecondaryColor() {
-		return ChatUtil.lookupChatColor(neutralColor2);
+	public String getNeutralSecondaryColor() {
+		return neutralColor2;
 	}
 
 	/* Regular Methods */

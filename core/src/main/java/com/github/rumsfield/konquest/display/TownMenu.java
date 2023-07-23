@@ -66,7 +66,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
         MenuIcon icon;
         List<String> loreList = new ArrayList<>();
 
-        String kingdomColor = Konquest.friendColor1;
+        String kingdomColor = Konquest.friendColor2;
 
         final int rows = 1;
 
@@ -173,7 +173,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
                 /* Town Icon (n) */
                 boolean isCurrentTownClickable = true;
                 KonTown currentTown = listIter.next();
-                String contextColor = Konquest.friendColor1;
+                String contextColor = Konquest.friendColor2;
                 loreList = new ArrayList<>();
                 // Context-based lore
                 switch(context) {

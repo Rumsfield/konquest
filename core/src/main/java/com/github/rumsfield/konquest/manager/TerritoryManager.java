@@ -239,7 +239,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				// Display town info to players in the newly claimed chunk
 	    		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 	    			if(occupant.getBukkitPlayer().getLocation().getChunk().equals(loc.getChunk())) {
-						String color = konquest.getDisplayPrimaryColor(occupant, closestAdjTerr);
+						String color = konquest.getDisplaySecondaryColor(occupant, closestAdjTerr);
 	    				ChatUtil.sendKonTitle(occupant, "", color+closestAdjTerr.getName());
 	    				if(closestAdjTerr instanceof KonBarDisplayer) {
 	    					((KonBarDisplayer)closestAdjTerr).addBarPlayer(occupant);
@@ -416,7 +416,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 				//if(occupant.getBukkitPlayer().getWorld().equals(claimWorld) && claimedChunks.contains(Konquest.toPoint(occupant.getBukkitPlayer().getLocation()))) {
 				if(closestTerritory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
-					String color = konquest.getDisplayPrimaryColor(occupant, closestTerritory);
+					String color = konquest.getDisplaySecondaryColor(occupant, closestTerritory);
 					ChatUtil.sendKonTitle(occupant, "", color+closestTerritory.getName());
 					if(closestTerritory instanceof KonBarDisplayer) {
 						((KonBarDisplayer)closestTerritory).addBarPlayer(occupant);
@@ -1300,8 +1300,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
     		if(isChunkClaimed(mapPoint,center.getWorld())) {
     			KonTerritory territory = getChunkTerritory(mapPoint,center.getWorld());
 				assert territory != null;
-				mapSymbolColor = konquest.getDisplayPrimaryColor(player,territory);
-				playerColor = konquest.getDisplaySecondaryColor(player,territory);
+				mapSymbolColor = konquest.getDisplaySecondaryColor(player,territory);
+				playerColor = konquest.getDisplayPrimaryColor(player,territory);
     			switch(territory.getTerritoryType()) {
         		case WILD:
         			map[mapX][mapY] = ChatColor.WHITE+mapWildSymbol;
@@ -1339,7 +1339,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
     	int distance = 0;
     	if(closestTerritory != null) {
     		distance = proximity;
-			closestTerritoryColor = konquest.getDisplayPrimaryColor(player,closestTerritory);
+			closestTerritoryColor = konquest.getDisplaySecondaryColor(player,closestTerritory);
     	}
     	String distStr;
     	int maxDist = 99;

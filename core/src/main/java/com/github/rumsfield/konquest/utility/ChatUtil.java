@@ -2,12 +2,14 @@ package com.github.rumsfield.konquest.utility;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonPlayer;
+import me.lucko.helper.config.typeserializers.HelperTypeSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.regex.Matcher;
@@ -49,8 +51,8 @@ public class ChatUtil {
 	
 	/**
 	 * Parse a string color code into usable color
-	 * @param input - The code to be parsed
-	 * @return ChatColor enum code, null if invalid code
+	 * @param input - The name of the ChatColor enum
+	 * @return ChatColor enum from name, null if invalid name
 	 */
 	public static ChatColor parseColorCode(String input) {
 		ChatColor result = null;
@@ -73,7 +75,7 @@ public class ChatUtil {
 	 * @param name Name to replace %NAME% with
 	 * @return Formatted string
 	 */
-	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, String teamColor, String titleColor, boolean formatName, boolean formatKingdom) {
+	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, String teamColor, String nameColor, boolean formatName, boolean formatKingdom) {
 		String message = base;
 		if(prefix.equals("")) {
 			message = message.replace("%PREFIX% ", "");
@@ -101,14 +103,18 @@ public class ChatUtil {
 			message = message.replace("%TITLE% ", "");
 			message = message.replace("%TITLE%", "");
 		} else {
-			message = message.replace("%TITLE%", titleColor+title);
+			if(formatKingdom) {
+				message = message.replace("%TITLE%", teamColor + title);
+			} else {
+				message = message.replace("%TITLE%", title);
+			}
 		}
 		if(name.equals("")) {
 			message = message.replace("%NAME% ", "");
 			message = message.replace("%NAME%", "");
 		} else {
 			if(formatName) {
-				message = message.replace("%NAME%", teamColor+name);
+				message = message.replace("%NAME%", nameColor+name);
 			} else {
 				message = message.replace("%NAME%", name);
 			}
@@ -221,8 +227,10 @@ public class ChatUtil {
 	 * @return The ChatColor from the string, else ChatColor.RESET if none exist.
 	 */
 	public static ChatColor lookupChatColor(String colorStr) {
-		ChatColor result = ChatColor.getByChar(colorStr);
+		ChatColor result = ChatColor.getByChar(colorStr.charAt(colorStr.length()-1));
 		if(result == null) {
+			String hexVal = String.format("%040x", new BigInteger(1, colorStr.getBytes()));
+			printDebug("Failed to lookup ChatColor \""+hexVal+"\"");
 			return ChatColor.RESET;
 		}
 		return result;

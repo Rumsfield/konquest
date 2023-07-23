@@ -25,105 +25,98 @@ public interface KonquestAPI {
 	 * 
 	 * @return The friendly primary color
 	 */
-	ChatColor getFriendlyPrimaryColor();
+	String getFriendlyPrimaryColor();
 
 	/**
 	 * Gets the friendly secondary color, from core.yml.
 	 *
 	 * @return The friendly secondary color
 	 */
-	@Deprecated
-	ChatColor getFriendlySecondaryColor();
+	String getFriendlySecondaryColor();
 
 	/**
 	 * Gets the enemy primary color, from core.yml.
 	 * 
 	 * @return The enemy primary color
 	 */
-	ChatColor getEnemyPrimaryColor();
+	String getEnemyPrimaryColor();
 	
 	/**
 	 * Gets the enemy secondary color, from core.yml.
 	 * 
 	 * @return The enemy secondary color
 	 */
-	@Deprecated
-	ChatColor getEnemySecondaryColor();
+	String getEnemySecondaryColor();
 	
 	/**
 	 * Gets the trade primary color, from core.yml.
 	 * 
 	 * @return The trade primary color
 	 */
-	ChatColor getTradePrimaryColor();
+	String getTradePrimaryColor();
 
 	/**
 	 * Gets the trade secondary color, from core.yml.
 	 *
 	 * @return The trade secondary color
 	 */
-	@Deprecated
-	ChatColor getTradeSecondaryColor();
+	String getTradeSecondaryColor();
 
 	/**
 	 * Gets the peaceful primary color, from core.yml.
 	 * 
 	 * @return The peaceful primary color
 	 */
-	ChatColor getPeacefulPrimaryColor();
+	String getPeacefulPrimaryColor();
 
 	/**
 	 * Gets the peaceful secondary color, from core.yml.
 	 *
 	 * @return The peaceful secondary color
 	 */
-	@Deprecated
-	ChatColor getPeacefulSecondaryColor();
+	String getPeacefulSecondaryColor();
 
 	/**
 	 * Gets the allied primary color, from core.yml.
 	 * 
 	 * @return The allied primary color
 	 */
-	ChatColor getAlliedPrimaryColor();
+	String getAlliedPrimaryColor();
 
 	/**
 	 * Gets the allied secondary color, from core.yml.
 	 *
 	 * @return The allied secondary color
 	 */
-	@Deprecated
-	ChatColor getAlliedSecondaryColor();
+	String getAlliedSecondaryColor();
 
 	/**
 	 * Gets the barbarian primary color, from core.yml.
 	 * 
 	 * @return The barbarian primary color
 	 */
-	ChatColor getBarbarianPrimaryColor();
+	String getBarbarianPrimaryColor();
 
 	/**
 	 * Gets the barbarian secondary color, from core.yml.
 	 *
 	 * @return The barbarian secondary color
 	 */
-	@Deprecated
-	ChatColor getBarbarianSecondaryColor();
+	String getBarbarianSecondaryColor();
 
 	/**
 	 * Gets the neutral primary color, from core.yml.
 	 * 
 	 * @return The neutral primary color
 	 */
-	ChatColor getNeutralPrimaryColor();
+	String getNeutralPrimaryColor();
 
 	/**
 	 * Gets the neutral secondary color, from core.yml.
 	 *
 	 * @return The neutral secondary color
 	 */
-	@Deprecated
-	ChatColor getNeutralSecondaryColor();
+	String getNeutralSecondaryColor();
 
 	/**
 	 * Gets the primary Konquest scoreboard with teams.

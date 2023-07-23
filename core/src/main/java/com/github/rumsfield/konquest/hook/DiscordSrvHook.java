@@ -120,7 +120,7 @@ public class DiscordSrvHook implements PluginHook {
 			String chatMessage = guildMessage.getContentDisplay();
 			boolean sendMessage = false;
 			if(viewerPlayer.getKingdom().equals(kingdom)) {
-				chatFormat = chatFormat + Konquest.friendColor1+kingdom.getName()+" "+guildUser.getName();
+				chatFormat = chatFormat + Konquest.friendColor2+kingdom.getName()+" "+guildUser.getName();
 				messageFormat = ""+ChatColor.GREEN+ChatColor.ITALIC;
 				sendMessage = true;
 			} else if(viewerPlayer.isAdminBypassActive()) {

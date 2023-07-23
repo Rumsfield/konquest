@@ -170,15 +170,25 @@ public interface KonquestPlaceholderManager {
     String getRelation(Player playerOne, Player playerTwo);
 	
 	/**
-	 * Gets the relationship color between the two players.
+	 * Gets the primary relationship color between the two players.
 	 * These colors are defined in the Konquest configuration.
 	 * 
 	 * @param playerOne The first player who is making the request
 	 * @param playerTwo The second player who is the context of the request
 	 * @return The relationship color between the two players, or an empty string when either player is invalid
 	 */
-    String getRelationColor(Player playerOne, Player playerTwo);
-	
+    String getRelationPrimaryColor(Player playerOne, Player playerTwo);
+
+	/**
+	 * Gets the secondary relationship color between the two players.
+	 * These colors are defined in the Konquest configuration.
+	 *
+	 * @param playerOne The first player who is making the request
+	 * @param playerTwo The second player who is the context of the request
+	 * @return The relationship color between the two players, or an empty string when either player is invalid
+	 */
+	String getRelationSecondaryColor(Player playerOne, Player playerTwo);
+
 	/**
 	 * Gets the kingdom name and score value, separated by a space, in the given rank of the leaderboard.
 	 * This method is cached.

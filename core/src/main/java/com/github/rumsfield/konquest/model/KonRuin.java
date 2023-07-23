@@ -41,7 +41,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		this.spawnTimer = new Timer(this);
 		this.captureTimer = new Timer(this);
 		this.isCaptureDisabled = false;
-		this.ruinBarAll = Bukkit.getServer().createBossBar(Konquest.neutralColor1+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SOLID);
+		this.ruinBarAll = Bukkit.getServer().createBossBar(Konquest.neutralColor2+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SOLID);
 		this.ruinBarAll.setVisible(true);
 		this.criticalLocations = new HashMap<>();
 		this.spawnLocations = new HashMap<>();
@@ -207,7 +207,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 
 	@Override
 	public void updateBarTitle() {
-		ruinBarAll.setTitle(Konquest.neutralColor1+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName());
+		ruinBarAll.setTitle(Konquest.neutralColor2+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName());
 	}
 	
 	public void setBarProgress(double progress) {

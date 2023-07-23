@@ -959,6 +959,7 @@ diplomacy:
   peace: "Peace"
   trade: "Trade"
   alliance: "Alliance"
+  self: "Your Kingdom"
 properties:
   travel-name: "Travel"
   travel: "Allow travel to this territory"

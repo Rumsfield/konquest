@@ -44,7 +44,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
  		final int MAX_ICONS_PER_PAGE = 45;
 		int pageTotal;
 		
-		String kingdomColor = getKonquest().getDisplayPrimaryColor(observer, infoTown);
+		String kingdomColor = getKonquest().getDisplaySecondaryColor(observer, infoTown);
  		String titleColor = DisplayManager.titleFormat;
 		String propertyColor = DisplayManager.propertyFormat;
 		String loreColor = DisplayManager.loreFormat;

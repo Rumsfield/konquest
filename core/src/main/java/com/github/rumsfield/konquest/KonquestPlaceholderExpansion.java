@@ -385,8 +385,12 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
 	        	break;
 	        /* %rel_konquest_relation_color% - playerOne's relationship color to playerTwo */
         	case "relation_color":
-        		result = placeholderManager.getRelationColor(playerOne, playerTwo);
+        		result = placeholderManager.getRelationPrimaryColor(playerOne, playerTwo);
 	        	break;
+			/* %rel_konquest_relation2_color% - playerOne's secondary relationship color to playerTwo */
+			case "relation2_color":
+				result = placeholderManager.getRelationSecondaryColor(playerOne, playerTwo);
+				break;
         	default: 
 	        	break;
         }
