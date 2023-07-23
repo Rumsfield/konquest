@@ -43,20 +43,20 @@ public class Konquest implements KonquestAPI, Timeable {
 	private static String chatTag;
 	private static String chatMessage;
 	public static final String chatDivider = "\u00BB"; // »
-	public static ChatColor friendColor1 = ChatColor.GREEN;
-	public static ChatColor friendColor2 = ChatColor.DARK_GREEN;
-	public static ChatColor enemyColor1 = ChatColor.RED;
-	public static ChatColor enemyColor2 = ChatColor.DARK_RED;
-	public static ChatColor tradeColor1 = ChatColor.LIGHT_PURPLE;
-	public static ChatColor tradeColor2 = ChatColor.DARK_PURPLE;
-	public static ChatColor peacefulColor1 = ChatColor.WHITE;
-	public static ChatColor peacefulColor2 = ChatColor.GRAY;
-	public static ChatColor alliedColor1 = ChatColor.AQUA;
-	public static ChatColor alliedColor2 = ChatColor.DARK_AQUA;
-	public static ChatColor barbarianColor1 = ChatColor.YELLOW;
-	public static ChatColor barbarianColor2 = ChatColor.GOLD;
-	public static ChatColor neutralColor1 = ChatColor.GRAY;
-	public static ChatColor neutralColor2 = ChatColor.DARK_GRAY;
+	public static String friendColor1 		= "§7";
+	public static String friendColor2 		= "§7";
+	public static String enemyColor1 		= "§7";
+	public static String enemyColor2 		= "§7";
+	public static String tradeColor1 		= "§7";
+	public static String tradeColor2 		= "§7";
+	public static String peacefulColor1 	= "§7";
+	public static String peacefulColor2 	= "§7";
+	public static String alliedColor1 		= "§7";
+	public static String alliedColor2 		= "§7";
+	public static String barbarianColor1 	= "§7";
+	public static String barbarianColor2 	= "§7";
+	public static String neutralColor1 		= "§7";
+	public static String neutralColor2 		= "§7";
 
 	public static ChatColor blockedProtectionColor = ChatColor.DARK_RED;
 	public static ChatColor blockedShieldColor = ChatColor.DARK_AQUA;
@@ -189,21 +189,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		} else {
 			ChatUtil.printDebug("Database thread is already running");
 		}
-		
-		// Create global scoreboard and teams
-        scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        friendlyTeam = scoreboard.registerNewTeam("friendlies");
-        friendlyTeam.setColor(friendColor1);
-        enemyTeam = scoreboard.registerNewTeam("enemies");
-        enemyTeam.setColor(enemyColor1);
-        tradeTeam = scoreboard.registerNewTeam("traders");
-        tradeTeam.setColor(tradeColor1);
-        peacefulTeam = scoreboard.registerNewTeam("peaceful");
-        peacefulTeam.setColor(peacefulColor1);
-        alliedTeam = scoreboard.registerNewTeam("allied");
-        alliedTeam.setColor(alliedColor1);
-        barbarianTeam = scoreboard.registerNewTeam("barbarians");
-        barbarianTeam.setColor(barbarianColor1);
+
+		initScoreboard();
         
         // Set up version-specific classes
 		initVersionHandlers();
@@ -347,58 +334,111 @@ public class Konquest implements KonquestAPI, Timeable {
 			}
 		}
 	}
+
+	private void initScoreboard() {
+		boolean useRelationSuffix = getCore().getBoolean(CorePath.PLAYER_NAMETAG_SUFFIX_RELATION.getPath());
+		// Create global scoreboard and teams
+		scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+		// Friendly team - players in the same kingdom
+		friendlyTeam = scoreboard.registerNewTeam("friendlies");
+		friendlyTeam.setColor(ChatUtil.lookupChatColor(friendColor1));
+		// Enemy team - players in another kingdom at war
+		enemyTeam = scoreboard.registerNewTeam("enemies");
+		enemyTeam.setColor(ChatUtil.lookupChatColor(enemyColor1));
+		// Trade team - players in another kingdom with a trade agreement
+		tradeTeam = scoreboard.registerNewTeam("traders");
+		tradeTeam.setColor(ChatUtil.lookupChatColor(tradeColor1));
+		// Peaceful team - players in another kingdom at peace
+		peacefulTeam = scoreboard.registerNewTeam("peaceful");
+		peacefulTeam.setColor(ChatUtil.lookupChatColor(peacefulColor1));
+		// Allied team - players in another kingdom in an alliance
+		alliedTeam = scoreboard.registerNewTeam("allied");
+		alliedTeam.setColor(ChatUtil.lookupChatColor(alliedColor1));
+		// Barbarian team - players that are barbarians (no kingdom)
+		barbarianTeam = scoreboard.registerNewTeam("barbarians");
+		barbarianTeam.setColor(ChatUtil.lookupChatColor(barbarianColor1));
+		// Apply suffix optionally
+		if(useRelationSuffix) {
+			String separator = " ";
+			friendlyTeam.setSuffix(separator+friendColor2+MessagePath.PLACEHOLDER_FRIENDLY.getMessage());
+			enemyTeam.setSuffix(separator+enemyColor2+MessagePath.PLACEHOLDER_ENEMY.getMessage());
+			tradeTeam.setSuffix(separator+tradeColor2+MessagePath.PLACEHOLDER_TRADER.getMessage());
+			peacefulTeam.setSuffix(separator+peacefulColor2+MessagePath.PLACEHOLDER_PEACEFUL.getMessage());
+			alliedTeam.setSuffix(separator+alliedColor2+MessagePath.PLACEHOLDER_ALLY.getMessage());
+			barbarianTeam.setSuffix(separator+barbarianColor2+MessagePath.PLACEHOLDER_BARBARIAN.getMessage());
+		}
+	}
 	
 	private void initColors() {
-		HashMap<CorePath,ChatColor> colorMap = new HashMap<>();
-		colorMap.put(CorePath.COLORS_FRIENDLY_PRIMARY,ChatColor.GREEN);
-		colorMap.put(CorePath.COLORS_FRIENDLY_SECONDARY,ChatColor.DARK_GREEN);
-		colorMap.put(CorePath.COLORS_ENEMY_PRIMARY,ChatColor.RED);
-		colorMap.put(CorePath.COLORS_ENEMY_SECONDARY,ChatColor.DARK_RED);
-		colorMap.put(CorePath.COLORS_TRADE_PRIMARY,ChatColor.LIGHT_PURPLE);
-		colorMap.put(CorePath.COLORS_TRADE_SECONDARY,ChatColor.DARK_PURPLE);
-		colorMap.put(CorePath.COLORS_PEACEFUL_PRIMARY,ChatColor.WHITE);
-		colorMap.put(CorePath.COLORS_PEACEFUL_SECONDARY,ChatColor.GRAY);
-		colorMap.put(CorePath.COLORS_ALLY_PRIMARY,ChatColor.AQUA);
-		colorMap.put(CorePath.COLORS_ALLY_SECONDARY,ChatColor.DARK_AQUA);
-		colorMap.put(CorePath.COLORS_BARBARIAN_PRIMARY,ChatColor.YELLOW);
-		colorMap.put(CorePath.COLORS_BARBARIAN_SECONDARY,ChatColor.GOLD);
-		colorMap.put(CorePath.COLORS_NEUTRAL_PRIMARY,ChatColor.GRAY);
-		colorMap.put(CorePath.COLORS_NEUTRAL_SECONDARY,ChatColor.DARK_GRAY);
-		HashMap<CorePath,ChatColor> updateMap = new HashMap<>();
-		// Parse colors from config
-		for(CorePath colorPath : colorMap.keySet()) {
+		HashMap<CorePath,String> colorMapPrimary = new HashMap<>();
+		HashMap<CorePath,String> colorMapSecondary = new HashMap<>();
+		// Default colors
+		colorMapPrimary.put(CorePath.COLORS_PRIMARY_FRIENDLY,		""+ChatColor.GREEN);
+		colorMapPrimary.put(CorePath.COLORS_PRIMARY_ENEMY,			""+ChatColor.RED);
+		colorMapPrimary.put(CorePath.COLORS_PRIMARY_TRADE,			""+ChatColor.LIGHT_PURPLE);
+		colorMapPrimary.put(CorePath.COLORS_PRIMARY_PEACEFUL,		""+ChatColor.WHITE);
+		colorMapPrimary.put(CorePath.COLORS_PRIMARY_ALLY,			""+ChatColor.AQUA);
+		colorMapPrimary.put(CorePath.COLORS_PRIMARY_BARBARIAN,		""+ChatColor.YELLOW);
+		colorMapPrimary.put(CorePath.COLORS_PRIMARY_NEUTRAL,		""+ChatColor.GRAY);
+		colorMapSecondary.put(CorePath.COLORS_SECONDARY_FRIENDLY,	""+ChatColor.DARK_GREEN);
+		colorMapSecondary.put(CorePath.COLORS_SECONDARY_ENEMY,		""+ChatColor.DARK_RED);
+		colorMapSecondary.put(CorePath.COLORS_SECONDARY_TRADE,		""+ChatColor.DARK_PURPLE);
+		colorMapSecondary.put(CorePath.COLORS_SECONDARY_PEACEFUL,	""+ChatColor.GRAY);
+		colorMapSecondary.put(CorePath.COLORS_SECONDARY_ALLY,		""+ChatColor.DARK_AQUA);
+		colorMapSecondary.put(CorePath.COLORS_SECONDARY_BARBARIAN,	""+ChatColor.GOLD);
+		colorMapSecondary.put(CorePath.COLORS_SECONDARY_NEUTRAL,	""+ChatColor.DARK_GRAY);
+		// Update default colors from config
+		HashMap<CorePath,String> updateMap = new HashMap<>();
+		// Parse primary colors from config
+		for(CorePath colorPath : colorMapPrimary.keySet()) {
 			String configColor = getCore().getString(colorPath.getPath(),"");
-			ChatColor color = ChatUtil.parseColorCode(configColor);
-			if(color == null) {
-				// Failed to match config setting to valid color
-				String defaultColor = colorMap.get(colorPath).toString();
-				ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", using "+defaultColor);
+			// Check for named ChatColor enum (required)
+			ChatColor namedColor = ChatUtil.parseColorCode(configColor);
+			if(namedColor == null) {
+				// Failed to match config setting to ChatColor enum
+				ChatUtil.printConsoleError("Invalid ChatColor name "+colorPath+": "+configColor+", primary colors require ChatColor names.");
 			} else {
-				// Update color map from config
-				updateMap.put(colorPath,color);
+				// Update color map from config using ChatColor enum
+				updateMap.put(colorPath,""+namedColor);
+			}
+		}
+		// Parse secondary colors from config
+		for(CorePath colorPath : colorMapSecondary.keySet()) {
+			String configColor = getCore().getString(colorPath.getPath(),"");
+			// First, check for named ChatColor enum
+			ChatColor namedColor = ChatUtil.parseColorCode(configColor);
+			if(namedColor == null) {
+				// Next, parse format codes and hex
+				String formatColor = ChatUtil.parseHex(configColor);
+				updateMap.put(colorPath,""+formatColor);
+			} else {
+				// Update color map from config using ChatColor enum
+				updateMap.put(colorPath,""+namedColor);
 			}
 		}
 		// Update color map
 		for(CorePath colorPath : updateMap.keySet()) {
-			if(colorMap.containsKey(colorPath)) {
-				colorMap.put(colorPath,updateMap.get(colorPath));
+			if(colorMapPrimary.containsKey(colorPath)) {
+				colorMapPrimary.put(colorPath,updateMap.get(colorPath));
+			} else if(colorMapSecondary.containsKey(colorPath)) {
+				colorMapSecondary.put(colorPath,updateMap.get(colorPath));
 			}
 		}
 		// Assign color fields
-		friendColor1         = colorMap.get(CorePath.COLORS_FRIENDLY_PRIMARY);
-		friendColor2         = colorMap.get(CorePath.COLORS_FRIENDLY_SECONDARY);
-		enemyColor1          = colorMap.get(CorePath.COLORS_ENEMY_PRIMARY);
-		enemyColor2          = colorMap.get(CorePath.COLORS_ENEMY_SECONDARY);
-		tradeColor1 		 = colorMap.get(CorePath.COLORS_TRADE_PRIMARY);
-		tradeColor2 		 = colorMap.get(CorePath.COLORS_TRADE_SECONDARY);
-		peacefulColor1       = colorMap.get(CorePath.COLORS_PEACEFUL_PRIMARY);
-		peacefulColor2       = colorMap.get(CorePath.COLORS_PEACEFUL_SECONDARY);
-		alliedColor1         = colorMap.get(CorePath.COLORS_ALLY_PRIMARY);
-		alliedColor2         = colorMap.get(CorePath.COLORS_ALLY_SECONDARY);
-		barbarianColor1      = colorMap.get(CorePath.COLORS_BARBARIAN_PRIMARY);
-		barbarianColor2      = colorMap.get(CorePath.COLORS_BARBARIAN_SECONDARY);
-		neutralColor1        = colorMap.get(CorePath.COLORS_NEUTRAL_PRIMARY);
-		neutralColor2        = colorMap.get(CorePath.COLORS_NEUTRAL_SECONDARY);
+		friendColor1         = colorMapPrimary.get(CorePath.COLORS_PRIMARY_FRIENDLY);
+		friendColor2         = colorMapSecondary.get(CorePath.COLORS_SECONDARY_FRIENDLY);
+		enemyColor1          = colorMapPrimary.get(CorePath.COLORS_PRIMARY_ENEMY);
+		enemyColor2          = colorMapSecondary.get(CorePath.COLORS_SECONDARY_ENEMY);
+		tradeColor1 		 = colorMapPrimary.get(CorePath.COLORS_PRIMARY_TRADE);
+		tradeColor2 		 = colorMapSecondary.get(CorePath.COLORS_SECONDARY_TRADE);
+		peacefulColor1       = colorMapPrimary.get(CorePath.COLORS_PRIMARY_PEACEFUL);
+		peacefulColor2       = colorMapSecondary.get(CorePath.COLORS_SECONDARY_PEACEFUL);
+		alliedColor1         = colorMapPrimary.get(CorePath.COLORS_PRIMARY_ALLY);
+		alliedColor2         = colorMapSecondary.get(CorePath.COLORS_SECONDARY_ALLY);
+		barbarianColor1      = colorMapPrimary.get(CorePath.COLORS_PRIMARY_BARBARIAN);
+		barbarianColor2      = colorMapSecondary.get(CorePath.COLORS_SECONDARY_BARBARIAN);
+		neutralColor1        = colorMapPrimary.get(CorePath.COLORS_PRIMARY_NEUTRAL);
+		neutralColor2        = colorMapSecondary.get(CorePath.COLORS_SECONDARY_NEUTRAL);
 	}
 
 	private void checkCorePaths() {
@@ -541,59 +581,59 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	/* API Methods */
 	public ChatColor getFriendlyPrimaryColor() {
-		return friendColor1;
+		return ChatUtil.lookupChatColor(friendColor1);
 	}
 	
 	public ChatColor getFriendlySecondaryColor() {
-		return friendColor2;
+		return ChatUtil.lookupChatColor(friendColor2);
 	}
 	
 	public ChatColor getEnemyPrimaryColor() {
-		return enemyColor1;
+		return ChatUtil.lookupChatColor(enemyColor1);
 	}
 	
 	public ChatColor getEnemySecondaryColor() {
-		return enemyColor2;
+		return ChatUtil.lookupChatColor(enemyColor2);
 	}
 	
 	public ChatColor getTradePrimaryColor() {
-		return tradeColor1;
+		return ChatUtil.lookupChatColor(tradeColor1);
 	}
 
 	public ChatColor getTradeSecondaryColor() {
-		return tradeColor2;
+		return ChatUtil.lookupChatColor(tradeColor2);
 	}
 
 	public ChatColor getPeacefulPrimaryColor() {
-		return peacefulColor1;
+		return ChatUtil.lookupChatColor(peacefulColor1);
 	}
 
 	public ChatColor getPeacefulSecondaryColor() {
-		return peacefulColor2;
+		return ChatUtil.lookupChatColor(peacefulColor2);
 	}
 
 	public ChatColor getAlliedPrimaryColor() {
-		return alliedColor1;
+		return ChatUtil.lookupChatColor(alliedColor1);
 	}
 
 	public ChatColor getAlliedSecondaryColor() {
-		return alliedColor2;
+		return ChatUtil.lookupChatColor(alliedColor2);
 	}
 
 	public ChatColor getBarbarianPrimaryColor() {
-		return barbarianColor1;
+		return ChatUtil.lookupChatColor(barbarianColor1);
 	}
 
 	public ChatColor getBarbarianSecondaryColor() {
-		return barbarianColor2;
+		return ChatUtil.lookupChatColor(barbarianColor2);
 	}
 
 	public ChatColor getNeutralPrimaryColor() {
-		return neutralColor1;
+		return ChatUtil.lookupChatColor(neutralColor1);
 	}
 
 	public ChatColor getNeutralSecondaryColor() {
-		return neutralColor2;
+		return ChatUtil.lookupChatColor(neutralColor2);
 	}
 
 	/* Regular Methods */
@@ -1429,8 +1469,8 @@ public class Konquest implements KonquestAPI, Timeable {
     	}
     }
 
-    public ChatColor getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
-    	ChatColor result = neutralColor1;
+    public String getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
+    	String result = neutralColor1;
 		KonquestRelationshipType role = kingdomManager.getRelationRole(displayKingdom,contextKingdom);
     	switch(role) {
 	    	case BARBARIAN:
@@ -1460,16 +1500,16 @@ public class Konquest implements KonquestAPI, Timeable {
     	return result;
     }
     
-    public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer) {
+    public String getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer) {
     	return getDisplayPrimaryColor(displayPlayer.getKingdom(),contextPlayer.getKingdom());
     }
     
-    public ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory) {
+    public String getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory) {
     	return getDisplayPrimaryColor(displayPlayer.getKingdom(),contextTerritory.getKingdom());
     }
     
-    public ChatColor getDisplaySecondaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
-    	ChatColor result = neutralColor2;
+    public String getDisplaySecondaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
+    	String result = neutralColor2;
 		KonquestRelationshipType role = kingdomManager.getRelationRole(displayKingdom,contextKingdom);
     	switch(role) {
 	    	case BARBARIAN:
@@ -1499,11 +1539,11 @@ public class Konquest implements KonquestAPI, Timeable {
     	return result;
     }
     
-    public ChatColor getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer) {
+    public String getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer) {
     	return getDisplaySecondaryColor(displayPlayer.getKingdom(),contextPlayer.getKingdom());
     }
     
-    public ChatColor getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory) {
+    public String getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory) {
     	return getDisplaySecondaryColor(displayPlayer.getKingdom(),contextTerritory.getKingdom());
     }
     
@@ -1574,6 +1614,10 @@ public class Konquest implements KonquestAPI, Timeable {
 		}
 		
 		return result;		
+	}
+
+	public static String getTimeFormat(int valSeconds, String color) {
+		return getTimeFormat(valSeconds, ChatUtil.lookupChatColor(color));
 	}
     
     public static String getLastSeenFormat(OfflinePlayer offlineBukkitPlayer) {

@@ -15,7 +15,7 @@ import java.util.List;
 public class TemplateIcon implements MenuIcon {
 
 	private final KonMonumentTemplate template;
-	private final ChatColor contextColor;
+	private final String contextColor;
 	private final List<String> lore;
 	private final int index;
 	private final boolean isClickable;
@@ -24,7 +24,7 @@ public class TemplateIcon implements MenuIcon {
 	private final String valueColor = DisplayManager.valueFormat;
 	private final String alertColor = DisplayManager.alertFormat;
 
-	public TemplateIcon(KonMonumentTemplate template, ChatColor contextColor, List<String> lore, int index, boolean isClickable) {
+	public TemplateIcon(KonMonumentTemplate template, String contextColor, List<String> lore, int index, boolean isClickable) {
 		this.template = template;
 		this.contextColor = contextColor;
 		this.lore = lore;

@@ -73,7 +73,7 @@ public class ChatUtil {
 	 * @param name Name to replace %NAME% with
 	 * @return Formatted string
 	 */
-	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, ChatColor teamColor, ChatColor titleColor, boolean formatName, boolean formatKingdom) {
+	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, String teamColor, String titleColor, boolean formatName, boolean formatKingdom) {
 		String message = base;
 		if(prefix.equals("")) {
 			message = message.replace("%PREFIX% ", "");
@@ -172,6 +172,10 @@ public class ChatUtil {
 		}
 		return result;
 	}
+
+	public static Color lookupColor(String reference) {
+		return lookupColor(lookupChatColor(reference));
+	}
 	
 	public static BarColor mapBarColor(ChatColor reference) {
 		BarColor result = BarColor.WHITE;
@@ -203,6 +207,23 @@ public class ChatUtil {
 				break;
 			default:
 				break;
+		}
+		return result;
+	}
+
+	public static BarColor mapBarColor(String reference) {
+		return mapBarColor(lookupChatColor(reference));
+	}
+
+	/**
+	 * Get a ChatColor enum from the string char code.
+	 * @param colorStr - The char code as a string.
+	 * @return The ChatColor from the string, else ChatColor.RESET if none exist.
+	 */
+	public static ChatColor lookupChatColor(String colorStr) {
+		ChatColor result = ChatColor.getByChar(colorStr);
+		if(result == null) {
+			return ChatColor.RESET;
 		}
 		return result;
 	}

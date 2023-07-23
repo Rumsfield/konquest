@@ -32,6 +32,7 @@ public interface KonquestAPI {
 	 *
 	 * @return The friendly secondary color
 	 */
+	@Deprecated
 	ChatColor getFriendlySecondaryColor();
 
 	/**
@@ -46,6 +47,7 @@ public interface KonquestAPI {
 	 * 
 	 * @return The enemy secondary color
 	 */
+	@Deprecated
 	ChatColor getEnemySecondaryColor();
 	
 	/**
@@ -60,6 +62,7 @@ public interface KonquestAPI {
 	 *
 	 * @return The trade secondary color
 	 */
+	@Deprecated
 	ChatColor getTradeSecondaryColor();
 
 	/**
@@ -74,6 +77,7 @@ public interface KonquestAPI {
 	 *
 	 * @return The peaceful secondary color
 	 */
+	@Deprecated
 	ChatColor getPeacefulSecondaryColor();
 
 	/**
@@ -88,6 +92,7 @@ public interface KonquestAPI {
 	 *
 	 * @return The allied secondary color
 	 */
+	@Deprecated
 	ChatColor getAlliedSecondaryColor();
 
 	/**
@@ -102,6 +107,7 @@ public interface KonquestAPI {
 	 *
 	 * @return The barbarian secondary color
 	 */
+	@Deprecated
 	ChatColor getBarbarianSecondaryColor();
 
 	/**
@@ -116,6 +122,7 @@ public interface KonquestAPI {
 	 *
 	 * @return The neutral secondary color
 	 */
+	@Deprecated
 	ChatColor getNeutralSecondaryColor();
 
 	/**
@@ -263,7 +270,7 @@ public interface KonquestAPI {
 	 * @param contextKingdom The target kingdom whose relationship to the observer determines the color
 	 * @return The primary display color
 	 */
-	ChatColor getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom);
+	String getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom);
 	
 	/**
 	 * Gets the primary display color based on relationships. This color is set in the Konquest configuration.
@@ -273,7 +280,7 @@ public interface KonquestAPI {
 	 * @param contextPlayer The target player whose relationship to the observer determines the color
 	 * @return The primary display color
 	 */
-	ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer);
+	String getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer);
 	
 	/**
 	 * Gets the primary display color based on relationships. This color is set in the Konquest configuration.
@@ -283,7 +290,7 @@ public interface KonquestAPI {
 	 * @param contextTerritory The target town whose relationship to the observer determines the color
 	 * @return The primary display color
 	 */
-	ChatColor getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);
+	String getDisplayPrimaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);
 	
 	/**
 	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
@@ -293,7 +300,7 @@ public interface KonquestAPI {
 	 * @param contextKingdom The target kingdom whose relationship to the observer determines the color
 	 * @return The secondary display color
 	 */
-	ChatColor getDisplaySecondaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom);
+	String getDisplaySecondaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom);
 	
 	/**
 	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
@@ -303,7 +310,7 @@ public interface KonquestAPI {
 	 * @param contextPlayer The target player whose relationship to the observer determines the color
 	 * @return The secondary display color
 	 */
-	ChatColor getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer);
+	String getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestOfflinePlayer contextPlayer);
 	
 	/**
 	 * Gets the secondary display color based on relationships. This color is set in the Konquest configuration.
@@ -313,7 +320,7 @@ public interface KonquestAPI {
 	 * @param contextTerritory The target town whose relationship to the observer determines the color
 	 * @return The secondary display color
 	 */
-	ChatColor getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);
+	String getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory);
 	
 	/**
 	 * Utility method to convert a location to a point representation of the chunk that contains the location.

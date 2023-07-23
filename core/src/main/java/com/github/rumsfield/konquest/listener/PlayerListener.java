@@ -279,8 +279,8 @@ public class PlayerListener implements Listener {
 
 		// Send messages to players
 		for(KonPlayer viewerPlayer : playerManager.getPlayersOnline()) {
-			ChatColor teamColor = ChatColor.GOLD;
-			ChatColor titleColor = ChatColor.GOLD;
+			String teamColor = ""+ChatColor.GOLD;
+			String titleColor = ""+ChatColor.GOLD;
 			boolean doFormatName = true;
 			boolean doFormatKingdom = true;
 			String messageFormat = "";
@@ -288,7 +288,7 @@ public class PlayerListener implements Listener {
 			boolean sendMessage = false;
 			if(player.isGlobalChat()) {
 				// Sender is in global chat mode
-				teamColor = konquest.getDisplayPrimaryColor(viewerPlayer, player);
+				teamColor = ""+konquest.getDisplayPrimaryColor(viewerPlayer, player);
 				titleColor = konquest.getDisplaySecondaryColor(viewerPlayer, player);
 				doFormatName = formatNameConfig;
 				doFormatKingdom = formatKingdomConfig;
@@ -1045,7 +1045,7 @@ public class PlayerListener implements Listener {
         			// Check if entry is allowed
         			if(isDeniedEnterTerritory(territoryTo,player,force)) return false;
         			// Set message color based on enemy territory
-        			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
+        			String color = konquest.getDisplayPrimaryColor(player, territoryTo);
 	                // Display Territory Name
 	    			ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
 	    			// Do things appropriate to the type of territory
@@ -1068,7 +1068,7 @@ public class PlayerListener implements Listener {
             				return false;
             			}
         				// Set message color based on To territory
-            			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
+            			String color = konquest.getDisplayPrimaryColor(player, territoryTo);
     	            	ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
     	            	// Do things appropriate to the type of territory
     	    			// Exit Territory
@@ -1135,7 +1135,7 @@ public class PlayerListener implements Listener {
     			
     			if(isTerritoryTo) {
 	                // Set message color based on enemy territory
-        			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
+        			String color = konquest.getDisplayPrimaryColor(player, territoryTo);
 	                // Display Territory Name
 	    			String territoryName = territoryTo.getName();
 	    			ChatUtil.sendKonTitle(player, "", color+territoryName);

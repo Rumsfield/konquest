@@ -50,7 +50,7 @@ public class DiplomacyIcon implements MenuIcon {
 			}
 		}
 		List<String> itemLore = new ArrayList<>(lore);
-		ChatColor nameColor = ChatColor.GOLD;
+		String nameColor = ""+ChatColor.GOLD;
 		switch(relation) {
 			case WAR:
 				nameColor = Konquest.enemyColor1;

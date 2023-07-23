@@ -103,7 +103,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         DisplayMenu result;
         MenuIcon icon;
         List<String> loreList = new ArrayList<>();
-        ChatColor kingdomColor = Konquest.friendColor1;
+        String kingdomColor = Konquest.friendColor1;
 
         int rows = 1;
         if(menuAccess.equals(AccessType.LORD)) {
