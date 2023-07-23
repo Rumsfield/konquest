@@ -82,8 +82,9 @@ core:
   colors:
 
     # //// CORE.COLORS.PRIMARY \\\\
-    # These colors are used for territory bars, player nametags and tab list displays.
-    # The following colors MUST match a ChatColor enum: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/ChatColor.html
+    # These colors are used for territory bars and borders, player names and tab list displays.
+    # The following colors MUST match a ChatColor enum (e.g. GREEN).
+    # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/ChatColor.html
     primary:
   
       # (*) The primary color that players see for their own kingdom.
@@ -108,30 +109,31 @@ core:
       neutral: GRAY
 
     # //// CORE.COLORS.SECONDARY \\\\
-    # These colors are used for other chat formats, territory border particles and relationships.
-    # The following colors may use hex colors (#RRGGBB) or match a ChatColor enum: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/ChatColor.html
+    # These colors are used for other chat formats, menu labels and kingdom relationships.
+    # The following colors may use hex colors (e.g. '#FF8080'), format codes (e.g. '&b&o'), or match a ChatColor enum (e.g. DARK_GREEN).
+    # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/ChatColor.html
     secondary:
 
       # (*) The secondary color that players see for their own kingdom.
-      friendly: DARK_GREEN
+      friendly: '#40C010'
 
       # (*) The secondary color that players see for enemy kingdoms.
-      enemy: DARK_RED
+      enemy: '#A02020'
 
       # (*) The secondary color that players see for trading kingdoms.
-      trade: DARK_PURPLE
+      trade: '#9050C0'
 
       # (*) The secondary color that players see for peaceful kingdoms.
-      peaceful: GRAY
+      peaceful: '#CCE0C8'
 
       # (*) The secondary color that players see for allied kingdoms.
-      ally: DARK_AQUA
+      ally: '#22B090'
 
       # (*) The secondary color that all players see for barbarians.
-      barbarian: GOLD
+      barbarian: '#F0C000'
 
       # (*) The secondary color that players see for neutral territory, like ruins and sanctuaries.
-      neutral: DARK_GRAY
+      neutral: '#A08890'
     
   # //// CORE.DATABASE \\\\
   database:
