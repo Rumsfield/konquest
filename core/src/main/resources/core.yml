@@ -176,6 +176,9 @@ core:
     
     # (*) Enable plugin integration with Dynmap (true/false)
     dynmap: true
+
+    # (*) Enable plugin integration with BlueMap (true/false)
+    bluemap: true
     
     # (*) Enable plugin integration with DiscordSRV (true/false)
     discordsrv: true

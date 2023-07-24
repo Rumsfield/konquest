@@ -5,6 +5,7 @@ plugins {
 
 repositories{
     mavenCentral()
+
     // Placeholder API
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 
@@ -25,7 +26,7 @@ repositories{
     maven("https://m2.dv8tion.net/releases")
     maven("https://nexus.scarsz.me/content/groups/public/")
 
-    // Vault
+    // Vault, BlueMap
     maven("https://jitpack.io")
 }
 
@@ -42,6 +43,7 @@ dependencies{
     compileOnly("com.discordsrv:discordsrv:1.25.1")
     compileOnly("me.clip:placeholderapi:2.11.2")
     compileOnly("net.luckperms:api:5.4")
+    compileOnly("com.github.BlueMap-Minecraft:BlueMapAPI:v2.6.0")
 
     implementation("org.xerial:sqlite-jdbc:3.40.1.0")
     implementation(project(":api"))
@@ -68,6 +70,6 @@ tasks {
 }
 
 java{
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }

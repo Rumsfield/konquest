@@ -51,6 +51,7 @@ public enum CorePath {
 	INTEGRATION_QUICKSHOP                                 ("core.integration.quickshop"),
 	INTEGRATION_LUCKPERMS                                 ("core.integration.luckperms"),
 	INTEGRATION_DYNMAP                                    ("core.integration.dynmap"),
+	INTEGRATION_BLUEMAP                                   ("core.integration.bluemap"),
 	INTEGRATION_DISCORDSRV                                ("core.integration.discordsrv"),
 	INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_DIRECT      ("core.integration.discordsrv_options.raid_alert_direct"),
 	INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_CHANNEL     ("core.integration.discordsrv_options.raid_alert_channel"),
