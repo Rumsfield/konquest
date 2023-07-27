@@ -14,6 +14,7 @@ import org.dynmap.markers.Marker;
 import org.dynmap.markers.MarkerIcon;
 import org.dynmap.markers.MarkerSet;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
@@ -25,7 +26,7 @@ import java.util.Objects;
 public class MapHandler {
 
 	private final Konquest konquest;
-	private final DynmapRender dynmapRenderer;
+	private final ArrayList<Renderable> renderers;
 
 	static final int sanctuaryColor = 0x646464;
 	static final int ruinColor = 0x242424;
@@ -35,11 +36,15 @@ public class MapHandler {
 	
 	public MapHandler(Konquest konquest) {
 		this.konquest = konquest;
-		this.dynmapRenderer = new DynmapRender(konquest);
+		renderers = new ArrayList<>();
+		renderers.add(new DynmapRender(konquest));
+		renderers.add(new BlueMapRender(konquest));
 	}
 	
 	public void initialize() {
-		dynmapRenderer.initialize();
+		for(Renderable ren : renderers) {
+			ren.initialize();
+		}
 	}
 
 	public static int getWebColor(KonTerritory territory) {
@@ -57,46 +62,80 @@ public class MapHandler {
 	/* Rendering Methods */
 	//TODO: Rename these methods
 	public void drawDynmapUpdateTerritory(KonKingdom kingdom) {
-		dynmapRenderer.drawUpdate(kingdom);
+		for(Renderable ren : renderers) {
+			ren.drawUpdate(kingdom);
+		}
 	}
 
 	public void drawDynmapUpdateTerritory(KonTerritory territory) {
-		dynmapRenderer.drawUpdate(territory);
+		for(Renderable ren : renderers) {
+			ren.drawUpdate(territory);
+		}
 	}
 
 	public void drawDynmapRemoveTerritory(KonTerritory territory) {
-		dynmapRenderer.drawRemove(territory);
+		for(Renderable ren : renderers) {
+			ren.drawRemove(territory);
+		}
 	}
 	
 	public void drawDynmapLabel(KonTerritory territory) {
-		dynmapRenderer.drawLabel(territory);
+		for(Renderable ren : renderers) {
+			ren.drawLabel(territory);
+		}
 	}
 	
 	public void postDynmapBroadcast(String message) {
-		dynmapRenderer.postBroadcast(message);
+		for(Renderable ren : renderers) {
+			ren.postBroadcast(message);
+		}
 	}
 	
 	public void drawDynmapAllTerritories() {
 		Date start = new Date();
 		// Sanctuaries
 		for (KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
-			dynmapRenderer.drawUpdate(sanctuary);
+			for(Renderable ren : renderers) {
+				ren.drawUpdate(sanctuary);
+			}
 		}
 		// Ruins
 		for (KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			dynmapRenderer.drawUpdate(ruin);
+			for(Renderable ren : renderers) {
+				ren.drawUpdate(ruin);
+			}
 		}
 		// Camps
 		for (KonCamp camp : konquest.getCampManager().getCamps()) {
-			dynmapRenderer.drawUpdate(camp);
+			for(Renderable ren : renderers) {
+				ren.drawUpdate(camp);
+			}
 		}
 		// Kingdoms
 		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
-			dynmapRenderer.drawUpdate(kingdom);
+			for(Renderable ren : renderers) {
+				ren.drawUpdate(kingdom);
+			}
 		}
 		Date end = new Date();
 		int time = (int)(end.getTime() - start.getTime());
 		ChatUtil.printDebug("Rendering all territories in maps took "+time+" ms");
+	}
+
+	static boolean isTerritoryInvalid(KonTerritory territory) {
+		boolean result = false;
+		switch (territory.getTerritoryType()) {
+			case SANCTUARY:
+			case RUIN:
+			case CAMP:
+			case CAPITAL:
+			case TOWN:
+				result = true;
+				break;
+			default:
+				break;
+		}
+		return !result;
 	}
 
 }

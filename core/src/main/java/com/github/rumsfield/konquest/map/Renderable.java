@@ -6,6 +6,11 @@ import com.github.rumsfield.konquest.model.KonTerritory;
 public interface Renderable {
 
     /**
+     * Initialize the API associated with the renderer.
+     */
+    void initialize();
+
+    /**
      * Draw the capital and all towns in a kingdom on the map.
      * @param kingdom The kingdom to draw
      */
@@ -30,5 +35,11 @@ public interface Renderable {
      * @param territory The territory to update
      */
     void drawLabel(KonTerritory territory);
+
+    /**
+     * Post a message to the web map.
+     * @param message The message to send
+     */
+    void postBroadcast(String message);
 
 }

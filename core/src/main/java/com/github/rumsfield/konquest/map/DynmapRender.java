@@ -27,6 +27,7 @@ public class DynmapRender implements Renderable {
         this.areaCache = new HashMap<>();
     }
 
+    @Override
     public void initialize() {
         // Get Dynmap API from integration manager
         isEnabled = konquest.getIntegrationManager().getDynmap().isEnabled();
@@ -71,7 +72,7 @@ public class DynmapRender implements Renderable {
     public void drawUpdate(KonTerritory territory) {
         if (!isEnabled) return;
 
-        if (isTerritoryInvalid(territory)) {
+        if (MapHandler.isTerritoryInvalid(territory)) {
             ChatUtil.printDebug("Could not draw territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
             return;
         }
@@ -165,7 +166,7 @@ public class DynmapRender implements Renderable {
     public void drawRemove(KonTerritory territory) {
         if (!isEnabled) return;
 
-        if (isTerritoryInvalid(territory)) {
+        if (MapHandler.isTerritoryInvalid(territory)) {
             ChatUtil.printDebug("Could not delete territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
             return;
         }
@@ -219,7 +220,7 @@ public class DynmapRender implements Renderable {
     @Override
     public void drawLabel(KonTerritory territory) {
         if (!isEnabled) return;
-        if (isTerritoryInvalid(territory)) {
+        if (MapHandler.isTerritoryInvalid(territory)) {
             ChatUtil.printDebug("Could not update label for territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
             return;
         }
@@ -248,6 +249,7 @@ public class DynmapRender implements Renderable {
         }
     }
 
+    @Override
     public void postBroadcast(String message) {
         if (!isEnabled) return;
         dapi.sendBroadcastToWeb("Konquest", message);
@@ -426,22 +428,6 @@ public class DynmapRender implements Renderable {
             result = MapHandler.lineCapitalColor;
         }
         return result;
-    }
-
-    private boolean isTerritoryInvalid(KonTerritory territory) {
-        boolean result = false;
-        switch (territory.getTerritoryType()) {
-            case SANCTUARY:
-            case RUIN:
-            case CAMP:
-            case CAPITAL:
-            case TOWN:
-                result = true;
-                break;
-            default:
-                break;
-        }
-        return !result;
     }
 
     private String getIconId(KonTerritory territory) {
