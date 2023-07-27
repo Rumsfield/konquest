@@ -32,7 +32,8 @@ public class BlueMapRender implements Renderable {
     @Override
     public void initialize() {
         // Get BlueMap API from integration manager
-        isEnabled = konquest.getIntegrationManager().getBlueMap().isEnabled();
+        boolean isReady = konquest.getIntegrationManager().getBlueMap().isReady();
+        isEnabled = isReady && konquest.getIntegrationManager().getBlueMap().isEnabled();
         if(isEnabled) {
             bapi = konquest.getIntegrationManager().getBlueMap().getAPI();
         }

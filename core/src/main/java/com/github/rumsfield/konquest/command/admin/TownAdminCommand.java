@@ -130,8 +130,8 @@ public class TownAdminCommand extends CommandBase {
 		        		if(createdTown != null) {
 		        			bukkitPlayer.teleport(getKonquest().getKingdomManager().getKingdom(kingdomName).getTown(townName).getSpawnLoc());
 			        		// Update labels
-			        		getKonquest().getMapHandler().drawDynmapLabel(createdTown);
-			        		getKonquest().getMapHandler().drawDynmapLabel(createdTown.getKingdom().getCapital());
+			        		getKonquest().getMapHandler().drawLabel(createdTown);
+			        		getKonquest().getMapHandler().drawLabel(createdTown.getKingdom().getCapital());
 			        		ChatUtil.sendNotice((Player) getSender(), MessagePath.COMMAND_SETTLE_NOTICE_SUCCESS.getMessage(townName));
 		        		} else {
 		        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());

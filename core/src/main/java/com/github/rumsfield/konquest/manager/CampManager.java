@@ -194,7 +194,7 @@ public class CampManager implements KonquestCampManager {
 					}
 				}
 			}
-			konquest.getMapHandler().drawDynmapUpdateTerritory(newCamp);
+			konquest.getMapHandler().drawUpdateTerritory(newCamp);
 		} else {
 			return 2;
 		}
@@ -254,7 +254,7 @@ public class CampManager implements KonquestCampManager {
 					}
 				}
 			}
-			konquest.getMapHandler().drawDynmapRemoveTerritory(removedCamp);
+			konquest.getMapHandler().drawRemoveTerritory(removedCamp);
 			removedCamp = null;
 		} else {
 			ChatUtil.printDebug("Failed to remove camp for missing UUID "+uuid);

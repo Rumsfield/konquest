@@ -305,7 +305,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		OfflinePlayer townPlayer = Bukkit.getOfflinePlayer(id);
 		for(KonTown town : getCapitalTowns()) {
 			if(town.removePlayerResident(townPlayer)) {
-				konquest.getMapHandler().drawDynmapLabel(town);
+				konquest.getMapHandler().drawLabel(town);
 			}
 		}
 	}

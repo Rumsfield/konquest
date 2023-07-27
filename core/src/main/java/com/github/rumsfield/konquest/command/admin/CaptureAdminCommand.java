@@ -105,7 +105,7 @@ public class CaptureAdminCommand extends CommandBase {
 				int x = capturedTown.getCenterLoc().getBlockX();
 				int y = capturedTown.getCenterLoc().getBlockY();
 				int z = capturedTown.getCenterLoc().getBlockZ();
-				getKonquest().getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(capturedTown.getName())+" ("+x+","+y+","+z+")");
+				getKonquest().getMapHandler().postBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(capturedTown.getName())+" ("+x+","+y+","+z+")");
 				// Broadcast to Discord
 				getKonquest().getIntegrationManager().getDiscordSrv().sendGameToDiscordMessage("global", ":crossed_swords: **"+MessagePath.PROTECTION_NOTICE_CONQUER_DISCORD.getMessage(capturedTown.getName(),capturedTown.getKingdom().getName())+"**");
 				capturedTown.getMonumentTimer().stopTimer();

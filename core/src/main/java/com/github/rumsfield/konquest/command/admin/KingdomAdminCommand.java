@@ -6,12 +6,10 @@ import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.ColorRGB;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -342,7 +340,7 @@ public class KingdomAdminCommand extends CommandBase {
 							}
 						}
 						// Update map
-						getKonquest().getMapHandler().drawDynmapUpdateTerritory(kingdom);
+						getKonquest().getMapHandler().drawUpdateTerritory(kingdom);
 						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_WEB_COLOR_SET.getMessage(kingdom.getName(),colorStr));
 					} else {
 						// Incorrect arguments

@@ -16,14 +16,12 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Snow;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.*;
-import java.util.function.Predicate;
 
 public class TerritoryManager implements KonquestTerritoryManager {
 
@@ -234,8 +232,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				// Add territory
 				closestAdjTerr.addChunk(addPoint);
 				addTerritory(loc.getWorld(),addPoint,closestAdjTerr);
-				konquest.getMapHandler().drawDynmapUpdateTerritory(closestAdjTerr);
-				konquest.getMapHandler().drawDynmapLabel(closestAdjTerr.getKingdom().getCapital());
+				konquest.getMapHandler().drawUpdateTerritory(closestAdjTerr);
+				konquest.getMapHandler().drawLabel(closestAdjTerr.getKingdom().getCapital());
 				// Display town info to players in the newly claimed chunk
 	    		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 	    			if(occupant.getBukkitPlayer().getLocation().getChunk().equals(loc.getChunk())) {
@@ -410,8 +408,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				addTerritory(claimWorld,claimChunk,closestTerritory);
 			}
 	    	// Update map render
-			konquest.getMapHandler().drawDynmapUpdateTerritory(closestTerritory);
-			konquest.getMapHandler().drawDynmapLabel(closestTerritory.getKingdom().getCapital());
+			konquest.getMapHandler().drawUpdateTerritory(closestTerritory);
+			konquest.getMapHandler().drawLabel(closestTerritory.getKingdom().getCapital());
 			// Display territory info to players in the newly claimed chunks
 			for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 				//if(occupant.getBukkitPlayer().getWorld().equals(claimWorld) && claimedChunks.contains(Konquest.toPoint(occupant.getBukkitPlayer().getLocation()))) {
@@ -619,8 +617,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			if(territory instanceof KonBarDisplayer) {
 				((KonBarDisplayer)territory).updateBarPlayers();
 			}
-			konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
-			konquest.getMapHandler().drawDynmapLabel(territory.getKingdom().getCapital());
+			konquest.getMapHandler().drawUpdateTerritory(territory);
+			konquest.getMapHandler().drawLabel(territory.getKingdom().getCapital());
 		}
 
 		return doUpdates;

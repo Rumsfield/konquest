@@ -524,7 +524,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			if(initStatus == 0) {
 				// Capital territory initialized successfully, finish kingdom setup
 				konquest.getTerritoryManager().addAllTerritory(centerLocation.getWorld(),newKingdom.getCapital().getChunkList());
-				konquest.getMapHandler().drawDynmapUpdateTerritory(newKingdom.getCapital());
+				konquest.getMapHandler().drawUpdateTerritory(newKingdom.getCapital());
 				if(isAdmin) {
 					// This kingdom is operated by admins only
 					newKingdom.setIsAdminOperated(true);
@@ -628,7 +628,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				// Remove capital
 				oldKingdom.removeCapital();
 				konquest.getTerritoryManager().removeAllTerritory(oldKingdom.getCapital().getWorld(),oldKingdom.getCapital().getChunkList().keySet());
-				konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
+				konquest.getMapHandler().drawRemoveTerritory(oldKingdom.getCapital());
 				oldKingdom = null;
 				// Update particle borders of everyone
 				// All kingdom's towns and capital were removed, so just update everyone's border particles.
@@ -675,16 +675,16 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Perform rename
 		KonKingdom oldKingdom = getKingdom(oldName);
 		for (KonTown town : oldKingdom.getTowns()) {
-			konquest.getMapHandler().drawDynmapRemoveTerritory(town);
+			konquest.getMapHandler().drawRemoveTerritory(town);
 		}
-		konquest.getMapHandler().drawDynmapRemoveTerritory(oldKingdom.getCapital());
+		konquest.getMapHandler().drawRemoveTerritory(oldKingdom.getCapital());
 		getKingdom(oldName).setName(newName);
 		KonKingdom kingdom = kingdomMap.remove(oldName);
 		kingdomMap.put(newName, kingdom);
 		kingdom.getCapital().updateName();
-		konquest.getMapHandler().drawDynmapUpdateTerritory(kingdom.getCapital());
+		konquest.getMapHandler().drawUpdateTerritory(kingdom.getCapital());
 		for (KonTown town : kingdom.getTowns()) {
-			konquest.getMapHandler().drawDynmapUpdateTerritory(town);
+			konquest.getMapHandler().drawUpdateTerritory(town);
 		}
 		konquest.getDatabaseThread().getDatabase().setOfflinePlayers(konquest.getPlayerManager().getAllPlayersInKingdom(kingdom));
 		
@@ -972,7 +972,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
     	}
     	
-    	konquest.getMapHandler().drawDynmapLabel(joinKingdom.getCapital());
+    	konquest.getMapHandler().drawLabel(joinKingdom.getCapital());
     	updateSmallestKingdom();
     	
 		return 0;
@@ -1153,7 +1153,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     	}
     	
     	// Common updates
-    	konquest.getMapHandler().drawDynmapLabel(getKingdom(oldKingdomName).getCapital());
+    	konquest.getMapHandler().drawLabel(getKingdom(oldKingdomName).getCapital());
     	updateSmallestKingdom();
     	updateKingdomOfflineProtection();
     	
@@ -2279,7 +2279,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				KonTown newTown = getKingdom(kingdomName).getTown(name);
 				// When a town is added successfully, update the chunk cache
 				konquest.getTerritoryManager().addAllTerritory(loc.getWorld(),newTown.getChunkList());
-				konquest.getMapHandler().drawDynmapUpdateTerritory(newTown);
+				konquest.getMapHandler().drawUpdateTerritory(newTown);
 				// Update territory bar
 				newTown.updateBarPlayers();
 				// Update border particles
@@ -2317,8 +2317,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			konquest.getTerritoryManager().updatePlayerBorderParticles(player);
 		}
 		// Update maps
-		konquest.getMapHandler().drawDynmapRemoveTerritory(town);
-		konquest.getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
+		konquest.getMapHandler().drawRemoveTerritory(town);
+		konquest.getMapHandler().drawLabel(town.getKingdom().getCapital());
 		// Update shops
 		konquest.getShopHandler().deleteShopsInPoints(townPoints,town.getWorld());
 		return true;
@@ -2334,12 +2334,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public boolean renameTown(String oldName, String newName, String kingdomName) {
 		if(!isKingdom(kingdomName) || !getKingdom(kingdomName).hasTown(oldName))return false;
 		KonKingdom kingdom = getKingdom(kingdomName);
-		konquest.getMapHandler().drawDynmapRemoveTerritory(kingdom.getTown(oldName));
+		konquest.getMapHandler().drawRemoveTerritory(kingdom.getTown(oldName));
 		boolean success = kingdom.renameTown(oldName, newName);
 		if(!success) return false;
 		KonTown town = kingdom.getTown(newName);
 		if (town != null) {
-			konquest.getMapHandler().drawDynmapUpdateTerritory(town);
+			konquest.getMapHandler().drawUpdateTerritory(town);
 		}
 		return true;
 	}
@@ -2374,7 +2374,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		boolean captureUpgrades = konquest.getCore().getBoolean(CorePath.TOWNS_CAPTURE_UPGRADES.getPath(),true);
 		if(isKingdom(oldKingdomName) && getKingdom(oldKingdomName).hasTown(name)) {
-			konquest.getMapHandler().drawDynmapRemoveTerritory(getKingdom(oldKingdomName).getTown(name));
+			konquest.getMapHandler().drawRemoveTerritory(getKingdom(oldKingdomName).getTown(name));
 			getKingdom(oldKingdomName).getTown(name).purgeResidents();
 			getKingdom(oldKingdomName).getTown(name).clearShieldsArmors();
 			getKingdom(oldKingdomName).getTown(name).setKingdom(conquerKingdom);
@@ -2389,9 +2389,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				conquerKingdom.getTown(name).clearUpgrades();
 			}
 			conquerKingdom.getTown(name).clearPlots();
-			konquest.getMapHandler().drawDynmapUpdateTerritory(conquerKingdom.getTown(name));
-			konquest.getMapHandler().drawDynmapLabel(getKingdom(oldKingdomName).getCapital());
-			konquest.getMapHandler().drawDynmapLabel(conquerKingdom.getCapital());
+			konquest.getMapHandler().drawUpdateTerritory(conquerKingdom.getTown(name));
+			konquest.getMapHandler().drawLabel(getKingdom(oldKingdomName).getCapital());
+			konquest.getMapHandler().drawLabel(conquerKingdom.getCapital());
 			konquest.getShopHandler().deleteShopsInPoints(conquerKingdom.getTown(name).getChunkList().keySet(),conquerKingdom.getTown(name).getWorld());
 			return conquerKingdom.getTown(name);
 		}
@@ -2472,8 +2472,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
             	refreshTownNerfs(town);
     			refreshTownHearts(town);
 				town.updateBarPlayers();
-				konquest.getMapHandler().drawDynmapUpdateTerritory(town);
-				konquest.getMapHandler().drawDynmapLabel(conquerKingdom.getCapital());
+				konquest.getMapHandler().drawUpdateTerritory(town);
+				konquest.getMapHandler().drawLabel(conquerKingdom.getCapital());
 				konquest.getShopHandler().deleteShopsInPoints(town.getChunkList().keySet(),town.getWorld());
 				return town;
 			} else {

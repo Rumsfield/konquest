@@ -11,7 +11,6 @@ import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -96,8 +95,8 @@ public class SettleCommand extends CommandBase {
         		getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.SETTLED,1);
         		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
         		// Update labels
-        		getKonquest().getMapHandler().drawDynmapLabel(town);
-        		getKonquest().getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
+        		getKonquest().getMapHandler().drawLabel(town);
+        		getKonquest().getMapHandler().drawLabel(town.getKingdom().getCapital());
         		
         		// Fire post event
         		KonquestTownSettleEvent invokePostEvent = new KonquestTownSettleEvent(getKonquest(), town, player, town.getKingdom());

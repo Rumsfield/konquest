@@ -6,7 +6,6 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.ColorRGB;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -320,9 +319,9 @@ public class KingdomCommand extends CommandBase {
 								}
 							}
 							// Update map
-							getKonquest().getMapHandler().drawDynmapUpdateTerritory(kingdom.getCapital());
+							getKonquest().getMapHandler().drawUpdateTerritory(kingdom.getCapital());
 							for (KonTown town : kingdom.getTowns()) {
-								getKonquest().getMapHandler().drawDynmapUpdateTerritory(town);
+								getKonquest().getMapHandler().drawUpdateTerritory(town);
 							}
 							ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_WEB_COLOR_SET.getMessage(kingdom.getName(),colorStr));
 						} else {

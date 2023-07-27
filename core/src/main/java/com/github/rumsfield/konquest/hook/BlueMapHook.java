@@ -14,12 +14,12 @@ public class BlueMapHook implements PluginHook {
 
     private final Konquest konquest;
     private boolean isEnabled;
-    private Optional<BlueMapAPI> bAPI;
+    private boolean isReady;
 
     public BlueMapHook(Konquest konquest) {
         this.konquest = konquest;
         this.isEnabled = false;
-        this.bAPI = Optional.empty();
+        this.isReady = false;
     }
 
     @Override
@@ -40,11 +40,17 @@ public class BlueMapHook implements PluginHook {
         if(!konquest.getCore().getBoolean(CorePath.INTEGRATION_BLUEMAP.getPath(),false)) {
             return 3;
         }
-        bAPI = BlueMapAPI.getInstance();
-        if(bAPI.isEmpty()) {
-            ChatUtil.printConsoleError("Failed to register BlueMap. Is it disabled?");
-            return -1;
-        }
+        // BlueMap doesn't load its API until post server load.
+        isReady = false;
+        BlueMapAPI.onEnable(api -> {
+            // Consumer that runs every time BlueMap is (re)loaded.
+            // This happens post server load, and any time the BlueMap plugin is reloaded.
+            // Update the API and re-draw all territories.
+            isReady = true;
+            konquest.getMapHandler().initialize();
+            konquest.getMapHandler().drawAllTerritories("BlueMap");
+        });
+
         isEnabled = true;
         return 0;
     }
@@ -52,8 +58,13 @@ public class BlueMapHook implements PluginHook {
     @Override
     public boolean isEnabled() { return isEnabled; }
 
+    public boolean isReady() {
+        return isReady;
+    }
+
     @Nullable
     public BlueMapAPI getAPI() {
-        return bAPI.orElse(null);
+        return BlueMapAPI.getInstance().orElse(null);
     }
+
 }
