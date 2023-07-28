@@ -77,13 +77,13 @@ public class DynmapRender implements Renderable {
             return;
         }
         String groupId = getGroupId(territory);
-        String groupLabel = getGroupLabel(territory);
+        String groupLabel = MapHandler.getGroupLabel(territory);
         String areaId = getAreaId(territory);
-        String areaLabel = getAreaLabel(territory);
+        String areaLabel = MapHandler.getAreaLabel(territory);
         int areaColor = getAreaColor(territory);
         int lineColor = getLineColor(territory);
         String iconId = getIconId(territory);
-        String iconLabel = getIconLabel(territory);
+        String iconLabel = MapHandler.getIconLabel(territory);
         MarkerIcon icon = getIconMarker(territory);
         // Get territory group
         MarkerSet territoryGroup = dapi.getMarkerAPI().getMarkerSet(groupId);
@@ -226,7 +226,7 @@ public class DynmapRender implements Renderable {
         }
         String groupId = getGroupId(territory);
         String areaId = getAreaId(territory);
-        String areaLabel = getAreaLabel(territory);
+        String areaLabel = MapHandler.getAreaLabel(territory);
         MarkerSet territoryGroup = dapi.getMarkerAPI().getMarkerSet(groupId);
         if (territoryGroup != null) {
             // Update all area point labels
@@ -279,28 +279,6 @@ public class DynmapRender implements Renderable {
         return result;
     }
 
-    private String getGroupLabel(KonTerritory territory) {
-        String result = "Konquest";
-        switch (territory.getTerritoryType()) {
-            case SANCTUARY:
-                result = "Konquest Sanctuaries";
-                break;
-            case RUIN:
-                result = "Konquest Ruins";
-                break;
-            case CAMP:
-                result = "Konquest Barbarian Camps";
-                break;
-            case CAPITAL:
-            case TOWN:
-                result = "Konquest Kingdoms";
-                break;
-            default:
-                break;
-        }
-        return result;
-    }
-
     private String getAreaId(KonTerritory territory) {
         String result = "konquest";
         switch (territory.getTerritoryType()) {
@@ -318,81 +296,6 @@ public class DynmapRender implements Renderable {
                 break;
             case TOWN:
                 result = result+".area.kingdom."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase();
-                break;
-            default:
-                break;
-        }
-        return result;
-    }
-
-    private String getAreaLabel(KonTerritory territory) {
-        String result = "Konquest";
-        switch (territory.getTerritoryType()) {
-            case SANCTUARY:
-                KonSanctuary sanctuary = (KonSanctuary)territory;
-                int numTemplates = sanctuary.getTemplates().size();
-                result = "<p>"+
-                        "<b>"+sanctuary.getName() + "</b><br>" +
-                        MessagePath.MAP_SANCTUARY.getMessage() + "<br>" +
-                        MessagePath.MAP_TEMPLATES.getMessage() + ": " + numTemplates + "<br>" +
-                        "</p>";
-                break;
-            case RUIN:
-                KonRuin ruin = (KonRuin)territory;
-                int numCriticals = ruin.getMaxCriticalHits();
-                int numSpawns = ruin.getSpawnLocations().size();
-                result = "<p>"+
-                        "<b>"+ruin.getName() + "</b><br>" +
-                        MessagePath.MAP_RUIN.getMessage() + "<br>" +
-                        MessagePath.MAP_CRITICAL_HITS.getMessage() + ": " + numCriticals + "<br>" +
-                        MessagePath.MAP_GOLEM_SPAWNS.getMessage() + ": " + numSpawns + "<br>" +
-                        "</p>";
-                break;
-            case CAMP:
-                KonCamp camp = (KonCamp)territory;
-                result = "<p>"+
-                        "<b>"+camp.getName() + "</b><br>" +
-                        MessagePath.MAP_BARBARIANS.getMessage() + "<br>" +
-                        "</p>";
-                break;
-            case CAPITAL:
-                KonCapital capital = (KonCapital)territory;
-                String capitalLordName = "-";
-                if(capital.getPlayerLord() != null) {
-                    capitalLordName = capital.getPlayerLord().getName();
-                }
-                int numKingdomTowns = territory.getKingdom().getTowns().size();
-                int numKingdomLand = 0;
-                for(KonTown town : territory.getKingdom().getCapitalTowns()) {
-                    numKingdomLand += town.getNumLand();
-                }
-                int numAllKingdomPlayers = konquest.getPlayerManager().getAllPlayersInKingdom(territory.getKingdom()).size();
-                result = "<p>"+
-                        "<b>"+capital.getName() + "</b><br>" +
-                        MessagePath.MAP_LORD.getMessage() + ": " + capitalLordName + "<br>" +
-                        MessagePath.MAP_LAND.getMessage() + ": " + capital.getNumLand() + "<br>" +
-                        MessagePath.MAP_POPULATION.getMessage() + ": " + capital.getNumResidents() + "<br>" +
-                        "</p>"+
-                        "<p>"+
-                        "<b>"+capital.getKingdom().getName() + "</b><br>" +
-                        MessagePath.MAP_TOWNS.getMessage() + ": " + numKingdomTowns + "<br>" +
-                        MessagePath.MAP_LAND.getMessage() + ": " + numKingdomLand + "<br>" +
-                        MessagePath.MAP_PLAYERS.getMessage() + ": " + numAllKingdomPlayers + "<br>" +
-                        "</p>";
-                break;
-            case TOWN:
-                KonTown town = (KonTown)territory;
-                String townLordName = "-";
-                if(town.getPlayerLord() != null) {
-                    townLordName = town.getPlayerLord().getName();
-                }
-                result = "<p>"+
-                        "<b>"+town.getName() + "</b><br>" +
-                        MessagePath.MAP_KINGDOM.getMessage() + ": " + town.getKingdom().getName() + "<br>" +
-                        MessagePath.MAP_LORD.getMessage() + ": " + townLordName + "<br>" +
-                        MessagePath.MAP_LAND.getMessage() + ": " + town.getNumLand() + "<br>" +
-                        MessagePath.MAP_POPULATION.getMessage() + ": " + town.getNumResidents() + "<br>" +
-                        "</p>";
                 break;
             default:
                 break;
@@ -447,30 +350,6 @@ public class DynmapRender implements Renderable {
                 break;
             case TOWN:
                 result = result+".icon.kingdom."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase();
-                break;
-            default:
-                break;
-        }
-        return result;
-    }
-
-    private String getIconLabel(KonTerritory territory) {
-        String result = "Konquest";
-        switch (territory.getTerritoryType()) {
-            case SANCTUARY:
-                result = MessagePath.MAP_SANCTUARY.getMessage()+" "+territory.getName();
-                break;
-            case RUIN:
-                result = MessagePath.MAP_RUIN.getMessage()+" "+territory.getName();
-                break;
-            case CAMP:
-                result = MessagePath.MAP_BARBARIAN.getMessage()+" "+territory.getName();
-                break;
-            case CAPITAL:
-                result = territory.getKingdom().getCapital().getName();
-                break;
-            case TOWN:
-                result = territory.getKingdom().getName()+" "+territory.getName();
                 break;
             default:
                 break;

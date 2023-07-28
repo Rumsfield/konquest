@@ -11,6 +11,8 @@ import com.github.rumsfield.konquest.utility.MessagePath;
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.BlueMapMap;
 import de.bluecolored.bluemap.api.BlueMapWorld;
+import de.bluecolored.bluemap.api.markers.DetailMarker;
+import de.bluecolored.bluemap.api.markers.Marker;
 import de.bluecolored.bluemap.api.markers.MarkerSet;
 import de.bluecolored.bluemap.api.markers.ShapeMarker;
 import de.bluecolored.bluemap.api.math.Color;
@@ -77,9 +79,9 @@ public class BlueMapRender implements Renderable {
 
         String groupId = getGroupId(territory);
         String areaId = getAreaId(territory);
-        String shapeLabel = areaId+".shape";
-        String groupLabel = getGroupLabel(territory);
-        String areaLabel = getAreaLabel(territory);
+        String groupLabel = MapHandler.getGroupLabel(territory); // The display name of the group
+        String areaLabel = MapHandler.getIconLabel(territory); // The display name of the area (icon)
+        String areaDetail = MapHandler.getAreaLabel(territory); // The display details of the area
         Color areaColor = getAreaColor(territory);
         Color lineColor = getLineColor(territory);
 
@@ -95,6 +97,7 @@ public class BlueMapRender implements Renderable {
         }
         if (territoryGroup == null) {
             // Need to create the group
+            ChatUtil.printDebug("Creating new group in BlueMap for territory "+territory.getName());
             territoryGroup = MarkerSet.builder()
                     .label(groupLabel)
                     .toggleable(true)
@@ -129,8 +132,11 @@ public class BlueMapRender implements Renderable {
                 areaBuilder.holes(shapeBuilder.build());
             }
         }
+        areaBuilder.centerPosition();
+        areaBuilder.depthTestEnabled(false);
+        areaBuilder.detail(areaDetail);
         // Add area to group
-        territoryGroup.put(shapeLabel,areaBuilder.build());
+        territoryGroup.put(areaId,areaBuilder.build());
         // Put group into maps
         if(bapi.getWorld(territory.getWorld()).isPresent()) {
             BlueMapWorld world = bapi.getWorld(territory.getWorld()).get();
@@ -172,12 +178,38 @@ public class BlueMapRender implements Renderable {
 
     @Override
     public void drawLabel(KonTerritory territory) {
-        // TODO
+        if (!isEnabled) return;
+        if (MapHandler.isTerritoryInvalid(territory)) {
+            ChatUtil.printDebug("Could not update label for territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
+            return;
+        }
+        String groupId = getGroupId(territory);
+        String areaId = getAreaId(territory);
+        String areaDetail = MapHandler.getAreaLabel(territory);
+        // Get territory group
+        if(bapi.getWorld(territory.getWorld()).isPresent()) {
+            BlueMapWorld world = bapi.getWorld(territory.getWorld()).get();
+            for(BlueMapMap map : world.getMaps()) {
+                if(!map.getMarkerSets().containsKey(groupId)) {
+                    ChatUtil.printDebug("Failed to set detail of missing group, BlueMap territory "+territory.getName());
+                }
+                MarkerSet territoryGroup = map.getMarkerSets().get(groupId);
+                if(!territoryGroup.getMarkers().containsKey(areaId)) {
+                    ChatUtil.printDebug("Failed to set detail of missing area, BlueMap territory "+territory.getName());
+                }
+                Marker area = territoryGroup.get(areaId);
+                if(area instanceof DetailMarker) {
+                    ((DetailMarker)area).setDetail(areaDetail);
+                } else {
+                    ChatUtil.printDebug("Failed to set detail of wrong marker type, BlueMap territory "+territory.getName());
+                }
+            }
+        }
     }
 
     @Override
     public void postBroadcast(String message) {
-        // TODO
+        // TODO Does BlueMap support posting messages to the web map?
     }
 
     /* Helper Methods */
@@ -208,19 +240,19 @@ public class BlueMapRender implements Renderable {
         String result = "konquest";
         switch (territory.getTerritoryType()) {
             case SANCTUARY:
-                result = result+".area.sanctuary."+territory.getName().toLowerCase();
+                result = result+".area.sanctuary."+territory.getName().toLowerCase()+".shape";
                 break;
             case RUIN:
-                result = result+".area.ruin."+territory.getName().toLowerCase();
+                result = result+".area.ruin."+territory.getName().toLowerCase()+".shape";
                 break;
             case CAMP:
-                result = result+".area.camp."+territory.getName().toLowerCase();
+                result = result+".area.camp."+territory.getName().toLowerCase()+".shape";
                 break;
             case CAPITAL:
-                result = result+".area.kingdom."+territory.getKingdom().getName().toLowerCase()+".capital";
+                result = result+".area.kingdom."+territory.getKingdom().getName().toLowerCase()+".capital.shape";
                 break;
             case TOWN:
-                result = result+".area.kingdom."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase();
+                result = result+".area.kingdom."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase()+".shape";
                 break;
             default:
                 break;
@@ -229,20 +261,20 @@ public class BlueMapRender implements Renderable {
     }
 
     private Color getAreaColor(KonTerritory territory) {
-        Color result = new Color(0xFFFFFF, 255);
+        Color result = new Color(0xFFFFFF, 128);
         switch (territory.getTerritoryType()) {
             case SANCTUARY:
-                result = new Color(MapHandler.sanctuaryColor, 255);
+                result = new Color(MapHandler.sanctuaryColor, 128);
                 break;
             case RUIN:
-                result = new Color(MapHandler.ruinColor, 255);
+                result = new Color(MapHandler.ruinColor, 128);
                 break;
             case CAMP:
-                result = new Color(MapHandler.campColor, 255);
+                result = new Color(MapHandler.campColor, 128);
                 break;
             case CAPITAL:
             case TOWN:
-                result = new Color(MapHandler.getWebColor(territory), 255);
+                result = new Color(MapHandler.getWebColor(territory), 128);
                 break;
             default:
                 break;
@@ -258,49 +290,4 @@ public class BlueMapRender implements Renderable {
         return result;
     }
 
-    private String getGroupLabel(KonTerritory territory) {
-        String result = "Konquest";
-        switch (territory.getTerritoryType()) {
-            case SANCTUARY:
-                result = "Konquest Sanctuaries";
-                break;
-            case RUIN:
-                result = "Konquest Ruins";
-                break;
-            case CAMP:
-                result = "Konquest Barbarian Camps";
-                break;
-            case CAPITAL:
-            case TOWN:
-                result = "Konquest Kingdoms";
-                break;
-            default:
-                break;
-        }
-        return result;
-    }
-
-    private String getAreaLabel(KonTerritory territory) {
-        String result = "Konquest";
-        switch (territory.getTerritoryType()) {
-            case SANCTUARY:
-                result = MessagePath.MAP_SANCTUARY.getMessage()+" "+territory.getName();
-                break;
-            case RUIN:
-                result = MessagePath.MAP_RUIN.getMessage()+" "+territory.getName();
-                break;
-            case CAMP:
-                result = MessagePath.MAP_BARBARIAN.getMessage()+" "+territory.getName();
-                break;
-            case CAPITAL:
-                result = territory.getKingdom().getCapital().getName();
-                break;
-            case TOWN:
-                result = territory.getKingdom().getName()+" "+territory.getName();
-                break;
-            default:
-                break;
-        }
-        return result;
-    }
 }
