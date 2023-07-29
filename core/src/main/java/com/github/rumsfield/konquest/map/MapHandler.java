@@ -31,12 +31,16 @@ public class MapHandler {
 
 	public MapHandler(Konquest konquest) {
 		this.konquest = konquest;
-		renderers = new HashMap<>();
-		renderers.put("Dynmap",new DynmapRender(konquest));
-		renderers.put("BlueMap",new BlueMapRender(konquest));
+		this.renderers = new HashMap<>();
 	}
 	
 	public void initialize() {
+		if (konquest.getIntegrationManager().getDynmap().isEnabled()) {
+			renderers.put("Dynmap",new DynmapRender(konquest));
+		}
+		if (konquest.getIntegrationManager().getBlueMap().isEnabled()) {
+			renderers.put("BlueMap",new BlueMapRender(konquest));
+		}
 		for(Renderable ren : renderers.values()) {
 			ren.initialize();
 		}

@@ -10,7 +10,10 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.BlueMapMap;
 import de.bluecolored.bluemap.api.BlueMapWorld;
-import de.bluecolored.bluemap.api.markers.*;
+import de.bluecolored.bluemap.api.markers.DetailMarker;
+import de.bluecolored.bluemap.api.markers.Marker;
+import de.bluecolored.bluemap.api.markers.MarkerSet;
+import de.bluecolored.bluemap.api.markers.ShapeMarker;
 import de.bluecolored.bluemap.api.math.Color;
 import de.bluecolored.bluemap.api.math.Shape;
 
@@ -34,6 +37,10 @@ public class BlueMapRender implements Renderable {
         isEnabled = isReady && konquest.getIntegrationManager().getBlueMap().isEnabled();
         if(isEnabled) {
             bapi = konquest.getIntegrationManager().getBlueMap().getAPI();
+            if(bapi == null) {
+                isEnabled = false;
+                ChatUtil.printDebug("Failed to initialize BlueMapRender with null API reference.");
+            }
         }
     }
 
