@@ -235,33 +235,45 @@ public class MapHandler {
 
 	static String getAreaLabel(KonTerritory territory) {
 		String result = "Konquest";
+		String bodyBegin = "<body style=\"background-color:#fff0cc;font-family:Georgia;\">";
+		String nameHeaderFormat = "<h2>%s</h2>";
+		String typeHeaderFormat = "<h3 style=\"color:#8048b8;\">%s</h3>";
+		String propertyLineFormat = "%s: %s <br>";
+		StringBuilder labelMaker = new StringBuilder();
 		switch (territory.getTerritoryType()) {
 			case SANCTUARY:
 				KonSanctuary sanctuary = (KonSanctuary)territory;
 				int numTemplates = sanctuary.getTemplates().size();
-				result = "<p>"+
-						"<b>"+sanctuary.getName() + "</b><br>" +
-						MessagePath.MAP_SANCTUARY.getMessage() + "<br>" +
-						MessagePath.MAP_TEMPLATES.getMessage() + ": " + numTemplates + "<br>" +
-						"</p>";
+				result = labelMaker.append(bodyBegin)
+						.append(String.format(nameHeaderFormat, sanctuary.getName()))
+						.append(String.format(typeHeaderFormat, MessagePath.MAP_SANCTUARY.getMessage()))
+						.append("<p>")
+						.append(String.format(propertyLineFormat, MessagePath.MAP_TEMPLATES.getMessage(), numTemplates))
+						.append("</p>")
+						.append("</body>")
+						.toString();
 				break;
 			case RUIN:
 				KonRuin ruin = (KonRuin)territory;
 				int numCriticals = ruin.getMaxCriticalHits();
 				int numSpawns = ruin.getSpawnLocations().size();
-				result = "<p>"+
-						"<b>"+ruin.getName() + "</b><br>" +
-						MessagePath.MAP_RUIN.getMessage() + "<br>" +
-						MessagePath.MAP_CRITICAL_HITS.getMessage() + ": " + numCriticals + "<br>" +
-						MessagePath.MAP_GOLEM_SPAWNS.getMessage() + ": " + numSpawns + "<br>" +
-						"</p>";
+				result = labelMaker.append(bodyBegin)
+						.append(String.format(nameHeaderFormat, ruin.getName()))
+						.append(String.format(typeHeaderFormat, MessagePath.MAP_RUIN.getMessage()))
+						.append("<p>")
+						.append(String.format(propertyLineFormat, MessagePath.MAP_CRITICAL_HITS.getMessage(), numCriticals))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_GOLEM_SPAWNS.getMessage(), numSpawns))
+						.append("</p>")
+						.append("</body>")
+						.toString();
 				break;
 			case CAMP:
 				KonCamp camp = (KonCamp)territory;
-				result = "<p>"+
-						"<b>"+camp.getName() + "</b><br>" +
-						MessagePath.MAP_BARBARIANS.getMessage() + "<br>" +
-						"</p>";
+				result = labelMaker.append(bodyBegin)
+						.append(String.format(nameHeaderFormat, camp.getName()))
+						.append(String.format(typeHeaderFormat, MessagePath.MAP_BARBARIANS.getMessage()))
+						.append("</body>")
+						.toString();
 				break;
 			case CAPITAL:
 				KonCapital capital = (KonCapital)territory;
@@ -275,18 +287,23 @@ public class MapHandler {
 				for(KonTown town : territory.getKingdom().getCapitalTowns()) {
 					numKingdomLand += town.getNumLand();
 				}
-				result = "<p>"+
-						"<b>"+capital.getName() + "</b><br>" +
-						MessagePath.MAP_LORD.getMessage() + ": " + capitalLordName + "<br>" +
-						MessagePath.MAP_LAND.getMessage() + ": " + capital.getNumLand() + "<br>" +
-						MessagePath.MAP_POPULATION.getMessage() + ": " + capital.getNumResidents() + "<br>" +
-						"</p>"+
-						"<p>"+
-						"<b>"+capital.getKingdom().getName() + "</b><br>" +
-						MessagePath.MAP_TOWNS.getMessage() + ": " + numKingdomTowns + "<br>" +
-						MessagePath.MAP_LAND.getMessage() + ": " + numKingdomLand + "<br>" +
-						MessagePath.MAP_PLAYERS.getMessage() + ": " + numAllKingdomPlayers + "<br>" +
-						"</p>";
+				result = labelMaker.append(bodyBegin)
+						.append(String.format(nameHeaderFormat, capital.getName()))
+						.append(String.format(typeHeaderFormat, MessagePath.MAP_CAPITAL.getMessage()))
+						.append("<p>")
+						.append(String.format(propertyLineFormat, MessagePath.MAP_KINGDOM.getMessage(), capital.getKingdom().getName()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LORD.getMessage(), capitalLordName))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), capital.getNumLand()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_POPULATION.getMessage(), capital.getNumResidents()))
+						.append("</p>")
+						.append(String.format(typeHeaderFormat, MessagePath.MAP_KINGDOM.getMessage()))
+						.append("<p>")
+						.append(String.format(propertyLineFormat, MessagePath.MAP_TOWNS.getMessage(), numKingdomTowns))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), numKingdomLand))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_PLAYERS.getMessage(), numAllKingdomPlayers))
+						.append("</p>")
+						.append("</body>")
+						.toString();
 				break;
 			case TOWN:
 				KonTown town = (KonTown)territory;
@@ -294,13 +311,17 @@ public class MapHandler {
 				if(town.getPlayerLord() != null) {
 					townLordName = town.getPlayerLord().getName();
 				}
-				result = "<p>"+
-						"<b>"+town.getName() + "</b><br>" +
-						MessagePath.MAP_KINGDOM.getMessage() + ": " + town.getKingdom().getName() + "<br>" +
-						MessagePath.MAP_LORD.getMessage() + ": " + townLordName + "<br>" +
-						MessagePath.MAP_LAND.getMessage() + ": " + town.getNumLand() + "<br>" +
-						MessagePath.MAP_POPULATION.getMessage() + ": " + town.getNumResidents() + "<br>" +
-						"</p>";
+				result = labelMaker.append(bodyBegin)
+						.append(String.format(nameHeaderFormat, town.getName()))
+						.append(String.format(typeHeaderFormat, MessagePath.MAP_TOWN.getMessage()))
+						.append("<p>")
+						.append(String.format(propertyLineFormat, MessagePath.MAP_KINGDOM.getMessage(), town.getKingdom().getName()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LORD.getMessage(), townLordName))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), town.getNumLand()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_POPULATION.getMessage(), town.getNumResidents()))
+						.append("</p>")
+						.append("</body>")
+						.toString();
 				break;
 			default:
 				break;
