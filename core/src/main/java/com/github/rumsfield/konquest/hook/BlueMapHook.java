@@ -1,14 +1,11 @@
 package com.github.rumsfield.konquest.hook;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 public class BlueMapHook implements PluginHook {
 

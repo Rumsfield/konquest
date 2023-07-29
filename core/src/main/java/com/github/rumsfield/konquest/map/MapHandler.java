@@ -236,7 +236,7 @@ public class MapHandler {
 	static String getAreaLabel(KonTerritory territory) {
 		String result = "Konquest";
 		String bodyBegin = "<body style=\"background-color:#fff0cc;font-family:Georgia;\">";
-		String nameHeaderFormat = "<h2>%s</h2>";
+		String nameHeaderFormat = "<h2 style=\"color:#de791b;\">%s</h2>";
 		String typeHeaderFormat = "<h3 style=\"color:#8048b8;\">%s</h3>";
 		String propertyLineFormat = "%s: %s <br>";
 		StringBuilder labelMaker = new StringBuilder();

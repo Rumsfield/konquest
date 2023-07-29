@@ -7,14 +7,10 @@ import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonTerritory;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.BlueMapMap;
 import de.bluecolored.bluemap.api.BlueMapWorld;
-import de.bluecolored.bluemap.api.markers.DetailMarker;
-import de.bluecolored.bluemap.api.markers.Marker;
-import de.bluecolored.bluemap.api.markers.MarkerSet;
-import de.bluecolored.bluemap.api.markers.ShapeMarker;
+import de.bluecolored.bluemap.api.markers.*;
 import de.bluecolored.bluemap.api.math.Color;
 import de.bluecolored.bluemap.api.math.Shape;
 
@@ -45,19 +41,19 @@ public class BlueMapRender implements Renderable {
      * BlueMap Marker ID formats:
      * Sanctuaries
      * 		MarkerSet Group:  		konquest.marker.sanctuary
-     * 		Marker Shapes: 	        konquest.area.sanctuary.<name>.shape
+     * 		Marker Shapes: 	        konquest.area.sanctuary.<name>
      * Ruins
      * 		MarkerSet Group:  		konquest.marker.ruin
-     * 		Marker Shapes: 	        konquest.area.ruin.<name>.shape
+     * 		Marker Shapes: 	        konquest.area.ruin.<name>
      * Camps
      * 		MarkerSet Group:  		konquest.marker.camp
-     * 		Marker Shapes: 	        konquest.area.camp.<name>.shape
+     * 		Marker Shapes: 	        konquest.area.camp.<name>
      * Kingdoms
      * 		MarkerSet Group:  		konquest.marker.kingdom
      * 		Capital
-     * 		Marker Shapes: 	        konquest.area.kingdom.<kingdom>.capital.shape
+     * 		Marker Shapes: 	        konquest.area.kingdom.<kingdom>.capital
      * 		Towns
-     * 		Marker Shapes: 	        konquest.area.kingdom.<kingdom>.<town>.shape
+     * 		Marker Shapes: 	        konquest.area.kingdom.<kingdom>.<town>
      */
 
     @Override
@@ -106,11 +102,11 @@ public class BlueMapRender implements Renderable {
                     .build();
         }
 
-        // Render shapes for marker
+        // Render markers for the territory
         AreaTerritory drawArea = new AreaTerritory(territory);
         float areaY = (float)territory.getCenterLoc().getY();
 
-        // Update the shape
+        // Create an area shape
         ShapeMarker.Builder areaBuilder = ShapeMarker.builder()
                 .label(areaLabel)
                 .fillColor(areaColor)
@@ -139,6 +135,7 @@ public class BlueMapRender implements Renderable {
         areaBuilder.detail(areaDetail);
         // Add area to group
         territoryGroup.put(areaId,areaBuilder.build());
+
         // Put group into maps
         if(bapi.getWorld(territory.getWorld()).isPresent()) {
             BlueMapWorld world = bapi.getWorld(territory.getWorld()).get();
@@ -247,19 +244,19 @@ public class BlueMapRender implements Renderable {
         String result = "konquest";
         switch (territory.getTerritoryType()) {
             case SANCTUARY:
-                result = result+".area.sanctuary."+territory.getName().toLowerCase()+".shape";
+                result = result+".area.sanctuary."+territory.getName().toLowerCase();
                 break;
             case RUIN:
-                result = result+".area.ruin."+territory.getName().toLowerCase()+".shape";
+                result = result+".area.ruin."+territory.getName().toLowerCase();
                 break;
             case CAMP:
-                result = result+".area.camp."+territory.getName().toLowerCase()+".shape";
+                result = result+".area.camp."+territory.getName().toLowerCase();
                 break;
             case CAPITAL:
-                result = result+".area.kingdom."+territory.getKingdom().getName().toLowerCase()+".capital.shape";
+                result = result+".area.kingdom."+territory.getKingdom().getName().toLowerCase()+".capital";
                 break;
             case TOWN:
-                result = result+".area.kingdom."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase()+".shape";
+                result = result+".area.kingdom."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase();
                 break;
             default:
                 break;
