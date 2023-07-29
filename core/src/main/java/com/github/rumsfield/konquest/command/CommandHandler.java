@@ -8,6 +8,7 @@ import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -26,6 +27,17 @@ public class CommandHandler  implements TabExecutor {
     }
 	
 	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        // Special reload command for console
+		if (sender instanceof ConsoleCommandSender) {
+			if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+				// Console Reload
+				konquest.reload();
+				ChatUtil.printConsoleAlert("Reloaded Konquest configuration files.");
+				return true;
+			}
+		}
+
+		// All other commands must be issued by players
         if (!(sender instanceof Player)) {
             Bukkit.getLogger().info("You need to be a player to issue commands.");
             return false;
