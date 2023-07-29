@@ -179,6 +179,21 @@ core:
 
     # (*) Enable plugin integration with BlueMap (true/false)
     bluemap: true
+
+    # //// CORE.INTEGRATION.MAP_OPTIONS \\\\
+    map_options:
+
+      # (*) Render kingdoms on the web-based map view (true/false)
+      enable_kingdoms: true
+
+      # (*) Render barbarian camps on the web-based map view (true/false)
+      enable_camps: true
+
+      # (*) Render sanctuaries on the web-based map view (true/false)
+      enable_sanctuaries: true
+
+      # (*) Render ruins on the web-based map view (true/false)
+      enable_ruins: true
     
     # (*) Enable plugin integration with DiscordSRV (true/false)
     discordsrv: true

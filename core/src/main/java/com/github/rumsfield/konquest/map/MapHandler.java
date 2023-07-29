@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.map;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 
 import java.util.Date;
@@ -22,7 +23,12 @@ public class MapHandler {
 	static final int campColor = 0xa3a10a;
 	static final int lineDefaultColor = 0x000000;
 	static final int lineCapitalColor = 0x8010d0;
-	
+
+	static boolean isEnableKingdoms = true;
+	static boolean isEnableCamps = true;
+	static boolean isEnableSanctuaries = true;
+	static boolean isEnableRuins = true;
+
 	public MapHandler(Konquest konquest) {
 		this.konquest = konquest;
 		renderers = new HashMap<>();
@@ -34,6 +40,10 @@ public class MapHandler {
 		for(Renderable ren : renderers.values()) {
 			ren.initialize();
 		}
+		isEnableKingdoms = konquest.getCore().getBoolean(CorePath.INTEGRATION_MAP_OPTIONS_ENABLE_KINGDOMS.getPath());
+		isEnableCamps = konquest.getCore().getBoolean(CorePath.INTEGRATION_MAP_OPTIONS_ENABLE_CAMPS.getPath());
+		isEnableSanctuaries = konquest.getCore().getBoolean(CorePath.INTEGRATION_MAP_OPTIONS_ENABLE_SANCTUARIES.getPath());
+		isEnableRuins = konquest.getCore().getBoolean(CorePath.INTEGRATION_MAP_OPTIONS_ENABLE_RUINS.getPath());
 	}
 
 	/* Rendering Methods */
@@ -148,6 +158,28 @@ public class MapHandler {
 			case CAPITAL:
 			case TOWN:
 				result = true;
+				break;
+			default:
+				break;
+		}
+		return !result;
+	}
+
+	static boolean isTerritoryDisabled(KonTerritory territory) {
+		boolean result = false;
+		switch (territory.getTerritoryType()) {
+			case SANCTUARY:
+				result = isEnableSanctuaries;
+				break;
+			case RUIN:
+				result = isEnableRuins;
+				break;
+			case CAMP:
+				result = isEnableCamps;
+				break;
+			case CAPITAL:
+			case TOWN:
+				result = isEnableKingdoms;
 				break;
 			default:
 				break;

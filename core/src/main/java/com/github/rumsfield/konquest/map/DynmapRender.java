@@ -72,6 +72,8 @@ public class DynmapRender implements Renderable {
     public void drawUpdate(KonTerritory territory) {
         if (!isEnabled) return;
 
+        if(MapHandler.isTerritoryDisabled(territory)) return;
+
         if (MapHandler.isTerritoryInvalid(territory)) {
             ChatUtil.printDebug("Could not draw territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
             return;
@@ -166,6 +168,8 @@ public class DynmapRender implements Renderable {
     public void drawRemove(KonTerritory territory) {
         if (!isEnabled) return;
 
+        if(MapHandler.isTerritoryDisabled(territory)) return;
+
         if (MapHandler.isTerritoryInvalid(territory)) {
             ChatUtil.printDebug("Could not delete territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
             return;
@@ -220,6 +224,9 @@ public class DynmapRender implements Renderable {
     @Override
     public void drawLabel(KonTerritory territory) {
         if (!isEnabled) return;
+
+        if(MapHandler.isTerritoryDisabled(territory)) return;
+
         if (MapHandler.isTerritoryInvalid(territory)) {
             ChatUtil.printDebug("Could not update label for territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
             return;
