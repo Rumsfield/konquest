@@ -95,6 +95,8 @@ map:
   barbarian: "Barbarian"
   barbarians: "Barbarians"
   kingdom: "Kingdom"
+  capital: "Capital"
+  town: "Town"
   towns: "Towns"
   land: "Land"
   players: "Players"

@@ -71,7 +71,7 @@ public class SanctuaryManager {
 			// Update border particles
 			konquest.getTerritoryManager().updatePlayerBorderParticles(loc);
 			// Update maps
-			konquest.getMapHandler().drawDynmapUpdateTerritory(sanctuaryMap.get(nameLower));
+			konquest.getMapHandler().drawUpdateTerritory(sanctuaryMap.get(nameLower));
 			result = true;
 		}
 		return result;
@@ -106,7 +106,7 @@ public class SanctuaryManager {
 				konquest.getTerritoryManager().updatePlayerBorderParticles(player);
 			}
 			// Update maps
-			konquest.getMapHandler().drawDynmapRemoveTerritory(oldSanctuary);
+			konquest.getMapHandler().drawRemoveTerritory(oldSanctuary);
 			ChatUtil.printDebug("Removed Sanctuary "+name);
 			// De-reference the object
 			oldSanctuary = null;

@@ -13,6 +13,7 @@ softdepend:
 - LuckPerms
 - PlaceholderAPI
 - dynmap
+- BlueMap
 - EconomyPlus
 - Economy
 - XConomy

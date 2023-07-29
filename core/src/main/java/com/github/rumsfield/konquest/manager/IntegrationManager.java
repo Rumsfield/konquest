@@ -20,6 +20,7 @@ public class IntegrationManager {
 	private final QuickShopHook quickshopHook;
 	private final DiscordSrvHook discordsrvHook;
 	private final DynmapHook dynmapHook;
+	private final BlueMapHook bluemapHook;
 	private final ProtocolLibHook protocollibHook;
 	private final PlaceholderAPIHook placeholderapiHook;
 	
@@ -31,6 +32,7 @@ public class IntegrationManager {
 		quickshopHook = new QuickShopHook(konquest);
 		discordsrvHook = new DiscordSrvHook(konquest);
 		dynmapHook = new DynmapHook(konquest);
+		bluemapHook = new BlueMapHook(konquest);
 		protocollibHook = new ProtocolLibHook();
 		placeholderapiHook = new PlaceholderAPIHook();
 		// Add hooks to set
@@ -38,6 +40,7 @@ public class IntegrationManager {
 		hooks.add(placeholderapiHook);
 		hooks.add(luckpermsHook);
 		hooks.add(dynmapHook);
+		hooks.add(bluemapHook);
 		hooks.add(discordsrvHook);
 		hooks.add(quickshopHook);
 		hooks.add(chestshopHook);
@@ -117,6 +120,10 @@ public class IntegrationManager {
 
 	public DynmapHook getDynmap() {
 		return dynmapHook;
+	}
+
+	public BlueMapHook getBlueMap() {
+		return bluemapHook;
 	}
 
 	public ProtocolLibHook getProtocolLib() {
