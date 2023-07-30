@@ -112,6 +112,9 @@ public class CampAdminCommand extends CommandBase {
 				case 5:
 					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
 					break;
+				case 6:
+					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_FAIL_OFFLINE.getMessage());
+					break;
 				default:
 					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 					break;

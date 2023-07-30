@@ -16,9 +16,11 @@ public class IntegrationManager {
 
 	private final ArrayList<PluginHook> hooks;
 	private final LuckPermsHook luckpermsHook;
+	private final ChestShopHook chestshopHook;
 	private final QuickShopHook quickshopHook;
 	private final DiscordSrvHook discordsrvHook;
 	private final DynmapHook dynmapHook;
+	private final BlueMapHook bluemapHook;
 	private final ProtocolLibHook protocollibHook;
 	private final PlaceholderAPIHook placeholderapiHook;
 	
@@ -26,9 +28,11 @@ public class IntegrationManager {
 		this.hooks = new ArrayList<>();
 		// Define new hooks
 		luckpermsHook = new LuckPermsHook(konquest);
+		chestshopHook = new ChestShopHook(konquest);
 		quickshopHook = new QuickShopHook(konquest);
 		discordsrvHook = new DiscordSrvHook(konquest);
 		dynmapHook = new DynmapHook(konquest);
+		bluemapHook = new BlueMapHook(konquest);
 		protocollibHook = new ProtocolLibHook();
 		placeholderapiHook = new PlaceholderAPIHook();
 		// Add hooks to set
@@ -36,8 +40,10 @@ public class IntegrationManager {
 		hooks.add(placeholderapiHook);
 		hooks.add(luckpermsHook);
 		hooks.add(dynmapHook);
+		hooks.add(bluemapHook);
 		hooks.add(discordsrvHook);
 		hooks.add(quickshopHook);
+		hooks.add(chestshopHook);
 
 	}
 	
@@ -99,6 +105,10 @@ public class IntegrationManager {
 	public LuckPermsHook getLuckPerms() {
 		return luckpermsHook;
 	}
+
+	public ChestShopHook getChestShop() {
+		return chestshopHook;
+	}
 	
 	public QuickShopHook getQuickShop() {
 		return quickshopHook;
@@ -110,6 +120,10 @@ public class IntegrationManager {
 
 	public DynmapHook getDynmap() {
 		return dynmapHook;
+	}
+
+	public BlueMapHook getBlueMap() {
+		return bluemapHook;
 	}
 
 	public ProtocolLibHook getProtocolLib() {

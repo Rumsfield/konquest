@@ -25,26 +25,36 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 	
 	public KonSanctuary(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, konquest);
-		this.sanctuaryBarAll = Bukkit.getServer().createBossBar(Konquest.neutralColor1+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SEGMENTED_20);
+		this.sanctuaryBarAll = Bukkit.getServer().createBossBar(Konquest.neutralColor2+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SEGMENTED_20);
 		this.sanctuaryBarAll.setVisible(true);
 		this.properties = new HashMap<>();
 		initProperties();
 		this.templates = new HashMap<>();
 		this.templateBlankingTimers = new HashMap<>();
 	}
-	
-	private void initProperties() {
+
+	public static java.util.List<KonPropertyFlag> getProperties() {
+		java.util.List<KonPropertyFlag> result = new ArrayList<>();
+		result.add(KonPropertyFlag.TRAVEL);
+		result.add(KonPropertyFlag.PVP);
+		result.add(KonPropertyFlag.PVE);
+		result.add(KonPropertyFlag.BUILD);
+		result.add(KonPropertyFlag.USE);
+		result.add(KonPropertyFlag.CHEST);
+		result.add(KonPropertyFlag.MOBS);
+		result.add(KonPropertyFlag.PORTALS);
+		result.add(KonPropertyFlag.ENTER);
+		result.add(KonPropertyFlag.EXIT);
+		result.add(KonPropertyFlag.SHOP);
+		return result;
+	}
+
+	@Override
+	public void initProperties() {
 		properties.clear();
-		properties.put(KonPropertyFlag.TRAVEL, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.travel"));
-		properties.put(KonPropertyFlag.PVP, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.pvp"));
-		properties.put(KonPropertyFlag.PVE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.pve"));
-		properties.put(KonPropertyFlag.BUILD, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.build"));
-		properties.put(KonPropertyFlag.USE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.use"));
-		properties.put(KonPropertyFlag.CHEST, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.chest"));
-		properties.put(KonPropertyFlag.MOBS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.mobs"));
-		properties.put(KonPropertyFlag.PORTALS, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.portals"));
-		properties.put(KonPropertyFlag.ENTER, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.enter"));
-		properties.put(KonPropertyFlag.EXIT, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries.exit"));
+		for (KonPropertyFlag flag : getProperties()) {
+			properties.put(flag, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.sanctuaries."+flag.toString().toLowerCase()));
+		}
 	}
 
 	@Override
@@ -87,7 +97,7 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 
 	@Override
 	public void updateBarTitle() {
-		sanctuaryBarAll.setTitle(Konquest.neutralColor1+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName());
+		sanctuaryBarAll.setTitle(Konquest.neutralColor2+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName());
 	}
 
 	@Override

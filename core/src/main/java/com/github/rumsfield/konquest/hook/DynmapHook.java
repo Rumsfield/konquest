@@ -51,7 +51,7 @@ public class DynmapHook implements PluginHook {
     public boolean isEnabled() { return isEnabled; }
 
     @Nullable
-    public DynmapAPI getDynmapAPI() {
+    public DynmapAPI getAPI() {
         return dAPI;
     }
 }

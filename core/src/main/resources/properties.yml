@@ -15,6 +15,7 @@
 #	PORTALS			Allow players to use portals
 #	ENTER			Allow players to enter
 #	EXIT			Allow players to exit
+#   SHOP            Allow players to create shops
 # 
 # Properties specifically for towns/capitals
 #	CAPTURE			Allow this town to be captured
@@ -26,6 +27,15 @@
 # Properties for kingdoms
 #	PEACEFUL		Make this kingdom only peaceful
 #	GOLEMS			Enable iron golems to attack enemies
+#
+# Properties for membership
+#   JOIN			Allow players to join
+#   LEAVE			Allow players to leave
+#   PROMOTE			Allow promotion of players
+#   DEMOTE			Allow demotion of players
+#   TRANSFER		Allow ownership transfer
+#
+# Remember to use the "/k admin reload" command after modifying this file if the server is running.
 # 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
@@ -33,6 +43,11 @@ properties:
   kingdoms:
     peaceful: false
     golems: true
+    join: true
+    leave: true
+    promote: true
+    demote: true
+    transfer: true
   sanctuaries:
     enter: true
     exit: true
@@ -44,6 +59,7 @@ properties:
     chest: false
     mobs: false
     portals: true
+    shop: false
   ruins:
     enter: true
     exit: true
@@ -66,3 +82,9 @@ properties:
     chest: true
     mobs: false
     portals: true
+    join: true
+    leave: true
+    promote: true
+    demote: true
+    transfer: true
+    shop: true

@@ -71,7 +71,7 @@ public class SanctuaryManager {
 			// Update border particles
 			konquest.getTerritoryManager().updatePlayerBorderParticles(loc);
 			// Update maps
-			konquest.getMapHandler().drawDynmapUpdateTerritory(sanctuaryMap.get(nameLower));
+			konquest.getMapHandler().drawUpdateTerritory(sanctuaryMap.get(nameLower));
 			result = true;
 		}
 		return result;
@@ -98,13 +98,15 @@ public class SanctuaryManager {
 			// Remove display bars
 			oldSanctuary.removeAllBarPlayers();
 			// Remove territory
+			ArrayList<Point> sanctuaryPoints = new ArrayList<>(oldSanctuary.getChunkList().keySet());
+			konquest.getShopHandler().deleteShopsInPoints(sanctuaryPoints,oldSanctuary.getWorld());
 			konquest.getTerritoryManager().removeAllTerritory(oldSanctuary.getCenterLoc().getWorld(), oldSanctuary.getChunkList().keySet());
 			// Update border particles
 			for(KonPlayer player : nearbyPlayers) {
 				konquest.getTerritoryManager().updatePlayerBorderParticles(player);
 			}
 			// Update maps
-			konquest.getMapHandler().drawDynmapRemoveTerritory(oldSanctuary);
+			konquest.getMapHandler().drawRemoveTerritory(oldSanctuary);
 			ChatUtil.printDebug("Removed Sanctuary "+name);
 			// De-reference the object
 			oldSanctuary = null;
@@ -286,6 +288,8 @@ public class SanctuaryManager {
 			if(sanctuary.isTemplate(name)) {
 				sanctuary.stopTemplateBlanking(name);
 				result = sanctuary.removeTemplate(name);
+				// Update Sanctuary Label
+				konquest.getMapHandler().drawLabel(sanctuary);
 				sanctuaryName = sanctuary.getName();
 				break;
 			}
@@ -389,6 +393,8 @@ public class SanctuaryManager {
 				ChatUtil.printDebug("Created new invalid template "+name);
 			}
 		}
+		// Update Sanctuary Label
+		konquest.getMapHandler().drawLabel(sanctuary);
 		// Before exit, save to file
 		if(status == 0 && save) {
 			saveSanctuaries();

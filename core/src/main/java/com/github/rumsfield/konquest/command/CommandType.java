@@ -8,7 +8,7 @@ public enum CommandType {
 	HELP    (Material.LANTERN,          "konquest.command.help",    "h",  "[<page>]",                                                       MessagePath.DESCRIPTION_HELP.getMessage()),
 	INFO    (Material.SPRUCE_SIGN,      "konquest.command.info",    "i",  "[<kingdom>|<town>|<player>]",                                    MessagePath.DESCRIPTION_INFO.getMessage()),
 	LIST    (Material.PAPER,            "konquest.command.list",    "l",  "[kingdom|town|ruin|sanctuary] [<page>]",                         MessagePath.DESCRIPTION_LIST.getMessage()),
-	KINGDOM (Material.GOLDEN_SWORD,     "konquest.command.kingdom", "k",  "[menu|create|invite|kick|rename|templates] [<template>] [<name>]",  MessagePath.DESCRIPTION_KINGDOM.getMessage()),
+	KINGDOM (Material.GOLDEN_SWORD,     "konquest.command.kingdom", "k",  "[menu|create|invite|kick|rename|templates|webcolor] [<template>] [<name>]",  MessagePath.DESCRIPTION_KINGDOM.getMessage()),
 	TOWN    (Material.OBSIDIAN,         "konquest.command.town",    "t",  "[<town>] [menu|invite|kick|lord|rename] [<name>]",                  MessagePath.DESCRIPTION_TOWN.getMessage()),
 	MAP     (Material.FILLED_MAP,       "konquest.command.map",     "m",  "[far|auto]",                                                     MessagePath.DESCRIPTION_MAP.getMessage()),
 	SETTLE  (Material.DIAMOND_PICKAXE,  "konquest.command.settle",  "",   "<name>",                                                         MessagePath.DESCRIPTION_SETTLE.getMessage()),

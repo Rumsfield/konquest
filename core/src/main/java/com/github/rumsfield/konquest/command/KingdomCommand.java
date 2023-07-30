@@ -3,9 +3,9 @@ package com.github.rumsfield.konquest.command;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.ColorRGB;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,7 +27,7 @@ public class KingdomCommand extends CommandBase {
 		if(getSender().hasPermission("konquest.command.admin.monument") && getKonquest().getSanctuaryManager().getNumTemplates() == 0) {
 			ChatUtil.sendError((Player) getSender(),MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_NO_TEMPLATES.getMessage());
 		}
-		// kingdom [menu|create|invite|kick|rename|templates] [template] [name]
+		// kingdom [menu|create|invite|kick|rename|templates|webcolor] [template] [name]
 		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length != 1 && getArgs().length != 2 && getArgs().length != 3 && getArgs().length != 4) {
 			sendInvalidArgMessage(bukkitPlayer,CommandType.KINGDOM);
@@ -70,6 +70,11 @@ public class KingdomCommand extends CommandBase {
 						boolean isAdminOnly = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_CREATE_ADMIN_ONLY.getPath());
 						if(isAdminOnly) {
 							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+							return;
+						}
+						// Check for permission
+						if(!bukkitPlayer.hasPermission("konquest.create.kingdom")) {
+							ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" konquest.create.kingdom");
 							return;
 						}
 	            		// Needs kingdom name and template name arguments
@@ -195,7 +200,7 @@ public class KingdomCommand extends CommandBase {
 	    		        		return;
 	    					}
 	            			playerName = offlinePlayer.getOfflineBukkitPlayer().getName();
-	            			boolean status = getKonquest().getKingdomManager().joinKingdomInvite(player, offlinePlayer.getOfflineBukkitPlayer(), kingdom);
+	            			boolean status = getKonquest().getKingdomManager().joinKingdomInvite(player, offlinePlayer, kingdom);
 							if(status) {
 								ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_INVITE_SENT.getMessage(playerName));
 							}
@@ -279,6 +284,51 @@ public class KingdomCommand extends CommandBase {
 						// Show monument template info menu
 						getKonquest().getDisplayManager().displayTemplateInfoMenu(player);
 						break;
+					case "webcolor":
+						if(getKonquest().getCore().getBoolean(CorePath.KINGDOMS_WEB_COLOR_ADMIN_ONLY.getPath())) {
+							// Only admins may set kingdom web colors
+							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+							return;
+						}
+						if(!kingdom.isMaster(bukkitPlayer.getUniqueId())) {
+							// The player is not the kingdom master
+							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+							return;
+						}
+						if(getArgs().length == 2) {
+							// Display current color
+							int currentWebColor = kingdom.getWebColor();
+							String colorStr = "default";
+							if(currentWebColor != -1) {
+								colorStr = ChatUtil.reverseLookupColorRGB(currentWebColor);
+							}
+							ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_WEB_COLOR_SHOW.getMessage(kingdom.getName(),colorStr));
+						} else if(getArgs().length == 3) {
+							// Set new color
+							String colorStr = getArgs()[2];
+							if(colorStr.equalsIgnoreCase("default")) {
+								kingdom.setWebColor(-1);
+							} else {
+								int newWebColor = ChatUtil.lookupColorRGB(colorStr);
+								if(newWebColor != -1) {
+									kingdom.setWebColor(newWebColor);
+								} else {
+									// The provided color string could not be resolved to a color
+									ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_WEB_COLOR_INVALID.getMessage());
+									return;
+								}
+							}
+							// Update map
+							getKonquest().getMapHandler().drawUpdateTerritory(kingdom.getCapital());
+							for (KonTown town : kingdom.getTowns()) {
+								getKonquest().getMapHandler().drawUpdateTerritory(town);
+							}
+							ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_WEB_COLOR_SET.getMessage(kingdom.getName(),colorStr));
+						} else {
+							// Incorrect arguments
+							sendInvalidArgMessage(bukkitPlayer,CommandType.KINGDOM);
+						}
+						break;
             		default:
 						sendInvalidArgMessage(bukkitPlayer,CommandType.KINGDOM);
             			break;
@@ -289,7 +339,7 @@ public class KingdomCommand extends CommandBase {
 
 	@Override
 	public List<String> tabComplete() {
-		// k kingdom [menu|create|invite|kick|rename|templates] [template] [name]
+		// k kingdom [menu|create|invite|kick|rename|templates|webcolor] [template] [name]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		Player bukkitPlayer = (Player) getSender();
@@ -303,6 +353,9 @@ public class KingdomCommand extends CommandBase {
 			tabList.add("kick");
 			tabList.add("rename");
 			tabList.add("templates");
+			if(!getKonquest().getCore().getBoolean(CorePath.KINGDOMS_WEB_COLOR_ADMIN_ONLY.getPath())) {
+				tabList.add("webcolor");
+			}
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
@@ -335,6 +388,12 @@ public class KingdomCommand extends CommandBase {
 					}
 				}
 				tabList.addAll(playerList);
+			} else if(subCommand.equalsIgnoreCase("webcolor")) {
+				for(ColorRGB color : ColorRGB.values()) {
+					tabList.add(color.getName());
+				}
+				tabList.add("#rrggbb");
+				tabList.add("default");
 			}
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);

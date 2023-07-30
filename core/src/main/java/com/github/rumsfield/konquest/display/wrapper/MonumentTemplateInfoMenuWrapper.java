@@ -96,7 +96,7 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
                 loreList.add(loreColor+MessagePath.LABEL_SANCTUARY.getMessage()+": "+valueColor+templateSanctuaryMap.get(currentTemplate));
                 loreList.add(loreColor+MessagePath.LABEL_KINGDOMS.getMessage()+": "+valueColor+templateUsedKingdomsMap.get(currentTemplate));
                 loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+totalCost);
-                TemplateIcon templateIcon = new TemplateIcon(currentTemplate,ChatColor.GOLD,loreList,slotIndex,true);
+                TemplateIcon templateIcon = new TemplateIcon(currentTemplate,""+ChatColor.GOLD,loreList,slotIndex,true);
                 getMenu().getPage(pageNum).addIcon(templateIcon);
                 slotIndex++;
             }

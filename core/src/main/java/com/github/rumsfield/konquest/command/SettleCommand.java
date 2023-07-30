@@ -11,7 +11,6 @@ import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -34,7 +33,6 @@ public class SettleCommand extends CommandBase {
            ChatUtil.sendError((Player) getSender(), MessagePath.COMMAND_SETTLE_ERROR_SPACE_NAME.getMessage());
 		} else {
         	Player bukkitPlayer = (Player) getSender();
-        	
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
@@ -45,6 +43,11 @@ public class SettleCommand extends CommandBase {
         		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
                 return;
         	}
+			// Check for permission
+			if(!bukkitPlayer.hasPermission("konquest.create.town")) {
+				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" konquest.create.town");
+				return;
+			}
         	
         	double cost = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
         	double incr = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath());
@@ -92,8 +95,8 @@ public class SettleCommand extends CommandBase {
         		getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.SETTLED,1);
         		getKonquest().getKingdomManager().updatePlayerMembershipStats(player);
         		// Update labels
-        		getKonquest().getMapHandler().drawDynmapLabel(town);
-        		getKonquest().getMapHandler().drawDynmapLabel(town.getKingdom().getCapital());
+        		getKonquest().getMapHandler().drawLabel(town);
+        		getKonquest().getMapHandler().drawLabel(town.getKingdom().getCapital());
         		
         		// Fire post event
         		KonquestTownSettleEvent invokePostEvent = new KonquestTownSettleEvent(getKonquest(), town, player, town.getKingdom());

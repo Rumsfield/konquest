@@ -123,6 +123,7 @@ public class CampManager implements KonquestCampManager {
 	 * 					3 = player is not a barbarian
 	 * 					4 = camps are disabled
 	 *                  5 = world is invalid
+	 *                  6 = not allowed to join clan group
 	 */
 	public int addCamp(Location loc, KonOfflinePlayer player) {
 		boolean enable = konquest.getCore().getBoolean(CorePath.CAMPS_ENABLE.getPath(),true);
@@ -149,6 +150,28 @@ public class CampManager implements KonquestCampManager {
 					return 1;
 				}
 			}
+			// Verify camp group (clan) allowed placement
+			boolean isOfflineJoinAllow = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ALLOW_JOIN_OFFLINE.getPath());
+			if(isClanEnabled) {
+				// Search surroundings for any adjacent camps with online members
+				boolean isAdjacentCampPresent = false;
+				boolean isAnyAdjacentOwnerOnline = false;
+				for(Point point : konquest.getBorderPoints(loc, radius+1)) {
+					if(konquest.getTerritoryManager().isChunkClaimed(point,loc.getWorld()) && konquest.getTerritoryManager().getChunkTerritory(point,loc.getWorld()) instanceof KonCamp) {
+						KonCamp adjCamp = (KonCamp)konquest.getTerritoryManager().getChunkTerritory(point,loc.getWorld());
+						isAdjacentCampPresent = true;
+						if(adjCamp != null && adjCamp.isOwnerOnline()) {
+							isAnyAdjacentOwnerOnline = true;
+						}
+					}
+				}
+				// Check if any adjacent camp has online members
+				if(isAdjacentCampPresent && !isAnyAdjacentOwnerOnline && !isOfflineJoinAllow) {
+					// Prevent this camp from being placed, there are no online owners in the adjacent camps
+					ChatUtil.printDebug("Failed to add camp, no adjacent camps have online members.");
+					return 6;
+				}
+			}
 			// Attempt to add the camp
 			KonCamp newCamp = new KonCamp(loc,player.getOfflineBukkitPlayer(),konquest.getKingdomManager().getBarbarians(),konquest);
 			barbarianCamps.put(uuid,newCamp);
@@ -171,7 +194,7 @@ public class CampManager implements KonquestCampManager {
 					}
 				}
 			}
-			konquest.getMapHandler().drawDynmapUpdateTerritory(newCamp);
+			konquest.getMapHandler().drawUpdateTerritory(newCamp);
 		} else {
 			return 2;
 		}
@@ -188,7 +211,7 @@ public class CampManager implements KonquestCampManager {
 				Konquest.callKonquestEvent(invokeEvent);
 				// Post-camp setup
 				player.getBukkitPlayer().setBedSpawnLocation(loc, true);
-				ChatUtil.sendKonTitle(player, "", Konquest.barbarianColor1+newCamp.getName());
+				ChatUtil.sendKonTitle(player, "", Konquest.barbarianColor2+newCamp.getName());
 			}
 		}
 		return result;
@@ -207,7 +230,7 @@ public class CampManager implements KonquestCampManager {
 	public boolean removeCamp(String uuid) {
 		if(barbarianCamps.containsKey(uuid)) {
 			ArrayList<Point> campPoints = new ArrayList<>(barbarianCamps.get(uuid).getChunkList().keySet());
-			konquest.getIntegrationManager().getQuickShop().deleteShopsInPoints(campPoints,barbarianCamps.get(uuid).getWorld());
+			konquest.getShopHandler().deleteShopsInPoints(campPoints,barbarianCamps.get(uuid).getWorld());
 			KonCamp removedCamp = barbarianCamps.remove(uuid);
 			removedCamp.removeAllBarPlayers();
 			// Ensure bed is broken
@@ -231,7 +254,7 @@ public class CampManager implements KonquestCampManager {
 					}
 				}
 			}
-			konquest.getMapHandler().drawDynmapRemoveTerritory(removedCamp);
+			konquest.getMapHandler().drawRemoveTerritory(removedCamp);
 			removedCamp = null;
 		} else {
 			ChatUtil.printDebug("Failed to remove camp for missing UUID "+uuid);

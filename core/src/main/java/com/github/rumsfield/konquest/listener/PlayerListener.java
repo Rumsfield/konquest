@@ -279,8 +279,8 @@ public class PlayerListener implements Listener {
 
 		// Send messages to players
 		for(KonPlayer viewerPlayer : playerManager.getPlayersOnline()) {
-			ChatColor teamColor = ChatColor.GOLD;
-			ChatColor titleColor = ChatColor.GOLD;
+			String teamColor = ""+ChatColor.GOLD;
+			String nameColor = ""+ChatColor.GOLD;
 			boolean doFormatName = true;
 			boolean doFormatKingdom = true;
 			String messageFormat = "";
@@ -288,8 +288,8 @@ public class PlayerListener implements Listener {
 			boolean sendMessage = false;
 			if(player.isGlobalChat()) {
 				// Sender is in global chat mode
-				teamColor = konquest.getDisplayPrimaryColor(viewerPlayer, player);
-				titleColor = konquest.getDisplaySecondaryColor(viewerPlayer, player);
+				nameColor = ""+konquest.getDisplayPrimaryColor(viewerPlayer, player);
+				teamColor = konquest.getDisplaySecondaryColor(viewerPlayer, player);
 				doFormatName = formatNameConfig;
 				doFormatKingdom = formatKingdomConfig;
 				messageFormat = "";
@@ -297,8 +297,8 @@ public class PlayerListener implements Listener {
 			} else {
 				// Sender is in kingdom chat mode
 				if(viewerPlayer.getKingdom().equals(kingdom)) {
+					nameColor = Konquest.friendColor1;
 					teamColor = Konquest.friendColor1;
-					titleColor = Konquest.friendColor1;
 					messageFormat = ""+ChatColor.GREEN+ChatColor.ITALIC;
 					sendMessage = true;
 				} else if(viewerPlayer.isAdminBypassActive()) {
@@ -316,7 +316,7 @@ public class PlayerListener implements Listener {
 						title,
 						name,
 						teamColor,
-						titleColor,
+						nameColor,
 						doFormatName,
 						doFormatKingdom);
 				// Attempt to use PAPI for external placeholders
@@ -1039,15 +1039,13 @@ public class PlayerListener implements Listener {
         			ChatUtil.sendKonTitle(player, "", MessagePath.GENERIC_NOTICE_WILD.getMessage());
         			// Do things appropriate to the type of territory
         			onExitTerritory(territoryFrom,player);
-        			// Remove potion effects for all players
-        			kingdomManager.clearTownNerf(player);
         			// Begin fly disable warmup
         			player.setFlyDisableWarmup(true);
         		} else if(isTerritoryTo && !isTerritoryFrom) { // When moving out of the wild
         			// Check if entry is allowed
         			if(isDeniedEnterTerritory(territoryTo,player,force)) return false;
         			// Set message color based on enemy territory
-        			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
+        			String color = konquest.getDisplaySecondaryColor(player, territoryTo);
 	                // Display Territory Name
 	    			ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
 	    			// Do things appropriate to the type of territory
@@ -1070,7 +1068,7 @@ public class PlayerListener implements Listener {
             				return false;
             			}
         				// Set message color based on To territory
-            			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
+            			String color = konquest.getDisplaySecondaryColor(player, territoryTo);
     	            	ChatUtil.sendKonTitle(player, "", color+territoryTo.getName());
     	            	// Do things appropriate to the type of territory
     	    			// Exit Territory
@@ -1092,7 +1090,11 @@ public class PlayerListener implements Listener {
         						kingdomManager.applyTownNerf(player, town);
         						// Update golem targets
         						town.updateGolemTargets(player,true);
-        					} else if(kingdomManager.isPlayerFriendly(player, town.getKingdom())) {
+        					} else {
+								// Remove potion effects
+								kingdomManager.clearTownNerf(player);
+							}
+							if(kingdomManager.isPlayerFriendly(player, town.getKingdom())) {
         						// Display plot message to friendly players
         						displayPlotMessage(town, moveTo, moveFrom, player);
         					}
@@ -1129,13 +1131,11 @@ public class PlayerListener implements Listener {
         		
     			if(isTerritoryFrom) {
     				onExitTerritory(territoryFrom,player);
-        			// Remove potion effects for all players
-        			kingdomManager.clearTownNerf(player);
     			}
     			
     			if(isTerritoryTo) {
 	                // Set message color based on enemy territory
-        			ChatColor color = konquest.getDisplayPrimaryColor(player, territoryTo);
+        			String color = konquest.getDisplaySecondaryColor(player, territoryTo);
 	                // Display Territory Name
 	    			String territoryName = territoryTo.getName();
 	    			ChatUtil.sendKonTitle(player, "", color+territoryName);
@@ -1293,6 +1293,8 @@ public class PlayerListener implements Listener {
 			town.updateGolemTargets(player,false);
 			// Try to clear heart adjustments
 			kingdomManager.clearTownHearts(player);
+			// Remove potion effects
+			kingdomManager.clearTownNerf(player);
 		} else if(territoryFrom instanceof KonRuin) {
 			KonRuin ruin = (KonRuin)territoryFrom;
 			ruin.stopTargetingPlayer(player.getBukkitPlayer());
@@ -1353,7 +1355,11 @@ public class PlayerListener implements Listener {
 					clickedBlockData instanceof Powerable ||
 					clickedState.getType().isInteractable()) {
 				event.setUseInteractedBlock(Event.Result.DENY);
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				if(!(clickedState instanceof Sign)) {
+					// Only display "Blocked" title when not interacting with a sign
+					// This is mainly for using chest shops
+					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				}
 				return true;
 			}
 		}

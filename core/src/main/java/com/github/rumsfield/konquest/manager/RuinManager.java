@@ -7,7 +7,6 @@ import com.github.rumsfield.konquest.api.model.KonquestRuin;
 import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonRuin;
-import com.github.rumsfield.konquest.model.KonSanctuary;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -119,7 +118,7 @@ public class RuinManager implements KonquestRuinManager {
 			// Update border particles
 			konquest.getTerritoryManager().updatePlayerBorderParticles(loc);
 			// Update maps
-			konquest.getMapHandler().drawDynmapUpdateTerritory(ruinMap.get(nameLower));
+			konquest.getMapHandler().drawUpdateTerritory(ruinMap.get(nameLower));
 			result = true;
 		}
 		return result;
@@ -138,7 +137,7 @@ public class RuinManager implements KonquestRuinManager {
 			for(KonPlayer player : nearbyPlayers) {
 				konquest.getTerritoryManager().updatePlayerBorderParticles(player);
 			}
-			konquest.getMapHandler().drawDynmapRemoveTerritory(oldRuin);
+			konquest.getMapHandler().drawRemoveTerritory(oldRuin);
 			ChatUtil.printDebug("Removed Ruin "+name);
 			oldRuin = null;
 			result = true;

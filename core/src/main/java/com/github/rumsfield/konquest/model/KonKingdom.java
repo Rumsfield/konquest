@@ -34,6 +34,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	private final Map<KonquestKingdom, KonquestDiplomacyType> activeRelationships; // This kingdom's active diplomatic state with other kingdoms
 	private final Map<KonquestKingdom, KonquestDiplomacyType> requestRelationships; // Other kingdom's requested diplomatic state with this kingdom
 	private final Map<KonPropertyFlag,Boolean> properties;
+	private int webColor;
 	
 	public KonKingdom(Location loc, String name, Konquest konquest) {
 		this.name = name;
@@ -55,6 +56,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.requestRelationships = new HashMap<>();
 		this.properties = new HashMap<>();
 		initProperties();
+		this.webColor = -1;
 	}
 	
 	// Constructor meant for default kingdoms created on startup (Barbarians, Neutrals)
@@ -77,12 +79,27 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.activeRelationships = new HashMap<>();
 		this.requestRelationships = new HashMap<>();
 		this.properties = new HashMap<>();
+		this.webColor = -1;
 	}
-	
-	private void initProperties() {
+
+	public static List<KonPropertyFlag> getProperties() {
+		List<KonPropertyFlag> result = new ArrayList<>();
+		result.add(KonPropertyFlag.PEACEFUL);
+		result.add(KonPropertyFlag.GOLEMS);
+		result.add(KonPropertyFlag.JOIN);
+		result.add(KonPropertyFlag.LEAVE);
+		result.add(KonPropertyFlag.PROMOTE);
+		result.add(KonPropertyFlag.DEMOTE);
+		result.add(KonPropertyFlag.TRANSFER);
+		return result;
+	}
+
+	@Override
+	public void initProperties() {
 		properties.clear();
-		properties.put(KonPropertyFlag.PEACEFUL, 	konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.peaceful"));
-		properties.put(KonPropertyFlag.GOLEMS, 		konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms.golems"));
+		for (KonPropertyFlag flag : getProperties()) {
+			properties.put(flag, konquest.getConfigManager().getConfig("properties").getBoolean("properties.kingdoms."+flag.toString().toLowerCase()));
+		}
 	}
 	
 	public boolean isCreated() {
@@ -115,6 +132,34 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public boolean isPeaceful() {
 		return getPropertyValue(KonPropertyFlag.PEACEFUL);
+	}
+
+	public boolean isJoinable() {
+		return getPropertyValue(KonPropertyFlag.JOIN);
+	}
+
+	public boolean isLeaveable() {
+		return getPropertyValue(KonPropertyFlag.LEAVE);
+	}
+
+	public boolean isPromoteable() {
+		return getPropertyValue(KonPropertyFlag.PROMOTE);
+	}
+
+	public boolean isDemoteable() {
+		return getPropertyValue(KonPropertyFlag.DEMOTE);
+	}
+
+	public boolean isTransferable() {
+		return getPropertyValue(KonPropertyFlag.TRANSFER);
+	}
+
+	public void setWebColor(int val) {
+		webColor = val;
+	}
+
+	public int getWebColor() {
+		return webColor;
 	}
 
 	@Override
@@ -260,7 +305,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		OfflinePlayer townPlayer = Bukkit.getOfflinePlayer(id);
 		for(KonTown town : getCapitalTowns()) {
 			if(town.removePlayerResident(townPlayer)) {
-				konquest.getMapHandler().drawDynmapLabel(town);
+				konquest.getMapHandler().drawLabel(town);
 			}
 		}
 	}

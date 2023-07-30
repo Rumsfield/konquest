@@ -33,7 +33,6 @@ import org.bukkit.event.block.*;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.nio.channels.ScatteringByteChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -774,7 +773,7 @@ public class BlockListener implements Listener {
 			// Attempt to create a camp for barbarians who place a bed
 			if(!player.isAdminBypassActive()) {
 				// Check if the player is a barbarian placing a bed
-				if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed) {
+				if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && player.getBukkitPlayer().hasPermission("konquest.create.camp")) {
 					// Fire event
 					KonquestPlayerCampEvent invokePreEvent = new KonquestPlayerCampEvent(konquest, player, event.getBlock().getLocation());
 					Konquest.callKonquestEvent(invokePreEvent);
@@ -806,6 +805,9 @@ public class BlockListener implements Listener {
 				    	case 5:
 				    		// This error message is removed because it could be annoying to see it every time a bed is placed in an invalid world.
 				    		break;
+						case 6:
+							ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OFFLINE.getMessage());
+							break;
 				    	default:
 				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 				    		break;
@@ -1380,7 +1382,7 @@ public class BlockListener implements Listener {
 					// Update directive progress
 					konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CAPTURE_TOWN);
 					// Broadcast to Dynmap
-					konquest.getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_RAZE.getMessage(townName)+" ("+x+","+y+","+z+")");
+					konquest.getMapHandler().postBroadcast(MessagePath.PROTECTION_NOTICE_RAZE.getMessage(townName)+" ("+x+","+y+","+z+")");
 				}
 
 			} else {
@@ -1450,7 +1452,7 @@ public class BlockListener implements Listener {
 					int x = capturedTown.getCenterLoc().getBlockX();
 					int y = capturedTown.getCenterLoc().getBlockY();
 					int z = capturedTown.getCenterLoc().getBlockZ();
-					konquest.getMapHandler().postDynmapBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(capturedTown.getName())+" ("+x+","+y+","+z+")");
+					konquest.getMapHandler().postBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(capturedTown.getName())+" ("+x+","+y+","+z+")");
 					// Broadcast to Discord
 					konquest.getIntegrationManager().getDiscordSrv().sendGameToDiscordMessage("global", ":crossed_swords: **"+MessagePath.PROTECTION_NOTICE_CONQUER_DISCORD.getMessage(capturedTown.getName(),capturedTown.getKingdom().getName())+"**");
 					capturedTown.getMonumentTimer().stopTimer();

@@ -112,7 +112,7 @@ public class KonquestPlugin extends JavaPlugin {
             	ChatUtil.printConsoleAlert("Konquest version is up to date.");
             } else {
             	String message = "Konquest version "+version+" is available to download! --> https://www.spigotmc.org/resources/konquest.92220/";
-                ChatUtil.printConsoleError(message);
+                ChatUtil.printConsoleWarning(message);
                 konquest.opStatusMessages.add(message);
             }
         });

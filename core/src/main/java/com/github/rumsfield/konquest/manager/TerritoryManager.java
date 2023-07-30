@@ -16,14 +16,12 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Snow;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.*;
-import java.util.function.Predicate;
 
 public class TerritoryManager implements KonquestTerritoryManager {
 
@@ -234,12 +232,12 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				// Add territory
 				closestAdjTerr.addChunk(addPoint);
 				addTerritory(loc.getWorld(),addPoint,closestAdjTerr);
-				konquest.getMapHandler().drawDynmapUpdateTerritory(closestAdjTerr);
-				konquest.getMapHandler().drawDynmapLabel(closestAdjTerr.getKingdom().getCapital());
+				konquest.getMapHandler().drawUpdateTerritory(closestAdjTerr);
+				konquest.getMapHandler().drawLabel(closestAdjTerr.getKingdom().getCapital());
 				// Display town info to players in the newly claimed chunk
 	    		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 	    			if(occupant.getBukkitPlayer().getLocation().getChunk().equals(loc.getChunk())) {
-	    				ChatColor color = konquest.getDisplayPrimaryColor(occupant, closestAdjTerr);
+						String color = konquest.getDisplaySecondaryColor(occupant, closestAdjTerr);
 	    				ChatUtil.sendKonTitle(occupant, "", color+closestAdjTerr.getName());
 	    				if(closestAdjTerr instanceof KonBarDisplayer) {
 	    					((KonBarDisplayer)closestAdjTerr).addBarPlayer(occupant);
@@ -410,13 +408,13 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				addTerritory(claimWorld,claimChunk,closestTerritory);
 			}
 	    	// Update map render
-			konquest.getMapHandler().drawDynmapUpdateTerritory(closestTerritory);
-			konquest.getMapHandler().drawDynmapLabel(closestTerritory.getKingdom().getCapital());
+			konquest.getMapHandler().drawUpdateTerritory(closestTerritory);
+			konquest.getMapHandler().drawLabel(closestTerritory.getKingdom().getCapital());
 			// Display territory info to players in the newly claimed chunks
 			for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 				//if(occupant.getBukkitPlayer().getWorld().equals(claimWorld) && claimedChunks.contains(Konquest.toPoint(occupant.getBukkitPlayer().getLocation()))) {
 				if(closestTerritory.isLocInside(occupant.getBukkitPlayer().getLocation())) {
-					ChatColor color = konquest.getDisplayPrimaryColor(occupant, closestTerritory);
+					String color = konquest.getDisplaySecondaryColor(occupant, closestTerritory);
 					ChatUtil.sendKonTitle(occupant, "", color+closestTerritory.getName());
 					if(closestTerritory instanceof KonBarDisplayer) {
 						((KonBarDisplayer)closestTerritory).addBarPlayer(occupant);
@@ -619,8 +617,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			if(territory instanceof KonBarDisplayer) {
 				((KonBarDisplayer)territory).updateBarPlayers();
 			}
-			konquest.getMapHandler().drawDynmapUpdateTerritory(territory);
-			konquest.getMapHandler().drawDynmapLabel(territory.getKingdom().getCapital());
+			konquest.getMapHandler().drawUpdateTerritory(territory);
+			konquest.getMapHandler().drawLabel(territory.getKingdom().getCapital());
 		}
 
 		return doUpdates;
@@ -1180,8 +1178,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
     	// Determine player's direction
     	BlockFace playerFace = bukkitPlayer.getFacing();
     	String mapPlayer = "!";
-		ChatColor mapSymbolColor = ChatColor.WHITE;
-    	ChatColor playerColor = ChatColor.WHITE;
+		String mapSymbolColor = ""+ChatColor.WHITE;
+    	String playerColor = ""+ChatColor.WHITE;
 		// Note: Unicode characters do not render correctly in game, must use escape sequence code.
     	if(playerFace.equals(BlockFace.NORTH)) {
     		mapPlayer = "\u25B2";// "^"
@@ -1300,8 +1298,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
     		if(isChunkClaimed(mapPoint,center.getWorld())) {
     			KonTerritory territory = getChunkTerritory(mapPoint,center.getWorld());
 				assert territory != null;
-				mapSymbolColor = konquest.getDisplayPrimaryColor(player,territory);
-				playerColor = konquest.getDisplaySecondaryColor(player,territory);
+				mapSymbolColor = konquest.getDisplaySecondaryColor(player,territory);
+				playerColor = konquest.getDisplayPrimaryColor(player,territory);
     			switch(territory.getTerritoryType()) {
         		case WILD:
         			map[mapX][mapY] = ChatColor.WHITE+mapWildSymbol;
@@ -1327,7 +1325,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
         		}
     		} else {
     			map[mapX][mapY] = ChatColor.WHITE+mapWildSymbol;
-    			playerColor = ChatColor.GRAY;
+    			playerColor = ""+ChatColor.GRAY;
     		}
     		// Override origin symbol with player
     		if(mapX == (mapSize-1)/2 && mapY == (mapSize-1)/2) {
@@ -1335,11 +1333,11 @@ public class TerritoryManager implements KonquestTerritoryManager {
     		}
     	}
     	// Determine distance to the closest territory
-    	ChatColor closestTerritoryColor = ChatColor.WHITE;
+    	String closestTerritoryColor = ""+ChatColor.WHITE;
     	int distance = 0;
     	if(closestTerritory != null) {
     		distance = proximity;
-			closestTerritoryColor = konquest.getDisplayPrimaryColor(player,closestTerritory);
+			closestTerritoryColor = konquest.getDisplaySecondaryColor(player,closestTerritory);
     	}
     	String distStr;
     	int maxDist = 99;
@@ -1348,7 +1346,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
     	}
     	if(distance > maxDist) {
     		distStr = ""+maxDist+"+";
-    		closestTerritoryColor = ChatColor.GRAY;
+    		closestTerritoryColor = ""+ChatColor.GRAY;
     	} else {
     		distStr = ""+distance;
     	}

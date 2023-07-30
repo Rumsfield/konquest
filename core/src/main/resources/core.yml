@@ -48,8 +48,11 @@ core:
   # Minimum time in seconds between placeholder requests, use lower values for faster update rates but more lag (0 to disable, integer >= 0)
   placeholder_request_limit: 60
   
-  # Enable player nametag colors. This may override other plugin nametag formatting (true/false)
+  # (*) Enable player nametag formatting. This may override other plugin nametag formatting (true/false)
   player_nametag_format: true
+
+  # (*) Display the relationship of a player (friendly, enemy, etc) as a suffix of their nametag. Requires player_nametag_format to be true (true/false)
+  player_nametag_suffix_relation: true
 
   # The number of automatic data backups to keep before deleting the oldest ones (0 to disable creating any backups, integer >= 0)
   backup_data_amount: 10
@@ -63,10 +66,10 @@ core:
     # Chat message format used for all players. Use %PREFIX%, %SUFFIX%, %KINGDOM%, %TITLE% and %NAME% as placeholders. Use & for color codes, or hex #000000. ('string')
     message: '%PREFIX% %KINGDOM% &7| %TITLE% %NAME% %SUFFIX% '
     
-    # Use team colors (red, green, yellow) for %KINGDOM% format, else use colors from message string (true/false)
+    # Use team colors for %KINGDOM% format, else use colors from message string (true/false)
     kingdom_team_color: true
     
-    # Use team colors (red, green, yellow) for %NAME% format, else use colors from message string (true/false)
+    # Use team colors for %NAME% format, else use colors from message string (true/false)
     name_team_color: true
     
     # Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
@@ -76,50 +79,61 @@ core:
     priority: HIGH
     
   # //// CORE.COLORS \\\\
-  # The following colors MUST match a ChatColor enum: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/ChatColor.html
   colors:
+
+    # //// CORE.COLORS.PRIMARY \\\\
+    # These colors are used for territory bars and borders, player names and tab list displays.
+    # The following colors MUST match a ChatColor enum (e.g. GREEN).
+    # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/ChatColor.html
+    primary:
   
-    # (*) The primary color that players see for their own kingdom.
-    friendly_primary: GREEN
-    
-    # (*) The secondary color that players see for their own kingdom.
-    friendly_secondary: DARK_GREEN
-    
-    # (*) The primary color that players see for enemy kingdoms.
-    enemy_primary: RED
-    
-    # (*) The secondary color that players see for enemy kingdoms.
-    enemy_secondary: DARK_RED
-    
-    # (*) The primary color that players see for trading kingdoms.
-    trade_primary: LIGHT_PURPLE
+      # (*) The primary color that players see for their own kingdom.
+      friendly: GREEN
 
-    # (*) The secondary color that players see for trading kingdoms.
-    trade_secondary: DARK_PURPLE
-    
-    # (*) The primary color that players see for peaceful kingdoms.
-    peaceful_primary: WHITE
+      # (*) The primary color that players see for enemy kingdoms.
+      enemy: RED
 
-    # (*) The secondary color that players see for peaceful kingdoms.
-    peaceful_secondary: GRAY
-    
-    # (*) The primary color that players see for allied kingdoms.
-    ally_primary: AQUA
+      # (*) The primary color that players see for trading kingdoms.
+      trade: LIGHT_PURPLE
 
-    # (*) The secondary color that players see for allied kingdoms.
-    ally_secondary: DARK_AQUA
+      # (*) The primary color that players see for peaceful kingdoms.
+      peaceful: WHITE
 
-    # (*) The primary color that all players see for barbarians.
-    barbarian_primary: YELLOW
+      # (*) The primary color that players see for allied kingdoms.
+      ally: AQUA
 
-    # (*) The secondary color that all players see for barbarians.
-    barbarian_secondary: GOLD
-    
-    # (*) The primary color that players see for neutral territory, like ruins and sanctuaries.
-    neutral_primary: GRAY
+      # (*) The primary color that all players see for barbarians.
+      barbarian: YELLOW
 
-    # (*) The secondary color that players see for neutral territory, like ruins and sanctuaries.
-    neutral_secondary: DARK_GRAY
+      # (*) The primary color that players see for neutral territory, like ruins and sanctuaries.
+      neutral: GRAY
+
+    # //// CORE.COLORS.SECONDARY \\\\
+    # These colors are used for other chat formats, menu labels and kingdom relationships.
+    # The following colors may use hex colors (e.g. '#FF8080'), format codes (e.g. '&b&o'), or match a ChatColor enum (e.g. DARK_GREEN).
+    # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/ChatColor.html
+    secondary:
+
+      # (*) The secondary color that players see for their own kingdom.
+      friendly: '#40C010'
+
+      # (*) The secondary color that players see for enemy kingdoms.
+      enemy: '#A02020'
+
+      # (*) The secondary color that players see for trading kingdoms.
+      trade: '#9050C0'
+
+      # (*) The secondary color that players see for peaceful kingdoms.
+      peaceful: '#CCE0C8'
+
+      # (*) The secondary color that players see for allied kingdoms.
+      ally: '#22B090'
+
+      # (*) The secondary color that all players see for barbarians.
+      barbarian: '#F0C000'
+
+      # (*) The secondary color that players see for neutral territory, like ruins and sanctuaries.
+      neutral: '#A08890'
     
   # //// CORE.DATABASE \\\\
   database:
@@ -150,7 +164,10 @@ core:
       
   # //// CORE.INTEGRATION \\\\
   integration:
-  
+
+    # (*) Enable plugin integration with ChestShop (true/false)
+    chestshop: true
+
     # (*) Enable plugin integration with QuickShop (true/false)
     quickshop: true
     
@@ -159,6 +176,24 @@ core:
     
     # (*) Enable plugin integration with Dynmap (true/false)
     dynmap: true
+
+    # (*) Enable plugin integration with BlueMap (true/false)
+    bluemap: true
+
+    # //// CORE.INTEGRATION.MAP_OPTIONS \\\\
+    map_options:
+
+      # (*) Render kingdoms on the web-based map view (true/false)
+      enable_kingdoms: true
+
+      # (*) Render barbarian camps on the web-based map view (true/false)
+      enable_camps: true
+
+      # (*) Render sanctuaries on the web-based map view (true/false)
+      enable_sanctuaries: true
+
+      # (*) Render ruins on the web-based map view (true/false)
+      enable_ruins: true
     
     # (*) Enable plugin integration with DiscordSRV (true/false)
     discordsrv: true
@@ -237,6 +272,9 @@ core:
     
     # Only allow admins to create new kingdoms (true), else players can create their own kingdoms (false) (true/false)
     create_admin_only: false
+
+    # Only allow admins to change the colors of kingdoms on web maps like Dynmap (true), else all kingdom masters can set the web color of their own kingdoms (false) (true/false)
+    web_color_admin_only: true
 
     # Prevent players in other kingdoms using containers in claimed land (true/false)
     protect_containers_use: true
@@ -469,8 +507,11 @@ core:
     
     # Time in seconds when a camp is protected from when the owner disconnects (integer >= 0)
     no_enemy_edit_offline_warmup: 120
+
+    # Prevent enemy players from traveling within camps (true/false)
+    no_enemy_travel: true
     
-    # [EXPERIMENTAL] Enable camp clans when barbarian camps are placed next to each other (true/false)
+    # [EXPERIMENTAL] (*) Enable camp clans when barbarian camps are placed next to each other (true/false)
     clan_enable: false
     
     # [EXPERIMENTAL] Allow barbarians to access containers in camps from the same clan, CAN BE ABUSED! (true/false)
@@ -478,6 +519,9 @@ core:
     
     # [EXPERIMENTAL] Allow barbarians to edit blocks in offline-protected camps from the same clan, CAN BE ABUSED! (true/false)
     clan_allow_edit_offline: false
+
+    # [EXPERIMENTAL] Allow barbarians to join a clan with their camp while all other clan members are offline (true/false)
+    clan_allow_join_offline: false
     
     # Apply the Glowing effect to enemies that break blocks within a camp (true/false)
     enemy_glow: true
@@ -657,5 +701,4 @@ core:
     prevent_command_list:
     - k travel
     - k settle
-    - k exile
     - k claim

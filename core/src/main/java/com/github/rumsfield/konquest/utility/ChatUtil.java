@@ -2,12 +2,14 @@ package com.github.rumsfield.konquest.utility;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonPlayer;
+import me.lucko.helper.config.typeserializers.HelperTypeSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.regex.Matcher;
@@ -49,8 +51,8 @@ public class ChatUtil {
 	
 	/**
 	 * Parse a string color code into usable color
-	 * @param input - The code to be parsed
-	 * @return ChatColor enum code, null if invalid code
+	 * @param input - The name of the ChatColor enum
+	 * @return ChatColor enum from name, null if invalid name
 	 */
 	public static ChatColor parseColorCode(String input) {
 		ChatColor result = null;
@@ -73,7 +75,7 @@ public class ChatUtil {
 	 * @param name Name to replace %NAME% with
 	 * @return Formatted string
 	 */
-	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, ChatColor teamColor, ChatColor titleColor, boolean formatName, boolean formatKingdom) {
+	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, String teamColor, String nameColor, boolean formatName, boolean formatKingdom) {
 		String message = base;
 		if(prefix.equals("")) {
 			message = message.replace("%PREFIX% ", "");
@@ -101,14 +103,18 @@ public class ChatUtil {
 			message = message.replace("%TITLE% ", "");
 			message = message.replace("%TITLE%", "");
 		} else {
-			message = message.replace("%TITLE%", titleColor+title);
+			if(formatKingdom) {
+				message = message.replace("%TITLE%", teamColor + title);
+			} else {
+				message = message.replace("%TITLE%", title);
+			}
 		}
 		if(name.equals("")) {
 			message = message.replace("%NAME% ", "");
 			message = message.replace("%NAME%", "");
 		} else {
 			if(formatName) {
-				message = message.replace("%NAME%", teamColor+name);
+				message = message.replace("%NAME%", nameColor+name);
 			} else {
 				message = message.replace("%NAME%", name);
 			}
@@ -172,6 +178,10 @@ public class ChatUtil {
 		}
 		return result;
 	}
+
+	public static Color lookupColor(String reference) {
+		return lookupColor(lookupChatColor(reference));
+	}
 	
 	public static BarColor mapBarColor(ChatColor reference) {
 		BarColor result = BarColor.WHITE;
@@ -206,6 +216,65 @@ public class ChatUtil {
 		}
 		return result;
 	}
+
+	public static BarColor mapBarColor(String reference) {
+		return mapBarColor(lookupChatColor(reference));
+	}
+
+	/**
+	 * Get a ChatColor enum from the string char code.
+	 * @param colorStr - The char code as a string.
+	 * @return The ChatColor from the string, else ChatColor.RESET if none exist.
+	 */
+	public static ChatColor lookupChatColor(String colorStr) {
+		ChatColor result = ChatColor.getByChar(colorStr.charAt(colorStr.length()-1));
+		if(result == null) {
+			String hexVal = String.format("%040x", new BigInteger(1, colorStr.getBytes()));
+			printDebug("Failed to lookup ChatColor \""+hexVal+"\"");
+			return ChatColor.RESET;
+		}
+		return result;
+	}
+
+	/**
+	 * Get a RGB color int from a string name. Supported names:
+	 * 1. Any ColorRGB enum name (maps to Bukkit.Color fields)
+	 * 2. A hex color code with format #RRGGBB
+	 * @param colorStr The name of the color, or hex code
+	 * @return The RGB color integer value, or -1 if no valid color could be found.
+	 */
+	public static int lookupColorRGB(String colorStr) {
+		// First, check for ColorRGB name
+		ColorRGB namedColor = ColorRGB.fromName(colorStr);
+		if(namedColor != null) {
+			// Found valid color
+			return namedColor.getColor().asRGB();
+		}
+		// Second, check for hex color code
+		if(colorStr.matches("#[a-fA-F0-9]{6}")) {
+			try {
+				return Integer.decode(colorStr);
+			} catch(NumberFormatException ignored) {}
+		}
+		// Couldn't find a supported color
+		return -1;
+	}
+
+	/**
+	 * Get the name of the color, or hex value as a string.
+	 * @param hexVal The integer RGB color value
+	 * @return The string color name or hex numbers
+	 */
+	public static String reverseLookupColorRGB(int hexVal) {
+		// First, check if the hex matches a ColorRGB enum
+		ColorRGB hexColor = ColorRGB.fromColor(Color.fromRGB(hexVal));
+		if(hexColor != null) {
+			// Found valid color
+			return hexColor.getName();
+		}
+		// Second, format the hex value into a string
+		return "#"+Integer.toHexString(hexVal);
+	}
 	
 	public static void printDebug(String message) {
 		if(Konquest.getInstance().getCore().getBoolean(CorePath.DEBUG.getPath())) {
@@ -218,13 +287,15 @@ public class ChatUtil {
 	}
 	
 	public static void printConsoleAlert(String message) {
-		String alert = alertColor + "[Konquest] " + message;
-		Bukkit.getServer().getConsoleSender().sendMessage(alert);
+		Bukkit.getServer().getConsoleSender().sendMessage(alertColor + "[Konquest] " + message);
 	}
 	
 	public static void printConsoleError(String message) {
-		String error = errorColor + "[Konquest ERROR] " + message;
-		Bukkit.getServer().getConsoleSender().sendMessage(error);
+		Bukkit.getLogger().severe("[Konquest] " + message);
+	}
+
+	public static void printConsoleWarning(String message) {
+		Bukkit.getLogger().warning("[Konquest] " + message);
 	}
 
 	public static void sendNotice(Player player, String message) {

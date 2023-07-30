@@ -103,7 +103,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         DisplayMenu result;
         MenuIcon icon;
         List<String> loreList = new ArrayList<>();
-        ChatColor kingdomColor = Konquest.friendColor1;
+        String kingdomColor = Konquest.friendColor2;
 
         int rows = 1;
         if(menuAccess.equals(AccessType.LORD)) {
@@ -183,24 +183,45 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                 loreList = new ArrayList<>();
                 loreList.add(propertyColor+MessagePath.LABEL_LORD.getMessage());
                 loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_PROMOTE.getMessage(),loreColor));
-                loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
-                icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_PROMOTE.getMessage(), loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, true);
+                boolean isPromoteClickable = true;
+                if(town.isPromoteable() || isAdmin) {
+                    loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                } else {
+                    // This option is unavailable due to property flags
+                    isPromoteClickable = false;
+                    loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+                }
+                icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_PROMOTE.getMessage(), loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, isPromoteClickable);
                 result.addIcon(icon);
 
                 /* Demote Icon */
                 loreList.clear();
                 loreList.add(propertyColor+MessagePath.LABEL_LORD.getMessage());
                 loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_DEMOTE.getMessage(),loreColor));
-                loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
-                icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_DEMOTE.getMessage(), loreList, Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, true);
+                boolean isDemoteClickable = true;
+                if(town.isDemoteable() || isAdmin) {
+                    loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                } else {
+                    // This option is unavailable due to property flags
+                    isDemoteClickable = false;
+                    loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+                }
+                icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_DEMOTE.getMessage(), loreList, Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, isDemoteClickable);
                 result.addIcon(icon);
 
                 /* Transfer Icon */
                 loreList.clear();
                 loreList.add(propertyColor+MessagePath.LABEL_LORD.getMessage());
                 loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_TRANSFER.getMessage(),loreColor));
-                loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
-                icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, true);
+                boolean isTransferClickable = true;
+                if(town.isTransferable() || isAdmin) {
+                    loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                } else {
+                    // This option is unavailable due to property flags
+                    isTransferClickable = false;
+                    loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+                }
+                icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, isTransferClickable);
                 result.addIcon(icon);
 
                 /* Upgrades Icon */
@@ -223,7 +244,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                 loreList.add(propertyColor+MessagePath.LABEL_LORD.getMessage());
                 loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_OPTIONS.getMessage(),loreColor));
                 loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
-                icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_OPTIONS.getMessage(), loreList, Material.PAPER, ROOT_SLOT_OPTIONS, true);
+                icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_OPTIONS.getMessage(), loreList, Material.OAK_SIGN, ROOT_SLOT_OPTIONS, true);
                 result.addIcon(icon);
 
                 /* Specialization Icon */
@@ -706,7 +727,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                 result = color+MessagePath.MENU_TOWN_TITLE_MANAGE.getMessage(name);
                 break;
             case A_REQUESTS:
-                result = color+MessagePath.MENU_TOWN_REQUESTS.getMessage();
+                result = color+MessagePath.MENU_TOWN_TITLE_REQUESTS.getMessage();
                 break;
             case A_SHIELD:
                 result = color+MessagePath.MENU_TOWN_SHIELDS.getMessage();

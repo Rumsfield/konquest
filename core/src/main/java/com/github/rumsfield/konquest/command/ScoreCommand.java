@@ -57,7 +57,7 @@ public class ScoreCommand extends CommandBase {
         		for(KonKingdom allKingdom : getKonquest().getKingdomManager().getKingdoms()) {
         			if(!kingdom.isPeaceful()) {
 	        			int score = getKonquest().getKingdomManager().getKingdomScore(allKingdom);
-						String color = ""+getKonquest().getDisplayPrimaryColor(player.getKingdom(),allKingdom);
+						String color = ""+getKonquest().getDisplaySecondaryColor(player.getKingdom(),allKingdom);
 	        			ChatUtil.sendMessage(bukkitPlayer, color+allKingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+score);
         			}
         		}

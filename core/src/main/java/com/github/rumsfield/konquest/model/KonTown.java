@@ -80,19 +80,19 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.isCaptureDisabled = false;
 		this.isRaidAlertDisabled = false;
 		// Display bars
-		this.monumentBarFriendlies = Bukkit.getServer().createBossBar(Konquest.friendColor1+name, ChatUtil.mapBarColor(Konquest.friendColor1), BarStyle.SOLID);
+		this.monumentBarFriendlies = Bukkit.getServer().createBossBar(Konquest.friendColor2+name, ChatUtil.mapBarColor(Konquest.friendColor1), BarStyle.SOLID);
 		this.monumentBarFriendlies.setVisible(true);
 		this.monumentBarFriendlies.setProgress(1.0);
-		this.monumentBarWar = Bukkit.getServer().createBossBar(Konquest.enemyColor1+name, ChatUtil.mapBarColor(Konquest.enemyColor1), BarStyle.SOLID);
+		this.monumentBarWar = Bukkit.getServer().createBossBar(Konquest.enemyColor2+name, ChatUtil.mapBarColor(Konquest.enemyColor1), BarStyle.SOLID);
 		this.monumentBarWar.setVisible(true);
 		this.monumentBarWar.setProgress(1.0);
-		this.monumentBarPeace = Bukkit.getServer().createBossBar(Konquest.peacefulColor1+name, ChatUtil.mapBarColor(Konquest.peacefulColor1), BarStyle.SOLID);
+		this.monumentBarPeace = Bukkit.getServer().createBossBar(Konquest.peacefulColor2+name, ChatUtil.mapBarColor(Konquest.peacefulColor1), BarStyle.SOLID);
 		this.monumentBarPeace.setVisible(true);
 		this.monumentBarPeace.setProgress(1.0);
-		this.monumentBarTrade = Bukkit.getServer().createBossBar(Konquest.tradeColor1 +name, ChatUtil.mapBarColor(Konquest.tradeColor1), BarStyle.SOLID);
+		this.monumentBarTrade = Bukkit.getServer().createBossBar(Konquest.tradeColor2 +name, ChatUtil.mapBarColor(Konquest.tradeColor1), BarStyle.SOLID);
 		this.monumentBarTrade.setVisible(true);
 		this.monumentBarTrade.setProgress(1.0);
-		this.monumentBarAlliance = Bukkit.getServer().createBossBar(Konquest.alliedColor1+name, ChatUtil.mapBarColor(Konquest.alliedColor1), BarStyle.SOLID);
+		this.monumentBarAlliance = Bukkit.getServer().createBossBar(Konquest.alliedColor2+name, ChatUtil.mapBarColor(Konquest.alliedColor1), BarStyle.SOLID);
 		this.monumentBarAlliance.setVisible(true);
 		this.monumentBarAlliance.setProgress(1.0);
 		// Other stuff
@@ -120,24 +120,60 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		initProperties();
 		this.specialization = Villager.Profession.NONE;
 	}
-	
-	private void initProperties() {
-		properties.clear();   
-		properties.put(KonPropertyFlag.CAPTURE, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.capture"));
-		properties.put(KonPropertyFlag.CLAIM, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.claim"));
-		properties.put(KonPropertyFlag.UNCLAIM, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.unclaim"));
-		properties.put(KonPropertyFlag.UPGRADE, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.upgrade"));
-		properties.put(KonPropertyFlag.PLOTS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.plots"));
-		properties.put(KonPropertyFlag.TRAVEL, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.travel"));
-		properties.put(KonPropertyFlag.PVP, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.pvp"));
-		properties.put(KonPropertyFlag.PVE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.pve"));
-		properties.put(KonPropertyFlag.BUILD, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.build"));
-		properties.put(KonPropertyFlag.USE, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.use"));
-		properties.put(KonPropertyFlag.CHEST, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.chest"));
-		properties.put(KonPropertyFlag.MOBS, 	getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.mobs"));
-		properties.put(KonPropertyFlag.PORTALS, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns.portals"));
+
+	public static List<KonPropertyFlag> getProperties() {
+		List<KonPropertyFlag> result = new ArrayList<>();
+		result.add(KonPropertyFlag.CAPTURE);
+		result.add(KonPropertyFlag.CLAIM);
+		result.add(KonPropertyFlag.UNCLAIM);
+		result.add(KonPropertyFlag.UPGRADE);
+		result.add(KonPropertyFlag.PLOTS);
+		result.add(KonPropertyFlag.TRAVEL);
+		result.add(KonPropertyFlag.PVP);
+		result.add(KonPropertyFlag.PVE);
+		result.add(KonPropertyFlag.BUILD);
+		result.add(KonPropertyFlag.USE);
+		result.add(KonPropertyFlag.CHEST);
+		result.add(KonPropertyFlag.MOBS);
+		result.add(KonPropertyFlag.PORTALS);
+		result.add(KonPropertyFlag.JOIN);
+		result.add(KonPropertyFlag.LEAVE);
+		result.add(KonPropertyFlag.PROMOTE);
+		result.add(KonPropertyFlag.DEMOTE);
+		result.add(KonPropertyFlag.TRANSFER);
+		result.add(KonPropertyFlag.SHOP);
+		return result;
 	}
-	
+
+	@Override
+	public void initProperties() {
+		properties.clear();
+		for (KonPropertyFlag flag : getProperties()) {
+			properties.put(flag, getKonquest().getConfigManager().getConfig("properties").getBoolean("properties.towns."+flag.toString().toLowerCase()));
+		}
+	}
+
+	public boolean isJoinable() {
+		return getPropertyValue(KonPropertyFlag.JOIN);
+	}
+
+	public boolean isLeaveable() {
+		return getPropertyValue(KonPropertyFlag.LEAVE);
+	}
+
+	public boolean isPromoteable() {
+		return getPropertyValue(KonPropertyFlag.PROMOTE);
+	}
+
+	public boolean isDemoteable() {
+		return getPropertyValue(KonPropertyFlag.DEMOTE);
+	}
+
+	public boolean isTransferable() {
+		return getPropertyValue(KonPropertyFlag.TRANSFER);
+	}
+
+
 	@Override
 	public boolean setPropertyValue(KonPropertyFlag property, boolean value) {
 		boolean result = false;
@@ -934,36 +970,36 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		// Set title conditions
 		if(isShielded && isArmored) {
 			remainingSeconds = getRemainingShieldTimeSeconds();
-			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor1));
-			monumentBarWar.setTitle(Konquest.enemyColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor1));
-			monumentBarAlliance.setTitle(Konquest.alliedColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor1));
-			monumentBarTrade.setTitle(Konquest.tradeColor1 +getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.tradeColor1));
-			monumentBarPeace.setTitle(Konquest.peacefulColor1+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor1));
+			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor2));
+			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
+			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
+			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
+			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
 		} else if(isShielded) {
 			remainingSeconds = getRemainingShieldTimeSeconds();
-			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor1));
-			monumentBarWar.setTitle(Konquest.enemyColor1+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor1));
-			monumentBarAlliance.setTitle(Konquest.alliedColor1+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor1));
-			monumentBarTrade.setTitle(Konquest.tradeColor1 +getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.tradeColor1));
-			monumentBarPeace.setTitle(Konquest.peacefulColor1+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor1));
+			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor2));
+			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
+			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
+			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
+			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
 		} else if(isArmored) {
-			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName()+separator+armorCurrentBlocks+" "+armor);
-			monumentBarWar.setTitle(Konquest.enemyColor1+getName()+separator+armorCurrentBlocks+" "+armor);
-			monumentBarAlliance.setTitle(Konquest.alliedColor1+getName()+separator+armorCurrentBlocks+" "+armor);
-			monumentBarTrade.setTitle(Konquest.tradeColor1 +getName()+separator+armorCurrentBlocks+" "+armor);
-			monumentBarPeace.setTitle(Konquest.peacefulColor1+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+armorCurrentBlocks+" "+armor);
+			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+armorCurrentBlocks+" "+armor);
 		} else if(isAttacked) {
-			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName()+separator+critical);
-			monumentBarWar.setTitle(Konquest.enemyColor1+getName()+separator+critical);
-			monumentBarAlliance.setTitle(Konquest.alliedColor1+getName()+separator+critical);
-			monumentBarTrade.setTitle(Konquest.tradeColor1 +getName()+separator+critical);
-			monumentBarPeace.setTitle(Konquest.peacefulColor1+getName()+separator+critical);
+			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+critical);
+			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+critical);
+			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+critical);
+			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+critical);
+			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+critical);
 		} else {
-			monumentBarFriendlies.setTitle(Konquest.friendColor1+getName());
-			monumentBarWar.setTitle(Konquest.enemyColor1+getName());
-			monumentBarAlliance.setTitle(Konquest.alliedColor1+getName());
-			monumentBarTrade.setTitle(Konquest.tradeColor1 +getName());
-			monumentBarPeace.setTitle(Konquest.peacefulColor1+getName());
+			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName());
+			monumentBarWar.setTitle(Konquest.enemyColor2+getName());
+			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName());
+			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName());
+			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName());
 		}
 		
 		// Set progress conditions
@@ -1182,7 +1218,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		if(!residents.containsKey(id)) {
 			residents.put(id,true);
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-			getKonquest().getMapHandler().drawDynmapLabel(this);
+			getKonquest().getMapHandler().drawLabel(this);
 		}
 	}
 	
@@ -1227,7 +1263,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		if(!residents.containsKey(playerUUID)) {
 			residents.put(playerUUID,isElite);
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-			getKonquest().getMapHandler().drawDynmapLabel(this);
+			getKonquest().getMapHandler().drawLabel(this);
 			status = true;
 		}
 		return status;
@@ -1242,7 +1278,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				lord = null;
 			}
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-			getKonquest().getMapHandler().drawDynmapLabel(this);
+			getKonquest().getMapHandler().drawLabel(this);
 			if(residents.isEmpty()) {
 				clearShieldsArmors();
 			}
