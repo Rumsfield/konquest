@@ -287,13 +287,15 @@ public class ChatUtil {
 	}
 	
 	public static void printConsoleAlert(String message) {
-		String alert = alertColor + "[Konquest] " + message;
-		Bukkit.getServer().getConsoleSender().sendMessage(alert);
+		Bukkit.getServer().getConsoleSender().sendMessage(alertColor + "[Konquest] " + message);
 	}
 	
 	public static void printConsoleError(String message) {
-		String error = errorColor + "[Konquest ERROR] " + message;
-		Bukkit.getServer().getConsoleSender().sendMessage(error);
+		Bukkit.getLogger().severe("[Konquest] " + message);
+	}
+
+	public static void printConsoleWarning(String message) {
+		Bukkit.getLogger().warning("[Konquest] " + message);
 	}
 
 	public static void sendNotice(Player player, String message) {

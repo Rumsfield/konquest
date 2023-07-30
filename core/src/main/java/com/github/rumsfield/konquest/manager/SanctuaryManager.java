@@ -288,6 +288,8 @@ public class SanctuaryManager {
 			if(sanctuary.isTemplate(name)) {
 				sanctuary.stopTemplateBlanking(name);
 				result = sanctuary.removeTemplate(name);
+				// Update Sanctuary Label
+				konquest.getMapHandler().drawLabel(sanctuary);
 				sanctuaryName = sanctuary.getName();
 				break;
 			}
@@ -391,6 +393,8 @@ public class SanctuaryManager {
 				ChatUtil.printDebug("Created new invalid template "+name);
 			}
 		}
+		// Update Sanctuary Label
+		konquest.getMapHandler().drawLabel(sanctuary);
 		// Before exit, save to file
 		if(status == 0 && save) {
 			saveSanctuaries();
