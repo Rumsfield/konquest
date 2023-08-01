@@ -1619,10 +1619,6 @@ public class Konquest implements KonquestAPI, Timeable {
 		
 		return result;		
 	}
-
-	public static String getTimeFormat(int valSeconds, String color) {
-		return getTimeFormat(valSeconds, ChatUtil.lookupChatColor(color));
-	}
     
     public static String getLastSeenFormat(OfflinePlayer offlineBukkitPlayer) {
     	Date date = new Date(); // Now

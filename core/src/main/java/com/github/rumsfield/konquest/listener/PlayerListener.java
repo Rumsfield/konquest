@@ -566,7 +566,8 @@ public class PlayerListener implements Listener {
         		} else {
         			// Interaction occurred in the wild
         			boolean isWildUse = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_USE.getPath(), true);
-        			if(!isWildUse && !konquest.isWorldIgnored(clickedState.getLocation())) {
+					boolean isWorldValid = konquest.isWorldValid(clickedState.getLocation());
+        			if(!isWildUse && isWorldValid) {
         				if(preventUse(event,player)) {
 							event.setCancelled(true);
 							return;
