@@ -1584,17 +1584,21 @@ public class Konquest implements KonquestAPI, Timeable {
     	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
 				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_EGG_THROW, (float)1.0, (float)0.1),1);
     }
-    
-    public static String getTimeFormat(int valSeconds, ChatColor color) {
+
+	public static String getTimeFormat(int valSeconds, ChatColor color) {
+		return getTimeFormat(valSeconds, ""+color);
+	}
+
+    public static String getTimeFormat(int valSeconds, String color) {
 		int days = valSeconds / 86400;
 		int hours = valSeconds % 86400 / 3600;
 		int minutes = valSeconds % 3600 / 60;
 		int seconds = valSeconds % 60;
 		
 		ChatColor nColor = ChatColor.GRAY;
-		ChatColor numColor = color;
+		String numColor = color;
 		if(valSeconds <= 30) {
-			numColor = ChatColor.DARK_RED;
+			numColor = ""+ChatColor.DARK_RED;
 		}
 		String result;
 		String format;

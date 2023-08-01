@@ -154,19 +154,24 @@ public class MapHandler {
 	}
 
 	static boolean isTerritoryInvalid(KonTerritory territory) {
-		boolean result = false;
+		boolean isValid = false;
 		switch (territory.getTerritoryType()) {
 			case SANCTUARY:
 			case RUIN:
 			case CAMP:
-			case CAPITAL:
 			case TOWN:
-				result = true;
+				isValid = true;
+				break;
+			case CAPITAL:
+				// Capitals are only valid for created kingdoms (not barbarians or neutrals)
+				if (territory.getKingdom().isCreated()) {
+					isValid = true;
+				}
 				break;
 			default:
 				break;
 		}
-		return !result;
+		return !isValid;
 	}
 
 	static boolean isTerritoryDisabled(KonTerritory territory) {
@@ -276,6 +281,9 @@ public class MapHandler {
 				result = labelMaker.append(bodyBegin)
 						.append(String.format(nameHeaderFormat, camp.getName()))
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_BARBARIANS.getMessage()))
+						.append("<p>")
+						.append(String.format(propertyLineFormat, MessagePath.LABEL_PLAYER.getMessage(), camp.getOwner().getName()))
+						.append("</p>")
 						.append("</body>")
 						.toString();
 				break;

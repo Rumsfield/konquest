@@ -203,10 +203,12 @@ public class BlueMapRender implements Renderable {
             for(BlueMapMap map : world.getMaps()) {
                 if(!map.getMarkerSets().containsKey(groupId)) {
                     ChatUtil.printDebug("Failed to set detail of missing group, BlueMap territory "+territory.getName());
+                    continue;
                 }
                 MarkerSet territoryGroup = map.getMarkerSets().get(groupId);
                 if(!territoryGroup.getMarkers().containsKey(areaId)) {
                     ChatUtil.printDebug("Failed to set detail of missing area, BlueMap territory "+territory.getName());
+                    continue;
                 }
                 Marker area = territoryGroup.get(areaId);
                 if(area instanceof DetailMarker) {
