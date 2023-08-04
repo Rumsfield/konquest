@@ -46,7 +46,7 @@ public class InventoryListener implements Listener {
 		this.playerManager = konquest.getPlayerManager();
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryOpen(InventoryOpenEvent event) {
 		if(konquest.isWorldIgnored(event.getInventory().getLocation())) return;
 		// Monitor blocks in claimed territory
@@ -174,7 +174,7 @@ public class InventoryListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryClose(InventoryCloseEvent event) {
 		// When a player closes a display menu inventory
 		if(konquest.getDisplayManager().isNotDisplayMenu(event.getInventory())) return;
@@ -199,7 +199,7 @@ public class InventoryListener implements Listener {
 
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onNetheriteCraft(InventoryClickEvent event) {
 		if(event.isCancelled()) return;
 		// Check for picking up netherite items for stats
@@ -226,7 +226,7 @@ public class InventoryListener implements Listener {
 		}
 	}
 
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onMonumentChestClick(InventoryClickEvent event) {
 		// Prevent placing items into chests located in a town monument
 		if(event.isCancelled()) return;
@@ -261,7 +261,7 @@ public class InventoryListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onCraftItem(CraftItemEvent event) {
 		if(konquest.isWorldIgnored(event.getInventory().getLocation())) {
 			return;
@@ -320,7 +320,7 @@ public class InventoryListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onFurnaceExtract(FurnaceExtractEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
 		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
@@ -339,7 +339,7 @@ public class InventoryListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onEnchantItem(EnchantItemEvent event) {
 		if(event.isCancelled())return;
 		if(konquest.isWorldIgnored(event.getInventory().getLocation())) return;
@@ -371,7 +371,7 @@ public class InventoryListener implements Listener {
 
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onPrepareItemEnchant(PrepareItemEnchantEvent event) {
 		if(event.isCancelled())return;
 		if(konquest.isWorldIgnored(event.getInventory().getLocation())) return;

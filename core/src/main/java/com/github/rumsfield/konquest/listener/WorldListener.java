@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.PortalCreateEvent;
@@ -20,10 +21,10 @@ public class WorldListener  implements Listener {
 		this.konquest = plugin.getKonquestInstance();
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onPortalCreate(PortalCreateEvent event) {
 		ChatUtil.printDebug("EVENT: Portal is being created in "+event.getWorld().getName());
-		
+		if(event.isCancelled()) return;
 		if(!konquest.isWorldValid(event.getWorld())) return;
 		// Check every block associated with the portal
 		for(BlockState current_blockState : event.getBlocks()) {
@@ -52,7 +53,7 @@ public class WorldListener  implements Listener {
 
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onChunkLoad(ChunkLoadEvent event) {
 		if(konquest.getTerritoryManager().isChunkClaimed(Konquest.toPoint(event.getChunk()), event.getWorld())) {
 			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(Konquest.toPoint(event.getChunk()), event.getWorld());
@@ -77,7 +78,7 @@ public class WorldListener  implements Listener {
 		konquest.applyQueuedTeleports(event.getChunk());
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onStructureGrow(StructureGrowEvent event) {
 		if(konquest.isWorldIgnored(event.getWorld())) return;
 		// Prevent growth if any blocks are within monument

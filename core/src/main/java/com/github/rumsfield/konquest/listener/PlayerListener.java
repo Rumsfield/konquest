@@ -86,7 +86,7 @@ public class PlayerListener implements Listener {
 	/**
      * Fires when a player joins the server
 	 */
-    @EventHandler()
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerJoin(PlayerJoinEvent event) {
     	//ChatUtil.printDebug("EVENT: Player Joined");
     	Player bukkitPlayer = event.getPlayer();
@@ -175,7 +175,7 @@ public class PlayerListener implements Listener {
     /**
      * Fires when a player quits the server
 	 */
-    @EventHandler()
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerQuit(PlayerQuitEvent event) {
     	ChatUtil.printDebug("EVENT: Player Quit");
     	// remove player from cache
@@ -207,7 +207,7 @@ public class PlayerListener implements Listener {
 		onAsyncPlayerChat(event);
     }
     
-    @EventHandler()
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onAsyncPlayerChatNormal(AsyncPlayerChatEvent event) {
     	if(!konquest.getChatPriority().equals(EventPriority.NORMAL)) return;
 		onAsyncPlayerChat(event);
@@ -356,7 +356,7 @@ public class PlayerListener implements Listener {
     /**
      * Handles when players are setting regions and clicking signs
 	 */
-    @EventHandler()
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
     	Player bukkitPlayer = event.getPlayer();
     	if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
@@ -595,7 +595,7 @@ public class PlayerListener implements Listener {
         }
     }
     
-    @EventHandler()
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerEnterVehicle(VehicleEnterEvent event) {
     	if(event.isCancelled()) return; // Do nothing if another plugin cancels this event
 
@@ -614,8 +614,9 @@ public class PlayerListener implements Listener {
     /**
      * Handles when players are right-clicking entities
 	 */
-    @EventHandler()
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+		if(event.isCancelled()) return; // Do nothing if another plugin cancels this event
     	if(konquest.isWorldIgnored(event.getPlayer().getLocation())) return;
     	Entity clicked = event.getRightClicked();
     	Player bukkitPlayer = event.getPlayer();
@@ -652,8 +653,9 @@ public class PlayerListener implements Listener {
         }
     }
     
-    @EventHandler()
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+		if(event.isCancelled()) return; // Do nothing if another plugin cancels this event
     	if(konquest.isWorldIgnored(event.getPlayer().getLocation())) return;
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
@@ -673,7 +675,7 @@ public class PlayerListener implements Listener {
         }
     }
     
-    @EventHandler()
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerFish(PlayerFishEvent event) {
     	if(!event.isCancelled()) {
     		if(konquest.isWorldIgnored(event.getPlayer().getLocation())) return;
@@ -701,7 +703,7 @@ public class PlayerListener implements Listener {
     	}
     }
     
-    @EventHandler()
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
     	if(!event.isCancelled()) {
     		if(konquest.isWorldIgnored(event.getPlayer().getLocation())) {
@@ -715,56 +717,56 @@ public class PlayerListener implements Listener {
     	}
     }
     
-    @EventHandler()
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
     	onBucketUse(event);
     }
     
-    @EventHandler()
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerBucketFill(PlayerBucketFillEvent event) {
     	onBucketUse(event);
     }    
     
     private void onBucketUse(PlayerBucketEvent event) {
-    	if(territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
-    		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
-				ChatUtil.printDebug("Failed to handle onBucketUse for non-existent player");
-				return;
+		if(event.isCancelled()) return; // Do nothing if another plugin cancels this event
+    	if(!territoryManager.isChunkClaimed(event.getBlock().getLocation())) return;
+		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
+			ChatUtil.printDebug("Failed to handle onBucketUse for non-existent player");
+			return;
+		}
+		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
+		KonTerritory territory = territoryManager.getChunkTerritory(event.getBlock().getLocation());
+		if(!player.isAdminBypassActive()) {
+			boolean cancelUse = false;
+			if(territory instanceof KonSanctuary && ((KonSanctuary) territory).isLocInsideTemplate(event.getBlock().getLocation())) {
+				// Block is inside monument template
+				cancelUse = true;
+			} else if(territory instanceof KonTown && ((KonTown) territory).isLocInsideMonumentProtectionArea(event.getBlock().getLocation())) {
+				// Block is inside town monument
+				cancelUse = true;
+			} else if(territory instanceof KonTown && !player.getKingdom().equals(territory.getKingdom())) {
+				// The block is located inside an enemy town
+				cancelUse = true;
+			} else if(territory instanceof KonRuin) {
+				// The block is inside a Ruin
+				cancelUse = true;
+			} else if(territory instanceof KonCamp && !((KonCamp)territory).isPlayerOwner(event.getPlayer())) {
+				// Block is inside a non-owned camp
+				cancelUse = true;
 			}
-    		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
-			KonTerritory territory = territoryManager.getChunkTerritory(event.getBlock().getLocation());
-			if(!player.isAdminBypassActive()) {
-				boolean cancelUse = false;
-				if(territory instanceof KonSanctuary && ((KonSanctuary) territory).isLocInsideTemplate(event.getBlock().getLocation())) {
-					// Block is inside monument template
-					cancelUse = true;
-				} else if(territory instanceof KonTown && ((KonTown) territory).isLocInsideMonumentProtectionArea(event.getBlock().getLocation())) {
-					// Block is inside town monument
-					cancelUse = true;
-				} else if(territory instanceof KonTown && !player.getKingdom().equals(territory.getKingdom())) {
-					// The block is located inside an enemy town
-					cancelUse = true;
-				} else if(territory instanceof KonRuin) {
-					// The block is inside a Ruin
-					cancelUse = true;
-				} else if(territory instanceof KonCamp && !((KonCamp)territory).isPlayerOwner(event.getPlayer())) {
-					// Block is inside a non-owned camp
-					cancelUse = true;
-				}
-				// General property flag
-				if(territory instanceof KonPropertyFlagHolder) {
-					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
-					if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
-						if(!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
-							cancelUse = true;
-						}
+			// General property flag
+			if(territory instanceof KonPropertyFlagHolder) {
+				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+				if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
+					if(!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
+						cancelUse = true;
 					}
 				}
-				
-				if(cancelUse) {
-					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-					event.setCancelled(true);
-				}
+			}
+
+			if(cancelUse) {
+				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				event.setCancelled(true);
 			}
 		}
     }
@@ -810,7 +812,7 @@ public class PlayerListener implements Listener {
 		}
 	}
     
-    @EventHandler()
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerExpChange(PlayerExpChangeEvent event) {
     	if(konquest.isWorldIgnored(event.getPlayer().getLocation())) return;
     	Player bukkitPlayer = event.getPlayer();
@@ -823,7 +825,7 @@ public class PlayerListener implements Listener {
     	}
     }
     
-    @EventHandler()
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDropMenuItem(PlayerDropItemEvent event) {
     	if(konquest.getDisplayManager().isPlayerViewingMenu(event.getPlayer())) {
     		ChatUtil.printDebug("Player "+event.getPlayer().getName()+" tried to drop an item from an inventory menu!");
@@ -831,7 +833,7 @@ public class PlayerListener implements Listener {
     	}
     }
     
-    @EventHandler()
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerPortal(PlayerPortalEvent event) {
     	if(event.isCancelled()) return;// Do nothing if another plugin cancels this event
     	Location portalToLoc = event.getTo();
@@ -889,7 +891,7 @@ public class PlayerListener implements Listener {
     /**
      * Checks for players moving into chunks
 	 */
-    @EventHandler()
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerMove(PlayerMoveEvent event) {
     	if(event.isCancelled()) return; // Do nothing if another plugin cancels this event
 		if(event.getTo() == null)return;
@@ -905,7 +907,7 @@ public class PlayerListener implements Listener {
     /**
      * Checks for players teleporting into chunks
 	 */
-    @EventHandler()
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
     	if(event.isCancelled()) return; // Do nothing if another plugin cancels this event
 		if(event.getTo() == null)return;

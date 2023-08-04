@@ -62,7 +62,7 @@ public class BlockListener implements Listener {
 	 * Fires when a block breaks.
 	 * Check for breaks inside Monuments by enemies. Peaceful members cannot break other territories.
 	 */
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
 		if(event.isCancelled()) return;
 		
@@ -513,7 +513,7 @@ public class BlockListener implements Listener {
 	 * Prevent placing blocks inside protected territories.
 	 * Check for barbarian bed placement.
 	 */
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockPlace(BlockPlaceEvent event) {
 		if(event.isCancelled()) {
 			return;
@@ -829,7 +829,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onSeedPlant(BlockPlaceEvent event) {
 		if(!event.isCancelled()) {
 			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
@@ -854,7 +854,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onFarmTill(BlockPlaceEvent event) {
 		if(!event.isCancelled()) {
 			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
@@ -876,7 +876,7 @@ public class BlockListener implements Listener {
 	 * Fires when blocks explode.
 	 * Protect capitals from explosions, and optionally protect chests inside claimed territory.
 	 */
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockExplode(BlockExplodeEvent event) {
 		// Protect blocks inside of territory
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
@@ -991,7 +991,7 @@ public class BlockListener implements Listener {
 	 * Allow admin bypass
 	 * 
 	 */
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onPistonExtend(BlockPistonExtendEvent event) {
 		// TODO: Add blocked messages to players somehow
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
@@ -1075,7 +1075,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onPistonRetract(BlockPistonRetractEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
 		Location pistonBaseLoc = event.getBlock().getLocation();
@@ -1158,7 +1158,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onFluidFlow(BlockFromToEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
@@ -1191,7 +1191,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockForm(BlockFormEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
@@ -1201,7 +1201,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockGrow(BlockGrowEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
@@ -1211,7 +1211,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockSpread(BlockSpreadEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
@@ -1266,7 +1266,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockIgnite(BlockIgniteEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
 		if(!isBlockInsideMonument(event.getBlock())) return;
