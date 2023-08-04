@@ -7,22 +7,24 @@ load: POSTWORLD
 main: com.github.rumsfield.konquest.KonquestPlugin
 depend: [Vault]
 softdepend:
-- ProtocolLib
-- ChestShop
-- QuickShop
-- LuckPerms
-- PlaceholderAPI
-- dynmap
-- BlueMap
-- EconomyPlus
-- Economy
-- XConomy
-- EssentialsX
-- Multiverse-Core
-- Multiverse-Inventories
-- Multiverse-Portals
-- Multiverse-NetherPortals
-- DiscordSRV
+  - ProtocolLib
+  - ChestShop
+  - QuickShop
+  - LuckPerms
+  - PlaceholderAPI
+  - dynmap
+  - BlueMap
+  - EconomyPlus
+  - Economy
+  - XConomy
+  - EssentialsX
+  - Multiverse-Core
+  - Multiverse-Inventories
+  - Multiverse-Portals
+  - Multiverse-NetherPortals
+  - DiscordSRV
+loadbefore:
+  - SmoothTimber
 commands:
   konquest:
     description: Base Konquest command

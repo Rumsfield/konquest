@@ -354,246 +354,258 @@ public class PlayerListener implements Listener {
     }
     
     /**
-     * Handles when players are setting regions and clicking signs
+     * Handles when players are setting regions.
+	 * This should run before any other handlers (Lowest priority).
 	 */
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerInteract(PlayerInteractEvent event) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerSetRegion(PlayerInteractEvent event) {
     	Player bukkitPlayer = event.getPlayer();
     	if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to handle onPlayerInteract for non-existent player");
 			return;
 		}
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-        // When a player is setting regions...
-        if (player.isSettingRegion()) {
-        	if (event.getClickedBlock() == null) {
-             	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_CLICKED_AIR.getMessage());
-             	player.setRegionCornerOneBuffer(null);
-                player.setRegionCornerTwoBuffer(null);
-                player.settingRegion(RegionType.NONE);
-                event.setCancelled(true);
-                return;
-            }
-        	// Different region cases...
-        	Location location = event.getClickedBlock().getLocation();
-        	String ruinName = "";
-        	switch (player.getRegionType()) {
-	        	case MONUMENT:
-	                if (player.getRegionCornerOneBuffer() == null) {
-	                	// Location is first corner, verify sanctuary
-	                	KonTerritory territory = territoryManager.getChunkTerritory(location);
-	                	if(territory != null && territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY)) {
-	                		// Location is inside a Sanctuary
-	                		String sanctuaryName = territory.getName();
-	                		player.setRegionSanctuaryName(sanctuaryName);
-	                		player.setRegionCornerOneBuffer(location);
-		                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_2.getMessage(), ChatColor.LIGHT_PURPLE);
-	                	} else {
-	                		// The first corner is not in a sanctuary, end the region setting flow
-							String templateName = player.getRegionTemplateName();
-	                		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage(templateName));
-	                		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SANCTUARY.getMessage());
-	                		player.setRegionCornerOneBuffer(null);
-		                    player.setRegionCornerTwoBuffer(null);
-		                    player.settingRegion(RegionType.NONE);
-		                    ChatUtil.printDebug("Ended setting monument region, no sanctuary");
-	                	}
-	                } else if (player.getRegionCornerTwoBuffer() == null) {
-	                	// Location is second corner, save to player
-	                	player.setRegionCornerTwoBuffer(location);
-	                    ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_3.getMessage(), ChatColor.LIGHT_PURPLE);
-	                } else {
-	                	// Location is travel point, create template using saved data
-	                	KonSanctuary sanctuary = konquest.getSanctuaryManager().getSanctuary(player.getRegionSanctuaryName());
-	                	String templateName = player.getRegionTemplateName();
-						double templateCost = player.getRegionTemplateCost();
-						Location templateCorner1 = player.getRegionCornerOneBuffer();
-						Location templateCorner2 = player.getRegionCornerTwoBuffer();
-	                	int createMonumentStatus = konquest.getSanctuaryManager().createMonumentTemplate(sanctuary, templateName, templateCorner1, templateCorner2, location, templateCost);
-	                	switch(createMonumentStatus) {
-	    				case 0:
-							ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_TEMPLATE_READY.getMessage(templateName));
-	    					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(templateName));
-	    					kingdomManager.reloadMonumentsForTemplate(konquest.getSanctuaryManager().getTemplate(templateName));
-	    					break;
-	    				case 1:
-	    					int diffX = (int)Math.abs(templateCorner1.getX()-templateCorner2.getX())+1;
-	    					int diffZ = (int)Math.abs(templateCorner1.getZ()-templateCorner2.getZ())+1;
-	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(templateName,diffX,diffZ));
-	    					break;
-	    				case 2:
-	    					String criticalBlockTypeName = konquest.getCore().getString(CorePath.MONUMENTS_CRITICAL_BLOCK.getPath());
-	    					int maxCriticalhits = konquest.getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
-	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(templateName,maxCriticalhits,criticalBlockTypeName));
-	    					break;
-	    				case 3:
-	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_TRAVEL.getMessage(templateName));
-	    					break;
-	    				case 4:
-	    					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage(templateName));
-	    					break;
-						case 5:
-							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(templateName));
-							break;
-						case 10:
-							ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_RESET.getMessage(templateName));
-							break;
-	    				default:
-	    					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(createMonumentStatus));
-	    					break;
-	    				}
-	                    player.setRegionCornerOneBuffer(null);
-	                    player.setRegionCornerTwoBuffer(null);
-						player.setRegionTemplateCost(0.0);
-	                    player.settingRegion(RegionType.NONE);
-	                    ChatUtil.printDebug("Finished setting monument region");
-	                }
-	        		break;
-	        	case RUIN_CRITICAL:
-	        		boolean validCriticalBlock = false;
-	        		if(territoryManager.isChunkClaimed(location)) {
-	        			KonTerritory territory = territoryManager.getChunkTerritory(location);
-	        			if(territory instanceof KonRuin) {
-	        				Material criticalType = konquest.getRuinManager().getRuinCriticalBlock();
-	        				if(event.getClickedBlock().getType().equals(criticalType)) {
-	        					((KonRuin)territory).addCriticalLocation(location);
-		        				ruinName = territory.getName();
-		        				validCriticalBlock = true;
-	        				} else {
-	        					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_MATCH.getMessage(criticalType.toString()));
-	        				}
-	        			}
-	        		}
-	        		if(validCriticalBlock) {
-	        			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_ADD.getMessage(ruinName));
-	        		} else {
-	        			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_INVALID.getMessage());
-	        		}
-	        		break;
-	        	case RUIN_SPAWN:
-	        		boolean validSpawnBlock = false;
-	        		if(territoryManager.isChunkClaimed(location)) {
-	        			KonTerritory territory = territoryManager.getChunkTerritory(location);
-	        			if(territory instanceof KonRuin) {
-	        				((KonRuin)territory).addSpawnLocation(location);
-	        				ruinName = territory.getName();
-	        				validSpawnBlock = true;
-	        			}
-	        		}
-	        		if(validSpawnBlock) {
-	        			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_ADD.getMessage(ruinName));
-	        		} else {
-	        			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_INVALID.getMessage());
-	        		}
-	        		break;
-	        	default:
-	        		break;
-        	}
-            event.setCancelled(true);
-        } else {
-        	// When a player is not setting regions...
-			//ChatUtil.printDebug("Interaction: block "+event.hasBlock()+", item "+event.hasItem()+"; "+event.getMaterial());
-			// Handle block interactions
-        	if(!player.isAdminBypassActive() && event.hasBlock()) {
-        		BlockState clickedState = event.getClickedBlock().getState();
-        		// Check for territory
-        		if(territoryManager.isChunkClaimed(clickedState.getLocation())) {
-        			// Interaction occurred within claimed territory
-	        		KonTerritory territory = territoryManager.getChunkTerritory(clickedState.getLocation());
-	        		// Property Flag Holders
-					if(territory instanceof KonPropertyFlagHolder) {
-						KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
-						if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
-							// Block non-sign uses
-							if(!(flagHolder.getPropertyValue(KonPropertyFlag.USE) || clickedState instanceof Sign)) {
-								preventUse(event,player);
-							}
+        // Check that the player is setting a region
+        if (!player.isSettingRegion()) return;
+		// Check if the player clicked air (cancel region setup)
+		if (event.getClickedBlock() == null) {
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_CLICKED_AIR.getMessage());
+			player.setRegionCornerOneBuffer(null);
+			player.setRegionCornerTwoBuffer(null);
+			player.settingRegion(RegionType.NONE);
+			event.setCancelled(true);
+			return;
+		}
+		// Different region cases...
+		Location location = event.getClickedBlock().getLocation();
+		String ruinName = "";
+		switch (player.getRegionType()) {
+			case MONUMENT:
+				if (player.getRegionCornerOneBuffer() == null) {
+					// Location is first corner, verify sanctuary
+					KonTerritory territory = territoryManager.getChunkTerritory(location);
+					if(territory != null && territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY)) {
+						// Location is inside a Sanctuary
+						String sanctuaryName = territory.getName();
+						player.setRegionSanctuaryName(sanctuaryName);
+						player.setRegionCornerOneBuffer(location);
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_2.getMessage(), ChatColor.LIGHT_PURPLE);
+					} else {
+						// The first corner is not in a sanctuary, end the region setting flow
+						String templateName = player.getRegionTemplateName();
+						ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage(templateName));
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SANCTUARY.getMessage());
+						player.setRegionCornerOneBuffer(null);
+						player.setRegionCornerTwoBuffer(null);
+						player.settingRegion(RegionType.NONE);
+						ChatUtil.printDebug("Ended setting monument region, no sanctuary");
+					}
+				} else if (player.getRegionCornerTwoBuffer() == null) {
+					// Location is second corner, save to player
+					player.setRegionCornerTwoBuffer(location);
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_3.getMessage(), ChatColor.LIGHT_PURPLE);
+				} else {
+					// Location is travel point, create template using saved data
+					KonSanctuary sanctuary = konquest.getSanctuaryManager().getSanctuary(player.getRegionSanctuaryName());
+					String templateName = player.getRegionTemplateName();
+					double templateCost = player.getRegionTemplateCost();
+					Location templateCorner1 = player.getRegionCornerOneBuffer();
+					Location templateCorner2 = player.getRegionCornerTwoBuffer();
+					int createMonumentStatus = konquest.getSanctuaryManager().createMonumentTemplate(sanctuary, templateName, templateCorner1, templateCorner2, location, templateCost);
+					switch(createMonumentStatus) {
+					case 0:
+						ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_TEMPLATE_READY.getMessage(templateName));
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SUCCESS.getMessage(templateName));
+						kingdomManager.reloadMonumentsForTemplate(konquest.getSanctuaryManager().getTemplate(templateName));
+						break;
+					case 1:
+						int diffX = (int)Math.abs(templateCorner1.getX()-templateCorner2.getX())+1;
+						int diffZ = (int)Math.abs(templateCorner1.getZ()-templateCorner2.getZ())+1;
+						ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_BASE.getMessage(templateName,diffX,diffZ));
+						break;
+					case 2:
+						String criticalBlockTypeName = konquest.getCore().getString(CorePath.MONUMENTS_CRITICAL_BLOCK.getPath());
+						int maxCriticalhits = konquest.getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
+						ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_CRITICAL.getMessage(templateName,maxCriticalhits,criticalBlockTypeName));
+						break;
+					case 3:
+						ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_TRAVEL.getMessage(templateName));
+						break;
+					case 4:
+						ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_REGION.getMessage(templateName));
+						break;
+					case 5:
+						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(templateName));
+						break;
+					case 10:
+						ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_FAIL_RESET.getMessage(templateName));
+						break;
+					default:
+						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(createMonumentStatus));
+						break;
+					}
+					player.setRegionCornerOneBuffer(null);
+					player.setRegionCornerTwoBuffer(null);
+					player.setRegionTemplateCost(0.0);
+					player.settingRegion(RegionType.NONE);
+					ChatUtil.printDebug("Finished setting monument region");
+				}
+				break;
+			case RUIN_CRITICAL:
+				boolean validCriticalBlock = false;
+				if(territoryManager.isChunkClaimed(location)) {
+					KonTerritory territory = territoryManager.getChunkTerritory(location);
+					if(territory instanceof KonRuin) {
+						Material criticalType = konquest.getRuinManager().getRuinCriticalBlock();
+						if(event.getClickedBlock().getType().equals(criticalType)) {
+							((KonRuin)territory).addCriticalLocation(location);
+							ruinName = territory.getName();
+							validCriticalBlock = true;
+						} else {
+							ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_MATCH.getMessage(criticalType.toString()));
 						}
 					}
-	        		// Ruin protections...
-	        		if(territory instanceof KonRuin) {
-	        			KonRuin ruin = (KonRuin)territory;
-	        			// Target player who interacts with critical blocks
-	        			if(ruin.isCriticalLocation(event.getClickedBlock().getLocation())) {
-	        				ruin.targetAllGolemsToPlayer(bukkitPlayer);
-	        			}
-	        		}
-	        		// Town protections...
-	        		if(territory instanceof KonTown) {
-	        			KonTown town = (KonTown) territory;
-						KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
-	        			// Target player who interacts with monument blocks
-	        			if(town.isLocInsideMonumentProtectionArea(event.getClickedBlock().getLocation())) {
-	        				town.targetRabbitToPlayer(bukkitPlayer);
-	        			}
-						// Protections for friendly non-residents of closed towns
-						if(playerRole.equals(KonquestRelationshipType.FRIENDLY) && !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
-							// Check for allowed usage like buttons, levers
-							if(!town.isFriendlyRedstoneAllowed() && preventUse(event,player)) {
-								event.setCancelled(true);
-								return;
-							}
-							// Try to protected physical interaction like pressure plates, trampling farmland
-							if(preventPhysical(event,player)) {
-								event.setCancelled(true);
-								return;
-							}
+				}
+				if(validCriticalBlock) {
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_ADD.getMessage(ruinName));
+				} else {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_INVALID.getMessage());
+				}
+				break;
+			case RUIN_SPAWN:
+				boolean validSpawnBlock = false;
+				if(territoryManager.isChunkClaimed(location)) {
+					KonTerritory territory = territoryManager.getChunkTerritory(location);
+					if(territory instanceof KonRuin) {
+						((KonRuin)territory).addSpawnLocation(location);
+						ruinName = territory.getName();
+						validSpawnBlock = true;
+					}
+				}
+				if(validSpawnBlock) {
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_ADD.getMessage(ruinName));
+				} else {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_INVALID.getMessage());
+				}
+				break;
+			default:
+				break;
+		}
+		event.setCancelled(true);
+    }
+
+	/**
+	 * Handles when players use blocks
+	 */
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onPlayerUse(PlayerInteractEvent event) {
+		Player bukkitPlayer = event.getPlayer();
+		if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
+			ChatUtil.printDebug("Failed to handle onPlayerInteract for non-existent player");
+			return;
+		}
+		KonPlayer player = playerManager.getPlayer(bukkitPlayer);
+		// Handle block interactions
+		if(!player.isAdminBypassActive() && event.hasBlock() && !event.useInteractedBlock().equals(Event.Result.DENY)) {
+			BlockState clickedState = event.getClickedBlock().getState();
+			// Check for territory
+			if(territoryManager.isChunkClaimed(clickedState.getLocation())) {
+				// Interaction occurred within claimed territory
+				KonTerritory territory = territoryManager.getChunkTerritory(clickedState.getLocation());
+				// Property Flag Holders
+				if(territory instanceof KonPropertyFlagHolder) {
+					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+					if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
+						// Block non-sign uses
+						if(!(flagHolder.getPropertyValue(KonPropertyFlag.USE) || clickedState instanceof Sign)) {
+							preventUse(event,player);
 						}
-						// Protections for non-friendlies
-						if(!playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
-							// Check for allowed usage like buttons, levers
-							if(!town.isEnemyRedstoneAllowed() && preventUse(event,player)) {
-								event.setCancelled(true);
-								return;
-							}
-							// Try to protected physical interaction like pressure plates, trampling farmland
-							if(preventPhysical(event,player)) {
-								event.setCancelled(true);
-								return;
-							}
-						}
-	        			// Prevent enemies and non-residents from interacting with item frames
-	        			if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
-	        				Material clickedMat = event.getClickedBlock().getType();
-	        				if(clickedMat.equals(Material.ITEM_FRAME)) {
-	        					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-	        					event.setCancelled(true);
-	    						return;
-	        				}
-	        			}
-	        		}
-	        		
-        		} else {
-        			// Interaction occurred in the wild
-        			boolean isWildUse = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_USE.getPath(), true);
-					boolean isWorldValid = konquest.isWorldValid(clickedState.getLocation());
-        			if(!isWildUse && isWorldValid) {
-        				if(preventUse(event,player)) {
+					}
+				}
+				// Ruin protections...
+				if(territory instanceof KonRuin) {
+					KonRuin ruin = (KonRuin)territory;
+					// Target player who interacts with critical blocks
+					if(ruin.isCriticalLocation(event.getClickedBlock().getLocation())) {
+						ruin.targetAllGolemsToPlayer(bukkitPlayer);
+					}
+				}
+				// Town protections...
+				if(territory instanceof KonTown) {
+					KonTown town = (KonTown) territory;
+					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+					// Target player who interacts with monument blocks
+					if(town.isLocInsideMonumentProtectionArea(event.getClickedBlock().getLocation())) {
+						town.targetRabbitToPlayer(bukkitPlayer);
+					}
+					// Protections for friendly non-residents of closed towns
+					if(playerRole.equals(KonquestRelationshipType.FRIENDLY) && !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+						// Check for allowed usage like buttons, levers
+						if(!town.isFriendlyRedstoneAllowed() && preventUse(event,player)) {
 							event.setCancelled(true);
 							return;
 						}
+						// Try to protected physical interaction like pressure plates, trampling farmland
 						if(preventPhysical(event,player)) {
 							event.setCancelled(true);
 							return;
 						}
-        			}
-        		}
-        	}
-        	// Jukebox handler
-			if(event.hasItem() &&
-					event.getItem().getType().isRecord() &&
-					event.getAction().equals(Action.RIGHT_CLICK_BLOCK) &&
-					event.hasBlock() &&
-					event.getClickedBlock().getType().equals(Material.JUKEBOX) &&
-					!konquest.isWorldIgnored(event.getClickedBlock().getLocation()) ) {
-				// Update music stat when not on record cooldown
-				if(player.isRecordPlayCooldownOver()) {
-					konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.MUSIC,1);
-					player.markRecordPlayCooldown();
+					}
+					// Protections for non-friendlies
+					if(!playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
+						// Check for allowed usage like buttons, levers
+						if(!town.isEnemyRedstoneAllowed() && preventUse(event,player)) {
+							event.setCancelled(true);
+							return;
+						}
+						// Try to protected physical interaction like pressure plates, trampling farmland
+						if(preventPhysical(event,player)) {
+							event.setCancelled(true);
+							return;
+						}
+					}
+					// Prevent enemies and non-residents from interacting with item frames
+					if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+						Material clickedMat = event.getClickedBlock().getType();
+						if(clickedMat.equals(Material.ITEM_FRAME)) {
+							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
+						}
+					}
+				}
+
+			} else {
+				// Interaction occurred in the wild
+				boolean isWildUse = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_USE.getPath(), true);
+				boolean isWorldValid = konquest.isWorldValid(clickedState.getLocation());
+				if(!isWildUse && isWorldValid) {
+					if(preventUse(event,player)) {
+						event.setCancelled(true);
+						return;
+					}
+					if(preventPhysical(event,player)) {
+						event.setCancelled(true);
+						return;
+					}
 				}
 			}
-        }
-    }
+		}
+		// Jukebox handler
+		if(event.hasItem() &&
+				!event.useItemInHand().equals(Event.Result.DENY) &&
+				event.getItem().getType().isRecord() &&
+				event.getAction().equals(Action.RIGHT_CLICK_BLOCK) &&
+				event.hasBlock() &&
+				event.getClickedBlock().getType().equals(Material.JUKEBOX) &&
+				!konquest.isWorldIgnored(event.getClickedBlock().getLocation()) ) {
+			// Update music stat when not on record cooldown
+			if(player.isRecordPlayCooldownOver()) {
+				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.MUSIC,1);
+				player.markRecordPlayCooldown();
+			}
+		}
+	}
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerEnterVehicle(VehicleEnterEvent event) {
@@ -614,7 +626,7 @@ public class PlayerListener implements Listener {
     /**
      * Handles when players are right-clicking entities
 	 */
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
 		if(event.isCancelled()) return; // Do nothing if another plugin cancels this event
     	if(konquest.isWorldIgnored(event.getPlayer().getLocation())) return;
@@ -653,7 +665,7 @@ public class PlayerListener implements Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
 		if(event.isCancelled()) return; // Do nothing if another plugin cancels this event
     	if(konquest.isWorldIgnored(event.getPlayer().getLocation())) return;
@@ -717,12 +729,12 @@ public class PlayerListener implements Listener {
     	}
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
     	onBucketUse(event);
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerBucketFill(PlayerBucketFillEvent event) {
     	onBucketUse(event);
     }    
@@ -771,7 +783,7 @@ public class PlayerListener implements Listener {
 		}
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerRespawnCapital(PlayerRespawnEvent event) {
     	if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onPlayerRespawnCapital for non-existent player");
@@ -833,7 +845,7 @@ public class PlayerListener implements Listener {
     	}
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerPortal(PlayerPortalEvent event) {
     	if(event.isCancelled()) return;// Do nothing if another plugin cancels this event
     	Location portalToLoc = event.getTo();

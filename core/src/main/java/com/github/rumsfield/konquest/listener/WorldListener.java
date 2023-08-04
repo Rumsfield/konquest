@@ -21,7 +21,7 @@ public class WorldListener  implements Listener {
 		this.konquest = plugin.getKonquestInstance();
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onPortalCreate(PortalCreateEvent event) {
 		ChatUtil.printDebug("EVENT: Portal is being created in "+event.getWorld().getName());
 		if(event.isCancelled()) return;
@@ -78,7 +78,7 @@ public class WorldListener  implements Listener {
 		konquest.applyQueuedTeleports(event.getChunk());
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onStructureGrow(StructureGrowEvent event) {
 		if(konquest.isWorldIgnored(event.getWorld())) return;
 		// Prevent growth if any blocks are within monument

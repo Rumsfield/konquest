@@ -260,7 +260,7 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onMobSpawn(CreatureSpawnEvent event) {
 		if(!territoryManager.isChunkClaimed(event.getLocation())) return;
 		// Inside claimed territory...
@@ -338,7 +338,7 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onEntityPotionEffect(EntityPotionEffectEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		// prevent milk buckets from removing town nerfs in enemy towns
@@ -439,12 +439,11 @@ public class EntityListener implements Listener {
 
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamageByPlayer(EntityDamageByEntityEvent event) {
 		// Player damages an entity (non-player)
-		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-			return;
-		}
+		if(event.isCancelled()) return;
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		Entity entityVictim = event.getEntity();
 		EntityType eType = event.getEntity().getType();
 		if(entityVictim instanceof Player) return;// Victim is a player, skip this event.
@@ -625,11 +624,10 @@ public class EntityListener implements Listener {
 		
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDamageByPlayer(EntityDamageByEntityEvent event) {
-		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-			return;
-		}
+		if(event.isCancelled()) return;
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		Player victimBukkitPlayer;
         Player attackerBukkitPlayer = null;
         boolean isEggAttack = false;
@@ -791,13 +789,13 @@ public class EntityListener implements Listener {
     	}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPotionSplash(PotionSplashEvent event) {
 		// Common handler
 		onPotionThrown(event);
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onLingeringPotionSplash(LingeringPotionSplashEvent event) {
 		// Common handler
 		onPotionThrown(event);

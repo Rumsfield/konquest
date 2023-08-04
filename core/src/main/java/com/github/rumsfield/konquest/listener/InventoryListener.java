@@ -46,8 +46,9 @@ public class InventoryListener implements Listener {
 		this.playerManager = konquest.getPlayerManager();
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onInventoryOpen(InventoryOpenEvent event) {
+		if(event.isCancelled()) return;
 		if(konquest.isWorldIgnored(event.getInventory().getLocation())) return;
 		// Monitor blocks in claimed territory
 		// Check for merchant trades in claimed territory of guilds
