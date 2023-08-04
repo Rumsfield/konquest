@@ -441,7 +441,8 @@ public class BlockListener implements Listener {
 		} else {
 			// Break occurred in the wild
 			boolean isWildBuild = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_BUILD.getPath(), true);
-			if(!player.isAdminBypassActive() && !isWildBuild) {
+			boolean isWorldValid = konquest.isWorldValid(event.getBlock().getLocation());
+			if(!player.isAdminBypassActive() && !isWildBuild && isWorldValid) {
 				// No building is allowed in the wild
 				notifyAdminBypass(event.getPlayer());
 				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -816,8 +817,9 @@ public class BlockListener implements Listener {
 				} else {
 					// Wild placement by non-barbarian
 					boolean isWildBuild = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_BUILD.getPath(), true);
-					if(!isWildBuild) {
-						// No building is allowed in the wild
+					boolean isWorldValid = konquest.isWorldValid(event.getBlock().getLocation());
+					if(!isWildBuild && isWorldValid) {
+						// No building is allowed in the wild in valid worlds
 						notifyAdminBypass(event.getPlayer());
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);

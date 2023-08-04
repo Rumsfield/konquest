@@ -33,7 +33,7 @@ public class MonumentAdminCommand extends CommandBase {
         	World bukkitWorld = bukkitPlayer.getWorld();
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	
-        	if(!getKonquest().isWorldValid(bukkitWorld)) {
+        	if(getKonquest().isWorldIgnored(bukkitWorld)) {
         		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
                 return;
         	}

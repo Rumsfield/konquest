@@ -679,6 +679,7 @@ public class EntityListener implements Listener {
 			}
             // Check for protections for attacks within claimed territory
             boolean isWildDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_PVP.getPath(), true);
+			boolean isWorldValid = konquest.isWorldValid(victimBukkitPlayer.getLocation());
             boolean isAttackInTerritory = territoryManager.isChunkClaimed(victimBukkitPlayer.getLocation());
 			boolean isVictimInsideFriendlyTerritory = false;
             if(isAttackInTerritory) {
@@ -701,7 +702,7 @@ public class EntityListener implements Listener {
             		event.setCancelled(true);
                 	return;
             	}
-            } else if(!isWildDamageEnabled) {
+            } else if(!isWildDamageEnabled && isWorldValid) {
             	event.setCancelled(true);
             	return;
             }
