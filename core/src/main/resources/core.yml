@@ -27,8 +27,8 @@ core:
   # (*) Reverse world_blacklist into a whitelist, where listed world names become the only worlds where kingdoms and towns can exist (true/false)
   world_blacklist_reverse: false
   
-  # [EXPERIMENTAL] (*) Ignore all Konquest protections in blacklist worlds, basically making the worlds into vanilla (true/false)
-  world_blacklist_ignore: false
+  # [EXPERIMENTAL] (*) World names that ignore most Konquest features (string list, use [] to disable)
+  world_ignorelist: []
   
   # (*) Save interval in minutes, 0 to disable (integer >= 0)
   save_interval: 60

@@ -101,8 +101,8 @@ public class Konquest implements KonquestAPI, Timeable {
 	private EventPriority chatPriority;
 	private static final EventPriority defaultChatPriority = EventPriority.HIGH;
     private final List<World> worlds;
+	private final List<World> ignoredWorlds;
     private boolean isWhitelist;
-    private boolean isBlacklistIgnored;
 	public List<String> opStatusMessages;
 	private final Timer saveTimer;
 	private final Timer compassTimer;
@@ -149,8 +149,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		
 		this.chatPriority = defaultChatPriority;
 		this.worlds = new ArrayList<>();
+		this.ignoredWorlds = new ArrayList<>();
 		this.isWhitelist = false;
-		this.isBlacklistIgnored = false;
 		this.opStatusMessages = new ArrayList<>();
 		this.saveTimer = new Timer(this);
 		this.compassTimer = new Timer(this);
@@ -318,7 +318,6 @@ public class Konquest implements KonquestAPI, Timeable {
 	private void initWorlds() {
 		List<String> worldNameList = getCore().getStringList(CorePath.WORLD_BLACKLIST.getPath());
 		isWhitelist = getCore().getBoolean(CorePath.WORLD_BLACKLIST_REVERSE.getPath(),false);
-		isBlacklistIgnored = getCore().getBoolean(CorePath.WORLD_BLACKLIST_IGNORE.getPath(),false);
 		// Verify listed worlds exist
 		for(String name : worldNameList) {
 			boolean matches = false;
@@ -331,6 +330,21 @@ public class Konquest implements KonquestAPI, Timeable {
 			}
 			if(!matches) {
 				ChatUtil.printConsoleError("core.world_blacklist name \""+name+"\" does not match any server worlds, check spelling and case.");
+			}
+		}
+		// Ignored Worlds
+		List<String> ignoredWorldNameList = getCore().getStringList(CorePath.WORLD_IGNORELIST.getPath());
+		for(String name : ignoredWorldNameList) {
+			boolean matches = false;
+			for(World world : Bukkit.getServer().getWorlds()) {
+				if(world.getName().equals(name)) {
+					matches = true;
+					ignoredWorlds.add(world);
+					break;
+				}
+			}
+			if(!matches) {
+				ChatUtil.printConsoleError("core.world_ignorelist name \""+name+"\" does not match any server worlds, check spelling and case.");
 			}
 		}
 	}
@@ -764,31 +778,31 @@ public class Konquest implements KonquestAPI, Timeable {
 	public boolean isWorldValid(Location loc) {
 		if(loc != null && loc.getWorld() != null) {
 			return isWorldValid(loc.getWorld());
-		} else {
-			return false;
 		}
+		return false;
 	}
 	
 	public boolean isWorldValid(World world) {
-		boolean result;
-		if(isWhitelist) {
-			result = worlds.contains(world);
-		} else {
-			result = !worlds.contains(world);
+		if(world != null) {
+			if (isWhitelist) {
+				return worlds.contains(world);
+			} else {
+				return !worlds.contains(world);
+			}
 		}
-		return result;
+		return false;
 	}
 	
 	public boolean isWorldIgnored(Location loc) {
-		if(loc != null) {
-			return isBlacklistIgnored && !isWorldValid(loc);
+		if(loc != null && loc.getWorld() != null) {
+			return isWorldIgnored(loc.getWorld());
 		}
 		return true;
 	}
 	
 	public boolean isWorldIgnored(World world) {
 		if(world != null) {
-			return isBlacklistIgnored && !isWorldValid(world);
+			return ignoredWorlds.contains(world);
 		}
 		return true;
 	}

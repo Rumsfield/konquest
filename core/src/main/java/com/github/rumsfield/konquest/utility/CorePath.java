@@ -6,7 +6,7 @@ public enum CorePath {
 	WORLD_NAME                                            ("core.world_name"),
 	WORLD_BLACKLIST                                       ("core.world_blacklist"),
 	WORLD_BLACKLIST_REVERSE                               ("core.world_blacklist_reverse"),
-	WORLD_BLACKLIST_IGNORE                                ("core.world_blacklist_ignore"),
+	WORLD_IGNORELIST                                      ("core.world_ignorelist"),
 	SAVE_INTERVAL                                         ("core.save_interval"),
 	COMMUNITY_LINK                                        ("core.community_link"),
 	ACCOMPLISHMENT_PREFIX                                 ("core.accomplishment_prefix"),
