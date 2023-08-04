@@ -781,13 +781,18 @@ public class Konquest implements KonquestAPI, Timeable {
 		}
 		return false;
 	}
-	
+
 	public boolean isWorldValid(World world) {
+		// A world is valid when:
+		// - it's NOT in the ignoreList, and it's in the whitelist (when reverse = true)
+		// - it's NOT in the ignoreList, and it's NOT in the blacklist (when reverse = false)
 		if(world != null) {
+			boolean isWorldInBlacklist = worlds.contains(world);
+			boolean isWorldInIgnorelist = ignoredWorlds.contains(world);
 			if (isWhitelist) {
-				return worlds.contains(world);
+				return !isWorldInIgnorelist && isWorldInBlacklist;
 			} else {
-				return !worlds.contains(world);
+				return !isWorldInIgnorelist && !isWorldInBlacklist;
 			}
 		}
 		return false;
