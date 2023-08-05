@@ -49,7 +49,7 @@ public class EntityListener implements Listener {
 		this.territoryManager = konquest.getTerritoryManager();
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.NORMAL)
     public void onItemSpawn(ItemSpawnEvent event) {
 		Location dropLoc = event.getEntity().getLocation();
 		if(!territoryManager.isChunkClaimed(dropLoc)) return;
@@ -66,7 +66,7 @@ public class EntityListener implements Listener {
 
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onEntityBreed(EntityBreedEvent event) {
 		if(event.isCancelled())  return;
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
@@ -86,7 +86,7 @@ public class EntityListener implements Listener {
 	 * Prevent Endermen from picking up blocks in claimed territory
 	 * @param event The block change event
 	 */
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityBlockChange(EntityChangeBlockEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		if(event.isCancelled()) return;
@@ -102,7 +102,7 @@ public class EntityListener implements Listener {
 	 * Fires when entities explode.
 	 * Protect territory from explosions, and optionally protect chests inside claimed territory.
 	 */
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityExplode(EntityExplodeEvent event) {
 		// Protect blocks inside of territory
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
@@ -260,7 +260,7 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
     public void onMobSpawn(CreatureSpawnEvent event) {
 		if(!territoryManager.isChunkClaimed(event.getLocation())) return;
 		// Inside claimed territory...
@@ -302,7 +302,7 @@ public class EntityListener implements Listener {
 		}
     }
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onGolemCreate(CreatureSpawnEvent event) {
 		// Check to see if player created an Iron Golem
 		if(event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM)) {
@@ -338,7 +338,7 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
     public void onEntityPotionEffect(EntityPotionEffectEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		// prevent milk buckets from removing town nerfs in enemy towns
@@ -360,7 +360,7 @@ public class EntityListener implements Listener {
     	}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.NORMAL)
     public void onEntityTarget(EntityTargetEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		// Prevent Iron Golems from targeting friendly players
@@ -403,7 +403,7 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.NORMAL)
     public void onArrowInteract(EntityInteractEvent event) {
 		// prevent arrows from interacting with things like pressure plates
 		// Checks
@@ -421,7 +421,7 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.NORMAL)
     public void onEntityDamage(EntityDamageEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld()))return;
 		Location damageLoc = event.getEntity().getLocation();
@@ -439,12 +439,11 @@ public class EntityListener implements Listener {
 
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamageByPlayer(EntityDamageByEntityEvent event) {
 		// Player damages an entity (non-player)
-		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-			return;
-		}
+		if(event.isCancelled()) return;
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		Entity entityVictim = event.getEntity();
 		EntityType eType = event.getEntity().getType();
 		if(entityVictim instanceof Player) return;// Victim is a player, skip this event.
@@ -625,11 +624,10 @@ public class EntityListener implements Listener {
 		
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDamageByPlayer(EntityDamageByEntityEvent event) {
-		if(konquest.isWorldIgnored(event.getEntity().getWorld())) {
-			return;
-		}
+		if(event.isCancelled()) return;
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		Player victimBukkitPlayer;
         Player attackerBukkitPlayer = null;
         boolean isEggAttack = false;
@@ -755,7 +753,7 @@ public class EntityListener implements Listener {
         }
     }
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDeath(PlayerDeathEvent event) {
 		Player bukkitPlayer = event.getEntity();
 		KonPlayer player = playerManager.getPlayer(bukkitPlayer);
@@ -766,7 +764,7 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onEntityDeath(EntityDeathEvent event) {
 		EntityType eType = event.getEntity().getType();
 		if(eType.equals(EntityType.IRON_GOLEM) && event.getEntity() instanceof IronGolem) {
@@ -778,7 +776,7 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		ProjectileSource source = event.getEntity().getShooter();
@@ -791,13 +789,13 @@ public class EntityListener implements Listener {
     	}
 	}
 
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPotionSplash(PotionSplashEvent event) {
 		// Common handler
 		onPotionThrown(event);
 	}
 
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onLingeringPotionSplash(LingeringPotionSplashEvent event) {
 		// Common handler
 		onPotionThrown(event);
@@ -830,7 +828,7 @@ public class EntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onAnimalDeathItem(EntityDeathEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		// Check for ruin golem
