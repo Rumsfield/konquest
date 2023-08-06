@@ -329,6 +329,10 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		if(!isCaptureDisabled) {
 			// Spawn all golems
 			for(KonRuinGolem golem : spawnLocations.values()) {
+				// Remove golems outside of ruin territory
+				if(!this.isLocInside(golem.getLocation())) {
+					golem.remove();
+				}
 				golem.spawn();
 			}
 		}
@@ -379,6 +383,12 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	public void removeAllGolems() {
 		for(KonRuinGolem golem : spawnLocations.values()) {
 			golem.remove();
+		}
+	}
+
+	public void removeGolem(Location spawn) {
+		if(spawnLocations.containsKey(spawn)) {
+			spawnLocations.get(spawn).remove();
 		}
 	}
 	

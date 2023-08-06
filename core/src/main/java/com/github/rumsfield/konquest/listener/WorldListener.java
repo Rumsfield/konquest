@@ -10,8 +10,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.StructureGrowEvent;
+
+import java.awt.*;
 
 public class WorldListener  implements Listener {
 
@@ -76,6 +79,27 @@ public class WorldListener  implements Listener {
 			}
 		}
 		konquest.applyQueuedTeleports(event.getChunk());
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onChunkUnload(ChunkUnloadEvent event) {
+		// Remove Ruin Golems when a chunk with a ruin spawn location unloads
+		Point chunkPoint = Konquest.toPoint(event.getChunk());
+		if(konquest.getTerritoryManager().isChunkClaimed(chunkPoint, event.getWorld())) {
+			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(Konquest.toPoint(event.getChunk()), event.getWorld());
+			if(territory instanceof KonRuin) {
+				KonRuin ruin = (KonRuin) territory;
+				for(Location spawn : ruin.getSpawnLocations()) {
+					Point spawnPoint = Konquest.toPoint(spawn);
+					if(chunkPoint.equals(spawnPoint)) {
+						// Found a ruin's spawn point within the chunk being unloaded
+						// Remove the golem associated with the spawn point
+						ruin.removeGolem(spawn);
+					}
+				}
+			}
+		}
+
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)

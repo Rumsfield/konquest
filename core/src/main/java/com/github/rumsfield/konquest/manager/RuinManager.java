@@ -43,6 +43,7 @@ public class RuinManager implements KonquestRuinManager {
 		for(KonRuin ruin : ruinMap.values()) {
 			ruin.regenCriticalBlocks();
 		}
+		ChatUtil.printDebug("Regenerated all ruin critical blocks");
 	}
 	
 	public void removeAllGolems() {
@@ -176,12 +177,6 @@ public class RuinManager implements KonquestRuinManager {
 	
 	public Material getRuinCriticalBlock() {
 		return ruinCriticalBlock;
-	}
-
-	public void regenAllCriticalBlocks() {
-		for(KonRuin ruin : ruinMap.values()) {
-			ruin.regenCriticalBlocks();
-		}
 	}
 	
 	private void loadCriticalBlocks() {
