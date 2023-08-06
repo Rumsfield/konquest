@@ -177,6 +177,12 @@ public class RuinManager implements KonquestRuinManager {
 	public Material getRuinCriticalBlock() {
 		return ruinCriticalBlock;
 	}
+
+	public void regenAllCriticalBlocks() {
+		for(KonRuin ruin : ruinMap.values()) {
+			ruin.regenCriticalBlocks();
+		}
+	}
 	
 	private void loadCriticalBlocks() {
 		String ruinCriticalBlockTypeName = konquest.getCore().getString(CorePath.RUINS_CRITICAL_BLOCK.getPath(),"");
