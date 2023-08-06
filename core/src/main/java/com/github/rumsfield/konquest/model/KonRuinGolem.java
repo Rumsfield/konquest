@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.model;
 
+import com.github.rumsfield.konquest.utility.ChatUtil;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -32,6 +33,11 @@ public class KonRuinGolem {
 		if(isRespawnCooldown)return;
 		if(golem == null || golem.isDead()) {
 			Location modLoc = new Location(spawnLoc.getWorld(),spawnLoc.getX()+0.5,spawnLoc.getY()+1.0,spawnLoc.getZ()+0.5);
+			// Load chunk if not already done
+			if(!modLoc.getChunk().isLoaded()) {
+				modLoc.getChunk().load();
+			}
+			// Spawn golem entity
 			golem = (IronGolem)spawnLoc.getWorld().spawnEntity(modLoc, EntityType.IRON_GOLEM);
 			golem.setPlayerCreated(true);
 			double defaultValue;
@@ -57,7 +63,20 @@ public class KonRuinGolem {
 	
 	public void remove() {
 		if(golem != null) {
-			golem.remove();
+			// Load the chunk of the entity to remove it
+			if(!golem.getLocation().getChunk().isEntitiesLoaded()) {
+				if(golem.getLocation().getChunk().load()) {
+					// Chunk loaded successfully
+					golem.remove();
+					ChatUtil.printDebug("Successfully removed golem in newly loaded chunk");
+				} else {
+					ChatUtil.printDebug("Failed to load chunk for golem removal");
+				}
+			} else {
+				// Entities are already loaded
+				golem.remove();
+				ChatUtil.printDebug("Successfully removed golem in previously loaded chunk");
+			}
 		}
 	}
 	

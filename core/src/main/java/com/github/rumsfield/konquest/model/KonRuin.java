@@ -325,6 +325,20 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	 * Ruin Golem Methods
 	 */
 	public void spawnAllGolems() {
+		pruneGolems();
+		if(!isCaptureDisabled) {
+			// Spawn all golems
+			for(KonRuinGolem golem : spawnLocations.values()) {
+				// Remove golems outside of ruin territory
+				if(!this.isLocInside(golem.getLocation())) {
+					golem.remove();
+				}
+				golem.spawn();
+			}
+		}
+	}
+
+	public void pruneGolems() {
 		if(!isCaptureDisabled) {
 			// Prune any golems not linked to this ruin
 			int min_distance_town = getKonquest().getCore().getInt(CorePath.TOWNS_MIN_DISTANCE_TOWN.getPath());
@@ -343,10 +357,6 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 						ChatUtil.printDebug("Pruned Iron Golem in ruin "+getName());
 					}
 				}
-			}
-			// Spawn all golems
-			for(KonRuinGolem golem : spawnLocations.values()) {
-				golem.spawn();
 			}
 		}
 	}
@@ -373,6 +383,12 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	public void removeAllGolems() {
 		for(KonRuinGolem golem : spawnLocations.values()) {
 			golem.remove();
+		}
+	}
+
+	public void removeGolem(Location spawn) {
+		if(spawnLocations.containsKey(spawn)) {
+			spawnLocations.get(spawn).remove();
 		}
 	}
 	
