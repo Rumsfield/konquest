@@ -26,7 +26,7 @@ public class HangingListener implements Listener {
 		this.territoryManager = konquest.getTerritoryManager();
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onHangingPlace(HangingPlaceEvent event) {
 		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 		if(player == null) return;
@@ -55,7 +55,7 @@ public class HangingListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onHangingBreakPlayer(HangingBreakByEntityEvent event) {
 		// Handle hanging breaks by players
 		if(!(event.getRemover() instanceof Player)) return;
@@ -86,7 +86,7 @@ public class HangingListener implements Listener {
 		}
     }
 
-	@EventHandler()
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onHangingBreakMonument(HangingBreakByEntityEvent event) {
 		// Handle hanging breaks during monument changes
 		Location brakeLoc = event.getEntity().getLocation();

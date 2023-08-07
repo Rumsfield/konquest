@@ -62,7 +62,7 @@ public class BlockListener implements Listener {
 	 * Fires when a block breaks.
 	 * Check for breaks inside Monuments by enemies. Peaceful members cannot break other territories.
 	 */
-	@EventHandler()
+	@EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
 		if(event.isCancelled()) return;
 		
@@ -441,7 +441,8 @@ public class BlockListener implements Listener {
 		} else {
 			// Break occurred in the wild
 			boolean isWildBuild = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_BUILD.getPath(), true);
-			if(!player.isAdminBypassActive() && !isWildBuild) {
+			boolean isWorldValid = konquest.isWorldValid(event.getBlock().getLocation());
+			if(!player.isAdminBypassActive() && !isWildBuild && isWorldValid) {
 				// No building is allowed in the wild
 				notifyAdminBypass(event.getPlayer());
 				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -479,29 +480,28 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onCropHarvest(BlockBreakEvent event) {
-		if(!event.isCancelled()) {
-			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
-				return;
-			}
-			Material brokenMat = event.getBlock().getType();
-			//ChatUtil.printDebug("EVENT: Broke material "+brokenMat.toString());
-			if(brokenMat.equals(Material.WHEAT) ||
-					brokenMat.equals(Material.POTATOES) ||
-					brokenMat.equals(Material.CARROTS) ||
-					brokenMat.equals(Material.BEETROOTS)) {
-				if(event.getBlock().getBlockData() instanceof Ageable) {
-					Ageable crop = (Ageable)event.getBlock().getBlockData();
-					//ChatUtil.printDebug("Broke crop block with age: "+crop.getAge());
-					if(crop.getAge() == crop.getMaximumAge()) {
-						if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
-							ChatUtil.printDebug("Failed to handle onCropHarvest for non-existent player");
-							return;
-						}
-						KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
-						konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.HARVEST,1);
+		if(event.isCancelled()) return;
+		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
+			return;
+		}
+		Material brokenMat = event.getBlock().getType();
+		//ChatUtil.printDebug("EVENT: Broke material "+brokenMat.toString());
+		if(brokenMat.equals(Material.WHEAT) ||
+				brokenMat.equals(Material.POTATOES) ||
+				brokenMat.equals(Material.CARROTS) ||
+				brokenMat.equals(Material.BEETROOTS)) {
+			if(event.getBlock().getBlockData() instanceof Ageable) {
+				Ageable crop = (Ageable)event.getBlock().getBlockData();
+				//ChatUtil.printDebug("Broke crop block with age: "+crop.getAge());
+				if(crop.getAge() == crop.getMaximumAge()) {
+					if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
+						ChatUtil.printDebug("Failed to handle onCropHarvest for non-existent player");
+						return;
 					}
+					KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
+					konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.HARVEST,1);
 				}
 			}
 		}
@@ -512,7 +512,7 @@ public class BlockListener implements Listener {
 	 * Prevent placing blocks inside protected territories.
 	 * Check for barbarian bed placement.
 	 */
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.LOWEST)
     public void onBlockPlace(BlockPlaceEvent event) {
 		if(event.isCancelled()) {
 			return;
@@ -816,8 +816,9 @@ public class BlockListener implements Listener {
 				} else {
 					// Wild placement by non-barbarian
 					boolean isWildBuild = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_BUILD.getPath(), true);
-					if(!isWildBuild) {
-						// No building is allowed in the wild
+					boolean isWorldValid = konquest.isWorldValid(event.getBlock().getLocation());
+					if(!isWildBuild && isWorldValid) {
+						// No building is allowed in the wild in valid worlds
 						notifyAdminBypass(event.getPlayer());
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
@@ -827,7 +828,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onSeedPlant(BlockPlaceEvent event) {
 		if(!event.isCancelled()) {
 			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
@@ -852,7 +853,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onFarmTill(BlockPlaceEvent event) {
 		if(!event.isCancelled()) {
 			if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
@@ -874,7 +875,7 @@ public class BlockListener implements Listener {
 	 * Fires when blocks explode.
 	 * Protect capitals from explosions, and optionally protect chests inside claimed territory.
 	 */
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockExplode(BlockExplodeEvent event) {
 		// Protect blocks inside of territory
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
@@ -989,7 +990,7 @@ public class BlockListener implements Listener {
 	 * Allow admin bypass
 	 * 
 	 */
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
     public void onPistonExtend(BlockPistonExtendEvent event) {
 		// TODO: Add blocked messages to players somehow
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
@@ -1073,7 +1074,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
     public void onPistonRetract(BlockPistonRetractEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
 		Location pistonBaseLoc = event.getBlock().getLocation();
@@ -1156,7 +1157,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
     public void onFluidFlow(BlockFromToEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
@@ -1189,7 +1190,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockForm(BlockFormEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
@@ -1199,7 +1200,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockGrow(BlockGrowEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
@@ -1209,7 +1210,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockSpread(BlockSpreadEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) {
 			return;
@@ -1264,7 +1265,7 @@ public class BlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler()
+	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockIgnite(BlockIgniteEvent event) {
 		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
 		if(!isBlockInsideMonument(event.getBlock())) return;
