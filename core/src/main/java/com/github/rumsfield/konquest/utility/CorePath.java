@@ -52,6 +52,7 @@ public enum CorePath {
 	INTEGRATION_LUCKPERMS                                 ("core.integration.luckperms"),
 	INTEGRATION_DYNMAP                                    ("core.integration.dynmap"),
 	INTEGRATION_BLUEMAP                                   ("core.integration.bluemap"),
+	INTEGRATION_WORLDGUARD                                ("core.integration.worldguard"),
 	INTEGRATION_MAP_OPTIONS_ENABLE_KINGDOMS               ("core.integration.map_options.enable_kingdoms"),
 	INTEGRATION_MAP_OPTIONS_ENABLE_CAMPS                  ("core.integration.map_options.enable_camps"),
 	INTEGRATION_MAP_OPTIONS_ENABLE_SANCTUARIES            ("core.integration.map_options.enable_sanctuaries"),

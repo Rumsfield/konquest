@@ -6,6 +6,9 @@ plugins {
 repositories{
     mavenCentral()
 
+    // WorldEdit & WorldGuard
+    maven("https://maven.enginehub.org/repo/")
+
     // Placeholder API
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 
@@ -44,6 +47,8 @@ dependencies{
     compileOnly("me.clip:placeholderapi:2.11.2")
     compileOnly("net.luckperms:api:5.4")
     compileOnly("com.github.BlueMap-Minecraft:BlueMapAPI:v2.6.0")
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.0.0")
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.0")
 
     implementation("org.xerial:sqlite-jdbc:3.40.1.0")
     implementation(project(":api"))

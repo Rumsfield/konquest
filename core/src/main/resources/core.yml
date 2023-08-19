@@ -180,6 +180,9 @@ core:
     # (*) Enable plugin integration with BlueMap (true/false)
     bluemap: true
 
+    # (*) Enable plugin integration with WorldGuard (true/false)
+    worldguard: true
+
     # //// CORE.INTEGRATION.MAP_OPTIONS \\\\
     map_options:
 

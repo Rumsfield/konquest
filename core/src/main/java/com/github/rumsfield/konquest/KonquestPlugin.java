@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
+import com.github.rumsfield.konquest.hook.WorldGuardRegistry;
 import com.github.rumsfield.konquest.listener.*;
 import com.github.rumsfield.konquest.utility.*;
 import net.milkbowl.vault.economy.Economy;
@@ -25,6 +26,15 @@ public class KonquestPlugin extends JavaPlugin {
 	boolean isSetupEconomy = false;
 	boolean isSetupMetrics = false;
 	boolean isSetupPlaceholders = false;
+
+	@Override
+	public void onLoad() {
+		// Attempt to register WorldGuard flags
+		boolean registerStatus = WorldGuardRegistry.load();
+		if(registerStatus) {
+			ChatUtil.printConsoleAlert("Successfully registered WorldGuard flags.");
+		}
+	}
 
 	@Override
 	public void onEnable() {

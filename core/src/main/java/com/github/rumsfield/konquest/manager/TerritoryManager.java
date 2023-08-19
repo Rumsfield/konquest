@@ -5,6 +5,7 @@ import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.territory.KonquestTerritoryChunkEvent;
 import com.github.rumsfield.konquest.api.manager.KonquestTerritoryManager;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
+import com.github.rumsfield.konquest.hook.WorldGuardRegistry;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
@@ -291,6 +292,14 @@ public class TerritoryManager implements KonquestTerritoryManager {
 	public boolean claimForPlayer(@NotNull KonPlayer player, @NotNull Location claimLoc) {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		World claimWorld = claimLoc.getWorld();
+		// Check for other plugin flags
+		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
+			if(!konquest.getIntegrationManager().getWorldGuard().isFlagAllowed(WorldGuardRegistry.CLAIM,claimLoc,bukkitPlayer)) {
+				// A region is denying this action
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+				return false;
+			}
+		}
 		// Verify no surrounding territory from other kingdoms
     	for(Point point : konquest.getAreaPoints(claimLoc,2)) {
 			if(isChunkClaimed(point,claimWorld)) {
