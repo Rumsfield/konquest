@@ -5,6 +5,7 @@ import com.github.rumsfield.konquest.api.event.camp.KonquestCampCreateEvent;
 import com.github.rumsfield.konquest.api.manager.KonquestCampManager;
 import com.github.rumsfield.konquest.api.model.KonquestCamp;
 import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
+import com.github.rumsfield.konquest.hook.WorldGuardRegistry;
 import com.github.rumsfield.konquest.model.KonCamp;
 import com.github.rumsfield.konquest.model.KonCampGroup;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
@@ -19,6 +20,7 @@ import org.bukkit.World;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -200,10 +202,26 @@ public class CampManager implements KonquestCampManager {
 		}
 		return 0;
 	}
-	
-	public int addCampForPlayer(Location loc, KonPlayer player) {
-		int result = addCamp(loc, player);
-		if(result == 0) {
+
+	// Return false to cancel placing a bed
+	public boolean addCampForPlayer(Location loc, KonPlayer player) {
+		Player bukkitPlayer = player.getBukkitPlayer();
+		// Check for other plugin flags
+		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
+			// Check new territory claims
+			int radius = konquest.getCore().getInt(CorePath.CAMPS_INIT_RADIUS.getPath());
+			World locWorld = loc.getWorld();
+			for(Point point : konquest.getAreaPoints(loc, radius)) {
+				if(!konquest.getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.CLAIM,locWorld,point,bukkitPlayer)) {
+					// A region is denying this action
+					ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
+					return false;
+				}
+			}
+		}
+		// Try to add the camp
+		int status = addCamp(loc, player);
+		if(status == 0) { // on successful camp setup...
 			KonCamp newCamp = getCamp(player);
 			if(newCamp != null) {
 				// Fire event
@@ -213,8 +231,33 @@ public class CampManager implements KonquestCampManager {
 				player.getBukkitPlayer().setBedSpawnLocation(loc, true);
 				ChatUtil.sendKonTitle(player, "", Konquest.barbarianColor2+newCamp.getName());
 			}
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
+		} else {
+			switch(status) {
+				case 1:
+					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
+					return false;
+				case 2:
+					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
+					return false;
+				case 3:
+					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
+					return false;
+				case 4:
+					// This error message is removed because it could be annoying to see it every time a bed is placed when camps are disabled.
+					break;
+				case 5:
+					// This error message is removed because it could be annoying to see it every time a bed is placed in an invalid world.
+					break;
+				case 6:
+					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_FAIL_OFFLINE.getMessage());
+					break;
+				default:
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+					break;
+			}
 		}
-		return result;
+		return true;
 	}
 	
 	public boolean removeCamp(KonquestOfflinePlayer player) {

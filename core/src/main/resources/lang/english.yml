@@ -741,6 +741,12 @@ shop:
     create-monument: "Cannot create a shop inside of monuments!"
     create-fail: "Cannot create a shop here!"
     create-wild: "Cannot create shops in the wild!"
+region:
+  error:
+    claim-deny: "A nearby region denies claiming this land."
+    unclaim-deny: "A nearby region denies unclaiming this land."
+    travel-enter-deny: "A region at the destination denies traveling into it."
+    travel-exit-deny: "A region at your current location denies traveling out of it."
 directive:
   create-kingdom: "Foundations"
   create-kingdom-info: "Create your own Kingdom."

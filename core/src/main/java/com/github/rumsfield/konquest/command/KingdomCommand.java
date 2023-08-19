@@ -1,16 +1,20 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.hook.WorldGuardRegistry;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.ColorRGB;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -92,6 +96,21 @@ public class KingdomCommand extends CommandBase {
 						if(getKonquest().validateName(newKingdomName,bukkitPlayer) != 0) {
 							// Player receives error message within validateName method
 							return;
+						}
+
+						// Check for other plugin flags
+						if(getKonquest().getIntegrationManager().getWorldGuard().isEnabled()) {
+							// Check new territory claims
+							Location settleLoc = bukkitPlayer.getLocation();
+							int radius = getKonquest().getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath());
+							World locWorld = settleLoc.getWorld();
+							for(Point point : getKonquest().getAreaPoints(settleLoc, radius)) {
+								if(!getKonquest().getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.CLAIM,locWorld,point,bukkitPlayer)) {
+									// A region is denying this action
+									ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
+									return;
+								}
+							}
 						}
 
 						int createStatus = getKonquest().getKingdomManager().createKingdom(bukkitPlayer.getLocation(), newKingdomName, templateName, player, false);

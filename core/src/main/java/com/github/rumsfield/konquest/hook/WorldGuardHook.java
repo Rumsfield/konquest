@@ -80,12 +80,12 @@ public class WorldGuardHook implements PluginHook {
         return new ProtectedCuboidRegion("konquest_chunk_temporary", true, pt1, pt2);
     }
 
-    public boolean isFlagAllowed(StateFlag flag, Location loc, Player player) {
+    public boolean isChunkFlagAllowed(StateFlag flag, Location loc, Player player) {
         assert loc.getWorld() != null;
-        return isFlagAllowed(flag, loc.getWorld(), Konquest.toPoint(loc), player);
+        return isChunkFlagAllowed(flag, loc.getWorld(), Konquest.toPoint(loc), player);
     }
 
-    public boolean isFlagAllowed(StateFlag flag, World world, Point point, Player player) {
+    public boolean isChunkFlagAllowed(StateFlag flag, World world, Point point, Player player) {
         if(!isEnabled) {
             // WorldGuard integration is disabled, always allow
             return true;
@@ -103,4 +103,26 @@ public class WorldGuardHook implements PluginHook {
         ApplicableRegionSet overlappingChunkRegions = regions.getApplicableRegions(toChunkRegion(world, point));
         return overlappingChunkRegions.testState(WorldGuardPlugin.inst().wrapPlayer(player), flag);
     }
+
+    public boolean isLocationFlagAllowed(StateFlag flag, Location loc, Player player) {
+        if(!isEnabled) {
+            // WorldGuard integration is disabled, always allow
+            return true;
+        }
+        if(!WorldGuardRegistry.isAvailable) {
+            // WorldGuard integration did not register custom flags, always allow
+            return true;
+        }
+        assert loc.getWorld() != null;
+        RegionContainer container = wgAPI.getPlatform().getRegionContainer();
+        RegionManager regions = container.get(BukkitAdapter.adapt(loc.getWorld()));
+        if(regions == null) {
+            // No regions available in this world, always allow
+            return true;
+        }
+        BlockVector3 pos = BlockVector3.at(loc.getX(),loc.getY(),loc.getZ());
+        ApplicableRegionSet overlappingChunkRegions = regions.getApplicableRegions(pos);
+        return overlappingChunkRegions.testState(WorldGuardPlugin.inst().wrapPlayer(player), flag);
+    }
+
 }

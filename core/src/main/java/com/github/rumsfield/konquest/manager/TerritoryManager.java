@@ -294,9 +294,9 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		World claimWorld = claimLoc.getWorld();
 		// Check for other plugin flags
 		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
-			if(!konquest.getIntegrationManager().getWorldGuard().isFlagAllowed(WorldGuardRegistry.CLAIM,claimLoc,bukkitPlayer)) {
+			if(!konquest.getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.CLAIM,claimLoc,bukkitPlayer)) {
 				// A region is denying this action
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+				ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
 				return false;
 			}
 		}
@@ -496,6 +496,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 	public boolean claimRadiusForPlayer(@NotNull KonPlayer player, Location claimLoc, int radius) {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		World claimWorld = claimLoc.getWorld();
+		assert claimWorld != null;
 		// Verify no surrounding territory from other kingdoms
 		for(Point point : konquest.getAreaPoints(claimLoc,radius+1)) {
 			if(isChunkClaimed(point,claimWorld)) {
@@ -519,6 +520,17 @@ public class TerritoryManager implements KonquestTerritoryManager {
     			toClaimChunks.add(point);
     		}
     	}
+		// Check for other plugin flags
+		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
+			// For all claiming chunks
+			for(Point testPoint : toClaimChunks) {
+				if(!konquest.getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.CLAIM,claimWorld,testPoint,bukkitPlayer)) {
+					// A region is denying this action
+					ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
+					return false;
+				}
+			}
+		}
     	// Ensure player can cover the cost
     	int unclaimedChunkAmount = toClaimChunks.size();
     	double cost = konquest.getCore().getDouble(CorePath.FAVOR_COST_CLAIM.getPath());
@@ -694,10 +706,14 @@ public class TerritoryManager implements KonquestTerritoryManager {
 	// Main method for admins to un-claim an individual chunk.
     // Calls event.
 	public boolean unclaimForAdmin(Player bukkitPlayer, Location claimLoc) {
+		// Get territory name
+		KonTerritory territory = getChunkTerritory(claimLoc);
+		String territoryName = territory.getName();
+
+		// Attempt to unclaim the current chunk
 		int unclaimStatus = unclaimChunk(claimLoc, true);
     	switch(unclaimStatus) {
     	case 0:
-			String territoryName = getChunkTerritory(claimLoc).getName();
 			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_SUCCESS.getMessage("1",territoryName));
     		break;
     	case 1:
@@ -737,6 +753,15 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		} else {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_FAIL_UNCLAIMED.getMessage());
 			return false;
+		}
+
+		// Check for other plugin flags
+		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
+			if(!konquest.getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.UNCLAIM,claimLoc,bukkitPlayer)) {
+				// A region is denying this action
+				ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_UNCLAIM_DENY.getMessage());
+				return false;
+			}
 		}
 		
 		// Get territory name
@@ -859,6 +884,9 @@ public class TerritoryManager implements KonquestTerritoryManager {
 	public boolean unclaimRadiusForPlayer(Player bukkitPlayer, Location claimLoc, int radius) {
 		//KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
 		// Verify town at location, and player is lord
+		HashSet<Point> toUnclaimChunks = new HashSet<>();
+		World claimWorld = claimLoc.getWorld();
+		assert claimWorld != null;
 		if(this.isChunkClaimed(claimLoc)) {
 			KonTerritory territory = this.getChunkTerritory(claimLoc);
 			if(territory instanceof KonTown) {
@@ -871,18 +899,34 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_FAIL_TOWN.getMessage());
 				return false;
 			}
+			// Determine which chunks to unclaim for flag check(s)
+			Point territoryCenter = Konquest.toPoint(territory.getCenterLoc());
+			for(Point point : konquest.getAreaPoints(claimLoc,radius)) {
+				if(territory.getChunkPoints().contains(point) && !territoryCenter.equals(point)) {
+					toUnclaimChunks.add(point);
+				}
+			}
 		} else {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_FAIL_UNCLAIMED.getMessage());
 			return false;
 		}
-		
+		// Check for other plugin flags
+		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
+			// For all unclaiming chunks
+			for(Point testPoint : toUnclaimChunks) {
+				if(!konquest.getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.UNCLAIM,claimWorld,testPoint,bukkitPlayer)) {
+					// A region is denying this action
+					ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_UNCLAIM_DENY.getMessage());
+					return false;
+				}
+			}
+		}
 		// Find adjacent or current territory
 		KonTerritory unclaimTerritory = getChunkTerritory(claimLoc);
 		if(unclaimTerritory == null) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_FAIL_UNCLAIMED.getMessage());
     		return false;
 		}
-		
 		// Attempt to un-claim
     	int preClaimLand = unclaimTerritory.getChunkPoints().size();
     	int postClaimLand;

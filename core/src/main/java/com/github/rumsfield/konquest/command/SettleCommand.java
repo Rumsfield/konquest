@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerSettleEvent;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownSettleEvent;
+import com.github.rumsfield.konquest.hook.WorldGuardRegistry;
 import com.github.rumsfield.konquest.model.KonDirective;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonStatsType;
@@ -11,10 +12,13 @@ import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,6 +51,20 @@ public class SettleCommand extends CommandBase {
 			if(!bukkitPlayer.hasPermission("konquest.create.town")) {
 				ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" konquest.create.town");
 				return;
+			}
+			// Check for other plugin flags
+			if(getKonquest().getIntegrationManager().getWorldGuard().isEnabled()) {
+				// Check new territory claims
+				Location settleLoc = bukkitPlayer.getLocation();
+				int radius = getKonquest().getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath());
+				World locWorld = settleLoc.getWorld();
+				for(Point point : getKonquest().getAreaPoints(settleLoc, radius)) {
+					if(!getKonquest().getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.CLAIM,locWorld,point,bukkitPlayer)) {
+						// A region is denying this action
+						ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
+						return;
+					}
+				}
 			}
         	
         	double cost = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());

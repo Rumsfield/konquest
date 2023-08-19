@@ -651,6 +651,11 @@ public enum MessagePath {
 	SHOP_ERROR_CREATE_FAIL                      (0, "shop.error.create-fail"),
 	SHOP_ERROR_CREATE_WILD                      (0, "shop.error.create-wild"),
 
+	REGION_ERROR_CLAIM_DENY                     (0, "region.error.claim-deny"),
+	REGION_ERROR_UNCLAIM_DENY                   (0, "region.error.unclaim-deny"),
+	REGION_ERROR_TRAVEL_ENTER_DENY              (0, "region.error.travel-enter-deny"),
+	REGION_ERROR_TRAVEL_EXIT_DENY               (0, "region.error.travel-exit-deny"),
+
 	DIRECTIVE_CREATE_KINGDOM                    (0, "directive.create-kingdom"),
 	DIRECTIVE_CREATE_KINGDOM_INFO               (0, "directive.create-kingdom-info"),
 	DIRECTIVE_SETTLE_TOWN                       (0, "directive.settle-town"),
