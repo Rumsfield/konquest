@@ -1,7 +1,7 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.hook.WorldGuardRegistry;
+import com.github.rumsfield.konquest.hook.WorldGuardHook;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.ColorRGB;
@@ -105,7 +105,7 @@ public class KingdomCommand extends CommandBase {
 							int radius = getKonquest().getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath());
 							World locWorld = settleLoc.getWorld();
 							for(Point point : getKonquest().getAreaPoints(settleLoc, radius)) {
-								if(!getKonquest().getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.CLAIM,locWorld,point,bukkitPlayer)) {
+								if(!getKonquest().getIntegrationManager().getWorldGuard().isChunkClaimAllowed(locWorld,point,bukkitPlayer)) {
 									// A region is denying this action
 									ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
 									return;

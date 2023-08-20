@@ -373,7 +373,7 @@ core:
     # Maximum distance in chunks between land claims and the town center monument (0 to disable, integer >= 0)
     max_size: 16
     
-    # Depth below the monument base in blocks to check for excess air when settling a new town (0 to disable, integer >= 0)
+    # Depth below the monument base in blocks to check for excess water and air when settling a new town (0 to disable, integer >= 0)
     settle_checks_depth: 32
     
     # Maximum height difference in blocks in the chunks of new town settlements (-1 to disable, integer >= 0)

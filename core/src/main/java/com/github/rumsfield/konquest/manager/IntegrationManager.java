@@ -8,8 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 
 
 public class IntegrationManager {
@@ -87,7 +85,7 @@ public class IntegrationManager {
 				break;
 			case 1:
 				//result = ChatUtil.parseHex("#5080B0")+"Missing JAR"; // Light Blue
-				result = ChatColor.DARK_AQUA+"Missing JAR";
+				result = ChatColor.DARK_AQUA+"Not Loaded";
 				break;
 			case 2:
 				//result = ChatUtil.parseHex("#B040C0")+"Disabled"; // Light Purple

@@ -27,6 +27,7 @@ public class QuickShopHook implements PluginHook {
 
 	@Override
 	public int reload() {
+		isEnabled = false;
 		// Attempt to integrate QuickShop
 		Plugin quickShop = Bukkit.getPluginManager().getPlugin("QuickShop");
 		if(quickShop == null) {

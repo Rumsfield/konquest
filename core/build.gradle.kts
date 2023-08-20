@@ -47,8 +47,8 @@ dependencies{
     compileOnly("me.clip:placeholderapi:2.11.2")
     compileOnly("net.luckperms:api:5.4")
     compileOnly("com.github.BlueMap-Minecraft:BlueMapAPI:v2.6.0")
-    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.0.0")
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.0")
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.15")
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5")
 
     implementation("org.xerial:sqlite-jdbc:3.40.1.0")
     implementation(project(":api"))

@@ -2,38 +2,27 @@ package com.github.rumsfield.konquest.hook;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.utility.CorePath;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
 public class WorldGuardHook implements PluginHook {
 
     private final Konquest konquest;
-    private WorldGuard wgAPI;
-    private boolean isEnabled;
+    private boolean isEnabled = false;
 
     public WorldGuardHook(Konquest konquest) {
         this.konquest = konquest;
-        this.wgAPI = null;
-        this.isEnabled = false;
     }
 
     @Override
     public int reload() {
+        isEnabled = false;
         // Attempt to integrate WorldGuard
         Plugin worldGuard = Bukkit.getPluginManager().getPlugin("WorldGuard");
         if(worldGuard == null){
@@ -45,7 +34,6 @@ public class WorldGuardHook implements PluginHook {
         if(!konquest.getCore().getBoolean(CorePath.INTEGRATION_WORLDGUARD.getPath(),false)) {
             return 3;
         }
-        wgAPI = WorldGuard.getInstance();
         isEnabled = true;
         return 0;
     }
@@ -65,64 +53,46 @@ public class WorldGuardHook implements PluginHook {
         return "WorldGuard";
     }
 
-    @Nullable
-    public WorldGuard getAPI() {
-        return wgAPI;
-    }
-
-    private ProtectedCuboidRegion toChunkRegion(World world, Point point) {
-        int chunkBlockX = point.x << 4;
-        int chunkBlockZ = point.y << 4;
-        int chunkMinY = world.getMinHeight();
-        int chunkMaxY = world.getMaxHeight();
-        BlockVector3 pt1 = BlockVector3.at(chunkBlockX, chunkMinY, chunkBlockZ);
-        BlockVector3 pt2 = BlockVector3.at(chunkBlockX + 15, chunkMaxY, chunkBlockZ + 15);
-        return new ProtectedCuboidRegion("konquest_chunk_temporary", true, pt1, pt2);
-    }
-
-    public boolean isChunkFlagAllowed(StateFlag flag, Location loc, Player player) {
+    public boolean isChunkClaimAllowed(Location loc, Player player) {
         assert loc.getWorld() != null;
-        return isChunkFlagAllowed(flag, loc.getWorld(), Konquest.toPoint(loc), player);
+        return isChunkClaimAllowed(loc.getWorld(), Konquest.toPoint(loc), player);
     }
 
-    public boolean isChunkFlagAllowed(StateFlag flag, World world, Point point, Player player) {
+    public boolean isChunkClaimAllowed(World world, Point point, Player player) {
         if(!isEnabled) {
             // WorldGuard integration is disabled, always allow
             return true;
         }
-        if(!WorldGuardRegistry.isAvailable) {
-            // WorldGuard integration did not register custom flags, always allow
-            return true;
-        }
-        RegionContainer container = wgAPI.getPlatform().getRegionContainer();
-        RegionManager regions = container.get(BukkitAdapter.adapt(world));
-        if(regions == null) {
-            // No regions available in this world, always allow
-            return true;
-        }
-        ApplicableRegionSet overlappingChunkRegions = regions.getApplicableRegions(toChunkRegion(world, point));
-        return overlappingChunkRegions.testState(WorldGuardPlugin.inst().wrapPlayer(player), flag);
+        return WorldGuardExec.isChunkClaimAllowed(world, point, player);
     }
 
-    public boolean isLocationFlagAllowed(StateFlag flag, Location loc, Player player) {
+    public boolean isChunkUnclaimAllowed(Location loc, Player player) {
+        assert loc.getWorld() != null;
+        return isChunkUnclaimAllowed(loc.getWorld(), Konquest.toPoint(loc), player);
+    }
+
+    public boolean isChunkUnclaimAllowed(World world, Point point, Player player) {
         if(!isEnabled) {
             // WorldGuard integration is disabled, always allow
             return true;
         }
-        if(!WorldGuardRegistry.isAvailable) {
-            // WorldGuard integration did not register custom flags, always allow
+        return WorldGuardExec.isChunkUnclaimAllowed(world, point, player);
+    }
+
+    public boolean isLocationTravelEnterAllowed(Location loc, Player player) {
+        if(!isEnabled) {
+            // WorldGuard integration is disabled, always allow
             return true;
         }
-        assert loc.getWorld() != null;
-        RegionContainer container = wgAPI.getPlatform().getRegionContainer();
-        RegionManager regions = container.get(BukkitAdapter.adapt(loc.getWorld()));
-        if(regions == null) {
-            // No regions available in this world, always allow
+        return WorldGuardExec.isLocationTravelEnterAllowed(loc, player);
+    }
+
+    public boolean isLocationTravelExitAllowed(Location loc, Player player) {
+        if(!isEnabled) {
+            // WorldGuard integration is disabled, always allow
             return true;
         }
-        BlockVector3 pos = BlockVector3.at(loc.getX(),loc.getY(),loc.getZ());
-        ApplicableRegionSet overlappingChunkRegions = regions.getApplicableRegions(pos);
-        return overlappingChunkRegions.testState(WorldGuardPlugin.inst().wrapPlayer(player), flag);
+        return WorldGuardExec.isLocationTravelExitAllowed(loc, player);
     }
 
 }

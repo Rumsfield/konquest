@@ -2,7 +2,7 @@ package com.github.rumsfield.konquest.manager;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
-import com.github.rumsfield.konquest.hook.WorldGuardRegistry;
+import com.github.rumsfield.konquest.hook.WorldGuardHook;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonStatsType;
 import com.github.rumsfield.konquest.model.KonTerritory;
@@ -47,13 +47,13 @@ public class TravelManager implements Timeable {
 		// Check for other plugin flags
 		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
 			// Origin location
-			if(!konquest.getIntegrationManager().getWorldGuard().isLocationFlagAllowed(WorldGuardRegistry.TRAVEL_EXIT,bukkitPlayer.getLocation(),bukkitPlayer)) {
+			if(!konquest.getIntegrationManager().getWorldGuard().isLocationTravelExitAllowed(bukkitPlayer.getLocation(),bukkitPlayer)) {
 				// A region is denying this action
 				ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_TRAVEL_EXIT_DENY.getMessage());
 				return;
 			}
 			// Destination location
-			if(!konquest.getIntegrationManager().getWorldGuard().isLocationFlagAllowed(WorldGuardRegistry.TRAVEL_ENTER,travelLoc,bukkitPlayer)) {
+			if(!konquest.getIntegrationManager().getWorldGuard().isLocationTravelEnterAllowed(travelLoc,bukkitPlayer)) {
 				// A region is denying this action
 				ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_TRAVEL_ENTER_DENY.getMessage());
 				return;

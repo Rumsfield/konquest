@@ -5,7 +5,7 @@ import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.territory.KonquestTerritoryChunkEvent;
 import com.github.rumsfield.konquest.api.manager.KonquestTerritoryManager;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.hook.WorldGuardRegistry;
+import com.github.rumsfield.konquest.hook.WorldGuardHook;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
@@ -294,7 +294,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		World claimWorld = claimLoc.getWorld();
 		// Check for other plugin flags
 		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
-			if(!konquest.getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.CLAIM,claimLoc,bukkitPlayer)) {
+			if(!konquest.getIntegrationManager().getWorldGuard().isChunkClaimAllowed(claimLoc,bukkitPlayer)) {
 				// A region is denying this action
 				ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
 				return false;
@@ -524,7 +524,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
 			// For all claiming chunks
 			for(Point testPoint : toClaimChunks) {
-				if(!konquest.getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.CLAIM,claimWorld,testPoint,bukkitPlayer)) {
+				if(!konquest.getIntegrationManager().getWorldGuard().isChunkClaimAllowed(claimWorld,testPoint,bukkitPlayer)) {
 					// A region is denying this action
 					ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
 					return false;
@@ -757,7 +757,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 
 		// Check for other plugin flags
 		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
-			if(!konquest.getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.UNCLAIM,claimLoc,bukkitPlayer)) {
+			if(!konquest.getIntegrationManager().getWorldGuard().isChunkUnclaimAllowed(claimLoc,bukkitPlayer)) {
 				// A region is denying this action
 				ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_UNCLAIM_DENY.getMessage());
 				return false;
@@ -914,7 +914,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
 			// For all unclaiming chunks
 			for(Point testPoint : toUnclaimChunks) {
-				if(!konquest.getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.UNCLAIM,claimWorld,testPoint,bukkitPlayer)) {
+				if(!konquest.getIntegrationManager().getWorldGuard().isChunkUnclaimAllowed(claimWorld,testPoint,bukkitPlayer)) {
 					// A region is denying this action
 					ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_UNCLAIM_DENY.getMessage());
 					return false;

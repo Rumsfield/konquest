@@ -4,7 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerSettleEvent;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownSettleEvent;
-import com.github.rumsfield.konquest.hook.WorldGuardRegistry;
+import com.github.rumsfield.konquest.hook.WorldGuardHook;
 import com.github.rumsfield.konquest.model.KonDirective;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonStatsType;
@@ -59,7 +59,7 @@ public class SettleCommand extends CommandBase {
 				int radius = getKonquest().getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath());
 				World locWorld = settleLoc.getWorld();
 				for(Point point : getKonquest().getAreaPoints(settleLoc, radius)) {
-					if(!getKonquest().getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.CLAIM,locWorld,point,bukkitPlayer)) {
+					if(!getKonquest().getIntegrationManager().getWorldGuard().isChunkClaimAllowed(locWorld,point,bukkitPlayer)) {
 						// A region is denying this action
 						ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
 						return;

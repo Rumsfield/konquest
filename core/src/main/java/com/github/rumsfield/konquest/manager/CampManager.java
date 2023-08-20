@@ -5,7 +5,7 @@ import com.github.rumsfield.konquest.api.event.camp.KonquestCampCreateEvent;
 import com.github.rumsfield.konquest.api.manager.KonquestCampManager;
 import com.github.rumsfield.konquest.api.model.KonquestCamp;
 import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
-import com.github.rumsfield.konquest.hook.WorldGuardRegistry;
+import com.github.rumsfield.konquest.hook.WorldGuardHook;
 import com.github.rumsfield.konquest.model.KonCamp;
 import com.github.rumsfield.konquest.model.KonCampGroup;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
@@ -212,7 +212,7 @@ public class CampManager implements KonquestCampManager {
 			int radius = konquest.getCore().getInt(CorePath.CAMPS_INIT_RADIUS.getPath());
 			World locWorld = loc.getWorld();
 			for(Point point : konquest.getAreaPoints(loc, radius)) {
-				if(!konquest.getIntegrationManager().getWorldGuard().isChunkFlagAllowed(WorldGuardRegistry.CLAIM,locWorld,point,bukkitPlayer)) {
+				if(!konquest.getIntegrationManager().getWorldGuard().isChunkClaimAllowed(locWorld,point,bukkitPlayer)) {
 					// A region is denying this action
 					ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
 					return false;

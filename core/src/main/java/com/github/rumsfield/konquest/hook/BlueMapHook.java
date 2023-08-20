@@ -26,6 +26,7 @@ public class BlueMapHook implements PluginHook {
 
     @Override
     public int reload() {
+        isEnabled = false;
         // Attempt to integrate BlueMap
         Plugin bluemap = Bukkit.getPluginManager().getPlugin("BlueMap");
         if(bluemap == null){

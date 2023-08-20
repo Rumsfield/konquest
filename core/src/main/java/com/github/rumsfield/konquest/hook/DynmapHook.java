@@ -27,6 +27,7 @@ public class DynmapHook implements PluginHook {
 
     @Override
     public int reload() {
+        isEnabled = false;
         // Attempt to integrate Dynmap
         Plugin dynmap = Bukkit.getPluginManager().getPlugin("dynmap");
         if(dynmap == null){

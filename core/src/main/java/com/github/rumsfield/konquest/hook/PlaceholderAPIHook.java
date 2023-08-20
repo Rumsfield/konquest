@@ -13,6 +13,7 @@ public class PlaceholderAPIHook implements PluginHook {
 
     @Override
     public int reload() {
+        isEnabled = false;
         Plugin placeholderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
         if(placeholderAPI == null) {
             return 1;

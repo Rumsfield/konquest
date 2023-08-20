@@ -1,7 +1,7 @@
 package com.github.rumsfield.konquest;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
-import com.github.rumsfield.konquest.hook.WorldGuardRegistry;
+import com.github.rumsfield.konquest.hook.WorldGuardExec;
 import com.github.rumsfield.konquest.listener.*;
 import com.github.rumsfield.konquest.utility.*;
 import net.milkbowl.vault.economy.Economy;
@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
@@ -30,7 +31,12 @@ public class KonquestPlugin extends JavaPlugin {
 	@Override
 	public void onLoad() {
 		// Attempt to register WorldGuard flags
-		boolean registerStatus = WorldGuardRegistry.load();
+		Plugin worldGuard = Bukkit.getPluginManager().getPlugin("WorldGuard");
+		// WorldGuard must be present but not yet enabled to register flags.
+		if(worldGuard == null){
+			return;
+		}
+		boolean registerStatus = WorldGuardExec.load();
 		if(registerStatus) {
 			ChatUtil.printConsoleAlert("Successfully registered WorldGuard flags.");
 		}
