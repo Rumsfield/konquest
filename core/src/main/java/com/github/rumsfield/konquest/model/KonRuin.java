@@ -155,8 +155,13 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	public void regenCriticalBlocks() {
 		for(Location loc : criticalLocations.keySet()) {
 			criticalLocations.put(loc, true);
-			loc.getWorld().getBlockAt(loc).setType(getKonquest().getRuinManager().getRuinCriticalBlock());
-			loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_PLACE, 1.0F, 0.6F);
+			if(loc.getWorld() != null) {
+				loc.getWorld().getChunkAt(loc).load();
+				loc.getWorld().getBlockAt(loc).setType(getKonquest().getRuinManager().getRuinCriticalBlock());
+				loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_PLACE, 1.0F, 0.6F);
+			} else {
+				ChatUtil.printDebug("Failed to regen critical ruin location in invalid world.");
+			}
 		}
 	}
 	
@@ -212,6 +217,15 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	
 	public void setBarProgress(double progress) {
 		ruinBarAll.setProgress(progress);
+	}
+
+	// Used for loading critical locations from file, because there may or may not be a valid
+	// critical block at the location.
+	public void setCriticalLocation(Location loc) {
+		// Check that the location is inside of this ruin
+		if(!this.isLocInside(loc)) return;
+		criticalLocations.put(loc, true);
+		getKonquest().getMapHandler().drawLabel(this);
 	}
 
 	public boolean addCriticalLocation(Location loc) {
