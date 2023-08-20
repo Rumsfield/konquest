@@ -34,6 +34,7 @@ public class LuckPermsHook implements PluginHook {
 
 	@Override
 	public int reload() {
+		isEnabled = false;
 		// Attempt to integrate Luckperms
 		Plugin luckPerms = Bukkit.getPluginManager().getPlugin("LuckPerms");
 		if(luckPerms == null){

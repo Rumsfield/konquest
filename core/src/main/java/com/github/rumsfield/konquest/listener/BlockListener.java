@@ -782,36 +782,9 @@ public class BlockListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
-					int status = campManager.addCampForPlayer(event.getBlock().getLocation(), player);
-					if(status == 0) { // on successful camp setup...
-						ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
-					} else {
-						switch(status) {
-				    	case 1:
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
-				    		event.setCancelled(true);
-				    		break;
-				    	case 2:
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
-				    		event.setCancelled(true);
-				    		break;
-				    	case 3:
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
-				    		event.setCancelled(true);
-				    		break;
-				    	case 4:
-				    		// This error message is removed because it could be annoying to see it every time a bed is placed when camps are disabled.
-				    		break;
-				    	case 5:
-				    		// This error message is removed because it could be annoying to see it every time a bed is placed in an invalid world.
-				    		break;
-						case 6:
-							ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OFFLINE.getMessage());
-							break;
-				    	default:
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-				    		break;
-						}
+					boolean status = campManager.addCampForPlayer(event.getBlock().getLocation(), player);
+					if(!status) {
+						event.setCancelled(true);
 					}
 				} else {
 					// Wild placement by non-barbarian
