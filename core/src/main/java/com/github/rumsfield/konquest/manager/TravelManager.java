@@ -2,7 +2,6 @@ package com.github.rumsfield.konquest.manager;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
-import com.github.rumsfield.konquest.hook.WorldGuardHook;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonStatsType;
 import com.github.rumsfield.konquest.model.KonTerritory;

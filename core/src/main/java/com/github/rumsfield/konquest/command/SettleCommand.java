@@ -4,7 +4,6 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerSettleEvent;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownSettleEvent;
-import com.github.rumsfield.konquest.hook.WorldGuardHook;
 import com.github.rumsfield.konquest.model.KonDirective;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonStatsType;

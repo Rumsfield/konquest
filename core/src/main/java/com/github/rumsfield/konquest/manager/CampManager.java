@@ -5,7 +5,6 @@ import com.github.rumsfield.konquest.api.event.camp.KonquestCampCreateEvent;
 import com.github.rumsfield.konquest.api.manager.KonquestCampManager;
 import com.github.rumsfield.konquest.api.model.KonquestCamp;
 import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
-import com.github.rumsfield.konquest.hook.WorldGuardHook;
 import com.github.rumsfield.konquest.model.KonCamp;
 import com.github.rumsfield.konquest.model.KonCampGroup;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
