@@ -391,17 +391,11 @@ public class BlockListener implements Listener {
 						// Prevent critical block drop
 						event.setDropItems(false);
 						// Restart capture cooldown timer
-						int ruinCaptureTimeSeconds = konquest.getCore().getInt(CorePath.RUINS_CAPTURE_COOLDOWN.getPath());
-						Timer captureTimer = ruin.getCaptureTimer();
-						captureTimer.stopTimer();
-						captureTimer.setTime(ruinCaptureTimeSeconds);
-						captureTimer.startTimer();
-						ChatUtil.printDebug("Starting ruin capture timer for "+ruinCaptureTimeSeconds+" seconds with taskID "+captureTimer.getTaskID()+" for Ruin "+ruin.getName());
+						ruin.startCaptureTimer();
 						// Disable broken critical block
 						ruin.setCriticalLocationEnabled(breakLoc, false);
 						// Update bar progress
-						double progress = (double)(ruin.getRemainingCriticalHits()) / (double)ruin.getMaxCriticalHits();
-						ruin.setBarProgress(progress);
+						ruin.updateBarProgress();
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CRITICAL.getMessage(ruin.getRemainingCriticalHits()));
 						event.getBlock().getWorld().playSound(breakLoc, Sound.BLOCK_FIRE_EXTINGUISH, 1.0F, 0.6F);
 						// Evaluate critical blocks

@@ -20,6 +20,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 
 	private final Timer spawnTimer;
 	private final Timer captureTimer;
+	private final Timer captureCountdownTimer;
 	private boolean isCaptureDisabled;
 	private final BossBar ruinBarAll;
 	private final Map<KonPropertyFlag,Boolean> properties;
@@ -40,6 +41,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		super(loc, name, kingdom, konquest);
 		this.spawnTimer = new Timer(this);
 		this.captureTimer = new Timer(this);
+		this.captureCountdownTimer = new Timer(this);
 		this.isCaptureDisabled = false;
 		this.ruinBarAll = Bukkit.getServer().createBossBar(Konquest.neutralColor2+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SOLID);
 		this.ruinBarAll.setVisible(true);
@@ -129,17 +131,24 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 			ChatUtil.printDebug("Ruin Capture Timer ended with taskID: "+taskID);
 			// When a capture cooldown timer ends
 			isCaptureDisabled = false;
+			captureCountdownTimer.stopTimer();
 			setBarProgress(1.0);
+			updateBarTitle();
 			regenCriticalBlocks();
 			if(isEmpty()) {
 				removeAllGolems();
 			} else {
 				spawnAllGolems();
 			}
+			getKonquest().getLootManager().resetRuinLoot(this);
+		} else if(taskID == captureCountdownTimer.getTaskID()) {
+			// Update capture countdown title
+			String remainingTime = Konquest.getTimeFormat(captureTimer.getTime(),ChatColor.RED);
+			ruinBarAll.setTitle(Konquest.neutralColor2+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName()+" "+remainingTime);
 		} else {
 			// Check for respawn timer in golem spawn map
 			for(KonRuinGolem golem : spawnLocations.values()) {
-				if(taskID == golem.getRespawnTimer().getTaskID()) {
+				if(taskID == golem.getRespawnTimerId()) {
 					// This golem's respawn timer expired, try to spawn it
 					golem.setIsRespawnCooldown(false);
 					if(!isCaptureDisabled && !isEmpty()) {
@@ -155,28 +164,45 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	public void regenCriticalBlocks() {
 		for(Location loc : criticalLocations.keySet()) {
 			criticalLocations.put(loc, true);
-			loc.getWorld().getBlockAt(loc).setType(getKonquest().getRuinManager().getRuinCriticalBlock());
-			loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_PLACE, 1.0F, 0.6F);
+			if(loc.getWorld() != null) {
+				loc.getWorld().getChunkAt(loc).load();
+				loc.getWorld().getBlockAt(loc).setType(getKonquest().getRuinManager().getRuinCriticalBlock());
+				loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_PLACE, 1.0F, 0.6F);
+			} else {
+				ChatUtil.printDebug("Failed to regen critical ruin location in invalid world.");
+			}
 		}
 	}
 	
 	public boolean isCaptureDisabled() {
 		return isCaptureDisabled;
 	}
-	
+
+	/**
+	 * Changes the state of the ruin to allow or deny capturing by players.
+	 * @param val True to deny capture, false to allow
+	 */
 	public void setIsCaptureDisabled(boolean val) {
 		isCaptureDisabled = val;
 		if(val) {
+			// Deny capturing this ruin until capture timer ends
 			killAllGolems();
+			// Start countdown timer
+			captureCountdownTimer.stopTimer();
+			captureCountdownTimer.setTime(0);
+			captureCountdownTimer.startLoopTimer();
 		}
 	}
 	
-	public Timer getSpawnTimer() {
-		return spawnTimer;
-	}
-	
-	public Timer getCaptureTimer() {
-		return captureTimer;
+	public void startCaptureTimer() {
+		// The capture timer is started every time a critical block is destroyed.
+		// This means that there could be only a few critical blocks broken, but capture is not yet disabled.
+		// When the capture timer ends, all criticals are regenerated.
+		int ruinCaptureTimeSeconds = getKonquest().getCore().getInt(CorePath.RUINS_CAPTURE_COOLDOWN.getPath());
+		captureTimer.stopTimer();
+		captureTimer.setTime(ruinCaptureTimeSeconds);
+		captureTimer.startTimer();
+		ChatUtil.printDebug("Starting ruin capture timer for "+ruinCaptureTimeSeconds+" seconds with taskID "+captureTimer.getTaskID()+" for Ruin "+getName());
 	}
 	
 	public String getCaptureCooldownString() {
@@ -209,9 +235,23 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	public void updateBarTitle() {
 		ruinBarAll.setTitle(Konquest.neutralColor2+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName());
 	}
+
+	public void updateBarProgress() {
+		double progress = (double)(getRemainingCriticalHits()) / (double)getMaxCriticalHits();
+		setBarProgress(progress);
+	}
 	
 	public void setBarProgress(double progress) {
 		ruinBarAll.setProgress(progress);
+	}
+
+	// Used for loading critical locations from file, because there may or may not be a valid
+	// critical block at the location.
+	public void setCriticalLocation(Location loc) {
+		// Check that the location is inside of this ruin
+		if(!this.isLocInside(loc)) return;
+		criticalLocations.put(loc, true);
+		getKonquest().getMapHandler().drawLabel(this);
 	}
 
 	public boolean addCriticalLocation(Location loc) {
@@ -455,9 +495,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 				golem.setIsRespawnCooldown(true);
 				golem.setLastTarget(null);
 				int golemRespawnTimeSeconds = getKonquest().getCore().getInt(CorePath.RUINS_RESPAWN_COOLDOWN.getPath());
-				golem.getRespawnTimer().stopTimer();
-				golem.getRespawnTimer().setTime(golemRespawnTimeSeconds);
-				golem.getRespawnTimer().startTimer();
+				golem.startRespawnTimer(golemRespawnTimeSeconds);
 			}
 		}
 	}
