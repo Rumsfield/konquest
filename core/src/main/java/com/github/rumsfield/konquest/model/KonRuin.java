@@ -140,6 +140,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 			} else {
 				spawnAllGolems();
 			}
+			getKonquest().getLootManager().resetRuinLoot(this);
 		} else if(taskID == captureCountdownTimer.getTaskID()) {
 			// Update capture countdown title
 			String remainingTime = Konquest.getTimeFormat(captureTimer.getTime(),ChatColor.RED);

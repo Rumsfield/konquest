@@ -567,6 +567,9 @@ core:
     
     # Prevent ruin golems from dropping items upon death (true/false)
     no_golem_drops: true
+
+    # Number of loot items to appear in ruin loot chests (integer >= 0)
+    loot_count: 1
     
   # //// CORE.FAVOR \\\\
   favor:

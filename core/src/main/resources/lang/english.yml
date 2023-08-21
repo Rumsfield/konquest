@@ -395,6 +395,7 @@ protection:
     untagged: "Tag Expired"
     untag-message: "You are no longer in combat."
     loot-later: "Come back later for more loot!"
+    loot-capture: "Loot will reset once this Ruin has finished being captured."
     raid: "Enemy spotted in %s, use \"/k travel %s\" to defend!"
     raid-alert: "Raid Alert"
     raid-capture-1: "%s is being conquered! Use \"/k travel %s\" to defend and receive %s Favor!"
