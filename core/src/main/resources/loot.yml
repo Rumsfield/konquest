@@ -22,6 +22,8 @@
 # table, GOLD_INGOT has a weight of 4, and the sum of all weights is 150, so the percent probability of GOLD_INGOT
 # is (4/150) * 100 = 2.67%. Entries with larger weights are more likely to be chosen as loot.
 #
+# The total weight for the loot section's items/potions/enchanted_books is independent from the ruins section's total weight.
+#
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
 # //// LOOT \\\\
@@ -184,31 +186,48 @@ loot:
 # Ruin chest loot
 ruins:
   items:
-    GOLD_INGOT:
-      amount: 64
+    GOLD_BLOCK:
+      amount: 5
+      weight: 5
+    BLAZE_ROD:
+      amount: 12
       weight: 4
-    IRON_INGOT:
-      amount: 64
-      weight: 4
-    DIAMOND:
-      amount: 64
-      weight: 1
-    EMERALD:
-      amount: 64
+    DIAMOND_BLOCK:
+      amount: 3
       weight: 2
+    LEAD:
+      amount: 1
+      weight: 4
+    POPPY:
+      amount: 1
+      weight: 6
   potions:
     SPEED:
       upgraded: true
-      extended: true
+      extended: false
       weight: 4
-    REGEN:
+    INSTANT_HEAL:
+      upgraded: true
+      extended: false
+      weight: 6
+    INVISIBILITY:
+      upgraded: false
+      extended: false
+      weight: 3
+    WATER_BREATHING:
       upgraded: true
       extended: true
-      weight: 4
+      weight: 3
   enchanted_books:
-    ARROW_DAMAGE:
-      level: 3
+    MENDING:
+      level: 0
       weight: 2
-    ARROW_FIRE:
+    DIG_SPEED:
       level: 3
-      weight: 2
+      weight: 4
+    LUCK:
+      level: 3
+      weight: 3
+    PROTECTION_PROJECTILE:
+      level: 1
+      weight: 4

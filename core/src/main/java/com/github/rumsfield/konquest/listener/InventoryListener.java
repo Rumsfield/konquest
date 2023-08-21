@@ -162,7 +162,7 @@ public class InventoryListener implements Listener {
 					// Attempt to put loot into empty chests within the ruin
 					if(event.getInventory().getType().equals(InventoryType.CHEST)) {
 						// Update loot with default count as defined in core YML
-						boolean result = konquest.getLootManager().updateRuinLoot(event.getInventory(), 1);
+						boolean result = konquest.getLootManager().updateRuinLoot(event.getInventory());
 						ChatUtil.printDebug("Attempted to update loot in ruin "+territory.getName()+", got "+result);
 						if(result) {
 							event.getInventory().getLocation().getWorld().playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);

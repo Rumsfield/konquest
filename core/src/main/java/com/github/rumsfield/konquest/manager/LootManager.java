@@ -310,8 +310,9 @@ public class LootManager implements Timeable{
 	 * Ruin Loot
 	 */
 
-	public boolean updateRuinLoot(Inventory inventory, int count) {
+	public boolean updateRuinLoot(Inventory inventory) {
 		Location invLoc = inventory.getLocation();
+		int count = ruinLootCount;
 		if(ruinLootEmptiedLog.containsKey(invLoc)) {
 			if(ruinLootEmptiedLog.get(invLoc)) {
 				// Inventory has been emptied and ruin has not yet been captured
