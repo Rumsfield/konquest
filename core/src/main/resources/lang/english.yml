@@ -551,6 +551,8 @@ command:
     notice:
       kingdom-header: "Kingdom of %s"
       town-header: "Town of %s"
+      camp-placed: "Barbarian Camp is placed."
+      camp-missing: "This player has no camp."
   kingdom:
     broadcast:
       create: "%s has created the Kingdom of %s"

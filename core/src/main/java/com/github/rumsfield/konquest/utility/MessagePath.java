@@ -489,6 +489,8 @@ public enum MessagePath {
 	COMMAND_HELP_ERROR_PAGE                     (0, "command.help.error.page"),
 	COMMAND_INFO_NOTICE_KINGDOM_HEADER          (1, "command.info.notice.kingdom-header"),
 	COMMAND_INFO_NOTICE_TOWN_HEADER             (1, "command.info.notice.town-header"),
+	COMMAND_INFO_NOTICE_CAMP_PLACED             (0, "command.info.notice.camp-placed"),
+	COMMAND_INFO_NOTICE_CAMP_MISSING            (0, "command.info.notice.camp-missing"),
 	COMMAND_KINGDOM_BROADCAST_CREATE            (2, "command.kingdom.broadcast.create"),
 	COMMAND_KINGDOM_BROADCAST_JOIN              (2, "command.kingdom.broadcast.join"),
 	COMMAND_KINGDOM_BROADCAST_RENAME            (2, "command.kingdom.broadcast.rename"),

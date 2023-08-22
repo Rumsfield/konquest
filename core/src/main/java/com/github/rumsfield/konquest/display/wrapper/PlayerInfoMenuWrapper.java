@@ -42,7 +42,7 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
  		// Page 0
 		pageLabel = titleColor+MessagePath.LABEL_PLAYER.getMessage()+" "+infoPlayer.getOfflineBukkitPlayer().getName();
 		getMenu().addPage(0, 1, pageLabel);
-		
+
 		/* Kingdom Icon (2) */
 		loreList = new ArrayList<>();
     	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
@@ -71,6 +71,18 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		loreList.add(loreColor + MessagePath.LABEL_RESIDENCIES.getMessage() + ": " + valueColor + numResidentTowns);
 		InfoIcon info = new InfoIcon(kingdomColor+MessagePath.LABEL_INFORMATION.getMessage(), loreList, Material.ENDER_EYE, 5, false);
 		getMenu().getPage(0).addIcon(info);
+
+		/* Camp Icon (6) */
+		if(infoPlayer.isBarbarian()) {
+			loreList = new ArrayList<>();
+			if(getKonquest().getCampManager().isCampSet(infoPlayer)) {
+				loreList.add(loreColor+MessagePath.COMMAND_INFO_NOTICE_CAMP_PLACED.getMessage());
+			} else {
+				loreList.add(loreColor+MessagePath.COMMAND_INFO_NOTICE_CAMP_MISSING.getMessage());
+			}
+			InfoIcon campInfo = new InfoIcon(kingdomColor+MessagePath.LABEL_CAMP.getMessage(), loreList, Material.YELLOW_BED, 6, false);
+			getMenu().getPage(0).addIcon(campInfo);
+		}
 
 		// Page 1+
 		List<KonTown> playerTowns = sortedTowns(infoPlayer);
