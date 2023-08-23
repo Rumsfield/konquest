@@ -68,6 +68,7 @@ public class SanctuaryInfoMenuWrapper extends MenuWrapper {
         getMenu().getPage(0).addIcon(propertyInfo);
 
         /* General Info Icon (5) */
+        loreList = new ArrayList<>();
         loreList.add(loreColor + MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage() + ": " + valueColor + infoSanctuary.getTemplates().size());
         loreList.add(loreColor + MessagePath.LABEL_LAND.getMessage() + ": " + valueColor + infoSanctuary.getChunkList().size());
         loreList.add(loreColor + MessagePath.LABEL_WORLD.getMessage() + ": " + valueColor + infoSanctuary.getWorld().getName());

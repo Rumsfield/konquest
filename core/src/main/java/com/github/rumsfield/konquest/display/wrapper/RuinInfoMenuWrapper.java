@@ -60,16 +60,22 @@ public class RuinInfoMenuWrapper extends MenuWrapper {
         Material iconMat;
         if(infoRuin.isCaptureDisabled()) {
             // Currently on capture cooldown
-            loreList.addAll(Konquest.stringPaginate(loreColor+MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(infoRuin.getCaptureCooldownString())));
-            iconMat = Material.FIRE;
+            for(String line : Konquest.stringPaginate(MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(infoRuin.getCaptureCooldownString()))) {
+                loreList.add(loreColor+line);
+            }
+            iconMat = Material.POPPY;
         } else {
             // Can be captured
-            loreList.addAll(Konquest.stringPaginate(loreColor+MessagePath.COMMAND_INFO_NOTICE_RUIN_CAPTURE.getMessage()));
+            for(String line : Konquest.stringPaginate(MessagePath.COMMAND_INFO_NOTICE_RUIN_CAPTURE.getMessage())) {
+                loreList.add(loreColor+line);
+            }
             iconMat = Material.IRON_BLOCK;
         }
         InfoIcon captureInfo = new InfoIcon(neutralColor+MessagePath.COMMAND_INFO_NOTICE_RUIN_STATUS.getMessage(), loreList, iconMat, 4, false);
+        getMenu().getPage(0).addIcon(captureInfo);
 
         /* General Info Icon (5) */
+        loreList = new ArrayList<>();
         loreList.add(loreColor + MessagePath.MAP_CRITICAL_HITS.getMessage() + ": " + valueColor + infoRuin.getMaxCriticalHits());
         loreList.add(loreColor + MessagePath.MAP_GOLEM_SPAWNS.getMessage() + ": " + valueColor + infoRuin.getSpawnLocations().size());
         loreList.add(loreColor + MessagePath.LABEL_LAND.getMessage() + ": " + valueColor + infoRuin.getChunkList().size());

@@ -75,7 +75,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			OfflinePlayer lordPlayer = infoTown.getPlayerLord();
 			loreList.add(propertyColor+MessagePath.LABEL_LORD.getMessage());
 			loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
-			PlayerIcon playerInfo = new PlayerIcon(kingdomColor+lordPlayer.getName(),loreList,lordPlayer,3,true,PlayerIconAction.DISPLAY_INFO);
+			PlayerIcon playerInfo = new PlayerIcon(kingdomColor+lordPlayer.getName(),loreList,lordPlayer,2,true,PlayerIconAction.DISPLAY_INFO);
 			getMenu().getPage(0).addIcon(playerInfo);
 		} else {
 			loreList.addAll(Konquest.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getTravelName()), ChatColor.RED));
@@ -83,16 +83,12 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			getMenu().getPage(0).addIcon(info);
 		}
 
-		/* Flags Info Icon (4) */
+		/* Specialization Info Icon (4) */
 		loreList = new ArrayList<>();
-		for(KonPropertyFlag flag : KonPropertyFlag.values()) {
-			if(infoTown.hasPropertyValue(flag)) {
-				String flagDisplaySymbol = DisplayManager.boolean2Symbol(infoTown.getPropertyValue(flag));
-				loreList.add(loreColor+flag.getName()+": "+flagDisplaySymbol);
-			}
-		}
-		InfoIcon propertyInfo = new InfoIcon(kingdomColor+MessagePath.LABEL_FLAGS.getMessage(), loreList, Material.REDSTONE_TORCH, 4, false);
-		getMenu().getPage(0).addIcon(propertyInfo);
+		loreList.add(valueColor+infoTown.getSpecialization().name());
+		Material specialMat = Konquest.getProfessionMaterial(infoTown.getSpecialization());
+		info = new InfoIcon(kingdomColor+MessagePath.LABEL_SPECIALIZATION.getMessage(), loreList, specialMat, 4, false);
+		getMenu().getPage(0).addIcon(info);
 
 		/* Properties Info Icon (5) */
     	String isProtected = DisplayManager.boolean2Symbol((infoTown.isCaptureDisabled() || infoTown.getKingdom().isOfflineProtected() || infoTown.isTownWatchProtected()));
@@ -138,12 +134,16 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		info = new InfoIcon(kingdomColor+MessagePath.LABEL_STATS.getMessage(), loreList, Material.BELL, 7, false);
 		getMenu().getPage(0).addIcon(info);
 
-		/* Specialization Info Icon (8) */
-    	loreList = new ArrayList<>();
-		loreList.add(valueColor+infoTown.getSpecialization().name());
-		Material specialMat = Konquest.getProfessionMaterial(infoTown.getSpecialization());
-    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_SPECIALIZATION.getMessage(), loreList, specialMat, 8, false);
-    	getMenu().getPage(0).addIcon(info);
+		/* Flags Info Icon (8) */
+		loreList = new ArrayList<>();
+		for(KonPropertyFlag flag : KonPropertyFlag.values()) {
+			if(infoTown.hasPropertyValue(flag)) {
+				String flagDisplaySymbol = DisplayManager.boolean2Symbol(infoTown.getPropertyValue(flag));
+				loreList.add(loreColor+flag.getName()+": "+flagDisplaySymbol);
+			}
+		}
+		InfoIcon propertyInfo = new InfoIcon(kingdomColor+MessagePath.LABEL_FLAGS.getMessage(), loreList, Material.REDSTONE_TORCH, 8, false);
+		getMenu().getPage(0).addIcon(propertyInfo);
 
     	// Page 1
 		pageLabel = titleColor+infoTown.getName()+" "+MessagePath.LABEL_UPGRADES.getMessage();

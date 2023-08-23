@@ -100,6 +100,9 @@ public class InfoCommand extends CommandBase {
 						sendInvalidArgMessage(bukkitPlayer,CommandType.INFO);
 						return;
 				}
+				// None of the types could find a valid name
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(infoName));
+				return;
 			}
 			// Something messed up?
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
