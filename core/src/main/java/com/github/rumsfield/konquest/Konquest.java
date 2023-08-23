@@ -174,6 +174,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		
 		initColors();
 		languageManager.initialize();
+		kingdomManager.loadCriticalBlocks(); // load critical block material before sanctuaries
 		sanctuaryManager.initialize(); // Load sanctuaries and monument templates
 		kingdomManager.initialize(); // Load all kingdoms + towns
 		sanctuaryManager.refresh(); // Update sanctuary references to neutrals kingdom

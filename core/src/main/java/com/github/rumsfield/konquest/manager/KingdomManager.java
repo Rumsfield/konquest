@@ -112,7 +112,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public void initialize() {
 		barbarians = new KonKingdom(MessagePath.LABEL_BARBARIANS.getMessage(),konquest);
 		neutrals = new KonKingdom(MessagePath.LABEL_NEUTRALS.getMessage(),konquest);
-		loadCriticalBlocks();
 		loadArmorBlacklist();
 		loadJoinExileCooldowns();
 		loadKingdoms();
@@ -3769,8 +3768,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public int getMaxCriticalHits() {
 		return maxCriticalHits;
 	}
-	
-	private void loadCriticalBlocks() {
+
+	/**
+	 * Loads the custom monument critical block from core.yml
+	 */
+	public void loadCriticalBlocks() {
 		maxCriticalHits = konquest.getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath(),12);
 		String townCriticalBlockTypeName = konquest.getCore().getString(CorePath.MONUMENTS_CRITICAL_BLOCK.getPath(),"");
 		try {
