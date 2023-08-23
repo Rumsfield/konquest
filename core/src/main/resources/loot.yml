@@ -215,7 +215,7 @@ ruins:
       extended: false
       weight: 3
     WATER_BREATHING:
-      upgraded: true
+      upgraded: false
       extended: true
       weight: 3
   enchanted_books:
