@@ -66,8 +66,31 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		pageLabel = titleColor+MessagePath.COMMAND_INFO_NOTICE_KINGDOM_HEADER.getMessage(infoKingdom.getName());
 		getMenu().addPage(pageIndex, pageRows, pageLabel);
 
-		/* Relationship Icon (1) */
-		slotIndex = 1;
+		/* Capital Info Icon (0) */
+		if(infoKingdom.isCreated()) {
+			KonCapital capital = infoKingdom.getCapital();
+			loreList = new ArrayList<>();
+			loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
+			TownIcon capitalIcon = new TownIcon(capital, kingdomColor, loreList, 0, true);
+			getMenu().getPage(pageIndex).addIcon(capitalIcon);
+		}
+
+		/* Master Player Info Icon (1) */
+		if(infoKingdom.isCreated()) {
+			loreList = new ArrayList<>();
+			if (infoKingdom.isMasterValid()) {
+				loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
+				loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
+				assert masterPlayer != null;
+				PlayerIcon playerInfo = new PlayerIcon(kingdomColor + masterPlayer.getName(), loreList, masterPlayer, 1, true, PlayerIconAction.DISPLAY_INFO);
+				getMenu().getPage(pageIndex).addIcon(playerInfo);
+			} else {
+				info = new InfoIcon(ChatColor.DARK_RED + MessagePath.LABEL_MASTER.getMessage(), loreList, Material.BARRIER, 1, false);
+				getMenu().getPage(pageIndex).addIcon(info);
+			}
+		}
+
+		/* Relationship Icon (3) */
 		loreList = new ArrayList<>();
 		if(observer.getKingdom().equals(infoKingdom)) {
 			loreList.add(loreColor+MessagePath.DIPLOMACY_SELF.getMessage());
@@ -85,37 +108,10 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 				loreList.add(alertColor+MessagePath.MENU_KINGDOM_WE_REQUESTED.getMessage()+": "+valueColor+theirRequestStatus);
 			}
 		}
-		InfoIcon relationIcon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_RELATION.getMessage(),loreList,Material.GOLDEN_SWORD,slotIndex,false);
+		InfoIcon relationIcon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_RELATION.getMessage(),loreList,Material.GOLDEN_SWORD,3,false);
 		getMenu().getPage(pageIndex).addIcon(relationIcon);
 
-		/* Capital Info Icon (2) */
-		if(infoKingdom.isCreated()) {
-			slotIndex = 2;
-			KonCapital capital = infoKingdom.getCapital();
-			loreList = new ArrayList<>();
-			loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
-			TownIcon capitalIcon = new TownIcon(capital, kingdomColor, loreList, slotIndex, true);
-			getMenu().getPage(pageIndex).addIcon(capitalIcon);
-		}
-
-		/* Master Player Info Icon (3) */
-		if(infoKingdom.isCreated()) {
-			slotIndex = 3;
-			loreList = new ArrayList<>();
-			if (infoKingdom.isMasterValid()) {
-				loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
-				loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
-				assert masterPlayer != null;
-				PlayerIcon playerInfo = new PlayerIcon(kingdomColor + masterPlayer.getName(), loreList, masterPlayer, slotIndex, true, PlayerIconAction.DISPLAY_INFO);
-				getMenu().getPage(pageIndex).addIcon(playerInfo);
-			} else {
-				info = new InfoIcon(ChatColor.DARK_RED + MessagePath.LABEL_MASTER.getMessage(), loreList, Material.BARRIER, slotIndex, false);
-				getMenu().getPage(pageIndex).addIcon(info);
-			}
-		}
-
-		/* Member Info Icon (5) */
-		slotIndex = 5;
+		/* Member Info Icon (4) */
 		int numKingdomPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(infoKingdom).size();
     	int numAllKingdomPlayers = allKingdomMembers.size();
     	int numKingdomOfficers = infoKingdom.getPlayerOfficersOnly().size();
@@ -123,39 +119,34 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
     	loreList.add(loreColor+MessagePath.LABEL_ONLINE_PLAYERS.getMessage()+": "+valueColor+numKingdomPlayers);
     	loreList.add(loreColor+MessagePath.LABEL_TOTAL_PLAYERS.getMessage()+": "+valueColor+numAllKingdomPlayers);
     	loreList.add(loreColor+MessagePath.LABEL_OFFICERS.getMessage()+": "+valueColor+numKingdomOfficers);
-    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PLAYERS.getMessage(), loreList, Material.NAME_TAG, slotIndex, false);
+    	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PLAYERS.getMessage(), loreList, Material.NAME_TAG, 4, false);
     	getMenu().getPage(pageIndex).addIcon(info);
-    	
+
+		/* Flags Info Icon (5) */
+		loreList = new ArrayList<>();
+		for(KonPropertyFlag flag : KonPropertyFlag.values()) {
+			if(infoKingdom.hasPropertyValue(flag)) {
+				String flagDisplaySymbol = DisplayManager.boolean2Symbol(infoKingdom.getPropertyValue(flag));
+				loreList.add(loreColor+flag.getName()+": "+flagDisplaySymbol);
+			}
+		}
+		InfoIcon propertyInfo = new InfoIcon(kingdomColor+MessagePath.LABEL_FLAGS.getMessage(), loreList, Material.REDSTONE_TORCH, 5, false);
+		getMenu().getPage(0).addIcon(propertyInfo);
+
     	/* Properties Info Icon (6) */
-    	slotIndex = 6;
-    	String isPeaceful = DisplayManager.boolean2Symbol(infoKingdom.isPeaceful());
     	String isSmallest = DisplayManager.boolean2Symbol(infoKingdom.isSmallest());
     	String isProtected = DisplayManager.boolean2Symbol(infoKingdom.isOfflineProtected());
     	String isOpen = DisplayManager.boolean2Symbol(infoKingdom.isOpen());
-		String isJoin = DisplayManager.boolean2Symbol(infoKingdom.isJoinable());
-		String isLeave = DisplayManager.boolean2Symbol(infoKingdom.isLeaveable());
-		String isPromote = DisplayManager.boolean2Symbol(infoKingdom.isPromoteable());
-		String isDemote = DisplayManager.boolean2Symbol(infoKingdom.isDemoteable());
-		String isTransfer = DisplayManager.boolean2Symbol(infoKingdom.isTransferable());
     	String isAdminOperated = DisplayManager.boolean2Symbol(infoKingdom.isAdminOperated());
     	loreList = new ArrayList<>();
 		loreList.add(loreColor+MessagePath.LABEL_ADMIN_KINGDOM.getMessage()+": "+isAdminOperated);
 		loreList.add(loreColor+MessagePath.LABEL_PROTECTED.getMessage()+": "+isProtected);
 		loreList.add(loreColor+MessagePath.LABEL_OPEN.getMessage()+": "+isOpen);
-		loreList.add(loreColor+MessagePath.PROPERTIES_JOIN_NAME.getMessage()+": "+isJoin);
-		loreList.add(loreColor+MessagePath.PROPERTIES_LEAVE_NAME.getMessage()+": "+isLeave);
-		if(!infoKingdom.isAdminOperated()) {
-			loreList.add(loreColor+MessagePath.PROPERTIES_PROMOTE_NAME.getMessage()+": "+isPromote);
-			loreList.add(loreColor+MessagePath.PROPERTIES_DEMOTE_NAME.getMessage()+": "+isDemote);
-			loreList.add(loreColor+MessagePath.PROPERTIES_TRANSFER_NAME.getMessage()+": "+isTransfer);
-		}
 		loreList.add(loreColor+MessagePath.LABEL_SMALLEST.getMessage()+": "+isSmallest);
-		loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
-		info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, slotIndex, false);
+		info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, 6, false);
     	getMenu().getPage(pageIndex).addIcon(info);
 
 		/* Stats Info Icon (7) */
-		slotIndex = 7;
 		ArrayList<KonOfflinePlayer> allPlayersInKingdom = getKonquest().getPlayerManager().getAllPlayersInKingdom(infoKingdom);
 		int numKingdomFavor = 0;
 		for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
@@ -170,18 +161,17 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 		loreList.add(loreColor+MessagePath.LABEL_FAVOR.getMessage()+": "+valueColor+numKingdomFavor);
 		loreList.add(loreColor+MessagePath.LABEL_TOWNS.getMessage()+": "+valueColor+numKingdomTowns);
 		loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+numKingdomLand);
-		info = new InfoIcon(kingdomColor+MessagePath.LABEL_INFORMATION.getMessage(), loreList, Material.ENDER_EYE, slotIndex, false);
+		info = new InfoIcon(kingdomColor+MessagePath.LABEL_INFORMATION.getMessage(), loreList, Material.ENDER_EYE, 7, false);
 		getMenu().getPage(pageIndex).addIcon(info);
 
 		/* Template Info Icon (8) */
 		if(infoKingdom.isCreated()) {
-			slotIndex = 8;
 			loreList = new ArrayList<>();
 			if (infoKingdom.hasMonumentTemplate()) {
 				KonMonumentTemplate template = infoKingdom.getMonumentTemplate();
-				info = new TemplateIcon(template,kingdomColor,loreList,slotIndex,false);
+				info = new TemplateIcon(template,kingdomColor,loreList,8,false);
 			} else {
-				info = new InfoIcon(ChatColor.RED+MessagePath.LABEL_INVALID.getMessage(), loreList, Material.BARRIER, slotIndex, false);
+				info = new InfoIcon(ChatColor.RED+MessagePath.LABEL_INVALID.getMessage(), loreList, Material.BARRIER, 8, false);
 			}
 			getMenu().getPage(pageIndex).addIcon(info);
 		}

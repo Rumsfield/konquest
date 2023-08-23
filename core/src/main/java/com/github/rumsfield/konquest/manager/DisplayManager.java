@@ -4,10 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.*;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.display.wrapper.*;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -241,6 +238,28 @@ public class DisplayManager {
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
 		// Create menu
 		MonumentTemplateInfoMenuWrapper wrapper = new MonumentTemplateInfoMenuWrapper(konquest);
+		wrapper.constructMenu();
+		// Display menu
+		showMenuWrapper(bukkitPlayer,wrapper);
+	}
+
+	// Sanctuary Info
+	public void displaySanctuaryInfoMenu(KonPlayer displayPlayer, KonSanctuary infoSanctuary) {
+		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
+		playMenuOpenSound(displayPlayer.getBukkitPlayer());
+		// Create menu
+		SanctuaryInfoMenuWrapper wrapper = new SanctuaryInfoMenuWrapper(konquest, infoSanctuary);
+		wrapper.constructMenu();
+		// Display menu
+		showMenuWrapper(bukkitPlayer,wrapper);
+	}
+
+	// Ruin Info
+	public void displayRuinInfoMenu(KonPlayer displayPlayer, KonRuin infoRuin) {
+		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
+		playMenuOpenSound(displayPlayer.getBukkitPlayer());
+		// Create menu
+		RuinInfoMenuWrapper wrapper = new RuinInfoMenuWrapper(konquest, infoRuin);
 		wrapper.constructMenu();
 		// Display menu
 		showMenuWrapper(bukkitPlayer,wrapper);

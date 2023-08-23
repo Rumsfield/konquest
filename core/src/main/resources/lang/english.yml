@@ -25,6 +25,7 @@ label:
   enemy-redstone: "Enemy Redstone"
   false: "False"
   favor: "Favor"
+  flags: "Flags"
   golem-offense: "Iron Golem Offense"
   health: "Health"
   immunity: "Immunity"
@@ -84,6 +85,7 @@ label:
   unavailable: "Unavailable"
   upgrades: "Upgrades"
   valid: "Valid"
+  world: "World"
 placeholder:
   friendly: "Friendly"
   enemy: "Enemy"
@@ -551,6 +553,10 @@ command:
     notice:
       kingdom-header: "Kingdom of %s"
       town-header: "Town of %s"
+      camp-placed: "Barbarian Camp is placed."
+      camp-missing: "This player has no camp."
+      ruin-status: "Capture Status"
+      ruin-capture: "This Ruin can be captured for a reward."
   kingdom:
     broadcast:
       create: "%s has created the Kingdom of %s"
