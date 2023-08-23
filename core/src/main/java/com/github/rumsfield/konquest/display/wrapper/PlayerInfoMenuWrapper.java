@@ -76,9 +76,13 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		if(infoPlayer.isBarbarian()) {
 			loreList = new ArrayList<>();
 			if(getKonquest().getCampManager().isCampSet(infoPlayer)) {
-				loreList.add(loreColor+MessagePath.COMMAND_INFO_NOTICE_CAMP_PLACED.getMessage());
+				for(String line : Konquest.stringPaginate(MessagePath.COMMAND_INFO_NOTICE_CAMP_PLACED.getMessage())) {
+					loreList.add(loreColor+line);
+				}
 			} else {
-				loreList.add(loreColor+MessagePath.COMMAND_INFO_NOTICE_CAMP_MISSING.getMessage());
+				for(String line : Konquest.stringPaginate(MessagePath.COMMAND_INFO_NOTICE_CAMP_MISSING.getMessage())) {
+					loreList.add(loreColor+line);
+				}
 			}
 			InfoIcon campInfo = new InfoIcon(kingdomColor+MessagePath.LABEL_CAMP.getMessage(), loreList, Material.YELLOW_BED, 6, false);
 			getMenu().getPage(0).addIcon(campInfo);

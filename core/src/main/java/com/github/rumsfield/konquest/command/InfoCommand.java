@@ -134,6 +134,9 @@ public class InfoCommand extends CommandBase {
 					}
 					break;
 				case "kingdom":
+					tabList.addAll(getKonquest().getKingdomManager().getKingdomNames());
+					tabList.add(MessagePath.LABEL_BARBARIANS.getMessage());
+					break;
 				case "capital":
 					tabList.addAll(getKonquest().getKingdomManager().getKingdomNames());
 					break;
