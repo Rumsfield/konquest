@@ -1,10 +1,7 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.OfflinePlayer;
@@ -17,118 +14,146 @@ import java.util.Collections;
 import java.util.List;
 
 public class InfoCommand extends CommandBase {
-
-	public enum infoType {
-		KINGDOM,
-		TOWN,
-		PLAYER
-	}
 	
 	public InfoCommand(Konquest konquest, CommandSender sender, String[] args) {
         super(konquest, sender, args);
     }
 	
 	public void execute() {
-		// k info <kingdomName>|<townName>|<playerName>
+		// k info [player|kingdom|capital|town|ruin|sanctuary <name>]
 		Player bukkitPlayer = (Player) getSender();
-		if (getArgs().length != 1 && getArgs().length != 2) {
+		if (getArgs().length != 1 && getArgs().length != 3) {
 			sendInvalidArgMessage(bukkitPlayer,CommandType.INFO);
 		} else {
-        	infoType displayState;
-        	// Init info as own player's
+        	// Init info as own player's kingdom
         	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
     			ChatUtil.printDebug("Failed to find non-existent player");
     			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     			return;
     		}
-        	KonPlayer sender = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-        	KonOfflinePlayer player = sender;
-        	KonKingdom kingdom = player.getKingdom();
-        	KonTown town = null;
-        	//String color = ""+ChatColor.GREEN;
-        	if(getArgs().length == 1) {
-        		// Display your own Kingdom info
-        		displayState = infoType.KINGDOM;
-        	} else {
-        		String name = getArgs()[1];
-        		// preliminary town search
-        		boolean foundTown = false;
-        		for(KonKingdom k : getKonquest().getKingdomManager().getKingdoms()) {
-    				if(k.hasTown(name)) {
-    					foundTown = true;
-    					town = k.getTown(name);
-    				}
-    			}
-        		//Check for info type
-				if(getKonquest().getKingdomManager().isKingdom(name)) {
-        			displayState = infoType.KINGDOM;
-        			kingdom = getKonquest().getKingdomManager().getKingdom(name);
-        		} else if(name.equalsIgnoreCase(MessagePath.LABEL_BARBARIANS.getMessage())) {
-        			displayState = infoType.KINGDOM;
-        			kingdom = getKonquest().getKingdomManager().getBarbarians();
-        		} else if(foundTown) {
-        			displayState = infoType.TOWN;
-        		} else {
-        			// Check for Player
-        			KonOfflinePlayer otherPlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(name);
-        			if(otherPlayer != null) {
-        				displayState = infoType.PLAYER;
-        				player = otherPlayer;
-        			} else {
-            			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(name));
-            	        return;
-        			}
-        		}
-        	}
+			KonPlayer sender = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
+			assert sender != null;
 
-        	switch(displayState) {
-        	case KINGDOM: // Display kingdom info
-        		getKonquest().getDisplayManager().displayKingdomInfoMenu(sender, kingdom);
-        		break;
-        	case TOWN: // Display town info
-        		if(town != null) {
-        			getKonquest().getDisplayManager().displayTownInfoMenu(sender, town);
-        		} else {
-        			ChatUtil.printDebug("Failed to display null town info of town "+getArgs()[1]);
-        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-        		}
-        		break;
-        	case PLAYER: // Display player info
-        		getKonquest().getDisplayManager().displayPlayerInfoMenu(sender, player);
-        		break;
-        	default:
-        		ChatUtil.printDebug("Failed to display info, unknown state");
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-        		break;
-        	}
+			if(getArgs().length == 1) {
+				// Display the player's kingdom info
+				getKonquest().getDisplayManager().displayKingdomInfoMenu(sender, sender.getKingdom());
+				return;
+			}
+
+			// Check for info type, must provide type and name
+			if(getArgs().length == 3) {
+				String infoType = getArgs()[1];
+				String infoName = getArgs()[2];
+
+				// Force type to lowercase for matching
+				infoType = infoType.toLowerCase();
+				switch(infoType) {
+					case "player":
+						KonOfflinePlayer otherPlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(infoName);
+						if(otherPlayer != null) {
+							getKonquest().getDisplayManager().displayPlayerInfoMenu(sender, otherPlayer);
+							return;
+						}
+						break;
+					case "kingdom":
+						if(getKonquest().getKingdomManager().isKingdom(infoName)) {
+							KonKingdom kingdom = getKonquest().getKingdomManager().getKingdom(infoName);
+							getKonquest().getDisplayManager().displayKingdomInfoMenu(sender, kingdom);
+							return;
+						} else if(infoName.equalsIgnoreCase(MessagePath.LABEL_BARBARIANS.getMessage())) {
+							KonKingdom kingdom = getKonquest().getKingdomManager().getBarbarians();
+							getKonquest().getDisplayManager().displayKingdomInfoMenu(sender, kingdom);
+							return;
+						}
+						break;
+					case "capital":
+						for(KonKingdom k : getKonquest().getKingdomManager().getKingdoms()) {
+							if(k.hasCapital(infoName)) {
+								getKonquest().getDisplayManager().displayTownInfoMenu(sender, k.getCapital());
+								return;
+							}
+						}
+						break;
+					case "town":
+						for(KonKingdom k : getKonquest().getKingdomManager().getKingdoms()) {
+							if(k.hasTown(infoName)) {
+								getKonquest().getDisplayManager().displayTownInfoMenu(sender, k.getTown(infoName));
+								return;
+							}
+						}
+						break;
+					case "ruin":
+						if(getKonquest().getRuinManager().isRuin(infoName)) {
+							KonRuin ruin = getKonquest().getRuinManager().getRuin(infoName);
+							getKonquest().getDisplayManager().displayRuinInfoMenu(sender, ruin);
+							return;
+						}
+						break;
+					case "sanctuary":
+						if(getKonquest().getSanctuaryManager().isSanctuary(infoName)) {
+							KonSanctuary sanctuary = getKonquest().getSanctuaryManager().getSanctuary(infoName);
+							getKonquest().getDisplayManager().displaySanctuaryInfoMenu(sender, sanctuary);
+							return;
+						}
+						break;
+					default:
+						sendInvalidArgMessage(bukkitPlayer,CommandType.INFO);
+						return;
+				}
+			}
+			// Something messed up?
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
         }
 	}
 	
 	@Override
 	public List<String> tabComplete() {
-		// k info <kingdomName>|<townName>|<playerName>|templates
+		// k info [player|kingdom|capital|town|ruin|sanctuary <name>]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		if(getArgs().length == 2) {
-			List<String> kingdomList = getKonquest().getKingdomManager().getKingdomNames();
-			List<String> townList = new ArrayList<>();
-			for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
-				townList.addAll(kingdom.getTownNames());
-			}
-			List<String> playerList = new ArrayList<>();
-			for(OfflinePlayer bukkitOfflinePlayer : getKonquest().getPlayerManager().getAllOfflinePlayers()) {
-				playerList.add(bukkitOfflinePlayer.getName());
-			}
+			tabList.add("player");
+			tabList.add("kingdom");
+			tabList.add("capital");
+			tabList.add("town");
+			tabList.add("ruin");
+			tabList.add("sanctuary");
 
-			tabList.addAll(kingdomList);
-			tabList.addAll(townList);
-			tabList.addAll(playerList);
-			tabList.add(MessagePath.LABEL_BARBARIANS.getMessage());
-			
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
+		} else if(getArgs().length == 3) {
+			String type = getArgs()[1].toLowerCase();
+			switch(type) {
+				case "player":
+					for(OfflinePlayer bukkitOfflinePlayer : getKonquest().getPlayerManager().getAllOfflinePlayers()) {
+						tabList.add(bukkitOfflinePlayer.getName());
+					}
+					break;
+				case "kingdom":
+				case "capital":
+					tabList.addAll(getKonquest().getKingdomManager().getKingdomNames());
+					break;
+				case "town":
+					for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
+						tabList.addAll(kingdom.getTownNames());
+					}
+					break;
+				case "ruin":
+					tabList.addAll(getKonquest().getRuinManager().getRuinNames());
+					break;
+				case "sanctuary":
+					tabList.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
+					break;
+				default:
+					break;
+			}
+
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
+			Collections.sort(matchedTabList);
 		}
+
 		return matchedTabList;
 	}
 }
