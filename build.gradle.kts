@@ -1,6 +1,6 @@
 allprojects {
     group = "com.github.rumsfield.konquest"
-    version = "0.12.1"
+    version = "1.0.0"
 }
 
 subprojects {
