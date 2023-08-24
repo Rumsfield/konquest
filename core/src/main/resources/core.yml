@@ -272,6 +272,9 @@ core:
     
     # Allow players to pvp with other kingdoms that are peaceful (true/false)
     allow_peaceful_pvp: false
+
+    # Allow players to pvp with all other players, including friendly kingdom members, regardless of kingdom relations (true/false)
+    allow_all_pvp: false
     
     # Only allow admins to create new kingdoms (true), else players can create their own kingdoms (false) (true/false)
     create_admin_only: false

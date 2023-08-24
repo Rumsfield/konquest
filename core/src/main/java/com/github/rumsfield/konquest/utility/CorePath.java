@@ -80,6 +80,7 @@ public enum CorePath {
 	KINGDOMS_INSTANT_WAR                                  ("core.kingdoms.instant_war"),
 	KINGDOMS_INSTANT_PEACE                                ("core.kingdoms.instant_peace"),
 	KINGDOMS_ALLOW_PEACEFUL_PVP                           ("core.kingdoms.allow_peaceful_pvp"),
+	KINGDOMS_ALLOW_ALL_PVP                                ("core.kingdoms.allow_all_pvp"),
 	KINGDOMS_CREATE_ADMIN_ONLY                            ("core.kingdoms.create_admin_only"),
 	KINGDOMS_WEB_COLOR_ADMIN_ONLY                         ("core.kingdoms.web_color_admin_only"),
 	KINGDOMS_PROTECT_CONTAINERS_USE                       ("core.kingdoms.protect_containers_use"),
