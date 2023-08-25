@@ -830,7 +830,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	 * 			10 - Error, name is reserved word
 	 */
 	public int validateNameConstraints(String name) {
-		if(name == null || name.equals("") || name.contains(" ") || StringUtils.isAlphanumeric(name.replace("_",""))) {
+		if(name == null || name.equals("") || name.contains(" ") || !StringUtils.isAlphanumeric(name.replace("_",""))) {
 			return 1;
     	}
     	if(name.length() > 20) {
