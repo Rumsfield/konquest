@@ -156,6 +156,21 @@ public class InventoryListener implements Listener {
 						}
 					}
 				}
+
+				// Ruin restrictions for inventories
+				if(territory instanceof KonRuin) {
+					// Attempt to put loot into empty chests within the ruin
+					if(event.getInventory().getType().equals(InventoryType.CHEST)) {
+						// Update loot with default count as defined in core YML
+						boolean result = konquest.getLootManager().updateRuinLoot(event.getInventory());
+						ChatUtil.printDebug("Attempted to update loot in ruin "+territory.getName()+", got "+result);
+						if(result) {
+							event.getInventory().getLocation().getWorld().playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
+						} else {
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_LOOT_CAPTURE.getMessage());
+						}
+					}
+				}
 				
 				// Prevent all inventory openings except for camp owner and clan members when allowed
 				boolean isCampContainersProtected = konquest.getCore().getBoolean(CorePath.CAMPS_PROTECT_CONTAINERS.getPath(), true);
@@ -228,40 +243,89 @@ public class InventoryListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onMonumentChestClick(InventoryClickEvent event) {
-		// Prevent placing items into chests located in a town monument
+	public void onLootChestClick(InventoryClickEvent event) {
+		// Prevent placing items into loot chests
 		if(event.isCancelled()) return;
-		Inventory clickedInventory = event.getClickedInventory();
-		if(clickedInventory == null) return;
-		Location inventoryLocation = clickedInventory.getLocation();
+		if(event.getClickedInventory() == null) return;
+		if(!event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) return;
+		Location inventoryLocation = event.getView().getTopInventory().getLocation();
 		if(inventoryLocation == null) return;
-		if(!clickedInventory.getType().equals(InventoryType.CHEST)) return;
-		// These actions will be prohibited, if done in town monument chest inventories
-		boolean isActionAllowed = event.getAction().equals(InventoryAction.PICKUP_ALL) ||
-				event.getAction().equals(InventoryAction.PICKUP_HALF) ||
-				event.getAction().equals(InventoryAction.PICKUP_ONE) ||
-				event.getAction().equals(InventoryAction.PICKUP_SOME) ||
-				event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY);
-		if(isActionAllowed) return;
 		// Check for ignored world
 		if(konquest.isWorldIgnored(inventoryLocation)) return;
-		// Check for territory at inventory location
-		if(konquest.getTerritoryManager().isChunkClaimed(inventoryLocation)) {
-			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(inventoryLocation);
-			// Check for town
-			if(territory instanceof KonTown) {
-				KonTown town = (KonTown) territory;
-				// Check for inventory inside monument
-				if(town.getMonument().isLocInside(inventoryLocation)) {
-					// At this point, due to previous checks, the inventory is inside of a town monument
-					// and is one of the prohibited actions. Cancel this event.
-					ChatUtil.printDebug("Cancelling player item placement into monument inventory of town "+town.getName());
-					event.setCancelled(true);
-				}
+		//ChatUtil.printDebug("Inventory clicked on raw slot "+event.getRawSlot()+"/"+event.getView().getTopInventory().getSize()+", action "+event.getAction());
+		// Check if the raw slot index is within the chest inventory
+		if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
+			// When clicking in the top (chest) inventory, only allow pickup and shift-click of items into bottom.
+			if(event.getAction().equals(InventoryAction.PICKUP_ALL) || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+				//ChatUtil.printDebug("Ignored top inventory");
+				return;
+			}
+		} else {
+			// When clicking in the bottom (player) inventory, allow everything but shift-clicks of items into top.
+			if(!event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+				//ChatUtil.printDebug("Ignored bottom inventory");
+				return;
 			}
 		}
+		//ChatUtil.printDebug("Checking for loot chest...");
+		// Check for loot chest
+		if(isLootChestLocation(inventoryLocation)) {
+			event.setCancelled(true);
+		}
 	}
-	
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onLootChestDrag(InventoryDragEvent event) {
+		// Prevent dragging items into loot chests
+		if(event.isCancelled()) return;
+		if(!event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) return;
+		Location inventoryLocation = event.getInventory().getLocation();
+		if(inventoryLocation == null) return;
+		// Check for ignored world
+		if(konquest.isWorldIgnored(inventoryLocation)) return;
+		// Check if any raw slot index is within the chest inventory
+		boolean isInTop = false;
+		for(int slot : event.getRawSlots()) {
+			if(slot < event.getView().getTopInventory().getSize()) {
+				isInTop = true;
+				break;
+			}
+		}
+		//ChatUtil.printDebug("Inventory dragged in top chest inventory: "+isInTop);
+		// When dragging in the top (chest) inventory, do not allow anything.
+		// When dragging in the bottom (player) inventory, allow everything.
+		if(!isInTop) {
+			//ChatUtil.printDebug("Ignored bottom inventory");
+			return;
+		}
+		//ChatUtil.printDebug("Checking for loot chest...");
+		// Check for territory at inventory location
+		if(isLootChestLocation(inventoryLocation)) {
+			event.setCancelled(true);
+		}
+	}
+
+	private boolean isLootChestLocation(Location loc) {
+		// Check for territory at inventory location
+		if(!konquest.getTerritoryManager().isChunkClaimed(loc)) return false;
+		KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(loc);
+		// Check for town
+		if(territory instanceof KonTown) {
+			KonTown town = (KonTown) territory;
+			// Check for inventory inside monument
+			if(town.getMonument().isLocInside(loc)) {
+				// At this point, due to previous checks, the inventory is inside of a town monument
+				// and is one of the prohibited actions. Cancel this event.
+				ChatUtil.printDebug("Cancelling player item placement into monument inventory of town "+territory.getName());
+				return true;
+			}
+		} else if(territory instanceof KonRuin) {
+			ChatUtil.printDebug("Cancelling player item placement into ruin inventory of ruin "+territory.getName());
+			return true;
+		}
+		return false;
+	}
+
 	@EventHandler(priority = EventPriority.MONITOR)
     public void onCraftItem(CraftItemEvent event) {
 		if(konquest.isWorldIgnored(event.getInventory().getLocation())) {

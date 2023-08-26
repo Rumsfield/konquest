@@ -219,7 +219,7 @@ public class RuinManager implements KonquestRuinManager {
 	        			ruin.addPoints(konquest.formatStringToPoints(ruinSection.getString("chunks","")));
 	                	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("criticals",""),world)) {
 	                		loc.setWorld(world);
-	                		ruin.addCriticalLocation(loc);
+	                		ruin.setCriticalLocation(loc);
 	            		}
 	                	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("spawns",""),world)) {
 	                		loc.setWorld(world);

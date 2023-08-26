@@ -180,6 +180,9 @@ core:
     # (*) Enable plugin integration with BlueMap (true/false)
     bluemap: true
 
+    # (*) Enable plugin integration with WorldGuard (true/false)
+    worldguard: true
+
     # //// CORE.INTEGRATION.MAP_OPTIONS \\\\
     map_options:
 
@@ -269,6 +272,9 @@ core:
     
     # Allow players to pvp with other kingdoms that are peaceful (true/false)
     allow_peaceful_pvp: false
+
+    # Allow players to pvp with all other players, including friendly kingdom members, regardless of kingdom relations (true/false)
+    allow_all_pvp: false
     
     # Only allow admins to create new kingdoms (true), else players can create their own kingdoms (false) (true/false)
     create_admin_only: false
@@ -370,7 +376,7 @@ core:
     # Maximum distance in chunks between land claims and the town center monument (0 to disable, integer >= 0)
     max_size: 16
     
-    # Depth below the monument base in blocks to check for excess air when settling a new town (0 to disable, integer >= 0)
+    # Depth below the monument base in blocks to check for excess water and air when settling a new town (0 to disable, integer >= 0)
     settle_checks_depth: 32
     
     # Maximum height difference in blocks in the chunks of new town settlements (-1 to disable, integer >= 0)
@@ -564,6 +570,9 @@ core:
     
     # Prevent ruin golems from dropping items upon death (true/false)
     no_golem_drops: true
+
+    # Number of loot items to appear in ruin loot chests (integer >= 0)
+    loot_count: 2
     
   # //// CORE.FAVOR \\\\
   favor:

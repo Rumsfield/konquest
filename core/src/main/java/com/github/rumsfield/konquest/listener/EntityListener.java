@@ -712,44 +712,51 @@ public class EntityListener implements Listener {
             
             // Prevent optional damage based on relations
 			// Kingdoms at peace may allow pvp. Kingdoms in alliance or trade cannot pvp.
+			boolean isAllDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_ALL_PVP.getPath(), false);
             boolean isPeaceDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_PEACEFUL_PVP.getPath(), false);
+			boolean isPlayerEnemy = true;
 			KonquestRelationshipType attackerRole = kingdomManager.getRelationRole(attackerPlayer.getKingdom(), victimPlayer.getKingdom());
             if(attackerRole.equals(KonquestRelationshipType.FRIENDLY) ||
             		attackerRole.equals(KonquestRelationshipType.ALLY) ||
 					attackerRole.equals(KonquestRelationshipType.TRADE) ||
             		(attackerRole.equals(KonquestRelationshipType.PEACEFUL) && (!isPeaceDamageEnabled || isVictimInsideFriendlyTerritory))) {
-            	ChatUtil.sendKonPriorityTitle(attackerPlayer, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				isPlayerEnemy = false;
+            }
+			if(!isAllDamageEnabled && !isPlayerEnemy) {
+				ChatUtil.sendKonPriorityTitle(attackerPlayer, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 				event.setCancelled(true);
 				return;
-            }
-            
-            // Check for death, update directive progress & stat
-            if(victimBukkitPlayer.getHealth() - event.getFinalDamage() <= 0) {
-            	konquest.getDirectiveManager().updateDirectiveProgress(attackerPlayer, KonDirective.KILL_ENEMY);
-            	konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.KILLS,1);
-            } else {
-            	// Player has not died, refresh combat tag timer
-            	int combatTagCooldownSeconds = konquest.getCore().getInt(CorePath.COMBAT_ENEMY_DAMAGE_COOLDOWN_SECONDS.getPath(),0);
-            	boolean combatTagEnabled = konquest.getCore().getBoolean(CorePath.COMBAT_PREVENT_COMMAND_ON_DAMAGE.getPath(),false);
-            	if(combatTagEnabled && combatTagCooldownSeconds > 0) {
-            		// Fire event
-            		KonquestPlayerCombatTagEvent invokePreEvent = new KonquestPlayerCombatTagEvent(konquest, victimPlayer, attackerPlayer, victimBukkitPlayer.getLocation());
-					Konquest.callKonquestEvent(invokePreEvent);
-					// Check for cancelled
-					if(!invokePreEvent.isCancelled()) {
-						// Notify player when tag is new
-	            		if(!victimPlayer.isCombatTagged()) {
-	            			ChatUtil.sendKonPriorityTitle(victimPlayer, "", ChatColor.GOLD+MessagePath.PROTECTION_NOTICE_TAGGED.getMessage(), 20, 1, 10);
-	                		ChatUtil.sendNotice(victimBukkitPlayer, MessagePath.PROTECTION_NOTICE_TAG_MESSAGE.getMessage());
-	            		}
-	            		victimPlayer.getCombatTagTimer().stopTimer();
-	            		victimPlayer.getCombatTagTimer().setTime(combatTagCooldownSeconds);
-	            		victimPlayer.getCombatTagTimer().startTimer();
-	            		victimPlayer.setIsCombatTagged(true);
+			}
+			// The victim may or may not be an enemy. Only do updates for enemy players.
+            if (isPlayerEnemy) {
+				// Check for death, update directive progress & stat
+				if (victimBukkitPlayer.getHealth() - event.getFinalDamage() <= 0) {
+					konquest.getDirectiveManager().updateDirectiveProgress(attackerPlayer, KonDirective.KILL_ENEMY);
+					konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer, KonStatsType.KILLS, 1);
+				} else {
+					// Player has not died, refresh combat tag timer
+					int combatTagCooldownSeconds = konquest.getCore().getInt(CorePath.COMBAT_ENEMY_DAMAGE_COOLDOWN_SECONDS.getPath(), 0);
+					boolean combatTagEnabled = konquest.getCore().getBoolean(CorePath.COMBAT_PREVENT_COMMAND_ON_DAMAGE.getPath(), false);
+					if (combatTagEnabled && combatTagCooldownSeconds > 0) {
+						// Fire event
+						KonquestPlayerCombatTagEvent invokePreEvent = new KonquestPlayerCombatTagEvent(konquest, victimPlayer, attackerPlayer, victimBukkitPlayer.getLocation());
+						Konquest.callKonquestEvent(invokePreEvent);
+						// Check for cancelled
+						if (!invokePreEvent.isCancelled()) {
+							// Notify player when tag is new
+							if (!victimPlayer.isCombatTagged()) {
+								ChatUtil.sendKonPriorityTitle(victimPlayer, "", ChatColor.GOLD + MessagePath.PROTECTION_NOTICE_TAGGED.getMessage(), 20, 1, 10);
+								ChatUtil.sendNotice(victimBukkitPlayer, MessagePath.PROTECTION_NOTICE_TAG_MESSAGE.getMessage());
+							}
+							victimPlayer.getCombatTagTimer().stopTimer();
+							victimPlayer.getCombatTagTimer().setTime(combatTagCooldownSeconds);
+							victimPlayer.getCombatTagTimer().startTimer();
+							victimPlayer.setIsCombatTagged(true);
+						}
 					}
-            	}
-            }
-            konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.DAMAGE,(int)event.getFinalDamage());
+				}
+				konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer, KonStatsType.DAMAGE, (int) event.getFinalDamage());
+			}
         }
     }
 	

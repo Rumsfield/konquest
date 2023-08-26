@@ -25,6 +25,7 @@ label:
   enemy-redstone: "Enemy Redstone"
   false: "False"
   favor: "Favor"
+  flags: "Flags"
   golem-offense: "Iron Golem Offense"
   health: "Health"
   immunity: "Immunity"
@@ -84,6 +85,7 @@ label:
   unavailable: "Unavailable"
   upgrades: "Upgrades"
   valid: "Valid"
+  world: "World"
 placeholder:
   friendly: "Friendly"
   enemy: "Enemy"
@@ -395,6 +397,7 @@ protection:
     untagged: "Tag Expired"
     untag-message: "You are no longer in combat."
     loot-later: "Come back later for more loot!"
+    loot-capture: "Loot will reset once this Ruin has finished being captured."
     raid: "Enemy spotted in %s, use \"/k travel %s\" to defend!"
     raid-alert: "Raid Alert"
     raid-capture-1: "%s is being conquered! Use \"/k travel %s\" to defend and receive %s Favor!"
@@ -550,6 +553,10 @@ command:
     notice:
       kingdom-header: "Kingdom of %s"
       town-header: "Town of %s"
+      camp-placed: "Barbarian Camp is placed."
+      camp-missing: "This player has no camp."
+      ruin-status: "Capture Status"
+      ruin-capture: "This Ruin can be captured for a reward."
   kingdom:
     broadcast:
       create: "%s has created the Kingdom of %s"
@@ -741,6 +748,12 @@ shop:
     create-monument: "Cannot create a shop inside of monuments!"
     create-fail: "Cannot create a shop here!"
     create-wild: "Cannot create shops in the wild!"
+region:
+  error:
+    claim-deny: "A nearby region denies claiming this land."
+    unclaim-deny: "A nearby region denies unclaiming this land."
+    travel-enter-deny: "A region at the destination denies traveling into it."
+    travel-exit-deny: "A region at your current location denies traveling out of it."
 directive:
   create-kingdom: "Foundations"
   create-kingdom-info: "Create your own Kingdom."

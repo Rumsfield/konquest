@@ -43,6 +43,22 @@ public class TravelManager implements Timeable {
 	public void submitTravel(Player bukkitPlayer, TravelDestination destination, KonTerritory territory, Location travelLoc) {
 		if(travelLoc == null) return;
 
+		// Check for other plugin flags
+		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
+			// Origin location
+			if(!konquest.getIntegrationManager().getWorldGuard().isLocationTravelExitAllowed(bukkitPlayer.getLocation(),bukkitPlayer)) {
+				// A region is denying this action
+				ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_TRAVEL_EXIT_DENY.getMessage());
+				return;
+			}
+			// Destination location
+			if(!konquest.getIntegrationManager().getWorldGuard().isLocationTravelEnterAllowed(travelLoc,bukkitPlayer)) {
+				// A region is denying this action
+				ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_TRAVEL_ENTER_DENY.getMessage());
+				return;
+			}
+		}
+
 		// Determine whether player can cover cost
 		boolean isTravelAlwaysAllowed = konquest.getCore().getBoolean(CorePath.FAVOR_ALLOW_TRAVEL_ALWAYS.getPath(),true);
 		double cost = konquest.getCore().getDouble(CorePath.FAVOR_COST_TRAVEL.getPath(),0.0);

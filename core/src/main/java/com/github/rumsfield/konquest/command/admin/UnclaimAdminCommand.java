@@ -35,7 +35,7 @@ public class UnclaimAdminCommand extends CommandBase {
         	}
         	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
         	
-        	if(getArgs().length > 1) {
+        	if(getArgs().length > 2) {
         		String unclaimMode = getArgs()[2];
         		switch(unclaimMode) {
         		case "radius" :

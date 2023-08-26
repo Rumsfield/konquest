@@ -17,6 +17,7 @@ public class ProtocolLibHook implements PluginHook {
 
     @Override
     public int reload() {
+        isEnabled = false;
         Plugin protocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib");
         if(protocolLib == null) {
             return 1;

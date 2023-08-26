@@ -19,7 +19,7 @@ tasks {
         classpath += project.configurations.getByName("compileClasspath").asFileTree
         title = "Konquest ${project.version} Documentation"
         options.overview("overview.html")
-        setDestinationDir(file("$rootDir/doc"))
+        setDestinationDir(file("$rootDir/docs"))
     }
 }
 

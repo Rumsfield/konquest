@@ -23,6 +23,8 @@ softdepend:
   - Multiverse-Portals
   - Multiverse-NetherPortals
   - DiscordSRV
+  - WorldEdit
+  - WorldGuard
 loadbefore:
   - SmoothTimber
 commands:

@@ -37,6 +37,7 @@ public class DiscordSrvHook implements PluginHook {
 
 	@Override
 	public int reload() {
+		isEnabled = false;
 		// Attempt to integrate DiscordSRV
 		Plugin discordSrv = Bukkit.getPluginManager().getPlugin("DiscordSRV");
 		if(discordSrv == null){

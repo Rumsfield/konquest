@@ -174,6 +174,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		
 		initColors();
 		languageManager.initialize();
+		kingdomManager.loadCriticalBlocks(); // load critical block material before sanctuaries
 		sanctuaryManager.initialize(); // Load sanctuaries and monument templates
 		kingdomManager.initialize(); // Load all kingdoms + towns
 		sanctuaryManager.refresh(); // Update sanctuary references to neutrals kingdom
@@ -829,7 +830,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	 * 			10 - Error, name is reserved word
 	 */
 	public int validateNameConstraints(String name) {
-		if(name == null || name.equals("") || name.contains(" ") || !name.matches("([A-Za-z0-9_]+)")) {
+		if(name == null || name.equals("") || name.contains(" ") || !StringUtils.isAlphanumeric(name.replace("_",""))) {
 			return 1;
     	}
     	if(name.length() > 20) {

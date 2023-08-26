@@ -391,17 +391,11 @@ public class BlockListener implements Listener {
 						// Prevent critical block drop
 						event.setDropItems(false);
 						// Restart capture cooldown timer
-						int ruinCaptureTimeSeconds = konquest.getCore().getInt(CorePath.RUINS_CAPTURE_COOLDOWN.getPath());
-						Timer captureTimer = ruin.getCaptureTimer();
-						captureTimer.stopTimer();
-						captureTimer.setTime(ruinCaptureTimeSeconds);
-						captureTimer.startTimer();
-						ChatUtil.printDebug("Starting ruin capture timer for "+ruinCaptureTimeSeconds+" seconds with taskID "+captureTimer.getTaskID()+" for Ruin "+ruin.getName());
+						ruin.startCaptureTimer();
 						// Disable broken critical block
 						ruin.setCriticalLocationEnabled(breakLoc, false);
 						// Update bar progress
-						double progress = (double)(ruin.getRemainingCriticalHits()) / (double)ruin.getMaxCriticalHits();
-						ruin.setBarProgress(progress);
+						ruin.updateBarProgress();
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CRITICAL.getMessage(ruin.getRemainingCriticalHits()));
 						event.getBlock().getWorld().playSound(breakLoc, Sound.BLOCK_FIRE_EXTINGUISH, 1.0F, 0.6F);
 						// Evaluate critical blocks
@@ -782,36 +776,9 @@ public class BlockListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
-					int status = campManager.addCampForPlayer(event.getBlock().getLocation(), player);
-					if(status == 0) { // on successful camp setup...
-						ChatUtil.sendNotice(event.getPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CREATE.getMessage());
-					} else {
-						switch(status) {
-				    	case 1:
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
-				    		event.setCancelled(true);
-				    		break;
-				    	case 2:
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
-				    		event.setCancelled(true);
-				    		break;
-				    	case 3:
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
-				    		event.setCancelled(true);
-				    		break;
-				    	case 4:
-				    		// This error message is removed because it could be annoying to see it every time a bed is placed when camps are disabled.
-				    		break;
-				    	case 5:
-				    		// This error message is removed because it could be annoying to see it every time a bed is placed in an invalid world.
-				    		break;
-						case 6:
-							ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAMP_FAIL_OFFLINE.getMessage());
-							break;
-				    	default:
-				    		ChatUtil.sendError(event.getPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-				    		break;
-						}
+					boolean status = campManager.addCampForPlayer(event.getBlock().getLocation(), player);
+					if(!status) {
+						event.setCancelled(true);
 					}
 				} else {
 					// Wild placement by non-barbarian

@@ -1,12 +1,21 @@
 # Konquest
 Konquest is a plugin for land claiming and territory control.
 
+<p align="center">
+    <img src="./img/KonquestLogo_Wide.png" width="80%" height="80%">
+</p>
+
+### Official Resource Links
+* [SpigotMC](https://www.spigotmc.org/resources/konquest.92220/)
+* [CurseForge](https://www.curseforge.com/minecraft/bukkit-plugins/konquest)
+* [Modrinth](https://modrinth.com/plugin/konquest)
+
 ## For Users
-All details can be found on the [wiki](https://github.com/Rumsfield/konquest-doc/wiki).
+All details can be found on the [wiki](https://github.com/Rumsfield/konquest/wiki).
 
 ## For Developers
 Here are a few helpful links.
-* [API Javadoc](https://rumsfield.github.io/konquest-doc/)
+* [API Javadoc](https://rumsfield.github.io/konquest/)
 * [Contributing Guide](./CONTRIBUTING.md)
 
 ### Project Layout
@@ -18,7 +27,7 @@ The [`doc`](./doc) folder contains auto-generated Javadoc files.
 
 ### Building
 Konquest uses Gradle for most dependencies, building and generating Javadoc.
-* Use Java 8 JDK or newer
+* Use Java 11 JDK or newer
 * Requires Git
 
 Use these commands to build from source:

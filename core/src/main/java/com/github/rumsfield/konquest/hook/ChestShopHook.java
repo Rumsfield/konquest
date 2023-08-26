@@ -22,6 +22,7 @@ public class ChestShopHook implements PluginHook {
 
     @Override
     public int reload() {
+        isEnabled = false;
         // Attempt to integrate ChestShop
         Plugin chestShop = Bukkit.getPluginManager().getPlugin("ChestShop");
         if(chestShop == null) {

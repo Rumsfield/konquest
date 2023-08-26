@@ -35,8 +35,6 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
 
         String pageLabel;
         List<String> loreList;
-        final int MAX_ICONS_PER_PAGE = 45;
-        int pageTotal;
 
         String titleColor = DisplayManager.titleFormat;
         String loreColor = DisplayManager.loreFormat;
@@ -73,18 +71,10 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
 
         // Page 0+
         int pageNum = 0;
-        pageTotal = (int)Math.ceil(((double)allTemplates.size())/MAX_ICONS_PER_PAGE);
-        if(pageTotal == 0) {
-            pageTotal = 1;
-        }
+        int pageTotal = getTotalPages(allTemplates.size());
         ListIterator<KonMonumentTemplate> templateIter = allTemplates.listIterator();
         for(int i = 0; i < pageTotal; i++) {
-            int numPageRows = (int)Math.ceil(((double)(allTemplates.size() - i*MAX_ICONS_PER_PAGE))/9);
-            if(numPageRows < 1) {
-                numPageRows = 1;
-            } else if(numPageRows > 5) {
-                numPageRows = 5;
-            }
+            int numPageRows = getNumPageRows(allTemplates.size(),i);
             pageLabel = titleColor+ MessagePath.LABEL_MONUMENT.getMessage()+" "+(i+1)+"/"+pageTotal;
             getMenu().addPage(pageNum, numPageRows, pageLabel);
             int slotIndex = 0;

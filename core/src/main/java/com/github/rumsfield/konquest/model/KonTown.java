@@ -398,13 +398,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
             for (int y = getWorld().getMinHeight(); y <= getWorld().getMaxHeight()-1; y++) {
                 for (int z = 0; z <= 15; z++) {
                     Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
-                    // Checks for any block in the chunk
-                    if(currentBlock.getType().equals(Material.WATER)) {
-                    	countWaterBlocks++;
-                    }
                     // Checks for blocks within min max monument Y levels
                     if(y >= yMin && y <= yMax) {
-                    	if(currentBlock.getType().equals(Material.AIR)) {
+						if(currentBlock.getType().equals(Material.WATER)) {
+							countWaterBlocks++;
+						} else if(currentBlock.getType().equals(Material.AIR)) {
                     		countAirBlocks++;
                         } else if(currentBlock.getState() instanceof Container) {
                         	countContainers++;

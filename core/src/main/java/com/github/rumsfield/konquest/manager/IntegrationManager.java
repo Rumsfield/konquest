@@ -8,8 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 
 
 public class IntegrationManager {
@@ -21,6 +19,7 @@ public class IntegrationManager {
 	private final DiscordSrvHook discordsrvHook;
 	private final DynmapHook dynmapHook;
 	private final BlueMapHook bluemapHook;
+	private final WorldGuardHook worldguardHook;
 	private final ProtocolLibHook protocollibHook;
 	private final PlaceholderAPIHook placeholderapiHook;
 	
@@ -33,6 +32,7 @@ public class IntegrationManager {
 		discordsrvHook = new DiscordSrvHook(konquest);
 		dynmapHook = new DynmapHook(konquest);
 		bluemapHook = new BlueMapHook(konquest);
+		worldguardHook = new WorldGuardHook(konquest);
 		protocollibHook = new ProtocolLibHook();
 		placeholderapiHook = new PlaceholderAPIHook();
 		// Add hooks to set
@@ -41,6 +41,7 @@ public class IntegrationManager {
 		hooks.add(luckpermsHook);
 		hooks.add(dynmapHook);
 		hooks.add(bluemapHook);
+		hooks.add(worldguardHook);
 		hooks.add(discordsrvHook);
 		hooks.add(quickshopHook);
 		hooks.add(chestshopHook);
@@ -84,7 +85,7 @@ public class IntegrationManager {
 				break;
 			case 1:
 				//result = ChatUtil.parseHex("#5080B0")+"Missing JAR"; // Light Blue
-				result = ChatColor.DARK_AQUA+"Missing JAR";
+				result = ChatColor.DARK_AQUA+"Not Loaded";
 				break;
 			case 2:
 				//result = ChatUtil.parseHex("#B040C0")+"Disabled"; // Light Purple
@@ -124,6 +125,10 @@ public class IntegrationManager {
 
 	public BlueMapHook getBlueMap() {
 		return bluemapHook;
+	}
+
+	public WorldGuardHook getWorldGuard() {
+		return worldguardHook;
 	}
 
 	public ProtocolLibHook getProtocolLib() {

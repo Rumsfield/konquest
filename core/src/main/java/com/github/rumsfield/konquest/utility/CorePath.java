@@ -52,6 +52,7 @@ public enum CorePath {
 	INTEGRATION_LUCKPERMS                                 ("core.integration.luckperms"),
 	INTEGRATION_DYNMAP                                    ("core.integration.dynmap"),
 	INTEGRATION_BLUEMAP                                   ("core.integration.bluemap"),
+	INTEGRATION_WORLDGUARD                                ("core.integration.worldguard"),
 	INTEGRATION_MAP_OPTIONS_ENABLE_KINGDOMS               ("core.integration.map_options.enable_kingdoms"),
 	INTEGRATION_MAP_OPTIONS_ENABLE_CAMPS                  ("core.integration.map_options.enable_camps"),
 	INTEGRATION_MAP_OPTIONS_ENABLE_SANCTUARIES            ("core.integration.map_options.enable_sanctuaries"),
@@ -79,6 +80,7 @@ public enum CorePath {
 	KINGDOMS_INSTANT_WAR                                  ("core.kingdoms.instant_war"),
 	KINGDOMS_INSTANT_PEACE                                ("core.kingdoms.instant_peace"),
 	KINGDOMS_ALLOW_PEACEFUL_PVP                           ("core.kingdoms.allow_peaceful_pvp"),
+	KINGDOMS_ALLOW_ALL_PVP                                ("core.kingdoms.allow_all_pvp"),
 	KINGDOMS_CREATE_ADMIN_ONLY                            ("core.kingdoms.create_admin_only"),
 	KINGDOMS_WEB_COLOR_ADMIN_ONLY                         ("core.kingdoms.web_color_admin_only"),
 	KINGDOMS_PROTECT_CONTAINERS_USE                       ("core.kingdoms.protect_containers_use"),
@@ -174,7 +176,8 @@ public enum CorePath {
 	RUINS_CAPTURE_REWARD_FAVOR                            ("core.ruins.capture_reward_favor"),
 	RUINS_CAPTURE_REWARD_EXP                              ("core.ruins.capture_reward_exp"),
 	RUINS_NO_GOLEM_DROPS                                  ("core.ruins.no_golem_drops"),
-	
+	RUINS_LOOT_COUNT                                      ("core.ruins.loot_count"),
+
 	FAVOR_COST_SPY                                        ("core.favor.cost_spy"),
 	FAVOR_COST_CLAIM                                      ("core.favor.cost_claim"),
 	FAVOR_COST_TRAVEL                                     ("core.favor.cost_travel"),

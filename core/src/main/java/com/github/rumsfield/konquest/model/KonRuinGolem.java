@@ -146,9 +146,15 @@ public class KonRuinGolem {
 	public void setIsRespawnCooldown(boolean val) {
 		isRespawnCooldown = val;
 	}
-	
-	public Timer getRespawnTimer() {
-		return respawnTimer;
+
+	public void startRespawnTimer(int duration) {
+		respawnTimer.stopTimer();
+		respawnTimer.setTime(duration);
+		respawnTimer.startTimer();
+	}
+
+	public int getRespawnTimerId() {
+		return respawnTimer.getTaskID();
 	}
 	
 }
