@@ -255,6 +255,9 @@ core:
     # (*) Suffix to be appended to Kingdom names which will be the name of the Capital city (string)
     capital_suffix: Capital
 
+    # (*) Whether to change the capital suffix into a prefix for Capital cities (true/false)
+    capital_prefix_swap: false
+
     # Force players to respawn at their kingdom capital (true/false)
     capital_respawn: true
     
