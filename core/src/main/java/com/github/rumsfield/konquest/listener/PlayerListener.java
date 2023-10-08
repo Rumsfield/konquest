@@ -741,15 +741,18 @@ public class PlayerListener implements Listener {
     
     private void onBucketUse(PlayerBucketEvent event) {
 		if(event.isCancelled()) return; // Do nothing if another plugin cancels this event
-    	if(!territoryManager.isChunkClaimed(event.getBlock().getLocation())) return;
 		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
 			ChatUtil.printDebug("Failed to handle onBucketUse for non-existent player");
 			return;
 		}
 		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
-		KonTerritory territory = territoryManager.getChunkTerritory(event.getBlock().getLocation());
-		if(!player.isAdminBypassActive()) {
-			boolean cancelUse = false;
+		assert player != null;
+		if(player.isAdminBypassActive()) return; // skip this check if admin bypass
+		// Check for territory
+		boolean cancelUse = false;
+		if(territoryManager.isChunkClaimed(event.getBlock().getLocation())) {
+			// Interaction occured in claimed territory
+			KonTerritory territory = territoryManager.getChunkTerritory(event.getBlock().getLocation());
 			if(territory instanceof KonSanctuary && ((KonSanctuary) territory).isLocInsideTemplate(event.getBlock().getLocation())) {
 				// Block is inside monument template
 				cancelUse = true;
@@ -775,11 +778,18 @@ public class PlayerListener implements Listener {
 					}
 				}
 			}
-
-			if(cancelUse) {
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-				event.setCancelled(true);
+		} else {
+			// Interaction occurred in the wild
+			boolean isWildUse = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_USE.getPath(), true);
+			boolean isWorldValid = konquest.isWorldValid(event.getBlock().getLocation());
+			if(!isWildUse && isWorldValid) {
+				// Block is in the wild of a valid world that has wild use disabled
+				cancelUse = true;
 			}
+		}
+		if(cancelUse) {
+			ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+			event.setCancelled(true);
 		}
     }
     
