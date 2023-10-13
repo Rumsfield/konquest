@@ -68,6 +68,7 @@ public class SettleCommand extends CommandBase {
 			if(settleWorld != null) {
 				boolean isPerWorld = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_MAX_TOWN_LIMIT_PER_WORLD.getPath(),false);
 				int maxTownLimit = getKonquest().getCore().getInt(CorePath.KINGDOMS_MAX_TOWN_LIMIT.getPath(),0);
+				maxTownLimit = Math.max(maxTownLimit,0); // clamp to 0 minimum
 				if(maxTownLimit != 0) {
 					int numTownsInWorld = 0;
 					if(isPerWorld) {
