@@ -326,6 +326,12 @@ core:
     
     # Kingdoms with this many players more than other Kingdoms will not accept new players (0 to disable, integer >= 0)
     max_player_diff: 0
+
+    # The maximum number of towns, including the capital, that a Kingdom can settle (0 to disable, integer >= 0)
+    max_town_limit: 0
+
+    # Whether the maximum town limit applies only in each world (true) or across all worlds (false) (true/false)
+    max_town_limit_per_world: false
     
     # Allow barbarians to join any kingdom, even when exiled (true) or prevent exiled barbarians from switching kingdoms (false) (true/false)
     allow_exile_switch: true
