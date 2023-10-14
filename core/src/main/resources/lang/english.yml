@@ -661,6 +661,8 @@ command:
       fail-water: "Too much water below the ground. Try settling somewhere else, or remove all water below you."
       fail-container: "Too many containers below the ground. Try settling somewhere else, or remove all containers below you."
       fail-init: "Town could not claim initial chunks."
+      fail-limit-all: "Cannot settle more towns than the global maximum limit of %s. There are currently %s towns in all worlds."
+      fail-limit-world: "Cannot settle more towns than the per-world maximum limit of %s. There are currently %s towns in this world."
   spy:
     notice:
       nearby: "nearby"

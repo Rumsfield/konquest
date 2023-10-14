@@ -98,6 +98,8 @@ public enum CorePath {
 	KINGDOMS_GOLEM_ATTACK_ENEMIES                         ("core.kingdoms.golem_attack_enemies"),
 	KINGDOMS_ATTACK_FRIENDLY_GOLEMS                       ("core.kingdoms.attack_friendly_golems"),
 	KINGDOMS_MAX_PLAYER_DIFF                              ("core.kingdoms.max_player_diff"),
+	KINGDOMS_MAX_TOWN_LIMIT                               ("core.kingdoms.max_town_limit"),
+	KINGDOMS_MAX_TOWN_LIMIT_PER_WORLD                     ("core.kingdoms.max_town_limit_per_world"),
 	KINGDOMS_ALLOW_EXILE_SWITCH                           ("core.kingdoms.allow_exile_switch"),
 	KINGDOMS_EXILE_COOLDOWN                               ("core.kingdoms.exile_cooldown"),
 	KINGDOMS_JOIN_COOLDOWN                                ("core.kingdoms.join_cooldown"),
