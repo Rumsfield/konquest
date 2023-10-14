@@ -583,6 +583,8 @@ public enum MessagePath {
 	COMMAND_SETTLE_ERROR_FAIL_WATER             (0, "command.settle.error.fail-water"),
 	COMMAND_SETTLE_ERROR_FAIL_CONTAINER         (0, "command.settle.error.fail-container"),
 	COMMAND_SETTLE_ERROR_FAIL_INIT              (0, "command.settle.error.fail-init"),
+	COMMAND_SETTLE_ERROR_FAIL_LIMIT_ALL         (2, "command.settle.error.fail-limit-all"),
+	COMMAND_SETTLE_ERROR_FAIL_LIMIT_WORLD       (2, "command.settle.error.fail-limit-world"),
 	COMMAND_SPY_NOTICE_NEARBY                   (0, "command.spy.notice.nearby"),
 	COMMAND_SPY_NOTICE_REGIONAL                 (0, "command.spy.notice.regional"),
 	COMMAND_SPY_NOTICE_FARAWAY                  (0, "command.spy.notice.faraway"),

@@ -255,6 +255,9 @@ core:
     # (*) Suffix to be appended to Kingdom names which will be the name of the Capital city (string)
     capital_suffix: Capital
 
+    # (*) Whether to change the capital suffix into a prefix for Capital cities (true/false)
+    capital_prefix_swap: false
+
     # Force players to respawn at their kingdom capital (true/false)
     capital_respawn: true
     
@@ -323,6 +326,12 @@ core:
     
     # Kingdoms with this many players more than other Kingdoms will not accept new players (0 to disable, integer >= 0)
     max_player_diff: 0
+
+    # The maximum number of towns, including the capital, that a Kingdom can settle (0 to disable, integer >= 0)
+    max_town_limit: 0
+
+    # Whether the maximum town limit applies only in each world (true) or across all worlds (false) (true/false)
+    max_town_limit_per_world: false
     
     # Allow barbarians to join any kingdom, even when exiled (true) or prevent exiled barbarians from switching kingdoms (false) (true/false)
     allow_exile_switch: true

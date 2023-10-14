@@ -4,10 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerSettleEvent;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownSettleEvent;
-import com.github.rumsfield.konquest.model.KonDirective;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonStatsType;
-import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -65,8 +62,39 @@ public class SettleCommand extends CommandBase {
 					}
 				}
 			}
-        	
-        	double cost = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
+			// Check max town limit
+			KonKingdom settleKingdom = player.getKingdom();
+			World settleWorld = bukkitPlayer.getLocation().getWorld();
+			if(settleWorld != null) {
+				boolean isPerWorld = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_MAX_TOWN_LIMIT_PER_WORLD.getPath(),false);
+				int maxTownLimit = getKonquest().getCore().getInt(CorePath.KINGDOMS_MAX_TOWN_LIMIT.getPath(),0);
+				maxTownLimit = Math.max(maxTownLimit,0); // clamp to 0 minimum
+				if(maxTownLimit != 0) {
+					int numTownsInWorld = 0;
+					if(isPerWorld) {
+						// Find towns within the given world
+						for(KonTown town : settleKingdom.getCapitalTowns()) {
+							if(town.getWorld().equals(settleWorld)) {
+								numTownsInWorld++;
+							}
+						}
+					} else {
+						// Find all towns
+						numTownsInWorld = settleKingdom.getCapitalTowns().size();
+					}
+					if(numTownsInWorld >= maxTownLimit) {
+						// Limit reached
+						if(isPerWorld) {
+							ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_LIMIT_WORLD.getMessage(numTownsInWorld,maxTownLimit));
+						} else {
+							ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_FAIL_LIMIT_ALL.getMessage(numTownsInWorld,maxTownLimit));
+						}
+						return;
+					}
+				}
+			}
+
+			double cost = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
         	double incr = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath());
         	int townCount = getKonquest().getKingdomManager().getPlayerLordships(player);
         	double adj_cost = (((double)townCount)*incr) + cost;
