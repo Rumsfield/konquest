@@ -99,7 +99,7 @@ public class PlayerManager implements KonquestPlayerManager {
 				newPlayer.setKingdom(kingdom);
 				newPlayer.setExileKingdom(kingdom);
 				newPlayer.setBarbarian(false);
-				ChatUtil.printDebug("New player has existing kingdom membership with "+kingdom.getName());
+				ChatUtil.printConsoleWarning("New player "+bukkitPlayer.getName()+" already has kingdom membership in "+kingdom.getName()+". Check your SQL database settings in core.yml, the database connection may have been lost or corrupted.");
 				break;
 			}
 		}
@@ -132,7 +132,7 @@ public class PlayerManager implements KonquestPlayerManager {
 					importedPlayer.setKingdom(kingdom);
 					importedPlayer.setExileKingdom(kingdom);
 					importedPlayer.setBarbarian(false);
-					ChatUtil.printDebug("Imported barbarian player has existing kingdom membership with "+kingdom.getName());
+					ChatUtil.printConsoleWarning("Existing barbarian player "+bukkitPlayer.getName()+" has kingdom membership in "+kingdom.getName()+". Check your SQL database settings in core.yml, the database connection may have been lost or corrupted.");
 					break;
 				}
 			}
@@ -155,7 +155,7 @@ public class PlayerManager implements KonquestPlayerManager {
 						importedPlayer.setKingdom(kingdom);
 						importedPlayer.setExileKingdom(kingdom);
 						importedPlayer.setBarbarian(false);
-						ChatUtil.printDebug("Imported non-barbarian player with missing kingdom has existing kingdom membership with "+kingdom.getName());
+						ChatUtil.printConsoleWarning("Existing player "+bukkitPlayer.getName()+" is in an unknown kingdom, but already has kingdom membership in "+kingdom.getName()+". Check your SQL database settings in core.yml, the database connection may have been lost or corrupted.");
 						break;
 					}
 				}
