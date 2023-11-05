@@ -238,6 +238,9 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
 			if(offlinePlayer != null && icon.getAction().equals(PlayerIconAction.DISPLAY_INFO)) {
 				getKonquest().getDisplayManager().displayPlayerInfoMenu(clickPlayer, offlinePlayer);
+			} else {
+				ChatUtil.sendError(clickPlayer.getBukkitPlayer(),MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+				ChatUtil.printConsoleWarning("Failed to open info menu for unknown player "+icon.getOfflinePlayer().getName()+". Check your SQL database settings in core.yml, the database connection may have been lost or corrupted.");
 			}
 		}
 	}
