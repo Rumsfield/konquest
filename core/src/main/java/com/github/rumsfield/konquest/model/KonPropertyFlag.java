@@ -21,6 +21,7 @@ public enum KonPropertyFlag {
 	ENTER			(MessagePath.PROPERTIES_ENTER_NAME.getMessage(), 	MessagePath.PROPERTIES_ENTER.getMessage()),
 	EXIT			(MessagePath.PROPERTIES_EXIT_NAME.getMessage(), 	MessagePath.PROPERTIES_EXIT.getMessage()),
 	SHOP			(MessagePath.PROPERTIES_SHOP_NAME.getMessage(), 	MessagePath.PROPERTIES_SHOP.getMessage()),
+	ARENA		    (MessagePath.PROPERTIES_ARENA_NAME.getMessage(), 	MessagePath.PROPERTIES_ARENA.getMessage()),
 
 	// Properties specifically for towns/capitals
 	CAPTURE			(MessagePath.PROPERTIES_CAPTURE_NAME.getMessage(), 	MessagePath.PROPERTIES_CAPTURE.getMessage()),

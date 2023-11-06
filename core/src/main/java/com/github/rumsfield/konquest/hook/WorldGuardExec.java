@@ -23,6 +23,7 @@ import java.awt.*;
  */
 public class WorldGuardExec {
 
+    private static StateFlag ARENA;
     private static StateFlag CLAIM;
     private static StateFlag UNCLAIM;
     private static StateFlag TRAVEL_ENTER;
@@ -37,48 +38,65 @@ public class WorldGuardExec {
     public static boolean load() {
         isAvailable = false;
         FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
+        String errorMessageFormat = "Konquest failed to register a custom flag with WorldGuard, %s, because another plugin has already registered it.";
+
+        /* Arena Flag */
+        String flagNameArena = "konquest-arena";
+        try {
+            StateFlag flag = new StateFlag(flagNameArena, true);
+            registry.register(flag);
+            ARENA = flag;
+        } catch (FlagConflictException e) {
+            // some other plugin registered a flag by the same name already.
+            ChatUtil.printConsoleError(String.format(errorMessageFormat, flagNameArena));
+            return false;
+        }
 
         /* Claim Flag */
+        String flagNameClaim = "konquest-claim";
         try {
-            StateFlag flag = new StateFlag("konquest-claim", true);
+            StateFlag flag = new StateFlag(flagNameClaim, true);
             registry.register(flag);
             CLAIM = flag;
         } catch (FlagConflictException e) {
             // some other plugin registered a flag by the same name already.
-            ChatUtil.printConsoleError("Konquest failed to register a custom flag with WorldGuard, konquest-claim, because another plugin has already registered it.");
+            ChatUtil.printConsoleError(String.format(errorMessageFormat, flagNameClaim));
             return false;
         }
 
         /* Unclaim Flag */
+        String flagNameUnclaim = "konquest-unclaim";
         try {
-            StateFlag flag = new StateFlag("konquest-unclaim", true);
+            StateFlag flag = new StateFlag(flagNameUnclaim, true);
             registry.register(flag);
             UNCLAIM = flag;
         } catch (FlagConflictException e) {
             // some other plugin registered a flag by the same name already.
-            ChatUtil.printConsoleError("Konquest failed to register a custom flag with WorldGuard, konquest-unclaim, because another plugin has already registered it.");
+            ChatUtil.printConsoleError(String.format(errorMessageFormat, flagNameUnclaim));
             return false;
         }
 
         /* Travel Enter Flag */
+        String flagNameTravelEnter = "konquest-travel-enter";
         try {
-            StateFlag flag = new StateFlag("konquest-travel-enter", true);
+            StateFlag flag = new StateFlag(flagNameTravelEnter, true);
             registry.register(flag);
             TRAVEL_ENTER = flag;
         } catch (FlagConflictException e) {
             // some other plugin registered a flag by the same name already.
-            ChatUtil.printConsoleError("Konquest failed to register a custom flag with WorldGuard, konquest-travel-enter, because another plugin has already registered it.");
+            ChatUtil.printConsoleError(String.format(errorMessageFormat, flagNameTravelEnter));
             return false;
         }
 
         /* Travel Exit Flag */
+        String flagNameTravelExit = "konquest-travel-exit";
         try {
-            StateFlag flag = new StateFlag("konquest-travel-exit", true);
+            StateFlag flag = new StateFlag(flagNameTravelExit, true);
             registry.register(flag);
             TRAVEL_EXIT = flag;
         } catch (FlagConflictException e) {
             // some other plugin registered a flag by the same name already.
-            ChatUtil.printConsoleError("Konquest failed to register a custom flag with WorldGuard, konquest-travel-exit, because another plugin has already registered it.");
+            ChatUtil.printConsoleError(String.format(errorMessageFormat, flagNameTravelExit));
             return false;
         }
 
@@ -117,17 +135,21 @@ public class WorldGuardExec {
     }
 
     static boolean isLocationTravelEnterAllowed(Location loc, Player player) {
-        return isLocationFlagAllowed(TRAVEL_ENTER, loc, player);
+        return isLocationFlagAllowed(TRAVEL_ENTER, loc, player, true);
     }
 
     static boolean isLocationTravelExitAllowed(Location loc, Player player) {
-        return isLocationFlagAllowed(TRAVEL_EXIT, loc, player);
+        return isLocationFlagAllowed(TRAVEL_EXIT, loc, player, true);
     }
 
-    private static boolean isLocationFlagAllowed(StateFlag flag, Location loc, Player player) {
+    static boolean isLocationArenaAllowed(Location loc, Player player) {
+        return isLocationFlagAllowed(ARENA, loc, player, false);
+    }
+
+    private static boolean isLocationFlagAllowed(StateFlag flag, Location loc, Player player, boolean defaultResult) {
         if(!isAvailable) {
-            // WorldGuard integration did not register custom flags, always allow
-            return true;
+            // WorldGuard integration did not register custom flags, use default result
+            return defaultResult;
         }
         assert loc.getWorld() != null;
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();

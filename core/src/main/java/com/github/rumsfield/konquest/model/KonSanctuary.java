@@ -36,6 +36,7 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 	public static java.util.List<KonPropertyFlag> getProperties() {
 		java.util.List<KonPropertyFlag> result = new ArrayList<>();
 		result.add(KonPropertyFlag.TRAVEL);
+		result.add(KonPropertyFlag.ARENA);
 		result.add(KonPropertyFlag.PVP);
 		result.add(KonPropertyFlag.PVE);
 		result.add(KonPropertyFlag.BUILD);

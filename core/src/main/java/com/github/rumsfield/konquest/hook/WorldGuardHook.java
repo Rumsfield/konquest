@@ -95,4 +95,12 @@ public class WorldGuardHook implements PluginHook {
         return WorldGuardExec.isLocationTravelExitAllowed(loc, player);
     }
 
+    public boolean isLocationArenaAllowed(Location loc, Player player) {
+        if(!isEnabled) {
+            // WorldGuard integration is disabled, always deny
+            return false;
+        }
+        return WorldGuardExec.isLocationArenaAllowed(loc, player);
+    }
+
 }

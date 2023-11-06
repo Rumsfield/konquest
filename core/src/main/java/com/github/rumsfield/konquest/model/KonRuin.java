@@ -53,6 +53,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 
 	public static java.util.List<KonPropertyFlag> getProperties() {
 		java.util.List<KonPropertyFlag> result = new ArrayList<>();
+		result.add(KonPropertyFlag.ARENA);
 		result.add(KonPropertyFlag.PVP);
 		result.add(KonPropertyFlag.PVE);
 		result.add(KonPropertyFlag.USE);
