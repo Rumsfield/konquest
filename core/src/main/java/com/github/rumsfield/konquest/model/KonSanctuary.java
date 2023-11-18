@@ -6,6 +6,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.utility.*;
 import com.github.rumsfield.konquest.utility.Timer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
@@ -25,10 +26,10 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 	
 	public KonSanctuary(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, konquest);
-		this.sanctuaryBarAll = Bukkit.getServer().createBossBar(Konquest.neutralColor2+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SEGMENTED_20);
-		this.sanctuaryBarAll.setVisible(true);
 		this.properties = new HashMap<>();
 		initProperties();
+		this.sanctuaryBarAll = Bukkit.getServer().createBossBar(getTitleName(), BarColor.WHITE, BarStyle.SEGMENTED_20);
+		this.sanctuaryBarAll.setVisible(true);
 		this.templates = new HashMap<>();
 		this.templateBlankingTimers = new HashMap<>();
 	}
@@ -98,7 +99,16 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 
 	@Override
 	public void updateBarTitle() {
-		sanctuaryBarAll.setTitle(Konquest.neutralColor2+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName());
+		sanctuaryBarAll.setTitle(getTitleName());
+	}
+
+	private String getTitleName() {
+		String title = Konquest.neutralColor2+MessagePath.TERRITORY_SANCTUARY.getMessage().trim()+" "+getName();
+		if(properties.get(KonPropertyFlag.ARENA)) {
+			// Arena property is true
+			title = title+" - "+ChatColor.RED+MessagePath.PROPERTIES_ARENA_NAME.getMessage();
+		}
+		return title;
 	}
 
 	@Override

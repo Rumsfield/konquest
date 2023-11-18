@@ -39,16 +39,16 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	 */
 	public KonRuin(Location loc, String name, KonKingdom kingdom, Konquest konquest) {
 		super(loc, name, kingdom, konquest);
+		this.properties = new HashMap<>();
+		initProperties();
 		this.spawnTimer = new Timer(this);
 		this.captureTimer = new Timer(this);
 		this.captureCountdownTimer = new Timer(this);
 		this.isCaptureDisabled = false;
-		this.ruinBarAll = Bukkit.getServer().createBossBar(Konquest.neutralColor2+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName(), BarColor.WHITE, BarStyle.SOLID);
+		this.ruinBarAll = Bukkit.getServer().createBossBar(getTitleName(), BarColor.WHITE, BarStyle.SOLID);
 		this.ruinBarAll.setVisible(true);
 		this.criticalLocations = new HashMap<>();
 		this.spawnLocations = new HashMap<>();
-		this.properties = new HashMap<>();
-		initProperties();
 	}
 
 	public static java.util.List<KonPropertyFlag> getProperties() {
@@ -234,7 +234,16 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 
 	@Override
 	public void updateBarTitle() {
-		ruinBarAll.setTitle(Konquest.neutralColor2+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName());
+		ruinBarAll.setTitle(getTitleName());
+	}
+
+	private String getTitleName() {
+		String title = Konquest.neutralColor2+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName();
+		if(properties.get(KonPropertyFlag.ARENA)) {
+			// Arena property is true
+			title = title+" - "+ChatColor.RED+MessagePath.PROPERTIES_ARENA_NAME.getMessage();
+		}
+		return title;
 	}
 
 	public void updateBarProgress() {

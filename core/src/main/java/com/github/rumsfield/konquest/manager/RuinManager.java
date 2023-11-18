@@ -6,6 +6,7 @@ import com.github.rumsfield.konquest.api.manager.KonquestRuinManager;
 import com.github.rumsfield.konquest.api.model.KonquestRuin;
 import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonPlayer;
+import com.github.rumsfield.konquest.model.KonPropertyFlag;
 import com.github.rumsfield.konquest.model.KonRuin;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
@@ -226,6 +227,20 @@ public class RuinManager implements KonquestRuinManager {
 	                		ruin.addSpawnLocation(loc);
 	            		}
 	                	konquest.getTerritoryManager().addAllTerritory(world,ruin.getChunkList());
+						// Set properties
+						ConfigurationSection ruinPropertiesSection = ruinSection.getConfigurationSection("properties");
+						if(ruinPropertiesSection != null) {
+							for (String propertyName : ruinPropertiesSection.getKeys(false)) {
+								boolean value = ruinPropertiesSection.getBoolean(propertyName);
+								KonPropertyFlag property = KonPropertyFlag.getFlag(propertyName);
+								boolean status = ruin.setPropertyValue(property, value);
+								if (!status) {
+									ChatUtil.printDebug("Failed to set invalid property " + propertyName + " to Ruin " + ruinName);
+								}
+							}
+						}
+						// Update title
+						ruin.updateBarTitle();
 	        		} else {
 	        			String message = "Could not load ruin "+ruinName+", ruins.yml may be corrupted and needs to be deleted.";
 	            		ChatUtil.printConsoleError(message);
@@ -263,6 +278,13 @@ public class RuinManager implements KonquestRuinManager {
 			ruinSection.set("chunks", konquest.formatPointsToString(ruin.getChunkList().keySet()));
 			ruinSection.set("criticals", konquest.formatLocationsToString(ruin.getCriticalLocations()));
 			ruinSection.set("spawns", konquest.formatLocationsToString(ruin.getSpawnLocations()));
+			// Properties
+			ConfigurationSection ruinPropertiesSection = ruinSection.createSection("properties");
+			for(KonPropertyFlag flag : KonPropertyFlag.values()) {
+				if(ruin.hasPropertyValue(flag)) {
+					ruinPropertiesSection.set(flag.toString(), ruin.getPropertyValue(flag));
+				}
+			}
 		}
 	}
 	

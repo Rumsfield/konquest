@@ -702,7 +702,7 @@ public class EntityListener implements Listener {
 			}
 
 			// Check for WorldGuard flags
-			boolean isFlagArenaAllowed = konquest.getIntegrationManager().getWorldGuard().isLocationTravelExitAllowed(victimBukkitPlayer.getLocation(),attackerBukkitPlayer);
+			boolean isFlagArenaAllowed = konquest.getIntegrationManager().getWorldGuard().isLocationArenaAllowed(victimBukkitPlayer.getLocation(),attackerBukkitPlayer);
 
 			// Check for kingdom relationships
 			boolean isAllDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_ALL_PVP.getPath(), false);
