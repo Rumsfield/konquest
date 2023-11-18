@@ -715,6 +715,8 @@ public class EntityListener implements Listener {
 					(attackerRole.equals(KonquestRelationshipType.PEACEFUL) && (!isPeaceDamageEnabled || isVictimInsideFriendlyTerritory))) {
 				isPlayerEnemy = false;
 			}
+//			ChatUtil.printDebug("Player "+attackerBukkitPlayer.getName()+" attacked "+victimBukkitPlayer.getName()+
+//					", role="+attackerRole+", enemy="+isPlayerEnemy+", arenaProperty="+isPropertyArenaEnabled+", arenaFlag="+isFlagArenaAllowed);
 
 			// Protection checks when the damage is not inside a territory with ARENA property = true
 			if(!isPropertyArenaEnabled && !isFlagArenaAllowed) {

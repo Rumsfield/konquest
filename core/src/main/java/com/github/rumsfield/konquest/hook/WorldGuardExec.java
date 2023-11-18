@@ -43,7 +43,7 @@ public class WorldGuardExec {
         /* Arena Flag */
         String flagNameArena = "konquest-arena";
         try {
-            StateFlag flag = new StateFlag(flagNameArena, true);
+            StateFlag flag = new StateFlag(flagNameArena, false);
             registry.register(flag);
             ARENA = flag;
         } catch (FlagConflictException e) {
@@ -155,8 +155,8 @@ public class WorldGuardExec {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager regions = container.get(BukkitAdapter.adapt(loc.getWorld()));
         if(regions == null) {
-            // No regions available in this world, always allow
-            return true;
+            // No regions available in this world, use default
+            return defaultResult;
         }
         BlockVector3 pos = BlockVector3.at(loc.getX(),loc.getY(),loc.getZ());
         ApplicableRegionSet overlappingChunkRegions = regions.getApplicableRegions(pos);
