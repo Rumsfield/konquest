@@ -1,8 +1,11 @@
 # Language File
 # English
+# To use this file, set core.yml language: english
 # 
 # "%s" are substitutes for words or numbers by the plugin.
-# If a line has a "%s", keep it. You cannot add or remove any "%s".
+# If a line has "%s", keep it. You cannot add or remove any "%s".
+# Use online YAML parsing tools to check for valid syntax:
+# https://yaml-online-parser.appspot.com/
 # 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
@@ -1028,3 +1031,8 @@ properties:
   shop: "Allow players to create shops"
   arena-name: "Arena"
   arena: "Allow any players to fight each other"
+discord-srv:
+  discord: "Discord"
+  no-link: "You are not linked to Discord. Type /discord link"
+  no-user: "Couldn't find the Discord user you're linked to."
+  linked-user: "You're linked to %s in Discord."
