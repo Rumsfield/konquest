@@ -145,7 +145,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		} else if(taskID == captureCountdownTimer.getTaskID()) {
 			// Update capture countdown title
 			String remainingTime = Konquest.getTimeFormat(captureTimer.getTime(),ChatColor.RED);
-			ruinBarAll.setTitle(Konquest.neutralColor2+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName()+" "+remainingTime);
+			ruinBarAll.setTitle(getTitleName()+" "+remainingTime);
 		} else {
 			// Check for respawn timer in golem spawn map
 			for(KonRuinGolem golem : spawnLocations.values()) {
@@ -160,6 +160,44 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 				}
 			}
 		}
+	}
+
+	// Returns true when all critical blocks have been destroyed, else false
+	public boolean onCriticalHit(Location criticalLoc) {
+		// Restart capture cooldown timer
+		startCaptureTimer();
+		// Disable broken critical block
+		if(criticalLocations.containsKey(criticalLoc)) {
+			criticalLocations.put(criticalLoc, false);
+		} else {
+			// The location is not a critical block
+			ChatUtil.printDebug("Bad critical location for Ruin "+getName());
+			return false;
+		}
+		// Update bar progress
+		updateBarProgress();
+		// Evaluate critical blocks
+		if(getRemainingCriticalHits() == 0) {
+			// All critical blocks are destroyed
+			setIsCaptureDisabled(true);
+			return true;
+		} else {
+			// Some critical blocks remain
+			// Force all alive golems to respawn
+			respawnAllDistantGolems();
+			return false;
+		}
+	}
+
+	public void resetRuinCapture() {
+		isCaptureDisabled = false;
+		captureCountdownTimer.stopTimer();
+		captureTimer.stopTimer();
+		setBarProgress(1.0);
+		updateBarTitle();
+		regenCriticalBlocks();
+		respawnAllGolems();
+		getKonquest().getLootManager().resetRuinLoot(this);
 	}
 	
 	public void regenCriticalBlocks() {
@@ -183,7 +221,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	 * Changes the state of the ruin to allow or deny capturing by players.
 	 * @param val True to deny capture, false to allow
 	 */
-	public void setIsCaptureDisabled(boolean val) {
+	private void setIsCaptureDisabled(boolean val) {
 		isCaptureDisabled = val;
 		if(val) {
 			// Deny capturing this ruin until capture timer ends
@@ -195,7 +233,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		}
 	}
 	
-	public void startCaptureTimer() {
+	private void startCaptureTimer() {
 		// The capture timer is started every time a critical block is destroyed.
 		// This means that there could be only a few critical blocks broken, but capture is not yet disabled.
 		// When the capture timer ends, all criticals are regenerated.
@@ -246,7 +284,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		return title;
 	}
 
-	public void updateBarProgress() {
+	private void updateBarProgress() {
 		double progress = (double)(getRemainingCriticalHits()) / (double)getMaxCriticalHits();
 		setBarProgress(progress);
 	}
@@ -306,15 +344,6 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	
 	public boolean isSpawnLocation(Location loc) {
 		return spawnLocations.containsKey(loc);
-	}
-	
-	public boolean setCriticalLocationEnabled(Location loc, boolean val) {
-		boolean result = false;
-		if(criticalLocations.containsKey(loc)) {
-			criticalLocations.put(loc, val);
-			result = true;
-		}
-		return result;
 	}
 	
 	public void clearCriticalLocations() {
@@ -419,7 +448,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		}
 	}
 	
-	public void respawnAllDistantGolems() {
+	private void respawnAllDistantGolems() {
 		if(!isCaptureDisabled) {
 			for(Location spawnLoc : spawnLocations.keySet()) {
 				KonRuinGolem golem = spawnLocations.get(spawnLoc);
