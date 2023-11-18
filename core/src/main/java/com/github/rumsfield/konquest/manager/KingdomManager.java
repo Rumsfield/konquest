@@ -4456,8 +4456,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			kingdomSection.set("webcolor",kingdom.getWebColor());
 			// Kingdom Properties
 			ConfigurationSection kingdomPropertiesSection = kingdomSection.createSection("properties");
-			for(KonPropertyFlag flag : kingdom.getAllProperties().keySet()) {
-				kingdomPropertiesSection.set(flag.toString(), kingdom.getAllProperties().get(flag));
+			for(KonPropertyFlag flag : KonPropertyFlag.values()) {
+				if(kingdom.hasPropertyValue(flag)) {
+					kingdomPropertiesSection.set(flag.toString(), kingdom.getPropertyValue(flag));
+				}
 			}
 			// Kingdom Membership
 			kingdomSection.set("open", kingdom.isOpen());
@@ -4505,8 +4507,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				}
 				// Town Properties
 				ConfigurationSection townPropertiesSection = townInstanceSection.createSection("properties");
-				for(KonPropertyFlag flag : town.getAllProperties().keySet()) {
-					townPropertiesSection.set(flag.toString(), town.getAllProperties().get(flag));
+				for(KonPropertyFlag flag : KonPropertyFlag.values()) {
+					if(town.hasPropertyValue(flag)) {
+						townPropertiesSection.set(flag.toString(), town.getPropertyValue(flag));
+					}
 				}
             	townInstanceSection.set("world", town.getWorld().getName());
             	townInstanceSection.set("base", town.getMonument().getBaseY());

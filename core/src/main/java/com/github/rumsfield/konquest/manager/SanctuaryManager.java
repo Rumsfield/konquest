@@ -589,15 +589,18 @@ public class SanctuaryManager {
 	        			konquest.getTerritoryManager().addAllTerritory(sanctuaryWorld,sanctuary.getChunkList());
 	        			// Set properties
 	        			ConfigurationSection sanctuaryPropertiesSection = sanctuarySection.getConfigurationSection("properties");
-						assert sanctuaryPropertiesSection != null;
-	        			for(String propertyName : sanctuaryPropertiesSection.getKeys(false)) {
-	        				boolean value = sanctuaryPropertiesSection.getBoolean(propertyName);
-	        				KonPropertyFlag property = KonPropertyFlag.getFlag(propertyName);
-	        				boolean status = sanctuary.setPropertyValue(property, value);
-	        				if(!status) {
-	        					ChatUtil.printDebug("Failed to set invalid property "+propertyName+" to Sanctuary "+sanctuaryName);
-	        				}
-	        			}
+						if(sanctuaryPropertiesSection != null) {
+							for (String propertyName : sanctuaryPropertiesSection.getKeys(false)) {
+								boolean value = sanctuaryPropertiesSection.getBoolean(propertyName);
+								KonPropertyFlag property = KonPropertyFlag.getFlag(propertyName);
+								boolean status = sanctuary.setPropertyValue(property, value);
+								if (!status) {
+									ChatUtil.printDebug("Failed to set invalid property " + propertyName + " to Sanctuary " + sanctuaryName);
+								}
+							}
+						}
+						// Update title
+						sanctuary.updateBarTitle();
 	        			// Load Monument Templates
 	        			ConfigurationSection sanctuaryMonumentsSection = sanctuarySection.getConfigurationSection("monuments");
 						assert sanctuaryMonumentsSection != null;
@@ -713,8 +716,10 @@ public class SanctuaryManager {
 			sanctuarySection.set("chunks", konquest.formatPointsToString(sanctuary.getChunkList().keySet()));
 			// Properties
 			ConfigurationSection sanctuaryPropertiesSection = sanctuarySection.createSection("properties");
-			for(KonPropertyFlag flag : sanctuary.getAllProperties().keySet()) {
-				sanctuaryPropertiesSection.set(flag.toString(), sanctuary.getAllProperties().get(flag));
+			for(KonPropertyFlag flag : KonPropertyFlag.values()) {
+				if(sanctuary.hasPropertyValue(flag)) {
+					sanctuaryPropertiesSection.set(flag.toString(), sanctuary.getPropertyValue(flag));
+				}
 			}
 			// Monuments
 			// Any template in memory, valid or invalid, gets saved to data file.

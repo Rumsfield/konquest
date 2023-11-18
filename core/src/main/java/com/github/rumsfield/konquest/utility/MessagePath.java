@@ -899,6 +899,7 @@ public enum MessagePath {
 	PROPERTIES_DEMOTE							(0, "properties.demote"),
 	PROPERTIES_TRANSFER							(0, "properties.transfer"),
 	PROPERTIES_SHOP  							(0, "properties.shop"),
+	PROPERTIES_ARENA  							(0, "properties.arena"),
 
 	PROPERTIES_TRAVEL_NAME						(0, "properties.travel-name"),
 	PROPERTIES_PVP_NAME							(0, "properties.pvp-name"),
@@ -923,6 +924,7 @@ public enum MessagePath {
 	PROPERTIES_DEMOTE_NAME						(0, "properties.demote-name"),
 	PROPERTIES_TRANSFER_NAME					(0, "properties.transfer-name"),
 	PROPERTIES_SHOP_NAME						(0, "properties.shop-name"),
+	PROPERTIES_ARENA_NAME						(0, "properties.arena-name"),
 
 	NULL_MESSAGE	(0,"");
 	

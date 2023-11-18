@@ -663,70 +663,91 @@ public class EntityListener implements Listener {
             if(victimPlayer == null || attackerPlayer == null) {
             	return;
             }
-			// Protect victim if they're peaceful
-			if(victimPlayer.getKingdom().isPeaceful()) {
-				ChatUtil.sendNotice(attackerBukkitPlayer, MessagePath.PROTECTION_NOTICE_PEACEFUL_VICTIM.getMessage());
-				event.setCancelled(true);
-				return;
+
+			// Update egg stat
+			if(isEggAttack) {
+				konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.EGG,1);
 			}
-			// Protect victim when attacker is peaceful
-			if(attackerPlayer.getKingdom().isPeaceful()) {
-				ChatUtil.sendNotice(attackerBukkitPlayer, MessagePath.PROTECTION_NOTICE_PEACEFUL_ATTACKER.getMessage());
-				event.setCancelled(true);
-				return;
-			}
-            // Check for protections for attacks within claimed territory
+
+            // Check for property flags
             boolean isWildDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_PVP.getPath(), true);
 			boolean isWorldValid = konquest.isWorldValid(victimBukkitPlayer.getLocation());
             boolean isAttackInTerritory = territoryManager.isChunkClaimed(victimBukkitPlayer.getLocation());
 			boolean isVictimInsideFriendlyTerritory = false;
-            if(isAttackInTerritory) {
-            	KonTerritory territory = territoryManager.getChunkTerritory(victimBukkitPlayer.getLocation());
+			boolean isPropertyPvpProtected = false; // True = no pvp is allowed at all, False = use normal pvp checks
+			boolean isPropertyArenaEnabled = false; // True = ignore kingdom relations for pvp, False = use normal relations checks
+			if(isAttackInTerritory) {
+				KonTerritory territory = territoryManager.getChunkTerritory(victimBukkitPlayer.getLocation());
 				assert territory != null;
-            	// Property Flag Holders
-    			if(territory instanceof KonPropertyFlagHolder) {
-    				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
-    				if(flagHolder.hasPropertyValue(KonPropertyFlag.PVP)) {
-    					if(!flagHolder.getPropertyValue(KonPropertyFlag.PVP)) {
-    						ChatUtil.sendKonPriorityTitle(attackerPlayer, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-    						event.setCancelled(true);
-    						return;
-    					}
-    				}
-    			}
-            	// Prevent damage to victim inside peaceful territory if the victim is a member
+				// Property Flag Holders
+				if(territory instanceof KonPropertyFlagHolder) {
+					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+					if(flagHolder.hasPropertyValue(KonPropertyFlag.PVP)) {
+						if(!flagHolder.getPropertyValue(KonPropertyFlag.PVP)) {
+							isPropertyPvpProtected = true;
+						}
+					}
+					if(flagHolder.hasPropertyValue(KonPropertyFlag.ARENA)) {
+						if(flagHolder.getPropertyValue(KonPropertyFlag.ARENA)) {
+							isPropertyArenaEnabled = true;
+						}
+					}
+				}
+				// Other territory checks
 				isVictimInsideFriendlyTerritory = territory.getKingdom().equals(victimPlayer.getKingdom());
-            	if(territory.getKingdom().isPeaceful() && isVictimInsideFriendlyTerritory) {
-            		event.setCancelled(true);
-                	return;
-            	}
-            } else if(!isWildDamageEnabled && isWorldValid) {
-            	event.setCancelled(true);
-            	return;
-            }
-            
-            // Update egg stat
-            if(isEggAttack) {
-            	konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.EGG,1);
-            }
-            
-            // Prevent optional damage based on relations
-			// Kingdoms at peace may allow pvp. Kingdoms in alliance or trade cannot pvp.
-			boolean isAllDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_ALL_PVP.getPath(), false);
-            boolean isPeaceDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_PEACEFUL_PVP.getPath(), false);
-			boolean isPlayerEnemy = true;
-			KonquestRelationshipType attackerRole = kingdomManager.getRelationRole(attackerPlayer.getKingdom(), victimPlayer.getKingdom());
-            if(attackerRole.equals(KonquestRelationshipType.FRIENDLY) ||
-            		attackerRole.equals(KonquestRelationshipType.ALLY) ||
-					attackerRole.equals(KonquestRelationshipType.TRADE) ||
-            		(attackerRole.equals(KonquestRelationshipType.PEACEFUL) && (!isPeaceDamageEnabled || isVictimInsideFriendlyTerritory))) {
-				isPlayerEnemy = false;
-            }
-			if(!isAllDamageEnabled && !isPlayerEnemy) {
-				ChatUtil.sendKonPriorityTitle(attackerPlayer, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+			} else if(!isWildDamageEnabled && isWorldValid) {
+				// Always disable PVP in the wild when configured
 				event.setCancelled(true);
 				return;
 			}
+
+			// Check for WorldGuard flags
+			boolean isFlagArenaAllowed = konquest.getIntegrationManager().getWorldGuard().isLocationArenaAllowed(victimBukkitPlayer.getLocation(),attackerBukkitPlayer);
+
+			// Check for kingdom relationships
+			boolean isAllDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_ALL_PVP.getPath(), false);
+			boolean isPeaceDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_PEACEFUL_PVP.getPath(), false);
+			boolean isPlayerEnemy = true;
+			KonquestRelationshipType attackerRole = kingdomManager.getRelationRole(attackerPlayer.getKingdom(), victimPlayer.getKingdom());
+			if (attackerRole.equals(KonquestRelationshipType.FRIENDLY) ||
+					attackerRole.equals(KonquestRelationshipType.ALLY) ||
+					attackerRole.equals(KonquestRelationshipType.TRADE) ||
+					(attackerRole.equals(KonquestRelationshipType.PEACEFUL) && (!isPeaceDamageEnabled || isVictimInsideFriendlyTerritory))) {
+				isPlayerEnemy = false;
+			}
+//			ChatUtil.printDebug("Player "+attackerBukkitPlayer.getName()+" attacked "+victimBukkitPlayer.getName()+
+//					", role="+attackerRole+", enemy="+isPlayerEnemy+", arenaProperty="+isPropertyArenaEnabled+", arenaFlag="+isFlagArenaAllowed);
+
+			// Protection checks when the damage is not inside a territory with ARENA property = true
+			if(!isPropertyArenaEnabled && !isFlagArenaAllowed) {
+				// Protect victim if they're peaceful
+				if (victimPlayer.getKingdom().isPeaceful()) {
+					ChatUtil.sendNotice(attackerBukkitPlayer, MessagePath.PROTECTION_NOTICE_PEACEFUL_VICTIM.getMessage());
+					event.setCancelled(true);
+					return;
+				}
+				// Protect victim when attacker is peaceful
+				if (attackerPlayer.getKingdom().isPeaceful()) {
+					ChatUtil.sendNotice(attackerBukkitPlayer, MessagePath.PROTECTION_NOTICE_PEACEFUL_ATTACKER.getMessage());
+					event.setCancelled(true);
+					return;
+				}
+				// Protect pvp when property is false
+				if (isPropertyPvpProtected) {
+					ChatUtil.sendKonPriorityTitle(attackerPlayer, "", Konquest.blockedFlagColor + MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					event.setCancelled(true);
+					return;
+				}
+				// Prevent optional damage based on relations
+				// Kingdoms at peace may allow pvp. Kingdoms in alliance or trade cannot pvp.
+				if (!isAllDamageEnabled && !isPlayerEnemy) {
+					ChatUtil.sendKonPriorityTitle(attackerPlayer, "", Konquest.blockedProtectionColor + MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					event.setCancelled(true);
+					return;
+				}
+			}
+			/* Finished with protection checks, the victim is damaged...*/
+
 			// The victim may or may not be an enemy. Only do updates for enemy players.
             if (isPlayerEnemy) {
 				// Check for death, update directive progress & stat

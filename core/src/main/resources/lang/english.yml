@@ -1024,3 +1024,5 @@ properties:
   transfer: "Allow ownership transfer"
   shop-name: "Shop"
   shop: "Allow players to create shops"
+  arena-name: "Arena"
+  arena: "Allow any players to fight each other"
