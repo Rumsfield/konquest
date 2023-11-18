@@ -180,6 +180,7 @@ public enum CorePath {
 	RUINS_CAPTURE_REWARD_EXP                              ("core.ruins.capture_reward_exp"),
 	RUINS_NO_GOLEM_DROPS                                  ("core.ruins.no_golem_drops"),
 	RUINS_LOOT_COUNT                                      ("core.ruins.loot_count"),
+	RUINS_LOOT_AFTER_CAPTURE                              ("core.ruins.loot_after_capture"),
 
 	FAVOR_COST_SPY                                        ("core.favor.cost_spy"),
 	FAVOR_COST_CLAIM                                      ("core.favor.cost_claim"),

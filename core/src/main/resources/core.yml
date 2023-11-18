@@ -582,6 +582,9 @@ core:
 
     # Number of loot items to appear in ruin loot chests (integer >= 0)
     loot_count: 2
+
+    # Only fill loot chests after the ruin has been captured during capture cooldown period (true/false)
+    loot_after_capture: true
     
   # //// CORE.FAVOR \\\\
   favor:

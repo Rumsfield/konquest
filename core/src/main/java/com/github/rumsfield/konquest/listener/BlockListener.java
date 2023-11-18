@@ -390,21 +390,14 @@ public class BlockListener implements Listener {
 						}
 						// Prevent critical block drop
 						event.setDropItems(false);
-						// Restart capture cooldown timer
-						ruin.startCaptureTimer();
-						// Disable broken critical block
-						ruin.setCriticalLocationEnabled(breakLoc, false);
-						// Update bar progress
-						ruin.updateBarProgress();
+						// Check ruin critical conditions
+						boolean hitStatus = ruin.onCriticalHit(breakLoc);
+						// Notify Player
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CRITICAL.getMessage(ruin.getRemainingCriticalHits()));
 						event.getBlock().getWorld().playSound(breakLoc, Sound.BLOCK_FIRE_EXTINGUISH, 1.0F, 0.6F);
-						// Evaluate critical blocks
-						if(ruin.getRemainingCriticalHits() == 0) {
-							ruin.setIsCaptureDisabled(true);
+						if(hitStatus) {
 							konquest.getRuinManager().rewardPlayers(ruin,player.getKingdom());
 						} else {
-							// Force all alive golems to respawn
-							ruin.respawnAllDistantGolems();
 							// All golems target player
 							ruin.targetAllGolemsToPlayer(event.getPlayer());
 						}
@@ -413,7 +406,6 @@ public class BlockListener implements Listener {
 						// Prevent all other block breaks
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
-						return;
 					}
 				} else if(territory instanceof KonSanctuary) {
 					KonSanctuary sanctuary = (KonSanctuary)territory;

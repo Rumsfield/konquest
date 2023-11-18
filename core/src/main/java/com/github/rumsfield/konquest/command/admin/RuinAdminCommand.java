@@ -90,11 +90,6 @@ public class RuinAdminCommand extends CommandBase {
 				sendInvalidArgMessage(bukkitPlayer, AdminCommandType.RUIN);
 			}
 		} else if(cmdMode.equalsIgnoreCase("reset")) {
-			// Check for valid ruin
-			if(!getKonquest().getRuinManager().isRuin(ruinName)) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
-				return;
-			}
 			// Reset ruin (restore critical blocks and respawn golems)
 			boolean pass = getKonquest().getRuinManager().resetRuin(ruinName);
 			if(!pass) {
