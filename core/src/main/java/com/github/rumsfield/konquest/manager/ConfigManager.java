@@ -117,6 +117,7 @@ public class ConfigManager{
 	public boolean addConfig(String key, KonConfig config) {
 		boolean status = false;
 		if(config.saveDefaultConfig()) {
+			// A config file exists, either existing or created from defaults
 			if(config.reloadConfig()) {
 				configCache.put(key, config);
 				status = true;

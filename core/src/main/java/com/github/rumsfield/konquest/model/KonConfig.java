@@ -3,7 +3,7 @@ package com.github.rumsfield.konquest.model;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.utility.ChatUtil;
-import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -45,11 +45,11 @@ public class KonConfig {
 		config = new YamlConfiguration();
 		if (file != null) {
 			try {
-				//config.load(file);
-				config = YamlConfiguration.loadConfiguration(file);
+				config.load(file);
+				//config = YamlConfiguration.loadConfiguration(file);
 			} catch (Exception e) {
-				e.printStackTrace();
-				ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check bad file for syntax errors.");
+				ChatUtil.printConsoleWarning(e.getMessage());
+				ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check bad file for syntax errors. Using new default version.");
 				File badFile = new File(plugin.getDataFolder(), fileName+".bad");
 				Path source = file.toPath();
 				Path destination = badFile.toPath();
@@ -105,7 +105,7 @@ public class KonConfig {
 	    if (!file.exists()) {
 	    	try {
 	    		plugin.saveResource(fileName, false);
-	    		ChatUtil.printConsoleAlert("Saved default resource "+fileName);
+	    		ChatUtil.printConsoleAlert("Created new default file "+fileName);
 	    	} catch(IllegalArgumentException e) {
 	    		result = false;
 	    		ChatUtil.printConsoleError("Unknown resource "+fileName+", check spelling.");
@@ -133,7 +133,7 @@ public class KonConfig {
 				} catch (IOException exception) {
 					exception.printStackTrace();
 				}
-				ChatUtil.printConsoleAlert("Created default config file \""+fileName+"\" for version "+pluginVersion);
+				//ChatUtil.printConsoleAlert("Created default config file \""+fileName+"\" for version "+pluginVersion);
 			} else {
 				// The config is from an older plugin version
 				// Make a copy of config file
