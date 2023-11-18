@@ -28,9 +28,13 @@ public class KonRuinGolem {
 		this.isRespawnCooldown = false;
 		this.lastTarget = null;
 	}
-	
+
 	public void spawn() {
-		if(isRespawnCooldown)return;
+		spawn(false);
+	}
+
+	public void spawn(boolean force) {
+		if(!force && isRespawnCooldown)return;
 		if(golem == null || golem.isDead()) {
 			Location modLoc = new Location(spawnLoc.getWorld(),spawnLoc.getX()+0.5,spawnLoc.getY()+1.0,spawnLoc.getZ()+0.5);
 			// Load chunk if not already done
@@ -58,7 +62,7 @@ public class KonRuinGolem {
 	
 	public void respawn() {
 		remove();
-		spawn();
+		spawn(true);
 	}
 	
 	public void remove() {

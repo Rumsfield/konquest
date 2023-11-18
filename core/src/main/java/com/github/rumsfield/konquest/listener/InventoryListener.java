@@ -162,7 +162,7 @@ public class InventoryListener implements Listener {
 					// Attempt to put loot into empty chests within the ruin
 					if(event.getInventory().getType().equals(InventoryType.CHEST)) {
 						// Update loot with default count as defined in core YML
-						boolean result = konquest.getLootManager().updateRuinLoot(event.getInventory());
+						boolean result = konquest.getLootManager().updateRuinLoot(event.getInventory(), (KonRuin)territory);
 						ChatUtil.printDebug("Attempted to update loot in ruin "+territory.getName()+", got "+result);
 						if(result) {
 							event.getInventory().getLocation().getWorld().playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
@@ -316,11 +316,11 @@ public class InventoryListener implements Listener {
 			if(town.getMonument().isLocInside(loc)) {
 				// At this point, due to previous checks, the inventory is inside of a town monument
 				// and is one of the prohibited actions. Cancel this event.
-				ChatUtil.printDebug("Cancelling player item placement into monument inventory of town "+territory.getName());
+				//ChatUtil.printDebug("Cancelling player item placement into monument inventory of town "+territory.getName());
 				return true;
 			}
 		} else if(territory instanceof KonRuin) {
-			ChatUtil.printDebug("Cancelling player item placement into ruin inventory of ruin "+territory.getName());
+			//ChatUtil.printDebug("Cancelling player item placement into ruin inventory of ruin "+territory.getName());
 			return true;
 		}
 		return false;

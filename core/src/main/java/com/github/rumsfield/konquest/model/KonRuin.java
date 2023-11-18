@@ -145,7 +145,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		} else if(taskID == captureCountdownTimer.getTaskID()) {
 			// Update capture countdown title
 			String remainingTime = Konquest.getTimeFormat(captureTimer.getTime(),ChatColor.RED);
-			ruinBarAll.setTitle(Konquest.neutralColor2+MessagePath.TERRITORY_RUIN.getMessage().trim()+" "+getName()+" "+remainingTime);
+			ruinBarAll.setTitle(getTitleName()+" "+remainingTime);
 		} else {
 			// Check for respawn timer in golem spawn map
 			for(KonRuinGolem golem : spawnLocations.values()) {
@@ -192,10 +192,11 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	public void resetRuinCapture() {
 		isCaptureDisabled = false;
 		captureCountdownTimer.stopTimer();
+		captureTimer.stopTimer();
 		setBarProgress(1.0);
 		updateBarTitle();
 		regenCriticalBlocks();
-		spawnAllGolems();
+		respawnAllGolems();
 		getKonquest().getLootManager().resetRuinLoot(this);
 	}
 	
