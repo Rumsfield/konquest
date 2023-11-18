@@ -161,6 +161,16 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 			}
 		}
 	}
+
+	public void resetRuinCapture() {
+		isCaptureDisabled = false;
+		captureCountdownTimer.stopTimer();
+		setBarProgress(1.0);
+		updateBarTitle();
+		regenCriticalBlocks();
+		spawnAllGolems();
+		getKonquest().getLootManager().resetRuinLoot(this);
+	}
 	
 	public void regenCriticalBlocks() {
 		for(Location loc : criticalLocations.keySet()) {

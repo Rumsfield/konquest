@@ -159,6 +159,13 @@ public class RuinManager implements KonquestRuinManager {
 		}
 		return result;
 	}
+
+	public boolean resetRuin(String name) {
+		if(!isRuin(name)) return false;
+		KonRuin ruin = ruinMap.get(name.toLowerCase());
+		ruin.resetRuinCapture();
+		return true;
+	}
 	
 	public KonRuin getRuin(String name) {
 		return ruinMap.get(name.toLowerCase());
