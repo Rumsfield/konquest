@@ -29,6 +29,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
@@ -438,6 +439,97 @@ public class EntityListener implements Listener {
 		}
 
 	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onVehicleDamage(VehicleDamageEvent event) {
+		// Player tries to break a vehicle: boat, minecart, etc
+		if (event.isCancelled()) return;
+		if (konquest.isWorldIgnored(event.getVehicle().getWorld())) return;
+		if(!(event.getAttacker() instanceof Player)) return;
+		Player bukkitPlayer = (Player)event.getAttacker();
+		if (bukkitPlayer == null) return;
+		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		if(player == null) return;
+		Location damageLoc = event.getVehicle().getLocation();
+		//ChatUtil.printDebug("EVENT player vehicle damage of " + event.getVehicle().getType());
+		if(!player.isAdminBypassActive() && territoryManager.isChunkClaimed(damageLoc)) {
+			KonTerritory territory = territoryManager.getChunkTerritory(damageLoc);
+			// Property Flag Holders
+			if(territory instanceof KonPropertyFlagHolder) {
+				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+				if(flagHolder.hasPropertyValue(KonPropertyFlag.BUILD)) {
+					if(!flagHolder.getPropertyValue(KonPropertyFlag.BUILD)) {
+						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						event.setCancelled(true);
+						return;
+					}
+				}
+			}
+			// Specific territory protections
+			if(territory instanceof KonTown) {
+				KonTown town = (KonTown) territory;
+				// Prevent non-friendlies (including enemies) and friendly non-residents
+				KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+				if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
+					event.setCancelled(true);
+					return;
+				}
+			} else if(territory instanceof KonRuin) {
+				// Always prevent
+				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				event.setCancelled(true);
+				return;
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onEntityPlace(EntityPlaceEvent event) {
+		// Player tries to place an entity on a block: armor stands, boats, minecarts, end crystals
+		if(event.isCancelled()) return;
+		if(konquest.isWorldIgnored(event.getBlock().getWorld())) return;
+		Player bukkitPlayer = event.getPlayer();
+		if(bukkitPlayer == null) return;
+		if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
+			ChatUtil.printDebug("Failed to handle onEntityPlace for non-existent player");
+			return;
+		}
+		KonPlayer player = playerManager.getPlayer(bukkitPlayer);
+		Location placeLoc = event.getBlock().getLocation();
+		//ChatUtil.printDebug("EVENT player entity placement of "+event.getEntityType());
+		// Check for claim protections at place location
+		if(!player.isAdminBypassActive() && territoryManager.isChunkClaimed(placeLoc)) {
+			KonTerritory territory = territoryManager.getChunkTerritory(placeLoc);
+			// Property Flag Holders
+			if(territory instanceof KonPropertyFlagHolder) {
+				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+				if(flagHolder.hasPropertyValue(KonPropertyFlag.BUILD)) {
+					if(!flagHolder.getPropertyValue(KonPropertyFlag.BUILD)) {
+						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						event.setCancelled(true);
+						return;
+					}
+				}
+			}
+			// Specific territory protections
+			if(territory instanceof KonTown) {
+				// Prevent non-friendlies (including enemies) and friendly non-residents
+				KonTown town = (KonTown) territory;
+				KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+				if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
+					event.setCancelled(true);
+					return;
+				}
+			} else if(territory instanceof KonRuin) {
+				// Always prevent
+				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				event.setCancelled(true);
+				return;
+			}
+		}
+	}
 	
 	@EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamageByPlayer(EntityDamageByEntityEvent event) {
@@ -503,12 +595,13 @@ public class EntityListener implements Listener {
         	if(territory instanceof KonTown) {
     			KonTown town = (KonTown) territory;
 				KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
-    			//ChatUtil.printDebug("EVENT player entity interaction within town "+town.getName());
+    			//ChatUtil.printDebug("EVENT player entity damage within town "+town.getName());
     			
     			// Preventions for non-friendlies and non-residents
     			if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
-    				// Cannot damage item frames
-    				if(eType.equals(EntityType.ITEM_FRAME)) {
+    				// Cannot damage item frames or armor stands
+    				if(eType.equals(EntityType.ITEM_FRAME) || eType.equals(EntityType.GLOW_ITEM_FRAME) || eType.equals(EntityType.ARMOR_STAND)) {
+						ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(town.getName()));
     					event.setCancelled(true);
 						return;
     				}
