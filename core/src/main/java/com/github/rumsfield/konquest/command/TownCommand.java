@@ -35,7 +35,7 @@ public class TownCommand extends CommandBase {
 		// Open a specific town management menu
 		// /k town <town>
 
-		// k town [<town>] [menu|invite|kick|lord|rename] [<name>]
+		// k town [<town>] [menu|join|leave|invite|kick|lord|rename] [<name>]
 		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length < 1 || getArgs().length > 4) {
 			sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
@@ -58,13 +58,8 @@ public class TownCommand extends CommandBase {
 		KonTown town = null;
 		if(getArgs().length >= 2) {
 			String townName = getArgs()[1];
-			boolean isTown = player.getKingdom().hasTown(townName);
-			boolean isCapital = player.getKingdom().hasCapital(townName);
-			if (isTown) {
-				town = player.getKingdom().getTown(townName);
-			} else if (isCapital) {
-				town = player.getKingdom().getCapital();
-			} else {
+			town = player.getKingdom().getTownCapital(townName);
+			if (town == null) {
 				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(townName));
 				return;
 			}
@@ -116,6 +111,40 @@ public class TownCommand extends CommandBase {
 					return;
 				}
 				getKonquest().getDisplayManager().displayTownManagementMenu(player, town, false);
+				break;
+
+			case "join":
+				if(getArgs().length == 4) {
+					// Get join town from name
+					String joinTownName = getArgs()[3];
+					KonTown joinTown = player.getKingdom().getTownCapital(joinTownName);
+					if (joinTown == null) {
+						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(joinTownName));
+						return;
+					}
+					// Call manager method, includes messages
+					getKonquest().getKingdomManager().menuJoinTownRequest(player,joinTown);
+				} else {
+					sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
+					return;
+				}
+				break;
+
+			case "leave":
+				if(getArgs().length == 4) {
+					// Get leave town from name
+					String leaveTownName = getArgs()[3];
+					KonTown leaveTown = player.getKingdom().getTownCapital(leaveTownName);
+					if (leaveTown == null) {
+						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(leaveTownName));
+						return;
+					}
+					// Call manager method, includes messages
+					getKonquest().getKingdomManager().menuLeaveTown(player,leaveTown);
+				} else {
+					sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
+					return;
+				}
 				break;
 
 			case "invite":
@@ -216,7 +245,7 @@ public class TownCommand extends CommandBase {
 
 	@Override
 	public List<String> tabComplete() {
-		// k town [<town>] [menu|invite|kick|lord|rename] [<name>]
+		// k town [<town>] [menu|join|leave|invite|kick|lord|rename] [<name>]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		Player bukkitPlayer = (Player) getSender();
@@ -239,6 +268,8 @@ public class TownCommand extends CommandBase {
 			tabList.add("lord");
 			tabList.add("rename");
 			tabList.add("menu");
+			tabList.add("join");
+			tabList.add("leave");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
@@ -255,7 +286,31 @@ public class TownCommand extends CommandBase {
 					}
 				}
 				tabList.addAll(playerList);
-			} else if(subCommand.equalsIgnoreCase("rename")) {
+			} else if(subCommand.equalsIgnoreCase("join")) {
+				// Get list of kingdom towns that player is not a member of
+				List<String> joinTownList = new ArrayList<>();
+				for(KonTown town : player.getKingdom().getTowns()) {
+					if(!town.isPlayerResident(player.getBukkitPlayer())) {
+						joinTownList.add(town.getName());
+					}
+				}
+				if(!player.getKingdom().getCapital().isPlayerResident(player.getBukkitPlayer())) {
+					joinTownList.add(player.getKingdom().getName());
+				}
+				tabList.addAll(joinTownList);
+			} else if(subCommand.equalsIgnoreCase("leave")) {
+				// Get list of kingdom towns that player is a member of
+				List<String> leaveTownList = new ArrayList<>();
+				for(KonTown town : player.getKingdom().getTowns()) {
+					if(town.isPlayerResident(player.getBukkitPlayer())) {
+						leaveTownList.add(town.getName());
+					}
+				}
+				if(player.getKingdom().getCapital().isPlayerResident(player.getBukkitPlayer())) {
+					leaveTownList.add(player.getKingdom().getName());
+				}
+				tabList.addAll(leaveTownList);
+			}  else if(subCommand.equalsIgnoreCase("rename")) {
 				tabList.add("***");
 			}
 			// Trim down completion options based on current input
