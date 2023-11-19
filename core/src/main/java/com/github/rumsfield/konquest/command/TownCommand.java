@@ -89,7 +89,7 @@ public class TownCommand extends CommandBase {
 			String subCmd = getArgs()[2];
 			// Check if town has a lord
 			boolean notifyLordTakeover = false;
-			if(!town.isLordValid() && !subCmd.equalsIgnoreCase("lord")) {
+			if(!town.isLordValid() && !subCmd.equalsIgnoreCase("lord") && !subCmd.equalsIgnoreCase("join")) {
 				if(town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 					notifyLordTakeover = true;
 				} else if(town.isPlayerResident(player.getOfflineBukkitPlayer()) && town.getPlayerKnights().isEmpty()) {
@@ -114,16 +114,9 @@ public class TownCommand extends CommandBase {
 				break;
 
 			case "join":
-				if(getArgs().length == 4) {
-					// Get join town from name
-					String joinTownName = getArgs()[3];
-					KonTown joinTown = player.getKingdom().getTownCapital(joinTownName);
-					if (joinTown == null) {
-						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(joinTownName));
-						return;
-					}
+				if(getArgs().length == 3) {
 					// Call manager method, includes messages
-					getKonquest().getKingdomManager().menuJoinTownRequest(player,joinTown);
+					getKonquest().getKingdomManager().menuJoinTownRequest(player, town);
 				} else {
 					sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
 					return;
@@ -131,16 +124,9 @@ public class TownCommand extends CommandBase {
 				break;
 
 			case "leave":
-				if(getArgs().length == 4) {
-					// Get leave town from name
-					String leaveTownName = getArgs()[3];
-					KonTown leaveTown = player.getKingdom().getTownCapital(leaveTownName);
-					if (leaveTown == null) {
-						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(leaveTownName));
-						return;
-					}
+				if(getArgs().length == 3) {
 					// Call manager method, includes messages
-					getKonquest().getKingdomManager().menuLeaveTown(player,leaveTown);
+					getKonquest().getKingdomManager().menuLeaveTown(player, town);
 				} else {
 					sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
 					return;
@@ -286,31 +272,7 @@ public class TownCommand extends CommandBase {
 					}
 				}
 				tabList.addAll(playerList);
-			} else if(subCommand.equalsIgnoreCase("join")) {
-				// Get list of kingdom towns that player is not a member of
-				List<String> joinTownList = new ArrayList<>();
-				for(KonTown town : player.getKingdom().getTowns()) {
-					if(!town.isPlayerResident(player.getBukkitPlayer())) {
-						joinTownList.add(town.getName());
-					}
-				}
-				if(!player.getKingdom().getCapital().isPlayerResident(player.getBukkitPlayer())) {
-					joinTownList.add(player.getKingdom().getName());
-				}
-				tabList.addAll(joinTownList);
-			} else if(subCommand.equalsIgnoreCase("leave")) {
-				// Get list of kingdom towns that player is a member of
-				List<String> leaveTownList = new ArrayList<>();
-				for(KonTown town : player.getKingdom().getTowns()) {
-					if(town.isPlayerResident(player.getBukkitPlayer())) {
-						leaveTownList.add(town.getName());
-					}
-				}
-				if(player.getKingdom().getCapital().isPlayerResident(player.getBukkitPlayer())) {
-					leaveTownList.add(player.getKingdom().getName());
-				}
-				tabList.addAll(leaveTownList);
-			}  else if(subCommand.equalsIgnoreCase("rename")) {
+			} else if(subCommand.equalsIgnoreCase("rename")) {
 				tabList.add("***");
 			}
 			// Trim down completion options based on current input
