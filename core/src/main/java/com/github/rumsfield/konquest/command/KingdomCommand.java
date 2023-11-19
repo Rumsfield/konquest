@@ -30,7 +30,7 @@ public class KingdomCommand extends CommandBase {
 		if(getSender().hasPermission("konquest.command.admin.monument") && getKonquest().getSanctuaryManager().getNumTemplates() == 0) {
 			ChatUtil.sendError((Player) getSender(),MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_NO_TEMPLATES.getMessage());
 		}
-		// kingdom [menu|create|invite|kick|rename|templates|webcolor] [template] [name]
+		// kingdom [menu|create|join|exile|invite|kick|rename|templates|webcolor] [template|kingdom] [name]
 		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length != 1 && getArgs().length != 2 && getArgs().length != 3 && getArgs().length != 4) {
 			sendInvalidArgMessage(bukkitPlayer,CommandType.KINGDOM);
@@ -200,6 +200,28 @@ public class KingdomCommand extends CommandBase {
 							ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SETTLE_NOTICE_MAP_HINT.getMessage());
 						}
 	            		break;
+					case "join":
+						// Join a new kingdom
+						if(getArgs().length == 3) {
+							String joinKingdomName = getArgs()[2];
+							if(!getKonquest().getKingdomManager().isKingdom(joinKingdomName)) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(joinKingdomName));
+								return;
+							}
+							KonKingdom joinKingdom = getKonquest().getKingdomManager().getKingdom(joinKingdomName);
+							getKonquest().getKingdomManager().menuJoinKingdomRequest(player, joinKingdom);
+						} else {
+							sendInvalidArgMessage(bukkitPlayer,CommandType.KINGDOM);
+						}
+						break;
+					case "exile":
+						// Exile to become a barbarian
+						if(getArgs().length == 2) {
+							getKonquest().getKingdomManager().menuExileKingdom(player);
+						} else {
+							sendInvalidArgMessage(bukkitPlayer,CommandType.KINGDOM);
+						}
+						break;
 	            	case "invite":
 	            		// Invite a new kingdom member (officers only)
 	            		if(player.isBarbarian()) {
@@ -367,6 +389,8 @@ public class KingdomCommand extends CommandBase {
 			// suggest sub-commands
 			tabList.add("menu");
 			tabList.add("create");
+			tabList.add("join");
+			tabList.add("exile");
 			tabList.add("invite");
 			tabList.add("kick");
 			tabList.add("rename");
@@ -386,6 +410,10 @@ public class KingdomCommand extends CommandBase {
 			if(subCommand.equalsIgnoreCase("create")) {
 				List<String> templateList = new ArrayList<>(getKonquest().getSanctuaryManager().getAllValidTemplateNames());
 				tabList.addAll(templateList);
+			} else if(subCommand.equalsIgnoreCase("join")) {
+				List<String> kingdomList = new ArrayList<>(getKonquest().getKingdomManager().getKingdomNames());
+				kingdomList.remove(player.getKingdom().getName());
+				tabList.addAll(kingdomList);
 			} else if(subCommand.equalsIgnoreCase("rename")) {
 				tabList.add("***");
 			} else if(subCommand.equalsIgnoreCase("invite")) {
