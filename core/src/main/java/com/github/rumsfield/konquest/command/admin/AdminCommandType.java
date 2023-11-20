@@ -14,7 +14,7 @@ public enum AdminCommandType {
 	UNCLAIM     (Material.COBWEB,				"konquest.admin.unclaim",      "[radius|auto] [<radius>]",                                     MessagePath.DESCRIPTION_ADMIN_UNCLAIM.getMessage()),
 	CAPTURE     (Material.FISHING_ROD,			"konquest.admin.capture",      "<town> <kingdom>",                                             MessagePath.DESCRIPTION_ADMIN_CAPTURE.getMessage()),
 	MONUMENT    (Material.CRAFTING_TABLE,		"konquest.admin.monument",     "create|remove|reset|show|status <name> [<cost>]",              MessagePath.DESCRIPTION_ADMIN_MONUMENT.getMessage()),
-	RUIN        (Material.CRACKED_STONE_BRICKS,	"konquest.admin.ruin",         "create|remove|rename|criticals|spawns [<name>] [<name>]",      MessagePath.DESCRIPTION_ADMIN_RUIN.getMessage()),
+	RUIN        (Material.CRACKED_STONE_BRICKS,	"konquest.admin.ruin",         "create|remove|rename|reset|criticals|spawns [<name>] [<name>]", MessagePath.DESCRIPTION_ADMIN_RUIN.getMessage()),
 	SANCTUARY   (Material.BEDROCK,				"konquest.admin.sanctuary",    "create|remove|rename <name> [<name>]",                         MessagePath.DESCRIPTION_ADMIN_SANCTUARY.getMessage()),
 	TRAVEL      (Material.COMPASS,				"konquest.admin.travel",       "<name>",                                                       MessagePath.DESCRIPTION_ADMIN_TRAVEL.getMessage()),
 	SETTRAVEL   (Material.OAK_SIGN,				"konquest.admin.settravel",    "",                                                             MessagePath.DESCRIPTION_ADMIN_SETTRAVEL.getMessage()),

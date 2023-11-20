@@ -137,6 +137,9 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
 			if(offlinePlayer != null && icon.getAction().equals(PlayerIconAction.DISPLAY_SCORE)) {
 				getKonquest().getDisplayManager().displayScoreMenu(clickPlayer, offlinePlayer);
+			} else {
+				ChatUtil.sendError(clickPlayer.getBukkitPlayer(),MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+				ChatUtil.printConsoleWarning("Failed to open score menu for unknown player "+icon.getOfflinePlayer().getName()+". Check your SQL database settings in core.yml, the database connection may have been lost or corrupted.");
 			}
 		} else if(clickedIcon instanceof KingdomIcon) {
 			// Kingdom Icons open a new kingdom info menu for the associated player

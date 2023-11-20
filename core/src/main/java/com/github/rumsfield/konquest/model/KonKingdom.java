@@ -794,6 +794,18 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		result.add(capital);
 		return result;
 	}
+
+	public KonTown getTownCapital(String name) {
+		KonTown resultTown = null;
+		boolean isTown = hasTown(name);
+		boolean isCapital = hasCapital(name);
+		if (isTown) {
+			resultTown = getTown(name);
+		} else if (isCapital) {
+			resultTown = getCapital();
+		}
+		return resultTown;
+	}
 	
 	public boolean isTownMapEmpty() {
 		return townMap.isEmpty();

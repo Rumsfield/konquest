@@ -450,12 +450,14 @@ public enum MessagePath {
 	COMMAND_ADMIN_RUIN_NOTICE_CREATE            (1, "command.admin.ruin.notice.create"),
 	COMMAND_ADMIN_RUIN_NOTICE_REMOVE            (1, "command.admin.ruin.notice.remove"),
 	COMMAND_ADMIN_RUIN_NOTICE_RENAME            (2, "command.admin.ruin.notice.rename"),
+	COMMAND_ADMIN_RUIN_NOTICE_RESET             (1, "command.admin.ruin.notice.reset"),
 	COMMAND_ADMIN_RUIN_NOTICE_CRITICALS         (1, "command.admin.ruin.notice.criticals"),
 	COMMAND_ADMIN_RUIN_NOTICE_SPAWNS            (1, "command.admin.ruin.notice.spawns"),
 	COMMAND_ADMIN_RUIN_NOTICE_ADD               (1, "command.admin.ruin.notice.add"),
 	COMMAND_ADMIN_RUIN_ERROR_CREATE             (1, "command.admin.ruin.error.create"),
 	COMMAND_ADMIN_RUIN_ERROR_REMOVE             (1, "command.admin.ruin.error.remove"),
 	COMMAND_ADMIN_RUIN_ERROR_RENAME             (2, "command.admin.ruin.error.rename"),
+	COMMAND_ADMIN_RUIN_ERROR_RESET              (1, "command.admin.ruin.error.reset"),
 	COMMAND_ADMIN_RUIN_ERROR_MATCH              (1, "command.admin.ruin.error.match"),
 	COMMAND_ADMIN_RUIN_ERROR_INVALID            (0, "command.admin.ruin.error.invalid"),
 	COMMAND_ADMIN_SANCTUARY_NOTICE_CREATE       (1, "command.admin.sanctuary.notice.create"),
@@ -899,6 +901,7 @@ public enum MessagePath {
 	PROPERTIES_DEMOTE							(0, "properties.demote"),
 	PROPERTIES_TRANSFER							(0, "properties.transfer"),
 	PROPERTIES_SHOP  							(0, "properties.shop"),
+	PROPERTIES_ARENA  							(0, "properties.arena"),
 
 	PROPERTIES_TRAVEL_NAME						(0, "properties.travel-name"),
 	PROPERTIES_PVP_NAME							(0, "properties.pvp-name"),
@@ -923,6 +926,7 @@ public enum MessagePath {
 	PROPERTIES_DEMOTE_NAME						(0, "properties.demote-name"),
 	PROPERTIES_TRANSFER_NAME					(0, "properties.transfer-name"),
 	PROPERTIES_SHOP_NAME						(0, "properties.shop-name"),
+	PROPERTIES_ARENA_NAME						(0, "properties.arena-name"),
 
 	NULL_MESSAGE	(0,"");
 	

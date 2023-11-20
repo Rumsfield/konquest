@@ -228,6 +228,10 @@ public class FlagAdminCommand extends CommandBase {
 						if(setHolder.setPropertyValue(flag, bValue)) {
 							// Successfully assigned value
 							ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SET.getMessage(flag.getName(), holderName, bValue));
+							if(flag.equals(KonPropertyFlag.ARENA) && (setHolder instanceof KonSanctuary || setHolder instanceof KonRuin)) {
+								// Update title bar
+								((KonBarDisplayer) setHolder).updateBarTitle();
+							}
 						} else {
 							// Failed to assign value
 							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());

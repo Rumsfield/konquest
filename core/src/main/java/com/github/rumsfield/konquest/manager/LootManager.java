@@ -310,12 +310,26 @@ public class LootManager implements Timeable{
 	 * Ruin Loot
 	 */
 
-	public boolean updateRuinLoot(Inventory inventory) {
+	/**
+	 * Attempts to fill an inventory with loot under the following conditions:
+	 * - The inventory has not already been emptied
+	 * - The ruin is in capture cooldown state
+	 * @param inventory The inventory to fill with loot
+	 * @param ruin The ruin that contains the inventory
+	 * @return True when loot was updated, else false
+	 */
+	public boolean updateRuinLoot(Inventory inventory, KonRuin ruin) {
 		Location invLoc = inventory.getLocation();
 		int count = ruinLootCount;
+		boolean isLootAfterCapture = konquest.getCore().getBoolean(CorePath.RUINS_LOOT_AFTER_CAPTURE.getPath());
+		boolean isRuinCaptured = ruin.isCaptureDisabled();
+		if(isLootAfterCapture && !isRuinCaptured) {
+			// This ruin has not been capture yet
+			return false;
+		}
 		if(ruinLootEmptiedLog.containsKey(invLoc)) {
 			if(ruinLootEmptiedLog.get(invLoc)) {
-				// Inventory has been emptied and ruin has not yet been captured
+				// Inventory has been emptied already
 				return false;
 			}
 		}

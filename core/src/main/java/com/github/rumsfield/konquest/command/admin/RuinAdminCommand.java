@@ -24,7 +24,7 @@ public class RuinAdminCommand extends CommandBase {
 
 	@Override
 	public void execute() {
-		// k admin ruin create|remove|rename|criticals|spawns <name> [<name>]
+		// k admin ruin create|remove|rename|reset|criticals|spawns <name> [<name>]
 		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length != 4 && getArgs().length != 5) {
 			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.RUIN);
@@ -89,6 +89,14 @@ public class RuinAdminCommand extends CommandBase {
 			} else {
 				sendInvalidArgMessage(bukkitPlayer, AdminCommandType.RUIN);
 			}
+		} else if(cmdMode.equalsIgnoreCase("reset")) {
+			// Reset ruin (restore critical blocks and respawn golems)
+			boolean pass = getKonquest().getRuinManager().resetRuin(ruinName);
+			if(!pass) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_RESET.getMessage(ruinName));
+			} else {
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_RESET.getMessage(ruinName));
+			}
 		} else if(cmdMode.equalsIgnoreCase("criticals")) {
         	if(player.isSettingRegion()) {
         		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_REGION.getMessage());
@@ -131,6 +139,7 @@ public class RuinAdminCommand extends CommandBase {
 			tabList.add("create");
 			tabList.add("remove");
 			tabList.add("rename");
+			tabList.add("reset");
 			tabList.add("criticals");
 			tabList.add("spawns");
 			// Trim down completion options based on current input
@@ -140,7 +149,7 @@ public class RuinAdminCommand extends CommandBase {
 			String subCmd = getArgs()[2];
 			if(subCmd.equalsIgnoreCase("create")) {
 				tabList.add("***");
-			} else if(subCmd.equalsIgnoreCase("remove") || subCmd.equalsIgnoreCase("criticals") || subCmd.equalsIgnoreCase("spawns") || subCmd.equalsIgnoreCase("rename")) {
+			} else if(subCmd.equalsIgnoreCase("remove") || subCmd.equalsIgnoreCase("reset") || subCmd.equalsIgnoreCase("criticals") || subCmd.equalsIgnoreCase("spawns") || subCmd.equalsIgnoreCase("rename")) {
 				tabList.addAll(getKonquest().getRuinManager().getRuinNames());
 			}
 			// Trim down completion options based on current input

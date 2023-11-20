@@ -16,6 +16,7 @@
 #	ENTER			Allow players to enter
 #	EXIT			Allow players to exit
 #   SHOP            Allow players to create shops
+#   ARENA           Allow any players to fight each other
 # 
 # Properties specifically for towns/capitals
 #	CAPTURE			Allow this town to be captured
@@ -60,6 +61,7 @@ properties:
     mobs: false
     portals: true
     shop: false
+    arena: false
   ruins:
     enter: true
     exit: true
@@ -68,6 +70,7 @@ properties:
     use: true
     chest: true
     portals: true
+    arena: false
   towns:
     capture: true
     claim: true

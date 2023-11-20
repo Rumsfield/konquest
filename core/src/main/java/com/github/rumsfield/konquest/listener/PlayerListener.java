@@ -636,7 +636,7 @@ public class PlayerListener implements Listener {
         if(player != null && !player.isAdminBypassActive() && territoryManager.isChunkClaimed(clicked.getLocation())) {
         	KonTerritory territory = territoryManager.getChunkTerritory(clicked.getLocation());
         	// Entity exceptions are always allowed to interact
-        	ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" interacted at entity of type: "+ clicked.getType());
+        	//ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" interacted at entity of type: "+ clicked.getType());
         	boolean isEntityAllowed = (clicked.getType().equals(EntityType.PLAYER) ||
 					clicked.getType().equals(EntityType.VILLAGER) ||
 					clicked.getType().equals(EntityType.BOAT));
@@ -673,7 +673,7 @@ public class PlayerListener implements Listener {
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
         if(player != null && !player.isAdminBypassActive() && territoryManager.isChunkClaimed(event.getRightClicked().getLocation())) {
 			KonTerritory territory = territoryManager.getChunkTerritory(event.getRightClicked().getLocation());
-			ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" manipulated armor stand in territory "+ territory.getName());
+			//ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" manipulated armor stand in territory "+ territory.getName());
         	// Property Flag Holders
 			if(territory instanceof KonPropertyFlagHolder) {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
@@ -682,6 +682,17 @@ public class PlayerListener implements Listener {
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
 					}
+				}
+			}
+			// Specific territory protections
+			if(territory instanceof KonTown) {
+				KonTown town = (KonTown) territory;
+				// Prevent non-friendlies (including enemies) and friendly non-residents
+				KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+				if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_NOT_RESIDENT.getMessage(territory.getName()));
+					event.setCancelled(true);
+					return;
 				}
 			}
         }

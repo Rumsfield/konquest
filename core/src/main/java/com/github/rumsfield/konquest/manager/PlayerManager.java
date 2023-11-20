@@ -83,16 +83,29 @@ public class PlayerManager implements KonquestPlayerManager {
 	}
 	
 	/**
-	 * This method is used for creating a new KonPlayer that has never joined before
+	 * This method is used for creating a new KonPlayer that has never joined before.
+	 * Once the new player is created, attempt to match it to existing memberships in kingdoms/towns.
 	 * @param bukkitPlayer - Bukkit player
 	 * @return KonPlayer of the bukkit player
 	 */
 	@NotNull
 	public KonPlayer createKonPlayer(Player bukkitPlayer) {
 		KonPlayer newPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), true);
-        onlinePlayers.put(bukkitPlayer, newPlayer);
-        linkOnlinePlayerToCache(newPlayer);
-        ChatUtil.printDebug("Created player "+bukkitPlayer.getName());
+		// Attempt to match existing memberships
+		UUID id = bukkitPlayer.getUniqueId();
+		for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+			if(kingdom.isMember(id)) {
+				// Found a kingdom membership, update player's data
+				newPlayer.setKingdom(kingdom);
+				newPlayer.setExileKingdom(kingdom);
+				newPlayer.setBarbarian(false);
+				ChatUtil.printConsoleWarning("New player "+bukkitPlayer.getName()+" already has kingdom membership in "+kingdom.getName()+". Check your SQL database settings in core.yml, the database connection may have been lost or corrupted.");
+				break;
+			}
+		}
+		onlinePlayers.put(bukkitPlayer, newPlayer);
+		linkOnlinePlayerToCache(newPlayer);
+		ChatUtil.printDebug("Created player "+bukkitPlayer.getName());
         return newPlayer;
     }
 	
@@ -107,11 +120,22 @@ public class PlayerManager implements KonquestPlayerManager {
 	@NotNull
 	public KonPlayer importKonPlayer(Player bukkitPlayer, String kingdomName, String exileKingdomName, boolean isBarbarian) {
 		KonPlayer importedPlayer;
-
+		UUID id = bukkitPlayer.getUniqueId();
     	// Create KonPlayer instance
     	if(isBarbarian) {
     		// Player data has barbarian flag set true, create barbarian player
     		importedPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), true);
+			// Attempt to match existing memberships
+			for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+				if(kingdom.isMember(id)) {
+					// Found a kingdom membership, update player's data
+					importedPlayer.setKingdom(kingdom);
+					importedPlayer.setExileKingdom(kingdom);
+					importedPlayer.setBarbarian(false);
+					ChatUtil.printConsoleWarning("Existing barbarian player "+bukkitPlayer.getName()+" has kingdom membership in "+kingdom.getName()+". Check your SQL database settings in core.yml, the database connection may have been lost or corrupted.");
+					break;
+				}
+			}
     	} else {
     		// Player's barbarian flag is false, should belong to a kingdom
     		KonKingdom playerKingdom = konquest.getKingdomManager().getKingdom(kingdomName);
@@ -120,12 +144,25 @@ public class PlayerManager implements KonquestPlayerManager {
 			if(playerKingdom.equals(konquest.getKingdomManager().getBarbarians())) {
 				// The player's kingdom does not exist
 				// Possibly renamed or removed
-				//TODO: Search for any other kingdoms with membership?
 				// When a kingdom is renamed, all offline players have their database entry updated with the new kingdom name.
-				// For now, just make them into a barbarian.
 				importedPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), true);
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_FORCE_BARBARIAN.getMessage());
-				ChatUtil.printDebug("Forced non-barbarian player with missing kingdom to become a barbarian");
+
+				// Attempt to match existing memberships
+				boolean foundMembership = false;
+				for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+					if(kingdom.isMember(id)) {
+						// Found a kingdom membership, update player's data
+						importedPlayer.setKingdom(kingdom);
+						importedPlayer.setExileKingdom(kingdom);
+						importedPlayer.setBarbarian(false);
+						ChatUtil.printConsoleWarning("Existing player "+bukkitPlayer.getName()+" is in an unknown kingdom, but already has kingdom membership in "+kingdom.getName()+". Check your SQL database settings in core.yml, the database connection may have been lost or corrupted.");
+						break;
+					}
+				}
+				if(!foundMembership) {
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_FORCE_BARBARIAN.getMessage());
+					ChatUtil.printDebug("Forced non-barbarian player with missing kingdom to become a barbarian");
+				}
 			} else {
 				// The player's kingdom was found
 				if(playerKingdom.isMember(bukkitPlayer.getUniqueId())) {
@@ -134,7 +171,6 @@ public class PlayerManager implements KonquestPlayerManager {
 				} else {
 					// The player is not a member of their kingdom
 					// Possibly kicked or renamed
-					//TODO: Search for any other kingdoms with membership?
 					// The most likely scenario is that the player was kicked.
 					// Just make them a barbarian.
 					importedPlayer = new KonPlayer(bukkitPlayer, konquest.getKingdomManager().getBarbarians(), true);
