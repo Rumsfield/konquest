@@ -35,7 +35,7 @@ public class TownCommand extends CommandBase {
 		// Open a specific town management menu
 		// /k town <town>
 
-		// k town [<town>] [menu|invite|kick|lord|rename] [<name>]
+		// k town [<town>] [menu|join|leave|invite|kick|lord|rename] [<name>]
 		Player bukkitPlayer = (Player) getSender();
 		if (getArgs().length < 1 || getArgs().length > 4) {
 			sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
@@ -58,13 +58,8 @@ public class TownCommand extends CommandBase {
 		KonTown town = null;
 		if(getArgs().length >= 2) {
 			String townName = getArgs()[1];
-			boolean isTown = player.getKingdom().hasTown(townName);
-			boolean isCapital = player.getKingdom().hasCapital(townName);
-			if (isTown) {
-				town = player.getKingdom().getTown(townName);
-			} else if (isCapital) {
-				town = player.getKingdom().getCapital();
-			} else {
+			town = player.getKingdom().getTownCapital(townName);
+			if (town == null) {
 				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(townName));
 				return;
 			}
@@ -94,7 +89,7 @@ public class TownCommand extends CommandBase {
 			String subCmd = getArgs()[2];
 			// Check if town has a lord
 			boolean notifyLordTakeover = false;
-			if(!town.isLordValid() && !subCmd.equalsIgnoreCase("lord")) {
+			if(!town.isLordValid() && !subCmd.equalsIgnoreCase("lord") && !subCmd.equalsIgnoreCase("join")) {
 				if(town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
 					notifyLordTakeover = true;
 				} else if(town.isPlayerResident(player.getOfflineBukkitPlayer()) && town.getPlayerKnights().isEmpty()) {
@@ -116,6 +111,26 @@ public class TownCommand extends CommandBase {
 					return;
 				}
 				getKonquest().getDisplayManager().displayTownManagementMenu(player, town, false);
+				break;
+
+			case "join":
+				if(getArgs().length == 3) {
+					// Call manager method, includes messages
+					getKonquest().getKingdomManager().menuJoinTownRequest(player, town);
+				} else {
+					sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
+					return;
+				}
+				break;
+
+			case "leave":
+				if(getArgs().length == 3) {
+					// Call manager method, includes messages
+					getKonquest().getKingdomManager().menuLeaveTown(player, town);
+				} else {
+					sendInvalidArgMessage(bukkitPlayer,CommandType.TOWN);
+					return;
+				}
 				break;
 
 			case "invite":
@@ -216,7 +231,7 @@ public class TownCommand extends CommandBase {
 
 	@Override
 	public List<String> tabComplete() {
-		// k town [<town>] [menu|invite|kick|lord|rename] [<name>]
+		// k town [<town>] [menu|join|leave|invite|kick|lord|rename] [<name>]
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
 		Player bukkitPlayer = (Player) getSender();
@@ -239,6 +254,8 @@ public class TownCommand extends CommandBase {
 			tabList.add("lord");
 			tabList.add("rename");
 			tabList.add("menu");
+			tabList.add("join");
+			tabList.add("leave");
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
 			Collections.sort(matchedTabList);
