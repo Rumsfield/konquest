@@ -1,0 +1,1039 @@
+# Language File
+# Chinese (Traditional)
+# To use this file, set core.yml language: chinese
+# 
+# "%s" are substitutes for words or numbers by the plugin.
+# If a line has "%s", keep it. You cannot add or remove any "%s".
+# Use online YAML parsing tools to check for valid syntax:
+# https://yaml-online-parser.appspot.com/
+# 
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
+label:
+  admin-kingdom: 管理員王國
+  armor: 裝甲
+  armors: 裝甲
+  back: 返回
+  barbarian: 野蠻人
+  barbarians: 野蠻人
+  blocks: 方塊
+  bypass: 避開
+  camp: 營地
+  close: 關閉
+  cost: 成本
+  critical-hits: 致命打擊
+  diplomacy: 外交
+  disabled: 禁用
+  friendly-redstone: 友好紅石
+  enemy-redstone: 敵對紅石
+  'false': '假'
+  favor: 寵幸
+  flags: 旗幟
+  golem-offense: 鐵傀儡攻擊
+  health: 生命值
+  immunity: 免疫
+  increment-cost: 增加成本
+  information: 資訊
+  invalid: 無效
+  kingdom: 王國
+  kingdom-role: 王國角色
+  kingdoms: 王國
+  knight: 騎士
+  knights: 騎士
+  land: 土地
+  last-seen: 最後出現 %s
+  leaderboard: 排行榜
+  level: 等級
+  loot-chests: 戰利品箱
+  lord: 領主
+  master: 王國大師
+  member: 成員
+  members: 成員
+  modified: 修改
+  monument: 紀念碑
+  monument-template: 紀念碑模板
+  name: 名稱
+  neutral: 中立
+  neutrals: 中立者
+  next: 下一個
+  no-lord: 無領主
+  officer: 官員
+  officers: 官員
+  online-players: 在線玩家
+  open: 開放
+  options: 選項
+  peaceful: 和平
+  player: 玩家
+  players: 玩家
+  plot: 土地
+  population: 人口
+  properties: 屬性
+  protected: 受保護
+  residencies: 居住區
+  resident: 居民
+  residents: 居民
+  ruin: 遺跡
+  sanctuary: 聖所
+  score: 得分
+  shield: 盾牌
+  shields: 盾牌
+  smallest: 最小
+  specialization: 專業
+  stats: 統計
+  total-players: 總玩家數
+  total: 總計
+  town: 城鎮
+  towns: 城鎮
+  'true': '真'
+  unavailable: 不可用
+  upgrades: 升級
+  valid: 有效
+  world: 世界
+placeholder:
+  friendly: 友好
+  enemy: 敵對
+  barbarian: 野蠻
+  ally: 盟友
+  trader: 貿易
+  peaceful: 和平
+map:
+  barbarian: 野蠻人
+  barbarians: 野蠻人
+  kingdom: 王國
+  capital: 首都
+  town: 城鎮
+  towns: 城鎮
+  land: 土地
+  players: 玩家
+  lord: 領主
+  population: 人口
+  ruin: 遺跡
+  critical-hits: 致命打擊
+  golem-spawns: 鐵傀儡生成
+  sanctuary: 聖所
+  templates: 紀念碑模板
+menu:
+  stats:
+    title: 成就統計
+    intro-1: 使用"/k stats"或"/k s"再次打開這本書。
+    intro-2: 查看您的成就統計，這將解鎖新的前綴供您使用。
+    max: 最高等級
+    category: 成就類別
+    next: 下一個前綴
+    unlock: 已解鎖的前綴
+    amount: 統計數量
+    points: 成就積分
+  quest:
+    title: 任務日誌
+    intro-1: 使用"/k quest"或"/k q"再次打開這本書。
+    intro-2: 完成這些任務以賺取Favor，用於索取土地並建立新城鎮。
+    reward: Favor獎勵
+  upgrade:
+    title: 可用的城鎮升級
+    fail-level: 無法添加 %s 等級 %s ，等級超過最大值或比當前等級太高， %s 。
+    fail-population: 無法添加 %s 等級 %s ，城鎮人口太低，需要%s。
+    fail-cost: 無法添加 %s 等級 %s ，需要%s Favor。
+    add: 已將 %s 等級 %s 添加到 %s 城鎮！
+  help:
+    title: Konquest說明
+    admin: 管理員說明
+    tips: Konquest小貼士
+    community: 社區
+    hint: 點擊以加入
+    tip-1: 野蠻人是沒有國家的預設玩家。他們可以放置床以建立營地，攻擊其他野蠻人，並摧毀城鎮。
+    tip-2: 使用"/k kingdom"來打開國家菜單，加入國家，或使用"/k kingdom create"創建自己的國家。
+    tip-3: 其他國家的外交選項包括：和平、貿易、聯盟、戰爭。處於戰爭狀態的敵對國家可以互相佔領對方的城鎮。
+    tip-4: 使用"/k settle"來為您的國家創建新的城鎮。使用"/k map"來查看周圍的土地，以及有關您所在位置是否可以建城的提示。
+    tip-5: 使用"/k town"打開一般的城鎮菜單，以加入和離開您的國家城鎮。使用"/k town <name>"來管理城鎮，如升級或居民。
+    tip-6: 要保護容器和動物免受敵人侵害，提高您的統計數據和得分，以及防止怪物生成，請聲明城鎮土地。
+    tip-7: 使用"/k town <name>"並選擇地塊，設立城鎮地塊，只有特定的居民可以在其中建造。更改城鎮選項以讓居民僅在自己的地塊中建造。
+    tip-8: 建造鐵傀儡來保護您的城鎮免受敵對玩家的侵害。尋找廢墟，擊敗廢墟鐵傀儡以獲得獎勵。
+    tip-9: 使用"/k stats"和"/k score"來查看玩家統計數據。使用"/k prefix"來設置您自己的聊天標題。通過增加統計數據解鎖稱號。
+  score:
+    kingdom-towns: 國家城鎮
+    kingdom-land: 國家土地
+    kingdom-favor: 國家好感度
+    kingdom-population: 國家人口
+    town-1: 玩家領主
+    land-1: 領主城鎮土地
+    town-2: 玩家騎士
+    land-2: 騎士城鎮土地
+    town-3: 玩家居民
+    land-3: 居民城鎮土地
+    player-score: 玩家得分
+    hint: 點擊以查看
+  map:
+    center: 地圖中心
+    proximity: 鄰近
+    settle-hint: 在此安頓
+  prefix:
+    disable: 關閉
+    hint-disable: 點擊以禁用
+    hint-apply: 點擊以應用
+    custom-pages: 自訂前綴
+    no-allow: 權限不足
+  shield:
+    hint: 點擊以充能
+    fail-max: 充能失敗，超過最大值：%s。
+    fail-add: 充能失敗，無法添加到現有充能。
+    fail-attack: 城鎮受到攻擊時無法充能！
+    fail-cost: 充能失敗，需要 %s 的青睞。
+    activate-new: 充能 %s 以獲得 %s。
+    activate-add: 透過 %s 增加了 %s 的充能。
+  options:
+    hint: 點擊以更改
+    current: '當前：%s'
+    open: 所有王國成員都可以建造和使用箱子
+    plot: 居民只能在地塊中建造和使用箱子
+    friendly-redstone: 王國成員可以使用紅石開關和門
+    redstone: 敵人可以使用紅石開關和門
+    golem: 鐵傀儡將攻擊進入的所有敵人
+  plots:
+    edit-add-land: 添加土地
+    edit-remove-land: 移除土地
+    edit-add-players: 添加玩家
+    edit-remove-players: 移除玩家
+    edit-show-players: 顯示玩家
+    capital-land: 首都土地
+    town-land: 城鎮土地
+    town-monument: 城鎮紀念碑
+    editing-plot: 編輯地塊
+    click-delete: 點擊以刪除地塊
+    click-edit: 點擊以編輯地塊
+    click-remove-chunk: 點擊以移除區塊
+    click-remove-player: 點擊以移除玩家
+    click-create: 點擊以創建地塊
+    click-add-chunk: 點擊以添加區塊
+    click-add-player: 點擊以添加玩家
+    click-move-player: 點擊以移動玩家
+    here: 你在這裡
+    title-plots: 地塊
+    title-create: 創建地塊
+    title-delete: 刪除地塊
+    title-edit: 編輯地塊
+    title-edit-options: 編輯選項
+    title-add-land: 添加土地
+    title-add-players: 添加玩家
+    title-remove-land: 移除土地
+    title-remove-players: 移除玩家
+    title-show-players: 顯示玩家
+    button-create: 創建
+    button-delete: 刪除
+    button-edit: 編輯
+    button-return: 返回
+    button-finish: 完成
+  town:
+    join: 加入
+    leave: 離開
+    list: 列表
+    invites: 邀請
+    manage: 管理
+    requests: 請求
+    plots: 地塊
+    shields: 盾牌
+    armor: 裝甲
+    promote: 晉升
+    demote: 降級
+    transfer: 轉移
+    upgrades: 升級
+    options: 選項
+    special: 專業
+    description-join: 加入新城鎮
+    description-leave: 離開現有城鎮
+    description-list: 列出您王國中的所有城鎮
+    description-invites: 顯示城鎮居民邀請
+    description-manage: 管理城鎮居民和選項
+    description-requests: 顯示要加入此城鎮的居民請求
+    description-plots: 管理城鎮地塊
+    description-shields: 應用城鎮盾牌
+    description-armor: 應用城鎮裝甲
+    description-promote: 晉升居民為騎士
+    description-demote: 降級騎士為居民
+    description-transfer: 將領主轉移到其他居民
+    description-upgrades: 應用城鎮升級
+    description-options: 編輯城鎮選項
+    description-special: 選擇專業以獲得與該城鎮的村民的折扣
+    hint-open: 點擊以打開
+    hint-join: 點擊以發送加入請求
+    hint-join-now: 點擊以立即加入
+    hint-leave: 點擊以離開
+    hint-list: 點擊以查看
+    hint-accept: 左鍵單擊接受
+    hint-decline: 右鍵單擊拒絕
+    hint-manage: 點擊以管理
+    hint-promote: 點擊以晉升為騎士
+    hint-demote: 點擊以降級為居民
+    hint-transfer: 點擊以贈送領主
+    hint-special: 點擊以專業化
+    lore-special: 選擇此專業以獲得此城鎮村民的折扣。
+    title-root: 城鎮菜單
+    title-join: 加入城鎮
+    title-leave: 離開城鎮
+    title-list: 城鎮列表
+    title-invites: 居民邀請
+    title-manage-town: 管理的城鎮
+    title-requests: 居民請求
+    title-manage: '%s 菜單'
+  kingdom:
+    join: 加入
+    exile: 放逐
+    invites: 邀請
+    list: 列表
+    relation: 關係
+    requests: 請求
+    promote: 晉升
+    demote: 降級
+    transfer: 轉移
+    template: 模板
+    disband: 解散
+    description-join: 請求加入一個王國，或使用 /k kingdom create 創建自己的王國
+    description-exile: 離開您當前的王國，成為一名蠻族
+    description-invites: 查看您的王國邀請
+    description-list: 查看所有王國
+    description-relation: 修改與其他王國的關係
+    description-requests: 查看王國成員請求
+    description-promote: 晉升成員為官員
+    description-demote: 降級官員為成員
+    description-transfer: 將王國主權轉移到另一成員
+    description-template: 更改王國紀念碑模板
+    description-disband: 解散並刪除王國
+    hint-open: 點擊以打開
+    hint-exile: 點擊以成為蠻族
+    hint-exit: 退出菜單
+    hint-disband: 點擊以刪除您的王國
+    hint-template: 點擊以更改模板
+    hint-join: 點擊以發送加入請求
+    hint-join-now: 點擊以立即加入
+    hint-accept: 左鍵點擊接受
+    hint-decline: 右鍵點擊拒絕
+    hint-list: 點擊以查看信息
+    hint-relation: 點擊以選擇外交方式
+    hint-diplomacy: 點擊以實施
+    hint-promote: 點擊以晉升為官員
+    hint-demote: 點擊以降級為成員
+    hint-transfer: 點擊以轉讓主權
+    they-requested: 他們請求
+    we-requested: 我們請求
+    diplomacy-peace-war-instant: 立即宣布和平
+    diplomacy-peace-war-request: 和平請求
+    diplomacy-peace-trade: 結束貿易並宣布和平
+    diplomacy-peace-alliance: 結束聯盟並宣布和平
+    diplomacy-trade-peace: 貿易請求
+    diplomacy-trade-alliance: 結束聯盟並宣布貿易
+    diplomacy-war-instant: 立即宣布戰爭
+    diplomacy-war-request: 戰爭請求
+    diplomacy-alliance: 聯盟請求
+    diplomacy-peace-info: 默認。可能允許PvP。
+    diplomacy-trade-info: 禁止PvP。村民交易折扣。使用箱子商店。
+    diplomacy-alliance-info: 禁止PvP。村民交易折扣。使用箱子商店。防禦性條約。前往城鎮和首都。
+    diplomacy-war-info: PvP。攻擊和佔領城鎮和首都。
+    title-root: 王國菜單
+    title-join: 加入王國
+    title-confirm: 您確定嗎？
+    title-invites: 王國邀請
+    title-list: 王國列表
+    title-relations: 關係
+    title-diplomacy: 外交
+    title-requests: 加入請求
+    title-promotion: 晉升
+    title-demotion: 降級
+    title-transfer: 王國主權轉移
+    title-template: 紀念碑模板
+    title-disband: 解散王國
+generic:
+  notice:
+    enable-auto: 已啟用。再次使用此命令可禁用。
+    disable-auto: 已禁用。
+    reduce-favor: 'Favor 減少 %s，總計：%s'
+    reward-favor: '獲得 Favor：%s，總計：%s'
+    reward-exp: '獲得 EXP：%s'
+    discount-favor: '%s 折扣，您節省了 %s Favor。'
+    click-air: 點擊空氣以取消。
+    clicked-air: 點擊了空氣，取消了區域創建。
+    success: 成功！
+    small-kingdom: 您的王國目前是最小的，享受 %s 折扣的經驗加成！
+    wild: 荒野
+    accomplishment: 恭喜！您完成了一個成就！
+    prefix-unlock: 成就前綴已解鎖
+    prefix-lost: 失去成就前綴
+    quest: 任務完成
+    loot: 現在可以獲得新的城鎮紀念碑戰利品。
+    absent: 您已經離開太長時間，已被從所有城鎮中踢出。
+    force-barbarian: 您現在是一名蠻族！
+  error:
+    deny-barbarian: 蠻族無法執行此操作。
+    internal: 內部錯誤，請聯繫管理員。
+    internal-message: '內部錯誤：%s'
+    invalid-parameters: 命令參數不正確。使用 /k help 查看幫助。
+    invalid-parameters-admin: 管理員命令參數不正確。使用 /k admin help 查看幫助。
+    invalid-world: 不能在此世界中使用該命令。
+    no-permission: 您沒有執行此操作的權限。
+    no-allow: 您不允許執行此操作。
+    no-player: 您必須是一名玩家才能執行此操作！
+    unknown-name: '無法找到未知名稱，請檢查拼寫： %s'
+    bad-name: 在您的王國中找不到 %s。
+    format-name: 名稱只能包含字母和/或數字。
+    length-name: 名稱不能超過 20 個字符。
+    taken-name: 該名稱已被使用。
+    no-favor: Favor 不足，需要 %s
+    invalid-player: 該玩家無效。
+    enemy-player: 該玩家是敵人。
+    enemy-town: 那是一個敵對的城鎮。
+    disabled: 目前已禁用此功能，請與管理員聯繫。
+    region: 在設定其他區域時無法執行此操作。
+    failed: 失敗 :(
+protection:
+  notice:
+    ignore: 使用 "/k admin bypass" 忽略保護。
+    peaceful-town: '%s 鎮是和平的，無法受到攻擊。'
+    peaceful-player: 您的王國是和平的，您不能攻擊城鎮。
+    peaceful-victim: 您無法攻擊和平王國中的玩家。
+    peaceful-attacker: 您的王國是和平的，您不能攻擊玩家。
+    camp-destroy: 已摧毀 %s！
+    camp-destroy-owner: 您的營地已被摧毀！
+    camp-create: 成功建立您的營地。
+    camp-clan-add: '%s 已添加到您的營地氏族。'
+    camp-clan-remove: '%s 已從您的營地氏族中移除。'
+    critical: 重要打擊！剩餘 %s 個重要方塊
+    tagged: 已標記
+    tag-message: 您已在戰鬥中被標記。
+    untagged: 標記已過期
+    untag-message: 您不再處於戰鬥中。
+    loot-later: 後來再來拿更多戰利品！
+    loot-capture: 一旦這個遺址完成佔領，戰利品將重置。
+    raid: 在 %s 發現敵人，使用 "/k travel %s" 進行防禦！
+    raid-alert: 襲擊警報
+    raid-capture-1: '%s 正在被征服！使用 "/k travel %s" 進行防禦並獲得 %s Favor！'
+    raid-capture-2: '%s 剩下一半實力！使用 "/k travel %s" 進行防禦並獲得 %s Favor！'
+    raid-capture-3: '%s 處於危急狀態！使用 "/k travel %s" 進行防禦並獲得 %s Favor！'
+    raid-discord-channel: 敵人正在佔領 %s 鎮，立即加入伺服器進行防禦！
+    raid-discord-direct: 敵人玩家正在佔領您王國中的 %s 鎮，%s！立即加入伺服器進行防禦。
+    raze: '%s 鎮已被蠻族大軍摧毀！'
+    destroy: 您已經為蠻族榮譽摧毀了 %s！
+    conquer: '%s 鎮已被征服！'
+    conquer-discord: '%s 鎮已被 %s 征服！'
+    capture: 您已經征服了 %s，以征服 %s！
+    kingdom-warmup: '%s 王國將在 %s 分鐘內受到保護。'
+    kingdom-conquer: '%s 王國已被 %s 征服！'
+    kingdom-raze: '%s 王國已被蠻族大軍摧毀！'
+    ruin: 您已經佔領了遺址 %s。
+    safe: '%s 鎮目前安全...'
+    attacked: 受到攻擊
+    template-modify: 紀念碑模板 %s 正在修改中，暫時不可用。
+    template-ready: 紀念碑模板 %s 現在可用。
+  error:
+    blocked: 已封鎖
+    not-resident: 您必須是 %s 的居民才能執行此操作。
+    not-plot: 您必須是一個地塊成員才能執行此操作。
+    only-plot: 您不能在城鎮地塊之外執行此操作。
+    online: '%s 王國沒有足夠的在線玩家，無法攻擊 %s 鎮。'
+    upgrade: '%s 已升級為 %s，必須有 %s 個在線居民才能攻擊。'
+    camp: 不能攻擊 %s，營地所有者不在線。
+    camp-bed: 不能在此營地內放置其他床。
+    camp-update: 已更新您的營地床位置。
+    camp-create: 不能建立多於一個營地。在放置新床之前，請摧毀您當前營地的床。
+    camp-fail-overlap: '建立營地失敗：新索賠重疊現有領土。'
+    camp-fail-barbarian: '建立營地失敗：您不是野蠻人。'
+    camp-fail-offline: '建立營地失敗：所有周圍營地的所有者都不在線。'
+    capture: 此領土還需等待 %s 才能被佔領。
+    golem: 您不能傷害 %s 鎮中的友好鐵傀儡。
+    tag-blocked: 在戰鬥中無法使用此命令。
+    portal-exit: 您的出口傳送門位於受保護的領土內，請移動您的傳送門！
+    capital-immune: 在 %s 鎮保持在 %s 王國中時，這個首都免受攻擊。
+command:
+  admin:
+    camp:
+      notice:
+        create: 成功為玩家 %s 創建了一個營地。
+        destroy: 成功移除了玩家 %s 的營地。
+      error:
+        create-exist: 玩家已經有一個營地，請先移除它，然後再創建一個新的。
+        destroy-exist: 玩家沒有營地。
+    flag:
+      notice:
+        all-properties: 所有屬性
+        single-property: 單個屬性
+        set: 設置 %s 的屬性 %s 為新值 %s。
+        reset: 重置所有屬性默認值在 properties.yml 中。
+    help:
+      notice:
+        message: '管理員幫助: 命令, 參數, 描述'
+    kingdom:
+      broadcast:
+        create: 管理員王國 %s 已經被創建！
+      notice:
+        admin-set: 王國 %s 現在是管理員王國。
+        admin-clear: 王國 %s 現在是普通王國。
+      error:
+        no-templates: 目前沒有紀念碑範本。您可以在聖殿內使用 "/k admin monument create (名稱)" 創建一個。
+        admin-set: 王國 %s 已經是一個管理員王國。
+        admin-clear: 王國 %s 已經是一個常規王國。
+    monument:
+      notice:
+        create-1: 現在正在創建新的紀念碑範本，點擊區域的第一個角落方塊。
+        create-2: 當所有粒子變為綠色時，點擊區域的第二個角落方塊。
+        create-3: 點擊旅行點方塊。
+        success: 成功創建了新的紀念碑範本 %s。
+        remove: 刪除了紀念碑範本 %s。
+        show: 在聖所 %s 中展示現有的紀念碑範本 %s。
+        sanctuary: 在創建紀念碑範本之前，使用 "/k admin sanctuary create (名稱)" 創建聖所領土。
+      error:
+        value: 成本值不是一個數字。
+        fail-base: 無法創建紀念碑範本 %s，基礎必須是 16x16 個方塊，但獲得 %s x %s。
+        fail-critical: 無法創建紀念碑範本 %s，它必須包含至少 %s 個%s方塊。
+        fail-travel: 無法創建紀念碑範本 %s，旅行點必須位於區域內。
+        fail-region: 無法創建紀念碑範本 %s，區域的角落必須位於聖所領土內。
+        fail-reset: 無法重置紀念碑範本 %s，已還原到之前的狀態。
+    ruin:
+      notice:
+        create: '成功創建新的廢墟：%s'
+        remove: '成功移除廢墟：%s'
+        rename: '成功將廢墟名稱從 %s 更改為 %s。'
+        reset: '成功重置關鍵方塊並在廢墟 %s，中產生傀儡。'
+        criticals: '已移除所有先前的關鍵方塊，從 %s 中移除，點擊方塊以添加。'
+        spawns: '已從 %s 中移除所有先前的生成方塊，點擊方塊以添加。'
+        add: '方塊已添加到廢墟 %s。'
+      error:
+        create: 無法創建廢墟 %s，名稱無效或領土重疊。
+        remove: 無法移除未知的廢墟 %s。
+        rename: 無法將廢墟 %s 重命名為 %s。
+        reset: 無法重置未知的廢墟 %s。
+        match: 點擊的方塊與類型不匹配：%s
+        invalid: 無法將此方塊添加到有效的廢墟中。
+    sanctuary:
+      notice:
+        create: 成功創建了新的聖所 %s，使用 "/k admin claim" 添加更多土地。
+        remove: 成功移除聖所 %s。
+        rename: 成功將聖所名稱從 %s 更改為 %s。
+      error:
+        create: 無法創建聖所 %s，名稱不合適或領土重疊。
+        remove: 無法移除未知的聖所 %s。
+        rename: 無法將聖所 %s 重命名為 %s。
+    save:
+      notice:
+        message: 已將所有數據保存到文件中.
+    settravel:
+      notice:
+        success: 成功在 %s 設置新的旅行點.
+      error:
+        fail: 無法在未知領土中設置旅行點.
+    stat:
+      notice:
+        show: '玩家 %s 的 %s 數值: %s'
+        set: 設定玩家 %s 的 %s 數值為 %s。
+        add: '為玩家 %s 的 %s 數值添加 %s： %s'
+        clear: 清除玩家 %s 的 %s 數值，設為零。
+      error:
+        name: 無效的屬性 %s，無法匹配到現有屬性。
+        value: 無效的屬性值：%s
+  border:
+    notice:
+      enable: 顯示粒子邊界
+      disable: 隱藏粒子邊界
+  chat:
+    notice:
+      enable: 王國聊天
+      disable: 全域聊天
+  claim:
+    notice:
+      success: 成功宣佈 %s 塊土地為 %s 。
+      fail-auto: 不能宣佈，已禁用自動宣佈。
+      pass-auto: 已宣佈
+    error:
+      radius: 半徑必須大於或等於%s，且小於或等於%s。
+      missing: 必須在現有領土附近宣佈。
+      proximity: 過於接近其他領土。
+      fail-adjacent: 宣佈失敗，無相鄰領土。
+      fail-far: 宣佈失敗，距離領土中心太遠。
+      fail-claimed: 宣佈失敗，已經被宣佈。
+  favor:
+    notice:
+      message: 你擁有 %s 的青睞，花費如下...
+  help:
+    notice:
+      message: 幫助 - 指令、參數、說明、別名
+    error:
+      page: 頁面值必須是一個數字。
+  info:
+    notice:
+      kingdom-header: '%s的王國'
+      town-header: '%s的城鎮'
+      camp-placed: 已放置蠻族營地。
+      camp-missing: 此玩家沒有營地。
+      ruin-status: 佔領狀態
+      ruin-capture: 此遺跡可以佔領以獲得獎勵。
+  kingdom:
+    broadcast:
+      create: '%s 建立了 %s 王國'
+      join: '%s 加入了 %s 王國'
+      rename: '%s 王國已更名為 %s'
+      peace: '%s 王國和 %s 王國已締結和平。'
+      peace-request: '%s 王國請求和平。使用 "/k kingdom" 來更改關係。'
+      trade: '%s 王國和 %s 王國現在是貿易夥伴。'
+      trade-request: '%s 王國請求進行貿易。使用 "/k kingdom" 來更改關係。'
+      no-trade: '%s 王國和 %s 王國不再進行貿易。'
+      ally: '%s 王國和 %s 王國結成了聯盟。'
+      ally-request: '%s 王國請求結盟。使用 "/k kingdom" 來更改關係。'
+      no-ally: '%s 王國和 %s 王國不再是盟友。'
+      war: '%s 王國和 %s 王國處於戰爭狀態！'
+      war-request: '%s 王國請求開戰。使用 "/k kingdom" 來更改關係。'
+      transfer: '%s 現在是 %s 王國的國王。'
+      promote: '%s 已晉升為 %s 王國的官員。'
+      demote: '%s 已降職為 %s 王國的成員。'
+      disband: '%s 王國已解散！'
+    notice:
+      request-sent: 已發送成員請求加入 %s。
+      request-received: 收到新的王國加入請求，輸入 "/k kingdom" 以查看。
+      request-declined: 拒絕了玩家 %s 的王國加入請求。
+      request-pending: 玩家請求加入您的王國。請使用 "/k kingdom"，然後選擇 "Requests" 以回應。
+      invite-sent: 邀請 %s 加入王國。
+      invite-received: 收到王國邀請，輸入 "/k kingdom" 以回應。
+      invite-declined: 拒絕了加入 %s 的邀請。
+      invite-pending: 您有待處理的邀請加入王國的邀請。請使用 "/k kingdom"，然後選擇 "Invites" 以回應。
+      exile: 您現在作為野蠻人被驅逐出 %s。
+      exile-stats: 從驅逐出去除了所有統計信息！
+      exile-favor: 從驅逐出去除了所有的愛戴！
+      kick: 將玩家 %s 從王國中踢出。
+      rename: 成功將王國名稱更改為 %s。
+      discount: '%s 王國為您提供與此商人 %s 折扣。'
+      open: 王國現在開放加入。
+      closed: 王國現在僅限邀請加入。
+      template: 更新了王國紀念碑模板為 %s。
+      pay: 收到王國付款。
+      diplomacy-sent: 向 %s 王國發送了外交請求。
+      diplomacy-pending: 您的王國有未處理的外交請求。請使用 "/k kingdom"，然後選擇 "Relationships" 以回應。
+      web-color-show: '%s 王國的 Web 地圖顏色為：%s'
+      web-color-set: '將 %s 王國的 Web 地圖顏色設置為：%s'
+    error:
+      barbarian-create: 您必須成為野蠻人才能創建一個王國。請在王國菜單中使用放逐選項。
+      invalid-template: '%s 是無效的紀念碑模板。請檢查拼寫或選擇另一個。'
+      missing-template: 您必須指定一個模板名稱。使用 "/k kingdom templates" 查看模板。
+      missing-name: 您必須指定一個王國名稱。
+      invite-member: '%s 已經是王國成員了。'
+      invite-exists: '%s 已經被邀請加入王國了。'
+      invite-open: 無法邀請玩家加入一個開放的王國。
+      request-exists: 您已經請求加入 %s。
+      request-deny: 被拒絕加入 %s 王國的請求。
+      join-member: 您已經是王國成員。
+      join-limit: '%s 王國的玩家太多了！'
+      join-master: 王國主不能加入其他王國。
+      join-switch: 玩家不能加入對立的王國。
+      join-cooldown: '加入另一個王國之前等待： %s'
+      kick-master: 不能踢出王國主。
+      kick-barbarian: 這個玩家已經是一個野蠻人。
+      exile-cooldown: '放逐為野蠻人之前等待： %s'
+      merchant: 無法在 %s 王國內與商人進行交易，需要貿易或盟友外交。
+      diplomacy-exists: 更改外交關係的請求已經存在。
+      template-attack: 無法在王國首都受到攻擊時更改紀念碑模板。
+      web-color-invalid: '無效的顏色，必須匹配顏色名稱或以 # 開頭的十六進位代碼。'
+  list:
+    notice:
+      header: '%s 列表'
+  prefix:
+    notice:
+      disable: 已關閉您的前綴稱號。
+      new: 您的前綴稱號現在是 %s。
+    error:
+      disable: 您的稱號前綴已經關閉。
+      new: 稱號前綴 %s 尚未解鎖！
+      default: 您的稱號前綴已恢復為默認。
+  score:
+    notice:
+      all-header: 所有王國分數
+      score: '您的分數：%s，%s 王國的分數：%s'
+      player: '%s 的分數：%s，%s 王國的分數：%s'
+    error:
+      peaceful: '%s 王國處於和平狀態，無法計分。'
+      barbarian: '%s 是野蠻人，無法計分。'
+  settle:
+    broadcast:
+      settle: '%s 已經為 %s 王國建立了 %s 城鎮'
+    notice:
+      success: '成功建立新城鎮：%s'
+      map-hint: 使用"/k map"獲取有用的資訊。
+    error:
+      missing-name: 必須指定城鎮名稱。
+      space-name: 城鎮名稱不正確，不能包含空格。
+      fail-name: 無效的城鎮名稱，已被使用或包含空格。
+      fail-overlap: 城鎮與附近領土重疊。
+      fail-placement: 找不到合適的紀念碑放置位置。
+      fail-template: 無效或不可用的紀念碑模板。
+      fail-proximity: 城鎮與另一個領土太近。目前相隔%s個區塊，必須至少%s個區塊。
+      fail-max: 城鎮距離其他領土太遠。目前相隔%s個區塊，必須至多%s個區塊。
+      fail-flat: 你的區塊區域不夠平坦。按F3+G查看區塊邊界。砍伐樹木並平整地面！
+      fail-height: 海拔不正確，請嘗試在更高或更低的地方建立。
+      fail-air: 地下空間過多。請嘗試在其他地方建立，或清空你下方的所有空氣。
+      fail-water: 地下水位過高。請嘗試在其他地方建立，或清除你下方的所有水。
+      fail-container: 地下容器過多。請嘗試在其他地方建立，或清除你下方的所有容器。
+      fail-init: 城鎮無法索取初始區塊。
+      fail-limit-all: 不能建立超過全局最大限制%s個城鎮。目前所有世界中有%s個城鎮。
+      fail-limit-world: 不能建立超過每個世界最大限制%s個城鎮。目前這個世界中有%s個城鎮。
+  spy:
+    notice:
+      nearby: 附近
+      regional: 區域
+      faraway: 遙遠
+      very-distant: 非常遙遠
+      success: 一名間諜已經取回了這張關於 %s 敵對城鎮的地圖！
+    error:
+      inventory: 庫存空間不足，請釋放一些空間。
+      town: 找不到敵對城鎮。
+  town:
+    notice:
+      open: 開放了 %s，所有王國成員都可以訪問。
+      close: 關閉了 %s，只有居民可以建造和訪問容器。
+      plot-enable: '%s 現在允許居民只能在地塊內建造。'
+      plot-disable: '%s 現在允許居民在城鎮土地內和地塊內建造。'
+      friendly-redstone-enable: '%s 現在允許王國成員使用紅石開關和門。'
+      friendly-redstone-disable: '%s 現在禁止王國成員使用紅石開關和門。'
+      redstone-enable: '%s 現在允許敵人使用紅石開關和門。'
+      redstone-disable: '%s 現在禁止敵人使用紅石開關和門。'
+      golem-enable: 在 %s 中的鐵傀儡將攻擊城鎮土地內的所有敵人。
+      golem-disable: 在 %s 中的鐵傀儡只會保衛城鎮紀念碑免受敵人的攻擊。
+      kick-resident: 將居民 %s 從城鎮 %s 中踢出。
+      lord-success: 把 %s 的領主地位給了 %s。
+      lord-claim: '%s 已經聲稱了 %s 的領主地位！'
+      knight-set: '%s 已經成為了 %s 的騎士。'
+      knight-clear: '%s 不再是 %s 的騎士。'
+      rename: 領主 %s 把城鎮 %s 重新命名為 %s。
+      no-lord: '%s 被遺棄了！使用 "/k town %s lord" 來聲稱領主地位。'
+      specialize: 成功將 %s 城鎮的專業化更改為 %s。
+      new-resident: '%s 已經成為了城鎮 %s 的居民。'
+      leave-resident: '%s 離開了城鎮 %s。'
+      request-sent: 發送了居民加入 %s 的請求。
+      request-received: 新的城鎮加入請求，輸入 "/k town" 來查看。
+      request-declined: 拒絕了玩家 %s 的城鎮加入請求。
+      request-pending: 玩家希望成為你城鎮的居民。使用 "/k town" 命令來回應。
+      invite-sent: 邀請了 %s 加入城鎮 %s。
+      invite-received: 收到城鎮邀請，輸入 "/k town" 來回應。
+      invite-declined: 拒絕了加入 %s 的邀請。
+      invite-pending: 你有待處理的城鎮邀請。使用 "/k town" 命令來回應。
+    error:
+      kick-fail: '%s 不是 %s 的居民。'
+      knight-resident: 騎士必須首先被添加為居民。
+      invite-member: '%s 已經是城鎮的居民了。'
+      invite-exists: '%s 已經被邀請加入城鎮了。'
+      invite-open: 不能邀請玩家加入一個開放的城鎮。
+      request-exists: 你已經請求加入 %s 了。
+      request-deny: 加入城鎮 %s 的請求已被拒絕。
+      join-member: 你已經是城鎮的居民了。
+      kicked: 你已經被從城鎮 %s 中踢出。
+      promote-knight: '%s 已經是一名騎士。'
+      demote-resident: '%s 已經是一名居民。' 
+  travel:
+    notice:
+      town-travel: '%s 已經前往了 %s。'
+      wild-search: 正在尋找一個隨機的荒野位置...
+      wild-travel: 前往了荒野中的一個隨機位置。
+      warmup: 旅行將在 %s 秒後開始。
+    error:
+      wild-timeout: 在荒野中找不到合適的位置。
+      enemy-territory: 你不能在敵對領土內旅行！
+      no-home: 你沒有家。
+      no-camp: 你沒有營地。
+      no-town: 你的王國中不存在該城鎮。
+      cooldown: 你必須等待 %s 才能旅行到 %s。
+      canceled: 你的旅行被移動取消了。
+      damaged: 您的旅行因損壞而取消。
+      disabled: 旅行到該領土被禁用了。
+  unclaim:
+    notice:
+      success: 成功解除佔領 %s 塊土地，來自 %s。
+      fail-auto: 無法解除佔領，已禁用自動解除佔領。
+      pass-auto: 已解除佔領。
+    error:
+      radius: 半徑必須大於或等於 %s 且小於或等於 %s。
+      fail-town: 必須從城鎮解除佔領。
+      fail-lord: 解除佔領失敗，您必須是城鎮領主。
+      fail-unclaimed: 解除佔領失敗，找不到任何佔領。
+      fail-center: 解除佔領失敗，無法移除領土中心。
+shop:
+  error:
+    use-disabled: 無法在此處使用商店！
+    use-relation: 無法與此商店進行交易，該城鎮的王國必須是友好的、結盟的或處於貿易協議中。
+    create-town: 僅能在友好的城鎮中創建商店。
+    create-camp: 僅能在您自己的營地中創建商店。
+    create-monument: 不能在紀念碑內創建商店！
+    create-fail: 不能在此處創建商店！
+    create-wild: 不能在荒野中創建商店！
+region:
+  error:
+    claim-deny: 附近的區域拒絕聲稱這塊土地。
+    unclaim-deny: 附近的區域拒絕放棄這塊土地。
+    travel-enter-deny: 目的地的區域拒絕進入。
+    travel-exit-deny: 您目前所處的位置的區域拒絕離開。
+directive:
+  create-kingdom: 建立基礎
+  create-kingdom-info: 創建您自己的王國。
+  settle-town: 新的開始
+  settle-town-info: 為您的王國建立一個城鎮。
+  claim-land: 貴族之路
+  claim-land-info: 為您王國的任何城鎮聲明土地。
+  build-town: 石造工程
+  build-town-info: 為您王國的任何城鎮建造結構。
+  craft-armor: 騎士精神
+  craft-armor-info: 製作一套鐵製護甲以保護自己。
+  create-golem: 堅韌的守護者
+  create-golem-info: 創建一個鐵傀儡來保護您王國的任何城鎮。
+  enchant-item: 神聖工具
+  enchant-item-info: 對工具/武器應用任何附魔。
+  attack-town: 侵略行為
+  attack-town-info: 通過破壞方塊來攻擊敵方王國中的任何城鎮。
+  capture-town: 軍事行動
+  capture-town-info: 通過摧毀城鎮紀念碑內的關鍵方塊，來佔領敵方王國中的任何城鎮。
+  kill-enemy: 最佳敵人
+  kill-enemy-info: 擊殺敵對王國的玩家。
+prefix:
+  category:
+    clergy: 神職
+    nobility: 貴族
+    tradesman: 商人
+    military: 軍事
+    farming: 農業
+    cooking: 烹飪
+    fishing: 釣魚
+    joking: 開玩笑
+    royalty: 王室
+  title:
+    king: 國王
+    queen: 皇后
+    prince: 王子
+    princess: 公主
+    noble: 貴族
+    cardinal: 樞機主教
+    bishop: 主教
+    priest: 牧師
+    cleric: 僧侶
+    chaplain: 牧師助手
+    scribe: 書記
+    viceroy: 副王
+    duke: 公爵
+    count: 伯爵
+    earl: 伯爵
+    baron: 男爵
+    lord: 領主
+    vassal: 附庸
+    peasant: 農民
+    master: 大師
+    artisan: 工匠
+    journeyman: 學徒
+    craftsman: 工匠
+    merchant: 商人
+    peddler: 小販
+    general: 將軍
+    major: 少校
+    captain: 上尉
+    sergeant: 中士
+    knight: 爵士
+    squire: 侍從
+    cowboy: 牛仔
+    breeder: 飼養者
+    rancher: 牧場主
+    farmer: 農夫
+    picker: 采摘工
+    sprout: 幼苗
+    jester: 滑稽演員
+    fool: 笨蛋
+    dancer: 舞者
+    bard: 吟遊詩人
+    fisherman: 漁夫
+    caster: 施法者
+    chum: 伙伴
+    chef: 廚師
+    cook: 廚師
+    baker: 麵包師傅
+stat:
+  enchantments: 附魔
+  enchantments-info: 應用於物品的附魔
+  potions: 藥水
+  potions-info: 使用或拋擲的藥水
+  mobs: 怪物
+  mobs-info: 擊殺的敵對怪物
+  settled: 定居
+  settled-info: 定居的城鎮數
+  claimed: 被聲稱
+  claimed-info: 已聲稱的土地
+  lords: 領主
+  lords-info: 城鎮領主數
+  knights: 騎士
+  knights-info: 城鎮騎士數
+  residents: 居民
+  residents-info: 城鎮居民數
+  ingots: 錠
+  ingots-info: 冶煉的錠數
+  diamonds: 鑽石
+  diamonds-info: 挖掘的鑽石礦石數
+  crafted: 製作
+  crafted-info: 工具、武器和護甲的製作技能
+  favor: 寵幸
+  favor-info: 花費的寵幸
+  kills: 擊殺
+  kills-info: 擊殺的玩家數
+  damage: 傷害
+  damage-info: 造成的傷害
+  golems: 魔像
+  golems-info: 擊殺的敵對鐵魔像數
+  captures: 佔領
+  captures-info: 佔領的敵對城鎮數
+  criticals: 關鍵打擊
+  criticals-info: 敵對城鎮的關鍵打擊
+  seeds: 種子
+  seeds-info: 種植的種子數
+  breed: 繁殖
+  breed-info: 動物繁殖數
+  till: 耕種
+  till-info: 耕地數
+  harvest: 收穫
+  harvest-info: 收穫的作物數
+  food: 食物
+  food-info: 製作的食物數
+  music: 音樂
+  music-info: 播放的音樂唱片數
+  egg: 蛋
+  egg-info: 使用蛋的次數
+  fish: 釣魚
+  fish-info: 釣魚技能
+  kingdoms: 王國
+  kingdoms-info: 創建的新王國數
+  conquests: 征服
+  conquests-info: 征服的敵對王國數
+upgrade:
+  loot:
+    name: 城鎮紀念碑戰利品
+    level-1: 每個箱子多增加1個戰利品項目
+    level-2: 每個箱子多增加2個戰利品項目
+    level-3: 每個箱子多增加3個戰利品項目
+  drops:
+    name: 動物掉落物品
+    level-1: 動物生物掉落1個額外的物品
+  fatigue:
+    name: 敵人疲勞
+    level-1: 敵人獲得挖掘疲勞 2
+  counter:
+    name: 反情報
+    level-1: 防止間諜地圖找到這個城鎮
+    level-2: 防止指南針指向這個城鎮
+  health:
+    name: 生命力增益
+    level-1: 增加友方生命條 1 顆心
+    level-2: 增加友方生命條 2 顆心
+    level-3: 增加友方生命條 3 顆心
+  damage:
+    name: 防止傷害
+    level-1: 防止所有火勢蔓延
+    level-2: 防止所有爆炸
+  watch:
+    name: 城鎮守衛
+    level-1: 除非至少有1名居民在線，否則阻止敵人的突襲
+    level-2: 除非至少有2名居民在線，否則阻止敵人的突襲
+    level-3: 除非至少有3名居民在線，否則阻止敵人的突襲
+  enchant:
+    name: 更好的附魔
+    level-1: 提高1級附魔選擇
+description:
+  help: 顯示幫助訊息。
+  info: 顯示關於不同事物的資訊。
+  list: 列出不同的領地。
+  favor: 顯示你的貨幣為「寵幸」。
+  map: 顯示已宣稱區塊的地圖。
+  chat: 在全域聊天和僅限王國聊天之間切換。
+  spy: 揭示敵方城鎮的位置。
+  settle: 創建新城鎮。
+  claim: 宣稱一塊土地。
+  unclaim: 放棄一塊土地。
+  travel: 前往其他領地的傳送點。
+  kingdom: 創建或管理王國。
+  town: 管理您所屬的城鎮。
+  quest: 顯示您的任務日誌。
+  stats: 顯示您的成就統計。
+  prefix: 設定您的前綴稱號。
+  score: 顯示玩家當前的分數。
+  fly: 在友好土地範圍內飛行。
+  border: 切換領地和地塊的粒子邊界。
+  admin: 供管理員使用。
+  admin-help: 顯示管理員幫助訊息。
+  admin-bypass: 切換管理員繞過模式。
+  admin-claim: 宣稱土地區塊。
+  admin-unclaim: 將區塊歸還給野外。
+  admin-kingdom: 管理任何王國。
+  admin-town: 管理任何城鎮。
+  admin-camp: 管理任何營地。
+  admin-capture: 為任何王國捕捉城鎮。
+  admin-monument: 創建、移除或顯示紀念碑模板。
+  admin-list: 顯示所有王國或王國的城鎮。
+  admin-ruin: 管理廢墟領地。
+  admin-sanctuary: 管理聖域領地。
+  admin-save: 保存王國和玩家數據文件。
+  admin-settravel: 設置您所在領地的旅行點。
+  admin-travel: 前往指定的王國或城鎮。
+  admin-reload: 重新加載配置文件。
+  admin-flag: 設定王國標誌。使用該命令而不帶參數來列出可用的標誌。
+  admin-stat: 管理玩家統計數據。
+territory:
+  wild: 野外
+  capital: 首都
+  town: 城鎮
+  camp: 營地
+  ruin: 廢墟
+  sanctuary: 聖域
+  other: 其他
+diplomacy:
+  war: 戰爭
+  peace: 和平
+  trade: 貿易
+  alliance: 聯盟
+  self: 你的王國
+properties:
+  travel-name: 旅行
+  travel: 允許前往這個領土
+  pvp-name: PvP
+  pvp: 允許玩家造成傷害
+  pve-name: PvE
+  pve: 允許實體造成傷害
+  build-name: 建造
+  build: 允許編輯方塊
+  use-name: 使用
+  use: 允許使用方塊
+  chest-name: 儲物箱
+  chest: 允許使用容器
+  mobs-name: 生物
+  mobs: 允許生成生物
+  portals-name: 傳送門
+  portals: 允許玩家使用傳送門
+  enter-name: 進入
+  enter: 允許玩家進入
+  exit-name: 離開
+  exit: 允許玩家離開
+  capture-name: 佔領
+  capture: 允許佔領這個城鎮
+  claim-name: 佔地
+  claim: 允許玩家佔領土地
+  unclaim-name: 解除佔地
+  unclaim: 允許玩家解除佔領
+  upgrade-name: 升級
+  upgrade: 允許玩家升級這個城鎮
+  plots-name: 土地劃分
+  plots: 允許玩家設置城鎮地塊
+  peaceful-name: 和平
+  peaceful: 使王國只能和平
+  golems-name: 鐵傀儡
+  golems: 啟用鐵傀儡攻擊敵人
+  join-name: 加入
+  join: 允許玩家加入
+  leave-name: 離開
+  leave: 允許玩家離開
+  promote-name: 晉升
+  promote: 允許晉升玩家
+  demote-name: 降職
+  demote: 允許降職玩家
+  transfer-name: 轉移
+  transfer: 允許所有權轉移
+  shop-name: 商店
+  shop: 允許玩家創建商店
+  arena-name: 競技場
+  arena: 允許任何玩家互相戰鬥
+discord-srv:
+  discord: Discord
+  no-link: 您沒有連結到 Discord。輸入 /discord 鏈接
+  no-user: 找不到與您關聯的 Discord 使用者。
+  linked-user: 您已連結到 Discord 中的 %s。

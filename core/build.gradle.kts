@@ -59,7 +59,6 @@ tasks {
         archiveBaseName.set("Konquest")
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir/build/libs"))
-
         dependencies {
             include(project(":api"))
         }

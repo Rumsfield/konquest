@@ -929,6 +929,11 @@ public enum MessagePath {
 	PROPERTIES_SHOP_NAME						(0, "properties.shop-name"),
 	PROPERTIES_ARENA_NAME						(0, "properties.arena-name"),
 
+	DISCORD_SRV_DISCORD  						(0, "discord-srv.discord"),
+	DISCORD_SRV_NO_LINK  						(0, "discord-srv.no-link"),
+	DISCORD_SRV_NO_USER  						(0, "discord-srv.no-user"),
+	DISCORD_SRV_LINKED_USER  					(1, "discord-srv.linked-user"),
+
 	NULL_MESSAGE	(0,"");
 	
 	private final String path;
