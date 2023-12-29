@@ -59,7 +59,6 @@ tasks {
         archiveBaseName.set("Konquest")
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir/build/libs"))
-
         dependencies {
             include(project(":api"))
         }
@@ -67,10 +66,16 @@ tasks {
 
     build {
         dependsOn(shadowJar)
+        doLast {
+            println(System.getProperty("file.encoding"))
+        }
     }
 
     processResources {
         filter<org.apache.tools.ant.filters.ReplaceTokens>("tokens" to mapOf("version" to project.version))
+        doLast {
+            println(System.getProperty("file.encoding"))
+        }
     }
 }
 
