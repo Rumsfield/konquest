@@ -522,7 +522,7 @@ command:
         show: '玩家 %s 的 %s 數值: %s'
         set: 設定玩家 %s 的 %s 數值為 %s。
         add: '為玩家 %s 的 %s 數值添加 %s： %s'
-        clear: 清除玩家 %s 的 %s 數值，設為零：%s。
+        clear: 清除玩家 %s 的 %s 數值，設為零。
       error:
         name: 無效的屬性 %s，無法匹配到現有屬性。
         value: 無效的屬性值：%s
