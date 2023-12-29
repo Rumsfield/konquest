@@ -66,16 +66,10 @@ tasks {
 
     build {
         dependsOn(shadowJar)
-        doLast {
-            println(System.getProperty("file.encoding"))
-        }
     }
 
     processResources {
         filter<org.apache.tools.ant.filters.ReplaceTokens>("tokens" to mapOf("version" to project.version))
-        doLast {
-            println(System.getProperty("file.encoding"))
-        }
     }
 }
 
