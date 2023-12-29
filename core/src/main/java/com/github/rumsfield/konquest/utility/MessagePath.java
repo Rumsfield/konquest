@@ -644,6 +644,7 @@ public enum MessagePath {
 	COMMAND_TRAVEL_ERROR_NO_TOWN                (0, "command.travel.error.no-town"),
 	COMMAND_TRAVEL_ERROR_COOLDOWN               (2, "command.travel.error.cooldown"),
 	COMMAND_TRAVEL_ERROR_CANCELED               (0, "command.travel.error.canceled"),
+	COMMAND_TRAVEL_ERROR_DAMAGED                (0, "command.travel.error.damaged"),
 	COMMAND_TRAVEL_ERROR_DISABLED               (0, "command.travel.error.disabled"),
 	COMMAND_UNCLAIM_NOTICE_SUCCESS              (2, "command.unclaim.notice.success"),
 	COMMAND_UNCLAIM_NOTICE_FAIL_AUTO            (0, "command.unclaim.notice.fail-auto"),

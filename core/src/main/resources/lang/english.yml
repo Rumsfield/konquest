@@ -734,6 +734,7 @@ command:
       no-town: "That town does not exist in your Kingdom."
       cooldown: "You must wait %s before traveling to %s."
       canceled: "Your travel was canceled by movement."
+      damaged: "Your travel was canceled by damage."
       disabled: "Travel to that territory is disabled."
   unclaim:
     notice:

@@ -248,6 +248,9 @@ core:
     
     # Whether to cancel a travel warmup if the player moves to another block (true/false)
     cancel_on_move: true
+
+    # Whether to cancel a travel warmup if the player takes any damage (true/false)
+    cancel_on_damage: true
     
   # //// CORE.KINGDOMS \\\\
   kingdoms:
