@@ -16,26 +16,24 @@ public class BorderCommand extends CommandBase {
 	public BorderCommand(Konquest konquest, CommandSender sender, String[] args) {
         super(konquest, sender, args);
     }
-	
+
+	// Player only
 	public void execute() {
 		// k border
-		Player bukkitPlayer = (Player) getSender();
+		KonPlayer player = getPlayerCheck();
+		if(player == null) return;
+
     	if (getArgs().length != 1) {
 			sendInvalidArgMessage(bukkitPlayer,CommandType.BORDER);
 			return;
 		}
-		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-			ChatUtil.printDebug("Failed to find non-existent player");
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-			return;
-		}
-		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
+
 		if(player.isBorderDisplay()) {
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_BORDER_NOTICE_DISABLE.getMessage());
+			ChatUtil.sendNotice(player, MessagePath.COMMAND_BORDER_NOTICE_DISABLE.getMessage());
 			player.setIsBorderDisplay(false);
 			getKonquest().getTerritoryManager().stopPlayerBorderParticles(player);
 		} else {
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_BORDER_NOTICE_ENABLE.getMessage());
+			ChatUtil.sendNotice(player, MessagePath.COMMAND_BORDER_NOTICE_ENABLE.getMessage());
 			player.setIsBorderDisplay(true);
 			getKonquest().getTerritoryManager().updatePlayerBorderParticles(player);
 		}

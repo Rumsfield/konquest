@@ -298,6 +298,10 @@ public class ChatUtil {
 		Bukkit.getLogger().warning("[Konquest] " + message);
 	}
 
+	public static void sendNotice(KonPlayer player, String message) {
+		sendNotice(player.getBukkitPlayer(), message);
+	}
+
 	public static void sendNotice(Player player, String message) {
 		String notice = Konquest.getChatTag() + noticeColor + message;
 		player.sendMessage(notice);
@@ -315,6 +319,10 @@ public class ChatUtil {
 	public static void sendMessage(Player player, String message, ChatColor color) {
 		String notice = color + message;
 		player.sendMessage(notice);
+	}
+
+	public static void sendError(KonPlayer player, String message) {
+		sendError(player.getBukkitPlayer(), message);
 	}
 
 	public static void sendError(Player player, String message) {
