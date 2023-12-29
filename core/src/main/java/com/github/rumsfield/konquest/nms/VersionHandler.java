@@ -10,5 +10,5 @@ public interface VersionHandler {
 
 	void applyTradeDiscount(double discountPercent, boolean isStack, MerchantInventory merchantInventory);
 	
-	void sendPlayerTeamPacket(Player player, List<String> teamNames, Team team);
+	boolean sendPlayerTeamPacket(Player player, List<String> teamNames, Team team);
 }
