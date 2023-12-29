@@ -734,6 +734,7 @@ command:
       no-town: 你的王國中不存在該城鎮。
       cooldown: 你必須等待 %s 才能旅行到 %s。
       canceled: 你的旅行被移動取消了。
+      damaged: 您的旅行因損壞而取消。
       disabled: 旅行到該領土被禁用了。
   unclaim:
     notice:
