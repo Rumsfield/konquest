@@ -45,14 +45,14 @@ public class Handler_1_19_R1 implements VersionHandler {
 	}
 	
 	@Override
-	public void sendPlayerTeamPacket(Player player, List<String> teamNames, Team team) {
+	public boolean sendPlayerTeamPacket(Player player, List<String> teamNames, Team team) {
 		// Create team packet
 		boolean fieldNameSuccess = false;
 		boolean fieldModeSuccess = false;
 		boolean fieldPlayersSuccess = false;
-		
-		PacketContainer teamPacket = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
+
 		try {
+			PacketContainer teamPacket = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
 			
 			teamPacket.getStrings().write(0, team.getName());
 			fieldNameSuccess = true;
@@ -64,9 +64,11 @@ public class Handler_1_19_R1 implements VersionHandler {
 			fieldPlayersSuccess = true;
 
 			ProtocolLibrary.getProtocolManager().sendServerPacket(player, teamPacket);
+			return true;
 
-		} catch(FieldAccessException e) {
+		} catch(Exception e) {
 			ChatUtil.printDebug("Failed to create team packet for player "+player.getName()+", field status is "+fieldNameSuccess+","+fieldModeSuccess+","+fieldPlayersSuccess+": "+e.getMessage());
+			return false;
 		}
 	}
 }

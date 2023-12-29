@@ -72,7 +72,8 @@ public enum CorePath {
 	TRAVEL_WILD_CENTER_Z                                  ("core.travel.wild_center_z"),
 	TRAVEL_WARMUP                                         ("core.travel.warmup"),
 	TRAVEL_CANCEL_ON_MOVE                                 ("core.travel.cancel_on_move"),
-	
+	TRAVEL_CANCEL_ON_DAMAGE                               ("core.travel.cancel_on_damage"),
+
 	KINGDOMS_CAPITAL_SUFFIX                               ("core.kingdoms.capital_suffix"),
 	KINGDOMS_CAPITAL_PREFIX_SWAP                          ("core.kingdoms.capital_prefix_swap"),
 	KINGDOMS_CAPITAL_RESPAWN                              ("core.kingdoms.capital_respawn"),

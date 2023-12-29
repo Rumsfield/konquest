@@ -421,6 +421,21 @@ public class EntityListener implements Listener {
 			event.setCancelled(true);
 		}
 	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerDamage(EntityDamageEvent event) {
+		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
+		if(!(event.getEntity() instanceof Player)) return;
+		Player damagePlayer = (Player)event.getEntity();
+		// Try to cancel any travel warmup
+		boolean doCancelTravelOnDamage = konquest.getCore().getBoolean(CorePath.TRAVEL_CANCEL_ON_DAMAGE.getPath(), false);
+		if(doCancelTravelOnDamage) {
+			boolean status = konquest.getTravelManager().cancelTravel(damagePlayer);
+			if(status) {
+				ChatUtil.sendError(damagePlayer, MessagePath.COMMAND_TRAVEL_ERROR_DAMAGED.getMessage());
+			}
+		}
+	}
 	
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onEntityDamage(EntityDamageEvent event) {
@@ -437,7 +452,6 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 			}
 		}
-
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)

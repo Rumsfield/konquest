@@ -416,7 +416,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 			for(KonKingdom kingdom : kingdomManager.getKingdoms()) {
 				String kingdomName = kingdom.getName();
 				int kingdomLand = 0;
-				for(KonTown town : kingdom.getTowns()) {
+				for(KonTown town : kingdom.getCapitalTowns()) {
 					kingdomLand += town.getChunkList().size();
 				}
 				topLandList.add(new Ranked(kingdomName, kingdomLand));

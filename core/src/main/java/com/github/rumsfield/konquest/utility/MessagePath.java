@@ -644,6 +644,7 @@ public enum MessagePath {
 	COMMAND_TRAVEL_ERROR_NO_TOWN                (0, "command.travel.error.no-town"),
 	COMMAND_TRAVEL_ERROR_COOLDOWN               (2, "command.travel.error.cooldown"),
 	COMMAND_TRAVEL_ERROR_CANCELED               (0, "command.travel.error.canceled"),
+	COMMAND_TRAVEL_ERROR_DAMAGED                (0, "command.travel.error.damaged"),
 	COMMAND_TRAVEL_ERROR_DISABLED               (0, "command.travel.error.disabled"),
 	COMMAND_UNCLAIM_NOTICE_SUCCESS              (2, "command.unclaim.notice.success"),
 	COMMAND_UNCLAIM_NOTICE_FAIL_AUTO            (0, "command.unclaim.notice.fail-auto"),
@@ -927,6 +928,11 @@ public enum MessagePath {
 	PROPERTIES_TRANSFER_NAME					(0, "properties.transfer-name"),
 	PROPERTIES_SHOP_NAME						(0, "properties.shop-name"),
 	PROPERTIES_ARENA_NAME						(0, "properties.arena-name"),
+
+	DISCORD_SRV_DISCORD  						(0, "discord-srv.discord"),
+	DISCORD_SRV_NO_LINK  						(0, "discord-srv.no-link"),
+	DISCORD_SRV_NO_USER  						(0, "discord-srv.no-user"),
+	DISCORD_SRV_LINKED_USER  					(1, "discord-srv.linked-user"),
 
 	NULL_MESSAGE	(0,"");
 	

@@ -236,6 +236,7 @@ public class Konquest implements KonquestAPI, Timeable {
 				case "v1_19_R3":
 				case "v1_20_R1":
 				case "v1_20_R2":
+				case "v1_20_R3":
 					if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
 	    			break;
 	    		default:
@@ -1354,7 +1355,8 @@ public class Konquest implements KonquestAPI, Timeable {
 					break;
 			}
     		// Send appropriate team packet to online player
-    		versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Collections.singletonList(player.getBukkitPlayer().getName()), onlinePacketTeam);
+			boolean status = versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Collections.singletonList(player.getBukkitPlayer().getName()), onlinePacketTeam);
+			if(!status) ChatUtil.printConsoleError("Failed to send Team Update packet, make sure ProtocolLib is updated and works for this Minecraft version.");
     	}
     	// Send packets to player
     	if(!barbarianNames.isEmpty()) {
