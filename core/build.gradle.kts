@@ -43,7 +43,7 @@ dependencies{
     compileOnly("com.acrobot.chestshop:chestshop:3.12")
     compileOnly("org.dynmap:dynmap:3.4-beta-2-spigot")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly("com.discordsrv:discordsrv:1.25.1")
+    compileOnly("com.discordsrv:discordsrv:1.27.0")
     compileOnly("me.clip:placeholderapi:2.11.2")
     compileOnly("net.luckperms:api:5.4")
     compileOnly("com.github.BlueMap-Minecraft:BlueMapAPI:v2.6.0")
