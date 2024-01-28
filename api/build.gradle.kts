@@ -1,6 +1,7 @@
 plugins {
     java
     id("com.github.johnrengelman.shadow") version "7.1.2"
+    `maven-publish`
 }
 
 dependencies{
@@ -26,4 +27,15 @@ tasks {
 java{
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = project.group.toString()
+            artifactId = rootProject.name+"-"+project.name
+            version = project.version.toString()
+            from(components["java"])
+        }
+    }
 }
