@@ -668,6 +668,7 @@ command:
       fail-init: 城鎮無法索取初始區塊。
       fail-limit-all: 不能建立超過全局最大限制%s個城鎮。目前所有世界中有%s個城鎮。
       fail-limit-world: 不能建立超過每個世界最大限制%s個城鎮。目前這個世界中有%s個城鎮。
+      officer-only: 只有王國主人和官員才能定居城鎮。要求升職！
   spy:
     notice:
       nearby: 附近
