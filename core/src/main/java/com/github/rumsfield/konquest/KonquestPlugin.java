@@ -18,7 +18,16 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class KonquestPlugin extends JavaPlugin {
-	
+
+	private static final String vaultEconomyWarning = "There is a problem with the economy plugin, %s! Attempting to work around...";
+	private static final String vaultEconomyError = "Failed to access the economy plugin %s using Vault API. This is an error in the economy plugin, NOT Konquest.\n"+
+			"Steps to troubleshoot:\n"+
+			"  1. Check for console errors from the economy plugin, did it enable correctly?\n"+
+			"  2. Make sure you only have one economy plugin. Having multiple may cause issues.\n"+
+			"  3. Contact the economy plugin developer to make them aware of this issue.\n"+
+			"  4. Use another economy plugin.\n"+
+			"Economy Error Message: %s\n";
+
 	private Konquest konquest;
 	private PluginManager pluginManager;
 	private static Economy econ = null;
@@ -154,6 +163,7 @@ public class KonquestPlugin extends JavaPlugin {
             return false;
         }
         econ = rsp.getProvider();
+		ChatUtil.printConsoleAlert("Using Economy: "+econ.getName());
         return true;
     }
 
@@ -215,13 +225,14 @@ public class KonquestPlugin extends JavaPlugin {
 		double result;
 		try {
 			result = econ.getBalance(offlineBukkitPlayer);
-		} catch(Exception e) {
-			ChatUtil.printDebug("Failed to get balance using Player: "+e.getMessage());
+		} catch(Exception ignored) {
+			ChatUtil.printConsoleWarning(String.format(vaultEconomyWarning,econ.getName()));
 			try {
 				result = econ.getBalance(offlineBukkitPlayer.getName());
 			} catch(Exception x) {
-				ChatUtil.printDebug("Failed to get balance using Name: "+x.getMessage());
-				result = econ.getBalance(formatStringForAConomyPlugin(offlineBukkitPlayer));
+				ChatUtil.printConsoleError(String.format(vaultEconomyError,econ.getName(),x.getMessage()));
+				x.printStackTrace();
+				result = 0;
 			}
 		}
 		return result;
@@ -280,13 +291,12 @@ public class KonquestPlugin extends JavaPlugin {
 		EconomyResponse resp = null;
 		try {
 			resp = econ.withdrawPlayer(offlineBukkitPlayer, amountMod);
-		} catch(Exception e) {
-			ChatUtil.printDebug("Failed to withdraw using Player: "+e.getMessage());
+		} catch(Exception ignored) {
+			ChatUtil.printConsoleWarning(String.format(vaultEconomyWarning,econ.getName()));
 			try {
 				resp = econ.withdrawPlayer(offlineBukkitPlayer.getName(), amountMod);
 			} catch(Exception x) {
-				ChatUtil.printDebug("Failed to withdraw using Name: "+x.getMessage());
-				resp = econ.withdrawPlayer(formatStringForAConomyPlugin(offlineBukkitPlayer), amountMod);
+				ChatUtil.printConsoleError(String.format(vaultEconomyError,econ.getName(),x.getMessage()));
 			}
 		}
 		// Send message
@@ -318,16 +328,15 @@ public class KonquestPlugin extends JavaPlugin {
 		boolean result = false;
 		boolean isOnlinePlayer = offlineBukkitPlayer instanceof Player;
 		// Perform transaction
-		EconomyResponse resp;
+		EconomyResponse resp = null;
 		try {
 			resp = econ.depositPlayer(offlineBukkitPlayer, amount);
-		} catch(Exception e) {
-			ChatUtil.printDebug("Failed to deposit using Player: "+e.getMessage());
+		} catch(Exception ignored) {
+			ChatUtil.printConsoleWarning(String.format(vaultEconomyWarning,econ.getName()));
 			try {
 				resp = econ.depositPlayer(offlineBukkitPlayer.getName(), amount);
 			} catch(Exception x) {
-				ChatUtil.printDebug("Failed to deposit using Name: "+x.getMessage());
-				resp = econ.depositPlayer(formatStringForAConomyPlugin(offlineBukkitPlayer), amount);
+				ChatUtil.printConsoleError(String.format(vaultEconomyError,econ.getName(),x.getMessage()));
 			}
 		}
 		// Send message
@@ -353,19 +362,5 @@ public class KonquestPlugin extends JavaPlugin {
 		}
 		return result;
 	}
-	
-	/**
-	 * This method is stupid, and is specific to unique way that AConomy implements its Vault API methods.
-	 * @param offlineBukkitPlayer The player to format
-	 * @return String of player's UUID when server is online-mode=true, else player's lowercase name.
-	 */
-	private static String formatStringForAConomyPlugin(OfflinePlayer offlineBukkitPlayer) {
-		String playerString;
-		if(Bukkit.getServer().getOnlineMode()) {
-			playerString = offlineBukkitPlayer.getUniqueId().toString();
-		} else {
-			playerString = offlineBukkitPlayer.getName().toLowerCase();
-		}
-		return playerString;
-	}
+
 }
