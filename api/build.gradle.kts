@@ -1,6 +1,5 @@
 plugins {
     java
-    id("com.github.johnrengelman.shadow") version "7.1.2"
     `maven-publish`
 }
 
@@ -9,7 +8,8 @@ dependencies{
 }
 
 tasks {
-    shadowJar {
+
+    jar{
         archiveBaseName.set(rootProject.name+"-"+project.name)
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir/build/libs"))
@@ -32,10 +32,11 @@ java{
 publishing {
     publications {
         create<MavenPublication>("maven") {
+            from(components["java"])
+
             groupId = project.group.toString()
             artifactId = rootProject.name+"-"+project.name
             version = project.version.toString()
-            from(components["java"])
         }
     }
     repositories{

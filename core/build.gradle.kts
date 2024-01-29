@@ -78,17 +78,3 @@ java{
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
 }
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = project.group.toString()
-            artifactId = rootProject.name+"-"+project.name
-            version = project.version.toString()
-            from(components["java"])
-        }
-    }
-    repositories{
-        mavenLocal()
-    }
-}
