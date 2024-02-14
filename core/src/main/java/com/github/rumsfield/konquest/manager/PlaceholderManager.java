@@ -126,68 +126,56 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 	
 	public String getTownsLord(Player player) {
 		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
-    	StringBuilder list = new StringBuilder();
+    	int numTowns = 0;
     	if(offlinePlayer != null) {
     		for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
     			if(town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
-    				list.append(town.getName()).append(",");
+					numTowns++;
     			}
     		}
-    		if(list.length() > 1) {
-    			list = new StringBuilder(list.substring(0, list.length() - 1));
-			}
     	}
-    	return list.toString();
+    	return ""+numTowns;
 	}
 	
 	public String getTownsKnight(Player player) {
 		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
-		StringBuilder list = new StringBuilder();
+		int numTowns = 0;
     	if(offlinePlayer != null) {
     		for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
     			if(town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer()) &&
     					!town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
-    				list.append(town.getName()).append(",");
+					numTowns++;
     			}
     		}
-    		if(list.length() > 1) {
-    			list = new StringBuilder(list.substring(0, list.length() - 1));
-			}
     	}
-    	return list.toString();
+    	return ""+numTowns;
 	}
 	
 	public String getTownsResident(Player player) {
 		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
-		StringBuilder list = new StringBuilder();
+		int numTowns = 0;
     	if(offlinePlayer != null) {
     		for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
     			if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer()) &&
     					!town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer())) {
-    				list.append(town.getName()).append(",");
+					numTowns++;
     			}
     		}
-    		if(list.length() > 1) {
-    			list = new StringBuilder(list.substring(0, list.length() - 1));
-			}
     	}
-    	return list.toString();
+    	return ""+numTowns;
 	}
 	
 	public String getTownsAll(Player player) {
 		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
-		StringBuilder list = new StringBuilder();
+		int numTowns = 0;
     	if(offlinePlayer != null) {
     		for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
     			if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
-    				list.append(town.getName()).append(",");
+					numTowns++;
     			}
     		}
-    		if(list.length() > 1) {
-    			list = new StringBuilder(list.substring(0, list.length() - 1));
-			}
     	}
-    	return list.toString();
+    	return ""+numTowns;
 	}
 	
 	public String getTerritory(Player player) {

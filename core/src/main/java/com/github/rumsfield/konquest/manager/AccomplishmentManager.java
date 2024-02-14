@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -244,7 +245,7 @@ public class AccomplishmentManager {
     	for(String prefixLabel : prefixConfig.getConfigurationSection("prefix").getKeys(false)) {
     		status = true;
     		prefixEntry = prefixConfig.getConfigurationSection("prefix."+prefixLabel);
-    		if(prefixEntry != null && prefixLabel.matches("[A-Za-z0-9_]+")) {
+    		if(prefixEntry != null && StringUtils.isAlphanumeric(prefixLabel.replace("_",""))) {
         		if(prefixEntry.contains("name")) {
         			prefixName = prefixEntry.getString("name","");
         			if(prefixName.isEmpty()) {
