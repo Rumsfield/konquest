@@ -151,9 +151,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		payPercentOfficer = Math.min(payPercentOfficer, 100);
 		payPercentMaster = Math.max(payPercentMaster, 0);
 		payPercentMaster = Math.min(payPercentMaster, 100);
-		
+
+		payTimer.stopTimer();
 		if(payIntervalSeconds > 0) {
-			payTimer.stopTimer();
 			payTimer.setTime((int)payIntervalSeconds);
 			payTimer.startLoopTimer();
 		}
@@ -169,7 +169,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 	public String getKingdomPayTime() {
 		String noColor = "";
-		return Konquest.getTimeFormat(payTimer.getTime(), noColor);
+		int timerCount = Math.max(payTimer.getTime(),0);
+		return Konquest.getTimeFormat(timerCount, noColor);
 	}
 	
 	public double getCostDiplomacyWar() {

@@ -54,8 +54,8 @@ public class LootManager implements Timeable{
 	public void initialize() {
 		// Parse config for refresh time
 		refreshTimeSeconds = konquest.getCore().getLong(CorePath.MONUMENTS_LOOT_REFRESH.getPath(),0L);
+		lootRefreshTimer.stopTimer();
 		if(refreshTimeSeconds > 0) {
-			lootRefreshTimer.stopTimer();
 			lootRefreshTimer.setTime((int)refreshTimeSeconds);
 			lootRefreshTimer.startLoopTimer();
 		}
@@ -268,7 +268,8 @@ public class LootManager implements Timeable{
 
 	public String getMonumentLootTime() {
 		String noColor = "";
-		return Konquest.getTimeFormat(lootRefreshTimer.getTime(), noColor);
+		int timerCount = Math.max(lootRefreshTimer.getTime(),0);
+		return Konquest.getTimeFormat(timerCount, noColor);
 	}
 
 	/**
