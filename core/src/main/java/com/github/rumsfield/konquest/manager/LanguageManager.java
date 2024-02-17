@@ -59,6 +59,8 @@ public class LanguageManager {
 			ChatUtil.printConsoleError("Language file is missing path: "+path);
 			result = "<MISSING>";
 		}
+		// Parse color codes
+		result = ChatUtil.parseHex(result);
 		return result;
 	}
 	
