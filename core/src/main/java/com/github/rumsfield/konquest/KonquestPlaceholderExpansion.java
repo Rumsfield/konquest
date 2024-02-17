@@ -391,6 +391,10 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
 			case "relation2_color":
 				result = placeholderManager.getRelationSecondaryColor(playerOne, playerTwo);
 				break;
+			/* %rel_konquest_kingdom_webcolor% - playerTwo's kingdom web color */
+			case "kingdom_webcolor":
+				result = placeholderManager.getRelationKingdomWebColor(playerTwo);
+				break;
         	default: 
 	        	break;
         }
