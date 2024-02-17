@@ -335,19 +335,15 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		return result;
 	}
 
-	public String getRelationKingdomWebColor(Player playerOne, Player playerTwo) {
+	public String getRelationKingdomWebColor(Player playerTwo) {
 		String result = "";
 		KonPlayer onlinePlayerTwo = playerManager.getPlayer(playerTwo);
 		if(onlinePlayerTwo != null) {
 			int webColor = onlinePlayerTwo.getKingdom().getWebColor();
-			int webColorHash;
 			if(webColor == -1) {
-				int hash = onlinePlayerTwo.getKingdom().getName().hashCode();
-				webColorHash = hash & 0xFFFFFF;
-			} else {
-				webColorHash = webColor;
+				webColor = onlinePlayerTwo.getKingdom().getName().hashCode() & 0xFFFFFF;
 			}
-			result = String.format("#%08X",webColorHash);
+			result = ChatUtil.parseHex(String.format("#%06X",webColor));
 		}
 		return result;
 	}
