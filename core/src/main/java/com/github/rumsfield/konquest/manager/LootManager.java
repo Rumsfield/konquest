@@ -266,6 +266,11 @@ public class LootManager implements Timeable{
 	 * Monument Loot
 	 */
 
+	public String getMonumentLootTime() {
+		String noColor = "";
+		return Konquest.getTimeFormat(lootRefreshTimer.getTime(), noColor);
+	}
+
 	/**
 	 * Attempts to fill an inventory with loot
 	 * @param inventory - the inventory to try and fill

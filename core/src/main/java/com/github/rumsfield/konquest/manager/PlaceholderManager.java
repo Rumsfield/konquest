@@ -623,5 +623,27 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		}
 		return result;
 	}
+
+	/*
+	 * Placeholder Timers
+	 */
+
+	public String getTimerLoot(Player player) {
+		String result = "";
+		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
+		if(offlinePlayer != null) {
+			result = konquest.getLootManager().getMonumentLootTime();
+		}
+		return result;
+	}
+
+	public String getTimerPayment(Player player) {
+		String result = "";
+		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
+		if(offlinePlayer != null) {
+			result = konquest.getKingdomManager().getKingdomPayTime();
+		}
+		return result;
+	}
 	
 }

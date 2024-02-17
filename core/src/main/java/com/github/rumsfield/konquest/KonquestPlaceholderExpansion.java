@@ -106,7 +106,15 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
         String result = null;
         String identifierLower = identifier.toLowerCase();
         switch(identifierLower) {
-	        /* %konquest_kingdom% - player's kingdom name */
+			/* %konquest_timer_loot% - Time until monument loot refreshes */
+			case "timer_loot":
+				result = placeholderManager.getTimerLoot(player);
+				break;
+			/* %konquest_timer_payment% - Time until kingdom payment refreshes */
+			case "timer_payment":
+				result = placeholderManager.getTimerPayment(player);
+				break;
+			/* %konquest_kingdom% - player's kingdom name */
         	case "kingdom":
         		result = placeholderManager.getKingdom(player);
 	        	break;

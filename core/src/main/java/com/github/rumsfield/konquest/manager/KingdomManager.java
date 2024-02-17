@@ -166,6 +166,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		discountPercent = Math.max(discountPercent,0);
 		discountPercent = Math.min(discountPercent,100);
 	}
+
+	public String getKingdomPayTime() {
+		String noColor = "";
+		return Konquest.getTimeFormat(payTimer.getTime(), noColor);
+	}
 	
 	public double getCostDiplomacyWar() {
 		return costDiplomacyWar;

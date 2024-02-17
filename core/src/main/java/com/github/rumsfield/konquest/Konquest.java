@@ -1617,14 +1617,21 @@ public class Konquest implements KonquestAPI, Timeable {
 		int hours = valSeconds % 86400 / 3600;
 		int minutes = valSeconds % 3600 / 60;
 		int seconds = valSeconds % 60;
-		
-		ChatColor nColor = ChatColor.GRAY;
-		String numColor = color;
-		if(valSeconds <= 30) {
-			numColor = ""+ChatColor.DARK_RED;
-		}
+
+		String nColor;
+		String numColor;
 		String result;
 		String format;
+		if(color != null && !color.equals("")) {
+			nColor = ""+ChatColor.GRAY;
+			numColor = color;
+			if(valSeconds <= 30) {
+				numColor = ""+ChatColor.DARK_RED;
+			}
+		} else {
+			nColor = "";
+			numColor = "";
+		}
 		
 		if(days != 0) {
 			format = numColor+"%03d"+nColor+"D:"+numColor+"%02d"+nColor+"H:"+numColor+"%02d"+nColor+"M:"+numColor+"%02d"+nColor+"S";
