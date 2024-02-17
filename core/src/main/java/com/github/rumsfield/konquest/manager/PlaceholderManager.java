@@ -334,6 +334,23 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		}
 		return result;
 	}
+
+	public String getRelationKingdomWebColor(Player playerOne, Player playerTwo) {
+		String result = "";
+		KonPlayer onlinePlayerTwo = playerManager.getPlayer(playerTwo);
+		if(onlinePlayerTwo != null) {
+			int webColor = onlinePlayerTwo.getKingdom().getWebColor();
+			int webColorHash;
+			if(webColor == -1) {
+				int hash = onlinePlayerTwo.getKingdom().getName().hashCode();
+				webColorHash = hash & 0xFFFFFF;
+			} else {
+				webColorHash = webColor;
+			}
+			result = String.format("#%08X",webColorHash);
+		}
+		return result;
+	}
 	
 	/*
 	 * Top rankings
