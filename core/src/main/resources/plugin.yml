@@ -2,7 +2,7 @@ name: Konquest
 description: A plugin for land claiming and territory control
 author: Rumsfield
 version: @version@
-api-version: 1.16
+api-version: 1.20
 load: POSTWORLD
 main: com.github.rumsfield.konquest.KonquestPlugin
 depend: [Vault]
@@ -48,6 +48,7 @@ permissions:
       konquest.directive.*: true
       konquest.compass: true
       konquest.join: true
+      konquest.chatcolor: true
 
   konquest.command:
     description: Base command permission
@@ -337,4 +338,8 @@ permissions:
     
   konquest.prefix:
     description: Grants access to a custom prefix
+    default: false
+
+  konquest.chatcolor:
+    description: Allows players to use color format codes in chat messages
     default: false

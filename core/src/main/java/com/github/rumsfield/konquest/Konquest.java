@@ -42,7 +42,8 @@ public class Konquest implements KonquestAPI, Timeable {
 	private static Konquest instance;
 	private static String chatTag;
 	private static String chatMessage;
-	public static final String chatDivider = "\u00BB"; // »
+	private static String chatDivider;
+	//public static final String chatDivider = "\u00BB"; // »
 	public static String friendColor1 		= "§7";
 	public static String friendColor2 		= "§7";
 	public static String enemyColor1 		= "§7";
@@ -121,6 +122,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		instance = this;
 		chatTag = "§7[§6Konquest§7]§f ";
 		chatMessage = "%PREFIX% %KINGDOM% §7| %TITLE% %NAME% %SUFFIX% ";
+		chatDivider = "§8»§r ";
 		
 		databaseThread = new DatabaseThread(this);
 		accomplishmentManager = new AccomplishmentManager(this);
@@ -272,14 +274,20 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	private void initManagers() {
-		String configTag = getCore().getString(CorePath.CHAT_TAG.getPath());
+		// Set up chat formats
+		String configTag = getCore().getString(CorePath.CHAT_TAG.getPath(),"");
 		chatTag = ChatUtil.parseHex(configTag);
 		ChatUtil.printDebug("Chat tag is "+chatTag);
 		String configMessage = getCore().getString(CorePath.CHAT_MESSAGE.getPath(),"");
 		if(!configMessage.equals("")) {
+			// Cannot be an empty string
 			chatMessage = ChatUtil.parseHex(configMessage);
 		}
 		ChatUtil.printDebug("Chat message is "+chatMessage);
+		String configDivider = getCore().getString(CorePath.CHAT_DIVIDER.getPath(),"");
+		chatDivider = ChatUtil.parseHex(configDivider);
+		ChatUtil.printDebug("Chat divider is "+chatDivider);
+
 		kingdomManager.loadOptions();
 		integrationManager.initialize();
 		lootManager.initialize();
@@ -1676,7 +1684,11 @@ public class Konquest implements KonquestAPI, Timeable {
     public static String getChatMessage() {
     	return chatMessage;
     }
-    
+
+	public static String getChatDivider() {
+		return chatDivider;
+	}
+
     public static void callKonquestEvent(KonquestEvent event) {
     	if(event != null) {
 	    	try {

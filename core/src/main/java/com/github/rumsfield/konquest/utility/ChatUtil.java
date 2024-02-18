@@ -63,62 +63,46 @@ public class ChatUtil {
 	}
 	
 	/**
-	 * Search base string and replace
-	 * 		%PREFIX% with prefix arg
-	 * 		%SUFFIX% with suffix arg
-	 * 		%KINGDOM% with kingdom arg
-	 * 		%TITLE% with title arg
-	 * 		%NAME% with name arg
+	 * Search base string and replace built-in format tags
 	 * @param base Base format that may or may not contain %PREFIX%, %SUFFIX%, %KINGDOM%, %TITLE% or %NAME%.
 	 * @param kingdom Kingdom name to replace %KINGDOM% with
 	 * @param title Title to replace %TITLE% with
 	 * @param name Name to replace %NAME% with
 	 * @return Formatted string
 	 */
-	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, String teamColor, String nameColor, boolean formatName, boolean formatKingdom) {
+	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, String primaryColor, String secondaryColor, String kingdomWebColor) {
 		String message = base;
+		// Tags
 		if(prefix.equals("")) {
-			message = message.replace("%PREFIX% ", "");
-			message = message.replace("%PREFIX%", "");
+			message = message.replaceAll("%PREFIX%\\s*", "");
 		} else {
 			message = message.replace("%PREFIX%", prefix);
 		}
 		if(suffix.equals("")) {
-			message = message.replace("%SUFFIX% ", "");
-			message = message.replace("%SUFFIX%", "");
+			message = message.replaceAll("%SUFFIX%\\s*", "");
 		} else {
 			message = message.replace("%SUFFIX%", suffix);
 		}
 		if(kingdom.equals("")) {
-			message = message.replace("%KINGDOM% ", "");
-			message = message.replace("%KINGDOM%", "");
+			message = message.replaceAll("%KINGDOM%\\s*", "");
 		} else {
-			if(formatKingdom) {
-				message = message.replace("%KINGDOM%", teamColor+kingdom);
-			} else {
-				message = message.replace("%KINGDOM%", kingdom);
-			}
+			message = message.replace("%KINGDOM%", kingdom);
 		}
 		if(title.equals("")) {
-			message = message.replace("%TITLE% ", "");
-			message = message.replace("%TITLE%", "");
+			message = message.replaceAll("%TITLE%\\s*", "");
 		} else {
-			if(formatKingdom) {
-				message = message.replace("%TITLE%", teamColor + title);
-			} else {
-				message = message.replace("%TITLE%", title);
-			}
+			message = message.replace("%TITLE%", title);
 		}
 		if(name.equals("")) {
-			message = message.replace("%NAME% ", "");
-			message = message.replace("%NAME%", "");
+			message = message.replaceAll("%NAME%\\s*", "");
 		} else {
-			if(formatName) {
-				message = message.replace("%NAME%", nameColor+name);
-			} else {
-				message = message.replace("%NAME%", name);
-			}
+			message = message.replace("%NAME%", name);
 		}
+		// Colors
+		message = message.replace("%C1%", primaryColor);
+		message = message.replace("%C2%", secondaryColor);
+		message = message.replace("%CW%", kingdomWebColor);
+
 		return message;
 	}
 	

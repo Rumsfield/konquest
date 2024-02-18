@@ -247,8 +247,6 @@ public class PlayerListener implements Listener {
 		KonKingdom kingdom = player.getKingdom();
 
 		// Built-in format string
-		boolean formatNameConfig = konquest.getCore().getBoolean(CorePath.CHAT_NAME_TEAM_COLOR.getPath(),true);
-		boolean formatKingdomConfig = konquest.getCore().getBoolean(CorePath.CHAT_KINGDOM_TEAM_COLOR.getPath(),true);
 		/* %TITLE% */
 		String title = "";
 		if(player.getPlayerPrefix().isEnabled()) {
@@ -261,8 +259,15 @@ public class PlayerListener implements Listener {
 		/* %KINGDOM% */
 		String kingdomName = kingdom.getName();
 		/* %NAME% */
-		String name = bukkitPlayer.getName();
+		String playerName = bukkitPlayer.getName();
+		/* %C1% */
+		String primaryColor = ""+ChatColor.GOLD; // default
+		/* %C2% */
+		String secondaryColor = ""+ChatColor.GOLD; // default
+		/* %CW% */
+		String kingdomWebColor = kingdom.getWebColorString();
 
+		String divider = Konquest.getChatDivider();
 		String rawFormat = Konquest.getChatMessage();
 		String parsedFormat;
 		String chatMessage = event.getMessage();
@@ -279,30 +284,26 @@ public class PlayerListener implements Listener {
 
 		// Send messages to players
 		for(KonPlayer viewerPlayer : playerManager.getPlayersOnline()) {
-			String teamColor = ""+ChatColor.GOLD;
-			String nameColor = ""+ChatColor.GOLD;
-			boolean doFormatName = true;
-			boolean doFormatKingdom = true;
-			String messageFormat = "";
+			primaryColor = konquest.getDisplayPrimaryColor(viewerPlayer, player);
+			secondaryColor = konquest.getDisplaySecondaryColor(viewerPlayer, player);
+
+			boolean isGlobal = player.isGlobalChat();
+			String messageFormatOverride = "";
 
 			boolean sendMessage = false;
 			if(player.isGlobalChat()) {
 				// Sender is in global chat mode
-				nameColor = ""+konquest.getDisplayPrimaryColor(viewerPlayer, player);
-				teamColor = konquest.getDisplaySecondaryColor(viewerPlayer, player);
-				doFormatName = formatNameConfig;
-				doFormatKingdom = formatKingdomConfig;
-				messageFormat = "";
+				// All viewers see the message
 				sendMessage = true;
 			} else {
 				// Sender is in kingdom chat mode
 				if(viewerPlayer.getKingdom().equals(kingdom)) {
-					nameColor = Konquest.friendColor1;
-					teamColor = Konquest.friendColor1;
-					messageFormat = ""+ChatColor.GREEN+ChatColor.ITALIC;
+					// Viewer is a friendly kingdom member
+					messageFormatOverride = ""+ChatColor.RESET+Konquest.friendColor1+ChatColor.ITALIC;
 					sendMessage = true;
 				} else if(viewerPlayer.isAdminBypassActive()) {
-					messageFormat = ""+ChatColor.GOLD+ChatColor.ITALIC;
+					// Viewer is an admin in bypass mode
+					messageFormatOverride = ""+ChatColor.RESET+ChatColor.GOLD+ChatColor.ITALIC;
 					sendMessage = true;
 				}
 			}
@@ -314,11 +315,10 @@ public class PlayerListener implements Listener {
 						suffix,
 						kingdomName,
 						title,
-						name,
-						teamColor,
-						nameColor,
-						doFormatName,
-						doFormatKingdom);
+						playerName,
+						primaryColor,
+						secondaryColor,
+						kingdomWebColor);
 				// Attempt to use PAPI for external placeholders
 				try {
 					// Try to parse placeholders in the format string, if the JAR is present.
@@ -326,8 +326,12 @@ public class PlayerListener implements Listener {
 					// Try to parse relational placeholders
 					parsedFormat = PlaceholderAPI.setRelationalPlaceholders(viewerPlayer.getBukkitPlayer(), bukkitPlayer, parsedFormat);
 				} catch (NoClassDefFoundError ignored) {}
+				// Try to parse color codes in the chat message
+				if(bukkitPlayer.hasPermission("konquest.chatcolor")) {
+					chatMessage = ChatUtil.parseHex(chatMessage);
+				}
 				// Send the chat message
-				viewerPlayer.getBukkitPlayer().sendMessage(parsedFormat + ChatColor.DARK_GRAY + Konquest.chatDivider + ChatColor.RESET + " " + messageFormat + chatMessage);
+				viewerPlayer.getBukkitPlayer().sendMessage(parsedFormat + divider + messageFormatOverride + chatMessage);
 			}
 		}
 
