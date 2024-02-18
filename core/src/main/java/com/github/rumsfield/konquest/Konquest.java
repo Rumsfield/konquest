@@ -43,7 +43,6 @@ public class Konquest implements KonquestAPI, Timeable {
 	private static String chatTag;
 	private static String chatMessage;
 	private static String chatDivider;
-	//public static final String chatDivider = "\u00BB"; // »
 	public static String friendColor1 		= "§7";
 	public static String friendColor2 		= "§7";
 	public static String enemyColor1 		= "§7";

@@ -283,15 +283,14 @@ public class PlayerListener implements Listener {
 		event.setCancelled(true);
 
 		// Send messages to players
+		boolean isGlobal = player.isGlobalChat();
 		for(KonPlayer viewerPlayer : playerManager.getPlayersOnline()) {
 			primaryColor = konquest.getDisplayPrimaryColor(viewerPlayer, player);
 			secondaryColor = konquest.getDisplaySecondaryColor(viewerPlayer, player);
-
-			boolean isGlobal = player.isGlobalChat();
-			String messageFormatOverride = "";
+			String kingdomChatFormat = "";
 
 			boolean sendMessage = false;
-			if(player.isGlobalChat()) {
+			if(isGlobal) {
 				// Sender is in global chat mode
 				// All viewers see the message
 				sendMessage = true;
@@ -299,11 +298,15 @@ public class PlayerListener implements Listener {
 				// Sender is in kingdom chat mode
 				if(viewerPlayer.getKingdom().equals(kingdom)) {
 					// Viewer is a friendly kingdom member
-					messageFormatOverride = ""+ChatColor.RESET+Konquest.friendColor2+ChatColor.ITALIC;
+					kingdomChatFormat = ""+ChatColor.GRAY+"["+Konquest.friendColor1+MessagePath.LABEL_KINGDOM.getMessage()+ChatColor.GRAY+"]";
+					kingdomChatFormat += " "+Konquest.friendColor1+playerName+ChatColor.GRAY+" » ";
+					kingdomChatFormat += ""+Konquest.friendColor2+ChatColor.ITALIC;
 					sendMessage = true;
 				} else if(viewerPlayer.isAdminBypassActive()) {
 					// Viewer is an admin in bypass mode
-					messageFormatOverride = ""+ChatColor.RESET+ChatColor.GOLD+ChatColor.ITALIC;
+					kingdomChatFormat = ""+ChatColor.GRAY+"["+ChatColor.GOLD+MessagePath.LABEL_BYPASS.getMessage()+" "+kingdomName+ChatColor.GRAY+"]";
+					kingdomChatFormat += " "+ChatColor.GOLD+playerName+ChatColor.GRAY+" » ";
+					kingdomChatFormat += ""+ChatColor.GOLD+ChatColor.ITALIC;
 					sendMessage = true;
 				}
 			}
@@ -326,20 +329,24 @@ public class PlayerListener implements Listener {
 					// Try to parse relational placeholders
 					parsedFormat = PlaceholderAPI.setRelationalPlaceholders(viewerPlayer.getBukkitPlayer(), bukkitPlayer, parsedFormat);
 				} catch (NoClassDefFoundError ignored) {}
-				// Try to parse color codes in the chat message
-				if(bukkitPlayer.hasPermission("konquest.chatcolor")) {
-					chatMessage = ChatUtil.parseHex(chatMessage);
-				}
 				// Send the chat message
-				viewerPlayer.getBukkitPlayer().sendMessage(parsedFormat + divider + messageFormatOverride + chatMessage);
+				if(isGlobal) {
+					// Try to parse color codes in the chat message
+					if(bukkitPlayer.hasPermission("konquest.chatcolor")) {
+						chatMessage = ChatUtil.parseHex(chatMessage);
+					}
+					viewerPlayer.getBukkitPlayer().sendMessage(parsedFormat + divider + chatMessage);
+				} else {
+					viewerPlayer.getBukkitPlayer().sendMessage(kingdomChatFormat + chatMessage);
+				}
 			}
 		}
 
 		// Send message to console
 		if(player.isGlobalChat()) {
-			ChatUtil.printConsole(ChatColor.GOLD + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+			ChatUtil.printConsole(ChatColor.GOLD + playerName+": "+ChatColor.DARK_GRAY+event.getMessage());
 		} else {
-			ChatUtil.printConsole(ChatColor.GOLD + "["+kingdom.getName()+"] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+			ChatUtil.printConsole(ChatColor.GOLD + "["+kingdomName+"] "+playerName+": "+ChatColor.DARK_GRAY+event.getMessage());
 		}
 
     }
