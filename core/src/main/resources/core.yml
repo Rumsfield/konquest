@@ -75,7 +75,7 @@ core:
     # %CW%        Kingdom webcolor
     message: '%PREFIX% %C1%%KINGDOM% &7| %C2%%TITLE% %C1%%NAME% %SUFFIX% '
 
-    # Text that divides the chat message format from the player's text. Use & for color codes, or hex #000000. ('string')
+    # Text that divides the chat message format from the player's text. Use '' to disable. Use & for color codes, or hex #000000. ('string')
     divider: '&8»&r '
     
     # Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
