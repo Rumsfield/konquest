@@ -122,21 +122,18 @@ public class DiscordSrvHook implements PluginHook {
 			String chatMessage = guildMessage.getContentDisplay();
 			boolean sendMessage = false;
 			if(viewerPlayer.getKingdom().equals(kingdom)) {
-				chatFormat = chatFormat + Konquest.friendColor2+kingdom.getName()+" "+guildUser.getName();
-				messageFormat = ""+ChatColor.GREEN+ChatColor.ITALIC;
+				chatFormat = chatFormat + Konquest.friendColor1+kingdom.getName()+" "+guildUser.getName();
+				messageFormat = ""+ChatColor.RESET+Konquest.friendColor2+ChatColor.ITALIC;
 				sendMessage = true;
 			} else if(viewerPlayer.isAdminBypassActive()) {
 				chatFormat = chatFormat + ChatColor.GOLD+kingdom.getName()+" "+guildUser.getName();
-				messageFormat = ""+ChatColor.GOLD+ChatColor.ITALIC;
+				messageFormat = ""+ChatColor.RESET+ChatColor.GOLD+ChatColor.ITALIC;
 				sendMessage = true;
 			}
-
 			if(sendMessage) {
-				viewerPlayer.getBukkitPlayer().sendMessage(chatFormat + Konquest.chatDivider + ChatColor.RESET + " " + messageFormat + chatMessage);
+				viewerPlayer.getBukkitPlayer().sendMessage(chatFormat + " » " + messageFormat + chatMessage);
 			}
 		}
-
-
 	}
 	
 	// Sends the linked player a direct message

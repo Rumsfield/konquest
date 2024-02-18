@@ -299,7 +299,7 @@ public class PlayerListener implements Listener {
 				// Sender is in kingdom chat mode
 				if(viewerPlayer.getKingdom().equals(kingdom)) {
 					// Viewer is a friendly kingdom member
-					messageFormatOverride = ""+ChatColor.RESET+Konquest.friendColor1+ChatColor.ITALIC;
+					messageFormatOverride = ""+ChatColor.RESET+Konquest.friendColor2+ChatColor.ITALIC;
 					sendMessage = true;
 				} else if(viewerPlayer.isAdminBypassActive()) {
 					// Viewer is an admin in bypass mode
