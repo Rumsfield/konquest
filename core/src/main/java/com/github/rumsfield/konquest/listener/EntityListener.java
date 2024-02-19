@@ -99,6 +99,92 @@ public class EntityListener implements Listener {
 			return;
 		}
 	}
+
+	private boolean isTerritoryExplosionProtected(KonTerritory territory, boolean isCreeper) {
+		// Protect Sanctuaries and Ruins always
+		if(territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY) ||
+				territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
+			return true;
+		}
+		// Protect territories with property flags from creepers
+		if(isCreeper && territory instanceof KonPropertyFlagHolder) {
+			KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+			if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
+				// Block creeper explosions
+				if(!flagHolder.getPropertyValue(KonPropertyFlag.PVE)) {
+					return true;
+				}
+			}
+		}
+		// Conditional town/capital protections
+		if(territory instanceof KonTown) {
+			KonTown town = (KonTown)territory;
+
+			//TODO: Implement this...
+			// Protect against TNT ignited by non-enemies
+				/*
+				ChatUtil.printDebug("Evaluating entity explosion in town...");
+				if(event.getEntity() instanceof TNTPrimed) {
+					ChatUtil.printDebug("  explosion is primed TNT");
+					TNTPrimed tnt = (TNTPrimed)event.getEntity();
+					Entity tntSource = tnt.getSource();
+					if(tntSource == null) {
+						ChatUtil.printDebug("  source is null!");
+					} else {
+						ChatUtil.printDebug("  source: "+tntSource.getType());
+					}
+					if(tntSource instanceof Player) {
+						ChatUtil.printDebug("  source is player");
+						Player tntSender = (Player)tntSource;
+						KonPlayer player = playerManager.getPlayer(tntSender);
+						if(player != null) {
+							ChatUtil.printDebug("  found KonPlayer");
+							KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
+							if(!playerRole.equals(KonquestRelationshipType.ENEMY)) {
+								ChatUtil.printDebug("protecting Town from non-enemy TNT entity explosion");
+								event.setCancelled(true);
+								return;
+							}
+						}
+					}
+				}
+				*/
+			// Protect peaceful towns
+			if(town.getKingdom().isPeaceful()) {
+				return true;
+			}
+			// Protect towns when all kingdom members are offline
+			if(town.getKingdom().isOfflineProtected()) {
+				return true;
+			}
+			// If town is upgraded to require a minimum online resident amount, prevent block damage
+			int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
+			if(upgradeLevelWatch > 0) {
+				if(town.getNumResidentsOnline() < upgradeLevelWatch) {
+					return true;
+				}
+			}
+			// Protect when town has upgrade
+			int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DAMAGE);
+			if(upgradeLevel >= 2) {
+				return true;
+			}
+			// Check for capital capture conditions
+			if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && town.getKingdom().isCapitalImmune()) {
+				// Capital is immune and cannot be attacked
+				return true;
+			}
+			// Verify town can be captured
+			if(town.isCaptureDisabled()) {
+				return true;
+			}
+			// If town is shielded, prevent all explosions
+			if(town.isShielded()) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * Fires when entities explode.
@@ -127,110 +213,10 @@ public class EntityListener implements Listener {
 			}
 		}
 		if(isInTerritory && wholeTerritory != null) {
-			// Protect Sanctuaries always
-			if(wholeTerritory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY)) {
-				ChatUtil.printDebug("protecting Sanctuary from entity explosion");
+			boolean isCreeper = event.getEntity() instanceof Creeper;
+			if(isTerritoryExplosionProtected(wholeTerritory,isCreeper)) {
 				event.setCancelled(true);
 				return;
-			}
-			// Protect Ruins always
-			if(wholeTerritory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
-				ChatUtil.printDebug("protecting Ruin from entity explosion");
-				event.setCancelled(true);
-				return;
-			}
-			// Protect territories with property flags from creepers
-			if(event.getEntity() instanceof Creeper && wholeTerritory instanceof KonPropertyFlagHolder) {
-				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)wholeTerritory;
-				if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
-					// Block creeper explosions
-					if(!flagHolder.getPropertyValue(KonPropertyFlag.PVE)) {
-						ChatUtil.printDebug("protecting territory with PVE = false from creeper explosion");
-						event.setCancelled(true);
-						return;
-					}
-				}
-			}
-			// Conditional town/capital protections
-			if(wholeTerritory instanceof KonTown) {
-				KonTown town = (KonTown)wholeTerritory;
-
-				//TODO: Implement this...
-				// Protect against TNT ignited by non-enemies
-				/*
-				ChatUtil.printDebug("Evaluating entity explosion in town...");
-				if(event.getEntity() instanceof TNTPrimed) {
-					ChatUtil.printDebug("  explosion is primed TNT");
-					TNTPrimed tnt = (TNTPrimed)event.getEntity();
-					Entity tntSource = tnt.getSource();
-					if(tntSource == null) {
-						ChatUtil.printDebug("  source is null!");
-					} else {
-						ChatUtil.printDebug("  source: "+tntSource.getType());
-					}
-					if(tntSource instanceof Player) {
-						ChatUtil.printDebug("  source is player");
-						Player tntSender = (Player)tntSource;
-						KonPlayer player = playerManager.getPlayer(tntSender);
-						if(player != null) {
-							ChatUtil.printDebug("  found KonPlayer");
-							KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
-							if(!playerRole.equals(KonquestRelationshipType.ENEMY)) {
-								ChatUtil.printDebug("protecting Town from non-enemy TNT entity explosion");
-								event.setCancelled(true);
-								return;
-							}
-						}
-					}
-				}
-				*/
-				// Protect peaceful towns
-				if(town.getKingdom().isPeaceful()) {
-					ChatUtil.printDebug("protecting peaceful Town from entity explosion");
-					event.setCancelled(true);
-					return;
-				}
-				// Protect towns when all kingdom members are offline
-				if(town.getKingdom().isOfflineProtected()) {
-					ChatUtil.printDebug("protecting offline Town from entity explosion");
-					event.setCancelled(true);
-					return;
-				}
-				// If town is upgraded to require a minimum online resident amount, prevent block damage
-				int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-				if(upgradeLevelWatch > 0) {
-					if(town.getNumResidentsOnline() < upgradeLevelWatch) {
-						ChatUtil.printDebug("protecting upgraded Town WATCH from entity explosion");
-						event.setCancelled(true);
-						return;
-					}
-				}
-				// Protect when town has upgrade
-				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DAMAGE);
-				if(upgradeLevel >= 2) {
-					ChatUtil.printDebug("protecting upgraded Town DAMAGE from entity explosion");
-					event.setCancelled(true);
-					return;
-				}
-				// Check for capital capture conditions
-				if(wholeTerritory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && town.getKingdom().isCapitalImmune()) {
-					// Capital is immune and cannot be attacked
-					ChatUtil.printDebug("protecting immune capital from entity explosion");
-					event.setCancelled(true);
-					return;
-				}
-				// Verify town can be captured
-				if(town.isCaptureDisabled()) {
-					ChatUtil.printDebug("protecting town in capture cooldown from entity explosion");
-					event.setCancelled(true);
-					return;
-				}
-				// If town is shielded, prevent all explosions
-				if(town.isShielded()) {
-					ChatUtil.printDebug("protecting shielded town from entity explosion");
-					event.setCancelled(true);
-					return;
-				}
 			}
 		}
 
@@ -295,7 +281,10 @@ public class EntityListener implements Listener {
 							event.getSpawnReason().equals(SpawnReason.PATROL) ||
 							event.getSpawnReason().equals(SpawnReason.RAID) ||
 							event.getSpawnReason().equals(SpawnReason.REINFORCEMENTS) ||
-							event.getSpawnReason().equals(SpawnReason.VILLAGE_INVASION)) {
+							event.getSpawnReason().equals(SpawnReason.SILVERFISH_BLOCK) ||
+							event.getSpawnReason().equals(SpawnReason.SLIME_SPLIT) ||
+							event.getSpawnReason().equals(SpawnReason.VILLAGE_INVASION) ||
+							event.getEntityType().equals(EntityType.PHANTOM)) {
 						event.setCancelled(true);
 						return;
 					}
@@ -378,39 +367,45 @@ public class EntityListener implements Listener {
     public void onEntityTarget(EntityTargetEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		Entity target = event.getTarget();
+		if(target == null) return;
 		Entity eAttacker = event.getEntity();
-		EntityType eType = event.getEntity().getType();
-		Location eLoc = event.getEntity().getLocation();
-		// Check for player targets inside claimed territory
-		if(target instanceof Player && territoryManager.isChunkClaimed(eLoc)) {
+		Location tLoc = target.getLocation();
+		Location eLoc = eAttacker.getLocation();
+		// Check for player targets
+		if(target instanceof Player) {
 			Player bukkitPlayer = (Player)target;
 			if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
 				ChatUtil.printDebug("Failed to handle onEntityTarget for non-existent player");
 			} else {
 				KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-				KonTerritory territory = territoryManager.getChunkTerritory(eLoc);
-				// Prevent hostile mobs from targeting players inside of territory with PVE disabled
-				if(eAttacker instanceof Monster && territory instanceof KonPropertyFlagHolder) {
-					Monster monsterAttacker = (Monster)eAttacker;
-					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
-					if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
-						if(!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
-							ChatUtil.printDebug("Cancelling Monster target of player in false PVE territory");
-							monsterAttacker.setTarget(null);
-							event.setCancelled(true);
-							return;
+				// Check for territory at target's location
+				if(territoryManager.isChunkClaimed(tLoc)) {
+					KonTerritory targetTerritory = territoryManager.getChunkTerritory(tLoc);
+					// Prevent hostile mobs from targeting players inside of territory with PVE disabled
+					if(eAttacker instanceof Enemy && eAttacker instanceof Mob && targetTerritory instanceof KonPropertyFlagHolder) {
+						Mob monsterAttacker = (Mob)eAttacker;
+						KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)targetTerritory;
+						if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
+							if(!flagHolder.getPropertyValue(KonPropertyFlag.PVE)) {
+								monsterAttacker.setTarget(null);
+								event.setCancelled(true);
+								return;
+							}
 						}
 					}
 				}
-				// Prevent Iron Golems from targeting friendly players
-				if(eAttacker instanceof IronGolem) {
-					IronGolem golemAttacker = (IronGolem)eAttacker;
-					if(territory.getKingdom().equals(player.getKingdom())) {
-						ChatUtil.printDebug("Cancelling Iron Golem target of friendly player");
-						golemAttacker.setPlayerCreated(true);
-						golemAttacker.setTarget(null);
-						event.setCancelled(true);
-						return;
+				// Check for territory at entity's location
+				if(territoryManager.isChunkClaimed(eLoc)) {
+					KonTerritory attackerTerritory = territoryManager.getChunkTerritory(eLoc);
+					// Prevent Iron Golems from targeting friendly players
+					if (eAttacker instanceof IronGolem) {
+						IronGolem golemAttacker = (IronGolem) eAttacker;
+						if (attackerTerritory.getKingdom().equals(player.getKingdom())) {
+							golemAttacker.setPlayerCreated(true);
+							golemAttacker.setTarget(null);
+							event.setCancelled(true);
+							return;
+						}
 					}
 				}
 			}
@@ -624,8 +619,8 @@ public class EntityListener implements Listener {
 			if(territory instanceof KonPropertyFlagHolder) {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 				if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
-					// Block non-monster PVE
-					if(!(flagHolder.getPropertyValue(KonPropertyFlag.PVE) || event.getEntity() instanceof Monster)) {
+					// Block non-enemy PVE
+					if(!(flagHolder.getPropertyValue(KonPropertyFlag.PVE) || event.getEntity() instanceof Enemy)) {
 						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 						event.setCancelled(true);
 						return;
@@ -915,6 +910,27 @@ public class EntityListener implements Listener {
 			}
         }
     }
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onEntityDamageByExplosion(EntityDamageByEntityEvent event) {
+		if (event.isCancelled()) return;
+		if (konquest.isWorldIgnored(event.getEntity().getWorld())) return;
+		Entity eAttacker = event.getDamager();
+		boolean isExplosive = eAttacker instanceof Explosive;
+		boolean isCreeper = eAttacker instanceof Creeper;
+
+		if(isExplosive || isCreeper) {
+			Location entityLoc = event.getEntity().getLocation();
+			if(territoryManager.isChunkClaimed(entityLoc)) {
+				KonTerritory territory = territoryManager.getChunkTerritory(entityLoc);
+				assert territory != null;
+				if(isTerritoryExplosionProtected(territory,isCreeper)) {
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
+	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDeath(PlayerDeathEvent event) {
