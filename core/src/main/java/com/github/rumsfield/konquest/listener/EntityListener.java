@@ -20,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.*;
 import org.bukkit.event.Event;
@@ -137,6 +138,18 @@ public class EntityListener implements Listener {
 				ChatUtil.printDebug("protecting Ruin from entity explosion");
 				event.setCancelled(true);
 				return;
+			}
+			// Protect territories with property flags from creepers
+			if(event.getEntity() instanceof Creeper && wholeTerritory instanceof KonPropertyFlagHolder) {
+				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)wholeTerritory;
+				if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
+					// Block creeper explosions
+					if(!flagHolder.getPropertyValue(KonPropertyFlag.PVE)) {
+						ChatUtil.printDebug("protecting territory with PVE = false from creeper explosion");
+						event.setCancelled(true);
+						return;
+					}
+				}
 			}
 			// Conditional town/capital protections
 			if(wholeTerritory instanceof KonTown) {
@@ -364,41 +377,56 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
     public void onEntityTarget(EntityTargetEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
-		// Prevent Iron Golems from targeting friendly players
 		Entity target = event.getTarget();
-		Entity e = event.getEntity();
+		Entity eAttacker = event.getEntity();
 		EntityType eType = event.getEntity().getType();
 		Location eLoc = event.getEntity().getLocation();
-		if(eType.equals(EntityType.IRON_GOLEM) && e instanceof IronGolem) {
-			IronGolem golemAttacker = (IronGolem)e;
-			// Protect friendly players in claimed land
-			if(target instanceof Player && territoryManager.isChunkClaimed(eLoc)) {
-				Player bukkitPlayer = (Player)target;
-				if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-					ChatUtil.printDebug("Failed to handle onEntityTarget for non-existent player");
-				} else {
-					KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-					KonTerritory territory = territoryManager.getChunkTerritory(eLoc);
+		// Check for player targets inside claimed territory
+		if(target instanceof Player && territoryManager.isChunkClaimed(eLoc)) {
+			Player bukkitPlayer = (Player)target;
+			if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
+				ChatUtil.printDebug("Failed to handle onEntityTarget for non-existent player");
+			} else {
+				KonPlayer player = playerManager.getPlayer(bukkitPlayer);
+				KonTerritory territory = territoryManager.getChunkTerritory(eLoc);
+				// Prevent hostile mobs from targeting players inside of territory with PVE disabled
+				if(eAttacker instanceof Monster && territory instanceof KonPropertyFlagHolder) {
+					Monster monsterAttacker = (Monster)eAttacker;
+					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+					if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
+						if(!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
+							ChatUtil.printDebug("Cancelling Monster target of player in false PVE territory");
+							monsterAttacker.setTarget(null);
+							event.setCancelled(true);
+							return;
+						}
+					}
+				}
+				// Prevent Iron Golems from targeting friendly players
+				if(eAttacker instanceof IronGolem) {
+					IronGolem golemAttacker = (IronGolem)eAttacker;
 					if(territory.getKingdom().equals(player.getKingdom())) {
 						ChatUtil.printDebug("Cancelling Iron Golem target of friendly player");
 						golemAttacker.setPlayerCreated(true);
 						golemAttacker.setTarget(null);
 						event.setCancelled(true);
+						return;
 					}
 				}
 			}
-			// Cancel Ruin Golems from targeting non-players
-			if(!(target instanceof Player) && target instanceof LivingEntity) {
-				for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
-					if(ruin.isGolem(golemAttacker)) {
-						target.getWorld().spawnParticle(Particle.SOUL,target.getLocation(),10);
-						target.remove();
-						eLoc.getWorld().playSound(eLoc, Sound.ENTITY_GHAST_DEATH, 1.0F, 0.1F);
-						event.setCancelled(true);
-						// Scheduled delayed task to change target back to last player if present
-						Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(),
-								() -> ruin.targetGolemToLast(golemAttacker),1);
-					}
+		}
+		// Cancel Ruin Golems from targeting non-players
+		if(!(target instanceof Player) && target instanceof LivingEntity && eAttacker instanceof IronGolem) {
+			IronGolem golemAttacker = (IronGolem)eAttacker;
+			for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
+				if(ruin.isGolem(golemAttacker)) {
+					target.getWorld().spawnParticle(Particle.SOUL,target.getLocation(),10);
+					target.remove();
+					eLoc.getWorld().playSound(eLoc, Sound.ENTITY_GHAST_DEATH, 1.0F, 0.1F);
+					event.setCancelled(true);
+					// Scheduled delayed task to change target back to last player if present
+					Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(),
+							() -> ruin.targetGolemToLast(golemAttacker),1);
 				}
 			}
 		}
