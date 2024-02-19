@@ -162,6 +162,14 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		return webColor;
 	}
 
+	public String getWebColorString() {
+		int webColorHash = webColor;
+		if(webColor == -1) {
+			webColorHash = getName().hashCode() & 0xFFFFFF;
+		}
+		return ChatUtil.parseHex(String.format("#%06X",webColorHash));
+	}
+
 	@Override
 	public boolean setPropertyValue(KonPropertyFlag property, boolean value) {
 		boolean result = false;

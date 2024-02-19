@@ -19,8 +19,7 @@ public enum CorePath {
 
 	CHAT_TAG                                              ("core.chat.tag"),
 	CHAT_MESSAGE                                          ("core.chat.message"),
-	CHAT_KINGDOM_TEAM_COLOR                               ("core.chat.kingdom_team_color"),
-	CHAT_NAME_TEAM_COLOR                                  ("core.chat.name_team_color"),
+	CHAT_DIVIDER                                          ("core.chat.divider"),
 	CHAT_ENABLE_FORMAT                                    ("core.chat.enable_format"),
 	CHAT_PRIORITY                                         ("core.chat.priority"),
 

@@ -63,14 +63,20 @@ core:
     # Text tag for all Konquest plugin messages. Use '' to disable. Use & for color codes, or hex #000000. ('string')
     tag: '&7[&6Konquest&7]&f '
     
-    # Chat message format used for all players. Use %PREFIX%, %SUFFIX%, %KINGDOM%, %TITLE% and %NAME% as placeholders. Use & for color codes, or hex #000000. ('string')
-    message: '%PREFIX% %KINGDOM% &7| %TITLE% %NAME% %SUFFIX% '
-    
-    # Use team colors for %KINGDOM% format, else use colors from message string (true/false)
-    kingdom_team_color: true
-    
-    # Use team colors for %NAME% format, else use colors from message string (true/false)
-    name_team_color: true
+    # Chat message format that appears before the divider. Use built-in tags or PAPI placeholders. Use & for color codes, or hex #000000. ('string')
+    # Built-In Konquest Message Tags:
+    # %PREFIX%    Permissions group meta prefix
+    # %SUFFIX%    Permissions group meta suffix
+    # %KINGDOM%   Kingdom name
+    # %TITLE%     Accomplishment title
+    # %NAME%      Player's name
+    # %C1%        Primary relationship color
+    # %C2%        Secondary relationship color
+    # %CW%        Kingdom webcolor
+    message: '%PREFIX% %C1%%KINGDOM% &7| %C2%%TITLE% %C1%%NAME% %SUFFIX% '
+
+    # Text that divides the chat message format from the player's text. Use '' to disable. Use & for color codes, or hex #000000. ('string')
+    divider: '&8»&r '
     
     # Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
     enable_format: true
