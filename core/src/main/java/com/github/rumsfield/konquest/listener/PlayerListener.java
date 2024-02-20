@@ -32,11 +32,7 @@ import org.bukkit.block.data.AnaloguePowerable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.type.*;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -1233,6 +1229,22 @@ public class PlayerListener implements Listener {
     	// Update bars
 		if(territoryTo instanceof KonBarDisplayer) {
 			((KonBarDisplayer)territoryTo).addBarPlayer(player);
+		}
+		// Handle property flag holders
+		if(territoryTo instanceof KonPropertyFlagHolder) {
+			KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territoryTo;
+			if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
+				// Search for mobs targeting player
+				if(!flagHolder.getPropertyValue(KonPropertyFlag.PVE) && locTo.getWorld() != null) {
+					for(Entity searchEntity : locTo.getWorld().getNearbyEntities(locTo,32,32,32,(e) -> e instanceof Mob)) {
+						Mob searchMob = (Mob)searchEntity;
+						LivingEntity mobTarget = searchMob.getTarget();
+						if(mobTarget != null && mobTarget.equals(player.getBukkitPlayer())) {
+							searchMob.setTarget(null);
+						}
+					}
+				}
+			}
 		}
 		// Decide what to do for specific territories
 		if(territoryTo instanceof KonTown) {
