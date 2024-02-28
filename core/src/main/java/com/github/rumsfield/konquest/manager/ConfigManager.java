@@ -57,6 +57,8 @@ public class ConfigManager{
 		updateConfigVersion("loot");
 		addConfig("prefix", new KonConfig("prefix",false));
 		updateConfigVersion("prefix");
+		addConfig("commands", new KonConfig("commands",false));
+		updateConfigVersion("commands");
 
 		// Data Storage
 		migrateConfigFile("kingdoms.yml","data/kingdoms.yml");

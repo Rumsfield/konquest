@@ -18,6 +18,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandException;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -1700,19 +1702,30 @@ public class Konquest implements KonquestAPI, Timeable {
     		ChatUtil.printDebug("Could not call null Konquest event");
     	}
     }
-    
-    public static void callEvent(Event event) {
-    	if(event != null) {
-	    	try {
-	            Bukkit.getServer().getPluginManager().callEvent(event);
-			} catch(IllegalStateException e) {
-				ChatUtil.printConsoleError("Failed to call Bukkit event!");
-				e.printStackTrace();
+
+	public void executeCustomCommand(CustomCommandPath command, Player bukkitPlayer) {
+		// Get custom command
+		String commandPath = command.getPath();
+		FileConfiguration customCommandConfig = configManager.getConfig("commands");
+		String customCommand = customCommandConfig.getString(commandPath,"");
+		// Check for empty string
+		ChatUtil.printDebug("Running command \""+customCommand+"\" for "+commandPath);
+		if (!customCommand.isEmpty()) {
+			// Replace tags in command string
+			customCommand = customCommand.replace("%PLAYER%", bukkitPlayer.getName());
+			// Execute the command as console
+			try {
+				boolean result = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), customCommand);
+				if (!result) {
+					ChatUtil.printConsoleWarning("Could not find valid target for command \""+customCommand+"\" from commands.yml entry "+commandPath);
+				}
+			} catch (CommandException me) {
+				ChatUtil.printConsoleError("Failed to execute custom command \""+customCommand+"\" from commands.yml entry "+commandPath);
+				ChatUtil.printConsole(me.getMessage());
+				me.printStackTrace();
 			}
-    	} else {
-    		ChatUtil.printDebug("Could not call null Bukkit event");
-    	}
-    }
+		}
+	}
 
 	public static Material getProfessionMaterial(Villager.Profession profession) {
 		Material result = Material.EMERALD;

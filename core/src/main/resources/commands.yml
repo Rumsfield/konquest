@@ -1,0 +1,32 @@
+# Custom Commands
+# Instructions: Put your own custom commands to be executed during specific events.
+# Use these tags in the commands:
+#   %PLAYER% - the player's name
+#
+# For example, for a command that gives the player 5 gold ingots when they kill a Ruin golem:
+# ruin_golem_kill: 'give %PLAYER% gold_ingot 5'
+#
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
+commands:
+
+  # The command that runs when any ruin critical block is destroyed.
+  ruin_critical: ''
+
+  # The command that runs when any ruin is captured.
+  ruin_capture: ''
+
+  # The command that runs when any ruin loot chest is opened.
+  ruin_loot_open: ''
+
+  # The command that runs when any ruin golem is killed.
+  ruin_golem_kill: ''
+
+  # The command that runs when any town monument critical block is destroyed.
+  town_monument_critical: ''
+
+  # The command that runs when any town is captured.
+  town_monument_capture: ''
+
+  # The command that runs when any town monument loot chest is opened.
+  town_monument_loot_open: ''
