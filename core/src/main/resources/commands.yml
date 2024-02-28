@@ -1,5 +1,6 @@
 # Custom Commands
 # Instructions: Put your own custom commands to be executed during specific events.
+# Do not include a slash "/" in the command string.
 # Use these tags in the commands:
 #   %PLAYER% - the player's name
 #

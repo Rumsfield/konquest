@@ -1718,6 +1718,10 @@ public class Konquest implements KonquestAPI, Timeable {
 				boolean result = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), customCommand);
 				if (!result) {
 					ChatUtil.printConsoleWarning("Could not run command \""+customCommand+"\" from commands.yml entry "+commandPath);
+					// Check for leading forward slash
+					if (customCommand.matches("^/.+")) {
+						ChatUtil.printConsoleWarning("Custom command starts with a forward slash \"/\". Remove the slash from the command in commands.yml.");
+					}
 				}
 			} catch (CommandException me) {
 				ChatUtil.printConsoleError("Failed to execute custom command \""+customCommand+"\" from commands.yml entry "+commandPath);
