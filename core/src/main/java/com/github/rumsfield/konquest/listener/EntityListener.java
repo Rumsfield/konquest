@@ -11,6 +11,7 @@ import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.manager.TerritoryManager;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.CustomCommandPath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 
 import org.bukkit.Bukkit;
@@ -604,6 +605,10 @@ public class EntityListener implements Listener {
         			// Check for golem death
         			if(golem.getHealth() - event.getFinalDamage() <= 0) {
         				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.GOLEMS,1);
+						// Execute custom commands from config
+						if(ruin.isGolem(golem)) {
+							konquest.executeCustomCommand(CustomCommandPath.RUIN_GOLEM_KILL,player.getBukkitPlayer());
+						}
         			} else {
         				// Golem is still alive
         				ruin.targetGolemToPlayer(bukkitPlayer, golem);

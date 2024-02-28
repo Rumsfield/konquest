@@ -16,10 +16,7 @@ import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.manager.TerritoryManager;
 import com.github.rumsfield.konquest.model.*;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.Timer;
+import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
@@ -378,6 +375,8 @@ public class BlockListener implements Listener {
 							event.setCancelled(true);
 							return;
 						}
+						// Execute custom commands from config
+						konquest.executeCustomCommand(CustomCommandPath.RUIN_CRITICAL,player.getBukkitPlayer());
 						// Fire event for pre-capture
 						if(ruin.getRemainingCriticalHits() == 0) {
 							List<KonPlayer> rewardPlayers = konquest.getRuinManager().getRuinPlayers(ruin,player.getKingdom());
@@ -397,6 +396,8 @@ public class BlockListener implements Listener {
 						event.getBlock().getWorld().playSound(breakLoc, Sound.BLOCK_FIRE_EXTINGUISH, 1.0F, 0.6F);
 						if(hitStatus) {
 							konquest.getRuinManager().rewardPlayers(ruin,player.getKingdom());
+							// Execute custom commands from config
+							konquest.executeCustomCommand(CustomCommandPath.RUIN_CAPTURE,player.getBukkitPlayer());
 						} else {
 							// All golems target player
 							ruin.targetAllGolemsToPlayer(event.getPlayer());
@@ -1401,6 +1402,8 @@ public class BlockListener implements Listener {
 						}
 						
 					}
+					// Execute custom commands from config
+					konquest.executeCustomCommand(CustomCommandPath.TOWN_MONUMENT_CAPTURE,player.getBukkitPlayer());
 					// Update directive progress
 					konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CAPTURE_TOWN);
 					// Update stat
@@ -1438,12 +1441,11 @@ public class BlockListener implements Listener {
 			int defendReward = konquest.getCore().getInt(CorePath.FAVOR_REWARDS_DEFEND_RAID.getPath());
 			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CRITICAL.getMessage(remainingHits));
 			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.CRITICALS,1);
-			
 			String kingdomName = town.getKingdom().getName();
-			
+			// Execute custom commands from config
+			konquest.executeCustomCommand(CustomCommandPath.TOWN_MONUMENT_CRITICAL,player.getBukkitPlayer());
 			// Target rabbit
 			town.targetRabbitToPlayer(player.getBukkitPlayer());
-					
 			// Alert all players of enemy Kingdom when the first critical block is broken
 			if(town.getMonument().getCriticalHits() == 1) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
@@ -1456,7 +1458,6 @@ public class BlockListener implements Listener {
 					konquest.getIntegrationManager().getDiscordSrv().alertDiscordMember(allPlayer, MessagePath.PROTECTION_NOTICE_RAID_DISCORD_DIRECT.getMessage(town.getName(),kingdomName));
 				}
 			}
-			
 			// Alert all players of enemy Kingdom when half of critical blocks are broken
 			if(town.getMonument().getCriticalHits() == maxCriticalhits/2) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
@@ -1464,7 +1465,6 @@ public class BlockListener implements Listener {
 					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_2.getMessage(town.getName(),town.getTravelName(),defendReward),ChatColor.DARK_RED);
 				}
 			}
-			
 			// Alert all players of enemy Kingdom when all but 1 critical blocks are broken
 			if(town.getMonument().getCriticalHits() == maxCriticalhits-1) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
