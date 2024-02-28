@@ -1717,7 +1717,7 @@ public class Konquest implements KonquestAPI, Timeable {
 			try {
 				boolean result = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), customCommand);
 				if (!result) {
-					ChatUtil.printConsoleWarning("Could not find valid target for command \""+customCommand+"\" from commands.yml entry "+commandPath);
+					ChatUtil.printConsoleWarning("Could not run command \""+customCommand+"\" from commands.yml entry "+commandPath);
 				}
 			} catch (CommandException me) {
 				ChatUtil.printConsoleError("Failed to execute custom command \""+customCommand+"\" from commands.yml entry "+commandPath);
