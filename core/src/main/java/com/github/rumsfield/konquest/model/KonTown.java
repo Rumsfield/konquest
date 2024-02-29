@@ -454,7 +454,13 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		
 		return 0;
 	}
-	
+
+	/**
+	 * Pastes the current monument template over the town monument.
+	 * Also clears air above the monument up to the tallest template height.
+	 * @param template The monument template to paste.
+	 * @return True when the paste was sucessfull, else false.
+	 */
 	public boolean pasteMonumentFromTemplate(KonMonumentTemplate template) {
 		if(template == null || !template.isValid()) {
 			return false;
@@ -505,6 +511,24 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	            }
 	        }
         }
+		// Clear any air above the monument, for when there was a previous taller template.
+		//TODO This is a brute-force way to do it, there's probably a smarter way to avoid always pasting air.
+		int maxHeight = getKonquest().getSanctuaryManager().getTallestTemplateHeight();
+		int monumentHeight = monument.getHeight();
+		if(monumentHeight < maxHeight) {
+			// The monument being pasted is shorter than the tallest possible template.
+			// Paste air above it just in case the tallest template was used previously.
+			int startY = monument.getBaseY()+monumentHeight+1;
+			int endY = monument.getBaseY()+maxHeight;
+			for (int x = 0; x < 16; x++) {
+				for (int z = 0; z < 16; z++) {
+					for (int y = startY; y <= endY; y++) {
+						Block currentBlock = getWorld().getChunkAt(getCenterLoc()).getBlock(x, y, z);
+						currentBlock.setType(Material.AIR);
+					}
+				}
+			}
+		}
         World templateWorld = template.getCornerOne().getWorld();
         BlockPaster monumentPaster = new BlockPaster(fillChunk,templateWorld,bottomBlockY,monument.getBaseY(),bottomBlockY,topBlockX,topBlockZ,bottomBlockX,bottomBlockZ);
         for (int y = bottomBlockY; y <= topBlockY; y++) {
@@ -674,10 +698,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			ChatUtil.printDebug("Failed to reload monument for attacked town "+getName());
 			return false;
 		}
-		// Paste the template into the town
-		pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
 		// Update this town's monument travel point and height based on template
 		monument.updateFromTemplate(getKingdom().getMonumentTemplate());
+		// Paste the template into the town
+		pasteMonumentFromTemplate(getKingdom().getMonumentTemplate());
 		// Update the town spawn point
 		setSpawn(monument.getTravelPoint());
 		return true;

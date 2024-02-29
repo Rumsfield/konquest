@@ -668,6 +668,7 @@ command:
       fail-init: "Town could not claim initial chunks."
       fail-limit-all: "Cannot settle more towns than the global maximum limit of %s. There are currently %s towns in all worlds."
       fail-limit-world: "Cannot settle more towns than the per-world maximum limit of %s. There are currently %s towns in this world."
+      officer-only: "Only the kingdom master and officers can settle towns. Ask to be promoted!"
   spy:
     notice:
       nearby: "nearby"

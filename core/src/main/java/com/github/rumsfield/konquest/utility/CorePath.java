@@ -19,8 +19,7 @@ public enum CorePath {
 
 	CHAT_TAG                                              ("core.chat.tag"),
 	CHAT_MESSAGE                                          ("core.chat.message"),
-	CHAT_KINGDOM_TEAM_COLOR                               ("core.chat.kingdom_team_color"),
-	CHAT_NAME_TEAM_COLOR                                  ("core.chat.name_team_color"),
+	CHAT_DIVIDER                                          ("core.chat.divider"),
 	CHAT_ENABLE_FORMAT                                    ("core.chat.enable_format"),
 	CHAT_PRIORITY                                         ("core.chat.priority"),
 
@@ -120,6 +119,7 @@ public enum CorePath {
 	TOWNS_MAX_SIZE                                        ("core.towns.max_size"),
 	TOWNS_SETTLE_CHECKS_DEPTH                             ("core.towns.settle_checks_depth"),
 	TOWNS_SETTLE_CHECK_FLATNESS                           ("core.towns.settle_check_flatness"),
+	TOWNS_SETTLE_OFFICER_ONLY                             ("core.towns.settle_officer_only"),
 	TOWNS_INIT_RADIUS                                     ("core.towns.init_radius"),
 	TOWNS_CAPTURE_UPGRADES                                ("core.towns.capture_upgrades"),
 	TOWNS_CAPTURE_COOLDOWN                                ("core.towns.capture_cooldown"),

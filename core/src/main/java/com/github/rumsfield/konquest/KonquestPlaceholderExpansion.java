@@ -106,7 +106,15 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
         String result = null;
         String identifierLower = identifier.toLowerCase();
         switch(identifierLower) {
-	        /* %konquest_kingdom% - player's kingdom name */
+			/* %konquest_timer_loot% - Time until monument loot refreshes */
+			case "timer_loot":
+				result = placeholderManager.getTimerLoot(player);
+				break;
+			/* %konquest_timer_payment% - Time until kingdom payment refreshes */
+			case "timer_payment":
+				result = placeholderManager.getTimerPayment(player);
+				break;
+			/* %konquest_kingdom% - player's kingdom name */
         	case "kingdom":
         		result = placeholderManager.getKingdom(player);
 	        	break;
@@ -118,20 +126,20 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
 	        case "barbarian":
 	        	result = placeholderManager.getBarbarian(player);
 	        	break;
-	        /* %konquest_towns_lord% - comma-separated list of player's lord only towns */
-	        case "towns_lord":
+	        /* %konquest_num_town_lord% - number of player's lord-only towns */
+	        case "num_town_lord":
 	        	result = placeholderManager.getTownsLord(player);
 	        	break;
-	        /* %konquest_towns_knight% - comma-separated list of player's knight only towns */
-	        case "towns_knight":
+	        /* %konquest_num_town_knight% - number of player's knight-only towns */
+	        case "num_town_knight":
 	        	result = placeholderManager.getTownsKnight(player);
 	        	break;
-	        /* %konquest_towns_resident% - comma-separated list of player's resident only towns */
-	        case "towns_resident":
+	        /* %konquest_num_town_resident% - number of player's resident-only towns */
+	        case "num_town_resident":
 	        	result = placeholderManager.getTownsResident(player);
 	        	break;
-	        /* %konquest_towns_all% - comma-separated list of player's all towns */
-	        case "towns_all":
+	        /* %konquest_num_town_all% - number of player's total towns */
+	        case "num_town_all":
 	        	result = placeholderManager.getTownsAll(player);
 	        	break;
 	        /* %konquest_territory% - player's current location territory type */
@@ -320,44 +328,44 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
 				break;
 	        default: 
 	        	// Check for kingdom-specific placeholders
-	        	
+
 	        	/* %konquest_players_<kingdom>% */
-	        	if(identifierLower.matches("players_[a-zA-Z0-9_]+")) {
+				if(identifierLower.matches("^players_.+$")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(8);
 	        			result = placeholderManager.getKingdomPlayers(kingdomName);
 	        		} catch(IndexOutOfBoundsException ignored) {}
 	        		
         		/* %konquest_online_<kingdom>% */
-	        	} else if(identifierLower.matches("online_[a-zA-Z0-9_]+")) {
+	        	} else if(identifierLower.matches("^online_.+$")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(7);
 	        			result = placeholderManager.getKingdomOnline(kingdomName);
 	        		} catch(IndexOutOfBoundsException ignored) {}
 	        		
         		/* %konquest_towns_<kingdom>% */
-	        	} else if(identifierLower.matches("towns_[a-zA-Z0-9_]+")) {
+	        	} else if(identifierLower.matches("^towns_.+$")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(6);
 	        			result = placeholderManager.getKingdomTowns(kingdomName);
 	        		} catch(IndexOutOfBoundsException ignored) {}
 	        		
         		/* %konquest_land_<kingdom>% */
-	        	} else if(identifierLower.matches("land_[a-zA-Z0-9_]+")) {
+	        	} else if(identifierLower.matches("^land_.+$")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(5);
 	        			result = placeholderManager.getKingdomLand(kingdomName);
 	        		} catch(IndexOutOfBoundsException ignored) {}
 	        		
         		/* %konquest_favor_<kingdom>% */
-	        	} else if(identifierLower.matches("favor_[a-zA-Z0-9_]+")) {
+	        	} else if(identifierLower.matches("^favor_.+$")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(6);
 	        			result = placeholderManager.getKingdomFavor(kingdomName);
 	        		} catch(IndexOutOfBoundsException ignored) {}
 	        		
         		/* %konquest_score_<kingdom>% */
-	        	} else if(identifierLower.matches("score_[a-zA-Z0-9_]+")) {
+	        	} else if(identifierLower.matches("^score_.+$")) {
 	        		try {
 	        			String kingdomName = identifierLower.substring(6);
 	        			result = placeholderManager.getKingdomScore(kingdomName);
@@ -390,6 +398,10 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
 			/* %rel_konquest_relation2_color% - playerOne's secondary relationship color to playerTwo */
 			case "relation2_color":
 				result = placeholderManager.getRelationSecondaryColor(playerOne, playerTwo);
+				break;
+			/* %rel_konquest_kingdom_webcolor% - playerTwo's kingdom web color */
+			case "kingdom_webcolor":
+				result = placeholderManager.getRelationKingdomWebColor(playerTwo);
 				break;
         	default: 
 	        	break;

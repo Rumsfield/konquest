@@ -1,6 +1,6 @@
 plugins {
     java
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    `maven-publish`
 }
 
 dependencies{
@@ -8,7 +8,8 @@ dependencies{
 }
 
 tasks {
-    shadowJar {
+
+    jar{
         archiveBaseName.set(rootProject.name+"-"+project.name)
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir/build/libs"))
@@ -24,6 +25,24 @@ tasks {
 }
 
 java{
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+
+            groupId = project.group.toString()
+            artifactId = rootProject.name+"-"+project.name
+            version = project.version.toString()
+        }
+    }
+    repositories{
+        mavenLocal()
+    }
 }

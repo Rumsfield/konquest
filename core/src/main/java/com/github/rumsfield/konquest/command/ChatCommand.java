@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.command;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,6 +30,13 @@ public class ChatCommand extends CommandBase {
 			return;
 		}
 		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
+		assert player != null;
+		boolean isChatFormatEnabled = getKonquest().getCore().getBoolean(CorePath.CHAT_ENABLE_FORMAT.getPath(),true);
+		if(!isChatFormatEnabled) {
+			// Chat formatting is disabled, so kingdom chat is unavailable
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			player.setIsGlobalChat(true);
+		}
 		if(!player.isBarbarian()) {
 			if(player.isGlobalChat()) {
 				//ChatUtil.sendNotice(bukkitPlayer, "Chat mode: Kingdom");
