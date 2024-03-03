@@ -2,9 +2,11 @@ name: Konquest
 description: A plugin for land claiming and territory control
 author: Rumsfield
 version: @version@
-api-version: 1.20
+api-version: 1.16
 load: POSTWORLD
 main: com.github.rumsfield.konquest.KonquestPlugin
+libraries:
+  - org.apache.commons:commons-lang3:3.14.0
 depend: [Vault]
 softdepend:
   - ProtocolLib
