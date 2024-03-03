@@ -1,18 +1,10 @@
 package com.github.rumsfield.konquest.database;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Sound;
-
-import java.util.ArrayList;
-import java.util.UUID;
 
 public class DatabaseThread implements Runnable {
     private final Konquest konquest;
