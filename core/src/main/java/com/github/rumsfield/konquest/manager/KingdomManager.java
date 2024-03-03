@@ -3813,7 +3813,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				if(mat != null) {
 					armorBlocks.add(mat);
 				}else{
-					ChatUtil.printConsoleAlert("Invalid material \""+entry+"\" in "+CorePath.TOWNS_ARMOR_BLACKLIST.getPath()+", ignoring.");
+					ChatUtil.printConsoleWarning("Invalid material \""+entry+"\" in "+CorePath.TOWNS_ARMOR_BLACKLIST.getPath()+", ignoring.");
 				}
 			}
 		}

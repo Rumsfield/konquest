@@ -51,6 +51,7 @@ dependencies{
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.15")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5")
 
+    implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("org.xerial:sqlite-jdbc:3.40.1.0")
     implementation(project(":api"))
 }
