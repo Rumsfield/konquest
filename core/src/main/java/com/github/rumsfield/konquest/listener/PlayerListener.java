@@ -637,38 +637,54 @@ public class PlayerListener implements Listener {
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
 		if(event.isCancelled()) return; // Do nothing if another plugin cancels this event
     	if(konquest.isWorldIgnored(event.getPlayer().getLocation())) return;
-    	Entity clicked = event.getRightClicked();
+    	Entity clickedEntity = event.getRightClicked();
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-        if(player != null && !player.isAdminBypassActive() && territoryManager.isChunkClaimed(clicked.getLocation())) {
-        	KonTerritory territory = territoryManager.getChunkTerritory(clicked.getLocation());
-        	// Entity exceptions are always allowed to interact
-        	//ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" interacted at entity of type: "+ clicked.getType());
-        	boolean isEntityAllowed = (clicked.getType().equals(EntityType.PLAYER) ||
-					clicked.getType().equals(EntityType.VILLAGER) ||
-					clicked.getType().equals(EntityType.BOAT));
-        	// Property Flag Holders
-			if(territory instanceof KonPropertyFlagHolder) {
-				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
-				if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
-					// Block non-allowed entity interaction
-					if(!isEntityAllowed && !flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-						event.setCancelled(true);
-						return;
+        if(player != null && !player.isAdminBypassActive() && territoryManager.isChunkClaimed(clickedEntity.getLocation())) {
+        	KonTerritory territory = territoryManager.getChunkTerritory(clickedEntity.getLocation());
+			// Always allow players to interact with tamed entities (horses, wolves, etc) that they own.
+			boolean isTamedByPlayer = false;
+			if(clickedEntity instanceof Tameable) {
+				Tameable tamedEntity = (Tameable)clickedEntity;
+				if(tamedEntity.isTamed()) {
+					AnimalTamer owner = tamedEntity.getOwner();
+					if(owner != null && owner.getUniqueId().equals(bukkitPlayer.getUniqueId())) {
+						isTamedByPlayer = true;
 					}
 				}
 			}
-        	// Town protections...
-    		if(territory instanceof KonTown && !isEntityAllowed) {
-    			KonTown town = (KonTown) territory;
-				KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
-    			// Prevent enemies and non-residents from interacting with entities
-    			if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
-    				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-    				event.setCancelled(true);
+        	// Entity exceptions are always allowed to interact
+        	boolean isEntityAlwaysAllowed = (clickedEntity instanceof Player) ||
+					(clickedEntity instanceof Villager) ||
+					(clickedEntity instanceof Boat) ||
+					(clickedEntity instanceof Minecart);
+			// Try to protect when entity is not an exception, and the entity is not tamed by the player
+			if(!isEntityAlwaysAllowed && !isTamedByPlayer) {
+				// Property Flag Holders
+				if (territory instanceof KonPropertyFlagHolder) {
+					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder) territory;
+					if (flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
+						// Block non-allowed entity interaction
+						if (!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
+							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor + MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+							return;
+						}
+					}
 				}
-    		}
+				// Town protections...
+				if (territory instanceof KonTown) {
+					KonTown town = (KonTown) territory;
+					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+					// Prevent enemies and non-residents from interacting with entities
+					boolean isNotFriendly = !playerRole.equals(KonquestRelationshipType.FRIENDLY);
+					boolean isClosedNotResident = (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()));
+					if (isNotFriendly || isClosedNotResident) {
+						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor + MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						event.setCancelled(true);
+					}
+				}
+			}
         }
     }
     
