@@ -36,7 +36,15 @@ public class TownOptionsMenuWrapper extends MenuWrapper {
 		// Page 0
 		String pageLabel = titleColor+town.getName()+" "+MessagePath.LABEL_OPTIONS.getMessage();
 		getMenu().addPage(0, 1, pageLabel);
-		
+
+		// Allied Building Info Icon
+		currentValue = DisplayManager.boolean2Lang(town.isAlliedBuildingAllowed())+" "+DisplayManager.boolean2Symbol(town.isAlliedBuildingAllowed());
+		loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_ALLIED_BUILDING.getMessage()));
+		loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
+		loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+		option = new OptionIcon(optionAction.TOWN_ALLIED_BUILDING, loreColor+MessagePath.LABEL_ALLIED_BUILDING.getMessage(), loreList, Material.BRICK_STAIRS, 1);
+		getMenu().getPage(0).addIcon(option);
+
 		// Open Info Icon
 		currentValue = DisplayManager.boolean2Lang(town.isOpen())+" "+DisplayManager.boolean2Symbol(town.isOpen());
 		loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_OPEN.getMessage()));

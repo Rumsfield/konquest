@@ -541,12 +541,15 @@ public class PlayerListener implements Listener {
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
 					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+					boolean isFriendly = playerRole.equals(KonquestRelationshipType.FRIENDLY);
+					boolean isClosedNonResident = !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer());
+					boolean isAlliedBuilder = playerRole.equals(KonquestRelationshipType.ALLY) && town.isAlliedBuildingAllowed() && konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
 					// Target player who interacts with monument blocks
 					if(town.isLocInsideMonumentProtectionArea(event.getClickedBlock().getLocation())) {
 						town.targetRabbitToPlayer(bukkitPlayer);
 					}
 					// Protections for friendly non-residents of closed towns
-					if(playerRole.equals(KonquestRelationshipType.FRIENDLY) && !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+					if(isFriendly && isClosedNonResident) {
 						// Check for allowed usage like buttons, levers
 						if(!town.isFriendlyRedstoneAllowed() && preventUse(event,player)) {
 							event.setCancelled(true);
@@ -558,8 +561,8 @@ public class PlayerListener implements Listener {
 							return;
 						}
 					}
-					// Protections for non-friendlies
-					if(!playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
+					// Protections for non-friendlies that are not allied builders
+					if(!isFriendly && !isAlliedBuilder) {
 						// Check for allowed usage like buttons, levers
 						if(!town.isEnemyRedstoneAllowed() && preventUse(event,player)) {
 							event.setCancelled(true);
@@ -571,8 +574,8 @@ public class PlayerListener implements Listener {
 							return;
 						}
 					}
-					// Prevent enemies and non-residents from interacting with item frames
-					if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+					// Prevent enemies and non-residents from interacting with item frames, ignore allied builders
+					if((!isFriendly || isClosedNonResident) && !isAlliedBuilder) {
 						Material clickedMat = event.getClickedBlock().getType();
 						if(clickedMat.equals(Material.ITEM_FRAME)) {
 							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
@@ -680,8 +683,12 @@ public class PlayerListener implements Listener {
 					boolean isNotFriendly = !playerRole.equals(KonquestRelationshipType.FRIENDLY);
 					boolean isClosedNotResident = (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()));
 					if (isNotFriendly || isClosedNotResident) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor + MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-						event.setCancelled(true);
+						boolean isAlliedBuildingEnable = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
+						boolean isAlliedBuilder = isAlliedBuildingEnable && town.isAlliedBuildingAllowed() && playerRole.equals(KonquestRelationshipType.ALLY);
+						if (!isAlliedBuilder) {
+							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor + MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							event.setCancelled(true);
+						}
 					}
 				}
 			}

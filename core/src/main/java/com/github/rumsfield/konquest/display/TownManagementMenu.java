@@ -462,6 +462,14 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         int pageRows = 1;
         pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
 
+        // Allied Building Info Icon
+        currentValue = DisplayManager.boolean2Lang(town.isAlliedBuildingAllowed())+" "+DisplayManager.boolean2Symbol(town.isAlliedBuildingAllowed());
+        loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_ALLIED_BUILDING.getMessage()));
+        loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
+        loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+        option = new OptionIcon(OptionIcon.optionAction.TOWN_ALLIED_BUILDING, loreColor+MessagePath.LABEL_ALLIED_BUILDING.getMessage(), loreList, Material.BRICK_STAIRS, 1);
+        pages.get(pageNum).addIcon(option);
+
         // Open Info Icon
         currentValue = DisplayManager.boolean2Lang(town.isOpen())+" "+DisplayManager.boolean2Symbol(town.isOpen());
         loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_OPEN.getMessage()));
