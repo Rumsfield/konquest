@@ -29,9 +29,10 @@ Every topic must have an associated issue in the repository's [Issues page](http
 Each issue has an ID number, which is used to reference the topic branch name.
 
 ### Topic branch naming convention
-Topic branch names must use 1 of 2 keywords:
+Topic branch names must use these keywords:
 * `feature` - For most topics, related to adding, removing or optimizing code.
 * `bugfix` - For generally fixing broken things in the code.
+* `hotfix` - For urgent errors that need to be fixed.
 
 The name must also reference the issue number, along with a short description of the topic.
 The name format is:
@@ -78,44 +79,56 @@ There may be merge conflicts during the merge. It is your respnsibility to [reso
 and commit the resolved files. Remember to merge `develop` into your branch at least once before opening a Pull Request.
 
 When your work is finished, create a new [Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)
-to merge it into the `develop` branch.
+to [Squash and Merge](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) 
+into the `develop` branch.
 * **DO NOT** merge your topic branch directly into `develop` or `main` using the `git merge` command.
 * **DO NOT** commit directly in `develop` or `main` using the `git commit` command.
-* **ALWAYS** use Pull Requests to merge branches back into `develop`.
+* **ALWAYS** use Pull Requests to merge topic branches back into `develop` using **Squash and Merge**.
 
-Once the Pull Request is merged and closed, **do not delete** the topic branch and just leave it alone.
+Once the Pull Request is merged and closed, **please delete** the topic branch to clean up the repo.
 
 ## Preparing Releases
 Usually the latest work on the `develop` branch becomes the next release.
 Planning for the content of a release is done in an issue, by tracking which topic issues to include.
+Use the ID of the issue in the branch name, using one of these keywords:
+* `release` - For new release versions that end in 0, i.e. vX.Y.0.
+* `patch` - For versions that increment the patch number, i.e. vX.Y.1.
 
-Create a topic branch for the new release, after all other desired topic branches have been merged into `develop`.
-In the release branch, 
-* Update the project version.
-* Re-generate the Javadoc if there were API-related changes.
-* Do a final play test of a plugin build in a fresh server.
-
-Merge the release branch back into `develop` like normal when finished.
+For example,
+* `release/101-v1.1.0`
+* `patch/120-v1.1.1`
 
 ### Release versioning
-Release versions follow a MAJOR.MINOR.PATCH format. The project version is defined in [this gradle script](https://github.com/Rumsfield/konquest/blob/main/build.gradle.kts).
+Release versions follow a MAJOR.MINOR.PATCH format. The project version is defined in [build.gradle.kts](https://github.com/Rumsfield/konquest/blob/main/build.gradle.kts).
 * PATCH - Increment when updates are mostly bug fixes and small improvements.
 * MINOR - Increment when there are large updates like new features, changes to commands, configuration, etc.
 * MAJOR - Increment when there are major wide-spread changes and incompatible API changes (and when the project moves from private beta to public open-source release).
 
-### Steps to make a new release
-1. When the `develop` branch is stable and contains all of the desired updates for the planned release,
-create a new Pull Request to merge it into `main`.
-2. Once the merge is complete, create a new tag in `main` using the release version as a name.
+### How to make a release branch
+Create a branch for the new release or patch from `develop`, just like a topic branch.
+The `develop` branch should have all the latest features that you want to include in the release.
+In the release branch, 
+* Update the project version in `build.gradle.kts`.
+* Re-generate the Javadoc if there were API-related changes or if the Major or Minor version changes.
+* Do a final play test of a plugin build in a fresh server, and test all the new features.
+
+### Steps to publish a new release
+Once the release branch is ready and contains every desired feature of the new version, follow these steps to publish it.
+
+1. Create a new Pull Request to merge the release branch into `develop` using **Squash and Merge**.
+2. Once `develop` has the new release commit, create a second Pull Request to merge `develop` into `main` using **Merge Commit**.
+3. Once the merge into `main` is complete, create a new tag in `main` using the release version as a name.
 ```
 git checkout main
 git pull
 git tag -a vX.Y.Z -m "{description}"
 git push origin vX.Y.Z
 ```
-3. Clean and build the project from `main`, and generate the Javadoc if the API changed.
+4. Clean and build the project from `main` to get JAR files.
 ```
 ./gradlew clean
 ./gradlew shadowJar
-./gradlew generateJavadoc
 ```
+5. On GitHub, [draft a new release](https://github.com/Rumsfield/konquest/releases) using the new tag. Provide detailed change notes and upload the JAR files as release assets:
+    * Konquest-X.Y.Z.jar
+    * konquest-api-X.Y.Z.jar

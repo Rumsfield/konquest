@@ -497,7 +497,7 @@ public class EntityListener implements Listener {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 				if(flagHolder.hasPropertyValue(KonPropertyFlag.BUILD)) {
 					if(!flagHolder.getPropertyValue(KonPropertyFlag.BUILD)) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendKonBlockedFlagTitle(player);
 						event.setCancelled(true);
 						return;
 					}
@@ -515,7 +515,7 @@ public class EntityListener implements Listener {
 				}
 			} else if(territory instanceof KonRuin) {
 				// Always prevent
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				ChatUtil.sendKonBlockedProtectionTitle(player);
 				event.setCancelled(true);
 				return;
 			}
@@ -544,7 +544,7 @@ public class EntityListener implements Listener {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 				if(flagHolder.hasPropertyValue(KonPropertyFlag.BUILD)) {
 					if(!flagHolder.getPropertyValue(KonPropertyFlag.BUILD)) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendKonBlockedFlagTitle(player);
 						event.setCancelled(true);
 						return;
 					}
@@ -562,7 +562,7 @@ public class EntityListener implements Listener {
 				}
 			} else if(territory instanceof KonRuin) {
 				// Always prevent
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				ChatUtil.sendKonBlockedProtectionTitle(player);
 				event.setCancelled(true);
 				return;
 			}
@@ -626,7 +626,7 @@ public class EntityListener implements Listener {
 				if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
 					// Block non-enemy PVE
 					if(!(flagHolder.getPropertyValue(KonPropertyFlag.PVE) || event.getEntity() instanceof Enemy)) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendKonBlockedFlagTitle(player);
 						event.setCancelled(true);
 						return;
 					}
@@ -684,7 +684,7 @@ public class EntityListener implements Listener {
 						}
 						// If the player is not enemy with the town, prevent event
 						if(!playerRole.equals(KonquestRelationshipType.ENEMY)) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendKonBlockedProtectionTitle(player);
 							event.setCancelled(true);
 							return;
 						}
@@ -692,21 +692,21 @@ public class EntityListener implements Listener {
 						if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && territory.getKingdom().isCapitalImmune()) {
 							// Capital is immune and cannot be attacked
 							int numTowns = territory.getKingdom().getNumTowns();
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendKonBlockedProtectionTitle(player);
 							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAPITAL_IMMUNE.getMessage(numTowns, territory.getKingdom().getName()));
 							event.setCancelled(true);
 							return;
 						}
 						// Verify town can be attacked
 						if(town.isCaptureDisabled()) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendKonBlockedProtectionTitle(player);
 							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(town.getCaptureCooldownString()));
 							event.setCancelled(true);
 							return;
 						}
 						// If town is shielded, prevent all enemy entity damage
 						if(town.isShielded()) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedShieldColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendKonBlockedShieldTitle(player);
 							event.setCancelled(true);
 							return;
 						}
@@ -869,14 +869,14 @@ public class EntityListener implements Listener {
 				}
 				// Protect pvp when property is false
 				if (isPropertyPvpProtected) {
-					ChatUtil.sendKonPriorityTitle(attackerPlayer, "", Konquest.blockedFlagColor + MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					ChatUtil.sendKonBlockedFlagTitle(attackerPlayer);
 					event.setCancelled(true);
 					return;
 				}
 				// Prevent optional damage based on relations
 				// Kingdoms at peace may allow pvp. Kingdoms in alliance or trade cannot pvp.
 				if (!isAllDamageEnabled && !isPlayerEnemy) {
-					ChatUtil.sendKonPriorityTitle(attackerPlayer, "", Konquest.blockedProtectionColor + MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					ChatUtil.sendKonBlockedProtectionTitle(attackerPlayer);
 					event.setCancelled(true);
 					return;
 				}
@@ -1000,13 +1000,13 @@ public class EntityListener implements Listener {
 			// Only allow splash potions in the town when source player is friendly or enemy (war)
 			KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
 			if(!playerRole.equals(KonquestRelationshipType.ENEMY) && !playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				ChatUtil.sendKonBlockedProtectionTitle(player);
 				event.setCancelled(true);
 				return;
 			}
 		} else if(territory instanceof KonSanctuary) {
 			// Prevent all splash potions
-			ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+			ChatUtil.sendKonBlockedProtectionTitle(player);
 			event.setCancelled(true);
 			return;
 		}

@@ -78,6 +78,7 @@ public enum CorePath {
 	KINGDOMS_CAPITAL_RESPAWN                              ("core.kingdoms.capital_respawn"),
 	KINGDOMS_CAPITAL_IMMUNITY_TOWNS                       ("core.kingdoms.capital_immunity_towns"),
 	KINGDOMS_ALLY_DEFENSE_PACT                            ("core.kingdoms.ally_defense_pact"),
+	KINGDOMS_ALLY_BUILD                                   ("core.kingdoms.ally_build"),
 	KINGDOMS_INSTANT_WAR                                  ("core.kingdoms.instant_war"),
 	KINGDOMS_INSTANT_PEACE                                ("core.kingdoms.instant_peace"),
 	KINGDOMS_ALLOW_PEACEFUL_PVP                           ("core.kingdoms.allow_peaceful_pvp"),

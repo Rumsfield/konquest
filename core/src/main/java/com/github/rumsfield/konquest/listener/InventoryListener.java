@@ -77,7 +77,7 @@ public class InventoryListener implements Listener {
 					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 					if(flagHolder.hasPropertyValue(KonPropertyFlag.CHEST)) {
 						if(!flagHolder.getPropertyValue(KonPropertyFlag.CHEST)) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendKonBlockedFlagTitle(player);
 							event.setCancelled(true);
 							return;
 						}
@@ -106,7 +106,7 @@ public class InventoryListener implements Listener {
 						// Prevent inventory openings by non-friendlies
 						boolean isEnemyInventoryOpenDenied = konquest.getCore().getBoolean(CorePath.KINGDOMS_PROTECT_CONTAINERS_USE.getPath());
 						if(isEnemyInventoryOpenDenied && !territoryRole.equals(KonquestRelationshipType.FRIENDLY)) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendKonBlockedProtectionTitle(player);
 							event.setCancelled(true);
 							return;
 						}
@@ -187,7 +187,7 @@ public class InventoryListener implements Listener {
 						isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
 					}
 					if(!(isMember && isMemberAllowed) && !player.getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendKonBlockedProtectionTitle(player);
 						event.setCancelled(true);
 					}
 				}

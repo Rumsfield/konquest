@@ -381,6 +381,17 @@ public class ChatUtil {
 		player.resetTitle();
 		player.sendTitle("", "", 1, 1, 1);
 	}
-	
+
+	public static void sendKonBlockedProtectionTitle(KonPlayer player) {
+		sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+	}
+
+	public static void sendKonBlockedFlagTitle(KonPlayer player) {
+		sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+	}
+
+	public static void sendKonBlockedShieldTitle(KonPlayer player) {
+		sendKonPriorityTitle(player, "", Konquest.blockedShieldColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+	}
 	
 }

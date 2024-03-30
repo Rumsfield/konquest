@@ -11,6 +11,7 @@
 version: 0.0.0
 label:
   admin-kingdom: 管理員王國
+  allied-building: 聯合建築商
   armor: 裝甲
   armors: 裝甲
   back: 返回
@@ -183,6 +184,7 @@ menu:
   options:
     hint: 點擊以更改
     current: '當前：%s'
+    allied-building: 同盟玩家可以建造
     open: 所有王國成員都可以建造和使用箱子
     plot: 居民只能在地塊中建造和使用箱子
     friendly-redstone: 王國成員可以使用紅石開關和門
@@ -440,6 +442,7 @@ protection:
     tag-blocked: 在戰鬥中無法使用此命令。
     portal-exit: 您的出口傳送門位於受保護的領土內，請移動您的傳送門！
     capital-immune: 在 %s 鎮保持在 %s 王國中時，這個首都免受攻擊。
+    no-allied-build: 該城鎮的選項不允許來自同盟王國的玩家建造。
 command:
   admin:
     camp:
@@ -685,6 +688,8 @@ command:
       close: 關閉了 %s，只有居民可以建造和訪問容器。
       plot-enable: '%s 現在允許居民只能在地塊內建造。'
       plot-disable: '%s 現在允許居民在城鎮土地內和地塊內建造。'
+      allied-building-enable: '%s 現在允許盟友建造。'
+      allied-building-disable: '%s 現在阻止盟友建造。'
       friendly-redstone-enable: '%s 現在允許王國成員使用紅石開關和門。'
       friendly-redstone-disable: '%s 現在禁止王國成員使用紅石開關和門。'
       redstone-enable: '%s 現在允許敵人使用紅石開關和門。'
