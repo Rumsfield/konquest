@@ -11,6 +11,7 @@
 version: 0.0.0
 label:
   admin-kingdom: "Admin Kingdom"
+  allied-building: "Allied Building"
   armor: "Armor"
   armors: "Armors"
   back: "Back"
@@ -183,6 +184,7 @@ menu:
   options:
     hint: "Click to change"
     current: "Current: %s"
+    allied-building: "Allied players can build"
     open: "All kingdom members can build and use chests"
     plot: "Residents can only build and use chests in plots"
     friendly-redstone: "Kingdom members can use redstone switches and doors"
@@ -440,6 +442,7 @@ protection:
     tag-blocked: "This command is blocked while in combat."
     portal-exit: "Your exit portal is inside of protected territory, move your portal!"
     capital-immune: "This capital is immune to attacks while %s towns remain in the Kingdom of %s."
+    no-allied-build: "This town's options do not allow players from allied kingdoms to build."
 command:
   admin:
     camp:
@@ -685,6 +688,8 @@ command:
       close: "Closed %s, only residents may build and access containers."
       plot-enable: "%s now allows residents to only build within plots."
       plot-disable: "%s now allows residents to build in town land and within plots."
+      allied-building-enable: "%s now allows allies to build."
+      allied-building-disable: "%s now prevents allies from building."
       friendly-redstone-enable: "%s now allows kingdom members to use redstone switches and doors."
       friendly-redstone-disable: "%s now prevents kingdom members from using redstone switches and doors."
       redstone-enable: "%s now allows enemies to use redstone switches and doors."

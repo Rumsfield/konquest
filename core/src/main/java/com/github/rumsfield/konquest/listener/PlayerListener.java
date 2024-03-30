@@ -541,12 +541,15 @@ public class PlayerListener implements Listener {
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
 					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+					boolean isFriendly = playerRole.equals(KonquestRelationshipType.FRIENDLY);
+					boolean isClosedNonResident = !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer());
+					boolean isAlliedBuilder = playerRole.equals(KonquestRelationshipType.ALLY) && town.isAlliedBuildingAllowed() && konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
 					// Target player who interacts with monument blocks
 					if(town.isLocInsideMonumentProtectionArea(event.getClickedBlock().getLocation())) {
 						town.targetRabbitToPlayer(bukkitPlayer);
 					}
 					// Protections for friendly non-residents of closed towns
-					if(playerRole.equals(KonquestRelationshipType.FRIENDLY) && !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+					if(isFriendly && isClosedNonResident) {
 						// Check for allowed usage like buttons, levers
 						if(!town.isFriendlyRedstoneAllowed() && preventUse(event,player)) {
 							event.setCancelled(true);
@@ -558,8 +561,8 @@ public class PlayerListener implements Listener {
 							return;
 						}
 					}
-					// Protections for non-friendlies
-					if(!playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
+					// Protections for non-friendlies that are not allied builders
+					if(!isFriendly && !isAlliedBuilder) {
 						// Check for allowed usage like buttons, levers
 						if(!town.isEnemyRedstoneAllowed() && preventUse(event,player)) {
 							event.setCancelled(true);
@@ -571,11 +574,11 @@ public class PlayerListener implements Listener {
 							return;
 						}
 					}
-					// Prevent enemies and non-residents from interacting with item frames
-					if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+					// Prevent enemies and non-residents from interacting with item frames, ignore allied builders
+					if((!isFriendly || isClosedNonResident) && !isAlliedBuilder) {
 						Material clickedMat = event.getClickedBlock().getType();
 						if(clickedMat.equals(Material.ITEM_FRAME)) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendKonBlockedProtectionTitle(player);
 							event.setCancelled(true);
 							return;
 						}
@@ -666,7 +669,7 @@ public class PlayerListener implements Listener {
 					if (flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
 						// Block non-allowed entity interaction
 						if (!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor + MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendKonBlockedFlagTitle(player);
 							event.setCancelled(true);
 							return;
 						}
@@ -680,8 +683,12 @@ public class PlayerListener implements Listener {
 					boolean isNotFriendly = !playerRole.equals(KonquestRelationshipType.FRIENDLY);
 					boolean isClosedNotResident = (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()));
 					if (isNotFriendly || isClosedNotResident) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor + MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-						event.setCancelled(true);
+						boolean isAlliedBuildingEnable = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
+						boolean isAlliedBuilder = isAlliedBuildingEnable && town.isAlliedBuildingAllowed() && playerRole.equals(KonquestRelationshipType.ALLY);
+						if (!isAlliedBuilder) {
+							ChatUtil.sendKonBlockedProtectionTitle(player);
+							event.setCancelled(true);
+						}
 					}
 				}
 			}
@@ -702,7 +709,7 @@ public class PlayerListener implements Listener {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 				if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
 					if(!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendKonBlockedFlagTitle(player);
 						event.setCancelled(true);
 					}
 				}
@@ -822,7 +829,7 @@ public class PlayerListener implements Listener {
 			}
 		}
 		if(cancelUse) {
-			ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+			ChatUtil.sendKonBlockedProtectionTitle(player);
 			event.setCancelled(true);
 		}
     }
@@ -981,7 +988,7 @@ public class PlayerListener implements Listener {
 			boolean isEnemyFrom = territoryManager.isChunkClaimed(event.getFrom()) &&
 					!kingdomManager.isPlayerFriendly(player, territoryManager.getChunkTerritory(event.getFrom()).getKingdom());
 			if(isEnemyTo || isEnemyFrom) {
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				ChatUtil.sendKonBlockedProtectionTitle(player);
 				event.setCancelled(true);
 				return;
 			}
@@ -1228,7 +1235,7 @@ public class PlayerListener implements Listener {
 						vehicle.setVelocity(vehicle.getVelocity().multiply(-4));
 						vehicle.eject();
 					}
-					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					ChatUtil.sendKonBlockedFlagTitle(player);
 					if(player.getBukkitPlayer().hasPermission("konquest.command.admin")) {
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
 					}
@@ -1342,7 +1349,7 @@ public class PlayerListener implements Listener {
 						vehicle.setVelocity(vehicle.getVelocity().multiply(-4));
 						vehicle.eject();
 					}
-					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					ChatUtil.sendKonBlockedFlagTitle(player);
 					if(player.getBukkitPlayer().hasPermission("konquest.command.admin")) {
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
 					}
@@ -1433,7 +1440,7 @@ public class PlayerListener implements Listener {
 				if(!(clickedState instanceof Sign)) {
 					// Only display "Blocked" title when not interacting with a sign
 					// This is mainly for using chest shops
-					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					ChatUtil.sendKonBlockedProtectionTitle(player);
 				}
 				return true;
 			}
@@ -1448,7 +1455,7 @@ public class PlayerListener implements Listener {
 			if(event.getAction().equals(Action.PHYSICAL) && clickedBlockData instanceof Farmland) {
 				// Prevent all physical stepping interaction, like trampling farmland
 				event.setUseInteractedBlock(Event.Result.DENY);
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				ChatUtil.sendKonBlockedProtectionTitle(player);
 				return true;
 			}
 		}

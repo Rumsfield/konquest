@@ -48,6 +48,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private final HashMap<UUID,Boolean> residents;
 	private final RequestKeeper joinRequestKeeper;
 	private boolean isOpen;
+	private boolean isAlliedBuildingAllowed;
 	private boolean isFriendlyRedstoneAllowed;
 	private boolean isEnemyRedstoneAllowed;
 	private boolean isResidentPlotOnly;
@@ -100,6 +101,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.residents = new HashMap<>();
 		this.joinRequestKeeper = new RequestKeeper();
 		this.isOpen = false; // init as a closed Town, requires Lord to add players as residents for build/container perms
+		this.isAlliedBuildingAllowed = false;
 		this.isFriendlyRedstoneAllowed = true;
 		this.isEnemyRedstoneAllowed = false;
 		this.isResidentPlotOnly = false;
@@ -1171,6 +1173,14 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	public boolean isOpen() {
 		return isOpen;
+	}
+
+	public void setIsAlliedBuildingAllowed(boolean val) {
+		isAlliedBuildingAllowed = val;
+	}
+
+	public boolean isAlliedBuildingAllowed() {
+		return isAlliedBuildingAllowed;
 	}
 
 	public void setIsFriendlyRedstoneAllowed(boolean val) {
