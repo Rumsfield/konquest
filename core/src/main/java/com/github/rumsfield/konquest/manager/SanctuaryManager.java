@@ -258,6 +258,19 @@ public class SanctuaryManager {
 		}
 		return result;
 	}
+
+	public int getTallestTemplateHeight() {
+		int maxHeight = -1;
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			for(KonMonumentTemplate template : sanctuary.getTemplates()) {
+				int templateHeight = template.getHeight();
+				if(templateHeight > maxHeight) {
+					maxHeight = templateHeight;
+				}
+			}
+		}
+		return maxHeight;
+	}
 	
 	/**
 	 * For each kingdom with a null template, assign any remaining valid template

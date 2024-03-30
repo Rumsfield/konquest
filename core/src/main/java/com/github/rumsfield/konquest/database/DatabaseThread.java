@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import org.bukkit.Bukkit;
 
 public class DatabaseThread implements Runnable {
     private final Konquest konquest;
@@ -21,6 +22,16 @@ public class DatabaseThread implements Runnable {
 
     public void run() {
         running = true;
+        // Start timeout check for database ready
+        long delayTicks = 10*20; // 10 seconds
+        Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), () -> {
+            // Actions to run after delay
+            if (database.isReady()) {
+                ChatUtil.printConsoleAlert("Konquest Database passed startup check.");
+            } else {
+                ChatUtil.printConsoleError("Something went wrong when starting the Konquest Database, and the plugin will not behave correctly! Please report this to the Konquest developer.");
+            }
+        }, delayTicks);
 
         createDatabase();
         database.initialize();

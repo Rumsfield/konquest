@@ -5,6 +5,7 @@ import com.github.rumsfield.konquest.Konquest;
 public enum MessagePath {
 
 	LABEL_ADMIN_KINGDOM                         (0, "label.admin-kingdom"),
+	LABEL_ALLIED_BUILDING                       (0, "label.allied-building"),
 	LABEL_ARMOR                             	(0, "label.armor"),
 	LABEL_ARMORS                            	(0, "label.armors"),
 	LABEL_BACK                                  (0, "label.back"),
@@ -168,6 +169,7 @@ public enum MessagePath {
 	MENU_SHIELD_ACTIVATE_ADD                    (2, "menu.shield.activate-add"),
 	MENU_OPTIONS_HINT                           (0, "menu.options.hint"),
 	MENU_OPTIONS_CURRENT                        (1, "menu.options.current"),
+	MENU_OPTIONS_ALLIED_BUILDING                (0, "menu.options.allied-building"),
 	MENU_OPTIONS_OPEN                           (0, "menu.options.open"),
 	MENU_OPTIONS_PLOT                           (0, "menu.options.plot"),
 	MENU_OPTIONS_FRIENDLY_REDSTONE              (0, "menu.options.friendly-redstone"),
@@ -418,6 +420,7 @@ public enum MessagePath {
 	PROTECTION_ERROR_TAG_BLOCKED                (0, "protection.error.tag-blocked"),
 	PROTECTION_ERROR_PORTAL_EXIT                (0, "protection.error.portal-exit"),
 	PROTECTION_ERROR_CAPITAL_IMMUNE             (2, "protection.error.capital-immune"),
+	PROTECTION_ERROR_NO_ALLIED_BUILD            (0, "protection.error.no-allied-build"),
 
 	COMMAND_ADMIN_CAMP_NOTICE_CREATE            (1, "command.admin.camp.notice.create"),
 	COMMAND_ADMIN_CAMP_NOTICE_DESTROY           (1, "command.admin.camp.notice.destroy"),
@@ -587,6 +590,7 @@ public enum MessagePath {
 	COMMAND_SETTLE_ERROR_FAIL_INIT              (0, "command.settle.error.fail-init"),
 	COMMAND_SETTLE_ERROR_FAIL_LIMIT_ALL         (2, "command.settle.error.fail-limit-all"),
 	COMMAND_SETTLE_ERROR_FAIL_LIMIT_WORLD       (2, "command.settle.error.fail-limit-world"),
+	COMMAND_SETTLE_ERROR_OFFICER_ONLY           (0, "command.settle.error.officer-only"),
 	COMMAND_SPY_NOTICE_NEARBY                   (0, "command.spy.notice.nearby"),
 	COMMAND_SPY_NOTICE_REGIONAL                 (0, "command.spy.notice.regional"),
 	COMMAND_SPY_NOTICE_FARAWAY                  (0, "command.spy.notice.faraway"),
@@ -598,6 +602,8 @@ public enum MessagePath {
 	COMMAND_TOWN_NOTICE_CLOSE                   (1, "command.town.notice.close"),
 	COMMAND_TOWN_NOTICE_PLOT_ENABLE             (1, "command.town.notice.plot-enable"),
 	COMMAND_TOWN_NOTICE_PLOT_DISABLE            (1, "command.town.notice.plot-disable"),
+	COMMAND_TOWN_NOTICE_ALLIED_BUILDING_ENABLE  (1, "command.town.notice.allied-building-enable"),
+	COMMAND_TOWN_NOTICE_ALLIED_BUILDING_DISABLE (1, "command.town.notice.allied-building-disable"),
 	COMMAND_TOWN_NOTICE_FRIENDLY_REDSTONE_ENABLE  (1, "command.town.notice.friendly-redstone-enable"),
 	COMMAND_TOWN_NOTICE_FRIENDLY_REDSTONE_DISABLE (1, "command.town.notice.friendly-redstone-disable"),
 	COMMAND_TOWN_NOTICE_REDSTONE_ENABLE         (1, "command.town.notice.redstone-enable"),
@@ -644,6 +650,7 @@ public enum MessagePath {
 	COMMAND_TRAVEL_ERROR_NO_TOWN                (0, "command.travel.error.no-town"),
 	COMMAND_TRAVEL_ERROR_COOLDOWN               (2, "command.travel.error.cooldown"),
 	COMMAND_TRAVEL_ERROR_CANCELED               (0, "command.travel.error.canceled"),
+	COMMAND_TRAVEL_ERROR_DAMAGED                (0, "command.travel.error.damaged"),
 	COMMAND_TRAVEL_ERROR_DISABLED               (0, "command.travel.error.disabled"),
 	COMMAND_UNCLAIM_NOTICE_SUCCESS              (2, "command.unclaim.notice.success"),
 	COMMAND_UNCLAIM_NOTICE_FAIL_AUTO            (0, "command.unclaim.notice.fail-auto"),
@@ -927,6 +934,11 @@ public enum MessagePath {
 	PROPERTIES_TRANSFER_NAME					(0, "properties.transfer-name"),
 	PROPERTIES_SHOP_NAME						(0, "properties.shop-name"),
 	PROPERTIES_ARENA_NAME						(0, "properties.arena-name"),
+
+	DISCORD_SRV_DISCORD  						(0, "discord-srv.discord"),
+	DISCORD_SRV_NO_LINK  						(0, "discord-srv.no-link"),
+	DISCORD_SRV_NO_USER  						(0, "discord-srv.no-user"),
+	DISCORD_SRV_LINKED_USER  					(1, "discord-srv.linked-user"),
 
 	NULL_MESSAGE	(0,"");
 	

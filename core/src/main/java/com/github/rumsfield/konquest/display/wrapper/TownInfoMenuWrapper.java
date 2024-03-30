@@ -121,6 +121,11 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		loreList.add(loreColor+MessagePath.LABEL_FRIENDLY_REDSTONE.getMessage()+": "+isFriendlyRedstone);
 		loreList.add(loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage()+": "+isRedstone);
     	loreList.add(loreColor+MessagePath.LABEL_GOLEM_OFFENSE.getMessage()+": "+isGolemOffense);
+		boolean isAlliedBuildingEnable = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
+		if(isAlliedBuildingEnable) {
+			String isAlliedBuildingAllowed = DisplayManager.boolean2Symbol(infoTown.isAlliedBuildingAllowed());
+			loreList.add(loreColor+MessagePath.LABEL_ALLIED_BUILDING.getMessage()+": "+isAlliedBuildingAllowed);
+		}
 		info = new InfoIcon(kingdomColor+MessagePath.LABEL_OPTIONS.getMessage(), loreList, Material.OAK_SIGN, 6, false);
 		getMenu().getPage(0).addIcon(info);
 

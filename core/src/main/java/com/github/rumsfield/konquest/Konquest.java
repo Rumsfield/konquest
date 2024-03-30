@@ -14,10 +14,12 @@ import com.github.rumsfield.konquest.shop.ShopHandler;
 import com.github.rumsfield.konquest.utility.*;
 import com.github.rumsfield.konquest.utility.Timer;
 import com.google.common.collect.MapMaker;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandException;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -42,7 +44,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	private static Konquest instance;
 	private static String chatTag;
 	private static String chatMessage;
-	public static final String chatDivider = "\u00BB"; // »
+	private static String chatDivider;
 	public static String friendColor1 		= "§7";
 	public static String friendColor2 		= "§7";
 	public static String enemyColor1 		= "§7";
@@ -121,6 +123,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		instance = this;
 		chatTag = "§7[§6Konquest§7]§f ";
 		chatMessage = "%PREFIX% %KINGDOM% §7| %TITLE% %NAME% %SUFFIX% ";
+		chatDivider = "§8»§r ";
 		
 		databaseThread = new DatabaseThread(this);
 		accomplishmentManager = new AccomplishmentManager(this);
@@ -236,6 +239,7 @@ public class Konquest implements KonquestAPI, Timeable {
 				case "v1_19_R3":
 				case "v1_20_R1":
 				case "v1_20_R2":
+				case "v1_20_R3":
 					if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
 	    			break;
 	    		default:
@@ -271,14 +275,20 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	private void initManagers() {
-		String configTag = getCore().getString(CorePath.CHAT_TAG.getPath());
+		// Set up chat formats
+		String configTag = getCore().getString(CorePath.CHAT_TAG.getPath(),"");
 		chatTag = ChatUtil.parseHex(configTag);
 		ChatUtil.printDebug("Chat tag is "+chatTag);
 		String configMessage = getCore().getString(CorePath.CHAT_MESSAGE.getPath(),"");
 		if(!configMessage.equals("")) {
+			// Cannot be an empty string
 			chatMessage = ChatUtil.parseHex(configMessage);
 		}
 		ChatUtil.printDebug("Chat message is "+chatMessage);
+		String configDivider = getCore().getString(CorePath.CHAT_DIVIDER.getPath(),"");
+		chatDivider = ChatUtil.parseHex(configDivider);
+		ChatUtil.printDebug("Chat divider is "+chatDivider);
+
 		kingdomManager.loadOptions();
 		integrationManager.initialize();
 		lootManager.initialize();
@@ -1354,7 +1364,8 @@ public class Konquest implements KonquestAPI, Timeable {
 					break;
 			}
     		// Send appropriate team packet to online player
-    		versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Collections.singletonList(player.getBukkitPlayer().getName()), onlinePacketTeam);
+			boolean status = versionHandler.sendPlayerTeamPacket(onlinePlayer.getBukkitPlayer(), Collections.singletonList(player.getBukkitPlayer().getName()), onlinePacketTeam);
+			if(!status) ChatUtil.printConsoleError("Failed to send Team Update packet, make sure ProtocolLib is updated and works for this Minecraft version.");
     	}
     	// Send packets to player
     	if(!barbarianNames.isEmpty()) {
@@ -1615,14 +1626,21 @@ public class Konquest implements KonquestAPI, Timeable {
 		int hours = valSeconds % 86400 / 3600;
 		int minutes = valSeconds % 3600 / 60;
 		int seconds = valSeconds % 60;
-		
-		ChatColor nColor = ChatColor.GRAY;
-		String numColor = color;
-		if(valSeconds <= 30) {
-			numColor = ""+ChatColor.DARK_RED;
-		}
+
+		String nColor;
+		String numColor;
 		String result;
 		String format;
+		if(color != null && !color.equals("")) {
+			nColor = ""+ChatColor.GRAY;
+			numColor = color;
+			if(valSeconds <= 30) {
+				numColor = ""+ChatColor.DARK_RED;
+			}
+		} else {
+			nColor = "";
+			numColor = "";
+		}
 		
 		if(days != 0) {
 			format = numColor+"%03d"+nColor+"D:"+numColor+"%02d"+nColor+"H:"+numColor+"%02d"+nColor+"M:"+numColor+"%02d"+nColor+"S";
@@ -1667,7 +1685,11 @@ public class Konquest implements KonquestAPI, Timeable {
     public static String getChatMessage() {
     	return chatMessage;
     }
-    
+
+	public static String getChatDivider() {
+		return chatDivider;
+	}
+
     public static void callKonquestEvent(KonquestEvent event) {
     	if(event != null) {
 	    	try {
@@ -1680,19 +1702,34 @@ public class Konquest implements KonquestAPI, Timeable {
     		ChatUtil.printDebug("Could not call null Konquest event");
     	}
     }
-    
-    public static void callEvent(Event event) {
-    	if(event != null) {
-	    	try {
-	            Bukkit.getServer().getPluginManager().callEvent(event);
-			} catch(IllegalStateException e) {
-				ChatUtil.printConsoleError("Failed to call Bukkit event!");
-				e.printStackTrace();
+
+	public void executeCustomCommand(CustomCommandPath command, Player bukkitPlayer) {
+		// Get custom command
+		String commandPath = command.getPath();
+		FileConfiguration customCommandConfig = configManager.getConfig("commands");
+		String customCommand = customCommandConfig.getString(commandPath,"");
+		// Check for empty string
+		ChatUtil.printDebug("Running command \""+customCommand+"\" for "+commandPath);
+		if (!customCommand.isEmpty()) {
+			// Replace tags in command string
+			customCommand = customCommand.replace("%PLAYER%", bukkitPlayer.getName());
+			// Execute the command as console
+			try {
+				boolean result = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), customCommand);
+				if (!result) {
+					ChatUtil.printConsoleWarning("Could not run command \""+customCommand+"\" from commands.yml entry "+commandPath);
+					// Check for leading forward slash
+					if (customCommand.matches("^/.+")) {
+						ChatUtil.printConsoleWarning("Custom command starts with a forward slash \"/\". Remove the slash from the command in commands.yml.");
+					}
+				}
+			} catch (CommandException me) {
+				ChatUtil.printConsoleError("Failed to execute custom command \""+customCommand+"\" from commands.yml entry "+commandPath);
+				ChatUtil.printConsole(me.getMessage());
+				me.printStackTrace();
 			}
-    	} else {
-    		ChatUtil.printDebug("Could not call null Bukkit event");
-    	}
-    }
+		}
+	}
 
 	public static Material getProfessionMaterial(Villager.Profession profession) {
 		Material result = Material.EMERALD;

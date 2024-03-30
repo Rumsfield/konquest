@@ -5,6 +5,8 @@ version: @version@
 api-version: 1.16
 load: POSTWORLD
 main: com.github.rumsfield.konquest.KonquestPlugin
+libraries:
+  - org.apache.commons:commons-lang3:3.14.0
 depend: [Vault]
 softdepend:
   - ProtocolLib
@@ -48,6 +50,7 @@ permissions:
       konquest.directive.*: true
       konquest.compass: true
       konquest.join: true
+      konquest.chatcolor: true
 
   konquest.command:
     description: Base command permission
@@ -337,4 +340,8 @@ permissions:
     
   konquest.prefix:
     description: Grants access to a custom prefix
+    default: false
+
+  konquest.chatcolor:
+    description: Allows players to use color format codes in chat messages
     default: false

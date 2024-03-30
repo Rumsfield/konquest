@@ -32,11 +32,7 @@ import org.bukkit.block.data.AnaloguePowerable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.type.*;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -247,8 +243,6 @@ public class PlayerListener implements Listener {
 		KonKingdom kingdom = player.getKingdom();
 
 		// Built-in format string
-		boolean formatNameConfig = konquest.getCore().getBoolean(CorePath.CHAT_NAME_TEAM_COLOR.getPath(),true);
-		boolean formatKingdomConfig = konquest.getCore().getBoolean(CorePath.CHAT_KINGDOM_TEAM_COLOR.getPath(),true);
 		/* %TITLE% */
 		String title = "";
 		if(player.getPlayerPrefix().isEnabled()) {
@@ -261,8 +255,15 @@ public class PlayerListener implements Listener {
 		/* %KINGDOM% */
 		String kingdomName = kingdom.getName();
 		/* %NAME% */
-		String name = bukkitPlayer.getName();
+		String playerName = bukkitPlayer.getName();
+		/* %C1% */
+		String primaryColor = ""+ChatColor.GOLD; // default
+		/* %C2% */
+		String secondaryColor = ""+ChatColor.GOLD; // default
+		/* %CW% */
+		String kingdomWebColor = kingdom.getWebColorString();
 
+		String divider = Konquest.getChatDivider();
 		String rawFormat = Konquest.getChatMessage();
 		String parsedFormat;
 		String chatMessage = event.getMessage();
@@ -278,31 +279,30 @@ public class PlayerListener implements Listener {
 		event.setCancelled(true);
 
 		// Send messages to players
+		boolean isGlobal = player.isGlobalChat();
 		for(KonPlayer viewerPlayer : playerManager.getPlayersOnline()) {
-			String teamColor = ""+ChatColor.GOLD;
-			String nameColor = ""+ChatColor.GOLD;
-			boolean doFormatName = true;
-			boolean doFormatKingdom = true;
-			String messageFormat = "";
+			primaryColor = konquest.getDisplayPrimaryColor(viewerPlayer, player);
+			secondaryColor = konquest.getDisplaySecondaryColor(viewerPlayer, player);
+			String kingdomChatFormat = "";
 
 			boolean sendMessage = false;
-			if(player.isGlobalChat()) {
+			if(isGlobal) {
 				// Sender is in global chat mode
-				nameColor = ""+konquest.getDisplayPrimaryColor(viewerPlayer, player);
-				teamColor = konquest.getDisplaySecondaryColor(viewerPlayer, player);
-				doFormatName = formatNameConfig;
-				doFormatKingdom = formatKingdomConfig;
-				messageFormat = "";
+				// All viewers see the message
 				sendMessage = true;
 			} else {
 				// Sender is in kingdom chat mode
 				if(viewerPlayer.getKingdom().equals(kingdom)) {
-					nameColor = Konquest.friendColor1;
-					teamColor = Konquest.friendColor1;
-					messageFormat = ""+ChatColor.GREEN+ChatColor.ITALIC;
+					// Viewer is a friendly kingdom member
+					kingdomChatFormat = ""+ChatColor.GRAY+"["+Konquest.friendColor1+MessagePath.LABEL_KINGDOM.getMessage()+ChatColor.GRAY+"]";
+					kingdomChatFormat += " "+Konquest.friendColor1+playerName+ChatColor.GRAY+" » ";
+					kingdomChatFormat += ""+Konquest.friendColor2+ChatColor.ITALIC;
 					sendMessage = true;
 				} else if(viewerPlayer.isAdminBypassActive()) {
-					messageFormat = ""+ChatColor.GOLD+ChatColor.ITALIC;
+					// Viewer is an admin in bypass mode
+					kingdomChatFormat = ""+ChatColor.GRAY+"["+ChatColor.GOLD+MessagePath.LABEL_BYPASS.getMessage()+" "+kingdomName+ChatColor.GRAY+"]";
+					kingdomChatFormat += " "+ChatColor.GOLD+playerName+ChatColor.GRAY+" » ";
+					kingdomChatFormat += ""+ChatColor.GOLD+ChatColor.ITALIC;
 					sendMessage = true;
 				}
 			}
@@ -314,11 +314,10 @@ public class PlayerListener implements Listener {
 						suffix,
 						kingdomName,
 						title,
-						name,
-						teamColor,
-						nameColor,
-						doFormatName,
-						doFormatKingdom);
+						playerName,
+						primaryColor,
+						secondaryColor,
+						kingdomWebColor);
 				// Attempt to use PAPI for external placeholders
 				try {
 					// Try to parse placeholders in the format string, if the JAR is present.
@@ -327,15 +326,23 @@ public class PlayerListener implements Listener {
 					parsedFormat = PlaceholderAPI.setRelationalPlaceholders(viewerPlayer.getBukkitPlayer(), bukkitPlayer, parsedFormat);
 				} catch (NoClassDefFoundError ignored) {}
 				// Send the chat message
-				viewerPlayer.getBukkitPlayer().sendMessage(parsedFormat + ChatColor.DARK_GRAY + Konquest.chatDivider + ChatColor.RESET + " " + messageFormat + chatMessage);
+				if(isGlobal) {
+					// Try to parse color codes in the chat message
+					if(bukkitPlayer.hasPermission("konquest.chatcolor")) {
+						chatMessage = ChatUtil.parseHex(chatMessage);
+					}
+					viewerPlayer.getBukkitPlayer().sendMessage(parsedFormat + divider + chatMessage);
+				} else {
+					viewerPlayer.getBukkitPlayer().sendMessage(kingdomChatFormat + chatMessage);
+				}
 			}
 		}
 
 		// Send message to console
 		if(player.isGlobalChat()) {
-			ChatUtil.printConsole(ChatColor.GOLD + bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+			ChatUtil.printConsole(ChatColor.GOLD + playerName+": "+ChatColor.DARK_GRAY+event.getMessage());
 		} else {
-			ChatUtil.printConsole(ChatColor.GOLD + "["+kingdom.getName()+"] "+bukkitPlayer.getName()+": "+ChatColor.DARK_GRAY+event.getMessage());
+			ChatUtil.printConsole(ChatColor.GOLD + "["+kingdomName+"] "+playerName+": "+ChatColor.DARK_GRAY+event.getMessage());
 		}
 
     }
@@ -534,12 +541,15 @@ public class PlayerListener implements Listener {
 				if(territory instanceof KonTown) {
 					KonTown town = (KonTown) territory;
 					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+					boolean isFriendly = playerRole.equals(KonquestRelationshipType.FRIENDLY);
+					boolean isClosedNonResident = !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer());
+					boolean isAlliedBuilder = playerRole.equals(KonquestRelationshipType.ALLY) && town.isAlliedBuildingAllowed() && konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
 					// Target player who interacts with monument blocks
 					if(town.isLocInsideMonumentProtectionArea(event.getClickedBlock().getLocation())) {
 						town.targetRabbitToPlayer(bukkitPlayer);
 					}
 					// Protections for friendly non-residents of closed towns
-					if(playerRole.equals(KonquestRelationshipType.FRIENDLY) && !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer())) {
+					if(isFriendly && isClosedNonResident) {
 						// Check for allowed usage like buttons, levers
 						if(!town.isFriendlyRedstoneAllowed() && preventUse(event,player)) {
 							event.setCancelled(true);
@@ -551,8 +561,8 @@ public class PlayerListener implements Listener {
 							return;
 						}
 					}
-					// Protections for non-friendlies
-					if(!playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
+					// Protections for non-friendlies that are not allied builders
+					if(!isFriendly && !isAlliedBuilder) {
 						// Check for allowed usage like buttons, levers
 						if(!town.isEnemyRedstoneAllowed() && preventUse(event,player)) {
 							event.setCancelled(true);
@@ -564,11 +574,11 @@ public class PlayerListener implements Listener {
 							return;
 						}
 					}
-					// Prevent enemies and non-residents from interacting with item frames
-					if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
+					// Prevent enemies and non-residents from interacting with item frames, ignore allied builders
+					if((!isFriendly || isClosedNonResident) && !isAlliedBuilder) {
 						Material clickedMat = event.getClickedBlock().getType();
 						if(clickedMat.equals(Material.ITEM_FRAME)) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendKonBlockedProtectionTitle(player);
 							event.setCancelled(true);
 							return;
 						}
@@ -630,38 +640,58 @@ public class PlayerListener implements Listener {
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
 		if(event.isCancelled()) return; // Do nothing if another plugin cancels this event
     	if(konquest.isWorldIgnored(event.getPlayer().getLocation())) return;
-    	Entity clicked = event.getRightClicked();
+    	Entity clickedEntity = event.getRightClicked();
     	Player bukkitPlayer = event.getPlayer();
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-        if(player != null && !player.isAdminBypassActive() && territoryManager.isChunkClaimed(clicked.getLocation())) {
-        	KonTerritory territory = territoryManager.getChunkTerritory(clicked.getLocation());
-        	// Entity exceptions are always allowed to interact
-        	//ChatUtil.printDebug("Player "+bukkitPlayer.getName()+" interacted at entity of type: "+ clicked.getType());
-        	boolean isEntityAllowed = (clicked.getType().equals(EntityType.PLAYER) ||
-					clicked.getType().equals(EntityType.VILLAGER) ||
-					clicked.getType().equals(EntityType.BOAT));
-        	// Property Flag Holders
-			if(territory instanceof KonPropertyFlagHolder) {
-				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
-				if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
-					// Block non-allowed entity interaction
-					if(!isEntityAllowed && !flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-						event.setCancelled(true);
-						return;
+        if(player != null && !player.isAdminBypassActive() && territoryManager.isChunkClaimed(clickedEntity.getLocation())) {
+        	KonTerritory territory = territoryManager.getChunkTerritory(clickedEntity.getLocation());
+			// Always allow players to interact with tamed entities (horses, wolves, etc) that they own.
+			boolean isTamedByPlayer = false;
+			if(clickedEntity instanceof Tameable) {
+				Tameable tamedEntity = (Tameable)clickedEntity;
+				if(tamedEntity.isTamed()) {
+					AnimalTamer owner = tamedEntity.getOwner();
+					if(owner != null && owner.getUniqueId().equals(bukkitPlayer.getUniqueId())) {
+						isTamedByPlayer = true;
 					}
 				}
 			}
-        	// Town protections...
-    		if(territory instanceof KonTown && !isEntityAllowed) {
-    			KonTown town = (KonTown) territory;
-				KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
-    			// Prevent enemies and non-residents from interacting with entities
-    			if(!playerRole.equals(KonquestRelationshipType.FRIENDLY) || (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()))) {
-    				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-    				event.setCancelled(true);
+        	// Entity exceptions are always allowed to interact
+        	boolean isEntityAlwaysAllowed = (clickedEntity instanceof Player) ||
+					(clickedEntity instanceof Villager) ||
+					(clickedEntity instanceof Boat) ||
+					(clickedEntity instanceof Minecart);
+			// Try to protect when entity is not an exception, and the entity is not tamed by the player
+			if(!isEntityAlwaysAllowed && !isTamedByPlayer) {
+				// Property Flag Holders
+				if (territory instanceof KonPropertyFlagHolder) {
+					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder) territory;
+					if (flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
+						// Block non-allowed entity interaction
+						if (!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
+							ChatUtil.sendKonBlockedFlagTitle(player);
+							event.setCancelled(true);
+							return;
+						}
+					}
 				}
-    		}
+				// Town protections...
+				if (territory instanceof KonTown) {
+					KonTown town = (KonTown) territory;
+					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), territory.getKingdom());
+					// Prevent enemies and non-residents from interacting with entities
+					boolean isNotFriendly = !playerRole.equals(KonquestRelationshipType.FRIENDLY);
+					boolean isClosedNotResident = (!town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer()));
+					if (isNotFriendly || isClosedNotResident) {
+						boolean isAlliedBuildingEnable = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
+						boolean isAlliedBuilder = isAlliedBuildingEnable && town.isAlliedBuildingAllowed() && playerRole.equals(KonquestRelationshipType.ALLY);
+						if (!isAlliedBuilder) {
+							ChatUtil.sendKonBlockedProtectionTitle(player);
+							event.setCancelled(true);
+						}
+					}
+				}
+			}
         }
     }
     
@@ -679,7 +709,7 @@ public class PlayerListener implements Listener {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 				if(flagHolder.hasPropertyValue(KonPropertyFlag.USE)) {
 					if(!flagHolder.getPropertyValue(KonPropertyFlag.USE)) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendKonBlockedFlagTitle(player);
 						event.setCancelled(true);
 					}
 				}
@@ -799,7 +829,7 @@ public class PlayerListener implements Listener {
 			}
 		}
 		if(cancelUse) {
-			ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+			ChatUtil.sendKonBlockedProtectionTitle(player);
 			event.setCancelled(true);
 		}
     }
@@ -958,7 +988,7 @@ public class PlayerListener implements Listener {
 			boolean isEnemyFrom = territoryManager.isChunkClaimed(event.getFrom()) &&
 					!kingdomManager.isPlayerFriendly(player, territoryManager.getChunkTerritory(event.getFrom()).getKingdom());
 			if(isEnemyTo || isEnemyFrom) {
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				ChatUtil.sendKonBlockedProtectionTitle(player);
 				event.setCancelled(true);
 				return;
 			}
@@ -1205,7 +1235,7 @@ public class PlayerListener implements Listener {
 						vehicle.setVelocity(vehicle.getVelocity().multiply(-4));
 						vehicle.eject();
 					}
-					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					ChatUtil.sendKonBlockedFlagTitle(player);
 					if(player.getBukkitPlayer().hasPermission("konquest.command.admin")) {
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
 					}
@@ -1222,6 +1252,22 @@ public class PlayerListener implements Listener {
     	// Update bars
 		if(territoryTo instanceof KonBarDisplayer) {
 			((KonBarDisplayer)territoryTo).addBarPlayer(player);
+		}
+		// Handle property flag holders
+		if(territoryTo instanceof KonPropertyFlagHolder) {
+			KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territoryTo;
+			if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
+				// Search for mobs targeting player
+				if(!flagHolder.getPropertyValue(KonPropertyFlag.PVE) && locTo.getWorld() != null) {
+					for(Entity searchEntity : locTo.getWorld().getNearbyEntities(locTo,32,32,32,(e) -> e instanceof Mob)) {
+						Mob searchMob = (Mob)searchEntity;
+						LivingEntity mobTarget = searchMob.getTarget();
+						if(mobTarget != null && mobTarget.equals(player.getBukkitPlayer())) {
+							searchMob.setTarget(null);
+						}
+					}
+				}
+			}
 		}
 		// Decide what to do for specific territories
 		if(territoryTo instanceof KonTown) {
@@ -1303,7 +1349,7 @@ public class PlayerListener implements Listener {
 						vehicle.setVelocity(vehicle.getVelocity().multiply(-4));
 						vehicle.eject();
 					}
-					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					ChatUtil.sendKonBlockedFlagTitle(player);
 					if(player.getBukkitPlayer().hasPermission("konquest.command.admin")) {
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_IGNORE.getMessage());
 					}
@@ -1394,7 +1440,7 @@ public class PlayerListener implements Listener {
 				if(!(clickedState instanceof Sign)) {
 					// Only display "Blocked" title when not interacting with a sign
 					// This is mainly for using chest shops
-					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					ChatUtil.sendKonBlockedProtectionTitle(player);
 				}
 				return true;
 			}
@@ -1409,7 +1455,7 @@ public class PlayerListener implements Listener {
 			if(event.getAction().equals(Action.PHYSICAL) && clickedBlockData instanceof Farmland) {
 				// Prevent all physical stepping interaction, like trampling farmland
 				event.setUseInteractedBlock(Event.Result.DENY);
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				ChatUtil.sendKonBlockedProtectionTitle(player);
 				return true;
 			}
 		}

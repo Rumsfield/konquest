@@ -1,6 +1,7 @@
 plugins {
     java
     id("com.github.johnrengelman.shadow") version "7.1.2"
+    `maven-publish`
 }
 
 repositories{
@@ -34,22 +35,23 @@ repositories{
 }
 
 dependencies{
-    compileOnly("org.spigotmc:spigot-api:1.20.2-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-1.17.1-R0.1-SNAPSHOT-remapped")
     compileOnly("org.spigotmc:spigot-1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
     compileOnly("org.maxgamer:QuickShop:5.1.2.2-SNAPSHOT")
     compileOnly("com.acrobot.chestshop:chestshop:3.12")
-    compileOnly("org.dynmap:dynmap:3.4-beta-2-spigot")
+    compileOnly("org.dynmap:Dynmap:3.4-beta-2-spigot")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly("com.discordsrv:discordsrv:1.25.1")
+    compileOnly("com.discordsrv:discordsrv:1.27.0")
     compileOnly("me.clip:placeholderapi:2.11.2")
     compileOnly("net.luckperms:api:5.4")
     compileOnly("com.github.BlueMap-Minecraft:BlueMapAPI:v2.6.0")
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.15")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5")
 
+    implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("org.xerial:sqlite-jdbc:3.40.1.0")
     implementation(project(":api"))
 }
@@ -59,7 +61,6 @@ tasks {
         archiveBaseName.set("Konquest")
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir/build/libs"))
-
         dependencies {
             include(project(":api"))
         }

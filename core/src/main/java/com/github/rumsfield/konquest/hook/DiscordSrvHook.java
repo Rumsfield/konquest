@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.hook;
 
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -78,15 +79,15 @@ public class DiscordSrvHook implements PluginHook {
 		if (!isEnabled) return "";
 		String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(player.getUniqueId());
 		if (discordId == null) {
-			return ChatColor.RED + "You are not linked to Discord. Type /discord link";
+			return ChatColor.RED + MessagePath.DISCORD_SRV_NO_LINK.getMessage();
 		}
 
 		User user = DiscordUtil.getJda().getUserById(discordId);
 		if (user == null) {
-			return ChatColor.YELLOW + "Couldn't find the Discord user you're linked to.";
+			return ChatColor.YELLOW + MessagePath.DISCORD_SRV_NO_USER.getMessage();
 		}
 
-		return ChatColor.GREEN + "You're linked to " + user.getAsTag() + " in Discord.";
+		return ChatColor.GREEN + MessagePath.DISCORD_SRV_LINKED_USER.getMessage(user.getAsTag());
 
 	}
 	
@@ -117,25 +118,22 @@ public class DiscordSrvHook implements PluginHook {
 		KonKingdom kingdom = konquest.getKingdomManager().getKingdom(kingdomChannel);
 		for(KonPlayer viewerPlayer : konquest.getPlayerManager().getPlayersOnline()) {
 			String messageFormat = "";
-			String chatFormat =  ChatColor.WHITE+"["+ChatColor.AQUA+"Discord"+ChatColor.WHITE+"] ";
+			String chatFormat =  ChatColor.WHITE+"["+ChatColor.AQUA+MessagePath.DISCORD_SRV_DISCORD.getMessage()+ChatColor.WHITE+"] ";
 			String chatMessage = guildMessage.getContentDisplay();
 			boolean sendMessage = false;
 			if(viewerPlayer.getKingdom().equals(kingdom)) {
-				chatFormat = chatFormat + Konquest.friendColor2+kingdom.getName()+" "+guildUser.getName();
-				messageFormat = ""+ChatColor.GREEN+ChatColor.ITALIC;
+				chatFormat = chatFormat + Konquest.friendColor1+kingdom.getName()+" "+guildUser.getName();
+				messageFormat = ""+ChatColor.RESET+Konquest.friendColor2+ChatColor.ITALIC;
 				sendMessage = true;
 			} else if(viewerPlayer.isAdminBypassActive()) {
 				chatFormat = chatFormat + ChatColor.GOLD+kingdom.getName()+" "+guildUser.getName();
-				messageFormat = ""+ChatColor.GOLD+ChatColor.ITALIC;
+				messageFormat = ""+ChatColor.RESET+ChatColor.GOLD+ChatColor.ITALIC;
 				sendMessage = true;
 			}
-
 			if(sendMessage) {
-				viewerPlayer.getBukkitPlayer().sendMessage(chatFormat + Konquest.chatDivider + ChatColor.RESET + " " + messageFormat + chatMessage);
+				viewerPlayer.getBukkitPlayer().sendMessage(chatFormat + " » " + messageFormat + chatMessage);
 			}
 		}
-
-
 	}
 	
 	// Sends the linked player a direct message

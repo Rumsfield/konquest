@@ -19,8 +19,7 @@ public enum CorePath {
 
 	CHAT_TAG                                              ("core.chat.tag"),
 	CHAT_MESSAGE                                          ("core.chat.message"),
-	CHAT_KINGDOM_TEAM_COLOR                               ("core.chat.kingdom_team_color"),
-	CHAT_NAME_TEAM_COLOR                                  ("core.chat.name_team_color"),
+	CHAT_DIVIDER                                          ("core.chat.divider"),
 	CHAT_ENABLE_FORMAT                                    ("core.chat.enable_format"),
 	CHAT_PRIORITY                                         ("core.chat.priority"),
 
@@ -72,12 +71,14 @@ public enum CorePath {
 	TRAVEL_WILD_CENTER_Z                                  ("core.travel.wild_center_z"),
 	TRAVEL_WARMUP                                         ("core.travel.warmup"),
 	TRAVEL_CANCEL_ON_MOVE                                 ("core.travel.cancel_on_move"),
-	
+	TRAVEL_CANCEL_ON_DAMAGE                               ("core.travel.cancel_on_damage"),
+
 	KINGDOMS_CAPITAL_SUFFIX                               ("core.kingdoms.capital_suffix"),
 	KINGDOMS_CAPITAL_PREFIX_SWAP                          ("core.kingdoms.capital_prefix_swap"),
 	KINGDOMS_CAPITAL_RESPAWN                              ("core.kingdoms.capital_respawn"),
 	KINGDOMS_CAPITAL_IMMUNITY_TOWNS                       ("core.kingdoms.capital_immunity_towns"),
 	KINGDOMS_ALLY_DEFENSE_PACT                            ("core.kingdoms.ally_defense_pact"),
+	KINGDOMS_ALLY_BUILD                                   ("core.kingdoms.ally_build"),
 	KINGDOMS_INSTANT_WAR                                  ("core.kingdoms.instant_war"),
 	KINGDOMS_INSTANT_PEACE                                ("core.kingdoms.instant_peace"),
 	KINGDOMS_ALLOW_PEACEFUL_PVP                           ("core.kingdoms.allow_peaceful_pvp"),
@@ -119,6 +120,7 @@ public enum CorePath {
 	TOWNS_MAX_SIZE                                        ("core.towns.max_size"),
 	TOWNS_SETTLE_CHECKS_DEPTH                             ("core.towns.settle_checks_depth"),
 	TOWNS_SETTLE_CHECK_FLATNESS                           ("core.towns.settle_check_flatness"),
+	TOWNS_SETTLE_OFFICER_ONLY                             ("core.towns.settle_officer_only"),
 	TOWNS_INIT_RADIUS                                     ("core.towns.init_radius"),
 	TOWNS_CAPTURE_UPGRADES                                ("core.towns.capture_upgrades"),
 	TOWNS_CAPTURE_COOLDOWN                                ("core.towns.capture_cooldown"),

@@ -151,9 +151,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		payPercentOfficer = Math.min(payPercentOfficer, 100);
 		payPercentMaster = Math.max(payPercentMaster, 0);
 		payPercentMaster = Math.min(payPercentMaster, 100);
-		
+
+		payTimer.stopTimer();
 		if(payIntervalSeconds > 0) {
-			payTimer.stopTimer();
 			payTimer.setTime((int)payIntervalSeconds);
 			payTimer.startLoopTimer();
 		}
@@ -165,6 +165,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 		discountPercent = Math.max(discountPercent,0);
 		discountPercent = Math.min(discountPercent,100);
+	}
+
+	public String getKingdomPayTime() {
+		String noColor = "";
+		int timerCount = Math.max(payTimer.getTime(),0);
+		return Konquest.getTimeFormat(timerCount, noColor);
 	}
 	
 	public double getCostDiplomacyWar() {
@@ -3174,6 +3180,23 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				}
 				result = true;
 				break;
+			case TOWN_ALLIED_BUILDING:
+				boolean isAlliedBuildingEnable = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
+				if(isAlliedBuildingEnable) {
+					if(town.isAlliedBuildingAllowed()) {
+						// Disable allied building
+						town.setIsAlliedBuildingAllowed(false);
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_ALLIED_BUILDING_DISABLE.getMessage(town.getName()));
+					} else {
+						// Enable allied building
+						town.setIsAlliedBuildingAllowed(true);
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_ALLIED_BUILDING_ENABLE.getMessage(town.getName()));
+					}
+					result = true;
+				} else {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+				}
+				break;
 			case TOWN_FRIENDLY_REDSTONE:
 				if(town.isFriendlyRedstoneAllowed()) {
 					// Disable friendly redstone
@@ -3807,7 +3830,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				if(mat != null) {
 					armorBlocks.add(mat);
 				}else{
-					ChatUtil.printConsoleAlert("Invalid material \""+entry+"\" in "+CorePath.TOWNS_ARMOR_BLACKLIST.getPath()+", ignoring.");
+					ChatUtil.printConsoleWarning("Invalid material \""+entry+"\" in "+CorePath.TOWNS_ARMOR_BLACKLIST.getPath()+", ignoring.");
 				}
 			}
 		}
@@ -4342,6 +4365,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Set plot flag
 		boolean isPlotOnly = townSection.getBoolean("plot",false);
 		town.setIsPlotOnly(isPlotOnly);
+		// Set allied building flags
+		boolean isAlliedBuilding = townSection.getBoolean("allied_building",false);
+		town.setIsAlliedBuildingAllowed(isAlliedBuilding);
 		// Set redstone flags
 		boolean isFriendlyRedstone = townSection.getBoolean("friendly_redstone",true);
 		town.setIsFriendlyRedstoneAllowed(isFriendlyRedstone);
@@ -4526,6 +4552,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				townInstanceSection.set("specialization", town.getSpecialization().toString());
 				townInstanceSection.set("open", town.isOpen());
                 townInstanceSection.set("plot", town.isPlotOnly());
+				townInstanceSection.set("allied_building", town.isAlliedBuildingAllowed());
 				townInstanceSection.set("friendly_redstone", town.isFriendlyRedstoneAllowed());
                 townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());
                 townInstanceSection.set("golem_offensive", town.isGolemOffensive());

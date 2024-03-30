@@ -93,6 +93,13 @@ public class SettleCommand extends CommandBase {
 					}
 				}
 			}
+			// Check officer only
+			boolean isOfficerOnly = getKonquest().getCore().getBoolean(CorePath.TOWNS_SETTLE_OFFICER_ONLY.getPath(),false);
+			if(isOfficerOnly && !settleKingdom.isOfficer(bukkitPlayer.getUniqueId())) {
+				// Player is not an officer and must be in order to settle
+				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SETTLE_ERROR_OFFICER_ONLY.getMessage());
+				return;
+			}
 
 			double cost = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
         	double incr = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath());

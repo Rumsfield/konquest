@@ -9,6 +9,7 @@ import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.CustomCommandPath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -76,7 +77,7 @@ public class InventoryListener implements Listener {
 					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 					if(flagHolder.hasPropertyValue(KonPropertyFlag.CHEST)) {
 						if(!flagHolder.getPropertyValue(KonPropertyFlag.CHEST)) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendKonBlockedFlagTitle(player);
 							event.setCancelled(true);
 							return;
 						}
@@ -105,7 +106,7 @@ public class InventoryListener implements Listener {
 						// Prevent inventory openings by non-friendlies
 						boolean isEnemyInventoryOpenDenied = konquest.getCore().getBoolean(CorePath.KINGDOMS_PROTECT_CONTAINERS_USE.getPath());
 						if(isEnemyInventoryOpenDenied && !territoryRole.equals(KonquestRelationshipType.FRIENDLY)) {
-							ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+							ChatUtil.sendKonBlockedProtectionTitle(player);
 							event.setCancelled(true);
 							return;
 						}
@@ -146,6 +147,8 @@ public class InventoryListener implements Listener {
 							ChatUtil.printDebug("Attempted to update loot in town "+territory.getName()+", got "+result);
 							if(result) {
 								event.getInventory().getLocation().getWorld().playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
+								// Execute custom commands from config
+								konquest.executeCustomCommand(CustomCommandPath.TOWN_MONUMENT_LOOT_OPEN,player.getBukkitPlayer());
 							} else {
 								ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_LOOT_LATER.getMessage());
 							}
@@ -166,6 +169,8 @@ public class InventoryListener implements Listener {
 						ChatUtil.printDebug("Attempted to update loot in ruin "+territory.getName()+", got "+result);
 						if(result) {
 							event.getInventory().getLocation().getWorld().playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
+							// Execute custom commands from config
+							konquest.executeCustomCommand(CustomCommandPath.RUIN_LOOT_OPEN,player.getBukkitPlayer());
 						} else {
 							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_LOOT_CAPTURE.getMessage());
 						}
@@ -182,7 +187,7 @@ public class InventoryListener implements Listener {
 						isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
 					}
 					if(!(isMember && isMemberAllowed) && !player.getBukkitPlayer().getUniqueId().equals(camp.getOwner().getUniqueId())) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendKonBlockedProtectionTitle(player);
 						event.setCancelled(true);
 					}
 				}

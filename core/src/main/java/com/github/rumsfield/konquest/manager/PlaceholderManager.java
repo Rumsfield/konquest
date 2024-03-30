@@ -126,68 +126,56 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 	
 	public String getTownsLord(Player player) {
 		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
-    	StringBuilder list = new StringBuilder();
+    	int numTowns = 0;
     	if(offlinePlayer != null) {
     		for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
     			if(town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
-    				list.append(town.getName()).append(",");
+					numTowns++;
     			}
     		}
-    		if(list.length() > 1) {
-    			list = new StringBuilder(list.substring(0, list.length() - 1));
-			}
     	}
-    	return list.toString();
+    	return ""+numTowns;
 	}
 	
 	public String getTownsKnight(Player player) {
 		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
-		StringBuilder list = new StringBuilder();
+		int numTowns = 0;
     	if(offlinePlayer != null) {
     		for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
     			if(town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer()) &&
     					!town.isPlayerLord(offlinePlayer.getOfflineBukkitPlayer())) {
-    				list.append(town.getName()).append(",");
+					numTowns++;
     			}
     		}
-    		if(list.length() > 1) {
-    			list = new StringBuilder(list.substring(0, list.length() - 1));
-			}
     	}
-    	return list.toString();
+    	return ""+numTowns;
 	}
 	
 	public String getTownsResident(Player player) {
 		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
-		StringBuilder list = new StringBuilder();
+		int numTowns = 0;
     	if(offlinePlayer != null) {
     		for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
     			if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer()) &&
     					!town.isPlayerKnight(offlinePlayer.getOfflineBukkitPlayer())) {
-    				list.append(town.getName()).append(",");
+					numTowns++;
     			}
     		}
-    		if(list.length() > 1) {
-    			list = new StringBuilder(list.substring(0, list.length() - 1));
-			}
     	}
-    	return list.toString();
+    	return ""+numTowns;
 	}
 	
 	public String getTownsAll(Player player) {
 		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
-		StringBuilder list = new StringBuilder();
+		int numTowns = 0;
     	if(offlinePlayer != null) {
     		for(KonTown town : offlinePlayer.getKingdom().getTowns()) {
     			if(town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
-    				list.append(town.getName()).append(",");
+					numTowns++;
     			}
     		}
-    		if(list.length() > 1) {
-    			list = new StringBuilder(list.substring(0, list.length() - 1));
-			}
     	}
-    	return list.toString();
+    	return ""+numTowns;
 	}
 	
 	public String getTerritory(Player player) {
@@ -343,6 +331,15 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		KonPlayer onlinePlayerTwo = playerManager.getPlayer(playerTwo);
 		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
 			result = ""+konquest.getDisplaySecondaryColor(onlinePlayerOne, onlinePlayerTwo);
+		}
+		return result;
+	}
+
+	public String getRelationKingdomWebColor(Player playerTwo) {
+		String result = "";
+		KonPlayer onlinePlayerTwo = playerManager.getPlayer(playerTwo);
+		if(onlinePlayerTwo != null) {
+			result = onlinePlayerTwo.getKingdom().getWebColorString();
 		}
 		return result;
 	}
@@ -619,6 +616,28 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 			}
 			// Get value
 			result = ""+kingdomCache.get(type).get(name);
+		}
+		return result;
+	}
+
+	/*
+	 * Placeholder Timers
+	 */
+
+	public String getTimerLoot(Player player) {
+		String result = "";
+		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
+		if(offlinePlayer != null) {
+			result = konquest.getLootManager().getMonumentLootTime();
+		}
+		return result;
+	}
+
+	public String getTimerPayment(Player player) {
+		String result = "";
+		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
+		if(offlinePlayer != null) {
+			result = konquest.getKingdomManager().getKingdomPayTime();
 		}
 		return result;
 	}
