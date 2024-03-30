@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.display.icon.OptionIcon.optionAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -32,16 +33,22 @@ public class TownOptionsMenuWrapper extends MenuWrapper {
 		String loreColor = DisplayManager.loreFormat;
 		String valueColor = DisplayManager.valueFormat;
 		String hintColor = DisplayManager.hintFormat;
+		String alertColor = DisplayManager.alertFormat;
 		
 		// Page 0
 		String pageLabel = titleColor+town.getName()+" "+MessagePath.LABEL_OPTIONS.getMessage();
 		getMenu().addPage(0, 1, pageLabel);
 
 		// Allied Building Info Icon
+		boolean isAlliedBuildingEnable = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
 		currentValue = DisplayManager.boolean2Lang(town.isAlliedBuildingAllowed())+" "+DisplayManager.boolean2Symbol(town.isAlliedBuildingAllowed());
 		loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_ALLIED_BUILDING.getMessage()));
 		loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
-		loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+		if(isAlliedBuildingEnable) {
+			loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+		} else {
+			loreList.add(alertColor+MessagePath.LABEL_DISABLED.getMessage());
+		}
 		option = new OptionIcon(optionAction.TOWN_ALLIED_BUILDING, loreColor+MessagePath.LABEL_ALLIED_BUILDING.getMessage(), loreList, Material.BRICK_STAIRS, 1);
 		getMenu().getPage(0).addIcon(option);
 
