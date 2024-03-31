@@ -15,29 +15,34 @@ import java.util.List;
 
 public class HelpCommand extends CommandBase{
 
-	public HelpCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
-    }
+	public HelpCommand() {
+		super("help",false);
+		// Define arguments:
+		// /k help [<page>]
+		CommandArgument arg0 = new CommandArgument(true);
+		arg0.addArgOption("page",false);
+		addArgument(arg0);
+	}
 
-    public void execute() {
-		// k help [<page>]
-		Player bukkitPlayer = (Player) getSender();
+	@Override
+    public void execute(Konquest konquest, CommandSender sender, String[] args) {
 		final int MAX_LINES_PER_PAGE = 6;
-
 		// Populate help lines
 		List<String> lines = new ArrayList<>();
-        for(CommandType cmd : CommandType.values()) {
-        	String alias = "";
-			if(!cmd.alias().equals("")) {
-				alias = " ("+cmd.alias()+")";
+        for (CommandType cmd : CommandType.values()) {
+			if (cmd.isSenderAllowed(sender)) {
+				// This command is supported for the current sender
+				String alias = "";
+				if (!cmd.alias().equals("")) {
+					alias = " ("+cmd.alias()+")";
+				}
+				String message = cmd.usage()+ChatColor.WHITE+": "+cmd.description()+ChatColor.LIGHT_PURPLE+alias;
+				lines.add(message);
 			}
-			String commandFormat = Labeler.format(cmd);
-			String message = commandFormat+ChatColor.WHITE+": "+cmd.description()+ChatColor.LIGHT_PURPLE+alias;
-			lines.add(message);
         }
 		// Check for any help lines
-		if(lines.isEmpty()) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+		if (lines.isEmpty()) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return;
 		}
 		// Max number of pages given help lines
@@ -45,14 +50,14 @@ public class HelpCommand extends CommandBase{
 		int maxPages = (int)Math.ceil(((double)numLines)/MAX_LINES_PER_PAGE);
 		// Get page index to display
 		int page = 1;
-		if (getArgs().length >= 2) {
-			String pageArg = getArgs()[1];
+		// Argument 0
+		if (hasValidArg(args,0)) {
 			try {
-				page = Integer.parseInt(pageArg);
+				page = Integer.parseInt(getArg(args,0));
 			}
 			catch (NumberFormatException ignored) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_HELP_ERROR_PAGE.getMessage());
-				sendInvalidArgMessage(bukkitPlayer,CommandType.HELP);
+				ChatUtil.sendError(sender, MessagePath.COMMAND_HELP_ERROR_PAGE.getMessage());
+				sendInvalidArgMessage(sender,false);
 				return;
 			}
 			page = Math.max(page,1);
@@ -60,28 +65,28 @@ public class HelpCommand extends CommandBase{
 		}
 		// Display help lines
 		String pageDisplay = page + "/" + maxPages;
-		ChatUtil.sendNotice(bukkitPlayer, pageDisplay + " " + MessagePath.COMMAND_HELP_NOTICE_MESSAGE.getMessage());
+		ChatUtil.sendNotice(sender, pageDisplay + " " + MessagePath.COMMAND_HELP_NOTICE_MESSAGE.getMessage());
 		int startIdx = (page-1) * MAX_LINES_PER_PAGE;
 		int endIdx = startIdx + MAX_LINES_PER_PAGE;
 		for (int i = startIdx; i < endIdx && i < numLines; i++) {
-			ChatUtil.sendMessage(bukkitPlayer, lines.get(i));
+			ChatUtil.sendMessage(sender, lines.get(i));
 		}
-
     }
     
     @Override
-	public List<String> tabComplete() {
-		// k help [<page>]
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, String[] args) {
 		List<String> tabList = new ArrayList<>();
 		final List<String> matchedTabList = new ArrayList<>();
-
-		if(getArgs().length == 2) {
-			tabList.add("#");
-
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
+		int currentArgIndex = getLastArgIndex(args);
+		// Suggestions based on argument index
+		switch (currentArgIndex) {
+			case 0:
+				tabList.add("#");
+				break;
 		}
+		// Trim down completion options based on current input
+		StringUtil.copyPartialMatches(getArg(args,currentArgIndex), tabList, matchedTabList);
+		Collections.sort(matchedTabList);
 		return matchedTabList;
 	}
 }

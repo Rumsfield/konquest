@@ -8,10 +8,10 @@ public class CommandArgument {
     private final ArrayList<Boolean> isOptionLiteral;
     private boolean isArgOptional;
 
-    public CommandArgument() {
+    public CommandArgument(boolean isOptional) {
         this.argOptions = new ArrayList<>();
         this.isOptionLiteral = new ArrayList<>();
-        this.isArgOptional = false;
+        this.isArgOptional = isOptional;
     }
 
     public boolean isArgOptional() {

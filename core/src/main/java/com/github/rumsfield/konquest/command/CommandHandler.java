@@ -20,16 +20,23 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class CommandHandler  implements TabExecutor {
+public class CommandHandler implements TabExecutor {
 
 	private final Konquest konquest;
 	
 	public CommandHandler(Konquest konquest) {
         this.konquest = konquest;
     }
-	
-	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        // Special reload command for console
+
+	/**
+	 * There is only 1 command: /konquest (alias /k).
+	 * All functional commands are sub-commands of /k, specified in args.
+	 * Parse the args to determine which sub-command is being used.
+	 * Return false only when no sub-commands could be matched, else return true.
+	 */
+	@Override
+	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+		// Special reload command for console
 		if (sender instanceof ConsoleCommandSender) {
 			if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
 				// Console Reload
@@ -38,205 +45,101 @@ public class CommandHandler  implements TabExecutor {
 				return true;
 			}
 		}
-
-		// All other commands must be issued by players
-        if (!(sender instanceof Player)) {
-            Bukkit.getLogger().info("You need to be a player to issue commands.");
-            return false;
-        }
-
-        if (sender.hasPermission("konquest.command")) {
-        	if (args.length == 0) {
-        		new KonquestCommand(konquest, sender).execute();
-            } else {
-            	//Get command type. If args[0] is not a command, defaults to HELP
-            	CommandType commandArg = CommandType.getCommand(args[0]);
-            	
-            	// Handle admin commands differently from normal commands
-            	if (commandArg.equals(CommandType.ADMIN)) {
-            		// Command is an admin command
-            		new AdminCommand(konquest, sender, args).execute();
-            	} else {
-            		// Command is a normal command
-	            	if (sender.hasPermission(commandArg.permission())) {
-	            		// Sender has permission for this command
-	            		switch (commandArg) {
-	                    case BORDER:
-	                        new BorderCommand(konquest, sender, args).execute();
-	                        break;
-	                    case CHAT:
-	                        new ChatCommand(konquest, sender, args).execute();
-	                        break;
-	                    case CLAIM:
-	                        new ClaimCommand(konquest, sender, args).execute();
-	                        break;
-	                    case FAVOR:
-	                        new FavorCommand(konquest, sender, args).execute();
-	                        break;
-	                    case FLY:
-	                        new FlyCommand(konquest, sender, args).execute();
-	                        break;
-	                    case INFO:
-	                        new InfoCommand(konquest, sender, args).execute();
-	                        break;
-	                    case KINGDOM:
-	                        new KingdomCommand(konquest, sender, args).execute();
-	                        break;
-	                    case LIST:
-	                        new ListCommand(konquest, sender, args).execute();
-	                        break;
-	                    case MAP:
-	                        new MapCommand(konquest, sender, args).execute();
-	                        break;
-	                    case PREFIX:
-	                        new PrefixCommand(konquest, sender, args).execute();
-	                        break;
-	                    case QUEST:
-	                        new QuestCommand(konquest, sender, args).execute();
-	                        break;
-	                    case SCORE:
-	                    	new ScoreCommand(konquest, sender, args).execute();
-	                    	break;
-	                    case SETTLE:
-	                    	new SettleCommand(konquest, sender, args).execute();
-	                    	break;
-	                    case SPY:
-	                    	new SpyCommand(konquest, sender, args).execute();
-	                    	break;
-	                    case STATS:
-	                    	new StatsCommand(konquest, sender, args).execute();
-	                    	break;
-	                    case TOWN:
-	                        new TownCommand(konquest, sender, args).execute();
-	                        break;
-	                    case TRAVEL:
-	                        new TravelCommand(konquest, sender, args).execute();
-	                        break;
-	                    case UNCLAIM:
-	                        new UnclaimCommand(konquest, sender, args).execute();
-	                        break;
-	                    case HELP:
-	                        new HelpCommand(konquest, sender, args).execute();
-	                        break;
-	                    default:
-	                    	return false;
-	            		}
-	            	} else {
-	            		// Sender does not have permission for this command
-	                    ChatUtil.sendError((Player) sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+commandArg.permission());
-	            	}
-            	}
-        	}
-        } else {
-        	ChatUtil.sendError((Player) sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" konquest.command");
-        }
+		// Check for base permission
+		if (!sender.hasPermission("konquest.command")) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage() + " konquest.command");
+			return true;
+		}
+		// Special case when no sub-command given
+		if (args.length == 0) {
+			new KonquestCommand().execute(konquest, sender, args);
+			return true;
+		}
+		// Check for unknown command
+		if (!CommandType.contains(args[0])) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
+			return false;
+		}
+		//Get command type. If args[0] is not a command, defaults to HELP
+		CommandType commandArg = CommandType.getCommand(args[0]);
+		// Handle admin commands differently from normal commands
+		if (commandArg.equals(CommandType.ADMIN)) {
+			// Command is an admin command
+			// TODO change this
+			new AdminCommand(konquest, sender, args).execute();
+		} else {
+			// Command is a normal command
+			CommandBase konquestCommand = commandArg.command();
+			if (!sender.hasPermission(commandArg.permission())) {
+				// Sender does not have permission for this command
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+commandArg.permission());
+				return true;
+			}
+			if (!konquestCommand.validateSender(sender)) {
+				// Sender is not supported for this command
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_PLAYER.getMessage());
+				return true;
+			}
+			int argStatus = konquestCommand.validateArgs(args);
+			if (argStatus != 0) {
+				// Failed argument validation
+				if (argStatus == -1) {
+					// No arguments or no matching command name (this should never happen)
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+				} else {
+					// Get the invalid argument
+					String requiredArg = konquestCommand.getSingleArgumentString(argStatus);
+					ChatUtil.sendError(sender,requiredArg);
+				}
+				return false;
+			}
+			/* Passed all command checks */
+			// Execute command
+			konquestCommand.execute(konquest, sender, args);
+		}
         return true;
     }
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+	public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+		if (!sender.hasPermission("konquest.command")) {
+			return Collections.emptyList();
+		}
 		List<String> tabList = new ArrayList<>();
-
-		if (sender.hasPermission("konquest.command")) {
-			//ChatUtil.printDebug("Entering onTabComplete, length: "+args.length+", args: "+String.join(",",args));
-        	if (args.length == 1) {
-        		List<String> baseList = new ArrayList<>();
-        		for(CommandType cmd : CommandType.values()) {
-        			String suggestion = cmd.toString().toLowerCase();
-        			if(cmd.equals(CommandType.ADMIN)) {
-        				// Suggest admin command if any sub-command permissions are valid
-        				for(AdminCommandType subcmd : AdminCommandType.values()) {
-        					if(sender.hasPermission(subcmd.permission()) && !baseList.contains(suggestion)) {
-        						baseList.add(suggestion);
-        					}
-        				}
-        			} else if(sender.hasPermission(cmd.permission())) {
-        				// Suggest command if permission is valid
-        				baseList.add(suggestion);
-        			}
-        		}
-    			// Trim down completion options based on current input
-    			StringUtil.copyPartialMatches(args[0], baseList, tabList);
-    			Collections.sort(tabList);
-        		//ChatUtil.printDebug("Tab Complete for 0 args: "+args.length);
-        	} else if(args.length >= 1){
-            	//Get command type. If args[0] is not a command, defaults to HELP
-            	CommandType commandArg = CommandType.getCommand(args[0]);
-            	//ChatUtil.printDebug("Arg is "+args[0]+", Command type is "+commandArg.toString());
-            	// Handle admin commands differently from normal commands
-            	if (commandArg.equals(CommandType.ADMIN)) {
-            		// Command is an admin command
-            		tabList.addAll(new AdminCommand(konquest, sender, args).tabComplete());
-            	} else {
-            		// Command is a normal command
-	            	if (sender.hasPermission(commandArg.permission())) {
-	            		switch (commandArg) {
-	                    case BORDER:
-	                    	tabList.addAll(new BorderCommand(konquest, sender, args).tabComplete());
-	                        break;
-	                    case CHAT:
-	                    	tabList.addAll(new ChatCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case CLAIM:
-	                    	tabList.addAll(new ClaimCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case FAVOR:
-	                    	tabList.addAll(new FavorCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case FLY:
-	                    	tabList.addAll(new FlyCommand(konquest, sender, args).tabComplete());
-	                        break;
-	                    case INFO:
-	                    	tabList.addAll(new InfoCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case KINGDOM:
-	                    	tabList.addAll(new KingdomCommand(konquest, sender, args).tabComplete());
-	                        break;
-	                    case LIST:
-	                    	tabList.addAll(new ListCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case MAP:
-	                    	tabList.addAll(new MapCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case PREFIX:
-	                    	tabList.addAll(new PrefixCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case QUEST:
-	                    	tabList.addAll(new QuestCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case SCORE:
-	                    	tabList.addAll(new ScoreCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case SETTLE:
-	                    	tabList.addAll(new SettleCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case SPY:
-	                    	tabList.addAll(new SpyCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case STATS:
-	                    	tabList.addAll(new StatsCommand(konquest, sender, args).tabComplete());
-	                    	break;
-	                    case TOWN:
-	                    	tabList.addAll(new TownCommand(konquest, sender, args).tabComplete());
-	                        break;
-	                    case TRAVEL:
-	                    	tabList.addAll(new TravelCommand(konquest, sender, args).tabComplete());
-	                        break;
-	                    case UNCLAIM:
-	                    	tabList.addAll(new UnclaimCommand(konquest, sender, args).tabComplete());
-	                        break;
-	                    case HELP:
-	                    	tabList.addAll(new HelpCommand(konquest, sender, args).tabComplete());
-	                        break;
-	                    default:
-	                    	break;
-	            		}
-	            	}
-            	}
-        	}
-        }
+		if (args.length == 1) {
+			List<String> baseList = new ArrayList<>();
+			for (CommandType cmd : CommandType.values()) {
+				String suggestion = cmd.toString().toLowerCase();
+				if (cmd.equals(CommandType.ADMIN)) {
+					// Suggest admin command if any sub-command permissions are valid
+					for (AdminCommandType subcmd : AdminCommandType.values()) {
+						if (sender.hasPermission(subcmd.permission()) && !baseList.contains(suggestion)) {
+							baseList.add(suggestion);
+						}
+					}
+				} else if (sender.hasPermission(cmd.permission())) {
+					// Suggest command if permission is valid
+					baseList.add(suggestion);
+				}
+			}
+			// Trim down completion options based on current input
+			StringUtil.copyPartialMatches(args[0], baseList, tabList);
+			Collections.sort(tabList);
+		} else if (args.length >= 1){
+			//Get command type. If args[0] is not a command, defaults to HELP
+			CommandType commandArg = CommandType.getCommand(args[0]);
+			// Handle admin commands differently from normal commands
+			if (commandArg.equals(CommandType.ADMIN)) {
+				// Command is an admin command
+				// TODO change this
+				tabList.addAll(new AdminCommand(konquest, sender, args).tabComplete());
+			} else if (sender.hasPermission(commandArg.permission())) {
+				// Command is a normal command and has permission
+				// Tab-Complete command
+				tabList.addAll(commandArg.command().tabComplete(konquest, sender, args));
+			}
+		}
         return tabList;
 	}
-	
-	
+
 }

@@ -207,6 +207,16 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public void disable() {
 		integrationManager.disable();
+		sanctuaryManager.saveSanctuaries();
+		kingdomManager.saveKingdoms();
+		campManager.saveCamps();
+		ruinManager.saveRuins();
+		ruinManager.regenAllRuins();
+		ruinManager.removeAllGolems();
+		kingdomManager.removeAllRabbits();
+		configManager.saveConfigs();
+		databaseThread.flushDatabase();
+		databaseThread.getDatabase().getDatabaseConnection().disconnect();
 	}
 	
 	private void initVersionHandlers() {

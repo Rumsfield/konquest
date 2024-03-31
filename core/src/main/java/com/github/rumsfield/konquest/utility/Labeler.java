@@ -28,7 +28,7 @@ public class Labeler {
     }
 
     public static String lookup(KonquestTerritoryType type) {
-        switch(type) {
+        switch (type) {
             case WILD:
                 return MessagePath.TERRITORY_WILD.getMessage();
             case CAPITAL:
@@ -45,16 +45,6 @@ public class Labeler {
                 break;
         }
         return "";
-    }
-
-    public static String format(CommandType type) {
-        String cmdArgsFormatted = type.arguments()
-                .replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA)
-                .replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA)
-                .replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA)
-                .replaceAll("]", ChatColor.GRAY+"]"+ChatColor.AQUA)
-                .replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
-        return ChatColor.GOLD+"/k "+type.toString().toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted;
     }
 
     public static String format(AdminCommandType type) {

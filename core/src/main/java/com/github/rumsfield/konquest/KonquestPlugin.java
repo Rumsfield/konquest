@@ -9,6 +9,7 @@ import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
@@ -88,16 +89,6 @@ public class KonquestPlugin extends JavaPlugin {
 	public void onDisable() {
 		if(enableSuccess) {
 			konquest.disable();
-			konquest.getSanctuaryManager().saveSanctuaries();
-			konquest.getKingdomManager().saveKingdoms();
-			konquest.getCampManager().saveCamps();
-			konquest.getRuinManager().saveRuins();
-			konquest.getRuinManager().regenAllRuins();
-			konquest.getRuinManager().removeAllGolems();
-			konquest.getKingdomManager().removeAllRabbits();
-			konquest.getConfigManager().saveConfigs();
-			konquest.getDatabaseThread().flushDatabase();
-			konquest.getDatabaseThread().getDatabase().getDatabaseConnection().disconnect();
 		}
 	}
 	
@@ -107,8 +98,9 @@ public class KonquestPlugin extends JavaPlugin {
 
 	private void registerListeners() {
 		// Set command executors
-		getCommand("konquest").setExecutor(konquest.getCommandHandler());
-		getCommand("k").setExecutor(konquest.getCommandHandler());
+		PluginCommand konquestCommand = getCommand("konquest");
+		assert konquestCommand != null;
+		konquestCommand.setExecutor(konquest.getCommandHandler());
 		// Register event listeners
 		pluginManager.registerEvents(new PlayerListener(this), this);
 		pluginManager.registerEvents(new EntityListener(this), this);
@@ -167,7 +159,7 @@ public class KonquestPlugin extends JavaPlugin {
         return true;
     }
 
-	private void printLogo() {
+	public static void printLogo() {
 //		String color1 = ChatUtil.parseHex("#FFA000");
 //		String color2 = ChatUtil.parseHex("#FFB020");
 //		String color3 = ChatUtil.parseHex("#FFC040");

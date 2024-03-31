@@ -31,13 +31,12 @@ loadbefore:
   - SmoothTimber
 commands:
   konquest:
-    description: Base Konquest command
-    usage: /<command> [sub-command] [arguments]
+    description: Base command, displays help menu
+    aliases: k
     permission: konquest.command
-  k:
-    description: Display help menu
-    usage: /<command> [sub-command] [arguments]
-    permission: konquest.command
+    permission-message: You do not have the base command permission "konquest.command".
+    usage: "/<command> [sub-command] [arguments]"
+
 permissions:
   konquest.*:
     description: Gives access to all Konquest permissions
