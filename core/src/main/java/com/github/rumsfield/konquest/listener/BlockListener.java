@@ -517,7 +517,10 @@ public class BlockListener implements Listener {
 	 * Fires when blocks are placed.
 	 * Prevent placing blocks inside protected territories.
 	 * Check for barbarian bed placement.
+	 * Player#setBedSpawnLocation is deprecated, but keep using it
+	 * for backwards compatibility to 1.16.
 	 */
+	@SuppressWarnings( "deprecation" )
 	@EventHandler(priority = EventPriority.LOWEST)
     public void onBlockPlace(BlockPlaceEvent event) {
 		if(event.isCancelled()) {
