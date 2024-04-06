@@ -644,7 +644,7 @@ public class BlockListener implements Listener {
 							return;
 						}
 						// Check for enemy player
-						if(playerRole.equals(KonquestRelationshipType.ENEMY)) {
+						if (playerRole.equals(KonquestRelationshipType.ENEMY)) {
 							// The player is an enemy and may edit blocks
 							// Check for capital capture conditions
 							if(isCapital && territory.getKingdom().isCapitalImmune()) {
@@ -676,7 +676,7 @@ public class BlockListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
-						} if(playerRole.equals(KonquestRelationshipType.ALLY)) {
+						} else if(playerRole.equals(KonquestRelationshipType.ALLY)) {
 							// Player is in an allied kingdom
 							// Can place blocks if town option Allied Building is true.
 							if(isAlliedBuildingEnable) {
