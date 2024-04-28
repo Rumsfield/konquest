@@ -7,6 +7,8 @@ import org.bukkit.Material;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
+
 public enum CommandType {
 //	HELP    (Material.LANTERN,          "konquest.command.help",    "h",  new CommandArgumentStructure("[<page>]"),                                                       MessagePath.DESCRIPTION_HELP.getMessage()),
 //	INFO    (Material.SPRUCE_SIGN,      "konquest.command.info",    "i",  new CommandArgumentStructure("[player|kingdom|capital|town|ruin|sanctuary <name>]"),            MessagePath.DESCRIPTION_INFO.getMessage()),
@@ -84,16 +86,16 @@ public enum CommandType {
 		return alias;
 	}
 
-	public String arguments() {
-		return command.getFullArgumentString();
-	}
-
-	public String usage() {
-		return command.getUsageString();
-	}
-
 	public boolean isSenderAllowed(CommandSender sender) {
 		return command.isSenderAllowed(sender);
+	}
+
+	public String baseUsage() {
+		return command.getBaseUsage();
+	}
+
+	public List<String> argumentUsage() {
+		return command.getArgumentUsage();
 	}
 	
 	/**

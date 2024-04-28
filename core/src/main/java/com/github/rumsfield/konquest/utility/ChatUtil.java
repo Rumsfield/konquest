@@ -260,11 +260,18 @@ public class ChatUtil {
 		// Second, format the hex value into a string
 		return "#"+Integer.toHexString(hexVal);
 	}
-	
+
 	public static void printDebug(String message) {
+		printDebug(message, false);
+	}
+
+	public static void printDebug(String message, boolean showStack) {
 		if(Konquest.getInstance().getCore().getBoolean(CorePath.DEBUG.getPath())) {
         	Bukkit.getServer().getConsoleSender().sendMessage("[Konquest DEBUG] " + message);
         }
+		if(showStack) {
+			showDebugStackTrace();
+		}
 	}
 	
 	public static void printConsole(String message) {

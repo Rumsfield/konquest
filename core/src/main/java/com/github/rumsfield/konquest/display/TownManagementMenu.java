@@ -462,58 +462,26 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         int pageRows = 1;
         pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
 
-        // Allied Building Info Icon
-        boolean isAlliedBuildingEnable = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
-        currentValue = DisplayManager.boolean2Lang(town.isAlliedBuildingAllowed())+" "+DisplayManager.boolean2Symbol(town.isAlliedBuildingAllowed());
-        loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_ALLIED_BUILDING.getMessage()));
-        loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
-        if(isAlliedBuildingEnable) {
-            loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-        } else {
-            loreList.add(alertColor+MessagePath.LABEL_DISABLED.getMessage());
+        // All town options
+        int iconIndex = 1;
+        for (KonTownOption townOption : KonTownOption.values()) {
+            boolean isOptionEnabled = true;
+            // Special option checks
+            if (townOption.equals(KonTownOption.ALLIED_BUILDING)) {
+                isOptionEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
+            }
+            // Try to add icon
+            if (isOptionEnabled) {
+                boolean val = town.getTownOption(townOption);
+                currentValue = DisplayManager.boolean2Lang(val) + " " + DisplayManager.boolean2Symbol(val);
+                loreList = new ArrayList<>(Konquest.stringPaginate(townOption.getDescription()));
+                loreList.add(loreColor + MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor + currentValue));
+                loreList.add(hintColor + MessagePath.MENU_OPTIONS_HINT.getMessage());
+                option = new OptionIcon(townOption, loreColor + townOption.getName(), loreList, townOption.getDisplayMaterial(), iconIndex);
+                pages.get(pageNum).addIcon(option);
+                iconIndex++;
+            }
         }
-        option = new OptionIcon(OptionIcon.optionAction.TOWN_ALLIED_BUILDING, loreColor+MessagePath.LABEL_ALLIED_BUILDING.getMessage(), loreList, Material.BRICK_STAIRS, 1);
-        pages.get(pageNum).addIcon(option);
-
-        // Open Info Icon
-        currentValue = DisplayManager.boolean2Lang(town.isOpen())+" "+DisplayManager.boolean2Symbol(town.isOpen());
-        loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_OPEN.getMessage()));
-        loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
-        loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-        option = new OptionIcon(OptionIcon.optionAction.TOWN_OPEN, loreColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.DARK_OAK_DOOR, 2);
-        pages.get(pageNum).addIcon(option);
-
-        // Plot Only Info Icon
-        currentValue = DisplayManager.boolean2Lang(town.isPlotOnly())+" "+DisplayManager.boolean2Symbol(town.isPlotOnly());
-        loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_PLOT.getMessage()));
-        loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
-        loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-        option = new OptionIcon(OptionIcon.optionAction.TOWN_PLOT_ONLY, loreColor+MessagePath.LABEL_PLOT.getMessage(), loreList, Material.DIAMOND_SHOVEL, 3);
-        pages.get(pageNum).addIcon(option);
-
-        // Friendly Redstone Info Icon
-        currentValue = DisplayManager.boolean2Lang(town.isFriendlyRedstoneAllowed())+" "+DisplayManager.boolean2Symbol(town.isFriendlyRedstoneAllowed());
-        loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_FRIENDLY_REDSTONE.getMessage()));
-        loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
-        loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-        option = new OptionIcon(OptionIcon.optionAction.TOWN_FRIENDLY_REDSTONE, loreColor+MessagePath.LABEL_FRIENDLY_REDSTONE.getMessage(), loreList, Material.LEVER, 4);
-        pages.get(pageNum).addIcon(option);
-
-        // Redstone Info Icon
-        currentValue = DisplayManager.boolean2Lang(town.isEnemyRedstoneAllowed())+" "+DisplayManager.boolean2Symbol(town.isEnemyRedstoneAllowed());
-        loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_REDSTONE.getMessage()));
-        loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
-        loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-        option = new OptionIcon(OptionIcon.optionAction.TOWN_REDSTONE, loreColor+MessagePath.LABEL_ENEMY_REDSTONE.getMessage(), loreList, Material.REDSTONE, 5);
-        pages.get(pageNum).addIcon(option);
-
-        // Golem Offensive Info Icon
-        currentValue = DisplayManager.boolean2Lang(town.isGolemOffensive())+" "+DisplayManager.boolean2Symbol(town.isGolemOffensive());
-        loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.MENU_OPTIONS_GOLEM.getMessage()));
-        loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
-        loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-        option = new OptionIcon(OptionIcon.optionAction.TOWN_GOLEM, loreColor+MessagePath.LABEL_GOLEM_OFFENSE.getMessage(), loreList, Material.IRON_SWORD, 6);
-        pages.get(pageNum).addIcon(option);
 
         result = pages.get(currentPage);
         return result;
@@ -703,7 +671,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                 case B_OPTIONS:
                     if(clickedIcon instanceof OptionIcon) {
                         OptionIcon icon = (OptionIcon)clickedIcon;
-                        boolean status = manager.changeTownOption(icon.getAction(), town, player.getBukkitPlayer());
+                        boolean status = manager.changeTownOption(icon.getOption(), town, player.getBukkitPlayer());
                         playStatusSound(player.getBukkitPlayer(),status);
                         result = goToOptionsView();
                     }

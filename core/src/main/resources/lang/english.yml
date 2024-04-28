@@ -552,6 +552,13 @@ command:
   favor:
     notice:
       message: "You have %s Favor, costs are..."
+      cost-spy: "Spy"
+      cost-travel: "Travel"
+      cost-claim: "Claim"
+      cost-town-settle: "Town Settle"
+      cost-town-rename: "Town Rename"
+      cost-kingdom-create: "Kingdom Create"
+      cost-kingdom-rename: "Kingdom Rename"
   help:
     notice:
       message: "Help - Command, Arguments, Description, Alias"
@@ -589,10 +596,12 @@ command:
       request-received: "New kingdom join request, type \"/k kingdom\" to review."
       request-declined: "Denied kingdom join request for player %s."
       request-pending: "Players requested to join your kingdom. Use \"/k kingdom\", then choose Requests to respond."
+      request-list: "These players have requested to join your kingdom:"
       invite-sent: "Invited %s to join the kingdom."
       invite-received: "Received kingdom invite, type \"/k kingdom\" to respond."
       invite-declined: "Declined invitation to join %s."
       invite-pending: "You have pending invites to join kingdoms. Use \"/k kingdom\", then choose Invites to respond."
+      invite-list: "These kingdoms have invited you to join:"
       exile: "You are now exiled from %s as a barbarian."
       exile-stats: "Removed all stats from exile!"
       exile-favor: "Removed all favor from exile!"
@@ -601,8 +610,10 @@ command:
       discount: "The Kingdom of %s gives you a %s percent discount with this merchant."
       open: "Kingdom is now open to join."
       closed: "Kingdom is now closed for invites only."
+      template-current: "The Kingdom Monument Template is %s."
       template: "Updated the Kingdom Monument Template to %s."
       pay: "Received kingdom payment."
+      diplomacy-current: "Your kingdom's diplomacy relationship to the Kingdom of %s is %s."
       diplomacy-sent: "Sent diplomacy request to the Kingdom of %s."
       diplomacy-pending: "Your kingdom has pending diplomacy requests. Use \"/k kingdom\", then choose Relationships to respond."
       web-color-show: "The Kingdom of %s has a web map color of: %s"
@@ -627,7 +638,10 @@ command:
       exile-cooldown: "Wait before exile to barbarian: %s"
       merchant: "Cannot trade with merchants in the Kingdom of %s, need Trade or Allied diplomacy."
       diplomacy-exists: "A request to change diplomacy already exists."
+      diplomacy-peaceful: "Cannot change the diplomacy relationships of peaceful kingdoms."
+      diplomacy-invalid: "This diplomacy relationship is not available, or already active."
       template-attack: "Cannot change monument template while the Kingdom Capital is under attack."
+      template-chosen: "This monument template has already been chosen for the Kingdom."
       web-color-invalid: "Invalid color, must match a color name or hex code starting with #"
   list:
     notice:
@@ -703,6 +717,9 @@ command:
       knight-clear: "%s is no longer a Knight in %s."
       rename: "Lord %s has renamed the Town of %s to %s."
       no-lord: "%s is abandoned! Use \"/k town %s lord\" to claim Lordship."
+      shield-list: "%s remaining shields for the town of %s."
+      armor-list: "%s remaining armor blocks for the town of %s."
+      specialize-list: "%s Town specialization is %s."
       specialize: "Successfully changed %s Town specialization to %s."
       new-resident: "%s has joined as a town resident of %s."
       leave-resident: "%s has left the town of %s."
@@ -710,10 +727,13 @@ command:
       request-received: "New town join request, type \"/k town\" to review."
       request-declined: "Denied town join request for player %s."
       request-pending: "Players want to become residents of your towns. Use \"/k town\" command to respond."
+      request-town-list: "These towns have new residents requesting to join:"
+      request-player-list: "These players have requested to join the Town of %s:"
       invite-sent: "Invited %s to join the town of %s."
       invite-received: "Received town invite, type \"/k town\" to respond."
       invite-declined: "Declined invitation to join %s."
       invite-pending: "You have pending invites to join towns. Use \"/k town\" command to respond."
+      invite-list: "These towns have invited you to join:"
     error:
       kick-fail: "%s is not a resident of %s."
       knight-resident: "Knights must be added as residents first."
@@ -726,6 +746,7 @@ command:
       kicked: "You have been kicked from the town of %s."
       promote-knight: "%s is already a Knight."
       demote-resident: "%s is already a resident."
+      upgrade-unavailable: "Upgrade %s is unavailable for the town of %s."
   travel:
     notice:
       town-travel: "%s has traveled to %s."

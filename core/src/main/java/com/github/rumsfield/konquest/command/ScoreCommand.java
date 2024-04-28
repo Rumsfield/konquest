@@ -13,94 +13,100 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class ScoreCommand extends CommandBase {
 
-	public ScoreCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public ScoreCommand() {
+		// Define name and sender support
+		super("score",true, false);
+		// None
+		setOptionalArgs(true);
+		// [all]
+		addArgument(
+				newArg("all",true,false)
+		);
+		// <player>
+		addArgument(
+				newArg("player",false,false)
+		);
     }
-	
-	public void execute() {
-		// k score [<player>|all]
+
+	@Override
+	public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		// Sender must be player
+		KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
+		if (player == null) {
+			sendInvalidSenderMessage(sender);
+			return;
+		}
 		// do not score peaceful kingdoms or barbarians
-		Player bukkitPlayer = (Player) getSender();
-    	if (getArgs().length != 1 && getArgs().length != 2) {
-			sendInvalidArgMessage(bukkitPlayer,CommandType.SCORE);
+		Player bukkitPlayer = player.getBukkitPlayer();
+		KonKingdom kingdom = player.getKingdom();
+		int kingdomScore;
+		int playerScore;
+		if(args.isEmpty()) {
+			// Display player's own score GUI
+			if(player.isBarbarian()) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
+			} else if(kingdom.isPeaceful()) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdom.getName()));
+			} else {
+				kingdomScore = konquest.getKingdomManager().getKingdomScore(kingdom);
+				playerScore = konquest.getKingdomManager().getPlayerScore(player);
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SCORE_NOTICE_SCORE.getMessage(playerScore,kingdom.getName(),kingdomScore));
+				// Display Score GUI
+				konquest.getDisplayManager().displayScoreMenu(player, player);
+			}
 		} else {
-        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-    			ChatUtil.printDebug("Failed to find non-existent player");
-    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-    			return;
-    		}
-        	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-        	KonKingdom kingdom = player.getKingdom();
-        	int kingdomScore;
-        	int playerScore;
-        	if(getArgs().length == 1) {
-        		// Display player's own score GUI
-        		if(player.isBarbarian()) {
-        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
-        		} else if(kingdom.isPeaceful()) {
-        			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdom.getName()));
-        		} else {
-        			kingdomScore = getKonquest().getKingdomManager().getKingdomScore(kingdom);
-        			playerScore = getKonquest().getKingdomManager().getPlayerScore(player);
-        			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SCORE_NOTICE_SCORE.getMessage(playerScore,kingdom.getName(),kingdomScore));
-        			// Display Score GUI
-        			getKonquest().getDisplayManager().displayScoreMenu(player, player);
-        		}
-        	} else if(getArgs()[1].equalsIgnoreCase("all")) {
-        		// Score all Kingdoms
-            	ChatUtil.sendNotice(bukkitPlayer, ChatColor.GOLD+MessagePath.COMMAND_SCORE_NOTICE_ALL_HEADER.getMessage());
-        		for(KonKingdom allKingdom : getKonquest().getKingdomManager().getKingdoms()) {
-        			if(!kingdom.isPeaceful()) {
-	        			int score = getKonquest().getKingdomManager().getKingdomScore(allKingdom);
-						String color = ""+getKonquest().getDisplaySecondaryColor(player.getKingdom(),allKingdom);
-	        			ChatUtil.sendMessage(bukkitPlayer, color+allKingdom.getName()+ChatColor.GOLD+": "+ChatColor.DARK_PURPLE+score);
-        			}
-        		}
-        	} else {
-        		String playerName = getArgs()[1];
-        		// Verify player exists
-            	KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
-            	if(offlinePlayer == null) {
-            		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
-                    return;
-            	}
-            	kingdom = offlinePlayer.getKingdom();
-            	String offlinePlayerName = offlinePlayer.getOfflineBukkitPlayer().getName();
-            	if(offlinePlayer.isBarbarian()) {
-        			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(offlinePlayerName));
-        		} else if(kingdom.isPeaceful()) {
-        			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdom.getName()));
-        		} else {
-        			kingdomScore = getKonquest().getKingdomManager().getKingdomScore(kingdom);
-        			playerScore = getKonquest().getKingdomManager().getPlayerScore(offlinePlayer);
-        			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SCORE_NOTICE_PLAYER.getMessage(offlinePlayerName,playerScore,kingdom.getName(),kingdomScore));
-        			// Display Score GUI
-        			getKonquest().getDisplayManager().displayScoreMenu(player, offlinePlayer);
-        		}
-        	}
-        }
+			if (args.get(0).equalsIgnoreCase("all")) {
+				// Score all Kingdoms
+				ChatUtil.sendNotice(bukkitPlayer, ChatColor.GOLD + MessagePath.COMMAND_SCORE_NOTICE_ALL_HEADER.getMessage());
+				for (KonKingdom allKingdom : konquest.getKingdomManager().getKingdoms()) {
+					if (!kingdom.isPeaceful()) {
+						int score = konquest.getKingdomManager().getKingdomScore(allKingdom);
+						String color = "" + konquest.getDisplaySecondaryColor(player.getKingdom(), allKingdom);
+						ChatUtil.sendMessage(bukkitPlayer, color + allKingdom.getName() + ChatColor.GOLD + ": " + ChatColor.DARK_PURPLE + score);
+					}
+				}
+			} else {
+				String playerName = args.get(0);
+				// Verify player exists
+				KonOfflinePlayer offlinePlayer = konquest.getPlayerManager().getOfflinePlayerFromName(playerName);
+				if (offlinePlayer == null) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(playerName));
+					return;
+				}
+				kingdom = offlinePlayer.getKingdom();
+				String offlinePlayerName = offlinePlayer.getOfflineBukkitPlayer().getName();
+				if (offlinePlayer.isBarbarian()) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(offlinePlayerName));
+				} else if (kingdom.isPeaceful()) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdom.getName()));
+				} else {
+					kingdomScore = konquest.getKingdomManager().getKingdomScore(kingdom);
+					playerScore = konquest.getKingdomManager().getPlayerScore(offlinePlayer);
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SCORE_NOTICE_PLAYER.getMessage(offlinePlayerName, playerScore, kingdom.getName(), kingdomScore));
+					// Display Score GUI
+					konquest.getDisplayManager().displayScoreMenu(player, offlinePlayer);
+				}
+			}
+		}
+		
 	}
 	
 	@Override
-	public List<String> tabComplete() {
-		// k score [<player>|all]
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		List<String> tabList = new ArrayList<>();
-		final List<String> matchedTabList = new ArrayList<>();
-		tabList.add("all");
-		List<String> playerList = new ArrayList<>();
-		for(OfflinePlayer bukkitOfflinePlayer : getKonquest().getPlayerManager().getAllOfflinePlayers()) {
-			playerList.add(bukkitOfflinePlayer.getName());
+		// Give suggestions
+		if(args.size() == 1) {
+			tabList.add("all");
+			for(OfflinePlayer bukkitOfflinePlayer : konquest.getPlayerManager().getAllOfflinePlayers()) {
+				tabList.add(bukkitOfflinePlayer.getName());
+			}
 		}
-		tabList.addAll(playerList);
-		// Trim down completion options based on current input
-		StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);
-		Collections.sort(matchedTabList);
-		
-		return matchedTabList;
+		return matchLastArgToList(tabList,args);
 	}
 }

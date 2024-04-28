@@ -19,7 +19,7 @@ public class KonquestCommand extends CommandBase{
     }
 
 	@Override
-    public void execute(Konquest konquest, CommandSender sender, String[] args) {
+    public void execute(Konquest konquest, CommandSender sender, List<String> args) {
 		// Display help GUI menu to players.
 		// Display logo and tip for console.
 		if (sender instanceof Player) {
@@ -33,7 +33,7 @@ public class KonquestCommand extends CommandBase{
     }
     
     @Override
-	public List<String> tabComplete(Konquest konquest, CommandSender sender, String[] args) {
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		// No arguments to complete
 		return Collections.emptyList();
 	}

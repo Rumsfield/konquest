@@ -8,55 +8,87 @@ import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class ChatCommand extends CommandBase {
 
-	public ChatCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public ChatCommand() {
+		// Define name and sender support
+		super("chat",true, false);
+		// None
+		setOptionalArgs(true);
+		// [global|kingdom]
+		List<String> argNames = Arrays.asList("global", "kingdom");
+		addArgument(
+				newArg(argNames,true,false)
+		);
     }
-	
-	public void execute() {
-		// k chat
-		Player bukkitPlayer = (Player) getSender();
-    	if (getArgs().length != 1) {
-			sendInvalidArgMessage(bukkitPlayer,CommandType.CHAT);
+
+	@Override
+	public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		// Sender must be player
+		KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
+		if (player == null) {
+			sendInvalidSenderMessage(sender);
 			return;
 		}
-		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-			ChatUtil.printDebug("Failed to find non-existent player");
-			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-			return;
-		}
-		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-		assert player != null;
-		boolean isChatFormatEnabled = getKonquest().getCore().getBoolean(CorePath.CHAT_ENABLE_FORMAT.getPath(),true);
-		if(!isChatFormatEnabled) {
+
+		// Check for disabled feature
+		boolean isChatFormatEnabled = konquest.getCore().getBoolean(CorePath.CHAT_ENABLE_FORMAT.getPath(),true);
+		if (!isChatFormatEnabled) {
 			// Chat formatting is disabled, so kingdom chat is unavailable
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			player.setIsGlobalChat(true);
 		}
-		if(!player.isBarbarian()) {
+		// Check for barbarian player (no kingdom)
+		if (player.isBarbarian()) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
+		}
+
+		if (args.isEmpty()) {
+			// Toggle between chats
 			if(player.isGlobalChat()) {
-				//ChatUtil.sendNotice(bukkitPlayer, "Chat mode: Kingdom");
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CHAT_NOTICE_ENABLE.getMessage());
+				// Kingdom Chat
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_CHAT_NOTICE_ENABLE.getMessage());
 				player.setIsGlobalChat(false);
 			} else {
-				//ChatUtil.sendNotice(bukkitPlayer, "Chat mode: Global");
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CHAT_NOTICE_DISABLE.getMessage());
+				// Global Chat
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_CHAT_NOTICE_DISABLE.getMessage());
 				player.setIsGlobalChat(true);
 			}
 		} else {
-			//ChatUtil.sendError(bukkitPlayer, "Cannot use Kingdom chat as Barbarian");
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
+			// Set specific chat mode
+			String chatMode = args.get(0);
+			switch (chatMode.toLowerCase()) {
+				case "kingdom":
+					// Kingdom Chat
+					ChatUtil.sendNotice(sender, MessagePath.COMMAND_CHAT_NOTICE_ENABLE.getMessage());
+					player.setIsGlobalChat(false);
+					break;
+				case "global":
+					// Global Chat
+					ChatUtil.sendNotice(sender, MessagePath.COMMAND_CHAT_NOTICE_DISABLE.getMessage());
+					player.setIsGlobalChat(true);
+					break;
+				default:
+					sendInvalidArgMessage(sender);
+					return;
+			}
 		}
 
 	}
 
 	@Override
-	public List<String> tabComplete() {
-		// No arguments to complete
-		return Collections.emptyList();
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
+		List<String> tabList = new ArrayList<>();
+		// Give suggestions
+		if(args.size() == 1) {
+			tabList.add("global");
+			tabList.add("kingdom");
+		}
+		return matchLastArgToList(tabList,args);
 	}
 }

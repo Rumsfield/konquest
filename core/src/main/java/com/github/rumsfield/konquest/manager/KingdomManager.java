@@ -6,7 +6,6 @@ import com.github.rumsfield.konquest.api.event.player.KonquestPlayerExileEvent;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerKingdomEvent;
 import com.github.rumsfield.konquest.api.manager.KonquestKingdomManager;
 import com.github.rumsfield.konquest.api.model.*;
-import com.github.rumsfield.konquest.display.icon.OptionIcon.optionAction;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
 import com.github.rumsfield.konquest.model.KonPlayerScoreAttributes.KonPlayerScoreAttribute;
@@ -1630,11 +1629,21 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 
 	// Get all kingdoms that have invited the player to join
-	public List<KonKingdom> getInviteKingdoms(KonPlayer player) {
+	public List<KonKingdom> getInviteKingdoms(KonOfflinePlayer player) {
 		List<KonKingdom> result = new ArrayList<>();
 		for(KonKingdom kingdom : kingdomMap.values()) {
-			if(!player.getKingdom().equals(kingdom) && kingdom.isJoinInviteValid(player.getBukkitPlayer().getUniqueId())) {
+			if(!player.getKingdom().equals(kingdom) && kingdom.isJoinInviteValid(player.getOfflineBukkitPlayer().getUniqueId())) {
 				result.add(kingdom);
+			}
+		}
+		return result;
+	}
+
+	public List<String> getInviteKingdomNames(KonOfflinePlayer player) {
+		List<String> result = new ArrayList<>();
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			if(!player.getKingdom().equals(kingdom) && kingdom.isJoinInviteValid(player.getOfflineBukkitPlayer().getUniqueId())) {
+				result.add(kingdom.getName());
 			}
 		}
 		return result;
@@ -1646,6 +1655,37 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		for(KonTown town : player.getKingdom().getCapitalTowns()) {
 			if(!town.isPlayerResident(player.getOfflineBukkitPlayer()) && town.isJoinInviteValid(player.getOfflineBukkitPlayer().getUniqueId())) {
 				result.add(town);
+			}
+		}
+		return result;
+	}
+
+	public List<String> getInviteTownNames(KonOfflinePlayer player) {
+		List<String> result = new ArrayList<>();
+		for(KonTown town : player.getKingdom().getCapitalTowns()) {
+			if(!town.isPlayerResident(player.getOfflineBukkitPlayer()) && town.isJoinInviteValid(player.getOfflineBukkitPlayer().getUniqueId())) {
+				result.add(town.getName());
+			}
+		}
+		return result;
+	}
+
+	// Get all towns within the player's kingdom that have requests to join by other players
+	public List<KonTown> getRequestTowns(KonOfflinePlayer player) {
+		List<KonTown> result = new ArrayList<>();
+		for(KonTown town : getManageTowns(player)) {
+			if(town.getJoinRequests().size() > 0) {
+				result.add(town);
+			}
+		}
+		return result;
+	}
+
+	public List<String> getRequestTownNames(KonOfflinePlayer player) {
+		List<String> result = new ArrayList<>();
+		for(KonTown town : getManageTowns(player)) {
+			if(town.getJoinRequests().size() > 0) {
+				result.add(town.getName());
 			}
 		}
 		return result;
@@ -1754,6 +1794,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			return false;
 		}
+		// Check template is not the current choice
+		if(kingdom.getMonumentTemplate().equals(template)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_TEMPLATE_CHOSEN.getMessage());
+			return false;
+		}
 		// Check capital is not under attack
 		if(kingdom.getCapital().isAttacked()) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_TEMPLATE_ATTACK.getMessage());
@@ -1854,7 +1899,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 		// Check for valid relation change given current states
 		if(!isValidRelationChoice(kingdom, otherKingdom, relation)) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_INVALID.getMessage());
 			return false;
 		}
 
@@ -3132,109 +3177,101 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	/**
 	 * Updates a town option based on action
-	 * @param action - The action to perform
+	 * @param option - The option to change
 	 * @param town - The town to update
 	 * @param bukkitPlayer - the player who is performing the action
 	 * @return true if action was successful
 	 */
-	public boolean changeTownOption(optionAction action, KonTown town, Player bukkitPlayer) {
-		boolean result = false;
-		switch(action) {
-			case TOWN_OPEN:
-				if(town.isOpen()) {
+	public boolean changeTownOption(KonTownOption option, KonTown town, Player bukkitPlayer) {
+		boolean result;
+		boolean currentValue = town.getTownOption(option);
+		if (currentValue) {
+			// Set to false
+			result = setTownOption(option, town, bukkitPlayer, false);
+		} else {
+			// Set to true
+			result = setTownOption(option, town, bukkitPlayer, true);
+		}
+		return result;
+	}
+
+	public boolean setTownOption(KonTownOption option, KonTown town, Player bukkitPlayer, boolean value) {
+		// Check for disabled options
+		if (option.equals(KonTownOption.ALLIED_BUILDING)) {
+			boolean isAlliedBuildingEnable = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
+			if(!isAlliedBuildingEnable) {
+				// Cannot set this option
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+				return false;
+			}
+		}
+		// Set option
+		boolean result = town.setTownOption(option, value);
+		// Display messages
+		String statusMessage = "";
+		switch(option) {
+			case OPEN:
+				if(!value) {
 					// Close the town
-            		town.setIsOpen(false);
-            		for(OfflinePlayer resident : town.getPlayerResidents()) {
-		    			if(resident.isOnline()) {
-		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_CLOSE.getMessage(town.getName()));
-		    			}
-		    		}
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_CLOSE.getMessage(town.getName());
 				} else {
 					// Open the town
-					town.setIsOpen(true);
-            		for(OfflinePlayer resident : town.getPlayerResidents()) {
-		    			if(resident.isOnline()) {
-		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_OPEN.getMessage(town.getName()));
-		    			}
-		    		}
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_OPEN.getMessage(town.getName());
 				}
-				result = true;
 				break;
-			case TOWN_PLOT_ONLY:
-				if(town.isPlotOnly()) {
+			case PLOTS_ONLY:
+				if(!value) {
 					// Disable plot only mode
-					town.setIsPlotOnly(false);
-					for(OfflinePlayer resident : town.getPlayerResidents()) {
-		    			if(resident.isOnline()) {
-		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_PLOT_DISABLE.getMessage(town.getName()));
-		    			}
-		    		}
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_PLOT_DISABLE.getMessage(town.getName());
 				} else {
 					// Enable plot only mode
-					town.setIsPlotOnly(true);
-					for(OfflinePlayer resident : town.getPlayerResidents()) {
-		    			if(resident.isOnline()) {
-		    				ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_PLOT_ENABLE.getMessage(town.getName()));
-		    			}
-		    		}
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_PLOT_ENABLE.getMessage(town.getName());
 				}
-				result = true;
 				break;
-			case TOWN_ALLIED_BUILDING:
-				boolean isAlliedBuildingEnable = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
-				if(isAlliedBuildingEnable) {
-					if(town.isAlliedBuildingAllowed()) {
-						// Disable allied building
-						town.setIsAlliedBuildingAllowed(false);
-						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_ALLIED_BUILDING_DISABLE.getMessage(town.getName()));
-					} else {
-						// Enable allied building
-						town.setIsAlliedBuildingAllowed(true);
-						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_ALLIED_BUILDING_ENABLE.getMessage(town.getName()));
-					}
-					result = true;
+			case ALLIED_BUILDING:
+				if(!value) {
+					// Disable allied building
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_ALLIED_BUILDING_DISABLE.getMessage(town.getName());
 				} else {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+					// Enable allied building
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_ALLIED_BUILDING_ENABLE.getMessage(town.getName());
 				}
 				break;
-			case TOWN_FRIENDLY_REDSTONE:
-				if(town.isFriendlyRedstoneAllowed()) {
+			case FRIENDLY_REDSTONE:
+				if(!value) {
 					// Disable friendly redstone
-					town.setIsFriendlyRedstoneAllowed(false);
-					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_FRIENDLY_REDSTONE_DISABLE.getMessage(town.getName()));
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_FRIENDLY_REDSTONE_DISABLE.getMessage(town.getName());
 				} else {
 					// Enable friendly redstone
-					town.setIsFriendlyRedstoneAllowed(true);
-					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_FRIENDLY_REDSTONE_ENABLE.getMessage(town.getName()));
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_FRIENDLY_REDSTONE_ENABLE.getMessage(town.getName());
 				}
-				result = true;
 				break;
-			case TOWN_REDSTONE:
-				if(town.isEnemyRedstoneAllowed()) {
+			case ENEMY_REDSTONE:
+				if(!value) {
 					// Disable enemy redstone
-            		town.setIsEnemyRedstoneAllowed(false);
-            		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_DISABLE.getMessage(town.getName()));
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_DISABLE.getMessage(town.getName());
 				} else {
 					// Enable enemy redstone
-					town.setIsEnemyRedstoneAllowed(true);
-					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_ENABLE.getMessage(town.getName()));
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_REDSTONE_ENABLE.getMessage(town.getName());
 				}
-				result = true;
 				break;
-			case TOWN_GOLEM:
-				if(town.isGolemOffensive()) {
+			case GOLEM_OFFENSE:
+				if(!value) {
 					// Disable golem offense
-            		town.setIsGolemOffensive(false);
-            		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_GOLEM_DISABLE.getMessage(town.getName()));
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_GOLEM_DISABLE.getMessage(town.getName());
 				} else {
 					// Enable golem offense
-					town.setIsGolemOffensive(true);
-					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_GOLEM_ENABLE.getMessage(town.getName()));
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_GOLEM_ENABLE.getMessage(town.getName());
 				}
-				result = true;
 				break;
 			default:
+				statusMessage = MessagePath.GENERIC_ERROR_INTERNAL.getMessage();
 				break;
+		}
+		for(OfflinePlayer resident : town.getPlayerResidents()) {
+			if(resident.isOnline()) {
+				ChatUtil.sendNotice((Player) resident, statusMessage);
+			}
 		}
 		return result;
 	}

@@ -212,6 +212,11 @@ public class KonquestPlugin extends JavaPlugin {
 	/*
 	 * Economy wrapper functions. Attempt to use Vault API methods, and then try depreciated methods if those fail.
 	 */
+
+	public static String getCurrencyFormat(double amount) {
+		return econ.format(amount);
+	}
+
 	@SuppressWarnings("deprecation")
 	public static double getBalance(OfflinePlayer offlineBukkitPlayer) {
 		double result;

@@ -150,6 +150,17 @@ public class ShieldManager implements KonquestShieldManager {
 		}
 		return result;
 	}
+
+	public KonArmor getArmor(String id) {
+		KonArmor result = null;
+		for(KonArmor armor : armors) {
+			if(armor.getId().equalsIgnoreCase(id)) {
+				result = armor;
+				break;
+			}
+		}
+		return result;
+	}
 	
 	public boolean isShieldsEnabled() {
 		return isShieldsEnabled;

@@ -9,67 +9,102 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class ListCommand extends CommandBase {
 
-	public ListCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public enum ListType {
+
+		KINGDOM     (MessagePath.LABEL_KINGDOM.getMessage()),
+		TOWN        (MessagePath.LABEL_TOWN.getMessage()),
+		CAMP        (MessagePath.LABEL_CAMP.getMessage()),
+		RUIN        (MessagePath.LABEL_RUIN.getMessage()),
+		SANCTUARY   (MessagePath.LABEL_SANCTUARY.getMessage());
+
+		private final String label;
+
+		ListType(String label) {
+			this.label = label;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+	}
+
+	public ListCommand() {
+		// Define name and sender support
+		super("list",false, false);
+		// None
+		setOptionalArgs(true);
+		// kingdom|town|camp|sanctuary|ruin [<page>]
+		List<String> argNames = Arrays.asList("kingdom", "town", "camp", "sanctuary", "ruin");
+		addArgument(
+				newArg(argNames,true,true)
+						.sub( newArg("page",false,false) )
+		);
     }
 	
 	// Display a paged list of names
-    public void execute() {
-    	// k list [kingdom|town|sanctuary] [<page>]
-		Player bukkitPlayer = (Player) getSender();
-    	if (getArgs().length > 3) {
-			sendInvalidArgMessage(bukkitPlayer,CommandType.LIST);
+    public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+    	if (args.size() > 2) {
+			sendInvalidArgMessage(sender);
 		} else {
-
         	// Determine list mode
         	ListType mode = ListType.KINGDOM;
-        	if (getArgs().length >= 2) {
-        		String listMode = getArgs()[1];
-        		if(listMode.equalsIgnoreCase("kingdom")) {
-					mode = ListType.KINGDOM;
-				} else if(listMode.equalsIgnoreCase("town")) {
-        			mode = ListType.TOWN;
-        		} else if(listMode.equalsIgnoreCase("ruin")) {
-					mode = ListType.RUIN;
-				} else if(listMode.equalsIgnoreCase("sanctuary")) {
-					mode = ListType.SANCTUARY;
-				} else {
-					sendInvalidArgMessage(bukkitPlayer,CommandType.LIST);
-                    return;
-        		}
+        	if (args.size() >= 1) {
+				switch (args.get(0).toLowerCase()) {
+					case "kingdom":
+						mode = ListType.KINGDOM;
+						break;
+					case "town":
+						mode = ListType.TOWN;
+						break;
+					case "camp":
+						mode = ListType.CAMP;
+						break;
+					case "sanctuary":
+						mode = ListType.SANCTUARY;
+						break;
+					case "ruin":
+						mode = ListType.RUIN;
+						break;
+					default:
+						sendInvalidArgMessage(sender);
+						return;
+				}
         	}
-        	
         	// Populate list lines
         	List<String> lines = new ArrayList<>();
         	switch(mode) {
 	        	case KINGDOM:
-	                lines.addAll(getKonquest().getKingdomManager().getKingdomNames());
+	                lines.addAll(konquest.getKingdomManager().getKingdomNames());
 	        		break;
 	        	case TOWN:
-	        		lines.addAll(getKonquest().getKingdomManager().getTownNames());
+	        		lines.addAll(konquest.getKingdomManager().getTownNames());
 	        		break;
+				case CAMP:
+					lines.addAll(konquest.getCampManager().getCampNames());
+					break;
 				case RUIN:
-					lines.addAll(getKonquest().getRuinManager().getRuinNames());
+					lines.addAll(konquest.getRuinManager().getRuinNames());
 					break;
 				case SANCTUARY:
-					lines.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
+					lines.addAll(konquest.getSanctuaryManager().getSanctuaryNames());
 					break;
 	        	default :
-					sendInvalidArgMessage(bukkitPlayer,CommandType.LIST);
+					sendInvalidArgMessage(sender);
 	                return;
         	}
         	Collections.sort(lines);
-        	ChatUtil.printDebug("List mode "+ mode +" with "+lines.size()+" lines.");
         	
         	if(lines.isEmpty()) {
         		// Nothing to display
         		String header = MessagePath.COMMAND_LIST_NOTICE_HEADER.getMessage(mode.getLabel()) + " 0/0";
-            	ChatUtil.sendNotice(bukkitPlayer, header);
+            	ChatUtil.sendNotice(sender, header);
         	} else {
         		// Display paged lines to player
         		int numLines = lines.size(); // should be 1 or more
@@ -77,12 +112,12 @@ public class ListCommand extends CommandBase {
 				int totalPages = (int)Math.ceil(((double)numLines)/MAX_LINES); // 1-based
             	totalPages = Math.max(totalPages, 1);
             	int page = 1; // 1-based
-            	if (getArgs().length == 3) {
+            	if (args.size() == 2) {
             		try {
-            			page = Integer.parseInt(getArgs()[2]);
+            			page = Integer.parseInt(args.get(1));
         			}
 					catch (NumberFormatException ex) {
-						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(ex.getMessage()));
+						ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(ex.getMessage()));
 						return;
 					}
             	}
@@ -94,40 +129,30 @@ public class ListCommand extends CommandBase {
             	int endIdx = startIdx + MAX_LINES;
             	// Display lines to player
 				String header = MessagePath.COMMAND_LIST_NOTICE_HEADER.getMessage(mode.getLabel()) + " "+page+"/"+totalPages;
-            	ChatUtil.sendNotice(bukkitPlayer,header);
+            	ChatUtil.sendNotice(sender,header);
 				List<String> pageLines = new ArrayList<>();
             	for (int i = startIdx; i < endIdx && i < numLines; i++) {
             		String line = ""+ChatColor.GOLD+(i+1)+". "+ChatColor.AQUA+lines.get(i);
 					pageLines.add(line);
             	}
-				ChatUtil.sendCommaMessage(bukkitPlayer,pageLines);
+				ChatUtil.sendCommaMessage(sender,pageLines);
         	}
         }
     }
     
     @Override
-	public List<String> tabComplete() {
-    	// k list [kingdom|town|sanctuary] [<page>]
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		List<String> tabList = new ArrayList<>();
-		final List<String> matchedTabList = new ArrayList<>();
-		
-		if(getArgs().length == 2) {
+		if(args.size() == 1) {
 			tabList.add("kingdom");
 			tabList.add("town");
+			tabList.add("camp");
 			tabList.add("ruin");
 			tabList.add("sanctuary");
-			
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
-		} else if(getArgs().length == 3) {
+		} else if(args.size() == 2) {
 			tabList.add("#");
-			
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
 		}
-		return matchedTabList;
+		return matchLastArgToList(tabList,args);
 	}
 
 }

@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.admin.AdminCommandType;
+import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.Labeler;
@@ -10,23 +11,40 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public abstract class CommandBase {
 
-    private final ArrayList<CommandArgument> arguments = new ArrayList<>();
-    private final String name;
+    private final String cmdName;
     private final boolean isPlayerOnly;
+    private final boolean isAdmin;
+    private final ArrayList<CommandArgument> arguments; // first level of argument options
+    private boolean hasOptionalArgs; // Can this command accept no arguments?
 
-    public CommandBase(String name, boolean isPlayerOnly) {
-        this.name = name;
+    public CommandBase(String name, boolean isPlayerOnly, boolean isAdmin) {
+        this.cmdName = name;
         this.isPlayerOnly = isPlayerOnly;
+        this.isAdmin = isAdmin;
+        this.arguments = new ArrayList<>();
+        this.hasOptionalArgs = false;
     }
 
     public String getName() {
-        return name;
+        return cmdName;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public boolean hasOptionalArgs() {
+        return hasOptionalArgs;
+    }
+
+    public void setOptionalArgs(boolean val) {
+        hasOptionalArgs = val;
     }
 
     public boolean isSenderAllowed(CommandSender sender) {
@@ -39,145 +57,100 @@ public abstract class CommandBase {
         }
     }
 
+    // Convenience method for making new arguments
+    public CommandArgument newArg(String arg, boolean isLiteral, boolean hasOptional) {
+        return new CommandArgument(arg, isLiteral, hasOptional);
+    }
+    public CommandArgument newArg(List<String> arg, boolean isLiteral, boolean hasOptional) {
+        return new CommandArgument(arg, isLiteral, hasOptional);
+    }
+
     public void addArgument(CommandArgument argument) {
         arguments.add(argument);
     }
 
-    public CommandArgument getArgument(int index) {
-        if (index >= 0 && index < arguments.size()) {
-            return arguments.get(index);
+    private String getBase() {
+        if (isAdmin) {
+            return "/k admin ";
         } else {
-            return null;
+            return "/k ";
         }
     }
 
-    public int getNumArguments() {
-        return arguments.size();
+    public String getBaseUsage() {
+        return ChatColor.GOLD+getBase()+cmdName.toLowerCase();
     }
 
-    /**
-     * Convenience method for checking a command argument string
-     * has a valid argument at the specified index.
-     * First array element should be sub-command. Ignore it.
-     * Index 0 starts at second array element:
-     * [sub-command, arg0, arg1, arg2, ...]
-     * @param args The argument string array used to execute a command
-     * @param index The index of the argument to check
-     * @return True when a valid argument exists at the given index, else false.
-     */
-    public boolean hasValidArg(String[] args, int index) {
-        // Check array limits
-        if (index < 0 || index > args.length-2) {
-            return false;
+    public List<String> getArgumentUsage() {
+        List<String> usageStrings = new ArrayList<>();
+        if (hasOptionalArgs) {
+            usageStrings.add(getBaseUsage());
         }
-        // Check command argument exists
-        CommandArgument cmdArg = getArgument(index);
-        if (cmdArg == null) {
-            return false;
-        }
-        // Check given arg matches expected command argument
-        if (!cmdArg.isArgMatch(args[index+1])) {
-            return false;
-        }
-        // Passed all checks
-        return true;
-    }
-
-    public String getArg(String[] args, int index) {
-        if (index >= 0 && index < args.length-1) {
-            return args[index+1];
-        } else {
-            return "";
-        }
-    }
-
-    public int getLastArgIndex(String[] args) {
-        // Ignore first element
-        return args.length-2;
-    }
-
-    public String getSingleArgumentString(int index) {
-        if(index < 0 || index >= arguments.size()) {
-            return "";
-        }
-        CommandArgument argOptions = arguments.get(index);
-        StringBuilder argBuilder = new StringBuilder();
-        if(argOptions.isArgOptional()) {
-            argBuilder.append("[");
-        }
-        for(int i = 0; i < argOptions.getNumOptions(); i++) {
-            String option = argOptions.getArgOption(i);
-            boolean isLiteral = argOptions.isArgOptionLiteral(i);
-            if(isLiteral) {
-                // Literal
-                argBuilder.append("<").append(option).append(">");
-            } else {
-                // Non-literal
-                argBuilder.append(option);
-            }
-            if(i != argOptions.getNumOptions()-1) {
-                argBuilder.append("|");
+        for (CommandArgument cmdArg : arguments) {
+            for (String argUsage : cmdArg.getUsageStrings(hasOptionalArgs)) {
+                usageStrings.add(getBaseUsage()+" "+ChatColor.AQUA+formatUsageString(argUsage));
             }
         }
-        if(argOptions.isArgOptional()) {
-            argBuilder.append("]");
-        }
-        return argBuilder.toString();
+        return usageStrings;
     }
 
-    public String getFullArgumentString() {
-        if (arguments.isEmpty()) {
-            return "";
-        }
-        // Build all formatted arguments
-        StringBuilder argBuilder = new StringBuilder();
-        for(int i = 0; i < arguments.size(); i++) {
-            argBuilder.append(getSingleArgumentString(i));
-            if(i != arguments.size()-1) {
-                argBuilder.append(" ");
-            }
-        }
-        return argBuilder.toString();
-    }
-
-    public String getUsageString() {
-        String cmdArgsFormatted = getFullArgumentString()
+    private String formatUsageString(String inArgs) {
+        return inArgs
                 .replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA)
                 .replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA)
                 .replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA)
                 .replaceAll("]", ChatColor.GRAY+"]"+ChatColor.AQUA)
                 .replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
-        return ChatColor.GOLD+"/k "+name.toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted;
     }
 
-    public abstract void execute(Konquest konquest, CommandSender sender, String[] args);
+    public abstract void execute(Konquest konquest, CommandSender sender, List<String> args);
     
-    public abstract List<String> tabComplete(Konquest konquest, CommandSender sender, String[] args);
+    public abstract List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args);
 
-    public void sendInvalidArgMessage(CommandSender sender, boolean isAdmin) {
+    public void sendInvalidArgMessage(CommandSender sender) {
         if (isAdmin) {
             ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS_ADMIN.getMessage());
         } else {
             ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
         }
-        ChatUtil.sendMessage(sender, getUsageString());
+        //ChatUtil.sendMessage(sender, getUsageString());
     }
 
-    /*
-    public KonPlayer getPlayerCheck() {
-        if(!(sender instanceof Player)) {
-            ChatUtil.printConsoleError(MessagePath.GENERIC_ERROR_NO_PLAYER.getMessage());
-            return null;
-        }
-        Player bukkitPlayer = (Player) sender;
-        if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-            ChatUtil.printDebug("Failed to find non-existent player as command sender");
-            ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-            return null;
-        }
-        return konquest.getPlayerManager().getPlayer(bukkitPlayer);
+    public void sendInvalidSenderMessage(CommandSender sender) {
+        ChatUtil.printDebug("Command executed with null player", true);
+        ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
     }
-    */
+
+    public List<String> matchLastArgToList(List<String> completions, List<String> args) {
+        List<String> matchedCompletions = new ArrayList<>();
+        // Trim down completion options based on current input
+        if (!args.isEmpty()) {
+            StringUtil.copyPartialMatches(args.get(args.size()-1), completions, matchedCompletions);
+            Collections.sort(matchedCompletions);
+        }
+        return matchedCompletions;
+    }
+
+    public String formatStringListLimited(List<String> entries, int limit) {
+        StringBuilder entryListBuilder = new StringBuilder();
+        String nameColor = ""+ChatColor.GOLD;
+        String sepColor = ""+ChatColor.GRAY;
+        for (int i = 0; i < entries.size(); i++) {
+            if (i < limit) {
+                // Add name to list
+                entryListBuilder.append(nameColor).append(entries.get(i));
+                if (i != entries.size()-1) {
+                    entryListBuilder.append(sepColor).append(", ");
+                }
+            } else {
+                // Stop listing, show remaining count
+                int numRemaining = entries.size() - limit;
+                entryListBuilder.append(sepColor).append("... (").append(numRemaining).append(")");
+                break;
+            }
+        }
+        return entryListBuilder.toString();
+    }
 
     public boolean validateSender(CommandSender sender) {
         // Check if sender is implemented for this command
@@ -186,58 +159,42 @@ public abstract class CommandBase {
 
     /**
      * Check the input args against expected arguments.
-     * @param args The argument string array from the command sender.
-     * @return Status code:
-     *          0 = Passed validation
-     *          1+ = 1-indexed argument index that failed validation
-     *          -1 = no arguments given
+     * @param args The argument string list from the command sender.
+     * @return Tru when args match expected pattern, else false
      */
-    public int validateArgs(String[] args) {
-        // Args is an array that includes everything after /k, delimited by spaces.
-        // For example, /k help 1 -> args[] = {help, 1}
-        // Make sure the arguments are valid
-        // Maximum Arguments, including name
-        int maxNumArgs = arguments.size()+1;
-        int numOptional = 0;
-        for(CommandArgument check : arguments) {
-            if(check.isArgOptional()) {
-                numOptional++;
-            }
-        }
-        // Minimum Arguments, including name
-        int minNumArgs = maxNumArgs - numOptional;
-        // Check for empty args
-        if(args.length == 0) {
-            return -1;
-        }
-        // Check for min limit,
-        if(args.length < minNumArgs) {
-            return args.length;
-        }
-        // Check for max limit
-        if(args.length > maxNumArgs) {
-            return maxNumArgs-1;
-        }
-        // Check for matching arguments
-        for(int i = 0; i < args.length; i++) {
-            String arg = args[i];
-            if (i == 0) {
-                // First argument must be command name
-                if (!arg.equalsIgnoreCase(name)) {
-                    return -1;
-                }
-            } else {
-                // Does it match any literals or is there a non-literal option
-                CommandArgument argOptions = arguments.get(i-1);
-                if(!argOptions.isArgMatch(arg)) {
-                    // No matching options
-                    return i;
-                }
-            }
-        }
-        // Passed all checks
-        return 0;
-    }
+    /*
+    public boolean validateArgs(List<String> args) {
+        // Args is a list that includes all arguments after /k <command>
+        // For example, /k kingdom create MyTemplate MyKingdom -> args = {create, MyTemplate, MyKingdom}
 
+        if (args.isEmpty() && !hasOptionalArg) {
+            // No arguments were given, but this command does not accept optionals
+            return false;
+        }
+
+        // Check each given argument, level by level
+        ArrayList<CommandArgument> testArguments = arguments;
+        ListIterator<String> argIter = args.listIterator();
+        while (argIter.hasNext()) {
+            String checkArg = argIter.next();
+            boolean foundNonLiteral = false;
+            for (CommandArgument cmdArg : testArguments) {
+                if (cmdArg.isArgLiteral() && cmdArg.matchesName(checkArg)) {
+                    // Matched the arg to a literal
+
+                } else if (!cmdArg.isArgLiteral()) {
+                    foundNonLiteral = true;
+                }
+            }
+            // No literal matches, check for non-literals
+            if (foundNonLiteral) {
+
+            }
+        }
+
+        // Passed all checks
+        return true;
+    }
+     */
 
 }

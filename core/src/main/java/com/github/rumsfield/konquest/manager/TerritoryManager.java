@@ -29,7 +29,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
 	private final HashMap<World,KonTerritoryCache> territoryWorldCache;
 	
 	public static final int DEFAULT_MAP_SIZE = 9; // 10 lines of chat, minus one for header, odd so player's chunk is centered
-	
+	public static final int FAR_MAP_SIZE = 19;
+
 	public TerritoryManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.territoryWorldCache = new HashMap<>();

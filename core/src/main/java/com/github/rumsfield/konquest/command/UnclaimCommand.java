@@ -17,119 +17,116 @@ import java.util.List;
 
 public class UnclaimCommand extends CommandBase {
 
-	public UnclaimCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public UnclaimCommand() {
+		// Define name and sender support
+		super("unclaim",true, false);
+		// None
+		setOptionalArgs(true);
+		// [auto]
+		addArgument(
+				newArg("auto",true,false)
+		);
+		// radius <value>
+		addArgument(
+				newArg("radius",true,false)
+						.sub( newArg("value", false, false) )
+		);
     }
-	
-	public void execute() {
-		// k unclaim [radius|auto] [<r>]
-		Player bukkitPlayer = (Player) getSender();
-    	boolean isEnabled = getKonquest().getCore().getBoolean(CorePath.TOWNS_ALLOW_UNCLAIM.getPath(),false);
+
+	@Override
+	public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		// Sender must be player
+		KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
+		if (player == null) {
+			sendInvalidSenderMessage(sender);
+			return;
+		}
+
+		Player bukkitPlayer = player.getBukkitPlayer();
+		World bukkitWorld = bukkitPlayer.getWorld();
+    	boolean isEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_ALLOW_UNCLAIM.getPath(),false);
 		if (!isEnabled) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return;
 		}
-		if (getArgs().length > 3) {
-			sendInvalidArgMessage(bukkitPlayer,CommandType.UNCLAIM);
+		// Verify that this command is being used in the default world
+		if(!konquest.isWorldValid(bukkitWorld)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+			return;
+		}
+		// Verify no Barbarians are using this command
+		if(player.isBarbarian()) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
+			return;
+		}
+
+		if(args.isEmpty()) {
+			// Unclaim the single chunk containing playerLoc for the current territory.
+			konquest.getTerritoryManager().unclaimForPlayer(bukkitPlayer, bukkitPlayer.getLocation());
 		} else {
-        	World bukkitWorld = bukkitPlayer.getWorld();
-        	// Verify that this command is being used in the default world
-        	if(!getKonquest().isWorldValid(bukkitWorld)) {
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
-                return;
-        	}
-        	// Verify no Barbarians are using this command
-        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-    			ChatUtil.printDebug("Failed to find non-existent player");
-    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-    			return;
-    		}
-        	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-        	if(player.isBarbarian()) {
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
-                return;
-        	}
+			// Has mode arguments
+			String unclaimMode = args.get(0);
+			switch(unclaimMode) {
+				case "radius" :
+					if(args.size() != 2) {
+						sendInvalidArgMessage(bukkitPlayer);
+						return;
+					}
 
-			if(getArgs().length <= 1) {
-				// Unclaim the single chunk containing playerLoc for the current territory.
-				getKonquest().getTerritoryManager().unclaimForPlayer(bukkitPlayer, bukkitPlayer.getLocation());
-			} else {
-				String unclaimMode = getArgs()[1];
-				switch(unclaimMode) {
-					case "radius" :
-						if(getArgs().length != 3) {
-							sendInvalidArgMessage(bukkitPlayer,CommandType.UNCLAIM);
-							return;
-						}
+					final int min = 1;
+					final int max = 5;
+					int radius = Integer.parseInt(args.get(1));
+					if(radius < min || radius > max) {
+						ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_RADIUS.getMessage(min,max));
+						return;
+					}
+					konquest.getTerritoryManager().unclaimRadiusForPlayer(bukkitPlayer, bukkitPlayer.getLocation(), radius);
+					break;
 
-						final int min = 1;
-						final int max = 5;
-						int radius = Integer.parseInt(getArgs()[2]);
-						if(radius < min || radius > max) {
-							sendInvalidArgMessage(bukkitPlayer,CommandType.UNCLAIM);
-							ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_RADIUS.getMessage(min,max));
-							return;
-						}
-						getKonquest().getTerritoryManager().unclaimRadiusForPlayer(bukkitPlayer, bukkitPlayer.getLocation(), radius);
-
-						break;
-
-					case "auto" :
-						boolean doAuto = false;
-						// Check if player is already in an auto follow state
-						if(player.isAutoFollowActive()) {
-							// Check if player is already in claim state
-							if(player.getAutoFollow().equals(FollowType.UNCLAIM)) {
-								// Disable the auto state
-								ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
-								player.setAutoFollow(FollowType.NONE);
-							} else {
-								// Change state
-								doAuto = true;
-							}
+				case "auto" :
+					boolean doAuto = false;
+					// Check if player is already in an auto follow state
+					if(player.isAutoFollowActive()) {
+						// Check if player is already in claim state
+						if(player.getAutoFollow().equals(FollowType.UNCLAIM)) {
+							// Disable the auto state
+							ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
+							player.setAutoFollow(FollowType.NONE);
 						} else {
-							// Player is not in any auto mode, enter normal un-claim following state
+							// Change state
 							doAuto = true;
 						}
-						if(doAuto) {
-							boolean isUnclaimSuccess = getKonquest().getTerritoryManager().unclaimForPlayer(bukkitPlayer, bukkitPlayer.getLocation());
-							if(isUnclaimSuccess) {
-								ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
-								player.setAutoFollow(FollowType.UNCLAIM);
-							}
+					} else {
+						// Player is not in any auto mode, enter normal un-claim following state
+						doAuto = true;
+					}
+					if(doAuto) {
+						boolean isUnclaimSuccess = konquest.getTerritoryManager().unclaimForPlayer(bukkitPlayer, bukkitPlayer.getLocation());
+						if(isUnclaimSuccess) {
+							ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
+							player.setAutoFollow(FollowType.UNCLAIM);
 						}
-						break;
+					}
+					break;
 
-					default :
-						sendInvalidArgMessage(bukkitPlayer,CommandType.UNCLAIM);
-				}
+				default :
+					sendInvalidArgMessage(bukkitPlayer);
 			}
-        }
+		}
 	}
 	
 	@Override
-	public List<String> tabComplete() {
-		// k unclaim [radius|auto] [<r>]
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		List<String> tabList = new ArrayList<>();
-		final List<String> matchedTabList = new ArrayList<>();
-		
-		if(getArgs().length == 2) {
+		// Give suggestions
+		if (args.size() == 1) {
 			tabList.add("radius");
 			tabList.add("auto");
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[1], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
-		} else if(getArgs().length == 3) {
-			// suggest number
-			String subCommand = getArgs()[1];
-			if(subCommand.equalsIgnoreCase("radius")) {
+		} else if (args.size() == 2) {
+			if(args.get(0).equalsIgnoreCase("radius")){
 				tabList.add("#");
 			}
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
 		}
-		
-		return matchedTabList;
+		return matchLastArgToList(tabList,args);
 	}
 }

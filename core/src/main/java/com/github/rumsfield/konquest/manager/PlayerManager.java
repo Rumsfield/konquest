@@ -10,6 +10,7 @@ import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,11 +56,29 @@ public class PlayerManager implements KonquestPlayerManager {
 
 	@Nullable
 	public KonPlayer getPlayer(Player bukkitPlayer) {
-		return onlinePlayers.get(bukkitPlayer);
+		if (bukkitPlayer == null) {
+			return null;
+		} else {
+			return onlinePlayers.get(bukkitPlayer);
+		}
+	}
+
+	@Nullable
+	public KonPlayer getPlayer(CommandSender sender) {
+		if (sender == null) return null;
+		if (sender instanceof Player) {
+			return onlinePlayers.get((Player)sender);
+		} else {
+			return null;
+		}
 	}
 	
 	public boolean isOnlinePlayer(Player bukkitPlayer) {
-		return onlinePlayers.containsKey(bukkitPlayer);
+		if (bukkitPlayer == null) {
+			return false;
+		} else {
+			return onlinePlayers.containsKey(bukkitPlayer);
+		}
 	}
 	
 	@Nullable

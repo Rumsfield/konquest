@@ -12,34 +12,63 @@ import org.bukkit.util.StringUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 public class HelpCommand extends CommandBase{
 
 	public HelpCommand() {
-		super("help",false);
-		// Define arguments:
-		// /k help [<page>]
-		CommandArgument arg0 = new CommandArgument(true);
-		arg0.addArgOption("page",false);
-		addArgument(arg0);
+		// Define name and sender support
+		super("help",false, false);
+		// None
+		setOptionalArgs(true);
+		// [<page>]
+		addArgument(
+				newArg("page",false,false)
+		);
+		// <command> [<page>]
+		addArgument(
+				newArg("command",false,true)
+						.sub( newArg("page",false,false) )
+		);
 	}
 
 	@Override
-    public void execute(Konquest konquest, CommandSender sender, String[] args) {
+    public void execute(Konquest konquest, CommandSender sender, List<String> args) {
 		final int MAX_LINES_PER_PAGE = 6;
+		String argPage = "";
+		String helpCommand = "";
+		if (!args.isEmpty()) {
+			if (CommandType.contains(args.get(0))) {
+				// First argument is a command
+				helpCommand = args.get(0);
+				// Check for second page argument
+				if (args.size() == 2) {
+					argPage = args.get(1);
+				}
+			} else {
+				// First argument is a page number
+				argPage = args.get(0);
+			}
+		}
 		// Populate help lines
 		List<String> lines = new ArrayList<>();
-        for (CommandType cmd : CommandType.values()) {
-			if (cmd.isSenderAllowed(sender)) {
-				// This command is supported for the current sender
-				String alias = "";
-				if (!cmd.alias().equals("")) {
-					alias = " ("+cmd.alias()+")";
+		if (helpCommand.isEmpty()) {
+			// Use command base usage
+			for (CommandType cmd : CommandType.values()) {
+				if (cmd.isSenderAllowed(sender) && sender.hasPermission(cmd.permission())) {
+					// This command is supported for the current sender
+					String alias = "";
+					if (!cmd.alias().equals("")) {
+						alias = " ("+cmd.alias()+")";
+					}
+					String message = cmd.baseUsage()+ChatColor.WHITE+" : "+cmd.description()+ChatColor.LIGHT_PURPLE+alias;
+					lines.add(message);
 				}
-				String message = cmd.usage()+ChatColor.WHITE+": "+cmd.description()+ChatColor.LIGHT_PURPLE+alias;
-				lines.add(message);
 			}
-        }
+		} else {
+			// First argument is a command
+			lines.addAll(CommandType.getCommand(helpCommand).argumentUsage());
+		}
 		// Check for any help lines
 		if (lines.isEmpty()) {
 			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
@@ -50,14 +79,13 @@ public class HelpCommand extends CommandBase{
 		int maxPages = (int)Math.ceil(((double)numLines)/MAX_LINES_PER_PAGE);
 		// Get page index to display
 		int page = 1;
-		// Argument 0
-		if (hasValidArg(args,0)) {
+		if (!argPage.isEmpty()) {
 			try {
-				page = Integer.parseInt(getArg(args,0));
+				page = Integer.parseInt(argPage);
 			}
 			catch (NumberFormatException ignored) {
 				ChatUtil.sendError(sender, MessagePath.COMMAND_HELP_ERROR_PAGE.getMessage());
-				sendInvalidArgMessage(sender,false);
+				sendInvalidArgMessage(sender);
 				return;
 			}
 			page = Math.max(page,1);
@@ -74,19 +102,23 @@ public class HelpCommand extends CommandBase{
     }
     
     @Override
-	public List<String> tabComplete(Konquest konquest, CommandSender sender, String[] args) {
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		List<String> tabList = new ArrayList<>();
-		final List<String> matchedTabList = new ArrayList<>();
-		int currentArgIndex = getLastArgIndex(args);
-		// Suggestions based on argument index
-		switch (currentArgIndex) {
-			case 0:
+		// Give suggestions
+		if(args.size() == 1) {
+			// Page number
+			tabList.add("#");
+			// Command names
+			for(CommandType cmd : CommandType.values()) {
+				tabList.add(cmd.toString().toLowerCase());
+			}
+		} else if(args.size() == 2) {
+			// Suggest page number when previous argument was a command
+			if(CommandType.contains(args.get(0))) {
+				// Page number
 				tabList.add("#");
-				break;
+			}
 		}
-		// Trim down completion options based on current input
-		StringUtil.copyPartialMatches(getArg(args,currentArgIndex), tabList, matchedTabList);
-		Collections.sort(matchedTabList);
-		return matchedTabList;
+		return matchLastArgToList(tabList,args);
 	}
 }
