@@ -186,7 +186,6 @@ permissions:
       konquest.admin.flag: true
       konquest.admin.help: true
       konquest.admin.kingdom: true
-      konquest.admin.list: true
       konquest.admin.monument: true
       konquest.admin.reload: true
       konquest.admin.ruin: true
@@ -199,11 +198,11 @@ permissions:
       konquest.admin.unclaim: true
   
   konquest.admin.bypass:
-    description: Toggle admin bypass mode
+    description: Toggle admin bypass mode to ignore Konquest protections
     default: op
   
   konquest.admin.camp:
-    description: Manage player Barbarian camps
+    description: Manage player Barbarian Camp territories
     default: op
     
   konquest.admin.capture:
@@ -211,11 +210,11 @@ permissions:
     default: op
     
   konquest.admin.claim:
-    description: Claim land chunks
+    description: Claim land chunks for the nearest territory
     default: op
   
   konquest.admin.flag:
-    description: Set kingdom flags
+    description: Set property flags for Kingdoms and territories
     default: op
   
   konquest.admin.help:
@@ -223,35 +222,31 @@ permissions:
     default: op
   
   konquest.admin.kingdom:
-    description: Manage player and server Kingdoms
-    default: op
-    
-  konquest.admin.list:
-    description: Display all Kingdoms or Towns of a Kingdom
+    description: Manage player and admin Kingdoms
     default: op
   
   konquest.admin.monument:
-    description: Creates, removes or shows the Monument Template for a Kingdom
+    description: Manage Monument Templates
     default: op
   
   konquest.admin.reload:
-    description: Reloads configuration files
+    description: Reload plugin configuration files
     default: op
   
   konquest.admin.ruin:
-    description: Manage a Ruin territory
+    description: Manage Ruin territories
     default: op
 
   konquest.admin.sanctuary:
-    description: Manage a Sanctuary territory
+    description: Manage Sanctuary territories
     default: op
 
   konquest.admin.save:
-    description: Saves Kingdoms and Players data files
+    description: Save all plugin data to files
     default: op
   
   konquest.admin.settravel:
-    description: Sets the travel point for the territory you're in
+    description: Set the travel spawn point for the nearest territory
     default: op
   
   konquest.admin.stat:
@@ -259,15 +254,15 @@ permissions:
     default: op
   
   konquest.admin.town:
-    description: Manage Towns
+    description: Manage Town and Kingdom Capital territories
     default: op
     
   konquest.admin.travel:
-    description: Teleport to the specified kingdom or town
+    description: Teleport to any kingdom or territory
     default: op
   
   konquest.admin.unclaim:
-    description: Return a chunk to the Wild
+    description: Return a claimed chunk of land to the Wild
     default: op
 
   konquest.directive.*:

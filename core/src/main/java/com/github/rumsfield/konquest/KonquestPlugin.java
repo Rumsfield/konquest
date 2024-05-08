@@ -159,6 +159,21 @@ public class KonquestPlugin extends JavaPlugin {
         return true;
     }
 
+	public void printVersion() {
+		String pluginVersion = this.getDescription().getVersion();
+		String serverVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+		String lineTemplate = "%-30s -> %s";
+		String [] versionInfo = {
+				String.format(lineTemplate,"Konquest Version",ChatColor.AQUA+pluginVersion),
+				String.format(lineTemplate,"Server Version",ChatColor.AQUA+serverVersion),
+				String.format(lineTemplate,"Server Version Supported",boolean2status(konquest.isVersionSupported()))
+		};
+		for (String row : versionInfo) {
+			String line = ChatColor.GOLD+"> "+ChatColor.RESET + row;
+			Bukkit.getServer().getConsoleSender().sendMessage(line);
+		}
+	}
+
 	public static void printLogo() {
 //		String color1 = ChatUtil.parseHex("#FFA000");
 //		String color2 = ChatUtil.parseHex("#FFB020");

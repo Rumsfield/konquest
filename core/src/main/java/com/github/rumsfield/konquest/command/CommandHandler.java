@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.command.admin.AdminCommand;
 import com.github.rumsfield.konquest.command.admin.AdminCommandType;
 import com.github.rumsfield.konquest.utility.ChatUtil;
@@ -45,14 +46,19 @@ public class CommandHandler implements TabExecutor {
 			return true;
 		}
 		// Extract command name
-		String konquestCommandName = arguments.get(0);
-		arguments.remove(0);
-		// Special reload command for console
+		String konquestCommandName = arguments.remove(0);
+		// Special console commands
 		if (sender instanceof ConsoleCommandSender) {
+			// Reload command
 			if (konquestCommandName.equalsIgnoreCase("reload")) {
-				// Console Reload
 				konquest.reload();
 				ChatUtil.printConsoleAlert("Reloaded Konquest configuration files.");
+				return true;
+			}
+			// Version command
+			if (konquestCommandName.equalsIgnoreCase("version")) {
+				KonquestPlugin.printLogo();
+				konquest.getPlugin().printVersion();
 				return true;
 			}
 		}
@@ -61,16 +67,10 @@ public class CommandHandler implements TabExecutor {
 			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage() + " konquest.command");
 			return true;
 		}
-		// Check for unknown command
-		// TODO remove this?
-		if (!CommandType.contains(konquestCommandName)) {
-			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INVALID_PARAMETERS.getMessage());
-			return false;
-		}
 		// Get command type. If the name is not a command, defaults to HELP
 		CommandType commandType = CommandType.getCommand(konquestCommandName);
 		// Check for command-specific permission
-		if (!sender.hasPermission(commandType.permission())) {
+		if (!commandType.isSenderHasPermission(sender)) {
 			// Sender does not have permission for this command
 			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+commandType.permission());
 			return true;
@@ -115,15 +115,17 @@ public class CommandHandler implements TabExecutor {
 		List<String> arguments = new ArrayList<>(Arrays.asList(args));
 		List<String> tabList = new ArrayList<>();
 		if (arguments.size() == 1) {
+			// Suggest command names
 			String konquestCommandName = arguments.get(0);
 			List<String> baseList = new ArrayList<>();
 			for (CommandType cmd : CommandType.values()) {
 				String suggestion = cmd.toString().toLowerCase();
 				if (cmd.equals(CommandType.ADMIN)) {
-					// Suggest admin command if any sub-command permissions are valid
+					// Suggest admin command only if any sub-command permissions are valid
 					for (AdminCommandType subcmd : AdminCommandType.values()) {
-						if (sender.hasPermission(subcmd.permission()) && !baseList.contains(suggestion)) {
+						if (sender.hasPermission(subcmd.permission())) {
 							baseList.add(suggestion);
+							break;
 						}
 					}
 				} else if (sender.hasPermission(cmd.permission())) {
@@ -134,19 +136,14 @@ public class CommandHandler implements TabExecutor {
 			// Trim down completion options based on current input
 			StringUtil.copyPartialMatches(konquestCommandName, baseList, tabList);
 			Collections.sort(tabList);
-		} else if (arguments.size() > 1){
+		} else if (arguments.size() > 1) {
+			// Suggest command arguments
 			// Extract command name
-			String konquestCommandName = arguments.get(0);
-			arguments.remove(0);
+			String konquestCommandName = arguments.remove(0);
 			// Get command type. If it's not a command, defaults to HELP
 			CommandType commandArg = CommandType.getCommand(konquestCommandName);
-			// Handle admin commands differently from normal commands
-			if (commandArg.equals(CommandType.ADMIN)) {
-				// Command is an admin command
-				// TODO change this
-				tabList.addAll(new AdminCommand(konquest, sender, args).tabComplete());
-			} else if (sender.hasPermission(commandArg.permission())) {
-				// Command is a normal command and has permission
+			// Check for permission
+			if (commandArg.isSenderHasPermission(sender)) {
 				// Tab-Complete command
 				tabList.addAll(commandArg.command().tabComplete(konquest, sender, arguments));
 			}

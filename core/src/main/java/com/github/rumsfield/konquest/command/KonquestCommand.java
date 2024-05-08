@@ -14,7 +14,7 @@ import java.util.List;
 public class KonquestCommand extends CommandBase{
 
 	public KonquestCommand() {
-		super("",false);
+		super("",false, false);
 		// No arguments
     }
 

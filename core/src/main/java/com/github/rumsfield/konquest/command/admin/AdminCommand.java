@@ -13,164 +13,76 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * AdminCommand is unique because it is not a command by itself, instead it acts as another
+ * handler for all the other admin commands.
+ */
 public class AdminCommand extends CommandBase {
 
-    public AdminCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+    public AdminCommand() {
+		// Define name and sender support
+		super("admin",false, true);
+		// <sub-command>
+		addArgument(
+				newArg("sub-command",false,false)
+		);
     }
 
-    public void execute() {
-        if (getArgs().length == 1) {
-        	if (getSender().hasPermission(AdminCommandType.HELP.permission())) {
-        		new HelpAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-        	} else {
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+AdminCommandType.HELP.permission());
-        	}
-        } else if (getArgs().length >= 2) {
-        	AdminCommandType commandArg = AdminCommandType.getCommand(getArgs()[1]);
-        	if (getSender().hasPermission(commandArg.permission())) {
-	            switch (commandArg) {
-		            case BYPASS:
-		                new BypassAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-		                break;
-		            case CAMP:
-		                new CampAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-		                break;
-		            case CAPTURE:
-		                new CaptureAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-		                break;
-	            	case CLAIM:
-	                    new ClaimAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	            	case FLAG:
-	                    new FlagAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case HELP:
-	                    new HelpAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case KINGDOM:
-		                new KingdomAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-		                break;
-	                case LIST:
-	                    new ListAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case MONUMENT:
-	                    new MonumentAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case RUIN:
-	                    new RuinAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case SANCTUARY:
-	                    new SanctuaryAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case SAVE:
-	                    new SaveAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case SETTRAVEL:
-	                    new SetTravelAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case STAT:
-	                    new StatAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case TOWN:
-		                new TownAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-		                break;
-	                case TRAVEL:
-	                    new TravelAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case UNCLAIM:
-	                    new UnclaimAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                case RELOAD:
-	                    new ReloadAdminCommand(getKonquest(), getSender(), getArgs()).execute();
-	                    break;
-	                default:
-	                	new KonquestCommand(getKonquest(), getSender()).execute();
-	                	//ChatUtil.sendError((Player) getSender(), "Command does not exist");
-	                	break;
-	            }
-        	} else {
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+commandArg.permission());
-        	}
-        }
+	@Override
+    public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		// Default command is help
+		AdminCommandType adminCommand = AdminCommandType.HELP;
+		// Extract admin command name, if exists
+		if (!args.isEmpty()) {
+			String konquestAdminCommandName = args.remove(0);
+			adminCommand = AdminCommandType.getCommand(konquestAdminCommandName);
+		}
+		// Check for permissions
+		if (!adminCommand.isSenderHasPermission(sender)) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" "+AdminCommandType.HELP.permission());
+			return;
+		}
+		// Get command
+		CommandBase konquestAdminCommand = adminCommand.command();
+		// Check for supported sender (player or console)
+		if (!konquestAdminCommand.validateSender(sender)) {
+			// Sender is not supported for this command
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_PLAYER.getMessage());
+			return;
+		}
+		/* Passed all command checks */
+		// Execute command
+		konquestAdminCommand.execute(konquest, sender, args);
     }
-    
-    public List<String> tabComplete() {
-    	List<String> tabList = new ArrayList<>();
-        if (getArgs().length == 2) {
+
+	@Override
+    public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
+		List<String> tabList = new ArrayList<>();
+        if (args.size() == 1) {
+			// Suggest admin sub-commands when sender has permission
         	List<String> baseList = new ArrayList<>();
         	for(AdminCommandType cmd : AdminCommandType.values()) {
-        		if(getSender().hasPermission(cmd.permission())) {
+        		if(cmd.isSenderHasPermission(sender)) {
         			baseList.add(cmd.toString().toLowerCase());
         		}
     		}
         	// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[1], baseList, tabList);
+			StringUtil.copyPartialMatches(args.get(0), baseList, tabList);
 			Collections.sort(tabList);
-        } else if (getArgs().length >= 3) {
-        	AdminCommandType commandArg = AdminCommandType.getCommand(getArgs()[1]);
-        	if (getSender().hasPermission(commandArg.permission())) {
-	            switch (commandArg) {
-		            case BYPASS:
-		                tabList.addAll(new BypassAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-		                break;
-		            case CAMP:
-		                tabList.addAll(new CampAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-		                break;
-		            case CAPTURE:
-		                tabList.addAll(new CaptureAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-		                break;
-	            	case CLAIM:
-	            		tabList.addAll(new ClaimAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	            	case FLAG:
-	            		tabList.addAll(new FlagAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case HELP:
-	                	tabList.addAll(new HelpAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case KINGDOM:
-		                tabList.addAll(new KingdomAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-		                break;
-	                case LIST:
-	                	tabList.addAll(new ListAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case MONUMENT:
-	                	tabList.addAll(new MonumentAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case RUIN:
-	                	tabList.addAll(new RuinAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case SANCTUARY:
-	                	tabList.addAll(new SanctuaryAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case SAVE:
-	                	tabList.addAll(new SaveAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case SETTRAVEL:
-	                	tabList.addAll(new SetTravelAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case STAT:
-	                	tabList.addAll(new StatAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case TOWN:
-		                tabList.addAll(new TownAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-		                break;
-	                case TRAVEL:
-	                	tabList.addAll(new TravelAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case UNCLAIM:
-	                	tabList.addAll(new UnclaimAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                case RELOAD:
-	                	tabList.addAll(new ReloadAdminCommand(getKonquest(), getSender(), getArgs()).tabComplete());
-	                    break;
-	                default:
-	                	tabList.addAll(Collections.emptyList());
-	                	break;
-	            }
-        	}
+        } else if (args.size() >= 2) {
+			// Extract admin command name
+			String konquestAdminCommandName = args.remove(0);
+			if (AdminCommandType.contains(konquestAdminCommandName)) {
+				// Get command type
+				AdminCommandType commandArg = AdminCommandType.getCommand(konquestAdminCommandName);
+				// Check for permission
+				if (commandArg.isSenderHasPermission(sender)) {
+					// Tab-Complete command
+					tabList.addAll(commandArg.command().tabComplete(konquest, sender, args));
+				}
+			}
         }
         return tabList;
     }
+
 }

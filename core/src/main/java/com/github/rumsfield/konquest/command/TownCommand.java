@@ -57,6 +57,7 @@ public class TownCommand extends CommandBase {
 		);
 		// manage <town> ...
 		List<String> requestsArgNames = Arrays.asList("accept", "deny");
+		List<String> optionsArgNames = Arrays.asList("true", "false");
 		List<String> residentArgNames = Arrays.asList("invite", "kick", "promote", "demote", "lord");
 		addArgument(
 				newArg("manage",true,false)
@@ -77,13 +78,13 @@ public class TownCommand extends CommandBase {
 								// manage <town> armor [<name>]
 								.sub( newArg("armor",true,true)
 										.sub( newArg("name",false,false) ) )
-								// manage <town> specialization [<profession>]
-								.sub( newArg("specialization",true,true)
-										.sub( newArg("profession",false,false) ) )
-								// manage <town> option <name> [<value>]
-								.sub( newArg("option",true,false)
+								// manage <town> specialize [<name>]
+								.sub( newArg("specialize",true,true)
+										.sub( newArg("name",false,false) ) )
+								// manage <town> option <name> [true|false]
+								.sub( newArg("option",true,true)
 										.sub( newArg("name",false,true)
-												.sub( newArg("value",false,false) ) ) )
+												.sub( newArg(optionsArgNames,true,false) ) ) )
 								// manage <town> requests [<player>] accept|deny
 								.sub( newArg("requests",true,true)
 										.sub( newArg("player",false,false)
@@ -428,7 +429,7 @@ public class TownCommand extends CommandBase {
 									sendInvalidArgMessage(bukkitPlayer);
 								}
 								break;
-							case "specialization":
+							case "specialize":
 								// Verify player is lord of the Town
 								if(!town.isLord(playerID)) {
 									ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
@@ -467,14 +468,20 @@ public class TownCommand extends CommandBase {
 								if (args.size() == 3) {
 									// Display all options
 									for (KonTownOption option : KonTownOption.values()) {
-										String optionInfo = formatOptionLine(option, town);
-										ChatUtil.sendMessage(bukkitPlayer, optionInfo);
+										if (konquest.getKingdomManager().isTownOptionFeatureEnabled(option)) {
+											String optionInfo = formatOptionLine(option, town);
+											ChatUtil.sendMessage(sender, optionInfo);
+										}
 									}
 								} else if (args.size() >= 4) {
 									String optionName = args.get(3);
 									KonTownOption option = KonTownOption.getOption(optionName);
 									if (option == null) {
 										ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(optionName));
+										return;
+									}
+									if (!konquest.getKingdomManager().isTownOptionFeatureEnabled(option)) {
+										ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 										return;
 									}
 									if (args.size() == 4) {
@@ -612,172 +619,175 @@ public class TownCommand extends CommandBase {
 			tabList.add("leave");
 			tabList.add("lord");
 			tabList.add("manage");
-		} else if (numArgs > 1) {
-			// First argument switch
+		} else if (numArgs == 2) {
 			switch (args.get(0).toLowerCase()) {
 				case "join":
-					if (numArgs == 2) {
-						// Suggest town names that the player can join
-						for (KonTown town : kingdom.getCapitalTowns()) {
-							if (!town.isPlayerResident(player.getBukkitPlayer())) {
-								tabList.add(town.getName());
-							}
-						}
-					}
-					break;
-				case "leave":
-					if (numArgs == 2) {
-						// Suggest town names that the player can leave
-						for (KonTown town : kingdom.getCapitalTowns()) {
-							if (town.isPlayerResident(player.getBukkitPlayer())) {
-								tabList.add(town.getName());
-							}
-						}
-					}
-					break;
-				case "lord":
-					if (numArgs == 2) {
-						// Suggest all town names
-						for (KonTown town : kingdom.getCapitalTowns()) {
+					// Suggest town names that the player can join
+					for (KonTown town : kingdom.getCapitalTowns()) {
+						if (!town.isPlayerResident(player.getBukkitPlayer())) {
 							tabList.add(town.getName());
 						}
 					}
 					break;
-				case "manage":
-					if (numArgs == 2) {
-						// Suggest managed towns
-						for (KonTown town : kingdom.getCapitalTowns()) {
-							if (town.isPlayerKnight(player.getBukkitPlayer())) {
-								tabList.add(town.getName());
-							}
+				case "leave":
+					// Suggest town names that the player can leave
+					for (KonTown town : kingdom.getCapitalTowns()) {
+						if (town.isPlayerResident(player.getBukkitPlayer())) {
+							tabList.add(town.getName());
 						}
-					} else if (numArgs == 3) {
-						// suggest sub-commands
-						tabList.add("plots");
-						tabList.add("rename");
-						tabList.add("upgrade");
-						tabList.add("shield");
-						tabList.add("armor");
-						tabList.add("specialization");
-						tabList.add("option");
-						tabList.add("requests");
-						tabList.add("resident");
-					} else if (numArgs > 3) {
-						String townName = args.get(1);
-						KonTown town = kingdom.getTownCapital(townName);
-						if (town == null) return Collections.emptyList();
-						// Second argument switch
-						switch (args.get(2).toLowerCase()) {
-							case "rename":
-								if (numArgs == 4) {
-									tabList.add("***");
-								}
-								break;
-							case "upgrade":
-								if (numArgs == 4) {
-									for (KonUpgrade upgrade : KonUpgrade.values()) {
-										tabList.add(upgrade.toString());
-									}
-								}
-								break;
-							case "shield":
-								if (numArgs == 4) {
-									for (KonShield shield : konquest.getShieldManager().getShields()) {
-										tabList.add(shield.getId());
-									}
-								}
-								break;
-							case "armor":
-								if (numArgs == 4) {
-									for (KonArmor armor : konquest.getShieldManager().getArmors()) {
-										tabList.add(armor.getId());
-									}
-								}
-								break;
-							case "specialization":
-								if (numArgs == 4) {
-									for (Villager.Profession profession : Villager.Profession.values()) {
-										tabList.add(profession.toString());
-									}
-								}
-								break;
-							case "option":
-								if (numArgs == 4) {
-									for (KonTownOption option : KonTownOption.values()) {
-										tabList.add(option.toString());
-									}
-								} else if (numArgs == 5) {
-									tabList.add("true");
-									tabList.add("false");
-								}
-								break;
-							case "requests":
-								if (numArgs == 4) {
-									for (OfflinePlayer requester : town.getJoinRequests()) {
-										tabList.add(requester.getName());
-									}
-								} else if (numArgs == 5) {
-									tabList.add("accept");
-									tabList.add("deny");
-								}
-								break;
-							case "resident":
-								if (numArgs == 4) {
-									tabList.add("invite");
-									tabList.add("kick");
-									tabList.add("promote");
-									tabList.add("demote");
-									tabList.add("lord");
-								} else if (numArgs == 5) {
-									// Third argument switch
-									switch (args.get(3).toLowerCase()) {
-										case "invite":
-											for (KonOfflinePlayer offlinePlayer : konquest.getPlayerManager().getAllKonquestOfflinePlayers()) {
-												String name = offlinePlayer.getOfflineBukkitPlayer().getName();
-												if (name != null && !town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
-													tabList.add(name);
-												}
-											}
-											break;
-										case "kick":
-											for (KonOfflinePlayer offlinePlayer : konquest.getPlayerManager().getAllKonquestOfflinePlayers()) {
-												String name = offlinePlayer.getOfflineBukkitPlayer().getName();
-												if (name != null && town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
-													tabList.add(name);
-												}
-											}
-											break;
-										case "promote":
-											for (OfflinePlayer offlinePlayer : town.getPlayerResidentsOnly()) {
-												String name = offlinePlayer.getName();
-												if (name != null) {
-													tabList.add(name);
-												}
-											}
-											break;
-										case "demote":
-											for (OfflinePlayer offlinePlayer : town.getPlayerKnightsOnly()) {
-												String name = offlinePlayer.getName();
-												if (name != null) {
-													tabList.add(name);
-												}
-											}
-											break;
-										case "lord":
-											for (OfflinePlayer offlinePlayer : town.getPlayerResidents()) {
-												String name = offlinePlayer.getName();
-												if (name != null && !town.isLord(offlinePlayer.getUniqueId())) {
-													tabList.add(name);
-												}
-											}
-											break;
-									} // End third switch
-								}
-								break;
-						} // End second switch
 					}
 					break;
-			} // End first switch
+				case "lord":
+					// Suggest all town names
+					for (KonTown town : kingdom.getCapitalTowns()) {
+						tabList.add(town.getName());
+					}
+					break;
+				case "manage":
+					// Suggest managed towns
+					for (KonTown town : kingdom.getCapitalTowns()) {
+						if (town.isPlayerKnight(player.getBukkitPlayer())) {
+							tabList.add(town.getName());
+						}
+					}
+					break;
+			}
+		} else if (numArgs == 3) {
+			if (args.get(0).equalsIgnoreCase("manage")) {
+				// suggest sub-commands
+				tabList.add("rename");
+				tabList.add("option");
+				tabList.add("requests");
+				tabList.add("resident");
+				if (konquest.getKingdomManager().getIsDiscountEnable()) {
+					tabList.add("specialize");
+				}
+				if (konquest.getShieldManager().isArmorsEnabled()) {
+					tabList.add("armor");
+				}
+				if (konquest.getShieldManager().isShieldsEnabled()) {
+					tabList.add("shield");
+				}
+				if (konquest.getUpgradeManager().isEnabled()) {
+					tabList.add("upgrade");
+				}
+				if (konquest.getPlotManager().isEnabled()) {
+					tabList.add("plots");
+				}
+			}
+		} else if (numArgs == 4) {
+			switch (args.get(2).toLowerCase()) {
+				case "rename":
+					tabList.add("***");
+					break;
+				case "upgrade":
+					if (konquest.getUpgradeManager().isEnabled()) {
+						for (KonUpgrade upgrade : KonUpgrade.values()) {
+							tabList.add(upgrade.toString());
+						}
+					}
+					break;
+				case "shield":
+					if (konquest.getShieldManager().isShieldsEnabled()) {
+						for (KonShield shield : konquest.getShieldManager().getShields()) {
+							tabList.add(shield.getId());
+						}
+					}
+					break;
+				case "armor":
+					if (konquest.getShieldManager().isArmorsEnabled()) {
+						for (KonArmor armor : konquest.getShieldManager().getArmors()) {
+							tabList.add(armor.getId());
+						}
+					}
+					break;
+				case "specialize":
+					if (konquest.getKingdomManager().getIsDiscountEnable()) {
+						for (Villager.Profession profession : Villager.Profession.values()) {
+							tabList.add(profession.toString());
+						}
+					}
+					break;
+				case "option":
+					for (KonTownOption option : KonTownOption.values()) {
+						tabList.add(option.toString());
+					}
+					break;
+				case "requests":
+					String townName = args.get(1);
+					KonTown town = kingdom.getTownCapital(townName);
+					if (town != null) {
+						for (OfflinePlayer requester : town.getJoinRequests()) {
+							tabList.add(requester.getName());
+						}
+					}
+					break;
+				case "resident":
+					tabList.add("invite");
+					tabList.add("kick");
+					tabList.add("promote");
+					tabList.add("demote");
+					tabList.add("lord");
+					break;
+			}
+		} else if (numArgs == 5) {
+			switch (args.get(2).toLowerCase()) {
+				case "option":
+					tabList.add("true");
+					tabList.add("false");
+					break;
+				case "requests":
+					tabList.add("accept");
+					tabList.add("deny");
+					break;
+				case "resident":
+					String townName = args.get(1);
+					KonTown town = kingdom.getTownCapital(townName);
+					if (town == null) return Collections.emptyList();
+					switch (args.get(3).toLowerCase()) {
+						case "invite":
+							for (KonOfflinePlayer offlinePlayer : konquest.getPlayerManager().getAllKonquestOfflinePlayers()) {
+								String name = offlinePlayer.getOfflineBukkitPlayer().getName();
+								if (name != null && kingdom.equals(offlinePlayer.getKingdom()) && !town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
+									tabList.add(name);
+								}
+							}
+							break;
+						case "kick":
+							for (KonOfflinePlayer offlinePlayer : konquest.getPlayerManager().getAllKonquestOfflinePlayers()) {
+								String name = offlinePlayer.getOfflineBukkitPlayer().getName();
+								if (name != null && town.isPlayerResident(offlinePlayer.getOfflineBukkitPlayer())) {
+									tabList.add(name);
+								}
+							}
+							break;
+						case "promote":
+							for (OfflinePlayer offlinePlayer : town.getPlayerResidentsOnly()) {
+								String name = offlinePlayer.getName();
+								if (name != null) {
+									tabList.add(name);
+								}
+							}
+							break;
+						case "demote":
+							for (OfflinePlayer offlinePlayer : town.getPlayerKnightsOnly()) {
+								String name = offlinePlayer.getName();
+								if (name != null) {
+									tabList.add(name);
+								}
+							}
+							break;
+						case "lord":
+							for (OfflinePlayer offlinePlayer : town.getPlayerResidents()) {
+								String name = offlinePlayer.getName();
+								if (name != null && !town.isLord(offlinePlayer.getUniqueId())) {
+									tabList.add(name);
+								}
+							}
+							break;
+					}
+					break;
+			}
 		}
 		return matchLastArgToList(tabList,args);
 	}

@@ -33,8 +33,7 @@ public class KingdomCommand extends CommandBase {
 		addArgument(
 				newArg("create",true,false)
 						.sub( newArg("template",false,false)
-								.sub( newArg("name",false,false) )
-						)
+								.sub( newArg("name",false,false) ) )
 		);
 		// invites
 		addArgument(
@@ -372,10 +371,7 @@ public class KingdomCommand extends CommandBase {
 									}
 								}
 								// Update map
-								konquest.getMapHandler().drawUpdateTerritory(kingdom.getCapital());
-								for (KonTown town : kingdom.getTowns()) {
-									konquest.getMapHandler().drawUpdateTerritory(town);
-								}
+								konquest.getMapHandler().drawUpdateTerritory(kingdom);
 								ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_WEB_COLOR_SET.getMessage(kingdom.getName(),colorStr));
 							} else {
 								// Incorrect arguments
@@ -602,149 +598,141 @@ public class KingdomCommand extends CommandBase {
 			tabList.add("join");
 			tabList.add("exile");
 			tabList.add("manage");
-		} else if (numArgs > 1) {
-			// First argument switch
+		} else if (numArgs == 2) {
 			switch (args.get(0).toLowerCase()) {
 				case "create":
-					if (numArgs == 2) {
-						List<String> templateList = new ArrayList<>(konquest.getSanctuaryManager().getAllValidTemplateNames());
-						tabList.addAll(templateList);
-					} else if (numArgs == 3) {
-						tabList.add("***");
-					}
+					tabList.addAll(konquest.getSanctuaryManager().getAllValidTemplateNames());
 					break;
 				case "join":
-					if (numArgs == 2) {
-						List<String> kingdomList = new ArrayList<>(konquest.getKingdomManager().getKingdomNames());
-						kingdomList.remove(player.getKingdom().getName());
-						tabList.addAll(kingdomList);
-					}
+					List<String> kingdomList = new ArrayList<>(konquest.getKingdomManager().getKingdomNames());
+					kingdomList.remove(player.getKingdom().getName());
+					tabList.addAll(kingdomList);
 					break;
 				case "manage":
-					if (numArgs == 2) {
-						tabList.add("disband");
-						tabList.add("rename");
-						tabList.add("template");
-						tabList.add("access");
-						tabList.add("diplomacy");
-						tabList.add("requests");
-						tabList.add("member");
-						if (!konquest.getCore().getBoolean(CorePath.KINGDOMS_WEB_COLOR_ADMIN_ONLY.getPath())) {
-							tabList.add("webcolor");
-						}
-					} else if (numArgs > 2) {
-						// Second argument switch
-						switch (args.get(1).toLowerCase()) {
-							case "rename":
-								if (numArgs == 3) {
-									tabList.add("***");
-								}
-								break;
-							case "webcolor":
-								if (numArgs == 3 && !konquest.getCore().getBoolean(CorePath.KINGDOMS_WEB_COLOR_ADMIN_ONLY.getPath())) {
-									for (ColorRGB color : ColorRGB.values()) {
-										tabList.add(color.getName());
-									}
-									tabList.add("#rrggbb");
-									tabList.add("default");
-								}
-								break;
-							case "template":
-								if (numArgs == 3) {
-									tabList.addAll(konquest.getSanctuaryManager().getAllTemplateNames());
-									tabList.remove(kingdom.getMonumentTemplateName());
-								}
-								break;
-							case "access":
-								if (numArgs == 3) {
-									tabList.add("open");
-									tabList.add("closed");
-								}
-								break;
-							case "diplomacy":
-								if (numArgs == 3) {
-									List<String> kingdomList = new ArrayList<>(konquest.getKingdomManager().getKingdomNames());
-									kingdomList.remove(player.getKingdom().getName());
-									tabList.addAll(kingdomList);
-								} else if (numArgs == 4) {
-									String otherKingdomName = args.get(2);
-									if (konquest.getKingdomManager().isKingdom(otherKingdomName)) {
-										for (KonquestDiplomacyType relation : KonquestDiplomacyType.values()) {
-											if (konquest.getKingdomManager().isValidRelationChoice(kingdom,konquest.getKingdomManager().getKingdom(otherKingdomName),relation)) {
-												tabList.add(relation.toString());
-											}
-										}
-									}
-								}
-								break;
-							case "requests":
-								if (numArgs == 3) {
-									for (OfflinePlayer requester : kingdom.getJoinRequests()) {
-										tabList.add(requester.getName());
-									}
-								} else if (numArgs == 4) {
-									tabList.add("accept");
-									tabList.add("deny");
-								}
-								break;
-							case "member":
-								if (numArgs == 3) {
-									tabList.add("invite");
-									tabList.add("kick");
-									tabList.add("promote");
-									tabList.add("demote");
-									tabList.add("master");
-								} else if (numArgs == 4) {
-									// Third argument switch
-									switch (args.get(2).toLowerCase()) {
-										case "invite":
-											for(KonOfflinePlayer offlinePlayer : konquest.getPlayerManager().getAllKonquestOfflinePlayers()) {
-												String name = offlinePlayer.getOfflineBukkitPlayer().getName();
-												if(name != null && !kingdom.isMember(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
-													tabList.add(name);
-												}
-											}
-											break;
-										case "kick":
-											for(KonOfflinePlayer offlinePlayer : konquest.getPlayerManager().getAllKonquestOfflinePlayers()) {
-												String name = offlinePlayer.getOfflineBukkitPlayer().getName();
-												if(name != null && kingdom.isMember(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
-													tabList.add(name);
-												}
-											}
-											break;
-										case "promote":
-											for(OfflinePlayer offlinePlayer : kingdom.getPlayerMembersOnly()) {
-												String name = offlinePlayer.getName();
-												if(name != null) {
-													tabList.add(name);
-												}
-											}
-											break;
-										case "demote":
-											for(OfflinePlayer offlinePlayer : kingdom.getPlayerOfficersOnly()) {
-												String name = offlinePlayer.getName();
-												if(name != null) {
-													tabList.add(name);
-												}
-											}
-											break;
-										case "master":
-											for(OfflinePlayer offlinePlayer : kingdom.getPlayerMembers()) {
-												String name = offlinePlayer.getName();
-												if(name != null && !kingdom.isMaster(offlinePlayer.getUniqueId())) {
-													tabList.add(name);
-												}
-											}
-											break;
-									} // End third switch
-								}
-								break;
-						} // End second switch
+					tabList.add("disband");
+					tabList.add("rename");
+					tabList.add("template");
+					tabList.add("access");
+					tabList.add("diplomacy");
+					tabList.add("requests");
+					tabList.add("member");
+					if (!konquest.getCore().getBoolean(CorePath.KINGDOMS_WEB_COLOR_ADMIN_ONLY.getPath())) {
+						tabList.add("webcolor");
 					}
 					break;
-			} // End first switch
+			}
+		} else if (numArgs == 3) {
+			switch (args.get(0).toLowerCase()) {
+				case "create":
+					tabList.add("***");
+					break;
+				case "manage":
+					switch (args.get(1).toLowerCase()) {
+						case "rename":
+							tabList.add("***");
+							break;
+						case "webcolor":
+							if (!konquest.getCore().getBoolean(CorePath.KINGDOMS_WEB_COLOR_ADMIN_ONLY.getPath())) {
+								for (ColorRGB color : ColorRGB.values()) {
+									tabList.add(color.getName());
+								}
+								tabList.add("#rrggbb");
+								tabList.add("default");
+							}
+							break;
+						case "template":
+							tabList.addAll(konquest.getSanctuaryManager().getAllTemplateNames());
+							tabList.remove(kingdom.getMonumentTemplateName());
+							break;
+						case "access":
+							tabList.add("open");
+							tabList.add("closed");
+							break;
+						case "diplomacy":
+							List<String> kingdomList = new ArrayList<>(konquest.getKingdomManager().getKingdomNames());
+							kingdomList.remove(player.getKingdom().getName());
+							tabList.addAll(kingdomList);
+							break;
+						case "requests":
+							for (OfflinePlayer requester : kingdom.getJoinRequests()) {
+								tabList.add(requester.getName());
+							}
+							break;
+						case "member":
+							tabList.add("invite");
+							tabList.add("kick");
+							tabList.add("promote");
+							tabList.add("demote");
+							tabList.add("master");
+							break;
+					}
+					break;
+			}
+		} else if (numArgs == 4) {
+			if (args.get(0).equalsIgnoreCase("manage")) {
+				switch (args.get(1).toLowerCase()) {
+					case "diplomacy":
+						String otherKingdomName = args.get(2);
+						if (konquest.getKingdomManager().isKingdom(otherKingdomName)) {
+							for (KonquestDiplomacyType relation : KonquestDiplomacyType.values()) {
+								if (konquest.getKingdomManager().isValidRelationChoice(kingdom,konquest.getKingdomManager().getKingdom(otherKingdomName),relation)) {
+									tabList.add(relation.toString());
+								}
+							}
+						}
+						break;
+					case "requests":
+						tabList.add("accept");
+						tabList.add("deny");
+						break;
+					case "member":
+						switch (args.get(2).toLowerCase()) {
+							case "invite":
+								for(KonOfflinePlayer offlinePlayer : konquest.getPlayerManager().getAllKonquestOfflinePlayers()) {
+									String name = offlinePlayer.getOfflineBukkitPlayer().getName();
+									if(name != null && !kingdom.isMember(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
+										tabList.add(name);
+									}
+								}
+								break;
+							case "kick":
+								for(KonOfflinePlayer offlinePlayer : konquest.getPlayerManager().getAllKonquestOfflinePlayers()) {
+									String name = offlinePlayer.getOfflineBukkitPlayer().getName();
+									if(name != null && kingdom.isMember(offlinePlayer.getOfflineBukkitPlayer().getUniqueId())) {
+										tabList.add(name);
+									}
+								}
+								break;
+							case "promote":
+								for(OfflinePlayer offlinePlayer : kingdom.getPlayerMembersOnly()) {
+									String name = offlinePlayer.getName();
+									if(name != null) {
+										tabList.add(name);
+									}
+								}
+								break;
+							case "demote":
+								for(OfflinePlayer offlinePlayer : kingdom.getPlayerOfficersOnly()) {
+									String name = offlinePlayer.getName();
+									if(name != null) {
+										tabList.add(name);
+									}
+								}
+								break;
+							case "master":
+								for(OfflinePlayer offlinePlayer : kingdom.getPlayerMembers()) {
+									String name = offlinePlayer.getName();
+									if(name != null && !kingdom.isMaster(offlinePlayer.getUniqueId())) {
+										tabList.add(name);
+									}
+								}
+								break;
+						}
+						break;
+				}
+			}
 		}
 		return matchLastArgToList(tabList,args);
 	}
+
 }

@@ -17,25 +17,58 @@ import java.util.List;
 
 public class HelpAdminCommand extends CommandBase {
 	
-	public HelpAdminCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public HelpAdminCommand() {
+		// Define name and sender support
+		super("help",false, true);
+		// None
+		setOptionalArgs(true);
+		// [<page>]
+		addArgument(
+				newArg("page",false,false)
+		);
+		// <command> [<page>]
+		addArgument(
+				newArg("command",false,true)
+						.sub( newArg("page",false,false) )
+		);
     }
 
-    public void execute() {
-		// k admin help [<page>]
-		Player bukkitPlayer = (Player) getSender();
+	@Override
+	public void execute(Konquest konquest, CommandSender sender, List<String> args) {
 		final int MAX_LINES_PER_PAGE = 6;
-
+		String argPage = "";
+		String helpCommand = "";
+		if (!args.isEmpty()) {
+			if (AdminCommandType.contains(args.get(0))) {
+				// First argument is a command
+				helpCommand = args.get(0);
+				// Check for second page argument
+				if (args.size() == 2) {
+					argPage = args.get(1);
+				}
+			} else {
+				// First argument is a page number
+				argPage = args.get(0);
+			}
+		}
 		// Populate help lines
 		List<String> lines = new ArrayList<>();
-		for(AdminCommandType cmd : AdminCommandType.values()) {
-			String commandFormat = Labeler.format(cmd);
-			String message = commandFormat+ChatColor.WHITE+": "+cmd.description();
-			lines.add(message);
+		if (helpCommand.isEmpty()) {
+			// Use command base usage
+			for (AdminCommandType cmd : AdminCommandType.values()) {
+				if (cmd.isSenderAllowed(sender) && sender.hasPermission(cmd.permission())) {
+					// This command is supported for the current sender
+					String message = cmd.baseUsage()+ChatColor.WHITE+" : "+cmd.description();
+					lines.add(message);
+				}
+			}
+		} else {
+			// First argument is a command
+			lines.addAll(AdminCommandType.getCommand(helpCommand).argumentUsage());
 		}
 		// Check for any help lines
-		if(lines.isEmpty()) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+		if (lines.isEmpty()) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return;
 		}
 		// Max number of pages given help lines
@@ -43,14 +76,13 @@ public class HelpAdminCommand extends CommandBase {
 		int maxPages = (int)Math.ceil(((double)numLines)/MAX_LINES_PER_PAGE);
 		// Get page index to display
 		int page = 1;
-		if (getArgs().length >= 3) {
-			String pageArg = getArgs()[2];
+		if (!argPage.isEmpty()) {
 			try {
-				page = Integer.parseInt(pageArg);
+				page = Integer.parseInt(argPage);
 			}
 			catch (NumberFormatException ignored) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_HELP_ERROR_PAGE.getMessage());
-				sendInvalidArgMessage(bukkitPlayer,AdminCommandType.HELP);
+				ChatUtil.sendError(sender, MessagePath.COMMAND_HELP_ERROR_PAGE.getMessage());
+				sendInvalidArgMessage(sender);
 				return;
 			}
 			page = Math.max(page,1);
@@ -58,27 +90,32 @@ public class HelpAdminCommand extends CommandBase {
 		}
 		// Display help lines
 		String pageDisplay = page + "/" + maxPages;
-		ChatUtil.sendNotice(bukkitPlayer, pageDisplay + " " + MessagePath.COMMAND_ADMIN_HELP_NOTICE_MESSAGE.getMessage());
+		ChatUtil.sendNotice(sender, pageDisplay + " " + MessagePath.COMMAND_HELP_NOTICE_MESSAGE.getMessage());
 		int startIdx = (page-1) * MAX_LINES_PER_PAGE;
 		int endIdx = startIdx + MAX_LINES_PER_PAGE;
 		for (int i = startIdx; i < endIdx && i < numLines; i++) {
-			ChatUtil.sendMessage(bukkitPlayer, lines.get(i));
+			ChatUtil.sendMessage(sender, lines.get(i));
 		}
-    }
-    
-    @Override
-	public List<String> tabComplete() {
-		// k admin help [<page>]
+	}
+
+	@Override
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		List<String> tabList = new ArrayList<>();
-		final List<String> matchedTabList = new ArrayList<>();
-
-		if(getArgs().length == 3) {
+		// Give suggestions
+		if(args.size() == 1) {
+			// Page number
 			tabList.add("#");
-
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
+			// Command names
+			for(CommandType cmd : CommandType.values()) {
+				tabList.add(cmd.toString().toLowerCase());
+			}
+		} else if(args.size() == 2) {
+			// Suggest page number when previous argument was a command
+			if(CommandType.contains(args.get(0))) {
+				// Page number
+				tabList.add("#");
+			}
 		}
-		return matchedTabList;
+		return matchLastArgToList(tabList,args);
 	}
 }

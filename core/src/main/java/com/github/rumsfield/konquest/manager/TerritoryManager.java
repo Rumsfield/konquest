@@ -705,16 +705,15 @@ public class TerritoryManager implements KonquestTerritoryManager {
 	
 	// Main method for admins to un-claim an individual chunk.
     // Calls event.
-	public boolean unclaimForAdmin(Player bukkitPlayer, Location claimLoc) {
-		// Get territory name
-		KonTerritory territory = getChunkTerritory(claimLoc);
-		String territoryName = territory.getName();
-
+	public boolean unclaimForAdmin(@NotNull KonPlayer player, @NotNull Location claimLoc) {
+		Player bukkitPlayer = player.getBukkitPlayer();
 		// Attempt to unclaim the current chunk
 		int unclaimStatus = unclaimChunk(claimLoc, true);
     	switch(unclaimStatus) {
     	case 0:
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_SUCCESS.getMessage("1",territoryName));
+			// Get territory name
+			KonTerritory territory = getChunkTerritory(claimLoc);
+			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_SUCCESS.getMessage("1",territory.getName()));
     		break;
     	case 1:
     		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_UNCLAIM_ERROR_FAIL_UNCLAIMED.getMessage());
@@ -736,7 +735,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
     	return unclaimStatus == 0;
 	}
 	
-	public boolean unclaimForPlayer(Player bukkitPlayer, Location claimLoc) {
+	public boolean unclaimForPlayer(@NotNull KonPlayer player, @NotNull Location claimLoc) {
+		Player bukkitPlayer = player.getBukkitPlayer();
 		// Verify town at location, and player is lord
 		if(this.isChunkClaimed(claimLoc)) {
 			KonTerritory territory = this.getChunkTerritory(claimLoc);
@@ -844,8 +844,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		return status ? 0 : 3;
 	}
 	
-	public boolean unclaimRadiusForAdmin(Player bukkitPlayer, Location claimLoc, int radius) {
-
+	public boolean unclaimRadiusForAdmin(@NotNull KonPlayer player, @NotNull Location claimLoc, int radius) {
+		Player bukkitPlayer = player.getBukkitPlayer();
 		// Find adjacent or current territory
 		KonTerritory unclaimTerritory = getChunkTerritory(claimLoc);
 		if(unclaimTerritory == null) {
@@ -881,8 +881,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		return unclaimStatus == 0;
 	}
 	
-	public boolean unclaimRadiusForPlayer(Player bukkitPlayer, Location claimLoc, int radius) {
-		//KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+	public boolean unclaimRadiusForPlayer(@NotNull KonPlayer player, @NotNull Location claimLoc, int radius) {
+		Player bukkitPlayer = player.getBukkitPlayer();
 		// Verify town at location, and player is lord
 		HashSet<Point> toUnclaimChunks = new HashSet<>();
 		World claimWorld = claimLoc.getWorld();

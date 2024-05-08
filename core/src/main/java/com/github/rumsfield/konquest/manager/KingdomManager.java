@@ -15,6 +15,7 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
@@ -652,7 +653,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * Renames a kingdom
 	 * @param oldName		The original name of the kingdom
 	 * @param newName		The new name for the kingdom
-	 * @param player		The player performing the name change
+	 * @param player		The player performing the name change, can be null
 	 * @param ignoreCost	Bypass cost checks when true
 	 * @return Status code
 	 * 			0 - Success
@@ -661,7 +662,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * 			3 - Not enough favor
 	 */
 	public int renameKingdom(String oldName, String newName, KonPlayer player, boolean ignoreCost) {
-		Player bukkitPlayer = player.getBukkitPlayer();
 		
 		if(!isKingdom(oldName)) {
 			return 1;
@@ -672,7 +672,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		
 		// Check cost
-		if(!ignoreCost && costRename > 0 && KonquestPlugin.getBalance(bukkitPlayer) < costRename) {
+		if(!ignoreCost && costRename > 0 && player != null && KonquestPlugin.getBalance(player.getBukkitPlayer()) < costRename) {
             return 3;
     	}
 		
@@ -693,7 +693,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		konquest.getDatabaseThread().getDatabase().setOfflinePlayers(konquest.getPlayerManager().getAllPlayersInKingdom(kingdom));
 		
 		// Withdraw cost
-		if(!ignoreCost && costRename > 0 && KonquestPlugin.withdrawPlayer(bukkitPlayer, costRename)) {
+		if(!ignoreCost && costRename > 0 && player != null && KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), costRename)) {
             konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costRename);
 		}
 		return 0;
@@ -1822,28 +1822,41 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return true;
 	}
 
-	// The primary way to change a town's specialization
-	public boolean menuChangeTownSpecialization(KonTown town, Villager.Profession profession, KonPlayer player, boolean isAdmin) {
-		Player bukkitPlayer = player.getBukkitPlayer();
+	/**
+	 * Sets a town's trade specialization to a villager profession.
+	 *
+	 * @param town The town being modified
+	 * @param profession The new trade specialization of the town
+	 * @param payPlayer The player paying for the change
+	 * @param messageSender The recipient of status messages
+	 * @param isAdmin Whether to ignore payment
+	 * @return True when the change was successful, else false
+	 */
+	public boolean menuChangeTownSpecialization(KonTown town, Villager.Profession profession, KonPlayer payPlayer, CommandSender messageSender, boolean isAdmin) {
+		if (town == null || profession == null) return false;
 		double costSpecial = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SPECIALIZE.getPath());
 		// Check cost
-		if(costSpecial > 0 && !isAdmin) {
-			if(KonquestPlugin.getBalance(bukkitPlayer) < costSpecial) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costSpecial));
+		if(costSpecial > 0 && !isAdmin && payPlayer != null) {
+			if(KonquestPlugin.getBalance(payPlayer.getBukkitPlayer()) < costSpecial) {
+				ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costSpecial));
 				return false;
 			}
 		}
 		town.setSpecialization(profession);
 		// Withdraw cost
-		if(costSpecial > 0 && !isAdmin) {
-			if(KonquestPlugin.withdrawPlayer(bukkitPlayer, costSpecial)) {
-				konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costSpecial);
+		if(costSpecial > 0 && !isAdmin && payPlayer != null) {
+			if(KonquestPlugin.withdrawPlayer(payPlayer.getBukkitPlayer(), costSpecial)) {
+				konquest.getAccomplishmentManager().modifyPlayerStat(payPlayer,KonStatsType.FAVOR,(int)costSpecial);
 			}
 		}
-		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_SPECIALIZE.getMessage(town.getName(),profession.name()));
+		ChatUtil.sendNotice(messageSender, MessagePath.COMMAND_TOWN_NOTICE_SPECIALIZE.getMessage(town.getName(),profession.name()));
 		return true;
 	}
-	
+	// Alternate
+	public boolean menuChangeTownSpecialization(KonTown town, Villager.Profession profession, KonPlayer player, boolean isAdmin) {
+		if (player == null) return false;
+		return menuChangeTownSpecialization(town, profession, player, player.getBukkitPlayer(), isAdmin);
+	}
 	
 	/*
 	 * =================================================
@@ -1858,13 +1871,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @param kingdom		The source kingdom initiating the change (ours)
 	 * @param otherKingdom	The target kingdom in question (theirs)
 	 * @param relation		The new diplomatic state to change to
-	 * @param player		The player performing the change
+	 * @param payPlayer		The player performing the change and making payments
+	 * @param messageSender The user receiving status messages
 	 * @param isAdmin		Whether the player is an admin (to bypass some checks)
 	 * @return				True when the change was successful, else false when the change could not be processed
 	 */
-	public boolean menuChangeKingdomRelation(@Nullable KonKingdom kingdom, @Nullable  KonKingdom otherKingdom, @NotNull KonquestDiplomacyType relation, @NotNull KonPlayer player, boolean isAdmin) {
+	public boolean menuChangeKingdomRelation(@Nullable KonKingdom kingdom, @Nullable  KonKingdom otherKingdom, @NotNull KonquestDiplomacyType relation, KonPlayer payPlayer, CommandSender messageSender, boolean isAdmin) {
 		if(kingdom == null || otherKingdom == null) return false;
-		Player bukkitPlayer = player.getBukkitPlayer();
 
 		// Check for peaceful kingdom flag
 		if(kingdom.isPeaceful() || otherKingdom.isPeaceful()) {
@@ -1872,15 +1885,15 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.printDebug("Tried to change relation of peaceful kingdom(s), reverting to default.");
 			kingdom.removeActiveRelation(otherKingdom);
 			otherKingdom.removeActiveRelation(kingdom);
-			ChatUtil.sendError(bukkitPlayer,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			ChatUtil.sendError(messageSender,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return false;
 		}
 
 		// Check cost
 		double costRelation = getRelationCost(relation);
-		if(costRelation > 0 && !isAdmin) {
-			if(KonquestPlugin.getBalance(bukkitPlayer) < costRelation) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costRelation));
+		if(costRelation > 0 && !isAdmin && payPlayer != null) {
+			if(KonquestPlugin.getBalance(payPlayer.getBukkitPlayer()) < costRelation) {
+				ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costRelation));
                 return false;
 			}
     	}
@@ -1899,7 +1912,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 		// Check for valid relation change given current states
 		if(!isValidRelationChoice(kingdom, otherKingdom, relation)) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_INVALID.getMessage());
+			ChatUtil.sendError(messageSender, MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_INVALID.getMessage());
 			return false;
 		}
 
@@ -1909,7 +1922,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.printDebug("Found invalid state combination, reverting to default.");
 			kingdom.removeActiveRelation(otherKingdom);
 			otherKingdom.removeActiveRelation(kingdom);
-			ChatUtil.sendError(bukkitPlayer,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			ChatUtil.sendError(messageSender,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return false;
 		}
 
@@ -1941,11 +1954,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						} else {
 							// We request peace, still at war
 							if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.PEACE)) {
-								ChatUtil.sendError(bukkitPlayer,MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
+								ChatUtil.sendError(messageSender,MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
 								return false;
 							}
 							otherKingdom.setRelationRequest(kingdom,relation);
-							ChatUtil.sendNotice(bukkitPlayer,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
+							ChatUtil.sendNotice(messageSender,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
 							broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_PEACE_REQUEST.getMessage(kingdom.getName()));
 						}
 					}
@@ -1973,11 +1986,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					} else {
 						// We request trade
 						if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.TRADE)) {
-							ChatUtil.sendError(bukkitPlayer,MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
+							ChatUtil.sendError(messageSender,MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
 							return false;
 						}
 						otherKingdom.setRelationRequest(kingdom,relation);
-						ChatUtil.sendNotice(bukkitPlayer,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
+						ChatUtil.sendNotice(messageSender,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
 						broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_TRADE_REQUEST.getMessage(kingdom.getName()));
 					}
 				} else if(ourActiveState.equals(KonquestDiplomacyType.ALLIANCE)) {
@@ -1995,11 +2008,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				} else {
 					// We request allied
 					if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.ALLIANCE)) {
-						ChatUtil.sendError(bukkitPlayer,MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
+						ChatUtil.sendError(messageSender,MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
 						return false;
 					}
 					otherKingdom.setRelationRequest(kingdom,relation);
-					ChatUtil.sendNotice(bukkitPlayer,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
+					ChatUtil.sendNotice(messageSender,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
 					broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_ALLY_REQUEST.getMessage(kingdom.getName()));
 				}
 				break;
@@ -2022,11 +2035,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					} else {
 						// We request enemy
 						if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.WAR)) {
-							ChatUtil.sendError(bukkitPlayer,MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
+							ChatUtil.sendError(messageSender,MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
 							return false;
 						}
 						otherKingdom.setRelationRequest(kingdom, relation);
-						ChatUtil.sendNotice(bukkitPlayer,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
+						ChatUtil.sendNotice(messageSender,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
 						broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_WAR_REQUEST.getMessage(kingdom.getName()));
 					}
 				}
@@ -2075,13 +2088,18 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 
 		// Withdraw cost
-		if(costRelation > 0 && !isAdmin) {
-            if(KonquestPlugin.withdrawPlayer(bukkitPlayer, costRelation)) {
-            	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costRelation);
+		if(costRelation > 0 && !isAdmin && payPlayer != null) {
+            if(KonquestPlugin.withdrawPlayer(payPlayer.getBukkitPlayer(), costRelation)) {
+            	konquest.getAccomplishmentManager().modifyPlayerStat(payPlayer,KonStatsType.FAVOR,(int)costRelation);
             }
 		}
 
 		return true;
+	}
+
+	public boolean menuChangeKingdomRelation(@Nullable KonKingdom kingdom, @Nullable  KonKingdom otherKingdom, @NotNull KonquestDiplomacyType relation, KonPlayer player, boolean isAdmin) {
+		if (player == null) return false;
+		return menuChangeKingdomRelation(kingdom, otherKingdom, relation, player, player.getBukkitPlayer(), isAdmin);
 	}
 	
 	public boolean isValidRelationChoice(@NotNull KonKingdom kingdom1,@NotNull KonKingdom kingdom2,@NotNull KonquestDiplomacyType relation) {
@@ -3150,6 +3168,23 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		return false;
 	}
+
+	/**
+	 * Finds the town with a matching name, or the kingdom capital with a matching kingdom name.
+	 * @param name The name of the town or kingdom capital
+	 * @return Town or capital
+	 */
+	@Nullable
+	public KonTown getTownCapital(String name) {
+		for(KonKingdom kingdom : kingdomMap.values()) {
+			if(kingdom.hasCapital(name)) {
+				return kingdom.getCapital();
+			} else if(kingdom.hasTown(name)) {
+				return kingdom.getTown(name);
+			}
+		}
+		return null;
+	}
 	
 	public KonKingdom getBarbarians() {
 		return barbarians;
@@ -3174,6 +3209,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 	}
+
+	public boolean isTownOptionFeatureEnabled(@NotNull KonTownOption option) {
+		if (option.equals(KonTownOption.ALLIED_BUILDING)) {
+			return konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(), false);
+		}
+		return true;
+	}
 	
 	/**
 	 * Updates a town option based on action
@@ -3195,15 +3237,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return result;
 	}
 
-	public boolean setTownOption(KonTownOption option, KonTown town, Player bukkitPlayer, boolean value) {
+	public boolean setTownOption(KonTownOption option, KonTown town, CommandSender messageSender, boolean value) {
 		// Check for disabled options
-		if (option.equals(KonTownOption.ALLIED_BUILDING)) {
-			boolean isAlliedBuildingEnable = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
-			if(!isAlliedBuildingEnable) {
-				// Cannot set this option
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
-				return false;
-			}
+		if (!isTownOptionFeatureEnabled(option)) {
+			// Cannot set this option
+			ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return false;
 		}
 		// Set option
 		boolean result = town.setTownOption(option, value);

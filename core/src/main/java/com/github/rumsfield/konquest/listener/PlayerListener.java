@@ -1074,10 +1074,10 @@ public class PlayerListener implements Listener {
 	        			// Auto un-claim
 	        			if(player.getAutoFollow().equals(FollowType.ADMIN_UNCLAIM)) {
 	        				// Admin un-claiming takes priority
-	        				territoryManager.unclaimForAdmin(movePlayer, moveTo);
+	        				territoryManager.unclaimForAdmin(player, moveTo);
 	        			} else if(player.getAutoFollow().equals(FollowType.UNCLAIM)) {
 	        				// Player is un-claim following
-	        				boolean isUnclaimSuccess = territoryManager.unclaimForPlayer(movePlayer, moveTo);
+	        				boolean isUnclaimSuccess = territoryManager.unclaimForPlayer(player, moveTo);
 	            			if(!isUnclaimSuccess) {
 	            				player.setAutoFollow(FollowType.NONE);
 	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_FAIL_AUTO.getMessage());

@@ -47,14 +47,4 @@ public class Labeler {
         return "";
     }
 
-    public static String format(AdminCommandType type) {
-        String cmdArgsFormatted = type.arguments()
-                .replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA)
-                .replaceAll(">", ChatColor.GRAY+">"+ChatColor.AQUA)
-                .replaceAll("\\|", ChatColor.GRAY+"|"+ChatColor.AQUA)
-                .replaceAll("]", ChatColor.GRAY+"]"+ChatColor.AQUA)
-                .replaceAll("\\[", ChatColor.GRAY+"["+ChatColor.AQUA);
-        return ChatColor.GOLD+"/k admin "+type.toString().toLowerCase()+" "+ChatColor.AQUA+cmdArgsFormatted;
-    }
-
 }

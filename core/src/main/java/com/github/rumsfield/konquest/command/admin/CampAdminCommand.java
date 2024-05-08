@@ -18,71 +18,83 @@ import org.bukkit.util.StringUtil;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class CampAdminCommand extends CommandBase {
 
-	public CampAdminCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public CampAdminCommand() {
+		// Define name and sender support
+		super("camp",true, true);
+		// Define arguments
+		// create|remove <player>
+		List<String> argNames = Arrays.asList("create", "remove");
+		addArgument(
+				newArg(argNames,true,false)
+						.sub( newArg("player",false,false) )
+		);
     }
 
 	@Override
-	public void execute() {
-		// k admin camp create|destroy <player>
-		Player bukkitPlayer = (Player) getSender();
-		if (getArgs().length != 4) {
-			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.CAMP);
-			return;
-        }
-		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-			ChatUtil.printDebug("Failed to find non-existent player");
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+	public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		// Sender must be player
+		KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
+		if (player == null) {
+			sendInvalidSenderMessage(sender);
 			return;
 		}
-		String cmdMode = getArgs()[2];
-		String playerName = getArgs()[3];
-		
+		if (args.size() != 2) {
+			sendInvalidArgMessage(sender);
+			return;
+        }
+		String cmdMode = args.get(0);
+		String playerName = args.get(1);
 		// Qualify arguments
-		KonOfflinePlayer targetPlayer = getKonquest().getPlayerManager().getOfflinePlayerFromName(playerName);
+		KonOfflinePlayer targetPlayer = konquest.getPlayerManager().getOfflinePlayerFromName(playerName);
 		if(targetPlayer == null) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage());
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage());
 			return;
 		}
 		String targetName = targetPlayer.getOfflineBukkitPlayer().getName();
-
 		// Execute sub-commands
 		if(cmdMode.equalsIgnoreCase("create")) {
+			// Sender must be a player, to get location
+			Location campLoc;
+			if (sender instanceof Player) {
+				campLoc = ((Player)sender).getLocation();
+			} else {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_PLAYER.getMessage());
+				return;
+			}
 			// Create a new camp for the target player
-			if(getKonquest().isWorldIgnored(bukkitPlayer.getWorld())) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+			if(konquest.isWorldIgnored(campLoc.getWorld())) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
 				return;
 			}
 			if(!targetPlayer.isBarbarian()) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PLAYER.getMessage());
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INVALID_PLAYER.getMessage());
 				return;
 			}
-			if(getKonquest().getCampManager().isCampSet(targetPlayer)) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_CAMP_ERROR_CREATE_EXIST.getMessage());
+			if(konquest.getCampManager().isCampSet(targetPlayer)) {
+				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_CAMP_ERROR_CREATE_EXIST.getMessage());
                 return;
 			}
-			Location bedLocation = bukkitPlayer.getLocation();
-
 			// Determine solid location to place bed
-			Chunk chunk = bedLocation.getChunk();
-			Point point = Konquest.toPoint(bedLocation);
-			int xLocal = bedLocation.getBlockX() - (point.x*16);
-			int zLocal = bedLocation.getBlockZ() - (point.y*16);
+			Chunk chunk = campLoc.getChunk();
+			Point point = Konquest.toPoint(campLoc);
+			int xLocal = campLoc.getBlockX() - (point.x*16);
+			int zLocal = campLoc.getBlockZ() - (point.y*16);
 			int yFloor = chunk.getChunkSnapshot(true, false, false).getHighestBlockYAt(xLocal, zLocal);
 			while((chunk.getBlock(xLocal, yFloor, zLocal).isPassable() || !chunk.getBlock(xLocal, yFloor, zLocal).getType().isOccluding()) && yFloor > 0) {
 				yFloor--;
 			}
-			bedLocation.setY(yFloor+1);
+			campLoc.setY(yFloor+1);
 
 			// Place a bed
 			// Author: LogicalDark
 			// https://www.spigotmc.org/threads/door-and-bed-placement.217786/#post-4478501
-			BlockState bedFoot = bedLocation.getBlock().getState();
+			BlockState bedFoot = campLoc.getBlock().getState();
 			BlockState bedHead = bedFoot.getBlock().getRelative(BlockFace.SOUTH).getState();
 			BlockData bedHeadData = Bukkit.getServer().createBlockData("minecraft:white_bed[facing=south,occupied=false,part=head]");
 			BlockData bedFootData = Bukkit.getServer().createBlockData("minecraft:white_bed[facing=south,occupied=false,part=foot]");
@@ -92,72 +104,64 @@ public class CampAdminCommand extends CommandBase {
 			bedHead.update(true, true);
 
 			// Create the camp
-			int status = getKonquest().getCampManager().addCamp(bedLocation, targetPlayer);
+			int status = konquest.getCampManager().addCamp(campLoc, targetPlayer);
 			switch(status) {
 				case 0:
-					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_CAMP_NOTICE_CREATE.getMessage(targetName));
+					ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_CAMP_NOTICE_CREATE.getMessage(targetName));
 					break;
 				case 1:
-					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
+					ChatUtil.sendError(sender, MessagePath.PROTECTION_ERROR_CAMP_FAIL_OVERLAP.getMessage());
 					break;
 				case 2:
-					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
+					ChatUtil.sendError(sender, MessagePath.PROTECTION_ERROR_CAMP_CREATE.getMessage());
 					break;
 				case 3:
-					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
+					ChatUtil.sendError(sender, MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
 					break;
 				case 4:
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 					break;
 				case 5:
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
 					break;
 				case 6:
-					ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_FAIL_OFFLINE.getMessage());
+					ChatUtil.sendError(sender, MessagePath.PROTECTION_ERROR_CAMP_FAIL_OFFLINE.getMessage());
 					break;
 				default:
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 					break;
 			}
-		} else if(cmdMode.equalsIgnoreCase("destroy")) {
-			if(!getKonquest().getCampManager().isCampSet(targetPlayer)) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_CAMP_ERROR_DESTROY_EXIST.getMessage());
+		} else if(cmdMode.equalsIgnoreCase("remove")) {
+			if(!konquest.getCampManager().isCampSet(targetPlayer)) {
+				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_CAMP_ERROR_DESTROY_EXIST.getMessage());
                 return;
 			}
-			boolean status = getKonquest().getCampManager().removeCamp(targetPlayer);
+			boolean status = konquest.getCampManager().removeCamp(targetPlayer);
 			if(status) {
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_CAMP_NOTICE_DESTROY.getMessage(targetName));
-				KonPlayer onlineOwner = getKonquest().getPlayerManager().getPlayerFromName(playerName);
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_CAMP_NOTICE_DESTROY.getMessage(targetName));
+				KonPlayer onlineOwner = konquest.getPlayerManager().getPlayerFromName(playerName);
 				if(onlineOwner != null) {
 					ChatUtil.sendError(onlineOwner.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY_OWNER.getMessage());
 				}
 			} else {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			}
 		} else {
-			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.CAMP);
+			sendInvalidArgMessage(sender);
 		}
 
 	}
 
 	@Override
-	public List<String> tabComplete() {
-		// k admin camp create|remove <player>
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		List<String> tabList = new ArrayList<>();
-		final List<String> matchedTabList = new ArrayList<>();
-		if(getArgs().length == 3) {
+		if (args.size() == 1) {
 			tabList.add("create");
-			tabList.add("destroy");
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
-		} else if(getArgs().length == 4) {
+			tabList.add("remove");
+		} else if (args.size() == 2) {
 			// suggest player names
-			tabList.addAll(getKonquest().getPlayerManager().getAllPlayerNames());
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
+			tabList.addAll(konquest.getPlayerManager().getAllPlayerNames());
 		}
-		return matchedTabList;
+		return matchLastArgToList(tabList,args);
 	}
 }

@@ -21,7 +21,8 @@ public class ListCommand extends CommandBase {
 		TOWN        (MessagePath.LABEL_TOWN.getMessage()),
 		CAMP        (MessagePath.LABEL_CAMP.getMessage()),
 		RUIN        (MessagePath.LABEL_RUIN.getMessage()),
-		SANCTUARY   (MessagePath.LABEL_SANCTUARY.getMessage());
+		SANCTUARY   (MessagePath.LABEL_SANCTUARY.getMessage()),
+		TEMPLATE	(MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage());
 
 		private final String label;
 
@@ -40,8 +41,8 @@ public class ListCommand extends CommandBase {
 		super("list",false, false);
 		// None
 		setOptionalArgs(true);
-		// kingdom|town|camp|sanctuary|ruin [<page>]
-		List<String> argNames = Arrays.asList("kingdom", "town", "camp", "sanctuary", "ruin");
+		// kingdom|town|camp|sanctuary|ruin|template [<page>]
+		List<String> argNames = Arrays.asList("kingdom", "town", "camp", "ruin", "sanctuary", "template");
 		addArgument(
 				newArg(argNames,true,true)
 						.sub( newArg("page",false,false) )
@@ -72,6 +73,9 @@ public class ListCommand extends CommandBase {
 					case "ruin":
 						mode = ListType.RUIN;
 						break;
+					case "template":
+						mode = ListType.TEMPLATE;
+						break;
 					default:
 						sendInvalidArgMessage(sender);
 						return;
@@ -95,6 +99,8 @@ public class ListCommand extends CommandBase {
 				case SANCTUARY:
 					lines.addAll(konquest.getSanctuaryManager().getSanctuaryNames());
 					break;
+				case TEMPLATE:
+					lines.addAll(konquest.getSanctuaryManager().getAllTemplateNames());
 	        	default :
 					sendInvalidArgMessage(sender);
 	                return;

@@ -458,6 +458,8 @@ command:
         single-property: "Single Property"
         set: "Set property %s of %s to new value %s."
         reset: "Reset all properties to default values in properties.yml"
+      error:
+        invalid: "The property flag %s does not apply to %s."
     help:
       notice:
         message: "Admin Help: Command, Arguments, Description"
@@ -465,12 +467,10 @@ command:
       broadcast:
         create: "The Admin Kingdom of %s has been created!"
       notice:
-        admin-set: "The Kingdom of %s is now an admin kingdom."
-        admin-clear: "The Kingdom of %s is now a regular kingdom."
+        admin-set: "The Kingdom of %s is an admin kingdom."
+        admin-clear: "The Kingdom of %s is a player kingdom."
       error:
         no-templates: "There are no monument templates. Create one in a sanctuary with \"/k admin monument create (name)\""
-        admin-set: "The Kingdom of %s is already an admin kingdom."
-        admin-clear: "The Kingdom of %s is already a regular kingdom."
     monument:
       notice:
         create-1: "Now creating new Monument Template, click on the first corner block of the region."
@@ -478,6 +478,7 @@ command:
         create-3: "Click on the travel point block."
         success: "Successfully created new Monument Template %s."
         remove: "Removed Monument Template %s."
+        rename: "Renamed Monument Template %s to %s."
         show: "Showing existing Monument Template %s in Sanctuary %s."
         sanctuary: "Create Sanctuary territory with \"/k admin sanctuary create (name)\" before creating Monument Templates."
       error:
@@ -487,6 +488,9 @@ command:
         fail-travel: "Failed to create Monument Template %s, travel point must be inside of the region."
         fail-region: "Failed to create Monument Template %s, region corners must be within Sanctuary territory."
         fail-reset: "Failed to reset Monument Template %s, restored to previous state."
+    reload:
+      notice:
+        message: "Reloaded Konquest configuration files."
     ruin:
       notice:
         create: "Successfully created new Ruin: %s"
@@ -710,6 +714,7 @@ command:
       redstone-disable: "%s now prevents enemies from using redstone switches and doors."
       golem-enable: "Iron Golems in %s will attack all enemies within town land."
       golem-disable: "Iron Golems in %s will only defend the town monument from enemies."
+      add-resident: "Added resident %s to town %s."
       kick-resident: "Kicked resident %s from town %s."
       lord-success: "Gave Lordship of %s to %s."
       lord-claim: "%s has claimed Lordship of %s!"
@@ -747,6 +752,7 @@ command:
       promote-knight: "%s is already a Knight."
       demote-resident: "%s is already a resident."
       upgrade-unavailable: "Upgrade %s is unavailable for the town of %s."
+      upgrade-level: "Upgrade level must be between %s and %s."
   travel:
     notice:
       town-travel: "%s has traveled to %s."

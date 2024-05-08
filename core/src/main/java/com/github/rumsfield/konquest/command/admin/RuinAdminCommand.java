@@ -13,158 +13,174 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class RuinAdminCommand extends CommandBase {
 
-	public RuinAdminCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public RuinAdminCommand() {
+		// Define name and sender support
+		super("ruin",true, true);
+		// Define arguments
+		// create <name>
+		addArgument(
+				newArg("create",true,false)
+						.sub( newArg("name",false,false) )
+		);
+		// rename <ruin> <name>
+		addArgument(
+				newArg("rename",true,false)
+						.sub( newArg("ruin",false,false)
+								.sub (newArg("name",false,false) ) )
+		);
+		// reset|remove|criticals|spawns <ruin>
+		List<String> argNames = Arrays.asList("reset", "remove", "criticals", "spawns");
+		addArgument(
+				newArg(argNames,true,false)
+						.sub( newArg("ruin",false,false) )
+		);
     }
 
 	@Override
-	public void execute() {
-		// k admin ruin create|remove|rename|reset|criticals|spawns <name> [<name>]
-		Player bukkitPlayer = (Player) getSender();
-		if (getArgs().length != 4 && getArgs().length != 5) {
-			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.RUIN);
-            return;
-        }
-		if(getKonquest().isWorldIgnored(bukkitPlayer.getWorld())) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+	public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		// Sender must be player
+		KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
+		if (player == null) {
+			sendInvalidSenderMessage(sender);
 			return;
 		}
-		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-			ChatUtil.printDebug("Failed to find non-existent player");
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+		if (args.size() != 2 && args.size() != 3) {
+			sendInvalidArgMessage(sender);
 			return;
 		}
-		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-		String cmdMode = getArgs()[2];
-		String ruinName = getArgs()[3];
-		
+		String cmdMode = args.get(0);
+		String ruinName = args.get(1);
+		// Check for invalid world
+		Location playerLoc = player.getBukkitPlayer().getLocation();
+		if(konquest.isWorldIgnored(playerLoc.getWorld())) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+			return;
+		}
+		// Parse sub-commands
 		if(cmdMode.equalsIgnoreCase("create")) {
-			if (getArgs().length != 4) {
-				sendInvalidArgMessage(bukkitPlayer, AdminCommandType.RUIN);
-				return;
-			}
-			Location playerLoc = bukkitPlayer.getLocation();
-			if(getKonquest().validateName(ruinName,bukkitPlayer) != 0) {
+			if(konquest.validateName(ruinName,sender) != 0) {
         		return;
         	}
-        	boolean pass = getKonquest().getRuinManager().addRuin(playerLoc, ruinName);
-        	if(!pass) {
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_CREATE.getMessage(ruinName));
+			// Create the new ruin
+			if (konquest.getRuinManager().addRuin(playerLoc, ruinName)) {
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CREATE.getMessage(ruinName));
 			} else {
-        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CREATE.getMessage(ruinName));
-        	}
+				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_RUIN_ERROR_CREATE.getMessage(ruinName));
+			}
 		} else if(cmdMode.equalsIgnoreCase("remove")) {
 			// Check for valid ruin
-			if(!getKonquest().getRuinManager().isRuin(ruinName)) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
+			if(!konquest.getRuinManager().isRuin(ruinName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
                 return;
 			}
-			boolean pass = getKonquest().getRuinManager().removeRuin(ruinName);
-        	if(!pass) {
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_REMOVE.getMessage(ruinName));
+			// Remove the ruin
+			if (konquest.getRuinManager().removeRuin(ruinName)) {
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_REMOVE.getMessage(ruinName));
 			} else {
-        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_REMOVE.getMessage(ruinName));
-        	}
+				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_RUIN_ERROR_REMOVE.getMessage(ruinName));
+			}
 		} else if(cmdMode.equalsIgnoreCase("rename")) {
-			if (getArgs().length == 5) {
-				if(!getKonquest().getRuinManager().isRuin(ruinName)) {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
-	                return;
-				}
-				String newName = getArgs()[4];
-				if(getKonquest().validateName(newName,bukkitPlayer) != 0) {
-	        		return;
-	        	}
-				boolean pass = getKonquest().getRuinManager().renameRuin(ruinName,newName);
-				if(!pass) {
-	        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_RENAME.getMessage(ruinName,newName));
-				} else {
-	        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_RENAME.getMessage(ruinName,newName));
-	        	}
+			if (args.size() != 3) {
+				sendInvalidArgMessage(sender);
+				return;
+			}
+			String newRuinName = args.get(2);
+			// Check for valid ruin
+			if(!konquest.getRuinManager().isRuin(ruinName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
+				return;
+			}
+			// Validate new name
+			if(konquest.validateName(newRuinName,sender) != 0) {
+				return;
+			}
+			// Rename the ruin
+			if (konquest.getRuinManager().renameRuin(ruinName,newRuinName)) {
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_RENAME.getMessage(ruinName,newRuinName));
 			} else {
-				sendInvalidArgMessage(bukkitPlayer, AdminCommandType.RUIN);
+				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_RUIN_ERROR_RENAME.getMessage(ruinName,newRuinName));
 			}
 		} else if(cmdMode.equalsIgnoreCase("reset")) {
+			// Check for valid ruin
+			if(!konquest.getRuinManager().isRuin(ruinName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
+				return;
+			}
 			// Reset ruin (restore critical blocks and respawn golems)
-			boolean pass = getKonquest().getRuinManager().resetRuin(ruinName);
-			if(!pass) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_RESET.getMessage(ruinName));
+			if (konquest.getRuinManager().resetRuin(ruinName)) {
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_RESET.getMessage(ruinName));
 			} else {
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_RESET.getMessage(ruinName));
+				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_RUIN_ERROR_RESET.getMessage(ruinName));
 			}
 		} else if(cmdMode.equalsIgnoreCase("criticals")) {
         	if(player.isSettingRegion()) {
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_REGION.getMessage());
+        		ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_REGION.getMessage());
                 return;
         	}
         	// Check for valid ruin
-			if(!getKonquest().getRuinManager().isRuin(ruinName)) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
+			if(!konquest.getRuinManager().isRuin(ruinName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
                 return;
 			}
-			getKonquest().getRuinManager().getRuin(ruinName).clearCriticalLocations();
+			konquest.getRuinManager().getRuin(ruinName).clearCriticalLocations();
 			player.settingRegion(RegionType.RUIN_CRITICAL);
-        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CRITICALS.getMessage(ruinName), ChatColor.LIGHT_PURPLE);
-        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
+        	ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_CRITICALS.getMessage(ruinName), ChatColor.LIGHT_PURPLE);
+        	ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 		} else if(cmdMode.equalsIgnoreCase("spawns")) {
         	if(player.isSettingRegion()) {
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_REGION.getMessage());
+        		ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_REGION.getMessage());
                 return;
         	}
         	// Check for valid ruin
-			if(!getKonquest().getRuinManager().isRuin(ruinName)) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
+			if(!konquest.getRuinManager().isRuin(ruinName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
                 return;
 			}
-			getKonquest().getRuinManager().getRuin(ruinName).clearSpawnLocations();
+			konquest.getRuinManager().getRuin(ruinName).clearSpawnLocations();
 			player.settingRegion(RegionType.RUIN_SPAWN);
-        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_SPAWNS.getMessage(ruinName), ChatColor.LIGHT_PURPLE);
-        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
+        	ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_RUIN_NOTICE_SPAWNS.getMessage(ruinName), ChatColor.LIGHT_PURPLE);
+        	ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 		} else {
-			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.RUIN);
+			sendInvalidArgMessage(sender);
 		}
 	}
 
 	@Override
-	public List<String> tabComplete() {
-		// k admin ruin create|remove|rename|criticals|spawns <name> [<name>]
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		List<String> tabList = new ArrayList<>();
-		final List<String> matchedTabList = new ArrayList<>();
-		if(getArgs().length == 3) {
+		if (args.size() == 1) {
 			tabList.add("create");
 			tabList.add("remove");
 			tabList.add("rename");
 			tabList.add("reset");
 			tabList.add("criticals");
 			tabList.add("spawns");
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
-		} else if(getArgs().length == 4) {
-			String subCmd = getArgs()[2];
-			if(subCmd.equalsIgnoreCase("create")) {
-				tabList.add("***");
-			} else if(subCmd.equalsIgnoreCase("remove") || subCmd.equalsIgnoreCase("reset") || subCmd.equalsIgnoreCase("criticals") || subCmd.equalsIgnoreCase("spawns") || subCmd.equalsIgnoreCase("rename")) {
-				tabList.addAll(getKonquest().getRuinManager().getRuinNames());
+		} else if (args.size() == 2) {
+			switch (args.get(0).toLowerCase()) {
+				case "create":
+					tabList.add("***");
+					break;
+				case "remove":
+				case "rename":
+				case "reset":
+				case "criticals":
+				case "spawns":
+					tabList.addAll(konquest.getRuinManager().getRuinNames());
+					break;
 			}
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
-		} else if(getArgs().length == 5) {
-			String subCmd = getArgs()[2];
-			if(subCmd.equalsIgnoreCase("rename")) {
+		} else if (args.size() == 3) {
+			if (args.get(0).equalsIgnoreCase("rename")) {
+				// New name
 				tabList.add("***");
 			}
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
 		}
-		return matchedTabList;
+		return matchLastArgToList(tabList,args);
 	}
 	
 }
