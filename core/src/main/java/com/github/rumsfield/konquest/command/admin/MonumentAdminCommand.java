@@ -192,7 +192,7 @@ public class MonumentAdminCommand extends CommandBase {
 			KonMonumentTemplate template = konquest.getSanctuaryManager().getTemplate(templateName);
 			String tempName = template.getName();
 			String sanctuaryName = konquest.getSanctuaryManager().getSanctuaryNameOfTemplate(templateName);
-			String cost = String.format("%f", template.getCost());
+			String cost = String.format("%.2f", template.getCost());
 			String isValid = String.format("%s", template.isValid());
 			String isBlanking = String.format("%s", template.isBlanking());
 			String allBlocks = String.format("%d", template.getNumBlocks());

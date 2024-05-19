@@ -90,7 +90,7 @@ public class TravelAdminCommand  extends CommandBase {
 				if (konquest.getSanctuaryManager().isTemplate(destinationName)) {
 					KonMonumentTemplate monument = konquest.getSanctuaryManager().getTemplate(destinationName);
 					if (monument != null) {
-						destination = monument.getTravelPoint();
+						destination = monument.getSpawnLoc();
 					}
 				}
 				break;

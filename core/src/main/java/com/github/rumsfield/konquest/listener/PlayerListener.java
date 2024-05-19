@@ -58,6 +58,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -366,14 +367,18 @@ public class PlayerListener implements Listener {
 	 */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerSetRegion(PlayerInteractEvent event) {
-    	Player bukkitPlayer = event.getPlayer();
+		if (event.getHand() != null && !event.getHand().equals(EquipmentSlot.HAND)) return;
+		if (event.getAction().equals(Action.PHYSICAL)) return;
+		Player bukkitPlayer = event.getPlayer();
     	if(!konquest.getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-			ChatUtil.printDebug("Failed to handle onPlayerInteract for non-existent player");
+			ChatUtil.printDebug("Failed to handle onPlayerSetRegion for non-existent player");
 			return;
 		}
         KonPlayer player = playerManager.getPlayer(bukkitPlayer);
+		assert player != null;
         // Check that the player is setting a region
         if (!player.isSettingRegion()) return;
+		ChatUtil.printDebug(bukkitPlayer.getName() + " setting region with action "+event.getAction()+", equipment "+event.getHand()+", state is "+player.getRegionType());
 		// Check if the player clicked air (cancel region setup)
 		if (event.getClickedBlock() == null) {
 			ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_CLICKED_AIR.getMessage());
@@ -478,6 +483,7 @@ public class PlayerListener implements Listener {
 				} else {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_INVALID.getMessage());
 				}
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 				break;
 			case RUIN_SPAWN:
 				boolean validSpawnBlock = false;
@@ -494,6 +500,7 @@ public class PlayerListener implements Listener {
 				} else {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_RUIN_ERROR_INVALID.getMessage());
 				}
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 				break;
 			default:
 				break;
@@ -1059,30 +1066,38 @@ public class PlayerListener implements Listener {
 	        			// Auto claim
 	        			if(player.getAutoFollow().equals(FollowType.ADMIN_CLAIM)) {
 	        				// Admin claiming takes priority
-	        				territoryManager.claimForAdmin(player, moveTo);
+	        				if(territoryManager.claimForAdmin(player, moveTo)) {
+								ChatUtil.sendKonTitle(player, "", ChatColor.GOLD+MessagePath.COMMAND_CLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
+							} else {
+								player.setAutoFollow(FollowType.NONE);
+								ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
+							}
 	        			} else if(player.getAutoFollow().equals(FollowType.CLAIM)) {
 	        				// Player is claim following
-	        				boolean isClaimSuccess = territoryManager.claimForPlayer(player, moveTo);
-	            			if(!isClaimSuccess) {
-	            				player.setAutoFollow(FollowType.NONE);
-	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
+	            			if(territoryManager.claimForPlayer(player, moveTo)) {
+								ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_CLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
 	            			} else {
-	            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_CLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
+								player.setAutoFollow(FollowType.NONE);
+								ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_CLAIM_NOTICE_FAIL_AUTO.getMessage());
 	            			}
 	        			}
 	        		} else {
 	        			// Auto un-claim
 	        			if(player.getAutoFollow().equals(FollowType.ADMIN_UNCLAIM)) {
 	        				// Admin un-claiming takes priority
-	        				territoryManager.unclaimForAdmin(player, moveTo);
+	        				if(territoryManager.unclaimForAdmin(player, moveTo)) {
+								ChatUtil.sendKonTitle(player, "", ChatColor.GOLD+MessagePath.COMMAND_UNCLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
+							} else {
+								player.setAutoFollow(FollowType.NONE);
+								ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_FAIL_AUTO.getMessage());
+							}
 	        			} else if(player.getAutoFollow().equals(FollowType.UNCLAIM)) {
 	        				// Player is un-claim following
-	        				boolean isUnclaimSuccess = territoryManager.unclaimForPlayer(player, moveTo);
-	            			if(!isUnclaimSuccess) {
-	            				player.setAutoFollow(FollowType.NONE);
-	            				ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_FAIL_AUTO.getMessage());
+	            			if(territoryManager.unclaimForPlayer(player, moveTo)) {
+								ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_UNCLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
 	            			} else {
-	            				ChatUtil.sendKonTitle(player, "", ChatColor.GREEN+MessagePath.COMMAND_UNCLAIM_NOTICE_PASS_AUTO.getMessage(), 15);
+								player.setAutoFollow(FollowType.NONE);
+								ChatUtil.sendNotice(movePlayer, MessagePath.COMMAND_UNCLAIM_NOTICE_FAIL_AUTO.getMessage());
 	            			}
 	        			}
 	        		}

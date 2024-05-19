@@ -37,6 +37,7 @@ public class StatAdminCommand extends CommandBase {
 	public void execute(Konquest konquest, CommandSender sender, List<String> args) {
 		if (args.size() < 3) {
 			sendInvalidArgMessage(sender);
+			return;
 		}
 		String subCmd = args.get(0);
 		String playerName = args.get(1);

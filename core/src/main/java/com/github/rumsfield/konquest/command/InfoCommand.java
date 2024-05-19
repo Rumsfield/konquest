@@ -18,10 +18,10 @@ public class InfoCommand extends CommandBase {
 		super("info",true, false);
 		// None
 		setOptionalArgs(true);
-		// player|kingdom|capital|town|sanctuary|ruin|template [<name>]
-		List<String> argNames = Arrays.asList("player", "kingdom", "capital", "town", "sanctuary", "ruin", "template");
+		// player|kingdom|capital|town|sanctuary|ruin <name>
+		List<String> argNames = Arrays.asList("player", "kingdom", "capital", "town", "sanctuary", "ruin");
 		addArgument(
-				newArg(argNames,true,true)
+				newArg(argNames,true,false)
 						.sub( newArg("name",false,false) )
 		);
     }
@@ -40,13 +40,6 @@ public class InfoCommand extends CommandBase {
 			// No arguments
 			// Display the player's kingdom info
 			konquest.getDisplayManager().displayKingdomInfoMenu(player, player.getKingdom());
-		} else if(args.size() == 1) {
-			// Single argument
-			String infoType = args.get(0);
-			if(infoType.equalsIgnoreCase("template")) {
-				// Show monument template info menu
-				konquest.getDisplayManager().displayTemplateInfoMenu(player);
-			}
 		} else if(args.size() == 2) {
 			// Two arguments
 			String infoType = args.get(0);
@@ -118,7 +111,6 @@ public class InfoCommand extends CommandBase {
 		List<String> tabList = new ArrayList<>();
 		// Give suggestions
 		if(args.size() == 1) {
-			tabList.add("template");
 			tabList.add("player");
 			tabList.add("kingdom");
 			tabList.add("capital");

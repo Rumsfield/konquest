@@ -121,7 +121,7 @@ public class SanctuaryAdminCommand extends CommandBase {
 					break;
 				case "remove":
 				case "rename":
-					tabList.addAll(konquest.getRuinManager().getRuinNames());
+					tabList.addAll(konquest.getSanctuaryManager().getSanctuaryNames());
 					break;
 			}
 		} else if (args.size() == 3) {

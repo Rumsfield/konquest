@@ -112,15 +112,12 @@ public class TownCommand extends CommandBase {
 	private String formatOptionLine(KonTownOption option, KonTown town) {
 		boolean val = town.getTownOption(option);
 		String optionLabel = option.toString();
-		String optionName = option.getName();
 		String optionValue = DisplayManager.boolean2Lang(val) + " " + DisplayManager.boolean2Symbol(val);
 		String optionDescription = option.getDescription();
 		return ChatColor.GOLD +
 				optionLabel +
 				" - " +
 				ChatColor.RESET +
-				optionName +
-				", " +
 				optionValue +
 				" " +
 				ChatColor.LIGHT_PURPLE +

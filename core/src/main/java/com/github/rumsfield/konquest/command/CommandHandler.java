@@ -52,12 +52,17 @@ public class CommandHandler implements TabExecutor {
 			// Reload command
 			if (konquestCommandName.equalsIgnoreCase("reload")) {
 				konquest.reload();
-				ChatUtil.printConsoleAlert("Reloaded Konquest configuration files.");
+				ChatUtil.printConsoleAlert(MessagePath.COMMAND_ADMIN_RELOAD_NOTICE_MESSAGE.getMessage());
+				return true;
+			}
+			// Save command
+			if (konquestCommandName.equalsIgnoreCase("save")) {
+				konquest.save();
+				ChatUtil.printConsoleAlert(MessagePath.COMMAND_ADMIN_SAVE_NOTICE_MESSAGE.getMessage());
 				return true;
 			}
 			// Version command
 			if (konquestCommandName.equalsIgnoreCase("version")) {
-				KonquestPlugin.printLogo();
 				konquest.getPlugin().printVersion();
 				return true;
 			}
@@ -83,26 +88,17 @@ public class CommandHandler implements TabExecutor {
 			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_PLAYER.getMessage());
 			return true;
 		}
-		// Check for correct command arguments
-		// TODO revisit this
-		/*
-		int argStatus = konquestCommand.validateArgs(args);
-		if (argStatus != 0) {
-			// Failed argument validation
-			if (argStatus == -1) {
-				// No arguments (this should never happen)
-				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-			} else {
-				// Get the invalid argument
-				String requiredArg = konquestCommand.getSingleArgumentString(argStatus);
-				ChatUtil.sendError(sender,requiredArg);
-			}
-			return false;
-		}
-		 */
+		// TODO Check for correct command arguments
 		/* Passed all command checks */
-		// Execute command
-		konquestCommand.execute(konquest, sender, arguments);
+		try {
+			// Execute command
+			konquestCommand.execute(konquest, sender, arguments);
+		} catch (Exception me) {
+			String message = "Failed to execute command "+commandType.toString();
+			ChatUtil.sendError(sender,MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(message));
+			ChatUtil.printConsoleError(message);
+			me.printStackTrace();
+		}
         return true;
     }
 

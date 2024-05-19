@@ -42,10 +42,12 @@ public class ChatCommand extends CommandBase {
 			// Chat formatting is disabled, so kingdom chat is unavailable
 			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			player.setIsGlobalChat(true);
+			return;
 		}
 		// Check for barbarian player (no kingdom)
 		if (player.isBarbarian()) {
 			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
+			return;
 		}
 
 		if (args.isEmpty()) {

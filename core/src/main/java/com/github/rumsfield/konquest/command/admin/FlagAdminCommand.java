@@ -23,7 +23,45 @@ import java.util.*;
  *  - KonRuin
  */
 public class FlagAdminCommand extends CommandBase {
-	
+
+	public enum HolderType {
+
+		KINGDOM     (MessagePath.LABEL_KINGDOM.getMessage()),
+		TOWN        (MessagePath.LABEL_TOWN.getMessage()),
+		CAPITAL     (MessagePath.LABEL_CAPITAL.getMessage()),
+		RUIN        (MessagePath.LABEL_RUIN.getMessage()),
+		SANCTUARY   (MessagePath.LABEL_SANCTUARY.getMessage());
+
+		private final String label;
+
+		HolderType(String label) {
+			this.label = label;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public static boolean contains(String type) {
+			for(HolderType check : HolderType.values()) {
+				if(check.toString().equalsIgnoreCase(type)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public static HolderType getType(String type) {
+			for(HolderType check : HolderType.values()) {
+				if(check.toString().equalsIgnoreCase(type)) {
+					return check;
+				}
+			}
+			return null;
+		}
+
+	}
+
 	public FlagAdminCommand() {
 		// Define name and sender support
 		super("flag",false, true);
@@ -58,33 +96,25 @@ public class FlagAdminCommand extends CommandBase {
 		);
     }
 
-	private boolean isHolderType(String type) {
-		return type.equalsIgnoreCase("kingdom") ||
-				type.equalsIgnoreCase("capital") ||
-				type.equalsIgnoreCase("town") ||
-				type.equalsIgnoreCase("sanctuary") ||
-				type.equalsIgnoreCase("ruin");
-	}
-
-	private KonPropertyFlagHolder getFlagHolder(Konquest konquest, String type, String name) {
+	private KonPropertyFlagHolder getFlagHolder(Konquest konquest, HolderType holderType, String name) {
 		KonPropertyFlagHolder holder = null;
-		switch(type.toLowerCase()) {
-			case "kingdom":
+		switch(holderType) {
+			case KINGDOM:
 				holder = konquest.getKingdomManager().getKingdom(name);
 				break;
-			case "capital":
+			case CAPITAL:
 				if(konquest.getKingdomManager().isKingdom(name)) {
 					// Found kingdom capital
 					holder = konquest.getKingdomManager().getKingdom(name).getCapital();
 				}
 				break;
-			case "town":
+			case TOWN:
 				holder = konquest.getKingdomManager().getTown(name);
 				break;
-			case "sanctuary":
+			case SANCTUARY:
 				holder = konquest.getSanctuaryManager().getSanctuary(name);
 				break;
-			case "ruin":
+			case RUIN:
 				holder = konquest.getRuinManager().getRuin(name);
 				break;
 			default:
@@ -93,26 +123,26 @@ public class FlagAdminCommand extends CommandBase {
 		return holder;
 	}
 
-	private ArrayList<KonPropertyFlagHolder> getFlagHolders(Konquest konquest, String type) {
+	private ArrayList<KonPropertyFlagHolder> getFlagHolders(Konquest konquest, HolderType holderType) {
 		ArrayList<KonPropertyFlagHolder> holders = new ArrayList<>();
-		switch(type.toLowerCase()) {
-			case "kingdom":
+		switch(holderType) {
+			case KINGDOM:
 				holders.addAll(konquest.getKingdomManager().getKingdoms());
 				break;
-			case "capital":
+			case CAPITAL:
 				for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
 					holders.add(kingdom.getCapital());
 				}
 				break;
-			case "town":
+			case TOWN:
 				for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
 					holders.addAll(kingdom.getTowns());
 				}
 				break;
-			case "sanctuary":
+			case SANCTUARY:
 				holders.addAll(konquest.getSanctuaryManager().getSanctuaries());
 				break;
-			case "ruin":
+			case RUIN:
 				holders.addAll(konquest.getRuinManager().getRuins());
 				break;
 			default:
@@ -125,27 +155,26 @@ public class FlagAdminCommand extends CommandBase {
     public void execute(Konquest konquest, CommandSender sender, List<String> args) {
 		if (args.size() < 2) {
 			sendInvalidArgMessage(sender);
+			return;
 		}
 		String subCmd = args.get(0);
-		String holderType = args.get(1);
+		String type = args.get(1);
 		String holderName = "";
-		String propertyName = "";
-		String valueStr = "";
+		String propertyName;
+		String valueStr;
 		KonPropertyFlagHolder holder = null;
 		KonPropertyFlag propertyFlag = null;
 		boolean propertyValue = false;
 		// Check for valid type
-		boolean isValidType = holderType.equalsIgnoreCase("kingdom") ||
-				holderType.equalsIgnoreCase("capital") ||
-				holderType.equalsIgnoreCase("town") ||
-				holderType.equalsIgnoreCase("sanctuary") ||
-				holderType.equalsIgnoreCase("ruin");
-		if (!isValidType) {
-			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(holderType));
+		if (!HolderType.contains(type)) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(type));
 			return;
 		}
+		HolderType holderType = HolderType.getType(type);
+		assert holderType != null;
+		String holderTypeLabel = holderType.getLabel();
 		// Check for property holder
-		if (args.size() == 3) {
+		if (args.size() >= 3) {
 			holderName = args.get(2);
 			// Get holder
 			holder = getFlagHolder(konquest, holderType, holderName);
@@ -155,7 +184,7 @@ public class FlagAdminCommand extends CommandBase {
 			}
 		}
 		// Check for property flag
-		if (args.size() == 4) {
+		if (args.size() >= 4) {
 			propertyName = args.get(3);
 			// Get Property
 			if(!KonPropertyFlag.contains(propertyName)) {
@@ -163,13 +192,13 @@ public class FlagAdminCommand extends CommandBase {
 				return;
 			}
 			propertyFlag = KonPropertyFlag.getFlag(propertyName);
-			if(holder != null && !holder.hasPropertyValue(propertyFlag)) {
-				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_FLAG_ERROR_INVALID.getMessage(propertyFlag.toString(),holderType.toLowerCase()));
+			if(!holder.hasPropertyValue(propertyFlag)) {
+				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_FLAG_ERROR_INVALID.getMessage(propertyFlag.toString(),holderTypeLabel));
 				return;
 			}
 		}
 		// Check for value
-		if (args.size() == 5) {
+		if (args.size() >= 5) {
 			valueStr = args.get(4);
 			// Get value
 			if (valueStr.equalsIgnoreCase("true")) {
@@ -187,9 +216,6 @@ public class FlagAdminCommand extends CommandBase {
 				// Set a new property flag value
 				if (args.size() != 5) {
 					sendInvalidArgMessage(sender);
-				}
-				if (holder == null || propertyFlag == null) {
-					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 					return;
 				}
 				// Set value
@@ -210,15 +236,12 @@ public class FlagAdminCommand extends CommandBase {
 				// Display a property flag value
 				if (args.size() != 3 && args.size() != 4) {
 					sendInvalidArgMessage(sender);
+					return;
 				}
 				if (args.size() == 3) {
-					if (holder == null) {
-						ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-						return;
-					}
 					// Display all property values
 					String header = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_ALL_PROPERTIES.getMessage() + " - " +
-							holderType + " " + holderName;
+							holderTypeLabel + " " + holderName;
 					ChatUtil.sendNotice(sender, header);
 					for(KonPropertyFlag flag : KonPropertyFlag.values()) {
 						if(holder.hasPropertyValue(flag)) {
@@ -232,13 +255,9 @@ public class FlagAdminCommand extends CommandBase {
 						}
 					}
 				} else if (args.size() == 4) {
-					if (holder == null || propertyFlag == null) {
-						ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-						return;
-					}
 					// Display single property value
 					String header = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SINGLE_PROPERTY.getMessage() + " - " +
-							holderType + " " + holderName;
+							holderTypeLabel + " " + holderName;
 					ChatUtil.sendNotice(sender, header);
 					String flagName = propertyFlag.getName();
 					String flagValue = holder.getPropertyValue(propertyFlag) ? ""+true : ChatColor.RED + ""+false;
@@ -253,27 +272,25 @@ public class FlagAdminCommand extends CommandBase {
 				// Reset a holder from properties.yml
 				if (args.size() != 3) {
 					sendInvalidArgMessage(sender);
-				}
-				if (holder == null) {
-					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 					return;
 				}
 				holder.initProperties();
 				String singleHeader = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_RESET.getMessage() + " - " +
-						holderType + "(" + 1 + ")";
+						holderTypeLabel + "(" + 1 + ")";
 				ChatUtil.sendNotice(sender, singleHeader);
 				break;
 			case "resetall":
 				// Reset all holders of the given type from properties.yml
 				if (args.size() != 2) {
 					sendInvalidArgMessage(sender);
+					return;
 				}
 				ArrayList<KonPropertyFlagHolder> holders = getFlagHolders(konquest, holderType);
 				for (KonPropertyFlagHolder aHolder : holders) {
 					aHolder.initProperties();
 				}
 				String multiHeader = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_RESET.getMessage() + " - " +
-						holderType + "(" + holders.size() + ")";
+						holderTypeLabel + "(" + holders.size() + ")";
 				ChatUtil.sendNotice(sender, multiHeader);
 				break;
 			default:

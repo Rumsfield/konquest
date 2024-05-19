@@ -21,7 +21,7 @@ public class AdminCommand extends CommandBase {
 
     public AdminCommand() {
 		// Define name and sender support
-		super("admin",false, true);
+		super("admin",false, false);
 		// <sub-command>
 		addArgument(
 				newArg("sub-command",false,false)
@@ -51,8 +51,15 @@ public class AdminCommand extends CommandBase {
 			return;
 		}
 		/* Passed all command checks */
-		// Execute command
-		konquestAdminCommand.execute(konquest, sender, args);
+		try {
+			// Execute command
+			konquestAdminCommand.execute(konquest, sender, args);
+		} catch (Exception me) {
+			String message = "Failed to execute command ADMIN "+adminCommand.toString();
+			ChatUtil.sendError(sender,MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(message));
+			ChatUtil.printConsoleError(message);
+			me.printStackTrace();
+		}
     }
 
 	@Override

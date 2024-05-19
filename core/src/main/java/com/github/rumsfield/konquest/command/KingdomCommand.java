@@ -48,6 +48,10 @@ public class KingdomCommand extends CommandBase {
 		addArgument(
 				newArg("exile",true,false)
 		);
+		// templates
+		addArgument(
+				newArg("templates",true,false)
+		);
 		// manage...
 		List<String> accessArgNames = Arrays.asList("open", "closed");
 		List<String> requestsArgNames = Arrays.asList("accept", "deny");
@@ -93,10 +97,6 @@ public class KingdomCommand extends CommandBase {
 			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return;
 		}
-		// Notify sender when admin
-		if(sender.hasPermission("konquest.command.admin.monument") && konquest.getSanctuaryManager().getNumTemplates() == 0) {
-			ChatUtil.sendError(sender,MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_NO_TEMPLATES.getMessage());
-		}
 		// Check for player's kingdom, should be either barbarians or another non-null kingdom
 		KonKingdom kingdom = player.getKingdom();
 		Player bukkitPlayer = player.getBukkitPlayer();
@@ -128,16 +128,23 @@ public class KingdomCommand extends CommandBase {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_PERMISSION.getMessage()+" konquest.create.kingdom");
 					return;
 				}
-				// Needs kingdom name and template name arguments
+				// Needs template name arguments
 				if(args.size() == 1) {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_MISSING_TEMPLATE.getMessage());
 					return;
 				}
+				// Pre-Check for any available templates
+				if(konquest.getSanctuaryManager().getNumTemplates() == 0) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_NO_TEMPLATES.getMessage());
+					return;
+				}
+				String templateName = args.get(1);
+				// Needs kingdom name arguments
 				if(args.size() == 2) {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_MISSING_NAME.getMessage());
 					return;
 				}
-				String templateName = args.get(1);
+				// Pre-Check for valid kingdom name
 				String newKingdomName = args.get(2);
 				if(konquest.validateName(newKingdomName,bukkitPlayer) != 0) {
 					// Player receives error message within validateName method
@@ -274,6 +281,14 @@ public class KingdomCommand extends CommandBase {
 				// Exile to become a barbarian
 				if(args.size() == 1) {
 					konquest.getKingdomManager().menuExileKingdom(player);
+				} else {
+					sendInvalidArgMessage(bukkitPlayer);
+				}
+				break;
+			case "templates":
+				// Display templates menu
+				if(args.size() == 1) {
+					konquest.getDisplayManager().displayTemplateInfoMenu(player);
 				} else {
 					sendInvalidArgMessage(bukkitPlayer);
 				}
@@ -597,6 +612,7 @@ public class KingdomCommand extends CommandBase {
 			tabList.add("invites");
 			tabList.add("join");
 			tabList.add("exile");
+			tabList.add("templates");
 			tabList.add("manage");
 		} else if (numArgs == 2) {
 			switch (args.get(0).toLowerCase()) {

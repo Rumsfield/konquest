@@ -83,7 +83,7 @@ public abstract class CommandBase {
 
     public List<String> getArgumentUsage() {
         List<String> usageStrings = new ArrayList<>();
-        if (hasOptionalArgs) {
+        if (hasOptionalArgs || arguments.isEmpty()) {
             usageStrings.add(getBaseUsage());
         }
         for (CommandArgument cmdArg : arguments) {

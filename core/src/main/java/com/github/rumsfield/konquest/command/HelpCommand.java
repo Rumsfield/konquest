@@ -51,6 +51,7 @@ public class HelpCommand extends CommandBase{
 			}
 		}
 		// Populate help lines
+		boolean isBaseHelp = true;
 		List<String> lines = new ArrayList<>();
 		if (helpCommand.isEmpty()) {
 			// Use command base usage
@@ -61,16 +62,19 @@ public class HelpCommand extends CommandBase{
 					if (!cmd.alias().equals("")) {
 						alias = " ("+cmd.alias()+")";
 					}
-					String message = cmd.baseUsage()+ChatColor.WHITE+" : "+cmd.description()+ChatColor.LIGHT_PURPLE+alias;
+					String message = cmd.baseUsage()+ChatColor.LIGHT_PURPLE+alias+ChatColor.WHITE+" : "+cmd.description();
 					lines.add(message);
 				}
 			}
 		} else {
 			// First argument is a command
 			lines.addAll(CommandType.getCommand(helpCommand).argumentUsage());
+			isBaseHelp = false;
+			helpCommand = CommandType.getCommand(helpCommand).toString().toLowerCase();
 		}
 		// Check for any help lines
 		if (lines.isEmpty()) {
+			ChatUtil.printConsoleError("Command help is missing lines! Contact the plugin author.");
 			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return;
 		}
@@ -93,11 +97,23 @@ public class HelpCommand extends CommandBase{
 		}
 		// Display help lines
 		String pageDisplay = page + "/" + maxPages;
-		ChatUtil.sendNotice(sender, pageDisplay + " " + MessagePath.COMMAND_HELP_NOTICE_MESSAGE.getMessage());
+		ChatUtil.sendNotice(sender, MessagePath.COMMAND_HELP_NOTICE_HEADER.getMessage(pageDisplay));
+		if (page == 1 && maxPages > 1) {
+			if (isBaseHelp) {
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_HELP_NOTICE_PAGE.getMessage());
+			} else {
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_HELP_NOTICE_PAGE_COMMAND.getMessage(helpCommand));
+			}
+		}
+		if (isBaseHelp) {
+			ChatUtil.sendNotice(sender, MessagePath.COMMAND_HELP_NOTICE_DETAIL.getMessage());
+		} else {
+			ChatUtil.sendNotice(sender, MessagePath.COMMAND_HELP_NOTICE_COMMAND.getMessage());
+		}
 		int startIdx = (page-1) * MAX_LINES_PER_PAGE;
 		int endIdx = startIdx + MAX_LINES_PER_PAGE;
 		for (int i = startIdx; i < endIdx && i < numLines; i++) {
-			ChatUtil.sendMessage(sender, lines.get(i));
+			ChatUtil.sendMessage(sender, "  "+lines.get(i));
 		}
     }
     

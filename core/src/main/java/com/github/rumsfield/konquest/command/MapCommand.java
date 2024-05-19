@@ -17,8 +17,6 @@ import java.util.List;
 
 public class MapCommand extends CommandBase {
 
-	private int mapSize = TerritoryManager.DEFAULT_MAP_SIZE;
-	
 	public MapCommand() {
 		// Define name and sender support
 		super("map",true, false);
@@ -40,28 +38,35 @@ public class MapCommand extends CommandBase {
 			return;
 		}
 		// Display formatted text in chat as chunk map
-		// 10 lines of text by default
-		if(args.size() == 1) {
+		if (args.isEmpty()) {
+			// Display default map
+			Bukkit.getScheduler().runTaskAsynchronously(konquest.getPlugin(),
+					() -> konquest.getTerritoryManager().printPlayerMap(player, TerritoryManager.DEFAULT_MAP_SIZE));
+		} else if(args.size() == 1) {
 			String subCmd = args.get(0);
 			if(subCmd.equalsIgnoreCase("far") || subCmd.equalsIgnoreCase("f")) {
-				mapSize = TerritoryManager.FAR_MAP_SIZE;
+				// Display far map
+				Bukkit.getScheduler().runTaskAsynchronously(konquest.getPlugin(),
+						() -> konquest.getTerritoryManager().printPlayerMap(player, TerritoryManager.FAR_MAP_SIZE));
 			} else if(subCmd.equalsIgnoreCase("auto") || subCmd.equalsIgnoreCase("a")) {
+				// Update auto map field
 				if(player.isMapAuto()) {
 					player.setIsMapAuto(false);
 					ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
-					return;
 				} else {
 					player.setIsMapAuto(true);
-					ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
+					// Display default map
+					Bukkit.getScheduler().runTaskAsynchronously(konquest.getPlugin(), () -> {
+						konquest.getTerritoryManager().printPlayerMap(player, TerritoryManager.DEFAULT_MAP_SIZE);
+						ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
+					});
 				}
 			} else {
 				sendInvalidArgMessage(sender);
-				return;
 			}
+		} else {
+			sendInvalidArgMessage(sender);
 		}
-		// Display map in chat
-		Bukkit.getScheduler().runTaskAsynchronously(konquest.getPlugin(),
-				() -> konquest.getTerritoryManager().printPlayerMap(player, mapSize));
 	}
 	
 	@Override

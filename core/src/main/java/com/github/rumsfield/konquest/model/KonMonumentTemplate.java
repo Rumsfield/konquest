@@ -91,6 +91,10 @@ public class KonMonumentTemplate {
 		return travelPoint;
 	}
 
+	public Location getSpawnLoc() {
+		return new Location(travelPoint.getWorld(),travelPoint.getBlockX(),travelPoint.getBlockY()+1,travelPoint.getBlockZ());
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}

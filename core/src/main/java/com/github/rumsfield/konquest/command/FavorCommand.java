@@ -46,8 +46,7 @@ public class FavorCommand extends CommandBase {
 		double cost_travel = konquest.getCore().getDouble(CorePath.FAVOR_COST_TRAVEL.getPath(),0.0);
 		double cost_kingdom_create = konquest.getKingdomManager().getCostCreate();
 		double cost_kingdom_rename = konquest.getKingdomManager().getCostRename();
-		String balanceF = String.format("%.2f",balance);
-		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_MESSAGE.getMessage(balanceF));
+		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_MESSAGE.getMessage(KonquestPlugin.getCurrencyFormat(balance)));
 		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_SPY.getMessage() + 			" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_spy));
 		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_TRAVEL.getMessage() +			" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_travel));
 		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_CLAIM.getMessage() +			" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_claim));

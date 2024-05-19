@@ -20,6 +20,7 @@ label:
   blocks: "Blocks"
   bypass: "BYPASS"
   camp: "Camp"
+  capital: "Capital"
   close: "Close"
   cost: "Cost"
   critical-hits: "Critical Hits"
@@ -268,6 +269,7 @@ menu:
     hint-transfer: "Click to give Lord"
     hint-special: "Click to specialize"
     lore-special: "Choose this profession for a discount with villagers in this town."
+    info-special: "Villagers with this profession give discounts in this town."
     title-root: "Town Menu"
     title-join: "Join a Town"
     title-leave: "Leave a Town"
@@ -462,7 +464,9 @@ command:
         invalid: "The property flag %s does not apply to %s."
     help:
       notice:
-        message: "Admin Help: Command, Arguments, Description"
+        detail: "For more command details use /k admin help <command>"
+        page: "To view more pages use /k admin help <page>"
+        page-command: "To view more pages use /k admin help %s <page>"
     kingdom:
       broadcast:
         create: "The Admin Kingdom of %s has been created!"
@@ -565,7 +569,11 @@ command:
       cost-kingdom-rename: "Kingdom Rename"
   help:
     notice:
-      message: "Help - Command, Arguments, Description, Alias"
+      header: "Help Page %s"
+      detail: "For more command details use /k help <command>"
+      page: "To view more pages use /k help <page>"
+      page-command: "To view more pages use /k help %s <page>"
+      command: "All major command uses:"
     error:
       page: "The page value must be a number."
   info:
@@ -721,7 +729,7 @@ command:
       knight-set: "%s has been Knighted in %s."
       knight-clear: "%s is no longer a Knight in %s."
       rename: "Lord %s has renamed the Town of %s to %s."
-      no-lord: "%s is abandoned! Use \"/k town %s lord\" to claim Lordship."
+      no-lord: "%s is abandoned! Use \"/k town lord %s\" to claim Lordship."
       shield-list: "%s remaining shields for the town of %s."
       armor-list: "%s remaining armor blocks for the town of %s."
       specialize-list: "%s Town specialization is %s."
@@ -778,7 +786,7 @@ command:
       radius: "Radius must be greater than or equal to %s and less than or equal to %s."
       fail-town: "Must unclaim from towns only."
       fail-lord: "Failed to unclaim, you must be the town lord."
-      fail-unclaimed: "Failed to unclaim, no claims found."
+      fail-unclaimed: "Failed to unclaim, you must be standing in claimed territory."
       fail-center: "Failed to unclaim, cannot remove territory center."
 shop:
   error:
@@ -988,19 +996,19 @@ description:
   admin-bypass: "Toggle Admin bypass mode."
   admin-claim: "Claim land chunks."
   admin-unclaim: "Return a chunk to the Wild."
-  admin-kingdom: "Manage any Kingdom."
-  admin-town: "Manage any Town."
-  admin-camp: "Manage any Camp."
+  admin-kingdom: "Manage a Kingdom."
+  admin-town: "Manage a Town or Capital."
+  admin-camp: "Manage a Barbarian Camp."
   admin-capture: "Capture a town for any Kingdom."
-  admin-monument: "Creates, removes or shows a Monument Template."
-  admin-list: "Display all Kingdoms or Towns of a Kingdom."
+  admin-monument: "Manage a Monument Template."
+  admin-list: "Display all Kingdoms and Territories."
   admin-ruin: "Manage a Ruin territory."
   admin-sanctuary: "Manage a Sanctuary territory."
-  admin-save: "Saves Kingdoms and Players data files."
+  admin-save: "Saves plugin data files."
   admin-settravel: "Sets the travel point for the territory you're in."
   admin-travel: "Teleport to the specified kingdom or town."
   admin-reload: "Reloads configuration files."
-  admin-flag: "Set kingdom flags. Use the command with no arguments to list available flags."
+  admin-flag: "Set kingdom property flags."
   admin-stat: "Manage player stats."
 territory:
   wild: "Wild"

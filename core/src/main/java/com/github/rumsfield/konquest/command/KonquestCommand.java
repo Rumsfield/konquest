@@ -26,9 +26,11 @@ public class KonquestCommand extends CommandBase{
 			konquest.getDisplayManager().displayHelpMenu((Player) sender);
 		} else if (sender instanceof ConsoleCommandSender) {
 			KonquestPlugin.printLogo();
-			ChatUtil.printConsole("Suggested commands:");
-			ChatUtil.printConsole("  k reload");
-			ChatUtil.printConsole("  k help <page>");
+			ChatUtil.sendNotice(sender,"Suggested console commands:");
+			ChatUtil.sendNotice(sender,"  k version");
+			ChatUtil.sendNotice(sender,"  k reload");
+			ChatUtil.sendNotice(sender,"  k save");
+			ChatUtil.sendNotice(sender,"  k help");
 		}
     }
     
