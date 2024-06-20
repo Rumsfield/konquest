@@ -473,6 +473,7 @@ command:
       notice:
         admin-set: "The Kingdom of %s is an admin kingdom."
         admin-clear: "The Kingdom of %s is a player kingdom."
+        diplomacy: "The Kingdoms of %s and %s have a diplomacy relationship of %s."
       error:
         no-templates: "There are no monument templates. Create one in a sanctuary with \"/k admin monument create (name)\""
     monument:
@@ -617,8 +618,10 @@ command:
       exile: "You are now exiled from %s as a barbarian."
       exile-stats: "Removed all stats from exile!"
       exile-favor: "Removed all favor from exile!"
+      remove-member: "You are no longer a member of the Kingdom of %s."
       kick: "Kicked player %s from the kingdom."
       rename: "Successfully changed kingdom name to %s."
+      transfer-master: "You made %s the new kingdom master of %s."
       discount: "The Kingdom of %s gives you a %s percent discount with this merchant."
       open: "Kingdom is now open to join."
       closed: "Kingdom is now closed for invites only."

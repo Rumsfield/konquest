@@ -26,6 +26,7 @@ public class TownCommand extends CommandBase {
 		// Define name and sender support
 		super("town",true, false);
 		// Define arguments
+		// Note: <town> non-literal arguments accept names of towns, and name of kingdom for capital, and literal "capital".
 		// None
 		setOptionalArgs(true);
 		// menu
@@ -99,9 +100,14 @@ public class TownCommand extends CommandBase {
 	private KonTown getVerifyTown(KonPlayer player, String townName) {
 		// Verify town or capital exists within sender's Kingdom
 		// Name can be the name of a town, or the name of the kingdom for the capital
+		// Or the literal string "capital".
 		KonTown town = null;
 		if (!townName.isEmpty()) {
-			town = player.getKingdom().getTownCapital(townName);
+			if (townName.equalsIgnoreCase("capital")) {
+				town = player.getKingdom().getCapital();
+			} else {
+				town = player.getKingdom().getTownCapital(townName);
+			}
 		}
 		if (town == null) {
 			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(townName));
@@ -512,7 +518,7 @@ public class TownCommand extends CommandBase {
 										requestPlayerNames.add(requester.getName());
 									}
 									String nameListStr = formatStringListLimited(requestPlayerNames, MAX_LIST_NAMES);
-									ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REQUEST_PLAYER_LIST.getMessage());
+									ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_REQUEST_PLAYER_LIST.getMessage(town.getName()));
 									ChatUtil.sendMessage(bukkitPlayer, nameListStr);
 								} else if (args.size() == 5) {
 									// Accept or deny player
@@ -532,6 +538,7 @@ public class TownCommand extends CommandBase {
 										sendInvalidArgMessage(bukkitPlayer);
 										return;
 									}
+									// Manager method includes messages
 									konquest.getKingdomManager().menuRespondTownRequest(player,requester.getOfflineBukkitPlayer(),town,response);
 								} else {
 									sendInvalidArgMessage(bukkitPlayer);
@@ -622,7 +629,12 @@ public class TownCommand extends CommandBase {
 					// Suggest town names that the player can join
 					for (KonTown town : kingdom.getCapitalTowns()) {
 						if (!town.isPlayerResident(player.getBukkitPlayer())) {
-							tabList.add(town.getName());
+							if (town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+								tabList.add(town.getKingdom().getName());
+								tabList.add("capital");
+							} else {
+								tabList.add(town.getName());
+							}
 						}
 					}
 					break;
@@ -630,21 +642,36 @@ public class TownCommand extends CommandBase {
 					// Suggest town names that the player can leave
 					for (KonTown town : kingdom.getCapitalTowns()) {
 						if (town.isPlayerResident(player.getBukkitPlayer())) {
-							tabList.add(town.getName());
+							if (town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+								tabList.add(town.getKingdom().getName());
+								tabList.add("capital");
+							} else {
+								tabList.add(town.getName());
+							}
 						}
 					}
 					break;
 				case "lord":
 					// Suggest all town names
 					for (KonTown town : kingdom.getCapitalTowns()) {
-						tabList.add(town.getName());
+						if (town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+							tabList.add(town.getKingdom().getName());
+							tabList.add("capital");
+						} else {
+							tabList.add(town.getName());
+						}
 					}
 					break;
 				case "manage":
 					// Suggest managed towns
 					for (KonTown town : kingdom.getCapitalTowns()) {
 						if (town.isPlayerKnight(player.getBukkitPlayer())) {
-							tabList.add(town.getName());
+							if (town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+								tabList.add(town.getKingdom().getName());
+								tabList.add("capital");
+							} else {
+								tabList.add(town.getName());
+							}
 						}
 					}
 					break;

@@ -541,10 +541,17 @@ public class KingdomCommand extends CommandBase {
 											return;
 										}
 										OfflinePlayer bukkitOfflinePlayer = offlinePlayer.getOfflineBukkitPlayer();
+										// Cannot kick master
 										if(kingdom.isMaster(bukkitOfflinePlayer.getUniqueId())) {
 											ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_KICK_MASTER.getMessage());
 											return;
 										}
+										// Cannot kick self
+										if (offlinePlayer.getOfflineBukkitPlayer().getUniqueId().equals(playerID)) {
+											ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+											return;
+										}
+										// Use manager method
 										if(konquest.getKingdomManager().kickKingdomMember(player, bukkitOfflinePlayer)) {
 											ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_KICK.getMessage(playerName));
 										}
@@ -555,7 +562,12 @@ public class KingdomCommand extends CommandBase {
 											ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 											return;
 										}
-										konquest.getKingdomManager().menuPromoteOfficer(offlinePlayer.getOfflineBukkitPlayer(), kingdom);
+										// Manager method includes broadcast on success
+										if(!konquest.getKingdomManager().menuPromoteOfficer(offlinePlayer.getOfflineBukkitPlayer(), kingdom)) {
+											// Failed
+											ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+											return;
+										}
 										break;
 									case "demote":
 										// Demote a kingdom officer to member (master only)
@@ -563,7 +575,12 @@ public class KingdomCommand extends CommandBase {
 											ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 											return;
 										}
-										konquest.getKingdomManager().menuDemoteOfficer(offlinePlayer.getOfflineBukkitPlayer(), kingdom);
+										// Manager method includes broadcast on success
+										if(!konquest.getKingdomManager().menuDemoteOfficer(offlinePlayer.getOfflineBukkitPlayer(), kingdom)) {
+											// Failed
+											ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+											return;
+										}
 										break;
 									case "master":
 										// Transfer kingdom master to another member (master only)
@@ -571,6 +588,7 @@ public class KingdomCommand extends CommandBase {
 											ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 											return;
 										}
+										// Manager method includes status messages
 										konquest.getKingdomManager().menuTransferMaster(offlinePlayer.getOfflineBukkitPlayer(), kingdom, player);
 										break;
 									default:

@@ -303,13 +303,13 @@ public class KingdomAdminCommand extends CommandBase {
 				kingdom = konquest.getKingdomManager().getKingdom(kingdomName);
 				assert kingdom != null;
 				// Set kingdom type
-				if (kingdomType.equalsIgnoreCase("true")) {
+				if (kingdomType.equalsIgnoreCase("admin")) {
 					// Set admin operated flag
 					kingdom.setIsAdminOperated(true);
 					// Clear master
 					kingdom.clearMaster();
 					ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_KINGDOM_NOTICE_ADMIN_SET.getMessage(kingdom.getName()));
-				} else if (kingdomType.equalsIgnoreCase("false")) {
+				} else if (kingdomType.equalsIgnoreCase("player")) {
 					// Clear admin operated flag
 					kingdom.setIsAdminOperated(false);
 					ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_KINGDOM_NOTICE_ADMIN_CLEAR.getMessage(kingdom.getName()));
@@ -389,36 +389,36 @@ public class KingdomAdminCommand extends CommandBase {
 				}
 				kingdom = konquest.getKingdomManager().getKingdom(kingdomName);
 				assert kingdom != null;
+				if (args.size() < 3) {
+					sendInvalidArgMessage(sender);
+				}
 
-				if (args.size() >= 3) {
-					String otherKingdomName = args.get(2);
-					if (!konquest.getKingdomManager().isKingdom(otherKingdomName)) {
-						ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(otherKingdomName));
+				String otherKingdomName = args.get(2);
+				if (!konquest.getKingdomManager().isKingdom(otherKingdomName)) {
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(otherKingdomName));
+					return;
+				}
+				KonKingdom otherKingdom = konquest.getKingdomManager().getKingdom(otherKingdomName);
+
+				if(args.size() == 3) {
+					// View relation with kingdom
+					ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_KINGDOM_NOTICE_DIPLOMACY.getMessage(kingdom.getName(),otherKingdom.getName(),kingdom.getActiveRelation(otherKingdom).toString()));
+				} else if(args.size() == 4) {
+					// Change diplomacy
+					if(kingdom.isPeaceful() || otherKingdom.isPeaceful()) {
+						// Cannot change diplomacy of peaceful kingdoms
+						ChatUtil.sendError(sender, MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_PEACEFUL.getMessage());
 						return;
 					}
-					KonKingdom otherKingdom = konquest.getKingdomManager().getKingdom(otherKingdomName);
-					if(args.size() == 3) {
-						// View relation with kingdom
-						ChatUtil.sendNotice(sender, MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_CURRENT.getMessage(otherKingdom.getName(),kingdom.getActiveRelation(otherKingdom).toString()));
-					} else if(args.size() == 4) {
-						// Change diplomacy
-						if(kingdom.isPeaceful() || otherKingdom.isPeaceful()) {
-							// Cannot change diplomacy of peaceful kingdoms
-							ChatUtil.sendError(sender, MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_PEACEFUL.getMessage());
-							return;
-						}
-						String relationName = args.get(3);
-						KonquestDiplomacyType relation;
-						try {
-							relation = KonquestDiplomacyType.valueOf(relationName.toUpperCase());
-						} catch (IllegalArgumentException ex) {
-							ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(relationName));
-							return;
-						}
-						konquest.getKingdomManager().menuChangeKingdomRelation(kingdom, otherKingdom, relation, player, sender, true);
-					} else {
-						sendInvalidArgMessage(sender);
+					String relationName = args.get(3);
+					KonquestDiplomacyType relation;
+					try {
+						relation = KonquestDiplomacyType.valueOf(relationName.toUpperCase());
+					} catch (IllegalArgumentException ex) {
+						ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(relationName));
+						return;
 					}
+					konquest.getKingdomManager().menuChangeKingdomRelation(kingdom, otherKingdom, relation, player, sender, true);
 				} else {
 					sendInvalidArgMessage(sender);
 				}
@@ -483,11 +483,23 @@ public class KingdomAdminCommand extends CommandBase {
 						break;
 					case "promote":
 						// Promote a kingdom member to officer
-						konquest.getKingdomManager().menuPromoteOfficer(offlinePlayer.getOfflineBukkitPlayer(), kingdom);
+						if(konquest.getKingdomManager().menuPromoteOfficer(offlinePlayer.getOfflineBukkitPlayer(), kingdom)) {
+							// Passed
+							ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+						} else {
+							// Failed
+							ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+						}
 						break;
 					case "demote":
 						// Demote a kingdom officer to member
-						konquest.getKingdomManager().menuDemoteOfficer(offlinePlayer.getOfflineBukkitPlayer(), kingdom);
+						if(konquest.getKingdomManager().menuDemoteOfficer(offlinePlayer.getOfflineBukkitPlayer(), kingdom)) {
+							// Passed
+							ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+						} else {
+							// Failed
+							ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+						}
 						break;
 					case "master":
 						// Transfer kingdom master to another member

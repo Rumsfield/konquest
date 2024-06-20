@@ -535,92 +535,91 @@ public class TownAdminCommand extends CommandBase {
 				}
 				break;
 			case "resident":
-				if (args.size() == 5) {
-					// Manage town residents
-					assert town != null;
-					String residentSubCmd = args.get(3);
-					String residentPlayerName = args.get(4);
-					KonOfflinePlayer residentPlayer = konquest.getPlayerManager().getOfflinePlayerFromName(residentPlayerName);
-					if(residentPlayer == null) {
-						ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(residentPlayerName));
-						return;
-					}
-					String playerName = residentPlayer.getOfflineBukkitPlayer().getName();
-					// Parse sub-commands
-					switch(residentSubCmd.toLowerCase()) {
-						case "add":
-							// Check for matching kingdom
-							if(!residentPlayer.getKingdom().equals(town.getKingdom())) {
-								ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
-								return;
-							}
-							// Add the player as a resident
-							if(town.addPlayerResident(residentPlayer.getOfflineBukkitPlayer(),false)) {
-								ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_ADD_RESIDENT.getMessage(playerName,townName));
-							} else {
-								// Player is already a resident
-								ChatUtil.sendError(sender, MessagePath.COMMAND_TOWN_ERROR_INVITE_MEMBER.getMessage(playerName));
-							}
-							break;
-						case "kick":
-							// Remove the player as a resident
-							if(town.removePlayerResident(residentPlayer.getOfflineBukkitPlayer())) {
-								ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_KICK_RESIDENT.getMessage(playerName,townName));
-							} else {
-								// Player was not a resident
-								ChatUtil.sendError(sender, MessagePath.COMMAND_TOWN_ERROR_KICK_FAIL.getMessage(playerName,townName));
-							}
-							break;
-						case "promote":
-							// Check for resident
-							if (!town.isPlayerResident(residentPlayer.getOfflineBukkitPlayer())) {
-								ChatUtil.sendError(sender, MessagePath.COMMAND_TOWN_ERROR_KNIGHT_RESIDENT.getMessage());
-							}
-							// Check for lord
-							if(town.isPlayerLord(residentPlayer.getOfflineBukkitPlayer())) {
-								ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-								return;
-							}
-							// Promote the resident to knight
-							if(town.setPlayerKnight(residentPlayer.getOfflineBukkitPlayer(), true)) {
-								ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_SET.getMessage(playerName,townName));
-							} else {
-								ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-							}
-							break;
-						case "demote":
-							// Check for resident
-							if (!town.isPlayerResident(residentPlayer.getOfflineBukkitPlayer())) {
-								ChatUtil.sendError(sender, MessagePath.COMMAND_TOWN_ERROR_KNIGHT_RESIDENT.getMessage());
-							}
-							// Check for lord
-							if(town.isPlayerLord(residentPlayer.getOfflineBukkitPlayer())) {
-								ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-								return;
-							}
-							// Demote the knight to resident
-							if(town.setPlayerKnight(residentPlayer.getOfflineBukkitPlayer(), false)) {
-								ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_CLEAR.getMessage(playerName,townName));
-							} else {
-								ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-							}
-							break;
-						case "lord":
-							// Check for matching kingdom
-							if(!residentPlayer.getKingdom().equals(town.getKingdom())) {
-								ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
-								return;
-							}
-							// Make the player into the new town lord
-							town.setPlayerLord(residentPlayer.getOfflineBukkitPlayer());
-							ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_LORD_SUCCESS.getMessage(townName,playerName));
-							break;
-						default:
-							sendInvalidArgMessage(sender);
-							break;
-					}
-				} else {
+				if (args.size() != 4) {
 					sendInvalidArgMessage(sender);
+				}
+				// Manage town residents
+				assert town != null;
+				String residentSubCmd = args.get(2);
+				String residentPlayerName = args.get(3);
+				KonOfflinePlayer residentPlayer = konquest.getPlayerManager().getOfflinePlayerFromName(residentPlayerName);
+				if(residentPlayer == null) {
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(residentPlayerName));
+					return;
+				}
+				String playerName = residentPlayer.getOfflineBukkitPlayer().getName();
+				// Parse sub-commands
+				switch(residentSubCmd.toLowerCase()) {
+					case "add":
+						// Check for matching kingdom
+						if(!residentPlayer.getKingdom().equals(town.getKingdom())) {
+							ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
+							return;
+						}
+						// Add the player as a resident
+						if(town.addPlayerResident(residentPlayer.getOfflineBukkitPlayer(),false)) {
+							ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_ADD_RESIDENT.getMessage(playerName,townName));
+						} else {
+							// Player is already a resident
+							ChatUtil.sendError(sender, MessagePath.COMMAND_TOWN_ERROR_INVITE_MEMBER.getMessage(playerName));
+						}
+						break;
+					case "kick":
+						// Remove the player as a resident
+						if(town.removePlayerResident(residentPlayer.getOfflineBukkitPlayer())) {
+							ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_KICK_RESIDENT.getMessage(playerName,townName));
+						} else {
+							// Player was not a resident
+							ChatUtil.sendError(sender, MessagePath.COMMAND_TOWN_ERROR_KICK_FAIL.getMessage(playerName,townName));
+						}
+						break;
+					case "promote":
+						// Check for resident
+						if (!town.isPlayerResident(residentPlayer.getOfflineBukkitPlayer())) {
+							ChatUtil.sendError(sender, MessagePath.COMMAND_TOWN_ERROR_KNIGHT_RESIDENT.getMessage());
+						}
+						// Check for lord
+						if(town.isPlayerLord(residentPlayer.getOfflineBukkitPlayer())) {
+							ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+							return;
+						}
+						// Promote the resident to knight
+						if(town.setPlayerKnight(residentPlayer.getOfflineBukkitPlayer(), true)) {
+							ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_SET.getMessage(playerName,townName));
+						} else {
+							ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+						}
+						break;
+					case "demote":
+						// Check for resident
+						if (!town.isPlayerResident(residentPlayer.getOfflineBukkitPlayer())) {
+							ChatUtil.sendError(sender, MessagePath.COMMAND_TOWN_ERROR_KNIGHT_RESIDENT.getMessage());
+						}
+						// Check for lord
+						if(town.isPlayerLord(residentPlayer.getOfflineBukkitPlayer())) {
+							ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+							return;
+						}
+						// Demote the knight to resident
+						if(town.setPlayerKnight(residentPlayer.getOfflineBukkitPlayer(), false)) {
+							ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_KNIGHT_CLEAR.getMessage(playerName,townName));
+						} else {
+							ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+						}
+						break;
+					case "lord":
+						// Check for matching kingdom
+						if(!residentPlayer.getKingdom().equals(town.getKingdom())) {
+							ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_ENEMY_PLAYER.getMessage());
+							return;
+						}
+						// Make the player into the new town lord
+						town.setPlayerLord(residentPlayer.getOfflineBukkitPlayer());
+						ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_LORD_SUCCESS.getMessage(townName,playerName));
+						break;
+					default:
+						sendInvalidArgMessage(sender);
+						break;
 				}
 				break;
 			case "plots":
@@ -735,6 +734,10 @@ public class TownAdminCommand extends CommandBase {
 					if (args.get(2).equalsIgnoreCase("set") || args.get(2).equalsIgnoreCase("add")) {
 						tabList.add("#");
 					}
+					break;
+				case "option":
+					tabList.add("true");
+					tabList.add("false");
 					break;
 				case "resident":
 					String townName = args.get(1);

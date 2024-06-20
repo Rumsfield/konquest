@@ -925,6 +925,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Only perform membership updates on created kingdoms
 		if(playerKingdom.isCreated()) {
 			// Remove membership from old kingdom
+			String oldKingdomName = playerKingdom.getName();
 			boolean removeStatus;
 			// The player could be master here
 			// Potentially transfer master or disband old kingdom when force = true
@@ -935,7 +936,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 			if(removeStatus) {
 				if(isOnline) {
-					ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), "Removed from kingdom and all towns");
+					ChatUtil.sendNotice(onlinePlayer.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_REMOVE_MEMBER.getMessage(oldKingdomName));
 				}
 	    	} else {
 	    		// Something went very wrong, the prior checks should have avoided this
@@ -1025,6 +1026,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		// Check for barbarian player or default kingdom
 		KonKingdom oldKingdom = isOnline ? onlinePlayer.getKingdom() : offlinePlayer.getKingdom();
+		String oldKingdomName = oldKingdom.getName();
 		boolean isPlayerBarbarian = isOnline ? onlinePlayer.isBarbarian() : offlinePlayer.isBarbarian();
 		if(isPlayerBarbarian || !oldKingdom.isCreated()) {
     		return 1;
@@ -1066,11 +1068,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		ChatUtil.printDebug("Failed to remove member "+id.toString()+" from kingdom "+oldKingdom.getName());
     		return -1;
     	}
-		
-		/* Now, oldKingdom is possibly removed. Re-acquire current kingdom of player (could be Barbarians). */
-		oldKingdom = isOnline ? onlinePlayer.getKingdom() : offlinePlayer.getKingdom();
-		String oldKingdomName = oldKingdom.getName();
-		
+
     	// Try to teleport the player (online only)
 		if(isOnline) {
 			World playerWorld = onlinePlayer.getBukkitPlayer().getLocation().getWorld();
@@ -1120,7 +1118,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 
-    	KonKingdom exileKingdom = isFull ? getBarbarians() : oldKingdom;
+		// Determine the exile kingdom
+		KonKingdom exileKingdom = getBarbarians();
+		if (!isFull && isKingdom(oldKingdomName)) {
+			exileKingdom = oldKingdom;
+		}
+
+		// Update player info
     	if(isOnline) {
     		// Force into global chat mode
     		onlinePlayer.setIsGlobalChat(true);
@@ -1718,6 +1722,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		UUID id = player.getUniqueId();
 		// Check for player that's already a member
 		if(!kingdom.isOfficer(id)) return false;
+		// Check for master
+		if(kingdom.isMaster(id)) return false;
 		// Attempt to demote
 		if(kingdom.setOfficer(id, false)) {
 			broadcastMembers(kingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_DEMOTE.getMessage(player.getName(),kingdom.getName()));
@@ -1729,11 +1735,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public boolean menuTransferMaster(OfflinePlayer master, KonKingdom kingdom, KonPlayer sender) {
 		UUID id = master.getUniqueId();
 		if(kingdom.isMember(id) && kingdom.setMaster(id)) {
+			ChatUtil.sendNotice(sender.getBukkitPlayer(), MessagePath.COMMAND_KINGDOM_NOTICE_TRANSFER_MASTER.getMessage(master.getName(),kingdom.getName()));
 			broadcastMembers(kingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_TRANSFER.getMessage(master.getName(),kingdom.getName()));
-			ChatUtil.sendNotice(sender.getBukkitPlayer(), MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 			return true;
 		} else {
-			ChatUtil.sendError(sender.getBukkitPlayer(), MessagePath.GENERIC_ERROR_FAILED.getMessage());
+			ChatUtil.sendError(sender.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
 	}
@@ -1936,127 +1942,150 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		/* At this point, the active states are valid and the change request can be processed */
 
 		// Relationship transition logic
-		switch(relation) {
-			case PEACE:
-				// Our kingdom wants to make peace
-				if(ourActiveState.equals(KonquestDiplomacyType.WAR)) {
-					// We are enemies, try to make peace
-					if(isInstantPeace) {
-						// Instantly change to active peace, force them to peace too
-						setJointActiveRelation(kingdom,otherKingdom,relation);
-						ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_PEACE.getMessage(kingdom.getName(),otherKingdom.getName()));
-					} else {
-						// Request peace from them
-						if(kingdom.hasRelationRequest(otherKingdom) && kingdom.getRelationRequest(otherKingdom).equals(relation)) {
-							// Both sides request peace, change to active peace
-							setJointActiveRelation(kingdom,otherKingdom,relation);
-							ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_PEACE.getMessage(kingdom.getName(),otherKingdom.getName()));
+		if(isAdmin) {
+			// Instantly force relation always for admins
+			setJointActiveRelation(kingdom,otherKingdom,relation);
+			// Broadcast change
+			switch (relation) {
+				case PEACE:
+					ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_PEACE.getMessage(kingdom.getName(), otherKingdom.getName()));
+					break;
+				case TRADE:
+					ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_TRADE.getMessage(kingdom.getName(), otherKingdom.getName()));
+					break;
+				case ALLIANCE:
+					ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_ALLY.getMessage(kingdom.getName(), otherKingdom.getName()));
+					break;
+				case WAR:
+					ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_WAR.getMessage(kingdom.getName(), otherKingdom.getName()));
+					break;
+				default:
+					break;
+			}
+		} else {
+			// Follow relation transition logic for regular players
+			switch (relation) {
+				case PEACE:
+					// Our kingdom wants to make peace
+					if (ourActiveState.equals(KonquestDiplomacyType.WAR)) {
+						// We are enemies, try to make peace
+						if (isInstantPeace) {
+							// Instantly change to active peace, force them to peace too
+							setJointActiveRelation(kingdom, otherKingdom, relation);
+							ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_PEACE.getMessage(kingdom.getName(), otherKingdom.getName()));
 						} else {
-							// We request peace, still at war
-							if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.PEACE)) {
-								ChatUtil.sendError(messageSender,MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
+							// Request peace from them
+							if (kingdom.hasRelationRequest(otherKingdom) && kingdom.getRelationRequest(otherKingdom).equals(relation)) {
+								// Both sides request peace, change to active peace
+								setJointActiveRelation(kingdom, otherKingdom, relation);
+								ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_PEACE.getMessage(kingdom.getName(), otherKingdom.getName()));
+							} else {
+								// We request peace, still at war
+								if (otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.PEACE)) {
+									ChatUtil.sendError(messageSender, MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
+									return false;
+								}
+								otherKingdom.setRelationRequest(kingdom, relation);
+								ChatUtil.sendNotice(messageSender, MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
+								broadcastMembers(otherKingdom, MessagePath.COMMAND_KINGDOM_BROADCAST_PEACE_REQUEST.getMessage(kingdom.getName()));
+							}
+						}
+					} else {
+						// We are not enemies
+						if (ourActiveState.equals(KonquestDiplomacyType.ALLIANCE)) {
+							// We are allies, instantly break alliance and set both to peace
+							setJointActiveRelation(kingdom, otherKingdom, relation);
+							ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_NO_ALLY.getMessage(kingdom.getName(), otherKingdom.getName()));
+						} else if (ourActiveState.equals(KonquestDiplomacyType.TRADE)) {
+							// We are trade partners, instantly go back to peace
+							setJointActiveRelation(kingdom, otherKingdom, relation);
+							ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_NO_TRADE.getMessage(kingdom.getName(), otherKingdom.getName()));
+						}
+					}
+					break;
+				case TRADE:
+					// Our kingdom wants to trade with the other
+					if (ourActiveState.equals(KonquestDiplomacyType.PEACE)) {
+						// We are at peace, request to trade
+						if (kingdom.hasRelationRequest(otherKingdom) && kingdom.getRelationRequest(otherKingdom).equals(relation)) {
+							// Both sides request trade, change to active trading
+							setJointActiveRelation(kingdom, otherKingdom, relation);
+							ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_TRADE.getMessage(kingdom.getName(), otherKingdom.getName()));
+						} else {
+							// We request trade
+							if (otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.TRADE)) {
+								ChatUtil.sendError(messageSender, MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
 								return false;
 							}
-							otherKingdom.setRelationRequest(kingdom,relation);
-							ChatUtil.sendNotice(messageSender,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
-							broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_PEACE_REQUEST.getMessage(kingdom.getName()));
+							otherKingdom.setRelationRequest(kingdom, relation);
+							ChatUtil.sendNotice(messageSender, MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
+							broadcastMembers(otherKingdom, MessagePath.COMMAND_KINGDOM_BROADCAST_TRADE_REQUEST.getMessage(kingdom.getName()));
 						}
+					} else if (ourActiveState.equals(KonquestDiplomacyType.ALLIANCE)) {
+						// We are allies, instantly break alliance and set both to trade
+						removeJointActiveRelation(kingdom, otherKingdom);
+						ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_NO_ALLY.getMessage(kingdom.getName(), otherKingdom.getName()));
 					}
-				} else {
-					// We are not enemies
-					if(ourActiveState.equals(KonquestDiplomacyType.ALLIANCE)) {
-						// We are allies, instantly break alliance and set both to peace
-						setJointActiveRelation(kingdom,otherKingdom,relation);
-						ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_NO_ALLY.getMessage(kingdom.getName(),otherKingdom.getName()));
-					} else if(ourActiveState.equals(KonquestDiplomacyType.TRADE)) {
-						// We are trade partners, instantly go back to peace
-						setJointActiveRelation(kingdom,otherKingdom,relation);
-						ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_NO_TRADE.getMessage(kingdom.getName(),otherKingdom.getName()));
-					}
-				}
-				break;
-			case TRADE:
-				// Our kingdom wants to trade with the other
-				if(ourActiveState.equals(KonquestDiplomacyType.PEACE)) {
-					// We are at peace, request to trade
-					if(kingdom.hasRelationRequest(otherKingdom) && kingdom.getRelationRequest(otherKingdom).equals(relation)) {
-						// Both sides request trade, change to active trading
-						setJointActiveRelation(kingdom,otherKingdom,relation);
-						ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_TRADE.getMessage(kingdom.getName(),otherKingdom.getName()));
+					break;
+				case ALLIANCE:
+					// Our kingdom wants to ally the other
+					if (kingdom.hasRelationRequest(otherKingdom) && kingdom.getRelationRequest(otherKingdom).equals(relation)) {
+						// Both sides request allied, change to active alliance
+						setJointActiveRelation(kingdom, otherKingdom, relation);
+						ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_ALLY.getMessage(kingdom.getName(), otherKingdom.getName()));
 					} else {
-						// We request trade
-						if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.TRADE)) {
-							ChatUtil.sendError(messageSender,MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
-							return false;
-						}
-						otherKingdom.setRelationRequest(kingdom,relation);
-						ChatUtil.sendNotice(messageSender,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
-						broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_TRADE_REQUEST.getMessage(kingdom.getName()));
-					}
-				} else if(ourActiveState.equals(KonquestDiplomacyType.ALLIANCE)) {
-					// We are allies, instantly break alliance and set both to trade
-					removeJointActiveRelation(kingdom,otherKingdom);
-					ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_NO_ALLY.getMessage(kingdom.getName(),otherKingdom.getName()));
-				}
-				break;
-			case ALLIANCE:
-				// Our kingdom wants to ally the other
-				if(kingdom.hasRelationRequest(otherKingdom) && kingdom.getRelationRequest(otherKingdom).equals(relation)) {
-					// Both sides request allied, change to active alliance
-					setJointActiveRelation(kingdom,otherKingdom,relation);
-					ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_ALLY.getMessage(kingdom.getName(),otherKingdom.getName()));
-				} else {
-					// We request allied
-					if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.ALLIANCE)) {
-						ChatUtil.sendError(messageSender,MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
-						return false;
-					}
-					otherKingdom.setRelationRequest(kingdom,relation);
-					ChatUtil.sendNotice(messageSender,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
-					broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_ALLY_REQUEST.getMessage(kingdom.getName()));
-				}
-				break;
-			case WAR:
-				// Our kingdom wants to declare war
-				boolean isWarDeclared = false;
-				if(isInstantWar) {
-					// Instantly change to active enemy, force them to enemy too
-					setJointActiveRelation(kingdom,otherKingdom,relation);
-					ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_WAR.getMessage(kingdom.getName(),otherKingdom.getName()));
-					isWarDeclared = true;
-				} else {
-					// Request war
-					// Check if they already request enemy
-					if(kingdom.hasRelationRequest(otherKingdom) && kingdom.getRelationRequest(otherKingdom).equals(relation)) {
-						// Both sides request enemy, change to active war
-						setJointActiveRelation(kingdom,otherKingdom,relation);
-						ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_WAR.getMessage(kingdom.getName(),otherKingdom.getName()));
-						isWarDeclared = true;
-					} else {
-						// We request enemy
-						if(otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.WAR)) {
-							ChatUtil.sendError(messageSender,MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
+						// We request allied
+						if (otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.ALLIANCE)) {
+							ChatUtil.sendError(messageSender, MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
 							return false;
 						}
 						otherKingdom.setRelationRequest(kingdom, relation);
-						ChatUtil.sendNotice(messageSender,MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
-						broadcastMembers(otherKingdom,MessagePath.COMMAND_KINGDOM_BROADCAST_WAR_REQUEST.getMessage(kingdom.getName()));
+						ChatUtil.sendNotice(messageSender, MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
+						broadcastMembers(otherKingdom, MessagePath.COMMAND_KINGDOM_BROADCAST_ALLY_REQUEST.getMessage(kingdom.getName()));
 					}
-				}
-				// Check for defense pact with allies
-				if(isWarDeclared && isDefensePact) {
-					// Set war with all allies of target kingdom
-					for(KonKingdom otherAlly : otherKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.ALLIANCE)) {
-						if(!otherAlly.equals(kingdom)) {
-							// Declare war on their allies
-							setJointActiveRelation(kingdom,otherAlly,relation);
-							ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_WAR.getMessage(kingdom.getName(),otherAlly.getName()));
+					break;
+				case WAR:
+					// Our kingdom wants to declare war
+					boolean isWarDeclared = false;
+					if (isInstantWar) {
+						// Instantly change to active enemy, force them to enemy too
+						setJointActiveRelation(kingdom, otherKingdom, relation);
+						ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_WAR.getMessage(kingdom.getName(), otherKingdom.getName()));
+						isWarDeclared = true;
+					} else {
+						// Request war
+						// Check if they already request enemy
+						if (kingdom.hasRelationRequest(otherKingdom) && kingdom.getRelationRequest(otherKingdom).equals(relation)) {
+							// Both sides request enemy, change to active war
+							setJointActiveRelation(kingdom, otherKingdom, relation);
+							ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_WAR.getMessage(kingdom.getName(), otherKingdom.getName()));
+							isWarDeclared = true;
+						} else {
+							// We request enemy
+							if (otherKingdom.hasRelationRequest(kingdom) && otherKingdom.getRelationRequest(kingdom).equals(KonquestDiplomacyType.WAR)) {
+								ChatUtil.sendError(messageSender, MessagePath.COMMAND_KINGDOM_ERROR_DIPLOMACY_EXISTS.getMessage());
+								return false;
+							}
+							otherKingdom.setRelationRequest(kingdom, relation);
+							ChatUtil.sendNotice(messageSender, MessagePath.COMMAND_KINGDOM_NOTICE_DIPLOMACY_SENT.getMessage(otherKingdom.getName()));
+							broadcastMembers(otherKingdom, MessagePath.COMMAND_KINGDOM_BROADCAST_WAR_REQUEST.getMessage(kingdom.getName()));
 						}
 					}
-				}
-				break;
-			default:
-				break;
+					// Check for defense pact with allies
+					if (isWarDeclared && isDefensePact) {
+						// Set war with all allies of target kingdom
+						for (KonKingdom otherAlly : otherKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.ALLIANCE)) {
+							if (!otherAlly.equals(kingdom)) {
+								// Declare war on their allies
+								setJointActiveRelation(kingdom, otherAlly, relation);
+								ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_WAR.getMessage(kingdom.getName(), otherAlly.getName()));
+							}
+						}
+					}
+					break;
+				default:
+					break;
+			}
 		}
 		
 		// Debug messaging
@@ -2666,7 +2695,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		UUID myId = bukkitPlayer.getUniqueId();
 		if(!town.isJoinInviteValid(myId)) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PLAYER.getMessage());
 			return false;
 		}
 		town.removeJoinRequest(myId);
@@ -2705,7 +2734,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		Player bukkitPlayer = sender.getBukkitPlayer();
 		UUID id = requester.getUniqueId();
 		if(!town.isJoinRequestValid(id)) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PLAYER.getMessage());
 			return false;
 		}
 		if(!town.isPlayerLord(bukkitPlayer) && !town.isPlayerKnight(bukkitPlayer)) {
@@ -3307,10 +3336,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				statusMessage = MessagePath.GENERIC_ERROR_INTERNAL.getMessage();
 				break;
 		}
+		boolean isSenderResident = false;
 		for(OfflinePlayer resident : town.getPlayerResidents()) {
 			if(resident.isOnline()) {
 				ChatUtil.sendNotice((Player) resident, statusMessage);
 			}
+			if(resident.equals(messageSender)) {
+				isSenderResident = true;
+			}
+		}
+		if(!isSenderResident) {
+			ChatUtil.sendNotice(messageSender, statusMessage);
 		}
 		return result;
 	}

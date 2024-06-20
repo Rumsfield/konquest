@@ -642,6 +642,7 @@ public class PlotMenu implements ViewableMenu {
 	 */
 	private void refreshNavigationButtons(PlotState context) {
 		DisplayMenu view = views.get(context);
+		if (view == null) return;
 		int navStart = view.getInventory().getSize()-9;
 		if(navStart < 0) {
 			ChatUtil.printDebug("Plot menu nav buttons failed to refresh in context "+context.toString());

@@ -697,7 +697,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         String result = "error";
         String color = DisplayManager.titleFormat;
         if(isAdmin) {
-            color = ""+ChatColor.GOLD;
+            color = ""+ChatColor.DARK_PURPLE;
         }
         String name = "";
         if(town != null) {
@@ -787,6 +787,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
      */
     void refreshNavigationButtons(State context) {
         DisplayMenu view = views.get(context);
+        if (view == null) return;
         int navStart = view.getInventory().getSize()-9;
         if(navStart < 0) {
             ChatUtil.printDebug("Guild menu nav buttons failed to refresh in context "+context.toString());
