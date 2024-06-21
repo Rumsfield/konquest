@@ -577,6 +577,7 @@ public class TownAdminCommand extends CommandBase {
 						// Check for resident
 						if (!town.isPlayerResident(residentPlayer.getOfflineBukkitPlayer())) {
 							ChatUtil.sendError(sender, MessagePath.COMMAND_TOWN_ERROR_KNIGHT_RESIDENT.getMessage());
+							return;
 						}
 						// Check for lord
 						if(town.isPlayerLord(residentPlayer.getOfflineBukkitPlayer())) {
@@ -594,6 +595,7 @@ public class TownAdminCommand extends CommandBase {
 						// Check for resident
 						if (!town.isPlayerResident(residentPlayer.getOfflineBukkitPlayer())) {
 							ChatUtil.sendError(sender, MessagePath.COMMAND_TOWN_ERROR_KNIGHT_RESIDENT.getMessage());
+							return;
 						}
 						// Check for lord
 						if(town.isPlayerLord(residentPlayer.getOfflineBukkitPlayer())) {
@@ -734,6 +736,9 @@ public class TownAdminCommand extends CommandBase {
 					if (args.get(2).equalsIgnoreCase("set") || args.get(2).equalsIgnoreCase("add")) {
 						tabList.add("#");
 					}
+					break;
+				case "upgrade":
+					tabList.add("#");
 					break;
 				case "option":
 					tabList.add("true");

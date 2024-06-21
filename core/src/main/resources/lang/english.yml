@@ -210,7 +210,7 @@ menu:
     click-add-player: "Click to Add Player"
     click-move-player: "Click to Move Player"
     here: "You Are Here"
-    title-plots: "Plots"
+    title-plots: "Town Plots"
     title-create: "Create Plot"
     title-delete: "Delete Plot"
     title-edit: "Edit Plot"
@@ -277,7 +277,7 @@ menu:
     title-invites: "Resident Invites"
     title-manage-town: "Managed Towns"
     title-requests: "Resident Requests"
-    title-manage: "%s Menu"
+    title-manage: "Town Management Menu"
   kingdom:
     join: "Join"
     exile: "Exile"
@@ -942,6 +942,7 @@ stat:
   conquests: "Conquests"
   conquests-info: "Enemy kingdoms conquered"
 upgrade:
+  disabled: "This town does not have enough population for the full upgrade level."
   loot:
     name: "Monument Loot"
     level-1: "Adds 1 more loot item per chest"

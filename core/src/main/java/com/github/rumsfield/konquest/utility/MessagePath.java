@@ -260,7 +260,7 @@ public enum MessagePath {
 	MENU_TOWN_TITLE_INVITES            			(0, "menu.town.title-invites"),
 	MENU_TOWN_TITLE_MANAGE_TOWN            		(0, "menu.town.title-manage-town"),
 	MENU_TOWN_TITLE_REQUESTS           		    (0, "menu.town.title-requests"),
-	MENU_TOWN_TITLE_MANAGE           			(1, "menu.town.title-manage"),
+	MENU_TOWN_TITLE_MANAGE           			(0, "menu.town.title-manage"),
 	MENU_KINGDOM_JOIN                           (0, "menu.kingdom.join"),
 	MENU_KINGDOM_EXILE                          (0, "menu.kingdom.exile"),
 	MENU_KINGDOM_INVITES                        (0, "menu.kingdom.invites"),
@@ -841,7 +841,8 @@ public enum MessagePath {
 	STAT_FISH_INFO                              (0, "stat.fish-info"),
 	STAT_KINGDOMS_INFO                          (0, "stat.kingdoms-info"),
 	STAT_CONQUESTS_INFO                         (0, "stat.conquests-info"),
-	
+
+	UPGRADE_DISABLED                            (0, "upgrade.disabled"),
 	UPGRADE_LOOT_NAME                           (0, "upgrade.loot.name"),
 	UPGRADE_LOOT_LEVEL_1                        (0, "upgrade.loot.level-1"),
 	UPGRADE_LOOT_LEVEL_2                        (0, "upgrade.loot.level-2"),

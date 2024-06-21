@@ -652,13 +652,15 @@ public class TownCommand extends CommandBase {
 					}
 					break;
 				case "lord":
-					// Suggest all town names
+					// Suggest all town names with no lord
 					for (KonTown town : kingdom.getCapitalTowns()) {
-						if (town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
-							tabList.add(town.getKingdom().getName());
-							tabList.add("capital");
-						} else {
-							tabList.add(town.getName());
+						if (!town.isLordValid()) {
+							if (town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+								tabList.add(town.getKingdom().getName());
+								tabList.add("capital");
+							} else {
+								tabList.add(town.getName());
+							}
 						}
 					}
 					break;

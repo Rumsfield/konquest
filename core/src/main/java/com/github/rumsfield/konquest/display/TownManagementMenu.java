@@ -39,10 +39,11 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
     }
 
     /* Icon slot indexes */
-    private final int ROOT_SLOT_REQUESTS 		= 1;
-    private final int ROOT_SLOT_PLOTS 			= 3;
-    private final int ROOT_SLOT_SHIELD 			= 5;
-    private final int ROOT_SLOT_ARMOR 			= 7;
+    private final int ROOT_SLOT_REQUESTS 		= 0;
+    private final int ROOT_SLOT_PLOTS 			= 2;
+    private final int ROOT_SLOT_INFO 			= 4;
+    private final int ROOT_SLOT_SHIELD 			= 6;
+    private final int ROOT_SLOT_ARMOR 			= 8;
     private final int ROOT_SLOT_PROMOTE 		= 10;
     private final int ROOT_SLOT_DEMOTE 	        = 11;
     private final int ROOT_SLOT_TRANSFER 		= 12;
@@ -147,6 +148,12 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                     loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
                 }
                 icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_PLOTS.getMessage(), loreList, Material.GRASS_BLOCK, ROOT_SLOT_PLOTS, isPlotsClickable);
+                result.addIcon(icon);
+
+                /* Info Icon */
+                loreList.clear();
+                loreList.add(hintColor + MessagePath.MENU_SCORE_HINT.getMessage());
+                icon = new TownIcon(town, kingdomColor, loreList, ROOT_SLOT_INFO, true);
                 result.addIcon(icon);
 
                 /* Shields Icon */
@@ -566,6 +573,11 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                         konquest.getDisplayManager().displayTownPlotMenu(player.getBukkitPlayer(),town);
                         // Return null result to close this menu
 
+                    } else if(slot == ROOT_SLOT_INFO) {
+                        // Open the town info menu
+                        konquest.getDisplayManager().displayTownInfoMenu(player,town);
+                        // Return null result to close this menu
+
                     } else if(slot == ROOT_SLOT_SHIELD) {
                         // Go to the shields view
                         currentState = MenuState.A_SHIELD;
@@ -699,13 +711,9 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         if(isAdmin) {
             color = ""+ChatColor.DARK_PURPLE;
         }
-        String name = "";
-        if(town != null) {
-            name = town.getName();
-        }
         switch(context) {
             case ROOT:
-                result = color+MessagePath.MENU_TOWN_TITLE_MANAGE.getMessage(name);
+                result = color+MessagePath.MENU_TOWN_TITLE_MANAGE.getMessage();
                 break;
             case A_REQUESTS:
                 result = color+MessagePath.MENU_TOWN_TITLE_REQUESTS.getMessage();
@@ -714,7 +722,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                 result = color+MessagePath.MENU_TOWN_SHIELDS.getMessage();
                 break;
             case A_ARMOR:
-                result = color+name+" "+MessagePath.MENU_TOWN_ARMOR.getMessage();
+                result = color+MessagePath.MENU_TOWN_ARMOR.getMessage();
                 break;
             case B_PROMOTE:
                 result = color+MessagePath.MENU_TOWN_PROMOTE.getMessage();

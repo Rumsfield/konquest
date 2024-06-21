@@ -441,7 +441,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 				flyDisableWarmupTimer.stopTimer();
 			} else {
 				int timeLeft = (int)(flyDisableTime - now.getTime()) / 1000;
-				ChatUtil.sendKonPriorityTitle(this, "", ChatColor.GOLD+""+(timeLeft+1), 10, 1, 1);
+				getBukkitPlayer().sendTitle(" ", ChatColor.GOLD+""+(timeLeft+1), 2, 10, 2);
 			}
 		}
 	}

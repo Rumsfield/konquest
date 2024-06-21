@@ -160,7 +160,9 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			if(currentLevel > 0) {
 				String formattedUpgrade = ChatColor.LIGHT_PURPLE+upgrade.getDescription()+" "+currentLevel;
 				int level = currentLevel;
+				boolean isDisabled = false;
 				if(infoTown.isUpgradeDisabled(upgrade)) {
+					isDisabled = true;
 					int reducedLevel = infoTown.getUpgradeLevel(upgrade);
 					level = reducedLevel;
 					if(reducedLevel > 0) {
@@ -171,7 +173,12 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 				}
 				loreList = new ArrayList<>();
 				for(String line : Konquest.stringPaginate(upgrade.getLevelDescription(level))) {
-					loreList.add(ChatColor.RED+line);
+					loreList.add(ChatColor.YELLOW+line);
+				}
+				if (isDisabled) {
+					for(String line : Konquest.stringPaginate(MessagePath.UPGRADE_DISABLED.getMessage())) {
+						loreList.add(ChatColor.RED+line);
+					}
 				}
 				// Create info icon with upgrade info
 				info = new InfoIcon(formattedUpgrade, loreList, upgrade.getIcon(), index, false);
