@@ -341,24 +341,6 @@ public class DisplayManager {
 					() -> bukkitPlayer.openInventory(newMenu.getCurrentView().getInventory()),1);
 		}
 	}
-
-	public void displayTownOptionsMenu(Player bukkitPlayer, KonTown town) {
-		playMenuOpenSound(bukkitPlayer);
-		// Create menu
-		TownOptionsMenuWrapper wrapper = new TownOptionsMenuWrapper(konquest, town);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
-	}
-
-	public void displayTownSpecializationMenu(Player bukkitPlayer, KonTown town, boolean isAdmin) {
-		playMenuOpenSound(bukkitPlayer);
-		// Create menu
-		TownSpecializationMenuWrapper wrapper = new TownSpecializationMenuWrapper(konquest, town, isAdmin);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
-	}
    	
    	/*
 	 * Helper methods

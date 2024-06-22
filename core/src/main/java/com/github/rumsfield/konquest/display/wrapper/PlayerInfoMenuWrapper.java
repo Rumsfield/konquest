@@ -104,7 +104,7 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 			} else if(numPageRows > 5) {
 				numPageRows = 5;
 			}
-			pageLabel = titleColor+infoPlayer.getOfflineBukkitPlayer().getName()+" "+MessagePath.LABEL_RESIDENCIES.getMessage()+" "+(i+1)+"/"+pageTotal;
+			pageLabel = titleColor+MessagePath.LABEL_RESIDENCIES.getMessage()+" "+(i+1)+"/"+pageTotal;
 			getMenu().addPage(pageNum, numPageRows, pageLabel);
 			int slotIndex = 0;
 			while(slotIndex < MAX_ICONS_PER_PAGE && townIter.hasNext()) {

@@ -345,11 +345,13 @@ public class TownAdminCommand extends CommandBase {
 					for (KonUpgrade upgrade : allUpgrades) {
 						int upgradeLevel = availableUpgrades.get(upgrade);
 						String upgradeInfo = ChatColor.GOLD +
+								upgrade.toString() +
+								" - " +
+								ChatColor.RESET +
 								upgrade.getDescription() +
 								" " +
 								upgradeLevel +
-								ChatColor.RESET +
-								" - " +
+								" " +
 								ChatColor.LIGHT_PURPLE +
 								upgrade.getLevelDescription(upgradeLevel);
 						ChatUtil.sendMessage(sender, upgradeInfo);

@@ -152,7 +152,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		getMenu().getPage(0).addIcon(propertyInfo);
 
     	// Page 1
-		pageLabel = titleColor+infoTown.getName()+" "+MessagePath.LABEL_UPGRADES.getMessage();
+		pageLabel = titleColor+MessagePath.LABEL_UPGRADES.getMessage();
 		getMenu().addPage(1, 1, pageLabel);
 		int index = 0;
 		for(KonUpgrade upgrade : KonUpgrade.values()) {
@@ -193,7 +193,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		ListIterator<OfflinePlayer> knightIter = townKnights.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
 			int numPageRows = getNumPageRows(townKnights.size(), i);
-			pageLabel = titleColor+infoTown.getName()+" "+MessagePath.LABEL_KNIGHTS.getMessage()+" "+(i+1)+"/"+pageTotal;
+			pageLabel = titleColor+MessagePath.LABEL_KNIGHTS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			getMenu().addPage(pageNum, numPageRows, pageLabel);
 			int slotIndex = 0;
 			while(slotIndex < MAX_ICONS_PER_PAGE && knightIter.hasNext()) {
@@ -214,7 +214,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		ListIterator<OfflinePlayer> residentIter = townResidents.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
 			int numPageRows = getNumPageRows(townResidents.size(), i);
-			pageLabel = titleColor+infoTown.getName()+" "+MessagePath.LABEL_RESIDENTS.getMessage()+" "+(i+1)+"/"+pageTotal;
+			pageLabel = titleColor+MessagePath.LABEL_RESIDENTS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			getMenu().addPage(pageNum, numPageRows, pageLabel);
 			int slotIndex = 0;
 			while(slotIndex < MAX_ICONS_PER_PAGE && residentIter.hasNext()) {

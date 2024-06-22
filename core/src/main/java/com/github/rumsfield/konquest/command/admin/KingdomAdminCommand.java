@@ -224,7 +224,7 @@ public class KingdomAdminCommand extends CommandBase {
 					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
 					return;
 				} else {
-					ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+					ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_DISBAND.getMessage(kingdomName));
 				}
 				break;
 			case "rename":
