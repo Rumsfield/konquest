@@ -473,7 +473,7 @@ command:
       notice:
         admin-set: 王國 %s 現在是管理員王國。
         admin-clear: 王國 %s 現在是普通王國。
-        diplomacy: %s 王國和 %s 之間有 %s 外交關係。
+        diplomacy: '%s 王國和 %s 之間有 %s 外交關係。'
       error:
         no-templates: 目前沒有紀念碑範本。您可以在聖殿內使用 "/k admin monument create (名稱)" 創建一個。
     monument:

@@ -574,7 +574,7 @@ command:
       detail: Para obtener más detalles sobre el comando, utilice /k help (comando)
       page: Para ver más páginas utilice /k help (página)
       page-command: Para ver más páginas utilice /k help %s (página)
-      command: Todos los usos principales de los comandos:
+      command: 'Todos los usos principales de los comandos:'
     error:
       page: El valor de la página debe ser un número.
   info:
@@ -609,12 +609,12 @@ command:
       request-received: Nueva solicitud de unión al reino, escribe "/k kingdom" para revisar.
       request-declined: Solicitud de unión al reino denegada para el jugador %s.
       request-pending: Jugadores solicitaron unirse a tu reino. Usa "/k kingdom", luego elige Solicitudes para responder.
-      request-list: Estos jugadores han solicitado unirse a tu reino:
+      request-list: 'Estos jugadores han solicitado unirse a tu reino:'
       invite-sent: Invitado %s para unirse al reino.
       invite-received: Invitación de reino recibida, escribe "/k kingdom" para responder.
       invite-declined: Invitación para unirse a %s rechazada.
       invite-pending: Tienes invitaciones pendientes para unirte a reinos. Usa "/k kingdom", luego elige Invitaciones para responder.
-      invite-list: Estos reinos te han invitado a unirte:
+      invite-list: 'Estos reinos te han invitado a unirte:'
       exile: Ahora estás exiliado de %s como bárbaro.
       exile-stats: ¡Todas las estadísticas eliminadas del exilio!
       exile-favor: ¡Todo el favor eliminado del exilio!
@@ -654,7 +654,7 @@ command:
       merchant: No se puede comerciar con comerciantes en el Reino de %s, necesita diplomacia de Comercio o Aliada.
       diplomacy-exists: Ya existe una solicitud para cambiar la diplomacia.
       diplomacy-peaceful: No se pueden cambiar las relaciones diplomáticas de los reinos pacíficos.
-      diplomacy-exists: Ya existe una solicitud para cambiar la diplomacia.
+      diplomacy-invalid: Esta relación diplomática no está disponible o ya está activa.
       template-attack: No se puede cambiar la plantilla del monumento mientras la Capital del Reino esté bajo ataque.
       template-chosen: Esta plantilla de monumento ya ha sido elegida para el Reino.
       web-color-invalid: 'Color inválido, debe coincidir con un nombre de color o un código hexadecimal que comience con #'
@@ -743,13 +743,13 @@ command:
       request-received: Nueva solicitud de unión al pueblo, escribe "/k town" para revisar.
       request-declined: Solicitud de unión al pueblo denegada para el jugador %s.
       request-pending: Los jugadores quieren convertirse en residentes de tus pueblos. Usa el comando "/k town" para responder.
-      request-town-list: Estos pueblos tienen nuevos residentes que solicitan unirse:
-      request-player-list: Estos jugadores han solicitado unirse al Pueblo de %s:
+      request-town-list: 'Estos pueblos tienen nuevos residentes que solicitan unirse:'
+      request-player-list: 'Estos jugadores han solicitado unirse al Pueblo de %s:'
       invite-sent: Invitado %s para unirse al pueblo de %s.
       invite-received: Invitación de pueblo recibida, escribe "/k town" para responder.
       invite-declined: Invitación para unirse a %s rechazada.
       invite-pending: Tienes invitaciones pendientes para unirte a pueblos. Usa el comando "/k town" para responder.
-      invite-list: Estos pueblos te han invitado a unirte:
+      invite-list: 'Estos pueblos te han invitado a unirte:'
     error:
       kick-fail: '%s no es un residente de %s.'
       knight-resident: Los Caballeros deben ser agregados como residentes primero.
