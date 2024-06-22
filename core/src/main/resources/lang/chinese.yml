@@ -20,6 +20,7 @@ label:
   blocks: 方塊
   bypass: 避開
   camp: 營地
+  capital: 首都
   close: 關閉
   cost: 成本
   critical-hits: 致命打擊
@@ -209,7 +210,7 @@ menu:
     click-add-player: 點擊以添加玩家
     click-move-player: 點擊以移動玩家
     here: 你在這裡
-    title-plots: 地塊
+    title-plots: 城鎮地塊
     title-create: 創建地塊
     title-delete: 刪除地塊
     title-edit: 編輯地塊
@@ -268,6 +269,7 @@ menu:
     hint-transfer: 點擊以贈送領主
     hint-special: 點擊以專業化
     lore-special: 選擇此專業以獲得此城鎮村民的折扣。
+    info-special: 從事這項職業的村民在這個鎮上給予折扣。
     title-root: 城鎮菜單
     title-join: 加入城鎮
     title-leave: 離開城鎮
@@ -275,7 +277,7 @@ menu:
     title-invites: 居民邀請
     title-manage-town: 管理的城鎮
     title-requests: 居民請求
-    title-manage: '%s 菜單'
+    title-manage: 城鎮管理菜單
   kingdom:
     join: 加入
     exile: 放逐
@@ -458,19 +460,22 @@ command:
         single-property: 單個屬性
         set: 設置 %s 的屬性 %s 為新值 %s。
         reset: 重置所有屬性默認值在 properties.yml 中。
+      error:
+        invalid: 屬性標誌 %s 不適用於 %s。
     help:
       notice:
-        message: '管理員幫助: 命令, 參數, 描述'
+        detail: 有關更多命令詳細信息，請使用 /k admin help (命令)
+        page: 若要查看更多頁面，請使用 /k admin help (頁)
+        page-command: 要查看更多頁面，請使用 /k admin help %s (頁)
     kingdom:
       broadcast:
         create: 管理員王國 %s 已經被創建！
       notice:
         admin-set: 王國 %s 現在是管理員王國。
         admin-clear: 王國 %s 現在是普通王國。
+        diplomacy: %s 王國和 %s 之間有 %s 外交關係。
       error:
         no-templates: 目前沒有紀念碑範本。您可以在聖殿內使用 "/k admin monument create (名稱)" 創建一個。
-        admin-set: 王國 %s 已經是一個管理員王國。
-        admin-clear: 王國 %s 已經是一個常規王國。
     monument:
       notice:
         create-1: 現在正在創建新的紀念碑範本，點擊區域的第一個角落方塊。
@@ -478,6 +483,7 @@ command:
         create-3: 點擊旅行點方塊。
         success: 成功創建了新的紀念碑範本 %s。
         remove: 刪除了紀念碑範本 %s。
+        rename: 已將紀念碑模板 %s 重新命名為 %s。
         show: 在聖所 %s 中展示現有的紀念碑範本 %s。
         sanctuary: 在創建紀念碑範本之前，使用 "/k admin sanctuary create (名稱)" 創建聖所領土。
       error:
@@ -487,6 +493,9 @@ command:
         fail-travel: 無法創建紀念碑範本 %s，旅行點必須位於區域內。
         fail-region: 無法創建紀念碑範本 %s，區域的角落必須位於聖所領土內。
         fail-reset: 無法重置紀念碑範本 %s，已還原到之前的狀態。
+    reload:
+      notice:
+        message: 重新載入 Konquest 設定檔。
     ruin:
       notice:
         create: '成功創建新的廢墟：%s'
@@ -552,9 +561,20 @@ command:
   favor:
     notice:
       message: 你擁有 %s 的青睞，花費如下...
+      cost-spy: 間諜
+      cost-travel: 傳送
+      cost-claim: 索取土地
+      cost-town-settle: 創建一個城鎮
+      cost-town-rename: 重命名一個城鎮
+      cost-kingdom-create: 創建一個王國
+      cost-kingdom-rename: 重命名王國
   help:
     notice:
-      message: 幫助 - 指令、參數、說明、別名
+      header: 幫助頁面 %s
+      detail: 有關更多命令詳細信息，請使用 /k help (命令)
+      page: 若要查看更多頁面，請使用 /k help (頁)
+      page-command: 要查看更多頁面，請使用 /k help %s (頁)
+      command: 所有主要命令都使用：
     error:
       page: 頁面值必須是一個數字。
   info:
@@ -589,20 +609,26 @@ command:
       request-received: 收到新的王國加入請求，輸入 "/k kingdom" 以查看。
       request-declined: 拒絕了玩家 %s 的王國加入請求。
       request-pending: 玩家請求加入您的王國。請使用 "/k kingdom"，然後選擇 "Requests" 以回應。
+      request-list: 這些玩家已要求加入您的王國：
       invite-sent: 邀請 %s 加入王國。
       invite-received: 收到王國邀請，輸入 "/k kingdom" 以回應。
       invite-declined: 拒絕了加入 %s 的邀請。
       invite-pending: 您有待處理的邀請加入王國的邀請。請使用 "/k kingdom"，然後選擇 "Invites" 以回應。
+      invite-list: 這些王國邀請您加入：
       exile: 您現在作為野蠻人被驅逐出 %s。
       exile-stats: 從驅逐出去除了所有統計信息！
       exile-favor: 從驅逐出去除了所有的愛戴！
+      remove-member: 你不再是 %s 王國的成員。
       kick: 將玩家 %s 從王國中踢出。
       rename: 成功將王國名稱更改為 %s。
+      transfer-master: 您讓 %s 成為 %s 的新王國主人。
       discount: '%s 王國為您提供與此商人 %s 折扣。'
       open: 王國現在開放加入。
       closed: 王國現在僅限邀請加入。
+      template-current: 王國紀念碑模板是 %s。
       template: 更新了王國紀念碑模板為 %s。
       pay: 收到王國付款。
+      diplomacy-current: 你的王國與 %s 王國的外交關係是 %s。
       diplomacy-sent: 向 %s 王國發送了外交請求。
       diplomacy-pending: 您的王國有未處理的外交請求。請使用 "/k kingdom"，然後選擇 "Relationships" 以回應。
       web-color-show: '%s 王國的 Web 地圖顏色為：%s'
@@ -627,7 +653,10 @@ command:
       exile-cooldown: '放逐為野蠻人之前等待： %s'
       merchant: 無法在 %s 王國內與商人進行交易，需要貿易或盟友外交。
       diplomacy-exists: 更改外交關係的請求已經存在。
+      diplomacy-peaceful: 無法改變和平王國的外交關係。
+      diplomacy-invalid: 此外交關係不可用或已處於活動狀態。
       template-attack: 無法在王國首都受到攻擊時更改紀念碑模板。
+      template-chosen: 此紀念碑模板已為王國選定。
       web-color-invalid: '無效的顏色，必須匹配顏色名稱或以 # 開頭的十六進位代碼。'
   list:
     notice:
@@ -696,13 +725,17 @@ command:
       redstone-disable: '%s 現在禁止敵人使用紅石開關和門。'
       golem-enable: 在 %s 中的鐵傀儡將攻擊城鎮土地內的所有敵人。
       golem-disable: 在 %s 中的鐵傀儡只會保衛城鎮紀念碑免受敵人的攻擊。
+      add-resident: 將居民 %s 加入城鎮 %s。
       kick-resident: 將居民 %s 從城鎮 %s 中踢出。
       lord-success: 把 %s 的領主地位給了 %s。
       lord-claim: '%s 已經聲稱了 %s 的領主地位！'
       knight-set: '%s 已經成為了 %s 的騎士。'
       knight-clear: '%s 不再是 %s 的騎士。'
       rename: 領主 %s 把城鎮 %s 重新命名為 %s。
-      no-lord: '%s 被遺棄了！使用 "/k town %s lord" 來聲稱領主地位。'
+      no-lord: '%s 被遺棄了！使用 "/k town lord %s" 來聲稱領主地位。'
+      shield-list: '%s 鎮剩餘 %s 盾牌。'
+      armor-list: '%s 鎮剩餘 %s 裝甲塊。'
+      specialize-list: '%s 城鎮專業化是 %s。'
       specialize: 成功將 %s 城鎮的專業化更改為 %s。
       new-resident: '%s 已經成為了城鎮 %s 的居民。'
       leave-resident: '%s 離開了城鎮 %s。'
@@ -710,10 +743,13 @@ command:
       request-received: 新的城鎮加入請求，輸入 "/k town" 來查看。
       request-declined: 拒絕了玩家 %s 的城鎮加入請求。
       request-pending: 玩家希望成為你城鎮的居民。使用 "/k town" 命令來回應。
+      request-town-list: 這些城鎮有新居民要求加入：
+      request-player-list: 這些玩家請求加入 %s 鎮：
       invite-sent: 邀請了 %s 加入城鎮 %s。
       invite-received: 收到城鎮邀請，輸入 "/k town" 來回應。
       invite-declined: 拒絕了加入 %s 的邀請。
       invite-pending: 你有待處理的城鎮邀請。使用 "/k town" 命令來回應。
+      invite-list: 這些城鎮邀請您加入：
     error:
       kick-fail: '%s 不是 %s 的居民。'
       knight-resident: 騎士必須首先被添加為居民。
@@ -726,6 +762,8 @@ command:
       kicked: 你已經被從城鎮 %s 中踢出。
       promote-knight: '%s 已經是一名騎士。'
       demote-resident: '%s 已經是一名居民。' 
+      upgrade-unavailable: '%s 鎮無法升級 %s。'
+      upgrade-level: 升級等級必須介於 %s 和 %s 之間。
   travel:
     notice:
       town-travel: '%s 已經前往了 %s。'
@@ -751,7 +789,7 @@ command:
       radius: 半徑必須大於或等於 %s 且小於或等於 %s。
       fail-town: 必須從城鎮解除佔領。
       fail-lord: 解除佔領失敗，您必須是城鎮領主。
-      fail-unclaimed: 解除佔領失敗，找不到任何佔領。
+      fail-unclaimed: 未能取消聲明，您必須站在已聲明的領土內。
       fail-center: 解除佔領失敗，無法移除領土中心。
 shop:
   error:
@@ -904,6 +942,7 @@ stat:
   conquests: 征服
   conquests-info: 征服的敵對王國數
 upgrade:
+  disabled: 城鎮沒有足夠的人口來完成全面升級。
   loot:
     name: 城鎮紀念碑戰利品
     level-1: 每個箱子多增加1個戰利品項目
@@ -965,15 +1004,15 @@ description:
   admin-town: 管理任何城鎮。
   admin-camp: 管理任何營地。
   admin-capture: 為任何王國捕捉城鎮。
-  admin-monument: 創建、移除或顯示紀念碑模板。
+  admin-monument: 建立、刪除或顯示紀念碑模板。
   admin-list: 顯示所有王國或王國的城鎮。
   admin-ruin: 管理廢墟領地。
   admin-sanctuary: 管理聖域領地。
-  admin-save: 保存王國和玩家數據文件。
+  admin-save: 保存王國和玩家資料檔。
   admin-settravel: 設置您所在領地的旅行點。
   admin-travel: 前往指定的王國或城鎮。
   admin-reload: 重新加載配置文件。
-  admin-flag: 設定王國標誌。使用該命令而不帶參數來列出可用的標誌。
+  admin-flag: 設置王國旗幟。使用不帶參數的命令列出可用標誌。
   admin-stat: 管理玩家統計數據。
 territory:
   wild: 野外
