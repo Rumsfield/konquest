@@ -759,6 +759,7 @@ command:
       request-exists: Ya has solicitado unirte a %s.
       request-deny: Solicitud para unirse al Pueblo de %s ha sido denegada.
       join-member: Ya eres un residente del pueblo.
+      join-limit: ¡El pueblo de %s tiene demasiados residentes!
       kicked: Has sido expulsado del pueblo de %s.
       promote-knight: '%s ya es un Caballero.'
       demote-resident: '%s ya es un residente.'

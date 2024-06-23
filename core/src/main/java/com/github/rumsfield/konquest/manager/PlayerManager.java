@@ -437,6 +437,7 @@ public class PlayerManager implements KonquestPlayerManager {
 				playerKingdom.addMember(id,false);
 			}
     	}
+		ChatUtil.printDebug("Initialized " + allPlayers.size() + " players from saved data.");
     }
 
 	public Collection<Player> getBukkitPlayersInKingdom(String kingdomName) {

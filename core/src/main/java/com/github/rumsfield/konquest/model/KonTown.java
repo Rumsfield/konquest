@@ -310,6 +310,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		if(maxChunkRange < 0) {
 			maxChunkRange = 0;
 		}
+		int initRange = getKonquest().getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath());
+		if(initRange > 0 && maxChunkRange < initRange) {
+			maxChunkRange = initRange;
+		}
 		if(maxChunkRange >= 1) {
 			int distX = (int)Math.abs(point.getX() - centerChunk.getX());
 			int distY = (int)Math.abs(point.getY() - centerChunk.getY());

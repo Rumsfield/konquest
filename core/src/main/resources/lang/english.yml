@@ -759,6 +759,7 @@ command:
       request-exists: "You have already requested to join %s."
       request-deny: "Request to join the Town of %s has been denied."
       join-member: "You are already a town resident."
+      join-limit: "The Town of %s has too many residents!"
       kicked: "You have been kicked from the town of %s."
       promote-knight: "%s is already a Knight."
       demote-resident: "%s is already a resident."

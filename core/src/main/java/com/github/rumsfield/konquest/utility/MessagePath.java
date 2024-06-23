@@ -669,6 +669,7 @@ public enum MessagePath {
 	COMMAND_TOWN_ERROR_REQUEST_EXISTS           (1, "command.town.error.request-exists"),
 	COMMAND_TOWN_ERROR_REQUEST_DENY             (1, "command.town.error.request-deny"),
 	COMMAND_TOWN_ERROR_JOIN_MEMBER              (0, "command.town.error.join-member"),
+	COMMAND_TOWN_ERROR_JOIN_LIMIT               (1, "command.town.error.join-limit"),
 	COMMAND_TOWN_ERROR_KICKED                   (1, "command.town.error.kicked"),
 	COMMAND_TOWN_ERROR_PROMOTE_KNIGHT           (1, "command.town.error.promote-knight"),
 	COMMAND_TOWN_ERROR_DEMOTE_RESIDENT          (1, "command.town.error.demote-resident"),
