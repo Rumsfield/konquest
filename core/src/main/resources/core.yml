@@ -347,7 +347,10 @@ core:
     
     # Allow players to attack iron golems inside of friendly towns (true/false)
     attack_friendly_golems: false
-    
+
+    # Kingdoms cannot have more than this number of members (0 to disable, integer >= 0)
+    max_player_limit: 0
+
     # Kingdoms with this many players more than other Kingdoms will not accept new players (0 to disable, integer >= 0)
     max_player_diff: 0
 
@@ -408,6 +411,9 @@ core:
     
     # Maximum distance in chunks between land claims and the town center monument, must be greater than init_radius (0 to disable, integer >= 0)
     max_size: 16
+
+    # Towns cannot have more than this number of residents (0 to disable, integer >= 0)
+    max_resident_limit: 0
     
     # Depth below the monument base in blocks to check for excess water and air when settling a new town (0 to disable, integer >= 0)
     settle_checks_depth: 32

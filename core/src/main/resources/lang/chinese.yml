@@ -759,6 +759,7 @@ command:
       request-exists: 你已經請求加入 %s 了。
       request-deny: 加入城鎮 %s 的請求已被拒絕。
       join-member: 你已經是城鎮的居民了。
+      join-limit: '%s 鎮的居民太多了！'
       kicked: 你已經被從城鎮 %s 中踢出。
       promote-knight: '%s 已經是一名騎士。'
       demote-resident: '%s 已經是一名居民。' 

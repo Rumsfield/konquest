@@ -699,19 +699,27 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return 0;
 	}
 
+	// Returns true when a kingdom is full, either by absolute limit or relative difference to smallest
 	public boolean isKingdomMembershipFull(KonKingdom kingdom) {
+		int targetKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(kingdom).size();
 		// Check if max_player_diff is disabled, or if the desired kingdom is within the max diff
 		int config_max_player_diff = konquest.getCore().getInt(CorePath.KINGDOMS_MAX_PLAYER_DIFF.getPath(),0);
-		int smallestKingdomPlayerCount = 0;
-		int targetKingdomPlayerCount = 0;
 		if(config_max_player_diff > 0) {
 			// Find the smallest kingdom, compare player count to this kingdom's
-			String smallestKingdomName = getSmallestKingdomName();
-			String checkKingdomName = kingdom.getName();
-			smallestKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(smallestKingdomName).size();
-			targetKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(checkKingdomName).size();
-			return targetKingdomPlayerCount > smallestKingdomPlayerCount + config_max_player_diff;
+			int smallestKingdomPlayerCount = konquest.getPlayerManager().getAllPlayersInKingdom(getSmallestKingdomName()).size();
+			if (targetKingdomPlayerCount > smallestKingdomPlayerCount + config_max_player_diff) {
+				return true;
+			}
 		}
+		// Check if max_player_limit is disabled, or if the kingdom has absolute max players
+		int config_max_player_limit = konquest.getCore().getInt(CorePath.KINGDOMS_MAX_PLAYER_LIMIT.getPath(),0);
+		if (config_max_player_limit > 0) {
+			// Check if the player count is at or above absolute max
+			if (targetKingdomPlayerCount >= config_max_player_limit) {
+				return true;
+			}
+		}
+		// Passed all checks, kingdom is not full
 		return false;
 	}
 
@@ -729,7 +737,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * 						3 - error, join cooldown has not expired yet
 	 * 						4 - error, no permission to join
 	 * 						5 - error, cannot switch kingdoms
-	 * 						6 - error, kingdom is at relative member limit
+	 * 						6 - error, kingdom is at relative/absolute member limit
 	 */
 	public int isPlayerJoinKingdomAllowed(KonPlayer player, KonKingdom kingdom) {
 		UUID id = player.getBukkitPlayer().getUniqueId();
@@ -759,6 +767,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return 5;
 		}
 		// Check if max_player_diff is disabled, or if the desired kingdom is within the max diff (both online & offline)
+		// Also checks for maximum absolute limit
 		if(isKingdomMembershipFull(kingdom)) {
 			return 6;
 		}
@@ -809,7 +818,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @return status
 	 * 				0	- success
 	 *  			1 	- kingdom name does not exist
-	 *  			2 	- the kingdom is full (config option max_player_diff)
+	 *  			2 	- the kingdom is full (config option max_player_diff and max_player_limit)
 	 *  			3 	- missing permission
 	 *  			4 	- cancelled
 	 *  			5 	- joining is denied, player is already member
@@ -2620,7 +2629,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		// Check for join property flag
 		if(!town.isJoinable()) {
-			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		// Check for maximum resident limit
+		int numMaxResidents = konquest.getCore().getInt(CorePath.TOWNS_MAX_RESIDENT_LIMIT.getPath(),0);
+		if(numMaxResidents > 0 && town.getNumResidents() >= numMaxResidents) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_JOIN_LIMIT.getMessage(town.getName()));
 			return false;
 		}
 		UUID myId = bukkitPlayer.getUniqueId();
@@ -2712,6 +2727,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
+		// Check for maximum resident limit
+		int numMaxResidents = konquest.getCore().getInt(CorePath.TOWNS_MAX_RESIDENT_LIMIT.getPath(),0);
+		if(numMaxResidents > 0 && town.getNumResidents() >= numMaxResidents) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_JOIN_LIMIT.getMessage(town.getName()));
+			return false;
+		}
 		if(resp) {
 			// Accept the invite
 			if(town.addPlayerResident(bukkitPlayer,false)) {
@@ -2745,6 +2766,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Check for join property flag
 		if(!town.isJoinable()) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		// Check for maximum resident limit
+		int numMaxResidents = konquest.getCore().getInt(CorePath.TOWNS_MAX_RESIDENT_LIMIT.getPath(),0);
+		if(numMaxResidents > 0 && town.getNumResidents() >= numMaxResidents) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_JOIN_LIMIT.getMessage(town.getName()));
 			return false;
 		}
 		KonOfflinePlayer offlinePlayer = konquest.getPlayerManager().getOfflinePlayer(requester);
@@ -2797,6 +2824,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Check for join property flag
 		if(!town.isJoinable()) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return;
+		}
+		// Check for maximum resident limit
+		int numMaxResidents = konquest.getCore().getInt(CorePath.TOWNS_MAX_RESIDENT_LIMIT.getPath(),0);
+		if(numMaxResidents > 0 && town.getNumResidents() >= numMaxResidents) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TOWN_ERROR_JOIN_LIMIT.getMessage(town.getName()));
 			return;
 		}
 		OfflinePlayer offlinePlayer = player.getOfflineBukkitPlayer();
