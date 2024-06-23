@@ -46,8 +46,9 @@ public class EssentialsXListener implements Listener {
             // Home is in a claimed territory
             KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(newHomeLoc);
             assert territory != null;
-            if (konquest.getKingdomManager().isPlayerFriendly(player,territory.getKingdom())) {
+            if (!konquest.getKingdomManager().isPlayerFriendly(player,territory.getKingdom())) {
                 // Homes cannot be made in non-friendly territory
+                ChatUtil.printDebug("Cancelled EssentialsX home update in non-friendly territory");
                 ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
                 event.setCancelled(true);
             }
@@ -55,6 +56,7 @@ public class EssentialsXListener implements Listener {
             // Home is in the wild
             if (!isWildHomeEnabled) {
                 // Homes cannot be made in the wild, cancel
+                ChatUtil.printDebug("Cancelled EssentialsX home update in the wild");
                 ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
                 event.setCancelled(true);
             }
@@ -96,6 +98,7 @@ public class EssentialsXListener implements Listener {
         boolean isCombatTagEnabled = konquest.getCore().getBoolean(CorePath.COMBAT_PREVENT_COMMAND_ON_DAMAGE.getPath(),true);
         if (isCombatTagEnabled && player.isCombatTagged()) {
             // Player is combat tagged, cancel teleport
+            ChatUtil.printDebug("Cancelled EssentialsX teleport for combat tagged player");
             ChatUtil.sendError(player, MessagePath.PROTECTION_ERROR_TAG_BLOCKED.getMessage());
             event.setCancelled(true);
             return;
@@ -111,6 +114,7 @@ public class EssentialsXListener implements Listener {
                 KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
                 if (flagHolder.hasPropertyValue(KonPropertyFlag.TRAVEL)) {
                     if (!flagHolder.getPropertyValue(KonPropertyFlag.TRAVEL)) {
+                        ChatUtil.printDebug("Cancelled EssentialsX teleport into territory with TRAVEL flag = false");
                         ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
                         event.setCancelled(true);
                         return;
@@ -120,6 +124,7 @@ public class EssentialsXListener implements Listener {
             // Check relationship
             if (konquest.getKingdomManager().isPlayerEnemy(player,territory.getKingdom())) {
                 // Cannot teleport into enemy territory
+                ChatUtil.printDebug("Cancelled EssentialsX teleport into enemy territory");
                 ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
                 event.setCancelled(true);
                 return;
@@ -134,6 +139,7 @@ public class EssentialsXListener implements Listener {
             // Check relationship
             if (konquest.getKingdomManager().isPlayerEnemy(player,territory.getKingdom())) {
                 // Cannot teleport out of an enemy territory
+                ChatUtil.printDebug("Cancelled EssentialsX teleport out of enemy territory");
                 ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
                 event.setCancelled(true);
                 return;

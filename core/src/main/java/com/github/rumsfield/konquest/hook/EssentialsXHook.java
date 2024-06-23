@@ -25,7 +25,7 @@ public class EssentialsXHook implements PluginHook {
     public int reload() {
         isEnabled = false;
         // Attempt to integrate EssentialsX
-        Plugin essentialsX = Bukkit.getPluginManager().getPlugin("EssentialsX");
+        Plugin essentialsX = Bukkit.getPluginManager().getPlugin("Essentials");
         if(essentialsX == null) {
             return 1;
         }
