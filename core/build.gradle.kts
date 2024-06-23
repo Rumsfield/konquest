@@ -32,6 +32,10 @@ repositories{
 
     // Vault, BlueMap
     maven("https://jitpack.io")
+
+    // EssentialsX
+    maven("https://repo.essentialsx.net/releases/")
+    maven("https://papermc.io/repo/repository/maven-public/")
 }
 
 dependencies{
@@ -50,6 +54,7 @@ dependencies{
     compileOnly("com.github.BlueMap-Minecraft:BlueMapAPI:v2.6.0")
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.15")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5")
+    compileOnly("net.essentialsx:EssentialsX:2.20.1")
 
     implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("org.xerial:sqlite-jdbc:3.40.1.0")

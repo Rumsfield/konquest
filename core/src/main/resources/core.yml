@@ -215,6 +215,18 @@ core:
       
       # Send a message to the linked kingdom channel in Discord when a critical block is broken in a town monument (true/false)
       raid_alert_channel: true
+
+    # (*) Enable plugin integration with EssentialsX (true/false)
+    essentialsx: true
+
+    # //// CORE.INTEGRATION.ESSENTIALSX_OPTIONS \\\\
+    essentialsx_options:
+
+      # Allow players to create home locations in the wild as well as friendly territory (true/false)
+      enable_wild_homes: true
+
+      # Prevent players from teleporting in enemy territory and during combat (true/false)
+      enable_teleport_protection: true
       
   # //// CORE.TRAVEL \\\\
   travel:
