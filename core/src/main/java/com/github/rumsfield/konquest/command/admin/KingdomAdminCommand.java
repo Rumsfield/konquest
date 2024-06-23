@@ -42,6 +42,11 @@ public class KingdomAdminCommand extends CommandBase {
 				newArg("remove",true,false)
 						.sub( newArg("kingdom",false,false) )
 		);
+		// exile <player>
+		addArgument(
+				newArg("exile",true,false)
+						.sub( newArg("player",false,false) )
+		);
 		// rename <kingdom> <name>
 		addArgument(
 				newArg("rename",true,false)
@@ -263,6 +268,35 @@ public class KingdomAdminCommand extends CommandBase {
 						break;
 				}
 				break;
+			case "exile":
+				// Force a player to become a barbarian
+				if(args.size() != 2) {
+					sendInvalidArgMessage(sender);
+					return;
+				}
+				String exilePlayerName = args.get(1);
+				KonOfflinePlayer exilePlayer = konquest.getPlayerManager().getOfflinePlayerFromName(exilePlayerName);
+				if(exilePlayer == null) {
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(exilePlayerName));
+					return;
+				}
+				exilePlayerName = exilePlayer.getOfflineBukkitPlayer().getName();
+				UUID exileUUID = exilePlayer.getOfflineBukkitPlayer().getUniqueId();
+				int playerExileStatus = konquest.getKingdomManager().exilePlayerBarbarian(exileUUID,true,true,true,true);
+				switch(playerExileStatus) {
+					case 0:
+						// Success
+						ChatUtil.sendNotice(sender, MessagePath.COMMAND_KINGDOM_NOTICE_KICK.getMessage(exilePlayerName));
+						break;
+					case 1:
+						// Player is already a barbarian
+						ChatUtil.sendError(sender, MessagePath.COMMAND_KINGDOM_ERROR_KICK_BARBARIAN.getMessage());
+						break;
+					default:
+						ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+						break;
+				}
+				break;
 			case "access":
 				// Make the kingdom open or closed
 				if(args.size() != 3) {
@@ -466,7 +500,7 @@ public class KingdomAdminCommand extends CommandBase {
 						break;
 					case "kick":
 						// Remove a kingdom member
-						int memberKickStatus = konquest.getKingdomManager().exilePlayerBarbarian(id,true,true,true,true);
+						int memberKickStatus = konquest.getKingdomManager().exilePlayerBarbarian(id,true,false,false,true);
 						switch(memberKickStatus) {
 							case 0:
 								// Success
@@ -526,6 +560,7 @@ public class KingdomAdminCommand extends CommandBase {
 			tabList.add("create");
 			tabList.add("remove");
 			tabList.add("rename");
+			tabList.add("exile");
 			tabList.add("access");
 			tabList.add("type");
 			tabList.add("template");
@@ -536,6 +571,8 @@ public class KingdomAdminCommand extends CommandBase {
 			// suggest kingdoms or template
 			if(args.get(0).equalsIgnoreCase("create")) {
 				tabList.addAll(konquest.getSanctuaryManager().getAllValidTemplateNames());
+			} else if (args.get(0).equalsIgnoreCase("exile")) {
+				tabList.addAll(konquest.getPlayerManager().getAllPlayerNames());
 			} else {
 				tabList.addAll(konquest.getKingdomManager().getKingdomNames());
 			}

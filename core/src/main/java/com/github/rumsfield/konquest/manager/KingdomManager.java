@@ -1510,7 +1510,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
-		int status = exilePlayerBarbarian(member.getUniqueId(),true,true,false,false);
+		int status = exilePlayerBarbarian(member.getUniqueId(),true,false,false,false);
 		if(status == 0) {
 			return true;
 		} else {

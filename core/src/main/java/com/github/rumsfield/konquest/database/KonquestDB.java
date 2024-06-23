@@ -166,6 +166,7 @@ public class KonquestDB extends Database{
             e.printStackTrace();
             ChatUtil.printConsoleError("A problem occured while getting all saved players from the database");
         }
+        ChatUtil.printDebug("Fetched " + players.size() + " players from database.");
     	return players;
     }
     
