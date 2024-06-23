@@ -59,7 +59,10 @@ public enum CorePath {
 	INTEGRATION_DISCORDSRV                                ("core.integration.discordsrv"),
 	INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_DIRECT      ("core.integration.discordsrv_options.raid_alert_direct"),
 	INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_CHANNEL     ("core.integration.discordsrv_options.raid_alert_channel"),
-	
+	INTEGRATION_ESSENTIALSX                               ("core.integration.essentialsx"),
+	INTEGRATION_ESSENTIALSX_OPTIONS_ENABLE_WILD_HOMES     ("core.integration.essentialsx_options.enable_wild_homes"),
+	INTEGRATION_ESSENTIALSX_OPTIONS_ENABLE_TELEPORT_PROTECTION ("core.integration.essentialsx_options.enable_teleport_protection"),
+
 	TRAVEL_ENABLE_SANCTUARY                               ("core.travel.enable.sanctuary"),
 	TRAVEL_ENABLE_TOWNS                                   ("core.travel.enable.towns"),
 	TRAVEL_ENABLE_CAPITAL                                 ("core.travel.enable.capital"),
