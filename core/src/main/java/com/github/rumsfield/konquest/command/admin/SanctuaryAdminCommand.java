@@ -16,116 +16,121 @@ import java.util.List;
 
 public class SanctuaryAdminCommand extends CommandBase {
 
-	public SanctuaryAdminCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public SanctuaryAdminCommand() {
+		// Define name and sender support
+		super("sanctuary",true, true);
+		// Define arguments
+		// create <name>
+		addArgument(
+				newArg("create",true,false)
+						.sub( newArg("name",false,false) )
+		);
+		// rename <sanctuary> <name>
+		addArgument(
+				newArg("rename",true,false)
+						.sub( newArg("sanctuary",false,false)
+								.sub (newArg("name",false,false) ) )
+		);
+		// remove <sanctuary>
+		addArgument(
+				newArg("remove",true,false)
+						.sub( newArg("sanctuary",false,false) )
+		);
     }
 
 	@Override
-	public void execute() {
-		// k admin sanctuary create|remove|rename <name> [<name>]
-		Player bukkitPlayer = (Player) getSender();
-		if (getArgs().length != 4 && getArgs().length != 5) {
-			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.SANCTUARY);
-            return;
-        }
-		if(getKonquest().isWorldIgnored(bukkitPlayer.getWorld())) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+	public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		// Sender must be player
+		KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
+		if (player == null) {
+			sendInvalidSenderMessage(sender);
 			return;
 		}
-		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-			ChatUtil.printDebug("Failed to find non-existent player");
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+		if (args.size() != 2 && args.size() != 3) {
+			sendInvalidArgMessage(sender);
 			return;
 		}
-
-		String cmdMode = getArgs()[2];
-		String name = getArgs()[3];
-		
+		String cmdMode = args.get(0);
+		String sanctuaryName = args.get(1);
+		// Check for invalid world
+		Location playerLoc = player.getBukkitPlayer().getLocation();
+		if(konquest.isWorldIgnored(playerLoc.getWorld())) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+			return;
+		}
+		// Parse sub-commands
 		if(cmdMode.equalsIgnoreCase("create")) {
-			if (getArgs().length != 4) {
-				sendInvalidArgMessage(bukkitPlayer, AdminCommandType.SANCTUARY);
-				return;
-			}
-			Location playerLoc = bukkitPlayer.getLocation();
-			if(getKonquest().validateName(name,bukkitPlayer) != 0) {
+			if(konquest.validateName(sanctuaryName,sender) != 0) {
         		return;
         	}
-        	boolean pass = getKonquest().getSanctuaryManager().addSanctuary(playerLoc, name);
-        	if(!pass) {
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_CREATE.getMessage(name));
+			// Create the new sanctuary
+			if (konquest.getSanctuaryManager().addSanctuary(playerLoc, sanctuaryName)) {
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_CREATE.getMessage(sanctuaryName));
 			} else {
-        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_CREATE.getMessage(name));
-        		// Render border particles
-        		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-        		getKonquest().getTerritoryManager().updatePlayerBorderParticles(player);
-        	}
-		} else if(cmdMode.equalsIgnoreCase("remove")) {
-			if(!getKonquest().getSanctuaryManager().isSanctuary(name)) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(name));
-                return;
+				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_CREATE.getMessage(sanctuaryName));
 			}
-			boolean pass = getKonquest().getSanctuaryManager().removeSanctuary(name);
-        	if(!pass) {
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_REMOVE.getMessage(name));
+		} else if(cmdMode.equalsIgnoreCase("remove")) {
+			// Check for valid sanctuary
+			if(!konquest.getSanctuaryManager().isSanctuary(sanctuaryName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(sanctuaryName));
+				return;
+			}
+			// Remove the sanctuary
+			if (konquest.getSanctuaryManager().removeSanctuary(sanctuaryName)) {
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_REMOVE.getMessage(sanctuaryName));
 			} else {
-        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_REMOVE.getMessage(name));
-        	}
+				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_REMOVE.getMessage(sanctuaryName));
+			}
 		} else if(cmdMode.equalsIgnoreCase("rename")) {
-			if (getArgs().length == 5) {
-				if(!getKonquest().getSanctuaryManager().isSanctuary(name)) {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(name));
-	                return;
-				}
-				String newName = getArgs()[4];
-				if(getKonquest().validateName(newName,bukkitPlayer) != 0) {
-	        		return;
-	        	}
-				boolean pass = getKonquest().getSanctuaryManager().renameSanctuary(name,newName);
-				if(!pass) {
-	        		ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_RENAME.getMessage(name,newName));
-				} else {
-	        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_RENAME.getMessage(name,newName));
-	        	}
+			if (args.size() != 3) {
+				sendInvalidArgMessage(sender);
+				return;
+			}
+			String newSanctuaryName = args.get(2);
+			// Check for valid sanctuary
+			if(!konquest.getSanctuaryManager().isSanctuary(sanctuaryName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(sanctuaryName));
+				return;
+			}
+			// Validate new name
+			if(konquest.validateName(newSanctuaryName,sender) != 0) {
+				return;
+			}
+			// Rename the sanctuary
+			if (konquest.getSanctuaryManager().renameSanctuary(sanctuaryName,newSanctuaryName)) {
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_SANCTUARY_NOTICE_RENAME.getMessage(sanctuaryName,newSanctuaryName));
 			} else {
-				sendInvalidArgMessage(bukkitPlayer, AdminCommandType.SANCTUARY);
+				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_SANCTUARY_ERROR_RENAME.getMessage(sanctuaryName,newSanctuaryName));
 			}
 		} else {
-			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.SANCTUARY);
+			sendInvalidArgMessage(sender);
 		}
 	}
 	
 	@Override
-	public List<String> tabComplete() {
-		// k admin sanctuary create|remove|rename <name> [<name>]
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		List<String> tabList = new ArrayList<>();
-		final List<String> matchedTabList = new ArrayList<>();
-		if(getArgs().length == 3) {
+		if (args.size() == 1) {
 			tabList.add("create");
 			tabList.add("remove");
 			tabList.add("rename");
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
-		} else if(getArgs().length == 4) {
-			String subCmd = getArgs()[2];
-			if(subCmd.equalsIgnoreCase("create")) {
-				tabList.add("***");
-			} else if(subCmd.equalsIgnoreCase("remove") || subCmd.equalsIgnoreCase("rename")) {
-				tabList.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
+		} else if (args.size() == 2) {
+			switch (args.get(0).toLowerCase()) {
+				case "create":
+					tabList.add("***");
+					break;
+				case "remove":
+				case "rename":
+					tabList.addAll(konquest.getSanctuaryManager().getSanctuaryNames());
+					break;
 			}
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
-		} else if(getArgs().length == 5) {
-			String subCmd = getArgs()[2];
-			if(subCmd.equalsIgnoreCase("rename")) {
+		} else if (args.size() == 3) {
+			if (args.get(0).equalsIgnoreCase("rename")) {
+				// New name
 				tabList.add("***");
 			}
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
 		}
-		return matchedTabList;
+		return matchLastArgToList(tabList,args);
 	}
 	
 }

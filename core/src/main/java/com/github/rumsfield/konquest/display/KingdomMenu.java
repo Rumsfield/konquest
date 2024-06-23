@@ -301,7 +301,6 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 		    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
 		    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-				loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 				icon = new InfoIcon(kingdomColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.IRON_DOOR, ROOT_SLOT_OPEN, true);
 				result.addIcon(icon);
 				
@@ -946,15 +945,11 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		String result = "error";
 		ChatColor color = ChatColor.BLACK;
 		if(isAdmin) {
-			color = ChatColor.GOLD;
-		}
-		String name = "";
-		if(kingdom != null) {
-			name = kingdom.getName();
+			color = ChatColor.DARK_PURPLE;
 		}
 		switch(context) {
 			case ROOT:
-				result = color+name+" "+MessagePath.MENU_KINGDOM_TITLE_ROOT.getMessage();
+				result = color+MessagePath.MENU_KINGDOM_TITLE_ROOT.getMessage();
 				break;
 			case A_JOIN:
 				result = color+MessagePath.MENU_KINGDOM_TITLE_JOIN.getMessage();
@@ -1039,6 +1034,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	 */
 	void refreshNavigationButtons(State context) {
 		DisplayMenu view = views.get(context);
+		if (view == null) return;
 		int navStart = view.getInventory().getSize()-9;
 		if(navStart < 0) {
 			ChatUtil.printDebug("Kingdom menu nav buttons failed to refresh in context "+context.toString());

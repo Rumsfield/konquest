@@ -1,36 +1,40 @@
 package com.github.rumsfield.konquest.command.admin;
 
+import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
+
+import java.util.List;
 
 public enum AdminCommandType {
-	HELP        (Material.REDSTONE_TORCH,		"konquest.admin.help",         "[<page>]",                                                     MessagePath.DESCRIPTION_ADMIN_HELP.getMessage()),
-	BYPASS      (Material.SPECTRAL_ARROW,		"konquest.admin.bypass",       "",                                                             MessagePath.DESCRIPTION_ADMIN_BYPASS.getMessage()),
-	LIST        (Material.PAPER,				"konquest.admin.list",         "[kingdom|town|camp|ruin|sanctuary] [<page>]",                  MessagePath.DESCRIPTION_ADMIN_LIST.getMessage()),
-	KINGDOM     (Material.GOLDEN_SWORD,			"konquest.admin.kingdom",      "menu|create|destroy|add|kick|rename|admin|webcolor <kingdom> [<name>]", MessagePath.DESCRIPTION_ADMIN_KINGDOM.getMessage()),
-	TOWN        (Material.OBSIDIAN,				"konquest.admin.town",         "create|destroy|add|kick|lord|knight|rename|upgrade|shield|armor|plots|options|specialize <town> [<name>] [<arg>]",  MessagePath.DESCRIPTION_ADMIN_TOWN.getMessage()),
-	CAMP        (Material.ORANGE_BED,			"konquest.admin.camp",         "create|destroy <player>",                                      MessagePath.DESCRIPTION_ADMIN_CAMP.getMessage()),
-	CLAIM       (Material.DIAMOND_SHOVEL,		"konquest.admin.claim",        "[radius|auto|undo] [<radius>]",                                MessagePath.DESCRIPTION_ADMIN_CLAIM.getMessage()),
-	UNCLAIM     (Material.COBWEB,				"konquest.admin.unclaim",      "[radius|auto] [<radius>]",                                     MessagePath.DESCRIPTION_ADMIN_UNCLAIM.getMessage()),
-	CAPTURE     (Material.FISHING_ROD,			"konquest.admin.capture",      "<town> <kingdom>",                                             MessagePath.DESCRIPTION_ADMIN_CAPTURE.getMessage()),
-	MONUMENT    (Material.CRAFTING_TABLE,		"konquest.admin.monument",     "create|remove|reset|show|status <name> [<cost>]",              MessagePath.DESCRIPTION_ADMIN_MONUMENT.getMessage()),
-	RUIN        (Material.CRACKED_STONE_BRICKS,	"konquest.admin.ruin",         "create|remove|rename|reset|criticals|spawns [<name>] [<name>]", MessagePath.DESCRIPTION_ADMIN_RUIN.getMessage()),
-	SANCTUARY   (Material.BEDROCK,				"konquest.admin.sanctuary",    "create|remove|rename <name> [<name>]",                         MessagePath.DESCRIPTION_ADMIN_SANCTUARY.getMessage()),
-	TRAVEL      (Material.COMPASS,				"konquest.admin.travel",       "<name>",                                                       MessagePath.DESCRIPTION_ADMIN_TRAVEL.getMessage()),
-	SETTRAVEL   (Material.OAK_SIGN,				"konquest.admin.settravel",    "",                                                             MessagePath.DESCRIPTION_ADMIN_SETTRAVEL.getMessage()),
-	FLAG        (Material.ORANGE_BANNER,		"konquest.admin.flag",         "kingdom|capital|town|sanctuary|ruin <name>|all [<flag>|reset] [<value>]", MessagePath.DESCRIPTION_ADMIN_FLAG.getMessage()),
-	STAT        (Material.BOOKSHELF,			"konquest.admin.stat",         "<player> <stat> show|set|add|clear [<value>]",                 MessagePath.DESCRIPTION_ADMIN_STAT.getMessage()),
-	SAVE        (Material.TOTEM_OF_UNDYING,		"konquest.admin.save",         "",                                                             MessagePath.DESCRIPTION_ADMIN_SAVE.getMessage()),
-	RELOAD      (Material.GLOWSTONE,			"konquest.admin.reload",       "",                                                             MessagePath.DESCRIPTION_ADMIN_RELOAD.getMessage());
+	HELP        (Material.REDSTONE_TORCH,		"konquest.admin.help",         new HelpAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_HELP.getMessage()),
+	BYPASS      (Material.SPECTRAL_ARROW,		"konquest.admin.bypass",       new BypassAdminCommand(),       MessagePath.DESCRIPTION_ADMIN_BYPASS.getMessage()),
+	KINGDOM     (Material.GOLDEN_SWORD,			"konquest.admin.kingdom",      new KingdomAdminCommand(),      MessagePath.DESCRIPTION_ADMIN_KINGDOM.getMessage()),
+	TOWN        (Material.OBSIDIAN,				"konquest.admin.town",         new TownAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_TOWN.getMessage()),
+	CAMP        (Material.ORANGE_BED,			"konquest.admin.camp",         new CampAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_CAMP.getMessage()),
+	CLAIM       (Material.DIAMOND_SHOVEL,		"konquest.admin.claim",        new ClaimAdminCommand(),        MessagePath.DESCRIPTION_ADMIN_CLAIM.getMessage()),
+	UNCLAIM     (Material.COBWEB,				"konquest.admin.unclaim",      new UnclaimAdminCommand(),      MessagePath.DESCRIPTION_ADMIN_UNCLAIM.getMessage()),
+	CAPTURE     (Material.FISHING_ROD,			"konquest.admin.capture",      new CaptureAdminCommand(),      MessagePath.DESCRIPTION_ADMIN_CAPTURE.getMessage()),
+	MONUMENT    (Material.CRAFTING_TABLE,		"konquest.admin.monument",     new MonumentAdminCommand(),     MessagePath.DESCRIPTION_ADMIN_MONUMENT.getMessage()),
+	RUIN        (Material.CRACKED_STONE_BRICKS,	"konquest.admin.ruin",         new RuinAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_RUIN.getMessage()),
+	SANCTUARY   (Material.BEDROCK,				"konquest.admin.sanctuary",    new SanctuaryAdminCommand(),    MessagePath.DESCRIPTION_ADMIN_SANCTUARY.getMessage()),
+	TRAVEL      (Material.COMPASS,				"konquest.admin.travel",       new TravelAdminCommand(),       MessagePath.DESCRIPTION_ADMIN_TRAVEL.getMessage()),
+	SETTRAVEL   (Material.OAK_SIGN,				"konquest.admin.settravel",    new SetTravelAdminCommand(),    MessagePath.DESCRIPTION_ADMIN_SETTRAVEL.getMessage()),
+	FLAG        (Material.ORANGE_BANNER,		"konquest.admin.flag",         new FlagAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_FLAG.getMessage()),
+	STAT        (Material.BOOKSHELF,			"konquest.admin.stat",         new StatAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_STAT.getMessage()),
+	SAVE        (Material.TOTEM_OF_UNDYING,		"konquest.admin.save",         new SaveAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_SAVE.getMessage()),
+	RELOAD      (Material.GLOWSTONE,			"konquest.admin.reload",       new ReloadAdminCommand(),       MessagePath.DESCRIPTION_ADMIN_RELOAD.getMessage());
 
-	private final String permission;
-	private final String arguments;
-	private final String description;
-	private final Material iconMaterial;
-	AdminCommandType(Material iconMaterial, String permission, String arguments, String description) {
+	private final Material iconMaterial;	// Item for menu icons
+	private final String permission;		// Permission node from plugin.yml, or "" for no permission
+	private final CommandBase command;		// Command class implementation
+	private final String description;		// Description of the command for help
+
+	AdminCommandType(Material iconMaterial, String permission, CommandBase command, String description) {
 		this.iconMaterial = iconMaterial;
 		this.permission = permission;
-		this.arguments = arguments;
+		this.command = command;
 		this.description = description;
 	}
 
@@ -41,15 +45,35 @@ public enum AdminCommandType {
 	public String permission() {
 		return permission;
 	}
-	
-	public String arguments() {
-		return arguments;
+
+	public CommandBase command() {
+		return command;
 	}
 	
 	public String description(){
 		return description;
 	}
-	
+
+	public boolean isSenderHasPermission(CommandSender sender) {
+		if (permission.isEmpty()) {
+			return true;
+		} else {
+			return sender.hasPermission(permission);
+		}
+	}
+
+	public boolean isSenderAllowed(CommandSender sender) {
+		return command.isSenderAllowed(sender);
+	}
+
+	public String baseUsage() {
+		return command.getBaseUsage();
+	}
+
+	public List<String> argumentUsage() {
+		return command.getArgumentUsage();
+	}
+
 	/**
 	 * Gets a AdminCommandType enum given a string command
 	 * @param command - The string name of the command

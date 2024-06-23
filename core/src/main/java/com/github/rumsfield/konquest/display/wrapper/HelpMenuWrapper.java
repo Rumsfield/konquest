@@ -163,15 +163,15 @@ public class HelpMenuWrapper extends MenuWrapper {
 		if(clickedIcon instanceof CommandIcon) {
 			// Command Icons close the GUI and print a command in chat
 			CommandIcon icon = (CommandIcon)clickedIcon;
-			CommandType cmd = icon.getCommand();
-			String commandFormat = Labeler.format(cmd);
-			ChatUtil.sendNotice(bukkitPlayer, commandFormat);
+			for (String usageLine : icon.getCommand().argumentUsage()) {
+				ChatUtil.sendNotice(bukkitPlayer, usageLine);
+			}
 		} else if(clickedIcon instanceof AdminCommandIcon) {
 			// Admin Command Icons close the GUI and print a command in chat
 			AdminCommandIcon icon = (AdminCommandIcon)clickedIcon;
-			AdminCommandType cmd = icon.getCommand();
-			String commandFormat = Labeler.format(cmd);
-			ChatUtil.sendNotice(bukkitPlayer, commandFormat);
+			for (String usageLine : icon.getCommand().argumentUsage()) {
+				ChatUtil.sendNotice(bukkitPlayer, usageLine);
+			}
 		} else if(clickedIcon instanceof InfoIcon) {
 			// Info Icons close the GUI and print their info in chat
 			InfoIcon icon = (InfoIcon)clickedIcon;

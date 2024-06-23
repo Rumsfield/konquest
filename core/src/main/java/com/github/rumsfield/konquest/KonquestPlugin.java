@@ -9,6 +9,7 @@ import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
@@ -88,16 +89,6 @@ public class KonquestPlugin extends JavaPlugin {
 	public void onDisable() {
 		if(enableSuccess) {
 			konquest.disable();
-			konquest.getSanctuaryManager().saveSanctuaries();
-			konquest.getKingdomManager().saveKingdoms();
-			konquest.getCampManager().saveCamps();
-			konquest.getRuinManager().saveRuins();
-			konquest.getRuinManager().regenAllRuins();
-			konquest.getRuinManager().removeAllGolems();
-			konquest.getKingdomManager().removeAllRabbits();
-			konquest.getConfigManager().saveConfigs();
-			konquest.getDatabaseThread().flushDatabase();
-			konquest.getDatabaseThread().getDatabase().getDatabaseConnection().disconnect();
 		}
 	}
 	
@@ -107,8 +98,9 @@ public class KonquestPlugin extends JavaPlugin {
 
 	private void registerListeners() {
 		// Set command executors
-		getCommand("konquest").setExecutor(konquest.getCommandHandler());
-		getCommand("k").setExecutor(konquest.getCommandHandler());
+		PluginCommand konquestCommand = getCommand("konquest");
+		assert konquestCommand != null;
+		konquestCommand.setExecutor(konquest.getCommandHandler());
 		// Register event listeners
 		pluginManager.registerEvents(new PlayerListener(this), this);
 		pluginManager.registerEvents(new EntityListener(this), this);
@@ -167,7 +159,22 @@ public class KonquestPlugin extends JavaPlugin {
         return true;
     }
 
-	private void printLogo() {
+	public void printVersion() {
+		String pluginVersion = this.getDescription().getVersion();
+		String serverVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+		String lineTemplate = "%-30s -> %s";
+		String [] versionInfo = {
+				String.format(lineTemplate,"Konquest Version",ChatColor.AQUA+pluginVersion),
+				String.format(lineTemplate,"Server Version",ChatColor.AQUA+serverVersion),
+				String.format(lineTemplate,"Server Version Supported",boolean2status(konquest.isVersionSupported()))
+		};
+		for (String row : versionInfo) {
+			String line = ChatColor.GOLD+"> "+ChatColor.RESET + row;
+			Bukkit.getServer().getConsoleSender().sendMessage(line);
+		}
+	}
+
+	public static void printLogo() {
 //		String color1 = ChatUtil.parseHex("#FFA000");
 //		String color2 = ChatUtil.parseHex("#FFB020");
 //		String color3 = ChatUtil.parseHex("#FFC040");
@@ -220,6 +227,11 @@ public class KonquestPlugin extends JavaPlugin {
 	/*
 	 * Economy wrapper functions. Attempt to use Vault API methods, and then try depreciated methods if those fail.
 	 */
+
+	public static String getCurrencyFormat(double amount) {
+		return econ.format(amount);
+	}
+
 	@SuppressWarnings("deprecation")
 	public static double getBalance(OfflinePlayer offlineBukkitPlayer) {
 		double result;

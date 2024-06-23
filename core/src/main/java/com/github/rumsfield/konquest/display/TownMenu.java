@@ -384,6 +384,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
      */
     void refreshNavigationButtons(State context) {
         DisplayMenu view = views.get(context);
+        if (view == null) return;
         int navStart = view.getInventory().getSize()-9;
         if(navStart < 0) {
             ChatUtil.printDebug("Town menu nav buttons failed to refresh in context "+context.toString());

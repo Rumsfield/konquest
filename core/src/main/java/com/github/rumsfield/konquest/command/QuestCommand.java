@@ -12,33 +12,35 @@ import java.util.List;
 
 public class QuestCommand extends CommandBase {
 
-	public QuestCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public QuestCommand() {
+		// Define name and sender support
+		super("quest",true, false);
+		// No Arguments
     }
-	
-	public void execute() {
-		// k quest
-		Player bukkitPlayer = (Player) getSender();
-    	if (getArgs().length != 1) {
-			sendInvalidArgMessage(bukkitPlayer,CommandType.QUEST);
-		} else {
-        	// Check for global enable
-        	if(!getKonquest().getDirectiveManager().isEnabled()) {
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
-        		return;
-        	}
-        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-    			ChatUtil.printDebug("Failed to find non-existent player");
-    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-    			return;
-    		}
-        	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-        	getKonquest().getDirectiveManager().displayBook(player);
-        }
+
+	@Override
+	public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		// Sender must be player
+		KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
+		if (player == null) {
+			sendInvalidSenderMessage(sender);
+			return;
+		}
+		if (!args.isEmpty()) {
+			sendInvalidArgMessage(sender);
+			return;
+		}
+		// Check for global enable
+		if(!konquest.getDirectiveManager().isEnabled()) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return;
+		}
+		// Display quest book
+		konquest.getDirectiveManager().displayBook(player);
 	}
 
 	@Override
-	public List<String> tabComplete() {
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		// No arguments to complete
 		return Collections.emptyList();
 	}

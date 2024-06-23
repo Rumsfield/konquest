@@ -19,6 +19,7 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandException;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -207,6 +208,16 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public void disable() {
 		integrationManager.disable();
+		sanctuaryManager.saveSanctuaries();
+		kingdomManager.saveKingdoms();
+		campManager.saveCamps();
+		ruinManager.saveRuins();
+		ruinManager.regenAllRuins();
+		ruinManager.removeAllGolems();
+		kingdomManager.removeAllRabbits();
+		configManager.saveConfigs();
+		databaseThread.flushDatabase();
+		databaseThread.getDatabase().getDatabaseConnection().disconnect();
 	}
 	
 	private void initVersionHandlers() {
@@ -880,6 +891,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		reservedWords.add("ruin");
 		reservedWords.add("sanctuary");
 		reservedWords.add("templates");
+		reservedWords.add("template");
+		reservedWords.add("monument");
 		reservedWords.add("all");
 		for(String word : reservedWords) {
 			if(name.equalsIgnoreCase(word)) {
@@ -889,15 +902,15 @@ public class Konquest implements KonquestAPI, Timeable {
 		return 0;
 	}
 	
-	public int validateName(String name, Player player) {
+	public int validateName(String name, CommandSender sender) {
 		int result = validateNameConstraints(name);
-		if(player != null) {
+		if(sender != null) {
 			if(result == 1) {
-				ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_FORMAT_NAME.getMessage());
 			} else if(result == 2) {
-				ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_LENGTH_NAME.getMessage());
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_LENGTH_NAME.getMessage());
 			} else if(result >= 3) {
-				ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
 			}
 		}
 		return result;

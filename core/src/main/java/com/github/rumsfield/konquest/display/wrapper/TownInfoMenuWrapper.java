@@ -86,6 +86,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		/* Specialization Info Icon (4) */
 		loreList = new ArrayList<>();
 		loreList.add(valueColor+infoTown.getSpecialization().name());
+		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_INFO_SPECIAL.getMessage(),loreColor));
 		Material specialMat = Konquest.getProfessionMaterial(infoTown.getSpecialization());
 		info = new InfoIcon(kingdomColor+MessagePath.LABEL_SPECIALIZATION.getMessage(), loreList, specialMat, 4, false);
 		getMenu().getPage(0).addIcon(info);
@@ -151,7 +152,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		getMenu().getPage(0).addIcon(propertyInfo);
 
     	// Page 1
-		pageLabel = titleColor+infoTown.getName()+" "+MessagePath.LABEL_UPGRADES.getMessage();
+		pageLabel = titleColor+MessagePath.LABEL_UPGRADES.getMessage();
 		getMenu().addPage(1, 1, pageLabel);
 		int index = 0;
 		for(KonUpgrade upgrade : KonUpgrade.values()) {
@@ -159,7 +160,9 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			if(currentLevel > 0) {
 				String formattedUpgrade = ChatColor.LIGHT_PURPLE+upgrade.getDescription()+" "+currentLevel;
 				int level = currentLevel;
+				boolean isDisabled = false;
 				if(infoTown.isUpgradeDisabled(upgrade)) {
+					isDisabled = true;
 					int reducedLevel = infoTown.getUpgradeLevel(upgrade);
 					level = reducedLevel;
 					if(reducedLevel > 0) {
@@ -170,7 +173,12 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 				}
 				loreList = new ArrayList<>();
 				for(String line : Konquest.stringPaginate(upgrade.getLevelDescription(level))) {
-					loreList.add(ChatColor.RED+line);
+					loreList.add(ChatColor.YELLOW+line);
+				}
+				if (isDisabled) {
+					for(String line : Konquest.stringPaginate(MessagePath.UPGRADE_DISABLED.getMessage())) {
+						loreList.add(ChatColor.RED+line);
+					}
 				}
 				// Create info icon with upgrade info
 				info = new InfoIcon(formattedUpgrade, loreList, upgrade.getIcon(), index, false);
@@ -185,7 +193,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		ListIterator<OfflinePlayer> knightIter = townKnights.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
 			int numPageRows = getNumPageRows(townKnights.size(), i);
-			pageLabel = titleColor+infoTown.getName()+" "+MessagePath.LABEL_KNIGHTS.getMessage()+" "+(i+1)+"/"+pageTotal;
+			pageLabel = titleColor+MessagePath.LABEL_KNIGHTS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			getMenu().addPage(pageNum, numPageRows, pageLabel);
 			int slotIndex = 0;
 			while(slotIndex < MAX_ICONS_PER_PAGE && knightIter.hasNext()) {
@@ -206,7 +214,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		ListIterator<OfflinePlayer> residentIter = townResidents.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
 			int numPageRows = getNumPageRows(townResidents.size(), i);
-			pageLabel = titleColor+infoTown.getName()+" "+MessagePath.LABEL_RESIDENTS.getMessage()+" "+(i+1)+"/"+pageTotal;
+			pageLabel = titleColor+MessagePath.LABEL_RESIDENTS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			getMenu().addPage(pageNum, numPageRows, pageLabel);
 			int slotIndex = 0;
 			while(slotIndex < MAX_ICONS_PER_PAGE && residentIter.hasNext()) {

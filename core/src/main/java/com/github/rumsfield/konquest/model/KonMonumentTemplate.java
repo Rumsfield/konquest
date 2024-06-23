@@ -14,7 +14,7 @@ public class KonMonumentTemplate {
 	private boolean isValid;
 	private boolean isBlanking;
 	private boolean hasLoot;
-	private final String name;
+	private String name;
 	private double cost;
 	private int numCriticals;
 	private int numBlocks;
@@ -89,6 +89,14 @@ public class KonMonumentTemplate {
 	
 	public Location getTravelPoint() {
 		return travelPoint;
+	}
+
+	public Location getSpawnLoc() {
+		return new Location(travelPoint.getWorld(),travelPoint.getBlockX(),travelPoint.getBlockY()+1,travelPoint.getBlockZ());
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	public void setNumCriticals(int val) {

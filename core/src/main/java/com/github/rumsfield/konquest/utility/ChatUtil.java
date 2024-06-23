@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.boss.BarColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.math.BigInteger;
@@ -259,11 +260,18 @@ public class ChatUtil {
 		// Second, format the hex value into a string
 		return "#"+Integer.toHexString(hexVal);
 	}
-	
+
 	public static void printDebug(String message) {
+		printDebug(message, false);
+	}
+
+	public static void printDebug(String message, boolean showStack) {
 		if(Konquest.getInstance().getCore().getBoolean(CorePath.DEBUG.getPath())) {
         	Bukkit.getServer().getConsoleSender().sendMessage("[Konquest DEBUG] " + message);
         }
+		if(showStack) {
+			showDebugStackTrace();
+		}
 	}
 	
 	public static void printConsole(String message) {
@@ -282,28 +290,35 @@ public class ChatUtil {
 		Bukkit.getLogger().warning("[Konquest] " + message);
 	}
 
-	public static void sendNotice(Player player, String message) {
-		String notice = Konquest.getChatTag() + noticeColor + message;
-		player.sendMessage(notice);
-	}
-	
-	public static void sendNotice(Player player, String message, ChatColor color) {
-		String notice = Konquest.getChatTag() + color + message;
-		player.sendMessage(notice);
-	}
-	
-	public static void sendMessage(Player player, String message) {
-		player.sendMessage(message);
-	}
-	
-	public static void sendMessage(Player player, String message, ChatColor color) {
-		String notice = color + message;
-		player.sendMessage(notice);
+	public static void sendNotice(KonPlayer player, String message) {
+		sendNotice(player.getBukkitPlayer(), message);
 	}
 
-	public static void sendError(Player player, String message) {
+	public static void sendNotice(CommandSender sender, String message) {
+		sendNotice(sender, message, noticeColor);
+	}
+	
+	public static void sendNotice(CommandSender sender, String message, ChatColor color) {
+		String notice = Konquest.getChatTag() + color + message;
+		sender.sendMessage(notice);
+	}
+	
+	public static void sendMessage(CommandSender sender, String message) {
+		sender.sendMessage(message);
+	}
+	
+	public static void sendMessage(CommandSender sender, String message, ChatColor color) {
+		String notice = color + message;
+		sender.sendMessage(notice);
+	}
+
+	public static void sendError(KonPlayer player, String message) {
+		sendError(player.getBukkitPlayer(), message);
+	}
+
+	public static void sendError(CommandSender sender, String message) {
 		String error = Konquest.getChatTag() + errorColor + message;
-		player.sendMessage(error);
+		sender.sendMessage(error);
 	}
 	
 	public static void sendBroadcast(String message) {
@@ -316,11 +331,11 @@ public class ChatUtil {
 		Bukkit.broadcast(notice,"konquest.command.admin.*");
 	}
 
-	public static void sendCommaMessage(Player player, List<String> values) {
-		sendCommaMessage(player, values, noticeColor);
+	public static void sendCommaMessage(CommandSender sender, List<String> values) {
+		sendCommaMessage(sender, values, noticeColor);
 	}
 
-	public static void sendCommaMessage(Player player, List<String> values, ChatColor color) {
+	public static void sendCommaMessage(CommandSender sender, List<String> values, ChatColor color) {
 		StringBuilder message = new StringBuilder();
 		ListIterator<String> listIter = values.listIterator();
 		while(listIter.hasNext()) {
@@ -331,7 +346,7 @@ public class ChatUtil {
 			}
 		}
 		String notice = "" + color + message;
-		player.sendMessage(notice);
+		sender.sendMessage(notice);
 	}
 	
 	public static void sendKonTitle(KonPlayer player, String title, String subtitle) {

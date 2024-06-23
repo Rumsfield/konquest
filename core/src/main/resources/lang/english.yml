@@ -20,6 +20,7 @@ label:
   blocks: "Blocks"
   bypass: "BYPASS"
   camp: "Camp"
+  capital: "Capital"
   close: "Close"
   cost: "Cost"
   critical-hits: "Critical Hits"
@@ -209,7 +210,7 @@ menu:
     click-add-player: "Click to Add Player"
     click-move-player: "Click to Move Player"
     here: "You Are Here"
-    title-plots: "Plots"
+    title-plots: "Town Plots"
     title-create: "Create Plot"
     title-delete: "Delete Plot"
     title-edit: "Edit Plot"
@@ -268,6 +269,7 @@ menu:
     hint-transfer: "Click to give Lord"
     hint-special: "Click to specialize"
     lore-special: "Choose this profession for a discount with villagers in this town."
+    info-special: "Villagers with this profession give discounts in this town."
     title-root: "Town Menu"
     title-join: "Join a Town"
     title-leave: "Leave a Town"
@@ -275,7 +277,7 @@ menu:
     title-invites: "Resident Invites"
     title-manage-town: "Managed Towns"
     title-requests: "Resident Requests"
-    title-manage: "%s Menu"
+    title-manage: "Town Management Menu"
   kingdom:
     join: "Join"
     exile: "Exile"
@@ -458,19 +460,22 @@ command:
         single-property: "Single Property"
         set: "Set property %s of %s to new value %s."
         reset: "Reset all properties to default values in properties.yml"
+      error:
+        invalid: "The property flag %s does not apply to %s."
     help:
       notice:
-        message: "Admin Help: Command, Arguments, Description"
+        detail: "For more command details use /k admin help <command>"
+        page: "To view more pages use /k admin help <page>"
+        page-command: "To view more pages use /k admin help %s <page>"
     kingdom:
       broadcast:
         create: "The Admin Kingdom of %s has been created!"
       notice:
-        admin-set: "The Kingdom of %s is now an admin kingdom."
-        admin-clear: "The Kingdom of %s is now a regular kingdom."
+        admin-set: "The Kingdom of %s is an admin kingdom."
+        admin-clear: "The Kingdom of %s is a player kingdom."
+        diplomacy: "The Kingdoms of %s and %s have a diplomacy relationship of %s."
       error:
         no-templates: "There are no monument templates. Create one in a sanctuary with \"/k admin monument create (name)\""
-        admin-set: "The Kingdom of %s is already an admin kingdom."
-        admin-clear: "The Kingdom of %s is already a regular kingdom."
     monument:
       notice:
         create-1: "Now creating new Monument Template, click on the first corner block of the region."
@@ -478,6 +483,7 @@ command:
         create-3: "Click on the travel point block."
         success: "Successfully created new Monument Template %s."
         remove: "Removed Monument Template %s."
+        rename: "Renamed Monument Template %s to %s."
         show: "Showing existing Monument Template %s in Sanctuary %s."
         sanctuary: "Create Sanctuary territory with \"/k admin sanctuary create (name)\" before creating Monument Templates."
       error:
@@ -487,6 +493,9 @@ command:
         fail-travel: "Failed to create Monument Template %s, travel point must be inside of the region."
         fail-region: "Failed to create Monument Template %s, region corners must be within Sanctuary territory."
         fail-reset: "Failed to reset Monument Template %s, restored to previous state."
+    reload:
+      notice:
+        message: "Reloaded Konquest configuration files."
     ruin:
       notice:
         create: "Successfully created new Ruin: %s"
@@ -552,9 +561,20 @@ command:
   favor:
     notice:
       message: "You have %s Favor, costs are..."
+      cost-spy: "Spy"
+      cost-travel: "Travel"
+      cost-claim: "Claim"
+      cost-town-settle: "Town Settle"
+      cost-town-rename: "Town Rename"
+      cost-kingdom-create: "Kingdom Create"
+      cost-kingdom-rename: "Kingdom Rename"
   help:
     notice:
-      message: "Help - Command, Arguments, Description, Alias"
+      header: "Help Page %s"
+      detail: "For more command details use /k help <command>"
+      page: "To view more pages use /k help <page>"
+      page-command: "To view more pages use /k help %s <page>"
+      command: "All major command uses:"
     error:
       page: "The page value must be a number."
   info:
@@ -589,20 +609,26 @@ command:
       request-received: "New kingdom join request, type \"/k kingdom\" to review."
       request-declined: "Denied kingdom join request for player %s."
       request-pending: "Players requested to join your kingdom. Use \"/k kingdom\", then choose Requests to respond."
+      request-list: "These players have requested to join your kingdom:"
       invite-sent: "Invited %s to join the kingdom."
       invite-received: "Received kingdom invite, type \"/k kingdom\" to respond."
       invite-declined: "Declined invitation to join %s."
       invite-pending: "You have pending invites to join kingdoms. Use \"/k kingdom\", then choose Invites to respond."
+      invite-list: "These kingdoms have invited you to join:"
       exile: "You are now exiled from %s as a barbarian."
       exile-stats: "Removed all stats from exile!"
       exile-favor: "Removed all favor from exile!"
+      remove-member: "You are no longer a member of the Kingdom of %s."
       kick: "Kicked player %s from the kingdom."
       rename: "Successfully changed kingdom name to %s."
+      transfer-master: "You made %s the new kingdom master of %s."
       discount: "The Kingdom of %s gives you a %s percent discount with this merchant."
       open: "Kingdom is now open to join."
       closed: "Kingdom is now closed for invites only."
+      template-current: "The Kingdom Monument Template is %s."
       template: "Updated the Kingdom Monument Template to %s."
       pay: "Received kingdom payment."
+      diplomacy-current: "Your kingdom's diplomacy relationship to the Kingdom of %s is %s."
       diplomacy-sent: "Sent diplomacy request to the Kingdom of %s."
       diplomacy-pending: "Your kingdom has pending diplomacy requests. Use \"/k kingdom\", then choose Relationships to respond."
       web-color-show: "The Kingdom of %s has a web map color of: %s"
@@ -627,7 +653,10 @@ command:
       exile-cooldown: "Wait before exile to barbarian: %s"
       merchant: "Cannot trade with merchants in the Kingdom of %s, need Trade or Allied diplomacy."
       diplomacy-exists: "A request to change diplomacy already exists."
+      diplomacy-peaceful: "Cannot change the diplomacy relationships of peaceful kingdoms."
+      diplomacy-invalid: "This diplomacy relationship is not available, or already active."
       template-attack: "Cannot change monument template while the Kingdom Capital is under attack."
+      template-chosen: "This monument template has already been chosen for the Kingdom."
       web-color-invalid: "Invalid color, must match a color name or hex code starting with #"
   list:
     notice:
@@ -696,13 +725,17 @@ command:
       redstone-disable: "%s now prevents enemies from using redstone switches and doors."
       golem-enable: "Iron Golems in %s will attack all enemies within town land."
       golem-disable: "Iron Golems in %s will only defend the town monument from enemies."
+      add-resident: "Added resident %s to town %s."
       kick-resident: "Kicked resident %s from town %s."
       lord-success: "Gave Lordship of %s to %s."
       lord-claim: "%s has claimed Lordship of %s!"
       knight-set: "%s has been Knighted in %s."
       knight-clear: "%s is no longer a Knight in %s."
       rename: "Lord %s has renamed the Town of %s to %s."
-      no-lord: "%s is abandoned! Use \"/k town %s lord\" to claim Lordship."
+      no-lord: "%s is abandoned! Use \"/k town lord %s\" to claim Lordship."
+      shield-list: "%s remaining shields for the town of %s."
+      armor-list: "%s remaining armor blocks for the town of %s."
+      specialize-list: "%s Town specialization is %s."
       specialize: "Successfully changed %s Town specialization to %s."
       new-resident: "%s has joined as a town resident of %s."
       leave-resident: "%s has left the town of %s."
@@ -710,10 +743,13 @@ command:
       request-received: "New town join request, type \"/k town\" to review."
       request-declined: "Denied town join request for player %s."
       request-pending: "Players want to become residents of your towns. Use \"/k town\" command to respond."
+      request-town-list: "These towns have new residents requesting to join:"
+      request-player-list: "These players have requested to join the Town of %s:"
       invite-sent: "Invited %s to join the town of %s."
       invite-received: "Received town invite, type \"/k town\" to respond."
       invite-declined: "Declined invitation to join %s."
       invite-pending: "You have pending invites to join towns. Use \"/k town\" command to respond."
+      invite-list: "These towns have invited you to join:"
     error:
       kick-fail: "%s is not a resident of %s."
       knight-resident: "Knights must be added as residents first."
@@ -726,6 +762,8 @@ command:
       kicked: "You have been kicked from the town of %s."
       promote-knight: "%s is already a Knight."
       demote-resident: "%s is already a resident."
+      upgrade-unavailable: "Upgrade %s is unavailable for the town of %s."
+      upgrade-level: "Upgrade level must be between %s and %s."
   travel:
     notice:
       town-travel: "%s has traveled to %s."
@@ -751,7 +789,7 @@ command:
       radius: "Radius must be greater than or equal to %s and less than or equal to %s."
       fail-town: "Must unclaim from towns only."
       fail-lord: "Failed to unclaim, you must be the town lord."
-      fail-unclaimed: "Failed to unclaim, no claims found."
+      fail-unclaimed: "Failed to unclaim, you must be standing in claimed territory."
       fail-center: "Failed to unclaim, cannot remove territory center."
 shop:
   error:
@@ -904,6 +942,7 @@ stat:
   conquests: "Conquests"
   conquests-info: "Enemy kingdoms conquered"
 upgrade:
+  disabled: "This town does not have enough population for the full upgrade level."
   loot:
     name: "Monument Loot"
     level-1: "Adds 1 more loot item per chest"
@@ -961,19 +1000,19 @@ description:
   admin-bypass: "Toggle Admin bypass mode."
   admin-claim: "Claim land chunks."
   admin-unclaim: "Return a chunk to the Wild."
-  admin-kingdom: "Manage any Kingdom."
-  admin-town: "Manage any Town."
-  admin-camp: "Manage any Camp."
+  admin-kingdom: "Manage a Kingdom."
+  admin-town: "Manage a Town or Capital."
+  admin-camp: "Manage a Barbarian Camp."
   admin-capture: "Capture a town for any Kingdom."
-  admin-monument: "Creates, removes or shows a Monument Template."
-  admin-list: "Display all Kingdoms or Towns of a Kingdom."
+  admin-monument: "Manage a Monument Template."
+  admin-list: "Display all Kingdoms and Territories."
   admin-ruin: "Manage a Ruin territory."
   admin-sanctuary: "Manage a Sanctuary territory."
-  admin-save: "Saves Kingdoms and Players data files."
+  admin-save: "Saves plugin data files."
   admin-settravel: "Sets the travel point for the territory you're in."
   admin-travel: "Teleport to the specified kingdom or town."
   admin-reload: "Reloads configuration files."
-  admin-flag: "Set kingdom flags. Use the command with no arguments to list available flags."
+  admin-flag: "Set kingdom property flags."
   admin-stat: "Manage player stats."
 territory:
   wild: "Wild"

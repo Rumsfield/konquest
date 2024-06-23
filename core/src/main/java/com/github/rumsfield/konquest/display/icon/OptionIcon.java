@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.model.KonTownOption;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -8,25 +9,16 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.List;
 
 public class OptionIcon implements MenuIcon {
-
-	public enum optionAction {
-		TOWN_OPEN,
-		TOWN_ALLIED_BUILDING,
-		TOWN_PLOT_ONLY,
-		TOWN_FRIENDLY_REDSTONE,
-		TOWN_REDSTONE,
-		TOWN_GOLEM
-    }
 	
-	private final optionAction action;
+	private final KonTownOption option;
 	private final String name;
 	private final List<String> lore;
 	private final Material mat;
 	private final int index;
 	private final ItemStack item;
 	
-	public OptionIcon(optionAction action, String name, List<String> lore, Material mat, int index) {
-		this.action = action;
+	public OptionIcon(KonTownOption option, String name, List<String> lore, Material mat, int index) {
+		this.option = option;
 		this.name = name;
 		this.lore = lore;
 		this.mat = mat;
@@ -49,8 +41,8 @@ public class OptionIcon implements MenuIcon {
 		return item;
 	}
 	
-	public optionAction getAction() {
-		return action;
+	public KonTownOption getOption() {
+		return option;
 	}
 	
 	@Override

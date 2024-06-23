@@ -293,6 +293,25 @@ public class SanctuaryManager {
 			ChatUtil.printDebug("No valid templates exist!");
 		}
 	}
+
+	public boolean renameMonumentTemplate(String name, String newName) {
+		if (!isTemplate(name) || konquest.validateNameConstraints(newName) != 0) {
+			return false;
+		}
+		// Get the template's sanctuary
+		KonSanctuary templateSanctuary = null;
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			if(sanctuary.isTemplate(name)) {
+				templateSanctuary = sanctuary;
+				break;
+			}
+		}
+		if (templateSanctuary == null) {
+			return false;
+		}
+		// Update the name
+		return templateSanctuary.renameTemplate(name,newName);
+	}
 	
 	public boolean removeMonumentTemplate(String name) {
 		boolean result = false;

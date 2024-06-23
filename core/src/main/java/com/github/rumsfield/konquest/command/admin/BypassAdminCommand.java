@@ -15,38 +15,37 @@ import java.util.List;
 
 public class BypassAdminCommand extends CommandBase {
 	
-	public BypassAdminCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public BypassAdminCommand() {
+		// Define name and sender support
+		super("bypass",true, true);
+		// No Arguments
     }
 
-    public void execute() {
-        // k admin bypass
-		Player bukkitPlayer = (Player) getSender();
-    	if (getArgs().length != 2) {
-			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.BYPASS);
+	@Override
+    public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		// Sender must be player
+		KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
+		if (player == null) {
+			sendInvalidSenderMessage(sender);
+			return;
+		}
+		if (!args.isEmpty()) {
+			sendInvalidArgMessage(sender);
+			return;
+		}
+		if(player.isAdminBypassActive()) {
+			player.setIsAdminBypassActive(false);
+			ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
+			ChatUtil.resetTitle(player.getBukkitPlayer());
 		} else {
-        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-    			ChatUtil.printDebug("Failed to find non-existent player");
-    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-    			return;
-    		}
-        	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-        	if(player.isAdminBypassActive()) {
-        		player.setIsAdminBypassActive(false);
-        		//ChatUtil.sendNotice((Player) getSender(), "Disabled admin bypass.");
-        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
-        		ChatUtil.resetTitle(bukkitPlayer);
-        	} else {
-        		player.setIsAdminBypassActive(true);
-        		//ChatUtil.sendNotice((Player) getSender(), "Enabled admin bypass, use this command again to disable.");
-        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
-        		ChatUtil.sendConstantTitle(bukkitPlayer, "", ChatColor.GOLD+MessagePath.LABEL_BYPASS.getMessage());
-        	}
-        }
+			player.setIsAdminBypassActive(true);
+			ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
+			ChatUtil.sendConstantTitle(player.getBukkitPlayer(), "", ChatColor.GOLD+MessagePath.LABEL_BYPASS.getMessage());
+		}
     }
     
     @Override
-	public List<String> tabComplete() {
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		// No arguments to complete
 		return Collections.emptyList();
 	}

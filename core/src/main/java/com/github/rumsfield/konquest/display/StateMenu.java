@@ -23,7 +23,7 @@ public abstract class StateMenu {
     protected final Konquest konquest;
     protected State currentState;
     protected Access menuAccess;
-    protected final HashMap<State,DisplayMenu> views;
+    protected final HashMap<State,DisplayMenu> views; // DisplayMenu values can be null!
     protected final ArrayList<DisplayMenu> pages;
     protected int currentPage;
 
