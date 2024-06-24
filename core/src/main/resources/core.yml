@@ -43,7 +43,7 @@ core:
   directive_quests: true
   
   # Reset player hearts to 20 if base value is greater than 20 on player join (true/false)
-  reset_legacy_health: true
+  reset_legacy_health: false
   
   # Minimum time in seconds between placeholder requests, use lower values for faster update rates but more lag (0 to disable, integer >= 0)
   placeholder_request_limit: 60

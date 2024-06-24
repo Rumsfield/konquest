@@ -3797,6 +3797,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 	public void updateAllTownDisabledUpgrades() {
 		for(KonKingdom kingdom : getKingdoms()) {
+			// Capital
+			konquest.getUpgradeManager().updateTownDisabledUpgrades(kingdom.getCapital());
+			// Towns
 			for(KonTown town : kingdom.getTowns()) {
 				konquest.getUpgradeManager().updateTownDisabledUpgrades(town);
 			}
@@ -4526,7 +4529,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(!lordUUID.equalsIgnoreCase("")) {
 			UUID playerID = Konquest.idFromString(lordUUID);
 			if(playerID != null) {
-				town.setLord(playerID);
+				town.setLord(playerID,false);
 			} else {
 				ChatUtil.printDebug("Town "+townName+" in kingdom "+kingdomName+" has a null UUID! Lord remains invalid");
 			}
@@ -4538,7 +4541,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(townResidentSection != null) {
 			for(String residentUUID : townResidentSection.getKeys(false)) {
 				boolean isElite = townSection.getBoolean("residents."+residentUUID);
-				town.addPlayerResident(Bukkit.getOfflinePlayer(UUID.fromString(residentUUID)),isElite);
+				town.addPlayerResident(Bukkit.getOfflinePlayer(UUID.fromString(residentUUID)),isElite,false);
 			}
 		}
 		// Add invite requests

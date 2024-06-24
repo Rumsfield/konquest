@@ -235,22 +235,25 @@ public class UpgradeManager implements KonquestUpgradeManager {
 								newLevel--;
 							}
 							town.disableUpgrade(upgrade,newLevel);
-							ChatUtil.printDebug("Disabled upgrade "+upgrade.getDescription()+" from level "+level+" to "+newLevel+" for town "+town.getName());
+							ChatUtil.printDebug("UPGRADE: Disabled upgrade "+upgrade.getDescription()+" from level "+level+" to "+newLevel+" for town "+town.getName());
 						} else {
 							// Current population is greater than or equal to this upgrade level's requirement
 							boolean status = town.allowUpgrade(upgrade);
 							if(status) {
-								ChatUtil.printDebug("Successfully allowed upgrade "+upgrade.getDescription()+" level "+level+" for town "+town.getName());
+								ChatUtil.printDebug("UPGRADE: Successfully allowed upgrade "+upgrade.getDescription()+" level "+level+" for town "+town.getName());
+							} else {
+								ChatUtil.printDebug("UPGRADE: No change to upgrade "+upgrade.getDescription()+" level "+level+" for town "+town.getName());
 							}
 						}
 					} else {
 						// This upgrade level is disabled because either the cost is set to a negative number or is missing from the upgrades.yml
 						town.disableUpgrade(upgrade,0);
-						ChatUtil.printDebug("Disabled invalid upgrade "+upgrade.getDescription()+" to level 0 for town "+town.getName()+", cost is "+cost);
+						ChatUtil.printDebug("UPGRADE: Disabled invalid upgrade "+upgrade.getDescription()+" to level 0 for town "+town.getName()+", cost is "+cost);
 					}
 				} else {
 					// Upgrades are disabled in config, disable every purchased upgrade
 					town.disableUpgrade(upgrade,0);
+					ChatUtil.printDebug("UPGRADE: Disabled unused upgrade "+upgrade.getDescription()+" to level 0 for town "+town.getName());
 				}
 			}
 		}

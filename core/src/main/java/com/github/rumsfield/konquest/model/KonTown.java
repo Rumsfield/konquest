@@ -1276,12 +1276,18 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public void setPlayerLord(OfflinePlayer player) {
 		setLord(player.getUniqueId());
 	}
-	
+
 	public void setLord(UUID id) {
+		setLord(id, true);
+	}
+
+	public void setLord(UUID id, boolean doUpdates) {
 		lord = id;
 		residents.put(id,true);
-		getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-		getKonquest().getMapHandler().drawLabel(this);
+		if (doUpdates) {
+			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
+			getKonquest().getMapHandler().drawLabel(this);
+		}
 	}
 	
 	public boolean isLord(UUID id) {
@@ -1319,14 +1325,20 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		return status;
 	}
-	
+
 	public boolean addPlayerResident(OfflinePlayer player, boolean isElite) {
+		return addPlayerResident(player, isElite, true);
+	}
+	
+	public boolean addPlayerResident(OfflinePlayer player, boolean isElite, boolean doUpdates) {
 		boolean status = false;
 		UUID playerUUID = player.getUniqueId();
 		if(!residents.containsKey(playerUUID)) {
 			residents.put(playerUUID,isElite);
-			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-			getKonquest().getMapHandler().drawLabel(this);
+			if (doUpdates) {
+				getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
+				getKonquest().getMapHandler().drawLabel(this);
+			}
 			status = true;
 		}
 		return status;
