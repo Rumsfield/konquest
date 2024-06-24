@@ -92,6 +92,9 @@ public enum MessagePath {
 	PLACEHOLDER_ALLY                            (0, "placeholder.ally"),
 	PLACEHOLDER_TRADER                          (0, "placeholder.trader"),
 	PLACEHOLDER_PEACEFUL                        (0, "placeholder.peaceful"),
+	PLACEHOLDER_RANK_MASTER                     (0, "placeholder.rank-master"),
+	PLACEHOLDER_RANK_OFFICER                    (0, "placeholder.rank-officer"),
+	PLACEHOLDER_RANK_MEMBER                     (0, "placeholder.rank-member"),
 
     MAP_BARBARIAN                               (0, "map.barbarian"),
     MAP_BARBARIANS                              (0, "map.barbarians"),

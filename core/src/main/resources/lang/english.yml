@@ -98,6 +98,9 @@ placeholder:
   ally: "Ally"
   trader: "Trader"
   peaceful: "Peaceful"
+  rank-master: "Master"
+  rank-officer: "Officer"
+  rank-member: "Member"
 map:
   barbarian: "Barbarian"
   barbarians: "Barbarians"

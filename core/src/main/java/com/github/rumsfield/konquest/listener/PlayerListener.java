@@ -257,7 +257,7 @@ public class PlayerListener implements Listener {
 		/* %KINGDOM% */
 		String kingdomName = kingdom.getName();
 		/* %RANK% */
-		String kingdomRank = kingdom.getPlayerRoleName(bukkitPlayer);
+		String kingdomRank = kingdom.getPlayerRankName(bukkitPlayer.getUniqueId());
 		/* %NAME% */
 		String playerName = bukkitPlayer.getName();
 		/* %C1% */

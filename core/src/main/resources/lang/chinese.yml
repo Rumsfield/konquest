@@ -98,6 +98,9 @@ placeholder:
   ally: 盟友
   trader: 貿易
   peaceful: 和平
+  rank-master: 王國大師
+  rank-officer: 官員
+  rank-member: 成員
 map:
   barbarian: 野蠻人
   barbarians: 野蠻人

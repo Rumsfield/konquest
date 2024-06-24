@@ -98,6 +98,9 @@ placeholder:
   ally: Союзник
   trader: Торговец
   peaceful: Мирный
+  rank-master: Мастер
+  rank-officer: Офицер
+  rank-member: Участвующий
 map:
   barbarian: Варвар
   barbarians: Варвары

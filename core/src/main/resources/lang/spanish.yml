@@ -98,6 +98,9 @@ placeholder:
   ally: Aliado
   trader: Comerciante
   peaceful: Pacifico
+  rank-master: Maestro
+  rank-officer: Oficial
+  rank-member: Miembro
 map:
   barbarian: Barbaro
   barbarians: Barbaros
