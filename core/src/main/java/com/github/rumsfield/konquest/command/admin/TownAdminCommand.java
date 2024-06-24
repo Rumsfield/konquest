@@ -561,6 +561,7 @@ public class TownAdminCommand extends CommandBase {
 						}
 						// Add the player as a resident
 						if(town.addPlayerResident(residentPlayer.getOfflineBukkitPlayer(),false)) {
+							town.removeJoinRequest(residentID);
 							ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_ADD_RESIDENT.getMessage(playerName,townName));
 						} else {
 							// Player is already a resident
@@ -570,6 +571,7 @@ public class TownAdminCommand extends CommandBase {
 					case "kick":
 						// Remove the player as a resident
 						if(town.removePlayerResident(residentPlayer.getOfflineBukkitPlayer())) {
+							town.removeJoinRequest(residentID);
 							ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_KICK_RESIDENT.getMessage(playerName,townName));
 						} else {
 							// Player was not a resident
