@@ -98,6 +98,9 @@ placeholder:
   ally: Союзник
   trader: Торговец
   peaceful: Мирный
+  rank-master: Мастер
+  rank-officer: Офицер
+  rank-member: Участвующий
 map:
   barbarian: Варвар
   barbarians: Варвары
@@ -669,6 +672,7 @@ command:
       disable: Ваш префикс уже выключен.
       new: Префикс %s еще не разблокирован!
       default: Ваш префикс был восстановлен по умолчанию.
+      always-on: Ваш префикс заголовка нельзя отключить.
   score:
     notice:
       all-header: Все результаты Королевства

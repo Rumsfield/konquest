@@ -200,18 +200,23 @@ public class AccomplishmentManager {
 	}
 	
 	public boolean disablePlayerPrefix(KonPlayer player) {
-		boolean result = false;
-		if(player.getPlayerPrefix().isEnabled()) {
-			player.getPlayerPrefix().setEnable(false);
-			// Fire event
-			KonquestPlayerPrefixEvent invokeEvent = new KonquestPlayerPrefixEvent(konquest, player, "", true);
-			Konquest.callKonquestEvent(invokeEvent);
-			ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_DISABLE.getMessage());
-			result = true;
+		boolean isTitleAlwaysShown = konquest.getCore().getBoolean(CorePath.CHAT_ALWAYS_SHOW_TITLE.getPath(),false);
+		if(isTitleAlwaysShown) {
+			// Prefix title cannot be turned off
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_ALWAYS_ON.getMessage());
 		} else {
-			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_DISABLE.getMessage());
+			if(player.getPlayerPrefix().isEnabled()) {
+				player.getPlayerPrefix().setEnable(false);
+				// Fire event
+				KonquestPlayerPrefixEvent invokeEvent = new KonquestPlayerPrefixEvent(konquest, player, "", true);
+				Konquest.callKonquestEvent(invokeEvent);
+				ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_NOTICE_DISABLE.getMessage());
+				return true;
+			} else {
+				ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.COMMAND_PREFIX_ERROR_DISABLE.getMessage());
+			}
 		}
-		return result;
+		return false;
 	}
 	
 	public boolean applyPlayerPrefix(KonPlayer player, KonPrefixType prefix) {

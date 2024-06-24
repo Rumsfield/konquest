@@ -20,6 +20,7 @@ public enum CorePath {
 	CHAT_TAG                                              ("core.chat.tag"),
 	CHAT_MESSAGE                                          ("core.chat.message"),
 	CHAT_DIVIDER                                          ("core.chat.divider"),
+	CHAT_ALWAYS_SHOW_TITLE                                ("core.chat.always_show_title"),
 	CHAT_ENABLE_FORMAT                                    ("core.chat.enable_format"),
 	CHAT_PRIORITY                                         ("core.chat.priority"),
 

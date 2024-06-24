@@ -397,6 +397,18 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		}
 		return result;
 	}
+
+	public String getPlayerRankName(UUID id) {
+		String result = "";
+		if(isMaster(id)) {
+			result = MessagePath.PLACEHOLDER_RANK_MASTER.getMessage();
+		} else if(isOfficer(id)) {
+			result = MessagePath.PLACEHOLDER_RANK_OFFICER.getMessage();
+		} else if(isMember(id)) {
+			result = MessagePath.PLACEHOLDER_RANK_MEMBER.getMessage();
+		}
+		return result;
+	}
 	
 	/*
 	 * =================================================

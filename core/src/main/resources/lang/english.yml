@@ -98,6 +98,9 @@ placeholder:
   ally: "Ally"
   trader: "Trader"
   peaceful: "Peaceful"
+  rank-master: "Master"
+  rank-officer: "Officer"
+  rank-member: "Member"
 map:
   barbarian: "Barbarian"
   barbarians: "Barbarians"
@@ -669,6 +672,7 @@ command:
       disable: "Your prefix title is already off."
       new: "The prefix %s is not unlocked!"
       default: "Your prefix has been reverted to default."
+      always-on: "Your prefix title cannot be disabled."
   score:
     notice:
       all-header: "All Kingdom scores"

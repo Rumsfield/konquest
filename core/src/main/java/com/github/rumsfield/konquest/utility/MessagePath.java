@@ -92,6 +92,9 @@ public enum MessagePath {
 	PLACEHOLDER_ALLY                            (0, "placeholder.ally"),
 	PLACEHOLDER_TRADER                          (0, "placeholder.trader"),
 	PLACEHOLDER_PEACEFUL                        (0, "placeholder.peaceful"),
+	PLACEHOLDER_RANK_MASTER                     (0, "placeholder.rank-master"),
+	PLACEHOLDER_RANK_OFFICER                    (0, "placeholder.rank-officer"),
+	PLACEHOLDER_RANK_MEMBER                     (0, "placeholder.rank-member"),
 
     MAP_BARBARIAN                               (0, "map.barbarian"),
     MAP_BARBARIANS                              (0, "map.barbarians"),
@@ -592,6 +595,7 @@ public enum MessagePath {
 	COMMAND_PREFIX_ERROR_DISABLE                (0, "command.prefix.error.disable"),
 	COMMAND_PREFIX_ERROR_NEW                    (1, "command.prefix.error.new"),
 	COMMAND_PREFIX_ERROR_DEFAULT                (0, "command.prefix.error.default"),
+	COMMAND_PREFIX_ERROR_ALWAYS_ON              (0, "command.prefix.error.always-on"),
 	COMMAND_SCORE_NOTICE_ALL_HEADER             (0, "command.score.notice.all-header"),
 	COMMAND_SCORE_NOTICE_SCORE                  (3, "command.score.notice.score"),
 	COMMAND_SCORE_NOTICE_PLAYER                 (4, "command.score.notice.player"),
