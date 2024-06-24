@@ -567,6 +567,11 @@ public class Konquest implements KonquestAPI, Timeable {
     			bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
     		}
     	}
+		// Force prefix title if needed
+		boolean isTitleAlwaysShown = getCore().getBoolean(CorePath.CHAT_ALWAYS_SHOW_TITLE.getPath(),false);
+		if(isTitleAlwaysShown) {
+			player.getPlayerPrefix().setEnable(true);
+		}
     	// Updates based on login position
     	Location loginLoc = bukkitPlayer.getLocation();
     	if(territoryManager.isChunkClaimed(loginLoc)) {

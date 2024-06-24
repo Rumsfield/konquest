@@ -68,15 +68,19 @@ core:
     # %PREFIX%    Permissions group meta prefix
     # %SUFFIX%    Permissions group meta suffix
     # %KINGDOM%   Kingdom name
+    # %RANK%      Kingdom rank (master, officer, member)
     # %TITLE%     Accomplishment title
     # %NAME%      Player's name
     # %C1%        Primary relationship color
     # %C2%        Secondary relationship color
     # %CW%        Kingdom webcolor
-    message: '%PREFIX% %C1%%KINGDOM% &7| %C2%%TITLE% %C1%%NAME% %SUFFIX% '
+    message: '%PREFIX% %C1%%KINGDOM% %RANK% &7| %C2%%TITLE% %C1%%NAME% %SUFFIX% '
 
     # Text that divides the chat message format from the player's text. Use '' to disable. Use & for color codes, or hex #000000. ('string')
     divider: '&8»&r '
+
+    # (*) Should the TITLE tag always be shown (true), or can players disable their own title (false) (true/false)
+    always_show_title: false
     
     # Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
     enable_format: true

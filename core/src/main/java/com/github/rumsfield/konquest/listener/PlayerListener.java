@@ -245,8 +245,9 @@ public class PlayerListener implements Listener {
 
 		// Built-in format string
 		/* %TITLE% */
+		boolean isTitleAlwaysShown = konquest.getCore().getBoolean(CorePath.CHAT_ALWAYS_SHOW_TITLE.getPath(),false);
 		String title = "";
-		if(player.getPlayerPrefix().isEnabled()) {
+		if(isTitleAlwaysShown || player.getPlayerPrefix().isEnabled()) {
 			title = ChatUtil.parseHex(player.getPlayerPrefix().getMainPrefixName());
 		}
 		/* %PREFIX% */
@@ -255,6 +256,8 @@ public class PlayerListener implements Listener {
 		String suffix = ChatUtil.parseHex(konquest.getIntegrationManager().getLuckPerms().getSuffix(bukkitPlayer));
 		/* %KINGDOM% */
 		String kingdomName = kingdom.getName();
+		/* %RANK% */
+		String kingdomRank = kingdom.getPlayerRoleName(bukkitPlayer);
 		/* %NAME% */
 		String playerName = bukkitPlayer.getName();
 		/* %C1% */
@@ -314,6 +317,7 @@ public class PlayerListener implements Listener {
 						prefix,
 						suffix,
 						kingdomName,
+						kingdomRank,
 						title,
 						playerName,
 						primaryColor,

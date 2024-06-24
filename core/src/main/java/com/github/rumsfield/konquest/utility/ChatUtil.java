@@ -71,7 +71,7 @@ public class ChatUtil {
 	 * @param name Name to replace %NAME% with
 	 * @return Formatted string
 	 */
-	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String title, String name, String primaryColor, String secondaryColor, String kingdomWebColor) {
+	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String rank, String title, String name, String primaryColor, String secondaryColor, String kingdomWebColor) {
 		String message = base;
 		// Tags
 		if(prefix.equals("")) {
@@ -88,6 +88,11 @@ public class ChatUtil {
 			message = message.replaceAll("%KINGDOM%\\s*", "");
 		} else {
 			message = message.replace("%KINGDOM%", kingdom);
+		}
+		if(rank.equals("")) {
+			message = message.replaceAll("%RANK%\\s*", "");
+		} else {
+			message = message.replace("%RANK%", rank);
 		}
 		if(title.equals("")) {
 			message = message.replaceAll("%TITLE%\\s*", "");

@@ -223,13 +223,19 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
     	KonPlayer onlinePlayer = playerManager.getPlayer(player);
     	if(onlinePlayer != null) {
     		KonPrefix playerPrefix = onlinePlayer.getPlayerPrefix();
-    		if(playerPrefix.isEnabled()) {
-    			result = playerPrefix.getMainPrefixName();
-    		} else {
-    			result = "";
-    		}
+			result = playerPrefix.getMainPrefixName();
     	}
     	return result;
+	}
+
+	public String getRank(Player player) {
+		String result = "";
+		KonPlayer onlinePlayer = playerManager.getPlayer(player);
+		if(onlinePlayer != null) {
+			KonKingdom kingdom = onlinePlayer.getKingdom();
+			result = kingdom.getPlayerRoleName(player);
+		}
+		return result;
 	}
 	
 	public String getLordships(Player player) {

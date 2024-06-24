@@ -669,6 +669,7 @@ command:
       disable: Tu título de prefijo ya está desactivado.
       new: El prefijo %s no está desbloqueado!
       default: Tu prefijo ha sido revertido al predeterminado.
+      always-on: El título de prefijo no se puede desactivar.
   score:
     notice:
       all-header: Todos los puntajes del reino

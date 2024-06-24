@@ -8,6 +8,7 @@ import com.github.rumsfield.konquest.display.icon.PrefixIcon.PrefixIconAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -30,6 +31,8 @@ public class PrefixMenuWrapper extends MenuWrapper {
 		String loreColor = DisplayManager.loreFormat;
 		String valueColor = DisplayManager.valueFormat;
 		String hintColor = DisplayManager.hintFormat;
+		String alertColor = DisplayManager.alertFormat;
+		List<String> loreList;
 		String pageLabel;
 		String playerPrefix = "";
 		if(observer.getPlayerPrefix().isEnabled()) {
@@ -81,7 +84,14 @@ public class PrefixMenuWrapper extends MenuWrapper {
 			int slotIndex = 0;
 			// Off and Info Icons on first row of page 0
 			if(pageNum == 0) {
-				PrefixIcon offIcon = new PrefixIcon(KonPrefixType.getDefault(), Collections.singletonList(hintColor + MessagePath.MENU_PREFIX_HINT_DISABLE.getMessage()),4,true,PrefixIconAction.DISABLE_PREFIX);
+				boolean isTitleAlwaysShown = getKonquest().getCore().getBoolean(CorePath.CHAT_ALWAYS_SHOW_TITLE.getPath(),false);
+				loreList = new ArrayList<>();
+				if (isTitleAlwaysShown) {
+					loreList.add(alertColor + MessagePath.LABEL_UNAVAILABLE.getMessage());
+				} else {
+					loreList.add(hintColor + MessagePath.MENU_PREFIX_HINT_DISABLE.getMessage());
+				}
+				PrefixIcon offIcon = new PrefixIcon(KonPrefixType.getDefault(), loreList,4,true,PrefixIconAction.DISABLE_PREFIX);
 				getMenu().getPage(pageNum).addIcon(offIcon);
 				slotIndex = 9;
 			}
@@ -110,7 +120,6 @@ public class PrefixMenuWrapper extends MenuWrapper {
 			pageNum++;
 		}
 		// Page N+
-		List<String> loreList;
 		boolean isAllowed;
 		List<KonCustomPrefix> allCustoms = getKonquest().getAccomplishmentManager().getCustomPrefixes();
 		pageTotal = (int)Math.ceil(((double)allCustoms.size())/MAX_ICONS_PER_PAGE);

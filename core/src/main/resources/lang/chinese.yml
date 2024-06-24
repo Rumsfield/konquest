@@ -669,6 +669,7 @@ command:
       disable: 您的稱號前綴已經關閉。
       new: 稱號前綴 %s 尚未解鎖！
       default: 您的稱號前綴已恢復為默認。
+      always-on: 您的標題前綴無法停用。
   score:
     notice:
       all-header: 所有王國分數
