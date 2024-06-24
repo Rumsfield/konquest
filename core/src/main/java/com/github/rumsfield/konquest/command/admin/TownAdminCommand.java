@@ -549,6 +549,7 @@ public class TownAdminCommand extends CommandBase {
 					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(residentPlayerName));
 					return;
 				}
+				UUID residentID = residentPlayer.getOfflineBukkitPlayer().getUniqueId();
 				String playerName = residentPlayer.getOfflineBukkitPlayer().getName();
 				// Parse sub-commands
 				switch(residentSubCmd.toLowerCase()) {
@@ -560,6 +561,7 @@ public class TownAdminCommand extends CommandBase {
 						}
 						// Add the player as a resident
 						if(town.addPlayerResident(residentPlayer.getOfflineBukkitPlayer(),false)) {
+							town.removeJoinRequest(residentID);
 							ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_ADD_RESIDENT.getMessage(playerName,townName));
 						} else {
 							// Player is already a resident
@@ -569,6 +571,7 @@ public class TownAdminCommand extends CommandBase {
 					case "kick":
 						// Remove the player as a resident
 						if(town.removePlayerResident(residentPlayer.getOfflineBukkitPlayer())) {
+							town.removeJoinRequest(residentID);
 							ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_KICK_RESIDENT.getMessage(playerName,townName));
 						} else {
 							// Player was not a resident
@@ -619,11 +622,18 @@ public class TownAdminCommand extends CommandBase {
 						}
 						// Make the player into the new town lord
 						town.setPlayerLord(residentPlayer.getOfflineBukkitPlayer());
+						town.removeJoinRequest(residentID);
 						ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_LORD_SUCCESS.getMessage(townName,playerName));
 						break;
 					default:
 						sendInvalidArgMessage(sender);
-						break;
+						return;
+				}
+				// Update membership stats for online players
+				KonPlayer onlinePlayer = konquest.getPlayerManager().getPlayerFromID(residentID);
+				if (onlinePlayer != null) {
+					// Player is valid and online
+					konquest.getKingdomManager().updatePlayerMembershipStats(onlinePlayer);
 				}
 				break;
 			case "plots":
@@ -784,7 +794,7 @@ public class TownAdminCommand extends CommandBase {
 							}
 							break;
 						case "lord":
-							for (OfflinePlayer offlinePlayer : town.getPlayerResidents()) {
+							for (OfflinePlayer offlinePlayer : town.getKingdom().getPlayerMembers()) {
 								String name = offlinePlayer.getName();
 								if (name != null && !town.isLord(offlinePlayer.getUniqueId())) {
 									tabList.add(name);

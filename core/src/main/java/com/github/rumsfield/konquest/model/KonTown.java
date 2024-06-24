@@ -1279,17 +1279,15 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	public void setLord(UUID id) {
 		lord = id;
-		if(!residents.containsKey(id)) {
-			residents.put(id,true);
-			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-			getKonquest().getMapHandler().drawLabel(this);
-		}
+		residents.put(id,true);
+		getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
+		getKonquest().getMapHandler().drawLabel(this);
 	}
 	
 	public boolean isLord(UUID id) {
 		boolean status = false;
 		if(lord != null) {
-			status =id.equals(lord);
+			status = id.equals(lord);
 		}
 		return status;
 	}
@@ -1297,7 +1295,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public boolean isPlayerLord(OfflinePlayer player) {
 		return isLord(player.getUniqueId());
 	}
-	
+
+	// Changes resident's knight flag, cannot be lord
 	public boolean setPlayerKnight(OfflinePlayer player, boolean val) {
 		boolean status = true;
 		UUID playerUUID = player.getUniqueId();
@@ -1313,7 +1312,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public boolean isPlayerKnight(OfflinePlayer player) {
 		boolean status = true;
 		UUID playerUUID = player.getUniqueId();
-		if(residents.containsKey(playerUUID)) {
+		if(residents.containsKey(playerUUID) || isLord(playerUUID)) {
 			status = residents.get(playerUUID);
 		} else {
 			status = false;
