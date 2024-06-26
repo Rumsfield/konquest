@@ -60,6 +60,9 @@ public class KingdomCommand extends CommandBase {
 				newArg("manage",true,false)
 						// manage disband
 						.sub( newArg("disband",true,false) )
+						// manage destroy <town>
+						.sub( newArg("destroy",true,false)
+								.sub( newArg("town",false,false) ) )
 						// manage rename <name>
 						.sub( newArg("rename",true,false)
 								.sub( newArg("name",false,false) ) )
@@ -310,6 +313,30 @@ public class KingdomCommand extends CommandBase {
 							}
 							if(args.size() == 2) {
 								konquest.getKingdomManager().menuDisbandKingdom(kingdom, player);
+							} else {
+								sendInvalidArgMessage(bukkitPlayer);
+							}
+							break;
+						case "destroy":
+							// Destroy a town in the kingdom (master only)
+							if(!kingdom.isMaster(playerID)) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+								return;
+							}
+							// Check for enabled feature
+							if(!konquest.getKingdomManager().getIsTownDestroyMasterEnable()) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+								return;
+							}
+							if(args.size() == 3) {
+								String townName = args.get(2);
+								// Check valid town name
+								if (!kingdom.hasTown(townName)) {
+									ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(townName));
+									return;
+								}
+								// Manager method includes messages
+								konquest.getKingdomManager().menuDestroyTown(kingdom.getTown(townName),player);
 							} else {
 								sendInvalidArgMessage(bukkitPlayer);
 							}
@@ -653,6 +680,9 @@ public class KingdomCommand extends CommandBase {
 					if (!konquest.getCore().getBoolean(CorePath.KINGDOMS_WEB_COLOR_ADMIN_ONLY.getPath())) {
 						tabList.add("webcolor");
 					}
+					if (konquest.getKingdomManager().getIsTownDestroyMasterEnable()) {
+						tabList.add("destroy");
+					}
 					break;
 			}
 		} else if (numArgs == 3) {
@@ -664,6 +694,11 @@ public class KingdomCommand extends CommandBase {
 					switch (args.get(1).toLowerCase()) {
 						case "rename":
 							tabList.add("***");
+							break;
+						case "destroy":
+							if (konquest.getKingdomManager().getIsTownDestroyMasterEnable()) {
+								tabList.addAll(kingdom.getTownNames());
+							}
 							break;
 						case "webcolor":
 							if (!konquest.getCore().getBoolean(CorePath.KINGDOMS_WEB_COLOR_ADMIN_ONLY.getPath())) {

@@ -241,6 +241,7 @@ menu:
     promote: 晉升
     demote: 降級
     transfer: 轉移
+    destroy: 破壞
     upgrades: 升級
     options: 選項
     special: 專業
@@ -256,6 +257,7 @@ menu:
     description-promote: 晉升居民為騎士
     description-demote: 降級騎士為居民
     description-transfer: 將領主轉移到其他居民
+    description-destroy: 摧毀城鎮及其聲稱的土地
     description-upgrades: 應用城鎮升級
     description-options: 編輯城鎮選項
     description-special: 選擇專業以獲得與該城鎮的村民的折扣
@@ -270,6 +272,7 @@ menu:
     hint-promote: 點擊以晉升為騎士
     hint-demote: 點擊以降級為居民
     hint-transfer: 點擊以贈送領主
+    hint-destroy: 點擊刪除城鎮
     hint-special: 點擊以專業化
     lore-special: 選擇此專業以獲得此城鎮村民的折扣。
     info-special: 從事這項職業的村民在這個鎮上給予折扣。
@@ -281,6 +284,7 @@ menu:
     title-manage-town: 管理的城鎮
     title-requests: 居民請求
     title-manage: 城鎮管理菜單
+    title-destroy: 摧毀城鎮
   kingdom:
     join: 加入
     exile: 放逐
@@ -607,6 +611,7 @@ command:
       promote: '%s 已晉升為 %s 王國的官員。'
       demote: '%s 已降職為 %s 王國的成員。'
       disband: '%s 王國已解散！'
+      destroy: '%s 鎮已被摧毀！'
     notice:
       request-sent: 已發送成員請求加入 %s。
       request-received: 收到新的王國加入請求，輸入 "/k kingdom" 以查看。

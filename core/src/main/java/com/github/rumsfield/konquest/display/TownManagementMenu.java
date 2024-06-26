@@ -27,6 +27,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         B_PROMOTE,
         B_DEMOTE,
         B_TRANSFER,
+        B_DESTROY,
         B_UPGRADES,
         B_OPTIONS,
         B_SPECIALIZATION
@@ -47,9 +48,13 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
     private final int ROOT_SLOT_PROMOTE 		= 10;
     private final int ROOT_SLOT_DEMOTE 	        = 11;
     private final int ROOT_SLOT_TRANSFER 		= 12;
+    private final int ROOT_SLOT_DESTROY 		= 13;
     private final int ROOT_SLOT_UPGRADES 		= 14;
     private final int ROOT_SLOT_OPTIONS 		= 15;
     private final int ROOT_SLOT_SPECIALIZATION	= 16;
+
+    private final int SLOT_YES 					= 3;
+    private final int SLOT_NO 					= 5;
 
     private final String propertyColor = DisplayManager.propertyFormat;
     private final String alertColor = DisplayManager.alertFormat;
@@ -229,6 +234,20 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                     loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
                 }
                 icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, isTransferClickable);
+                result.addIcon(icon);
+
+                /* Destroy Icon */
+                loreList.clear();
+                loreList.add(propertyColor+MessagePath.LABEL_LORD.getMessage());
+                loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage(),loreColor));
+                boolean isDestroyClickable = true;
+                if(konquest.getKingdomManager().getIsTownDestroyLordEnable() || isAdmin) {
+                    loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                } else {
+                    isDestroyClickable = false;
+                    loreList.add(alertColor+MessagePath.LABEL_DISABLED.getMessage());
+                }
+                icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_DESTROY.getMessage(), loreList, Material.TNT, ROOT_SLOT_DESTROY, isDestroyClickable);
                 result.addIcon(icon);
 
                 /* Upgrades Icon */
@@ -531,6 +550,32 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         return result;
     }
 
+    private DisplayMenu createDestroyView() {
+        DisplayMenu result;
+        pages.clear();
+        currentPage = 0;
+        String pageLabel;
+        InfoIcon icon;
+
+        // Page 0
+        pageLabel = getTitle(MenuState.B_DESTROY);
+        int pageNum = 0;
+        pages.add(pageNum, new DisplayMenu(2, pageLabel));
+        List<String> loreList = new ArrayList<>();
+
+        loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_DESTROY.getMessage());
+        icon = new InfoIcon(DisplayManager.boolean2Symbol(true), loreList, Material.GLOWSTONE_DUST, SLOT_YES, true);
+        pages.get(pageNum).addIcon(icon);
+
+        loreList.clear();
+        loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_EXIT.getMessage());
+        icon = new InfoIcon(DisplayManager.boolean2Symbol(false), loreList, Material.REDSTONE, SLOT_NO, true);
+        pages.get(pageNum).addIcon(icon);
+
+        result = pages.get(currentPage);
+        return result;
+    }
+
     @Override
     public DisplayMenu getCurrentView() {
         return views.get(currentState);
@@ -603,6 +648,11 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                         currentState = MenuState.B_TRANSFER;
                         result = goToPlayerView(MenuState.B_TRANSFER);
 
+                    } else if(slot == ROOT_SLOT_DESTROY) {
+                        // Clicked to destroy town
+                        currentState = MenuState.B_DESTROY;
+                        result = goToDestroyView();
+
                     } else if(slot == ROOT_SLOT_UPGRADES) {
                         // Clicked to view town upgrades
                         currentState = MenuState.B_UPGRADES;
@@ -672,6 +722,12 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                         // No result, close menu
                     }
                     break;
+                case B_DESTROY:
+                    if(slot == SLOT_YES) {
+                        boolean status = manager.menuDestroyTown(town,player);
+                        playStatusSound(player.getBukkitPlayer(),status);
+                    }
+                    break;
                 case B_UPGRADES:
                     if(clickedIcon instanceof UpgradeIcon) {
                         UpgradeIcon icon = (UpgradeIcon)clickedIcon;
@@ -733,6 +789,9 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
             case B_TRANSFER:
                 result = color+MessagePath.MENU_TOWN_TRANSFER.getMessage();
                 break;
+            case B_DESTROY:
+                result = color+MessagePath.MENU_TOWN_DESTROY.getMessage();
+                break;
             case B_UPGRADES:
                 result = color+MessagePath.MENU_TOWN_UPGRADES.getMessage();
                 break;
@@ -790,6 +849,12 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         return result;
     }
 
+    private DisplayMenu goToDestroyView() {
+        DisplayMenu result = createDestroyView();
+        views.put(MenuState.B_DESTROY, result);
+        return result;
+    }
+
     /**
      * Place all navigation button icons on view given context and update icons
      */
@@ -812,7 +877,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
             view.addIcon(navIconEmpty(navStart+6));
             view.addIcon(navIconEmpty(navStart+7));
             view.addIcon(navIconEmpty(navStart+8));
-        } else if(context.equals(MenuState.B_UPGRADES) || context.equals(MenuState.B_OPTIONS) || context.equals(MenuState.B_SPECIALIZATION)) {
+        } else if(context.equals(MenuState.B_UPGRADES) || context.equals(MenuState.B_OPTIONS) || context.equals(MenuState.B_SPECIALIZATION) || context.equals(MenuState.B_DESTROY)) {
             // Close [4], Return [5]
             view.addIcon(navIconEmpty(navStart));
             view.addIcon(navIconEmpty(navStart+1));
