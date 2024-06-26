@@ -295,19 +295,15 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				}
 
 				/* Destroy Icon */
-				loreList.clear();
-				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
-				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage(),loreColor));
-				boolean isDestroyClickable = true;
-				if(konquest.getKingdomManager().getIsTownDestroyMasterEnable() || isAdmin) {
-					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-				} else {
-					isDestroyClickable = false;
-					loreList.add(alertColor+MessagePath.LABEL_DISABLED.getMessage());
+				if(konquest.getKingdomManager().getIsTownDestroyMasterEnable()) {
+					loreList.clear();
+					loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
+					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage(), loreColor));
+					loreList.add(hintColor + MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					icon = new InfoIcon(kingdomColor + MessagePath.MENU_TOWN_DESTROY.getMessage(), loreList, Material.TNT, ROOT_SLOT_DESTROY, true);
+					result.addIcon(icon);
 				}
-				icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_DESTROY.getMessage(), loreList, Material.TNT, ROOT_SLOT_DESTROY, isDestroyClickable);
-				result.addIcon(icon);
-				
+
 				/* Open/Close Button */
 				String currentValue = DisplayManager.boolean2Lang(kingdom.isOpen())+" "+DisplayManager.boolean2Symbol(kingdom.isOpen());
 				loreList.clear();
