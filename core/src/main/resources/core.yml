@@ -387,7 +387,13 @@ core:
     
   # //// CORE.TOWNS \\\\
   towns:
-  
+
+    # Allow kingdom masters to remove any town in their kingdom, destroying all land claims (true/false)
+    allow_destroy_master: true
+
+    # Allow town lords to remove their towns, destroying all land claims (true/false)
+    allow_destroy_lord: true
+
     # Allow town lords to unclaim town land (true/false)
     allow_unclaim: true
 

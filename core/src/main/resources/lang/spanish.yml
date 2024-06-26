@@ -241,6 +241,7 @@ menu:
     promote: Promover
     demote: Degradar
     transfer: Transferir
+    destroy: Destruir
     upgrades: Mejoras
     options: Opciones
     special: Especializacion
@@ -256,6 +257,7 @@ menu:
     description-promote: Promueve a residentes a caballeros
     description-demote: Degradar a caballeros a residentes
     description-transfer: Transferir el señor a otro residente
+    description-destroy: Destruye el pueblo y sus tierras reclamadas.
     description-upgrades: Aplica mejoras del pueblo
     description-options: Editar opciones del pueblo
     description-special: Elige una profesion para descuentos comerciales
@@ -270,6 +272,7 @@ menu:
     hint-promote: Haz clic para promover a Caballero
     hint-demote: Haz clic para degradar a Residente
     hint-transfer: Haz clic para dar Señor
+    hint-destroy: Haga clic para eliminar el pueblo
     hint-special: Haz clic para especializarte
     lore-special: Elige esta profesion para obtener un descuento con los aldeanos en este pueblo.
     info-special: Los aldeanos con esta profesión dan descuentos en este pueblo.
@@ -281,6 +284,7 @@ menu:
     title-manage-town: Pueblos Administrados
     title-requests: Solicitudes de Residente
     title-manage: Menú de Gestión del Pueblo
+    title-destroy: Destruir el pueblo
   kingdom:
     join: Unirse
     exile: Exilio
@@ -607,6 +611,7 @@ command:
       promote: '%s ha sido promovido a Oficial del Reino de %s.'
       demote: '%s ha sido degradado a Miembro del Reino de %s.'
       disband: ¡El Reino de %s ha sido disuelto!
+      destroy: ¡El Pueblo de %s ha sido destruida!
     notice:
       request-sent: Solicitud de miembro enviada para unirse a %s.
       request-received: Nueva solicitud de unión al reino, escribe "/k kingdom" para revisar.

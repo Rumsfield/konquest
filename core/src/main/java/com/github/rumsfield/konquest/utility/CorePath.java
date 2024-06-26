@@ -113,7 +113,9 @@ public enum CorePath {
 	KINGDOMS_WILD_PVP                                     ("core.kingdoms.wild_pvp"),
 	KINGDOMS_WILD_USE                                     ("core.kingdoms.wild_use"),
 	KINGDOMS_WILD_BUILD                                   ("core.kingdoms.wild_build"),
-	
+
+	TOWNS_ALLOW_DESTROY_MASTER                            ("core.towns.allow_destroy_master"),
+	TOWNS_ALLOW_DESTROY_LORD                              ("core.towns.allow_destroy_lord"),
 	TOWNS_ALLOW_UNCLAIM                                   ("core.towns.allow_unclaim"),
 	TOWNS_ALLOW_CLAIM_RADIUS                              ("core.towns.allow_claim_radius"),
 	TOWNS_ALLOW_CLAIM_AUTO                                ("core.towns.allow_claim_auto"),

@@ -241,6 +241,7 @@ menu:
     promote: Повысить
     demote: Понизить
     transfer: Передача
+    destroy: Уничтожать
     upgrades: Улучшения
     options: Параметры
     special: Специализация
@@ -256,6 +257,7 @@ menu:
     description-promote: Повысить жителей до рыцарей
     description-demote: Понизить рыцарей до резидентов
     description-transfer: Передача лорда другому резиденту
+    description-destroy: Уничтожьте город и принадлежащие ему земли.
     description-upgrades: Применить улучшение города
     description-options: Изменить параметры города
     description-special: Выбрать профессию для скидок в торгах
@@ -270,6 +272,7 @@ menu:
     hint-promote: Нажмите, что бы повысить до Рыцаря
     hint-demote: Нажмите, что бы понизить до резидента
     hint-transfer: Нажмите что бы дать управление
+    hint-destroy: Нажмите, чтобы удалить город
     hint-special: Нажмите, что бы специализироваться
     lore-special: Выберите эту профессию, чтобы получить скидку у жителей этого города.
     info-special: Жители этой профессии дают скидки в этом городе.
@@ -281,6 +284,7 @@ menu:
     title-manage-town: Управление городами
     title-requests: Запросы на вступление
     title-manage: Меню управления городом
+    title-destroy: Уничтожить город
   kingdom:
     join: Вступить
     exile: Изгнать
@@ -607,6 +611,7 @@ command:
       promote: '%s был повышен до Офицера Королевства %s.'
       demote: '%s понижен в должности до учестника Королевства %s.'
       disband: Королевство %s расформировано!
+      destroy: Город %s разрушен!
     notice:
       request-sent: Отправлен запрос участника на присоединение к %s.
       request-received: Запрос на присоединение к новому королевству, введите "/k kingdom" для просмотра.

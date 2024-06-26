@@ -39,6 +39,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
  		List<String> loreList;
  		InfoIcon info;
 		int pageTotal;
+		int pageNum = 0;
 		
 		String kingdomColor = getKonquest().getDisplaySecondaryColor(observer, infoTown);
  		String titleColor = DisplayManager.titleFormat;
@@ -61,13 +62,13 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 
  		// Page 0
 		pageLabel = titleColor+MessagePath.COMMAND_INFO_NOTICE_TOWN_HEADER.getMessage(infoTown.getName());
-		getMenu().addPage(0, 1, pageLabel);
+		getMenu().addPage(pageNum, 1, pageLabel);
 
 		/* Kingdom Info Icon (1) */
 		loreList = new ArrayList<>();
     	loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
     	KingdomIcon kingdom = new KingdomIcon(infoTown.getKingdom(),kingdomColor,loreList,1,true);
-    	getMenu().getPage(0).addIcon(kingdom);
+    	getMenu().getPage(pageNum).addIcon(kingdom);
 
 		/* Lord Player Info Icon (2) */
 		loreList = new ArrayList<>();
@@ -76,20 +77,22 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			loreList.add(propertyColor+MessagePath.LABEL_LORD.getMessage());
 			loreList.add(hintColor+MessagePath.MENU_SCORE_HINT.getMessage());
 			PlayerIcon playerInfo = new PlayerIcon(kingdomColor+lordPlayer.getName(),loreList,lordPlayer,2,true,PlayerIconAction.DISPLAY_INFO);
-			getMenu().getPage(0).addIcon(playerInfo);
+			getMenu().getPage(pageNum).addIcon(playerInfo);
 		} else {
 			loreList.addAll(Konquest.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getTravelName()), ChatColor.RED));
 			info = new InfoIcon(kingdomColor+MessagePath.LABEL_LORD.getMessage(),loreList,Material.BARRIER,2,false);
-			getMenu().getPage(0).addIcon(info);
+			getMenu().getPage(pageNum).addIcon(info);
 		}
 
 		/* Specialization Info Icon (4) */
-		loreList = new ArrayList<>();
-		loreList.add(valueColor+infoTown.getSpecialization().name());
-		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_INFO_SPECIAL.getMessage(),loreColor));
-		Material specialMat = Konquest.getProfessionMaterial(infoTown.getSpecialization());
-		info = new InfoIcon(kingdomColor+MessagePath.LABEL_SPECIALIZATION.getMessage(), loreList, specialMat, 4, false);
-		getMenu().getPage(0).addIcon(info);
+		if (getKonquest().getKingdomManager().getIsDiscountEnable()) {
+			loreList = new ArrayList<>();
+			loreList.add(valueColor + infoTown.getSpecialization().name());
+			loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_INFO_SPECIAL.getMessage(), loreColor));
+			Material specialMat = Konquest.getProfessionMaterial(infoTown.getSpecialization());
+			info = new InfoIcon(kingdomColor + MessagePath.LABEL_SPECIALIZATION.getMessage(), loreList, specialMat, 4, false);
+			getMenu().getPage(pageNum).addIcon(info);
+		}
 
 		/* Properties Info Icon (5) */
     	String isProtected = DisplayManager.boolean2Symbol((infoTown.isCaptureDisabled() || infoTown.getKingdom().isOfflineProtected() || infoTown.isTownWatchProtected()));
@@ -108,7 +111,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		loreList.add(loreColor+MessagePath.LABEL_ARMOR.getMessage()+": "+isArmored);
     	loreList.add(loreColor+MessagePath.LABEL_PEACEFUL.getMessage()+": "+isPeaceful);
     	info = new InfoIcon(kingdomColor+MessagePath.LABEL_PROPERTIES.getMessage(), loreList, Material.PAPER, 5, false);
-    	getMenu().getPage(0).addIcon(info);
+    	getMenu().getPage(pageNum).addIcon(info);
 
 		/* Options Info Icon (6) */
 		String isOpen = DisplayManager.boolean2Symbol(infoTown.isOpen());
@@ -128,7 +131,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			loreList.add(loreColor+MessagePath.LABEL_ALLIED_BUILDING.getMessage()+": "+isAlliedBuildingAllowed);
 		}
 		info = new InfoIcon(kingdomColor+MessagePath.LABEL_OPTIONS.getMessage(), loreList, Material.OAK_SIGN, 6, false);
-		getMenu().getPage(0).addIcon(info);
+		getMenu().getPage(pageNum).addIcon(info);
 
 		/* Stats Info Icon (7) */
 		int maxCriticalHits = getKonquest().getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
@@ -138,7 +141,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage()+": "+valueColor+infoTown.getChunkList().size());
 		loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+infoTown.getNumResidents());
 		info = new InfoIcon(kingdomColor+MessagePath.LABEL_STATS.getMessage(), loreList, Material.BELL, 7, false);
-		getMenu().getPage(0).addIcon(info);
+		getMenu().getPage(pageNum).addIcon(info);
 
 		/* Flags Info Icon (8) */
 		loreList = new ArrayList<>();
@@ -149,46 +152,49 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			}
 		}
 		InfoIcon propertyInfo = new InfoIcon(kingdomColor+MessagePath.LABEL_FLAGS.getMessage(), loreList, Material.REDSTONE_TORCH, 8, false);
-		getMenu().getPage(0).addIcon(propertyInfo);
+		getMenu().getPage(pageNum).addIcon(propertyInfo);
+		pageNum++;
 
     	// Page 1
-		pageLabel = titleColor+MessagePath.LABEL_UPGRADES.getMessage();
-		getMenu().addPage(1, 1, pageLabel);
-		int index = 0;
-		for(KonUpgrade upgrade : KonUpgrade.values()) {
-			int currentLevel = infoTown.getRawUpgradeLevel(upgrade);
-			if(currentLevel > 0) {
-				String formattedUpgrade = ChatColor.LIGHT_PURPLE+upgrade.getDescription()+" "+currentLevel;
-				int level = currentLevel;
-				boolean isDisabled = false;
-				if(infoTown.isUpgradeDisabled(upgrade)) {
-					isDisabled = true;
-					int reducedLevel = infoTown.getUpgradeLevel(upgrade);
-					level = reducedLevel;
-					if(reducedLevel > 0) {
-						formattedUpgrade = ChatColor.LIGHT_PURPLE+upgrade.getDescription()+" "+ChatColor.GRAY+reducedLevel;
-					} else {
-						formattedUpgrade = ChatColor.GRAY+""+ChatColor.STRIKETHROUGH+upgrade.getDescription()+" "+reducedLevel;
+		if (getKonquest().getUpgradeManager().isEnabled()) {
+			pageLabel = titleColor + MessagePath.LABEL_UPGRADES.getMessage();
+			getMenu().addPage(pageNum, 1, pageLabel);
+			int index = 0;
+			for (KonUpgrade upgrade : KonUpgrade.values()) {
+				int currentLevel = infoTown.getRawUpgradeLevel(upgrade);
+				if (currentLevel > 0) {
+					String formattedUpgrade = ChatColor.LIGHT_PURPLE + upgrade.getDescription() + " " + currentLevel;
+					int level = currentLevel;
+					boolean isDisabled = false;
+					if (infoTown.isUpgradeDisabled(upgrade)) {
+						isDisabled = true;
+						int reducedLevel = infoTown.getUpgradeLevel(upgrade);
+						level = reducedLevel;
+						if (reducedLevel > 0) {
+							formattedUpgrade = ChatColor.LIGHT_PURPLE + upgrade.getDescription() + " " + ChatColor.GRAY + reducedLevel;
+						} else {
+							formattedUpgrade = ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + upgrade.getDescription() + " " + reducedLevel;
+						}
 					}
-				}
-				loreList = new ArrayList<>();
-				for(String line : Konquest.stringPaginate(upgrade.getLevelDescription(level))) {
-					loreList.add(ChatColor.YELLOW+line);
-				}
-				if (isDisabled) {
-					for(String line : Konquest.stringPaginate(MessagePath.UPGRADE_DISABLED.getMessage())) {
-						loreList.add(ChatColor.RED+line);
+					loreList = new ArrayList<>();
+					for (String line : Konquest.stringPaginate(upgrade.getLevelDescription(level))) {
+						loreList.add(ChatColor.YELLOW + line);
 					}
+					if (isDisabled) {
+						for (String line : Konquest.stringPaginate(MessagePath.UPGRADE_DISABLED.getMessage())) {
+							loreList.add(ChatColor.RED + line);
+						}
+					}
+					// Create info icon with upgrade info
+					info = new InfoIcon(formattedUpgrade, loreList, upgrade.getIcon(), index, false);
+					getMenu().getPage(pageNum).addIcon(info);
+					index++;
 				}
-				// Create info icon with upgrade info
-				info = new InfoIcon(formattedUpgrade, loreList, upgrade.getIcon(), index, false);
-				getMenu().getPage(1).addIcon(info);
-				index++;
 			}
+			pageNum++;
 		}
 
 		// Page 2+
-		int pageNum = 2;
 		pageTotal = getTotalPages(townKnights.size());
 		ListIterator<OfflinePlayer> knightIter = townKnights.listIterator();
 		for(int i = 0; i < pageTotal; i++) {

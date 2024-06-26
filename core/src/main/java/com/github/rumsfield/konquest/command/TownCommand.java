@@ -67,6 +67,8 @@ public class TownCommand extends CommandBase {
 								.sub( newArg("menu",true,false) )
 								// manage <town> plots
 								.sub( newArg("plots",true,false) )
+								// manage <town> destroy
+								.sub( newArg("destroy",true,false) )
 								// manage <town> rename <name>
 								.sub( newArg("rename",true,false)
 										.sub( newArg("name",false,false) ) )
@@ -253,6 +255,24 @@ public class TownCommand extends CommandBase {
 								if (args.size() == 3) {
 									// Open plots menu
 									konquest.getDisplayManager().displayTownPlotMenu(bukkitPlayer, town);
+								} else {
+									sendInvalidArgMessage(bukkitPlayer);
+								}
+								break;
+							case "destroy":
+								// Verify player is lord of the Town
+								if(!town.isLord(playerID)) {
+									ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+									return;
+								}
+								// Check for enabled feature
+								if(!konquest.getKingdomManager().getIsTownDestroyLordEnable()) {
+									ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+									return;
+								}
+								if (args.size() == 3) {
+									// Manager method includes messages
+									konquest.getKingdomManager().menuDestroyTown(town,player);
 								} else {
 									sendInvalidArgMessage(bukkitPlayer);
 								}
@@ -701,6 +721,9 @@ public class TownCommand extends CommandBase {
 				}
 				if (konquest.getPlotManager().isEnabled()) {
 					tabList.add("plots");
+				}
+				if (konquest.getKingdomManager().getIsTownDestroyLordEnable()) {
+					tabList.add("destroy");
 				}
 			}
 		} else if (numArgs == 4) {

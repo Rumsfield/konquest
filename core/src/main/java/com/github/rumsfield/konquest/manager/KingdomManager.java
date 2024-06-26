@@ -72,6 +72,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private double costDiplomacyPeace;
 	private double costDiplomacyTrade;
 	private double costDiplomacyAlliance;
+	private boolean townDestroyLordEnable;
+	private boolean townDestroyMasterEnable;
 
 	private final Timer payTimer;
 	
@@ -159,6 +161,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 
 		// Town Settings
+		townDestroyLordEnable   = konquest.getCore().getBoolean(CorePath.TOWNS_ALLOW_DESTROY_LORD.getPath());
+		townDestroyMasterEnable = konquest.getCore().getBoolean(CorePath.TOWNS_ALLOW_DESTROY_MASTER.getPath());
+
 		discountEnable 	    = konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath());
 		discountPercent		= konquest.getCore().getInt(CorePath.TOWNS_DISCOUNT_PERCENT.getPath());
 		discountStack		= konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_STACK.getPath());
@@ -211,6 +216,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 	public boolean getIsDiscountStack() {
 		return discountStack;
+	}
+
+	public boolean getIsTownDestroyLordEnable() {
+		return townDestroyLordEnable;
+	}
+
+	public boolean getIsTownDestroyMasterEnable() {
+		return townDestroyMasterEnable;
 	}
 	
 	@Override
@@ -2412,6 +2425,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		KonKingdom kingdom = getKingdom(kingdomName);
 		KonTown town = kingdom.getTown(name);
 		ArrayList<Point> townPoints = new ArrayList<>(town.getChunkList().keySet());
+		ArrayList<OfflinePlayer> residentPlayers = town.getPlayerResidents();
 		ArrayList<KonPlayer> nearbyPlayers = konquest.getPlayerManager().getPlayersNearTerritory(town);
 		clearAllTownNerfs(town);
 		clearAllTownHearts(town);
@@ -2421,6 +2435,15 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Update border particles
 		for(KonPlayer player : nearbyPlayers) {
 			konquest.getTerritoryManager().updatePlayerBorderParticles(player);
+		}
+		// Update memberships
+		for(OfflinePlayer resident : residentPlayers) {
+			if (resident.isOnline()) {
+				KonPlayer onlineResident = konquest.getPlayerManager().getPlayer((Player)resident);
+				if (onlineResident != null) {
+					updatePlayerMembershipStats(onlineResident);
+				}
+			}
 		}
 		// Update maps
 		konquest.getMapHandler().drawRemoveTerritory(town);
@@ -2588,6 +2611,26 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 		return null;
+	}
+
+	public boolean menuDestroyTown(KonTown town, KonPlayer player) {
+		// Cannot destroy: a null town
+		if(town == null) return false;
+		// Destroy the town (cannot be capital)
+		if (town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		// Try to remove
+		String townName = town.getName();
+		if (removeTown(townName, town.getKingdom().getName())) {
+			// Successfully removed the town
+			ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_DESTROY.getMessage(townName));
+		} else {
+			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return false;
+		}
+		return true;
 	}
 
 	/*
