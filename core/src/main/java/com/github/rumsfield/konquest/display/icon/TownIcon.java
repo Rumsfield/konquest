@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.display.icon;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -74,7 +75,7 @@ public class TownIcon implements MenuIcon {
 			loreList.add(propertyColor+MessagePath.LABEL_ARMOR.getMessage());
 		}
 		if(town.isShielded()) {
-			meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
+			meta.addEnchant(CompatibilityUtil.getProtectionEnchantment(), 1, true);
 			loreList.add(propertyColor+MessagePath.LABEL_SHIELD.getMessage());
 		}
 		// Lore

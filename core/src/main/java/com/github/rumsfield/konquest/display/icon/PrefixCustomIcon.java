@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.model.KonCustomPrefix;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -31,7 +32,7 @@ public class PrefixCustomIcon implements MenuIcon {
 		ItemMeta meta = item.getItemMeta();
 		assert meta != null;
 		if(isClickable) {
-			meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
+			meta.addEnchant(CompatibilityUtil.getProtectionEnchantment(), 1, true);
 		}
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {

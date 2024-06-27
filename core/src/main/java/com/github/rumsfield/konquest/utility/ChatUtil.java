@@ -431,5 +431,15 @@ public class ChatUtil {
 			}
 		}
 	}
+
+	public static void showStackTrace() {
+		// Get stack trace
+		for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+			String traceStr = element.toString();
+			if (traceStr.contains("Konquest")) {
+				Bukkit.getServer().getConsoleSender().sendMessage(element.toString());
+			}
+		}
+	}
 	
 }

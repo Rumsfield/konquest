@@ -165,14 +165,7 @@ public class LootManager implements Timeable{
 			if(status && itemWeight > 0) {
 				// Add loot table entry
 				ItemStack potion = new ItemStack(Material.POTION, 1);
-				PotionMeta meta;
-				meta = (PotionMeta) potion.getItemMeta();
-				try {
-					meta.setBasePotionData(new PotionData(potionType, itemExtended, itemUpgraded));
-				} catch(IllegalArgumentException e) {
-					meta.setBasePotionData(new PotionData(potionType, false, false));
-					ChatUtil.printConsoleError("Invalid options extended="+itemExtended+", upgraded="+itemUpgraded+" for potion "+potionName+" in loot.yml path "+pathName);
-				}
+				PotionMeta meta = CompatibilityUtil.setPotionData((PotionMeta) potion.getItemMeta(), potionType, itemExtended, itemUpgraded);
 				potion.setItemMeta(meta);
 				result.put(potion, itemWeight);
 				ChatUtil.printDebug("  Added loot path "+pathName+" potion "+potionName+" with extended "+itemExtended+", upgraded "+itemUpgraded+", weight "+itemWeight);

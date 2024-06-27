@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonKingdom;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -58,7 +59,7 @@ public class KingdomIcon implements MenuIcon {
 			loreList.add(propertyColor+MessagePath.LABEL_OPEN.getMessage());
 		}
 		if(kingdom.isOfflineProtected()) {
-			meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
+			meta.addEnchant(CompatibilityUtil.getProtectionEnchantment(), 1, true);
 			loreList.add(propertyColor+MessagePath.LABEL_PROTECTED.getMessage());
 		}
 		loreList.add(loreColor+MessagePath.LABEL_TOWNS.getMessage()+": "+valueColor+kingdom.getNumTowns());

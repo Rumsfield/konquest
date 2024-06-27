@@ -1,9 +1,7 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.Timeable;
+import com.github.rumsfield.konquest.utility.*;
 import com.github.rumsfield.konquest.utility.Timer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -401,7 +399,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 			for(Location loc : borderMap.keySet()) {
 				if(loc.getWorld().equals(getBukkitPlayer().getWorld()) && loc.distance(getBukkitPlayer().getLocation()) < 12) {
 					particleColor = borderMap.get(loc);
-					getBukkitPlayer().spawnParticle(Particle.REDSTONE, loc, 2, 0.25, 0, 0.25, new Particle.DustOptions(particleColor,1));
+					getBukkitPlayer().spawnParticle(CompatibilityUtil.getParticle("dust"), loc, 2, 0.25, 0, 0.25, new Particle.DustOptions(particleColor,1));
 				}
 			}
 			for(Location loc : borderPlotMap.keySet()) {
@@ -410,13 +408,13 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 					double red = particleColor.getRed() / 255D;
 					double green = particleColor.getGreen() / 255D;
 					double blue = particleColor.getBlue() / 255D;
-					getBukkitPlayer().spawnParticle(Particle.SPELL_MOB_AMBIENT, loc, 0, red, green, blue, 1);
+					getBukkitPlayer().spawnParticle(CompatibilityUtil.getParticle("spell"), loc, 0, red, green, blue, 1);
 				}
 			}
 		} else if(taskID == monumentTemplateLoopTimer.getTaskID()) {
 			updateMonumentTemplateBoundary();
 			for(Location loc : monumentTemplateBoundary.keySet()) {
-				getBukkitPlayer().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, new Particle.DustOptions(monumentTemplateBoundary.get(loc),1));
+				getBukkitPlayer().spawnParticle(CompatibilityUtil.getParticle("dust"), loc, 1, 0, 0, 0, new Particle.DustOptions(monumentTemplateBoundary.get(loc),1));
 			}
 		} else if(taskID == monumentShowLoopTimer.getTaskID()) {
 			if(monumentShowLoopCount <= 0) {
@@ -425,7 +423,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 			} else {
 				monumentShowLoopCount--;
 				for(Location loc : monumentShowBoundary) {
-					getBukkitPlayer().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, new Particle.DustOptions(Color.LIME,1));
+					getBukkitPlayer().spawnParticle(CompatibilityUtil.getParticle("dust"), loc, 1, 0, 0, 0, new Particle.DustOptions(Color.LIME,1));
 				}
 			}
 		} else if(taskID == combatTagTimer.getTaskID()) {

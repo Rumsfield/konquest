@@ -9,10 +9,7 @@ import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.manager.TerritoryManager;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.CustomCommandPath;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -434,7 +431,7 @@ public class EntityListener implements Listener {
 		// Checks
 		if(event.isCancelled()) return;
     	if(konquest.isWorldIgnored(event.getEntity().getLocation())) return;
-		boolean isProtectedType = event.getEntityType().equals(EntityType.DROPPED_ITEM) ||
+		boolean isProtectedType = event.getEntityType().equals(CompatibilityUtil.getEntityType("item")) ||
 				event.getEntityType().equals(EntityType.ARROW) ||
 				event.getEntityType().equals(EntityType.SPECTRAL_ARROW);
 		if(!isProtectedType) return;
@@ -964,7 +961,7 @@ public class EntityListener implements Listener {
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		ProjectileSource source = event.getEntity().getShooter();
-		if(event.getEntityType().equals(EntityType.SPLASH_POTION) && source instanceof Player) {
+		if(event.getEntityType().equals(CompatibilityUtil.getEntityType("potion")) && source instanceof Player) {
 			Player bukkitPlayer = (Player)source;
 			KonPlayer player = playerManager.getPlayer(bukkitPlayer);
 			if(player != null) {
@@ -989,7 +986,7 @@ public class EntityListener implements Listener {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		ProjectileSource source = event.getEntity().getShooter();
 		// Check for splash potion thrown by player
-		if(!(event.getEntityType().equals(EntityType.SPLASH_POTION) && source instanceof Player)) return;
+		if(!(event.getEntityType().equals(CompatibilityUtil.getEntityType("potion")) && source instanceof Player)) return;
 		Player bukkitPlayer = (Player)source;
 		KonPlayer player = playerManager.getPlayer(bukkitPlayer);
 		// Check for claimed territory

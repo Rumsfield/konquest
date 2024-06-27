@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonArmor;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -45,7 +46,7 @@ public class ArmorIcon implements MenuIcon {
 		ItemStack item = new ItemStack(itemMaterial,1);
 		ItemMeta meta = item.getItemMeta();
 		assert meta != null;
-		meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
+		meta.addEnchant(CompatibilityUtil.getProtectionEnchantment(), 1, true);
 		for(ItemFlag flag : ItemFlag.values()) {
 			if(!meta.hasItemFlag(flag)) {
 				meta.addItemFlags(flag);
