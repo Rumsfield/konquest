@@ -18,8 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 
-public class
-Handler_1_16_R3 implements VersionHandler {
+public class Handler_1_16_R3 implements VersionHandler {
 
 	public Handler_1_16_R3() {}
 	

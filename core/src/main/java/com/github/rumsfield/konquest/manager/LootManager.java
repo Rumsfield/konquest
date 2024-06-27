@@ -185,7 +185,7 @@ public class LootManager implements Timeable{
 			status = true;
 			int itemLevel = 0;
 			int itemWeight = 0;
-			bookType = getEnchantment(enchantName);
+			bookType = CompatibilityUtil.getEnchantment(enchantName);
 			if(bookType == null) {
 				ChatUtil.printConsoleError("Invalid loot enchantment \""+enchantName+"\" given in loot.yml path "+pathName+", skipping this enchantment.");
 				status = false;
@@ -223,7 +223,7 @@ public class LootManager implements Timeable{
 				enchantMeta.addStoredEnchant(bookType, itemLevel, true);
 				enchantBook.setItemMeta(enchantMeta);
 				result.put(enchantBook, itemWeight);
-				ChatUtil.printDebug("  Added loot path "+pathName+" enchant "+enchantName+" with level "+itemLevel+", weight "+itemWeight);
+				ChatUtil.printDebug("  Added loot path "+pathName+" enchant "+bookType.getKey().toString()+" with level "+itemLevel+", weight "+itemWeight);
 			}
 		}
 		return result;
@@ -359,16 +359,6 @@ public class LootManager implements Timeable{
 	/*
 	 * Common
 	 */
-
-	private Enchantment getEnchantment(String fieldName) {
-		Enchantment result = null;
-		try {
-			Class<?> c = Enchantment.class;
-			Field field = c.getDeclaredField(fieldName);
-			result = (Enchantment)field.get(null);
-		} catch(NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ignored) {}
-		return result;
-	}
 
 	private void clearUpperInventory(Inventory inventory) {
 		inventory.clear();

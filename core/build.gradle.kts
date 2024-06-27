@@ -67,22 +67,7 @@ dependencies{
     implementation("org.xerial:sqlite-jdbc:3.40.1.0")
     implementation(project(":api"))
 }
-/*
-configurations.all {
-    resolutionStrategy.force("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
-}
-*/
 
-/*
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "org.spigotmc" && requested.name == "spigot") {
-            useVersion("1.20.6-R0.1-SNAPSHOT")
-            because("Ensure spigot-api is preferred for overlapping classes")
-        }
-    }
-}
-*/
 tasks {
     shadowJar {
         archiveBaseName.set("Konquest")
