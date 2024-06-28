@@ -403,20 +403,20 @@ public class ChatUtil {
 	}
 
 	public static void sendKonBlockedProtectionTitle(KonPlayer player) {
-		printDebug("Blocked Protection by player "+player.getBukkitPlayer().getName());
-		showDebugStackTrace();
+		//printDebug("Blocked Protection by player "+player.getBukkitPlayer().getName());
+		//showDebugStackTrace();
 		sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 	}
 
 	public static void sendKonBlockedFlagTitle(KonPlayer player) {
-		printDebug("Blocked Flag by player "+player.getBukkitPlayer().getName());
-		showDebugStackTrace();
+		//printDebug("Blocked Flag by player "+player.getBukkitPlayer().getName());
+		//showDebugStackTrace();
 		sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 	}
 
 	public static void sendKonBlockedShieldTitle(KonPlayer player) {
-		printDebug("Blocked Shield by player "+player.getBukkitPlayer().getName());
-		showDebugStackTrace();
+		//printDebug("Blocked Shield by player "+player.getBukkitPlayer().getName());
+		//showDebugStackTrace();
 		sendKonPriorityTitle(player, "", Konquest.blockedShieldColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 	}
 

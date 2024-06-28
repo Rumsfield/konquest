@@ -405,10 +405,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 			for(Location loc : borderPlotMap.keySet()) {
 				if(loc.getWorld().equals(getBukkitPlayer().getWorld()) && loc.distance(getBukkitPlayer().getLocation()) < 12) {
 					particleColor = borderPlotMap.get(loc);
-					double red = particleColor.getRed() / 255D;
-					double green = particleColor.getGreen() / 255D;
-					double blue = particleColor.getBlue() / 255D;
-					getBukkitPlayer().spawnParticle(CompatibilityUtil.getParticle("spell"), loc, 0, red, green, blue, 1);
+					CompatibilityUtil.playerSpawnEffect(getBukkitPlayer(),loc,particleColor);
 				}
 			}
 		} else if(taskID == monumentTemplateLoopTimer.getTaskID()) {

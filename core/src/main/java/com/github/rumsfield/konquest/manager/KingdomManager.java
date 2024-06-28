@@ -1919,6 +1919,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return false;
 		}
 
+		// Check for self relation
+		if(kingdom.equals(otherKingdom)) {
+			ChatUtil.sendError(messageSender,MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+
 		// Check cost
 		double costRelation = getRelationCost(relation);
 		if(costRelation > 0 && !isAdmin && payPlayer != null) {

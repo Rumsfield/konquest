@@ -43,7 +43,8 @@ repositories{
 
 dependencies{
     // Spigot
-    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT") // Primary API
+    //compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT") // Primary API
+    compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT") // Primary API
     compileOnly("org.spigotmc:spigot-1.17.1-R0.1-SNAPSHOT-remapped") // for nms packets, local lib
     compileOnly("org.spigotmc:spigot-1.16.5-R0.1-SNAPSHOT") // for nms packets, local lib
 

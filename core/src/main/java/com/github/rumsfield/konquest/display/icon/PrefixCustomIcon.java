@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Collections;
 import java.util.List;
 
 public class PrefixCustomIcon implements MenuIcon {
@@ -28,25 +29,14 @@ public class PrefixCustomIcon implements MenuIcon {
 	}
 	
 	private ItemStack initItem() {
-		ItemStack item = new ItemStack(Material.IRON_BARS);
-		ItemMeta meta = item.getItemMeta();
-		assert meta != null;
+		Material material = Material.IRON_BARS;
+		boolean isProtected = false;
 		if(isClickable) {
-			meta.addEnchant(CompatibilityUtil.getProtectionEnchantment(), 1, true);
+			isProtected = true;
+			material = Material.GOLD_BLOCK;
 		}
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
-		if(isClickable) {
-			item.setType(Material.GOLD_BLOCK);
-		}
-		String displayName = ChatUtil.parseHex(prefix.getName());
-		meta.setDisplayName(displayName);
-		meta.setLore(lore);
-		item.setItemMeta(meta);
-		return item;
+		String name = ChatUtil.parseHex(prefix.getName());
+		return CompatibilityUtil.buildItem(material, name, Collections.emptyList(), isProtected);
 	}
 	
 	public KonCustomPrefix getPrefix() {

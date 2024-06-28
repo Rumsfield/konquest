@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.display.icon;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.admin.AdminCommandType;
 import com.github.rumsfield.konquest.manager.DisplayManager;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -26,20 +27,9 @@ public class AdminCommandIcon  implements MenuIcon{
     }
 
     private ItemStack initItem() {
-        ItemStack item = new ItemStack(command.iconMaterial());
-        ItemMeta meta = item.getItemMeta();
-        assert meta != null;
-        for(ItemFlag flag : ItemFlag.values()) {
-            if(!meta.hasItemFlag(flag)) {
-                meta.addItemFlags(flag);
-            }
-        }
-        List<String> loreList = new ArrayList<>();
-        loreList.addAll(Konquest.stringPaginate(command.description(),loreColor));
-        meta.setDisplayName(""+ChatColor.GOLD+ChatColor.ITALIC+getName());
-        meta.setLore(loreList);
-        item.setItemMeta(meta);
-        return item;
+        List<String> loreList = new ArrayList<>(Konquest.stringPaginate(command.description(), loreColor));
+        String name = ""+ChatColor.GOLD+ChatColor.ITALIC+getName();
+        return CompatibilityUtil.buildItem(command.iconMaterial(), name, loreList);
     }
 
     public AdminCommandType getCommand() {

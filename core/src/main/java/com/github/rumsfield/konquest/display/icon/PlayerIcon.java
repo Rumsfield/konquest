@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.manager.DisplayManager;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemFlag;
@@ -58,23 +59,13 @@ public class PlayerIcon implements MenuIcon {
 
 	@Override
 	public ItemStack getItem() {
-		ItemStack item = Konquest.getInstance().getPlayerHead(player);
-		ItemMeta meta = item.getItemMeta();
-		assert meta != null;
 		List<String> loreList = new ArrayList<>();
 		String lastOnlineFormat = Konquest.getLastSeenFormat(player);
 		loreList.add(propertyColor+MessagePath.LABEL_PLAYER.getMessage());
 		loreList.add(loreColor+ MessagePath.LABEL_LAST_SEEN.getMessage(valueColor+lastOnlineFormat));
 		loreList.addAll(lore);
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
-		meta.setDisplayName(getName());
-		meta.setLore(loreList);
-		item.setItemMeta(meta);
-		return item;
+		String name = getName();
+		return CompatibilityUtil.buildItem(null, name, loreList, false, player);
 	}
 	
 	@Override

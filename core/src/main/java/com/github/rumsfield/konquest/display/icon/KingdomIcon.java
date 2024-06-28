@@ -42,10 +42,8 @@ public class KingdomIcon implements MenuIcon {
 		if(kingdom.isAdminOperated()) {
 			material = Material.GOLDEN_HELMET;
 		}
-		ItemStack item = new ItemStack(material,1);
-		ItemMeta meta = item.getItemMeta();
-		assert meta != null;
 		// Add applicable labels
+		boolean isProtected = false;
 		List<String> loreList = new ArrayList<>();
 		if(kingdom.isAdminOperated()) {
 			loreList.add(propertyColor+MessagePath.LABEL_ADMIN_KINGDOM.getMessage());
@@ -59,21 +57,14 @@ public class KingdomIcon implements MenuIcon {
 			loreList.add(propertyColor+MessagePath.LABEL_OPEN.getMessage());
 		}
 		if(kingdom.isOfflineProtected()) {
-			meta.addEnchant(CompatibilityUtil.getProtectionEnchantment(), 1, true);
+			isProtected = true;
 			loreList.add(propertyColor+MessagePath.LABEL_PROTECTED.getMessage());
 		}
 		loreList.add(loreColor+MessagePath.LABEL_TOWNS.getMessage()+": "+valueColor+kingdom.getNumTowns());
 		loreList.add(loreColor+MessagePath.LABEL_MEMBERS.getMessage()+": "+valueColor+kingdom.getNumMembers());
 		loreList.addAll(lore);
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
-		meta.setDisplayName(contextColor+kingdom.getName());
-		meta.setLore(loreList);
-		item.setItemMeta(meta);
-		return item;
+		String name = contextColor+kingdom.getName();
+		return CompatibilityUtil.buildItem(material, name, loreList, isProtected);
 	}
 	
 	public KonKingdom getKingdom() {

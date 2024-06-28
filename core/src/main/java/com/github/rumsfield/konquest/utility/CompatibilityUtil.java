@@ -1,14 +1,20 @@
 package com.github.rumsfield.konquest.utility;
 
-import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Particle;
-import org.bukkit.Registry;
+import com.github.rumsfield.konquest.Konquest;
+import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
 
 /**
  * This class provides static method implementations that work for the full range of supported Spigot API versions.
@@ -117,7 +123,9 @@ public class CompatibilityUtil {
         V1_21_0
     }
 
-    public static SpigotApiVersion getApiVersion() {
+    public static SpigotApiVersion apiVersion = getApiVersion();
+
+    private static SpigotApiVersion getApiVersion() {
         String bukkitVersion = Bukkit.getVersion();
         if (bukkitVersion.contains("1.16.5")) {
             return SpigotApiVersion.V1_16_5;
@@ -206,7 +214,7 @@ public class CompatibilityUtil {
 
     public static PotionEffectType getMiningFatigue() {
         PotionEffectType result;
-        switch(getApiVersion()) {
+        switch(apiVersion) {
             case V1_16_5:
             case V1_17_1:
             case V1_18_1:
@@ -233,7 +241,7 @@ public class CompatibilityUtil {
 
     public static Enchantment getProtectionEnchantment() {
         Enchantment result;
-        switch(getApiVersion()) {
+        switch(apiVersion) {
             case V1_16_5:
             case V1_17_1:
             case V1_18_1:
@@ -273,7 +281,7 @@ public class CompatibilityUtil {
             return null;
         }
         String enchantNamespace;
-        switch (getApiVersion()) {
+        switch (apiVersion) {
             case V1_16_5:
             case V1_17_1:
             case V1_18_1:
@@ -318,7 +326,7 @@ public class CompatibilityUtil {
      */
     public static Particle getParticle(String type) {
         try {
-            switch (getApiVersion()) {
+            switch (apiVersion) {
                 case V1_16_5:
                 case V1_17_1:
                 case V1_18_1:
@@ -337,7 +345,7 @@ public class CompatibilityUtil {
                     if (type.equals("dust")) {
                         return Particle.valueOf("DUST");
                     } else if (type.equals("spell")) {
-                        return Particle.valueOf("EFFECT");
+                        return Particle.valueOf("ENTITY_EFFECT");
                     }
                     break;
             }
@@ -357,7 +365,7 @@ public class CompatibilityUtil {
      */
     public static EntityType getEntityType(String type) {
         try {
-            switch (getApiVersion()) {
+            switch (apiVersion) {
                 case V1_16_5:
                 case V1_17_1:
                 case V1_18_1:
@@ -391,7 +399,7 @@ public class CompatibilityUtil {
 
     @SuppressWarnings({"removal","deprecation"})
     public static PotionMeta setPotionData(PotionMeta meta, PotionType type, boolean isExtended, boolean isUpgraded) {
-        switch(getApiVersion()) {
+        switch(apiVersion) {
             case V1_16_5:
             case V1_17_1:
             case V1_18_1:
@@ -412,6 +420,59 @@ public class CompatibilityUtil {
                 break;
         }
         return meta;
+    }
+
+    public static void playerSpawnEffect(Player target, Location loc, Color color) {
+        switch(apiVersion) {
+            case V1_16_5:
+            case V1_17_1:
+            case V1_18_1:
+            case V1_18_2:
+            case V1_19_4:
+            case V1_20_4:
+                // Older versions
+                double red = color.getRed() / 255D;
+                double green = color.getGreen() / 255D;
+                double blue = color.getBlue() / 255D;
+                target.spawnParticle(CompatibilityUtil.getParticle("spell"), loc, 0, red, green, blue, 1);
+                break;
+            default:
+                // Latest versions
+                target.spawnParticle(CompatibilityUtil.getParticle("spell"), loc, 1, 0, 0, 0, color);
+                break;
+        }
+    }
+
+    public static ItemStack buildItem(Material mat, String name, List<String> loreList) {
+        return buildItem(mat, name, loreList, false, null);
+    }
+
+    public static ItemStack buildItem(Material mat, String name, List<String> loreList, boolean hasProtection) {
+        return buildItem(mat, name, loreList, hasProtection, null);
+    }
+
+    public static ItemStack buildItem(Material mat, String name, List<String> loreList, boolean hasProtection, OfflinePlayer playerHead) {
+        ItemStack item;
+        if (playerHead == null && mat != null) {
+            item = new ItemStack(mat);
+        } else if (playerHead != null) {
+            item = Konquest.getInstance().getPlayerHead(playerHead);
+        } else {
+            item = new ItemStack(Material.DIRT);
+        }
+        ItemMeta meta = item.getItemMeta();
+        assert meta != null;
+        meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier("foo",0,AttributeModifier.Operation.MULTIPLY_SCALAR_1)); // This is necessary as of 1.20.6
+        for(ItemFlag flag : ItemFlag.values()) {
+            meta.addItemFlags(flag);
+        }
+        if (hasProtection) {
+            meta.addEnchant(CompatibilityUtil.getProtectionEnchantment(), 1, true);
+        }
+        meta.setDisplayName(name);
+        meta.setLore(loreList);
+        item.setItemMeta(meta);
+        return item;
     }
 
 

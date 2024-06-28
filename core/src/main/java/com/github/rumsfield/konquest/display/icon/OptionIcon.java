@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.model.KonTownOption;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -27,18 +28,8 @@ public class OptionIcon implements MenuIcon {
 	}
 	
 	private ItemStack initItem() {
-		ItemStack item = new ItemStack(mat);
-		ItemMeta meta = item.getItemMeta();
-		assert meta != null;
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
-		meta.setDisplayName(getName());
-		meta.setLore(lore);
-		item.setItemMeta(meta);
-		return item;
+		String name = getName();
+		return CompatibilityUtil.buildItem(mat, name, lore);
 	}
 	
 	public KonTownOption getOption() {

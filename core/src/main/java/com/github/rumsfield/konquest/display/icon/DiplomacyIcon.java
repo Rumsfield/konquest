@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.Labeler;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemFlag;
@@ -41,14 +42,6 @@ public class DiplomacyIcon implements MenuIcon {
 
 	@Override
 	public ItemStack getItem() {
-		ItemStack item = new ItemStack(relation.getIcon(),1);
-		ItemMeta meta = item.getItemMeta();
-		assert meta != null;
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
 		List<String> itemLore = new ArrayList<>(lore);
 		String nameColor = ""+ChatColor.GOLD;
 		switch(relation) {
@@ -67,10 +60,8 @@ public class DiplomacyIcon implements MenuIcon {
 			default:
 				break;
 		}
-		meta.setDisplayName(nameColor+getName());
-		meta.setLore(itemLore);
-		item.setItemMeta(meta);
-		return item;
+		String name = nameColor+getName();
+		return CompatibilityUtil.buildItem(relation.getIcon(), name, itemLore);
 	}
 
 	@Override

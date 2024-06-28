@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemFlag;
@@ -41,18 +42,7 @@ public class ProfessionIcon implements MenuIcon {
 
 	@Override
 	public ItemStack getItem() {
-		ItemStack item = new ItemStack(Konquest.getProfessionMaterial(profession),1);
-		ItemMeta meta = item.getItemMeta();
-		assert meta != null;
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
-		meta.setDisplayName(getName());
-		meta.setLore(lore);
-		item.setItemMeta(meta);
-		return item;
+		return CompatibilityUtil.buildItem(Konquest.getProfessionMaterial(profession), getName(), lore);
 	}
 
 	@Override

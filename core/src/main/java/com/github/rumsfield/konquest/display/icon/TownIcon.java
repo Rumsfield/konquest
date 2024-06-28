@@ -46,10 +46,8 @@ public class TownIcon implements MenuIcon {
 		} else if(town.isArmored()) {
 			material = Material.STONE_BRICKS;
 		}
-		ItemStack item = new ItemStack(material,1);
-		ItemMeta meta = item.getItemMeta();
-		assert meta != null;
 		// Add applicable labels
+		boolean isProtected = false;
 		List<String> loreList = new ArrayList<>();
 		// Alerts
 		if(town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) &&
@@ -75,22 +73,15 @@ public class TownIcon implements MenuIcon {
 			loreList.add(propertyColor+MessagePath.LABEL_ARMOR.getMessage());
 		}
 		if(town.isShielded()) {
-			meta.addEnchant(CompatibilityUtil.getProtectionEnchantment(), 1, true);
+			isProtected = true;
 			loreList.add(propertyColor+MessagePath.LABEL_SHIELD.getMessage());
 		}
 		// Lore
 		loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage() + ": " + valueColor + town.getNumResidents());
 		loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage() + ": " + valueColor + town.getChunkList().size());
 		loreList.addAll(lore);
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
-		meta.setDisplayName(contextColor+town.getName());
-		meta.setLore(loreList);
-		item.setItemMeta(meta);
-		return item;
+		String name = contextColor+town.getName();
+		return CompatibilityUtil.buildItem(material, name, loreList, isProtected);
 	}
 	
 	public KonTown getTown() {

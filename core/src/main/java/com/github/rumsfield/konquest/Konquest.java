@@ -225,7 +225,7 @@ public class Konquest implements KonquestAPI, Timeable {
     	boolean isProtocolLibEnabled = integrationManager.getProtocolLib().isEnabled();
     	// Version-specific cases
     	try {
-	    	switch(CompatibilityUtil.getApiVersion()) {
+	    	switch(CompatibilityUtil.apiVersion) {
 	    		case V1_16_5:
 					isVersionSupported = true;
 					if(isProtocolLibEnabled) { versionHandler = new Handler_1_16_R3(); }
