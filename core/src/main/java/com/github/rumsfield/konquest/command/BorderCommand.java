@@ -8,43 +8,75 @@ import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class BorderCommand extends CommandBase {
 
-	public BorderCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public BorderCommand() {
+		// Define name and sender support
+		super("border",true, false);
+		// None
+		setOptionalArgs(true);
+		// [on|off]
+		List<String> argNames = Arrays.asList("on", "off");
+		addArgument(
+				newArg(argNames,true,false)
+		);
     }
-	
-	public void execute() {
-		// k border
-		Player bukkitPlayer = (Player) getSender();
-    	if (getArgs().length != 1) {
-			sendInvalidArgMessage(bukkitPlayer,CommandType.BORDER);
-			return;
-		}
-		if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-			ChatUtil.printDebug("Failed to find non-existent player");
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-			return;
-		}
-		KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-		if(player.isBorderDisplay()) {
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_BORDER_NOTICE_DISABLE.getMessage());
-			player.setIsBorderDisplay(false);
-			getKonquest().getTerritoryManager().stopPlayerBorderParticles(player);
-		} else {
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_BORDER_NOTICE_ENABLE.getMessage());
-			player.setIsBorderDisplay(true);
-			getKonquest().getTerritoryManager().updatePlayerBorderParticles(player);
-		}
 
+	@Override
+	public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		// Sender must be player
+		KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
+		if (player == null) {
+			sendInvalidSenderMessage(sender);
+			return;
+		}
+		// Parse arguments
+		if (args.isEmpty()) {
+			// Toggle between borders
+			if(player.isBorderDisplay()) {
+				ChatUtil.sendNotice(player, MessagePath.COMMAND_BORDER_NOTICE_DISABLE.getMessage());
+				player.setIsBorderDisplay(false);
+			} else {
+				ChatUtil.sendNotice(player, MessagePath.COMMAND_BORDER_NOTICE_ENABLE.getMessage());
+				player.setIsBorderDisplay(true);
+			}
+		} else {
+			// Set specific border mode
+			String borderMode = args.get(0);
+			switch (borderMode.toLowerCase()) {
+				case "off":
+					// Disabled borders
+					ChatUtil.sendNotice(player, MessagePath.COMMAND_BORDER_NOTICE_DISABLE.getMessage());
+					player.setIsBorderDisplay(false);
+					break;
+				case "on":
+					// Enabled borders
+					ChatUtil.sendNotice(player, MessagePath.COMMAND_BORDER_NOTICE_ENABLE.getMessage());
+					player.setIsBorderDisplay(true);
+					break;
+				default:
+					sendInvalidArgMessage(sender);
+					return;
+			}
+		}
+		// Update borders
+		konquest.getTerritoryManager().updatePlayerBorderParticles(player);
 	}
 
 	@Override
-	public List<String> tabComplete() {
-		// No arguments to complete
-		return Collections.emptyList();
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
+		List<String> tabList = new ArrayList<>();
+		// Give suggestions
+		if(args.size() == 1) {
+			tabList.add("on");
+			tabList.add("off");
+		}
+		return matchLastArgToList(tabList,args);
 	}
+
 }

@@ -187,7 +187,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			ListIterator<KonKingdom> enemyIterator = enemyKingdoms.listIterator();
 			for (int i = 0; i < pageTotal; i++) {
 				int numPageRows = getNumPageRows(enemyKingdoms.size(),i);
-				pageLabel = titleColor + infoKingdom.getName() + " " + MessagePath.DIPLOMACY_WAR.getMessage() + " " + (i + 1) + "/" + pageTotal;
+				pageLabel = titleColor + MessagePath.DIPLOMACY_WAR.getMessage() + " " + (i + 1) + "/" + pageTotal;
 				getMenu().addPage(pageIndex, numPageRows, pageLabel);
 				slotIndex = 0;
 				while (slotIndex < MAX_ICONS_PER_PAGE && enemyIterator.hasNext()) {
@@ -209,7 +209,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			ListIterator<KonKingdom> allyIterator = allyKingdoms.listIterator();
 			for (int i = 0; i < pageTotal; i++) {
 				int numPageRows = getNumPageRows(allyKingdoms.size(),i);
-				pageLabel = titleColor + infoKingdom.getName() + " " + MessagePath.DIPLOMACY_ALLIANCE.getMessage() + " " + (i + 1) + "/" + pageTotal;
+				pageLabel = titleColor + MessagePath.DIPLOMACY_ALLIANCE.getMessage() + " " + (i + 1) + "/" + pageTotal;
 				getMenu().addPage(pageIndex, numPageRows, pageLabel);
 				slotIndex = 0;
 				while (slotIndex < MAX_ICONS_PER_PAGE && allyIterator.hasNext()) {
@@ -231,7 +231,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			ListIterator<KonKingdom> tradeIterator = tradeKingdoms.listIterator();
 			for (int i = 0; i < pageTotal; i++) {
 				int numPageRows = getNumPageRows(tradeKingdoms.size(),i);
-				pageLabel = titleColor + infoKingdom.getName() + " " + MessagePath.DIPLOMACY_TRADE.getMessage() + " " + (i + 1) + "/" + pageTotal;
+				pageLabel = titleColor + MessagePath.DIPLOMACY_TRADE.getMessage() + " " + (i + 1) + "/" + pageTotal;
 				getMenu().addPage(pageIndex, numPageRows, pageLabel);
 				slotIndex = 0;
 				while (slotIndex < MAX_ICONS_PER_PAGE && tradeIterator.hasNext()) {
@@ -253,7 +253,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			ListIterator<KonTown> townIter = kingdomTowns.listIterator();
 			for (int i = 0; i < pageTotal; i++) {
 				int numPageRows = getNumPageRows(kingdomTowns.size(),i);
-				pageLabel = titleColor + infoKingdom.getName() + " " + MessagePath.LABEL_TOWNS.getMessage() + " " + (i + 1) + "/" + pageTotal;
+				pageLabel = titleColor + MessagePath.LABEL_TOWNS.getMessage() + " " + (i + 1) + "/" + pageTotal;
 				getMenu().addPage(pageIndex, numPageRows, pageLabel);
 				slotIndex = 0;
 				while (slotIndex < MAX_ICONS_PER_PAGE && townIter.hasNext()) {
@@ -283,7 +283,7 @@ public class KingdomInfoMenuWrapper extends MenuWrapper {
 			} else if(numPageRows > 5) {
 				numPageRows = 5;
 			}
-			pageLabel = titleColor+infoKingdom.getName()+" "+MessagePath.LABEL_PLAYERS.getMessage()+" "+(i+1)+"/"+pageTotal;
+			pageLabel = titleColor+MessagePath.LABEL_PLAYERS.getMessage()+" "+(i+1)+"/"+pageTotal;
 			getMenu().addPage(pageIndex, numPageRows, pageLabel);
 			slotIndex = 0;
 			while(slotIndex < MAX_ICONS_PER_PAGE && memberIter.hasNext()) {

@@ -216,6 +216,17 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 		}
 		return result;
 	}
+
+	public boolean renameTemplate(String name, String newName) {
+		String nameLower = name.toLowerCase();
+		if(templates.containsKey(nameLower)) {
+			KonMonumentTemplate template = templates.remove(nameLower);
+			template.setName(newName);
+			templates.put(newName.toLowerCase(), template);
+			return true;
+		}
+		return false;
+	}
 	
 	public boolean removeTemplate(String name) {
 		boolean result = false;

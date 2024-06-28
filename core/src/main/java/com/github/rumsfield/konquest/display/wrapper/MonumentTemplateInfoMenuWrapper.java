@@ -71,26 +71,37 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
 
         // Page 0+
         int pageNum = 0;
-        int pageTotal = getTotalPages(allTemplates.size());
-        ListIterator<KonMonumentTemplate> templateIter = allTemplates.listIterator();
-        for(int i = 0; i < pageTotal; i++) {
-            int numPageRows = getNumPageRows(allTemplates.size(),i);
-            pageLabel = titleColor+ MessagePath.LABEL_MONUMENT.getMessage()+" "+(i+1)+"/"+pageTotal;
-            getMenu().addPage(pageNum, numPageRows, pageLabel);
-            int slotIndex = 0;
-            while(slotIndex < MAX_ICONS_PER_PAGE && templateIter.hasNext()) {
-                /* Template Icon (n) */
-                KonMonumentTemplate currentTemplate = templateIter.next();
-                double totalCost = getKonquest().getKingdomManager().getCostTemplate()+currentTemplate.getCost();
-                loreList = new ArrayList<>();
-                loreList.add(loreColor+MessagePath.LABEL_SANCTUARY.getMessage()+": "+valueColor+templateSanctuaryMap.get(currentTemplate));
-                loreList.add(loreColor+MessagePath.LABEL_KINGDOMS.getMessage()+": "+valueColor+templateUsedKingdomsMap.get(currentTemplate));
-                loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+totalCost);
-                TemplateIcon templateIcon = new TemplateIcon(currentTemplate,""+ChatColor.GOLD,loreList,slotIndex,true);
-                getMenu().getPage(pageNum).addIcon(templateIcon);
-                slotIndex++;
+        if (allTemplates.isEmpty()) {
+            // When there are no templates
+            pageLabel = titleColor + MessagePath.LABEL_MONUMENT.getMessage();
+            getMenu().addPage(pageNum, 1, pageLabel);
+            /* Info Icon */
+            loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_NO_TEMPLATES.getMessage(), ChatColor.RED));
+            InfoIcon info = new InfoIcon(ChatColor.DARK_RED+MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage(),loreList,Material.BARRIER,0,false);
+            getMenu().getPage(pageNum).addIcon(info);
+        } else {
+            // When there are templates
+            int pageTotal = getTotalPages(allTemplates.size());
+            ListIterator<KonMonumentTemplate> templateIter = allTemplates.listIterator();
+            for (int i = 0; i < pageTotal; i++) {
+                int numPageRows = getNumPageRows(allTemplates.size(), i);
+                pageLabel = titleColor + MessagePath.LABEL_MONUMENT.getMessage() + " " + (i + 1) + "/" + pageTotal;
+                getMenu().addPage(pageNum, numPageRows, pageLabel);
+                int slotIndex = 0;
+                while (slotIndex < MAX_ICONS_PER_PAGE && templateIter.hasNext()) {
+                    /* Template Icon (n) */
+                    KonMonumentTemplate currentTemplate = templateIter.next();
+                    double totalCost = getKonquest().getKingdomManager().getCostTemplate() + currentTemplate.getCost();
+                    loreList = new ArrayList<>();
+                    loreList.add(loreColor + MessagePath.LABEL_SANCTUARY.getMessage() + ": " + valueColor + templateSanctuaryMap.get(currentTemplate));
+                    loreList.add(loreColor + MessagePath.LABEL_KINGDOMS.getMessage() + ": " + valueColor + templateUsedKingdomsMap.get(currentTemplate));
+                    loreList.add(loreColor + MessagePath.LABEL_COST.getMessage() + ": " + valueColor + totalCost);
+                    TemplateIcon templateIcon = new TemplateIcon(currentTemplate, "" + ChatColor.GOLD, loreList, slotIndex, true);
+                    getMenu().getPage(pageNum).addIcon(templateIcon);
+                    slotIndex++;
+                }
+                pageNum++;
             }
-            pageNum++;
         }
 
         getMenu().refreshNavigationButtons();

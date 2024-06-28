@@ -1,0 +1,1094 @@
+# Language File
+# Spanish
+# To use this file, set core.yml language: spanish
+# 
+# "%s" are substitutes for words or numbers by the plugin.
+# If a line has "%s", keep it. You cannot add or remove any "%s".
+# Use online YAML parsing tools to check for valid syntax:
+# https://yaml-online-parser.appspot.com/
+# 
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
+label:
+  admin-kingdom: Reino Administrativo
+  allied-building: Construccion Aliada
+  armor: Armadura
+  armors: Armaduras
+  back: Atras
+  barbarian: Barbaro
+  barbarians: Barbaros
+  blocks: Bloques
+  bypass: BYPASS
+  camp: Campamento
+  capital: Capital
+  close: Cerrar
+  cost: Costo
+  critical-hits: Golpes Criticos
+  diplomacy: Diplomacia
+  disabled: Deshabilitado
+  friendly-redstone: Redstone Amigable
+  enemy-redstone: Redstone Enemigo
+  'false': 'Falso'
+  favor: Favor
+  flags: Banderas
+  golem-offense: Ofensiva de Golem de Hierro
+  health: Salud
+  immunity: Inmunidad
+  increment-cost: Incremento de Costo
+  information: Informacion
+  invalid: Invalido
+  kingdom: Reino
+  kingdom-role: Rol del Reino
+  kingdoms: Reinos
+  knight: Caballero
+  knights: Caballeros
+  land: Tierra
+  last-seen: Ultima Vez Visto %s
+  leaderboard: Tabla de Liderazgo
+  level: Nivel
+  loot-chests: Cofres de Botin
+  lord: Senor
+  master: Maestro
+  member: Miembro
+  members: Miembros
+  modified: Modificado
+  monument: Monumento
+  monument-template: Plantilla de Monumento
+  name: Nombre
+  neutral: Neutral
+  neutrals: Neutrales
+  next: Siguiente
+  no-lord: Sin Senor
+  officer: Oficial
+  officers: Oficiales
+  online-players: Jugadores en Linea
+  open: Abrir
+  options: Opciones
+  peaceful: Pacifico
+  player: Jugador
+  players: Jugadores
+  plot: Parcela
+  population: Poblacion
+  properties: Propiedades
+  protected: Protegido
+  residencies: Residencias
+  resident: Residente
+  residents: Residentes
+  ruin: Ruina
+  sanctuary: Santuario
+  score: Puntuacion
+  shield: Escudo
+  shields: Escudos
+  smallest: Mas Pequeno
+  specialization: Especializacion
+  stats: Estadisticas
+  total-players: Total de Jugadores
+  total: Total
+  town: Pueblo
+  towns: Pueblos
+  'true': 'Verdadero'
+  unavailable: No Disponible
+  upgrades: Mejoras
+  valid: Valido
+  world: Mundo
+placeholder:
+  friendly: Amistoso
+  enemy: Enemigo
+  barbarian: Barbaro
+  ally: Aliado
+  trader: Comerciante
+  peaceful: Pacifico
+  rank-master: Maestro
+  rank-officer: Oficial
+  rank-member: Miembro
+map:
+  barbarian: Barbaro
+  barbarians: Barbaros
+  kingdom: Reino
+  capital: Capital
+  town: Pueblo
+  towns: Pueblos
+  land: Tierra
+  players: Jugadores
+  lord: Senor
+  population: Poblacion
+  ruin: Ruina
+  critical-hits: Golpes Criticos
+  golem-spawns: Aparicion de Golems
+  sanctuary: Santuario
+  templates: Plantillas de Monumento
+menu:
+  stats:
+    title: Estadisticas de Logros
+    intro-1: Usa "/k stats" o "/k s" para abrir este libro de nuevo.
+    intro-2: Mira tus estadisticas hacia Logros, que desbloquean nuevos prefijos para que puedas usar.
+    max: Nivel Maximo
+    category: Categoria de Logro
+    next: Siguiente Prefijo
+    unlock: Prefijos Desbloqueados
+    amount: Cantidad de Estadisticas
+    points: Puntos de Logro
+  quest:
+    title: Registro de Misiones
+    intro-1: Usa "/k quest" o "/k q" para abrir este libro de nuevo.
+    intro-2: Completa estas misiones para ganar Favor, que se utiliza para reclamar tierra y fundar nuevos pueblos.
+    reward: Recompensa de Favor
+  upgrade:
+    title: Mejoras de Pueblo Disponibles
+    fail-level: Fallo al agregar %s nivel %s, el nivel es mayor que el maximo o demasiado alto desde el nivel actual, %s.
+    fail-population: Fallo al agregar %s nivel %s, la poblacion del pueblo es demasiado baja, requiere %s.
+    fail-cost: Fallo al agregar %s nivel %s, requiere %s Favor.
+    add: Agregado %s nivel %s al Pueblo de %s!
+  help:
+    title: Ayuda de Konquest
+    admin: Ayuda de Admin
+    tips: Consejos de Konquest
+    community: Comunidad
+    hint: Haz clic para unirte
+    tip-1: Los barbaros son jugadores predeterminados que no tienen reino. Pueden colocar camas para hacer campamentos, atacar a otros barbaros y destruir pueblos.
+    tip-2: Usa "/k kingdom" para abrir el menu del reino y unirte a reinos, o usa "/k kingdom create" para crear el tuyo propio.
+    tip-3: 'Las opciones de diplomacia para otros reinos son: paz, comercio, alianza, guerra. Los reinos enemigos en guerra pueden capturar los pueblos de cada uno.'
+    tip-4: Usa "/k settle" para crear nuevos pueblos para tu reino. Usa "/k map" para ver la tierra circundante y un consejo sobre si tu ubicacion puede ser colonizada.
+    tip-5: Abre el Menu General de Pueblo con "/k town" para unirte y salir de pueblos en tu reino. Usa "/k town <nombre>" para administrar un pueblo, como mejoras o residentes.
+    tip-6: Reclama la tierra del pueblo para proteger contenedores y animales de enemigos, aumenta tus estadisticas y puntuacion, y para prevenir la aparicion de monstruos.
+    tip-7: Usa "/k town <nombre>" y elige Parcelas para configurar parcelas del pueblo donde solo residentes especificos pueden construir. Cambia las opciones del pueblo para permitir a los residentes solo construir en sus parcelas.
+    tip-8: Construye Golems de Hierro para proteger tus pueblos de jugadores enemigos. Busca Ruinas y derrota a los Golems de Ruina por una recompensa.
+    tip-9: Usa "/k stats" y "/k score" para ver estadisticas de jugadores. Usa "/k prefix" para establecer tu propio titulo de chat. Desbloquea titulos con estadisticas aumentadas.
+  score:
+    kingdom-towns: Pueblos del Reino
+    kingdom-land: Tierra del Reino
+    kingdom-favor: Favor del Reino
+    kingdom-population: Poblacion del Reino
+    town-1: Señoríos de Jugadores
+    land-1: Tierra de Pueblo del Señor
+    town-2: Caballerías de Jugadores
+    land-2: Tierra de Pueblo del Caballero
+    town-3: Residencias de Jugadores
+    land-3: Tierra de Pueblo del Residente
+    player-score: Puntuacion del Jugador
+    hint: Haz clic para ver
+  map:
+    center: Centro del Mapa
+    proximity: Proximidad
+    settle-hint: Coloniza Aqui
+  prefix:
+    disable: 'Off'
+    hint-disable: Haz clic para deshabilitar
+    hint-apply: Haz clic para aplicar
+    custom-pages: Prefijos Personalizados
+    no-allow: Permiso faltante
+  shield:
+    hint: Haz clic para cargar
+    fail-max: Fallo al cargar, supera el maximo de %s.
+    fail-add: Fallo al cargar, no se puede agregar a la carga existente.
+    fail-attack: Fallo al cargar mientras el pueblo esta bajo ataque!
+    fail-cost: Fallo al cargar, requiere %s Favor.
+    activate-new: Cargado %s por %s.
+    activate-add: Aumentada la carga con %s por %s.
+  options:
+    hint: Haz clic para cambiar
+    current: 'Actual: %s'
+    allied-building: Los jugadores aliados pueden construir
+    open: Todos los miembros del reino pueden construir y usar cofres
+    plot: Los residentes solo pueden construir y usar cofres en parcelas
+    friendly-redstone: Los miembros del reino pueden usar interruptores y puertas de redstone
+    redstone: Los enemigos pueden usar interruptores y puertas de redstone
+    golem: Los Golems de Hierro atacaran a todos los enemigos que entren
+  plots:
+    edit-add-land: Agregar Tierra
+    edit-remove-land: Remover Tierra
+    edit-add-players: Agregar Jugadores
+    edit-remove-players: Remover Jugadores
+    edit-show-players: Mostrar Jugadores
+    capital-land: Tierra Capital
+    town-land: Tierra del Pueblo
+    town-monument: Monumento del Pueblo
+    editing-plot: Editando Parcela
+    click-delete: Haz clic para Eliminar Parcela
+    click-edit: Haz clic para Editar Parcela
+    click-remove-chunk: Haz clic para Remover Chunk
+    click-remove-player: Haz clic para Remover Jugador
+    click-create: Haz clic para Crear Parcela
+    click-add-chunk: Haz clic para Agregar Chunk
+    click-add-player: Haz clic para Agregar Jugador
+    click-move-player: Haz clic para Mover Jugador
+    here: Estas Aqui
+    title-plots: Parcelas del Pueblo
+    title-create: Crear Parcela
+    title-delete: Eliminar Parcela
+    title-edit: Editar Parcela
+    title-edit-options: Editar Opciones
+    title-add-land: Agregar Tierra
+    title-add-players: Agregar Jugadores
+    title-remove-land: Remover Tierra
+    title-remove-players: Remover Jugadores
+    title-show-players: Mostrar Jugadores
+    button-create: Crear
+    button-delete: Eliminar
+    button-edit: Editar
+    button-return: Regresar
+    button-finish: Finalizar
+  town:
+    join: Unirse
+    leave: Salir
+    list: Lista
+    invites: Invitaciones
+    manage: Administrar
+    requests: Solicitudes
+    plots: Parcelas
+    shields: Escudos
+    armor: Armadura
+    promote: Promover
+    demote: Degradar
+    transfer: Transferir
+    destroy: Destruir
+    upgrades: Mejoras
+    options: Opciones
+    special: Especializacion
+    description-join: Unete a un nuevo pueblo
+    description-leave: Sal de un pueblo existente
+    description-list: Lista todos los pueblos en tu reino
+    description-invites: Muestra tus invitaciones de residente de pueblo
+    description-manage: Administra los residentes y opciones de tus pueblos
+    description-requests: Muestra solicitudes de residentes para unirse a este pueblo
+    description-plots: Administra las parcelas del pueblo
+    description-shields: Aplica escudos del pueblo
+    description-armor: Aplica armadura del pueblo
+    description-promote: Promueve a residentes a caballeros
+    description-demote: Degradar a caballeros a residentes
+    description-transfer: Transferir el señor a otro residente
+    description-destroy: Destruye el pueblo y sus tierras reclamadas.
+    description-upgrades: Aplica mejoras del pueblo
+    description-options: Editar opciones del pueblo
+    description-special: Elige una profesion para descuentos comerciales
+    hint-open: Haz clic para abrir
+    hint-join: Haz clic para enviar una solicitud de union
+    hint-join-now: Haz clic para unirte al instante
+    hint-leave: Haz clic para salir
+    hint-list: Haz clic para ver
+    hint-accept: Haz clic izquierdo para aceptar
+    hint-decline: Haz clic derecho para rechazar
+    hint-manage: Haz clic para administrar
+    hint-promote: Haz clic para promover a Caballero
+    hint-demote: Haz clic para degradar a Residente
+    hint-transfer: Haz clic para dar Señor
+    hint-destroy: Haga clic para eliminar el pueblo
+    hint-special: Haz clic para especializarte
+    lore-special: Elige esta profesion para obtener un descuento con los aldeanos en este pueblo.
+    info-special: Los aldeanos con esta profesión dan descuentos en este pueblo.
+    title-root: Menu del Pueblo
+    title-join: Unirse a un Pueblo
+    title-leave: Salir de un Pueblo
+    title-list: Lista de Pueblos
+    title-invites: Invitaciones de Residente
+    title-manage-town: Pueblos Administrados
+    title-requests: Solicitudes de Residente
+    title-manage: Menú de Gestión del Pueblo
+    title-destroy: Destruir el pueblo
+  kingdom:
+    join: Unirse
+    exile: Exilio
+    invites: Invitaciones
+    list: Lista
+    relation: Relaciones
+    requests: Solicitudes
+    promote: Promover
+    demote: Degradar
+    transfer: Transferir
+    template: Plantillas
+    disband: Disolver
+    description-join: Solicita unirte a un reino, o crea el tuyo propio con /k kingdom create
+    description-exile: Deja tu reino actual y conviertete en barbaro
+    description-invites: Visualiza tus invitaciones de reino
+    description-list: Visualiza todos los reinos
+    description-relation: Modifica las relaciones con otros reinos
+    description-requests: Visualiza solicitudes de membresia de reino
+    description-promote: Promueve a miembros a oficiales
+    description-demote: Degradar a oficiales a miembros
+    description-transfer: Transferir el maestro a otro miembro
+    description-template: Cambiar la plantilla del monumento del reino
+    description-disband: Disolver y eliminar el reino
+    hint-open: Haz clic para abrir
+    hint-exile: Haz clic para convertirte en barbaro
+    hint-exit: Salir del menu
+    hint-disband: Haz clic para eliminar tu reino
+    hint-template: Haz clic para cambiar plantillas
+    hint-join: Haz clic para enviar una solicitud de union
+    hint-join-now: Haz clic para unirte al instante
+    hint-accept: Haz clic izquierdo para aceptar
+    hint-decline: Haz clic derecho para rechazar
+    hint-list: Haz clic para ver informacion
+    hint-relation: Haz clic para elegir diplomacia
+    hint-diplomacy: Haz clic para promulgar
+    hint-promote: Haz clic para promover a Oficial
+    hint-demote: Haz clic para degradar a Miembro
+    hint-transfer: Haz clic para dar Maestro
+    they-requested: Ellos Solicitaron
+    we-requested: Nosotros Solicitamos
+    diplomacy-peace-war-instant: Declarar paz al instante
+    diplomacy-peace-war-request: Solicitar paz
+    diplomacy-peace-trade: Terminar comercio y declarar paz
+    diplomacy-peace-alliance: Terminar alianza y declarar paz
+    diplomacy-trade-peace: Solicitar comercio
+    diplomacy-trade-alliance: Terminar alianza y declarar comercio
+    diplomacy-war-instant: Declarar guerra al instante
+    diplomacy-war-request: Solicitar guerra
+    diplomacy-alliance: Solicitar alianza
+    diplomacy-peace-info: Predeterminado. Puede permitir PvP.
+    diplomacy-trade-info: Sin PvP. Descuentos de comercio con aldeanos. Usa tiendas de cofres.
+    diplomacy-alliance-info: Sin PvP. Descuentos de comercio con aldeanos. Usa tiendas de cofres. Pacto defensivo. Viajar a pueblos y capital.
+    diplomacy-war-info: PvP. Atacar y capturar pueblos y capital.
+    title-root: Menu del Reino
+    title-join: Unirse a un Reino
+    title-confirm: Estas seguro?
+    title-invites: Invitaciones del Reino
+    title-list: Lista de Reinos
+    title-relations: Relaciones
+    title-diplomacy: Diplomacia
+    title-requests: Solicitudes de Union
+    title-promotion: Promociones
+    title-demotion: Degradaciones
+    title-transfer: Transferencia del Maestro del Reino
+    title-template: Plantillas de Monumentos
+    title-disband: Disolver Reino
+generic:
+  notice:
+    enable-auto: Activado. Usa este comando de nuevo para desactivar.
+    disable-auto: Desactivado.
+    reduce-favor: 'Favor reducido por %s, total: %s'
+    reward-favor: 'Favor recompensado: %s, total: %s'
+    reward-exp: 'EXP recompensada: %s'
+    discount-favor: '%s por ciento de descuento, ahorraste %s Favor.'
+    click-air: Haz clic en el Aire para cancelar.
+    clicked-air: Hiciste clic en el Aire, cancelada la creacion de region.
+    success: ¡Exito!
+    small-kingdom: Tu Reino es actualmente el mas pequeno, disfruta de un %s por ciento de aumento de experiencia boost!
+    wild: La Commonwelth
+    accomplishment: ¡Has logrado un Logro!
+    prefix-unlock: Prefijo de logro desbloqueado
+    prefix-lost: Prefijo de logro perdido
+    quest: Mision completa
+    loot: El botin del nuevo monumento del pueblo esta disponible.
+    absent: Has estado ausente durante demasiado tiempo y has sido expulsado de todos los pueblos.
+    force-barbarian: ¡Ahora eres un barbaro!
+  error:
+    deny-barbarian: Los barbaros no pueden hacer esto.
+    internal: Error interno, contacta a un administrador.
+    internal-message: 'Error interno: %s'
+    invalid-parameters: El comando tenia argumentos incorrectos. Usa /k help.
+    invalid-parameters-admin: El comando de administrador tenia argumentos incorrectos. Usa /k admin help.
+    invalid-world: El comando no se puede usar en este mundo.
+    no-permission: No tienes permiso para hacer eso.
+    no-allow: No tienes permiso para hacer eso.
+    no-player: ¡Debes ser un jugador para hacer esto!
+    unknown-name: 'Error al encontrar nombre desconocido, verifica la ortografia: %s'
+    bad-name: No se pudo encontrar %s en tu Reino.
+    format-name: El nombre solo puede contener letras y/o numeros.
+    length-name: El nombre no puede tener mas de 20 caracteres.
+    taken-name: Ese nombre ya esta ocupado.
+    no-favor: No hay suficiente Favor, necesita %s
+    invalid-player: Ese jugador no es valido.
+    enemy-player: Ese jugador es un enemigo.
+    enemy-town: Ese es un pueblo enemigo.
+    disabled: Esta caracteristica esta actualmente deshabilitada, habla con un administrador.
+    region: No se puede hacer esto mientras se configuran otras regiones.
+    failed: ¡Fallo :(
+protection:
+  notice:
+    ignore: Usa "/k admin bypass" para ignorar protecciones.
+    peaceful-town: El Pueblo de %s es pacifico y no puede ser atacado.
+    peaceful-player: Tu Reino es pacifico, y no puedes atacar pueblos.
+    peaceful-victim: No puedes atacar a jugadores en reinos pacificos.
+    peaceful-attacker: Tu Reino es pacifico, y no puedes atacar jugadores.
+    camp-destroy: ¡Destruido %s!
+    camp-destroy-owner: ¡Tu campamento ha sido destruido!
+    camp-create: Campamento establecido con exito.
+    camp-clan-add: '%s ha sido agregado a tu clan de campamento.'
+    camp-clan-remove: '%s ha sido removido de tu clan de campamento.'
+    critical: ¡Golpe Critico! %s Bloques Criticos restantes
+    tagged: Marcado
+    tag-message: Has sido marcado en combate.
+    untagged: Etiqueta Expirada
+    untag-message: Ya no estas en combate.
+    loot-later: Vuelve mas tarde por mas botin!
+    loot-capture: El botin se reiniciara una vez que esta Ruina haya terminado de ser capturada.
+    raid: Enemigo avistado en %s, usa "/k travel %s" para defender!
+    raid-alert: Alerta de Incursion
+    raid-capture-1: '¡%s esta siendo conquistado! Usa "/k travel %s" para defender y recibir %s Favor!'
+    raid-capture-2: '¡%s esta a media fuerza! Usa "/k travel %s" para defender y recibir %s Favor!'
+    raid-capture-3: '¡%s esta en condicion critica! Usa "/k travel %s" para defender y recibir %s Favor!'
+    raid-discord-channel: El enemigo esta capturando el pueblo de %s, unete al servidor ahora para defender!
+    raid-discord-direct: Jugadores enemigos estan capturando el pueblo de %s en tu reino, %s! Unete al servidor ahora para defender.
+    raze: El Pueblo de %s ha sido destruido por la horda Barbaro!
+    destroy: Has destruido %s por la gloria de la horda Barbaro!
+    conquer: El Pueblo de %s ha sido conquistado!
+    conquer-discord: ¡El Pueblo de %s ha sido conquistado por %s!
+    capture: Has conquistado %s para la conquista de %s!
+    kingdom-warmup: El Reino de %s estara protegido en %s minutos.
+    kingdom-conquer: El Reino de %s ha sido conquistado por %s!
+    kingdom-raze: El Reino de %s ha sido destruido por la horda Barbaro!
+    ruin: Has capturado la Ruina %s.
+    safe: El Pueblo de %s esta seguro, por ahora...
+    attacked: Bajo Ataque
+    template-modify: La Plantilla de Monumento %s esta siendo modificada y esta temporalmente no disponible.
+    template-ready: La Plantilla de Monumento %s ahora esta disponible.
+  error:
+    blocked: Bloqueado
+    not-resident: Debes ser un residente de %s para hacer esto.
+    not-plot: Debes ser miembro de una parcela para hacer esto.
+    only-plot: No puedes hacer esto fuera de una parcela del pueblo.
+    online: El Reino de %s no tiene suficientes jugadores en linea, no puede atacar el Pueblo de %s.
+    upgrade: '%s esta mejorado con %s y no puede ser atacado sin %s residentes en linea.'
+    camp: No se puede atacar %s, el dueno del campamento esta desconectado.
+    camp-bed: No se pueden colocar camas adicionales dentro de este Campamento.
+    camp-update: Ubicacion de la cama de tu Campamento actualizada.
+    camp-create: No se puede crear mas de un Campamento. Destruye la cama en tu Campamento actual antes de colocar una nueva cama.
+    camp-fail-overlap: 'Fallo al acampar: Las nuevas reclamaciones se superponen con el territorio existente.'
+    camp-fail-barbarian: 'Fallo al acampar: No eres un Barbaro.'
+    camp-fail-offline: 'Fallo al acampar: Todos los duenos de campamentos circundantes estan desconectados.'
+    capture: Este territorio no puede ser capturado durante otros %s.
+    golem: No puedes herir a los Golems de Hierro amigables en el Pueblo de %s.
+    tag-blocked: Este comando esta bloqueado mientras estas en combate.
+    portal-exit: Tu portal de salida esta dentro de un territorio protegido, mueve tu portal!
+    capital-immune: Esta capital es inmune a ataques mientras %s pueblos permanezcan en el Reino de %s.
+    no-allied-build: Las opciones de este pueblo no permiten que jugadores de reinos aliados construyan.
+command:
+  admin:
+    camp:
+      notice:
+        create: Campamento creado con exito para el jugador %s.
+        destroy: Campamento eliminado con exito para el jugador %s.
+      error:
+        create-exist: El jugador ya tiene un campamento, eliminelo primero antes de crear uno nuevo.
+        destroy-exist: El jugador no tiene un campamento.
+    flag:
+      notice:
+        all-properties: Todas las Propiedades
+        single-property: Propiedad Unica
+        set: Establecer propiedad %s de %s a nuevo valor %s.
+        reset: Restablecer todas las propiedades a los valores predeterminados en properties.yml
+      error:
+        invalid: El indicador de propiedad %s no se aplica a %s.
+    help:
+      notice:
+        detail: Para obtener más detalles sobre el comando, utilice /k admin help (comando)
+        page: Para ver más páginas utilice /k admin help (página)
+        page-command: Para ver más páginas utilice /k admin help %s (página)
+    kingdom:
+      broadcast:
+        create: ¡El Reino Administrativo de %s ha sido creado!
+      notice:
+        admin-set: El Reino de %s es un reino administrativo.
+        admin-clear: El Reino de %s es un reino regular.
+        diplomacy: Los Reinos de %s y %s tienen una relación diplomática de %s.
+      error:
+        no-templates: No hay plantillas de monumentos. Crea una en un santuario con "/k admin monument create (nombre)"
+    monument:
+      notice:
+        create-1: Ahora creando nueva Plantilla de Monumento, haz clic en el primer bloque de esquina de la region.
+        create-2: Haz clic en el segundo bloque de esquina de la region, cuando todas las particulas sean verdes.
+        create-3: Haz clic en el bloque de punto de viaje.
+        success: Plantilla de Monumento nueva creada con exito %s.
+        remove: Plantilla de Monumento eliminada %s.
+        rename: Renombrado Plantilla de Monumento %s a %s.
+        show: Mostrando Plantilla de Monumento existente %s en Santuario %s.
+        sanctuary: Crea territorio de Santuario con "/k admin sanctuary create (nombre)" antes de crear Plantillas de Monumento.
+      error:
+        value: El valor de costo no es un numero.
+        fail-base: Fallo al crear Plantilla de Monumento %s, la base debe ser de 16x16 bloques pero se obtuvo %s por %s.
+        fail-critical: Fallo al crear Plantilla de Monumento %s, debe contener al menos %s bloques %s.
+        fail-travel: Fallo al crear Plantilla de Monumento %s, el punto de viaje debe estar dentro de la region.
+        fail-region: Fallo al crear Plantilla de Monumento %s, las esquinas de la region deben estar dentro del territorio del Santuario.
+        fail-reset: Fallo al restablecer Plantilla de Monumento %s, restaurada al estado anterior.
+    reload:
+      notice:
+        message: Archivos de configuración de Konquest recargados.
+    ruin:
+      notice:
+        create: 'Ruína nueva creada con éxito: %s'
+        remove: 'Ruína eliminada con éxito: %s'
+        rename: Nombre de Ruína cambiado con éxito de %s a %s.
+        reset: Bloques críticos y aparición de golem en Ruína %s restablecidos con éxito.
+        criticals: Todos los bloques críticos anteriores eliminados de %s, haz clic en bloques para agregar.
+        spawns: Todos los bloques de aparición anteriores eliminados de %s, haz clic en bloques para agregar.
+        add: Bloque agregado a la Ruína %s.
+      error:
+        create: No se pudo crear Ruína %s, nombre incorrecto o superposición de territorio.
+        remove: Fallo al eliminar Ruína desconocida %s.
+        rename: Fallo al cambiar el nombre de Ruína %s a %s.
+        reset: Fallo al restablecer Ruína desconocida %s.
+        match: 'El bloque clickeado no coincide con el tipo: %s'
+        invalid: No se pudo agregar este bloque a una Ruína válida.
+    sanctuary:
+      notice:
+        create: Santuario nuevo creado con éxito %s, agrega más tierra con "/k admin claim".
+        remove: Santuario eliminado con éxito %s
+        rename: Nombre de Santuario cambiado con éxito de %s a %s.
+      error:
+        create: No se pudo crear Santuario %s, nombre incorrecto o superposición de territorio.
+        remove: Fallo al eliminar Santuario desconocido %s.
+        rename: Fallo al cambiar el nombre de Santuario %s a %s.
+    save:
+      notice:
+        message: Datos guardados en archivos.
+    settravel:
+      notice:
+        success: Punto de viaje nuevo establecido con éxito en %s.
+      error:
+        fail: Fallo al establecer punto de viaje en territorio desconocido.
+    stat:
+      notice:
+        show: 'Estadística %s para jugador %s: %s'
+        set: Establecer estadística %s para jugador %s a %s.
+        add: 'Agregados %s a estadística %s para jugador %s: %s'
+        clear: Estadística %s restablecida a cero para jugador %s.
+      error:
+        name: Estadística %s inválida, no se pudo coincidir con estadísticas existentes.
+        value: 'Valor de estadística inválido: %s'
+  border:
+    notice:
+      enable: Mostrando bordes de partículas
+      disable: Ocultando bordes de partículas
+  chat:
+    notice:
+      enable: Chat del reino
+      disable: Chat global
+  claim:
+    notice:
+      success: Se Anexaron %s chunks de tierra reclamados con éxito para %s.
+      fail-auto: No se pudo reclamar, reclamación automática desactivada.
+      pass-auto: Reclamado
+    error:
+      radius: El radio debe ser mayor o igual a %s y menor o igual a %s.
+      missing: Debe reclamar cerca del territorio existente.
+      proximity: Demasiado cerca de otro territorio.
+      fail-adjacent: Fallo al reclamar, no hay territorio adyacente.
+      fail-far: Fallo al reclamar, demasiado lejos del centro del territorio.
+      fail-claimed: Fallo al reclamar, ya reclamado.
+  favor:
+    notice:
+      message: Tienes %s Favor, los costos son...
+      cost-spy: Espiar
+      cost-travel: Viajar
+      cost-claim: Reclamar Tierras
+      cost-town-settle: Establecer un Pueblo
+      cost-town-rename: Cambiar el Nombre de un Pueblo
+      cost-kingdom-create: Crear un Reino
+      cost-kingdom-rename: Cambiar el Nombre de un Reino
+  help:
+    notice:
+      header: Página de Ayuda %s
+      detail: Para obtener más detalles sobre el comando, utilice /k help (comando)
+      page: Para ver más páginas utilice /k help (página)
+      page-command: Para ver más páginas utilice /k help %s (página)
+      command: 'Todos los usos principales de los comandos:'
+    error:
+      page: El valor de la página debe ser un número.
+  info:
+    notice:
+      kingdom-header: Reino de %s
+      town-header: Pueblo de %s
+      camp-placed: Campamento Bárbaro colocado.
+      camp-missing: Este jugador no tiene campamento.
+      ruin-status: Estado de Captura
+      ruin-capture: Esta Ruína puede ser capturada por una recompensa.
+  kingdom:
+    broadcast:
+      create: '%s ha creado el Reino de %s'
+      join: '%s se unió al Reino de %s'
+      rename: El Reino de %s ha sido renombrado a %s
+      peace: Los Reinos de %s y %s han hecho paz.
+      peace-request: El Reino de %s solicita hacer paz. Usa "/k kingdom" para cambiar relaciones.
+      trade: Los Reinos de %s y %s ahora son socios comerciales.
+      trade-request: El Reino de %s solicita comerciar. Usa "/k kingdom" para cambiar relaciones.
+      no-trade: Los Reinos de %s y %s ya no están comerciando.
+      ally: Los Reinos de %s y %s han formado una alianza.
+      ally-request: El Reino de %s solicita una alianza. Usa "/k kingdom" para cambiar relaciones.
+      no-ally: Los Reinos de %s y %s ya no están aliados.
+      war: ¡Los Reinos de %s y %s están en guerra!
+      war-request: El Reino de %s solicita ir a la guerra. Usa "/k kingdom" para cambiar relaciones.
+      transfer: '%s ahora es el Maestro del Reino de %s.'
+      promote: '%s ha sido promovido a Oficial del Reino de %s.'
+      demote: '%s ha sido degradado a Miembro del Reino de %s.'
+      disband: ¡El Reino de %s ha sido disuelto!
+      destroy: ¡El Pueblo de %s ha sido destruida!
+    notice:
+      request-sent: Solicitud de miembro enviada para unirse a %s.
+      request-received: Nueva solicitud de unión al reino, escribe "/k kingdom" para revisar.
+      request-declined: Solicitud de unión al reino denegada para el jugador %s.
+      request-pending: Jugadores solicitaron unirse a tu reino. Usa "/k kingdom", luego elige Solicitudes para responder.
+      request-list: 'Estos jugadores han solicitado unirse a tu reino:'
+      invite-sent: Invitado %s para unirse al reino.
+      invite-received: Invitación de reino recibida, escribe "/k kingdom" para responder.
+      invite-declined: Invitación para unirse a %s rechazada.
+      invite-pending: Tienes invitaciones pendientes para unirte a reinos. Usa "/k kingdom", luego elige Invitaciones para responder.
+      invite-list: 'Estos reinos te han invitado a unirte:'
+      exile: Ahora estás exiliado de %s como bárbaro.
+      exile-stats: ¡Todas las estadísticas eliminadas del exilio!
+      exile-favor: ¡Todo el favor eliminado del exilio!
+      remove-member: Ya no eres miembro del Reino de %s.
+      kick: Jugador %s expulsado del reino.
+      rename: Nombre del reino cambiado con éxito a %s.
+      transfer-master: Hiciste a %s el nuevo amo del reino de %s.
+      discount: El Reino de %s te da un %s por ciento de descuento con este comerciante.
+      open: El reino ahora está abierto para unirse.
+      closed: El reino ahora está cerrado solo para invitaciones.
+      template-current: La plantilla del Monumento del Reino es %s.
+      template: Plantilla del Monumento del Reino actualizada a %s.
+      pay: Pago del reino recibido.
+      diplomacy-current: La relación diplomática de tu reino con el Reino de %s es %s.
+      diplomacy-sent: Solicitud de diplomacia enviada al Reino de %s.
+      diplomacy-pending: Tu reino tiene solicitudes de diplomacia pendientes. Usa "/k kingdom", luego elige Relaciones para responder.
+      web-color-show: 'El Reino de %s tiene un color de mapa web de: %s'
+      web-color-set: 'Establecer el color de mapa web de %s a: %s'
+    error:
+      barbarian-create: Debes ser un bárbaro para crear un reino. Usa la opción de Exilio en el menú del reino.
+      invalid-template: '%s es una plantilla de monumento inválida. Verifica la ortografía o elige otra.'
+      missing-template: Debes especificar un nombre de plantilla. Visualiza plantillas con "/k kingdom templates"
+      missing-name: Debes especificar un nombre de reino.
+      invite-member: '%s ya es miembro del reino.'
+      invite-exists: '%s ya ha sido invitado a unirse al reino.'
+      invite-open: No se pueden invitar jugadores a un reino abierto.
+      request-exists: Ya has solicitado unirte a %s.
+      request-deny: Solicitud para unirse al Reino de %s ha sido denegada.
+      join-member: Ya eres miembro de un reino.
+      join-limit: ¡El Reino de %s tiene demasiados jugadores!
+      join-master: Los maestros del reino no pueden unirse a otros reinos.
+      join-switch: Los jugadores no pueden unirse a reinos rivales.
+      join-cooldown: 'Espera antes de unirte a otro reino: %s'
+      kick-master: No se puede expulsar al maestro del reino.
+      kick-barbarian: El jugador ya es un bárbaro.
+      exile-cooldown: 'Espera antes del exilio a bárbaro: %s'
+      merchant: No se puede comerciar con comerciantes en el Reino de %s, necesita diplomacia de Comercio o Aliada.
+      diplomacy-exists: Ya existe una solicitud para cambiar la diplomacia.
+      diplomacy-peaceful: No se pueden cambiar las relaciones diplomáticas de los reinos pacíficos.
+      diplomacy-invalid: Esta relación diplomática no está disponible o ya está activa.
+      template-attack: No se puede cambiar la plantilla del monumento mientras la Capital del Reino esté bajo ataque.
+      template-chosen: Esta plantilla de monumento ya ha sido elegida para el Reino.
+      web-color-invalid: 'Color inválido, debe coincidir con un nombre de color o un código hexadecimal que comience con #'
+  list:
+    notice:
+      header: 'Lista de %s'
+  prefix:
+    notice:
+      disable: Desactivaste tu título de prefijo.
+      new: Tu prefijo ahora es %s
+    error:
+      disable: Tu título de prefijo ya está desactivado.
+      new: El prefijo %s no está desbloqueado!
+      default: Tu prefijo ha sido revertido al predeterminado.
+      always-on: El título de prefijo no se puede desactivar.
+  score:
+    notice:
+      all-header: Todos los puntajes del reino
+      score: 'Tu puntaje: %s, puntaje del Reino de %s: %s'
+      player: 'Puntaje de %s: %s, puntaje del Reino de %s: %s'
+    error:
+      peaceful: El Reino de %s es pacífico y no puede ser puntuado.
+      barbarian: '%s es un Bárbaro y no puede ser puntuado.'
+  settle:
+    broadcast:
+      settle: '%s ha fundado el Pueblo de %s para el Reino %s'
+    notice:
+      success: 'Pueblo nuevo fundado con éxito: %s'
+      map-hint: Usa "/k map" para información útil.
+    error:
+      missing-name: Debe especificar un nombre de pueblo.
+      space-name: Nombre de pueblo incorrecto, no puede usar espacios.
+      fail-name: Nombre de Pueblo inválido, ya ocupado o tiene espacios.
+      fail-overlap: Pueblo se superpone con un territorio cercano.
+      fail-placement: No se pudo encontrar un buen emplazamiento para el Monumento.
+      fail-template: Plantilla de Monumento inválida o no disponible.
+      fail-proximity: Pueblo está demasiado cerca de otro territorio. Actualmente %s chunks de distancia, debe ser al menos %s.
+      fail-max: Pueblo está demasiado lejos de otros territorios. Actualmente %s chunks de distancia, debe ser como máximo %s.
+      fail-flat: Tu área de chunks no es lo suficientemente plana. Presiona F3+G para ver los límites de chunks. Corta árboles y aplana el suelo!
+      fail-height: Elevación incorrecta, intenta establecerte en algún lugar más alto o más bajo.
+      fail-air: Demasiado aire debajo del suelo. Intenta establecerte en otro lugar, o rellena todo el aire debajo de ti.
+      fail-water: Demasiado agua debajo del suelo. Intenta establecerte en otro lugar, o elimina toda el agua debajo de ti.
+      fail-container: Demasiados contenedores debajo del suelo. Intenta establecerte en otro lugar, o elimina todos los contenedores debajo de ti.
+      fail-init: El pueblo no pudo reclamar chunks iniciales.
+      fail-limit-all: No se pueden fundar más pueblos que el límite máximo global de %s. Actualmente hay %s pueblos en todos los mundos.
+      fail-limit-world: No se pueden fundar más pueblos que el límite máximo por mundo  de %s. Actualmente hay %s pueblos en este mundo.
+      officer-only: Solo el maestro del reino y los oficiales pueden fundar pueblos. ¡Pide ser promovido!
+  spy:
+    notice:
+      nearby: cercano
+      regional: regional
+      faraway: lejano
+      very-distant: muy distante
+      success: Un espía ha recuperado este mapa de un pueblo enemigo %s! 
+    error:
+      inventory: No hay suficiente espacio en el inventario, haz espacio.
+      town: No se pudo encontrar un pueblo enemigo.
+  town:
+    notice:
+      open: Abierto %s para acceso por todos los miembros del reino.
+      close: Cerrado %s, solo los residentes pueden construir y acceder a contenedores.
+      plot-enable: '%s ahora permite que los residentes solo construyan dentro de parcelas.'
+      plot-disable: '%s ahora permite que los residentes construyan en tierra del pueblo y dentro de parcelas.'
+      allied-building-enable: '%s ahora permite que los aliados construyan.'
+      allied-building-disable: '%s ahora previene que los aliados construyan.'
+      friendly-redstone-enable: '%s ahora permite que los miembros del reino usen interruptores y puertas de redstone.'
+      friendly-redstone-disable: '%s ahora previene que los miembros del reino usen interruptores y puertas de redstone.'
+      redstone-enable: '%s ahora permite que los enemigos usen interruptores y puertas de redstone.'
+      redstone-disable: '%s ahora previene que los enemigos usen interruptores y puertas de redstone.'
+      golem-enable: Los Golems de Hierro en %s atacarán a todos los enemigos dentro del territorio del pueblo.
+      golem-disable: Los Golems de Hierro en %s solo defenderán el monumento del pueblo de los enemigos.
+      add-resident: Residente %s agregado al Pueblo %s.
+      kick-resident: Residente %s expulsado del Pueblo %s.
+      lord-success: Señoría de %s otorgada a %s.
+      lord-claim: '%s ha reclamado la Señoría de %s!'
+      knight-set: '%s ha sido Nombrado Caballero en %s.'
+      knight-clear: '%s ya no es un Caballero en %s.'
+      rename: Señor %s ha renombrado el Pueblo de %s a %s.
+      no-lord: '%s está abandonado! Usa "/k town lord %s" para reclamar la Señoría.'
+      shield-list: '%s escudos restantes para el pueblo de %s.'
+      armor-list: '%s bloques de armadura restantes para la ciudad de %s.'
+      specialize-list: El Pueblo de %s especialización es %s.
+      specialize: Especialización del Pueblo de %s cambiada con éxito a %s.
+      new-resident: '%s se ha unido como residente del pueblo de %s.'
+      leave-resident: '%s ha salido del pueblo de %s.'
+      request-sent: Solicitud de residente enviada para unirse a %s.
+      request-received: Nueva solicitud de unión al pueblo, escribe "/k town" para revisar.
+      request-declined: Solicitud de unión al pueblo denegada para el jugador %s.
+      request-pending: Los jugadores quieren convertirse en residentes de tus pueblos. Usa el comando "/k town" para responder.
+      request-town-list: 'Estos pueblos tienen nuevos residentes que solicitan unirse:'
+      request-player-list: 'Estos jugadores han solicitado unirse al Pueblo de %s:'
+      invite-sent: Invitado %s para unirse al pueblo de %s.
+      invite-received: Invitación de pueblo recibida, escribe "/k town" para responder.
+      invite-declined: Invitación para unirse a %s rechazada.
+      invite-pending: Tienes invitaciones pendientes para unirte a pueblos. Usa el comando "/k town" para responder.
+      invite-list: 'Estos pueblos te han invitado a unirte:'
+    error:
+      kick-fail: '%s no es un residente de %s.'
+      knight-resident: Los Caballeros deben ser agregados como residentes primero.
+      invite-member: '%s ya es un residente del pueblo.'
+      invite-exists: '%s ya ha sido invitado a unirse al pueblo.'
+      invite-open: No se pueden invitar jugadores a un pueblo abierto.
+      request-exists: Ya has solicitado unirte a %s.
+      request-deny: Solicitud para unirse al Pueblo de %s ha sido denegada.
+      join-member: Ya eres un residente del pueblo.
+      join-limit: ¡El pueblo de %s tiene demasiados residentes!
+      kicked: Has sido expulsado del pueblo de %s.
+      promote-knight: '%s ya es un Caballero.'
+      demote-resident: '%s ya es un residente.'
+      upgrade-unavailable: La mejora %s no está disponible para el pueblo de %s.
+      upgrade-level: El nivel de mejora debe estar entre %s y %s.
+  travel:
+    notice:
+      town-travel: '%s ha viajado a %s.'
+      wild-search: Buscando una ubicación aleatoria en La Commonwelth...
+      wild-travel: Viajado a una ubicación aleatoria en La Commonwelth.
+      warmup: El viaje comienza en %s segundos.
+    error:
+      wild-timeout: Fallo al encontrar una ubicación adecuada en La Commonwelth.
+      enemy-territory: ¡No puedes viajar dentro del territorio enemigo!
+      no-home: ¡No tienes un hogar!
+      no-camp: ¡No tienes un campamento!
+      no-town: Ese pueblo no existe en tu Reino.
+      cooldown: Debes esperar %s antes de viajar a %s.
+      canceled: Tu viaje fue cancelado por movimiento.
+      damaged: Tu viaje fue cancelado por daño.
+      disabled: El viaje a ese territorio está deshabilitado.
+  unclaim:
+    notice:
+      success: Fueron %s chunks de tierra desreclamados con éxito de %s.
+      fail-auto: No se pudo desreclamar, desreclamación automática desactivada.
+      pass-auto: Desreclamado
+    error:
+      radius: El radio debe ser mayor o igual a %s y menor o igual a %s.
+      fail-town: Debe desreclamar solo de pueblos.
+      fail-lord: Fallo al desreclamar, debes ser el señor del pueblo.
+      fail-unclaimed: Fallo al desreclamar, debes estar en territorio reclamado.
+      fail-center: Fallo al desreclamar, no se puede remover el centro del territorio.
+shop:
+  error:
+    use-disabled: ¡No se pueden usar tiendas aquí!
+    use-relation: No se puede comerciar con esta tienda, el reino del pueblo debe ser amistoso, aliado o en un acuerdo comercial.
+    create-town: Solo se pueden crear tiendas en pueblos amigables.
+    create-camp: Solo se pueden crear tiendas en tu propio campamento.
+    create-monument: ¡No se puede crear una tienda dentro de monumentos!
+    create-fail: ¡No se puede crear una tienda aquí!
+    create-wild: ¡No se pueden crear tiendas en La Commonwelth!
+region:
+  error:
+    claim-deny: Una región cercana niega reclamar esta tierra.
+    unclaim-deny: Una región cercana niega desreclamar esta tierra.
+    travel-enter-deny: Una región en el destino niega viajar hacia ella.
+    travel-exit-deny: Una región en tu ubicación actual niega viajar fuera de ella.
+directive:
+  create-kingdom: Fundaciones
+  create-kingdom-info: Crea tu propio Reino.
+  settle-town: Nuevo Comienzo
+  settle-town-info: Funda un Pueblo para tu Reino.
+  claim-land: Camino a la Nobleza
+  claim-land-info: Reclama tierra para cualquier Pueblo en tu Reino.
+  build-town: Albañilería
+  build-town-info: Construye estructuras para cualquier Pueblo en tu Reino.
+  craft-armor: Caballería
+  craft-armor-info: Crea un conjunto de armadura de hierro para protegerte.
+  create-golem: Protector Estoico
+  create-golem-info: Crea un Golem de Hierro para proteger cualquier Pueblo en tu Reino.
+  enchant-item: Herramientas Divinas
+  enchant-item-info: Aplica cualquier encantamiento a herramientas/armas.
+  attack-town: Acto de Agresión
+  attack-town-info: Ataca cualquier Pueblo en un Reino enemigo rompiendo bloques.
+  capture-town: Acción Militar
+  capture-town-info: Captura cualquier Pueblo en un Reino enemigo destruyendo los bloques críticos dentro del Monumento del Pueblo.
+  kill-enemy: Mejores Enemigos
+  kill-enemy-info: Mata a un jugador de un Reino enemigo.
+prefix:
+  category:
+    clergy: Clero
+    nobility: Nobleza
+    tradesman: Comerciante
+    military: Militar
+    farming: Agricultura
+    cooking: Cocina
+    fishing: Pesca
+    joking: Bromista
+    royalty: Realeza
+  title:
+    king: Rey
+    queen: Reina
+    prince: Principe
+    princess: Princesa
+    noble: Noble
+    cardinal: Cardenal
+    bishop: Obispo
+    priest: Sacerdote
+    cleric: Clerigo
+    chaplain: Capellan
+    scribe: Escriba
+    viceroy: Virrey
+    duke: Duque
+    count: Conde
+    earl: Conde
+    baron: Baron
+    lord: Señor
+    vassal: Vasallo
+    peasant: Campesino
+    master: Maestro
+    artisan: Artesano
+    journeyman: Oficial
+    craftsman: Artesano
+    merchant: Comerciante
+    peddler: Vendedor Ambulante
+    general: General
+    major: Mayor
+    captain: Capitan
+    sergeant: Sargento
+    knight: Sir
+    squire: Escudero
+    cowboy: Vaquero
+    breeder: Criador
+    rancher: Ranchero
+    farmer: Agricultor
+    picker: Recolector
+    sprout: Brote
+    jester: Bufon
+    fool: Tonto
+    dancer: Bailarin
+    bard: Trovador
+    fisherman: Pescador
+    caster: Lanzador
+    chum: Compañero
+    chef: Chef
+    cook: Cocinero
+    baker: Panadero
+stat:
+  enchantments: Encantamientos
+  enchantments-info: Encantamientos aplicados a objetos
+  potions: Pociones
+  potions-info: Pociones usadas o lanzadas
+  mobs: Mobs
+  mobs-info: Mobs hostiles eliminados
+  settled: Fundados
+  settled-info: Pueblos fundados
+  claimed: Reclamados
+  claimed-info: Tierra reclamada
+  lords: Señores
+  lords-info: Señorías de Pueblos
+  knights: Caballeros
+  knights-info: Caballerías de Pueblos
+  residents: Residentes
+  residents-info: Residencias de Pueblos
+  ingots: Lingotes
+  ingots-info: Lingotes fundidos
+  diamonds: Diamantes
+  diamonds-info: Minerales de diamante minados
+  crafted: Fabricados
+  crafted-info: Habilidad de fabricación de herramientas, armas y armaduras
+  favor: Favor
+  favor-info: Favor gastado
+  kills: Muertes
+  kills-info: Jugadores eliminados
+  damage: Daño
+  damage-info: Daño a jugadores dado
+  golems: Golems
+  golems-info: Golems de Hierro enemigos eliminados
+  captures: Capturas
+  captures-info: Pueblos enemigos capturados
+  criticals: Criticos
+  criticals-info: Golpes críticos en pueblos enemigos
+  seeds: Semillas
+  seeds-info: Semillas plantadas
+  breed: Cría
+  breed-info: Mobs apareados
+  till: Labrado
+  till-info: Tierra de granja fertilizada
+  harvest: Cosecha
+  harvest-info: Cosechas recolectadas
+  food: Comida
+  food-info: Objetos de comida hechos
+  music: Musica
+  music-info: Discos de música reproducidos
+  egg: Huevo
+  egg-info: Jugadores atacados con huevos
+  fish: Pesca
+  fish-info: Habilidad de pesca
+  kingdoms: Reinos
+  kingdoms-info: Reinos nuevos creados
+  conquests: Conquistas
+  conquests-info: Reinos enemigos conquistados
+upgrade:
+  disabled: Esto pueblo no tiene suficiente población para el nivel de mejora completo.
+  loot:
+    name: Botin de Monumento
+    level-1: Añade 1 objeto más por cofre
+    level-2: Añade 2 objetos más por cofre
+    level-3: Añade 3 objetos más por cofre
+  drops:
+    name: Caídas de Animales
+    level-1: Los mobs de animales sueltan 1 objeto más
+  fatigue:
+    name: Fatiga Enemiga
+    level-1: Los enemigos obtienen fatiga de minería 2
+  counter:
+    name: Contrainteligencia
+    level-1: Previene que mapas de espías localicen este pueblo
+    level-2: Previene que brújulas apunten a este pueblo
+  health:
+    name: Mejora de Salud
+    level-1: Añade 1 corazón a las barras de salud amigas
+    level-2: Añade 2 corazones a las barras de salud amigas
+    level-3: Añade 3 corazones a las barras de salud amigas
+  damage:
+    name: Prevención de Daño
+    level-1: Previene toda propagación de fuego
+    level-2: Previene todas las explosiones
+  watch:
+    name: Vigilancia del Pueblo
+    level-1: Previene incursiones enemigas a menos que al menos 1 residente esté en línea
+    level-2: Previene incursiones enemigas a menos que al menos 2 residentes estén en línea
+    level-3: Previene incursiones enemigas a menos que al menos 3 residentes estén en línea
+  enchant:
+    name: Mejores Encantamientos
+    level-1: Eleva las ofertas de encantamientos en 1 nivel
+description:
+  help: Mostrar el mensaje de ayuda.
+  info: Mostrar información sobre diferentes cosas.
+  list: Listar diferentes Territorios.
+  favor: Mostrar tu moneda como Favor.
+  map: Mostrar un mapa de chunks reclamados.
+  chat: Cambiar entre chat global y solo del reino.
+  spy: Revelar la ubicación de un pueblo enemigo.
+  settle: Fundar un nuevo Pueblo.
+  claim: Reclamar un chunk de tierra.
+  unclaim: Desreclamar un chunk de tierra.
+  travel: Teletransportarte a otros Territorios.
+  kingdom: Crear o gestionar reinos.
+  town: Gestionar Pueblos a los que perteneces.
+  quest: Mostrar tu registro de misiones.
+  stats: Mostrar tus Estadísticas de Logros.
+  prefix: Establecer tu título de prefijo.
+  score: Mostrar la puntuación actual de un Jugador.
+  fly: Volar dentro de tierra amiga.
+  border: Alternar los bordes de partículas de territorios y parcelas.
+  admin: Solo para Admins.
+  admin-help: Mostrar el mensaje de ayuda de admin.
+  admin-bypass: Alternar modo de omisión de admin.
+  admin-claim: Reclamar chunks de tierra.
+  admin-unclaim: Devolver un chunk a La Commonwelth.
+  admin-kingdom: Gestionar un Reino.
+  admin-town: Gestionar un Pueblo o Capital.
+  admin-camp: Gestionar un Campamento Bárbaro.
+  admin-capture: Capturar un pueblo para cualquier Reino.
+  admin-monument: Gestionar una Plantilla de Monumento.
+  admin-list: Mostrar todos los Reinos y Territorios.
+  admin-ruin: Gestionar un territorio de Ruína.
+  admin-sanctuary: Gestionar un territorio de Santuario.
+  admin-save: Guarda los archivos de datos de Reinos y Jugadores.
+  admin-settravel: Establece el punto de viaje para el territorio en el que estás.
+  admin-travel: Teletransportarte al reino o pueblo especificado.
+  admin-reload: Recargar archivos de configuración.
+  admin-flag: Establece banderas de propiedad del reino.
+  admin-stat: Gestionar estadísticas de jugadores.
+territory:
+  wild: Salvaje
+  capital: Capital
+  town: Pueblo
+  camp: Campamento
+  ruin: Ruina
+  sanctuary: Santuario
+  other: Otro
+diplomacy:
+  war: Guerra
+  peace: Paz
+  trade: Comercio
+  alliance: Alianza
+  self: Tu Reino
+properties:
+  travel-name: Viaje
+  travel: Permitir viaje a este territorio
+  pvp-name: PvP
+  pvp: Permitir daño a jugadores
+  pve-name: PvE
+  pve: Permitir daño a entidades
+  build-name: Construir
+  build: Permitir ediciones de bloques
+  use-name: Uso
+  use: Permitir usar bloques
+  chest-name: Cofre
+  chest: Permitir usar contenedores
+  mobs-name: Mobs
+  mobs: Permitir que los mobs aparezcan
+  portals-name: Portales
+  portals: Permitir que los jugadores usen portales
+  enter-name: Entrar
+  enter: Permitir que los jugadores entren
+  exit-name: Salir
+  exit: Permitir que los jugadores salgan
+  capture-name: Captura
+  capture: Permitir que este pueblo sea capturado
+  claim-name: Reclamacion
+  claim: Permitir que los jugadores reclamen tierra
+  unclaim-name: Desreclamacion
+  unclaim: Permitir que los jugadores desreclamen tierra
+  upgrade-name: Mejora
+  upgrade: Permitir que los jugadores mejoren este pueblo
+  plots-name: Parcelas
+  plots: Permitir que los jugadores establezcan parcelas del pueblo
+  peaceful-name: Pacifico
+  peaceful: Hacer un reino solo pacifico
+  golems-name: Golems
+  golems: Habilitar golems de hierro para atacar enemigos
+  join-name: Unirse
+  join: Permitir que los jugadores se unan
+  leave-name: Salir
+  leave: Permitir que los jugadores salgan
+  promote-name: Promover
+  promote: Permitir la promoción de jugadores
+  demote-name: Degradar
+  demote: Permitir la degradación de jugadores
+  transfer-name: Transferir
+  transfer: Permitir la transferencia de propiedad
+  shop-name: Tienda
+  shop: Permitir que los jugadores creen tiendas
+  arena-name: Arena
+  arena: Permitir que cualquier jugador luche entre sí
+discord-srv:
+  discord: Discord
+  no-link: No estás vinculado a Discord. Escribe /discord link
+  no-user: No se pudo encontrar el usuario de Discord con el que estás vinculado.
+  linked-user: Estás vinculado a %s en Discord.

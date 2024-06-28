@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.display.icon;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonUpgrade;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemFlag;
@@ -34,14 +35,6 @@ public class UpgradeIcon implements MenuIcon{
 	}
 
 	private ItemStack initItem() {
-		ItemStack item = new ItemStack(upgrade.getIcon(),1);
-		ItemMeta meta = item.getItemMeta();
-		assert meta != null;
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
 		List<String> loreList = new ArrayList<>();
 		loreList.add(loreColor+MessagePath.LABEL_LEVEL.getMessage()+" "+level);
 		loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
@@ -49,10 +42,8 @@ public class UpgradeIcon implements MenuIcon{
 		for(String line : Konquest.stringPaginate(upgrade.getLevelDescription(level))) {
 			loreList.add(loreColor+line);
 		}
-		meta.setDisplayName(ChatColor.GOLD+upgrade.getDescription());
-		meta.setLore(loreList);
-		item.setItemMeta(meta);
-		return item;
+		String name = ChatColor.GOLD+upgrade.getDescription();
+		return CompatibilityUtil.buildItem(upgrade.getIcon(), name, loreList);
 	}
 	
 	public KonUpgrade getUpgrade() {

@@ -186,7 +186,7 @@ public class PlotMenu implements ViewableMenu {
 						loreList.clear();
 						isPlot = false;
 					}
-					// Add render for editPloy
+					// Add render for editPlot
 					if(editPlot != null && editPlot.hasPoint(drawPoint)) {
 						landMat = Material.GLASS_PANE;
 						landTitle = ChatColor.WHITE+MessagePath.MENU_PLOTS_EDITING_PLOT.getMessage()+" | "+drawPoint.x+","+drawPoint.y;
@@ -217,6 +217,7 @@ public class PlotMenu implements ViewableMenu {
 					if(Konquest.toPoint(town.getCenterLoc()).equals(drawPoint)) {
 						isClickable = false;
 						loreList.clear();
+						loreList.add(ChatColor.GOLD+town.getName());
 						loreList.add(ChatColor.YELLOW+MessagePath.MENU_PLOTS_TOWN_MONUMENT.getMessage());
 						landMat = Material.OBSIDIAN;
 					}
@@ -642,6 +643,7 @@ public class PlotMenu implements ViewableMenu {
 	 */
 	private void refreshNavigationButtons(PlotState context) {
 		DisplayMenu view = views.get(context);
+		if (view == null) return;
 		int navStart = view.getInventory().getSize()-9;
 		if(navStart < 0) {
 			ChatUtil.printDebug("Plot menu nav buttons failed to refresh in context "+context.toString());
@@ -720,36 +722,36 @@ public class PlotMenu implements ViewableMenu {
 		String result = "";
 		switch(context) {
 			case ROOT:
-				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_PLOTS.getMessage();
+				result = ChatColor.BLACK+MessagePath.MENU_PLOTS_TITLE_PLOTS.getMessage();
 				break;
 			case ROOT_CREATE:
-				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_CREATE.getMessage();
+				result = ChatColor.BLACK+MessagePath.MENU_PLOTS_TITLE_CREATE.getMessage();
 				break;
 			case ROOT_DELETE:
-				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_DELETE.getMessage();
+				result = ChatColor.BLACK+MessagePath.MENU_PLOTS_TITLE_DELETE.getMessage();
 				break;
 			case ROOT_EDIT:
-				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_EDIT.getMessage();
+				result = ChatColor.BLACK+MessagePath.MENU_PLOTS_TITLE_EDIT.getMessage();
 				break;
 			case CREATE_LAND_ADD:
 			case EDIT_LAND_ADD:
-				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_ADD_LAND.getMessage();
+				result = ChatColor.BLACK+MessagePath.MENU_PLOTS_TITLE_ADD_LAND.getMessage();
 				break;
 			case CREATE_PLAYER_ADD:
 			case EDIT_PLAYER_ADD:
-				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_ADD_PLAYERS.getMessage();
+				result = ChatColor.BLACK+MessagePath.MENU_PLOTS_TITLE_ADD_PLAYERS.getMessage();
 				break;
 			case EDIT:
-				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_EDIT_OPTIONS.getMessage();
+				result = ChatColor.BLACK+MessagePath.MENU_PLOTS_TITLE_EDIT_OPTIONS.getMessage();
 				break;
 			case EDIT_LAND_REMOVE:
-				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_REMOVE_LAND.getMessage();
+				result = ChatColor.BLACK+MessagePath.MENU_PLOTS_TITLE_REMOVE_LAND.getMessage();
 				break;
 			case EDIT_PLAYER_SHOW:
-				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_SHOW_PLAYERS.getMessage();
+				result = ChatColor.BLACK+MessagePath.MENU_PLOTS_TITLE_SHOW_PLAYERS.getMessage();
 				break;
 			case EDIT_PLAYER_REMOVE:
-				result = ChatColor.BLACK+town.getName()+" "+MessagePath.MENU_PLOTS_TITLE_REMOVE_PLAYERS.getMessage();
+				result = ChatColor.BLACK+MessagePath.MENU_PLOTS_TITLE_REMOVE_PLAYERS.getMessage();
 				break;
 			default:
 				break;

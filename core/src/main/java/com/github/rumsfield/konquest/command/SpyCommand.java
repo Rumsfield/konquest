@@ -24,116 +24,112 @@ import java.util.List;
 
 public class SpyCommand extends CommandBase {
 
-	public SpyCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public SpyCommand() {
+		// Define name and sender support
+		super("spy",true, false);
+		// No Arguments
     }
 
 	@Override
-	public void execute() {
-		// k spy
-		Player bukkitPlayer = (Player) getSender();
-    	if (getArgs().length != 1) {
-			sendInvalidArgMessage(bukkitPlayer,CommandType.SPY);
-		} else {
-        	World bukkitWorld = bukkitPlayer.getWorld();
-        	// Verify allowed world
-        	if(!getKonquest().isWorldValid(bukkitWorld)) {
-        		ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
-                return;
-        	}
-        	
-        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-    			ChatUtil.printDebug("Failed to find non-existent player");
-    			ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-    			return;
-    		}
-        	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-        	// Verify enough favor
-        	double cost = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_SPY.getPath(),0.0);
-			if(cost > 0) {
-				if(KonquestPlugin.getBalance(bukkitPlayer) < cost) {
-					ChatUtil.sendError((Player) getSender(), MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
-                    return;
-				}
+	public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		// Sender must be player
+		KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
+		if (player == null) {
+			sendInvalidSenderMessage(sender);
+			return;
+		}
+		if (!args.isEmpty()) {
+			sendInvalidArgMessage(sender);
+			return;
+		}
+		Player bukkitPlayer = player.getBukkitPlayer();
+		World bukkitWorld = bukkitPlayer.getWorld();
+		// Verify allowed world
+		if(!konquest.isWorldValid(bukkitWorld)) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+			return;
+		}
+		// Verify enough favor
+		double cost = konquest.getCore().getDouble(CorePath.FAVOR_COST_SPY.getPath(),0.0);
+		if(cost > 0) {
+			if(KonquestPlugin.getBalance(bukkitPlayer) < cost) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(cost));
+				return;
 			}
-			
-			// Verify enough inventory space to place map
-			if(bukkitPlayer.getInventory().firstEmpty() == -1) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SPY_ERROR_INVENTORY.getMessage());
-                return;
-			}
-			
-			// Find the nearest enemy town
-			KonKingdom playerKingdom = player.getKingdom();
-			List<KonKingdom> enemyKingdoms = playerKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.WAR);
-			KonTerritory closestTerritory = null;
-			int minDistance = Integer.MAX_VALUE;
-			for(KonKingdom kingdom : enemyKingdoms) {
-				for(KonTown town : kingdom.getCapitalTowns()) {
-					// Only find enemy towns which do not have the counter-intelligence upgrade level 1+
-					int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.COUNTER);
-					if(upgradeLevel < 1) {
-						int townDist = Konquest.chunkDistance(bukkitPlayer.getLocation(), town.getCenterLoc());
-						if(townDist != -1 && townDist < minDistance) {
-							minDistance = townDist;
-							closestTerritory = town;
-						}
+		}
+		// Verify enough inventory space to place map
+		if(bukkitPlayer.getInventory().firstEmpty() == -1) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SPY_ERROR_INVENTORY.getMessage());
+			return;
+		}
+		// Find the nearest enemy town
+		KonKingdom playerKingdom = player.getKingdom();
+		List<KonKingdom> enemyKingdoms = playerKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.WAR);
+		KonTerritory closestTerritory = null;
+		int minDistance = Integer.MAX_VALUE;
+		for(KonKingdom kingdom : enemyKingdoms) {
+			for(KonTown town : kingdom.getCapitalTowns()) {
+				// Only find enemy towns which do not have the counter-intelligence upgrade level 1+
+				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.COUNTER);
+				if(upgradeLevel < 1) {
+					int townDist = Konquest.chunkDistance(bukkitPlayer.getLocation(), town.getCenterLoc());
+					if(townDist != -1 && townDist < minDistance) {
+						minDistance = townDist;
+						closestTerritory = town;
 					}
 				}
 			}
-			if(closestTerritory == null) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SPY_ERROR_TOWN.getMessage());
-                return;
+		}
+		if(closestTerritory == null) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_SPY_ERROR_TOWN.getMessage());
+			return;
+		}
+		// Generate map item
+		ChatUtil.printDebug("Generating map...");
+		ItemStack item = new ItemStack(Material.FILLED_MAP, 1);
+		MapMeta meta = (MapMeta)item.getItemMeta();
+		meta.setColor(Color.RED);
+		meta.setLocationName(closestTerritory.getName());
+		MapView view = Bukkit.getServer().createMap(bukkitPlayer.getWorld());
+		//view.addRenderer(new KonMapRenderer(closestTerritory.getName()));
+		view.setCenterX(closestTerritory.getCenterLoc().getBlockX());
+		view.setCenterZ(closestTerritory.getCenterLoc().getBlockZ());
+		view.setScale(Scale.FARTHEST);
+		view.setTrackingPosition(true);
+		view.setUnlimitedTracking(true);
+		view.setLocked(false);
+		for(MapRenderer ren : view.getRenderers()) {
+			if(ren != null) {
+				ren.initialize(view);
 			}
-			
-			// Generate map item
-			ChatUtil.printDebug("Generating map...");
-			ItemStack item = new ItemStack(Material.FILLED_MAP, 1);
-			MapMeta meta = (MapMeta)item.getItemMeta();
-			meta.setColor(Color.RED);
-			meta.setLocationName(closestTerritory.getName());
-			MapView view = Bukkit.getServer().createMap(bukkitPlayer.getWorld());
-			//view.addRenderer(new KonMapRenderer(closestTerritory.getName()));
-			view.setCenterX(closestTerritory.getCenterLoc().getBlockX());
-			view.setCenterZ(closestTerritory.getCenterLoc().getBlockZ());
-			view.setScale(Scale.FARTHEST);
-			view.setTrackingPosition(true);
-			view.setUnlimitedTracking(true);
-			view.setLocked(false);
-			for(MapRenderer ren : view.getRenderers()) {
-				if(ren != null) {
-					ren.initialize(view);
-				}
-			}
-			meta.setMapView(view);
-			meta.setLore(Arrays.asList(ChatColor.RESET+""+ChatColor.AQUA+closestTerritory.getName(),ChatColor.RED+"Spy Map",ChatColor.YELLOW+"Centered on an enemy Town"));
-			item.setItemMeta(meta);
-			// Place map item in player's inventory
-			PlayerInventory inv = bukkitPlayer.getInventory();
-			inv.setItem(inv.firstEmpty(), inv.getItemInMainHand());
-			inv.setItemInMainHand(item);
-			
-            if(KonquestPlugin.withdrawPlayer(bukkitPlayer, cost)) {
-            	getKonquest().getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)cost);
-            }
-            
-			String dist;
-			if(minDistance < 32) {
-				dist = MessagePath.COMMAND_SPY_NOTICE_NEARBY.getMessage();
-			} else if (minDistance < 64) {
-				dist = MessagePath.COMMAND_SPY_NOTICE_REGIONAL.getMessage();
-			} else if (minDistance < 128) {
-				dist = MessagePath.COMMAND_SPY_NOTICE_FARAWAY.getMessage();
-			} else {
-				dist = MessagePath.COMMAND_SPY_NOTICE_VERY_DISTANT.getMessage();
-			}
-			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SPY_NOTICE_SUCCESS.getMessage(dist));
-        }
-		
+		}
+		meta.setMapView(view);
+		meta.setLore(Arrays.asList(ChatColor.RESET+""+ChatColor.AQUA+closestTerritory.getName(),ChatColor.RED+"Spy Map",ChatColor.YELLOW+"Centered on an enemy Town"));
+		item.setItemMeta(meta);
+		// Place map item in player's inventory
+		PlayerInventory inv = bukkitPlayer.getInventory();
+		inv.setItem(inv.firstEmpty(), inv.getItemInMainHand());
+		inv.setItemInMainHand(item);
+
+		if(KonquestPlugin.withdrawPlayer(bukkitPlayer, cost)) {
+			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)cost);
+		}
+
+		String dist;
+		if(minDistance < 32) {
+			dist = MessagePath.COMMAND_SPY_NOTICE_NEARBY.getMessage();
+		} else if (minDistance < 64) {
+			dist = MessagePath.COMMAND_SPY_NOTICE_REGIONAL.getMessage();
+		} else if (minDistance < 128) {
+			dist = MessagePath.COMMAND_SPY_NOTICE_FARAWAY.getMessage();
+		} else {
+			dist = MessagePath.COMMAND_SPY_NOTICE_VERY_DISTANT.getMessage();
+		}
+		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SPY_NOTICE_SUCCESS.getMessage(dist));
 	}
 
 	@Override
-	public List<String> tabComplete() {
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		// No arguments to complete
 		return Collections.emptyList();
 	}

@@ -47,12 +47,13 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private UUID lord;
 	private final HashMap<UUID,Boolean> residents;
 	private final RequestKeeper joinRequestKeeper;
-	private boolean isOpen;
-	private boolean isAlliedBuildingAllowed;
-	private boolean isFriendlyRedstoneAllowed;
-	private boolean isEnemyRedstoneAllowed;
-	private boolean isResidentPlotOnly;
-	private boolean isGolemOffensive;
+	private HashMap<KonTownOption,Boolean> townOptions;
+//	private boolean isOpen;
+//	private boolean isAlliedBuildingAllowed;
+//	private boolean isFriendlyRedstoneAllowed;
+//	private boolean isEnemyRedstoneAllowed;
+//	private boolean isResidentPlotOnly;
+//	private boolean isGolemOffensive;
 	private boolean isAttacked;
 	private boolean isShielded;
 	private boolean isArmored;
@@ -100,12 +101,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.lord = null; // init with no lord
 		this.residents = new HashMap<>();
 		this.joinRequestKeeper = new RequestKeeper();
-		this.isOpen = false; // init as a closed Town, requires Lord to add players as residents for build/container perms
-		this.isAlliedBuildingAllowed = false;
-		this.isFriendlyRedstoneAllowed = true;
-		this.isEnemyRedstoneAllowed = false;
-		this.isResidentPlotOnly = false;
-		this.isGolemOffensive = false;
 		this.isAttacked = false;
 		this.isShielded = false;
 		this.shieldEndTimeSeconds = 0;
@@ -118,9 +113,18 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.disabledUpgrades = new HashMap<>();
 		this.rabbit = new KonTownRabbit(getSpawnLoc());
 		this.plots = new HashMap<>();
+		this.townOptions = new HashMap<>();
+		initOptions();
 		this.properties = new HashMap<>();
 		initProperties();
 		this.specialization = Villager.Profession.NONE;
+	}
+
+	private void initOptions() {
+		townOptions.clear();
+		for (KonTownOption option : KonTownOption.values()) {
+			townOptions.put(option,option.getDefaultValue());
+		}
 	}
 
 	public static List<KonPropertyFlag> getProperties() {
@@ -305,6 +309,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		int maxChunkRange = getKonquest().getCore().getInt(CorePath.TOWNS_MAX_SIZE.getPath());
 		if(maxChunkRange < 0) {
 			maxChunkRange = 0;
+		}
+		int initRange = getKonquest().getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath());
+		if(initRange > 0 && maxChunkRange < initRange) {
+			maxChunkRange = initRange;
 		}
 		if(maxChunkRange >= 1) {
 			int distX = (int)Math.abs(point.getX() - centerChunk.getX());
@@ -1166,53 +1174,77 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			}
 		}
     }
-	
+
+	/*
+		Town Options
+	 */
+
+	public boolean setTownOption(KonTownOption option, boolean value) {
+		if (townOptions.containsKey(option)) {
+			// Set valid option
+			townOptions.put(option,value);
+			return true;
+		}
+		// No valid option
+		return false;
+	}
+
+	public boolean getTownOption(KonTownOption option) {
+		if (townOptions.containsKey(option)) {
+			// Get valid option
+			return townOptions.get(option);
+		}
+		// No valid option
+		return false;
+	}
+
+	/* Legacy Methods */
 	public void setIsOpen(boolean val) {
-		isOpen = val;
+		townOptions.put(KonTownOption.OPEN,val);
 	}
 	
 	public boolean isOpen() {
-		return isOpen;
+		return townOptions.get(KonTownOption.OPEN);
 	}
 
 	public void setIsAlliedBuildingAllowed(boolean val) {
-		isAlliedBuildingAllowed = val;
+		townOptions.put(KonTownOption.ALLIED_BUILDING,val);
 	}
 
 	public boolean isAlliedBuildingAllowed() {
-		return isAlliedBuildingAllowed;
+		return townOptions.get(KonTownOption.ALLIED_BUILDING);
 	}
 
 	public void setIsFriendlyRedstoneAllowed(boolean val) {
-		isFriendlyRedstoneAllowed = val;
+		townOptions.put(KonTownOption.FRIENDLY_REDSTONE,val);
 	}
 
 	public boolean isFriendlyRedstoneAllowed() {
-		return isFriendlyRedstoneAllowed;
+		return townOptions.get(KonTownOption.FRIENDLY_REDSTONE);
 	}
 
 	public void setIsEnemyRedstoneAllowed(boolean val) {
-		isEnemyRedstoneAllowed = val;
+		townOptions.put(KonTownOption.ENEMY_REDSTONE,val);
 	}
 	
 	public boolean isEnemyRedstoneAllowed() {
-		return isEnemyRedstoneAllowed;
+		return townOptions.get(KonTownOption.ENEMY_REDSTONE);
 	}
 	
 	public void setIsPlotOnly(boolean val) {
-		isResidentPlotOnly = val;
+		townOptions.put(KonTownOption.PLOTS_ONLY,val);
 	}
 	
 	public boolean isPlotOnly() {
-		return isResidentPlotOnly;
+		return townOptions.get(KonTownOption.PLOTS_ONLY);
 	}
 	
 	public void setIsGolemOffensive(boolean val) {
-		isGolemOffensive = val;
+		townOptions.put(KonTownOption.GOLEM_OFFENSE,val);
 	}
 	
 	public boolean isGolemOffensive() {
-		return isGolemOffensive;
+		return townOptions.get(KonTownOption.GOLEM_OFFENSE);
 	}
 
 	/*
@@ -1244,11 +1276,15 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public void setPlayerLord(OfflinePlayer player) {
 		setLord(player.getUniqueId());
 	}
-	
+
 	public void setLord(UUID id) {
+		setLord(id, true);
+	}
+
+	public void setLord(UUID id, boolean doUpdates) {
 		lord = id;
-		if(!residents.containsKey(id)) {
-			residents.put(id,true);
+		residents.put(id,true);
+		if (doUpdates) {
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
 			getKonquest().getMapHandler().drawLabel(this);
 		}
@@ -1257,7 +1293,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public boolean isLord(UUID id) {
 		boolean status = false;
 		if(lord != null) {
-			status =id.equals(lord);
+			status = id.equals(lord);
 		}
 		return status;
 	}
@@ -1265,7 +1301,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public boolean isPlayerLord(OfflinePlayer player) {
 		return isLord(player.getUniqueId());
 	}
-	
+
+	// Changes resident's knight flag, cannot be lord
 	public boolean setPlayerKnight(OfflinePlayer player, boolean val) {
 		boolean status = true;
 		UUID playerUUID = player.getUniqueId();
@@ -1281,21 +1318,27 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public boolean isPlayerKnight(OfflinePlayer player) {
 		boolean status = true;
 		UUID playerUUID = player.getUniqueId();
-		if(residents.containsKey(playerUUID)) {
+		if(residents.containsKey(playerUUID) || isLord(playerUUID)) {
 			status = residents.get(playerUUID);
 		} else {
 			status = false;
 		}
 		return status;
 	}
-	
+
 	public boolean addPlayerResident(OfflinePlayer player, boolean isElite) {
+		return addPlayerResident(player, isElite, true);
+	}
+	
+	public boolean addPlayerResident(OfflinePlayer player, boolean isElite, boolean doUpdates) {
 		boolean status = false;
 		UUID playerUUID = player.getUniqueId();
 		if(!residents.containsKey(playerUUID)) {
 			residents.put(playerUUID,isElite);
-			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-			getKonquest().getMapHandler().drawLabel(this);
+			if (doUpdates) {
+				getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
+				getKonquest().getMapHandler().drawLabel(this);
+			}
 			status = true;
 		}
 		return status;

@@ -15,191 +15,230 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class MonumentAdminCommand extends CommandBase {
 	
-	public MonumentAdminCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public MonumentAdminCommand() {
+		// Define name and sender support
+		super("monument",true, true);
+		// Define arguments
+		// create <name> [<cost>]
+		addArgument(
+				newArg("create",true,false)
+						.sub( newArg("name",false,true)
+								.sub (newArg("cost",false,false) ) )
+		);
+		// reset <monument> [<cost>]
+		addArgument(
+				newArg("reset",true,false)
+						.sub( newArg("monument",false,true)
+								.sub (newArg("cost",false,false) ) )
+		);
+		// rename <monument> <name>
+		addArgument(
+				newArg("rename",true,false)
+						.sub( newArg("monument",false,false)
+								.sub (newArg("name",false,false) ) )
+		);
+		// remove|show|status <monument>
+		List<String> argNames = Arrays.asList("remove", "show", "status");
+		addArgument(
+				newArg(argNames,true,false)
+						.sub( newArg("monument",false,false) )
+		);
     }
 
-    public void execute() {
-    	// k admin monument create|remove|reset|show|status <name> [<cost>]
-		Player bukkitPlayer = (Player) getSender();
-    	if (getArgs().length != 4 && getArgs().length != 5) {
-			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.MONUMENT);
-		} else {
-        	World bukkitWorld = bukkitPlayer.getWorld();
-        	KonPlayer player = getKonquest().getPlayerManager().getPlayer(bukkitPlayer);
-        	
-        	if(getKonquest().isWorldIgnored(bukkitWorld)) {
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
-                return;
-        	}
-        	
-        	if(!getKonquest().getPlayerManager().isOnlinePlayer(bukkitPlayer)) {
-    			ChatUtil.printDebug("Failed to find non-existent player");
-    			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
-    			return;
-    		}
-        	
-        	if(player.isSettingRegion()) {
-        		ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_REGION.getMessage());
-                return;
-        	}
-
-        	String cmdMode = getArgs()[2];
-        	String templateName = getArgs()[3];
-        	if(cmdMode.equalsIgnoreCase("create")) {
-				// Creating a new template
-				double costNum = 0;
-				if (getArgs().length == 5) {
-					try {
-						costNum = Double.parseDouble(getArgs()[4]);
-					} catch (NumberFormatException e) {
-						ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_VALUE.getMessage());
-						ChatUtil.sendError(bukkitPlayer, e.getMessage());
-						return;
-					}
-					costNum = Math.max(costNum, 0);
-				}
-				// Validate name first
-				if (getKonquest().validateName(templateName, bukkitPlayer) != 0) {
-					return;
-				}
-				// Begin region setting flow
-				player.settingRegion(RegionType.MONUMENT);
-				player.setRegionTemplateName(templateName);
-				player.setRegionTemplateCost(costNum);
-				// Send flow messages
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_1.getMessage(), ChatColor.LIGHT_PURPLE);
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
-			} else if(cmdMode.equalsIgnoreCase("reset")) {
-				// Resetting an existing template fields
-				if (getArgs().length != 5) {
-					sendInvalidArgMessage(bukkitPlayer, AdminCommandType.MONUMENT);
-					return;
-				}
-				double costNum = 0;
+	@Override
+    public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		// Sender must be player
+		KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
+		if (player == null) {
+			sendInvalidSenderMessage(sender);
+			return;
+		}
+		if (args.size() != 2 && args.size() != 3) {
+			sendInvalidArgMessage(sender);
+			return;
+		}
+		Location playerLoc = player.getBukkitPlayer().getLocation();
+		World bukkitWorld = playerLoc.getWorld();
+		// Check for valid world
+		if(konquest.isWorldIgnored(bukkitWorld)) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+			return;
+		}
+		// Check for prior region setting mode
+		if(player.isSettingRegion()) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_REGION.getMessage());
+			return;
+		}
+		// Parse sub-commands
+		String cmdMode = args.get(0);
+		String templateName = args.get(1);
+		if(cmdMode.equalsIgnoreCase("create")) {
+			// Creating a new template
+			double costNum = 0;
+			if (args.size() == 3) {
 				try {
-					costNum = Double.parseDouble(getArgs()[4]);
+					costNum = Double.parseDouble(args.get(2));
 				} catch (NumberFormatException e) {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_VALUE.getMessage());
-					ChatUtil.sendError(bukkitPlayer, e.getMessage());
+					ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_VALUE.getMessage());
+					ChatUtil.sendError(sender, e.getMessage());
 					return;
 				}
 				costNum = Math.max(costNum, 0);
-				// Check for existing valid template name
-				if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
+			}
+			// Validate name first
+			if (konquest.validateName(templateName, sender) != 0) {
+				return;
+			}
+			// Begin region setting flow
+			player.settingRegion(RegionType.MONUMENT);
+			player.setRegionTemplateName(templateName);
+			player.setRegionTemplateCost(costNum);
+			// Send flow messages
+			ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_1.getMessage(), ChatColor.LIGHT_PURPLE);
+			ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
+
+		} else if(cmdMode.equalsIgnoreCase("reset")) {
+			// Resetting an existing template fields
+			double costNum = 0;
+			if (args.size() == 3) {
+				try {
+					costNum = Double.parseDouble(args.get(2));
+				} catch (NumberFormatException e) {
+					ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_MONUMENT_ERROR_VALUE.getMessage());
+					ChatUtil.sendError(sender, e.getMessage());
 					return;
 				}
-				// Stop any template blanking
-				String sanctuaryName = getKonquest().getSanctuaryManager().getSanctuaryNameOfTemplate(templateName);
-				if(getKonquest().getSanctuaryManager().isSanctuary(sanctuaryName)) {
-					getKonquest().getSanctuaryManager().getSanctuary(sanctuaryName).stopTemplateBlanking(templateName);
-				}
-				// Begin region setting flow
-				player.settingRegion(RegionType.MONUMENT);
-				player.setRegionTemplateName(templateName);
-				player.setRegionTemplateCost(costNum);
-				// Send flow messages
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_1.getMessage(), ChatColor.LIGHT_PURPLE);
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
+				costNum = Math.max(costNum, 0);
+			}
+			// Check for existing valid template name
+			if(!konquest.getSanctuaryManager().isTemplate(templateName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
+				return;
+			}
+			// Stop any template blanking
+			String sanctuaryName = konquest.getSanctuaryManager().getSanctuaryNameOfTemplate(templateName);
+			if(konquest.getSanctuaryManager().isSanctuary(sanctuaryName)) {
+				konquest.getSanctuaryManager().getSanctuary(sanctuaryName).stopTemplateBlanking(templateName);
+			}
+			// Begin region setting flow
+			player.settingRegion(RegionType.MONUMENT);
+			player.setRegionTemplateName(templateName);
+			player.setRegionTemplateCost(costNum);
+			// Send flow messages
+			ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_CREATE_1.getMessage(), ChatColor.LIGHT_PURPLE);
+			ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_CLICK_AIR.getMessage());
 
-        	} else if(cmdMode.equalsIgnoreCase("remove")) {
-        		// Confirm name is a template
-        		if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {
-        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
-        			return;
-        		}
-        		// Remove template
-        		player.settingRegion(RegionType.NONE);
-        		getKonquest().getSanctuaryManager().removeMonumentTemplate(templateName);
-        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_REMOVE.getMessage(templateName));
-        		
-        	} else if(cmdMode.equalsIgnoreCase("show")) {
-        		// Confirm name is a template
-        		if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {
-        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
-        			return;
-        		}
-        		// Show template even when invalid
-    			player.settingRegion(RegionType.NONE);
-    			Location loc0 = getKonquest().getSanctuaryManager().getTemplate(templateName).getCornerOne();
-    			Location loc1 = getKonquest().getSanctuaryManager().getTemplate(templateName).getCornerTwo();
-    			player.startMonumentShow(loc0, loc1);
-    			String sanctuaryName = getKonquest().getSanctuaryManager().getSanctuaryNameOfTemplate(templateName);
-    			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SHOW.getMessage(templateName,sanctuaryName));
+		} else if(cmdMode.equalsIgnoreCase("remove")) {
+			// Confirm name is a template
+			if(!konquest.getSanctuaryManager().isTemplate(templateName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
+				return;
+			}
+			// Remove template
+			player.settingRegion(RegionType.NONE);
+			konquest.getSanctuaryManager().removeMonumentTemplate(templateName);
+			ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_REMOVE.getMessage(templateName));
 
-        	} else if(cmdMode.equalsIgnoreCase("status")) {
-        		// Confirm name is a template
-        		if(!getKonquest().getSanctuaryManager().isTemplate(templateName)) {
-        			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
-        			return;
-        		}
-        		ChatColor loreColor = ChatColor.YELLOW;
-        		ChatColor valueColor = ChatColor.AQUA;
-        		KonMonumentTemplate template = getKonquest().getSanctuaryManager().getTemplate(templateName);
-        		String tempName = template.getName();
-        		String sanctuaryName = getKonquest().getSanctuaryManager().getSanctuaryNameOfTemplate(templateName);
-				String cost = String.format("%f", template.getCost());
-        		String isValid = String.format("%s", template.isValid());
-        		String isBlanking = String.format("%s", template.isBlanking());
-        		String allBlocks = String.format("%d", template.getNumBlocks());
-        		String critBlocks = String.format("%d", template.getNumCriticals());
-        		String lootChests = String.format("%d", template.getNumLootChests());
-        		ChatUtil.sendNotice(bukkitPlayer, MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage()+" "+tempName);
-				ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_SANCTUARY.getMessage()+": "+valueColor+sanctuaryName);
-				ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
-        		ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_VALID.getMessage()+": "+valueColor+isValid);
-        		ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_MODIFIED.getMessage()+": "+valueColor+isBlanking);
-        		ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_BLOCKS.getMessage()+": "+valueColor+allBlocks);
-        		ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_CRITICAL_HITS.getMessage()+": "+valueColor+critBlocks);
-        		ChatUtil.sendMessage(bukkitPlayer, loreColor+MessagePath.LABEL_LOOT_CHESTS.getMessage()+": "+valueColor+lootChests);
-        	} else {
-				sendInvalidArgMessage(bukkitPlayer, AdminCommandType.MONUMENT);
-        	}
-        }
+		} else if(cmdMode.equalsIgnoreCase("rename")) {
+			// Confirm name is a template
+			if(!konquest.getSanctuaryManager().isTemplate(templateName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
+				return;
+			}
+			// Get the new name
+			if(args.size() != 3) {
+				sendInvalidArgMessage(sender);
+			}
+			String newTemplateName = args.get(2);
+			// Validate new name
+			if (konquest.validateName(newTemplateName, sender) != 0) {
+				return;
+			}
+			// Rename the template
+			if (konquest.getSanctuaryManager().renameMonumentTemplate(templateName,newTemplateName)) {
+				ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_RENAME.getMessage(templateName,newTemplateName));
+			} else {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+			}
+
+		} else if(cmdMode.equalsIgnoreCase("show")) {
+			// Confirm name is a template
+			if(!konquest.getSanctuaryManager().isTemplate(templateName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
+				return;
+			}
+			// Show template even when invalid
+			player.settingRegion(RegionType.NONE);
+			Location loc0 = konquest.getSanctuaryManager().getTemplate(templateName).getCornerOne();
+			Location loc1 = konquest.getSanctuaryManager().getTemplate(templateName).getCornerTwo();
+			player.startMonumentShow(loc0, loc1);
+			String sanctuaryName = konquest.getSanctuaryManager().getSanctuaryNameOfTemplate(templateName);
+			ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_MONUMENT_NOTICE_SHOW.getMessage(templateName,sanctuaryName));
+
+		} else if(cmdMode.equalsIgnoreCase("status")) {
+			// Confirm name is a template
+			if(!konquest.getSanctuaryManager().isTemplate(templateName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
+				return;
+			}
+			ChatColor loreColor = ChatColor.YELLOW;
+			ChatColor valueColor = ChatColor.AQUA;
+			KonMonumentTemplate template = konquest.getSanctuaryManager().getTemplate(templateName);
+			String tempName = template.getName();
+			String sanctuaryName = konquest.getSanctuaryManager().getSanctuaryNameOfTemplate(templateName);
+			String cost = String.format("%.2f", template.getCost());
+			String isValid = String.format("%s", template.isValid());
+			String isBlanking = String.format("%s", template.isBlanking());
+			String allBlocks = String.format("%d", template.getNumBlocks());
+			String critBlocks = String.format("%d", template.getNumCriticals());
+			String lootChests = String.format("%d", template.getNumLootChests());
+			ChatUtil.sendNotice(sender, MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage()+" "+tempName);
+			ChatUtil.sendMessage(sender, loreColor+MessagePath.LABEL_SANCTUARY.getMessage()+": "+valueColor+sanctuaryName);
+			ChatUtil.sendMessage(sender, loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
+			ChatUtil.sendMessage(sender, loreColor+MessagePath.LABEL_VALID.getMessage()+": "+valueColor+isValid);
+			ChatUtil.sendMessage(sender, loreColor+MessagePath.LABEL_MODIFIED.getMessage()+": "+valueColor+isBlanking);
+			ChatUtil.sendMessage(sender, loreColor+MessagePath.LABEL_BLOCKS.getMessage()+": "+valueColor+allBlocks);
+			ChatUtil.sendMessage(sender, loreColor+MessagePath.LABEL_CRITICAL_HITS.getMessage()+": "+valueColor+critBlocks);
+			ChatUtil.sendMessage(sender, loreColor+MessagePath.LABEL_LOOT_CHESTS.getMessage()+": "+valueColor+lootChests);
+		} else {
+			sendInvalidArgMessage(sender);
+		}
+
     }
     
     @Override
-	public List<String> tabComplete() {
-    	// k admin monument create|remove|reset|show <name> [<cost>]
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		List<String> tabList = new ArrayList<>();
-		final List<String> matchedTabList = new ArrayList<>();
-		if(getArgs().length == 3) {
-			// Suggest sub-commands
+		if (args.size() == 1) {
 			tabList.add("create");
 			tabList.add("remove");
+			tabList.add("rename");
 			tabList.add("reset");
 			tabList.add("show");
 			tabList.add("status");
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
-		} else if(getArgs().length == 4) {
-			// Suggest new name or existing name
-			String subCmd = getArgs()[2];
-			if(subCmd.equalsIgnoreCase("create")) {
+		} else if (args.size() == 2) {
+			if(args.get(0).equalsIgnoreCase("create")) {
+				// Name
 				tabList.add("***");
 			} else {
-				tabList.addAll(getKonquest().getSanctuaryManager().getAllTemplateNames());
+				// Existing templates
+				tabList.addAll(konquest.getSanctuaryManager().getAllTemplateNames());
 			}
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
-		} else if(getArgs().length == 5) {
-			// Suggest cost
-			String subCmd = getArgs()[2];
-			if(subCmd.equalsIgnoreCase("create") || subCmd.equalsIgnoreCase("reset")) {
+		} else if (args.size() == 3) {
+			if(args.get(0).equalsIgnoreCase("create") || args.get(0).equalsIgnoreCase("reset")) {
+				// Cost
 				tabList.add("#");
+			} else if (args.get(0).equalsIgnoreCase("rename")) {
+				// New name
+				tabList.add("***");
 			}
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
 		}
-		return matchedTabList;
+		return matchLastArgToList(tabList,args);
 	}
 }

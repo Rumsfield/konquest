@@ -11,319 +11,366 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * Modifies property flags of various property holder objects.
+ * The following classes are known property holders
+ * 	- KonKingdom
+ *  - KonCapital
+ * 	- KonTown
+ * 	- KonSanctuary
+ *  - KonRuin
+ */
 public class FlagAdminCommand extends CommandBase {
-	
-	public FlagAdminCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+
+	public enum HolderType {
+
+		KINGDOM     (MessagePath.LABEL_KINGDOM.getMessage()),
+		TOWN        (MessagePath.LABEL_TOWN.getMessage()),
+		CAPITAL     (MessagePath.LABEL_CAPITAL.getMessage()),
+		RUIN        (MessagePath.LABEL_RUIN.getMessage()),
+		SANCTUARY   (MessagePath.LABEL_SANCTUARY.getMessage());
+
+		private final String label;
+
+		HolderType(String label) {
+			this.label = label;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public static boolean contains(String type) {
+			for(HolderType check : HolderType.values()) {
+				if(check.toString().equalsIgnoreCase(type)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public static HolderType getType(String type) {
+			for(HolderType check : HolderType.values()) {
+				if(check.toString().equalsIgnoreCase(type)) {
+					return check;
+				}
+			}
+			return null;
+		}
+
+	}
+
+	public FlagAdminCommand() {
+		// Define name and sender support
+		super("flag",false, true);
+		// Define arguments
+		List<String> argNames = Arrays.asList("kingdom", "capital", "town", "sanctuary", "ruin");
+		List<String> valueNames = Arrays.asList("true", "false");
+		// set kingdom|capital|town|sanctuary|ruin <name> <property> true|false
+		addArgument(
+				newArg("set",true,false)
+						.sub( newArg(argNames,true,false)
+								.sub( newArg("name",false,false)
+										.sub( newArg("property",false,false)
+												.sub( newArg(valueNames,true,false) ) ) ) )
+		);
+		// show kingdom|capital|town|sanctuary|ruin <name> [<property>]
+		addArgument(
+				newArg("show",true,false)
+						.sub( newArg(argNames,true,false)
+								.sub( newArg("name",false,true)
+										.sub( newArg("property",false,false) ) ) )
+		);
+		// reset kingdom|capital|town|sanctuary|ruin <name>
+		addArgument(
+				newArg("reset",true,false)
+						.sub( newArg(argNames,true,false)
+								.sub( newArg("name",false,false) ) )
+		);
+		// resetall kingdom|capital|town|sanctuary|ruin
+		addArgument(
+				newArg("resetall",true,false)
+						.sub( newArg(argNames,true,false) )
+		);
     }
 
-	/*
-	 * The following classes are known property holders
-	 * 	- KonKingdom
-	 *  - KonCapital
-	 * 	- KonTown
-	 * 	- KonSanctuary
-	 *  - KonRuin
-	 */
-
-    public void execute() {
-    	// k admin flag kingdom|capital|town|sanctuary|ruin <name>|all [<flag>|reset] [<value>]
-		Player bukkitPlayer = (Player) getSender();
-    	if (getArgs().length != 4 && getArgs().length != 5 && getArgs().length != 6) {
-			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.FLAG);
-		} else {
-
-			String holderType = getArgs()[2];
-			holderType = holderType.toLowerCase();
-			String holderName = getArgs()[3];
-			ArrayList<KonPropertyFlagHolder> holders = new ArrayList<>();
-			boolean isAll = false;
-
-    		// Check for valid holder name
-			if (holderName.equalsIgnoreCase("all")) {
-				isAll = true;
-				// Operation on all holders of specified type
-				switch(holderType) {
-					case "kingdom":
-						holders.addAll(getKonquest().getKingdomManager().getKingdoms());
-						break;
-					case "capital":
-						for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
-							holders.add(kingdom.getCapital());
-						}
-						break;
-					case "town":
-						for(KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
-							holders.addAll(kingdom.getTowns());
-						}
-						break;
-					case "sanctuary":
-						holders.addAll(getKonquest().getSanctuaryManager().getSanctuaries());
-						break;
-					case "ruin":
-						holders.addAll(getKonquest().getRuinManager().getRuins());
-						break;
-					default:
-						break;
+	private KonPropertyFlagHolder getFlagHolder(Konquest konquest, HolderType holderType, String name) {
+		KonPropertyFlagHolder holder = null;
+		switch(holderType) {
+			case KINGDOM:
+				holder = konquest.getKingdomManager().getKingdom(name);
+				break;
+			case CAPITAL:
+				if(konquest.getKingdomManager().isKingdom(name)) {
+					// Found kingdom capital
+					holder = konquest.getKingdomManager().getKingdom(name).getCapital();
 				}
+				break;
+			case TOWN:
+				holder = konquest.getKingdomManager().getTown(name);
+				break;
+			case SANCTUARY:
+				holder = konquest.getSanctuaryManager().getSanctuary(name);
+				break;
+			case RUIN:
+				holder = konquest.getRuinManager().getRuin(name);
+				break;
+			default:
+				break;
+		}
+		return holder;
+	}
+
+	private ArrayList<KonPropertyFlagHolder> getFlagHolders(Konquest konquest, HolderType holderType) {
+		ArrayList<KonPropertyFlagHolder> holders = new ArrayList<>();
+		switch(holderType) {
+			case KINGDOM:
+				holders.addAll(konquest.getKingdomManager().getKingdoms());
+				break;
+			case CAPITAL:
+				for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+					holders.add(kingdom.getCapital());
+				}
+				break;
+			case TOWN:
+				for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+					holders.addAll(kingdom.getTowns());
+				}
+				break;
+			case SANCTUARY:
+				holders.addAll(konquest.getSanctuaryManager().getSanctuaries());
+				break;
+			case RUIN:
+				holders.addAll(konquest.getRuinManager().getRuins());
+				break;
+			default:
+				break;
+		}
+		return holders;
+	}
+
+	@Override
+    public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		if (args.size() < 2) {
+			sendInvalidArgMessage(sender);
+			return;
+		}
+		String subCmd = args.get(0);
+		String type = args.get(1);
+		String holderName = "";
+		String propertyName;
+		String valueStr;
+		KonPropertyFlagHolder holder = null;
+		KonPropertyFlag propertyFlag = null;
+		boolean propertyValue = false;
+		// Check for valid type
+		if (!HolderType.contains(type)) {
+			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(type));
+			return;
+		}
+		HolderType holderType = HolderType.getType(type);
+		assert holderType != null;
+		String holderTypeLabel = holderType.getLabel();
+		// Check for property holder
+		if (args.size() >= 3) {
+			holderName = args.get(2);
+			// Get holder
+			holder = getFlagHolder(konquest, holderType, holderName);
+			if (holder == null) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(holderName));
+				return;
+			}
+		}
+		// Check for property flag
+		if (args.size() >= 4) {
+			propertyName = args.get(3);
+			// Get Property
+			if(!KonPropertyFlag.contains(propertyName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(propertyName));
+				return;
+			}
+			propertyFlag = KonPropertyFlag.getFlag(propertyName);
+			if(!holder.hasPropertyValue(propertyFlag)) {
+				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_FLAG_ERROR_INVALID.getMessage(propertyFlag.toString(),holderTypeLabel));
+				return;
+			}
+		}
+		// Check for value
+		if (args.size() >= 5) {
+			valueStr = args.get(4);
+			// Get value
+			if (valueStr.equalsIgnoreCase("true")) {
+				propertyValue = true;
+			} else if (valueStr.equalsIgnoreCase("false")) {
+				propertyValue = false;
 			} else {
-				// Operation on single holder of given type
-				KonPropertyFlagHolder holder = null;
-				switch(holderType) {
-					case "kingdom":
-						holder = getKonquest().getKingdomManager().getKingdom(holderName);
-						break;
-					case "capital":
-						if(getKonquest().getKingdomManager().isKingdom(holderName)) {
-							// Found kingdom capital
-							holder = getKonquest().getKingdomManager().getKingdom(holderName).getCapital();
-						}
-						break;
-					case "town":
-						holder = getKonquest().getKingdomManager().getTown(holderName);
-						break;
-					case "sanctuary":
-						holder = getKonquest().getSanctuaryManager().getSanctuary(holderName);
-						break;
-					case "ruin":
-						holder = getKonquest().getRuinManager().getRuin(holderName);
-						break;
-					default:
-						break;
-				}
-				if(holder == null) {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(holderName));
+				sendInvalidArgMessage(sender);
+				return;
+			}
+		}
+		// Parse sub-commands
+		switch (subCmd.toLowerCase()) {
+			case "set":
+				// Set a new property flag value
+				if (args.size() != 5) {
+					sendInvalidArgMessage(sender);
 					return;
 				}
-				holders.add(holder);
-			}
-			// At this point, holders may be empty if "all" was used, else it should have a single element.
-			KonPropertyFlagHolder infoHolder = null;
-			if(!holders.isEmpty()) {
-				infoHolder = holders.get(0);
-			}
-			int numHolders = holders.size();
-
-    		if (getArgs().length == 4) {
-    			// k admin flag kingdom|capital|town|sanctuary|ruin <name>|all
-				if (isAll) {
-					// When multiple holders, show amount of holders and common flags
-					String header = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_ALL_PROPERTIES.getMessage() + " - " +
-							holderType + "(" + numHolders + ")";
-					ChatUtil.sendNotice(bukkitPlayer, header);
-					if(infoHolder != null) {
-						for(KonPropertyFlag flag : KonPropertyFlag.values()) {
-							if(infoHolder.hasPropertyValue(flag)) {
-								int numTrue = 0;
-								int numFalse = 0;
-								for (KonPropertyFlagHolder countHolder : holders) {
-									if(countHolder.getPropertyValue(flag)) {
-										numTrue++;
-									} else {
-										numFalse++;
-									}
-								}
-								String flagName = flag.getName();
-								String flagValues = true + "(" + numTrue + "), " + ChatColor.RED + false + "(" + numFalse + ")";
-								String flagDescription = flag.getDescription();
-								String infoLine = DisplayManager.loreFormat + flag + ": " +
-										DisplayManager.valueFormat + flagName + " = " + flagValues +
-										ChatColor.RESET + " | " + flagDescription;
-								ChatUtil.sendMessage((Player) getSender(), infoLine);
-							}
-						}
+				// Set value
+				if(holder.setPropertyValue(propertyFlag, propertyValue)) {
+					// Successfully assigned value
+					ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SET.getMessage(propertyFlag.getName(), holderName, propertyValue));
+					if(propertyFlag.equals(KonPropertyFlag.ARENA) && (holder instanceof KonSanctuary || holder instanceof KonRuin)) {
+						// Update title bar
+						((KonBarDisplayer) holder).updateBarTitle();
 					}
 				} else {
-					// When single holder, list all flags with current values
-					String header = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_ALL_PROPERTIES.getMessage() + " - " +
-							holderType + " " + holderName;
-					ChatUtil.sendNotice(bukkitPlayer, header);
-					if(infoHolder != null) {
-						for(KonPropertyFlag flag : KonPropertyFlag.values()) {
-							if(infoHolder.hasPropertyValue(flag)) {
-								String flagName = flag.getName();
-								String flagValue = infoHolder.getPropertyValue(flag) ? ""+true : ChatColor.RED + ""+false;
-								String flagDescription = flag.getDescription();
-								String infoLine = DisplayManager.loreFormat + flag + ": " +
-										DisplayManager.valueFormat + flagName + " = " + flagValue +
-										ChatColor.RESET + " | " + flagDescription;
-								ChatUtil.sendMessage((Player) getSender(), infoLine);
-							}
-						}
-					}
-				}
-
-            } else if (getArgs().length > 4) {
-            	// Attempt to display a valid flag, or reset all flags, for the given holder(s)
-            	String flagNameArg = getArgs()[4];
-				KonPropertyFlag flag = KonPropertyFlag.getFlag(flagNameArg);
-				if(flagNameArg.equalsIgnoreCase("reset")) {
-					// When reset, revert all flags to the value stored in properties.yml
-					for (KonPropertyFlagHolder resetHolder : holders) {
-						resetHolder.initProperties();
-					}
-					String header = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_RESET.getMessage() + " - " +
-							holderType + "(" + numHolders + ")";
-					ChatUtil.sendNotice(bukkitPlayer, header);
+					// Failed to assign value
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_FAILED.getMessage());
 					return;
-				} else {
-					if(!KonPropertyFlag.contains(flagNameArg) || infoHolder == null) {
-						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(flagNameArg));
-						return;
-					}
-					if(!infoHolder.hasPropertyValue(flag)) {
-						ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(flagNameArg));
-						return;
-					}
 				}
-            	
-            	if (getArgs().length == 5) {
-            		// k admin flag kingdom|capital|town|sanctuary|ruin <name>|all <flag>
-					// Display single flag value(s)
-					if (isAll) {
-						// When multiple holders, display the flag and the number of true/false
-						int numTrue = 0;
-						int numFalse = 0;
-						for (KonPropertyFlagHolder countHolder : holders) {
-							if(countHolder.getPropertyValue(flag)) {
-								numTrue++;
-							} else {
-								numFalse++;
-							}
-						}
-						String header = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SINGLE_PROPERTY.getMessage() + " - " +
-								holderType + "(" + numHolders + ")";
-						ChatUtil.sendNotice(bukkitPlayer, header);
-						String flagName = flag.getName();
-						String flagValues = true + "(" + numTrue + "), " + ChatColor.RED + false + "(" + numFalse + ")";
-						String flagDescription = flag.getDescription();
-						String infoLine = DisplayManager.loreFormat + flag + ": " +
-								DisplayManager.valueFormat + flagName + " = " + flagValues +
-								ChatColor.RESET + " | " + flagDescription;
-						ChatUtil.sendMessage((Player) getSender(), infoLine);
-					} else {
-						// When single holder, display the value of the flag
-						String header = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SINGLE_PROPERTY.getMessage() + " - " +
-								holderType + " " + holderName;
-						ChatUtil.sendNotice(bukkitPlayer, header);
-						String flagName = flag.getName();
-						String flagValue = infoHolder.getPropertyValue(flag) ? ""+true : ChatColor.RED + ""+false;
-						String flagDescription = flag.getDescription();
-						String infoLine = DisplayManager.loreFormat + flag + ": " +
-								DisplayManager.valueFormat + flagName + " = " + flagValue +
-								ChatColor.RESET + " | " + flagDescription;
-						ChatUtil.sendMessage((Player) getSender(), infoLine);
-					}
-            	} else if (getArgs().length == 6) {
-            		// k admin flag kingdom|capital|town|sanctuary|ruin <name>|all <flag> <value>
-            		// Set new value for flag
-            		String flagValueArg = getArgs()[5];
-            		boolean bValue = Boolean.parseBoolean(flagValueArg);
-					for (KonPropertyFlagHolder setHolder : holders) {
-						if(setHolder.setPropertyValue(flag, bValue)) {
-							// Successfully assigned value
-							ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SET.getMessage(flag.getName(), holderName, bValue));
-							if(flag.equals(KonPropertyFlag.ARENA) && (setHolder instanceof KonSanctuary || setHolder instanceof KonRuin)) {
-								// Update title bar
-								((KonBarDisplayer) setHolder).updateBarTitle();
-							}
-						} else {
-							// Failed to assign value
-							ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_FAILED.getMessage());
-							return;
+				break;
+			case "show":
+				// Display a property flag value
+				if (args.size() != 3 && args.size() != 4) {
+					sendInvalidArgMessage(sender);
+					return;
+				}
+				if (args.size() == 3) {
+					// Display all property values
+					String header = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_ALL_PROPERTIES.getMessage() + " - " +
+							holderTypeLabel + " " + holderName;
+					ChatUtil.sendNotice(sender, header);
+					for(KonPropertyFlag flag : KonPropertyFlag.values()) {
+						if(holder.hasPropertyValue(flag)) {
+							String flagName = flag.getName();
+							String flagValue = holder.getPropertyValue(flag) ? ""+true : ChatColor.RED + ""+false;
+							String flagDescription = flag.getDescription();
+							String infoLine = DisplayManager.loreFormat + flag + ": " +
+									DisplayManager.valueFormat + flagName + " = " + flagValue +
+									ChatColor.RESET + " | " + flagDescription;
+							ChatUtil.sendMessage(sender, infoLine);
 						}
 					}
-            	}
-            }	
-    	}
+				} else if (args.size() == 4) {
+					// Display single property value
+					String header = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_SINGLE_PROPERTY.getMessage() + " - " +
+							holderTypeLabel + " " + holderName;
+					ChatUtil.sendNotice(sender, header);
+					String flagName = propertyFlag.getName();
+					String flagValue = holder.getPropertyValue(propertyFlag) ? ""+true : ChatColor.RED + ""+false;
+					String flagDescription = propertyFlag.getDescription();
+					String infoLine = DisplayManager.loreFormat + propertyFlag + ": " +
+							DisplayManager.valueFormat + flagName + " = " + flagValue +
+							ChatColor.RESET + " | " + flagDescription;
+					ChatUtil.sendMessage(sender, infoLine);
+				}
+				break;
+			case "reset":
+				// Reset a holder from properties.yml
+				if (args.size() != 3) {
+					sendInvalidArgMessage(sender);
+					return;
+				}
+				holder.initProperties();
+				String singleHeader = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_RESET.getMessage() + " - " +
+						holderTypeLabel + "(" + 1 + ")";
+				ChatUtil.sendNotice(sender, singleHeader);
+				break;
+			case "resetall":
+				// Reset all holders of the given type from properties.yml
+				if (args.size() != 2) {
+					sendInvalidArgMessage(sender);
+					return;
+				}
+				ArrayList<KonPropertyFlagHolder> holders = getFlagHolders(konquest, holderType);
+				for (KonPropertyFlagHolder aHolder : holders) {
+					aHolder.initProperties();
+				}
+				String multiHeader = MessagePath.COMMAND_ADMIN_FLAG_NOTICE_RESET.getMessage() + " - " +
+						holderTypeLabel + "(" + holders.size() + ")";
+				ChatUtil.sendNotice(sender, multiHeader);
+				break;
+			default:
+				sendInvalidArgMessage(sender);
+				break;
+		}
     }
     
     @Override
-	public List<String> tabComplete() {
-    	// k admin flag kingdom|capital|town|sanctuary|ruin <name> [<flag>] [<value>]
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		List<String> tabList = new ArrayList<>();
-		final List<String> matchedTabList = new ArrayList<>();
-
-		if(getArgs().length == 3) {
+		if (args.size() == 1) {
+			// Suggest sub-commands
+			tabList.add("show");
+			tabList.add("set");
+			tabList.add("reset");
+			tabList.add("resetall");
+		} else if (args.size() == 2) {
 			// Suggest all types
 			tabList.add("kingdom");
 			tabList.add("capital");
 			tabList.add("town");
 			tabList.add("sanctuary");
 			tabList.add("ruin");
-			// Trim down completion options based on current input
-			StringUtil.copyPartialMatches(getArgs()[2], tabList, matchedTabList);
-			Collections.sort(matchedTabList);
-		} else if(getArgs().length > 3) {
-			String holderType = getArgs()[2];
-			holderType = holderType.toLowerCase();
-			if(getArgs().length == 4) {
+		} else if (args.size() == 3) {
+			if (args.get(0).equalsIgnoreCase("set") || args.get(0).equalsIgnoreCase("show") || args.get(0).equalsIgnoreCase("reset")) {
 				// Suggest all known property holders
-				switch(holderType) {
+				switch(args.get(1).toLowerCase()) {
 					case "kingdom":
 					case "capital":
-						tabList.addAll(getKonquest().getKingdomManager().getKingdomNames());
+						tabList.addAll(konquest.getKingdomManager().getKingdomNames());
 						break;
 					case "town":
-						tabList.addAll(getKonquest().getKingdomManager().getTownNames());
+						tabList.addAll(konquest.getKingdomManager().getTownNames());
 						break;
 					case "sanctuary":
-						tabList.addAll(getKonquest().getSanctuaryManager().getSanctuaryNames());
+						tabList.addAll(konquest.getSanctuaryManager().getSanctuaryNames());
 						break;
 					case "ruin":
-						tabList.addAll(getKonquest().getRuinManager().getRuinNames());
+						tabList.addAll(konquest.getRuinManager().getRuinNames());
 						break;
 					default:
 						break;
 				}
-				tabList.add("all");
-				// Trim down completion options based on current input
-				StringUtil.copyPartialMatches(getArgs()[3], tabList, matchedTabList);
-				Collections.sort(matchedTabList);
-			} else if(getArgs().length == 5) {
+			}
+		} else if (args.size() == 4) {
+			if (args.get(0).equalsIgnoreCase("set") || args.get(0).equalsIgnoreCase("show")) {
 				// Suggest properties
-				ArrayList<KonPropertyFlag> flags = new ArrayList<>();
-				switch(holderType) {
+				switch (args.get(1).toLowerCase()) {
 					case "kingdom":
-						flags.addAll(KonKingdom.getProperties());
+						for (KonPropertyFlag flag : KonKingdom.getProperties()) {
+							tabList.add(flag.toString());
+						}
 						break;
 					case "capital":
 					case "town":
-						flags.addAll(KonTown.getProperties());
+						for (KonPropertyFlag flag : KonTown.getProperties()) {
+							tabList.add(flag.toString());
+						}
 						break;
 					case "sanctuary":
-						flags.addAll(KonSanctuary.getProperties());
+						for (KonPropertyFlag flag : KonSanctuary.getProperties()) {
+							tabList.add(flag.toString());
+						}
 						break;
 					case "ruin":
-						flags.addAll(KonRuin.getProperties());
+						for (KonPropertyFlag flag : KonRuin.getProperties()) {
+							tabList.add(flag.toString());
+						}
 						break;
 					default:
 						break;
 				}
-				for(KonPropertyFlag flag : flags) {
-					tabList.add(flag.toString());
-				}
-				tabList.add("reset");
-				// Trim down completion options based on current input
-				StringUtil.copyPartialMatches(getArgs()[4], tabList, matchedTabList);
-				Collections.sort(matchedTabList);
-			} else if(getArgs().length == 6) {
-				String flagName = getArgs()[4];
-				if(!flagName.equalsIgnoreCase("reset")) {
-					// Suggest values
-					tabList.add(String.valueOf(true));
-					tabList.add(String.valueOf(false));
-				}
-				// Trim down completion options based on current input
-				StringUtil.copyPartialMatches(getArgs()[5], tabList, matchedTabList);
-				Collections.sort(matchedTabList);
+			}
+		} else if (args.size() == 5) {
+			if (args.get(0).equalsIgnoreCase("set")) {
+				tabList.add("true");
+				tabList.add("false");
 			}
 		}
-		return matchedTabList;
+		return matchLastArgToList(tabList,args);
 	}
 }

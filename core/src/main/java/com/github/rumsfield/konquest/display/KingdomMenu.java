@@ -6,10 +6,7 @@ import com.github.rumsfield.konquest.display.icon.*;
 import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.manager.KingdomManager;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonMonumentTemplate;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
-import com.github.rumsfield.konquest.model.KonPlayer;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.Labeler;
@@ -40,6 +37,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		C_PROMOTE,
 		C_DEMOTE,
 		C_TRANSFER,
+		C_DESTROY,
 		C_TEMPLATE,
 		C_DISBAND
 	}
@@ -75,6 +73,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	private final int ROOT_SLOT_PROMOTE 		= 19;
 	private final int ROOT_SLOT_DEMOTE 			= 20;
 	private final int ROOT_SLOT_TRANSFER		= 21;
+	private final int ROOT_SLOT_DESTROY		    = 22;
 	private final int ROOT_SLOT_OPEN 			= 23;
 	private final int ROOT_SLOT_TEMPLATE 		= 24;
 	private final int ROOT_SLOT_DISBAND			= 25;
@@ -294,14 +293,23 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, isTransferClickable);
 					result.addIcon(icon);
 				}
-				
+
+				/* Destroy Icon */
+				if(konquest.getKingdomManager().getIsTownDestroyMasterEnable()) {
+					loreList.clear();
+					loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
+					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage(), loreColor));
+					loreList.add(hintColor + MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					icon = new InfoIcon(kingdomColor + MessagePath.MENU_TOWN_DESTROY.getMessage(), loreList, Material.TNT, ROOT_SLOT_DESTROY, true);
+					result.addIcon(icon);
+				}
+
 				/* Open/Close Button */
 				String currentValue = DisplayManager.boolean2Lang(kingdom.isOpen())+" "+DisplayManager.boolean2Symbol(kingdom.isOpen());
 				loreList.clear();
 				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 		    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
 		    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-				loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 				icon = new InfoIcon(kingdomColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.IRON_DOOR, ROOT_SLOT_OPEN, true);
 				result.addIcon(icon);
 				
@@ -643,6 +651,42 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		result = pages.get(currentPage);
 		return result;
 	}
+
+	private DisplayMenu createTownView() {
+		// A paged view of towns, only for DESTROY context
+		DisplayMenu result;
+		pages.clear();
+		currentPage = 0;
+		// List of all towns in kingdom
+		List<KonTown> towns = new ArrayList<>(kingdom.getTowns());
+		// Sort list
+		towns.sort(townComparator);
+		// Create page(s)
+		String pageLabel;
+		List<String> loreList;
+		int pageTotal = getTotalPages(towns.size());
+		int pageNum = 0;
+		ListIterator<KonTown> listIter = towns.listIterator();
+		for(int i = 0; i < pageTotal; i++) {
+			int pageRows = getNumPageRows(towns.size(), i);
+			pageLabel = getTitle(MenuState.C_DESTROY)+" "+(i+1)+"/"+pageTotal;
+			pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
+			int slotIndex = 0;
+			while(slotIndex < MAX_ICONS_PER_PAGE && listIter.hasNext()) {
+				/* Town Icon (n) */
+				KonTown currentTown = listIter.next();
+				String contextColor = Konquest.friendColor2;
+				loreList = new ArrayList<>();
+				loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_DESTROY.getMessage());
+				TownIcon icon = new TownIcon(currentTown,contextColor,loreList,slotIndex,true);
+				pages.get(pageNum).addIcon(icon);
+				slotIndex++;
+			}
+			pageNum++;
+		}
+		result = pages.get(currentPage);
+		return result;
+	}
 	
 	private DisplayMenu createPlayerView(MenuState context) {
 		// A paged view of players, with lore based on context
@@ -808,12 +852,17 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						currentState = MenuState.C_TRANSFER;
 						result = goToPlayerView(MenuState.C_TRANSFER);
 						
+					} else if(slot == ROOT_SLOT_DESTROY) {
+						// Clicked to view towns to destroy
+						currentState = MenuState.C_DESTROY;
+						result = goToTownView();
+
 					} else if(slot == ROOT_SLOT_DISBAND) {
 						// Clicked to disband kingdom
 						currentState = MenuState.C_DISBAND;
 						result = goToDisbandView();
 						
-					}  else if(slot == ROOT_SLOT_OPEN) {
+					} else if(slot == ROOT_SLOT_OPEN) {
 						// Clicked to toggle open/closed state
 						manager.menuToggleKingdomOpen(kingdom, player);
 						Konquest.playSuccessSound(player.getBukkitPlayer());
@@ -919,6 +968,14 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						playStatusSound(player.getBukkitPlayer(),status);
 					}
 					break;
+				case C_DESTROY:
+					if(clickedIcon instanceof TownIcon) {
+						TownIcon icon = (TownIcon)clickedIcon;
+						KonTown clickTown = icon.getTown();
+						boolean status = manager.menuDestroyTown(clickTown, player);
+						playStatusSound(player.getBukkitPlayer(),status);
+					}
+					break;
 				case C_TEMPLATE:
 					if(clickedIcon instanceof TemplateIcon) {
 						TemplateIcon icon = (TemplateIcon)clickedIcon;
@@ -946,15 +1003,11 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		String result = "error";
 		ChatColor color = ChatColor.BLACK;
 		if(isAdmin) {
-			color = ChatColor.GOLD;
-		}
-		String name = "";
-		if(kingdom != null) {
-			name = kingdom.getName();
+			color = ChatColor.DARK_PURPLE;
 		}
 		switch(context) {
 			case ROOT:
-				result = color+name+" "+MessagePath.MENU_KINGDOM_TITLE_ROOT.getMessage();
+				result = color+MessagePath.MENU_KINGDOM_TITLE_ROOT.getMessage();
 				break;
 			case A_JOIN:
 				result = color+MessagePath.MENU_KINGDOM_TITLE_JOIN.getMessage();
@@ -986,6 +1039,9 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			case C_TRANSFER:
 				result = color+MessagePath.MENU_KINGDOM_TITLE_TRANSFER.getMessage();
 				break;
+			case C_DESTROY:
+				result = color+MessagePath.MENU_TOWN_TITLE_DESTROY.getMessage();
+				break;
 			case C_TEMPLATE:
 				result = color+MessagePath.MENU_KINGDOM_TITLE_TEMPLATE.getMessage();
 				break;
@@ -1001,6 +1057,12 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	private DisplayMenu goToKingdomView(MenuState context) {
 		DisplayMenu result = createKingdomView(context);
 		views.put(context, result);
+		return result;
+	}
+
+	private DisplayMenu goToTownView() {
+		DisplayMenu result = createTownView();
+		views.put(MenuState.C_DESTROY, result);
 		return result;
 	}
 	
@@ -1039,6 +1101,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	 */
 	void refreshNavigationButtons(State context) {
 		DisplayMenu view = views.get(context);
+		if (view == null) return;
 		int navStart = view.getInventory().getSize()-9;
 		if(navStart < 0) {
 			ChatUtil.printDebug("Kingdom menu nav buttons failed to refresh in context "+context.toString());
@@ -1068,7 +1131,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			view.addIcon(navIconEmpty(navStart+8));
 		} else if(context.equals(MenuState.A_JOIN) || context.equals(MenuState.A_INVITE) || context.equals(MenuState.A_LIST) ||
 				context.equals(MenuState.B_RELATIONSHIP) || context.equals(MenuState.B_REQUESTS) || 
-				context.equals(MenuState.C_PROMOTE) || context.equals(MenuState.C_DEMOTE) || context.equals(MenuState.C_TRANSFER)) {
+				context.equals(MenuState.C_PROMOTE) || context.equals(MenuState.C_DEMOTE) || context.equals(MenuState.C_TRANSFER) || context.equals(MenuState.C_DESTROY)) {
 			// (back [0]) close [4], return [5] (next [8])
 			if(currentPage > 0) {
 				// Place a back button

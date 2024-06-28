@@ -22,6 +22,7 @@ public class IntegrationManager {
 	private final WorldGuardHook worldguardHook;
 	private final ProtocolLibHook protocollibHook;
 	private final PlaceholderAPIHook placeholderapiHook;
+	private final EssentialsXHook essentialsXHook;
 	
 	public IntegrationManager(Konquest konquest) {
 		this.hooks = new ArrayList<>();
@@ -35,9 +36,11 @@ public class IntegrationManager {
 		worldguardHook = new WorldGuardHook(konquest);
 		protocollibHook = new ProtocolLibHook();
 		placeholderapiHook = new PlaceholderAPIHook();
+		essentialsXHook = new EssentialsXHook(konquest);
 		// Add hooks to set
 		hooks.add(protocollibHook);
 		hooks.add(placeholderapiHook);
+		hooks.add(essentialsXHook);
 		hooks.add(luckpermsHook);
 		hooks.add(dynmapHook);
 		hooks.add(bluemapHook);
@@ -138,5 +141,9 @@ public class IntegrationManager {
 	public PlaceholderAPIHook getPlaceholderAPI() {
 		return placeholderapiHook;
 	}
-	
+
+	public EssentialsXHook getEssentialsXAPI() {
+		return essentialsXHook;
+	}
+
 }

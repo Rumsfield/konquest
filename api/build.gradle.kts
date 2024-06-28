@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies{
-    compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT") // Primary API
 }
 
 tasks {

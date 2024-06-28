@@ -20,6 +20,7 @@ public enum CorePath {
 	CHAT_TAG                                              ("core.chat.tag"),
 	CHAT_MESSAGE                                          ("core.chat.message"),
 	CHAT_DIVIDER                                          ("core.chat.divider"),
+	CHAT_ALWAYS_SHOW_TITLE                                ("core.chat.always_show_title"),
 	CHAT_ENABLE_FORMAT                                    ("core.chat.enable_format"),
 	CHAT_PRIORITY                                         ("core.chat.priority"),
 
@@ -59,7 +60,10 @@ public enum CorePath {
 	INTEGRATION_DISCORDSRV                                ("core.integration.discordsrv"),
 	INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_DIRECT      ("core.integration.discordsrv_options.raid_alert_direct"),
 	INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_CHANNEL     ("core.integration.discordsrv_options.raid_alert_channel"),
-	
+	INTEGRATION_ESSENTIALSX                               ("core.integration.essentialsx"),
+	INTEGRATION_ESSENTIALSX_OPTIONS_ENABLE_WILD_HOMES     ("core.integration.essentialsx_options.enable_wild_homes"),
+	INTEGRATION_ESSENTIALSX_OPTIONS_ENABLE_TELEPORT_PROTECTION ("core.integration.essentialsx_options.enable_teleport_protection"),
+
 	TRAVEL_ENABLE_SANCTUARY                               ("core.travel.enable.sanctuary"),
 	TRAVEL_ENABLE_TOWNS                                   ("core.travel.enable.towns"),
 	TRAVEL_ENABLE_CAPITAL                                 ("core.travel.enable.capital"),
@@ -98,6 +102,7 @@ public enum CorePath {
 	KINGDOMS_OFFLINE_TIMEOUT_EXILE                        ("core.kingdoms.offline_timeout_exile"),
 	KINGDOMS_GOLEM_ATTACK_ENEMIES                         ("core.kingdoms.golem_attack_enemies"),
 	KINGDOMS_ATTACK_FRIENDLY_GOLEMS                       ("core.kingdoms.attack_friendly_golems"),
+	KINGDOMS_MAX_PLAYER_LIMIT                             ("core.kingdoms.max_player_limit"),
 	KINGDOMS_MAX_PLAYER_DIFF                              ("core.kingdoms.max_player_diff"),
 	KINGDOMS_MAX_TOWN_LIMIT                               ("core.kingdoms.max_town_limit"),
 	KINGDOMS_MAX_TOWN_LIMIT_PER_WORLD                     ("core.kingdoms.max_town_limit_per_world"),
@@ -108,7 +113,9 @@ public enum CorePath {
 	KINGDOMS_WILD_PVP                                     ("core.kingdoms.wild_pvp"),
 	KINGDOMS_WILD_USE                                     ("core.kingdoms.wild_use"),
 	KINGDOMS_WILD_BUILD                                   ("core.kingdoms.wild_build"),
-	
+
+	TOWNS_ALLOW_DESTROY_MASTER                            ("core.towns.allow_destroy_master"),
+	TOWNS_ALLOW_DESTROY_LORD                              ("core.towns.allow_destroy_lord"),
 	TOWNS_ALLOW_UNCLAIM                                   ("core.towns.allow_unclaim"),
 	TOWNS_ALLOW_CLAIM_RADIUS                              ("core.towns.allow_claim_radius"),
 	TOWNS_ALLOW_CLAIM_AUTO                                ("core.towns.allow_claim_auto"),
@@ -118,6 +125,7 @@ public enum CorePath {
 	TOWNS_MIN_DISTANCE_SANCTUARY                          ("core.towns.min_distance_sanctuary"),
 	TOWNS_MAX_DISTANCE_ALL                                ("core.towns.max_distance_all"),
 	TOWNS_MAX_SIZE                                        ("core.towns.max_size"),
+	TOWNS_MAX_RESIDENT_LIMIT                              ("core.towns.max_resident_limit"),
 	TOWNS_SETTLE_CHECKS_DEPTH                             ("core.towns.settle_checks_depth"),
 	TOWNS_SETTLE_CHECK_FLATNESS                           ("core.towns.settle_check_flatness"),
 	TOWNS_SETTLE_OFFICER_ONLY                             ("core.towns.settle_officer_only"),

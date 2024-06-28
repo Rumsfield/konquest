@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonMonumentTemplate;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -52,14 +53,6 @@ public class TemplateIcon implements MenuIcon {
 
 	@Override
 	public ItemStack getItem() {
-		ItemStack item = new ItemStack(Material.CRAFTING_TABLE,1);
-		ItemMeta meta = item.getItemMeta();
-		assert meta != null;
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
 		List<String> itemLore = new ArrayList<>();
 		if(template != null) {
 			if(!template.isValid()) {
@@ -74,10 +67,8 @@ public class TemplateIcon implements MenuIcon {
 			itemLore.add(loreColor+MessagePath.LABEL_LOOT_CHESTS.getMessage()+": "+valueColor+template.getNumLootChests());
 		}
 		itemLore.addAll(lore);
-		meta.setDisplayName(contextColor+MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage());
-		meta.setLore(itemLore);
-		item.setItemMeta(meta);
-		return item;
+		String name = contextColor+MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage();
+		return CompatibilityUtil.buildItem(Material.CRAFTING_TABLE, name, itemLore);
 	}
 
 	@Override

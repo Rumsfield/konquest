@@ -13,7 +13,10 @@ repositories{
     // Placeholder API
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 
-    // Dynmap & QuickShop
+    // Dynmap
+    maven("https://repo.mikeprimm.com/")
+
+    // QuickShop
     maven("https://repo.codemc.io/repository/maven-public/")
 
     // ProtocolLib
@@ -32,17 +35,25 @@ repositories{
 
     // Vault, BlueMap
     maven("https://jitpack.io")
+
+    // EssentialsX
+    maven("https://repo.essentialsx.net/releases/")
+    maven("https://papermc.io/repo/repository/maven-public/")
 }
 
 dependencies{
-    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
-    compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
-    compileOnly("org.spigotmc:spigot-1.17.1-R0.1-SNAPSHOT-remapped")
-    compileOnly("org.spigotmc:spigot-1.16.5-R0.1-SNAPSHOT")
+    // Spigot
+    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT") // Primary API
+    compileOnly("org.spigotmc:spigot-1.17.1-R0.1-SNAPSHOT-remapped") // for nms packets, local lib
+    compileOnly("org.spigotmc:spigot-1.16.5-R0.1-SNAPSHOT") // for nms packets, local lib
+
+    // Integrated third-party plugins
     compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
-    compileOnly("org.maxgamer:QuickShop:5.1.2.2-SNAPSHOT")
+    compileOnly("com.github.jikoo.OpenInv:openinvapi:4.3.1")
+    compileOnly("org.maxgamer:QuickShop:5.1.2.5-SNAPSHOT")
     compileOnly("com.acrobot.chestshop:chestshop:3.12")
-    compileOnly("org.dynmap:Dynmap:3.4-beta-2-spigot")
+    compileOnly("us.dynmap:DynmapCoreAPI:3.6")
+    compileOnly("us.dynmap:dynmap-api:3.6")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
     compileOnly("com.discordsrv:discordsrv:1.27.0")
     compileOnly("me.clip:placeholderapi:2.11.2")
@@ -50,6 +61,7 @@ dependencies{
     compileOnly("com.github.BlueMap-Minecraft:BlueMapAPI:v2.6.0")
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.15")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5")
+    compileOnly("net.essentialsx:EssentialsX:2.20.1")
 
     implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("org.xerial:sqlite-jdbc:3.40.1.0")

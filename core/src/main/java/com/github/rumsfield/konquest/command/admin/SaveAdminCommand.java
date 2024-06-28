@@ -12,25 +12,25 @@ import java.util.List;
 
 public class SaveAdminCommand extends CommandBase {
 	
-	public SaveAdminCommand(Konquest konquest, CommandSender sender, String[] args) {
-        super(konquest, sender, args);
+	public SaveAdminCommand() {
+		// Define name and sender support
+		super("save",false, true);
+		// No arguments
     }
 
-    public void execute() {
-    	// k admin save
-		Player bukkitPlayer = (Player) getSender();
-    	if (getArgs().length != 2) {
-			sendInvalidArgMessage(bukkitPlayer, AdminCommandType.SAVE);
-        } else {
-
-        	getKonquest().save();
-
-        	ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_ADMIN_SAVE_NOTICE_MESSAGE.getMessage());
-        }
+	@Override
+    public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+		if (!args.isEmpty()) {
+			sendInvalidArgMessage(sender);
+			return;
+		}
+		// Save config files
+		konquest.save();
+		ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_SAVE_NOTICE_MESSAGE.getMessage());
     }
     
     @Override
-	public List<String> tabComplete() {
+	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		// No arguments to complete
 		return Collections.emptyList();
 	}

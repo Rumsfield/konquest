@@ -43,7 +43,7 @@ core:
   directive_quests: true
   
   # Reset player hearts to 20 if base value is greater than 20 on player join (true/false)
-  reset_legacy_health: true
+  reset_legacy_health: false
   
   # Minimum time in seconds between placeholder requests, use lower values for faster update rates but more lag (0 to disable, integer >= 0)
   placeholder_request_limit: 60
@@ -68,15 +68,19 @@ core:
     # %PREFIX%    Permissions group meta prefix
     # %SUFFIX%    Permissions group meta suffix
     # %KINGDOM%   Kingdom name
+    # %RANK%      Kingdom rank (master, officer, member)
     # %TITLE%     Accomplishment title
     # %NAME%      Player's name
     # %C1%        Primary relationship color
     # %C2%        Secondary relationship color
     # %CW%        Kingdom webcolor
-    message: '%PREFIX% %C1%%KINGDOM% &7| %C2%%TITLE% %C1%%NAME% %SUFFIX% '
+    message: '%PREFIX% %C1%%KINGDOM% %RANK% &7| %C2%%TITLE% %C1%%NAME% %SUFFIX% '
 
     # Text that divides the chat message format from the player's text. Use '' to disable. Use & for color codes, or hex #000000. ('string')
     divider: '&8»&r '
+
+    # (*) Should the TITLE tag always be shown (true), or can players disable their own title (false) (true/false)
+    always_show_title: false
     
     # Enable Konquest formatting chat messages, which overrides all other plugin chat formatting (true/false)
     enable_format: true
@@ -215,6 +219,18 @@ core:
       
       # Send a message to the linked kingdom channel in Discord when a critical block is broken in a town monument (true/false)
       raid_alert_channel: true
+
+    # (*) Enable plugin integration with EssentialsX (true/false)
+    essentialsx: true
+
+    # //// CORE.INTEGRATION.ESSENTIALSX_OPTIONS \\\\
+    essentialsx_options:
+
+      # Allow players to create home locations in the wild as well as friendly territory (true/false)
+      enable_wild_homes: true
+
+      # Prevent players from teleporting in enemy territory and during combat (true/false)
+      enable_teleport_protection: true
       
   # //// CORE.TRAVEL \\\\
   travel:
@@ -335,7 +351,10 @@ core:
     
     # Allow players to attack iron golems inside of friendly towns (true/false)
     attack_friendly_golems: false
-    
+
+    # Kingdoms cannot have more than this number of members (0 to disable, integer >= 0)
+    max_player_limit: 0
+
     # Kingdoms with this many players more than other Kingdoms will not accept new players (0 to disable, integer >= 0)
     max_player_diff: 0
 
@@ -368,7 +387,13 @@ core:
     
   # //// CORE.TOWNS \\\\
   towns:
-  
+
+    # Allow kingdom masters to remove any town in their kingdom, destroying all land claims (true/false)
+    allow_destroy_master: true
+
+    # Allow town lords to remove their towns, destroying all land claims (true/false)
+    allow_destroy_lord: true
+
     # Allow town lords to unclaim town land (true/false)
     allow_unclaim: true
 
@@ -394,8 +419,11 @@ core:
     # Maximum distance in chunks between Towns and all other territory (0 to disable, integer >= 0)
     max_distance_all: 99
     
-    # Maximum distance in chunks between land claims and the town center monument (0 to disable, integer >= 0)
+    # Maximum distance in chunks between land claims and the town center monument, must be greater than init_radius (0 to disable, integer >= 0)
     max_size: 16
+
+    # Towns cannot have more than this number of residents (0 to disable, integer >= 0)
+    max_resident_limit: 0
     
     # Depth below the monument base in blocks to check for excess water and air when settling a new town (0 to disable, integer >= 0)
     settle_checks_depth: 32
