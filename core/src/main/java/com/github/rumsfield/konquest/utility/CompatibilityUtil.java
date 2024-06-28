@@ -7,6 +7,8 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
@@ -14,6 +16,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -151,6 +155,7 @@ public class CompatibilityUtil {
     }
 
     private static PotionType lookupPotionType(PotionType type, boolean isExtended, boolean isUpgraded) {
+        // Try to change type to LONG or STRONG variant
         switch (type) {
             case FIRE_RESISTANCE:
                 if (isExtended) return PotionType.LONG_FIRE_RESISTANCE;
@@ -207,7 +212,8 @@ public class CompatibilityUtil {
             default:
                 break;
         }
-        return PotionType.AWKWARD;
+        // Otherwise, return type as-is
+        return type;
     }
 
     /* Class Field Name Requests */
@@ -475,6 +481,25 @@ public class CompatibilityUtil {
         return item;
     }
 
+    /* Java Class Reflection */
 
+    /**
+     * In API versions 1.20.6 and earlier, InventoryView is a class.
+     * In versions 1.21 and later, it is an interface.
+     * This method uses reflection to get the top Inventory object from the
+     * InventoryView associated with an InventoryEvent, to avoid runtime errors.
+     * @param event The generic InventoryEvent with an InventoryView to inspect.
+     * @return The top Inventory object from the event's InventoryView.
+     */
+    public static Inventory getTopInventory(InventoryEvent event) {
+        try {
+            Object view = event.getView();
+            Method getTopInventory = view.getClass().getMethod("getTopInventory");
+            getTopInventory.setAccessible(true);
+            return (Inventory) getTopInventory.invoke(view);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

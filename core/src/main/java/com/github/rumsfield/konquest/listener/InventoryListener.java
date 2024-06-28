@@ -7,10 +7,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.PlayerManager;
 import com.github.rumsfield.konquest.model.*;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.CustomCommandPath;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,6 +30,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.SmithingInventory;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 public class InventoryListener implements Listener {
@@ -209,7 +208,7 @@ public class InventoryListener implements Listener {
 		int slot = event.getRawSlot();
 		Player bukkitPlayer = (Player) event.getWhoClicked();
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-		if(player == null || slot >= event.getView().getTopInventory().getSize()) return;
+		if(player == null || slot >= CompatibilityUtil.getTopInventory(event).getSize()) return;
 		event.setResult(Event.Result.DENY);
 		event.setCancelled(true);
 		if(event.getClick().equals(ClickType.LEFT) || event.getClick().equals(ClickType.RIGHT)) {
@@ -252,14 +251,13 @@ public class InventoryListener implements Listener {
 		// Prevent placing items into loot chests
 		if(event.isCancelled()) return;
 		if(event.getClickedInventory() == null) return;
-		if(!event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) return;
-		Location inventoryLocation = event.getView().getTopInventory().getLocation();
+		if(!CompatibilityUtil.getTopInventory(event).getType().equals(InventoryType.CHEST)) return;
+		Location inventoryLocation = CompatibilityUtil.getTopInventory(event).getLocation();
 		if(inventoryLocation == null) return;
 		// Check for ignored world
 		if(konquest.isWorldIgnored(inventoryLocation)) return;
-		//ChatUtil.printDebug("Inventory clicked on raw slot "+event.getRawSlot()+"/"+event.getView().getTopInventory().getSize()+", action "+event.getAction());
 		// Check if the raw slot index is within the chest inventory
-		if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
+		if(event.getRawSlot() < CompatibilityUtil.getTopInventory(event).getSize()) {
 			// When clicking in the top (chest) inventory, only allow pickup and shift-click of items into bottom.
 			if(event.getAction().equals(InventoryAction.PICKUP_ALL) || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
 				//ChatUtil.printDebug("Ignored top inventory");
@@ -283,7 +281,7 @@ public class InventoryListener implements Listener {
 	public void onLootChestDrag(InventoryDragEvent event) {
 		// Prevent dragging items into loot chests
 		if(event.isCancelled()) return;
-		if(!event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) return;
+		if(!CompatibilityUtil.getTopInventory(event).getType().equals(InventoryType.CHEST)) return;
 		Location inventoryLocation = event.getInventory().getLocation();
 		if(inventoryLocation == null) return;
 		// Check for ignored world
@@ -291,7 +289,7 @@ public class InventoryListener implements Listener {
 		// Check if any raw slot index is within the chest inventory
 		boolean isInTop = false;
 		for(int slot : event.getRawSlots()) {
-			if(slot < event.getView().getTopInventory().getSize()) {
+			if(slot < CompatibilityUtil.getTopInventory(event).getSize()) {
 				isInTop = true;
 				break;
 			}

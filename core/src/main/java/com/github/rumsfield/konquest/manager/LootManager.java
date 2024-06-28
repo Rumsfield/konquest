@@ -166,9 +166,10 @@ public class LootManager implements Timeable{
 				// Add loot table entry
 				ItemStack potion = new ItemStack(Material.POTION, 1);
 				PotionMeta meta = CompatibilityUtil.setPotionData((PotionMeta) potion.getItemMeta(), potionType, itemExtended, itemUpgraded);
+				assert meta != null;
 				potion.setItemMeta(meta);
 				result.put(potion, itemWeight);
-				ChatUtil.printDebug("  Added loot path "+pathName+" potion "+potionName+" with extended "+itemExtended+", upgraded "+itemUpgraded+", weight "+itemWeight);
+				ChatUtil.printDebug("  Added loot path "+pathName+" potion "+meta.getBasePotionType()+" with extended "+itemExtended+", upgraded "+itemUpgraded+", weight "+itemWeight);
 			}
 		}
 		return result;
