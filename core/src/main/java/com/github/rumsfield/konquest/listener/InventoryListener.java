@@ -33,6 +33,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.SmithingInventory;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 public class InventoryListener implements Listener {
@@ -209,7 +211,7 @@ public class InventoryListener implements Listener {
 		int slot = event.getRawSlot();
 		Player bukkitPlayer = (Player) event.getWhoClicked();
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
-		if(player == null || slot >= event.getView().getTopInventory().getSize()) return;
+		if(player == null || slot >= getTopInventory(event).getSize()) return;
 		event.setResult(Event.Result.DENY);
 		event.setCancelled(true);
 		if(event.getClick().equals(ClickType.LEFT) || event.getClick().equals(ClickType.RIGHT)) {
@@ -252,14 +254,14 @@ public class InventoryListener implements Listener {
 		// Prevent placing items into loot chests
 		if(event.isCancelled()) return;
 		if(event.getClickedInventory() == null) return;
-		if(!event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) return;
-		Location inventoryLocation = event.getView().getTopInventory().getLocation();
+		if(!getTopInventory(event).getType().equals(InventoryType.CHEST)) return;
+		Location inventoryLocation = getTopInventory(event).getLocation();
 		if(inventoryLocation == null) return;
 		// Check for ignored world
 		if(konquest.isWorldIgnored(inventoryLocation)) return;
-		//ChatUtil.printDebug("Inventory clicked on raw slot "+event.getRawSlot()+"/"+event.getView().getTopInventory().getSize()+", action "+event.getAction());
+		//ChatUtil.printDebug("Inventory clicked on raw slot "+event.getRawSlot()+"/"+getTopInventory(event).getSize()+", action "+event.getAction());
 		// Check if the raw slot index is within the chest inventory
-		if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
+		if(event.getRawSlot() < getTopInventory(event).getSize()) {
 			// When clicking in the top (chest) inventory, only allow pickup and shift-click of items into bottom.
 			if(event.getAction().equals(InventoryAction.PICKUP_ALL) || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
 				//ChatUtil.printDebug("Ignored top inventory");
@@ -283,7 +285,7 @@ public class InventoryListener implements Listener {
 	public void onLootChestDrag(InventoryDragEvent event) {
 		// Prevent dragging items into loot chests
 		if(event.isCancelled()) return;
-		if(!event.getView().getTopInventory().getType().equals(InventoryType.CHEST)) return;
+		if(!getTopInventory(event).getType().equals(InventoryType.CHEST)) return;
 		Location inventoryLocation = event.getInventory().getLocation();
 		if(inventoryLocation == null) return;
 		// Check for ignored world
@@ -291,7 +293,7 @@ public class InventoryListener implements Listener {
 		// Check if any raw slot index is within the chest inventory
 		boolean isInTop = false;
 		for(int slot : event.getRawSlots()) {
-			if(slot < event.getView().getTopInventory().getSize()) {
+			if(slot < getTopInventory(event).getSize()) {
 				isInTop = true;
 				break;
 			}
@@ -467,5 +469,20 @@ public class InventoryListener implements Listener {
 		}
 
 	}
+
+	private Inventory getTopInventory(InventoryEvent event){
+		try {
+			Method getView = event.getClass().getMethod("getView");
+			Object view = getView.invoke(event);
+			Method getTopInventory = view.getClass().getMethod("getTopInventory");
+			return (Inventory) getTopInventory.invoke(view);
+		}catch(NoSuchMethodException e){
+			return null;
+		} catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
