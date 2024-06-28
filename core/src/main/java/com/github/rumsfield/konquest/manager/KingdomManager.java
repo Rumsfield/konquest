@@ -51,7 +51,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private int exileCooldownSeconds;
 	private final HashMap<UUID,Integer> joinPlayerCooldowns;
 	private final HashMap<UUID,Integer> exilePlayerCooldowns;
-	private ArrayList<DiplomacyTicket> diplomacyTickets;
+	private final ArrayList<DiplomacyTicket> diplomacyTickets;
 	private boolean isKingdomDataNull;
 
 	// Config Settings
@@ -1013,6 +1013,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * (Optionally) Removes all favor.
 	 * (Optionally) Resets their exileKingdom to Barbarians, making them look like a new player to Konquest.
 	 * Applies exile cool-down timer.
+	 * Method call setBedSpawnLocation() is known to be deprecated.
 	 * 
 	 * @param id The UUID of the player who is being exiled
 	 * @param teleport Teleport the player based on Konquest configuration when true
@@ -1028,6 +1029,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * 				9   - Unknown player ID
 	 *             -1 	- internal error
 	 */
+	@SuppressWarnings("deprecation")
 	public int exilePlayerBarbarian(UUID id, boolean teleport, boolean clearStats, boolean isFull, boolean force) {
 		
 		// Determine offline/online player
@@ -1914,6 +1916,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			kingdom.removeActiveRelation(otherKingdom);
 			otherKingdom.removeActiveRelation(kingdom);
 			ChatUtil.sendError(messageSender,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return false;
+		}
+
+		// Check for self relation
+		if(kingdom.equals(otherKingdom)) {
+			ChatUtil.sendError(messageSender,MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
 
@@ -3428,7 +3436,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	private void makeTownNerfs() {
-		townNerfs.put(PotionEffectType.SLOW_DIGGING, 0);
+		townNerfs.put(CompatibilityUtil.getMiningFatigue(), 0);
 	}
 	
 	public void applyTownNerf(KonPlayer player, KonTown town) {

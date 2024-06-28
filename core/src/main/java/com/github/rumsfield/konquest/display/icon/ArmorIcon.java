@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonArmor;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -42,15 +43,6 @@ public class ArmorIcon implements MenuIcon {
 		}else {
 			itemMaterial = Material.IRON_BARS;
 		}
-		ItemStack item = new ItemStack(itemMaterial,1);
-		ItemMeta meta = item.getItemMeta();
-		assert meta != null;
-		meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
 		int totalCost = armor.getCost() + (armor.getCostPerResident()*population) + (armor.getCostPerLand()*land);
 		List<String> loreList = new ArrayList<>();
 		loreList.add(ChatColor.DARK_AQUA+""+armor.getBlocks());
@@ -58,10 +50,8 @@ public class ArmorIcon implements MenuIcon {
     	if(isAvailable) {
     		loreList.add(hintColor+MessagePath.MENU_SHIELD_HINT.getMessage());
     	}
-    	meta.setDisplayName(ChatColor.GOLD+armor.getId()+" "+MessagePath.LABEL_ARMOR.getMessage());
-		meta.setLore(loreList);
-		item.setItemMeta(meta);
-		return item;
+		String name = ChatColor.GOLD+armor.getId()+" "+MessagePath.LABEL_ARMOR.getMessage();
+		return CompatibilityUtil.buildItem(itemMaterial, name, loreList, true);
 	}
 	
 	public KonArmor getArmor() {

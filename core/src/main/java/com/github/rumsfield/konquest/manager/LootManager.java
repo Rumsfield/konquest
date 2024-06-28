@@ -165,17 +165,11 @@ public class LootManager implements Timeable{
 			if(status && itemWeight > 0) {
 				// Add loot table entry
 				ItemStack potion = new ItemStack(Material.POTION, 1);
-				PotionMeta meta;
-				meta = (PotionMeta) potion.getItemMeta();
-				try {
-					meta.setBasePotionData(new PotionData(potionType, itemExtended, itemUpgraded));
-				} catch(IllegalArgumentException e) {
-					meta.setBasePotionData(new PotionData(potionType, false, false));
-					ChatUtil.printConsoleError("Invalid options extended="+itemExtended+", upgraded="+itemUpgraded+" for potion "+potionName+" in loot.yml path "+pathName);
-				}
+				PotionMeta meta = CompatibilityUtil.setPotionData((PotionMeta) potion.getItemMeta(), potionType, itemExtended, itemUpgraded);
+				assert meta != null;
 				potion.setItemMeta(meta);
 				result.put(potion, itemWeight);
-				ChatUtil.printDebug("  Added loot path "+pathName+" potion "+potionName+" with extended "+itemExtended+", upgraded "+itemUpgraded+", weight "+itemWeight);
+				ChatUtil.printDebug("  Added loot path "+pathName+" potion "+potionType+" with extended "+itemExtended+", upgraded "+itemUpgraded+", weight "+itemWeight);
 			}
 		}
 		return result;
@@ -192,7 +186,7 @@ public class LootManager implements Timeable{
 			status = true;
 			int itemLevel = 0;
 			int itemWeight = 0;
-			bookType = getEnchantment(enchantName);
+			bookType = CompatibilityUtil.getEnchantment(enchantName);
 			if(bookType == null) {
 				ChatUtil.printConsoleError("Invalid loot enchantment \""+enchantName+"\" given in loot.yml path "+pathName+", skipping this enchantment.");
 				status = false;
@@ -230,7 +224,7 @@ public class LootManager implements Timeable{
 				enchantMeta.addStoredEnchant(bookType, itemLevel, true);
 				enchantBook.setItemMeta(enchantMeta);
 				result.put(enchantBook, itemWeight);
-				ChatUtil.printDebug("  Added loot path "+pathName+" enchant "+enchantName+" with level "+itemLevel+", weight "+itemWeight);
+				ChatUtil.printDebug("  Added loot path "+pathName+" enchant "+bookType.getKey().toString()+" with level "+itemLevel+", weight "+itemWeight);
 			}
 		}
 		return result;
@@ -366,16 +360,6 @@ public class LootManager implements Timeable{
 	/*
 	 * Common
 	 */
-
-	private Enchantment getEnchantment(String fieldName) {
-		Enchantment result = null;
-		try {
-			Class<?> c = Enchantment.class;
-			Field field = c.getDeclaredField(fieldName);
-			result = (Enchantment)field.get(null);
-		} catch(NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ignored) {}
-		return result;
-	}
 
 	private void clearUpperInventory(Inventory inventory) {
 		inventory.clear();

@@ -27,7 +27,8 @@ The [`doc`](./doc) folder contains auto-generated Javadoc files.
 
 ### Building
 Konquest uses Gradle for most dependencies, building and generating Javadoc.
-* Use Java 11 JDK or newer
+* Use Java 21 JDK or newer
+  * If using IntelliJ IDEA, must be version 2024 or newer
 * Requires Git
 
 Use these commands to build from source:

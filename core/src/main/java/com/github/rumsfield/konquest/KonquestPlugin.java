@@ -37,6 +37,7 @@ public class KonquestPlugin extends JavaPlugin {
 	boolean isSetupEconomy = false;
 	boolean isSetupMetrics = false;
 	boolean isSetupPlaceholders = false;
+	boolean isEnchantmentsValidated = false;
 
 	@Override
 	public void onLoad() {
@@ -75,6 +76,8 @@ public class KonquestPlugin extends JavaPlugin {
         registerApi(konquest);
         // Register placeholders
 		isSetupPlaceholders = registerPlaceholders();
+		// Validate API Enchantments
+		isEnchantmentsValidated = CompatibilityUtil.validateEnchantments();
         // Check for updates
         checkForUpdates();
         // Done!
@@ -203,7 +206,8 @@ public class KonquestPlugin extends JavaPlugin {
 				String.format(lineTemplate,"Economy Linked",boolean2status(isSetupEconomy)),
 				String.format(lineTemplate,"Placeholders Registered",boolean2status(isSetupPlaceholders)),
 				String.format(lineTemplate,"Team Colors Registered",boolean2status(konquest.isVersionHandlerEnabled())),
-				String.format(lineTemplate,"Minecraft Version Supported",boolean2status(konquest.isVersionSupported()))
+				String.format(lineTemplate,"Minecraft Version Supported",boolean2status(konquest.isVersionSupported())),
+				String.format(lineTemplate,"API Enchantments Validated",boolean2status(isEnchantmentsValidated))
 		};
 		ChatUtil.printConsoleAlert("Final Status...");
 		for (String row : status) {

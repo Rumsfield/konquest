@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.display.icon;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.manager.DisplayManager;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemFlag;
@@ -32,14 +33,6 @@ public class CommandIcon implements MenuIcon{
 	}
 
 	private ItemStack initItem() {
-		ItemStack item = new ItemStack(command.iconMaterial());
-		ItemMeta meta = item.getItemMeta();
-		assert meta != null;
-		for(ItemFlag flag : ItemFlag.values()) {
-			if(!meta.hasItemFlag(flag)) {
-				meta.addItemFlags(flag);
-			}
-		}
 		List<String> loreList = new ArrayList<>();
 		if(cost > 0) {
 			loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
@@ -48,10 +41,8 @@ public class CommandIcon implements MenuIcon{
 			loreList.add(loreColor+MessagePath.LABEL_INCREMENT_COST.getMessage()+": "+valueColor+cost_incr);
 		}
 		loreList.addAll(Konquest.stringPaginate(command.description(),loreColor));
-		meta.setDisplayName(ChatColor.GOLD+getName());
-		meta.setLore(loreList);
-		item.setItemMeta(meta);
-		return item;
+		String name = ChatColor.GOLD+getName();
+		return CompatibilityUtil.buildItem(command.iconMaterial(), name, loreList);
 	}
 	
 	public CommandType getCommand() {

@@ -22,6 +22,7 @@ import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.Event;
@@ -161,7 +162,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		this.pingTimer = new Timer(this);
 		this.saveIntervalSeconds = 0;
 		this.offlineTimeoutSeconds = 0;
-		this.isVersionSupported = true;
+		this.isVersionSupported = false;
 		this.isVersionHandlerEnabled = false;
 		this.teleportLocationQueue = new HashMap<>();
 	}
@@ -175,7 +176,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		ChatUtil.printDebug("Debug is "+debug);
 		String worldName = getCore().getString(CorePath.WORLD_NAME.getPath());
 		ChatUtil.printDebug("Primary world is "+worldName);
-		
+
 		initColors();
 		languageManager.initialize();
 		kingdomManager.loadCriticalBlocks(); // load critical block material before sanctuaries
@@ -221,36 +222,32 @@ public class Konquest implements KonquestAPI, Timeable {
 	}
 	
 	private void initVersionHandlers() {
-		String version;
-    	try {
-    		version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-    	} catch (ArrayIndexOutOfBoundsException e) {
-    		ChatUtil.printConsoleError("Failed to determine server version.");
-    		return;
-    	}
-    	ChatUtil.printConsoleAlert("Your server version is "+version+", "+Bukkit.getServer().getBukkitVersion());
+    	ChatUtil.printConsoleAlert("Your server version is "+Bukkit.getServer().getBukkitVersion());
     	boolean isProtocolLibEnabled = integrationManager.getProtocolLib().isEnabled();
     	// Version-specific cases
     	try {
-	    	switch(version) {
-	    		case "v1_16_R3":
+	    	switch(CompatibilityUtil.apiVersion) {
+	    		case V1_16_5:
+					isVersionSupported = true;
 					if(isProtocolLibEnabled) { versionHandler = new Handler_1_16_R3(); }
 	    			break;
-	    		case "v1_17_R1":
+	    		case V1_17_1:
+					isVersionSupported = true;
 					if(isProtocolLibEnabled) { versionHandler = new Handler_1_17_R1(); }
 	    			break;
-	    		case "v1_18_R1":
+	    		case V1_18_1:
+					isVersionSupported = true;
 					if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R1(); }
 	    			break;
-	    		case "v1_18_R2":
+	    		case V1_18_2:
+					isVersionSupported = true;
 					if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R2(); }
 	    			break;
-	    		case "v1_19_R1":
-				case "v1_19_R2":
-				case "v1_19_R3":
-				case "v1_20_R1":
-				case "v1_20_R2":
-				case "v1_20_R3":
+	    		case V1_19_4:
+				case V1_20_4:
+				case V1_20_6:
+				case V1_21:
+					isVersionSupported = true;
 					if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
 	    			break;
 	    		default:
