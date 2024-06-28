@@ -169,7 +169,7 @@ public class LootManager implements Timeable{
 				assert meta != null;
 				potion.setItemMeta(meta);
 				result.put(potion, itemWeight);
-				ChatUtil.printDebug("  Added loot path "+pathName+" potion "+meta.getBasePotionType()+" with extended "+itemExtended+", upgraded "+itemUpgraded+", weight "+itemWeight);
+				ChatUtil.printDebug("  Added loot path "+pathName+" potion "+potionType+" with extended "+itemExtended+", upgraded "+itemUpgraded+", weight "+itemWeight);
 			}
 		}
 		return result;

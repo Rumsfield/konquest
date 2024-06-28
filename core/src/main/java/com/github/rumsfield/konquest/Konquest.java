@@ -22,6 +22,7 @@ import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.Event;
@@ -175,7 +176,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		ChatUtil.printDebug("Debug is "+debug);
 		String worldName = getCore().getString(CorePath.WORLD_NAME.getPath());
 		ChatUtil.printDebug("Primary world is "+worldName);
-		
+
 		initColors();
 		languageManager.initialize();
 		kingdomManager.loadCriticalBlocks(); // load critical block material before sanctuaries
@@ -245,7 +246,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	    		case V1_19_4:
 				case V1_20_4:
 				case V1_20_6:
-				case V1_21_0:
+				case V1_21:
 					isVersionSupported = true;
 					if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
 	    			break;

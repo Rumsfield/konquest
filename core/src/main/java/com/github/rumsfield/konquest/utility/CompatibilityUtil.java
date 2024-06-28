@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -29,80 +30,85 @@ public class CompatibilityUtil {
      * Map old enchantment namespaces to new ones
      */
     public enum EnchantComp {
-        // Enchantment              Pre 1.20.6                      1.20.6 and later
-        // Common
-        BINDING_CURSE               ("binding_curse",               "binding_curse"),
-        CHANNELING                  ("channeling",                  "channeling"),
-        DEPTH_STRIDER               ("depth_strider",               "depth_strider"),
-        FIRE_ASPECT                 ("fire_aspect",                 "fire_aspect"),
-        FROST_WALKER                ("frost_walker",                "frost_walker"),
-        IMPALING                    ("impaling",                    "impaling"),
-        KNOCKBACK                   ("knockback",                   "knockback"),
-        LOYALTY                     ("loyalty",                     "loyalty"),
-        LURE                        ("lure",                        "lure"),
-        MENDING                     ("mending",                     "mending"),
-        MULTISHOT                   ("multishot",                   "multishot"),
-        PIERCING                    ("piercing",                    "piercing"),
-        QUICK_CHARGE                ("quick_charge",                "quick_charge"),
-        RIPTIDE                     ("riptide",                     "riptide"),
-        SILK_TOUCH                  ("silk_touch",                  "silk_touch"),
-        SOUL_SPEED                  ("soul_speed",                  "soul_speed"),
-        SWEEPING_EDGE               ("sweeping_edge",               "sweeping_edge"),
-        SWIFT_SNEAK                 ("swift_sneak",                 "swift_sneak"),
-        THORNS                      ("thorns",                      "thorns"),
-        VANISHING_CURSE             ("vanishing_curse",             "vanishing_curse"),
+        // Enchantment Field Name   1.16.5 - 1.18.2             1.19.4 - 1.20.4             1.20.6 +
+
+        // Common names to all versions
+        BINDING_CURSE               ("binding_curse",           "binding_curse",            "binding_curse"),
+        CHANNELING                  ("channeling",              "channeling",               "channeling"),
+        DEPTH_STRIDER               ("depth_strider",           "depth_strider",            "depth_strider"),
+        FIRE_ASPECT                 ("fire_aspect",             "fire_aspect",              "fire_aspect"),
+        FROST_WALKER                ("frost_walker",            "frost_walker",             "frost_walker"),
+        IMPALING                    ("impaling",                "impaling",                 "impaling"),
+        KNOCKBACK                   ("knockback",               "knockback",                "knockback"),
+        LOYALTY                     ("loyalty",                 "loyalty",                  "loyalty"),
+        LURE                        ("lure",                    "lure",                     "lure"),
+        MENDING                     ("mending",                 "mending",                  "mending"),
+        MULTISHOT                   ("multishot",               "multishot",                "multishot"),
+        PIERCING                    ("piercing",                "piercing",                 "piercing"),
+        QUICK_CHARGE                ("quick_charge",            "quick_charge",             "quick_charge"),
+        RIPTIDE                     ("riptide",                 "riptide",                  "riptide"),
+        SILK_TOUCH                  ("silk_touch",              "silk_touch",               "silk_touch"),
+        SOUL_SPEED                  ("soul_speed",              "soul_speed",               "soul_speed"),
+        SWEEPING_EDGE               ("sweeping",                "sweeping",                 "sweeping_edge"),
+        THORNS                      ("thorns",                  "thorns",                   "thorns"),
+        VANISHING_CURSE             ("vanishing_curse",         "vanishing_curse",          "vanishing_curse"),
+
+        // 1.19.4 and later names
+        SWIFT_SNEAK                 ("",                        "swift_sneak",              "swift_sneak"),
 
         // 1.20.4 and earlier
-        WATER_WORKING               ("water_working",               "aqua_afinity"),
-        DAMAGE_ARTHROPODS           ("damage_arthropods",           "bane_of_arthropods"),
-        PROTECTION_EXPLOSIONS       ("protection_explosions",       "blast_protection"),
-        DIG_SPEED                   ("dig_speed",                   "efficiency"),
-        PROTECTION_FALL             ("protection_fall",             "feather_falling"),
-        PROTECTION_FIRE             ("protection_fire",             "fire_protection"),
-        ARROW_FIRE                  ("arrow_fire",                  "flame"),
-        LOOT_BONUS_BLOCKS           ("loot_bonus_blocks",           "fortune"),
-        ARROW_INFINITE              ("arrow_infinite",              "infinity"),
-        LOOT_BONUS_MOBS             ("loot_bonus_mobs",             "looting"),
-        LUCK                        ("luck",                        "luck_of_the_sea"),
-        ARROW_DAMAGE                ("arrow_damage",                "power"),
-        PROTECTION_PROJECTILE       ("protection_projectile",       "projectile_protection"),
-        PROTECTION_ENVIRONMENTAL    ("protection_environmental",    "protection"),
-        ARROW_KNOCKBACK             ("arrow_knockback",             "punch"),
-        OXYGEN                      ("oxygen",                      "respiration"),
-        DAMAGE_ALL                  ("damage_all",                  "sharpness"),
-        DAMAGE_UNDEAD               ("damage_undead",               "smite"),
-        DURABILITY                  ("durability",                  "unbreaking"),
+        WATER_WORKER                ("aqua_affinity",           "aqua_affinity",            "aqua_affinity"),
+        DAMAGE_ARTHROPODS           ("bane_of_arthropods",      "bane_of_arthropods",       "bane_of_arthropods"),
+        PROTECTION_EXPLOSIONS       ("blast_protection",        "blast_protection",         "blast_protection"),
+        DIG_SPEED                   ("efficiency",              "efficiency",               "efficiency"),
+        PROTECTION_FALL             ("feather_falling",         "feather_falling",          "feather_falling"),
+        PROTECTION_FIRE             ("fire_protection",         "fire_protection",          "fire_protection"),
+        ARROW_FIRE                  ("flame",                   "flame",                    "flame"),
+        LOOT_BONUS_BLOCKS           ("fortune",                 "fortune",                  "fortune"),
+        ARROW_INFINITE              ("infinity",                "infinity",                 "infinity"),
+        LOOT_BONUS_MOBS             ("looting",                 "looting",                  "looting"),
+        LUCK                        ("luck_of_the_sea",         "luck_of_the_sea",          "luck_of_the_sea"),
+        ARROW_DAMAGE                ("power",                   "power",                    "power"),
+        PROTECTION_PROJECTILE       ("projectile_protection",   "projectile_protection",    "projectile_protection"),
+        PROTECTION_ENVIRONMENTAL    ("protection",              "protection",               "protection"),
+        ARROW_KNOCKBACK             ("punch",                   "punch",                    "punch"),
+        OXYGEN                      ("respiration",             "respiration",              "respiration"),
+        DAMAGE_ALL                  ("sharpness",               "sharpness",                "sharpness"),
+        DAMAGE_UNDEAD               ("smite",                   "smite",                    "smite"),
+        DURABILITY                  ("unbreaking",              "unbreaking",               "unbreaking"),
 
         // 1.20.6 and later
-        AQUA_AFINITY                ("water_working",               "aqua_afinity"),
-        BANE_OF_ARTHROPODS          ("damage_arthropods",           "bane_of_arthropods"),
-        BLAST_PROTECTION            ("protection_explosions",       "blast_protection"),
-        BREACH                      ("",                            "breach"),
-        DENSITY                     ("",                            "density"),
-        EFFICIENCY                  ("dig_speed",                   "efficiency"),
-        FEATHER_FALLING             ("protection_fall",             "feather_falling"),
-        FIRE_PROTECTION             ("protection_fire",             "fire_protection"),
-        FLAME                       ("arrow_fire",                  "flame"),
-        FORTUNE                     ("loot_bonus_blocks",           "fortune"),
-        INFINITY                    ("arrow_infinite",              "infinity"),
-        LOOTING                     ("loot_bonus_mobs",             "looting"),
-        LUCK_OF_THE_SEA             ("luck",                        "luck_of_the_sea"),
-        POWER                       ("arrow_damage",                "power"),
-        PROJECTILE_PROTECTION       ("protection_projectile",       "projectile_protection"),
-        PROTECTION                  ("protection_environmental",    "protection"),
-        PUNCH                       ("arrow_knockback",             "punch"),
-        RESPIRATION                 ("oxygen",                      "respiration"),
-        SHARPNESS                   ("damage_all",                  "sharpness"),
-        SMITE                       ("damage_undead",               "smite"),
-        UNBREAKING                  ("durability",                  "unbreaking"),
-        WIND_BURST                  ("",                            "wind_burst");
+        AQUA_AFFINITY               ("aqua_affinity",           "aqua_affinity",            "aqua_affinity"),
+        BANE_OF_ARTHROPODS          ("bane_of_arthropods",      "bane_of_arthropods",       "bane_of_arthropods"),
+        BLAST_PROTECTION            ("blast_protection",        "blast_protection",         "blast_protection"),
+        EFFICIENCY                  ("efficiency",              "efficiency",               "efficiency"),
+        FEATHER_FALLING             ("feather_falling",         "feather_falling",          "feather_falling"),
+        FIRE_PROTECTION             ("fire_protection",         "fire_protection",          "fire_protection"),
+        FLAME                       ("flame",                   "flame",                    "flame"),
+        FORTUNE                     ("fortune",                 "fortune",                  "fortune"),
+        INFINITY                    ("infinity",                "infinity",                 "infinity"),
+        LOOTING                     ("looting",                 "looting",                  "looting"),
+        LUCK_OF_THE_SEA             ("luck_of_the_sea",         "luck_of_the_sea",          "luck_of_the_sea"),
+        POWER                       ("power",                   "power",                    "power"),
+        PROJECTILE_PROTECTION       ("projectile_protection",   "projectile_protection",    "projectile_protection"),
+        PROTECTION                  ("protection",              "protection",               "protection"),
+        PUNCH                       ("punch",                   "punch",                    "punch"),
+        RESPIRATION                 ("respiration",             "respiration",              "respiration"),
+        SHARPNESS                   ("sharpness",               "sharpness",                "sharpness"),
+        SMITE                       ("smite",                   "smite",                    "smite"),
+        UNBREAKING                  ("unbreaking",              "unbreaking",               "unbreaking"),
+        BREACH                      ("",                        "",                         "breach"),
+        DENSITY                     ("",                        "",                         "density"),
+        WIND_BURST                  ("",                        "",                         "wind_burst");
 
-        public final String namespace1; // Pre 1.20.6
-        public final String namespace2; // 1.20.6 and later
+        public final String namespace1;
+        public final String namespace2;
+        public final String namespace3;
 
-        EnchantComp(String namespace1, String namespace2) {
-            this.namespace1 = namespace1;
-            this.namespace2 = namespace2;
+        EnchantComp(String namespace1, String namespace2, String namespace3) {
+            this.namespace1 = namespace1; // 1.16.5 - 1.18.2
+            this.namespace2 = namespace2; // 1.19.4 - 1.20.4
+            this.namespace3 = namespace3; // 1.20.6 +
         }
 
         public static EnchantComp getFromName(String name) {
@@ -115,6 +121,25 @@ public class CompatibilityUtil {
         }
     }
 
+    @SuppressWarnings("deprecation")
+    public static boolean validateEnchantments() {
+        // Loop over all API Enchantment fields
+        boolean pass = true;
+        for (Enchantment enchant : Enchantment.values()) {
+            String apiName = enchant.getName();
+            Enchantment enchantComp = getEnchantment(apiName);
+            if (enchantComp == null) {
+                pass = false;
+            }
+        }
+        if (pass) {
+            ChatUtil.printConsoleAlert("Successfully validated API Enchantments");
+        } else {
+            ChatUtil.printConsoleError("Failed to validate some API Enchantments, report this as a bug to the plugin author!");
+        }
+        return pass;
+    }
+
     public enum SpigotApiVersion {
         INVALID,
         V1_16_5,
@@ -124,7 +149,7 @@ public class CompatibilityUtil {
         V1_19_4,
         V1_20_4,
         V1_20_6,
-        V1_21_0
+        V1_21
     }
 
     public static SpigotApiVersion apiVersion = getApiVersion();
@@ -145,8 +170,8 @@ public class CompatibilityUtil {
             return SpigotApiVersion.V1_20_4;
         } else if (bukkitVersion.contains("1.20.6")) {
             return SpigotApiVersion.V1_20_6;
-        } else if (bukkitVersion.contains("1.20.0")) {
-            return SpigotApiVersion.V1_21_0;
+        } else if (bukkitVersion.contains("1.21")) {
+            return SpigotApiVersion.V1_21;
         } else {
             ChatUtil.printConsoleError("Failed to resolve valid API version for compatibility: "+bukkitVersion);
             ChatUtil.showStackTrace();
@@ -218,6 +243,7 @@ public class CompatibilityUtil {
 
     /* Class Field Name Requests */
 
+    @SuppressWarnings("deprecation")
     public static PotionEffectType getMiningFatigue() {
         PotionEffectType result;
         switch(apiVersion) {
@@ -226,56 +252,33 @@ public class CompatibilityUtil {
             case V1_18_1:
             case V1_18_2:
             case V1_19_4:
-            case V1_20_4:
-                // Older versions
-                result = Registry.EFFECT.get(NamespacedKey.minecraft("slow_digging"));
+                // These version use a direct name lookup
+                result = PotionEffectType.getByName("SLOW_DIGGING");
+                if (result == null) {
+                    ChatUtil.printConsoleError("Failed to get Mining Fatigue PotionEffectType using getByName for Bukkit version "+Bukkit.getVersion());
+                    ChatUtil.printConsole("Valid Names for Potion Effects are:");
+                    for (PotionEffectType effect : PotionEffectType.values()) {
+                        ChatUtil.printConsole(effect.getName());
+                    }
+                }
                 break;
             default:
-                // Latest versions
+                // Latest versions uses namespace with Registry
                 result = Registry.EFFECT.get(NamespacedKey.minecraft("mining_fatigue"));
+                if (result == null) {
+                    ChatUtil.printConsoleError("Failed to get Mining Fatigue PotionEffectType using Registry for Bukkit version "+Bukkit.getVersion());
+                    ChatUtil.printConsole("Valid NamespacedKeys for Potion Effects are:");
+                    for (PotionEffectType effect : Registry.EFFECT) {
+                        ChatUtil.printConsole(effect.getKey().toString());
+                    }
+                }
                 break;
-        }
-        if (result == null) {
-            ChatUtil.printConsoleError("Failed to get Mining Fatigue PotionEffectType for Bukkit version "+Bukkit.getVersion());
-            ChatUtil.printConsole("Valid NamespacedKeys for Potion Effects are:");
-            for (PotionEffectType effect : Registry.EFFECT) {
-                ChatUtil.printConsole(effect.getKey().toString());
-            }
-        }
-        return result;
-    }
-
-    public static Enchantment getProtectionEnchantment() {
-        Enchantment result;
-        switch(apiVersion) {
-            case V1_16_5:
-            case V1_17_1:
-            case V1_18_1:
-            case V1_18_2:
-            case V1_19_4:
-            case V1_20_4:
-                // Older versions
-                result = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("protection_environmental"));
-                break;
-            default:
-                // Latest versions
-                result = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("protection"));
-                break;
-        }
-        if (result == null) {
-            ChatUtil.printConsoleError("Failed to get Protection Enchantment for Bukkit version "+Bukkit.getVersion());
-            ChatUtil.printConsole("Valid NamespacedKeys for Enchantments are:");
-            for (Enchantment enchant : Registry.ENCHANTMENT) {
-                ChatUtil.printConsole(enchant.getKey().toString());
-            }
         }
         return result;
     }
 
     /**
      * Gets the Enchantment field that matches the given name.
-     * When the Bukkit version is 1.20.6 or later, this method attempts to map current namespace to older ones.
-     * When the Bukkit version is before 1.20.6, this method attempts to map names to the appropriate version namespace.
      * @param name The name of the enchantment, either old or new names
      * @return The Enchantment appropriate for the current version
      */
@@ -292,18 +295,25 @@ public class CompatibilityUtil {
             case V1_17_1:
             case V1_18_1:
             case V1_18_2:
-            case V1_19_4:
-            case V1_20_4:
-                // Older versions
+                // Version 1.16.5 - 1.18.2
                 enchantNamespace = enchant.namespace1;
                 if (enchantNamespace.isEmpty()) {
-                    ChatUtil.printConsoleError("Failed to match enchantment \""+name+"\" to versions 1.20.4 or earlier. Enchantment does not exist.");
+                    ChatUtil.printConsoleError("Failed to match enchantment \""+name+"\" to versions 1.16.5 - 1.18.2. Enchantment does not exist.");
+                    return null;
+                }
+                break;
+            case V1_19_4:
+            case V1_20_4:
+                // Versions 1.19.4 - 1.20.4
+                enchantNamespace = enchant.namespace2;
+                if (enchantNamespace.isEmpty()) {
+                    ChatUtil.printConsoleError("Failed to match enchantment \""+name+"\" to versions 1.19.4 - 1.20.4. Enchantment does not exist.");
                     return null;
                 }
                 break;
             default:
                 // Latest versions
-                enchantNamespace = enchant.namespace2;
+                enchantNamespace = enchant.namespace3;
                 if (enchantNamespace.isEmpty()) {
                     ChatUtil.printConsoleError("Failed to match enchantment \""+name+"\" to versions 1.20.6 or later. Enchantment does not exist.");
                     return null;
@@ -315,8 +325,14 @@ public class CompatibilityUtil {
         try {
             result = Registry.ENCHANTMENT.get(NamespacedKey.minecraft(enchantNamespace));
         } catch (IllegalArgumentException exception) {
+            result = null;
+        }
+        if (result == null) {
             ChatUtil.printConsoleError("Failed to get Enchantment using minecraft namespace \""+enchantNamespace+"\" for Bukkit version "+Bukkit.getVersion());
-            return null;
+            ChatUtil.printConsole("Valid NamespacedKeys for Enchantments are:");
+            for (Enchantment enchantment : Registry.ENCHANTMENT) {
+                ChatUtil.printConsole(enchantment.getKey().toString());
+            }
         }
         return result;
     }
@@ -473,7 +489,10 @@ public class CompatibilityUtil {
             meta.addItemFlags(flag);
         }
         if (hasProtection) {
-            meta.addEnchant(CompatibilityUtil.getProtectionEnchantment(), 1, true);
+            Enchantment protectionEnchant = CompatibilityUtil.getEnchantment("protection_environmental");
+            if (protectionEnchant != null) {
+                meta.addEnchant(protectionEnchant, 1, true);
+            }
         }
         meta.setDisplayName(name);
         meta.setLore(loreList);
