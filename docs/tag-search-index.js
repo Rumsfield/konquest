@@ -1,1 +1,1 @@
-tagSearchIndex = [];updateSearchResults();
+tagSearchIndex = [{"l":"Public API of the Konquest plugin for Spigot Minecraft","h":"Overview","d":"Section","u":"index.html#public-api-of-the-konquest-plugin-for-spigot-minecraft-heading"}];updateSearchResults();
