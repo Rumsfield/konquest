@@ -170,7 +170,7 @@ public class KonquestPlugin extends JavaPlugin {
 
 	public void printVersion() {
 		String pluginVersion = this.getDescription().getVersion();
-		String serverVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+		String serverVersion = Bukkit.getServer().getBukkitVersion();
 		String lineTemplate = "%-30s -> %s";
 		String [] versionInfo = {
 				String.format(lineTemplate,"Konquest Version",ChatColor.AQUA+pluginVersion),
