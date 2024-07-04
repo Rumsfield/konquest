@@ -49,6 +49,11 @@ public class TownAdminCommand extends CommandBase {
 						.sub( newArg("town",false,false)
 								.sub( newArg("name",false,false) ) )
 		);
+		// plots <town>
+		addArgument(
+				newArg("plots",true,false)
+						.sub( newArg("town",false,false) )
+		);
 		// specialize <town> [<name>]
 		addArgument(
 				newArg("specialize",true,false)
