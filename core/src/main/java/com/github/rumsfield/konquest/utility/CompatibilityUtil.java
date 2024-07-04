@@ -16,7 +16,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -122,9 +121,9 @@ public class CompatibilityUtil {
     }
 
     @SuppressWarnings("deprecation")
-    public static boolean validateEnchantments() {
-        // Loop over all API Enchantment fields
+    public static boolean runBIT() {
         boolean pass = true;
+        // Loop over all API Enchantment fields
         for (Enchantment enchant : Enchantment.values()) {
             String apiName = enchant.getName();
             Enchantment enchantComp = getEnchantment(apiName);
@@ -132,51 +131,55 @@ public class CompatibilityUtil {
                 pass = false;
             }
         }
+        // Mining Fatigue
+        PotionEffectType type = getMiningFatigue();
+        if (type == null) {
+            pass = false;
+        }
+        // Particles
+        Particle dust = getParticle("dust");
+        Particle spell = getParticle("spell");
+        if (dust.equals(Particle.FLAME) || spell.equals(Particle.FLAME)) {
+            pass = false;
+        }
+        // Entities
+        EntityType item = getEntityType("item");
+        EntityType potion = getEntityType("potion");
+        if (item.equals(EntityType.EGG) || potion.equals(EntityType.EGG)) {
+            pass = false;
+        }
         if (pass) {
-            ChatUtil.printConsoleAlert("Successfully validated API Enchantments");
+            ChatUtil.printConsoleAlert("Successfully validated API compatibility");
         } else {
-            ChatUtil.printConsoleError("Failed to validate some API Enchantments, report this as a bug to the plugin author!");
+            ChatUtil.printConsoleError("Failed to validate some API compatibilities, report this as a bug to the plugin author!");
         }
         return pass;
     }
 
-    public enum SpigotApiVersion {
-        INVALID,
-        V1_16_5,
-        V1_17_1,
-        V1_18_1,
-        V1_18_2,
-        V1_19_4,
-        V1_20_4,
-        V1_20_6,
-        V1_21
-    }
+    public static Version apiVersion = getApiVersion();
 
-    public static SpigotApiVersion apiVersion = getApiVersion();
-
-    private static SpigotApiVersion getApiVersion() {
-        String bukkitVersion = Bukkit.getVersion();
-        if (bukkitVersion.contains("1.16.5")) {
-            return SpigotApiVersion.V1_16_5;
-        } else if (bukkitVersion.contains("1.17.1")) {
-            return SpigotApiVersion.V1_17_1;
-        } else if (bukkitVersion.contains("1.18.1")) {
-            return SpigotApiVersion.V1_18_1;
-        } else if (bukkitVersion.contains("1.18.2")) {
-            return SpigotApiVersion.V1_18_2;
-        } else if (bukkitVersion.contains("1.19.4")) {
-            return SpigotApiVersion.V1_19_4;
-        } else if (bukkitVersion.contains("1.20.4")) {
-            return SpigotApiVersion.V1_20_4;
-        } else if (bukkitVersion.contains("1.20.6")) {
-            return SpigotApiVersion.V1_20_6;
-        } else if (bukkitVersion.contains("1.21")) {
-            return SpigotApiVersion.V1_21;
-        } else {
-            ChatUtil.printConsoleError("Failed to resolve valid API version for compatibility: "+bukkitVersion);
-            ChatUtil.showStackTrace();
-            return SpigotApiVersion.INVALID;
+    private static Version getApiVersion() {
+        String bukkitVersionName = Bukkit.getServer().getBukkitVersion();
+        String versionNum;
+        try {
+            // Version strings should look like this: 1.20.4-R0.1-SNAPSHOT
+            // Split the string by dashes "-" and use the first element: 1.20.4
+            versionNum = bukkitVersionName.split("-")[0];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            ChatUtil.printConsoleError("Failed to determine server version: "+bukkitVersionName);
+            return null;
         }
+
+        Version bukkitVersion;
+        try {
+            bukkitVersion = new Version(versionNum);
+        } catch (IllegalArgumentException ex) {
+            ChatUtil.printConsoleError("Failed to resolve valid API version: "+bukkitVersionName+", "+versionNum);
+            ChatUtil.printConsoleError(ex.getMessage());
+            return null;
+        }
+
+        return bukkitVersion;
     }
 
     private static PotionType lookupPotionType(PotionType type, boolean isExtended, boolean isUpgraded) {
@@ -246,33 +249,32 @@ public class CompatibilityUtil {
     @SuppressWarnings("deprecation")
     public static PotionEffectType getMiningFatigue() {
         PotionEffectType result;
-        switch(apiVersion) {
-            case V1_16_5:
-            case V1_17_1:
-            case V1_18_1:
-            case V1_18_2:
-            case V1_19_4:
-                // These version use a direct name lookup
-                result = PotionEffectType.getByName("SLOW_DIGGING");
-                if (result == null) {
-                    ChatUtil.printConsoleError("Failed to get Mining Fatigue PotionEffectType using getByName for Bukkit version "+Bukkit.getVersion());
-                    ChatUtil.printConsole("Valid Names for Potion Effects are:");
-                    for (PotionEffectType effect : PotionEffectType.values()) {
-                        ChatUtil.printConsole(effect.getName());
-                    }
-                }
-                break;
-            default:
-                // Latest versions uses namespace with Registry
+        // First, try the latest API approach
+        try {
+            // Latest versions uses namespace with Registry
+            try {
                 result = Registry.EFFECT.get(NamespacedKey.minecraft("mining_fatigue"));
-                if (result == null) {
-                    ChatUtil.printConsoleError("Failed to get Mining Fatigue PotionEffectType using Registry for Bukkit version "+Bukkit.getVersion());
-                    ChatUtil.printConsole("Valid NamespacedKeys for Potion Effects are:");
-                    for (PotionEffectType effect : Registry.EFFECT) {
-                        ChatUtil.printConsole(effect.getKey().toString());
-                    }
+            } catch (IllegalArgumentException exception) {
+                result = null;
+            }
+            if (result == null) {
+                ChatUtil.printConsoleError("Failed to get Mining Fatigue PotionEffectType using Registry for Bukkit version "+Bukkit.getVersion());
+                ChatUtil.printConsole("Valid NamespacedKeys for Potion Effects are:");
+                for (PotionEffectType effect : Registry.EFFECT) {
+                    ChatUtil.printConsole(effect.getKey().toString());
                 }
-                break;
+            }
+        } catch (NoSuchFieldError ignored) {
+            // Older versions use direct name lookup
+            ChatUtil.printDebug("Could not use Registry to get Mining Fatigue effect, trying name lookup...");
+            result = PotionEffectType.getByName("SLOW_DIGGING");
+            if (result == null) {
+                ChatUtil.printConsoleError("Failed to get Mining Fatigue PotionEffectType using getByName for Bukkit version "+Bukkit.getVersion());
+                ChatUtil.printConsole("Valid Names for Potion Effects are:");
+                for (PotionEffectType effect : PotionEffectType.values()) {
+                    ChatUtil.printConsole(effect.getName());
+                }
+            }
         }
         return result;
     }
@@ -290,35 +292,27 @@ public class CompatibilityUtil {
             return null;
         }
         String enchantNamespace;
-        switch (apiVersion) {
-            case V1_16_5:
-            case V1_17_1:
-            case V1_18_1:
-            case V1_18_2:
-                // Version 1.16.5 - 1.18.2
-                enchantNamespace = enchant.namespace1;
-                if (enchantNamespace.isEmpty()) {
-                    ChatUtil.printConsoleError("Failed to match enchantment \""+name+"\" to versions 1.16.5 - 1.18.2. Enchantment does not exist.");
-                    return null;
-                }
-                break;
-            case V1_19_4:
-            case V1_20_4:
-                // Versions 1.19.4 - 1.20.4
-                enchantNamespace = enchant.namespace2;
-                if (enchantNamespace.isEmpty()) {
-                    ChatUtil.printConsoleError("Failed to match enchantment \""+name+"\" to versions 1.19.4 - 1.20.4. Enchantment does not exist.");
-                    return null;
-                }
-                break;
-            default:
-                // Latest versions
-                enchantNamespace = enchant.namespace3;
-                if (enchantNamespace.isEmpty()) {
-                    ChatUtil.printConsoleError("Failed to match enchantment \""+name+"\" to versions 1.20.6 or later. Enchantment does not exist.");
-                    return null;
-                }
-                break;
+        if (apiVersion.compareTo(new Version("1.18.2")) <= 0) {
+            // Version 1.16.5 - 1.18.2
+            enchantNamespace = enchant.namespace1;
+            if (enchantNamespace.isEmpty()) {
+                ChatUtil.printConsoleError("Failed to match enchantment \""+name+"\" to versions 1.16.5 - 1.18.2. Enchantment does not exist.");
+                return null;
+            }
+        } else if (apiVersion.compareTo(new Version("1.20.4")) <= 0) {
+            // Versions 1.19.4 - 1.20.4
+            enchantNamespace = enchant.namespace2;
+            if (enchantNamespace.isEmpty()) {
+                ChatUtil.printConsoleError("Failed to match enchantment \""+name+"\" to versions 1.19.4 - 1.20.4. Enchantment does not exist.");
+                return null;
+            }
+        } else {
+            // Latest versions
+            enchantNamespace = enchant.namespace3;
+            if (enchantNamespace.isEmpty()) {
+                ChatUtil.printConsoleError("Failed to match enchantment \""+name+"\" to versions 1.20.6 or later. Enchantment does not exist.");
+                return null;
+            }
         }
         // Get the enchantment from the namespace registry
         Enchantment result;
@@ -348,28 +342,20 @@ public class CompatibilityUtil {
      */
     public static Particle getParticle(String type) {
         try {
-            switch (apiVersion) {
-                case V1_16_5:
-                case V1_17_1:
-                case V1_18_1:
-                case V1_18_2:
-                case V1_19_4:
-                case V1_20_4:
-                    // Older versions
-                    if (type.equals("dust")) {
-                        return Particle.valueOf("REDSTONE");
-                    } else if (type.equals("spell")) {
-                        return Particle.valueOf("SPELL_MOB_AMBIENT");
-                    }
-                    break;
-                default:
-                    // Latest versions
-                    if (type.equals("dust")) {
-                        return Particle.valueOf("DUST");
-                    } else if (type.equals("spell")) {
-                        return Particle.valueOf("ENTITY_EFFECT");
-                    }
-                    break;
+            if (apiVersion.compareTo(new Version("1.20.4")) <= 0) {
+                // Older versions
+                if (type.equals("dust")) {
+                    return Particle.valueOf("REDSTONE");
+                } else if (type.equals("spell")) {
+                    return Particle.valueOf("SPELL_MOB_AMBIENT");
+                }
+            } else {
+                // Latest versions
+                if (type.equals("dust")) {
+                    return Particle.valueOf("DUST");
+                } else if (type.equals("spell")) {
+                    return Particle.valueOf("ENTITY_EFFECT");
+                }
             }
         } catch (IllegalArgumentException exception) {
             ChatUtil.printConsoleError("Failed to get Particle for Bukkit version "+Bukkit.getVersion());
@@ -387,28 +373,20 @@ public class CompatibilityUtil {
      */
     public static EntityType getEntityType(String type) {
         try {
-            switch (apiVersion) {
-                case V1_16_5:
-                case V1_17_1:
-                case V1_18_1:
-                case V1_18_2:
-                case V1_19_4:
-                case V1_20_4:
-                    // Older versions
-                    if (type.equals("item")) {
-                        return EntityType.valueOf("DROPPED_ITEM");
-                    } else if (type.equals("potion")) {
-                        return EntityType.valueOf("SPLASH_POTION");
-                    }
-                    break;
-                default:
-                    // Latest versions
-                    if (type.equals("item")) {
-                        return EntityType.valueOf("ITEM");
-                    } else if (type.equals("potion")) {
-                        return EntityType.valueOf("POTION");
-                    }
-                    break;
+            if (apiVersion.compareTo(new Version("1.20.4")) <= 0) {
+                // Older versions
+                if (type.equals("item")) {
+                    return EntityType.valueOf("DROPPED_ITEM");
+                } else if (type.equals("potion")) {
+                    return EntityType.valueOf("SPLASH_POTION");
+                }
+            } else {
+                // Latest versions
+                if (type.equals("item")) {
+                    return EntityType.valueOf("ITEM");
+                } else if (type.equals("potion")) {
+                    return EntityType.valueOf("POTION");
+                }
             }
         } catch (IllegalArgumentException exception) {
             ChatUtil.printConsoleError("Failed to get Entity Type for Bukkit version "+Bukkit.getVersion());
@@ -421,47 +399,32 @@ public class CompatibilityUtil {
 
     @SuppressWarnings({"removal","deprecation"})
     public static PotionMeta setPotionData(PotionMeta meta, PotionType type, boolean isExtended, boolean isUpgraded) {
-        switch(apiVersion) {
-            case V1_16_5:
-            case V1_17_1:
-            case V1_18_1:
-            case V1_18_2:
-            case V1_19_4:
-            case V1_20_4:
-                // Older versions
-                try {
-                    meta.setBasePotionData(new org.bukkit.potion.PotionData(type, isExtended, isUpgraded));
-                } catch(IllegalArgumentException e) {
-                    meta.setBasePotionData(new org.bukkit.potion.PotionData(type, false, false));
-                    ChatUtil.printConsoleError("Invalid options extended="+isExtended+", upgraded="+isUpgraded+" for potion "+type.name()+" in loot.yml");
-                }
-                break;
-            default:
-                // Latest versions
-                meta.setBasePotionType(lookupPotionType(type,isExtended,isUpgraded));
-                break;
+        // First, try the latest API approach
+        try {
+            // Latest versions
+            meta.setBasePotionType(lookupPotionType(type, isExtended, isUpgraded));
+        } catch (NoSuchMethodError | NoSuchFieldError ignored) {
+            // Older versions
+            try {
+                meta.setBasePotionData(new org.bukkit.potion.PotionData(type, isExtended, isUpgraded));
+            } catch (IllegalArgumentException e) {
+                meta.setBasePotionData(new org.bukkit.potion.PotionData(type, false, false));
+                ChatUtil.printConsoleError("Invalid options extended=" + isExtended + ", upgraded=" + isUpgraded + " for potion " + type.name() + " in loot.yml");
+            }
         }
         return meta;
     }
 
     public static void playerSpawnEffect(Player target, Location loc, Color color) {
-        switch(apiVersion) {
-            case V1_16_5:
-            case V1_17_1:
-            case V1_18_1:
-            case V1_18_2:
-            case V1_19_4:
-            case V1_20_4:
-                // Older versions
-                double red = color.getRed() / 255D;
-                double green = color.getGreen() / 255D;
-                double blue = color.getBlue() / 255D;
-                target.spawnParticle(CompatibilityUtil.getParticle("spell"), loc, 0, red, green, blue, 1);
-                break;
-            default:
-                // Latest versions
-                target.spawnParticle(CompatibilityUtil.getParticle("spell"), loc, 1, 0, 0, 0, color);
-                break;
+        if (apiVersion.compareTo(new Version("1.20.4")) <= 0) {
+            // Older versions
+            double red = color.getRed() / 255D;
+            double green = color.getGreen() / 255D;
+            double blue = color.getBlue() / 255D;
+            target.spawnParticle(CompatibilityUtil.getParticle("spell"), loc, 0, red, green, blue, 1);
+        } else {
+            // Latest versions
+            target.spawnParticle(CompatibilityUtil.getParticle("spell"), loc, 1, 0, 0, 0, color);
         }
     }
 

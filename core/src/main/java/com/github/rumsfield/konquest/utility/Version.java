@@ -24,6 +24,12 @@ public class Version implements Comparable<Version> {
         this.version = version;
     }
 
+    /**
+     * Compares versions
+     * @param that the object to be compared.
+     * @return 0 when versions are equal, -1 when this version is less than that version,
+     *         and 1 when this version is greater than that version.
+     */
     @Override public int compareTo(@NotNull Version that) {
         String[] thisParts = this.get().split("\\.");
         String[] thatParts = that.get().split("\\.");
