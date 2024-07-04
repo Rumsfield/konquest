@@ -37,7 +37,7 @@ public class KonquestPlugin extends JavaPlugin {
 	boolean isSetupEconomy = false;
 	boolean isSetupMetrics = false;
 	boolean isSetupPlaceholders = false;
-	boolean isEnchantmentsValidated = false;
+	boolean isCompatibiltyValidated = false;
 
 	@Override
 	public void onLoad() {
@@ -66,6 +66,12 @@ public class KonquestPlugin extends JavaPlugin {
  			pluginManager.disablePlugin(this);
             return;
         }
+	    // Check Version
+		if (CompatibilityUtil.apiVersion == null) {
+			getLogger().severe(String.format("%s disabled due to invalid Bukkit API version.", getDescription().getName()));
+			pluginManager.disablePlugin(this);
+			return;
+		}
  		// Enable metrics
  		isSetupMetrics = loadMetrics();
  		// Register command executors & listeners
@@ -76,8 +82,8 @@ public class KonquestPlugin extends JavaPlugin {
         registerApi(konquest);
         // Register placeholders
 		isSetupPlaceholders = registerPlaceholders();
-		// Validate API Enchantments
-		isEnchantmentsValidated = CompatibilityUtil.validateEnchantments();
+		// Validate API Compatibility
+		isCompatibiltyValidated = CompatibilityUtil.runBIT();
         // Check for updates
         checkForUpdates();
         // Done!
@@ -207,7 +213,7 @@ public class KonquestPlugin extends JavaPlugin {
 				String.format(lineTemplate,"Placeholders Registered",boolean2status(isSetupPlaceholders)),
 				String.format(lineTemplate,"Team Colors Registered",boolean2status(konquest.isVersionHandlerEnabled())),
 				String.format(lineTemplate,"Minecraft Version Supported",boolean2status(konquest.isVersionSupported())),
-				String.format(lineTemplate,"API Enchantments Validated",boolean2status(isEnchantmentsValidated))
+				String.format(lineTemplate,"API Compatibility Validated",boolean2status(isCompatibiltyValidated))
 		};
 		ChatUtil.printConsoleAlert("Final Status...");
 		for (String row : status) {

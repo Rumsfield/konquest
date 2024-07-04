@@ -226,35 +226,30 @@ public class Konquest implements KonquestAPI, Timeable {
     	boolean isProtocolLibEnabled = integrationManager.getProtocolLib().isEnabled();
     	// Version-specific cases
     	try {
-	    	switch(CompatibilityUtil.apiVersion) {
-	    		case V1_16_5:
-					isVersionSupported = true;
-					if(isProtocolLibEnabled) { versionHandler = new Handler_1_16_R3(); }
-	    			break;
-	    		case V1_17_1:
-					isVersionSupported = true;
-					if(isProtocolLibEnabled) { versionHandler = new Handler_1_17_R1(); }
-	    			break;
-	    		case V1_18_1:
-					isVersionSupported = true;
-					if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R1(); }
-	    			break;
-	    		case V1_18_2:
-					isVersionSupported = true;
-					if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R2(); }
-	    			break;
-	    		case V1_19_4:
-				case V1_20_4:
-				case V1_20_6:
-				case V1_21:
-					isVersionSupported = true;
-					if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
-	    			break;
-	    		default:
-					isVersionSupported = false;
-	    			ChatUtil.printConsoleError("This version of Minecraft is not supported by Konquest!");
-	    			break;
-	    	}
+			if (CompatibilityUtil.apiVersion.compareTo(new Version("1.16.5")) <= 0) {
+				isVersionSupported = true;
+				if(isProtocolLibEnabled) { versionHandler = new Handler_1_16_R3(); }
+
+			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.17.1")) <= 0) {
+				isVersionSupported = true;
+				if(isProtocolLibEnabled) { versionHandler = new Handler_1_17_R1(); }
+
+			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.18.1")) <= 0) {
+				isVersionSupported = true;
+				if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R1(); }
+
+			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.18.2")) <= 0) {
+				isVersionSupported = true;
+				if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R2(); }
+
+			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.21")) <= 0) {
+				isVersionSupported = true;
+				if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
+
+			} else {
+				isVersionSupported = false;
+				ChatUtil.printConsoleError("This version of Minecraft is not supported by Konquest!");
+			}
     	} catch (Exception | NoClassDefFoundError e) {
     		ChatUtil.printConsoleError("Failed to setup a version handler, ProtocolLib is probably missing. ");
     		e.printStackTrace();
