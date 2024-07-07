@@ -1,4 +1,4 @@
-rootProject.name = "konquest"
+rootProject.name = "Konquest"
 
 include("core")
 include("api")
