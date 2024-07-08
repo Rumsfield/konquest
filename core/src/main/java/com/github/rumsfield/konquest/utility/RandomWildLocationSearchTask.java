@@ -5,15 +5,14 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Consumer;
-
+import java.util.function.Consumer;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomWildLocationSearchTask extends BukkitRunnable {
 
-    private Konquest konquest;
+    private final Konquest konquest;
     private final World world;
-    private Consumer<Location> locationFoundCallback;
+    private final Consumer<Location> locationFoundCallback;
     private int triesCount;
 
     private int radius;

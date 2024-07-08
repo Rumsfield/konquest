@@ -10,6 +10,7 @@ import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
@@ -89,7 +90,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			loreList = new ArrayList<>();
 			loreList.add(valueColor + infoTown.getSpecialization().name());
 			loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_INFO_SPECIAL.getMessage(), loreColor));
-			Material specialMat = Konquest.getProfessionMaterial(infoTown.getSpecialization());
+			Material specialMat = CompatibilityUtil.getProfessionMaterial(infoTown.getSpecialization());
 			info = new InfoIcon(kingdomColor + MessagePath.LABEL_SPECIALIZATION.getMessage(), loreList, specialMat, 4, false);
 			getMenu().getPage(pageNum).addIcon(info);
 		}

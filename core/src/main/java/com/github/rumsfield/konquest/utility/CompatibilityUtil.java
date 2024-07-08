@@ -7,6 +7,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -461,6 +462,53 @@ public class CompatibilityUtil {
         meta.setLore(loreList);
         item.setItemMeta(meta);
         return item;
+    }
+
+    /**
+     * Before version 1.21, Villager.Profession is an Enum.
+     * In version 1.21 and later, it is an interface.
+     * Use deprecated methods to look up the name of the profession field.
+     * @param profession The villager profession to match to a Material
+     * @return A Material that matches the given profession
+     */
+    @SuppressWarnings("deprecation")
+    public static Material getProfessionMaterial(Villager.Profession profession) {
+        switch(profession.name().toUpperCase()) {
+            case "ARMORER":
+                return Material.BLAST_FURNACE;
+            case "BUTCHER":
+                return Material.SMOKER;
+            case "CARTOGRAPHER":
+                return Material.CARTOGRAPHY_TABLE;
+            case "CLERIC":
+                return Material.BREWING_STAND;
+            case "FARMER":
+                return Material.COMPOSTER;
+            case "FISHERMAN":
+                return Material.BARREL;
+            case "FLETCHER":
+                return Material.FLETCHING_TABLE;
+            case "LEATHERWORKER":
+                return Material.CAULDRON;
+            case "LIBRARIAN":
+                return Material.LECTERN;
+            case "MASON":
+                return Material.STONECUTTER;
+            case "NITWIT":
+                return Material.PUFFERFISH_BUCKET;
+            case "NONE":
+                return Material.GRAVEL;
+            case "SHEPHERD":
+                return Material.LOOM;
+            case "TOOLSMITH":
+                return Material.SMITHING_TABLE;
+            case "WEAPONSMITH":
+                return Material.GRINDSTONE;
+            default:
+                break;
+        }
+        // Default
+        return Material.EMERALD;
     }
 
     /* Java Class Reflection */
