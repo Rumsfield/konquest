@@ -6,9 +6,7 @@ import com.github.rumsfield.konquest.api.event.territory.KonquestTerritoryChunkE
 import com.github.rumsfield.konquest.api.manager.KonquestTerritoryManager;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.model.*;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.*;
 import com.github.rumsfield.konquest.utility.Timer;
 import org.bukkit.Color;
 import org.bukkit.*;
@@ -75,7 +73,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 	}
 	
 	public boolean removeTerritory(Location loc) {
-		return removeTerritory(loc.getWorld(),Konquest.toPoint(loc));
+		return removeTerritory(loc.getWorld(),HelperUtil.toPoint(loc));
 	}
 	
 	public boolean removeTerritory(World world, Point point) {
@@ -93,7 +91,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 	}
 	
 	public boolean isChunkClaimed(Location loc) {
-		return isChunkClaimed(Konquest.toPoint(loc),loc.getWorld());
+		return isChunkClaimed(HelperUtil.toPoint(loc),loc.getWorld());
 	}
 	
 	public boolean isChunkClaimed(Point point, World world) {
@@ -106,7 +104,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 	
 	@Nullable
 	public KonTerritory getChunkTerritory(Location loc) {
-		return getChunkTerritory(Konquest.toPoint(loc),loc.getWorld());
+		return getChunkTerritory(HelperUtil.toPoint(loc),loc.getWorld());
 	}
 	
 	@Nullable
@@ -127,10 +125,10 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			KonTerritory currentTerritory;
 			int searchDist;
 			int minDistance = Integer.MAX_VALUE;
-			for(Point areaPoint : konquest.getSidePoints(loc)) {
+			for(Point areaPoint : HelperUtil.getSidePoints(loc)) {
 				if(isChunkClaimed(areaPoint,loc.getWorld())) {
 					currentTerritory = getChunkTerritory(areaPoint,loc.getWorld());
-					searchDist = Konquest.chunkDistance(loc, currentTerritory.getCenterLoc());
+					searchDist = HelperUtil.chunkDistance(loc, currentTerritory.getCenterLoc());
 					if(searchDist != -1) {
 						if(searchDist < minDistance) {
 							minDistance = searchDist;
@@ -147,25 +145,25 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		int minDistance = Integer.MAX_VALUE;
 		int searchDist = 0;
 		for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
-			searchDist = Konquest.chunkDistance(loc, kingdom.getCapital().getCenterLoc());
+			searchDist = HelperUtil.chunkDistance(loc, kingdom.getCapital().getCenterLoc());
 			if(searchDist != -1 && searchDist < minDistance) {
 				minDistance = searchDist;
 			}
 			for(KonTown town : kingdom.getTowns()) {
-				searchDist = Konquest.chunkDistance(loc, town.getCenterLoc());
+				searchDist = HelperUtil.chunkDistance(loc, town.getCenterLoc());
 				if(searchDist != -1 && searchDist < minDistance) {
 					minDistance = searchDist;
 				}
 			}
 		}
 		for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			searchDist = Konquest.chunkDistance(loc, ruin.getCenterLoc());
+			searchDist = HelperUtil.chunkDistance(loc, ruin.getCenterLoc());
 			if(searchDist != -1 && searchDist < minDistance) {
 				minDistance = searchDist;
 			}
 		}
 		for(KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
-			searchDist = Konquest.chunkDistance(loc, sanctuary.getCenterLoc());
+			searchDist = HelperUtil.chunkDistance(loc, sanctuary.getCenterLoc());
 			if(searchDist != -1 && searchDist < minDistance) {
 				minDistance = searchDist;
 			}
@@ -199,10 +197,10 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		World claimWorld = loc.getWorld();
 		int searchDist;
 		int minDistance = Integer.MAX_VALUE;
-		for(Point sidePoint : konquest.getSidePoints(loc)) {
+		for(Point sidePoint : HelperUtil.getSidePoints(loc)) {
 			if(isChunkClaimed(sidePoint,claimWorld)) {
 				currentTerr = getChunkTerritory(sidePoint,claimWorld);
-				searchDist = Konquest.chunkDistance(loc, currentTerr.getCenterLoc());
+				searchDist = HelperUtil.chunkDistance(loc, currentTerr.getCenterLoc());
 				if(searchDist != -1) {
 					if(searchDist < minDistance) {
 						minDistance = searchDist;
@@ -213,7 +211,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			}
 		}
 		if(foundAdjTerr) {
-			Point addPoint = Konquest.toPoint(loc);
+			Point addPoint = HelperUtil.toPoint(loc);
 			if(closestAdjTerr.getWorld().equals(loc.getWorld()) && closestAdjTerr.testChunk(addPoint)) {
 				// Check property flag
 				if(closestAdjTerr instanceof KonPropertyFlagHolder && !force) {
@@ -269,7 +267,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_CLAIM_NOTICE_SUCCESS.getMessage("1",territoryName));
     		// Push claim to admin register
     		Set<Point> claimSet = new HashSet<>();
-    		claimSet.add(Konquest.toPoint(claimLoc));
+    		claimSet.add(HelperUtil.toPoint(claimLoc));
     		player.getAdminClaimRegister().push(claimSet, territory);
     		break;
     	case 1:
@@ -305,7 +303,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			}
 		}
 		// Verify no surrounding territory from other kingdoms
-    	for(Point point : konquest.getAreaPoints(claimLoc,2)) {
+    	for(Point point : HelperUtil.getAreaPoints(claimLoc,2)) {
 			if(isChunkClaimed(point,claimWorld)) {
 				KonTerritory territory = getChunkTerritory(point,claimWorld);
 				if(territory != null && !player.getKingdom().equals(territory.getKingdom())) {
@@ -378,7 +376,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		
     	// Find all unclaimed chunks to claim
 		HashSet<Point> unclaimedChunks = new HashSet<>();
-    	for(Point point : konquest.getAreaPoints(loc,radius)) {
+    	for(Point point : HelperUtil.getAreaPoints(loc,radius)) {
     		if(!isChunkClaimed(point,claimWorld)) {
     			unclaimedChunks.add(point);
     		}
@@ -451,7 +449,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		}
 		
 		// Verify no overlapping territories
-		for(Point point : konquest.getAreaPoints(claimLoc,radius+1)) {
+		for(Point point : HelperUtil.getAreaPoints(claimLoc,radius+1)) {
     		if(isChunkClaimed(point,claimWorld)) {
     			if(!claimTerritory.getKingdom().equals(getChunkTerritory(point,claimWorld).getKingdom())) {
     				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
@@ -462,7 +460,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		
 		// Find all unclaimed chunks to claim
 		HashSet<Point> toClaimChunks = new HashSet<>();
-    	for(Point point : konquest.getAreaPoints(claimLoc,radius)) {
+    	for(Point point : HelperUtil.getAreaPoints(claimLoc,radius)) {
     		if(!isChunkClaimed(point,claimWorld) && claimTerritory.testChunk(point)) {
     			toClaimChunks.add(point);
     		}
@@ -502,7 +500,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		World claimWorld = claimLoc.getWorld();
 		assert claimWorld != null;
 		// Verify no surrounding territory from other kingdoms
-		for(Point point : konquest.getAreaPoints(claimLoc,radius+1)) {
+		for(Point point : HelperUtil.getAreaPoints(claimLoc,radius+1)) {
 			if(isChunkClaimed(point,claimWorld)) {
 				KonTerritory territory = getChunkTerritory(point,claimWorld);
 				if(territory != null && !player.getKingdom().equals(territory.getKingdom())) {
@@ -519,7 +517,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		}
     	// Find all unclaimed chunks to claim
 		HashSet<Point> toClaimChunks = new HashSet<>();
-    	for(Point point : konquest.getAreaPoints(claimLoc,radius)) {
+    	for(Point point : HelperUtil.getAreaPoints(claimLoc,radius)) {
     		if(!isChunkClaimed(point,claimWorld) && claimTerritory.testChunk(point)) {
     			toClaimChunks.add(point);
     		}
@@ -594,7 +592,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		}
 		
 		World territoryWorld = territory.getWorld();
-		Point territorySpawn = Konquest.toPoint(territory.getSpawnLoc());
+		Point territorySpawn = HelperUtil.toPoint(territory.getSpawnLoc());
 		
 		// Player occupants
 		Set<KonPlayer> occupants = new HashSet<>();
@@ -694,7 +692,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		}
 		// Fire event
 		Set<Point> points = new HashSet<>();
-		points.add(Konquest.toPoint(loc));
+		points.add(HelperUtil.toPoint(loc));
 		KonquestTerritoryChunkEvent invokeEvent = new KonquestTerritoryChunkEvent(konquest, territory, loc, points, false);
 		Konquest.callKonquestEvent(invokeEvent);
 		if(invokeEvent.isCancelled()) {
@@ -821,8 +819,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		
 		// Find all claimed chunks to unclaim (not center)
 		HashSet<Point> claimedChunks = new HashSet<>();
-		Point territoryCenter = Konquest.toPoint(territory.getCenterLoc());
-    	for(Point point : konquest.getAreaPoints(loc,radius)) {
+		Point territoryCenter = HelperUtil.toPoint(territory.getCenterLoc());
+    	for(Point point : HelperUtil.getAreaPoints(loc,radius)) {
     		if(territory.getChunkPoints().contains(point) && !territoryCenter.equals(point)) {
     			claimedChunks.add(point);
     		}
@@ -908,8 +906,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				return false;
 			}
 			// Determine which chunks to unclaim for flag check(s)
-			Point territoryCenter = Konquest.toPoint(territory.getCenterLoc());
-			for(Point point : konquest.getAreaPoints(claimLoc,radius)) {
+			Point territoryCenter = HelperUtil.toPoint(territory.getCenterLoc());
+			for(Point point : HelperUtil.getAreaPoints(claimLoc,radius)) {
 				if(territory.getChunkPoints().contains(point) && !territoryCenter.equals(point)) {
 					toUnclaimChunks.add(point);
 				}
@@ -1000,7 +998,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		double y_mod;
 		// Evaluate every chunk in the provided list. If it's claimed, check each adjacent chunk and determine border locations
 		for(Chunk chunk : renderChunks) {
-			Point point = Konquest.toPoint(chunk);
+			Point point = HelperUtil.toPoint(chunk);
 			World renderWorld = chunk.getWorld();
 			if(isChunkClaimed(point,renderWorld)) {
 				KonTerritory territory = getChunkTerritory(point,renderWorld);
@@ -1084,7 +1082,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		Color renderColor;
 		// Evaluate every chunk in the provided list. If it's claimed and a town plot, check each adjacent chunk and determine border locations
 		for(Chunk chunk : renderChunks) {
-			Point point = Konquest.toPoint(chunk);
+			Point point = HelperUtil.toPoint(chunk);
 			World renderWorld = chunk.getWorld();
 			if(isChunkClaimed(point,renderWorld)) {
 				territory = getChunkTerritory(point,renderWorld);
@@ -1181,10 +1179,10 @@ public class TerritoryManager implements KonquestTerritoryManager {
 	public void updatePlayerBorderParticles(KonPlayer player, Location loc) {
     	if(player != null && player.isBorderDisplay()) {
     		// Border particle update
-			ArrayList<Chunk> nearbyChunks = konquest.getAreaChunks(loc, 2);
+			ArrayList<Chunk> nearbyChunks = HelperUtil.getAreaChunks(loc, 2);
 			boolean isTerritoryNearby = false;
 			for(Chunk chunk : nearbyChunks) {
-				if(isChunkClaimed(Konquest.toPoint(chunk),chunk.getWorld())) {
+				if(isChunkClaimed(HelperUtil.toPoint(chunk),chunk.getWorld())) {
 					isTerritoryNearby = true;
 					break;
 				}
@@ -1228,7 +1226,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 	public void printPlayerMap(KonPlayer player, int mapSize, Location center) {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		// Generate Map
-    	Point originPoint = Konquest.toPoint(center);
+    	Point originPoint = HelperUtil.toPoint(center);
     	String mapWildSymbol = "-";
     	String mapTownSymbol = "+";
     	String mapCampSymbol = "=";
@@ -1263,7 +1261,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			isLocValidSettle = false;
 		}
 		for(KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
-			searchDist = Konquest.chunkDistance(center, kingdom.getCapital().getCenterLoc());
+			searchDist = HelperUtil.chunkDistance(center, kingdom.getCapital().getCenterLoc());
 			if(searchDist != -1) {
 				if(searchDist < minDistance) {
 					minDistance = searchDist;
@@ -1275,7 +1273,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				}
 			}
 			for(KonTown town : kingdom.getTowns()) {
-				searchDist = Konquest.chunkDistance(center, town.getCenterLoc());
+				searchDist = HelperUtil.chunkDistance(center, town.getCenterLoc());
 				if(searchDist != -1) {
 					if(searchDist < minDistance) {
 						minDistance = searchDist;
@@ -1289,7 +1287,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			}
 		}
 		for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			searchDist = Konquest.chunkDistance(center, ruin.getCenterLoc());
+			searchDist = HelperUtil.chunkDistance(center, ruin.getCenterLoc());
 			if(searchDist != -1) {
 				if(searchDist < minDistance) {
 					minDistance = searchDist;
@@ -1302,7 +1300,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			}
 		}
 		for(KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
-			searchDist = Konquest.chunkDistance(center, sanctuary.getCenterLoc());
+			searchDist = HelperUtil.chunkDistance(center, sanctuary.getCenterLoc());
 			if(searchDist != -1) {
 				if(searchDist < minDistance) {
 					minDistance = searchDist;
@@ -1315,7 +1313,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			}
 		}
 		for(KonCamp camp : konquest.getCampManager().getCamps()) {
-			searchDist = Konquest.chunkDistance(center, camp.getCenterLoc());
+			searchDist = HelperUtil.chunkDistance(center, camp.getCenterLoc());
 			if(searchDist != -1) {
 				if(searchDist < minDistance) {
 					proximity = searchDist;
@@ -1330,7 +1328,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		}
 		// Verify no overlapping init chunks
 		int radius = konquest.getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath());
-		for(Point point : konquest.getAreaPoints(center, radius)) {
+		for(Point point : HelperUtil.getAreaPoints(center, radius)) {
 			if(isChunkClaimed(point,center.getWorld())) {
 				isLocValidSettle = false;
 			}
@@ -1343,7 +1341,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
     		settleTip = ChatColor.GRAY+settleTip;
     	}
     	// Evaluate surrounding chunks
-    	for(Point mapPoint: konquest.getAreaPoints(center, ((mapSize-1)/2)+1)) {
+    	for(Point mapPoint: HelperUtil.getAreaPoints(center, ((mapSize-1)/2)+1)) {
     		int diffOriginX = (int)(mapPoint.getX() - originPoint.getX());
     		int diffOriginY = (int)(mapPoint.getY() - originPoint.getY());
     		int mapY = (mapSize-1)/2 - diffOriginX; // Swap X & Y to translate map to be oriented up as north

@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -55,7 +56,7 @@ public class SanctuaryManager {
 		boolean result = false;
 		if(konquest.validateNameConstraints(name) == 0) {
 			// Verify no overlapping init chunks
-			for(Point point : konquest.getAreaPoints(loc, 2)) {
+			for(Point point : HelperUtil.getAreaPoints(loc, 2)) {
 				if(konquest.getTerritoryManager().isChunkClaimed(point,loc.getWorld())) {
 					ChatUtil.printDebug("Found a chunk conflict during sanctuary init: "+name);
 					return false;
@@ -617,7 +618,7 @@ public class SanctuaryManager {
 	        			// Set spawn location
 		        		sanctuary.setSpawn(sanctuarySpawn);
 		        		// Set territory chunks
-	        			sanctuary.addPoints(konquest.formatStringToPoints(sanctuarySection.getString("chunks","")));
+	        			sanctuary.addPoints(HelperUtil.formatStringToPoints(sanctuarySection.getString("chunks","")));
 	        			konquest.getTerritoryManager().addAllTerritory(sanctuaryWorld,sanctuary.getChunkList());
 	        			// Set properties
 	        			ConfigurationSection sanctuaryPropertiesSection = sanctuarySection.getConfigurationSection("properties");
@@ -745,7 +746,7 @@ public class SanctuaryManager {
 			sanctuarySection.set("center", new int[] {sanctuary.getCenterLoc().getBlockX(),
 					sanctuary.getCenterLoc().getBlockY(),
 					sanctuary.getCenterLoc().getBlockZ()});
-			sanctuarySection.set("chunks", konquest.formatPointsToString(sanctuary.getChunkList().keySet()));
+			sanctuarySection.set("chunks", HelperUtil.formatPointsToString(sanctuary.getChunkList().keySet()));
 			// Properties
 			ConfigurationSection sanctuaryPropertiesSection = sanctuarySection.createSection("properties");
 			for(KonPropertyFlag flag : KonPropertyFlag.values()) {

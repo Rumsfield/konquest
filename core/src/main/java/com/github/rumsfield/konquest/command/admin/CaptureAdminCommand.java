@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Chunk;
 import org.bukkit.Effect;
@@ -98,7 +99,7 @@ public class CaptureAdminCommand extends CommandBase {
 					onlinePlayer.clearAllMobAttackers();
 				}
 				// Update particle border renders for nearby players
-				for(Chunk chunk : konquest.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
+				for(Chunk chunk : HelperUtil.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
 					if(capturedTown.hasChunk(chunk)) {
 						konquest.getTerritoryManager().updatePlayerBorderParticles(onlinePlayer);
 						break;

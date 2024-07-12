@@ -12,6 +12,7 @@ import com.github.rumsfield.konquest.model.KonMonumentTemplate;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonSanctuary;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.Labeler;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
@@ -76,7 +77,7 @@ public class MonumentTemplateInfoMenuWrapper extends MenuWrapper {
             pageLabel = titleColor + MessagePath.LABEL_MONUMENT.getMessage();
             getMenu().addPage(pageNum, 1, pageLabel);
             /* Info Icon */
-            loreList = new ArrayList<>(Konquest.stringPaginate(MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_NO_TEMPLATES.getMessage(), ChatColor.RED));
+            loreList = new ArrayList<>(HelperUtil.stringPaginate(MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_NO_TEMPLATES.getMessage(), ChatColor.RED));
             InfoIcon info = new InfoIcon(ChatColor.DARK_RED+MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage(),loreList,Material.BARRIER,0,false);
             getMenu().getPage(pageNum).addIcon(info);
         } else {

@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestTerritory;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -69,7 +70,7 @@ public abstract class KonTerritory implements KonquestTerritory {
 	}
 	
 	public boolean removeChunk(Location loc) {
-		return removeChunk(Konquest.toPoint(loc));
+		return removeChunk(HelperUtil.toPoint(loc));
 	}
 	
 	public boolean removeChunk(Point point) {
@@ -81,22 +82,22 @@ public abstract class KonTerritory implements KonquestTerritory {
 	}
 	
 	public boolean isLocInside(Location loc) {
-		return loc.getWorld().equals(getWorld()) && chunkList.containsKey(Konquest.toPoint(loc));
+		return loc.getWorld().equals(getWorld()) && chunkList.containsKey(HelperUtil.toPoint(loc));
 	}
 	
 	public boolean isLocInCenter(Location loc) {
-		return loc.getWorld().equals(getWorld()) && Konquest.toPoint(loc).equals(Konquest.toPoint(centerLoc));
+		return loc.getWorld().equals(getWorld()) && HelperUtil.toPoint(loc).equals(HelperUtil.toPoint(centerLoc));
 	}
 	
 	public boolean hasChunk(Chunk chunk) {
-		return chunk.getWorld().equals(getWorld()) && chunkList.containsKey(Konquest.toPoint(chunk));
+		return chunk.getWorld().equals(getWorld()) && chunkList.containsKey(HelperUtil.toPoint(chunk));
 	}
 	
 	public boolean isLocAdjacent(Location loc) {
 		boolean result = false;
 		int[] coordLUTX = {0,1,0,-1};
 		int[] coordLUTZ = {1,0,-1,0};
-		Point center = Konquest.toPoint(loc);
+		Point center = HelperUtil.toPoint(loc);
 		for(int i = 0;i<4;i++) {
 			if(loc.getWorld().equals(getWorld()) && chunkList.containsKey(new Point(center.x + coordLUTX[i], center.y + coordLUTZ[i]))) {
 				result = true;

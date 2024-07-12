@@ -305,7 +305,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	@Override
 	public boolean testChunk(Point point) {
 		// Tests a chunk to make sure it is within the max town size limit
-		Point centerChunk = Konquest.toPoint(getCenterLoc());
+		Point centerChunk = HelperUtil.toPoint(getCenterLoc());
 		int maxChunkRange = getKonquest().getCore().getInt(CorePath.TOWNS_MAX_SIZE.getPath());
 		if(maxChunkRange < 0) {
 			maxChunkRange = 0;
@@ -445,7 +445,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		if(radius < 1) {
 			radius = 1;
 		}
-		if(!addChunks(getKonquest().getAreaPoints(getCenterLoc(), radius))) {
+		if(!addChunks(HelperUtil.getAreaPoints(getCenterLoc(), radius))) {
 			ChatUtil.printDebug("Town init failed: problem adding some chunks");
 			return 3;
 		}
@@ -629,20 +629,20 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 
 	public boolean isLocInsideCenterChunk(Location loc) {
-		Point centerPoint = Konquest.toPoint(getCenterLoc());
-		Point testPoint = Konquest.toPoint(loc);
+		Point centerPoint = HelperUtil.toPoint(getCenterLoc());
+		Point testPoint = HelperUtil.toPoint(loc);
 		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
 	}
 	
 	public boolean isChunkCenter(Chunk chunk) {
-		Point centerPoint = Konquest.toPoint(getCenterLoc());
-		Point testPoint = Konquest.toPoint(chunk);
+		Point centerPoint = HelperUtil.toPoint(getCenterLoc());
+		Point testPoint = HelperUtil.toPoint(chunk);
 		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
 	}
 	
 	public boolean isLocInsideMonumentProtectionArea(Location loc) {
-		Point centerPoint = Konquest.toPoint(getCenterLoc());
-		Point testPoint = Konquest.toPoint(loc);
+		Point centerPoint = HelperUtil.toPoint(getCenterLoc());
+		Point testPoint = HelperUtil.toPoint(loc);
 		int baseDepth = getKonquest().getCore().getInt(CorePath.TOWNS_SETTLE_CHECKS_DEPTH.getPath(),0);
 		if(baseDepth < 0) {
 			baseDepth = 0;
@@ -1002,18 +1002,18 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		// Set title conditions
 		if(isShielded && isArmored) {
 			remainingSeconds = getRemainingShieldTimeSeconds();
-			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor2));
-			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
-			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
-			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
-			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
+			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.friendColor2));
+			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
+			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
+			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
+			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
 		} else if(isShielded) {
 			remainingSeconds = getRemainingShieldTimeSeconds();
-			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor2));
-			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
-			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
-			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
-			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
+			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.friendColor2));
+			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
+			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
+			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
+			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
 		} else if(isArmored) {
 			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+armorCurrentBlocks+" "+armor);
 			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+armorCurrentBlocks+" "+armor);
@@ -1719,7 +1719,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public boolean hasPlot(Location loc) {
-		return hasPlot(Konquest.toPoint(loc), loc.getWorld());
+		return hasPlot(HelperUtil.toPoint(loc), loc.getWorld());
 	}
 	
 	public boolean hasPlot(Point p, World w) {
@@ -1732,7 +1732,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	@Nullable
 	public KonPlot getPlot(Location loc) {
-		return getPlot(Konquest.toPoint(loc), loc.getWorld());
+		return getPlot(HelperUtil.toPoint(loc), loc.getWorld());
 	}
 	
 	@Nullable

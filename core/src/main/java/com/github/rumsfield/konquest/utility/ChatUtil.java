@@ -266,6 +266,14 @@ public class ChatUtil {
 		return "#"+Integer.toHexString(hexVal);
 	}
 
+	public static String boolean2enable(boolean val) {
+		return val ? ChatColor.DARK_GREEN+"Enabled" : ChatColor.DARK_RED+"Disabled";
+	}
+
+	public static String boolean2status(boolean val) {
+		return val ? ChatColor.DARK_GREEN+"Success" : ChatColor.DARK_RED+"Fail";
+	}
+
 	public static void printDebug(String message) {
 		printDebug(message, false);
 	}

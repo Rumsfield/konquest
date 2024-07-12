@@ -879,7 +879,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		allTownsAndCapital.add(getCapital());
 		allTownsAndCapital.addAll(getTowns());
 		for(KonTown town : allTownsAndCapital) {
-			tPoint = Konquest.toPoint(town.getCenterLoc());
+			tPoint = HelperUtil.toPoint(town.getCenterLoc());
 			if(town.getWorld().isChunkLoaded(tPoint.x,tPoint.y)) {
 				if(town.isAttacked()) {
 					ChatUtil.printDebug("Could not paste monument in town "+town.getName()+" while under attack");

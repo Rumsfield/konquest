@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -229,7 +230,7 @@ public class ShieldManager implements KonquestShieldManager {
 		}
 		
 		// Passed checks, activate the shield
-		String timeFormat = Konquest.getTimeFormat(shield.getDurationSeconds(), ChatColor.AQUA);
+		String timeFormat = HelperUtil.getTimeFormat(shield.getDurationSeconds(), ChatColor.AQUA);
 		String shieldName = shield.getId()+" "+MessagePath.LABEL_SHIELD.getMessage();
 		if(town.isShielded()) {
 			endTime = town.getShieldEndTime() + shieldTime;

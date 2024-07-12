@@ -263,7 +263,7 @@ public class LootManager implements Timeable{
 	public String getMonumentLootTime() {
 		String noColor = "";
 		int timerCount = Math.max(lootRefreshTimer.getTime(),0);
-		return Konquest.getTimeFormat(timerCount, noColor);
+		return HelperUtil.getTimeFormat(timerCount, noColor);
 	}
 
 	/**

@@ -124,35 +124,49 @@ public class CompatibilityUtil {
     @SuppressWarnings("deprecation")
     public static boolean runBIT() {
         boolean pass = true;
+        int errorCode = 0;
         // Loop over all API Enchantment fields
         for (Enchantment enchant : Enchantment.values()) {
             String apiName = enchant.getName();
             Enchantment enchantComp = getEnchantment(apiName);
             if (enchantComp == null) {
                 pass = false;
+                errorCode |= 1;
             }
         }
         // Mining Fatigue
         PotionEffectType type = getMiningFatigue();
         if (type == null) {
             pass = false;
+            errorCode |= 2;
         }
         // Particles
         Particle dust = getParticle("dust");
         Particle spell = getParticle("spell");
         if (dust.equals(Particle.FLAME) || spell.equals(Particle.FLAME)) {
             pass = false;
+            errorCode |= 4;
         }
         // Entities
         EntityType item = getEntityType("item");
         EntityType potion = getEntityType("potion");
         if (item.equals(EntityType.EGG) || potion.equals(EntityType.EGG)) {
             pass = false;
+            errorCode |= 8;
         }
+        // Villager Professions
+        for (Villager.Profession profession : Villager.Profession.values()) {
+            Material professionMaterial = getProfessionMaterial(profession);
+            if (professionMaterial.equals(Material.EMERALD)) {
+                pass = false;
+                errorCode |= 16;
+            }
+        }
+        // Result message
         if (pass) {
             ChatUtil.printConsoleAlert("Successfully validated API compatibility");
         } else {
-            ChatUtil.printConsoleError("Failed to validate some API compatibilities, report this as a bug to the plugin author!");
+            ChatUtil.printConsoleError("Failed to validate some API compatibilities, report this as a bug to the plugin author! Error "+errorCode);
         }
         return pass;
     }

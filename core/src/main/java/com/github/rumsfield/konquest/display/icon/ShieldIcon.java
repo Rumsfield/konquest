@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonShield;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -44,7 +45,7 @@ public class ShieldIcon implements MenuIcon {
 		}
 		int totalCost = shield.getCost() + (shield.getCostPerResident()*population) + (shield.getCostPerLand()*land);
 		List<String> loreList = new ArrayList<>();
-		loreList.add(Konquest.getTimeFormat(shield.getDurationSeconds(), ChatColor.DARK_AQUA));
+		loreList.add(HelperUtil.getTimeFormat(shield.getDurationSeconds(), ChatColor.DARK_AQUA));
     	loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+totalCost);
     	if(isAvailable) {
     		loreList.add(hintColor+MessagePath.MENU_SHIELD_HINT.getMessage());

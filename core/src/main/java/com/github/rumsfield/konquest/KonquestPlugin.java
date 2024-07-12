@@ -175,7 +175,7 @@ public class KonquestPlugin extends JavaPlugin {
 		String [] versionInfo = {
 				String.format(lineTemplate,"Konquest Version",ChatColor.AQUA+pluginVersion),
 				String.format(lineTemplate,"Server Version",ChatColor.AQUA+serverVersion),
-				String.format(lineTemplate,"Server Version Supported",boolean2status(konquest.isVersionSupported()))
+				String.format(lineTemplate,"Server Version Supported",ChatUtil.boolean2status(konquest.isVersionSupported()))
 		};
 		for (String row : versionInfo) {
 			String line = ChatColor.GOLD+"> "+ChatColor.RESET + row;
@@ -202,28 +202,18 @@ public class KonquestPlugin extends JavaPlugin {
 	private void printEnableStatus() {
 		String lineTemplate = "%-30s -> %s";
 		String [] status = {
-				String.format(lineTemplate,"Anonymous Metrics",boolean2status(isSetupMetrics)),
-				String.format(lineTemplate,"Economy Linked",boolean2status(isSetupEconomy)),
-				String.format(lineTemplate,"Placeholders Registered",boolean2status(isSetupPlaceholders)),
-				String.format(lineTemplate,"Team Colors Registered",boolean2status(konquest.isVersionHandlerEnabled())),
-				String.format(lineTemplate,"Minecraft Version Supported",boolean2status(konquest.isVersionSupported())),
-				String.format(lineTemplate,"API Compatibility Validated",boolean2status(isCompatibiltyValidated))
+				String.format(lineTemplate,"Anonymous Metrics",ChatUtil.boolean2status(isSetupMetrics)),
+				String.format(lineTemplate,"Economy Linked",ChatUtil.boolean2status(isSetupEconomy)),
+				String.format(lineTemplate,"Placeholders Registered",ChatUtil.boolean2status(isSetupPlaceholders)),
+				String.format(lineTemplate,"Team Colors Registered",ChatUtil.boolean2status(konquest.isVersionHandlerEnabled())),
+				String.format(lineTemplate,"Minecraft Version Supported",ChatUtil.boolean2status(konquest.isVersionSupported())),
+				String.format(lineTemplate,"API Compatibility Validated",ChatUtil.boolean2status(isCompatibiltyValidated))
 		};
 		ChatUtil.printConsoleAlert("Final Status...");
 		for (String row : status) {
 			String line = ChatColor.GOLD+"> "+ChatColor.RESET + row;
 			Bukkit.getServer().getConsoleSender().sendMessage(line);
 		}
-	}
-
-	private String boolean2status(boolean val) {
-		String result = "";
-		if(val) {
-			result = ChatColor.DARK_GREEN+"Success";
-		} else {
-			result = ChatColor.DARK_RED+"Fail";
-		}
-		return result;
 	}
 	
 	/*

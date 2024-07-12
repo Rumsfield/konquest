@@ -6,6 +6,7 @@ import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
@@ -72,7 +73,7 @@ public class SpyCommand extends CommandBase {
 				// Only find enemy towns which do not have the counter-intelligence upgrade level 1+
 				int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.COUNTER);
 				if(upgradeLevel < 1) {
-					int townDist = Konquest.chunkDistance(bukkitPlayer.getLocation(), town.getCenterLoc());
+					int townDist = HelperUtil.chunkDistance(bukkitPlayer.getLocation(), town.getCenterLoc());
 					if(townDist != -1 && townDist < minDistance) {
 						minDistance = townDist;
 						closestTerritory = town;

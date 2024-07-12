@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.model.KonPlot;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -75,7 +76,7 @@ public class PlotManager implements KonquestPlotManager {
 	}
 	
 	public void removePlotPoint(KonTown town, Location loc) {
-		removePlotPoint(town,Konquest.toPoint(loc),loc.getWorld());
+		removePlotPoint(town, HelperUtil.toPoint(loc),loc.getWorld());
 	}
 	
 	public boolean addPlot(KonTown town, KonPlot plot) {

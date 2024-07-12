@@ -9,6 +9,7 @@ import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -76,11 +77,11 @@ public class PlayerInfoMenuWrapper extends MenuWrapper {
 		if(infoPlayer.isBarbarian()) {
 			loreList = new ArrayList<>();
 			if(getKonquest().getCampManager().isCampSet(infoPlayer)) {
-				for(String line : Konquest.stringPaginate(MessagePath.COMMAND_INFO_NOTICE_CAMP_PLACED.getMessage())) {
+				for(String line : HelperUtil.stringPaginate(MessagePath.COMMAND_INFO_NOTICE_CAMP_PLACED.getMessage())) {
 					loreList.add(loreColor+line);
 				}
 			} else {
-				for(String line : Konquest.stringPaginate(MessagePath.COMMAND_INFO_NOTICE_CAMP_MISSING.getMessage())) {
+				for(String line : HelperUtil.stringPaginate(MessagePath.COMMAND_INFO_NOTICE_CAMP_MISSING.getMessage())) {
 					loreList.add(loreColor+line);
 				}
 			}

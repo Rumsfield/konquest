@@ -159,7 +159,7 @@ public class KingdomCommand extends CommandBase {
 					Location settleLoc = bukkitPlayer.getLocation();
 					int radius = konquest.getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath());
 					World locWorld = settleLoc.getWorld();
-					for(Point point : konquest.getAreaPoints(settleLoc, radius)) {
+					for(Point point : HelperUtil.getAreaPoints(settleLoc, radius)) {
 						if(!konquest.getIntegrationManager().getWorldGuard().isChunkClaimAllowed(locWorld,point,bukkitPlayer)) {
 							// A region is denying this action
 							ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
