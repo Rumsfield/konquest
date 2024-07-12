@@ -503,14 +503,6 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		return result;
 	}
 	
-	public List<String> getActiveRelationNames() {
-		List<String> result = new ArrayList<>();
-		for(KonquestKingdom kingdom : activeRelationships.keySet()) {
-			result.add(kingdom.getName());
-		}
-		return result;
-	}
-	
 	/* Request Relationship */
 	
 	public void setRelationRequest(KonquestKingdom kingdom, KonquestDiplomacyType relation) {
@@ -827,10 +819,6 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		return resultTown;
 	}
 	
-	public boolean isTownMapEmpty() {
-		return townMap.isEmpty();
-	}
-	
 	public boolean hasTown(String name) {
 		boolean isTown = false;
 		// Check for exact String key match
@@ -867,19 +855,13 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		return protectedWarmupTimer;
 	}
 	
-	public void updateAllTownBars() {
-		for(KonTown town : townMap.values()) {
-			town.updateBarPlayers();
-		}
-	}
-	
 	public void reloadLoadedTownMonuments() {
 		Point tPoint;
 		List<KonTown> allTownsAndCapital = new ArrayList<>();
 		allTownsAndCapital.add(getCapital());
 		allTownsAndCapital.addAll(getTowns());
 		for(KonTown town : allTownsAndCapital) {
-			tPoint = Konquest.toPoint(town.getCenterLoc());
+			tPoint = HelperUtil.toPoint(town.getCenterLoc());
 			if(town.getWorld().isChunkLoaded(tPoint.x,tPoint.y)) {
 				if(town.isAttacked()) {
 					ChatUtil.printDebug("Could not paste monument in town "+town.getName()+" while under attack");

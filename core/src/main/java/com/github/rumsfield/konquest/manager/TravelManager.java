@@ -74,7 +74,7 @@ public class TravelManager implements Timeable {
 			total_cost = cost_camp;
 		} else {
 			// Player is traveling to town, capital, sanctuary or wild
-			int chunkDistance = Konquest.chunkDistance(travelLoc,bukkitPlayer.getLocation());
+			int chunkDistance = HelperUtil.chunkDistance(travelLoc,bukkitPlayer.getLocation());
 			if(chunkDistance >= 0) {
 				// Value is chunk distance within the same world
 				total_cost = cost + cost_per_chunk*chunkDistance;

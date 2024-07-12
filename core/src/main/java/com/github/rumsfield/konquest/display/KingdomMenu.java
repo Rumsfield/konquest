@@ -7,10 +7,7 @@ import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.model.*;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.Labeler;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -159,7 +156,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		result = new DisplayMenu(rows, getTitle(MenuState.ROOT));
 		
 		/* Join Icon */
-		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_JOIN.getMessage(),loreColor));
+		loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_JOIN.getMessage(),loreColor));
 		isClickable = false;
 		if(!isAdmin) {
 			isClickable = true;
@@ -170,7 +167,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		
 		/* Exile Icon */
 		loreList.clear();
-		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_EXILE.getMessage(),loreColor));
+		loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_EXILE.getMessage(),loreColor));
 		isClickable = false;
 		if(!isAdmin) {
 			isClickable = true;
@@ -181,7 +178,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 
 		/* Invites Icon */
 		loreList.clear();
-		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_INVITES.getMessage(),loreColor));
+		loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_INVITES.getMessage(),loreColor));
 		int numInvites = manager.getInviteKingdoms(player).size();
 		Material inviteMat = Material.BOOK;
 		if(numInvites > 0) {
@@ -198,7 +195,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		
 		/* List Icon */
 		loreList.clear();
-		loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_LIST.getMessage(),loreColor));
+		loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_LIST.getMessage(),loreColor));
 		isClickable = false;
 		if(!isAdmin) {
 			isClickable = true;
@@ -220,7 +217,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				boolean isRelationsClickable = true;
 				loreList = new ArrayList<>();
 				loreList.add(propertyColor+MessagePath.LABEL_OFFICER.getMessage());
-				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_RELATION.getMessage(),loreColor));
+				loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_RELATION.getMessage(),loreColor));
 				if(kingdom.isPeaceful()) {
 					isRelationsClickable = false;
 					// This option is unavailable due to property flags
@@ -234,7 +231,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				/* Requests Icon */
 				loreList.clear();
 				loreList.add(propertyColor+MessagePath.LABEL_OFFICER.getMessage());
-				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_REQUESTS.getMessage(),loreColor));
+				loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_REQUESTS.getMessage(),loreColor));
 				int numRequests = kingdom.getJoinRequests().size();
 				Material requestMat = Material.GLASS_BOTTLE;
 				if(numRequests > 0) {
@@ -251,7 +248,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				boolean isPromoteClickable = true;
 				loreList = new ArrayList<>();
 				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
-				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_PROMOTE.getMessage(),loreColor));
+				loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_PROMOTE.getMessage(),loreColor));
 				if(kingdom.isPromoteable() || isAdmin) {
 					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 				} else {
@@ -266,7 +263,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				boolean isDemoteClickable = true;
 				loreList.clear();
 				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
-				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DEMOTE.getMessage(),loreColor));
+				loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DEMOTE.getMessage(),loreColor));
 				if(kingdom.isDemoteable() || isAdmin) {
 					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 				} else {
@@ -282,7 +279,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					boolean isTransferClickable = true;
 					loreList.clear();
 					loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
-					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_TRANSFER.getMessage(),loreColor));
+					loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_TRANSFER.getMessage(),loreColor));
 					if(kingdom.isTransferable() || isAdmin) {
 						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 					} else {
@@ -298,7 +295,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				if(konquest.getKingdomManager().getIsTownDestroyMasterEnable()) {
 					loreList.clear();
 					loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
-					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage(), loreColor));
+					loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage(), loreColor));
 					loreList.add(hintColor + MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 					icon = new InfoIcon(kingdomColor + MessagePath.MENU_TOWN_DESTROY.getMessage(), loreList, Material.TNT, ROOT_SLOT_DESTROY, true);
 					result.addIcon(icon);
@@ -316,7 +313,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				/* Template Icon */
 				loreList.clear();
 				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
-				loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_TEMPLATE.getMessage(),loreColor));
+				loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_TEMPLATE.getMessage(),loreColor));
 				loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+kingdom.getMonumentTemplateName()));
 				loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 				icon = new InfoIcon(kingdomColor+MessagePath.MENU_KINGDOM_TEMPLATE.getMessage(), loreList, Material.ANVIL, ROOT_SLOT_TEMPLATE, true);
@@ -326,7 +323,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				if(!kingdom.isAdminOperated()) {
 					loreList.clear();
 					loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
-					loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DISBAND.getMessage(), loreColor));
+					loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DISBAND.getMessage(), loreColor));
 					loreList.add(hintColor + MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 					icon = new InfoIcon(kingdomColor + MessagePath.MENU_KINGDOM_DISBAND.getMessage(), loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
 					result.addIcon(icon);
@@ -511,9 +508,9 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 							break;
 					}
 				}
-				loreList.addAll(Konquest.stringPaginate(description,relationColor));
+				loreList.addAll(HelperUtil.stringPaginate(description,relationColor));
 				if(isValidChoice) {
-					loreList.addAll(Konquest.stringPaginate(detailedInfo,ChatColor.LIGHT_PURPLE));
+					loreList.addAll(HelperUtil.stringPaginate(detailedInfo,ChatColor.LIGHT_PURPLE));
 					if(!isAdmin) {
 						double costRelation = manager.getRelationCost(relation);
 						String cost = String.format("%.2f",costRelation);

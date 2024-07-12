@@ -6,6 +6,7 @@ import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -383,7 +384,7 @@ public class PlayerManager implements KonquestPlayerManager {
 	public ArrayList<KonPlayer> getPlayersNearTerritory(KonTerritory territory) {
 		ArrayList<KonPlayer> playerList = new ArrayList<>();
 		for(KonPlayer onlinePlayer : onlinePlayers.values()) {
-			for(Chunk chunk : konquest.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
+			for(Chunk chunk : HelperUtil.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
 				if(territory.hasChunk(chunk)) {
 					playerList.add(onlinePlayer);
 					break;

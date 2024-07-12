@@ -11,6 +11,7 @@ import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -64,17 +65,6 @@ public class CampManager implements KonquestCampManager {
 		return barbarianCamps.get(uuid);
 	}
 	
-	public KonCamp getCampFromName(String name) {
-		KonCamp result = null;
-		for(KonCamp camp : barbarianCamps.values()) {
-			if(camp.getName().equalsIgnoreCase(name)) {
-				result = camp;
-				break;
-			}
-		}
-		return result;
-	}
-	
 	public ArrayList<KonCamp> getCamps() {
 		return new ArrayList<>(barbarianCamps.values());
 	}
@@ -85,17 +75,6 @@ public class CampManager implements KonquestCampManager {
 			campNames.add(camp.getName());
 		}
 		return campNames;
-	}
-	
-	public boolean isCampName(String name) {
-		boolean result = false;
-		for(KonCamp camp : barbarianCamps.values()) {
-			if(camp.getName().equalsIgnoreCase(name)) {
-				result = true;
-				break;
-			}
-		}
-		return result;
 	}
 	
 	public void activateCampProtection(@Nullable KonOfflinePlayer offlinePlayer) {
@@ -145,7 +124,7 @@ public class CampManager implements KonquestCampManager {
 			// Verify no overlapping init chunks
 			int radius = konquest.getCore().getInt(CorePath.CAMPS_INIT_RADIUS.getPath());
 			World addWorld = loc.getWorld();
-			for(Point point : konquest.getAreaPoints(loc, radius)) {
+			for(Point point : HelperUtil.getAreaPoints(loc, radius)) {
 				if(konquest.getTerritoryManager().isChunkClaimed(point,addWorld)) {
 					ChatUtil.printDebug("Found a chunk conflict in camp placement for player "+player.getOfflineBukkitPlayer().getName()+" "+uuid);
 					return 1;
@@ -157,7 +136,7 @@ public class CampManager implements KonquestCampManager {
 				// Search surroundings for any adjacent camps with online members
 				boolean isAdjacentCampPresent = false;
 				boolean isAnyAdjacentOwnerOnline = false;
-				for(Point point : konquest.getBorderPoints(loc, radius+1)) {
+				for(Point point : HelperUtil.getBorderPoints(loc, radius+1)) {
 					if(konquest.getTerritoryManager().isChunkClaimed(point,loc.getWorld()) && konquest.getTerritoryManager().getChunkTerritory(point,loc.getWorld()) instanceof KonCamp) {
 						KonCamp adjCamp = (KonCamp)konquest.getTerritoryManager().getChunkTerritory(point,loc.getWorld());
 						isAdjacentCampPresent = true;
@@ -210,7 +189,7 @@ public class CampManager implements KonquestCampManager {
 			// Check new territory claims
 			int radius = konquest.getCore().getInt(CorePath.CAMPS_INIT_RADIUS.getPath());
 			World locWorld = loc.getWorld();
-			for(Point point : konquest.getAreaPoints(loc, radius)) {
+			for(Point point : HelperUtil.getAreaPoints(loc, radius)) {
 				if(!konquest.getIntegrationManager().getWorldGuard().isChunkClaimAllowed(locWorld,point,bukkitPlayer)) {
 					// A region is denying this action
 					ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
@@ -331,7 +310,7 @@ public class CampManager implements KonquestCampManager {
 				center = currCamp.getCenterLoc();
 				// Search surroundings for all adjacent camps
 				HashSet<KonCamp> adjCamps = new HashSet<>();
-				for(Point point : konquest.getBorderPoints(center, radius+1)) {
+				for(Point point : HelperUtil.getBorderPoints(center, radius+1)) {
 					if(konquest.getTerritoryManager().isChunkClaimed(point,center.getWorld()) && konquest.getTerritoryManager().getChunkTerritory(point,center.getWorld()) instanceof KonCamp) {
 						KonCamp adjCamp = (KonCamp)konquest.getTerritoryManager().getChunkTerritory(point,center.getWorld());
 						adjCamps.add(adjCamp);
@@ -424,7 +403,7 @@ public class CampManager implements KonquestCampManager {
 	            		Location camp_center = new Location(world,x,y,z);
 	            		int status = addCamp(camp_center, offlinePlayer);
 	            		if(status == 0) {
-		            		getCamp(offlinePlayer).addPoints(konquest.formatStringToPoints(playerCampSection.getString("chunks")));
+		            		getCamp(offlinePlayer).addPoints(HelperUtil.formatStringToPoints(playerCampSection.getString("chunks")));
 		            		konquest.getTerritoryManager().addAllTerritory(world,getCamp(offlinePlayer).getChunkList());
 		            		totalCamps++;
 	            		} else {
@@ -459,7 +438,7 @@ public class CampManager implements KonquestCampManager {
 			campSection.set("center", new int[] {camp.getCenterLoc().getBlockX(),
 					camp.getCenterLoc().getBlockY(),
 					camp.getCenterLoc().getBlockZ()});
-	        campSection.set("chunks", konquest.formatPointsToString(camp.getChunkList().keySet()));
+	        campSection.set("chunks", HelperUtil.formatPointsToString(camp.getChunkList().keySet()));
 		}
 	}
 }

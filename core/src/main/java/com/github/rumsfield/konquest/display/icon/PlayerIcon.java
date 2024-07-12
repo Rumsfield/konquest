@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.display.icon;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemFlag;
@@ -60,7 +61,7 @@ public class PlayerIcon implements MenuIcon {
 	@Override
 	public ItemStack getItem() {
 		List<String> loreList = new ArrayList<>();
-		String lastOnlineFormat = Konquest.getLastSeenFormat(player);
+		String lastOnlineFormat = HelperUtil.getLastSeenFormat(player);
 		loreList.add(propertyColor+MessagePath.LABEL_PLAYER.getMessage());
 		loreList.add(loreColor+ MessagePath.LABEL_LAST_SEEN.getMessage(valueColor+lastOnlineFormat));
 		loreList.addAll(lore);

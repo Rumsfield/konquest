@@ -175,23 +175,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public String getKingdomPayTime() {
 		String noColor = "";
 		int timerCount = Math.max(payTimer.getTime(),0);
-		return Konquest.getTimeFormat(timerCount, noColor);
-	}
-	
-	public double getCostDiplomacyWar() {
-		return costDiplomacyWar;
-	}
-
-	public double getCostDiplomacyPeace() {
-		return costDiplomacyPeace;
-	}
-
-	public double getCostDiplomacyTrade() {
-		return costDiplomacyTrade;
-	}
-
-	public double getCostDiplomacyAlliance() {
-		return costDiplomacyAlliance;
+		return HelperUtil.getTimeFormat(timerCount, noColor);
 	}
 	
 	public double getCostCreate() {
@@ -328,7 +312,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		int searchDistance;
 		int minDistance = Integer.MAX_VALUE;
 		for(KonKingdom kingdom : kingdomMap.values()) {
-			searchDistance = Konquest.chunkDistance(loc, kingdom.getCapital().getCenterLoc());
+			searchDistance = HelperUtil.chunkDistance(loc, kingdom.getCapital().getCenterLoc());
 			if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
 				ChatUtil.printDebug("Failed to add town, too close to capital "+kingdom.getCapital().getName());
 				return 2;
@@ -337,7 +321,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				minDistance = searchDistance;
 			}
 			for(KonTown town : kingdom.getTowns()) {
-				searchDistance = Konquest.chunkDistance(loc, town.getCenterLoc());
+				searchDistance = HelperUtil.chunkDistance(loc, town.getCenterLoc());
 				if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
 					ChatUtil.printDebug("Failed to add town, too close to town "+town.getName());
 					return 2;
@@ -348,7 +332,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 		for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			searchDistance = Konquest.chunkDistance(loc, ruin.getCenterLoc());
+			searchDistance = HelperUtil.chunkDistance(loc, ruin.getCenterLoc());
 			if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
 				ChatUtil.printDebug("Failed to add town, too close to ruin "+ruin.getName());
 				return 2;
@@ -358,7 +342,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 		for(KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
-			searchDistance = Konquest.chunkDistance(loc, sanctuary.getCenterLoc());
+			searchDistance = HelperUtil.chunkDistance(loc, sanctuary.getCenterLoc());
 			if(searchDistance != -1 && min_distance_sanc > 0 && searchDistance < min_distance_sanc) {
 				ChatUtil.printDebug("Failed to add town, too close to sanctuary "+sanctuary.getName());
 				return 2;
@@ -379,7 +363,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			radius = 1;
 		}
 		ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
-		for(Point point : konquest.getAreaPoints(loc, radius)) {
+		for(Point point : HelperUtil.getAreaPoints(loc, radius)) {
 			if(konquest.getTerritoryManager().isChunkClaimed(point,loc.getWorld())) {
 				ChatUtil.printDebug("Found a chunk conflict");
 				return 4;
@@ -2389,7 +2373,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		/* Passed checks, start to create town */
 		
 		// Modify location to max Y at given X,Z
-		Point point = Konquest.toPoint(loc);
+		Point point = HelperUtil.toPoint(loc);
 		int xLocal = loc.getBlockX() - (point.x*16);
 		int zLocal = loc.getBlockZ() - (point.y*16);
 		Chunk chunk = loc.getChunk();
@@ -3180,7 +3164,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			if(!kingdom.equals(friendlyKingdom)) {
 				for(KonTown town : kingdom.getTowns()) {
-					int townDist = Konquest.chunkDistance(loc, town.getCenterLoc());
+					int townDist = HelperUtil.chunkDistance(loc, town.getCenterLoc());
 					if(townDist != -1 && townDist < minDistance) {
 						minDistance = townDist;
 						closestTerritory = town;
@@ -3896,7 +3880,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		String remainCooldown = "";
 		int cooldown = getJoinCooldownRemainingSeconds(player);
 		if(cooldown > 0) {
-			remainCooldown = Konquest.getTimeFormat(cooldown, color);
+			remainCooldown = HelperUtil.getTimeFormat(cooldown, color);
 		}
 		return remainCooldown;
 	}
@@ -3940,7 +3924,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		String remainCooldown = "";
 		int cooldown = getExileCooldownRemainingSeconds(player);
 		if(cooldown > 0) {
-			remainCooldown = Konquest.getTimeFormat(cooldown, color);
+			remainCooldown = HelperUtil.getTimeFormat(cooldown, color);
 		}
 		return remainCooldown;
 	}
@@ -4176,7 +4160,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			// Assign Master
 			String masterUUID = kingdomSection.getString("master","");
 			if(!masterUUID.equalsIgnoreCase("")) {
-				UUID playerID = Konquest.idFromString(masterUUID);
+				UUID playerID = HelperUtil.idFromString(masterUUID);
 				if(playerID != null) {
 					newKingdom.forceMaster(playerID);
 				} else {
@@ -4331,7 +4315,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		ArrayList<Point> capital_chunks = new ArrayList<>();
 		String chunkStr = capitalSection.getString("chunks");
 		if(chunkStr != null) {
-			capital_chunks.addAll(konquest.formatStringToPoints(chunkStr));
+			capital_chunks.addAll(HelperUtil.formatStringToPoints(chunkStr));
 		}
 		sectionList = monumentSection.getDoubleList("travel");
 		x = sectionList.get(0);
@@ -4395,7 +4379,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			// Count town land
 			String townChunks = townSection.getString("chunks");
 			if(townChunks != null) {
-				townLand += konquest.formatStringToPoints(townChunks).size();
+				townLand += HelperUtil.formatStringToPoints(townChunks).size();
 			}
 			// Compare to previous
 			ChatUtil.printDebug("Evaluating for capital: "+townName+", "+townLand+", "+townPopulation);
@@ -4532,7 +4516,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Add all Town chunk claims
 		String chunkStr = townSection.getString("chunks");
 		if(chunkStr != null) {
-			town.addPoints(konquest.formatStringToPoints(chunkStr));
+			town.addPoints(HelperUtil.formatStringToPoints(chunkStr));
 		}
 		// Update territory cache
 		konquest.getTerritoryManager().addAllTerritory(townWorld,town.getChunkList());
@@ -4578,7 +4562,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Assign Lord
 		String lordUUID = townSection.getString("lord","");
 		if(!lordUUID.equalsIgnoreCase("")) {
-			UUID playerID = Konquest.idFromString(lordUUID);
+			UUID playerID = HelperUtil.idFromString(lordUUID);
 			if(playerID != null) {
 				town.setLord(playerID,false);
 			} else {
@@ -4624,7 +4608,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				if(plotStr == null) {
 					continue;
 				}
-				HashSet<Point> points = new HashSet<>(konquest.formatStringToPoints(plotStr));
+				HashSet<Point> points = new HashSet<>(HelperUtil.formatStringToPoints(plotStr));
 				ArrayList<UUID> users = new ArrayList<>();
 				for(String user : townSection.getStringList("plots."+plotIndex+".members")) {
 					users.add(UUID.fromString(user));
@@ -4747,7 +4731,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
             	townInstanceSection.set("center", new int[] {town.getCenterLoc().getBlockX(),
 						town.getCenterLoc().getBlockY(),
 						town.getCenterLoc().getBlockZ()});
-                townInstanceSection.set("chunks", konquest.formatPointsToString(town.getChunkList().keySet()));
+                townInstanceSection.set("chunks", HelperUtil.formatPointsToString(town.getChunkList().keySet()));
 				townInstanceSection.set("specialization", town.getSpecialization().toString());
 				townInstanceSection.set("open", town.isOpen());
                 townInstanceSection.set("plot", town.isPlotOnly());
@@ -4791,7 +4775,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
                 int plotIndex = 0;
                 for(KonPlot plot : town.getPlots()) {
                 	ConfigurationSection plotInstanceSection = townInstancePlotSection.createSection("plot_"+plotIndex);
-                	plotInstanceSection.set("chunks", konquest.formatPointsToString(plot.getPoints()));
+                	plotInstanceSection.set("chunks", HelperUtil.formatPointsToString(plot.getPoints()));
                 	plotInstanceSection.set("members",plot.getUserStrings());
                 	plotIndex++;
                 }

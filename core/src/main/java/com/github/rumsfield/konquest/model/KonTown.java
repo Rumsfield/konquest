@@ -47,13 +47,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private UUID lord;
 	private final HashMap<UUID,Boolean> residents;
 	private final RequestKeeper joinRequestKeeper;
-	private HashMap<KonTownOption,Boolean> townOptions;
-//	private boolean isOpen;
-//	private boolean isAlliedBuildingAllowed;
-//	private boolean isFriendlyRedstoneAllowed;
-//	private boolean isEnemyRedstoneAllowed;
-//	private boolean isResidentPlotOnly;
-//	private boolean isGolemOffensive;
+	private final HashMap<KonTownOption,Boolean> townOptions;
 	private boolean isAttacked;
 	private boolean isShielded;
 	private boolean isArmored;
@@ -305,7 +299,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	@Override
 	public boolean testChunk(Point point) {
 		// Tests a chunk to make sure it is within the max town size limit
-		Point centerChunk = Konquest.toPoint(getCenterLoc());
+		Point centerChunk = HelperUtil.toPoint(getCenterLoc());
 		int maxChunkRange = getKonquest().getCore().getInt(CorePath.TOWNS_MAX_SIZE.getPath());
 		if(maxChunkRange < 0) {
 			maxChunkRange = 0;
@@ -445,7 +439,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		if(radius < 1) {
 			radius = 1;
 		}
-		if(!addChunks(getKonquest().getAreaPoints(getCenterLoc(), radius))) {
+		if(!addChunks(HelperUtil.getAreaPoints(getCenterLoc(), radius))) {
 			ChatUtil.printDebug("Town init failed: problem adding some chunks");
 			return 3;
 		}
@@ -629,20 +623,20 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 
 	public boolean isLocInsideCenterChunk(Location loc) {
-		Point centerPoint = Konquest.toPoint(getCenterLoc());
-		Point testPoint = Konquest.toPoint(loc);
+		Point centerPoint = HelperUtil.toPoint(getCenterLoc());
+		Point testPoint = HelperUtil.toPoint(loc);
 		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
 	}
 	
 	public boolean isChunkCenter(Chunk chunk) {
-		Point centerPoint = Konquest.toPoint(getCenterLoc());
-		Point testPoint = Konquest.toPoint(chunk);
+		Point centerPoint = HelperUtil.toPoint(getCenterLoc());
+		Point testPoint = HelperUtil.toPoint(chunk);
 		return centerPoint.x == testPoint.x && centerPoint.y == testPoint.y;
 	}
 	
 	public boolean isLocInsideMonumentProtectionArea(Location loc) {
-		Point centerPoint = Konquest.toPoint(getCenterLoc());
-		Point testPoint = Konquest.toPoint(loc);
+		Point centerPoint = HelperUtil.toPoint(getCenterLoc());
+		Point testPoint = HelperUtil.toPoint(loc);
 		int baseDepth = getKonquest().getCore().getInt(CorePath.TOWNS_SETTLE_CHECKS_DEPTH.getPath(),0);
 		if(baseDepth < 0) {
 			baseDepth = 0;
@@ -776,14 +770,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	public boolean isPlayerTravelDisabled(UUID uuid) {
 		return playerTravelTimers.containsKey(uuid);
-	}
-	
-	public int getPlayerTravelCooldown(UUID uuid) {
-		int cooldownTime = 0;
-		if(playerTravelTimers.containsKey(uuid)) {
-			cooldownTime = playerTravelTimers.get(uuid).getSeconds();
-		}
-		return cooldownTime;
 	}
 	
 	public String getPlayerTravelCooldownString(UUID uuid) {
@@ -1002,18 +988,18 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		// Set title conditions
 		if(isShielded && isArmored) {
 			remainingSeconds = getRemainingShieldTimeSeconds();
-			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor2));
-			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
-			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
-			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
-			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
+			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.friendColor2));
+			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
+			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
+			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
+			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
 		} else if(isShielded) {
 			remainingSeconds = getRemainingShieldTimeSeconds();
-			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.friendColor2));
-			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
-			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
-			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
-			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+shield+" "+Konquest.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
+			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.friendColor2));
+			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
+			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
+			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
+			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
 		} else if(isArmored) {
 			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+armorCurrentBlocks+" "+armor);
 			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+armorCurrentBlocks+" "+armor);
@@ -1571,11 +1557,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			shieldTimer.stopTimer();
 			shieldTimer.setTime(0);
 			shieldTimer.startLoopTimer();
-			// No longer attacked when shielded
-			//setAttacked(false);
 		}
-		//shieldArmorBarAll.setVisible(true);
-		//refreshShieldBarTitle();
 		updateBarTitle();
 	}
 	
@@ -1585,7 +1567,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		isShielded = false;
 		shieldTimer.stopTimer();
-		//refreshShieldBarTitle();
 		updateBarTitle();
 	}
 	
@@ -1593,16 +1574,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		if(!isArmored) {
 			// Activate new armor
 			isArmored = true;
-			// No longer attacked when armored
-			//setAttacked(false);
 		}
 		armorCurrentBlocks = val;
 		armorTotalBlocks = armorCurrentBlocks;
 		armorProgress = 1.0;
-		//shieldArmorBarAll.setVisible(true);
-		//shieldArmorBarAll.setProgress(1.0);
-		//setBarProgress(1.0);
-		//refreshShieldBarTitle();
 		updateBarTitle();
 	}
 	
@@ -1611,12 +1586,9 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			playDeactivateSound();
 		}
 		isArmored = false;
-		//shieldArmorBarAll.setProgress(0.0);
-		//setBarProgress(0.0);
 		armorCurrentBlocks = 0;
 		armorTotalBlocks = 0;
 		armorProgress = 0.0;
-		//refreshShieldBarTitle();
 		updateBarTitle();
 	}
 	
@@ -1640,26 +1612,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		return result;
 	}
 	
-	/*
-	private void refreshShieldBarTitle() {
-		ChatColor titleColor = ChatColor.AQUA;
-		int remainingSeconds = getRemainingShieldTimeSeconds();
-		String remainingTime = Konquest.getTimeFormat(remainingSeconds,titleColor);
-		String armor = MessagePath.LABEL_ARMOR.getMessage();
-		String shield = MessagePath.LABEL_SHIELD.getMessage();
-		if(isShielded && isArmored) {
-			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+" "+armor+" | "+shield+" "+remainingTime);
-		} else if(isShielded) {
-			shieldArmorBarAll.setTitle(titleColor+shield+" "+remainingTime);
-		} else if(isArmored) {
-			shieldArmorBarAll.setTitle(titleColor+""+armorCurrentBlocks+" "+armor);
-		} else {
-			shieldArmorBarAll.setProgress(0.0);
-			shieldArmorBarAll.setVisible(false);
-		}
-	}
-	*/
-	
 	public int getShieldEndTime() {
 		return shieldEndTimeSeconds;
 	}
@@ -1680,27 +1632,14 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		getWorld().playSound(getCenterLoc(), Sound.BLOCK_GLASS_BREAK, (float)3.0, (float)0.3);
 	}
 	
-	/*public boolean addPlot(Location loc) {
-		boolean result = false;
-		if(this.isLocInside(loc)) {
-			Point p = Konquest.toPoint(loc);
-			plots.put(p,new KonPlot(p));
-			result = true;
-		}
-		return result;
-	}*/
-	
 	public void putPlot(KonPlot plot) {
 		if(plot == null) {
 			ChatUtil.printDebug("Failed to set null plot!");
 			return;
 		}
-		//ChatUtil.printDebug("Putting plot with "+plot.getPoints().size()+" points...");
 		for(Point p : plot.getPoints()) {
 			plots.put(p, plot);
-			//ChatUtil.printDebug("  Put point "+p.x+","+p.y);
 		}
-		//ChatUtil.printDebug("Finished putting plot, plot size: "+plots.size());
 	}
 	
 	public void removePlot(KonPlot plot) {
@@ -1708,18 +1647,13 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			ChatUtil.printDebug("Failed to remove null plot!");
 			return;
 		}
-		//ChatUtil.printDebug("Removing plot with "+plot.getPoints().size()+" points...");
 		for(Point p : plot.getPoints()) {
 			plots.remove(p);
-			/*if(plots.containsKey(p)) {
-				plots.remove(p);
-				//ChatUtil.printDebug("  Removed point "+p.x+","+p.y);
-			}*/
 		}
 	}
 	
 	public boolean hasPlot(Location loc) {
-		return hasPlot(Konquest.toPoint(loc), loc.getWorld());
+		return hasPlot(HelperUtil.toPoint(loc), loc.getWorld());
 	}
 	
 	public boolean hasPlot(Point p, World w) {
@@ -1732,7 +1666,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	@Nullable
 	public KonPlot getPlot(Location loc) {
-		return getPlot(Konquest.toPoint(loc), loc.getWorld());
+		return getPlot(HelperUtil.toPoint(loc), loc.getWorld());
 	}
 	
 	@Nullable

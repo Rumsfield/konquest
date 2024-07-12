@@ -5,6 +5,7 @@ import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -82,7 +83,7 @@ public class CampAdminCommand extends CommandBase {
 			}
 			// Determine solid location to place bed
 			Chunk chunk = campLoc.getChunk();
-			Point point = Konquest.toPoint(campLoc);
+			Point point = HelperUtil.toPoint(campLoc);
 			int xLocal = campLoc.getBlockX() - (point.x*16);
 			int zLocal = campLoc.getBlockZ() - (point.y*16);
 			int yFloor = chunk.getChunkSnapshot(true, false, false).getHighestBlockYAt(xLocal, zLocal);

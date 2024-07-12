@@ -27,10 +27,6 @@ public class Timer {
     public int getTime() {
         return time;
     }
-    
-    public int getLoopTime() {
-    	return looptime;
-    }
 
     public void setTime(int time) {
         this.time = time;
@@ -43,10 +39,6 @@ public class Timer {
 
     public int getMinutes() {
         return time / 60;
-    }
-
-    public Runnable getTask() {
-        return task;
     }
 
     public int getTaskID() {

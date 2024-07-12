@@ -42,7 +42,7 @@ public class ProfessionIcon implements MenuIcon {
 
 	@Override
 	public ItemStack getItem() {
-		return CompatibilityUtil.buildItem(Konquest.getProfessionMaterial(profession), getName(), lore);
+		return CompatibilityUtil.buildItem(CompatibilityUtil.getProfessionMaterial(profession), getName(), lore);
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
@@ -58,8 +59,8 @@ public class WorldListener  implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR)
     public void onChunkLoad(ChunkLoadEvent event) {
-		if(konquest.getTerritoryManager().isChunkClaimed(Konquest.toPoint(event.getChunk()), event.getWorld())) {
-			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(Konquest.toPoint(event.getChunk()), event.getWorld());
+		if(konquest.getTerritoryManager().isChunkClaimed(HelperUtil.toPoint(event.getChunk()), event.getWorld())) {
+			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(HelperUtil.toPoint(event.getChunk()), event.getWorld());
 			if(territory instanceof KonTown) {
 				KonTown town = (KonTown) territory;
 				if(town.isChunkCenter(event.getChunk())) {
@@ -84,13 +85,13 @@ public class WorldListener  implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChunkUnload(ChunkUnloadEvent event) {
 		// Remove Ruin Golems when a chunk with a ruin spawn location unloads
-		Point chunkPoint = Konquest.toPoint(event.getChunk());
+		Point chunkPoint = HelperUtil.toPoint(event.getChunk());
 		if(konquest.getTerritoryManager().isChunkClaimed(chunkPoint, event.getWorld())) {
-			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(Konquest.toPoint(event.getChunk()), event.getWorld());
+			KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(HelperUtil.toPoint(event.getChunk()), event.getWorld());
 			if(territory instanceof KonRuin) {
 				KonRuin ruin = (KonRuin) territory;
 				for(Location spawn : ruin.getSpawnLocations()) {
-					Point spawnPoint = Konquest.toPoint(spawn);
+					Point spawnPoint = HelperUtil.toPoint(spawn);
 					if(chunkPoint.equals(spawnPoint)) {
 						// Found a ruin's spawn point within the chunk being unloaded
 						// Remove the golem associated with the spawn point

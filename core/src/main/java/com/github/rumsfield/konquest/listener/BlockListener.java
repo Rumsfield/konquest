@@ -1437,7 +1437,7 @@ public class BlockListener implements Listener {
 							onlinePlayer.clearAllMobAttackers();
 						}
 						// Update particle border renders for nearby players
-						for(Chunk chunk : konquest.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
+						for(Chunk chunk : HelperUtil.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
 							if(capturedTown.hasChunk(chunk)) {
 								territoryManager.updatePlayerBorderParticles(onlinePlayer);
 								break;

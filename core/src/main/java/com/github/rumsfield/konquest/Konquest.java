@@ -127,30 +127,30 @@ public class Konquest implements KonquestAPI, Timeable {
 		chatMessage = "%PREFIX% %KINGDOM% §7| %TITLE% %NAME% %SUFFIX% ";
 		chatDivider = "§8»§r ";
 		
-		databaseThread = new DatabaseThread(this);
-		accomplishmentManager = new AccomplishmentManager(this);
-		directiveManager = new DirectiveManager(this);
-		playerManager = new PlayerManager(this);
-		kingdomManager = new KingdomManager(this);
-		campManager = new CampManager(this);
-		configManager = new ConfigManager(this);
-		integrationManager = new IntegrationManager(this);
-		lootManager = new LootManager(this);
-		commandHandler = new CommandHandler(this);
-		displayManager = new DisplayManager(this);
-		upgradeManager = new UpgradeManager(this);
-		shieldManager = new ShieldManager(this);
-		ruinManager = new RuinManager(this);
-		languageManager = new LanguageManager(this);
-		mapHandler = new MapHandler(this);
-		shopHandler = new ShopHandler(this);
-		plotManager = new PlotManager(this);
-		travelManager = new TravelManager(this);
-		sanctuaryManager = new SanctuaryManager(this);
-		territoryManager = new TerritoryManager(this);
-		placeholderManager = new PlaceholderManager(this);
-		
-		versionHandler = null;
+		this.databaseThread = new DatabaseThread(this);
+		this.accomplishmentManager = new AccomplishmentManager(this);
+		this.directiveManager = new DirectiveManager(this);
+		this.playerManager = new PlayerManager(this);
+		this.kingdomManager = new KingdomManager(this);
+		this.campManager = new CampManager(this);
+		this.configManager = new ConfigManager(this);
+		this.integrationManager = new IntegrationManager(this);
+		this.lootManager = new LootManager(this);
+		this.commandHandler = new CommandHandler(this);
+		this.displayManager = new DisplayManager(this);
+		this.upgradeManager = new UpgradeManager(this);
+		this.shieldManager = new ShieldManager(this);
+		this.ruinManager = new RuinManager(this);
+		this.languageManager = new LanguageManager(this);
+		this.mapHandler = new MapHandler(this);
+		this.shopHandler = new ShopHandler(this);
+		this.plotManager = new PlotManager(this);
+		this.travelManager = new TravelManager(this);
+		this.sanctuaryManager = new SanctuaryManager(this);
+		this.territoryManager = new TerritoryManager(this);
+		this.placeholderManager = new PlaceholderManager(this);
+
+		this.versionHandler = null;
 		
 		this.chatPriority = defaultChatPriority;
 		this.worlds = new ArrayList<>();
@@ -482,36 +482,24 @@ public class Konquest implements KonquestAPI, Timeable {
 	private void printConfigFeatures() {
 		String lineTemplate = "%-30s -> %s";
 		String [] status = {
-				String.format(lineTemplate,"Accomplishment Prefixes",boolean2enable(getCore().getBoolean(CorePath.ACCOMPLISHMENT_PREFIX.getPath()))),
-				String.format(lineTemplate,"Tutorial Quests",boolean2enable(getCore().getBoolean(CorePath.DIRECTIVE_QUESTS.getPath()))),
-				String.format(lineTemplate,"Chat Formatting",boolean2enable(getCore().getBoolean(CorePath.CHAT_ENABLE_FORMAT.getPath()))),
-				String.format(lineTemplate,"Admin Kingdoms Only",boolean2enable(getCore().getBoolean(CorePath.KINGDOMS_CREATE_ADMIN_ONLY.getPath()))),
-				String.format(lineTemplate,"Combat Tag",boolean2enable(getCore().getBoolean(CorePath.COMBAT_PREVENT_COMMAND_ON_DAMAGE.getPath()))),
-				String.format(lineTemplate,"Town Upgrades",boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_UPGRADES.getPath()))),
-				String.format(lineTemplate,"Town Shields",boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_SHIELDS.getPath()))),
-				String.format(lineTemplate,"Town Armor",boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_ARMOR.getPath()))),
-				String.format(lineTemplate,"Town Specializations",boolean2enable(getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath()))),
-				String.format(lineTemplate,"Town Plots",boolean2enable(getCore().getBoolean(CorePath.PLOTS_ENABLE.getPath()))),
-				String.format(lineTemplate,"Barbarian Camps",boolean2enable(getCore().getBoolean(CorePath.CAMPS_ENABLE.getPath()))),
-				String.format(lineTemplate,"Barbarian Clans",boolean2enable(getCore().getBoolean(CorePath.CAMPS_CLAN_ENABLE.getPath())))
+				String.format(lineTemplate,"Accomplishment Prefixes",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.ACCOMPLISHMENT_PREFIX.getPath()))),
+				String.format(lineTemplate,"Tutorial Quests",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.DIRECTIVE_QUESTS.getPath()))),
+				String.format(lineTemplate,"Chat Formatting",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.CHAT_ENABLE_FORMAT.getPath()))),
+				String.format(lineTemplate,"Admin Kingdoms Only",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.KINGDOMS_CREATE_ADMIN_ONLY.getPath()))),
+				String.format(lineTemplate,"Combat Tag",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.COMBAT_PREVENT_COMMAND_ON_DAMAGE.getPath()))),
+				String.format(lineTemplate,"Town Upgrades",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_UPGRADES.getPath()))),
+				String.format(lineTemplate,"Town Shields",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_SHIELDS.getPath()))),
+				String.format(lineTemplate,"Town Armor",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_ARMOR.getPath()))),
+				String.format(lineTemplate,"Town Specializations",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath()))),
+				String.format(lineTemplate,"Town Plots",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.PLOTS_ENABLE.getPath()))),
+				String.format(lineTemplate,"Barbarian Camps",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.CAMPS_ENABLE.getPath()))),
+				String.format(lineTemplate,"Barbarian Clans",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.CAMPS_CLAN_ENABLE.getPath())))
 		};
 		ChatUtil.printConsoleAlert("Feature Summary...");
 		for (String row : status) {
 			String line = ChatColor.GOLD+"> "+ChatColor.RESET + row;
 			Bukkit.getServer().getConsoleSender().sendMessage(line);
 		}
-	}
-
-	private String boolean2enable(boolean val) {
-		String result = "";
-		if(val) {
-			//result = ChatUtil.parseHex("#60C030")+"Enabled"; // Green
-			result = ChatColor.DARK_GREEN+"Enabled";
-		} else {
-			//result = ChatUtil.parseHex("#B040C0")+"Disabled"; // Light Purple
-			result = ChatColor.DARK_RED+"Disabled";
-		}
-		return result;
 	}
 	
 	public void initOnlinePlayers() {
@@ -609,7 +597,6 @@ public class Konquest implements KonquestAPI, Timeable {
 		kingdomManager.saveKingdoms();
 		campManager.saveCamps();
 		ruinManager.saveRuins();
-		//guildManager.saveGuilds();
 		configManager.saveConfigs();
 	}
 	
@@ -794,6 +781,18 @@ public class Konquest implements KonquestAPI, Timeable {
 	public EventPriority getChatPriority() {
 		return chatPriority;
 	}
+
+	public static String getChatTag() {
+		return chatTag;
+	}
+
+	public static String getChatMessage() {
+		return chatMessage;
+	}
+
+	public static String getChatDivider() {
+		return chatDivider;
+	}
 	
 	public boolean isWorldValid(Location loc) {
 		if(loc != null && loc.getWorld() != null) {
@@ -970,7 +969,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	    					// Only find enemy towns which do not have the counter-intelligence upgrade level 2+
 	    					int upgradeLevel = upgradeManager.getTownUpgradeLevel(town, KonUpgrade.COUNTER);
 	    					if(upgradeLevel < 2) {
-	    						int townDist = chunkDistance(player.getBukkitPlayer().getLocation(), town.getCenterLoc());
+	    						int townDist = HelperUtil.chunkDistance(player.getBukkitPlayer().getLocation(), town.getCenterLoc());
 	    						if(townDist != -1 && townDist < minDistance) {
 	    							minDistance = townDist;
 	    							nearestTerritory = town;
@@ -990,226 +989,6 @@ public class Konquest implements KonquestAPI, Timeable {
 				ChatUtil.printDebug("Database ping success!");
 			}
 		}
-	}
-	
-	// Helper methods
-	/**
-	 * Gets chunks around loc, (2r-1)^2 chunks squared
-	 * @param loc location of area
-	 * @param radius radius of area around loc
-	 * @return (2r-1)^2 chunks squared
-	 */
-	public ArrayList<Chunk> getAreaChunks(Location loc, int radius) {
-		ArrayList<Chunk> areaChunks = new ArrayList<>();
-		areaChunks.add(loc.getChunk());
-		int curX = loc.getChunk().getX();
-		int curZ = loc.getChunk().getZ();
-		if(radius > 0) {
-			int min = (radius-1)*-1;
-			int max = (radius-1);
-			for(int x=min;x<=max;x++) {
-				for(int z=min;z<=max;z++) {
-					if(x != 0 || z != 0) {
-						areaChunks.add(loc.getWorld().getChunkAt(curX+x, curZ+z));
-					}
-				}
-			}
-		}
-		return areaChunks;
-	}
-
-	public ArrayList<Point> getAreaPoints(Location loc, int radius) {
-		ArrayList<Point> areaPoints = new ArrayList<>();
-		Point center = toPoint(loc);
-		areaPoints.add(center);
-		if(radius > 0) {
-			int min = (radius-1)*-1;
-			int max = (radius-1);
-			for(int x=min;x<=max;x++) {
-				for(int z=min;z<=max;z++) {
-					if(x != 0 || z != 0) {
-						areaPoints.add(new Point(center.x + x, center.y + z));
-					}
-				}
-			}
-		}
-		return areaPoints;
-	}
-	
-	/**
-	 * Gets chunks surrounding loc, (2r-1)^2-1 chunks squared
-	 * @param loc location of area
-	 * @param radius radius of area around loc
-	 * @return (2r-1)^2 chunks squared
-	 */
-	public ArrayList<Chunk> getSurroundingChunks(Location loc, int radius) {
-		ArrayList<Chunk> areaChunks = new ArrayList<>();
-		int curX = loc.getChunk().getX();
-		int curZ = loc.getChunk().getZ();
-		if(radius > 0) {
-			int min = (radius-1)*-1;
-			int max = (radius-1);
-			for(int x=min;x<=max;x++) {
-				for(int z=min;z<=max;z++) {
-					if(x != 0 || z != 0) {
-						areaChunks.add(loc.getWorld().getChunkAt(curX+x, curZ+z));
-					}
-				}
-			}
-		}
-		return areaChunks;
-	}
-	
-	public ArrayList<Point> getSurroundingPoints(Location loc, int radius) {
-		ArrayList<Point> areaPoints = new ArrayList<>();
-		Point center = toPoint(loc);
-		if(radius > 0) {
-			int min = (radius-1)*-1;
-			int max = (radius-1);
-			for(int x=min;x<=max;x++) {
-				for(int z=min;z<=max;z++) {
-					if(x != 0 || z != 0) {
-						areaPoints.add(new Point(center.x + x, center.y + z));
-					}
-				}
-			}
-		}
-		return areaPoints;
-	}
-	
-	public ArrayList<Point> getBorderPoints(Location loc, int radius) {
-		ArrayList<Point> areaPoints = new ArrayList<>();
-		Point center = toPoint(loc);
-		if(radius > 0) {
-			int min = (radius-1)*-1;
-			int max = (radius-1);
-			for(int x=min;x<=max;x++) {
-				for(int z=min;z<=max;z++) {
-					if(x == min || z == min || x == max || z == max) {
-						areaPoints.add(new Point(center.x + x, center.y + z));
-					}
-				}
-			}
-		}
-		return areaPoints;
-	}
-	
-	public ArrayList<Chunk> getSideChunks(Chunk chunk) {
-		ArrayList<Chunk> sideChunks = new ArrayList<>();
-		int[] coordLUTX = {0,1,0,-1};
-		int[] coordLUTZ = {1,0,-1,0};
-		int curX = chunk.getX();
-		int curZ = chunk.getZ();
-		for(int i = 0;i<4;i++) {
-			sideChunks.add(chunk.getWorld().getChunkAt(curX+coordLUTX[i], curZ+coordLUTZ[i]));
-		}
-		return sideChunks;
-	}
-	
-	public ArrayList<Chunk> getSideChunks(Location loc) {
-		ArrayList<Chunk> sideChunks = new ArrayList<>();
-		int[] coordLUTX = {0,1,0,-1};
-		int[] coordLUTZ = {1,0,-1,0};
-		int curX = loc.getChunk().getX();
-		int curZ = loc.getChunk().getZ();
-		for(int i = 0;i<4;i++) {
-			sideChunks.add(loc.getWorld().getChunkAt(curX+coordLUTX[i], curZ+coordLUTZ[i]));
-		}
-		return sideChunks;
-	}
-	
-	public ArrayList<Point> getSidePoints(Location loc) {
-		ArrayList<Point> sidePoints = new ArrayList<>();
-		Point center = toPoint(loc);
-		int[] coordLUTX = {0,1,0,-1};
-		int[] coordLUTZ = {1,0,-1,0};
-		for(int i = 0;i<4;i++) {
-			sidePoints.add(new Point(center.x + coordLUTX[i], center.y + coordLUTZ[i]));
-		}
-		return sidePoints;
-	}
-	
-	public static Point toPoint(Location loc) {
-		return new Point((int)Math.floor((double)loc.getBlockX()/16),(int)Math.floor((double)loc.getBlockZ()/16));
-	}
-	
-	public static Point toPoint(Chunk chunk) {
-		return new Point(chunk.getX(),chunk.getZ());
-	}
-	
-	public static Chunk toChunk(Point point, World world) {
-		return world.getChunkAt(point.x, point.y);
-	}
-	
-	public static int chunkDistance(Location loc1, Location loc2) {
-		if(loc1.getWorld().getName().equals(loc2.getWorld().getName())) {
-			int loc1X = (int)Math.floor((double)loc1.getBlockX()/16);
-			int loc1Z = (int)Math.floor((double)loc1.getBlockZ()/16);
-			int loc2X = (int)Math.floor((double)loc2.getBlockX()/16);
-			int loc2Z = (int)Math.floor((double)loc2.getBlockZ()/16);
-			return Math.max(Math.abs(loc1X - loc2X), Math.abs(loc1Z - loc2Z));
-		} else {
-			return -1;
-		}
-	}
-	
-	public String formatPointsToString(Collection<Point> points) {
-		StringBuilder result = new StringBuilder();
-        for(Point point : points) {
-        	int x = (int)point.getX();
-        	int y = (int)point.getY();
-        	result.append(x).append(",").append(y).append(".");
-        }
-        return result.toString();
-	}
-	
-	public ArrayList<Point> formatStringToPoints(String coords) {
-		ArrayList<Point> points = new ArrayList<>();
-		String[] coord_list = coords.split("\\.");
-		//ChatUtil.printDebug("Split coords: "+Arrays.toString(coord_list));
-		for(String coord : coord_list) {
-			if(!coord.equals("")) {
-				//ChatUtil.printDebug("Parsing chunk coord: "+coord);
-				String[] coord_pair = coord.split(",");
-				int x = Integer.parseInt(coord_pair[0]);
-				int z = Integer.parseInt(coord_pair[1]);
-				//ChatUtil.printDebug("Got chunk coord: "+x+","+z);
-				points.add(new Point(x,z));
-			}
-		}
-		//ChatUtil.printDebug("Chunk coords: "+Arrays.toString(points.toArray()));
-		return points;
-	}
-	
-	public String formatLocationsToString(Collection<Location> locs) {
-		StringBuilder result = new StringBuilder();
-        for(Location loc : locs) {
-        	int x = loc.getBlockX();
-        	int y = loc.getBlockY();
-        	int z = loc.getBlockZ();
-        	result.append(x).append(",").append(y).append(",").append(z).append(".");
-        }
-        return result.toString();
-	}
-	
-	public ArrayList<Location> formatStringToLocations(String coords, World world) {
-		ArrayList<Location> locations = new ArrayList<>();
-		String[] coord_list = coords.split("\\.");
-		//ChatUtil.printDebug("Split coords: "+Arrays.toString(coord_list));
-		for(String coord : coord_list) {
-			if(!coord.equals("")) {
-				//ChatUtil.printDebug("Parsing chunk coord: "+coord);
-				String[] coord_pair = coord.split(",");
-				int x = Integer.parseInt(coord_pair[0]);
-				int y = Integer.parseInt(coord_pair[1]);
-				int z = Integer.parseInt(coord_pair[2]);
-				//ChatUtil.printDebug("Got chunk coord: "+x+","+z);
-				// Add location in primary world by default
-				locations.add(new Location(world,x,y,z));
-			}
-		}
-		//ChatUtil.printDebug("Chunk coords: "+Arrays.toString(points.toArray()));
-		return locations;
 	}
 	
 	// This can return null!
@@ -1275,7 +1054,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		int randomNumY;
 		boolean foundValidLoc = false;
 		int timeout = 0;
-		ArrayList<Chunk> chunkList = getSurroundingChunks(center, radius);
+		ArrayList<Chunk> chunkList = HelperUtil.getSurroundingChunks(center, radius);
 		while(!foundValidLoc) {
 			randomChunkIdx = ThreadLocalRandom.current().nextInt(0, chunkList.size());
 			randomNumX = ThreadLocalRandom.current().nextInt(0, 16);
@@ -1397,15 +1176,6 @@ public class Konquest implements KonquestAPI, Timeable {
     		versionHandler.sendPlayerTeamPacket(player.getBukkitPlayer(), peacefulNames, peacefulTeam);
     	}
     }
-    
-    public void updateNamePackets(OfflinePlayer offlineBukkitPlayer) {
-    	if(offlineBukkitPlayer != null && offlineBukkitPlayer.getName() != null && offlineBukkitPlayer.isOnline()) {
-    		KonPlayer player = playerManager.getPlayer((Player)offlineBukkitPlayer);
-    		if(player != null) {
-    			updateNamePackets(player);
-    		}
-    	}
-    }
 
 	// Updates the name packets for all online players in a kingdom
     public void updateNamePackets(KonKingdom kingdom) {
@@ -1413,19 +1183,9 @@ public class Konquest implements KonquestAPI, Timeable {
 			updateNamePackets(player);
 		}
     }
-    
-    public static UUID idFromString(String id) {
-    	UUID result = null;
-    	try {
-    		result = UUID.fromString(id);
-    	} catch(IllegalArgumentException e) {
-    		e.printStackTrace();
-    	}
-    	return result;
-    }
-    
+
     public void telePlayerLocation(Player player, Location travelLocation) {
-    	Point locPoint = toPoint(travelLocation);
+    	Point locPoint = HelperUtil.toPoint(travelLocation);
 		Location destination = new Location(travelLocation.getWorld(), travelLocation.getBlockX()+0.5, travelLocation.getBlockY()+0.5, travelLocation.getBlockZ()+0.5, travelLocation.getYaw(), travelLocation.getPitch());
     	if(travelLocation.getWorld().isChunkLoaded(locPoint.x,locPoint.y)) {
     		ChatUtil.printDebug("Teleporting player "+player.getName()+" to loaded chunk");
@@ -1439,13 +1199,13 @@ public class Konquest implements KonquestAPI, Timeable {
     }
 
     public void applyQueuedTeleports(Chunk chunk) {
-    	Point cPoint = toPoint(chunk);
+    	Point cPoint = HelperUtil.toPoint(chunk);
     	Point qPoint;
 		Location qLoc;
     	if(!teleportLocationQueue.isEmpty()) {
 	    	for(Player qPlayer : teleportLocationQueue.keySet()) {
 	    		qLoc = teleportLocationQueue.get(qPlayer);
-	    		qPoint = toPoint(qLoc);
+	    		qPoint = HelperUtil.toPoint(qLoc);
 	    		if(qPoint.equals(cPoint) && chunk.getWorld().equals(qLoc.getWorld())) {
 	    			//Location destination = new Location(qLoc.getWorld(),qLoc.getBlockX()+0.5,qLoc.getBlockY()+1.0,qLoc.getBlockZ()+0.5,qLoc.getYaw(),qLoc.getPitch());
 	    			qPlayer.teleport(qLoc,TeleportCause.PLUGIN);
@@ -1456,46 +1216,6 @@ public class Konquest implements KonquestAPI, Timeable {
 	    	}
     	}
     }
-    
-    public static List<String> stringPaginate(String sentence) {
-    	ArrayList<String> result = new ArrayList<>();
-    	String[] words = sentence.split(" ");
-    	StringBuilder line = new StringBuilder();
-    	// create lines no more than 30 characters (including spaces) long
-    	for(int i=0;i<words.length;i++) {
-    		String test = line + words[i];
-    		if(i == words.length-1) {
-    			if(test.length() > 30) {
-        			result.add(line.toString().trim());
-        			result.add(words[i].trim());
-        		} else {
-        			result.add(test.trim());
-        		}
-    		} else {
-    			if(test.length() > 30) {
-        			result.add(line.toString().trim());
-        			line = new StringBuilder(words[i] + " ");
-        		} else {
-        			line.append(words[i]).append(" ");
-        		}
-    		}
-    	}
-    	return result;
-    }
-
-	public static List<String> stringPaginate(String sentence, String format) {
-		ArrayList<String> result = new ArrayList<>();
-		List<String> lines = stringPaginate(sentence);
-		for(String line : lines) {
-			result.add(format+line);
-		}
-		return result;
-	}
-
-	public static List<String> stringPaginate(String sentence, ChatColor format) {
-		String formatStr = ""+format;
-		return stringPaginate(sentence,formatStr);
-	}
     
     public ItemStack getPlayerHead(OfflinePlayer bukkitOfflinePlayer) {
 		if(!headCache.containsKey(bukkitOfflinePlayer.getUniqueId())) {
@@ -1510,6 +1230,10 @@ public class Konquest implements KonquestAPI, Timeable {
     		return headCache.get(bukkitOfflinePlayer.getUniqueId());
     	}
     }
+
+	/*
+	 * Color Methods
+	 */
 
     public String getDisplayPrimaryColor(KonquestKingdom displayKingdom, KonquestKingdom contextKingdom) {
     	String result = neutralColor1;
@@ -1588,6 +1312,10 @@ public class Konquest implements KonquestAPI, Timeable {
     public String getDisplaySecondaryColor(KonquestOfflinePlayer displayPlayer, KonquestTerritory contextTerritory) {
     	return getDisplaySecondaryColor(displayPlayer.getKingdom(),contextTerritory.getKingdom());
     }
+
+	/*
+	 * Sound Methods
+	 */
     
     public static void playSuccessSound(Player bukkitPlayer) {
     	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
@@ -1627,56 +1355,9 @@ public class Konquest implements KonquestAPI, Timeable {
 				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_EGG_THROW, (float)1.0, (float)0.1),1);
     }
 
-	public static String getTimeFormat(int valSeconds, ChatColor color) {
-		return getTimeFormat(valSeconds, ""+color);
-	}
-
-    public static String getTimeFormat(int valSeconds, String color) {
-		int days = valSeconds / 86400;
-		int hours = valSeconds % 86400 / 3600;
-		int minutes = valSeconds % 3600 / 60;
-		int seconds = valSeconds % 60;
-
-		String nColor;
-		String numColor;
-		String result;
-		String format;
-		if(color != null && !color.equals("")) {
-			nColor = ""+ChatColor.GRAY;
-			numColor = color;
-			if(valSeconds <= 30) {
-				numColor = ""+ChatColor.DARK_RED;
-			}
-		} else {
-			nColor = "";
-			numColor = "";
-		}
-		
-		if(days != 0) {
-			format = numColor+"%03d"+nColor+"D:"+numColor+"%02d"+nColor+"H:"+numColor+"%02d"+nColor+"M:"+numColor+"%02d"+nColor+"S";
-			result = String.format(format, days, hours, minutes, seconds);
-		} else if(hours != 0) {
-			format = numColor+"%02d"+nColor+"H:"+numColor+"%02d"+nColor+"M:"+numColor+"%02d"+nColor+"S";
-			result = String.format(format, hours, minutes, seconds);
-		} else if(minutes != 0) {
-			format = numColor+"%02d"+nColor+"M:"+numColor+"%02d"+nColor+"S";
-			result = String.format(format, minutes, seconds);
-		} else {
-			format = numColor+"%02d"+nColor+"S";
-			result = String.format(format, seconds);
-		}
-		
-		return result;		
-	}
-    
-    public static String getLastSeenFormat(OfflinePlayer offlineBukkitPlayer) {
-    	Date date = new Date(); // Now
-    	if(!offlineBukkitPlayer.isOnline()) {
-    		date = new Date(offlineBukkitPlayer.getLastPlayed()); // Last joined
-    	}
-    	SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm");
-        return formatter.format(date);
-    }
+	/*
+	 * Events and Commands
+	 */
     
     public static EventPriority getEventPriority(String priority) {
     	EventPriority result = defaultChatPriority;
@@ -1687,18 +1368,6 @@ public class Konquest implements KonquestAPI, Timeable {
     	}
     	return result;
     }
-    
-    public static String getChatTag() {
-    	return chatTag;
-    }
-    
-    public static String getChatMessage() {
-    	return chatMessage;
-    }
-
-	public static String getChatDivider() {
-		return chatDivider;
-	}
 
     public static void callKonquestEvent(KonquestEvent event) {
     	if(event != null) {
@@ -1739,60 +1408,6 @@ public class Konquest implements KonquestAPI, Timeable {
 				me.printStackTrace();
 			}
 		}
-	}
-
-	public static Material getProfessionMaterial(Villager.Profession profession) {
-		Material result = Material.EMERALD;
-		switch(profession) {
-			case ARMORER:
-				result = Material.BLAST_FURNACE;
-				break;
-			case BUTCHER:
-				result = Material.SMOKER;
-				break;
-			case CARTOGRAPHER:
-				result = Material.CARTOGRAPHY_TABLE;
-				break;
-			case CLERIC:
-				result = Material.BREWING_STAND;
-				break;
-			case FARMER:
-				result = Material.COMPOSTER;
-				break;
-			case FISHERMAN:
-				result = Material.BARREL;
-				break;
-			case FLETCHER:
-				result = Material.FLETCHING_TABLE;
-				break;
-			case LEATHERWORKER:
-				result = Material.CAULDRON;
-				break;
-			case LIBRARIAN:
-				result = Material.LECTERN;
-				break;
-			case MASON:
-				result = Material.STONECUTTER;
-				break;
-			case NITWIT:
-				result = Material.PUFFERFISH_BUCKET;
-				break;
-			case NONE:
-				result = Material.GRAVEL;
-				break;
-			case SHEPHERD:
-				result = Material.LOOM;
-				break;
-			case TOOLSMITH:
-				result = Material.SMITHING_TABLE;
-				break;
-			case WEAPONSMITH:
-				result = Material.GRINDSTONE;
-				break;
-			default:
-				break;
-		}
-		return result;
 	}
 	
 }

@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.hook;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.utility.CorePath;
 
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -55,7 +56,7 @@ public class WorldGuardHook implements PluginHook {
 
     public boolean isChunkClaimAllowed(Location loc, Player player) {
         assert loc.getWorld() != null;
-        return isChunkClaimAllowed(loc.getWorld(), Konquest.toPoint(loc), player);
+        return isChunkClaimAllowed(loc.getWorld(), HelperUtil.toPoint(loc), player);
     }
 
     public boolean isChunkClaimAllowed(World world, Point point, Player player) {
@@ -68,7 +69,7 @@ public class WorldGuardHook implements PluginHook {
 
     public boolean isChunkUnclaimAllowed(Location loc, Player player) {
         assert loc.getWorld() != null;
-        return isChunkUnclaimAllowed(loc.getWorld(), Konquest.toPoint(loc), player);
+        return isChunkUnclaimAllowed(loc.getWorld(), HelperUtil.toPoint(loc), player);
     }
 
     public boolean isChunkUnclaimAllowed(World world, Point point, Player player) {

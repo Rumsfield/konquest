@@ -7,9 +7,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.*;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.*;
 import com.github.rumsfield.konquest.utility.Timer;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -382,11 +380,11 @@ public class TownCommand extends CommandBase {
 								}
 								if (args.size() == 3) {
 									// Display current shield time and available shields
-									String shieldTime = Konquest.getTimeFormat(town.getRemainingShieldTimeSeconds(),"");
+									String shieldTime = HelperUtil.getTimeFormat(town.getRemainingShieldTimeSeconds(),"");
 									ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_SHIELD_LIST.getMessage(shieldTime, town.getName()));
 									for (KonShield shield : konquest.getShieldManager().getShields()) {
 										String shieldName = shield.getId();
-										String shieldDuration = Konquest.getTimeFormat(shield.getDurationSeconds(),"");
+										String shieldDuration = HelperUtil.getTimeFormat(shield.getDurationSeconds(),"");
 										int shieldCost = konquest.getShieldManager().getTotalCostShield(shield,town);
 										String shieldInfo = ChatColor.GOLD +
 												shieldName +

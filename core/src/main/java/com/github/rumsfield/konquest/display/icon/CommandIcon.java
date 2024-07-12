@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemFlag;
@@ -40,7 +41,7 @@ public class CommandIcon implements MenuIcon{
 		if(cost_incr > 0) {
 			loreList.add(loreColor+MessagePath.LABEL_INCREMENT_COST.getMessage()+": "+valueColor+cost_incr);
 		}
-		loreList.addAll(Konquest.stringPaginate(command.description(),loreColor));
+		loreList.addAll(HelperUtil.stringPaginate(command.description(),loreColor));
 		String name = ChatColor.GOLD+getName();
 		return CompatibilityUtil.buildItem(command.iconMaterial(), name, loreList);
 	}
