@@ -187,10 +187,6 @@ public class ShieldManager implements KonquestShieldManager {
 		return armor.getCost() + (armor.getCostPerResident()*town.getNumResidents()) + (armor.getCostPerLand()*town.getNumLand());
 	}
 
-	public boolean activateTownShield(KonShield shield, KonTown town, Player bukkitPlayer) {
-		return activateTownShield(shield, town, bukkitPlayer, false);
-	}
-
 	public boolean activateTownShield(KonShield shield, KonTown town, Player bukkitPlayer, boolean ignoreCost) {
 		if(!isShieldsEnabled) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
@@ -250,10 +246,6 @@ public class ShieldManager implements KonquestShieldManager {
         	}
         }
 		return true;
-	}
-
-	public boolean activateTownArmor(KonArmor armor, KonTown town, Player bukkitPlayer) {
-		return activateTownArmor(armor, town, bukkitPlayer, false);
 	}
 
 	public boolean activateTownArmor(KonArmor armor, KonTown town, Player bukkitPlayer, boolean ignoreCost) {

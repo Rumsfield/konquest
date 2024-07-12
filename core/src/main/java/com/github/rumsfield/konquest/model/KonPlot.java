@@ -27,10 +27,6 @@ public class KonPlot implements KonquestPlot {
 		this.users = users;
 	}
 	
-	public void addPoints(List<Point> p) {
-		points.addAll(p);
-	}
-	
 	public void addPoint(Point p) {
 		points.add(p);
 	}

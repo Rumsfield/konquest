@@ -503,14 +503,6 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		return result;
 	}
 	
-	public List<String> getActiveRelationNames() {
-		List<String> result = new ArrayList<>();
-		for(KonquestKingdom kingdom : activeRelationships.keySet()) {
-			result.add(kingdom.getName());
-		}
-		return result;
-	}
-	
 	/* Request Relationship */
 	
 	public void setRelationRequest(KonquestKingdom kingdom, KonquestDiplomacyType relation) {
@@ -827,10 +819,6 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		return resultTown;
 	}
 	
-	public boolean isTownMapEmpty() {
-		return townMap.isEmpty();
-	}
-	
 	public boolean hasTown(String name) {
 		boolean isTown = false;
 		// Check for exact String key match
@@ -865,12 +853,6 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public Timer getProtectedWarmupTimer() {
 		return protectedWarmupTimer;
-	}
-	
-	public void updateAllTownBars() {
-		for(KonTown town : townMap.values()) {
-			town.updateBarPlayers();
-		}
 	}
 	
 	public void reloadLoadedTownMonuments() {

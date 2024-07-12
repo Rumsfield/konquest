@@ -65,17 +65,6 @@ public class CampManager implements KonquestCampManager {
 		return barbarianCamps.get(uuid);
 	}
 	
-	public KonCamp getCampFromName(String name) {
-		KonCamp result = null;
-		for(KonCamp camp : barbarianCamps.values()) {
-			if(camp.getName().equalsIgnoreCase(name)) {
-				result = camp;
-				break;
-			}
-		}
-		return result;
-	}
-	
 	public ArrayList<KonCamp> getCamps() {
 		return new ArrayList<>(barbarianCamps.values());
 	}
@@ -86,17 +75,6 @@ public class CampManager implements KonquestCampManager {
 			campNames.add(camp.getName());
 		}
 		return campNames;
-	}
-	
-	public boolean isCampName(String name) {
-		boolean result = false;
-		for(KonCamp camp : barbarianCamps.values()) {
-			if(camp.getName().equalsIgnoreCase(name)) {
-				result = true;
-				break;
-			}
-		}
-		return result;
 	}
 	
 	public void activateCampProtection(@Nullable KonOfflinePlayer offlinePlayer) {

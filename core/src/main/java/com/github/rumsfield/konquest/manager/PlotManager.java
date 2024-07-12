@@ -75,10 +75,6 @@ public class PlotManager implements KonquestPlotManager {
 
 	}
 	
-	public void removePlotPoint(KonTown town, Location loc) {
-		removePlotPoint(town, HelperUtil.toPoint(loc),loc.getWorld());
-	}
-	
 	public boolean addPlot(KonTown town, KonPlot plot) {
 		boolean enabled = konquest.getCore().getBoolean(CorePath.PLOTS_ENABLE.getPath(),false);
 		if(!enabled) return true;

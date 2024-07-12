@@ -72,10 +72,6 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		return result;
 	}
 	
-	public boolean removeTerritory(Location loc) {
-		return removeTerritory(loc.getWorld(),HelperUtil.toPoint(loc));
-	}
-	
 	public boolean removeTerritory(World world, Point point) {
 		boolean result = false;
 		if(territoryWorldCache.containsKey(world)) {
@@ -1431,20 +1427,6 @@ public class TerritoryManager implements KonquestTerritoryManager {
     		}
     		ChatUtil.sendMessage(bukkitPlayer, mapLine.toString());
     	}
-	}
-
-	/**
-	 * Protection Methods
-	 */
-
-	public boolean canPlayerBreakBlocks(Player player, Location loc) {
-
-		return true;
-	}
-
-	public boolean canPlayerPlaceBlocks(Player player, Location loc) {
-
-		return true;
 	}
 	
 }
