@@ -211,6 +211,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		return specialization;
 	}
 
+	public String getSpecializationName() {
+		return CompatibilityUtil.getProfessionName(specialization);
+	}
+
 	public void applyTradeDiscounts(KonPlayer player, Inventory inv) {
 		/*
 		 * Ensure inventory is from a not-null merchant

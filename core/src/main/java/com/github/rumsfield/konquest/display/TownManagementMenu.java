@@ -7,10 +7,7 @@ import com.github.rumsfield.konquest.display.icon.*;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.model.*;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.HelperUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -271,7 +268,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
                 if (konquest.getKingdomManager().getIsDiscountEnable()) {
                     loreList.clear();
                     loreList.add(propertyColor + MessagePath.LABEL_LORD.getMessage());
-                    loreList.add(loreColor + MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor + town.getSpecialization().name()));
+                    loreList.add(loreColor + MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor + town.getSpecializationName()));
                     loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_SPECIAL.getMessage(), loreColor));
                     loreList.add(hintColor + MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
                     icon = new InfoIcon(kingdomColor + MessagePath.MENU_TOWN_SPECIAL.getMessage(), loreList, Material.EMERALD, ROOT_SLOT_SPECIALIZATION, true);
@@ -516,7 +513,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
 
         // Page 0
         pageLabel = getTitle(MenuState.B_SPECIALIZATION);
-        int numEntries = Villager.Profession.values().length - 1; // Subtract one to omit current specialization choice
+        int numEntries = CompatibilityUtil.getProfessions().size() - 1; // Subtract one to omit current specialization choice
         int pageRows = (int)Math.ceil((double)numEntries / 9);
         int pageNum = 0;
         pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
@@ -529,9 +526,9 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
             loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
         }
         loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_SPECIAL.getMessage());
-        for(Villager.Profession profession : Villager.Profession.values()) {
+        for(Villager.Profession profession : CompatibilityUtil.getProfessions()) {
             if(town != null && !profession.equals(town.getSpecialization())) {
-                ProfessionIcon professionIcon = new ProfessionIcon(ChatColor.GOLD+profession.name(),loreList,profession,index,true);
+                ProfessionIcon professionIcon = new ProfessionIcon(loreList,profession,index,true);
                 pages.get(pageNum).addIcon(professionIcon);
                 index++;
             }

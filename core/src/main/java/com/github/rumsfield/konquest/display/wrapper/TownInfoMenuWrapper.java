@@ -85,7 +85,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		/* Specialization Info Icon (4) */
 		if (getKonquest().getKingdomManager().getIsDiscountEnable()) {
 			loreList = new ArrayList<>();
-			loreList.add(valueColor + infoTown.getSpecialization().name());
+			loreList.add(valueColor + infoTown.getSpecializationName());
 			loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_TOWN_INFO_SPECIAL.getMessage(), loreColor));
 			Material specialMat = CompatibilityUtil.getProfessionMaterial(infoTown.getSpecialization());
 			info = new InfoIcon(kingdomColor + MessagePath.LABEL_SPECIALIZATION.getMessage(), loreList, specialMat, 4, false);
