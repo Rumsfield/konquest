@@ -704,7 +704,7 @@ public class TownAdminCommand extends CommandBase {
 				case "specialize":
 					if (konquest.getKingdomManager().getIsDiscountEnable()) {
 						for (Villager.Profession profession : CompatibilityUtil.getProfessions()) {
-							tabList.add(profession.toString());
+							tabList.add(CompatibilityUtil.getProfessionName(profession));
 						}
 					}
 					break;

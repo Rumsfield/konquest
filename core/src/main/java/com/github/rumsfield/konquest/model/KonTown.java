@@ -231,7 +231,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 
 				// Check that the merchant is of the correct specialized profession
 				Villager host = (Villager)merch.getHolder();
-				if(host.getProfession().equals(this.getSpecialization())) {
+				if(CompatibilityUtil.isProfessionEqual(host.getProfession(),this.getSpecialization())) {
 					double discountPercent = getKonquest().getKingdomManager().getDiscountPercent();
 					boolean isDiscountStack = getKonquest().getKingdomManager().getIsDiscountStack();
 					if(discountPercent > 0) {

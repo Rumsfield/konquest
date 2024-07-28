@@ -527,7 +527,7 @@ public class TownManagementMenu extends StateMenu implements ViewableMenu {
         }
         loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_SPECIAL.getMessage());
         for(Villager.Profession profession : CompatibilityUtil.getProfessions()) {
-            if(town != null && !profession.equals(town.getSpecialization())) {
+            if(town != null && !CompatibilityUtil.isProfessionEqual(profession,town.getSpecialization())) {
                 ProfessionIcon professionIcon = new ProfessionIcon(loreList,profession,index,true);
                 pages.get(pageNum).addIcon(professionIcon);
                 index++;

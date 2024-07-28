@@ -93,7 +93,7 @@ public class CommandHandler implements TabExecutor {
 		try {
 			// Execute command
 			konquestCommand.execute(konquest, sender, arguments);
-		} catch (Exception me) {
+		} catch (Exception | Error me) {
 			String message = "Failed to execute command "+commandType.toString();
 			ChatUtil.sendError(sender,MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(message));
 			ChatUtil.printConsoleError(message);
@@ -140,8 +140,15 @@ public class CommandHandler implements TabExecutor {
 			CommandType commandArg = CommandType.getCommand(konquestCommandName);
 			// Check for permission
 			if (commandArg.isSenderHasPermission(sender)) {
-				// Tab-Complete command
-				tabList.addAll(commandArg.command().tabComplete(konquest, sender, arguments));
+				try {
+					// Tab-Complete command
+					tabList.addAll(commandArg.command().tabComplete(konquest, sender, arguments));
+				} catch (Exception | Error me) {
+					String message = "Failed to tab-complete command "+commandArg.toString();
+					ChatUtil.sendError(sender,MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage(message));
+					ChatUtil.printConsoleError(message);
+					me.printStackTrace();
+				}
 			}
 		}
         return tabList;

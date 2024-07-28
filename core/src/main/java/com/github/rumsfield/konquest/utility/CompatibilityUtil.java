@@ -472,6 +472,7 @@ public class CompatibilityUtil {
         return buildItem(mat, name, loreList, hasProtection, null);
     }
 
+    @SuppressWarnings("deprecation")
     public static ItemStack buildItem(Material mat, String name, List<String> loreList, boolean hasProtection, OfflinePlayer playerHead) {
         ItemStack item;
         if (playerHead == null && mat != null) {
@@ -676,6 +677,18 @@ public class CompatibilityUtil {
             Method getName = prof.getClass().getMethod("name");
             getName.setAccessible(true);
             return (String) getName.invoke(prof);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean isProfessionEqual(Villager.Profession thisProfession, Villager.Profession thatProfession) {
+        try {
+            Object thisProf = thisProfession;
+            Object thatProf = thatProfession;
+            Method isEqual = thisProf.getClass().getMethod("equals", Object.class);
+            isEqual.setAccessible(true);
+            return (Boolean) isEqual.invoke(thisProf, thatProf);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
