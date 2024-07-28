@@ -22,6 +22,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -1863,7 +1864,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				konquest.getAccomplishmentManager().modifyPlayerStat(payPlayer,KonStatsType.FAVOR,(int)costSpecial);
 			}
 		}
-		ChatUtil.sendNotice(messageSender, MessagePath.COMMAND_TOWN_NOTICE_SPECIALIZE.getMessage(town.getName(),profession.name()));
+		String professionName = CompatibilityUtil.getProfessionName(profession);
+		ChatUtil.sendNotice(messageSender, MessagePath.COMMAND_TOWN_NOTICE_SPECIALIZE.getMessage(town.getName(),professionName));
 		return true;
 	}
 	// Alternate
@@ -3464,11 +3466,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			refreshTownNerfs(town);
 		}
 	}
-
-	@NotNull
-	public Set<PotionEffectType> getTownNerfs() {
-		return townNerfs.keySet();
-	}
 	
 	public boolean isTownNerf(PotionEffectType pot) {
 		return townNerfs.containsKey(pot);
@@ -3476,45 +3473,22 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	public void applyTownHearts(KonPlayer player, KonTown town) {
 		if(player.getKingdom().equals(town.getKingdom())) {
+			String modName = Konquest.healthModName;
+			NamespacedKey modKey = konquest.healthModKey;
 			int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.HEALTH);
 			if(upgradeLevel >= 1) {
-				//double upgradedBaseHealth = 20 + (upgradeLevel*2);
-				//player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(upgradedBaseHealth);
 				double modifier = (upgradeLevel*2);
-				String modName = Konquest.healthModName;
-				// Check for existing modifier
-				boolean isModActive = false;
-				AttributeInstance playerHealthAtt = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH);
-				for(AttributeModifier mod : playerHealthAtt.getModifiers()) {
-					if(mod.getName().equals(modName)) {
-						isModActive = true;
-						break;
-					}
-				}
-				// Apply modifier
-				double baseHealth = playerHealthAtt.getBaseValue();
-				if(!isModActive) {
-					playerHealthAtt.addModifier(new AttributeModifier(modName,modifier,AttributeModifier.Operation.ADD_NUMBER));
-					ChatUtil.printDebug("Applied max health attribute modifier "+modifier+" to player "+player.getBukkitPlayer().getName()+" with base health "+baseHealth);
-				} else {
-					ChatUtil.printDebug("Could not apply max health attribute modifier to player "+player.getBukkitPlayer().getName()+" with base health "+baseHealth);
-				}
+				CompatibilityUtil.applyHealthModifier(player.getBukkitPlayer(),modifier,modName,modKey);
 			} else {
-				clearTownHearts(player);
+				CompatibilityUtil.removeHealthModifier(player.getBukkitPlayer(),modName,modKey);
 			}
 		}
 	}
 	
 	public void clearTownHearts(KonPlayer player) {
 		String modName = Konquest.healthModName;
-		// Search for modifier and remove
-		AttributeInstance playerHealthAtt = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH);
-		for(AttributeModifier mod : playerHealthAtt.getModifiers()) {
-			if(mod.getName().equals(modName)) {
-				playerHealthAtt.removeModifier(mod);
-				ChatUtil.printDebug("Removed max health attribute modifier for player "+player.getBukkitPlayer().getName());
-			}
-		}
+		NamespacedKey modKey = konquest.healthModKey;
+		CompatibilityUtil.removeHealthModifier(player.getBukkitPlayer(),modName,modKey);
 	}
 	
 	public void clearAllTownHearts(KonTown town) {
@@ -4522,11 +4496,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		konquest.getTerritoryManager().addAllTerritory(townWorld,town.getChunkList());
 		// Set specialization
 		String specializationName = townSection.getString("specialization","NONE");
-		Villager.Profession profession = Villager.Profession.NONE;
-		try {
-			profession = Villager.Profession.valueOf(specializationName);
-		} catch(Exception e) {
+		Villager.Profession profession = CompatibilityUtil.getProfessionFromName(specializationName);
+		if (profession == null) {
 			ChatUtil.printConsoleAlert("Failed to parse profession "+specializationName+" for town "+townName);
+			profession = Villager.Profession.NONE;
 		}
 		town.setSpecialization(profession);
 		// Set shield
@@ -4732,7 +4705,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 						town.getCenterLoc().getBlockY(),
 						town.getCenterLoc().getBlockZ()});
                 townInstanceSection.set("chunks", HelperUtil.formatPointsToString(town.getChunkList().keySet()));
-				townInstanceSection.set("specialization", town.getSpecialization().toString());
+				townInstanceSection.set("specialization", town.getSpecializationName());
 				townInstanceSection.set("open", town.isOpen());
                 townInstanceSection.set("plot", town.isPlotOnly());
 				townInstanceSection.set("allied_building", town.isAlliedBuildingAllowed());

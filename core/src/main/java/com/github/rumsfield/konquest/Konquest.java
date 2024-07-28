@@ -67,6 +67,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	public static ChatColor blockedFlagColor = ChatColor.DARK_GRAY;
 	
 	public static String healthModName = "konquest.health_buff"; // never change this :)
+	public NamespacedKey healthModKey;
 	
 	private final DatabaseThread databaseThread;
 	private final AccomplishmentManager accomplishmentManager;
@@ -126,6 +127,8 @@ public class Konquest implements KonquestAPI, Timeable {
 		chatTag = "§7[§6Konquest§7]§f ";
 		chatMessage = "%PREFIX% %KINGDOM% §7| %TITLE% %NAME% %SUFFIX% ";
 		chatDivider = "§8»§r ";
+
+		healthModKey = new NamespacedKey(plugin,"health_upgrade");
 		
 		this.databaseThread = new DatabaseThread(this);
 		this.accomplishmentManager = new AccomplishmentManager(this);

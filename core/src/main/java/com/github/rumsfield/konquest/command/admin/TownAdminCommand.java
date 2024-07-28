@@ -6,10 +6,7 @@ import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
 import com.github.rumsfield.konquest.command.CommandBase;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.*;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.HelperUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -310,15 +307,13 @@ public class TownAdminCommand extends CommandBase {
 				}
 				if (args.size() == 2) {
 					// Display current specialization
-					String specialName = town.getSpecialization().toString();
+					String specialName = town.getSpecializationName();
 					ChatUtil.sendNotice(sender, MessagePath.COMMAND_TOWN_NOTICE_SPECIALIZE_LIST.getMessage(town.getName(), specialName));
 				} else if (args.size() == 3) {
 					// Set new specialization
 					String professionName = args.get(2);
-					Villager.Profession profession;
-					try {
-						profession = Villager.Profession.valueOf(professionName.toUpperCase());
-					} catch (IllegalArgumentException ex) {
+					Villager.Profession profession = CompatibilityUtil.getProfessionFromName(professionName);
+					if (profession == null) {
 						ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(professionName));
 						return;
 					}
@@ -708,8 +703,8 @@ public class TownAdminCommand extends CommandBase {
 					break;
 				case "specialize":
 					if (konquest.getKingdomManager().getIsDiscountEnable()) {
-						for (Villager.Profession profession : Villager.Profession.values()) {
-							tabList.add(profession.toString());
+						for (Villager.Profession profession : CompatibilityUtil.getProfessions()) {
+							tabList.add(CompatibilityUtil.getProfessionName(profession));
 						}
 					}
 					break;

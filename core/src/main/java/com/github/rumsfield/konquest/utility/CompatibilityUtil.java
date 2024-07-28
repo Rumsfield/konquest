@@ -3,12 +3,14 @@ package com.github.rumsfield.konquest.utility;
 import com.github.rumsfield.konquest.Konquest;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.inventory.InventoryEvent;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffectType;
@@ -19,17 +21,36 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class provides static method implementations that work for the full range of supported Spigot API versions.
  */
 public class CompatibilityUtil {
 
+    private static final HashMap<Villager.Profession,Material> professionMaterial = new HashMap<>();
+    static {
+        professionMaterial.put(Villager.Profession.ARMORER,         Material.BLAST_FURNACE);
+        professionMaterial.put(Villager.Profession.BUTCHER,         Material.SMOKER);
+        professionMaterial.put(Villager.Profession.CARTOGRAPHER,    Material.CARTOGRAPHY_TABLE);
+        professionMaterial.put(Villager.Profession.CLERIC,          Material.BREWING_STAND);
+        professionMaterial.put(Villager.Profession.FARMER,          Material.COMPOSTER);
+        professionMaterial.put(Villager.Profession.FISHERMAN,       Material.BARREL);
+        professionMaterial.put(Villager.Profession.FLETCHER,        Material.FLETCHING_TABLE);
+        professionMaterial.put(Villager.Profession.LEATHERWORKER,   Material.CAULDRON);
+        professionMaterial.put(Villager.Profession.LIBRARIAN,       Material.LECTERN);
+        professionMaterial.put(Villager.Profession.MASON,           Material.STONECUTTER);
+        professionMaterial.put(Villager.Profession.NITWIT,          Material.PUFFERFISH_BUCKET);
+        professionMaterial.put(Villager.Profession.NONE,            Material.GRAVEL);
+        professionMaterial.put(Villager.Profession.SHEPHERD,        Material.LOOM);
+        professionMaterial.put(Villager.Profession.TOOLSMITH,       Material.SMITHING_TABLE);
+        professionMaterial.put(Villager.Profession.WEAPONSMITH,     Material.GRINDSTONE);
+    }
+
     /**
      * Map old enchantment namespaces to new ones
      */
-    public enum EnchantComp {
+    private enum EnchantComp {
         // Enchantment Field Name   1.16.5 - 1.18.2             1.19.4 - 1.20.4             1.20.6 +
 
         // Common names to all versions
@@ -155,7 +176,7 @@ public class CompatibilityUtil {
             errorCode |= 8;
         }
         // Villager Professions
-        for (Villager.Profession profession : Villager.Profession.values()) {
+        for (Villager.Profession profession : getProfessions()) {
             Material professionMaterial = getProfessionMaterial(profession);
             if (professionMaterial.equals(Material.EMERALD)) {
                 pass = false;
@@ -451,6 +472,7 @@ public class CompatibilityUtil {
         return buildItem(mat, name, loreList, hasProtection, null);
     }
 
+    @SuppressWarnings("deprecation")
     public static ItemStack buildItem(Material mat, String name, List<String> loreList, boolean hasProtection, OfflinePlayer playerHead) {
         ItemStack item;
         if (playerHead == null && mat != null) {
@@ -478,48 +500,127 @@ public class CompatibilityUtil {
         return item;
     }
 
+    //
+
     /**
+     * Attempts to apply a health attribute modifier if it is not already applied.
+     * In 1.21, the names of deprecated attribute modifiers return as UUIDs, which might be a Spigot bug?
+     * Check for names that look like UUIDs and remove those mods.
+     * @param player The player to add a new health attribute modifier
+     * @param modAmount The amount of health to add
+     * @param modName The name of the modifier for version 1.20.6 and older
+     * @param modKey The key of the modifier for version 1.21 and newer
+     */
+    @SuppressWarnings("deprecation")
+    public static void applyHealthModifier(Player player, double modAmount, String modName, NamespacedKey modKey) {
+        // Check for existing modifier
+        boolean isModActive = false;
+        AttributeInstance playerHealthAtt = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        assert playerHealthAtt != null;
+        for (AttributeModifier mod : playerHealthAtt.getModifiers()) {
+            ChatUtil.printDebug("Checking health mod: "+mod.getName());
+            // UUIDs look like this: 08c78410-53fc-453d-981d-35b16a50eeb4
+            // (8)-(4)-(4)-(4)-(12)
+            if (mod.getName().matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")) {
+                ChatUtil.printDebug("  Found bad mod, removing!");
+                playerHealthAtt.removeModifier(mod);
+            } else {
+                // Check for existing health mod
+                if (apiVersion.compareTo(new Version("1.20.6")) <= 0) {
+                    // Legacy names in version 1.20.6 and older
+                    if (mod.getName().equals(modName)) {
+                        isModActive = true;
+                        break;
+                    }
+                } else {
+                    // NamespacedKey in version 1.21 and newer
+                    if (mod.getKey().equals(modKey)) {
+                        isModActive = true;
+                        break;
+                    }
+                }
+            }
+        }
+        // Apply modifier
+        double baseHealth = playerHealthAtt.getBaseValue();
+        if(!isModActive) {
+            AttributeModifier modification;
+            if (apiVersion.compareTo(new Version("1.20.6")) <= 0) {
+                // Legacy names in version 1.20.6 and older
+                modification = new AttributeModifier(modName, modAmount, AttributeModifier.Operation.ADD_NUMBER);
+            } else {
+                // NamespacedKey in version 1.21 and newer
+                modification = new AttributeModifier(modKey, modAmount, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY);
+            }
+            playerHealthAtt.addModifier(modification);
+            ChatUtil.printDebug("Applied max health attribute modifier "+modAmount+" to player "+player.getName()+" with base health "+baseHealth);
+        } else {
+            ChatUtil.printDebug("Skipped existing max health attribute modifier on player "+player.getName()+" with base health "+baseHealth);
+        }
+    }
+
+    public static void removeHealthModifier(Player player, String modName, NamespacedKey modKey) {
+        // Search for modifier and remove
+        AttributeInstance playerHealthAtt = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        assert playerHealthAtt != null;
+        for (AttributeModifier mod : playerHealthAtt.getModifiers()) {
+            ChatUtil.printDebug("Checking health mod: "+mod.getName());
+            // UUIDs look like this: 08c78410-53fc-453d-981d-35b16a50eeb4
+            // (8)-(4)-(4)-(4)-(12)
+            if (mod.getName().matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")) {
+                ChatUtil.printDebug("  Found bad mod, removing!");
+                playerHealthAtt.removeModifier(mod);
+            } else {
+                // Check for existing health mod
+                if (apiVersion.compareTo(new Version("1.20.6")) <= 0) {
+                    // Legacy names in version 1.20.6 and older
+                    if (mod.getName().equals(modName)) {
+                        playerHealthAtt.removeModifier(mod);
+                        ChatUtil.printDebug("Removed max health attribute modifier by name for player "+player.getName());
+                    }
+                } else {
+                    // NamespacedKey in version 1.21 and newer
+                    if (mod.getKey().equals(modKey)) {
+                        playerHealthAtt.removeModifier(mod);
+                        ChatUtil.printDebug("Removed max health attribute modifier by namespace key for player "+player.getName());
+                    }
+                }
+            }
+        }
+    }
+
+    /*
+     * Villager Professions
      * Before version 1.21, Villager.Profession is an Enum.
      * In version 1.21 and later, it is an interface.
-     * Use deprecated methods to look up the name of the profession field.
+     */
+
+    @SuppressWarnings("deprecation")
+    public static ArrayList<Villager.Profession> getProfessions() {
+        ArrayList<Villager.Profession> result = new ArrayList<>();
+        try {
+            for (Villager.Profession profession : Registry.VILLAGER_PROFESSION) {
+                result.add(profession);
+            }
+        } catch (NoSuchFieldError ignored) {
+            // When registry doesn't have the VILLAGER_PROFESSION field
+            try {
+                result.addAll(Arrays.asList(Villager.Profession.values()));
+            } catch (IncompatibleClassChangeError dumb) {
+                // I give up
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Look up the name of the profession field.
      * @param profession The villager profession to match to a Material
      * @return A Material that matches the given profession
      */
-    @SuppressWarnings("deprecation")
     public static Material getProfessionMaterial(Villager.Profession profession) {
-        switch(profession.name().toUpperCase()) {
-            case "ARMORER":
-                return Material.BLAST_FURNACE;
-            case "BUTCHER":
-                return Material.SMOKER;
-            case "CARTOGRAPHER":
-                return Material.CARTOGRAPHY_TABLE;
-            case "CLERIC":
-                return Material.BREWING_STAND;
-            case "FARMER":
-                return Material.COMPOSTER;
-            case "FISHERMAN":
-                return Material.BARREL;
-            case "FLETCHER":
-                return Material.FLETCHING_TABLE;
-            case "LEATHERWORKER":
-                return Material.CAULDRON;
-            case "LIBRARIAN":
-                return Material.LECTERN;
-            case "MASON":
-                return Material.STONECUTTER;
-            case "NITWIT":
-                return Material.PUFFERFISH_BUCKET;
-            case "NONE":
-                return Material.GRAVEL;
-            case "SHEPHERD":
-                return Material.LOOM;
-            case "TOOLSMITH":
-                return Material.SMITHING_TABLE;
-            case "WEAPONSMITH":
-                return Material.GRINDSTONE;
-            default:
-                break;
+        if (professionMaterial.containsKey(profession)) {
+            return professionMaterial.get(profession);
         }
         // Default
         return Material.EMERALD;
@@ -541,6 +642,53 @@ public class CompatibilityUtil {
             Method getTopInventory = view.getClass().getMethod("getTopInventory");
             getTopInventory.setAccessible(true);
             return (Inventory) getTopInventory.invoke(view);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Before version 1.21, Villager.Profession is an Enum.
+     * In version 1.21 and later, it is an interface.
+     * Use deprecated methods to look up the profession field by name.
+     * @param name The name of the villager profession
+     * @return The villager profession that matches a name, else null
+     */
+    public static Villager.Profession getProfessionFromName(String name) {
+        try {
+            for (Object profession : getProfessions()) {
+                Method getName = profession.getClass().getMethod("name");
+                getName.setAccessible(true);
+                String professionName = (String) getName.invoke(profession);
+                if (professionName.equalsIgnoreCase(name)) {
+                    return (Villager.Profession)profession;
+                }
+            }
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        // Could not match a name
+        return null;
+    }
+
+    public static String getProfessionName(Villager.Profession profession) {
+        try {
+            Object prof = profession;
+            Method getName = prof.getClass().getMethod("name");
+            getName.setAccessible(true);
+            return (String) getName.invoke(prof);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean isProfessionEqual(Villager.Profession thisProfession, Villager.Profession thatProfession) {
+        try {
+            Object thisProf = thisProfession;
+            Object thatProf = thatProfession;
+            Method isEqual = thisProf.getClass().getMethod("equals", Object.class);
+            isEqual.setAccessible(true);
+            return (Boolean) isEqual.invoke(thisProf, thatProf);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

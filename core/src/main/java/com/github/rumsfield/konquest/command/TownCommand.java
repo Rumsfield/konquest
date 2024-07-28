@@ -465,15 +465,13 @@ public class TownCommand extends CommandBase {
 								}
 								if (args.size() == 3) {
 									// Display current profession
-									String specialName = town.getSpecialization().toString();
+									String specialName = town.getSpecializationName();
 									ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_SPECIALIZE_LIST.getMessage(town.getName(), specialName));
 								} else if (args.size() == 4) {
 									// Try to change profession
 									String professionName = args.get(3);
-									Villager.Profession profession;
-									try {
-										profession = Villager.Profession.valueOf(professionName.toUpperCase());
-									} catch (IllegalArgumentException ex) {
+									Villager.Profession profession = CompatibilityUtil.getProfessionFromName(professionName);
+									if (profession == null) {
 										ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(professionName));
 										return;
 									}
@@ -752,8 +750,8 @@ public class TownCommand extends CommandBase {
 					break;
 				case "specialize":
 					if (konquest.getKingdomManager().getIsDiscountEnable()) {
-						for (Villager.Profession profession : Villager.Profession.values()) {
-							tabList.add(profession.toString());
+						for (Villager.Profession profession : CompatibilityUtil.getProfessions()) {
+							tabList.add(CompatibilityUtil.getProfessionName(profession));
 						}
 					}
 					break;
