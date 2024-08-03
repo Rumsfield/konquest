@@ -130,6 +130,7 @@ public enum CorePath {
 	TOWNS_SETTLE_CHECKS_DEPTH                             ("core.towns.settle_checks_depth"),
 	TOWNS_SETTLE_CHECK_FLATNESS                           ("core.towns.settle_check_flatness"),
 	TOWNS_SETTLE_OFFICER_ONLY                             ("core.towns.settle_officer_only"),
+	TOWNS_SETTLE_INCREMENT_KINGDOM                        ("core.towns.settle_increment_kingdom"),
 	TOWNS_INIT_RADIUS                                     ("core.towns.init_radius"),
 	TOWNS_CAPTURE_UPGRADES                                ("core.towns.capture_upgrades"),
 	TOWNS_CAPTURE_COOLDOWN                                ("core.towns.capture_cooldown"),

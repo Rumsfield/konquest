@@ -436,6 +436,9 @@ core:
 
     # Whether new towns can only be created by the kingdom master and officers (true) or by all kingdom members (false) (true/false)
     settle_officer_only: false
+
+    # Whether the cost to settle new towns increments based on all kingdom towns (true) or only the towns where each player is a lord (false) (true/false)
+    settle_increment_kingdom: false
     
     # Radius of initial settlements. Initial chunk area will be (2r-1)^2 chunks squared (integer >= 1)
     init_radius: 2

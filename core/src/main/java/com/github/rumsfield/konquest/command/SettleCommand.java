@@ -111,7 +111,15 @@ public class SettleCommand extends CommandBase {
 
 			double cost = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
         	double incr = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath());
-        	int townCount = konquest.getKingdomManager().getPlayerLordships(player);
+			boolean isIncrementKingdom = konquest.getCore().getBoolean(CorePath.TOWNS_SETTLE_INCREMENT_KINGDOM.getPath(),false);
+			int townCount;
+			if (isIncrementKingdom) {
+				// All kingdom towns
+				townCount = player.getKingdom().getNumTowns();
+			} else {
+				// Towns that have the player as the lord
+				townCount = konquest.getKingdomManager().getPlayerLordships(player);
+			}
         	double adj_cost = (((double)townCount)*incr) + cost;
         	if(cost > 0) {
 	        	if(KonquestPlugin.getBalance(bukkitPlayer) < adj_cost) {
