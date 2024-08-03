@@ -331,11 +331,14 @@ core:
     # Time in seconds when a Kingdom is protected from when the minimum player disconnects (integer >= 0)
     no_enemy_edit_offline_warmup: 300
     
-    # Number of players required for a Kingdom to be protected (integer >= 0)
+    # Number of online players required for a Kingdom to be protected from enemy attacks (integer >= 0)
     no_enemy_edit_offline_minimum: 2
     
     # Prevent enemy players from throwing ender pearls into kingdom territory (true/false)
     no_enemy_ender_pearl: false
+
+    # Prevent players in offline-protected kingdoms from attacking other enemy kingdoms (true/false)
+    no_protected_attacking: false
     
     # Percentage boost EXP gain for the smallest kingdom (0 to disable, 0 - 100)
     smallest_exp_boost_percent: 25

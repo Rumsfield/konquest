@@ -228,6 +228,14 @@ public class BlockListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
+							// If not enough players are online in the attacker's kingdom, prevent block edits
+							boolean isNoProtectedAttack = konquest.getCore().getBoolean(CorePath.KINGDOMS_NO_PROTECTED_ATTACKING.getPath(),false);
+							if (isNoProtectedAttack && player.getKingdom().isOfflineProtected()) {
+								ChatUtil.sendKonBlockedProtectionTitle(player);
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_PROTECTED_ATTACK.getMessage(town.getName()));
+								event.setCancelled(true);
+								return;
+							}
 							/* This town can be attacked... */
 							
 							// Event pre-checks
@@ -662,6 +670,14 @@ public class BlockListener implements Listener {
 							if(town.isCaptureDisabled()) {
 								ChatUtil.sendKonBlockedProtectionTitle(player);
 								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(town.getCaptureCooldownString()));
+								event.setCancelled(true);
+								return;
+							}
+							// If not enough players are online in the attacker's kingdom, prevent block edits
+							boolean isNoProtectedAttack = konquest.getCore().getBoolean(CorePath.KINGDOMS_NO_PROTECTED_ATTACKING.getPath(),false);
+							if (isNoProtectedAttack && player.getKingdom().isOfflineProtected()) {
+								ChatUtil.sendKonBlockedProtectionTitle(player);
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_PROTECTED_ATTACK.getMessage(town.getName()));
 								event.setCancelled(true);
 								return;
 							}

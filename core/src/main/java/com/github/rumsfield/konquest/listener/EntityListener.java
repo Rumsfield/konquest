@@ -701,6 +701,14 @@ public class EntityListener implements Listener {
 							event.setCancelled(true);
 							return;
 						}
+						// If not enough players are online in the attacker's kingdom, prevent animal attacks
+						boolean isNoProtectedAttack = konquest.getCore().getBoolean(CorePath.KINGDOMS_NO_PROTECTED_ATTACKING.getPath(),false);
+						if (isNoProtectedAttack && player.getKingdom().isOfflineProtected()) {
+							ChatUtil.sendKonBlockedProtectionTitle(player);
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_PROTECTED_ATTACK.getMessage(town.getName()));
+							event.setCancelled(true);
+							return;
+						}
 						// If town is shielded, prevent all enemy entity damage
 						if(town.isShielded()) {
 							ChatUtil.sendKonBlockedShieldTitle(player);

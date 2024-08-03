@@ -97,6 +97,7 @@ public enum CorePath {
 	KINGDOMS_NO_ENEMY_EDIT_OFFLINE_WARMUP                 ("core.kingdoms.no_enemy_edit_offline_warmup"),
 	KINGDOMS_NO_ENEMY_EDIT_OFFLINE_MINIMUM                ("core.kingdoms.no_enemy_edit_offline_minimum"),
 	KINGDOMS_NO_ENEMY_ENDER_PEARL                         ("core.kingdoms.no_enemy_ender_pearl"),
+	KINGDOMS_NO_PROTECTED_ATTACKING                       ("core.kingdoms.no_protected_attacking"),
 	KINGDOMS_SMALLEST_EXP_BOOST_PERCENT                   ("core.kingdoms.smallest_exp_boost_percent"),
 	KINGDOMS_OFFLINE_TIMEOUT_DAYS                         ("core.kingdoms.offline_timeout_days"),
 	KINGDOMS_OFFLINE_TIMEOUT_EXILE                        ("core.kingdoms.offline_timeout_exile"),
