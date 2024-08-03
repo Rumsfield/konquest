@@ -2,10 +2,7 @@ package com.github.rumsfield.konquest.listener;
 
 import com.earth2me.essentials.ITarget;
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonPropertyFlag;
-import com.github.rumsfield.konquest.model.KonPropertyFlagHolder;
-import com.github.rumsfield.konquest.model.KonTerritory;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -46,11 +43,23 @@ public class EssentialsXListener implements Listener {
             // Home is in a claimed territory
             KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(newHomeLoc);
             assert territory != null;
-            if (!konquest.getKingdomManager().isPlayerFriendly(player,territory.getKingdom())) {
-                // Homes cannot be made in non-friendly territory
-                ChatUtil.printDebug("Cancelled EssentialsX home update in non-friendly territory");
-                ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-                event.setCancelled(true);
+            if (territory instanceof KonCamp) {
+                // For camps, check if player is the owner
+                KonCamp camp = (KonCamp)territory;
+                if (!camp.isPlayerOwner(player.getBukkitPlayer())) {
+                    // Homes cannot be made in barbarian camps except by the owner
+                    ChatUtil.printDebug("Cancelled EssentialsX home update in camp by non-owner");
+                    ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+                    event.setCancelled(true);
+                }
+            } else {
+                // For all other territories, check for friendly relation
+                if (!konquest.getKingdomManager().isPlayerFriendly(player,territory.getKingdom())) {
+                    // Homes cannot be made in non-friendly territory
+                    ChatUtil.printDebug("Cancelled EssentialsX home update in non-friendly territory");
+                    ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+                    event.setCancelled(true);
+                }
             }
         } else {
             // Home is in the wild
