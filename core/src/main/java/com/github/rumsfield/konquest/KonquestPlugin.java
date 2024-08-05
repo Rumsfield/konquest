@@ -117,6 +117,7 @@ public class KonquestPlugin extends JavaPlugin {
 		pluginManager.registerEvents(new InventoryListener(this), this);
 		pluginManager.registerEvents(new HangingListener(this), this);
 		pluginManager.registerEvents(new WorldListener(this), this);
+		pluginManager.registerEvents(new TNTListener(this), this);
 	}
 	
 	private void registerApi(KonquestAPI api) {

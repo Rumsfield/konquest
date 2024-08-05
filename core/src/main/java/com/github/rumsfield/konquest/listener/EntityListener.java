@@ -18,16 +18,13 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.*;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -112,6 +109,14 @@ public class EntityListener implements Listener {
 				if(!flagHolder.getPropertyValue(KonPropertyFlag.PVE)) {
 					return true;
 				}
+			}
+		}
+		// Conditional camp protections
+		if(territory instanceof KonCamp) {
+			KonCamp camp = (KonCamp) territory;
+			// Protect camps when owner is offline
+			if(camp.isProtected()) {
+				return true;
 			}
 		}
 		// Conditional town/capital protections
