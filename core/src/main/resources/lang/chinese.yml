@@ -438,6 +438,7 @@ protection:
     not-plot: 您必須是一個地塊成員才能執行此操作。
     only-plot: 您不能在城鎮地塊之外執行此操作。
     online: '%s 王國沒有足夠的在線玩家，無法攻擊 %s 鎮。'
+    protected-attack: 你的王國沒有足夠的線上玩家，無法攻擊 %s 鎮。
     upgrade: '%s 已升級為 %s，必須有 %s 個在線居民才能攻擊。'
     camp: 不能攻擊 %s，營地所有者不在線。
     camp-bed: 不能在此營地內放置其他床。

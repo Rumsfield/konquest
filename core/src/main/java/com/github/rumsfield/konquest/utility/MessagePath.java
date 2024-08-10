@@ -416,6 +416,7 @@ public enum MessagePath {
 	PROTECTION_ERROR_NOT_PLOT                   (0, "protection.error.not-plot"),
 	PROTECTION_ERROR_ONLY_PLOT                  (0, "protection.error.only-plot"),
 	PROTECTION_ERROR_ONLINE                     (2, "protection.error.online"),
+	PROTECTION_ERROR_PROTECTED_ATTACK           (1, "protection.error.protected-attack"),
 	PROTECTION_ERROR_UPGRADE                    (3, "protection.error.upgrade"),
 	PROTECTION_ERROR_CAMP                       (1, "protection.error.camp"),
 	PROTECTION_ERROR_CAMP_BED                   (0, "protection.error.camp-bed"),

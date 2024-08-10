@@ -37,7 +37,7 @@ public class Handler_1_19_R1 implements VersionHandler {
 					discount += trade.getSpecialPrice();
 				}
 				trade.setSpecialPrice(discount);
-				ChatUtil.printDebug("  Applied 1.18.x special price "+discount);
+				ChatUtil.printDebug("  Applied 1.19.x special price "+discount);
 			}
 			tradeListDiscounted.add(trade);
 		}

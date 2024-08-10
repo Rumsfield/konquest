@@ -438,6 +438,7 @@ protection:
     not-plot: Debes ser miembro de una parcela para hacer esto.
     only-plot: No puedes hacer esto fuera de una parcela del pueblo.
     online: El Reino de %s no tiene suficientes jugadores en linea, no puede atacar el Pueblo de %s.
+    protected-attack: Tu Reino no tiene suficientes jugadores en línea, no puede atacar el Pueblo de %s.
     upgrade: '%s esta mejorado con %s y no puede ser atacado sin %s residentes en linea.'
     camp: No se puede atacar %s, el dueno del campamento esta desconectado.
     camp-bed: No se pueden colocar camas adicionales dentro de este Campamento.
