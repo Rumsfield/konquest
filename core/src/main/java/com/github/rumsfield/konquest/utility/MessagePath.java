@@ -129,6 +129,7 @@ public enum MessagePath {
 	MENU_UPGRADE_FAIL_LEVEL                     (3, "menu.upgrade.fail-level"),
 	MENU_UPGRADE_FAIL_POPULATION                (3, "menu.upgrade.fail-population"),
 	MENU_UPGRADE_FAIL_COST                      (3, "menu.upgrade.fail-cost"),
+	MENU_UPGRADE_FAIL_ATTACK                    (0, "menu.upgrade.fail-attack"),
 	MENU_UPGRADE_ADD                            (3, "menu.upgrade.add"),
 	MENU_HELP_TITLE                             (0, "menu.help.title"),
 	MENU_HELP_ADMIN                             (0, "menu.help.admin"),

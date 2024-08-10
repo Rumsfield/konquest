@@ -469,8 +469,11 @@ core:
     
     # The number of armor points that each block destroyed by TNT removes from the town's armor (integer >= 0)
     armor_tnt_damage: 10
-    
-    # Allow shields to be charged charged while a town is under attack (true/false)
+
+    # Allow upgrades to be purchased while a town is under attack (true/false)
+    upgrade_while_attacked: false
+
+    # Allow shields to be charged while a town is under attack (true/false)
     shields_while_attacked: false
     
     # Allow armor to be applied while a town is under attack (true/false)

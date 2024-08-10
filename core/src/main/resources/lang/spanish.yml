@@ -138,6 +138,7 @@ menu:
     fail-level: Fallo al agregar %s nivel %s, el nivel es mayor que el maximo o demasiado alto desde el nivel actual, %s.
     fail-population: Fallo al agregar %s nivel %s, la poblacion del pueblo es demasiado baja, requiere %s.
     fail-cost: Fallo al agregar %s nivel %s, requiere %s Favor.
+    fail-attack: ¡No se pudieron agregar mejoras mientras el pueblo estaba bajo ataque!
     add: Agregado %s nivel %s al Pueblo de %s!
   help:
     title: Ayuda de Konquest

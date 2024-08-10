@@ -138,6 +138,7 @@ menu:
     fail-level: 無法添加 %s 等級 %s ，等級超過最大值或比當前等級太高， %s 。
     fail-population: 無法添加 %s 等級 %s ，城鎮人口太低，需要%s。
     fail-cost: 無法添加 %s 等級 %s ，需要%s Favor。
+    fail-attack: 當城鎮受到攻擊時無法添加任何升級！
     add: 已將 %s 等級 %s 添加到 %s 城鎮！
   help:
     title: Konquest說明
