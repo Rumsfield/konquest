@@ -5,6 +5,7 @@ import com.github.rumsfield.konquest.api.event.KonquestEvent;
 import com.github.rumsfield.konquest.api.model.*;
 import com.github.rumsfield.konquest.command.CommandHandler;
 import com.github.rumsfield.konquest.database.DatabaseThread;
+import com.github.rumsfield.konquest.listener.TNTListener;
 import com.github.rumsfield.konquest.manager.*;
 import com.github.rumsfield.konquest.manager.TravelManager.TravelDestination;
 import com.github.rumsfield.konquest.map.MapHandler;
@@ -65,7 +66,8 @@ public class Konquest implements KonquestAPI, Timeable {
 	public static ChatColor blockedProtectionColor = ChatColor.DARK_RED;
 	public static ChatColor blockedShieldColor = ChatColor.DARK_AQUA;
 	public static ChatColor blockedFlagColor = ChatColor.DARK_GRAY;
-	
+
+	public static String metaTntOwnerId = "konquest-tnt-owner";
 	public static String healthModName = "konquest.health_buff"; // never change this :)
 	public NamespacedKey healthModKey;
 	
@@ -206,6 +208,13 @@ public class Konquest implements KonquestAPI, Timeable {
 		
 		// Render Maps
 		mapHandler.initialize();
+
+		// Enable special event listeners
+		boolean isTNTListenerEnabled = getCore().getBoolean(CorePath.ENABLE_ADVANCED_TNT_PROTECTION.getPath(),true);
+		if (isTNTListenerEnabled) {
+			plugin.getServer().getPluginManager().registerEvents(new TNTListener(plugin), plugin);
+			ChatUtil.printDebug("Enabled TNT Listener");
+		}
 		
 		ChatUtil.printDebug("Finished core Konquest initialization");
 	}

@@ -29,6 +29,9 @@ core:
   
   # [EXPERIMENTAL] (*) World names that ignore most Konquest features (string list, use [] to disable)
   world_ignorelist: []
+
+  # [EXPERIMENTAL] (*) Track which players ignite TNT to protect specific territories against those TNT explosions (true/false)
+  enable_advanced_tnt_protection: true
   
   # (*) Save interval in minutes, 0 to disable (integer >= 0)
   save_interval: 60

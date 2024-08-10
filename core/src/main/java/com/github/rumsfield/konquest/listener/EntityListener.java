@@ -30,6 +30,8 @@ import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
+import java.util.UUID;
+
 public class EntityListener implements Listener {
 
 	private final KonquestPlugin konquestPlugin;
@@ -95,7 +97,9 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	private boolean isTerritoryExplosionProtected(KonTerritory territory, boolean isCreeper) {
+	private boolean isTerritoryExplosionProtected(KonTerritory territory, Entity explosion) {
+		boolean isCreeper = explosion instanceof Creeper;
+
 		// Protect Sanctuaries and Ruins always
 		if(territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY) ||
 				territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
@@ -123,35 +127,27 @@ public class EntityListener implements Listener {
 		if(territory instanceof KonTown) {
 			KonTown town = (KonTown)territory;
 
-			//TODO: Implement this...
 			// Protect against TNT ignited by non-enemies
-				/*
-				ChatUtil.printDebug("Evaluating entity explosion in town...");
-				if(event.getEntity() instanceof TNTPrimed) {
-					ChatUtil.printDebug("  explosion is primed TNT");
-					TNTPrimed tnt = (TNTPrimed)event.getEntity();
-					Entity tntSource = tnt.getSource();
-					if(tntSource == null) {
-						ChatUtil.printDebug("  source is null!");
-					} else {
-						ChatUtil.printDebug("  source: "+tntSource.getType());
-					}
-					if(tntSource instanceof Player) {
-						ChatUtil.printDebug("  source is player");
-						Player tntSender = (Player)tntSource;
-						KonPlayer player = playerManager.getPlayer(tntSender);
-						if(player != null) {
-							ChatUtil.printDebug("  found KonPlayer");
-							KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
-							if(!playerRole.equals(KonquestRelationshipType.ENEMY)) {
-								ChatUtil.printDebug("protecting Town from non-enemy TNT entity explosion");
-								event.setCancelled(true);
-								return;
-							}
+			if (explosion instanceof TNTPrimed) {
+				if (explosion.hasMetadata(Konquest.metaTntOwnerId)) {
+					UUID ownerId = UUID.fromString(explosion.getMetadata(Konquest.metaTntOwnerId).get(0).asString());
+					Player owner = Bukkit.getPlayer(ownerId);
+					KonPlayer player = playerManager.getPlayer(owner);
+					if(player != null) {
+						assert owner != null;
+						KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
+						ChatUtil.printDebug("TNT exploded with owner "+owner.getName()+" relation to "+town.getName()+" as "+playerRole);
+						if(playerRole.equals(KonquestRelationshipType.PEACEFUL) ||
+								playerRole.equals(KonquestRelationshipType.TRADE) ||
+								playerRole.equals(KonquestRelationshipType.ALLY)) {
+							ChatUtil.printDebug("  Protecting Town from non-enemy TNT entity explosion");
+							ChatUtil.sendKonBlockedProtectionTitle(player);
+							return true;
 						}
 					}
 				}
-				*/
+			}
+
 			// Protect peaceful towns
 			if(town.getKingdom().isPeaceful()) {
 				return true;
@@ -216,8 +212,7 @@ public class EntityListener implements Listener {
 			}
 		}
 		if(isInTerritory && wholeTerritory != null) {
-			boolean isCreeper = event.getEntity() instanceof Creeper;
-			if(isTerritoryExplosionProtected(wholeTerritory,isCreeper)) {
+			if(isTerritoryExplosionProtected(wholeTerritory,event.getEntity())) {
 				event.setCancelled(true);
 				return;
 			}
@@ -939,7 +934,7 @@ public class EntityListener implements Listener {
 			if(territoryManager.isChunkClaimed(entityLoc)) {
 				KonTerritory territory = territoryManager.getChunkTerritory(entityLoc);
 				assert territory != null;
-				if(isTerritoryExplosionProtected(territory,isCreeper)) {
+				if(isTerritoryExplosionProtected(territory,eAttacker)) {
 					event.setCancelled(true);
 					return;
 				}

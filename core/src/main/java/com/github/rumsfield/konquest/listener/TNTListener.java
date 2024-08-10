@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.listener;
 
+import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import org.bukkit.*;
@@ -25,12 +26,14 @@ import java.util.UUID;
 
 public class TNTListener implements Listener {
 
-    private final String metaOwnerId = "konquest-tnt-owner";
+    private final String metaOwnerId = Konquest.metaTntOwnerId;
     private final KonquestPlugin plugin;
+    private final Konquest konquest;
     private final HashMap<Player,Location> lastPowered;
 
     public TNTListener(KonquestPlugin plugin) {
         this.plugin = plugin;
+        this.konquest = plugin.getKonquestInstance();
         this.lastPowered = new HashMap<>();
     }
 
@@ -65,6 +68,7 @@ public class TNTListener implements Listener {
      *
      */
 
+    /*
     @EventHandler(priority = EventPriority.NORMAL)
     public void onTNTPrimed(ExplosionPrimeEvent event) {
         if (event.getEntity() instanceof TNTPrimed) {
@@ -79,91 +83,100 @@ public class TNTListener implements Listener {
             }
         }
     }
+    */
+
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onTNTSpawn(EntitySpawnEvent event) {
-        if (event.getEntity() instanceof TNTPrimed) {
-            Block spawnBlock = event.getLocation().getBlock();
-            TNTPrimed tnt = (TNTPrimed)event.getEntity();
-            String sourceName = tnt.getSource() == null ? "null" : tnt.getSource().getName();
-            ChatUtil.printDebug("TNT Entity spawned on block "+spawnBlock.getType()+" from source "+sourceName);
-            World spawnWorld = event.getLocation().getWorld();
-            assert spawnWorld != null;
-            boolean hasOwner = false;
-            Player nearestPlayer = null;
-            double nearestDistance = 0;
-            // Search surrounding blocks for metadata
-            int x = spawnBlock.getX()-2;
-            int y = spawnBlock.getY()-2;
-            int z = spawnBlock.getZ()-2;
-            for (int ix = 0; ix < 5; ix++) {
-                for (int iy = 0; iy < 5; iy++) {
-                    for (int iz = 0; iz < 5; iz++) {
-                        BlockState checkState = spawnWorld.getBlockAt(new Location(spawnWorld,x+ix,y+iy,z+iz)).getState();
-                        if (checkState.hasMetadata(metaOwnerId)) {
-                            for (MetadataValue meta : checkState.getMetadata(metaOwnerId)) {
-                                event.getEntity().setMetadata(metaOwnerId,meta);
-                            }
-                            checkState.removeMetadata(metaOwnerId,plugin);
-                            ChatUtil.printDebug("  Found nearby block with owner " + checkState.getType());
-                            hasOwner = true;
-                            break;
+        if (event.isCancelled()) return;
+        if (!(event.getEntity() instanceof TNTPrimed)) return;
+        if (konquest.isWorldIgnored(event.getLocation().getWorld())) return;
+        Block spawnBlock = event.getLocation().getBlock();
+        World spawnWorld = event.getLocation().getWorld();
+        assert spawnWorld != null;
+        boolean hasOwner = false;
+        String ownerSource = "";
+        Player nearestPlayer = null;
+        double nearestDistance = 0;
+        // Search surrounding blocks for metadata
+        int x = spawnBlock.getX()-2;
+        int y = spawnBlock.getY()-2;
+        int z = spawnBlock.getZ()-2;
+        for (int ix = 0; ix < 5; ix++) {
+            for (int iy = 0; iy < 5; iy++) {
+                for (int iz = 0; iz < 5; iz++) {
+                    BlockState checkState = spawnWorld.getBlockAt(new Location(spawnWorld,x+ix,y+iy,z+iz)).getState();
+                    if (checkState.hasMetadata(metaOwnerId)) {
+                        for (MetadataValue meta : checkState.getMetadata(metaOwnerId)) {
+                            event.getEntity().setMetadata(metaOwnerId,meta);
                         }
-                    }
-                }
-            }
-            // Search surrounding entities for metadata, and nearest player
-            if (!hasOwner) {
-                for (Entity checkEntity : spawnWorld.getNearbyEntities(event.getLocation(), 32, 32, 32)) {
-                    if (checkEntity.hasMetadata(metaOwnerId)) {
-                        for (MetadataValue meta : checkEntity.getMetadata(metaOwnerId)) {
-                            event.getEntity().setMetadata(metaOwnerId, meta);
-                        }
-                        ChatUtil.printDebug("  Found nearby entity with owner " + checkEntity.getName());
+                        UUID ownerId = UUID.fromString(checkState.getMetadata(metaOwnerId).get(0).asString());
+                        Player owner = Bukkit.getPlayer(ownerId);
+                        String ownerName = owner == null ? "unknown" : owner.getName();
+                        ownerSource = "Block "+checkState.getType()+" with owner "+ownerName;
                         hasOwner = true;
+                        checkState.removeMetadata(metaOwnerId,plugin);
                         break;
-                    } else if (checkEntity instanceof Player) {
-                        // Find nearest player
-                        double checkDistance = event.getLocation().distance(checkEntity.getLocation());
-                        if (nearestPlayer == null || checkDistance < nearestDistance) {
-                            nearestPlayer = (Player)checkEntity;
-                            nearestDistance = checkDistance;
-                        }
                     }
                 }
             }
-            // Search for nearby powered activation
-            if (!hasOwner) {
-                Player nearestPowerPlayer = null;
-                double nearestPowerDistance = 0;
-                for (Player checkPlayer : lastPowered.keySet()) {
-                    Location checkLocation = lastPowered.get(checkPlayer);
-                    if (event.getLocation().getWorld().equals(checkLocation.getWorld())) {
-                        double checkDistance = event.getLocation().distance(checkLocation);
-                        if (checkDistance < 256) {
-                            // Distance must be within 256 blocks (16 chunks)
-                            if (nearestPowerPlayer == null || checkDistance < nearestPowerDistance) {
-                                nearestPowerPlayer = checkPlayer;
-                                nearestPowerDistance = checkDistance;
-                            }
-                        }
+        }
+        // Search surrounding entities for metadata, and nearest player
+        if (!hasOwner) {
+            for (Entity checkEntity : spawnWorld.getNearbyEntities(event.getLocation(), 32, 32, 32)) {
+                if (checkEntity.hasMetadata(metaOwnerId)) {
+                    for (MetadataValue meta : checkEntity.getMetadata(metaOwnerId)) {
+                        event.getEntity().setMetadata(metaOwnerId, meta);
                     }
-                }
-                if (nearestPowerPlayer != null) {
-                    ChatUtil.printDebug("Found nearby power source by "+nearestPowerPlayer.getName()+", "+nearestPowerDistance);
+                    UUID ownerId = UUID.fromString(checkEntity.getMetadata(metaOwnerId).get(0).asString());
+                    Player owner = Bukkit.getPlayer(ownerId);
+                    String ownerName = owner == null ? "unknown" : owner.getName();
+                    ownerSource = "Entity "+checkEntity.getName()+" with owner "+ownerName;
                     hasOwner = true;
-                    updateMetaOwner(event.getEntity(),nearestPowerPlayer);
+                    break;
+                } else if (checkEntity instanceof Player) {
+                    // Find nearest player
+                    double checkDistance = event.getLocation().distance(checkEntity.getLocation());
+                    if (nearestPlayer == null || checkDistance < nearestDistance) {
+                        nearestPlayer = (Player)checkEntity;
+                        nearestDistance = checkDistance;
+                    }
                 }
             }
-            // Last resort, check for nearest player
-            if (!hasOwner && nearestPlayer != null) {
-                ChatUtil.printDebug("  Defaulting to nearby player "+nearestPlayer.getName());
+        }
+        // Search for nearby powered activation
+        if (!hasOwner) {
+            Player nearestPowerPlayer = null;
+            double nearestPowerDistance = 0;
+            for (Player checkPlayer : lastPowered.keySet()) {
+                Location checkLocation = lastPowered.get(checkPlayer);
+                if (event.getLocation().getWorld().equals(checkLocation.getWorld())) {
+                    double checkDistance = event.getLocation().distance(checkLocation);
+                    if (checkDistance < 256) {
+                        // Distance must be within 256 blocks (16 chunks)
+                        if (nearestPowerPlayer == null || checkDistance < nearestPowerDistance) {
+                            nearestPowerPlayer = checkPlayer;
+                            nearestPowerDistance = checkDistance;
+                        }
+                    }
+                }
+            }
+            if (nearestPowerPlayer != null) {
+                ownerSource = "Powered by player "+nearestPowerPlayer.getName();
                 hasOwner = true;
-                updateMetaOwner(event.getEntity(),nearestPlayer);
+                updateMetaOwner(event.getEntity(),nearestPowerPlayer);
             }
-            if (hasOwner) {
-                ChatUtil.printDebug("  TNT has owner!");
-            }
+        }
+        // Last resort, check for nearest player
+        if (!hasOwner && nearestPlayer != null) {
+            ownerSource = "Nearby player "+nearestPlayer.getName();
+            hasOwner = true;
+            updateMetaOwner(event.getEntity(),nearestPlayer);
+        }
+        if (hasOwner) {
+            ChatUtil.printDebug("Primed TNT spawned because of: "+ownerSource);
+        } else {
+            ChatUtil.printDebug("Primed TNT spawned from unknown source.");
         }
     }
 
@@ -191,10 +204,10 @@ public class TNTListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onTNTInteractPlayer(PlayerInteractEvent event) {
+        if (konquest.isWorldIgnored(event.getPlayer().getWorld())) return;
         Block clickBlock = event.getClickedBlock();
         if (event.hasBlock() && clickBlock != null) {
             if (clickBlock.getBlockData() instanceof TNT && event.hasItem() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                ChatUtil.printDebug("TNT block interaction by player!");
                 updateMetaOwner(clickBlock.getState(),event.getPlayer());
             } else {
                 // Record all powered interactions
@@ -214,6 +227,7 @@ public class TNTListener implements Listener {
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof AbstractArrow || event.getEntity() instanceof Explosive)) return;
         if (!(event.getEntity().getShooter() instanceof Player)) return;
+        if (konquest.isWorldIgnored(event.getEntity().getWorld())) return;
         updateMetaOwner(event.getEntity(),((Player)event.getEntity().getShooter()));
     }
 
@@ -224,6 +238,7 @@ public class TNTListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onTNTPlayerPlaceRedstone(BlockPlaceEvent event) {
         if (event.isCancelled()) return;
+        if (konquest.isWorldIgnored(event.getBlock().getWorld())) return;
         Material placeType = event.getBlockPlaced().getType();
         if (!(placeType.equals(Material.REDSTONE_BLOCK) ||
                 placeType.equals(Material.REDSTONE_TORCH) ||
@@ -245,6 +260,7 @@ public class TNTListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onTNTPlayerBreakRedstone(BlockBreakEvent event) {
         if (event.isCancelled()) return;
+        if (konquest.isWorldIgnored(event.getBlock().getWorld())) return;
         Material breakType = event.getBlock().getType();
         // Redstone power sources
         if (breakType.equals(Material.REDSTONE_BLOCK) ||
@@ -261,6 +277,7 @@ public class TNTListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onTNTFireSpread(BlockSpreadEvent event) {
         if (event.isCancelled()) return;
+        if (konquest.isWorldIgnored(event.getBlock().getWorld())) return;
         if (!(event.getBlock().getBlockData() instanceof Fire)) return;
         if (!(event.getSource().getBlockData() instanceof Fire)) return;
         if (event.getSource().getState().hasMetadata(metaOwnerId)) {
@@ -283,10 +300,14 @@ public class TNTListener implements Listener {
     }
 
     private void updateLastPowered(Player player, Location loc) {
+        if (!lastPowered.containsKey(player)) {
+            // Player has timed out their last placement, start a new delayed removal
+            // 30 second timeout
+            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin,
+                    () -> lastPowered.remove(player), 20*30);
+        }
+        // Update last location
         lastPowered.put(player,loc);
-        // 30 second timeout
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin,
-                () -> lastPowered.remove(player), 20*30);
     }
 
 }
