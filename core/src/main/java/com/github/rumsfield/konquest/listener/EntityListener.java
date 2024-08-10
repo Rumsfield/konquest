@@ -194,7 +194,7 @@ public class EntityListener implements Listener {
 	 * Fires when entities explode.
 	 * Protect territory from explosions, and optionally protect chests inside claimed territory.
 	 */
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onEntityExplode(EntityExplodeEvent event) {
 		// Protect blocks inside of territory
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
