@@ -85,7 +85,7 @@ public class EntityListener implements Listener {
 	 * Prevent Endermen from picking up blocks in claimed territory
 	 * @param event The block change event
 	 */
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onEntityBlockChange(EntityChangeBlockEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		if(event.isCancelled()) return;
@@ -127,20 +127,25 @@ public class EntityListener implements Listener {
 		if(territory instanceof KonTown) {
 			KonTown town = (KonTown)territory;
 
-			// Protect against TNT ignited by non-enemies
-			if (explosion instanceof TNTPrimed) {
-				if (explosion.hasMetadata(Konquest.metaTntOwnerId)) {
-					UUID ownerId = UUID.fromString(explosion.getMetadata(Konquest.metaTntOwnerId).get(0).asString());
-					Player owner = Bukkit.getPlayer(ownerId);
-					KonPlayer player = playerManager.getPlayer(owner);
-					if(player != null) {
-						assert owner != null;
-						KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
-						ChatUtil.printDebug("TNT exploded with owner "+owner.getName()+" relation to "+town.getName()+" as "+playerRole);
-						if(playerRole.equals(KonquestRelationshipType.PEACEFUL) ||
-								playerRole.equals(KonquestRelationshipType.TRADE) ||
-								playerRole.equals(KonquestRelationshipType.ALLY)) {
-							ChatUtil.printDebug("  Protecting Town from non-enemy TNT entity explosion");
+			// Protect against TNT ignited by specific players
+			if (explosion instanceof TNTPrimed && explosion.hasMetadata(Konquest.metaTntOwnerId)) {
+				UUID ownerId = UUID.fromString(explosion.getMetadata(Konquest.metaTntOwnerId).get(0).asString());
+				Player owner = Bukkit.getPlayer(ownerId);
+				KonPlayer player = playerManager.getPlayer(owner);
+				if (player != null) {
+					assert owner != null;
+					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
+					ChatUtil.printDebug("TNT exploded with owner "+owner.getName()+" relation to "+town.getName()+" as "+playerRole);
+					if (playerRole.equals(KonquestRelationshipType.PEACEFUL) ||
+							playerRole.equals(KonquestRelationshipType.TRADE) ||
+							playerRole.equals(KonquestRelationshipType.ALLY)) {
+						ChatUtil.sendKonBlockedProtectionTitle(player);
+						return true;
+					} else if (!playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
+						// For all other non-friendly players
+						// If not enough players are online in the attacker's kingdom, prevent block edits
+						boolean isNoProtectedAttack = konquest.getCore().getBoolean(CorePath.KINGDOMS_NO_PROTECTED_ATTACKING.getPath(),false);
+						if (isNoProtectedAttack && player.getKingdom().isOfflineProtected()) {
 							ChatUtil.sendKonBlockedProtectionTitle(player);
 							return true;
 						}
@@ -189,7 +194,7 @@ public class EntityListener implements Listener {
 	 * Fires when entities explode.
 	 * Protect territory from explosions, and optionally protect chests inside claimed territory.
 	 */
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.NORMAL)
     public void onEntityExplode(EntityExplodeEvent event) {
 		// Protect blocks inside of territory
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
@@ -213,6 +218,7 @@ public class EntityListener implements Listener {
 		}
 		if(isInTerritory && wholeTerritory != null) {
 			if(isTerritoryExplosionProtected(wholeTerritory,event.getEntity())) {
+				ChatUtil.printDebug("  Protected territory from explosion in "+wholeTerritory.getName());
 				event.setCancelled(true);
 				return;
 			}
@@ -921,23 +927,27 @@ public class EntityListener implements Listener {
         }
     }
 
+	/**
+	 * Checks for entities protected by territory when explosion is outside of territory.
+	 * For protections from explosions inside of territory, see onEntityExplode.
+	 * @param event
+	 */
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onEntityDamageByExplosion(EntityDamageByEntityEvent event) {
 		if (event.isCancelled()) return;
 		if (konquest.isWorldIgnored(event.getEntity().getWorld())) return;
-		Entity eAttacker = event.getDamager();
-		boolean isExplosive = eAttacker instanceof Explosive;
-		boolean isCreeper = eAttacker instanceof Creeper;
-
-		if(isExplosive || isCreeper) {
-			Location entityLoc = event.getEntity().getLocation();
-			if(territoryManager.isChunkClaimed(entityLoc)) {
-				KonTerritory territory = territoryManager.getChunkTerritory(entityLoc);
-				assert territory != null;
-				if(isTerritoryExplosionProtected(territory,eAttacker)) {
-					event.setCancelled(true);
-					return;
-				}
+		// Damager entity must be explosive (TNT) or Creeper
+		if (!(event.getDamager() instanceof Explosive || event.getDamager() instanceof Creeper)) return;
+		// Damager must be outside of territory
+		if (territoryManager.isChunkClaimed(event.getDamager().getLocation())) return;
+		// Try to protect entity if it's inside of territory
+		Location entityLoc = event.getEntity().getLocation();
+		if(territoryManager.isChunkClaimed(entityLoc)) {
+			KonTerritory territory = territoryManager.getChunkTerritory(entityLoc);
+			assert territory != null;
+			if(isTerritoryExplosionProtected(territory,event.getDamager())) {
+				ChatUtil.printDebug("  Protected entity "+event.getEntity().getName()+" from explosion damage in "+territory.getName());
+				event.setCancelled(true);
 			}
 		}
 	}

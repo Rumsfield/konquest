@@ -925,7 +925,7 @@ public class BlockListener implements Listener {
 						return;
 					}
 					// Protect towns when all kingdom members are offline
-					if(playerManager.getPlayersInKingdom(town.getKingdom()).isEmpty()) {
+					if(town.getKingdom().isOfflineProtected()) {
 						ChatUtil.printDebug("protecting offline Town from block explosion");
 						event.setCancelled(true);
 						return;
@@ -1053,7 +1053,7 @@ public class BlockListener implements Listener {
 						return;
 					}
 					// Check if block is inside an offline kingdom
-					if(playerManager.getPlayersInKingdom(territory.getKingdom()).isEmpty()) {
+					if(town.getKingdom().isOfflineProtected()) {
 						event.setCancelled(true);
 						return;
 					}
@@ -1136,7 +1136,7 @@ public class BlockListener implements Listener {
 						return;
 					}
 					// Check if block is inside an offline kingdom
-					if(playerManager.getPlayersInKingdom(territory.getKingdom()).isEmpty()) {
+					if(town.getKingdom().isOfflineProtected()) {
 						event.setCancelled(true);
 						return;
 					}

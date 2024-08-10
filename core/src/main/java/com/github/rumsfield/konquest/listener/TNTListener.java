@@ -121,29 +121,6 @@ public class TNTListener implements Listener {
                 }
             }
         }
-        // Search surrounding entities for metadata, and nearest player
-        if (!hasOwner) {
-            for (Entity checkEntity : spawnWorld.getNearbyEntities(event.getLocation(), 32, 32, 32)) {
-                if (checkEntity.hasMetadata(metaOwnerId)) {
-                    for (MetadataValue meta : checkEntity.getMetadata(metaOwnerId)) {
-                        event.getEntity().setMetadata(metaOwnerId, meta);
-                    }
-                    UUID ownerId = UUID.fromString(checkEntity.getMetadata(metaOwnerId).get(0).asString());
-                    Player owner = Bukkit.getPlayer(ownerId);
-                    String ownerName = owner == null ? "unknown" : owner.getName();
-                    ownerSource = "Entity "+checkEntity.getName()+" with owner "+ownerName;
-                    hasOwner = true;
-                    break;
-                } else if (checkEntity instanceof Player) {
-                    // Find nearest player
-                    double checkDistance = event.getLocation().distance(checkEntity.getLocation());
-                    if (nearestPlayer == null || checkDistance < nearestDistance) {
-                        nearestPlayer = (Player)checkEntity;
-                        nearestDistance = checkDistance;
-                    }
-                }
-            }
-        }
         // Search for nearby powered activation
         if (!hasOwner) {
             Player nearestPowerPlayer = null;
@@ -165,6 +142,29 @@ public class TNTListener implements Listener {
                 ownerSource = "Powered by player "+nearestPowerPlayer.getName();
                 hasOwner = true;
                 updateMetaOwner(event.getEntity(),nearestPowerPlayer);
+            }
+        }
+        // Search surrounding entities for metadata, and nearest player
+        if (!hasOwner) {
+            for (Entity checkEntity : spawnWorld.getNearbyEntities(event.getLocation(), 32, 32, 32)) {
+                if (checkEntity.hasMetadata(metaOwnerId)) {
+                    for (MetadataValue meta : checkEntity.getMetadata(metaOwnerId)) {
+                        event.getEntity().setMetadata(metaOwnerId, meta);
+                    }
+                    UUID ownerId = UUID.fromString(checkEntity.getMetadata(metaOwnerId).get(0).asString());
+                    Player owner = Bukkit.getPlayer(ownerId);
+                    String ownerName = owner == null ? "unknown" : owner.getName();
+                    ownerSource = "Entity "+checkEntity.getName()+" with owner "+ownerName;
+                    hasOwner = true;
+                    break;
+                } else if (checkEntity instanceof Player) {
+                    // Find nearest player
+                    double checkDistance = event.getLocation().distance(checkEntity.getLocation());
+                    if (nearestPlayer == null || checkDistance < nearestDistance) {
+                        nearestPlayer = (Player)checkEntity;
+                        nearestDistance = checkDistance;
+                    }
+                }
             }
         }
         // Last resort, check for nearest player

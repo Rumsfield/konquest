@@ -238,7 +238,10 @@ public class Konquest implements KonquestAPI, Timeable {
     	boolean isProtocolLibEnabled = integrationManager.getProtocolLib().isEnabled();
     	// Version-specific cases
     	try {
-			if (CompatibilityUtil.apiVersion.compareTo(new Version("1.16.5")) <= 0) {
+			if (CompatibilityUtil.apiVersion.compareTo(new Version("1.16")) < 0) {
+				isVersionSupported = false;
+
+			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.16.5")) <= 0) {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_16_R3(); }
 
