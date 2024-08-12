@@ -428,6 +428,7 @@ protection:
     kingdom-warmup: "The Kingdom of %s will be protected in %s minutes."
     kingdom-conquer: "The Kingdom of %s has been conquered by %s!"
     kingdom-raze: "The Kingdom of %s has been destroyed by the Barbarian horde!"
+    town-warmup: "These towns in the Kingdom of %s will be protected in %s minutes: %s"
     ruin: "You have captured the Ruin %s."
     safe: "The Town of %s is safe, for now..."
     attacked: "Under Attack"

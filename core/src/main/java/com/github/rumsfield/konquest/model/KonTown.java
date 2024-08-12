@@ -36,6 +36,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private final Timer captureTimer;
 	private final Timer raidAlertTimer;
 	private final Timer shieldTimer;
+	private final Timer protectedWarmupTimer;
 	private final HashMap<UUID, Timer> playerTravelTimers;
 	private boolean isCaptureDisabled;
 	private boolean isRaidAlertDisabled;
@@ -51,6 +52,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private boolean isAttacked;
 	private boolean isShielded;
 	private boolean isArmored;
+	private boolean isTownWatchProtected;
 	private int shieldEndTimeSeconds;
 	private int shieldNowTimeSeconds;
 	private int armorTotalBlocks;
@@ -72,6 +74,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.captureTimer = new Timer(this);
 		this.raidAlertTimer = new Timer(this);
 		this.shieldTimer = new Timer(this);
+		this.protectedWarmupTimer = new Timer(this);
 		this.playerTravelTimers = new HashMap<>();
 		this.isCaptureDisabled = false;
 		this.isRaidAlertDisabled = false;
@@ -97,6 +100,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.joinRequestKeeper = new RequestKeeper();
 		this.isAttacked = false;
 		this.isShielded = false;
+		this.isArmored = false;
+		this.isTownWatchProtected = false;
 		this.shieldEndTimeSeconds = 0;
 		this.shieldNowTimeSeconds = 0;
 		this.armorTotalBlocks = 0;
@@ -826,6 +831,9 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				//refreshShieldBarTitle();
 				updateBarTitle();
 			}
+		} else if(taskID == protectedWarmupTimer.getTaskID()) {
+			ChatUtil.printDebug("Town Watch protection warmup Timer ended with taskID: "+taskID);
+			isTownWatchProtected = true;
 		} else {
 			// Check for timer in player travel cool-down map
 			for(UUID uuid : playerTravelTimers.keySet()) {
@@ -965,6 +973,45 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	public boolean isAttacked() {
 		return isAttacked;
+	}
+
+	// Return true when protection warmup starts, else false
+	public boolean updateProtection(boolean force) {
+		int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(this, KonUpgrade.WATCH);
+		boolean isTownWatchValid = (upgradeLevel > 0 && getNumResidentsOnline() < upgradeLevel);
+		if (!isTownWatchValid) {
+			// Town Watch conditions are no longer met
+			// Disable protection
+			isTownWatchProtected = false;
+			protectedWarmupTimer.stopTimer();
+		} else if (!isTownWatchProtected) {
+			// Town Watch is disabled, and conditions are met
+			// Enable protection warmup
+			if (force) {
+				ChatUtil.printDebug("Town Watch protection enabled forced in "+getName());
+				isTownWatchProtected = true;
+				protectedWarmupTimer.stopTimer();
+				return true;
+			}
+			// Use same warmup time as kingdom offline protection
+			int offlineProtectedWarmupSeconds = getKonquest().getCore().getInt(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE_WARMUP.getPath(),0);
+			if (offlineProtectedWarmupSeconds > 0 && protectedWarmupTimer.getTime() == -1) {
+				// Timer is not running, and config time is non-zero
+				// start warmup timer
+				ChatUtil.printDebug("Starting town watch protection warmup timer for " + offlineProtectedWarmupSeconds + " seconds: " + this.getName());
+				protectedWarmupTimer.stopTimer();
+				protectedWarmupTimer.setTime(offlineProtectedWarmupSeconds);
+				protectedWarmupTimer.startTimer();
+			} else if (offlineProtectedWarmupSeconds <= 0) {
+				// Warmup is disabled, immediately enable protection
+				ChatUtil.printDebug("Town Watch protection enabled without warmup in "+getName());
+				isTownWatchProtected = true;
+				protectedWarmupTimer.stopTimer();
+			}
+			return true;
+		}
+		// Default
+		return false;
 	}
 	
 	public void targetRabbitToPlayer(Player player) {
@@ -1438,7 +1485,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public int getNumResidentsOnline() {
 		int result = 0;
 		for(UUID id : residents.keySet()) {
-			if(Bukkit.getOfflinePlayer(id).isOnline()) {
+			if(getKonquest().getPlayerManager().isOnlinePlayer(Bukkit.getPlayer(id))) {
 				result++;
 			}
 		}
@@ -1527,17 +1574,9 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public void removeJoinRequest(UUID id) {
 		joinRequestKeeper.removeJoinRequest(id);
 	}
-	
+
 	public boolean isTownWatchProtected() {
-		boolean result = false;
-		int upgradeLevel = getKonquest().getUpgradeManager().getTownUpgradeLevel(this, KonUpgrade.WATCH);
-		if(upgradeLevel > 0) {
-			int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
-			if(getNumResidentsOnline() < minimumOnlineResidents) {
-				result = true;
-			}
-		}
-		return result;
+		return isTownWatchProtected;
 	}
 	
 	public boolean isShielded() {

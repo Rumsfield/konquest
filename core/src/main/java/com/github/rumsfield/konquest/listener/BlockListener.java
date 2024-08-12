@@ -193,13 +193,11 @@ public class BlockListener implements Listener {
 								return;
 							}
 							// If town is upgraded to require a minimum online resident amount, prevent block edits
-							int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-							if (upgradeLevel > 0) {
-								if (town.getNumResidentsOnline() < upgradeLevel) {
-									ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevel));
-									event.setCancelled(true);
-									return;
-								}
+							if(town.isTownWatchProtected()) {
+								int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevelWatch));
+								event.setCancelled(true);
+								return;
 							}
 						}
 						// If block is a container, protect (optionally)
@@ -638,13 +636,11 @@ public class BlockListener implements Listener {
 								return;
 							}
 							// If town is upgraded to require a minimum online resident amount, prevent block damage
-							int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-							if (upgradeLevel > 0) {
-								if (town.getNumResidentsOnline() < upgradeLevel) {
-									ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevel));
-									event.setCancelled(true);
-									return;
-								}
+							if(town.isTownWatchProtected()) {
+								int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
+								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevelWatch));
+								event.setCancelled(true);
+								return;
 							}
 						}
 						// Prevent inventory blocks from being placed
@@ -931,14 +927,10 @@ public class BlockListener implements Listener {
 						return;
 					}
 					// If town is upgraded to require a minimum online resident amount, prevent block damage
-					int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-					if(upgradeLevel > 0) {
-						int minimumOnlineResidents = upgradeLevel; // 1, 2, 3
-						if(town.getNumResidentsOnline() < minimumOnlineResidents) {
-							ChatUtil.printDebug("protecting upgraded Town from block explosion");
-							event.setCancelled(true);
-							return;
-						}
+					if(town.isTownWatchProtected()) {
+						ChatUtil.printDebug("protecting upgraded Town from block explosion");
+						event.setCancelled(true);
+						return;
 					}
 					// Check for capital capture conditions
 					if(territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) && territory.getKingdom().isCapitalImmune()) {
@@ -1253,14 +1245,11 @@ public class BlockListener implements Listener {
 					return;
 				}
 				// If town is upgraded to require a minimum online resident amount, prevent block damage
-				int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-				if(event.getSource().getType().equals(Material.FIRE) && upgradeLevelWatch > 0) {
-					if(town.getNumResidentsOnline() < upgradeLevelWatch) {
-						ChatUtil.printDebug("EVENT: Stopped fire spread in upgraded town, WATCH");
-						event.getSource().setType(Material.AIR);
-						event.setCancelled(true);
-						return;
-					}
+				if(event.getSource().getType().equals(Material.FIRE) && town.isTownWatchProtected()) {
+					ChatUtil.printDebug("EVENT: Stopped fire spread in upgraded town, WATCH");
+					event.getSource().setType(Material.AIR);
+					event.setCancelled(true);
+					return;
 				}
 				// If town is shielded
 				if(event.getSource().getType().equals(Material.FIRE) && town.isShielded()) {

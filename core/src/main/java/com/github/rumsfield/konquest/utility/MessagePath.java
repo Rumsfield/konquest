@@ -407,6 +407,7 @@ public enum MessagePath {
 	PROTECTION_NOTICE_KINGDOM_WARMUP            (2, "protection.notice.kingdom-warmup"),
 	PROTECTION_NOTICE_KINGDOM_CONQUER           (2, "protection.notice.kingdom-conquer"),
 	PROTECTION_NOTICE_KINGDOM_RAZE              (1, "protection.notice.kingdom-raze"),
+	PROTECTION_NOTICE_TOWN_WARMUP               (3, "protection.notice.town-warmup"),
 	PROTECTION_NOTICE_RUIN                      (1, "protection.notice.ruin"),
 	PROTECTION_NOTICE_SAFE                      (1, "protection.notice.safe"),
 	PROTECTION_NOTICE_ATTACKED                  (0, "protection.notice.attacked"),

@@ -331,7 +331,7 @@ core:
     # Prevent enemy players from breaking any blocks in a Kingdom with no players online (true/false)
     no_enemy_edit_offline: true
     
-    # Time in seconds when a Kingdom is protected from when the minimum player disconnects (integer >= 0)
+    # Time in seconds when a Kingdom or Town is protected from when the minimum player disconnects (integer >= 0)
     no_enemy_edit_offline_warmup: 300
     
     # Number of online players required for a Kingdom to be protected from enemy attacks (integer >= 0)
