@@ -118,7 +118,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		loadArmorBlacklist();
 		loadJoinExileCooldowns();
 		loadKingdoms();
-		updateKingdomOfflineProtection(true);
 		makeTownNerfs();
 		ChatUtil.printDebug("Kingdom Manager is ready");
 	}
@@ -3522,7 +3521,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		int warmupSeconds = offlineProtectedWarmupSeconds % 60;
 		String warmupTime = String.format("%d:%02d", warmupMinutes, warmupSeconds);
 		// For each kingdom, start protection warmup timer if no players are online, else ensure the timer is stopped
-		ChatUtil.printDebug("Beginning protection update...");
 		for(KonKingdom kingdom : getKingdoms()) {
 			// Kingdom Offline Protection
 			if(isOfflineProtectedEnabled) {

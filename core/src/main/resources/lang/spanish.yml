@@ -428,6 +428,7 @@ protection:
     kingdom-warmup: El Reino de %s estara protegido en %s minutos.
     kingdom-conquer: El Reino de %s ha sido conquistado por %s!
     kingdom-raze: El Reino de %s ha sido destruido por la horda Barbaro!
+    town-warmup: Estos pueblos del Reino de %s estarán protegidos en %s minutos: %s
     ruin: Has capturado la Ruina %s.
     safe: El Pueblo de %s esta seguro, por ahora...
     attacked: Bajo Ataque

@@ -987,26 +987,20 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		} else if (!isTownWatchProtected) {
 			// Town Watch is disabled, and conditions are met
 			// Enable protection warmup
-			if (force) {
-				ChatUtil.printDebug("Town Watch protection enabled forced in "+getName());
-				isTownWatchProtected = true;
-				protectedWarmupTimer.stopTimer();
-				return true;
-			}
 			// Use same warmup time as kingdom offline protection
 			int offlineProtectedWarmupSeconds = getKonquest().getCore().getInt(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE_WARMUP.getPath(),0);
-			if (offlineProtectedWarmupSeconds > 0 && protectedWarmupTimer.getTime() == -1) {
+			if (force || offlineProtectedWarmupSeconds <= 0) {
+				// Warmup is disabled, immediately enable protection
+				ChatUtil.printDebug("Town Watch protection enabled without warmup in "+getName());
+				isTownWatchProtected = true;
+				protectedWarmupTimer.stopTimer();
+			} else if (protectedWarmupTimer.getTime() == -1) {
 				// Timer is not running, and config time is non-zero
 				// start warmup timer
 				ChatUtil.printDebug("Starting town watch protection warmup timer for " + offlineProtectedWarmupSeconds + " seconds: " + this.getName());
 				protectedWarmupTimer.stopTimer();
 				protectedWarmupTimer.setTime(offlineProtectedWarmupSeconds);
 				protectedWarmupTimer.startTimer();
-			} else if (offlineProtectedWarmupSeconds <= 0) {
-				// Warmup is disabled, immediately enable protection
-				ChatUtil.printDebug("Town Watch protection enabled without warmup in "+getName());
-				isTownWatchProtected = true;
-				protectedWarmupTimer.stopTimer();
 			}
 			return true;
 		}

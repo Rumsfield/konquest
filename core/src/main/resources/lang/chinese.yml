@@ -428,6 +428,7 @@ protection:
     kingdom-warmup: '%s 王國將在 %s 分鐘內受到保護。'
     kingdom-conquer: '%s 王國已被 %s 征服！'
     kingdom-raze: '%s 王國已被蠻族大軍摧毀！'
+    town-warmup: '%s 王國的這些城鎮將在 %s 分鐘後受到保護： %s'
     ruin: 您已經佔領了遺址 %s。
     safe: '%s 鎮目前安全...'
     attacked: 受到攻擊
