@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import net.ess3.api.IUser;
+import net.ess3.api.events.AfkStatusChangeEvent;
 import net.ess3.api.events.teleport.PreTeleportEvent;
 import net.essentialsx.api.v2.events.HomeModifyEvent;
 import org.bukkit.Location;
@@ -154,6 +155,21 @@ public class EssentialsXListener implements Listener {
                 return;
             }
         }
+    }
+
+    /**
+     * Track when players go AFK
+     */
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onAfkChange(AfkStatusChangeEvent event) {
+        if (event.isCancelled()) return;
+        // Get player
+        IUser afkUser = event.getAffected();
+        if (afkUser == null) return;
+        KonPlayer player = konquest.getPlayerManager().getPlayer(afkUser.getBase());
+        if (player == null) return;
+        // Update player's AFK status
+        player.setIsAfk(event.getValue());
     }
 
 }

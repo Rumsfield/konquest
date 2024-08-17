@@ -64,6 +64,7 @@ public enum CorePath {
 	INTEGRATION_ESSENTIALSX                               ("core.integration.essentialsx"),
 	INTEGRATION_ESSENTIALSX_OPTIONS_ENABLE_WILD_HOMES     ("core.integration.essentialsx_options.enable_wild_homes"),
 	INTEGRATION_ESSENTIALSX_OPTIONS_ENABLE_TELEPORT_PROTECTION ("core.integration.essentialsx_options.enable_teleport_protection"),
+	INTEGRATION_ESSENTIALSX_OPTIONS_ENABLE_AFK_PAYMENTS   ("core.integration.essentialsx_options.enable_afk_payments"),
 
 	TRAVEL_ENABLE_SANCTUARY                               ("core.travel.enable.sanctuary"),
 	TRAVEL_ENABLE_TOWNS                                   ("core.travel.enable.towns"),
