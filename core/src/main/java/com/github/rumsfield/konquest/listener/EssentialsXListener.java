@@ -2,14 +2,12 @@ package com.github.rumsfield.konquest.listener;
 
 import com.earth2me.essentials.ITarget;
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonPropertyFlag;
-import com.github.rumsfield.konquest.model.KonPropertyFlagHolder;
-import com.github.rumsfield.konquest.model.KonTerritory;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import net.ess3.api.IUser;
+import net.ess3.api.events.AfkStatusChangeEvent;
 import net.ess3.api.events.teleport.PreTeleportEvent;
 import net.essentialsx.api.v2.events.HomeModifyEvent;
 import org.bukkit.Location;
@@ -46,11 +44,23 @@ public class EssentialsXListener implements Listener {
             // Home is in a claimed territory
             KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(newHomeLoc);
             assert territory != null;
-            if (!konquest.getKingdomManager().isPlayerFriendly(player,territory.getKingdom())) {
-                // Homes cannot be made in non-friendly territory
-                ChatUtil.printDebug("Cancelled EssentialsX home update in non-friendly territory");
-                ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-                event.setCancelled(true);
+            if (territory instanceof KonCamp) {
+                // For camps, check if player is the owner
+                KonCamp camp = (KonCamp)territory;
+                if (!camp.isPlayerOwner(player.getBukkitPlayer())) {
+                    // Homes cannot be made in barbarian camps except by the owner
+                    ChatUtil.printDebug("Cancelled EssentialsX home update in camp by non-owner");
+                    ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+                    event.setCancelled(true);
+                }
+            } else {
+                // For all other territories, check for friendly relation
+                if (!konquest.getKingdomManager().isPlayerFriendly(player,territory.getKingdom())) {
+                    // Homes cannot be made in non-friendly territory
+                    ChatUtil.printDebug("Cancelled EssentialsX home update in non-friendly territory");
+                    ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+                    event.setCancelled(true);
+                }
             }
         } else {
             // Home is in the wild
@@ -145,6 +155,21 @@ public class EssentialsXListener implements Listener {
                 return;
             }
         }
+    }
+
+    /**
+     * Track when players go AFK
+     */
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onAfkChange(AfkStatusChangeEvent event) {
+        if (event.isCancelled()) return;
+        // Get player
+        IUser afkUser = event.getAffected();
+        if (afkUser == null) return;
+        KonPlayer player = konquest.getPlayerManager().getPlayer(afkUser.getBase());
+        if (player == null) return;
+        // Update player's AFK status
+        player.setIsAfk(event.getValue());
     }
 
 }

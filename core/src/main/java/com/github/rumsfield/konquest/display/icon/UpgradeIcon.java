@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemFlag;
@@ -39,7 +40,7 @@ public class UpgradeIcon implements MenuIcon{
 		loreList.add(loreColor+MessagePath.LABEL_LEVEL.getMessage()+" "+level);
 		loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
 		loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+pop);
-		for(String line : Konquest.stringPaginate(upgrade.getLevelDescription(level))) {
+		for(String line : HelperUtil.stringPaginate(upgrade.getLevelDescription(level))) {
 			loreList.add(loreColor+line);
 		}
 		String name = ChatColor.GOLD+upgrade.getDescription();

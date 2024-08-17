@@ -141,10 +141,11 @@ public class UpgradeManager implements KonquestUpgradeManager {
 	
 	/**
 	 * Main method for applying town upgrades.
+	 * Used by normal players purchasing an upgrade.
 	 * @param town the town to upgrade
 	 * @param upgrade upgrade to apply
-	 * @param level the level
-	 * @param bukkitPlayer player
+	 * @param level the level of the upgrade
+	 * @param bukkitPlayer player purchasing the upgrade
 	 * @return True on successful addition of the upgrade, else false.
 	 */
 	public boolean addTownUpgrade(KonTown town, KonUpgrade upgrade, int level, Player bukkitPlayer) {
@@ -155,6 +156,12 @@ public class UpgradeManager implements KonquestUpgradeManager {
 		}
 		if(town.hasPropertyValue(KonPropertyFlag.UPGRADE) && !town.getPropertyValue(KonPropertyFlag.UPGRADE)) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return false;
+		}
+		// Check that the town is not under attack
+		boolean isAttackCheckEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_UPGRADE_WHILE_ATTACKED.getPath(),false);
+		if(!isAttackCheckEnabled && town.isAttacked()) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_ATTACK.getMessage());
 			return false;
 		}
 		// Check that the town has the previous level, if applicable

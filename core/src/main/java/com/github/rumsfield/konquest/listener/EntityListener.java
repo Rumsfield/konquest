@@ -18,20 +18,19 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.*;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
+
+import java.util.UUID;
 
 public class EntityListener implements Listener {
 
@@ -86,7 +85,7 @@ public class EntityListener implements Listener {
 	 * Prevent Endermen from picking up blocks in claimed territory
 	 * @param event The block change event
 	 */
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onEntityBlockChange(EntityChangeBlockEvent event) {
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		if(event.isCancelled()) return;
@@ -98,7 +97,9 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	private boolean isTerritoryExplosionProtected(KonTerritory territory, boolean isCreeper) {
+	private boolean isTerritoryExplosionProtected(KonTerritory territory, Entity explosion) {
+		boolean isCreeper = explosion instanceof Creeper;
+
 		// Protect Sanctuaries and Ruins always
 		if(territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY) ||
 				territory.getTerritoryType().equals(KonquestTerritoryType.RUIN)) {
@@ -114,39 +115,44 @@ public class EntityListener implements Listener {
 				}
 			}
 		}
+		// Conditional camp protections
+		if(territory instanceof KonCamp) {
+			KonCamp camp = (KonCamp) territory;
+			// Protect camps when owner is offline
+			if(camp.isProtected()) {
+				return true;
+			}
+		}
 		// Conditional town/capital protections
 		if(territory instanceof KonTown) {
 			KonTown town = (KonTown)territory;
 
-			//TODO: Implement this...
-			// Protect against TNT ignited by non-enemies
-				/*
-				ChatUtil.printDebug("Evaluating entity explosion in town...");
-				if(event.getEntity() instanceof TNTPrimed) {
-					ChatUtil.printDebug("  explosion is primed TNT");
-					TNTPrimed tnt = (TNTPrimed)event.getEntity();
-					Entity tntSource = tnt.getSource();
-					if(tntSource == null) {
-						ChatUtil.printDebug("  source is null!");
-					} else {
-						ChatUtil.printDebug("  source: "+tntSource.getType());
-					}
-					if(tntSource instanceof Player) {
-						ChatUtil.printDebug("  source is player");
-						Player tntSender = (Player)tntSource;
-						KonPlayer player = playerManager.getPlayer(tntSender);
-						if(player != null) {
-							ChatUtil.printDebug("  found KonPlayer");
-							KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
-							if(!playerRole.equals(KonquestRelationshipType.ENEMY)) {
-								ChatUtil.printDebug("protecting Town from non-enemy TNT entity explosion");
-								event.setCancelled(true);
-								return;
-							}
+			// Protect against TNT ignited by specific players
+			if (explosion instanceof TNTPrimed && explosion.hasMetadata(Konquest.metaTntOwnerId)) {
+				UUID ownerId = UUID.fromString(explosion.getMetadata(Konquest.metaTntOwnerId).get(0).asString());
+				Player owner = Bukkit.getPlayer(ownerId);
+				KonPlayer player = playerManager.getPlayer(owner);
+				if (player != null) {
+					assert owner != null;
+					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
+					ChatUtil.printDebug("TNT exploded with owner "+owner.getName()+" relation to "+town.getName()+" as "+playerRole);
+					if (playerRole.equals(KonquestRelationshipType.PEACEFUL) ||
+							playerRole.equals(KonquestRelationshipType.TRADE) ||
+							playerRole.equals(KonquestRelationshipType.ALLY)) {
+						ChatUtil.sendKonBlockedProtectionTitle(player);
+						return true;
+					} else if (!playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
+						// For all other non-friendly players
+						// If not enough players are online in the attacker's kingdom, prevent block edits
+						boolean isNoProtectedAttack = konquest.getCore().getBoolean(CorePath.KINGDOMS_NO_PROTECTED_ATTACKING.getPath(),false);
+						if (isNoProtectedAttack && player.getKingdom().isOfflineProtected()) {
+							ChatUtil.sendKonBlockedProtectionTitle(player);
+							return true;
 						}
 					}
 				}
-				*/
+			}
+
 			// Protect peaceful towns
 			if(town.getKingdom().isPeaceful()) {
 				return true;
@@ -156,11 +162,8 @@ public class EntityListener implements Listener {
 				return true;
 			}
 			// If town is upgraded to require a minimum online resident amount, prevent block damage
-			int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-			if(upgradeLevelWatch > 0) {
-				if(town.getNumResidentsOnline() < upgradeLevelWatch) {
-					return true;
-				}
+			if(town.isTownWatchProtected()) {
+				return true;
 			}
 			// Protect when town has upgrade
 			int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DAMAGE);
@@ -188,7 +191,7 @@ public class EntityListener implements Listener {
 	 * Fires when entities explode.
 	 * Protect territory from explosions, and optionally protect chests inside claimed territory.
 	 */
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onEntityExplode(EntityExplodeEvent event) {
 		// Protect blocks inside of territory
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
@@ -211,8 +214,8 @@ public class EntityListener implements Listener {
 			}
 		}
 		if(isInTerritory && wholeTerritory != null) {
-			boolean isCreeper = event.getEntity() instanceof Creeper;
-			if(isTerritoryExplosionProtected(wholeTerritory,isCreeper)) {
+			if(isTerritoryExplosionProtected(wholeTerritory,event.getEntity())) {
+				ChatUtil.printDebug("  Protected territory from explosion in "+wholeTerritory.getName());
 				event.setCancelled(true);
 				return;
 			}
@@ -671,13 +674,11 @@ public class EntityListener implements Listener {
 							return;
 	    				}
 	    				// If town is upgraded to require a minimum online resident amount, prevent block damage
-						int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-						if(upgradeLevelWatch > 0) {
-							if(town.getNumResidentsOnline() < upgradeLevelWatch) {
-								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevelWatch));
-								event.setCancelled(true);
-								return;
-							}
+						if(town.isTownWatchProtected()) {
+							int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevelWatch));
+							event.setCancelled(true);
+							return;
 						}
 						// If the player is not enemy with the town, prevent event
 						if(!playerRole.equals(KonquestRelationshipType.ENEMY)) {
@@ -698,6 +699,14 @@ public class EntityListener implements Listener {
 						if(town.isCaptureDisabled()) {
 							ChatUtil.sendKonBlockedProtectionTitle(player);
 							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(town.getCaptureCooldownString()));
+							event.setCancelled(true);
+							return;
+						}
+						// If not enough players are online in the attacker's kingdom, prevent animal attacks
+						boolean isNoProtectedAttack = konquest.getCore().getBoolean(CorePath.KINGDOMS_NO_PROTECTED_ATTACKING.getPath(),false);
+						if (isNoProtectedAttack && player.getKingdom().isOfflineProtected()) {
+							ChatUtil.sendKonBlockedProtectionTitle(player);
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_PROTECTED_ATTACK.getMessage(town.getName()));
 							event.setCancelled(true);
 							return;
 						}
@@ -913,23 +922,27 @@ public class EntityListener implements Listener {
         }
     }
 
+	/**
+	 * Checks for entities protected by territory when explosion is outside of territory.
+	 * For protections from explosions inside of territory, see onEntityExplode.
+	 * @param event
+	 */
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onEntityDamageByExplosion(EntityDamageByEntityEvent event) {
 		if (event.isCancelled()) return;
 		if (konquest.isWorldIgnored(event.getEntity().getWorld())) return;
-		Entity eAttacker = event.getDamager();
-		boolean isExplosive = eAttacker instanceof Explosive;
-		boolean isCreeper = eAttacker instanceof Creeper;
-
-		if(isExplosive || isCreeper) {
-			Location entityLoc = event.getEntity().getLocation();
-			if(territoryManager.isChunkClaimed(entityLoc)) {
-				KonTerritory territory = territoryManager.getChunkTerritory(entityLoc);
-				assert territory != null;
-				if(isTerritoryExplosionProtected(territory,isCreeper)) {
-					event.setCancelled(true);
-					return;
-				}
+		// Damager entity must be explosive (TNT) or Creeper
+		if (!(event.getDamager() instanceof Explosive || event.getDamager() instanceof Creeper)) return;
+		// Damager must be outside of territory
+		if (territoryManager.isChunkClaimed(event.getDamager().getLocation())) return;
+		// Try to protect entity if it's inside of territory
+		Location entityLoc = event.getEntity().getLocation();
+		if(territoryManager.isChunkClaimed(entityLoc)) {
+			KonTerritory territory = territoryManager.getChunkTerritory(entityLoc);
+			assert territory != null;
+			if(isTerritoryExplosionProtected(territory,event.getDamager())) {
+				ChatUtil.printDebug("  Protected entity "+event.getEntity().getName()+" from explosion damage in "+territory.getName());
+				event.setCancelled(true);
 			}
 		}
 	}

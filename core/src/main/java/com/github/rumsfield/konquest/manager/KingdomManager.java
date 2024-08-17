@@ -22,6 +22,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -117,7 +118,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		loadArmorBlacklist();
 		loadJoinExileCooldowns();
 		loadKingdoms();
-		updateKingdomOfflineProtection();
 		makeTownNerfs();
 		ChatUtil.printDebug("Kingdom Manager is ready");
 	}
@@ -175,23 +175,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public String getKingdomPayTime() {
 		String noColor = "";
 		int timerCount = Math.max(payTimer.getTime(),0);
-		return Konquest.getTimeFormat(timerCount, noColor);
-	}
-	
-	public double getCostDiplomacyWar() {
-		return costDiplomacyWar;
-	}
-
-	public double getCostDiplomacyPeace() {
-		return costDiplomacyPeace;
-	}
-
-	public double getCostDiplomacyTrade() {
-		return costDiplomacyTrade;
-	}
-
-	public double getCostDiplomacyAlliance() {
-		return costDiplomacyAlliance;
+		return HelperUtil.getTimeFormat(timerCount, noColor);
 	}
 	
 	public double getCostCreate() {
@@ -238,70 +222,86 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	/**
-	 * Kingdom payments for members<br>
-	 * Total payment is based on all towns & land.<br>
-	 * Kingdom members only get paid based on the towns & land they are lord of.<br>
-	 * Kingdom officers/master get a bonus = percentage of total payment.<br>
+	 * Kingdom payments for members
+	 * Total payment is based on all towns & land.
+	 * Kingdom members only get paid based on the towns & land they are lord of.
+	 * Kingdom officers/master get a bonus = percentage of total payment.
 	 */
 	private void disbursePayments() {
-		HashMap<OfflinePlayer,Double> payments = new HashMap<>();
-		HashMap<OfflinePlayer,KonKingdom> masters = new HashMap<>();
-		HashMap<OfflinePlayer,KonKingdom> officers = new HashMap<>();
-		HashMap<KonKingdom,Double> totalPay = new HashMap<>();
-		// Initialize payment table
-		for(KonKingdom kingdom : kingdomMap.values()) {
-			totalPay.put(kingdom, 0.0);
-			for(OfflinePlayer offlinePlayer : kingdom.getPlayerMembers()) {
-				if(offlinePlayer.isOnline()) {
-					payments.put(offlinePlayer, 0.0);
-					if(kingdom.isMaster(offlinePlayer.getUniqueId())) {
-						masters.put(offlinePlayer,kingdom);
-					} else if(kingdom.isOfficer(offlinePlayer.getUniqueId())) {
-						officers.put(offlinePlayer,kingdom);
-					}
-				}
-			}
+
+		// Map of online players and their payments
+		HashMap<UUID,Double> payments = new HashMap<>();
+		// Initialize payment table with online players
+		for (KonPlayer onlinePlayer : konquest.getPlayerManager().getPlayersOnline()) {
+			payments.put(onlinePlayer.getBukkitPlayer().getUniqueId(), 0.0);
 		}
+
 		// Determine pay amounts by town + capital
-		OfflinePlayer lord;
-		int land;
-		int pop;
-		double pay;
+		ChatUtil.printDebug("Evaluating kingdom payments...");
 		for(KonKingdom kingdom : kingdomMap.values()) {
+			ChatUtil.printDebug("  Kingdom of "+kingdom.getName());
+			// Determine bonus amounts for kingdom masters and officers
+			int kingdomLand = kingdom.getNumLand();
+			int kingdomPopulation = kingdom.getNumMembers();
+			double baseBonus = (kingdomLand * payPerChunk) + (kingdomPopulation * payPerResident);
+			double masterBonus = baseBonus * ((double)payPercentMaster/100);
+			double officerBonus = baseBonus * ((double)payPercentOfficer/100);
+			// Give master bonus
+			UUID masterId = kingdom.getMaster();
+			if (payments.containsKey(masterId)) {
+				payments.put(masterId,payments.get(masterId)+masterBonus);
+				Player masterPlayer = Bukkit.getPlayer(masterId);
+				String masterName = masterPlayer == null ? "unknown" : masterPlayer.getName();
+				ChatUtil.printDebug("  + "+masterName+" Master Bonus = "+masterBonus);
+			}
+			// Give officers bonus
+			for (OfflinePlayer officer : kingdom.getPlayerOfficersOnly()) {
+				UUID officerId = officer.getUniqueId();
+				if (payments.containsKey(officerId)) {
+					payments.put(officerId,payments.get(officerId)+officerBonus);
+					Player officerPlayer = Bukkit.getPlayer(officerId);
+					String officerName = officerPlayer == null ? "unknown" : officerPlayer.getName();
+					ChatUtil.printDebug("  + "+officerName+" Officer Bonus = "+officerBonus);
+				}
+			}
+			// Determine payment amounts from lordships
 			for(KonTown town : kingdom.getCapitalTowns()) {
-				lord = town.getPlayerLord();
-				land = town.getChunkList().size();
-				pop = town.getNumResidents();
-				if(payments.containsKey(lord)) {
-					double totalPrev = totalPay.get(kingdom);
-					double lordPrev = payments.get(lord);
-					pay = (land*payPerChunk) + (pop*payPerResident);
-					payments.put(lord, lordPrev+pay);
-					totalPay.put(kingdom, totalPrev+pay);
+				int townLand = town.getNumLand();
+				int townPopulation = town.getNumResidents();
+				double townPay = (townLand * payPerChunk) + (townPopulation * payPerResident);
+				UUID lordId = town.getLord();
+				if (payments.containsKey(lordId)) {
+					payments.put(lordId,payments.get(lordId)+townPay);
+					Player lordPlayer = Bukkit.getPlayer(lordId);
+					String lordName = lordPlayer == null ? "unknown" : lordPlayer.getName();
+					ChatUtil.printDebug("  + "+lordName+" Town Lord of "+town.getName()+" = "+townPay);
 				}
 			}
 		}
+
 		// Deposit payments
-		double basePay;
-		double bonusPay;
-		double payAmount;
-		for(OfflinePlayer offlinePlayer : payments.keySet()) {
-			basePay = payments.get(offlinePlayer);
-			bonusPay = 0;
-			if(masters.containsKey(offlinePlayer)) {
-				bonusPay = ((double)payPercentMaster/100) * totalPay.get(masters.get(offlinePlayer));
-			} else if(officers.containsKey(offlinePlayer)) {
-				bonusPay = ((double)payPercentOfficer/100) * totalPay.get(officers.get(offlinePlayer));
-			}
-			payAmount = basePay + bonusPay;
+		ChatUtil.printDebug("Depositing kingdom payments...");
+		boolean isEssentialsEnabled = konquest.getIntegrationManager().getEssentialsXAPI().isEnabled();
+		boolean isAfkPayEnabled = konquest.getCore().getBoolean(CorePath.INTEGRATION_ESSENTIALSX_OPTIONS_ENABLE_AFK_PAYMENTS.getPath(),true);
+		for(UUID id : payments.keySet()) {
+			double payAmount = payments.get(id);
 			if(payLimit > 0 && payAmount > payLimit) {
 				payAmount = payLimit;
 			}
-			if(offlinePlayer.isOnline() && payAmount > 0) {
-				Player player = (Player)offlinePlayer;
-				if(KonquestPlugin.depositPlayer(player, payAmount)) {
-	            	ChatUtil.sendNotice(player, MessagePath.COMMAND_KINGDOM_NOTICE_PAY.getMessage());
-	            }
+			Player bukkitPlayer = Bukkit.getPlayer(id);
+			KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+			if(payAmount > 0 && player != null) {
+				String playerName = bukkitPlayer == null ? "unknown" : bukkitPlayer.getName();
+				if (isEssentialsEnabled && !isAfkPayEnabled && player.isAfk()) {
+					// EssentialsX integration is enabled with no payments while AFK.
+					// This player is AFK. Do not pay them.
+					ChatUtil.printDebug("  "+playerName+" Skipped payment while AFK");
+				} else {
+					ChatUtil.printDebug("  "+playerName+" = "+payAmount);
+					if(KonquestPlugin.depositPlayer(bukkitPlayer, payAmount)) {
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_PAY.getMessage());
+					}
+				}
 			}
 		}
 	}
@@ -328,7 +328,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		int searchDistance;
 		int minDistance = Integer.MAX_VALUE;
 		for(KonKingdom kingdom : kingdomMap.values()) {
-			searchDistance = Konquest.chunkDistance(loc, kingdom.getCapital().getCenterLoc());
+			searchDistance = HelperUtil.chunkDistance(loc, kingdom.getCapital().getCenterLoc());
 			if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
 				ChatUtil.printDebug("Failed to add town, too close to capital "+kingdom.getCapital().getName());
 				return 2;
@@ -337,7 +337,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				minDistance = searchDistance;
 			}
 			for(KonTown town : kingdom.getTowns()) {
-				searchDistance = Konquest.chunkDistance(loc, town.getCenterLoc());
+				searchDistance = HelperUtil.chunkDistance(loc, town.getCenterLoc());
 				if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
 					ChatUtil.printDebug("Failed to add town, too close to town "+town.getName());
 					return 2;
@@ -348,7 +348,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 		for(KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			searchDistance = Konquest.chunkDistance(loc, ruin.getCenterLoc());
+			searchDistance = HelperUtil.chunkDistance(loc, ruin.getCenterLoc());
 			if(searchDistance != -1 && min_distance_town > 0 && searchDistance < min_distance_town) {
 				ChatUtil.printDebug("Failed to add town, too close to ruin "+ruin.getName());
 				return 2;
@@ -358,7 +358,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 		for(KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
-			searchDistance = Konquest.chunkDistance(loc, sanctuary.getCenterLoc());
+			searchDistance = HelperUtil.chunkDistance(loc, sanctuary.getCenterLoc());
 			if(searchDistance != -1 && min_distance_sanc > 0 && searchDistance < min_distance_sanc) {
 				ChatUtil.printDebug("Failed to add town, too close to sanctuary "+sanctuary.getName());
 				return 2;
@@ -379,7 +379,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			radius = 1;
 		}
 		ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
-		for(Point point : konquest.getAreaPoints(loc, radius)) {
+		for(Point point : HelperUtil.getAreaPoints(loc, radius)) {
 			if(konquest.getTerritoryManager().isChunkClaimed(point,loc.getWorld())) {
 				ChatUtil.printDebug("Found a chunk conflict");
 				return 4;
@@ -1879,7 +1879,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				konquest.getAccomplishmentManager().modifyPlayerStat(payPlayer,KonStatsType.FAVOR,(int)costSpecial);
 			}
 		}
-		ChatUtil.sendNotice(messageSender, MessagePath.COMMAND_TOWN_NOTICE_SPECIALIZE.getMessage(town.getName(),profession.name()));
+		String professionName = CompatibilityUtil.getProfessionName(profession);
+		ChatUtil.sendNotice(messageSender, MessagePath.COMMAND_TOWN_NOTICE_SPECIALIZE.getMessage(town.getName(),professionName));
 		return true;
 	}
 	// Alternate
@@ -2389,7 +2390,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		/* Passed checks, start to create town */
 		
 		// Modify location to max Y at given X,Z
-		Point point = Konquest.toPoint(loc);
+		Point point = HelperUtil.toPoint(loc);
 		int xLocal = loc.getBlockX() - (point.x*16);
 		int zLocal = loc.getBlockZ() - (point.y*16);
 		Chunk chunk = loc.getChunk();
@@ -3180,7 +3181,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		for(KonKingdom kingdom : kingdomMap.values()) {
 			if(!kingdom.equals(friendlyKingdom)) {
 				for(KonTown town : kingdom.getTowns()) {
-					int townDist = Konquest.chunkDistance(loc, town.getCenterLoc());
+					int townDist = HelperUtil.chunkDistance(loc, town.getCenterLoc());
 					if(townDist != -1 && townDist < minDistance) {
 						minDistance = townDist;
 						closestTerritory = town;
@@ -3480,11 +3481,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			refreshTownNerfs(town);
 		}
 	}
-
-	@NotNull
-	public Set<PotionEffectType> getTownNerfs() {
-		return townNerfs.keySet();
-	}
 	
 	public boolean isTownNerf(PotionEffectType pot) {
 		return townNerfs.containsKey(pot);
@@ -3492,45 +3488,22 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	
 	public void applyTownHearts(KonPlayer player, KonTown town) {
 		if(player.getKingdom().equals(town.getKingdom())) {
+			String modName = Konquest.healthModName;
+			NamespacedKey modKey = konquest.healthModKey;
 			int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.HEALTH);
 			if(upgradeLevel >= 1) {
-				//double upgradedBaseHealth = 20 + (upgradeLevel*2);
-				//player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(upgradedBaseHealth);
 				double modifier = (upgradeLevel*2);
-				String modName = Konquest.healthModName;
-				// Check for existing modifier
-				boolean isModActive = false;
-				AttributeInstance playerHealthAtt = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH);
-				for(AttributeModifier mod : playerHealthAtt.getModifiers()) {
-					if(mod.getName().equals(modName)) {
-						isModActive = true;
-						break;
-					}
-				}
-				// Apply modifier
-				double baseHealth = playerHealthAtt.getBaseValue();
-				if(!isModActive) {
-					playerHealthAtt.addModifier(new AttributeModifier(modName,modifier,AttributeModifier.Operation.ADD_NUMBER));
-					ChatUtil.printDebug("Applied max health attribute modifier "+modifier+" to player "+player.getBukkitPlayer().getName()+" with base health "+baseHealth);
-				} else {
-					ChatUtil.printDebug("Could not apply max health attribute modifier to player "+player.getBukkitPlayer().getName()+" with base health "+baseHealth);
-				}
+				CompatibilityUtil.applyHealthModifier(player.getBukkitPlayer(),modifier,modName,modKey);
 			} else {
-				clearTownHearts(player);
+				CompatibilityUtil.removeHealthModifier(player.getBukkitPlayer(),modName,modKey);
 			}
 		}
 	}
 	
 	public void clearTownHearts(KonPlayer player) {
 		String modName = Konquest.healthModName;
-		// Search for modifier and remove
-		AttributeInstance playerHealthAtt = player.getBukkitPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH);
-		for(AttributeModifier mod : playerHealthAtt.getModifiers()) {
-			if(mod.getName().equals(modName)) {
-				playerHealthAtt.removeModifier(mod);
-				ChatUtil.printDebug("Removed max health attribute modifier for player "+player.getBukkitPlayer().getName());
-			}
-		}
+		NamespacedKey modKey = konquest.healthModKey;
+		CompatibilityUtil.removeHealthModifier(player.getBukkitPlayer(),modName,modKey);
 	}
 	
 	public void clearAllTownHearts(KonTown town) {
@@ -3553,32 +3526,48 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 
 	public void updateKingdomOfflineProtection() {
+		updateKingdomOfflineProtection(false);
+	}
+
+	public void updateKingdomOfflineProtection(boolean force) {
 		boolean isOfflineProtectedEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE.getPath(),true);
 		int offlineProtectedWarmupSeconds = konquest.getCore().getInt(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE_WARMUP.getPath(),0);
 		int offlineProtectedMinimumPlayers = konquest.getCore().getInt(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE_MINIMUM.getPath(),0);
-		if(isOfflineProtectedEnabled) {
-			// For each kingdom, start protection warmup timer if no players are online, else ensure the timer is stopped
-			for(KonKingdom kingdom : getKingdoms()) {
+		int warmupMinutes = offlineProtectedWarmupSeconds / 60;
+		int warmupSeconds = offlineProtectedWarmupSeconds % 60;
+		String warmupTime = String.format("%d:%02d", warmupMinutes, warmupSeconds);
+		// For each kingdom, start protection warmup timer if no players are online, else ensure the timer is stopped
+		for(KonKingdom kingdom : getKingdoms()) {
+			// Kingdom Offline Protection
+			if(isOfflineProtectedEnabled) {
 				ArrayList<KonPlayer> onlineKingdomPlayers = konquest.getPlayerManager().getPlayersInKingdom(kingdom.getName());
 				int numOnlineKingdomPlayers = onlineKingdomPlayers.size();
 				Timer protectedWarmupTimer = kingdom.getProtectedWarmupTimer();
-				if((offlineProtectedMinimumPlayers <= 0 && onlineKingdomPlayers.isEmpty()) || (numOnlineKingdomPlayers < offlineProtectedMinimumPlayers)) {
-					if(offlineProtectedWarmupSeconds > 0 && protectedWarmupTimer.getTime() == -1 && !kingdom.isOfflineProtected()) {
+				if ((offlineProtectedMinimumPlayers <= 0 && onlineKingdomPlayers.isEmpty()) || (numOnlineKingdomPlayers < offlineProtectedMinimumPlayers)) {
+					if (offlineProtectedWarmupSeconds > 0 && protectedWarmupTimer.getTime() == -1 && !kingdom.isOfflineProtected()) {
 						// start timer
-						ChatUtil.printDebug("Starting kingdom protection warmup timer for "+offlineProtectedWarmupSeconds+" seconds: "+kingdom.getName());
+						ChatUtil.printDebug("Starting kingdom protection warmup timer for " + offlineProtectedWarmupSeconds + " seconds: " + kingdom.getName());
 						protectedWarmupTimer.stopTimer();
 						protectedWarmupTimer.setTime(offlineProtectedWarmupSeconds);
 						protectedWarmupTimer.startTimer();
-						int warmupMinutes = offlineProtectedWarmupSeconds / 60;
-						int warmupSeconds = offlineProtectedWarmupSeconds % 60;
-						String warmupTime = String.format("%d:%02d", warmupMinutes , warmupSeconds);
-						ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_NOTICE_KINGDOM_WARMUP.getMessage(kingdom.getName(),warmupTime));
+						ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE + MessagePath.PROTECTION_NOTICE_KINGDOM_WARMUP.getMessage(kingdom.getName(), warmupTime));
 					}
 				} else {
 					// stop timer, clear protection
 					kingdom.setOfflineProtected(false);
 					protectedWarmupTimer.stopTimer();
 				}
+			}
+			// Town Watch Protection
+			ArrayList<String> protectedTownNames = new ArrayList<>();
+			for(KonTown town : kingdom.getCapitalTowns()) {
+				if (town.updateProtection(force)) {
+					protectedTownNames.add(town.getName());
+				}
+			}
+			if (!protectedTownNames.isEmpty() && !force) {
+				// Broadcast protection info
+				ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE + MessagePath.PROTECTION_NOTICE_TOWN_WARMUP.getMessage(kingdom.getName(), warmupTime, HelperUtil.formatCommaSeparatedList(protectedTownNames)));
 			}
 		}
 	}
@@ -3896,7 +3885,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		String remainCooldown = "";
 		int cooldown = getJoinCooldownRemainingSeconds(player);
 		if(cooldown > 0) {
-			remainCooldown = Konquest.getTimeFormat(cooldown, color);
+			remainCooldown = HelperUtil.getTimeFormat(cooldown, color);
 		}
 		return remainCooldown;
 	}
@@ -3940,7 +3929,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		String remainCooldown = "";
 		int cooldown = getExileCooldownRemainingSeconds(player);
 		if(cooldown > 0) {
-			remainCooldown = Konquest.getTimeFormat(cooldown, color);
+			remainCooldown = HelperUtil.getTimeFormat(cooldown, color);
 		}
 		return remainCooldown;
 	}
@@ -4176,7 +4165,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			// Assign Master
 			String masterUUID = kingdomSection.getString("master","");
 			if(!masterUUID.equalsIgnoreCase("")) {
-				UUID playerID = Konquest.idFromString(masterUUID);
+				UUID playerID = HelperUtil.idFromString(masterUUID);
 				if(playerID != null) {
 					newKingdom.forceMaster(playerID);
 				} else {
@@ -4331,7 +4320,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		ArrayList<Point> capital_chunks = new ArrayList<>();
 		String chunkStr = capitalSection.getString("chunks");
 		if(chunkStr != null) {
-			capital_chunks.addAll(konquest.formatStringToPoints(chunkStr));
+			capital_chunks.addAll(HelperUtil.formatStringToPoints(chunkStr));
 		}
 		sectionList = monumentSection.getDoubleList("travel");
 		x = sectionList.get(0);
@@ -4395,7 +4384,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			// Count town land
 			String townChunks = townSection.getString("chunks");
 			if(townChunks != null) {
-				townLand += konquest.formatStringToPoints(townChunks).size();
+				townLand += HelperUtil.formatStringToPoints(townChunks).size();
 			}
 			// Compare to previous
 			ChatUtil.printDebug("Evaluating for capital: "+townName+", "+townLand+", "+townPopulation);
@@ -4532,17 +4521,16 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Add all Town chunk claims
 		String chunkStr = townSection.getString("chunks");
 		if(chunkStr != null) {
-			town.addPoints(konquest.formatStringToPoints(chunkStr));
+			town.addPoints(HelperUtil.formatStringToPoints(chunkStr));
 		}
 		// Update territory cache
 		konquest.getTerritoryManager().addAllTerritory(townWorld,town.getChunkList());
 		// Set specialization
 		String specializationName = townSection.getString("specialization","NONE");
-		Villager.Profession profession = Villager.Profession.NONE;
-		try {
-			profession = Villager.Profession.valueOf(specializationName);
-		} catch(Exception e) {
+		Villager.Profession profession = CompatibilityUtil.getProfessionFromName(specializationName);
+		if (profession == null) {
 			ChatUtil.printConsoleAlert("Failed to parse profession "+specializationName+" for town "+townName);
+			profession = Villager.Profession.NONE;
 		}
 		town.setSpecialization(profession);
 		// Set shield
@@ -4578,7 +4566,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Assign Lord
 		String lordUUID = townSection.getString("lord","");
 		if(!lordUUID.equalsIgnoreCase("")) {
-			UUID playerID = Konquest.idFromString(lordUUID);
+			UUID playerID = HelperUtil.idFromString(lordUUID);
 			if(playerID != null) {
 				town.setLord(playerID,false);
 			} else {
@@ -4624,7 +4612,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				if(plotStr == null) {
 					continue;
 				}
-				HashSet<Point> points = new HashSet<>(konquest.formatStringToPoints(plotStr));
+				HashSet<Point> points = new HashSet<>(HelperUtil.formatStringToPoints(plotStr));
 				ArrayList<UUID> users = new ArrayList<>();
 				for(String user : townSection.getStringList("plots."+plotIndex+".members")) {
 					users.add(UUID.fromString(user));
@@ -4747,8 +4735,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
             	townInstanceSection.set("center", new int[] {town.getCenterLoc().getBlockX(),
 						town.getCenterLoc().getBlockY(),
 						town.getCenterLoc().getBlockZ()});
-                townInstanceSection.set("chunks", konquest.formatPointsToString(town.getChunkList().keySet()));
-				townInstanceSection.set("specialization", town.getSpecialization().toString());
+                townInstanceSection.set("chunks", HelperUtil.formatPointsToString(town.getChunkList().keySet()));
+				townInstanceSection.set("specialization", town.getSpecializationName());
 				townInstanceSection.set("open", town.isOpen());
                 townInstanceSection.set("plot", town.isPlotOnly());
 				townInstanceSection.set("allied_building", town.isAlliedBuildingAllowed());
@@ -4791,7 +4779,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
                 int plotIndex = 0;
                 for(KonPlot plot : town.getPlots()) {
                 	ConfigurationSection plotInstanceSection = townInstancePlotSection.createSection("plot_"+plotIndex);
-                	plotInstanceSection.set("chunks", konquest.formatPointsToString(plot.getPoints()));
+                	plotInstanceSection.set("chunks", HelperUtil.formatPointsToString(plot.getPoints()));
                 	plotInstanceSection.set("members",plot.getUserStrings());
                 	plotIndex++;
                 }

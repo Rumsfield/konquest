@@ -139,7 +139,7 @@ public class DisplayManager {
 	            	playerViewerCache.remove(bukkitPlayer);
 				}
 			}
-		} catch(Exception e) {
+		} catch(Exception | Error e) {
 			// Close inventory view
 			bukkitPlayer.closeInventory();
         	playerViewerCache.remove(bukkitPlayer);

@@ -39,7 +39,15 @@ public class FavorCommand extends CommandBase {
 		double cost_spy = konquest.getCore().getDouble(CorePath.FAVOR_COST_SPY.getPath(),0.0);
 		double cost_settle = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath(),0.0);
 		double cost_settle_incr = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath(),0.0);
-		int townCount = konquest.getKingdomManager().getPlayerLordships(player);
+		boolean isIncrementKingdom = konquest.getCore().getBoolean(CorePath.TOWNS_SETTLE_INCREMENT_KINGDOM.getPath(),false);
+		int townCount;
+		if (isIncrementKingdom) {
+			// All kingdom towns
+			townCount = player.getKingdom().getNumTowns();
+		} else {
+			// Towns that have the player as the lord
+			townCount = konquest.getKingdomManager().getPlayerLordships(player);
+		}
 		double cost_settle_adj = (((double)townCount)*cost_settle_incr) + cost_settle;
 		double cost_town_rename = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_RENAME.getPath(),0.0);
 		double cost_claim = konquest.getCore().getDouble(CorePath.FAVOR_COST_CLAIM.getPath(),0.0);
@@ -54,7 +62,6 @@ public class FavorCommand extends CommandBase {
 		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_TOWN_RENAME.getMessage() +		" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_town_rename));
 		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_KINGDOM_CREATE.getMessage() +	" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_kingdom_create));
 		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_KINGDOM_RENAME.getMessage() +	" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_kingdom_rename));
-        
 	}
 	
 	@Override

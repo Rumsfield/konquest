@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -185,10 +186,10 @@ public class KonMonumentTemplate {
 	        Location c3 = new Location(allWorld, botX, 0.0, topZ);
 	        Location c4 = new Location(allWorld, botX, 0.0, botZ);
 			
-			Point p1 = Konquest.toPoint(c1);
-			Point p2 = Konquest.toPoint(c2);
-			Point p3 = Konquest.toPoint(c3);
-			Point p4 = Konquest.toPoint(c4);
+			Point p1 = HelperUtil.toPoint(c1);
+			Point p2 = HelperUtil.toPoint(c2);
+			Point p3 = HelperUtil.toPoint(c3);
+			Point p4 = HelperUtil.toPoint(c4);
 			
 			if(point.equals(p1) || point.equals(p2) || point.equals(p3) || point.equals(p4)) {
 				result = true;

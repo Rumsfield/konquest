@@ -8,6 +8,7 @@ import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -73,28 +74,28 @@ public class TownMenu extends StateMenu implements ViewableMenu {
         result = new DisplayMenu(rows+1, getTitle(MenuState.ROOT));
 
         /* Join Icon */
-        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_JOIN.getMessage(),loreColor));
+        loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_JOIN.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
         icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_JOIN.getMessage(), loreList, Material.SADDLE, ROOT_SLOT_JOIN, true);
         result.addIcon(icon);
 
         /* Exile Icon */
         loreList.clear();
-        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_LEAVE.getMessage(),loreColor));
+        loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_LEAVE.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
         icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_LEAVE.getMessage(), loreList, Material.ARROW, ROOT_SLOT_LEAVE, true);
         result.addIcon(icon);
 
         /* List Icon */
         loreList.clear();
-        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_LIST.getMessage(),loreColor));
+        loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_LIST.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
         icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_LIST.getMessage(), loreList, Material.PAPER, ROOT_SLOT_LIST, true);
         result.addIcon(icon);
 
         /* Invites Icon */
         loreList.clear();
-        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_INVITES.getMessage(),loreColor));
+        loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_INVITES.getMessage(),loreColor));
         int numInvites = manager.getInviteTowns(player).size();
         Material inviteMat = Material.BOOK;
         if(numInvites > 0) {
@@ -107,7 +108,7 @@ public class TownMenu extends StateMenu implements ViewableMenu {
 
         /* Manage Icon */
         loreList.clear();
-        loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_MANAGE.getMessage(),loreColor));
+        loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_MANAGE.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
         icon = new InfoIcon(kingdomColor+MessagePath.MENU_TOWN_MANAGE.getMessage(), loreList, Material.BOOKSHELF, ROOT_SLOT_MANAGE, true);
         result.addIcon(icon);

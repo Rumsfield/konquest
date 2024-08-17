@@ -8,6 +8,7 @@ import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
 import com.github.rumsfield.konquest.model.KonPlot;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -76,7 +77,7 @@ public class PlotMenu implements ViewableMenu {
 		this.bukkitPlayer = bukkitPlayer;
 		this.maxSize = maxSize;
 		this.playerLoc = bukkitPlayer.getLocation();
-		this.center = Konquest.toPoint(playerLoc);
+		this.center = HelperUtil.toPoint(playerLoc);
 		this.origin = center;
 		this.views = new HashMap<>();
 		this.playerPages = new ArrayList<>();
@@ -89,7 +90,7 @@ public class PlotMenu implements ViewableMenu {
 	private void initializeMenu() {
 		// Create empty display views by default
 		if(!town.isLocInside(playerLoc)) {
-			center = Konquest.toPoint(town.getCenterLoc());
+			center = HelperUtil.toPoint(town.getCenterLoc());
 		}
 	}
 	
@@ -214,7 +215,7 @@ public class PlotMenu implements ViewableMenu {
 						}
 					}
 					// Check for monument chunk
-					if(Konquest.toPoint(town.getCenterLoc()).equals(drawPoint)) {
+					if(HelperUtil.toPoint(town.getCenterLoc()).equals(drawPoint)) {
 						isClickable = false;
 						loreList.clear();
 						loreList.add(ChatColor.GOLD+town.getName());
@@ -222,7 +223,7 @@ public class PlotMenu implements ViewableMenu {
 						landMat = Material.OBSIDIAN;
 					}
 					// Add other info to lore
-					if(Konquest.toPoint(playerLoc).equals(drawPoint)) {
+					if(HelperUtil.toPoint(playerLoc).equals(drawPoint)) {
 						loreList.add(ChatColor.YELLOW+MessagePath.MENU_PLOTS_HERE.getMessage());
 					}
 					// Build icon and add to menu view

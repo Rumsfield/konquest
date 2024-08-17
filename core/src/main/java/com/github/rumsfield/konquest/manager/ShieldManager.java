@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -186,10 +187,6 @@ public class ShieldManager implements KonquestShieldManager {
 		return armor.getCost() + (armor.getCostPerResident()*town.getNumResidents()) + (armor.getCostPerLand()*town.getNumLand());
 	}
 
-	public boolean activateTownShield(KonShield shield, KonTown town, Player bukkitPlayer) {
-		return activateTownShield(shield, town, bukkitPlayer, false);
-	}
-
 	public boolean activateTownShield(KonShield shield, KonTown town, Player bukkitPlayer, boolean ignoreCost) {
 		if(!isShieldsEnabled) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
@@ -229,7 +226,7 @@ public class ShieldManager implements KonquestShieldManager {
 		}
 		
 		// Passed checks, activate the shield
-		String timeFormat = Konquest.getTimeFormat(shield.getDurationSeconds(), ChatColor.AQUA);
+		String timeFormat = HelperUtil.getTimeFormat(shield.getDurationSeconds(), ChatColor.AQUA);
 		String shieldName = shield.getId()+" "+MessagePath.LABEL_SHIELD.getMessage();
 		if(town.isShielded()) {
 			endTime = town.getShieldEndTime() + shieldTime;
@@ -249,10 +246,6 @@ public class ShieldManager implements KonquestShieldManager {
         	}
         }
 		return true;
-	}
-
-	public boolean activateTownArmor(KonArmor armor, KonTown town, Player bukkitPlayer) {
-		return activateTownArmor(armor, town, bukkitPlayer, false);
 	}
 
 	public boolean activateTownArmor(KonArmor armor, KonTown town, Player bukkitPlayer, boolean ignoreCost) {

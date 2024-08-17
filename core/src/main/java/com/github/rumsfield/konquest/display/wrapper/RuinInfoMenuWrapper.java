@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonPropertyFlag;
 import com.github.rumsfield.konquest.model.KonRuin;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Material;
 
@@ -60,13 +61,13 @@ public class RuinInfoMenuWrapper extends MenuWrapper {
         Material iconMat;
         if(infoRuin.isCaptureDisabled()) {
             // Currently on capture cooldown
-            for(String line : Konquest.stringPaginate(MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(infoRuin.getCaptureCooldownString()))) {
+            for(String line : HelperUtil.stringPaginate(MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(infoRuin.getCaptureCooldownString()))) {
                 loreList.add(loreColor+line);
             }
             iconMat = Material.POPPY;
         } else {
             // Can be captured
-            for(String line : Konquest.stringPaginate(MessagePath.COMMAND_INFO_NOTICE_RUIN_CAPTURE.getMessage())) {
+            for(String line : HelperUtil.stringPaginate(MessagePath.COMMAND_INFO_NOTICE_RUIN_CAPTURE.getMessage())) {
                 loreList.add(loreColor+line);
             }
             iconMat = Material.IRON_BLOCK;

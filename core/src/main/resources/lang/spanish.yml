@@ -138,6 +138,7 @@ menu:
     fail-level: Fallo al agregar %s nivel %s, el nivel es mayor que el maximo o demasiado alto desde el nivel actual, %s.
     fail-population: Fallo al agregar %s nivel %s, la poblacion del pueblo es demasiado baja, requiere %s.
     fail-cost: Fallo al agregar %s nivel %s, requiere %s Favor.
+    fail-attack: ¡No se pudieron agregar mejoras mientras el pueblo estaba bajo ataque!
     add: Agregado %s nivel %s al Pueblo de %s!
   help:
     title: Ayuda de Konquest
@@ -427,6 +428,7 @@ protection:
     kingdom-warmup: El Reino de %s estara protegido en %s minutos.
     kingdom-conquer: El Reino de %s ha sido conquistado por %s!
     kingdom-raze: El Reino de %s ha sido destruido por la horda Barbaro!
+    town-warmup: 'Estos pueblos del Reino de %s estarán protegidos en %s minutos: %s'
     ruin: Has capturado la Ruina %s.
     safe: El Pueblo de %s esta seguro, por ahora...
     attacked: Bajo Ataque
@@ -438,6 +440,7 @@ protection:
     not-plot: Debes ser miembro de una parcela para hacer esto.
     only-plot: No puedes hacer esto fuera de una parcela del pueblo.
     online: El Reino de %s no tiene suficientes jugadores en linea, no puede atacar el Pueblo de %s.
+    protected-attack: Tu Reino no tiene suficientes jugadores en línea, no puede atacar el Pueblo de %s.
     upgrade: '%s esta mejorado con %s y no puede ser atacado sin %s residentes en linea.'
     camp: No se puede atacar %s, el dueno del campamento esta desconectado.
     camp-bed: No se pueden colocar camas adicionales dentro de este Campamento.

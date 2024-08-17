@@ -9,9 +9,7 @@ import com.github.rumsfield.konquest.display.icon.PlayerIcon;
 import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.*;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -79,7 +77,7 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 			PlayerIcon playerInfo = new PlayerIcon(kingdomColor+lordPlayer.getName(),loreList,lordPlayer,2,true,PlayerIconAction.DISPLAY_INFO);
 			getMenu().getPage(pageNum).addIcon(playerInfo);
 		} else {
-			loreList.addAll(Konquest.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getTravelName()), ChatColor.RED));
+			loreList.addAll(HelperUtil.stringPaginate(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getTravelName()), ChatColor.RED));
 			info = new InfoIcon(kingdomColor+MessagePath.LABEL_LORD.getMessage(),loreList,Material.BARRIER,2,false);
 			getMenu().getPage(pageNum).addIcon(info);
 		}
@@ -87,9 +85,9 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 		/* Specialization Info Icon (4) */
 		if (getKonquest().getKingdomManager().getIsDiscountEnable()) {
 			loreList = new ArrayList<>();
-			loreList.add(valueColor + infoTown.getSpecialization().name());
-			loreList.addAll(Konquest.stringPaginate(MessagePath.MENU_TOWN_INFO_SPECIAL.getMessage(), loreColor));
-			Material specialMat = Konquest.getProfessionMaterial(infoTown.getSpecialization());
+			loreList.add(valueColor + infoTown.getSpecializationName());
+			loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_TOWN_INFO_SPECIAL.getMessage(), loreColor));
+			Material specialMat = CompatibilityUtil.getProfessionMaterial(infoTown.getSpecialization());
 			info = new InfoIcon(kingdomColor + MessagePath.LABEL_SPECIALIZATION.getMessage(), loreList, specialMat, 4, false);
 			getMenu().getPage(pageNum).addIcon(info);
 		}
@@ -177,11 +175,11 @@ public class TownInfoMenuWrapper extends MenuWrapper {
 						}
 					}
 					loreList = new ArrayList<>();
-					for (String line : Konquest.stringPaginate(upgrade.getLevelDescription(level))) {
+					for (String line : HelperUtil.stringPaginate(upgrade.getLevelDescription(level))) {
 						loreList.add(ChatColor.YELLOW + line);
 					}
 					if (isDisabled) {
-						for (String line : Konquest.stringPaginate(MessagePath.UPGRADE_DISABLED.getMessage())) {
+						for (String line : HelperUtil.stringPaginate(MessagePath.UPGRADE_DISABLED.getMessage())) {
 							loreList.add(ChatColor.RED + line);
 						}
 					}

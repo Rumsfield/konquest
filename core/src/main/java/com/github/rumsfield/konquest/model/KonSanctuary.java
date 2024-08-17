@@ -113,7 +113,7 @@ public class KonSanctuary extends KonTerritory implements KonquestSanctuary, Kon
 
 	@Override
 	public int initClaim() {
-		addChunk(Konquest.toPoint(getCenterLoc()));
+		addChunk(HelperUtil.toPoint(getCenterLoc()));
 		return 0;
 	}
 

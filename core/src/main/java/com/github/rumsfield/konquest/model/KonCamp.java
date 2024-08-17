@@ -57,7 +57,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 	 * 			4 - error, bad chunk
 	 */
 	public int initClaim() {
-		if(!addChunks(getKonquest().getAreaPoints(getCenterLoc(), getKonquest().getCore().getInt(CorePath.CAMPS_INIT_RADIUS.getPath())))) {
+		if(!addChunks(HelperUtil.getAreaPoints(getCenterLoc(), getKonquest().getCore().getInt(CorePath.CAMPS_INIT_RADIUS.getPath())))) {
 			ChatUtil.printDebug("Camp init failed: problem adding some chunks");
 			return 4;
 		}
@@ -123,7 +123,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 			campBarAll.setTitle(Konquest.barbarianColor2+getName()+" "+MessagePath.LABEL_PROTECTED.getMessage());
 		} else if(taskID == protectedCountdownTimer.getTaskID()) {
 			// Update protection countdown title
-			String remainingTime = Konquest.getTimeFormat(protectedWarmupTimer.getTime(),ChatColor.RED);
+			String remainingTime = HelperUtil.getTimeFormat(protectedWarmupTimer.getTime(),ChatColor.RED);
 			campBarAll.setTitle(Konquest.barbarianColor2+getName()+" "+remainingTime);
 			//ChatUtil.printDebug("Camp protection countdown tick with taskID: "+taskID);
 		} else {

@@ -2,12 +2,12 @@ package com.github.rumsfield.konquest.utility;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Consumer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
+import java.util.function.Consumer;
 
 public class Updater {
 

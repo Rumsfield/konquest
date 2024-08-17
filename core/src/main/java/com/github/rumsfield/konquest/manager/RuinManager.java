@@ -10,6 +10,7 @@ import com.github.rumsfield.konquest.model.KonPropertyFlag;
 import com.github.rumsfield.konquest.model.KonRuin;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
@@ -104,7 +105,7 @@ public class RuinManager implements KonquestRuinManager {
 		boolean result = false;
 		if(konquest.validateNameConstraints(name) == 0) {
 			// Verify no overlapping init chunks
-			for(Point point : konquest.getAreaPoints(loc, 2)) {
+			for(Point point : HelperUtil.getAreaPoints(loc, 2)) {
 				if(konquest.getTerritoryManager().isChunkClaimed(point,loc.getWorld())) {
 					ChatUtil.printDebug("Found a chunk conflict during ruin init: "+name);
 					return false;
@@ -224,12 +225,12 @@ public class RuinManager implements KonquestRuinManager {
 	        	if(addRuin(ruin_center,ruinName)) {
 	        		ruin = getRuin(ruinName);
 	        		if(ruin != null) {
-	        			ruin.addPoints(konquest.formatStringToPoints(ruinSection.getString("chunks","")));
-	                	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("criticals",""),world)) {
+	        			ruin.addPoints(HelperUtil.formatStringToPoints(ruinSection.getString("chunks","")));
+	                	for(Location loc : HelperUtil.formatStringToLocations(ruinSection.getString("criticals",""),world)) {
 	                		loc.setWorld(world);
 	                		ruin.setCriticalLocation(loc);
 	            		}
-	                	for(Location loc : konquest.formatStringToLocations(ruinSection.getString("spawns",""),world)) {
+	                	for(Location loc : HelperUtil.formatStringToLocations(ruinSection.getString("spawns",""),world)) {
 	                		loc.setWorld(world);
 	                		ruin.addSpawnLocation(loc);
 	            		}
@@ -282,9 +283,9 @@ public class RuinManager implements KonquestRuinManager {
 			ruinSection.set("center", new int[] {ruin.getCenterLoc().getBlockX(),
 					ruin.getCenterLoc().getBlockY(),
 					ruin.getCenterLoc().getBlockZ()});
-			ruinSection.set("chunks", konquest.formatPointsToString(ruin.getChunkList().keySet()));
-			ruinSection.set("criticals", konquest.formatLocationsToString(ruin.getCriticalLocations()));
-			ruinSection.set("spawns", konquest.formatLocationsToString(ruin.getSpawnLocations()));
+			ruinSection.set("chunks", HelperUtil.formatPointsToString(ruin.getChunkList().keySet()));
+			ruinSection.set("criticals", HelperUtil.formatLocationsToString(ruin.getCriticalLocations()));
+			ruinSection.set("spawns", HelperUtil.formatLocationsToString(ruin.getSpawnLocations()));
 			// Properties
 			ConfigurationSection ruinPropertiesSection = ruinSection.createSection("properties");
 			for(KonPropertyFlag flag : KonPropertyFlag.values()) {
