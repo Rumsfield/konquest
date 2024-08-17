@@ -222,70 +222,86 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 	
 	/**
-	 * Kingdom payments for members<br>
-	 * Total payment is based on all towns & land.<br>
-	 * Kingdom members only get paid based on the towns & land they are lord of.<br>
-	 * Kingdom officers/master get a bonus = percentage of total payment.<br>
+	 * Kingdom payments for members
+	 * Total payment is based on all towns & land.
+	 * Kingdom members only get paid based on the towns & land they are lord of.
+	 * Kingdom officers/master get a bonus = percentage of total payment.
 	 */
 	private void disbursePayments() {
-		HashMap<OfflinePlayer,Double> payments = new HashMap<>();
-		HashMap<OfflinePlayer,KonKingdom> masters = new HashMap<>();
-		HashMap<OfflinePlayer,KonKingdom> officers = new HashMap<>();
-		HashMap<KonKingdom,Double> totalPay = new HashMap<>();
-		// Initialize payment table
-		for(KonKingdom kingdom : kingdomMap.values()) {
-			totalPay.put(kingdom, 0.0);
-			for(OfflinePlayer offlinePlayer : kingdom.getPlayerMembers()) {
-				if(offlinePlayer.isOnline()) {
-					payments.put(offlinePlayer, 0.0);
-					if(kingdom.isMaster(offlinePlayer.getUniqueId())) {
-						masters.put(offlinePlayer,kingdom);
-					} else if(kingdom.isOfficer(offlinePlayer.getUniqueId())) {
-						officers.put(offlinePlayer,kingdom);
-					}
-				}
-			}
+
+		// Map of online players and their payments
+		HashMap<UUID,Double> payments = new HashMap<>();
+		// Initialize payment table with online players
+		for (KonPlayer onlinePlayer : konquest.getPlayerManager().getPlayersOnline()) {
+			payments.put(onlinePlayer.getBukkitPlayer().getUniqueId(), 0.0);
 		}
+
 		// Determine pay amounts by town + capital
-		OfflinePlayer lord;
-		int land;
-		int pop;
-		double pay;
+		ChatUtil.printDebug("Evaluating kingdom payments...");
 		for(KonKingdom kingdom : kingdomMap.values()) {
+			ChatUtil.printDebug("  Kingdom of "+kingdom.getName());
+			// Determine bonus amounts for kingdom masters and officers
+			int kingdomLand = kingdom.getNumLand();
+			int kingdomPopulation = kingdom.getNumMembers();
+			double baseBonus = (kingdomLand * payPerChunk) + (kingdomPopulation * payPerResident);
+			double masterBonus = baseBonus * ((double)payPercentMaster/100);
+			double officerBonus = baseBonus * ((double)payPercentOfficer/100);
+			// Give master bonus
+			UUID masterId = kingdom.getMaster();
+			if (payments.containsKey(masterId)) {
+				payments.put(masterId,payments.get(masterId)+masterBonus);
+				Player masterPlayer = Bukkit.getPlayer(masterId);
+				String masterName = masterPlayer == null ? "unknown" : masterPlayer.getName();
+				ChatUtil.printDebug("  + "+masterName+" Master Bonus = "+masterBonus);
+			}
+			// Give officers bonus
+			for (OfflinePlayer officer : kingdom.getPlayerOfficersOnly()) {
+				UUID officerId = officer.getUniqueId();
+				if (payments.containsKey(officerId)) {
+					payments.put(officerId,payments.get(officerId)+officerBonus);
+					Player officerPlayer = Bukkit.getPlayer(masterId);
+					String officerName = officerPlayer == null ? "unknown" : officerPlayer.getName();
+					ChatUtil.printDebug("  + "+officerName+" Officer Bonus = "+officerBonus);
+				}
+			}
+			// Determine payment amounts from lordships
 			for(KonTown town : kingdom.getCapitalTowns()) {
-				lord = town.getPlayerLord();
-				land = town.getChunkList().size();
-				pop = town.getNumResidents();
-				if(payments.containsKey(lord)) {
-					double totalPrev = totalPay.get(kingdom);
-					double lordPrev = payments.get(lord);
-					pay = (land*payPerChunk) + (pop*payPerResident);
-					payments.put(lord, lordPrev+pay);
-					totalPay.put(kingdom, totalPrev+pay);
+				int townLand = town.getNumLand();
+				int townPopulation = town.getNumResidents();
+				double townPay = (townLand * payPerChunk) + (townPopulation * payPerResident);
+				UUID lordId = town.getLord();
+				if (payments.containsKey(lordId)) {
+					payments.put(lordId,payments.get(lordId)+townPay);
+					Player lordPlayer = Bukkit.getPlayer(lordId);
+					String lordName = lordPlayer == null ? "unknown" : lordPlayer.getName();
+					ChatUtil.printDebug("  + "+lordName+" Town Lord of "+town.getName()+" = "+townPay);
 				}
 			}
 		}
+
 		// Deposit payments
-		double basePay;
-		double bonusPay;
-		double payAmount;
-		for(OfflinePlayer offlinePlayer : payments.keySet()) {
-			basePay = payments.get(offlinePlayer);
-			bonusPay = 0;
-			if(masters.containsKey(offlinePlayer)) {
-				bonusPay = ((double)payPercentMaster/100) * totalPay.get(masters.get(offlinePlayer));
-			} else if(officers.containsKey(offlinePlayer)) {
-				bonusPay = ((double)payPercentOfficer/100) * totalPay.get(officers.get(offlinePlayer));
-			}
-			payAmount = basePay + bonusPay;
+		ChatUtil.printDebug("Depositing kingdom payments...");
+		boolean isEssentialsEnabled = konquest.getIntegrationManager().getEssentialsXAPI().isEnabled();
+		boolean isAfkPayEnabled = konquest.getCore().getBoolean(CorePath.INTEGRATION_ESSENTIALSX_OPTIONS_ENABLE_AFK_PAYMENTS.getPath(),true);
+		for(UUID id : payments.keySet()) {
+			double payAmount = payments.get(id);
 			if(payLimit > 0 && payAmount > payLimit) {
 				payAmount = payLimit;
 			}
-			if(offlinePlayer.isOnline() && payAmount > 0) {
-				Player player = (Player)offlinePlayer;
-				if(KonquestPlugin.depositPlayer(player, payAmount)) {
-	            	ChatUtil.sendNotice(player, MessagePath.COMMAND_KINGDOM_NOTICE_PAY.getMessage());
-	            }
+			Player bukkitPlayer = Bukkit.getPlayer(id);
+			KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+			if(payAmount > 0 && player != null) {
+				String playerName = bukkitPlayer == null ? "unknown" : bukkitPlayer.getName();
+				if (isEssentialsEnabled && !isAfkPayEnabled && player.isAfk()) {
+					// EssentialsX integration is enabled with no payments while AFK.
+					// This player is AFK. Do not pay them.
+					ChatUtil.printDebug("  "+playerName+" Skipped payment while AFK");
+				} else {
+					ChatUtil.printDebug("  "+playerName+" = "+payAmount);
+					if(KonquestPlugin.depositPlayer(bukkitPlayer, payAmount)) {
+						ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_PAY.getMessage());
+					}
+				}
 			}
 		}
 	}

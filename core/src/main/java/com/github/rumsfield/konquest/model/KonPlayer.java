@@ -51,6 +51,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	private boolean isCombatTagged;
 	private boolean isFlying;
 	private boolean isBorderDisplay;
+	private boolean isAfk;
 	private final Timer priorityTitleDisplayTimer;
 	private final Timer borderUpdateLoopTimer;
 	private final Timer monumentTemplateLoopTimer;
@@ -87,6 +88,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		this.isCombatTagged = false;
 		this.isFlying = false;
 		this.isBorderDisplay = true;
+		this.isAfk = false;
 		this.priorityTitleDisplayTimer = new Timer(this);
 		this.borderUpdateLoopTimer = new Timer(this);
 		this.monumentTemplateLoopTimer = new Timer(this);
@@ -204,6 +206,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	public boolean isBorderDisplay() {
 		return isBorderDisplay;
 	}
+
+	public boolean isAfk() {
+		return isAfk;
+	}
 	
 	public Timer getPriorityTitleDisplayTimer() {
 		return priorityTitleDisplayTimer;
@@ -290,6 +296,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	
 	public void setIsBorderDisplay(boolean val) {
 		isBorderDisplay = val;
+	}
+
+	public void setIsAfk(boolean val) {
+		isAfk = val;
 	}
 	
 	public void setIsFlyEnabled(boolean val) {
