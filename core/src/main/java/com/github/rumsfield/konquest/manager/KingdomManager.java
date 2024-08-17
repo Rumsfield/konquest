@@ -259,7 +259,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				UUID officerId = officer.getUniqueId();
 				if (payments.containsKey(officerId)) {
 					payments.put(officerId,payments.get(officerId)+officerBonus);
-					Player officerPlayer = Bukkit.getPlayer(masterId);
+					Player officerPlayer = Bukkit.getPlayer(officerId);
 					String officerName = officerPlayer == null ? "unknown" : officerPlayer.getName();
 					ChatUtil.printDebug("  + "+officerName+" Officer Bonus = "+officerBonus);
 				}
