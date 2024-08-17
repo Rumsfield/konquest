@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.utility;
 
 import org.bukkit.*;
+import org.bukkit.command.CommandSender;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
@@ -279,6 +280,19 @@ public class HelperUtil {
         }
 
         return result;
+    }
+
+    public static String formatCommaSeparatedList(List<String> values) {
+        StringBuilder message = new StringBuilder();
+        ListIterator<String> listIter = values.listIterator();
+        while(listIter.hasNext()) {
+            String currentValue = listIter.next();
+            message.append(currentValue);
+            if(listIter.hasNext()) {
+                message.append(", ");
+            }
+        }
+        return message.toString();
     }
 
     /*

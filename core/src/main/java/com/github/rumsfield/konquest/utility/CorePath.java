@@ -141,6 +141,7 @@ public enum CorePath {
 	TOWNS_ENABLE_ARMOR                                    ("core.towns.enable_armor"),
 	TOWNS_ENABLE_SHIELDS                                  ("core.towns.enable_shields"),
 	TOWNS_ARMOR_TNT_DAMAGE                                ("core.towns.armor_tnt_damage"),
+	TOWNS_UPGRADE_WHILE_ATTACKED                          ("core.towns.upgrade_while_attacked"),
 	TOWNS_SHIELDS_WHILE_ATTACKED                          ("core.towns.shields_while_attacked"),
 	TOWNS_ARMOR_WHILE_ATTACKED                            ("core.towns.armor_while_attacked"),
 	TOWNS_SHIELDS_ADD                                     ("core.towns.shields_add"),

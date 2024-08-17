@@ -162,11 +162,8 @@ public class EntityListener implements Listener {
 				return true;
 			}
 			// If town is upgraded to require a minimum online resident amount, prevent block damage
-			int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-			if(upgradeLevelWatch > 0) {
-				if(town.getNumResidentsOnline() < upgradeLevelWatch) {
-					return true;
-				}
+			if(town.isTownWatchProtected()) {
+				return true;
 			}
 			// Protect when town has upgrade
 			int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.DAMAGE);
@@ -677,13 +674,11 @@ public class EntityListener implements Listener {
 							return;
 	    				}
 	    				// If town is upgraded to require a minimum online resident amount, prevent block damage
-						int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-						if(upgradeLevelWatch > 0) {
-							if(town.getNumResidentsOnline() < upgradeLevelWatch) {
-								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevelWatch));
-								event.setCancelled(true);
-								return;
-							}
+						if(town.isTownWatchProtected()) {
+							int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevelWatch));
+							event.setCancelled(true);
+							return;
 						}
 						// If the player is not enemy with the town, prevent event
 						if(!playerRole.equals(KonquestRelationshipType.ENEMY)) {

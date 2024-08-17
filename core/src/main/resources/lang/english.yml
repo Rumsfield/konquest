@@ -138,6 +138,7 @@ menu:
     fail-level: "Failed to add %s level %s, level is greater than maximum or too high from current level, %s."
     fail-population: "Failed to add %s level %s, town population is too low, requires %s."
     fail-cost: "Failed to add %s level %s, requires %s Favor."
+    fail-attack: "Failed to add any upgrades while town is under attack!"
     add: "Added %s level %s to the Town of %s!"
   help:
     title: "Konquest Help"
@@ -427,6 +428,7 @@ protection:
     kingdom-warmup: "The Kingdom of %s will be protected in %s minutes."
     kingdom-conquer: "The Kingdom of %s has been conquered by %s!"
     kingdom-raze: "The Kingdom of %s has been destroyed by the Barbarian horde!"
+    town-warmup: "These towns in the Kingdom of %s will be protected in %s minutes: %s"
     ruin: "You have captured the Ruin %s."
     safe: "The Town of %s is safe, for now..."
     attacked: "Under Attack"

@@ -118,7 +118,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		loadArmorBlacklist();
 		loadJoinExileCooldowns();
 		loadKingdoms();
-		updateKingdomOfflineProtection();
 		makeTownNerfs();
 		ChatUtil.printDebug("Kingdom Manager is ready");
 	}
@@ -3511,32 +3510,48 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	}
 
 	public void updateKingdomOfflineProtection() {
+		updateKingdomOfflineProtection(false);
+	}
+
+	public void updateKingdomOfflineProtection(boolean force) {
 		boolean isOfflineProtectedEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE.getPath(),true);
 		int offlineProtectedWarmupSeconds = konquest.getCore().getInt(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE_WARMUP.getPath(),0);
 		int offlineProtectedMinimumPlayers = konquest.getCore().getInt(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE_MINIMUM.getPath(),0);
-		if(isOfflineProtectedEnabled) {
-			// For each kingdom, start protection warmup timer if no players are online, else ensure the timer is stopped
-			for(KonKingdom kingdom : getKingdoms()) {
+		int warmupMinutes = offlineProtectedWarmupSeconds / 60;
+		int warmupSeconds = offlineProtectedWarmupSeconds % 60;
+		String warmupTime = String.format("%d:%02d", warmupMinutes, warmupSeconds);
+		// For each kingdom, start protection warmup timer if no players are online, else ensure the timer is stopped
+		for(KonKingdom kingdom : getKingdoms()) {
+			// Kingdom Offline Protection
+			if(isOfflineProtectedEnabled) {
 				ArrayList<KonPlayer> onlineKingdomPlayers = konquest.getPlayerManager().getPlayersInKingdom(kingdom.getName());
 				int numOnlineKingdomPlayers = onlineKingdomPlayers.size();
 				Timer protectedWarmupTimer = kingdom.getProtectedWarmupTimer();
-				if((offlineProtectedMinimumPlayers <= 0 && onlineKingdomPlayers.isEmpty()) || (numOnlineKingdomPlayers < offlineProtectedMinimumPlayers)) {
-					if(offlineProtectedWarmupSeconds > 0 && protectedWarmupTimer.getTime() == -1 && !kingdom.isOfflineProtected()) {
+				if ((offlineProtectedMinimumPlayers <= 0 && onlineKingdomPlayers.isEmpty()) || (numOnlineKingdomPlayers < offlineProtectedMinimumPlayers)) {
+					if (offlineProtectedWarmupSeconds > 0 && protectedWarmupTimer.getTime() == -1 && !kingdom.isOfflineProtected()) {
 						// start timer
-						ChatUtil.printDebug("Starting kingdom protection warmup timer for "+offlineProtectedWarmupSeconds+" seconds: "+kingdom.getName());
+						ChatUtil.printDebug("Starting kingdom protection warmup timer for " + offlineProtectedWarmupSeconds + " seconds: " + kingdom.getName());
 						protectedWarmupTimer.stopTimer();
 						protectedWarmupTimer.setTime(offlineProtectedWarmupSeconds);
 						protectedWarmupTimer.startTimer();
-						int warmupMinutes = offlineProtectedWarmupSeconds / 60;
-						int warmupSeconds = offlineProtectedWarmupSeconds % 60;
-						String warmupTime = String.format("%d:%02d", warmupMinutes , warmupSeconds);
-						ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE+MessagePath.PROTECTION_NOTICE_KINGDOM_WARMUP.getMessage(kingdom.getName(),warmupTime));
+						ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE + MessagePath.PROTECTION_NOTICE_KINGDOM_WARMUP.getMessage(kingdom.getName(), warmupTime));
 					}
 				} else {
 					// stop timer, clear protection
 					kingdom.setOfflineProtected(false);
 					protectedWarmupTimer.stopTimer();
 				}
+			}
+			// Town Watch Protection
+			ArrayList<String> protectedTownNames = new ArrayList<>();
+			for(KonTown town : kingdom.getCapitalTowns()) {
+				if (town.updateProtection(force)) {
+					protectedTownNames.add(town.getName());
+				}
+			}
+			if (!protectedTownNames.isEmpty() && !force) {
+				// Broadcast protection info
+				ChatUtil.sendBroadcast(ChatColor.LIGHT_PURPLE + MessagePath.PROTECTION_NOTICE_TOWN_WARMUP.getMessage(kingdom.getName(), warmupTime, HelperUtil.formatCommaSeparatedList(protectedTownNames)));
 			}
 		}
 	}
