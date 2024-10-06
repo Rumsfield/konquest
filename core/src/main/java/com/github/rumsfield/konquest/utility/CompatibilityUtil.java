@@ -472,7 +472,7 @@ public class CompatibilityUtil {
         return buildItem(mat, name, loreList, hasProtection, null);
     }
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation","removal"})
     public static ItemStack buildItem(Material mat, String name, List<String> loreList, boolean hasProtection, OfflinePlayer playerHead) {
         ItemStack item;
         if (playerHead == null && mat != null) {
@@ -511,7 +511,7 @@ public class CompatibilityUtil {
      * @param modName The name of the modifier for version 1.20.6 and older
      * @param modKey The key of the modifier for version 1.21 and newer
      */
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation","removal"})
     public static void applyHealthModifier(Player player, double modAmount, String modName, NamespacedKey modKey) {
         // Check for existing modifier
         boolean isModActive = false;
