@@ -994,6 +994,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				ChatUtil.printDebug("Town Watch protection enabled without warmup in "+getName());
 				isTownWatchProtected = true;
 				protectedWarmupTimer.stopTimer();
+				return true;
 			} else if (protectedWarmupTimer.getTime() == -1) {
 				// Timer is not running, and config time is non-zero
 				// start warmup timer
@@ -1001,8 +1002,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				protectedWarmupTimer.stopTimer();
 				protectedWarmupTimer.setTime(offlineProtectedWarmupSeconds);
 				protectedWarmupTimer.startTimer();
+				return true;
 			}
-			return true;
 		}
 		// Default
 		return false;
