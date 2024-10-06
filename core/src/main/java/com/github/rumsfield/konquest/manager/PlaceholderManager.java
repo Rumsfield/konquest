@@ -42,6 +42,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 	private final Konquest konquest;
 	private final PlayerManager playerManager;
 	private final KingdomManager kingdomManager;
+	private final RuinManager ruinManager;
 	private final TerritoryManager territoryManager;
 	private int cooldownSeconds;
 	private final Comparator<Ranked> rankedComparator;
@@ -58,6 +59,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		this.konquest = konquest;
 		this.playerManager = konquest.getPlayerManager();
 		this.kingdomManager = konquest.getKingdomManager();
+		this.ruinManager = konquest.getRuinManager();
 		this.territoryManager = konquest.getTerritoryManager();
 		this.cooldownSeconds = 0;
 		this.topScoreCooldownTime = 0L;
@@ -553,6 +555,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		    	for(KonTown town : kingdomManager.getKingdom(name).getTowns()) {
 		    		value += town.getChunkList().size();
 		    	}
+				ChatUtil.printDebug("Got placeholder kingdom land for "+name);
 				kingdomCache.get(type).put(name, value);
 				// Update new cool-down time
 				kingdomCooldownTimes.put(type, now.getTime() + (cooldownSeconds* 1000L));
@@ -622,6 +625,46 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 			}
 			// Get value
 			result = ""+kingdomCache.get(type).get(name);
+		}
+		return result;
+	}
+
+	/*
+	 * Placeholder Ruin Requesters
+	 */
+
+	public String getRuinCooldown(String name) {
+		String result = "";
+		if(ruinManager.isRuin(name)) {
+			result = ruinManager.getRuin(name).getCaptureTime();
+			ChatUtil.printDebug("Got placeholder ruin cooldown");
+		}
+		return result;
+	}
+
+	public String getRuinCapture(String name) {
+		String result = "";
+		if(ruinManager.isRuin(name)) {
+			result = boolean2Lang(!ruinManager.getRuin(name).isCaptureDisabled());
+			ChatUtil.printDebug("Got placeholder ruin capture");
+		}
+		return result;
+	}
+
+	public String getRuinCriticals(String name) {
+		String result = "";
+		if(ruinManager.isRuin(name)) {
+			result = ""+ruinManager.getRuin(name).getCriticalLocations().size();
+			ChatUtil.printDebug("Got placeholder ruin criticals");
+		}
+		return result;
+	}
+
+	public String getRuinSpawns(String name) {
+		String result = "";
+		if(ruinManager.isRuin(name)) {
+			result = ""+ruinManager.getRuin(name).getSpawnLocations().size();
+			ChatUtil.printDebug("Got placeholder ruin spawns");
 		}
 		return result;
 	}
