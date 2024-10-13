@@ -146,9 +146,13 @@ public class CompatibilityUtil {
     public static boolean runBIT() {
         boolean pass = true;
         int errorCode = 0;
-        // Loop over all API Enchantment fields
+        // Loop over all Spigot API Enchantment fields only
         for (Enchantment enchant : Enchantment.values()) {
-            String apiName = enchant.getName();
+            String apiName = enchant.getName(); // This name may be from a data pack
+            if (EnchantComp.getFromName(apiName) == null) {
+                // Skip enchantments that are not found in the API name list
+                continue;
+            }
             Enchantment enchantComp = getEnchantment(apiName);
             if (enchantComp == null) {
                 pass = false;
