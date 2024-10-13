@@ -443,10 +443,18 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		Long futureTime = now.getTime() + (cooldownSeconds* 1000L);
 		boolean isReady = false;
 		if (kingdomCooldownTimes.containsKey(nameKey)) {
-			// A cache entry exists
-			if (now.after(new Date(kingdomCooldownTimes.get(nameKey).get(valueType)))) {
-				// The cool-down time is over
+			// A kingdom cache entry exists
+			if (kingdomCooldownTimes.get(nameKey).containsKey(valueType)) {
+				// A type cache entry exists
+				if (now.after(new Date(kingdomCooldownTimes.get(nameKey).get(valueType)))) {
+					// The cool-down time is over
+					isReady = true;
+					kingdomCooldownTimes.get(nameKey).put(valueType, futureTime);
+				}
+			} else {
 				isReady = true;
+				// Create a new type cache entry
+				kingdomCache.get(nameKey).put(valueType, 0);
 				kingdomCooldownTimes.get(nameKey).put(valueType, futureTime);
 			}
 		} else if (kingdomManager.isKingdom(nameKey)) {
