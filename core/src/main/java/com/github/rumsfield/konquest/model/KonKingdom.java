@@ -3,6 +3,8 @@ package com.github.rumsfield.konquest.model;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
+import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
+import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
 import com.github.rumsfield.konquest.utility.Timer;
 import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.*;
@@ -18,12 +20,16 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	private String name;
 	private final Konquest konquest;
-	private final KonCapital capital;
+	private KonCapital capital;
+	private KonTown swapCapital;
 	private KonMonumentTemplate monumentTemplate;
 	private final HashMap<String, KonTown> townMap;
 	private boolean isSmallest;
 	private boolean isOfflineProtected;
 	private final Timer protectedWarmupTimer;
+	private final Timer capitalSwapWarmupTimer;
+	private final Timer capitalSwapCountdownTimer;
+	private int capitalSwapWarmup;
 	private final boolean isCreated;
 	private boolean isAdminOperated;
 	private boolean isOpen;
@@ -40,11 +46,15 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.name = name;
 		this.konquest = konquest;
 		this.capital = new KonCapital(loc, this, konquest);
+		this.swapCapital = null;
 		this.townMap = new HashMap<>();
 		this.monumentTemplate = null; // new kingdoms start with null template
 		this.isSmallest = false;
 		this.isOfflineProtected = true;
 		this.protectedWarmupTimer = new Timer(this);
+		this.capitalSwapWarmupTimer = new Timer(this);
+		this.capitalSwapCountdownTimer = new Timer(this);
+		this.capitalSwapWarmup = 1;
 		this.isCreated = true;
 		this.isAdminOperated = false;
 		this.isOpen = false;
@@ -69,6 +79,9 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		this.isSmallest = false;
 		this.isOfflineProtected = false;
 		this.protectedWarmupTimer = new Timer(this);
+		this.capitalSwapWarmupTimer = new Timer(this);
+		this.capitalSwapCountdownTimer = new Timer(this);
+		this.capitalSwapWarmup = 1;
 		this.isCreated = false;
 		this.isAdminOperated = false;
 		this.isOpen = true;
@@ -596,7 +609,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	/*
 	 * =================================================
-	 * Original Kingdom Methods
+	 * Capital, Town and Miscellaneous Methods
 	 * =================================================
 	 */
 	
@@ -843,18 +856,122 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 
 	@Override
 	public void onEndTimer(int taskID) {
-		if(taskID == 0) {
+		if (taskID == 0) {
 			ChatUtil.printDebug("Kingdom Timer ended with null taskID!");
-		} else if(taskID == protectedWarmupTimer.getTaskID()) {
+		} else if (taskID == protectedWarmupTimer.getTaskID()) {
 			ChatUtil.printDebug("Kingdom protection warmup Timer ended with taskID: "+taskID);
 			isOfflineProtected = true;
+		} else if (taskID == capitalSwapWarmupTimer.getTaskID()) {
+			ChatUtil.printDebug("Kingdom capital swap warmup Timer ended with taskID: "+taskID);
+			// When a capital swap warmup timer ends
+			capitalSwapCountdownTimer.stopTimer();
+			swapCapital.updateCapitalSwapBar(0, true, "");
+			capital.updateCapitalSwapBar(0, false, "");
+			swapCapitalToTown(swapCapital);
+			// Reset links
+			swapCapital = null;
+			capitalSwapWarmup = 0;
+		} else if (taskID == capitalSwapCountdownTimer.getTaskID()) {
+			// This ticks every second to show the countdown time
+			String remainingTime = HelperUtil.getTimeFormat(capitalSwapWarmupTimer.getTime(),ChatColor.GOLD);
+			double progress = 1;
+			if (capitalSwapWarmup > 0) {
+				progress = (double)capitalSwapWarmupTimer.getTime() / capitalSwapWarmup;
+			}
+			swapCapital.updateCapitalSwapBar(progress, true, remainingTime);
+			capital.updateCapitalSwapBar(progress, false, remainingTime);
 		}
 	}
 	
 	public Timer getProtectedWarmupTimer() {
 		return protectedWarmupTimer;
 	}
-	
+
+	public void startCapitalSwapWarmup(KonTown town, int warmupTime) {
+		swapCapital = town;
+		capitalSwapWarmup = warmupTime;
+		// Start warmup
+		capitalSwapWarmupTimer.stopTimer();
+		capitalSwapWarmupTimer.setTime(warmupTime);
+		capitalSwapWarmupTimer.startTimer();
+		// Start countdown
+		capitalSwapCountdownTimer.stopTimer();
+		capitalSwapCountdownTimer.setTime(0); // 1 second loop
+		capitalSwapCountdownTimer.startLoopTimer();
+		// Update display bars
+		String remainingTime = HelperUtil.getTimeFormat(warmupTime,ChatColor.GOLD);
+		swapCapital.updateCapitalSwapBar(1, true, remainingTime);
+		capital.updateCapitalSwapBar(1, false, remainingTime);
+		// Send broadcast
+		ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_CAPITAL_WARMUP.getMessage(getName(),town.getName(),remainingTime));
+	}
+
+	public void cancelCapitalSwapWarmup() {
+		// Update display bars
+		if (swapCapital != null) {
+			swapCapital.updateCapitalSwapBar(0, true, "");
+			// Send broadcast
+			ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_CAPITAL_WARMUP.getMessage(getName(),swapCapital.getName()));
+		}
+		capital.updateCapitalSwapBar(0, false, "");
+		// Stop timers
+		capitalSwapWarmupTimer.stopTimer();
+		capitalSwapCountdownTimer.stopTimer();
+		// Reset links
+		swapCapital = null;
+		capitalSwapWarmup = 0;
+	}
+
+	public boolean isCapitalSwapInProgress(KonTown town) {
+		return capitalSwapWarmup > 0 && swapCapital != null && (capital.equals(town) || swapCapital.equals(town));
+	}
+
+	public boolean swapCapitalToTown(KonTown town) {
+		// Check conditions
+		if (town == null || this.capital == null) return false;
+		if (!town.getKingdom().equals(this)) return false;
+		if (town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) return false;
+		String townName = town.getName();
+		// Make a new Capital from town
+		KonCapital newCapital = (KonCapital)town.copy(new KonCapital(town.getCenterLoc(),this,konquest));
+		// Make a new Town from the capital, using the original town's name
+		KonTown newTown = capital.copy(new KonTown(capital.getCenterLoc(),townName,this,konquest));
+		// Replace Capital
+		if(capital != null) {
+			capital.removeAllBarPlayers();
+			capital.stopTimers();
+			konquest.getTerritoryManager().removeAllTerritory(capital.getWorld(),capital.getChunkList().keySet());
+			konquest.getMapHandler().drawRemoveTerritory(capital);
+		}
+		capital = newCapital;
+		capital.updateBarTitle();
+		capital.updateBarPlayers();
+		konquest.getKingdomManager().refreshTownNerfs(capital);
+		konquest.getKingdomManager().refreshTownHearts(capital);
+		konquest.getUpgradeManager().updateTownDisabledUpgrades(capital);
+		konquest.getTerritoryManager().addAllTerritory(capital.getWorld(),capital.getChunkList());
+		konquest.getMapHandler().drawUpdateTerritory(capital);
+		// Replace Town
+		KonTown oldTown = townMap.remove(townName);
+		if(oldTown != null) {
+			oldTown.removeAllBarPlayers();
+			oldTown.stopTimers();
+			konquest.getTerritoryManager().removeAllTerritory(oldTown.getWorld(),oldTown.getChunkList().keySet());
+			konquest.getMapHandler().drawRemoveTerritory(oldTown);
+		}
+		townMap.put(townName, newTown);
+		newTown.updateBarTitle();
+		newTown.updateBarPlayers();
+		konquest.getKingdomManager().refreshTownNerfs(newTown);
+		konquest.getKingdomManager().refreshTownHearts(newTown);
+		konquest.getUpgradeManager().updateTownDisabledUpgrades(newTown);
+		konquest.getTerritoryManager().addAllTerritory(newTown.getWorld(),newTown.getChunkList());
+		konquest.getMapHandler().drawUpdateTerritory(newTown);
+		// Send broadcast
+		ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_CAPITAL_SWAP.getMessage(getName(),townName));
+		return true;
+	}
+
 	public void reloadLoadedTownMonuments() {
 		Point tPoint;
 		List<KonTown> allTownsAndCapital = new ArrayList<>();

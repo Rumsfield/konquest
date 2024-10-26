@@ -21,6 +21,8 @@ label:
   bypass: "BYPASS"
   camp: "Camp"
   capital: "Capital"
+  changing-capital: "Changing to Capital"
+  changing-town: "Changing to Town"
   close: "Close"
   cost: "Cost"
   critical-hits: "Critical Hits"
@@ -615,6 +617,9 @@ command:
       demote: "%s has been demoted to Kingdom Member of %s."
       disband: "The Kingdom of %s has been disbanded!"
       destroy: "The Town of %s has been destroyed!"
+      capital-swap: "The Kingdom Capital of %s has moved to the Town of %s."
+      capital-warmup: "The Kingdom Capital of %s will move to the Town of %s in %s."
+      capital-cancel: "Enemy attacks have stopped the Kingdom Capital of %s from moving to the Town of %s!"
     notice:
       request-sent: "Sent member request to join %s."
       request-received: "New kingdom join request, type \"/k kingdom\" to review."
