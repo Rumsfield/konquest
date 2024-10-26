@@ -363,7 +363,7 @@ public class KingdomCommand extends CommandBase {
 									return;
 								}
 								// Manager method includes messages
-								konquest.getKingdomManager().menuCapitalSwap(kingdom.getTown(townName),player);
+								konquest.getKingdomManager().menuCapitalSwap(kingdom.getTown(townName),player,false);
 							} else {
 								sendInvalidArgMessage(bukkitPlayer);
 							}

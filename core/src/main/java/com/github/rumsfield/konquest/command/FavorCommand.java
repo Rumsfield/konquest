@@ -54,14 +54,18 @@ public class FavorCommand extends CommandBase {
 		double cost_travel = konquest.getCore().getDouble(CorePath.FAVOR_COST_TRAVEL.getPath(),0.0);
 		double cost_kingdom_create = konquest.getKingdomManager().getCostCreate();
 		double cost_kingdom_rename = konquest.getKingdomManager().getCostRename();
+		double cost_capital_swap = konquest.getKingdomManager().getCostCapitalSwap();
 		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_MESSAGE.getMessage(KonquestPlugin.getCurrencyFormat(balance)));
 		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_SPY.getMessage() + 			" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_spy));
 		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_TRAVEL.getMessage() +			" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_travel));
 		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_CLAIM.getMessage() +			" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_claim));
-		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_TOWN_SETTLE.getMessage() +		" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_settle_adj));
-		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_TOWN_RENAME.getMessage() +		" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_town_rename));
+		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_TOWN_SETTLE.getMessage() +	" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_settle_adj));
+		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_TOWN_RENAME.getMessage() +	" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_town_rename));
 		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_KINGDOM_CREATE.getMessage() +	" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_kingdom_create));
 		ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_KINGDOM_RENAME.getMessage() +	" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_kingdom_rename));
+		if (konquest.getKingdomManager().getIsCapitalSwapEnable()) {
+			ChatUtil.sendMessage(bukkitPlayer, MessagePath.COMMAND_FAVOR_NOTICE_COST_CAPITAL_SWAP.getMessage() +	" - "+ChatColor.AQUA + KonquestPlugin.getCurrencyFormat(cost_capital_swap));
+		}
 	}
 	
 	@Override

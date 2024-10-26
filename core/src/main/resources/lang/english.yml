@@ -580,6 +580,7 @@ command:
       cost-town-rename: "Town Rename"
       cost-kingdom-create: "Kingdom Create"
       cost-kingdom-rename: "Kingdom Rename"
+      cost-capital-swap: "Capital Change"
   help:
     notice:
       header: "Help Page %s"
@@ -674,6 +675,8 @@ command:
       template-attack: "Cannot change monument template while the Kingdom Capital is under attack."
       template-chosen: "This monument template has already been chosen for the Kingdom."
       web-color-invalid: "Invalid color, must match a color name or hex code starting with #"
+      capital-swap-attack: "Cannot change the Kingdom Capital while under attack."
+      capital-swap-war: "Cannot change the Kingdom Capital while your kingdom is at war."
   list:
     notice:
       header: "%s List"

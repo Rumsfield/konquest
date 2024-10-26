@@ -865,8 +865,8 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 			ChatUtil.printDebug("Kingdom capital swap warmup Timer ended with taskID: "+taskID);
 			// When a capital swap warmup timer ends
 			capitalSwapCountdownTimer.stopTimer();
-			swapCapital.updateCapitalSwapBar(0, true, "");
-			capital.updateCapitalSwapBar(0, false, "");
+			swapCapital.updateCapitalSwapBar(1, true, "");
+			capital.updateCapitalSwapBar(1, false, "");
 			swapCapitalToTown(swapCapital);
 			// Reset links
 			swapCapital = null;
@@ -876,7 +876,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 			String remainingTime = HelperUtil.getTimeFormat(capitalSwapWarmupTimer.getTime(),ChatColor.GOLD);
 			double progress = 1;
 			if (capitalSwapWarmup > 0) {
-				progress = (double)capitalSwapWarmupTimer.getTime() / capitalSwapWarmup;
+				progress = (double)(capitalSwapWarmup - capitalSwapWarmupTimer.getTime()) / capitalSwapWarmup;
 			}
 			swapCapital.updateCapitalSwapBar(progress, true, remainingTime);
 			capital.updateCapitalSwapBar(progress, false, remainingTime);
@@ -900,8 +900,8 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		capitalSwapCountdownTimer.startLoopTimer();
 		// Update display bars
 		String remainingTime = HelperUtil.getTimeFormat(warmupTime,ChatColor.GOLD);
-		swapCapital.updateCapitalSwapBar(1, true, remainingTime);
-		capital.updateCapitalSwapBar(1, false, remainingTime);
+		swapCapital.updateCapitalSwapBar(0, true, remainingTime);
+		capital.updateCapitalSwapBar(0, false, remainingTime);
 		// Send broadcast
 		ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_CAPITAL_WARMUP.getMessage(getName(),town.getName(),remainingTime));
 	}
@@ -911,7 +911,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		if (swapCapital != null) {
 			swapCapital.updateCapitalSwapBar(0, true, "");
 			// Send broadcast
-			ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_CAPITAL_WARMUP.getMessage(getName(),swapCapital.getName()));
+			ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_CAPITAL_CANCEL.getMessage(getName(),swapCapital.getName()));
 		}
 		capital.updateCapitalSwapBar(0, false, "");
 		// Stop timers
@@ -936,22 +936,14 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		KonCapital newCapital = (KonCapital)town.copy(new KonCapital(town.getCenterLoc(),this,konquest));
 		// Make a new Town from the capital, using the original town's name
 		KonTown newTown = capital.copy(new KonTown(capital.getCenterLoc(),townName,this,konquest));
-		// Replace Capital
+		// Remove old capital
 		if(capital != null) {
 			capital.removeAllBarPlayers();
 			capital.stopTimers();
 			konquest.getTerritoryManager().removeAllTerritory(capital.getWorld(),capital.getChunkList().keySet());
 			konquest.getMapHandler().drawRemoveTerritory(capital);
 		}
-		capital = newCapital;
-		capital.updateBarTitle();
-		capital.updateBarPlayers();
-		konquest.getKingdomManager().refreshTownNerfs(capital);
-		konquest.getKingdomManager().refreshTownHearts(capital);
-		konquest.getUpgradeManager().updateTownDisabledUpgrades(capital);
-		konquest.getTerritoryManager().addAllTerritory(capital.getWorld(),capital.getChunkList());
-		konquest.getMapHandler().drawUpdateTerritory(capital);
-		// Replace Town
+		// Remove old town
 		KonTown oldTown = townMap.remove(townName);
 		if(oldTown != null) {
 			oldTown.removeAllBarPlayers();
@@ -959,9 +951,21 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 			konquest.getTerritoryManager().removeAllTerritory(oldTown.getWorld(),oldTown.getChunkList().keySet());
 			konquest.getMapHandler().drawRemoveTerritory(oldTown);
 		}
+		// Replace Capital
+		capital = newCapital;
+		capital.updateBarTitle();
+		capital.updateBarPlayers();
+		capital.refreshMonument();
+		konquest.getKingdomManager().refreshTownNerfs(capital);
+		konquest.getKingdomManager().refreshTownHearts(capital);
+		konquest.getUpgradeManager().updateTownDisabledUpgrades(capital);
+		konquest.getTerritoryManager().addAllTerritory(capital.getWorld(),capital.getChunkList());
+		konquest.getMapHandler().drawUpdateTerritory(capital);
+		// Replace Town
 		townMap.put(townName, newTown);
 		newTown.updateBarTitle();
 		newTown.updateBarPlayers();
+		newTown.refreshMonument();
 		konquest.getKingdomManager().refreshTownNerfs(newTown);
 		konquest.getKingdomManager().refreshTownHearts(newTown);
 		konquest.getUpgradeManager().updateTownDisabledUpgrades(newTown);

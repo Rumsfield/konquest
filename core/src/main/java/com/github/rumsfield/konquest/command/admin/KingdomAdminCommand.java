@@ -280,7 +280,6 @@ public class KingdomAdminCommand extends CommandBase {
 					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 					return;
 				}
-				// Rename the kingdom
 				if(args.size() != 3) {
 					sendInvalidArgMessage(sender);
 					return;
@@ -302,7 +301,7 @@ public class KingdomAdminCommand extends CommandBase {
 				// Includes broadcast
 				boolean swapStatus = kingdom.swapCapitalToTown(kingdom.getTown(townName));
 				if (swapStatus) {
-					//TODO message
+					ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
 				} else {
 					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_FAILED.getMessage());
 				}

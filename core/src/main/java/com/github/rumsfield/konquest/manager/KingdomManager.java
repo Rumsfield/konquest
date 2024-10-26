@@ -214,12 +214,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return capitalSwapEnable;
 	}
 
-	public boolean getIsCapitalSwapWar() {
-		return capitalSwapWar;
-	}
-
-	public double getIsCapitalSwapWarmup() {
-		return capitalSwapWarmup;
+	public double getCostCapitalSwap() {
+		return costCapitalSwap;
 	}
 
 	public boolean getIsTownDestroyLordEnable() {
@@ -2662,11 +2658,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return true;
 	}
 
-	public boolean menuCapitalSwap(KonTown town, KonPlayer player) {
+	public boolean menuCapitalSwap(KonTown town, KonPlayer player, boolean isAdmin) {
 		if (town == null || player == null) return false;
-		if (!capitalSwapEnable) return false;
 		Player bukkitPlayer = player.getBukkitPlayer();
 		KonKingdom kingdom = town.getKingdom();
+		if (!capitalSwapEnable) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return false;
+		}
 		/* Check for swap criteria
 		 * - Target town cannot be a capital
 		 * - Target town must be in the same kingdom as capital
@@ -2677,32 +2676,39 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		*/
 		// Cannot swap to a capital
 		if (town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
-			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
 		// Check capital and town are not under attack
-		if(kingdom.getCapital().isAttacked() || town.isAttacked()) {
-			//TODO message
-			//ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_TEMPLATE_ATTACK.getMessage());
+		if(!isAdmin && (kingdom.getCapital().isAttacked() || town.isAttacked())) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_CAPITAL_SWAP_ATTACK.getMessage());
 			return false;
 		}
 		// Check war
-		if (capitalSwapWar && !kingdom.getActiveRelationKingdoms(KonquestDiplomacyType.WAR).isEmpty()) {
-			//TODO message
+		if (!capitalSwapWar && !isAdmin && !kingdom.getActiveRelationKingdoms(KonquestDiplomacyType.WAR).isEmpty()) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_CAPITAL_SWAP_WAR.getMessage());
 			return false;
 		}
 		// Check cost
-		if(costCapitalSwap > 0 && KonquestPlugin.getBalance(bukkitPlayer) < costCapitalSwap) {
+		if(costCapitalSwap > 0 && !isAdmin && KonquestPlugin.getBalance(bukkitPlayer) < costCapitalSwap) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costCapitalSwap));
 			return false;
 		}
 		// Try to do the swap
-		if (capitalSwapWarmup > 0) {
+		if (capitalSwapWarmup > 0 && !isAdmin) {
 			// Start warmup
 			kingdom.startCapitalSwapWarmup(town,(int)capitalSwapWarmup);
 		} else {
 			// Instantly swap
-			kingdom.swapCapitalToTown(town);
+			boolean status = kingdom.swapCapitalToTown(town);
+			if (!status) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+				return false;
+			}
+		}
+		// Withdraw cost
+		if(costCapitalSwap > 0 && !isAdmin && KonquestPlugin.withdrawPlayer(bukkitPlayer, costCapitalSwap)) {
+			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costCapitalSwap);
 		}
 		return true;
 	}
