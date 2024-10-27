@@ -12,9 +12,6 @@ import com.github.rumsfield.konquest.model.KonPlayerScoreAttributes.KonPlayerSco
 import com.github.rumsfield.konquest.utility.Timer;
 import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -22,7 +19,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -73,6 +69,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private double costDiplomacyPeace;
 	private double costDiplomacyTrade;
 	private double costDiplomacyAlliance;
+	private double costCapitalSwap;
+	private boolean capitalSwapEnable;
+	private boolean capitalSwapWar;
+	private double capitalSwapWarmup;
 	private boolean townDestroyLordEnable;
 	private boolean townDestroyMasterEnable;
 
@@ -109,6 +109,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		this.costDiplomacyPeace = 0;
 		this.costDiplomacyTrade = 0;
 		this.costDiplomacyAlliance = 0;
+		this.costCapitalSwap = 0;
 		this.payTimer = new Timer(this);
 	}
 	
@@ -138,6 +139,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		costDiplomacyPeace 		= konquest.getCore().getDouble(CorePath.FAVOR_DIPLOMACY_COST_PEACE.getPath());
 		costDiplomacyTrade 		= konquest.getCore().getDouble(CorePath.FAVOR_DIPLOMACY_COST_TRADE.getPath());
 		costDiplomacyAlliance 	= konquest.getCore().getDouble(CorePath.FAVOR_DIPLOMACY_COST_ALLIANCE.getPath());
+		costCapitalSwap 		= konquest.getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_CAPITAL_SWAP.getPath());
 		
 		payPerChunk = payPerChunk < 0 ? 0 : payPerChunk;
 		payPerResident = payPerResident < 0 ? 0 : payPerResident;
@@ -149,6 +151,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		costDiplomacyPeace = Math.max(costDiplomacyPeace,0);
 		costDiplomacyTrade = Math.max(costDiplomacyTrade,0);
 		costDiplomacyAlliance = Math.max(costDiplomacyAlliance,0);
+		costCapitalSwap = Math.max(costCapitalSwap,0);
 		payPercentOfficer = Math.max(payPercentOfficer, 0);
 		payPercentOfficer = Math.min(payPercentOfficer, 100);
 		payPercentMaster = Math.max(payPercentMaster, 0);
@@ -160,16 +163,21 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			payTimer.startLoopTimer();
 		}
 
+		// Capital Swap Settings
+		capitalSwapEnable 		= konquest.getCore().getBoolean(CorePath.KINGDOMS_CAPITAL_SWAP_ENABLE.getPath());
+		capitalSwapWar 			= konquest.getCore().getBoolean(CorePath.KINGDOMS_CAPITAL_SWAP_WAR.getPath());
+		capitalSwapWarmup 		= konquest.getCore().getDouble(CorePath.KINGDOMS_CAPITAL_SWAP_WARMUP.getPath());
+
 		// Town Settings
 		townDestroyLordEnable   = konquest.getCore().getBoolean(CorePath.TOWNS_ALLOW_DESTROY_LORD.getPath());
 		townDestroyMasterEnable = konquest.getCore().getBoolean(CorePath.TOWNS_ALLOW_DESTROY_MASTER.getPath());
 
-		discountEnable 	    = konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath());
-		discountPercent		= konquest.getCore().getInt(CorePath.TOWNS_DISCOUNT_PERCENT.getPath());
-		discountStack		= konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_STACK.getPath());
-
-		discountPercent = Math.max(discountPercent,0);
-		discountPercent = Math.min(discountPercent,100);
+		// Discount Settings
+		discountEnable 	    	= konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath());
+		discountPercent			= konquest.getCore().getInt(CorePath.TOWNS_DISCOUNT_PERCENT.getPath());
+		discountStack			= konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_STACK.getPath());
+		discountPercent 		= Math.max(discountPercent,0);
+		discountPercent 		= Math.min(discountPercent,100);
 	}
 
 	public String getKingdomPayTime() {
@@ -200,6 +208,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 	public boolean getIsDiscountStack() {
 		return discountStack;
+	}
+
+	public boolean getIsCapitalSwapEnable() {
+		return capitalSwapEnable;
+	}
+
+	public double getCostCapitalSwap() {
+		return costCapitalSwap;
 	}
 
 	public boolean getIsTownDestroyLordEnable() {
@@ -2638,6 +2654,61 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		} else {
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return false;
+		}
+		return true;
+	}
+
+	public boolean menuCapitalSwap(KonTown town, KonPlayer player, boolean isAdmin) {
+		if (town == null || player == null) return false;
+		Player bukkitPlayer = player.getBukkitPlayer();
+		KonKingdom kingdom = town.getKingdom();
+		if (!capitalSwapEnable) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return false;
+		}
+		/* Check for swap criteria
+		 * - Target town cannot be a capital
+		 * - Target town must be in the same kingdom as capital
+		 * - Capital and target town cannot be under attack
+		 * - (Optional) Kingdom cannot be at war
+		 * - (Optional) Player must have enough favor
+		 * - (Optional) Kingdom warmup timer for capital swap cannot be running (swap in progress)
+		*/
+		// Cannot swap to a capital
+		if (town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		// Check capital and town are not under attack
+		if(!isAdmin && (kingdom.getCapital().isAttacked() || town.isAttacked())) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_CAPITAL_SWAP_ATTACK.getMessage());
+			return false;
+		}
+		// Check war
+		if (!capitalSwapWar && !isAdmin && !kingdom.getActiveRelationKingdoms(KonquestDiplomacyType.WAR).isEmpty()) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_KINGDOM_ERROR_CAPITAL_SWAP_WAR.getMessage());
+			return false;
+		}
+		// Check cost
+		if(costCapitalSwap > 0 && !isAdmin && KonquestPlugin.getBalance(bukkitPlayer) < costCapitalSwap) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costCapitalSwap));
+			return false;
+		}
+		// Try to do the swap
+		if (capitalSwapWarmup > 0 && !isAdmin) {
+			// Start warmup
+			kingdom.startCapitalSwapWarmup(town,(int)capitalSwapWarmup);
+		} else {
+			// Instantly swap
+			boolean status = kingdom.swapCapitalToTown(town);
+			if (!status) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+				return false;
+			}
+		}
+		// Withdraw cost
+		if(costCapitalSwap > 0 && !isAdmin && KonquestPlugin.withdrawPlayer(bukkitPlayer, costCapitalSwap)) {
+			konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costCapitalSwap);
 		}
 		return true;
 	}

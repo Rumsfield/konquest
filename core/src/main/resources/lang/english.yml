@@ -21,6 +21,8 @@ label:
   bypass: "BYPASS"
   camp: "Camp"
   capital: "Capital"
+  changing-capital: "Changing to Capital"
+  changing-town: "Changing to Town"
   close: "Close"
   cost: "Cost"
   critical-hits: "Critical Hits"
@@ -298,6 +300,7 @@ menu:
     transfer: "Transfer"
     template: "Templates"
     disband: "Disband"
+    capital: "Capital"
     description-join: "Request to join a kingdom, or create your own with /k kingdom create"
     description-exile: "Leave your current kingdom and become a barbarian"
     description-invites: "View your kingdom invites"
@@ -309,6 +312,7 @@ menu:
     description-transfer: "Transfer master to another member"
     description-template: "Change kingdom monument template"
     description-disband: "Disband and delete the kingdom"
+    description-capital: "Move the Capital to a different town"
     hint-open: "Click to open"
     hint-exile: "Click to become a barbarian"
     hint-exit: "Exit the menu"
@@ -324,6 +328,7 @@ menu:
     hint-promote: "Click to promote to Officer"
     hint-demote: "Click to demote to Member"
     hint-transfer: "Click to give Master"
+    hint-capital: "Click to change to the Capital"
     they-requested: "They Requested"
     we-requested: "We Requested"
     diplomacy-peace-war-instant: "Instantly declare peace"
@@ -352,6 +357,7 @@ menu:
     title-transfer: "Kingdom Master Transfer"
     title-template: "Monument Templates"
     title-disband: "Disband Kingdom"
+    title-capital: "Move Capital"
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."
@@ -578,6 +584,7 @@ command:
       cost-town-rename: "Town Rename"
       cost-kingdom-create: "Kingdom Create"
       cost-kingdom-rename: "Kingdom Rename"
+      cost-capital-swap: "Capital Change"
   help:
     notice:
       header: "Help Page %s"
@@ -615,6 +622,9 @@ command:
       demote: "%s has been demoted to Kingdom Member of %s."
       disband: "The Kingdom of %s has been disbanded!"
       destroy: "The Town of %s has been destroyed!"
+      capital-swap: "The Kingdom Capital of %s has moved to the Town of %s."
+      capital-warmup: "The Kingdom Capital of %s will move to the Town of %s in %s."
+      capital-cancel: "Enemy attacks have stopped the Kingdom Capital of %s from moving to the Town of %s!"
     notice:
       request-sent: "Sent member request to join %s."
       request-received: "New kingdom join request, type \"/k kingdom\" to review."
@@ -669,6 +679,8 @@ command:
       template-attack: "Cannot change monument template while the Kingdom Capital is under attack."
       template-chosen: "This monument template has already been chosen for the Kingdom."
       web-color-invalid: "Invalid color, must match a color name or hex code starting with #"
+      capital-swap-attack: "Cannot change the Kingdom Capital while under attack."
+      capital-swap-war: "Cannot change the Kingdom Capital while your kingdom is at war."
   list:
     notice:
       header: "%s List"

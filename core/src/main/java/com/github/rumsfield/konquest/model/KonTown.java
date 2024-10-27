@@ -30,8 +30,8 @@ import java.util.*;
  * @prerequisites	The Town's Kingdom must have a valid Monument Template
  */
 public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplayer, KonPropertyFlagHolder, Timeable {
-	
-	private final KonMonument monument;
+
+	private KonMonument monument;
 	private final Timer monumentTimer;
 	private final Timer captureTimer;
 	private final Timer raidAlertTimer;
@@ -45,9 +45,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private final BossBar monumentBarPeace;
 	private final BossBar monumentBarTrade;
 	private final BossBar monumentBarAlliance;
+	private final BossBar capitalSwapBar;
 	private UUID lord;
 	private final HashMap<UUID,Boolean> residents;
-	private final RequestKeeper joinRequestKeeper;
+	private RequestKeeper joinRequestKeeper;
 	private final HashMap<KonTownOption,Boolean> townOptions;
 	private boolean isAttacked;
 	private boolean isShielded;
@@ -88,12 +89,15 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.monumentBarPeace = Bukkit.getServer().createBossBar(Konquest.peacefulColor2+name, ChatUtil.mapBarColor(Konquest.peacefulColor1), BarStyle.SOLID);
 		this.monumentBarPeace.setVisible(true);
 		this.monumentBarPeace.setProgress(1.0);
-		this.monumentBarTrade = Bukkit.getServer().createBossBar(Konquest.tradeColor2 +name, ChatUtil.mapBarColor(Konquest.tradeColor1), BarStyle.SOLID);
+		this.monumentBarTrade = Bukkit.getServer().createBossBar(Konquest.tradeColor2+name, ChatUtil.mapBarColor(Konquest.tradeColor1), BarStyle.SOLID);
 		this.monumentBarTrade.setVisible(true);
 		this.monumentBarTrade.setProgress(1.0);
 		this.monumentBarAlliance = Bukkit.getServer().createBossBar(Konquest.alliedColor2+name, ChatUtil.mapBarColor(Konquest.alliedColor1), BarStyle.SOLID);
 		this.monumentBarAlliance.setVisible(true);
 		this.monumentBarAlliance.setProgress(1.0);
+		this.capitalSwapBar = Bukkit.getServer().createBossBar(ChatColor.GOLD+"", ChatUtil.mapBarColor(ChatColor.GOLD), BarStyle.SOLID);
+		this.capitalSwapBar.setVisible(false);
+		this.capitalSwapBar.setProgress(1.0);
 		// Other stuff
 		this.lord = null; // init with no lord
 		this.residents = new HashMap<>();
@@ -117,6 +121,45 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.properties = new HashMap<>();
 		initProperties();
 		this.specialization = Villager.Profession.NONE;
+	}
+
+	public KonTown copy(KonTown copyTown) {
+		// Set land and monument
+		copyTown.addPoints(getChunkPoints());
+		copyTown.setMonument(monument);
+		// Set residents
+		for (UUID id : residents.keySet()) {
+			copyTown.addPlayerResident(Bukkit.getOfflinePlayer(id),residents.get(id),false);
+		}
+		copyTown.setLord(lord, false);
+		copyTown.setJoinRequests(joinRequestKeeper);
+		// Set shields and armor
+		if (isShielded) {
+			copyTown.activateShield(shieldEndTimeSeconds);
+		}
+		if (isArmored) {
+			copyTown.activateArmor(armorCurrentBlocks);
+		}
+		// Set town plots
+		for (KonPlot plot : getPlots()) {
+			copyTown.putPlot(plot);
+		}
+		// Set options
+		for (KonTownOption option : townOptions.keySet()) {
+			copyTown.setTownOption(option, townOptions.get(option));
+		}
+		// Set properties
+		for (KonPropertyFlag flag : properties.keySet()) {
+			copyTown.setPropertyValue(flag, properties.get(flag));
+		}
+		// Set upgrades
+		for (KonquestUpgrade upgrade : upgrades.keySet()) {
+			copyTown.addUpgrade(upgrade, upgrades.get(upgrade));
+		}
+		// Set specialization
+		copyTown.setSpecialization(specialization);
+
+		return copyTown;
 	}
 
 	private void initOptions() {
@@ -741,7 +784,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			ChatUtil.printDebug("Failed to refresh monument from template for town "+getName());
 		}
 	}
-	
+
+	protected void setMonument(KonMonument monumentOverride) {
+		monument = monumentOverride;
+	}
+
 	public KonMonument getMonument() {
 		return monument;
 	}
@@ -828,7 +875,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			if(shieldEndTimeSeconds < shieldNowTimeSeconds) {
 				deactivateShield();
 			} else {
-				//refreshShieldBarTitle();
 				updateBarTitle();
 			}
 		} else if(taskID == protectedWarmupTimer.getTaskID()) {
@@ -874,6 +920,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		monumentBarAlliance.removeAll();
 		monumentBarTrade.removeAll();
 		monumentBarPeace.removeAll();
+		capitalSwapBar.removeAll();
 		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
 			Player bukkitPlayer = player.getBukkitPlayer();
 			if(isLocInside(bukkitPlayer.getLocation())) {
@@ -897,6 +944,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		    		default:
 		    			break;
 		    	}
+				// All Players
+				capitalSwapBar.addPlayer(bukkitPlayer);
 			}
 		}
 	}
@@ -922,6 +971,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			default:
 				break;
 		}
+		// All Players
+		capitalSwapBar.addPlayer(player.getBukkitPlayer());
 	}
 	
 	public void removeBarPlayer(KonPlayer player) {
@@ -930,6 +981,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		monumentBarAlliance.removePlayer(player.getBukkitPlayer());
 		monumentBarTrade.removePlayer(player.getBukkitPlayer());
 		monumentBarPeace.removePlayer(player.getBukkitPlayer());
+		capitalSwapBar.removePlayer(player.getBukkitPlayer());
 	}
 	
 	public void removeAllBarPlayers() {
@@ -938,6 +990,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		monumentBarAlliance.removeAll();
 		monumentBarTrade.removeAll();
 		monumentBarPeace.removeAll();
+		capitalSwapBar.removeAll();
 	}
 	
 	public void setBarProgress(double prog) {
@@ -1088,6 +1141,34 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		monumentBarAlliance.setStyle(style);
 		monumentBarTrade.setStyle(style);
 		monumentBarPeace.setStyle(style);
+	}
+
+	/**
+	 * Updates the title and display of the capital swap bar
+	 * @param progress Value 0 to 1 for bar fill, 0 disables the bar
+	 * @param isCapitalNotTown true for swapping to capital, false for swapping to town
+	 * @param countdown Timer count to display in bar title
+	 */
+	public void updateCapitalSwapBar(double progress, boolean isCapitalNotTown, String countdown) {
+		capitalSwapBar.setProgress(progress);
+		if (progress > 0) {
+			capitalSwapBar.setVisible(true);
+			String titleCount = "";
+			if (!countdown.isEmpty()) {
+				titleCount = ChatColor.RESET+" "+countdown;
+			}
+			if (isCapitalNotTown) {
+				// Changing to a capital
+				capitalSwapBar.setTitle(ChatColor.GOLD+MessagePath.LABEL_CHANGING_CAPITAL.getMessage()+titleCount);
+			} else {
+				// Changing to a town
+				capitalSwapBar.setTitle(ChatColor.GOLD+MessagePath.LABEL_CHANGING_TOWN.getMessage()+titleCount);
+			}
+		} else {
+			// Disable swap bar
+			capitalSwapBar.setVisible(false);
+			capitalSwapBar.setTitle("");
+		}
 	}
 	
 	public boolean addDefender(Player bukkitPlayer) {
@@ -1541,7 +1622,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public boolean isUpgradeDisabled(KonquestUpgrade upgrade) {
 		return disabledUpgrades.containsKey(upgrade);
 	}
-	
+
+	protected void setJoinRequests(RequestKeeper requestOverride) {
+		joinRequestKeeper = requestOverride;
+	}
+
 	// Players who have tried joining but need to be added
 	public List<OfflinePlayer> getJoinRequests() {
 		return joinRequestKeeper.getJoinRequests();

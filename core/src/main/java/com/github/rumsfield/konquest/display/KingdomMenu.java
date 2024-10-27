@@ -35,6 +35,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		C_DEMOTE,
 		C_TRANSFER,
 		C_DESTROY,
+		C_CAPITAL,
 		C_TEMPLATE,
 		C_DISBAND
 	}
@@ -47,8 +48,8 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	 * Access  | Labels...
 	 * ----------------------------------------------------------------------------------
 	 * Regular | *Join   		*Leave		+Info		*Invites	*List
-	 * Officer | *Relationship	*Requests<br>
-	 * Master  | *Promote 		*Demote 	*Transfer 	+Open		*Template 	 *Disband
+	 * Officer | *Relationship	*Requests
+	 * Master  | *Promote 		*Demote 	*Transfer 	+Open		*Template		*Disband	*Destroy	*Capital
 	 *
 	 * Relationship selects other kingdom and opens diplomacy view, which selects new status (enemy, ally, etc)
 	 */
@@ -60,21 +61,25 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	}
 	
 	/* Icon slot indexes */
+	// Row 0: 0 1 2 3 4 5 6 7 8
 	private final int ROOT_SLOT_JOIN 			= 0;
 	private final int ROOT_SLOT_EXILE 			= 2;
 	private final int ROOT_SLOT_INFO 			= 4;
 	private final int ROOT_SLOT_INVITE 			= 6;
 	private final int ROOT_SLOT_LIST 			= 8;
-	private final int ROOT_SLOT_RELATIONSHIPS 	= 12;
-	private final int ROOT_SLOT_REQUESTS 		= 14;
-	private final int ROOT_SLOT_PROMOTE 		= 19;
-	private final int ROOT_SLOT_DEMOTE 			= 20;
-	private final int ROOT_SLOT_TRANSFER		= 21;
-	private final int ROOT_SLOT_DESTROY		    = 22;
-	private final int ROOT_SLOT_OPEN 			= 23;
-	private final int ROOT_SLOT_TEMPLATE 		= 24;
-	private final int ROOT_SLOT_DISBAND			= 25;
-	
+	// Row 1: 9 10 11 12 13 14 15 16 17
+	private final int ROOT_SLOT_RELATIONSHIPS 	= 11;
+	private final int ROOT_SLOT_REQUESTS 		= 15;
+	// Row 2: 18 19 20 21 22 23 24 25 26
+	private final int ROOT_SLOT_PROMOTE 		= 18;
+	private final int ROOT_SLOT_DEMOTE 			= 19;
+	private final int ROOT_SLOT_TRANSFER		= 20;
+	private final int ROOT_SLOT_OPEN 			= 21;
+	private final int ROOT_SLOT_TEMPLATE 		= 23;
+	private final int ROOT_SLOT_DISBAND			= 24;
+	private final int ROOT_SLOT_DESTROY		    = 25;
+	private final int ROOT_SLOT_CAPITAL		    = 26;
+
 	private final int SLOT_YES 					= 3;
 	private final int SLOT_NO 					= 5;
 
@@ -298,6 +303,16 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage(), loreColor));
 					loreList.add(hintColor + MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 					icon = new InfoIcon(kingdomColor + MessagePath.MENU_TOWN_DESTROY.getMessage(), loreList, Material.TNT, ROOT_SLOT_DESTROY, true);
+					result.addIcon(icon);
+				}
+
+				/* Capital Icon */
+				if(konquest.getKingdomManager().getIsCapitalSwapEnable()) {
+					loreList.clear();
+					loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
+					loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_CAPITAL.getMessage(), loreColor));
+					loreList.add(hintColor + MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					icon = new InfoIcon(kingdomColor + MessagePath.MENU_KINGDOM_CAPITAL.getMessage(), loreList, Material.PISTON, ROOT_SLOT_CAPITAL, true);
 					result.addIcon(icon);
 				}
 
@@ -649,8 +664,8 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		return result;
 	}
 
-	private DisplayMenu createTownView() {
-		// A paged view of towns, only for DESTROY context
+	private DisplayMenu createTownView(MenuState context) {
+		// A paged view of towns, for multiple contexts
 		DisplayMenu result;
 		pages.clear();
 		currentPage = 0;
@@ -666,15 +681,25 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		ListIterator<KonTown> listIter = towns.listIterator();
 		for(int i = 0; i < pageTotal; i++) {
 			int pageRows = getNumPageRows(towns.size(), i);
-			pageLabel = getTitle(MenuState.C_DESTROY)+" "+(i+1)+"/"+pageTotal;
+			pageLabel = getTitle(context)+" "+(i+1)+"/"+pageTotal;
 			pages.add(pageNum, new DisplayMenu(pageRows+1, pageLabel));
 			int slotIndex = 0;
 			while(slotIndex < MAX_ICONS_PER_PAGE && listIter.hasNext()) {
 				/* Town Icon (n) */
 				KonTown currentTown = listIter.next();
 				String contextColor = Konquest.friendColor2;
+				// Context-specific lore + click conditions
 				loreList = new ArrayList<>();
-				loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_DESTROY.getMessage());
+				switch(context) {
+					case C_DESTROY:
+						loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_DESTROY.getMessage());
+						break;
+					case C_CAPITAL:
+						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_CAPITAL.getMessage());
+						break;
+					default:
+						break;
+				}
 				TownIcon icon = new TownIcon(currentTown,contextColor,loreList,slotIndex,true);
 				pages.get(pageNum).addIcon(icon);
 				slotIndex++;
@@ -852,7 +877,12 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					} else if(slot == ROOT_SLOT_DESTROY) {
 						// Clicked to view towns to destroy
 						currentState = MenuState.C_DESTROY;
-						result = goToTownView();
+						result = goToTownView(MenuState.C_DESTROY);
+
+					} else if(slot == ROOT_SLOT_CAPITAL) {
+						// Clicked to view towns to move capital
+						currentState = MenuState.C_CAPITAL;
+						result = goToTownView(MenuState.C_CAPITAL);
 
 					} else if(slot == ROOT_SLOT_DISBAND) {
 						// Clicked to disband kingdom
@@ -973,6 +1003,14 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						playStatusSound(player.getBukkitPlayer(),status);
 					}
 					break;
+				case C_CAPITAL:
+					if(clickedIcon instanceof TownIcon) {
+						TownIcon icon = (TownIcon)clickedIcon;
+						KonTown clickTown = icon.getTown();
+						boolean status = manager.menuCapitalSwap(clickTown, player, isAdmin);
+						playStatusSound(player.getBukkitPlayer(),status);
+					}
+					break;
 				case C_TEMPLATE:
 					if(clickedIcon instanceof TemplateIcon) {
 						TemplateIcon icon = (TemplateIcon)clickedIcon;
@@ -1045,6 +1083,9 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			case C_DISBAND:
 				result = color+MessagePath.MENU_KINGDOM_TITLE_DISBAND.getMessage();
 				break;
+			case C_CAPITAL:
+				result = color+MessagePath.MENU_KINGDOM_TITLE_CAPITAL.getMessage();
+				break;
 			default:
 				break;
 		}
@@ -1057,9 +1098,9 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		return result;
 	}
 
-	private DisplayMenu goToTownView() {
-		DisplayMenu result = createTownView();
-		views.put(MenuState.C_DESTROY, result);
+	private DisplayMenu goToTownView(MenuState context) {
+		DisplayMenu result = createTownView(context);
+		views.put(context, result);
 		return result;
 	}
 	
@@ -1128,7 +1169,8 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			view.addIcon(navIconEmpty(navStart+8));
 		} else if(context.equals(MenuState.A_JOIN) || context.equals(MenuState.A_INVITE) || context.equals(MenuState.A_LIST) ||
 				context.equals(MenuState.B_RELATIONSHIP) || context.equals(MenuState.B_REQUESTS) || 
-				context.equals(MenuState.C_PROMOTE) || context.equals(MenuState.C_DEMOTE) || context.equals(MenuState.C_TRANSFER) || context.equals(MenuState.C_DESTROY)) {
+				context.equals(MenuState.C_PROMOTE) || context.equals(MenuState.C_DEMOTE) || context.equals(MenuState.C_TRANSFER) ||
+				context.equals(MenuState.C_DESTROY) || context.equals(MenuState.C_CAPITAL)) {
 			// (back [0]) close [4], return [5] (next [8])
 			if(currentPage > 0) {
 				// Place a back button

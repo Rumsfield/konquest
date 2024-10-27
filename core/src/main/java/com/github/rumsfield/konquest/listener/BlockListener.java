@@ -1327,6 +1327,11 @@ public class BlockListener implements Listener {
 		int maxCriticalhits = konquest.getKingdomManager().getMaxCriticalHits();
 		// Update bar progress
 		town.updateBarTitle();
+		// Check for capital swap cancellation
+		if (town.getKingdom().isCapitalSwapInProgress(town)) {
+			// This town or capital is being swapped, cancel it
+			town.getKingdom().cancelCapitalSwapWarmup();
+		}
 		// Evaluate town capture conditions
 		if(town.getMonument().getCriticalHits() >= maxCriticalhits) {
 			// The Town is at critical max, conquer or destroy

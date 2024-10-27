@@ -63,6 +63,9 @@ public class KingdomCommand extends CommandBase {
 						// manage destroy <town>
 						.sub( newArg("destroy",true,false)
 								.sub( newArg("town",false,false) ) )
+						// manage capital <town>
+						.sub( newArg("capital",true,false)
+								.sub( newArg("town",false,false) ) )
 						// manage rename <name>
 						.sub( newArg("rename",true,false)
 								.sub( newArg("name",false,false) ) )
@@ -337,6 +340,30 @@ public class KingdomCommand extends CommandBase {
 								}
 								// Manager method includes messages
 								konquest.getKingdomManager().menuDestroyTown(kingdom.getTown(townName),player);
+							} else {
+								sendInvalidArgMessage(bukkitPlayer);
+							}
+							break;
+						case "capital":
+							// Swap the capital to another town (master only)
+							if(!kingdom.isMaster(playerID)) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+								return;
+							}
+							// Check for enabled feature
+							if(!konquest.getKingdomManager().getIsCapitalSwapEnable()) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+								return;
+							}
+							if(args.size() == 3) {
+								String townName = args.get(2);
+								// Check valid town name
+								if (!kingdom.hasTown(townName)) {
+									ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(townName));
+									return;
+								}
+								// Manager method includes messages
+								konquest.getKingdomManager().menuCapitalSwap(kingdom.getTown(townName),player,false);
 							} else {
 								sendInvalidArgMessage(bukkitPlayer);
 							}
@@ -683,6 +710,9 @@ public class KingdomCommand extends CommandBase {
 					if (konquest.getKingdomManager().getIsTownDestroyMasterEnable()) {
 						tabList.add("destroy");
 					}
+					if (konquest.getKingdomManager().getIsCapitalSwapEnable()) {
+						tabList.add("capital");
+					}
 					break;
 			}
 		} else if (numArgs == 3) {
@@ -697,6 +727,11 @@ public class KingdomCommand extends CommandBase {
 							break;
 						case "destroy":
 							if (konquest.getKingdomManager().getIsTownDestroyMasterEnable()) {
+								tabList.addAll(kingdom.getTownNames());
+							}
+							break;
+						case "capital":
+							if (konquest.getKingdomManager().getIsCapitalSwapEnable()) {
 								tabList.addAll(kingdom.getTownNames());
 							}
 							break;

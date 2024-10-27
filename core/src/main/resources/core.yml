@@ -294,6 +294,15 @@ core:
     
     # Capitals will be immune from capture while there are this many other towns in the kingdom (0 to disable, integer >= 0)
     capital_immunity_towns: 2
+
+    # Allow kingdom capitals to be swapped with other towns by the kingdom master (true/false)
+    capital_swap_enable: true
+
+    # Allow kingdom capitals to be swapped while the kingdom is at war with any other kingdom (true/false)
+    capital_swap_war: true
+
+    # Time in seconds for a kingdom capital swap to happen after it has been initiated (0 to disable, integer >= 0)
+    capital_swap_warmup: 300
     
     # Declaring war on a kingdom will also declare war on their allies (true), else only the target kingdom will be at war (false) (true/false)
     ally_defense_pact: true
@@ -694,6 +703,9 @@ core:
       
       # Cost to change the monument template of a kingdom (decimal >= 0)
       cost_template: 200
+
+      # Cost to swap the capital to another town (decimal >= 0)
+      cost_capital_swap: 500
       
       # Time in seconds between payments (0 to disable, integer >= 0)
       pay_interval_seconds: 1800
