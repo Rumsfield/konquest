@@ -282,6 +282,7 @@ public enum MessagePath {
 	MENU_KINGDOM_TRANSFER                       (0, "menu.kingdom.transfer"),
 	MENU_KINGDOM_TEMPLATE                       (0, "menu.kingdom.template"),
 	MENU_KINGDOM_DISBAND                        (0, "menu.kingdom.disband"),
+	MENU_KINGDOM_CAPITAL                        (0, "menu.kingdom.capital"),
 	MENU_KINGDOM_DESCRIPTION_JOIN               (0, "menu.kingdom.description-join"),
 	MENU_KINGDOM_DESCRIPTION_EXILE              (0, "menu.kingdom.description-exile"),
 	MENU_KINGDOM_DESCRIPTION_INVITES            (0, "menu.kingdom.description-invites"),
@@ -293,6 +294,7 @@ public enum MessagePath {
 	MENU_KINGDOM_DESCRIPTION_TRANSFER           (0, "menu.kingdom.description-transfer"),
 	MENU_KINGDOM_DESCRIPTION_TEMPLATE           (0, "menu.kingdom.description-template"),
 	MENU_KINGDOM_DESCRIPTION_DISBAND            (0, "menu.kingdom.description-disband"),
+	MENU_KINGDOM_DESCRIPTION_CAPITAL            (0, "menu.kingdom.description-capital"),
 	MENU_KINGDOM_HINT_OPEN                      (0, "menu.kingdom.hint-open"),
 	MENU_KINGDOM_HINT_EXILE                     (0, "menu.kingdom.hint-exile"),
 	MENU_KINGDOM_HINT_EXIT                      (0, "menu.kingdom.hint-exit"),
@@ -308,6 +310,7 @@ public enum MessagePath {
 	MENU_KINGDOM_HINT_PROMOTE                   (0, "menu.kingdom.hint-promote"),
 	MENU_KINGDOM_HINT_DEMOTE                    (0, "menu.kingdom.hint-demote"),
 	MENU_KINGDOM_HINT_TRANSFER                  (0, "menu.kingdom.hint-transfer"),
+	MENU_KINGDOM_HINT_CAPITAL                   (0, "menu.kingdom.hint-capital"),
 	MENU_KINGDOM_THEY_REQUESTED                 (0, "menu.kingdom.they-requested"),
 	MENU_KINGDOM_WE_REQUESTED                   (0, "menu.kingdom.we-requested"),
 	MENU_KINGDOM_DIPLOMACY_PEACE_WAR_INSTANT    (0, "menu.kingdom.diplomacy-peace-war-instant"),
@@ -336,7 +339,8 @@ public enum MessagePath {
 	MENU_KINGDOM_TITLE_TRANSFER        			(0, "menu.kingdom.title-transfer"),
 	MENU_KINGDOM_TITLE_TEMPLATE        			(0, "menu.kingdom.title-template"),
 	MENU_KINGDOM_TITLE_DISBAND         			(0, "menu.kingdom.title-disband"),
-    	
+	MENU_KINGDOM_TITLE_CAPITAL         			(0, "menu.kingdom.title-capital"),
+
 	GENERIC_NOTICE_ENABLE_AUTO                  (0, "generic.notice.enable-auto"),
 	GENERIC_NOTICE_DISABLE_AUTO                 (0, "generic.notice.disable-auto"),
 	GENERIC_NOTICE_REDUCE_FAVOR                 (2, "generic.notice.reduce-favor"),

@@ -300,6 +300,7 @@ menu:
     transfer: "Transfer"
     template: "Templates"
     disband: "Disband"
+    capital: "Capital"
     description-join: "Request to join a kingdom, or create your own with /k kingdom create"
     description-exile: "Leave your current kingdom and become a barbarian"
     description-invites: "View your kingdom invites"
@@ -311,6 +312,7 @@ menu:
     description-transfer: "Transfer master to another member"
     description-template: "Change kingdom monument template"
     description-disband: "Disband and delete the kingdom"
+    description-capital: "Move the Capital to a different town"
     hint-open: "Click to open"
     hint-exile: "Click to become a barbarian"
     hint-exit: "Exit the menu"
@@ -326,6 +328,7 @@ menu:
     hint-promote: "Click to promote to Officer"
     hint-demote: "Click to demote to Member"
     hint-transfer: "Click to give Master"
+    hint-capital: "Click to change to the Capital"
     they-requested: "They Requested"
     we-requested: "We Requested"
     diplomacy-peace-war-instant: "Instantly declare peace"
@@ -354,6 +357,7 @@ menu:
     title-transfer: "Kingdom Master Transfer"
     title-template: "Monument Templates"
     title-disband: "Disband Kingdom"
+    title-capital: "Move Capital"
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."

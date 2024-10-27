@@ -899,7 +899,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		capitalSwapCountdownTimer.setTime(0); // 1 second loop
 		capitalSwapCountdownTimer.startLoopTimer();
 		// Update display bars
-		String remainingTime = HelperUtil.getTimeFormat(warmupTime,ChatColor.GOLD);
+		String remainingTime = HelperUtil.getTimeFormat(warmupTime,"");
 		swapCapital.updateCapitalSwapBar(0, true, remainingTime);
 		capital.updateCapitalSwapBar(0, false, remainingTime);
 		// Send broadcast
