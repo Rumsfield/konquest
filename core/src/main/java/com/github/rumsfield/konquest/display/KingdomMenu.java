@@ -49,8 +49,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	 * ----------------------------------------------------------------------------------
 	 * Regular | *Join   		*Leave		+Info		*Invites	*List
 	 * Officer | *Relationship	*Requests
-	 * Master  | *Promote 		*Demote 	*Transfer 	+Open
-	 * Master  | *Template		*Disband	*Destroy	*Capital
+	 * Master  | *Promote 		*Demote 	*Transfer 	+Open		*Template		*Disband	*Destroy	*Capital
 	 *
 	 * Relationship selects other kingdom and opens diplomacy view, which selects new status (enemy, ally, etc)
 	 */
@@ -72,15 +71,14 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	private final int ROOT_SLOT_RELATIONSHIPS 	= 11;
 	private final int ROOT_SLOT_REQUESTS 		= 15;
 	// Row 2: 18 19 20 21 22 23 24 25 26
-	private final int ROOT_SLOT_PROMOTE 		= 19;
-	private final int ROOT_SLOT_DEMOTE 			= 21;
-	private final int ROOT_SLOT_TRANSFER		= 23;
-	private final int ROOT_SLOT_OPEN 			= 25;
-	// Row 3: 27 28 29 30 31 32 33 34 35
-	private final int ROOT_SLOT_TEMPLATE 		= 28;
-	private final int ROOT_SLOT_DISBAND			= 30;
-	private final int ROOT_SLOT_DESTROY		    = 32;
-	private final int ROOT_SLOT_CAPITAL		    = 34;
+	private final int ROOT_SLOT_PROMOTE 		= 18;
+	private final int ROOT_SLOT_DEMOTE 			= 19;
+	private final int ROOT_SLOT_TRANSFER		= 20;
+	private final int ROOT_SLOT_OPEN 			= 21;
+	private final int ROOT_SLOT_TEMPLATE 		= 23;
+	private final int ROOT_SLOT_DISBAND			= 24;
+	private final int ROOT_SLOT_DESTROY		    = 25;
+	private final int ROOT_SLOT_CAPITAL		    = 26;
 
 	private final int SLOT_YES 					= 3;
 	private final int SLOT_NO 					= 5;
@@ -157,7 +155,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 		if(menuAccess.equals(AccessType.OFFICER)) {
 			rows = 3;
 		} else if(menuAccess.equals(AccessType.MASTER)) {
-			rows = 5;
+			rows = 4;
 		}
 		
 		result = new DisplayMenu(rows, getTitle(MenuState.ROOT));
