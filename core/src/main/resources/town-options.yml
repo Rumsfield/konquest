@@ -1,0 +1,13 @@
+# Town Option Overrides
+# 
+# All towns and kingdom capitals have a set of options which affect how each town works.
+# By default, the town lords can modify these options in-game.
+# Use this config file to force any town options to a fixed value for all towns, and prevent
+# players from modifying it in-game.
+# 
+#
+# Remember to use the "/k admin reload" command after modifying this file if the server is running.
+# 
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
+town-options:
