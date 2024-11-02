@@ -28,7 +28,7 @@ public class QuickShopListener implements Listener {
 		if (opPlayer.isPresent()) {
 			boolean status = shopHandler.onShopCreate(event.getLocation(), opPlayer.get());
 			if(!status) {
-				event.setCancelled(true,(String)null);
+				event.setCancelled(true,"Konquest");
 			}
 		}
 	}
@@ -42,7 +42,7 @@ public class QuickShopListener implements Listener {
 		if (opPlayer.isPresent()) {
 			boolean status = shopHandler.onShopUse(event.getShop().getLocation(), opPlayer.get());
 			if (!status) {
-				event.setCancelled(true,(String)null);
+				event.setCancelled(true,"Konquest");
 			}
 		}
 	}
@@ -51,7 +51,7 @@ public class QuickShopListener implements Listener {
 	public void onShopClick(ShopClickEvent event) {
 		boolean status = shopHandler.onShopUse(event.getShop().getLocation(), event.getClicker());
 		if(!status) {
-			event.setCancelled(true,(String)null);
+			event.setCancelled(true,"Konquest");
 		}
 	}
 	
