@@ -1,15 +1,15 @@
 package com.github.rumsfield.konquest.listener;
 
+import com.ghostchu.quickshop.api.event.ShopClickEvent;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.shop.ShopHandler;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.maxgamer.quickshop.api.event.PlayerShopClickEvent;
-import org.maxgamer.quickshop.api.event.ShopPreCreateEvent;
-import org.maxgamer.quickshop.api.event.ShopPurchaseEvent;
+import com.ghostchu.quickshop.api.event.ShopPreCreateEvent;
+import com.ghostchu.quickshop.api.event.ShopPurchaseEvent;
+
+import java.util.Optional;
 
 public class QuickShopListener implements Listener {
 
@@ -24,9 +24,12 @@ public class QuickShopListener implements Listener {
 	 */
 	@EventHandler()
     public void onShopPreCreate(ShopPreCreateEvent event) {
-		boolean status = shopHandler.onShopCreate(event.getLocation(), event.getPlayer());
-		if(!status) {
-			event.setCancelled(true);
+		Optional<Player> opPlayer = event.getCreator().getBukkitPlayer();
+		if (opPlayer.isPresent()) {
+			boolean status = shopHandler.onShopCreate(event.getLocation(), opPlayer.get());
+			if(!status) {
+				event.setCancelled(true,(String)null);
+			}
 		}
 	}
 	
@@ -35,18 +38,20 @@ public class QuickShopListener implements Listener {
 	 */
 	@EventHandler()
     public void onShopPurchase(ShopPurchaseEvent event) {
-		Player purchaser = Bukkit.getPlayer(event.getPurchaser());
-		boolean status = shopHandler.onShopUse(event.getShop().getLocation(), purchaser);
-		if(!status) {
-			event.setCancelled(true);
+		Optional<Player> opPlayer = event.getPurchaser().getBukkitPlayer();
+		if (opPlayer.isPresent()) {
+			boolean status = shopHandler.onShopUse(event.getShop().getLocation(), opPlayer.get());
+			if (!status) {
+				event.setCancelled(true,(String)null);
+			}
 		}
 	}
 
 	@EventHandler()
-	public void onShopClick(PlayerShopClickEvent event) {
-		boolean status = shopHandler.onShopUse(event.getShop().getLocation(), event.getPlayer());
+	public void onShopClick(ShopClickEvent event) {
+		boolean status = shopHandler.onShopUse(event.getShop().getLocation(), event.getClicker());
 		if(!status) {
-			event.setCancelled(true);
+			event.setCancelled(true,(String)null);
 		}
 	}
 	

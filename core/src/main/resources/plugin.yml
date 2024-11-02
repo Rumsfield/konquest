@@ -12,6 +12,7 @@ softdepend:
   - ProtocolLib
   - ChestShop
   - QuickShop
+  - QuickShop-Hikari
   - LuckPerms
   - PlaceholderAPI
   - dynmap

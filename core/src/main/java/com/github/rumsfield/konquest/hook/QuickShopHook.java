@@ -1,12 +1,15 @@
 package com.github.rumsfield.konquest.hook;
 
+import com.ghostchu.quickshop.api.QuickShopProvider;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.listener.QuickShopListener;
+import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import org.bukkit.*;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.api.QuickShopAPI;
+import com.ghostchu.quickshop.api.QuickShopAPI;
 
 public class QuickShopHook implements PluginHook {
 
@@ -22,14 +25,18 @@ public class QuickShopHook implements PluginHook {
 
 	@Override
 	public String getPluginName() {
-		return "QuickShop";
+		return "QuickShop-Hikari";
 	}
 
 	@Override
 	public int reload() {
 		isEnabled = false;
+		// Check for older QuickShop
+		if (Bukkit.getPluginManager().isPluginEnabled("QuickShop")) {
+			ChatUtil.printConsoleError("Unsupported QuickShop plugin found, install QuickShop-Hikari plugin instead");
+		}
 		// Attempt to integrate QuickShop
-		Plugin quickShop = Bukkit.getPluginManager().getPlugin("QuickShop");
+		Plugin quickShop = Bukkit.getPluginManager().getPlugin("QuickShop-Hikari");
 		if(quickShop == null) {
 			return 1;
 		}
@@ -39,8 +46,12 @@ public class QuickShopHook implements PluginHook {
 		if(!konquest.getCore().getBoolean(CorePath.INTEGRATION_QUICKSHOP.getPath(),false)) {
 			return 3;
 		}
-
-		quickShopAPI = (QuickShopAPI) quickShop;
+		RegisteredServiceProvider<QuickShopProvider> provider = Bukkit.getServicesManager().getRegistration(QuickShopProvider.class);
+		if(provider == null){
+			ChatUtil.printConsoleError("Failed to integrate QuickShop-Hikari, plugin not found or disabled");
+			return -1;
+		}
+		quickShopAPI = provider.getProvider().getApiInstance();
 		isEnabled = true;
 		konquest.getPlugin().getServer().getPluginManager().registerEvents(new QuickShopListener(konquest.getPlugin()), konquest.getPlugin());
 		return 0;
