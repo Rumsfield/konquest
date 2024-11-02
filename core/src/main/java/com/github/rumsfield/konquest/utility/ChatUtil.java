@@ -2,7 +2,6 @@ package com.github.rumsfield.konquest.utility;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonPlayer;
-import me.lucko.helper.config.typeserializers.HelperTypeSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -74,32 +73,32 @@ public class ChatUtil {
 	public static String parseFormat(String base, String prefix, String suffix, String kingdom, String rank, String title, String name, String primaryColor, String secondaryColor, String kingdomWebColor) {
 		String message = base;
 		// Tags
-		if(prefix.equals("")) {
+		if(prefix.isEmpty()) {
 			message = message.replaceAll("%PREFIX%\\s*", "");
 		} else {
 			message = message.replace("%PREFIX%", prefix);
 		}
-		if(suffix.equals("")) {
+		if(suffix.isEmpty()) {
 			message = message.replaceAll("%SUFFIX%\\s*", "");
 		} else {
 			message = message.replace("%SUFFIX%", suffix);
 		}
-		if(kingdom.equals("")) {
+		if(kingdom.isEmpty()) {
 			message = message.replaceAll("%KINGDOM%\\s*", "");
 		} else {
 			message = message.replace("%KINGDOM%", kingdom);
 		}
-		if(rank.equals("")) {
+		if(rank.isEmpty()) {
 			message = message.replaceAll("%RANK%\\s*", "");
 		} else {
 			message = message.replace("%RANK%", rank);
 		}
-		if(title.equals("")) {
+		if(title.isEmpty()) {
 			message = message.replaceAll("%TITLE%\\s*", "");
 		} else {
 			message = message.replace("%TITLE%", title);
 		}
-		if(name.equals("")) {
+		if(name.isEmpty()) {
 			message = message.replaceAll("%NAME%\\s*", "");
 		} else {
 			message = message.replace("%NAME%", name);
@@ -363,7 +362,7 @@ public class ChatUtil {
 	}
 	
 	public static void sendKonTitle(KonPlayer player, String title, String subtitle) {
-		if(title.equals("")) {
+		if(title.isEmpty()) {
 			title = " ";
 		}
 		if(!player.isAdminBypassActive() && !player.isPriorityTitleDisplay()) {
@@ -372,7 +371,7 @@ public class ChatUtil {
 	}
 	
 	public static void sendKonTitle(KonPlayer player, String title, String subtitle, int duration) {
-		if(title.equals("")) {
+		if(title.isEmpty()) {
 			title = " ";
 		}
 		if(!player.isAdminBypassActive() && !player.isPriorityTitleDisplay()) {
@@ -381,7 +380,7 @@ public class ChatUtil {
 	}
 	
 	public static void sendKonPriorityTitle(KonPlayer player, String title, String subtitle, int durationTicks, int fadeInTicks, int fadeOutTicks) {
-		if(title.equals("")) {
+		if(title.isEmpty()) {
 			title = " ";
 		}
 		if(!player.isAdminBypassActive() && !player.isPriorityTitleDisplay()) {
@@ -399,7 +398,7 @@ public class ChatUtil {
 	}
 
 	public static void sendConstantTitle(Player player, String title, String subtitle) {
-		if(title.equals("")) {
+		if(title.isEmpty()) {
 			title = " ";
 		}
 		player.sendTitle(title, subtitle, 1, 9999999, 1);
