@@ -210,6 +210,13 @@ public class BlockListener implements Listener {
 						// Check for enemy player
 						if (playerRole.equals(KonquestRelationshipType.ENEMY)) {
 							// The player is an enemy and may edit blocks
+							// Check for barbarian allowed to attack
+							boolean isBarbarianAttackEnabled = konquest.getCore().getBoolean(CorePath.BARBARIANS_ALLOW_ATTACK_KINGDOMS.getPath(), true);
+							if (player.isBarbarian() && !isBarbarianAttackEnabled) {
+								ChatUtil.sendKonBlockedProtectionTitle(player);
+								event.setCancelled(true);
+								return;
+							}
 							// Check for capital capture conditions
 							if(isCapital && territory.getKingdom().isCapitalImmune()) {
 								// Capital is immune and cannot be attacked
@@ -354,6 +361,13 @@ public class BlockListener implements Listener {
 					}
 					// Prevent group members from breaking beds they don't own
 					if(isMember && !camp.isPlayerOwner(event.getPlayer()) && event.getBlock().getBlockData() instanceof Bed) {
+						ChatUtil.sendKonBlockedProtectionTitle(player);
+						event.setCancelled(true);
+						return;
+					}
+					// Check for barbarian allowed to attack
+					boolean isBarbarianAttackEnabled = konquest.getCore().getBoolean(CorePath.BARBARIANS_ALLOW_ATTACK_CAMPS.getPath(), true);
+					if (player.isBarbarian() && !isBarbarianAttackEnabled) {
 						ChatUtil.sendKonBlockedProtectionTitle(player);
 						event.setCancelled(true);
 						return;
