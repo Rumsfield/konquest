@@ -367,7 +367,7 @@ public class BlockListener implements Listener {
 					}
 					// Check for barbarian allowed to attack
 					boolean isBarbarianAttackEnabled = konquest.getCore().getBoolean(CorePath.BARBARIANS_ALLOW_ATTACK_CAMPS.getPath(), true);
-					if (player.isBarbarian() && !isBarbarianAttackEnabled) {
+					if (player.isBarbarian() && !camp.isPlayerOwner(event.getPlayer()) && !isBarbarianAttackEnabled) {
 						ChatUtil.sendKonBlockedProtectionTitle(player);
 						event.setCancelled(true);
 						return;

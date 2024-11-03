@@ -880,9 +880,9 @@ public class EntityListener implements Listener {
 					event.setCancelled(true);
 					return;
 				}
-				// Protect victim when attacker is barbarian and pvp is not allowed
-				if (attackerPlayer.isBarbarian() && !isBarbarianPvpEnabled) {
-					ChatUtil.sendKonBlockedFlagTitle(attackerPlayer);
+				// Protect against barbarian pvp
+				if (!isBarbarianPvpEnabled && (attackerPlayer.isBarbarian() || victimPlayer.isBarbarian())) {
+					ChatUtil.sendKonBlockedProtectionTitle(attackerPlayer);
 					event.setCancelled(true);
 					return;
 				}
