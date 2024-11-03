@@ -556,7 +556,19 @@ core:
     
     # Allow town knights to ignore plot protections (true/false)
     ignore_knights: true
-    
+
+  # //// CORE.BARBARIANS \\\\
+  barbarians:
+
+    # Allow barbarian players to modify blocks inside town land (true/false)
+    allow_attack_kingdoms: true
+
+    # Allow barbarian players to modify blocks inside other barbarian camps (true/false)
+    allow_attack_camps: true
+
+    # Allow barbarian players to damage other players (true/false)
+    allow_pvp: true
+
   # //// CORE.EXILE \\\\
   exile:
     

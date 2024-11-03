@@ -846,6 +846,7 @@ public class EntityListener implements Listener {
 			boolean isFlagArenaAllowed = konquest.getIntegrationManager().getWorldGuard().isLocationArenaAllowed(victimBukkitPlayer.getLocation(),attackerBukkitPlayer);
 
 			// Check for kingdom relationships
+			boolean isBarbarianPvpEnabled = konquest.getCore().getBoolean(CorePath.BARBARIANS_ALLOW_PVP.getPath(), true);
 			boolean isAllDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_ALL_PVP.getPath(), false);
 			boolean isPeaceDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_PEACEFUL_PVP.getPath(), false);
 			boolean isPlayerEnemy = true;
@@ -876,6 +877,12 @@ public class EntityListener implements Listener {
 				// Protect pvp when property is false
 				if (isPropertyPvpProtected) {
 					ChatUtil.sendKonBlockedFlagTitle(attackerPlayer);
+					event.setCancelled(true);
+					return;
+				}
+				// Protect against barbarian pvp
+				if (!isBarbarianPvpEnabled && (attackerPlayer.isBarbarian() || victimPlayer.isBarbarian())) {
+					ChatUtil.sendKonBlockedProtectionTitle(attackerPlayer);
 					event.setCancelled(true);
 					return;
 				}

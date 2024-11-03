@@ -167,7 +167,11 @@ public enum CorePath {
 	PLOTS_ALLOW_BUILD                                     ("core.plots.allow_build"),
 	PLOTS_ALLOW_CONTAINERS                                ("core.plots.allow_containers"),
 	PLOTS_IGNORE_KNIGHTS                                  ("core.plots.ignore_knights"),
-	
+
+	BARBARIANS_ALLOW_ATTACK_KINGDOMS                      ("core.barbarians.allow_attack_kingdoms"),
+	BARBARIANS_ALLOW_ATTACK_CAMPS                         ("core.barbarians.allow_attack_camps"),
+	BARBARIANS_ALLOW_PVP                                  ("core.barbarians.allow_pvp"),
+
 	EXILE_REMOVE_FAVOR                                    ("core.exile.remove_favor"),
 	EXILE_REMOVE_STATS                                    ("core.exile.remove_stats"),
 	EXILE_TELEPORT_WILD                                   ("core.exile.teleport_wild"),
