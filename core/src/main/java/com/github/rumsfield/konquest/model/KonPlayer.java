@@ -115,8 +115,11 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		}
 	}
 	
-	public boolean removeMobAttacker(Mob mob) {
-		return targetMobList.remove(mob);
+	public void removeMobAttacker(Mob mob) {
+		if(targetMobList.contains(mob)) {
+			mob.setTarget(null);
+			targetMobList.remove(mob);
+		}
 	}
 	
 	public void clearAllMobAttackers() {

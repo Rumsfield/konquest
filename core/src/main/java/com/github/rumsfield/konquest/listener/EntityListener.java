@@ -739,12 +739,10 @@ public class EntityListener implements Listener {
     					// Iron Golem lives
 	    				LivingEntity currentTarget = golem.getTarget();
 	    				if(currentTarget instanceof Player) {
-	    					if(!konquest.getPlayerManager().isOnlinePlayer((Player)currentTarget)) {
-	    						ChatUtil.printDebug("Failed to handle onEntityDamageByPlayer golem targeting for non-existent player");
-	    					} else {
-		    					KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
-		    					previousTargetPlayer.removeMobAttacker(golem);
-	    					}
+							KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
+							if (previousTargetPlayer != null) {
+								previousTargetPlayer.removeMobAttacker(golem);
+							}
 	    				}
 	    				golem.setTarget(bukkitPlayer);
 	    				player.addMobAttacker(golem);
