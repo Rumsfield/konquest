@@ -489,4 +489,10 @@ public class PlayerManager implements KonquestPlayerManager {
 		return new HashSet<>(onlinePlayers.keySet());
 	}
 
+	public void clearAllMobTargets() {
+		for (KonPlayer player : onlinePlayers.values()) {
+			player.clearAllMobAttackers();
+		}
+	}
+
 }

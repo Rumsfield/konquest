@@ -229,6 +229,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		ruinManager.regenAllRuins();
 		ruinManager.removeAllGolems();
 		kingdomManager.removeAllRabbits();
+		playerManager.clearAllMobTargets();
 		configManager.saveConfigs();
 		databaseThread.flushDatabase();
 		databaseThread.getDatabase().getDatabaseConnection().disconnect();

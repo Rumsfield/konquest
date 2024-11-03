@@ -1256,6 +1256,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			if (!isLocInside(golem.getLocation()) && getKonquest().getTerritoryManager().isChunkClaimed(golem.getLocation())) {
 				continue;
 			}
+			// Force player-created to make targeting easy to work with
+			golem.setPlayerCreated(true);
 			// Check for closest enemy player inside of town
 			boolean isNearbyPlayer = false;
 			double minDistance = 99;
