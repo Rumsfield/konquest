@@ -441,6 +441,8 @@ public class KingdomCommand extends CommandBase {
 								}
 								// Update map
 								konquest.getMapHandler().drawUpdateTerritory(kingdom);
+								// Update Discord roles
+								konquest.getIntegrationManager().getDiscordSrv().changeKingdomRole(kingdom.getName(), kingdom.getName(), kingdom.getWebColorFormal());
 								ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_WEB_COLOR_SET.getMessage(kingdom.getName(),colorStr));
 							} else {
 								// Incorrect arguments

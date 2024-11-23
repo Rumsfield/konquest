@@ -210,6 +210,9 @@ public class Konquest implements KonquestAPI, Timeable {
 		// Render Maps
 		mapHandler.initialize();
 
+		// Refresh Discord Roles
+		integrationManager.getDiscordSrv().refreshRoles();
+
 		// Enable special event listeners
 		boolean isTNTListenerEnabled = getCore().getBoolean(CorePath.ENABLE_ADVANCED_TNT_PROTECTION.getPath(),true);
 		if (isTNTListenerEnabled) {
@@ -289,6 +292,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		ChatUtil.printConsoleAlert("Reloading config files");
 		configManager.reloadConfigs();
 		initManagers();
+		integrationManager.getDiscordSrv().reloadSettings();
 		initWorlds();
 		printConfigFeatures();
 		ChatUtil.printConsoleAlert("Finished reload");

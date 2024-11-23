@@ -59,6 +59,8 @@ public class ConfigManager{
 		updateConfigVersion("prefix");
 		addConfig("commands", new KonConfig("commands",false));
 		updateConfigVersion("commands");
+		addConfig("discord", new KonConfig("discord",false));
+		updateConfigVersion("discord");
 
 		// Data Storage
 		migrateConfigFile("kingdoms.yml","data/kingdoms.yml");

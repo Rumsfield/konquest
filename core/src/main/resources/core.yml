@@ -223,6 +223,9 @@ core:
       # Send a message to the linked kingdom channel in Discord when a critical block is broken in a town monument (true/false)
       raid_alert_channel: true
 
+      # Automatically create and give roles based on kingdoms to linked Discord members (true/false)
+      auto_roles: true
+
     # (*) Enable plugin integration with EssentialsX (true/false)
     essentialsx: true
 

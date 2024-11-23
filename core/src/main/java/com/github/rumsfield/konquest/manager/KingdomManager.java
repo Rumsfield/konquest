@@ -559,6 +559,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				// Capital territory initialized successfully, finish kingdom setup
 				konquest.getTerritoryManager().addAllTerritory(centerLocation.getWorld(),newKingdom.getCapital().getChunkList());
 				konquest.getMapHandler().drawUpdateTerritory(newKingdom.getCapital());
+				// Update Discord roles
+				konquest.getIntegrationManager().getDiscordSrv().addKingdomRole(newKingdom.getName(),newKingdom.getWebColorFormal());
 				if(isAdmin) {
 					// This kingdom is operated by admins only
 					newKingdom.setIsAdminOperated(true);
@@ -663,6 +665,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				oldKingdom.removeCapital();
 				konquest.getTerritoryManager().removeAllTerritory(oldKingdom.getCapital().getWorld(),oldKingdom.getCapital().getChunkList().keySet());
 				konquest.getMapHandler().drawRemoveTerritory(oldKingdom.getCapital());
+				// Update Discord roles
+				konquest.getIntegrationManager().getDiscordSrv().removeKingdomRole(oldKingdom.getName());
 				oldKingdom = null;
 				// Update particle borders of everyone
 				// All kingdom's towns and capital were removed, so just update everyone's border particles.
@@ -707,6 +711,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		
 		// Perform rename
 		KonKingdom oldKingdom = getKingdom(oldName);
+		String oldKingdomName = oldKingdom.getName();
 		for (KonTown town : oldKingdom.getTowns()) {
 			konquest.getMapHandler().drawRemoveTerritory(town);
 		}
@@ -720,7 +725,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			konquest.getMapHandler().drawUpdateTerritory(town);
 		}
 		konquest.getDatabaseThread().getDatabase().setOfflinePlayers(konquest.getPlayerManager().getAllPlayersInKingdom(kingdom));
-		
+		// Update Discord roles
+		konquest.getIntegrationManager().getDiscordSrv().changeKingdomRole(oldKingdomName, kingdom.getName(), kingdom.getWebColorFormal());
+
 		// Withdraw cost
 		if(!ignoreCost && costRename > 0 && player != null && KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), costRename)) {
             konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costRename);
@@ -881,6 +888,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		 * 		Updates the smallest kingdom
 		 * 		Updates offline protections
 		 * 		Updates border particles for player
+		 * 		Updates discord roles, if enabled
 		 * 		
 		 */
     	
@@ -914,6 +922,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(joinKingdom.equals(playerKingdom) || joinKingdom.isMember(id)) {
 			return 5;
 		}
+		String oldKingdomName = playerKingdom.getName();
+		String newKingdomName = joinKingdom.getName();
 		// These checks may be bypassed when forced
 		if(!force) {
 			// Check for player that's already a kingdom master
@@ -963,7 +973,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Only perform membership updates on created kingdoms
 		if(playerKingdom.isCreated()) {
 			// Remove membership from old kingdom
-			String oldKingdomName = playerKingdom.getName();
 			boolean removeStatus;
 			// The player could be master here
 			// Potentially transfer master or disband old kingdom when force = true
@@ -989,8 +998,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		ChatUtil.printDebug("Failed to add member "+ id +" to kingdom "+joinKingdom.getName());
     		return -1;
     	}
-    	
-    	if(isOnline) {
+
+		if(isOnline) {
     		onlinePlayer.setKingdom(joinKingdom);
     		onlinePlayer.setExileKingdom(joinKingdom);
     		onlinePlayer.setBarbarian(false);
@@ -1014,7 +1023,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		offlinePlayer.setBarbarian(false);
     		konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
     	}
-    	
+		// Update Discord roles
+		OfflinePlayer commonPlayer = isOnline ? onlinePlayer.getBukkitPlayer() : offlinePlayer.getOfflineBukkitPlayer();
+		konquest.getIntegrationManager().getDiscordSrv().modifyPlayerRoles(commonPlayer, oldKingdomName, newKingdomName);
+		// Update maps
     	konquest.getMapHandler().drawLabel(joinKingdom.getCapital());
     	updateSmallestKingdom();
     	
@@ -1199,8 +1211,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		offlinePlayer.setBarbarian(true);
     		konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
     	}
-    	
-    	// Common updates
+		// Update Discord roles
+		OfflinePlayer commonPlayer = isOnline ? onlinePlayer.getBukkitPlayer() : offlinePlayer.getOfflineBukkitPlayer();
+		konquest.getIntegrationManager().getDiscordSrv().modifyPlayerRoles(commonPlayer, oldKingdomName, getBarbarians().getName());
+		// Common updates
     	konquest.getMapHandler().drawLabel(getKingdom(oldKingdomName).getCapital());
     	updateSmallestKingdom();
     	updateKingdomOfflineProtection();
