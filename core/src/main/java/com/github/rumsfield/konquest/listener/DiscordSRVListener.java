@@ -28,6 +28,8 @@ public class DiscordSRVListener {
         ChatUtil.printConsole("Chatting on Discord with " + DiscordUtil.getJda().getUsers().size() + " users!");
         // see https://ci.dv8tion.net/job/JDA/javadoc/ for JDA's javadoc
         // see https://github.com/DV8FromTheWorld/JDA/wiki for JDA's wiki
+        konquest.getIntegrationManager().getDiscordSrv().setDiscordReady();
+        konquest.getIntegrationManager().getDiscordSrv().refreshRoles();
     }
 
     @Subscribe(priority = ListenerPriority.MONITOR)

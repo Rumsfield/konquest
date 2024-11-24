@@ -923,7 +923,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return 5;
 		}
 		String oldKingdomName = playerKingdom.getName();
-		String newKingdomName = joinKingdom.getName();
 		// These checks may be bypassed when forced
 		if(!force) {
 			// Check for player that's already a kingdom master
@@ -1005,7 +1004,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		onlinePlayer.setBarbarian(false);
     		// Refresh any territory bars
     		KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(onlinePlayer.getBukkitPlayer().getLocation());
-    		if(territory != null && territory instanceof KonBarDisplayer) {
+    		if(territory instanceof KonBarDisplayer) {
     			((KonBarDisplayer)territory).removeBarPlayer(onlinePlayer);
     			((KonBarDisplayer)territory).addBarPlayer(onlinePlayer);
     		}
@@ -1024,8 +1023,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
     	}
 		// Update Discord roles
-		OfflinePlayer commonPlayer = isOnline ? onlinePlayer.getBukkitPlayer() : offlinePlayer.getOfflineBukkitPlayer();
-		konquest.getIntegrationManager().getDiscordSrv().modifyPlayerRoles(commonPlayer, oldKingdomName, newKingdomName);
+		KonOfflinePlayer commonPlayer = isOnline ? onlinePlayer : offlinePlayer;
+		konquest.getIntegrationManager().getDiscordSrv().refreshPlayerRoles(commonPlayer);
 		// Update maps
     	konquest.getMapHandler().drawLabel(joinKingdom.getCapital());
     	updateSmallestKingdom();
@@ -1212,8 +1211,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
     	}
 		// Update Discord roles
-		OfflinePlayer commonPlayer = isOnline ? onlinePlayer.getBukkitPlayer() : offlinePlayer.getOfflineBukkitPlayer();
-		konquest.getIntegrationManager().getDiscordSrv().modifyPlayerRoles(commonPlayer, oldKingdomName, getBarbarians().getName());
+		KonOfflinePlayer commonPlayer = isOnline ? onlinePlayer : offlinePlayer;
+		konquest.getIntegrationManager().getDiscordSrv().refreshPlayerRoles(commonPlayer);
 		// Common updates
     	konquest.getMapHandler().drawLabel(getKingdom(oldKingdomName).getCapital());
     	updateSmallestKingdom();

@@ -210,9 +210,6 @@ public class Konquest implements KonquestAPI, Timeable {
 		// Render Maps
 		mapHandler.initialize();
 
-		// Refresh Discord Roles
-		integrationManager.getDiscordSrv().refreshRoles();
-
 		// Enable special event listeners
 		boolean isTNTListenerEnabled = getCore().getBoolean(CorePath.ENABLE_ADVANCED_TNT_PROTECTION.getPath(),true);
 		if (isTNTListenerEnabled) {
@@ -221,6 +218,19 @@ public class Konquest implements KonquestAPI, Timeable {
 		}
 		
 		ChatUtil.printDebug("Finished core Konquest initialization");
+	}
+
+	// Initialization that happens after the database is ready on startup
+	public void initializePostDB() {
+		accomplishmentManager.loadCustomPrefixes();
+		databaseThread.getDatabase().spawnTables();
+		playerManager.initAllSavedPlayers();
+		kingdomManager.loadLegacyKingdomMemberships();
+		campManager.initCamps();
+		mapHandler.drawAllTerritories();
+		initOnlinePlayers();
+		integrationManager.getDiscordSrv().setKonquestReady();
+		integrationManager.getDiscordSrv().refreshRoles();
 	}
 	
 	public void disable() {

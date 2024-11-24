@@ -32,16 +32,9 @@ public class KonquestDB extends Database{
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        konquest.getAccomplishmentManager().loadCustomPrefixes();
-        spawnTables();
-        konquest.getPlayerManager().initAllSavedPlayers();
-        konquest.getKingdomManager().loadLegacyKingdomMemberships();
-        konquest.getCampManager().initCamps();
-        konquest.getMapHandler().drawAllTerritories();
+        konquest.initializePostDB();
         isReady = true;
         ChatUtil.printConsole("SQL database is ready");
-        
-        konquest.initOnlinePlayers();
     }
     
     public boolean isReady() {

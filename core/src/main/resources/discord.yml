@@ -29,96 +29,15 @@ discord:
   # Options for automatic kingdom roles
   # core.yml setting core.integration.discordsrv_options.auto_roles must be true
   # These settings apply to all kingdom roles
+  # https://docs.jda.wiki/net/dv8tion/jda/api/Permission.html
+  # Restart the server to refresh all roles
   roles:
-    icon-emoji: ":crown:"
+    # must be a hex code
+    default-color: '#A3A10A'
+    # must be text, used at the end of the role name
+    suffix: '(auto)'
     is-mentionable: true
     permissions:
       - "MESSAGE_SEND"
       - "VOICE_CONNECT"
       - "VOICE_SPEAK"
-
-  # Event Message Settings
-
-  # When a new kingdom is created
-  kingdom-create:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When a kingdom is disbanded or removed, not from enemy attacks
-  kingdom-disband:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When a kingdom is conquered by enemies capturing the capital
-  kingdom-conquer:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When a kingdom moves its capital to another town
-  kingdom-capital-swap:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When a new town is settled for a kingdom
-  town-settle:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When town is under attack and its monument's critical block is broken by enemy players
-  town-raid-alert:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When a town is destroyed, either by barbarians or by its own kingdom
-  town-destroy:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When a town is captured by an enemy kingdom
-  town-capture:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When a barbarian camp is destroyed by a player who is not the owner
-  camp-destroy:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When a ruin is captured by players
-  ruin-capture:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When two kingdoms become peaceful
-  diplomacy-peace:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When two kingdoms become trade partners
-  diplomacy-trade:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When two kingdoms become allied
-  diplomacy-allied:
-    enable: true
-    channel: "global"
-    message: "TODO"
-
-  # When two kingdoms start a war
-  diplomacy-war:
-    enable: true
-    channel: "global"
-    message: "TODO"

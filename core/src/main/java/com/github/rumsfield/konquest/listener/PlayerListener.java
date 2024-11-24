@@ -85,7 +85,6 @@ public class PlayerListener implements Listener {
 	 */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerJoin(PlayerJoinEvent event) {
-    	//ChatUtil.printDebug("EVENT: Player Joined");
     	Player bukkitPlayer = event.getPlayer();
     	KonPlayer player = konquest.initPlayer(bukkitPlayer);
     	// Schedule messages to display after 10-tick delay (0.5 second)
@@ -163,6 +162,7 @@ public class PlayerListener implements Listener {
 
 			// DiscordSRV
 			if(konquest.getIntegrationManager().getDiscordSrv().isEnabled()) {
+				konquest.getIntegrationManager().getDiscordSrv().refreshPlayerRoles(player);
 				String message = konquest.getIntegrationManager().getDiscordSrv().getLinkMessage(bukkitPlayer);
 				ChatUtil.sendNotice(bukkitPlayer, message);
 			}

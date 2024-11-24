@@ -11,6 +11,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.requests.restaction.RoleAct
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * API References
@@ -59,24 +61,33 @@ public class DiscordSrvHook implements PluginHook {
 		}
 	}
 
-	private final int barbarianColor = 0xa3a10a;
-	private final String roleSuffix = "(auto)";
 	private final String noPermissionMessage = "Failed to modify kingdom role to Discord. " +
 			"The bot lacks sufficient permissions to manage roles. " +
 			"Change the bot's permissions, or disable the auto_roles option in Konquest core.yml.";
 
-	private String roleEmoji;
+	private final int barbarianColor = 0xa3a10a;
+	private int roleDefaultColor;
+	private String roleSuffix;
 	private boolean roleIsMentionable;
 	private ArrayList<Permission> rolePermissions;
 
 	private final Konquest konquest;
 	private boolean isEnabled;
 	private final DiscordSRVListener discordSrvListener;
+	private boolean isKonquestReady;
+	private boolean isDiscordReady;
 	
 	public DiscordSrvHook(Konquest konquest) {
 		this.konquest = konquest;
 		this.isEnabled = false;
 		this.discordSrvListener = new DiscordSRVListener(konquest);
+		this.isKonquestReady = false;
+		this.isDiscordReady = false;
+
+		this.roleDefaultColor = barbarianColor;
+		this.roleSuffix = "(auto)";
+		this.roleIsMentionable = true;
+		this.rolePermissions = new ArrayList<>();
 	}
 
 	@Override
@@ -112,7 +123,16 @@ public class DiscordSrvHook implements PluginHook {
 
 	public void reloadSettings() {
 		if (!isEnabled) return;
-		roleEmoji = konquest.getConfigManager().getConfig("discord").getString("discord.roles.icon-emoji","");
+		String defaultColor = konquest.getConfigManager().getConfig("discord").getString("discord.roles.default-color","");
+		if (defaultColor.isEmpty()) {
+			roleDefaultColor = barbarianColor;
+		} else {
+			roleDefaultColor = ChatUtil.lookupColorRGB(defaultColor);
+			if (roleDefaultColor == -1) {
+				roleDefaultColor = barbarianColor;
+			}
+		}
+		roleSuffix = konquest.getConfigManager().getConfig("discord").getString("discord.roles.suffix","(auto)");
 		roleIsMentionable = konquest.getConfigManager().getConfig("discord").getBoolean("discord.roles.is-mentionable",true);
 		List<String> rolePermissionNames = konquest.getConfigManager().getConfig("discord").getStringList("discord.roles.permissions");
 		rolePermissions = new ArrayList<>();
@@ -138,7 +158,19 @@ public class DiscordSrvHook implements PluginHook {
 	public boolean isEnabled() {
 		return isEnabled;
 	}
-	
+
+	public void setKonquestReady() {
+		isKonquestReady = true;
+	}
+
+	public void setDiscordReady() {
+		isDiscordReady = true;
+	}
+
+	private boolean isReady() {
+		return isEnabled && isKonquestReady && isDiscordReady;
+	}
+
 	public String getLinkMessage(Player player) {
 		if (!isEnabled) return "";
 		String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(player.getUniqueId());
@@ -191,130 +223,208 @@ public class DiscordSrvHook implements PluginHook {
 	 */
 
 	private String formatRoleName(String baseName) {
-        return baseName + " " + roleSuffix;
+        return roleSuffix.isEmpty() ? baseName : baseName + " " + roleSuffix;
+	}
+
+	private boolean isRoleAuto(String roleName) {
+		return !roleSuffix.isEmpty() && roleName.contains(roleSuffix);
 	}
 
 	/**
-	 * Ensure that all kingdoms have roles on Discord, when enabled
+	 * Sends a role update command to Discord
+	 * @param role The role to modify
+	 * @param name The new role name, ignored when empty string
+	 * @param color The new role color, ignore when 0
+	 * @return True when the update was successful, else false
 	 */
-	public void refreshRoles() {
-		if (!isEnabled) return;
-		boolean isAutoRoleEnabled = konquest.getCore().getBoolean(CorePath.INTEGRATION_DISCORDSRV_OPTIONS_AUTO_ROLES.getPath());
-		if (!isAutoRoleEnabled) return;
+	private boolean updateRole(Role role, String name, int color) {
+		RoleManager manager = role.getManager();
+		// Update name
+		if (!name.isEmpty()) {
+			manager = manager.setName(name);
+		}
+		// Update color
+		if (color != 0) {
+			manager = manager.setColor(color);
+		}
+		// Update mentionable
+		manager = manager.setMentionable(roleIsMentionable);
+		// Update permissions
+		manager = manager.setPermissions(rolePermissions);
+		// Send update
+		try {
+			manager.reason("Konquest auto role update");
+			manager.queue();
+			ChatUtil.printDebug("Discord updated existing role: "+role.getName());
+		} catch (Exception me) {
+			ChatUtil.sendAdminBroadcast(noPermissionMessage);
+			ChatUtil.printConsoleError(noPermissionMessage);
+			return false;
+		}
+		return true;
+	}
+
+	private boolean createRole(String name, int color, Consumer<Role> callback) {
 		Guild mainGuild = DiscordSRV.getPlugin().getMainGuild();
 		if (mainGuild == null) {
-			ChatUtil.printDebug("Discord main guild does not exist.");
+			ChatUtil.printConsoleError("Discord main guild does not exist.");
+			return false;
+		}
+		RoleAction addRole = mainGuild.createRole();
+		// Set name
+		if (!name.isEmpty()) {
+			addRole = addRole.setName(name);
+		}
+		// Set color
+		if (color != 0) {
+			addRole = addRole.setColor(color);
+		}
+		// Set mentionable
+		addRole = addRole.setMentionable(roleIsMentionable);
+		// Set permissions
+		addRole = addRole.setPermissions(rolePermissions);
+		// Send creation
+		try {
+			addRole.reason("Konquest auto role creation");
+			if (callback == null) {
+				addRole.queue();
+			} else {
+				addRole.queue(callback);
+			}
+			ChatUtil.printDebug("Discord created new role: "+name);
+		} catch (Exception me) {
+			ChatUtil.sendAdminBroadcast(noPermissionMessage);
+			ChatUtil.printConsoleError(noPermissionMessage);
+			return false;
+		}
+		return true;
+	}
+
+	private boolean deleteRole(Role role) {
+		try {
+			role.delete().reason("Konquest auto role removal").queue();
+			ChatUtil.printDebug("Discord removed existing role: "+role.getName());
+		} catch (Exception me) {
+			ChatUtil.sendAdminBroadcast(noPermissionMessage);
+			ChatUtil.printConsoleError(noPermissionMessage);
+			return false;
+		}
+		return true;
+	}
+
+	public void refreshRoles() {
+		if (!isReady()) return;
+		boolean isAutoRoleEnabled = konquest.getCore().getBoolean(CorePath.INTEGRATION_DISCORDSRV_OPTIONS_AUTO_ROLES.getPath());
+		if (!isAutoRoleEnabled) return;
+		ChatUtil.printConsoleAlert("Starting Discord Auto-Role Refresh");
+		Guild mainGuild = DiscordSRV.getPlugin().getMainGuild();
+		if (mainGuild == null) {
+			ChatUtil.printConsoleError("Discord main guild does not exist.");
 			return;
 		}
-		int numDiscordRoles = 0;
-		int numMemberRoles = 0;
-		// Get all kingdom names
-        HashMap<String,Integer> allActiveRoles = new HashMap<>(); // names and colors
-		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
-			allActiveRoles.put(formatRoleName(kingdom.getName()),kingdom.getWebColorFormal());
+		int numRolesCreated = 0;
+		int numRolesUpdated = 0;
+		int numRolesDeleted = 0;
+
+		// Get all kingdoms
+		HashSet<String> activeKingdomRoleNames = new HashSet<>();
+		ArrayList<KonKingdom> allKingdoms = new ArrayList<>();
+		allKingdoms.add(konquest.getKingdomManager().getBarbarians());
+		allKingdoms.addAll(konquest.getKingdomManager().getKingdoms());
+		for (KonKingdom kingdom : allKingdoms) {
+			activeKingdomRoleNames.add(formatRoleName(kingdom.getName()));
 		}
-		allActiveRoles.put(formatRoleName(konquest.getKingdomManager().getBarbarians().getName()),barbarianColor);
-		// Check all current Discord roles for actives and pruning
-		for (Role currentRole : mainGuild.getRoles()) {
-			String roleName = currentRole.getName();
-			// Check for role format
-			if (!roleName.contains(roleSuffix)) {
+
+		// Go through all active kingdom roles
+		for (KonKingdom kingdom : allKingdoms) {
+			String kingdomRoleName = formatRoleName(kingdom.getName()); // may or may not have suffix tag
+			int kingdomColor = kingdom.getWebColorFormal();
+			if (kingdom.equals(konquest.getKingdomManager().getBarbarians())) {
+				kingdomColor = roleDefaultColor;
+			}
+
+			// Get kingdom members
+			HashSet<Member> kingdomMembers = new HashSet<>();
+			for (OfflinePlayer player : konquest.getPlayerManager().getAllBukkitPlayersInKingdom(kingdom)) {
+				Member playerMember = getPlayerMember(player);
+				if (playerMember == null) {
+					// Player is not linked to Discord, skip
+					continue;
+				}
+				kingdomMembers.add(playerMember);
+			}
+
+			// Get other Discord roles that are not this kingdom role, which have a suffix tag
+			HashSet<Role> rolesToRemove = new HashSet<>();
+			for (Role discordRole : mainGuild.getRoles()) {
+				String discordRoleName = discordRole.getName();
+				if (!discordRoleName.equalsIgnoreCase(kingdomRoleName) && (isRoleAuto(discordRoleName) || activeKingdomRoleNames.contains(discordRoleName))) {
+					// Discord role is another active kingdom role, or has a suffix tag
+					rolesToRemove.add(discordRole);
+				}
+			}
+
+			// Check if role exists on discord
+			if (mainGuild.getRolesByName(kingdomRoleName,true).isEmpty()) {
+				// Role does not exist, create it
+				Consumer<Role> callback = (role) -> {
+					// Assign all kingdom members the role
+					for (Member member : kingdomMembers) {
+						DiscordUtil.removeRolesFromMember(member, rolesToRemove);
+						DiscordUtil.addRoleToMember(member, role);
+						ChatUtil.printDebug("Discord assigned role "+role.getName()+" to member "+member.getEffectiveName());
+					}
+				};
+				// Send creation
+				if (createRole(kingdomRoleName, kingdomColor, callback)) {
+					numRolesCreated++;
+				} else {
+					return;
+				}
+			} else {
+				// Role exists, update it
+				Role kingdomRole = mainGuild.getRolesByName(kingdomRoleName,true).getFirst();
+				// Assign all kingdom members the role
+				for (Member member : kingdomMembers) {
+					DiscordUtil.removeRolesFromMember(member, rolesToRemove);
+					DiscordUtil.addRoleToMember(member, kingdomRole);
+					ChatUtil.printDebug("Discord assigned role "+kingdomRole.getName()+" to member "+member.getEffectiveName());
+				}
+				RoleManager manager = kingdomRole.getManager()
+						.setColor(kingdomColor)
+						.setMentionable(roleIsMentionable)
+						.setPermissions(rolePermissions);
+				// Send update
+				if (updateRole(kingdomRole,"", kingdomColor)) {
+					numRolesUpdated++;
+				} else {
+					return;
+				}
+			}
+		}
+
+		// Prune any stale roles from Discord that have a suffix tag
+		for (Role discordRole : mainGuild.getRoles()) {
+			String roleName = discordRole.getName();
+			// Check for role format and active kingdom name
+			if (!isRoleAuto(roleName) || activeKingdomRoleNames.contains(roleName)) {
 				// This role does not have the special Konquest role format, skip it
 				continue;
 			}
-			// Check for kingdom match
-			if (allActiveRoles.containsKey(roleName)) {
-				// This Discord role matches an active kingdom
-				int roleColor = allActiveRoles.get(roleName);
-				// Update it
-				try {
-					currentRole.getManager().
-							setColor(roleColor).
-							setIcon(roleEmoji).
-							setMentionable(roleIsMentionable).
-							setPermissions(rolePermissions).
-							queue();
-					ChatUtil.printDebug("Discord role refresh updated existing role: "+roleName);
-					numDiscordRoles++;
-				} catch (Exception me) {
-					ChatUtil.sendAdminBroadcast(noPermissionMessage);
-					ChatUtil.printConsoleError(noPermissionMessage);
-					return;
-				}
-				// Remove this role name from the active set
-				allActiveRoles.remove(roleName);
-			} else {
-				// This Discord role does not match any kingdom, delete it
-				try {
-					currentRole.delete().reason("Konquest auto role removal").queue();
-					ChatUtil.printDebug("Discord role refresh removed stale existing role: "+roleName);
-				} catch (Exception me) {
-					ChatUtil.sendAdminBroadcast(noPermissionMessage);
-					ChatUtil.printConsoleError(noPermissionMessage);
-					return;
-				}
+			if (discordRole.isPublicRole() || discordRole.isManaged()) {
+				// This role is public or managed
+				continue;
 			}
-		}
-		// Add all kingdom roles that don't exist
-		// Any remaining active roles must be created
-		for (String roleName : allActiveRoles.keySet()) {
-			int roleColor = allActiveRoles.get(roleName);
-			try {
-				RoleAction addRole = mainGuild.createRole().
-						setName(roleName).
-						setColor(roleColor).
-						setIcon(roleEmoji).
-						setMentionable(roleIsMentionable).
-						setPermissions(rolePermissions);
-				addRole.reason("Konquest auto role creation");
-				addRole.queue();
-				ChatUtil.printDebug("Discord role refresh created new role: "+roleName);
-				numDiscordRoles++;
-			} catch (Exception me) {
-				ChatUtil.sendAdminBroadcast(noPermissionMessage);
-				ChatUtil.printConsoleError(noPermissionMessage);
+			// This role has a Konquest auto role suffix tag, but is not included in the active kingdom roles.
+			// Delete it.
+			if (deleteRole(discordRole)) {
+				numRolesDeleted++;
+			} else {
 				return;
 			}
 		}
-		// Update all member roles
-		for (KonOfflinePlayer player : konquest.getPlayerManager().getAllKonquestOfflinePlayers()) {
-			Member playerMember = getPlayerMember(player.getOfflineBukkitPlayer());
-			if (playerMember == null) {
-				// Player is not linked to Discord, skip
-				continue;
-			}
-			// Ensure player is assigned their kingdom role
-			String kingdomRoleName = formatRoleName(player.getKingdom().getName());
-			boolean hasKingdomRole = false;
-			HashSet<Role> rolesToRemove = new HashSet<>();
-			for (Role memberRole : playerMember.getRoles()) {
-				// Check if member has their kingdom role
-				if (memberRole.getName().equalsIgnoreCase(kingdomRoleName)) {
-					// This role is for the active kingdom, keep it
-					hasKingdomRole = true;
-				} else if (memberRole.getName().contains(roleSuffix)) {
-					// This role is from another kingdom, remove it
-					rolesToRemove.add(memberRole);
-				}
-			}
-			// Add kingdom role
-			if (!hasKingdomRole) {
-				List<Role> kingdomRoles = mainGuild.getRolesByName(kingdomRoleName,true);
-				if (!kingdomRoles.isEmpty()) {
-					DiscordUtil.addRoleToMember(playerMember, kingdomRoles.get(0));
-					ChatUtil.printDebug("Discord role refresh assigned role to member: "+kingdomRoleName+", "+playerMember.getEffectiveName());
-				} else {
-					ChatUtil.printDebug("Discord role refresh failed to assign unknown role: "+kingdomRoleName);
-				}
-			}
-			// Remove any extra kingdom roles
-			DiscordUtil.removeRolesFromMember(playerMember, rolesToRemove);
-			if (!rolesToRemove.isEmpty()) {
-				ChatUtil.printDebug("Discord role refresh removed "+rolesToRemove.size()+" stale role(s) from member: "+playerMember.getEffectiveName());
-			}
-			numMemberRoles++;
-		}
-		ChatUtil.printConsoleAlert("Discord Auto-Role refresh finished with "+numDiscordRoles+" total kingdom roles, assigned to "+numMemberRoles+" members.");
+
+		ChatUtil.printConsoleAlert("Discord Auto-Role refresh finished with "+numRolesCreated+" kingdom roles created, "+numRolesUpdated+" updated, "+numRolesDeleted+" deleted.");
 	}
 
 	/**
@@ -324,7 +434,7 @@ public class DiscordSrvHook implements PluginHook {
 	 * @param color The color of the role as a rgb integer
 	 */
 	public void addKingdomRole(String kingdomName, int color) {
-		if (!isEnabled) return;
+		if (!isReady()) return;
 		boolean isAutoRoleEnabled = konquest.getCore().getBoolean(CorePath.INTEGRATION_DISCORDSRV_OPTIONS_AUTO_ROLES.getPath());
 		if (!isAutoRoleEnabled) return;
 		Guild mainGuild = DiscordSRV.getPlugin().getMainGuild();
@@ -332,25 +442,14 @@ public class DiscordSrvHook implements PluginHook {
 			ChatUtil.printDebug("Discord main guild does not exist.");
 			return;
 		}
-		if (!mainGuild.getRolesByName(formatRoleName(kingdomName),true).isEmpty()) {
+		String roleName = formatRoleName(kingdomName);
+		if (!mainGuild.getRolesByName(roleName,true).isEmpty()) {
 			// This role already exists
 			ChatUtil.printDebug("Discord kingdom role already exists, could not add "+kingdomName);
 			return;
 		}
 		// Create the role
-		try {
-			RoleAction addRole = mainGuild.createRole().
-					setName(formatRoleName(kingdomName)).
-					setColor(color).
-					setIcon(roleEmoji).
-					setMentionable(roleIsMentionable).
-					setPermissions(rolePermissions);
-			addRole.reason("Konquest auto role creation");
-			addRole.queue();
-		} catch (Exception me) {
-			ChatUtil.sendAdminBroadcast(noPermissionMessage);
-			ChatUtil.printConsoleError(noPermissionMessage);
-		}
+		createRole(roleName, color, (role) -> ChatUtil.printDebug("Discord finished creating role "+role.getName()));
 	}
 
 	/**
@@ -358,7 +457,7 @@ public class DiscordSrvHook implements PluginHook {
 	 * @param kingdomName The name of the role to remove
 	 */
 	public void removeKingdomRole(String kingdomName) {
-		if (!isEnabled) return;
+		if (!isReady()) return;
 		boolean isAutoRoleEnabled = konquest.getCore().getBoolean(CorePath.INTEGRATION_DISCORDSRV_OPTIONS_AUTO_ROLES.getPath());
 		if (!isAutoRoleEnabled) return;
 		Guild mainGuild = DiscordSRV.getPlugin().getMainGuild();
@@ -368,12 +467,7 @@ public class DiscordSrvHook implements PluginHook {
 		}
 		for (Role kingdomRole : mainGuild.getRolesByName(formatRoleName(kingdomName),true)) {
 			// Remove the role
-			try {
-				kingdomRole.delete().reason("Konquest auto role removal").queue();
-			} catch (Exception me) {
-				ChatUtil.sendAdminBroadcast(noPermissionMessage);
-				ChatUtil.printConsoleError(noPermissionMessage);
-			}
+			deleteRole(kingdomRole);
 		}
 	}
 
@@ -384,7 +478,7 @@ public class DiscordSrvHook implements PluginHook {
 	 * @param changeToColor The new color for the role
 	 */
 	public void changeKingdomRole(String kingdomName, String changeToName, int changeToColor) {
-		if (!isEnabled) return;
+		if (!isReady()) return;
 		boolean isAutoRoleEnabled = konquest.getCore().getBoolean(CorePath.INTEGRATION_DISCORDSRV_OPTIONS_AUTO_ROLES.getPath());
 		if (!isAutoRoleEnabled) return;
 		Guild mainGuild = DiscordSRV.getPlugin().getMainGuild();
@@ -392,33 +486,29 @@ public class DiscordSrvHook implements PluginHook {
 			ChatUtil.printDebug("Discord main guild does not exist.");
 			return;
 		}
+		String updateName = "";
+		if (changeToName != null && !changeToName.isEmpty() && !changeToName.equals(kingdomName)) {
+			updateName = formatRoleName(changeToName);
+		}
+		int updateColor = 0;
+		if (changeToColor != 0 && changeToColor != -1) {
+			updateColor = changeToColor;
+		}
 		for (Role kingdomRole : mainGuild.getRolesByName(formatRoleName(kingdomName),true)) {
-			try {
-				kingdomRole.getManager().
-						setName(formatRoleName(changeToName)).
-						setColor(changeToColor).
-						setIcon(roleEmoji).
-						setMentionable(roleIsMentionable).
-						setPermissions(rolePermissions).
-						queue();
-			} catch (Exception me) {
-				ChatUtil.sendAdminBroadcast(noPermissionMessage);
-				ChatUtil.printConsoleError(noPermissionMessage);
-			}
+			updateRole(kingdomRole, updateName, updateColor);
 		}
 	}
 
 	/**
-	 * Change a player's roles on Discord.
-	 * Remove and add roles with this method.
-	 * @param player The player who is a member of the Discord guild.
-	 * @param removeRoleName The name of a role to remove, skip when empty string
-	 * @param addRoleName The name of a role to add, skip when empty string
+	 * Update a player's roles on Discord to match their active kingdom
+	 * @param player The player to update roles
 	 */
-	public void modifyPlayerRoles(OfflinePlayer player, String removeRoleName, String addRoleName) {
-		Member playerMember = getPlayerMember(player);
+	public void refreshPlayerRoles(KonOfflinePlayer player) {
+		if (!isReady()) return;
+		boolean isAutoRoleEnabled = konquest.getCore().getBoolean(CorePath.INTEGRATION_DISCORDSRV_OPTIONS_AUTO_ROLES.getPath());
+		if (!isAutoRoleEnabled) return;
+		Member playerMember = getPlayerMember(player.getOfflineBukkitPlayer());
 		if (playerMember == null) {
-			ChatUtil.printDebug("Discord member does not exist for player "+player.getName());
 			return;
 		}
 		Guild mainGuild = DiscordSRV.getPlugin().getMainGuild();
@@ -426,25 +516,41 @@ public class DiscordSrvHook implements PluginHook {
 			ChatUtil.printDebug("Discord main guild does not exist.");
 			return;
 		}
-		// Try to remove roles
-		if (!removeRoleName.isEmpty()) {
-			HashSet<Role> rolesToRemove = new HashSet<>(mainGuild.getRolesByName(formatRoleName(removeRoleName), true));
-			if (!rolesToRemove.isEmpty()) {
-				DiscordUtil.removeRolesFromMember(playerMember, rolesToRemove);
-			} else {
-				ChatUtil.printDebug("Failed to remove role \""+addRoleName+"\" from member \""+playerMember.getEffectiveName()+"\" linked to player \""+player.getName()+"\", role does not exist on Discord.");
-			}
+		String kingdomRoleName = formatRoleName(player.getKingdom().getName());
+		// Get all kingdoms
+		HashSet<String> activeKingdomRoleNames = new HashSet<>();
+		ArrayList<KonKingdom> allKingdoms = new ArrayList<>();
+		allKingdoms.add(konquest.getKingdomManager().getBarbarians());
+		allKingdoms.addAll(konquest.getKingdomManager().getKingdoms());
+		for (KonKingdom kingdom : allKingdoms) {
+			activeKingdomRoleNames.add(formatRoleName(kingdom.getName()));
 		}
-		// Try to add roles
-		if (!addRoleName.isEmpty()) {
-			HashSet<Role> rolesToAdd = new HashSet<>(mainGuild.getRolesByName(formatRoleName(addRoleName), true));
-			if (!rolesToAdd.isEmpty()) {
-				DiscordUtil.addRolesToMember(playerMember, rolesToAdd);
-			} else {
-				ChatUtil.printDebug("Failed to add role \""+addRoleName+"\" to member \""+playerMember.getEffectiveName()+"\" linked to player \""+player.getName()+"\", role does not exist on Discord.");
+		// Add the active kingdom role
+		// Remove all other kingdom roles, and any other roles with suffix tags
+		HashSet<Role> rolesToRemove = new HashSet<>();
+		HashSet<Role> rolesToAdd = new HashSet<>();
+		// Delay task 5 seconds
+		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), () -> {
+			for (Role discordRole : mainGuild.getRoles()) {
+				String discordRoleName = discordRole.getName();
+				if (discordRoleName.equalsIgnoreCase(kingdomRoleName)) {
+					// This discord role is the active kingdom role
+					rolesToAdd.add(discordRole);
+				} else {
+					// This role is not the active role
+					if (isRoleAuto(discordRoleName) || activeKingdomRoleNames.contains(discordRoleName)) {
+						// Discord role is another active kingdom role, or has a suffix tag
+						rolesToRemove.add(discordRole);
+					}
+				}
 			}
-		}
-    }
+			if (rolesToAdd.isEmpty()) {
+				ChatUtil.printDebug("Discord is missing active kingdom role "+kingdomRoleName);
+			}
+			DiscordUtil.modifyRolesOfMember(playerMember,rolesToAdd,rolesToRemove);
+			ChatUtil.printDebug("Discord refreshed role \""+kingdomRoleName+"\" for member \""+playerMember.getEffectiveName()+"\" linked to player \""+player.getOfflineBukkitPlayer().getName()+"\".");
+		}, 20*5);
+	}
 
 	/*
 	 * Messaging Methods
