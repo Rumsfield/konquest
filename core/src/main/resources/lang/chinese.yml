@@ -429,7 +429,6 @@ protection:
     raze: '%s 鎮已被蠻族大軍摧毀！'
     destroy: 您已經為蠻族榮譽摧毀了 %s！
     conquer: '%s 鎮已被征服！'
-    conquer-discord: '%s 鎮已被 %s 征服！'
     capture: 您已經征服了 %s，以征服 %s！
     kingdom-warmup: '%s 王國將在 %s 分鐘內受到保護。'
     kingdom-conquer: '%s 王國已被 %s 征服！'

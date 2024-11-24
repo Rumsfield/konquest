@@ -1483,9 +1483,6 @@ public class BlockListener implements Listener {
 					int y = capturedTown.getCenterLoc().getBlockY();
 					int z = capturedTown.getCenterLoc().getBlockZ();
 					konquest.getMapHandler().postBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(capturedTown.getName())+" ("+x+","+y+","+z+")");
-					// Broadcast to Discord
-					// TODO improve this?
-					konquest.getIntegrationManager().getDiscordSrv().sendGameToDiscordMessage("global", ":crossed_swords: **"+MessagePath.PROTECTION_NOTICE_CONQUER_DISCORD.getMessage(capturedTown.getName(),capturedTown.getKingdom().getName())+"**");
 					capturedTown.getMonumentTimer().stopTimer();
 					capturedTown.setAttacked(false,player);
 					capturedTown.setBarProgress(1.0);

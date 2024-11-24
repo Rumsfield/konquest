@@ -408,7 +408,6 @@ public enum MessagePath {
 	PROTECTION_NOTICE_RAZE                      (1, "protection.notice.raze"),
 	PROTECTION_NOTICE_DESTROY                   (1, "protection.notice.destroy"),
 	PROTECTION_NOTICE_CONQUER                   (1, "protection.notice.conquer"),
-	PROTECTION_NOTICE_CONQUER_DISCORD           (2, "protection.notice.conquer-discord"),
 	PROTECTION_NOTICE_CAPTURE                   (2, "protection.notice.capture"),
 	PROTECTION_NOTICE_KINGDOM_WARMUP            (2, "protection.notice.kingdom-warmup"),
 	PROTECTION_NOTICE_KINGDOM_CONQUER           (2, "protection.notice.kingdom-conquer"),

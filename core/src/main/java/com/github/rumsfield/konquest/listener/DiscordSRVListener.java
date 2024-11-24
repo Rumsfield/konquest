@@ -2,13 +2,13 @@ package com.github.rumsfield.konquest.listener;
 
 import com.github.rumsfield.konquest.Konquest;
 
+import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import github.scarsz.discordsrv.DiscordSRV;
 
 import github.scarsz.discordsrv.api.ListenerPriority;
 import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.*;
-
 
 import github.scarsz.discordsrv.util.DiscordUtil;
 
@@ -30,6 +30,17 @@ public class DiscordSRVListener {
         // see https://github.com/DV8FromTheWorld/JDA/wiki for JDA's wiki
         konquest.getIntegrationManager().getDiscordSrv().setDiscordReady();
         konquest.getIntegrationManager().getDiscordSrv().refreshRoles();
+    }
+
+    @Subscribe(priority = ListenerPriority.MONITOR)
+    public void onDiscordAccountLinked(AccountLinkedEvent event) {
+        ChatUtil.printDebug("Discord member linked account to player "+event.getPlayer().getName());
+        KonOfflinePlayer player = konquest.getPlayerManager().getOfflinePlayerFromID(event.getPlayer().getUniqueId());
+        if (player == null) {
+            ChatUtil.printDebug("Failed to find linked player from Konquest database.");
+            return;
+        }
+        konquest.getIntegrationManager().getDiscordSrv().refreshPlayerRoles(player);
     }
 
     @Subscribe(priority = ListenerPriority.MONITOR)

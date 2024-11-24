@@ -5,13 +5,11 @@ import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import github.scarsz.discordsrv.dependencies.jda.api.Permission;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.*;
-import github.scarsz.discordsrv.dependencies.jda.api.exceptions.InsufficientPermissionException;
 import github.scarsz.discordsrv.dependencies.jda.api.managers.RoleManager;
 import github.scarsz.discordsrv.dependencies.jda.api.requests.restaction.RoleAction;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -24,7 +22,6 @@ import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
@@ -556,6 +553,7 @@ public class DiscordSrvHook implements PluginHook {
 	 * Messaging Methods
 	 */
 
+	//TODO remove this? DiscordSRV alerts can replace this function
 	public boolean sendGameToDiscordMessage(String channel, String message) {
 		if (!isEnabled) return false;
 		TextChannel textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName(channel);
@@ -569,7 +567,8 @@ public class DiscordSrvHook implements PluginHook {
 		textChannel.sendMessage(message).queue();
 		return true;
 	}
-	
+
+	// For sending chat messages to the DiscordSRV processor
 	public void sendGameChatToDiscord(Player player, String message, String channel, boolean isCancelled) {
 		if (!isEnabled) return;
 		DiscordSRV.getPlugin().processChatMessage(player, message, channel, isCancelled);

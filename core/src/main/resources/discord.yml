@@ -29,15 +29,31 @@ discord:
   # Options for automatic kingdom roles
   # core.yml setting core.integration.discordsrv_options.auto_roles must be true
   # These settings apply to all kingdom roles
-  # https://docs.jda.wiki/net/dv8tion/jda/api/Permission.html
   # Restart the server to refresh all roles
   roles:
-    # must be a hex code
+
+    # The color of the default role (Barbarians).
+    # You may use hex colors ('#FF8080'), see https://htmlcolorcodes.com/
+    # Or you may use named colors ('RED'), see https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html
     default-color: '#A3A10A'
-    # must be text, used at the end of the role name
+
+    # The suffix tag applied to the end of a kingdom role's name.
+    # This is used to keep track of auto roles in Discord.
+    # This can be an empty value (''), then the role name will simply be the kingdom name (not recommended).
     suffix: '(auto)'
+
+    # Whether all auto roles can be mentioned by Discord members.
+    # When true, roles can be mentioned in Discord, for example: @Rome (auto) Hello!
     is-mentionable: true
+
+    # List of permissions to be applied to Discord roles.
+    # Permissions must match from this list: https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/jda/api/Permission.html
     permissions:
-      - "MESSAGE_SEND"
+      - "MESSAGE_WRITE"
+      - "MESSAGE_READ"
+      - "VIEW_CHANNEL"
       - "VOICE_CONNECT"
       - "VOICE_SPEAK"
+
+  messages:
+
