@@ -1,6 +1,8 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.event.kingdom.KonquestKingdomCapitalSwapEvent;
+import com.github.rumsfield.konquest.api.event.town.KonquestTownDestroyPostEvent;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
@@ -977,6 +979,8 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		konquest.getMapHandler().drawUpdateTerritory(newTown);
 		// Send broadcast
 		ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_CAPITAL_SWAP.getMessage(getName(),townName));
+		// Fire event
+		Konquest.callKonquestEvent(new KonquestKingdomCapitalSwapEvent(konquest, this, capital, newTown));
 		return true;
 	}
 

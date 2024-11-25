@@ -1,6 +1,8 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.event.town.KonquestTownAttackEvent;
+import com.github.rumsfield.konquest.api.event.town.KonquestTownRaidEvent;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
@@ -1188,7 +1190,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 	}
 	
-	public void sendRaidAlert() {
+	public void sendRaidAlert(KonPlayer attacker) {
 		// Attempt to start a raid alert
 		if(!isRaidAlertDisabled()) {
 			// Alert all players of this town's kingdom
@@ -1206,6 +1208,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			raidAlertTimer.stopTimer();
 			raidAlertTimer.setTime(raidAlertTimeSeconds);
 			raidAlertTimer.startTimer();
+			// Fire event for raid alert when attacked
+			if (isAttacked) {
+				KonquestTownRaidEvent invokeEvent = new KonquestTownRaidEvent(getKonquest(), this, attacker);
+				Konquest.callKonquestEvent(invokeEvent);
+			}
 		}
 	}
 	

@@ -18,6 +18,7 @@ import java.util.Set;
  * Admins can claim and unclaim land for any territory.
  * When this event is cancelled, the territory will be unmodified.
  * </p>
+ *
  * @author Rumsfield
  *
  */
@@ -94,11 +95,22 @@ public class KonquestTerritoryChunkEvent extends KonquestEvent implements Cancel
 		return isClaimed;
 	}
 
+	/**
+	 * Checks whether this event is canceled.
+	 *
+	 * @return True when the event is canceled, else false
+	 */
 	@Override
 	public boolean isCancelled() {
 		return isCancelled;
 	}
 
+	/**
+	 * Controls whether the event is canceled.
+	 * Canceling this event prevents the territory from being modified.
+	 *
+	 * @param val True to cancel this event, else false
+	 */
 	@Override
 	public void setCancelled(boolean val) {
 		isCancelled = val;

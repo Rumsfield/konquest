@@ -4,6 +4,8 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.event.KonquestEvent;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
 
+import javax.annotation.Nullable;
+
 /**
  * The base town event.
  * 
@@ -27,9 +29,9 @@ public class KonquestTownEvent extends KonquestEvent {
 	/**
 	 * Gets the town associated with the event.
 	 * 
-	 * @return The town
+	 * @return The town, or null if the town no longer exists
 	 */
-	public KonquestTown getTown() {
+	public @Nullable KonquestTown getTown() {
 		return town;
 	}
 

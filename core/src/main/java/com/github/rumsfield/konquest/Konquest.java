@@ -612,7 +612,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	    		}
 				// Send a raid alert for enemies and barbarians
 				if(playerRole.equals(KonquestRelationshipType.ENEMY) || playerRole.equals(KonquestRelationshipType.BARBARIAN)) {
-					town.sendRaidAlert();
+					town.sendRaidAlert(player);
 				}
     		}
 		} else {

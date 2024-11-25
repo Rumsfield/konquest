@@ -8,7 +8,7 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 /**
  * Called when a new camp is created by a barbarian player.
  * <p>
- * This event cannot be cancelled, as it is called after the camp is created.
+ * This event cannot be canceled, as it is called after the camp is created.
  * To prevent players creating camps, listen for {@link KonquestPlayerCampEvent KonquestPlayerCampEvent} and cancel it.
  * </p>
  * 

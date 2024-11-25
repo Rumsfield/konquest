@@ -11,7 +11,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
  * Called when an enemy player breaks a block within a town.
  * <p>
  * This event occurs for all blocks broken inside town land, including inside of the monument and for critical blocks.
- * Canceling this event prevents the block from braking.
+ * Canceling this event prevents the block from breaking.
  * </p>
  * 
  * @author Rumsfield
@@ -80,11 +80,22 @@ public class KonquestTownAttackEvent extends KonquestTownEvent implements Cancel
 		return isCritical;
 	}
 
+	/**
+	 * Checks whether this event is canceled.
+	 *
+	 * @return True when the event is canceled, else false
+	 */
 	@Override
 	public boolean isCancelled() {
 		return isCancelled;
 	}
 
+	/**
+	 * Controls whether the event is canceled.
+	 * Canceling this event prevents the town from being attacked, and any associated blocks from breaking.
+	 *
+	 * @param val True to cancel this event, else false
+	 */
 	@Override
 	public void setCancelled(boolean val) {
 		isCancelled = val;

@@ -1,6 +1,8 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerCreateKingdomEvent;
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerSettleEvent;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.model.*;
@@ -169,6 +171,12 @@ public class KingdomCommand extends CommandBase {
 							return;
 						}
 					}
+				}
+				// Fire pre event
+				KonquestPlayerCreateKingdomEvent invokeEvent = new KonquestPlayerCreateKingdomEvent(konquest, player, bukkitPlayer.getLocation(), newKingdomName);
+				Konquest.callKonquestEvent(invokeEvent);
+				if(invokeEvent.isCancelled()) {
+					return;
 				}
 				// Create the kingdom
 				int createStatus = konquest.getKingdomManager().createKingdom(bukkitPlayer.getLocation(), newKingdomName, templateName, player, false);

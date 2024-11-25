@@ -4,6 +4,8 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.event.KonquestEvent;
 import com.github.rumsfield.konquest.api.model.KonquestCamp;
 
+import javax.annotation.Nullable;
+
 /**
  * The base camp event.
  * 
@@ -29,7 +31,7 @@ public class KonquestCampEvent extends KonquestEvent {
 	 * 
 	 * @return The town
 	 */
-	public KonquestCamp getCamp() {
+	public @Nullable KonquestCamp getCamp() {
 		return camp;
 	}
 

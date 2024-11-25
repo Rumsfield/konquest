@@ -9,7 +9,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
 /**
  * Called when a new town is settled by a player.
  * <p>
- * This event cannot be cancelled, as it is called after the town is created.
+ * This event cannot be canceled, as it is called after the town is created.
  * To prevent players settling towns, listen for {@link KonquestPlayerSettleEvent KonquestPlayerSettleEvent} and cancel it.
  * </p>
  * 

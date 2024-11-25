@@ -1306,7 +1306,7 @@ public class PlayerListener implements Listener {
 				// Evaluate player's relationship for town alerts/nerfs
 				if(kingdomManager.isPlayerEnemy(player, town.getKingdom())) {
 					// Attempt to start a raid alert
-					town.sendRaidAlert();
+					town.sendRaidAlert(player);
 					// Apply town nerfs
 					kingdomManager.applyTownNerf(player, town);
 				} else if(kingdomManager.isPlayerFriendly(player, town.getKingdom())) {

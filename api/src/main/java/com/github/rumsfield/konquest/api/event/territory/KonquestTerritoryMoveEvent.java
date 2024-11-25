@@ -70,11 +70,22 @@ public class KonquestTerritoryMoveEvent extends KonquestEvent implements Cancell
 		return territoryFrom;
 	}
 
+	/**
+	 * Checks whether this event is canceled.
+	 *
+	 * @return True when the event is canceled, else false
+	 */
 	@Override
 	public boolean isCancelled() {
 		return isCancelled;
 	}
 
+	/**
+	 * Controls whether the event is canceled.
+	 * Canceling this event stops the player's movement into or out of this territory.
+	 *
+	 * @param val True to cancel this event, else false
+	 */
 	@Override
 	public void setCancelled(boolean val) {
 		isCancelled = val;

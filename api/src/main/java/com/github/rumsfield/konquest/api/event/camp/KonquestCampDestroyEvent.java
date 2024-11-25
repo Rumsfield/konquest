@@ -10,7 +10,7 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 /**
  * Called before a player breaks a camp's bed to destroy it.
  * <p>
- * This event is called when any player breaks the camp's bed, even the camp owner.
+ * This event is called when any player attempts to break the camp's bed, even the camp owner.
  * Canceling this event will prevent the bed from breaking, and the camp will not be destroyed.
  * </p>
  * 
@@ -56,11 +56,22 @@ public class KonquestCampDestroyEvent extends KonquestCampEvent implements Cance
 		return location;
 	}
 
+	/**
+	 * Checks whether this event is canceled.
+	 *
+	 * @return True when the event is canceled, else false
+	 */
 	@Override
 	public boolean isCancelled() {
 		return isCancelled;
 	}
 
+	/**
+	 * Controls whether the event is canceled.
+	 * Canceling this event will prevent the bed from breaking, and the camp will not be destroyed.
+	 *
+	 * @param val True to cancel this event, else false
+	 */
 	@Override
 	public void setCancelled(boolean val) {
 		isCancelled = val;

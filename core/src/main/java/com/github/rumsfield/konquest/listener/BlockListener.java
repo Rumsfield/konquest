@@ -3,12 +3,13 @@ package com.github.rumsfield.konquest.listener;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.camp.KonquestCampDestroyEvent;
+import com.github.rumsfield.konquest.api.event.camp.KonquestCampDestroyPostEvent;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerCampEvent;
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerConquerEvent;
 import com.github.rumsfield.konquest.api.event.ruin.KonquestRuinAttackEvent;
 import com.github.rumsfield.konquest.api.event.ruin.KonquestRuinCaptureEvent;
-import com.github.rumsfield.konquest.api.event.town.KonquestTownAttackEvent;
-import com.github.rumsfield.konquest.api.event.town.KonquestTownCaptureEvent;
-import com.github.rumsfield.konquest.api.event.town.KonquestTownDestroyEvent;
+import com.github.rumsfield.konquest.api.event.ruin.KonquestRuinCapturePostEvent;
+import com.github.rumsfield.konquest.api.event.town.*;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.manager.CampManager;
@@ -258,7 +259,7 @@ public class BlockListener implements Listener {
 							town.updateBarTitle();
 							town.applyGlow(event.getPlayer());
 							// Attempt to start a raid alert
-							town.sendRaidAlert();
+							town.sendRaidAlert(player);
 							// If town is shielded, prevent all enemy block edits
 							if(town.isShielded()) {
 								ChatUtil.sendKonBlockedShieldTitle(player);
@@ -379,7 +380,7 @@ public class BlockListener implements Listener {
 					}
 					// Remove the camp if a bed is broken within it
 					if(event.getBlock().getBlockData() instanceof Bed) {
-						// Fire event
+						// Fire event for pre-destroy
 						KonquestCampDestroyEvent invokeEvent = new KonquestCampDestroyEvent(konquest, camp, player, event.getBlock().getLocation());
 						Konquest.callKonquestEvent(invokeEvent);
 						// Check for cancelled
@@ -387,6 +388,7 @@ public class BlockListener implements Listener {
 							event.setCancelled(true);
 							return;
 						}
+						KonOfflinePlayer owner = konquest.getPlayerManager().getOfflinePlayer(camp.getOwner());
 						campManager.removeCamp(camp);
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_DESTROY.getMessage(camp.getName()));
 						KonPlayer onlineOwner = playerManager.getPlayerFromName(camp.getOwner().getName());
@@ -395,6 +397,8 @@ public class BlockListener implements Listener {
 						} else {
 							ChatUtil.printDebug("Failed attempt to send camp destruction message to offline owner "+camp.getOwner().getName());
 						}
+						// Fire event for post-destroy
+						Konquest.callKonquestEvent(new KonquestCampDestroyPostEvent(konquest, owner, player, event.getBlock().getLocation()));
 					}
 				} else if(territory instanceof KonRuin) {
 					KonRuin ruin = (KonRuin)territory;
@@ -417,8 +421,8 @@ public class BlockListener implements Listener {
 						// Execute custom commands from config
 						konquest.executeCustomCommand(CustomCommandPath.RUIN_CRITICAL,player.getBukkitPlayer());
 						// Fire event for pre-capture
+						List<KonPlayer> rewardPlayers = konquest.getRuinManager().getRuinPlayers(ruin,player.getKingdom());
 						if(ruin.getRemainingCriticalHits() == 0) {
-							List<KonPlayer> rewardPlayers = konquest.getRuinManager().getRuinPlayers(ruin,player.getKingdom());
 							KonquestRuinCaptureEvent invokeEventCapture = new KonquestRuinCaptureEvent(konquest, ruin, player, rewardPlayers);
 							Konquest.callKonquestEvent(invokeEventCapture);
 							if(invokeEventCapture.isCancelled()) {
@@ -434,7 +438,10 @@ public class BlockListener implements Listener {
 						ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CRITICAL.getMessage(ruin.getRemainingCriticalHits()));
 						event.getBlock().getWorld().playSound(breakLoc, Sound.BLOCK_FIRE_EXTINGUISH, 1.0F, 0.6F);
 						if(hitStatus) {
+							// Ruin has been captures
 							konquest.getRuinManager().rewardPlayers(ruin,player.getKingdom());
+							// Fire event for post-capture
+							Konquest.callKonquestEvent(new KonquestRuinCapturePostEvent(konquest, ruin, player, rewardPlayers));
 							// Execute custom commands from config
 							konquest.executeCustomCommand(CustomCommandPath.RUIN_CAPTURE,player.getBukkitPlayer());
 						} else {
@@ -1336,9 +1343,35 @@ public class BlockListener implements Listener {
 		} else {
 			ChatUtil.printDebug("Critical strike on Monument in Town "+town.getName());
 		}
+		// Evaluate pre-events on final critical hits
+		int maxCriticalhits = konquest.getKingdomManager().getMaxCriticalHits();
+		if(town.getMonument().getCriticalHits()+1 >= maxCriticalhits) {
+			if(isCapital) {
+				// Fire event pre-conquer
+				KonquestPlayerConquerEvent invokeEvent = new KonquestPlayerConquerEvent(konquest, player, town.getKingdom());
+				Konquest.callKonquestEvent(invokeEvent);
+				if (invokeEvent.isCancelled()) {
+					return;
+				}
+			}
+			if(player.isBarbarian()) {
+				// Fire event pre-destroy
+				KonquestTownDestroyEvent invokeEvent = new KonquestTownDestroyEvent(konquest, town, player, isCapital);
+				Konquest.callKonquestEvent(invokeEvent);
+				if (invokeEvent.isCancelled()) {
+					return;
+				}
+			} else {
+				// Fire event pre-capture
+				KonquestTownCaptureEvent invokeEvent = new KonquestTownCaptureEvent(konquest, town, player, player.getKingdom(), isCapital);
+				Konquest.callKonquestEvent(invokeEvent);
+				if(invokeEvent.isCancelled()) {
+					return;
+				}
+			}
+		}
 		// Update critical hits
 		town.getMonument().addCriticalHit();
-		int maxCriticalhits = konquest.getKingdomManager().getMaxCriticalHits();
 		// Update bar progress
 		town.updateBarTitle();
 		// Check for capital swap cancellation
@@ -1350,12 +1383,6 @@ public class BlockListener implements Listener {
 		if(town.getMonument().getCriticalHits() >= maxCriticalhits) {
 			// The Town is at critical max, conquer or destroy
 			if(player.isBarbarian()) {
-				// Fire event
-				KonquestTownDestroyEvent invokeEvent = new KonquestTownDestroyEvent(konquest, town, player);
-				Konquest.callKonquestEvent(invokeEvent);
-				if(invokeEvent.isCancelled()) {
-					return;
-				}
 				// Destroy the town when the enemy is a barbarian
 				String townName = town.getName();
 				String kingdomName = town.getKingdom().getName();
@@ -1372,7 +1399,6 @@ public class BlockListener implements Listener {
 				int x = town.getCenterLoc().getBlockX();
 				int y = town.getCenterLoc().getBlockY();
 				int z = town.getCenterLoc().getBlockZ();
-				//Timer townMonumentTimer = town.getMonumentTimer();
 				Location townCenterLoc = town.getCenterLoc();
 				boolean result = false;
 				if(isCapital) {
@@ -1388,7 +1414,6 @@ public class BlockListener implements Listener {
 						ChatUtil.printDebug("Problem destroying Town "+town.getName()+" in Kingdom "+town.getKingdom().getName()+" for a barbarian raider "+player.getBukkitPlayer().getName());
 					}
 				}
-				
 				if(result) {
 					// Town is removed, no longer exists
 					if(isCapital) {
@@ -1411,16 +1436,13 @@ public class BlockListener implements Listener {
 					konquest.getDirectiveManager().updateDirectiveProgress(player, KonDirective.CAPTURE_TOWN);
 					// Broadcast to Dynmap
 					konquest.getMapHandler().postBroadcast(MessagePath.PROTECTION_NOTICE_RAZE.getMessage(townName)+" ("+x+","+y+","+z+")");
+					// Fire event post-destroy
+					Konquest.callKonquestEvent(new KonquestTownDestroyPostEvent(konquest, townName, kingdomName, player, isCapital));
 				}
 
 			} else {
-				// Fire event
-				KonquestTownCaptureEvent invokeEvent = new KonquestTownCaptureEvent(konquest, town, player, player.getKingdom(), isCapital);
-				Konquest.callKonquestEvent(invokeEvent);
-				if(invokeEvent.isCancelled()) {
-					return;
-				}
 				// Conquer the town for the enemy player's kingdom
+				KonKingdom oldKingdom = town.getKingdom();
 				String oldKingdomName = town.getKingdom().getName();
 				String newKingdomName = player.getKingdom().getName();
 				KonTown capturedTown;
@@ -1487,6 +1509,8 @@ public class BlockListener implements Listener {
 					capturedTown.setAttacked(false,player);
 					capturedTown.setBarProgress(1.0);
 					capturedTown.updateBarTitle();
+					// Fire event post-capture
+					Konquest.callKonquestEvent(new KonquestTownCapturePostEvent(konquest, capturedTown, player, oldKingdom, isCapital));
 				} else {
 					ChatUtil.printDebug("Problem converting Town "+town.getName()+" from Kingdom "+town.getKingdom().getName()+" to "+player.getKingdom().getName());
 					// If, for example, a player in the Barbarians default kingdom captured the monument

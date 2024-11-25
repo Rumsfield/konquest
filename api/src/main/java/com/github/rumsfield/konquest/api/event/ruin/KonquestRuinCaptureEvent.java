@@ -40,7 +40,7 @@ public class KonquestRuinCaptureEvent extends KonquestRuinEvent implements Cance
 	}
 
 	/**
-	 * Gets the player that captured this ruin.
+	 * Gets the player that will capture this ruin.
 	 * This player broke the final critical block.
 	 * 
 	 * @return The player
@@ -50,19 +50,30 @@ public class KonquestRuinCaptureEvent extends KonquestRuinEvent implements Cance
 	}
 	
 	/**
-	 * Gets the list of players that get a reward for capturing the ruin.
+	 * Gets the list of players that will get a reward for capturing the ruin.
 	 * 
 	 * @return The list of players
 	 */
 	public List<? extends KonquestPlayer> getRewardPlayers() {
 		return rewardPlayers;
 	}
-	
+
+	/**
+	 * Checks whether this event is canceled.
+	 *
+	 * @return True when the event is canceled, else false
+	 */
 	@Override
 	public boolean isCancelled() {
 		return isCancelled;
 	}
 
+	/**
+	 * Controls whether the event is canceled.
+	 * Canceling this event will stop the final critical block break and prevent the ruin from being captured.
+	 *
+	 * @param val True to cancel this event, else false
+	 */
 	@Override
 	public void setCancelled(boolean val) {
 		isCancelled = val;
