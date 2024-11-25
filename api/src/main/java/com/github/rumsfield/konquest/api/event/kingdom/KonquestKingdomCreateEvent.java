@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.api.event.kingdom;
 import org.bukkit.Location;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerCreateKingdomEvent;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 
@@ -10,6 +11,7 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
  * Called after a kingdom is created, either by players or admins.
  * <p>
  * Kingdoms can be created by normal players and/or admins, depending on the Konquest configuration.
+ * This event will not be invoked when {@link KonquestPlayerCreateKingdomEvent KonquestPlayerCreateKingdomEvent} is cancelled.
  * </p>
  *
  * @author Rumsfield

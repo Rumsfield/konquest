@@ -6,7 +6,7 @@ import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
 
 /**
- * Called when a kingdom swaps its capital to another town.
+ * Called after a kingdom swaps its capital to another town.
  * <p>
  * A capital swap involves changing a town into the kingdom's new capital, and preserves the town's land claims,
  * upgrades, residents, and all other attributes. The original capital takes the name of the town.

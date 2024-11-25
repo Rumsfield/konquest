@@ -8,8 +8,9 @@ import org.bukkit.event.Cancellable;
 import java.util.List;
 
 /**
- * Called before a player captures a ruin, but after {@link KonquestRuinAttackEvent KonquestRuinAttackEvent}
+ * Called before a player captures a ruin.
  * <p>
+ * This event is called after {@link KonquestRuinAttackEvent KonquestRuinAttackEvent}.
  * Players capture ruins by breaking all critical blocks inside.
  * When the final critical block is broken, all players located inside of the ruin receive a reward.
  * Canceling this event will stop the final critical block break and prevent the ruin from being captured.

@@ -10,9 +10,6 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
  * This event occurs every time a town raid alert is sent to the town's kingdom members, while the town is under attack.
  * Raid alerts have cooldown times specified by the Konquest configuration.
  * A new event is invoked for every raid alert caused by enemy players entering a town, or breaking blocks in the town, while the town is under attack.
- * </p>
- *
- * <p>
  * This event will not be invoked when {@link KonquestTownAttackEvent KonquestTownAttackEvent} is cancelled.
  * </p>
  * @author Rumsfield

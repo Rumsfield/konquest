@@ -7,7 +7,7 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 
 /**
- * Called when a player is attacked by another player.
+ * Called before a player is attacked by another player.
  * <p>
  * Attacking another player causes the victim to become combat tagged.
  * A player that is combat tagged is restricted from using a list of commands from the Konquest configuration.

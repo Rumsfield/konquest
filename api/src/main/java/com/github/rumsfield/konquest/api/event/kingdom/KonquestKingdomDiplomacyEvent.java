@@ -5,7 +5,7 @@ import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 
 /**
- * Called when a kingdom changes its active diplomatic relationship with another kingdom.
+ * Called after a kingdom changes its active diplomatic relationship with another kingdom.
  * <p>
  * Kingdoms have a diplomatic relationship with every other kingdom.
  * Some relationships have to be requested by both kingdoms, depending on the Konquest configuration.

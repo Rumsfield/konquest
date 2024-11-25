@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.api.event.kingdom;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerConquerEvent;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 
 /**
@@ -9,6 +10,7 @@ import com.github.rumsfield.konquest.api.model.KonquestKingdom;
  * Kingdoms are conquered when enemy players capture the capital.
  * The kingdom has no more towns, and is removed.
  * The kingdom referenced by this event no longer exists, so the getKingdom() method will return null.
+ * This event will not be invoked when {@link KonquestPlayerConquerEvent KonquestPlayerConquerEvent} is cancelled.
  * </p>
  *
  * @author Rumsfield
@@ -22,7 +24,8 @@ public class KonquestKingdomConquerEvent extends KonquestKingdomEvent {
     /**
      * Default constructor
      * @param konquest The API instance
-     * @param name The kingdom of the removed kingdom
+     * @param name The name of the removed kingdom
+     * @param conqueror The conqueror kingdom
      */
     public KonquestKingdomConquerEvent(KonquestAPI konquest, String name, KonquestKingdom conqueror) {
         super(konquest, null);

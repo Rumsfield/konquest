@@ -8,8 +8,9 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestRuin;
 
 /**
- * Called when a player breaks a critical block within a ruin, but before {@link KonquestRuinCaptureEvent KonquestRuinCaptureEvent}
+ * Called before a player breaks a critical block within a ruin.
  * <p>
+ * This event is called before {@link KonquestRuinCaptureEvent KonquestRuinCaptureEvent}.
  * Players can only break critical blocks inside of ruins.
  * Canceling this event prevents the critical block from braking.
  * </p>

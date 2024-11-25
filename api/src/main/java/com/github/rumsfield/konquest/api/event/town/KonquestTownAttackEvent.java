@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.api.event.town;
 
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerConquerEvent;
 import org.bukkit.block.Block;
 import org.bukkit.event.Cancellable;
 
@@ -10,6 +11,8 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
 /**
  * Called when an enemy player breaks a block within a town.
  * <p>
+ * This event is called before {@link KonquestTownCaptureEvent KonquestTownCaptureEvent},
+ * {@link KonquestTownDestroyEvent KonquestTownDestroyEvent}, and {@link KonquestPlayerConquerEvent KonquestPlayerConquerEvent}.
  * This event occurs for all blocks broken inside town land, including inside of the monument and for critical blocks.
  * Canceling this event prevents the block from breaking.
  * </p>

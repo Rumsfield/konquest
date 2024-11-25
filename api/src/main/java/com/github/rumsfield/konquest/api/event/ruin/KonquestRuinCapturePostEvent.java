@@ -1,14 +1,13 @@
 package com.github.rumsfield.konquest.api.event.ruin;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
-import com.github.rumsfield.konquest.api.event.town.KonquestTownAttackEvent;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestRuin;
 
 import java.util.List;
 
 /**
- * Called after a player successfully captures a ruin
+ * Called after a player successfully captures a ruin.
  * <p>
  * Players capture ruins by breaking all critical blocks inside.
  * When the final critical block is broken, all players located inside of the ruin receive a reward.
