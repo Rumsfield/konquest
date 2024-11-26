@@ -422,7 +422,7 @@ public class BlockListener implements Listener {
 						konquest.executeCustomCommand(CustomCommandPath.RUIN_CRITICAL,player.getBukkitPlayer());
 						// Fire event for pre-capture
 						List<KonPlayer> rewardPlayers = konquest.getRuinManager().getRuinPlayers(ruin,player.getKingdom());
-						if(ruin.getRemainingCriticalHits() == 0) {
+						if(ruin.getRemainingCriticalHits() == 1) {
 							KonquestRuinCaptureEvent invokeEventCapture = new KonquestRuinCaptureEvent(konquest, ruin, player, rewardPlayers);
 							Konquest.callKonquestEvent(invokeEventCapture);
 							if(invokeEventCapture.isCancelled()) {

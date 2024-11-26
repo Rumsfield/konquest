@@ -33,7 +33,12 @@ public abstract class KonquestEvent extends Event {
 	public KonquestAPI getKonquest() {
 		return konquest;
 	}
-    
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
 	@Override
 	public HandlerList getHandlers() {
 		return handlers;

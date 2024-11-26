@@ -652,6 +652,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					ChatUtil.printDebug("Removing offline KonOfflinePlayer "+playerName+" to barbarian.");
 				}
 				konquest.getDatabaseThread().getDatabase().setOfflinePlayer(member); // push to database
+				// Update Discord roles
+				konquest.getIntegrationManager().getDiscordSrv().refreshPlayerRoles(member);
 			}
 			// Remove all towns
 			for(KonTown town : kingdom.getTowns()) {

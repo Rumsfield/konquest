@@ -11,6 +11,7 @@ import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.*;
 
 import github.scarsz.discordsrv.util.DiscordUtil;
+import org.bukkit.event.Listener;
 
 
 public class DiscordSRVListener {

@@ -32,34 +32,8 @@ import java.util.function.Consumer;
  */
 public class DiscordSrvHook implements PluginHook {
 
-	public enum DiscordMessage {
-		KINGDOM_CREATE			("discord.kingdom-create"),
-		KINGDOM_DISBAND			("discord.kingdom-disband"),
-		KINGDOM_CONQUER			("discord.kingdom-conquer"),
-		KINGDOM_CAPITAL_SWAP	("discord.kingdom-capital-swap"),
-		TOWN_SETTLE				("discord.town-settle"),
-		TOWN_RAID_ALERT			("discord.town-raid-alert"),
-		TOWN_DESTROY			("discord.town-destroy"),
-		TOWN_CAPTURE			("discord.town-capture"),
-		CAMP_DESTROY			("discord.camp-destroy"),
-		RUIN_CAPTURE			("discord.ruin-capture"),
-		DIPLOMACY_PEACE			("discord.diplomacy-peace"),
-		DIPLOMACY_TRADE			("discord.diplomacy-trade"),
-		DIPLOMACY_ALLIED		("discord.diplomacy-allied"),
-		DIPLOMACY_WAR			("discord.diplomacy-war");
-
-		private final String path;
-		DiscordMessage(String path) {
-			this.path = path;
-		}
-
-		public String getPath() {
-			return path;
-		}
-	}
-
-	private final String noPermissionMessage = "Failed to modify kingdom role to Discord. " +
-			"The bot lacks sufficient permissions to manage roles. " +
+	private final String noPermissionMessage = "Failed to modify kingdom roles in Discord. " +
+			"The Discord bot lacks sufficient permissions to manage roles. " +
 			"Change the bot's permissions, or disable the auto_roles option in Konquest core.yml.";
 
 	private final int barbarianColor = 0xa3a10a;
@@ -120,7 +94,7 @@ public class DiscordSrvHook implements PluginHook {
 
 	public void reloadSettings() {
 		if (!isEnabled) return;
-		String defaultColor = konquest.getConfigManager().getConfig("discord").getString("discord.roles.default-color","");
+		String defaultColor = konquest.getCore().getString(CorePath.INTEGRATION_DISCORDSRV_OPTIONS_ROLE_DEFAULT_COLOR.getPath(),"");
 		if (defaultColor.isEmpty()) {
 			roleDefaultColor = barbarianColor;
 		} else {
@@ -129,9 +103,9 @@ public class DiscordSrvHook implements PluginHook {
 				roleDefaultColor = barbarianColor;
 			}
 		}
-		roleSuffix = konquest.getConfigManager().getConfig("discord").getString("discord.roles.suffix","(auto)");
-		roleIsMentionable = konquest.getConfigManager().getConfig("discord").getBoolean("discord.roles.is-mentionable",true);
-		List<String> rolePermissionNames = konquest.getConfigManager().getConfig("discord").getStringList("discord.roles.permissions");
+		roleSuffix = konquest.getCore().getString(CorePath.INTEGRATION_DISCORDSRV_OPTIONS_ROLE_SUFFIX.getPath(),"(auto)");
+		roleIsMentionable = konquest.getCore().getBoolean(CorePath.INTEGRATION_DISCORDSRV_OPTIONS_ROLE_IS_MENTIONABLE.getPath(),true);
+		List<String> rolePermissionNames = konquest.getCore().getStringList(CorePath.INTEGRATION_DISCORDSRV_OPTIONS_ROLE_PERMISSIONS.getPath());
 		rolePermissions = new ArrayList<>();
 		for (String permName : rolePermissionNames) {
 			try {
@@ -235,21 +209,21 @@ public class DiscordSrvHook implements PluginHook {
 	 * @return True when the update was successful, else false
 	 */
 	private boolean updateRole(Role role, String name, int color) {
-		RoleManager manager = role.getManager();
-		// Update name
-		if (!name.isEmpty()) {
-			manager = manager.setName(name);
-		}
-		// Update color
-		if (color != 0) {
-			manager = manager.setColor(color);
-		}
-		// Update mentionable
-		manager = manager.setMentionable(roleIsMentionable);
-		// Update permissions
-		manager = manager.setPermissions(rolePermissions);
-		// Send update
 		try {
+			RoleManager manager = role.getManager();
+			// Update name
+			if (!name.isEmpty()) {
+				manager = manager.setName(name);
+			}
+			// Update color
+			if (color != 0) {
+				manager = manager.setColor(color);
+			}
+			// Update mentionable
+			manager = manager.setMentionable(roleIsMentionable);
+			// Update permissions
+			manager = manager.setPermissions(rolePermissions);
+			// Send update
 			manager.reason("Konquest auto role update");
 			manager.queue();
 			ChatUtil.printDebug("Discord updated existing role: "+role.getName());
@@ -267,21 +241,21 @@ public class DiscordSrvHook implements PluginHook {
 			ChatUtil.printConsoleError("Discord main guild does not exist.");
 			return false;
 		}
-		RoleAction addRole = mainGuild.createRole();
-		// Set name
-		if (!name.isEmpty()) {
-			addRole = addRole.setName(name);
-		}
-		// Set color
-		if (color != 0) {
-			addRole = addRole.setColor(color);
-		}
-		// Set mentionable
-		addRole = addRole.setMentionable(roleIsMentionable);
-		// Set permissions
-		addRole = addRole.setPermissions(rolePermissions);
-		// Send creation
 		try {
+			RoleAction addRole = mainGuild.createRole();
+			// Set name
+			if (!name.isEmpty()) {
+				addRole = addRole.setName(name);
+			}
+			// Set color
+			if (color != 0) {
+				addRole = addRole.setColor(color);
+			}
+			// Set mentionable
+			addRole = addRole.setMentionable(roleIsMentionable);
+			// Set permissions
+			addRole = addRole.setPermissions(rolePermissions);
+			// Send creation
 			addRole.reason("Konquest auto role creation");
 			if (callback == null) {
 				addRole.queue();
@@ -376,6 +350,7 @@ public class DiscordSrvHook implements PluginHook {
 				if (createRole(kingdomRoleName, kingdomColor, callback)) {
 					numRolesCreated++;
 				} else {
+					ChatUtil.printConsoleError("Discord Auto-Role refresh failed.");
 					return;
 				}
 			} else {
@@ -387,14 +362,11 @@ public class DiscordSrvHook implements PluginHook {
 					DiscordUtil.addRoleToMember(member, kingdomRole);
 					ChatUtil.printDebug("Discord assigned role "+kingdomRole.getName()+" to member "+member.getEffectiveName());
 				}
-				RoleManager manager = kingdomRole.getManager()
-						.setColor(kingdomColor)
-						.setMentionable(roleIsMentionable)
-						.setPermissions(rolePermissions);
 				// Send update
 				if (updateRole(kingdomRole,"", kingdomColor)) {
 					numRolesUpdated++;
 				} else {
+					ChatUtil.printConsoleError("Discord Auto-Role refresh failed.");
 					return;
 				}
 			}
@@ -417,6 +389,7 @@ public class DiscordSrvHook implements PluginHook {
 			if (deleteRole(discordRole)) {
 				numRolesDeleted++;
 			} else {
+				ChatUtil.printConsoleError("Discord Auto-Role refresh failed.");
 				return;
 			}
 		}
