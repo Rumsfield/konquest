@@ -5,6 +5,9 @@ import org.bukkit.event.Cancellable;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called before the given player has been assigned to the given kingdom.
@@ -16,6 +19,7 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
  */
 public class KonquestPlayerKingdomEvent extends KonquestPlayerEvent implements Cancellable {
 
+	private static final HandlerList handlers = new HandlerList();
 	private final KonquestKingdom newKingdom;
 	private final KonquestKingdom oldKingdom;
 	private boolean isCancelled;
@@ -73,4 +77,23 @@ public class KonquestPlayerKingdomEvent extends KonquestPlayerEvent implements C
 		isCancelled = val;
 	}
 
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	@Override
+	@Nonnull
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 }

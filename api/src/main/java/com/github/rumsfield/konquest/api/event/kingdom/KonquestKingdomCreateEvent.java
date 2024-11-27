@@ -6,6 +6,9 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerCreateKingdomEvent;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called after a kingdom is created, either by players or admins.
@@ -19,6 +22,7 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
  */
 public class KonquestKingdomCreateEvent extends KonquestKingdomEvent {
 
+    private static final HandlerList handlers = new HandlerList();
     private final KonquestPlayer player;
     private final Location location;
     private final boolean isAdmin;
@@ -65,4 +69,23 @@ public class KonquestKingdomCreateEvent extends KonquestKingdomEvent {
         return isAdmin;
     }
 
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    @Override
+    @Nonnull
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 }

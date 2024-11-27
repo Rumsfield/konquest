@@ -6,7 +6,9 @@ import com.github.rumsfield.konquest.api.model.KonquestTerritory;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.Cancellable;
+import org.bukkit.event.HandlerList;
 
+import javax.annotation.Nonnull;
 import java.awt.*;
 import java.util.Set;
 
@@ -24,8 +26,8 @@ import java.util.Set;
  */
 public class KonquestTerritoryChunkEvent extends KonquestEvent implements Cancellable {
 
+	private static final HandlerList handlers = new HandlerList();
 	private boolean isCancelled;
-	
 	private final KonquestTerritory territory;
 	private final Location location;
 	private final Set<Point> points;
@@ -114,5 +116,25 @@ public class KonquestTerritoryChunkEvent extends KonquestEvent implements Cancel
 	@Override
 	public void setCancelled(boolean val) {
 		isCancelled = val;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	@Override
+	@Nonnull
+	public HandlerList getHandlers() {
+		return handlers;
 	}
 }

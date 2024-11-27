@@ -3,6 +3,9 @@ package com.github.rumsfield.konquest.api.event.town;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called after a town has been attacked, caused by a town raid alert.
@@ -17,6 +20,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
  */
 public class KonquestTownRaidEvent extends KonquestTownEvent {
 
+    private static final HandlerList handlers = new HandlerList();
     private final KonquestPlayer attacker;
 
     /**
@@ -39,4 +43,23 @@ public class KonquestTownRaidEvent extends KonquestTownEvent {
         return attacker;
     }
 
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    @Override
+    @Nonnull
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 }

@@ -6,6 +6,9 @@ import org.bukkit.event.Cancellable;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.event.kingdom.KonquestKingdomCreateEvent;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called before a player creates a new kingdom using the "/k kingdom create" command.
@@ -20,8 +23,8 @@ import com.github.rumsfield.konquest.api.event.kingdom.KonquestKingdomCreateEven
  */
 public class KonquestPlayerCreateKingdomEvent extends KonquestPlayerEvent implements Cancellable {
 
+    private static final HandlerList handlers = new HandlerList();
     private boolean isCancelled;
-
     private final Location location;
     private final String name;
 
@@ -78,4 +81,23 @@ public class KonquestPlayerCreateKingdomEvent extends KonquestPlayerEvent implem
         isCancelled = val;
     }
 
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    @Override
+    @Nonnull
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 }

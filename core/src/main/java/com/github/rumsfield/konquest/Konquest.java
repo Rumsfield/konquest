@@ -1406,7 +1406,6 @@ public class Konquest implements KonquestAPI, Timeable {
     	if(event != null) {
 	    	try {
 	            Bukkit.getServer().getPluginManager().callEvent(event);
-				ChatUtil.printDebug("Called event: "+event.getEventName());
 			} catch(IllegalStateException e) {
 				ChatUtil.printConsoleError("Failed to call Konquest event!");
 				e.printStackTrace();

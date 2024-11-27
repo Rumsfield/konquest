@@ -2,6 +2,9 @@ package com.github.rumsfield.konquest.api.event.town;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called after a barbarian player destroys a town by breaking its final critical block,
@@ -19,6 +22,7 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
  */
 public class KonquestTownDestroyPostEvent extends KonquestTownEvent {
 
+    private static final HandlerList handlers = new HandlerList();
     private final String townName;
     private final String kingdomName;
     private final KonquestPlayer player;
@@ -86,4 +90,23 @@ public class KonquestTownDestroyPostEvent extends KonquestTownEvent {
         return player.isBarbarian();
     }
 
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    @Override
+    @Nonnull
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 }

@@ -4,6 +4,9 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestCapital;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called after a kingdom swaps its capital to another town.
@@ -19,6 +22,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
  */
 public class KonquestKingdomCapitalSwapEvent extends KonquestKingdomEvent {
 
+    private static final HandlerList handlers = new HandlerList();
     private final KonquestCapital capital;
     private final KonquestTown town;
 
@@ -55,4 +59,23 @@ public class KonquestKingdomCapitalSwapEvent extends KonquestKingdomEvent {
         return town;
     }
 
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    @Override
+    @Nonnull
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 }

@@ -5,7 +5,9 @@ import org.bukkit.Location;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
+import org.bukkit.event.HandlerList;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -21,6 +23,7 @@ import javax.annotation.Nullable;
  */
 public class KonquestCampDestroyPostEvent extends KonquestCampEvent {
 
+    private static final HandlerList handlers = new HandlerList();
     private final KonquestOfflinePlayer owner;
     private final KonquestPlayer player;
     private final Location location;
@@ -66,4 +69,23 @@ public class KonquestCampDestroyPostEvent extends KonquestCampEvent {
         return location;
     }
 
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    @Override
+    @Nonnull
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 }

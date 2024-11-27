@@ -111,7 +111,6 @@ public class KonquestPlugin extends JavaPlugin {
 		assert konquestCommand != null;
 		konquestCommand.setExecutor(konquest.getCommandHandler());
 		// Register event listeners
-		pluginManager.registerEvents(new KonquestListener(), this);
 		pluginManager.registerEvents(new PlayerListener(this), this);
 		pluginManager.registerEvents(new EntityListener(this), this);
 		pluginManager.registerEvents(new BlockListener(this), this);

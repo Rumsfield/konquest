@@ -3,6 +3,9 @@ package com.github.rumsfield.konquest.api.event.kingdom;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called after a kingdom changes its active diplomatic relationship with another kingdom.
@@ -18,6 +21,7 @@ import com.github.rumsfield.konquest.api.model.KonquestKingdom;
  */
 public class KonquestKingdomDiplomacyEvent extends KonquestKingdomEvent {
 
+    private static final HandlerList handlers = new HandlerList();
     private final KonquestKingdom targetKingdom;
     private final KonquestDiplomacyType diplomacy;
 
@@ -88,4 +92,23 @@ public class KonquestKingdomDiplomacyEvent extends KonquestKingdomEvent {
         return diplomacy.equals(KonquestDiplomacyType.ALLIANCE);
     }
 
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    @Override
+    @Nonnull
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 }

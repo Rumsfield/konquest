@@ -6,6 +6,9 @@ import org.bukkit.event.Cancellable;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestRuin;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called before a player breaks a critical block within a ruin.
@@ -20,8 +23,8 @@ import com.github.rumsfield.konquest.api.model.KonquestRuin;
  */
 public class KonquestRuinAttackEvent extends KonquestRuinEvent implements Cancellable {
 
+	private static final HandlerList handlers = new HandlerList();
 	private boolean isCancelled;
-	
 	private final KonquestPlayer attacker;
 	private final Block block;
 	
@@ -78,4 +81,23 @@ public class KonquestRuinAttackEvent extends KonquestRuinEvent implements Cancel
 		isCancelled = val;
 	}
 
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	@Override
+	@Nonnull
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 }

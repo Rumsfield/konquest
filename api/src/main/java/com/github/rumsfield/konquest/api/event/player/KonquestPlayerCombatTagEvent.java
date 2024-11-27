@@ -5,6 +5,9 @@ import org.bukkit.event.Cancellable;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called before a player is attacked by another player.
@@ -19,8 +22,8 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
  */
 public class KonquestPlayerCombatTagEvent extends KonquestPlayerEvent implements Cancellable {
 
+	private static final HandlerList handlers = new HandlerList();
 	private boolean isCancelled;
-	
 	private final KonquestPlayer attacker;
 	private final Location location;
 	
@@ -77,4 +80,23 @@ public class KonquestPlayerCombatTagEvent extends KonquestPlayerEvent implements
 		isCancelled = val;
 	}
 
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	@Override
+	@Nonnull
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 }

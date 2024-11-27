@@ -6,6 +6,9 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called before an enemy player captures a town for their own kingdom.
@@ -22,8 +25,8 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
  */
 public class KonquestTownCaptureEvent extends KonquestTownEvent implements Cancellable {
 
+	private static final HandlerList handlers = new HandlerList();
 	private boolean isCancelled;
-	
 	private final KonquestPlayer player;
 	private final KonquestKingdom newKingdom;
 	private final boolean isCapital;
@@ -93,4 +96,23 @@ public class KonquestTownCaptureEvent extends KonquestTownEvent implements Cance
 		isCancelled = val;
 	}
 
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	@Override
+	@Nonnull
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 }

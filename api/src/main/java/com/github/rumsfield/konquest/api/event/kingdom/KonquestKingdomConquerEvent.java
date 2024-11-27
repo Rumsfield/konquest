@@ -3,6 +3,9 @@ package com.github.rumsfield.konquest.api.event.kingdom;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerConquerEvent;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called after a kingdom is conquered by another kingdom and removed.
@@ -18,6 +21,7 @@ import com.github.rumsfield.konquest.api.model.KonquestKingdom;
  */
 public class KonquestKingdomConquerEvent extends KonquestKingdomEvent {
 
+    private static final HandlerList handlers = new HandlerList();
     private final String name;
     private final KonquestKingdom conqueror;
 
@@ -51,4 +55,23 @@ public class KonquestKingdomConquerEvent extends KonquestKingdomEvent {
         return conqueror;
     }
 
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    @Override
+    @Nonnull
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 }

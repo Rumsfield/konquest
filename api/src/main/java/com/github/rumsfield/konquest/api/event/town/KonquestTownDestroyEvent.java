@@ -5,6 +5,9 @@ import org.bukkit.event.Cancellable;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called before a barbarian player destroys a town by breaking its final critical block.
@@ -19,8 +22,8 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
  */
 public class KonquestTownDestroyEvent extends KonquestTownEvent implements Cancellable {
 
+	private static final HandlerList handlers = new HandlerList();
 	private boolean isCancelled;
-	
 	private final KonquestPlayer player;
 	private final boolean isCapital;
 	
@@ -78,4 +81,23 @@ public class KonquestTownDestroyEvent extends KonquestTownEvent implements Cance
 		isCancelled = val;
 	}
 
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	@Override
+	@Nonnull
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 }

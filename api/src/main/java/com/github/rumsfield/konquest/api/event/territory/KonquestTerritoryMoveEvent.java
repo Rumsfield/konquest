@@ -6,6 +6,9 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.event.KonquestEvent;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestTerritory;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called before a player enters or leaves a territory. 
@@ -20,8 +23,8 @@ import com.github.rumsfield.konquest.api.model.KonquestTerritory;
  */
 public class KonquestTerritoryMoveEvent extends KonquestEvent implements Cancellable {
 
+	private static final HandlerList handlers = new HandlerList();
 	private boolean isCancelled;
-	
 	private final KonquestTerritory territoryTo;
 	private final KonquestTerritory territoryFrom;
 	private final KonquestPlayer player;
@@ -91,4 +94,23 @@ public class KonquestTerritoryMoveEvent extends KonquestEvent implements Cancell
 		isCancelled = val;
 	}
 
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	@Override
+	@Nonnull
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 }

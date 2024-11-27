@@ -2,6 +2,9 @@ package com.github.rumsfield.konquest.api.event.player;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called after a player changes their accomplishment prefix.
@@ -11,6 +14,7 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
  */
 public class KonquestPlayerPrefixEvent extends KonquestPlayerEvent {
 
+	private static final HandlerList handlers = new HandlerList();
 	private final String prefix;
 	private final boolean isDisabled;
 	
@@ -46,4 +50,23 @@ public class KonquestPlayerPrefixEvent extends KonquestPlayerEvent {
 		return isDisabled;
 	}
 
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	@Override
+	@Nonnull
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 }

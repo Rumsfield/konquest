@@ -1,6 +1,9 @@
 package com.github.rumsfield.konquest.api.event.kingdom;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called after a kingdom is disbanded and removed.
@@ -15,6 +18,7 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
  */
 public class KonquestKingdomDisbandEvent extends KonquestKingdomEvent {
 
+    private static final HandlerList handlers = new HandlerList();
     private final String name;
 
     /**
@@ -36,4 +40,23 @@ public class KonquestKingdomDisbandEvent extends KonquestKingdomEvent {
         return name;
     }
 
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
+    /**
+     * Get the handler list
+     *
+     * @return handlers
+     */
+    @Override
+    @Nonnull
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 }

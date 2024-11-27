@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
  * @author Rumsfield
  *
  */
-public class KonquestTownEvent extends KonquestEvent {
+public abstract class KonquestTownEvent extends KonquestEvent {
 
 	private final KonquestTown town;
 	
