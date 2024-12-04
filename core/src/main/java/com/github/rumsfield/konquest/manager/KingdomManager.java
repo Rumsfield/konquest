@@ -2,8 +2,13 @@ package com.github.rumsfield.konquest.manager;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
+import com.github.rumsfield.konquest.api.event.kingdom.KonquestKingdomConquerEvent;
+import com.github.rumsfield.konquest.api.event.kingdom.KonquestKingdomCreateEvent;
+import com.github.rumsfield.konquest.api.event.kingdom.KonquestKingdomDisbandEvent;
+import com.github.rumsfield.konquest.api.event.kingdom.KonquestKingdomDiplomacyEvent;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerExileEvent;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerKingdomEvent;
+import com.github.rumsfield.konquest.api.event.town.KonquestTownDestroyPostEvent;
 import com.github.rumsfield.konquest.api.manager.KonquestKingdomManager;
 import com.github.rumsfield.konquest.api.model.*;
 import com.github.rumsfield.konquest.model.*;
@@ -559,6 +564,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				// Capital territory initialized successfully, finish kingdom setup
 				konquest.getTerritoryManager().addAllTerritory(centerLocation.getWorld(),newKingdom.getCapital().getChunkList());
 				konquest.getMapHandler().drawUpdateTerritory(newKingdom.getCapital());
+				// Update Discord roles
+				konquest.getIntegrationManager().getDiscordSrv().addKingdomRole(newKingdom.getName(),newKingdom.getWebColorFormal());
 				if(isAdmin) {
 					// This kingdom is operated by admins only
 					newKingdom.setIsAdminOperated(true);
@@ -584,6 +591,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				// Update border particles
 				konquest.getTerritoryManager().updatePlayerBorderParticles(newKingdom.getCapital().getCenterLoc());
 				newKingdom.getCapital().updateBarPlayers();
+				// Fire event
+				Konquest.callKonquestEvent(new KonquestKingdomCreateEvent(konquest, newKingdom, master, centerLocation, isAdmin));
 			} else {
 				// Failed to pass all init checks, remove the kingdom
 				ChatUtil.printDebug("Kingdom capital init failed, error code: "+initStatus);
@@ -643,6 +652,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					ChatUtil.printDebug("Removing offline KonOfflinePlayer "+playerName+" to barbarian.");
 				}
 				konquest.getDatabaseThread().getDatabase().setOfflinePlayer(member); // push to database
+				// Update Discord roles
+				konquest.getIntegrationManager().getDiscordSrv().refreshPlayerRoles(member);
 			}
 			// Remove all towns
 			for(KonTown town : kingdom.getTowns()) {
@@ -663,6 +674,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				oldKingdom.removeCapital();
 				konquest.getTerritoryManager().removeAllTerritory(oldKingdom.getCapital().getWorld(),oldKingdom.getCapital().getChunkList().keySet());
 				konquest.getMapHandler().drawRemoveTerritory(oldKingdom.getCapital());
+				// Update Discord roles
+				konquest.getIntegrationManager().getDiscordSrv().removeKingdomRole(oldKingdom.getName());
 				oldKingdom = null;
 				// Update particle borders of everyone
 				// All kingdom's towns and capital were removed, so just update everyone's border particles.
@@ -707,6 +720,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		
 		// Perform rename
 		KonKingdom oldKingdom = getKingdom(oldName);
+		String oldKingdomName = oldKingdom.getName();
 		for (KonTown town : oldKingdom.getTowns()) {
 			konquest.getMapHandler().drawRemoveTerritory(town);
 		}
@@ -720,7 +734,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			konquest.getMapHandler().drawUpdateTerritory(town);
 		}
 		konquest.getDatabaseThread().getDatabase().setOfflinePlayers(konquest.getPlayerManager().getAllPlayersInKingdom(kingdom));
-		
+		// Update Discord roles
+		konquest.getIntegrationManager().getDiscordSrv().changeKingdomRole(oldKingdomName, kingdom.getName(), kingdom.getWebColorFormal());
+
 		// Withdraw cost
 		if(!ignoreCost && costRename > 0 && player != null && KonquestPlugin.withdrawPlayer(player.getBukkitPlayer(), costRename)) {
             konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)costRename);
@@ -881,6 +897,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		 * 		Updates the smallest kingdom
 		 * 		Updates offline protections
 		 * 		Updates border particles for player
+		 * 		Updates discord roles, if enabled
 		 * 		
 		 */
     	
@@ -914,6 +931,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if(joinKingdom.equals(playerKingdom) || joinKingdom.isMember(id)) {
 			return 5;
 		}
+		String oldKingdomName = playerKingdom.getName();
 		// These checks may be bypassed when forced
 		if(!force) {
 			// Check for player that's already a kingdom master
@@ -963,7 +981,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Only perform membership updates on created kingdoms
 		if(playerKingdom.isCreated()) {
 			// Remove membership from old kingdom
-			String oldKingdomName = playerKingdom.getName();
 			boolean removeStatus;
 			// The player could be master here
 			// Potentially transfer master or disband old kingdom when force = true
@@ -989,14 +1006,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		ChatUtil.printDebug("Failed to add member "+ id +" to kingdom "+joinKingdom.getName());
     		return -1;
     	}
-    	
-    	if(isOnline) {
+
+		if(isOnline) {
     		onlinePlayer.setKingdom(joinKingdom);
     		onlinePlayer.setExileKingdom(joinKingdom);
     		onlinePlayer.setBarbarian(false);
     		// Refresh any territory bars
     		KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(onlinePlayer.getBukkitPlayer().getLocation());
-    		if(territory != null && territory instanceof KonBarDisplayer) {
+    		if(territory instanceof KonBarDisplayer) {
     			((KonBarDisplayer)territory).removeBarPlayer(onlinePlayer);
     			((KonBarDisplayer)territory).addBarPlayer(onlinePlayer);
     		}
@@ -1014,7 +1031,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		offlinePlayer.setBarbarian(false);
     		konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
     	}
-    	
+		// Update Discord roles
+		KonOfflinePlayer commonPlayer = isOnline ? onlinePlayer : offlinePlayer;
+		konquest.getIntegrationManager().getDiscordSrv().refreshPlayerRoles(commonPlayer);
+		// Update maps
     	konquest.getMapHandler().drawLabel(joinKingdom.getCapital());
     	updateSmallestKingdom();
     	
@@ -1183,7 +1203,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			if(territory instanceof KonTown) {
 				// Send a raid alert (barbarians are always a threat to towns)
 				KonTown town = (KonTown)territory;
-				town.sendRaidAlert();
+				town.sendRaidAlert(onlinePlayer);
 			}
     		// General Updates
     		konquest.updateNamePackets(onlinePlayer);
@@ -1199,8 +1219,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		offlinePlayer.setBarbarian(true);
     		konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
     	}
-    	
-    	// Common updates
+		// Update Discord roles
+		KonOfflinePlayer commonPlayer = isOnline ? onlinePlayer : offlinePlayer;
+		konquest.getIntegrationManager().getDiscordSrv().refreshPlayerRoles(commonPlayer);
+		// Common updates
     	konquest.getMapHandler().drawLabel(getKingdom(oldKingdomName).getCapital());
     	updateSmallestKingdom();
     	updateKingdomOfflineProtection();
@@ -1628,10 +1650,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				} else {
 					// There are no members to transfer master to, remove the kingdom
 					// This will also exile all players to barbarians, including the given ID
-					String name = kingdom.getName();
-					if(removeKingdom(name)) {
-						ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_DISBAND.getMessage(name));
+					if(removeKingdom(kingdomName)) {
+						ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_DISBAND.getMessage(kingdomName));
 						ChatUtil.printDebug("Successfully removed all players from kingdom "+kingdomName+", and removed the kingdom");
+						// Fire event
+						Konquest.callKonquestEvent(new KonquestKingdomDisbandEvent(konquest, kingdomName));
 						return true;
 					} else {
 						ChatUtil.printDebug("Failed to remove kingdom "+kingdomName+", no officers or members");
@@ -1824,6 +1847,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_DISBAND.getMessage(kingdomName));
 			// Update stats
 			konquest.getAccomplishmentManager().modifyPlayerStat(player, KonStatsType.KINGDOMS, -1);
+			// Fire event
+			Konquest.callKonquestEvent(new KonquestKingdomDisbandEvent(konquest, kingdomName));
 			return true;
 		} else {
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
@@ -2169,7 +2194,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
             	konquest.getAccomplishmentManager().modifyPlayerStat(payPlayer,KonStatsType.FAVOR,(int)costRelation);
             }
 		}
-
+		// Fire event
+		Konquest.callKonquestEvent(new KonquestKingdomDiplomacyEvent(konquest, kingdom, otherKingdom, ourNewActiveState));
 		return true;
 	}
 
@@ -2629,6 +2655,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				konquest.getMapHandler().drawUpdateTerritory(town);
 				konquest.getMapHandler().drawLabel(conquerKingdom.getCapital());
 				konquest.getShopHandler().deleteShopsInPoints(town.getChunkList().keySet(),town.getWorld());
+				// Fire event
+				Konquest.callKonquestEvent(new KonquestKingdomConquerEvent(konquest, oldKingdomName, conquerKingdom));
 				return town;
 			} else {
 				ChatUtil.printDebug("Failed to create new town over captured capital, status code "+status);
@@ -2648,9 +2676,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		// Try to remove
 		String townName = town.getName();
+		String kingdomName = town.getKingdom().getName();
 		if (removeTown(townName, town.getKingdom().getName())) {
 			// Successfully removed the town
 			ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_DESTROY.getMessage(townName));
+			// Fire event post-destroy
+			Konquest.callKonquestEvent(new KonquestTownDestroyPostEvent(konquest, townName, kingdomName, player, false));
 		} else {
 			ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return false;

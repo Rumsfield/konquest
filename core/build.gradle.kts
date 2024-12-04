@@ -57,7 +57,7 @@ dependencies{
     compileOnly("us.dynmap:DynmapCoreAPI:3.6")
     compileOnly("us.dynmap:dynmap-api:3.6")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly("com.discordsrv:discordsrv:1.27.0")
+    compileOnly("com.discordsrv:discordsrv:1.29.0")
     compileOnly("me.clip:placeholderapi:2.11.2")
     compileOnly("net.luckperms:api:5.4")
     compileOnly("com.github.BlueMap-Minecraft:BlueMapAPI:v2.6.0")

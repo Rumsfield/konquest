@@ -10,7 +10,7 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
  * @author Rumsfield
  *
  */
-public class KonquestPlayerEvent extends KonquestEvent {
+public abstract class KonquestPlayerEvent extends KonquestEvent {
 
 	private final KonquestPlayer player;
 	
@@ -31,6 +31,19 @@ public class KonquestPlayerEvent extends KonquestEvent {
 	 */
 	public KonquestPlayer getPlayer() {
 		return player;
+	}
+
+	/**
+	 * Convenience method to get the player's name.
+	 *
+	 * @return The player's name
+	 */
+	public String getPlayerName() {
+		if (player != null && player.getBukkitPlayer() != null) {
+			return player.getBukkitPlayer().getName();
+		} else {
+			return "";
+		}
 	}
 	
 }

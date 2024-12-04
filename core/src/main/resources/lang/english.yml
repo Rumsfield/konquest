@@ -429,7 +429,6 @@ protection:
     raze: "The Town of %s has been destroyed by the Barbarian horde!"
     destroy: "You have destroyed %s for the glory of the Barbarian horde!"
     conquer: "The Town of %s has been conquered!"
-    conquer-discord: "The Town of %s has been conquered by %s!"
     capture: "You have conquered %s for the conquest of %s!"
     kingdom-warmup: "The Kingdom of %s will be protected in %s minutes."
     kingdom-conquer: "The Kingdom of %s has been conquered by %s!"

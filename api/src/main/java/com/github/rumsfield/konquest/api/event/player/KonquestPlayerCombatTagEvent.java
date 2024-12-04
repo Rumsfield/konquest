@@ -5,9 +5,12 @@ import org.bukkit.event.Cancellable;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
- * Called when a player is attacked by another player.
+ * Called before a player is attacked by another player.
  * <p>
  * Attacking another player causes the victim to become combat tagged.
  * A player that is combat tagged is restricted from using a list of commands from the Konquest configuration.
@@ -19,8 +22,8 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
  */
 public class KonquestPlayerCombatTagEvent extends KonquestPlayerEvent implements Cancellable {
 
+	private static final HandlerList handlers = new HandlerList();
 	private boolean isCancelled;
-	
 	private final KonquestPlayer attacker;
 	private final Location location;
 	
@@ -56,14 +59,44 @@ public class KonquestPlayerCombatTagEvent extends KonquestPlayerEvent implements
 		return location;
 	}
 
+	/**
+	 * Checks whether this event is canceled.
+	 *
+	 * @return True when the event is canceled, else false
+	 */
 	@Override
 	public boolean isCancelled() {
 		return isCancelled;
 	}
 
+	/**
+	 * Controls whether the event is canceled.
+	 * Canceling this event will prevent the victim from becoming combat tagged.
+	 *
+	 * @param val True to cancel this event, else false
+	 */
 	@Override
 	public void setCancelled(boolean val) {
 		isCancelled = val;
 	}
 
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	@Override
+	@Nonnull
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 }

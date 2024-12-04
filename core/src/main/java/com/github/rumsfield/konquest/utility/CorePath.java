@@ -61,6 +61,11 @@ public enum CorePath {
 	INTEGRATION_DISCORDSRV                                ("core.integration.discordsrv"),
 	INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_DIRECT      ("core.integration.discordsrv_options.raid_alert_direct"),
 	INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_CHANNEL     ("core.integration.discordsrv_options.raid_alert_channel"),
+	INTEGRATION_DISCORDSRV_OPTIONS_AUTO_ROLES             ("core.integration.discordsrv_options.auto_roles"),
+	INTEGRATION_DISCORDSRV_OPTIONS_ROLE_DEFAULT_COLOR     ("core.integration.discordsrv_options.role_default_color"),
+	INTEGRATION_DISCORDSRV_OPTIONS_ROLE_SUFFIX            ("core.integration.discordsrv_options.role_suffix"),
+	INTEGRATION_DISCORDSRV_OPTIONS_ROLE_IS_MENTIONABLE    ("core.integration.discordsrv_options.role_is_mentionable"),
+	INTEGRATION_DISCORDSRV_OPTIONS_ROLE_PERMISSIONS       ("core.integration.discordsrv_options.role_permissions"),
 	INTEGRATION_ESSENTIALSX                               ("core.integration.essentialsx"),
 	INTEGRATION_ESSENTIALSX_OPTIONS_ENABLE_WILD_HOMES     ("core.integration.essentialsx_options.enable_wild_homes"),
 	INTEGRATION_ESSENTIALSX_OPTIONS_ENABLE_TELEPORT_PROTECTION ("core.integration.essentialsx_options.enable_teleport_protection"),
@@ -161,7 +166,7 @@ public enum CorePath {
 	TOWNS_DISCOUNT_ENABLE                                 ("core.towns.discount_enable"),
 	TOWNS_DISCOUNT_PERCENT                                ("core.towns.discount_percent"),
 	TOWNS_DISCOUNT_STACK                                  ("core.towns.discount_stack"),
-	
+
 	PLOTS_ENABLE                                          ("core.plots.enable"),
 	PLOTS_MAX_SIZE                                        ("core.plots.max_size"),
 	PLOTS_ALLOW_BUILD                                     ("core.plots.allow_build"),
@@ -176,7 +181,7 @@ public enum CorePath {
 	EXILE_REMOVE_STATS                                    ("core.exile.remove_stats"),
 	EXILE_TELEPORT_WILD                                   ("core.exile.teleport_wild"),
 	EXILE_TELEPORT_WORLD_SPAWN                            ("core.exile.teleport_world_spawn"),
-	
+
 	CAMPS_ENABLE                                          ("core.camps.enable"),
 	CAMPS_INIT_RADIUS                                     ("core.camps.init_radius"),
 	CAMPS_PROTECT_CONTAINERS                              ("core.camps.protect_containers"),
@@ -188,13 +193,13 @@ public enum CorePath {
 	CAMPS_CLAN_ALLOW_EDIT_OFFLINE                         ("core.camps.clan_allow_edit_offline"),
 	CAMPS_CLAN_ALLOW_JOIN_OFFLINE                         ("core.camps.clan_allow_join_offline"),
 	CAMPS_ENEMY_GLOW                                      ("core.camps.enemy_glow"),
-	
+
 	MONUMENTS_CRITICAL_BLOCK                              ("core.monuments.critical_block"),
 	MONUMENTS_DESTROY_AMOUNT                              ("core.monuments.destroy_amount"),
 	MONUMENTS_DAMAGE_REGEN                                ("core.monuments.damage_regen"),
 	MONUMENTS_LOOT_REFRESH                                ("core.monuments.loot_refresh"),
 	MONUMENTS_LOOT_COUNT                                  ("core.monuments.loot_count"),
-	
+
 	RUINS_CRITICAL_BLOCK                                  ("core.ruins.critical_block"),
 	RUINS_CAPTURE_COOLDOWN                                ("core.ruins.capture_cooldown"),
 	RUINS_RESPAWN_COOLDOWN                                ("core.ruins.respawn_cooldown"),
@@ -239,21 +244,21 @@ public enum CorePath {
 	FAVOR_REWARDS_CAPTURE_TOWN                            ("core.favor.rewards.capture_town"),
 	FAVOR_REWARDS_KILL_ENEMY                              ("core.favor.rewards.kill_enemy"),
 	FAVOR_REWARDS_DEFEND_RAID                             ("core.favor.rewards.defend_raid"),
-	
+
 	COMBAT_PLACEHOLDER_TAG                                ("core.combat.placeholder_tag"),
 	COMBAT_PREVENT_COMMAND_ON_DAMAGE                      ("core.combat.prevent_command_on_damage"),
 	COMBAT_ENEMY_DAMAGE_COOLDOWN_SECONDS                  ("core.combat.enemy_damage_cooldown_seconds"),
 	COMBAT_PREVENT_COMMAND_LIST                           ("core.combat.prevent_command_list"),
-	
+
 	NONE									  ("");
-	
-	
+
+
 	private final String path;
-	
+
 	CorePath(String path) {
 		this.path = path;
 	}
-	
+
 	public String getPath() {
 		return path;
     }

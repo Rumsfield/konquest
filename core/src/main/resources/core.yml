@@ -223,6 +223,31 @@ core:
       # Send a message to the linked kingdom channel in Discord when a critical block is broken in a town monument (true/false)
       raid_alert_channel: true
 
+      # (*) Automatically create and give roles based on kingdoms to linked Discord members (true/false)
+      auto_roles: true
+
+      # The color of the default role (Barbarians).
+      # You may use hex colors ('#FF8080'), see https://htmlcolorcodes.com/
+      # Or you may use named colors ('RED'), see https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html
+      role_default_color: '#A3A10A'
+
+      # The suffix tag applied to the end of a kingdom role's name.
+      # This is used to keep track of auto roles in Discord.
+      role_suffix: '(auto)'
+
+      # Whether all auto roles can be mentioned by Discord members.
+      # When true, roles can be mentioned in Discord, for example: @Rome (auto) Hello!
+      role_is_mentionable: true
+
+      # List of permissions to be applied to Discord roles.
+      # Permissions must match from this list: https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/jda/api/Permission.html
+      role_permissions:
+        - "MESSAGE_WRITE"
+        - "MESSAGE_READ"
+        - "VIEW_CHANNEL"
+        - "VOICE_CONNECT"
+        - "VOICE_SPEAK"
+
     # (*) Enable plugin integration with EssentialsX (true/false)
     essentialsx: true
 

@@ -429,7 +429,6 @@ protection:
     raze: El Pueblo de %s ha sido destruido por la horda Barbaro!
     destroy: Has destruido %s por la gloria de la horda Barbaro!
     conquer: El Pueblo de %s ha sido conquistado!
-    conquer-discord: ¡El Pueblo de %s ha sido conquistado por %s!
     capture: Has conquistado %s para la conquista de %s!
     kingdom-warmup: El Reino de %s estara protegido en %s minutos.
     kingdom-conquer: El Reino de %s ha sido conquistado por %s!
