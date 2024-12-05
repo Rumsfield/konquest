@@ -42,15 +42,20 @@ public class AccomplishmentManager {
 	public boolean isEnabled() {
 		return isEnabled;
 	}
-	
-	//TODO: Store category level map in KonStats object instead of re-calculating for every stat update
+
 	public void modifyPlayerStat(KonPlayer player, KonStatsType stat, int amount) {
+		modifyPlayerStat(player, stat, amount, false);
+	}
+
+	//TODO: Store category level map in KonStats object instead of re-calculating for every stat update
+	public void modifyPlayerStat(KonPlayer player, KonStatsType stat, int amount, boolean force) {
 		// Increase stat by amount and check for prefix updates when not in admin bypass
-		if(player.isAdminBypassActive() || player.isBarbarian())return;
+		if (!force && (player.isAdminBypassActive() || player.isBarbarian())) return;
 		KonStats playerStats = player.getPlayerStats();
 		KonPrefix playerPrefix = player.getPlayerPrefix();
-		// Increase stat
+		// Increase stat, even when accomplishment prefixes are disabled
 		playerStats.increaseStat(stat, amount);
+		// Check for enabled accomplishment prefix feature
 		if(!isEnabled) return;
 		// Determine stat category level
 		double level = 0;
