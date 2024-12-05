@@ -272,18 +272,22 @@ public class Konquest implements KonquestAPI, Timeable {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R2(); }
 
-			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.21.1")) <= 0) {
+			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.21.4")) <= 0) {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
 
 			} else {
 				isVersionSupported = false;
-				ChatUtil.printConsoleError("This version of Minecraft is not supported by Konquest!");
+
 			}
     	} catch (Exception | NoClassDefFoundError e) {
     		ChatUtil.printConsoleError("Failed to setup a version handler, ProtocolLib is probably missing. ");
     		e.printStackTrace();
     	}
+
+		if (!isVersionSupported) {
+			ChatUtil.printConsoleError("This version of Minecraft is not supported by Konquest! Some features may not work correctly.");
+		}
 
 		if(isProtocolLibEnabled) {
 			if(versionHandler != null) {
@@ -293,6 +297,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		} else {
 			ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is missing or disabled! Check version.");
 		}
+
 		if(!isVersionHandlerEnabled) {
 			ChatUtil.printConsoleError("Some Konquest features are disabled. See previous error messages.");
 		}
