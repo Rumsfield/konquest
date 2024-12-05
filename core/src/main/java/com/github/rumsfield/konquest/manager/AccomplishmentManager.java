@@ -49,8 +49,9 @@ public class AccomplishmentManager {
 		if(player.isAdminBypassActive() || player.isBarbarian())return;
 		KonStats playerStats = player.getPlayerStats();
 		KonPrefix playerPrefix = player.getPlayerPrefix();
-		// Increase stat
+		// Increase stat, even when accomplishment prefixes are disabled
 		playerStats.increaseStat(stat, amount);
+		// Check for enabled accomplishment prefix feature
 		if(!isEnabled) return;
 		// Determine stat category level
 		double level = 0;
