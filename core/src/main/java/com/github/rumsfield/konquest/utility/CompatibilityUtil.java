@@ -347,7 +347,7 @@ public class CompatibilityUtil {
 
     /**
      * Gets the Attribute field for the given name.
-     * Up until 1.21.3, Attribute was an Enum class, but then it changed into an Interface.
+     * Up until 1.21.2, Attribute was an Enum class, but then it changed into an Interface.
      * @param name Which Attribute to get, accepted values are:
      *                  "health"
      *                  "speed"
@@ -370,17 +370,28 @@ public class CompatibilityUtil {
             default:
                 break;
         }
+        String tryKey1 = "";
+        String tryKey2 = "";
         try {
-            result = Registry.ATTRIBUTE.get(NamespacedKey.minecraft(key.namespace1));
+            NamespacedKey firstKey = NamespacedKey.minecraft(key.namespace1);
+            tryKey1 = firstKey.toString();
+            result = Registry.ATTRIBUTE.get(firstKey);
         } catch (IllegalArgumentException ignore1) {
+            result = null;
+        }
+        if (result == null) {
+            // Try again
             try {
-                result = Registry.ATTRIBUTE.get(NamespacedKey.minecraft(key.namespace2));
+                NamespacedKey secondKey = NamespacedKey.minecraft(key.namespace2);
+                tryKey2 = secondKey.toString();
+                result = Registry.ATTRIBUTE.get(secondKey);
             } catch (IllegalArgumentException ignore2) {
                 result = null;
             }
         }
         if (result == null) {
             ChatUtil.printConsoleError("Failed to get Attribute using Registry key \""+key+"\" for Bukkit version "+Bukkit.getVersion());
+            ChatUtil.printConsole("Tried these namespace keys: \""+tryKey1+"\", \""+tryKey2+"\"");
             ChatUtil.printConsole("Valid NamespacedKeys for Attributes are:");
             try {
                 for (Object attribute : Registry.ATTRIBUTE) {
