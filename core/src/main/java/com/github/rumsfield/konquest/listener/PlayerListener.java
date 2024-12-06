@@ -555,10 +555,6 @@ public class PlayerListener implements Listener {
 					boolean isFriendly = playerRole.equals(KonquestRelationshipType.FRIENDLY);
 					boolean isClosedNonResident = !town.isOpen() && !town.isPlayerResident(player.getOfflineBukkitPlayer());
 					boolean isAlliedBuilder = playerRole.equals(KonquestRelationshipType.ALLY) && town.isAlliedBuildingAllowed() && konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
-					// Target player who interacts with monument blocks
-					if(town.isLocInsideMonumentProtectionArea(event.getClickedBlock().getLocation())) {
-						town.targetRabbitToPlayer(bukkitPlayer);
-					}
 					// Protections for friendly non-residents of closed towns
 					if(isFriendly && isClosedNonResident) {
 						// Check for allowed usage like buttons, levers

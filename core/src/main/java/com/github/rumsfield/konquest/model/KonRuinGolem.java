@@ -1,10 +1,12 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
@@ -46,18 +48,27 @@ public class KonRuinGolem {
 			golem.setPlayerCreated(true);
 			double defaultValue;
 			// Modify health
-			defaultValue = golem.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
-			golem.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(defaultValue*4);
-			golem.setHealth(defaultValue*1.5);
+			Attribute maxHealth = CompatibilityUtil.getAttribute("health");
+			if (maxHealth != null) {
+				AttributeInstance golemHealth = golem.getAttribute(maxHealth);
+				if (golemHealth != null) {
+					defaultValue = golemHealth.getDefaultValue();
+					golemHealth.setBaseValue(defaultValue*4);
+					golem.setHealth(defaultValue*1.5);
+				}
+			}
 			// Modify movement speed
-			defaultValue = golem.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getDefaultValue();
-			golem.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(defaultValue*0.5);
-			// Modify follow range
-			//golem.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(10);
+			Attribute movementSpeed = CompatibilityUtil.getAttribute("speed");
+			if (movementSpeed != null) {
+				AttributeInstance golemSpeed = golem.getAttribute(movementSpeed);
+				if (golemSpeed != null) {
+					defaultValue = golemSpeed.getDefaultValue();
+					golemSpeed.setBaseValue(defaultValue*0.5);
+				}
+			}
 			// Play spawn noise
 			spawnLoc.getWorld().playSound(spawnLoc, Sound.ENTITY_IRON_GOLEM_REPAIR, 1.0F, 1.2F);
 		}
-
 	}
 	
 	public void respawn() {
