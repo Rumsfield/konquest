@@ -1533,8 +1533,6 @@ public class BlockListener implements Listener {
 			String kingdomName = town.getKingdom().getName();
 			// Execute custom commands from config
 			konquest.executeCustomCommand(CustomCommandPath.TOWN_MONUMENT_CRITICAL,player.getBukkitPlayer());
-			// Target rabbit
-			town.targetRabbitToPlayer(player.getBukkitPlayer());
 			// Alert all players of enemy Kingdom when the first critical block is broken
 			if(town.getMonument().getCriticalHits() == 1) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {

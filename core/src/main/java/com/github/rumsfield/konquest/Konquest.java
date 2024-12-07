@@ -18,6 +18,7 @@ import com.google.common.collect.MapMaker;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
@@ -241,7 +242,6 @@ public class Konquest implements KonquestAPI, Timeable {
 		ruinManager.saveRuins();
 		ruinManager.regenAllRuins();
 		ruinManager.removeAllGolems();
-		kingdomManager.removeAllRabbits();
 		playerManager.clearAllMobTargets();
 		configManager.saveConfigs();
 		databaseThread.flushDatabase();
@@ -272,18 +272,22 @@ public class Konquest implements KonquestAPI, Timeable {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R2(); }
 
-			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.21.1")) <= 0) {
+			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.21.4")) <= 0) {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
 
 			} else {
 				isVersionSupported = false;
-				ChatUtil.printConsoleError("This version of Minecraft is not supported by Konquest!");
+
 			}
     	} catch (Exception | NoClassDefFoundError e) {
     		ChatUtil.printConsoleError("Failed to setup a version handler, ProtocolLib is probably missing. ");
     		e.printStackTrace();
     	}
+
+		if (!isVersionSupported) {
+			ChatUtil.printConsoleError("This version of Minecraft is not supported by Konquest! Some features may not work correctly.");
+		}
 
 		if(isProtocolLibEnabled) {
 			if(versionHandler != null) {
@@ -293,6 +297,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		} else {
 			ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is missing or disabled! Check version.");
 		}
+
 		if(!isVersionHandlerEnabled) {
 			ChatUtil.printConsoleError("Some Konquest features are disabled. See previous error messages.");
 		}
@@ -575,10 +580,16 @@ public class Konquest implements KonquestAPI, Timeable {
     	kingdomManager.clearTownHearts(player);
     	boolean doReset = getCore().getBoolean(CorePath.RESET_LEGACY_HEALTH.getPath(),false);
     	if(doReset) {
-    		double baseHealth = bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
-    		if(baseHealth > 20) {
-    			bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
-    		}
+			Attribute maxHealth = CompatibilityUtil.getAttribute("health");
+			if (maxHealth != null) {
+				AttributeInstance playerHealth = bukkitPlayer.getAttribute(maxHealth);
+				if (playerHealth != null) {
+					double baseHealth = playerHealth.getBaseValue();
+					if(baseHealth > 20) {
+						playerHealth.setBaseValue(20);
+					}
+				}
+			}
     	}
 		// Force prefix title if needed
 		boolean isTitleAlwaysShown = getCore().getBoolean(CorePath.CHAT_ALWAYS_SHOW_TITLE.getPath(),false);

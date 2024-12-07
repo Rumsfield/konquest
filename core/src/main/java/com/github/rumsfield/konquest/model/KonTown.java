@@ -1,7 +1,6 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.api.event.town.KonquestTownAttackEvent;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownRaidEvent;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
@@ -64,7 +63,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private final ArrayList<UUID> defenders;
 	private final HashMap<KonquestUpgrade,Integer> upgrades;
 	private final HashMap<KonquestUpgrade,Integer> disabledUpgrades;
-	private final KonTownRabbit rabbit;
 	private final HashMap<Point,KonPlot> plots;
 	private final Map<KonPropertyFlag,Boolean> properties;
 	private Villager.Profession specialization;
@@ -116,7 +114,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.defenders = new ArrayList<>();
 		this.upgrades = new HashMap<>();
 		this.disabledUpgrades = new HashMap<>();
-		this.rabbit = new KonTownRabbit(getSpawnLoc());
 		this.plots = new HashMap<>();
 		this.townOptions = new HashMap<>();
 		initOptions();
@@ -1022,7 +1019,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		} else {
 			this.isAttacked = false;
 			defenders.clear();
-			rabbit.remove();
 		}
 	}
 	
@@ -1062,14 +1058,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		// Default
 		return false;
-	}
-	
-	public void targetRabbitToPlayer(Player player) {
-		rabbit.targetTo(player);
-	}
-	
-	public void removeRabbit() {
-		rabbit.remove();
 	}
 	
 	public void updateBarTitle() {

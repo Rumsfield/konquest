@@ -3410,14 +3410,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		return neutrals;
 	}
 	
-	public void removeAllRabbits() {
-		for(KonKingdom kingdom : getKingdoms()) {
-			for(KonTown town : kingdom.getCapitalTowns()) {
-				town.removeRabbit();
-			}
-		}
-	}
-	
 	public void reloadMonumentsForTemplate(KonMonumentTemplate template) {
 		for(KonKingdom kingdom : getKingdoms()) {
 			if(kingdom.isMonumentTemplateValid() && kingdom.getMonumentTemplate().equals(template)) {

@@ -48,6 +48,24 @@ public class CompatibilityUtil {
     }
 
     /**
+     * Map old attribute namespaces to new ones
+     */
+    private enum AttributeComp {
+        // Attribute Field Name     1.16.5 - 1.21.1             1.21.2 +
+        MAX_HEALTH                  ("generic.max_health",      "max_health"),
+        MOVEMENT_SPEED              ("generic.movement_speed",  "movement_speed"),
+        ATTACK_DAMAGE               ("generic.attack_damage",   "attack_damage");
+
+        public final String namespace1;
+        public final String namespace2;
+
+        AttributeComp(String namespace1, String namespace2) {
+            this.namespace1 = namespace1; // 1.16.5 - 1.21.1
+            this.namespace2 = namespace2; // 1.21.2 +
+        }
+    }
+
+    /**
      * Map old enchantment namespaces to new ones
      */
     private enum EnchantComp {
@@ -187,6 +205,14 @@ public class CompatibilityUtil {
                 errorCode |= 16;
             }
         }
+        // Attributes
+        Attribute maxHealth = getAttribute("health");
+        Attribute movementSpeed = getAttribute("speed");
+        Attribute attackDamage = getAttribute("damage");
+        if (maxHealth == null || movementSpeed == null || attackDamage == null) {
+            pass = false;
+            errorCode |= 32;
+        }
         // Result message
         if (pass) {
             ChatUtil.printConsoleAlert("Successfully validated API compatibility");
@@ -314,6 +340,68 @@ public class CompatibilityUtil {
                 for (PotionEffectType effect : PotionEffectType.values()) {
                     ChatUtil.printConsole(effect.getName());
                 }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Gets the Attribute field for the given name.
+     * Up until 1.21.2, Attribute was an Enum class, but then it changed into an Interface.
+     * @param name Which Attribute to get, accepted values are:
+     *                  "health"
+     *                  "speed"
+     *                  "damage"
+     * @return The Attribute appropriate for the current version
+     */
+    public static Attribute getAttribute(String name) {
+        Attribute result;
+        AttributeComp key = AttributeComp.MAX_HEALTH;
+        switch (name.toLowerCase()) {
+            case "health":
+                key = AttributeComp.MAX_HEALTH;
+                break;
+            case "speed":
+                key = AttributeComp.MOVEMENT_SPEED;
+                break;
+            case "damage":
+                key = AttributeComp.ATTACK_DAMAGE;
+                break;
+            default:
+                break;
+        }
+        String tryKey1 = "";
+        String tryKey2 = "";
+        try {
+            NamespacedKey firstKey = NamespacedKey.minecraft(key.namespace1);
+            tryKey1 = firstKey.toString();
+            result = Registry.ATTRIBUTE.get(firstKey);
+        } catch (IllegalArgumentException ignore1) {
+            result = null;
+        }
+        if (result == null) {
+            // Try again
+            try {
+                NamespacedKey secondKey = NamespacedKey.minecraft(key.namespace2);
+                tryKey2 = secondKey.toString();
+                result = Registry.ATTRIBUTE.get(secondKey);
+            } catch (IllegalArgumentException ignore2) {
+                result = null;
+            }
+        }
+        if (result == null) {
+            ChatUtil.printConsoleError("Failed to get Attribute using Registry key \""+key+"\" for Bukkit version "+Bukkit.getVersion());
+            ChatUtil.printConsole("Tried these namespace keys: \""+tryKey1+"\", \""+tryKey2+"\"");
+            ChatUtil.printConsole("Valid NamespacedKeys for Attributes are:");
+            try {
+                for (Object attribute : Registry.ATTRIBUTE) {
+                    Method getKey = attribute.getClass().getMethod("getKey");
+                    getKey.setAccessible(true);
+                    NamespacedKey attributeNamespacedKey = (NamespacedKey) getKey.invoke(attribute);
+                    ChatUtil.printConsole(attributeNamespacedKey.toString());
+                }
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
         }
         return result;
@@ -488,7 +576,7 @@ public class CompatibilityUtil {
         }
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
-        meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier("foo",0,AttributeModifier.Operation.MULTIPLY_SCALAR_1)); // This is necessary as of 1.20.6
+        meta.addAttributeModifier(getAttribute("damage"), new AttributeModifier("foo",0,AttributeModifier.Operation.MULTIPLY_SCALAR_1)); // This is necessary as of 1.20.6
         for(ItemFlag flag : ItemFlag.values()) {
             meta.addItemFlags(flag);
         }
@@ -519,7 +607,9 @@ public class CompatibilityUtil {
     public static void applyHealthModifier(Player player, double modAmount, String modName, NamespacedKey modKey) {
         // Check for existing modifier
         boolean isModActive = false;
-        AttributeInstance playerHealthAtt = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        Attribute maxHealth = getAttribute("health");
+        if (maxHealth == null) return;
+        AttributeInstance playerHealthAtt = player.getAttribute(maxHealth);
         assert playerHealthAtt != null;
         for (AttributeModifier mod : playerHealthAtt.getModifiers()) {
             ChatUtil.printDebug("Checking health mod: "+mod.getName());
@@ -565,7 +655,9 @@ public class CompatibilityUtil {
 
     public static void removeHealthModifier(Player player, String modName, NamespacedKey modKey) {
         // Search for modifier and remove
-        AttributeInstance playerHealthAtt = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        Attribute maxHealth = getAttribute("health");
+        if (maxHealth == null) return;
+        AttributeInstance playerHealthAtt = player.getAttribute(maxHealth);
         assert playerHealthAtt != null;
         for (AttributeModifier mod : playerHealthAtt.getModifiers()) {
             ChatUtil.printDebug("Checking health mod: "+mod.getName());
