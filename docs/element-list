@@ -1,6 +1,7 @@
 com.github.rumsfield.konquest.api
 com.github.rumsfield.konquest.api.event
 com.github.rumsfield.konquest.api.event.camp
+com.github.rumsfield.konquest.api.event.kingdom
 com.github.rumsfield.konquest.api.event.player
 com.github.rumsfield.konquest.api.event.ruin
 com.github.rumsfield.konquest.api.event.territory
