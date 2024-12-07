@@ -46,24 +46,26 @@ public class KonRuinGolem {
 			// Spawn golem entity
 			golem = (IronGolem)spawnLoc.getWorld().spawnEntity(modLoc, EntityType.IRON_GOLEM);
 			golem.setPlayerCreated(true);
-			double defaultValue;
+			double baseValue;
 			// Modify health
+			// Iron Golem default = 20, base = 100
 			Attribute maxHealth = CompatibilityUtil.getAttribute("health");
 			if (maxHealth != null) {
 				AttributeInstance golemHealth = golem.getAttribute(maxHealth);
 				if (golemHealth != null) {
-					defaultValue = golemHealth.getDefaultValue();
-					golemHealth.setBaseValue(defaultValue*4);
-					golem.setHealth(defaultValue*1.5);
+					baseValue = golemHealth.getBaseValue();
+					golemHealth.setBaseValue(baseValue*4);
+					golem.setHealth(baseValue*1.5);
 				}
 			}
 			// Modify movement speed
+			// Iron Golem default = 0.7, base = 0.25
 			Attribute movementSpeed = CompatibilityUtil.getAttribute("speed");
 			if (movementSpeed != null) {
 				AttributeInstance golemSpeed = golem.getAttribute(movementSpeed);
 				if (golemSpeed != null) {
-					defaultValue = golemSpeed.getDefaultValue();
-					golemSpeed.setBaseValue(defaultValue*0.5);
+					baseValue = golemSpeed.getBaseValue();
+					golemSpeed.setBaseValue(baseValue*1.5);
 				}
 			}
 			// Play spawn noise
