@@ -572,7 +572,6 @@ public class BlockListener implements Listener {
 			if(player.isAdminBypassActive()) {
 				// When player is in admin bypass and places a block
 				checkMonumentTemplateBlanking(event);
-			} else {
 				return;
 			}
 
@@ -761,21 +760,14 @@ public class BlockListener implements Listener {
 						isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
 					}
 					// Prevent additional beds from being placed by anyone
-					boolean isBlockBed = event.getBlock().getBlockData() instanceof Bed;
-					boolean isPlaceLocBed = event.getBlock().getWorld().getBlockAt(placeLoc).getBlockData() instanceof Bed;
-					if(isBlockBed && !isPlaceLocBed) {
-						if(event.getBlock().getWorld().getBlockAt(camp.getBedLocation()).getBlockData() instanceof Bed) {
-							// The camp has a bed block already
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_BED.getMessage());
-							event.setCancelled(true);
-							return;
-						} else if(camp.isPlayerOwner(player.getBukkitPlayer())){
-							// The camp does not have a bed and the owner is placing a new one
+					if(event.getBlock().getBlockData() instanceof Bed) {
+						if(camp.isPlayerOwner(player.getBukkitPlayer())){
+							// The owner is placing a new bed
 							camp.setBedLocation(event.getBlock().getLocation());
 							player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
 							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_UPDATE.getMessage());
 						} else {
-							// The camp does not have a bed and this player is not the owner
+							// This player is not the owner, prevent bed placements
 							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_BED.getMessage());
 							event.setCancelled(true);
 							return;
