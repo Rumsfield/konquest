@@ -60,7 +60,7 @@ public class BlockListener implements Listener {
 	 * Fires when a block breaks.
 	 * Check for breaks inside Monuments by enemies. Peaceful members cannot break other territories.
 	 */
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockBreak(BlockBreakEvent event) {
 		if(event.isCancelled()) return;
 		
@@ -548,7 +548,7 @@ public class BlockListener implements Listener {
 	 * for backwards compatibility to 1.16.
 	 */
 	@SuppressWarnings( "deprecation" )
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onBlockPlace(BlockPlaceEvent event) {
 		if(event.isCancelled()) {
 			return;
@@ -560,48 +560,59 @@ public class BlockListener implements Listener {
 		
 		// Track last block placed per player
 		konquest.lastPlaced.put(event.getPlayer(),event.getBlock().getLocation());
-		if(!konquest.getPlayerManager().isOnlinePlayer(event.getPlayer())) {
+		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
+		if (player == null) {
 			ChatUtil.printDebug("Failed to handle onBlockPlace for non-existent player");
 			return;
 		}
-		KonPlayer player = konquest.getPlayerManager().getPlayer(event.getPlayer());
 		Location placeLoc = event.getBlock().getLocation();
 		// Monitor blocks in claimed territory
 		if(territoryManager.isChunkClaimed(placeLoc)) {
 			// Bypass event restrictions for player in Admin Bypass Mode
-			if(!player.isAdminBypassActive()) {
-				KonTerritory territory = territoryManager.getChunkTerritory(placeLoc);
-				
-				// Property Flag Holders
-				if(territory instanceof KonPropertyFlagHolder) {
-					KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
-					if(flagHolder.hasPropertyValue(KonPropertyFlag.BUILD)) {
-						if(!flagHolder.getPropertyValue(KonPropertyFlag.BUILD)) {
-							notifyAdminBypass(event.getPlayer());
-							// Block it
-							ChatUtil.sendKonBlockedFlagTitle(player);
-							event.setCancelled(true);
-							return;
-						}
+			if(player.isAdminBypassActive()) {
+				// When player is in admin bypass and places a block
+				checkMonumentTemplateBlanking(event);
+				return;
+			}
+
+			KonTerritory territory = territoryManager.getChunkTerritory(placeLoc);
+			assert territory != null;
+
+			// Property Flag Holders
+			if(territory instanceof KonPropertyFlagHolder) {
+				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
+				if(flagHolder.hasPropertyValue(KonPropertyFlag.BUILD)) {
+					if(!flagHolder.getPropertyValue(KonPropertyFlag.BUILD)) {
+						notifyAdminBypass(event.getPlayer());
+						// Block it
+						ChatUtil.sendKonBlockedFlagTitle(player);
+						event.setCancelled(true);
+						return;
 					}
 				}
-				
-				// Checks for capital and town
-				boolean isCapital = territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL);
-				boolean isTown = territory.getTerritoryType().equals(KonquestTerritoryType.TOWN);
-				if(isCapital || isTown) {
+			}
+
+			// Territory-specific checks
+			switch(territory.getTerritoryType()) {
+
+				/*
+				 * Capital & Town checks
+				 */
+				case CAPITAL:
+				case TOWN:
 					assert territory instanceof KonTown;
 					KonTown town = (KonTown) territory;
+					boolean isCapital = territory.getTerritoryType().equals(KonquestTerritoryType.CAPITAL);
 					// Check player's relationship to this town
 					KonquestRelationshipType playerRole = kingdomManager.getRelationRole(player.getKingdom(), town.getKingdom());
-					
+
 					// Stop all block edits in center chunk
 					if(town.isLocInsideMonumentProtectionArea(placeLoc)) {
 						ChatUtil.sendKonBlockedProtectionTitle(player);
 						event.setCancelled(true);
 						return;
 					}
-					
+
 					// Checks for friendly players
 					if(playerRole.equals(KonquestRelationshipType.FRIENDLY)) {
 						// Notify player when there is no lord
@@ -699,7 +710,7 @@ public class BlockListener implements Listener {
 								return;
 							}
 							/* This town can be attacked... */
-							
+
 							// If town is shielded, prevent all enemy block edits
 							if(town.isShielded()) {
 								ChatUtil.sendKonBlockedShieldTitle(player);
@@ -734,131 +745,103 @@ public class BlockListener implements Listener {
 							event.setCancelled(true);
 							return;
 						}
-						
 					}
-					
-				}
-				
-				// Territory-specific checks
-				switch(territory.getTerritoryType()) {
-					
-					/*
-					 * Capital checks
-					 */
-					case CAPITAL:
-						// TBD
-						break;
-						
-					/*
-					 * Town checks
-					 */
-					case TOWN:
-						// TBD
-						break;
-						
-					/*
-					 * Camp checks
-					 */
-					case CAMP:
-						assert territory instanceof KonCamp;
-						KonCamp camp = (KonCamp)territory;
-						boolean isMemberAllowedEdit = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ALLOW_EDIT_OFFLINE.getPath(), false);
-						boolean isMember = false;
-						if(konquest.getCampManager().isCampGrouped(camp)) {
-							isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
-						}
-						// Prevent additional beds from being placed by anyone
-						if(event.getBlock().getBlockData() instanceof Bed) {
-							if(event.getBlock().getWorld().getBlockAt(camp.getBedLocation()).getBlockData() instanceof Bed) {
-								// The camp has a bed block already
-								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_BED.getMessage());
-								event.setCancelled(true);
-								return;
-							} else if(camp.isPlayerOwner(player.getBukkitPlayer())){
-								// The camp does not have a bed and the owner is placing a new one
-								camp.setBedLocation(event.getBlock().getLocation());
-								player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
-								ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_UPDATE.getMessage());
-							} else {
-								// The camp does not have a bed and this player is not the owner
-								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_BED.getMessage());
-								event.setCancelled(true);
-								return;
-							}
-						}
-						// If the camp owner is not online, prevent block placement optionally for clan members
-						if(camp.isProtected() && !(isMember && isMemberAllowedEdit)) {
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP.getMessage(camp.getName()));
+					break;
+
+				/*
+				 * Camp checks
+				 */
+				case CAMP:
+					assert territory instanceof KonCamp;
+					KonCamp camp = (KonCamp)territory;
+					boolean isMemberAllowedEdit = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ALLOW_EDIT_OFFLINE.getPath(), false);
+					boolean isMember = false;
+					if(konquest.getCampManager().isCampGrouped(camp)) {
+						isMember = konquest.getCampManager().getCampGroup(camp).isPlayerMember(player.getBukkitPlayer());
+					}
+					// Prevent additional beds from being placed by anyone
+					if(event.getBlock().getBlockData() instanceof Bed) {
+						if(camp.isPlayerOwner(player.getBukkitPlayer())){
+							// The owner is placing a new bed
+							camp.setBedLocation(event.getBlock().getLocation());
+							player.getBukkitPlayer().setBedSpawnLocation(event.getBlock().getLocation(), true);
+							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_UPDATE.getMessage());
+						} else {
+							// This player is not the owner, prevent bed placements
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP_BED.getMessage());
 							event.setCancelled(true);
 							return;
 						}
-						break;
-						
-					/*
-					 * Ruin checks
-					 */
-					case RUIN:
-						// Prevent all placement within ruins
+					}
+					// If the camp owner is not online, prevent block placement optionally for clan members
+					if(camp.isProtected() && !(isMember && isMemberAllowedEdit)) {
+						ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_CAMP.getMessage(camp.getName()));
+						event.setCancelled(true);
+						return;
+					}
+					break;
+
+				/*
+				 * Ruin checks
+				 */
+				case RUIN:
+					// Prevent all placement within ruins
+					notifyAdminBypass(event.getPlayer());
+					ChatUtil.sendKonBlockedProtectionTitle(player);
+					event.setCancelled(true);
+					return;
+
+				/*
+				 * Sanctuary checks
+				 */
+				case SANCTUARY:
+					assert territory instanceof KonSanctuary;
+					KonSanctuary sanctuary = (KonSanctuary)territory;
+					// Always prevent monument template edits
+					KonMonumentTemplate template = sanctuary.getTemplate(placeLoc);
+					if(template != null) {
 						notifyAdminBypass(event.getPlayer());
+						// Block it
 						ChatUtil.sendKonBlockedProtectionTitle(player);
 						event.setCancelled(true);
 						return;
-						
-					/*
-					 * Sanctuary checks
-					 */
-					case SANCTUARY:
-						assert territory instanceof KonSanctuary;
-						KonSanctuary sanctuary = (KonSanctuary)territory;
-						// Always prevent monument template edits
-						KonMonumentTemplate template = sanctuary.getTemplate(placeLoc);
-						if(template != null) {
-							notifyAdminBypass(event.getPlayer());
-							// Block it
-							ChatUtil.sendKonBlockedProtectionTitle(player);
-							event.setCancelled(true);
-							return;
-						}
-						break;
-						
-					default:
-						// Unknown territory type, do nothing.
-						break;
-				}
-			} else {
-				// When player is in admin bypass and places a block
-				checkMonumentTemplateBlanking(event);
+					}
+					break;
+
+				default:
+					// Unknown territory type, do nothing.
+					break;
 			}
+
 		} else {
 			// When placing blocks in the wilderness...
+			if(player.isAdminBypassActive()) return;
 
 			// Prevent barbarians who already have a camp from placing a bed
 			// Attempt to create a camp for barbarians who place a bed
-			if(!player.isAdminBypassActive()) {
-				// Check if the player is a barbarian placing a bed
-				if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && player.getBukkitPlayer().hasPermission("konquest.create.camp")) {
-					// Fire event
-					KonquestPlayerCampEvent invokePreEvent = new KonquestPlayerCampEvent(konquest, player, event.getBlock().getLocation());
-					Konquest.callKonquestEvent(invokePreEvent);
-					// Check for cancelled
-					if(invokePreEvent.isCancelled()) {
-						event.setCancelled(true);
-						return;
-					}
-					boolean status = campManager.addCampForPlayer(event.getBlock().getLocation(), player);
-					if(!status) {
-						event.setCancelled(true);
-					}
-				} else {
-					// Wild placement by non-barbarian
-					boolean isWildBuild = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_BUILD.getPath(), true);
-					boolean isWorldValid = konquest.isWorldValid(event.getBlock().getLocation());
-					if(!isWildBuild && isWorldValid) {
-						// No building is allowed in the wild in valid worlds
-						notifyAdminBypass(event.getPlayer());
-						ChatUtil.sendKonBlockedProtectionTitle(player);
-						event.setCancelled(true);
-					}
+			// Check if the player is a barbarian placing a bed
+			if(player.isBarbarian() && event.getBlock().getBlockData() instanceof Bed && player.getBukkitPlayer().hasPermission("konquest.create.camp")) {
+				// Fire event
+				KonquestPlayerCampEvent invokePreEvent = new KonquestPlayerCampEvent(konquest, player, event.getBlock().getLocation());
+				Konquest.callKonquestEvent(invokePreEvent);
+				// Check for cancelled
+				if(invokePreEvent.isCancelled()) {
+					event.setCancelled(true);
+					return;
+				}
+				boolean status = campManager.addCampForPlayer(event.getBlock().getLocation(), player);
+				if(!status) {
+					event.setCancelled(true);
+				}
+			} else {
+				// Wild placement by non-barbarian
+				boolean isWildBuild = konquest.getCore().getBoolean(CorePath.KINGDOMS_WILD_BUILD.getPath(), true);
+				boolean isWorldValid = konquest.isWorldValid(event.getBlock().getLocation());
+				if(!isWildBuild && isWorldValid) {
+					// No building is allowed in the wild in valid worlds
+					notifyAdminBypass(event.getPlayer());
+					ChatUtil.sendKonBlockedProtectionTitle(player);
+					event.setCancelled(true);
 				}
 			}
 		}
