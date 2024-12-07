@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.hook;
 import com.Acrobot.ChestShop.ChestShop;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.listener.ChestShopListener;
+import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -34,11 +35,15 @@ public class ChestShopHook implements PluginHook {
         if(!konquest.getCore().getBoolean(CorePath.INTEGRATION_CHESTSHOP.getPath(),false)) {
             return 3;
         }
-
-        chestShopAPI = (ChestShop) chestShop;
-        isEnabled = true;
-        konquest.getPlugin().getServer().getPluginManager().registerEvents(new ChestShopListener(konquest.getPlugin()), konquest.getPlugin());
-        return 0;
+        try {
+            chestShopAPI = (ChestShop) chestShop;
+            konquest.getPlugin().getServer().getPluginManager().registerEvents(new ChestShopListener(konquest.getPlugin()), konquest.getPlugin());
+            isEnabled = true;
+            return 0;
+        } catch (NoClassDefFoundError ignore) {
+            ChatUtil.printConsoleError("Wrong ChestShop plugin installed, check the Konquest wiki for official dependencies.");
+            return 4;
+        }
     }
 
     @Override
