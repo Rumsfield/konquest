@@ -21,6 +21,8 @@ label:
   bypass: 避開
   camp: 營地
   capital: 首都
+  changing-capital: 更改為王國首都
+  changing-town: 換到城鎮
   close: 關閉
   cost: 成本
   critical-hits: 致命打擊
@@ -298,6 +300,7 @@ menu:
     transfer: 轉移
     template: 模板
     disband: 解散
+    capital: 首都
     description-join: 請求加入一個王國，或使用 /k kingdom create 創建自己的王國
     description-exile: 離開您當前的王國，成為一名蠻族
     description-invites: 查看您的王國邀請
@@ -309,6 +312,7 @@ menu:
     description-transfer: 將王國主權轉移到另一成員
     description-template: 更改王國紀念碑模板
     description-disband: 解散並刪除王國
+    description-capital: 將首都遷往另一個城鎮
     hint-open: 點擊以打開
     hint-exile: 點擊以成為蠻族
     hint-exit: 退出菜單
@@ -324,6 +328,7 @@ menu:
     hint-promote: 點擊以晉升為官員
     hint-demote: 點擊以降級為成員
     hint-transfer: 點擊以轉讓主權
+    hint-capital: 點擊更改首都
     they-requested: 他們請求
     we-requested: 我們請求
     diplomacy-peace-war-instant: 立即宣布和平
@@ -352,6 +357,7 @@ menu:
     title-transfer: 王國主權轉移
     title-template: 紀念碑模板
     title-disband: 解散王國
+    title-capital: 轉移資本
 generic:
   notice:
     enable-auto: 已啟用。再次使用此命令可禁用。
@@ -423,7 +429,6 @@ protection:
     raze: '%s 鎮已被蠻族大軍摧毀！'
     destroy: 您已經為蠻族榮譽摧毀了 %s！
     conquer: '%s 鎮已被征服！'
-    conquer-discord: '%s 鎮已被 %s 征服！'
     capture: 您已經征服了 %s，以征服 %s！
     kingdom-warmup: '%s 王國將在 %s 分鐘內受到保護。'
     kingdom-conquer: '%s 王國已被 %s 征服！'
@@ -578,6 +583,7 @@ command:
       cost-town-rename: 重命名一個城鎮
       cost-kingdom-create: 創建一個王國
       cost-kingdom-rename: 重命名王國
+      cost-capital-swap: 遷都王國
   help:
     notice:
       header: 幫助頁面 %s
@@ -615,6 +621,9 @@ command:
       demote: '%s 已降職為 %s 王國的成員。'
       disband: '%s 王國已解散！'
       destroy: '%s 鎮已被摧毀！'
+      capital-swap: '%s 的王國首都已遷至 %s 鎮。'
+      capital-warmup: '%s 的王國首都將在 %s 遷往 %s 的城鎮。'
+      capital-cancel: 敵人的攻擊阻止了 %s 王國首都向 %s 鎮的遷移！
     notice:
       request-sent: 已發送成員請求加入 %s。
       request-received: 收到新的王國加入請求，輸入 "/k kingdom" 以查看。
@@ -669,6 +678,8 @@ command:
       template-attack: 無法在王國首都受到攻擊時更改紀念碑模板。
       template-chosen: 此紀念碑模板已為王國選定。
       web-color-invalid: '無效的顏色，必須匹配顏色名稱或以 # 開頭的十六進位代碼。'
+      capital-swap-attack: 受到攻擊時無法更改王國首都。
+      capital-swap-war: 當您的王國處於戰爭狀態時無法更改王國首都。
   list:
     notice:
       header: '%s 列表'

@@ -10,7 +10,7 @@ import com.github.rumsfield.konquest.api.model.KonquestRuin;
  * @author Rumsfield
  *
  */
-public class KonquestRuinEvent extends KonquestEvent {
+public abstract class KonquestRuinEvent extends KonquestEvent {
 
 	private final KonquestRuin ruin;
 	

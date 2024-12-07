@@ -739,12 +739,10 @@ public class EntityListener implements Listener {
     					// Iron Golem lives
 	    				LivingEntity currentTarget = golem.getTarget();
 	    				if(currentTarget instanceof Player) {
-	    					if(!konquest.getPlayerManager().isOnlinePlayer((Player)currentTarget)) {
-	    						ChatUtil.printDebug("Failed to handle onEntityDamageByPlayer golem targeting for non-existent player");
-	    					} else {
-		    					KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
-		    					previousTargetPlayer.removeMobAttacker(golem);
-	    					}
+							KonPlayer previousTargetPlayer = playerManager.getPlayer((Player)currentTarget);
+							if (previousTargetPlayer != null) {
+								previousTargetPlayer.removeMobAttacker(golem);
+							}
 	    				}
 	    				golem.setTarget(bukkitPlayer);
 	    				player.addMobAttacker(golem);
@@ -846,6 +844,7 @@ public class EntityListener implements Listener {
 			boolean isFlagArenaAllowed = konquest.getIntegrationManager().getWorldGuard().isLocationArenaAllowed(victimBukkitPlayer.getLocation(),attackerBukkitPlayer);
 
 			// Check for kingdom relationships
+			boolean isBarbarianPvpEnabled = konquest.getCore().getBoolean(CorePath.BARBARIANS_ALLOW_PVP.getPath(), true);
 			boolean isAllDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_ALL_PVP.getPath(), false);
 			boolean isPeaceDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_PEACEFUL_PVP.getPath(), false);
 			boolean isPlayerEnemy = true;
@@ -876,6 +875,12 @@ public class EntityListener implements Listener {
 				// Protect pvp when property is false
 				if (isPropertyPvpProtected) {
 					ChatUtil.sendKonBlockedFlagTitle(attackerPlayer);
+					event.setCancelled(true);
+					return;
+				}
+				// Protect against barbarian pvp
+				if (!isBarbarianPvpEnabled && (attackerPlayer.isBarbarian() || victimPlayer.isBarbarian())) {
+					ChatUtil.sendKonBlockedProtectionTitle(attackerPlayer);
 					event.setCancelled(true);
 					return;
 				}

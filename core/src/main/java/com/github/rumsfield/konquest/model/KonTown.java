@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.event.town.KonquestTownRaidEvent;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
@@ -30,8 +31,8 @@ import java.util.*;
  * @prerequisites	The Town's Kingdom must have a valid Monument Template
  */
 public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplayer, KonPropertyFlagHolder, Timeable {
-	
-	private final KonMonument monument;
+
+	private KonMonument monument;
 	private final Timer monumentTimer;
 	private final Timer captureTimer;
 	private final Timer raidAlertTimer;
@@ -45,9 +46,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private final BossBar monumentBarPeace;
 	private final BossBar monumentBarTrade;
 	private final BossBar monumentBarAlliance;
+	private final BossBar capitalSwapBar;
 	private UUID lord;
 	private final HashMap<UUID,Boolean> residents;
-	private final RequestKeeper joinRequestKeeper;
+	private RequestKeeper joinRequestKeeper;
 	private final HashMap<KonTownOption,Boolean> townOptions;
 	private boolean isAttacked;
 	private boolean isShielded;
@@ -61,7 +63,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private final ArrayList<UUID> defenders;
 	private final HashMap<KonquestUpgrade,Integer> upgrades;
 	private final HashMap<KonquestUpgrade,Integer> disabledUpgrades;
-	private final KonTownRabbit rabbit;
 	private final HashMap<Point,KonPlot> plots;
 	private final Map<KonPropertyFlag,Boolean> properties;
 	private Villager.Profession specialization;
@@ -88,12 +89,15 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.monumentBarPeace = Bukkit.getServer().createBossBar(Konquest.peacefulColor2+name, ChatUtil.mapBarColor(Konquest.peacefulColor1), BarStyle.SOLID);
 		this.monumentBarPeace.setVisible(true);
 		this.monumentBarPeace.setProgress(1.0);
-		this.monumentBarTrade = Bukkit.getServer().createBossBar(Konquest.tradeColor2 +name, ChatUtil.mapBarColor(Konquest.tradeColor1), BarStyle.SOLID);
+		this.monumentBarTrade = Bukkit.getServer().createBossBar(Konquest.tradeColor2+name, ChatUtil.mapBarColor(Konquest.tradeColor1), BarStyle.SOLID);
 		this.monumentBarTrade.setVisible(true);
 		this.monumentBarTrade.setProgress(1.0);
 		this.monumentBarAlliance = Bukkit.getServer().createBossBar(Konquest.alliedColor2+name, ChatUtil.mapBarColor(Konquest.alliedColor1), BarStyle.SOLID);
 		this.monumentBarAlliance.setVisible(true);
 		this.monumentBarAlliance.setProgress(1.0);
+		this.capitalSwapBar = Bukkit.getServer().createBossBar(ChatColor.GOLD+"", ChatUtil.mapBarColor(ChatColor.GOLD), BarStyle.SOLID);
+		this.capitalSwapBar.setVisible(false);
+		this.capitalSwapBar.setProgress(1.0);
 		// Other stuff
 		this.lord = null; // init with no lord
 		this.residents = new HashMap<>();
@@ -110,13 +114,51 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.defenders = new ArrayList<>();
 		this.upgrades = new HashMap<>();
 		this.disabledUpgrades = new HashMap<>();
-		this.rabbit = new KonTownRabbit(getSpawnLoc());
 		this.plots = new HashMap<>();
 		this.townOptions = new HashMap<>();
 		initOptions();
 		this.properties = new HashMap<>();
 		initProperties();
 		this.specialization = Villager.Profession.NONE;
+	}
+
+	public KonTown copy(KonTown copyTown) {
+		// Set land and monument
+		copyTown.addPoints(getChunkPoints());
+		copyTown.setMonument(monument);
+		// Set residents
+		for (UUID id : residents.keySet()) {
+			copyTown.addPlayerResident(Bukkit.getOfflinePlayer(id),residents.get(id),false);
+		}
+		copyTown.setLord(lord, false);
+		copyTown.setJoinRequests(joinRequestKeeper);
+		// Set shields and armor
+		if (isShielded) {
+			copyTown.activateShield(shieldEndTimeSeconds);
+		}
+		if (isArmored) {
+			copyTown.activateArmor(armorCurrentBlocks);
+		}
+		// Set town plots
+		for (KonPlot plot : getPlots()) {
+			copyTown.putPlot(plot);
+		}
+		// Set options
+		for (KonTownOption option : townOptions.keySet()) {
+			copyTown.setTownOption(option, townOptions.get(option));
+		}
+		// Set properties
+		for (KonPropertyFlag flag : properties.keySet()) {
+			copyTown.setPropertyValue(flag, properties.get(flag));
+		}
+		// Set upgrades
+		for (KonquestUpgrade upgrade : upgrades.keySet()) {
+			copyTown.addUpgrade(upgrade, upgrades.get(upgrade));
+		}
+		// Set specialization
+		copyTown.setSpecialization(specialization);
+
+		return copyTown;
 	}
 
 	private void initOptions() {
@@ -741,7 +783,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			ChatUtil.printDebug("Failed to refresh monument from template for town "+getName());
 		}
 	}
-	
+
+	protected void setMonument(KonMonument monumentOverride) {
+		monument = monumentOverride;
+	}
+
 	public KonMonument getMonument() {
 		return monument;
 	}
@@ -828,7 +874,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			if(shieldEndTimeSeconds < shieldNowTimeSeconds) {
 				deactivateShield();
 			} else {
-				//refreshShieldBarTitle();
 				updateBarTitle();
 			}
 		} else if(taskID == protectedWarmupTimer.getTaskID()) {
@@ -874,6 +919,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		monumentBarAlliance.removeAll();
 		monumentBarTrade.removeAll();
 		monumentBarPeace.removeAll();
+		capitalSwapBar.removeAll();
 		for(KonPlayer player : getKonquest().getPlayerManager().getPlayersOnline()) {
 			Player bukkitPlayer = player.getBukkitPlayer();
 			if(isLocInside(bukkitPlayer.getLocation())) {
@@ -897,6 +943,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		    		default:
 		    			break;
 		    	}
+				// All Players
+				capitalSwapBar.addPlayer(bukkitPlayer);
 			}
 		}
 	}
@@ -922,6 +970,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			default:
 				break;
 		}
+		// All Players
+		capitalSwapBar.addPlayer(player.getBukkitPlayer());
 	}
 	
 	public void removeBarPlayer(KonPlayer player) {
@@ -930,6 +980,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		monumentBarAlliance.removePlayer(player.getBukkitPlayer());
 		monumentBarTrade.removePlayer(player.getBukkitPlayer());
 		monumentBarPeace.removePlayer(player.getBukkitPlayer());
+		capitalSwapBar.removePlayer(player.getBukkitPlayer());
 	}
 	
 	public void removeAllBarPlayers() {
@@ -938,6 +989,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		monumentBarAlliance.removeAll();
 		monumentBarTrade.removeAll();
 		monumentBarPeace.removeAll();
+		capitalSwapBar.removeAll();
 	}
 	
 	public void setBarProgress(double prog) {
@@ -967,7 +1019,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		} else {
 			this.isAttacked = false;
 			defenders.clear();
-			rabbit.remove();
 		}
 	}
 	
@@ -994,6 +1045,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				ChatUtil.printDebug("Town Watch protection enabled without warmup in "+getName());
 				isTownWatchProtected = true;
 				protectedWarmupTimer.stopTimer();
+				return true;
 			} else if (protectedWarmupTimer.getTime() == -1) {
 				// Timer is not running, and config time is non-zero
 				// start warmup timer
@@ -1001,19 +1053,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				protectedWarmupTimer.stopTimer();
 				protectedWarmupTimer.setTime(offlineProtectedWarmupSeconds);
 				protectedWarmupTimer.startTimer();
+				return true;
 			}
-			return true;
 		}
 		// Default
 		return false;
-	}
-	
-	public void targetRabbitToPlayer(Player player) {
-		rabbit.targetTo(player);
-	}
-	
-	public void removeRabbit() {
-		rabbit.remove();
 	}
 	
 	public void updateBarTitle() {
@@ -1088,6 +1132,34 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		monumentBarTrade.setStyle(style);
 		monumentBarPeace.setStyle(style);
 	}
+
+	/**
+	 * Updates the title and display of the capital swap bar
+	 * @param progress Value 0 to 1 for bar fill, 0 disables the bar
+	 * @param isCapitalNotTown true for swapping to capital, false for swapping to town
+	 * @param countdown Timer count to display in bar title
+	 */
+	public void updateCapitalSwapBar(double progress, boolean isCapitalNotTown, String countdown) {
+		capitalSwapBar.setProgress(progress);
+		if (progress > 0) {
+			capitalSwapBar.setVisible(true);
+			String titleCount = "";
+			if (!countdown.isEmpty()) {
+				titleCount = ChatColor.RESET+" "+countdown;
+			}
+			if (isCapitalNotTown) {
+				// Changing to a capital
+				capitalSwapBar.setTitle(ChatColor.GOLD+MessagePath.LABEL_CHANGING_CAPITAL.getMessage()+titleCount);
+			} else {
+				// Changing to a town
+				capitalSwapBar.setTitle(ChatColor.GOLD+MessagePath.LABEL_CHANGING_TOWN.getMessage()+titleCount);
+			}
+		} else {
+			// Disable swap bar
+			capitalSwapBar.setVisible(false);
+			capitalSwapBar.setTitle("");
+		}
+	}
 	
 	public boolean addDefender(Player bukkitPlayer) {
 		boolean result = false;
@@ -1106,7 +1178,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 	}
 	
-	public void sendRaidAlert() {
+	public void sendRaidAlert(KonPlayer attacker) {
 		// Attempt to start a raid alert
 		if(!isRaidAlertDisabled()) {
 			// Alert all players of this town's kingdom
@@ -1124,6 +1196,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			raidAlertTimer.stopTimer();
 			raidAlertTimer.setTime(raidAlertTimeSeconds);
 			raidAlertTimer.startTimer();
+			// Fire event for raid alert when attacked
+			if (isAttacked) {
+				KonquestTownRaidEvent invokeEvent = new KonquestTownRaidEvent(getKonquest(), this, attacker);
+				Konquest.callKonquestEvent(invokeEvent);
+			}
 		}
 	}
 	
@@ -1141,67 +1218,83 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
     	// Do not update targets if triggering player is not an enemy of this town
     	boolean isTriggerPlayerEnemy = getKonquest().getKingdomManager().isPlayerEnemy(triggerPlayer, getKingdom());
     	boolean isGolemAttackEnemies = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_GOLEM_ATTACK_ENEMIES.getPath());
-		if(isGolemAttackEnemies && !triggerPlayer.isAdminBypassActive() && !triggerPlayer.getKingdom().equals(getKingdom()) && isTriggerPlayerEnemy) {
-			Location centerLoc = getCenterLoc();
-			int golumSearchRange = getKonquest().getCore().getInt(CorePath.TOWNS_MAX_SIZE.getPath(),1); // chunks
-			int radius = 16*16;
-			if(golumSearchRange > 1) {
-				radius = golumSearchRange*16;
+		boolean isAdminBypassDisabled = !triggerPlayer.isAdminBypassActive();
+		boolean isPlayerInOtherKingdom = !triggerPlayer.getKingdom().equals(getKingdom());
+		if(!(isGolemAttackEnemies && isAdminBypassDisabled && isPlayerInOtherKingdom && isTriggerPlayerEnemy)) {
+			return;
+		}
+		// Search for Iron Golems
+		// 1) Around the town center
+		// 2) Around the trigger player
+		int SEARCH_HEIGHT = 64;
+		int CENTER_SEARCH_RADIUS = 192; // 12 chunks
+		int PLAYER_SEARCH_RADIUS = 128; // 8 chunks
+		int GOLEM_TARGET_RADIUS = 32; // 2 chunks
+		Location searchTownLoc = getCenterLoc();
+		Location searchPlayerLoc = triggerPlayer.getBukkitPlayer().getLocation();
+		// Town center
+		HashSet<Entity> nearbyGolems = new HashSet<>(getWorld().getNearbyEntities(searchTownLoc,
+				CENTER_SEARCH_RADIUS,
+				SEARCH_HEIGHT,
+				CENTER_SEARCH_RADIUS,
+				(e) -> e.getType() == EntityType.IRON_GOLEM));
+		// Trigger Player
+		nearbyGolems.addAll(getWorld().getNearbyEntities(searchPlayerLoc,
+				PLAYER_SEARCH_RADIUS,
+				SEARCH_HEIGHT,
+				PLAYER_SEARCH_RADIUS,
+				(e) -> e.getType() == EntityType.IRON_GOLEM));
+		// Targeting logic for each golem
+		for(Entity e : nearbyGolems) {
+			IronGolem golem = (IronGolem)e;
+			// Skip this golem if it's not inside the town, and not in the wild
+			if (!isLocInside(golem.getLocation()) && getKonquest().getTerritoryManager().isChunkClaimed(golem.getLocation())) {
+				continue;
 			}
-			for(Entity e : centerLoc.getWorld().getNearbyEntities(centerLoc,radius,256,radius,(e) -> e.getType() == EntityType.IRON_GOLEM)) {
-				IronGolem golem = (IronGolem)e;
-				// Check for golem inside given territory or in wild
-				if(isLocInside(golem.getLocation()) || !getKonquest().getTerritoryManager().isChunkClaimed(golem.getLocation())) {
-					
-					// Check for closest enemy player
-					boolean isNearbyPlayer = false;
-					double minDistance = 99;
-					KonPlayer nearestPlayer = null;
-					for(Entity p : golem.getNearbyEntities(32,32,32)) {
-						if(p instanceof Player) {
-							KonPlayer nearbyPlayer = getKonquest().getPlayerManager().getPlayer((Player)p);
-							if(nearbyPlayer != null && !nearbyPlayer.isAdminBypassActive() && !nearbyPlayer.getKingdom().equals(getKingdom()) && isLocInside(p.getLocation()) &&
-									(useTriggerPlayerAsTarget || !nearbyPlayer.equals(triggerPlayer))) {
-								// Found nearby player that might be a valid target
-								// Check for closest distance, and that the player is an enemy
-								boolean isEnemy = getKonquest().getKingdomManager().isPlayerEnemy(nearbyPlayer, getKingdom());
-								double distance = golem.getLocation().distance(p.getLocation());
-								if(distance < minDistance && isEnemy) {
-									minDistance = distance;
-									isNearbyPlayer = true;
-									nearestPlayer = nearbyPlayer;
-								}
-							}
+			// Force player-created to make targeting easy to work with
+			golem.setPlayerCreated(true);
+			// Check for closest enemy player inside of town
+			boolean isNearbyPlayer = false;
+			double minDistance = 99;
+			KonPlayer nearestPlayer = null;
+			for(Entity p : golem.getNearbyEntities(GOLEM_TARGET_RADIUS,GOLEM_TARGET_RADIUS,GOLEM_TARGET_RADIUS)) {
+				if(p instanceof Player) {
+					KonPlayer nearbyPlayer = getKonquest().getPlayerManager().getPlayer((Player)p);
+					// Nearby player must not be in admin bypass, be in an enemy kingdom, be inside the town,
+					// and cannot be the trigger player when useTriggerPlayerAsTarget = true.
+					if(nearbyPlayer != null &&
+							!nearbyPlayer.isAdminBypassActive() &&
+							getKonquest().getKingdomManager().isPlayerEnemy(nearbyPlayer, getKingdom()) &&
+							isLocInside(p.getLocation()) &&
+							(useTriggerPlayerAsTarget || !nearbyPlayer.equals(triggerPlayer))) {
+						// Found nearby player that might be a valid target
+						// Check for closest distance
+						double distance = golem.getLocation().distance(p.getLocation());
+						if(distance < minDistance) {
+							minDistance = distance;
+							isNearbyPlayer = true;
+							nearestPlayer = nearbyPlayer;
 						}
 					}
-					
-					// Attempt to remove current target
-					LivingEntity currentTarget = golem.getTarget();
-					//ChatUtil.printDebug("Golem: Evaluating new targets in territory "+territory.getName());
-					if(currentTarget != null && currentTarget instanceof Player) {
-						KonPlayer previousTargetPlayer = getKonquest().getPlayerManager().getPlayer((Player)currentTarget);
-						if(previousTargetPlayer != null) {
-							previousTargetPlayer.removeMobAttacker(golem);
-							//ChatUtil.printDebug("Golem: Removed mob attacker from player "+previousTargetPlayer.getBukkitPlayer().getName());
-						}
-					} else {
-						//ChatUtil.printDebug("Golem: Bad current target");
-					}
-					
-					// Attempt to apply new target, either closest player or default trigger player
-					if(isNearbyPlayer) {
-						//ChatUtil.printDebug("Golem: Found nearby player "+nearestPlayer.getBukkitPlayer().getName());
-						golem.setTarget(nearestPlayer.getBukkitPlayer());
-						nearestPlayer.addMobAttacker(golem);
-					} else if(useTriggerPlayerAsTarget){
-						//ChatUtil.printDebug("Golem: Targeting default player "+triggerPlayer.getBukkitPlayer().getName());
-						golem.setTarget(triggerPlayer.getBukkitPlayer());
-						triggerPlayer.addMobAttacker(golem);
-					}
-					
-				} else {
-					ChatUtil.printDebug("Golem: Not in this territory or wild");
 				}
+			}
+			// Now, the golem has a new closest enemy player if isNearbyPlayer = true, else
+			// there is no target.
+			// Attempt to remove current target
+			LivingEntity currentTarget = golem.getTarget();
+			if(currentTarget instanceof Player) {
+				KonPlayer previousTargetPlayer = getKonquest().getPlayerManager().getPlayer((Player)currentTarget);
+				if(previousTargetPlayer != null) {
+					previousTargetPlayer.removeMobAttacker(golem);
+				}
+			}
+			// Attempt to apply new target, either closest player or default trigger player
+			if(isNearbyPlayer) {
+				golem.setTarget(nearestPlayer.getBukkitPlayer());
+				nearestPlayer.addMobAttacker(golem);
+			} else if(useTriggerPlayerAsTarget){
+				golem.setTarget(triggerPlayer.getBukkitPlayer());
+				triggerPlayer.addMobAttacker(golem);
 			}
 		}
     }
@@ -1540,7 +1633,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public boolean isUpgradeDisabled(KonquestUpgrade upgrade) {
 		return disabledUpgrades.containsKey(upgrade);
 	}
-	
+
+	protected void setJoinRequests(RequestKeeper requestOverride) {
+		joinRequestKeeper = requestOverride;
+	}
+
 	// Players who have tried joining but need to be added
 	public List<OfflinePlayer> getJoinRequests() {
 		return joinRequestKeeper.getJoinRequests();

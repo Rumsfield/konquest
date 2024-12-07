@@ -21,6 +21,8 @@ label:
   bypass: BYPASS
   camp: Campamento
   capital: Capital
+  changing-capital: Cambiar a Capital
+  changing-town: Cambiar al Pueblo
   close: Cerrar
   cost: Costo
   critical-hits: Golpes Criticos
@@ -298,6 +300,7 @@ menu:
     transfer: Transferir
     template: Plantillas
     disband: Disolver
+    capital: Capital
     description-join: Solicita unirte a un reino, o crea el tuyo propio con /k kingdom create
     description-exile: Deja tu reino actual y conviertete en barbaro
     description-invites: Visualiza tus invitaciones de reino
@@ -309,6 +312,7 @@ menu:
     description-transfer: Transferir el maestro a otro miembro
     description-template: Cambiar la plantilla del monumento del reino
     description-disband: Disolver y eliminar el reino
+    description-capital: Mover la capital a un pueblo diferente
     hint-open: Haz clic para abrir
     hint-exile: Haz clic para convertirte en barbaro
     hint-exit: Salir del menu
@@ -324,6 +328,7 @@ menu:
     hint-promote: Haz clic para promover a Oficial
     hint-demote: Haz clic para degradar a Miembro
     hint-transfer: Haz clic para dar Maestro
+    hint-capital: Haz clic para cambiar a la Capital
     they-requested: Ellos Solicitaron
     we-requested: Nosotros Solicitamos
     diplomacy-peace-war-instant: Declarar paz al instante
@@ -352,6 +357,7 @@ menu:
     title-transfer: Transferencia del Maestro del Reino
     title-template: Plantillas de Monumentos
     title-disband: Disolver Reino
+    title-capital: Mover Capital
 generic:
   notice:
     enable-auto: Activado. Usa este comando de nuevo para desactivar.
@@ -423,7 +429,6 @@ protection:
     raze: El Pueblo de %s ha sido destruido por la horda Barbaro!
     destroy: Has destruido %s por la gloria de la horda Barbaro!
     conquer: El Pueblo de %s ha sido conquistado!
-    conquer-discord: ¡El Pueblo de %s ha sido conquistado por %s!
     capture: Has conquistado %s para la conquista de %s!
     kingdom-warmup: El Reino de %s estara protegido en %s minutos.
     kingdom-conquer: El Reino de %s ha sido conquistado por %s!
@@ -578,6 +583,7 @@ command:
       cost-town-rename: Cambiar el Nombre de un Pueblo
       cost-kingdom-create: Crear un Reino
       cost-kingdom-rename: Cambiar el Nombre de un Reino
+      cost-capital-swap: Cambio de Capital
   help:
     notice:
       header: Página de Ayuda %s
@@ -615,6 +621,9 @@ command:
       demote: '%s ha sido degradado a Miembro del Reino de %s.'
       disband: ¡El Reino de %s ha sido disuelto!
       destroy: ¡El Pueblo de %s ha sido destruida!
+      capital-swap: La Capital del Reino de %s se ha trasladado al Pueblo de %s.
+      capital-warmup: La Capital del Reino de %s se trasladará al Pueblo de %s en %s.
+      capital-cancel: ¡Los ataques enemigos han impedido que la Capital del Reino de %s se traslade al Pueblo de %s!
     notice:
       request-sent: Solicitud de miembro enviada para unirse a %s.
       request-received: Nueva solicitud de unión al reino, escribe "/k kingdom" para revisar.
@@ -669,6 +678,8 @@ command:
       template-attack: No se puede cambiar la plantilla del monumento mientras la Capital del Reino esté bajo ataque.
       template-chosen: Esta plantilla de monumento ya ha sido elegida para el Reino.
       web-color-invalid: 'Color inválido, debe coincidir con un nombre de color o un código hexadecimal que comience con #'
+      capital-swap-attack: No se puede cambiar la capital del reino mientras estás bajo ataque.
+      capital-swap-war: No puedes cambiar la capital del reino mientras tu reino está en guerra.
   list:
     notice:
       header: 'Lista de %s'

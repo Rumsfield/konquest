@@ -5,11 +5,14 @@ import com.github.rumsfield.konquest.api.event.player.KonquestPlayerSettleEvent;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called when a new town is settled by a player.
  * <p>
- * This event cannot be cancelled, as it is called after the town is created.
+ * This event cannot be canceled, as it is called after the town is created.
  * To prevent players settling towns, listen for {@link KonquestPlayerSettleEvent KonquestPlayerSettleEvent} and cancel it.
  * </p>
  * 
@@ -18,6 +21,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
  */
 public class KonquestTownSettleEvent extends KonquestTownEvent {
 
+	private static final HandlerList handlers = new HandlerList();
 	private final KonquestPlayer player;
 	private final KonquestKingdom kingdom;
 	
@@ -53,4 +57,23 @@ public class KonquestTownSettleEvent extends KonquestTownEvent {
 		return kingdom;
 	}
 
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	@Override
+	@Nonnull
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 }

@@ -43,19 +43,21 @@ repositories{
 
 dependencies{
     // Spigot
-    compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT") // Primary API
+    compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT") // Primary API
     compileOnly("org.spigotmc:spigot-1.17.1-R0.1-SNAPSHOT-remapped") // for nms packets, local lib
     compileOnly("org.spigotmc:spigot-1.16.5-R0.1-SNAPSHOT") // for nms packets, local lib
 
     // Integrated third-party plugins
     compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
     compileOnly("com.github.jikoo.OpenInv:openinvapi:4.3.1")
-    compileOnly("org.maxgamer:QuickShop:5.1.2.5-SNAPSHOT")
+    compileOnly("net.kyori:adventure-api:4.17.0")
+    compileOnly("com.ghostchu:quickshop-common:6.2.0.6")
+    compileOnly("com.ghostchu:quickshop-api:6.2.0.6")
     compileOnly("com.acrobot.chestshop:chestshop:3.12")
     compileOnly("us.dynmap:DynmapCoreAPI:3.6")
     compileOnly("us.dynmap:dynmap-api:3.6")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly("com.discordsrv:discordsrv:1.27.0")
+    compileOnly("com.discordsrv:discordsrv:1.29.0")
     compileOnly("me.clip:placeholderapi:2.11.2")
     compileOnly("net.luckperms:api:5.4")
     compileOnly("com.github.BlueMap-Minecraft:BlueMapAPI:v2.6.0")
@@ -64,7 +66,7 @@ dependencies{
     compileOnly("net.essentialsx:EssentialsX:2.20.1")
 
     implementation("org.apache.commons:commons-lang3:3.14.0")
-    implementation("org.xerial:sqlite-jdbc:3.40.1.0")
+    implementation("org.xerial:sqlite-jdbc:3.41.2.2")
     implementation(project(":api"))
 }
 

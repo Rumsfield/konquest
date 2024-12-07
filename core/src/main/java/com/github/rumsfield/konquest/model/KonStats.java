@@ -24,15 +24,14 @@ public class KonStats {
 		return result;
 	}
 	
-	public int increaseStat(KonStatsType stat, int incr) {
-		int newValue;
-		if(statMap.containsKey(stat)) {
-			newValue = statMap.get(stat) + incr;
-		} else {
-			newValue = incr;
+	public void increaseStat(KonStatsType stat, int incr) {
+		int value = 0;
+		if (statMap.containsKey(stat)) {
+			value = statMap.get(stat);
 		}
-		statMap.put(stat, newValue);
-		return newValue;
+		// Add to value, with limit of 0
+		value = Math.max(value + incr, 0);
+		statMap.put(stat, value);
 	}
 	
 	public void clearStats() {

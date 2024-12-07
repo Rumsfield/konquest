@@ -9,13 +9,11 @@ import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.*;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
-import org.maxgamer.quickshop.api.QuickShopAPI;
-import org.maxgamer.quickshop.api.shop.Shop;
+import com.ghostchu.quickshop.api.QuickShopAPI;
+import com.ghostchu.quickshop.api.shop.Shop;
 
 import java.awt.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -60,8 +58,10 @@ public class ShopHandler {
                     Map<Location, Shop> shopList = quickshop.getShopManager().getShops(world.getName(), chunkX, chunkZ);
                     if(shopList != null) {
                         for(Map.Entry<Location, Shop> entry : shopList.entrySet()) {
-                            final OfflinePlayer owner = Bukkit.getOfflinePlayer(entry.getValue().getOwner());
-                            entry.getValue().delete();
+                            UUID ownerID = entry.getValue().getOwner().getUniqueId();
+                            assert ownerID != null;
+                            final OfflinePlayer owner = Bukkit.getOfflinePlayer(ownerID);
+                            quickshop.getShopManager().deleteShop(entry.getValue());
                             // Record metrics
                             String ownerName = owner.getName();
                             if(removedShops.containsKey(ownerName)) {

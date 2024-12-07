@@ -18,6 +18,7 @@ import com.google.common.collect.MapMaker;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
@@ -219,6 +220,19 @@ public class Konquest implements KonquestAPI, Timeable {
 		
 		ChatUtil.printDebug("Finished core Konquest initialization");
 	}
+
+	// Initialization that happens after the database is ready on startup
+	public void initializePostDB() {
+		accomplishmentManager.loadCustomPrefixes();
+		databaseThread.getDatabase().spawnTables();
+		playerManager.initAllSavedPlayers();
+		kingdomManager.loadLegacyKingdomMemberships();
+		campManager.initCamps();
+		mapHandler.drawAllTerritories();
+		initOnlinePlayers();
+		integrationManager.getDiscordSrv().setKonquestReady();
+		integrationManager.getDiscordSrv().refreshRoles();
+	}
 	
 	public void disable() {
 		integrationManager.disable();
@@ -228,7 +242,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		ruinManager.saveRuins();
 		ruinManager.regenAllRuins();
 		ruinManager.removeAllGolems();
-		kingdomManager.removeAllRabbits();
+		playerManager.clearAllMobTargets();
 		configManager.saveConfigs();
 		databaseThread.flushDatabase();
 		databaseThread.getDatabase().getDatabaseConnection().disconnect();
@@ -258,18 +272,22 @@ public class Konquest implements KonquestAPI, Timeable {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R2(); }
 
-			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.21.1")) <= 0) {
+			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.21.4")) <= 0) {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
 
 			} else {
 				isVersionSupported = false;
-				ChatUtil.printConsoleError("This version of Minecraft is not supported by Konquest!");
+
 			}
     	} catch (Exception | NoClassDefFoundError e) {
     		ChatUtil.printConsoleError("Failed to setup a version handler, ProtocolLib is probably missing. ");
     		e.printStackTrace();
     	}
+
+		if (!isVersionSupported) {
+			ChatUtil.printConsoleError("This version of Minecraft is not supported by Konquest! Some features may not work correctly.");
+		}
 
 		if(isProtocolLibEnabled) {
 			if(versionHandler != null) {
@@ -279,6 +297,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		} else {
 			ChatUtil.printConsoleError("Failed to register name color packets, ProtocolLib is missing or disabled! Check version.");
 		}
+
 		if(!isVersionHandlerEnabled) {
 			ChatUtil.printConsoleError("Some Konquest features are disabled. See previous error messages.");
 		}
@@ -288,6 +307,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		ChatUtil.printConsoleAlert("Reloading config files");
 		configManager.reloadConfigs();
 		initManagers();
+		integrationManager.getDiscordSrv().reloadSettings();
 		initWorlds();
 		printConfigFeatures();
 		ChatUtil.printConsoleAlert("Finished reload");
@@ -501,8 +521,10 @@ public class Konquest implements KonquestAPI, Timeable {
 				String.format(lineTemplate,"Accomplishment Prefixes",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.ACCOMPLISHMENT_PREFIX.getPath()))),
 				String.format(lineTemplate,"Tutorial Quests",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.DIRECTIVE_QUESTS.getPath()))),
 				String.format(lineTemplate,"Chat Formatting",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.CHAT_ENABLE_FORMAT.getPath()))),
-				String.format(lineTemplate,"Admin Kingdoms Only",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.KINGDOMS_CREATE_ADMIN_ONLY.getPath()))),
 				String.format(lineTemplate,"Combat Tag",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.COMBAT_PREVENT_COMMAND_ON_DAMAGE.getPath()))),
+				String.format(lineTemplate,"Admin Kingdoms Only",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.KINGDOMS_CREATE_ADMIN_ONLY.getPath()))),
+				String.format(lineTemplate,"Kingdom Capital Swap",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.KINGDOMS_CAPITAL_SWAP_ENABLE.getPath()))),
+				String.format(lineTemplate,"Kingdom Allied Building",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath()))),
 				String.format(lineTemplate,"Town Upgrades",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_UPGRADES.getPath()))),
 				String.format(lineTemplate,"Town Shields",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_SHIELDS.getPath()))),
 				String.format(lineTemplate,"Town Armor",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_ARMOR.getPath()))),
@@ -558,10 +580,16 @@ public class Konquest implements KonquestAPI, Timeable {
     	kingdomManager.clearTownHearts(player);
     	boolean doReset = getCore().getBoolean(CorePath.RESET_LEGACY_HEALTH.getPath(),false);
     	if(doReset) {
-    		double baseHealth = bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
-    		if(baseHealth > 20) {
-    			bukkitPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
-    		}
+			Attribute maxHealth = CompatibilityUtil.getAttribute("health");
+			if (maxHealth != null) {
+				AttributeInstance playerHealth = bukkitPlayer.getAttribute(maxHealth);
+				if (playerHealth != null) {
+					double baseHealth = playerHealth.getBaseValue();
+					if(baseHealth > 20) {
+						playerHealth.setBaseValue(20);
+					}
+				}
+			}
     	}
 		// Force prefix title if needed
 		boolean isTitleAlwaysShown = getCore().getBoolean(CorePath.CHAT_ALWAYS_SHOW_TITLE.getPath(),false);
@@ -595,7 +623,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	    		}
 				// Send a raid alert for enemies and barbarians
 				if(playerRole.equals(KonquestRelationshipType.ENEMY) || playerRole.equals(KonquestRelationshipType.BARBARIAN)) {
-					town.sendRaidAlert();
+					town.sendRaidAlert(player);
 				}
     		}
 		} else {

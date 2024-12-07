@@ -223,6 +223,31 @@ core:
       # Send a message to the linked kingdom channel in Discord when a critical block is broken in a town monument (true/false)
       raid_alert_channel: true
 
+      # (*) Automatically create and give roles based on kingdoms to linked Discord members (true/false)
+      auto_roles: true
+
+      # The color of the default role (Barbarians).
+      # You may use hex colors ('#FF8080'), see https://htmlcolorcodes.com/
+      # Or you may use named colors ('RED'), see https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html
+      role_default_color: '#A3A10A'
+
+      # The suffix tag applied to the end of a kingdom role's name.
+      # This is used to keep track of auto roles in Discord.
+      role_suffix: '(auto)'
+
+      # Whether all auto roles can be mentioned by Discord members.
+      # When true, roles can be mentioned in Discord, for example: @Rome (auto) Hello!
+      role_is_mentionable: true
+
+      # List of permissions to be applied to Discord roles.
+      # Permissions must match from this list: https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/jda/api/Permission.html
+      role_permissions:
+        - "MESSAGE_WRITE"
+        - "MESSAGE_READ"
+        - "VIEW_CHANNEL"
+        - "VOICE_CONNECT"
+        - "VOICE_SPEAK"
+
     # (*) Enable plugin integration with EssentialsX (true/false)
     essentialsx: true
 
@@ -294,6 +319,15 @@ core:
     
     # Capitals will be immune from capture while there are this many other towns in the kingdom (0 to disable, integer >= 0)
     capital_immunity_towns: 2
+
+    # Allow kingdom capitals to be swapped with other towns by the kingdom master (true/false)
+    capital_swap_enable: true
+
+    # Allow kingdom capitals to be swapped while the kingdom is at war with any other kingdom (true/false)
+    capital_swap_war: true
+
+    # Time in seconds for a kingdom capital swap to happen after it has been initiated (0 to disable, integer >= 0)
+    capital_swap_warmup: 300
     
     # Declaring war on a kingdom will also declare war on their allies (true), else only the target kingdom will be at war (false) (true/false)
     ally_defense_pact: true
@@ -547,7 +581,19 @@ core:
     
     # Allow town knights to ignore plot protections (true/false)
     ignore_knights: true
-    
+
+  # //// CORE.BARBARIANS \\\\
+  barbarians:
+
+    # Allow barbarian players to modify blocks inside town land (true/false)
+    allow_attack_kingdoms: true
+
+    # Allow barbarian players to modify blocks inside other barbarian camps (true/false)
+    allow_attack_camps: true
+
+    # Allow barbarian players to damage other players (true/false)
+    allow_pvp: true
+
   # //// CORE.EXILE \\\\
   exile:
     
@@ -694,6 +740,9 @@ core:
       
       # Cost to change the monument template of a kingdom (decimal >= 0)
       cost_template: 200
+
+      # Cost to swap the capital to another town (decimal >= 0)
+      cost_capital_swap: 500
       
       # Time in seconds between payments (0 to disable, integer >= 0)
       pay_interval_seconds: 1800

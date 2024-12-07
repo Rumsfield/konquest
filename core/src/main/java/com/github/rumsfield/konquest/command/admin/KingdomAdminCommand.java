@@ -53,6 +53,12 @@ public class KingdomAdminCommand extends CommandBase {
 						.sub( newArg("kingdom",false,false)
 								.sub( newArg("name",false,false) ) )
 		);
+		// capital <kingdom> <town>
+		addArgument(
+				newArg("capital",true,false)
+						.sub( newArg("kingdom",false,false)
+								.sub( newArg("town",false,false) ) )
+		);
 		// access <kingdom> open|closed
 		List<String> accessArgNames = Arrays.asList("open", "closed");
 		addArgument(
@@ -268,6 +274,38 @@ public class KingdomAdminCommand extends CommandBase {
 						break;
 				}
 				break;
+			case "capital":
+				// Check for enabled feature
+				if(!konquest.getKingdomManager().getIsCapitalSwapEnable()) {
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+					return;
+				}
+				if(args.size() != 3) {
+					sendInvalidArgMessage(sender);
+					return;
+				}
+				// Check for valid kingdom
+				if(!konquest.getKingdomManager().isKingdom(kingdomName)) {
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(kingdomName));
+					return;
+				}
+				kingdom = konquest.getKingdomManager().getKingdom(kingdomName);
+				assert kingdom != null;
+				String townName = args.get(2);
+				// Check valid town name
+				if (!kingdom.hasTown(townName)) {
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(townName));
+					return;
+				}
+				// Do capital swap without warmup
+				// Includes broadcast
+				boolean swapStatus = kingdom.swapCapitalToTown(kingdom.getTown(townName));
+				if (swapStatus) {
+					ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
+				} else {
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+				}
+				break;
 			case "exile":
 				// Force a player to become a barbarian
 				if(args.size() != 2) {
@@ -409,6 +447,8 @@ public class KingdomAdminCommand extends CommandBase {
 					}
 					// Update map
 					konquest.getMapHandler().drawUpdateTerritory(kingdom);
+					// Update Discord roles
+					konquest.getIntegrationManager().getDiscordSrv().changeKingdomRole(kingdom.getName(), kingdom.getName(), kingdom.getWebColorFormal());
 					ChatUtil.sendNotice(sender, MessagePath.COMMAND_KINGDOM_NOTICE_WEB_COLOR_SET.getMessage(kingdom.getName(),colorStr));
 				} else {
 					// Incorrect arguments
@@ -567,6 +607,9 @@ public class KingdomAdminCommand extends CommandBase {
 			tabList.add("webcolor");
 			tabList.add("diplomacy");
 			tabList.add("member");
+			if (konquest.getKingdomManager().getIsCapitalSwapEnable()) {
+				tabList.add("capital");
+			}
 		} else if (numArgs == 2) {
 			// suggest kingdoms or template
 			if(args.get(0).equalsIgnoreCase("create")) {
@@ -582,6 +625,13 @@ public class KingdomAdminCommand extends CommandBase {
 				case "rename":
 					// new name
 					tabList.add("***");
+					break;
+				case "capital":
+					// town name
+					String targetKingdomName = args.get(1);
+					if (konquest.getKingdomManager().isKingdom(targetKingdomName)) {
+						tabList.addAll(konquest.getKingdomManager().getKingdom(targetKingdomName).getTownNames());
+					}
 					break;
 				case "access":
 					// Open or close the kingdom

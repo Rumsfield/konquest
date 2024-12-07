@@ -6,12 +6,18 @@ import org.bukkit.event.Cancellable;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerConquerEvent;
+import org.bukkit.event.HandlerList;
+
+import javax.annotation.Nonnull;
 
 /**
  * Called when an enemy player breaks a block within a town.
  * <p>
+ * This event is called before {@link KonquestTownCaptureEvent KonquestTownCaptureEvent},
+ * {@link KonquestTownDestroyEvent KonquestTownDestroyEvent}, and {@link KonquestPlayerConquerEvent KonquestPlayerConquerEvent}.
  * This event occurs for all blocks broken inside town land, including inside of the monument and for critical blocks.
- * Canceling this event prevents the block from braking.
+ * Canceling this event prevents the block from breaking.
  * </p>
  * 
  * @author Rumsfield
@@ -19,8 +25,8 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
  */
 public class KonquestTownAttackEvent extends KonquestTownEvent implements Cancellable {
 
+	private static final HandlerList handlers = new HandlerList();
 	private boolean isCancelled;
-	
 	private final KonquestPlayer attacker;
 	private final Block block;
 	private final boolean isMonument;
@@ -80,14 +86,45 @@ public class KonquestTownAttackEvent extends KonquestTownEvent implements Cancel
 		return isCritical;
 	}
 
+	/**
+	 * Checks whether this event is canceled.
+	 *
+	 * @return True when the event is canceled, else false
+	 */
 	@Override
 	public boolean isCancelled() {
 		return isCancelled;
 	}
 
+	/**
+	 * Controls whether the event is canceled.
+	 * Canceling this event prevents the town from being attacked, and any associated blocks from breaking.
+	 *
+	 * @param val True to cancel this event, else false
+	 */
 	@Override
 	public void setCancelled(boolean val) {
 		isCancelled = val;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	/**
+	 * Get the handler list
+	 *
+	 * @return handlers
+	 */
+	@Override
+	@Nonnull
+	public HandlerList getHandlers() {
+		return handlers;
 	}
 
 }

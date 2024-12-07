@@ -1,6 +1,8 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerCreateKingdomEvent;
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerSettleEvent;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.model.*;
@@ -62,6 +64,9 @@ public class KingdomCommand extends CommandBase {
 						.sub( newArg("disband",true,false) )
 						// manage destroy <town>
 						.sub( newArg("destroy",true,false)
+								.sub( newArg("town",false,false) ) )
+						// manage capital <town>
+						.sub( newArg("capital",true,false)
 								.sub( newArg("town",false,false) ) )
 						// manage rename <name>
 						.sub( newArg("rename",true,false)
@@ -166,6 +171,12 @@ public class KingdomCommand extends CommandBase {
 							return;
 						}
 					}
+				}
+				// Fire pre event
+				KonquestPlayerCreateKingdomEvent invokeEvent = new KonquestPlayerCreateKingdomEvent(konquest, player, bukkitPlayer.getLocation(), newKingdomName);
+				Konquest.callKonquestEvent(invokeEvent);
+				if(invokeEvent.isCancelled()) {
+					return;
 				}
 				// Create the kingdom
 				int createStatus = konquest.getKingdomManager().createKingdom(bukkitPlayer.getLocation(), newKingdomName, templateName, player, false);
@@ -341,6 +352,30 @@ public class KingdomCommand extends CommandBase {
 								sendInvalidArgMessage(bukkitPlayer);
 							}
 							break;
+						case "capital":
+							// Swap the capital to another town (master only)
+							if(!kingdom.isMaster(playerID)) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+								return;
+							}
+							// Check for enabled feature
+							if(!konquest.getKingdomManager().getIsCapitalSwapEnable()) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+								return;
+							}
+							if(args.size() == 3) {
+								String townName = args.get(2);
+								// Check valid town name
+								if (!kingdom.hasTown(townName)) {
+									ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_BAD_NAME.getMessage(townName));
+									return;
+								}
+								// Manager method includes messages
+								konquest.getKingdomManager().menuCapitalSwap(kingdom.getTown(townName),player,false);
+							} else {
+								sendInvalidArgMessage(bukkitPlayer);
+							}
+							break;
 						case "rename":
 							// Rename your kingdom (master only)
 							if(!kingdom.isMaster(playerID)) {
@@ -414,6 +449,8 @@ public class KingdomCommand extends CommandBase {
 								}
 								// Update map
 								konquest.getMapHandler().drawUpdateTerritory(kingdom);
+								// Update Discord roles
+								konquest.getIntegrationManager().getDiscordSrv().changeKingdomRole(kingdom.getName(), kingdom.getName(), kingdom.getWebColorFormal());
 								ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_WEB_COLOR_SET.getMessage(kingdom.getName(),colorStr));
 							} else {
 								// Incorrect arguments
@@ -683,6 +720,9 @@ public class KingdomCommand extends CommandBase {
 					if (konquest.getKingdomManager().getIsTownDestroyMasterEnable()) {
 						tabList.add("destroy");
 					}
+					if (konquest.getKingdomManager().getIsCapitalSwapEnable()) {
+						tabList.add("capital");
+					}
 					break;
 			}
 		} else if (numArgs == 3) {
@@ -697,6 +737,11 @@ public class KingdomCommand extends CommandBase {
 							break;
 						case "destroy":
 							if (konquest.getKingdomManager().getIsTownDestroyMasterEnable()) {
+								tabList.addAll(kingdom.getTownNames());
+							}
+							break;
+						case "capital":
+							if (konquest.getKingdomManager().getIsCapitalSwapEnable()) {
 								tabList.addAll(kingdom.getTownNames());
 							}
 							break;

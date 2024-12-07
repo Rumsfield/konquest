@@ -2,6 +2,8 @@ package com.github.rumsfield.konquest.api.event;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import javax.annotation.Nonnull;
+
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
 
@@ -13,7 +15,6 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
  */
 public abstract class KonquestEvent extends Event {
 
-	private static final HandlerList handlers = new HandlerList();
 	private final KonquestAPI konquest;
 	
 	/**
@@ -33,19 +34,8 @@ public abstract class KonquestEvent extends Event {
 	public KonquestAPI getKonquest() {
 		return konquest;
 	}
-    
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-	
-	/**
-	 * Get the handler list
-	 * 
-	 * @return handlers
-	 */
-	public static HandlerList getHandlerList() {
-        return handlers;
-    }
+
+	@Nonnull
+	public abstract HandlerList getHandlers();
 
 }

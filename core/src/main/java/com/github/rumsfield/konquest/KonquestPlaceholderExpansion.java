@@ -331,7 +331,7 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
 				result = placeholderManager.getPlayerKingdomScore(player);
 				break;
 	        default: 
-	        	// Check for kingdom-specific placeholders
+	        	// Check for kingdom-specific and ruin-specific placeholders
 
 	        	/* %konquest_players_<kingdom>% */
 				if(identifierLower.matches("^players_.+$")) {
@@ -374,8 +374,36 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
 	        			String kingdomName = identifierLower.substring(6);
 	        			result = placeholderManager.getKingdomScore(kingdomName);
 	        		} catch(IndexOutOfBoundsException ignored) {}
-	        		
-	        	}
+
+				/* %konquest_ruin_cooldown_<ruin>% */
+				} else if(identifierLower.matches("^ruin_cooldown_.+$")) {
+					try {
+						String ruinName = identifierLower.substring(14);
+						result = placeholderManager.getRuinCooldown(ruinName);
+					} catch(IndexOutOfBoundsException ignored) {}
+
+				/* %konquest_ruin_capture_<ruin>% */
+				} else if(identifierLower.matches("^ruin_capture_.+$")) {
+					try {
+						String ruinName = identifierLower.substring(13);
+						result = placeholderManager.getRuinCapture(ruinName);
+					} catch(IndexOutOfBoundsException ignored) {}
+
+				/* %konquest_ruin_criticals_<ruin>% */
+				} else if(identifierLower.matches("^ruin_criticals_.+$")) {
+					try {
+						String ruinName = identifierLower.substring(15);
+						result = placeholderManager.getRuinCriticals(ruinName);
+					} catch(IndexOutOfBoundsException ignored) {}
+
+				/* %konquest_ruin_spawns_<ruin>% */
+				} else if(identifierLower.matches("^ruin_spawns_.+$")) {
+					try {
+						String ruinName = identifierLower.substring(12);
+						result = placeholderManager.getRuinSpawns(ruinName);
+					} catch(IndexOutOfBoundsException ignored) {}
+
+				}
 	        	break;
         }
 
