@@ -5,22 +5,17 @@ import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TownIcon implements MenuIcon {
+public class TownIcon extends MenuIcon {
 
 	private final KonTown town;
 	private final String contextColor;
 	private final List<String> lore;
-	private final int index;
 	private final boolean isClickable;
 	private final ItemStack item;
 
@@ -30,11 +25,11 @@ public class TownIcon implements MenuIcon {
 	private final String valueColor = DisplayManager.valueFormat;
 	
 	public TownIcon(KonTown town, String contextColor, List<String> lore, int index, boolean isClickable) {
+		super(index);
 		this.town = town;
 		this.contextColor = contextColor;
 		this.isClickable = isClickable;
 		this.lore = lore;
-		this.index = index;
 		this.item = initItem();
 	}
 	
@@ -86,11 +81,6 @@ public class TownIcon implements MenuIcon {
 	
 	public KonTown getTown() {
 		return town;
-	}
-	
-	@Override
-	public int getIndex() {
-		return index;
 	}
 
 	@Override

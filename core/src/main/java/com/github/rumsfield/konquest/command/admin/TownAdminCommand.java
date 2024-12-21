@@ -645,7 +645,7 @@ public class TownAdminCommand extends CommandBase {
 					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_PLAYER.getMessage());
 					return;
 				}
-				konquest.getDisplayManager().displayTownPlotMenu(player.getBukkitPlayer(), town);
+				konquest.getDisplayManager().displayTownPlotMenu(player, town);
 				break;
 		}
 	}

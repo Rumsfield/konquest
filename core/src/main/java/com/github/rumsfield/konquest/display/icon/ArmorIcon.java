@@ -6,21 +6,17 @@ import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArmorIcon implements MenuIcon {
+public class ArmorIcon extends MenuIcon {
 
 	private final KonArmor armor;
 	private final boolean isAvailable;
 	private final int population;
 	private final int land;
-	private final int index;
 	ItemStack item;
 
 	private final String loreColor = DisplayManager.loreFormat;
@@ -28,11 +24,11 @@ public class ArmorIcon implements MenuIcon {
 	private final String hintColor = DisplayManager.hintFormat;
 	
 	public ArmorIcon(KonArmor armor, boolean isAvailable, int population, int land, int index) {
+		super(index);
 		this.armor = armor;
 		this.isAvailable = isAvailable;
 		this.population = population;
 		this.land = land;
-		this.index = index;
 		this.item = initItem();
 	}
 	
@@ -56,11 +52,6 @@ public class ArmorIcon implements MenuIcon {
 	
 	public KonArmor getArmor() {
 		return armor;
-	}
-
-	@Override
-	public int getIndex() {
-		return index;
 	}
 
 	@Override

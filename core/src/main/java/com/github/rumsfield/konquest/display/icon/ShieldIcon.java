@@ -1,6 +1,5 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonShield;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
@@ -8,21 +7,17 @@ import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShieldIcon implements MenuIcon {
+public class ShieldIcon extends MenuIcon {
 
 	private final KonShield shield;
 	private final boolean isAvailable;
 	private final int population;
 	private final int land;
-	private final int index;
 	ItemStack item;
 
 	private final String loreColor = DisplayManager.loreFormat;
@@ -30,11 +25,11 @@ public class ShieldIcon implements MenuIcon {
 	private final String hintColor = DisplayManager.hintFormat;
 	
 	public ShieldIcon(KonShield shield, boolean isAvailable, int population, int land, int index) {
+		super(index);
 		this.shield = shield;
 		this.isAvailable = isAvailable;
 		this.population = population;
 		this.land = land;
-		this.index = index;
 		this.item = initItem();
 	}
 	
@@ -56,11 +51,6 @@ public class ShieldIcon implements MenuIcon {
 	
 	public KonShield getShield() {
 		return shield;
-	}
-
-	@Override
-	public int getIndex() {
-		return index;
 	}
 
 	@Override

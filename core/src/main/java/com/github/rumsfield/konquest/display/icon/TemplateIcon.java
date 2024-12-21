@@ -4,21 +4,17 @@ import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonMonumentTemplate;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TemplateIcon implements MenuIcon {
+public class TemplateIcon extends MenuIcon {
 
 	private final KonMonumentTemplate template;
 	private final String contextColor;
 	private final List<String> lore;
-	private final int index;
 	private final boolean isClickable;
 
 	private final String loreColor = DisplayManager.loreFormat;
@@ -26,20 +22,15 @@ public class TemplateIcon implements MenuIcon {
 	private final String alertColor = DisplayManager.alertFormat;
 
 	public TemplateIcon(KonMonumentTemplate template, String contextColor, List<String> lore, int index, boolean isClickable) {
+		super(index);
 		this.template = template;
 		this.contextColor = contextColor;
 		this.lore = lore;
-		this.index = index;
 		this.isClickable = isClickable;
 	}
 	
 	public KonMonumentTemplate getTemplate() {
 		return template;
-	}
-	
-	@Override
-	public int getIndex() {
-		return index;
 	}
 
 	@Override

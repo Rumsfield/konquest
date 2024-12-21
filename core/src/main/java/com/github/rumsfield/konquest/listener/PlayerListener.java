@@ -895,14 +895,6 @@ public class PlayerListener implements Listener {
     	}
     }
     
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerDropMenuItem(PlayerDropItemEvent event) {
-    	if(konquest.getDisplayManager().isPlayerViewingMenu(event.getPlayer())) {
-    		ChatUtil.printDebug("Player "+event.getPlayer().getName()+" tried to drop an item from an inventory menu!");
-    		//TODO: Destroy the item dropped from the menu GUI
-    	}
-    }
-    
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerPortal(PlayerPortalEvent event) {
     	if(event.isCancelled()) return;// Do nothing if another plugin cancels this event

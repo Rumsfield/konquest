@@ -1,40 +1,42 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandIcon implements MenuIcon{
+public class CommandIcon extends MenuIcon{
 
 	private final CommandType command;
+	private final boolean permission;
 	private final int cost;
 	private final int cost_incr;
-	private final int index;
 	private final ItemStack item;
 
+	private final String alertColor = DisplayManager.alertFormat;
 	private final String loreColor = DisplayManager.loreFormat;
 	private final String valueColor = DisplayManager.valueFormat;
 
-	public CommandIcon(CommandType command, int cost, int cost_incr, int index) {
+	public CommandIcon(CommandType command, boolean permission, int cost, int cost_incr, int index) {
+		super(index);
 		this.command = command;
+		this.permission = permission;
 		this.cost = cost;
 		this.cost_incr = cost_incr;
-		this.index = index;
 		this.item = initItem();
 	}
 
 	private ItemStack initItem() {
 		List<String> loreList = new ArrayList<>();
+		if(!permission) {
+			loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
+		}
 		if(cost > 0) {
 			loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
 		}
@@ -51,11 +53,6 @@ public class CommandIcon implements MenuIcon{
 	}
 
 	@Override
-	public int getIndex() {
-		return index;
-	}
-
-	@Override
 	public String getName() {
 		return command.toString();
 	}
@@ -67,7 +64,7 @@ public class CommandIcon implements MenuIcon{
 
 	@Override
 	public boolean isClickable() {
-		return true;
+		return permission;
 	}
 
 }

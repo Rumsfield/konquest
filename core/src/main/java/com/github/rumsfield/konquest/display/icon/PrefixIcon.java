@@ -13,7 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.Collections;
 import java.util.List;
 
-public class PrefixIcon implements MenuIcon {
+public class PrefixIcon extends MenuIcon {
 
 	public enum PrefixIconAction {
 		APPLY_PREFIX,
@@ -22,15 +22,14 @@ public class PrefixIcon implements MenuIcon {
 	
 	private final PrefixIconAction action;
 	private final List<String> lore;
-	private final int index;
 	private final boolean isClickable;
 	private final KonPrefixType prefix;
 	private final ItemStack item;
 	
 	public PrefixIcon(KonPrefixType prefix, List<String> lore, int index, boolean isClickable, PrefixIconAction action) {
+		super(index);
 		this.prefix = prefix;
 		this.lore = lore;
-		this.index = index;
 		this.isClickable = isClickable;
 		this.action = action;
 		this.item = initItem();
@@ -59,11 +58,6 @@ public class PrefixIcon implements MenuIcon {
 	
 	public KonPrefixType getPrefix() {
 		return prefix;
-	}
-	
-	@Override
-	public int getIndex() {
-		return index;
 	}
 
 	@Override

@@ -3,18 +3,27 @@ package com.github.rumsfield.konquest.display;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.display.icon.PlayerIcon;
+import com.github.rumsfield.konquest.utility.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 
 import java.util.HashMap;
 
+/**
+ * A wrapper for a single Inventory view that contains icons.
+ * This class is used in higher level menus to represent individual pages.
+ */
 public class DisplayMenu {
 
 	private final Inventory inventory;
 	private final HashMap<Integer,MenuIcon> iconMap;
 	
 	public DisplayMenu (int rows, String label) {
-		inventory = Bukkit.createInventory(null, rows*9, label);
+		if(rows > 5) {
+			ChatUtil.printConsoleError("Failed to create menu display with "+rows+" rows: "+label);
+		}
+		int invRows = Math.min(rows,5)+1; // add row for navigation
+		inventory = Bukkit.createInventory(null, invRows*9, label);
 		iconMap = new HashMap<>();
 	}
 	
@@ -28,6 +37,10 @@ public class DisplayMenu {
 	
 	public MenuIcon getIcon(int index) {
 		return iconMap.get(index);
+	}
+
+	public boolean hasIcon(int index) {
+		return iconMap.containsKey(index);
 	}
 	
 	public void updateIcons() {

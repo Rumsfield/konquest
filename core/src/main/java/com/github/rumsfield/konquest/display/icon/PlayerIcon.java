@@ -1,19 +1,16 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerIcon implements MenuIcon {
+public class PlayerIcon extends MenuIcon {
 
 	public enum PlayerIconAction {
 		DISPLAY_SCORE,
@@ -23,7 +20,6 @@ public class PlayerIcon implements MenuIcon {
 	private final String name;
 	private final List<String> lore;
 	private final OfflinePlayer player;
-	private final int index;
 	private final boolean isClickable;
 	private final PlayerIconAction action;
 
@@ -32,10 +28,10 @@ public class PlayerIcon implements MenuIcon {
 	private final String valueColor = DisplayManager.valueFormat;
 
 	public PlayerIcon(String name, List<String> lore, OfflinePlayer player, int index, boolean isClickable, PlayerIconAction action) {
+		super(index);
 		this.name = name;
 		this.lore = lore;
 		this.player = player;
-		this.index = index;
 		this.isClickable = isClickable;
 		this.action = action;
 	}
@@ -46,11 +42,6 @@ public class PlayerIcon implements MenuIcon {
 	
 	public OfflinePlayer getOfflinePlayer() {
 		return player;
-	}
-
-	@Override
-	public int getIndex() {
-		return index;
 	}
 
 	@Override

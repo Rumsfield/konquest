@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
+import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.command.CommandSender;
@@ -23,7 +24,10 @@ public class KonquestCommand extends CommandBase{
 		// Display help GUI menu to players.
 		// Display logo and tip for console.
 		if (sender instanceof Player) {
-			konquest.getDisplayManager().displayHelpMenu((Player) sender);
+			KonPlayer displayPlayer = konquest.getPlayerManager().getPlayer((Player) sender);
+			if (displayPlayer != null) {
+				konquest.getDisplayManager().displayHelpMenu(displayPlayer);
+			}
 		} else if (sender instanceof ConsoleCommandSender) {
 			KonquestPlugin.printLogo();
 			ChatUtil.sendNotice(sender,"Suggested console commands:");

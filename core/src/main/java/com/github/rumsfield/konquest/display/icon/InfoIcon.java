@@ -2,28 +2,25 @@ package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 
-public class InfoIcon implements MenuIcon{
+public class InfoIcon extends MenuIcon{
 	
 	private final String name;
 	private final List<String> lore;
 	private final Material mat;
 	private String info;
-	private final int index;
 	private final ItemStack item;
 	private final boolean isClickable;
 	
 	public InfoIcon(String name, List<String> lore, Material mat, int index, boolean isClickable) {
+		super(index);
 		this.name = name;
 		this.lore = lore;
 		this.mat = mat;
 		this.info = "";
-		this.index = index;
 		this.isClickable = isClickable;
 		this.item = initItem();
 	}
@@ -39,11 +36,6 @@ public class InfoIcon implements MenuIcon{
 	
 	public String getInfo() {
 		return info;
-	}
-
-	@Override
-	public int getIndex() {
-		return index;
 	}
 
 	@Override

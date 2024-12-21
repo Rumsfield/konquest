@@ -252,7 +252,7 @@ public class TownCommand extends CommandBase {
 								}
 								if (args.size() == 3) {
 									// Open plots menu
-									konquest.getDisplayManager().displayTownPlotMenu(bukkitPlayer, town);
+									konquest.getDisplayManager().displayTownPlotMenu(player, town);
 								} else {
 									sendInvalidArgMessage(bukkitPlayer);
 								}

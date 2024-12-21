@@ -4,22 +4,17 @@ import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class KingdomIcon implements MenuIcon {
+public class KingdomIcon extends MenuIcon {
 
 	private final KonKingdom kingdom;
 	private final String contextColor;
 	private final List<String> lore;
-	private final int index;
 	private final ItemStack item;
 	private final boolean isClickable;
 
@@ -28,10 +23,10 @@ public class KingdomIcon implements MenuIcon {
 	private final String valueColor = DisplayManager.valueFormat;
 
 	public KingdomIcon(KonKingdom kingdom, String contextColor, List<String> lore, int index, boolean isClickable) {
+		super(index);
 		this.kingdom = kingdom;
 		this.contextColor = contextColor;
 		this.lore = lore;
-		this.index = index;
 		this.isClickable = isClickable;
 		this.item = initItem();
 	}
@@ -69,11 +64,6 @@ public class KingdomIcon implements MenuIcon {
 	
 	public KonKingdom getKingdom() {
 		return kingdom;
-	}
-	
-	@Override
-	public int getIndex() {
-		return index;
 	}
 
 	@Override
