@@ -26,19 +26,12 @@ public class HelpMenu extends StateMenu {
     enum MenuState implements State {
         ROOT,
         START,
+        COMMUNITY,
+        MAIN,
         COMMANDS,
-        COMMANDS_ADMIN
+        COMMANDS_ADMIN,
+        QUEST
     }
-
-    /* Icon slot indexes */
-    // Row 0: 0  1  2  3  4  5  6  7  8
-    // Row 1: 9 10 11 12 13 14 15 16 17
-    private final int ROOT_SLOT_START 			= 0;
-    private final int ROOT_SLOT_COMMUNITY		= 2;
-    private final int ROOT_SLOT_MAIN 			= 4;
-    private final int ROOT_SLOT_COMMANDS 		= 6;
-    private final int ROOT_SLOT_COMMANDS_ADMIN 	= 8;
-    private final int START_SLOT_QUEST 	        = 13;
 
     private final String titleColor = DisplayManager.titleFormat;
     private final String loreColor = DisplayManager.loreFormat;
@@ -67,7 +60,16 @@ public class HelpMenu extends StateMenu {
      */
     private DisplayMenu createRootView() {
         DisplayMenu result;
+        MenuIcon icon;
         List<String> loreList = new ArrayList<>();
+
+        /* Icon slot indexes */
+        // Row 0: 0  1  2  3  4  5  6  7  8
+        int ROOT_SLOT_START 			= 0;
+        int ROOT_SLOT_COMMUNITY		    = 2;
+        int ROOT_SLOT_MAIN 			    = 4;
+        int ROOT_SLOT_COMMANDS 		    = 6;
+        int ROOT_SLOT_COMMANDS_ADMIN 	= 8;
 
         result = new DisplayMenu(1, titleColor+MessagePath.MENU_HELP_TITLE.getMessage());
 
@@ -75,7 +77,9 @@ public class HelpMenu extends StateMenu {
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_START.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_HELP_START.getMessage(), loreList, Material.PAPER, ROOT_SLOT_START, true));
+        icon = new InfoIcon(labelColor+MessagePath.MENU_HELP_START.getMessage(), loreList, Material.PAPER, ROOT_SLOT_START, true);
+        icon.setState(MenuState.START);
+        result.addIcon(icon);
 
         /* Community Link */
         String communityLink = getKonquest().getCore().getString(CorePath.COMMUNITY_LINK.getPath(),"");
@@ -84,25 +88,32 @@ public class HelpMenu extends StateMenu {
         loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
         InfoIcon communityIcon = new InfoIcon(labelColor+MessagePath.MENU_HELP_COMMUNITY.getMessage(), loreList, Material.MINECART, ROOT_SLOT_COMMUNITY, true);
         communityIcon.setInfo(""+ChatColor.LIGHT_PURPLE+ChatColor.UNDERLINE+communityLink);
+        communityIcon.setState(MenuState.COMMUNITY);
         result.addIcon(communityIcon);
 
         /* Main Menu */
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_MAIN.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_HELP_MAIN.getMessage(), loreList, Material.LADDER, ROOT_SLOT_MAIN, true));
+        icon = new InfoIcon(labelColor+MessagePath.MENU_HELP_MAIN.getMessage(), loreList, Material.LADDER, ROOT_SLOT_MAIN, true);
+        icon.setState(MenuState.MAIN);
+        result.addIcon(icon);
 
         /* Commands */
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_COMMANDS.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_HELP_COMMANDS.getMessage(), loreList, Material.COMPASS, ROOT_SLOT_COMMANDS, true));
+        icon = new InfoIcon(labelColor+MessagePath.MENU_HELP_COMMANDS.getMessage(), loreList, Material.COMPASS, ROOT_SLOT_COMMANDS, true);
+        icon.setState(MenuState.COMMANDS);
+        result.addIcon(icon);
 
         /* Admin Commands */
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_ADMIN.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_HELP_ADMIN.getMessage(), loreList, Material.NETHER_STAR, ROOT_SLOT_COMMANDS_ADMIN, true));
+        icon = new InfoIcon(labelColor+MessagePath.MENU_HELP_ADMIN.getMessage(), loreList, Material.NETHER_STAR, ROOT_SLOT_COMMANDS_ADMIN, true);
+        icon.setState(MenuState.COMMANDS_ADMIN);
+        result.addIcon(icon);
 
         /* Navigation */
         addNavEmpty(result);
@@ -117,9 +128,14 @@ public class HelpMenu extends StateMenu {
      */
     private DisplayMenu createStartView() {
         DisplayMenu result;
+        MenuIcon icon;
         List<String> loreList = new ArrayList<>();
         int numRows = 1;
         boolean isQuestEnabled = false;
+
+        /* Icon slot indexes */
+        // Row 1: 9 10 11 12 13 14 15 16 17
+        int START_SLOT_QUEST 	        = 13;
 
         // Check for enabled quests
         if (getKonquest().getDirectiveManager().isEnabled()) {
@@ -164,7 +180,9 @@ public class HelpMenu extends StateMenu {
             loreList.clear();
             loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_QUEST.getMessage(), loreColor));
             loreList.add(hintColor + MessagePath.MENU_HELP_HINT.getMessage());
-            result.addIcon(new InfoIcon(labelColor + MessagePath.MENU_HELP_QUEST.getMessage(), loreList, Material.WRITABLE_BOOK, START_SLOT_QUEST, true));
+            icon = new InfoIcon(labelColor + MessagePath.MENU_HELP_QUEST.getMessage(), loreList, Material.WRITABLE_BOOK, START_SLOT_QUEST, true);
+            icon.setState(MenuState.QUEST);
+            result.addIcon(icon);
         }
 
         /* Navigation */
@@ -251,16 +269,15 @@ public class HelpMenu extends StateMenu {
         DisplayMenu result = null;
         if (isCurrentNavSlot(slot)) {
             // Clicked in navigation bar
-            int navIndex = getCurrentNavIndex(slot);
-            if (navIndex == INDEX_BACK) {
-                result = goPageBack();
-            } else if (navIndex == INDEX_CLOSE) {
+            if (isNavClose(slot)) {
                 // Close the menu by returning a null view
-                result = null;
-            } else if (navIndex == INDEX_RETURN) {
+                return null;
+            } else if (isNavReturn(slot)) {
                 // Return to root
                 result = setCurrentView(MenuState.ROOT);
-            } else if (navIndex == INDEX_NEXT) {
+            } else if (isNavBack(slot)) {
+                result = goPageBack();
+            } else if (isNavNext(slot)) {
                 result = goPageNext();
             }
         } else if (isCurrentMenuSlot(slot)) {
@@ -268,36 +285,36 @@ public class HelpMenu extends StateMenu {
             DisplayMenu view = getCurrentView();
             if (view == null) return null;
             MenuIcon clickedIcon = view.getIcon(slot);
-            switch ((MenuState)getCurrentState()) {
+            MenuState currentState = (MenuState)getCurrentState();
+            if (currentState == null) return null;
+            MenuState nextState = (MenuState)clickedIcon.getState(); // could be null in some states
+            switch (currentState) {
                 case ROOT:
-                    if (slot == ROOT_SLOT_START) {
-                        // Open Getting Started view
-                        result = setCurrentView(MenuState.START);
-                    } else if (slot == ROOT_SLOT_COMMUNITY) {
-                        // Display community link and close menu
-                        if (clickedIcon instanceof InfoIcon) {
-                            ChatUtil.sendNotice(player.getBukkitPlayer(), ((InfoIcon)clickedIcon).getInfo());
-                        }
-                    } else if (slot == ROOT_SLOT_MAIN) {
-                        // Go to Main Menu
-                        //TODO link to DisplayManager main menu
-                    } else if (slot == ROOT_SLOT_COMMANDS) {
-                        // Open Commands view
-                        result = setCurrentView(MenuState.COMMANDS);
-                    } else if (slot == ROOT_SLOT_COMMANDS_ADMIN) {
-                        // Open Admin Commands view
-                        result = setCurrentView(MenuState.COMMANDS_ADMIN);
+                    // Root view, use stored icon state
+                    if (nextState == null) return null;
+                    switch (nextState) {
+                        case START:
+                        case COMMANDS:
+                        case COMMANDS_ADMIN:
+                            // Go to next state as defined by icon
+                            result = setCurrentView(nextState);
+                            break;
+                        case COMMUNITY:
+                            // Display community link and close menu
+                            if (clickedIcon instanceof InfoIcon) {
+                                ChatUtil.sendNotice(player.getBukkitPlayer(), ((InfoIcon)clickedIcon).getInfo());
+                            }
+                            break;
+                        case MAIN:
+                            // Go to Main Menu and close this menu
+                            getKonquest().getDisplayManager().displayMainMenu(player);
+                            break;
                     }
                     break;
                 case START:
-                    if (slot == START_SLOT_QUEST) {
+                    if (nextState != null && nextState.equals(MenuState.QUEST)) {
                         // Open Quest Book and close menu
-                        if(!getKonquest().getDirectiveManager().isEnabled()) {
-                            // Display quest book
-                            getKonquest().getDirectiveManager().displayBook(player);
-                        } else {
-                            ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_DISABLED.getMessage());
-                        }
+                        getKonquest().getDirectiveManager().displayBook(player);
                     }
                     break;
                 case COMMANDS:

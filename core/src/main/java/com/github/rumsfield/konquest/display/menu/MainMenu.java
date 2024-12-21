@@ -5,11 +5,17 @@ import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.command.admin.AdminCommandType;
 import com.github.rumsfield.konquest.display.DisplayMenu;
 import com.github.rumsfield.konquest.display.StateMenu;
+import com.github.rumsfield.konquest.display.icon.AdminCommandIcon;
+import com.github.rumsfield.konquest.display.icon.CommandIcon;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
+import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.manager.DisplayManager;
+import com.github.rumsfield.konquest.manager.TerritoryManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
+import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
@@ -71,18 +77,6 @@ public class MainMenu extends StateMenu {
 
         /* Set current menu view */
         setCurrentView(MenuState.ROOT);
-    }
-
-    private boolean hasPermission(CommandType cmd) {
-        return player.getBukkitPlayer().hasPermission(cmd.permission());
-    }
-
-    private boolean hasPermission(AdminCommandType cmd) {
-        return player.getBukkitPlayer().hasPermission(cmd.permission());
-    }
-
-    private String getDisplayValue(boolean value) {
-        return DisplayManager.boolean2Lang(value) + " " + DisplayManager.boolean2Symbol(value);
     }
 
     /**
@@ -366,8 +360,119 @@ public class MainMenu extends StateMenu {
      */
     @Override
     public DisplayMenu updateState(int slot, boolean clickType) {
-        return null;
+        DisplayMenu result = null;
+        if (isCurrentNavSlot(slot)) {
+            // Clicked in navigation bar
+            if (isNavClose(slot)) {
+                // Close the menu by returning a null view
+                return null;
+            } else if (isNavReturn(slot)) {
+                // Return to root
+                result = setCurrentView(MenuState.ROOT);
+            } else if (isNavBack(slot)) {
+                result = goPageBack();
+            } else if (isNavNext(slot)) {
+                result = goPageNext();
+            }
+        } else if (isCurrentMenuSlot(slot)) {
+            // Clicked in menu
+            DisplayMenu view = getCurrentView();
+            if (view == null) return null;
+            switch ((MenuState)getCurrentState()) {
+                case ROOT:
+                    switch (slot) {
+                        case ROOT_SLOT_HELP:
+                            // Open Help Menu (close this menu)
+                            getKonquest().getDisplayManager().displayHelpMenu(player);
+                            break;
+                        case ROOT_SLOT_DASH:
+                            // Open Dashboard view
+                            result = setCurrentView(MenuState.DASHBOARD);
+                            break;
+                        case ROOT_SLOT_KINGDOM:
+                            // Open Kingdom Menu (close this menu)
+                            getKonquest().getDisplayManager().displayKingdomMenu(player);
+                            break;
+                        case ROOT_SLOT_INFO:
+                            // Open Info Menu (close this menu)
+                            // TODO
+                            break;
+                        case ROOT_SLOT_TOWN:
+                            // Open Town Menu (close this menu)
+                            // TODO
+                            break;
+                        case ROOT_SLOT_QUEST:
+                            // Open Quest Book (close this menu)
+                            getKonquest().getDirectiveManager().displayBook(player);
+                            break;
+                        case ROOT_SLOT_STATS:
+                            // Open Stats Book (close this menu)
+                            getKonquest().getAccomplishmentManager().displayStats(player);
+                            break;
+                        case ROOT_SLOT_PREFIX:
+                            // Open Prefix Menu (close this menu)
+                            // TODO
+                            break;
+                        case ROOT_SLOT_SCORE:
+                            // Open Score Menu (close this menu)
+                            // TODO
+                            break;
+                        case ROOT_SLOT_TRAVEL:
+                            // Open Travel Menu (close this menu)
+                            // TODO
+                            break;
+                        case ROOT_SLOT_SECRET:
+                            // Open Secret view
+                            result = setCurrentView(MenuState.SECRET);
+                            break;
+                    }
+                    break;
+                case DASHBOARD:
+                    switch (slot) {
+                        case DASH_SLOT_MAP_AUTO:
+                            // Toggle map auto
+                            player.setIsMapAuto(!player.isMapAuto());
+                            break;
+                        case DASH_SLOT_CHAT:
+                            // Toggle kingdom chat
+                            player.setIsGlobalChat(!player.isGlobalChat());
+                            break;
+                        case DASH_SLOT_BORDER:
+                            // Toggle border display
+                            player.setIsBorderDisplay(!player.isBorderDisplay());
+                            break;
+                        case DASH_SLOT_FLY:
+                            // Toggle flying
+                            player.setIsFlyEnabled(!player.isFlyEnabled());
+                            break;
+                        case DASH_SLOT_BYPASS:
+                            // Toggle admin bypass
+                            player.setIsAdminBypassActive(!player.isAdminBypassActive());
+                            break;
+                    }
+                    // Keep menu open, refresh view
+                    result = updateView(createDashboardView(), MenuState.DASHBOARD);
+                    break;
+                case SECRET:
+                    //TODO do something
+                    result = view;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return result;
     }
 
+    private boolean hasPermission(CommandType cmd) {
+        return player.getBukkitPlayer().hasPermission(cmd.permission());
+    }
 
+    private boolean hasPermission(AdminCommandType cmd) {
+        return player.getBukkitPlayer().hasPermission(cmd.permission());
+    }
+
+    private String getDisplayValue(boolean value) {
+        return DisplayManager.boolean2Lang(value) + " " + DisplayManager.boolean2Symbol(value);
+    }
 }

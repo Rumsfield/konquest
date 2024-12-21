@@ -4,10 +4,11 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.*;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.display.menu.HelpMenu;
+import com.github.rumsfield.konquest.display.menu.KingdomMenu;
+import com.github.rumsfield.konquest.display.menu.MainMenu;
 import com.github.rumsfield.konquest.display.wrapper.*;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -18,7 +19,6 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class DisplayManager {
 
@@ -99,15 +99,16 @@ public class DisplayManager {
 		if (view == null) return;
 		playMenuOpenSound(viewer.getBukkitPlayer());
 		stateMenus.put(view.getInventory(), menu);
+		ChatUtil.printDebug("Displaying new menu to player " + viewer.getBukkitPlayer().getName() + ", total menus = " + stateMenus.size());
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), () -> viewer.getBukkitPlayer().openInventory(view.getInventory()),1);
 	}
 
 	/* All menus
 	 *
-	 * Help Menu
-	 * Main Menu
-	 * Kingdom Menu
+	 * + Help Menu
+	 * + Main Menu
+	 * + Kingdom Menu
 	 * Town Menu
 	 * Town Management Menu
 	 * Town Plot Menu
@@ -130,9 +131,24 @@ public class DisplayManager {
 
 	/*
 	 * ===============================================
+	 * Main Menu
+	 * ===============================================
+	 */
+	public void displayMainMenu(KonPlayer displayPlayer) {
+		if (displayPlayer == null) return;
+		MainMenu newMenu = new MainMenu(konquest, displayPlayer);
+		displayMenuToPlayer(displayPlayer, newMenu);
+	}
+
+	/*
+	 * ===============================================
 	 * Kingdom Menu
 	 * ===============================================
 	 */
+	public void displayKingdomMenu(KonPlayer displayPlayer) {
+		displayKingdomMenu(displayPlayer, displayPlayer.getKingdom(), false);
+	}
+
 	public void displayKingdomMenu(KonPlayer displayPlayer, KonKingdom kingdom, boolean isAdmin) {
 		if (displayPlayer == null) return;
 		KingdomMenu newMenu = new KingdomMenu(konquest, displayPlayer, kingdom, isAdmin);

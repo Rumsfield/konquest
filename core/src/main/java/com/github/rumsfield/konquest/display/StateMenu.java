@@ -31,6 +31,7 @@ public abstract class StateMenu {
     protected final Comparator<KonKingdom> kingdomComparator;
     protected final int MAX_ICONS_PER_PAGE = 45;
     protected final int MAX_ROW_SIZE = 9;
+    protected final int INDEX_HOME = 3;
     protected final int INDEX_CLOSE = 4;
     protected final int INDEX_RETURN = 5;
     protected final int INDEX_BACK = 0;
@@ -103,6 +104,10 @@ public abstract class StateMenu {
         this.menuAccess = access;
     }
 
+    public boolean isCurrentStateEqual(State checkState) {
+        return currentState.equals(checkState);
+    }
+
     /*
      * Abstract Methods
      */
@@ -139,6 +144,16 @@ public abstract class StateMenu {
             view.updateIcons();
         }
         return view;
+    }
+
+    public DisplayMenu updateView(DisplayMenu refreshView, State newState) {
+        return updateView(Collections.singletonList(refreshView), newState);
+    }
+
+    public DisplayMenu updateView(List<DisplayMenu> refreshView, State newState) {
+        if (refreshView.isEmpty()) return null;
+        initView(refreshView, newState);
+        return setCurrentView(newState);
     }
 
     public int getCurrentNumPages() {
@@ -220,6 +235,12 @@ public abstract class StateMenu {
         view.addIcon(navIconReturn(getNavStartSlot(view)+INDEX_RETURN));
     }
 
+    public void addNavHome(DisplayMenu view) {
+        // Home [3]
+        if (view == null) return;
+        view.addIcon(navIconHome(getNavStartSlot(view)+INDEX_HOME));
+    }
+
     public void addNavBack(DisplayMenu view) {
         // Back [0]
         if (view == null) return;
@@ -241,22 +262,33 @@ public abstract class StateMenu {
         }
     }
 
-    /*
-    public void addNavBackNext(DisplayMenu view) {
-        if (view == null) return;
-        if(currentPage > 0) {
-            // Place a back button [0]
-            view.addIcon(navIconBack(getNavStart(view)+INDEX_BACK));
-        } else {
-            view.addIcon(navIconEmpty(getNavStart(view)+INDEX_BACK));
+    private boolean isNavIndex(int slot, int index) {
+        if (isCurrentNavSlot(slot)) {
+            int navIndex = getCurrentNavIndex(slot);
+            return navIndex == index;
         }
-        if(getCurrentViewPages() != null && currentPage < getCurrentViewPages().size()-1) {
-            // Place a next button [8]
-            view.addIcon(navIconNext(getNavStart(view)+INDEX_NEXT));
-        } else {
-            view.addIcon(navIconEmpty(getNavStart(view)+INDEX_NEXT));
-        }
-    }*/
+        return false;
+    }
+
+    protected boolean isNavClose(int slot) {
+        return isNavIndex(slot,INDEX_CLOSE);
+    }
+
+    protected boolean isNavReturn(int slot) {
+        return isNavIndex(slot,INDEX_RETURN);
+    }
+
+    protected boolean isNavHome(int slot) {
+        return isNavIndex(slot,INDEX_HOME);
+    }
+
+    protected boolean isNavBack(int slot) {
+        return isNavIndex(slot,INDEX_BACK);
+    }
+
+    protected boolean isNavNext(int slot) {
+        return isNavIndex(slot,INDEX_NEXT);
+    }
 
     /*
      * Page Methods
@@ -373,12 +405,16 @@ public abstract class StateMenu {
         return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_NEXT.getMessage(),Collections.emptyList(),Material.ENDER_PEARL,index,true);
     }
 
-    protected InfoIcon navIconEmpty(int index) {
-        return new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,index,false);
+    protected InfoIcon navIconReturn(int index) {
+        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_RETURN.getMessage(),Collections.emptyList(),Material.FIREWORK_ROCKET,index,true);
     }
 
-    protected InfoIcon navIconReturn(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_RETURN.getMessage(),Collections.emptyList(),Material.FIREWORK_ROCKET,index,true);
+    protected InfoIcon navIconHome(int index) {
+        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_HOME.getMessage(),Collections.emptyList(),Material.ORANGE_BED,index,true);
+    }
+
+    protected InfoIcon navIconEmpty(int index) {
+        return new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,index,false);
     }
 
     /*
