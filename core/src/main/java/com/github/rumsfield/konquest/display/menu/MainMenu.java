@@ -70,12 +70,7 @@ public class MainMenu extends StateMenu {
         super(konquest, HelpMenu.MenuState.ROOT, null);
         this.player = player;
 
-        /* Initialize menu views */
-        initView(createRootView(), MenuState.ROOT);
-        initView(createDashboardView(), MenuState.DASHBOARD);
-        initView(createSecretView(), MenuState.SECRET);
-
-        /* Set current menu view */
+        /* Initialize menu view */
         setCurrentView(MenuState.ROOT);
     }
 
@@ -350,6 +345,31 @@ public class MainMenu extends StateMenu {
     }
 
     /**
+     * Create a list of views for a given menu state.
+     * This creates new views, specific to each menu.
+     * @param context The menu state for the corresponding view
+     * @return The list of menu views to be displayed to the player
+     */
+    @Override
+    public ArrayList<DisplayMenu> createView(State context) {
+        ArrayList<DisplayMenu> result = new ArrayList<>();
+        switch ((MenuState)context) {
+            case ROOT:
+                result.add(createRootView());
+                break;
+            case DASHBOARD:
+                result.add(createDashboardView());
+                break;
+            case SECRET:
+                result.add(createSecretView());
+                break;
+            default:
+                break;
+        }
+        return result;
+    }
+
+    /**
      * Change the menu's state based on the clicked inventory slot and type of click (right or left mouse).
      * Assume a clickable icon was clicked and visible to the player.
      * Returning a null value will close the menu.
@@ -370,8 +390,10 @@ public class MainMenu extends StateMenu {
                 // Return to root
                 result = setCurrentView(MenuState.ROOT);
             } else if (isNavBack(slot)) {
+                // Page back
                 result = goPageBack();
             } else if (isNavNext(slot)) {
+                // Page next
                 result = goPageNext();
             }
         } else if (isCurrentMenuSlot(slot)) {
@@ -451,7 +473,7 @@ public class MainMenu extends StateMenu {
                             break;
                     }
                     // Keep menu open, refresh view
-                    result = updateView(createDashboardView(), MenuState.DASHBOARD);
+                    result = setCurrentView(MenuState.DASHBOARD, true);
                     break;
                 case SECRET:
                     //TODO do something

@@ -21,7 +21,6 @@ public abstract class StateMenu {
     public interface Access {}
 
     private final Konquest konquest;
-    private final State rootState;
     private State currentState;
     private Access menuAccess;
     private final HashMap<State,ArrayList<DisplayMenu>> viewPages; // Map of paged views
@@ -40,7 +39,6 @@ public abstract class StateMenu {
     public StateMenu(Konquest konquest, State initialState, Access initialAccess) {
         this.viewPages = new HashMap<>();
         this.currentPage = 0;
-        this.rootState = initialState;
         this.currentState = initialState;
         this.menuAccess = initialAccess;
         this.konquest = konquest;
@@ -113,6 +111,14 @@ public abstract class StateMenu {
      */
 
     /**
+     * Create a list of views for a given menu state.
+     * This creates new views, specific to each menu.
+     * @param context The menu state for the corresponding view
+     * @return The list of menu views to be displayed to the player
+     */
+    public abstract ArrayList<DisplayMenu> createView(State context);
+
+    /**
      * Change the menu's state based on the clicked inventory slot and type of click (right or left mouse).
      * Assume a clickable icon was clicked and visible to the player.
      * Returning a null value will close the menu.
@@ -125,7 +131,26 @@ public abstract class StateMenu {
     /*
      * Common Methods
      */
+    public DisplayMenu setCurrentView(State context) {
+        return setCurrentView(context, false);
+    }
 
+    public DisplayMenu setCurrentView(State context, boolean refresh) {
+        if (!hasView(context) || refresh) {
+            // Create a new view
+            viewPages.put(context, createView(context));
+        }
+        currentState = context;
+        currentPage = 0;
+        DisplayMenu view = getCurrentView();
+        if (view != null) {
+            view.updateIcons();
+        }
+        return view;
+    }
+
+
+    /*
     public void initView(DisplayMenu view, State context) {
         initView(Collections.singletonList(view), context);
     }
@@ -155,6 +180,7 @@ public abstract class StateMenu {
         initView(refreshView, newState);
         return setCurrentView(newState);
     }
+    */
 
     public int getCurrentNumPages() {
         return getCurrentViewPages() == null ? 0 : getCurrentViewPages().size();
@@ -167,7 +193,7 @@ public abstract class StateMenu {
     public @Nullable DisplayMenu getCurrentView() {
         // Fetch current display view and update the icons in the inventory
         DisplayMenu view = null;
-        if (getCurrentViewPages() != null) {
+        if (getCurrentViewPages() != null && !getCurrentViewPages().isEmpty() && currentPage < getCurrentNumPages()) {
             view = getCurrentViewPages().get(currentPage);
         }
         return view;
@@ -175,14 +201,6 @@ public abstract class StateMenu {
 
     public boolean hasView(State checkState) {
         return viewPages.containsKey(checkState);
-    }
-
-    public boolean isRoot(State checkState) {
-        return rootState.equals(checkState);
-    }
-
-    public State getRootState() {
-        return rootState;
     }
 
     /*
@@ -309,12 +327,20 @@ public abstract class StateMenu {
 
     protected DisplayMenu goPageBack() {
         currentPage = Math.max(currentPage-1,0);
-        return getCurrentView();
+        DisplayMenu view = getCurrentView();
+        if (view != null) {
+            view.updateIcons();
+        }
+        return view;
     }
 
     protected DisplayMenu goPageNext() {
         currentPage = Math.min(currentPage+1,getCurrentNumPages());
-        return getCurrentView();
+        DisplayMenu view = getCurrentView();
+        if (view != null) {
+            view.updateIcons();
+        }
+        return view;
     }
 
     protected ArrayList<DisplayMenu> makePages(List<MenuIcon> icons, String baseTitle) {

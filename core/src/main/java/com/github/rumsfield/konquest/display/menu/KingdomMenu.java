@@ -108,25 +108,9 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 			}
 		}
 
-		/* Initialize menu views */
-		initView(createRootView(), 								MenuState.ROOT);
-		initView(createKingdomView(MenuState.A_JOIN), 			MenuState.A_JOIN);
-		initView(createExileView(), 							MenuState.A_EXILE);
-		initView(createKingdomView(MenuState.A_INVITE), 		MenuState.A_INVITE);
-		initView(createKingdomView(MenuState.A_LIST), 			MenuState.A_LIST);
-		initView(createKingdomView(MenuState.B_RELATIONSHIP), 	MenuState.B_RELATIONSHIP);
-		initView(createDiplomacyView(), 						MenuState.B_DIPLOMACY);
-		initView(createPlayerView(MenuState.B_REQUESTS), 		MenuState.B_REQUESTS);
-		initView(createPlayerView(MenuState.C_PROMOTE), 		MenuState.C_PROMOTE);
-		initView(createPlayerView(MenuState.C_DEMOTE), 			MenuState.C_DEMOTE);
-		initView(createPlayerView(MenuState.C_TRANSFER), 		MenuState.C_TRANSFER);
-		initView(createTownView(MenuState.C_DESTROY), 			MenuState.C_DESTROY);
-		initView(createTownView(MenuState.C_CAPITAL), 			MenuState.C_CAPITAL);
-		initView(createTemplateView(), 							MenuState.C_TEMPLATE);
-		initView(createDisbandView(), 							MenuState.C_DISBAND);
-
-		/* Set current menu view */
+		/* Initialize menu view */
 		setCurrentView(MenuState.ROOT);
+
 	}
 	
 	private DisplayMenu createRootView() {
@@ -756,6 +740,67 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 	}
 
 	/**
+	 * Create a list of views for a given menu state.
+	 * This creates new views, specific to each menu.
+	 * @param context The menu state for the corresponding view
+	 * @return The list of menu views to be displayed to the player
+	 */
+	@Override
+	public ArrayList<DisplayMenu> createView(State context) {
+		ArrayList<DisplayMenu> result = new ArrayList<>();
+		switch ((MenuState)context) {
+			case ROOT:
+				result.add(createRootView());
+				break;
+			case A_JOIN:
+				result.addAll(createKingdomView(MenuState.A_JOIN));
+				break;
+			case A_EXILE:
+				result.add(createExileView());
+				break;
+			case A_INVITE:
+				result.addAll(createKingdomView(MenuState.A_INVITE));
+				break;
+			case A_LIST:
+				result.addAll(createKingdomView(MenuState.A_LIST));
+				break;
+			case B_RELATIONSHIP:
+				result.addAll(createKingdomView(MenuState.B_RELATIONSHIP));
+				break;
+			case B_DIPLOMACY:
+				result.add(createDiplomacyView());
+				break;
+			case B_REQUESTS:
+				result.addAll(createPlayerView(MenuState.B_REQUESTS));
+				break;
+			case C_PROMOTE:
+				result.addAll(createPlayerView(MenuState.C_PROMOTE));
+				break;
+			case C_DEMOTE:
+				result.addAll(createPlayerView(MenuState.C_DEMOTE));
+				break;
+			case C_TRANSFER:
+				result.addAll(createPlayerView(MenuState.C_TRANSFER));
+				break;
+			case C_DESTROY:
+				result.addAll(createTownView(MenuState.C_DESTROY));
+				break;
+			case C_CAPITAL:
+				result.addAll(createTownView(MenuState.C_CAPITAL));
+				break;
+			case C_TEMPLATE:
+				result.addAll(createTemplateView());
+				break;
+			case C_DISBAND:
+				result.add(createDisbandView());
+				break;
+			default:
+				break;
+		}
+		return result;
+	}
+
+	/**
 	 * Change the menu's state based on the clicked inventory slot and type of click (right or left mouse).
 	 * Assume a clickable icon was clicked and visible to the player.
 	 * Returning a null value will close the menu.
@@ -778,14 +823,16 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 				// Return to previous
 				if (isCurrentStateEqual(MenuState.B_DIPLOMACY)) {
 					// Return to refreshed relationship from diplomacy
-					result = updateView(createKingdomView(MenuState.B_RELATIONSHIP),MenuState.B_RELATIONSHIP);
+					result = setCurrentView(MenuState.B_RELATIONSHIP);
 				} else {
 					// Return to root
 					result = setCurrentView(MenuState.ROOT);
 				}
 			} else if (isNavBack(slot)) {
+				// Page back
 				result = goPageBack();
 			} else if (isNavNext(slot)) {
+				// Page next
 				result = goPageNext();
 			}
 		} else if (isCurrentMenuSlot(slot)) {
@@ -825,7 +872,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 							// Clicked to toggle open/closed state, refresh this view
 							manager.menuToggleKingdomOpen(kingdom, player);
 							playStatusSound(player.getBukkitPlayer(),true);
-							result = updateView(createRootView(), MenuState.ROOT);
+							result = setCurrentView(MenuState.ROOT, true);
 							break;
 					}
 					break;
@@ -855,7 +902,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						playStatusSound(player.getBukkitPlayer(),status);
 						if (!status) {
 							// Invite declined, player assignment unchanged
-							result = updateView(createKingdomView(MenuState.A_INVITE), MenuState.A_INVITE);
+							result = setCurrentView(MenuState.A_INVITE, true);
 						}
 					}
 					break;
@@ -872,7 +919,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 					if (clickedIcon instanceof KingdomIcon) {
 						KingdomIcon icon = (KingdomIcon)clickedIcon;
 						diplomacyKingdom = icon.getKingdom();
-						result = updateView(createDiplomacyView(), MenuState.B_DIPLOMACY);
+						result = setCurrentView(MenuState.B_DIPLOMACY, true);
 					}
 					break;
 				case B_DIPLOMACY:
@@ -885,7 +932,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						diplomacyKingdom = null;
 						if (status) {
 							// Return to relationship view
-							result = updateView(createKingdomView(MenuState.B_RELATIONSHIP), MenuState.B_RELATIONSHIP);
+							result = setCurrentView(MenuState.B_RELATIONSHIP, true);
 						}
 					}
 					break;
@@ -895,7 +942,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						KonOfflinePlayer clickPlayer = getKonquest().getPlayerManager().getOfflinePlayer(icon.getOfflinePlayer());
 						boolean status = manager.menuRespondKingdomRequest(player, clickPlayer, kingdom, clickType);
 						playStatusSound(player.getBukkitPlayer(),status);
-						result = updateView(createPlayerView(MenuState.B_REQUESTS), MenuState.B_REQUESTS);
+						result = setCurrentView(MenuState.B_REQUESTS, true);
 					}
 					break;
 				case C_PROMOTE:
@@ -904,7 +951,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
 						boolean status = manager.menuPromoteOfficer(clickPlayer, kingdom);
 						playStatusSound(player.getBukkitPlayer(),status);
-						result = updateView(createPlayerView(MenuState.C_PROMOTE), MenuState.C_PROMOTE);
+						result = setCurrentView(MenuState.C_PROMOTE, true);
 					}
 					break;
 				case C_DEMOTE:
@@ -913,7 +960,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						OfflinePlayer clickPlayer = icon.getOfflinePlayer();
 						boolean status = manager.menuDemoteOfficer(clickPlayer, kingdom);
 						playStatusSound(player.getBukkitPlayer(),status);
-						result = updateView(createPlayerView(MenuState.C_DEMOTE), MenuState.C_DEMOTE);
+						result = setCurrentView(MenuState.C_DEMOTE, true);
 					}
 					break;
 				case C_TRANSFER:
@@ -946,7 +993,7 @@ public class KingdomMenu extends StateMenu implements ViewableMenu {
 						KonMonumentTemplate template = icon.getTemplate();
 						boolean status = manager.menuChangeKingdomTemplate(kingdom, template, player, isAdmin);
 						playStatusSound(player.getBukkitPlayer(),status);
-						result = updateView(createTemplateView(), MenuState.C_TEMPLATE);
+						result = setCurrentView(MenuState.C_TEMPLATE, true);
 					}
 					break;
 				case C_DISBAND:
