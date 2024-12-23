@@ -5,18 +5,11 @@ import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.command.admin.AdminCommandType;
 import com.github.rumsfield.konquest.display.DisplayMenu;
 import com.github.rumsfield.konquest.display.StateMenu;
-import com.github.rumsfield.konquest.display.icon.AdminCommandIcon;
-import com.github.rumsfield.konquest.display.icon.CommandIcon;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
-import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.manager.DisplayManager;
-import com.github.rumsfield.konquest.manager.TerritoryManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -56,19 +49,26 @@ public class MainMenu extends StateMenu {
     private final int DASH_SLOT_FLY 	    = 5;
     private final int DASH_SLOT_BYPASS 	    = 6;
 
-    private final String titleColor = DisplayManager.titleFormat;
-    private final String loreColor = DisplayManager.loreFormat;
-    private final String valueColor = DisplayManager.valueFormat;
-    private final String hintColor = DisplayManager.hintFormat;
-    private final String alertColor = DisplayManager.alertFormat;
-    private final String labelColor = ""+ ChatColor.GOLD;
-
+    private final String titleColor;
+    private final String nameColor;
+    private final String alertColor;
+    private final String loreColor;
+    private final String valueColor;
+    private final String hintColor;
 
     private final KonPlayer player;
 
     public MainMenu(Konquest konquest, KonPlayer player) {
         super(konquest, HelpMenu.MenuState.ROOT, null);
         this.player = player;
+
+        /* Formats */
+        titleColor = DisplayManager.titleFormat;
+        nameColor = DisplayManager.nameFormat;
+        alertColor = DisplayManager.alertFormat;
+        loreColor = DisplayManager.loreFormat;
+        valueColor = DisplayManager.valueFormat;
+        hintColor = DisplayManager.hintFormat;
 
         /* Initialize menu view */
         setCurrentView(MenuState.ROOT);
@@ -90,13 +90,13 @@ public class MainMenu extends StateMenu {
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.DESCRIPTION_HELP.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_MAIN_HINT.getMessage());
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_HELP.getMessage(), loreList, CommandType.HELP.iconMaterial(), ROOT_SLOT_HELP, true));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_HELP.getMessage(), loreList, CommandType.HELP.iconMaterial(), ROOT_SLOT_HELP, true));
 
         /* Dashboard */
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_MAIN_DESCRIPTION_DASHBOARD.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_MAIN_HINT.getMessage());
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_DASHBOARD.getMessage(), loreList, Material.COMMAND_BLOCK, ROOT_SLOT_DASH, true));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_DASHBOARD.getMessage(), loreList, Material.COMMAND_BLOCK, ROOT_SLOT_DASH, true));
 
         /* Kingdom Menu */
         iconCommand = CommandType.KINGDOM;
@@ -110,7 +110,7 @@ public class MainMenu extends StateMenu {
             loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
             loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_KINGDOM.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_KINGDOM, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_KINGDOM.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_KINGDOM, isClickable));
 
         /* Info Menu */
         iconCommand = CommandType.INFO;
@@ -124,7 +124,7 @@ public class MainMenu extends StateMenu {
             loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
             loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_INFO.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_INFO, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_INFO.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_INFO, isClickable));
 
         /* Town Menu */
         iconCommand = CommandType.TOWN;
@@ -138,7 +138,7 @@ public class MainMenu extends StateMenu {
             loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
             loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_TOWN.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_TOWN, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_TOWN.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_TOWN, isClickable));
 
         /* Quest Book */
         iconCommand = CommandType.QUEST;
@@ -158,7 +158,7 @@ public class MainMenu extends StateMenu {
             loreList.add(alertColor+MessagePath.LABEL_DISABLED.getMessage());
             loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_QUEST.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_QUEST, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_QUEST.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_QUEST, isClickable));
 
         /* Stats Book */
         iconCommand = CommandType.STATS;
@@ -172,7 +172,7 @@ public class MainMenu extends StateMenu {
             loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
             loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_STATS.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_STATS, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_STATS.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_STATS, isClickable));
 
         /* Prefix Menu */
         iconCommand = CommandType.PREFIX;
@@ -192,7 +192,7 @@ public class MainMenu extends StateMenu {
             loreList.add(alertColor+MessagePath.LABEL_DISABLED.getMessage());
             loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_PREFIX.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_PREFIX, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_PREFIX.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_PREFIX, isClickable));
 
         /* Score Menu */
         iconCommand = CommandType.SCORE;
@@ -206,7 +206,7 @@ public class MainMenu extends StateMenu {
             loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
             loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_SCORE.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_SCORE, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_SCORE.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_SCORE, isClickable));
 
         /* Travel Menu */
         iconCommand = CommandType.TRAVEL;
@@ -220,7 +220,7 @@ public class MainMenu extends StateMenu {
             loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
             loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_TRAVEL.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_TRAVEL, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_TRAVEL.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_TRAVEL, isClickable));
 
         /* Navigation */
         addNavEmpty(result);
@@ -246,7 +246,7 @@ public class MainMenu extends StateMenu {
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate("Placeholder icon",loreColor));
         loreList.add(hintColor+"Do not click");
-        result.addIcon(new InfoIcon(labelColor+"TODO", loreList, Material.SLIME_BALL, 0, false));
+        result.addIcon(new InfoIcon(nameColor+"TODO", loreList, Material.SLIME_BALL, 0, false));
 
         /* Navigation */
         addNavEmpty(result);
@@ -280,7 +280,7 @@ public class MainMenu extends StateMenu {
             isClickable = false;
             loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_MAP_AUTO.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_MAP_AUTO, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_MAP_AUTO.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_MAP_AUTO, isClickable));
 
         /* Kingdom Chat */
         iconCommand = CommandType.CHAT;
@@ -293,7 +293,7 @@ public class MainMenu extends StateMenu {
             isClickable = false;
             loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_KINGDOM_CHAT.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_CHAT, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_KINGDOM_CHAT.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_CHAT, isClickable));
 
         /* Border */
         iconCommand = CommandType.BORDER;
@@ -306,7 +306,7 @@ public class MainMenu extends StateMenu {
             isClickable = false;
             loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_BORDER.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_BORDER, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_BORDER.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_BORDER, isClickable));
 
         /* Fly */
         iconCommand = CommandType.FLY;
@@ -319,7 +319,7 @@ public class MainMenu extends StateMenu {
             isClickable = false;
             loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_FLYING.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_FLY, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_FLYING.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_FLY, isClickable));
 
         /* Bypass */
         iconAdminCommand = AdminCommandType.BYPASS;
@@ -332,7 +332,7 @@ public class MainMenu extends StateMenu {
             isClickable = false;
             loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(labelColor+MessagePath.MENU_MAIN_ADMIN_BYPASS.getMessage(), loreList, iconAdminCommand.iconMaterial(), DASH_SLOT_BYPASS, isClickable));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_ADMIN_BYPASS.getMessage(), loreList, iconAdminCommand.iconMaterial(), DASH_SLOT_BYPASS, isClickable));
 
         // TODO add other commands
 
@@ -473,7 +473,7 @@ public class MainMenu extends StateMenu {
                             break;
                     }
                     // Keep menu open, refresh view
-                    result = setCurrentView(MenuState.DASHBOARD, true);
+                    result = refreshCurrentView();
                     break;
                 case SECRET:
                     //TODO do something

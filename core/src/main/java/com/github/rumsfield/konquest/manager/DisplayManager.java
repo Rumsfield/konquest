@@ -3,9 +3,7 @@ package com.github.rumsfield.konquest.manager;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.*;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
-import com.github.rumsfield.konquest.display.menu.HelpMenu;
-import com.github.rumsfield.konquest.display.menu.KingdomMenu;
-import com.github.rumsfield.konquest.display.menu.MainMenu;
+import com.github.rumsfield.konquest.display.menu.*;
 import com.github.rumsfield.konquest.display.wrapper.*;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
@@ -24,8 +22,10 @@ public class DisplayManager {
 
 	private final Konquest konquest;
 	private final HashMap<Inventory, StateMenu> stateMenus;
-	
+
+	public static String adminFormat 		= ""+ChatColor.DARK_PURPLE;
 	public static String titleFormat 		= ""+ChatColor.BLACK;
+	public static String nameFormat         = ""+ChatColor.LIGHT_PURPLE;
 	public static String loreFormat 		= ""+ChatColor.YELLOW;
 	public static String valueFormat 		= ""+ChatColor.AQUA;
 	public static String hintFormat 		= ""+ChatColor.GOLD+ChatColor.UNDERLINE+"\u21D2"; // ⇒
@@ -109,8 +109,7 @@ public class DisplayManager {
 	 * + Help Menu
 	 * + Main Menu
 	 * + Kingdom Menu
-	 * Town Menu
-	 * Town Management Menu
+	 * + Town Menu (with management)
 	 * Town Plot Menu
 	 * Info Menu
 	 * Score Menu
@@ -160,16 +159,17 @@ public class DisplayManager {
 	 * Town Menus
 	 * ===============================================
 	 */
-	public void displayTownMenu(KonPlayer displayPlayer) {
+	public void displayTownMenu(KonPlayer displayPlayer, boolean isAdmin) {
 		if (displayPlayer == null) return;
-		TownMenu newMenu = new TownMenu(konquest, displayPlayer);
-		displayMenu(displayPlayer, newMenu);
+		TownMenu newMenu = new TownMenu(konquest, displayPlayer, isAdmin);
+		displayMenuToPlayer(displayPlayer, newMenu);
 	}
 
 	public void displayTownManagementMenu(KonPlayer displayPlayer, KonTown town, boolean isAdmin) {
 		if (displayPlayer == null) return;
-		TownManagementMenu newMenu = new TownManagementMenu(konquest, displayPlayer, town, isAdmin);
-		displayMenu(displayPlayer, newMenu);
+		TownMenu newMenu = new TownMenu(konquest, displayPlayer, isAdmin);
+		newMenu.goToManagementRoot(town);
+		displayMenuToPlayer(displayPlayer, newMenu);
 	}
 
 	public void displayTownPlotMenu(KonPlayer displayPlayer, KonTown town) {
@@ -180,8 +180,8 @@ public class DisplayManager {
 		} else {
 			// Open the menu
 			int maxSize = konquest.getPlotManager().getMaxSize();
-			PlotMenu newMenu = new PlotMenu(town, displayPlayer.getBukkitPlayer(), maxSize);
-			displayMenu(displayPlayer, newMenu);
+			PlotMenu newMenu = new PlotMenu(konquest, town, displayPlayer, maxSize);
+			displayMenuToPlayer(displayPlayer, newMenu);
 		}
 	}
 

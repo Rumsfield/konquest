@@ -15,7 +15,6 @@ import java.util.List;
 public class ShieldIcon extends MenuIcon {
 
 	private final KonShield shield;
-	private final boolean isAvailable;
 	private final int population;
 	private final int land;
 	ItemStack item;
@@ -24,10 +23,9 @@ public class ShieldIcon extends MenuIcon {
 	private final String valueColor = DisplayManager.valueFormat;
 	private final String hintColor = DisplayManager.hintFormat;
 	
-	public ShieldIcon(KonShield shield, boolean isAvailable, int population, int land, int index) {
+	public ShieldIcon(KonShield shield, int population, int land, int index) {
 		super(index);
 		this.shield = shield;
-		this.isAvailable = isAvailable;
 		this.population = population;
 		this.land = land;
 		this.item = initItem();
@@ -35,16 +33,11 @@ public class ShieldIcon extends MenuIcon {
 	
 	private ItemStack initItem() {
 		Material material = Material.SHIELD;
-		if(!isAvailable) {
-			material = Material.IRON_BARS;
-		}
 		int totalCost = shield.getCost() + (shield.getCostPerResident()*population) + (shield.getCostPerLand()*land);
 		List<String> loreList = new ArrayList<>();
 		loreList.add(HelperUtil.getTimeFormat(shield.getDurationSeconds(), ChatColor.DARK_AQUA));
     	loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+totalCost);
-    	if(isAvailable) {
-    		loreList.add(hintColor+MessagePath.MENU_SHIELD_HINT.getMessage());
-    	}
+		loreList.add(hintColor+MessagePath.MENU_SHIELD_HINT.getMessage());
 		String name = ChatColor.GOLD+shield.getId()+" "+MessagePath.LABEL_SHIELD.getMessage();
 		return CompatibilityUtil.buildItem(material, name, loreList, true);
 	}
@@ -65,6 +58,6 @@ public class ShieldIcon extends MenuIcon {
 
 	@Override
 	public boolean isClickable() {
-		return isAvailable;
+		return true;
 	}
 }

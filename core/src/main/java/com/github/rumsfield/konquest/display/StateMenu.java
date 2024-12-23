@@ -102,7 +102,11 @@ public abstract class StateMenu {
         this.menuAccess = access;
     }
 
-    public boolean isCurrentStateEqual(State checkState) {
+    public boolean isAccess(Access checkAccess) {
+        return menuAccess.equals(checkAccess);
+    }
+
+    public boolean isState(State checkState) {
         return currentState.equals(checkState);
     }
 
@@ -135,7 +139,15 @@ public abstract class StateMenu {
         return setCurrentView(context, false);
     }
 
-    public DisplayMenu setCurrentView(State context, boolean refresh) {
+    public DisplayMenu refreshCurrentView() {
+        return setCurrentView(currentState, true);
+    }
+
+    public DisplayMenu refreshNewView(State context) {
+        return setCurrentView(context, true);
+    }
+
+    private DisplayMenu setCurrentView(State context, boolean refresh) {
         if (!hasView(context) || refresh) {
             // Create a new view
             viewPages.put(context, createView(context));
@@ -148,39 +160,6 @@ public abstract class StateMenu {
         }
         return view;
     }
-
-
-    /*
-    public void initView(DisplayMenu view, State context) {
-        initView(Collections.singletonList(view), context);
-    }
-
-    public void initView(List<DisplayMenu> view, State context) {
-        if (view.isEmpty()) return;
-        viewPages.put(context, new ArrayList<>(view));
-    }
-
-    public DisplayMenu setCurrentView(State newState) {
-        if (!hasView(newState)) return null;
-        currentState = newState;
-        currentPage = 0;
-        DisplayMenu view = getCurrentView();
-        if (view != null) {
-            view.updateIcons();
-        }
-        return view;
-    }
-
-    public DisplayMenu updateView(DisplayMenu refreshView, State newState) {
-        return updateView(Collections.singletonList(refreshView), newState);
-    }
-
-    public DisplayMenu updateView(List<DisplayMenu> refreshView, State newState) {
-        if (refreshView.isEmpty()) return null;
-        initView(refreshView, newState);
-        return setCurrentView(newState);
-    }
-    */
 
     public int getCurrentNumPages() {
         return getCurrentViewPages() == null ? 0 : getCurrentViewPages().size();
@@ -280,7 +259,7 @@ public abstract class StateMenu {
         }
     }
 
-    private boolean isNavIndex(int slot, int index) {
+    protected boolean isNavIndex(int slot, int index) {
         if (isCurrentNavSlot(slot)) {
             int navIndex = getCurrentNavIndex(slot);
             return navIndex == index;
@@ -361,7 +340,9 @@ public abstract class StateMenu {
             // Fill icons
             int slotIndex = 0;
             while(slotIndex < MAX_ICONS_PER_PAGE && iconIter.hasNext()) {
-                page.addIcon(iconIter.next());
+                MenuIcon icon = iconIter.next();
+                icon.setIndex(slotIndex);
+                page.addIcon(icon);
                 slotIndex++;
             }
             // Add navigation
@@ -382,42 +363,6 @@ public abstract class StateMenu {
     /*
      * Navigation Icons
      */
-
-    protected InfoIcon navIconScrollLeft(int index) {
-        // Note: Unicode characters do not render correctly in game, must use escape sequence code.
-        return new InfoIcon(ChatColor.GOLD+"\u25C0",Collections.emptyList(),Material.STONE_BUTTON,index,true);
-    }
-
-    protected InfoIcon navIconScrollRight(int index) {
-        // Note: Unicode characters do not render correctly in game, must use escape sequence code.
-        return new InfoIcon(ChatColor.GOLD+"\u25B6",Collections.emptyList(),Material.STONE_BUTTON,index,true);
-    }
-
-    protected InfoIcon navIconScrollUp(int index) {
-        // Note: Unicode characters do not render correctly in game, must use escape sequence code.
-        return new InfoIcon(ChatColor.GOLD+"\u25B2",Collections.emptyList(),Material.STONE_BUTTON,index,true);
-    }
-
-    protected InfoIcon navIconScrollDown(int index) {
-        // Note: Unicode characters do not render correctly in game, must use escape sequence code.
-        return new InfoIcon(ChatColor.GOLD+"\u25BC",Collections.emptyList(),Material.STONE_BUTTON,index,true);
-    }
-
-    protected InfoIcon navIconCreate(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_CREATE.getMessage(),Collections.emptyList(),Material.OAK_SAPLING,index,true);
-    }
-
-    protected InfoIcon navIconDelete(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_DELETE.getMessage(),Collections.emptyList(),Material.BARRIER,index,true);
-    }
-
-    protected InfoIcon navIconEdit(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_EDIT.getMessage(),Collections.emptyList(),Material.WRITABLE_BOOK,index,true);
-    }
-
-    protected InfoIcon navIconFinish(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_FINISH.getMessage(),Collections.emptyList(),Material.WRITTEN_BOOK,index,true);
-    }
 
     protected InfoIcon navIconClose(int index) {
         return new InfoIcon(ChatColor.GOLD+ MessagePath.LABEL_CLOSE.getMessage(), Collections.emptyList(), Material.STRUCTURE_VOID,index,true);

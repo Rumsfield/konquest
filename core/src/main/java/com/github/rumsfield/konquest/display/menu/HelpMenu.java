@@ -33,16 +33,22 @@ public class HelpMenu extends StateMenu {
         QUEST
     }
 
-    private final String titleColor = DisplayManager.titleFormat;
-    private final String loreColor = DisplayManager.loreFormat;
-    private final String hintColor = DisplayManager.hintFormat;
-    private final String labelColor = ""+ChatColor.GOLD;
+    private final String titleColor;
+    private final String nameColor;
+    private final String loreColor;
+    private final String hintColor;
 
     private final KonPlayer player;
 
     public HelpMenu(Konquest konquest, KonPlayer player) {
         super(konquest, MenuState.ROOT, null);
         this.player = player;
+
+        /* Formats */
+        titleColor = DisplayManager.titleFormat;
+        nameColor = DisplayManager.nameFormat;
+        loreColor = DisplayManager.loreFormat;
+        hintColor = DisplayManager.hintFormat;
 
         /* Initialize menu view */
         setCurrentView(MenuState.ROOT);
@@ -71,7 +77,7 @@ public class HelpMenu extends StateMenu {
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_START.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        icon = new InfoIcon(labelColor+MessagePath.MENU_HELP_START.getMessage(), loreList, Material.PAPER, ROOT_SLOT_START, true);
+        icon = new InfoIcon(nameColor+MessagePath.MENU_HELP_START.getMessage(), loreList, Material.PAPER, ROOT_SLOT_START, true);
         icon.setState(MenuState.START);
         result.addIcon(icon);
 
@@ -80,7 +86,7 @@ public class HelpMenu extends StateMenu {
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_COMMUNITY.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        InfoIcon communityIcon = new InfoIcon(labelColor+MessagePath.MENU_HELP_COMMUNITY.getMessage(), loreList, Material.MINECART, ROOT_SLOT_COMMUNITY, true);
+        InfoIcon communityIcon = new InfoIcon(nameColor+MessagePath.MENU_HELP_COMMUNITY.getMessage(), loreList, Material.MINECART, ROOT_SLOT_COMMUNITY, true);
         communityIcon.setInfo(""+ChatColor.LIGHT_PURPLE+ChatColor.UNDERLINE+communityLink);
         communityIcon.setState(MenuState.COMMUNITY);
         result.addIcon(communityIcon);
@@ -89,7 +95,7 @@ public class HelpMenu extends StateMenu {
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_MAIN.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        icon = new InfoIcon(labelColor+MessagePath.MENU_HELP_MAIN.getMessage(), loreList, Material.LADDER, ROOT_SLOT_MAIN, true);
+        icon = new InfoIcon(nameColor+MessagePath.MENU_HELP_MAIN.getMessage(), loreList, Material.LADDER, ROOT_SLOT_MAIN, true);
         icon.setState(MenuState.MAIN);
         result.addIcon(icon);
 
@@ -97,7 +103,7 @@ public class HelpMenu extends StateMenu {
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_COMMANDS.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        icon = new InfoIcon(labelColor+MessagePath.MENU_HELP_COMMANDS.getMessage(), loreList, Material.COMPASS, ROOT_SLOT_COMMANDS, true);
+        icon = new InfoIcon(nameColor+MessagePath.MENU_HELP_COMMANDS.getMessage(), loreList, Material.COMPASS, ROOT_SLOT_COMMANDS, true);
         icon.setState(MenuState.COMMANDS);
         result.addIcon(icon);
 
@@ -105,7 +111,7 @@ public class HelpMenu extends StateMenu {
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_ADMIN.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        icon = new InfoIcon(labelColor+MessagePath.MENU_HELP_ADMIN.getMessage(), loreList, Material.NETHER_STAR, ROOT_SLOT_COMMANDS_ADMIN, true);
+        icon = new InfoIcon(nameColor+MessagePath.MENU_HELP_ADMIN.getMessage(), loreList, Material.NETHER_STAR, ROOT_SLOT_COMMANDS_ADMIN, true);
         icon.setState(MenuState.COMMANDS_ADMIN);
         result.addIcon(icon);
 
@@ -174,7 +180,7 @@ public class HelpMenu extends StateMenu {
             loreList.clear();
             loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_QUEST.getMessage(), loreColor));
             loreList.add(hintColor + MessagePath.MENU_HELP_HINT.getMessage());
-            icon = new InfoIcon(labelColor + MessagePath.MENU_HELP_QUEST.getMessage(), loreList, Material.WRITABLE_BOOK, START_SLOT_QUEST, true);
+            icon = new InfoIcon(nameColor + MessagePath.MENU_HELP_QUEST.getMessage(), loreList, Material.WRITABLE_BOOK, START_SLOT_QUEST, true);
             icon.setState(MenuState.QUEST);
             result.addIcon(icon);
         }
