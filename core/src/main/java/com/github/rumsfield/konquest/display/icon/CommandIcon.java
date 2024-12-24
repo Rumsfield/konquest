@@ -19,9 +19,11 @@ public class CommandIcon extends MenuIcon{
 	private final int cost_incr;
 	private final ItemStack item;
 
+	private final String nameColor = DisplayManager.nameFormat;
 	private final String alertColor = DisplayManager.alertFormat;
 	private final String loreColor = DisplayManager.loreFormat;
 	private final String valueColor = DisplayManager.valueFormat;
+	private final String hintColor = DisplayManager.hintFormat;
 
 	public CommandIcon(CommandType command, boolean permission, int cost, int cost_incr, int index) {
 		super(index);
@@ -44,7 +46,10 @@ public class CommandIcon extends MenuIcon{
 			loreList.add(loreColor+MessagePath.LABEL_INCREMENT_COST.getMessage()+": "+valueColor+cost_incr);
 		}
 		loreList.addAll(HelperUtil.stringPaginate(command.description(),loreColor));
-		String name = ChatColor.GOLD+getName();
+		if (permission) {
+			loreList.add(hintColor+MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+		}
+		String name = nameColor+getName();
 		return CompatibilityUtil.buildItem(command.iconMaterial(), name, loreList);
 	}
 	

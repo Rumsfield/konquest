@@ -3,16 +3,14 @@ package com.github.rumsfield.konquest.display.menu;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
+import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.display.DisplayMenu;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.*;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.model.*;
-import com.github.rumsfield.konquest.utility.CompatibilityUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.HelperUtil;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Villager;
@@ -93,11 +91,7 @@ public class TownMenu extends StateMenu {
         }
 
         /* Initialize menu access */
-        if (isAdmin) {
-            setAccess(AccessType.DEFAULT);
-        } else {
-            setAccess(AccessType.ADMIN);
-        }
+        updateAccess();
 
         /* Initialize menu view */
         setCurrentView(MenuState.ROOT);
@@ -130,6 +124,8 @@ public class TownMenu extends StateMenu {
     private DisplayMenu createRootView() {
         DisplayMenu result;
         MenuIcon icon;
+        CommandType iconCommand;
+        boolean isPermission;
         List<String> loreList = new ArrayList<>();
         boolean isClickable = !isAdmin;
 
@@ -140,8 +136,13 @@ public class TownMenu extends StateMenu {
         int ROOT_SLOT_MANAGE 		= 4;
         int ROOT_SLOT_INVITES 		= 6;
         int ROOT_SLOT_LIST 			= 8;
+        // Row 1: 9 10 11 12 13 14 15 16 17
+        int ROOT_SLOT_SETTLE		= 10;
+        int ROOT_SLOT_CLAIM 		= 12;
+        int ROOT_SLOT_UNCLAIM		= 14;
+        int ROOT_SLOT_SPY		    = 16;
 
-        result = new DisplayMenu(1, getTitle(MenuState.ROOT));
+        result = new DisplayMenu(2, getTitle(MenuState.ROOT));
 
         /* Join Icon (Unavailable for admins) */
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_JOIN.getMessage(),loreColor));
@@ -200,6 +201,30 @@ public class TownMenu extends StateMenu {
         icon.setState(MenuState.MANAGE);
         result.addIcon(icon);
 
+        /* Settle Command Icon */
+        iconCommand = CommandType.SETTLE;
+        double cost_settle = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath(),0.0);
+        double cost_settle_incr = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath(),0.0);
+        isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
+        result.addIcon(new CommandIcon(iconCommand, isPermission, (int)cost_settle, (int)cost_settle_incr, ROOT_SLOT_SETTLE));
+
+        /* Claim Command Icon */
+        iconCommand = CommandType.CLAIM;
+        double cost_claim = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_CLAIM.getPath(),0.0);
+        isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
+        result.addIcon(new CommandIcon(iconCommand, isPermission, (int)cost_claim, 0, ROOT_SLOT_CLAIM));
+
+        /* Unclaim Command Icon */
+        iconCommand = CommandType.UNCLAIM;
+        isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
+        result.addIcon(new CommandIcon(iconCommand, isPermission, 0, 0, ROOT_SLOT_UNCLAIM));
+
+        /* Spy Command Icon */
+        iconCommand = CommandType.SPY;
+        double cost_spy = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_SPY.getPath(),0.0);
+        isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
+        result.addIcon(new CommandIcon(iconCommand, isPermission, (int)cost_spy, 0, ROOT_SLOT_SPY));
+
         /* Navigation */
         addNavEmpty(result);
         addNavHome(result);
@@ -213,7 +238,7 @@ public class TownMenu extends StateMenu {
      * This is a multiple paged view.
      * Contexts: JOIN, LEAVE, LIST, INVITES, MANAGE
      */
-    private ArrayList<DisplayMenu> createTownView(MenuState context) {
+    private List<DisplayMenu> createTownView(MenuState context) {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonTown> towns = new ArrayList<>();
 
@@ -255,7 +280,7 @@ public class TownMenu extends StateMenu {
                 }
                 break;
             default:
-                return null;
+                return Collections.emptyList();
         }
         // Sort list
         towns.sort(townComparator);
@@ -263,18 +288,20 @@ public class TownMenu extends StateMenu {
         /* Town Icons */
         for (KonTown currentTown : towns) {
             boolean isCurrentTownClickable = true;
+            ArrayList<String> alertList = new ArrayList<>();
+            ArrayList<String> propertyList = new ArrayList<>();
             ArrayList<String> loreList = new ArrayList<>();
             switch(context) {
                 case JOIN:
                     if(currentTown.isJoinable()) {
-                        if(currentTown.isOpen()) {
+                        if(currentTown.isOpen() || currentTown.getNumResidents() == 0) {
                             loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_JOIN_NOW.getMessage());
                         } else {
                             loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_JOIN.getMessage());
                         }
                     } else {
                         isCurrentTownClickable = false;
-                        loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+                        alertList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
                     }
                     break;
                 case LEAVE:
@@ -282,7 +309,7 @@ public class TownMenu extends StateMenu {
                         loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_LEAVE.getMessage());
                     } else {
                         isCurrentTownClickable = false;
-                        loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+                        alertList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
                     }
                     break;
                 case LIST:
@@ -293,23 +320,17 @@ public class TownMenu extends StateMenu {
                     loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_DECLINE.getMessage());
                     break;
                 case MANAGE:
-                    // Display lord or knight
-                    if(currentTown.isPlayerLord(player.getBukkitPlayer())) {
-                        loreList.add(propertyColor+MessagePath.LABEL_LORD.getMessage());
-                    } else if(currentTown.isPlayerKnight(player.getBukkitPlayer())) {
-                        loreList.add(propertyColor+MessagePath.LABEL_KNIGHT.getMessage());
-                    }
                     // Display number of pending requests
                     int numRequests = currentTown.getJoinRequests().size();
                     if(numRequests > 0) {
-                        loreList.add(alertColor+MessagePath.MENU_TOWN_REQUESTS.getMessage()+": "+numRequests);
+                        alertList.add(alertColor+MessagePath.MENU_TOWN_REQUESTS.getMessage()+": "+numRequests);
                     }
                     loreList.add(hintColor+MessagePath.MENU_TOWN_HINT_MANAGE.getMessage());
                     break;
                 default:
                     break;
             }
-            icons.add(new TownIcon(currentTown,contextColor,loreList,0,isCurrentTownClickable));
+            icons.add(new TownIcon(currentTown,player.getBukkitPlayer(),contextColor,alertList,propertyList,loreList,0,isCurrentTownClickable));
         }
 
         /* Make Pages (includes navigation) */
@@ -530,8 +551,8 @@ public class TownMenu extends StateMenu {
      * This is a multiple paged view.
      * Contexts: A_REQUESTS, B_PROMOTE, B_DEMOTE, B_TRANSFER
      */
-    private ArrayList<DisplayMenu> createPlayerView(MenuState context) {
-        if (town == null) return null;
+    private List<DisplayMenu> createPlayerView(MenuState context) {
+        if (town == null) return Collections.emptyList();
         String loreHintStr1 = "";
         String loreHintStr2 = "";
         List<OfflinePlayer> players = new ArrayList<>();
@@ -558,7 +579,7 @@ public class TownMenu extends StateMenu {
                 loreHintStr1 = MessagePath.MENU_TOWN_HINT_TRANSFER.getMessage();
                 break;
             default:
-                return null;
+                return Collections.emptyList();
         }
 
         /* Player Icons */
@@ -585,9 +606,8 @@ public class TownMenu extends StateMenu {
      * Creates the shield menu view.
      * This is a multiple paged view.
      */
-    private ArrayList<DisplayMenu> createShieldView() {
-        if (!getKonquest().getShieldManager().isShieldsEnabled()) return null;
-        if (town == null) return null;
+    private List<DisplayMenu> createShieldView() {
+        if (town == null || !getKonquest().getShieldManager().isShieldsEnabled()) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
 
         /* Shield Icons */
@@ -603,9 +623,8 @@ public class TownMenu extends StateMenu {
      * Creates the armor menu view.
      * This is a multiple paged view.
      */
-    private ArrayList<DisplayMenu> createArmorView() {
-        if (!getKonquest().getShieldManager().isArmorsEnabled()) return null;
-        if (town == null) return null;
+    private List<DisplayMenu> createArmorView() {
+        if (town == null || !getKonquest().getShieldManager().isArmorsEnabled()) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
 
         /* Armor Icons */
@@ -621,9 +640,8 @@ public class TownMenu extends StateMenu {
      * Creates the upgrade menu view.
      * This is a multiple paged view.
      */
-    private ArrayList<DisplayMenu> createUpgradeView() {
-        if (!getKonquest().getUpgradeManager().isEnabled()) return null;
-        if (town == null) return null;
+    private List<DisplayMenu> createUpgradeView() {
+        if (town == null || !getKonquest().getUpgradeManager().isEnabled()) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
 
         // Place upgrades in ordinal order into list
@@ -651,8 +669,8 @@ public class TownMenu extends StateMenu {
      * Creates the options menu view.
      * This is a multiple paged view.
      */
-    private ArrayList<DisplayMenu> createOptionsView() {
-        if (town == null) return null;
+    private List<DisplayMenu> createOptionsView() {
+        if (town == null) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
 
         // Get enable options
@@ -672,10 +690,10 @@ public class TownMenu extends StateMenu {
         for (KonTownOption currentOption : allOptions) {
             boolean val = town.getTownOption(currentOption);
             String currentValue = DisplayManager.boolean2Lang(val) + " " + DisplayManager.boolean2Symbol(val);
-            ArrayList<String> loreList = new ArrayList<>(HelperUtil.stringPaginate(currentOption.getDescription()));
+            ArrayList<String> loreList = new ArrayList<>(HelperUtil.stringPaginate(currentOption.getDescription(), loreColor));
             loreList.add(loreColor + MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor + currentValue));
             loreList.add(hintColor + MessagePath.MENU_OPTIONS_HINT.getMessage());
-            icons.add(new OptionIcon(currentOption, loreColor + currentOption.getName(), loreList, currentOption.getDisplayMaterial(), 0));
+            icons.add(new OptionIcon(currentOption, nameColor + currentOption.getName(), loreList, currentOption.getDisplayMaterial(), 0));
         }
 
         /* Make Pages (includes navigation) */
@@ -686,9 +704,8 @@ public class TownMenu extends StateMenu {
      * Creates the specialization menu view.
      * This is a multiple paged view.
      */
-    private ArrayList<DisplayMenu> createSpecializationView() {
-        if (!getKonquest().getKingdomManager().getIsDiscountEnable()) return null;
-        if (town == null) return null;
+    private List<DisplayMenu> createSpecializationView() {
+        if (town == null || !getKonquest().getKingdomManager().getIsDiscountEnable()) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
 
         // Common lore for every icon
@@ -836,8 +853,12 @@ public class TownMenu extends StateMenu {
                     case B_OPTIONS:
                     case B_SPECIALIZATION:
                         // Return to management root
-                        this.town = null;
                         result = setCurrentView(MenuState.MANAGEMENT_ROOT);
+                        break;
+                    case MANAGEMENT_ROOT:
+                        // Return to manage list
+                        this.town = null;
+                        result = setCurrentView(MenuState.MANAGE);
                         break;
                     default:
                         // Return to base root
@@ -862,17 +883,27 @@ public class TownMenu extends StateMenu {
                  * Base Menu States
                  */
                 case ROOT:
-                    // Root view, use stored icon state
-                    if (nextState == null) return null;
-                    switch (nextState) {
-                        case JOIN:
-                        case LEAVE:
-                        case LIST:
-                        case INVITES:
-                        case MANAGE:
-                            // Go to next state as defined by icon
-                            result = setCurrentView(nextState);
-                            break;
+                    // Root view
+                    // Check for command icons
+                    if (clickedIcon instanceof CommandIcon) {
+                        CommandIcon icon = (CommandIcon) clickedIcon;
+                        for (String usageLine : icon.getCommand().argumentUsage()) {
+                            ChatUtil.sendNotice(player.getBukkitPlayer(), usageLine);
+                        }
+                        result = view;
+                    } else {
+                        // Use stored icon state
+                        if (nextState == null) return null;
+                        switch (nextState) {
+                            case JOIN:
+                            case LEAVE:
+                            case LIST:
+                            case INVITES:
+                            case MANAGE:
+                                // Go to next state as defined by icon
+                                result = setCurrentView(nextState);
+                                break;
+                        }
                     }
                     break;
                 case JOIN:

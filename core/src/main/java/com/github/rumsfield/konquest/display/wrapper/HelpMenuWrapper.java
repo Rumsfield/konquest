@@ -79,7 +79,7 @@ public class HelpMenuWrapper extends MenuWrapper {
 					cost_incr = 0;
 					break;
 			}
-			icon = new CommandIcon(cmd, cost, cost_incr, slotIndex);
+			icon = new CommandIcon(cmd, true, cost, cost_incr, slotIndex);
 			getMenu().getPage(pageIndex).addIcon(icon);
 			slotIndex++;
 		}
@@ -106,7 +106,7 @@ public class HelpMenuWrapper extends MenuWrapper {
 			getMenu().addPage(pageIndex, pageRows, pageLabel);
 			// Add command icons
 			for(AdminCommandType adminCmd : allowedCmdList) {
-				icon = new AdminCommandIcon(adminCmd, slotIndex);
+				icon = new AdminCommandIcon(adminCmd, true, slotIndex);
 				getMenu().getPage(pageIndex).addIcon(icon);
 				slotIndex++;
 			}
@@ -114,7 +114,7 @@ public class HelpMenuWrapper extends MenuWrapper {
 		}
 
 		// Page 2 - Tips
-		pageLabel = titleColor+MessagePath.MENU_HELP_TIPS.getMessage();
+		pageLabel = titleColor+MessagePath.MENU_HELP_START.getMessage();
 		pageRows = 1;
 		slotIndex = 0;
 		getMenu().addPage(pageIndex, pageRows, pageLabel);

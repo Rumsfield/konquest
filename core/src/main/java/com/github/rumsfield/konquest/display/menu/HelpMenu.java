@@ -15,6 +15,7 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
@@ -77,7 +78,7 @@ public class HelpMenu extends StateMenu {
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_START.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        icon = new InfoIcon(nameColor+MessagePath.MENU_HELP_START.getMessage(), loreList, Material.PAPER, ROOT_SLOT_START, true);
+        icon = new InfoIcon(nameColor+MessagePath.MENU_HELP_START.getMessage(), loreList, Material.WOODEN_PICKAXE, ROOT_SLOT_START, true);
         icon.setState(MenuState.START);
         result.addIcon(icon);
 
@@ -103,7 +104,7 @@ public class HelpMenu extends StateMenu {
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_COMMANDS.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        icon = new InfoIcon(nameColor+MessagePath.MENU_HELP_COMMANDS.getMessage(), loreList, Material.COMPASS, ROOT_SLOT_COMMANDS, true);
+        icon = new InfoIcon(nameColor+MessagePath.MENU_HELP_COMMANDS.getMessage(), loreList, Material.TORCH, ROOT_SLOT_COMMANDS, true);
         icon.setState(MenuState.COMMANDS);
         result.addIcon(icon);
 
@@ -197,15 +198,14 @@ public class HelpMenu extends StateMenu {
      * Creates the command or admin views, given the state context.
      * This can be a multiple paged view.
      */
-    private ArrayList<DisplayMenu> createCommandView(MenuState context) {
+    private List<DisplayMenu> createCommandView(MenuState context) {
         // Context-specific info
         ArrayList<MenuIcon> commandIcons = new ArrayList<>();
         String title = "";
-        int index;
         /* Commands (by context) */
         switch (context) {
             case COMMANDS:
-                title = MessagePath.MENU_HELP_TITLE_COMMANDS.getMessage();
+                title = titleColor+MessagePath.MENU_HELP_TITLE_COMMANDS.getMessage();
                 double cost_spy = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_SPY.getPath(),0.0);
                 double cost_settle = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath(),0.0);
                 double cost_settle_incr = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath(),0.0);
@@ -213,7 +213,6 @@ public class HelpMenu extends StateMenu {
                 double cost_travel = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_TRAVEL.getPath(),0.0);
                 int cost;
                 int cost_incr;
-                index = 0;
                 for(CommandType cmd : CommandType.values()) {
                     switch (cmd) {
                         case SPY:
@@ -238,17 +237,14 @@ public class HelpMenu extends StateMenu {
                             break;
                     }
                     boolean isPermission = player.getBukkitPlayer().hasPermission(cmd.permission());
-                    commandIcons.add(new CommandIcon(cmd, isPermission, cost, cost_incr, index));
-                    index++;
+                    commandIcons.add(new CommandIcon(cmd, isPermission, cost, cost_incr, 0));
                 }
                 break;
             case COMMANDS_ADMIN:
-                title = MessagePath.MENU_HELP_TITLE_ADMIN.getMessage();
-                index = 0;
+                title = titleColor+MessagePath.MENU_HELP_TITLE_ADMIN.getMessage();
                 for(AdminCommandType adminCmd : AdminCommandType.values()) {
                     boolean isPermission = player.getBukkitPlayer().hasPermission(adminCmd.permission());
-                    commandIcons.add(new AdminCommandIcon(adminCmd, isPermission, index));
-                    index++;
+                    commandIcons.add(new AdminCommandIcon(adminCmd, isPermission, 0));
                 }
                 break;
         }
@@ -344,7 +340,8 @@ public class HelpMenu extends StateMenu {
                 case START:
                     if (nextState != null && nextState.equals(MenuState.QUEST)) {
                         // Open Quest Book and close menu
-                        getKonquest().getDirectiveManager().displayBook(player);
+                        // Schedule delayed task to open book
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(getKonquest().getPlugin(), () -> getKonquest().getDirectiveManager().displayBook(player),5);
                     }
                     break;
                 case COMMANDS:

@@ -19,6 +19,7 @@ public class ShieldIcon extends MenuIcon {
 	private final int land;
 	ItemStack item;
 
+	private final String nameColor = DisplayManager.nameFormat;
 	private final String loreColor = DisplayManager.loreFormat;
 	private final String valueColor = DisplayManager.valueFormat;
 	private final String hintColor = DisplayManager.hintFormat;
@@ -38,7 +39,7 @@ public class ShieldIcon extends MenuIcon {
 		loreList.add(HelperUtil.getTimeFormat(shield.getDurationSeconds(), ChatColor.DARK_AQUA));
     	loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+totalCost);
 		loreList.add(hintColor+MessagePath.MENU_SHIELD_HINT.getMessage());
-		String name = ChatColor.GOLD+shield.getId()+" "+MessagePath.LABEL_SHIELD.getMessage();
+		String name = nameColor+shield.getId()+" "+MessagePath.LABEL_SHIELD.getMessage();
 		return CompatibilityUtil.buildItem(material, name, loreList, true);
 	}
 	

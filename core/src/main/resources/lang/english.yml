@@ -35,7 +35,6 @@ label:
   flags: "Flags"
   golem-offense: "Iron Golem Offense"
   health: "Health"
-  home: "Home"
   immunity: "Immunity"
   increment-cost: "Increment Cost"
   information: "Information"
@@ -189,6 +188,7 @@ menu:
     admin: "Admin Commands"
     quest: "Quest Book"
     hint: "Click to open"
+    hint-command: "Click to view command"
     tip-1: "Barbarians are default players who have no kingdom. They can place beds to make camps, attack other barbarians, and destroy towns."
     tip-2: "Use \"/k kingdom\" to open the kingdom menu and join kingdoms, or use \"/k kingdom create\" to make your own."
     tip-3: "The diplomacy options for other kingdoms are: peace, trade, alliance, war. Enemy kingdoms at war can capture each other's towns."
@@ -1042,6 +1042,7 @@ upgrade:
     level-1: "Raises enchantment offers by 1 level"
 description:
   help: "Display the help message."
+  menu: "Open the Konquest Main Menu."
   info: "Display info about different things."
   list: "List different Territories."
   favor: "Display your currency as Favor."

@@ -5,7 +5,6 @@ import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -17,8 +16,10 @@ public class AdminCommandIcon extends MenuIcon{
     private final boolean permission;
     private final ItemStack item;
 
+    private final String adminColor = DisplayManager.adminFormat;
     private final String alertColor = DisplayManager.alertFormat;
     private final String loreColor = DisplayManager.loreFormat;
+    private final String hintColor = DisplayManager.hintFormat;
 
     public AdminCommandIcon(AdminCommandType command, boolean permission, int index) {
         super(index);
@@ -33,7 +34,10 @@ public class AdminCommandIcon extends MenuIcon{
             loreList.add(alertColor+ MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
         loreList.addAll(HelperUtil.stringPaginate(command.description(), loreColor));
-        String name = ""+ChatColor.GOLD+ChatColor.ITALIC+getName();
+        if (permission) {
+            loreList.add(hintColor+MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+        }
+        String name = adminColor+getName();
         return CompatibilityUtil.buildItem(command.iconMaterial(), name, loreList);
     }
 

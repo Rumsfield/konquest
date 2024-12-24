@@ -110,7 +110,7 @@ public class DisplayManager {
 	 * + Main Menu
 	 * + Kingdom Menu
 	 * + Town Menu (with management)
-	 * Town Plot Menu
+	 * + Plot Menu
 	 * Info Menu
 	 * Score Menu
 	 * Travel Menu
@@ -159,6 +159,10 @@ public class DisplayManager {
 	 * Town Menus
 	 * ===============================================
 	 */
+	public void displayTownMenu(KonPlayer displayPlayer) {
+		displayTownMenu(displayPlayer, false);
+	}
+
 	public void displayTownMenu(KonPlayer displayPlayer, boolean isAdmin) {
 		if (displayPlayer == null) return;
 		TownMenu newMenu = new TownMenu(konquest, displayPlayer, isAdmin);
@@ -198,11 +202,7 @@ public class DisplayManager {
 		if (displayPlayer == null) return;
 		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
 		playMenuOpenSound(bukkitPlayer);
-		// Create menu
-		ScoreMenuWrapper wrapper = new ScoreMenuWrapper(konquest, scorePlayer, displayPlayer);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
+		// TODO
 	}
 	
  	/*
@@ -215,11 +215,7 @@ public class DisplayManager {
 		if (displayPlayer == null) return;
 		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// Create menu
-		PlayerInfoMenuWrapper wrapper = new PlayerInfoMenuWrapper(konquest, infoPlayer, displayPlayer);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
+		// TODO
  	}
  	
  	// Kingdom Info
@@ -227,11 +223,7 @@ public class DisplayManager {
 		if (displayPlayer == null) return;
 		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// Create menu
-		KingdomInfoMenuWrapper wrapper = new KingdomInfoMenuWrapper(konquest, infoKingdom, displayPlayer);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
+		// TODO
   	}
  	
   	// Town Info
@@ -239,11 +231,7 @@ public class DisplayManager {
 		if (displayPlayer == null) return;
 		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// Create menu
-		TownInfoMenuWrapper wrapper = new TownInfoMenuWrapper(konquest, infoTown, displayPlayer);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
+		// TODO
    	}
 
 	// Monument Template Info
@@ -251,11 +239,7 @@ public class DisplayManager {
 		if (displayPlayer == null) return;
 		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// Create menu
-		MonumentTemplateInfoMenuWrapper wrapper = new MonumentTemplateInfoMenuWrapper(konquest);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
+		// TODO
 	}
 
 	// Sanctuary Info
@@ -263,11 +247,7 @@ public class DisplayManager {
 		if (displayPlayer == null) return;
 		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// Create menu
-		SanctuaryInfoMenuWrapper wrapper = new SanctuaryInfoMenuWrapper(konquest, infoSanctuary);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer, wrapper);
+		// TODO
 	}
 
 	// Ruin Info
@@ -275,11 +255,7 @@ public class DisplayManager {
 		if (displayPlayer == null) return;
 		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// Create menu
-		RuinInfoMenuWrapper wrapper = new RuinInfoMenuWrapper(konquest, infoRuin);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
+		// TODO
 	}
    	
    	/*
@@ -291,11 +267,7 @@ public class DisplayManager {
 		if (displayPlayer == null) return;
 		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// Create menu
-		PrefixMenuWrapper wrapper = new PrefixMenuWrapper(konquest, displayPlayer);
-		wrapper.constructMenu();
-		// Display menu
-		showMenuWrapper(bukkitPlayer,wrapper);
+		// TODO
    	}
    	
 

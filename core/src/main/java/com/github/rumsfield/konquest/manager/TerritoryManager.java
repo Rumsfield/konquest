@@ -1173,7 +1173,8 @@ public class TerritoryManager implements KonquestTerritoryManager {
 	}
 	
 	public void updatePlayerBorderParticles(KonPlayer player, Location loc) {
-    	if(player != null && player.isBorderDisplay()) {
+    	if (player == null) return;
+		if(player.isBorderDisplay()) {
     		// Border particle update
 			ArrayList<Chunk> nearbyChunks = HelperUtil.getAreaChunks(loc, 2);
 			boolean isTerritoryNearby = false;
@@ -1199,7 +1200,9 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				// Player is not nearby a territory, stop rendering
 				stopPlayerBorderParticles(player);
 			}
-    	}
+    	} else {
+			stopPlayerBorderParticles(player);
+		}
     }
 	
 	public void stopPlayerBorderParticles(KonPlayer player) {

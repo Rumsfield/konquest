@@ -19,6 +19,7 @@ public class UpgradeIcon extends MenuIcon{
 	private final int pop;
 	private final ItemStack item;
 
+	private final String nameColor = DisplayManager.nameFormat;
 	private final String loreColor = DisplayManager.loreFormat;
 	private final String valueColor = DisplayManager.valueFormat;
 	
@@ -39,7 +40,7 @@ public class UpgradeIcon extends MenuIcon{
 		for(String line : HelperUtil.stringPaginate(upgrade.getLevelDescription(level))) {
 			loreList.add(loreColor+line);
 		}
-		String name = ChatColor.GOLD+upgrade.getDescription();
+		String name = nameColor+upgrade.getDescription();
 		return CompatibilityUtil.buildItem(upgrade.getIcon(), name, loreList);
 	}
 	

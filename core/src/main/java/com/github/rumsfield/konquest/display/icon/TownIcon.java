@@ -6,15 +6,20 @@ import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TownIcon extends MenuIcon {
 
 	private final KonTown town;
+	private final OfflinePlayer viewer;
 	private final String contextColor;
+	private final List<String> alerts;
+	private final List<String> properties;
 	private final List<String> lore;
 	private final boolean isClickable;
 	private final ItemStack item;
@@ -27,9 +32,24 @@ public class TownIcon extends MenuIcon {
 	public TownIcon(KonTown town, String contextColor, List<String> lore, int index, boolean isClickable) {
 		super(index);
 		this.town = town;
+		this.viewer = null;
 		this.contextColor = contextColor;
-		this.isClickable = isClickable;
+		this.alerts = Collections.emptyList();
+		this.properties = Collections.emptyList();
 		this.lore = lore;
+		this.isClickable = isClickable;
+		this.item = initItem();
+	}
+
+	public TownIcon(KonTown town, OfflinePlayer viewer, String contextColor, List<String> alerts, List<String> properties, List<String> lore, int index, boolean isClickable) {
+		super(index);
+		this.town = town;
+		this.viewer = viewer;
+		this.contextColor = contextColor;
+		this.alerts = alerts;
+		this.properties = properties;
+		this.lore = lore;
+		this.isClickable = isClickable;
 		this.item = initItem();
 	}
 	
@@ -55,6 +75,7 @@ public class TownIcon extends MenuIcon {
 		if(town.isAttacked()) {
 			loreList.add(alertColor+MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage());
 		}
+		loreList.addAll(alerts);
 		// Properties
 		if(town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
 			loreList.add(propertyColor+MessagePath.TERRITORY_CAPITAL.getMessage());
@@ -71,6 +92,13 @@ public class TownIcon extends MenuIcon {
 			isProtected = true;
 			loreList.add(propertyColor+MessagePath.LABEL_SHIELD.getMessage());
 		}
+		if(viewer != null) {
+			String viewerRole = town.getPlayerRoleName(viewer);
+			if (!viewerRole.isEmpty()) {
+				loreList.add(propertyColor+viewerRole);
+			}
+		}
+		loreList.addAll(properties);
 		// Lore
 		loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage() + ": " + valueColor + town.getNumResidents());
 		loreList.add(loreColor+MessagePath.LABEL_LAND.getMessage() + ": " + valueColor + town.getChunkList().size());

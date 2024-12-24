@@ -8,8 +8,11 @@ import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -96,7 +99,7 @@ public class MainMenu extends StateMenu {
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_MAIN_DESCRIPTION_DASHBOARD.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_MAIN_HINT.getMessage());
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_DASHBOARD.getMessage(), loreList, Material.COMMAND_BLOCK, ROOT_SLOT_DASH, true));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_DASHBOARD.getMessage(), loreList, Material.GOLD_BLOCK, ROOT_SLOT_DASH, true));
 
         /* Kingdom Menu */
         iconCommand = CommandType.KINGDOM;
@@ -269,6 +272,8 @@ public class MainMenu extends StateMenu {
 
         result = new DisplayMenu(2, titleColor+MessagePath.MENU_MAIN_TITLE_DASHBOARD.getMessage());
 
+        //TODO - Add map and favor executors
+
         /* Map Auto */
         iconCommand = CommandType.MAP;
         loreList.clear();
@@ -286,12 +291,25 @@ public class MainMenu extends StateMenu {
         iconCommand = CommandType.CHAT;
         loreList.clear();
         loreList.add(valueColor + getDisplayValue(!player.isGlobalChat()));
-        if (hasPermission(iconCommand)) {
-            isClickable = true;
-            loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+
+        // Check for disabled feature
+        boolean isChatFormatEnabled = getKonquest().getCore().getBoolean(CorePath.CHAT_ENABLE_FORMAT.getPath(),true);
+        if (isChatFormatEnabled) {
+            if (!player.isBarbarian()) {
+                if (hasPermission(iconCommand)) {
+                    isClickable = true;
+                    loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+                } else {
+                    isClickable = false;
+                    loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
+                }
+            } else {
+                isClickable = false;
+                loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+            }
         } else {
             isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
+            loreList.add(alertColor+MessagePath.LABEL_DISABLED.getMessage());
         }
         result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_KINGDOM_CHAT.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_CHAT, isClickable));
 
@@ -395,6 +413,9 @@ public class MainMenu extends StateMenu {
             } else if (isNavNext(slot)) {
                 // Page next
                 result = goPageNext();
+            } else if (slot == ROOT_SLOT_SECRET) {
+                // Open Secret view
+                result = setCurrentView(MenuState.SECRET);
             }
         } else if (isCurrentMenuSlot(slot)) {
             // Clicked in menu
@@ -421,15 +442,17 @@ public class MainMenu extends StateMenu {
                             break;
                         case ROOT_SLOT_TOWN:
                             // Open Town Menu (close this menu)
-                            // TODO
+                            getKonquest().getDisplayManager().displayTownMenu(player);
                             break;
                         case ROOT_SLOT_QUEST:
                             // Open Quest Book (close this menu)
-                            getKonquest().getDirectiveManager().displayBook(player);
+                            // Schedule delayed task to open book
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(getKonquest().getPlugin(), () -> getKonquest().getDirectiveManager().displayBook(player),5);
                             break;
                         case ROOT_SLOT_STATS:
                             // Open Stats Book (close this menu)
-                            getKonquest().getAccomplishmentManager().displayStats(player);
+                            // Schedule delayed task to open book
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(getKonquest().getPlugin(), () -> getKonquest().getAccomplishmentManager().displayStats(player),5);
                             break;
                         case ROOT_SLOT_PREFIX:
                             // Open Prefix Menu (close this menu)
@@ -442,10 +465,6 @@ public class MainMenu extends StateMenu {
                         case ROOT_SLOT_TRAVEL:
                             // Open Travel Menu (close this menu)
                             // TODO
-                            break;
-                        case ROOT_SLOT_SECRET:
-                            // Open Secret view
-                            result = setCurrentView(MenuState.SECRET);
                             break;
                     }
                     break;
@@ -462,6 +481,8 @@ public class MainMenu extends StateMenu {
                         case DASH_SLOT_BORDER:
                             // Toggle border display
                             player.setIsBorderDisplay(!player.isBorderDisplay());
+                            // Update borders
+                            getKonquest().getTerritoryManager().updatePlayerBorderParticles(player);
                             break;
                         case DASH_SLOT_FLY:
                             // Toggle flying

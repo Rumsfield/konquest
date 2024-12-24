@@ -29,7 +29,6 @@ public enum MessagePath {
 	LABEL_FLAGS                                 (0, "label.flags"),
 	LABEL_GOLEM_OFFENSE                         (0, "label.golem-offense"),
 	LABEL_HEALTH                                (0, "label.health"),
-	LABEL_HOME                                  (0, "label.home"),
 	LABEL_IMMUNITY                              (0, "label.immunity"),
 	LABEL_INCREMENT_COST                        (0, "label.increment-cost"),
 	LABEL_INFORMATION                          	(0, "label.information"),
@@ -178,6 +177,7 @@ public enum MessagePath {
 	MENU_HELP_ADMIN                             (0, "menu.help.admin"),
 	MENU_HELP_QUEST                             (0, "menu.help.quest"),
     MENU_HELP_HINT                              (0, "menu.help.hint"),
+	MENU_HELP_HINT_COMMAND                      (0, "menu.help.hint-command"),
 	MENU_HELP_TIP_1                             (0, "menu.help.tip-1"),
 	MENU_HELP_TIP_2                             (0, "menu.help.tip-2"),
 	MENU_HELP_TIP_3                             (0, "menu.help.tip-3"),
@@ -933,6 +933,7 @@ public enum MessagePath {
 	UPGRADE_ENCHANT_LEVEL_1                     (0, "upgrade.enchant.level-1"),
 	
 	DESCRIPTION_HELP                            (0, "description.help"),
+	DESCRIPTION_MENU                            (0, "description.menu"),
 	DESCRIPTION_INFO                            (0, "description.info"),
 	DESCRIPTION_LIST                            (0, "description.list"),
 	DESCRIPTION_FAVOR                           (0, "description.favor"),

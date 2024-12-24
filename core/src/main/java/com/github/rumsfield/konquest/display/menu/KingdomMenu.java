@@ -66,6 +66,7 @@ public class KingdomMenu extends StateMenu {
 		MASTER
 	}
 
+	private String contextColor;
 	private String titleColor;
 	private String nameColor;
 	private final String propertyColor;
@@ -91,6 +92,7 @@ public class KingdomMenu extends StateMenu {
 		this.isAdmin = isAdmin; // Is player viewing the menu as an admin?
 
 		/* Formats */
+		contextColor = Konquest.friendColor2;
 		titleColor = DisplayManager.titleFormat;
 		nameColor = DisplayManager.nameFormat;
 		propertyColor = DisplayManager.propertyFormat;
@@ -99,6 +101,7 @@ public class KingdomMenu extends StateMenu {
 		valueColor = DisplayManager.valueFormat;
 		hintColor = DisplayManager.hintFormat;
 		if (isAdmin) {
+			contextColor = DisplayManager.adminFormat;
 			titleColor = DisplayManager.adminFormat;
 			nameColor = DisplayManager.adminFormat;
 		}
@@ -131,7 +134,6 @@ public class KingdomMenu extends StateMenu {
 		DisplayMenu result;
 		MenuIcon icon;
 		List<String> loreList = new ArrayList<>();
-		boolean isClickable = !isAdmin;
 
 		/* Icon slot indexes */
 		// Row 0: 0 1 2 3 4 5 6 7 8
@@ -153,40 +155,45 @@ public class KingdomMenu extends StateMenu {
 		int ROOT_SLOT_DESTROY		= 25;
 		int ROOT_SLOT_CAPITAL		= 26;
 		
-		int rows = 2; // default rows for regular
+		int rows = 1; // default rows for regular
 		if(getAccess().equals(AccessType.OFFICER)) {
-			rows = 3;
+			rows = 2;
 		} else if(getAccess().equals(AccessType.MASTER)) {
-			rows = 4;
+			rows = 3;
 		}
 		
 		result = new DisplayMenu(rows, getTitle(MenuState.ROOT));
 		
 		/* Join Icon */
+		boolean isJoinClickable = true;
 		loreList.clear();
 		loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_JOIN.getMessage(),loreColor));
 		if(isAdmin) {
 			loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+			isJoinClickable = false;
 		} else {
 			loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 		}
-		icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_JOIN.getMessage(), loreList, Material.SADDLE, ROOT_SLOT_JOIN, isClickable);
+		icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_JOIN.getMessage(), loreList, Material.SADDLE, ROOT_SLOT_JOIN, isJoinClickable);
 		icon.setState(MenuState.A_JOIN);
 		result.addIcon(icon);
 		
 		/* Exile Icon */
+		boolean isExileClickable = true;
 		loreList.clear();
 		loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_EXILE.getMessage(),loreColor));
-		if(isAdmin || isCreatedKingdom) {
+		if(isAdmin || !isCreatedKingdom) {
 			loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+			isExileClickable = false;
 		} else {
 			loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 		}
-		icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_EXILE.getMessage(), loreList, Material.ARROW, ROOT_SLOT_EXILE, isClickable);
+		icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_EXILE.getMessage(), loreList, Material.ARROW, ROOT_SLOT_EXILE, isExileClickable);
 		icon.setState(MenuState.A_EXILE);
 		result.addIcon(icon);
 
 		/* Invites Icon */
+		boolean isInvitesClickable = true;
 		loreList.clear();
 		loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_INVITES.getMessage(),loreColor));
 		int numInvites = manager.getInviteKingdoms(player).size();
@@ -197,10 +204,11 @@ public class KingdomMenu extends StateMenu {
 		}
 		if(isAdmin) {
 			loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+			isInvitesClickable = false;
 		} else {
 			loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 		}
-		icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_INVITES.getMessage(), loreList, inviteMat, ROOT_SLOT_INVITE, isClickable);
+		icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_INVITES.getMessage(), loreList, inviteMat, ROOT_SLOT_INVITE, isInvitesClickable);
 		icon.setState(MenuState.A_INVITE);
 		result.addIcon(icon);
 		
@@ -214,9 +222,12 @@ public class KingdomMenu extends StateMenu {
 		// These icons only appear for created kingdoms
 		if(isCreatedKingdom) {
 			/* Kingdom Info Icon */
+			boolean isViewer = kingdom.equals(player.getKingdom());
 			loreList = new ArrayList<>();
 			loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_LIST.getMessage());
-			result.addIcon(new KingdomIcon(kingdom,nameColor,loreList,ROOT_SLOT_INFO,true));
+			icon = new KingdomIcon(kingdom,nameColor,Collections.emptyList(),Collections.emptyList(),loreList,ROOT_SLOT_INFO,true,isViewer);
+			icon.setState(MenuState.A_INFO);
+			result.addIcon(icon);
 
 			if(getAccess().equals(AccessType.OFFICER) || getAccess().equals(AccessType.MASTER)) {
 				/* Relations Icon */
@@ -231,7 +242,9 @@ public class KingdomMenu extends StateMenu {
 				} else {
 					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
 				}
-				result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_RELATION.getMessage(), loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, isRelationsClickable));
+				icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_RELATION.getMessage(), loreList, Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, isRelationsClickable);
+				icon.setState(MenuState.B_RELATIONSHIP);
+				result.addIcon(icon);
 				
 				/* Requests Icon */
 				loreList.clear();
@@ -244,7 +257,9 @@ public class KingdomMenu extends StateMenu {
 					requestMat = Material.HONEY_BOTTLE;
 				}
 				loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-				result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_REQUESTS.getMessage(), loreList, requestMat, ROOT_SLOT_REQUESTS, true));
+				icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_REQUESTS.getMessage(), loreList, requestMat, ROOT_SLOT_REQUESTS, true);
+				icon.setState(MenuState.B_REQUESTS);
+				result.addIcon(icon);
 			}
 			
 			if(getAccess().equals(AccessType.MASTER)) {
@@ -260,8 +275,10 @@ public class KingdomMenu extends StateMenu {
 					isPromoteClickable = false;
 					loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
 				}
-				result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_PROMOTE.getMessage(), loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, isPromoteClickable));
-				
+				icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_PROMOTE.getMessage(), loreList, Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, isPromoteClickable);
+				icon.setState(MenuState.C_PROMOTE);
+				result.addIcon(icon);
+
 				/* Demote Icon */
 				boolean isDemoteClickable = true;
 				loreList.clear();
@@ -274,8 +291,10 @@ public class KingdomMenu extends StateMenu {
 					isDemoteClickable = false;
 					loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
 				}
-				result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_DEMOTE.getMessage(), loreList, Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, isDemoteClickable));
-				
+				icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_DEMOTE.getMessage(), loreList, Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, isDemoteClickable);
+				icon.setState(MenuState.C_DEMOTE);
+				result.addIcon(icon);
+
 				/* Transfer Icon */
 				if(!kingdom.isAdminOperated()) {
 					boolean isTransferClickable = true;
@@ -289,7 +308,9 @@ public class KingdomMenu extends StateMenu {
 						isTransferClickable = false;
 						loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
 					}
-					result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, isTransferClickable));
+					icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_TRANSFER.getMessage(), loreList, Material.ELYTRA, ROOT_SLOT_TRANSFER, isTransferClickable);
+					icon.setState(MenuState.C_TRANSFER);
+					result.addIcon(icon);
 				}
 
 				/* Destroy Icon */
@@ -298,7 +319,9 @@ public class KingdomMenu extends StateMenu {
 					loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
 					loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage(), loreColor));
 					loreList.add(hintColor + MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-					result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_TOWN_DESTROY.getMessage(), loreList, Material.TNT, ROOT_SLOT_DESTROY, true));
+					icon = new InfoIcon(nameColor+MessagePath.MENU_TOWN_DESTROY.getMessage(), loreList, Material.TNT, ROOT_SLOT_DESTROY, true);
+					icon.setState(MenuState.C_DESTROY);
+					result.addIcon(icon);
 				}
 
 				/* Capital Icon */
@@ -307,7 +330,9 @@ public class KingdomMenu extends StateMenu {
 					loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
 					loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_CAPITAL.getMessage(), loreColor));
 					loreList.add(hintColor + MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-					result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_CAPITAL.getMessage(), loreList, Material.PISTON, ROOT_SLOT_CAPITAL, true));
+					icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_CAPITAL.getMessage(), loreList, Material.PISTON, ROOT_SLOT_CAPITAL, true);
+					icon.setState(MenuState.C_CAPITAL);
+					result.addIcon(icon);
 				}
 
 				/* Open/Close Button */
@@ -316,23 +341,29 @@ public class KingdomMenu extends StateMenu {
 				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 		    	loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+currentValue));
 		    	loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
-				result.addIcon(new InfoIcon(nameColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.IRON_DOOR, ROOT_SLOT_OPEN, true));
-				
+				icon = new InfoIcon(nameColor+MessagePath.LABEL_OPEN.getMessage(), loreList, Material.IRON_DOOR, ROOT_SLOT_OPEN, true);
+				icon.setState(MenuState.C_OPEN);
+				result.addIcon(icon);
+
 				/* Template Icon */
 				loreList.clear();
 				loreList.add(propertyColor+MessagePath.LABEL_MASTER.getMessage());
 				loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_TEMPLATE.getMessage(),loreColor));
 				loreList.add(loreColor+MessagePath.MENU_OPTIONS_CURRENT.getMessage(valueColor+kingdom.getMonumentTemplateName()));
 				loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-				result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_TEMPLATE.getMessage(), loreList, Material.ANVIL, ROOT_SLOT_TEMPLATE, true));
-				
+				icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_TEMPLATE.getMessage(), loreList, Material.ANVIL, ROOT_SLOT_TEMPLATE, true);
+				icon.setState(MenuState.C_TEMPLATE);
+				result.addIcon(icon);
+
 				/* Disband Icon */
 				if(!kingdom.isAdminOperated()) {
 					loreList.clear();
 					loreList.add(propertyColor + MessagePath.LABEL_MASTER.getMessage());
 					loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_KINGDOM_DESCRIPTION_DISBAND.getMessage(), loreColor));
 					loreList.add(hintColor + MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
-					result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_DISBAND.getMessage(), loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true));
+					icon = new InfoIcon(nameColor+MessagePath.MENU_KINGDOM_DISBAND.getMessage(), loreList, Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
+					icon.setState(MenuState.C_DISBAND);
+					result.addIcon(icon);
 				}
 			}
 		}
@@ -409,7 +440,7 @@ public class KingdomMenu extends StateMenu {
 		return result;
 	}
 
-	private ArrayList<DisplayMenu> createTemplateView() {
+	private List<DisplayMenu> createTemplateView() {
 		ArrayList<MenuIcon> icons = new ArrayList<>();
 
 		/* Template Icons */
@@ -441,34 +472,32 @@ public class KingdomMenu extends StateMenu {
 
 	private DisplayMenu createDiplomacyView() {
 		// diplomacyKingdom is the global variable to keep track of current kingdom changing status
-		if (diplomacyKingdom == null) {
-			diplomacyKingdom = kingdom;
-		}
+		if (diplomacyKingdom == null || diplomacyKingdom.equals(kingdom)) return null;
 
 		int numIcons = KonquestDiplomacyType.values().length + 2; // Add 2 for kingdom info and spacer
 		int numRows = (int)Math.ceil((double)numIcons / MAX_ROW_SIZE);
 		int index = 0;
-		List<String> loreList;
+		ArrayList<String> alertList = new ArrayList<>();
+		ArrayList<String> loreList = new ArrayList<>();
 		DisplayMenu result = new DisplayMenu(numRows, getTitle(MenuState.B_DIPLOMACY));
 
 		KonquestDiplomacyType currentDiplomacy = manager.getDiplomacy(kingdom,diplomacyKingdom);
 
 		/* Kingdom Info Icon */
 		String contextColor = getKonquest().getDisplaySecondaryColor(kingdom, diplomacyKingdom);
-		loreList = new ArrayList<>();
 		String diplomacyState = Labeler.lookup(currentDiplomacy);
 		loreList.add(loreColor+MessagePath.LABEL_DIPLOMACY.getMessage()+": "+valueColor+diplomacyState);
 		if(kingdom.hasRelationRequest(diplomacyKingdom)) {
 			// They have sent a valid diplomacy change request to us
 			String ourRequestStatus = Labeler.lookup(kingdom.getRelationRequest(diplomacyKingdom));
-			loreList.add(alertColor+MessagePath.MENU_KINGDOM_THEY_REQUESTED.getMessage()+": "+valueColor+ourRequestStatus);
+			alertList.add(alertColor+MessagePath.MENU_KINGDOM_THEY_REQUESTED.getMessage()+": "+valueColor+ourRequestStatus);
 		}
 		if(diplomacyKingdom.hasRelationRequest(kingdom)) {
 			// We have sent a valid diplomacy change request to them
 			String theirRequestStatus = Labeler.lookup(diplomacyKingdom.getRelationRequest(kingdom));
-			loreList.add(alertColor+MessagePath.MENU_KINGDOM_WE_REQUESTED.getMessage()+": "+valueColor+theirRequestStatus);
+			alertList.add(alertColor+MessagePath.MENU_KINGDOM_WE_REQUESTED.getMessage()+": "+valueColor+theirRequestStatus);
 		}
-		result.addIcon(new KingdomIcon(diplomacyKingdom,contextColor,loreList,index,false));
+		result.addIcon(new KingdomIcon(diplomacyKingdom,contextColor,alertList,Collections.emptyList(),loreList,index,false,false));
 
 		/* Relationship Icons */
 		// Only create relation options for created kingdoms
@@ -559,7 +588,7 @@ public class KingdomMenu extends StateMenu {
 		return result;
 	}
 
-	private ArrayList<DisplayMenu> createKingdomView(MenuState context) {
+	private List<DisplayMenu> createKingdomView(MenuState context) {
 		ArrayList<MenuIcon> icons = new ArrayList<>();
 		boolean isClickable = false;
 		List<KonKingdom> kingdoms = new ArrayList<>();
@@ -605,6 +634,8 @@ public class KingdomMenu extends StateMenu {
 		/* Kingdom Icons */
 		for (KonKingdom currentKingdom : kingdoms) {
 			String contextColor = getKonquest().getDisplaySecondaryColor(kingdom, currentKingdom);
+			boolean isViewer = currentKingdom.equals(player.getKingdom());
+			ArrayList<String> alertList = new ArrayList<>();
 			ArrayList<String> loreList = new ArrayList<>();
 			if(isCreatedKingdom) {
 				if(!currentKingdom.equals(kingdom)) {
@@ -615,12 +646,12 @@ public class KingdomMenu extends StateMenu {
 				if(kingdom.hasRelationRequest(currentKingdom)) {
 					// They have sent a valid diplomacy change request to us
 					String ourRequestStatus = Labeler.lookup(kingdom.getRelationRequest(currentKingdom));
-					loreList.add(alertColor+MessagePath.MENU_KINGDOM_THEY_REQUESTED.getMessage()+": "+valueColor+ourRequestStatus);
+					alertList.add(alertColor+MessagePath.MENU_KINGDOM_THEY_REQUESTED.getMessage()+": "+valueColor+ourRequestStatus);
 				}
 				if(currentKingdom.hasRelationRequest(kingdom)) {
 					// We have sent a valid diplomacy change request to them
 					String theirRequestStatus = Labeler.lookup(currentKingdom.getRelationRequest(kingdom));
-					loreList.add(alertColor+MessagePath.MENU_KINGDOM_WE_REQUESTED.getMessage()+": "+valueColor+theirRequestStatus);
+					alertList.add(alertColor+MessagePath.MENU_KINGDOM_WE_REQUESTED.getMessage()+": "+valueColor+theirRequestStatus);
 				}
 			}
 			// Context-specific lore + click conditions
@@ -631,7 +662,7 @@ public class KingdomMenu extends StateMenu {
 							!currentKingdom.isJoinable() ||
 							(kingdom.isCreated() && !kingdom.isLeaveable())) {
 						// The kingdom is unavailable to join at this time
-						loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+						alertList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
 					}
 					if(currentKingdom.isOpen()) {
 						loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_JOIN_NOW.getMessage());
@@ -645,7 +676,7 @@ public class KingdomMenu extends StateMenu {
 							!currentKingdom.isJoinable() ||
 							(kingdom.isCreated() && !kingdom.isLeaveable())) {
 						// The kingdom is unavailable to join at this time
-						loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+						alertList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
 					}
 					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_ACCEPT.getMessage());
 					loreList.add(hintColor+MessagePath.MENU_KINGDOM_HINT_DECLINE.getMessage());
@@ -659,14 +690,14 @@ public class KingdomMenu extends StateMenu {
 				default:
 					break;
 			}
-			icons.add(new KingdomIcon(currentKingdom,contextColor,loreList,0,isClickable));
+			icons.add(new KingdomIcon(currentKingdom,contextColor,alertList,Collections.emptyList(),loreList,0,isClickable,isViewer));
 		}
 
 		/* Make Pages (includes navigation) */
 		return new ArrayList<>(makePages(icons, getTitle(context)));
 	}
 
-	private ArrayList<DisplayMenu> createTownView(MenuState context) {
+	private List<DisplayMenu> createTownView(MenuState context) {
 		ArrayList<MenuIcon> icons = new ArrayList<>();
 		// List of all towns in kingdom
 		List<KonTown> towns = new ArrayList<>(kingdom.getTowns());
@@ -675,7 +706,6 @@ public class KingdomMenu extends StateMenu {
 
 		/* Town Icons */
 		for (KonTown currentTown : towns) {
-			String contextColor = Konquest.friendColor2;
 			// Context-specific lore + click conditions
 			ArrayList<String> loreList = new ArrayList<>();
 			switch(context) {
@@ -688,14 +718,14 @@ public class KingdomMenu extends StateMenu {
 				default:
 					break;
 			}
-			icons.add(new TownIcon(currentTown,contextColor,loreList,0,true));
+			icons.add(new TownIcon(currentTown,player.getBukkitPlayer(),contextColor,Collections.emptyList(),Collections.emptyList(),loreList,0,true));
 		}
 
 		/* Make Pages (includes navigation) */
 		return new ArrayList<>(makePages(icons, getTitle(context)));
 	}
 
-	private ArrayList<DisplayMenu> createPlayerView(MenuState context) {
+	private List<DisplayMenu> createPlayerView(MenuState context) {
 		ArrayList<MenuIcon> icons = new ArrayList<>();
 		String loreHintStr1 = "";
 		String loreHintStr2 = "";

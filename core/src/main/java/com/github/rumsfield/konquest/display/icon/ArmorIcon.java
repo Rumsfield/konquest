@@ -18,6 +18,7 @@ public class ArmorIcon extends MenuIcon {
 	private final int land;
 	ItemStack item;
 
+	private final String nameColor = DisplayManager.nameFormat;
 	private final String loreColor = DisplayManager.loreFormat;
 	private final String valueColor = DisplayManager.valueFormat;
 	private final String hintColor = DisplayManager.hintFormat;
@@ -37,7 +38,7 @@ public class ArmorIcon extends MenuIcon {
 		loreList.add(ChatColor.DARK_AQUA+""+armor.getBlocks());
     	loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+totalCost);
 		loreList.add(hintColor+MessagePath.MENU_SHIELD_HINT.getMessage());
-		String name = ChatColor.GOLD+armor.getId()+" "+MessagePath.LABEL_ARMOR.getMessage();
+		String name = nameColor+armor.getId()+" "+MessagePath.LABEL_ARMOR.getMessage();
 		return CompatibilityUtil.buildItem(itemMaterial, name, loreList, true);
 	}
 	

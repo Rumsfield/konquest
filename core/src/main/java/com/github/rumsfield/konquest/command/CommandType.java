@@ -16,6 +16,7 @@ import java.util.List;
  */
 public enum CommandType {
 	HELP    (Material.LANTERN,          "konquest.command.help",    "h",  new HelpCommand(),      MessagePath.DESCRIPTION_HELP.getMessage()),
+	MENU    (Material.LADDER,           "konquest.command.menu",    "",   new MenuCommand(),      MessagePath.DESCRIPTION_MENU.getMessage()),
 	INFO    (Material.SPRUCE_SIGN,      "konquest.command.info",    "i",  new InfoCommand(),      MessagePath.DESCRIPTION_INFO.getMessage()),
 	LIST    (Material.PAPER,            "konquest.command.list",    "l",  new ListCommand(),      MessagePath.DESCRIPTION_LIST.getMessage()),
 	KINGDOM (Material.GOLDEN_SWORD,     "konquest.command.kingdom", "k",  new KingdomCommand(),   MessagePath.DESCRIPTION_KINGDOM.getMessage()),

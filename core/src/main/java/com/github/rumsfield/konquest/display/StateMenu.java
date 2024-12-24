@@ -345,6 +345,7 @@ public abstract class StateMenu {
                 page.addIcon(icon);
                 slotIndex++;
             }
+
             // Add navigation
             addNavEmpty(page);
             addNavClose(page);
@@ -381,7 +382,7 @@ public abstract class StateMenu {
     }
 
     protected InfoIcon navIconHome(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_HOME.getMessage(),Collections.emptyList(),Material.ORANGE_BED,index,true);
+        return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_MAIN_TITLE.getMessage(),Collections.emptyList(),Material.BELL,index,true);
     }
 
     protected InfoIcon navIconEmpty(int index) {

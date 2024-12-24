@@ -68,7 +68,6 @@ public class PlotMenu extends StateMenu {
     private final int INDEX_EDIT = 7;
 
     private final KonTown town;
-    private Point center;
     private Point origin;
     private final Player bukkitPlayer;
     private final int maxSize;
@@ -92,11 +91,10 @@ public class PlotMenu extends StateMenu {
         this.bukkitPlayer = player.getBukkitPlayer();
         this.maxSize = maxSize;
         this.playerLoc = bukkitPlayer.getLocation();
-        this.origin = center;
         if(town.isLocInside(playerLoc)) {
-            this.center = HelperUtil.toPoint(playerLoc);
+            this.origin = HelperUtil.toPoint(playerLoc);
         } else {
-            this.center = HelperUtil.toPoint(town.getCenterLoc());
+            this.origin = HelperUtil.toPoint(town.getCenterLoc());
         }
 
         /* Formats */
@@ -236,21 +234,21 @@ public class PlotMenu extends StateMenu {
                     if(isPlot) {
                         if(context.equals(MenuState.ROOT_DELETE)) {
                             isClickable = true;
-                            loreList.add(ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_DELETE.getMessage());
+                            loreList.add(hintColor+MessagePath.MENU_PLOTS_CLICK_DELETE.getMessage());
                         } else if(context.equals(MenuState.ROOT_EDIT)) {
                             isClickable = true;
-                            loreList.add(ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_EDIT.getMessage());
+                            loreList.add(hintColor+MessagePath.MENU_PLOTS_CLICK_EDIT.getMessage());
                         } else if(context.equals(MenuState.EDIT_LAND_REMOVE)) {
                             isClickable = true;
-                            loreList.add(ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_REMOVE_CHUNK.getMessage());
+                            loreList.add(hintColor+MessagePath.MENU_PLOTS_CLICK_REMOVE_CHUNK.getMessage());
                         }
                     } else {
                         if(context.equals(MenuState.ROOT_CREATE)) {
                             isClickable = true;
-                            loreList.add(ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_CREATE.getMessage());
+                            loreList.add(hintColor+MessagePath.MENU_PLOTS_CLICK_CREATE.getMessage());
                         } else if(context.equals(MenuState.EDIT_LAND_ADD) || context.equals(MenuState.CREATE_LAND_ADD)) {
                             isClickable = true;
-                            loreList.add(ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_ADD_CHUNK.getMessage());
+                            loreList.add(hintColor+MessagePath.MENU_PLOTS_CLICK_ADD_CHUNK.getMessage());
                         }
                     }
                     // Check for monument chunk
@@ -319,8 +317,8 @@ public class PlotMenu extends StateMenu {
      * This is a multiple paged view.
      * Contexts: CREATE_PLAYER_ADD, EDIT_PLAYER_ADD, EDIT_PLAYER_REMOVE, EDIT_PLAYER_SHOW
      */
-    private ArrayList<DisplayMenu> createPlayerView(MenuState context) {
-        if (editPlot == null || town == null) return null;
+    private List<DisplayMenu> createPlayerView(MenuState context) {
+        if (editPlot == null || town == null) return Collections.emptyList();
         List<OfflinePlayer> players = new ArrayList<>();
         ArrayList<MenuIcon> icons = new ArrayList<>();
 
@@ -331,15 +329,15 @@ public class PlotMenu extends StateMenu {
             case EDIT_PLAYER_ADD:
                 players.addAll(town.getPlayerResidents());
                 players.removeAll(editPlot.getUserOfflinePlayers());
-                loreStr = ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_ADD_PLAYER.getMessage();
+                loreStr = hintColor+MessagePath.MENU_PLOTS_CLICK_ADD_PLAYER.getMessage();
                 break;
             case EDIT_PLAYER_REMOVE:
                 players.addAll(editPlot.getUserOfflinePlayers());
-                loreStr = ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_REMOVE_PLAYER.getMessage();
+                loreStr = hintColor+MessagePath.MENU_PLOTS_CLICK_REMOVE_PLAYER.getMessage();
                 break;
             case EDIT_PLAYER_SHOW:
                 players.addAll(editPlot.getUserOfflinePlayers());
-                loreStr = ChatColor.GOLD+MessagePath.MENU_PLOTS_CLICK_MOVE_PLAYER.getMessage();
+                loreStr = hintColor+MessagePath.MENU_PLOTS_CLICK_MOVE_PLAYER.getMessage();
                 break;
             default:
                 return null;
@@ -388,7 +386,7 @@ public class PlotMenu extends StateMenu {
             case EDIT_PLAYER_REMOVE:
             case EDIT_PLAYER_ADD:
             case EDIT_PLAYER_SHOW:
-                result = createPlayerView(currentState);
+                result.addAll(createPlayerView(currentState));
                 break;
             case EDIT:
                 result.add(createEditView());
@@ -484,6 +482,9 @@ public class PlotMenu extends StateMenu {
                     } else if (isNavFinish(slot)) {
                         // Finish
                         commitPlot();
+                        editPlot = null;
+                        oldPlot = null;
+                        result = refreshNewView(MenuState.ROOT);
                     } else if (isNavBack(slot)) {
                         // Page back
                         result = goPageBack();
@@ -519,6 +520,9 @@ public class PlotMenu extends StateMenu {
                     } else if (isNavFinish(slot)) {
                         // Finish
                         commitPlot();
+                        editPlot = null;
+                        oldPlot = null;
+                        result = refreshNewView(MenuState.ROOT);
                     }
                     break;
                 case EDIT_PLAYER_SHOW:
@@ -534,6 +538,9 @@ public class PlotMenu extends StateMenu {
                     } else if (isNavFinish(slot)) {
                         // Finish
                         commitPlot();
+                        editPlot = null;
+                        oldPlot = null;
+                        result = refreshNewView(MenuState.ROOT);
                     } else if (isNavBack(slot)) {
                         // Page back
                         result = goPageBack();
@@ -570,6 +577,7 @@ public class PlotMenu extends StateMenu {
                         oldPlot = town.getPlot(clickPoint,town.getWorld());
                         editPlot = null;
                         commitPlot();
+                        result = refreshNewView(MenuState.ROOT);
                     }
                     break;
                 case ROOT_EDIT:

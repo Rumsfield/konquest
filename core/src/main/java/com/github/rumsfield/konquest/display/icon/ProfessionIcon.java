@@ -1,7 +1,7 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,10 +13,12 @@ public class ProfessionIcon extends MenuIcon {
 	private final List<String> lore;
 	private final Villager.Profession profession;
 	private final boolean isClickable;
-	
+
+	private final String nameColor = DisplayManager.nameFormat;
+
 	public ProfessionIcon(List<String> lore, Villager.Profession profession, int index, boolean isClickable) {
 		super(index);
-		this.name = ChatColor.GOLD+CompatibilityUtil.getProfessionName(profession);
+		this.name = CompatibilityUtil.getProfessionName(profession);
 		this.lore = lore;
 		this.profession = profession;
 		this.isClickable = isClickable;
@@ -33,7 +35,7 @@ public class ProfessionIcon extends MenuIcon {
 
 	@Override
 	public ItemStack getItem() {
-		return CompatibilityUtil.buildItem(CompatibilityUtil.getProfessionMaterial(profession), getName(), lore);
+		return CompatibilityUtil.buildItem(CompatibilityUtil.getProfessionMaterial(profession), nameColor+getName(), lore);
 	}
 
 	@Override
