@@ -5,10 +5,11 @@ import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.command.admin.AdminCommandType;
 import com.github.rumsfield.konquest.display.DisplayMenu;
 import com.github.rumsfield.konquest.display.StateMenu;
+import com.github.rumsfield.konquest.display.icon.CommandIcon;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
+import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -51,6 +52,10 @@ public class MainMenu extends StateMenu {
     private final int DASH_SLOT_BORDER 	    = 4;
     private final int DASH_SLOT_FLY 	    = 5;
     private final int DASH_SLOT_BYPASS 	    = 6;
+    // Row 1:  9 10 11 12 13 14 15 16 17
+    private final int DASH_SLOT_MAP 	    = 12;
+    private final int DASH_SLOT_FAVOR 	    = 13;
+    private final int DASH_SLOT_SPY 	    = 14;
 
     private final String titleColor;
     private final String nameColor;
@@ -77,6 +82,11 @@ public class MainMenu extends StateMenu {
         setCurrentView(MenuState.ROOT);
     }
 
+    public DisplayMenu goToDashboard() {
+        // Change to management root view
+        return refreshNewView(MenuState.DASHBOARD);
+    }
+
     /**
      * Creates the root menu view for this menu.
      * This is a single page view.
@@ -99,7 +109,7 @@ public class MainMenu extends StateMenu {
         loreList.clear();
         loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_MAIN_DESCRIPTION_DASHBOARD.getMessage(),loreColor));
         loreList.add(hintColor+MessagePath.MENU_MAIN_HINT.getMessage());
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_DASHBOARD.getMessage(), loreList, Material.GOLD_BLOCK, ROOT_SLOT_DASH, true));
+        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_DASHBOARD.getMessage(), loreList, Material.CLOCK, ROOT_SLOT_DASH, true));
 
         /* Kingdom Menu */
         iconCommand = CommandType.KINGDOM;
@@ -269,10 +279,9 @@ public class MainMenu extends StateMenu {
         CommandType iconCommand;
         AdminCommandType iconAdminCommand;
         boolean isClickable;
+        boolean isPermission;
 
         result = new DisplayMenu(2, titleColor+MessagePath.MENU_MAIN_TITLE_DASHBOARD.getMessage());
-
-        //TODO - Add map and favor executors
 
         /* Map Auto */
         iconCommand = CommandType.MAP;
@@ -291,7 +300,6 @@ public class MainMenu extends StateMenu {
         iconCommand = CommandType.CHAT;
         loreList.clear();
         loreList.add(valueColor + getDisplayValue(!player.isGlobalChat()));
-
         // Check for disabled feature
         boolean isChatFormatEnabled = getKonquest().getCore().getBoolean(CorePath.CHAT_ENABLE_FORMAT.getPath(),true);
         if (isChatFormatEnabled) {
@@ -352,7 +360,34 @@ public class MainMenu extends StateMenu {
         }
         result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_ADMIN_BYPASS.getMessage(), loreList, iconAdminCommand.iconMaterial(), DASH_SLOT_BYPASS, isClickable));
 
-        // TODO add other commands
+        /* Map Command */
+        iconCommand = CommandType.MAP;
+        loreList.clear();
+        isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
+        if (isPermission) {
+            loreList.add(hintColor+MessagePath.MENU_MAIN_HINT_MAP_1.getMessage());
+            loreList.add(hintColor+MessagePath.MENU_MAIN_HINT_MAP_2.getMessage());
+        }
+        result.addIcon(new CommandIcon(iconCommand, isPermission, 0, 0, loreList, DASH_SLOT_MAP));
+
+        /* Favor Command */
+        iconCommand = CommandType.FAVOR;
+        loreList.clear();
+        isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
+        if (isPermission) {
+            loreList.add(hintColor+MessagePath.MENU_MAIN_HINT_FAVOR.getMessage());
+        }
+        result.addIcon(new CommandIcon(iconCommand, isPermission, 0, 0, loreList, DASH_SLOT_FAVOR));
+
+        /* Spy Command */
+        iconCommand = CommandType.SPY;
+        loreList.clear();
+        double cost_spy = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_SPY.getPath(),0.0);
+        isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
+        if (isPermission) {
+            loreList.add(hintColor+MessagePath.MENU_MAIN_HINT_SPY.getMessage());
+        }
+        result.addIcon(new CommandIcon(iconCommand, isPermission, (int)cost_spy, 0, loreList, DASH_SLOT_SPY));
 
         /* Navigation */
         addNavEmpty(result);
@@ -421,6 +456,7 @@ public class MainMenu extends StateMenu {
             // Clicked in menu
             DisplayMenu view = getCurrentView();
             if (view == null) return null;
+            MenuIcon clickedIcon = view.getIcon(slot);
             switch ((MenuState)getCurrentState()) {
                 case ROOT:
                     switch (slot) {
@@ -469,32 +505,58 @@ public class MainMenu extends StateMenu {
                     }
                     break;
                 case DASHBOARD:
+                    boolean doRefresh = true;
                     switch (slot) {
                         case DASH_SLOT_MAP_AUTO:
                             // Toggle map auto
                             player.setIsMapAuto(!player.isMapAuto());
+                            playStatusSound(player.getBukkitPlayer(),true);
                             break;
                         case DASH_SLOT_CHAT:
                             // Toggle kingdom chat
                             player.setIsGlobalChat(!player.isGlobalChat());
+                            playStatusSound(player.getBukkitPlayer(),true);
                             break;
                         case DASH_SLOT_BORDER:
                             // Toggle border display
                             player.setIsBorderDisplay(!player.isBorderDisplay());
                             // Update borders
                             getKonquest().getTerritoryManager().updatePlayerBorderParticles(player);
+                            playStatusSound(player.getBukkitPlayer(),true);
                             break;
                         case DASH_SLOT_FLY:
                             // Toggle flying
-                            player.setIsFlyEnabled(!player.isFlyEnabled());
+                            boolean status = getKonquest().getPlayerManager().togglePlayerFly(player);
+                            playStatusSound(player.getBukkitPlayer(),status);
                             break;
                         case DASH_SLOT_BYPASS:
                             // Toggle admin bypass
                             player.setIsAdminBypassActive(!player.isAdminBypassActive());
+                            playStatusSound(player.getBukkitPlayer(),true);
+                            break;
+                        case DASH_SLOT_MAP:
+                        case DASH_SLOT_FAVOR:
+                        case DASH_SLOT_SPY:
+                            // Execute command
+                            if (clickedIcon instanceof CommandIcon) {
+                                CommandIcon icon = (CommandIcon)clickedIcon;
+                                List<String> args = new ArrayList<>();
+                                CommandType cmd = icon.getCommand();
+                                if (cmd.equals(CommandType.MAP) && !clickType) {
+                                    // Right Click, far map
+                                    args.add("far");
+                                }
+                                cmd.command().execute(getKonquest(), player.getBukkitPlayer(),args);
+                                if (cmd.equals(CommandType.SPY)) {
+                                    doRefresh = false;
+                                }
+                            }
                             break;
                     }
                     // Keep menu open, refresh view
-                    result = refreshCurrentView();
+                    if (doRefresh) {
+                        result = refreshCurrentView();
+                    }
                     break;
                 case SECRET:
                     //TODO do something

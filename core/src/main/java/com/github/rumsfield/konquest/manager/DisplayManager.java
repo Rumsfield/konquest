@@ -139,6 +139,13 @@ public class DisplayManager {
 		displayMenuToPlayer(displayPlayer, newMenu);
 	}
 
+	public void displayMainMenuDashboard(KonPlayer displayPlayer) {
+		if (displayPlayer == null) return;
+		MainMenu newMenu = new MainMenu(konquest, displayPlayer);
+		newMenu.goToDashboard();
+		displayMenuToPlayer(displayPlayer, newMenu);
+	}
+
 	/*
 	 * ===============================================
 	 * Kingdom Menu

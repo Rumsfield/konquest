@@ -137,10 +137,9 @@ public class TownMenu extends StateMenu {
         int ROOT_SLOT_INVITES 		= 6;
         int ROOT_SLOT_LIST 			= 8;
         // Row 1: 9 10 11 12 13 14 15 16 17
-        int ROOT_SLOT_SETTLE		= 10;
-        int ROOT_SLOT_CLAIM 		= 12;
+        int ROOT_SLOT_SETTLE		= 12;
+        int ROOT_SLOT_CLAIM 		= 13;
         int ROOT_SLOT_UNCLAIM		= 14;
-        int ROOT_SLOT_SPY		    = 16;
 
         result = new DisplayMenu(2, getTitle(MenuState.ROOT));
 
@@ -203,27 +202,33 @@ public class TownMenu extends StateMenu {
 
         /* Settle Command Icon */
         iconCommand = CommandType.SETTLE;
+        loreList.clear();
         double cost_settle = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath(),0.0);
         double cost_settle_incr = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath(),0.0);
         isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
-        result.addIcon(new CommandIcon(iconCommand, isPermission, (int)cost_settle, (int)cost_settle_incr, ROOT_SLOT_SETTLE));
+        if (isPermission) {
+            loreList.add(hintColor+MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+        }
+        result.addIcon(new CommandIcon(iconCommand, isPermission, (int)cost_settle, (int)cost_settle_incr, loreList, ROOT_SLOT_SETTLE));
 
         /* Claim Command Icon */
         iconCommand = CommandType.CLAIM;
+        loreList.clear();
         double cost_claim = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_CLAIM.getPath(),0.0);
         isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
-        result.addIcon(new CommandIcon(iconCommand, isPermission, (int)cost_claim, 0, ROOT_SLOT_CLAIM));
+        if (isPermission) {
+            loreList.add(hintColor+MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+        }
+        result.addIcon(new CommandIcon(iconCommand, isPermission, (int)cost_claim, 0, loreList, ROOT_SLOT_CLAIM));
 
         /* Unclaim Command Icon */
         iconCommand = CommandType.UNCLAIM;
+        loreList.clear();
         isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
-        result.addIcon(new CommandIcon(iconCommand, isPermission, 0, 0, ROOT_SLOT_UNCLAIM));
-
-        /* Spy Command Icon */
-        iconCommand = CommandType.SPY;
-        double cost_spy = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_SPY.getPath(),0.0);
-        isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
-        result.addIcon(new CommandIcon(iconCommand, isPermission, (int)cost_spy, 0, ROOT_SLOT_SPY));
+        if (isPermission) {
+            loreList.add(hintColor+MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+        }
+        result.addIcon(new CommandIcon(iconCommand, isPermission, 0, 0, loreList, ROOT_SLOT_UNCLAIM));
 
         /* Navigation */
         addNavEmpty(result);

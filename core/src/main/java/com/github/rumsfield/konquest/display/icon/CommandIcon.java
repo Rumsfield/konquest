@@ -5,7 +5,6 @@ import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -18,19 +17,20 @@ public class CommandIcon extends MenuIcon{
 	private final int cost;
 	private final int cost_incr;
 	private final ItemStack item;
+	private final List<String> lore;
 
 	private final String nameColor = DisplayManager.nameFormat;
 	private final String alertColor = DisplayManager.alertFormat;
 	private final String loreColor = DisplayManager.loreFormat;
 	private final String valueColor = DisplayManager.valueFormat;
-	private final String hintColor = DisplayManager.hintFormat;
 
-	public CommandIcon(CommandType command, boolean permission, int cost, int cost_incr, int index) {
+	public CommandIcon(CommandType command, boolean permission, int cost, int cost_incr, List<String> lore, int index) {
 		super(index);
 		this.command = command;
 		this.permission = permission;
 		this.cost = cost;
 		this.cost_incr = cost_incr;
+		this.lore = lore;
 		this.item = initItem();
 	}
 
@@ -46,9 +46,7 @@ public class CommandIcon extends MenuIcon{
 			loreList.add(loreColor+MessagePath.LABEL_INCREMENT_COST.getMessage()+": "+valueColor+cost_incr);
 		}
 		loreList.addAll(HelperUtil.stringPaginate(command.description(),loreColor));
-		if (permission) {
-			loreList.add(hintColor+MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
-		}
+		loreList.addAll(lore);
 		String name = nameColor+getName();
 		return CompatibilityUtil.buildItem(command.iconMaterial(), name, loreList);
 	}

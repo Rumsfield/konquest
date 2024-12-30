@@ -201,6 +201,7 @@ public class HelpMenu extends StateMenu {
     private List<DisplayMenu> createCommandView(MenuState context) {
         // Context-specific info
         ArrayList<MenuIcon> commandIcons = new ArrayList<>();
+        List<String> loreList = new ArrayList<>();
         String title = "";
         /* Commands (by context) */
         switch (context) {
@@ -236,15 +237,23 @@ public class HelpMenu extends StateMenu {
                             cost_incr = 0;
                             break;
                     }
+                    loreList.clear();
                     boolean isPermission = player.getBukkitPlayer().hasPermission(cmd.permission());
-                    commandIcons.add(new CommandIcon(cmd, isPermission, cost, cost_incr, 0));
+                    if (isPermission) {
+                        loreList.add(hintColor+MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+                    }
+                    commandIcons.add(new CommandIcon(cmd, isPermission, cost, cost_incr, loreList, 0));
                 }
                 break;
             case COMMANDS_ADMIN:
                 title = titleColor+MessagePath.MENU_HELP_TITLE_ADMIN.getMessage();
                 for(AdminCommandType adminCmd : AdminCommandType.values()) {
+                    loreList.clear();
                     boolean isPermission = player.getBukkitPlayer().hasPermission(adminCmd.permission());
-                    commandIcons.add(new AdminCommandIcon(adminCmd, isPermission, 0));
+                    if (isPermission) {
+                        loreList.add(hintColor+MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+                    }
+                    commandIcons.add(new AdminCommandIcon(adminCmd, isPermission, loreList, 0));
                 }
                 break;
         }

@@ -15,16 +15,17 @@ public class AdminCommandIcon extends MenuIcon{
     private final AdminCommandType command;
     private final boolean permission;
     private final ItemStack item;
+    private final List<String> lore;
 
     private final String adminColor = DisplayManager.adminFormat;
     private final String alertColor = DisplayManager.alertFormat;
     private final String loreColor = DisplayManager.loreFormat;
-    private final String hintColor = DisplayManager.hintFormat;
 
-    public AdminCommandIcon(AdminCommandType command, boolean permission, int index) {
+    public AdminCommandIcon(AdminCommandType command, boolean permission, List<String> lore, int index) {
         super(index);
         this.command = command;
         this.permission = permission;
+        this.lore = lore;
         this.item = initItem();
     }
 
@@ -34,9 +35,7 @@ public class AdminCommandIcon extends MenuIcon{
             loreList.add(alertColor+ MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
         loreList.addAll(HelperUtil.stringPaginate(command.description(), loreColor));
-        if (permission) {
-            loreList.add(hintColor+MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
-        }
+        loreList.addAll(lore);
         String name = adminColor+getName();
         return CompatibilityUtil.buildItem(command.iconMaterial(), name, loreList);
     }
