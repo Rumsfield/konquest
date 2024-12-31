@@ -366,27 +366,27 @@ public abstract class StateMenu {
      */
 
     protected InfoIcon navIconClose(int index) {
-        return new InfoIcon(ChatColor.GOLD+ MessagePath.LABEL_CLOSE.getMessage(), Collections.emptyList(), Material.STRUCTURE_VOID,index,true);
+        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_CLOSE.getMessage(),Material.STRUCTURE_VOID,index,true);
     }
 
     protected InfoIcon navIconBack(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_BACK.getMessage(),Collections.emptyList(),Material.ENDER_PEARL,index,true);
+        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_BACK.getMessage(),Material.ENDER_PEARL,index,true);
     }
 
     protected InfoIcon navIconNext(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_NEXT.getMessage(),Collections.emptyList(),Material.ENDER_PEARL,index,true);
+        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_NEXT.getMessage(),Material.ENDER_PEARL,index,true);
     }
 
     protected InfoIcon navIconReturn(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_RETURN.getMessage(),Collections.emptyList(),Material.FIREWORK_ROCKET,index,true);
+        return new InfoIcon(ChatColor.GOLD+MessagePath.LABEL_RETURN.getMessage(),Material.FIREWORK_ROCKET,index,true);
     }
 
     protected InfoIcon navIconHome(int index) {
-        return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_MAIN_TITLE.getMessage(),Collections.emptyList(),Material.BELL,index,true);
+        return new InfoIcon(ChatColor.GOLD+MessagePath.MENU_MAIN_TITLE.getMessage(),Material.BELL,index,true);
     }
 
     protected InfoIcon navIconEmpty(int index) {
-        return new InfoIcon(" ",Collections.emptyList(),Material.GRAY_STAINED_GLASS_PANE,index,false);
+        return new InfoIcon(" ",Material.GRAY_STAINED_GLASS_PANE,index,false);
     }
 
     /*

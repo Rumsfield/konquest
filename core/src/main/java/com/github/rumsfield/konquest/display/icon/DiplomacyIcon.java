@@ -7,19 +7,14 @@ import com.github.rumsfield.konquest.utility.Labeler;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DiplomacyIcon extends MenuIcon {
 
 	private final KonquestDiplomacyType relation;
-	private final List<String> lore;
 	private final boolean isClickable;
 	
-	public DiplomacyIcon(KonquestDiplomacyType relation, List<String> lore, int index, boolean isClickable) {
+	public DiplomacyIcon(KonquestDiplomacyType relation, int index, boolean isClickable) {
 		super(index);
 		this.relation = relation;
-		this.lore = lore;
 		this.isClickable = isClickable;
 	}
 	
@@ -29,12 +24,6 @@ public class DiplomacyIcon extends MenuIcon {
 
 	@Override
 	public String getName() {
-		return Labeler.lookup(relation);
-	}
-
-	@Override
-	public ItemStack getItem() {
-		List<String> itemLore = new ArrayList<>(lore);
 		String nameColor = ""+ChatColor.GOLD;
 		switch(relation) {
 			case WAR:
@@ -52,8 +41,12 @@ public class DiplomacyIcon extends MenuIcon {
 			default:
 				break;
 		}
-		String name = nameColor+getName();
-		return CompatibilityUtil.buildItem(relation.getIcon(), name, itemLore);
+		return nameColor+Labeler.lookup(relation);
+	}
+
+	@Override
+	public ItemStack getItem() {
+		return CompatibilityUtil.buildItem(relation.getIcon(), getName(), getLore());
 	}
 
 	@Override

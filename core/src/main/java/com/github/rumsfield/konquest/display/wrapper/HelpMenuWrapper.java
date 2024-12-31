@@ -79,7 +79,7 @@ public class HelpMenuWrapper extends MenuWrapper {
 					cost_incr = 0;
 					break;
 			}
-			icon = new CommandIcon(cmd, true, cost, cost_incr, slotIndex);
+			icon = new CommandIcon(cmd, true, cost, cost_incr, Collections.emptyList(), slotIndex);
 			getMenu().getPage(pageIndex).addIcon(icon);
 			slotIndex++;
 		}
@@ -106,7 +106,7 @@ public class HelpMenuWrapper extends MenuWrapper {
 			getMenu().addPage(pageIndex, pageRows, pageLabel);
 			// Add command icons
 			for(AdminCommandType adminCmd : allowedCmdList) {
-				icon = new AdminCommandIcon(adminCmd, true, slotIndex);
+				icon = new AdminCommandIcon(adminCmd, true, Collections.emptyList(), slotIndex);
 				getMenu().getPage(pageIndex).addIcon(icon);
 				slotIndex++;
 			}

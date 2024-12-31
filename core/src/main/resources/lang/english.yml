@@ -10,6 +10,7 @@
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
 label:
+  admin: "Admin"
   admin-kingdom: "Admin Kingdom"
   allied-building: "Allied Building"
   armor: "Armor"
@@ -90,6 +91,7 @@ label:
   total: "Total"
   town: "Town"
   towns: "Towns"
+  town-role: "Town Role"
   true: "True"
   unavailable: "Unavailable"
   upgrades: "Upgrades"
@@ -331,6 +333,7 @@ menu:
     title-destroy: "Destroy Town"
   kingdom:
     join: "Join"
+    create: "Create"
     exile: "Exile"
     invites: "Invites"
     list: "List"
@@ -343,6 +346,7 @@ menu:
     disband: "Disband"
     capital: "Capital"
     description-join: "Request to join a kingdom, or create your own with /k kingdom create"
+    description-create: "Create a new Kingdom Capital at your current location"
     description-exile: "Leave your current kingdom and become a barbarian"
     description-invites: "View your kingdom invites"
     description-list: "View all kingdoms"

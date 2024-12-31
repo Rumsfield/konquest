@@ -9,11 +9,9 @@ import com.github.rumsfield.konquest.display.icon.AdminCommandIcon;
 import com.github.rumsfield.konquest.display.icon.CommandIcon;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
-import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -34,22 +32,11 @@ public class HelpMenu extends StateMenu {
         QUEST
     }
 
-    private final String titleColor;
-    private final String nameColor;
-    private final String loreColor;
-    private final String hintColor;
-
     private final KonPlayer player;
 
     public HelpMenu(Konquest konquest, KonPlayer player) {
         super(konquest, MenuState.ROOT, null);
         this.player = player;
-
-        /* Formats */
-        titleColor = DisplayManager.titleFormat;
-        nameColor = DisplayManager.nameFormat;
-        loreColor = DisplayManager.loreFormat;
-        hintColor = DisplayManager.hintFormat;
 
         /* Initialize menu view */
         setCurrentView(MenuState.ROOT);
@@ -62,7 +49,6 @@ public class HelpMenu extends StateMenu {
     private DisplayMenu createRootView() {
         DisplayMenu result;
         MenuIcon icon;
-        List<String> loreList = new ArrayList<>();
 
         /* Icon slot indexes */
         // Row 0: 0  1  2  3  4  5  6  7  8
@@ -72,47 +58,42 @@ public class HelpMenu extends StateMenu {
         int ROOT_SLOT_COMMANDS 		    = 6;
         int ROOT_SLOT_COMMANDS_ADMIN 	= 8;
 
-        result = new DisplayMenu(1, titleColor+MessagePath.MENU_HELP_TITLE.getMessage());
+        result = new DisplayMenu(1, MessagePath.MENU_HELP_TITLE.getMessage());
 
         /* Getting Started */
-        loreList.clear();
-        loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_START.getMessage(),loreColor));
-        loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        icon = new InfoIcon(nameColor+MessagePath.MENU_HELP_START.getMessage(), loreList, Material.WOODEN_PICKAXE, ROOT_SLOT_START, true);
+        icon = new InfoIcon(MessagePath.MENU_HELP_START.getMessage(), Material.WOODEN_PICKAXE, ROOT_SLOT_START, true);
+        icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_START.getMessage());
+        icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         icon.setState(MenuState.START);
         result.addIcon(icon);
 
         /* Community Link */
         String communityLink = getKonquest().getCore().getString(CorePath.COMMUNITY_LINK.getPath(),"");
-        loreList.clear();
-        loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_COMMUNITY.getMessage(),loreColor));
-        loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        InfoIcon communityIcon = new InfoIcon(nameColor+MessagePath.MENU_HELP_COMMUNITY.getMessage(), loreList, Material.MINECART, ROOT_SLOT_COMMUNITY, true);
+        InfoIcon communityIcon = new InfoIcon(MessagePath.MENU_HELP_COMMUNITY.getMessage(), Material.MINECART, ROOT_SLOT_COMMUNITY, true);
+        communityIcon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_COMMUNITY.getMessage());
+        communityIcon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         communityIcon.setInfo(""+ChatColor.LIGHT_PURPLE+ChatColor.UNDERLINE+communityLink);
         communityIcon.setState(MenuState.COMMUNITY);
         result.addIcon(communityIcon);
 
         /* Main Menu */
-        loreList.clear();
-        loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_MAIN.getMessage(),loreColor));
-        loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        icon = new InfoIcon(nameColor+MessagePath.MENU_HELP_MAIN.getMessage(), loreList, Material.LADDER, ROOT_SLOT_MAIN, true);
+        icon = new InfoIcon(MessagePath.MENU_HELP_MAIN.getMessage(), Material.LADDER, ROOT_SLOT_MAIN, true);
+        icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_MAIN.getMessage());
+        icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         icon.setState(MenuState.MAIN);
         result.addIcon(icon);
 
         /* Commands */
-        loreList.clear();
-        loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_COMMANDS.getMessage(),loreColor));
-        loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        icon = new InfoIcon(nameColor+MessagePath.MENU_HELP_COMMANDS.getMessage(), loreList, Material.TORCH, ROOT_SLOT_COMMANDS, true);
+        icon = new InfoIcon(MessagePath.MENU_HELP_COMMANDS.getMessage(), Material.TORCH, ROOT_SLOT_COMMANDS, true);
+        icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_COMMANDS.getMessage());
+        icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         icon.setState(MenuState.COMMANDS);
         result.addIcon(icon);
 
         /* Admin Commands */
-        loreList.clear();
-        loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_ADMIN.getMessage(),loreColor));
-        loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-        icon = new InfoIcon(nameColor+MessagePath.MENU_HELP_ADMIN.getMessage(), loreList, Material.NETHER_STAR, ROOT_SLOT_COMMANDS_ADMIN, true);
+        icon = new InfoIcon(MessagePath.MENU_HELP_ADMIN.getMessage(), Material.NETHER_STAR, ROOT_SLOT_COMMANDS_ADMIN, true);
+        icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_ADMIN.getMessage());
+        icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         icon.setState(MenuState.COMMANDS_ADMIN);
         result.addIcon(icon);
 
@@ -130,7 +111,6 @@ public class HelpMenu extends StateMenu {
     private DisplayMenu createStartView() {
         DisplayMenu result;
         MenuIcon icon;
-        List<String> loreList = new ArrayList<>();
         int numRows = 1;
         boolean isQuestEnabled = false;
 
@@ -144,7 +124,7 @@ public class HelpMenu extends StateMenu {
             isQuestEnabled = true;
         }
 
-        result = new DisplayMenu(numRows, titleColor+MessagePath.MENU_HELP_START.getMessage());
+        result = new DisplayMenu(numRows, MessagePath.MENU_HELP_START.getMessage());
 
         /* Tips */
         String[] tips = {
@@ -170,18 +150,16 @@ public class HelpMenu extends StateMenu {
                 Material.MAGENTA_BANNER
         };
         for(int i = 0; i < 9; i++) {
-            String tip = tips[i];
-            Material iconMaterial = iconMaterials[i];
-            loreList = new ArrayList<>(HelperUtil.stringPaginate(tip, ChatColor.LIGHT_PURPLE));
-            result.addIcon(new InfoIcon(MessagePath.LABEL_INFORMATION.getMessage(), loreList, iconMaterial, i, false));
+            icon = new InfoIcon(MessagePath.LABEL_INFORMATION.getMessage(), iconMaterials[i], i, false);
+            icon.addDescription(tips[i]);
+            result.addIcon(icon);
         }
 
         /* Quest Book */
         if (isQuestEnabled) {
-            loreList.clear();
-            loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_HELP_DESCRIPTION_QUEST.getMessage(), loreColor));
-            loreList.add(hintColor + MessagePath.MENU_HELP_HINT.getMessage());
-            icon = new InfoIcon(nameColor + MessagePath.MENU_HELP_QUEST.getMessage(), loreList, Material.WRITABLE_BOOK, START_SLOT_QUEST, true);
+            icon = new InfoIcon(MessagePath.MENU_HELP_QUEST.getMessage(), Material.WRITABLE_BOOK, START_SLOT_QUEST, true);
+            icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_QUEST.getMessage());
+            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
             icon.setState(MenuState.QUEST);
             result.addIcon(icon);
         }
@@ -201,12 +179,12 @@ public class HelpMenu extends StateMenu {
     private List<DisplayMenu> createCommandView(MenuState context) {
         // Context-specific info
         ArrayList<MenuIcon> commandIcons = new ArrayList<>();
-        List<String> loreList = new ArrayList<>();
+        MenuIcon icon;
         String title = "";
         /* Commands (by context) */
         switch (context) {
             case COMMANDS:
-                title = titleColor+MessagePath.MENU_HELP_TITLE_COMMANDS.getMessage();
+                title = MessagePath.MENU_HELP_TITLE_COMMANDS.getMessage();
                 double cost_spy = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_SPY.getPath(),0.0);
                 double cost_settle = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath(),0.0);
                 double cost_settle_incr = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath(),0.0);
@@ -237,23 +215,23 @@ public class HelpMenu extends StateMenu {
                             cost_incr = 0;
                             break;
                     }
-                    loreList.clear();
                     boolean isPermission = player.getBukkitPlayer().hasPermission(cmd.permission());
+                    icon = new CommandIcon(cmd, isPermission, cost, cost_incr, 0);
                     if (isPermission) {
-                        loreList.add(hintColor+MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+                        icon.addHint(MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
                     }
-                    commandIcons.add(new CommandIcon(cmd, isPermission, cost, cost_incr, loreList, 0));
+                    commandIcons.add(icon);
                 }
                 break;
             case COMMANDS_ADMIN:
-                title = titleColor+MessagePath.MENU_HELP_TITLE_ADMIN.getMessage();
+                title = MessagePath.MENU_HELP_TITLE_ADMIN.getMessage();
                 for(AdminCommandType adminCmd : AdminCommandType.values()) {
-                    loreList.clear();
                     boolean isPermission = player.getBukkitPlayer().hasPermission(adminCmd.permission());
+                    icon = new AdminCommandIcon(adminCmd, isPermission, 0);
                     if (isPermission) {
-                        loreList.add(hintColor+MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+                        icon.addHint(MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
                     }
-                    commandIcons.add(new AdminCommandIcon(adminCmd, isPermission, loreList, 0));
+                    commandIcons.add(icon);
                 }
                 break;
         }

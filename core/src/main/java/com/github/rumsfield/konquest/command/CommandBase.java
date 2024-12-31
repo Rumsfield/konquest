@@ -94,6 +94,18 @@ public abstract class CommandBase {
         return usageStrings;
     }
 
+    public List<String> getArgumentUsage(String subArg) {
+        List<String> usageStrings = new ArrayList<>();
+        for (CommandArgument cmdArg : arguments) {
+            if (cmdArg.matchesName(subArg)) {
+                for (String argUsage : cmdArg.getUsageStrings(hasOptionalArgs)) {
+                    usageStrings.add(getBaseUsage()+" "+ChatColor.AQUA+formatUsageString(argUsage));
+                }
+            }
+        }
+        return usageStrings;
+    }
+
     private String formatUsageString(String inArgs) {
         return inArgs
                 .replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA)

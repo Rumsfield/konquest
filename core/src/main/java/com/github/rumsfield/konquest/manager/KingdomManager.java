@@ -230,6 +230,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public boolean getIsTownDestroyMasterEnable() {
 		return townDestroyMasterEnable;
 	}
+
+	public boolean isKingdomCreateAdminOnly() {
+		return isAdminOnly;
+	}
 	
 	@Override
 	public void onEndTimer(int taskID) {

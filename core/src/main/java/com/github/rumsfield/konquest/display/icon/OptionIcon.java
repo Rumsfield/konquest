@@ -1,32 +1,20 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonTownOption;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
 
 public class OptionIcon extends MenuIcon {
 	
 	private final KonTownOption option;
-	private final String name;
-	private final List<String> lore;
-	private final Material mat;
-	private final ItemStack item;
 	
-	public OptionIcon(KonTownOption option, String name, List<String> lore, Material mat, int index) {
+	public OptionIcon(KonTownOption option, int index) {
 		super(index);
 		this.option = option;
-		this.name = name;
-		this.lore = lore;
-		this.mat = mat;
-		this.item = initItem();
-	}
-	
-	private ItemStack initItem() {
-		String name = getName();
-		return CompatibilityUtil.buildItem(mat, name, lore);
+		// Item Lore
+		addDescription(option.getDescription());
 	}
 	
 	public KonTownOption getOption() {
@@ -35,12 +23,12 @@ public class OptionIcon extends MenuIcon {
 
 	@Override
 	public String getName() {
-		return name;
+		return DisplayManager.nameFormat+option.getName();
 	}
 
 	@Override
 	public ItemStack getItem() {
-		return item;
+		return CompatibilityUtil.buildItem(option.getDisplayMaterial(), getName(), getLore());
 	}
 
 	@Override

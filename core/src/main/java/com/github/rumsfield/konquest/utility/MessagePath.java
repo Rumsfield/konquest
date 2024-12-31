@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 
 public enum MessagePath {
 
+	LABEL_ADMIN                                 (0, "label.admin"),
 	LABEL_ADMIN_KINGDOM                         (0, "label.admin-kingdom"),
 	LABEL_ALLIED_BUILDING                       (0, "label.allied-building"),
 	LABEL_ARMOR                             	(0, "label.armor"),
@@ -84,6 +85,7 @@ public enum MessagePath {
 	LABEL_TOTAL_PLAYERS                         (0, "label.total-players"),
 	LABEL_TOWN                                  (0, "label.town"),
 	LABEL_TOWNS                                 (0, "label.towns"),
+	LABEL_TOWN_ROLE                             (0, "label.town-role"),
 	LABEL_TRUE                               	(0, "label.true"),
 	LABEL_UNAVAILABLE                           (0, "label.unavailable"),
 	LABEL_UPGRADES                              (0, "label.upgrades"),
@@ -312,6 +314,7 @@ public enum MessagePath {
 	MENU_TOWN_TITLE_MANAGE           			(0, "menu.town.title-manage"),
 	MENU_TOWN_TITLE_DESTROY           			(0, "menu.town.title-destroy"),
 	MENU_KINGDOM_JOIN                           (0, "menu.kingdom.join"),
+	MENU_KINGDOM_CREATE                         (0, "menu.kingdom.create"),
 	MENU_KINGDOM_EXILE                          (0, "menu.kingdom.exile"),
 	MENU_KINGDOM_INVITES                        (0, "menu.kingdom.invites"),
 	MENU_KINGDOM_LIST                           (0, "menu.kingdom.list"),
@@ -324,6 +327,7 @@ public enum MessagePath {
 	MENU_KINGDOM_DISBAND                        (0, "menu.kingdom.disband"),
 	MENU_KINGDOM_CAPITAL                        (0, "menu.kingdom.capital"),
 	MENU_KINGDOM_DESCRIPTION_JOIN               (0, "menu.kingdom.description-join"),
+	MENU_KINGDOM_DESCRIPTION_CREATE             (0, "menu.kingdom.description-create"),
 	MENU_KINGDOM_DESCRIPTION_EXILE              (0, "menu.kingdom.description-exile"),
 	MENU_KINGDOM_DESCRIPTION_INVITES            (0, "menu.kingdom.description-invites"),
 	MENU_KINGDOM_DESCRIPTION_LIST               (0, "menu.kingdom.description-list"),

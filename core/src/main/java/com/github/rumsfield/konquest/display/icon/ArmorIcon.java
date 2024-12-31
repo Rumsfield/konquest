@@ -8,38 +8,17 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ArmorIcon extends MenuIcon {
 
 	private final KonArmor armor;
-	private final int population;
-	private final int land;
-	ItemStack item;
-
-	private final String nameColor = DisplayManager.nameFormat;
-	private final String loreColor = DisplayManager.loreFormat;
-	private final String valueColor = DisplayManager.valueFormat;
-	private final String hintColor = DisplayManager.hintFormat;
 	
-	public ArmorIcon(KonArmor armor, int population, int land, int index) {
+	public ArmorIcon(KonArmor armor, int cost, int index) {
 		super(index);
 		this.armor = armor;
-		this.population = population;
-		this.land = land;
-		this.item = initItem();
-	}
-	
-	private ItemStack initItem() {
-		Material itemMaterial = Material.DIAMOND_CHESTPLATE;
-		int totalCost = armor.getCost() + (armor.getCostPerResident()*population) + (armor.getCostPerLand()*land);
-		List<String> loreList = new ArrayList<>();
-		loreList.add(ChatColor.DARK_AQUA+""+armor.getBlocks());
-    	loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+totalCost);
-		loreList.add(hintColor+MessagePath.MENU_SHIELD_HINT.getMessage());
-		String name = nameColor+armor.getId()+" "+MessagePath.LABEL_ARMOR.getMessage();
-		return CompatibilityUtil.buildItem(itemMaterial, name, loreList, true);
+		// Item Lore
+		addNameValue(MessagePath.LABEL_ARMOR.getMessage(), ""+ChatColor.DARK_AQUA+armor.getBlocks());
+		addNameValue(MessagePath.LABEL_COST.getMessage(), cost);
+		addHint(MessagePath.MENU_SHIELD_HINT.getMessage());
 	}
 	
 	public KonArmor getArmor() {
@@ -48,12 +27,12 @@ public class ArmorIcon extends MenuIcon {
 
 	@Override
 	public String getName() {
-		return armor.getId();
+		return DisplayManager.nameFormat+armor.getId()+" "+MessagePath.LABEL_ARMOR.getMessage();
 	}
 
 	@Override
 	public ItemStack getItem() {
-		return item;
+		return CompatibilityUtil.buildItem(Material.DIAMOND_CHESTPLATE, getName(), getLore(), true);
 	}
 
 	@Override

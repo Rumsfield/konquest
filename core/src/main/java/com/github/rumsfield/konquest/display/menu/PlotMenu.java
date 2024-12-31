@@ -50,14 +50,6 @@ public class PlotMenu extends StateMenu {
         EDIT_PLAYER_REMOVE
     }
 
-    private final String titleColor;
-    private final String nameColor;
-    private final String propertyColor;
-    private final String alertColor;
-    private final String loreColor;
-    private final String valueColor;
-    private final String hintColor;
-
     private final int INDEX_SCROLL_LEFT = 0;
     private final int INDEX_SCROLL_UP = 1;
     private final int INDEX_SCROLL_DOWN = 2;
@@ -97,15 +89,6 @@ public class PlotMenu extends StateMenu {
             this.origin = HelperUtil.toPoint(town.getCenterLoc());
         }
 
-        /* Formats */
-        titleColor = DisplayManager.titleFormat;
-        nameColor = DisplayManager.nameFormat;
-        propertyColor = DisplayManager.propertyFormat;
-        alertColor = DisplayManager.alertFormat;
-        loreColor = DisplayManager.loreFormat;
-        valueColor = DisplayManager.valueFormat;
-        hintColor = DisplayManager.hintFormat;
-
         /* Initialize menu view */
         setCurrentView(MenuState.ROOT);
 
@@ -127,23 +110,23 @@ public class PlotMenu extends StateMenu {
         int EDIT_SLOT_REMOVE_PLAYER 	= 6;
         int EDIT_SLOT_SHOW_PLAYER 	    = 7;
 
-        icon = new InfoIcon(nameColor+MessagePath.MENU_PLOTS_EDIT_ADD_LAND.getMessage(), Collections.emptyList(), Material.GRASS_BLOCK, EDIT_SLOT_ADD_LAND, true);
+        icon = new InfoIcon(MessagePath.MENU_PLOTS_EDIT_ADD_LAND.getMessage(), Material.GRASS_BLOCK, EDIT_SLOT_ADD_LAND, true);
         icon.setState(MenuState.EDIT_LAND_ADD);
         result.addIcon(icon);
 
-        icon = new InfoIcon(nameColor+MessagePath.MENU_PLOTS_EDIT_REMOVE_LAND.getMessage(), Collections.emptyList(), Material.COARSE_DIRT, EDIT_SLOT_REMOVE_LAND, true);
+        icon = new InfoIcon(MessagePath.MENU_PLOTS_EDIT_REMOVE_LAND.getMessage(), Material.COARSE_DIRT, EDIT_SLOT_REMOVE_LAND, true);
         icon.setState(MenuState.EDIT_LAND_REMOVE);
         result.addIcon(icon);
 
-        icon = new InfoIcon(nameColor+MessagePath.MENU_PLOTS_EDIT_ADD_PLAYERS.getMessage(), Collections.emptyList(), Material.PLAYER_HEAD, EDIT_SLOT_ADD_PLAYER, true);
+        icon = new InfoIcon(MessagePath.MENU_PLOTS_EDIT_ADD_PLAYERS.getMessage(), Material.PLAYER_HEAD, EDIT_SLOT_ADD_PLAYER, true);
         icon.setState(MenuState.EDIT_PLAYER_ADD);
         result.addIcon(icon);
 
-        icon = new InfoIcon(nameColor+MessagePath.MENU_PLOTS_EDIT_REMOVE_PLAYERS.getMessage(), Collections.emptyList(), Material.SKELETON_SKULL, EDIT_SLOT_REMOVE_PLAYER, true);
+        icon = new InfoIcon(MessagePath.MENU_PLOTS_EDIT_REMOVE_PLAYERS.getMessage(), Material.SKELETON_SKULL, EDIT_SLOT_REMOVE_PLAYER, true);
         icon.setState(MenuState.EDIT_PLAYER_REMOVE);
         result.addIcon(icon);
 
-        icon = new InfoIcon(nameColor+MessagePath.MENU_PLOTS_EDIT_SHOW_PLAYERS.getMessage(), Collections.emptyList(), Material.PAINTING, EDIT_SLOT_SHOW_PLAYER, true);
+        icon = new InfoIcon(MessagePath.MENU_PLOTS_EDIT_SHOW_PLAYERS.getMessage(), Material.PAINTING, EDIT_SLOT_SHOW_PLAYER, true);
         icon.setState(MenuState.EDIT_PLAYER_SHOW);
         result.addIcon(icon);
 
@@ -163,6 +146,7 @@ public class PlotMenu extends StateMenu {
     private DisplayMenu createLandView(MenuState context) {
         DisplayMenu result = new DisplayMenu(5, getTitle(context));
         List<String> loreList;
+        List<String> hintList;
         InfoIcon icon;
         Point drawPoint;
         KonPlot drawPlot;
@@ -177,6 +161,7 @@ public class PlotMenu extends StateMenu {
                 if(town.getChunkList().containsKey(drawPoint)) {
                     // This tile is claimed by the town
                     loreList = new ArrayList<>();
+                    hintList = new ArrayList<>();
                     boolean isClickable = false;
                     Material landMat = Material.GREEN_STAINED_GLASS_PANE;
                     String landTitle = ChatColor.GREEN+MessagePath.MENU_PLOTS_TOWN_LAND.getMessage()+" | "+drawPoint.x+","+drawPoint.y;
@@ -234,21 +219,21 @@ public class PlotMenu extends StateMenu {
                     if(isPlot) {
                         if(context.equals(MenuState.ROOT_DELETE)) {
                             isClickable = true;
-                            loreList.add(hintColor+MessagePath.MENU_PLOTS_CLICK_DELETE.getMessage());
+                            hintList.add(MessagePath.MENU_PLOTS_CLICK_DELETE.getMessage());
                         } else if(context.equals(MenuState.ROOT_EDIT)) {
                             isClickable = true;
-                            loreList.add(hintColor+MessagePath.MENU_PLOTS_CLICK_EDIT.getMessage());
+                            hintList.add(MessagePath.MENU_PLOTS_CLICK_EDIT.getMessage());
                         } else if(context.equals(MenuState.EDIT_LAND_REMOVE)) {
                             isClickable = true;
-                            loreList.add(hintColor+MessagePath.MENU_PLOTS_CLICK_REMOVE_CHUNK.getMessage());
+                            hintList.add(MessagePath.MENU_PLOTS_CLICK_REMOVE_CHUNK.getMessage());
                         }
                     } else {
                         if(context.equals(MenuState.ROOT_CREATE)) {
                             isClickable = true;
-                            loreList.add(hintColor+MessagePath.MENU_PLOTS_CLICK_CREATE.getMessage());
+                            hintList.add(MessagePath.MENU_PLOTS_CLICK_CREATE.getMessage());
                         } else if(context.equals(MenuState.EDIT_LAND_ADD) || context.equals(MenuState.CREATE_LAND_ADD)) {
                             isClickable = true;
-                            loreList.add(hintColor+MessagePath.MENU_PLOTS_CLICK_ADD_CHUNK.getMessage());
+                            hintList.add(MessagePath.MENU_PLOTS_CLICK_ADD_CHUNK.getMessage());
                         }
                     }
                     // Check for monument chunk
@@ -264,7 +249,13 @@ public class PlotMenu extends StateMenu {
                         loreList.add(ChatColor.YELLOW+MessagePath.MENU_PLOTS_HERE.getMessage());
                     }
                     // Build icon and add to menu view
-                    icon = new InfoIcon(landTitle,loreList,landMat,index,isClickable);
+                    icon = new InfoIcon(landTitle,landMat,index,isClickable);
+                    for (String loreLine : loreList) {
+                        icon.addDescription(loreLine);
+                    }
+                    for (String hintLine : hintList) {
+                        icon.addHint(hintLine);
+                    }
                     result.addIcon(icon);
                 }
                 index++;
@@ -321,33 +312,35 @@ public class PlotMenu extends StateMenu {
         if (editPlot == null || town == null) return Collections.emptyList();
         List<OfflinePlayer> players = new ArrayList<>();
         ArrayList<MenuIcon> icons = new ArrayList<>();
+        MenuIcon icon;
 
         // Determine list of players given context
-        String loreStr;
+        String hintStr;
         switch (context) {
             case CREATE_PLAYER_ADD:
             case EDIT_PLAYER_ADD:
                 players.addAll(town.getPlayerResidents());
                 players.removeAll(editPlot.getUserOfflinePlayers());
-                loreStr = hintColor+MessagePath.MENU_PLOTS_CLICK_ADD_PLAYER.getMessage();
+                hintStr = MessagePath.MENU_PLOTS_CLICK_ADD_PLAYER.getMessage();
                 break;
             case EDIT_PLAYER_REMOVE:
                 players.addAll(editPlot.getUserOfflinePlayers());
-                loreStr = hintColor+MessagePath.MENU_PLOTS_CLICK_REMOVE_PLAYER.getMessage();
+                hintStr = MessagePath.MENU_PLOTS_CLICK_REMOVE_PLAYER.getMessage();
                 break;
             case EDIT_PLAYER_SHOW:
                 players.addAll(editPlot.getUserOfflinePlayers());
-                loreStr = hintColor+MessagePath.MENU_PLOTS_CLICK_MOVE_PLAYER.getMessage();
+                hintStr = MessagePath.MENU_PLOTS_CLICK_MOVE_PLAYER.getMessage();
                 break;
             default:
                 return null;
         }
 
         /* Player Icons */
+        String contextColor = Konquest.friendColor2;
         for (OfflinePlayer currentPlayer : players) {
-            ArrayList<String> loreList = new ArrayList<>();
-            loreList.add(loreStr);
-            icons.add(new PlayerIcon(nameColor+currentPlayer.getName(),loreList,currentPlayer,0,true, PlayerIcon.PlayerIconAction.DISPLAY_INFO));
+            icon = new PlayerIcon(currentPlayer, contextColor, 0,true, PlayerIcon.PlayerIconAction.DISPLAY_INFO);
+            icon.addHint(hintStr);
+            icons.add(icon);
         }
 
         /* Make Pages (includes navigation) */
@@ -687,36 +680,36 @@ public class PlotMenu extends StateMenu {
         String result = "";
         switch(context) {
             case ROOT:
-                result = titleColor+MessagePath.MENU_PLOTS_TITLE_PLOTS.getMessage();
+                result = MessagePath.MENU_PLOTS_TITLE_PLOTS.getMessage();
                 break;
             case ROOT_CREATE:
-                result = titleColor+MessagePath.MENU_PLOTS_TITLE_CREATE.getMessage();
+                result = MessagePath.MENU_PLOTS_TITLE_CREATE.getMessage();
                 break;
             case ROOT_DELETE:
-                result = titleColor+MessagePath.MENU_PLOTS_TITLE_DELETE.getMessage();
+                result = MessagePath.MENU_PLOTS_TITLE_DELETE.getMessage();
                 break;
             case ROOT_EDIT:
-                result = titleColor+MessagePath.MENU_PLOTS_TITLE_EDIT.getMessage();
+                result = MessagePath.MENU_PLOTS_TITLE_EDIT.getMessage();
                 break;
             case CREATE_LAND_ADD:
             case EDIT_LAND_ADD:
-                result = titleColor+MessagePath.MENU_PLOTS_TITLE_ADD_LAND.getMessage();
+                result = MessagePath.MENU_PLOTS_TITLE_ADD_LAND.getMessage();
                 break;
             case CREATE_PLAYER_ADD:
             case EDIT_PLAYER_ADD:
-                result = titleColor+MessagePath.MENU_PLOTS_TITLE_ADD_PLAYERS.getMessage();
+                result = MessagePath.MENU_PLOTS_TITLE_ADD_PLAYERS.getMessage();
                 break;
             case EDIT:
-                result = titleColor+MessagePath.MENU_PLOTS_TITLE_EDIT_OPTIONS.getMessage();
+                result = MessagePath.MENU_PLOTS_TITLE_EDIT_OPTIONS.getMessage();
                 break;
             case EDIT_LAND_REMOVE:
-                result = titleColor+MessagePath.MENU_PLOTS_TITLE_REMOVE_LAND.getMessage();
+                result = MessagePath.MENU_PLOTS_TITLE_REMOVE_LAND.getMessage();
                 break;
             case EDIT_PLAYER_SHOW:
-                result = titleColor+MessagePath.MENU_PLOTS_TITLE_SHOW_PLAYERS.getMessage();
+                result = MessagePath.MENU_PLOTS_TITLE_SHOW_PLAYERS.getMessage();
                 break;
             case EDIT_PLAYER_REMOVE:
-                result = titleColor+MessagePath.MENU_PLOTS_TITLE_REMOVE_PLAYERS.getMessage();
+                result = MessagePath.MENU_PLOTS_TITLE_REMOVE_PLAYERS.getMessage();
                 break;
             default:
                 break;
@@ -791,49 +784,49 @@ public class PlotMenu extends StateMenu {
     private void addNavScrollLeft(DisplayMenu view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_SCROLL_LEFT;
-        view.addIcon(new InfoIcon(ChatColor.GOLD+"\u25C0",Collections.emptyList(),Material.STONE_BUTTON,index,true));
+        view.addIcon(new InfoIcon(ChatColor.GOLD+"\u25C0",Material.STONE_BUTTON,index,true));
     }
 
     private void addNavScrollUp(DisplayMenu view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_SCROLL_UP;
-        view.addIcon(new InfoIcon(ChatColor.GOLD+"\u25B2",Collections.emptyList(),Material.STONE_BUTTON,index,true));
+        view.addIcon(new InfoIcon(ChatColor.GOLD+"\u25B2",Material.STONE_BUTTON,index,true));
     }
 
     private void addNavScrollDown(DisplayMenu view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_SCROLL_DOWN;
-        view.addIcon(new InfoIcon(ChatColor.GOLD+"\u25BC",Collections.emptyList(),Material.STONE_BUTTON,index,true));
+        view.addIcon(new InfoIcon(ChatColor.GOLD+"\u25BC",Material.STONE_BUTTON,index,true));
     }
 
     private void addNavScrollRight(DisplayMenu view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_SCROLL_RIGHT;
-        view.addIcon(new InfoIcon(ChatColor.GOLD+"\u25B6",Collections.emptyList(),Material.STONE_BUTTON,index,true));
+        view.addIcon(new InfoIcon(ChatColor.GOLD+"\u25B6",Material.STONE_BUTTON,index,true));
     }
 
     private void addNavCreate(DisplayMenu view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_CREATE;
-        view.addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_CREATE.getMessage(),Collections.emptyList(),Material.OAK_SAPLING,index,true));
+        view.addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_CREATE.getMessage(),Material.OAK_SAPLING,index,true));
     }
 
     private void addNavDelete(DisplayMenu view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_DELETE;
-        view.addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_DELETE.getMessage(),Collections.emptyList(),Material.BARRIER,index,true));
+        view.addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_DELETE.getMessage(),Material.BARRIER,index,true));
     }
 
     private void addNavEdit(DisplayMenu view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_EDIT;
-        view.addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_EDIT.getMessage(),Collections.emptyList(),Material.WRITABLE_BOOK,index,true));
+        view.addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_EDIT.getMessage(),Material.WRITABLE_BOOK,index,true));
     }
 
     private void addNavFinish(DisplayMenu view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_FINISH;
-        view.addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_FINISH.getMessage(),Collections.emptyList(),Material.WRITTEN_BOOK,index,true));
+        view.addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_FINISH.getMessage(),Material.WRITTEN_BOOK,index,true));
     }
 
 

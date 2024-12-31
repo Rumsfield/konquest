@@ -1,17 +1,11 @@
 package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.model.KonPrefixType;
-import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.Collections;
-import java.util.List;
 
 public class PrefixIcon extends MenuIcon {
 
@@ -21,35 +15,14 @@ public class PrefixIcon extends MenuIcon {
     }
 	
 	private final PrefixIconAction action;
-	private final List<String> lore;
 	private final boolean isClickable;
 	private final KonPrefixType prefix;
-	private final ItemStack item;
 	
-	public PrefixIcon(KonPrefixType prefix, List<String> lore, int index, boolean isClickable, PrefixIconAction action) {
+	public PrefixIcon(KonPrefixType prefix, int index, boolean isClickable, PrefixIconAction action) {
 		super(index);
 		this.prefix = prefix;
-		this.lore = lore;
 		this.isClickable = isClickable;
 		this.action = action;
-		this.item = initItem();
-	}
-	
-	private ItemStack initItem() {
-		Material material = Material.IRON_BARS;
-		ChatColor iconColor = ChatColor.GRAY;
-		String name;
-		if(isClickable) {
-			material = prefix.category().getMaterial();
-			iconColor = ChatColor.DARK_GREEN;
-		}
-		if(action.equals(PrefixIconAction.DISABLE_PREFIX)) {
-			material = Material.MILK_BUCKET;
-			name = ChatColor.DARK_RED+MessagePath.MENU_PREFIX_DISABLE.getMessage();
-		} else {
-			name = iconColor+prefix.getName();
-		}
-		return CompatibilityUtil.buildItem(material, name, lore);
 	}
 	
 	public PrefixIconAction getAction() {
@@ -62,12 +35,25 @@ public class PrefixIcon extends MenuIcon {
 
 	@Override
 	public String getName() {
-		return prefix.getName();
+		String name;
+		if(action.equals(PrefixIconAction.DISABLE_PREFIX)) {
+			name = ChatColor.DARK_RED+MessagePath.MENU_PREFIX_DISABLE.getMessage();
+		} else {
+			ChatColor nameColor = isClickable ? ChatColor.DARK_GREEN : ChatColor.GRAY;
+			name = nameColor+prefix.getName();
+		}
+		return name;
 	}
 
 	@Override
 	public ItemStack getItem() {
-		return item;
+		Material material;
+		if(action.equals(PrefixIconAction.DISABLE_PREFIX)) {
+			material = Material.MILK_BUCKET;
+		} else {
+			material = isClickable ? prefix.category().getMaterial() : Material.IRON_BARS;
+		}
+		return CompatibilityUtil.buildItem(material, getName(), getLore());
 	}
 
 	@Override

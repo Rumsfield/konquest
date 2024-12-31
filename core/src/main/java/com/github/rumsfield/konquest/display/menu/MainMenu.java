@@ -11,13 +11,11 @@ import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class MainMenu extends StateMenu {
@@ -57,26 +55,11 @@ public class MainMenu extends StateMenu {
     private final int DASH_SLOT_FAVOR 	    = 13;
     private final int DASH_SLOT_SPY 	    = 14;
 
-    private final String titleColor;
-    private final String nameColor;
-    private final String alertColor;
-    private final String loreColor;
-    private final String valueColor;
-    private final String hintColor;
-
     private final KonPlayer player;
 
     public MainMenu(Konquest konquest, KonPlayer player) {
         super(konquest, HelpMenu.MenuState.ROOT, null);
         this.player = player;
-
-        /* Formats */
-        titleColor = DisplayManager.titleFormat;
-        nameColor = DisplayManager.nameFormat;
-        alertColor = DisplayManager.alertFormat;
-        loreColor = DisplayManager.loreFormat;
-        valueColor = DisplayManager.valueFormat;
-        hintColor = DisplayManager.hintFormat;
 
         /* Initialize menu view */
         setCurrentView(MenuState.ROOT);
@@ -93,154 +76,138 @@ public class MainMenu extends StateMenu {
      */
     private DisplayMenu createRootView() {
         DisplayMenu result;
-        List<String> loreList = new ArrayList<>();
+        MenuIcon icon;
         CommandType iconCommand;
         boolean isClickable;
 
-        result = new DisplayMenu(3, titleColor+MessagePath.MENU_MAIN_TITLE.getMessage());
+        result = new DisplayMenu(3, MessagePath.MENU_MAIN_TITLE.getMessage());
 
         /* Help Menu */
-        loreList.clear();
-        loreList.addAll(HelperUtil.stringPaginate(MessagePath.DESCRIPTION_HELP.getMessage(),loreColor));
-        loreList.add(hintColor+MessagePath.MENU_MAIN_HINT.getMessage());
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_HELP.getMessage(), loreList, CommandType.HELP.iconMaterial(), ROOT_SLOT_HELP, true));
+        icon = new InfoIcon(MessagePath.MENU_MAIN_HELP.getMessage(), CommandType.HELP.iconMaterial(), ROOT_SLOT_HELP, true);
+        icon.addDescription(MessagePath.DESCRIPTION_HELP.getMessage());
+        icon.addHint(MessagePath.MENU_MAIN_HINT.getMessage());
+        result.addIcon(icon);
 
         /* Dashboard */
-        loreList.clear();
-        loreList.addAll(HelperUtil.stringPaginate(MessagePath.MENU_MAIN_DESCRIPTION_DASHBOARD.getMessage(),loreColor));
-        loreList.add(hintColor+MessagePath.MENU_MAIN_HINT.getMessage());
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_DASHBOARD.getMessage(), loreList, Material.CLOCK, ROOT_SLOT_DASH, true));
+        icon = new InfoIcon(MessagePath.MENU_MAIN_DASHBOARD.getMessage(), Material.CLOCK, ROOT_SLOT_DASH, true);
+        icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_DASHBOARD.getMessage());
+        icon.addHint(MessagePath.MENU_MAIN_HINT.getMessage());
+        result.addIcon(icon);
 
         /* Kingdom Menu */
         iconCommand = CommandType.KINGDOM;
-        loreList.clear();
-        if (hasPermission(iconCommand)) {
-            isClickable = true;
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
-            loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
+        isClickable = hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_KINGDOM.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_KINGDOM, isClickable);
+        icon.addDescription(iconCommand.description());
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_KINGDOM.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_KINGDOM, isClickable));
+        result.addIcon(icon);
 
         /* Info Menu */
         iconCommand = CommandType.INFO;
-        loreList.clear();
-        if (hasPermission(iconCommand)) {
-            isClickable = true;
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
-            loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
+        isClickable = hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_INFO.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_INFO, isClickable);
+        icon.addDescription(iconCommand.description());
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_INFO.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_INFO, isClickable));
+        result.addIcon(icon);
 
-        /* Town Menu */
+        /* Town Menu (Unavailable to barbarians) */
         iconCommand = CommandType.TOWN;
-        loreList.clear();
-        if (hasPermission(iconCommand)) {
-            isClickable = true;
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
-            loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
+        isClickable = !player.isBarbarian() && hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_TOWN.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_TOWN, isClickable);
+        icon.addDescription(iconCommand.description());
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
+            if (player.isBarbarian()) {
+                icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
+            } else {
+                icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
+            }
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_TOWN.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_TOWN, isClickable));
+        result.addIcon(icon);
 
         /* Quest Book */
         iconCommand = CommandType.QUEST;
-        loreList.clear();
-        if (getKonquest().getDirectiveManager().isEnabled()) {
-            if (hasPermission(iconCommand)) {
-                isClickable = true;
-                loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
-                loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-            } else {
-                isClickable = false;
-                loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
-                loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
-            }
+        isClickable = getKonquest().getDirectiveManager().isEnabled() && hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_QUEST.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_QUEST, isClickable);
+        icon.addDescription(iconCommand.description());
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_DISABLED.getMessage());
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
+            if (getKonquest().getDirectiveManager().isEnabled()) {
+                icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
+            } else {
+                icon.addAlert(MessagePath.LABEL_DISABLED.getMessage());
+            }
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_QUEST.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_QUEST, isClickable));
+        result.addIcon(icon);
 
         /* Stats Book */
         iconCommand = CommandType.STATS;
-        loreList.clear();
-        if (hasPermission(iconCommand)) {
-            isClickable = true;
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
-            loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
+        isClickable = hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_STATS.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_STATS, isClickable);
+        icon.addDescription(iconCommand.description());
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_STATS.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_STATS, isClickable));
+        result.addIcon(icon);
 
         /* Prefix Menu */
         iconCommand = CommandType.PREFIX;
-        loreList.clear();
-        if (getKonquest().getAccomplishmentManager().isEnabled()) {
-            if (hasPermission(iconCommand)) {
-                isClickable = true;
-                loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
-                loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
-            } else {
-                isClickable = false;
-                loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
-                loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
-            }
+        isClickable = getKonquest().getAccomplishmentManager().isEnabled() && hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_PREFIX.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_PREFIX, isClickable);
+        icon.addDescription(iconCommand.description());
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_DISABLED.getMessage());
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
+            if (getKonquest().getAccomplishmentManager().isEnabled()) {
+                icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
+            } else {
+                icon.addAlert(MessagePath.LABEL_DISABLED.getMessage());
+            }
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_PREFIX.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_PREFIX, isClickable));
+        result.addIcon(icon);
 
         /* Score Menu */
         iconCommand = CommandType.SCORE;
-        loreList.clear();
-        if (hasPermission(iconCommand)) {
-            isClickable = true;
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
-            loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
+        isClickable = hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_SCORE.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_SCORE, isClickable);
+        icon.addDescription(iconCommand.description());
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_SCORE.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_SCORE, isClickable));
+        result.addIcon(icon);
 
         /* Travel Menu */
         iconCommand = CommandType.TRAVEL;
-        loreList.clear();
-        if (hasPermission(iconCommand)) {
-            isClickable = true;
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
-            loreList.add(hintColor+MessagePath.MENU_HELP_HINT.getMessage());
+        isClickable = hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_TRAVEL.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_TRAVEL, isClickable);
+        icon.addDescription(iconCommand.description());
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
-            loreList.addAll(HelperUtil.stringPaginate(iconCommand.description(),loreColor));
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_TRAVEL.getMessage(), loreList, iconCommand.iconMaterial(), ROOT_SLOT_TRAVEL, isClickable));
+        result.addIcon(icon);
 
         /* Navigation */
         addNavEmpty(result);
         addNavClose(result);
 
         /* Secret */
-        result.addIcon(new InfoIcon(" ", Collections.emptyList(), Material.GRAY_STAINED_GLASS_PANE, ROOT_SLOT_SECRET, true));
+        result.addIcon(new InfoIcon(" ", Material.GRAY_STAINED_GLASS_PANE, ROOT_SLOT_SECRET, true));
 
         return result;
     }
@@ -251,15 +218,15 @@ public class MainMenu extends StateMenu {
      */
     private DisplayMenu createSecretView() {
         DisplayMenu result;
-        List<String> loreList = new ArrayList<>();
+        MenuIcon icon;
 
-        result = new DisplayMenu(1, titleColor+"Secret Menu");
+        result = new DisplayMenu(1, "Secret Menu");
 
         /* TODO */
-        loreList.clear();
-        loreList.addAll(HelperUtil.stringPaginate("Placeholder icon",loreColor));
-        loreList.add(hintColor+"Do not click");
-        result.addIcon(new InfoIcon(nameColor+"TODO", loreList, Material.SLIME_BALL, 0, false));
+        icon = new InfoIcon("TODO", Material.SLIME_BALL, 0, false);
+        icon.addDescription("Placeholder icon");
+        icon.addHint("Do not click");
+        result.addIcon(icon);
 
         /* Navigation */
         addNavEmpty(result);
@@ -275,119 +242,129 @@ public class MainMenu extends StateMenu {
      */
     private DisplayMenu createDashboardView() {
         DisplayMenu result;
-        List<String> loreList = new ArrayList<>();
+        MenuIcon icon;
         CommandType iconCommand;
         AdminCommandType iconAdminCommand;
+        Material iconMaterial;
         boolean isClickable;
         boolean isPermission;
+        boolean currentValue;
 
-        result = new DisplayMenu(2, titleColor+MessagePath.MENU_MAIN_TITLE_DASHBOARD.getMessage());
+        result = new DisplayMenu(2, MessagePath.MENU_MAIN_TITLE_DASHBOARD.getMessage());
 
         /* Map Auto */
         iconCommand = CommandType.MAP;
-        loreList.clear();
-        loreList.add(valueColor + getDisplayValue(player.isMapAuto()));
-        if (hasPermission(iconCommand)) {
-            isClickable = true;
-            loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+        currentValue = player.isMapAuto();
+        iconMaterial = currentValue ? Material.LIGHT_GRAY_WOOL : Material.LIGHT_GRAY_CARPET;
+        isClickable = hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_MAP_AUTO.getMessage(), iconMaterial, DASH_SLOT_MAP_AUTO, isClickable);
+        icon.addDescription(getDisplayValue(currentValue));
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_OPTIONS_HINT.getMessage());
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_MAP_AUTO.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_MAP_AUTO, isClickable));
+        result.addIcon(icon);
 
         /* Kingdom Chat */
         iconCommand = CommandType.CHAT;
-        loreList.clear();
-        loreList.add(valueColor + getDisplayValue(!player.isGlobalChat()));
-        // Check for disabled feature
+        currentValue = !player.isGlobalChat();
+        iconMaterial = currentValue ? Material.GREEN_WOOL : Material.GREEN_CARPET;
+        isClickable = !player.isBarbarian() && hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_KINGDOM_CHAT.getMessage(), iconMaterial, DASH_SLOT_CHAT, isClickable);
+        icon.addDescription(getDisplayValue(currentValue));
         boolean isChatFormatEnabled = getKonquest().getCore().getBoolean(CorePath.CHAT_ENABLE_FORMAT.getPath(),true);
         if (isChatFormatEnabled) {
             if (!player.isBarbarian()) {
                 if (hasPermission(iconCommand)) {
-                    isClickable = true;
-                    loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+                    icon.addHint(MessagePath.MENU_OPTIONS_HINT.getMessage());
                 } else {
-                    isClickable = false;
-                    loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
+                    icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
                 }
             } else {
-                isClickable = false;
-                loreList.add(alertColor+MessagePath.LABEL_UNAVAILABLE.getMessage());
+                icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
             }
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_DISABLED.getMessage());
+            icon.addAlert(MessagePath.LABEL_DISABLED.getMessage());
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_KINGDOM_CHAT.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_CHAT, isClickable));
+        result.addIcon(icon);
 
         /* Border */
         iconCommand = CommandType.BORDER;
-        loreList.clear();
-        loreList.add(valueColor + getDisplayValue(player.isBorderDisplay()));
-        if (hasPermission(iconCommand)) {
-            isClickable = true;
-            loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+        currentValue = player.isBorderDisplay();
+        iconMaterial = currentValue ? Material.BROWN_WOOL : Material.BROWN_CARPET;
+        isClickable = hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_BORDER.getMessage(), iconMaterial, DASH_SLOT_BORDER, isClickable);
+        icon.addDescription(getDisplayValue(currentValue));
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_OPTIONS_HINT.getMessage());
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_BORDER.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_BORDER, isClickable));
+        result.addIcon(icon);
 
         /* Fly */
         iconCommand = CommandType.FLY;
-        loreList.clear();
-        loreList.add(valueColor + getDisplayValue(player.isFlyEnabled()));
-        if (hasPermission(iconCommand)) {
-            isClickable = true;
-            loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+        currentValue = player.isFlyEnabled();
+        iconMaterial = currentValue ? Material.LIGHT_BLUE_WOOL : Material.LIGHT_BLUE_CARPET;
+        isClickable = hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_FLYING.getMessage(), iconMaterial, DASH_SLOT_FLY, isClickable);
+        icon.addDescription(getDisplayValue(currentValue));
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_OPTIONS_HINT.getMessage());
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_FLYING.getMessage(), loreList, iconCommand.iconMaterial(), DASH_SLOT_FLY, isClickable));
+        result.addIcon(icon);
 
         /* Bypass */
         iconAdminCommand = AdminCommandType.BYPASS;
-        loreList.clear();
-        loreList.add(valueColor + getDisplayValue(player.isAdminBypassActive()));
-        if (hasPermission(iconAdminCommand)) {
-            isClickable = true;
-            loreList.add(hintColor+MessagePath.MENU_OPTIONS_HINT.getMessage());
+        currentValue = player.isAdminBypassActive();
+        iconMaterial = currentValue ? Material.ORANGE_WOOL : Material.ORANGE_CARPET;
+        isClickable = hasPermission(iconAdminCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_ADMIN_BYPASS.getMessage(), iconMaterial, DASH_SLOT_BYPASS, isClickable);
+        icon.addDescription(getDisplayValue(currentValue));
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_OPTIONS_HINT.getMessage());
         } else {
-            isClickable = false;
-            loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new InfoIcon(nameColor+MessagePath.MENU_MAIN_ADMIN_BYPASS.getMessage(), loreList, iconAdminCommand.iconMaterial(), DASH_SLOT_BYPASS, isClickable));
+        result.addIcon(icon);
 
         /* Map Command */
         iconCommand = CommandType.MAP;
-        loreList.clear();
         isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
+        icon = new CommandIcon(iconCommand, isPermission, 0, 0, DASH_SLOT_MAP);
         if (isPermission) {
-            loreList.add(hintColor+MessagePath.MENU_MAIN_HINT_MAP_1.getMessage());
-            loreList.add(hintColor+MessagePath.MENU_MAIN_HINT_MAP_2.getMessage());
+            icon.addHint(MessagePath.MENU_MAIN_HINT_MAP_1.getMessage());
+            icon.addHint(MessagePath.MENU_MAIN_HINT_MAP_2.getMessage());
+        } else {
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new CommandIcon(iconCommand, isPermission, 0, 0, loreList, DASH_SLOT_MAP));
+        result.addIcon(icon);
 
         /* Favor Command */
         iconCommand = CommandType.FAVOR;
-        loreList.clear();
         isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
+        icon = new CommandIcon(iconCommand, isPermission, 0, 0, DASH_SLOT_FAVOR);
         if (isPermission) {
-            loreList.add(hintColor+MessagePath.MENU_MAIN_HINT_FAVOR.getMessage());
+            icon.addHint(MessagePath.MENU_MAIN_HINT_FAVOR.getMessage());
+        } else {
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new CommandIcon(iconCommand, isPermission, 0, 0, loreList, DASH_SLOT_FAVOR));
+        result.addIcon(icon);
 
         /* Spy Command */
         iconCommand = CommandType.SPY;
-        loreList.clear();
         double cost_spy = getKonquest().getCore().getDouble(CorePath.FAVOR_COST_SPY.getPath(),0.0);
         isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
+        icon = new CommandIcon(iconCommand, isPermission, (int)cost_spy, 0, DASH_SLOT_SPY);
         if (isPermission) {
-            loreList.add(hintColor+MessagePath.MENU_MAIN_HINT_SPY.getMessage());
+            icon.addHint(MessagePath.MENU_MAIN_HINT_SPY.getMessage());
+        } else {
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
-        result.addIcon(new CommandIcon(iconCommand, isPermission, (int)cost_spy, 0, loreList, DASH_SLOT_SPY));
+        result.addIcon(icon);
 
         /* Navigation */
         addNavEmpty(result);

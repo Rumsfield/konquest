@@ -3,52 +3,29 @@ package com.github.rumsfield.konquest.display.icon;
 import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
-import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CommandIcon extends MenuIcon{
 
 	private final CommandType command;
 	private final boolean permission;
-	private final int cost;
-	private final int cost_incr;
-	private final ItemStack item;
-	private final List<String> lore;
 
-	private final String nameColor = DisplayManager.nameFormat;
-	private final String alertColor = DisplayManager.alertFormat;
-	private final String loreColor = DisplayManager.loreFormat;
-	private final String valueColor = DisplayManager.valueFormat;
-
-	public CommandIcon(CommandType command, boolean permission, int cost, int cost_incr, List<String> lore, int index) {
+	public CommandIcon(CommandType command, boolean permission, int cost, int cost_incr, int index) {
 		super(index);
 		this.command = command;
 		this.permission = permission;
-		this.cost = cost;
-		this.cost_incr = cost_incr;
-		this.lore = lore;
-		this.item = initItem();
-	}
-
-	private ItemStack initItem() {
-		List<String> loreList = new ArrayList<>();
+		// Item Lore
 		if(!permission) {
-			loreList.add(alertColor+MessagePath.LABEL_NO_PERMISSION.getMessage());
+			addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
 		}
 		if(cost > 0) {
-			loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
+			addNameValue(MessagePath.LABEL_COST.getMessage(), cost);
 		}
 		if(cost_incr > 0) {
-			loreList.add(loreColor+MessagePath.LABEL_INCREMENT_COST.getMessage()+": "+valueColor+cost_incr);
+			addNameValue(MessagePath.LABEL_INCREMENT_COST.getMessage(), cost_incr);
 		}
-		loreList.addAll(HelperUtil.stringPaginate(command.description(),loreColor));
-		loreList.addAll(lore);
-		String name = nameColor+getName();
-		return CompatibilityUtil.buildItem(command.iconMaterial(), name, loreList);
+		addDescription(command.description());
 	}
 	
 	public CommandType getCommand() {
@@ -57,12 +34,12 @@ public class CommandIcon extends MenuIcon{
 
 	@Override
 	public String getName() {
-		return command.toString();
+		return DisplayManager.nameFormat+command.toString();
 	}
 
 	@Override
 	public ItemStack getItem() {
-		return item;
+		return CompatibilityUtil.buildItem(command.iconMaterial(), getName(), getLore());
 	}
 
 	@Override
