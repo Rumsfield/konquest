@@ -48,13 +48,15 @@ public class DisplayMenu {
 			for(MenuIcon icon : iconMap.values()) {
 				if(icon instanceof PlayerIcon) {
 					heads.add(icon);
-				} else {
+				} else if (icon.getIndex() < inventory.getSize()) {
 					inventory.setItem(icon.getIndex(), icon.getItem());
 				}
 			}
 			// Set player heads last
 			for(MenuIcon icon : heads) {
-				inventory.setItem(icon.getIndex(), icon.getItem());
+				if (icon.getIndex() < inventory.getSize()) {
+					inventory.setItem(icon.getIndex(), icon.getItem());
+				}
 			}
 		});
 	}

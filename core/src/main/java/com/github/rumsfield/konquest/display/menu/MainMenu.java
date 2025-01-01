@@ -100,7 +100,7 @@ public class MainMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_MAIN_KINGDOM.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_KINGDOM, isClickable);
         icon.addDescription(iconCommand.description());
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
@@ -112,7 +112,7 @@ public class MainMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_MAIN_INFO.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_INFO, isClickable);
         icon.addDescription(iconCommand.description());
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
@@ -124,7 +124,7 @@ public class MainMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_MAIN_TOWN.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_TOWN, isClickable);
         icon.addDescription(iconCommand.description());
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             if (player.isBarbarian()) {
                 icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
@@ -140,7 +140,7 @@ public class MainMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_MAIN_QUEST.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_QUEST, isClickable);
         icon.addDescription(iconCommand.description());
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             if (getKonquest().getDirectiveManager().isEnabled()) {
                 icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
@@ -156,7 +156,7 @@ public class MainMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_MAIN_STATS.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_STATS, isClickable);
         icon.addDescription(iconCommand.description());
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
@@ -168,7 +168,7 @@ public class MainMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_MAIN_PREFIX.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_PREFIX, isClickable);
         icon.addDescription(iconCommand.description());
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             if (getKonquest().getAccomplishmentManager().isEnabled()) {
                 icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
@@ -184,7 +184,7 @@ public class MainMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_MAIN_SCORE.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_SCORE, isClickable);
         icon.addDescription(iconCommand.description());
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
@@ -196,7 +196,7 @@ public class MainMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_MAIN_TRAVEL.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_TRAVEL, isClickable);
         icon.addDescription(iconCommand.description());
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
@@ -260,7 +260,7 @@ public class MainMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_MAIN_MAP_AUTO.getMessage(), iconMaterial, DASH_SLOT_MAP_AUTO, isClickable);
         icon.addDescription(getDisplayValue(currentValue));
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_OPTIONS_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
@@ -277,7 +277,7 @@ public class MainMenu extends StateMenu {
         if (isChatFormatEnabled) {
             if (!player.isBarbarian()) {
                 if (hasPermission(iconCommand)) {
-                    icon.addHint(MessagePath.MENU_OPTIONS_HINT.getMessage());
+                    icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
                 } else {
                     icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
                 }
@@ -297,7 +297,7 @@ public class MainMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_MAIN_BORDER.getMessage(), iconMaterial, DASH_SLOT_BORDER, isClickable);
         icon.addDescription(getDisplayValue(currentValue));
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_OPTIONS_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
@@ -311,7 +311,7 @@ public class MainMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_MAIN_FLYING.getMessage(), iconMaterial, DASH_SLOT_FLY, isClickable);
         icon.addDescription(getDisplayValue(currentValue));
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_OPTIONS_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
@@ -325,7 +325,7 @@ public class MainMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_MAIN_ADMIN_BYPASS.getMessage(), iconMaterial, DASH_SLOT_BYPASS, isClickable);
         icon.addDescription(getDisplayValue(currentValue));
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_OPTIONS_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }

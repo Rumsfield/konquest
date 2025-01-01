@@ -63,7 +63,7 @@ public class HelpMenu extends StateMenu {
         /* Getting Started */
         icon = new InfoIcon(MessagePath.MENU_HELP_START.getMessage(), Material.WOODEN_PICKAXE, ROOT_SLOT_START, true);
         icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_START.getMessage());
-        icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.START);
         result.addIcon(icon);
 
@@ -71,29 +71,29 @@ public class HelpMenu extends StateMenu {
         String communityLink = getKonquest().getCore().getString(CorePath.COMMUNITY_LINK.getPath(),"");
         InfoIcon communityIcon = new InfoIcon(MessagePath.MENU_HELP_COMMUNITY.getMessage(), Material.MINECART, ROOT_SLOT_COMMUNITY, true);
         communityIcon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_COMMUNITY.getMessage());
-        communityIcon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+        communityIcon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         communityIcon.setInfo(""+ChatColor.LIGHT_PURPLE+ChatColor.UNDERLINE+communityLink);
         communityIcon.setState(MenuState.COMMUNITY);
         result.addIcon(communityIcon);
 
         /* Main Menu */
-        icon = new InfoIcon(MessagePath.MENU_HELP_MAIN.getMessage(), Material.LADDER, ROOT_SLOT_MAIN, true);
+        icon = new InfoIcon(MessagePath.MENU_HELP_MAIN.getMessage(), Material.BELL, ROOT_SLOT_MAIN, true);
         icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_MAIN.getMessage());
-        icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.MAIN);
         result.addIcon(icon);
 
         /* Commands */
         icon = new InfoIcon(MessagePath.MENU_HELP_COMMANDS.getMessage(), Material.TORCH, ROOT_SLOT_COMMANDS, true);
         icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_COMMANDS.getMessage());
-        icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.COMMANDS);
         result.addIcon(icon);
 
         /* Admin Commands */
         icon = new InfoIcon(MessagePath.MENU_HELP_ADMIN.getMessage(), Material.NETHER_STAR, ROOT_SLOT_COMMANDS_ADMIN, true);
         icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_ADMIN.getMessage());
-        icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.COMMANDS_ADMIN);
         result.addIcon(icon);
 
@@ -159,7 +159,7 @@ public class HelpMenu extends StateMenu {
         if (isQuestEnabled) {
             icon = new InfoIcon(MessagePath.MENU_HELP_QUEST.getMessage(), Material.WRITABLE_BOOK, START_SLOT_QUEST, true);
             icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_QUEST.getMessage());
-            icon.addHint(MessagePath.MENU_HELP_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.QUEST);
             result.addIcon(icon);
         }
@@ -218,7 +218,7 @@ public class HelpMenu extends StateMenu {
                     boolean isPermission = player.getBukkitPlayer().hasPermission(cmd.permission());
                     icon = new CommandIcon(cmd, isPermission, cost, cost_incr, 0);
                     if (isPermission) {
-                        icon.addHint(MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+                        icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
                     }
                     commandIcons.add(icon);
                 }
@@ -229,7 +229,7 @@ public class HelpMenu extends StateMenu {
                     boolean isPermission = player.getBukkitPlayer().hasPermission(adminCmd.permission());
                     icon = new AdminCommandIcon(adminCmd, isPermission, 0);
                     if (isPermission) {
-                        icon.addHint(MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+                        icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
                     }
                     commandIcons.add(icon);
                 }

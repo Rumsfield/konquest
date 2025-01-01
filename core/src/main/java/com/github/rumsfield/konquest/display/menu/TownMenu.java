@@ -126,7 +126,7 @@ public class TownMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_TOWN_JOIN.getMessage(), Material.SADDLE, ROOT_SLOT_JOIN, isClickable);
         icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_JOIN.getMessage());
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
         }
@@ -137,7 +137,7 @@ public class TownMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_TOWN_LEAVE.getMessage(), Material.ARROW, ROOT_SLOT_LEAVE, isClickable);
         icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_LEAVE.getMessage());
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
         }
@@ -147,7 +147,7 @@ public class TownMenu extends StateMenu {
         /* List Icon */
         icon = new InfoIcon(MessagePath.MENU_TOWN_LIST.getMessage(), Material.PAPER, ROOT_SLOT_LIST, true);
         icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_LIST.getMessage());
-        icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.LIST);
         result.addIcon(icon);
 
@@ -158,7 +158,7 @@ public class TownMenu extends StateMenu {
         icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_INVITES.getMessage());
         icon.addNameValue(MessagePath.MENU_TOWN_INVITES.getMessage(), numInvites);
         if (isClickable) {
-            icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
         }
@@ -168,7 +168,7 @@ public class TownMenu extends StateMenu {
         /* Manage Icon */
         icon = new InfoIcon(MessagePath.MENU_TOWN_MANAGE.getMessage(), Material.BOOKSHELF, ROOT_SLOT_MANAGE, true);
         icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_MANAGE.getMessage());
-        icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.MANAGE);
         result.addIcon(icon);
 
@@ -179,7 +179,7 @@ public class TownMenu extends StateMenu {
         isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
         icon = new CommandIcon(iconCommand, isPermission, (int)cost_settle, (int)cost_settle_incr, ROOT_SLOT_SETTLE);
         if (isPermission) {
-            icon.addHint(MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
@@ -191,7 +191,7 @@ public class TownMenu extends StateMenu {
         isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
         icon = new CommandIcon(iconCommand, isPermission, (int)cost_claim, 0, ROOT_SLOT_CLAIM);
         if (isPermission) {
-            icon.addHint(MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
@@ -202,7 +202,7 @@ public class TownMenu extends StateMenu {
         isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
         icon = new CommandIcon(iconCommand, isPermission, 0, 0, ROOT_SLOT_UNCLAIM);
         if (isPermission) {
-            icon.addHint(MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
@@ -295,7 +295,7 @@ public class TownMenu extends StateMenu {
                     }
                     break;
                 case LIST:
-                    icon.addHint(MessagePath.MENU_TOWN_HINT_LIST.getMessage());
+                    icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
                     break;
                 case INVITES:
                     icon.addHint(MessagePath.MENU_TOWN_HINT_ACCEPT.getMessage());
@@ -366,7 +366,7 @@ public class TownMenu extends StateMenu {
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_REQUESTS.getMessage());
             icon.addProperty(MessagePath.LABEL_KNIGHT.getMessage());
             icon.addNameValue(MessagePath.MENU_TOWN_REQUESTS.getMessage(), numRequests);
-            icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.A_REQUESTS);
             result.addIcon(icon);
 
@@ -377,7 +377,7 @@ public class TownMenu extends StateMenu {
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_PLOTS.getMessage());
                 icon.addProperty(MessagePath.LABEL_KNIGHT.getMessage());
                 if (isPlotsClickable) {
-                    icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                    icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 } else {
                     icon.addAlert(MessagePath.LABEL_DISABLED.getMessage());
                 }
@@ -387,7 +387,7 @@ public class TownMenu extends StateMenu {
 
             /* Info Icon */
             icon = new TownIcon(town, player.getBukkitPlayer(), contextColor, ROOT_SLOT_INFO, true);
-            icon.addHint(MessagePath.MENU_SCORE_HINT.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
             icon.setState(MenuState.A_INFO);
             result.addIcon(icon);
 
@@ -396,7 +396,7 @@ public class TownMenu extends StateMenu {
                 icon = new InfoIcon(MessagePath.MENU_TOWN_SHIELDS.getMessage(), Material.SHIELD, ROOT_SLOT_SHIELD, true);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_SHIELDS.getMessage());
                 icon.addProperty(MessagePath.LABEL_KNIGHT.getMessage());
-                icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.A_SHIELD);
                 result.addIcon(icon);
             }
@@ -406,7 +406,7 @@ public class TownMenu extends StateMenu {
                 icon = new InfoIcon(MessagePath.MENU_TOWN_ARMOR.getMessage(), Material.DIAMOND_CHESTPLATE, ROOT_SLOT_ARMOR, true);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_ARMOR.getMessage());
                 icon.addProperty(MessagePath.LABEL_KNIGHT.getMessage());
-                icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.A_ARMOR);
                 result.addIcon(icon);
             }
@@ -419,7 +419,7 @@ public class TownMenu extends StateMenu {
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_PROMOTE.getMessage());
             icon.addProperty(MessagePath.LABEL_LORD.getMessage());
             if (isPromoteClickable) {
-                icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             } else {
                 icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
             }
@@ -432,7 +432,7 @@ public class TownMenu extends StateMenu {
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_DEMOTE.getMessage());
             icon.addProperty(MessagePath.LABEL_LORD.getMessage());
             if (isPromoteClickable) {
-                icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             } else {
                 icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
             }
@@ -445,7 +445,7 @@ public class TownMenu extends StateMenu {
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_TRANSFER.getMessage());
             icon.addProperty(MessagePath.LABEL_LORD.getMessage());
             if (isPromoteClickable) {
-                icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             } else {
                 icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
             }
@@ -457,7 +457,7 @@ public class TownMenu extends StateMenu {
                 icon = new InfoIcon(MessagePath.MENU_TOWN_DESTROY.getMessage(), Material.TNT, ROOT_SLOT_DESTROY, true);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage());
                 icon.addProperty(MessagePath.LABEL_LORD.getMessage());
-                icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.B_DESTROY);
                 result.addIcon(icon);
             }
@@ -469,7 +469,7 @@ public class TownMenu extends StateMenu {
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_UPGRADES.getMessage());
                 icon.addProperty(MessagePath.LABEL_LORD.getMessage());
                 if (isUpgradesClickable) {
-                    icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                    icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 } else {
                     icon.addAlert(MessagePath.LABEL_DISABLED.getMessage());
                 }
@@ -481,7 +481,7 @@ public class TownMenu extends StateMenu {
             icon = new InfoIcon(MessagePath.MENU_TOWN_OPTIONS.getMessage(), Material.OAK_SIGN, ROOT_SLOT_OPTIONS, true);
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_OPTIONS.getMessage());
             icon.addProperty(MessagePath.LABEL_LORD.getMessage());
-            icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.B_OPTIONS);
             result.addIcon(icon);
 
@@ -491,7 +491,7 @@ public class TownMenu extends StateMenu {
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_SPECIAL.getMessage());
                 icon.addProperty(MessagePath.LABEL_LORD.getMessage());
                 icon.addNameValue(MessagePath.LABEL_SPECIALIZATION.getMessage(), town.getSpecializationName());
-                icon.addHint(MessagePath.MENU_TOWN_HINT_OPEN.getMessage());
+                icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.B_SPECIALIZATION);
                 result.addIcon(icon);
             }
@@ -655,8 +655,8 @@ public class TownMenu extends StateMenu {
             boolean val = town.getTownOption(currentOption);
             String currentValue = DisplayManager.boolean2Lang(val) + " " + DisplayManager.boolean2Symbol(val);
             icon = new OptionIcon(currentOption, 0);
-            icon.addDescription(MessagePath.MENU_OPTIONS_CURRENT.getMessage(DisplayManager.valueFormat + currentValue));
-            icon.addHint(MessagePath.MENU_OPTIONS_HINT.getMessage());
+            icon.addNameValue(MessagePath.LABEL_CURRENT.getMessage(), currentValue);
+            icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
             icons.add(icon);
         }
 
@@ -714,7 +714,7 @@ public class TownMenu extends StateMenu {
 
         /* No Button */
         icon = new ConfirmationIcon(false, SLOT_NO);
-        icon.addHint(MessagePath.MENU_KINGDOM_HINT_EXIT.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_EXIT.getMessage());
         icon.setState(MenuState.CONFIRM_NO);
         result.addIcon(icon);
 

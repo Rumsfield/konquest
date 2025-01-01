@@ -290,6 +290,10 @@ public class AccomplishmentManager {
 	public List<KonCustomPrefix> getCustomPrefixes() {
 		return new ArrayList<>(customPrefixes.values());
 	}
+
+	public int getNumCustomPrefixes() {
+		return customPrefixes.size();
+	}
 	
 	/**
 	 * Sets a player prefix without checks

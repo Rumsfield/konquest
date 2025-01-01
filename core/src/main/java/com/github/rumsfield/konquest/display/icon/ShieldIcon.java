@@ -19,7 +19,7 @@ public class ShieldIcon extends MenuIcon {
 		// Item Lore
 		addNameValue(MessagePath.LABEL_SHIELD.getMessage(), HelperUtil.getTimeFormat(shield.getDurationSeconds(), ChatColor.DARK_AQUA));
 		addNameValue(MessagePath.LABEL_COST.getMessage(), cost);
-		addHint(MessagePath.MENU_SHIELD_HINT.getMessage());
+		addHint(MessagePath.MENU_HINT_CHARGE.getMessage());
 	}
 	
 	public KonShield getShield() {

@@ -147,7 +147,7 @@ public class KingdomMenu extends StateMenu {
 		icon = new InfoIcon(MessagePath.MENU_KINGDOM_JOIN.getMessage(), Material.SADDLE, ROOT_SLOT_JOIN, isJoinClickable);
 		icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_JOIN.getMessage());
 		if(isJoinClickable) {
-			icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+			icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 		} else {
 			icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
 		}
@@ -160,7 +160,7 @@ public class KingdomMenu extends StateMenu {
 			icon = new InfoIcon(MessagePath.MENU_KINGDOM_CREATE.getMessage(), CommandType.KINGDOM.iconMaterial(), ROOT_SLOT_CREATE, true);
 			icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_CREATE.getMessage());
 			icon.addNameValue(MessagePath.LABEL_COST.getMessage(), (int)cost_create);
-			icon.addHint(MessagePath.MENU_HELP_HINT_COMMAND.getMessage());
+			icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
 			icon.setState(MenuState.A_CREATE);
 			result.addIcon(icon);
 		}
@@ -170,7 +170,7 @@ public class KingdomMenu extends StateMenu {
 		icon = new InfoIcon(MessagePath.MENU_KINGDOM_EXILE.getMessage(), Material.ARROW, ROOT_SLOT_EXILE, isExileClickable);
 		icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_EXILE.getMessage());
 		if(isExileClickable) {
-			icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+			icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 		} else {
 			icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
 		}
@@ -187,7 +187,7 @@ public class KingdomMenu extends StateMenu {
 		icon = new InfoIcon(MessagePath.MENU_KINGDOM_INVITES.getMessage(), inviteMat, ROOT_SLOT_INVITE, isInvitesClickable);
 		icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_INVITES.getMessage());
 		if(isExileClickable) {
-			icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+			icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 		} else {
 			icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
 		}
@@ -200,7 +200,7 @@ public class KingdomMenu extends StateMenu {
 		/* List Icon */
 		icon = new InfoIcon(MessagePath.MENU_KINGDOM_LIST.getMessage(), Material.PAPER, ROOT_SLOT_LIST, true);
 		icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_LIST.getMessage());
-		icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+		icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 		icon.setState(MenuState.A_LIST);
 		result.addIcon(icon);
 
@@ -209,7 +209,7 @@ public class KingdomMenu extends StateMenu {
 
 			/* Kingdom Info Icon */
 			icon = new KingdomIcon(kingdom,DisplayManager.nameFormat,ROOT_SLOT_INFO,true,isViewer);
-			icon.addHint(MessagePath.MENU_KINGDOM_HINT_LIST.getMessage());
+			icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
 			icon.setState(MenuState.A_INFO);
 			result.addIcon(icon);
 
@@ -222,7 +222,7 @@ public class KingdomMenu extends StateMenu {
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_RELATION.getMessage());
 				icon.addProperty(MessagePath.LABEL_OFFICER.getMessage());
 				if(isRelationsClickable) {
-					icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 				} else {
 					icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
 				}
@@ -238,7 +238,7 @@ public class KingdomMenu extends StateMenu {
 				icon = new InfoIcon(MessagePath.MENU_KINGDOM_REQUESTS.getMessage(), requestMat, ROOT_SLOT_REQUESTS, true);
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_REQUESTS.getMessage());
 				icon.addProperty(MessagePath.LABEL_OFFICER.getMessage());
-				icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+				icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 				if(numRequests > 0) {
 					icon.addNameValue(MessagePath.MENU_KINGDOM_REQUESTS.getMessage(), numRequests);
 				}
@@ -255,7 +255,7 @@ public class KingdomMenu extends StateMenu {
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_PROMOTE.getMessage());
 				icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
 				if(isPromoteClickable) {
-					icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 				} else {
 					icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
 				}
@@ -268,7 +268,7 @@ public class KingdomMenu extends StateMenu {
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_DEMOTE.getMessage());
 				icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
 				if(isDemoteClickable) {
-					icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 				} else {
 					icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
 				}
@@ -282,7 +282,7 @@ public class KingdomMenu extends StateMenu {
 					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_TRANSFER.getMessage());
 					icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
 					if(isTransferClickable) {
-						icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+						icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 					} else {
 						icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
 					}
@@ -295,7 +295,7 @@ public class KingdomMenu extends StateMenu {
 					icon = new InfoIcon(MessagePath.MENU_TOWN_DESTROY.getMessage(), Material.TNT, ROOT_SLOT_DESTROY, true);
 					icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage());
 					icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
-					icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 					icon.setState(MenuState.C_DESTROY);
 					result.addIcon(icon);
 				}
@@ -305,7 +305,7 @@ public class KingdomMenu extends StateMenu {
 					icon = new InfoIcon(MessagePath.MENU_KINGDOM_CAPITAL.getMessage(), Material.PISTON, ROOT_SLOT_CAPITAL, true);
 					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_CAPITAL.getMessage());
 					icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
-					icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 					icon.setState(MenuState.C_CAPITAL);
 					result.addIcon(icon);
 				}
@@ -314,8 +314,8 @@ public class KingdomMenu extends StateMenu {
 				String currentValue = DisplayManager.boolean2Lang(kingdom.isOpen())+" "+DisplayManager.boolean2Symbol(kingdom.isOpen());
 				icon = new InfoIcon(MessagePath.LABEL_OPEN.getMessage(), Material.IRON_DOOR, ROOT_SLOT_OPEN, true);
 				icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
-				icon.addDescription(MessagePath.MENU_OPTIONS_CURRENT.getMessage(DisplayManager.valueFormat+currentValue));
-				icon.addHint(MessagePath.MENU_OPTIONS_HINT.getMessage());
+				icon.addNameValue(MessagePath.LABEL_CURRENT.getMessage(), currentValue);
+				icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
 				icon.setState(MenuState.C_OPEN);
 				result.addIcon(icon);
 
@@ -324,7 +324,7 @@ public class KingdomMenu extends StateMenu {
 				icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_TEMPLATE.getMessage());
 				icon.addNameValue(MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage(), kingdom.getMonumentTemplateName());
-				icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+				icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 				icon.setState(MenuState.C_TEMPLATE);
 				result.addIcon(icon);
 
@@ -333,7 +333,7 @@ public class KingdomMenu extends StateMenu {
 					icon = new InfoIcon(MessagePath.MENU_KINGDOM_DISBAND.getMessage(), Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
 					icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
 					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_DISBAND.getMessage());
-					icon.addHint(MessagePath.MENU_KINGDOM_HINT_OPEN.getMessage());
+					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 					icon.setState(MenuState.C_DISBAND);
 					result.addIcon(icon);
 				}
@@ -366,7 +366,7 @@ public class KingdomMenu extends StateMenu {
 
 		/* No Button */
 		icon = new ConfirmationIcon(false, SLOT_NO);
-		icon.addHint(MessagePath.MENU_KINGDOM_HINT_EXIT.getMessage());
+		icon.addHint(MessagePath.MENU_HINT_EXIT.getMessage());
 		icon.setState(MenuState.CONFIRM_NO);
 		result.addIcon(icon);
 
@@ -396,7 +396,7 @@ public class KingdomMenu extends StateMenu {
 
 		/* No Button */
 		icon = new ConfirmationIcon(false, SLOT_NO);
-		icon.addHint(MessagePath.MENU_KINGDOM_HINT_EXIT.getMessage());
+		icon.addHint(MessagePath.MENU_HINT_EXIT.getMessage());
 		icon.setState(MenuState.CONFIRM_NO);
 		result.addIcon(icon);
 
@@ -659,7 +659,7 @@ public class KingdomMenu extends StateMenu {
 					icon.addHint(MessagePath.MENU_KINGDOM_HINT_DECLINE.getMessage());
 					break;
 				case A_LIST:
-					icon.addHint(MessagePath.MENU_KINGDOM_HINT_LIST.getMessage());
+					icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
 					break;
 				case B_RELATIONSHIP:
 					icon.addHint(MessagePath.MENU_KINGDOM_HINT_RELATION.getMessage());

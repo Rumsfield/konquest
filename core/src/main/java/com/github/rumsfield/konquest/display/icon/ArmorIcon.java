@@ -18,7 +18,7 @@ public class ArmorIcon extends MenuIcon {
 		// Item Lore
 		addNameValue(MessagePath.LABEL_ARMOR.getMessage(), ""+ChatColor.DARK_AQUA+armor.getBlocks());
 		addNameValue(MessagePath.LABEL_COST.getMessage(), cost);
-		addHint(MessagePath.MENU_SHIELD_HINT.getMessage());
+		addHint(MessagePath.MENU_HINT_CHARGE.getMessage());
 	}
 	
 	public KonArmor getArmor() {

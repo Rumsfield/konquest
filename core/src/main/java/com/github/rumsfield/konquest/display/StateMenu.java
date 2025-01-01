@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.model.KonKingdom;
+import com.github.rumsfield.konquest.model.KonPrefixType;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -28,6 +29,7 @@ public abstract class StateMenu {
 
     protected final Comparator<KonTown> townComparator;
     protected final Comparator<KonKingdom> kingdomComparator;
+    protected final Comparator<KonPrefixType> prefixComparator;
     protected final int MAX_ICONS_PER_PAGE = 45;
     protected final int MAX_ROW_SIZE = 9;
     protected final int INDEX_HOME = 3;
@@ -81,6 +83,17 @@ public abstract class StateMenu {
                 } else if(g1Pop > g2Pop) {
                     result = -1;
                 }
+            }
+            return result;
+        };
+
+        this.prefixComparator = (prefixOne, prefixTwo) -> {
+            // sort by level
+            int result = 0;
+            if(prefixOne.level() < prefixTwo.level()) {
+                result = -1;
+            } else if(prefixOne.level() > prefixTwo.level()) {
+                result = 1;
             }
             return result;
         };
