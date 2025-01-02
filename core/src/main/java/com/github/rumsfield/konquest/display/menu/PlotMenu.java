@@ -338,7 +338,7 @@ public class PlotMenu extends StateMenu {
         /* Player Icons */
         String contextColor = Konquest.friendColor2;
         for (OfflinePlayer currentPlayer : players) {
-            icon = new PlayerIcon(currentPlayer, contextColor, 0,true, PlayerIcon.PlayerIconAction.DISPLAY_INFO);
+            icon = new PlayerIcon(currentPlayer, contextColor, 0,true);
             icon.addHint(hintStr);
             icons.add(icon);
         }

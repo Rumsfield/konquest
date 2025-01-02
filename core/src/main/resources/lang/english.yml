@@ -208,6 +208,7 @@ menu:
     tip-8: "Build Iron Golems to protect your towns from enemy players. Seek out Ruins and defeat the Ruin Golems for a reward."
     tip-9: "Use \"/k stats\" and \"/k score\" to view player statistics. Use \"/k prefix\" to set your own chat title. Unlock titles with increased stats."
   score:
+    title: "Score Menu"
     kingdom-towns: "Kingdom Towns"
     kingdom-land: "Kingdom Land"
     kingdom-favor: "Kingdom Favor"
@@ -219,6 +220,9 @@ menu:
     town-3: "Player Residencies"
     land-3: "Resident Town Land"
     player-score: "Player Score"
+    kingdom-score: "Kingdom Score"
+    description-players: "List all player scores and view details"
+    description-kingdoms: "List all kingdom scores and view details with leaderboards"
   map:
     center: "Map Center"
     proximity: "Proximity"

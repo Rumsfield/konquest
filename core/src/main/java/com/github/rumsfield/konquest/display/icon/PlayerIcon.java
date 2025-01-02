@@ -9,30 +9,19 @@ import org.bukkit.inventory.ItemStack;
 
 public class PlayerIcon extends MenuIcon {
 
-	public enum PlayerIconAction {
-		DISPLAY_SCORE,
-		DISPLAY_INFO
-    }
-
 	private final OfflinePlayer player;
 	private final String contextColor;
 	private final boolean isClickable;
-	private final PlayerIconAction action;
 
-	public PlayerIcon(OfflinePlayer player, String contextColor, int index, boolean isClickable, PlayerIconAction action) {
+	public PlayerIcon(OfflinePlayer player, String contextColor, int index, boolean isClickable) {
 		super(index);
 		this.contextColor = contextColor;
 		this.player = player;
 		this.isClickable = isClickable;
-		this.action = action;
 		// Item Lore
 		addProperty(MessagePath.LABEL_PLAYER.getMessage());
 		String lastOnlineFormat = DisplayManager.valueFormat+HelperUtil.getLastSeenFormat(player);
 		addDescription(MessagePath.LABEL_LAST_SEEN.getMessage(lastOnlineFormat));
-	}
-
-	public PlayerIconAction getAction() {
-		return action;
 	}
 	
 	public OfflinePlayer getOfflinePlayer() {

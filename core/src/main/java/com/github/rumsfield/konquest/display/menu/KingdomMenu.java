@@ -6,7 +6,6 @@ import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.display.DisplayMenu;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.*;
-import com.github.rumsfield.konquest.display.icon.PlayerIcon.PlayerIconAction;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.model.*;
@@ -710,7 +709,6 @@ public class KingdomMenu extends StateMenu {
 		ArrayList<MenuIcon> icons = new ArrayList<>();
 		String loreHintStr1 = "";
 		String loreHintStr2 = "";
-		PlayerIconAction iconAction = PlayerIconAction.DISPLAY_INFO;
 		boolean isClickable = true;
 		List<OfflinePlayer> players = new ArrayList<>();
 
@@ -745,7 +743,7 @@ public class KingdomMenu extends StateMenu {
 			if (offlinePlayer != null) {
 				contextColor = getKonquest().getDisplaySecondaryColor(kingdom, offlinePlayer.getKingdom());
 			}
-			icon = new PlayerIcon(currentPlayer,contextColor,0,isClickable,iconAction);
+			icon = new PlayerIcon(currentPlayer,contextColor,0,isClickable);
 			String kingdomRole = kingdom.getPlayerRoleName(currentPlayer);
 			if(!kingdomRole.isEmpty()) {
 				icon.addProperty(kingdomRole);

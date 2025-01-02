@@ -545,7 +545,7 @@ public class TownMenu extends StateMenu {
         /* Player Icons */
         MenuIcon icon;
         for (OfflinePlayer currentPlayer : players) {
-            icon = new PlayerIcon(currentPlayer,contextColor,0,true,PlayerIcon.PlayerIconAction.DISPLAY_INFO);
+            icon = new PlayerIcon(currentPlayer,contextColor,0,true);
             String townRole = town.getPlayerRoleName(currentPlayer);
             if(!townRole.isEmpty()) {
                 icon.addProperty(townRole);

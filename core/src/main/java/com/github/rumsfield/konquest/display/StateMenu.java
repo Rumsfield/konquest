@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.model.KonKingdom;
+import com.github.rumsfield.konquest.model.KonOfflinePlayer;
 import com.github.rumsfield.konquest.model.KonPrefixType;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
@@ -30,6 +31,8 @@ public abstract class StateMenu {
     protected final Comparator<KonTown> townComparator;
     protected final Comparator<KonKingdom> kingdomComparator;
     protected final Comparator<KonPrefixType> prefixComparator;
+    protected final Comparator<KonOfflinePlayer> playerScoreComparator;
+    protected final Comparator<KonKingdom> kingdomScoreComparator;
     protected final int MAX_ICONS_PER_PAGE = 45;
     protected final int MAX_ROW_SIZE = 9;
     protected final int INDEX_HOME = 3;
@@ -93,6 +96,32 @@ public abstract class StateMenu {
             if(prefixOne.level() < prefixTwo.level()) {
                 result = -1;
             } else if(prefixOne.level() > prefixTwo.level()) {
+                result = 1;
+            }
+            return result;
+        };
+
+        this.playerScoreComparator = (playerOne, playerTwo) -> {
+            // sort by score
+            int scoreOne = konquest.getKingdomManager().getPlayerScore(playerOne);
+            int scoreTwo = konquest.getKingdomManager().getPlayerScore(playerTwo);
+            int result = 0;
+            if(scoreOne < scoreTwo) {
+                result = -1;
+            } else if(scoreOne > scoreTwo) {
+                result = 1;
+            }
+            return result;
+        };
+
+        this.kingdomScoreComparator = (kingdomOne, kingdomTwo) -> {
+            // sort by score
+            int scoreOne = konquest.getKingdomManager().getKingdomScore(kingdomOne);
+            int scoreTwo = konquest.getKingdomManager().getKingdomScore(kingdomTwo);
+            int result = 0;
+            if(scoreOne < scoreTwo) {
+                result = -1;
+            } else if(scoreOne > scoreTwo) {
                 result = 1;
             }
             return result;

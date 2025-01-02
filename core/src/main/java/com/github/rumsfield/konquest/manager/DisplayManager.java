@@ -4,7 +4,6 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.*;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.display.menu.*;
-import com.github.rumsfield.konquest.display.wrapper.*;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -114,7 +113,7 @@ public class DisplayManager {
 	 * Info Menu
 	 * Score Menu
 	 * Travel Menu
-	 * Prefix Menu
+	 * + Prefix Menu
 	 */
 
 	/*
@@ -196,6 +195,17 @@ public class DisplayManager {
 		}
 	}
 
+	/*
+	 * ===============================================
+	 * Prefix Menu
+	 * ===============================================
+	 */
+	public void displayPrefixMenu(KonPlayer displayPlayer) {
+		if (displayPlayer == null) return;
+		PrefixMenu newMenu = new PrefixMenu(konquest, displayPlayer);
+		displayMenuToPlayer(displayPlayer, newMenu);
+	}
+
 
 	// Old menu wrappers
 
@@ -264,18 +274,6 @@ public class DisplayManager {
 		playMenuOpenSound(displayPlayer.getBukkitPlayer());
 		// TODO
 	}
-   	
-   	/*
-	 * ===============================================
-	 * Prefix Menu
-	 * ===============================================
-	 */
-   	public void displayPrefixMenu(KonPlayer displayPlayer) {
-		if (displayPlayer == null) return;
-		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
-		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// TODO
-   	}
    	
 
    	

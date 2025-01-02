@@ -66,7 +66,7 @@ public class MainMenu extends StateMenu {
     }
 
     public DisplayMenu goToDashboard() {
-        // Change to management root view
+        // Change to dashboard view
         return refreshNewView(MenuState.DASHBOARD);
     }
 
