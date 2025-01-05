@@ -111,7 +111,7 @@ public class DisplayManager {
 	 * + Town Menu (with management)
 	 * + Plot Menu
 	 * Info Menu
-	 * Score Menu
+	 * + Score Menu
 	 * Travel Menu
 	 * + Prefix Menu
 	 */
@@ -206,76 +206,83 @@ public class DisplayManager {
 		displayMenuToPlayer(displayPlayer, newMenu);
 	}
 
-
-	// Old menu wrappers
-
-
 	/*
 	 * ===============================================
 	 * Score Menu
 	 * ===============================================
 	 */
- 	public void displayScoreMenu(KonPlayer displayPlayer, KonOfflinePlayer scorePlayer) {
+	public void displayScoreMenu(KonPlayer displayPlayer) {
 		if (displayPlayer == null) return;
-		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
-		playMenuOpenSound(bukkitPlayer);
-		// TODO
+		ScoreMenu newMenu = new ScoreMenu(konquest, displayPlayer);
+		displayMenuToPlayer(displayPlayer, newMenu);
 	}
-	
- 	/*
+
+	public void displayScorePlayerMenu(KonPlayer displayPlayer, KonOfflinePlayer scorePlayer) {
+		if (displayPlayer == null) return;
+		ScoreMenu newMenu = new ScoreMenu(konquest, displayPlayer);
+		newMenu.goToPlayerScore(scorePlayer);
+		displayMenuToPlayer(displayPlayer, newMenu);
+	}
+
+	public void displayScoreKingdomMenu(KonPlayer displayPlayer, KonKingdom scoreKingdom) {
+		if (displayPlayer == null) return;
+		ScoreMenu newMenu = new ScoreMenu(konquest, displayPlayer);
+		newMenu.goToKingdomScore(scoreKingdom);
+		displayMenuToPlayer(displayPlayer, newMenu);
+	}
+
+	/*
 	 * ===============================================
-	 * Info Menus
+	 * Info Menu
 	 * ===============================================
 	 */
- 	// Player Info
- 	public void displayPlayerInfoMenu(KonPlayer displayPlayer, KonOfflinePlayer infoPlayer) {
+	public void displayInfoMenu(KonPlayer displayPlayer) {
 		if (displayPlayer == null) return;
-		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
-		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// TODO
+		InfoMenu newMenu = new InfoMenu(konquest, displayPlayer);
+		displayMenuToPlayer(displayPlayer, newMenu);
+	}
+
+ 	public void displayInfoPlayerMenu(KonPlayer displayPlayer, KonOfflinePlayer infoPlayer) {
+		if (displayPlayer == null) return;
+		InfoMenu newMenu = new InfoMenu(konquest, displayPlayer);
+		newMenu.goToPlayerInfo(infoPlayer);
+		displayMenuToPlayer(displayPlayer, newMenu);
  	}
- 	
- 	// Kingdom Info
-  	public void displayKingdomInfoMenu(KonPlayer displayPlayer, KonKingdom infoKingdom) {
-		if (displayPlayer == null) return;
-		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
-		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// TODO
-  	}
- 	
-  	// Town Info
-   	public void displayTownInfoMenu(KonPlayer displayPlayer, KonTown infoTown) {
-		if (displayPlayer == null) return;
-		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
-		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// TODO
-   	}
 
-	// Monument Template Info
-	public void displayTemplateInfoMenu(KonPlayer displayPlayer) {
+	public void displayInfoKingdomMenu(KonPlayer displayPlayer, KonKingdom infoKingdom) {
 		if (displayPlayer == null) return;
-		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
-		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// TODO
+		InfoMenu newMenu = new InfoMenu(konquest, displayPlayer);
+		newMenu.goToKingdomInfo(infoKingdom);
+		displayMenuToPlayer(displayPlayer, newMenu);
 	}
 
-	// Sanctuary Info
-	public void displaySanctuaryInfoMenu(KonPlayer displayPlayer, KonSanctuary infoSanctuary) {
+	public void displayInfoTownMenu(KonPlayer displayPlayer, KonTown infoTown) {
 		if (displayPlayer == null) return;
-		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
-		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// TODO
+		InfoMenu newMenu = new InfoMenu(konquest, displayPlayer);
+		newMenu.goToTownInfo(infoTown);
+		displayMenuToPlayer(displayPlayer, newMenu);
 	}
 
-	// Ruin Info
-	public void displayRuinInfoMenu(KonPlayer displayPlayer, KonRuin infoRuin) {
+	public void displayInfoSanctuaryMenu(KonPlayer displayPlayer, KonSanctuary infoSanctuary) {
 		if (displayPlayer == null) return;
-		Player bukkitPlayer = displayPlayer.getBukkitPlayer();
-		playMenuOpenSound(displayPlayer.getBukkitPlayer());
-		// TODO
+		InfoMenu newMenu = new InfoMenu(konquest, displayPlayer);
+		newMenu.goToSanctuaryInfo(infoSanctuary);
+		displayMenuToPlayer(displayPlayer, newMenu);
 	}
-   	
 
+	public void displayInfoRuinMenu(KonPlayer displayPlayer, KonRuin infoRuin) {
+		if (displayPlayer == null) return;
+		InfoMenu newMenu = new InfoMenu(konquest, displayPlayer);
+		newMenu.goToRuinInfo(infoRuin);
+		displayMenuToPlayer(displayPlayer, newMenu);
+	}
+
+	public void displayInfoTemplateListMenu(KonPlayer displayPlayer) {
+		if (displayPlayer == null) return;
+		InfoMenu newMenu = new InfoMenu(konquest, displayPlayer);
+		newMenu.goToTemplateListInfo();
+		displayMenuToPlayer(displayPlayer, newMenu);
+	}
    	
    	/*
 	 * Helper methods

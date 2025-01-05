@@ -26,6 +26,8 @@ public class PrefixMenu extends StateMenu {
     private final KonPlayer player;
 
     //TODO Add an admin mode for modifying online and offline player prefixes
+
+    // Barbarian players can use this menu, but cannot apply prefixes.
     public PrefixMenu(Konquest konquest, KonPlayer player) {
         super(konquest, MenuState.ROOT, null);
         this.player = player;
@@ -83,18 +85,28 @@ public class PrefixMenu extends StateMenu {
         icon.setState(MenuState.DISABLE);
         result.addIcon(icon);
 
-        /* Prefix Icon */
-        icon = new InfoIcon(MessagePath.MENU_PREFIX_TITLE_PREFIX.getMessage(), Material.NAME_TAG, ROOT_SLOT_PREFIX, true);
+        /* Prefix Icon (Unavailable for Barbarians) */
+        boolean isPrefixClickable = !player.isBarbarian();
+        icon = new InfoIcon(MessagePath.MENU_PREFIX_TITLE_PREFIX.getMessage(), Material.NAME_TAG, ROOT_SLOT_PREFIX, isPrefixClickable);
         icon.addDescription(MessagePath.MENU_PREFIX_DESCRIPTION_PREFIX.getMessage());
-        icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+        if (isPrefixClickable) {
+            icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+        } else {
+            icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
+        }
         icon.setState(MenuState.PREFIX);
         result.addIcon(icon);
 
-        /* Custom Icon */
+        /* Custom Icon (Unavailable for Barbarians) */
         if (getKonquest().getAccomplishmentManager().getNumCustomPrefixes() > 0) {
-            icon = new InfoIcon(MessagePath.MENU_PREFIX_TITLE_CUSTOM.getMessage(), Material.GOLDEN_CARROT, ROOT_SLOT_CUSTOM, true);
+            boolean isCustomClickable = !player.isBarbarian();
+            icon = new InfoIcon(MessagePath.MENU_PREFIX_TITLE_CUSTOM.getMessage(), Material.GOLDEN_CARROT, ROOT_SLOT_CUSTOM, isCustomClickable);
             icon.addDescription(MessagePath.MENU_PREFIX_DESCRIPTION_CUSTOM.getMessage());
-            icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+            if (isCustomClickable) {
+                icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+            } else {
+                icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
+            }
             icon.setState(MenuState.CUSTOM);
             result.addIcon(icon);
         }
@@ -332,7 +344,7 @@ public class PrefixMenu extends StateMenu {
         String result = "error";
         switch (context) {
             case ROOT:
-                result = MessagePath.MENU_PREFIX_TITLE.getMessage();
+                result = MessagePath.MENU_MAIN_PREFIX.getMessage();
                 break;
             case PREFIX:
                 result = MessagePath.MENU_PREFIX_TITLE_PREFIX.getMessage();

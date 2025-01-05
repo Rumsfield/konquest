@@ -21,6 +21,7 @@ public class TemplateIcon extends MenuIcon {
 			if(!template.isValid()) {
 				if(template.isBlanking()) {
 					addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
+					addDescription(MessagePath.PROTECTION_ERROR_TEMPLATE_MODIFY.getMessage());
 				} else {
 					addAlert(MessagePath.LABEL_INVALID.getMessage());
 				}

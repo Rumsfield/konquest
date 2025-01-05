@@ -80,19 +80,18 @@ public class TownMenu extends StateMenu {
      * Change the menu to the management view for a given town.
      * The town must be in the viewing player's kingdom when not in admin mode.
      * @param town The town to manage
-     * @return The display view of the menu
      */
-    public DisplayMenu goToManagementRoot(KonTown town) {
-        if (town == null) return null;
+    public void goToManagementRoot(KonTown town) {
+        if (town == null) return;
         this.town = town;
         // Update menu access
         updateAccess();
         if (isAccess(AccessType.DEFAULT)) {
             playStatusSound(player.getBukkitPlayer(),false);
-            return null;
+            return;
         }
         // Change to management root view
-        return refreshNewView(MenuState.MANAGEMENT_ROOT);
+        refreshNewView(MenuState.MANAGEMENT_ROOT);
     }
 
     /**
@@ -654,7 +653,7 @@ public class TownMenu extends StateMenu {
         for (KonTownOption currentOption : allOptions) {
             boolean val = town.getTownOption(currentOption);
             String currentValue = DisplayManager.boolean2Lang(val) + " " + DisplayManager.boolean2Symbol(val);
-            icon = new OptionIcon(currentOption, 0);
+            icon = new OptionIcon(currentOption, 0, true);
             icon.addNameValue(MessagePath.LABEL_CURRENT.getMessage(), currentValue);
             icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
             icons.add(icon);
@@ -893,7 +892,7 @@ public class TownMenu extends StateMenu {
                     if(clickedIcon instanceof TownIcon) {
                         TownIcon icon = (TownIcon)clickedIcon;
                         KonTown clickTown = icon.getTown();
-                        getKonquest().getDisplayManager().displayTownInfoMenu(player, clickTown);
+                        getKonquest().getDisplayManager().displayInfoTownMenu(player, clickTown);
                     }
                     break;
                 case INVITES:
@@ -947,7 +946,7 @@ public class TownMenu extends StateMenu {
                             break;
                         case A_INFO:
                             // Open the town info menu
-                            getKonquest().getDisplayManager().displayTownInfoMenu(player,town);
+                            getKonquest().getDisplayManager().displayInfoTownMenu(player,town);
                             break;
                     }
                     break;
@@ -1047,7 +1046,7 @@ public class TownMenu extends StateMenu {
         String result = "error";
         switch(context) {
             case ROOT:
-                result = MessagePath.MENU_TOWN_TITLE_ROOT.getMessage();
+                result = MessagePath.MENU_MAIN_TOWN.getMessage();
                 break;
             case JOIN:
                 result = MessagePath.MENU_TOWN_TITLE_JOIN.getMessage();

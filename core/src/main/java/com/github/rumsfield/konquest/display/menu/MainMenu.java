@@ -451,7 +451,7 @@ public class MainMenu extends StateMenu {
                             break;
                         case ROOT_SLOT_INFO:
                             // Open Info Menu (close this menu)
-                            // TODO
+                            getKonquest().getDisplayManager().displayInfoMenu(player);
                             break;
                         case ROOT_SLOT_TOWN:
                             // Open Town Menu (close this menu)
@@ -469,11 +469,11 @@ public class MainMenu extends StateMenu {
                             break;
                         case ROOT_SLOT_PREFIX:
                             // Open Prefix Menu (close this menu)
-                            // TODO
+                            getKonquest().getDisplayManager().displayPrefixMenu(player);
                             break;
                         case ROOT_SLOT_SCORE:
                             // Open Score Menu (close this menu)
-                            // TODO
+                            getKonquest().getDisplayManager().displayScoreMenu(player);
                             break;
                         case ROOT_SLOT_TRAVEL:
                             // Open Travel Menu (close this menu)

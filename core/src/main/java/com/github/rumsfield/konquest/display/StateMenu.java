@@ -3,10 +3,7 @@ package com.github.rumsfield.konquest.display;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonOfflinePlayer;
-import com.github.rumsfield.konquest.model.KonPrefixType;
-import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
@@ -30,6 +27,11 @@ public abstract class StateMenu {
 
     protected final Comparator<KonTown> townComparator;
     protected final Comparator<KonKingdom> kingdomComparator;
+    protected final Comparator<KonCamp> campComparator;
+    protected final Comparator<KonRuin> ruinComparator;
+    protected final Comparator<KonSanctuary> sanctuaryComparator;
+    protected final Comparator<KonMonumentTemplate> templateComparator;
+    protected final Comparator<KonOfflinePlayer> playerComparator;
     protected final Comparator<KonPrefixType> prefixComparator;
     protected final Comparator<KonOfflinePlayer> playerScoreComparator;
     protected final Comparator<KonKingdom> kingdomScoreComparator;
@@ -88,6 +90,51 @@ public abstract class StateMenu {
                 }
             }
             return result;
+        };
+
+        this.campComparator = (campOne, campTwo) -> {
+            // Sort by owner alphabetical name
+            String p1Name = campOne.getOwner().getName();
+            String p2Name = campTwo.getOwner().getName();
+            assert p1Name != null;
+            assert p2Name != null;
+            return p1Name.compareTo(p2Name);
+        };
+
+        this.ruinComparator = (ruinOne, ruinTwo) -> {
+            // Sort by alphabetical name
+            String p1Name = ruinOne.getName();
+            String p2Name = ruinTwo.getName();
+            assert p1Name != null;
+            assert p2Name != null;
+            return p1Name.compareTo(p2Name);
+        };
+
+        this.sanctuaryComparator = (sanctuaryOne, sanctuaryTwo) -> {
+            // Sort by alphabetical name
+            String p1Name = sanctuaryOne.getName();
+            String p2Name = sanctuaryTwo.getName();
+            assert p1Name != null;
+            assert p2Name != null;
+            return p1Name.compareTo(p2Name);
+        };
+
+        this.templateComparator = (templateOne, templateTwo) -> {
+            // Sort by alphabetical name
+            String p1Name = templateOne.getName();
+            String p2Name = templateTwo.getName();
+            assert p1Name != null;
+            assert p2Name != null;
+            return p1Name.compareTo(p2Name);
+        };
+
+        this.playerComparator = (playerOne, playerTwo) -> {
+            // Sort by alphabetical name
+            String p1Name = playerOne.getOfflineBukkitPlayer().getName();
+            String p2Name = playerTwo.getOfflineBukkitPlayer().getName();
+            assert p1Name != null;
+            assert p2Name != null;
+            return p1Name.compareTo(p2Name);
         };
 
         this.prefixComparator = (prefixOne, prefixTwo) -> {

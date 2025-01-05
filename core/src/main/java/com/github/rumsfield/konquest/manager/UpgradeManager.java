@@ -14,6 +14,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -96,6 +97,15 @@ public class UpgradeManager implements KonquestUpgradeManager {
         }
         return status;
 	}
+
+	/**
+	 * Provides a list of all upgrades.
+	 *
+	 * @return All upgrades
+	 */
+	public List<KonquestUpgrade> getAllUpgrades() {
+        return new ArrayList<>(Arrays.asList(KonUpgrade.values()));
+	}
 	
 	/**
 	 * Provides a list of upgrades available for purchase for the given town.
@@ -167,20 +177,20 @@ public class UpgradeManager implements KonquestUpgradeManager {
 		// Check that the town has the previous level, if applicable
 		int currentLevel = town.getUpgradeLevel(upgrade);
 		if(level < 1 || level > upgrade.getMaxLevel() || level != currentLevel+1) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_LEVEL.getMessage(upgrade.getDescription(),level,currentLevel));
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_LEVEL.getMessage(upgrade.getName(),level,currentLevel));
 			return false;
 		}
 		// Check that the town has enough population
 		int currentPopulation = town.getNumResidents();
 		int requiredPopulation = upgradePopulations.get(upgrade).get(level-1);
 		if(currentPopulation < requiredPopulation) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_POPULATION.getMessage(upgrade.getDescription(),level,requiredPopulation));
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_POPULATION.getMessage(upgrade.getName(),level,requiredPopulation));
 			return false;
 		}
 		// Check that the player has enough favor
 		int requiredCost = upgradeCosts.get(upgrade).get(level-1);
 		if(KonquestPlugin.getBalance(bukkitPlayer) < requiredCost) {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_COST.getMessage(upgrade.getDescription(),level,requiredCost));
+			ChatUtil.sendError(bukkitPlayer, MessagePath.MENU_UPGRADE_FAIL_COST.getMessage(upgrade.getName(),level,requiredCost));
             return false;
 		}
 		// Passed all checks, add the upgrade
@@ -188,8 +198,8 @@ public class UpgradeManager implements KonquestUpgradeManager {
 		if(upgrade.equals(KonUpgrade.HEALTH)) {
 			konquest.getKingdomManager().refreshTownHearts(town);
 		}
-		ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_UPGRADE_ADD.getMessage(upgrade.getDescription(),level,town.getName()));
-		ChatUtil.printDebug("Applied new upgrade "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
+		ChatUtil.sendNotice(bukkitPlayer, MessagePath.MENU_UPGRADE_ADD.getMessage(upgrade.getName(),level,town.getName()));
+		ChatUtil.printDebug("Applied new upgrade "+upgrade.getName()+" level "+level+" to town "+town.getName());
 		// Withdraw cost
 		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
         if(KonquestPlugin.withdrawPlayer(bukkitPlayer, requiredCost)) {
@@ -209,7 +219,7 @@ public class UpgradeManager implements KonquestUpgradeManager {
 		if(upgrade.equals(KonUpgrade.HEALTH)) {
 			konquest.getKingdomManager().refreshTownHearts(town);
 		}
-		ChatUtil.printDebug("Applied upgrade "+upgrade.getDescription()+" level "+level+" to town "+town.getName());
+		ChatUtil.printDebug("Applied upgrade "+upgrade.getName()+" level "+level+" to town "+town.getName());
 		updateTownDisabledUpgrades(town);
 		return true;
 	}
@@ -242,25 +252,25 @@ public class UpgradeManager implements KonquestUpgradeManager {
 								newLevel--;
 							}
 							town.disableUpgrade(upgrade,newLevel);
-							ChatUtil.printDebug("UPGRADE: Disabled upgrade "+upgrade.getDescription()+" from level "+level+" to "+newLevel+" for town "+town.getName());
+							ChatUtil.printDebug("UPGRADE: Disabled upgrade "+upgrade.getName()+" from level "+level+" to "+newLevel+" for town "+town.getName());
 						} else {
 							// Current population is greater than or equal to this upgrade level's requirement
 							boolean status = town.allowUpgrade(upgrade);
 							if(status) {
-								ChatUtil.printDebug("UPGRADE: Successfully allowed upgrade "+upgrade.getDescription()+" level "+level+" for town "+town.getName());
+								ChatUtil.printDebug("UPGRADE: Successfully allowed upgrade "+upgrade.getName()+" level "+level+" for town "+town.getName());
 							} else {
-								ChatUtil.printDebug("UPGRADE: No change to upgrade "+upgrade.getDescription()+" level "+level+" for town "+town.getName());
+								ChatUtil.printDebug("UPGRADE: No change to upgrade "+upgrade.getName()+" level "+level+" for town "+town.getName());
 							}
 						}
 					} else {
 						// This upgrade level is disabled because either the cost is set to a negative number or is missing from the upgrades.yml
 						town.disableUpgrade(upgrade,0);
-						ChatUtil.printDebug("UPGRADE: Disabled invalid upgrade "+upgrade.getDescription()+" to level 0 for town "+town.getName()+", cost is "+cost);
+						ChatUtil.printDebug("UPGRADE: Disabled invalid upgrade "+upgrade.getName()+" to level 0 for town "+town.getName()+", cost is "+cost);
 					}
 				} else {
 					// Upgrades are disabled in config, disable every purchased upgrade
 					town.disableUpgrade(upgrade,0);
-					ChatUtil.printDebug("UPGRADE: Disabled unused upgrade "+upgrade.getDescription()+" to level 0 for town "+town.getName());
+					ChatUtil.printDebug("UPGRADE: Disabled unused upgrade "+upgrade.getName()+" to level 0 for town "+town.getName());
 				}
 			}
 		}

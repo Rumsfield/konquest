@@ -346,7 +346,7 @@ public class TownCommand extends CommandBase {
 												upgrade.toString() +
 												" - " +
 												ChatColor.RESET +
-												upgrade.getDescription() +
+												upgrade.getName() +
 												" " +
 												upgradeLevel +
 												" " +

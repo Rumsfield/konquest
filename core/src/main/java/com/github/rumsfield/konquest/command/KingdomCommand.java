@@ -301,7 +301,7 @@ public class KingdomCommand extends CommandBase {
 			case "templates":
 				// Display templates menu
 				if(args.size() == 1) {
-					konquest.getDisplayManager().displayTemplateInfoMenu(player);
+					konquest.getDisplayManager().displayInfoTemplateListMenu(player);
 				} else {
 					sendInvalidArgMessage(bukkitPlayer);
 				}

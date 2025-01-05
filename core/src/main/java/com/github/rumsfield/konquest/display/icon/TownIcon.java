@@ -61,7 +61,7 @@ public class TownIcon extends MenuIcon {
 			}
 		}
 		addNameValue(MessagePath.LABEL_POPULATION.getMessage(), town.getNumResidents());
-		addNameValue(MessagePath.LABEL_POPULATION.getMessage(), town.getNumLand());
+		addNameValue(MessagePath.LABEL_LAND.getMessage(), town.getNumLand());
 	}
 	
 	public KonTown getTown() {

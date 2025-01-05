@@ -9,10 +9,12 @@ import org.bukkit.inventory.ItemStack;
 public class OptionIcon extends MenuIcon {
 	
 	private final KonTownOption option;
+	private final boolean isClickable;
 	
-	public OptionIcon(KonTownOption option, int index) {
+	public OptionIcon(KonTownOption option, int index, boolean isClickable) {
 		super(index);
 		this.option = option;
+		this.isClickable = isClickable;
 		// Item Lore
 		addDescription(option.getDescription());
 	}
@@ -33,7 +35,7 @@ public class OptionIcon extends MenuIcon {
 
 	@Override
 	public boolean isClickable() {
-		return true;
+		return isClickable;
 	}
 
 }

@@ -33,7 +33,7 @@ public class UpgradeIcon extends MenuIcon{
 
 	@Override
 	public String getName() {
-		return DisplayManager.nameFormat + upgrade.getDescription();
+		return DisplayManager.nameFormat + upgrade.getName();
 	}
 
 	@Override

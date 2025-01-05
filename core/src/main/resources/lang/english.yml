@@ -21,7 +21,11 @@ label:
   blocks: "Blocks"
   bypass: "BYPASS"
   camp: "Camp"
+  camps: "Camps"
+  camp-clan: "Camp Clan"
   capital: "Capital"
+  capitals: "Capitals"
+  captured: "Captured"
   changing-capital: "Changing to Capital"
   changing-town: "Changing to Town"
   close: "Close"
@@ -36,6 +40,7 @@ label:
   favor: "Favor"
   flags: "Flags"
   golem-offense: "Iron Golem Offense"
+  golem-spawns: "Iron Golem Spawns"
   health: "Health"
   immunity: "Immunity"
   increment-cost: "Increment Cost"
@@ -52,12 +57,14 @@ label:
   level: "Level"
   loot-chests: "Loot Chests"
   lord: "Lord"
+  map-color: "Map Color"
   master: "Master"
   member: "Member"
   members: "Members"
   modified: "Modified"
   monument: "Monument"
   monument-template: "Monument Template"
+  monument-templates: "Monument Templates"
   name: "Name"
   neutral: "Neutral"
   neutrals: "Neutrals"
@@ -81,7 +88,9 @@ label:
   residents: "Residents"
   return: "Return"
   ruin: "Ruin"
+  ruins: "Ruins"
   sanctuary: "Sanctuary"
+  sanctuaries: "Sanctuaries"
   score: "Score"
   shield: "Shield"
   shields: "Shields"
@@ -137,11 +146,11 @@ menu:
     title: "Konquest Main Menu"
     title-dashboard: "Konquest Dashboard"
     dashboard: "Dashboard"
-    help: "Help Menu"
+    help: "Konquest Menu"
     info: "Info Menu"
     quest: "Quest Book"
     stats: "Stats Books"
-    prefix: "Prefix Menu"
+    prefix: "Accomplishment Prefix Menu"
     score: "Score Menu"
     kingdom: "Kingdom Menu"
     town: "Town Menu"
@@ -182,7 +191,6 @@ menu:
     fail-attack: "Failed to add any upgrades while town is under attack!"
     add: "Added %s level %s to the Town of %s!"
   help:
-    title: "Konquest Help"
     title-start: "Konquest Getting Started"
     title-commands: "Konquest Commands"
     title-admin: "Konquest Admin Commands"
@@ -208,7 +216,6 @@ menu:
     tip-8: "Build Iron Golems to protect your towns from enemy players. Seek out Ruins and defeat the Ruin Golems for a reward."
     tip-9: "Use \"/k stats\" and \"/k score\" to view player statistics. Use \"/k prefix\" to set your own chat title. Unlock titles with increased stats."
   score:
-    title: "Score Menu"
     kingdom-towns: "Kingdom Towns"
     kingdom-land: "Kingdom Land"
     kingdom-favor: "Kingdom Favor"
@@ -228,7 +235,6 @@ menu:
     proximity: "Proximity"
     settle-hint: "Settle Here"
   prefix:
-    title: "Accomplishment Prefix Menu"
     title-prefix: "Prefix Titles"
     title-custom: "Custom Prefixes"
     title-stats: "Accomplishment Stats"
@@ -251,6 +257,12 @@ menu:
     friendly-redstone: "Kingdom members can use redstone switches and doors"
     redstone: "Enemies can use redstone switches and doors"
     golem: "Iron Golems will attack all enemies who enter"
+  info:
+    camp-placed: "Barbarian Camp is placed."
+    camp-missing: "This player has no camp."
+    ruin-status: "Capture Status"
+    ruin-capture: "This Ruin can be captured for a reward."
+    template-kingdoms: "List all kingdoms that use this Monument Template."
   plots:
     edit-add-land: "Add Land"
     edit-remove-land: "Remove Land"
@@ -331,7 +343,6 @@ menu:
     hint-special: "Click to specialize"
     lore-special: "Choose this profession for a discount with villagers in this town."
     info-special: "Villagers with this profession give discounts in this town."
-    title-root: "Town Menu"
     title-join: "Join a Town"
     title-leave: "Leave a Town"
     title-list: "Town List"
@@ -395,7 +406,6 @@ menu:
     diplomacy-trade-info: "No PvP. Villager trade discounts. Use chest shops."
     diplomacy-alliance-info: "No PvP. Villager trade discounts. Use chest shops. Defensive pact. Travel to towns and capital."
     diplomacy-war-info: "PvP. Attack and capture towns and capital."
-    title-root: "Kingdom Menu"
     title-join: "Join a Kingdom"
     title-confirm: "Are you sure?"
     title-invites: "Kingdom Invites"
@@ -511,6 +521,7 @@ protection:
     portal-exit: "Your exit portal is inside of protected territory, move your portal!"
     capital-immune: "This capital is immune to attacks while %s towns remain in the Kingdom of %s."
     no-allied-build: "This town's options do not allow players from allied kingdoms to build."
+    template-modify: "This monument template is currently being modified and will be available soon."
 command:
   admin:
     camp:
@@ -644,14 +655,6 @@ command:
       command: "All major command uses:"
     error:
       page: "The page value must be a number."
-  info:
-    notice:
-      kingdom-header: "Kingdom of %s"
-      town-header: "Town of %s"
-      camp-placed: "Barbarian Camp is placed."
-      camp-missing: "This player has no camp."
-      ruin-status: "Capture Status"
-      ruin-capture: "This Ruin can be captured for a reward."
   kingdom:
     broadcast:
       create: "%s has created the Kingdom of %s"
@@ -751,6 +754,7 @@ command:
     error:
       peaceful: "The Kingdom of %s is peaceful, and cannot be scored."
       barbarian: "%s is a Barbarian, and cannot be scored."
+      kingdom: "This Kingdom cannot be scored."
   settle:
     broadcast:
       settle: "%s has settled the Town of %s for Kingdom %s"
@@ -1088,7 +1092,7 @@ description:
   admin-settravel: "Sets the travel point for the territory you're in."
   admin-travel: "Teleport to the specified kingdom or town."
   admin-reload: "Reloads configuration files."
-  admin-flag: "Set kingdom property flags."
+  admin-flag: "Set property flags for kingdoms and territories."
   admin-stat: "Manage player stats."
 territory:
   wild: "Wild"

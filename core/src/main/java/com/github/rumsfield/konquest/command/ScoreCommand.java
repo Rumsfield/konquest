@@ -48,7 +48,7 @@ public class ScoreCommand extends CommandBase {
 		int kingdomScore;
 		int playerScore;
 		if(args.isEmpty()) {
-			// Display player's own score GUI
+			// Display base score menu
 			if(player.isBarbarian()) {
 				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
 			} else if(kingdom.isPeaceful()) {
@@ -58,7 +58,7 @@ public class ScoreCommand extends CommandBase {
 				playerScore = konquest.getKingdomManager().getPlayerScore(player);
 				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SCORE_NOTICE_SCORE.getMessage(playerScore,kingdom.getName(),kingdomScore));
 				// Display Score GUI
-				konquest.getDisplayManager().displayScoreMenu(player, player);
+				konquest.getDisplayManager().displayScoreMenu(player);
 			}
 		} else {
 			if (args.get(0).equalsIgnoreCase("all")) {
@@ -90,7 +90,7 @@ public class ScoreCommand extends CommandBase {
 					playerScore = konquest.getKingdomManager().getPlayerScore(offlinePlayer);
 					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_SCORE_NOTICE_PLAYER.getMessage(offlinePlayerName, playerScore, kingdom.getName(), kingdomScore));
 					// Display Score GUI
-					konquest.getDisplayManager().displayScoreMenu(player, offlinePlayer);
+					konquest.getDisplayManager().displayScorePlayerMenu(player, offlinePlayer);
 				}
 			}
 		}

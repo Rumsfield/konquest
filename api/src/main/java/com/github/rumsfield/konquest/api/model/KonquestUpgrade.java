@@ -27,11 +27,11 @@ public interface KonquestUpgrade {
     Material getIcon();
 
     /**
-     * Gets the description of this upgrade.
+     * Gets the name of this upgrade.
      *
-     * @return The description
+     * @return The name
      */
-    String getDescription();
+    String getName();
 
     /**
      * Gets the level description, starting at 1.

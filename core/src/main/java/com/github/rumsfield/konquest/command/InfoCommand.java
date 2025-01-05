@@ -38,8 +38,8 @@ public class InfoCommand extends CommandBase {
 		// Parse arguments
 		if (args.isEmpty()) {
 			// No arguments
-			// Display the player's kingdom info
-			konquest.getDisplayManager().displayKingdomInfoMenu(player, player.getKingdom());
+			// Display the base info menu
+			konquest.getDisplayManager().displayInfoMenu(player);
 		} else if(args.size() == 2) {
 			// Two arguments
 			String infoType = args.get(0);
@@ -49,25 +49,25 @@ public class InfoCommand extends CommandBase {
 				case "player":
 					KonOfflinePlayer otherPlayer = konquest.getPlayerManager().getOfflinePlayerFromName(infoName);
 					if(otherPlayer != null) {
-						konquest.getDisplayManager().displayPlayerInfoMenu(player, otherPlayer);
+						konquest.getDisplayManager().displayInfoPlayerMenu(player, otherPlayer);
 						return;
 					}
 					break;
 				case "kingdom":
 					if(konquest.getKingdomManager().isKingdom(infoName)) {
 						KonKingdom kingdom = konquest.getKingdomManager().getKingdom(infoName);
-						konquest.getDisplayManager().displayKingdomInfoMenu(player, kingdom);
+						konquest.getDisplayManager().displayInfoKingdomMenu(player, kingdom);
 						return;
 					} else if(infoName.equalsIgnoreCase(MessagePath.LABEL_BARBARIANS.getMessage())) {
 						KonKingdom kingdom = konquest.getKingdomManager().getBarbarians();
-						konquest.getDisplayManager().displayKingdomInfoMenu(player, kingdom);
+						konquest.getDisplayManager().displayInfoKingdomMenu(player, kingdom);
 						return;
 					}
 					break;
 				case "capital":
 					for(KonKingdom k : konquest.getKingdomManager().getKingdoms()) {
 						if(k.hasCapital(infoName)) {
-							konquest.getDisplayManager().displayTownInfoMenu(player, k.getCapital());
+							konquest.getDisplayManager().displayInfoTownMenu(player, k.getCapital());
 							return;
 						}
 					}
@@ -75,7 +75,7 @@ public class InfoCommand extends CommandBase {
 				case "town":
 					for(KonKingdom k : konquest.getKingdomManager().getKingdoms()) {
 						if(k.hasTown(infoName)) {
-							konquest.getDisplayManager().displayTownInfoMenu(player, k.getTown(infoName));
+							konquest.getDisplayManager().displayInfoTownMenu(player, k.getTown(infoName));
 							return;
 						}
 					}
@@ -83,14 +83,14 @@ public class InfoCommand extends CommandBase {
 				case "ruin":
 					if(konquest.getRuinManager().isRuin(infoName)) {
 						KonRuin ruin = konquest.getRuinManager().getRuin(infoName);
-						konquest.getDisplayManager().displayRuinInfoMenu(player, ruin);
+						konquest.getDisplayManager().displayInfoRuinMenu(player, ruin);
 						return;
 					}
 					break;
 				case "sanctuary":
 					if(konquest.getSanctuaryManager().isSanctuary(infoName)) {
 						KonSanctuary sanctuary = konquest.getSanctuaryManager().getSanctuary(infoName);
-						konquest.getDisplayManager().displaySanctuaryInfoMenu(player, sanctuary);
+						konquest.getDisplayManager().displayInfoSanctuaryMenu(player, sanctuary);
 						return;
 					}
 					break;

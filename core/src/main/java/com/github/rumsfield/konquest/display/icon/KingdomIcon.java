@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.model.KonKingdom;
+import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Material;
@@ -22,6 +23,10 @@ public class KingdomIcon extends MenuIcon {
 		this.material = isViewer ? Material.GOLDEN_HELMET : Material.DIAMOND_HELMET;
 		this.isProtected = kingdom.isOfflineProtected();
 		// Item Lore
+		int numKingdomLand = 0;
+		for(KonTown town : kingdom.getCapitalTowns()) {
+			numKingdomLand += town.getNumLand();
+		}
 		if(kingdom.isOfflineProtected()) {
 			addAlert(MessagePath.LABEL_PROTECTED.getMessage());
 		}
@@ -39,7 +44,11 @@ public class KingdomIcon extends MenuIcon {
 		if(kingdom.isOpen()) {
 			addProperty(MessagePath.LABEL_OPEN.getMessage());
 		}
+		if(kingdom.isSmallest()) {
+			addProperty(MessagePath.LABEL_SMALLEST.getMessage());
+		}
 		addNameValue(MessagePath.LABEL_TOWNS.getMessage(), kingdom.getNumTowns());
+		addNameValue(MessagePath.LABEL_LAND.getMessage(), numKingdomLand);
 		addNameValue(MessagePath.LABEL_MEMBERS.getMessage(), kingdom.getNumMembers());
 	}
 	

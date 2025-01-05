@@ -58,7 +58,7 @@ public class HelpMenu extends StateMenu {
         int ROOT_SLOT_COMMANDS 		    = 6;
         int ROOT_SLOT_COMMANDS_ADMIN 	= 8;
 
-        result = new DisplayMenu(1, MessagePath.MENU_HELP_TITLE.getMessage());
+        result = new DisplayMenu(1, MessagePath.MENU_MAIN_HELP.getMessage());
 
         /* Getting Started */
         icon = new InfoIcon(MessagePath.MENU_HELP_START.getMessage(), Material.WOODEN_PICKAXE, ROOT_SLOT_START, true);

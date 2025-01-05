@@ -882,7 +882,7 @@ public class KingdomMenu extends StateMenu {
 							break;
 						case A_INFO:
 							// Open the kingdom info menu, close this menu
-							getKonquest().getDisplayManager().displayKingdomInfoMenu(player, kingdom);
+							getKonquest().getDisplayManager().displayInfoKingdomMenu(player, kingdom);
 							break;
 						case C_OPEN:
 							// Clicked to toggle open/closed state, refresh this view
@@ -927,7 +927,7 @@ public class KingdomMenu extends StateMenu {
 					if (clickedIcon instanceof KingdomIcon) {
 						KingdomIcon icon = (KingdomIcon)clickedIcon;
 						KonKingdom clickKingdom = icon.getKingdom();
-						getKonquest().getDisplayManager().displayKingdomInfoMenu(player, clickKingdom);
+						getKonquest().getDisplayManager().displayInfoKingdomMenu(player, clickKingdom);
 					}
 					break;
 				case B_RELATIONSHIP:
@@ -1033,7 +1033,7 @@ public class KingdomMenu extends StateMenu {
 		String result = "error";
 		switch(context) {
 			case ROOT:
-				result = MessagePath.MENU_KINGDOM_TITLE_ROOT.getMessage();
+				result = MessagePath.MENU_MAIN_KINGDOM.getMessage();
 				break;
 			case A_JOIN:
 				result = MessagePath.MENU_KINGDOM_TITLE_JOIN.getMessage();

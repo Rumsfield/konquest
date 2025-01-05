@@ -33,23 +33,25 @@ public class ScoreMenu extends StateMenu {
         this.player = player;
         this.scorePlayer = null;
         this.scoreKingdom = null;
-        this.returnState = MenuState.ROOT;
+        this.returnState = null;
 
         /* Initialize menu view */
         setCurrentView(MenuState.ROOT);
 
     }
 
-    public DisplayMenu goToPlayerScore(KonOfflinePlayer scorePlayer) {
+    public void goToPlayerScore(KonOfflinePlayer scorePlayer) {
+        if (scorePlayer == null) return;
         this.scorePlayer = scorePlayer;
         // Change to player score view
-        return refreshNewView(MenuState.PLAYER_SCORE);
+        refreshNewView(MenuState.PLAYER_SCORE);
     }
 
-    public DisplayMenu goToKingdomScore(KonKingdom scoreKingdom) {
+    public void goToKingdomScore(KonKingdom scoreKingdom) {
+        if (scoreKingdom == null) return;
         this.scoreKingdom = scoreKingdom;
         // Change to kingdom score view
-        return refreshNewView(MenuState.KINGDOM_SCORE);
+        refreshNewView(MenuState.KINGDOM_SCORE);
     }
 
     /**
@@ -546,7 +548,7 @@ public class ScoreMenu extends StateMenu {
         String result = "error";
         switch (context) {
             case ROOT:
-                result = MessagePath.MENU_SCORE_TITLE.getMessage();
+                result = MessagePath.MENU_MAIN_SCORE.getMessage();
                 break;
             case PLAYER_ALL:
                 result = MessagePath.LABEL_PLAYERS.getMessage();
