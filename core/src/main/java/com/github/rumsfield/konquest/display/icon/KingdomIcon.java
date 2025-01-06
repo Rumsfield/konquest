@@ -47,9 +47,9 @@ public class KingdomIcon extends MenuIcon {
 		if(kingdom.isSmallest()) {
 			addProperty(MessagePath.LABEL_SMALLEST.getMessage());
 		}
+		addNameValue(MessagePath.LABEL_MEMBERS.getMessage(), kingdom.getNumMembers());
 		addNameValue(MessagePath.LABEL_TOWNS.getMessage(), kingdom.getNumTowns());
 		addNameValue(MessagePath.LABEL_LAND.getMessage(), numKingdomLand);
-		addNameValue(MessagePath.LABEL_MEMBERS.getMessage(), kingdom.getNumMembers());
 	}
 	
 	public KonKingdom getKingdom() {

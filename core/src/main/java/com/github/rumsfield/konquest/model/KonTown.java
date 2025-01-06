@@ -1377,7 +1377,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 
 	public boolean canClaimLordship(KonPlayer player) {
 		boolean result = false;
-		if(!isLordValid()) {
+		if(!isLordValid() && player.getKingdom().equals(this.getKingdom())) {
 			if(isOpen()) {
 				result = true;
 			} else {

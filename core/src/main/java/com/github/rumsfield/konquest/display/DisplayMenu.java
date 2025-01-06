@@ -8,8 +8,8 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * A wrapper for a single Inventory view that contains icons.
@@ -44,7 +44,7 @@ public class DisplayMenu {
 	public void updateIcons() {
 		Bukkit.getScheduler().runTaskAsynchronously(Konquest.getInstance().getPlugin(), () -> {
 			// Set non-player heads first
-			HashSet<MenuIcon> heads = new HashSet<>();
+			ArrayList<MenuIcon> heads = new ArrayList<>();
 			for(MenuIcon icon : iconMap.values()) {
 				if(icon instanceof PlayerIcon) {
 					heads.add(icon);

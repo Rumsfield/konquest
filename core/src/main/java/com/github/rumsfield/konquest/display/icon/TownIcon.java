@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display.icon;
 
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
+import com.github.rumsfield.konquest.model.KonCapital;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
@@ -22,11 +23,19 @@ public class TownIcon extends MenuIcon {
 		this.contextColor = contextColor;
 		this.isClickable = isClickable;
 		if(town.isAttacked()) {
-			this.material = Material.RED_WOOL;
+			this.material = Material.REDSTONE_BLOCK;
 		} else if(town.isArmored()) {
 			this.material = Material.STONE_BRICKS;
 		} else {
-			this.material = Material.OBSIDIAN;
+			if (town instanceof KonCapital) {
+				if (town.getKingdom().isCapitalImmune()) {
+					this.material = Material.ORANGE_STAINED_GLASS;
+				} else {
+					this.material = Material.ORANGE_CONCRETE;
+				}
+			} else {
+				this.material = Material.OBSIDIAN;
+			}
 		}
 		this.isProtected = town.isShielded();
 		// Item Lore

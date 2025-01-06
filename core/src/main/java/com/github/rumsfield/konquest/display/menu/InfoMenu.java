@@ -54,11 +54,11 @@ public class InfoMenu extends StateMenu {
         DISPLAY_KINGDOM_SCORE
     }
 
-    private final Material flagMaterial = Material.REDSTONE_TORCH;
+    private final Material flagMaterial = Material.ORANGE_BANNER;
     private final Material propMaterial = Material.PAPER;
 
+    private final HashMap<MenuState,MenuState> returnStack;
     private final KonPlayer player;
-    private MenuState returnState;
     private KonOfflinePlayer infoPlayer;
     private KonKingdom infoKingdom;
     private KonTown infoTown;
@@ -70,7 +70,6 @@ public class InfoMenu extends StateMenu {
     public InfoMenu(Konquest konquest, KonPlayer player) {
         super(konquest, MenuState.ROOT, null);
         this.player = player;
-        this.returnState = null;
         this.infoPlayer = null;
         this.infoKingdom = null;
         this.infoTown = null;
@@ -78,6 +77,7 @@ public class InfoMenu extends StateMenu {
         this.infoRuin = null;
         this.infoSanctuary = null;
         this.infoTemplate = null;
+        this.returnStack = new HashMap<>();
 
         /* Initialize menu view */
         setCurrentView(MenuState.ROOT);
@@ -157,7 +157,7 @@ public class InfoMenu extends StateMenu {
         result.addIcon(icon);
 
         /* Kingdoms Icon */
-        icon = new InfoIcon(MessagePath.LABEL_KINGDOMS.getMessage(), Material.GOLDEN_SWORD, ROOT_SLOT_KINGDOMS, true);
+        icon = new InfoIcon(MessagePath.LABEL_KINGDOMS.getMessage(), Material.DIAMOND_HELMET, ROOT_SLOT_KINGDOMS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
         icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         icon.setState(MenuState.KINGDOM_LIST);
@@ -171,14 +171,14 @@ public class InfoMenu extends StateMenu {
         result.addIcon(icon);
 
         /* Ruins Icon */
-        icon = new InfoIcon(MessagePath.LABEL_RUINS.getMessage(), Material.CRACKED_STONE_BRICKS, ROOT_SLOT_RUINS, true);
+        icon = new InfoIcon(MessagePath.LABEL_RUINS.getMessage(), Material.MOSSY_COBBLESTONE, ROOT_SLOT_RUINS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
         icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         icon.setState(MenuState.RUIN_LIST);
         result.addIcon(icon);
 
         /* Capitals Icon */
-        icon = new InfoIcon(MessagePath.LABEL_CAPITALS.getMessage(), Material.STONE_BRICKS, ROOT_SLOT_CAPITALS, true);
+        icon = new InfoIcon(MessagePath.LABEL_CAPITALS.getMessage(), Material.ORANGE_CONCRETE, ROOT_SLOT_CAPITALS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
         icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         icon.setState(MenuState.CAPITAL_LIST);
@@ -274,6 +274,9 @@ public class InfoMenu extends StateMenu {
             icon = new PlayerIcon(currentPlayer.getOfflineBukkitPlayer(),contextColor,0,true);
             // Context lore
             switch (context) {
+                case PLAYER_LIST:
+                    icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), currentPlayer.getKingdom().getName());
+                    break;
                 case KINGDOM_INFO_OFFICERS:
                     icon.addProperty(MessagePath.LABEL_OFFICER.getMessage());
                     break;
@@ -301,7 +304,7 @@ public class InfoMenu extends StateMenu {
     /**
      * Creates the kingdom list view.
      * This can be a multiple paged view.
-     * Context states: KINGDOM_LIST, MONUMENT_INFO_KINGDOMS
+     * Context states: KINGDOM_LIST, MONUMENT_INFO_KINGDOMS, KINGDOM_INFO_ENEMIES, KINGDOM_INFO_ALLIES, KINGDOM_INFO_TRADERS
      */
     private List<DisplayMenu> createKingdomView(MenuState context) {
         ArrayList<MenuIcon> icons = new ArrayList<>();
@@ -320,6 +323,21 @@ public class InfoMenu extends StateMenu {
                             kingdoms.add(kingdom);
                         }
                     }
+                }
+                break;
+            case KINGDOM_INFO_ENEMIES:
+                if (infoKingdom != null) {
+                    kingdoms.addAll(infoKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.WAR));
+                }
+                break;
+            case KINGDOM_INFO_ALLIES:
+                if (infoKingdom != null) {
+                    kingdoms.addAll(infoKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.ALLIANCE));
+                }
+                break;
+            case KINGDOM_INFO_TRADERS:
+                if (infoKingdom != null) {
+                    kingdoms.addAll(infoKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.TRADE));
                 }
                 break;
             default:
@@ -382,7 +400,7 @@ public class InfoMenu extends StateMenu {
                 break;
             case KINGDOM_INFO_TOWNS:
                 if (infoKingdom != null) {
-                    contextViewer = infoPlayer.getOfflineBukkitPlayer();
+                    contextViewer = player.getBukkitPlayer();
                     towns.addAll(infoKingdom.getTowns());
                 }
                 break;
@@ -654,6 +672,8 @@ public class InfoMenu extends StateMenu {
         icon = new PlayerIcon(infoPlayer.getOfflineBukkitPlayer(), contextColor, SLOT_PLAYER, false);
         if (infoPlayer.isBarbarian()) {
             icon.addProperty(MessagePath.LABEL_BARBARIAN.getMessage());
+        } else {
+            icon.addProperty(infoPlayer.getKingdom().getPlayerRoleName(infoPlayer));
         }
         result.addIcon(icon);
 
@@ -666,6 +686,7 @@ public class InfoMenu extends StateMenu {
                 icon.setState(MenuState.CAMP_INFO);
             } else {
                 icon = new InfoIcon(MessagePath.LABEL_CAMP.getMessage(), Material.BARRIER, SLOT_KINGDOM_CAMP, false);
+                icon.addProperty(MessagePath.LABEL_BARBARIANS.getMessage());
                 icon.addDescription(MessagePath.MENU_INFO_CAMP_MISSING.getMessage());
             }
         } else {
@@ -731,7 +752,7 @@ public class InfoMenu extends StateMenu {
         MenuIcon icon;
 
         /* Icon slot indexes */
-        int rows = 2;
+        int rows = 3;
         // Row 0: 0  1  2  3  4  5  6  7  8
         int SLOT_KINGDOM = 0;
         int SLOT_DIPLOMACY = 1;
@@ -742,12 +763,13 @@ public class InfoMenu extends StateMenu {
         int SLOT_MONUMENT = 7;
         int SLOT_SCORE = 8;
         // Row 1: 9 10 11 12 13 14 15 16 17
-        int SLOT_OFFICERS = 10;
-        int SLOT_MEMBERS = 11;
-        int SLOT_TOWNS = 12;
-        int SLOT_ENEMIES = 13;
-        int SLOT_ALLIES = 14;
-        int SLOT_TRADERS = 15;
+        int SLOT_OFFICERS = 12;
+        int SLOT_MEMBERS = 13;
+        int SLOT_TOWNS = 14;
+        // Row 2: 18 19 20 21 22 23 24 25 26
+        int SLOT_ENEMIES = 21;
+        int SLOT_ALLIES = 22;
+        int SLOT_TRADERS = 23;
 
         boolean isClickable = infoKingdom.isCreated();
         boolean isViewer = infoKingdom.equals(player.getKingdom());
@@ -879,7 +901,7 @@ public class InfoMenu extends StateMenu {
 
         /* Score Icon (Unavailable to Barbarians and peaceful kingdoms) */
         boolean isScoreClickable = infoKingdom.isCreated() && !infoKingdom.isPeaceful();
-        icon = new InfoIcon(MessagePath.LABEL_SCORE.getMessage(), CommandType.SCORE.iconMaterial(), SLOT_SCORE, isScoreClickable);
+        icon = new InfoIcon(MessagePath.MENU_SCORE_KINGDOM_SCORE.getMessage(), CommandType.SCORE.iconMaterial(), SLOT_SCORE, isScoreClickable);
         if (isScoreClickable) {
             int kingdomScore = getKonquest().getKingdomManager().getKingdomScore(infoKingdom);
             icon.addNameValue(MessagePath.LABEL_SCORE.getMessage(), kingdomScore);
@@ -897,7 +919,7 @@ public class InfoMenu extends StateMenu {
 
         /* Officers Icon */
         int numOfficers = infoKingdom.getPlayerOfficersOnly().size();
-        icon = new InfoIcon(MessagePath.LABEL_OFFICERS.getMessage(), Material.IRON_SWORD, SLOT_OFFICERS, true);
+        icon = new InfoIcon(MessagePath.LABEL_OFFICERS.getMessage(), Material.IRON_HORSE_ARMOR, SLOT_OFFICERS, true);
         icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numOfficers);
         icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         icon.setState(MenuState.KINGDOM_INFO_OFFICERS);
@@ -905,7 +927,7 @@ public class InfoMenu extends StateMenu {
 
         /* Members Icon */
         int numMembers = infoKingdom.getPlayerMembersOnly().size();
-        icon = new InfoIcon(MessagePath.LABEL_MEMBERS.getMessage(), Material.IRON_HOE, SLOT_MEMBERS, true);
+        icon = new InfoIcon(MessagePath.LABEL_MEMBERS.getMessage(), Material.LEATHER_CHESTPLATE, SLOT_MEMBERS, true);
         icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numMembers);
         icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         icon.setState(MenuState.KINGDOM_INFO_MEMBERS);
@@ -913,9 +935,9 @@ public class InfoMenu extends StateMenu {
 
         /* Towns Icon (Unavailable to Barbarians) */
         int numTowns = infoKingdom.getNumTowns();
-        icon = new InfoIcon(MessagePath.LABEL_TOWNS.getMessage(), Material.OBSIDIAN, SLOT_TOWNS, isClickable);
+        icon = new InfoIcon(MessagePath.LABEL_TOWNS.getMessage(), CommandType.TOWN.iconMaterial(), SLOT_TOWNS, isClickable);
         if (isClickable) {
-            icon.addNameValue(MessagePath.LABEL_TOWNS.getMessage(), numTowns);
+            icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numTowns);
             icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
             icon.setState(MenuState.KINGDOM_INFO_TOWNS);
         } else {
@@ -925,7 +947,7 @@ public class InfoMenu extends StateMenu {
 
         /* Enemies Icon (Unavailable to Barbarians) */
         int numEnemies = infoKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.WAR).size();
-        icon = new InfoIcon(MessagePath.DIPLOMACY_WAR.getMessage(), Material.WOODEN_SWORD, SLOT_ENEMIES, isClickable);
+        icon = new InfoIcon(MessagePath.DIPLOMACY_WAR.getMessage(), Material.GUNPOWDER, SLOT_ENEMIES, isClickable);
         if (isClickable) {
             icon.addNameValue(MessagePath.LABEL_KINGDOMS.getMessage(), numEnemies);
             icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
@@ -937,7 +959,7 @@ public class InfoMenu extends StateMenu {
 
         /* Allies Icon (Unavailable to Barbarians) */
         int numAllies = infoKingdom.getActiveRelationKingdoms(KonquestDiplomacyType.ALLIANCE).size();
-        icon = new InfoIcon(MessagePath.DIPLOMACY_ALLIANCE.getMessage(), Material.LEATHER_CHESTPLATE, SLOT_ALLIES, isClickable);
+        icon = new InfoIcon(MessagePath.DIPLOMACY_ALLIANCE.getMessage(), Material.DIAMOND, SLOT_ALLIES, isClickable);
         if (isClickable) {
             icon.addNameValue(MessagePath.LABEL_KINGDOMS.getMessage(), numAllies);
             icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
@@ -1065,32 +1087,39 @@ public class InfoMenu extends StateMenu {
             icon.setState(MenuState.PLAYER_INFO);
         } else {
             icon = new InfoIcon(MessagePath.LABEL_LORD.getMessage(), Material.BARRIER, SLOT_LORD, false);
-            icon.addDescription(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getTravelName()), ChatColor.RED);
+            icon.addAlert(MessagePath.LABEL_NO_LORD.getMessage());
+            if (infoTown.canClaimLordship(player)) {
+                icon.addDescription(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getTravelName()), ChatColor.RED);
+            }
         }
         result.addIcon(icon);
 
         /* Knights Icon */
-        icon = new InfoIcon(MessagePath.LABEL_KNIGHTS.getMessage(), Material.DIAMOND_HORSE_ARMOR, SLOT_KNIGHTS, true);
+        icon = new InfoIcon(MessagePath.LABEL_KNIGHTS.getMessage(), Material.IRON_HORSE_ARMOR, SLOT_KNIGHTS, true);
         icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numTownKnights);
         icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         icon.setState(MenuState.TOWN_INFO_KNIGHTS);
         result.addIcon(icon);
 
         /* Residents Icon */
-        icon = new InfoIcon(MessagePath.LABEL_RESIDENTS.getMessage(), Material.LEATHER_HELMET, SLOT_RESIDENTS, true);
+        icon = new InfoIcon(MessagePath.LABEL_RESIDENTS.getMessage(), Material.LEATHER_CHESTPLATE, SLOT_RESIDENTS, true);
         icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numTownResidents);
         icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         icon.setState(MenuState.TOWN_INFO_RESIDENTS);
         result.addIcon(icon);
 
         /* Options Icon */
+        int numOptions = KonTownOption.values().length;
         icon = new InfoIcon(MessagePath.LABEL_OPTIONS.getMessage(), Material.OAK_SIGN, SLOT_OPTIONS, true);
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numOptions);
         icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         icon.setState(MenuState.TOWN_INFO_OPTIONS);
         result.addIcon(icon);
 
         /* Upgrades Icon */
+        int numUpgrades = infoTown.getUpgrades().size();
         icon = new InfoIcon(MessagePath.LABEL_UPGRADES.getMessage(), Material.GOLDEN_APPLE, SLOT_UPGRADES, true);
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numUpgrades);
         icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         icon.setState(MenuState.TOWN_INFO_UPGRADES);
         result.addIcon(icon);
@@ -1184,7 +1213,7 @@ public class InfoMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_INFO_RUIN_STATUS.getMessage(), captureMaterial, SLOT_CAPTURE, false);
         if(infoRuin.isCaptureDisabled()) {
             // Currently on capture cooldown
-            icon.addDescription(MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(infoRuin.getCaptureCooldownString()));
+            icon.addDescription(MessagePath.PROTECTION_ERROR_CAPTURE.getMessage());
         } else {
             // Can be captured
             icon.addDescription(MessagePath.MENU_INFO_RUIN_CAPTURE.getMessage(infoRuin.getCaptureCooldownString()));
@@ -1233,7 +1262,7 @@ public class InfoMenu extends StateMenu {
         result.addIcon(icon);
 
         /* Clan Icon */
-        icon = new InfoIcon(MessagePath.LABEL_CAMP_CLAN.getMessage(), Material.BRICK, SLOT_CLAN, false);
+        icon = new InfoIcon(MessagePath.LABEL_CAMP_CLAN.getMessage(), Material.CHAIN, SLOT_CLAN, false);
         if (getKonquest().getCampManager().isCampGroupsEnabled()) {
             if (getKonquest().getCampManager().isCampGrouped(infoCamp)) {
                 KonCampGroup clan = getKonquest().getCampManager().getCampGroup(infoCamp);
@@ -1341,12 +1370,16 @@ public class InfoMenu extends StateMenu {
                 result.addAll(createPlayerView(currentState));
                 break;
             case KINGDOM_LIST:
+            case KINGDOM_INFO_ENEMIES:
+            case KINGDOM_INFO_ALLIES:
+            case KINGDOM_INFO_TRADERS:
             case MONUMENT_INFO_KINGDOMS:
                 result.addAll(createKingdomView(currentState));
                 break;
             case CAPITAL_LIST:
             case TOWN_LIST:
             case PLAYER_INFO_TOWNS:
+            case KINGDOM_INFO_TOWNS:
                 result.addAll(createTownView(currentState));
                 break;
             case CAMP_LIST:
@@ -1422,6 +1455,7 @@ public class InfoMenu extends StateMenu {
                 getKonquest().getDisplayManager().displayMainMenu(player);
             }  else if (isNavReturn(slot)) {
                 // Return to previous view
+                MenuState returnState = popReturn(currentState);
                 if (returnState == null) {
                     result = setCurrentView(MenuState.ROOT);
                 } else {
@@ -1441,9 +1475,9 @@ public class InfoMenu extends StateMenu {
             MenuIcon clickedIcon = view.getIcon(slot);
             MenuState nextState = (MenuState)clickedIcon.getState(); // could be null in some states
             if (nextState == null) return null;
-            returnState = currentState;
             switch (currentState) {
                 case ROOT:
+                    clearReturn();
                     switch (nextState) {
                         case PLAYER_LIST:
                         case KINGDOM_LIST:
@@ -1459,6 +1493,10 @@ public class InfoMenu extends StateMenu {
                     }
                     break;
                 case PLAYER_LIST:
+                case KINGDOM_INFO_OFFICERS:
+                case KINGDOM_INFO_MEMBERS:
+                case TOWN_INFO_KNIGHTS:
+                case TOWN_INFO_RESIDENTS:
                 case CAMP_INFO:
                     if(nextState.equals(MenuState.PLAYER_INFO) && clickedIcon instanceof PlayerIcon) {
                         infoPlayer = getKonquest().getPlayerManager().getOfflinePlayer(((PlayerIcon)clickedIcon).getOfflinePlayer());
@@ -1466,6 +1504,10 @@ public class InfoMenu extends StateMenu {
                     }
                     break;
                 case KINGDOM_LIST:
+                case KINGDOM_INFO_ENEMIES:
+                case KINGDOM_INFO_ALLIES:
+                case KINGDOM_INFO_TRADERS:
+                case MONUMENT_INFO_KINGDOMS:
                     if(nextState.equals(MenuState.KINGDOM_INFO) && clickedIcon instanceof KingdomIcon) {
                         infoKingdom = ((KingdomIcon)clickedIcon).getKingdom();
                         result = refreshNewView(nextState);
@@ -1474,6 +1516,7 @@ public class InfoMenu extends StateMenu {
                 case CAPITAL_LIST:
                 case TOWN_LIST:
                 case PLAYER_INFO_TOWNS:
+                case KINGDOM_INFO_TOWNS:
                     if(nextState.equals(MenuState.TOWN_INFO) && clickedIcon instanceof TownIcon) {
                         infoTown = ((TownIcon)clickedIcon).getTown();
                         result = refreshNewView(nextState);
@@ -1498,6 +1541,7 @@ public class InfoMenu extends StateMenu {
                     }
                     break;
                 case MONUMENT_LIST:
+                case SANCTUARY_INFO_MONUMENTS:
                     if(nextState.equals(MenuState.MONUMENT_INFO) && clickedIcon instanceof TemplateIcon) {
                         infoTemplate = ((TemplateIcon)clickedIcon).getTemplate();
                         result = refreshNewView(nextState);
@@ -1602,6 +1646,7 @@ public class InfoMenu extends StateMenu {
                 default:
                     break;
             }
+            pushReturn(currentState, nextState);
         }
         return result;
     }
@@ -1616,12 +1661,14 @@ public class InfoMenu extends StateMenu {
                 result = MessagePath.LABEL_PLAYERS.getMessage();
                 break;
             case KINGDOM_LIST:
+            case MONUMENT_INFO_KINGDOMS:
                 result = MessagePath.LABEL_KINGDOMS.getMessage();
                 break;
             case CAPITAL_LIST:
                 result = MessagePath.LABEL_CAPITALS.getMessage();
                 break;
             case PLAYER_INFO_TOWNS:
+            case KINGDOM_INFO_TOWNS:
             case TOWN_LIST:
                 result = MessagePath.LABEL_TOWNS.getMessage();
                 break;
@@ -1647,6 +1694,15 @@ public class InfoMenu extends StateMenu {
             case KINGDOM_INFO_MEMBERS:
                 result = MessagePath.LABEL_MEMBERS.getMessage();
                 break;
+            case KINGDOM_INFO_ENEMIES:
+                result = MessagePath.DIPLOMACY_WAR.getMessage();
+                break;
+            case KINGDOM_INFO_ALLIES:
+                result = MessagePath.DIPLOMACY_ALLIANCE.getMessage();
+                break;
+            case KINGDOM_INFO_TRADERS:
+                result = MessagePath.DIPLOMACY_TRADE.getMessage();
+                break;
             case TOWN_INFO_KNIGHTS:
                 result = MessagePath.LABEL_KNIGHTS.getMessage();
                 break;
@@ -1664,4 +1720,19 @@ public class InfoMenu extends StateMenu {
         }
         return result;
     }
+
+    private void pushReturn(MenuState currentState, MenuState nextState) {
+        if (!returnStack.containsKey(nextState)) {
+            returnStack.put(nextState,currentState);
+        }
+    }
+
+    private MenuState popReturn(MenuState currentState) {
+        return returnStack.get(currentState);
+    }
+
+    private void clearReturn() {
+        returnStack.clear();
+    }
+
 }

@@ -184,8 +184,9 @@ public class KonquestDB extends Database{
 			ChatUtil.printDebug("Failed to flush non-existent offlinePlayer to database");
 		}
     }
-    
-    public void fetchPlayerData(Player bukkitPlayer) {
+
+    // Returns true when the player already exists, false when a new player was created.
+    public boolean fetchPlayerData(Player bukkitPlayer) {
         /*
          * A player has joined the server. There are two possibilities:
          * 1. The player does not exist in the database. Create a new KonPlayer and treat them
@@ -197,7 +198,7 @@ public class KonquestDB extends Database{
             // The player data does not exist. Create a new player.
             createPlayerData(bukkitPlayer);
             konquest.getPlayerManager().createKonPlayer(bukkitPlayer);
-            return;
+            return false;
         }
 
         // The player data should exist
@@ -226,7 +227,7 @@ public class KonquestDB extends Database{
         } catch (Exception e) {
             e.printStackTrace();
             ChatUtil.printDebug("Aborting player import "+bukkitPlayer.getName());
-            return;
+            return true;
         }
         if(kingdomName==null) { kingdomName = konquest.getKingdomManager().getBarbarians().getName(); }
         if(exileKingdomName==null) { exileKingdomName = konquest.getKingdomManager().getBarbarians().getName(); }
@@ -288,6 +289,7 @@ public class KonquestDB extends Database{
             }, 20);
         }
         player.getPlayerPrefix().setEnable(enablePrefix);
+        return true;
     }
 
     public KonStats pullPlayerStats(OfflinePlayer offlineBukkitPlayer) {

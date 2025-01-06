@@ -156,7 +156,7 @@ public class KingdomMenu extends StateMenu {
 		/* Create Icon */
 		if (!getKonquest().getKingdomManager().isKingdomCreateAdminOnly()) {
 			double cost_create = getKonquest().getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_CREATE.getPath(),0.0);
-			icon = new InfoIcon(MessagePath.MENU_KINGDOM_CREATE.getMessage(), CommandType.KINGDOM.iconMaterial(), ROOT_SLOT_CREATE, true);
+			icon = new InfoIcon(MessagePath.MENU_KINGDOM_CREATE.getMessage(), Material.PUFFERFISH_SPAWN_EGG, ROOT_SLOT_CREATE, true);
 			icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_CREATE.getMessage());
 			icon.addNameValue(MessagePath.LABEL_COST.getMessage(), (int)cost_create);
 			icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
@@ -179,13 +179,10 @@ public class KingdomMenu extends StateMenu {
 		/* Invites Icon */
 		boolean isInvitesClickable = !isAdmin;
 		int numInvites = manager.getInviteKingdoms(player).size();
-		Material inviteMat = Material.BOOK;
-		if(numInvites > 0) {
-			inviteMat = Material.WRITABLE_BOOK;
-		}
+		Material inviteMat = numInvites > 0 ? Material.WRITABLE_BOOK : Material.BOOK;
 		icon = new InfoIcon(MessagePath.MENU_KINGDOM_INVITES.getMessage(), inviteMat, ROOT_SLOT_INVITE, isInvitesClickable);
 		icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_INVITES.getMessage());
-		if(isExileClickable) {
+		if(isInvitesClickable) {
 			icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 		} else {
 			icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
@@ -250,7 +247,7 @@ public class KingdomMenu extends StateMenu {
 
 				/* Promote Icon */
 				boolean isPromoteClickable = kingdom.isPromoteable() || isAdmin;
-				icon = new InfoIcon(MessagePath.MENU_KINGDOM_PROMOTE.getMessage(), Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, isPromoteClickable);
+				icon = new InfoIcon(MessagePath.MENU_KINGDOM_PROMOTE.getMessage(), Material.IRON_HORSE_ARMOR, ROOT_SLOT_PROMOTE, isPromoteClickable);
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_PROMOTE.getMessage());
 				icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
 				if(isPromoteClickable) {
@@ -263,7 +260,7 @@ public class KingdomMenu extends StateMenu {
 
 				/* Demote Icon */
 				boolean isDemoteClickable = kingdom.isDemoteable() || isAdmin;
-				icon = new InfoIcon(MessagePath.MENU_KINGDOM_DEMOTE.getMessage(), Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, isDemoteClickable);
+				icon = new InfoIcon(MessagePath.MENU_KINGDOM_DEMOTE.getMessage(), Material.LEATHER_CHESTPLATE, ROOT_SLOT_DEMOTE, isDemoteClickable);
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_DEMOTE.getMessage());
 				icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
 				if(isDemoteClickable) {
@@ -277,7 +274,7 @@ public class KingdomMenu extends StateMenu {
 				/* Transfer Icon */
 				if(!kingdom.isAdminOperated()) {
 					boolean isTransferClickable = kingdom.isTransferable() || isAdmin;
-					icon = new InfoIcon(MessagePath.MENU_KINGDOM_TRANSFER.getMessage(), Material.ELYTRA, ROOT_SLOT_TRANSFER, isTransferClickable);
+					icon = new InfoIcon(MessagePath.MENU_KINGDOM_TRANSFER.getMessage(), Material.IRON_HELMET, ROOT_SLOT_TRANSFER, isTransferClickable);
 					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_TRANSFER.getMessage());
 					icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
 					if(isTransferClickable) {
@@ -291,7 +288,7 @@ public class KingdomMenu extends StateMenu {
 
 				/* Destroy Icon */
 				if(getKonquest().getKingdomManager().getIsTownDestroyMasterEnable()) {
-					icon = new InfoIcon(MessagePath.MENU_TOWN_DESTROY.getMessage(), Material.TNT, ROOT_SLOT_DESTROY, true);
+					icon = new InfoIcon(MessagePath.MENU_TOWN_DESTROY.getMessage(), Material.FLINT_AND_STEEL, ROOT_SLOT_DESTROY, true);
 					icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage());
 					icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
 					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
@@ -319,7 +316,7 @@ public class KingdomMenu extends StateMenu {
 				result.addIcon(icon);
 
 				/* Template Icon */
-				icon = new InfoIcon(MessagePath.MENU_KINGDOM_TEMPLATE.getMessage(), Material.ANVIL, ROOT_SLOT_TEMPLATE, true);
+				icon = new InfoIcon(MessagePath.MENU_KINGDOM_TEMPLATE.getMessage(), Material.CRAFTING_TABLE, ROOT_SLOT_TEMPLATE, true);
 				icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_TEMPLATE.getMessage());
 				icon.addNameValue(MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage(), kingdom.getMonumentTemplateName());
@@ -329,7 +326,7 @@ public class KingdomMenu extends StateMenu {
 
 				/* Disband Icon */
 				if(!kingdom.isAdminOperated()) {
-					icon = new InfoIcon(MessagePath.MENU_KINGDOM_DISBAND.getMessage(), Material.CREEPER_HEAD, ROOT_SLOT_DISBAND, true);
+					icon = new InfoIcon(MessagePath.MENU_KINGDOM_DISBAND.getMessage(), Material.BONE, ROOT_SLOT_DISBAND, true);
 					icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
 					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_DISBAND.getMessage());
 					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());

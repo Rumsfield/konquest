@@ -217,6 +217,7 @@ public enum MessagePath {
 	MENU_SCORE_KINGDOM_SCORE                    (0, "menu.score.kingdom-score"),
 	MENU_SCORE_DESCRIPTION_PLAYERS              (0, "menu.score.description-players"),
 	MENU_SCORE_DESCRIPTION_KINGDOMS             (0, "menu.score.description-kingdoms"),
+	MENU_SCORE_LEADERBOARD_EMPTY                (0, "menu.score.leaderboard-empty"),
 	MENU_MAP_CENTER                             (0, "menu.map.center"),
 	MENU_MAP_PROXIMITY                          (0, "menu.map.proximity"),
 	MENU_MAP_SETTLE_HINT                        (0, "menu.map.settle-hint"),

@@ -19,7 +19,7 @@ public class CampIcon extends MenuIcon {
         // Item Lore
         addProperty(MessagePath.LABEL_CAMP.getMessage());
         if (camp.isProtected()) {
-            addProperty(MessagePath.LABEL_PROTECTED.getMessage());
+            addAlert(MessagePath.LABEL_PROTECTED.getMessage());
         }
         addNameValue(MessagePath.LABEL_BARBARIAN.getMessage(), camp.getOwner().getName());
     }

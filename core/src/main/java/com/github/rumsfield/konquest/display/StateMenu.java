@@ -98,7 +98,7 @@ public abstract class StateMenu {
             String p2Name = campTwo.getOwner().getName();
             assert p1Name != null;
             assert p2Name != null;
-            return p1Name.compareTo(p2Name);
+            return p1Name.toLowerCase().compareTo(p2Name.toLowerCase());
         };
 
         this.ruinComparator = (ruinOne, ruinTwo) -> {
@@ -107,7 +107,7 @@ public abstract class StateMenu {
             String p2Name = ruinTwo.getName();
             assert p1Name != null;
             assert p2Name != null;
-            return p1Name.compareTo(p2Name);
+            return p1Name.toLowerCase().compareTo(p2Name.toLowerCase());
         };
 
         this.sanctuaryComparator = (sanctuaryOne, sanctuaryTwo) -> {
@@ -116,7 +116,7 @@ public abstract class StateMenu {
             String p2Name = sanctuaryTwo.getName();
             assert p1Name != null;
             assert p2Name != null;
-            return p1Name.compareTo(p2Name);
+            return p1Name.toLowerCase().compareTo(p2Name.toLowerCase());
         };
 
         this.templateComparator = (templateOne, templateTwo) -> {
@@ -125,7 +125,7 @@ public abstract class StateMenu {
             String p2Name = templateTwo.getName();
             assert p1Name != null;
             assert p2Name != null;
-            return p1Name.compareTo(p2Name);
+            return p1Name.toLowerCase().compareTo(p2Name.toLowerCase());
         };
 
         this.playerComparator = (playerOne, playerTwo) -> {
@@ -134,16 +134,16 @@ public abstract class StateMenu {
             String p2Name = playerTwo.getOfflineBukkitPlayer().getName();
             assert p1Name != null;
             assert p2Name != null;
-            return p1Name.compareTo(p2Name);
+            return p1Name.toLowerCase().compareTo(p2Name.toLowerCase());
         };
 
         this.prefixComparator = (prefixOne, prefixTwo) -> {
             // sort by level
             int result = 0;
             if(prefixOne.level() < prefixTwo.level()) {
-                result = -1;
-            } else if(prefixOne.level() > prefixTwo.level()) {
                 result = 1;
+            } else if(prefixOne.level() > prefixTwo.level()) {
+                result = -1;
             }
             return result;
         };
@@ -154,9 +154,9 @@ public abstract class StateMenu {
             int scoreTwo = konquest.getKingdomManager().getPlayerScore(playerTwo);
             int result = 0;
             if(scoreOne < scoreTwo) {
-                result = -1;
-            } else if(scoreOne > scoreTwo) {
                 result = 1;
+            } else if(scoreOne > scoreTwo) {
+                result = -1;
             }
             return result;
         };
@@ -167,9 +167,9 @@ public abstract class StateMenu {
             int scoreTwo = konquest.getKingdomManager().getKingdomScore(kingdomTwo);
             int result = 0;
             if(scoreOne < scoreTwo) {
-                result = -1;
-            } else if(scoreOne > scoreTwo) {
                 result = 1;
+            } else if(scoreOne > scoreTwo) {
+                result = -1;
             }
             return result;
         };

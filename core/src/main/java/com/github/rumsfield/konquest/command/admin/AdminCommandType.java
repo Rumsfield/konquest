@@ -10,7 +10,7 @@ import java.util.List;
 public enum AdminCommandType {
 	HELP        (Material.REDSTONE_TORCH,		"konquest.admin.help",         new HelpAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_HELP.getMessage()),
 	BYPASS      (Material.SPECTRAL_ARROW,		"konquest.admin.bypass",       new BypassAdminCommand(),       MessagePath.DESCRIPTION_ADMIN_BYPASS.getMessage()),
-	KINGDOM     (Material.GOLDEN_SWORD,			"konquest.admin.kingdom",      new KingdomAdminCommand(),      MessagePath.DESCRIPTION_ADMIN_KINGDOM.getMessage()),
+	KINGDOM     (Material.DIAMOND_HELMET,		"konquest.admin.kingdom",      new KingdomAdminCommand(),      MessagePath.DESCRIPTION_ADMIN_KINGDOM.getMessage()),
 	TOWN        (Material.OBSIDIAN,				"konquest.admin.town",         new TownAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_TOWN.getMessage()),
 	CAMP        (Material.ORANGE_BED,			"konquest.admin.camp",         new CampAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_CAMP.getMessage()),
 	CLAIM       (Material.DIAMOND_SHOVEL,		"konquest.admin.claim",        new ClaimAdminCommand(),        MessagePath.DESCRIPTION_ADMIN_CLAIM.getMessage()),

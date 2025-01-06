@@ -32,7 +32,7 @@ public class ArmorIcon extends MenuIcon {
 
 	@Override
 	public ItemStack getItem() {
-		return CompatibilityUtil.buildItem(Material.DIAMOND_CHESTPLATE, getName(), getLore(), true);
+		return CompatibilityUtil.buildItem(Material.CHAINMAIL_CHESTPLATE, getName(), getLore(), true);
 	}
 
 	@Override

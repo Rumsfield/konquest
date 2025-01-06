@@ -77,21 +77,21 @@ public class HelpMenu extends StateMenu {
         result.addIcon(communityIcon);
 
         /* Main Menu */
-        icon = new InfoIcon(MessagePath.MENU_HELP_MAIN.getMessage(), Material.BELL, ROOT_SLOT_MAIN, true);
+        icon = new InfoIcon(MessagePath.MENU_HELP_MAIN.getMessage(), CommandType.MENU.iconMaterial(), ROOT_SLOT_MAIN, true);
         icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_MAIN.getMessage());
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.MAIN);
         result.addIcon(icon);
 
         /* Commands */
-        icon = new InfoIcon(MessagePath.MENU_HELP_COMMANDS.getMessage(), Material.TORCH, ROOT_SLOT_COMMANDS, true);
+        icon = new InfoIcon(MessagePath.MENU_HELP_COMMANDS.getMessage(), CommandType.HELP.iconMaterial(), ROOT_SLOT_COMMANDS, true);
         icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_COMMANDS.getMessage());
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.COMMANDS);
         result.addIcon(icon);
 
         /* Admin Commands */
-        icon = new InfoIcon(MessagePath.MENU_HELP_ADMIN.getMessage(), Material.NETHER_STAR, ROOT_SLOT_COMMANDS_ADMIN, true);
+        icon = new InfoIcon(MessagePath.MENU_HELP_ADMIN.getMessage(), CommandType.ADMIN.iconMaterial(), ROOT_SLOT_COMMANDS_ADMIN, true);
         icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_ADMIN.getMessage());
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.COMMANDS_ADMIN);
@@ -157,7 +157,7 @@ public class HelpMenu extends StateMenu {
 
         /* Quest Book */
         if (isQuestEnabled) {
-            icon = new InfoIcon(MessagePath.MENU_HELP_QUEST.getMessage(), Material.WRITABLE_BOOK, START_SLOT_QUEST, true);
+            icon = new InfoIcon(MessagePath.MENU_HELP_QUEST.getMessage(), CommandType.QUEST.iconMaterial(), START_SLOT_QUEST, true);
             icon.addDescription(MessagePath.MENU_HELP_DESCRIPTION_QUEST.getMessage());
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.QUEST);

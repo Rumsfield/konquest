@@ -230,6 +230,7 @@ menu:
     kingdom-score: "Kingdom Score"
     description-players: "List all player scores and view details"
     description-kingdoms: "List all kingdom scores and view details with leaderboards"
+    leaderboard-empty: "There are no players on this kingdom's score leaderboard"
   map:
     center: "Map Center"
     proximity: "Proximity"

@@ -77,9 +77,9 @@ public class PrefixMenu extends StateMenu {
             icon.addHint(MessagePath.MENU_HINT_DISABLE.getMessage());
         } else {
             if (isPrefixDisabled) {
-                icon.addAlert(MessagePath.COMMAND_PREFIX_ERROR_DISABLE.getMessage());
+                icon.addDescription(MessagePath.COMMAND_PREFIX_ERROR_DISABLE.getMessage());
             } else {
-                icon.addAlert(MessagePath.COMMAND_PREFIX_ERROR_ALWAYS_ON.getMessage());
+                icon.addDescription(MessagePath.COMMAND_PREFIX_ERROR_ALWAYS_ON.getMessage());
             }
         }
         icon.setState(MenuState.DISABLE);
@@ -100,7 +100,7 @@ public class PrefixMenu extends StateMenu {
         /* Custom Icon (Unavailable for Barbarians) */
         if (getKonquest().getAccomplishmentManager().getNumCustomPrefixes() > 0) {
             boolean isCustomClickable = !player.isBarbarian();
-            icon = new InfoIcon(MessagePath.MENU_PREFIX_TITLE_CUSTOM.getMessage(), Material.GOLDEN_CARROT, ROOT_SLOT_CUSTOM, isCustomClickable);
+            icon = new InfoIcon(MessagePath.MENU_PREFIX_TITLE_CUSTOM.getMessage(), Material.GOLD_BLOCK, ROOT_SLOT_CUSTOM, isCustomClickable);
             icon.addDescription(MessagePath.MENU_PREFIX_DESCRIPTION_CUSTOM.getMessage());
             if (isCustomClickable) {
                 icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());

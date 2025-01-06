@@ -35,7 +35,7 @@ public class RuinIcon extends MenuIcon {
 
     @Override
     public ItemStack getItem() {
-        return CompatibilityUtil.buildItem(Material.CRACKED_STONE_BRICKS, getName(), getLore(), ruin.isCaptureDisabled());
+        return CompatibilityUtil.buildItem(Material.MOSSY_COBBLESTONE, getName(), getLore(), ruin.isCaptureDisabled());
     }
 
     @Override
