@@ -90,7 +90,7 @@ public class PrefixMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_PREFIX_TITLE_PREFIX.getMessage(), Material.NAME_TAG, ROOT_SLOT_PREFIX, isPrefixClickable);
         icon.addDescription(MessagePath.MENU_PREFIX_DESCRIPTION_PREFIX.getMessage());
         if (isPrefixClickable) {
-            icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
         }
@@ -103,7 +103,7 @@ public class PrefixMenu extends StateMenu {
             icon = new InfoIcon(MessagePath.MENU_PREFIX_TITLE_CUSTOM.getMessage(), Material.GOLD_BLOCK, ROOT_SLOT_CUSTOM, isCustomClickable);
             icon.addDescription(MessagePath.MENU_PREFIX_DESCRIPTION_CUSTOM.getMessage());
             if (isCustomClickable) {
-                icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+                icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             } else {
                 icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
             }

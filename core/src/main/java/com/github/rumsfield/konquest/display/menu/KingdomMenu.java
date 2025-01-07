@@ -73,7 +73,6 @@ public class KingdomMenu extends StateMenu {
 	private KonKingdom diplomacyKingdom;
 	private boolean isCreatedKingdom;
 	private final boolean isAdmin;
-	private final boolean isViewer;
 	
 	public KingdomMenu(Konquest konquest, KonPlayer player, KonKingdom kingdom, boolean isAdmin) {
 		super(konquest, MenuState.ROOT, AccessType.REGULAR);
@@ -83,7 +82,6 @@ public class KingdomMenu extends StateMenu {
 		this.diplomacyKingdom = null;
 		this.isCreatedKingdom = false; // Is this kingdom created by players, i.e. not barbarians or neutrals
 		this.isAdmin = isAdmin; // Is player viewing the menu as an admin?
-		this.isViewer = kingdom.equals(player.getKingdom()); // Is the player viewing their own kingdom?
 
 		/* Initialize menu access */
 		if(kingdom.isCreated()) {
@@ -182,6 +180,7 @@ public class KingdomMenu extends StateMenu {
 		Material inviteMat = numInvites > 0 ? Material.WRITABLE_BOOK : Material.BOOK;
 		icon = new InfoIcon(MessagePath.MENU_KINGDOM_INVITES.getMessage(), inviteMat, ROOT_SLOT_INVITE, isInvitesClickable);
 		icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_INVITES.getMessage());
+		icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numInvites);
 		if(isInvitesClickable) {
 			icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 		} else {
@@ -194,8 +193,10 @@ public class KingdomMenu extends StateMenu {
 		result.addIcon(icon);
 		
 		/* List Icon */
+		int numList = manager.getKingdoms().size();
 		icon = new InfoIcon(MessagePath.MENU_KINGDOM_LIST.getMessage(), Material.PAPER, ROOT_SLOT_LIST, true);
 		icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_LIST.getMessage());
+		icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numList);
 		icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 		icon.setState(MenuState.A_LIST);
 		result.addIcon(icon);
@@ -204,7 +205,8 @@ public class KingdomMenu extends StateMenu {
 		if(isCreatedKingdom) {
 
 			/* Kingdom Info Icon */
-			icon = new KingdomIcon(kingdom,DisplayManager.nameFormat,ROOT_SLOT_INFO,true,isViewer);
+			icon = new KingdomIcon(kingdom,getColor(player,kingdom),getRelation(player,kingdom),ROOT_SLOT_INFO,true);
+			icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
 			icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
 			icon.setState(MenuState.A_INFO);
 			result.addIcon(icon);
@@ -227,17 +229,12 @@ public class KingdomMenu extends StateMenu {
 				
 				/* Requests Icon */
 				int numRequests = kingdom.getJoinRequests().size();
-				Material requestMat = Material.GLASS_BOTTLE;
-				if(numRequests > 0) {
-					requestMat = Material.HONEY_BOTTLE;
-				}
+				Material requestMat = numRequests > 0 ? Material.HONEY_BOTTLE : Material.GLASS_BOTTLE;
 				icon = new InfoIcon(MessagePath.MENU_KINGDOM_REQUESTS.getMessage(), requestMat, ROOT_SLOT_REQUESTS, true);
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_REQUESTS.getMessage());
+				icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numRequests);
 				icon.addProperty(MessagePath.LABEL_OFFICER.getMessage());
 				icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
-				if(numRequests > 0) {
-					icon.addNameValue(MessagePath.MENU_KINGDOM_REQUESTS.getMessage(), numRequests);
-				}
 				icon.setState(MenuState.B_REQUESTS);
 				result.addIcon(icon);
 			}
@@ -450,9 +447,8 @@ public class KingdomMenu extends StateMenu {
 		KonquestDiplomacyType currentDiplomacy = manager.getDiplomacy(kingdom,diplomacyKingdom);
 
 		/* Kingdom Info Icon */
-		String contextColor = getKonquest().getDisplaySecondaryColor(kingdom, diplomacyKingdom);
 		String diplomacyState = Labeler.lookup(currentDiplomacy);
-		icon = new KingdomIcon(diplomacyKingdom,contextColor,index,false,isViewer);
+		icon = new KingdomIcon(diplomacyKingdom,getColor(kingdom,diplomacyKingdom),getRelation(kingdom,diplomacyKingdom),index,false);
 		icon.addNameValue(MessagePath.LABEL_DIPLOMACY.getMessage(), diplomacyState);
 		if(kingdom.hasRelationRequest(diplomacyKingdom) || diplomacyKingdom.hasRelationRequest(kingdom)) {
 			icon.addAlert(MessagePath.MENU_KINGDOM_REQUESTS.getMessage());
@@ -604,15 +600,15 @@ public class KingdomMenu extends StateMenu {
 
 		/* Kingdom Icons */
 		for (KonKingdom currentKingdom : kingdoms) {
-			String contextColor = getKonquest().getDisplaySecondaryColor(kingdom, currentKingdom);
-			boolean isViewer = currentKingdom.equals(player.getKingdom());
-			icon = new KingdomIcon(currentKingdom,contextColor,0,isClickable,isViewer);
+			icon = new KingdomIcon(currentKingdom,getColor(player,currentKingdom),getRelation(player,currentKingdom),0,isClickable);
 			if(isCreatedKingdom) {
-				if(!currentKingdom.equals(kingdom)) {
-					// Show diplomacy state for other kingdoms
-					String diplomacyState = Labeler.lookup(manager.getDiplomacy(kingdom,currentKingdom));
-					icon.addNameValue(MessagePath.LABEL_DIPLOMACY.getMessage(), diplomacyState);
+				String diplomacyState;
+				if(currentKingdom.equals(kingdom)) {
+					diplomacyState = MessagePath.DIPLOMACY_SELF.getMessage();
+				} else {
+					diplomacyState = Labeler.lookup(manager.getDiplomacy(kingdom,currentKingdom));
 				}
+				icon.addNameValue(MessagePath.LABEL_DIPLOMACY.getMessage(), diplomacyState);
 				if(kingdom.hasRelationRequest(currentKingdom) || currentKingdom.hasRelationRequest(kingdom)) {
 					icon.addAlert(MessagePath.MENU_KINGDOM_REQUESTS.getMessage());
 				}
@@ -677,12 +673,10 @@ public class KingdomMenu extends StateMenu {
 		List<KonTown> towns = new ArrayList<>(kingdom.getTowns());
 		// Sort list
 		towns.sort(townComparator);
-		// Name color
-		String contextColor = isAdmin ? DisplayManager.adminFormat : Konquest.friendColor2;
 
 		/* Town Icons */
 		for (KonTown currentTown : towns) {
-			icon = new TownIcon(currentTown,player.getBukkitPlayer(),contextColor,0,true);
+			icon = new TownIcon(currentTown,getColor(player,currentTown),getRelation(player,currentTown),0,true);
 			// Context-specific lore + click conditions
 			switch(context) {
 				case C_DESTROY:
@@ -735,15 +729,14 @@ public class KingdomMenu extends StateMenu {
 
 		/* Player Icons */
 		for (OfflinePlayer currentPlayer : players) {
-			String contextColor = DisplayManager.nameFormat;
 			KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayer(currentPlayer);
-			if (offlinePlayer != null) {
-				contextColor = getKonquest().getDisplaySecondaryColor(kingdom, offlinePlayer.getKingdom());
+			if (offlinePlayer == null) {
+				continue;
 			}
-			icon = new PlayerIcon(currentPlayer,contextColor,0,isClickable);
+			icon = new PlayerIcon(currentPlayer,getColor(player,offlinePlayer),getRelation(player,offlinePlayer),0,isClickable);
 			String kingdomRole = kingdom.getPlayerRoleName(currentPlayer);
 			if(!kingdomRole.isEmpty()) {
-				icon.addProperty(kingdomRole);
+				icon.addNameValue(MessagePath.LABEL_KINGDOM_ROLE.getMessage(), kingdomRole);
 			}
 			if(!loreHintStr1.isEmpty()) {
 				icon.addHint(loreHintStr1);

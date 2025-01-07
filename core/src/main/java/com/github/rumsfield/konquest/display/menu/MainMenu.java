@@ -84,7 +84,7 @@ public class MainMenu extends StateMenu {
 
         /* Help Menu */
         icon = new InfoIcon(MessagePath.MENU_MAIN_HELP.getMessage(), CommandType.HELP.iconMaterial(), ROOT_SLOT_HELP, true);
-        icon.addDescription(MessagePath.DESCRIPTION_HELP.getMessage());
+        icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_HELP.getMessage());
         icon.addHint(MessagePath.MENU_MAIN_HINT.getMessage());
         result.addIcon(icon);
 
@@ -98,7 +98,7 @@ public class MainMenu extends StateMenu {
         iconCommand = CommandType.KINGDOM;
         isClickable = hasPermission(iconCommand);
         icon = new InfoIcon(MessagePath.MENU_MAIN_KINGDOM.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_KINGDOM, isClickable);
-        icon.addDescription(iconCommand.description());
+        icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_KINGDOM.getMessage());
         if (isClickable) {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
@@ -110,7 +110,7 @@ public class MainMenu extends StateMenu {
         iconCommand = CommandType.INFO;
         isClickable = hasPermission(iconCommand);
         icon = new InfoIcon(MessagePath.MENU_MAIN_INFO.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_INFO, isClickable);
-        icon.addDescription(iconCommand.description());
+        icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_INFO.getMessage());
         if (isClickable) {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
@@ -122,7 +122,7 @@ public class MainMenu extends StateMenu {
         iconCommand = CommandType.TOWN;
         isClickable = !player.isBarbarian() && hasPermission(iconCommand);
         icon = new InfoIcon(MessagePath.MENU_MAIN_TOWN.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_TOWN, isClickable);
-        icon.addDescription(iconCommand.description());
+        icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_TOWN.getMessage());
         if (isClickable) {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
@@ -138,7 +138,7 @@ public class MainMenu extends StateMenu {
         iconCommand = CommandType.QUEST;
         isClickable = getKonquest().getDirectiveManager().isEnabled() && hasPermission(iconCommand);
         icon = new InfoIcon(MessagePath.MENU_MAIN_QUEST.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_QUEST, isClickable);
-        icon.addDescription(iconCommand.description());
+        icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_QUEST.getMessage());
         if (isClickable) {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
@@ -154,7 +154,7 @@ public class MainMenu extends StateMenu {
         iconCommand = CommandType.STATS;
         isClickable = hasPermission(iconCommand);
         icon = new InfoIcon(MessagePath.MENU_MAIN_STATS.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_STATS, isClickable);
-        icon.addDescription(iconCommand.description());
+        icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_STATS.getMessage());
         if (isClickable) {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
@@ -166,7 +166,7 @@ public class MainMenu extends StateMenu {
         iconCommand = CommandType.PREFIX;
         isClickable = getKonquest().getAccomplishmentManager().isEnabled() && hasPermission(iconCommand);
         icon = new InfoIcon(MessagePath.MENU_MAIN_PREFIX.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_PREFIX, isClickable);
-        icon.addDescription(iconCommand.description());
+        icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_PREFIX.getMessage());
         if (isClickable) {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
@@ -182,7 +182,7 @@ public class MainMenu extends StateMenu {
         iconCommand = CommandType.SCORE;
         isClickable = hasPermission(iconCommand);
         icon = new InfoIcon(MessagePath.MENU_MAIN_SCORE.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_SCORE, isClickable);
-        icon.addDescription(iconCommand.description());
+        icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_SCORE.getMessage());
         if (isClickable) {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
@@ -194,7 +194,7 @@ public class MainMenu extends StateMenu {
         iconCommand = CommandType.TRAVEL;
         isClickable = hasPermission(iconCommand);
         icon = new InfoIcon(MessagePath.MENU_MAIN_TRAVEL.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_TRAVEL, isClickable);
-        icon.addDescription(iconCommand.description());
+        icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_TRAVEL.getMessage());
         if (isClickable) {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {

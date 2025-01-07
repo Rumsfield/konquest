@@ -58,7 +58,6 @@ public class TownMenu extends StateMenu {
     private final KonKingdom kingdom; // The kingdom of the player
     private final boolean isAdmin;
     private KonTown town; // The town being managed
-    private final String contextColor = Konquest.friendColor2;
 
     public TownMenu(Konquest konquest, KonPlayer player, boolean isAdmin) {
         super(konquest, MenuState.ROOT, null);
@@ -144,8 +143,10 @@ public class TownMenu extends StateMenu {
         result.addIcon(icon);
 
         /* List Icon */
+        int numList = kingdom.getCapitalTowns().size();
         icon = new InfoIcon(MessagePath.MENU_TOWN_LIST.getMessage(), Material.PAPER, ROOT_SLOT_LIST, true);
         icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_LIST.getMessage());
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numList);
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.LIST);
         result.addIcon(icon);
@@ -155,7 +156,7 @@ public class TownMenu extends StateMenu {
         Material inviteMat = numInvites > 0 ? Material.WRITABLE_BOOK : Material.BOOK;
         icon = new InfoIcon(MessagePath.MENU_TOWN_INVITES.getMessage(), inviteMat, ROOT_SLOT_INVITES, isClickable);
         icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_INVITES.getMessage());
-        icon.addNameValue(MessagePath.MENU_TOWN_INVITES.getMessage(), numInvites);
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numInvites);
         if (isClickable) {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
@@ -165,18 +166,19 @@ public class TownMenu extends StateMenu {
         result.addIcon(icon);
 
         /* Manage Icon */
+        int numManage = manager.getManageTowns(player).size();
         icon = new InfoIcon(MessagePath.MENU_TOWN_MANAGE.getMessage(), Material.BOOKSHELF, ROOT_SLOT_MANAGE, true);
         icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_MANAGE.getMessage());
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numManage);
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.MANAGE);
         result.addIcon(icon);
 
         /* Settle Command Icon */
         iconCommand = CommandType.SETTLE;
-        double cost_settle = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath(),0.0);
-        double cost_settle_incr = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath(),0.0);
+        double settleCost = getKonquest().getKingdomManager().getSettleCost(player);
         isPermission = player.getBukkitPlayer().hasPermission(iconCommand.permission());
-        icon = new CommandIcon(iconCommand, isPermission, (int)cost_settle, (int)cost_settle_incr, ROOT_SLOT_SETTLE);
+        icon = new CommandIcon(iconCommand, isPermission, (int)settleCost, 0, ROOT_SLOT_SETTLE);
         if (isPermission) {
             icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         } else {
@@ -272,7 +274,7 @@ public class TownMenu extends StateMenu {
         for (KonTown currentTown : towns) {
             boolean isCurrentTownClickable = (!context.equals(MenuState.JOIN) || currentTown.isJoinable()) &&
                     (!context.equals(MenuState.LEAVE) || currentTown.isLeaveable());
-            icon = new TownIcon(currentTown,player.getBukkitPlayer(),contextColor,0,isCurrentTownClickable);
+            icon = new TownIcon(currentTown,getColor(player,currentTown),getRelation(player,currentTown),0,isCurrentTownClickable);
             // Add lore
             switch(context) {
                 case JOIN:
@@ -357,14 +359,11 @@ public class TownMenu extends StateMenu {
         if(isAccess(AccessType.KNIGHT) || isAccess(AccessType.LORD) || isAccess(AccessType.ADMIN)) {
             /* Requests Icon */
             int numRequests = town.getJoinRequests().size();
-            Material requestMat = Material.GLASS_BOTTLE;
-            if(numRequests > 0) {
-                requestMat = Material.HONEY_BOTTLE;
-            }
+            Material requestMat = numRequests > 0 ? Material.HONEY_BOTTLE : Material.GLASS_BOTTLE;
             icon = new InfoIcon(MessagePath.MENU_TOWN_REQUESTS.getMessage(), requestMat, ROOT_SLOT_REQUESTS, true);
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_REQUESTS.getMessage());
+            icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numRequests);
             icon.addProperty(MessagePath.LABEL_KNIGHT.getMessage());
-            icon.addNameValue(MessagePath.MENU_TOWN_REQUESTS.getMessage(), numRequests);
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.A_REQUESTS);
             result.addIcon(icon);
@@ -385,7 +384,8 @@ public class TownMenu extends StateMenu {
             }
 
             /* Info Icon */
-            icon = new TownIcon(town, player.getBukkitPlayer(), contextColor, ROOT_SLOT_INFO, true);
+            icon = new TownIcon(town, getColor(player,town), getRelation(player,town), ROOT_SLOT_INFO, true);
+            icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
             icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
             icon.setState(MenuState.A_INFO);
             result.addIcon(icon);
@@ -402,7 +402,7 @@ public class TownMenu extends StateMenu {
 
             /* Armor Icon (Can be disabled) */
             if (getKonquest().getShieldManager().isArmorsEnabled()) {
-                icon = new InfoIcon(MessagePath.MENU_TOWN_ARMOR.getMessage(), Material.DIAMOND_CHESTPLATE, ROOT_SLOT_ARMOR, true);
+                icon = new InfoIcon(MessagePath.MENU_TOWN_ARMOR.getMessage(), Material.CHAINMAIL_CHESTPLATE, ROOT_SLOT_ARMOR, true);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_ARMOR.getMessage());
                 icon.addProperty(MessagePath.LABEL_KNIGHT.getMessage());
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
@@ -414,7 +414,7 @@ public class TownMenu extends StateMenu {
         if(isAccess(AccessType.LORD) || isAccess(AccessType.ADMIN)) {
             /* Promote Icon */
             boolean isPromoteClickable = town.isPromoteable() || isAdmin;
-            icon = new InfoIcon(MessagePath.MENU_TOWN_PROMOTE.getMessage(), Material.DIAMOND_HORSE_ARMOR, ROOT_SLOT_PROMOTE, isPromoteClickable);
+            icon = new InfoIcon(MessagePath.MENU_TOWN_PROMOTE.getMessage(), Material.IRON_HORSE_ARMOR, ROOT_SLOT_PROMOTE, isPromoteClickable);
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_PROMOTE.getMessage());
             icon.addProperty(MessagePath.LABEL_LORD.getMessage());
             if (isPromoteClickable) {
@@ -427,7 +427,7 @@ public class TownMenu extends StateMenu {
 
             /* Demote Icon */
             boolean isDemoteClickable = town.isDemoteable() || isAdmin;
-            icon = new InfoIcon(MessagePath.MENU_TOWN_DEMOTE.getMessage(), Material.LEATHER_HORSE_ARMOR, ROOT_SLOT_DEMOTE, isDemoteClickable);
+            icon = new InfoIcon(MessagePath.MENU_TOWN_DEMOTE.getMessage(), Material.LEATHER_CHESTPLATE, ROOT_SLOT_DEMOTE, isDemoteClickable);
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_DEMOTE.getMessage());
             icon.addProperty(MessagePath.LABEL_LORD.getMessage());
             if (isPromoteClickable) {
@@ -440,7 +440,7 @@ public class TownMenu extends StateMenu {
 
             /* Transfer Icon */
             boolean isTransferClickable = town.isTransferable() || isAdmin;
-            icon = new InfoIcon(MessagePath.MENU_TOWN_TRANSFER.getMessage(), Material.ELYTRA, ROOT_SLOT_TRANSFER, isTransferClickable);
+            icon = new InfoIcon(MessagePath.MENU_TOWN_TRANSFER.getMessage(), Material.IRON_HELMET, ROOT_SLOT_TRANSFER, isTransferClickable);
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_TRANSFER.getMessage());
             icon.addProperty(MessagePath.LABEL_LORD.getMessage());
             if (isPromoteClickable) {
@@ -544,10 +544,14 @@ public class TownMenu extends StateMenu {
         /* Player Icons */
         MenuIcon icon;
         for (OfflinePlayer currentPlayer : players) {
-            icon = new PlayerIcon(currentPlayer,contextColor,0,true);
+            KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayer(currentPlayer);
+            if (offlinePlayer == null) {
+                continue;
+            }
+            icon = new PlayerIcon(currentPlayer,getColor(player,offlinePlayer),getRelation(player,offlinePlayer),0,true);
             String townRole = town.getPlayerRoleName(currentPlayer);
             if(!townRole.isEmpty()) {
-                icon.addProperty(townRole);
+                icon.addNameValue(MessagePath.LABEL_TOWN_ROLE.getMessage(), townRole);
             }
             if(!loreHintStr1.isEmpty()) {
                 icon.addHint(loreHintStr1);

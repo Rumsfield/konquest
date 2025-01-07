@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.model.*;
@@ -138,12 +139,12 @@ public abstract class StateMenu {
         };
 
         this.prefixComparator = (prefixOne, prefixTwo) -> {
-            // sort by level
+            // sort by level (backwards)
             int result = 0;
             if(prefixOne.level() < prefixTwo.level()) {
-                result = 1;
-            } else if(prefixOne.level() > prefixTwo.level()) {
                 result = -1;
+            } else if(prefixOne.level() > prefixTwo.level()) {
+                result = 1;
             }
             return result;
         };
@@ -488,5 +489,43 @@ public abstract class StateMenu {
         } else {
             Konquest.playFailSound(bukkitPlayer);
         }
+    }
+
+    /*
+     * Convenience Methods
+     */
+
+    // Context color
+    protected String getColor(KonOfflinePlayer displayPlayer, KonOfflinePlayer targetPlayer) {
+        return konquest.getDisplaySecondaryColor(displayPlayer,targetPlayer);
+    }
+
+    protected String getColor(KonOfflinePlayer displayPlayer, KonTown targetTown) {
+        return konquest.getDisplaySecondaryColor(displayPlayer,targetTown);
+    }
+
+    protected String getColor(KonOfflinePlayer displayPlayer, KonKingdom targetKingdom) {
+        return konquest.getDisplaySecondaryColor(displayPlayer.getKingdom(),targetKingdom);
+    }
+
+    protected String getColor(KonKingdom displayKingdom, KonKingdom targetKingdom) {
+        return konquest.getDisplaySecondaryColor(displayKingdom,targetKingdom);
+    }
+
+    // Relationship type
+    protected KonquestRelationshipType getRelation(KonOfflinePlayer displayPlayer, KonOfflinePlayer targetPlayer) {
+        return konquest.getKingdomManager().getRelationRole(displayPlayer.getKingdom(),targetPlayer.getKingdom());
+    }
+
+    protected KonquestRelationshipType getRelation(KonOfflinePlayer displayPlayer, KonTown targetTown) {
+        return konquest.getKingdomManager().getRelationRole(displayPlayer.getKingdom(),targetTown.getKingdom());
+    }
+
+    protected KonquestRelationshipType getRelation(KonOfflinePlayer displayPlayer, KonKingdom targetKingdom) {
+        return konquest.getKingdomManager().getRelationRole(displayPlayer.getKingdom(),targetKingdom);
+    }
+
+    protected KonquestRelationshipType getRelation(KonKingdom displayKingdom, KonKingdom targetKingdom) {
+        return konquest.getKingdomManager().getRelationRole(displayKingdom,targetKingdom);
     }
 }

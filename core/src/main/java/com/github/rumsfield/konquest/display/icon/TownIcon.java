@@ -1,12 +1,13 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.model.KonCapital;
 import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
+import com.github.rumsfield.konquest.utility.Labeler;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
 public class TownIcon extends MenuIcon {
@@ -15,29 +16,37 @@ public class TownIcon extends MenuIcon {
 	private final String contextColor;
 	private final boolean isClickable;
 	private final Material material;
-	private final boolean isProtected;
 
-	public TownIcon(KonTown town, OfflinePlayer viewer, String contextColor, int index, boolean isClickable) {
+	public TownIcon(KonTown town, String contextColor, KonquestRelationshipType relation, int index, boolean isClickable) {
 		super(index);
 		this.town = town;
 		this.contextColor = contextColor;
 		this.isClickable = isClickable;
 		if(town.isAttacked()) {
+			// Town / Capital is under attack
 			this.material = Material.REDSTONE_BLOCK;
-		} else if(town.isArmored()) {
-			this.material = Material.STONE_BRICKS;
-		} else {
-			if (town instanceof KonCapital) {
-				if (town.getKingdom().isCapitalImmune()) {
-					this.material = Material.ORANGE_STAINED_GLASS;
-				} else {
-					this.material = Material.ORANGE_CONCRETE;
-				}
+		} else if (town instanceof KonCapital) {
+			// Capital materials
+			if (town.getKingdom().isCapitalImmune()) {
+				// Capital is immune
+				this.material = Material.BEDROCK;
+			} else if (town.isArmored()) {
+				// Capital has armor
+				this.material = Material.NETHER_BRICKS;
 			} else {
+				// Default capital material
+				this.material = Material.NETHERITE_BLOCK;
+			}
+		} else {
+			// Town materials
+			if (town.isArmored()) {
+				// Town has armor
+				this.material = Material.STONE_BRICKS;
+			} else {
+				// Default town material
 				this.material = Material.OBSIDIAN;
 			}
 		}
-		this.isProtected = town.isShielded();
 		// Item Lore
 		if(town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL) &&
 				town.getKingdom().isCapitalImmune()) {
@@ -54,6 +63,9 @@ public class TownIcon extends MenuIcon {
 		} else {
 			addProperty(MessagePath.TERRITORY_TOWN.getMessage());
 		}
+		if (relation != null) {
+			addProperty(Labeler.lookup(relation));
+		}
 		if(town.isOpen()) {
 			addProperty(MessagePath.LABEL_OPEN.getMessage());
 		}
@@ -62,12 +74,6 @@ public class TownIcon extends MenuIcon {
 		}
 		if(town.isShielded()) {
 			addProperty(MessagePath.LABEL_SHIELD.getMessage());
-		}
-		if(viewer != null) {
-			String viewerRole = town.getPlayerRoleName(viewer);
-			if (!viewerRole.isEmpty()) {
-				addNameValue(MessagePath.LABEL_TOWN_ROLE.getMessage(), viewerRole);
-			}
 		}
 		addNameValue(MessagePath.LABEL_POPULATION.getMessage(), town.getNumResidents());
 		addNameValue(MessagePath.LABEL_LAND.getMessage(), town.getNumLand());
@@ -84,7 +90,7 @@ public class TownIcon extends MenuIcon {
 
 	@Override
 	public ItemStack getItem() {
-		return CompatibilityUtil.buildItem(material, getName(), getLore(), isProtected);
+		return CompatibilityUtil.buildItem(material, getName(), getLore(), town.isShielded());
 	}
 
 	@Override

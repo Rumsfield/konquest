@@ -98,7 +98,7 @@ public class DisplayManager {
 		if (view == null) return;
 		playMenuOpenSound(viewer.getBukkitPlayer());
 		stateMenus.put(view.getInventory(), menu);
-		ChatUtil.printDebug("Displaying new menu to player " + viewer.getBukkitPlayer().getName() + ", total menus = " + stateMenus.size());
+		ChatUtil.printDebug("Displaying new menu "+menu.getClass().getSimpleName()+" to player " + viewer.getBukkitPlayer().getName() + ", total menus = " + stateMenus.size());
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), () -> viewer.getBukkitPlayer().openInventory(view.getInventory()),1);
 	}

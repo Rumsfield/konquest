@@ -291,29 +291,7 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		if(onlinePlayerOne != null && onlinePlayerTwo != null) {
 			KonKingdom kingdomOne = onlinePlayerOne.getKingdom();
 			KonKingdom kingdomTwo = onlinePlayerTwo.getKingdom();
-			KonquestRelationshipType role = kingdomManager.getRelationRole(kingdomOne, kingdomTwo);
-			switch(role) {
-		    	case BARBARIAN:
-		    		result = MessagePath.PLACEHOLDER_BARBARIAN.getMessage();
-					break;
-		    	case ENEMY:
-		    		result = MessagePath.PLACEHOLDER_ENEMY.getMessage();
-		    		break;
-		    	case FRIENDLY:
-		    		result = MessagePath.PLACEHOLDER_FRIENDLY.getMessage();
-		    		break;
-		    	case ALLY:
-		    		result = MessagePath.PLACEHOLDER_ALLY.getMessage();
-		    		break;
-		    	case TRADE:
-		    		result = MessagePath.PLACEHOLDER_TRADER.getMessage();
-		    		break;
-		    	case PEACEFUL:
-		    		result = MessagePath.PLACEHOLDER_PEACEFUL.getMessage();
-		    		break;
-	    		default:
-	    			break;
-	    	}
+			result = Labeler.lookup(kingdomManager.getRelationRole(kingdomOne, kingdomTwo));
 		}
 		return result;
 	}

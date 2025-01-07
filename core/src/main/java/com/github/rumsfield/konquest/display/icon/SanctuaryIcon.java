@@ -32,7 +32,7 @@ public class SanctuaryIcon  extends MenuIcon {
 
     @Override
     public ItemStack getItem() {
-        return CompatibilityUtil.buildItem(Material.BEDROCK, getName(), getLore());
+        return CompatibilityUtil.buildItem(Material.SMOOTH_QUARTZ, getName(), getLore());
     }
 
     @Override

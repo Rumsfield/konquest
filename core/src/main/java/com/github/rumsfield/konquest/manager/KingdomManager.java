@@ -3668,6 +3668,21 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 	}
+
+	public double getSettleCost(KonOfflinePlayer player) {
+		double cost = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
+		double incrementCost = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath());
+		boolean isIncrementKingdom = konquest.getCore().getBoolean(CorePath.TOWNS_SETTLE_INCREMENT_KINGDOM.getPath(),false);
+		int townCount;
+		if (isIncrementKingdom) {
+			// All kingdom towns
+			townCount = player.getKingdom().getNumTowns();
+		} else {
+			// Towns that have the player as the lord
+			townCount = getPlayerLordships(player);
+		}
+		return (((double)townCount)*incrementCost) + cost;
+	}
 	
 	public int getPlayerLordships(KonOfflinePlayer player) {
 		int count = 0;

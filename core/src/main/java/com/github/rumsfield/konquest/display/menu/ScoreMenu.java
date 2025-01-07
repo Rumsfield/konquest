@@ -8,6 +8,7 @@ import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,14 +65,14 @@ public class ScoreMenu extends StateMenu {
         MenuIcon icon;
 
         /* Icon slot indexes */
+        int rows = 1;
         // Row 0: 0  1  2  3  4  5  6  7  8
-        int ROOT_SLOT_PLAYER = 3;
-        int ROOT_SLOT_KINGDOM = 5;
-        // Row 1: 9 10 11 12 13 14 15 16 17
-        int ROOT_SLOT_ALL_PLAYERS = 12;
-        int ROOT_SLOT_ALL_KINGDOMS = 14;
+        int ROOT_SLOT_PLAYER = 2;
+        int ROOT_SLOT_KINGDOM = 3;
+        int ROOT_SLOT_ALL_PLAYERS = 5;
+        int ROOT_SLOT_ALL_KINGDOMS = 6;
 
-        result = new DisplayMenu(2, getTitle(MenuState.ROOT));
+        result = new DisplayMenu(rows, getTitle(MenuState.ROOT));
 
         int playerScore = getKonquest().getKingdomManager().getPlayerScore(player);
         int kingdomScore = getKonquest().getKingdomManager().getKingdomScore(player.getKingdom());
@@ -80,10 +81,10 @@ public class ScoreMenu extends StateMenu {
 
         /* Player Score Icon */
         boolean isPlayerClickable = isPlayerScored(player);
-        icon = new PlayerIcon(player.getBukkitPlayer(), Konquest.friendColor2, ROOT_SLOT_PLAYER, isPlayerClickable);
+        icon = new PlayerIcon(player.getBukkitPlayer(), Konquest.friendColor2, null, ROOT_SLOT_PLAYER, isPlayerClickable);
         icon.addNameValue(MessagePath.MENU_SCORE_PLAYER_SCORE.getMessage(), playerScore);
         if (isPlayerClickable) {
-            icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
             if (player.isBarbarian()) {
@@ -97,10 +98,10 @@ public class ScoreMenu extends StateMenu {
 
         /* Kingdom Score Icon */
         boolean isKingdomClickable = isKingdomScored(player.getKingdom());
-        icon = new KingdomIcon(player.getKingdom(), Konquest.friendColor2, ROOT_SLOT_KINGDOM, isKingdomClickable, true);
+        icon = new KingdomIcon(player.getKingdom(), Konquest.friendColor2, null, ROOT_SLOT_KINGDOM, isKingdomClickable);
         icon.addNameValue(MessagePath.MENU_SCORE_KINGDOM_SCORE.getMessage(), kingdomScore);
         if (isKingdomClickable) {
-            icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
             if (player.isBarbarian()) {
@@ -150,20 +151,18 @@ public class ScoreMenu extends StateMenu {
         String currentPlayerName;
         String currentKingdomName;
         int currentScore;
-        String contextColor;
         boolean isPlayerClickable;
         for (KonOfflinePlayer currentPlayer : players) {
             currentPlayerName = currentPlayer.getOfflineBukkitPlayer().getName();
             currentKingdomName = currentPlayer.getKingdom().getName();
             currentScore = getKonquest().getKingdomManager().getPlayerScore(currentPlayer);
-            contextColor = getKonquest().getDisplaySecondaryColor(player,currentPlayer);
             isPlayerClickable = isPlayerScored(currentPlayer);
-            icon = new PlayerIcon(currentPlayer.getOfflineBukkitPlayer(),contextColor,0,isPlayerClickable);
-            icon.addProperty("#"+rank);
+            icon = new PlayerIcon(currentPlayer.getOfflineBukkitPlayer(),getColor(player,currentPlayer),getRelation(player,currentPlayer),0,isPlayerClickable);
+            icon.addProperty(MessagePath.LABEL_LEADERBOARD.getMessage()+" #"+rank);
             icon.addNameValue(MessagePath.LABEL_SCORE.getMessage(), currentScore);
             icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), currentKingdomName);
             if (isPlayerClickable) {
-                icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+                icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             } else {
                 icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
                 if (currentPlayer.isBarbarian()) {
@@ -196,20 +195,16 @@ public class ScoreMenu extends StateMenu {
         MenuIcon icon;
         String currentKingdomName;
         int currentScore;
-        String contextColor;
         boolean isKingdomClickable;
-        boolean isViewer;
         for (KonKingdom currentKingdom : kingdoms) {
             currentKingdomName = currentKingdom.getName();
             currentScore = getKonquest().getKingdomManager().getKingdomScore(currentKingdom);
-            contextColor = getKonquest().getDisplaySecondaryColor(player.getKingdom(),currentKingdom);
             isKingdomClickable = isKingdomScored(currentKingdom);
-            isViewer = currentKingdom.equals(player.getKingdom());
-            icon = new KingdomIcon(currentKingdom,contextColor,0,isKingdomClickable,isViewer);
-            icon.addProperty("#"+rank);
+            icon = new KingdomIcon(currentKingdom,getColor(player,currentKingdom),getRelation(player,currentKingdom),0,isKingdomClickable);
+            icon.addProperty(MessagePath.LABEL_LEADERBOARD.getMessage()+" #"+rank);
             icon.addNameValue(MessagePath.LABEL_SCORE.getMessage(), currentScore);
             if (isKingdomClickable) {
-                icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+                icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             } else {
                 icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
                 if (currentKingdom.isCreated()) {
@@ -249,10 +244,9 @@ public class ScoreMenu extends StateMenu {
         KonPlayerScoreAttributes playerScoreAttributes = getKonquest().getKingdomManager().getPlayerScoreAttributes(scorePlayer);
 
         int playerScore = playerScoreAttributes.getScore();
-        String contextColor = getKonquest().getDisplaySecondaryColor(player, scorePlayer);
 
         /* Player Score Icon */
-        icon = new PlayerIcon(scorePlayer.getOfflineBukkitPlayer(), contextColor, SLOT_TOTAL, false);
+        icon = new PlayerIcon(scorePlayer.getOfflineBukkitPlayer(), getColor(player, scorePlayer), getRelation(player, scorePlayer), SLOT_TOTAL, false);
         icon.addNameValue(MessagePath.MENU_SCORE_PLAYER_SCORE.getMessage(), playerScore);
         result.addIcon(icon);
 
@@ -326,10 +320,10 @@ public class ScoreMenu extends StateMenu {
         int SLOT_LEADERBOARD_START = 0;
         // Row 1: 9 10 11 12 13 14 15 16 17
         int SLOT_TOTAL = 9;
-        int SLOT_TOWNS = 12;
-        int SLOT_LAND = 13;
-        int SLOT_FAVOR = 14;
-        int SLOT_POPULATION = 15;
+        int SLOT_TOWNS = 11;
+        int SLOT_LAND = 12;
+        int SLOT_FAVOR = 13;
+        int SLOT_POPULATION = 14;
 
         result = new DisplayMenu(rows, getTitle(MenuState.KINGDOM_SCORE));
 
@@ -337,11 +331,9 @@ public class ScoreMenu extends StateMenu {
 
         int kingdomScore = kingdomScoreAttributes.getScore();
         String kingdomName = scoreKingdom.getName();
-        String contextColor = getKonquest().getDisplaySecondaryColor(player.getKingdom(),scoreKingdom);
-        boolean isViewer = scoreKingdom.equals(player.getKingdom());
 
         /* Kingdom Score Icon */
-        icon = new KingdomIcon(scoreKingdom, contextColor, SLOT_TOTAL, false, isViewer);
+        icon = new KingdomIcon(scoreKingdom, getColor(player,scoreKingdom), getRelation(player,scoreKingdom), SLOT_TOTAL, false);
         icon.addNameValue(MessagePath.MENU_SCORE_KINGDOM_SCORE.getMessage(), kingdomScore);
         result.addIcon(icon);
 
@@ -392,13 +384,17 @@ public class ScoreMenu extends StateMenu {
             }
             int rank = 1;
             int index = SLOT_LEADERBOARD_START;
-            int score;
             for (int n = 0; n < numEntries; n++) {
-                icon = new PlayerIcon(leaderboard.getOfflinePlayer(n),contextColor,index,true);
+                OfflinePlayer entryPlayer = leaderboard.getOfflinePlayer(n);
+                KonOfflinePlayer offlinePlayer = getKonquest().getPlayerManager().getOfflinePlayer(entryPlayer);
+                if (offlinePlayer == null) {
+                    continue;
+                }
+                icon = new PlayerIcon(entryPlayer,getColor(player,offlinePlayer),getRelation(player,offlinePlayer),index,true);
                 icon.addProperty(MessagePath.LABEL_LEADERBOARD.getMessage()+" #"+rank);
                 icon.addNameValue(MessagePath.LABEL_SCORE.getMessage(), leaderboard.getScore(n));
                 icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), kingdomName);
-                icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+                icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.PLAYER_SCORE);
                 result.addIcon(icon);
                 rank++;

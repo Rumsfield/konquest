@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.display.menu;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.display.DisplayMenu;
@@ -152,56 +153,56 @@ public class InfoMenu extends StateMenu {
         /* Players Icon */
         icon = new InfoIcon(MessagePath.LABEL_PLAYERS.getMessage(), Material.PLAYER_HEAD, ROOT_SLOT_PLAYERS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
-        icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.PLAYER_LIST);
         result.addIcon(icon);
 
         /* Kingdoms Icon */
         icon = new InfoIcon(MessagePath.LABEL_KINGDOMS.getMessage(), Material.DIAMOND_HELMET, ROOT_SLOT_KINGDOMS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
-        icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.KINGDOM_LIST);
         result.addIcon(icon);
 
         /* Camps Icon */
         icon = new InfoIcon(MessagePath.LABEL_CAMPS.getMessage(), Material.ORANGE_BED, ROOT_SLOT_CAMPS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
-        icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.CAMP_LIST);
         result.addIcon(icon);
 
         /* Ruins Icon */
         icon = new InfoIcon(MessagePath.LABEL_RUINS.getMessage(), Material.MOSSY_COBBLESTONE, ROOT_SLOT_RUINS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
-        icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.RUIN_LIST);
         result.addIcon(icon);
 
         /* Capitals Icon */
-        icon = new InfoIcon(MessagePath.LABEL_CAPITALS.getMessage(), Material.ORANGE_CONCRETE, ROOT_SLOT_CAPITALS, true);
+        icon = new InfoIcon(MessagePath.LABEL_CAPITALS.getMessage(), Material.NETHERITE_BLOCK, ROOT_SLOT_CAPITALS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
-        icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.CAPITAL_LIST);
         result.addIcon(icon);
 
         /* Towns Icon */
         icon = new InfoIcon(MessagePath.LABEL_TOWNS.getMessage(), Material.OBSIDIAN, ROOT_SLOT_TOWNS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
-        icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.TOWN_LIST);
         result.addIcon(icon);
 
         /* Sanctuaries Icon */
-        icon = new InfoIcon(MessagePath.LABEL_SANCTUARIES.getMessage(), Material.BEDROCK, ROOT_SLOT_SANCTUARIES, true);
+        icon = new InfoIcon(MessagePath.LABEL_SANCTUARIES.getMessage(), Material.SMOOTH_QUARTZ, ROOT_SLOT_SANCTUARIES, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
-        icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.SANCTUARY_LIST);
         result.addIcon(icon);
 
         /* Monument Templates Icon */
         icon = new InfoIcon(MessagePath.LABEL_MONUMENT_TEMPLATES.getMessage(), Material.CRAFTING_TABLE, ROOT_SLOT_MONUMENTS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
-        icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.MONUMENT_LIST);
         result.addIcon(icon);
 
@@ -268,10 +269,8 @@ public class InfoMenu extends StateMenu {
 
         /* Player Icons */
         MenuIcon icon;
-        String contextColor;
         for (KonOfflinePlayer currentPlayer : players) {
-            contextColor = getKonquest().getDisplaySecondaryColor(player,currentPlayer);
-            icon = new PlayerIcon(currentPlayer.getOfflineBukkitPlayer(),contextColor,0,true);
+            icon = new PlayerIcon(currentPlayer.getOfflineBukkitPlayer(),getColor(player,currentPlayer),getRelation(player,currentPlayer),0,true);
             // Context lore
             switch (context) {
                 case PLAYER_LIST:
@@ -349,12 +348,8 @@ public class InfoMenu extends StateMenu {
 
         /* Kingdom Icons */
         MenuIcon icon;
-        String contextColor;
-        boolean isViewer;
         for (KonKingdom currentKingdom : kingdoms) {
-            contextColor = getKonquest().getDisplaySecondaryColor(player.getKingdom(),currentKingdom);
-            isViewer = currentKingdom.equals(player.getKingdom());
-            icon = new KingdomIcon(currentKingdom,contextColor,0,true,isViewer);
+            icon = new KingdomIcon(currentKingdom,getColor(player,currentKingdom),getRelation(player,currentKingdom),0,true);
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.KINGDOM_INFO);
             icons.add(icon);
@@ -413,10 +408,8 @@ public class InfoMenu extends StateMenu {
 
         /* Town Icons */
         MenuIcon icon;
-        String contextColor;
         for (KonTown currentTown : towns) {
-            contextColor = getKonquest().getDisplaySecondaryColor(player.getKingdom(),currentTown.getKingdom());
-            icon = new TownIcon(currentTown,contextViewer,contextColor,0,true);
+            icon = new TownIcon(currentTown,getColor(player,currentTown),getRelation(player,currentTown),0,true);
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.TOWN_INFO);
             icons.add(icon);
@@ -664,16 +657,17 @@ public class InfoMenu extends StateMenu {
         int SLOT_STATS = 7;
         // Row 1: 9 10 11 12 13 14 15 16 17
 
-        String contextColor = getKonquest().getDisplaySecondaryColor(player,infoPlayer);
+        String contextColor = getColor(player,infoPlayer);
+        KonquestRelationshipType relation = getRelation(player,infoPlayer);
         String title = MessagePath.LABEL_PLAYER.getMessage()+" "+infoPlayer.getOfflineBukkitPlayer().getName();
         result = new DisplayMenu(rows, title);
 
         /* Player Icon */
-        icon = new PlayerIcon(infoPlayer.getOfflineBukkitPlayer(), contextColor, SLOT_PLAYER, false);
+        icon = new PlayerIcon(infoPlayer.getOfflineBukkitPlayer(), contextColor, relation, SLOT_PLAYER, false);
         if (infoPlayer.isBarbarian()) {
             icon.addProperty(MessagePath.LABEL_BARBARIAN.getMessage());
         } else {
-            icon.addProperty(infoPlayer.getKingdom().getPlayerRoleName(infoPlayer));
+            icon.addNameValue(MessagePath.LABEL_KINGDOM_ROLE.getMessage(), infoPlayer.getKingdom().getPlayerRoleName(infoPlayer));
         }
         result.addIcon(icon);
 
@@ -691,8 +685,7 @@ public class InfoMenu extends StateMenu {
             }
         } else {
             /* Kingdom Icon */
-            boolean isViewer = infoPlayer.getKingdom().equals(player.getKingdom());
-            icon = new KingdomIcon(infoPlayer.getKingdom(), contextColor, SLOT_KINGDOM_CAMP, true, isViewer);
+            icon = new KingdomIcon(infoPlayer.getKingdom(), contextColor, relation, SLOT_KINGDOM_CAMP, true);
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.KINGDOM_INFO);
         }
@@ -772,8 +765,8 @@ public class InfoMenu extends StateMenu {
         int SLOT_TRADERS = 23;
 
         boolean isClickable = infoKingdom.isCreated();
-        boolean isViewer = infoKingdom.equals(player.getKingdom());
-        String contextColor = getKonquest().getDisplaySecondaryColor(player.getKingdom(),infoKingdom);
+        String contextColor = getColor(player,infoKingdom);
+        KonquestRelationshipType relation = getRelation(player,infoKingdom);
         String title;
         if (infoKingdom.isCreated()) {
             title = MessagePath.LABEL_KINGDOM.getMessage()+" "+infoKingdom.getName();
@@ -795,7 +788,7 @@ public class InfoMenu extends StateMenu {
             colorName = ChatUtil.reverseLookupColorRGB(currentWebColor);
         }
         String webColorFormat = infoKingdom.getWebColorString()+colorName;
-        icon = new KingdomIcon(infoKingdom, contextColor, SLOT_KINGDOM, false, isViewer);
+        icon = new KingdomIcon(infoKingdom, contextColor, relation, SLOT_KINGDOM, false);
         icon.addNameValue(MessagePath.LABEL_ONLINE_PLAYERS.getMessage(), numKingdomPlayers);
         icon.addNameValue(MessagePath.LABEL_OFFICERS.getMessage(), numKingdomOfficers);
         icon.addNameValue(MessagePath.LABEL_FAVOR.getMessage(), numKingdomFavor);
@@ -858,7 +851,7 @@ public class InfoMenu extends StateMenu {
 
         /* Capital Icon (Unavailable to Barbarians) */
         if (isClickable) {
-            icon = new TownIcon(infoKingdom.getCapital(), player.getBukkitPlayer(), contextColor, SLOT_CAPITAL, true);
+            icon = new TownIcon(infoKingdom.getCapital(), contextColor, relation, SLOT_CAPITAL, true);
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.TOWN_INFO);
         } else {
@@ -870,7 +863,7 @@ public class InfoMenu extends StateMenu {
         /* Master Icon (Unavailable to Barbarians and Admin Kingdoms) */
         if (infoKingdom.isCreated() && !infoKingdom.isAdminOperated()) {
             if (infoKingdom.isMasterValid()) {
-                icon = new PlayerIcon(infoKingdom.getPlayerMaster(), contextColor, SLOT_MASTER, true);
+                icon = new PlayerIcon(infoKingdom.getPlayerMaster(), contextColor, relation, SLOT_MASTER, true);
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.PLAYER_INFO);
             } else {
@@ -1015,7 +1008,8 @@ public class InfoMenu extends StateMenu {
         int SLOT_UPGRADES = 15;
 
         boolean isCapital = infoTown.getTerritoryType().equals(KonquestTerritoryType.CAPITAL);
-        String contextColor = getKonquest().getDisplaySecondaryColor(player,infoTown);
+        String contextColor = getColor(player,infoTown);
+        KonquestRelationshipType relation = getRelation(player,infoTown);
         String title;
         if (isCapital) {
             title = infoTown.getName();
@@ -1033,7 +1027,7 @@ public class InfoMenu extends StateMenu {
         String townHealth = remainingCriticalHits+"/"+maxCriticalHits;
         String shieldTime = HelperUtil.getTimeFormat(infoTown.getRemainingShieldTimeSeconds(),"");
         int armorBlocks = infoTown.getArmorBlocks();
-        icon = new TownIcon(infoTown, player.getBukkitPlayer(), contextColor, SLOT_TOWN, false);
+        icon = new TownIcon(infoTown, contextColor, relation, SLOT_TOWN, false);
         icon.addNameValue(MessagePath.LABEL_ONLINE_PLAYERS.getMessage(), numTownPlayers);
         icon.addNameValue(MessagePath.LABEL_KNIGHTS.getMessage(), numTownKnights);
         icon.addNameValue(MessagePath.LABEL_HEALTH.getMessage(), townHealth);
@@ -1073,20 +1067,19 @@ public class InfoMenu extends StateMenu {
         }
 
         /* Kingdom Icon */
-        boolean isViewer = infoTown.getKingdom().equals(player.getKingdom());
-        icon = new KingdomIcon(infoTown.getKingdom(), contextColor, SLOT_KINGDOM, true, isViewer);
+        icon = new KingdomIcon(infoTown.getKingdom(), contextColor, relation, SLOT_KINGDOM, true);
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.KINGDOM_INFO);
         result.addIcon(icon);
 
         /* Lord Icon */
         if(infoTown.isLordValid()) {
-            icon = new PlayerIcon(infoTown.getPlayerLord(), contextColor, SLOT_LORD, true);
+            icon = new PlayerIcon(infoTown.getPlayerLord(), contextColor, relation, SLOT_LORD, true);
             icon.addProperty(MessagePath.LABEL_LORD.getMessage());
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.PLAYER_INFO);
         } else {
-            icon = new InfoIcon(MessagePath.LABEL_LORD.getMessage(), Material.BARRIER, SLOT_LORD, false);
+            icon = new InfoIcon(MessagePath.LABEL_LORD.getMessage(), Material.IRON_HELMET, SLOT_LORD, false);
             icon.addAlert(MessagePath.LABEL_NO_LORD.getMessage());
             if (infoTown.canClaimLordship(player)) {
                 icon.addDescription(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getTravelName()), ChatColor.RED);
@@ -1213,10 +1206,10 @@ public class InfoMenu extends StateMenu {
         icon = new InfoIcon(MessagePath.MENU_INFO_RUIN_STATUS.getMessage(), captureMaterial, SLOT_CAPTURE, false);
         if(infoRuin.isCaptureDisabled()) {
             // Currently on capture cooldown
-            icon.addDescription(MessagePath.PROTECTION_ERROR_CAPTURE.getMessage());
+            icon.addDescription(MessagePath.PROTECTION_ERROR_CAPTURE.getMessage(infoRuin.getCaptureCooldownString()));
         } else {
             // Can be captured
-            icon.addDescription(MessagePath.MENU_INFO_RUIN_CAPTURE.getMessage(infoRuin.getCaptureCooldownString()));
+            icon.addDescription(MessagePath.MENU_INFO_RUIN_CAPTURE.getMessage());
         }
         result.addIcon(icon);
 
@@ -1277,8 +1270,7 @@ public class InfoMenu extends StateMenu {
         result.addIcon(icon);
 
         /* Owner Icon */
-        String contextColor = getKonquest().getDisplaySecondaryColor(player.getKingdom(),infoCamp.getKingdom());
-        icon = new PlayerIcon(infoCamp.getOwner(), contextColor, SLOT_OWNER, true);
+        icon = new PlayerIcon(infoCamp.getOwner(), getColor(player,infoCamp.getKingdom()), getRelation(player,infoCamp.getKingdom()), SLOT_OWNER, true);
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.PLAYER_INFO);
         result.addIcon(icon);
