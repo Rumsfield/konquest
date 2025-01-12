@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display.menu;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
 import com.github.rumsfield.konquest.command.CommandType;
@@ -296,6 +297,7 @@ public class TownMenu extends StateMenu {
                     }
                     break;
                 case LIST:
+                    icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
                     icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
                     break;
                 case INVITES:
@@ -675,7 +677,6 @@ public class TownMenu extends StateMenu {
         if (town == null || !getKonquest().getKingdomManager().getIsDiscountEnable()) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
         double costSpecial = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SPECIALIZE.getPath());
-        String cost = String.format("%.2f",costSpecial);
 
         /* Profession Icons */
         MenuIcon icon;
@@ -684,7 +685,7 @@ public class TownMenu extends StateMenu {
                 icon = new ProfessionIcon(profession,0,true);
                 icon.addDescription(MessagePath.MENU_TOWN_LORE_SPECIAL.getMessage());
                 if(!isAdmin) {
-                    icon.addNameValue(MessagePath.LABEL_COST.getMessage(), cost);
+                    icon.addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(costSpecial));
                 }
                 icon.addHint(MessagePath.MENU_TOWN_HINT_SPECIAL.getMessage());
                 icons.add(icon);
@@ -818,16 +819,16 @@ public class TownMenu extends StateMenu {
                     case B_OPTIONS:
                     case B_SPECIALIZATION:
                         // Return to management root
-                        result = setCurrentView(MenuState.MANAGEMENT_ROOT);
+                        result = refreshNewView(MenuState.MANAGEMENT_ROOT);
                         break;
                     case MANAGEMENT_ROOT:
                         // Return to manage list
                         this.town = null;
-                        result = setCurrentView(MenuState.MANAGE);
+                        result = refreshNewView(MenuState.MANAGE);
                         break;
                     default:
                         // Return to base root
-                        result = setCurrentView(MenuState.ROOT);
+                        result = refreshNewView(MenuState.ROOT);
                         break;
                 }
             } else if (isNavBack(slot)) {
@@ -866,7 +867,7 @@ public class TownMenu extends StateMenu {
                             case INVITES:
                             case MANAGE:
                                 // Go to next state as defined by icon
-                                result = setCurrentView(nextState);
+                                result = refreshNewView(nextState);
                                 break;
                         }
                     }
@@ -1012,6 +1013,7 @@ public class TownMenu extends StateMenu {
                         // Destroy the town
                         boolean status = manager.menuDestroyTown(town,player);
                         playStatusSound(player.getBukkitPlayer(),status);
+                        // No result, close menu
                     }
                     break;
                 case B_UPGRADES:

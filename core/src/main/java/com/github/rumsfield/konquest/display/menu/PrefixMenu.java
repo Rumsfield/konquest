@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display.menu;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.display.DisplayMenu;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.*;
@@ -195,8 +196,7 @@ public class PrefixMenu extends StateMenu {
             boolean isClickable = player.getBukkitPlayer().hasPermission("konquest.prefix."+currentCustom.getLabel());
             icon = new PrefixCustomIcon(currentCustom, 0, isClickable);
             if(!player.getPlayerPrefix().isCustomAvailable(currentCustom.getLabel())) {
-                String cost = String.format("%.2f",(double)currentCustom.getCost());
-                icon.addNameValue(MessagePath.LABEL_COST.getMessage(), cost);
+                icon.addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(currentCustom.getCost()));
             }
             if(isClickable) {
                 icon.addHint(MessagePath.MENU_HINT_APPLY.getMessage());

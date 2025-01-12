@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonArmor;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
@@ -17,7 +18,7 @@ public class ArmorIcon extends MenuIcon {
 		this.armor = armor;
 		// Item Lore
 		addNameValue(MessagePath.LABEL_ARMOR.getMessage(), ""+ChatColor.DARK_AQUA+armor.getBlocks());
-		addNameValue(MessagePath.LABEL_COST.getMessage(), cost);
+		addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(cost));
 		addHint(MessagePath.MENU_HINT_CHARGE.getMessage());
 	}
 	

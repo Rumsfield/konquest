@@ -27,7 +27,9 @@ public abstract class StateMenu {
     private int currentPage;
 
     protected final Comparator<KonTown> townComparator;
+    protected final Comparator<KonTown> townNameComparator;
     protected final Comparator<KonKingdom> kingdomComparator;
+    protected final Comparator<KonKingdom> kingdomNameComparator;
     protected final Comparator<KonCamp> campComparator;
     protected final Comparator<KonRuin> ruinComparator;
     protected final Comparator<KonSanctuary> sanctuaryComparator;
@@ -93,49 +95,67 @@ public abstract class StateMenu {
             return result;
         };
 
+        this.townNameComparator = (townOne, townTwo) -> {
+            // Sort by alphabetical name
+            String s1 = townOne.getName();
+            String s2 = townTwo.getName();
+            assert s1 != null;
+            assert s2 != null;
+            return s1.toLowerCase().compareTo(s2.toLowerCase());
+        };
+
+        this.kingdomNameComparator = (kingdomOne, kingdomTwo) -> {
+            // Sort by alphabetical name
+            String s1 = kingdomOne.getName();
+            String s2 = kingdomTwo.getName();
+            assert s1 != null;
+            assert s2 != null;
+            return s1.toLowerCase().compareTo(s2.toLowerCase());
+        };
+
         this.campComparator = (campOne, campTwo) -> {
             // Sort by owner alphabetical name
-            String p1Name = campOne.getOwner().getName();
-            String p2Name = campTwo.getOwner().getName();
-            assert p1Name != null;
-            assert p2Name != null;
-            return p1Name.toLowerCase().compareTo(p2Name.toLowerCase());
+            String s1 = campOne.getOwner().getName();
+            String s2 = campTwo.getOwner().getName();
+            assert s1 != null;
+            assert s2 != null;
+            return s1.toLowerCase().compareTo(s2.toLowerCase());
         };
 
         this.ruinComparator = (ruinOne, ruinTwo) -> {
             // Sort by alphabetical name
-            String p1Name = ruinOne.getName();
-            String p2Name = ruinTwo.getName();
-            assert p1Name != null;
-            assert p2Name != null;
-            return p1Name.toLowerCase().compareTo(p2Name.toLowerCase());
+            String s1 = ruinOne.getName();
+            String s2 = ruinTwo.getName();
+            assert s1 != null;
+            assert s2 != null;
+            return s1.toLowerCase().compareTo(s2.toLowerCase());
         };
 
         this.sanctuaryComparator = (sanctuaryOne, sanctuaryTwo) -> {
             // Sort by alphabetical name
-            String p1Name = sanctuaryOne.getName();
-            String p2Name = sanctuaryTwo.getName();
-            assert p1Name != null;
-            assert p2Name != null;
-            return p1Name.toLowerCase().compareTo(p2Name.toLowerCase());
+            String s1 = sanctuaryOne.getName();
+            String s2 = sanctuaryTwo.getName();
+            assert s1 != null;
+            assert s2 != null;
+            return s1.toLowerCase().compareTo(s2.toLowerCase());
         };
 
         this.templateComparator = (templateOne, templateTwo) -> {
             // Sort by alphabetical name
-            String p1Name = templateOne.getName();
-            String p2Name = templateTwo.getName();
-            assert p1Name != null;
-            assert p2Name != null;
-            return p1Name.toLowerCase().compareTo(p2Name.toLowerCase());
+            String s1 = templateOne.getName();
+            String s2 = templateTwo.getName();
+            assert s1 != null;
+            assert s2 != null;
+            return s1.toLowerCase().compareTo(s2.toLowerCase());
         };
 
         this.playerComparator = (playerOne, playerTwo) -> {
             // Sort by alphabetical name
-            String p1Name = playerOne.getOfflineBukkitPlayer().getName();
-            String p2Name = playerTwo.getOfflineBukkitPlayer().getName();
-            assert p1Name != null;
-            assert p2Name != null;
-            return p1Name.toLowerCase().compareTo(p2Name.toLowerCase());
+            String s1 = playerOne.getOfflineBukkitPlayer().getName();
+            String s2 = playerTwo.getOfflineBukkitPlayer().getName();
+            assert s1 != null;
+            assert s2 != null;
+            return s1.toLowerCase().compareTo(s2.toLowerCase());
         };
 
         this.prefixComparator = (prefixOne, prefixTwo) -> {
@@ -175,6 +195,10 @@ public abstract class StateMenu {
             return result;
         };
     }
+
+    /*
+     * Getters & Setters
+     */
 
     public Konquest getKonquest() {
         return konquest;

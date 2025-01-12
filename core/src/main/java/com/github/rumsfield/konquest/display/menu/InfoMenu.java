@@ -369,33 +369,24 @@ public class InfoMenu extends StateMenu {
         List<KonTown> towns = new ArrayList<>();
 
         // Get list of towns (or capitals)
-        OfflinePlayer contextViewer = null;
         switch (context) {
             case TOWN_LIST:
-                contextViewer = player.getBukkitPlayer();
                 for (KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
                     towns.addAll(kingdom.getTowns());
                 }
                 break;
             case CAPITAL_LIST:
-                contextViewer = player.getBukkitPlayer();
                 for (KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
                     towns.add(kingdom.getCapital());
                 }
                 break;
             case PLAYER_INFO_TOWNS:
                 if (infoPlayer != null) {
-                    contextViewer = infoPlayer.getOfflineBukkitPlayer();
-                    for(KonTown town : infoPlayer.getKingdom().getCapitalTowns()) {
-                        if(town.isPlayerResident(player.getOfflineBukkitPlayer())) {
-                            towns.add(town);
-                        }
-                    }
+                    towns.addAll(getKonquest().getKingdomManager().getPlayerResidenceTowns(infoPlayer));
                 }
                 break;
             case KINGDOM_INFO_TOWNS:
                 if (infoKingdom != null) {
-                    contextViewer = player.getBukkitPlayer();
                     towns.addAll(infoKingdom.getTowns());
                 }
                 break;
@@ -410,6 +401,12 @@ public class InfoMenu extends StateMenu {
         MenuIcon icon;
         for (KonTown currentTown : towns) {
             icon = new TownIcon(currentTown,getColor(player,currentTown),getRelation(player,currentTown),0,true);
+            if (context.equals(MenuState.PLAYER_INFO_TOWNS) && infoPlayer != null) {
+                String townRole = currentTown.getPlayerRoleName(infoPlayer);
+                if(!townRole.isEmpty()) {
+                    icon.addNameValue(MessagePath.LABEL_TOWN_ROLE.getMessage(), townRole);
+                }
+            }
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.TOWN_INFO);
             icons.add(icon);
@@ -530,7 +527,7 @@ public class InfoMenu extends StateMenu {
         /* Error Icon */
         if (templates.isEmpty()) {
             icon = new InfoIcon(ChatColor.DARK_RED+MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage(),Material.BARRIER,0,false);
-            icon.addDescription(MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_NO_TEMPLATES.getMessage(), ChatColor.RED);
+            icon.addError(MessagePath.COMMAND_ADMIN_KINGDOM_ERROR_NO_TEMPLATES.getMessage());
             icons.add(icon);
         }
 
@@ -625,7 +622,7 @@ public class InfoMenu extends StateMenu {
             icon.addDescription(upgrade.getLevelDescription(upgradeLevel));
             if (isDisabled) {
                 icon.addAlert(MessagePath.LABEL_DISABLED.getMessage());
-                icon.addDescription(MessagePath.UPGRADE_DISABLED.getMessage(), ChatColor.RED);
+                icon.addError(MessagePath.UPGRADE_DISABLED.getMessage());
             }
             icons.add(icon);
         }
@@ -713,6 +710,8 @@ public class InfoMenu extends StateMenu {
         boolean isTownClickable = !infoPlayer.isBarbarian();
         icon = new InfoIcon(MessagePath.LABEL_TOWNS.getMessage(), CommandType.TOWN.iconMaterial(), SLOT_TOWNS, isTownClickable);
         if (isTownClickable) {
+            int numTowns = getKonquest().getKingdomManager().getPlayerResidencies(infoPlayer);
+            icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numTowns);
             icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
             icon.setState(MenuState.PLAYER_INFO_TOWNS);
         } else {
@@ -1082,7 +1081,7 @@ public class InfoMenu extends StateMenu {
             icon = new InfoIcon(MessagePath.LABEL_LORD.getMessage(), Material.IRON_HELMET, SLOT_LORD, false);
             icon.addAlert(MessagePath.LABEL_NO_LORD.getMessage());
             if (infoTown.canClaimLordship(player)) {
-                icon.addDescription(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getTravelName()), ChatColor.RED);
+                icon.addError(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getTravelName()));
             }
         }
         result.addIcon(icon);
@@ -1305,7 +1304,7 @@ public class InfoMenu extends StateMenu {
         /* Monument Template Icon */
         double totalCost = getKonquest().getKingdomManager().getCostTemplate() + infoTemplate.getCost();
         icon = new TemplateIcon(infoTemplate, SLOT_TEMPLATE, false);
-        icon.addNameValue(MessagePath.LABEL_COST.getMessage(), String.format("%.2f",totalCost));
+        icon.addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(totalCost));
         result.addIcon(icon);
 
         /* Sanctuary Icon */

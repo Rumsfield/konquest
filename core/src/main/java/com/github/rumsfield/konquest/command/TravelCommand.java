@@ -169,21 +169,9 @@ public class TravelCommand extends CommandBase {
 					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 					return;
 				}
-				ChatUtil.sendNotice(sender, MessagePath.COMMAND_TRAVEL_NOTICE_WILD_SEARCH.getMessage());
 				destination = TravelDestination.WILD;
-				// Wild travel is a little different.
-				// It takes a lot of effort to load random chunks and find a valid travel location,
-				// too much effort for 1 tick. So the search will take place in a separate thread
-				// over multiple ticks. When the task is finished, use a lamba expression to submit the travel.
-				RandomWildLocationSearchTask task = new RandomWildLocationSearchTask(konquest,bukkitWorld,location -> {
-					if(location == null) {
-						ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TRAVEL_ERROR_WILD_TIMEOUT.getMessage());
-					} else {
-						konquest.getTravelManager().submitTravel(bukkitPlayer, destination, null, location);
-					}
-				});
-				// schedule the task to run once every 20 ticks (20 ticks per second)
-				task.runTaskTimer(konquest.getPlugin(), 0L, 20L);
+				// Execute wild travel using manager
+				konquest.getTravelManager().submitWildTravel(bukkitPlayer);
 				break;
 			case "sanctuary":
 				if (args.size() != 2) {

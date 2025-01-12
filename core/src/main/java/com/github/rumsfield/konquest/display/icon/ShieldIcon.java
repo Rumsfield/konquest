@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonShield;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
@@ -18,7 +19,7 @@ public class ShieldIcon extends MenuIcon {
 		this.shield = shield;
 		// Item Lore
 		addNameValue(MessagePath.LABEL_SHIELD.getMessage(), HelperUtil.getTimeFormat(shield.getDurationSeconds(), ChatColor.DARK_AQUA));
-		addNameValue(MessagePath.LABEL_COST.getMessage(), cost);
+		addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(cost));
 		addHint(MessagePath.MENU_HINT_CHARGE.getMessage());
 	}
 	

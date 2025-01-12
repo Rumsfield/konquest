@@ -395,7 +395,7 @@ public class TownCommand extends CommandBase {
 												ChatColor.DARK_AQUA +
 												MessagePath.LABEL_COST.getMessage() +
 												" " +
-												shieldCost;
+												KonquestPlugin.getCurrencyFormat(shieldCost);
 										ChatUtil.sendMessage(bukkitPlayer, shieldInfo);
 									}
 								} else if (args.size() == 4) {
@@ -435,7 +435,7 @@ public class TownCommand extends CommandBase {
 												ChatColor.DARK_AQUA +
 												MessagePath.LABEL_COST.getMessage() +
 												" " +
-												armorCost;
+												KonquestPlugin.getCurrencyFormat(armorCost);
 										ChatUtil.sendMessage(bukkitPlayer, armorInfo);
 									}
 								} else if (args.size() == 4) {

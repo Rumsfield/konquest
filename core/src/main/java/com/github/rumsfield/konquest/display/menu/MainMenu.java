@@ -477,7 +477,7 @@ public class MainMenu extends StateMenu {
                             break;
                         case ROOT_SLOT_TRAVEL:
                             // Open Travel Menu (close this menu)
-                            // TODO
+                            getKonquest().getDisplayManager().displayTravelMenu(player);
                             break;
                     }
                     break;

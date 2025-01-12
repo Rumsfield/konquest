@@ -41,6 +41,7 @@ label:
   golem-offense: "Iron Golem Offense"
   golem-spawns: "Iron Golem Spawns"
   health: "Health"
+  home: "Home"
   immunity: "Immunity"
   increment-cost: "Increment Cost"
   information: "Information"
@@ -100,6 +101,7 @@ label:
   town: "Town"
   towns: "Towns"
   town-role: "Town Role"
+  travel: "Travel"
   true: "True"
   unavailable: "Unavailable"
   upgrades: "Upgrades"
@@ -139,6 +141,7 @@ menu:
     open: "Click to open"
     charge: "Click to charge"
     change: "Click to change"
+    travel: "Click to travel"
     exit: "Exit the menu"
   main:
     title: "Konquest Main Menu"
@@ -271,6 +274,11 @@ menu:
     ruin-status: "Capture Status"
     ruin-capture: "This Ruin can be captured for a reward."
     template-kingdoms: "List all kingdoms that use this Monument Template."
+  travel:
+    description-capital: "Go to your kingdom's capital."
+    description-home: "Go to your home bed."
+    description-camp: "Go to your barbarian camp."
+    description-wild: "Go to a random location in the wild."
   plots:
     edit-add-land: "Add Land"
     edit-remove-land: "Remove Land"

@@ -30,6 +30,7 @@ public class DisplayManager {
 	public static String hintFormat 		= ""+ChatColor.GOLD+ChatColor.UNDERLINE+"\u21D2"; // ⇒
 	public static String propertyFormat 	= ""+ChatColor.LIGHT_PURPLE+ChatColor.ITALIC+"\u25C6"; // ◆
 	public static String alertFormat 		= ""+ChatColor.RED+ChatColor.ITALIC+"\u26A0"; // ⚠
+	public static String errorFormat        = ""+ChatColor.RED;
 	
 	public DisplayManager(Konquest konquest) {
 		this.konquest = konquest;
@@ -102,19 +103,6 @@ public class DisplayManager {
 		// Schedule delayed task to display inventory to player
 		Bukkit.getScheduler().scheduleSyncDelayedTask(konquest.getPlugin(), () -> viewer.getBukkitPlayer().openInventory(view.getInventory()),1);
 	}
-
-	/* All menus
-	 *
-	 * + Help Menu
-	 * + Main Menu
-	 * + Kingdom Menu
-	 * + Town Menu (with management)
-	 * + Plot Menu
-	 * Info Menu
-	 * + Score Menu
-	 * Travel Menu
-	 * + Prefix Menu
-	 */
 
 	/*
 	 * ===============================================
@@ -281,6 +269,21 @@ public class DisplayManager {
 		if (displayPlayer == null) return;
 		InfoMenu newMenu = new InfoMenu(konquest, displayPlayer);
 		newMenu.goToTemplateListInfo();
+		displayMenuToPlayer(displayPlayer, newMenu);
+	}
+
+	/*
+	 * ===============================================
+	 * Travel Menu
+	 * ===============================================
+	 */
+	public void displayTravelMenu(KonPlayer displayPlayer) {
+		displayTravelMenu(displayPlayer, false);
+	}
+
+	public void displayTravelMenu(KonPlayer displayPlayer, boolean isAdmin) {
+		if (displayPlayer == null) return;
+		TravelMenu newMenu = new TravelMenu(konquest, displayPlayer, isAdmin);
 		displayMenuToPlayer(displayPlayer, newMenu);
 	}
    	

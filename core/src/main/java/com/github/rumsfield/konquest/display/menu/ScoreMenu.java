@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display.menu;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.display.DisplayMenu;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.*;
@@ -98,7 +99,7 @@ public class ScoreMenu extends StateMenu {
 
         /* Kingdom Score Icon */
         boolean isKingdomClickable = isKingdomScored(player.getKingdom());
-        icon = new KingdomIcon(player.getKingdom(), Konquest.friendColor2, null, ROOT_SLOT_KINGDOM, isKingdomClickable);
+        icon = new KingdomIcon(player.getKingdom(), Konquest.friendColor2, KonquestRelationshipType.FRIENDLY, ROOT_SLOT_KINGDOM, isKingdomClickable);
         icon.addNameValue(MessagePath.MENU_SCORE_KINGDOM_SCORE.getMessage(), kingdomScore);
         if (isKingdomClickable) {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
@@ -374,7 +375,7 @@ public class ScoreMenu extends StateMenu {
         if (leaderboard.isEmpty()) {
             // Error Icon
             icon = new InfoIcon(ChatColor.DARK_RED+MessagePath.LABEL_LEADERBOARD.getMessage(),Material.BARRIER,SLOT_LEADERBOARD_START,false);
-            icon.addDescription(MessagePath.MENU_SCORE_LEADERBOARD_EMPTY.getMessage(), ChatColor.RED);
+            icon.addError(MessagePath.MENU_SCORE_LEADERBOARD_EMPTY.getMessage());
             result.addIcon(icon);
         } else {
             // Player Icons

@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
@@ -20,7 +21,7 @@ public class CommandIcon extends MenuIcon{
 			addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
 		}
 		if(cost > 0) {
-			addNameValue(MessagePath.LABEL_COST.getMessage(), cost);
+			addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(cost));
 		}
 		if(cost_incr > 0) {
 			addNameValue(MessagePath.LABEL_INCREMENT_COST.getMessage(), cost_incr);

@@ -1,5 +1,6 @@
 package com.github.rumsfield.konquest.display.icon;
 
+import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
@@ -18,7 +19,7 @@ public class UpgradeIcon extends MenuIcon{
 		this.level = level;
 		// Item Lore
 		addNameValue(MessagePath.LABEL_LEVEL.getMessage(),level);
-		addNameValue(MessagePath.LABEL_COST.getMessage(),cost);
+		addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(cost));
 		addNameValue(MessagePath.LABEL_POPULATION.getMessage(),pop);
 		addDescription(upgrade.getLevelDescription(level));
 	}

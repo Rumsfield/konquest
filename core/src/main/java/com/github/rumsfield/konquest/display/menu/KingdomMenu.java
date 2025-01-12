@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.display.menu;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.display.DisplayMenu;
@@ -156,7 +157,7 @@ public class KingdomMenu extends StateMenu {
 			double cost_create = getKonquest().getCore().getDouble(CorePath.FAVOR_KINGDOMS_COST_CREATE.getPath(),0.0);
 			icon = new InfoIcon(MessagePath.MENU_KINGDOM_CREATE.getMessage(), Material.PUFFERFISH_SPAWN_EGG, ROOT_SLOT_CREATE, true);
 			icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_CREATE.getMessage());
-			icon.addNameValue(MessagePath.LABEL_COST.getMessage(), (int)cost_create);
+			icon.addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(cost_create));
 			icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
 			icon.setState(MenuState.A_CREATE);
 			result.addIcon(icon);
@@ -313,12 +314,24 @@ public class KingdomMenu extends StateMenu {
 				result.addIcon(icon);
 
 				/* Template Icon */
-				icon = new InfoIcon(MessagePath.MENU_KINGDOM_TEMPLATE.getMessage(), Material.CRAFTING_TABLE, ROOT_SLOT_TEMPLATE, true);
+				boolean isTemplateClickable = kingdom.isMonumentTemplateValid();
+				icon = new InfoIcon(MessagePath.MENU_KINGDOM_TEMPLATE.getMessage(), Material.CRAFTING_TABLE, ROOT_SLOT_TEMPLATE, isTemplateClickable);
 				icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_TEMPLATE.getMessage());
 				icon.addNameValue(MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage(), kingdom.getMonumentTemplateName());
-				icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
-				icon.setState(MenuState.C_TEMPLATE);
+				icon.addNameValue(MessagePath.LABEL_CRITICAL_HITS.getMessage(), kingdom.getMonumentTemplate().getNumCriticals());
+				icon.addNameValue(MessagePath.LABEL_LOOT_CHESTS.getMessage(), kingdom.getMonumentTemplate().getNumLootChests());
+				if (isTemplateClickable) {
+					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
+					icon.setState(MenuState.C_TEMPLATE);
+				} else {
+					if(kingdom.getMonumentTemplate().isBlanking()) {
+						icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
+						icon.addDescription(MessagePath.PROTECTION_ERROR_TEMPLATE_MODIFY.getMessage());
+					} else {
+						icon.addAlert(MessagePath.LABEL_INVALID.getMessage());
+					}
+				}
 				result.addIcon(icon);
 
 				/* Disband Icon */
@@ -412,18 +425,17 @@ public class KingdomMenu extends StateMenu {
 				continue;
 			}
 			boolean isClickable = true;
-			String cost = "0";
+			double totalCost = 0;
 			if(template.isValid()) {
 				if(!isAdmin && kingdom.hasMonumentTemplate()) {
-					double totalCost = manager.getCostTemplate() + template.getCost();
-					cost = String.format("%.2f",totalCost);
+					totalCost = manager.getCostTemplate() + template.getCost();
 				}
 			} else {
 				// Invalid template, check for blanking
 				isClickable = false;
 			}
 			icon = new TemplateIcon(template,0,isClickable);
-			icon.addNameValue(MessagePath.LABEL_COST.getMessage(), cost);
+			icon.addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(totalCost));
 			if (isClickable) {
 				icon.addHint(MessagePath.MENU_KINGDOM_HINT_TEMPLATE.getMessage());
 			}
@@ -536,8 +548,7 @@ public class KingdomMenu extends StateMenu {
 					icon.addDescription(detailedInfo);
 					if(!isAdmin) {
 						double costRelation = manager.getRelationCost(relation);
-						String cost = String.format("%.2f",costRelation);
-						icon.addNameValue(MessagePath.LABEL_COST.getMessage(), cost);
+						icon.addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(costRelation));
 					}
 					icon.addHint(MessagePath.MENU_KINGDOM_HINT_DIPLOMACY.getMessage());
 				}
@@ -651,6 +662,7 @@ public class KingdomMenu extends StateMenu {
 					icon.addHint(MessagePath.MENU_KINGDOM_HINT_DECLINE.getMessage());
 					break;
 				case A_LIST:
+					icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
 					icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
 					break;
 				case B_RELATIONSHIP:
@@ -683,6 +695,8 @@ public class KingdomMenu extends StateMenu {
 					icon.addHint(MessagePath.MENU_TOWN_HINT_DESTROY.getMessage());
 					break;
 				case C_CAPITAL:
+					double costSwap = getKonquest().getKingdomManager().getCostCapitalSwap();
+					icon.addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(costSwap));
 					icon.addHint(MessagePath.MENU_KINGDOM_HINT_CAPITAL.getMessage());
 					break;
 				default:
@@ -822,10 +836,10 @@ public class KingdomMenu extends StateMenu {
 				// Return to previous
 				if (isState(MenuState.B_DIPLOMACY)) {
 					// Return to refreshed relationship from diplomacy
-					result = setCurrentView(MenuState.B_RELATIONSHIP);
+					result = refreshNewView(MenuState.B_RELATIONSHIP);
 				} else {
 					// Return to root
-					result = setCurrentView(MenuState.ROOT);
+					result = refreshNewView(MenuState.ROOT);
 				}
 			} else if (isNavBack(slot)) {
 				// Page back
@@ -861,7 +875,7 @@ public class KingdomMenu extends StateMenu {
 						case C_DISBAND:
 						case C_TEMPLATE:
 							// Go to next state as defined by icon
-							result = setCurrentView(nextState);
+							result = refreshNewView(nextState);
 							break;
 						case A_CREATE:
 							// Display command usage
