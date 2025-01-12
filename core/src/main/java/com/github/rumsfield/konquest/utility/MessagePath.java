@@ -686,6 +686,7 @@ public enum MessagePath {
 	COMMAND_SCORE_NOTICE_ALL_HEADER             (0, "command.score.notice.all-header"),
 	COMMAND_SCORE_NOTICE_SCORE                  (3, "command.score.notice.score"),
 	COMMAND_SCORE_NOTICE_PLAYER                 (4, "command.score.notice.player"),
+	COMMAND_SCORE_NOTICE_KINGDOM                (2, "command.score.notice.kingdom"),
 	COMMAND_SCORE_ERROR_PEACEFUL                (1, "command.score.error.peaceful"),
 	COMMAND_SCORE_ERROR_BARBARIAN               (1, "command.score.error.barbarian"),
 	COMMAND_SCORE_ERROR_KINGDOM                 (0, "command.score.error.kingdom"),

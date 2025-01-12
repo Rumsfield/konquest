@@ -27,7 +27,7 @@ public class KingdomCommand extends CommandBase {
 		// Define arguments
 		// None
 		setOptionalArgs(true);
-		// menu
+		// [menu]
 		addArgument(
 				newArg("menu",true,false)
 		);

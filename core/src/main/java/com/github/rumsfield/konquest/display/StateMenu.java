@@ -5,7 +5,6 @@ import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.model.*;
-import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -23,7 +22,7 @@ public abstract class StateMenu {
     private final Konquest konquest;
     private State currentState;
     private Access menuAccess;
-    private final HashMap<State,ArrayList<DisplayMenu>> viewPages; // Map of paged views
+    private final HashMap<State,ArrayList<DisplayView>> viewPages; // Map of paged views
     private int currentPage;
 
     protected final Comparator<KonTown> townComparator;
@@ -234,7 +233,7 @@ public abstract class StateMenu {
      * @param context The menu state for the corresponding view
      * @return The list of menu views to be displayed to the player
      */
-    public abstract ArrayList<DisplayMenu> createView(State context);
+    public abstract ArrayList<DisplayView> createView(State context);
 
     /**
      * Change the menu's state based on the clicked inventory slot and type of click (right or left mouse).
@@ -244,31 +243,31 @@ public abstract class StateMenu {
      * @param clickType The type of click, true for left-click, false for right click
      * @return The new view state of the menu, or null to close the menu
      */
-    public abstract DisplayMenu updateState(int slot, boolean clickType);
+    public abstract DisplayView updateState(int slot, boolean clickType);
 
     /*
      * Common Methods
      */
-    public DisplayMenu setCurrentView(State context) {
+    public DisplayView setCurrentView(State context) {
         return setCurrentView(context, false);
     }
 
-    public DisplayMenu refreshCurrentView() {
+    public DisplayView refreshCurrentView() {
         return setCurrentView(currentState, true);
     }
 
-    public DisplayMenu refreshNewView(State context) {
+    public DisplayView refreshNewView(State context) {
         return setCurrentView(context, true);
     }
 
-    private DisplayMenu setCurrentView(State context, boolean refresh) {
+    private DisplayView setCurrentView(State context, boolean refresh) {
         if (!hasView(context) || refresh) {
             // Create a new view
             viewPages.put(context, createView(context));
         }
         currentState = context;
         currentPage = 0;
-        DisplayMenu view = getCurrentView();
+        DisplayView view = getCurrentView();
         if (view != null) {
             view.updateIcons();
         }
@@ -279,13 +278,13 @@ public abstract class StateMenu {
         return getCurrentViewPages() == null ? 0 : getCurrentViewPages().size();
     }
 
-    public @Nullable ArrayList<DisplayMenu> getCurrentViewPages() {
+    public @Nullable ArrayList<DisplayView> getCurrentViewPages() {
         return viewPages.get(currentState);
     }
 
-    public @Nullable DisplayMenu getCurrentView() {
+    public @Nullable DisplayView getCurrentView() {
         // Fetch current display view and update the icons in the inventory
-        DisplayMenu view = null;
+        DisplayView view = null;
         if (getCurrentViewPages() != null && !getCurrentViewPages().isEmpty() && currentPage < getCurrentNumPages()) {
             view = getCurrentViewPages().get(currentPage);
         }
@@ -302,7 +301,7 @@ public abstract class StateMenu {
 
     // Is the slot in the current view's navigation row?
     protected boolean isCurrentNavSlot(int slot) {
-        DisplayMenu view = getCurrentView();
+        DisplayView view = getCurrentView();
         if (view == null) return false;
         int invSize = view.getInventory().getSize();
         int navStop = Math.max(invSize-1,0);
@@ -312,7 +311,7 @@ public abstract class StateMenu {
 
     // Is the slot in the current view's menu rows?
     protected boolean isCurrentMenuSlot(int slot) {
-        DisplayMenu view = getCurrentView();
+        DisplayView view = getCurrentView();
         if (view == null) return false;
         int invSize = view.getInventory().getSize();
         int navStart = Math.max(invSize-MAX_ROW_SIZE,0);
@@ -321,50 +320,50 @@ public abstract class StateMenu {
 
     // Get the nav index offset based on the current slot
     protected int getCurrentNavIndex(int slot) {
-        DisplayMenu view = getCurrentView();
+        DisplayView view = getCurrentView();
         if (view == null) return 0;
         int invSize = view.getInventory().getSize();
         int navStart = Math.max(invSize-MAX_ROW_SIZE,0);
         return Math.min(Math.max(slot-navStart,0),MAX_ROW_SIZE-1);
     }
 
-    protected int getNavStartSlot(DisplayMenu view) {
+    protected int getNavStartSlot(DisplayView view) {
         if (view == null) return 0;
         int navStart = view.getInventory().getSize()-MAX_ROW_SIZE;
         return Math.max(navStart, 0);
     }
 
-    public void addNavClose(DisplayMenu view) {
+    public void addNavClose(DisplayView view) {
         // Close [4]
         if (view == null) return;
         view.addIcon(navIconClose(getNavStartSlot(view)+INDEX_CLOSE));
     }
 
-    public void addNavReturn(DisplayMenu view) {
+    public void addNavReturn(DisplayView view) {
         // Return [5]
         if (view == null) return;
         view.addIcon(navIconReturn(getNavStartSlot(view)+INDEX_RETURN));
     }
 
-    public void addNavHome(DisplayMenu view) {
+    public void addNavHome(DisplayView view) {
         // Home [3]
         if (view == null) return;
         view.addIcon(navIconHome(getNavStartSlot(view)+INDEX_HOME));
     }
 
-    public void addNavBack(DisplayMenu view) {
+    public void addNavBack(DisplayView view) {
         // Back [0]
         if (view == null) return;
         view.addIcon(navIconBack(getNavStartSlot(view)+INDEX_BACK));
     }
 
-    public void addNavNext(DisplayMenu view) {
+    public void addNavNext(DisplayView view) {
         // Next [8]
         if (view == null) return;
         view.addIcon(navIconNext(getNavStartSlot(view)+INDEX_NEXT));
     }
 
-    public void addNavEmpty(DisplayMenu view) {
+    public void addNavEmpty(DisplayView view) {
         // Fill entire row with empty icons
         if (view == null) return;
         int start = getNavStartSlot(view);
@@ -418,26 +417,26 @@ public abstract class StateMenu {
         return numPageRows;
     }
 
-    protected DisplayMenu goPageBack() {
+    protected DisplayView goPageBack() {
         currentPage = Math.max(currentPage-1,0);
-        DisplayMenu view = getCurrentView();
+        DisplayView view = getCurrentView();
         if (view != null) {
             view.updateIcons();
         }
         return view;
     }
 
-    protected DisplayMenu goPageNext() {
+    protected DisplayView goPageNext() {
         currentPage = Math.min(currentPage+1,getCurrentNumPages());
-        DisplayMenu view = getCurrentView();
+        DisplayView view = getCurrentView();
         if (view != null) {
             view.updateIcons();
         }
         return view;
     }
 
-    protected ArrayList<DisplayMenu> makePages(List<MenuIcon> icons, String baseTitle) {
-        ArrayList<DisplayMenu> result = new ArrayList<>();
+    protected ArrayList<DisplayView> makePages(List<MenuIcon> icons, String baseTitle) {
+        ArrayList<DisplayView> result = new ArrayList<>();
         ListIterator<MenuIcon> iconIter = icons.listIterator();
         int numIcons = icons.size();
         int pageTotal = getTotalPages(numIcons);
@@ -450,7 +449,7 @@ public abstract class StateMenu {
                 pageLabel = baseTitle;
             }
             // Create page
-            DisplayMenu page = new DisplayMenu(pageRows, pageLabel);
+            DisplayView page = new DisplayView(pageRows, pageLabel);
             // Fill icons
             int slotIndex = 0;
             while(slotIndex < MAX_ICONS_PER_PAGE && iconIter.hasNext()) {

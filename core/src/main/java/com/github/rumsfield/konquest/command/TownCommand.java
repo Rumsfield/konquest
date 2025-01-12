@@ -27,7 +27,7 @@ public class TownCommand extends CommandBase {
 		// Note: <town> non-literal arguments accept names of towns, and name of kingdom for capital, and literal "capital".
 		// None
 		setOptionalArgs(true);
-		// menu
+		// [menu]
 		addArgument(
 				newArg("menu",true,false)
 		);

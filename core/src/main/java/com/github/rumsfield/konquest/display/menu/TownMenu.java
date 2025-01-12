@@ -5,7 +5,7 @@ import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
 import com.github.rumsfield.konquest.command.CommandType;
-import com.github.rumsfield.konquest.display.DisplayMenu;
+import com.github.rumsfield.konquest.display.DisplayView;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.*;
 import com.github.rumsfield.konquest.manager.DisplayManager;
@@ -98,10 +98,10 @@ public class TownMenu extends StateMenu {
      * Creates the root menu view for this menu.
      * This is a single page view.
      */
-    private DisplayMenu createRootView() {
+    private DisplayView createRootView() {
         if (isAccess(AccessType.BARBARIAN)) return null;
 
-        DisplayMenu result;
+        DisplayView result;
         MenuIcon icon;
         CommandType iconCommand;
         boolean isPermission;
@@ -119,7 +119,7 @@ public class TownMenu extends StateMenu {
         int ROOT_SLOT_CLAIM 		= 13;
         int ROOT_SLOT_UNCLAIM		= 14;
 
-        result = new DisplayMenu(2, getTitle(MenuState.ROOT));
+        result = new DisplayView(2, getTitle(MenuState.ROOT));
 
         /* Join Icon (Unavailable for admins) */
         icon = new InfoIcon(MessagePath.MENU_TOWN_JOIN.getMessage(), Material.SADDLE, ROOT_SLOT_JOIN, isClickable);
@@ -223,7 +223,7 @@ public class TownMenu extends StateMenu {
      * This is a multiple paged view.
      * Contexts: JOIN, LEAVE, LIST, INVITES, MANAGE
      */
-    private List<DisplayMenu> createTownView(MenuState context) {
+    private List<DisplayView> createTownView(MenuState context) {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonTown> towns = new ArrayList<>();
 
@@ -327,14 +327,15 @@ public class TownMenu extends StateMenu {
      * Creates the management root menu view for this menu.
      * This is a single page view.
      */
-    private DisplayMenu createManagementRootView() {
-        DisplayMenu result;
+    private DisplayView createManagementRootView() {
+        DisplayView result;
         MenuIcon icon;
-        int rows = 1;
-        if(isAccess(AccessType.LORD)) {
+        int rows;
+        if(isAccess(AccessType.LORD) || isAccess(AccessType.ADMIN)) {
             rows = 2;
-        }
-        if(isAccess(AccessType.DEFAULT)) {
+        } else if (isAccess(AccessType.KNIGHT)) {
+            rows = 1;
+        } else {
             // Invalid access
             return null;
         }
@@ -355,7 +356,7 @@ public class TownMenu extends StateMenu {
         int ROOT_SLOT_OPTIONS 		    = 15;
         int ROOT_SLOT_SPECIALIZATION	= 16;
 
-        result = new DisplayMenu(rows, getTitle(MenuState.MANAGEMENT_ROOT));
+        result = new DisplayView(rows, getTitle(MenuState.MANAGEMENT_ROOT));
 
         // Render icons for Knights and Lords
         if(isAccess(AccessType.KNIGHT) || isAccess(AccessType.LORD) || isAccess(AccessType.ADMIN)) {
@@ -386,9 +387,12 @@ public class TownMenu extends StateMenu {
             }
 
             /* Info Icon */
-            icon = new TownIcon(town, getColor(player,town), getRelation(player,town), ROOT_SLOT_INFO, true);
+            boolean isInfoClickable = !isAdmin;
+            icon = new TownIcon(town, getColor(player,town), getRelation(player,town), ROOT_SLOT_INFO, isInfoClickable);
             icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
-            icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+            if (isInfoClickable) {
+                icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+            }
             icon.setState(MenuState.A_INFO);
             result.addIcon(icon);
 
@@ -500,9 +504,11 @@ public class TownMenu extends StateMenu {
 
         /* Navigation */
         addNavEmpty(result);
-        addNavHome(result);
         addNavClose(result);
-        addNavReturn(result);
+        if (!isAdmin) {
+            addNavHome(result);
+            addNavReturn(result);
+        }
 
         return result;
     }
@@ -512,7 +518,7 @@ public class TownMenu extends StateMenu {
      * This is a multiple paged view.
      * Contexts: A_REQUESTS, B_PROMOTE, B_DEMOTE, B_TRANSFER
      */
-    private List<DisplayMenu> createPlayerView(MenuState context) {
+    private List<DisplayView> createPlayerView(MenuState context) {
         if (town == null) return Collections.emptyList();
         String loreHintStr1 = "";
         String loreHintStr2 = "";
@@ -572,7 +578,7 @@ public class TownMenu extends StateMenu {
      * Creates the shield menu view.
      * This is a multiple paged view.
      */
-    private List<DisplayMenu> createShieldView() {
+    private List<DisplayView> createShieldView() {
         if (town == null || !getKonquest().getShieldManager().isShieldsEnabled()) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
 
@@ -590,7 +596,7 @@ public class TownMenu extends StateMenu {
      * Creates the armor menu view.
      * This is a multiple paged view.
      */
-    private List<DisplayMenu> createArmorView() {
+    private List<DisplayView> createArmorView() {
         if (town == null || !getKonquest().getShieldManager().isArmorsEnabled()) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
 
@@ -608,7 +614,7 @@ public class TownMenu extends StateMenu {
      * Creates the upgrade menu view.
      * This is a multiple paged view.
      */
-    private List<DisplayMenu> createUpgradeView() {
+    private List<DisplayView> createUpgradeView() {
         if (town == null || !getKonquest().getUpgradeManager().isEnabled()) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
 
@@ -637,7 +643,7 @@ public class TownMenu extends StateMenu {
      * Creates the options menu view.
      * This is a multiple paged view.
      */
-    private List<DisplayMenu> createOptionsView() {
+    private List<DisplayView> createOptionsView() {
         if (town == null) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
 
@@ -673,7 +679,7 @@ public class TownMenu extends StateMenu {
      * Creates the specialization menu view.
      * This is a multiple paged view.
      */
-    private List<DisplayMenu> createSpecializationView() {
+    private List<DisplayView> createSpecializationView() {
         if (town == null || !getKonquest().getKingdomManager().getIsDiscountEnable()) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
         double costSpecial = getKonquest().getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SPECIALIZE.getPath());
@@ -700,10 +706,10 @@ public class TownMenu extends StateMenu {
      * Creates the destroy menu view.
      * This is a single page view.
      */
-    private DisplayMenu createDestroyView() {
-        DisplayMenu result;
+    private DisplayView createDestroyView() {
+        DisplayView result;
         MenuIcon icon;
-        result = new DisplayMenu(1, getTitle(MenuState.B_DESTROY));
+        result = new DisplayView(1, getTitle(MenuState.B_DESTROY));
 
         /* Icon slot indexes */
         // Row 0: 0 1 2 3 4 5 6 7 8
@@ -737,8 +743,8 @@ public class TownMenu extends StateMenu {
      * @return The list of menu views to be displayed to the player
      */
     @Override
-    public ArrayList<DisplayMenu> createView(State context) {
-        ArrayList<DisplayMenu> result = new ArrayList<>();
+    public ArrayList<DisplayView> createView(State context) {
+        ArrayList<DisplayView> result = new ArrayList<>();
         MenuState currentState = (MenuState)context;
         switch (currentState) {
             case ROOT:
@@ -793,8 +799,8 @@ public class TownMenu extends StateMenu {
      * @return The new view state of the menu, or null to close the menu
      */
     @Override
-    public DisplayMenu updateState(int slot, boolean clickType) {
-        DisplayMenu result = null;
+    public DisplayView updateState(int slot, boolean clickType) {
+        DisplayView result = null;
         MenuState currentState = (MenuState)getCurrentState();
         if (currentState == null) return null;
         if (isCurrentNavSlot(slot)) {
@@ -840,7 +846,7 @@ public class TownMenu extends StateMenu {
             }
         } else if (isCurrentMenuSlot(slot)) {
             // Clicked in menu
-            DisplayMenu view = getCurrentView();
+            DisplayView view = getCurrentView();
             if (view == null) return null;
             MenuIcon clickedIcon = view.getIcon(slot);
             MenuState nextState = (MenuState)clickedIcon.getState(); // could be null in some states

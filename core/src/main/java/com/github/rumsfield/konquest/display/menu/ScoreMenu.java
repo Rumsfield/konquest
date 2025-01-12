@@ -2,7 +2,7 @@ package com.github.rumsfield.konquest.display.menu;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
-import com.github.rumsfield.konquest.display.DisplayMenu;
+import com.github.rumsfield.konquest.display.DisplayView;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.*;
 import com.github.rumsfield.konquest.model.*;
@@ -61,8 +61,8 @@ public class ScoreMenu extends StateMenu {
      * Creates the root menu view for this menu.
      * This is a single page view.
      */
-    private DisplayMenu createRootView() {
-        DisplayMenu result;
+    private DisplayView createRootView() {
+        DisplayView result;
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -73,7 +73,7 @@ public class ScoreMenu extends StateMenu {
         int ROOT_SLOT_ALL_PLAYERS = 5;
         int ROOT_SLOT_ALL_KINGDOMS = 6;
 
-        result = new DisplayMenu(rows, getTitle(MenuState.ROOT));
+        result = new DisplayView(rows, getTitle(MenuState.ROOT));
 
         int playerScore = getKonquest().getKingdomManager().getPlayerScore(player);
         int kingdomScore = getKonquest().getKingdomManager().getKingdomScore(player.getKingdom());
@@ -140,7 +140,7 @@ public class ScoreMenu extends StateMenu {
      * Creates the all-player view.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createPlayerView() {
+    private List<DisplayView> createPlayerView() {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonOfflinePlayer> players = new ArrayList<>(getKonquest().getPlayerManager().getAllKonquestOfflinePlayers());
         // Sort by score
@@ -185,7 +185,7 @@ public class ScoreMenu extends StateMenu {
      * Creates the all-kingdom view.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createKingdomView() {
+    private List<DisplayView> createKingdomView() {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonKingdom> kingdoms = new ArrayList<>(getKonquest().getKingdomManager().getKingdoms());
         // Sort by score
@@ -225,9 +225,9 @@ public class ScoreMenu extends StateMenu {
      * Creates the player score view for this menu.
      * This is a single page view.
      */
-    private DisplayMenu createPlayerScoreView() {
+    private DisplayView createPlayerScoreView() {
         if (scorePlayer == null) return null;
-        DisplayMenu result;
+        DisplayView result;
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -240,7 +240,7 @@ public class ScoreMenu extends StateMenu {
         int SLOT_LAND_KNIGHT = 6;
         int SLOT_LAND_RESIDENT = 7;
 
-        result = new DisplayMenu(1, getTitle(MenuState.PLAYER_SCORE));
+        result = new DisplayView(1, getTitle(MenuState.PLAYER_SCORE));
 
         KonPlayerScoreAttributes playerScoreAttributes = getKonquest().getKingdomManager().getPlayerScoreAttributes(scorePlayer);
 
@@ -309,9 +309,9 @@ public class ScoreMenu extends StateMenu {
      * Creates the kingdom score view for this menu.
      * This is a single page view.
      */
-    private DisplayMenu createKingdomScoreView() {
+    private DisplayView createKingdomScoreView() {
         if (scoreKingdom == null) return null;
-        DisplayMenu result;
+        DisplayView result;
         MenuIcon icon;
         int NUM_LEADERBOARD = 9;
 
@@ -326,7 +326,7 @@ public class ScoreMenu extends StateMenu {
         int SLOT_FAVOR = 13;
         int SLOT_POPULATION = 14;
 
-        result = new DisplayMenu(rows, getTitle(MenuState.KINGDOM_SCORE));
+        result = new DisplayView(rows, getTitle(MenuState.KINGDOM_SCORE));
 
         KonKingdomScoreAttributes kingdomScoreAttributes = getKonquest().getKingdomManager().getKingdomScoreAttributes(scoreKingdom);
 
@@ -419,8 +419,8 @@ public class ScoreMenu extends StateMenu {
      * @return The list of menu views to be displayed to the player
      */
     @Override
-    public ArrayList<DisplayMenu> createView(State context) {
-        ArrayList<DisplayMenu> result = new ArrayList<>();
+    public ArrayList<DisplayView> createView(State context) {
+        ArrayList<DisplayView> result = new ArrayList<>();
         switch ((MenuState)context) {
             case ROOT:
                 result.add(createRootView());
@@ -453,8 +453,8 @@ public class ScoreMenu extends StateMenu {
      * @return The new view state of the menu, or null to close the menu
      */
     @Override
-    public DisplayMenu updateState(int slot, boolean clickType) {
-        DisplayMenu result = null;
+    public DisplayView updateState(int slot, boolean clickType) {
+        DisplayView result = null;
         MenuState currentState = (MenuState)getCurrentState();
         if (currentState == null) return null;
         if (isCurrentNavSlot(slot)) {
@@ -500,7 +500,7 @@ public class ScoreMenu extends StateMenu {
             }
         } else if (isCurrentMenuSlot(slot)) {
             // Clicked in menu
-            DisplayMenu view = getCurrentView();
+            DisplayView view = getCurrentView();
             if (view == null) return null;
             MenuIcon clickedIcon = view.getIcon(slot);
             MenuState nextState = (MenuState)clickedIcon.getState(); // could be null in some states

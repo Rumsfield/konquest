@@ -2,7 +2,7 @@ package com.github.rumsfield.konquest.display.menu;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
-import com.github.rumsfield.konquest.display.DisplayMenu;
+import com.github.rumsfield.konquest.display.DisplayView;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.*;
 import com.github.rumsfield.konquest.model.*;
@@ -42,9 +42,9 @@ public class PrefixMenu extends StateMenu {
      * Creates the root menu view for this menu.
      * This is a single page view.
      */
-    private DisplayMenu createRootView() {
+    private DisplayView createRootView() {
         if (!getKonquest().getAccomplishmentManager().isEnabled()) return null;
-        DisplayMenu result;
+        DisplayView result;
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -56,7 +56,7 @@ public class PrefixMenu extends StateMenu {
         int ROOT_SLOT_CUSTOM = 13;
         int ROOT_SLOT_STATS = 15;
 
-        result = new DisplayMenu(2, getTitle(MenuState.ROOT));
+        result = new DisplayView(2, getTitle(MenuState.ROOT));
 
         /* Current Info Icon */
         String playerPrefix;
@@ -131,7 +131,7 @@ public class PrefixMenu extends StateMenu {
      * Creates the prefix views.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createPrefixView() {
+    private List<DisplayView> createPrefixView() {
         ArrayList<MenuIcon> prefixIcons = new ArrayList<>();
         MenuIcon icon;
 
@@ -187,7 +187,7 @@ public class PrefixMenu extends StateMenu {
      * Creates the custom views.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createCustomView() {
+    private List<DisplayView> createCustomView() {
         ArrayList<MenuIcon> customPrefixIcons = new ArrayList<>();
         MenuIcon icon;
 
@@ -214,7 +214,7 @@ public class PrefixMenu extends StateMenu {
      * Creates the stats views.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createStatsView() {
+    private List<DisplayView> createStatsView() {
         ArrayList<MenuIcon> statsIcons = new ArrayList<>();
         MenuIcon icon;
 
@@ -237,8 +237,8 @@ public class PrefixMenu extends StateMenu {
      * @return The list of menu views to be displayed to the player
      */
     @Override
-    public ArrayList<DisplayMenu> createView(State context) {
-        ArrayList<DisplayMenu> result = new ArrayList<>();
+    public ArrayList<DisplayView> createView(State context) {
+        ArrayList<DisplayView> result = new ArrayList<>();
         switch ((MenuState)context) {
             case ROOT:
                 result.add(createRootView());
@@ -268,8 +268,8 @@ public class PrefixMenu extends StateMenu {
      * @return The new view state of the menu, or null to close the menu
      */
     @Override
-    public DisplayMenu updateState(int slot, boolean clickType) {
-        DisplayMenu result = null;
+    public DisplayView updateState(int slot, boolean clickType) {
+        DisplayView result = null;
         if (isCurrentNavSlot(slot)) {
             // Clicked in navigation bar
             if (isNavClose(slot)) {
@@ -290,7 +290,7 @@ public class PrefixMenu extends StateMenu {
             }
         } else if (isCurrentMenuSlot(slot)) {
             // Clicked in menu
-            DisplayMenu view = getCurrentView();
+            DisplayView view = getCurrentView();
             if (view == null) return null;
             MenuIcon clickedIcon = view.getIcon(slot);
             MenuState currentState = (MenuState)getCurrentState();

@@ -3,7 +3,7 @@ package com.github.rumsfield.konquest.display.menu;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.command.admin.AdminCommandType;
-import com.github.rumsfield.konquest.display.DisplayMenu;
+import com.github.rumsfield.konquest.display.DisplayView;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.CommandIcon;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
@@ -65,7 +65,7 @@ public class MainMenu extends StateMenu {
         setCurrentView(MenuState.ROOT);
     }
 
-    public DisplayMenu goToDashboard() {
+    public DisplayView goToDashboard() {
         // Change to dashboard view
         return refreshNewView(MenuState.DASHBOARD);
     }
@@ -74,13 +74,13 @@ public class MainMenu extends StateMenu {
      * Creates the root menu view for this menu.
      * This is a single page view.
      */
-    private DisplayMenu createRootView() {
-        DisplayMenu result;
+    private DisplayView createRootView() {
+        DisplayView result;
         MenuIcon icon;
         CommandType iconCommand;
         boolean isClickable;
 
-        result = new DisplayMenu(3, MessagePath.MENU_MAIN_TITLE.getMessage());
+        result = new DisplayView(3, MessagePath.MENU_MAIN_TITLE.getMessage());
 
         /* Help Menu */
         icon = new InfoIcon(MessagePath.MENU_MAIN_HELP.getMessage(), CommandType.HELP.iconMaterial(), ROOT_SLOT_HELP, true);
@@ -216,11 +216,11 @@ public class MainMenu extends StateMenu {
      * Creates the secret view.
      * This is a single page view.
      */
-    private DisplayMenu createSecretView() {
-        DisplayMenu result;
+    private DisplayView createSecretView() {
+        DisplayView result;
         MenuIcon icon;
 
-        result = new DisplayMenu(1, "Secret Menu");
+        result = new DisplayView(1, "Secret Menu");
 
         /* TODO */
         icon = new InfoIcon("TODO", Material.SLIME_BALL, 0, false);
@@ -240,8 +240,8 @@ public class MainMenu extends StateMenu {
      * Creates the dashboard view.
      * This is a single page view.
      */
-    private DisplayMenu createDashboardView() {
-        DisplayMenu result;
+    private DisplayView createDashboardView() {
+        DisplayView result;
         MenuIcon icon;
         CommandType iconCommand;
         AdminCommandType iconAdminCommand;
@@ -250,7 +250,7 @@ public class MainMenu extends StateMenu {
         boolean isPermission;
         boolean currentValue;
 
-        result = new DisplayMenu(2, MessagePath.MENU_MAIN_TITLE_DASHBOARD.getMessage());
+        result = new DisplayView(2, MessagePath.MENU_MAIN_TITLE_DASHBOARD.getMessage());
 
         /* Map Auto */
         iconCommand = CommandType.MAP;
@@ -381,8 +381,8 @@ public class MainMenu extends StateMenu {
      * @return The list of menu views to be displayed to the player
      */
     @Override
-    public ArrayList<DisplayMenu> createView(State context) {
-        ArrayList<DisplayMenu> result = new ArrayList<>();
+    public ArrayList<DisplayView> createView(State context) {
+        ArrayList<DisplayView> result = new ArrayList<>();
         switch ((MenuState)context) {
             case ROOT:
                 result.add(createRootView());
@@ -409,8 +409,8 @@ public class MainMenu extends StateMenu {
      * @return The new view state of the menu, or null to close the menu
      */
     @Override
-    public DisplayMenu updateState(int slot, boolean clickType) {
-        DisplayMenu result = null;
+    public DisplayView updateState(int slot, boolean clickType) {
+        DisplayView result = null;
         if (isCurrentNavSlot(slot)) {
             // Clicked in navigation bar
             if (isNavClose(slot)) {
@@ -431,7 +431,7 @@ public class MainMenu extends StateMenu {
             }
         } else if (isCurrentMenuSlot(slot)) {
             // Clicked in menu
-            DisplayMenu view = getCurrentView();
+            DisplayView view = getCurrentView();
             if (view == null) return null;
             MenuIcon clickedIcon = view.getIcon(slot);
             switch ((MenuState)getCurrentState()) {

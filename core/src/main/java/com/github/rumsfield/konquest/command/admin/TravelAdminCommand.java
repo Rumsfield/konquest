@@ -21,8 +21,14 @@ public class TravelAdminCommand  extends CommandBase {
 		// Define name and sender support
 		super("travel",true, true);
 		// Define arguments
-		List<String> argNames = Arrays.asList("town", "kingdom", "camp", "ruin", "sanctuary", "monument");
-		// town|kingdom|camp|ruin|sanctuary|monument <name>
+		// None
+		setOptionalArgs(true);
+		// [menu]
+		addArgument(
+				newArg("menu",true,false)
+		);
+		List<String> argNames = Arrays.asList("town", "kingdom", "sanctuary", "camp", "ruin", "monument");
+		// town|kingdom|sanctuary|camp|ruin|monument <name>
 		addArgument(
 				newArg(argNames,true,false)
 						.sub( newArg("name",false,false) )
@@ -35,6 +41,11 @@ public class TravelAdminCommand  extends CommandBase {
 		KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
 		if (player == null) {
 			sendInvalidSenderMessage(sender);
+			return;
+		}
+		if (args.isEmpty() || args.get(0).equalsIgnoreCase("menu")) {
+			// Display travel menu
+			konquest.getDisplayManager().displayTravelMenu(player, true);
 			return;
 		}
 		if (args.size() != 2) {
@@ -111,6 +122,7 @@ public class TravelAdminCommand  extends CommandBase {
 	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		List<String> tabList = new ArrayList<>();
 		if (args.size() == 1) {
+			tabList.add("menu");
 			tabList.add("town");
 			tabList.add("kingdom");
 			tabList.add("camp");

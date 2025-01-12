@@ -1,7 +1,6 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.TravelManager.TravelDestination;
@@ -9,12 +8,10 @@ import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.RandomWildLocationSearchTask;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,23 +23,20 @@ public class TravelCommand extends CommandBase {
 	public TravelCommand() {
 		// Define name and sender support
 		super("travel",true, false);
-		// town <town>
+		// None
+		setOptionalArgs(true);
+		// [menu]
 		addArgument(
-				newArg("town", true, false)
-						.sub( newArg("town", false, false) )
+				newArg("menu",true,false)
 		);
-		// kingdom <kingdom>
+		// town|kingdom|sanctuary <name>
+		List<String> argNames = Arrays.asList("town", "kingdom", "sanctuary");
 		addArgument(
-				newArg("kingdom", true, false)
-						.sub( newArg("kingdom", false, false) )
-		);
-		// sanctuary <sanctuary>
-		addArgument(
-				newArg("sanctuary", true, false)
-						.sub( newArg("sanctuary", false, false) )
+				newArg(argNames,true,false)
+						.sub( newArg("name",false,false) )
 		);
 		// capital|home|camp|wild
-		List<String> argNames = Arrays.asList("capital", "home", "camp", "wild");
+		argNames = Arrays.asList("capital", "home", "camp", "wild");
 		addArgument(
 				newArg(argNames,true,false)
 		);
@@ -84,11 +78,14 @@ public class TravelCommand extends CommandBase {
 			}
 		}
 
-		// Determine travel destination and location
-		if (args.isEmpty()) {
-			sendInvalidArgMessage(sender);
+		// No arguments, or menu argument
+		if (args.isEmpty() || args.get(0).equalsIgnoreCase("menu")) {
+			// Display travel menu
+			konquest.getDisplayManager().displayTravelMenu(player);
 			return;
 		}
+
+		// Determine travel destination and location
 		String travelType = args.get(0);
 		Location travelLoc = null;
 		TravelDestination destination;
@@ -317,6 +314,7 @@ public class TravelCommand extends CommandBase {
 		boolean isWildTravel = konquest.getCore().getBoolean(CorePath.TRAVEL_ENABLE_WILD.getPath(),false);
 
 		if (args.size() == 1) {
+			tabList.add("menu");
 			if (isWildTravel) {
 				tabList.add("wild");
 			}

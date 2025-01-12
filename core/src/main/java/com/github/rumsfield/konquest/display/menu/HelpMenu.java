@@ -3,7 +3,7 @@ package com.github.rumsfield.konquest.display.menu;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandType;
 import com.github.rumsfield.konquest.command.admin.AdminCommandType;
-import com.github.rumsfield.konquest.display.DisplayMenu;
+import com.github.rumsfield.konquest.display.DisplayView;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.AdminCommandIcon;
 import com.github.rumsfield.konquest.display.icon.CommandIcon;
@@ -46,8 +46,8 @@ public class HelpMenu extends StateMenu {
      * Creates the root menu view for this menu.
      * This is a single page view.
      */
-    private DisplayMenu createRootView() {
-        DisplayMenu result;
+    private DisplayView createRootView() {
+        DisplayView result;
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -58,7 +58,7 @@ public class HelpMenu extends StateMenu {
         int ROOT_SLOT_COMMANDS 		    = 6;
         int ROOT_SLOT_COMMANDS_ADMIN 	= 8;
 
-        result = new DisplayMenu(1, MessagePath.MENU_MAIN_HELP.getMessage());
+        result = new DisplayView(1, MessagePath.MENU_MAIN_HELP.getMessage());
 
         /* Getting Started */
         icon = new InfoIcon(MessagePath.MENU_HELP_START.getMessage(), Material.WOODEN_PICKAXE, ROOT_SLOT_START, true);
@@ -108,8 +108,8 @@ public class HelpMenu extends StateMenu {
      * Creates the getting started view.
      * This is a single page view.
      */
-    private DisplayMenu createStartView() {
-        DisplayMenu result;
+    private DisplayView createStartView() {
+        DisplayView result;
         MenuIcon icon;
         int numRows = 1;
         boolean isQuestEnabled = false;
@@ -124,7 +124,7 @@ public class HelpMenu extends StateMenu {
             isQuestEnabled = true;
         }
 
-        result = new DisplayMenu(numRows, MessagePath.MENU_HELP_START.getMessage());
+        result = new DisplayView(numRows, MessagePath.MENU_HELP_START.getMessage());
 
         /* Tips */
         String[] tips = {
@@ -176,7 +176,7 @@ public class HelpMenu extends StateMenu {
      * Creates the command or admin views, given the state context.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createCommandView(MenuState context) {
+    private List<DisplayView> createCommandView(MenuState context) {
         // Context-specific info
         ArrayList<MenuIcon> commandIcons = new ArrayList<>();
         MenuIcon icon;
@@ -246,8 +246,8 @@ public class HelpMenu extends StateMenu {
      * @return The list of menu views to be displayed to the player
      */
     @Override
-    public ArrayList<DisplayMenu> createView(State context) {
-        ArrayList<DisplayMenu> result = new ArrayList<>();
+    public ArrayList<DisplayView> createView(State context) {
+        ArrayList<DisplayView> result = new ArrayList<>();
         switch ((MenuState)context) {
             case ROOT:
                 result.add(createRootView());
@@ -276,8 +276,8 @@ public class HelpMenu extends StateMenu {
      * @return The new view state of the menu, or null to close the menu
      */
     @Override
-    public DisplayMenu updateState(int slot, boolean clickType) {
-        DisplayMenu result = null;
+    public DisplayView updateState(int slot, boolean clickType) {
+        DisplayView result = null;
         if (isCurrentNavSlot(slot)) {
             // Clicked in navigation bar
             if (isNavClose(slot)) {
@@ -295,7 +295,7 @@ public class HelpMenu extends StateMenu {
             }
         } else if (isCurrentMenuSlot(slot)) {
             // Clicked in menu
-            DisplayMenu view = getCurrentView();
+            DisplayView view = getCurrentView();
             if (view == null) return null;
             MenuIcon clickedIcon = view.getIcon(slot);
             MenuState currentState = (MenuState)getCurrentState();

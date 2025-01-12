@@ -1,12 +1,11 @@
 package com.github.rumsfield.konquest.display.menu;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.display.DisplayMenu;
+import com.github.rumsfield.konquest.display.DisplayView;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
 import com.github.rumsfield.konquest.display.icon.PlayerIcon;
-import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonPlot;
 import com.github.rumsfield.konquest.model.KonTown;
@@ -98,8 +97,8 @@ public class PlotMenu extends StateMenu {
      * Creates the edit menu view.
      * This is a single page view.
      */
-    private DisplayMenu createEditView() {
-        DisplayMenu result = new DisplayMenu(1, getTitle(MenuState.EDIT));
+    private DisplayView createEditView() {
+        DisplayView result = new DisplayView(1, getTitle(MenuState.EDIT));
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -143,8 +142,8 @@ public class PlotMenu extends StateMenu {
      * This is a single page view that gets refreshed with every scroll.
      * Contexts: ROOT, ROOT_CREATE, ROOT_DELETE, ROOT_EDIT, CREATE_LAND_ADD, EDIT_LAND_REMOVE, EDIT_LAND_ADD
      */
-    private DisplayMenu createLandView(MenuState context) {
-        DisplayMenu result = new DisplayMenu(5, getTitle(context));
+    private DisplayView createLandView(MenuState context) {
+        DisplayView result = new DisplayView(5, getTitle(context));
         List<String> loreList;
         List<String> hintList;
         InfoIcon icon;
@@ -308,7 +307,7 @@ public class PlotMenu extends StateMenu {
      * This is a multiple paged view.
      * Contexts: CREATE_PLAYER_ADD, EDIT_PLAYER_ADD, EDIT_PLAYER_REMOVE, EDIT_PLAYER_SHOW
      */
-    private List<DisplayMenu> createPlayerView(MenuState context) {
+    private List<DisplayView> createPlayerView(MenuState context) {
         if (editPlot == null || town == null) return Collections.emptyList();
         List<OfflinePlayer> players = new ArrayList<>();
         ArrayList<MenuIcon> icons = new ArrayList<>();
@@ -343,10 +342,10 @@ public class PlotMenu extends StateMenu {
         }
 
         /* Make Pages (includes navigation) */
-        ArrayList<DisplayMenu> result = new ArrayList<>(makePages(icons, getTitle(context)));
+        ArrayList<DisplayView> result = new ArrayList<>(makePages(icons, getTitle(context)));
 
         /* Extra Navigation */
-        for (DisplayMenu view : result) {
+        for (DisplayView view : result) {
             addNavFinish(view);
         }
 
@@ -361,8 +360,8 @@ public class PlotMenu extends StateMenu {
      * @return The list of menu views to be displayed to the player
      */
     @Override
-    public ArrayList<DisplayMenu> createView(State context) {
-        ArrayList<DisplayMenu> result = new ArrayList<>();
+    public ArrayList<DisplayView> createView(State context) {
+        ArrayList<DisplayView> result = new ArrayList<>();
         MenuState currentState = (MenuState)context;
         switch(currentState) {
             case ROOT:
@@ -399,8 +398,8 @@ public class PlotMenu extends StateMenu {
      * @return The new view state of the menu, or null to close the menu
      */
     @Override
-    public DisplayMenu updateState(int slot, boolean clickType) {
-        DisplayMenu result = null;
+    public DisplayView updateState(int slot, boolean clickType) {
+        DisplayView result = null;
         MenuState currentState = (MenuState)getCurrentState();
         if (currentState == null) return null;
         if (isCurrentNavSlot(slot)) {
@@ -546,7 +545,7 @@ public class PlotMenu extends StateMenu {
             }
         } else if (isCurrentMenuSlot(slot)) {
             // Clicked in menu
-            DisplayMenu view = getCurrentView();
+            DisplayView view = getCurrentView();
             if (view == null) return null;
             Point clickPoint = slotToPoint(slot);
             MenuIcon clickedIcon = view.getIcon(slot);
@@ -657,7 +656,7 @@ public class PlotMenu extends StateMenu {
         return result;
     }
 
-    private DisplayMenu scrollView(int slot) {
+    private DisplayView scrollView(int slot) {
         int navIndex = getCurrentNavIndex(slot);
         if (navIndex == INDEX_SCROLL_LEFT) {
             // Scroll left
@@ -780,49 +779,49 @@ public class PlotMenu extends StateMenu {
         return isNavIndex(slot,INDEX_FINISH);
     }
 
-    private void addNavScrollLeft(DisplayMenu view) {
+    private void addNavScrollLeft(DisplayView view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_SCROLL_LEFT;
         view.addIcon(new InfoIcon(ChatColor.GOLD+"\u25C0",Material.STONE_BUTTON,index,true));
     }
 
-    private void addNavScrollUp(DisplayMenu view) {
+    private void addNavScrollUp(DisplayView view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_SCROLL_UP;
         view.addIcon(new InfoIcon(ChatColor.GOLD+"\u25B2",Material.STONE_BUTTON,index,true));
     }
 
-    private void addNavScrollDown(DisplayMenu view) {
+    private void addNavScrollDown(DisplayView view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_SCROLL_DOWN;
         view.addIcon(new InfoIcon(ChatColor.GOLD+"\u25BC",Material.STONE_BUTTON,index,true));
     }
 
-    private void addNavScrollRight(DisplayMenu view) {
+    private void addNavScrollRight(DisplayView view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_SCROLL_RIGHT;
         view.addIcon(new InfoIcon(ChatColor.GOLD+"\u25B6",Material.STONE_BUTTON,index,true));
     }
 
-    private void addNavCreate(DisplayMenu view) {
+    private void addNavCreate(DisplayView view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_CREATE;
         view.addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_CREATE.getMessage(),Material.OAK_SAPLING,index,true));
     }
 
-    private void addNavDelete(DisplayMenu view) {
+    private void addNavDelete(DisplayView view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_DELETE;
         view.addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_DELETE.getMessage(),Material.BARRIER,index,true));
     }
 
-    private void addNavEdit(DisplayMenu view) {
+    private void addNavEdit(DisplayView view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_EDIT;
         view.addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_EDIT.getMessage(),Material.WRITABLE_BOOK,index,true));
     }
 
-    private void addNavFinish(DisplayMenu view) {
+    private void addNavFinish(DisplayView view) {
         if (view == null) return;
         int index = getNavStartSlot(view)+INDEX_FINISH;
         view.addIcon(new InfoIcon(ChatColor.GOLD+MessagePath.MENU_PLOTS_BUTTON_FINISH.getMessage(),Material.WRITTEN_BOOK,index,true));

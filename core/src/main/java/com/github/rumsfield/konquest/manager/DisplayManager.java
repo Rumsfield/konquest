@@ -22,13 +22,13 @@ public class DisplayManager {
 	private final Konquest konquest;
 	private final HashMap<Inventory, StateMenu> stateMenus;
 
-	public static String adminFormat 		= ""+ChatColor.DARK_PURPLE;
+	public static String adminFormat 		= ""+ChatColor.DARK_GRAY;
 	public static String titleFormat 		= ""+ChatColor.BLACK;
-	public static String nameFormat         = ""+ChatColor.LIGHT_PURPLE;
+	public static String nameFormat         = ""+ChatColor.GOLD;
 	public static String loreFormat 		= ""+ChatColor.YELLOW;
 	public static String valueFormat 		= ""+ChatColor.AQUA;
-	public static String hintFormat 		= ""+ChatColor.GOLD+ChatColor.UNDERLINE+"\u21D2"; // ⇒
-	public static String propertyFormat 	= ""+ChatColor.LIGHT_PURPLE+ChatColor.ITALIC+"\u25C6"; // ◆
+	public static String hintFormat 		= ""+ChatColor.GRAY+ChatColor.UNDERLINE+"\u21D2"; // ⇒
+	public static String propertyFormat 	= ""+ChatColor.GOLD+ChatColor.ITALIC+"\u25C6"; // ◆
 	public static String alertFormat 		= ""+ChatColor.RED+ChatColor.ITALIC+"\u26A0"; // ⚠
 	public static String errorFormat        = ""+ChatColor.RED;
 	
@@ -58,7 +58,7 @@ public class DisplayManager {
 				// Handle menu navigation and states
 				// Every clickable icon in a menu view will update the state and refresh the open inventory
 				StateMenu clickMenu = stateMenus.get(inv);
-				DisplayMenu currentView = clickMenu.getCurrentView();
+				DisplayView currentView = clickMenu.getCurrentView();
 				if(currentView == null || !currentView.getInventory().equals(inv)) {
 					ChatUtil.printDebug("State menu view is not current!");
 					return;
@@ -69,7 +69,7 @@ public class DisplayManager {
 				}
 				playMenuClickSound(bukkitPlayer);
 				// Update menu state
-				DisplayMenu updateView = clickMenu.updateState(slot, clickType);
+				DisplayView updateView = clickMenu.updateState(slot, clickType);
 				// Update inventory view
 				stateMenus.remove(inv);
 				if(updateView != null) {
@@ -95,7 +95,7 @@ public class DisplayManager {
 	}
 
 	public void displayMenuToPlayer(KonPlayer viewer, StateMenu menu) {
-		DisplayMenu view = menu.getCurrentView();
+		DisplayView view = menu.getCurrentView();
 		if (view == null) return;
 		playMenuOpenSound(viewer.getBukkitPlayer());
 		stateMenus.put(view.getInventory(), menu);
@@ -262,6 +262,20 @@ public class DisplayManager {
 		if (displayPlayer == null) return;
 		InfoMenu newMenu = new InfoMenu(konquest, displayPlayer);
 		newMenu.goToRuinInfo(infoRuin);
+		displayMenuToPlayer(displayPlayer, newMenu);
+	}
+
+	public void displayInfoCampMenu(KonPlayer displayPlayer, KonCamp infoCamp) {
+		if (displayPlayer == null) return;
+		InfoMenu newMenu = new InfoMenu(konquest, displayPlayer);
+		newMenu.goToCampInfo(infoCamp);
+		displayMenuToPlayer(displayPlayer, newMenu);
+	}
+
+	public void displayInfoTemplateMenu(KonPlayer displayPlayer, KonMonumentTemplate infoTemplate) {
+		if (displayPlayer == null) return;
+		InfoMenu newMenu = new InfoMenu(konquest, displayPlayer);
+		newMenu.goToTemplateInfo(infoTemplate);
 		displayMenuToPlayer(displayPlayer, newMenu);
 	}
 

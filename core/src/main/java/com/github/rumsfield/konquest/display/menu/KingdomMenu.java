@@ -4,7 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.command.CommandType;
-import com.github.rumsfield.konquest.display.DisplayMenu;
+import com.github.rumsfield.konquest.display.DisplayView;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.*;
 import com.github.rumsfield.konquest.manager.DisplayManager;
@@ -106,8 +106,8 @@ public class KingdomMenu extends StateMenu {
 
 	}
 	
-	private DisplayMenu createRootView() {
-		DisplayMenu result;
+	private DisplayView createRootView() {
+		DisplayView result;
 		MenuIcon icon;
 
 		/* Icon slot indexes */
@@ -138,7 +138,7 @@ public class KingdomMenu extends StateMenu {
 			rows = 3;
 		}
 		
-		result = new DisplayMenu(rows, getTitle(MenuState.ROOT));
+		result = new DisplayView(rows, getTitle(MenuState.ROOT));
 		
 		/* Join Icon */
 		boolean isJoinClickable = !isAdmin;
@@ -206,9 +206,12 @@ public class KingdomMenu extends StateMenu {
 		if(isCreatedKingdom) {
 
 			/* Kingdom Info Icon */
-			icon = new KingdomIcon(kingdom,getColor(player,kingdom),getRelation(player,kingdom),ROOT_SLOT_INFO,true);
+			boolean isInfoClickable = !isAdmin;
+			icon = new KingdomIcon(kingdom,getColor(player,kingdom),getRelation(player,kingdom),ROOT_SLOT_INFO,isInfoClickable);
 			icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
-			icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+			if (isInfoClickable) {
+				icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+			}
 			icon.setState(MenuState.A_INFO);
 			result.addIcon(icon);
 
@@ -348,16 +351,18 @@ public class KingdomMenu extends StateMenu {
 
 		/* Navigation */
 		addNavEmpty(result);
-		addNavHome(result);
 		addNavClose(result);
+		if (!isAdmin) {
+			addNavHome(result);
+		}
 		
 		return result;
 	}
 	
-	private DisplayMenu createExileView() {
-		DisplayMenu result;
+	private DisplayView createExileView() {
+		DisplayView result;
 		MenuIcon icon;
-		result = new DisplayMenu(1, getTitle(MenuState.A_EXILE));
+		result = new DisplayView(1, getTitle(MenuState.A_EXILE));
 
 		/* Icon slot indexes */
 		// Row 0: 0 1 2 3 4 5 6 7 8
@@ -384,10 +389,10 @@ public class KingdomMenu extends StateMenu {
 		return result;
 	}
 	
-	private DisplayMenu createDisbandView() {
-		DisplayMenu result;
+	private DisplayView createDisbandView() {
+		DisplayView result;
 		MenuIcon icon;
-		result = new DisplayMenu(1, getTitle(MenuState.C_DISBAND));
+		result = new DisplayView(1, getTitle(MenuState.C_DISBAND));
 
 		/* Icon slot indexes */
 		// Row 0: 0 1 2 3 4 5 6 7 8
@@ -414,7 +419,7 @@ public class KingdomMenu extends StateMenu {
 		return result;
 	}
 
-	private List<DisplayMenu> createTemplateView() {
+	private List<DisplayView> createTemplateView() {
 		MenuIcon icon;
 		ArrayList<MenuIcon> icons = new ArrayList<>();
 
@@ -446,7 +451,7 @@ public class KingdomMenu extends StateMenu {
 		return new ArrayList<>(makePages(icons, getTitle(MenuState.C_TEMPLATE)));
 	}
 
-	private DisplayMenu createDiplomacyView() {
+	private DisplayView createDiplomacyView() {
 		// diplomacyKingdom is the global variable to keep track of current kingdom changing status
 		if (diplomacyKingdom == null || diplomacyKingdom.equals(kingdom)) return null;
 
@@ -454,7 +459,7 @@ public class KingdomMenu extends StateMenu {
 		int numRows = (int)Math.ceil((double)numIcons / MAX_ROW_SIZE);
 		int index = 0;
 		MenuIcon icon;
-		DisplayMenu result = new DisplayMenu(numRows, getTitle(MenuState.B_DIPLOMACY));
+		DisplayView result = new DisplayView(numRows, getTitle(MenuState.B_DIPLOMACY));
 
 		KonquestDiplomacyType currentDiplomacy = manager.getDiplomacy(kingdom,diplomacyKingdom);
 
@@ -565,7 +570,7 @@ public class KingdomMenu extends StateMenu {
 		return result;
 	}
 
-	private List<DisplayMenu> createKingdomView(MenuState context) {
+	private List<DisplayView> createKingdomView(MenuState context) {
 		MenuIcon icon;
 		ArrayList<MenuIcon> icons = new ArrayList<>();
 		boolean isClickable = false;
@@ -678,7 +683,7 @@ public class KingdomMenu extends StateMenu {
 		return new ArrayList<>(makePages(icons, getTitle(context)));
 	}
 
-	private List<DisplayMenu> createTownView(MenuState context) {
+	private List<DisplayView> createTownView(MenuState context) {
 		MenuIcon icon;
 		ArrayList<MenuIcon> icons = new ArrayList<>();
 		// List of all towns in kingdom
@@ -709,7 +714,7 @@ public class KingdomMenu extends StateMenu {
 		return new ArrayList<>(makePages(icons, getTitle(context)));
 	}
 
-	private List<DisplayMenu> createPlayerView(MenuState context) {
+	private List<DisplayView> createPlayerView(MenuState context) {
 		MenuIcon icon;
 		ArrayList<MenuIcon> icons = new ArrayList<>();
 		String loreHintStr1 = "";
@@ -772,8 +777,8 @@ public class KingdomMenu extends StateMenu {
 	 * @return The list of menu views to be displayed to the player
 	 */
 	@Override
-	public ArrayList<DisplayMenu> createView(State context) {
-		ArrayList<DisplayMenu> result = new ArrayList<>();
+	public ArrayList<DisplayView> createView(State context) {
+		ArrayList<DisplayView> result = new ArrayList<>();
 		MenuState currentState = (MenuState)context;
 		switch (currentState) {
 			case ROOT:
@@ -822,8 +827,8 @@ public class KingdomMenu extends StateMenu {
 	 * @return The new view state of the menu, or null to close the menu
 	 */
 	@Override
-	public DisplayMenu updateState(int slot, boolean clickType) {
-		DisplayMenu result = null;
+	public DisplayView updateState(int slot, boolean clickType) {
+		DisplayView result = null;
 		if (isCurrentNavSlot(slot)) {
 			// Clicked in navigation bar
 			if (isNavClose(slot)) {
@@ -850,7 +855,7 @@ public class KingdomMenu extends StateMenu {
 			}
 		} else if (isCurrentMenuSlot(slot)) {
 			// Clicked in menu
-			DisplayMenu view = getCurrentView();
+			DisplayView view = getCurrentView();
 			if (view == null) return null;
 			MenuIcon clickedIcon = view.getIcon(slot);
 			MenuState currentState = (MenuState)getCurrentState();

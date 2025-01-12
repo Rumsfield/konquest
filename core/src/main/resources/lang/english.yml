@@ -767,6 +767,7 @@ command:
       all-header: "All Kingdom scores"
       score: "Your score: %s, Kingdom of %s score: %s"
       player: "%s's score: %s, Kingdom of %s score: %s"
+      kingdom: "Kingdom of %s score: %s"
     error:
       peaceful: "The Kingdom of %s is peaceful, and cannot be scored."
       barbarian: "%s is a Barbarian, and cannot be scored."

@@ -2,9 +2,10 @@ package com.github.rumsfield.konquest.display.menu;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.display.DisplayMenu;
+import com.github.rumsfield.konquest.display.DisplayView;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.*;
+import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.manager.TravelManager;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
@@ -60,7 +61,7 @@ public class TravelMenu extends StateMenu {
      * Creates the root menu view for this menu.
      * This is a single page view.
      */
-    private DisplayMenu createRootView() {
+    private DisplayView createRootView() {
 
         // Menu conditions
         // Check for valid world
@@ -74,7 +75,7 @@ public class TravelMenu extends StateMenu {
             return null;
         }
 
-        DisplayMenu result;
+        DisplayView result;
         MenuIcon icon;
         boolean isClickable;
 
@@ -103,7 +104,7 @@ public class TravelMenu extends StateMenu {
         int SLOT_TEMPLATES = 10;
         int SLOT_RUINS = 11;
 
-        result = new DisplayMenu(rows, getTitle(MenuState.ROOT));
+        result = new DisplayView(rows, getTitle(MenuState.ROOT));
 
         // Default Icons
 
@@ -260,8 +261,10 @@ public class TravelMenu extends StateMenu {
 
         /* Navigation */
         addNavEmpty(result);
-        addNavHome(result);
         addNavClose(result);
+        if (!isAdmin) {
+            addNavHome(result);
+        }
 
         return result;
     }
@@ -270,7 +273,7 @@ public class TravelMenu extends StateMenu {
      * Creates the town list view.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createTownView() {
+    private List<DisplayView> createTownView() {
         // List towns the player is able to travel to
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonTown> towns = new ArrayList<>();
@@ -327,7 +330,7 @@ public class TravelMenu extends StateMenu {
      * Creates the kingdom list view.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createKingdomView() {
+    private List<DisplayView> createKingdomView() {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonKingdom> kingdoms = new ArrayList<>();
 
@@ -373,7 +376,7 @@ public class TravelMenu extends StateMenu {
      * Creates the sanctuary list view.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createSanctuaryView() {
+    private List<DisplayView> createSanctuaryView() {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonSanctuary> sanctuaries = new ArrayList<>(getKonquest().getSanctuaryManager().getSanctuaries());
         // Sort by name
@@ -406,7 +409,7 @@ public class TravelMenu extends StateMenu {
      * Creates the camp list view.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createCampView() {
+    private List<DisplayView> createCampView() {
         // (Admin) All camps
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonCamp> camps = new ArrayList<>(getKonquest().getCampManager().getCamps());
@@ -429,7 +432,7 @@ public class TravelMenu extends StateMenu {
      * Creates the ruin list view.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createRuinView() {
+    private List<DisplayView> createRuinView() {
         // (Admin) All ruins
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonRuin> ruins = new ArrayList<>(getKonquest().getRuinManager().getRuins());
@@ -452,7 +455,7 @@ public class TravelMenu extends StateMenu {
      * Creates the template list view.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createTemplateView() {
+    private List<DisplayView> createTemplateView() {
         // (Admin) All templates
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonMonumentTemplate> templates = new ArrayList<>(getKonquest().getSanctuaryManager().getAllTemplates());
@@ -479,8 +482,8 @@ public class TravelMenu extends StateMenu {
      * @return The list of menu views to be displayed to the player
      */
     @Override
-    public ArrayList<DisplayMenu> createView(State context) {
-        ArrayList<DisplayMenu> result = new ArrayList<>();
+    public ArrayList<DisplayView> createView(State context) {
+        ArrayList<DisplayView> result = new ArrayList<>();
         switch ((MenuState)context) {
             case ROOT:
                 result.add(createRootView());
@@ -519,8 +522,8 @@ public class TravelMenu extends StateMenu {
      * @return The new view state of the menu, or null to close the menu
      */
     @Override
-    public DisplayMenu updateState(int slot, boolean clickType) {
-        DisplayMenu result = null;
+    public DisplayView updateState(int slot, boolean clickType) {
+        DisplayView result = null;
         if (isCurrentNavSlot(slot)) {
             // Clicked in navigation bar
             if (isNavClose(slot)) {
@@ -541,7 +544,7 @@ public class TravelMenu extends StateMenu {
             }
         } else if (isCurrentMenuSlot(slot)) {
             // Clicked in menu
-            DisplayMenu view = getCurrentView();
+            DisplayView view = getCurrentView();
             if (view == null) return null;
             MenuIcon clickedIcon = view.getIcon(slot);
             MenuState currentState = (MenuState)getCurrentState();
@@ -670,6 +673,9 @@ public class TravelMenu extends StateMenu {
                 break;
             default:
                 break;
+        }
+        if (isAdmin) {
+            result = DisplayManager.adminFormat + MessagePath.LABEL_ADMIN.getMessage() + " - " + result;
         }
         return result;
     }

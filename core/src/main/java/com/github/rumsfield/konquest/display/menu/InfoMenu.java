@@ -6,7 +6,7 @@ import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.command.CommandType;
-import com.github.rumsfield.konquest.display.DisplayMenu;
+import com.github.rumsfield.konquest.display.DisplayView;
 import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.*;
 import com.github.rumsfield.konquest.manager.DisplayManager;
@@ -132,8 +132,8 @@ public class InfoMenu extends StateMenu {
      * Creates the root menu view for this menu.
      * This is a single page view.
      */
-    private DisplayMenu createRootView() {
-        DisplayMenu result;
+    private DisplayView createRootView() {
+        DisplayView result;
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -148,7 +148,7 @@ public class InfoMenu extends StateMenu {
         int ROOT_SLOT_SANCTUARIES = 15;
         int ROOT_SLOT_MONUMENTS = 17;
 
-        result = new DisplayMenu(2, getTitle(MenuState.ROOT));
+        result = new DisplayView(2, getTitle(MenuState.ROOT));
 
         /* Players Icon */
         icon = new InfoIcon(MessagePath.LABEL_PLAYERS.getMessage(), Material.PLAYER_HEAD, ROOT_SLOT_PLAYERS, true);
@@ -223,7 +223,7 @@ public class InfoMenu extends StateMenu {
      * This can be a multiple paged view.
      * Context states: PLAYER_LIST, KINGDOM_INFO_OFFICERS, KINGDOM_INFO_MEMBERS, TOWN_INFO_KNIGHTS, TOWN_INFO_RESIDENTS
      */
-    private List<DisplayMenu> createPlayerView(MenuState context) {
+    private List<DisplayView> createPlayerView(MenuState context) {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonOfflinePlayer> players = new ArrayList<>();
 
@@ -305,7 +305,7 @@ public class InfoMenu extends StateMenu {
      * This can be a multiple paged view.
      * Context states: KINGDOM_LIST, MONUMENT_INFO_KINGDOMS, KINGDOM_INFO_ENEMIES, KINGDOM_INFO_ALLIES, KINGDOM_INFO_TRADERS
      */
-    private List<DisplayMenu> createKingdomView(MenuState context) {
+    private List<DisplayView> createKingdomView(MenuState context) {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonKingdom> kingdoms = new ArrayList<>();
 
@@ -364,7 +364,7 @@ public class InfoMenu extends StateMenu {
      * This can be a multiple paged view.
      * Context states: TOWN_LIST, CAPITAL_LIST, PLAYER_INFO_TOWNS, KINGDOM_INFO_TOWNS
      */
-    private List<DisplayMenu> createTownView(MenuState context) {
+    private List<DisplayView> createTownView(MenuState context) {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonTown> towns = new ArrayList<>();
 
@@ -420,7 +420,7 @@ public class InfoMenu extends StateMenu {
      * Creates the camp list view.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createCampView() {
+    private List<DisplayView> createCampView() {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonCamp> camps = new ArrayList<>(getKonquest().getCampManager().getCamps());
         // Sort by name
@@ -443,7 +443,7 @@ public class InfoMenu extends StateMenu {
      * Creates the ruin list view.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createRuinView() {
+    private List<DisplayView> createRuinView() {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonRuin> ruins = new ArrayList<>(getKonquest().getRuinManager().getRuins());
         // Sort by name
@@ -466,7 +466,7 @@ public class InfoMenu extends StateMenu {
      * Creates the sanctuary list view.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createSanctuaryView() {
+    private List<DisplayView> createSanctuaryView() {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonSanctuary> sanctuaries = new ArrayList<>(getKonquest().getSanctuaryManager().getSanctuaries());
         // Sort by name
@@ -490,7 +490,7 @@ public class InfoMenu extends StateMenu {
      * This can be a multiple paged view.
      * Context states: MONUMENT_LIST, SANCTUARY_INFO_MONUMENTS
      */
-    private List<DisplayMenu> createMonumentView(MenuState context) {
+    private List<DisplayView> createMonumentView(MenuState context) {
         ArrayList<MenuIcon> icons = new ArrayList<>();
         List<KonMonumentTemplate> templates = new ArrayList<>();
 
@@ -539,7 +539,7 @@ public class InfoMenu extends StateMenu {
      * Creates the stats views.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createStatsView() {
+    private List<DisplayView> createStatsView() {
         if (infoPlayer == null) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
         MenuIcon icon;
@@ -570,7 +570,7 @@ public class InfoMenu extends StateMenu {
      * Creates the options views.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createOptionsView() {
+    private List<DisplayView> createOptionsView() {
         if (infoTown == null) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
         MenuIcon icon;
@@ -592,7 +592,7 @@ public class InfoMenu extends StateMenu {
      * Creates the upgrades views.
      * This can be a multiple paged view.
      */
-    private List<DisplayMenu> createUpgradesView() {
+    private List<DisplayView> createUpgradesView() {
         if (infoTown == null || !getKonquest().getUpgradeManager().isEnabled()) return Collections.emptyList();
         ArrayList<MenuIcon> icons = new ArrayList<>();
         MenuIcon icon;
@@ -639,9 +639,9 @@ public class InfoMenu extends StateMenu {
      * Creates the player info view.
      * This is a single page view.
      */
-    private DisplayMenu createPlayerInfoView() {
+    private DisplayView createPlayerInfoView() {
         if (infoPlayer == null) return null;
-        DisplayMenu result;
+        DisplayView result;
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -657,7 +657,7 @@ public class InfoMenu extends StateMenu {
         String contextColor = getColor(player,infoPlayer);
         KonquestRelationshipType relation = getRelation(player,infoPlayer);
         String title = MessagePath.LABEL_PLAYER.getMessage()+" "+infoPlayer.getOfflineBukkitPlayer().getName();
-        result = new DisplayMenu(rows, title);
+        result = new DisplayView(rows, title);
 
         /* Player Icon */
         icon = new PlayerIcon(infoPlayer.getOfflineBukkitPlayer(), contextColor, relation, SLOT_PLAYER, false);
@@ -738,9 +738,9 @@ public class InfoMenu extends StateMenu {
      * This is a single page view.
      * The info kingdom could be barbarians or neutrals (not created)
      */
-    private DisplayMenu createKingdomInfoView() {
+    private DisplayView createKingdomInfoView() {
         if (infoKingdom == null) return null;
-        DisplayMenu result;
+        DisplayView result;
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -772,7 +772,7 @@ public class InfoMenu extends StateMenu {
         } else {
             title = infoKingdom.getName();
         }
-        result = new DisplayMenu(rows, title);
+        result = new DisplayView(rows, title);
 
         /* Kingdom Icon */
         int numKingdomPlayers = getKonquest().getPlayerManager().getPlayersInKingdom(infoKingdom).size();
@@ -986,9 +986,9 @@ public class InfoMenu extends StateMenu {
      * This is a single page view.
      * The info town could be a capital or town.
      */
-    private DisplayMenu createTownInfoView() {
+    private DisplayView createTownInfoView() {
         if (infoTown == null) return null;
-        DisplayMenu result;
+        DisplayView result;
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -1015,7 +1015,7 @@ public class InfoMenu extends StateMenu {
         } else {
             title = MessagePath.LABEL_TOWN.getMessage()+" "+infoTown.getName();
         }
-        result = new DisplayMenu(rows, title);
+        result = new DisplayView(rows, title);
 
         /* Town Icon */
         int numTownPlayers = infoTown.getNumResidentsOnline();
@@ -1128,9 +1128,9 @@ public class InfoMenu extends StateMenu {
      * Creates the sanctuary info view.
      * This is a single page view.
      */
-    private DisplayMenu createSanctuaryInfoView() {
+    private DisplayView createSanctuaryInfoView() {
         if (infoSanctuary == null) return null;
-        DisplayMenu result;
+        DisplayView result;
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -1142,7 +1142,7 @@ public class InfoMenu extends StateMenu {
 
         int numTemplates = infoSanctuary.getTemplates().size();
         String title = MessagePath.LABEL_SANCTUARY.getMessage()+" "+infoSanctuary.getName();
-        result = new DisplayMenu(rows, title);
+        result = new DisplayView(rows, title);
 
         /* Sanctuary Icon */
         icon = new SanctuaryIcon(infoSanctuary, SLOT_SANCTUARY, false);
@@ -1179,9 +1179,9 @@ public class InfoMenu extends StateMenu {
      * Creates the ruin info view.
      * This is a single page view.
      */
-    private DisplayMenu createRuinInfoView() {
+    private DisplayView createRuinInfoView() {
         if (infoRuin == null) return null;
-        DisplayMenu result;
+        DisplayView result;
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -1192,7 +1192,7 @@ public class InfoMenu extends StateMenu {
         int SLOT_FLAGS = 5;
 
         String title = MessagePath.LABEL_RUIN.getMessage()+" "+infoRuin.getName();
-        result = new DisplayMenu(rows, title);
+        result = new DisplayView(rows, title);
 
         /* Ruin Icon */
         icon = new RuinIcon(infoRuin, SLOT_RUIN, false);
@@ -1234,9 +1234,9 @@ public class InfoMenu extends StateMenu {
      * Creates the camp info view.
      * This is a single page view.
      */
-    private DisplayMenu createCampInfoView() {
+    private DisplayView createCampInfoView() {
         if (infoCamp == null) return null;
-        DisplayMenu result;
+        DisplayView result;
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -1247,7 +1247,7 @@ public class InfoMenu extends StateMenu {
         int SLOT_OWNER = 5;
 
         String title = MessagePath.LABEL_CAMP.getMessage()+" "+infoCamp.getOwner().getName();
-        result = new DisplayMenu(rows, title);
+        result = new DisplayView(rows, title);
 
         /* Camp Icon */
         icon = new CampIcon(infoCamp, SLOT_CAMP, false);
@@ -1286,9 +1286,9 @@ public class InfoMenu extends StateMenu {
      * Creates the monument template info view.
      * This is a single page view.
      */
-    private DisplayMenu createMonumentInfoView() {
+    private DisplayView createMonumentInfoView() {
         if (infoTemplate == null) return null;
-        DisplayMenu result;
+        DisplayView result;
         MenuIcon icon;
 
         /* Icon slot indexes */
@@ -1299,7 +1299,7 @@ public class InfoMenu extends StateMenu {
         int SLOT_KINGDOMS = 6;
 
         String title = MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage()+" "+infoTemplate.getName();
-        result = new DisplayMenu(rows, title);
+        result = new DisplayView(rows, title);
 
         /* Monument Template Icon */
         double totalCost = getKonquest().getKingdomManager().getCostTemplate() + infoTemplate.getCost();
@@ -1346,8 +1346,8 @@ public class InfoMenu extends StateMenu {
      * @return The list of menu views to be displayed to the player
      */
     @Override
-    public ArrayList<DisplayMenu> createView(State context) {
-        ArrayList<DisplayMenu> result = new ArrayList<>();
+    public ArrayList<DisplayView> createView(State context) {
+        ArrayList<DisplayView> result = new ArrayList<>();
         MenuState currentState = (MenuState)context;
         switch (currentState) {
             case ROOT:
@@ -1432,8 +1432,8 @@ public class InfoMenu extends StateMenu {
      * @return The new view state of the menu, or null to close the menu
      */
     @Override
-    public DisplayMenu updateState(int slot, boolean clickType) {
-        DisplayMenu result = null;
+    public DisplayView updateState(int slot, boolean clickType) {
+        DisplayView result = null;
         MenuState currentState = (MenuState)getCurrentState();
         if (currentState == null) return null;
         if (isCurrentNavSlot(slot)) {
@@ -1461,7 +1461,7 @@ public class InfoMenu extends StateMenu {
             }
         } else if (isCurrentMenuSlot(slot)) {
             // Clicked in menu
-            DisplayMenu view = getCurrentView();
+            DisplayView view = getCurrentView();
             if (view == null) return null;
             MenuIcon clickedIcon = view.getIcon(slot);
             MenuState nextState = (MenuState)clickedIcon.getState(); // could be null in some states

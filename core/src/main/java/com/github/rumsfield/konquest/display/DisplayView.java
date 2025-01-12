@@ -15,12 +15,12 @@ import java.util.HashMap;
  * A wrapper for a single Inventory view that contains icons.
  * This class is used in higher level menus to represent individual pages.
  */
-public class DisplayMenu {
+public class DisplayView {
 
 	private final Inventory inventory;
 	private final HashMap<Integer,MenuIcon> iconMap;
 	
-	public DisplayMenu (int rows, String label) {
+	public DisplayView(int rows, String label) {
 		if(rows > 5) {
 			ChatUtil.printConsoleError("Failed to create menu display with "+rows+" rows: "+label);
 		}
