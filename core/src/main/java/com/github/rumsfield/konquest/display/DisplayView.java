@@ -7,6 +7,7 @@ import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,30 +20,22 @@ public class DisplayView {
 
 	private final Inventory inventory;
 	private final HashMap<Integer,MenuIcon> iconMap;
+	private final Runnable updateTask;
+	private BukkitTask executionTask;
+	private int refreshTickRate;
+
 	
 	public DisplayView(int rows, String label) {
 		if(rows > 5) {
 			ChatUtil.printConsoleError("Failed to create menu display with "+rows+" rows: "+label);
 		}
 		int invRows = Math.min(rows,5)+1; // add row for navigation
-		inventory = Bukkit.createInventory(null, invRows*9, DisplayManager.titleFormat+label);
-		iconMap = new HashMap<>();
-	}
-	
-	public Inventory getInventory() {
-        return inventory;
-    }
-	
-	public void addIcon(MenuIcon icon) {
-		iconMap.put(icon.getIndex(), icon);
-	}
-	
-	public MenuIcon getIcon(int index) {
-		return iconMap.get(index);
-	}
-	
-	public void updateIcons() {
-		Bukkit.getScheduler().runTaskAsynchronously(Konquest.getInstance().getPlugin(), () -> {
+		this.inventory = Bukkit.createInventory(null, invRows*9, DisplayManager.titleFormat+label);
+		this.iconMap = new HashMap<>();
+		this.refreshTickRate = 0;
+		this.executionTask = null;
+
+		this.updateTask = () -> {
 			// Set non-player heads first
 			ArrayList<MenuIcon> heads = new ArrayList<>();
 			for(MenuIcon icon : iconMap.values()) {
@@ -58,7 +51,39 @@ public class DisplayView {
 					inventory.setItem(icon.getIndex(), icon.getItem());
 				}
 			}
-		});
+			//ChatUtil.printDebug("Updated "+iconMap.size()+" icons in view "+label);
+		};
+
+	}
+
+	public void setRefreshTickRate(int ticks) {
+		refreshTickRate = ticks;
+	}
+	
+	public Inventory getInventory() {
+        return inventory;
+    }
+	
+	public void addIcon(MenuIcon icon) {
+		iconMap.put(icon.getIndex(), icon);
+	}
+	
+	public MenuIcon getIcon(int index) {
+		return iconMap.get(index);
+	}
+	
+	public void updateIcons() {
+		if (refreshTickRate > 0) {
+			executionTask = Bukkit.getScheduler().runTaskTimer(Konquest.getInstance().getPlugin(), updateTask, 0L, refreshTickRate);
+		} else {
+			executionTask = Bukkit.getScheduler().runTaskAsynchronously(Konquest.getInstance().getPlugin(), updateTask);
+		}
+	}
+
+	public void clearUpdates() {
+		if (executionTask != null) {
+			executionTask.cancel();
+		}
 	}
 
 }

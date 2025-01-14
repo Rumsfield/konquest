@@ -68,6 +68,8 @@ public class DisplayManager {
 					return;
 				}
 				playMenuClickSound(bukkitPlayer);
+				// Stop icon updates
+				clickMenu.stopIconUpdates();
 				// Update menu state
 				DisplayView updateView = clickMenu.updateState(slot, clickType);
 				// Update inventory view

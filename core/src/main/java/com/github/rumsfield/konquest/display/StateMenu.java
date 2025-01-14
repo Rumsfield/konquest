@@ -295,6 +295,14 @@ public abstract class StateMenu {
         return viewPages.containsKey(checkState);
     }
 
+    public void stopIconUpdates() {
+        for (ArrayList<DisplayView> pages : viewPages.values()) {
+            for (DisplayView view : pages) {
+                view.clearUpdates();
+            }
+        }
+    }
+
     /*
      * Navigation Methods
      */

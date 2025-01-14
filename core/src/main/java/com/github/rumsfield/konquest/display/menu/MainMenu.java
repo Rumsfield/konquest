@@ -8,54 +8,60 @@ import com.github.rumsfield.konquest.display.StateMenu;
 import com.github.rumsfield.konquest.display.icon.CommandIcon;
 import com.github.rumsfield.konquest.display.icon.InfoIcon;
 import com.github.rumsfield.konquest.display.icon.MenuIcon;
+import com.github.rumsfield.konquest.display.icon.RandomIcon;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
+import com.github.rumsfield.konquest.model.KonStatsType;
+import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MainMenu extends StateMenu {
 
     enum MenuState implements State {
         ROOT,
+        HELP,
+        KINGDOM,
+        INFO,
+        TOWN,
+        QUEST,
+        STATS,
+        PREFIX,
+        SCORE,
+        TRAVEL,
         DASHBOARD,
-        SECRET
+        DASH_MAP_AUTO,
+        DASH_CHAT,
+        DASH_BORDER,
+        DASH_FLY,
+        DASH_BYPASS,
+        DASH_MAP,
+        DASH_FAVOR,
+        DASH_SPY,
+        SECRET,
+        SECRET_RTD
     }
 
-    /* Icon slot indexes */
-    // Root View
-    // Row 0:  0  1  2  3  4  5  6  7  8
-    private final int ROOT_SLOT_HELP 	    = 1;
-    private final int ROOT_SLOT_DASH 	    = 4;
-    private final int ROOT_SLOT_KINGDOM 	= 7;
-    // Row 1:  9 10 11 12 13 14 15 16 17
-    private final int ROOT_SLOT_INFO 		= 10;
-    private final int ROOT_SLOT_TOWN		= 16;
-    // Row 2: 18 19 20 21 22 23 24 25 26
-    private final int ROOT_SLOT_QUEST 	    = 19;
-    private final int ROOT_SLOT_STATS 	    = 21;
-    private final int ROOT_SLOT_PREFIX 		= 22;
-    private final int ROOT_SLOT_SCORE 	    = 23;
-    private final int ROOT_SLOT_TRAVEL 	    = 25;
-    // Row 3: 27 28 29 30 31 32 33 34 35 (Navigation Bar)
-    private final int ROOT_SLOT_SECRET 	    = 34;
-    // Dashboard View
-    // Row 0:  0  1  2  3  4  5  6  7  8
-    private final int DASH_SLOT_MAP_AUTO 	= 2;
-    private final int DASH_SLOT_CHAT 	    = 3;
-    private final int DASH_SLOT_BORDER 	    = 4;
-    private final int DASH_SLOT_FLY 	    = 5;
-    private final int DASH_SLOT_BYPASS 	    = 6;
-    // Row 1:  9 10 11 12 13 14 15 16 17
-    private final int DASH_SLOT_MAP 	    = 12;
-    private final int DASH_SLOT_FAVOR 	    = 13;
-    private final int DASH_SLOT_SPY 	    = 14;
-
     private final KonPlayer player;
+
+    private final int ROOT_SLOT_SECRET = 34;
 
     public MainMenu(Konquest konquest, KonPlayer player) {
         super(konquest, HelpMenu.MenuState.ROOT, null);
@@ -80,18 +86,35 @@ public class MainMenu extends StateMenu {
         CommandType iconCommand;
         boolean isClickable;
 
+        /* Icon slot indexes */
+        // Row 0:  0  1  2  3  4  5  6  7  8
+        int ROOT_SLOT_HELP 	    = 1;
+        int ROOT_SLOT_DASH 	    = 4;
+        int ROOT_SLOT_KINGDOM 	= 7;
+        // Row 1:  9 10 11 12 13 14 15 16 17
+        int ROOT_SLOT_INFO 		= 10;
+        int ROOT_SLOT_TOWN		= 16;
+        // Row 2: 18 19 20 21 22 23 24 25 26
+        int ROOT_SLOT_QUEST 	= 19;
+        int ROOT_SLOT_STATS 	= 21;
+        int ROOT_SLOT_PREFIX    = 22;
+        int ROOT_SLOT_SCORE 	= 23;
+        int ROOT_SLOT_TRAVEL 	= 25;
+
         result = new DisplayView(3, MessagePath.MENU_MAIN_TITLE.getMessage());
 
         /* Help Menu */
         icon = new InfoIcon(MessagePath.MENU_MAIN_HELP.getMessage(), CommandType.HELP.iconMaterial(), ROOT_SLOT_HELP, true);
         icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_HELP.getMessage());
         icon.addHint(MessagePath.MENU_MAIN_HINT.getMessage());
+        icon.setState(MenuState.HELP);
         result.addIcon(icon);
 
         /* Dashboard */
         icon = new InfoIcon(MessagePath.MENU_MAIN_DASHBOARD.getMessage(), Material.CLOCK, ROOT_SLOT_DASH, true);
         icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_DASHBOARD.getMessage());
         icon.addHint(MessagePath.MENU_MAIN_HINT.getMessage());
+        icon.setState(MenuState.DASHBOARD);
         result.addIcon(icon);
 
         /* Kingdom Menu */
@@ -104,6 +127,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
+        icon.setState(MenuState.KINGDOM);
         result.addIcon(icon);
 
         /* Info Menu */
@@ -116,6 +140,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
+        icon.setState(MenuState.INFO);
         result.addIcon(icon);
 
         /* Town Menu (Unavailable to barbarians) */
@@ -132,6 +157,7 @@ public class MainMenu extends StateMenu {
                 icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
             }
         }
+        icon.setState(MenuState.TOWN);
         result.addIcon(icon);
 
         /* Quest Book */
@@ -148,6 +174,7 @@ public class MainMenu extends StateMenu {
                 icon.addAlert(MessagePath.LABEL_DISABLED.getMessage());
             }
         }
+        icon.setState(MenuState.QUEST);
         result.addIcon(icon);
 
         /* Stats Book */
@@ -160,6 +187,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
+        icon.setState(MenuState.STATS);
         result.addIcon(icon);
 
         /* Prefix Menu */
@@ -176,6 +204,7 @@ public class MainMenu extends StateMenu {
                 icon.addAlert(MessagePath.LABEL_DISABLED.getMessage());
             }
         }
+        icon.setState(MenuState.PREFIX);
         result.addIcon(icon);
 
         /* Score Menu */
@@ -188,6 +217,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
+        icon.setState(MenuState.SCORE);
         result.addIcon(icon);
 
         /* Travel Menu */
@@ -200,6 +230,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
+        icon.setState(MenuState.TRAVEL);
         result.addIcon(icon);
 
         /* Navigation */
@@ -207,7 +238,9 @@ public class MainMenu extends StateMenu {
         addNavClose(result);
 
         /* Secret */
-        result.addIcon(new InfoIcon(" ", Material.GRAY_STAINED_GLASS_PANE, ROOT_SLOT_SECRET, true));
+        icon = new InfoIcon(" ", Material.GRAY_STAINED_GLASS_PANE, ROOT_SLOT_SECRET, true);
+        icon.setState(MenuState.SECRET);
+        result.addIcon(icon);
 
         return result;
     }
@@ -222,11 +255,14 @@ public class MainMenu extends StateMenu {
 
         result = new DisplayView(1, "Secret Menu");
 
-        /* TODO */
-        icon = new InfoIcon("TODO", Material.SLIME_BALL, 0, false);
-        icon.addDescription("Placeholder icon");
-        icon.addHint("Do not click");
+        /* Roll The Dice */
+        icon = new RandomIcon("Roll The Dice", 4, true);
+        icon.addDescription(ChatColor.MAGIC+"Gain a mysterious ability.");
+        icon.setState(MenuState.SECRET_RTD);
         result.addIcon(icon);
+
+        // Periodically refresh icons
+        result.setRefreshTickRate(5);
 
         /* Navigation */
         addNavEmpty(result);
@@ -250,6 +286,18 @@ public class MainMenu extends StateMenu {
         boolean isPermission;
         boolean currentValue;
 
+        /* Icon slot indexes */
+        // Row 0:  0  1  2  3  4  5  6  7  8
+        int DASH_SLOT_MAP_AUTO 	= 2;
+        int DASH_SLOT_CHAT 	    = 3;
+        int DASH_SLOT_BORDER 	= 4;
+        int DASH_SLOT_FLY 	    = 5;
+        int DASH_SLOT_BYPASS 	= 6;
+        // Row 1:  9 10 11 12 13 14 15 16 17
+        int DASH_SLOT_MAP 	    = 12;
+        int DASH_SLOT_FAVOR 	= 13;
+        int DASH_SLOT_SPY 	    = 14;
+
         result = new DisplayView(2, MessagePath.MENU_MAIN_TITLE_DASHBOARD.getMessage());
 
         /* Map Auto */
@@ -264,6 +312,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
+        icon.setState(MenuState.DASH_MAP_AUTO);
         result.addIcon(icon);
 
         /* Kingdom Chat */
@@ -287,6 +336,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_DISABLED.getMessage());
         }
+        icon.setState(MenuState.DASH_CHAT);
         result.addIcon(icon);
 
         /* Border */
@@ -301,6 +351,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
+        icon.setState(MenuState.DASH_BORDER);
         result.addIcon(icon);
 
         /* Fly */
@@ -315,6 +366,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
+        icon.setState(MenuState.DASH_FLY);
         result.addIcon(icon);
 
         /* Bypass */
@@ -329,6 +381,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
+        icon.setState(MenuState.DASH_BYPASS);
         result.addIcon(icon);
 
         /* Map Command */
@@ -341,6 +394,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
+        icon.setState(MenuState.DASH_MAP);
         result.addIcon(icon);
 
         /* Favor Command */
@@ -352,6 +406,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
+        icon.setState(MenuState.DASH_FAVOR);
         result.addIcon(icon);
 
         /* Spy Command */
@@ -364,6 +419,7 @@ public class MainMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
+        icon.setState(MenuState.DASH_SPY);
         result.addIcon(icon);
 
         /* Navigation */
@@ -434,48 +490,50 @@ public class MainMenu extends StateMenu {
             DisplayView view = getCurrentView();
             if (view == null) return null;
             MenuIcon clickedIcon = view.getIcon(slot);
+            MenuState nextState = (MenuState)clickedIcon.getState();
+            if (nextState == null) return null;
             switch ((MenuState)getCurrentState()) {
                 case ROOT:
-                    switch (slot) {
-                        case ROOT_SLOT_HELP:
+                    switch (nextState) {
+                        case HELP:
                             // Open Help Menu (close this menu)
                             getKonquest().getDisplayManager().displayHelpMenu(player);
                             break;
-                        case ROOT_SLOT_DASH:
+                        case DASHBOARD:
                             // Open Dashboard view
                             result = setCurrentView(MenuState.DASHBOARD);
                             break;
-                        case ROOT_SLOT_KINGDOM:
+                        case KINGDOM:
                             // Open Kingdom Menu (close this menu)
                             getKonquest().getDisplayManager().displayKingdomMenu(player);
                             break;
-                        case ROOT_SLOT_INFO:
+                        case INFO:
                             // Open Info Menu (close this menu)
                             getKonquest().getDisplayManager().displayInfoMenu(player);
                             break;
-                        case ROOT_SLOT_TOWN:
+                        case TOWN:
                             // Open Town Menu (close this menu)
                             getKonquest().getDisplayManager().displayTownMenu(player);
                             break;
-                        case ROOT_SLOT_QUEST:
+                        case QUEST:
                             // Open Quest Book (close this menu)
                             // Schedule delayed task to open book
                             Bukkit.getScheduler().scheduleSyncDelayedTask(getKonquest().getPlugin(), () -> getKonquest().getDirectiveManager().displayBook(player),5);
                             break;
-                        case ROOT_SLOT_STATS:
+                        case STATS:
                             // Open Stats Book (close this menu)
                             // Schedule delayed task to open book
                             Bukkit.getScheduler().scheduleSyncDelayedTask(getKonquest().getPlugin(), () -> getKonquest().getAccomplishmentManager().displayStats(player),5);
                             break;
-                        case ROOT_SLOT_PREFIX:
+                        case PREFIX:
                             // Open Prefix Menu (close this menu)
                             getKonquest().getDisplayManager().displayPrefixMenu(player);
                             break;
-                        case ROOT_SLOT_SCORE:
+                        case SCORE:
                             // Open Score Menu (close this menu)
                             getKonquest().getDisplayManager().displayScoreMenu(player);
                             break;
-                        case ROOT_SLOT_TRAVEL:
+                        case TRAVEL:
                             // Open Travel Menu (close this menu)
                             getKonquest().getDisplayManager().displayTravelMenu(player);
                             break;
@@ -483,37 +541,37 @@ public class MainMenu extends StateMenu {
                     break;
                 case DASHBOARD:
                     boolean doRefresh = true;
-                    switch (slot) {
-                        case DASH_SLOT_MAP_AUTO:
+                    switch (nextState) {
+                        case DASH_MAP_AUTO:
                             // Toggle map auto
                             player.setIsMapAuto(!player.isMapAuto());
                             playStatusSound(player.getBukkitPlayer(),true);
                             break;
-                        case DASH_SLOT_CHAT:
+                        case DASH_CHAT:
                             // Toggle kingdom chat
                             player.setIsGlobalChat(!player.isGlobalChat());
                             playStatusSound(player.getBukkitPlayer(),true);
                             break;
-                        case DASH_SLOT_BORDER:
+                        case DASH_BORDER:
                             // Toggle border display
                             player.setIsBorderDisplay(!player.isBorderDisplay());
                             // Update borders
                             getKonquest().getTerritoryManager().updatePlayerBorderParticles(player);
                             playStatusSound(player.getBukkitPlayer(),true);
                             break;
-                        case DASH_SLOT_FLY:
+                        case DASH_FLY:
                             // Toggle flying
                             boolean status = getKonquest().getPlayerManager().togglePlayerFly(player);
                             playStatusSound(player.getBukkitPlayer(),status);
                             break;
-                        case DASH_SLOT_BYPASS:
+                        case DASH_BYPASS:
                             // Toggle admin bypass
                             player.setIsAdminBypassActive(!player.isAdminBypassActive());
                             playStatusSound(player.getBukkitPlayer(),true);
                             break;
-                        case DASH_SLOT_MAP:
-                        case DASH_SLOT_FAVOR:
-                        case DASH_SLOT_SPY:
+                        case DASH_MAP:
+                        case DASH_FAVOR:
+                        case DASH_SPY:
                             // Execute command
                             if (clickedIcon instanceof CommandIcon) {
                                 CommandIcon icon = (CommandIcon)clickedIcon;
@@ -536,8 +594,9 @@ public class MainMenu extends StateMenu {
                     }
                     break;
                 case SECRET:
-                    //TODO do something
-                    result = view;
+                    if (nextState.equals(MenuState.SECRET_RTD)) {
+                        rollTheDice();
+                    }
                     break;
                 default:
                     break;
@@ -556,5 +615,86 @@ public class MainMenu extends StateMenu {
 
     private String getDisplayValue(boolean value) {
         return DisplayManager.boolean2Lang(value) + " " + DisplayManager.boolean2Symbol(value);
+    }
+
+    // Do something random to the player
+    private void rollTheDice() {
+        try {
+            Location playerLoc = player.getBukkitPlayer().getLocation();
+            boolean isHit = false;
+            int index = ThreadLocalRandom.current().nextInt(0, 100);
+            switch (index) {
+                case 0:
+                    // Lightning strike
+                    isHit = true;
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(getKonquest().getPlugin(), () -> {
+                        player.getBukkitPlayer().getWorld().strikeLightning(playerLoc);
+                    },40);
+                    break;
+                case 10:
+                    // Poison potion effect
+                    isHit = true;
+                    player.getBukkitPlayer().addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 60, 1));
+                    break;
+                case 20:
+                    // Hunger potion effect
+                    isHit = true;
+                    player.getBukkitPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 20 * 120, 1));
+                    break;
+                case 30:
+                    // Weakness potion effect
+                    isHit = true;
+                    player.getBukkitPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 120, 1));
+                    break;
+                case 40:
+                    // Health Boost potion effect
+                    isHit = true;
+                    player.getBukkitPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 20 * 600, 2));
+                    break;
+                case 50:
+                    // Give grass item
+                    isHit = true;
+                    giveItems(new ItemStack(Material.GRASS_BLOCK,3));
+                    break;
+                case 60:
+                    // Give poisonous potato item
+                    isHit = true;
+                    giveItems(new ItemStack(Material.POISONOUS_POTATO,5));
+                    break;
+                case 70:
+                    // Give leather boots item
+                    isHit = true;
+                    giveItems(new ItemStack(Material.LEATHER_BOOTS,1));
+                    break;
+                case 80:
+                    // Give stick item
+                    isHit = true;
+                    giveItems(new ItemStack(Material.STICK,7));
+                    break;
+                case 90:
+                    // Increase a random stat
+                    isHit = true;
+                    int statIndex = ThreadLocalRandom.current().nextInt(0, KonStatsType.values().length);
+                    KonStatsType randomStat = KonStatsType.values()[statIndex];
+                    int addValue = 1;
+                    getKonquest().getAccomplishmentManager().modifyPlayerStat(player,randomStat,addValue);
+                    int newValue = player.getPlayerStats().getStat(randomStat);
+                    ChatUtil.sendNotice(player, MessagePath.COMMAND_ADMIN_STAT_NOTICE_ADD.getMessage(addValue,randomStat.toString(),player.getBukkitPlayer().getName(),newValue));
+                    break;
+                default:
+                    break;
+            }
+            playStatusSound(player.getBukkitPlayer(), isHit);
+        } catch (Exception | Error issue) {
+            ChatUtil.printConsoleError("Failed to apply random effect to player "+player.getBukkitPlayer().getName());
+            issue.printStackTrace();
+        }
+    }
+
+    private void giveItems(ItemStack items) {
+        HashMap<Integer,ItemStack> leftovers = player.getBukkitPlayer().getInventory().addItem(items);
+        for (ItemStack item : leftovers.values()) {
+            player.getBukkitPlayer().getWorld().dropItem(player.getBukkitPlayer().getLocation(),item);
+        }
     }
 }
