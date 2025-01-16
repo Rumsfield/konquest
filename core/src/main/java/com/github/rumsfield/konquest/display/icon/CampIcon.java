@@ -21,7 +21,7 @@ public class CampIcon extends MenuIcon {
         if (camp.isProtected()) {
             addAlert(MessagePath.LABEL_PROTECTED.getMessage());
         }
-        addNameValue(MessagePath.LABEL_BARBARIAN.getMessage(), camp.getOwner().getName());
+        addNameValue(MessagePath.LABEL_OWNER.getMessage(), camp.getOwner().getName());
     }
 
     public KonCamp getCamp() {

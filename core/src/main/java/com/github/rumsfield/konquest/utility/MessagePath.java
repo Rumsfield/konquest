@@ -70,6 +70,7 @@ public enum MessagePath {
 	LABEL_ONLINE_PLAYERS                        (0, "label.online-players"),
 	LABEL_OPEN                                  (0, "label.open"),
 	LABEL_OPTIONS                             	(0, "label.options"),
+	LABEL_OWNER                             	(0, "label.owner"),
 	LABEL_PEACEFUL                              (0, "label.peaceful"),
 	LABEL_PLAYER                                (0, "label.player"),
 	LABEL_PLAYERS                               (0, "label.players"),

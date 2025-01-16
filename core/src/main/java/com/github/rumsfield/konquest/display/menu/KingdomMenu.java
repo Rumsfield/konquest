@@ -171,6 +171,7 @@ public class KingdomMenu extends StateMenu {
 			icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 		} else {
 			icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
+			icon.addError(MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
 		}
 		icon.setState(MenuState.A_EXILE);
 		result.addIcon(icon);

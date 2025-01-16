@@ -94,6 +94,7 @@ public class PrefixMenu extends StateMenu {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
+            icon.addError(MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
         }
         icon.setState(MenuState.PREFIX);
         result.addIcon(icon);
@@ -107,6 +108,7 @@ public class PrefixMenu extends StateMenu {
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             } else {
                 icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
+                icon.addError(MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
             }
             icon.setState(MenuState.CUSTOM);
             result.addIcon(icon);

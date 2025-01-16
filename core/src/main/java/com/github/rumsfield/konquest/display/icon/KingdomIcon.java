@@ -23,33 +23,39 @@ public class KingdomIcon extends MenuIcon {
 		this.relation = relation;
 		this.isClickable = isClickable;
 		// Item Lore
-		int numKingdomLand = 0;
-		for(KonTown town : kingdom.getCapitalTowns()) {
-			numKingdomLand += town.getNumLand();
-		}
-		if(kingdom.isOfflineProtected()) {
-			addAlert(MessagePath.LABEL_PROTECTED.getMessage());
-		}
-		if(kingdom.isAdminOperated()) {
-			addProperty(MessagePath.LABEL_ADMIN_KINGDOM.getMessage());
-		} else {
-			addProperty(MessagePath.LABEL_KINGDOM.getMessage());
+		if(kingdom.isCreated()) {
+			if(kingdom.isOfflineProtected()) {
+				addAlert(MessagePath.LABEL_PROTECTED.getMessage());
+			}
+			if(kingdom.isAdminOperated()) {
+				addProperty(MessagePath.LABEL_ADMIN_KINGDOM.getMessage());
+			} else {
+				addProperty(MessagePath.LABEL_KINGDOM.getMessage());
+			}
 		}
 		if (relation != null) {
 			addProperty(Labeler.lookup(relation));
 		}
-		if(kingdom.isPeaceful()) {
-			addProperty(MessagePath.LABEL_PEACEFUL.getMessage());
-		}
-		if(kingdom.isOpen()) {
-			addProperty(MessagePath.LABEL_OPEN.getMessage());
-		}
-		if(kingdom.isSmallest()) {
-			addProperty(MessagePath.LABEL_SMALLEST.getMessage());
+		if(kingdom.isCreated()) {
+			if (kingdom.isPeaceful()) {
+				addProperty(MessagePath.LABEL_PEACEFUL.getMessage());
+			}
+			if (kingdom.isOpen()) {
+				addProperty(MessagePath.LABEL_OPEN.getMessage());
+			}
+			if (kingdom.isSmallest()) {
+				addProperty(MessagePath.LABEL_SMALLEST.getMessage());
+			}
 		}
 		addNameValue(MessagePath.LABEL_MEMBERS.getMessage(), kingdom.getNumMembers());
-		addNameValue(MessagePath.LABEL_TOWNS.getMessage(), kingdom.getNumTowns());
-		addNameValue(MessagePath.LABEL_LAND.getMessage(), numKingdomLand);
+		if(kingdom.isCreated()) {
+			int numKingdomLand = 0;
+			for (KonTown town : kingdom.getCapitalTowns()) {
+				numKingdomLand += town.getNumLand();
+			}
+			addNameValue(MessagePath.LABEL_TOWNS.getMessage(), kingdom.getNumTowns());
+			addNameValue(MessagePath.LABEL_LAND.getMessage(), numKingdomLand);
+		}
 	}
 	
 	public KonKingdom getKingdom() {
@@ -64,8 +70,15 @@ public class KingdomIcon extends MenuIcon {
 	@Override
 	public ItemStack getItem() {
 		Material iconMat = Material.DIAMOND_HELMET;
-		if (relation != null && relation.equals(KonquestRelationshipType.FRIENDLY)) {
-			iconMat = Material.GOLDEN_HELMET;
+		if (relation != null) {
+			switch (relation) {
+				case FRIENDLY:
+					iconMat = Material.GOLDEN_HELMET;
+					break;
+				case BARBARIAN:
+					iconMat = Material.STONE_AXE;
+					break;
+			}
 		}
 		return CompatibilityUtil.buildItem(iconMat, getName(), getLore(), kingdom.isOfflineProtected());
 	}

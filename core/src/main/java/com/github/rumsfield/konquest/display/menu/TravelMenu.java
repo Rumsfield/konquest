@@ -92,8 +92,8 @@ public class TravelMenu extends StateMenu {
             rows = 2;
         }
         // Row 0: 0  1  2  3  4  5  6  7  8
-        int SLOT_TOWNS = 0;
-        int SLOT_KINGDOMS = 1;
+        int SLOT_KINGDOMS = 0;
+        int SLOT_TOWNS = 1;
         int SLOT_SANCTUARIES = 2;
         int SLOT_CAPITAL = 5;
         int SLOT_HOME = 6;

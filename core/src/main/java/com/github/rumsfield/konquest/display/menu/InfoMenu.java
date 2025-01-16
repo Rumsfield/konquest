@@ -274,7 +274,9 @@ public class InfoMenu extends StateMenu {
             // Context lore
             switch (context) {
                 case PLAYER_LIST:
-                    icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), currentPlayer.getKingdom().getName());
+                    if (!currentPlayer.isBarbarian()) {
+                        icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), currentPlayer.getKingdom().getName());
+                    }
                     break;
                 case KINGDOM_INFO_OFFICERS:
                     icon.addProperty(MessagePath.LABEL_OFFICER.getMessage());
@@ -313,6 +315,7 @@ public class InfoMenu extends StateMenu {
         switch (context) {
             case KINGDOM_LIST:
                 kingdoms.addAll(getKonquest().getKingdomManager().getKingdoms());
+                kingdoms.add(getKonquest().getKingdomManager().getBarbarians());
                 break;
             case MONUMENT_INFO_KINGDOMS:
                 if (infoTemplate != null) {
@@ -661,9 +664,7 @@ public class InfoMenu extends StateMenu {
 
         /* Player Icon */
         icon = new PlayerIcon(infoPlayer.getOfflineBukkitPlayer(), contextColor, relation, SLOT_PLAYER, false);
-        if (infoPlayer.isBarbarian()) {
-            icon.addProperty(MessagePath.LABEL_BARBARIAN.getMessage());
-        } else {
+        if (!infoPlayer.isBarbarian()) {
             icon.addNameValue(MessagePath.LABEL_KINGDOM_ROLE.getMessage(), infoPlayer.getKingdom().getPlayerRoleName(infoPlayer));
         }
         result.addIcon(icon);
@@ -720,7 +721,7 @@ public class InfoMenu extends StateMenu {
         result.addIcon(icon);
 
         /* Stats List Icon */
-        icon = new InfoIcon(MessagePath.LABEL_STATS.getMessage(), CommandType.STATS.iconMaterial(), SLOT_STATS, true);
+        icon = new InfoIcon(MessagePath.MENU_PREFIX_TITLE_STATS.getMessage(), CommandType.STATS.iconMaterial(), SLOT_STATS, true);
         icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
         icon.setState(MenuState.PLAYER_INFO_STATS);
         result.addIcon(icon);
@@ -789,9 +790,11 @@ public class InfoMenu extends StateMenu {
         String webColorFormat = infoKingdom.getWebColorString()+colorName;
         icon = new KingdomIcon(infoKingdom, contextColor, relation, SLOT_KINGDOM, false);
         icon.addNameValue(MessagePath.LABEL_ONLINE_PLAYERS.getMessage(), numKingdomPlayers);
-        icon.addNameValue(MessagePath.LABEL_OFFICERS.getMessage(), numKingdomOfficers);
-        icon.addNameValue(MessagePath.LABEL_FAVOR.getMessage(), numKingdomFavor);
-        icon.addNameValue(MessagePath.LABEL_MAP_COLOR.getMessage(), webColorFormat);
+        if (infoKingdom.isCreated()) {
+            icon.addNameValue(MessagePath.LABEL_OFFICERS.getMessage(), numKingdomOfficers);
+            icon.addNameValue(MessagePath.LABEL_FAVOR.getMessage(), numKingdomFavor);
+            icon.addNameValue(MessagePath.LABEL_MAP_COLOR.getMessage(), webColorFormat);
+        }
         result.addIcon(icon);
 
         /* Diplomacy Icon */
@@ -854,7 +857,7 @@ public class InfoMenu extends StateMenu {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.TOWN_INFO);
         } else {
-            icon = new InfoIcon(MessagePath.LABEL_CAPITAL.getMessage(), Material.BARRIER, SLOT_CAPITAL, false);
+            icon = new InfoIcon(MessagePath.LABEL_CAPITAL.getMessage(), Material.NETHERITE_BLOCK, SLOT_CAPITAL, false);
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
         }
         result.addIcon(icon);
@@ -870,7 +873,7 @@ public class InfoMenu extends StateMenu {
                 icon.addAlert(MessagePath.LABEL_INVALID.getMessage());
             }
         } else {
-            icon = new InfoIcon(MessagePath.LABEL_MASTER.getMessage(), Material.BARRIER, SLOT_MASTER, false);
+            icon = new InfoIcon(MessagePath.LABEL_MASTER.getMessage(), Material.IRON_HELMET, SLOT_MASTER, false);
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
         }
         result.addIcon(icon);
@@ -886,7 +889,7 @@ public class InfoMenu extends StateMenu {
                 icon.addAlert(MessagePath.LABEL_INVALID.getMessage());
             }
         } else {
-            icon = new InfoIcon(MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage(), Material.BARRIER, SLOT_MONUMENT, false);
+            icon = new InfoIcon(MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage(), Material.CRAFTING_TABLE, SLOT_MONUMENT, false);
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
         }
         result.addIcon(icon);
@@ -904,17 +907,21 @@ public class InfoMenu extends StateMenu {
             if (infoKingdom.isCreated()) {
                 icon.addDescription(MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(infoKingdom.getName()));
             } else {
-                icon.addDescription(MessagePath.COMMAND_SCORE_ERROR_KINGDOM.getMessage(infoKingdom.getName()));
+                icon.addDescription(MessagePath.COMMAND_SCORE_ERROR_KINGDOM.getMessage());
             }
         }
         result.addIcon(icon);
 
         /* Officers Icon */
         int numOfficers = infoKingdom.getPlayerOfficersOnly().size();
-        icon = new InfoIcon(MessagePath.LABEL_OFFICERS.getMessage(), Material.IRON_HORSE_ARMOR, SLOT_OFFICERS, true);
-        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numOfficers);
-        icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
-        icon.setState(MenuState.KINGDOM_INFO_OFFICERS);
+        icon = new InfoIcon(MessagePath.LABEL_OFFICERS.getMessage(), Material.IRON_HORSE_ARMOR, SLOT_OFFICERS, isClickable);
+        if (isClickable) {
+            icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numOfficers);
+            icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+            icon.setState(MenuState.KINGDOM_INFO_OFFICERS);
+        } else {
+            icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
+        }
         result.addIcon(icon);
 
         /* Members Icon */
@@ -1677,7 +1684,7 @@ public class InfoMenu extends StateMenu {
                 result = MessagePath.LABEL_MONUMENT_TEMPLATES.getMessage();
                 break;
             case PLAYER_INFO_STATS:
-                result = MessagePath.LABEL_STATS.getMessage();
+                result = MessagePath.MENU_PREFIX_TITLE_STATS.getMessage();
                 break;
             case KINGDOM_INFO_OFFICERS:
                 result = MessagePath.LABEL_OFFICERS.getMessage();

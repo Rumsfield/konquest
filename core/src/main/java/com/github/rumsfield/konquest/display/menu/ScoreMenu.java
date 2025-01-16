@@ -82,16 +82,16 @@ public class ScoreMenu extends StateMenu {
 
         /* Player Score Icon */
         boolean isPlayerClickable = isPlayerScored(player);
-        icon = new PlayerIcon(player.getBukkitPlayer(), Konquest.friendColor2, null, ROOT_SLOT_PLAYER, isPlayerClickable);
+        icon = new PlayerIcon(player.getBukkitPlayer(), getColor(player,player), getRelation(player,player), ROOT_SLOT_PLAYER, isPlayerClickable);
         icon.addNameValue(MessagePath.MENU_SCORE_PLAYER_SCORE.getMessage(), playerScore);
         if (isPlayerClickable) {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
             if (player.isBarbarian()) {
-                icon.addDescription(MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(playerName));
+                icon.addError(MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(playerName));
             } else {
-                icon.addDescription(MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdomName));
+                icon.addError(MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdomName));
             }
         }
         icon.setState(MenuState.PLAYER_SELF);
@@ -99,16 +99,16 @@ public class ScoreMenu extends StateMenu {
 
         /* Kingdom Score Icon */
         boolean isKingdomClickable = isKingdomScored(player.getKingdom());
-        icon = new KingdomIcon(player.getKingdom(), Konquest.friendColor2, KonquestRelationshipType.FRIENDLY, ROOT_SLOT_KINGDOM, isKingdomClickable);
+        icon = new KingdomIcon(player.getKingdom(), getColor(player,player), getRelation(player,player), ROOT_SLOT_KINGDOM, isKingdomClickable);
         icon.addNameValue(MessagePath.MENU_SCORE_KINGDOM_SCORE.getMessage(), kingdomScore);
         if (isKingdomClickable) {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         } else {
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
             if (player.isBarbarian()) {
-                icon.addDescription(MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(playerName));
+                icon.addError(MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(playerName));
             } else {
-                icon.addDescription(MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdomName));
+                icon.addError(MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(kingdomName));
             }
         }
         icon.setState(MenuState.KINGDOM_SELF);
@@ -154,6 +154,9 @@ public class ScoreMenu extends StateMenu {
         int currentScore;
         boolean isPlayerClickable;
         for (KonOfflinePlayer currentPlayer : players) {
+            if (!isPlayerScored(currentPlayer)) {
+                continue;
+            }
             currentPlayerName = currentPlayer.getOfflineBukkitPlayer().getName();
             currentKingdomName = currentPlayer.getKingdom().getName();
             currentScore = getKonquest().getKingdomManager().getPlayerScore(currentPlayer);
@@ -161,15 +164,17 @@ public class ScoreMenu extends StateMenu {
             icon = new PlayerIcon(currentPlayer.getOfflineBukkitPlayer(),getColor(player,currentPlayer),getRelation(player,currentPlayer),0,isPlayerClickable);
             icon.addProperty(MessagePath.LABEL_LEADERBOARD.getMessage()+" #"+rank);
             icon.addNameValue(MessagePath.LABEL_SCORE.getMessage(), currentScore);
-            icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), currentKingdomName);
+            if (!currentPlayer.isBarbarian()) {
+                icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), currentKingdomName);
+            }
             if (isPlayerClickable) {
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             } else {
                 icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
                 if (currentPlayer.isBarbarian()) {
-                    icon.addDescription(MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(currentPlayerName));
+                    icon.addError(MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(currentPlayerName));
                 } else {
-                    icon.addDescription(MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(currentKingdomName));
+                    icon.addError(MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(currentKingdomName));
                 }
             }
             icon.setState(MenuState.PLAYER_SCORE);
@@ -209,7 +214,7 @@ public class ScoreMenu extends StateMenu {
             } else {
                 icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
                 if (currentKingdom.isCreated()) {
-                    icon.addDescription(MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(currentKingdomName));
+                    icon.addError(MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(currentKingdomName));
                 }
             }
             icon.setState(MenuState.KINGDOM_SCORE);
