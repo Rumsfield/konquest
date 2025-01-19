@@ -366,7 +366,7 @@ public class TownMenu extends StateMenu {
             icon = new InfoIcon(MessagePath.MENU_TOWN_REQUESTS.getMessage(), requestMat, ROOT_SLOT_REQUESTS, true);
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_REQUESTS.getMessage());
             icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numRequests);
-            icon.addProperty(MessagePath.LABEL_KNIGHT.getMessage());
+            icon.addProperty(MessagePath.RELATIONSHIP_ROLE_KNIGHT.getMessage());
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.A_REQUESTS);
             result.addIcon(icon);
@@ -376,7 +376,7 @@ public class TownMenu extends StateMenu {
                 boolean isPlotsClickable = town.hasPropertyValue(KonPropertyFlag.PLOTS) && town.getPropertyValue(KonPropertyFlag.PLOTS);
                 icon = new InfoIcon(MessagePath.MENU_TOWN_PLOTS.getMessage(), Material.GRASS_BLOCK, ROOT_SLOT_PLOTS, isPlotsClickable);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_PLOTS.getMessage());
-                icon.addProperty(MessagePath.LABEL_KNIGHT.getMessage());
+                icon.addProperty(MessagePath.RELATIONSHIP_ROLE_KNIGHT.getMessage());
                 if (isPlotsClickable) {
                     icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 } else {
@@ -400,7 +400,7 @@ public class TownMenu extends StateMenu {
             if (getKonquest().getShieldManager().isShieldsEnabled()) {
                 icon = new InfoIcon(MessagePath.MENU_TOWN_SHIELDS.getMessage(), Material.SHIELD, ROOT_SLOT_SHIELD, true);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_SHIELDS.getMessage());
-                icon.addProperty(MessagePath.LABEL_KNIGHT.getMessage());
+                icon.addProperty(MessagePath.RELATIONSHIP_ROLE_KNIGHT.getMessage());
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.A_SHIELD);
                 result.addIcon(icon);
@@ -410,7 +410,7 @@ public class TownMenu extends StateMenu {
             if (getKonquest().getShieldManager().isArmorsEnabled()) {
                 icon = new InfoIcon(MessagePath.MENU_TOWN_ARMOR.getMessage(), Material.CHAINMAIL_CHESTPLATE, ROOT_SLOT_ARMOR, true);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_ARMOR.getMessage());
-                icon.addProperty(MessagePath.LABEL_KNIGHT.getMessage());
+                icon.addProperty(MessagePath.RELATIONSHIP_ROLE_KNIGHT.getMessage());
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.A_ARMOR);
                 result.addIcon(icon);
@@ -422,7 +422,7 @@ public class TownMenu extends StateMenu {
             boolean isPromoteClickable = town.isPromoteable() || isAdmin;
             icon = new InfoIcon(MessagePath.MENU_TOWN_PROMOTE.getMessage(), Material.IRON_HORSE_ARMOR, ROOT_SLOT_PROMOTE, isPromoteClickable);
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_PROMOTE.getMessage());
-            icon.addProperty(MessagePath.LABEL_LORD.getMessage());
+            icon.addProperty(MessagePath.RELATIONSHIP_ROLE_LORD.getMessage());
             if (isPromoteClickable) {
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             } else {
@@ -435,7 +435,7 @@ public class TownMenu extends StateMenu {
             boolean isDemoteClickable = town.isDemoteable() || isAdmin;
             icon = new InfoIcon(MessagePath.MENU_TOWN_DEMOTE.getMessage(), Material.LEATHER_CHESTPLATE, ROOT_SLOT_DEMOTE, isDemoteClickable);
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_DEMOTE.getMessage());
-            icon.addProperty(MessagePath.LABEL_LORD.getMessage());
+            icon.addProperty(MessagePath.RELATIONSHIP_ROLE_LORD.getMessage());
             if (isPromoteClickable) {
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             } else {
@@ -448,7 +448,7 @@ public class TownMenu extends StateMenu {
             boolean isTransferClickable = town.isTransferable() || isAdmin;
             icon = new InfoIcon(MessagePath.MENU_TOWN_TRANSFER.getMessage(), Material.IRON_HELMET, ROOT_SLOT_TRANSFER, isTransferClickable);
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_TRANSFER.getMessage());
-            icon.addProperty(MessagePath.LABEL_LORD.getMessage());
+            icon.addProperty(MessagePath.RELATIONSHIP_ROLE_LORD.getMessage());
             if (isPromoteClickable) {
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             } else {
@@ -461,7 +461,7 @@ public class TownMenu extends StateMenu {
             if (town.getTerritoryType().equals(KonquestTerritoryType.TOWN) && getKonquest().getKingdomManager().getIsTownDestroyLordEnable()) {
                 icon = new InfoIcon(MessagePath.MENU_TOWN_DESTROY.getMessage(), Material.TNT, ROOT_SLOT_DESTROY, true);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage());
-                icon.addProperty(MessagePath.LABEL_LORD.getMessage());
+                icon.addProperty(MessagePath.RELATIONSHIP_ROLE_LORD.getMessage());
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.B_DESTROY);
                 result.addIcon(icon);
@@ -472,7 +472,7 @@ public class TownMenu extends StateMenu {
                 boolean isUpgradesClickable = town.hasPropertyValue(KonPropertyFlag.UPGRADE) && town.getPropertyValue(KonPropertyFlag.UPGRADE);
                 icon = new InfoIcon(MessagePath.MENU_TOWN_UPGRADES.getMessage(), Material.GOLDEN_APPLE, ROOT_SLOT_UPGRADES, isUpgradesClickable);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_UPGRADES.getMessage());
-                icon.addProperty(MessagePath.LABEL_LORD.getMessage());
+                icon.addProperty(MessagePath.RELATIONSHIP_ROLE_LORD.getMessage());
                 if (isUpgradesClickable) {
                     icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 } else {
@@ -485,7 +485,7 @@ public class TownMenu extends StateMenu {
             /* Options Icon */
             icon = new InfoIcon(MessagePath.MENU_TOWN_OPTIONS.getMessage(), Material.OAK_SIGN, ROOT_SLOT_OPTIONS, true);
             icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_OPTIONS.getMessage());
-            icon.addProperty(MessagePath.LABEL_LORD.getMessage());
+            icon.addProperty(MessagePath.RELATIONSHIP_ROLE_LORD.getMessage());
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.B_OPTIONS);
             result.addIcon(icon);
@@ -494,7 +494,7 @@ public class TownMenu extends StateMenu {
             if (getKonquest().getKingdomManager().getIsDiscountEnable()) {
                 icon = new InfoIcon(MessagePath.MENU_TOWN_SPECIAL.getMessage(), Material.EMERALD, ROOT_SLOT_SPECIALIZATION, true);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_SPECIAL.getMessage());
-                icon.addProperty(MessagePath.LABEL_LORD.getMessage());
+                icon.addProperty(MessagePath.RELATIONSHIP_ROLE_LORD.getMessage());
                 icon.addNameValue(MessagePath.LABEL_SPECIALIZATION.getMessage(), town.getSpecializationName());
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.B_SPECIALIZATION);

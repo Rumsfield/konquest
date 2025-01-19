@@ -28,7 +28,7 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 	private final BossBar campBarAll;
 	
 	public KonCamp(Location loc, OfflinePlayer owner, KonKingdom kingdom, Konquest konquest) {
-		super(loc, MessagePath.LABEL_CAMP.getMessage().trim()+"_"+owner.getName(), kingdom, konquest);
+		super(loc, MessagePath.TERRITORY_CAMP.getMessage().trim()+"_"+owner.getName(), kingdom, konquest);
 		
 		this.owner = owner;
 		this.raidAlertTimer = new Timer(this);

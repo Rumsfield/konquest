@@ -27,10 +27,10 @@ public class FlagAdminCommand extends CommandBase {
 	public enum HolderType {
 
 		KINGDOM     (MessagePath.LABEL_KINGDOM.getMessage()),
-		TOWN        (MessagePath.LABEL_TOWN.getMessage()),
-		CAPITAL     (MessagePath.LABEL_CAPITAL.getMessage()),
-		RUIN        (MessagePath.LABEL_RUIN.getMessage()),
-		SANCTUARY   (MessagePath.LABEL_SANCTUARY.getMessage());
+		TOWN        (MessagePath.TERRITORY_TOWN.getMessage()),
+		CAPITAL     (MessagePath.TERRITORY_CAPITAL.getMessage()),
+		RUIN        (MessagePath.TERRITORY_RUIN.getMessage()),
+		SANCTUARY   (MessagePath.TERRITORY_SANCTUARY.getMessage());
 
 		private final String label;
 

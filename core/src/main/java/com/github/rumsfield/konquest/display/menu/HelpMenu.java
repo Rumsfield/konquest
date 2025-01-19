@@ -124,7 +124,7 @@ public class HelpMenu extends StateMenu {
             isQuestEnabled = true;
         }
 
-        result = new DisplayView(numRows, MessagePath.MENU_HELP_START.getMessage());
+        result = new DisplayView(numRows, MessagePath.MENU_HELP_TITLE_START.getMessage());
 
         /* Tips */
         String[] tips = {

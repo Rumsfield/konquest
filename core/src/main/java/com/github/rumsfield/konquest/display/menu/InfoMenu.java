@@ -279,16 +279,16 @@ public class InfoMenu extends StateMenu {
                     }
                     break;
                 case KINGDOM_INFO_OFFICERS:
-                    icon.addProperty(MessagePath.LABEL_OFFICER.getMessage());
+                    icon.addProperty(MessagePath.RELATIONSHIP_RANK_OFFICER.getMessage());
                     break;
                 case KINGDOM_INFO_MEMBERS:
-                    icon.addProperty(MessagePath.LABEL_MEMBER.getMessage());
+                    icon.addProperty(MessagePath.RELATIONSHIP_RANK_MEMBER.getMessage());
                     break;
                 case TOWN_INFO_KNIGHTS:
-                    icon.addProperty(MessagePath.LABEL_KNIGHT.getMessage());
+                    icon.addProperty(MessagePath.RELATIONSHIP_ROLE_KNIGHT.getMessage());
                     break;
                 case TOWN_INFO_RESIDENTS:
-                    icon.addProperty(MessagePath.LABEL_RESIDENT.getMessage());
+                    icon.addProperty(MessagePath.RELATIONSHIP_ROLE_RESIDENT.getMessage());
                     break;
                 default:
                     break;
@@ -520,7 +520,7 @@ public class InfoMenu extends StateMenu {
             icon = new TemplateIcon(currentTemplate,0,true);
             // Context Lore
             if (context.equals(MenuState.MONUMENT_LIST)) {
-                icon.addNameValue(MessagePath.LABEL_SANCTUARY.getMessage(), getKonquest().getSanctuaryManager().getSanctuaryNameOfTemplate(currentTemplate.getName()));
+                icon.addNameValue(MessagePath.TERRITORY_SANCTUARY.getMessage(), getKonquest().getSanctuaryManager().getSanctuaryNameOfTemplate(currentTemplate.getName()));
             }
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.MONUMENT_INFO);
@@ -665,7 +665,7 @@ public class InfoMenu extends StateMenu {
         /* Player Icon */
         icon = new PlayerIcon(infoPlayer.getOfflineBukkitPlayer(), contextColor, relation, SLOT_PLAYER, false);
         if (!infoPlayer.isBarbarian()) {
-            icon.addNameValue(MessagePath.LABEL_KINGDOM_ROLE.getMessage(), infoPlayer.getKingdom().getPlayerRoleName(infoPlayer));
+            icon.addNameValue(MessagePath.LABEL_KINGDOM_RANK.getMessage(), infoPlayer.getKingdom().getPlayerRankName(infoPlayer));
         }
         result.addIcon(icon);
 
@@ -677,7 +677,7 @@ public class InfoMenu extends StateMenu {
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.CAMP_INFO);
             } else {
-                icon = new InfoIcon(MessagePath.LABEL_CAMP.getMessage(), Material.BARRIER, SLOT_KINGDOM_CAMP, false);
+                icon = new InfoIcon(MessagePath.TERRITORY_CAMP.getMessage(), Material.BARRIER, SLOT_KINGDOM_CAMP, false);
                 icon.addProperty(MessagePath.LABEL_BARBARIANS.getMessage());
                 icon.addDescription(MessagePath.MENU_INFO_CAMP_MISSING.getMessage());
             }
@@ -857,7 +857,7 @@ public class InfoMenu extends StateMenu {
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.TOWN_INFO);
         } else {
-            icon = new InfoIcon(MessagePath.LABEL_CAPITAL.getMessage(), Material.NETHERITE_BLOCK, SLOT_CAPITAL, false);
+            icon = new InfoIcon(MessagePath.TERRITORY_CAPITAL.getMessage(), Material.NETHERITE_BLOCK, SLOT_CAPITAL, false);
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
         }
         result.addIcon(icon);
@@ -869,11 +869,11 @@ public class InfoMenu extends StateMenu {
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.PLAYER_INFO);
             } else {
-                icon = new InfoIcon(MessagePath.LABEL_MASTER.getMessage(), Material.BARRIER, SLOT_MASTER, false);
+                icon = new InfoIcon(MessagePath.RELATIONSHIP_RANK_MASTER.getMessage(), Material.BARRIER, SLOT_MASTER, false);
                 icon.addAlert(MessagePath.LABEL_INVALID.getMessage());
             }
         } else {
-            icon = new InfoIcon(MessagePath.LABEL_MASTER.getMessage(), Material.IRON_HELMET, SLOT_MASTER, false);
+            icon = new InfoIcon(MessagePath.RELATIONSHIP_RANK_MASTER.getMessage(), Material.IRON_HELMET, SLOT_MASTER, false);
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
         }
         result.addIcon(icon);
@@ -1020,7 +1020,7 @@ public class InfoMenu extends StateMenu {
         if (isCapital) {
             title = infoTown.getName();
         } else {
-            title = MessagePath.LABEL_TOWN.getMessage()+" "+infoTown.getName();
+            title = MessagePath.TERRITORY_TOWN.getMessage()+" "+infoTown.getName();
         }
         result = new DisplayView(rows, title);
 
@@ -1056,7 +1056,7 @@ public class InfoMenu extends StateMenu {
         if (isCapital) {
             icon.addNameValue(MessagePath.LABEL_IMMUNITY.getMessage(), DisplayManager.boolean2Symbol(infoTown.getKingdom().isCapitalImmune()));
         }
-        icon.addNameValue(MessagePath.LABEL_LORD.getMessage(), DisplayManager.boolean2Symbol(infoTown.isLordValid()));
+        icon.addNameValue(MessagePath.RELATIONSHIP_ROLE_LORD.getMessage(), DisplayManager.boolean2Symbol(infoTown.isLordValid()));
         icon.addNameValue(MessagePath.PROTECTION_NOTICE_ATTACKED.getMessage(), DisplayManager.boolean2Symbol(infoTown.isAttacked()));
         icon.addNameValue(MessagePath.LABEL_PROTECTED.getMessage(), DisplayManager.boolean2Symbol((infoTown.isCaptureDisabled() || infoTown.getKingdom().isOfflineProtected() || infoTown.isTownWatchProtected())));
         icon.addNameValue(MessagePath.LABEL_SHIELD.getMessage(), DisplayManager.boolean2Symbol(infoTown.isShielded()));
@@ -1081,11 +1081,11 @@ public class InfoMenu extends StateMenu {
         /* Lord Icon */
         if(infoTown.isLordValid()) {
             icon = new PlayerIcon(infoTown.getPlayerLord(), contextColor, relation, SLOT_LORD, true);
-            icon.addProperty(MessagePath.LABEL_LORD.getMessage());
+            icon.addProperty(MessagePath.RELATIONSHIP_ROLE_LORD.getMessage());
             icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
             icon.setState(MenuState.PLAYER_INFO);
         } else {
-            icon = new InfoIcon(MessagePath.LABEL_LORD.getMessage(), Material.IRON_HELMET, SLOT_LORD, false);
+            icon = new InfoIcon(MessagePath.RELATIONSHIP_ROLE_LORD.getMessage(), Material.IRON_HELMET, SLOT_LORD, false);
             icon.addAlert(MessagePath.LABEL_NO_LORD.getMessage());
             if (infoTown.canClaimLordship(player)) {
                 icon.addError(MessagePath.COMMAND_TOWN_NOTICE_NO_LORD.getMessage(infoTown.getName(), infoTown.getTravelName()));
@@ -1148,7 +1148,7 @@ public class InfoMenu extends StateMenu {
         int SLOT_MONUMENTS = 6;
 
         int numTemplates = infoSanctuary.getTemplates().size();
-        String title = MessagePath.LABEL_SANCTUARY.getMessage()+" "+infoSanctuary.getName();
+        String title = MessagePath.TERRITORY_SANCTUARY.getMessage()+" "+infoSanctuary.getName();
         result = new DisplayView(rows, title);
 
         /* Sanctuary Icon */
@@ -1198,7 +1198,7 @@ public class InfoMenu extends StateMenu {
         int SLOT_CAPTURE = 4;
         int SLOT_FLAGS = 5;
 
-        String title = MessagePath.LABEL_RUIN.getMessage()+" "+infoRuin.getName();
+        String title = MessagePath.TERRITORY_RUIN.getMessage()+" "+infoRuin.getName();
         result = new DisplayView(rows, title);
 
         /* Ruin Icon */
@@ -1253,7 +1253,7 @@ public class InfoMenu extends StateMenu {
         int SLOT_CLAN = 4;
         int SLOT_OWNER = 5;
 
-        String title = MessagePath.LABEL_CAMP.getMessage()+" "+infoCamp.getOwner().getName();
+        String title = MessagePath.TERRITORY_CAMP.getMessage()+" "+infoCamp.getOwner().getName();
         result = new DisplayView(rows, title);
 
         /* Camp Icon */

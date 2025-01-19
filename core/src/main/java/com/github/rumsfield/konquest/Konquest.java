@@ -426,12 +426,12 @@ public class Konquest implements KonquestAPI, Timeable {
 		// Apply suffix optionally
 		if(useRelationSuffix) {
 			String separator = " ";
-			friendlyTeam.setSuffix(separator+friendColor2+MessagePath.PLACEHOLDER_FRIENDLY.getMessage());
-			enemyTeam.setSuffix(separator+enemyColor2+MessagePath.PLACEHOLDER_ENEMY.getMessage());
-			tradeTeam.setSuffix(separator+tradeColor2+MessagePath.PLACEHOLDER_TRADER.getMessage());
-			peacefulTeam.setSuffix(separator+peacefulColor2+MessagePath.PLACEHOLDER_PEACEFUL.getMessage());
-			alliedTeam.setSuffix(separator+alliedColor2+MessagePath.PLACEHOLDER_ALLY.getMessage());
-			barbarianTeam.setSuffix(separator+barbarianColor2+MessagePath.PLACEHOLDER_BARBARIAN.getMessage());
+			friendlyTeam.setSuffix(separator+friendColor2+MessagePath.RELATIONSHIP_FRIENDLY.getMessage());
+			enemyTeam.setSuffix(separator+enemyColor2+MessagePath.RELATIONSHIP_ENEMY.getMessage());
+			tradeTeam.setSuffix(separator+tradeColor2+MessagePath.RELATIONSHIP_TRADER.getMessage());
+			peacefulTeam.setSuffix(separator+peacefulColor2+MessagePath.RELATIONSHIP_PEACEFUL.getMessage());
+			alliedTeam.setSuffix(separator+alliedColor2+MessagePath.RELATIONSHIP_ALLY.getMessage());
+			barbarianTeam.setSuffix(separator+barbarianColor2+MessagePath.RELATIONSHIP_BARBARIAN.getMessage());
 		}
 	}
 	

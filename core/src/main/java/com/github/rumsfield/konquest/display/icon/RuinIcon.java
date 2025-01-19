@@ -17,7 +17,7 @@ public class RuinIcon extends MenuIcon {
         this.ruin = ruin;
         this.isClickable = isClickable;
         // Item Lore
-        addProperty(MessagePath.LABEL_RUIN.getMessage());
+        addProperty(MessagePath.TERRITORY_RUIN.getMessage());
         if (ruin.isCaptureDisabled()) {
             addProperty(MessagePath.LABEL_CAPTURED.getMessage());
         }

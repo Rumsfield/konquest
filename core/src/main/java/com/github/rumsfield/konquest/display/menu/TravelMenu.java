@@ -156,7 +156,7 @@ public class TravelMenu extends StateMenu {
         /* Capital Icon */
         boolean isFlagAllowed = player.getKingdom().getCapital().getPropertyValue(KonPropertyFlag.TRAVEL);
         isClickable = isAdmin || (isCapitalTravel && isFlagAllowed && !player.isBarbarian());
-        icon = new InfoIcon(MessagePath.LABEL_CAPITAL.getMessage(), Material.NETHERITE_BLOCK, SLOT_CAPITAL, isClickable);
+        icon = new InfoIcon(MessagePath.TERRITORY_CAPITAL.getMessage(), Material.NETHERITE_BLOCK, SLOT_CAPITAL, isClickable);
         icon.addProperty(MessagePath.LABEL_TRAVEL.getMessage());
         icon.addDescription(MessagePath.MENU_TRAVEL_DESCRIPTION_CAPITAL.getMessage());
         if (isClickable) {
@@ -198,7 +198,7 @@ public class TravelMenu extends StateMenu {
         /* Camp Icon */
         boolean isCampSet = getKonquest().getCampManager().isCampSet(player);
         isClickable = player.isBarbarian() && isCampSet && (isCampTravel || isAdmin);
-        icon = new InfoIcon(MessagePath.LABEL_CAMP.getMessage(), Material.ORANGE_BED, SLOT_CAMP, isClickable);
+        icon = new InfoIcon(MessagePath.TERRITORY_CAMP.getMessage(), Material.ORANGE_BED, SLOT_CAMP, isClickable);
         icon.addProperty(MessagePath.LABEL_TRAVEL.getMessage());
         icon.addDescription(MessagePath.MENU_TRAVEL_DESCRIPTION_CAMP.getMessage());
         if (isClickable) {

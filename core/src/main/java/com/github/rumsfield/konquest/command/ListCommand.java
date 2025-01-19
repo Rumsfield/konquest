@@ -18,10 +18,10 @@ public class ListCommand extends CommandBase {
 	public enum ListType {
 
 		KINGDOM     (MessagePath.LABEL_KINGDOM.getMessage()),
-		TOWN        (MessagePath.LABEL_TOWN.getMessage()),
-		CAMP        (MessagePath.LABEL_CAMP.getMessage()),
-		RUIN        (MessagePath.LABEL_RUIN.getMessage()),
-		SANCTUARY   (MessagePath.LABEL_SANCTUARY.getMessage()),
+		TOWN        (MessagePath.TERRITORY_TOWN.getMessage()),
+		CAMP        (MessagePath.TERRITORY_CAMP.getMessage()),
+		RUIN        (MessagePath.TERRITORY_RUIN.getMessage()),
+		SANCTUARY   (MessagePath.TERRITORY_SANCTUARY.getMessage()),
 		TEMPLATE	(MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage());
 
 		private final String label;

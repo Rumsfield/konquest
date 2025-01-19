@@ -9,20 +9,19 @@
 # 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
+# //// LABEL \\\\
+# Simple words or phrases used throughout the plugin.
 label:
   admin: "Admin"
   admin-kingdom: "Admin Kingdom"
   allied-building: "Allied Building"
   armor: "Armor"
   back: "Back"
-  barbarian: "Barbarian"
   barbarians: "Barbarians"
   blocks: "Blocks"
   bypass: "BYPASS"
-  camp: "Camp"
   camps: "Camps"
   camp-clan: "Camp Clan"
-  capital: "Capital"
   capitals: "Capitals"
   captured: "Captured"
   changing-capital: "Changing to Capital"
@@ -47,31 +46,23 @@ label:
   information: "Information"
   invalid: "Invalid"
   kingdom: "Kingdom"
-  kingdom-role: "Kingdom Role"
+  kingdom-rank: "Kingdom Rank"
   kingdoms: "Kingdoms"
-  knight: "Knight"
   knights: "Knights"
   land: "Land"
   last-seen: "Last Seen %s"
   leaderboard: "Leaderboard"
   level: "Level"
   loot-chests: "Loot Chests"
-  lord: "Lord"
   map-color: "Map Color"
-  master: "Master"
-  member: "Member"
   members: "Members"
   modified: "Modified"
-  monument: "Monument"
   monument-template: "Monument Template"
   monument-templates: "Monument Templates"
-  name: "Name"
-  neutral: "Neutral"
   neutrals: "Neutrals"
   next: "Next"
   no-lord: "No Lord"
   no-permission: "No Permission"
-  officer: "Officer"
   officers: "Officers"
   online-players: "Online Players"
   open: "Open"
@@ -84,22 +75,15 @@ label:
   population: "Population"
   properties: "Properties"
   protected: "Protected"
-  residencies: "Residencies"
-  resident: "Resident"
   residents: "Residents"
   return: "Return"
-  ruin: "Ruin"
   ruins: "Ruins"
-  sanctuary: "Sanctuary"
   sanctuaries: "Sanctuaries"
   score: "Score"
   shield: "Shield"
   smallest: "Smallest"
   specialization: "Specialization"
-  stats: "Stats"
-  total-players: "Total Players"
   total: "Total"
-  town: "Town"
   towns: "Towns"
   town-role: "Town Role"
   travel: "Travel"
@@ -108,7 +92,26 @@ label:
   upgrades: "Upgrades"
   valid: "Valid"
   world: "World"
-placeholder:
+# //// TERRITORY \\\\
+# Names of different territory types.
+territory:
+  wild: "Wild"
+  capital: "Capital"
+  town: "Town"
+  camp: "Camp"
+  ruin: "Ruin"
+  sanctuary: "Sanctuary"
+# //// DIPLOMACY \\\\
+# Names for diplomatic relationships between kingdoms.
+diplomacy:
+  war: "War"
+  peace: "Peace"
+  trade: "Trade"
+  alliance: "Alliance"
+  self: "Your Kingdom"
+# //// LABEL \\\\
+# Names for relationships between players, their ranks within a kingdom, and their roles within a town.
+relationship:
   friendly: "Friendly"
   enemy: "Enemy"
   barbarian: "Barbarian"
@@ -118,6 +121,12 @@ placeholder:
   rank-master: "Master"
   rank-officer: "Officer"
   rank-member: "Member"
+  role-lord: "Lord"
+  role-knight: "Knight"
+  role-resident: "Resident"
+# //// MAP \\\\
+# Labels used only in web browser maps like Dynmap.
+# These can have HTML formatting.
 map:
   barbarian: "Barbarian"
   barbarians: "Barbarians"
@@ -134,6 +143,8 @@ map:
   golem-spawns: "Golem Spawns"
   sanctuary: "Sanctuary"
   templates: "Monument Templates"
+# //// MENU \\\\
+# Text used in all inventory menus.
 menu:
   hint:
     disable: "Click to disable"
@@ -163,8 +174,6 @@ menu:
     admin-bypass: "Admin Bypass"
     border: "Border Display"
     flying: "Flying"
-    favor: "Display Favor"
-    map: "Display Map"
     hint-map-1: "Left-click for regular map"
     hint-map-2: "Right-click for far map"
     hint-favor: "Click to show favor costs"
@@ -436,6 +445,8 @@ menu:
     title-template: "Monument Templates"
     title-disband: "Disband Kingdom"
     title-capital: "Move Capital"
+# //// GENERIC \\\\
+# Messages used throughout the plugin.
 generic:
   notice:
     enable-auto: "Enabled. Use this command again to disable."
@@ -478,6 +489,8 @@ generic:
     disabled: "This feature is currently disabled, talk to an admin."
     region: "Cannot do this while setting other regions."
     failed: "Failed :("
+# //// PROTECTION \\\\
+# Messages about protecting blocks and land from players.
 protection:
   notice:
     ignore: "Use \"/k admin bypass\" to ignore protections."
@@ -539,6 +552,8 @@ protection:
     capital-immune: "This capital is immune to attacks while %s towns remain in the Kingdom of %s."
     no-allied-build: "This town's options do not allow players from allied kingdoms to build."
     template-modify: "This monument template is currently being modified and will be available soon."
+# //// COMMAND \\\\
+# Messages used for all commands.
 command:
   admin:
     camp:
@@ -888,6 +903,8 @@ command:
       fail-lord: "Failed to unclaim, you must be the town lord."
       fail-unclaimed: "Failed to unclaim, you must be standing in claimed territory."
       fail-center: "Failed to unclaim, cannot remove territory center."
+# //// SHOP \\\\
+# Messages used for chest shop integration.
 shop:
   error:
     use-disabled: "Cannot use shops here!"
@@ -897,12 +914,23 @@ shop:
     create-monument: "Cannot create a shop inside of monuments!"
     create-fail: "Cannot create a shop here!"
     create-wild: "Cannot create shops in the wild!"
+# //// REGION \\\\
+# Messages used for land region integration.
 region:
   error:
     claim-deny: "A nearby region denies claiming this land."
     unclaim-deny: "A nearby region denies unclaiming this land."
     travel-enter-deny: "A region at the destination denies traveling into it."
     travel-exit-deny: "A region at your current location denies traveling out of it."
+# //// DISCORD-SRV \\\\
+# Messages used for DiscordSRV integration.
+discord-srv:
+  discord: "Discord"
+  no-link: "You are not linked to Discord. Type /discord link"
+  no-user: "Couldn't find the Discord user you're linked to."
+  linked-user: "You're linked to %s in Discord."
+# //// DIRECTIVE \\\\
+# Labels and descriptions for the quest directives.
 directive:
   create-kingdom: "Foundations"
   create-kingdom-info: "Create your own Kingdom."
@@ -924,6 +952,8 @@ directive:
   capture-town-info: "Capture any Town in an enemy Kingdom by destroying the critical blocks within the Town Monument."
   kill-enemy: "Best Enemies"
   kill-enemy-info: "Kill a player from an enemy Kingdom."
+# //// PREFIX \\\\
+# Names for all accomplishment prefix titles and categories.
 prefix:
   category:
     clergy: "Clergy"
@@ -983,6 +1013,8 @@ prefix:
     chef: "Chef"
     cook: "Cook"
     baker: "Baker"
+# //// STAT \\\\
+# Names and descriptions for all accomplishment stats.
 stat:
   enchantments: "Enchantments"
   enchantments-info: "Enchantments applied to items"
@@ -1038,6 +1070,8 @@ stat:
   kingdoms-info: "New kingdoms created"
   conquests: "Conquests"
   conquests-info: "Enemy kingdoms conquered"
+# //// UPGRADE \\\\
+# Names and descriptions for all town upgrades.
 upgrade:
   disabled: "This town does not have enough population for the full upgrade level."
   loot:
@@ -1072,6 +1106,8 @@ upgrade:
   enchant:
     name: "Better Enchantments"
     level-1: "Raises enchantment offers by 1 level"
+# //// DESCRIPTION \\\\
+# Descriptions for all plugin commands.
 description:
   help: "Display the help message."
   menu: "Open the Konquest Main Menu."
@@ -1103,7 +1139,6 @@ description:
   admin-camp: "Manage a Barbarian Camp."
   admin-capture: "Capture a town for any Kingdom."
   admin-monument: "Manage a Monument Template."
-  admin-list: "Display all Kingdoms and Territories."
   admin-ruin: "Manage a Ruin territory."
   admin-sanctuary: "Manage a Sanctuary territory."
   admin-save: "Saves plugin data files."
@@ -1112,20 +1147,8 @@ description:
   admin-reload: "Reloads configuration files."
   admin-flag: "Set property flags for kingdoms and territories."
   admin-stat: "Manage player stats."
-territory:
-  wild: "Wild"
-  capital: "Capital"
-  town: "Town"
-  camp: "Camp"
-  ruin: "Ruin"
-  sanctuary: "Sanctuary"
-  other: "Other"
-diplomacy:
-  war: "War"
-  peace: "Peace"
-  trade: "Trade"
-  alliance: "Alliance"
-  self: "Your Kingdom"
+# //// PROPERTIES \\\\
+# Names and descriptions for all property flags in kingdoms and territories.
 properties:
   travel-name: "Travel"
   travel: "Allow travel to this territory"
@@ -1175,8 +1198,3 @@ properties:
   shop: "Allow players to create shops"
   arena-name: "Arena"
   arena: "Allow any players to fight each other"
-discord-srv:
-  discord: "Discord"
-  no-link: "You are not linked to Discord. Type /discord link"
-  no-user: "Couldn't find the Discord user you're linked to."
-  linked-user: "You're linked to %s in Discord."

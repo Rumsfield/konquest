@@ -48,17 +48,17 @@ public class Labeler {
     public static String lookup(KonquestRelationshipType type) {
         switch(type) {
             case BARBARIAN:
-                return MessagePath.PLACEHOLDER_BARBARIAN.getMessage();
+                return MessagePath.RELATIONSHIP_BARBARIAN.getMessage();
             case ENEMY:
-                return MessagePath.PLACEHOLDER_ENEMY.getMessage();
+                return MessagePath.RELATIONSHIP_ENEMY.getMessage();
             case FRIENDLY:
-                return MessagePath.PLACEHOLDER_FRIENDLY.getMessage();
+                return MessagePath.RELATIONSHIP_FRIENDLY.getMessage();
             case ALLY:
-                return MessagePath.PLACEHOLDER_ALLY.getMessage();
+                return MessagePath.RELATIONSHIP_ALLY.getMessage();
             case TRADE:
-                return MessagePath.PLACEHOLDER_TRADER.getMessage();
+                return MessagePath.RELATIONSHIP_TRADER.getMessage();
             case PEACEFUL:
-                return MessagePath.PLACEHOLDER_PEACEFUL.getMessage();
+                return MessagePath.RELATIONSHIP_PEACEFUL.getMessage();
             default:
                 break;
         }

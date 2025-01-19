@@ -10,22 +10,27 @@
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
 label:
+  admin: 管理員
   admin-kingdom: 管理員王國
   allied-building: 聯合建築商
   armor: 裝甲
-  armors: 裝甲
   back: 返回
   barbarian: 野蠻人
   barbarians: 野蠻人
   blocks: 方塊
   bypass: 避開
   camp: 營地
+  camps: 露營地
+  camp-clan: 營地族
   capital: 首都
+  capitals: 首都
+  captured: 被捕獲
   changing-capital: 更改為王國首都
   changing-town: 換到城鎮
   close: 關閉
   cost: 成本
   critical-hits: 致命打擊
+  current: "Current"
   diplomacy: 外交
   disabled: 禁用
   friendly-redstone: 友好紅石
@@ -34,7 +39,9 @@ label:
   favor: 寵幸
   flags: 旗幟
   golem-offense: 鐵傀儡攻擊
+  golem-spawns: "Iron Golem Spawns"
   health: 生命值
+  home: "Home"
   immunity: 免疫
   increment-cost: 增加成本
   information: 資訊
@@ -50,6 +57,7 @@ label:
   level: 等級
   loot-chests: 戰利品箱
   lord: 領主
+  map-color: "Map Color"
   master: 王國大師
   member: 成員
   members: 成員

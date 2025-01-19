@@ -17,7 +17,7 @@ public class CampIcon extends MenuIcon {
         this.camp = camp;
         this.isClickable = isClickable;
         // Item Lore
-        addProperty(MessagePath.LABEL_CAMP.getMessage());
+        addProperty(MessagePath.TERRITORY_CAMP.getMessage());
         if (camp.isProtected()) {
             addAlert(MessagePath.LABEL_PROTECTED.getMessage());
         }

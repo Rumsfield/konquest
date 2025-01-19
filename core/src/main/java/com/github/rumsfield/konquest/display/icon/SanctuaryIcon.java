@@ -17,7 +17,7 @@ public class SanctuaryIcon  extends MenuIcon {
         this.sanctuary = sanctuary;
         this.isClickable = isClickable;
         // Item Lore
-        addProperty(MessagePath.LABEL_SANCTUARY.getMessage());
+        addProperty(MessagePath.TERRITORY_SANCTUARY.getMessage());
         addNameValue(MessagePath.LABEL_WORLD.getMessage(), sanctuary.getWorld().getName());
     }
 

@@ -223,7 +223,7 @@ public class KingdomMenu extends StateMenu {
 				boolean isRelationsClickable = !kingdom.isPeaceful();
 				icon = new InfoIcon(MessagePath.MENU_KINGDOM_RELATION.getMessage(), Material.GOLDEN_SWORD, ROOT_SLOT_RELATIONSHIPS, isRelationsClickable);
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_RELATION.getMessage());
-				icon.addProperty(MessagePath.LABEL_OFFICER.getMessage());
+				icon.addProperty(MessagePath.RELATIONSHIP_RANK_OFFICER.getMessage());
 				if(isRelationsClickable) {
 					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 				} else {
@@ -238,7 +238,7 @@ public class KingdomMenu extends StateMenu {
 				icon = new InfoIcon(MessagePath.MENU_KINGDOM_REQUESTS.getMessage(), requestMat, ROOT_SLOT_REQUESTS, true);
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_REQUESTS.getMessage());
 				icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numRequests);
-				icon.addProperty(MessagePath.LABEL_OFFICER.getMessage());
+				icon.addProperty(MessagePath.RELATIONSHIP_RANK_OFFICER.getMessage());
 				icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 				icon.setState(MenuState.B_REQUESTS);
 				result.addIcon(icon);
@@ -251,7 +251,7 @@ public class KingdomMenu extends StateMenu {
 				boolean isPromoteClickable = kingdom.isPromoteable() || isAdmin;
 				icon = new InfoIcon(MessagePath.MENU_KINGDOM_PROMOTE.getMessage(), Material.IRON_HORSE_ARMOR, ROOT_SLOT_PROMOTE, isPromoteClickable);
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_PROMOTE.getMessage());
-				icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
+				icon.addProperty(MessagePath.RELATIONSHIP_RANK_MASTER.getMessage());
 				if(isPromoteClickable) {
 					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 				} else {
@@ -264,7 +264,7 @@ public class KingdomMenu extends StateMenu {
 				boolean isDemoteClickable = kingdom.isDemoteable() || isAdmin;
 				icon = new InfoIcon(MessagePath.MENU_KINGDOM_DEMOTE.getMessage(), Material.LEATHER_CHESTPLATE, ROOT_SLOT_DEMOTE, isDemoteClickable);
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_DEMOTE.getMessage());
-				icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
+				icon.addProperty(MessagePath.RELATIONSHIP_RANK_MASTER.getMessage());
 				if(isDemoteClickable) {
 					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 				} else {
@@ -278,7 +278,7 @@ public class KingdomMenu extends StateMenu {
 					boolean isTransferClickable = kingdom.isTransferable() || isAdmin;
 					icon = new InfoIcon(MessagePath.MENU_KINGDOM_TRANSFER.getMessage(), Material.IRON_HELMET, ROOT_SLOT_TRANSFER, isTransferClickable);
 					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_TRANSFER.getMessage());
-					icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
+					icon.addProperty(MessagePath.RELATIONSHIP_RANK_MASTER.getMessage());
 					if(isTransferClickable) {
 						icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 					} else {
@@ -292,7 +292,7 @@ public class KingdomMenu extends StateMenu {
 				if(getKonquest().getKingdomManager().getIsTownDestroyMasterEnable()) {
 					icon = new InfoIcon(MessagePath.MENU_TOWN_DESTROY.getMessage(), Material.FLINT_AND_STEEL, ROOT_SLOT_DESTROY, true);
 					icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_DESTROY.getMessage());
-					icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
+					icon.addProperty(MessagePath.RELATIONSHIP_RANK_MASTER.getMessage());
 					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 					icon.setState(MenuState.C_DESTROY);
 					result.addIcon(icon);
@@ -302,7 +302,7 @@ public class KingdomMenu extends StateMenu {
 				if(getKonquest().getKingdomManager().getIsCapitalSwapEnable()) {
 					icon = new InfoIcon(MessagePath.MENU_KINGDOM_CAPITAL.getMessage(), Material.PISTON, ROOT_SLOT_CAPITAL, true);
 					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_CAPITAL.getMessage());
-					icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
+					icon.addProperty(MessagePath.RELATIONSHIP_RANK_MASTER.getMessage());
 					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 					icon.setState(MenuState.C_CAPITAL);
 					result.addIcon(icon);
@@ -311,7 +311,7 @@ public class KingdomMenu extends StateMenu {
 				/* Open/Close Button */
 				String currentValue = DisplayManager.boolean2Lang(kingdom.isOpen())+" "+DisplayManager.boolean2Symbol(kingdom.isOpen());
 				icon = new InfoIcon(MessagePath.LABEL_OPEN.getMessage(), Material.IRON_DOOR, ROOT_SLOT_OPEN, true);
-				icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
+				icon.addProperty(MessagePath.RELATIONSHIP_RANK_MASTER.getMessage());
 				icon.addNameValue(MessagePath.LABEL_CURRENT.getMessage(), currentValue);
 				icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
 				icon.setState(MenuState.C_OPEN);
@@ -320,7 +320,7 @@ public class KingdomMenu extends StateMenu {
 				/* Template Icon */
 				boolean isTemplateClickable = kingdom.isMonumentTemplateValid();
 				icon = new InfoIcon(MessagePath.MENU_KINGDOM_TEMPLATE.getMessage(), Material.CRAFTING_TABLE, ROOT_SLOT_TEMPLATE, isTemplateClickable);
-				icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
+				icon.addProperty(MessagePath.RELATIONSHIP_RANK_MASTER.getMessage());
 				icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_TEMPLATE.getMessage());
 				icon.addNameValue(MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage(), kingdom.getMonumentTemplateName());
 				icon.addNameValue(MessagePath.LABEL_CRITICAL_HITS.getMessage(), kingdom.getMonumentTemplate().getNumCriticals());
@@ -341,7 +341,7 @@ public class KingdomMenu extends StateMenu {
 				/* Disband Icon */
 				if(!kingdom.isAdminOperated()) {
 					icon = new InfoIcon(MessagePath.MENU_KINGDOM_DISBAND.getMessage(), Material.BONE, ROOT_SLOT_DISBAND, true);
-					icon.addProperty(MessagePath.LABEL_MASTER.getMessage());
+					icon.addProperty(MessagePath.RELATIONSHIP_RANK_MASTER.getMessage());
 					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_DISBAND.getMessage());
 					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 					icon.setState(MenuState.C_DISBAND);
@@ -754,9 +754,9 @@ public class KingdomMenu extends StateMenu {
 				continue;
 			}
 			icon = new PlayerIcon(currentPlayer,getColor(player,offlinePlayer),getRelation(player,offlinePlayer),0,isClickable);
-			String kingdomRole = kingdom.getPlayerRoleName(currentPlayer);
+			String kingdomRole = kingdom.getPlayerRankName(currentPlayer);
 			if(!kingdomRole.isEmpty()) {
-				icon.addNameValue(MessagePath.LABEL_KINGDOM_ROLE.getMessage(), kingdomRole);
+				icon.addNameValue(MessagePath.LABEL_KINGDOM_RANK.getMessage(), kingdomRole);
 			}
 			if(!loreHintStr1.isEmpty()) {
 				icon.addHint(loreHintStr1);

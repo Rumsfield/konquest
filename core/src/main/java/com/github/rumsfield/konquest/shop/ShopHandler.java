@@ -120,10 +120,23 @@ public class ShopHandler {
                 konquest.getKingdomManager().isPlayerAlly(player,territory.getKingdom()) ||
                 territory.getTerritoryType().equals(KonquestTerritoryType.SANCTUARY);
 
+        boolean isPropertyAllowed = true;
+        if(territory instanceof KonPropertyFlagHolder) {
+            KonPropertyFlagHolder holder = (KonPropertyFlagHolder)territory;
+            if(holder.hasPropertyValue(KonPropertyFlag.SHOP)) {
+                isPropertyAllowed = holder.getPropertyValue(KonPropertyFlag.SHOP);
+            }
+        }
+
         // Bypass all checks for admins in bypass mode
         if(!player.isAdminBypassActive() && !isRelationAllowed) {
             notifyAdminBypass(bukkitPlayer);
             ChatUtil.sendError(bukkitPlayer, MessagePath.SHOP_ERROR_USE_RELATION.getMessage());
+            return false;
+        }
+        if(!player.isAdminBypassActive() && !isPropertyAllowed) {
+            notifyAdminBypass(bukkitPlayer);
+            ChatUtil.sendError(bukkitPlayer, MessagePath.SHOP_ERROR_USE_DISABLED.getMessage());
             return false;
         }
 
