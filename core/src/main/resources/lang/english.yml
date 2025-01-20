@@ -109,7 +109,7 @@ diplomacy:
   trade: "Trade"
   alliance: "Alliance"
   self: "Your Kingdom"
-# //// LABEL \\\\
+# //// RELATIONSHIP \\\\
 # Names for relationships between players, their ranks within a kingdom, and their roles within a town.
 relationship:
   friendly: "Friendly"
@@ -168,7 +168,6 @@ menu:
     kingdom: "Kingdom Menu"
     town: "Town Menu"
     travel: "Travel Menu"
-    hint: "Click to open"
     map-auto: "Map Auto Mode"
     kingdom-chat: "Kingdom Chat"
     admin-bypass: "Admin Bypass"

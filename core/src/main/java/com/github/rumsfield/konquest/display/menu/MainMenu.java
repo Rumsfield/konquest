@@ -101,14 +101,14 @@ public class MainMenu extends StateMenu {
         /* Help Menu */
         icon = new InfoIcon(MessagePath.MENU_MAIN_HELP.getMessage(), CommandType.HELP.iconMaterial(), ROOT_SLOT_HELP, true);
         icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_HELP.getMessage());
-        icon.addHint(MessagePath.MENU_MAIN_HINT.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.HELP);
         result.addIcon(icon);
 
         /* Dashboard */
         icon = new InfoIcon(MessagePath.MENU_MAIN_DASHBOARD.getMessage(), Material.CLOCK, ROOT_SLOT_DASH, true);
         icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_DASHBOARD.getMessage());
-        icon.addHint(MessagePath.MENU_MAIN_HINT.getMessage());
+        icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.DASHBOARD);
         result.addIcon(icon);
 

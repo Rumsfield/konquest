@@ -147,7 +147,6 @@ public enum MessagePath {
 	MENU_MAIN_KINGDOM                           (0, "menu.main.kingdom"),
 	MENU_MAIN_TOWN                              (0, "menu.main.town"),
 	MENU_MAIN_TRAVEL                            (0, "menu.main.travel"),
-	MENU_MAIN_HINT                              (0, "menu.main.hint"),
 	MENU_MAIN_MAP_AUTO                          (0, "menu.main.map-auto"),
 	MENU_MAIN_KINGDOM_CHAT                      (0, "menu.main.kingdom-chat"),
 	MENU_MAIN_ADMIN_BYPASS                      (0, "menu.main.admin-bypass"),
