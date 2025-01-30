@@ -1,0 +1,1199 @@
+# Language File
+# Turkish
+# To use this file, set core.yml language: turkish
+# 
+# "%s" are substitutes for words or numbers by the plugin.
+# If a line has "%s", keep it. You cannot add or remove any "%s".
+# Use online YAML parsing tools to check for valid syntax:
+# https://yaml-online-parser.appspot.com/
+# 
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
+# //// LABEL \\\\
+# Eklenti boyunca kullanılan basit kelimeler veya ifadeler.
+label:
+  admin: Yönetici
+  admin-kingdom: Yönetici Krallığı
+  allied-building: Müttefik Yapı
+  armor: Zırh
+  back: Geri
+  barbarian: Barbar
+  blocks: Bloklar
+  bypass: BYPASS
+  camps: Kamplar
+  camp-clan: Kamp Klanı
+  capitals: Başkentler
+  captured: Yakalandı
+  changing-capital: Sermayeye Geçiş
+  changing-town: Şehre Geçiş
+  close: Kapat
+  cost: Ücret
+  critical-hits: Kritik Vuruş
+  current: Akım
+  diplomacy: Diplomasi
+  disabled: Engelli
+  friendly-redstone: Dost Kızıltaş
+  enemy-redstone: Düşman Kızıltaş
+  false: Yanlış
+  favor: Para
+  flags: Bayraklar
+  golem-offense: Demir Golem Hücumu
+  golem-spawns: Demir Golem Doğurur
+  health: Can
+  home: Ev
+  immunity: Dokunulmazlık
+  increment-cost: Yükseltme Ücreti
+  information: Bilgi
+  invalid: Geçersiz
+  kingdom: Krallık
+  kingdom-role: Krallık Rolü
+  kingdoms: Krallıklar
+  knights: Şovalyeler
+  land: Alan
+  last-seen: Son Görülme %s
+  leaderboard: Liderlik Tablosu
+  level: Seviye
+  loot-chests: Ganimet Sandığı
+  map-color: Harita Rengi
+  members: Üyeler
+  modified: Değiştirildi
+  monument-template: Anıt Şablonu
+  monument-templates: Anıt Şablonları
+  neutrals: Tarafsızlar
+  next: Sonraki
+  no-lord: Lordsuz
+  no-permission: İzin Yok
+  officers: Memurlar
+  online-players: Çevrim içi Oyuncular
+  open: Açık
+  options: Ayarlar
+  owner: Mal sahibi
+  peaceful: Barışçıl
+  player: Oyuncu
+  players: Oyuncular
+  plot: Arsa
+  population: Nufüs
+  properties: Özellikler
+  protected: Korunaklı
+  residents: Oturan Kişiler
+  return: Geri dönmek
+  ruins: Kalıntılar
+  sanctuaries: Kutsal Alanlar
+  score: Skor
+  shield: Kalkan
+  smallest: En Küçük
+  specialization: Uzmanlık
+  total: Toplam
+  towns: Kasabalar
+  town-role: Kasaba Rolü
+  travel: Seyahat
+  true: Doğru
+  unavailable: Mevcut Değil
+  upgrades: Yükseltme
+  valid: Geçerli
+  world: Dünya
+# //// TERRITORY \\\\
+# Farklı toprak tiplerinin isimleri.
+territory:
+  wild: Vahşi
+  capital: Başkent
+  town: Kasaba
+  camp: Kamp
+  ruin: Harabe
+  sanctuary: Güvenli Bölge
+# //// DIPLOMACY \\\\
+# Krallıklar arasındaki diplomatik ilişkilere verilen adlar.
+diplomacy:
+  war: Savaş
+  peace: Barış
+  trade: Ticaret
+  alliance: İttifak
+  self: Krallığınız
+# //// RELATIONSHIP \\\\
+# Oyuncular arasındaki ilişkilere, krallık içindeki rütbelerine ve kasaba içindeki rollerine ait isimler.
+relationship:
+  friendly: Dost
+  enemy: Düşman
+  barbarian: Barbar
+  ally: Müttefik
+  trader: Ticaret
+  peaceful: Barışçıl
+  rank-master: Usta
+  rank-officer: Memur
+  rank-member: Üye
+  role-lord: Lord
+  role-knight: Şövalye
+  role-resident: İkamet eden kişi
+# //// MAP \\\\
+# Etiketler sadece Dynmap gibi web tarayıcısı haritalarında kullanılır.
+# Bunlar HTML biçimlendirmesine sahip olabilir.
+map:
+  barbarian: Barbar
+  barbarians: Barbarlar
+  kingdom: Krallık
+  capital: Başket
+  town: Kasaba
+  towns: Kasabalar
+  land: Alan
+  players: Oyuncular
+  lord: Lord
+  population: Nüfus
+  ruin: Kalıntı
+  critical-hits: Kritik Vuruşlar
+  golem-spawns: Golem Doğum Yeri
+  sanctuary: Koruma Alanı
+  templates: Anıt Şablonları
+# //// MENU \\\\
+# Tüm envanter menülerinde kullanılan metin.
+menu:
+  hint:
+    disable: Devre dışı bırakmak için tıklayın
+    apply: Uygulamak için tıklayın
+    view: Görüntülemek için tıklayın
+    open: Açmak için tıklayın
+    charge: Ücretlendirmek için tıklayın
+    change: Değiştirmek için tıklayın
+    travel: Seyahat etmek için tıklayın
+    exit: Menüden çık
+  main:
+    title: Konquest Ana Menü
+    title-dashboard: Konquest Panosu
+    dashboard: Pano
+    help: Konquest Yardım Menüsü
+    info: Bilgi Menüsü
+    quest: Görev Kitabı
+    stats: Başarı İstatistikleri Kitabı
+    prefix: Ön Ek Menüsü
+    score: Puan Menüsü
+    kingdom: Krallık Menüsü
+    town: Kasaba Menüsü
+    travel: Seyahat Menüsü
+    map-auto: Harita Otomatik Modu
+    kingdom-chat: Krallık Sohbeti
+    admin-bypass: Yönetici Atlama
+    border: Sınır Gösterimi
+    flying: Uçan
+    hint-map-1: Normal harita için sol tıklama
+    hint-map-2: Uzak harita için sağ tıklama
+    hint-favor: Favor maliyetlerini göstermek için tıklayın
+    hint-spy: Casus haritası satın almak için tıklayın
+    description-dashboard: Ayarlarınızı değiştirin ve komutları kullanın.
+    description-help: Nasıl oynanacağına dair ipuçlarını ve komut listelerini görüntüleyin.
+    description-info: Tüm oyuncular, krallıklar, kasabalar ve daha fazlası hakkında bilgi görüntüleyin.
+    description-quest: Ödüllere doğru ilerlemenizi görmek için görev kitabınızı açın.
+    description-stats: Başarı istatistiklerinizi ve yeni önek ünvanlarına doğru ilerlemenizi görmek için istatistik kitabınızı açın.
+    description-prefix: Sohbette adınızla birlikte gösterilen önek ünvanınızı değiştirin.
+    description-score: Oyuncular ve krallıklar için puanları ve liderlik tablolarını görüntüleyin.
+    description-kingdom: Krallığınızı yönetin, diğer krallıklara katılın veya barbar olun.
+    description-town: Kasabalarınızı yönetin ve diğer kasabalara katılın.
+    description-travel: Çeşitli hedeflere ışınlanın.
+  stats:
+    title: Başarı İstatistikleri
+    intro-1: Bu kitabı tekrar açmak için "/k stats" veya "/k s" komutlarını kullan.
+    intro-2: Başarımlar için istatistiklerinizi görüntüleyin; bu, kullanabileceğiniz yeni Lakap kilidini açar.
+    max: Son Seviye
+    category: Başarı Kategorisi
+    next: Sonraki Lakap
+    unlock: Kilidi Açılmış Lakaplar
+    amount: İstatistik Tutarı
+    points: Başarı Puanları
+  quest:
+    title: Görev Günlüğü
+    intro-1: Bu kitabı tekrar açmak için "/k quest" veya "/k q" komutlarını kullan.
+    intro-2: Bu görevleri tamamlayarak arazi talep etmek ve yeni kasabalar kurmak için kullanılan Para kazanın.
+    reward: Para Ödülü
+  upgrade:
+    title: Mevcut Kasaba Yükseltmeleri
+    fail-level: Seviye %s seviyesi %s eklenemedi, seviye maksimumdan büyük veya mevcut seviyeden çok yüksek, %s.
+    fail-population: Seviye%s seviyesi %s eklenemedi, kasaba nüfusu çok düşük, %s gerekiyor.
+    fail-cost: Seviye %s seviyesi %s eklenemedi, %s Para gerektiriyor.
+    fail-attack: Kasaba saldırı altındayken herhangi bir yükseltme yapılamadı!
+    add: -%s Kasabasına %s seviyesi %s eklendi!
+  help:
+    title-start: Konquest Başlarken
+    title-commands: Konquest Komutları
+    title-admin: Konquest Yönetici Komutları
+    description-start: Konquest'i nasıl oynayacağınıza dair ipuçları bulun.
+    description-community: Bu sunucunun çevrimiçi topluluğuna erişin.
+    description-main: Konquest Ana Menüsüne gidin.
+    description-commands: Tüm sohbet komutlarını görüntüleyin.
+    description-admin: Tüm yönetici sohbet komutlarını görüntüleyin.
+    description-quest: Görev kitabınızı açın.
+    start: Başlarken
+    community: Topluluk
+    main: Ana Menü
+    commands: Komutlar
+    admin: Yönetici Komutları
+    quest: Görev Kitabı
+    tip-1: Barbarlar, krallığı olmayan varsayılan oyunculardır. Kamp kurmak, diğer barbarlara saldırmak ve kasabaları yok etmek için yataklar yerleştirebilirler.
+    tip-2: Krallık menüsünü açmak ve krallıklara katılmak için "/k kingdom" kullanın veya kendi krallığınızı oluşturmak için "/k kingdom create" kullanın.
+    tip-3: Diğer krallıklar için diplomasi seçenekleri barış, ticaret, ittifak, savaştır. Savaştaki düşman krallıklar birbirlerinin kasabalarını ele geçirebilir.
+    tip-4: Krallığınız için yeni kasabalar oluşturmak için "/k settle" kullanın. Çevredeki arazileri ve konumunuzun yerleşilebilir olup olmadığına dair bir ipucu görmek için "/k map" kullanın.
+    tip-5: Krallığınızdaki kasabalara katılmak ve çıkmak ve kontrol ettiğiniz kasabaları yönetmek için "/k town" ile Kasaba Menüsünü açın.
+    tip-6: Konteynerleri ve hayvanları düşmanlardan korumak, istatistiklerinizi ve puanınızı artırmak ve canavarların ortaya çıkmasını önlemek için "/k claim" ile kasaba arazisini talep edin.
+    tip-7: Kasaba Menüsünde yalnızca belirli sakinlerin inşa edebileceği kasaba parselleri ayarlayın. Kasaba seçeneklerini sakinlerin yalnızca kendi parsellerinde inşa etmelerine izin verecek şekilde değiştirin.
+    tip-8: Kasabalarınızı düşman oyunculardan korumak için Demir Golemler inşa edin. Harabeleri arayın ve bir ödül için Harabe Golemlerini yenin.
+    tip-9: Oyuncu istatistiklerini görüntülemek için "/k stats" ve "/k score" kullanın. Kendi sohbet başlığınızı belirlemek için "/k prefix" kullanın. İstatistikleri artırılmış unvanların kilidini açın.
+  score:
+    kingdom-towns: Krallığın Kasabaları
+    kingdom-land: Krallığın Alanları
+    kingdom-favor: Krallığın Parası
+    kingdom-population: Krallığın Nüfusu
+    town-1: Oyuncu Lordlukları
+    land-1: Lord Kasabası Arazisi
+    town-2: Oyuncu Şövalyelikleri
+    land-2: Şövalye Kasabası Arazisi
+    town-3: Oyuncu Konaklamaları
+    land-3: Sakin Kasaba Arazisi
+    player-score: Oyuncu Skoru
+    kingdom-score: Krallık Puanı
+    description-players: Tüm oyuncu puanlarını listeleyin ve ayrıntıları görüntüleyin
+    description-kingdoms: Tüm krallık puanlarını listeleyin ve liderlik tablolarıyla ayrıntıları görüntüleyin
+    leaderboard-empty: Bu krallığın skor liderlik tablosunda hiçbir oyuncu yok
+  map:
+    center: Harita Merkezi
+    proximity: Yakınlık
+    settle-hint: Buraya Yerleşin
+  prefix:
+    title-prefix: Önek Başlıkları
+    title-custom: Özel Önekler
+    title-stats: Başarı İstatistikleri
+    current-prefix: Mevcut Önek
+    disable-prefix: Öneki Devre Dışı Bırak
+    description-prefix: Adınız için yeni bir önek başlığı seçin
+    description-custom: Adınız için özel bir önek satın alın
+    description-stats: Yeni önek başlıklarının kilidini açmak için kullanılan istatistiklerinizi gösterin
+  shield:
+    fail-max: Şarj edilemedi, maksimum %s sınırı aşıldı.
+    fail-add: Şarj edilemedi, mevcut Şarja eklenemiyor.
+    fail-attack: Kasaba saldırı altındayken Şarj başarısız oldu!
+    fail-cost: Şarj edilemedi, %s para gerekiyor.
+    activate-new:  Şarj edildi %s için %s.
+    activate-add:  .%s ile şarj %s artırıldı.
+  options:
+    allied-building: Dost oyuncular inşa edebilir
+    open: Tüm krallık üyeleri sandık inşa edebilir ve kullanabilir
+    plot: Sakinler yalnızca arsalarda sandık inşa edebilir ve kullanabilirler
+    friendly-redstone: Krallık üyeleri redstone anahtarlarını ve kapılarını kullanabilir
+    redstone: Düşmanlar redstone anahtarlarını ve kapılarını kullanabilir
+    golem: Demir Golemler içeri giren tüm düşmanlara saldıracak
+  info:
+    camp-placed: Barbar Kampı yerleştirildi.
+    camp-missing: Bu oyuncunun kampı yok.
+    ruin-status: Ele Geçirme Durumu
+    ruin-capture: Bu Harabe bir ödül karşılığında ele geçirilebilir.
+    template-kingdoms: Bu Anıt Şablonunu kullanan tüm krallıkları listeleyin.
+  travel:
+    description-capital: Krallığınızın başkentine gidin.
+    description-home: Ev yatağınıza gidin.
+    description-camp: Barbar kampınıza gidin.
+    description-wild: Vahşi doğada rastgele bir yere gidin.
+  plots:
+    edit-add-land: Alan Ekle
+    edit-remove-land: Alan Kaldır
+    edit-add-players: Oyuncu Ekle
+    edit-remove-players: Oyuncuları Kaldır
+    edit-show-players: Oyuncuları Göster
+    capital-land: Başkent Alanı
+    town-land: Kasaba Alanı
+    town-monument: Kasaba Anıtı
+    editing-plot: Arazi Düzenleme
+    click-delete: Araziyi Silmek İçin Tıklayın
+    click-edit: Araziyi Düzenlemek İçin Tıklayın
+    click-remove-chunk: Chunk Kaldırmak İçin Tıklayın
+    click-remove-player: Oyuncuyu Kaldırmak İçin Tıklayın
+    click-create: Arazi Oluşturmak İçin Tıklayın
+    click-add-chunk: Chunk Eklemek İçin Tıklayın
+    click-add-player: Oyuncu Eklemek İçin Tıklayın
+    click-move-player: Oyuncuyu Hareket Ettirmek İçin Tıklayın
+    here: Burdasın
+    title-plots: Kasaba Arazileri
+    title-create: Arazi Oluştur
+    title-delete: Arazi Sil
+    title-edit: Arazi Düzenle
+    title-edit-options: Ayarları Düzenle
+    title-add-land: Alan Ekle
+    title-add-players: Oyuncu Ekle
+    title-remove-land: Alan Kaldır
+    title-remove-players: Oyuncu Kaldır
+    title-show-players: Oyuncuları Göster
+    button-create: Oluştur
+    button-delete: Sil
+    button-edit: Düzenle
+    button-return: Geri
+    button-finish: Bitir
+  town:
+    join: Katıl
+    leave: Ayrıl
+    list: Liste
+    invites: Davetler
+    manage: Yönet
+    requests: İstekler
+    plots: Araziler
+    shields: Kalkanlar
+    armor: Zırhlar
+    promote: Terfi Yükselt
+    demote: Terfi Düşür
+    transfer: Transfer
+    destroy: Yok Et
+    upgrades: Yükseltmeler
+    options: Ayarlar
+    special: Uzmanlık
+    description-join: Yeni bir kasabaya katıl
+    description-leave: Mevcut bir kasabayı bırak
+    description-list: Krallığınızdaki tüm kasabaları listele
+    description-invites: Kasaba sakinleri davetlerini göster
+    description-manage: Kasabalarınızın sakinlerini ve seçeneklerini yönet
+    description-requests: Bu kasabaya katılma taleplerini göster
+    description-plots: Kasaba arazilerini yönet
+    description-shields: Kasaba kalkanlarını uygula
+    description-armor: Kasaba zırhlarını uygula
+    description-promote: Sakinleri şovalye olarak terfi ettir
+    description-demote: Şövalyeleri sakin olarak geri al
+    description-transfer: Lordu başka bir sakine transfer et
+    description-destroy: Kasabayı ve onun talep edilen arazilerini yok et
+    description-upgrades: Kasaba yükseltmelerini uygula
+    description-options: Kasaba seçeneklerini düzenle
+    description-special: Ticaret indirimleri için bir meslek seç
+    hint-join: Katılma isteği göndermek için tıklayın
+    hint-join-now: Hızla katılmak için tıklayın
+    hint-leave: Ayrılmak için tıklayın
+    hint-accept: Kabul etmek için sol tıklayın
+    hint-decline: Reddetmek için sağ tıklayın
+    hint-manage: Yönetmek için tıklayın
+    hint-promote: Şövalye olarak terfi ettirmek için tıklayın
+    hint-demote: Sakin olarak geri almak için tıklayın
+    hint-transfer: Lord vermek için tıklayın
+    hint-destroy: Kasabayı silmek için tıklayın
+    hint-special: Uzmanlık seçmek için tıklayın
+    lore-special: Bu mesleği seçerek bu kasabadaki köylülerden indirim alın.
+    info-special: Bu meslekten köylüler, bu kasabada indirimler sunar.
+    title-join: Kasabaya Katıl
+    title-leave: Kasabayı Bırak
+    title-list: Kasaba Listesi
+    title-invites: Sakin Davetleri
+    title-manage-town: Yönetilen Kasabalar
+    title-requests: Sakin Talepleri
+    title-manage: Kasaba Yönetim Menüsü
+    title-destroy: Kasabayı Yok Et
+  kingdom:
+    join: Katıl
+    create: Yaratmak
+    exile: Sürgün
+    invites: Davetler
+    list: Liste
+    relation: İlişkiler
+    requests: Talepler
+    promote: Terfi Ettir
+    demote: Geri Al
+    transfer: Transfer Et
+    template: Şablonlar
+    disband: Dağıt
+    capital: Başkent
+    description-join: Bir krallığa katılma talebinde bulunun veya kendi krallığınızı /k kingdom create komutu ile oluşturun
+    description-create: Mevcut konumunuzda yeni bir Krallık Başkenti yaratın
+    description-exile: Mevcut krallığınızı bırakın ve barbar olun
+    description-invites: Krallığınızın davetlerini görüntüleyin
+    description-list: Tüm krallıkları görüntüleyin
+    description-relation: Diğer krallıklarla ilişkileri düzenleyin
+    description-requests: Krallık üyeliği taleplerini görüntüleyin
+    description-promote: Üyeleri memur olarak terfi ettirin
+    description-demote: Memurları üye olarak geri alın
+    description-transfer: Lord'u başka bir üyeye transfer edin
+    description-template: Krallık anıtı şablonunu değiştirin
+    description-disband: Krallığı dağıtın ve silin
+    description-capital: Başkenti başka bir şehre taşıyın
+    hint-exile: Barbar olmak için tıklayın
+    hint-disband: Krallığınızı silmek için tıklayın
+    hint-template: Şablonları değiştirmek için tıklayın
+    hint-join: Katılma talebi göndermek için tıklayın
+    hint-join-now: Hızla katılmak için tıklayın
+    hint-accept: Kabul etmek için sol tıklayın
+    hint-decline: Reddetmek için sağ tıklayın
+    hint-relation: Diplomasi seçmek için tıklayın
+    hint-diplomacy: Uygulamak için tıklayın
+    hint-promote: Şövalye olarak terfi ettirmek için tıklayın
+    hint-demote: Üye olarak geri almak için tıklayın
+    hint-transfer: Lord vermek için tıklayın
+    hint-capital: Başkente geçmek için tıklayın
+    they-requested: Onlar Talep Etti
+    we-requested: Biz Talep Ettik
+    diplomacy-peace-war-instant: Anında barış ilan et
+    diplomacy-peace-war-request: Barış talep et
+    diplomacy-peace-trade: Ticareti bitir ve barış ilan et
+    diplomacy-peace-alliance: İttifakı sonlandır ve barış ilan et
+    diplomacy-trade-peace: Ticaret talep et
+    diplomacy-trade-alliance: İttifakı sonlandır ve ticaret talep et
+    diplomacy-war-instant: Anında savaş ilan et
+    diplomacy-war-request: Savaş talep et
+    diplomacy-alliance: İttifak talep et
+    diplomacy-peace-info: Varsayılan. PvP'ye izin verebilir.
+    diplomacy-trade-info: PvP yok. Köylü ticaret indirimleri. Sandık dükkanlarını kullanın.
+    diplomacy-alliance-info: PvP yok. Köylü ticaret indirimleri. Sandık dükkanlarını kullanın. Savunma paktı. Kasabalara ve başkente seyahat edin.
+    diplomacy-war-info: PvP. Kasabaları ve başkenti saldırın ve ele geçirin.
+    title-join: Bir Krallığa Katıl
+    title-confirm: Emin misiniz?
+    title-invites: Krallık Davetleri
+    title-list: Krallık Listesi
+    title-relations: İlişkiler
+    title-diplomacy: Diplomasi
+    title-requests: Katılma Talepleri
+    title-promotion: Terfiler
+    title-demotion: Geri Alma
+    title-transfer: Krallık Lordu Transferi
+    title-template: Anıt Şablonları
+    title-disband: Krallığı Dağıt
+    title-capital: Sermayeyi Taşı
+# //// GENERIC \\\\
+# Eklenti boyunca kullanılan mesajlar.
+generic:
+  notice:
+    enable-auto: Etkinleştirildi. Devre dışı bırakmak için bu komutu tekrar kullanın.
+    disable-auto: Devre dışı bırakıldı.
+    reduce-favor: Para %s azaltıldı, toplam %s
+    reward-favor: Para ile ödüllendirildi %s, toplam %s
+    reward-exp: EXP ödüllendirildi %s
+    discount-favor: '%s yüzde indirim, %s Para tasarruf ettiniz.'
+    click-air: İptal etmek için Hava'ya tıklayın.
+    clicked-air: Hava'ya tıklandı, bölge oluşturma iptal edildi.
+    success: Başarıyla!
+    small-kingdom: Krallığınız şu anda en küçüğü, %s yüzde deneyim artışının tadını çıkarın!
+    wild: Yaban
+    accomplishment: Bir Başarıya İmza Attınız!
+    prefix-unlock: Başarı lakabı açıldı
+    prefix-lost: Başarı lakabı kayboldu
+    quest: Görev tamamlandı
+    loot: Yeni kasaba anıtı ganimeti mevcut.
+    absent: Çok uzun süre yoktunuz ve tüm kasabalardan atıldınız.
+    force-barbarian: Artık bir barbar oldunuz!
+  error:
+    deny-barbarian: Barbarlar bunu yapamaz.
+    internal: İçsel hata, bir admin ile iletişime geçin.
+    internal-message: 'İçsel hata: %s'
+    invalid-parameters: Komut yanlış argümanlar içeriyor. /k help komutunu kullanın.
+    invalid-parameters-admin: Admin komutu yanlış argümanlar içeriyor. /k admin help komutunu kullanın.
+    invalid-world: Bu komut bu dünyada kullanılamaz.
+    no-permission: Bunu yapma izniniz yok.
+    no-allow: Bunu yapmanıza izin verilmiyor.
+    no-player: Bunu yapmak için bir oyuncu olmalısınız!
+    unknown-name: 'Bilinmeyen adı bulamadı, yazımı kontrol edin: %s'
+    bad-name: Krallığınızda %s bulunamadı.
+    format-name: İsim sadece harf ve/veya rakamlardan oluşmalıdır.
+    length-name: İsim 20 karakterden uzun olamaz.
+    taken-name: Bu isim zaten alınmış.
+    no-favor: Yeterli Favor yok, %s gerekli.
+    invalid-player: Bu oyuncu geçerli değil.
+    enemy-player: Bu oyuncu bir düşmandır.
+    enemy-town: Bu bir düşman kasabasıdır.
+    disabled: Bu özellik şu anda devre dışı, bir admin ile konuşun.
+    region: Diğer bölgeleri ayarlarken bunu yapamazsınız.
+    failed: Başarısız :(
+# //// PROTECTION \\\\
+# Blok ve arazilerin oyunculardan korunmasına dair mesajlar.
+protection:
+  notice:
+    ignore: Korumaları görmezden gelmek için "/k admin bypass" komutunu kullanın.
+    peaceful-town: '%s Kasabası barışçıldır ve saldırıya uğrayamaz.'
+    peaceful-player: Krallığınız barışçıldır, kasabalara saldırı yapamazsınız.
+    peaceful-victim: Barışçıl krallıklardaki oyunculara saldırı yapamazsınız.
+    peaceful-attacker: Krallığınız barışçıldır ve oyunculara saldırı yapamazsınız.
+    camp-destroy: '%s yok edildi!'
+    camp-destroy-owner: Kampınız yok edildi!
+    camp-create: Kampınızı başarıyla kurdunuz.
+    camp-clan-add: '%s kamp klanınıza eklendi.'
+    camp-clan-remove: '%s kamp klanınızdan çıkarıldı.'
+    critical: Kritik Vuruş! %s Kritik Blok kaldı
+    tagged: Hasar Alındı
+    tag-message: Savaşta Hasar Aldınız.
+    untagged: Savaş Süresi Doldu
+    untag-message: Artık savaşta değilsiniz.
+    loot-later: Daha fazla ganimet için daha sonra geri dönün!
+    loot-capture: Ganimet, bu Harabe yakalanana kadar sıfırlanacak.
+    raid: '%s\'de düşman tespit edildi, savunmak için "/k travel %s" kullanın!'
+    raid-alert: Akın Uyarısı
+    raid-capture-1: '%s fethediliyor! Savunmak ve %s Favor almak için "/k travel %s" kullanın!'
+    raid-capture-2: '%s yarı güçte! Savunmak ve %s Favor almak için "/k travel %s" kullanın!'
+    raid-capture-3: '%s kritik durumda! Savunmak ve %s Favor almak için "/k travel %s" kullanın!'
+    raid-discord-channel: Düşman %s kasabasını ele geçiriyor, savunmak için hemen sunucuya katılın!
+    raid-discord-direct: Düşman oyuncular krallığınızdaki %s kasabasını ele geçiriyor, %s! Savunmak için hemen sunucuya katılın.
+    raze: '%s Kasabası Barbarların ordusu tarafından yok edildi!'
+    destroy: '%s\'yi Barbarların ordusu için yok ettiniz!'
+    conquer: '%s Kasabası fethedildi!'
+    capture: '%s\'yi %s'nin fethedilmesi için ele geçirdiniz!'
+    kingdom-warmup: '%s Krallığı %s dakika içinde korunacak.'
+    kingdom-conquer: '%s Krallığı %s tarafından fethedildi!'
+    kingdom-raze: '%s Krallığı Barbarların ordusu tarafından yok edildi!'
+    town-warmup: '%s Krallığındaki bu kasabalar %s dakika içinde korunacak %s'
+    ruin: '%s Harabesini ele geçirdiniz.'
+    safe: '%s Kasabası şu anda güvenli...'
+    attacked: Saldırı Altında
+    template-modify: Anıt Şablonu %s değiştiriliyor ve geçici olarak kullanılamaz.
+    template-ready: Anıt Şablonu %s artık kullanılabilir.
+  error:
+    blocked: Engellendi
+    not-resident: Bunu yapmak için %s'nin sakini olmalısınız.
+    not-plot: Bunu yapmak için bir arazi üyesi olmalısınız.
+    only-plot: Bunu bir kasaba parselinin dışında yapamazsınız.
+    online: '%s Krallığı'nda yeterli çevrimiçi oyuncu yok, %s Kasabasına saldırı yapılamaz.'
+    protected-attack: Krallığınızda yeterli çevrimiçi oyuncu yok, %s Kasabasına saldırı yapılamaz.
+    upgrade: '%s, %s ile yükseltildi ve %s çevrimiçi sakini olmadan saldırı yapılamaz.'
+    camp: '%s\'ye saldırı yapılamaz, kamp sahibi çevrimdışıdır.'
+    camp-bed: Bu Kampta ek yatak yerleştirilemez.
+    camp-update: Kampınızın yatak yerleşimi güncellendi.
+    camp-create: Birden fazla Kamp oluşturamazsınız. Yeni bir yatak koymadan önce mevcut Kampınızdaki yatağı yok edin.
+    camp-fail-overlap: 'Kamp başarısız oldu: Yeni talepler mevcut topraklarla çakışıyor.'
+    camp-fail-barbarian: 'Kamp başarısız oldu: Barbar değilsiniz.'
+    camp-fail-offline: 'Kamp başarısız oldu: Çevredeki tüm kamp sahipleri çevrimdışıdır.'
+    capture: Bu bölge başka bir %s süreyle ele geçirilemez.
+    golem: '%s Kasabası'ndaki dostça Demir Golemlere zarar veremezsiniz.'
+    tag-blocked: Bu komut savaş sırasında engellenmiştir.
+    portal-exit: Çıkış portalınız korunan bir bölgede, portalınızı taşıyın!
+    capital-immune: Bu başkent, %s Krallığı'nda %s kasaba kaldığı sürece saldırılara karşı bağışıktır.
+    no-allied-build: Bu kasabanın seçenekleri, müttefik krallıklardan oyuncuların inşaat yapmasına izin vermiyor.
+    template-modify: Bu anıt şablonu şu anda değiştiriliyor ve yakında kullanıma sunulacak.
+# //// COMMAND \\\\
+# Tüm komutlar için kullanılan mesajlar.
+command:
+  admin:
+    camp:
+      notice:
+       create: Başarıyla %s oyuncusu için bir kamp oluşturuldu.
+       destroy: Başarıyla %s oyuncusunun kampı kaldırıldı.
+      error:
+        create-exist: Oyuncunun zaten bir kampı var, yeni bir tane oluşturmadan önce mevcut kampı kaldırın.
+        destroy-exist: Oyuncunun kampı yok.
+    flag:
+      notice:
+        all-properties: Tüm Özellikler
+        single-property: Tek Özellik
+        set: '%s özelliğini %s için yeni değer %s olarak ayarlayın.'
+        reset: Tüm özellikleri varsayılan değerlere sıfırlayın (properties.yml dosyasında).
+      error:
+        invalid: Özellik bayrağı %s, %s için geçerli değil.
+    help:
+      notice:
+        detail: Daha fazla komut detayı için /k admin help <komut> kullanın.
+        page: Daha fazla sayfa görüntülemek için /k admin help <sayfa> kullanın.
+        page-command: Daha fazla sayfa görüntülemek için /k admin help %s <sayfa> kullanın.
+    kingdom:
+      broadcast:
+        create: '%s Yönetici Krallığı oluşturuldu!'
+      notice:
+        admin-set: '%s Krallığı bir yönetici krallığıdır.'
+        admin-clear: '%s Krallığı bir oyuncu krallığıdır.'
+        diplomacy: '%s ve %s Krallıkları arasında %s ilişkisi var.'
+      error:
+        no-templates: Hiç monument şablonu yok. Bir şablon oluşturmak için bir tapınakta "/k admin monument create (isim)" kullanın.
+    monument:
+      notice:
+        create-1: Yeni Monument Şablonu oluşturuluyor, bölgenin ilk köşe bloğuna tıklayın.
+        create-2: Tüm parçacıklar yeşil olduğunda, bölgenin ikinci köşe bloğuna tıklayın.
+        create-3: Seyahat noktası bloğuna tıklayın.
+        success: Başarıyla yeni Monument Şablonu %s oluşturuldu.
+        remove: Monument Şablonu %s kaldırıldı.
+        rename: Monument Şablonu %s, %s olarak yeniden adlandırıldı.
+        show: Mevcut Monument Şablonu %s, ,Güvenli Bölgesi %s içinde gösteriliyor.
+        sanctuary: Monument Şablonları oluşturmadan önce "/k admin sanctuary create (isim)" ile Güvenli bölge oluşturun.
+      error:
+        value: Maliyet değeri bir sayı değil.
+        fail-base: Monument Şablonu %s oluşturulamadı, temel 16x16 blok olmalı ancak %s x %s olarak alındı.
+        fail-critical: Monument Şablonu %s oluşturulamadı, en az %s %s blok içermelidir.
+        fail-travel: Monument Şablonu %s oluşturulamadı, seyahat noktası bölgenin içinde olmalıdır.
+        fail-region: Monument Şablonu %s oluşturulamadı, bölge köşeleri Güvenli bölge içinde olmalıdır.
+        fail-reset: Monument Şablonu %s sıfırlanamadı, önceki duruma geri döndürüldü.
+    reload:
+      notice:
+        message: Reloaded Konquest configuration files.
+    ruin:
+      notice:
+        create: Başarıyla yeni Harabe oluşturuldu %s
+        remove: Başarıyla Harabe kaldırıldı %s
+        rename: Harabe adı başarıyla değiştirildi %s den %s e
+        reset: Harabe %s için kritik bloklar ve golem çıkışları başarıyla sıfırlandı.
+        criticals: .%s için önceki tüm kritik bloklar kaldırıldı, blokları eklemek için tıklayın.
+        spawns: .%s için önceki tüm çıkış blokları kaldırıldı, blokları eklemek için tıklayın.
+        add: Blok %s Harabe'ye eklendi.
+      error:
+        create: Harabe %s oluşturulamadı, geçersiz ad veya bölge örtüşmesi.
+        remove: Bilinmeyen Harabe %s kaldırılırken hata oluştu.
+        rename: Harabe %s %s olarak yeniden adlandırılamadı.
+        reset: Bilinmeyen Harabe %s sıfırlanamadı.
+        match: 'Tıklanan blok türü ile eşleşmiyor: %s'
+        invalid: Bu bloğu geçerli bir Harabe'ye ekleyemedik.
+    sanctuary:
+      notice:
+        create: Başarıyla yeni Güvenli Bölge oluşturuldu %s, daha fazla alan eklemek için "/k admin claim" kullanın".
+        remove: Başarıyla Güvenli Bölge kaldırıldı %s
+        rename: Güvenli Bölge adı başarıyla değiştirildi %s den %s e.
+      error:
+        create: Güvenli Bölge %s oluşturulamadı, geçersiz ad veya bölge örtüşmesi.
+        remove: Bilinmeyen Güvenli Bölge %s kaldırılırken hata oluştu.
+        rename: Güvenli Bölge %s %s olarak yeniden adlandırılamadı.
+    save:
+      notice:
+        message: Tüm veriler dosyalara kaydedildi.
+    settravel:
+      notice:
+        success: .%s'de yeni seyahat noktası başarıyla ayarlandı.
+      error:
+        fail: Bilinmeyen bölgede seyahat noktası ayarlama başarısız oldu.
+    stat:
+      notice:
+        show: 'Oyuncu %s için Stat %s: %s'
+        set: Oyuncu %s için stat %s, %s olarak ayarlandı.
+        add: Oyuncu %s için stat %s'ye %s eklendi %s'
+        clear: Oyuncu %s için stat %s sıfırlandı.
+      error:
+        name: Geçersiz stat %s, mevcut statlarla eşleşmiyor.
+        value: 'Geçersiz stat değeri: %s'
+  border:
+    notice:
+      enable: Parçacık sınırları gösteriliyor
+      disable: Parçacık sınırları gizleniyor
+  chat:
+    notice:
+      enable: Krallık sohbeti
+      disable: Küresel sohbet
+  claim:
+    notice:
+      success: '%s parça arazi başarıyla %s için talep edildi.'
+      fail-auto: Talep edilemedi, otomatik talep devre dışı bırakıldı.
+      pass-auto: Talep edildi
+    error:
+      radius: Yarıçap %s'den büyük veya eşit ve %s'den küçük veya eşit olmalıdır.
+      missing: Mevcut bir bölgeye yakın talep etmelisiniz.
+      proximity: Başka bir bölgeye çok yakın.
+      fail-adjacent: Talep edilemedi, komşu bölge yok.
+      fail-far: Talep edilemedi, bölge merkezinden çok uzak.
+      fail-claimed: Talep edilemedi, zaten talep edilmiş.
+  favor:
+    notice:
+      message: '%s para'ınız var, maliyetler...'
+      cost-spy: Casus
+      cost-travel: Seyahat
+      cost-claim: Talep
+      cost-town-settle: Kasaba Yerleşimi
+      cost-town-rename: Kasaba Yeniden Adlandırma
+      cost-kingdom-create: Krallık Oluşturma
+      cost-kingdom-rename: Krallık Yeniden Adlandırma
+      cost-capital-swap: Sermaye Değişikliği
+  help:
+    notice:
+      header: Yardım Sayfası %s
+      detail: Daha fazla komut detayı için /k help <komut> kullanın
+      page: Daha fazla sayfa görüntülemek için /k help <sayfa> kullanın
+      page-command: Daha fazla sayfa görüntülemek için /k help %s <sayfa> kullanın
+      command: 'Tüm ana komut kullanımları:'
+    error:
+      page: Sayfa değeri bir sayı olmalıdır.
+  kingdom:
+    broadcast:
+      create: '%s, %s Krallığını kurdu!'
+      join: '%s, %s Krallığına katıldı.'
+      rename: '%s Krallığı, %s olarak yeniden adlandırıldı.'
+      peace: '%s ve %s Krallıkları barış yaptı.'
+      peace-request: '%s Krallığı barış talep etti. İlişkileri değiştirmek için "/k kingdom" komutunu kullanın.'
+      trade: '%s ve %s Krallıkları artık ticaret ortakları.'
+      trade-request: '%s Krallığı ticaret talep etti. İlişkileri değiştirmek için "/k kingdom" komutunu kullanın.'
+      no-trade: '%s ve %s Krallıkları artık ticaret yapmıyor.'
+      ally: '%s ve %s Krallıkları ittifak kurdu.'
+      ally-request: '%s Krallığı ittifak talep etti. İlişkileri değiştirmek için "/k kingdom" komutunu kullanın.'
+      no-ally: '%s ve %s Krallıkları artık müttefik değil.'
+      war: '%s ve %s Krallıkları savaş halinde!'
+      war-request: '%s Krallığı savaşa gitmek istiyor. İlişkileri değiştirmek için "/k kingdom" komutunu kullanın.'
+      transfer: '%s, %s Krallığının Krallık Yöneticisi oldu.'
+      promote: '%s, %s Krallığında Krallık Subayı olarak terfi etti.'
+      demote: '%s, %s Krallığında Krallık Üyesi olarak terfi etti.'
+      disband: '%s Krallığı dağıtıldı!'
+      destroy: '%s Kasabası yok edildi!'
+      capital-swap: '%s Krallığının Başkenti %s Kasabasına taşındı.'
+      capital-warmup: '%s Krallığının Başkenti %s yılında %s Kasabasına taşınacak.'
+      capital-cancel: Düşman saldırıları, %s Krallığının Başkentinin %s Kasabasına taşınmasını engelledi!
+    notice:
+      request-sent: '%s Krallığına katılmak için üye talebi gönderildi.'
+      request-received: Yeni bir krallık katılma talebi aldı. İncelemek için "/k kingdom" yazın.
+      request-declined: '%s oyuncusunun krallığa katılma talebi reddedildi.'
+      request-pending: Oyuncular krallığınıza katılmak için talepte bulundular. Yanıt vermek için "/k kingdom" yazın, ardından Requests seçeneğini seçin.
+      request-list: Krallığınıza katılmak için talepte bulunan oyuncular
+      invite-sent: '%s Krallığına katılmaları için davet edildi.'
+      invite-received: Krallık daveti aldınız, yanıt vermek için "/k kingdom" yazın.
+      invite-declined: '%s Krallığına katılma davetini reddettiniz.'
+      invite-pending: Katılmak için bekleyen davetleriniz var. Yanıt vermek için "/k kingdom" yazın, ardından Invites seçeneğini seçin.
+      invite-list: Sizi davet eden krallıklar
+      exile: Artık %s'den sürgün edildiniz ve bir barbar oldunuz.
+      exile-stats: Sürgün sırasında tüm istatistikler kaldırıldı!
+      exile-favor: Sürgün sırasında tüm para kaldırıldı!
+      remove-member: Artık %s Krallığının bir üyesi değilsiniz.
+      kick: '%s oyuncusunu krallıktan attınız.'
+      rename: Krallık adı başarıyla %s olarak değiştirildi.
+      transfer-master: '%s\'yi %s Krallığının yeni krallık yöneticisi yaptınız.'
+      discount: '%s Krallığı, bu tüccarla %s yüzde indirim sağlıyor.'
+      open: Krallık şimdi katılmak için açık.
+      closed: Krallık şimdi sadece davetlere kapalı.
+      template-current: Krallık Anıt Şablonu şu anda %s.
+      template: Krallık Anıt Şablonunu %s olarak güncellediniz.
+      pay: Krallık ödemesi alındı.
+      diplomacy-current: Krallığınızın %s Krallığıyla diplomasi ilişkisi %s.
+      diplomacy-sent: '%s Krallığına diplomasi talebi gönderildi.'
+      diplomacy-pending: Krallığınızın bekleyen diplomasi talepleri var. Yanıt vermek için "/k kingdom" yazın, ardından Relationships seçeneğini seçin.
+      web-color-show: '%s Krallığının web haritası rengi %s'
+      web-color-set: '%s Krallığının web haritası rengini %s olarak ayarladınız.'
+    error:
+      barbarian-create: Krallık oluşturmak için barbar olmanız gerekir. Krallık menüsünde Sürgün seçeneğini kullanın.
+      invalid-template: '%s geçersiz bir anıt şablonu. Yazımını kontrol edin veya başka birini seçin.'
+      missing-template: Bir şablon adı belirtmeniz gerekiyor. Şablonları görüntülemek için "/k kingdom templates" yazın.
+      missing-name: Bir krallık adı belirtmeniz gerekiyor.
+      invite-member: '%s zaten bir krallık üyesi.'
+      invite-exists: '%s zaten krallığa katılmak için davet edildi.'
+      invite-open: Açık bir krallığa oyuncu daveti yapamazsınız.
+      request-exists: '%s Krallığına katılmak için zaten talepte bulundunuz.'
+      request-deny: '%s Krallığına katılma talebiniz reddedildi.'
+      join-member: Zaten bir krallık üyesisiniz.
+      join-limit: '%s Krallığının çok fazla oyuncusu var!'
+      join-master: Krallık yöneticileri diğer krallıklara katılamaz.
+      join-switch: Oyuncular rakip krallıklara katılamaz.
+      join-cooldown: Başka bir krallığa katılmak için bekleyin %s
+      kick-master: Krallık yöneticisini atamazsınız.
+      kick-barbarian: Oyuncu zaten bir barbar.
+      exile-cooldown: Barbar olarak sürgün olmak için bekleyin %s
+      merchant: '%s Krallığında tüccarlarla ticaret yapamazsınız, Trade veya Allied diplomasi gereklidir.'
+      diplomacy-exists: Diplomasi değişikliği talebi zaten mevcut.
+      diplomacy-peaceful: Barışçıl krallıkların diplomasi ilişkilerini değiştiremezsiniz.
+      diplomacy-invalid: Bu diplomasi ilişkisi mevcut değil veya zaten aktif.
+      template-attack: Krallık Başkenti saldırı altındayken anıt şablonunu değiştiremezsiniz.
+      template-chosen: Bu anıt şablonu zaten Krallık için seçilmiştir.
+      web-color-invalid: Geçersiz renk, bir renk adı veya # ile başlayan hex koduna uymalıdır.
+      capital-swap-attack: Saldırı altındayken Krallık Başkenti değiştirilemez.
+      capital-swap-war: Krallığınız savaş halindeyken Krallık Başkentini değiştiremezsiniz.
+  list:
+    notice:
+      header: '%s Liste'
+  prefix:
+    notice:
+      disable: Lakab başlığınızı kapatınız.
+      new: Yeni lakabınız şimdi %s
+    error:
+      disable: Başlık Lakabınız zaten kapalı.
+      new: '%s lakabı kilitli!'
+      default: Lakabınız varsayılana geri döndü.
+      always-on: Başlık lakabınız kapatılamaz.
+  score:
+    notice:
+      all-header: Bütün Krallık skorları
+      score: 'Skorunuz: %s, %s Krallığının skoru: %s'
+      player: "%s\'nin skoru: %s, %s Krallığının skoru: %s"
+      kingdom: '%s Krallığı %s puanı'
+    error:
+      peaceful: '%s Krallığı barışçıldır ve puanlanamaz.'
+      barbarian: '%s bir Barbar, bu yüzden puanlanamaz.'
+      kingdom: Bu Krallık puanlanamaz.
+  settle:
+    broadcast:
+      settle: '%s, %s Kasabasını %s Krallığı için kurdu.'
+    notice:
+      success: 'Yeni Kasaba başarıyla kuruldu: %s'
+      map-hint: Yardımcı bilgiler için "/k map" komutunu kullanın.
+    error:
+      missing-name: 'Bir kasaba adı belirtmelisiniz.'
+      space-name: 'Geçersiz kasaba adı, boşluk kullanılamaz.'
+      fail-name: 'Geçersiz kasaba adı, ya alınmış ya da boşluk içeriyor.'
+      fail-overlap: 'Kasaba, yakınlardaki bir bölgeyle örtüşüyor.'
+      fail-placement: 'İyi bir Anıt yerleştirme yeri bulunamadı.'
+      fail-template: 'Geçersiz veya mevcut olmayan Anıt Şablonu.'
+      fail-proximity: 'Kasaba, diğer bölgelerden çok yakın. Şu anda %s yığın uzaklıkta, en az %s olmalı.'
+      fail-max: 'Kasaba, diğer bölgelerden çok uzak. Şu anda %s yığın uzaklıkta, en fazla %s olmalı.'
+      fail-flat: 'Alanınız yeterince düz değil. Chunk sınırlarını görmek için F3+G tuşlarına basın. Ağaçları kesin ve zemini düzleştirin!'
+      fail-height: 'Yükseklik uygun değil, daha yüksek veya daha düşük bir yere yerleşmeyi deneyin.'
+      fail-air: 'Yerin altında çok fazla hava var. Başka bir yere yerleşmeyi deneyin veya altını doldurun.'
+      fail-water: 'Yerin altında çok fazla su var. Başka bir yere yerleşmeyi deneyin veya suyu temizleyin.'
+      fail-container: 'Yerin altında çok fazla konteyner var. Başka bir yere yerleşmeyi deneyin veya konteynerleri kaldırın.'
+      fail-init: 'Kasaba ilk yığınları talep edilemedi.'
+      fail-limit-all: 'Tüm dünyalarda global maksimum sınır olan %s den fazla kasaba yerleştirilemez. Şu anda tüm dünyalarda %s kasaba var.'
+      fail-limit-world: 'Bu dünyada dünya başına maksimum sınır olan %s den fazla kasaba yerleştirilemez. Şu anda bu dünyada %s kasaba var.'
+      officer-only: 'Kasabaları sadece krallık sahibi ve memurlar kurabilir. Terfi için istekte bulunun!'
+  spy:
+    notice:
+     nearby: 'yakın'
+     regional: 'bölgesel'
+     faraway: 'uzak'
+     very-distant: 'çok uzak'
+     success: 'Bir casus, %s düşman kasabasının haritasını geri getirdi!'
+    error:
+      inventory: 'Yeterli envanter alanı yok, biraz yer açın.'
+      town: 'Düşman kasabası bulunamadı.'
+  town:
+    notice:
+      open: '%s tüm krallık üyeleri için erişime açıldı.'
+      close: '%s kapatıldı, sadece sakinler inşa edebilir ve konteynerlere erişebilir.'
+      plot-enable: '%s artık sakinlerin sadece parseller içinde inşa etmesine izin veriyor.'
+      plot-disable: '%s artık sakinlerin şehir arazisinde ve parseller içinde inşa etmesine izin veriyor.'
+      allied-building-enable: '%s artık müttefiklerin inşa etmesine izin veriyor.'
+      allied-building-disable: '%s artık müttefiklerin inşa etmesini engelliyor.'
+      friendly-redstone-enable: '%s artık krallık üyelerinin redstone anahtarlarını ve kapıları kullanmasına izin veriyor.'
+      friendly-redstone-disable: '%s artık krallık üyelerinin redstone anahtarlarını ve kapıları kullanmasını engelliyor.'
+      redstone-enable: '%s artık düşmanların redstone anahtarlarını ve kapıları kullanmasına izin veriyor.'
+      redstone-disable: '%s artık düşmanların redstone anahtarlarını ve kapıları kullanmasını engelliyor.'
+      golem-enable: '%s içindeki Demir Golemler, şehir arazisindeki tüm düşmanları saldırıya geçirecek.'
+      golem-disable: '%s içindeki Demir Golemler, sadece şehir anıtını düşmanlardan koruyacak.'
+      add-resident: '%s sakin olarak %s eklendi.'
+      kick-resident: '%s, %s şehrinden atıldı.'
+      lord-success: '%s’ye %s Lordluğu verildi.'
+      lord-claim: '%s, %s Lordluğu’nu talep etti!'
+      knight-set: '%s, %s şehrinde Şövalye olarak atandı.'
+      knight-clear: '%s artık %s şehrinde Şövalye değil.'
+      rename: 'Lord %s, %s şehrinin adını %s olarak değiştirdi.'
+      no-lord: '%s terkedilmiş! Lordluk talep etmek için "/k town lord %s" kullanın.'
+      shield-list: '%s kalan kalkan, %s şehri için.'
+      armor-list: '%s kalan zırh bloğu, %s şehri için.'
+      specialize-list: '%s Şehir uzmanlaşması %s.'
+      specialize: '%s Şehir uzmanlaşması başarıyla %s olarak değiştirildi.'
+      new-resident: '%s, %s şehrinin yeni bir sakini oldu.'
+      leave-resident: '%s, %s şehrinden ayrıldı.'
+      request-sent: '%s şehrine katılmak için sakin talebi gönderildi.'
+      request-received: 'Yeni şehir katılım talebi, gözden geçirmek için "/k town" yazın.'
+      request-declined: '%s oyuncusu için şehir katılım talebi reddedildi.'
+      request-pending: 'Oyuncular şehirlerinizde sakin olmak istiyor. Yanıt vermek için "/k town" komutunu kullanın.'
+      request-town-list: 'Bu şehirlerde yeni sakinler katılmak için başvurdu:'
+      request-player-list: '%s şehrine katılmak için başvuran oyuncular:'
+      invite-sent: '%s, %s şehrine katılmaları için davet edildi.'
+      invite-received: 'Şehir daveti alındı, yanıtlamak için "/k town" yazın.'
+      invite-declined: '%s şehrine katılma daveti reddedildi.'
+      invite-pending: 'Şehirlere katılmak için bekleyen davetleriniz var. Yanıtlamak için "/k town" komutunu kullanın.'
+      invite-list: 'Bu şehirler size katılmak için davette bulundu:'
+    error:
+      kick-fail: '%s, %s şehrinin sakini değil.'
+      knight-resident: 'Şövalyeler önce sakin olarak eklenmelidir.'
+      invite-member: '%s zaten bir şehir sakini.'
+      invite-exists: '%s zaten şehre katılmak için davet edildi.'
+      invite-open: 'Açık bir şehre oyuncu davet edilemez.'
+      request-exists: '%s şehrine katılmak için zaten bir talepte bulundunuz.'
+      request-deny: '%s şehrine katılma talebi reddedildi.'
+      join-member: 'Zaten bir şehir sakinisiniz.'
+      join-limit: '%s şehri çok fazla sakine sahip!'
+      kicked: '%s şehrinden atıldınız.'
+      promote-knight: '%s zaten bir Şövalye.'
+      demote-resident: '%s zaten bir sakin.'
+      upgrade-unavailable: '%s yükseltmesi %s şehri için mevcut değil.'
+      upgrade-level: 'Yükseltme seviyesi %s ile %s arasında olmalıdır.'
+  travel:
+    notice:
+      town-travel: '%s, %s şehrine seyahat etti.'
+      wild-search: Rastgele bir Vahşi konum aranıyor...
+      wild-travel: Vahşi doğada rastgele bir konuma seyahat edildi.
+      warmup: Seyahat %s saniye içinde başlıyor.
+    error:
+      wild-timeout: Vahşi doğada uygun bir yer bulunamadı.
+      enemy-territory: Düşman topraklarında seyahat edemezsiniz!
+      no-home: Bir eviniz yok!
+      no-camp: Bir kampınız yok!
+      no-town: O kasaba krallığınızda mevcut değil.
+      cooldown: .%s yere seyahat etmek için %s beklemeniz gerekiyor.
+      canceled: Hareket nedeniyle seyahatiniz iptal edildi.
+      damaged: Hasar nedeniyle seyahatiniz iptal edildi.
+      disabled: O bölgeye seyahat devre dışı bırakıldı.
+  unclaim:
+    notice:
+      success: .%s kadar toprak parçası %s'den başarıyla bırakıldı.
+      fail-auto: Bırakılamadı, otomatik bırakma devre dışı.
+      pass-auto: Bırakıldı
+    error:
+      radius: Yarıçap %s'den büyük veya %s'den küçük olmalıdır.
+      fail-town: Yalnızca kasabalardan toprak bırakabilirsiniz.
+      fail-lord: Bırakma başarısız oldu, kasaba lordu olmalısınız.
+      fail-unclaimed: Bırakma başarısız oldu, bırakmak için ele geçirilmiş toprakta olmalısınız.
+      fail-center: Bırakma başarısız oldu, toprak merkezi kaldırılamaz.
+# //// SHOP \\\\
+# Sandık dükkanı entegrasyonu için kullanılan mesajlar.
+shop:
+  error:
+    use-disabled: Burada dükkanları kullanamazsınız!
+    use-relation: Bu dükkanda ticaret yapamazsınız, kasabanın krallığı dost, müttefik veya ticaret anlaşmasında olmalıdır.
+    create-town: Sadece dost kasabalarda dükkan kurabilirsiniz.
+    create-camp: Sadece kendi kampınızda dükkan kurabilirsiniz.
+    create-monument: Anıtların içinde dükkan kuramazsınız!
+    create-fail: Burada dükkan kuramazsınız!
+    create-wild: Vahşi doğada dükkan kuramazsınız!
+# //// REGION \\\\
+# Kara bölgesi entegrasyonu için kullanılan mesajlar.
+region:
+  error:
+    claim-deny: Yakındaki bir bölge bu toprakların ele geçirilmesini reddediyor.
+    unclaim-deny: Yakındaki bir bölge bu toprakların bırakılmasını reddediyor.
+    travel-enter-deny: Hedef bölgedeki bir bölge, oraya seyahati reddediyor.
+    travel-exit-deny: Bulunduğunuz bölgedeki bir bölge, oradan ayrılmayı reddediyor.
+# //// DISCORD-SRV \\\\
+# DiscordSRV entegrasyonu için kullanılan mesajlar.
+discord-srv:
+  discord: Discord
+  no-link: Discord ile bağlı değilsiniz. Bağlanmak için /discord link yazın.
+  no-user: Bağlı olduğunuz Discord kullanıcısı bulunamadı.
+  linked-user: Discord'da %s ile bağlısınız.
+# //// DIRECTIVE \\\\
+# Görev yönergeleri için etiketler ve açıklamalar.
+directive:
+  create-kingdom: Krallık Kurmak
+  create-kingdom-info: Kendi Krallığını kur.
+  settle-town: Yeni Başlangıç
+  settle-town-info: Krallığın için bir Kasaba kur.
+  claim-land: Asalet Yolu
+  claim-land-info: Krallığındaki herhangi bir Kasaba için toprak ele geçir.
+  build-town: Duvar Ustası
+  build-town-info: Krallığındaki herhangi bir Kasaba için yapılar inşa et.
+  craft-armor: Şövalyelik
+  craft-armor-info: Kendini korumak için bir demir zırh seti yap.
+  create-golem: Stoik Koruyucu
+  create-golem-info: Krallığındaki herhangi bir Kasabayı korumak için bir Demir Golem oluştur.
+  enchant-item: İlahi Aletler
+  enchant-item-info: Aletlere/silahlara herhangi bir büyü uygula.
+  attack-town: Saldırı Eylemi
+  attack-town-info: Düşman Krallığındaki herhangi bir Kasabaya saldırarak blokları kır.
+  capture-town: Askeri Harekat
+  capture-town-info: Düşman Krallığındaki herhangi bir Kasabayı, Kasaba Anıtı içindeki kritik blokları yok ederek ele geçir.
+  kill-enemy: En İyi Düşmanlar
+  kill-enemy-info: Düşman Krallığından bir oyuncuyu öldür.
+# //// PREFIX \\\\
+# Tüm başarı önekleri, unvanları ve kategorileri için isimler.
+prefix:
+  category:
+    clergy: Din Adamları
+    nobility: Asiller
+    tradesman: Tüccarlar
+    military: Askeriye
+    farming: Çiftçilik
+    cooking: Aşçılık
+    fishing: Balıkçılık
+    joking: Şakacılar
+    royalty: Kraliyet
+  title:
+    king: Kral
+    queen: Kraliçe
+    prince: Prens
+    princess: Prenses
+    noble: Asil
+    cardinal: Kardinal
+    bishop: Piskopos
+    priest: Rahip
+    cleric: Ruhban
+    chaplain: Papaz
+    scribe: Katip
+    viceroy: Genel Vali
+    duke: Dük
+    count: Kont
+    earl: Earl (İngiliz asalet unvanı)
+    baron: Baron
+    lord: Lord
+    vassal: Vasat
+    peasant: Köylü
+    master: Usta
+    artisan: Zanaatkar
+    journeyman: Kalfa
+    craftsman: Esnaf
+    merchant: Tüccar
+    peddler: Seyyar Satıcı
+    general: General
+    major: Binbaşı
+    captain: Yüzbaşı
+    sergeant: Çavuş
+    knight: Şövalye
+    squire: Silahşör
+    cowboy: Kovboy
+    breeder: Yetiştirici
+    rancher: Çiftlik Sahibi
+    farmer: Çiftçi
+    picker: Toplayıcı
+    sprout: Filiz
+    jester: Soytarı
+    fool: Aptal
+    dancer: Dansçı
+    bard: Ozan
+    fisherman: Balıkçı
+    caster: Olta Kullanıcısı
+    chum: Balıkçı Arkadaşı
+    chef: Şef
+    cook: Aşçı
+    baker: Fırıncı
+# //// STAT \\\\
+# Tüm başarı istatistiklerinin adları ve açıklamaları.
+stat:
+  enchantments: Büyüler
+  enchantments-info: Eşyalara uygulanan büyüler
+  potions: İksirler
+  potions-info: Kullanılan veya fırlatılan iksirler
+  mobs: Yaratıklar
+  mobs-info: Öldürülen düşmanca yaratıklar
+  settled: Kurulan
+  settled-info: Kurulan şehirler
+  claimed: Hakimiyet
+  claimed-info: Hakimiyet kurulan topraklar
+  lords: Lordlar
+  lords-info: Şehir lordlukları
+  knights: Şövalyeler
+  knights-info: Şehir şövalyelikleri
+  residents: Sakinler
+  residents-info: Şehir sakinlikleri
+  ingots: Külçeler
+  ingots-info: Eritilmiş külçeler
+  diamonds: Elmaslar
+  diamonds-info: Çıkarılan elmas madenleri
+  crafted: Yapılmış
+  crafted-info: Araç, silah ve zırh yapım becerisi
+  favor: Para
+  favor-info: Harcanan para
+  kills: Öldürmeler
+  kills-info: Öldürülen oyuncular
+  damage: Hasar
+  damage-info: Verilen oyuncu hasarı
+  golems: Golemler
+  golems-info: Öldürülen düşman Demir Golemleri
+  captures: Ele Geçirmeler
+  captures-info: Ele geçirilen düşman şehirleri
+  criticals: Kritik Vuruşlar
+  criticals-info: Düşman şehirlerde yapılan kritik vuruşlar
+  seeds: Tohumlar
+  seeds-info: Ekilen tohumlar
+  breed: Üretme
+  breed-info: Romantikleştirilmiş yaratıklar
+  till: Toprak İşleme
+  till-info: Tarım arazisi gübreleme
+  harvest: Hasat
+  harvest-info: Hasat edilen ürünler
+  food: Yiyecek
+  food-info: Yapılan yiyecekler
+  music: Müzik
+  music-info: Çalınan müzik diskleri
+  egg: Yumurta
+  egg-info: Yumurta attığınız oyuncular
+  fish: Balık
+  fish-info: Balık tutma becerisi
+  kingdoms: Krallıklar
+  kingdoms-info: Oluşturulan yeni krallıklar
+  conquests: Fetihler
+  conquests-info: Fethedilen düşman krallıkları
+# //// UPGRADE \\\\
+# Tüm kasaba yükseltmelerinin adları ve açıklamaları.
+upgrade:
+  disabled: Bu şehir, tam yükseltme seviyesine ulaşmak için yeterli nüfusa sahip değil.
+  loot:
+    name: Anıt Ganimeti
+    level-1: Her sandığa 1 ek yağma eşyası ekler
+    level-2: Her sandığa 2 ek yağma eşyası ekler
+    level-3: Her sandığa 3 ek yağma eşyası ekler
+  drops:
+    name: Hayvan Düşüşleri
+    level-1: Hayvan yaratıkları 1 ek eşya düşürür
+  fatigue:
+    name: Düşman Yorgunluğu
+    level-1: Düşmanlara madencilik yorgunluğu 2 verir
+  counter:
+    name: Karşı-Keşif
+    level-1: Casus haritaların bu şehri bulmasını engeller
+    level-2: Pusulaların bu şehri göstermesini engeller
+  health:
+    name: Sağlık Artışı
+    level-1: Dost sağlık barlarına 1 kalp ekler
+    level-2: Dost sağlık barlarına 2 kalp ekler
+    level-3: Dost sağlık barlarına 3 kalp ekler
+  damage:
+    name: Hasarı Önleme
+    level-1: Tüm ateş yayılmasını engeller
+    level-2: Tüm patlamaları engeller
+  watch:
+    name: Şehir Gözcüsü
+    level-1: Düşman baskınlarını, en az 1 sakin çevrimiçi olmadıkça engeller
+    level-2: Düşman baskınlarını, en az 2 sakin çevrimiçi olmadıkça engeller
+    level-3: Düşman baskınlarını, en az 3 sakin çevrimiçi olmadıkça engeller
+  enchant:
+    name: Daha İyi Büyüler
+    level-1: Büyü tekliflerini 1 seviye artırır
+# //// DESCRIPTION \\\\
+# Tüm eklenti komutlarının açıklamaları.
+description:
+  help: Yardım mesajını gösterir.
+  menu: Konquest Ana Menüsünü açın.
+  info: Farklı şeyler hakkında bilgi gösterir.
+  list: Farklı Bölge listesini gösterir.
+  favor: Para biriminizi Favor olarak gösterir.
+  map: Talep edilen alanların haritasını gösterir.
+  chat: Küresel ve krallık sohbeti arasında geçiş yapar.
+  spy: Bir düşman şehrinin konumunu açığa çıkarır.
+  settle: Yeni bir Şehir kurar.
+  claim: Bir arazi parçasını talep eder.
+  unclaim: Bir arazi parçasının talebini geri alır.
+  travel: Diğer Bölgelere ışınlanır.
+  kingdom: Krallıkları oluşturur veya yönetir.
+  town: Üyesi olduğunuz Şehirleri yönetir.
+  quest: Görev günlüğünüzü gösterir.
+  stats: Başarı istatistiklerinizi gösterir.
+  prefix: Lakap başlığınızı ayarlar.
+  score: Bir Oyuncunun mevcut puanını gösterir.
+  fly: Dost topraklarda uçar.
+  border: Bölgelerin ve planların sınır parçacıklarını açar/kapatır.
+  admin: Yalnızca Yöneticiler için.
+  admin-help: Yönetici yardım mesajını gösterir.
+  admin-bypass: Yönetici geçiş modunu açar/kapatır.
+  admin-claim: Arazi parçalarını talep eder.
+  admin-unclaim: Bir parçayı Doğaya geri verir.
+  admin-kingdom: Bir Krallığı yönetir.
+  admin-town: Bir Şehir veya Başkenti yönetir.
+  admin-camp: Bir Barbar Kampını yönetir.
+  admin-capture: Herhangi bir Krallık için bir şehri ele geçirir.
+  admin-monument: Anıt Şablonunu yönetir.
+  admin-ruin: Bir Harabe bölgesini yönetir.
+  admin-sanctuary: Bir Güvenli Bölgeyi yönetir.
+  admin-save: Eklenti veri dosyalarını kaydeder.
+  admin-settravel: Bulunduğunuz bölge için seyahat noktasını ayarlar.
+  admin-travel: Belirtilen krallığa veya şehire ışınlanır.
+  admin-reload: Konfigürasyon dosyalarını yeniden yükler.
+  admin-flag: Krallık mülkiyet bayraklarını ayarlar.
+  admin-stat: Oyuncu istatistiklerini yönetir.
+# //// PROPERTIES \\\\
+# Krallık ve bölgelerdeki tüm mülk bayraklarının adları ve açıklamaları.
+properties:
+  travel-name: Seyahat
+  travel: Bu bölgeye seyahat etmeye izin ver
+  pvp-name: PvP
+  pvp: Oyuncu hasarına izin ver
+  pve-name: PvE
+  pve: Varlık hasarına izin ver
+  build-name: İnşaat
+  build: Blok düzenlemeye izin ver
+  use-name: Kullan
+  use: Blokları kullanmaya izin ver
+  chest-name: Sandık
+  chest: Konteynerleri kullanmaya izin ver
+  mobs-name: Canavarlar
+  mobs: Canavarların doğmasına izin ver
+  portals-name: Portallar
+  portals: Oyuncuların portalları kullanmasına izin ver
+  enter-name: Giriş
+  enter: Oyuncuların girmesine izin ver
+  exit-name: Çıkış
+  exit: Oyuncuların çıkmasına izin ver
+  capture-name: Ele Geçirme
+  capture: Bu şehrin ele geçirilmesine izin ver
+  claim-name: İddia
+  claim: Oyuncuların arazi iddia etmesine izin ver
+  unclaim-name: İddia İptali
+  unclaim: Oyuncuların araziyi iptal etmesine izin ver
+  upgrade-name: Yükseltme
+  upgrade: Oyuncuların bu şehri yükseltmesine izin ver
+  plots-name: Alanlar
+  plots: Oyuncuların şehir alanlarını belirlemesine izin ver
+  peaceful-name: Barışçıl
+  peaceful: Bir krallığı sadece barışçıl hale getir
+  golems-name: Golem
+  golems: Demir golemlerin düşmanları saldırmasına izin ver
+  join-name: Katıl
+  join: Oyuncuların katılmasına izin ver
+  leave-name: Ayrıl
+  leave: Oyuncuların ayrılmasına izin ver
+  promote-name: Terfi
+  promote: Oyuncuları terfi ettirmeye izin ver
+  demote-name: Rütbe Düşürme
+  demote: Oyuncuları rütbe düşürmeye izin ver
+  transfer-name: Devretme
+  transfer: Mülk devrine izin ver
+  shop-name: Dükkan
+  shop: Oyuncuların dükkan yaratmasına izin ver
+  arena-name: Arena
+  arena: Herhangi bir oyuncunun birbirleriyle savaşmasına izin ver
