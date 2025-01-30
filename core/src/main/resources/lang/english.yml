@@ -453,7 +453,7 @@ generic:
     reduce-favor: Favor reduced %s, total %s
     reward-favor: Favor rewarded %s, total %s
     reward-exp: EXP rewarded %s
-    discount-favor: %s percent discount, you saved %s Favor.
+    discount-favor: '%s percent discount, you saved %s Favor.'
     click-air: Click on Air to cancel.
     clicked-air: Clicked in Air, cancelled region creation.
     success: Success!
@@ -500,8 +500,8 @@ protection:
     camp-destroy: Destroyed %s!
     camp-destroy-owner: Your camp has been destroyed!
     camp-create: Successfully set up your Camp.
-    camp-clan-add: %s has been added to your camp clan.
-    camp-clan-remove: %s has been removed from your camp clan.
+    camp-clan-add: '%s has been added to your camp clan.'
+    camp-clan-remove: '%s has been removed from your camp clan.'
     critical: Critical Hit! %s Critical Blocks remain
     tagged: Tagged
     tag-message: You have been tagged in combat.
@@ -511,9 +511,9 @@ protection:
     loot-capture: Loot will reset once this Ruin has finished being captured.
     raid: Enemy spotted in %s, use "/k travel %s" to defend!
     raid-alert: Raid Alert
-    raid-capture-1: %s is being conquered! Use "/k travel %s" to defend and receive %s Favor!
-    raid-capture-2: %s is at half strength! Use "/k travel %s" to defend and receive %s Favor!
-    raid-capture-3: %s is in critical condition! Use "/k travel %s" to defend and receive %s Favor!
+    raid-capture-1: '%s is being conquered! Use "/k travel %s" to defend and receive %s Favor!'
+    raid-capture-2: '%s is at half strength! Use "/k travel %s" to defend and receive %s Favor!'
+    raid-capture-3: '%s is in critical condition! Use "/k travel %s" to defend and receive %s Favor!'
     raid-discord-channel: The enemy is capturing the town of %s, join the server now to defend!
     raid-discord-direct: Enemy players are capturing the town of %s in your kingdom, %s! Join the server now to defend.
     raze: The Town of %s has been destroyed by the Barbarian horde!
@@ -536,7 +536,7 @@ protection:
     only-plot: You cannot do this outside of a town plot.
     online: The Kingdom of %s doesn't have enough online players, cannot attack the Town of %s.
     protected-attack: Your Kingdom doesn't have enough online players, cannot attack the Town of %s.
-    upgrade: %s is upgraded with %s and cannot be attacked without %s residents online.
+    upgrade: '%s is upgraded with %s and cannot be attacked without %s residents online.'
     camp: Cannot attack %s, the camp owner is offline.
     camp-bed: Cannot place additional beds within this Camp.
     camp-update: Updated your Camp's bed location.
@@ -688,8 +688,8 @@ command:
       page: The page value must be a number.
   kingdom:
     broadcast:
-      create: %s has created the Kingdom of %s
-      join: %s joined the Kingdom of %s
+      create: '%s has created the Kingdom of %s'
+      join: '%s joined the Kingdom of %s'
       rename: The Kingdom of %s has been renamed to %s
       peace: The Kingdoms of %s and %s have made peace.
       peace-request: The Kingdom of %s requests to make peace. Use "/k kingdom" to change relationships.
@@ -701,9 +701,9 @@ command:
       no-ally: The Kingdoms of %s and %s are no longer allies.
       war: The Kingdoms of %s and %s are at war!
       war-request: The Kingdom of %s requests to go to war. Use "/k kingdom" to change relationships.
-      transfer: %s is now the Kingdom Master of %s.
-      promote: %s has been promoted to Kingdom Officer of %s.
-      demote: %s has been demoted to Kingdom Member of %s.
+      transfer: '%s is now the Kingdom Master of %s.'
+      promote: '%s has been promoted to Kingdom Officer of %s.'
+      demote: '%s has been demoted to Kingdom Member of %s.'
       disband: The Kingdom of %s has been disbanded!
       destroy: The Town of %s has been destroyed!
       capital-swap: The Kingdom Capital of %s has moved to the Town of %s.
@@ -740,11 +740,11 @@ command:
       web-color-set: Set the web map color of %s to %s
     error:
       barbarian-create: You must be a barbarian to create a kingdom. Use the Exile option in the kingdom menu.
-      invalid-template: %s is an invalid monument template. Check spelling or choose another.
+      invalid-template: '%s is an invalid monument template. Check spelling or choose another.'
       missing-template: You must specify a template name. View templates with "/k kingdom templates"
       missing-name: You must specify a kingdom name.
-      invite-member: %s is already a kingdom member.
-      invite-exists: %s has already been invited to join the kingdom.
+      invite-member: '%s is already a kingdom member.'
+      invite-exists: '%s has already been invited to join the kingdom.'
       invite-open: Cannot invite players to an open kingdom.
       request-exists: You have already requested to join %s.
       request-deny: Request to join the Kingdom of %s has been denied.
@@ -767,7 +767,7 @@ command:
       capital-swap-war: Cannot change the Kingdom Capital while your kingdom is at war.
   list:
     notice:
-      header: %s List
+      header: '%s List'
   prefix:
     notice:
       disable: Turned off your prefix title.
@@ -781,15 +781,15 @@ command:
     notice:
       all-header: All Kingdom scores
       score: Your score %s, Kingdom of %s score %s
-      player: %s's score %s, Kingdom of %s score %s
+      player: "%s's score %s, Kingdom of %s score %s"
       kingdom: Kingdom of %s score %s
     error:
       peaceful: The Kingdom of %s is peaceful, and cannot be scored.
-      barbarian: %s is a Barbarian, and cannot be scored.
+      barbarian: '%s is a Barbarian, and cannot be scored.'
       kingdom: This Kingdom cannot be scored.
   settle:
     broadcast:
-      settle: %s has settled the Town of %s for Kingdom %s
+      settle: '%s has settled the Town of %s for Kingdom %s'
     notice:
       success: Successfully settled new Town %s
       map-hint: Use "/k map" for helpful info.
@@ -825,30 +825,30 @@ command:
     notice:
       open: Opened %s for access by all kingdom members.
       close: Closed %s, only residents may build and access containers.
-      plot-enable: %s now allows residents to only build within plots.
-      plot-disable: %s now allows residents to build in town land and within plots.
-      allied-building-enable: %s now allows allies to build.
-      allied-building-disable: %s now prevents allies from building.
-      friendly-redstone-enable: %s now allows kingdom members to use redstone switches and doors.
-      friendly-redstone-disable: %s now prevents kingdom members from using redstone switches and doors.
-      redstone-enable: %s now allows enemies to use redstone switches and doors.
-      redstone-disable: %s now prevents enemies from using redstone switches and doors.
+      plot-enable: '%s now allows residents to only build within plots.'
+      plot-disable: '%s now allows residents to build in town land and within plots.'
+      allied-building-enable: '%s now allows allies to build.'
+      allied-building-disable: '%s now prevents allies from building.'
+      friendly-redstone-enable: '%s now allows kingdom members to use redstone switches and doors.'
+      friendly-redstone-disable: '%s now prevents kingdom members from using redstone switches and doors.'
+      redstone-enable: '%s now allows enemies to use redstone switches and doors.'
+      redstone-disable: '%s now prevents enemies from using redstone switches and doors.'
       golem-enable: Iron Golems in %s will attack all enemies within town land.
       golem-disable: Iron Golems in %s will only defend the town monument from enemies.
       add-resident: Added resident %s to town %s.
       kick-resident: Kicked resident %s from town %s.
       lord-success: Gave Lordship of %s to %s.
-      lord-claim: %s has claimed Lordship of %s!
-      knight-set: %s has been Knighted in %s.
-      knight-clear: %s is no longer a Knight in %s.
+      lord-claim: '%s has claimed Lordship of %s!'
+      knight-set: '%s has been Knighted in %s.'
+      knight-clear: '%s is no longer a Knight in %s.'
       rename: Lord %s has renamed the Town of %s to %s.
-      no-lord: %s is abandoned! Use "/k town lord %s" to claim Lordship.
-      shield-list: %s remaining shields for the town of %s.
-      armor-list: %s remaining armor blocks for the town of %s.
-      specialize-list: %s Town specialization is %s.
+      no-lord: '%s is abandoned! Use "/k town lord %s" to claim Lordship.'
+      shield-list: '%s remaining shields for the town of %s.'
+      armor-list: '%s remaining armor blocks for the town of %s.'
+      specialize-list: '%s Town specialization is %s.'
       specialize: Successfully changed %s Town specialization to %s.
-      new-resident: %s has joined as a town resident of %s.
-      leave-resident: %s has left the town of %s.
+      new-resident: '%s has joined as a town resident of %s.'
+      leave-resident: '%s has left the town of %s.'
       request-sent: Sent resident request to join %s.
       request-received: New town join request, type "/k town" to review.
       request-declined: Denied town join request for player %s.
@@ -861,23 +861,23 @@ command:
       invite-pending: You have pending invites to join towns. Use "/k town" command to respond.
       invite-list: These towns have invited you to join...
     error:
-      kick-fail: %s is not a resident of %s.
+      kick-fail: '%s is not a resident of %s.'
       knight-resident: Knights must be added as residents first.
-      invite-member: %s is already a town resident.
-      invite-exists: %s has already been invited to join the town.
+      invite-member: '%s is already a town resident.'
+      invite-exists: '%s has already been invited to join the town.'
       invite-open: Cannot invite players to an open town.
       request-exists: You have already requested to join %s.
       request-deny: Request to join the Town of %s has been denied.
       join-member: You are already a town resident.
       join-limit: The Town of %s has too many residents!
       kicked: You have been kicked from the town of %s.
-      promote-knight: %s is already a Knight.
-      demote-resident: %s is already a resident.
+      promote-knight: '%s is already a Knight.'
+      demote-resident: '%s is already a resident.'
       upgrade-unavailable: Upgrade %s is unavailable for the town of %s.
       upgrade-level: Upgrade level must be between %s and %s.
   travel:
     notice:
-      town-travel: %s has traveled to %s.
+      town-travel: '%s has traveled to %s.'
       wild-search: Searching for a random Wild location...
       wild-travel: Traveled to a random location in the Wild.
       warmup: Travel starts in %s seconds.
