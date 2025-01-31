@@ -509,7 +509,7 @@ protection:
     untag-message: Artık savaşta değilsiniz.
     loot-later: Daha fazla ganimet için daha sonra geri dönün!
     loot-capture: Ganimet, bu Harabe yakalanana kadar sıfırlanacak.
-    raid: '%s\'de düşman tespit edildi, savunmak için "/k travel %s" kullanın!'
+    raid: "%s'de düşman tespit edildi, savunmak için \"/k travel %s\" kullanın!"
     raid-alert: Akın Uyarısı
     raid-capture-1: '%s fethediliyor! Savunmak ve %s Favor almak için "/k travel %s" kullanın!'
     raid-capture-2: '%s yarı güçte! Savunmak ve %s Favor almak için "/k travel %s" kullanın!'
@@ -517,9 +517,9 @@ protection:
     raid-discord-channel: Düşman %s kasabasını ele geçiriyor, savunmak için hemen sunucuya katılın!
     raid-discord-direct: Düşman oyuncular krallığınızdaki %s kasabasını ele geçiriyor, %s! Savunmak için hemen sunucuya katılın.
     raze: '%s Kasabası Barbarların ordusu tarafından yok edildi!'
-    destroy: '%s\'yi Barbarların ordusu için yok ettiniz!'
+    destroy: "%s'yi Barbarların ordusu için yok ettiniz!"
     conquer: '%s Kasabası fethedildi!'
-    capture: '%s\'yi %s'nin fethedilmesi için ele geçirdiniz!'
+    capture: "%s'yi %s'nin fethedilmesi için ele geçirdiniz!"
     kingdom-warmup: '%s Krallığı %s dakika içinde korunacak.'
     kingdom-conquer: '%s Krallığı %s tarafından fethedildi!'
     kingdom-raze: '%s Krallığı Barbarların ordusu tarafından yok edildi!'
@@ -534,10 +534,10 @@ protection:
     not-resident: Bunu yapmak için %s'nin sakini olmalısınız.
     not-plot: Bunu yapmak için bir arazi üyesi olmalısınız.
     only-plot: Bunu bir kasaba parselinin dışında yapamazsınız.
-    online: '%s Krallığı'nda yeterli çevrimiçi oyuncu yok, %s Kasabasına saldırı yapılamaz.'
+    online: "%s Krallığı'nda yeterli çevrimiçi oyuncu yok, %s Kasabasına saldırı yapılamaz."
     protected-attack: Krallığınızda yeterli çevrimiçi oyuncu yok, %s Kasabasına saldırı yapılamaz.
     upgrade: '%s, %s ile yükseltildi ve %s çevrimiçi sakini olmadan saldırı yapılamaz.'
-    camp: '%s\'ye saldırı yapılamaz, kamp sahibi çevrimdışıdır.'
+    camp: "%s'ye saldırı yapılamaz, kamp sahibi çevrimdışıdır."
     camp-bed: Bu Kampta ek yatak yerleştirilemez.
     camp-update: Kampınızın yatak yerleşimi güncellendi.
     camp-create: Birden fazla Kamp oluşturamazsınız. Yeni bir yatak koymadan önce mevcut Kampınızdaki yatağı yok edin.
@@ -545,7 +545,7 @@ protection:
     camp-fail-barbarian: 'Kamp başarısız oldu: Barbar değilsiniz.'
     camp-fail-offline: 'Kamp başarısız oldu: Çevredeki tüm kamp sahipleri çevrimdışıdır.'
     capture: Bu bölge başka bir %s süreyle ele geçirilemez.
-    golem: '%s Kasabası'ndaki dostça Demir Golemlere zarar veremezsiniz.'
+    golem: "%s Kasabası'ndaki dostça Demir Golemlere zarar veremezsiniz."
     tag-blocked: Bu komut savaş sırasında engellenmiştir.
     portal-exit: Çıkış portalınız korunan bir bölgede, portalınızı taşıyın!
     capital-immune: Bu başkent, %s Krallığı'nda %s kasaba kaldığı sürece saldırılara karşı bağışıktır.
@@ -668,7 +668,7 @@ command:
       fail-claimed: Talep edilemedi, zaten talep edilmiş.
   favor:
     notice:
-      message: '%s para'ınız var, maliyetler...'
+      message: "%s para'ınız var, maliyetler..."
       cost-spy: Casus
       cost-travel: Seyahat
       cost-claim: Talep
@@ -726,7 +726,7 @@ command:
       remove-member: Artık %s Krallığının bir üyesi değilsiniz.
       kick: '%s oyuncusunu krallıktan attınız.'
       rename: Krallık adı başarıyla %s olarak değiştirildi.
-      transfer-master: '%s\'yi %s Krallığının yeni krallık yöneticisi yaptınız.'
+      transfer-master: "%s'yi %s Krallığının yeni krallık yöneticisi yaptınız."
       discount: '%s Krallığı, bu tüccarla %s yüzde indirim sağlıyor.'
       open: Krallık şimdi katılmak için açık.
       closed: Krallık şimdi sadece davetlere kapalı.
@@ -781,7 +781,7 @@ command:
     notice:
       all-header: Bütün Krallık skorları
       score: 'Skorunuz: %s, %s Krallığının skoru: %s'
-      player: "%s\'nin skoru: %s, %s Krallığının skoru: %s"
+      player: "%s'nin skoru: %s, %s Krallığının skoru: %s"
       kingdom: '%s Krallığı %s puanı'
     error:
       peaceful: '%s Krallığı barışçıldır ve puanlanamaz.'
