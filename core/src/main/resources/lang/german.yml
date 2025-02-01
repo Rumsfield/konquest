@@ -91,7 +91,7 @@ label:
   unavailable: Nicht verfügbar
   upgrades: Upgrades
   valid: Gültig
-  Welt: Welt
+  world: Welt
 # //// TERRITORY \\\\
 # Namen verschiedener Gebietstypen.
 territory:
@@ -418,19 +418,19 @@ menu:
     hint-capital: Klicken, um zur Hauptstadt zu wechseln
     they-requested: Sie haben angefragt
     we-requested: Wir fordernsted
-    diplocy-peace-war-instant: Sofort Frieden erklären
-    diplocy-peace-war-request: Friedensanfrage
-    diplocy-peace-trade: Handel beenden und Frieden erklären
-    diplocy-peace-alliance: Allianz beenden und Frieden erklären
-    diplocy-trade-peace: Handelsanfrage
-    diplocy-trade-alliance: Allianz beenden und Handel erklären
-    diplocy-war-instant: Sofort Krieg erklären
-    diplocy-war-request: Kriegsanfrage
-    diplocy-alliance: Allianzanfrage
-    diplocy-peace-info: Standard. Kann PvP zulassen.
-    diplocy-trade-info: Kein PvP. Handelsrabatte für Dorfbewohner. Truhenläden nutzen.
-    diplocy-alliance-info: Kein PvP. Handelsrabatte für Dorfbewohner. Truhenläden nutzen. Verteidigungspakt. Zu Städten und Hauptstädten reisen.
-    diplocy-war-info: PvP. Städte und Hauptstädte angreifen und erobern.
+    diplomacy-peace-war-instant: Sofort Frieden erklären
+    diplomacy-peace-war-request: Friedensanfrage
+    diplomacy-peace-trade: Handel beenden und Frieden erklären
+    diplomacy-peace-alliance: Allianz beenden und Frieden erklären
+    diplomacy-trade-peace: Handelsanfrage
+    diplomacy-trade-alliance: Allianz beenden und Handel erklären
+    diplomacy-war-instant: Sofort Krieg erklären
+    diplomacy-war-request: Kriegsanfrage
+    diplomacy-alliance: Allianzanfrage
+    diplomacy-peace-info: Standard. Kann PvP zulassen.
+    diplomacy-trade-info: Kein PvP. Handelsrabatte für Dorfbewohner. Truhenläden nutzen.
+    diplomacy-alliance-info: Kein PvP. Handelsrabatte für Dorfbewohner. Truhenläden nutzen. Verteidigungspakt. Zu Städten und Hauptstädten reisen.
+    diplomacy-war-info: PvP. Städte und Hauptstädte angreifen und erobern.
     title-join: Einem Königreich beitreten
     title-confirm: Sind Sie sicher?
     title-invites: Königreich-Einladungen

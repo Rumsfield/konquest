@@ -17,7 +17,7 @@ label:
   allied-building: Müttefik Yapı
   armor: Zırh
   back: Geri
-  barbarian: Barbar
+  barbarians: Barbarlar
   blocks: Bloklar
   bypass: BYPASS
   camps: Kamplar
@@ -46,7 +46,7 @@ label:
   information: Bilgi
   invalid: Geçersiz
   kingdom: Krallık
-  kingdom-role: Krallık Rolü
+  kingdom-rank: Krallık Sıralaması
   kingdoms: Krallıklar
   knights: Şovalyeler
   land: Alan
