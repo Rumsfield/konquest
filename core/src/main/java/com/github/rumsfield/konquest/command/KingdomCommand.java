@@ -27,7 +27,7 @@ public class KingdomCommand extends CommandBase {
 		// Define arguments
 		// None
 		setOptionalArgs(true);
-		// menu
+		// [menu]
 		addArgument(
 				newArg("menu",true,false)
 		);
@@ -126,8 +126,7 @@ public class KingdomCommand extends CommandBase {
 			case "create":
 				// Create a new kingdom
 				// Check if players can create kingdoms from config
-				boolean isAdminOnly = konquest.getCore().getBoolean(CorePath.KINGDOMS_CREATE_ADMIN_ONLY.getPath());
-				if(isAdminOnly) {
+				if(konquest.getKingdomManager().isKingdomCreateAdminOnly()) {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 					return;
 				}
@@ -302,7 +301,7 @@ public class KingdomCommand extends CommandBase {
 			case "templates":
 				// Display templates menu
 				if(args.size() == 1) {
-					konquest.getDisplayManager().displayTemplateInfoMenu(player);
+					konquest.getDisplayManager().displayInfoTemplateListMenu(player);
 				} else {
 					sendInvalidArgMessage(bukkitPlayer);
 				}

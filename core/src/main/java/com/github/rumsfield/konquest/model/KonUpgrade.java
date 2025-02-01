@@ -48,13 +48,13 @@ public enum KonUpgrade implements KonquestUpgrade {
 
 	private final int levels;
 	private final Material icon;
-	private final String description;
+	private final String name;
 	private final String[] levelDescriptions;
 	
-	KonUpgrade(int levels, Material icon, String description, String[] levelDescriptions) {
+	KonUpgrade(int levels, Material icon, String name, String[] levelDescriptions) {
 		this.levels = levels;
 		this.icon = icon;
-		this.description = description;
+		this.name = name;
 		this.levelDescriptions = levelDescriptions;
 	}
 	
@@ -79,13 +79,23 @@ public enum KonUpgrade implements KonquestUpgrade {
 	}
 	
 	/**
-	 * Gets the description of this upgrade.
+	 * Gets the name of this upgrade.
 	 * 
-	 * @return The description
+	 * @return The name
+	 */
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Gets the name of this upgrade.
+	 *
+	 * @return The name
 	 */
 	@Override
 	public String getDescription() {
-		return description;
+		return name;
 	}
 	
 	/**

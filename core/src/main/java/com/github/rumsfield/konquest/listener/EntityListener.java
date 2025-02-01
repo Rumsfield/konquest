@@ -676,7 +676,7 @@ public class EntityListener implements Listener {
 	    				// If town is upgraded to require a minimum online resident amount, prevent block damage
 						if(town.isTownWatchProtected()) {
 							int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevelWatch));
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getName(), upgradeLevelWatch));
 							event.setCancelled(true);
 							return;
 						}

@@ -9,23 +9,27 @@
 # 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
+# //// LABEL \\\\
+# 整個插件中使用的簡單單字或短語。
 label:
+  admin: 管理員
   admin-kingdom: 管理員王國
   allied-building: 聯合建築商
   armor: 裝甲
-  armors: 裝甲
   back: 返回
-  barbarian: 野蠻人
   barbarians: 野蠻人
   blocks: 方塊
   bypass: 避開
-  camp: 營地
-  capital: 首都
+  camps: 露營地
+  camp-clan: 營地族
+  capitals: 首都
+  captured: 被捕獲
   changing-capital: 更改為王國首都
   changing-town: 換到城鎮
   close: 關閉
   cost: 成本
   critical-hits: 致命打擊
+  current: 現在
   diplomacy: 外交
   disabled: 禁用
   friendly-redstone: 友好紅石
@@ -34,38 +38,36 @@ label:
   favor: 寵幸
   flags: 旗幟
   golem-offense: 鐵傀儡攻擊
+  golem-spawns: 鐵傀儡生成
   health: 生命值
+  home: 家
   immunity: 免疫
   increment-cost: 增加成本
   information: 資訊
   invalid: 無效
   kingdom: 王國
-  kingdom-role: 王國角色
+  kingdom-rank: 王國排名
   kingdoms: 王國
-  knight: 騎士
   knights: 騎士
   land: 土地
   last-seen: 最後出現 %s
   leaderboard: 排行榜
   level: 等級
   loot-chests: 戰利品箱
-  lord: 領主
-  master: 王國大師
-  member: 成員
+  map-color: 地圖顏色
   members: 成員
   modified: 修改
-  monument: 紀念碑
   monument-template: 紀念碑模板
-  name: 名稱
-  neutral: 中立
+  monument-templates: 紀念碑模板
   neutrals: 中立者
   next: 下一個
   no-lord: 無領主
-  officer: 官員
+  no-permission: 沒有許可
   officers: 官員
   online-players: 在線玩家
   open: 開放
   options: 選項
+  owner: 擁有者
   peaceful: 和平
   player: 玩家
   players: 玩家
@@ -73,27 +75,43 @@ label:
   population: 人口
   properties: 屬性
   protected: 受保護
-  residencies: 居住區
-  resident: 居民
   residents: 居民
-  ruin: 遺跡
-  sanctuary: 聖所
+  return: 回程
+  ruins: 遺跡
+  sanctuaries: 聖殿
   score: 得分
   shield: 盾牌
-  shields: 盾牌
   smallest: 最小
   specialization: 專業
-  stats: 統計
-  total-players: 總玩家數
   total: 總計
-  town: 城鎮
   towns: 城鎮
+  town-role: 城鎮角色
+  travel: 旅行
   'true': '真'
   unavailable: 不可用
   upgrades: 升級
   valid: 有效
   world: 世界
-placeholder:
+# //// TERRITORY \\\\
+# 不同領土類型的名稱。
+territory:
+  wild: 野外
+  capital: 首都
+  town: 城鎮
+  camp: 營地
+  ruin: 廢墟
+  sanctuary: 聖域
+# //// DIPLOMACY \\\\
+# 王國之間外交關係的名稱。
+diplomacy:
+  war: 戰爭
+  peace: 和平
+  trade: 貿易
+  alliance: 聯盟
+  self: 你的王國
+# //// RELATIONSHIP \\\\
+# 玩家之間的關係、他們在王國內的等級以及他們在城鎮內的角色的名稱。
+relationship:
   friendly: 友好
   enemy: 敵對
   barbarian: 野蠻
@@ -103,6 +121,12 @@ placeholder:
   rank-master: 王國大師
   rank-officer: 官員
   rank-member: 成員
+  role-lord: 領主
+  role-knight: 騎士
+  role-resident: 居民
+# //// MAP \\\\
+# 標籤僅在 Dynmap 等網頁瀏覽器地圖中使用。
+# 這些可以具有 HTML 格式。
 map:
   barbarian: 野蠻人
   barbarians: 野蠻人
@@ -119,7 +143,50 @@ map:
   golem-spawns: 鐵傀儡生成
   sanctuary: 聖所
   templates: 紀念碑模板
+# //// MENU \\\\
+# 所有庫存選單中使用的文字。
 menu:
+  hint:
+    disable: 點選停用
+    apply: 點擊申請
+    view: 點擊查看
+    open: 點擊打開
+    charge: 點擊充電
+    change: 點擊更改
+    travel: 點擊旅行
+    exit: 退出選單
+  main:
+    title: Konquest主選單
+    title-dashboard: Konquest儀表板
+    dashboard: 儀表板
+    help: Konquest說明選單
+    info: 資訊選單
+    quest: 任務書
+    stats: 成就統計簿
+    prefix: 前綴選單
+    score: 分數選單
+    kingdom: 王國菜單
+    town: 城鎮菜單
+    travel: 旅遊選單
+    map-auto: 地圖自動模式
+    kingdom-chat: 王國聊天
+    admin-bypass: 管理員繞過
+    border: 邊框顯示
+    flying: 飛行
+    hint-map-1: 左鍵點擊可查看常規地圖
+    hint-map-2: 右鍵點擊查看遠處地圖
+    hint-favor: 點擊顯示恩惠成本
+    hint-spy: 點擊購買間諜地圖
+    description-dashboard: 更改您的設定並使用命令。
+    description-help: 查看有關如何玩的提示和命令清單。
+    description-info: 查看所有玩家、王國、城鎮等的資訊。
+    description-quest: 打開你的任務書來查看你獲得獎勵的進度。
+    description-stats: 打開您的統計手冊以查看您的成就統計數據以及獲得新前綴稱號的進度。
+    description-prefix: 修改聊天中與您的姓名一起顯示的前綴標題。
+    description-score: 顯示玩家和王國的分數和排行榜。
+    description-kingdom: 管理你的王國，加入其他王國，或成為一個野蠻人。
+    description-town: 管理您的城鎮並加入其他城鎮。
+    description-travel: 傳送至各個目的地。
   stats:
     title: 成就統計
     intro-1: 使用"/k stats"或"/k s"再次打開這本書。
@@ -143,18 +210,28 @@ menu:
     fail-attack: 當城鎮受到攻擊時無法添加任何升級！
     add: 已將 %s 等級 %s 添加到 %s 城鎮！
   help:
-    title: Konquest說明
-    admin: 管理員說明
-    tips: Konquest小貼士
+    title-start: Konquest入門
+    title-commands: Konquest指令
+    title-admin: Konquest管理指令
+    description-start: 尋找有關如何玩Konquest的提示。
+    description-community: 訪問該伺服器的線上社群。
+    description-main: 前往Konquest主選單。
+    description-commands: 查看所有聊天命令。
+    description-admin: 查看所有管理員聊天命令。
+    description-quest: 打開你的任務書。
+    start: 入門
     community: 社區
-    hint: 點擊以加入
+    main: 主選單
+    commands: 命令
+    admin: 管理命令
+    quest: 尋書
     tip-1: 野蠻人是沒有國家的預設玩家。他們可以放置床以建立營地，攻擊其他野蠻人，並摧毀城鎮。
     tip-2: 使用"/k kingdom"來打開國家菜單，加入國家，或使用"/k kingdom create"創建自己的國家。
     tip-3: 其他國家的外交選項包括：和平、貿易、聯盟、戰爭。處於戰爭狀態的敵對國家可以互相佔領對方的城鎮。
     tip-4: 使用"/k settle"來為您的國家創建新的城鎮。使用"/k map"來查看周圍的土地，以及有關您所在位置是否可以建城的提示。
-    tip-5: 使用"/k town"打開一般的城鎮菜單，以加入和離開您的國家城鎮。使用"/k town <name>"來管理城鎮，如升級或居民。
-    tip-6: 要保護容器和動物免受敵人侵害，提高您的統計數據和得分，以及防止怪物生成，請聲明城鎮土地。
-    tip-7: 使用"/k town <name>"並選擇地塊，設立城鎮地塊，只有特定的居民可以在其中建造。更改城鎮選項以讓居民僅在自己的地塊中建造。
+    tip-5: 使用"/k town"開啟城鎮選單，加入和離開您王國的城鎮，以及管理您控制的城鎮。
+    tip-6: 使用"/k claim"聲明城鎮土地，以保護容器和動物免受敵人侵害，提高您的統計數據和分數，並防止怪物產卵。
+    tip-7: 在城鎮選單中設定只有特定居民才能建造的城鎮地塊。改變城鎮選項以允許居民僅在自己的地塊上建造建築物。
     tip-8: 建造鐵傀儡來保護您的城鎮免受敵對玩家的侵害。尋找廢墟，擊敗廢墟鐵傀儡以獲得獎勵。
     tip-9: 使用"/k stats"和"/k score"來查看玩家統計數據。使用"/k prefix"來設置您自己的聊天標題。通過增加統計數據解鎖稱號。
   score:
@@ -169,19 +246,24 @@ menu:
     town-3: 玩家居民
     land-3: 居民城鎮土地
     player-score: 玩家得分
-    hint: 點擊以查看
+    kingdom-score: 王國分數
+    description-players: 列出所有玩家得分並查看詳細信息
+    description-kingdoms: 列出所有王國的得分並通過排行榜查看詳細信息
+    leaderboard-empty: 此王國的得分排行榜上沒有玩家
   map:
     center: 地圖中心
     proximity: 鄰近
     settle-hint: 在此安頓
   prefix:
-    disable: 關閉
-    hint-disable: 點擊以禁用
-    hint-apply: 點擊以應用
-    custom-pages: 自訂前綴
-    no-allow: 權限不足
+    title-prefix: 前綴標題
+    title-custom: 自訂前綴
+    title-stats: 成就統計
+    current-prefix: 目前前綴
+    disable-prefix: 禁用前綴
+    description-prefix: 為你的名字選擇一個新的前綴標題
+    description-custom: 購買您名字的自訂前綴
+    description-stats: 顯示用於解鎖新前綴標題的統計數據
   shield:
-    hint: 點擊以充能
     fail-max: 充能失敗，超過最大值：%s。
     fail-add: 充能失敗，無法添加到現有充能。
     fail-attack: 城鎮受到攻擊時無法充能！
@@ -189,14 +271,23 @@ menu:
     activate-new: 充能 %s 以獲得 %s。
     activate-add: 透過 %s 增加了 %s 的充能。
   options:
-    hint: 點擊以更改
-    current: '當前：%s'
     allied-building: 同盟玩家可以建造
     open: 所有王國成員都可以建造和使用箱子
     plot: 居民只能在地塊中建造和使用箱子
     friendly-redstone: 王國成員可以使用紅石開關和門
     redstone: 敵人可以使用紅石開關和門
     golem: 鐵傀儡將攻擊進入的所有敵人
+  info:
+    camp-placed: 野蠻人營地已放置。
+    camp-missing: 該玩家沒有營地。
+    ruin-status: 捕獲狀態
+    ruin-capture: 佔領這個遺骸可以獲得獎勵。
+    template-kingdoms: 列出所有使用此紀念碑模板的王國。
+  travel:
+    description-capital: 前往你們王國的首都。
+    description-home: 到你家的床上去。
+    description-camp: 前往你的野蠻人營地。
+    description-wild: 前往野外的隨機地點。
   plots:
     edit-add-land: 添加土地
     edit-remove-land: 移除土地
@@ -264,11 +355,9 @@ menu:
     description-upgrades: 應用城鎮升級
     description-options: 編輯城鎮選項
     description-special: 選擇專業以獲得與該城鎮的村民的折扣
-    hint-open: 點擊以打開
     hint-join: 點擊以發送加入請求
     hint-join-now: 點擊以立即加入
     hint-leave: 點擊以離開
-    hint-list: 點擊以查看
     hint-accept: 左鍵單擊接受
     hint-decline: 右鍵單擊拒絕
     hint-manage: 點擊以管理
@@ -279,7 +368,6 @@ menu:
     hint-special: 點擊以專業化
     lore-special: 選擇此專業以獲得此城鎮村民的折扣。
     info-special: 從事這項職業的村民在這個鎮上給予折扣。
-    title-root: 城鎮菜單
     title-join: 加入城鎮
     title-leave: 離開城鎮
     title-list: 城鎮列表
@@ -290,6 +378,7 @@ menu:
     title-destroy: 摧毀城鎮
   kingdom:
     join: 加入
+    create: 創造
     exile: 放逐
     invites: 邀請
     list: 列表
@@ -302,6 +391,7 @@ menu:
     disband: 解散
     capital: 首都
     description-join: 請求加入一個王國，或使用 /k kingdom create 創建自己的王國
+    description-create: 在你目前位置創建一個新的王國首都
     description-exile: 離開您當前的王國，成為一名蠻族
     description-invites: 查看您的王國邀請
     description-list: 查看所有王國
@@ -313,16 +403,13 @@ menu:
     description-template: 更改王國紀念碑模板
     description-disband: 解散並刪除王國
     description-capital: 將首都遷往另一個城鎮
-    hint-open: 點擊以打開
     hint-exile: 點擊以成為蠻族
-    hint-exit: 退出菜單
     hint-disband: 點擊以刪除您的王國
     hint-template: 點擊以更改模板
     hint-join: 點擊以發送加入請求
     hint-join-now: 點擊以立即加入
     hint-accept: 左鍵點擊接受
     hint-decline: 右鍵點擊拒絕
-    hint-list: 點擊以查看信息
     hint-relation: 點擊以選擇外交方式
     hint-diplomacy: 點擊以實施
     hint-promote: 點擊以晉升為官員
@@ -344,7 +431,6 @@ menu:
     diplomacy-trade-info: 禁止PvP。村民交易折扣。使用箱子商店。
     diplomacy-alliance-info: 禁止PvP。村民交易折扣。使用箱子商店。防禦性條約。前往城鎮和首都。
     diplomacy-war-info: PvP。攻擊和佔領城鎮和首都。
-    title-root: 王國菜單
     title-join: 加入王國
     title-confirm: 您確定嗎？
     title-invites: 王國邀請
@@ -358,6 +444,8 @@ menu:
     title-template: 紀念碑模板
     title-disband: 解散王國
     title-capital: 轉移資本
+# //// GENERIC \\\\
+# 整個插件中使用的訊息。
 generic:
   notice:
     enable-auto: 已啟用。再次使用此命令可禁用。
@@ -400,6 +488,8 @@ generic:
     disabled: 目前已禁用此功能，請與管理員聯繫。
     region: 在設定其他區域時無法執行此操作。
     failed: 失敗 :(
+# //// PROTECTION \\\\
+# 關於保護方塊和土地不受玩家幹擾的資訊。
 protection:
   notice:
     ignore: 使用 "/k admin bypass" 忽略保護。
@@ -460,6 +550,9 @@ protection:
     portal-exit: 您的出口傳送門位於受保護的領土內，請移動您的傳送門！
     capital-immune: 在 %s 鎮保持在 %s 王國中時，這個首都免受攻擊。
     no-allied-build: 該城鎮的選項不允許來自同盟王國的玩家建造。
+    template-modify: 該紀念碑模板目前正在修改，即將發布。
+# //// COMMAND \\\\
+# 用於所有命令的訊息。
 command:
   admin:
     camp:
@@ -593,14 +686,6 @@ command:
       command: 所有主要命令都使用：
     error:
       page: 頁面值必須是一個數字。
-  info:
-    notice:
-      kingdom-header: '%s的王國'
-      town-header: '%s的城鎮'
-      camp-placed: 已放置蠻族營地。
-      camp-missing: 此玩家沒有營地。
-      ruin-status: 佔領狀態
-      ruin-capture: 此遺跡可以佔領以獲得獎勵。
   kingdom:
     broadcast:
       create: '%s 建立了 %s 王國'
@@ -697,9 +782,11 @@ command:
       all-header: 所有王國分數
       score: '您的分數：%s，%s 王國的分數：%s'
       player: '%s 的分數：%s，%s 王國的分數：%s'
+      kingdom: '%s 王國得分：%s'
     error:
       peaceful: '%s 王國處於和平狀態，無法計分。'
       barbarian: '%s 是野蠻人，無法計分。'
+      kingdom: 此王國無法得分。
   settle:
     broadcast:
       settle: '%s 已經為 %s 王國建立了 %s 城鎮'
@@ -815,6 +902,8 @@ command:
       fail-lord: 解除佔領失敗，您必須是城鎮領主。
       fail-unclaimed: 未能取消聲明，您必須站在已聲明的領土內。
       fail-center: 解除佔領失敗，無法移除領土中心。
+# //// SHOP \\\\
+# 用於寶箱商店整合的訊息。
 shop:
   error:
     use-disabled: 無法在此處使用商店！
@@ -824,12 +913,23 @@ shop:
     create-monument: 不能在紀念碑內創建商店！
     create-fail: 不能在此處創建商店！
     create-wild: 不能在荒野中創建商店！
+# //// REGION \\\\
+# 用於陸地區域整合的訊息。
 region:
   error:
     claim-deny: 附近的區域拒絕聲稱這塊土地。
     unclaim-deny: 附近的區域拒絕放棄這塊土地。
     travel-enter-deny: 目的地的區域拒絕進入。
     travel-exit-deny: 您目前所處的位置的區域拒絕離開。
+# //// DISCORD-SRV \\\\
+# 用於DiscordSRV整合的訊息。
+discord-srv:
+  discord: Discord
+  no-link: 您沒有連結到 Discord。輸入 /discord 鏈接
+  no-user: 找不到與您關聯的 Discord 使用者。
+  linked-user: 您已連結到 Discord 中的 %s。
+# //// DIRECTIVE \\\\
+# 任務指令的標籤和描述。
 directive:
   create-kingdom: 建立基礎
   create-kingdom-info: 創建您自己的王國。
@@ -851,6 +951,8 @@ directive:
   capture-town-info: 通過摧毀城鎮紀念碑內的關鍵方塊，來佔領敵方王國中的任何城鎮。
   kill-enemy: 最佳敵人
   kill-enemy-info: 擊殺敵對王國的玩家。
+# //// PREFIX \\\\
+# 所有成就前綴標題和類別的名稱。
 prefix:
   category:
     clergy: 神職
@@ -910,6 +1012,8 @@ prefix:
     chef: 廚師
     cook: 廚師
     baker: 麵包師傅
+# //// STAT \\\\
+# 所有成就統計的名稱和描述。
 stat:
   enchantments: 附魔
   enchantments-info: 應用於物品的附魔
@@ -965,6 +1069,8 @@ stat:
   kingdoms-info: 創建的新王國數
   conquests: 征服
   conquests-info: 征服的敵對王國數
+# //// UPGRADE \\\\
+# 所有城鎮升級的名稱和描述。
 upgrade:
   disabled: 城鎮沒有足夠的人口來完成全面升級。
   loot:
@@ -999,8 +1105,11 @@ upgrade:
   enchant:
     name: 更好的附魔
     level-1: 提高1級附魔選擇
+# //// DESCRIPTION \\\\
+# 所有插件命令的描述。
 description:
   help: 顯示幫助訊息。
+  menu: 開啟Konquest主選單。
   info: 顯示關於不同事物的資訊。
   list: 列出不同的領地。
   favor: 顯示你的貨幣為「寵幸」。
@@ -1029,29 +1138,16 @@ description:
   admin-camp: 管理任何營地。
   admin-capture: 為任何王國捕捉城鎮。
   admin-monument: 建立、刪除或顯示紀念碑模板。
-  admin-list: 顯示所有王國或王國的城鎮。
   admin-ruin: 管理廢墟領地。
   admin-sanctuary: 管理聖域領地。
   admin-save: 保存王國和玩家資料檔。
   admin-settravel: 設置您所在領地的旅行點。
   admin-travel: 前往指定的王國或城鎮。
   admin-reload: 重新加載配置文件。
-  admin-flag: 設置王國旗幟。使用不帶參數的命令列出可用標誌。
+  admin-flag: 為王國和領土設置財產旗幟。
   admin-stat: 管理玩家統計數據。
-territory:
-  wild: 野外
-  capital: 首都
-  town: 城鎮
-  camp: 營地
-  ruin: 廢墟
-  sanctuary: 聖域
-  other: 其他
-diplomacy:
-  war: 戰爭
-  peace: 和平
-  trade: 貿易
-  alliance: 聯盟
-  self: 你的王國
+# //// PROPERTIES \\\\
+# 王國和領土內所有財產旗幟的名稱和描述。
 properties:
   travel-name: 旅行
   travel: 允許前往這個領土
@@ -1101,8 +1197,3 @@ properties:
   shop: 允許玩家創建商店
   arena-name: 競技場
   arena: 允許任何玩家互相戰鬥
-discord-srv:
-  discord: Discord
-  no-link: 您沒有連結到 Discord。輸入 /discord 鏈接
-  no-user: 找不到與您關聯的 Discord 使用者。
-  linked-user: 您已連結到 Discord 中的 %s。

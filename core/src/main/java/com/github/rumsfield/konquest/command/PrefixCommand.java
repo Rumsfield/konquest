@@ -22,7 +22,7 @@ public class PrefixCommand extends CommandBase {
 		super("prefix",true, false);
 		// None
 		setOptionalArgs(true);
-		// menu
+		// [menu]
 		addArgument(
 				newArg("menu",true,false)
 		);

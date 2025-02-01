@@ -230,6 +230,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		campManager.initCamps();
 		mapHandler.drawAllTerritories();
 		initOnlinePlayers();
+		refreshPlayerHeads();
 		integrationManager.getDiscordSrv().setKonquestReady();
 		integrationManager.getDiscordSrv().refreshRoles();
 	}
@@ -425,12 +426,12 @@ public class Konquest implements KonquestAPI, Timeable {
 		// Apply suffix optionally
 		if(useRelationSuffix) {
 			String separator = " ";
-			friendlyTeam.setSuffix(separator+friendColor2+MessagePath.PLACEHOLDER_FRIENDLY.getMessage());
-			enemyTeam.setSuffix(separator+enemyColor2+MessagePath.PLACEHOLDER_ENEMY.getMessage());
-			tradeTeam.setSuffix(separator+tradeColor2+MessagePath.PLACEHOLDER_TRADER.getMessage());
-			peacefulTeam.setSuffix(separator+peacefulColor2+MessagePath.PLACEHOLDER_PEACEFUL.getMessage());
-			alliedTeam.setSuffix(separator+alliedColor2+MessagePath.PLACEHOLDER_ALLY.getMessage());
-			barbarianTeam.setSuffix(separator+barbarianColor2+MessagePath.PLACEHOLDER_BARBARIAN.getMessage());
+			friendlyTeam.setSuffix(separator+friendColor2+MessagePath.RELATIONSHIP_FRIENDLY.getMessage());
+			enemyTeam.setSuffix(separator+enemyColor2+MessagePath.RELATIONSHIP_ENEMY.getMessage());
+			tradeTeam.setSuffix(separator+tradeColor2+MessagePath.RELATIONSHIP_TRADER.getMessage());
+			peacefulTeam.setSuffix(separator+peacefulColor2+MessagePath.RELATIONSHIP_PEACEFUL.getMessage());
+			alliedTeam.setSuffix(separator+alliedColor2+MessagePath.RELATIONSHIP_ALLY.getMessage());
+			barbarianTeam.setSuffix(separator+barbarianColor2+MessagePath.RELATIONSHIP_BARBARIAN.getMessage());
 		}
 	}
 	
@@ -552,7 +553,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		KonPlayer player;
     	// Fetch player from the database
     	// Also instantiates player object in PlayerManager
-		databaseThread.getDatabase().fetchPlayerData(bukkitPlayer);
+		boolean isExistingPlayer = databaseThread.getDatabase().fetchPlayerData(bukkitPlayer);
 		if(!playerManager.isOnlinePlayer(bukkitPlayer)) {
 			ChatUtil.printDebug("Failed to init a non-existent player!");
 			return null;
@@ -632,6 +633,10 @@ public class Konquest implements KonquestAPI, Timeable {
 		}
     	territoryManager.updatePlayerBorderParticles(player);
     	ChatUtil.resetTitle(bukkitPlayer);
+		if (!isExistingPlayer) {
+			// Update player head
+			getPlayerHead(bukkitPlayer);
+		}
 		return player;
 	}
 	
@@ -1260,19 +1265,24 @@ public class Konquest implements KonquestAPI, Timeable {
 	    	}
     	}
     }
+
+	public void refreshPlayerHeads() {
+		for (OfflinePlayer player : playerManager.getAllOfflinePlayers()) {
+			getPlayerHead(player);
+		}
+	}
     
     public ItemStack getPlayerHead(OfflinePlayer bukkitOfflinePlayer) {
-		if(!headCache.containsKey(bukkitOfflinePlayer.getUniqueId())) {
+		UUID playerId = bukkitOfflinePlayer.getUniqueId();
+		if(!headCache.containsKey(playerId)) {
     		ChatUtil.printDebug("Missing "+bukkitOfflinePlayer.getName()+" player head in the cache, creating...");
     		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
     		SkullMeta meta = (SkullMeta)item.getItemMeta();
         	meta.setOwningPlayer(bukkitOfflinePlayer);
     		item.setItemMeta(meta);
-    		headCache.put(bukkitOfflinePlayer.getUniqueId(),item);
-    		return item;
-    	} else {
-    		return headCache.get(bukkitOfflinePlayer.getUniqueId());
+    		headCache.put(playerId,item);
     	}
+		return headCache.get(playerId);
     }
 
 	/*

@@ -23,12 +23,16 @@ public class LanguageManager {
 		if(lang == null) {
 			ChatUtil.printConsoleError("Failed to load any language messages");
 		} else {
-			if(validateMessages()) {
-				isValid = true;
+			if(lang.getKeys(false).size() > 1) {
+				if(validateMessages()) {
+					isValid = true;
+				} else {
+					ChatUtil.printConsoleError("Failed to validate language messages. Correct the above issues with the language YAML file.");
+				}
+				checkMessages();
 			} else {
-				ChatUtil.printConsoleError("Failed to validate language messages. Correct the above issues with the language YAML file.");
+				ChatUtil.printConsoleError("Failed to load language messages. Correct the above issues with the language YAML file.");
 			}
-			checkMessages();
 		}
 		ChatUtil.printDebug("Language Manager is ready");
 	}

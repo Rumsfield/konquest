@@ -55,6 +55,24 @@ public class CampManager implements KonquestCampManager {
 		String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
 		return player.isBarbarian() && barbarianCamps.containsKey(uuid);
 	}
+
+	public boolean isCampName(String name) {
+		for(KonCamp camp : barbarianCamps.values()) {
+			if(camp.getName().equalsIgnoreCase(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public KonCamp getCampByName(String name) {
+		for(KonCamp camp : barbarianCamps.values()) {
+			if(camp.getName().equalsIgnoreCase(name)) {
+				return camp;
+			}
+		}
+		return null;
+	}
 	
 	public KonCamp getCamp(KonquestOfflinePlayer player) {
 		String uuid = player.getOfflineBukkitPlayer().getUniqueId().toString();
@@ -258,7 +276,7 @@ public class CampManager implements KonquestCampManager {
 			if(removedCamp.getBedLocation().getBlock().getBlockData() instanceof Bed) {
 				removedCamp.getBedLocation().getBlock().breakNaturally();
 			}
-			//update the chunk cache, remove all points from primary world
+			// Update the chunk cache, remove all points from primary world
 			konquest.getTerritoryManager().removeAllTerritory(removedCamp.getWorld(),removedCamp.getChunkList().keySet());
 			// Refresh groups
 			Collection<KonCamp> groupSet = new ArrayList<>();

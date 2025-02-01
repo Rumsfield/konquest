@@ -41,7 +41,7 @@ public class CompatibilityUtil {
         professionMaterial.put(Villager.Profession.LIBRARIAN,       Material.LECTERN);
         professionMaterial.put(Villager.Profession.MASON,           Material.STONECUTTER);
         professionMaterial.put(Villager.Profession.NITWIT,          Material.PUFFERFISH_BUCKET);
-        professionMaterial.put(Villager.Profession.NONE,            Material.GRAVEL);
+        professionMaterial.put(Villager.Profession.NONE,            Material.BUCKET);
         professionMaterial.put(Villager.Profession.SHEPHERD,        Material.LOOM);
         professionMaterial.put(Villager.Profession.TOOLSMITH,       Material.SMITHING_TABLE);
         professionMaterial.put(Villager.Profession.WEAPONSMITH,     Material.GRINDSTONE);

@@ -349,7 +349,7 @@ public class TownAdminCommand extends CommandBase {
 								upgrade.toString() +
 								" - " +
 								ChatColor.RESET +
-								upgrade.getDescription() +
+								upgrade.getName() +
 								" " +
 								upgradeLevel +
 								" " +
@@ -380,7 +380,7 @@ public class TownAdminCommand extends CommandBase {
 					}
 					// Set town upgrade and level
 					if (konquest.getUpgradeManager().applyTownUpgrade(town, upgrade, upgradeLevel)) {
-						ChatUtil.sendNotice(sender, MessagePath.MENU_UPGRADE_ADD.getMessage(upgrade.getDescription(),upgradeLevel,town.getName()));
+						ChatUtil.sendNotice(sender, MessagePath.MENU_UPGRADE_ADD.getMessage(upgrade.getName(),upgradeLevel,town.getName()));
 					}
 				} else {
 					sendInvalidArgMessage(sender);
@@ -645,7 +645,7 @@ public class TownAdminCommand extends CommandBase {
 					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_PLAYER.getMessage());
 					return;
 				}
-				konquest.getDisplayManager().displayTownPlotMenu(player.getBukkitPlayer(), town);
+				konquest.getDisplayManager().displayTownPlotMenu(player, town);
 				break;
 		}
 	}

@@ -110,20 +110,10 @@ public class SettleCommand extends CommandBase {
 			}
 
 			double cost = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
-        	double incr = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath());
-			boolean isIncrementKingdom = konquest.getCore().getBoolean(CorePath.TOWNS_SETTLE_INCREMENT_KINGDOM.getPath(),false);
-			int townCount;
-			if (isIncrementKingdom) {
-				// All kingdom towns
-				townCount = player.getKingdom().getNumTowns();
-			} else {
-				// Towns that have the player as the lord
-				townCount = konquest.getKingdomManager().getPlayerLordships(player);
-			}
-        	double adj_cost = (((double)townCount)*incr) + cost;
+			double settleCost = konquest.getKingdomManager().getSettleCost(player);
         	if(cost > 0) {
-	        	if(KonquestPlugin.getBalance(bukkitPlayer) < adj_cost) {
-					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(adj_cost));
+	        	if(KonquestPlugin.getBalance(bukkitPlayer) < settleCost) {
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(settleCost));
 	                return;
 				}
         	}
@@ -234,8 +224,8 @@ public class SettleCommand extends CommandBase {
         	}
         	
 			if(cost > 0 && settleStatus == 0) {
-	            if(KonquestPlugin.withdrawPlayer(bukkitPlayer, adj_cost)) {
-	            	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)cost);
+	            if(KonquestPlugin.withdrawPlayer(bukkitPlayer, settleCost)) {
+	            	konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.FAVOR,(int)settleCost);
 	            }
 			}
         }

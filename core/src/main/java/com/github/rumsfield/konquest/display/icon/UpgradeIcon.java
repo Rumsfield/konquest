@@ -1,50 +1,27 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonUpgrade;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
-import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.ChatColor;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
+public class UpgradeIcon extends MenuIcon{
 
-public class UpgradeIcon implements MenuIcon{
+	private final KonUpgrade upgrade;
+	private final int level;
 
-	KonUpgrade upgrade;
-	int level;
-	int cost;
-	int pop;
-	int index;
-	ItemStack item;
-
-	private final String loreColor = DisplayManager.loreFormat;
-	private final String valueColor = DisplayManager.valueFormat;
 	
 	public UpgradeIcon(KonUpgrade upgrade, int level, int index, int cost, int pop) {
+		super(index);
 		this.upgrade = upgrade;
 		this.level = level;
-		this.index = index;
-		this.cost = cost;
-		this.pop = pop;
-		this.item = initItem();
-	}
-
-	private ItemStack initItem() {
-		List<String> loreList = new ArrayList<>();
-		loreList.add(loreColor+MessagePath.LABEL_LEVEL.getMessage()+" "+level);
-		loreList.add(loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
-		loreList.add(loreColor+MessagePath.LABEL_POPULATION.getMessage()+": "+valueColor+pop);
-		for(String line : HelperUtil.stringPaginate(upgrade.getLevelDescription(level))) {
-			loreList.add(loreColor+line);
-		}
-		String name = ChatColor.GOLD+upgrade.getDescription();
-		return CompatibilityUtil.buildItem(upgrade.getIcon(), name, loreList);
+		// Item Lore
+		addNameValue(MessagePath.LABEL_LEVEL.getMessage(),level);
+		addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(cost));
+		addNameValue(MessagePath.LABEL_POPULATION.getMessage(),pop);
+		addDescription(upgrade.getLevelDescription(level));
 	}
 	
 	public KonUpgrade getUpgrade() {
@@ -56,18 +33,13 @@ public class UpgradeIcon implements MenuIcon{
 	}
 
 	@Override
-	public int getIndex() {
-		return index;
-	}
-
-	@Override
 	public String getName() {
-		return upgrade.getDescription();
+		return DisplayManager.nameFormat + upgrade.getName();
 	}
 
 	@Override
 	public ItemStack getItem() {
-		return item;
+		return CompatibilityUtil.buildItem(upgrade.getIcon(), getName(), getLore());
 	}
 	
 	@Override

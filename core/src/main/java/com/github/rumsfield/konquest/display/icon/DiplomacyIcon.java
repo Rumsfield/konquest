@@ -5,44 +5,25 @@ import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.Labeler;
 import org.bukkit.ChatColor;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class DiplomacyIcon implements MenuIcon {
+public class DiplomacyIcon extends MenuIcon {
 
 	private final KonquestDiplomacyType relation;
-	private final List<String> lore;
-	private final int index;
 	private final boolean isClickable;
 	
-	public DiplomacyIcon(KonquestDiplomacyType relation, List<String> lore, int index, boolean isClickable) {
+	public DiplomacyIcon(KonquestDiplomacyType relation, int index, boolean isClickable) {
+		super(index);
 		this.relation = relation;
-		this.lore = lore;
-		this.index = index;
 		this.isClickable = isClickable;
 	}
 	
 	public KonquestDiplomacyType getRelation() {
 		return relation;
 	}
-	
-	@Override
-	public int getIndex() {
-		return index;
-	}
 
 	@Override
 	public String getName() {
-		return Labeler.lookup(relation);
-	}
-
-	@Override
-	public ItemStack getItem() {
-		List<String> itemLore = new ArrayList<>(lore);
 		String nameColor = ""+ChatColor.GOLD;
 		switch(relation) {
 			case WAR:
@@ -60,8 +41,12 @@ public class DiplomacyIcon implements MenuIcon {
 			default:
 				break;
 		}
-		String name = nameColor+getName();
-		return CompatibilityUtil.buildItem(relation.getIcon(), name, itemLore);
+		return nameColor+Labeler.lookup(relation);
+	}
+
+	@Override
+	public ItemStack getItem() {
+		return CompatibilityUtil.buildItem(relation.getIcon(), getName(), getLore());
 	}
 
 	@Override

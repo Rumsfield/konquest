@@ -1,10 +1,8 @@
 package com.github.rumsfield.konquest.utility;
 
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.command.CommandType;
-import com.github.rumsfield.konquest.command.admin.AdminCommandType;
-import org.bukkit.ChatColor;
 
 /**
  * Provides static methods for looking up MessagePath labels from API enums
@@ -41,6 +39,26 @@ public class Labeler {
                 return MessagePath.TERRITORY_RUIN.getMessage();
             case SANCTUARY:
                 return MessagePath.TERRITORY_SANCTUARY.getMessage();
+            default:
+                break;
+        }
+        return "";
+    }
+
+    public static String lookup(KonquestRelationshipType type) {
+        switch(type) {
+            case BARBARIAN:
+                return MessagePath.RELATIONSHIP_BARBARIAN.getMessage();
+            case ENEMY:
+                return MessagePath.RELATIONSHIP_ENEMY.getMessage();
+            case FRIENDLY:
+                return MessagePath.RELATIONSHIP_FRIENDLY.getMessage();
+            case ALLY:
+                return MessagePath.RELATIONSHIP_ALLY.getMessage();
+            case TRADE:
+                return MessagePath.RELATIONSHIP_TRADER.getMessage();
+            case PEACEFUL:
+                return MessagePath.RELATIONSHIP_PEACEFUL.getMessage();
             default:
                 break;
         }

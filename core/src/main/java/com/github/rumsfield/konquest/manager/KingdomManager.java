@@ -12,8 +12,7 @@ import com.github.rumsfield.konquest.api.event.town.KonquestTownDestroyPostEvent
 import com.github.rumsfield.konquest.api.manager.KonquestKingdomManager;
 import com.github.rumsfield.konquest.api.model.*;
 import com.github.rumsfield.konquest.model.*;
-import com.github.rumsfield.konquest.model.KonKingdomScoreAttributes.KonKingdomScoreAttribute;
-import com.github.rumsfield.konquest.model.KonPlayerScoreAttributes.KonPlayerScoreAttribute;
+import com.github.rumsfield.konquest.model.KonKingdomScoreAttributes.ScoreAttribute;
 import com.github.rumsfield.konquest.utility.Timer;
 import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.*;
@@ -229,6 +228,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 	public boolean getIsTownDestroyMasterEnable() {
 		return townDestroyMasterEnable;
+	}
+
+	public boolean isKingdomCreateAdminOnly() {
+		return isAdminOnly;
 	}
 	
 	@Override
@@ -3665,6 +3668,21 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 	}
+
+	public double getSettleCost(KonOfflinePlayer player) {
+		double cost = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
+		double incrementCost = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE_INCREMENT.getPath());
+		boolean isIncrementKingdom = konquest.getCore().getBoolean(CorePath.TOWNS_SETTLE_INCREMENT_KINGDOM.getPath(),false);
+		int townCount;
+		if (isIncrementKingdom) {
+			// All kingdom towns
+			townCount = player.getKingdom().getNumTowns();
+		} else {
+			// Towns that have the player as the lord
+			townCount = getPlayerLordships(player);
+		}
+		return (((double)townCount)*incrementCost) + cost;
+	}
 	
 	public int getPlayerLordships(KonOfflinePlayer player) {
 		int count = 0;
@@ -3811,22 +3829,22 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					numResidentLand += town.getChunkList().size();
 				}
 				if(memberScores.containsKey(offlinePlayer)) {
-					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.TOWN_LORDS, numTownLords);
-					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.TOWN_KNIGHTS, numTownKnights);
-					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.TOWN_RESIDENTS, numTownResidents);
-					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.LAND_LORDS, numLordLand);
-					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.LAND_KNIGHTS, numKnightLand);
-					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttribute.LAND_RESIDENTS, numResidentLand);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_LORDS, numTownLords);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_KNIGHTS, numTownKnights);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_RESIDENTS, numTownResidents);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttributes.ScoreAttribute.LAND_LORDS, numLordLand);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttributes.ScoreAttribute.LAND_KNIGHTS, numKnightLand);
+					memberScores.get(offlinePlayer).addAttribute(KonPlayerScoreAttributes.ScoreAttribute.LAND_RESIDENTS, numResidentLand);
 				} else {
 					KonOfflinePlayer validPlayer = konquest.getPlayerManager().getOfflinePlayer(offlinePlayer);
 					if(validPlayer != null && validPlayer.getKingdom().equals(kingdom)) {
 						KonPlayerScoreAttributes newMemberAttributes = new KonPlayerScoreAttributes();
-						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_LORDS, numTownLords);
-						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_KNIGHTS, numTownKnights);
-						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_RESIDENTS, numTownResidents);
-						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_LORDS, numLordLand);
-						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_KNIGHTS, numKnightLand);
-						newMemberAttributes.setAttribute(KonPlayerScoreAttribute.LAND_RESIDENTS, numResidentLand);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_LORDS, numTownLords);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_KNIGHTS, numTownKnights);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_RESIDENTS, numTownResidents);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.LAND_LORDS, numLordLand);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.LAND_KNIGHTS, numKnightLand);
+						newMemberAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.LAND_RESIDENTS, numResidentLand);
 						memberScores.put(offlinePlayer, newMemberAttributes);
 					}
 				}
@@ -3878,12 +3896,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	    	int cost_settle = (int)konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
 	    	int cost_claim = (int)konquest.getCore().getDouble(CorePath.FAVOR_COST_CLAIM.getPath());
 	    	// Set attributes
-	    	scoreAttributes.setAttributeWeight(KonKingdomScoreAttribute.TOWNS, cost_settle+2);
-	    	scoreAttributes.setAttributeWeight(KonKingdomScoreAttribute.LAND, cost_claim+1);
-	    	scoreAttributes.setAttribute(KonKingdomScoreAttribute.TOWNS, numKingdomTowns);
-	    	scoreAttributes.setAttribute(KonKingdomScoreAttribute.LAND, numKingdomLand);
-	    	scoreAttributes.setAttribute(KonKingdomScoreAttribute.FAVOR, numKingdomFavor);
-	    	scoreAttributes.setAttribute(KonKingdomScoreAttribute.POPULATION, numAllKingdomPlayers);
+	    	scoreAttributes.setAttributeWeight(ScoreAttribute.TOWNS, cost_settle+2);
+	    	scoreAttributes.setAttributeWeight(ScoreAttribute.LAND, cost_claim+1);
+	    	scoreAttributes.setAttribute(ScoreAttribute.TOWNS, numKingdomTowns);
+	    	scoreAttributes.setAttribute(ScoreAttribute.LAND, numKingdomLand);
+	    	scoreAttributes.setAttribute(ScoreAttribute.FAVOR, numKingdomFavor);
+	    	scoreAttributes.setAttribute(ScoreAttribute.POPULATION, numAllKingdomPlayers);
 		}
 		return scoreAttributes;
 	}
@@ -3915,12 +3933,12 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					numResidentLand += town.getChunkList().size();
 				}
 			}
-			scoreAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_LORDS, numTownLords);
-			scoreAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_KNIGHTS, numTownKnights);
-			scoreAttributes.setAttribute(KonPlayerScoreAttribute.TOWN_RESIDENTS, numTownResidents);
-			scoreAttributes.setAttribute(KonPlayerScoreAttribute.LAND_LORDS, numLordLand);
-			scoreAttributes.setAttribute(KonPlayerScoreAttribute.LAND_KNIGHTS, numKnightLand);
-			scoreAttributes.setAttribute(KonPlayerScoreAttribute.LAND_RESIDENTS, numResidentLand);
+			scoreAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_LORDS, numTownLords);
+			scoreAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_KNIGHTS, numTownKnights);
+			scoreAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_RESIDENTS, numTownResidents);
+			scoreAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.LAND_LORDS, numLordLand);
+			scoreAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.LAND_KNIGHTS, numKnightLand);
+			scoreAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.LAND_RESIDENTS, numResidentLand);
 		}
 		return scoreAttributes;
 	}

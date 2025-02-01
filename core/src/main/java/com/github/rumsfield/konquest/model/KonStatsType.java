@@ -6,16 +6,16 @@ import com.github.rumsfield.konquest.utility.MessagePath;
 
 public enum KonStatsType {
 
-	KINGDOMS        (Material.PUFFERFISH_SPAWN_EGG, KonPrefixCategory.ROYALTY,    1,     MessagePath.STAT_KINGDOMS.getMessage(),     MessagePath.STAT_KINGDOMS_INFO.getMessage()),
+	KINGDOMS        (Material.DIAMOND_HELMET, 		KonPrefixCategory.ROYALTY,    1,     MessagePath.STAT_KINGDOMS.getMessage(),     MessagePath.STAT_KINGDOMS_INFO.getMessage()),
 	CONQUESTS       (Material.FIRE_CHARGE,      	KonPrefixCategory.ROYALTY,    1,     MessagePath.STAT_CONQUESTS.getMessage(),    MessagePath.STAT_CONQUESTS_INFO.getMessage()),
 	ENCHANTMENTS    (Material.ENCHANTING_TABLE, 	KonPrefixCategory.CLERGY,     2,     MessagePath.STAT_ENCHANTMENTS.getMessage(), MessagePath.STAT_ENCHANTMENTS_INFO.getMessage()),
 	POTIONS         (Material.BREWING_STAND,    	KonPrefixCategory.CLERGY,     1,     MessagePath.STAT_POTIONS.getMessage(),      MessagePath.STAT_POTIONS_INFO.getMessage()),
 	MOBS            (Material.CREEPER_HEAD,     	KonPrefixCategory.CLERGY,     1,     MessagePath.STAT_MOBS.getMessage(),         MessagePath.STAT_MOBS_INFO.getMessage()),
 	SETTLED         (Material.OAK_DOOR,         	KonPrefixCategory.NOBILITY,   5,     MessagePath.STAT_SETTLED.getMessage(),      MessagePath.STAT_SETTLED_INFO.getMessage()),
 	CLAIMED         (Material.GRASS_BLOCK,      	KonPrefixCategory.NOBILITY,   1,     MessagePath.STAT_CLAIMED.getMessage(),      MessagePath.STAT_CLAIMED_INFO.getMessage()),
-	LORDS           (Material.PURPLE_CONCRETE,  	KonPrefixCategory.NOBILITY,   1,     MessagePath.STAT_LORDS.getMessage(),        MessagePath.STAT_LORDS_INFO.getMessage()),
-	KNIGHTS         (Material.BLUE_CONCRETE,    	KonPrefixCategory.NOBILITY,   0.5,   MessagePath.STAT_KNIGHTS.getMessage(),      MessagePath.STAT_KNIGHTS_INFO.getMessage()),
-	RESIDENTS       (Material.WHITE_CONCRETE,   	KonPrefixCategory.NOBILITY,   0.1,   MessagePath.STAT_RESIDENTS.getMessage(),    MessagePath.STAT_RESIDENTS_INFO.getMessage()),
+	LORDS           (Material.IRON_HELMET,  		KonPrefixCategory.NOBILITY,   1,     MessagePath.STAT_LORDS.getMessage(),        MessagePath.STAT_LORDS_INFO.getMessage()),
+	KNIGHTS         (Material.IRON_HORSE_ARMOR,    	KonPrefixCategory.NOBILITY,   0.5,   MessagePath.STAT_KNIGHTS.getMessage(),      MessagePath.STAT_KNIGHTS_INFO.getMessage()),
+	RESIDENTS       (Material.LEATHER_CHESTPLATE,   KonPrefixCategory.NOBILITY,   0.1,   MessagePath.STAT_RESIDENTS.getMessage(),    MessagePath.STAT_RESIDENTS_INFO.getMessage()),
 	INGOTS          (Material.IRON_INGOT,       	KonPrefixCategory.TRADESMAN,  0.5,   MessagePath.STAT_INGOTS.getMessage(),       MessagePath.STAT_INGOTS_INFO.getMessage()),
 	DIAMONDS        (Material.DIAMOND_ORE,      	KonPrefixCategory.TRADESMAN,  1,     MessagePath.STAT_DIAMONDS.getMessage(),     MessagePath.STAT_DIAMONDS_INFO.getMessage()),
 	CRAFTED         (Material.IRON_PICKAXE,     	KonPrefixCategory.TRADESMAN,  0.1,   MessagePath.STAT_CRAFTED.getMessage(),      MessagePath.STAT_CRAFTED_INFO.getMessage()),

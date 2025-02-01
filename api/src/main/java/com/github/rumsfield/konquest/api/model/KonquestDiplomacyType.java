@@ -21,7 +21,7 @@ public enum KonquestDiplomacyType {
     /**
      * Trading kingdoms allow villager trades and cannot pvp.
      */
-    TRADE			    (Material.GOLD_BLOCK),
+    TRADE			    (Material.EMERALD_BLOCK),
     /**
      * Allied kingdoms can travel to each other's towns and may share a defense pact.
      */

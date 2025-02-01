@@ -40,16 +40,16 @@ public class KonConfig {
 	
 	// returns false if the configuration could not be loaded from a default resource or file
 	public boolean reloadConfig() {
-		boolean result = true;
-		boolean isFileValid = true;
+		boolean isFileValid = false;
+		boolean hasDefaultFile = false;
 		config = new YamlConfiguration();
 		if (file != null) {
 			try {
 				config.load(file);
-				//config = YamlConfiguration.loadConfiguration(file);
+				isFileValid = true;
 			} catch (Exception e) {
+				ChatUtil.printConsoleError(fileName+" contains syntax errors, and has been replaced with the default version. Review the following warning for details. A copy of the original file has been saved, ending in \".bad\".");
 				ChatUtil.printConsoleWarning(e.getMessage());
-				ChatUtil.printConsoleError(fileName+" is not a valid configuration file! Check bad file for syntax errors. Using new default version.");
 				File badFile = new File(plugin.getDataFolder(), fileName+".bad");
 				Path source = file.toPath();
 				Path destination = badFile.toPath();
@@ -61,7 +61,6 @@ public class KonConfig {
 					io.printStackTrace();
 					ChatUtil.printConsoleError("Failed to save bad config file "+fileName);
 				}
-				isFileValid = false;
 			}
 		}
 		// look for defaults in jar, if any
@@ -74,8 +73,9 @@ public class KonConfig {
 			} else {
 				config = defaultConfig;
 			}
+			hasDefaultFile = true;
 		}
-        return result;
+        return isFileValid || hasDefaultFile;
 	}
 	
 	public FileConfiguration getConfig() {
