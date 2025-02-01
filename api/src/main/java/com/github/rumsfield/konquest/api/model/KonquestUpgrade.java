@@ -27,6 +27,15 @@ public interface KonquestUpgrade {
     Material getIcon();
 
     /**
+     * Gets the description of this upgrade.
+     *
+     * @deprecated This method has a confusing name, use {@link #getName()} instead.
+     * @return The description
+     */
+    @Deprecated
+    String getDescription();
+
+    /**
      * Gets the name of this upgrade.
      *
      * @return The name

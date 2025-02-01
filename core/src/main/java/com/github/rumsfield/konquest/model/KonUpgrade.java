@@ -87,6 +87,16 @@ public enum KonUpgrade implements KonquestUpgrade {
 	public String getName() {
 		return name;
 	}
+
+	/**
+	 * Gets the name of this upgrade.
+	 *
+	 * @return The name
+	 */
+	@Override
+	public String getDescription() {
+		return name;
+	}
 	
 	/**
 	 * Gets the level description, starting at 1. 
