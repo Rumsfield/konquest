@@ -624,8 +624,8 @@ public class EntityListener implements Listener {
 			if(territory instanceof KonPropertyFlagHolder) {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 				if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
-					// Block non-enemy PVE
-					if(!(flagHolder.getPropertyValue(KonPropertyFlag.PVE) || event.getEntity() instanceof Enemy)) {
+					// Block non-monster PVE
+					if(!(flagHolder.getPropertyValue(KonPropertyFlag.PVE) || event.getEntity() instanceof Monster)) {
 						ChatUtil.sendKonBlockedFlagTitle(player);
 						event.setCancelled(true);
 						return;
