@@ -11,6 +11,7 @@ import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.*;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -36,6 +37,10 @@ public class KingdomMenu extends StateMenu {
 		B_RELATIONSHIP,
 		B_DIPLOMACY,
 		B_REQUESTS,
+		B_PURCHASE,
+		B_PURCHASE_AMOUNT,
+		B_OFFERS,
+		B_OFFERS_PLAYERS,
 		C_PROMOTE,
 		C_DEMOTE,
 		C_TRANSFER,
@@ -56,7 +61,7 @@ public class KingdomMenu extends StateMenu {
 	 * Access  | Labels...
 	 * ----------------------------------------------------------------------------------
 	 * Regular | *Join   		*Leave		+Info		*Invites	*List
-	 * Officer | *Relationship	*Requests
+	 * Officer | *Relationship	*Requests 	*Purchase 	*Offers
 	 * Master  | *Promote 		*Demote 	*Transfer 	+Open		*Template		*Disband	*Destroy	*Capital
 	 *
 	 * Relationship selects other kingdom and opens diplomacy view, which selects new status (enemy, ally, etc)
@@ -72,6 +77,9 @@ public class KingdomMenu extends StateMenu {
 	private final KonPlayer player;
 	private final KonKingdom kingdom;
 	private KonKingdom diplomacyKingdom;
+	private KonTown purchaseOfferTown;
+	private double purchaseOfferAmount;
+	private double purchaseOfferModify;
 	private boolean isCreatedKingdom;
 	private final boolean isAdmin;
 	
@@ -81,6 +89,9 @@ public class KingdomMenu extends StateMenu {
 		this.player = player;
 		this.kingdom = kingdom;
 		this.diplomacyKingdom = null;
+		this.purchaseOfferTown = null;
+		this.purchaseOfferAmount = 0;
+		this.purchaseOfferModify = 1;
 		this.isCreatedKingdom = false; // Is this kingdom created by players, i.e. not barbarians or neutrals
 		this.isAdmin = isAdmin; // Is player viewing the menu as an admin?
 
@@ -120,6 +131,8 @@ public class KingdomMenu extends StateMenu {
 		int ROOT_SLOT_LIST 			= 8;
 		// Row 1: 9 10 11 12 13 14 15 16 17
 		int ROOT_SLOT_RELATIONSHIPS = 11;
+		int ROOT_SLOT_PURCHASE 		= 12;
+		int ROOT_SLOT_OFFERS 		= 14;
 		int ROOT_SLOT_REQUESTS 		= 15;
 		// Row 2: 18 19 20 21 22 23 24 25 26
 		int ROOT_SLOT_PROMOTE 		= 18;
@@ -231,7 +244,38 @@ public class KingdomMenu extends StateMenu {
 				}
 				icon.setState(MenuState.B_RELATIONSHIP);
 				result.addIcon(icon);
-				
+
+				if (getKonquest().getKingdomManager().getIsTownPurchaseEnable()) {
+					/* Purchase Icon */
+					boolean isPurchaseClickable = !isAdmin;
+					icon = new InfoIcon(MessagePath.MENU_KINGDOM_PURCHASE.getMessage(), Material.GOLDEN_HOE, ROOT_SLOT_PURCHASE, isPurchaseClickable);
+					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_PURCHASE.getMessage());
+					icon.addProperty(MessagePath.RELATIONSHIP_RANK_OFFICER.getMessage());
+					if(isPurchaseClickable) {
+						icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
+					} else {
+						icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
+					}
+					icon.setState(MenuState.B_PURCHASE);
+					result.addIcon(icon);
+
+					/* Offers Icon */
+					boolean isOffersClickable = !isAdmin;
+					int numOffers = getKonquest().getKingdomManager().getNumTownPurchaseOffers(kingdom);
+					Material offerMat = numOffers > 0 ? Material.POTTED_OAK_SAPLING : Material.FLOWER_POT;
+					icon = new InfoIcon(MessagePath.MENU_KINGDOM_OFFERS.getMessage(), offerMat, ROOT_SLOT_OFFERS, isOffersClickable);
+					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_OFFERS.getMessage());
+					icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numOffers);
+					icon.addProperty(MessagePath.RELATIONSHIP_RANK_OFFICER.getMessage());
+					if(isOffersClickable) {
+						icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
+					} else {
+						icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
+					}
+					icon.setState(MenuState.B_OFFERS);
+					result.addIcon(icon);
+				}
+
 				/* Requests Icon */
 				int numRequests = kingdom.getJoinRequests().size();
 				Material requestMat = numRequests > 0 ? Material.HONEY_BOTTLE : Material.GLASS_BOTTLE;
@@ -664,8 +708,8 @@ public class KingdomMenu extends StateMenu {
 						// The kingdom is unavailable to join at this time
 						icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
 					}
-					icon.addHint(MessagePath.MENU_KINGDOM_HINT_ACCEPT.getMessage());
-					icon.addHint(MessagePath.MENU_KINGDOM_HINT_DECLINE.getMessage());
+					icon.addHint(MessagePath.MENU_HINT_ACCEPT.getMessage());
+					icon.addHint(MessagePath.MENU_HINT_DECLINE.getMessage());
 					break;
 				case A_LIST:
 					icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
@@ -687,16 +731,55 @@ public class KingdomMenu extends StateMenu {
 	private List<DisplayView> createTownView(MenuState context) {
 		MenuIcon icon;
 		ArrayList<MenuIcon> icons = new ArrayList<>();
-		// List of all towns in kingdom
-		List<KonTown> towns = new ArrayList<>(kingdom.getTowns());
+		List<KonTown> towns = new ArrayList<>();
+		switch (context) {
+			case B_PURCHASE:
+				// All towns in other kingdoms
+				for (KonKingdom otherKingdom : getKonquest().getKingdomManager().getKingdoms()) {
+					if (!otherKingdom.equals(kingdom)) {
+						towns.addAll(otherKingdom.getTowns());
+					}
+				}
+				break;
+			case B_OFFERS:
+				// Towns with purchase offers
+				for (KonTown town : kingdom.getTowns()) {
+					if (town.hasPurchaseOffers()) {
+						towns.add(town);
+					}
+				}
+				break;
+			case C_DESTROY:
+			case C_CAPITAL:
+				// All towns in the kingdom
+				towns.addAll(kingdom.getTowns());
+				break;
+			default:
+				break;
+		}
 		// Sort list
 		towns.sort(townComparator);
 
 		/* Town Icons */
 		for (KonTown currentTown : towns) {
 			icon = new TownIcon(currentTown,getColor(player,currentTown),getRelation(player,currentTown),0,true);
+			int numOffers;
 			// Context-specific lore + click conditions
 			switch(context) {
+				case B_PURCHASE:
+					numOffers = currentTown.getPurchaseOffers().size();
+					icon.addNameValue(MessagePath.MENU_KINGDOM_PURCHASE_OFFERS.getMessage(), numOffers);
+					double offerAmount = currentTown.getPurchaseOfferAmount(player.getBukkitPlayer().getUniqueId());
+					if (offerAmount >= 0) {
+						icon.addNameValue(MessagePath.MENU_KINGDOM_PURCHASE_YOUR_OFFER.getMessage(), KonquestPlugin.getCurrencyFormat(offerAmount));
+					}
+					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
+					break;
+				case B_OFFERS:
+					numOffers = currentTown.getPurchaseOffers().size();
+					icon.addNameValue(MessagePath.MENU_KINGDOM_PURCHASE_OFFERS.getMessage(), numOffers);
+					icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
+					break;
 				case C_DESTROY:
 					icon.addHint(MessagePath.MENU_TOWN_HINT_DESTROY.getMessage());
 					break;
@@ -718,30 +801,33 @@ public class KingdomMenu extends StateMenu {
 	private List<DisplayView> createPlayerView(MenuState context) {
 		MenuIcon icon;
 		ArrayList<MenuIcon> icons = new ArrayList<>();
-		String loreHintStr1 = "";
-		String loreHintStr2 = "";
 		boolean isClickable = true;
 		List<OfflinePlayer> players = new ArrayList<>();
 
 		// Gather players
 		switch (context) {
+			case B_OFFERS_PLAYERS:
+				if (purchaseOfferTown != null) {
+					for (UUID id : purchaseOfferTown.getPurchaseOffers()) {
+						OfflinePlayer offerPlayer = Bukkit.getOfflinePlayer(id);
+						if (getKonquest().getPlayerManager().isOfflinePlayer(offerPlayer)) {
+							players.add(offerPlayer);
+						}
+					}
+				}
+				break;
 			case B_REQUESTS:
 				players.addAll(kingdom.getJoinRequests());
-				loreHintStr1 = MessagePath.MENU_KINGDOM_HINT_ACCEPT.getMessage();
-				loreHintStr2 = MessagePath.MENU_KINGDOM_HINT_DECLINE.getMessage();
 				break;
 			case C_PROMOTE:
 				players.addAll(kingdom.getPlayerMembersOnly());
-				loreHintStr1 = MessagePath.MENU_KINGDOM_HINT_PROMOTE.getMessage();
 				break;
 			case C_DEMOTE:
 				players.addAll(kingdom.getPlayerOfficersOnly());
-				loreHintStr1 = MessagePath.MENU_KINGDOM_HINT_DEMOTE.getMessage();
 				break;
 			case C_TRANSFER:
 				players.addAll(kingdom.getPlayerOfficersOnly());
 				players.addAll(kingdom.getPlayerMembersOnly());
-				loreHintStr1 = MessagePath.MENU_KINGDOM_HINT_TRANSFER.getMessage();
 				break;
 			default:
 				break;
@@ -758,17 +844,115 @@ public class KingdomMenu extends StateMenu {
 			if(!kingdomRole.isEmpty()) {
 				icon.addNameValue(MessagePath.LABEL_KINGDOM_RANK.getMessage(), kingdomRole);
 			}
-			if(!loreHintStr1.isEmpty()) {
-				icon.addHint(loreHintStr1);
-			}
-			if(!loreHintStr2.isEmpty()) {
-				icon.addHint(loreHintStr2);
+			// Context-specific lore
+			switch (context) {
+				case B_OFFERS_PLAYERS:
+					OfflinePlayer kingdomMaster = kingdom.getPlayerMaster();
+					String masterName = kingdomMaster == null ? "null" : kingdomMaster.getName();
+					String offerTownName = purchaseOfferTown == null ? "null" : purchaseOfferTown.getName();
+					String otherKingdomName = offlinePlayer.getKingdom().getName();
+					icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), otherKingdomName);
+					double offerAmount = purchaseOfferTown.getPurchaseOfferAmount(currentPlayer.getUniqueId());
+					if (offerAmount >= 0) {
+						icon.addNameValue(MessagePath.MENU_KINGDOM_PURCHASE_THEIR_OFFER.getMessage(), KonquestPlugin.getCurrencyFormat(offerAmount));
+					}
+					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_OFFER_ACCEPT.getMessage(offerAmount,currentPlayer.getName(),masterName,offerTownName,otherKingdomName));
+					icon.addHint(MessagePath.MENU_HINT_ACCEPT.getMessage());
+					icon.addHint(MessagePath.MENU_HINT_DECLINE.getMessage());
+					break;
+				case B_REQUESTS:
+					icon.addHint(MessagePath.MENU_HINT_ACCEPT.getMessage());
+					icon.addHint(MessagePath.MENU_HINT_DECLINE.getMessage());
+					break;
+				case C_PROMOTE:
+					icon.addHint(MessagePath.MENU_KINGDOM_HINT_PROMOTE.getMessage());
+					break;
+				case C_DEMOTE:
+					icon.addHint(MessagePath.MENU_KINGDOM_HINT_DEMOTE.getMessage());
+					break;
+				case C_TRANSFER:
+					icon.addHint(MessagePath.MENU_KINGDOM_HINT_TRANSFER.getMessage());
+					break;
+				default:
+					break;
 			}
 			icons.add(icon);
 		}
 
 		/* Make Pages (includes navigation) */
 		return new ArrayList<>(makePages(icons, getTitle(context)));
+	}
+
+	private DisplayView createPurchaseAmountView() {
+		DisplayView result;
+		InfoIcon icon;
+		result = new DisplayView(1, getTitle(MenuState.B_PURCHASE_AMOUNT));
+
+		/* Icon slot indexes */
+		// Row 0: 0 1 2 3 4 5 6 7 8
+		int SLOT_PURCHASE 		= 4;
+		// Row 1: 9 10 11 12 13 14 15 16 17
+		int SLOT_SHIFT_DOWN		= 12;
+		int SLOT_AMOUNT			= 13;
+		int SLOT_SHIFT_UP		= 14;
+
+		String townName = "";
+		String kingdomName = "";
+		boolean isClickable = false;
+		if (purchaseOfferTown != null) {
+			townName = purchaseOfferTown.getName();
+			kingdomName = purchaseOfferTown.getKingdom().getName();
+			isClickable = true;
+		}
+		String amount = KonquestPlugin.getCurrencyFormat(purchaseOfferAmount);
+		String modify = KonquestPlugin.getCurrencyFormat(purchaseOfferModify);
+
+		/* Purchase Icon */
+		icon = new InfoIcon(MessagePath.MENU_KINGDOM_PURCHASE_YOUR_OFFER.getMessage(), Material.WRITABLE_BOOK, SLOT_PURCHASE, isClickable);
+		icon.addNameValue(MessagePath.TERRITORY_TOWN.getMessage(), townName);
+		icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), kingdomName);
+		icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), amount);
+		icon.setInfo("purchase");
+		if (isClickable) {
+			icon.addHint(MessagePath.MENU_KINGDOM_HINT_PURCHASE.getMessage());
+		}
+		result.addIcon(icon);
+
+		/* Amount Icon */
+		icon = new InfoIcon(MessagePath.LABEL_AMOUNT.getMessage(), Material.GOLD_INGOT, SLOT_AMOUNT, isClickable);
+		icon.addNameValue(MessagePath.LABEL_MODIFIER.getMessage(), modify);
+		icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), amount);
+		if (isClickable) {
+			icon.addHint(MessagePath.MENU_HINT_INCREASE.getMessage());
+			icon.addHint(MessagePath.MENU_HINT_DECREASE.getMessage());
+		}
+		icon.setInfo("amount");
+		result.addIcon(icon);
+
+		/* Modify Down Icon */
+		icon = new InfoIcon(MessagePath.LABEL_MODIFIER.getMessage(), Material.YELLOW_CARPET, SLOT_SHIFT_DOWN, isClickable);
+		icon.addNameValue(MessagePath.LABEL_MODIFIER.getMessage(), modify);
+		if (isClickable) {
+			icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
+		}
+		icon.setInfo("modify_down");
+		result.addIcon(icon);
+
+		/* Modify Up Icon */
+		icon = new InfoIcon(MessagePath.LABEL_MODIFIER.getMessage(), Material.YELLOW_WOOL, SLOT_SHIFT_UP, isClickable);
+		icon.addNameValue(MessagePath.LABEL_MODIFIER.getMessage(), modify);
+		if (isClickable) {
+			icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
+		}
+		icon.setInfo("modify_up");
+		result.addIcon(icon);
+
+		/* Navigation */
+		addNavEmpty(result);
+		addNavClose(result);
+		addNavReturn(result);
+
+		return result;
 	}
 
 	/**
@@ -794,6 +978,9 @@ public class KingdomMenu extends StateMenu {
 			case C_DISBAND:
 				result.add(createDisbandView());
 				break;
+			case B_PURCHASE_AMOUNT:
+				result.add(createPurchaseAmountView());
+				break;
 			case C_TEMPLATE:
 				result.addAll(createTemplateView());
 				break;
@@ -803,12 +990,15 @@ public class KingdomMenu extends StateMenu {
 			case B_RELATIONSHIP:
 				result.addAll(createKingdomView(currentState));
 				break;
+			case B_OFFERS_PLAYERS:
 			case B_REQUESTS:
 			case C_PROMOTE:
 			case C_DEMOTE:
 			case C_TRANSFER:
 				result.addAll(createPlayerView(currentState));
 				break;
+			case B_PURCHASE:
+			case B_OFFERS:
 			case C_DESTROY:
 			case C_CAPITAL:
 				result.addAll(createTownView(currentState));
@@ -830,6 +1020,8 @@ public class KingdomMenu extends StateMenu {
 	@Override
 	public DisplayView updateState(int slot, boolean clickType) {
 		DisplayView result = null;
+		MenuState currentState = (MenuState)getCurrentState();
+		if (currentState == null) return null;
 		if (isCurrentNavSlot(slot)) {
 			// Clicked in navigation bar
 			if (isNavClose(slot)) {
@@ -840,12 +1032,19 @@ public class KingdomMenu extends StateMenu {
 				getKonquest().getDisplayManager().displayMainMenu(player);
 			} else if (isNavReturn(slot)) {
 				// Return to previous
-				if (isState(MenuState.B_DIPLOMACY)) {
-					// Return to refreshed relationship from diplomacy
-					result = refreshNewView(MenuState.B_RELATIONSHIP);
-				} else {
-					// Return to root
-					result = refreshNewView(MenuState.ROOT);
+				switch (currentState) {
+					case B_DIPLOMACY:
+						result = refreshNewView(MenuState.B_RELATIONSHIP);
+						break;
+					case B_PURCHASE_AMOUNT:
+						result = refreshNewView(MenuState.B_PURCHASE);
+						break;
+					case B_OFFERS_PLAYERS:
+						result = refreshNewView(MenuState.B_OFFERS);
+						break;
+					default:
+						result = refreshNewView(MenuState.ROOT);
+						break;
 				}
 			} else if (isNavBack(slot)) {
 				// Page back
@@ -859,8 +1058,6 @@ public class KingdomMenu extends StateMenu {
 			DisplayView view = getCurrentView();
 			if (view == null) return null;
 			MenuIcon clickedIcon = view.getIcon(slot);
-			MenuState currentState = (MenuState)getCurrentState();
-			if (currentState == null) return null;
 			MenuState nextState = (MenuState)clickedIcon.getState(); // could be null in some states
 			switch (currentState) {
 				case ROOT:
@@ -972,6 +1169,79 @@ public class KingdomMenu extends StateMenu {
 						result = refreshCurrentView();
 					}
 					break;
+				case B_PURCHASE:
+					// Clicking goes to the purchase amount view for the chosen town
+					if (clickedIcon instanceof TownIcon) {
+						TownIcon icon = (TownIcon)clickedIcon;
+						this.purchaseOfferTown = icon.getTown();
+						this.purchaseOfferAmount = 0;
+						this.purchaseOfferModify = 1;
+						// Go to purchase amount view
+						result = refreshNewView(MenuState.B_PURCHASE_AMOUNT);
+					}
+					break;
+				case B_PURCHASE_AMOUNT:
+					if (clickedIcon instanceof InfoIcon) {
+						InfoIcon icon = (InfoIcon)clickedIcon;
+						switch (icon.getInfo().toLowerCase()) {
+							case "purchase":
+								// Submit the current purchase offer
+								boolean status = manager.applyTownPurchaseOffer(purchaseOfferTown, player, purchaseOfferAmount);
+								playStatusSound(player.getBukkitPlayer(),status);
+								result = refreshNewView(MenuState.B_PURCHASE);
+								break;
+							case "amount":
+								// Change the current purchase offer amount
+								double modifiedAmount;
+								if (clickType) {
+									// Increase by modifier, limited to 1 billion
+									modifiedAmount = purchaseOfferAmount + purchaseOfferModify;
+									purchaseOfferAmount = Math.min(modifiedAmount, 1000000000);
+								} else {
+									// Decrease by modifier, limited to 0
+									modifiedAmount = purchaseOfferAmount - purchaseOfferModify;
+									purchaseOfferAmount = Math.max(modifiedAmount, 0);
+								}
+								result = refreshCurrentView();
+								break;
+							case "modify_down":
+								// Shift the amount modifier down, limited to 1
+								double shiftedModifyDown = purchaseOfferModify/10;
+								purchaseOfferModify = Math.max(shiftedModifyDown,1);
+								result = refreshCurrentView();
+								break;
+							case "modify_up":
+								// Shift the amount modifier up, limited to 100 million
+								double shiftedModifyUp = purchaseOfferModify*10;
+								purchaseOfferModify = Math.min(shiftedModifyUp,100000000);
+								result = refreshCurrentView();
+								break;
+						}
+					}
+					break;
+				case B_OFFERS:
+					// Clicking goes to the offer player view for the chosen town
+					if (clickedIcon instanceof TownIcon) {
+						TownIcon icon = (TownIcon)clickedIcon;
+						this.purchaseOfferTown = icon.getTown();
+						// Go to purchase amount view
+						result = refreshNewView(MenuState.B_OFFERS_PLAYERS);
+					}
+					break;
+				case B_OFFERS_PLAYERS:
+					if (clickedIcon instanceof PlayerIcon) {
+						PlayerIcon icon = (PlayerIcon)clickedIcon;
+						boolean status = manager.respondTownPurchaseOffer(purchaseOfferTown, player, icon.getOfflinePlayer().getUniqueId(), clickType);
+						playStatusSound(player.getBukkitPlayer(),status);
+						if (clickType) {
+							// Accepted offer, go back to offers list
+							result = refreshNewView(MenuState.B_OFFERS);
+						} else {
+							// Declined offer, refresh this view
+							result = refreshCurrentView();
+						}
+					}
+					break;
 				case C_PROMOTE:
 					if (clickedIcon instanceof PlayerIcon) {
 						PlayerIcon icon = (PlayerIcon)clickedIcon;
@@ -1065,6 +1335,16 @@ public class KingdomMenu extends StateMenu {
 				break;
 			case B_REQUESTS:
 				result = MessagePath.MENU_KINGDOM_TITLE_REQUESTS.getMessage();
+				break;
+			case B_PURCHASE:
+				result = MessagePath.MENU_KINGDOM_TITLE_PURCHASE.getMessage();
+				break;
+			case B_PURCHASE_AMOUNT:
+				result = MessagePath.MENU_KINGDOM_TITLE_AMOUNT.getMessage();
+				break;
+			case B_OFFERS:
+			case B_OFFERS_PLAYERS:
+				result = MessagePath.MENU_KINGDOM_TITLE_OFFERS.getMessage();
 				break;
 			case C_PROMOTE:
 				result = MessagePath.MENU_KINGDOM_TITLE_PROMOTION.getMessage();

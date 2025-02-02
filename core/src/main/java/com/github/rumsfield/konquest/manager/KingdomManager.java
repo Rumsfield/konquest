@@ -4178,6 +4178,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	// Returns true when the offer is successfully applied
 	public boolean applyTownPurchaseOffer(KonTown town, KonPlayer player, double amount) {
 		// Error checks
+		if (town == null) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return false;
+		}
 		if (!townPurchaseEnable) {
 			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return false;
@@ -4205,8 +4209,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	// A player responds to an existing offer to purchase a town in their kingdom
 	// Returns true when the offer is accepted and successfully completed
 	// Assume that the offer is valid
+	// When response is true, accept the offer, else decline it
 	public boolean respondTownPurchaseOffer(KonTown town, KonPlayer player, UUID offerID, boolean response) {
 		// Error checks
+		if (town == null) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return false;
+		}
 		if (!townPurchaseEnable) {
 			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return false;

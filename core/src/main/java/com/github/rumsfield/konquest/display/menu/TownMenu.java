@@ -301,8 +301,8 @@ public class TownMenu extends StateMenu {
                     icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
                     break;
                 case INVITES:
-                    icon.addHint(MessagePath.MENU_TOWN_HINT_ACCEPT.getMessage());
-                    icon.addHint(MessagePath.MENU_TOWN_HINT_DECLINE.getMessage());
+                    icon.addHint(MessagePath.MENU_HINT_ACCEPT.getMessage());
+                    icon.addHint(MessagePath.MENU_HINT_DECLINE.getMessage());
                     break;
                 case MANAGE:
                     // Display number of pending requests
@@ -529,8 +529,8 @@ public class TownMenu extends StateMenu {
         switch (context) {
             case A_REQUESTS:
                 players.addAll(town.getJoinRequests());
-                loreHintStr1 = MessagePath.MENU_TOWN_HINT_ACCEPT.getMessage();
-                loreHintStr2 = MessagePath.MENU_TOWN_HINT_DECLINE.getMessage();
+                loreHintStr1 = MessagePath.MENU_HINT_ACCEPT.getMessage();
+                loreHintStr2 = MessagePath.MENU_HINT_DECLINE.getMessage();
                 break;
             case B_PROMOTE:
                 players.addAll(town.getPlayerResidentsOnly());
