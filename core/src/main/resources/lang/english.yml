@@ -520,6 +520,7 @@ protection:
     destroy: You have destroyed %s for the glory of the Barbarian horde!
     conquer: The Town of %s has been conquered!
     capture: You have conquered %s for the conquest of %s!
+    purchase: The Town of %s has been purchased by the Kingdom of %s!
     kingdom-warmup: The Kingdom of %s will be protected in %s minutes.
     kingdom-conquer: The Kingdom of %s has been conquered by %s!
     kingdom-raze: The Kingdom of %s has been destroyed by the Barbarian horde!
@@ -738,6 +739,10 @@ command:
       diplomacy-pending: Your kingdom has pending diplomacy requests. Use "/k kingdom", then choose Relationships to respond.
       web-color-show: The Kingdom of %s has a web map color of %s
       web-color-set: Set the web map color of %s to %s
+      offer-pending: Your kingdom has %s pending town purchase offers. Use "/k kingdom", then choose Town Offers to respond.
+      offer-towns: These towns in your kingdom have offers to be purchased...
+      offer-players: These players have offered to purchase the town of %s...
+      offer-declined: Declined the offer by player %s to purchase the town of %s.
     error:
       barbarian-create: You must be a barbarian to create a kingdom. Use the Exile option in the kingdom menu.
       invalid-template: '%s is an invalid monument template. Check spelling or choose another.'

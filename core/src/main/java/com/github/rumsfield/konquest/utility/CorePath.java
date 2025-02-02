@@ -124,6 +124,7 @@ public enum CorePath {
 	KINGDOMS_WILD_PVP                                     ("core.kingdoms.wild_pvp"),
 	KINGDOMS_WILD_USE                                     ("core.kingdoms.wild_use"),
 	KINGDOMS_WILD_BUILD                                   ("core.kingdoms.wild_build"),
+	KINGDOMS_PURCHASE_TOWNS                               ("core.kingdoms.purchase_towns"),
 
 	TOWNS_ALLOW_DESTROY_MASTER                            ("core.towns.allow_destroy_master"),
 	TOWNS_ALLOW_DESTROY_LORD                              ("core.towns.allow_destroy_lord"),

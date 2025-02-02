@@ -87,34 +87,11 @@ public class CaptureAdminCommand extends CommandBase {
 				ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(townName));
 			}
 			ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_SUCCESS.getMessage());
-			// For all online players...
-			for(KonPlayer onlinePlayer : konquest.getPlayerManager().getPlayersOnline()) {
-				// Teleport all players inside center chunk to new spawn location
-				if(capturedTown.isLocInsideCenterChunk(onlinePlayer.getBukkitPlayer().getLocation())) {
-					onlinePlayer.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(capturedTown.getCenterLoc(), 2));
-					onlinePlayer.getBukkitPlayer().playEffect(onlinePlayer.getBukkitPlayer().getLocation(), Effect.ANVIL_LAND, null);
-				}
-				// Remove mob targets
-				if(capturedTown.isLocInside(onlinePlayer.getBukkitPlayer().getLocation())) {
-					onlinePlayer.clearAllMobAttackers();
-				}
-				// Update particle border renders for nearby players
-				for(Chunk chunk : HelperUtil.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
-					if(capturedTown.hasChunk(chunk)) {
-						konquest.getTerritoryManager().updatePlayerBorderParticles(onlinePlayer);
-						break;
-					}
-				}
-			}
 			// Broadcast to Dynmap
 			int x = capturedTown.getCenterLoc().getBlockX();
 			int y = capturedTown.getCenterLoc().getBlockY();
 			int z = capturedTown.getCenterLoc().getBlockZ();
 			konquest.getMapHandler().postBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(capturedTown.getName())+" ("+x+","+y+","+z+")");
-			capturedTown.getMonumentTimer().stopTimer();
-			capturedTown.setAttacked(false,null);
-			capturedTown.setBarProgress(1.0);
-			capturedTown.updateBarTitle();
 		} else {
 			ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_FAILED.getMessage());
 		}
