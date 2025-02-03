@@ -845,14 +845,14 @@ public class KingdomMenu extends StateMenu {
 			switch (context) {
 				case B_OFFERS_PLAYERS:
 					OfflinePlayer kingdomMaster = kingdom.getPlayerMaster();
-					String masterName = kingdomMaster == null ? "null" : kingdomMaster.getName();
+					String receiverName = kingdomMaster == null ? player.getBukkitPlayer().getName() : kingdomMaster.getName();
 					String offerTownName = purchaseOfferTown.getName();
 					String otherKingdomName = offlinePlayer.getKingdom().getName();
 					String offerAmount = KonquestPlugin.getCurrencyFormat(purchaseOfferTown.getPurchaseOfferAmount(currentPlayer.getUniqueId()));
 					icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), otherKingdomName);
 					icon.addNameValue(MessagePath.TERRITORY_TOWN.getMessage(), offerTownName);
 					icon.addNameValue(MessagePath.MENU_KINGDOM_PURCHASE_THEIR_OFFER.getMessage(), offerAmount);
-					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_OFFER_ACCEPT.getMessage(offerTownName,otherKingdomName,masterName,offerAmount,currentPlayer.getName()));
+					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_OFFER_ACCEPT.getMessage(offerTownName,otherKingdomName,receiverName,offerAmount,currentPlayer.getName()));
 					icon.addHint(MessagePath.MENU_HINT_ACCEPT.getMessage());
 					icon.addHint(MessagePath.MENU_HINT_DECLINE.getMessage());
 					break;

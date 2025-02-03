@@ -145,7 +145,7 @@ public abstract class CommandBase {
 
     public String formatStringListLimited(List<String> entries, int limit) {
         StringBuilder entryListBuilder = new StringBuilder();
-        String nameColor = ""+ChatColor.GOLD;
+        String nameColor = ""+ChatColor.AQUA;
         String sepColor = ""+ChatColor.GRAY;
         for (int i = 0; i < entries.size(); i++) {
             if (i < limit) {

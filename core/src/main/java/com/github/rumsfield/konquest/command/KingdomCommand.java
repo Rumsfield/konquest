@@ -631,8 +631,10 @@ public class KingdomCommand extends CommandBase {
 							if (args.size() == 2) {
 								// No town name given, list all towns with offers
 								ArrayList<String> offerTownNames = new ArrayList<>();
+								int numOffers;
 								for (KonTown town : konquest.getKingdomManager().getActiveTownPurchaseOffers(kingdom)) {
-									offerTownNames.add(town.getName());
+									numOffers = town.getNumPurchaseOffers();
+									offerTownNames.add(town.getName()+" ("+numOffers+")");
 								}
 								String nameListStr = formatStringListLimited(offerTownNames, MAX_LIST_NAMES);
 								ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_TOWNS.getMessage());
@@ -656,7 +658,7 @@ public class KingdomCommand extends CommandBase {
 									for (UUID id : offerTown.getPurchaseOffers()) {
 										offerPlayer = konquest.getPlayerManager().getOfflinePlayerFromID(id);
 										offerAmount = offerTown.getPurchaseOfferAmount(id);
-										offerLine = offerPlayer.getOfflineBukkitPlayer().getName() + " (" + offerPlayer.getKingdom().getName() + ") - " + KonquestPlugin.getCurrencyFormat(offerAmount);
+										offerLine = ChatColor.AQUA+offerPlayer.getOfflineBukkitPlayer().getName() + " (" + offerPlayer.getKingdom().getName() + ") - " + KonquestPlugin.getCurrencyFormat(offerAmount);
 										ChatUtil.sendMessage(bukkitPlayer, offerLine);
 									}
 								} else if (args.size() == 5) {

@@ -1851,6 +1851,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		return new ArrayList<>(purchaseOffers.keySet());
 	}
 
+	public int getNumPurchaseOffers() {
+		return purchaseOffers.size();
+	}
+
 	public boolean hasPurchaseOffers() {
 		return !purchaseOffers.isEmpty();
 	}

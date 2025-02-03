@@ -4223,19 +4223,16 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return false;
 		}
-		if (player.isBarbarian()) {
-			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
-			return false;
-		}
-		if (town.getKingdom().equals(player.getKingdom()) || town instanceof KonCapital) {
-			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-			return false;
-		}
 		KonOfflinePlayer offerPlayer = konquest.getPlayerManager().getOfflinePlayerFromID(offerID);
 		if (offerPlayer == null) {
 			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return false;
 		}
+		if (offerPlayer.isBarbarian() || town.getKingdom().equals(offerPlayer.getKingdom()) || town instanceof KonCapital) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+
 		// Check for declined response
 		if (!response) {
 			town.removePurchaseOffer(offerID);
@@ -4249,9 +4246,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return false;
 		}
-		// Withdraw favor from offer player, deposit to original kingdom's master
+		// Withdraw favor from offer player, deposit to original kingdom's master or responder when master is null
 		KonquestPlugin.withdrawPlayer(offerPlayer.getOfflineBukkitPlayer(), offerAmount);
-		KonquestPlugin.depositPlayer(town.getKingdom().getPlayerMaster(), offerAmount);
+		if (town.getKingdom().isMasterValid()) {
+			KonquestPlugin.depositPlayer(town.getKingdom().getPlayerMaster(), offerAmount);
+		} else {
+			KonquestPlugin.depositPlayer(player.getBukkitPlayer(), offerAmount);
+		}
 		// Capture the town for the offer player's kingdom
 		KonTown purchasedTown = captureTown(town.getName(), town.getKingdom().getName(), offerPlayer.getKingdom());
 		// Check for successful capture
@@ -4274,6 +4275,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				continue;
 			}
 			offerPlayer = konquest.getPlayerManager().getOfflinePlayerFromID(id);
+			if (offerPlayer == null) {
+				continue;
+			}
 			if (offerPlayer.isBarbarian() || town.getKingdom().equals(offerPlayer.getKingdom())) {
 				town.removePurchaseOffer(id);
 				continue;
@@ -4289,7 +4293,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		int result = 0;
 		for (KonTown town : kingdom.getTowns()) {
 			refreshPurchaseOffers(town);
-			result += town.getPurchaseOffers().size();
+			result += town.getNumPurchaseOffers();
 		}
 		return result;
 	}

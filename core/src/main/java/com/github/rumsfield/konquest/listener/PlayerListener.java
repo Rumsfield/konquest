@@ -161,9 +161,8 @@ public class PlayerListener implements Listener {
 			}
 			// Notify offers (officers only)
 			if(konquest.getKingdomManager().getIsTownPurchaseEnable() && isPlayerKingdomOfficer) {
-				int numOffers = konquest.getKingdomManager().getNumTownPurchaseOffers(player.getKingdom());
-				if (numOffers > 0) {
-					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_PENDING.getMessage(numOffers));
+				if (konquest.getKingdomManager().getNumTownPurchaseOffers(player.getKingdom()) > 0) {
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_PENDING.getMessage(), ChatColor.GOLD);
 				}
 			}
 
