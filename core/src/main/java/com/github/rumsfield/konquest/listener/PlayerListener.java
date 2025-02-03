@@ -163,7 +163,7 @@ public class PlayerListener implements Listener {
 			if(konquest.getKingdomManager().getIsTownPurchaseEnable() && isPlayerKingdomOfficer) {
 				int numOffers = konquest.getKingdomManager().getNumTownPurchaseOffers(player.getKingdom());
 				if (numOffers > 0) {
-					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_OFFERS_PENDING.getMessage(numOffers));
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_PENDING.getMessage(numOffers));
 				}
 			}
 

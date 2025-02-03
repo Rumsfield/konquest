@@ -4190,16 +4190,19 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
 			return false;
 		}
-		if (town.getKingdom().equals(player.getKingdom()) || town instanceof KonCapital || amount < 0) {
+		if (town.getKingdom().equals(player.getKingdom()) || town instanceof KonCapital || amount < 1) {
 			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
+		String offerAmount = KonquestPlugin.getCurrencyFormat(amount);
 		if (KonquestPlugin.getBalance(player.getBukkitPlayer()) < amount) {
-			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(amount));
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(offerAmount));
 			return false;
 		}
 		// Apply offer
 		town.addPurchaseOffer(player.getBukkitPlayer().getUniqueId(), amount);
+		// Status message
+		ChatUtil.sendNotice(player,MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_PURCHASE.getMessage(town.getName(),town.getKingdom().getName(),offerAmount));
 		// Notify town's kingdom
 		int numOffers = konquest.getKingdomManager().getNumTownPurchaseOffers(town.getKingdom());
 		broadcastOfficers(town.getKingdom(),MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_PENDING.getMessage(numOffers));
@@ -4242,7 +4245,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Response is approved
 		// Check for valid offer amount
 		double offerAmount = town.getPurchaseOfferAmount(offerID);
-		if (offerAmount < 0 || KonquestPlugin.getBalance(offerPlayer.getOfflineBukkitPlayer()) < offerAmount) {
+		if (offerAmount < 1 || KonquestPlugin.getBalance(offerPlayer.getOfflineBukkitPlayer()) < offerAmount) {
 			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
 			return false;
 		}
@@ -4254,6 +4257,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Check for successful capture
 		if (purchasedTown != null) {
 			ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_PURCHASE.getMessage(purchasedTown.getName(), purchasedTown.getKingdom().getName()));
+			purchasedTown.setPlayerLord(offerPlayer.getOfflineBukkitPlayer());
 		} else {
 			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			return false;
@@ -4275,7 +4279,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				continue;
 			}
 			double offerAmount = town.getPurchaseOfferAmount(id);
-			if (offerAmount < 0 || KonquestPlugin.getBalance(offerPlayer.getOfflineBukkitPlayer()) < offerAmount) {
+			if (offerAmount < 1 || KonquestPlugin.getBalance(offerPlayer.getOfflineBukkitPlayer()) < offerAmount) {
 				town.removePurchaseOffer(id);
 			}
 		}

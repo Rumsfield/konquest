@@ -405,7 +405,7 @@ menu:
     description-requests: View kingdom membership requests
     description-purchase: Purchase towns from other kingdoms by making an offer
     description-offers: View offers by other kingdoms to purchase your towns
-    description-offer-accept: Accept this offer to give %s Favor from player %s to Kingdom Master %s, and give the Town of %s to the Kingdom of %s.
+    description-offer-accept: Give the Town of %s to the Kingdom of %s, and Kingdom Master %s receives %s from player %s.
     description-promote: Promote members to officers
     description-demote: Demote officers to members
     description-transfer: Transfer master to another member
@@ -753,6 +753,7 @@ command:
       diplomacy-pending: Your kingdom has pending diplomacy requests. Use "/k kingdom", then choose Relationships to respond.
       web-color-show: The Kingdom of %s has a web map color of %s
       web-color-set: Set the web map color of %s to %s
+      offer-purchase: You sent an offer to purchase the Town of %s from the Kingdom of %s for %s.
       offer-pending: Your kingdom has %s pending town purchase offers. Use "/k kingdom", then choose Town Offers to respond.
       offer-towns: These towns in your kingdom have offers to be purchased...
       offer-players: These players have offered to purchase the town of %s...

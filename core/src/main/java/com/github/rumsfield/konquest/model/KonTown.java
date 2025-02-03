@@ -1842,7 +1842,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		// The ID cannot be a kingdom member
 		if (this.getKingdom().isMember(id)) return;
 		// Amount must be non-negative
-		if (amount < 0) return;
+		if (amount < 1) return;
 		// Override any existing offer from this ID
 		purchaseOffers.put(id, amount);
 	}

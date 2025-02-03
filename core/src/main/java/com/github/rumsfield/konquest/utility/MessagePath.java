@@ -661,6 +661,7 @@ public enum MessagePath {
 	COMMAND_KINGDOM_NOTICE_DIPLOMACY_PENDING    (0, "command.kingdom.notice.diplomacy-pending"),
 	COMMAND_KINGDOM_NOTICE_WEB_COLOR_SHOW       (2, "command.kingdom.notice.web-color-show"),
 	COMMAND_KINGDOM_NOTICE_WEB_COLOR_SET        (2, "command.kingdom.notice.web-color-set"),
+	COMMAND_KINGDOM_NOTICE_OFFER_PURCHASE       (3, "command.kingdom.notice.offer-purchase"),
 	COMMAND_KINGDOM_NOTICE_OFFER_PENDING        (1, "command.kingdom.notice.offer-pending"),
 	COMMAND_KINGDOM_NOTICE_OFFER_TOWNS          (0, "command.kingdom.notice.offer-towns"),
 	COMMAND_KINGDOM_NOTICE_OFFER_PLAYERS        (0, "command.kingdom.notice.offer-players"),

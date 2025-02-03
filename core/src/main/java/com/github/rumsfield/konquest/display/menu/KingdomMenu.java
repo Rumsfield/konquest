@@ -260,18 +260,13 @@ public class KingdomMenu extends StateMenu {
 					result.addIcon(icon);
 
 					/* Offers Icon */
-					boolean isOffersClickable = !isAdmin;
 					int numOffers = getKonquest().getKingdomManager().getNumTownPurchaseOffers(kingdom);
-					Material offerMat = numOffers > 0 ? Material.POTTED_OAK_SAPLING : Material.FLOWER_POT;
-					icon = new InfoIcon(MessagePath.MENU_KINGDOM_OFFERS.getMessage(), offerMat, ROOT_SLOT_OFFERS, isOffersClickable);
+					Material offerMat = numOffers > 0 ? Material.GOLD_INGOT : Material.BOWL;
+					icon = new InfoIcon(MessagePath.MENU_KINGDOM_OFFERS.getMessage(), offerMat, ROOT_SLOT_OFFERS, true);
 					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_OFFERS.getMessage());
 					icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numOffers);
 					icon.addProperty(MessagePath.RELATIONSHIP_RANK_OFFICER.getMessage());
-					if(isOffersClickable) {
-						icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
-					} else {
-						icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
-					}
+					icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
 					icon.setState(MenuState.B_OFFERS);
 					result.addIcon(icon);
 				}
@@ -744,6 +739,7 @@ public class KingdomMenu extends StateMenu {
 			case B_OFFERS:
 				// Towns with purchase offers
 				for (KonTown town : kingdom.getTowns()) {
+					getKonquest().getKingdomManager().refreshPurchaseOffers(town);
 					if (town.hasPurchaseOffers()) {
 						towns.add(town);
 					}
@@ -767,6 +763,7 @@ public class KingdomMenu extends StateMenu {
 			// Context-specific lore + click conditions
 			switch(context) {
 				case B_PURCHASE:
+					icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), currentTown.getKingdom().getName());
 					numOffers = currentTown.getPurchaseOffers().size();
 					icon.addNameValue(MessagePath.MENU_KINGDOM_PURCHASE_OFFERS.getMessage(), numOffers);
 					double offerAmount = currentTown.getPurchaseOfferAmount(player.getBukkitPlayer().getUniqueId());
@@ -801,13 +798,13 @@ public class KingdomMenu extends StateMenu {
 	private List<DisplayView> createPlayerView(MenuState context) {
 		MenuIcon icon;
 		ArrayList<MenuIcon> icons = new ArrayList<>();
-		boolean isClickable = true;
 		List<OfflinePlayer> players = new ArrayList<>();
 
 		// Gather players
 		switch (context) {
 			case B_OFFERS_PLAYERS:
 				if (purchaseOfferTown != null) {
+					getKonquest().getKingdomManager().refreshPurchaseOffers(purchaseOfferTown);
 					for (UUID id : purchaseOfferTown.getPurchaseOffers()) {
 						OfflinePlayer offerPlayer = Bukkit.getOfflinePlayer(id);
 						if (getKonquest().getPlayerManager().isOfflinePlayer(offerPlayer)) {
@@ -839,7 +836,7 @@ public class KingdomMenu extends StateMenu {
 			if (offlinePlayer == null) {
 				continue;
 			}
-			icon = new PlayerIcon(currentPlayer,getColor(player,offlinePlayer),getRelation(player,offlinePlayer),0,isClickable);
+			icon = new PlayerIcon(currentPlayer,getColor(player,offlinePlayer),getRelation(player,offlinePlayer),0,true);
 			String kingdomRole = kingdom.getPlayerRankName(currentPlayer);
 			if(!kingdomRole.isEmpty()) {
 				icon.addNameValue(MessagePath.LABEL_KINGDOM_RANK.getMessage(), kingdomRole);
@@ -849,14 +846,13 @@ public class KingdomMenu extends StateMenu {
 				case B_OFFERS_PLAYERS:
 					OfflinePlayer kingdomMaster = kingdom.getPlayerMaster();
 					String masterName = kingdomMaster == null ? "null" : kingdomMaster.getName();
-					String offerTownName = purchaseOfferTown == null ? "null" : purchaseOfferTown.getName();
+					String offerTownName = purchaseOfferTown.getName();
 					String otherKingdomName = offlinePlayer.getKingdom().getName();
+					String offerAmount = KonquestPlugin.getCurrencyFormat(purchaseOfferTown.getPurchaseOfferAmount(currentPlayer.getUniqueId()));
 					icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), otherKingdomName);
-					double offerAmount = purchaseOfferTown.getPurchaseOfferAmount(currentPlayer.getUniqueId());
-					if (offerAmount >= 0) {
-						icon.addNameValue(MessagePath.MENU_KINGDOM_PURCHASE_THEIR_OFFER.getMessage(), KonquestPlugin.getCurrencyFormat(offerAmount));
-					}
-					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_OFFER_ACCEPT.getMessage(offerAmount,currentPlayer.getName(),masterName,offerTownName,otherKingdomName));
+					icon.addNameValue(MessagePath.TERRITORY_TOWN.getMessage(), offerTownName);
+					icon.addNameValue(MessagePath.MENU_KINGDOM_PURCHASE_THEIR_OFFER.getMessage(), offerAmount);
+					icon.addDescription(MessagePath.MENU_KINGDOM_DESCRIPTION_OFFER_ACCEPT.getMessage(offerTownName,otherKingdomName,masterName,offerAmount,currentPlayer.getName()));
 					icon.addHint(MessagePath.MENU_HINT_ACCEPT.getMessage());
 					icon.addHint(MessagePath.MENU_HINT_DECLINE.getMessage());
 					break;
@@ -890,38 +886,45 @@ public class KingdomMenu extends StateMenu {
 
 		/* Icon slot indexes */
 		// Row 0: 0 1 2 3 4 5 6 7 8
-		int SLOT_PURCHASE 		= 4;
-		// Row 1: 9 10 11 12 13 14 15 16 17
-		int SLOT_SHIFT_DOWN		= 12;
-		int SLOT_AMOUNT			= 13;
-		int SLOT_SHIFT_UP		= 14;
+		int SLOT_MODIFIER		= 2;
+		int SLOT_AMOUNT			= 4;
+		int SLOT_PURCHASE 		= 6;
 
 		String townName = "";
 		String kingdomName = "";
 		boolean isClickable = false;
+		double offerAmount = -1;
 		if (purchaseOfferTown != null) {
 			townName = purchaseOfferTown.getName();
 			kingdomName = purchaseOfferTown.getKingdom().getName();
 			isClickable = true;
+			offerAmount = purchaseOfferTown.getPurchaseOfferAmount(player.getBukkitPlayer().getUniqueId());
 		}
 		String amount = KonquestPlugin.getCurrencyFormat(purchaseOfferAmount);
 		String modify = KonquestPlugin.getCurrencyFormat(purchaseOfferModify);
+		String currentOffer = KonquestPlugin.getCurrencyFormat(offerAmount);
 
 		/* Purchase Icon */
-		icon = new InfoIcon(MessagePath.MENU_KINGDOM_PURCHASE_YOUR_OFFER.getMessage(), Material.WRITABLE_BOOK, SLOT_PURCHASE, isClickable);
+		boolean isPurchaseClickable = isClickable && purchaseOfferAmount >= 1;
+		icon = new InfoIcon(MessagePath.MENU_KINGDOM_PURCHASE_YOUR_OFFER.getMessage(), Material.WRITABLE_BOOK, SLOT_PURCHASE, isPurchaseClickable);
 		icon.addNameValue(MessagePath.TERRITORY_TOWN.getMessage(), townName);
 		icon.addNameValue(MessagePath.LABEL_KINGDOM.getMessage(), kingdomName);
+		if (offerAmount >= 0) {
+			icon.addNameValue(MessagePath.LABEL_CURRENT.getMessage(), currentOffer);
+		}
 		icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), amount);
 		icon.setInfo("purchase");
-		if (isClickable) {
+		if (isPurchaseClickable) {
 			icon.addHint(MessagePath.MENU_KINGDOM_HINT_PURCHASE.getMessage());
+		} else {
+			icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
 		}
 		result.addIcon(icon);
 
 		/* Amount Icon */
 		icon = new InfoIcon(MessagePath.LABEL_AMOUNT.getMessage(), Material.GOLD_INGOT, SLOT_AMOUNT, isClickable);
-		icon.addNameValue(MessagePath.LABEL_MODIFIER.getMessage(), modify);
 		icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), amount);
+		icon.addDescription("+"+modify+" -"+modify);
 		if (isClickable) {
 			icon.addHint(MessagePath.MENU_HINT_INCREASE.getMessage());
 			icon.addHint(MessagePath.MENU_HINT_DECREASE.getMessage());
@@ -929,22 +932,15 @@ public class KingdomMenu extends StateMenu {
 		icon.setInfo("amount");
 		result.addIcon(icon);
 
-		/* Modify Down Icon */
-		icon = new InfoIcon(MessagePath.LABEL_MODIFIER.getMessage(), Material.YELLOW_CARPET, SLOT_SHIFT_DOWN, isClickable);
-		icon.addNameValue(MessagePath.LABEL_MODIFIER.getMessage(), modify);
+		/* Modifier Icon */
+		icon = new InfoIcon(MessagePath.LABEL_MODIFIER.getMessage(), Material.GOLD_NUGGET, SLOT_MODIFIER, isClickable);
+		icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), modify);
+		icon.addDescription("×10 ÷10");
 		if (isClickable) {
-			icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
+			icon.addHint(MessagePath.MENU_HINT_INCREASE.getMessage());
+			icon.addHint(MessagePath.MENU_HINT_DECREASE.getMessage());
 		}
-		icon.setInfo("modify_down");
-		result.addIcon(icon);
-
-		/* Modify Up Icon */
-		icon = new InfoIcon(MessagePath.LABEL_MODIFIER.getMessage(), Material.YELLOW_WOOL, SLOT_SHIFT_UP, isClickable);
-		icon.addNameValue(MessagePath.LABEL_MODIFIER.getMessage(), modify);
-		if (isClickable) {
-			icon.addHint(MessagePath.MENU_HINT_CHANGE.getMessage());
-		}
-		icon.setInfo("modify_up");
+		icon.setInfo("modifier");
 		result.addIcon(icon);
 
 		/* Navigation */
@@ -1069,6 +1065,8 @@ public class KingdomMenu extends StateMenu {
 						case A_INVITE:
 						case A_LIST:
 						case B_RELATIONSHIP:
+						case B_PURCHASE:
+						case B_OFFERS:
 						case B_REQUESTS:
 						case C_PROMOTE:
 						case C_DEMOTE:
@@ -1204,16 +1202,17 @@ public class KingdomMenu extends StateMenu {
 								}
 								result = refreshCurrentView();
 								break;
-							case "modify_down":
-								// Shift the amount modifier down, limited to 1
-								double shiftedModifyDown = purchaseOfferModify/10;
-								purchaseOfferModify = Math.max(shiftedModifyDown,1);
-								result = refreshCurrentView();
-								break;
-							case "modify_up":
-								// Shift the amount modifier up, limited to 100 million
-								double shiftedModifyUp = purchaseOfferModify*10;
-								purchaseOfferModify = Math.min(shiftedModifyUp,100000000);
+							case "modifier":
+								double shiftedModifier;
+								if (clickType) {
+									// Shift the amount modifier up, limited to 100 million
+									shiftedModifier = purchaseOfferModify*10;
+									purchaseOfferModify = Math.min(shiftedModifier,100000000);
+								} else {
+									// Shift the amount modifier down, limited to 1
+									shiftedModifier = purchaseOfferModify/10;
+									purchaseOfferModify = Math.max(shiftedModifier,1);
+								}
 								result = refreshCurrentView();
 								break;
 						}
