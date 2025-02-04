@@ -15,6 +15,7 @@ label:
   admin: Admin
   admin-kingdom: Admin Kingdom
   allied-building: Allied Building
+  amount: Amount
   armor: Armor
   back: Back
   barbarians: Barbarians
@@ -57,6 +58,7 @@ label:
   map-color: Map Color
   members: Members
   modified: Modified
+  modifier: Modifier
   monument-template: Monument Template
   monument-templates: Monument Templates
   neutrals: Neutrals
@@ -154,6 +156,10 @@ menu:
     charge: Click to charge
     change: Click to change
     travel: Click to travel
+    accept: Left-click to accept
+    decline: Right-click to decline
+    increase: Left-click to increase
+    decrease: Right-click to decrease
     exit: Exit the menu
   main:
     title: Konquest Main Menu
@@ -358,8 +364,6 @@ menu:
     hint-join: Click to send a join request
     hint-join-now: Click to instantly join
     hint-leave: Click to leave
-    hint-accept: Left-click to accept
-    hint-decline: Right-click to decline
     hint-manage: Click to manage
     hint-promote: Click to promote to Knight
     hint-demote: Click to demote to Resident
@@ -384,6 +388,8 @@ menu:
     list: List
     relation: Relationships
     requests: Requests
+    purchase: Purchase Towns
+    offers: Town Offers
     promote: Promote
     demote: Demote
     transfer: Transfer
@@ -397,6 +403,9 @@ menu:
     description-list: View all kingdoms
     description-relation: Modify relationships with other kingdoms
     description-requests: View kingdom membership requests
+    description-purchase: Purchase towns from other kingdoms by making an offer
+    description-offers: View offers by other kingdoms to purchase your towns
+    description-offer-accept: Give the Town of %s to the Kingdom of %s, and %s receives %s Favor from %s.
     description-promote: Promote members to officers
     description-demote: Demote officers to members
     description-transfer: Transfer master to another member
@@ -408,10 +417,9 @@ menu:
     hint-template: Click to change templates
     hint-join: Click to send a join request
     hint-join-now: Click to instantly join
-    hint-accept: Left-click to accept
-    hint-decline: Right-click to decline
     hint-relation: Click to choose diplomacy
     hint-diplomacy: Click to enact
+    hint-purchase: Click to send purchase offer
     hint-promote: Click to promote to Officer
     hint-demote: Click to demote to Member
     hint-transfer: Click to give Master
@@ -431,6 +439,9 @@ menu:
     diplomacy-trade-info: No PvP. Villager trade discounts. Use chest shops.
     diplomacy-alliance-info: No PvP. Villager trade discounts. Use chest shops. Defensive pact. Travel to towns and capital.
     diplomacy-war-info: PvP. Attack and capture towns and capital.
+    purchase-offers: Purchase Offers
+    purchase-your-offer: Your Offer
+    purchase-their-offer: Their Offer
     title-join: Join a Kingdom
     title-confirm: Are you sure?
     title-invites: Kingdom Invites
@@ -438,6 +449,9 @@ menu:
     title-relations: Relationships
     title-diplomacy: Diplomacy
     title-requests: Join Requests
+    title-purchase: Purchase Towns
+    title-amount: Purchase Amount
+    title-offers: Town Offers
     title-promotion: Promotions
     title-demotion: Demotions
     title-transfer: Kingdom Master Transfer
@@ -520,6 +534,7 @@ protection:
     destroy: You have destroyed %s for the glory of the Barbarian horde!
     conquer: The Town of %s has been conquered!
     capture: You have conquered %s for the conquest of %s!
+    purchase: The Town of %s has been purchased by the Kingdom of %s!
     kingdom-warmup: The Kingdom of %s will be protected in %s minutes.
     kingdom-conquer: The Kingdom of %s has been conquered by %s!
     kingdom-raze: The Kingdom of %s has been destroyed by the Barbarian horde!
@@ -738,6 +753,11 @@ command:
       diplomacy-pending: Your kingdom has pending diplomacy requests. Use "/k kingdom", then choose Relationships to respond.
       web-color-show: The Kingdom of %s has a web map color of %s
       web-color-set: Set the web map color of %s to %s
+      offer-purchase: You sent an offer to purchase the Town of %s from the Kingdom of %s for %s.
+      offer-pending: Your kingdom has pending town purchase offers. Use "/k kingdom", then choose Town Offers to respond.
+      offer-towns: These towns in your kingdom have offers to be purchased...
+      offer-players: These players have offered to purchase the town of %s...
+      offer-declined: Declined the offer by player %s to purchase the town of %s.
     error:
       barbarian-create: You must be a barbarian to create a kingdom. Use the Exile option in the kingdom menu.
       invalid-template: '%s is an invalid monument template. Check spelling or choose another.'

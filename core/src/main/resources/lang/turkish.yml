@@ -15,6 +15,7 @@ label:
   admin: Yönetici
   admin-kingdom: Yönetici Krallığı
   allied-building: Müttefik Yapı
+  amount: Miktar
   armor: Zırh
   back: Geri
   barbarians: Barbarlar
@@ -57,6 +58,7 @@ label:
   map-color: Harita Rengi
   members: Üyeler
   modified: Değiştirildi
+  modifier: Değiştirici
   monument-template: Anıt Şablonu
   monument-templates: Anıt Şablonları
   neutrals: Tarafsızlar
@@ -154,6 +156,10 @@ menu:
     charge: Ücretlendirmek için tıklayın
     change: Değiştirmek için tıklayın
     travel: Seyahat etmek için tıklayın
+    accept: Kabul etmek için sol tıklayın
+    decline: Reddetmek için sağ tıklayın
+    increase: Artırmak için sol tıklayın
+    decrease: Azaltmak için sağ tıklayın
     exit: Menüden çık
   main:
     title: Konquest Ana Menü
@@ -358,8 +364,6 @@ menu:
     hint-join: Katılma isteği göndermek için tıklayın
     hint-join-now: Hızla katılmak için tıklayın
     hint-leave: Ayrılmak için tıklayın
-    hint-accept: Kabul etmek için sol tıklayın
-    hint-decline: Reddetmek için sağ tıklayın
     hint-manage: Yönetmek için tıklayın
     hint-promote: Şövalye olarak terfi ettirmek için tıklayın
     hint-demote: Sakin olarak geri almak için tıklayın
@@ -384,6 +388,8 @@ menu:
     list: Liste
     relation: İlişkiler
     requests: Talepler
+    purchase: Kasabaları satın al
+    offers: Şehir Teklifleri
     promote: Terfi Ettir
     demote: Geri Al
     transfer: Transfer Et
@@ -397,6 +403,9 @@ menu:
     description-list: Tüm krallıkları görüntüleyin
     description-relation: Diğer krallıklarla ilişkileri düzenleyin
     description-requests: Krallık üyeliği taleplerini görüntüleyin
+    description-purchase: Teklif vererek diğer krallıklardan kasaba satın alın
+    description-offers: Kasabalarınızı satın almak için diğer krallıkların tekliflerini görüntüleyin
+    description-offer-accept: "%s Kasabasını %s Krallığına verin ve %s, %s'den %s Lütfu alır."
     description-promote: Üyeleri memur olarak terfi ettirin
     description-demote: Memurları üye olarak geri alın
     description-transfer: Lord'u başka bir üyeye transfer edin
@@ -408,10 +417,9 @@ menu:
     hint-template: Şablonları değiştirmek için tıklayın
     hint-join: Katılma talebi göndermek için tıklayın
     hint-join-now: Hızla katılmak için tıklayın
-    hint-accept: Kabul etmek için sol tıklayın
-    hint-decline: Reddetmek için sağ tıklayın
     hint-relation: Diplomasi seçmek için tıklayın
     hint-diplomacy: Uygulamak için tıklayın
+    hint-purchase: Satın alma teklifini göndermek için tıklayın
     hint-promote: Şövalye olarak terfi ettirmek için tıklayın
     hint-demote: Üye olarak geri almak için tıklayın
     hint-transfer: Lord vermek için tıklayın
@@ -431,6 +439,9 @@ menu:
     diplomacy-trade-info: PvP yok. Köylü ticaret indirimleri. Sandık dükkanlarını kullanın.
     diplomacy-alliance-info: PvP yok. Köylü ticaret indirimleri. Sandık dükkanlarını kullanın. Savunma paktı. Kasabalara ve başkente seyahat edin.
     diplomacy-war-info: PvP. Kasabaları ve başkenti saldırın ve ele geçirin.
+    purchase-offers: Satınalma Teklifleri
+    purchase-your-offer: Teklifiniz
+    purchase-their-offer: Onların Teklifi
     title-join: Bir Krallığa Katıl
     title-confirm: Emin misiniz?
     title-invites: Krallık Davetleri
@@ -438,6 +449,9 @@ menu:
     title-relations: İlişkiler
     title-diplomacy: Diplomasi
     title-requests: Katılma Talepleri
+    title-purchase: Kasabaları satın al
+    title-amount: Satın Alma Tutarı
+    title-offers: Şehir Teklifleri
     title-promotion: Terfiler
     title-demotion: Geri Alma
     title-transfer: Krallık Lordu Transferi
@@ -520,6 +534,7 @@ protection:
     destroy: "%s'yi Barbarların ordusu için yok ettiniz!"
     conquer: '%s Kasabası fethedildi!'
     capture: "%s'yi %s'nin fethedilmesi için ele geçirdiniz!"
+    purchase: '%s Şehri %s Krallığı tarafından satın alındı!'
     kingdom-warmup: '%s Krallığı %s dakika içinde korunacak.'
     kingdom-conquer: '%s Krallığı %s tarafından fethedildi!'
     kingdom-raze: '%s Krallığı Barbarların ordusu tarafından yok edildi!'
@@ -738,6 +753,11 @@ command:
       diplomacy-pending: Krallığınızın bekleyen diplomasi talepleri var. Yanıt vermek için "/k kingdom" yazın, ardından Relationships seçeneğini seçin.
       web-color-show: '%s Krallığının web haritası rengi %s'
       web-color-set: '%s Krallığının web haritası rengini %s olarak ayarladınız.'
+      offer-purchase: "%s Krallığı'ndan %s karşılığında %s Kasabası'nı satın alma teklifinde bulundunuz."
+      offer-pending: Krallığınızda bekleyen şehir satın alma teklifleri var. "/k kingdom" kullanın, ardından yanıtlamak için Şehir Teklifleri'ni seçin.
+      offer-towns: Krallığınızdaki bu kasabalarda satın alma teklifleri var...
+      offer-players: Bu oyuncular %s kasabasını satın almayı teklif ettiler...
+      offer-declined: '%s isimli oyuncunun %s şehrini satın alma teklifi reddedildi.'
     error:
       barbarian-create: Krallık oluşturmak için barbar olmanız gerekir. Krallık menüsünde Sürgün seçeneğini kullanın.
       invalid-template: '%s geçersiz bir anıt şablonu. Yazımını kontrol edin veya başka birini seçin.'

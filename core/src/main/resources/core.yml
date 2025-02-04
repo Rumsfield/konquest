@@ -427,6 +427,9 @@ core:
     
     # Allow players to build in the wild (true/false)
     wild_build: true
+
+    # Allow kingdom masters and officers to make offers to purchase towns from other kingdoms (true/false)
+    purchase_towns: true
     
   # //// CORE.TOWNS \\\\
   towns:

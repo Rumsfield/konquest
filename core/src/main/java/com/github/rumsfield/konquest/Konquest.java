@@ -526,6 +526,7 @@ public class Konquest implements KonquestAPI, Timeable {
 				String.format(lineTemplate,"Admin Kingdoms Only",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.KINGDOMS_CREATE_ADMIN_ONLY.getPath()))),
 				String.format(lineTemplate,"Kingdom Capital Swap",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.KINGDOMS_CAPITAL_SWAP_ENABLE.getPath()))),
 				String.format(lineTemplate,"Kingdom Allied Building",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath()))),
+				String.format(lineTemplate,"Kingdom Town Purchases",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.KINGDOMS_PURCHASE_TOWNS.getPath()))),
 				String.format(lineTemplate,"Town Upgrades",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_UPGRADES.getPath()))),
 				String.format(lineTemplate,"Town Shields",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_SHIELDS.getPath()))),
 				String.format(lineTemplate,"Town Armor",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.TOWNS_ENABLE_ARMOR.getPath()))),

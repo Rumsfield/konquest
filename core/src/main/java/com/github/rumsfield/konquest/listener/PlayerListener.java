@@ -159,6 +159,12 @@ public class PlayerListener implements Listener {
 				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_INVITE_PENDING.getMessage());
 				ChatUtil.sendCommaMessage(bukkitPlayer, townInviteNames);
 			}
+			// Notify offers (officers only)
+			if(konquest.getKingdomManager().getIsTownPurchaseEnable() && isPlayerKingdomOfficer) {
+				if (konquest.getKingdomManager().getNumTownPurchaseOffers(player.getKingdom()) > 0) {
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_PENDING.getMessage(), ChatColor.GOLD);
+				}
+			}
 
 			// DiscordSRV
 			if(konquest.getIntegrationManager().getDiscordSrv().isEnabled()) {

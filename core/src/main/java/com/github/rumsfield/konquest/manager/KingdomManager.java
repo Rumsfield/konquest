@@ -79,6 +79,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private double capitalSwapWarmup;
 	private boolean townDestroyLordEnable;
 	private boolean townDestroyMasterEnable;
+	private boolean townPurchaseEnable;
 
 	private final Timer payTimer;
 	
@@ -175,6 +176,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Town Settings
 		townDestroyLordEnable   = konquest.getCore().getBoolean(CorePath.TOWNS_ALLOW_DESTROY_LORD.getPath());
 		townDestroyMasterEnable = konquest.getCore().getBoolean(CorePath.TOWNS_ALLOW_DESTROY_MASTER.getPath());
+		townPurchaseEnable      = konquest.getCore().getBoolean(CorePath.KINGDOMS_PURCHASE_TOWNS.getPath());
 
 		// Discount Settings
 		discountEnable 	    	= konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath());
@@ -228,6 +230,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 
 	public boolean getIsTownDestroyMasterEnable() {
 		return townDestroyMasterEnable;
+	}
+
+	public boolean getIsTownPurchaseEnable() {
+		return townPurchaseEnable;
 	}
 
 	public boolean isKingdomCreateAdminOnly() {
@@ -2560,23 +2566,27 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			konquest.getMapHandler().drawRemoveTerritory(getKingdom(oldKingdomName).getTown(name));
 			getKingdom(oldKingdomName).getTown(name).purgeResidents();
 			getKingdom(oldKingdomName).getTown(name).clearShieldsArmors();
+			getKingdom(oldKingdomName).getTown(name).clearPurchaseOffers();
 			getKingdom(oldKingdomName).getTown(name).setKingdom(conquerKingdom);
 			conquerKingdom.addTownConquer(name, getKingdom(oldKingdomName).removeTownConquer(name));
-			conquerKingdom.getTown(name).refreshMonument();
-			refreshTownNerfs(conquerKingdom.getTown(name));
-			refreshTownHearts(conquerKingdom.getTown(name));
-			conquerKingdom.getTown(name).updateBarPlayers();
+			KonTown captureTown = conquerKingdom.getTown(name);
+			captureTown.refreshMonument();
+			refreshTownNerfs(captureTown);
+			refreshTownHearts(captureTown);
+			captureTown.updateBarPlayers();
 			if(captureUpgrades) {
-				konquest.getUpgradeManager().updateTownDisabledUpgrades(conquerKingdom.getTown(name));
+				konquest.getUpgradeManager().updateTownDisabledUpgrades(captureTown);
 			} else {
-				conquerKingdom.getTown(name).clearUpgrades();
+				captureTown.clearUpgrades();
 			}
-			conquerKingdom.getTown(name).clearPlots();
-			konquest.getMapHandler().drawUpdateTerritory(conquerKingdom.getTown(name));
+			captureTown.clearPlots();
+			konquest.getMapHandler().drawUpdateTerritory(captureTown);
 			konquest.getMapHandler().drawLabel(getKingdom(oldKingdomName).getCapital());
 			konquest.getMapHandler().drawLabel(conquerKingdom.getCapital());
-			konquest.getShopHandler().deleteShopsInPoints(conquerKingdom.getTown(name).getChunkList().keySet(),conquerKingdom.getTown(name).getWorld());
-			return conquerKingdom.getTown(name);
+			konquest.getShopHandler().deleteShopsInPoints(captureTown.getChunkList().keySet(),captureTown.getWorld());
+			// Post-capture updates
+			captureTownUpdate(captureTown);
+			return captureTown;
 		}
 		return null;
 	}
@@ -2660,6 +2670,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				konquest.getShopHandler().deleteShopsInPoints(town.getChunkList().keySet(),town.getWorld());
 				// Fire event
 				Konquest.callKonquestEvent(new KonquestKingdomConquerEvent(konquest, oldKingdomName, conquerKingdom));
+				// Post-capture updates
+				captureTownUpdate(town);
 				return town;
 			} else {
 				ChatUtil.printDebug("Failed to create new town over captured capital, status code "+status);
@@ -2667,6 +2679,32 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 		}
 		return null;
+	}
+
+	private void captureTownUpdate(KonTown town) {
+		// For all online players...
+		for(KonPlayer onlinePlayer : konquest.getPlayerManager().getPlayersOnline()) {
+			// Teleport all players inside center chunk to new spawn location
+			if(town.isLocInsideCenterChunk(onlinePlayer.getBukkitPlayer().getLocation())) {
+				onlinePlayer.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(town.getCenterLoc(), 2));
+				onlinePlayer.getBukkitPlayer().playEffect(onlinePlayer.getBukkitPlayer().getLocation(), Effect.ANVIL_LAND, null);
+			}
+			// Remove mob targets
+			if(town.isLocInside(onlinePlayer.getBukkitPlayer().getLocation())) {
+				onlinePlayer.clearAllMobAttackers();
+			}
+			// Update particle border renders for nearby players
+			for(Chunk chunk : HelperUtil.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
+				if(town.hasChunk(chunk)) {
+					konquest.getTerritoryManager().updatePlayerBorderParticles(onlinePlayer);
+					break;
+				}
+			}
+		}
+		town.getMonumentTimer().stopTimer();
+		town.setAttacked(false,null);
+		town.setBarProgress(1.0);
+		town.updateBarTitle();
 	}
 
 	public boolean menuDestroyTown(KonTown town, KonPlayer player) {
@@ -4136,6 +4174,150 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 	}
 
+	// A player makes a new offer to purchase a town in a different kingdom
+	// Returns true when the offer is successfully applied
+	public boolean applyTownPurchaseOffer(KonTown town, KonPlayer player, double amount) {
+		// Error checks
+		if (town == null) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return false;
+		}
+		if (!townPurchaseEnable) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return false;
+		}
+		if (player.isBarbarian()) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_DENY_BARBARIAN.getMessage());
+			return false;
+		}
+		if (town.getKingdom().equals(player.getKingdom()) || town instanceof KonCapital || amount < 1) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+		String offerAmount = KonquestPlugin.getCurrencyFormat(amount);
+		if (KonquestPlugin.getBalance(player.getBukkitPlayer()) < amount) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(offerAmount));
+			return false;
+		}
+		// Apply offer
+		town.addPurchaseOffer(player.getBukkitPlayer().getUniqueId(), amount);
+		// Status message
+		ChatUtil.sendNotice(player,MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_PURCHASE.getMessage(town.getName(),town.getKingdom().getName(),offerAmount));
+		// Notify town's kingdom
+		int numOffers = konquest.getKingdomManager().getNumTownPurchaseOffers(town.getKingdom());
+		broadcastOfficers(town.getKingdom(),MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_PENDING.getMessage(numOffers));
+		return true;
+	}
+
+	// A player responds to an existing offer to purchase a town in their kingdom
+	// Returns true when the offer is accepted and successfully completed
+	// Assume that the offer is valid
+	// When response is true, accept the offer, else decline it
+	public boolean respondTownPurchaseOffer(KonTown town, KonPlayer player, UUID offerID, boolean response) {
+		// Error checks
+		if (town == null) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return false;
+		}
+		if (!townPurchaseEnable) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return false;
+		}
+		KonOfflinePlayer offerPlayer = konquest.getPlayerManager().getOfflinePlayerFromID(offerID);
+		if (offerPlayer == null) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return false;
+		}
+		if (offerPlayer.isBarbarian() || town.getKingdom().equals(offerPlayer.getKingdom()) || town instanceof KonCapital) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+
+		// Check for declined response
+		if (!response) {
+			town.removePurchaseOffer(offerID);
+			ChatUtil.sendNotice(player,MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_DECLINED.getMessage(offerPlayer.getOfflineBukkitPlayer().getName(), town.getName()));
+			return false;
+		}
+		// Response is approved
+		// Check for valid offer amount
+		double offerAmount = town.getPurchaseOfferAmount(offerID);
+		if (offerAmount < 1 || KonquestPlugin.getBalance(offerPlayer.getOfflineBukkitPlayer()) < offerAmount) {
+			ChatUtil.sendError(player,MessagePath.GENERIC_ERROR_INTERNAL.getMessage());
+			return false;
+		}
+		// Withdraw favor from offer player, deposit to original kingdom's master or responder when master is null
+		KonquestPlugin.withdrawPlayer(offerPlayer.getOfflineBukkitPlayer(), offerAmount);
+		if (town.getKingdom().isMasterValid()) {
+			KonquestPlugin.depositPlayer(town.getKingdom().getPlayerMaster(), offerAmount);
+		} else {
+			KonquestPlugin.depositPlayer(player.getBukkitPlayer(), offerAmount);
+		}
+		// Capture the town for the offer player's kingdom
+		KonTown purchasedTown = captureTown(town.getName(), town.getKingdom().getName(), offerPlayer.getKingdom());
+		// Check for successful capture
+		if (purchasedTown != null) {
+			ChatUtil.sendBroadcast(MessagePath.PROTECTION_NOTICE_PURCHASE.getMessage(purchasedTown.getName(), purchasedTown.getKingdom().getName()));
+			purchasedTown.setPlayerLord(offerPlayer.getOfflineBukkitPlayer());
+		} else {
+			ChatUtil.sendError(player, MessagePath.GENERIC_ERROR_FAILED.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	public void refreshPurchaseOffers(KonTown town) {
+		// Remove any invalid offers
+		KonOfflinePlayer offerPlayer;
+		for (UUID id : town.getPurchaseOffers()) {
+			if (!townPurchaseEnable || town instanceof KonCapital) {
+				town.removePurchaseOffer(id);
+				continue;
+			}
+			offerPlayer = konquest.getPlayerManager().getOfflinePlayerFromID(id);
+			if (offerPlayer == null) {
+				continue;
+			}
+			if (offerPlayer.isBarbarian() || town.getKingdom().equals(offerPlayer.getKingdom())) {
+				town.removePurchaseOffer(id);
+				continue;
+			}
+			double offerAmount = town.getPurchaseOfferAmount(id);
+			if (offerAmount < 1 || KonquestPlugin.getBalance(offerPlayer.getOfflineBukkitPlayer()) < offerAmount) {
+				town.removePurchaseOffer(id);
+			}
+		}
+	}
+
+	public int getNumTownPurchaseOffers(KonKingdom kingdom) {
+		int result = 0;
+		for (KonTown town : kingdom.getTowns()) {
+			refreshPurchaseOffers(town);
+			result += town.getNumPurchaseOffers();
+		}
+		return result;
+	}
+
+	public List<KonTown> getActiveTownPurchaseOffers(KonKingdom kingdom) {
+		List<KonTown> result = new ArrayList<>();
+		for (KonTown town : kingdom.getTowns()) {
+			refreshPurchaseOffers(town);
+			if (town.hasPurchaseOffers()) {
+				result.add(town);
+			}
+		}
+		return result;
+	}
+
+	public List<OfflinePlayer> getPlayerTownPurchaseOffers(KonTown town) {
+		refreshPurchaseOffers(town);
+		List<OfflinePlayer> result = new ArrayList<>();
+		for (UUID id : town.getPurchaseOffers()) {
+			result.add(Bukkit.getOfflinePlayer(id));
+		}
+		return result;
+	}
+
 	/**
 	 * This method is meant to run after all kingdoms have been loaded from file
 	 */
@@ -4703,6 +4885,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				town.addJoinRequest(UUID.fromString(requestUUID), type);
 			}
 		}
+		// Add purchase offers
+		ConfigurationSection townOffersSection = townSection.getConfigurationSection("offers");
+		if(townOffersSection != null) {
+			for(String offerUUID : townOffersSection.getKeys(false)) {
+				double amount = townSection.getDouble("offers."+offerUUID);
+				town.addPurchaseOffer(UUID.fromString(offerUUID), amount);
+			}
+		}
 		// Add upgrades
 		ConfigurationSection townUpgradesSection = townSection.getConfigurationSection("upgrades");
 		if(townUpgradesSection != null) {
@@ -4880,6 +5070,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
                 	String uuid = invitee.getUniqueId().toString();
                 	townInstanceRequestsSection.set(uuid, true);
                 }
+				ConfigurationSection townInstanceOffersSection = townInstanceSection.createSection("offers");
+				for(UUID id : town.getPurchaseOffers()) {
+					double amount = town.getPurchaseOfferAmount(id);
+					townInstanceOffersSection.set(id.toString(), amount);
+				}
                 ConfigurationSection townInstanceUpgradeSection = townInstanceSection.createSection("upgrades");
                 for(KonUpgrade upgrade : KonUpgrade.values()) {
                 	int level = town.getRawUpgradeLevel(upgrade);
