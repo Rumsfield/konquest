@@ -15,6 +15,7 @@ label:
   admin: Admin
   admin-kingdom: Admin-Königreich
   allied-building: Alliiertes Gebäude
+  amount: Menge
   armor: Rüstung
   back: Zurück
   barbarians: Barbaren
@@ -57,6 +58,7 @@ label:
   map-color: Kartenfarbe
   members: Mitglieder
   modified: Geändert
+  modifier: Modifikator
   monument-template: Monumentvorlage
   monument-templates: Monumentvorlagen
   neutrals: Neutrale
@@ -154,6 +156,10 @@ menu:
     charge: Zum Aufladen klicken
     change: Zum Ändern klicken
     travel: Zum Reisen klicken
+    accept: Zum Akzeptieren linksklicken
+    decline: Zum Ablehnen Rechtsklick
+    increase: Zum Vergrößern linksklicken
+    decrease: Zum Verkleinern mit der rechten Maustaste klicken
     exit: Menü verlassen
   main:
     title: Konquest-Hauptmenü
@@ -358,8 +364,6 @@ menu:
     hint-join: Klicken, um eine Beitrittsanfrage zu senden
     hint-join-now: Klicken, um sofort beizutreten
     hint-leave: Klicken, um zu gehen
-    hint-accept: Linksklick, um zu akzeptieren
-    hint-decline: Rechtsklick, um abzulehnen
     hint-manage: Klicken, um zu verwalten
     hint-promote: Klicken, um zum Ritter zu befördern
     hint-demote: Klicken, um zum Bewohner degradiert zu werden
@@ -384,6 +388,8 @@ menu:
     list: Liste
     relation: Beziehungen
     requests: Anfragen
+    purchase: Städte kaufen
+    offers: Stadtangebote
     promote: Befördern
     demote: Degradieren
     transfer: Übertragen
@@ -397,6 +403,9 @@ menu:
     description-list: Alle Königreiche anzeigen
     description-relation: Beziehungen zu anderen Königreichen ändern
     description-requests: Königreichsmitgliedschaftsanfragen anzeigen
+    description-purchase: Kaufen Sie Städte von anderen Königreichen, indem Sie ein Angebot machen
+    description-offers: Angebote anderer Königreiche zum Kauf Ihrer Städte ansehen
+    description-offer-accept: Geben Sie die Stadt %s dem Königreich %s, und %s erhält %s Gunst von %s.
     description-promote: Mitglieder zu Offizieren befördern
     description-demote: Offiziere zu Mitgliedern degradieren
     description-transfer: Meister an ein anderes Mitglied übertragen
@@ -408,10 +417,9 @@ menu:
     hint-template: Klicken, um Vorlagen zu ändern
     hint-join: Klicken, um eine Beitrittsanfrage zu senden
     hint-join-now: Klicken, um sofort beizutreten
-    hint-accept: Linksklick, um zu akzeptieren
-    hint-decline: Rechtsklick, um abzulehnen
     hint-relation: Klicken, um Diplomatie auszuwählen
     hint-diplomacy: Klicken, um zu aktivieren
+    hint-purchase: Klicken Sie hier, um ein Kaufangebot zu senden
     hint-promote: Klicken, um zum Offizier zu befördern
     hint-demote: Klicken, um zum Mitglied degradiert zu werden
     hint-transfer: Klicken, um Meister zu geben
@@ -431,6 +439,9 @@ menu:
     diplomacy-trade-info: Kein PvP. Handelsrabatte für Dorfbewohner. Truhenläden nutzen.
     diplomacy-alliance-info: Kein PvP. Handelsrabatte für Dorfbewohner. Truhenläden nutzen. Verteidigungspakt. Zu Städten und Hauptstädten reisen.
     diplomacy-war-info: PvP. Städte und Hauptstädte angreifen und erobern.
+    purchase-offers: Kaufangebote
+    purchase-your-offer: Ihr Angebot
+    purchase-their-offer: Ihr Angebot
     title-join: Einem Königreich beitreten
     title-confirm: Sind Sie sicher?
     title-invites: Königreich-Einladungen
@@ -438,6 +449,9 @@ menu:
     title-relations: Beziehungen
     title-diplomacy: Diplomatie
     title-requests: Beitrittsanfragen
+    title-purchase: Städte kaufen
+    title-amount: Kaufbetrag
+    title-offers: Stadtangebote
     title-promotion: Beförderungen
     title-demotion: Degradierungen
     title-transfer: Übertragung des Königreichsmeisters
@@ -520,6 +534,7 @@ protection:
     destroy: Sie haben %s für den Ruhm der Barbarenhorde zerstört!
     conquer: Die Stadt %s wurde erobert!
     capture: Sie haben %s für die Eroberung von %s erobert!
+    purchase: Die Stadt %s wurde vom Königreich %s gekauft!
     kingdom-warmup: Das Königreich %s wird in %s Minuten geschützt.
     kingdom-conquer: Das Königreich %s wurde von %s erobert!
     kingdom-raze: Das Königreich %s wurde von der Barbarenhorde zerstört!
@@ -738,6 +753,11 @@ command:
       diplomacy-pending: Ihr Königreich hat ausstehende Diplomatieanfragen. Verwenden Sie "/k kingdom" und wählen Sie dann „Beziehungen“, um zu antworten.
       web-color-show: Das Königreich %s hat eine Webkartenfarbe von %s
       web-color-set: Stellen Sie die Webkartenfarbe von %s auf %s ein
+      offer-purchase: Sie haben ein Angebot zum Kauf der Stadt %s vom Königreich %s für %s gesendet.
+      offer-pending: Für Ihr Königreich liegen ausstehende Angebote zum Kauf von Städten vor. Verwenden Sie "/k kingdom" und wählen Sie dann Stadtangebote, um zu antworten.
+      offer-towns: Für diese Städte in Ihrem Königreich gibt es Kaufangebote …
+      offer-players: Diese Spieler haben angeboten, die Stadt %s zu kaufen …
+      offer-declined: Das Angebot des Spielers %s zum Kauf der Stadt %s wurde abgelehnt.
     error:
       barbarian-create: Sie müssen ein Barbar sein, um ein Königreich zu erstellen. Verwenden Sie die Option „Exil“ im Königreichsmenü.
       invalid-template: '%s ist eine ungültige Monumentvorlage. Überprüfen Sie die Rechtschreibung oder wählen Sie eine andere.'

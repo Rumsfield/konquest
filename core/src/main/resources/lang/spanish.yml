@@ -15,6 +15,7 @@ label:
   admin: Administrador
   admin-kingdom: Reino Administrativo
   allied-building: Construccion Aliada
+  amount: Cantidad
   armor: Armadura
   back: Atras
   barbarians: Barbaros
@@ -57,6 +58,7 @@ label:
   map-color: Color del Mapa
   members: Miembros
   modified: Modificado
+  modifier: Modificador
   monument-template: Plantilla de Monumento
   monument-templates: Plantillas de Monumentos
   neutrals: Neutrales
@@ -154,6 +156,10 @@ menu:
     charge: Haz clic para cargar
     change: Haz clic para cambiar
     travel: Haz clic para viajar
+    accept: Haz clic izquierdo para aceptar
+    decline: Haz clic derecho para rechazar
+    increase: Haz clic izquierdo para aumentar
+    decrease: Haz clic derecho para disminuir
     exit: Salga del menú
   main:
     title: Menú principal de Konquest
@@ -358,8 +364,6 @@ menu:
     hint-join: Haz clic para enviar una solicitud de union
     hint-join-now: Haz clic para unirte al instante
     hint-leave: Haz clic para salir
-    hint-accept: Haz clic izquierdo para aceptar
-    hint-decline: Haz clic derecho para rechazar
     hint-manage: Haz clic para administrar
     hint-promote: Haz clic para promover a Caballero
     hint-demote: Haz clic para degradar a Residente
@@ -384,6 +388,8 @@ menu:
     list: Lista
     relation: Relaciones
     requests: Solicitudes
+    purchase: Compra de ciudades
+    offers: Ofertas de la ciudad
     promote: Promover
     demote: Degradar
     transfer: Transferir
@@ -397,6 +403,9 @@ menu:
     description-list: Visualiza todos los reinos
     description-relation: Modifica las relaciones con otros reinos
     description-requests: Visualiza solicitudes de membresia de reino
+    description-purchase: Compra ciudades de otros reinos haciendo una oferta
+    description-offers: Ver ofertas de otros reinos para comprar tus ciudades
+    description-offer-accept: Entregue la ciudad de %s al reino de %s y %s recibirá %s favores de %s.
     description-promote: Promueve a miembros a oficiales
     description-demote: Degradar a oficiales a miembros
     description-transfer: Transferir el maestro a otro miembro
@@ -408,10 +417,9 @@ menu:
     hint-template: Haz clic para cambiar plantillas
     hint-join: Haz clic para enviar una solicitud de union
     hint-join-now: Haz clic para unirte al instante
-    hint-accept: Haz clic izquierdo para aceptar
-    hint-decline: Haz clic derecho para rechazar
     hint-relation: Haz clic para elegir diplomacia
     hint-diplomacy: Haz clic para promulgar
+    hint-purchase: Haz clic para enviar oferta de compra
     hint-promote: Haz clic para promover a Oficial
     hint-demote: Haz clic para degradar a Miembro
     hint-transfer: Haz clic para dar Maestro
@@ -431,6 +439,9 @@ menu:
     diplomacy-trade-info: Sin PvP. Descuentos de comercio con aldeanos. Usa tiendas de cofres.
     diplomacy-alliance-info: Sin PvP. Descuentos de comercio con aldeanos. Usa tiendas de cofres. Pacto defensivo. Viajar a pueblos y capital.
     diplomacy-war-info: PvP. Atacar y capturar pueblos y capital.
+    purchase-offers: Ofertas de compra
+    purchase-your-offer: Su oferta
+    purchase-their-offer: Su oferta
     title-join: Unirse a un Reino
     title-confirm: Estas seguro?
     title-invites: Invitaciones del Reino
@@ -438,6 +449,9 @@ menu:
     title-relations: Relaciones
     title-diplomacy: Diplomacia
     title-requests: Solicitudes de Union
+    title-purchase: Compra de ciudades
+    title-amount: Monto de la compra
+    title-offers: Ofertas de la ciudad
     title-promotion: Promociones
     title-demotion: Degradaciones
     title-transfer: Transferencia del Maestro del Reino
@@ -520,6 +534,7 @@ protection:
     destroy: Has destruido %s por la gloria de la horda Barbaro!
     conquer: El Pueblo de %s ha sido conquistado!
     capture: Has conquistado %s para la conquista de %s!
+    purchase: ¡El Pueblo de %s ha sido comprada por el Reino de %s!
     kingdom-warmup: El Reino de %s estara protegido en %s minutos.
     kingdom-conquer: El Reino de %s ha sido conquistado por %s!
     kingdom-raze: El Reino de %s ha sido destruido por la horda Barbaro!
@@ -738,6 +753,11 @@ command:
       diplomacy-pending: Tu reino tiene solicitudes de diplomacia pendientes. Usa "/k kingdom", luego elige Relaciones para responder.
       web-color-show: 'El Reino de %s tiene un color de mapa web de: %s'
       web-color-set: 'Establecer el color de mapa web de %s a: %s'
+      offer-purchase: Enviaste una oferta para comprar la ciudad de %s al Reino de %s por %s.
+      offer-pending: Tu reino tiene ofertas de compra de ciudades pendientes. Usa "/k kingdom" y, a continuación, elige Ofertas de ciudades para responder.
+      offer-towns: Estas ciudades de tu reino tienen ofertas para ser compradas...
+      offer-players: Estos jugadores han ofrecido comprar la ciudad de %s...
+      offer-declined: Rechazó la oferta del jugador %s para comprar la ciudad de %s.
     error:
       barbarian-create: Debes ser un bárbaro para crear un reino. Usa la opción de Exilio en el menú del reino.
       invalid-template: '%s es una plantilla de monumento inválida. Verifica la ortografía o elige otra.'
