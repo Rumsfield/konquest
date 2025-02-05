@@ -70,9 +70,6 @@ public class InfoCommand extends CommandBase {
 					if(konquest.getKingdomManager().isKingdom(infoName)) {
 						konquest.getDisplayManager().displayInfoKingdomMenu(player, konquest.getKingdomManager().getKingdom(infoName));
 						return;
-					} else if(infoName.equalsIgnoreCase(konquest.getKingdomManager().getBarbarians().getName())) {
-						konquest.getDisplayManager().displayInfoKingdomMenu(player, konquest.getKingdomManager().getBarbarians());
-						return;
 					}
 					break;
 				case "capital":
@@ -150,9 +147,6 @@ public class InfoCommand extends CommandBase {
 					}
 					break;
 				case "kingdom":
-					tabList.addAll(konquest.getKingdomManager().getKingdomNames());
-					tabList.add(konquest.getKingdomManager().getBarbarians().getName());
-					break;
 				case "capital":
 					tabList.addAll(konquest.getKingdomManager().getKingdomNames());
 					break;

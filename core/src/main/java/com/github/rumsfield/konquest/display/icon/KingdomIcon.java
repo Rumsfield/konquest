@@ -46,13 +46,11 @@ public class KingdomIcon extends MenuIcon {
 			if (kingdom.isSmallest()) {
 				addProperty(MessagePath.LABEL_SMALLEST.getMessage());
 			}
-		}
-		addNameValue(MessagePath.LABEL_MEMBERS.getMessage(), kingdom.getNumMembers());
-		if(kingdom.isCreated()) {
 			int numKingdomLand = 0;
 			for (KonTown town : kingdom.getCapitalTowns()) {
 				numKingdomLand += town.getNumLand();
 			}
+			addNameValue(MessagePath.LABEL_MEMBERS.getMessage(), kingdom.getNumMembers());
 			addNameValue(MessagePath.LABEL_TOWNS.getMessage(), kingdom.getNumTowns());
 			addNameValue(MessagePath.LABEL_LAND.getMessage(), numKingdomLand);
 		}
