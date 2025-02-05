@@ -153,6 +153,8 @@ public class InfoMenu extends StateMenu {
         /* Players Icon */
         icon = new InfoIcon(MessagePath.LABEL_PLAYERS.getMessage(), Material.PLAYER_HEAD, ROOT_SLOT_PLAYERS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
+        int numPlayers = getKonquest().getPlayerManager().getAllKonquestOfflinePlayers().size();
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numPlayers);
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.PLAYER_LIST);
         result.addIcon(icon);
@@ -160,6 +162,8 @@ public class InfoMenu extends StateMenu {
         /* Kingdoms Icon */
         icon = new InfoIcon(MessagePath.LABEL_KINGDOMS.getMessage(), Material.DIAMOND_HELMET, ROOT_SLOT_KINGDOMS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
+        int numKingdoms = getKonquest().getKingdomManager().getKingdoms().size();
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numKingdoms);
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.KINGDOM_LIST);
         result.addIcon(icon);
@@ -167,6 +171,8 @@ public class InfoMenu extends StateMenu {
         /* Camps Icon */
         icon = new InfoIcon(MessagePath.LABEL_CAMPS.getMessage(), Material.ORANGE_BED, ROOT_SLOT_CAMPS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
+        int numCamps = getKonquest().getCampManager().getCamps().size();
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numCamps);
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.CAMP_LIST);
         result.addIcon(icon);
@@ -174,6 +180,8 @@ public class InfoMenu extends StateMenu {
         /* Ruins Icon */
         icon = new InfoIcon(MessagePath.LABEL_RUINS.getMessage(), Material.MOSSY_COBBLESTONE, ROOT_SLOT_RUINS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
+        int numRuins = getKonquest().getRuinManager().getRuins().size();
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numRuins);
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.RUIN_LIST);
         result.addIcon(icon);
@@ -181,6 +189,7 @@ public class InfoMenu extends StateMenu {
         /* Capitals Icon */
         icon = new InfoIcon(MessagePath.LABEL_CAPITALS.getMessage(), Material.NETHERITE_BLOCK, ROOT_SLOT_CAPITALS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numKingdoms);
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.CAPITAL_LIST);
         result.addIcon(icon);
@@ -188,6 +197,11 @@ public class InfoMenu extends StateMenu {
         /* Towns Icon */
         icon = new InfoIcon(MessagePath.LABEL_TOWNS.getMessage(), Material.OBSIDIAN, ROOT_SLOT_TOWNS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
+        int numTowns = 0;
+        for (KonKingdom kingdom : getKonquest().getKingdomManager().getKingdoms()) {
+            numTowns += kingdom.getNumTowns();
+        }
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numTowns);
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.TOWN_LIST);
         result.addIcon(icon);
@@ -195,6 +209,8 @@ public class InfoMenu extends StateMenu {
         /* Sanctuaries Icon */
         icon = new InfoIcon(MessagePath.LABEL_SANCTUARIES.getMessage(), Material.SMOOTH_QUARTZ, ROOT_SLOT_SANCTUARIES, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
+        int numSanctuaries = getKonquest().getSanctuaryManager().getSanctuaries().size();
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numSanctuaries);
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.SANCTUARY_LIST);
         result.addIcon(icon);
@@ -202,6 +218,8 @@ public class InfoMenu extends StateMenu {
         /* Monument Templates Icon */
         icon = new InfoIcon(MessagePath.LABEL_MONUMENT_TEMPLATES.getMessage(), Material.CRAFTING_TABLE, ROOT_SLOT_MONUMENTS, true);
         icon.addProperty(MessagePath.LABEL_INFORMATION.getMessage());
+        int numTemplates = getKonquest().getSanctuaryManager().getNumTemplates();
+        icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numTemplates);
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.MONUMENT_LIST);
         result.addIcon(icon);
@@ -315,7 +333,6 @@ public class InfoMenu extends StateMenu {
         switch (context) {
             case KINGDOM_LIST:
                 kingdoms.addAll(getKonquest().getKingdomManager().getKingdoms());
-                kingdoms.add(getKonquest().getKingdomManager().getBarbarians());
                 break;
             case MONUMENT_INFO_KINGDOMS:
                 if (infoTemplate != null) {
@@ -700,9 +717,9 @@ public class InfoMenu extends StateMenu {
         } else {
             icon.addAlert(MessagePath.LABEL_UNAVAILABLE.getMessage());
             if (infoPlayer.isBarbarian()) {
-                icon.addDescription(MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(infoPlayer.getOfflineBukkitPlayer().getName()));
+                icon.addError(MessagePath.COMMAND_SCORE_ERROR_BARBARIAN.getMessage(infoPlayer.getOfflineBukkitPlayer().getName()));
             } else {
-                icon.addDescription(MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(infoPlayer.getKingdom().getName()));
+                icon.addError(MessagePath.COMMAND_SCORE_ERROR_PEACEFUL.getMessage(infoPlayer.getKingdom().getName()));
             }
         }
         result.addIcon(icon);
